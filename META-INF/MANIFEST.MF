@@ -1,0 +1,16 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: AutoRefactor
+Bundle-SymbolicName: org.autorefactor;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: org.autorefactor.Activator
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.jdt.core;bundle-version="3.7.1",
+ org.eclipse.text;bundle-version="3.5.101",
+ org.eclipse.jface.text;bundle-version="3.7.1",
+ org.eclipse.jdt.ui;bundle-version="3.7.1"
+Bundle-ActivationPolicy: lazy
+# Need to follow Eclipse's supported JRE
+# unless dictated by functionalities
+Bundle-RequiredExecutionEnvironment: J2SE-1.5

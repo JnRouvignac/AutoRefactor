@@ -1,0 +1,5 @@
+Initial author, project lead, target of blame:
+
+Jean-Noël Rouvignac <jn.rouvignac@gmail.com>
+
+Other authors:

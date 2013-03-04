@@ -1,0 +1,69 @@
+<!--
+    AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
+
+    Copyright (C) 2013 Jean-Noël Rouvignac
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+    <extension point="org.eclipse.ui.menus">
+        <menuContribution locationURI="popup:org.eclipse.jdt.ui.PackageExplorer?after=org.eclipse.jdt.ui.refactoring.menu">
+            <command
+                    commandId="org.autorefactor.eclipse.ui.refactoring.apply"
+                    label="Auto Refactor"
+                    style="push">
+            </command>
+        </menuContribution>
+        <!-- Cannot add to Refactor sub menu: @see https://issues.jboss.org/browse/JBIDE-1077 from Alexey Kazakov:
+
+             More precisely @see https://issues.jboss.org/browse/JBIDE-1077#comment-12466929:
+			"Unfortunately we can't use this context menu... "Refactor" is assembled programmatically by JDT and it ignores any custom extensions."
+
+             and            @see https://issues.jboss.org/browse/JBIDE-1077#comment-12466953
+			"Me, Viktor and Denis tried to find a way to add any custom action in "Refactor" menu. We tried to use standard Eclipse extension points to point it to the same menu as JDT does but without success.
+			Viktor found out that JDT hard codes items for that menu and it seems that there is no way to add our item there. But it was almost a year ago and maybe JDT has changed something... I doubt that but anyway let's research it in Eclipse 3.5."
+
+			@see org.eclipse.jdt.ui.actions.RefactorActionGroup
+        -->
+        <menuContribution locationURI="popup:#CompilationUnitEditorContext?after=org.eclipse.jdt.ui.refactoring.menu">
+            <command
+                    commandId="org.autorefactor.eclipse.ui.refactoring.apply"
+                    label="Auto Refactor"
+                    style="push">
+            </command>
+        </menuContribution>
+    </extension>
+
+	<extension point="org.eclipse.ui.bindings">
+		<!-- @see http://www.vogella.com/articles/EclipseCommandsKeybindings/article.html -->
+		<!-- TODO JNR org.eclipse.ui.textEditorScope" schemeId="org.eclipse.ui.defaultAcceleratorConfiguration 
+						contextId="org.eclipse.ui.editors"
+		-->
+		<key
+				commandId="org.autorefactor.eclipse.ui.refactoring.apply"
+				contextId="org.eclipse.ui.contexts.window"
+				sequence="M2+M3+Y"
+				schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"/>
+	</extension>
+
+    <extension point="org.eclipse.ui.commands">
+        <command
+                id="org.autorefactor.eclipse.ui.refactoring.apply"
+                defaultHandler="org.autorefactor.eclipse.ui.refactoring.handler.RefactorHandler"
+                name="Refactor">
+        </command>
+    </extension>
+</plugin>

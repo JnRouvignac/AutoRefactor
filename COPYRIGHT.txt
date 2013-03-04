@@ -1,0 +1,17 @@
+Short version for non-lawyers:
+
+The AutoRefactor Project is dual-licensed under Eclipse Public License v1.0
+and GNU General Public License v3+ terms.
+
+
+Longer version:
+
+The AutoRefactor Project is copyright 2013, The AutoRefactor Project
+Developers (given in the file AUTHORS.txt).
+
+Licensed under the Eclipse Public License, Version 1.0 <LICENSE-ECLIPSE or
+http://wiki.eclipse.org/EPL> or the GNU General Public License, Version 3.0 or
+any later version <LICENSE-GNUGPL or http://www.gnu.org/licenses/gpl-3.0.html>,
+at your option. All files in the project carrying such notice may not be
+copied, modified, or distributed except according to those terms.
+
