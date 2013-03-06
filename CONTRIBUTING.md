@@ -1,5 +1,5 @@
 TODO!!!
 
-Set the cipyright on AUTHORS.txt and add a line to each file you modify with name + email + work you did.
+Add your name to AUTHORS.txt and add a line to each file you modify with (C) name + email + work you did.
 
-See the eclipse/ folder for Eclipse settings.
+Setup the eclipse/ folder for Eclipse settings.
