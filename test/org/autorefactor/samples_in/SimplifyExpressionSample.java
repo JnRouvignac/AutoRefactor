@@ -43,14 +43,14 @@ public class SimplifyExpressionSample {
             boolean b2 = null != args[0] && args[0] instanceof String;
         }
         {
-            // Remove redundant left / write hand operands
+            // Remove redundant left / write hand side operands
             boolean b3 = true && args[0] != null;
             boolean b4 = false && args[0] != null;
             boolean b5 = true || args[0] != null;
             boolean b6 = false || args[0] != null;
         }
         {
-            // Right hand side left unchanged because left hand side can have
+            // Right-hand-side left unchanged because left-hand-side can have
             // side effects
             boolean b3 = args[0] != null && true;
             boolean b4 = args[0] != null && false;
@@ -155,7 +155,7 @@ public class SimplifyExpressionSample {
         }
     }
 
-    public void simplifyBooleanExpression(boolean b) {
+    public void simplifyPrimitiveBooleanExpression(boolean b) {
         if (b == true) {
             int i = 0;
         }
@@ -168,6 +168,36 @@ public class SimplifyExpressionSample {
         if (b != true) {
             int i = 0;
         }
+        if (b == Boolean.TRUE) {
+            int i = 0;
+        }
+        if (b != Boolean.FALSE) {
+            int i = 0;
+        }
+        if (b == Boolean.FALSE) {
+            int i = 0;
+        }
+        if (b != Boolean.TRUE) {
+            int i = 0;
+        }
+    }
+
+    public void simplifyBooleanWrapperExpression(Boolean b) {
+        if (b == true) {
+            int i = 0;
+        }
+        if (b != false) {
+            int i = 0;
+        }
+        if (b == false) {
+            int i = 0;
+        }
+        if (b != true) {
+            int i = 0;
+        }
+    }
+
+    public void doNotSimplifyBooleanWrapperExpression(Boolean b) {
         if (b == Boolean.TRUE) {
             int i = 0;
         }

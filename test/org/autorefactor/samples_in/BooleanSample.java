@@ -235,6 +235,8 @@ public class BooleanSample {
         }
     }
 
+    // TODO redo the next 4 with Boolean object
+
     public boolean removeUselessIfInBooleanPrimitiveAssignment7(boolean bo) {
         if (bo) {
             return aMethodThatReturnsBoolean();
@@ -262,6 +264,11 @@ public class BooleanSample {
         }
         return aMethodThatReturnsBoolean();
     }
+
+    // TODO aMethodThatAcceptsABoolean(bo ? true : false);
+    // TODO aMethodThatAcceptsABoolean(bo ? false : true);
+    // TODO aMethodThatAcceptsABoolean(bo ? Boolean.TRUE : Boolean.FALSE);
+    // TODO aMethodThatAcceptsABoolean(bo ? Boolean.FALSE : Boolean.TRUE);
 
     public void removeUselessIfInBooleanPrimitiveExpression10(boolean bo) {
         if (bo) {
