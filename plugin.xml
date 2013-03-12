@@ -1,3 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
 <!--
     AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
 
@@ -23,8 +25,6 @@
     which accompanies this distribution under LICENSE-ECLIPSE, and is
     available at http://www.eclipse.org/legal/epl-v10.html
 -->
-<?xml version="1.0" encoding="UTF-8"?>
-<?eclipse version="3.4"?>
 <plugin>
     <extension point="org.eclipse.ui.menus">
         <menuContribution locationURI="popup:org.eclipse.jdt.ui.PackageExplorer?after=org.eclipse.jdt.ui.refactoring.menu">
