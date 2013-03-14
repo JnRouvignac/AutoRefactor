@@ -143,7 +143,7 @@ public class AutoRefactorHandler extends AbstractHandler {
 		 * <pre>
 		 * Caused by: java.lang.IllegalArgumentException: This API can only be used if the AST is created from a compilation unit or class file
 		 * 	at org.eclipse.jdt.core.dom.rewrite.ASTRewrite.rewriteAST(ASTRewrite.java:272)
-		 * 	at org.autorefactor.eclipse.ui.refactoring.handler.RefactorHandler.applyRefactorings(RefactorHandler.java:367)
+		 * 	at org.autorefactor.ui.AutoRefactorHandler.applyRefactorings(RefactorHandler.java:367)
 		 * </pre>
 		 */
 		private void testWithSamples() {

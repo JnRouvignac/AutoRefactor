@@ -29,7 +29,7 @@
     <extension point="org.eclipse.ui.menus">
         <menuContribution locationURI="popup:org.eclipse.jdt.ui.PackageExplorer?after=org.eclipse.jdt.ui.refactoring.menu">
             <command
-                    commandId="org.autorefactor.eclipse.ui.refactoring.apply"
+                    commandId="org.autorefactor.ui.handler"
                     label="Auto Refactor"
                     style="push">
             </command>
@@ -47,7 +47,7 @@
         -->
         <menuContribution locationURI="popup:#CompilationUnitEditorContext?after=org.eclipse.jdt.ui.refactoring.menu">
             <command
-                    commandId="org.autorefactor.eclipse.ui.refactoring.apply"
+                    commandId="org.autorefactor.ui.handler"
                     label="Auto Refactor"
                     style="push">
             </command>
@@ -60,7 +60,7 @@
 						contextId="org.eclipse.ui.editors"
 		-->
 		<key
-				commandId="org.autorefactor.eclipse.ui.refactoring.apply"
+				commandId="org.autorefactor.ui.handler"
 				contextId="org.eclipse.ui.contexts.window"
 				sequence="M2+M3+Y"
 				schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"/>
@@ -68,8 +68,8 @@
 
     <extension point="org.eclipse.ui.commands">
         <command
-                id="org.autorefactor.eclipse.ui.refactoring.apply"
-                defaultHandler="org.autorefactor.eclipse.ui.refactoring.handler.RefactorHandler"
+                id="org.autorefactor.ui.handler"
+                defaultHandler="org.autorefactor.ui.AutoRefactorHandler"
                 name="Refactor">
         </command>
     </extension>
