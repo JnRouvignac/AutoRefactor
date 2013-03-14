@@ -137,15 +137,15 @@ public class SimplifyExpressionSample {
     }
 
     public void removeThisExpression() {
-        this.simplifyBooleanExpression(false);
-        SimplifyExpressionSample.this.simplifyBooleanExpression(false);
+        this.simplifyPrimitiveBooleanExpression(false);
+        SimplifyExpressionSample.this.simplifyPrimitiveBooleanExpression(false);
     }
 
     public class InnerClass {
 
         public void removeThisExpression() {
             this.simplifyBooleanExpression(false);
-            SimplifyExpressionSample.this.simplifyBooleanExpression(false);
+            SimplifyExpressionSample.this.simplifyPrimitiveBooleanExpression(false);
             InnerClass.this.simplifyBooleanExpression(false);
             SimplifyExpressionSample.InnerClass.this
                     .simplifyBooleanExpression(false);

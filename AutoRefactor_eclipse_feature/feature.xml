@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
-      id="AutoRefactor_eclipse_feature"
-      label="AutoRefactor_eclipse_feature"
+      id="org.autorefactor.feature"
+      label="AutoRefactor"
       version="0.0.1.qualifier">
 
    <description url="http://autorefactor.org">
@@ -17,10 +17,10 @@
    </license>
 
    <plugin
-         id="org.autorefactor"
+         id="org.autorefactor.plugin"
          download-size="0"
          install-size="0"
-         version="0.0.1.qualifier"
+         version="0.0.0"
          unpack="false"/>
 
 </feature>
