@@ -27,15 +27,21 @@ package org.autorefactor.samples_out;
 
 public class CollapseIfStatementSample {
 
-    public void collapseIfStatements(Boolean b1, Boolean b2) {
-        if (b1.booleanValue() && b2.booleanValue()) {
+    public void collapseIfStatements(boolean b1, boolean b2) {
+        if (b1 && b2) {
             int i = 0;
         }
     }
 
-    public void doNotCollapseOuterIfWithElseStatement(Boolean b1, Boolean b2) {
-        if (b1.booleanValue()) {
-            if (b2.booleanValue()) {
+    public void collapseIfStatementsAddParenthesesIfDifferentConditionalOperator(boolean b1, boolean b2, boolean b3) {
+        if (b1 && (b2 || b3)) {
+			int i = 0;
+		}
+    }
+
+    public void doNotCollapseOuterIfWithElseStatement(boolean b1, boolean b2) {
+        if (b1) {
+            if (b2) {
                 int i = 0;
             }
         } else {
@@ -43,13 +49,9 @@ public class CollapseIfStatementSample {
         }
     }
 
-    public void doNotCollapseIfWithElseStatement2(Boolean b1, Boolean b2) {
-        if (b1.booleanValue()) {
-            if (b2.booleanValue()) {
-                int i = 0;
-            } else {
-                int i = 0;
-            }
+    public void doNotCollapseIfWithElseStatement2(boolean b1, boolean b2) {
+        if (b1) {
+            int i = 0;
         }
     }
 

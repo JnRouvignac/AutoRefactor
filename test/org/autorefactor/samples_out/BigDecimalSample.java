@@ -30,19 +30,45 @@ import java.math.BigDecimal;
 public class BigDecimalSample {
 
     public static void main(String[] args) {
-        // should use a string to initialize
-        BigDecimal bd1 = new BigDecimal("123.345");
-        // should use a string to initialize
-        BigDecimal bd2 = new BigDecimal("123.345");
+        {
+            // should use a string to initialize
+            BigDecimal bd1 = new BigDecimal("123.345");
+            BigDecimal bd2 = new BigDecimal("123.345");
+            // should not be touched
+            BigDecimal bd3 = BigDecimal.valueOf(123);
+            BigDecimal bd4 = BigDecimal.valueOf(123);
 
-        // should use compareTo() == 0
-        boolean b = bd1.compareTo(bd2) == 0;
-        // should use compareTo() == 0 with parentheses
-        String s = "" + (bd1.compareTo(bd2) == 0);
-        // should use compareTo() == 0 with parentheses
-        String s2 = "" + 1 + (bd1.compareTo(bd2) == 0) + 2;
-        // should use compareTo() == 0 with parentheses
-        String s3 = ("" + 1) + (bd1.compareTo(bd2) == 0);
+            // should use compareTo() == 0
+            boolean b = bd1.compareTo(bd2) == 0;
+            // should use compareTo() == 0 with parentheses
+            String s = "" + (bd1.compareTo(bd2) == 0);
+            // should use compareTo() == 0 with parentheses
+            String s2 = "" + 1 + (bd1.compareTo(bd2) == 0) + 2;
+            // should use compareTo() == 0 with parentheses
+            String s3 = "" + 1 + (bd1.compareTo(bd2) == 0);
+        }
+
+        {
+            BigDecimal bd1 = BigDecimal.ZERO;
+            BigDecimal bd2 = BigDecimal.ONE;
+            BigDecimal bd3 = BigDecimal.TEN;
+            BigDecimal bd4 = BigDecimal.valueOf(5);
+            BigDecimal bd5 = new BigDecimal("5.4");
+        }
+        {
+            BigDecimal bd1 = BigDecimal.ZERO;
+            BigDecimal bd2 = BigDecimal.ONE;
+            BigDecimal bd3 = BigDecimal.TEN;
+            BigDecimal bd4 = BigDecimal.valueOf(5);
+            BigDecimal bd5 = new BigDecimal("5.4");
+        }
+        {
+            BigDecimal bd1 = BigDecimal.ZERO;
+            BigDecimal bd2 = BigDecimal.ONE;
+            BigDecimal bd3 = BigDecimal.TEN;
+            BigDecimal bd4 = BigDecimal.valueOf(5);
+            BigDecimal bd5 = new BigDecimal("5.4");
+        }
     }
 
 }

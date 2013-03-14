@@ -30,16 +30,21 @@ public class RemoveUnnecessaryLocalBeforeReturnSample {
     private int i;
 
     public int inlineLocalVariableDeclaration() {
-         return 0;
+        return 0;
     }
 
     public int inlineLocalVariableAssignment(int i) {
-         return 0;
+        return 0;
     }
 
-    public int notInlineFieldAssignment() {
-         this.i = 0;
-         return i;
+    public int notInlineFieldAssignment1() {
+        i = 0;
+        return i;
+    }
+
+    public int notInlineFieldAssignment2() {
+        this.i = 0;
+        return i;
     }
 
 }

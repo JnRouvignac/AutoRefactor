@@ -27,13 +27,20 @@ package org.autorefactor.samples_out;
 
 public class StringSample {
 
-    public static void main(String[] args) {
+    public String main() {
+        // replace
         String s = "";
 
+        // replace
         String s2 = s;
         String s3 = "";
         String s4 = "";
         String s5 = getS();
+        // replace
+        String s6 = "" + Boolean.TRUE;
+        // do not replace
+        String s7 = Boolean.TRUE.toString();
+        return Boolean.TRUE.toString();
     }
 
     private static String getS() {

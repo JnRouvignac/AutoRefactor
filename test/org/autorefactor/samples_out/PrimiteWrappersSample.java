@@ -27,7 +27,7 @@ package org.autorefactor.samples_out;
 
 public class PrimiteWrappersSample {
 
-    public static void main(String[] args) {
+    public static void replaceWrapperConstructorsWithValueOf() {
         // Replace all calls to wrapper constructors with calls to .valueOf() methods
         byte b = 4;
         Byte by = Byte.valueOf(b);
@@ -39,5 +39,15 @@ public class PrimiteWrappersSample {
         short s = 1;
         Short sh = Short.valueOf(s);
         Integer i = Integer.valueOf(1);
+    }
+
+    public static void removeUnnecessaryObjectCreation() {
+        Byte.parseByte("0");
+        Boolean.valueOf("true");
+        Integer.parseInt("42"); 
+        Long.parseLong("42"); 
+        // nothing for Short?
+        Float.parseFloat("42.42");
+        Double.parseDouble("42.42");
     }
 }

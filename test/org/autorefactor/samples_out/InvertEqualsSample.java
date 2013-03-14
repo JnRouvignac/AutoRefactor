@@ -25,8 +25,6 @@
  */
 package org.autorefactor.samples_out;
 
-import org.autorefactor.samples_in.InvertEqualsSample.Itf;
-
 public class InvertEqualsSample {
 
     public static interface Itf {

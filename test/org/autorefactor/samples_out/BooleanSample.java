@@ -27,6 +27,9 @@ package org.autorefactor.samples_out;
 
 public class BooleanSample {
 
+    private boolean f;
+    private Boolean g;
+
     public void useBooleanConstants() {
         Boolean b1 = Boolean.TRUE;
         Boolean b2 = Boolean.FALSE;
@@ -118,12 +121,81 @@ public class BooleanSample {
         b = bo;
     }
 
+    public void removeUselessIfInBooleanPrimitiveAssignmentSearchFurtherAwayForPreviousSibling(
+            boolean bo, boolean b) {
+        b = false;
+        char c = 'a';
+        byte by = 0;
+        double d = 0.0;
+        if (bo) {
+            b = true;
+        }
+    }
+
     public void removeUselessIfInBooleanObjectAssignment3(boolean bo, Boolean b) {
         b = Boolean.valueOf(!bo);
     }
 
     public void removeUselessIfInBooleanObjectAssignment4(boolean bo, Boolean b) {
         b = Boolean.valueOf(bo);
+    }
+
+    public void removeUselessIfInBooleanPrimitiveAssignment5(boolean bo) {
+        this.f = bo;
+    }
+
+    public void removeUselessIfInBooleanObjectAssignment5(boolean bo) {
+        this.g = Boolean.valueOf(bo);
+    }
+
+    public void removeUselessIfInBooleanPrimitiveAssignment6(boolean bo) {
+        f = bo;
+    }
+
+    public void removeUselessIfInBooleanObjectAssignment6(boolean bo) {
+        g = Boolean.valueOf(bo);
+    }
+
+    public void removeUselessIfInBooleanObjectAssignment7(boolean bo) {
+        BooleanSample.this.g = Boolean.valueOf(bo);
+    }
+
+    // TODO redo the next 4 with Boolean object
+
+    public boolean removeUselessIfInBooleanPrimitiveAssignment7(boolean bo) {
+        return bo && aMethodThatReturnsBoolean();
+    }
+
+    public boolean removeUselessIfInBooleanPrimitiveAssignment8(boolean bo) {
+        return !bo || aMethodThatReturnsBoolean();
+    }
+
+    public boolean removeUselessIfInBooleanPrimitiveAssignment9(boolean bo) {
+        return !bo && aMethodThatReturnsBoolean();
+    }
+
+    public boolean removeUselessIfInBooleanPrimitiveAssignment10(boolean bo) {
+        return bo || aMethodThatReturnsBoolean();
+    }
+
+    // TODO aMethodThatAcceptsABoolean(bo ? true : false);
+    // TODO aMethodThatAcceptsABoolean(bo ? false : true);
+    // TODO aMethodThatAcceptsABoolean(bo ? Boolean.TRUE : Boolean.FALSE);
+    // TODO aMethodThatAcceptsABoolean(bo ? Boolean.FALSE : Boolean.TRUE);
+
+    public void removeUselessIfInBooleanPrimitiveExpression10(boolean bo) {
+        aMethodThatAcceptsABoolean(bo);
+    }
+
+    public void removeUselessIfInBooleanPrimitiveExpression11(boolean bo) {
+        aMethodThatAcceptsABoolean(!bo);
+    }
+
+    private boolean aMethodThatReturnsBoolean() {
+        return false;
+    }
+
+    private void aMethodThatAcceptsABoolean(boolean b) {
     }
 
 }

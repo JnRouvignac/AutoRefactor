@@ -26,10 +26,12 @@
 package org.autorefactor.samples_out;
 
 import java.util.Collection;
+import java.util.Date;
+import java.util.List;
 
 public class SimplifyExpressionSample {
 
-    public static void main(String[] args) {
+    public void removeUselessNullCheck(String[] args) {
         {
             // Remove redundant null checks
             boolean b1 = "".equals(args[0]);
@@ -41,14 +43,14 @@ public class SimplifyExpressionSample {
             boolean b2 = args[0] instanceof String;
         }
         {
-            // Remove redundant left / write hand operands
+            // Remove redundant left / write hand side operands
             boolean b3 = args[0] != null;
             boolean b4 = false;
             boolean b5 = true;
             boolean b6 = args[0] != null;
         }
         {
-            // Right hand side left unchanged because left hand side can have
+            // Right-hand-side left unchanged because left-hand-side can have
             // side effects
             boolean b3 = args[0] != null && true;
             boolean b4 = args[0] != null && false;
@@ -57,7 +59,7 @@ public class SimplifyExpressionSample {
         }
     }
 
-    public void compareToTest() {
+    public void fixCompareToUsage() {
         boolean b;
         final String s = "";
 
@@ -78,7 +80,24 @@ public class SimplifyExpressionSample {
         b = s.compareToIgnoreCase("") > 0;
     }
 
-    public boolean simplifyExpression() throws Exception {
+    public void borderLineParenthezisedExpressions(Integer i) throws Exception {
+        // Do not replace any because they are in a String concatenation
+        String s1 = ((Number) i).doubleValue() + "";
+        String s2 = (i instanceof Number) + "";
+        String s3 = (i + 0) + "";
+
+        // replace
+        boolean b1 = ((Number) i).doubleValue() == 0;
+        // replace
+        boolean b2 = i instanceof Number;
+        // do not replace
+        boolean b3 = (i + 0) == 0;
+        // do not replace
+        Collection<?> c = null;
+        Object obj = ((List<?>) c).get(0);
+    }
+
+    public boolean removeUselessParentheses() throws Exception {
         boolean b = true;
         int i;
         Collection<?> col = null;

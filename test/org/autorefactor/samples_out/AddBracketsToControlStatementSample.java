@@ -32,6 +32,7 @@ public class AddBracketsToControlStatementSample {
     public static void main(String[] args) {
         int i = 0;
         i++;
+
         if (true) {
             i++;
         } else if (false) {
