@@ -139,13 +139,15 @@ public class SimplifyExpressionSample {
         System.out.println(i1 ^ (i2 ^ i3));
     }
 
-    public void doNotRemoveParenthesesWithNonAssociativeOperators(boolean b1,
-            boolean b2, boolean b3) {
-        int i1 = 0;
-        int i2 = 0;
-        int i3 = 0;
+    public void doNotRemoveParenthesesWithNonAssociativeOperators(int i1,
+            int i2, int i3) {
         System.out.println(i1 - (i2 - i3));
         System.out.println(i1 / (i2 / i3));
+    }
+
+    public void doNotRemoveParenthesesDueToOperatorsPriority(int i1,
+            int i2, int i3) {
+        System.out.println((i1 + i2) / i3);
     }
 
     public void removeThisExpression() {
