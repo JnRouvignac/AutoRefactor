@@ -124,4 +124,106 @@ public class SimplifyExpressionSample {
         }
         return b;
     }
+
+    public void removeUselessParenthesesWithAssociativeOperators(boolean b1,
+            boolean b2, boolean b3) {
+        System.out.println(b1 && b2 && b3);
+        System.out.println(b1 || b2 || b3);
+        int i1 = 0;
+        int i2 = 0;
+        int i3 = 0;
+        System.out.println(i1 * i2 * i3);
+        System.out.println(i1 + i2 + i3);
+        System.out.println(i1 & i2 & i3);
+        System.out.println(i1 | i2 | i3);
+        System.out.println(i1 ^ i2 ^ i3);
+    }
+
+    public void doNotRemoveParenthesesWithNonAssociativeOperators(boolean b1,
+            boolean b2, boolean b3) {
+        int i1 = 0;
+        int i2 = 0;
+        int i3 = 0;
+        System.out.println(i1 - (i2 - i3));
+        System.out.println(i1 / (i2 / i3));
+    }
+
+    public void removeThisExpression() {
+        simplifyPrimitiveBooleanExpression(false);
+        simplifyPrimitiveBooleanExpression(false);
+    }
+
+    public class InnerClass {
+
+        public void removeThisExpression() {
+            simplifyBooleanExpression(false);
+            simplifyBooleanExpression(false);
+            simplifyBooleanExpression(false);
+        }
+
+        public void doNotRemoveThisExpression() {
+            SimplifyExpressionSample.this.simplifyPrimitiveBooleanExpression(false);
+        }
+
+        public void simplifyBooleanExpression(boolean b) {
+        }
+    }
+
+    public void simplifyPrimitiveBooleanExpression(boolean b) {
+        if (b) {
+            int i = 0;
+        }
+        if (b) {
+            int i = 0;
+        }
+        if (!b) {
+            int i = 0;
+        }
+        if (!b) {
+            int i = 0;
+        }
+        if (b) {
+            int i = 0;
+        }
+        if (b) {
+            int i = 0;
+        }
+        if (!b) {
+            int i = 0;
+        }
+        if (!b) {
+            int i = 0;
+        }
+    }
+
+    public void simplifyBooleanWrapperExpression(Boolean b) {
+        if (b) {
+            int i = 0;
+        }
+        if (b) {
+            int i = 0;
+        }
+        if (!b) {
+            int i = 0;
+        }
+        if (!b) {
+            int i = 0;
+        }
+    }
+
+    public void doNotSimplifyBooleanWrapperExpression(Boolean b) {
+        if (b == Boolean.TRUE) {
+            int i = 0;
+        }
+        if (b != Boolean.FALSE) {
+            int i = 0;
+        }
+        if (b == Boolean.FALSE) {
+            int i = 0;
+        }
+        if (b != Boolean.TRUE) {
+            int i = 0;
+        }
+    }
+
 }

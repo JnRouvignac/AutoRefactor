@@ -125,14 +125,27 @@ public class SimplifyExpressionSample {
         return ((b));
     }
 
-    public void removeUselessParenthesesInInfixExpression(boolean b1,
+    public void removeUselessParenthesesWithAssociativeOperators(boolean b1,
             boolean b2, boolean b3) {
-        if (b1 && (b2 && b3)) {
-            int i;
-        }
-        if (b1 || (b2 || b3)) {
-            int i;
-        }
+        System.out.println(b1 && (b2 && b3));
+        System.out.println(b1 || (b2 || b3));
+        int i1 = 0;
+        int i2 = 0;
+        int i3 = 0;
+        System.out.println(i1 * (i2 * i3));
+        System.out.println(i1 + (i2 + i3));
+        System.out.println(i1 & (i2 & i3));
+        System.out.println(i1 | (i2 | i3));
+        System.out.println(i1 ^ (i2 ^ i3));
+    }
+
+    public void doNotRemoveParenthesesWithNonAssociativeOperators(boolean b1,
+            boolean b2, boolean b3) {
+        int i1 = 0;
+        int i2 = 0;
+        int i3 = 0;
+        System.out.println(i1 - (i2 - i3));
+        System.out.println(i1 / (i2 / i3));
     }
 
     public void removeThisExpression() {
@@ -144,10 +157,13 @@ public class SimplifyExpressionSample {
 
         public void removeThisExpression() {
             this.simplifyBooleanExpression(false);
-            SimplifyExpressionSample.this.simplifyPrimitiveBooleanExpression(false);
             InnerClass.this.simplifyBooleanExpression(false);
             SimplifyExpressionSample.InnerClass.this
                     .simplifyBooleanExpression(false);
+        }
+
+        public void doNotRemoveThisExpression() {
+            SimplifyExpressionSample.this.simplifyPrimitiveBooleanExpression(false);
         }
 
         public void simplifyBooleanExpression(boolean b) {
@@ -210,4 +226,5 @@ public class SimplifyExpressionSample {
             int i = 0;
         }
     }
+
 }

@@ -121,16 +121,39 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
 				return node;
 			}
 		}
+		if (innerExpr instanceof InfixExpression
+				&& parent instanceof InfixExpression) {
+			final InfixExpression innerInfixExpr = (InfixExpression) innerExpr;
+			final InfixExpression parentInfixExpr = (InfixExpression) parent;
+			final Operator innerOp = innerInfixExpr.getOperator();
+			if (innerOp == parentInfixExpr.getOperator()
+					&& isAssociativeOperator(innerOp)
+					// Leave String concatenations with mixed type
+					// to other if statements in this method.
+					&& innerExpr.resolveTypeBinding().equals(
+							parentInfixExpr.resolveTypeBinding())) {
+				return innerExpr;
+			}
+		}
 		if (
 		// TODO JNR can we revert the InfixExpression?
 		// parentheses are sometimes needed to explicit code,
 		// some like it like that
 		innerExpr instanceof InfixExpression
-		// TODO JNR is the cast required or can it be removed?
+		// TODO JNR add additional code to check if the cast i really required
+		// or if it can be removed.
 				|| innerExpr instanceof CastExpression) {
 			return node;
 		}
 		return innerExpr;
+	}
+
+	private boolean isAssociativeOperator(final Operator innerOp) {
+		return innerOp == Operator.CONDITIONAL_AND
+				|| innerOp == Operator.CONDITIONAL_OR
+				|| innerOp == Operator.PLUS || innerOp == Operator.TIMES
+				|| innerOp == Operator.AND || innerOp == Operator.OR
+				|| innerOp == Operator.XOR;
 	}
 
 	@Override
@@ -145,16 +168,19 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
 			if (ASTHelper.instanceOf(typeBinding, "java.lang.Comparable")
 					&& node.arguments().size() == 1) {
 				replaceInfixExpressionIfNeeded(node.getParent());
+				return ASTHelper.DO_NOT_VISIT_SUBTREE;
 			} else if (ASTHelper
 					.instanceOf(typeBinding, "java.lang.Comparator")
 					&& node.arguments().size() == 2) {
 				replaceInfixExpressionIfNeeded(node.getParent());
+				return ASTHelper.DO_NOT_VISIT_SUBTREE;
 			}
 		} else if (javaMinorVersion >= 2
 				&& "compareToIgnoreCase".equals(node.getName().getIdentifier())
 				&& ASTHelper.instanceOf(typeBinding, "java.lang.String")
 				&& node.arguments().size() == 1) {
 			replaceInfixExpressionIfNeeded(node.getParent());
+			return ASTHelper.DO_NOT_VISIT_SUBTREE;
 		} else {
 			ThisExpression te = ASTHelper.as(node.getExpression(),
 					ThisExpression.class);
@@ -163,9 +189,10 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
 							te.getQualifier(), node)) {
 				// remove useless thisExpressions
 				this.refactorings.remove(node.getExpression());
+				return ASTHelper.DO_NOT_VISIT_SUBTREE;
 			}
 		}
-		return ASTHelper.DO_NOT_VISIT_SUBTREE;
+		return ASTHelper.VISIT_SUBTREE;
 	}
 
 	private void replaceInfixExpressionIfNeeded(ASTNode expr) {
@@ -275,8 +302,23 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
 		return ASTHelper.VISIT_SUBTREE;
 	}
 
+	private boolean isPrimitiveBool(Expression expr) {
+		ITypeBinding typeBinding = expr.resolveTypeBinding();
+		return typeBinding.isPrimitive()
+				&& "boolean".equals(typeBinding.getQualifiedName());
+	}
+
 	private void replace(InfixExpression node, boolean negate,
 			Expression exprToCopy) {
+		if (!isPrimitiveBool(node.getLeftOperand())
+				&& !isPrimitiveBool(node.getRightOperand())) {
+			return;
+		}
+		// Either:
+		// - Two boolean primitives: no possible NPE
+		// - One boolean primitive and one Boolean object, this code already run
+		// the risk of an NPE, so we can replace the infix expression without
+		// fearing we would introduce a previously non existing NPE.
 		Expression operand;
 		if (negate) {
 			operand = ASTHelper.copySubtree(this.ast, exprToCopy);
