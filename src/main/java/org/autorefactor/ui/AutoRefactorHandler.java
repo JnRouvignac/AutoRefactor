@@ -43,7 +43,6 @@ import org.autorefactor.refactoring.rules.BigDecimalRefactorings;
 import org.autorefactor.refactoring.rules.BooleanRefactoring;
 import org.autorefactor.refactoring.rules.CollapseIfStatementRefactoring;
 import org.autorefactor.refactoring.rules.CommonCodeInIfElseStatementRefactoring;
-import org.autorefactor.refactoring.rules.ForeachRefactoring;
 import org.autorefactor.refactoring.rules.InvertEqualsRefactoring;
 import org.autorefactor.refactoring.rules.PrimitiveWrapperCreationRefactoring;
 import org.autorefactor.refactoring.rules.RemoveEmptyCommentsRefactoring;
@@ -255,7 +254,7 @@ public class AutoRefactorHandler extends AbstractHandler {
 						"This action only works on Java source files");
 			}
 		} else if ("org.eclipse.jdt.ui.PackageExplorer".equals(activePartId)) {
-			final ISelection sel = HandlerUtil.getActiveMenuSelection(event);
+			final ISelection sel = HandlerUtil.getCurrentSelection(event);
 			final IStructuredSelection selection = (IStructuredSelection) sel;
 			final Object firstElement = selection.getFirstElement();
 			if (firstElement instanceof ICompilationUnit) {

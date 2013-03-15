@@ -26,7 +26,6 @@
 package org.autorefactor.samples_out;
 
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 
 public class SimplifyExpressionSample {
