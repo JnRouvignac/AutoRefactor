@@ -28,8 +28,7 @@ package org.autorefactor.samples_in;
 public class PrimiteWrappersSample {
 
     public static void replaceWrapperConstructorsWithValueOf() {
-        // Replace all calls to wrapper constructors with calls to .valueOf()
-        // methods
+        // Replace all calls to wrapper constructors with calls to .valueOf() methods
         byte b = 4;
         Byte by = new Byte(b);
         Boolean bo = new Boolean(true);

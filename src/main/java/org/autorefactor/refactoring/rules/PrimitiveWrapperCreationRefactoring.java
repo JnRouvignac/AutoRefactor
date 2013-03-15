@@ -69,6 +69,9 @@ public class PrimitiveWrapperCreationRefactoring extends ASTVisitor implements
 	// context)
 
 	public boolean visit(MethodInvocation node) {
+		if (node.getExpression() == null) {
+			return ASTHelper.VISIT_SUBTREE;
+		}
 		final ITypeBinding typeBinding = node.getExpression()
 				.resolveTypeBinding();
 		if (typeBinding != null
@@ -128,7 +131,7 @@ public class PrimitiveWrapperCreationRefactoring extends ASTVisitor implements
 	public boolean visit(ClassInstanceCreation node) {
 		final ITypeBinding typeBinding = node.getType().resolveBinding();
 		if (javaMinorVersion >= 5 && typeBinding != null
-				&& node.arguments().size() == 0) {
+				&& node.arguments().size() == 1) {
 			final String qualifiedName = typeBinding.getQualifiedName();
 			if ("java.lang.Boolean".equals(qualifiedName)
 					|| "java.lang.Byte".equals(qualifiedName)
