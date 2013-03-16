@@ -125,6 +125,21 @@ public class SimplifyExpressionSample {
         return b;
     }
 
+	public int removeUselessParenthesesInStatements(int i) {
+		int j = i;
+		j = i;
+		if (j == 0) {
+			removeUselessParenthesesInStatements(i);
+		}
+		do {
+			i++;
+		} while (i == 0);
+		while (i == 0) {
+			i++;
+		}
+		return (i);
+	}
+
     public void removeUselessParenthesesWithAssociativeOperators(boolean b1,
             boolean b2, boolean b3) {
         System.out.println(b1 && b2 && b3);

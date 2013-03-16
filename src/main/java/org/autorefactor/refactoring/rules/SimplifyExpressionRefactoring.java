@@ -33,10 +33,13 @@ import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTMatcher;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
+import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.CastExpression;
 import org.eclipse.jdt.core.dom.CompilationUnit;
+import org.eclipse.jdt.core.dom.DoStatement;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ITypeBinding;
+import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.InfixExpression.Operator;
 import org.eclipse.jdt.core.dom.InstanceofExpression;
@@ -44,7 +47,11 @@ import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.NullLiteral;
 import org.eclipse.jdt.core.dom.ParenthesizedExpression;
 import org.eclipse.jdt.core.dom.PrefixExpression;
+import org.eclipse.jdt.core.dom.ReturnStatement;
+import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.ThisExpression;
+import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
+import org.eclipse.jdt.core.dom.WhileStatement;
 
 /**
  * Simplify Java expressions:
@@ -111,16 +118,6 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
 		if (innerExpr instanceof ParenthesizedExpression) {
 			return getExpressionWithoutParentheses((ParenthesizedExpression) innerExpr);
 		}
-		if (parent instanceof InfixExpression) {
-			final InfixExpression parentInfixExpr = (InfixExpression) parent;
-			if (innerExpr instanceof InstanceofExpression
-					&& !ASTHelper.hasType(innerExpr, "java.lang.String")
-					&& ASTHelper.hasType(parentInfixExpr, "java.lang.String")) {
-				// The parentheses hold an InfixExpression that does not resolve
-				// to String but is inside a String concatenation
-				return node;
-			}
-		}
 		if (innerExpr instanceof InfixExpression
 				&& parent instanceof InfixExpression) {
 			final InfixExpression innerInfixExpr = (InfixExpression) innerExpr;
@@ -135,8 +132,21 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
 				return innerExpr;
 			}
 		}
+		if (parent instanceof InfixExpression) {
+			final InfixExpression parentInfixExpr = (InfixExpression) parent;
+			if (innerExpr instanceof InstanceofExpression
+					&& !ASTHelper.hasType(innerExpr, "java.lang.String")
+					&& ASTHelper.hasType(parentInfixExpr, "java.lang.String")) {
+				// The parentheses hold an InfixExpression that does not resolve
+				// to String but is inside a String concatenation
+				return node;
+			}
+		}
+		if (isUselessParenthesesInStatement(parent, node)) {
+			return innerExpr;
+		}
 		if (
-		// TODO JNR can we revert the InfixExpression?
+		// TODO JNR can we revert the condition in the InfixExpression?
 		// parentheses are sometimes needed to explicit code,
 		// some like it like that
 		innerExpr instanceof InfixExpression
@@ -146,6 +156,35 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
 			return node;
 		}
 		return innerExpr;
+	}
+
+	private boolean isUselessParenthesesInStatement(final ASTNode parent,
+			ParenthesizedExpression node) {
+		if (parent instanceof Assignment) {
+			Assignment a = (Assignment) parent;
+			return node.equals(a.getRightHandSide());
+		} else if (parent instanceof Statement) {
+			if (parent instanceof IfStatement) {
+				IfStatement is = (IfStatement) parent;
+				return node.equals(is.getExpression());
+			} else if (parent instanceof WhileStatement) {
+				WhileStatement ws = (WhileStatement) parent;
+				return node.equals(ws.getExpression());
+			} else if (parent instanceof DoStatement) {
+				DoStatement ds = (DoStatement) parent;
+				return node.equals(ds.getExpression());
+			} else if (parent instanceof ReturnStatement) {
+				ReturnStatement rs = (ReturnStatement) parent;
+				return node.equals(rs.getExpression());
+			} else if (parent instanceof VariableDeclarationFragment) {
+				VariableDeclarationFragment vdf = (VariableDeclarationFragment) parent;
+				return node.equals(vdf.getInitializer());
+			} else if (parent instanceof MethodInvocation) {
+				MethodInvocation mi = (MethodInvocation) parent;
+				return mi.arguments().contains(node);
+			}
+		}
+		return false;
 	}
 
 	private boolean isAssociativeOperator(final Operator innerOp) {
