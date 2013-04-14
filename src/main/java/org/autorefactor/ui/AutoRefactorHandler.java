@@ -65,6 +65,7 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTParser;
@@ -280,24 +281,29 @@ public class AutoRefactorHandler extends AbstractHandler {
 			if (javaElement instanceof ICompilationUnit) {
 				results.add((ICompilationUnit) javaElement);
 			} else if (javaElement instanceof IPackageFragment) {
-				final IPackageFragment packageFragment = (IPackageFragment) javaElement;
-				for (ICompilationUnit compilationUnit : packageFragment
-						.getCompilationUnits()) {
-					results.add(compilationUnit);
-				}
+				final IPackageFragment pf = (IPackageFragment) javaElement;
+				addAll(results, pf.getCompilationUnits());
 			} else if (javaElement instanceof IJavaProject) {
-				IJavaProject iJavaProject = (IJavaProject) javaElement;
-				for (IPackageFragment packageFragment : iJavaProject
-						.getPackageFragments()) {
-					for (ICompilationUnit compilationUnit : packageFragment
-							.getCompilationUnits()) {
-						results.add(compilationUnit);
-					}
+				IJavaProject javaProject = (IJavaProject) javaElement;
+				for (IPackageFragment pf : javaProject.getPackageFragments()) {
+					addAll(results, pf.getCompilationUnits());
 				}
 			}
 			return results;
 		} catch (Exception e) {
 			throw new RuntimeException(e);
+		}
+	}
+
+	private static void addAll(final List<ICompilationUnit> results,
+			ICompilationUnit[] compilationUnits) throws JavaModelException {
+		for (ICompilationUnit cu : compilationUnits) {
+			if (!cu.isConsistent()) {
+				cu.makeConsistent(null);
+			}
+			if (!cu.isReadOnly()) {// is consistent?
+				results.add(cu);
+			}
 		}
 	}
 
@@ -374,9 +380,12 @@ public class AutoRefactorHandler extends AbstractHandler {
 					edits.apply(document);
 					final String newSource = document.get();
 					if (!isInMemory) {
+						boolean hadUnsavedChanges = compilationUnit.hasUnsavedChanges();
 						compilationUnit.getBuffer().setContents(newSource);
+						if (!hadUnsavedChanges) {
+							compilationUnit.save(null, true);
+						}
 					}
-					// TODO JNR save file
 
 					// I did not find any other way to directly modify the AST
 					// while
