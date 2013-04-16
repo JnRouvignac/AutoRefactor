@@ -279,7 +279,7 @@ public class AutoRefactorHandler extends AbstractHandler {
 		try {
 			final List<ICompilationUnit> results = new LinkedList<ICompilationUnit>();
 			if (javaElement instanceof ICompilationUnit) {
-				results.add((ICompilationUnit) javaElement);
+				add(results, (ICompilationUnit) javaElement);
 			} else if (javaElement instanceof IPackageFragment) {
 				final IPackageFragment pf = (IPackageFragment) javaElement;
 				addAll(results, pf.getCompilationUnits());
@@ -298,12 +298,17 @@ public class AutoRefactorHandler extends AbstractHandler {
 	private static void addAll(final List<ICompilationUnit> results,
 			ICompilationUnit[] compilationUnits) throws JavaModelException {
 		for (ICompilationUnit cu : compilationUnits) {
-			if (!cu.isConsistent()) {
-				cu.makeConsistent(null);
-			}
-			if (!cu.isReadOnly()) {// is consistent?
-				results.add(cu);
-			}
+			add(results, cu);
+		}
+	}
+
+	private static void add(final List<ICompilationUnit> results,
+			ICompilationUnit cu) throws JavaModelException {
+		if (!cu.isConsistent()) {
+			cu.makeConsistent(null);
+		}
+		if (!cu.isReadOnly()) {// is consistent?
+			results.add(cu);
 		}
 	}
 
