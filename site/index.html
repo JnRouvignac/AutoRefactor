@@ -8,11 +8,47 @@
 <p>AutoRefactor project delivers free software that automatically refactor code bases.</p>
 <p>The aim is to fix language/API usage in order to deliver smaller, more maintainable and more expressive code bases.</p>
 <p>The first software will be an Eclipse plugin to automatically refactor Java code bases. License will be dual licensed under EPLv1.0 and GPLv3+.</p>
+<h2>Why?</h2>
+After years working in different large code bases, I (Jean-No&euml;l Rouvignac) got tired of spending too much time applying the same code cleanups again and again.
+In addition, tools like <a href="http://www.sonarsource.org">Sonar</a> (aggregating <a href="http://findbugs.sourceforge.net">FindBugs&trade;</a>, <a href="http://checkstyle.sourceforge.net">Checkstyle</a> and <a href="http://pmd.sourceforge.net">PMD</a>) are fantastic, but they do not not help fix the thousand warnings you can find in legacy code bases.
+<p>
+I decided I had spent too much time on manually doing these changes, so I tried using <a href="http://en.wikipedia.org/wiki/Regular_expression">regular expressions</a>. They work great for some code transforms, but can only do so much: they do not understand the language semantics, reapplying them again and again consumes time, they sometimes fail to execute due to too much complexity. I then sought for better and libre solutions, but found none. This is when I started AutoRefactor.
+</p>
+<p>
+<a href="http://en.wikipedia.org/wiki/Software_rot">Software rots</a>, particularly if the developers in charge do not care enough. Software has to be nurtured like a <a href="http://www.chrisaitchison.com/2011/05/03/you-are-not-a-software-engineer">garden</a>. Other causes for software rot are:
+<ul>
+<li>developers lack of knowledge of the language in use and its features/idioms</li>
+<li>developers habits coming from other languages (Any C programmers around?)</li>
+<li>new language features get added, but the code base lags behind</li>
+<li>incomplete automatic changes are applied</li>
+<li>short deadlines, lack of investment in the software, lack of stakeholder supprot for reducing the technical debt</li>
+</ul>
+</p>
+<h2>Goals</h2>
+<ul>
+<li>Easier maintenance</li>
+<li>Leaner code base</li>
+<li>Performance improvements</li>
+</ul>
 <h2>Features</h2>
+TODO explain the different refactorings offered
+<h2>How to use it</h2>
+Open a Java file you want to automatically refactor in Eclipse and type Shift+Alt+Y.
+In the package explorer, you can also select one or several Java files, packages or Java projects and type Shift+Alt+Y. The AutoRefactor plugin will apply the refactorings to all the selected Java files, or to the Java files located under the selected packages or under the Java projects.
 <h2>News</h2>
 TODO Publish first version
 <h2>Install</h2>
-TODO Eclipse update site
+<ul>
+<li>Go to <code>Menu</code> > <code>Help</code> > <code>Install New Software...</code></li>
+<li>Click the <code>Add...</code> button on the right</li>
+<li>Enter "<em>AutoRefactor Nightly</em>" in the <code>Name</code> field</li>
+<li>Enter "<em><a href="http://autorefactor.org/nightly/">http://autorefactor.org/nightly/</a></em>" in the <code>Location</code> field</li>
+<li>Select <code>Programming Languages</code> > <code>AutoRefactor</code></li>
+<li>Click the <code>Next ></code> button at the bottom</li>
+<li>Click the <code>Next ></code> button at the bottom</li>
+<li>Accept the terms of the license agreement</li>
+<li>Click the <code>Finish</code> button at the bottom.</li>
+</ul>
 <h2>Contribute</h2>
 How to <a href="https://github.com/JnRouvignac/AutoRefactor/blob/master/CONTRIBUTING.md">Contribute</a>
 <h2>Donate</h2>
@@ -40,14 +76,18 @@ How to <a href="https://github.com/JnRouvignac/AutoRefactor/blob/master/CONTRIBU
 <li>Develop other languages</li>
 </ul>
 <h2>Links</h2>
-<a href="http://www.eclipse.org/jdt/">Eclipse Java development tools (JDT)</a>
-<a href="http://findbugs.sourceforge.net">FindBugs&trade;</a>
-<a href="http://fb-contrib.sourceforge.net">fb-contrib&trade;</a>
-<a href="http://checkstyle.sourceforge.net">Checkstyle</a>
-<a href="http://pmd.sourceforge.net">PMD</a>
-<a href="http://www.sonarsource.org">Sonar</a>
-<a href="http://coccinelle.lip6.fr/">Coccinnelle</a>
-<br>
+<ul>
+<li><a href="http://www.eclipse.org/jdt/">Eclipse Java development tools (JDT)</a>, the base for this plugin</li>
+<li><a href="http://findbugs.sourceforge.net">FindBugs&trade;</a> and <a href="http://fb-contrib.sourceforge.net">fb-contrib&trade;</a>, bytecode-based software flaw finder for Java programs</li>
+<li><a href="http://checkstyle.sourceforge.net">Checkstyle</a>, coding conventions checker for Java programs</li>
+<li><a href="http://pmd.sourceforge.net">PMD</a>, source-based software flaw finder for Java programs</li>
+<li><a href="http://www.sonarsource.org">Sonar</a> aggregates the results of the precedent three software in a unified and coherent interface. It is very useful for managing technical debt.</li>
+<li><a href="http://coccinelle.lip6.fr/">Coccinelle</a>, a fantastic source of inspiration for automated source-to-source transformations</li>
+</ul>
+<h6>Trademarks</h6>
+Oracle and Java are registered trademarks of Oracle and/or its affiliates. Other names may be trademarks of their respective owners.
+<p>
 <img src="http://i.creativecommons.org/l/by-sa/3.0/88x31.png"> This website is (C) 2013 The AutoRefactor project and is licensed under the terms of the <a href="http://creativecommons.org/licenses/by-sa/3.0/">Creative Commons Attribution-ShareAlike 3.0</a>
+</p>
 </body>
 </html>
