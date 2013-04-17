@@ -307,7 +307,7 @@ public class AutoRefactorHandler extends AbstractHandler {
 		if (!cu.isConsistent()) {
 			cu.makeConsistent(null);
 		}
-		if (!cu.isReadOnly()) {// is consistent?
+		if (!cu.isReadOnly()) {
 			results.add(cu);
 		}
 	}
