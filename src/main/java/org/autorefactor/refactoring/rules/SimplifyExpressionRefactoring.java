@@ -124,12 +124,15 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
 			final InfixExpression innerInfixExpr = (InfixExpression) innerExpr;
 			final InfixExpression parentInfixExpr = (InfixExpression) parent;
 			final Operator innerOp = innerInfixExpr.getOperator();
+			final Operator outerOp = parentInfixExpr.getOperator();
 			if (innerOp == parentInfixExpr.getOperator()
 					&& isAssociativeOperator(innerOp)
 					// Leave String concatenations with mixed type
 					// to other if statements in this method.
 					&& innerExpr.resolveTypeBinding().equals(
 							parentInfixExpr.resolveTypeBinding())) {
+				return innerExpr;
+			} else if (isReadable(innerOp, outerOp)) {
 				return innerExpr;
 			}
 		}
@@ -168,6 +171,35 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
 			return node;
 		}
 		return innerExpr;
+	}
+
+	/**
+	 * Returns whether a condition using the specified inner operation within the
+	 * specified outer operation remains easily readable.
+	 *
+	 * @param innerOp
+	 *          the inner operation
+	 * @param outerOp
+	 *          the outer operation
+	 * @return true if the made up condition would still be readable, false
+	 *         otherwise
+	 */
+	private boolean isReadable(Operator innerOp, Operator outerOp)
+	{
+		if (Operator.CONDITIONAL_AND.equals(outerOp)
+				|| Operator.CONDITIONAL_OR.equals(outerOp)) {
+			if (Operator.EQUALS.equals(innerOp)
+					|| Operator.NOT_EQUALS.equals(innerOp)
+					|| Operator.GREATER.equals(innerOp)
+					|| Operator.GREATER_EQUALS.equals(innerOp)
+					|| Operator.LESS.equals(innerOp)
+					|| Operator.LESS_EQUALS.equals(innerOp)
+					|| Operator.CONDITIONAL_AND.equals(innerOp)
+					|| Operator.CONDITIONAL_OR.equals(innerOp)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private boolean isUselessParenthesesInStatement(final ASTNode parent,

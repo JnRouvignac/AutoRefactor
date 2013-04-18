@@ -99,6 +99,8 @@ public class SimplifyExpressionSample {
         boolean b4 = !(i instanceof Number);
         // replace
         boolean b5 = (i != null);
+        // replace
+        boolean b6 = b5 && (i != null);
     }
 
     public boolean removeUselessParentheses() throws Exception {
