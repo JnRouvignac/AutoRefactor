@@ -36,11 +36,13 @@ import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.CastExpression;
 import org.eclipse.jdt.core.dom.CompilationUnit;
+import org.eclipse.jdt.core.dom.ConditionalExpression;
 import org.eclipse.jdt.core.dom.DoStatement;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.InfixExpression;
+import org.eclipse.jdt.core.dom.InfixExpression.Operator;
 import org.eclipse.jdt.core.dom.InstanceofExpression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.NullLiteral;
@@ -138,6 +140,12 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
 					&& ASTHelper.hasType(parentInfixExpr, "java.lang.String")) {
 				// The parentheses hold an InfixExpression that does not resolve
 				// to String but is inside a String concatenation
+				return node;
+			}
+			if (innerExpr instanceof ConditionalExpression
+					&& ASTHelper.hasType(parentInfixExpr, "java.lang.String")) {
+				// The parentheses hold a ConditionalExpression that is inside a String
+				// concatenation
 				return node;
 			}
 		}

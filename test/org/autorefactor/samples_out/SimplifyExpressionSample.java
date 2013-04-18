@@ -84,6 +84,7 @@ public class SimplifyExpressionSample {
         String s1 = ((Number) i).doubleValue() + "";
         String s2 = (i instanceof Number) + "";
         String s3 = (i + 0) + "";
+        String s4 = (i == null ? null : "i")  + "";
 
         // replace
         boolean b1 = ((Number) i).doubleValue() == 0;
