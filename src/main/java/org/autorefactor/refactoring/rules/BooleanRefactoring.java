@@ -218,38 +218,34 @@ public class BooleanRefactoring extends ASTVisitor implements IJavaRefactoring {
 
 		final ReturnStatement thenRs = ASTHelper.as(node.getThenStatement(),
 				ReturnStatement.class);
-		final ReturnStatement elseRs = ASTHelper.as(node.getElseStatement(),
-				ReturnStatement.class);
-		if (thenRs != null) {
-			if (elseRs == null) {
-				// The != null case is handled with the matcher above
-				final ReturnStatement rs = ASTHelper.as(
-						ASTHelper.getNextSibling(node), ReturnStatement.class);
-				if (rs != null) {
-					final Boolean thenBool = getBooleanLiteral(thenRs
-							.getExpression());
-					final Boolean elseBool = getBooleanLiteral(rs
-							.getExpression());
-					ReturnStatement newRs = getReturnStatement(node, thenBool,
-							elseBool);
-					if (newRs != null) {
-						this.refactorings.replace(node, newRs);
-						this.refactorings.remove(rs);
-					} else {
-						final MethodDeclaration md = ASTHelper.getAncestor(
-								node, MethodDeclaration.class);
-						final Type returnType = md.getReturnType2();
-						if (returnType != null && returnType.isPrimitiveType()) {
-							final PrimitiveType pt = (PrimitiveType) returnType;
-							if (PrimitiveType.BOOLEAN.equals(pt
-									.getPrimitiveTypeCode())) {
-								newRs = getReturnStatement(node, thenBool,
-										elseBool, thenRs.getExpression(),
-										rs.getExpression());
-								if (newRs != null) {
-									this.refactorings.replace(node, newRs);
-									this.refactorings.remove(rs);
-								}
+		if (thenRs != null
+				&& ASTHelper.asList(node.getElseStatement()).isEmpty()) {
+			// The case where the else statement is not empty is handled with
+			// the matcher above
+			final ReturnStatement rs = ASTHelper.as(
+					ASTHelper.getNextSibling(node), ReturnStatement.class);
+			if (rs != null) {
+				final Boolean thenBool = getBooleanLiteral(thenRs
+						.getExpression());
+				final Boolean elseBool = getBooleanLiteral(rs.getExpression());
+				ReturnStatement newRs = getReturnStatement(node, thenBool,
+						elseBool);
+				if (newRs != null) {
+					this.refactorings.replace(node, newRs);
+					this.refactorings.remove(rs);
+				} else {
+					final MethodDeclaration md = ASTHelper.getAncestor(node,
+							MethodDeclaration.class);
+					final Type returnType = md.getReturnType2();
+					if (returnType != null && returnType.isPrimitiveType()) {
+						final PrimitiveType pt = (PrimitiveType) returnType;
+						if (PrimitiveType.BOOLEAN.equals(pt
+								.getPrimitiveTypeCode())) {
+							newRs = getReturnStatement(node, thenBool, elseBool,
+									thenRs.getExpression(), rs.getExpression());
+							if (newRs != null) {
+								this.refactorings.replace(node, newRs);
+								this.refactorings.remove(rs);
 							}
 						}
 					}
@@ -258,7 +254,8 @@ public class BooleanRefactoring extends ASTVisitor implements IJavaRefactoring {
 		} else {
 			final ExpressionStatement thenEs = ASTHelper.as(
 					node.getThenStatement(), ExpressionStatement.class);
-			if (thenEs != null) {
+			if (thenEs != null
+					&& ASTHelper.asList(node.getElseStatement()).isEmpty()) {
 				final Assignment thenA = ASTHelper.as(thenEs.getExpression(),
 						Assignment.class);
 				if (thenA != null

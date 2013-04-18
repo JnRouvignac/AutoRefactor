@@ -131,6 +131,15 @@ public class BooleanSample {
         Boolean b = bo ? Boolean.FALSE : Boolean.TRUE;
     }
 
+    public void doNotRemoveIfInBooleanPrimitiveAssignment1(boolean bo) {
+        boolean b = true;
+        if (bo) {
+            b = false;
+        } else {
+            System.out.println();
+        }
+    }
+
     public void removeUselessIfInBooleanPrimitiveAssignment1(boolean bo) {
         boolean b = true;
         if (bo) {
