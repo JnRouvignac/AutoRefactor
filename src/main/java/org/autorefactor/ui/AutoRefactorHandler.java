@@ -79,6 +79,7 @@ import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.text.edits.TextEdit;
 import org.eclipse.ui.IEditorPart;
@@ -87,7 +88,7 @@ import org.eclipse.ui.handlers.HandlerUtil;
 /**
  * This is the Eclipse handler for launching the automated refactorings. This is
  * invoked from the Eclipse UI.
- * 
+ *
  * @see <a
  *      href="http://www.vogella.com/articles/EclipsePlugIn/article.html#contribute">Extending
  *      Eclipse - Plug-in Development Tutorial</a>
@@ -139,7 +140,7 @@ public class AutoRefactorHandler extends AbstractHandler {
 
 		/**
 		 * Does not work:
-		 * 
+		 *
 		 * <pre>
 		 * Caused by: java.lang.IllegalArgumentException: This API can only be used if the AST is created from a compilation unit or class file
 		 * 	at org.eclipse.jdt.core.dom.rewrite.ASTRewrite.rewriteAST(ASTRewrite.java:272)
@@ -150,7 +151,7 @@ public class AutoRefactorHandler extends AbstractHandler {
 			final Shell shell = HandlerUtil.getActiveShell(event);
 			try {
 				final IJavaProject javaProject = getIJavaProject(getSelectedJavaElement(event));
-				final String javaSourceCompatibility = getJavaSourceCompatibility(javaProject);
+				getJavaSourceCompatibility(javaProject);
 				for (IPackageFragmentRoot packageFragmentRoot : javaProject
 						.getPackageFragmentRoots()) {
 					final List<ICompilationUnit> samplesIn = getSamples(
@@ -250,10 +251,14 @@ public class AutoRefactorHandler extends AbstractHandler {
 					.getEditorInputJavaElement(activeEditor.getEditorInput());
 			if (javaElement instanceof ICompilationUnit) {
 				return javaElement;
-			} else {
-				MessageDialog.openInformation(shell, "Info",
-						"This action only works on Java source files");
 			}
+			Display.getDefault().asyncExec(new Runnable() {
+
+				public void run() {
+					MessageDialog.openInformation(shell, "Info",
+						"This action only works on Java source files");
+				}
+			});
 		} else if ("org.eclipse.jdt.ui.PackageExplorer".equals(activePartId)) {
 			final ISelection sel = HandlerUtil.getCurrentSelection(event);
 			final IStructuredSelection selection = (IStructuredSelection) sel;
@@ -266,9 +271,14 @@ public class AutoRefactorHandler extends AbstractHandler {
 				// project.isNatureEnabled("org.eclipse.jdt.core.javanature") ?
 				return (IJavaProject) firstElement;
 			} else {
-				MessageDialog
-						.openInformation(shell, "Info",
-								"Please select a Java source file, Java package or Java project");
+				Display.getDefault().asyncExec(new Runnable() {
+
+					public void run() {
+						MessageDialog.openInformation(shell, "Info",
+							"Please select a Java source file, Java package or Java project");
+					}
+
+				});
 			}
 		}
 		return null;
@@ -340,7 +350,7 @@ public class AutoRefactorHandler extends AbstractHandler {
 	 * @see <a
 	 *      href="http://help.eclipse.org/indigo/index.jsp?topic=%2Forg.eclipse.jdt.doc.isv%2Fguide%2Fjdt_api_manip.htm">Eclipse
 	 *      JDT core - Manipulating Java code</a>
-	 * 
+	 *
 	 * @see <a
 	 *      href="http://help.eclipse.org/indigo/index.jsp?topic=/org.eclipse.platform.doc.isv/guide/workbench_cmd_menus.htm">
 	 *      Eclipse Platform Plug-in Developer Guide > Plugging into the
