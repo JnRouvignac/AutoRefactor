@@ -97,6 +97,8 @@ public class SimplifyExpressionSample {
         Object obj = ((List<?>) c).get(0);
         // do not replace
         boolean b4 = !(i instanceof Number);
+        // replace
+        boolean b5 = (i != null);
     }
 
     public boolean removeUselessParentheses() throws Exception {

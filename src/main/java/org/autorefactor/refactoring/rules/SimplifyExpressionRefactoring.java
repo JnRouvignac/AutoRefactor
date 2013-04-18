@@ -172,9 +172,14 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
 
 	private boolean isUselessParenthesesInStatement(final ASTNode parent,
 			ParenthesizedExpression node) {
-		if (parent instanceof Assignment) {
-			Assignment a = (Assignment) parent;
-			return node.equals(a.getRightHandSide());
+		if (parent instanceof Expression) {
+			if (parent instanceof Assignment) {
+				Assignment a = (Assignment) parent;
+				return node.equals(a.getRightHandSide());
+			} else if (parent instanceof MethodInvocation) {
+				MethodInvocation mi = (MethodInvocation) parent;
+				return mi.arguments().contains(node);
+			}
 		} else if (parent instanceof Statement) {
 			if (parent instanceof IfStatement) {
 				IfStatement is = (IfStatement) parent;
@@ -188,13 +193,10 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
 			} else if (parent instanceof ReturnStatement) {
 				ReturnStatement rs = (ReturnStatement) parent;
 				return node.equals(rs.getExpression());
-			} else if (parent instanceof VariableDeclarationFragment) {
-				VariableDeclarationFragment vdf = (VariableDeclarationFragment) parent;
-				return node.equals(vdf.getInitializer());
-			} else if (parent instanceof MethodInvocation) {
-				MethodInvocation mi = (MethodInvocation) parent;
-				return mi.arguments().contains(node);
 			}
+		} else if (parent instanceof VariableDeclarationFragment) {
+			VariableDeclarationFragment vdf = (VariableDeclarationFragment) parent;
+			return node.equals(vdf.getInitializer());
 		}
 		return false;
 	}
