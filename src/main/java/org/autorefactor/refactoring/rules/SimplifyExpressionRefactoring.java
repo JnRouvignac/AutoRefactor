@@ -41,7 +41,6 @@ import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.InfixExpression;
-import org.eclipse.jdt.core.dom.InfixExpression.Operator;
 import org.eclipse.jdt.core.dom.InstanceofExpression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.NullLiteral;
@@ -141,6 +140,11 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
 				// to String but is inside a String concatenation
 				return node;
 			}
+		}
+		if (parent instanceof PrefixExpression
+				&& innerExpr instanceof InstanceofExpression) {
+			// Cannot remove parentheses around InstanceofExpression if it is negated
+			return node;
 		}
 		if (isUselessParenthesesInStatement(parent, node)) {
 			return innerExpr;
@@ -392,7 +396,7 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
 	 * object equality against an expression that resolves to a non null
 	 * constant</li>
 	 * </ul>
-	 * 
+	 *
 	 * @param e
 	 * @param nullCheckedExpression
 	 * @return
