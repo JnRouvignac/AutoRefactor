@@ -88,7 +88,7 @@ import org.eclipse.ui.handlers.HandlerUtil;
 /**
  * This is the Eclipse handler for launching the automated refactorings. This is
  * invoked from the Eclipse UI.
- *
+ * 
  * @see <a
  *      href="http://www.vogella.com/articles/EclipsePlugIn/article.html#contribute">Extending
  *      Eclipse - Plug-in Development Tutorial</a>
@@ -140,7 +140,7 @@ public class AutoRefactorHandler extends AbstractHandler {
 
 		/**
 		 * Does not work:
-		 *
+		 * 
 		 * <pre>
 		 * Caused by: java.lang.IllegalArgumentException: This API can only be used if the AST is created from a compilation unit or class file
 		 * 	at org.eclipse.jdt.core.dom.rewrite.ASTRewrite.rewriteAST(ASTRewrite.java:272)
@@ -151,7 +151,7 @@ public class AutoRefactorHandler extends AbstractHandler {
 			final Shell shell = HandlerUtil.getActiveShell(event);
 			try {
 				final IJavaProject javaProject = getIJavaProject(getSelectedJavaElement(event));
-				getJavaSourceCompatibility(javaProject);
+				String javaSourceCompatibility = getJavaSourceCompatibility(javaProject);
 				for (IPackageFragmentRoot packageFragmentRoot : javaProject
 						.getPackageFragmentRoots()) {
 					final List<ICompilationUnit> samplesIn = getSamples(
@@ -164,11 +164,8 @@ public class AutoRefactorHandler extends AbstractHandler {
 										"Different number of samples in and samples out. Cannot validate anything.");
 					} else {
 						for (ICompilationUnit compilationUnit : samplesIn) {
-							final String elementName = compilationUnit
-									.getElementName();
-							final String className = elementName
-									.substring(elementName.indexOf('.'));
-							final ICompilationUnit sampleOut = getSampleOut(
+							final String className = getClassName(compilationUnit);
+							final ICompilationUnit sampleOut = findCorrespondingSampleOut(
 									samplesOut, className);
 							if (sampleOut == null) {
 								MessageDialog.openInformation(shell, "Error",
@@ -176,16 +173,16 @@ public class AutoRefactorHandler extends AbstractHandler {
 												+ className);
 								continue;
 							}
-							// final String newContent = applyRefactorings(
-							// compilationUnit,
-							// Release.javaSE(javaSourceCompatibility),
-							// true);
-							// if (!newContent.equals(sampleOut.getSource())) {
-							// MessageDialog.openInformation(shell, "Error",
-							// "Refactorings did not provide expected output for class name "
-							// + className);
-							// continue;
-							// }
+							final String newContent = applyRefactorings(
+									compilationUnit,
+									Release.javaSE(javaSourceCompatibility),
+									true);
+							if (!newContent.equals(sampleOut.getSource())) {
+								MessageDialog.openInformation(shell, "Error",
+										"Refactorings did not provide expected output for class name "
+												+ className);
+								continue;
+							}
 						}
 					}
 				}
@@ -194,16 +191,19 @@ public class AutoRefactorHandler extends AbstractHandler {
 			}
 		}
 
-		private ICompilationUnit getSampleOut(
+		private ICompilationUnit findCorrespondingSampleOut(
 				List<ICompilationUnit> samplesOut, String className) {
 			for (ICompilationUnit compilationUnit : samplesOut) {
-				final String elementName = compilationUnit.getElementName();
-				if (className.equals(elementName.substring(elementName
-						.indexOf('.')))) {
+				if (className.equals(getClassName(compilationUnit))) {
 					return compilationUnit;
 				}
 			}
 			return null;
+		}
+
+		private String getClassName(ICompilationUnit compilationUnit) {
+			final String elementName = compilationUnit.getElementName();
+			return elementName.substring(0, elementName.indexOf('.'));
 		}
 
 		private List<ICompilationUnit> getSamples(
@@ -350,18 +350,23 @@ public class AutoRefactorHandler extends AbstractHandler {
 	 * @see <a
 	 *      href="http://help.eclipse.org/indigo/index.jsp?topic=%2Forg.eclipse.jdt.doc.isv%2Fguide%2Fjdt_api_manip.htm">Eclipse
 	 *      JDT core - Manipulating Java code</a>
-	 *
+	 * 
 	 * @see <a
 	 *      href="http://help.eclipse.org/indigo/index.jsp?topic=/org.eclipse.platform.doc.isv/guide/workbench_cmd_menus.htm">
 	 *      Eclipse Platform Plug-in Developer Guide > Plugging into the
 	 *      workbench > Basic workbench extension points using commands >
 	 *      org.eclipse.ui.menus </a>
 	 */
-	private static void applyRefactorings(ICompilationUnit compilationUnit,
+	private static String applyRefactorings(ICompilationUnit compilationUnit,
 			Release javaSERelease, boolean isInMemory) throws Exception {
 		// creation of DOM/AST from a ICompilationUnit
 		final ASTParser parser = ASTParser.newParser(AST.JLS4);
-		parser.setSource(compilationUnit);
+		String source = compilationUnit.getSource();
+		if (!isInMemory) {
+			parser.setSource(compilationUnit);
+		} else {
+			parser.setSource(source.toCharArray());
+		}
 		parser.setResolveBindings(true);
 
 		CompilationUnit astRoot = (CompilationUnit) parser.createAST(null);
@@ -410,15 +415,21 @@ public class AutoRefactorHandler extends AbstractHandler {
 					// FIXME we should find a way to apply all the changes at
 					// the AST level only (transactional-like feature) and
 					// refresh the bindings
-					parser.setSource(compilationUnit);
+					if (!isInMemory) {
+						parser.setSource(compilationUnit);
+					} else {
+						parser.setSource(newSource.toCharArray());
+					}
 					parser.setResolveBindings(true);
 					astRoot = (CompilationUnit) parser.createAST(null);
+					source = newSource;
 				}
 			} catch (Exception e) {
 				// TODO JNR add UI error reporting
 				throw new RuntimeException("Unexpected exception", e);
 			}
 		}
+		return source;
 	}
 
 	private static ASTRewrite getASTRewrite(final CompilationUnit astRoot,
