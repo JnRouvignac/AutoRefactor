@@ -142,6 +142,8 @@ public class AutoRefactorHandler extends AbstractHandler {
 		private void testWithSamples() {
 			final Shell shell = HandlerUtil.getActiveShell(event);
 			try {
+				boolean success = true;
+				final StringBuilder errorMessages = new StringBuilder();
 				final IJavaProject javaProject = getIJavaProject(getSelectedJavaElement(event));
 				String javaSourceCompatibility = getJavaSourceCompatibility(javaProject);
 				for (IPackageFragmentRoot packageFragmentRoot : javaProject
@@ -150,32 +152,37 @@ public class AutoRefactorHandler extends AbstractHandler {
 							packageFragmentRoot, "org.autorefactor.samples_in");
 					final List<ICompilationUnit> samplesOut = getSamples(
 							packageFragmentRoot, "org.autorefactor.samples_out");
-					if (samplesIn.size() != samplesOut.size()) {
-						MessageDialog
-								.openInformation(shell, "Error",
-										"Different number of samples in and samples out. Cannot validate anything.");
-					} else {
+					{
 						for (ICompilationUnit sampleIn : samplesIn) {
 							final String className = getClassName(sampleIn);
 							final ICompilationUnit sampleOut = findCorrespondingSampleOut(
 									samplesOut, className);
+							errorMessages.append(className).append(".java: ");
 							if (sampleOut == null) {
-								MessageDialog.openInformation(shell, "Error",
-										"Could not find a sample out for class name "
-												+ className);
+								errorMessages.append("MISSING OUTPUT\n");
+								success = false;
 								continue;
 							}
 							applyRefactorings(sampleIn,
 									Release.javaSE(javaSourceCompatibility));
-							String refactoredSource = sampleIn.getSource();
-							if (!refactoredSource.equals(sampleOut.getSource())) {
-								MessageDialog.openInformation(shell, "Error",
-										"Refactorings did not provide expected output for class name "
-												+ className);
-								continue;
+							String actualSource =
+									sampleIn.getSource().replaceAll(
+											"package org.autorefactor.samples_in;",
+											"package org.autorefactor.samples_out;");
+							String expectedSource = sampleOut.getSource();
+							if (actualSource.equals(expectedSource)) {
+								errorMessages.append("Success\n");
+							} else {
+								errorMessages.append("FAILURE\n");
+								success = false;
 							}
 						}
 					}
+				}
+				if (success) {
+					MessageDialog.openInformation(shell, "Tests Success!!", errorMessages.toString());
+				}else {
+					MessageDialog.openError(shell, "Tests ERROR", errorMessages.toString());
 				}
 			} catch (Exception e) {
 				throw new RuntimeException("Unexpected exception", e);
