@@ -152,33 +152,33 @@ public class AutoRefactorHandler extends AbstractHandler {
 							packageFragmentRoot, "org.autorefactor.samples_in");
 					final List<ICompilationUnit> samplesOut = getSamples(
 							packageFragmentRoot, "org.autorefactor.samples_out");
-					{
-						for (ICompilationUnit sampleIn : samplesIn) {
-							final String className = getClassName(sampleIn);
-							final ICompilationUnit sampleOut = findCorrespondingSampleOut(
-									samplesOut, className);
-							errorMessages.append(className).append(".java: ");
-							if (sampleOut == null) {
-								errorMessages.append("MISSING OUTPUT\n");
-								success = false;
-								continue;
-							}
-							applyRefactorings(sampleIn,
-									Release.javaSE(javaSourceCompatibility));
-							String actualSource =
-									sampleIn.getSource().replaceAll(
-											"package org.autorefactor.samples_in;",
-											"package org.autorefactor.samples_out;");
-							String expectedSource = sampleOut.getSource();
-							if (actualSource.equals(expectedSource)) {
-								errorMessages.append("Success\n");
-							} else {
-								errorMessages.append("FAILURE\n");
-								success = false;
-							}
+
+					for (ICompilationUnit sampleIn : samplesIn) {
+						final String className = getClassName(sampleIn);
+						final ICompilationUnit sampleOut = findCorrespondingSampleOut(
+								samplesOut, className);
+						errorMessages.append(className).append(".java: ");
+						if (sampleOut == null) {
+							errorMessages.append("MISSING OUTPUT\n");
+							success = false;
+							continue;
+						}
+						applyRefactorings(sampleIn,
+								Release.javaSE(javaSourceCompatibility));
+						String actualSource =
+								sampleIn.getSource().replaceAll(
+										"package org.autorefactor.samples_in;",
+										"package org.autorefactor.samples_out;");
+						String expectedSource = sampleOut.getSource();
+						if (actualSource.equals(expectedSource)) {
+							errorMessages.append("Success\n");
+						} else {
+							errorMessages.append("FAILURE\n");
+							success = false;
 						}
 					}
 				}
+
 				if (success) {
 					MessageDialog.openInformation(shell, "Tests Success!!", errorMessages.toString());
 				}else {
