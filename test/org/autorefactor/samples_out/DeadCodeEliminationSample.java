@@ -27,31 +27,24 @@ package org.autorefactor.samples_out;
 
 public class DeadCodeEliminationSample {
 
-	private int removeEmptyElseClause(boolean b)
-	{
+	private int removeEmptyElseClause(boolean b) {
 		int i = 0;
-		if (b)
-		{
+		if (b) {
 			i++;
 		}
 		return i;
 	}
 
-	private int doesNotKnowHowToRemoveEmptyThenClause(boolean b)
-	{
+	private int doesNotKnowHowToRemoveEmptyThenClause(boolean b) {
 		int i = 0;
-		if (b)
-		{
-		}
-		else
-		{
+		if (b){
+		} else {
 			i++;
 		}
 		return i;
 	}
 
-	private int removeImpossibleIfClauses()
-	{
+	private int removeImpossibleIfClauses() {
 		int i = 0;
 		int j = 0;
 		{

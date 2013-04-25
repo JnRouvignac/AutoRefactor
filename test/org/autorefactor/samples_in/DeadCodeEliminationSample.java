@@ -25,45 +25,32 @@
  */
 package org.autorefactor.samples_in;
 
-
 public class DeadCodeEliminationSample {
 
-	private int removeEmptyElseClause(boolean b)
-	{
+	private int removeEmptyElseClause(boolean b) {
 		int i = 0;
-		if (b)
-		{
+		if (b) {
 			i++;
-		}
-		else
-		{
+		} else {
 		}
 		return i;
 	}
 
-	private int doesNotKnowHowToRemoveEmptyThenClause(boolean b)
-	{
+	private int doesNotKnowHowToRemoveEmptyThenClause(boolean b) {
 		int i = 0;
-		if (b)
-		{
-		}
-		else
-		{
+		if (b) {
+		} else {
 			i++;
 		}
 		return i;
 	}
 
-	private int removeImpossibleIfClauses()
-	{
+	private int removeImpossibleIfClauses() {
 		int i = 0;
 		int j = 0;
-		if (true)
-		{
+		if (true) {
 			i++;
-		}
-		else
-		{
+		} else {
 			j++;
 		}
 
@@ -72,12 +59,9 @@ public class DeadCodeEliminationSample {
 		else
 			j++;
 
-		if (false)
-		{
+		if (false) {
 			i++;
-		}
-		else
-		{
+		} else {
 			j++;
 		}
 
@@ -92,8 +76,7 @@ public class DeadCodeEliminationSample {
 	private int removeWhileWithoutIterations()
 	{
 		int i = 0;
-		while (false)
-		{
+		while (false) {
 			i++;
 		}
 		while (false)
@@ -104,15 +87,10 @@ public class DeadCodeEliminationSample {
 	private int removeEmptyTry()
 	{
 		int i = 0;
-		try
-		{
-		}
-		catch (Exception e)
-		{
+		try {
+		} catch (Exception e) {
 			i++;
-		}
-		finally
-		{
+		} finally {
 			i++;
 		}
 		return i;
