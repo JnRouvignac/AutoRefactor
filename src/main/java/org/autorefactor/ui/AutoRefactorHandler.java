@@ -125,7 +125,7 @@ public class AutoRefactorHandler extends AbstractHandler {
 								.getElementName() + "." + simpleName;
 						monitor.subTask("Applying refactorings to " + className);
 						applyRefactorings(compilationUnit,
-								Release.javaSE(javaSourceCompatibility), false);
+								Release.javaSE(javaSourceCompatibility));
 					} catch (Exception e) {
 						throw new RuntimeException(e);
 					} finally {
@@ -163,8 +163,8 @@ public class AutoRefactorHandler extends AbstractHandler {
 								.openInformation(shell, "Error",
 										"Different number of samples in and samples out. Cannot validate anything.");
 					} else {
-						for (ICompilationUnit compilationUnit : samplesIn) {
-							final String className = getClassName(compilationUnit);
+						for (ICompilationUnit sampleIn : samplesIn) {
+							final String className = getClassName(sampleIn);
 							final ICompilationUnit sampleOut = findCorrespondingSampleOut(
 									samplesOut, className);
 							if (sampleOut == null) {
@@ -173,11 +173,10 @@ public class AutoRefactorHandler extends AbstractHandler {
 												+ className);
 								continue;
 							}
-							final String newContent = applyRefactorings(
-									compilationUnit,
-									Release.javaSE(javaSourceCompatibility),
-									true);
-							if (!newContent.equals(sampleOut.getSource())) {
+							applyRefactorings(sampleIn,
+									Release.javaSE(javaSourceCompatibility));
+							String refactoredSource = sampleIn.getSource();
+							if (!refactoredSource.equals(sampleOut.getSource())) {
 								MessageDialog.openInformation(shell, "Error",
 										"Refactorings did not provide expected output for class name "
 												+ className);
@@ -218,10 +217,10 @@ public class AutoRefactorHandler extends AbstractHandler {
 	}
 
 	public Object execute(final ExecutionEvent event) throws ExecutionException {
-		// new ApplyRefactoringsJob(event).testWithSamples();
-		// if (true) {
-		// return Status.OK_STATUS;
-		// }
+		new ApplyRefactoringsJob(event).testWithSamples();
+		if (true) {
+			return Status.OK_STATUS;
+		}
 
 		new ApplyRefactoringsJob(event).schedule();
 
@@ -357,16 +356,11 @@ public class AutoRefactorHandler extends AbstractHandler {
 	 *      workbench > Basic workbench extension points using commands >
 	 *      org.eclipse.ui.menus </a>
 	 */
-	private static String applyRefactorings(ICompilationUnit compilationUnit,
-			Release javaSERelease, boolean isInMemory) throws Exception {
+	private static void applyRefactorings(ICompilationUnit compilationUnit,
+			Release javaSERelease) throws Exception {
 		// creation of DOM/AST from a ICompilationUnit
 		final ASTParser parser = ASTParser.newParser(AST.JLS4);
-		String source = compilationUnit.getSource();
-		if (!isInMemory) {
-			parser.setSource(compilationUnit);
-		} else {
-			parser.setSource(source.toCharArray());
-		}
+		parser.setSource(compilationUnit);
 		parser.setResolveBindings(true);
 
 		CompilationUnit astRoot = (CompilationUnit) parser.createAST(null);
@@ -388,6 +382,9 @@ public class AutoRefactorHandler extends AbstractHandler {
 					// IApacheCommonsRefactoring) {
 					// }else if (refactoring instanceof IGuavaRefactoring) {
 				}
+
+				// new BlockScopeBuilder().buildScope(astRoot);
+
 				final Refactorings refactorings = refactoring
 						.getRefactorings(astRoot);
 				if (refactorings.hasRefactorings()) {
@@ -398,13 +395,10 @@ public class AutoRefactorHandler extends AbstractHandler {
 					// apply the text edits and save the compilation unit
 					final TextEdit edits = rewrite.rewriteAST();
 					edits.apply(document);
-					final String newSource = document.get();
-					if (!isInMemory) {
-						boolean hadUnsavedChanges = compilationUnit.hasUnsavedChanges();
-						compilationUnit.getBuffer().setContents(newSource);
-						if (!hadUnsavedChanges) {
-							compilationUnit.save(null, true);
-						}
+					boolean hadUnsavedChanges = compilationUnit.hasUnsavedChanges();
+					compilationUnit.getBuffer().setContents(document.get());
+					if (!hadUnsavedChanges) {
+						compilationUnit.save(null, true);
 					}
 
 					// I did not find any other way to directly modify the AST
@@ -415,21 +409,15 @@ public class AutoRefactorHandler extends AbstractHandler {
 					// FIXME we should find a way to apply all the changes at
 					// the AST level only (transactional-like feature) and
 					// refresh the bindings
-					if (!isInMemory) {
-						parser.setSource(compilationUnit);
-					} else {
-						parser.setSource(newSource.toCharArray());
-					}
+					parser.setSource(compilationUnit);
 					parser.setResolveBindings(true);
 					astRoot = (CompilationUnit) parser.createAST(null);
-					source = newSource;
 				}
 			} catch (Exception e) {
 				// TODO JNR add UI error reporting
 				throw new RuntimeException("Unexpected exception", e);
 			}
 		}
-		return source;
 	}
 
 	private static ASTRewrite getASTRewrite(final CompilationUnit astRoot,
