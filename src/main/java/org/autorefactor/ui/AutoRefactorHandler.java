@@ -43,6 +43,7 @@ import org.autorefactor.refactoring.rules.BigDecimalRefactorings;
 import org.autorefactor.refactoring.rules.BooleanRefactoring;
 import org.autorefactor.refactoring.rules.CollapseIfStatementRefactoring;
 import org.autorefactor.refactoring.rules.CommonCodeInIfElseStatementRefactoring;
+import org.autorefactor.refactoring.rules.DeadCodeEliminationRefactoring;
 import org.autorefactor.refactoring.rules.InvertEqualsRefactoring;
 import org.autorefactor.refactoring.rules.PrimitiveWrapperCreationRefactoring;
 import org.autorefactor.refactoring.rules.RemoveEmptyCommentsRefactoring;
@@ -88,7 +89,7 @@ import org.eclipse.ui.handlers.HandlerUtil;
 /**
  * This is the Eclipse handler for launching the automated refactorings. This is
  * invoked from the Eclipse UI.
- * 
+ *
  * @see <a
  *      href="http://www.vogella.com/articles/EclipsePlugIn/article.html#contribute">Extending
  *      Eclipse - Plug-in Development Tutorial</a>
@@ -138,15 +139,6 @@ public class AutoRefactorHandler extends AbstractHandler {
 			return Status.OK_STATUS;
 		}
 
-		/**
-		 * Does not work:
-		 * 
-		 * <pre>
-		 * Caused by: java.lang.IllegalArgumentException: This API can only be used if the AST is created from a compilation unit or class file
-		 * 	at org.eclipse.jdt.core.dom.rewrite.ASTRewrite.rewriteAST(ASTRewrite.java:272)
-		 * 	at org.autorefactor.ui.AutoRefactorHandler.applyRefactorings(RefactorHandler.java:367)
-		 * </pre>
-		 */
 		private void testWithSamples() {
 			final Shell shell = HandlerUtil.getActiveShell(event);
 			try {
@@ -217,8 +209,8 @@ public class AutoRefactorHandler extends AbstractHandler {
 	}
 
 	public Object execute(final ExecutionEvent event) throws ExecutionException {
-		new ApplyRefactoringsJob(event).testWithSamples();
-		if (true) {
+		if (false) {
+			new ApplyRefactoringsJob(event).testWithSamples();
 			return Status.OK_STATUS;
 		}
 
@@ -344,12 +336,11 @@ public class AutoRefactorHandler extends AbstractHandler {
 	 * @param compilationUnit
 	 * @param javaSERelease
 	 * @param isInMemory
-	 * @return
 	 * @throws Exception
 	 * @see <a
 	 *      href="http://help.eclipse.org/indigo/index.jsp?topic=%2Forg.eclipse.jdt.doc.isv%2Fguide%2Fjdt_api_manip.htm">Eclipse
 	 *      JDT core - Manipulating Java code</a>
-	 * 
+	 *
 	 * @see <a
 	 *      href="http://help.eclipse.org/indigo/index.jsp?topic=/org.eclipse.platform.doc.isv/guide/workbench_cmd_menus.htm">
 	 *      Eclipse Platform Plug-in Developer Guide > Plugging into the
@@ -459,8 +450,7 @@ public class AutoRefactorHandler extends AbstractHandler {
 				new BigDecimalRefactorings(),
 				// TODO JNR implement
 				// new ForeachRefactoring(),
-				// TODO JNR implement
-				// new DeadCodeEliminationRefactoring(),
+				new DeadCodeEliminationRefactoring(),
 				new CollapseIfStatementRefactoring(),
 				new CommonCodeInIfElseStatementRefactoring(),
 				// TODO JNR complete it

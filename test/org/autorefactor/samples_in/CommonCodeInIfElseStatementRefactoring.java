@@ -27,7 +27,12 @@ package org.autorefactor.samples_in;
 
 public class CommonCodeInIfElseStatementRefactoring {
 
-    public static void main(String[] args) {
+    /** no code at all, remove all */
+    public void emptyIfOrElseClauses(Boolean b, int i, int j) {
+        if (b.booleanValue()) {
+            System.out.println();
+        } else {
+        }
     }
 
     /** no common code, Do not remove anything */

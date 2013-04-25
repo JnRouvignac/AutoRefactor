@@ -288,18 +288,22 @@ public class CommonCodeInIfElseStatementRefactoring extends ASTVisitor
 	 */
 	private boolean collectAllCases(List<List<Statement>> allCases,
 			IfStatement node) {
-		allCases.add(ASTHelper.asList(node.getThenStatement()));
-
-		final Statement elseStmt = node.getElseStatement();
-		if (elseStmt == null) {
+		final List<Statement> thenStmts = ASTHelper.asList(node.getThenStatement());
+		final List<Statement> elseStmts = ASTHelper.asList(node.getElseStatement());
+		if (thenStmts.isEmpty() || elseStmts.isEmpty()) {
+			// if the then or else clause is empty, then there is no common code whatsoever.
+			// let other refactorings take care of removing empty blocks.
 			return false;
-		} else {
-			final IfStatement is = ASTHelper.as(elseStmt, IfStatement.class);
+		}
+
+		allCases.add(thenStmts);
+		if (elseStmts.size() == 1) {
+			final IfStatement is = ASTHelper.as(elseStmts.get(0), IfStatement.class);
 			if (is != null) {
 				return collectAllCases(allCases, is);
 			}
 		}
-		allCases.add(ASTHelper.asList(elseStmt));
+		allCases.add(elseStmts);
 		return true;
 	}
 
