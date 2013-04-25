@@ -91,8 +91,6 @@ public class StringBuilderRefactoring extends ASTVisitor implements
 		return ASTHelper.VISIT_SUBTREE;
 	}
 
-	// TODO JNR add samples
-
 	@Override
 	public boolean visit(MethodInvocation node) {
 		if (node.getExpression() == null) {
@@ -115,7 +113,7 @@ public class StringBuilderRefactoring extends ASTVisitor implements
 				return ASTHelper.DO_NOT_VISIT_SUBTREE;
 			}
 		} else if ("toString".equals(node.getName().getIdentifier())
-				&& node.arguments().size() == 0
+				&& node.arguments().isEmpty()
 				&& ASTHelper.hasType(node.getExpression(),
 						"java.lang.StringBuilder", "java.lang.StringBuffer")) {
 			final LinkedList<Expression> allAppendedStrings = new LinkedList<Expression>();

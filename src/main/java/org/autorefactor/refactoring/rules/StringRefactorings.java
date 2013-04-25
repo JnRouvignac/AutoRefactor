@@ -44,7 +44,7 @@ import org.eclipse.jdt.core.dom.MethodInvocation;
  * literal.</li>
  * <li>Calling {@link String#toString()} on a {@link String} instance</li>
  * </ul>
- * 
+ *
  * @author jnrouvignac
  */
 public class StringRefactorings extends ASTVisitor implements IJavaRefactoring {
@@ -88,6 +88,7 @@ public class StringRefactorings extends ASTVisitor implements IJavaRefactoring {
 		final Expression expression = node.getExpression();
 		if (expression != null
 				&& "toString".equals(node.getName().getIdentifier())
+				&& node.arguments().isEmpty()
 				&& canRemoveToStringMethodCall(node, expression)) {
 			this.refactorings.replace(node,
 					ASTHelper.copySubtree(this.ast, expression));
@@ -103,8 +104,7 @@ public class StringRefactorings extends ASTVisitor implements IJavaRefactoring {
 				"java.lang.String")) {
 			// We are in a String context, no need to call toString()
 			return true;
-		} else if (ASTHelper.hasType(expression, "java.lang.String")
-				&& node.arguments().size() == 0) {
+		} else if (ASTHelper.hasType(expression, "java.lang.String")) {
 			// It's already a String, no need to call toString()
 			return true;
 		}
