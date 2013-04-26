@@ -26,11 +26,13 @@
 package org.autorefactor.ui;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import org.autorefactor.refactoring.IJavaRefactoring;
 import org.autorefactor.refactoring.IRefactoring;
@@ -74,6 +76,8 @@ import org.eclipse.jdt.core.dom.ChildListPropertyDescriptor;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.rewrite.ASTRewrite;
 import org.eclipse.jdt.core.dom.rewrite.ListRewrite;
+import org.eclipse.jdt.internal.core.ExternalPackageFragmentRoot;
+import org.eclipse.jdt.internal.core.JarPackageFragmentRoot;
 import org.eclipse.jdt.ui.JavaUI;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.text.Document;
@@ -117,6 +121,7 @@ public class AutoRefactorHandler extends AbstractHandler {
 
 			monitor.beginTask("", compilationUnits.size());
 			try {
+				final Release javaSERelease = Release.javaSE(javaSourceCompatibility);
 				for (final ICompilationUnit compilationUnit : compilationUnits) {
 					try {
 						final String elName = compilationUnit.getElementName();
@@ -125,8 +130,8 @@ public class AutoRefactorHandler extends AbstractHandler {
 						final String className = compilationUnit.getParent()
 								.getElementName() + "." + simpleName;
 						monitor.subTask("Applying refactorings to " + className);
-						applyRefactorings(compilationUnit,
-								Release.javaSE(javaSourceCompatibility));
+						applyRefactorings(compilationUnit, javaSERelease,
+								getAllRefactorings());
 					} catch (Exception e) {
 						throw new RuntimeException(e);
 					} finally {
@@ -140,66 +145,117 @@ public class AutoRefactorHandler extends AbstractHandler {
 		}
 
 		private void testWithSamples() {
-			final Shell shell = HandlerUtil.getActiveShell(event);
 			try {
-				boolean success = true;
-				final StringBuilder errorMessages = new StringBuilder();
 				final IJavaProject javaProject = getIJavaProject(getSelectedJavaElement(event));
-				String javaSourceCompatibility = getJavaSourceCompatibility(javaProject);
+				final String javaSourceCompatibility = getJavaSourceCompatibility(javaProject);
+				final Release javaSERelease = Release.javaSE(javaSourceCompatibility);
 				for (IPackageFragmentRoot packageFragmentRoot : javaProject
 						.getPackageFragmentRoots()) {
-					final List<ICompilationUnit> samplesIn = getSamples(
-							packageFragmentRoot, "org.autorefactor.samples_in");
-					final List<ICompilationUnit> samplesOut = getSamples(
-							packageFragmentRoot, "org.autorefactor.samples_out");
-
-					for (ICompilationUnit sampleIn : samplesIn) {
-						final String className = getClassName(sampleIn);
-						final ICompilationUnit sampleOut = findCorrespondingSampleOut(
-								samplesOut, className);
-						errorMessages.append(className).append(".java: ");
-						if (sampleOut == null) {
-							errorMessages.append("MISSING OUTPUT\n");
-							success = false;
-							continue;
-						}
-						applyRefactorings(sampleIn,
-								Release.javaSE(javaSourceCompatibility));
-						String actualSource =
-								sampleIn.getSource().replaceAll(
-										"package org.autorefactor.samples_in;",
-										"package org.autorefactor.samples_out;");
-						String expectedSource = sampleOut.getSource();
-						if (actualSource.equals(expectedSource)) {
-							errorMessages.append("Success\n");
-						} else {
-							errorMessages.append("FAILURE\n");
-							success = false;
-						}
+					if (packageFragmentRoot instanceof JarPackageFragmentRoot
+							|| packageFragmentRoot instanceof ExternalPackageFragmentRoot) {
+						continue;
 					}
-				}
 
-				if (success) {
-					MessageDialog.openInformation(shell, "Tests Success!!", errorMessages.toString());
-				}else {
-					MessageDialog.openError(shell, "Tests ERROR", errorMessages.toString());
+					String samplesInPkg = "org.autorefactor.samples_in";
+					String samplesOutPkg = "org.autorefactor.samples_out";
+					final List<ICompilationUnit> samplesIn = getSamples(
+							packageFragmentRoot, samplesInPkg);
+					final List<ICompilationUnit> samplesOut = getSamples(
+							packageFragmentRoot, samplesOutPkg);
+
+					Collection<TestCase> testCases = buildTestCases(samplesIn, samplesOut);
+					runTests(testCases, samplesInPkg, samplesOutPkg, javaSERelease);
 				}
 			} catch (Exception e) {
 				throw new RuntimeException("Unexpected exception", e);
 			}
 		}
 
-		private ICompilationUnit findCorrespondingSampleOut(
-				List<ICompilationUnit> samplesOut, String className) {
-			for (ICompilationUnit compilationUnit : samplesOut) {
-				if (className.equals(getClassName(compilationUnit))) {
-					return compilationUnit;
+		private void runTests(Collection<TestCase> testCases, String samplesInPkg,
+				String samplesOutPkg, final Release javaSERelease) throws Exception {
+			boolean success = true;
+			final StringBuilder result = new StringBuilder();
+
+			for (TestCase testCase : testCases) {
+				result.append(testCase.sampleName).append(".java: ");
+
+				if (testCase.refactoring == null
+						|| testCase.sampleIn == null
+						|| testCase.sampleOut == null) {
+					result.append("MISSING ");
+					if (testCase.sampleIn == null || testCase.sampleOut == null) {
+						result.append(testCase.getINAndOUT(false));
+						if (testCase.refactoring == null) {
+							result.append(" and Refactoring");
+						}
+					} else if (testCase.refactoring == null) {
+						result.append("Refactoring");
+					}
+					result.append("\n");
+					success = false;
+					continue;
+				}
+
+				applyRefactorings(testCase.sampleIn, javaSERelease, Collections
+						.singletonList(testCase.refactoring));
+
+				// Change the package to be the same as the sampleOut
+				String actualSource = testCase.sampleIn.getSource()
+						.replaceAll(samplesInPkg, samplesOutPkg);
+				String expectedSource = testCase.sampleOut.getSource();
+				if (actualSource.equals(expectedSource)) {
+					result.append("Success\n");
+				} else {
+					result.append("FAILURE\n");
+					success = false;
 				}
 			}
-			return null;
+
+			final Shell shell = HandlerUtil.getActiveShell(event);
+			if (success) {
+				MessageDialog.openInformation(shell, "Tests Success!!", result.toString());
+			} else {
+				MessageDialog.openError(shell, "Tests ERROR", result.toString());
+			}
 		}
 
-		private String getClassName(ICompilationUnit compilationUnit) {
+		private Collection<TestCase> buildTestCases(
+				final List<ICompilationUnit> samplesIn,
+				final List<ICompilationUnit> samplesOut)
+		{
+			Map<String, TestCase> testCases = new TreeMap<String, TestCase>();
+			for (ICompilationUnit sampleIn : samplesIn)
+			{
+				final String sampleName = getSampleName(sampleIn);
+				TestCase testCase = getTestCase(testCases, sampleName);
+				testCase.sampleIn = sampleIn;
+			}
+			for (ICompilationUnit sampleOut : samplesOut)
+			{
+				final String sampleName = getSampleName(sampleOut);
+				TestCase testCase = getTestCase(testCases, sampleName);
+				testCase.sampleOut = sampleOut;
+			}
+			for (IRefactoring refactoring : getAllRefactorings())
+			{
+				String name = refactoring.getClass().getSimpleName();
+				String sampleName = name.substring(0, name.indexOf("Refactoring")) + "Sample";
+				TestCase testCase = getTestCase(testCases, sampleName);
+				testCase.refactoring = refactoring;
+			}
+			return testCases.values();
+		}
+
+		private TestCase getTestCase(Map<String, TestCase> testContexts, String sampleName) {
+			TestCase testCase = testContexts.get(sampleName);
+			if (testCase == null) {
+				testCase = new TestCase(sampleName);
+				testContexts.put(sampleName, testCase);
+			}
+			return testCase;
+		}
+
+		private String getSampleName(ICompilationUnit compilationUnit) {
 			final String elementName = compilationUnit.getElementName();
 			return elementName.substring(0, elementName.indexOf('.'));
 		}
@@ -355,7 +411,8 @@ public class AutoRefactorHandler extends AbstractHandler {
 	 *      org.eclipse.ui.menus </a>
 	 */
 	private static void applyRefactorings(ICompilationUnit compilationUnit,
-			Release javaSERelease) throws Exception {
+			Release javaSERelease, List<IRefactoring> refactoringsToApply)
+			throws Exception {
 		// creation of DOM/AST from a ICompilationUnit
 		final ASTParser parser = ASTParser.newParser(AST.JLS4);
 		parser.setSource(compilationUnit);
@@ -363,13 +420,10 @@ public class AutoRefactorHandler extends AbstractHandler {
 
 		CompilationUnit astRoot = (CompilationUnit) parser.createAST(null);
 		// final List<CFGBasicBlock> basicBlocks = new
-		// CFGBuilder(astRoot.getAST())
-		// .buildCFG(astRoot);
+		// CFGBuilder(astRoot.getAST()).buildCFG(astRoot);
 
-		// TODO JNR add testing for the refactorings, can it be done like in the
-		// Main class of coccimain_javacc project?
 		final IDocument document = new Document(compilationUnit.getSource());
-		for (IRefactoring refactoring : getAllRefactorings()) {
+		for (IRefactoring refactoring : refactoringsToApply) {
 			try {
 				refactoring.setAST(astRoot.getAST());
 				// TODO JNR pass down Java version or library version

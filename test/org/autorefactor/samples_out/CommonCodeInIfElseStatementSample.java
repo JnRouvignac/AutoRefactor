@@ -23,15 +23,15 @@
  * which accompanies this distribution under LICENSE-ECLIPSE, and is
  * available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.autorefactor.samples_in;
+package org.autorefactor.samples_out;
 
-public class CommonCodeInIfElseStatementRefactoring {
+public class CommonCodeInIfElseStatementSample
+{
 
     /** no code at all, remove all */
     public void emptyIfOrElseClauses(Boolean b, int i, int j) {
         if (b.booleanValue()) {
             System.out.println();
-        } else {
         }
     }
 
@@ -46,39 +46,28 @@ public class CommonCodeInIfElseStatementRefactoring {
 
     /** common code: i++, Remove if statement */
     public void ifElseRemoveIfNoBrackets(Boolean b, int i) {
-        // keep this!
-        if (b.booleanValue())
-            i++;
-        else
-            i++;
+        i++;
     }
 
     /** common code: i++, Remove if statement */
     public void ifElseRemoveIf(Boolean b, int i) {
-        if (b.booleanValue()) {
-            i++;
-        } else {
-            i++;
-        }
+        i++;
     }
 
     /** common code: i++, Remove then case */
     public void ifElseRemoveThen(Boolean b, int i, int j) {
+        i++;
         if (b.booleanValue()) {
-            i++;
         } else {
-            i++;
             j++;
         }
     }
 
     /** common code: i++, Remove else case */
     public void ifElseRemoveElse(Boolean b, int i, int j) {
+        i++;
         if (b.booleanValue()) {
-            i++;
             j++;
-        } else {
-            i++;
         }
     }
 
@@ -87,26 +76,19 @@ public class CommonCodeInIfElseStatementRefactoring {
      * not remove if statement.
      */
     public void ifElseRemoveIf(Boolean b, int i, int j, int k, int l) {
+        i++;
         if (b.booleanValue()) {
-            i++;
             j++;
-            l++;
         } else {
-            i++;
             k++;
-            l++;
         }
+        l++;
     }
 
     /** only common code, Remove if statement */
     public void ifElseRemoveIfSeveralStatements(Boolean b, int i, int j) {
-        if (b.booleanValue()) {
-            i++;
-            j++;
-        } else {
-            i++;
-            j++;
-        }
+        i++;
+        j++;
     }
 
     /** not all cases covered, Do not remove anything */
@@ -122,16 +104,8 @@ public class CommonCodeInIfElseStatementRefactoring {
 
     /** only common code: remove if statement */
     public void ifElseIfElseRemoveIf(Boolean b, int i, int j) {
-        if (b.booleanValue()) {
-            i++;
-            j++;
-        } else if (!b.booleanValue()) {
-            i++;
-            j++;
-        } else {
-            i++;
-            j++;
-        }
+        i++;
+        j++;
     }
 
 }

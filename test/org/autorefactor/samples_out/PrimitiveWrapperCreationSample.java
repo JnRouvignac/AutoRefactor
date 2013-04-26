@@ -25,7 +25,7 @@
  */
 package org.autorefactor.samples_out;
 
-public class PrimiteWrappersSample {
+public class PrimitiveWrapperCreationSample {
 
     public static void replaceWrapperConstructorsWithValueOf() {
         // Replace all calls to wrapper constructors with calls to .valueOf() methods
