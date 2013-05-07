@@ -92,6 +92,21 @@ public class StringBuilderRefactoring extends ASTVisitor implements
 	}
 
 	@Override
+	public boolean visit(InfixExpression node) {
+		if (Operator.PLUS.equals(node.getOperator())
+				&& "".equals(node.getRightOperand().resolveConstantExpressionValue())) {
+			ITypeBinding typeBinding = node.getLeftOperand().resolveTypeBinding();
+			if (typeBinding != null
+					&& "java.lang.String".equals(typeBinding.getQualifiedName())) {
+				Expression newE = ASTHelper.copySubtree(this.ast, node.getLeftOperand());
+				this.refactorings.replace(node, newE);
+				return ASTHelper.DO_NOT_VISIT_SUBTREE;
+			}
+		}
+		return super.visit(node);
+	}
+	
+	@Override
 	public boolean visit(MethodInvocation node) {
 		if (node.getExpression() == null) {
 			return ASTHelper.VISIT_SUBTREE;
