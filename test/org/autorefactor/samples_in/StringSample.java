@@ -34,12 +34,11 @@ public class StringSample {
         // replace
         String s2 = s.toString();
         String s3 = "".toString();
-        String s4 = ("").toString();
-        String s5 = getS().toString();
+        String s4 = getS().toString();
         // replace
-        String s6 = "" + Boolean.TRUE.toString();
+        String s5 = "" + Boolean.TRUE.toString();
         // do not replace
-        String s7 = Boolean.TRUE.toString();
+        String s6 = Boolean.TRUE.toString();
         return Boolean.TRUE.toString();
     }
 
