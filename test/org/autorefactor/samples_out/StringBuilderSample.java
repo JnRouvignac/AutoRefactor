@@ -43,6 +43,9 @@ public class StringBuilderSample {
         // DO NOT replace with string append
         String s5 = sbuf.append("foo ").append("bar").toString();
         String s6 = sbui.append("foo ").append("bar").toString();
+
+        // remove useless string concatenation
+        String s7 = Integer.toString(42);
     }
 
 }

@@ -40,7 +40,6 @@ public class StringSample {
         String s6 = "" + Boolean.TRUE.toString();
         // do not replace
         String s7 = Boolean.TRUE.toString();
-        String s8 = Integer.toString(42) + "";
         return Boolean.TRUE.toString();
     }
 

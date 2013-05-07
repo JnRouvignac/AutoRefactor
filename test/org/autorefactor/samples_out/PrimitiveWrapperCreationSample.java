@@ -31,7 +31,7 @@ public class PrimitiveWrapperCreationSample {
         // Replace all calls to wrapper constructors with calls to .valueOf() methods
         byte b = 4;
         Byte by = Byte.valueOf(b);
-        Boolean bo = Boolean.TRUE;
+        Boolean bo = Boolean.valueOf(true);
         Character c = Character.valueOf('c');
         Double d = Double.valueOf(1);
         Float f = Float.valueOf(1);

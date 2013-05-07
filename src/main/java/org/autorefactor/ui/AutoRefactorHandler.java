@@ -200,9 +200,12 @@ public class AutoRefactorHandler extends AbstractHandler {
 						.singletonList(testCase.refactoring));
 
 				// Change the package to be the same as the sampleOut
+				// and ignore insignificant space characters
 				String actualSource = testCase.sampleIn.getSource()
-						.replaceAll(samplesInPkg, samplesOutPkg);
-				String expectedSource = testCase.sampleOut.getSource();
+						.replaceAll(samplesInPkg, samplesOutPkg)
+						.replaceAll("\\s\\s+", "\n");
+				String expectedSource = testCase.sampleOut.getSource()
+						.replaceAll("\\s\\s+", "\n");
 				if (actualSource.equals(expectedSource)) {
 					result.append("Success\n");
 				} else {

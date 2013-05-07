@@ -120,6 +120,7 @@ public class StringBuilderRefactoring extends ASTVisitor implements
 			final Expression lastExpr = collectAllAppendedStrings(
 					node.getExpression(), allAppendedStrings);
 			// TODO new StringBuffer().append(" bla").append("bla").toString();
+			// outputs " blabla"
 			if (lastExpr instanceof ClassInstanceCreation) {
 				this.refactorings.replace(node,
 						createStringAdds(allAppendedStrings));
