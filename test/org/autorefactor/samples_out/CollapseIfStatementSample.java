@@ -51,7 +51,11 @@ public class CollapseIfStatementSample {
 
     public void doNotCollapseIfWithElseStatement2(boolean b1, boolean b2) {
         if (b1) {
-            int i = 0;
+            if (b2) {
+                int i = 0;
+            } else {
+                int i = 0;
+            }
         }
     }
 

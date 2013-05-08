@@ -32,6 +32,7 @@ public class CommonCodeInIfElseStatementSample
     public void emptyIfOrElseClauses(Boolean b, int i, int j) {
         if (b.booleanValue()) {
             System.out.println();
+        } else {
         }
     }
 
