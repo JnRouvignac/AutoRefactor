@@ -61,12 +61,25 @@ public class SimplifyExpressionSample {
             boolean b2 = args[0] != null && NULL_CONSTANT.equalsIgnoreCase(args[0]);
         }
         {
+            // Do not remove non redundant null checks
+            boolean b1 = null != args[0] && NULL_CONSTANT.equals(args[0]);
+            boolean b2 = null != args[0] && NULL_CONSTANT.equalsIgnoreCase(args[0]);
+        }
+        {
             // Right-hand-side left unchanged because left-hand-side can have
             // side effects
             boolean b3 = args[0] != null && true;
             boolean b4 = args[0] != null && false;
             boolean b5 = args[0] != null || true;
             boolean b6 = args[0] != null || false;
+        }
+        {
+            // Right-hand-side left unchanged because left-hand-side can have
+            // side effects
+            boolean b3 = null != args[0] && true;
+            boolean b4 = null != args[0] && false;
+            boolean b5 = null != args[0] || true;
+            boolean b6 = null != args[0] || false;
         }
     }
 
