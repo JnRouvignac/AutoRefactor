@@ -48,28 +48,4 @@ public class InvertEqualsSample {
         return s.equalsIgnoreCase(Itf.nullConstant);
     }
 
-    public static void main(String[] args) {
-        {
-            // Invert equals()
-            boolean b1 = "".equals(args[0]);
-            boolean b2 = Itf.constant.equals(args[0]);
-            boolean b3 = "".equals(args[0]);
-            boolean b4 = Itf.constant.equals(args[0]);
-            // Do NOT invert equals()
-            boolean b5 = args[0] != null && args[0].equals(Itf.nullConstant);
-            boolean b6 = null != args[0] && args[0].equals(Itf.nullConstant);
-        }
-        {
-            // Invert equals()
-            boolean b1 = "".equalsIgnoreCase(args[0]);
-            boolean b2 = Itf.constant.equalsIgnoreCase(args[0]);
-            boolean b3 = "".equalsIgnoreCase(args[0]);
-            boolean b4 = Itf.constant.equalsIgnoreCase(args[0]);
-            // Do NOT invert equals()
-            boolean b5 = args[0] != null
-                    && args[0].equalsIgnoreCase(Itf.nullConstant);
-            boolean b6 = null != args[0]
-                    && args[0].equalsIgnoreCase(Itf.nullConstant);
-        }
-    }
 }
