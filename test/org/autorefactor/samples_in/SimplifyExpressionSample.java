@@ -57,13 +57,13 @@ public class SimplifyExpressionSample {
     public void doNotRemoveNullCheck(String[] args) {
         {
             // Do not remove non redundant null checks
-            boolean b1 = args[0] != null && NULL_CONSTANT.equals(args[0]);
-            boolean b2 = args[0] != null && NULL_CONSTANT.equalsIgnoreCase(args[0]);
+            boolean b1 = args[0] != null && args[0].equals(NULL_CONSTANT);
+            boolean b2 = args[0] != null && args[0].equalsIgnoreCase(NULL_CONSTANT);
         }
         {
             // Do not remove non redundant null checks
-            boolean b1 = null != args[0] && NULL_CONSTANT.equals(args[0]);
-            boolean b2 = null != args[0] && NULL_CONSTANT.equalsIgnoreCase(args[0]);
+            boolean b1 = null != args[0] && args[0].equals(NULL_CONSTANT);
+            boolean b2 = null != args[0] && args[0].equalsIgnoreCase(NULL_CONSTANT);
         }
         {
             // Right-hand-side left unchanged because left-hand-side can have
