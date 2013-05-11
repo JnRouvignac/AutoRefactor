@@ -185,7 +185,7 @@ public class ASTHelper {
 			return false;
 		}
 		throw new IllegalStateException(
-				"Not implemented for fully qualified name" + fqn);
+				"Not implemented for fully qualified name \"" + fqn + "\"");
 	}
 
 	// AST navigation

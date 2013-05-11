@@ -83,17 +83,18 @@ public class InvertEqualsRefactoring extends ASTVisitor implements
 					.resolveConstantExpressionValue();
 			if (exprConstantValue == null && argConstantValue != null) {
 				this.refactorings.replace(node,
-						invertEqualsInvocation(expr, arg));
+						invertEqualsInvocation(expr, arg, isEquals));
 				return ASTHelper.DO_NOT_VISIT_SUBTREE;
 			}
 		}
 		return ASTHelper.VISIT_SUBTREE;
 	}
 
-	private ASTNode invertEqualsInvocation(Expression lhs, Expression rhs) {
+	private ASTNode invertEqualsInvocation(Expression lhs, Expression rhs, boolean isEquals) {
+		final String methodName = isEquals ? "equals" : "equalsIgnoreCase";
 		final MethodInvocation mi = this.ast.newMethodInvocation();
 		mi.setExpression(ASTHelper.copySubtree(this.ast, rhs));
-		mi.setName(this.ast.newSimpleName("equals"));
+		mi.setName(this.ast.newSimpleName(methodName));
 		mi.arguments().add(ASTHelper.copySubtree(this.ast, lhs));
 		return mi;
 	}

@@ -32,6 +32,22 @@ public class InvertEqualsSample {
         String nullConstant = null;
     }
 
+    public boolean invertEquals(Object obj) {
+        return "".equals(obj) && Itf.constant.equals(obj);
+    }
+
+    public boolean doNotInvertEquals(Object obj) {
+        return obj.equals(Itf.nullConstant);
+    }
+
+    public boolean invertEqualsIgnoreCase(String s) {
+        return "".equalsIgnoreCase(s) && Itf.constant.equalsIgnoreCase(s);
+    }
+
+    public boolean doNotInvertEqualsIgnoreCase(String s) {
+        return s.equalsIgnoreCase(Itf.nullConstant);
+    }
+
     public static void main(String[] args) {
         {
             // Invert equals()
