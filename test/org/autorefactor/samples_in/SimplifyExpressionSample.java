@@ -30,16 +30,20 @@ import java.util.List;
 
 public class SimplifyExpressionSample {
 
+    private static final String NULL_CONSTANT = null;
+
     public void removeUselessNullCheck(String[] args) {
         {
             // Remove redundant null checks
             boolean b1 = args[0] != null && "".equals(args[0]);
-            boolean b2 = args[0] != null && args[0] instanceof String;
+            boolean b2 = args[0] != null && "".equalsIgnoreCase(args[0]);
+            boolean b3 = args[0] != null && args[0] instanceof String;
         }
         {
             // Remove redundant null checks
             boolean b1 = null != args[0] && "".equals(args[0]);
-            boolean b2 = null != args[0] && args[0] instanceof String;
+            boolean b2 = null != args[0] && "".equalsIgnoreCase(args[0]);
+            boolean b3 = null != args[0] && args[0] instanceof String;
         }
         {
             // Remove redundant left / write hand side operands
@@ -47,6 +51,14 @@ public class SimplifyExpressionSample {
             boolean b4 = false && args[0] != null;
             boolean b5 = true || args[0] != null;
             boolean b6 = false || args[0] != null;
+        }
+    }
+
+    public void doNotRemoveNullCheck(String[] args) {
+        {
+            // Do not remove non redundant null checks
+            boolean b1 = args[0] != null && NULL_CONSTANT.equals(args[0]);
+            boolean b2 = args[0] != null && NULL_CONSTANT.equalsIgnoreCase(args[0]);
         }
         {
             // Right-hand-side left unchanged because left-hand-side can have

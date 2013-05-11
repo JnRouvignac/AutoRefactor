@@ -30,16 +30,20 @@ import java.util.List;
 
 public class SimplifyExpressionSample {
 
+    private static final String NULL_CONSTANT = null;
+
     public void removeUselessNullCheck(String[] args) {
         {
             // Remove redundant null checks
             boolean b1 = "".equals(args[0]);
-            boolean b2 = args[0] instanceof String;
+            boolean b2 = "".equalsIgnoreCase(args[0]);
+            boolean b3 = args[0] instanceof String;
         }
         {
             // Remove redundant null checks
             boolean b1 = "".equals(args[0]);
-            boolean b2 = args[0] instanceof String;
+            boolean b2 = "".equalsIgnoreCase(args[0]);
+            boolean b3 = args[0] instanceof String;
         }
         {
             // Remove redundant left / write hand side operands
@@ -47,6 +51,14 @@ public class SimplifyExpressionSample {
             boolean b4 = false;
             boolean b5 = true;
             boolean b6 = args[0] != null;
+        }
+    }
+
+    public void doNotRemoveNullCheck(String[] args) {
+        {
+            // Do not remove non redundant null checks
+            boolean b1 = args[0] != null && NULL_CONSTANT.equals(args[0]);
+            boolean b2 = args[0] != null && NULL_CONSTANT.equalsIgnoreCase(args[0]);
         }
         {
             // Right-hand-side left unchanged because left-hand-side can have
@@ -98,9 +110,9 @@ public class SimplifyExpressionSample {
         // do not replace
         boolean b4 = !(i instanceof Number);
         // replace
-        boolean b5 = (i != null);
+        boolean b5 = i != null;
         // replace
-        boolean b6 = b5 && (i != null);
+        boolean b6 = b5 && i != null;
     }
 
     public boolean removeUselessParentheses() throws Exception {
@@ -109,7 +121,7 @@ public class SimplifyExpressionSample {
         Collection<?> col = null;
         i = 0;
         int[] ar = new int[i];
-        ar = new int[]{i};
+        ar = new int[] { i };
         ar[i] = i;
         if (b) {
             throw new Exception();
@@ -144,7 +156,7 @@ public class SimplifyExpressionSample {
 		while (i == 0) {
 			i++;
 		}
-		return (i);
+		return i;
 	}
 
     public void removeUselessParenthesesWithAssociativeOperators(boolean b1,
