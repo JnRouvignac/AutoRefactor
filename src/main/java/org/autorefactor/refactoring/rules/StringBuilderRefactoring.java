@@ -31,8 +31,6 @@ import java.util.List;
 import org.autorefactor.refactoring.ASTHelper;
 import org.autorefactor.refactoring.IJavaRefactoring;
 import org.autorefactor.refactoring.Refactorings;
-import org.autorefactor.refactoring.Release;
-import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
@@ -60,22 +58,16 @@ import org.eclipse.jdt.core.dom.StringLiteral;
 public class StringBuilderRefactoring extends ASTVisitor implements
 		IJavaRefactoring {
 
-	private final Refactorings refactorings = new Refactorings();
-	private AST ast;
-	private Release javaSERelease;
+	private RefactoringContext ctx;
 	private int javaMinorVersion;
 
 	public StringBuilderRefactoring() {
 		super();
 	}
 
-	public void setAST(final AST ast) {
-		this.ast = ast;
-	}
-
-	public void setJavaSERelease(Release javaSERelease) {
-		this.javaSERelease = javaSERelease;
-		this.javaMinorVersion = this.javaSERelease.getMinorVersion();
+	public void setRefactoringContext(RefactoringContext ctx) {
+		this.ctx = ctx;
+		this.javaMinorVersion = this.ctx.getJavaSERelease().getMinorVersion();
 	}
 
 	@Override
@@ -96,13 +88,13 @@ public class StringBuilderRefactoring extends ASTVisitor implements
 		if (Operator.PLUS.equals(node.getOperator())
 				&& "".equals(node.getRightOperand().resolveConstantExpressionValue())
 				&& ASTHelper.hasType(node.getLeftOperand(), "java.lang.String")) {
-			Expression newE = ASTHelper.copySubtree(this.ast, node.getLeftOperand());
-			this.refactorings.replace(node, newE);
+			Expression newE = ASTHelper.copySubtree(this.ctx.getAST(), node.getLeftOperand());
+			this.ctx.getRefactorings().replace(node, newE);
 			return ASTHelper.DO_NOT_VISIT_SUBTREE;
 		}
 		return super.visit(node);
 	}
-	
+
 	@Override
 	public boolean visit(MethodInvocation node) {
 		if (node.getExpression() == null) {
@@ -120,7 +112,7 @@ public class StringBuilderRefactoring extends ASTVisitor implements
 			if (lastExpr instanceof Name || lastExpr instanceof FieldAccess) {
 				// TODO do EfficientAppendableUse
 				// TODO if content is equal to 0 + "", then drop ""
-				this.refactorings.replace(node,
+				this.ctx.getRefactorings().replace(node,
 						createStringAppends(lastExpr, allAppendedStrings));
 				return ASTHelper.DO_NOT_VISIT_SUBTREE;
 			}
@@ -134,7 +126,7 @@ public class StringBuilderRefactoring extends ASTVisitor implements
 			// TODO new StringBuffer().append(" bla").append("bla").toString();
 			// outputs " blabla"
 			if (lastExpr instanceof ClassInstanceCreation) {
-				this.refactorings.replace(node,
+				this.ctx.getRefactorings().replace(node,
 						createStringAdds(allAppendedStrings));
 				return ASTHelper.DO_NOT_VISIT_SUBTREE;
 			}
@@ -149,9 +141,9 @@ public class StringBuilderRefactoring extends ASTVisitor implements
 			if (result == null) {
 				result = expr;
 			} else {
-				final MethodInvocation mi = this.ast.newMethodInvocation();
+				final MethodInvocation mi = this.ctx.getAST().newMethodInvocation();
 				mi.setExpression(result);
-				mi.setName(this.ast.newSimpleName("append"));
+				mi.setName(this.ctx.getAST().newSimpleName("append"));
 				mi.arguments().add(expr);
 				result = mi;
 			}
@@ -165,7 +157,7 @@ public class StringBuilderRefactoring extends ASTVisitor implements
 			if (result == null) {
 				result = expr;
 			} else {
-				final InfixExpression ie = this.ast.newInfixExpression();
+				final InfixExpression ie = this.ctx.getAST().newInfixExpression();
 				ie.setLeftOperand(result);
 				ie.setOperator(Operator.PLUS);
 				ie.setRightOperand(expr);
@@ -195,12 +187,12 @@ public class StringBuilderRefactoring extends ASTVisitor implements
 					if (ASTHelper.hasType(arg, "java.lang.String")
 							|| ASTHelper.instanceOf(arg.resolveTypeBinding(),
 									"java.lang.CharSequence")) {
-						results.add(ASTHelper.copySubtree(this.ast, arg));
+						results.add(ASTHelper.copySubtree(this.ctx.getAST(), arg));
 					}
 				}
-				return ASTHelper.copySubtree(this.ast, cic);
+				return ASTHelper.copySubtree(this.ctx.getAST(), cic);
 			} else if (expr instanceof Name || expr instanceof FieldAccess) {
-				return ASTHelper.copySubtree(this.ast, expr);
+				return ASTHelper.copySubtree(this.ctx.getAST(), expr);
 			}
 		}
 		return null;
@@ -222,11 +214,11 @@ public class StringBuilderRefactoring extends ASTVisitor implements
 				return;
 			}
 		}
-		results.addFirst(ASTHelper.copySubtree(this.ast, arg));
+		results.addFirst(ASTHelper.copySubtree(this.ctx.getAST(), arg));
 	}
 
 	public Refactorings getRefactorings(CompilationUnit astRoot) {
 		astRoot.accept(this);
-		return this.refactorings;
+		return this.ctx.getRefactorings();
 	}
 }

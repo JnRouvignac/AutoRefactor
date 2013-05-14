@@ -28,8 +28,6 @@ package org.autorefactor.refactoring.rules;
 import org.autorefactor.refactoring.ASTHelper;
 import org.autorefactor.refactoring.IJavaRefactoring;
 import org.autorefactor.refactoring.Refactorings;
-import org.autorefactor.refactoring.Release;
-import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.CompilationUnit;
@@ -49,20 +47,14 @@ import org.eclipse.jdt.core.dom.MethodInvocation;
  */
 public class StringRefactorings extends ASTVisitor implements IJavaRefactoring {
 
-	private final Refactorings refactorings = new Refactorings();
-	private AST ast;
-	private Release javaSERelease;
+	private RefactoringContext ctx;
 
 	public StringRefactorings() {
 		super();
 	}
 
-	public void setAST(final AST ast) {
-		this.ast = ast;
-	}
-
-	public void setJavaSERelease(Release javaSERelease) {
-		this.javaSERelease = javaSERelease;
+	public void setRefactoringContext(RefactoringContext ctx) {
+		this.ctx = ctx;
 	}
 
 	// TODO JNR remove calls to toString() inside string concatenation
@@ -75,8 +67,8 @@ public class StringRefactorings extends ASTVisitor implements IJavaRefactoring {
 				&& node.arguments().size() == 1) {
 			final Expression arg = (Expression) node.arguments().get(0);
 			if (arg.resolveConstantExpressionValue() != null) {
-				this.refactorings.replace(node,
-						ASTHelper.copySubtree(this.ast, arg));
+				this.ctx.getRefactorings().replace(node,
+						ASTHelper.copySubtree(this.ctx.getAST(), arg));
 				return ASTHelper.DO_NOT_VISIT_SUBTREE;
 			}
 		}
@@ -90,8 +82,8 @@ public class StringRefactorings extends ASTVisitor implements IJavaRefactoring {
 				&& "toString".equals(node.getName().getIdentifier())
 				&& node.arguments().isEmpty()
 				&& canRemoveToStringMethodCall(node, expression)) {
-			this.refactorings.replace(node,
-					ASTHelper.copySubtree(this.ast, expression));
+			this.ctx.getRefactorings().replace(node,
+					ASTHelper.copySubtree(this.ctx.getAST(), expression));
 			return ASTHelper.DO_NOT_VISIT_SUBTREE;
 		}
 		return ASTHelper.VISIT_SUBTREE;
@@ -113,6 +105,6 @@ public class StringRefactorings extends ASTVisitor implements IJavaRefactoring {
 
 	public Refactorings getRefactorings(CompilationUnit astRoot) {
 		astRoot.accept(this);
-		return this.refactorings;
+		return this.ctx.getRefactorings();
 	}
 }

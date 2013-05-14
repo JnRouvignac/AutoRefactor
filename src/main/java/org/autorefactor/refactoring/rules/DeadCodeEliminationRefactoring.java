@@ -30,8 +30,6 @@ import java.util.List;
 import org.autorefactor.refactoring.ASTHelper;
 import org.autorefactor.refactoring.IJavaRefactoring;
 import org.autorefactor.refactoring.Refactorings;
-import org.autorefactor.refactoring.Release;
-import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.Block;
@@ -47,20 +45,14 @@ import org.eclipse.jdt.core.dom.WhileStatement;
 public class DeadCodeEliminationRefactoring extends ASTVisitor implements
 		IJavaRefactoring {
 
-	private final Refactorings refactorings = new Refactorings();
-	private AST ast;
-	private Release javaSERelease;
+	private RefactoringContext ctx;
 
 	public DeadCodeEliminationRefactoring() {
 		super();
 	}
 
-	public void setAST(final AST ast) {
-		this.ast = ast;
-	}
-
-	public void setJavaSERelease(Release javaSERelease) {
-		this.javaSERelease = javaSERelease;
+	public void setRefactoringContext(RefactoringContext ctx) {
+		this.ctx = ctx;
 	}
 
 	// TODO JNR
@@ -77,7 +69,7 @@ public class DeadCodeEliminationRefactoring extends ASTVisitor implements
 		if (parent instanceof IfStatement) {
 			final IfStatement is = (IfStatement) parent;
 			if (is.getElseStatement() == node) {
-				this.refactorings.remove(node);
+				this.ctx.getRefactorings().remove(node);
 				return ASTHelper.DO_NOT_VISIT_SUBTREE;
 			} // TODO handle empty then clause
 		}
@@ -89,11 +81,11 @@ public class DeadCodeEliminationRefactoring extends ASTVisitor implements
 		final Object constantCondition =
 				node.getExpression().resolveConstantExpressionValue();
 		if (Boolean.TRUE.equals(constantCondition)) {
-			this.refactorings.replace(node, ASTHelper.copySubtree(this.ast, node
+			this.ctx.getRefactorings().replace(node, ASTHelper.copySubtree(this.ctx.getAST(), node
 					.getThenStatement()));
 			return ASTHelper.DO_NOT_VISIT_SUBTREE;
 		} else if (Boolean.FALSE.equals(constantCondition)) {
-			this.refactorings.replace(node, ASTHelper.copySubtree(this.ast, node
+			this.ctx.getRefactorings().replace(node, ASTHelper.copySubtree(this.ctx.getAST(), node
 					.getElseStatement()));
 			return ASTHelper.DO_NOT_VISIT_SUBTREE;
 		}
@@ -105,7 +97,7 @@ public class DeadCodeEliminationRefactoring extends ASTVisitor implements
 		final Object constantCondition =
 				node.getExpression().resolveConstantExpressionValue();
 		if (Boolean.FALSE.equals(constantCondition)) {
-			this.refactorings.remove(node);
+			this.ctx.getRefactorings().remove(node);
 			return ASTHelper.DO_NOT_VISIT_SUBTREE;
 		}
 		return ASTHelper.VISIT_SUBTREE;
@@ -115,7 +107,7 @@ public class DeadCodeEliminationRefactoring extends ASTVisitor implements
 	public boolean visit(TryStatement node) {
 		final List<Statement> stmts = ASTHelper.asList(node.getBody());
 		if (stmts.isEmpty()) {
-			this.refactorings.remove(node);
+			this.ctx.getRefactorings().remove(node);
 			return ASTHelper.DO_NOT_VISIT_SUBTREE;
 		}
 	// }else {
@@ -125,13 +117,13 @@ public class DeadCodeEliminationRefactoring extends ASTVisitor implements
 	// if (finallyStmts.isEmpty()) {
 	// // TODO cannot remove without checking what subsequent catch clauses are
 	// catching
-	// this.refactorings.remove(catchClause);
+	// this.ctx.getRefactorings().remove(catchClause);
 	// }
 	// }
 	//
 	// final List<Statement> finallyStmts = ASTHelper.asList(node.getFinally());
 	// if (finallyStmts.isEmpty()) {
-	// this.refactorings.remove(node.getFinally());
+	// this.ctx.getRefactorings().remove(node.getFinally());
 	// }
 	// // TODO If all finally and catch clauses have been removed,
 	// // then we can remove the whole try statement and replace it with a simple block
@@ -142,6 +134,6 @@ public class DeadCodeEliminationRefactoring extends ASTVisitor implements
 
 	public Refactorings getRefactorings(CompilationUnit astRoot) {
 		astRoot.accept(this);
-		return this.refactorings;
+		return this.ctx.getRefactorings();
 	}
 }

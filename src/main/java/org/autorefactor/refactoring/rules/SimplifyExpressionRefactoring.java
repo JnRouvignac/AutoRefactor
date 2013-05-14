@@ -28,7 +28,6 @@ package org.autorefactor.refactoring.rules;
 import org.autorefactor.refactoring.ASTHelper;
 import org.autorefactor.refactoring.IJavaRefactoring;
 import org.autorefactor.refactoring.Refactorings;
-import org.autorefactor.refactoring.Release;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTMatcher;
 import org.eclipse.jdt.core.dom.ASTNode;
@@ -67,22 +66,16 @@ import org.eclipse.jdt.core.dom.WhileStatement;
 public class SimplifyExpressionRefactoring extends ASTVisitor implements
 		IJavaRefactoring {
 
-	private final Refactorings refactorings = new Refactorings();
-	private AST ast;
-	private Release javaSERelease;
+	private RefactoringContext ctx;
 	private int javaMinorVersion;
 
 	public SimplifyExpressionRefactoring() {
 		super();
 	}
 
-	public void setAST(final AST ast) {
-		this.ast = ast;
-	}
-
-	public void setJavaSERelease(Release javaSERelease) {
-		this.javaSERelease = javaSERelease;
-		this.javaMinorVersion = this.javaSERelease.getMinorVersion();
+	public void setRefactoringContext(RefactoringContext ctx) {
+		this.ctx = ctx;
+		this.javaMinorVersion = this.ctx.getJavaSERelease().getMinorVersion();
 	}
 
 	// TODO JNR remove avoidable boxing / unboxing
@@ -104,9 +97,9 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
 	public boolean visit(ParenthesizedExpression node) {
 		final Expression innerExpr = getExpressionWithoutParentheses(node);
 		if (innerExpr != node) {
-			final Expression innerExprCopy = ASTHelper.copySubtree(this.ast,
+			final Expression innerExprCopy = ASTHelper.copySubtree(this.ctx.getAST(),
 					innerExpr);
-			this.refactorings.replace(node, innerExprCopy);
+			this.ctx.getRefactorings().replace(node, innerExprCopy);
 			innerExprCopy.accept(this);
 		}
 		return ASTHelper.VISIT_SUBTREE;
@@ -273,7 +266,7 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
 					&& ASTHelper.thisExpressionRefersToCurrentType(
 							te.getQualifier(), node)) {
 				// remove useless thisExpressions
-				this.refactorings.remove(node.getExpression());
+				this.ctx.getRefactorings().remove(node.getExpression());
 				return ASTHelper.DO_NOT_VISIT_SUBTREE;
 			}
 		}
@@ -296,22 +289,22 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
 					if (nb.doubleValue() < 0) {
 						final InfixExpression newIe = getNewInfixExpression(ie);
 						newIe.setOperator(InfixExpression.Operator.LESS);
-						this.refactorings.replace(ie, newIe);
+						this.ctx.getRefactorings().replace(ie, newIe);
 					} else if (nb.doubleValue() > 0) {
 						final InfixExpression newIe = getNewInfixExpression(ie);
 						newIe.setOperator(InfixExpression.Operator.GREATER);
-						this.refactorings.replace(ie, newIe);
+						this.ctx.getRefactorings().replace(ie, newIe);
 					}
 				} else if (InfixExpression.Operator.NOT_EQUALS.equals(ie
 						.getOperator())) {
 					if (nb.doubleValue() < 0) {
 						final InfixExpression newIe = getNewInfixExpression(ie);
 						newIe.setOperator(InfixExpression.Operator.GREATER_EQUALS);
-						this.refactorings.replace(ie, newIe);
+						this.ctx.getRefactorings().replace(ie, newIe);
 					} else if (nb.doubleValue() > 0) {
 						final InfixExpression newIe = getNewInfixExpression(ie);
 						newIe.setOperator(InfixExpression.Operator.LESS_EQUALS);
-						this.refactorings.replace(ie, newIe);
+						this.ctx.getRefactorings().replace(ie, newIe);
 					}
 				}
 			}
@@ -319,10 +312,10 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
 	}
 
 	private InfixExpression getNewInfixExpression(final InfixExpression ie) {
-		final InfixExpression newIe = this.ast.newInfixExpression();
-		newIe.setLeftOperand(ASTHelper.copySubtree(this.ast,
-				ie.getLeftOperand()));
-		newIe.setRightOperand(this.ast.newNumberLiteral("0"));
+		final AST ast = this.ctx.getAST();
+		final InfixExpression newIe = ast.newInfixExpression();
+		newIe.setLeftOperand(ASTHelper.copySubtree(ast, ie.getLeftOperand()));
+		newIe.setRightOperand(ast.newNumberLiteral("0"));
 		return newIe;
 	}
 
@@ -406,28 +399,28 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
 		// fearing we would introduce a previously non existing NPE.
 		Expression operand;
 		if (negate) {
-			operand = ASTHelper.copySubtree(this.ast, exprToCopy);
+			operand = ASTHelper.copySubtree(this.ctx.getAST(), exprToCopy);
 		} else {
 			operand = negate(exprToCopy);
 		}
-		this.refactorings.replace(node, operand);
+		this.ctx.getRefactorings().replace(node, operand);
 	}
 
 	private Expression negate(Expression expr) {
 		if (expr instanceof PrefixExpression) {
 			final PrefixExpression pe = (PrefixExpression) expr;
 			if (PrefixExpression.Operator.NOT.equals(pe.getOperator())) {
-				return ASTHelper.copySubtree(this.ast, pe.getOperand());
+				return ASTHelper.copySubtree(this.ctx.getAST(), pe.getOperand());
 			}
 		}
-		final PrefixExpression pe = this.ast.newPrefixExpression();
+		final PrefixExpression pe = this.ctx.getAST().newPrefixExpression();
 		pe.setOperator(PrefixExpression.Operator.NOT);
-		pe.setOperand(ASTHelper.copySubtree(this.ast, expr));
+		pe.setOperand(ASTHelper.copySubtree(this.ctx.getAST(), expr));
 		return pe;
 	}
 
 	private void replaceByCopy(InfixExpression node, final Expression lhs) {
-		this.refactorings.replace(node, ASTHelper.copySubtree(this.ast, lhs));
+		this.ctx.getRefactorings().replace(node, ASTHelper.copySubtree(this.ctx.getAST(), lhs));
 	}
 
 	/**
@@ -484,6 +477,6 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
 
 	public Refactorings getRefactorings(CompilationUnit astRoot) {
 		astRoot.accept(this);
-		return this.refactorings;
+		return this.ctx.getRefactorings();
 	}
 }

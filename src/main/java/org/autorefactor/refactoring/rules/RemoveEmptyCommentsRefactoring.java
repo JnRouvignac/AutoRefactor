@@ -29,8 +29,6 @@ import java.util.List;
 
 import org.autorefactor.refactoring.IJavaRefactoring;
 import org.autorefactor.refactoring.Refactorings;
-import org.autorefactor.refactoring.Release;
-import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.BlockComment;
 import org.eclipse.jdt.core.dom.Comment;
@@ -44,20 +42,14 @@ import org.eclipse.jdt.core.dom.LineComment;
 public class RemoveEmptyCommentsRefactoring extends ASTVisitor implements
 		IJavaRefactoring {
 
-	private final Refactorings refactorings = new Refactorings();
-	private AST ast;
-	private Release javaSERelease;
+	private RefactoringContext ctx;
 
 	public RemoveEmptyCommentsRefactoring() {
 		super();
 	}
 
-	public void setAST(final AST ast) {
-		this.ast = ast;
-	}
-
-	public void setJavaSERelease(Release javaSERelease) {
-		this.javaSERelease = javaSERelease;
+	public void setRefactoringContext(RefactoringContext ctx) {
+		this.ctx = ctx;
 	}
 
 	// TODO also remove commented out code
@@ -73,7 +65,7 @@ public class RemoveEmptyCommentsRefactoring extends ASTVisitor implements
 	@Override
 	public boolean visit(Javadoc node) {
 		if (node.tags().size() == 0) {
-			this.refactorings.remove(node);
+			this.ctx.getRefactorings().remove(node);
 		}
 		return super.visit(node);
 	}
@@ -99,6 +91,6 @@ public class RemoveEmptyCommentsRefactoring extends ASTVisitor implements
 				jc.accept(this);
 			}
 		}
-		return this.refactorings;
+		return this.ctx.getRefactorings();
 	}
 }

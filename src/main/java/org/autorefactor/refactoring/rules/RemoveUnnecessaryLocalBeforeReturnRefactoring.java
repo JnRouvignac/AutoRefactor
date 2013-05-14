@@ -28,8 +28,6 @@ package org.autorefactor.refactoring.rules;
 import org.autorefactor.refactoring.ASTHelper;
 import org.autorefactor.refactoring.IJavaRefactoring;
 import org.autorefactor.refactoring.Refactorings;
-import org.autorefactor.refactoring.Release;
-import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.Assignment;
@@ -50,20 +48,14 @@ import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 public class RemoveUnnecessaryLocalBeforeReturnRefactoring extends ASTVisitor
 		implements IJavaRefactoring {
 
-	private final Refactorings refactorings = new Refactorings();
-	private AST ast;
-	private Release javaSERelease;
+	private RefactoringContext ctx;
 
 	public RemoveUnnecessaryLocalBeforeReturnRefactoring() {
 		super();
 	}
 
-	public void setAST(final AST ast) {
-		this.ast = ast;
-	}
-
-	public void setJavaSERelease(Release javaSERelease) {
-		this.javaSERelease = javaSERelease;
+	public void setRefactoringContext(RefactoringContext ctx) {
+		this.ctx = ctx;
 	}
 
 	@Override
@@ -111,8 +103,8 @@ public class RemoveUnnecessaryLocalBeforeReturnRefactoring extends ASTVisitor
 			if (!bnd1.isField() && !bnd2.isField() && bnd1.isEqualTo(bnd2)) {
 				// to avoid changing the class's behaviour,
 				// we must not prevent field's assignment
-				this.refactorings.remove(previousSibling);
-				this.refactorings.replace(node,
+				this.ctx.getRefactorings().remove(previousSibling);
+				this.ctx.getRefactorings().replace(node,
 						getReturnStatement(node, returnEpr));
 			}
 		}
@@ -120,13 +112,13 @@ public class RemoveUnnecessaryLocalBeforeReturnRefactoring extends ASTVisitor
 
 	private ASTNode getReturnStatement(ReturnStatement node,
 			Expression initializer) {
-		final ReturnStatement rs = this.ast.newReturnStatement();
-		rs.setExpression(ASTHelper.copySubtree(this.ast, initializer));
+		final ReturnStatement rs = this.ctx.getAST().newReturnStatement();
+		rs.setExpression(ASTHelper.copySubtree(this.ctx.getAST(), initializer));
 		return rs;
 	}
 
 	public Refactorings getRefactorings(CompilationUnit astRoot) {
 		astRoot.accept(this);
-		return this.refactorings;
+		return this.ctx.getRefactorings();
 	}
 }

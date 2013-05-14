@@ -28,8 +28,6 @@ package org.autorefactor.refactoring.rules;
 import org.autorefactor.refactoring.ASTHelper;
 import org.autorefactor.refactoring.IJavaRefactoring;
 import org.autorefactor.refactoring.Refactorings;
-import org.autorefactor.refactoring.Release;
-import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.CompilationUnit;
@@ -52,20 +50,14 @@ import org.eclipse.jdt.core.dom.WhileStatement;
 public class AddBracketsToControlStatementRefactoring extends ASTVisitor
 		implements IJavaRefactoring {
 
-	private final Refactorings refactorings = new Refactorings();
-	private AST ast;
-	private Release javaSERelease;
+	private RefactoringContext ctx;
 
 	public AddBracketsToControlStatementRefactoring() {
 		super();
 	}
 
-	public void setAST(final AST ast) {
-		this.ast = ast;
-	}
-
-	public void setJavaSERelease(Release javaSERelease) {
-		this.javaSERelease = javaSERelease;
+	public void setRefactoringContext(RefactoringContext ctx) {
+		this.ctx = ctx;
 	}
 
 	@Override
@@ -119,16 +111,16 @@ public class AddBracketsToControlStatementRefactoring extends ASTVisitor
 		if (statement == null) {
 			return ASTHelper.VISIT_SUBTREE;
 		}
-		final Block block = this.ast.newBlock();
-		block.statements().add(ASTHelper.copySubtree(this.ast, statement));
+		final Block block = this.ctx.getAST().newBlock();
+		block.statements().add(ASTHelper.copySubtree(this.ctx.getAST(), statement));
 		block.accept(this);
-		this.refactorings.replace(statement, block);
+		this.ctx.getRefactorings().replace(statement, block);
 		return ASTHelper.DO_NOT_VISIT_SUBTREE;
 	}
 
 	public Refactorings getRefactorings(CompilationUnit astRoot) {
 		astRoot.accept(this);
-		return this.refactorings;
+		return this.ctx.getRefactorings();
 	}
 
 }

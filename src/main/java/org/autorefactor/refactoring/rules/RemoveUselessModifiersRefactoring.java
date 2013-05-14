@@ -32,8 +32,6 @@ import java.util.List;
 import org.autorefactor.refactoring.ASTHelper;
 import org.autorefactor.refactoring.IJavaRefactoring;
 import org.autorefactor.refactoring.Refactorings;
-import org.autorefactor.refactoring.Release;
-import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
@@ -57,20 +55,14 @@ import org.eclipse.jdt.core.dom.TypeDeclaration;
 public class RemoveUselessModifiersRefactoring extends ASTVisitor implements
 		IJavaRefactoring {
 
-	private final Refactorings refactorings = new Refactorings();
-	private AST ast;
-	private Release javaSERelease;
+	private RefactoringContext ctx;
 
 	public RemoveUselessModifiersRefactoring() {
 		super();
 	}
 
-	public void setAST(final AST ast) {
-		this.ast = ast;
-	}
-
-	public void setJavaSERelease(Release javaSERelease) {
-		this.javaSERelease = javaSERelease;
+	public void setRefactoringContext(RefactoringContext ctx) {
+		this.ctx = ctx;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -81,7 +73,7 @@ public class RemoveUselessModifiersRefactoring extends ASTVisitor implements
 				// remove modifiers implied by the context
 				for (Modifier m : getModifiersOnly(fd.modifiers())) {
 					if (m.isPublic() || m.isStatic() || m.isFinal()) {
-						this.refactorings.remove(m);
+						this.ctx.getRefactorings().remove(m);
 					}
 				}
 			}
@@ -89,7 +81,7 @@ public class RemoveUselessModifiersRefactoring extends ASTVisitor implements
 				// remove modifiers implied by the context
 				for (Modifier m : getModifiersOnly(md.modifiers())) {
 					if (m.isPublic() || m.isAbstract()) {
-						this.refactorings.remove(m);
+						this.ctx.getRefactorings().remove(m);
 					}
 				}
 
@@ -98,7 +90,7 @@ public class RemoveUselessModifiersRefactoring extends ASTVisitor implements
 						.parameters()) {
 					for (Modifier m : getModifiersOnly(svd.modifiers())) {
 						if (m.isFinal()) {
-							this.refactorings.remove(m);
+							this.ctx.getRefactorings().remove(m);
 						}
 					}
 				}
@@ -106,6 +98,7 @@ public class RemoveUselessModifiersRefactoring extends ASTVisitor implements
 		}
 		return ASTHelper.DO_NOT_VISIT_SUBTREE;
 	}
+
 
 	private List<Modifier> getModifiersOnly(
 			Collection<IExtendedModifier> modifiers) {
@@ -120,6 +113,6 @@ public class RemoveUselessModifiersRefactoring extends ASTVisitor implements
 
 	public Refactorings getRefactorings(CompilationUnit astRoot) {
 		astRoot.accept(this);
-		return this.refactorings;
+		return this.ctx.getRefactorings();
 	}
 }

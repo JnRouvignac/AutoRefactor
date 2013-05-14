@@ -25,14 +25,11 @@
  */
 package org.autorefactor.refactoring.rules;
 
-import java.util.List;
 import java.util.Map;
 
 import org.autorefactor.refactoring.ASTHelper;
 import org.autorefactor.refactoring.IJavaRefactoring;
 import org.autorefactor.refactoring.Refactorings;
-import org.autorefactor.refactoring.Release;
-import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.CompilationUnit;
@@ -51,20 +48,14 @@ import org.eclipse.jdt.core.dom.WhileStatement;
  */
 public class ForeachRefactoring extends ASTVisitor implements IJavaRefactoring {
 
-	private final Refactorings refactorings = new Refactorings();
-	private AST ast;
-	private Release javaSERelease;
+	private RefactoringContext ctx;
 
 	public ForeachRefactoring() {
 		super();
 	}
 
-	public void setAST(final AST ast) {
-		this.ast = ast;
-	}
-
-	public void setJavaSERelease(Release javaSERelease) {
-		this.javaSERelease = javaSERelease;
+	public void setRefactoringContext(RefactoringContext ctx) {
+		this.ctx = ctx;
 	}
 
 	private static class VariableUseVisitor extends ASTVisitor {
@@ -86,7 +77,7 @@ public class ForeachRefactoring extends ASTVisitor implements IJavaRefactoring {
 		node.accept(variableUseVisitor);
 
 		if (node.initializers().size() == 1) {
-			List initializers = node.initializers();
+			node.initializers();
 		}
 
 		node.getExpression();
@@ -126,6 +117,6 @@ public class ForeachRefactoring extends ASTVisitor implements IJavaRefactoring {
 
 	public Refactorings getRefactorings(CompilationUnit astRoot) {
 		astRoot.accept(this);
-		return this.refactorings;
+		return this.ctx.getRefactorings();
 	}
 }

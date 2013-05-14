@@ -28,7 +28,6 @@ package org.autorefactor.refactoring.rules;
 import org.autorefactor.refactoring.ASTHelper;
 import org.autorefactor.refactoring.IJavaRefactoring;
 import org.autorefactor.refactoring.Refactorings;
-import org.autorefactor.refactoring.Release;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
@@ -48,20 +47,14 @@ import org.eclipse.jdt.core.dom.MethodInvocation;
 public class InvertEqualsRefactoring extends ASTVisitor implements
 		IJavaRefactoring {
 
-	private final Refactorings refactorings = new Refactorings();
-	private AST ast;
-	private Release javaSERelease;
+	private RefactoringContext ctx;
 
 	public InvertEqualsRefactoring() {
 		super();
 	}
 
-	public void setAST(final AST ast) {
-		this.ast = ast;
-	}
-
-	public void setJavaSERelease(Release javaSERelease) {
-		this.javaSERelease = javaSERelease;
+	public void setRefactoringContext(RefactoringContext ctx) {
+		this.ctx = ctx;
 	}
 
 	@Override
@@ -82,7 +75,7 @@ public class InvertEqualsRefactoring extends ASTVisitor implements
 			final Object argConstantValue = arg
 					.resolveConstantExpressionValue();
 			if (exprConstantValue == null && argConstantValue != null) {
-				this.refactorings.replace(node,
+				this.ctx.getRefactorings().replace(node,
 						invertEqualsInvocation(expr, arg, isEquals));
 				return ASTHelper.DO_NOT_VISIT_SUBTREE;
 			}
@@ -92,15 +85,16 @@ public class InvertEqualsRefactoring extends ASTVisitor implements
 
 	private ASTNode invertEqualsInvocation(Expression lhs, Expression rhs, boolean isEquals) {
 		final String methodName = isEquals ? "equals" : "equalsIgnoreCase";
-		final MethodInvocation mi = this.ast.newMethodInvocation();
-		mi.setExpression(ASTHelper.copySubtree(this.ast, rhs));
-		mi.setName(this.ast.newSimpleName(methodName));
-		mi.arguments().add(ASTHelper.copySubtree(this.ast, lhs));
+		final AST ast = this.ctx.getAST();
+		final MethodInvocation mi = ast.newMethodInvocation();
+		mi.setExpression(ASTHelper.copySubtree(ast, rhs));
+		mi.setName(ast.newSimpleName(methodName));
+		mi.arguments().add(ASTHelper.copySubtree(ast, lhs));
 		return mi;
 	}
 
 	public Refactorings getRefactorings(CompilationUnit astRoot) {
 		astRoot.accept(this);
-		return this.refactorings;
+		return this.ctx.getRefactorings();
 	}
 }

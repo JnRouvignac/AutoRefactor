@@ -32,8 +32,6 @@ import java.util.List;
 import org.autorefactor.refactoring.ASTHelper;
 import org.autorefactor.refactoring.IJavaRefactoring;
 import org.autorefactor.refactoring.Refactorings;
-import org.autorefactor.refactoring.Release;
-import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTMatcher;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
@@ -50,20 +48,14 @@ import org.eclipse.jdt.core.dom.Statement;
 public class CommonCodeInIfElseStatementRefactoring extends ASTVisitor
 		implements IJavaRefactoring {
 
-	private final Refactorings refactorings = new Refactorings();
-	private AST ast;
-	private Release javaSERelease;
+	private RefactoringContext ctx;
 
 	public CommonCodeInIfElseStatementRefactoring() {
 		super();
 	}
 
-	public void setAST(final AST ast) {
-		this.ast = ast;
-	}
-
-	public void setJavaSERelease(Release javaSERelease) {
-		this.javaSERelease = javaSERelease;
+	public void setRefactoringContext(RefactoringContext ctx) {
+		this.ctx = ctx;
 	}
 
 	// TODO handle switch statements
@@ -99,8 +91,8 @@ public class CommonCodeInIfElseStatementRefactoring extends ASTVisitor
 						allCasesStmts.size())) {
 					break;
 				}
-				this.refactorings.insertBefore(
-						ASTHelper.copySubtree(this.ast,
+				this.ctx.getRefactorings().insertBefore(
+						ASTHelper.copySubtree(this.ctx.getAST(),
 								caseStmts.get(stmtIndex)), node);
 				removeStmts(allCasesStmts, true, stmtIndex, removedCaseStmts);
 			}
@@ -113,8 +105,8 @@ public class CommonCodeInIfElseStatementRefactoring extends ASTVisitor
 								stmtIndex)) {
 					break;
 				}
-				this.refactorings.insertAfter(
-						ASTHelper.copySubtree(this.ast,
+				this.ctx.getRefactorings().insertAfter(
+						ASTHelper.copySubtree(this.ctx.getAST(),
 								caseStmts.get(caseStmts.size() - stmtIndex)),
 						node);
 				removeStmts(allCasesStmts, false, stmtIndex, removedCaseStmts);
@@ -130,22 +122,22 @@ public class CommonCodeInIfElseStatementRefactoring extends ASTVisitor
 
 			if (allEmpty(areCasesEmpty)) {
 				// TODO JNR keep comments
-				this.refactorings.remove(node);
+				this.ctx.getRefactorings().remove(node);
 				// } else if (areCasesEmpty.get(0)) {
 				// // TODO JNR then clause is empty => revert if statement
-				// this.refactorings.replace(node.getThenStatement(),
-				// this.ast.newBlock());
+				// this.ctx.getRefactorings().replace(node.getThenStatement(),
+				// this.ctx.getAST().newBlock());
 			} else {
 				// remove empty cases
 				if (areCasesEmpty.get(0)) {
 					// TODO JNR then clause is empty => revert if statement
-					this.refactorings.replace(node.getThenStatement(),
-							this.ast.newBlock());
+					this.ctx.getRefactorings().replace(node.getThenStatement(),
+							this.ctx.getAST().newBlock());
 				}
 				for (int i = 1; i < areCasesEmpty.size(); i++) {
 					if (areCasesEmpty.get(i)) {
 						final Statement firstStmt = allCasesStmts.get(i).get(0);
-						this.refactorings.remove(findNodeToRemove(firstStmt,
+						this.ctx.getRefactorings().remove(findNodeToRemove(firstStmt,
 								firstStmt.getParent()));
 					}
 				}
@@ -200,7 +192,7 @@ public class CommonCodeInIfElseStatementRefactoring extends ASTVisitor
 			if (removedStmts.containsAll(allCasesStmts.get(i))) {
 				areCasesEmpty.set(i, Boolean.TRUE);
 			} else {
-				this.refactorings.remove(removedStmts);
+				this.ctx.getRefactorings().remove(removedStmts);
 			}
 		}
 	}
@@ -309,6 +301,6 @@ public class CommonCodeInIfElseStatementRefactoring extends ASTVisitor
 
 	public Refactorings getRefactorings(CompilationUnit astRoot) {
 		astRoot.accept(this);
-		return this.refactorings;
+		return this.ctx.getRefactorings();
 	}
 }

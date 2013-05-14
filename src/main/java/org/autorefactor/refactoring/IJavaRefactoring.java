@@ -30,6 +30,4 @@ package org.autorefactor.refactoring;
  */
 public interface IJavaRefactoring extends IRefactoring {
 
-	void setJavaSERelease(Release javaSERelease);
-
 }

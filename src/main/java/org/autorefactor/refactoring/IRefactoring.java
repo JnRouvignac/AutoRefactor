@@ -25,16 +25,13 @@
  */
 package org.autorefactor.refactoring;
 
-import org.eclipse.jdt.core.dom.AST;
-import org.eclipse.jdt.core.dom.CompilationUnit;
+import org.autorefactor.refactoring.rules.RefactoringContext;
 
 /**
  * Interface for all refactorings.
  */
 public interface IRefactoring {
 
-	void setAST(AST ast);
-
-	Refactorings getRefactorings(CompilationUnit astRoot);
+	void setRefactoringContext(RefactoringContext ctx);
 
 }

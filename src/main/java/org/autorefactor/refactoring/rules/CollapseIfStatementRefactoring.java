@@ -28,7 +28,6 @@ package org.autorefactor.refactoring.rules;
 import org.autorefactor.refactoring.ASTHelper;
 import org.autorefactor.refactoring.IJavaRefactoring;
 import org.autorefactor.refactoring.Refactorings;
-import org.autorefactor.refactoring.Release;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.CompilationUnit;
@@ -44,20 +43,14 @@ import org.eclipse.jdt.core.dom.ParenthesizedExpression;
 public class CollapseIfStatementRefactoring extends ASTVisitor implements
 		IJavaRefactoring {
 
-	private final Refactorings refactorings = new Refactorings();
-	private AST ast;
-	private Release javaSERelease;
+	private RefactoringContext ctx;
 
 	public CollapseIfStatementRefactoring() {
 		super();
 	}
 
-	public void setAST(final AST ast) {
-		this.ast = ast;
-	}
-
-	public void setJavaSERelease(Release javaSERelease) {
-		this.javaSERelease = javaSERelease;
+	public void setRefactoringContext(RefactoringContext ctx) {
+		this.ctx = ctx;
 	}
 
 	@Override
@@ -78,21 +71,21 @@ public class CollapseIfStatementRefactoring extends ASTVisitor implements
 			return ASTHelper.VISIT_SUBTREE;
 		}
 
-		final Expression leftOperand = ASTHelper.copySubtree(this.ast,
+		final AST ast = this.ctx.getAST();
+		final Expression leftOperand = ASTHelper.copySubtree(ast,
 				outerIf.getExpression());
-		final Expression rightOperand = ASTHelper.copySubtree(this.ast,
+		final Expression rightOperand = ASTHelper.copySubtree(ast,
 				innerIf.getExpression());
 
-		final InfixExpression ie = this.ast.newInfixExpression();
+		final InfixExpression ie = ast.newInfixExpression();
 		ie.setLeftOperand(parenthesizeInfixExpr(leftOperand));
 		ie.setOperator(Operator.CONDITIONAL_AND);
 		ie.setRightOperand(parenthesizeInfixExpr(rightOperand));
 
-		final IfStatement is = this.ast.newIfStatement();
+		final IfStatement is = ast.newIfStatement();
 		is.setExpression(ie);
-		is.setThenStatement(ASTHelper.copySubtree(this.ast,
-				innerIf.getThenStatement()));
-		this.refactorings.replace(outerIf, is);
+		is.setThenStatement(ASTHelper.copySubtree(ast, innerIf.getThenStatement()));
+		this.ctx.getRefactorings().replace(outerIf, is);
 		return ASTHelper.DO_NOT_VISIT_SUBTREE;
 	}
 
@@ -101,7 +94,7 @@ public class CollapseIfStatementRefactoring extends ASTVisitor implements
 			final InfixExpression ie = (InfixExpression) expr;
 			if (InfixExpression.Operator.CONDITIONAL_OR
 					.equals(ie.getOperator())) {
-				final ParenthesizedExpression pe = this.ast
+				final ParenthesizedExpression pe = this.ctx.getAST()
 						.newParenthesizedExpression();
 				pe.setExpression(ie);
 				return pe;
@@ -112,6 +105,6 @@ public class CollapseIfStatementRefactoring extends ASTVisitor implements
 
 	public Refactorings getRefactorings(CompilationUnit astRoot) {
 		astRoot.accept(this);
-		return this.refactorings;
+		return this.ctx.getRefactorings();
 	}
 }

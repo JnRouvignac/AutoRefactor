@@ -30,7 +30,6 @@ import java.util.List;
 import org.autorefactor.refactoring.ASTHelper;
 import org.autorefactor.refactoring.IJavaRefactoring;
 import org.autorefactor.refactoring.Refactorings;
-import org.autorefactor.refactoring.Release;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
@@ -46,28 +45,23 @@ import org.eclipse.jdt.core.dom.MethodInvocation;
 public class PrimitiveWrapperCreationRefactoring extends ASTVisitor implements
 		IJavaRefactoring {
 
-	private final Refactorings refactorings = new Refactorings();
-	private AST ast;
-	private Release javaSERelease;
+	private RefactoringContext ctx;
 	private int javaMinorVersion;
 
 	public PrimitiveWrapperCreationRefactoring() {
 		super();
 	}
 
-	public void setAST(final AST ast) {
-		this.ast = ast;
-	}
-
-	public void setJavaSERelease(Release javaSERelease) {
-		this.javaSERelease = javaSERelease;
-		this.javaMinorVersion = this.javaSERelease.getMinorVersion();
+	public void setRefactoringContext(RefactoringContext ctx) {
+		this.ctx = ctx;
+		this.javaMinorVersion = this.ctx.getJavaSERelease().getMinorVersion();
 	}
 
 	// TODO Can we reduce bad effects of autoboxing / unboxing
 	// fix autoboxing and unboxing (returning boxed value in primitve
 	// context)
 
+	@Override
 	public boolean visit(MethodInvocation node) {
 		if (node.getExpression() == null) {
 			return ASTHelper.VISIT_SUBTREE;
@@ -92,7 +86,7 @@ public class PrimitiveWrapperCreationRefactoring extends ASTVisitor implements
 					if (methodName != null) {
 						final Expression arg = (Expression) cic.arguments()
 								.get(0);
-						this.refactorings.replace(
+						this.ctx.getRefactorings().replace(
 								node,
 								newMethodInvocation(typeBinding.getName(),
 										methodName, arg));
@@ -141,7 +135,7 @@ public class PrimitiveWrapperCreationRefactoring extends ASTVisitor implements
 					|| "java.lang.Long".equals(qualifiedName)
 					|| "java.lang.Short".equals(qualifiedName)
 					|| "java.lang.Integer".equals(qualifiedName)) {
-				this.refactorings.replace(
+				this.ctx.getRefactorings().replace(
 						node,
 						newMethodInvocation(typeBinding.getName(), "valueOf",
 								(Expression) node.arguments().get(0)));
@@ -153,15 +147,16 @@ public class PrimitiveWrapperCreationRefactoring extends ASTVisitor implements
 
 	private MethodInvocation newMethodInvocation(String typeName,
 			String methodName, Expression arg) {
-		final MethodInvocation mi = this.ast.newMethodInvocation();
-		mi.setExpression(this.ast.newSimpleName(typeName));
-		mi.setName(this.ast.newSimpleName(methodName));
-		mi.arguments().add(ASTHelper.copySubtree(mi.getAST(), arg));
+		final AST ast = this.ctx.getAST();
+		final MethodInvocation mi = ast.newMethodInvocation();
+		mi.setExpression(ast.newSimpleName(typeName));
+		mi.setName(ast.newSimpleName(methodName));
+		mi.arguments().add(ASTHelper.copySubtree(ast, arg));
 		return mi;
 	}
 
 	public Refactorings getRefactorings(CompilationUnit astRoot) {
 		astRoot.accept(this);
-		return this.refactorings;
+		return this.ctx.getRefactorings();
 	}
 }

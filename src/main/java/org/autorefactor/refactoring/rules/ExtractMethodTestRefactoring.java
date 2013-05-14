@@ -32,8 +32,6 @@ import java.util.List;
 
 import org.autorefactor.refactoring.IJavaRefactoring;
 import org.autorefactor.refactoring.Refactorings;
-import org.autorefactor.refactoring.Release;
-import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTMatcher;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
@@ -84,7 +82,7 @@ public class ExtractMethodTestRefactoring extends ASTVisitor implements
 		}
 
 		/**
-		 * @see http 
+		 * @see http
 		 *      ://help.eclipse.org/helios/index.jsp?topic=%2Forg.eclipse.jdt
 		 *      .doc.isv%2Freference%2Fapi%2Forg%2Feclipse%2Fjdt%2Fcore%2Fdom%2F
 		 *      FieldAccess.html
@@ -216,18 +214,14 @@ public class ExtractMethodTestRefactoring extends ASTVisitor implements
 
 	}
 
-	private final Refactorings refactorings = new Refactorings();
-	private AST ast;
+	private RefactoringContext ctx;
 
 	public ExtractMethodTestRefactoring() {
 		super();
 	}
 
-	public void setAST(final AST ast) {
-		this.ast = ast;
-	}
-
-	public void setJavaSERelease(Release javaSERelease) {
+	public void setRefactoringContext(RefactoringContext ctx) {
+		this.ctx = ctx;
 	}
 
 	@Override
@@ -323,6 +317,6 @@ public class ExtractMethodTestRefactoring extends ASTVisitor implements
 
 	public Refactorings getRefactorings(CompilationUnit astRoot) {
 		astRoot.accept(this);
-		return this.refactorings;
+		return this.ctx.getRefactorings();
 	}
 }
