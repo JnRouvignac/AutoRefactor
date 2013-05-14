@@ -34,7 +34,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
-import org.autorefactor.refactoring.IJavaRefactoring;
 import org.autorefactor.refactoring.IRefactoring;
 import org.autorefactor.refactoring.Refactorings;
 import org.autorefactor.refactoring.Refactorings.Insert;
@@ -48,6 +47,7 @@ import org.autorefactor.refactoring.rules.CommonCodeInIfElseStatementRefactoring
 import org.autorefactor.refactoring.rules.DeadCodeEliminationRefactoring;
 import org.autorefactor.refactoring.rules.InvertEqualsRefactoring;
 import org.autorefactor.refactoring.rules.PrimitiveWrapperCreationRefactoring;
+import org.autorefactor.refactoring.rules.RefactoringContext;
 import org.autorefactor.refactoring.rules.RemoveEmptyCommentsRefactoring;
 import org.autorefactor.refactoring.rules.RemoveUnnecessaryLocalBeforeReturnRefactoring;
 import org.autorefactor.refactoring.rules.RemoveUselessModifiersRefactoring;
@@ -275,7 +275,8 @@ public class AutoRefactorHandler extends AbstractHandler {
 	}
 
 	public Object execute(final ExecutionEvent event) throws ExecutionException {
-		if (false) {
+		boolean useTests = false; // local variable helps switching while debugging
+		if (useTests) {
 			new ApplyRefactoringsJob(event).testWithSamples();
 			return Status.OK_STATUS;
 		}
@@ -428,24 +429,17 @@ public class AutoRefactorHandler extends AbstractHandler {
 		final IDocument document = new Document(compilationUnit.getSource());
 		for (IRefactoring refactoring : refactoringsToApply) {
 			try {
-				refactoring.setAST(astRoot.getAST());
-				// TODO JNR pass down Java version or library version
-				if (refactoring instanceof IJavaRefactoring) {
-					((IJavaRefactoring) refactoring)
-							.setJavaSERelease(javaSERelease);
-					// }else if (refactoring instanceof
-					// IApacheCommonsRefactoring) {
-					// }else if (refactoring instanceof IGuavaRefactoring) {
-				}
+				final RefactoringContext ctx = new RefactoringContext();
+				ctx.setAST(astRoot.getAST());
+				ctx.setJavaSERelease(javaSERelease);
+				refactoring.setRefactoringContext(ctx);
 
 				// new BlockScopeBuilder().buildScope(astRoot);
 
-				final Refactorings refactorings = refactoring
-						.getRefactorings(astRoot);
+				final Refactorings refactorings = refactoring.getRefactorings(astRoot);
 				if (refactorings.hasRefactorings()) {
 					// Describing the rewrite
-					final ASTRewrite rewrite = getASTRewrite(astRoot,
-							refactorings);
+					final ASTRewrite rewrite = getASTRewrite(astRoot, refactorings);
 
 					// apply the text edits and save the compilation unit
 					final TextEdit edits = rewrite.rewriteAST();

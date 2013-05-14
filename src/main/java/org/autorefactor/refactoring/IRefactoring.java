@@ -26,11 +26,14 @@
 package org.autorefactor.refactoring;
 
 import org.autorefactor.refactoring.rules.RefactoringContext;
+import org.eclipse.jdt.core.dom.CompilationUnit;
 
 /**
  * Interface for all refactorings.
  */
 public interface IRefactoring {
+
+	Refactorings getRefactorings(CompilationUnit astRoot);
 
 	void setRefactoringContext(RefactoringContext ctx);
 
