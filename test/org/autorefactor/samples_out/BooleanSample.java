@@ -54,7 +54,7 @@ public class BooleanSample {
     }
 
     public boolean returnIfConditionMixedBoolean1(boolean b) {
-        return b;
+        return Boolean.valueOf(b);
     }
 
     public boolean returnIfConditionMixedBoolean2(boolean b) {

@@ -163,6 +163,7 @@ public class BooleanRefactoring extends ASTVisitor implements IJavaRefactoring {
 
 	public void setRefactoringContext(RefactoringContext ctx) {
 		this.ctx = ctx;
+		this.javaMinorVersion = this.ctx.getJavaSERelease().getMinorVersion();
 	}
 
 	@Override
@@ -204,40 +205,44 @@ public class BooleanRefactoring extends ASTVisitor implements IJavaRefactoring {
 				} else {
 					this.ctx.getRefactorings().replace(node, copyStmt);
 				}
-				return ASTHelper.VISIT_SUBTREE;
+				return ASTHelper.DO_NOT_VISIT_SUBTREE;
 			}
 		}
 
 		final ReturnStatement thenRs = ASTHelper.as(node.getThenStatement(),
 				ReturnStatement.class);
-		if (thenRs != null
-				&& ASTHelper.asList(node.getElseStatement()).isEmpty()) {
-			// The case where the else statement is not empty is handled with
-			// the matcher above
-			final ReturnStatement rs = ASTHelper.as(
-					ASTHelper.getNextSibling(node), ReturnStatement.class);
-			if (rs != null) {
-				final Boolean thenBool = getBooleanLiteral(thenRs
-						.getExpression());
-				final Boolean elseBool = getBooleanLiteral(rs.getExpression());
-				ReturnStatement newRs = getReturnStatement(node, thenBool,
-						elseBool);
-				if (newRs != null) {
-					this.ctx.getRefactorings().replace(node, newRs);
-					this.ctx.getRefactorings().remove(rs);
-				} else {
-					final MethodDeclaration md = ASTHelper.getAncestor(node,
-							MethodDeclaration.class);
-					final Type returnType = md.getReturnType2();
-					if (returnType != null && returnType.isPrimitiveType()) {
-						final PrimitiveType pt = (PrimitiveType) returnType;
-						if (PrimitiveType.BOOLEAN.equals(pt
-								.getPrimitiveTypeCode())) {
-							newRs = getReturnStatement(node, thenBool, elseBool,
-									thenRs.getExpression(), rs.getExpression());
-							if (newRs != null) {
-								this.ctx.getRefactorings().replace(node, newRs);
-								this.ctx.getRefactorings().remove(rs);
+		final ReturnStatement elseRs = ASTHelper.as(node.getElseStatement(),
+				ReturnStatement.class);
+		if (thenRs != null) {
+			if (elseRs == null) {
+				// The != null case is handled with the matcher above
+				final ReturnStatement rs = ASTHelper.as(
+						ASTHelper.getNextSibling(node), ReturnStatement.class);
+				if (rs != null) {
+					final Boolean thenBool = getBooleanLiteral(thenRs
+							.getExpression());
+					final Boolean elseBool = getBooleanLiteral(rs
+							.getExpression());
+					ReturnStatement newRs = getReturnStatement(node, thenBool,
+							elseBool);
+					if (newRs != null) {
+						this.ctx.getRefactorings().replace(node, newRs);
+						this.ctx.getRefactorings().remove(rs);
+					} else {
+						final MethodDeclaration md = ASTHelper.getAncestor(
+								node, MethodDeclaration.class);
+						final Type returnType = md.getReturnType2();
+						if (returnType != null && returnType.isPrimitiveType()) {
+							final PrimitiveType pt = (PrimitiveType) returnType;
+							if (PrimitiveType.BOOLEAN.equals(pt
+									.getPrimitiveTypeCode())) {
+								newRs = getReturnStatement(node, thenBool,
+										elseBool, thenRs.getExpression(),
+										rs.getExpression());
+								if (newRs != null) {
+									this.ctx.getRefactorings().replace(node, newRs);
+									this.ctx.getRefactorings().remove(rs);
+								}
 							}
 						}
 					}

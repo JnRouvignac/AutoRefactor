@@ -26,6 +26,7 @@
 package org.autorefactor.refactoring;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -135,7 +136,9 @@ public class ASTHelper {
 	// AST nodes conversions
 
 	public static List<Statement> asList(Statement node) {
-		if (node instanceof Block) {
+		if (node == null) {
+			return Collections.emptyList();
+		} else if (node instanceof Block) {
 			return ((Block) node).statements();
 		}
 		return Arrays.asList(node);
