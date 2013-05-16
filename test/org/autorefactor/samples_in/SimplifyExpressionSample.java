@@ -106,10 +106,10 @@ public class SimplifyExpressionSample {
 
     public void borderLineParenthezisedExpressions(Integer i) throws Exception {
         // Do not replace any because they are in a String concatenation
-        String s1 = ((Number) i).doubleValue() + "";
-        String s2 = (i instanceof Number) + "";
-        String s3 = (i + 0) + "";
-        String s4 = (i == null ? null : "i")  + "";
+        String s1 = ((Number) i).doubleValue() + " ";
+        String s2 = (i instanceof Number) + " ";
+        String s3 = (i + 0) + " ";
+        String s4 = (i == null ? null : "i")  + " ";
 
         // replace
         boolean b1 = ((Number) i).doubleValue() == 0;
@@ -128,6 +128,8 @@ public class SimplifyExpressionSample {
         boolean b6 = b5 && (i != null);
         // do not replace
         boolean b7 = b1 ? (b2 ? b3 : b4) : (b5 ? b6 : true);
+        boolean b8 = b1 ? (b2 = true) : (b3 = true);
+        boolean b9 = b1 ? (i instanceof Number) : (i instanceof Object);
     }
 
     public boolean removeUselessParentheses() throws Exception {

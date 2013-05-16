@@ -50,7 +50,6 @@ import org.eclipse.jdt.core.dom.PrefixExpression;
 import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.ThisExpression;
-import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.WhileStatement;
 
@@ -102,6 +101,7 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
 					innerExpr);
 			this.ctx.getRefactorings().replace(node, innerExprCopy);
 			innerExprCopy.accept(this);
+			return ASTHelper.DO_NOT_VISIT_SUBTREE;
 		}
 		return ASTHelper.VISIT_SUBTREE;
 	}
@@ -113,42 +113,38 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
 		if (innerExpr instanceof ParenthesizedExpression) {
 			return getExpressionWithoutParentheses((ParenthesizedExpression) innerExpr);
 		}
-		if (innerExpr instanceof InfixExpression
-				&& parent instanceof InfixExpression) {
-			final InfixExpression innerInfixExpr = (InfixExpression) innerExpr;
-			final InfixExpression parentInfixExpr = (InfixExpression) parent;
-			final Operator innerOp = innerInfixExpr.getOperator();
-			final Operator outerOp = parentInfixExpr.getOperator();
-			if (innerOp == parentInfixExpr.getOperator()
-					&& isAssociativeOperator(innerOp)
-					// Leave String concatenations with mixed type
-					// to other if statements in this method.
-					&& innerExpr.resolveTypeBinding().equals(
-							parentInfixExpr.resolveTypeBinding())) {
-				return innerExpr;
-			} else if (isReadable(innerOp, outerOp)) {
-				return innerExpr;
-			}
-		}
 		if (parent instanceof InfixExpression) {
 			final InfixExpression parentInfixExpr = (InfixExpression) parent;
-			if (innerExpr instanceof InstanceofExpression
+			if (innerExpr instanceof InfixExpression) {
+				final Operator innerOp = ((InfixExpression) innerExpr).getOperator();
+				final Operator outerOp = parentInfixExpr.getOperator();
+				if (innerOp == parentInfixExpr.getOperator()
+						&& isAssociativeOperator(innerOp)
+						// Leave String concatenations with mixed type
+						// to other if statements in this method.
+						&& innerExpr.resolveTypeBinding().equals(
+								parentInfixExpr.resolveTypeBinding())) {
+					return innerExpr;
+				} else if (isReadable(innerOp, outerOp)) {
+					return innerExpr;
+				}
+			} else if (innerExpr instanceof InstanceofExpression
 					&& !ASTHelper.hasType(innerExpr, "java.lang.String")
 					&& ASTHelper.hasType(parentInfixExpr, "java.lang.String")) {
 				// The parentheses hold an InfixExpression that does not resolve
 				// to String but is inside a String concatenation
 				return node;
-			}
-			if (innerExpr instanceof ConditionalExpression
+			} else if (innerExpr instanceof ConditionalExpression
 					&& ASTHelper.hasType(parentInfixExpr, "java.lang.String")) {
 				// The parentheses hold a ConditionalExpression that is inside a String
 				// concatenation
 				return node;
 			}
-		}
-		if (parent instanceof PrefixExpression
+		} else if (parent instanceof PrefixExpression
 				&& innerExpr instanceof InstanceofExpression) {
 			// Cannot remove parentheses around InstanceofExpression if it is negated
+			return node;
+		} else if (parent instanceof ConditionalExpression && isHardToRead(innerExpr)) {
 			return node;
 		}
 		if (isUselessParenthesesInStatement(parent, node)) {
@@ -162,9 +158,6 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
 		// TODO JNR add additional code to check if the cast i really required
 		// or if it can be removed.
 				|| innerExpr instanceof CastExpression) {
-			return node;
-		}
-		if (parent instanceof ConditionalExpression && isHardToRead(innerExpr)) {
 			return node;
 		}
 		return innerExpr;
@@ -181,8 +174,7 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
 	{
 		return expr instanceof ConditionalExpression
 				|| expr instanceof Assignment
-				|| expr instanceof InstanceofExpression
-				|| expr instanceof VariableDeclarationExpression;
+				|| expr instanceof InstanceofExpression;
 	}
 
 	/**
