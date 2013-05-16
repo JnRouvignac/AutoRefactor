@@ -32,6 +32,18 @@
                     commandId="org.autorefactor.ui.handler"
                     label="Auto Refactor"
                     style="push">
+                <!-- See http://blog.richclientgui.com/?p=50
+                     "Eclipse RCP Commands Part 3: visibleWhen and Core Expressions"
+                -->
+                <visibleWhen checkEnabled="false">
+                    <iterate ifEmpty="false">
+                        <or>
+                            <instanceof value="org.eclipse.jdt.core.IJavaProject" />
+                            <instanceof value="org.eclipse.jdt.core.IPackageFragment" />
+                            <instanceof value="org.eclipse.jdt.core.ICompilationUnit" />
+                        </or>
+                    </iterate>
+                </visibleWhen>
             </command>
         </menuContribution>
         <!-- Cannot add to Refactor sub menu: @see https://issues.jboss.org/browse/JBIDE-1077 from Alexey Kazakov:
