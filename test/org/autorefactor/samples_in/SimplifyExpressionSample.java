@@ -25,6 +25,8 @@
  */
 package org.autorefactor.samples_in;
 
+import java.io.IOException;
+import java.io.Reader;
 import java.util.Collection;
 import java.util.List;
 
@@ -132,6 +134,11 @@ public class SimplifyExpressionSample {
         boolean b9 = b1 ? (i instanceof Number) : (i instanceof Object);
     }
 
+    public boolean doNotReplaceParenthesesAroundAssignmentInCondition(Reader reader, char[] cbuf, int c) throws IOException {
+	// such expressions are used a lot in while conditions
+        return -1 != (c = reader.read(cbuf));
+    }
+
     public boolean removeUselessParentheses() throws Exception {
         boolean b = (true);
         int i;
@@ -161,20 +168,20 @@ public class SimplifyExpressionSample {
         return ((b));
     }
 
-	public int removeUselessParenthesesInStatements(int i) {
-		int j = (i);
-		j = (i);
-		if ((j == 0)) {
-			removeUselessParenthesesInStatements((i));
-		}
-		do {
-			i++;
-		} while ((i == 0));
-		while ((i == 0)) {
-			i++;
-		}
-		return (i);
-	}
+    public int removeUselessParenthesesInStatements(int i) {
+        int j = (i);
+        j = (i);
+        if ((j == 0)) {
+            removeUselessParenthesesInStatements((i));
+        }
+        do {
+            i++;
+        } while ((i == 0));
+        while ((i == 0)) {
+            i++;
+        }
+        return (i);
+    }
 
     public void removeUselessParenthesesWithAssociativeOperators(boolean b1,
             boolean b2, boolean b3) {

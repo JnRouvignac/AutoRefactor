@@ -139,6 +139,10 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
 				// The parentheses hold a ConditionalExpression that is inside a String
 				// concatenation
 				return node;
+			} else if (innerExpr instanceof Assignment
+					&& isBooleanOperator(parentInfixExpr.getOperator())) {
+				// Do not replace since code would not compile
+				return node;
 			}
 		} else if (parent instanceof PrefixExpression
 				&& innerExpr instanceof InstanceofExpression) {
@@ -170,8 +174,7 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
 	 *          the expression to tests for ease of read
 	 * @return true if the expressions is hard to read, false otherwise
 	 */
-	private boolean isHardToRead(Expression expr)
-	{
+	private boolean isHardToRead(Expression expr) {
 		return expr instanceof ConditionalExpression
 				|| expr instanceof Assignment
 				|| expr instanceof InstanceofExpression;
@@ -188,8 +191,7 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
 	 * @return true if the made up condition would still be readable, false
 	 *         otherwise
 	 */
-	private boolean isReadable(Operator innerOp, Operator outerOp)
-	{
+	private boolean isReadable(Operator innerOp, Operator outerOp) {
 		if (Operator.CONDITIONAL_AND.equals(outerOp)
 				|| Operator.CONDITIONAL_OR.equals(outerOp)) {
 			if (Operator.EQUALS.equals(innerOp)
@@ -237,12 +239,25 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
 		return false;
 	}
 
-	private boolean isAssociativeOperator(final Operator innerOp) {
-		return innerOp == Operator.CONDITIONAL_AND
-				|| innerOp == Operator.CONDITIONAL_OR
-				|| innerOp == Operator.PLUS || innerOp == Operator.TIMES
-				|| innerOp == Operator.AND || innerOp == Operator.OR
-				|| innerOp == Operator.XOR;
+	private boolean isAssociativeOperator(final Operator op) {
+		return op == Operator.CONDITIONAL_AND
+				|| op == Operator.CONDITIONAL_OR
+				|| op == Operator.PLUS
+				|| op == Operator.TIMES
+				|| op == Operator.AND
+				|| op == Operator.OR
+				|| op == Operator.XOR;
+	}
+
+	private boolean isBooleanOperator(Operator op) {
+		return op == Operator.CONDITIONAL_AND
+				|| op == Operator.CONDITIONAL_OR
+				|| op == Operator.EQUALS
+				|| op == Operator.GREATER
+				|| op == Operator.GREATER_EQUALS
+				|| op == Operator.LESS
+				|| op == Operator.LESS_EQUALS
+				|| op == Operator.NOT_EQUALS;
 	}
 
 	@Override
@@ -412,6 +427,7 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
 		if (negate) {
 			operand = ASTHelper.copySubtree(this.ctx.getAST(), exprToCopy);
 		} else {
+
 			operand = negate(exprToCopy);
 		}
 		this.ctx.getRefactorings().replace(node, operand);
@@ -431,7 +447,6 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
 	}
 
 	private void replaceByCopy(InfixExpression node, final Expression lhs) {
-
 		this.ctx.getRefactorings().replace(node, ASTHelper.copySubtree(this.ctx.getAST(), lhs));
 	}
 
