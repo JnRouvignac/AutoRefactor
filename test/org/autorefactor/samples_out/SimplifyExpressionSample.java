@@ -126,6 +126,8 @@ public class SimplifyExpressionSample {
         boolean b5 = i != null;
         // replace
         boolean b6 = b5 && i != null;
+        // do not replace
+        boolean b7 = b1 ? (b2 ? b3 : b4) : (b5 ? b6 : true);
     }
 
     public boolean removeUselessParentheses() throws Exception {

@@ -50,6 +50,7 @@ import org.eclipse.jdt.core.dom.PrefixExpression;
 import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.ThisExpression;
+import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.WhileStatement;
 
@@ -163,7 +164,25 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
 				|| innerExpr instanceof CastExpression) {
 			return node;
 		}
+		if (parent instanceof ConditionalExpression && isHardToRead(innerExpr)) {
+			return node;
+		}
 		return innerExpr;
+	}
+
+	/**
+	 * Returns whether the supplied expression is complex enough to read.
+	 *
+	 * @param expr
+	 *          the expression to tests for ease of read
+	 * @return true if the expressions is hard to read, false otherwise
+	 */
+	private boolean isHardToRead(Expression expr)
+	{
+		return expr instanceof ConditionalExpression
+				|| expr instanceof Assignment
+				|| expr instanceof InstanceofExpression
+				|| expr instanceof VariableDeclarationExpression;
 	}
 
 	/**
@@ -420,6 +439,7 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
 	}
 
 	private void replaceByCopy(InfixExpression node, final Expression lhs) {
+
 		this.ctx.getRefactorings().replace(node, ASTHelper.copySubtree(this.ctx.getAST(), lhs));
 	}
 
