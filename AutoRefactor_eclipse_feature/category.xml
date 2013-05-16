@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
-   <feature url="features/org.autorefactor.feature_0.0.1.qualifier.jar" id="org.autorefactor.feature" version="0.0.1.qualifier">
+   <feature url="features/org.autorefactor.feature_0.0.2.qualifier.jar" id="org.autorefactor.feature" version="0.0.2.qualifier">
       <category name="programming_languages"/>
    </feature>
    <category-def name="programming_languages" label="Programming Languages"/>
