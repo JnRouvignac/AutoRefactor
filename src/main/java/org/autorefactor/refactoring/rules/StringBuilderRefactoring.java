@@ -187,7 +187,7 @@ public class StringBuilderRefactoring extends ASTVisitor implements
 					if (ASTHelper.hasType(arg, "java.lang.String")
 							|| ASTHelper.instanceOf(arg.resolveTypeBinding(),
 									"java.lang.CharSequence")) {
-						results.add(ASTHelper.copySubtree(this.ctx.getAST(), arg));
+						results.addFirst(ASTHelper.copySubtree(this.ctx.getAST(), arg));
 					}
 				}
 				return ASTHelper.copySubtree(this.ctx.getAST(), cic);

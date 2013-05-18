@@ -36,8 +36,8 @@ public class StringBuilderSample {
         sbui.append("foo ").append("bar ").append(0).append(1);
 
         // replace with string append
-        String s1 = "bar " + "baz" + "foo ";
-        String s2 = "bar " + "baz" + "foo ";
+        String s1 = "foo " + "bar " + "baz";
+        String s2 = "foo " + "bar " + "baz";
         String s3 = 0 + 1 + "bar";
         String s4 = 0 + 1 + "bar";
         // DO NOT replace with string append
