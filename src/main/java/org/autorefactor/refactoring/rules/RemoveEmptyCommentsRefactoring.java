@@ -26,9 +26,11 @@
 package org.autorefactor.refactoring.rules;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.autorefactor.refactoring.IJavaRefactoring;
 import org.autorefactor.refactoring.Refactorings;
+import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.BlockComment;
 import org.eclipse.jdt.core.dom.Comment;
@@ -42,6 +44,10 @@ import org.eclipse.jdt.core.dom.LineComment;
 public class RemoveEmptyCommentsRefactoring extends ASTVisitor implements
 		IJavaRefactoring {
 
+	private Pattern EMPTY_LINE_COMMENT = Pattern.compile("//\\s*");
+	private Pattern EMPTY_BLOCK_COMMENT = Pattern
+			.compile("/\\*\\s*(\\*\\s*)*\\*/");
+	private Pattern EMPTY_JAVADOC = Pattern.compile("/\\*\\*\\s*(\\*\\s*)*\\*/");
 	private RefactoringContext ctx;
 
 	public RemoveEmptyCommentsRefactoring() {
@@ -56,14 +62,20 @@ public class RemoveEmptyCommentsRefactoring extends ASTVisitor implements
 
 	@Override
 	public boolean visit(BlockComment node) {
-		// TODO, this is just a placeholder, how to read the comment's text?
-		// node.getStartPosition();
-		// node.getLength();
+		final String comment = getComment(node);
+		if (EMPTY_BLOCK_COMMENT.matcher(comment).matches()) {
+			// this.ctx.getRefactorings().remove(node);
+		}
 		return super.visit(node);
 	}
 
 	@Override
 	public boolean visit(Javadoc node) {
+		// TODO JNR
+		final String comment = getComment(node);
+		if (EMPTY_JAVADOC.matcher(comment).matches()) {
+			this.ctx.getRefactorings().remove(node);
+		}
 		if (node.tags().size() == 0) {
 			this.ctx.getRefactorings().remove(node);
 		}
@@ -72,9 +84,10 @@ public class RemoveEmptyCommentsRefactoring extends ASTVisitor implements
 
 	@Override
 	public boolean visit(LineComment node) {
-		// TODO, this is just a placeholder, how to read the comment's text?
-		// node.getStartPosition();
-		// node.getLength();
+		final String comment = getComment(node);
+		if (EMPTY_LINE_COMMENT.matcher(comment).matches()) {
+			// this.ctx.getRefactorings().remove(node);
+		}
 		return super.visit(node);
 	}
 
@@ -93,4 +106,15 @@ public class RemoveEmptyCommentsRefactoring extends ASTVisitor implements
 		}
 		return this.ctx.getRefactorings();
 	}
+
+	private String getComment(Comment node) {
+		try {
+			final String source = this.ctx.getCompilationUnit().getSource();
+			final int start = node.getStartPosition();
+			return source.substring(start, start + node.getLength());
+		} catch (JavaModelException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
 }

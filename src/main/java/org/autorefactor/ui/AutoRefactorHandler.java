@@ -224,8 +224,7 @@ public class AutoRefactorHandler extends AbstractHandler {
 
 		private Collection<TestCase> buildTestCases(
 				final List<ICompilationUnit> samplesIn,
-				final List<ICompilationUnit> samplesOut)
-		{
+				final List<ICompilationUnit> samplesOut) {
 			Map<String, TestCase> testCases = new TreeMap<String, TestCase>();
 			for (ICompilationUnit sampleIn : samplesIn)
 			{
@@ -429,9 +428,8 @@ public class AutoRefactorHandler extends AbstractHandler {
 		final IDocument document = new Document(compilationUnit.getSource());
 		for (IRefactoring refactoring : refactoringsToApply) {
 			try {
-				final RefactoringContext ctx = new RefactoringContext();
-				ctx.setAST(astRoot.getAST());
-				ctx.setJavaSERelease(javaSERelease);
+				final RefactoringContext ctx = new RefactoringContext(compilationUnit,
+						astRoot.getAST(), javaSERelease);
 				refactoring.setRefactoringContext(ctx);
 
 				// new BlockScopeBuilder().buildScope(astRoot);

@@ -27,6 +27,7 @@ package org.autorefactor.refactoring.rules;
 
 import org.autorefactor.refactoring.Refactorings;
 import org.autorefactor.refactoring.Release;
+import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.dom.AST;
 
 /**
@@ -35,11 +36,24 @@ import org.eclipse.jdt.core.dom.AST;
 public class RefactoringContext {
 
 	private final Refactorings refactorings = new Refactorings();
-	private AST ast;
-	private Release javaSERelease;
+	private final ICompilationUnit compilationUnit;
+	private final AST ast;
+	private final Release javaSERelease;
+
+	public RefactoringContext(ICompilationUnit compilationUnit, AST ast,
+			Release javaSERelease) {
+		this.ast = ast;
+		this.javaSERelease = javaSERelease;
+		this.compilationUnit = compilationUnit;
+	}
 
 	public AST getAST() {
 		return ast;
+	}
+
+	public ICompilationUnit getCompilationUnit()
+	{
+		return compilationUnit;
 	}
 
 	public Release getJavaSERelease() {
@@ -50,11 +64,4 @@ public class RefactoringContext {
 		return refactorings;
 	}
 
-	public void setAST(AST ast) {
-		this.ast = ast;
-	}
-
-	public void setJavaSERelease(Release javaSERelease) {
-		this.javaSERelease = javaSERelease;
-	}
 }
