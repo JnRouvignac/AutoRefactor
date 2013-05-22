@@ -34,6 +34,9 @@
                     style="push">
                 <!-- See http://blog.richclientgui.com/?p=50
                      "Eclipse RCP Commands Part 3: visibleWhen and Core Expressions"
+                     http://wiki.eclipse.org/Platform_Expression_Framework
+                     http://blog.eclipse-tips.com/2009/01/commands-part-2-selection-and.html
+                     http://unicase.blogspot.fr/2011/02/curious-case-of-visiblewhen.html
                 -->
                 <visibleWhen checkEnabled="false">
                     <iterate ifEmpty="false">
