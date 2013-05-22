@@ -30,10 +30,16 @@ public class InvertEqualsSample {
     public static interface Itf {
         String constant = "fkjfkjf";
         String nullConstant = null;
+        MyEnum enumConstant = MyEnum.NOT_NULL;
+    }
+
+    private static enum MyEnum {
+        NOT_NULL
     }
 
     public boolean invertEquals(Object obj) {
         return obj.equals("") && obj.equals(Itf.constant);
+                // && obj.equals(MyEnum.NOT_NULL) && obj.equals(Itf.enumConstant);
     }
 
     public boolean doNotInvertEquals(Object obj) {

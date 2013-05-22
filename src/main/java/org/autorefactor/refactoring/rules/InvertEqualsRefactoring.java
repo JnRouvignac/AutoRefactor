@@ -74,6 +74,7 @@ public class InvertEqualsRefactoring extends ASTVisitor implements
 			final Expression arg = (Expression) node.arguments().get(0);
 			final Object argConstantValue = arg
 					.resolveConstantExpressionValue();
+			// TODO JNR make it work for enums
 			if (exprConstantValue == null && argConstantValue != null) {
 				this.ctx.getRefactorings().replace(node,
 						invertEqualsInvocation(expr, arg, isEquals));
