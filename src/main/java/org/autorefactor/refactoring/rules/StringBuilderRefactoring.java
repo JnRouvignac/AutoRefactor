@@ -25,6 +25,9 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -127,7 +130,7 @@ public class StringBuilderRefactoring extends ASTVisitor implements
 			// outputs " blabla"
 			if (lastExpr instanceof ClassInstanceCreation) {
 				this.ctx.getRefactorings().replace(node,
-						createStringAdds(allAppendedStrings));
+						createStringConcats(allAppendedStrings));
 				return ASTHelper.DO_NOT_VISIT_SUBTREE;
 			}
 		}
@@ -151,20 +154,22 @@ public class StringBuilderRefactoring extends ASTVisitor implements
 		return result;
 	}
 
-	private Expression createStringAdds(List<Expression> appendedStrings) {
-		Expression result = null;
-		for (Expression expr : appendedStrings) {
-			if (result == null) {
-				result = expr;
-			} else {
-				final InfixExpression ie = this.ctx.getAST().newInfixExpression();
-				ie.setLeftOperand(result);
-				ie.setOperator(Operator.PLUS);
-				ie.setRightOperand(expr);
-				result = ie;
-			}
+	private Expression createStringConcats(List<Expression> appendedStrings) {
+		if (appendedStrings.size() == 0) {
+			throw new RuntimeException("Not implemented");
+		} else if (appendedStrings.size() == 1) {
+			return appendedStrings.get(0);
 		}
-		return result;
+
+		final Iterator<Expression> it = appendedStrings.iterator();
+		final InfixExpression ie = this.ctx.getAST().newInfixExpression();
+		ie.setLeftOperand(it.next());
+		ie.setOperator(Operator.PLUS);
+		ie.setRightOperand(it.next());
+		while (it.hasNext()) {
+			ie.extendedOperands().add(it.next());
+		}
+		return ie;
 	}
 
 	private Expression collectAllAppendedStrings(Expression expr,
@@ -203,6 +208,14 @@ public class StringBuilderRefactoring extends ASTVisitor implements
 		if (arg instanceof InfixExpression) {
 			final InfixExpression ie = (InfixExpression) arg;
 			if (InfixExpression.Operator.PLUS.equals(ie.getOperator())) {
+				if (ie.hasExtendedOperands()) {
+					final List<Expression> reversed =
+							new ArrayList<Expression>(ie.extendedOperands());
+					Collections.reverse(reversed);
+					for (Expression op : reversed) {
+						addAllAppendedString(op, results);
+					}
+				}
 				addAllAppendedString(ie.getRightOperand(), results);
 				addAllAppendedString(ie.getLeftOperand(), results);
 				return;

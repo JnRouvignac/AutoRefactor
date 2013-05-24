@@ -27,24 +27,26 @@ package org.autorefactor.samples_in;
 
 public class StringBuilderSample {
 
-    public static void main(String[] args) {
-        StringBuffer sbuf = new StringBuffer();
-        StringBuilder sbui = new StringBuilder();
-
-        // change to efficient string append
+    public void replaceWithEfficientStringAppend(StringBuffer sbuf, StringBuilder sbui, String s) {
         sbuf.append("" + "foo ").append("bar " + 0).append("" + 1);
         sbui.append("" + "foo ").append("bar " + 0).append("" + 1);
+        sbuf.append("foo" + 0 + "bar" + 1);
+        sbui.append("foo" + 0 + "bar" + 1);
+    }
 
-        // replace with string append
+    public void replaceWithStringAppend() {
         String s1 = new StringBuffer("foo ").append("bar ").append("baz").toString();
         String s2 = new StringBuilder("foo ").append("bar ").append("baz").toString();
         String s3 = new StringBuffer().append(0).append(1).append("bar").toString();
         String s4 = new StringBuilder().append(0).append(1).append("bar").toString();
-        // DO NOT replace with string append
+    }
+
+    public void doNotReplaceWithStringAppend(StringBuffer sbuf, StringBuilder sbui) {
         String s5 = sbuf.append("foo ").append("bar").toString();
         String s6 = sbui.append("foo ").append("bar").toString();
+    }
 
-        // remove useless string concatenation
+    public void removeUselessStringConcatenation() {
         String s7 = Integer.toString(42) + "";
     }
 
