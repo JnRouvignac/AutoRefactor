@@ -30,12 +30,15 @@ import org.eclipse.jdt.core.dom.Expression;
 public class CFGEdge {
 
 	private final Expression condition;
+	/** TODO JNR rename */
+	private final boolean evaluationResult;
 	private final CFGBasicBlock sourceBlock;
 	private final CFGBasicBlock targetBlock;
 
-	private CFGEdge(Expression condition, CFGBasicBlock source,
-			CFGBasicBlock target) {
+	public CFGEdge(Expression condition, boolean evaluationResult,
+			CFGBasicBlock source, CFGBasicBlock target) {
 		this.condition = condition;
+		this.evaluationResult = evaluationResult;
 		this.sourceBlock = source;
 		this.targetBlock = target;
 	}
@@ -52,32 +55,60 @@ public class CFGEdge {
 		return this.targetBlock;
 	}
 
+	public boolean getEvaluationResult() {
+		return evaluationResult;
+	}
+
 	@Override
 	public String toString() {
 		final StringBuilder sb = new StringBuilder();
-		sb.append(this.sourceBlock);
-		arcToString(sb, this.condition);
-		sb.append(this.targetBlock);
+		this.sourceBlock.appendSummary(sb);
+		sb.append(" -> ");
+		this.targetBlock.appendSummary(sb);
 		return sb.toString();
 	}
 
-	public static void arcToString(final StringBuilder sb,
-			Expression condition) {
-		sb.append(" +---{");
-		sb.append(condition != null ? condition : "true");
-		sb.append("}---> ");
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((condition == null) ? 0 : condition.hashCode());
+		result = prime * result + (evaluationResult ? 1231 : 1237);
+		result = prime * result
+				+ ((sourceBlock == null) ? 0 : sourceBlock.hashCode());
+		result = prime * result
+				+ ((targetBlock == null) ? 0 : targetBlock.hashCode());
+		return result;
 	}
 
-	public static CFGEdge build(CFGBasicBlock source, CFGBasicBlock target) {
-		return build(null, source, target);
-	}
-
-	public static CFGEdge build(Expression condition, CFGBasicBlock source,
-			CFGBasicBlock target) {
-		final CFGEdge edge = new CFGEdge(condition, source, target);
-		source.addOutgoingEdge(edge);
-		target.addIncomingEdge(edge);
-		return edge;
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		CFGEdge other = (CFGEdge) obj;
+		if (condition == null) {
+			if (other.condition != null)
+				return false;
+		} else if (!condition.equals(other.condition))
+			return false;
+		if (evaluationResult != other.evaluationResult)
+			return false;
+		if (sourceBlock == null) {
+			if (other.sourceBlock != null)
+				return false;
+		} else if (!sourceBlock.equals(other.sourceBlock))
+			return false;
+		if (targetBlock == null) {
+			if (other.targetBlock != null)
+				return false;
+		} else if (!targetBlock.equals(other.targetBlock))
+			return false;
+		return true;
 	}
 
 }

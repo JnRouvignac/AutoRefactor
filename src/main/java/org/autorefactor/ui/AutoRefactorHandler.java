@@ -25,6 +25,9 @@
  */
 package org.autorefactor.ui;
 
+import static org.eclipse.jdt.core.JavaCore.COMPILER_SOURCE;
+import static org.eclipse.jdt.core.formatter.DefaultCodeFormatterConstants.FORMATTER_INDENTATION_SIZE;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -67,7 +70,6 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
-import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
@@ -117,7 +119,9 @@ public class AutoRefactorHandler extends AbstractHandler {
 				return Status.OK_STATUS;
 			}
 			final List<ICompilationUnit> compilationUnits = collectCompilationUnits(javaElement);
-			final String javaSourceCompatibility = getJavaSourceCompatibility(javaElement);
+			final Map<String, String> options = getJavaProjectOptions(javaElement);
+			final String javaSourceCompatibility = options.get(COMPILER_SOURCE);
+			final int tabSize = getTabSize(options);
 
 			monitor.beginTask("", compilationUnits.size());
 			try {
@@ -131,7 +135,7 @@ public class AutoRefactorHandler extends AbstractHandler {
 								.getElementName() + "." + simpleName;
 						monitor.subTask("Applying refactorings to " + className);
 						applyRefactorings(compilationUnit, javaSERelease,
-								getAllRefactorings());
+								tabSize, getAllRefactorings());
 					} catch (Exception e) {
 						throw new RuntimeException(e);
 					} finally {
@@ -144,10 +148,21 @@ public class AutoRefactorHandler extends AbstractHandler {
 			return Status.OK_STATUS;
 		}
 
+		private int getTabSize(final Map<String, String> options) {
+			String tabSize = options.get(FORMATTER_INDENTATION_SIZE);
+			try {
+				return Integer.valueOf(tabSize);
+			} catch (NumberFormatException e) {
+				throw new RuntimeException("Unhandled exception");
+			}
+		}
+
 		private void testWithSamples() {
 			try {
 				final IJavaProject javaProject = getIJavaProject(getSelectedJavaElement(event));
-				final String javaSourceCompatibility = getJavaSourceCompatibility(javaProject);
+				final Map<String, String> options = getJavaProjectOptions(javaProject);
+				final String javaSourceCompatibility = options.get(COMPILER_SOURCE);
+				final int tabSize = getTabSize(options);
 				final Release javaSERelease = Release.javaSE(javaSourceCompatibility);
 				for (IPackageFragmentRoot packageFragmentRoot : javaProject
 						.getPackageFragmentRoots()) {
@@ -164,15 +179,17 @@ public class AutoRefactorHandler extends AbstractHandler {
 							packageFragmentRoot, samplesOutPkg);
 
 					Collection<TestCase> testCases = buildTestCases(samplesIn, samplesOut);
-					runTests(testCases, samplesInPkg, samplesOutPkg, javaSERelease);
+					runTests(testCases, samplesInPkg, samplesOutPkg,
+							javaSERelease, tabSize);
 				}
 			} catch (Exception e) {
 				throw new RuntimeException("Unexpected exception", e);
 			}
 		}
 
-		private void runTests(Collection<TestCase> testCases, String samplesInPkg,
-				String samplesOutPkg, final Release javaSERelease) throws Exception {
+		private void runTests(Collection<TestCase> testCases,
+				String samplesInPkg, String samplesOutPkg,
+				final Release javaSERelease, int tabSize) throws Exception {
 			boolean success = true;
 			final StringBuilder result = new StringBuilder();
 
@@ -196,8 +213,8 @@ public class AutoRefactorHandler extends AbstractHandler {
 					continue;
 				}
 
-				applyRefactorings(testCase.sampleIn, javaSERelease, Collections
-						.singletonList(testCase.refactoring));
+				applyRefactorings(testCase.sampleIn, javaSERelease, tabSize,
+						Collections.singletonList(testCase.refactoring));
 
 				// Change the package to be the same as the sampleOut
 				// and ignore insignificant space characters
@@ -226,20 +243,17 @@ public class AutoRefactorHandler extends AbstractHandler {
 				final List<ICompilationUnit> samplesIn,
 				final List<ICompilationUnit> samplesOut) {
 			Map<String, TestCase> testCases = new TreeMap<String, TestCase>();
-			for (ICompilationUnit sampleIn : samplesIn)
-			{
+			for (ICompilationUnit sampleIn : samplesIn) {
 				final String sampleName = getSampleName(sampleIn);
 				TestCase testCase = getTestCase(testCases, sampleName);
 				testCase.sampleIn = sampleIn;
 			}
-			for (ICompilationUnit sampleOut : samplesOut)
-			{
+			for (ICompilationUnit sampleOut : samplesOut) {
 				final String sampleName = getSampleName(sampleOut);
 				TestCase testCase = getTestCase(testCases, sampleName);
 				testCase.sampleOut = sampleOut;
 			}
-			for (IRefactoring refactoring : getAllRefactorings())
-			{
+			for (IRefactoring refactoring : getAllRefactorings()) {
 				String name = refactoring.getClass().getSimpleName();
 				String sampleName = name.substring(0, name.indexOf("Refactoring")) + "Sample";
 				TestCase testCase = getTestCase(testCases, sampleName);
@@ -248,7 +262,8 @@ public class AutoRefactorHandler extends AbstractHandler {
 			return testCases.values();
 		}
 
-		private TestCase getTestCase(Map<String, TestCase> testContexts, String sampleName) {
+		private TestCase getTestCase(Map<String, TestCase> testContexts,
+				String sampleName) {
 			TestCase testCase = testContexts.get(sampleName);
 			if (testCase == null) {
 				testCase = new TestCase(sampleName);
@@ -313,7 +328,7 @@ public class AutoRefactorHandler extends AbstractHandler {
 
 				public void run() {
 					MessageDialog.openInformation(shell, "Info",
-						"This action only works on Java source files");
+							"This action only works on Java source files");
 				}
 			});
 		} else if ("org.eclipse.jdt.ui.PackageExplorer".equals(activePartId)) {
@@ -332,7 +347,7 @@ public class AutoRefactorHandler extends AbstractHandler {
 
 					public void run() {
 						MessageDialog.openInformation(shell, "Info",
-							"Please select a Java source file, Java package or Java project");
+								"Please select a Java source file, Java package or Java project");
 					}
 
 				});
@@ -380,10 +395,10 @@ public class AutoRefactorHandler extends AbstractHandler {
 	}
 
 	@SuppressWarnings("unchecked")
-	private static String getJavaSourceCompatibility(IJavaElement javaElement) {
+	private static Map<String, String> getJavaProjectOptions(
+			IJavaElement javaElement) {
 		final IJavaProject javaProject = getIJavaProject(javaElement);
-		final Map<String, String> options = javaProject.getOptions(true);
-		return options.get(JavaCore.COMPILER_SOURCE);
+		return javaProject.getOptions(true);
 	}
 
 	private static IJavaProject getIJavaProject(IJavaElement javaElement) {
@@ -401,6 +416,7 @@ public class AutoRefactorHandler extends AbstractHandler {
 	/**
 	 * @param compilationUnit
 	 * @param javaSERelease
+	 * @param tabSize
 	 * @param isInMemory
 	 * @throws Exception
 	 * @see <a
@@ -414,16 +430,17 @@ public class AutoRefactorHandler extends AbstractHandler {
 	 *      org.eclipse.ui.menus </a>
 	 */
 	private static void applyRefactorings(ICompilationUnit compilationUnit,
-			Release javaSERelease, List<IRefactoring> refactoringsToApply)
-			throws Exception {
+			Release javaSERelease, int tabSize,
+			List<IRefactoring> refactoringsToApply) throws Exception {
 		// creation of DOM/AST from a ICompilationUnit
 		final ASTParser parser = ASTParser.newParser(AST.JLS4);
 		parser.setSource(compilationUnit);
 		parser.setResolveBindings(true);
 
 		CompilationUnit astRoot = (CompilationUnit) parser.createAST(null);
-		// final List<CFGBasicBlock> basicBlocks = new
-		// CFGBuilder(astRoot.getAST()).buildCFG(astRoot);
+
+		// new CFGBuilder(compilationUnit.getSource(),
+		// tabSize).buildCFG(astRoot);
 
 		final IDocument document = new Document(compilationUnit.getSource());
 		for (IRefactoring refactoring : refactoringsToApply) {
@@ -431,8 +448,6 @@ public class AutoRefactorHandler extends AbstractHandler {
 				final RefactoringContext ctx = new RefactoringContext(compilationUnit,
 						astRoot.getAST(), javaSERelease);
 				refactoring.setRefactoringContext(ctx);
-
-				// new BlockScopeBuilder().buildScope(astRoot);
 
 				final Refactorings refactorings = refactoring.getRefactorings(astRoot);
 				if (refactorings.hasRefactorings()) {

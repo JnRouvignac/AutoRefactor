@@ -25,13 +25,26 @@
  */
 package org.autorefactor.cfg;
 
+import static org.autorefactor.cfg.VariableAccess.DECL_INIT;
+import static org.autorefactor.cfg.VariableAccess.DECL_UNINIT;
+import static org.autorefactor.cfg.VariableAccess.READ;
+import static org.autorefactor.cfg.VariableAccess.WRITE;
+
 import java.lang.reflect.Method;
+import java.util.Collection;
+import java.util.Deque;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.regex.MatchResult;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.autorefactor.refactoring.ASTHelper;
 import org.autorefactor.util.Pair;
-import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.AbstractTypeDeclaration;
 import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
@@ -112,126 +125,101 @@ import org.eclipse.jdt.core.dom.WildcardType;
 
 public class CFGBuilder {
 
-	private final AST ast;
-	private CFGBasicBlock currentBasicBlock;
-	/** TODO JNR need to pass down a stack of live basic blocks? */
-	private final List<CFGBasicBlock> liveBasicBlocks = new LinkedList<CFGBasicBlock>();
-	private final List<Pair<CFGBasicBlock, Expression>> edgesToBuild = new LinkedList<Pair<CFGBasicBlock, Expression>>();
-	private final CFGBasicBlock exitBlock = new CFGBasicBlock();
+	private String source;
+	private int tabSize;
+	private final Deque<CFGBasicBlock> currentBlockStack = new LinkedList<CFGBasicBlock>();
+	/** Edges to be built when visiting the node used as the key. */
+	private final Map<ASTNode, Set<CFGEdgeBuilder>> edgesToBuild = new HashMap<ASTNode, Set<CFGEdgeBuilder>>();
+	/** The exit block for the CFG being built */
+	private CFGBasicBlock exitBlock;
 
-	public CFGBuilder(AST ast) {
-		this.ast = ast;
-	}
-
-	private void addReadWrite(CFGBasicBlock basicBlock, Expression node) {
-		addReadWrite(basicBlock, node, VariableAccess.READ
-				| VariableAccess.WRITE);
-	}
-
-	private void addReadWrites(CFGBasicBlock basicBlock, List<Expression> nodes) {
-		addReadWrites(basicBlock, nodes, VariableAccess.READ
-				| VariableAccess.WRITE);
+	public CFGBuilder(String source, int tabSize) {
+		this.source = source;
+		this.tabSize = tabSize;
 	}
 
 	@SuppressWarnings("unchecked")
-	private void addReadWrite(CFGBasicBlock basicBlock, Expression node,
+	private void addVariableAccess(CFGBasicBlock basicBlock, Expression node,
 			int flags) {
 		if (node instanceof ArrayAccess) {
 			ArrayAccess aa = (ArrayAccess) node;
-			addReadWrite(basicBlock, aa.getArray(), flags);
-			addReadWrite(basicBlock, aa.getIndex(), flags);
-			return;
+			addVariableAccess(basicBlock, aa.getArray(), flags);
+			addVariableAccess(basicBlock, aa.getIndex(), flags);
 		} else if (node instanceof ArrayCreation) {
 			ArrayCreation ac = (ArrayCreation) node;
-			addReadWrite(basicBlock, ac.getInitializer(), flags);
-			addReadWrites(basicBlock, ac.dimensions(), flags);
-			return;
+			addVariableAccess(basicBlock, ac.getInitializer(), flags);
+			addVariableAccesses(basicBlock, ac.dimensions(), flags);
 		} else if (node instanceof ArrayInitializer) {
 			ArrayInitializer ai = (ArrayInitializer) node;
-			addReadWrites(basicBlock, ai.expressions(), flags);
-			return;
+			addVariableAccesses(basicBlock, ai.expressions(), flags);
 		} else if (node instanceof Assignment) {
 			Assignment a = (Assignment) node;
-			addReadWrite(basicBlock, a.getLeftHandSide(), VariableAccess.WRITE);
-			addReadWrite(basicBlock, a.getRightHandSide(), VariableAccess.READ);
-			return;
+			addVariableAccess(basicBlock, a.getLeftHandSide(), WRITE);
+			addVariableAccess(basicBlock, a.getRightHandSide(), READ);
 		} else if (node instanceof BooleanLiteral
 				|| node instanceof CharacterLiteral
 				|| node instanceof NullLiteral || node instanceof NumberLiteral
 				|| node instanceof StringLiteral || node instanceof TypeLiteral) {
 			// nothing to do
-			return;
 		} else if (node instanceof CastExpression) {
 			CastExpression ce = (CastExpression) node;
-			addReadWrite(basicBlock, ce.getExpression(), flags);
-			return;
+			addVariableAccess(basicBlock, ce.getExpression(), flags);
 		} else if (node instanceof ClassInstanceCreation) {
 			ClassInstanceCreation cic = (ClassInstanceCreation) node;
-			addReadWrite(basicBlock, cic.getExpression(), flags);
-			addReadWrites(basicBlock, cic.arguments(), flags);
-			return;
+			addVariableAccess(basicBlock, cic.getExpression(), flags);
+			addVariableAccesses(basicBlock, cic.arguments(), flags);
 		} else if (node instanceof ConditionalExpression) {
 			ConditionalExpression ce = (ConditionalExpression) node;
-			addReadWrite(basicBlock, ce.getExpression(), flags);
-			addReadWrite(basicBlock, ce.getThenExpression(), flags);
-			addReadWrite(basicBlock, ce.getElseExpression(), flags);
-			return;
+			addVariableAccess(basicBlock, ce.getExpression(), flags);
+			addVariableAccess(basicBlock, ce.getThenExpression(), flags);
+			addVariableAccess(basicBlock, ce.getElseExpression(), flags);
 		} else if (node instanceof FieldAccess) {
 			FieldAccess fa = (FieldAccess) node;
 			basicBlock.addVariableAccess(new VariableAccess(fa, flags));
-			return;
 		} else if (node instanceof InfixExpression) {
 			InfixExpression ie = (InfixExpression) node;
-			addReadWrite(basicBlock, ie.getLeftOperand(), flags);
-			addReadWrite(basicBlock, ie.getRightOperand(), flags);
-			return;
+			addVariableAccess(basicBlock, ie.getLeftOperand(), flags);
+			addVariableAccess(basicBlock, ie.getRightOperand(), flags);
 		} else if (node instanceof InstanceofExpression) {
 			InstanceofExpression ie = (InstanceofExpression) node;
-			addReadWrite(basicBlock, ie.getLeftOperand(), flags);
-			return;
+			addVariableAccess(basicBlock, ie.getLeftOperand(), flags);
 		} else if (node instanceof MethodInvocation) {
 			MethodInvocation mi = (MethodInvocation) node;
-			addReadWrite(basicBlock, mi.getExpression(), flags);
-			addReadWrites(basicBlock, mi.arguments(), flags);
-			return;
+			addVariableAccess(basicBlock, mi.getExpression(), flags);
+			addVariableAccesses(basicBlock, mi.arguments(), flags);
 		} else if (node instanceof SimpleName) {
 			SimpleName sn = (SimpleName) node;
 			basicBlock.addVariableAccess(new VariableAccess(sn, flags));
-			return;
 		} else if (node instanceof QualifiedName) {
 			QualifiedName qn = (QualifiedName) node;
 			basicBlock.addVariableAccess(new VariableAccess(qn, flags));
-			return;
 		} else if (node instanceof ParenthesizedExpression) {
 			ParenthesizedExpression pe = (ParenthesizedExpression) node;
-			addReadWrite(basicBlock, pe.getExpression(), flags);
-			return;
+			addVariableAccess(basicBlock, pe.getExpression(), flags);
 		} else if (node instanceof PostfixExpression) {
 			PostfixExpression pe = (PostfixExpression) node;
-			addReadWrite(basicBlock, pe.getOperand(), flags);
-			return;
+			addVariableAccess(basicBlock, pe.getOperand(), flags);
 		} else if (node instanceof PrefixExpression) {
 			PrefixExpression pe = (PrefixExpression) node;
-			addReadWrite(basicBlock, pe.getOperand(), flags);
-			return;
-		} else if (node instanceof SuperFieldAccess) {
-			SuperFieldAccess sfa = (SuperFieldAccess) node;
-		} else if (node instanceof SuperMethodInvocation) {
-			SuperMethodInvocation smi = (SuperMethodInvocation) node;
-		} else if (node instanceof ThisExpression) {
-			ThisExpression te = (ThisExpression) node;
+			addVariableAccess(basicBlock, pe.getOperand(), flags);
+			// } else if (node instanceof SuperFieldAccess) {
+			// SuperFieldAccess sfa = (SuperFieldAccess) node;
+			// } else if (node instanceof SuperMethodInvocation) {
+			// SuperMethodInvocation smi = (SuperMethodInvocation) node;
+			// } else if (node instanceof ThisExpression) {
+			// ThisExpression te = (ThisExpression) node;
 		} else if (node instanceof VariableDeclarationExpression) {
 			VariableDeclarationExpression vde = (VariableDeclarationExpression) node;
 			addDeclarations(basicBlock, vde.fragments(), vde.getType());
-			return;
+		} else {
+			throw new RuntimeException(notImplementedFor(node));
 		}
-		throw new RuntimeException("Not implemented for " + node.getClass());
 	}
 
-	private void addReadWrites(CFGBasicBlock basicBlock,
+	private void addVariableAccesses(CFGBasicBlock basicBlock,
 			List<Expression> expressions, int flags) {
 		for (Expression exor : expressions) {
-			addReadWrite(basicBlock, exor, flags);
+			addVariableAccess(basicBlock, exor, flags);
 		}
 	}
 
@@ -244,8 +232,8 @@ public class CFGBuilder {
 
 	private void addDeclaration(final CFGBasicBlock basicBlock,
 			VariableDeclarationFragment vdf, Type type) {
-		final int accessType = vdf.getInitializer() == null ? VariableAccess.DECL_INIT
-				: VariableAccess.DECL_INIT | VariableAccess.WRITE;
+		final int accessType = vdf.getInitializer() == null ? DECL_UNINIT
+				: DECL_INIT | WRITE;
 		basicBlock.addVariableAccess(new VariableAccess(vdf, vdf.getName(),
 				type, accessType));
 	}
@@ -259,7 +247,7 @@ public class CFGBuilder {
 
 	private void addDeclaration(final CFGBasicBlock basicBlock,
 			final SingleVariableDeclaration varDecl) {
-		addDeclaration(basicBlock, varDecl, VariableAccess.DECL_INIT);
+		addDeclaration(basicBlock, varDecl, DECL_INIT);
 	}
 
 	private void addDeclaration(CFGBasicBlock basicBlock,
@@ -268,201 +256,141 @@ public class CFGBuilder {
 				.getName(), varDecl.getType(), flags));
 	}
 
-	private void add(List<CFGBasicBlock> liveBasicBlocks,
-			CFGBasicBlock lastBuiltBasicBlock) {
-		if (lastBuiltBasicBlock != null) {
-			liveBasicBlocks.add(lastBuiltBasicBlock);
-		}
-	}
-
-	private CFGBasicBlock buildCFG(Statement node) {
+	private void buildCFG(Statement node) {
 		if (node == null) {
-			return null;
+			return;
 		}
 		try {
-			final Method buildCfgMethod = getClass().getMethod("buildCFG",
-					node.getClass());
-			return (CFGBasicBlock) buildCfgMethod.invoke(this, node);
+			final Method m = getClass().getMethod("buildCFG", node.getClass());
+			m.invoke(this, node);
 		} catch (Exception e) {
 			throw new RuntimeException("Unhandled exception", e);
 		}
 	}
 
-	public CFGBasicBlock buildCFG(QualifiedName node) {
-		if (true) {
-			throw new RuntimeException("Not implemented");
-		}
-		return null;
+	public void buildCFG(QualifiedName node) {
+		throw new RuntimeException("Not implemented");
 	}
 
-	public CFGBasicBlock buildCFG(PrimitiveType node) {
-		if (true) {
-			throw new RuntimeException("Not implemented");
-		}
-		return null;
+	public void buildCFG(PrimitiveType node) {
+		throw new RuntimeException("Not implemented");
 	}
 
-	public CFGBasicBlock buildCFG(QualifiedType node) {
-		if (true) {
-			throw new RuntimeException("Not implemented");
-		}
-		return null;
+	public void buildCFG(QualifiedType node) {
+		throw new RuntimeException("Not implemented");
 	}
 
-	public CFGBasicBlock buildCFG(PrefixExpression node) {
-		if (true) {
-			throw new RuntimeException("Not implemented");
-		}
-		return null;
+	public void buildCFG(PrefixExpression node) {
+		throw new RuntimeException("Not implemented");
 	}
 
-	public CFGBasicBlock buildCFG(PostfixExpression node) {
-		if (true) {
-			throw new RuntimeException("Not implemented");
-		}
-		return null;
+	public void buildCFG(PostfixExpression node) {
+		throw new RuntimeException("Not implemented");
 	}
 
-	public CFGBasicBlock buildCFG(ParenthesizedExpression node) {
-		if (true) {
-			throw new RuntimeException("Not implemented");
-		}
-		return null;
+	public void buildCFG(ParenthesizedExpression node) {
+		throw new RuntimeException("Not implemented");
 	}
 
-	public CFGBasicBlock buildCFG(SingleVariableDeclaration node) {
-		if (true) {
-			throw new RuntimeException("Not implemented");
-		}
-		return null;
+	public void buildCFG(SingleVariableDeclaration node) {
+		throw new RuntimeException("Not implemented");
 	}
 
-	public CFGBasicBlock buildCFG(SimpleType node) {
-		if (true) {
-			throw new RuntimeException("Not implemented");
-		}
-		return null;
+	public void buildCFG(SimpleType node) {
+		throw new RuntimeException("Not implemented");
 	}
 
-	public CFGBasicBlock buildCFG(SimpleName node) {
-		if (true) {
-			throw new RuntimeException("Not implemented");
-		}
-		return null;
+	public void buildCFG(SimpleName node) {
+		throw new RuntimeException("Not implemented");
 	}
 
-	public CFGBasicBlock buildCFG(ReturnStatement node) {
-		if (true) {
-			throw new RuntimeException("Not implemented");
+	public void buildCFG(ReturnStatement node) {
+		addVariableAccess(this.currentBlockStack.peek(), node.getExpression(),
+				READ);
+		final Set<CFGEdgeBuilder> toBuild = this.edgesToBuild.get(node);
+		if (isNotEmpty(toBuild)) {
+			final CFGBasicBlock basicBlock = newCFGBasicBlock(node);
+			CFGEdgeBuilder.buildEdge(basicBlock, this.exitBlock);
+		} else {
+			CFGEdgeBuilder.buildEdge(this.currentBlockStack.peek(),
+					this.exitBlock);
 		}
-		return null;
 	}
 
-	public CFGBasicBlock buildCFG(Modifier node) {
-		if (true) {
-			throw new RuntimeException("Not implemented");
-		}
-		return null;
+	public void buildCFG(Modifier node) {
+		throw new RuntimeException("Not implemented");
 	}
 
-	public CFGBasicBlock buildCFG(MethodInvocation node) {
-		if (true) {
-			throw new RuntimeException("Not implemented");
-		}
-		return null;
+	public void buildCFG(MethodInvocation node) {
+		throw new RuntimeException("Not implemented");
 	}
 
 	public CFGBasicBlock buildCFG(MethodDeclaration node) {
-		final CFGBasicBlock basicBlock = new CFGBasicBlock(node);
-		this.currentBasicBlock = basicBlock;
+		final CFGBasicBlock entryBlock = new CFGBasicBlock(true, node);
+		this.exitBlock = new CFGBasicBlock(false, node);
 
-		addDeclarations(basicBlock, node.parameters());
+		addDeclarations(entryBlock, node.parameters());
 
-		// ConstructorDeclaration:
-		// [ Javadoc ] { ExtendedModifier }
-		// [ < TypeParameter { , TypeParameter } > ]
-		// Identifier (
-		// [ FormalParameter
-		// { , FormalParameter } ] )
-		// [throws TypeName { , TypeName } ] Block
-		// TODO JNR
-		buildCFG(node.getBody());
-		if ("void".equals(node.getReturnType2().resolveBinding().getName())) {
-			// TODO JNR fix this when the last statement is a return statement
-			CFGEdge.build(this.currentBasicBlock, this.exitBlock);
+		final CFGBasicBlock basicBlock = newCFGBasicBlock((ASTNode) node
+				.getBody());
+		CFGEdgeBuilder.buildEdge(entryBlock, basicBlock);
+		this.currentBlockStack.push(basicBlock);
+		try {
+			buildCFG(node.getBody());
+			if ("void".equals(node.getReturnType2().resolveBinding().getName())) {
+				// TODO JNR handle methods with void return type
+			}
+			if (!this.edgesToBuild.isEmpty()) {
+				throw new IllegalStateException(
+						"At this point, there should not be any edges left to build");
+			}
+			// new CFGDotPrinter().toDot(entryBlock);
+			// new CodePathCollector().getPaths(entryBlock);
+			return entryBlock;
+		} finally {
+			this.currentBlockStack.pop();
+			this.exitBlock = null;
 		}
-		basicBlock.toString();
-		return basicBlock;
 	}
 
-	public CFGBasicBlock buildCFG(MethodRefParameter node) {
-		if (true) {
-			throw new RuntimeException("Not implemented");
-		}
-		return null;
+	public void buildCFG(MethodRefParameter node) {
+		throw new RuntimeException("Not implemented");
 	}
 
-	public CFGBasicBlock buildCFG(MethodRef node) {
-		if (true) {
-			throw new RuntimeException("Not implemented");
-		}
-		return null;
+	public void buildCFG(MethodRef node) {
+		throw new RuntimeException("Not implemented");
 	}
 
-	public CFGBasicBlock buildCFG(MemberValuePair node) {
-		if (true) {
-			throw new RuntimeException("Not implemented");
-		}
-		return null;
+	public void buildCFG(MemberValuePair node) {
+		throw new RuntimeException("Not implemented");
 	}
 
-	public CFGBasicBlock buildCFG(ParameterizedType node) {
-		if (true) {
-			throw new RuntimeException("Not implemented");
-		}
-		return null;
+	public void buildCFG(ParameterizedType node) {
+		throw new RuntimeException("Not implemented");
 	}
 
-	public CFGBasicBlock buildCFG(NumberLiteral node) {
-		if (true) {
-			throw new RuntimeException("Not implemented");
-		}
-		return null;
+	public void buildCFG(NumberLiteral node) {
+		throw new RuntimeException("Not implemented");
 	}
 
-	public CFGBasicBlock buildCFG(NullLiteral node) {
-		if (true) {
-			throw new RuntimeException("Not implemented");
-		}
-		return null;
+	public void buildCFG(NullLiteral node) {
+		throw new RuntimeException("Not implemented");
 	}
 
-	public CFGBasicBlock buildCFG(UnionType node) {
-		if (true) {
-			throw new RuntimeException("Not implemented");
-		}
-		return null;
+	public void buildCFG(UnionType node) {
+		throw new RuntimeException("Not implemented");
 	}
 
-	public CFGBasicBlock buildCFG(TypeParameter node) {
-		if (true) {
-			throw new RuntimeException("Not implemented");
-		}
-		return null;
+	public void buildCFG(TypeParameter node) {
+		throw new RuntimeException("Not implemented");
 	}
 
-	public CFGBasicBlock buildCFG(TypeLiteral node) {
-		if (true) {
-			throw new RuntimeException("Not implemented");
-		}
-		return null;
+	public void buildCFG(TypeLiteral node) {
+		throw new RuntimeException("Not implemented");
 	}
 
-	public CFGBasicBlock buildCFG(TypeDeclarationStatement node) {
-		if (true) {
-			throw new RuntimeException("Not implemented");
-		}
-		return null;
+	public void buildCFG(TypeDeclarationStatement node) {
+		throw new RuntimeException("Not implemented");
 	}
 
 	public CFGBasicBlock buildCFG(TypeDeclaration node) {
@@ -484,466 +412,428 @@ public class CFGBuilder {
 		return null;
 	}
 
-	public CFGBasicBlock buildCFG(TryStatement node) {
-		if (true) {
-			throw new RuntimeException("Not implemented");
-		}
-		return null;
+	public void buildCFG(TryStatement node) {
+		throw new RuntimeException("Not implemented");
 	}
 
-	public CFGBasicBlock buildCFG(WildcardType node) {
-		if (true) {
-			throw new RuntimeException("Not implemented");
-		}
-		return null;
+	public void buildCFG(WildcardType node) {
+		throw new RuntimeException("Not implemented");
 	}
 
-	public CFGBasicBlock buildCFG(WhileStatement node) {
-		return buildCFG(node.getBody());
+	public void buildCFG(WhileStatement node) {
+		throw new RuntimeException("Not implemented");
 	}
 
-	public CFGBasicBlock buildCFG(VariableDeclarationFragment node) {
-		if (true) {
-			throw new RuntimeException("Not implemented");
-		}
-		return null;
+	public void buildCFG(VariableDeclarationFragment node) {
+		throw new RuntimeException("Not implemented");
 	}
 
-	public CFGBasicBlock buildCFG(VariableDeclarationStatement node) {
-		if (true) {
-			throw new RuntimeException("Not implemented");
-		}
-		return null;
+	public void buildCFG(VariableDeclarationStatement node) {
+		addDeclarations(this.currentBlockStack.peek(), node.fragments(),
+				node.getType());
 	}
 
-	public CFGBasicBlock buildCFG(VariableDeclarationExpression node) {
-		if (true) {
-			throw new RuntimeException("Not implemented");
-		}
-		return null;
+	public void buildCFG(VariableDeclarationExpression node) {
+		throw new RuntimeException("Not implemented");
 	}
 
-	public CFGBasicBlock buildCFG(SwitchStatement node) {
-		if (true) {
-			throw new RuntimeException("Not implemented");
-		}
-		return null;
+	public void buildCFG(SwitchStatement node) {
+		throw new RuntimeException("Not implemented");
 	}
 
-	public CFGBasicBlock buildCFG(SwitchCase node) {
-		if (true) {
-			throw new RuntimeException("Not implemented");
-		}
-		return null;
+	public void buildCFG(SwitchCase node) {
+		throw new RuntimeException("Not implemented");
 	}
 
-	public CFGBasicBlock buildCFG(SuperMethodInvocation node) {
-		if (true) {
-			throw new RuntimeException("Not implemented");
-		}
-		return null;
+	public void buildCFG(SuperMethodInvocation node) {
+		throw new RuntimeException("Not implemented");
 	}
 
-	public CFGBasicBlock buildCFG(SuperFieldAccess node) {
-		if (true) {
-			throw new RuntimeException("Not implemented");
-		}
-		return null;
+	public void buildCFG(SuperFieldAccess node) {
+		throw new RuntimeException("Not implemented");
 	}
 
-	public CFGBasicBlock buildCFG(SuperConstructorInvocation node) {
-		if (true) {
-			throw new RuntimeException("Not implemented");
-		}
-		return null;
+	public void buildCFG(SuperConstructorInvocation node) {
+		throw new RuntimeException("Not implemented");
 	}
 
-	public CFGBasicBlock buildCFG(StringLiteral node) {
-		if (true) {
-			throw new RuntimeException("Not implemented");
-		}
-		return null;
+	public void buildCFG(StringLiteral node) {
+		throw new RuntimeException("Not implemented");
 	}
 
-	public CFGBasicBlock buildCFG(ThrowStatement node) {
-		if (true) {
-			throw new RuntimeException("Not implemented");
-		}
-		return null;
+	public void buildCFG(ThrowStatement node) {
+		throw new RuntimeException("Not implemented");
 	}
 
-	public CFGBasicBlock buildCFG(ThisExpression node) {
-		if (true) {
-			throw new RuntimeException("Not implemented");
-		}
-		return null;
+	public void buildCFG(ThisExpression node) {
+		throw new RuntimeException("Not implemented");
 	}
 
-	public CFGBasicBlock buildCFG(TextElement node) {
-		if (true) {
-			throw new RuntimeException("Not implemented");
-		}
-		return null;
+	public void buildCFG(TextElement node) {
+		throw new RuntimeException("Not implemented");
 	}
 
-	public CFGBasicBlock buildCFG(TagElement node) {
-		if (true) {
-			throw new RuntimeException("Not implemented");
-		}
-		return null;
+	public void buildCFG(TagElement node) {
+		throw new RuntimeException("Not implemented");
 	}
 
-	public CFGBasicBlock buildCFG(SynchronizedStatement node) {
-		if (true) {
-			throw new RuntimeException("Not implemented");
-		}
-		return null;
+	public void buildCFG(SynchronizedStatement node) {
+		throw new RuntimeException("Not implemented");
 	}
 
-	public CFGBasicBlock buildCFG(CatchClause node) {
-		if (true) {
-			throw new RuntimeException("Not implemented");
-		}
-		return null;
+	public void buildCFG(CatchClause node) {
+		throw new RuntimeException("Not implemented");
 	}
 
-	public CFGBasicBlock buildCFG(CastExpression node) {
-		if (true) {
-			throw new RuntimeException("Not implemented");
-		}
-		return null;
+	public void buildCFG(CastExpression node) {
+		throw new RuntimeException("Not implemented");
 	}
 
-	public CFGBasicBlock buildCFG(BreakStatement node) {
-		if (true) {
-			throw new RuntimeException("Not implemented");
-		}
-		return null;
+	public void buildCFG(BreakStatement node) {
+		throw new RuntimeException("Not implemented");
 	}
 
-	public CFGBasicBlock buildCFG(BooleanLiteral node) {
-		if (true) {
-			throw new RuntimeException("Not implemented");
-		}
-		return null;
+	public void buildCFG(BooleanLiteral node) {
+		throw new RuntimeException("Not implemented");
 	}
 
-	public CFGBasicBlock buildCFG(ConstructorInvocation node) {
-		if (true) {
-			throw new RuntimeException("Not implemented");
-		}
-		return null;
+	public void buildCFG(ConstructorInvocation node) {
+		throw new RuntimeException("Not implemented");
 	}
 
-	public CFGBasicBlock buildCFG(ConditionalExpression node) {
-		if (true) {
-			throw new RuntimeException("Not implemented");
-		}
-		return null;
+	public void buildCFG(ConditionalExpression node) {
+		throw new RuntimeException("Not implemented");
 	}
 
 	public List<CFGBasicBlock> buildCFG(CompilationUnit node) {
 		List<CFGBasicBlock> results = new LinkedList<CFGBasicBlock>();
-		for (AbstractTypeDeclaration decl : (List<AbstractTypeDeclaration>) node.types()) {
+		for (AbstractTypeDeclaration decl : (List<AbstractTypeDeclaration>) node
+				.types()) {
 			if (decl instanceof TypeDeclaration) {
 				results.add(buildCFG((TypeDeclaration) decl));
-				// TODO JNR?
-				// } else if (decl instanceof EnumDeclaration) {
-				// buildCFG((EnumDeclaration) decl);
+			} else {
+				throw new RuntimeException(notImplementedFor(node));
 			}
-		}
-
-		boolean b = true;
-		if (b) {
-			throw new RuntimeException("Not implemented");
 		}
 		return results;
 	}
 
-	public CFGBasicBlock buildCFG(ClassInstanceCreation node) {
-		if (true) {
-			throw new RuntimeException("Not implemented");
-		}
-		return null;
+	public void buildCFG(ClassInstanceCreation node) {
+		throw new RuntimeException("Not implemented");
 	}
 
-	public CFGBasicBlock buildCFG(CharacterLiteral node) {
-		if (true) {
-			throw new RuntimeException("Not implemented");
-		}
-		return null;
+	public void buildCFG(CharacterLiteral node) {
+		throw new RuntimeException("Not implemented");
 	}
 
-	public CFGBasicBlock buildCFG(ArrayCreation node) {
-		if (true) {
-			throw new RuntimeException("Not implemented");
-		}
-		return null;
+	public void buildCFG(ArrayCreation node) {
+		throw new RuntimeException("Not implemented");
 	}
 
-	public CFGBasicBlock buildCFG(ArrayAccess node) {
-		if (true) {
-			throw new RuntimeException("Not implemented");
-		}
-		return null;
+	public void buildCFG(ArrayAccess node) {
+		throw new RuntimeException("Not implemented");
 	}
 
-	public CFGBasicBlock buildCFG(AnonymousClassDeclaration node) {
-		if (true) {
-			throw new RuntimeException("Not implemented");
-		}
-		return null;
+	public void buildCFG(AnonymousClassDeclaration node) {
+		throw new RuntimeException("Not implemented");
 	}
 
-	public CFGBasicBlock buildCFG(Block node) {
-		final CFGBasicBlock basicBlock;
+	public void buildCFG(Block node) {
 		final ASTNode parent = node.getParent();
-		if (parent instanceof ForStatement
-				|| parent instanceof EnhancedForStatement
-				|| parent instanceof WhileStatement) {
-			basicBlock = this.currentBasicBlock;
+		final CFGBasicBlock basicBlock;
+		final boolean needNewBlock = !(parent instanceof IfStatement)
+				&& !(parent instanceof MethodDeclaration);
+		if (needNewBlock) {
+			basicBlock = newCFGBasicBlock(node);
+			CFGEdgeBuilder.buildEdge(this.currentBlockStack.peek(), basicBlock);
+			this.currentBlockStack.push(basicBlock);
 		} else {
-			basicBlock = new CFGBasicBlock(node);
-			CFGEdge.build(this.currentBasicBlock, basicBlock);
-			this.currentBasicBlock = basicBlock;
+			basicBlock = this.currentBlockStack.peek();
 		}
-
-		for (Statement stmt : (List<Statement>) node.statements()) {
-			if (stmt instanceof Block) {
-				Block b = (Block) stmt;
-				// continuity of current block
-			} else if (stmt instanceof BreakStatement) {
-				BreakStatement bs = (BreakStatement) stmt;
-				// adds an edge
-			} else if (stmt instanceof ConstructorInvocation) {
-				ConstructorInvocation ci = (ConstructorInvocation) stmt;
-			} else if (stmt instanceof ContinueStatement) {
-				ContinueStatement cs = (ContinueStatement) stmt;
-				// adds an edge
-			} else if (stmt instanceof DoStatement) {
-				DoStatement ws = (DoStatement) stmt;
-			} else if (stmt instanceof EmptyStatement) {
-				EmptyStatement es = (EmptyStatement) stmt;
-			} else if (stmt instanceof EnhancedForStatement) {
-				buildCFG((EnhancedForStatement) stmt);
-				continue;
-			} else if (stmt instanceof ExpressionStatement) {
-				ExpressionStatement es = (ExpressionStatement) stmt;
-			} else if (stmt instanceof ForStatement) {
-				add(liveBasicBlocks, buildCFG((ForStatement) stmt));
-				continue;
-			} else if (stmt instanceof IfStatement) {
-				buildCFG((IfStatement) stmt);
-				continue;
-			} else if (stmt instanceof LabeledStatement) {
-				LabeledStatement ls = (LabeledStatement) stmt;
-			} else if (stmt instanceof ReturnStatement) {
-				CFGEdge.build(basicBlock, exitBlock);
-				for (CFGBasicBlock block : liveBasicBlocks) {
-					CFGEdge.build(block, exitBlock);
+		try {
+			for (Statement stmt : (List<Statement>) node.statements()) {
+				// if (stmt instanceof AssertStatement) {
+				// // AssertStatement as = (AssertStatement) stmt;
+				// } else if (stmt instanceof Block) {
+				// Block b = (Block) stmt;
+				// } else if (stmt instanceof BreakStatement) {
+				// BreakStatement bs = (BreakStatement) stmt;
+				// } else if (stmt instanceof ConstructorInvocation) {
+				// ConstructorInvocation ci = (ConstructorInvocation) stmt;
+				// } else if (stmt instanceof ContinueStatement) {
+				// ContinueStatement cs = (ContinueStatement) stmt;
+				// } else if (stmt instanceof DoStatement) {
+				// DoStatement ws = (DoStatement) stmt;
+				// } else if (stmt instanceof EmptyStatement) {
+				// EmptyStatement es = (EmptyStatement) stmt;
+				// } else if (stmt instanceof EnhancedForStatement) {
+				// buildCFG((EnhancedForStatement) stmt);
+				// } else
+				if (stmt instanceof ExpressionStatement) {
+					ExpressionStatement es = (ExpressionStatement) stmt;
+					addVariableAccess(currentBlockStack.peek(),
+							es.getExpression(), READ);
+					// } else if (stmt instanceof ForStatement) {
+					// ForStatement fs = (ForStatement) stmt;
+				} else if (stmt instanceof IfStatement) {
+					buildCFG((IfStatement) stmt);
+					// } else if (stmt instanceof LabeledStatement) {
+					// LabeledStatement ls = (LabeledStatement) stmt;
+				} else if (stmt instanceof ReturnStatement) {
+					buildCFG((ReturnStatement) stmt);
+					// } else if (stmt instanceof SuperConstructorInvocation) {
+					// SuperConstructorInvocation sci =
+					// (SuperConstructorInvocation)
+					// stmt;
+					// } else if (stmt instanceof SwitchCase) {
+					// SwitchCase sc = (SwitchCase) stmt;
+					// } else if (stmt instanceof SwitchStatement) {
+					// SwitchStatement ss = (SwitchStatement) stmt;
+					// } else if (stmt instanceof SynchronizedStatement) {
+					// SynchronizedStatement ss = (SynchronizedStatement) stmt;
+					// } else if (stmt instanceof ThrowStatement) {
+					// // ThrowStatement ts = (ThrowStatement) stmt;
+					// } else if (stmt instanceof TryStatement) {
+					// TryStatement ts = (TryStatement) stmt;
+					// } else if (stmt instanceof TypeDeclarationStatement) {
+					// TypeDeclarationStatement tds = (TypeDeclarationStatement)
+					// stmt;
+				} else if (stmt instanceof VariableDeclarationStatement) {
+					buildCFG((VariableDeclarationStatement) stmt);
+					// } else if (stmt instanceof WhileStatement) {
+					// WhileStatement ws = (WhileStatement) stmt;
+					// buildCFG(ws);
+				} else {
+					throw new RuntimeException(notImplementedFor(stmt));
 				}
-				for (Pair<CFGBasicBlock, Expression> pair : edgesToBuild) {
-					CFGEdge.build(pair.getSecond(), pair.getFirst(), exitBlock);
-				}
-				continue;
-			} else if (stmt instanceof SwitchCase) {
-				SwitchCase sc = (SwitchCase) stmt;
-			} else if (stmt instanceof SwitchStatement) {
-				SwitchStatement ss = (SwitchStatement) stmt;
-			} else if (stmt instanceof SynchronizedStatement) {
-				SynchronizedStatement ss = (SynchronizedStatement) stmt;
-			} else if (stmt instanceof ThrowStatement
-					|| stmt instanceof AssertStatement) {
-				// AssertStatement as = (AssertStatement) stmt;
-				// ThrowStatement ts = (ThrowStatement) stmt;
-				// adds an edge
-			} else if (stmt instanceof TryStatement) {
-				TryStatement ts = (TryStatement) stmt;
-			} else if (stmt instanceof TypeDeclarationStatement) {
-				TypeDeclarationStatement tds = (TypeDeclarationStatement) stmt;
-			} else if (stmt instanceof VariableDeclarationStatement) {
-				VariableDeclarationStatement vds = (VariableDeclarationStatement) stmt;
-				addDeclarations(basicBlock, vds.fragments(), vds.getType());
-				continue;
-			} else if (stmt instanceof SuperConstructorInvocation) {
-				SuperConstructorInvocation sci = (SuperConstructorInvocation) stmt;
-			} else if (stmt instanceof WhileStatement) {
-				WhileStatement ws = (WhileStatement) stmt;
-				buildCFG(ws);
-				continue;
 			}
-			throw new RuntimeException("Not implemented for "
-					+ stmt.getClass().getSimpleName());
+		} finally {
+			if (needNewBlock) {
+				this.currentBlockStack.pop();
+			}
 		}
-		return basicBlock;
 	}
 
-	public CFGBasicBlock buildCFG(Assignment node) {
-		if (true) {
-			throw new RuntimeException("Not implemented");
-		}
-		return null;
+	public void buildCFG(Assignment node) {
+		throw new RuntimeException("Not implemented");
 	}
 
-	public CFGBasicBlock buildCFG(AssertStatement node) {
-		if (true) {
-			throw new RuntimeException("Not implemented");
-		}
-		return null;
+	public void buildCFG(AssertStatement node) {
+		throw new RuntimeException("Not implemented");
 	}
 
-	public CFGBasicBlock buildCFG(ArrayType node) {
-		if (true) {
-			throw new RuntimeException("Not implemented");
-		}
-		return null;
+	public void buildCFG(ArrayType node) {
+		throw new RuntimeException("Not implemented");
 	}
 
-	public CFGBasicBlock buildCFG(ArrayInitializer node) {
-		if (true) {
-			throw new RuntimeException("Not implemented");
-		}
-		return null;
+	public void buildCFG(ArrayInitializer node) {
+		throw new RuntimeException("Not implemented");
 	}
 
-	public CFGBasicBlock buildCFG(Initializer node) {
-		if (true) {
-			throw new RuntimeException("Not implemented");
-		}
-		return null;
+	public void buildCFG(Initializer node) {
+		throw new RuntimeException("Not implemented");
 	}
 
-	public CFGBasicBlock buildCFG(InstanceofExpression node) {
-		if (true) {
-			throw new RuntimeException("Not implemented");
-		}
-		return null;
+	public void buildCFG(InstanceofExpression node) {
+		throw new RuntimeException("Not implemented");
 	}
 
-	public CFGBasicBlock buildCFG(InfixExpression node) {
-		if (true) {
-			throw new RuntimeException("Not implemented");
-		}
-		return null;
+	public void buildCFG(InfixExpression node) {
+		throw new RuntimeException("Not implemented");
 	}
 
 	public void buildCFG(IfStatement node) {
-		final CFGBasicBlock thenBlock = buildCFG(node.getThenStatement());
-		if (thenBlock != null) {
-			for (CFGBasicBlock previousBasicBlock : liveBasicBlocks) {
-				CFGEdge.build(node.getExpression(), previousBasicBlock,
-						thenBlock);
-			}
+		final CFGBasicBlock exprBlock;
+		final boolean needNewBlock = !"elseStatement".equals(node
+				.getLocationInParent().getId());
+		if (needNewBlock) {
+			exprBlock = newCFGBasicBlock(node);
+			CFGEdgeBuilder.buildEdge(this.currentBlockStack.peek(), exprBlock);
+			this.currentBlockStack.push(exprBlock);
+		} else {
+			exprBlock = this.currentBlockStack.peek();
+			// let's remove the edge we thought we needed to build,
+			// going from the else statement of the parent if to the
+			// statement just after the if
+			final IfStatement parent = (IfStatement) node.getParent();
+			final Statement stmtAfterIf = ASTHelper.getNextStatement(parent);
+			this.edgesToBuild.get(stmtAfterIf).remove(
+					new CFGEdgeBuilder(exprBlock));
 		}
-		final CFGBasicBlock elseBlock = buildCFG(node.getElseStatement());
-		if (elseBlock != null) {
-			for (CFGBasicBlock previousBasicBlock : liveBasicBlocks) {
-				final Expression negatedExpr = ASTHelper.negate(this.ast,
-						node.getExpression());
-				CFGEdge.build(negatedExpr, previousBasicBlock, elseBlock);
-			}
-		}
+		try {
+			addVariableAccess(exprBlock, node.getExpression(), READ);
 
-		if (thenBlock != null) {
-			if (elseBlock != null) {
-				liveBasicBlocks.clear();
-				liveBasicBlocks.add(elseBlock);
+			handleClause(node, exprBlock, node.getThenStatement(), true);
+			handleClause(node, exprBlock, node.getElseStatement(), false);
+		} finally {
+			if (needNewBlock) {
+				this.currentBlockStack.pop();
 			}
-			liveBasicBlocks.add(thenBlock);
 		}
 	}
 
-	public CFGBasicBlock buildCFG(MemberRef node) {
-		if (true) {
-			throw new RuntimeException("Not implemented");
+	private void handleClause(IfStatement node, final CFGBasicBlock exprBlock,
+			final Statement clauseStmt, boolean evaluationResult) {
+		if (clauseStmt != null) {
+			final CFGBasicBlock clauseBlock = newCFGBasicBlock(clauseStmt);
+			CFGEdgeBuilder.buildEdge(node.getExpression(), evaluationResult,
+					exprBlock, clauseBlock);
+			this.currentBlockStack.push(clauseBlock);
+			try {
+				addEdgeToBuild(node, new CFGEdgeBuilder(clauseBlock));
+				buildCFG(clauseStmt);
+			} finally {
+				this.currentBlockStack.pop();
+			}
 		}
-		return null;
 	}
 
-	public CFGBasicBlock buildCFG(LabeledStatement node) {
-		if (true) {
-			throw new RuntimeException("Not implemented");
+	private void addEdgeToBuild(Statement startNode, CFGEdgeBuilder builder) {
+		final Statement node = ASTHelper.getNextStatement(startNode);
+		if (node == null) {
+			builder.withTarget(this.exitBlock).build();
 		}
-		return null;
+		Set<CFGEdgeBuilder> builders = this.edgesToBuild.get(node);
+		if (builders == null) {
+			builders = new HashSet<CFGEdgeBuilder>();
+			this.edgesToBuild.put(node, builders);
+		}
+		builders.add(builder);
+	}
+
+	public void buildCFG(MemberRef node) {
+		throw new RuntimeException("Not implemented");
+	}
+
+	public void buildCFG(LabeledStatement node) {
+		throw new RuntimeException("Not implemented");
 	}
 
 	public void buildCFG(EnhancedForStatement node) {
-		CFGBasicBlock basicBlock = new CFGBasicBlock(node);
-		CFGEdge.build(this.currentBasicBlock, basicBlock);
-		this.currentBasicBlock = basicBlock;
+		CFGBasicBlock basicBlock = newCFGBasicBlock(node);
+		CFGEdgeBuilder.buildEdge(this.currentBlockStack.peek(), basicBlock);
+		this.currentBlockStack.push(basicBlock);
+		try {
+			addDeclaration(basicBlock, node.getParameter(), DECL_INIT | WRITE);
 
-		addDeclaration(basicBlock, node.getParameter(),
-				VariableAccess.DECL_INIT | VariableAccess.WRITE);
+			// for (CFGBasicBlock previousBasicBlock : liveBasicBlocks) {
+			// CFGEdge.build(previousBasicBlock, basicBlock);
+			// }
+			// liveBasicBlocks.add(basicBlock);
+			buildCFG(node.getBody());
+		} finally {
+			this.currentBlockStack.pop();
+		}
+	}
 
+	public void buildCFG(EmptyStatement node) {
+		throw new RuntimeException("Not implemented");
+	}
+
+	public void buildCFG(DoStatement node) {
+		throw new RuntimeException("Not implemented");
+	}
+
+	public void buildCFG(ContinueStatement node) {
+		throw new RuntimeException("Not implemented");
+	}
+
+	public void buildCFG(ForStatement node) {
+		throw new RuntimeException("Not implemented");
+		// CFGEdge.build(this.currentBasicBlock, basicBlock);
+		// this.currentBasicBlock = basicBlock;
+		//
+		// for (Expression expression : (List<Expression>) node.initializers())
+		// {
+		// if (expression instanceof VariableDeclarationExpression) {
+		// final VariableDeclarationExpression vde =
+		// (VariableDeclarationExpression) expression;
+		// addDeclarations(basicBlock, vde.fragments(), vde.getType());
+		// }
+		// }
+		//
+		// addReadWrite(basicBlock, node.getExpression());
+		// edgesToBuild.add(Pair.of(basicBlock, node.getExpression()));
+		// final Expression negatedExpr = ASTHelper.negate(this.ast,
+		// ASTHelper.copySubtree(this.ast, node.getExpression()));
+		// edgesToBuild.add(Pair.of(basicBlock, negatedExpr));
+		// addReadWrites(basicBlock, node.updaters());
+		//
 		// for (CFGBasicBlock previousBasicBlock : liveBasicBlocks) {
 		// CFGEdge.build(previousBasicBlock, basicBlock);
 		// }
-		// liveBasicBlocks.add(basicBlock);
-		buildCFG(node.getBody());
+		// buildCFG(node.getBody());
 	}
 
-	public CFGBasicBlock buildCFG(EmptyStatement node) {
-		if (true) {
-			throw new RuntimeException("Not implemented");
-		}
-		return null;
+	public void buildCFG(FieldDeclaration node) {
+		throw new RuntimeException("Not implemented");
 	}
 
-	public CFGBasicBlock buildCFG(DoStatement node) {
-		return buildCFG(node.getBody());
+	public void buildCFG(FieldAccess node) {
+		throw new RuntimeException("Not implemented");
 	}
 
-	public CFGBasicBlock buildCFG(ContinueStatement node) {
-		if (true) {
-			throw new RuntimeException("Not implemented");
-		}
-		return null;
+	public void buildCFG(ExpressionStatement node) {
+		addVariableAccess(this.currentBlockStack.peek(), node.getExpression(),
+				READ | WRITE);
 	}
 
-	public CFGBasicBlock buildCFG(ForStatement node) {
-		final CFGBasicBlock basicBlock = new CFGBasicBlock(node);
-		CFGEdge.build(this.currentBasicBlock, basicBlock);
-		this.currentBasicBlock = basicBlock;
-
-		for (Expression expression : (List<Expression>) node.initializers()) {
-			if (expression instanceof VariableDeclarationExpression) {
-				final VariableDeclarationExpression vde = (VariableDeclarationExpression) expression;
-				addDeclarations(basicBlock, vde.fragments(),
-						vde.getType());
+	private CFGBasicBlock newCFGBasicBlock(ASTNode node) {
+		final Pair<Integer, Integer> pair = getLineAndColumn(node);
+		final CFGBasicBlock basicBlock = new CFGBasicBlock(node,
+				pair.getFirst(), pair.getSecond());
+		final Set<CFGEdgeBuilder> toBuild = this.edgesToBuild.remove(node);
+		if (isNotEmpty(toBuild)) {
+			for (CFGEdgeBuilder builder : toBuild) {
+				builder.withTarget(basicBlock).build();
 			}
 		}
-
-		addReadWrite(basicBlock, node.getExpression());
-		edgesToBuild.add(Pair.of(basicBlock, node.getExpression()));
-		final Expression negatedExpr = ASTHelper.negate(this.ast,
-				ASTHelper.copySubtree(this.ast, node.getExpression()));
-		edgesToBuild.add(Pair.of(basicBlock, negatedExpr));
-		addReadWrites(basicBlock, node.updaters());
-
-		for (CFGBasicBlock previousBasicBlock : liveBasicBlocks) {
-			CFGEdge.build(previousBasicBlock, basicBlock);
-		}
-		buildCFG(node.getBody());
 		return basicBlock;
 	}
 
-	public CFGBasicBlock buildCFG(FieldDeclaration node) {
-		if (true) {
-			throw new RuntimeException("Not implemented");
+	private Pair<Integer, Integer> getLineAndColumn(ASTNode node) {
+		final int position = node.getStartPosition();
+		// file starts with line 1
+		int lineNo = 1;
+		int lastMatchPosition = 0;
+		final Matcher matcher = Pattern.compile("\r\n|\r|\n").matcher(source);
+		while (matcher.find()) {
+			final MatchResult matchResult = matcher.toMatchResult();
+			if (matchResult.end() >= position) {
+				final String startOfLine = this.source.substring(
+						lastMatchPosition, position);
+				final int nbChars = countCharacters(startOfLine, tabSize);
+				// + 1 because line starts with column 1
+				return Pair.of(lineNo, nbChars + 1);
+			}
+			lastMatchPosition = matchResult.end();
+			++lineNo;
 		}
-		return null;
+		throw new IllegalStateException(
+				"A line and column number should have been found");
 	}
 
-	public CFGBasicBlock buildCFG(FieldAccess node) {
-		if (true) {
-			throw new RuntimeException("Not implemented");
+	private int countCharacters(String s, int tabSize) {
+		int result = 0;
+		for (int i = 0; i < s.length(); i++) {
+			if (s.charAt(i) == '\t') {
+				result += tabSize - (i % tabSize);
+			} else {
+				result++;
+			}
 		}
-		return null;
+		return result;
 	}
 
-	public CFGBasicBlock buildCFG(ExpressionStatement node) {
-		addReadWrite(this.currentBasicBlock, node.getExpression());
-		return null;
+	private String notImplementedFor(ASTNode node) {
+		if (node != null) {
+			return "Not implemented for " + node.getClass().getSimpleName();
+		}
+		return "Not implemented for null";
+	}
+
+	private boolean isNotEmpty(final Collection<CFGEdgeBuilder> toBuild) {
+		return toBuild != null && !toBuild.isEmpty();
 	}
 
 }

@@ -25,13 +25,12 @@
  */
 package org.autorefactor.cfg;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
-import java.util.List;
 
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.CompilationUnit;
+import org.eclipse.jdt.core.dom.MethodDeclaration;
 
 /**
  * Control Flow Graph Basic Block. Basic blocks here are a little different from
@@ -50,18 +49,25 @@ public class CFGBasicBlock {
 
 	/** The ASTNode owning this basic block */
 	private ASTNode node;
+	private int line;
+	private int column;
 	private final Collection<CFGEdge> incomingEdges = new LinkedList<CFGEdge>();
-	private final Collection<CFGEdge> outgoingEdges = new LinkedList<CFGEdge>();
-	private final List<VariableAccess> variableAccesses = new ArrayList<VariableAccess>();
-	public boolean isEntryBlock;
-	public boolean isExitBlock;
+	private final Collection<Object> outgoingEdgesAndVariableAccesses = new LinkedList<Object>();
+	private Boolean isEntryBlock;
 
-	public CFGBasicBlock() {
-		this.isExitBlock = true;
+	public CFGBasicBlock(boolean isEntry, MethodDeclaration node) {
+		this.isEntryBlock = isEntry;
+		this.node = node;
 	}
 
 	public CFGBasicBlock(ASTNode node) {
 		this.node = node;
+	}
+
+	public CFGBasicBlock(ASTNode node, int lineNumber, int column) {
+		this.node = node;
+		this.line = lineNumber;
+		this.column = column;
 	}
 
 	/** @return the ASTNode owning this basic block */
@@ -69,50 +75,141 @@ public class CFGBasicBlock {
 		return this.node;
 	}
 
+	public int getColumn() {
+		return column;
+	}
+
+	public int getLine() {
+		return line;
+	}
+
+	public boolean isEntryBlock() {
+		return Boolean.TRUE.equals(this.isEntryBlock);
+	}
+
+	public boolean isExitBlock() {
+		return Boolean.FALSE.equals(this.isEntryBlock);
+	}
+
+	public Collection<Object> getOutgoingEdgesAndVariableAccesses() {
+		return outgoingEdgesAndVariableAccesses;
+	}
+
 	public void addIncomingEdge(CFGEdge edge) {
-		this.incomingEdges.add(edge);
+		if (edge.getTargetBlock() != this) {
+			throw new IllegalArgumentException(
+					"Error: the target block of this incoming edge is not the current block: "
+							+ edge);
+		}
+		if (!this.incomingEdges.add(edge)) {
+			throw new IllegalArgumentException(
+					"Error: duplicate incoming edge:" + edge);
+		}
 	}
 
 	public void addOutgoingEdge(CFGEdge edge) {
-		this.outgoingEdges.add(edge);
+		if (edge.getSourceBlock() != this) {
+			throw new IllegalArgumentException(
+					"Error: the source block of this outgoing edge is not the current block");
+		}
+		if (!this.outgoingEdgesAndVariableAccesses.add(edge)) {
+			throw new IllegalArgumentException(
+					"Error: duplicate outgoing edge:" + edge);
+		}
 	}
 
 	public void addVariableAccess(VariableAccess varAccess) {
-		this.variableAccesses.add(varAccess);
+		this.outgoingEdgesAndVariableAccesses.add(varAccess);
 	}
 
 	@Override
 	public String toString() {
 		final StringBuilder sb = new StringBuilder();
-		toStringNoOutgoingEdges(sb);
-
-		for (CFGEdge outgoing : this.outgoingEdges) {
-			sb.append("\n\t");
-			CFGEdge.arcToString(sb, outgoing.getCondition());
-			outgoing.getTargetBlock().toStringNoOutgoingEdges(sb);
-		}
-
-		for (CFGEdge outgoing : this.outgoingEdges) {
-			sb.append("\n");
-			sb.append("\n");
-			sb.append(outgoing.getTargetBlock());
-		}
-
+		toString(sb);
 		return sb.toString();
 	}
 
-	private void toStringNoOutgoingEdges(final StringBuilder sb) {
-		if (this.node != null) {
-			if (this.node.getRoot() instanceof CompilationUnit) {
-				CompilationUnit cu = (CompilationUnit) this.node.getRoot();
-				sb.append(cu.getTypeRoot().getElementName()).append(":");
+	private void toString(final StringBuilder sb) {
+		if (this.node == null) {
+			return;
+		}
+		// append this node's identity
+		String fileName = getFileName();
+		if (fileName != null) {
+			sb.append(fileName).append(":");
+			sb.append(this.node.getStartPosition()).append(" - ");
+			appendSummary(sb);
+		}
+
+		// append the sub nodes identity
+		for (Object obj : this.outgoingEdgesAndVariableAccesses) {
+			sb.append('\n');
+			if (obj instanceof CFGEdge) {
+				((CFGEdge) obj).getTargetBlock().toString(sb);
+			} else if (obj instanceof VariableAccess) {
+				((VariableAccess) obj).toString(sb);
+			} else {
+				throw new RuntimeException(
+						"Not implemented for " + obj != null ? obj.getClass()
+								.getSimpleName() : null);
 			}
-			sb.append(this.node.getStartPosition());
-			final String s = this.node.toString();
-			sb.append(" - ").append(s.substring(0, s.indexOf('\n')));
 		}
-		if (this.isExitBlock) {
-			sb.append("EXIT");
+		sb.append("\n");
+		if (fileName != null) {
+			sb.append(fileName).append(":");
+			sb.append(this.node.getStartPosition() + this.node.getLength());
+			sb.append(" - ");
 		}
+		sb.append("}");
+	}
+
+	void appendSummary(final StringBuilder sb) {
+		final String s = this.node.toString();
+		final int idx = s.indexOf('\n');
+		if (idx != -1) {
+			sb.append(s.substring(0, idx));
+		} else {
+			sb.append(s);
+		}
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + column;
+		result = prime * result
+				+ ((isEntryBlock == null) ? 0 : isEntryBlock.hashCode());
+		result = prime * result + line;
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		CFGBasicBlock other = (CFGBasicBlock) obj;
+		if (column != other.column)
+			return false;
+		if (isEntryBlock == null) {
+			if (other.isEntryBlock != null)
+				return false;
+		} else if (!isEntryBlock.equals(other.isEntryBlock))
+			return false;
+		if (line != other.line)
+			return false;
+		return true;
+	}
+
+	String getFileName() {
+		if (this.node.getRoot() instanceof CompilationUnit) {
+			CompilationUnit cu = (CompilationUnit) this.node.getRoot();
+			return cu.getTypeRoot().getElementName();
+		}
+		return null;
 	}
 }

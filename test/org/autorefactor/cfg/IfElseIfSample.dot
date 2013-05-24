@@ -1,0 +1,40 @@
+digraph IfElseIfSample {
+label="IfElseIfSample";
+subgraph cluster_public_int_sample_boolean_b1_boolean_b2__ {
+label="public int sample(boolean b1,boolean b2){";
+Entry [style="filled" fillcolor="red"   fontcolor="white"];
+
+
+
+Entry -> _5_47
+_5_47 [label="{ int i; ...\n(5,47)"];
+
+_5_47 -> _7_8
+_7_8 [label="if (b1) {\n(7,8)",shape="triangle"];
+
+_7_8 -> _7_16 [label="true"];
+_7_16 [label="{ i=0; ...\n(7,16)"];
+
+_7_16 -> _14_8
+_14_8 [label="return i;\n(14,8)"];
+_14_8 -> Exit
+Exit  [style="filled" fillcolor="black" fontcolor="white"];
+
+_7_8 -> _9_15 [label="false"];
+_9_15 [label="if (b2) {\n(9,15)",shape="triangle"];
+
+_9_15 -> _9_23 [label="true"];
+_9_23 [label="{ i=1; ...\n(9,23)"];
+
+_9_23 -> _14_8
+
+
+_9_15 -> _11_15 [label="false"];
+_11_15 [label="{ i=2; ...\n(11,15)"];
+
+_11_15 -> _14_8
+
+
+}
+}
+

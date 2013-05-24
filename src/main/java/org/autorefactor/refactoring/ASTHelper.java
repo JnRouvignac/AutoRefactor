@@ -210,8 +210,27 @@ public class ASTHelper {
 		return getSibling(node, true);
 	}
 
+	/**
+	 * @return the next statement in the same block if it exists, null otherwise
+	 */
 	public static Statement getNextSibling(Statement node) {
 		return getSibling(node, false);
+	}
+
+	/**
+	 * @return the next statement in the source file if it exists, null
+	 *         otherwise
+	 */
+	public static Statement getNextStatement(Statement node) {
+		final Statement nextSibling = getNextSibling(node);
+		if (nextSibling != null) {
+			return nextSibling;
+		}
+		final ASTNode parent = node.getParent();
+		if (parent instanceof Statement) {
+			return getNextStatement((Statement) parent);
+		}
+		return null;
 	}
 
 	private static Statement getSibling(Statement node, boolean isPrevious) {
