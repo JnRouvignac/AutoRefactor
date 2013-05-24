@@ -1,9 +1,16 @@
 *.class
 
-# Package Files #
+# Eclipse files
+.classpath
+.project
+.settings
+
+# Package Files
 *.jar
 *.war
 *.ear
 
 # build directory
 target
+test/bin
+
