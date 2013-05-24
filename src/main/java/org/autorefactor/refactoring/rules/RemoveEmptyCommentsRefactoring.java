@@ -59,6 +59,7 @@ public class RemoveEmptyCommentsRefactoring extends ASTVisitor implements
 	}
 
 	// TODO also remove commented out code
+	// TODO also transform block or line comments into javadocs where possible
 
 	@Override
 	public boolean visit(BlockComment node) {
@@ -88,6 +89,11 @@ public class RemoveEmptyCommentsRefactoring extends ASTVisitor implements
 		if (EMPTY_LINE_COMMENT.matcher(comment).matches()) {
 			// this.ctx.getRefactorings().remove(node);
 		}
+//		if (comment.matches("\\s*TODO Auto-generated method stub\\s*")
+//		|| comment.matches("\\s*TODO Auto-generated constructor stub\\s*")
+//		|| comment.matches("\\s*TODO Auto-generated catch block\\s*")) {
+////		TODO Remove
+//		}
 		return super.visit(node);
 	}
 
