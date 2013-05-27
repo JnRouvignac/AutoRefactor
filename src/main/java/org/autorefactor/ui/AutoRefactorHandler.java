@@ -25,10 +25,9 @@
  */
 package org.autorefactor.ui;
 
-import static org.eclipse.jdt.core.JavaCore.COMPILER_SOURCE;
-import static org.eclipse.jdt.core.formatter.DefaultCodeFormatterConstants.FORMATTER_INDENTATION_SIZE;
+import static org.eclipse.jdt.core.JavaCore.*;
+import static org.eclipse.jdt.core.formatter.DefaultCodeFormatterConstants.*;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -57,6 +56,7 @@ import org.autorefactor.refactoring.rules.RemoveUselessModifiersRefactoring;
 import org.autorefactor.refactoring.rules.SimplifyExpressionRefactoring;
 import org.autorefactor.refactoring.rules.StringBuilderRefactoring;
 import org.autorefactor.refactoring.rules.StringRefactorings;
+import org.autorefactor.ui.GrowableArrayList.GrowableListIterator;
 import org.autorefactor.util.Pair;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
@@ -214,7 +214,7 @@ public class AutoRefactorHandler extends AbstractHandler {
 				}
 
 				applyRefactorings(testCase.sampleIn, javaSERelease, tabSize,
-						Collections.singletonList(testCase.refactoring));
+						new GrowableArrayList<IRefactoring>(testCase.refactoring));
 
 				// Change the package to be the same as the sampleOut
 				// and ignore insignificant space characters
@@ -289,6 +289,8 @@ public class AutoRefactorHandler extends AbstractHandler {
 	}
 
 	public Object execute(final ExecutionEvent event) throws ExecutionException {
+		// TODO JNR keep track of the job so it can be cancelled by the plugin on workspace exit
+
 		boolean useTests = false; // local variable helps switching while debugging
 		if (useTests) {
 			new ApplyRefactoringsJob(event).testWithSamples();
@@ -431,7 +433,7 @@ public class AutoRefactorHandler extends AbstractHandler {
 	 */
 	private static void applyRefactorings(ICompilationUnit compilationUnit,
 			Release javaSERelease, int tabSize,
-			List<IRefactoring> refactoringsToApply) throws Exception {
+			GrowableArrayList<IRefactoring> refactoringsToApply) throws Exception {
 		// creation of DOM/AST from a ICompilationUnit
 		final ASTParser parser = ASTParser.newParser(AST.JLS4);
 		parser.setSource(compilationUnit);
@@ -443,7 +445,8 @@ public class AutoRefactorHandler extends AbstractHandler {
 		// tabSize).buildCFG(astRoot);
 
 		final IDocument document = new Document(compilationUnit.getSource());
-		for (IRefactoring refactoring : refactoringsToApply) {
+		for (GrowableListIterator iter = refactoringsToApply.iterator(); iter.hasNext();) {
+			IRefactoring refactoring = (IRefactoring) iter.next();
 			try {
 				final RefactoringContext ctx = new RefactoringContext(compilationUnit,
 						astRoot.getAST(), javaSERelease);
@@ -474,6 +477,10 @@ public class AutoRefactorHandler extends AbstractHandler {
 					parser.setSource(compilationUnit);
 					parser.setResolveBindings(true);
 					astRoot = (CompilationUnit) parser.createAST(null);
+
+					// Append the already done refactorings to see if more refactorings
+					// were enabled after applying the current refactoring.
+					iter.reloop();
 				}
 			} catch (Exception e) {
 				// TODO JNR add UI error reporting
@@ -510,8 +517,8 @@ public class AutoRefactorHandler extends AbstractHandler {
 		return rewrite;
 	}
 
-	private static List<IRefactoring> getAllRefactorings() {
-		return Arrays.<IRefactoring> asList(
+	private static GrowableArrayList<IRefactoring> getAllRefactorings() {
+		return new GrowableArrayList<IRefactoring>(
 				new PrimitiveWrapperCreationRefactoring(),
 				new BooleanRefactoring(),
 				new AddBracketsToControlStatementRefactoring(),
