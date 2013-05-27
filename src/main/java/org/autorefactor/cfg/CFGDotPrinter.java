@@ -25,61 +25,122 @@
  */
 package org.autorefactor.cfg;
 
-import java.util.HashSet;
+import java.util.Comparator;
 import java.util.Set;
+import java.util.TreeSet;
 
+import org.autorefactor.util.Pair;
 import org.eclipse.jdt.core.dom.IfStatement;
 
+/**
+ * Outputs a string representing the CFG in the dot format.
+ */
 public class CFGDotPrinter {
 
-	private Set<Object> alreadyPrinted = new HashSet<Object>();
+	private final class CFGBasicBlockComparator implements
+			Comparator<CFGBasicBlock> {
+		public int compare(CFGBasicBlock o1, CFGBasicBlock o2) {
+			if (o1.getLine() < o2.getLine()) {
+				return -1;
+			} else if (o1.getLine() > o2.getLine()) {
+				return 1;
+			}
+			if (o1.getColumn() < o2.getColumn()) {
+				return -1;
+			} else if (o1.getColumn() > o2.getColumn()) {
+				return 1;
+			}
+			return 0;
+		}
+	}
 
-	public String toDot(final CFGBasicBlock block) {
-		final String fileName = block.getFileName();
-		final String className = fileName.substring(0, fileName.indexOf('.'));
+	private final class CFGEdgeComparator implements Comparator<CFGEdge> {
+
+		private CFGBasicBlockComparator c = new CFGBasicBlockComparator();
+
+		public int compare(CFGEdge e1, CFGEdge e2) {
+			final int cmp = c.compare(e1.getSourceBlock(), e2.getSourceBlock());
+			if (cmp != 0) {
+				return cmp;
+			}
+			return c.compare(e1.getTargetBlock(), e2.getTargetBlock());
+		}
+	}
+
+	/**
+	 * Returns a String representing the CFG in the dot format.
+	 * 
+	 * @param startblock
+	 *            the block from where to start printing
+	 * @return a String representing the CFG in the dot format.
+	 */
+	public String toDot(final CFGBasicBlock startblock) {
 		final StringBuilder sb = new StringBuilder();
-		sb.append("digraph ").append(className).append(" {\n");
-		sb.append("label=\"").append(className).append("\";\n");
-		final String methodCodeExcerpt = codeExcerpt(block);
-		String methodSignature = methodCodeExcerpt.replaceAll("\\W", "_");
-		sb.append("subgraph cluster_").append(methodSignature).append(" {\n");
-		sb.append("label=\"").append(methodCodeExcerpt).append("\";\n");
-		toDot(block, sb);
+		appendDigraph(startblock, sb);
+		appendSubgraph(startblock, sb);
+
+		final Pair<Set<CFGBasicBlock>, Set<CFGEdge>> nodesAndEdges = collect(startblock);
+		for (CFGBasicBlock block : nodesAndEdges.getFirst()) {
+			appendDotNode(block, sb);
+		}
+		sb.append("\n");
+		for (CFGEdge edge : nodesAndEdges.getSecond()) {
+			appendDotEdge(edge, sb);
+		}
+
 		sb.append("}\n}\n");
 		return sb.toString();
 	}
 
-	private void toDot(final CFGBasicBlock block, final StringBuilder sb) {
-		appendDotNode(block, sb);
+	private Pair<Set<CFGBasicBlock>, Set<CFGEdge>> collect(CFGBasicBlock block) {
+		final Set<CFGBasicBlock> blockSet = new TreeSet<CFGBasicBlock>(
+				new CFGBasicBlockComparator());
+		final Set<CFGEdge> edgeSet = new TreeSet<CFGEdge>(
+				new CFGEdgeComparator());
+		final Pair<Set<CFGBasicBlock>, Set<CFGEdge>> results = Pair.of(
+				blockSet, edgeSet);
+		collect(block, results);
+		return results;
+	}
 
-		// append the sub nodes identity
+	private void collect(CFGBasicBlock block,
+			final Pair<Set<CFGBasicBlock>, Set<CFGEdge>> results) {
+		if (!results.getFirst().add(block)) {
+			// node was already added. No need to go through this path again
+			return;
+		}
+
 		for (Object obj : block.getOutgoingEdgesAndVariableAccesses()) {
-			sb.append('\n');
 			if (obj instanceof CFGEdge) {
-				final CFGEdge cfgEdge = (CFGEdge) obj;
-				if (appendDotEdge(cfgEdge, sb)) {
-					// We already printed the source block
-					// at the start of the current method
-					toDot(cfgEdge.getTargetBlock(), sb);
-				}
-				// else we already printed the edge,
-				// so the target block was also printed.
+				final CFGEdge edge = (CFGEdge) obj;
+				results.getSecond().add(edge);
+				collect(edge.getTargetBlock(), results);
 			}
 		}
 	}
 
-	private boolean appendDotEdge(final CFGEdge edge, final StringBuilder sb) {
-		if (!alreadyPrinted.add(edge)) {
-			// do not print again already printed edge
-			return false;
-		}
+	private StringBuilder appendDigraph(final CFGBasicBlock block,
+			final StringBuilder sb) {
+		final String fileName = block.getFileName();
+		final String className = fileName.substring(0, fileName.indexOf('.'));
+		sb.append("digraph ").append(className).append(" {\n");
+		sb.append("label=\"").append(className).append("\";\n");
+		return sb;
+	}
 
+	private StringBuilder appendSubgraph(final CFGBasicBlock block,
+			final StringBuilder sb) {
+		final String methodCodeExcerpt = codeExcerpt(block);
+		String methodSignature = methodCodeExcerpt.replaceAll("\\W", "_");
+		sb.append("subgraph cluster_").append(methodSignature).append(" {\n");
+		sb.append("label=\"").append(methodCodeExcerpt).append("\";\n");
+		return sb;
+	}
+
+	private boolean appendDotEdge(final CFGEdge edge, final StringBuilder sb) {
 		appendDotNodeName(edge.getSourceBlock(), sb).append(" -> ");
 		appendDotNodeName(edge.getTargetBlock(), sb);
 		if (edge.getCondition() != null) {
-			// String condition =
-			// escape(cfgEdge.getCondition().toString());
-			// sb.append(" [label=\"").append(condition).append("\\n-> ");
 			sb.append(" [label=\"").append(edge.getEvaluationResult())
 					.append("\"];");
 		}
@@ -88,11 +149,6 @@ public class CFGDotPrinter {
 	}
 
 	private void appendDotNode(CFGBasicBlock block, StringBuilder sb) {
-		if (!alreadyPrinted.add(block)) {
-			// do not print again already printed node
-			return;
-		}
-
 		if (block.isEntryBlock()) {
 			sb.append("Entry [style=\"filled\" fillcolor=\"red\"   fontcolor=\"white\"];\n");
 		} else if (block.isExitBlock()) {
@@ -105,7 +161,7 @@ public class CFGDotPrinter {
 			if (block.getASTNode() instanceof IfStatement) {
 				sb.append(",shape=\"triangle\"");
 			}
-			sb.append("];");
+			sb.append("];\n");
 		}
 	}
 
