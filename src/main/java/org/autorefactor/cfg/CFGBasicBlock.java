@@ -55,9 +55,11 @@ public class CFGBasicBlock {
 	private final Collection<Object> outgoingEdgesAndVariableAccesses = new LinkedList<Object>();
 	private Boolean isEntryBlock;
 
-	public CFGBasicBlock(boolean isEntry, MethodDeclaration node) {
+	private CFGBasicBlock(boolean isEntry, MethodDeclaration node, int line, int column) {
 		this.isEntryBlock = isEntry;
 		this.node = node;
+		this.line = line;
+		this.column = column;
 	}
 
 	public CFGBasicBlock(ASTNode node) {
@@ -68,6 +70,14 @@ public class CFGBasicBlock {
 		this.node = node;
 		this.line = lineNumber;
 		this.column = column;
+	}
+
+	public static CFGBasicBlock buildEntryBlock(MethodDeclaration node) {
+		return new CFGBasicBlock(true, node, 1, 1);
+	}
+
+	public static CFGBasicBlock buildExitBlock(MethodDeclaration node, int line, int column) {
+		return new CFGBasicBlock(false, node, line, column);
 	}
 
 	/** @return the ASTNode owning this basic block */

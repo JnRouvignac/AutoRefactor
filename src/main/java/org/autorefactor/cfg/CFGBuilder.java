@@ -128,8 +128,15 @@ public class CFGBuilder {
 	private String source;
 	private int tabSize;
 	private final Deque<CFGBasicBlock> currentBlockStack = new LinkedList<CFGBasicBlock>();
-	/** Edges to be built when visiting the node used as the key. */
-	private final Map<ASTNode, Set<CFGEdgeBuilder>> edgesToBuild = new HashMap<ASTNode, Set<CFGEdgeBuilder>>();
+	/**
+	 * Edges to be built before or after visiting the statement used as the key.
+	 * When the statement is visited, code checks whether there are edges to
+	 * build and builds them. After the statement was visited, code checks
+	 * whether there are edges to build and decides whether to build them now
+	 * (loops) or to forward them to the next statement for building them
+	 * (decision statement).
+	 */
+	private final Map<Statement, Set<CFGEdgeBuilder>> edgesToBuild = new HashMap<Statement, Set<CFGEdgeBuilder>>();
 	/** The exit block for the CFG being built */
 	private CFGBasicBlock exitBlock;
 
@@ -326,8 +333,11 @@ public class CFGBuilder {
 	}
 
 	public CFGBasicBlock buildCFG(MethodDeclaration node) {
-		final CFGBasicBlock entryBlock = new CFGBasicBlock(true, node);
-		this.exitBlock = new CFGBasicBlock(false, node);
+		final CFGBasicBlock entryBlock = CFGBasicBlock.buildEntryBlock(node);
+		final Pair<Integer, Integer> lineCol = getLineAndColumn(node
+				.getStartPosition() + node.getLength());
+		this.exitBlock = CFGBasicBlock.buildExitBlock(node, lineCol.getFirst(),
+				lineCol.getSecond());
 
 		addDeclarations(entryBlock, node.parameters());
 
@@ -643,6 +653,7 @@ public class CFGBuilder {
 	}
 
 	public void buildCFG(IfStatement node) {
+		final Statement parent = (Statement) node.getParent();
 		final CFGBasicBlock exprBlock;
 		final boolean needNewBlock = !"elseStatement".equals(node
 				.getLocationInParent().getId());
@@ -655,10 +666,10 @@ public class CFGBuilder {
 			// let's remove the edge we thought we needed to build,
 			// going from the else statement of the parent if to the
 			// statement just after the if
-			final IfStatement parent = (IfStatement) node.getParent();
-			final Statement stmtAfterIf = ASTHelper.getNextStatement(parent);
-			this.edgesToBuild.get(stmtAfterIf).remove(
-					new CFGEdgeBuilder(exprBlock));
+			final Set<CFGEdgeBuilder> toBuild = this.edgesToBuild.get(parent);
+			if (toBuild != null) {
+				toBuild.remove(new CFGEdgeBuilder(exprBlock));
+			}
 		}
 		try {
 			addVariableAccess(exprBlock, node.getExpression(), READ);
@@ -668,6 +679,13 @@ public class CFGBuilder {
 		} finally {
 			if (needNewBlock) {
 				this.currentBlockStack.pop();
+			}
+			final Set<CFGEdgeBuilder> toBuild = this.edgesToBuild.remove(node);
+			if (toBuild != null && !toBuild.isEmpty()) {
+				final Statement nextStmt = ASTHelper.getNextStatement(node);
+				for (CFGEdgeBuilder builder : toBuild) {
+					addEdgeToBuild(nextStmt, builder);
+				}
 			}
 		}
 	}
@@ -688,11 +706,7 @@ public class CFGBuilder {
 		}
 	}
 
-	private void addEdgeToBuild(Statement startNode, CFGEdgeBuilder builder) {
-		final Statement node = ASTHelper.getNextStatement(startNode);
-		if (node == null) {
-			builder.withTarget(this.exitBlock).build();
-		}
+	private void addEdgeToBuild(final Statement node, CFGEdgeBuilder builder) {
 		Set<CFGEdgeBuilder> builders = this.edgesToBuild.get(node);
 		if (builders == null) {
 			builders = new HashSet<CFGEdgeBuilder>();
@@ -775,13 +789,13 @@ public class CFGBuilder {
 
 	public void buildCFG(ExpressionStatement node) {
 		addVariableAccess(this.currentBlockStack.peek(), node.getExpression(),
-				READ | WRITE);
+				READ);
 	}
 
 	private CFGBasicBlock newCFGBasicBlock(ASTNode node) {
-		final Pair<Integer, Integer> pair = getLineAndColumn(node);
+		final Pair<Integer, Integer> lineCol = getLineAndColumn(node);
 		final CFGBasicBlock basicBlock = new CFGBasicBlock(node,
-				pair.getFirst(), pair.getSecond());
+				lineCol.getFirst(), lineCol.getSecond());
 		final Set<CFGEdgeBuilder> toBuild = this.edgesToBuild.remove(node);
 		if (isNotEmpty(toBuild)) {
 			for (CFGEdgeBuilder builder : toBuild) {
@@ -792,7 +806,10 @@ public class CFGBuilder {
 	}
 
 	private Pair<Integer, Integer> getLineAndColumn(ASTNode node) {
-		final int position = node.getStartPosition();
+		return getLineAndColumn(node.getStartPosition());
+	}
+
+	private Pair<Integer, Integer> getLineAndColumn(final int position) {
 		// file starts with line 1
 		int lineNo = 1;
 		int lastMatchPosition = 0;
