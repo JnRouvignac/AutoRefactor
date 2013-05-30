@@ -33,6 +33,7 @@ import java.util.Collection;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -791,17 +792,18 @@ public class CFGBuilder {
 	}
 
 	public void buildCFG(ForStatement node) {
-		final CFGBasicBlock initBlock = newCFGBasicBlock(node);
-		// TODO JNR display node, line and column
-		CFGEdgeBuilder.buildEdge(this.currentBlockStack.peek(), initBlock);
-		this.currentBlockStack.push(initBlock);
+		final CFGBasicBlock initBlock = newCFGBasicBlock(node.initializers());
 		final CFGBasicBlock exprBlock = newCFGBasicBlock(node.getExpression());
-		CFGEdgeBuilder.buildEdge(initBlock, exprBlock);
-		this.currentBlockStack.push(exprBlock);
-		// TODO JNR display node, line and column
-		final CFGBasicBlock updatersBlock = newCFGBasicBlock(node, 8888, 8888); 
+		final CFGBasicBlock updatersBlock = newCFGBasicBlock(node.updaters());
 		final CFGBasicBlock bodyBlock = newCFGBasicBlock(node.getBody());
+
+		CFGEdgeBuilder.buildEdge(this.currentBlockStack.peek(), initBlock);
+		CFGEdgeBuilder.buildEdge(initBlock, exprBlock);
 		CFGEdgeBuilder.buildEdge(exprBlock, bodyBlock);
+		CFGEdgeBuilder.buildEdge(updatersBlock, exprBlock);
+
+		this.currentBlockStack.push(initBlock);
+		this.currentBlockStack.push(exprBlock);
 		this.currentBlockStack.push(bodyBlock);
 		try {
 			for (Expression expression : (List<Expression>) node.initializers()) {
@@ -817,7 +819,6 @@ public class CFGBuilder {
 
 			final Set<CFGEdgeBuilder> toBuild = this.edgesToBuild.remove(node);
 			buildWithTarget(toBuild, updatersBlock);
-			CFGEdgeBuilder.buildEdge(updatersBlock, exprBlock);
 		} finally {
 			addEdgesToBuildForNextStatement(node,
 					new CFGEdgeBuilder(node.getExpression(), false, exprBlock));
@@ -855,6 +856,16 @@ public class CFGBuilder {
 		return basicBlock;
 	}
 
+	private CFGBasicBlock newCFGBasicBlock(List<Expression> expressions) {
+		if (isNotEmpty(expressions)) {
+			final Expression firstExpr = expressions.get(0);
+			final Pair<Integer, Integer> lineCol = getLineAndColumn(firstExpr.getStartPosition());
+			return new CFGBasicBlock(getFileName(firstExpr), codeExcerpt(expressions),
+					false, lineCol.getFirst(), lineCol.getSecond());
+		}
+		throw new RuntimeException(notImplementedFor(null));
+	}
+
 	private CFGBasicBlock newEntryBlock(MethodDeclaration node) {
 		return CFGBasicBlock.buildEntryBlock(getFileName(node), codeExcerpt(node));
 	}
@@ -871,6 +882,18 @@ public class CFGBuilder {
 			return cu.getTypeRoot().getElementName();
 		}
 		return null;
+	}
+
+	private String codeExcerpt(List<Expression> expressions) {
+		final StringBuilder sb = new StringBuilder();
+		for (final Iterator<Expression> iter = expressions.iterator(); iter.hasNext();) {
+			final Expression expr = iter.next();
+			sb.append(expr.toString());
+			if (iter.hasNext()) {
+				sb.append(", ");
+			}
+		}
+		return sb.toString();
 	}
 
 	private String codeExcerpt(ASTNode node) {
