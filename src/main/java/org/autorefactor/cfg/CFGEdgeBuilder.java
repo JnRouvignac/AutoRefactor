@@ -102,14 +102,14 @@ public class CFGEdgeBuilder {
 
 	@Override
 	public String toString() {
-		final StringBuilder sb = new StringBuilder();
-		this.sourceBlock.appendSummary(sb);
+		final StringBuilder sb = new StringBuilder("EDGE_BUILDER[");
+		this.sourceBlock.appendDotNodeLabel(sb);
 		sb.append(" -> ");
 		if (this.targetBlock != null) {
-			this.targetBlock.appendSummary(sb);
+			this.targetBlock.appendDotNodeLabel(sb);
 		} else {
 			sb.append("?");
 		}
-		return sb.toString();
+		return sb.append("]").toString();
 	}
 }

@@ -61,11 +61,11 @@ public class CFGEdge {
 
 	@Override
 	public String toString() {
-		final StringBuilder sb = new StringBuilder();
-		this.sourceBlock.appendSummary(sb);
+		final StringBuilder sb = new StringBuilder("EDGE[");
+		this.sourceBlock.appendDotNodeLabel(sb);
 		sb.append(" -> ");
-		this.targetBlock.appendSummary(sb);
-		return sb.toString();
+		this.targetBlock.appendDotNodeLabel(sb);
+		return sb.append("]").toString();
 	}
 
 	@Override

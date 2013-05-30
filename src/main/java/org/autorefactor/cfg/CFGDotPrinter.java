@@ -48,13 +48,11 @@ public class CFGDotPrinter {
 	// - node label of the form: var name + line, column + R, W, Decl
 	// - use separate colors?
 
-	// TODO JNR add one subgraph for each complex statements 
+	// TODO JNR add one subgraph for each complex statements
 	// that deserve one (if, for, while, switch, etc.)
 
-	// TODO JNR CFGBasicBlock: replace the ASTNode member with a 
+	// TODO JNR CFGBasicBlock: replace the ASTNode member with a
 	// String label (useful for for statement initializers + updaters)
-	// TODO JNR CFGBasicBlock + CFGEdge + CFGEdgeBuilder
-	// + VariableAccess: change toString() impl. 
 
 	private final class CFGBasicBlockComparator implements
 			Comparator<CFGBasicBlock> {
@@ -88,7 +86,7 @@ public class CFGDotPrinter {
 
 	/**
 	 * Returns a String representing the CFG in the dot format.
-	 * 
+	 *
 	 * @param startblock
 	 *            the block from where to start printing
 	 * @return a String representing the CFG in the dot format.
@@ -149,7 +147,7 @@ public class CFGDotPrinter {
 
 	private StringBuilder appendSubgraph(final CFGBasicBlock block,
 			final StringBuilder sb) {
-		final String methodCodeExcerpt = codeExcerpt(block);
+		final String methodCodeExcerpt = escape(block.codeExcerpt());
 		String methodSignature = methodCodeExcerpt.replaceAll("\\W", "_");
 		sb.append("subgraph cluster_").append(methodSignature).append(" {\n");
 		sb.append("label=\"").append(methodCodeExcerpt).append("\";\n");
@@ -157,8 +155,8 @@ public class CFGDotPrinter {
 	}
 
 	private boolean appendDotEdge(final CFGEdge edge, final StringBuilder sb) {
-		appendDotNodeName(edge.getSourceBlock(), sb).append(" -> ");
-		appendDotNodeName(edge.getTargetBlock(), sb);
+		edge.getSourceBlock().appendDotNodeId(sb).append(" -> ");
+		edge.getTargetBlock().appendDotNodeId(sb);
 		if (edge.getCondition() != null) {
 			sb.append(" [label=\"").append(edge.getEvaluationResult())
 					.append("\"];");
@@ -173,10 +171,8 @@ public class CFGDotPrinter {
 		} else if (block.isExitBlock()) {
 			sb.append("Exit  [style=\"filled\" fillcolor=\"black\" fontcolor=\"white\"];\n");
 		} else {
-			appendDotNodeName(block, sb);
-			sb.append(" [label=\"").append(codeExcerpt(block));
-			sb.append("\\n(").append(block.getLine()).append(",")
-					.append(block.getColumn()).append(")").append("\"");
+			block.appendDotNodeId(sb);
+			sb.append(" [label=\"").append(escape(block.getDotNodeLabel())).append("\"");
 			if (block.getASTNode() instanceof IfStatement) {
 				sb.append(",shape=\"triangle\"");
 			}
@@ -184,33 +180,8 @@ public class CFGDotPrinter {
 		}
 	}
 
-	private String codeExcerpt(CFGBasicBlock block) {
-		final String nodeString = block.getASTNode().toString();
-		final String[] nodeLines = nodeString.split("\n");
-		final String codeExcerpt;
-		if (nodeLines[0].matches("\\s*\\{\\s*")) {
-			codeExcerpt = nodeLines[0] + " " + nodeLines[1] + " ...";
-		} else {
-			codeExcerpt = nodeLines[0];
-		}
-		return escape(codeExcerpt.replaceAll("\\s+", " "));
-	}
-
 	private String escape(String s) {
 		return s != null ? s.replaceAll("\"", "\\\"") : null;
-	}
-
-	private StringBuilder appendDotNodeName(CFGBasicBlock block,
-			StringBuilder sb) {
-		if (block.isEntryBlock()) {
-			sb.append("Entry");
-		} else if (block.isExitBlock()) {
-			sb.append("Exit");
-		} else {
-			sb.append("_").append(block.getLine()).append("_")
-					.append(block.getColumn());
-		}
-		return sb;
 	}
 
 }

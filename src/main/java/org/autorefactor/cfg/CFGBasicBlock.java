@@ -38,7 +38,7 @@ import org.eclipse.jdt.core.dom.MethodDeclaration;
  * Here, things like for statement initializers, if conditions, while conditions
  * all receive their own basic block in order to be able to link variable use to
  * one basic block.
- * 
+ *
  * @author jnrouvignac
  * @see <a href="http://en.wikipedia.org/wiki/Control_flow_graph">Control flow
  *      graph on wikipedia</a>
@@ -133,57 +133,6 @@ public class CFGBasicBlock {
 	}
 
 	@Override
-	public String toString() {
-		final StringBuilder sb = new StringBuilder();
-		toString(sb);
-		return sb.toString();
-	}
-
-	private void toString(final StringBuilder sb) {
-		if (this.node == null) {
-			return;
-		}
-		// append this node's identity
-		String fileName = getFileName();
-		if (fileName != null) {
-			sb.append(fileName).append(":");
-			sb.append(this.node.getStartPosition()).append(" - ");
-			appendSummary(sb);
-		}
-
-		// append the sub nodes identity
-		for (Object obj : this.outgoingEdgesAndVariableAccesses) {
-			sb.append('\n');
-			if (obj instanceof CFGEdge) {
-				((CFGEdge) obj).getTargetBlock().toString(sb);
-			} else if (obj instanceof VariableAccess) {
-				((VariableAccess) obj).toString(sb);
-			} else {
-				throw new RuntimeException(
-						"Not implemented for " + obj != null ? obj.getClass()
-								.getSimpleName() : null);
-			}
-		}
-		sb.append("\n");
-		if (fileName != null) {
-			sb.append(fileName).append(":");
-			sb.append(this.node.getStartPosition() + this.node.getLength());
-			sb.append(" - ");
-		}
-		sb.append("}");
-	}
-
-	void appendSummary(final StringBuilder sb) {
-		final String s = this.node.toString();
-		final int idx = s.indexOf('\n');
-		if (idx != -1) {
-			sb.append(s.substring(0, idx));
-		} else {
-			sb.append(s);
-		}
-	}
-
-	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
@@ -222,4 +171,55 @@ public class CFGBasicBlock {
 		}
 		return null;
 	}
+
+	String getDotNodeLabel() {
+		final StringBuilder sb = new StringBuilder();
+		appendDotNodeLabel(sb);
+		return sb.toString();
+	}
+
+	StringBuilder appendDotNodeId(StringBuilder sb) {
+		if (isEntryBlock()) {
+			sb.append("Entry");
+		} else if (isExitBlock()) {
+			sb.append("Exit");
+		} else {
+			sb.append("_").append(this.line).append("_").append(this.column);
+		}
+		return sb;
+	}
+
+	StringBuilder appendDotNodeLabel(StringBuilder sb) {
+		sb.append(codeExcerpt());
+		sb.append("\\n(").append(this.line).append(",")
+    			.append(this.column).append(")");
+		return sb;
+	}
+
+	String codeExcerpt() {
+		final String nodeString = this.node.toString();
+		final String[] nodeLines = nodeString.split("\n");
+		final String codeExcerpt;
+		if (nodeLines[0].matches("\\s*\\{\\s*")) {
+			codeExcerpt = nodeLines[0] + " " + nodeLines[1] + " ...";
+		} else {
+			codeExcerpt = nodeLines[0];
+		}
+		return codeExcerpt.replaceAll("\\s+", " ");
+	}
+
+	@Override
+	public String toString() {
+		final StringBuilder sb = new StringBuilder("BLOCK[");
+		toString(sb);
+		return sb.append("]").toString();
+	}
+
+	private void toString(final StringBuilder sb) {
+		if (this.node == null) {
+			return;
+		}
+		appendDotNodeLabel(sb);
+	}
+
 }

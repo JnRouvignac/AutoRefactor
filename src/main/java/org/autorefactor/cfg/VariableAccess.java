@@ -60,7 +60,13 @@ public class VariableAccess {
 
 	@Override
 	public String toString() {
-		final StringBuilder sb = new StringBuilder(this.type.toString());
+		final StringBuilder sb = new StringBuilder("VAR_ACCESS[");
+		toString(sb);
+		return sb.append("]").toString();
+	}
+
+	private void toString(final StringBuilder sb) {
+		sb.append(this.type.toString());
 		sb.append(" ").append(this.name.toString()).append(" <= ");
 		if ((this.accessType & DECL_INIT) != 0) {
 			sb.append("DECL_INIT");
@@ -83,8 +89,5 @@ public class VariableAccess {
 			}
 			sb.append("WRITE");
 		}
-		sb.append("\n");
-		sb.append(this.astNode);
-		return sb.toString();
 	}
 }
