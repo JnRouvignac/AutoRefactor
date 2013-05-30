@@ -308,6 +308,13 @@ public class ASTHelper {
 		return false;
 	}
 
+	public static boolean isLoop(Object node) {
+		return node instanceof DoStatement
+				|| node instanceof EnhancedForStatement
+				|| node instanceof ForStatement
+				|| node instanceof WhileStatement;
+	}
+
 	/**
 	 * Infers what type the parent node expects to be returned by the passed in
 	 * Expression.
@@ -568,6 +575,19 @@ public class ASTHelper {
 			}
 		}
 		return false;
+	}
+
+	/**
+	 * @return the parent node filtering out ParenthesizedExpression and Blocks.
+	 */
+	public static Object getParent(ASTNode node) {
+		ASTNode parent = node.getParent();
+		if (parent instanceof ParenthesizedExpression) {
+			return getParent(((ParenthesizedExpression) parent).getParent());
+		} else if (parent instanceof Block) {
+			return getParent(((Block) parent).getParent());
+		}
+		return parent;
 	}
 
 }

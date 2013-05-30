@@ -659,7 +659,7 @@ public class CFGBuilder {
 		final boolean needNewBlock = !"elseStatement".equals(node
 				.getLocationInParent().getId());
 		if (needNewBlock) {
-			exprBlock = newCFGBasicBlock(node);
+			exprBlock = newCFGBasicBlock(node, true);
 			CFGEdgeBuilder.buildEdge(this.currentBlockStack.peek(), exprBlock);
 			this.currentBlockStack.push(exprBlock);
 		} else {
@@ -682,14 +682,19 @@ public class CFGBuilder {
 				this.currentBlockStack.pop();
 			}
 			final Set<CFGEdgeBuilder> toBuild = this.edgesToBuild.remove(node);
-			addEdgesToBuild((Statement) node.getParent(), toBuild);
+			final Statement nextStmt = ASTHelper.getNextStatement(node);
+			if (nextStmt.getParent() == node.getParent()) {
+				addEdgesToBuildForNextStatement(node, toBuild);
+			} else {
+				addEdgesToBuild((Statement) parent, toBuild);
+			}
 		}
 	}
 
 	private void handleClause(IfStatement node, final CFGBasicBlock exprBlock,
 			final Statement clauseStmt, boolean evaluationResult) {
 		if (clauseStmt != null) {
-			final CFGBasicBlock clauseBlock = newCFGBasicBlock(clauseStmt);
+			final CFGBasicBlock clauseBlock = newCFGBasicBlock(clauseStmt, clauseStmt instanceof IfStatement);
 			CFGEdgeBuilder.buildEdge(node.getExpression(), evaluationResult,
 					exprBlock, clauseBlock);
 			this.currentBlockStack.push(clauseBlock);
@@ -793,13 +798,14 @@ public class CFGBuilder {
 
 	public void buildCFG(ForStatement node) {
 		final CFGBasicBlock initBlock = newCFGBasicBlock(node.initializers());
-		final CFGBasicBlock exprBlock = newCFGBasicBlock(node.getExpression());
+		final CFGBasicBlock exprBlock = newCFGBasicBlock(node.getExpression(),
+				true);
 		final CFGBasicBlock updatersBlock = newCFGBasicBlock(node.updaters());
 		final CFGBasicBlock bodyBlock = newCFGBasicBlock(node.getBody());
 
 		CFGEdgeBuilder.buildEdge(this.currentBlockStack.peek(), initBlock);
 		CFGEdgeBuilder.buildEdge(initBlock, exprBlock);
-		CFGEdgeBuilder.buildEdge(exprBlock, bodyBlock);
+		CFGEdgeBuilder.buildEdge(node.getExpression(), true, exprBlock, bodyBlock);
 		CFGEdgeBuilder.buildEdge(updatersBlock, exprBlock);
 
 		this.currentBlockStack.push(initBlock);
@@ -843,14 +849,14 @@ public class CFGBuilder {
 	}
 
 	private CFGBasicBlock newCFGBasicBlock(ASTNode node) {
-		final Pair<Integer, Integer> lineCol = getLineAndColumn(node);
-		return newCFGBasicBlock(node, lineCol.getFirst(), lineCol.getSecond());
+		return newCFGBasicBlock(node, false);
 	}
 
-	private CFGBasicBlock newCFGBasicBlock(ASTNode node, int line, int column) {
-		boolean isDecision = node instanceof IfStatement;
-		final CFGBasicBlock basicBlock = new CFGBasicBlock(node, getFileName(node),
-				codeExcerpt(node), isDecision, line, column);
+	private CFGBasicBlock newCFGBasicBlock(ASTNode node, boolean isDecision) {
+		final Pair<Integer, Integer> lineCol = getLineAndColumn(node);
+		final CFGBasicBlock basicBlock = new CFGBasicBlock(node,
+				getFileName(node), codeExcerpt(node), isDecision,
+				lineCol.getFirst(), lineCol.getSecond());
 		final Set<CFGEdgeBuilder> toBuild = this.edgesToBuild.remove(node);
 		buildWithTarget(toBuild, basicBlock);
 		return basicBlock;
@@ -859,21 +865,25 @@ public class CFGBuilder {
 	private CFGBasicBlock newCFGBasicBlock(List<Expression> expressions) {
 		if (isNotEmpty(expressions)) {
 			final Expression firstExpr = expressions.get(0);
-			final Pair<Integer, Integer> lineCol = getLineAndColumn(firstExpr.getStartPosition());
-			return new CFGBasicBlock(expressions.get(0), getFileName(firstExpr), codeExcerpt(expressions),
-					false, lineCol.getFirst(), lineCol.getSecond());
+			final Pair<Integer, Integer> lineCol = getLineAndColumn(firstExpr
+					.getStartPosition());
+			return new CFGBasicBlock(expressions.get(0),
+					getFileName(firstExpr), codeExcerpt(expressions), false,
+					lineCol.getFirst(), lineCol.getSecond());
 		}
 		throw new RuntimeException(notImplementedFor(null));
 	}
 
 	private CFGBasicBlock newEntryBlock(MethodDeclaration node) {
-		return CFGBasicBlock.buildEntryBlock(node, getFileName(node), codeExcerpt(node));
+		return CFGBasicBlock.buildEntryBlock(node, getFileName(node),
+				codeExcerpt(node));
 	}
 
 	private CFGBasicBlock newExitBlock(MethodDeclaration node) {
-		final Pair<Integer, Integer> lineCol = getLineAndColumn(node.getStartPosition() + node.getLength());
-		return CFGBasicBlock.buildExitBlock(node, getFileName(node), codeExcerpt(node),
-				lineCol.getFirst(), lineCol.getSecond());
+		final Pair<Integer, Integer> lineCol = getLineAndColumn(node
+				.getStartPosition() + node.getLength());
+		return CFGBasicBlock.buildExitBlock(node, getFileName(node),
+				codeExcerpt(node), lineCol.getFirst(), lineCol.getSecond());
 	}
 
 	private Pair<Integer, Integer> getLineAndColumn(ASTNode node) {

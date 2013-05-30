@@ -33,16 +33,25 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.autorefactor.refactoring.ASTHelper;
 import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.DoStatement;
+import org.eclipse.jdt.core.dom.EnhancedForStatement;
 import org.eclipse.jdt.core.dom.ForStatement;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
+import org.eclipse.jdt.core.dom.SwitchStatement;
+import org.eclipse.jdt.core.dom.WhileStatement;
 
 /**
  * Outputs a string representing the CFG in the dot format.
  * <p>
  * Example command to output an image:
- * <pre>dot IfElseIfSample.dot -Tpng > IfElseIfSample.png</pre>
+ * 
+ * <pre>
+ * dot IfElseIfSample.dot -Tpng > IfElseIfSample.png
+ * </pre>
+ * 
  * </p>
  */
 public class CFGDotPrinter {
@@ -61,8 +70,7 @@ public class CFGDotPrinter {
 		final Set<CFGBasicBlock> blocks = new TreeSet<CFGBasicBlock>(
 				new CFGBasicBlockComparator());
 		final Set<CFGEdge> edges = new TreeSet<CFGEdge>(new CFGEdgeComparator());
-		final List<CFGSubGraph> subGraphs =
-				new ArrayList<CFGDotPrinter.CFGSubGraph>();
+		final List<CFGSubGraph> subGraphs = new ArrayList<CFGDotPrinter.CFGSubGraph>();
 
 		public CFGSubGraph(String codeExcerpt, int startPosition) {
 			this.codeExcerpt = codeExcerpt;
@@ -115,7 +123,8 @@ public class CFGDotPrinter {
 		return sb.toString();
 	}
 
-	private void appendGraph(final CFGBasicBlock startblock, final CFGSubGraph graph, final StringBuilder sb) {
+	private void appendGraph(final CFGBasicBlock startblock,
+			final CFGSubGraph graph, final StringBuilder sb) {
 		final boolean needDigraph = sb.length() == 0;
 		if (needDigraph) {
 			appendDigraph(startblock, sb);
@@ -145,15 +154,17 @@ public class CFGDotPrinter {
 	}
 
 	private CFGSubGraph collect(CFGBasicBlock block) {
-		Map<ASTNode , CFGSubGraph> subGraphs = new HashMap<ASTNode, CFGDotPrinter.CFGSubGraph>();
+		Map<ASTNode, CFGSubGraph> subGraphs = new HashMap<ASTNode, CFGDotPrinter.CFGSubGraph>();
 		collect(block, subGraphs);
 		return subGraphs.get(block.getNode());
 	}
 
-	private void collect(CFGBasicBlock block, Map<ASTNode, CFGSubGraph> subGraphs) {
+	private void collect(CFGBasicBlock block,
+			Map<ASTNode, CFGSubGraph> subGraphs) {
 		CFGSubGraph blockSubGraph = getSubGraph(subGraphs, block.getNode());
 		if (!blockSubGraph.blocks.add(block)) {
-			// node was already added. Avoid cycles: do not go through this path again
+			// node was already added.
+			// Avoid cycles: do not go through this path again
 			return;
 		}
 
@@ -166,20 +177,25 @@ public class CFGDotPrinter {
 		}
 	}
 
-	private CFGSubGraph getSubGraph(Map<ASTNode, CFGSubGraph> subGraphs, ASTNode node) {
+	private CFGSubGraph getSubGraph(Map<ASTNode, CFGSubGraph> subGraphs,
+			ASTNode node) {
 		if (node == null) {
 			return null;
 		}
 		CFGSubGraph subGraph = subGraphs.get(node);
 		if (subGraph == null) {
-			if (node instanceof IfStatement
-					|| node instanceof ForStatement
+			if (ASTHelper.isLoop(node)
+					|| node instanceof IfStatement
+					|| node instanceof SwitchStatement
 					|| node instanceof MethodDeclaration) {
-				// such statements deserver their own subgraph to ease reading the CFG
-				subGraph = new CFGSubGraph(ASTPrintHelper.codeExcerpt(node), node.getStartPosition());
+				// such statements need their own subgraph to ease reading the
+				// CFG
+				subGraph = new CFGSubGraph(ASTPrintHelper.codeExcerpt(node),
+						node.getStartPosition());
 				subGraphs.put(node, subGraph);
 				// builds all sub graphs all the way to the top node
-				CFGSubGraph parentSubGraph = getSubGraph(subGraphs, node.getParent());
+				CFGSubGraph parentSubGraph = getSubGraph(subGraphs,
+						node.getParent());
 				if (parentSubGraph != null) {
 					parentSubGraph.subGraphs.add(subGraph);
 				}
@@ -203,7 +219,8 @@ public class CFGDotPrinter {
 			final StringBuilder sb) {
 		final String blockCodeExcerpt = escape(graph.codeExcerpt);
 		String clusterName = blockCodeExcerpt.replaceAll("\\W", "_");
-		sb.append("subgraph cluster_").append(graph.startPosition).append("_").append(clusterName).append(" {\n");
+		sb.append("subgraph cluster_").append(graph.startPosition).append("_")
+				.append(clusterName).append(" {\n");
 		sb.append("label=\"").append(blockCodeExcerpt).append("\";\n");
 		return sb;
 	}
@@ -226,7 +243,8 @@ public class CFGDotPrinter {
 			sb.append("Exit  [style=\"filled\" fillcolor=\"black\" fontcolor=\"white\"];\n");
 		} else {
 			block.appendDotNodeId(sb);
-			sb.append(" [label=\"").append(escape(block.getDotNodeLabel())).append("\"");
+			sb.append(" [label=\"").append(escape(block.getDotNodeLabel()))
+					.append("\"");
 			if (block.isDecision()) {
 				sb.append(",shape=\"triangle\"");
 			}
