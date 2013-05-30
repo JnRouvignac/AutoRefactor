@@ -30,7 +30,6 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.autorefactor.util.Pair;
-import org.eclipse.jdt.core.dom.IfStatement;
 
 /**
  * Outputs a string representing the CFG in the dot format.
@@ -50,9 +49,6 @@ public class CFGDotPrinter {
 
 	// TODO JNR add one subgraph for each complex statements
 	// that deserve one (if, for, while, switch, etc.)
-
-	// TODO JNR CFGBasicBlock: replace the ASTNode member with a
-	// String label (useful for for statement initializers + updaters)
 
 	private final class CFGBasicBlockComparator implements
 			Comparator<CFGBasicBlock> {
@@ -147,7 +143,7 @@ public class CFGDotPrinter {
 
 	private StringBuilder appendSubgraph(final CFGBasicBlock block,
 			final StringBuilder sb) {
-		final String methodCodeExcerpt = escape(block.codeExcerpt());
+		final String methodCodeExcerpt = escape(block.getCodeExcerpt());
 		String methodSignature = methodCodeExcerpt.replaceAll("\\W", "_");
 		sb.append("subgraph cluster_").append(methodSignature).append(" {\n");
 		sb.append("label=\"").append(methodCodeExcerpt).append("\";\n");
@@ -173,7 +169,7 @@ public class CFGDotPrinter {
 		} else {
 			block.appendDotNodeId(sb);
 			sb.append(" [label=\"").append(escape(block.getDotNodeLabel())).append("\"");
-			if (block.getASTNode() instanceof IfStatement) {
+			if (block.isDecision()) {
 				sb.append(",shape=\"triangle\"");
 			}
 			sb.append("];\n");

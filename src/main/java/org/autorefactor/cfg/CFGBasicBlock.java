@@ -28,10 +28,6 @@ package org.autorefactor.cfg;
 import java.util.Collection;
 import java.util.LinkedList;
 
-import org.eclipse.jdt.core.dom.ASTNode;
-import org.eclipse.jdt.core.dom.CompilationUnit;
-import org.eclipse.jdt.core.dom.MethodDeclaration;
-
 /**
  * Control Flow Graph Basic Block. Basic blocks here are a little different from
  * the normal definition of "all adjacent statements not separated by a jump".
@@ -47,42 +43,35 @@ import org.eclipse.jdt.core.dom.MethodDeclaration;
  */
 public class CFGBasicBlock {
 
-	/** The ASTNode owning this basic block */
-	private ASTNode node;
-	private int line;
-	private int column;
+	private final String fileName;
+	private final String codeExcerpt;
+	private final boolean isDecision;
+	private final Boolean isEntryBlock;
+	private final int line;
+	private final int column;
 	private final Collection<CFGEdge> incomingEdges = new LinkedList<CFGEdge>();
 	private final Collection<Object> outgoingEdgesAndVariableAccesses = new LinkedList<Object>();
-	private Boolean isEntryBlock;
 
-	private CFGBasicBlock(boolean isEntry, MethodDeclaration node, int line, int column) {
-		this.isEntryBlock = isEntry;
-		this.node = node;
+	private CFGBasicBlock(String fileName, String codeExcerpt, boolean isDecision, Boolean isEntryBlock,
+			int line, int column) {
+		this.fileName = fileName;
+		this.codeExcerpt = codeExcerpt;
+		this.isDecision = isDecision;
+		this.isEntryBlock = isEntryBlock;
 		this.line = line;
 		this.column = column;
 	}
 
-	public CFGBasicBlock(ASTNode node) {
-		this.node = node;
+	public CFGBasicBlock(String fileName, String codeExcerpt, boolean isDecision, int lineNumber, int column) {
+		this(fileName, codeExcerpt, isDecision, null, lineNumber, column);
 	}
 
-	public CFGBasicBlock(ASTNode node, int lineNumber, int column) {
-		this.node = node;
-		this.line = lineNumber;
-		this.column = column;
+	public static CFGBasicBlock buildEntryBlock(String fileName, String codeExcerpt) {
+		return new CFGBasicBlock(fileName, codeExcerpt, false, true, 1, 1);
 	}
 
-	public static CFGBasicBlock buildEntryBlock(MethodDeclaration node) {
-		return new CFGBasicBlock(true, node, 1, 1);
-	}
-
-	public static CFGBasicBlock buildExitBlock(MethodDeclaration node, int line, int column) {
-		return new CFGBasicBlock(false, node, line, column);
-	}
-
-	/** @return the ASTNode owning this basic block */
-	public ASTNode getASTNode() {
-		return this.node;
+	public static CFGBasicBlock buildExitBlock(String fileName, String codeExcerpt, int line, int column) {
+		return new CFGBasicBlock(fileName, codeExcerpt, false, false, line, column);
 	}
 
 	public int getColumn() {
@@ -91,6 +80,10 @@ public class CFGBasicBlock {
 
 	public int getLine() {
 		return line;
+	}
+
+	public boolean isDecision() {
+		return this.isDecision;
 	}
 
 	public boolean isEntryBlock() {
@@ -164,12 +157,12 @@ public class CFGBasicBlock {
 		return true;
 	}
 
-	String getFileName() {
-		if (this.node.getRoot() instanceof CompilationUnit) {
-			CompilationUnit cu = (CompilationUnit) this.node.getRoot();
-			return cu.getTypeRoot().getElementName();
-		}
-		return null;
+	public String getFileName() {
+		return this.fileName;
+	}
+
+	public String getCodeExcerpt() {
+		return codeExcerpt;
 	}
 
 	String getDotNodeLabel() {
@@ -190,22 +183,9 @@ public class CFGBasicBlock {
 	}
 
 	StringBuilder appendDotNodeLabel(StringBuilder sb) {
-		sb.append(codeExcerpt());
-		sb.append("\\n(").append(this.line).append(",")
-    			.append(this.column).append(")");
+		sb.append(this.codeExcerpt).append("\\n(");
+		sb.append(this.line).append(",").append(this.column).append(")");
 		return sb;
-	}
-
-	String codeExcerpt() {
-		final String nodeString = this.node.toString();
-		final String[] nodeLines = nodeString.split("\n");
-		final String codeExcerpt;
-		if (nodeLines[0].matches("\\s*\\{\\s*")) {
-			codeExcerpt = nodeLines[0] + " " + nodeLines[1] + " ...";
-		} else {
-			codeExcerpt = nodeLines[0];
-		}
-		return codeExcerpt.replaceAll("\\s+", " ");
 	}
 
 	@Override
@@ -216,7 +196,7 @@ public class CFGBasicBlock {
 	}
 
 	private void toString(final StringBuilder sb) {
-		if (this.node == null) {
+		if (this.codeExcerpt == null) {
 			return;
 		}
 		appendDotNodeLabel(sb);

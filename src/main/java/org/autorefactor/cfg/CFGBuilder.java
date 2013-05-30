@@ -25,15 +25,11 @@
  */
 package org.autorefactor.cfg;
 
-import static org.autorefactor.cfg.VariableAccess.DECL_INIT;
-import static org.autorefactor.cfg.VariableAccess.DECL_UNINIT;
-import static org.autorefactor.cfg.VariableAccess.READ;
-import static org.autorefactor.cfg.VariableAccess.WRITE;
+import static org.autorefactor.cfg.VariableAccess.*;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -339,11 +335,8 @@ public class CFGBuilder {
 	}
 
 	public CFGBasicBlock buildCFG(MethodDeclaration node) {
-		final CFGBasicBlock entryBlock = CFGBasicBlock.buildEntryBlock(node);
-		final Pair<Integer, Integer> lineCol = getLineAndColumn(node
-				.getStartPosition() + node.getLength());
-		this.exitBlock = CFGBasicBlock.buildExitBlock(node, lineCol.getFirst(),
-				lineCol.getSecond());
+		final CFGBasicBlock entryBlock = newEntryBlock(node);
+		this.exitBlock = newExitBlock(node);
 
 		addDeclarations(entryBlock, node.parameters());
 
@@ -799,6 +792,7 @@ public class CFGBuilder {
 
 	public void buildCFG(ForStatement node) {
 		final CFGBasicBlock initBlock = newCFGBasicBlock(node);
+		// TODO JNR display node, line and column
 		CFGEdgeBuilder.buildEdge(this.currentBlockStack.peek(), initBlock);
 		this.currentBlockStack.push(initBlock);
 		final CFGBasicBlock exprBlock = newCFGBasicBlock(node.getExpression());
@@ -853,10 +847,42 @@ public class CFGBuilder {
 	}
 
 	private CFGBasicBlock newCFGBasicBlock(ASTNode node, int line, int column) {
-		final CFGBasicBlock basicBlock = new CFGBasicBlock(node, line, column);
+		boolean isDecision = node instanceof IfStatement;
+		final CFGBasicBlock basicBlock = new CFGBasicBlock(getFileName(node),
+				codeExcerpt(node), isDecision, line, column);
 		final Set<CFGEdgeBuilder> toBuild = this.edgesToBuild.remove(node);
 		buildWithTarget(toBuild, basicBlock);
 		return basicBlock;
+	}
+
+	private CFGBasicBlock newEntryBlock(MethodDeclaration node) {
+		return CFGBasicBlock.buildEntryBlock(getFileName(node), codeExcerpt(node));
+	}
+
+	private CFGBasicBlock newExitBlock(MethodDeclaration node) {
+		final Pair<Integer, Integer> lineCol = getLineAndColumn(node.getStartPosition() + node.getLength());
+		return CFGBasicBlock.buildExitBlock(getFileName(node), codeExcerpt(node),
+				lineCol.getFirst(), lineCol.getSecond());
+	}
+
+	private String getFileName(ASTNode node) {
+		if (node.getRoot() instanceof CompilationUnit) {
+			CompilationUnit cu = (CompilationUnit) node.getRoot();
+			return cu.getTypeRoot().getElementName();
+		}
+		return null;
+	}
+
+	private String codeExcerpt(ASTNode node) {
+		final String nodeString = node.toString();
+		final String[] nodeLines = nodeString.split("\n");
+		final String codeExcerpt;
+		if (nodeLines[0].matches("\\s*\\{\\s*")) {
+			codeExcerpt = nodeLines[0] + " " + nodeLines[1] + " ...";
+		} else {
+			codeExcerpt = nodeLines[0];
+		}
+		return codeExcerpt.replaceAll("\\s+", " ");
 	}
 
 	private Pair<Integer, Integer> getLineAndColumn(ASTNode node) {
