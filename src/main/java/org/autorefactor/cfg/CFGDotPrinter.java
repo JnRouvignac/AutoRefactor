@@ -34,8 +34,27 @@ import org.eclipse.jdt.core.dom.IfStatement;
 
 /**
  * Outputs a string representing the CFG in the dot format.
+ * <p>
+ * Example command to output an image:
+ * <pre>dot IfElseIfSample.dot -Tpng > IfElseIfSample.png</pre>
+ * </p>
  */
 public class CFGDotPrinter {
+
+	// TODO JNR
+	// - Add variable access nodes
+	// - link them with "--" and/or inside a box
+	// - Display expr in the box?
+	// - node label of the form: var name + line, column + R, W, Decl
+	// - use separate colors?
+
+	// TODO JNR add one subgraph for each complex statements 
+	// that deserve one (if, for, while, switch, etc.)
+
+	// TODO JNR CFGBasicBlock: replace the ASTNode member with a 
+	// String label (useful for for statement initializers + updaters)
+	// TODO JNR CFGBasicBlock + CFGEdge + CFGEdgeBuilder
+	// + VariableAccess: change toString() impl. 
 
 	private final class CFGBasicBlockComparator implements
 			Comparator<CFGBasicBlock> {
