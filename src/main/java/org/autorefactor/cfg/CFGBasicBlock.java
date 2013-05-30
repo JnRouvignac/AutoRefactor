@@ -28,6 +28,8 @@ package org.autorefactor.cfg;
 import java.util.Collection;
 import java.util.LinkedList;
 
+import org.eclipse.jdt.core.dom.ASTNode;
+
 /**
  * Control Flow Graph Basic Block. Basic blocks here are a little different from
  * the normal definition of "all adjacent statements not separated by a jump".
@@ -43,6 +45,7 @@ import java.util.LinkedList;
  */
 public class CFGBasicBlock {
 
+	private final ASTNode node;
 	private final String fileName;
 	private final String codeExcerpt;
 	private final boolean isDecision;
@@ -52,8 +55,9 @@ public class CFGBasicBlock {
 	private final Collection<CFGEdge> incomingEdges = new LinkedList<CFGEdge>();
 	private final Collection<Object> outgoingEdgesAndVariableAccesses = new LinkedList<Object>();
 
-	private CFGBasicBlock(String fileName, String codeExcerpt, boolean isDecision, Boolean isEntryBlock,
+	private CFGBasicBlock(ASTNode node, String fileName, String codeExcerpt, boolean isDecision, Boolean isEntryBlock,
 			int line, int column) {
+		this.node = node;
 		this.fileName = fileName;
 		this.codeExcerpt = codeExcerpt;
 		this.isDecision = isDecision;
@@ -62,24 +66,28 @@ public class CFGBasicBlock {
 		this.column = column;
 	}
 
-	public CFGBasicBlock(String fileName, String codeExcerpt, boolean isDecision, int lineNumber, int column) {
-		this(fileName, codeExcerpt, isDecision, null, lineNumber, column);
+	public CFGBasicBlock(ASTNode node, String fileName, String codeExcerpt, boolean isDecision, int lineNumber, int column) {
+		this(node, fileName, codeExcerpt, isDecision, null, lineNumber, column);
 	}
 
-	public static CFGBasicBlock buildEntryBlock(String fileName, String codeExcerpt) {
-		return new CFGBasicBlock(fileName, codeExcerpt, false, true, 1, 1);
+	public static CFGBasicBlock buildEntryBlock(ASTNode node, String fileName, String codeExcerpt) {
+		return new CFGBasicBlock(node, fileName, codeExcerpt, false, true, 1, 1);
 	}
 
-	public static CFGBasicBlock buildExitBlock(String fileName, String codeExcerpt, int line, int column) {
-		return new CFGBasicBlock(fileName, codeExcerpt, false, false, line, column);
+	public static CFGBasicBlock buildExitBlock(ASTNode node, String fileName, String codeExcerpt, int line, int column) {
+		return new CFGBasicBlock(node, fileName, codeExcerpt, false, false, line, column);
+	}
+
+	public int getLine() {
+		return line;
 	}
 
 	public int getColumn() {
 		return column;
 	}
 
-	public int getLine() {
-		return line;
+	public ASTNode getNode() {
+		return node;
 	}
 
 	public boolean isDecision() {
@@ -129,10 +137,11 @@ public class CFGBasicBlock {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
+		result = prime * result + ((fileName == null) ? 0 : fileName.hashCode());
+		result = prime * result + line;
 		result = prime * result + column;
 		result = prime * result
 				+ ((isEntryBlock == null) ? 0 : isEntryBlock.hashCode());
-		result = prime * result + line;
 		return result;
 	}
 
@@ -145,14 +154,19 @@ public class CFGBasicBlock {
 		if (getClass() != obj.getClass())
 			return false;
 		CFGBasicBlock other = (CFGBasicBlock) obj;
+		if (fileName == null) {
+			if (other.fileName != null)
+				return false;
+		} else if (!fileName.equals(other.fileName))
+			return false;
+		if (line != other.line)
+			return false;
 		if (column != other.column)
 			return false;
 		if (isEntryBlock == null) {
 			if (other.isEntryBlock != null)
 				return false;
 		} else if (!isEntryBlock.equals(other.isEntryBlock))
-			return false;
-		if (line != other.line)
 			return false;
 		return true;
 	}

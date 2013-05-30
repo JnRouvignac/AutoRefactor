@@ -26,6 +26,7 @@
 package org.autorefactor.cfg;
 
 import static org.autorefactor.cfg.VariableAccess.*;
+import static org.autorefactor.cfg.ASTPrintHelper.*;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -33,7 +34,6 @@ import java.util.Collection;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -849,7 +849,7 @@ public class CFGBuilder {
 
 	private CFGBasicBlock newCFGBasicBlock(ASTNode node, int line, int column) {
 		boolean isDecision = node instanceof IfStatement;
-		final CFGBasicBlock basicBlock = new CFGBasicBlock(getFileName(node),
+		final CFGBasicBlock basicBlock = new CFGBasicBlock(node, getFileName(node),
 				codeExcerpt(node), isDecision, line, column);
 		final Set<CFGEdgeBuilder> toBuild = this.edgesToBuild.remove(node);
 		buildWithTarget(toBuild, basicBlock);
@@ -860,52 +860,20 @@ public class CFGBuilder {
 		if (isNotEmpty(expressions)) {
 			final Expression firstExpr = expressions.get(0);
 			final Pair<Integer, Integer> lineCol = getLineAndColumn(firstExpr.getStartPosition());
-			return new CFGBasicBlock(getFileName(firstExpr), codeExcerpt(expressions),
+			return new CFGBasicBlock(expressions.get(0), getFileName(firstExpr), codeExcerpt(expressions),
 					false, lineCol.getFirst(), lineCol.getSecond());
 		}
 		throw new RuntimeException(notImplementedFor(null));
 	}
 
 	private CFGBasicBlock newEntryBlock(MethodDeclaration node) {
-		return CFGBasicBlock.buildEntryBlock(getFileName(node), codeExcerpt(node));
+		return CFGBasicBlock.buildEntryBlock(node, getFileName(node), codeExcerpt(node));
 	}
 
 	private CFGBasicBlock newExitBlock(MethodDeclaration node) {
 		final Pair<Integer, Integer> lineCol = getLineAndColumn(node.getStartPosition() + node.getLength());
-		return CFGBasicBlock.buildExitBlock(getFileName(node), codeExcerpt(node),
+		return CFGBasicBlock.buildExitBlock(node, getFileName(node), codeExcerpt(node),
 				lineCol.getFirst(), lineCol.getSecond());
-	}
-
-	private String getFileName(ASTNode node) {
-		if (node.getRoot() instanceof CompilationUnit) {
-			CompilationUnit cu = (CompilationUnit) node.getRoot();
-			return cu.getTypeRoot().getElementName();
-		}
-		return null;
-	}
-
-	private String codeExcerpt(List<Expression> expressions) {
-		final StringBuilder sb = new StringBuilder();
-		for (final Iterator<Expression> iter = expressions.iterator(); iter.hasNext();) {
-			final Expression expr = iter.next();
-			sb.append(expr.toString());
-			if (iter.hasNext()) {
-				sb.append(", ");
-			}
-		}
-		return sb.toString();
-	}
-
-	private String codeExcerpt(ASTNode node) {
-		final String nodeString = node.toString();
-		final String[] nodeLines = nodeString.split("\n");
-		final String codeExcerpt;
-		if (nodeLines[0].matches("\\s*\\{\\s*")) {
-			codeExcerpt = nodeLines[0] + " " + nodeLines[1] + " ...";
-		} else {
-			codeExcerpt = nodeLines[0];
-		}
-		return codeExcerpt.replaceAll("\\s+", " ");
 	}
 
 	private Pair<Integer, Integer> getLineAndColumn(ASTNode node) {
@@ -949,6 +917,7 @@ public class CFGBuilder {
 		if (node != null) {
 			return "Not implemented for " + node.getClass().getSimpleName();
 		}
+
 		return "Not implemented for null";
 	}
 

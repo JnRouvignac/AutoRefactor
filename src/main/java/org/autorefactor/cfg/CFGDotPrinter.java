@@ -25,11 +25,18 @@
  */
 package org.autorefactor.cfg;
 
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.autorefactor.util.Pair;
+import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.ForStatement;
+import org.eclipse.jdt.core.dom.IfStatement;
+import org.eclipse.jdt.core.dom.MethodDeclaration;
 
 /**
  * Outputs a string representing the CFG in the dot format.
@@ -47,8 +54,21 @@ public class CFGDotPrinter {
 	// - node label of the form: var name + line, column + R, W, Decl
 	// - use separate colors?
 
-	// TODO JNR add one subgraph for each complex statements
-	// that deserve one (if, for, while, switch, etc.)
+	private final class CFGSubGraph {
+
+		private final String codeExcerpt;
+		private final int startPosition;
+		final Set<CFGBasicBlock> blocks = new TreeSet<CFGBasicBlock>(
+				new CFGBasicBlockComparator());
+		final Set<CFGEdge> edges = new TreeSet<CFGEdge>(new CFGEdgeComparator());
+		final List<CFGSubGraph> subGraphs =
+				new ArrayList<CFGDotPrinter.CFGSubGraph>();
+
+		public CFGSubGraph(String codeExcerpt, int startPosition) {
+			this.codeExcerpt = codeExcerpt;
+			this.startPosition = startPosition;
+		}
+	}
 
 	private final class CFGBasicBlockComparator implements
 			Comparator<CFGBasicBlock> {
@@ -88,48 +108,86 @@ public class CFGDotPrinter {
 	 * @return a String representing the CFG in the dot format.
 	 */
 	public String toDot(final CFGBasicBlock startblock) {
+		final CFGSubGraph subGraph = collect(startblock);
+
 		final StringBuilder sb = new StringBuilder();
-		appendDigraph(startblock, sb);
-		appendSubgraph(startblock, sb);
-
-		final Pair<Set<CFGBasicBlock>, Set<CFGEdge>> nodesAndEdges = collect(startblock);
-		for (CFGBasicBlock block : nodesAndEdges.getFirst()) {
-			appendDotNode(block, sb);
-		}
-		sb.append("\n");
-		for (CFGEdge edge : nodesAndEdges.getSecond()) {
-			appendDotEdge(edge, sb);
-		}
-
-		sb.append("}\n}\n");
+		appendGraph(startblock, subGraph, sb);
 		return sb.toString();
 	}
 
-	private Pair<Set<CFGBasicBlock>, Set<CFGEdge>> collect(CFGBasicBlock block) {
-		final Set<CFGBasicBlock> blockSet = new TreeSet<CFGBasicBlock>(
-				new CFGBasicBlockComparator());
-		final Set<CFGEdge> edgeSet = new TreeSet<CFGEdge>(
-				new CFGEdgeComparator());
-		final Pair<Set<CFGBasicBlock>, Set<CFGEdge>> results = Pair.of(
-				blockSet, edgeSet);
-		collect(block, results);
-		return results;
+	private void appendGraph(final CFGBasicBlock startblock, final CFGSubGraph graph, final StringBuilder sb) {
+		final boolean needDigraph = sb.length() == 0;
+		if (needDigraph) {
+			appendDigraph(startblock, sb);
+		}
+		appendSubgraph(graph, sb);
+
+		for (CFGBasicBlock block : graph.blocks) {
+			appendDotNode(block, sb);
+		}
+		if (!graph.edges.isEmpty()) {
+			sb.append("\n");
+			for (CFGEdge edge : graph.edges) {
+				appendDotEdge(edge, sb);
+			}
+		}
+		if (!graph.subGraphs.isEmpty()) {
+			sb.append("\n");
+			for (CFGSubGraph subGraph : graph.subGraphs) {
+				appendGraph(startblock, subGraph, sb);
+			}
+		}
+
+		sb.append("}\n");
+		if (needDigraph) {
+			sb.append("}\n");
+		}
 	}
 
-	private void collect(CFGBasicBlock block,
-			final Pair<Set<CFGBasicBlock>, Set<CFGEdge>> results) {
-		if (!results.getFirst().add(block)) {
-			// node was already added. No need to go through this path again
+	private CFGSubGraph collect(CFGBasicBlock block) {
+		Map<ASTNode , CFGSubGraph> subGraphs = new HashMap<ASTNode, CFGDotPrinter.CFGSubGraph>();
+		collect(block, subGraphs);
+		return subGraphs.get(block.getNode());
+	}
+
+	private void collect(CFGBasicBlock block, Map<ASTNode, CFGSubGraph> subGraphs) {
+		CFGSubGraph blockSubGraph = getSubGraph(subGraphs, block.getNode());
+		if (!blockSubGraph.blocks.add(block)) {
+			// node was already added. Avoid cycles: do not go through this path again
 			return;
 		}
 
 		for (Object obj : block.getOutgoingEdgesAndVariableAccesses()) {
 			if (obj instanceof CFGEdge) {
 				final CFGEdge edge = (CFGEdge) obj;
-				results.getSecond().add(edge);
-				collect(edge.getTargetBlock(), results);
+				blockSubGraph.edges.add(edge);
+				collect(edge.getTargetBlock(), subGraphs);
 			}
 		}
+	}
+
+	private CFGSubGraph getSubGraph(Map<ASTNode, CFGSubGraph> subGraphs, ASTNode node) {
+		if (node == null) {
+			return null;
+		}
+		CFGSubGraph subGraph = subGraphs.get(node);
+		if (subGraph == null) {
+			if (node instanceof IfStatement
+					|| node instanceof ForStatement
+					|| node instanceof MethodDeclaration) {
+				// such statements deserver their own subgraph to ease reading the CFG
+				subGraph = new CFGSubGraph(ASTPrintHelper.codeExcerpt(node), node.getStartPosition());
+				subGraphs.put(node, subGraph);
+				// builds all sub graphs all the way to the top node
+				CFGSubGraph parentSubGraph = getSubGraph(subGraphs, node.getParent());
+				if (parentSubGraph != null) {
+					parentSubGraph.subGraphs.add(subGraph);
+				}
+			} else {
+				return getSubGraph(subGraphs, node.getParent());
+			}
+		}
+		return subGraph;
 	}
 
 	private StringBuilder appendDigraph(final CFGBasicBlock block,
@@ -141,12 +199,12 @@ public class CFGDotPrinter {
 		return sb;
 	}
 
-	private StringBuilder appendSubgraph(final CFGBasicBlock block,
+	private StringBuilder appendSubgraph(final CFGSubGraph graph,
 			final StringBuilder sb) {
-		final String methodCodeExcerpt = escape(block.getCodeExcerpt());
-		String methodSignature = methodCodeExcerpt.replaceAll("\\W", "_");
-		sb.append("subgraph cluster_").append(methodSignature).append(" {\n");
-		sb.append("label=\"").append(methodCodeExcerpt).append("\";\n");
+		final String blockCodeExcerpt = escape(graph.codeExcerpt);
+		String clusterName = blockCodeExcerpt.replaceAll("\\W", "_");
+		sb.append("subgraph cluster_").append(graph.startPosition).append("_").append(clusterName).append(" {\n");
+		sb.append("label=\"").append(blockCodeExcerpt).append("\";\n");
 		return sb;
 	}
 
