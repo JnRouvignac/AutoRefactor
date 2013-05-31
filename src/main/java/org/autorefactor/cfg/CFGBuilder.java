@@ -615,13 +615,10 @@ public class CFGBuilder {
 				}
 			}
 		} finally {
-			Set<CFGEdgeBuilder> toBuild = this.edgesToBuild.remove(node);
 			if (needNewBlock) {
-				addEdgesToBuildForNextStatement(node, toBuild);
 				this.currentBlockStack.pop();
-			} else {
-				addEdgesToBuild((Statement) node.getParent(), toBuild);
 			}
+			moveEdgesToBuild(node);
 		}
 	}
 
@@ -681,20 +678,15 @@ public class CFGBuilder {
 			if (needNewBlock) {
 				this.currentBlockStack.pop();
 			}
-			final Set<CFGEdgeBuilder> toBuild = this.edgesToBuild.remove(node);
-			final Statement nextStmt = ASTHelper.getNextStatement(node);
-			if (nextStmt.getParent() == node.getParent()) {
-				addEdgesToBuildForNextStatement(node, toBuild);
-			} else {
-				addEdgesToBuild((Statement) parent, toBuild);
-			}
+			moveEdgesToBuild(node);
 		}
 	}
 
 	private void handleClause(IfStatement node, final CFGBasicBlock exprBlock,
 			final Statement clauseStmt, boolean evaluationResult) {
 		if (clauseStmt != null) {
-			final CFGBasicBlock clauseBlock = newCFGBasicBlock(clauseStmt, clauseStmt instanceof IfStatement);
+			final CFGBasicBlock clauseBlock = newCFGBasicBlock(clauseStmt,
+					clauseStmt instanceof IfStatement);
 			CFGEdgeBuilder.buildEdge(node.getExpression(), evaluationResult,
 					exprBlock, clauseBlock);
 			this.currentBlockStack.push(clauseBlock);
@@ -747,6 +739,17 @@ public class CFGBuilder {
 			for (CFGEdgeBuilder builder : toBuild) {
 				addEdgeToBuild(nextStmt, builder);
 			}
+		}
+	}
+
+	private void moveEdgesToBuild(final Statement node) {
+		final Set<CFGEdgeBuilder> toBuild = this.edgesToBuild.remove(node);
+		final Statement nextStmt = ASTHelper.getNextStatement(node);
+		final ASTNode parent = node.getParent();
+		if (nextStmt.getParent() == parent) {
+			addEdgesToBuildForNextStatement(node, toBuild);
+		} else {
+			addEdgesToBuild((Statement) parent, toBuild);
 		}
 	}
 
@@ -805,7 +808,8 @@ public class CFGBuilder {
 
 		CFGEdgeBuilder.buildEdge(this.currentBlockStack.peek(), initBlock);
 		CFGEdgeBuilder.buildEdge(initBlock, exprBlock);
-		CFGEdgeBuilder.buildEdge(node.getExpression(), true, exprBlock, bodyBlock);
+		CFGEdgeBuilder.buildEdge(node.getExpression(), true, exprBlock,
+				bodyBlock);
 		CFGEdgeBuilder.buildEdge(updatersBlock, exprBlock);
 
 		this.currentBlockStack.push(initBlock);
