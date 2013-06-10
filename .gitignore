@@ -16,3 +16,4 @@ test/bin
 
 # By product files
 test/org/autorefactor/cfg/*.png
+test-output

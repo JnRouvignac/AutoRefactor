@@ -25,8 +25,8 @@
  */
 package org.autorefactor.cfg;
 
-import static org.autorefactor.cfg.VariableAccess.*;
 import static org.autorefactor.cfg.ASTPrintHelper.*;
+import static org.autorefactor.cfg.VariableAccess.*;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -928,11 +928,7 @@ public class CFGBuilder {
 	}
 
 	private String notImplementedFor(ASTNode node) {
-		if (node != null) {
-			return "Not implemented for " + node.getClass().getSimpleName();
-		}
-
-		return "Not implemented for null";
+		return "Not implemented for " + (node != null? node.getClass().getSimpleName() : null);
 	}
 
 	private boolean isNotEmpty(final Collection<?> col) {
