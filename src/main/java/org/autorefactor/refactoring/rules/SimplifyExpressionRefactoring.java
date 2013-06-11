@@ -304,6 +304,7 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
 			replaceInfixExpressionIfNeeded(expr.getParent());
 		} else if (expr instanceof InfixExpression) {
 			final InfixExpression ie = (InfixExpression) expr;
+			checkNoExtendedOperands(ie);
 			final Object value = ie.getRightOperand()
 					.resolveConstantExpressionValue();
 			if (value instanceof Number) {
@@ -347,6 +348,7 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
 
 	@Override
 	public boolean visit(InfixExpression node) {
+		checkNoExtendedOperands(node);
 		final Expression lhs = node.getLeftOperand();
 		final Expression rhs = node.getRightOperand();
 		final Operator operator = node.getOperator();
@@ -406,6 +408,20 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
 		return ASTHelper.VISIT_SUBTREE;
 	}
 
+	/**
+	 * Extended operands are used for deeply nested expressions, mostly string concatenation expressions.
+	 * <p>
+	 * This will be implemented only if somebody comes up with code where the runtime exception is thrown.
+	 * </p>
+	 * 
+	 * @see <a href="http://publib.boulder.ibm.com/infocenter/iadthelp/v6r0/topic/org.eclipse.jdt.doc.isv/reference/api/org/eclipse/jdt/core/dom/InfixExpression.html#extendedOperands()">
+	 */
+	private void checkNoExtendedOperands(InfixExpression node) {
+		if (!node.extendedOperands().isEmpty()) {
+			throw new RuntimeException("Not implemented for extended operands");
+		}
+	}
+
 	private boolean isPrimitiveBool(Expression expr) {
 		ITypeBinding typeBinding = expr.resolveTypeBinding();
 		return typeBinding.isPrimitive()
@@ -414,6 +430,7 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
 
 	private void replace(InfixExpression node, boolean negate,
 			Expression exprToCopy) {
+		checkNoExtendedOperands(node);
 		if (!isPrimitiveBool(node.getLeftOperand())
 				&& !isPrimitiveBool(node.getRightOperand())) {
 			return;
@@ -491,6 +508,7 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
 	private Expression getNullCheckedExpression(Expression e) {
 		if (e instanceof InfixExpression) {
 			final InfixExpression expr = (InfixExpression) e;
+			checkNoExtendedOperands(expr);
 			if (Operator.NOT_EQUALS.equals(expr.getOperator())) {
 				if (expr.getLeftOperand() instanceof NullLiteral) {
 					return expr.getRightOperand();
