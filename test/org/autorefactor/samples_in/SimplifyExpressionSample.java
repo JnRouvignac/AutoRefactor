@@ -34,54 +34,54 @@ public class SimplifyExpressionSample {
 
     private static final String NULL_CONSTANT = null;
 
-    public void removeUselessNullCheck(String[] args) {
+    public void removeUselessNullCheck(String s) {
         {
             // Remove redundant null checks
-            boolean b1 = args[0] != null && "".equals(args[0]);
-            boolean b2 = args[0] != null && "".equalsIgnoreCase(args[0]);
-            boolean b3 = args[0] != null && args[0] instanceof String;
+            boolean b1 = s != null && "".equals(s);
+            boolean b2 = s != null && "".equalsIgnoreCase(s);
+            boolean b3 = s != null && s instanceof String;
         }
         {
             // Remove redundant null checks
-            boolean b1 = null != args[0] && "".equals(args[0]);
-            boolean b2 = null != args[0] && "".equalsIgnoreCase(args[0]);
-            boolean b3 = null != args[0] && args[0] instanceof String;
+            boolean b1 = null != s && "".equals(s);
+            boolean b2 = null != s && "".equalsIgnoreCase(s);
+            boolean b3 = null != s && s instanceof String;
         }
         {
             // Remove redundant left / write hand side operands
-            boolean b3 = true && args[0] != null;
-            boolean b4 = false && args[0] != null;
-            boolean b5 = true || args[0] != null;
-            boolean b6 = false || args[0] != null;
+            boolean b3 = true && s != null;
+            boolean b4 = false && s != null;
+            boolean b5 = true || s != null;
+            boolean b6 = false || s != null;
         }
     }
 
-    public void doNotRemoveNullCheck(String[] args) {
+    public void doNotRemoveNullCheck(String s) {
         {
             // Do not remove non redundant null checks
-            boolean b1 = args[0] != null && args[0].equals(NULL_CONSTANT);
-            boolean b2 = args[0] != null && args[0].equalsIgnoreCase(NULL_CONSTANT);
+            boolean b1 = s != null && s.equals(NULL_CONSTANT);
+            boolean b2 = s != null && s.equalsIgnoreCase(NULL_CONSTANT);
         }
         {
             // Do not remove non redundant null checks
-            boolean b1 = null != args[0] && args[0].equals(NULL_CONSTANT);
-            boolean b2 = null != args[0] && args[0].equalsIgnoreCase(NULL_CONSTANT);
+            boolean b1 = null != s && s.equals(NULL_CONSTANT);
+            boolean b2 = null != s && s.equalsIgnoreCase(NULL_CONSTANT);
         }
         {
             // Right-hand-side left unchanged because left-hand-side can have
             // side effects
-            boolean b3 = args[0] != null && true;
-            boolean b4 = args[0] != null && false;
-            boolean b5 = args[0] != null || true;
-            boolean b6 = args[0] != null || false;
+            boolean b3 = s != null && true;
+            boolean b4 = s != null && false;
+            boolean b5 = s != null || true;
+            boolean b6 = s != null || false;
         }
         {
             // Right-hand-side left unchanged because left-hand-side can have
             // side effects
-            boolean b3 = null != args[0] && true;
-            boolean b4 = null != args[0] && false;
-            boolean b5 = null != args[0] || true;
-            boolean b6 = null != args[0] || false;
+            boolean b3 = null != s && true;
+            boolean b4 = null != s && false;
+            boolean b5 = null != s || true;
+            boolean b6 = null != s || false;
         }
     }
 
