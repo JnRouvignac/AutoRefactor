@@ -66,7 +66,14 @@ final class GrowableArrayList<T> extends ArrayList<T> {
 				final int nbAlreadyReadded = size() % initialSize;
 				final int nbToReAdd = this.nextIndex % initialSize;
 				// append the refactorings to reapply
-				addAll(subList(nbAlreadyReadded, nbToReAdd));
+				if (nbAlreadyReadded < nbToReAdd) {
+					addAll(subList(nbAlreadyReadded, nbToReAdd));
+				} else {
+					// need to add the end of the initial list...
+					addAll(subList(nbAlreadyReadded, initialSize));
+					// ...before adding from the start of the initial list
+					addAll(subList(0, nbToReAdd));
+				}
 			}
 		}
 	}

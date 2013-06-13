@@ -124,14 +124,15 @@ public class SimplifyExpressionSample {
         Object obj = ((List<?>) c).get(0);
         // do not replace
         boolean b4 = !(i instanceof Number);
+        boolean b5 = !(b4 = false);
         // replace
-        boolean b5 = i != null;
+        boolean b6 = i != null;
         // replace
-        boolean b6 = b5 && i != null;
+        boolean b7 = b5 && i != null;
         // do not replace
-        boolean b7 = b1 ? (b2 ? b3 : b4) : (b5 ? b6 : true);
-        boolean b8 = b1 ? (b2 = true) : (b3 = true);
-        boolean b9 = b1 ? (i instanceof Number) : (i instanceof Object);
+        boolean b8 = b1 ? (b2 ? b3 : b4) : (b5 ? b6 : true);
+        boolean b9 = b1 ? (b2 = true) : (b3 = true);
+        boolean b10 = b1 ? (i instanceof Number) : (i instanceof Object);
     }
 
     public boolean doNotReplaceParenthesesAroundAssignmentInCondition(Reader reader, char[] cbuf, int c) throws IOException {
