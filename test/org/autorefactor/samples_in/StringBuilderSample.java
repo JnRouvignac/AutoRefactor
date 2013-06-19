@@ -47,7 +47,8 @@ public class StringBuilderSample {
     }
 
     public void removeUselessStringConcatenation() {
-        String s7 = Integer.toString(42) + "";
+        String s1 = Integer.toString(42) + "";
+        String s2 = "foo " + "" + 0 + "bar " + 1 + "";
     }
 
 }
