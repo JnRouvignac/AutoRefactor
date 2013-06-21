@@ -22,7 +22,7 @@ I decided I had spent too much time on manually doing these changes, so I tried 
         <li>developers habits coming from other languages (Any C programmers around?)</li>
         <li>new language features get added, but the code base lags behind</li>
         <li>incomplete automatic changes are applied</li>
-        <li>short deadlines, lack of investment in the software, lack of stakeholder supprot for reducing the technical debt</li>
+        <li>short deadlines, lack of investment in the software, lack of stakeholder support for reducing the technical debt</li>
       </ul>
     </p>
     <h2>Goals</h2>
@@ -69,12 +69,15 @@ How to <a href="https://github.com/JnRouvignac/AutoRefactor/blob/master/CONTRIBU
         <li>Turn refactorings into proper <a href="http://help.eclipse.org/helios/index.jsp?topic=%2Forg.eclipse.jdt.doc.isv%2Freference%2Fextension-points%2Findex.html">Eclipse extension points</a>: <a href="http://help.eclipse.org/indigo/index.jsp?topic=%2Forg.eclipse.jdt.doc.isv%2Fguide%2Fjdt_api_contributing_a_cleanup.htm">cleanups, save actions</a> or quick fixes</li>
         <li>Develop automatic refactoring for other languages:
           <ul>
-            <li>C/C++ via the <a href="http://help.eclipse.org/indigo/index.jsp?topic=%2Forg.eclipse.cdt.doc.isv%2Freference%2Fapi%2Forg%2Feclipse%2Fcdt%2Fcore%2Fdom%2Fast%2Fpackage-summary.html">Eclipse CDT DOM</a> or via <a href="http://clang.llvm.org/">clang</a></li>
+            <li>C/C++ via the <a href="http://help.eclipse.org/indigo/index.jsp?topic=%2Forg.eclipse.cdt.doc.isv%2Freference%2Fapi%2Forg%2Feclipse%2Fcdt%2Fcore%2Fdom%2Fast%2Fpackage-summary.html">Eclipse CDT DOM</a> or via <a href="http://clang.llvm.org/">clang</a>
+              <ul>
+                <li>Note: <a href="http://llvm.org/">LLVM</a> project provides <a href="http://clang.llvm.org/extra/cpp11-migrate.html">cpp11-migrate</a> to refactor codebases to use the much improved <a href="http://en.wikipedia.org/wiki/C%2B%2B11">C++11</a> features.</li>
+              </ul>
+            </li>
             <li>PHP via the <a href="http://eclipsesourcecode.appspot.com/jsrcs/org.eclipse.php.internal.core.compiler.ast.nodes.package.html">Eclipse PDT DOM</a></li>
             <li>JavaScript via the <a href="http://help.eclipse.org/indigo/index.jsp?topic=%2Forg.eclipse.wst.jsdt.doc%2Freference%2Fapi%2Forg%2Feclipse%2Fwst%2Fjsdt%2Fcore%2Fpackage-summary.html">Eclipse JSDT DOM</a></li>
             <li>Go like <a href="http://golang.org/cmd/go/#hdr-Run_go_tool_fix_on_packages"><code>gofix</code></a></li>
           </ul>
-        <li>Develop other languages</li>
       </ul>
     <h2>Links</h2>
       <ul>
