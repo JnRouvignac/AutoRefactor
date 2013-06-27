@@ -61,6 +61,11 @@ import org.autorefactor.util.Pair;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.filebuffers.FileBuffers;
+import org.eclipse.core.filebuffers.ITextFileBuffer;
+import org.eclipse.core.filebuffers.ITextFileBufferManager;
+import org.eclipse.core.filebuffers.LocationKind;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -82,7 +87,6 @@ import org.eclipse.jdt.internal.core.ExternalPackageFragmentRoot;
 import org.eclipse.jdt.internal.core.JarPackageFragmentRoot;
 import org.eclipse.jdt.ui.JavaUI;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -123,7 +127,9 @@ public class AutoRefactorHandler extends AbstractHandler {
 			final String javaSourceCompatibility = options.get(COMPILER_SOURCE);
 			final int tabSize = getTabSize(options);
 
-			monitor.beginTask("", compilationUnits.size());
+			if (monitor != null) {
+				monitor.beginTask("", compilationUnits.size());
+			}
 			try {
 				final Release javaSERelease = Release.javaSE(javaSourceCompatibility);
 				for (final ICompilationUnit compilationUnit : compilationUnits) {
@@ -133,17 +139,23 @@ public class AutoRefactorHandler extends AbstractHandler {
 								elName.lastIndexOf('.'));
 						final String className = compilationUnit.getParent()
 								.getElementName() + "." + simpleName;
-						monitor.subTask("Applying refactorings to " + className);
+						if (monitor != null) {
+							monitor.subTask("Applying refactorings to " + className);
+						}
 						applyRefactorings(compilationUnit, javaSERelease,
 								tabSize, getAllRefactorings());
 					} catch (Exception e) {
 						throw new RuntimeException(e);
 					} finally {
-						monitor.worked(1);
+						if (monitor != null) {
+							monitor.worked(1);
+						}
 					}
 				}
 			} finally {
-				monitor.done();
+				if (monitor != null) {
+					monitor.done();
+				}
 			}
 			return Status.OK_STATUS;
 		}
@@ -297,7 +309,7 @@ public class AutoRefactorHandler extends AbstractHandler {
 			return Status.OK_STATUS;
 		}
 
-		new ApplyRefactoringsJob(event).schedule();
+		new ApplyRefactoringsJob(event).run(null);
 
 		// TODO JNR provide a maven plugin
 		// TODO JNR provide a gradle plugin
@@ -429,14 +441,36 @@ public class AutoRefactorHandler extends AbstractHandler {
 	 *      href="http://help.eclipse.org/indigo/index.jsp?topic=/org.eclipse.platform.doc.isv/guide/workbench_cmd_menus.htm">
 	 *      Eclipse Platform Plug-in Developer Guide > Plugging into the
 	 *      workbench > Basic workbench extension points using commands >
-	 *      org.eclipse.ui.menus </a>
+	 *      org.eclipse.ui.menus</a>
+	 * @see <a
+	 *      href="http://www.eclipse.org/articles/article.php?file=Article-JavaCodeManipulation_AST/index.html#sec-write-it-down">
+	 *      Abstract Syntax Tree > Write it down</a>
 	 */
 	private static void applyRefactorings(ICompilationUnit compilationUnit,
 			Release javaSERelease, int tabSize,
 			GrowableArrayList<IRefactoring> refactoringsToApply) throws Exception {
+		final ITextFileBufferManager bufferManager = FileBuffers.getTextFileBufferManager();
+		final IPath path = compilationUnit.getPath();
+		final LocationKind locationKind = LocationKind.NORMALIZE;
+		try {
+			bufferManager.connect(path, locationKind, null);
+			final ITextFileBuffer textFileBuffer = bufferManager
+					.getTextFileBuffer(path, locationKind);
+			final IDocument document = textFileBuffer.getDocument();
+			applyRefactorings(document, compilationUnit,
+					javaSERelease, refactoringsToApply);
+			textFileBuffer.commit(null, false);
+		} finally {
+			bufferManager.disconnect(path, locationKind, null);
+		}
+	}
+
+	private static void applyRefactorings(IDocument document,
+			ICompilationUnit compilationUnit, Release javaSERelease,
+			GrowableArrayList<IRefactoring> refactoringsToApply) {
 		// creation of DOM/AST from a ICompilationUnit
 		final ASTParser parser = ASTParser.newParser(AST.JLS4);
-		parser.setSource(compilationUnit);
+		parser.setSource(document.get().toCharArray());
 		parser.setResolveBindings(true);
 
 		CompilationUnit astRoot = (CompilationUnit) parser.createAST(null);
@@ -444,7 +478,6 @@ public class AutoRefactorHandler extends AbstractHandler {
 		// new CFGBuilder(compilationUnit.getSource(),
 		// tabSize).buildCFG(astRoot);
 
-		final IDocument document = new Document(compilationUnit.getSource());
 		for (GrowableListIterator iter = refactoringsToApply.iterator(); iter.hasNext();) {
 			IRefactoring refactoring = (IRefactoring) iter.next();
 			try {
@@ -458,17 +491,24 @@ public class AutoRefactorHandler extends AbstractHandler {
 					final ASTRewrite rewrite = getASTRewrite(astRoot, refactorings);
 
 					// apply the text edits and save the compilation unit
-					final TextEdit edits = rewrite.rewriteAST();
+					final TextEdit edits = rewrite.rewriteAST(document, null);
 					edits.apply(document);
 					boolean hadUnsavedChanges = compilationUnit.hasUnsavedChanges();
 					compilationUnit.getBuffer().setContents(document.get());
+					// http://wiki.eclipse.org/FAQ_What_is_a_working_copy%3F
+					// compilationUnit.reconcile(AST.JLS4,
+					// ICompilationUnit.ENABLE_BINDINGS_RECOVERY |
+					// ICompilationUnit.ENABLE_STATEMENTS_RECOVERY |
+					// ICompilationUnit.FORCE_PROBLEM_DETECTION
+					// /** can be useful to back off a change that does not
+					// compile*/
+					// , null, null);
 					if (!hadUnsavedChanges) {
 						compilationUnit.save(null, true);
 					}
 
 					// I did not find any other way to directly modify the AST
-					// while
-					// still keeping the resolved type bindings working.
+					// while still keeping the resolved type bindings working.
 					// Using astRoot.recordModifications() did not work:
 					// type bindings were lost. Is there a way to recover them?
 					// FIXME we should find a way to apply all the changes at
