@@ -36,6 +36,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
+import org.autorefactor.cfg.CFGBuilder;
 import org.autorefactor.refactoring.IRefactoring;
 import org.autorefactor.refactoring.Refactorings;
 import org.autorefactor.refactoring.Refactorings.Insert;
@@ -458,7 +459,7 @@ public class AutoRefactorHandler extends AbstractHandler {
 					.getTextFileBuffer(path, locationKind);
 			final IDocument document = textFileBuffer.getDocument();
 			applyRefactorings(document, compilationUnit,
-					javaSERelease, refactoringsToApply);
+					javaSERelease, tabSize, refactoringsToApply);
 			textFileBuffer.commit(null, false);
 		} finally {
 			bufferManager.disconnect(path, locationKind, null);
@@ -467,10 +468,11 @@ public class AutoRefactorHandler extends AbstractHandler {
 
 	private static void applyRefactorings(IDocument document,
 			ICompilationUnit compilationUnit, Release javaSERelease,
-			GrowableArrayList<IRefactoring> refactoringsToApply) {
+			int tabSize, GrowableArrayList<IRefactoring> refactoringsToApply)
+					throws JavaModelException {
 		// creation of DOM/AST from a ICompilationUnit
 		final ASTParser parser = ASTParser.newParser(AST.JLS4);
-		parser.setSource(document.get().toCharArray());
+		parser.setSource(compilationUnit);
 		parser.setResolveBindings(true);
 
 		CompilationUnit astRoot = (CompilationUnit) parser.createAST(null);
