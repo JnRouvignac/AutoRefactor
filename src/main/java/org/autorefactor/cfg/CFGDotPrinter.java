@@ -26,6 +26,7 @@
 package org.autorefactor.cfg;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -69,7 +70,6 @@ public class CFGDotPrinter {
 		private final int startPosition;
 		final Set<CFGBasicBlock> blocks = new TreeSet<CFGBasicBlock>(
 				new CFGBasicBlockComparator());
-		final Set<CFGEdge> edges = new TreeSet<CFGEdge>(new CFGEdgeComparator());
 		final List<CFGSubGraph> subGraphs = new ArrayList<CFGDotPrinter.CFGSubGraph>();
 
 		public CFGSubGraph(String codeExcerpt, int startPosition) {
@@ -111,39 +111,44 @@ public class CFGDotPrinter {
 	/**
 	 * Returns a String representing the CFG in the dot format.
 	 *
-	 * @param startblock
+	 * @param startBlock
 	 *            the block from where to start printing
 	 * @return a String representing the CFG in the dot format.
 	 */
-	public String toDot(final CFGBasicBlock startblock) {
-		final CFGSubGraph subGraph = collect(startblock);
+	public String toDot(final CFGBasicBlock startBlock) {
+		final Map<ASTNode, CFGSubGraph> subGraphs = new HashMap<ASTNode, CFGSubGraph>();
+		final Set<CFGEdge> edges = new TreeSet<CFGEdge>(new CFGEdgeComparator());
+		collect(startBlock, subGraphs, edges);
+		final CFGSubGraph subGraph = subGraphs.get(startBlock.getNode());
 
 		final StringBuilder sb = new StringBuilder();
-		appendGraph(startblock, subGraph, sb);
+		appendGraph(startBlock, subGraph, edges, sb);
 		return sb.toString();
 	}
 
 	private void appendGraph(final CFGBasicBlock startblock,
-			final CFGSubGraph graph, final StringBuilder sb) {
+			final CFGSubGraph graph, Set<CFGEdge> edges, final StringBuilder sb) {
 		final boolean needDigraph = sb.length() == 0;
 		if (needDigraph) {
 			appendDigraph(startblock, sb);
+			sb.append("\n");
 		}
+		if (!edges.isEmpty()) {
+			for (CFGEdge edge : edges) {
+				appendDotEdge(edge, sb);
+			}
+			sb.append("\n");
+		}
+
 		appendSubgraph(graph, sb);
 
 		for (CFGBasicBlock block : graph.blocks) {
 			appendDotNode(block, sb);
 		}
-		if (!graph.edges.isEmpty()) {
-			sb.append("\n");
-			for (CFGEdge edge : graph.edges) {
-				appendDotEdge(edge, sb);
-			}
-		}
 		if (!graph.subGraphs.isEmpty()) {
 			sb.append("\n");
 			for (CFGSubGraph subGraph : graph.subGraphs) {
-				appendGraph(startblock, subGraph, sb);
+				appendGraph(startblock, subGraph, Collections.EMPTY_SET, sb);
 			}
 		}
 
@@ -153,14 +158,8 @@ public class CFGDotPrinter {
 		}
 	}
 
-	private CFGSubGraph collect(CFGBasicBlock block) {
-		Map<ASTNode, CFGSubGraph> subGraphs = new HashMap<ASTNode, CFGDotPrinter.CFGSubGraph>();
-		collect(block, subGraphs);
-		return subGraphs.get(block.getNode());
-	}
-
 	private void collect(CFGBasicBlock block,
-			Map<ASTNode, CFGSubGraph> subGraphs) {
+			Map<ASTNode, CFGSubGraph> subGraphs, Set<CFGEdge> edges) {
 		CFGSubGraph blockSubGraph = getSubGraph(subGraphs, block.getNode());
 		if (!blockSubGraph.blocks.add(block)) {
 			// node was already added.
@@ -171,8 +170,8 @@ public class CFGDotPrinter {
 		for (Object obj : block.getOutgoingEdgesAndVariableAccesses()) {
 			if (obj instanceof CFGEdge) {
 				final CFGEdge edge = (CFGEdge) obj;
-				blockSubGraph.edges.add(edge);
-				collect(edge.getTargetBlock(), subGraphs);
+				edges.add(edge);
+				collect(edge.getTargetBlock(), subGraphs, edges);
 			}
 		}
 	}

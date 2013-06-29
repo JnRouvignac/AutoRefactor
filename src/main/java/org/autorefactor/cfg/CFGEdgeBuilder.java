@@ -9,6 +9,8 @@ public class CFGEdgeBuilder {
 	private boolean evaluationResult;
 	private CFGBasicBlock sourceBlock;
 	private CFGBasicBlock targetBlock;
+	/** Prevents building twice */
+	private boolean built;
 
 	public CFGEdgeBuilder(CFGBasicBlock sourceBlock) {
 		this(null, false, sourceBlock);
@@ -76,6 +78,11 @@ public class CFGEdgeBuilder {
 		if (targetBlock == null) {
 			throw new IllegalStateException("targetBlock is mandatory");
 		}
+		if (built) {
+			throw new IllegalStateException("CFGEdgeBuilder " + this
+					+ " has already been built");
+		}
+		this.built = true;
 		if (condition != null) {
 			return buildEdge(condition, evaluationResult, sourceBlock, targetBlock);
 		}
