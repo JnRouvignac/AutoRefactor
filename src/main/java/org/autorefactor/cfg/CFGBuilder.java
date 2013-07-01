@@ -29,114 +29,25 @@ import static org.autorefactor.cfg.ASTPrintHelper.*;
 import static org.autorefactor.cfg.VariableAccess.*;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Deque;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.autorefactor.refactoring.ASTHelper;
 import org.autorefactor.util.Pair;
-import org.eclipse.jdt.core.dom.ASTNode;
-import org.eclipse.jdt.core.dom.AbstractTypeDeclaration;
-import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
-import org.eclipse.jdt.core.dom.ArrayAccess;
-import org.eclipse.jdt.core.dom.ArrayCreation;
-import org.eclipse.jdt.core.dom.ArrayInitializer;
-import org.eclipse.jdt.core.dom.ArrayType;
-import org.eclipse.jdt.core.dom.AssertStatement;
-import org.eclipse.jdt.core.dom.Assignment;
-import org.eclipse.jdt.core.dom.Block;
-import org.eclipse.jdt.core.dom.BooleanLiteral;
-import org.eclipse.jdt.core.dom.BreakStatement;
-import org.eclipse.jdt.core.dom.CastExpression;
-import org.eclipse.jdt.core.dom.CatchClause;
-import org.eclipse.jdt.core.dom.CharacterLiteral;
-import org.eclipse.jdt.core.dom.ClassInstanceCreation;
-import org.eclipse.jdt.core.dom.CompilationUnit;
-import org.eclipse.jdt.core.dom.ConditionalExpression;
-import org.eclipse.jdt.core.dom.ConstructorInvocation;
-import org.eclipse.jdt.core.dom.ContinueStatement;
-import org.eclipse.jdt.core.dom.DoStatement;
-import org.eclipse.jdt.core.dom.EmptyStatement;
-import org.eclipse.jdt.core.dom.EnhancedForStatement;
-import org.eclipse.jdt.core.dom.Expression;
-import org.eclipse.jdt.core.dom.ExpressionStatement;
-import org.eclipse.jdt.core.dom.FieldAccess;
-import org.eclipse.jdt.core.dom.FieldDeclaration;
-import org.eclipse.jdt.core.dom.ForStatement;
-import org.eclipse.jdt.core.dom.IfStatement;
-import org.eclipse.jdt.core.dom.InfixExpression;
-import org.eclipse.jdt.core.dom.Initializer;
-import org.eclipse.jdt.core.dom.InstanceofExpression;
-import org.eclipse.jdt.core.dom.LabeledStatement;
-import org.eclipse.jdt.core.dom.MemberRef;
-import org.eclipse.jdt.core.dom.MemberValuePair;
-import org.eclipse.jdt.core.dom.MethodDeclaration;
-import org.eclipse.jdt.core.dom.MethodInvocation;
-import org.eclipse.jdt.core.dom.MethodRef;
-import org.eclipse.jdt.core.dom.MethodRefParameter;
-import org.eclipse.jdt.core.dom.Modifier;
-import org.eclipse.jdt.core.dom.NullLiteral;
-import org.eclipse.jdt.core.dom.NumberLiteral;
-import org.eclipse.jdt.core.dom.ParameterizedType;
-import org.eclipse.jdt.core.dom.ParenthesizedExpression;
-import org.eclipse.jdt.core.dom.PostfixExpression;
-import org.eclipse.jdt.core.dom.PrefixExpression;
-import org.eclipse.jdt.core.dom.PrimitiveType;
-import org.eclipse.jdt.core.dom.QualifiedName;
-import org.eclipse.jdt.core.dom.QualifiedType;
-import org.eclipse.jdt.core.dom.ReturnStatement;
-import org.eclipse.jdt.core.dom.SimpleName;
-import org.eclipse.jdt.core.dom.SimpleType;
-import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
-import org.eclipse.jdt.core.dom.Statement;
-import org.eclipse.jdt.core.dom.StringLiteral;
-import org.eclipse.jdt.core.dom.SuperConstructorInvocation;
-import org.eclipse.jdt.core.dom.SuperFieldAccess;
-import org.eclipse.jdt.core.dom.SuperMethodInvocation;
-import org.eclipse.jdt.core.dom.SwitchCase;
-import org.eclipse.jdt.core.dom.SwitchStatement;
-import org.eclipse.jdt.core.dom.SynchronizedStatement;
-import org.eclipse.jdt.core.dom.TagElement;
-import org.eclipse.jdt.core.dom.TextElement;
-import org.eclipse.jdt.core.dom.ThisExpression;
-import org.eclipse.jdt.core.dom.ThrowStatement;
-import org.eclipse.jdt.core.dom.TryStatement;
-import org.eclipse.jdt.core.dom.Type;
-import org.eclipse.jdt.core.dom.TypeDeclaration;
-import org.eclipse.jdt.core.dom.TypeDeclarationStatement;
-import org.eclipse.jdt.core.dom.TypeLiteral;
-import org.eclipse.jdt.core.dom.TypeParameter;
-import org.eclipse.jdt.core.dom.UnionType;
-import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
-import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
-import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
-import org.eclipse.jdt.core.dom.WhileStatement;
-import org.eclipse.jdt.core.dom.WildcardType;
+import org.eclipse.jdt.core.dom.*;
 
 /**
  * Builds a CFG.
  * <p>
- * The buildCFG(*Statement) methods receive as parameter the List of live blocks
- * before the current statement, and are responsible for returning the list of
- * live blocks after the current statement.
+ * Look at {@link #buildCFG(IfStatement, List, CFGBasicBlock)} for a javadoc for
+ * all the buildCFG(*Statement, List<CFGEdgeBuilder>, CFGBasicBlock) methods.
  */
 public class CFGBuilder {
 
 	private String source;
 	private int tabSize;
-	// TODO JNR can I get rid of the stack?
-	private final Deque<CFGBasicBlock> currentBlockStack = new LinkedList<CFGBasicBlock>();
 	/**
 	 * Edges to be built before or after visiting the statement used as the key.
 	 * When the statement is visited, code checks whether there are edges to
@@ -281,13 +192,13 @@ public class CFGBuilder {
 
 	@SuppressWarnings("unchecked")
 	private List<CFGEdgeBuilder> buildCFG(Statement node,
-			List<CFGEdgeBuilder> liveBlocks, boolean buildNewBlock) {
+			List<CFGEdgeBuilder> liveBlocks, CFGBasicBlock currentBasicBlock) {
 		if (node == null) {
 			return Collections.emptyList();
 		}
 		try {
-			final Method m = getClass().getMethod("buildCFG", node.getClass(), List.class, boolean.class);
-			return (List<CFGEdgeBuilder>) m.invoke(this, node, liveBlocks, buildNewBlock);
+			final Method m = getClass().getMethod("buildCFG", node.getClass(), List.class, CFGBasicBlock.class);
+			return (List<CFGEdgeBuilder>) m.invoke(this, node, liveBlocks, currentBasicBlock);
 		} catch (Exception e) {
 			throw new RuntimeException("Unhandled exception", e);
 		}
@@ -330,8 +241,8 @@ public class CFGBuilder {
 	}
 
 	public List<CFGEdgeBuilder> buildCFG(ReturnStatement node,
-			List<CFGEdgeBuilder> liveBlocks, boolean buildNewBlock) {
-		final CFGBasicBlock basicBlock = newCFGBasicBlock(node, buildNewBlock);
+			List<CFGEdgeBuilder> liveBlocks, CFGBasicBlock currentBasicBlock) {
+		final CFGBasicBlock basicBlock = newCFGBasicBlock(node, currentBasicBlock);
 		addVariableAccess(basicBlock, node.getExpression(), READ);
 		buildWithTarget(liveBlocks, basicBlock);
 		CFGEdgeBuilder.buildEdge(basicBlock, this.exitBlock);
@@ -352,10 +263,9 @@ public class CFGBuilder {
 
 		addDeclarations(entryBlock, node.parameters());
 
-		this.currentBlockStack.push(entryBlock);
 		try {
 			final List<CFGEdgeBuilder> liveBlocks = newList(new CFGEdgeBuilder(entryBlock));
-			final List<CFGEdgeBuilder> edgesToBuild = buildCFG(node.getBody(), liveBlocks, true);
+			final List<CFGEdgeBuilder> edgesToBuild = buildCFG(node.getBody(), liveBlocks, null);
 			if (!edgesToBuild.isEmpty()) {
 				if ("void".equals(node.getReturnType2().resolveBinding().getName())) {
 					for (CFGEdgeBuilder builder : edgesToBuild) {
@@ -367,13 +277,12 @@ public class CFGBuilder {
 			}
 			if (!this.edgesToBuild.isEmpty()) {
 				throw new IllegalStateException(
-						"At this point, there should not be any edges left to build");
+						"At this point, there should not be any edges left to build. Left edges: " + this.edgesToBuild);
 			}
 			// new CFGDotPrinter().toDot(entryBlock);
 			// new CodePathCollector().getPaths(entryBlock);
 			return entryBlock;
 		} finally {
-			this.currentBlockStack.pop();
 			this.exitBlock = null;
 		}
 	}
@@ -453,10 +362,11 @@ public class CFGBuilder {
 		throw new RuntimeException("Not implemented");
 	}
 
-	public List<CFGEdgeBuilder> buildCFG(VariableDeclarationStatement node, List<CFGEdgeBuilder> liveBlocks, boolean buildNewBlock) {
-		final CFGBasicBlock basicBlock = newCFGBasicBlock(node, buildNewBlock);
+	public List<CFGEdgeBuilder> buildCFG(VariableDeclarationStatement node,
+			List<CFGEdgeBuilder> liveBlocks, CFGBasicBlock currentBasicBlock) {
+		final CFGBasicBlock basicBlock = newCFGBasicBlock(node, currentBasicBlock);
 		addDeclarations(basicBlock, node.fragments(), node.getType());
-		if (buildNewBlock) {
+		if (currentBasicBlock == null) {
 			return newList(new CFGEdgeBuilder(basicBlock));
 		} else {
 			return liveBlocks;
@@ -569,16 +479,15 @@ public class CFGBuilder {
 	}
 
 	public List<CFGEdgeBuilder> buildCFG(Block node, List<CFGEdgeBuilder> previousLiveBlocks,
-			boolean buildNewBlock) {
+			CFGBasicBlock currentBasicBlock) {
 		List<CFGEdgeBuilder> liveBlocks = previousLiveBlocks;
-		final CFGBasicBlock basicBlock = newCFGBasicBlock(node, buildNewBlock);
-		if (buildNewBlock) {
+		final CFGBasicBlock basicBlock = newCFGBasicBlock(node, currentBasicBlock);
+		if (currentBasicBlock == null) {
 			buildWithTarget(previousLiveBlocks, basicBlock);
-			this.currentBlockStack.push(basicBlock);
 			liveBlocks = newList(new CFGEdgeBuilder(basicBlock));
 		}
 		try {
-			boolean localBuildNewBlock = false;
+			CFGBasicBlock localBasicBlock = basicBlock;
 			for (Statement stmt : (List<Statement>) node.statements()) {
 				// if (stmt instanceof AssertStatement) {
 				// // AssertStatement as = (AssertStatement) stmt;
@@ -598,17 +507,17 @@ public class CFGBuilder {
 				// buildCFG((EnhancedForStatement) stmt);
 				// } else
 				if (stmt instanceof ExpressionStatement) {
-					liveBlocks = buildCFG((ExpressionStatement) stmt, liveBlocks, localBuildNewBlock);
+					liveBlocks = buildCFG((ExpressionStatement) stmt, liveBlocks, localBasicBlock);
 				} else if (stmt instanceof ForStatement) {
-					liveBlocks = buildCFG((ForStatement) stmt, liveBlocks, localBuildNewBlock);
-					localBuildNewBlock = true;
+					liveBlocks = buildCFG((ForStatement) stmt, liveBlocks, localBasicBlock);
+					localBasicBlock = null;
 				} else if (stmt instanceof IfStatement) {
-					liveBlocks = buildCFG((IfStatement) stmt, liveBlocks, localBuildNewBlock);
-					localBuildNewBlock = true;
+					liveBlocks = buildCFG((IfStatement) stmt, liveBlocks, localBasicBlock);
+					localBasicBlock = null;
 					// } else if (stmt instanceof LabeledStatement) {
 					// LabeledStatement ls = (LabeledStatement) stmt;
 				} else if (stmt instanceof ReturnStatement) {
-					liveBlocks = buildCFG((ReturnStatement) stmt, liveBlocks, localBuildNewBlock);
+					liveBlocks = buildCFG((ReturnStatement) stmt, liveBlocks, localBasicBlock);
 					// } else if (stmt instanceof SuperConstructorInvocation) {
 					// SuperConstructorInvocation sci =
 					// (SuperConstructorInvocation)
@@ -627,7 +536,7 @@ public class CFGBuilder {
 					// TypeDeclarationStatement tds = (TypeDeclarationStatement)
 					// stmt;
 				} else if (stmt instanceof VariableDeclarationStatement) {
-					liveBlocks = buildCFG((VariableDeclarationStatement) stmt, liveBlocks, localBuildNewBlock);
+					liveBlocks = buildCFG((VariableDeclarationStatement) stmt, liveBlocks, localBasicBlock);
 					// } else if (stmt instanceof WhileStatement) {
 					// WhileStatement ws = (WhileStatement) stmt;
 					// buildCFG(ws);
@@ -636,9 +545,6 @@ public class CFGBuilder {
 				}
 			}
 		} finally {
-			if (buildNewBlock) {
-				this.currentBlockStack.pop();
-			}
 			moveEdgesToBuild(node);
 		}
 		return liveBlocks;
@@ -672,28 +578,39 @@ public class CFGBuilder {
 		throw new RuntimeException("Not implemented");
 	}
 
+	/**
+	 * Builds a CFG for the passed in statement.
+         *
+	 * @param node
+	 *          the statement for which to build a CFG
+	 * @param liveBlocks
+	 *          the List of live blocks before the current statement
+	 * @param currentBasicBlock
+	 *          the current basic block to which the current statement might be
+	 *          added. If null, then the a new basic block must be created for the
+	 *          current statement
+	 * @return the list of live blocks after the current statement
+	 */
 	public List<CFGEdgeBuilder> buildCFG(IfStatement node,
-			List<CFGEdgeBuilder> liveBlocks, boolean buildNewBlockIgnored) {
-		final CFGBasicBlock exprBlock = newCFGBasicBlock(node, true, true);
+			List<CFGEdgeBuilder> liveBlocks, CFGBasicBlock currentBasicBlockIgnored) {
+		final CFGBasicBlock exprBlock = newCFGBasicBlock(node, null, true);
 		buildWithTarget(liveBlocks, exprBlock);
-		this.currentBlockStack.push(exprBlock);
 		try {
 			addVariableAccess(exprBlock, node.getExpression(), READ);
 
 			final List<CFGEdgeBuilder> results = new ArrayList<CFGEdgeBuilder>();
 			CFGEdgeBuilder liveAfterThen = new CFGEdgeBuilder(node.getExpression(), true, exprBlock);
-			results.addAll(buildCFG(node.getThenStatement(), newList(liveAfterThen), true));
+			results.addAll(buildCFG(node.getThenStatement(), newList(liveAfterThen), null));
 
 			final Statement elseStmt = node.getElseStatement();
 			if (elseStmt != null) {
 				CFGEdgeBuilder liveAfterElse = new CFGEdgeBuilder(node.getExpression(), false, exprBlock);
-				results.addAll(buildCFG(elseStmt, newList(liveAfterElse), true));
+				results.addAll(buildCFG(elseStmt, newList(liveAfterElse), null));
 			} else {
 				results.add(new CFGEdgeBuilder(node.getExpression(), false, exprBlock));
 			}
 			return results;
 		} finally {
-			this.currentBlockStack.pop();
 			moveEdgesToBuild(node);
 		}
 	}
@@ -777,20 +694,19 @@ public class CFGBuilder {
 		throw new RuntimeException("Not implemented");
 	}
 
-	public void buildCFG(EnhancedForStatement node) {
-		CFGBasicBlock basicBlock = newCFGBasicBlock(node, true);
-		CFGEdgeBuilder.buildEdge(this.currentBlockStack.peek(), basicBlock);
-		this.currentBlockStack.push(basicBlock);
-		try {
+	public void buildCFG(EnhancedForStatement node,
+			List<CFGEdgeBuilder> liveBlocks, CFGBasicBlock currentBasicBlock) {
+		CFGBasicBlock basicBlock = newCFGBasicBlock(node, null);
+		CFGEdgeBuilder.buildEdge(currentBasicBlock, basicBlock);
+		try { //TODO JNR remove try ... finally
 			addDeclaration(basicBlock, node.getParameter(), DECL_INIT | WRITE);
 
 			// for (CFGBasicBlock previousBasicBlock : liveBasicBlocks) {
 			// CFGEdge.build(previousBasicBlock, basicBlock);
 			// }
 			// liveBasicBlocks.add(basicBlock);
-			buildCFG(node.getBody(), Collections.EMPTY_LIST, true);
+			buildCFG(node.getBody(), Collections.EMPTY_LIST, null);
 		} finally {
-			this.currentBlockStack.pop();
 		}
 	}
 
@@ -807,17 +723,15 @@ public class CFGBuilder {
 	}
 
 	public List<CFGEdgeBuilder> buildCFG(ForStatement node,
-			List<CFGEdgeBuilder> liveBlocks, boolean buildNewBlockIgnored) {
+			List<CFGEdgeBuilder> liveBlocks, CFGBasicBlock currentBasicBlockIgnored) {
 		final CFGBasicBlock initBlock = newCFGBasicBlock(node.initializers());
-		final CFGBasicBlock exprBlock = newCFGBasicBlock(node.getExpression(), true, true);
+		final CFGBasicBlock exprBlock = newCFGBasicBlock(node.getExpression(), null, true);
 		final CFGBasicBlock updatersBlock = newCFGBasicBlock(node.updaters());
 
 		buildWithTarget(liveBlocks, initBlock);
 		CFGEdgeBuilder.buildEdge(initBlock, exprBlock);
 		CFGEdgeBuilder.buildEdge(updatersBlock, exprBlock);
 
-		this.currentBlockStack.push(initBlock);
-		this.currentBlockStack.push(exprBlock);
 		try {
 			for (Expression expression : (List<Expression>) node.initializers()) {
 				if (expression instanceof VariableDeclarationExpression) {
@@ -830,7 +744,7 @@ public class CFGBuilder {
 
 			CFGEdgeBuilder liveBlock = new CFGEdgeBuilder(node.getExpression(), true, exprBlock);
 
-			final List<CFGEdgeBuilder> liveAfterLoop = buildCFG(node.getBody(), newList(liveBlock), true);
+			final List<CFGEdgeBuilder> liveAfterLoop = buildCFG(node.getBody(), newList(liveBlock), null);
 			buildWithTarget(liveAfterLoop, updatersBlock);
 
 			final Set<CFGEdgeBuilder> toBuild = this.edgesToBuild.remove(node);
@@ -839,9 +753,6 @@ public class CFGBuilder {
 		} finally {
 			addEdgesToBuildForNextStatement(node,
 					new CFGEdgeBuilder(node.getExpression(), false, exprBlock));
-
-			this.currentBlockStack.pop();
-			this.currentBlockStack.pop();
 		}
 	}
 
@@ -854,23 +765,23 @@ public class CFGBuilder {
 	}
 
 	public List<CFGEdgeBuilder> buildCFG(ExpressionStatement node,
-			List<CFGEdgeBuilder> liveBlocks, boolean buildNewBlock) {
-		final CFGBasicBlock basicBlock = newCFGBasicBlock(node, buildNewBlock);
+			List<CFGEdgeBuilder> liveBlocks, CFGBasicBlock currentBasicBlock) {
+		final CFGBasicBlock basicBlock = newCFGBasicBlock(node, currentBasicBlock);
 		addVariableAccess(basicBlock, node.getExpression(), READ);
-		if (buildNewBlock) {
+		if (currentBasicBlock != null) {
 			return newList(new CFGEdgeBuilder(basicBlock));
 		} else {
 			return liveBlocks;
 		}
 	}
 
-	private CFGBasicBlock newCFGBasicBlock(ASTNode node, boolean buildNewBlock) {
-		return newCFGBasicBlock(node, buildNewBlock, false);
+	private CFGBasicBlock newCFGBasicBlock(ASTNode node, CFGBasicBlock currentBasicBlock) {
+		return newCFGBasicBlock(node, currentBasicBlock, false);
 	}
 
-	private CFGBasicBlock newCFGBasicBlock(ASTNode node, boolean buildNewBlock, boolean isDecision) {
-		if (!buildNewBlock) {
-			return this.currentBlockStack.peek();
+	private CFGBasicBlock newCFGBasicBlock(ASTNode node, CFGBasicBlock currentBasicBlock, boolean isDecision) {
+		if (currentBasicBlock != null) {
+			return currentBasicBlock;
 		}
 		final Pair<Integer, Integer> lineCol = getLineAndColumn(node);
 		final CFGBasicBlock basicBlock = new CFGBasicBlock(node,
