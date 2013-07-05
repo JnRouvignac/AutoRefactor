@@ -308,11 +308,15 @@ public class ASTHelper {
 		return false;
 	}
 
-	public static boolean isLoop(Object node) {
+	public static boolean isLoop(ASTNode node) {
 		return node instanceof DoStatement
 				|| node instanceof EnhancedForStatement
 				|| node instanceof ForStatement
 				|| node instanceof WhileStatement;
+	}
+
+	public static boolean isBreakable(ASTNode node) {
+		return isLoop(node) || node instanceof SwitchStatement;
 	}
 
 	/**

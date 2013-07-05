@@ -29,7 +29,7 @@ public class LabelsSample {
 
 	public void sample(String[] strings, boolean b1, boolean b2, boolean b3) {
 		outerLoop: for (String s : strings) {
-			for (String s : strings) {
+			for (String s2 : strings) {
 				if (b1 && b2 && b3) {
 					break outerLoop;
 				}
@@ -50,9 +50,13 @@ public class LabelsSample {
 
 		disguisedGoto: {
 			int i = 0;
-			break disguisedGoto;
+			if (b1) {
+				break disguisedGoto;
+			}
 			i++;
-			return;
+			if (b2) {
+				return;
+			}
 			i++;
 		}
 	}
