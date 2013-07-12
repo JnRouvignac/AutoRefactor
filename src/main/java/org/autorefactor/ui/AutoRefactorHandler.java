@@ -37,6 +37,7 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import org.autorefactor.cfg.CFGBuilder;
+import org.autorefactor.refactoring.ASTCommentRewriter;
 import org.autorefactor.refactoring.IRefactoring;
 import org.autorefactor.refactoring.Refactorings;
 import org.autorefactor.refactoring.Refactorings.Insert;
@@ -490,10 +491,12 @@ public class AutoRefactorHandler extends AbstractHandler {
 				final Refactorings refactorings = refactoring.getRefactorings(astRoot);
 				if (refactorings.hasRefactorings()) {
 					// Describing the rewrite
-					final ASTRewrite rewrite = getASTRewrite(astRoot, refactorings);
+					final Pair<ASTRewrite, ASTCommentRewriter> rewrites = getASTRewrite(astRoot, refactorings);
+					final ASTCommentRewriter commentRewriter = rewrites.getSecond();
 
 					// apply the text edits and save the compilation unit
-					final TextEdit edits = rewrite.rewriteAST(document, null);
+					final TextEdit edits = rewrites.getFirst().rewriteAST(document, null);
+					commentRewriter.addEdits(document, edits);
 					edits.apply(document);
 					boolean hadUnsavedChanges = compilationUnit.hasUnsavedChanges();
 					compilationUnit.getBuffer().setContents(document.get());
@@ -531,8 +534,8 @@ public class AutoRefactorHandler extends AbstractHandler {
 		}
 	}
 
-	private static ASTRewrite getASTRewrite(final CompilationUnit astRoot,
-			final Refactorings refactorings) {
+	private static Pair<ASTRewrite, ASTCommentRewriter> getASTRewrite(
+			final CompilationUnit astRoot, final Refactorings refactorings) {
 		final ASTRewrite rewrite = ASTRewrite.create(astRoot.getAST());
 		if (!refactorings.getInserts().isEmpty()) {
 			for (Entry<ChildListPropertyDescriptor, List<Insert>> entry : refactorings
@@ -556,7 +559,11 @@ public class AutoRefactorHandler extends AbstractHandler {
 		for (ASTNode toRemove : refactorings.getRemovals()) {
 			rewrite.remove(toRemove, null);
 		}
-		return rewrite;
+		final ASTCommentRewriter commentRewriter = new ASTCommentRewriter();
+		for (ASTNode toRemove : refactorings.getCommentRemovals()) {
+			commentRewriter.remove(toRemove);
+		}
+		return Pair.of(rewrite, commentRewriter);
 	}
 
 	private static GrowableArrayList<IRefactoring> getAllRefactorings() {

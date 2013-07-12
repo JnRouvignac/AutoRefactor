@@ -27,11 +27,28 @@ package org.autorefactor.samples_out;
 
 public class RemoveEmptyCommentsSample {
 
+    /**
+     * This is a javadoc that must be kept 
+     */
+    private int i;
+
+    public RemoveEmptyCommentsSample() {
+    }
+
+    // Remove javadoc below
+    private boolean test2(int j) {
+        // Remove comment line just below
+        return false;
+    }
+
     public static void main(String[] args) {
-        /*
-         * 
-         */
-        //
+        // remove block comment just below
+        // remove comment lines just above and below
+
+        try {
+            args[0] = "blue";
+        } catch (Exception e) {
+        }
     }
 
     /**

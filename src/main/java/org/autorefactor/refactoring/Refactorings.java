@@ -25,6 +25,7 @@
  */
 package org.autorefactor.refactoring;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -34,6 +35,7 @@ import java.util.Map;
 import org.autorefactor.util.Pair;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ChildListPropertyDescriptor;
+import org.eclipse.jdt.core.dom.Comment;
 
 /**
  * Class aggregating all the refactorings performed by a refactoring rule until
@@ -53,6 +55,7 @@ public class Refactorings {
 	 * The refactorings removing code from the AST tree.
 	 */
 	private final List<ASTNode> removals = new LinkedList<ASTNode>();
+	private final List<Comment> commentRemovals = new LinkedList<Comment>();
 
 	/**
 	 * Describes where to insert new code: before or after an existing
@@ -104,25 +107,35 @@ public class Refactorings {
 		return this.inserts;
 	}
 
+	public List<Comment> getCommentRemovals() {
+		return this.commentRemovals;
+	}
+
 	public void replace(ASTNode node, ASTNode replacement) {
 		this.replacements.add(Pair.of(node, replacement));
 	}
 
-	public void remove(ASTNode... nodes) {
-		for (ASTNode node : nodes) {
+	public void remove(ASTNode node) {
+		if (node instanceof Comment) {
+			this.commentRemovals.add((Comment) node);
+		} else {
 			this.removals.add(node);
 		}
 	}
 
+	public void remove(ASTNode... nodes) {
+		remove(Arrays.asList(nodes));
+	}
+
 	public void remove(Collection<ASTNode> nodes) {
 		for (ASTNode node : nodes) {
-			this.removals.add(node);
+			remove(node);
 		}
 	}
 
 	public boolean hasRefactorings() {
 		return !this.replacements.isEmpty() || !this.removals.isEmpty()
-				|| !this.inserts.isEmpty();
+				|| !this.inserts.isEmpty() || !this.commentRemovals.isEmpty();
 	}
 
 	public void insertBefore(ASTNode node, ASTNode element) {
