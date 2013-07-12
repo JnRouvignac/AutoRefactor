@@ -1,22 +1,17 @@
 package org.autorefactor.refactoring;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.jdt.core.dom.ASTNode;
-import org.eclipse.jdt.core.dom.rewrite.ASTRewrite;
-import org.eclipse.jdt.core.dom.rewrite.ITrackedNodePosition;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.text.edits.DeleteEdit;
 import org.eclipse.text.edits.TextEdit;
 
 public class ASTCommentRewriter {
 
-	private static final Pattern whiteSpaces = Pattern.compile("\\s+");
+	private static final Pattern WHITESPACES = Pattern.compile("\\s+");
 	private List<ASTNode> removals = new ArrayList<ASTNode>();
 
 	public ASTCommentRewriter() {

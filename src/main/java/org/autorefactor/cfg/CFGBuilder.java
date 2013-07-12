@@ -869,6 +869,7 @@ public class CFGBuilder {
 	}
 
 	private Pair<Integer, Integer> getLineAndColumn(final int position) {
+		// TODO Use CompilationUnit.getLineNumber() and CompilationUnit.getColumnNumber()
 		// file starts with line 1
 		int lineNo = 1;
 		int lastMatchPosition = 0;
