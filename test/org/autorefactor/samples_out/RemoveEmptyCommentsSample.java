@@ -32,15 +32,19 @@ public class RemoveEmptyCommentsSample {
      */
     private int i;
 
+    /** Convert to a javadoc */
     public RemoveEmptyCommentsSample() {
     }
 
-    // Remove javadoc below
+    /** Remove javadoc below, current comment will be converted to javadoc */
     private boolean test2(int j) {
         // Remove comment line just below
         return false;
     }
 
+    /**
+     * Convert to a javadoc
+     */
     public static void main(String[] args) {
         // remove block comment just below
         // remove comment lines just above and below
@@ -56,6 +60,9 @@ public class RemoveEmptyCommentsSample {
      */
     public void test() {
         /**
+         * This is a javadoc that must be transformed to a blockcomment
+         */
+        /*
          * This is a blockcomment that must be kept
          */
         // This is a linecomment that must be kept

@@ -32,11 +32,12 @@ public class RemoveEmptyCommentsSample {
      */
     private int i;
 
+    // Convert to a javadoc
     public RemoveEmptyCommentsSample() {
         // TODO Auto-generated constructor stub
     }
 
-    // Remove javadoc below
+    // Remove javadoc below, current comment will be converted to javadoc
     /**
      * @param j
      * @return
@@ -47,6 +48,9 @@ public class RemoveEmptyCommentsSample {
         return false;
     }
 
+    /*
+     * Convert to a javadoc
+     */
     public static void main(String[] args) {
         // remove block comment just below
         /*
@@ -60,6 +64,7 @@ public class RemoveEmptyCommentsSample {
             args[0] = "blue";
         } catch (Exception e) {
             // TODO: handle exception
+            // TODO Auto-generated catch block
         }
     }
 
@@ -68,6 +73,9 @@ public class RemoveEmptyCommentsSample {
      */
     public void test() {
         /**
+         * This is a javadoc that must be transformed to a blockcomment
+         */
+        /*
          * This is a blockcomment that must be kept
          */
         // This is a linecomment that must be kept

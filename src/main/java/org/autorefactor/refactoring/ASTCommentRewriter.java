@@ -1,18 +1,23 @@
 package org.autorefactor.refactoring;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.BlockComment;
+import org.eclipse.jdt.core.dom.LineComment;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.text.edits.DeleteEdit;
+import org.eclipse.text.edits.InsertEdit;
+import org.eclipse.text.edits.ReplaceEdit;
 import org.eclipse.text.edits.TextEdit;
 
 public class ASTCommentRewriter {
 
-	private static final Pattern WHITESPACES = Pattern.compile("\\s+");
 	private List<ASTNode> removals = new ArrayList<ASTNode>();
+	private List<BlockComment> blockCommentToJavadoc = new ArrayList<BlockComment>();
+	private List<List<LineComment>> lineCommentsToJavadoc = new ArrayList<List<LineComment>>();
 
 	public ASTCommentRewriter() {
 	}
@@ -21,7 +26,20 @@ public class ASTCommentRewriter {
 		this.removals.add(node);
 	}
 
+	public void toJavadoc(BlockComment comment) {
+		this.blockCommentToJavadoc.add(comment);
+	}
+
+	public void toJavadoc(List<LineComment> comments) {
+		this.lineCommentsToJavadoc.add(comments);
+	}
+
 	public void addEdits(IDocument document, TextEdit edits) {
+		addRemovalEdits(document, edits);
+		addToJavadocEdits(document, edits);
+	}
+
+	private void addRemovalEdits(IDocument document, TextEdit edits) {
 		if (this.removals.isEmpty()) {
 			return;
 		}
@@ -36,6 +54,47 @@ public class ASTCommentRewriter {
 			final int lengthToRemove = endToRemove - startToRemove;
 
 			edits.addChild(new DeleteEdit(startToRemove, lengthToRemove));
+		}
+	}
+
+	private void addToJavadocEdits(IDocument document, TextEdit edits) {
+		for (BlockComment blockComment : this.blockCommentToJavadoc) {
+			final int offset = blockComment.getStartPosition() + "/*".length();
+			edits.addChild(new InsertEdit(offset, "*"));
+		}
+		for (List<LineComment> lineComments : this.lineCommentsToJavadoc) {
+			// TODO Collect all words from the line comments,
+			// then get access to indent settings, line length and newline chars
+			// then spread them across several lines if needed or folded on one line only
+			if (lineComments.size() == 1) {
+				final LineComment lineComment = lineComments.get(0);
+				final int start = lineComment.getStartPosition();
+				// TODO JNR how to obey configured indentation?
+				// TODO JNR how to obey configured line length?
+				edits.addChild(new ReplaceEdit(start, "//".length(), "/**"));
+				edits.addChild(new InsertEdit(start + lineComment.getLength(), " */"));
+				continue;
+			}
+
+			boolean isFirst = true;
+			for (Iterator<LineComment> iter = lineComments.iterator(); iter
+					.hasNext();) {
+				LineComment lineComment = (LineComment) iter.next();
+				if (isFirst) {
+					edits.addChild(new ReplaceEdit(lineComment.getStartPosition(), "//".length(), "/**"));
+					// TODO JNR how to obey configured indentation?
+					// TODO JNR how to obey configured line length?
+					isFirst = false;
+				} else {
+					edits.addChild(new ReplaceEdit(lineComment.getStartPosition(), "//".length(), " *"));
+				}
+				if (!iter.hasNext())  {
+					// this was the last line comment to transform
+					// TODO JNR how to get access to configured newline?
+					// TODO JNR how to obey configured indentation?
+					edits.addChild(new InsertEdit(lineComment.getStartPosition() + lineComment.getLength(), "\n*/"));
+				}
+			}
 		}
 	}
 

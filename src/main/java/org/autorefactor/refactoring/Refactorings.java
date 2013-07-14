@@ -27,6 +27,7 @@ package org.autorefactor.refactoring;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -34,8 +35,10 @@ import java.util.Map;
 
 import org.autorefactor.util.Pair;
 import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.BlockComment;
 import org.eclipse.jdt.core.dom.ChildListPropertyDescriptor;
 import org.eclipse.jdt.core.dom.Comment;
+import org.eclipse.jdt.core.dom.LineComment;
 
 /**
  * Class aggregating all the refactorings performed by a refactoring rule until
@@ -56,6 +59,8 @@ public class Refactorings {
 	 */
 	private final List<ASTNode> removals = new LinkedList<ASTNode>();
 	private final List<Comment> commentRemovals = new LinkedList<Comment>();
+	private final Map<ASTNode, List<LineComment>> lineCommentsToJavadoc = new HashMap<ASTNode, List<LineComment>>();
+	private final List<BlockComment> blockCommentToJavadoc = new LinkedList<BlockComment>();
 
 	/**
 	 * Describes where to insert new code: before or after an existing
@@ -111,6 +116,14 @@ public class Refactorings {
 		return this.commentRemovals;
 	}
 
+	public List<BlockComment> getBlockCommentToJavadoc() {
+		return blockCommentToJavadoc;
+	}
+
+	public Collection<List<LineComment>> getLineCommentsToJavadoc() {
+		return lineCommentsToJavadoc.values();
+	}
+
 	public void replace(ASTNode node, ASTNode replacement) {
 		this.replacements.add(Pair.of(node, replacement));
 	}
@@ -135,7 +148,9 @@ public class Refactorings {
 
 	public boolean hasRefactorings() {
 		return !this.replacements.isEmpty() || !this.removals.isEmpty()
-				|| !this.inserts.isEmpty() || !this.commentRemovals.isEmpty();
+				|| !this.inserts.isEmpty() || !this.commentRemovals.isEmpty()
+				|| !this.lineCommentsToJavadoc.isEmpty()
+				|| !this.blockCommentToJavadoc.isEmpty();
 	}
 
 	public void insertBefore(ASTNode node, ASTNode element) {
@@ -156,6 +171,19 @@ public class Refactorings {
 			this.inserts.put(clpd, inserts);
 		}
 		inserts.add(insert);
+	}
+
+	public void toJavadoc(LineComment lineComment, ASTNode nextNode) {
+		List<LineComment> comments = this.lineCommentsToJavadoc.get(nextNode);
+		if (comments == null) {
+			comments = new LinkedList<LineComment>();
+			this.lineCommentsToJavadoc.put(nextNode, comments);
+		}
+		comments.add(lineComment);
+	}
+
+	public void toJavadoc(BlockComment blockComment) {
+		this.blockCommentToJavadoc.add(blockComment);
 	}
 
 }

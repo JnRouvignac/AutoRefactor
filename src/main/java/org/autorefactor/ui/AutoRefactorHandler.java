@@ -81,8 +81,10 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTParser;
+import org.eclipse.jdt.core.dom.BlockComment;
 import org.eclipse.jdt.core.dom.ChildListPropertyDescriptor;
 import org.eclipse.jdt.core.dom.CompilationUnit;
+import org.eclipse.jdt.core.dom.LineComment;
 import org.eclipse.jdt.core.dom.rewrite.ASTRewrite;
 import org.eclipse.jdt.core.dom.rewrite.ListRewrite;
 import org.eclipse.jdt.internal.core.ExternalPackageFragmentRoot;
@@ -562,6 +564,12 @@ public class AutoRefactorHandler extends AbstractHandler {
 		final ASTCommentRewriter commentRewriter = new ASTCommentRewriter();
 		for (ASTNode toRemove : refactorings.getCommentRemovals()) {
 			commentRewriter.remove(toRemove);
+		}
+		for (BlockComment toJavadoc : refactorings.getBlockCommentToJavadoc()) {
+			commentRewriter.toJavadoc(toJavadoc);
+		}
+		for (List<LineComment> toJavadoc : refactorings.getLineCommentsToJavadoc()) {
+			commentRewriter.toJavadoc(toJavadoc);
 		}
 		return Pair.of(rewrite, commentRewriter);
 	}

@@ -32,12 +32,23 @@ import org.autorefactor.refactoring.ASTHelper;
 import org.autorefactor.refactoring.IJavaRefactoring;
 import org.autorefactor.refactoring.Refactorings;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
+import org.eclipse.jdt.core.dom.AbstractTypeDeclaration;
+import org.eclipse.jdt.core.dom.AnnotationTypeMemberDeclaration;
+import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
 import org.eclipse.jdt.core.dom.BlockComment;
 import org.eclipse.jdt.core.dom.Comment;
 import org.eclipse.jdt.core.dom.CompilationUnit;
+import org.eclipse.jdt.core.dom.EnumConstantDeclaration;
+import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.Javadoc;
 import org.eclipse.jdt.core.dom.LineComment;
+import org.eclipse.jdt.core.dom.MethodDeclaration;
+import org.eclipse.jdt.core.dom.NodeFinder;
+import org.eclipse.jdt.core.dom.SimpleName;
+import org.eclipse.jdt.core.dom.TagElement;
+import org.eclipse.jdt.core.dom.TextElement;
 
 /**
  * Remove all empty comments.
@@ -50,13 +61,14 @@ public class RemoveEmptyCommentsRefactoring extends ASTVisitor implements
 	private static final Pattern EMPTY_JAVADOC = Pattern.compile("/\\*\\*\\s*(\\*\\s*)*\\*/");
 	private static final Pattern ECLIPSE_GENERATED_TODOS = Pattern.compile("//\\s*"
 			+ "(:?"
-			+   "(?:TODO Auto-generated (?:(?:method|constructor) stub)|(?:catch block))"
+			+   "(?:TODO Auto-generated (?:(?:(?:method|constructor) stub)|(?:catch block)))"
 			+ "|"
 			+   "(?:TODO: handle exception)"
 			+ ")"
 			+ "\\s*");
 
 	private RefactoringContext ctx;
+	private CompilationUnit astRoot;
 
 	public RemoveEmptyCommentsRefactoring() {
 		super();
@@ -76,23 +88,124 @@ public class RemoveEmptyCommentsRefactoring extends ASTVisitor implements
 		if (EMPTY_BLOCK_COMMENT.matcher(comment).matches()) {
 			this.ctx.getRefactorings().remove(node);
 			return ASTHelper.DO_NOT_VISIT_SUBTREE;
+		} else if (acceptJavadoc(getNextNode(node))) {
+			this.ctx.getRefactorings().toJavadoc(node);
+			return ASTHelper.DO_NOT_VISIT_SUBTREE;
 		}
 		return super.visit(node);
 	}
 
+	private ASTNode getNextNode(Comment node) {
+		final int nodeEndPosition = node.getStartPosition() + node.getLength();
+		final ASTNode root = getCoveringNode(node);
+		final int parentNodeEndPosition = root.getStartPosition() + root.getLength();
+		final NodeFinder finder = new NodeFinder(root,
+				nodeEndPosition, parentNodeEndPosition - nodeEndPosition);
+		return finder.getCoveredNode();
+	}
+
+	private ASTNode getCoveringNode(Comment node) {
+		final ASTNode root = this.astRoot;
+		final NodeFinder finder = new NodeFinder(root, node.getStartPosition(),
+				node.getLength());
+		return finder.getCoveringNode();
+	}
+
 	@Override
 	public boolean visit(Javadoc node) {
-		// TODO JNR
 		final String comment = getComment(node);
 		if (EMPTY_JAVADOC.matcher(comment).matches()) {
 			this.ctx.getRefactorings().remove(node);
 			return ASTHelper.DO_NOT_VISIT_SUBTREE;
-		}
-		if (node.tags().size() == 0) {
+		} else if (allTagsEmpty(node.tags())) {
 			this.ctx.getRefactorings().remove(node);
 			return ASTHelper.DO_NOT_VISIT_SUBTREE;
+		} else if (!acceptJavadoc(getNextNode(node))) {
+			// TODO JNR convert to block comment
 		}
 		return super.visit(node);
+	}
+
+	private boolean allTagsEmpty(List<TagElement> tags) {
+		return !anyTagNotEmpty(tags, false);
+	}
+
+	/**
+	 * A tag is considered empty when it does not provide any useful information
+	 * beyond what is already in the code.
+	 * 
+	 * @param tags the tags to look for emptiness
+	 * @param throwIfUnknown only useful for debugging. For now, default is to not remove tag or throw when unknown
+	 * @return true if any tag is not empty, false otherwise
+	 */
+	private boolean anyTagNotEmpty(List<TagElement> tags, boolean throwIfUnknown) {
+		if (tags.isEmpty()) {
+			return false;
+		}
+		for (TagElement tag : tags) {
+			if (isNotEmpty(tag, throwIfUnknown)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private boolean isNotEmpty(TagElement tag, boolean throwIfUnknown) {
+		if (tag.getTagName() == null) {
+			if (anyTextElementNotEmpty(tag.fragments(), throwIfUnknown)) {
+				return true;
+			}
+//			} else if (TagElement.TAG_AUTHOR.equals(tag.getTagName())) {
+//			} else if (TagElement.TAG_CODE.equals(tag.getTagName())) {
+//			} else if (TagElement.TAG_DEPRECATED.equals(tag.getTagName())) {
+//			} else if (TagElement.TAG_DOCROOT.equals(tag.getTagName())) {
+//			} else if (TagElement.TAG_EXCEPTION.equals(tag.getTagName())) {
+//			} else if (TagElement.TAG_INHERITDOC.equals(tag.getTagName())) {
+//			} else if (TagElement.TAG_LINK.equals(tag.getTagName())) {
+//			} else if (TagElement.TAG_LINKPLAIN.equals(tag.getTagName())) {
+//			} else if (TagElement.TAG_LITERAL.equals(tag.getTagName())) {
+		} else if (TagElement.TAG_PARAM.equals(tag.getTagName())) {
+			if (anyTextElementNotEmpty(tag.fragments(), throwIfUnknown)) {
+				// TODO JNR a @param tag repeating the parameters of the method is useless  
+				return true;
+			}
+		} else if (TagElement.TAG_RETURN.equals(tag.getTagName())) {
+			if (anyTextElementNotEmpty(tag.fragments(), throwIfUnknown)) {
+				// TODO JNR a return tag repeating the return type of the method is useless  
+				return true;
+			}
+//			} else if (TagElement.TAG_SEE.equals(tag.getTagName())) {
+//			} else if (TagElement.TAG_SERIAL.equals(tag.getTagName())) {
+//			} else if (TagElement.TAG_SERIALDATA.equals(tag.getTagName())) {
+//			} else if (TagElement.TAG_SERIALFIELD.equals(tag.getTagName())) {
+//			} else if (TagElement.TAG_SINCE.equals(tag.getTagName())) {
+//			} else if (TagElement.TAG_THROWS.equals(tag.getTagName())) {
+			// TODO JNR a @throws tag repeating the checked exceptions of the method is useless  
+//			} else if (TagElement.TAG_VALUE.equals(tag.getTagName())) {
+//			} else if (TagElement.TAG_VERSION.equals(tag.getTagName())) {
+		} else if (throwIfUnknown) {
+			throw new RuntimeException("Not implemented for tagName " + tag.getTagName());
+		}
+		return false;
+	}
+
+	private boolean anyTextElementNotEmpty(List<?> fragments, boolean throwIfUnknown) {
+		for (Object fragment : fragments) {
+			if (fragment instanceof TextElement) {
+				String text = ((TextElement) fragment).getText();
+				if (text != null && text.length() > 0) {
+					return true;
+				}
+			} else if (throwIfUnknown) {
+				throw new RuntimeException(notImplementedFor(fragment));
+			}
+		}
+		return false;
+	}
+
+	private String notImplementedFor(Object fragment) {
+		return "Not implemented for an object of type "
+				+ (fragment != null ? fragment.getClass().getSimpleName() : null);
 	}
 
 	@Override
@@ -101,15 +214,34 @@ public class RemoveEmptyCommentsRefactoring extends ASTVisitor implements
 		if (EMPTY_LINE_COMMENT.matcher(comment).matches()) {
 			this.ctx.getRefactorings().remove(node);
 			return ASTHelper.DO_NOT_VISIT_SUBTREE;
-		}
-		if (ECLIPSE_GENERATED_TODOS.matcher(comment).matches()) {
+		} else if (ECLIPSE_GENERATED_TODOS.matcher(comment).matches()) {
 			this.ctx.getRefactorings().remove(node);
 			return ASTHelper.DO_NOT_VISIT_SUBTREE;
+		} else {
+			final ASTNode nextNode = getNextNode(node);
+			if (acceptJavadoc(nextNode)) {
+				this.ctx.getRefactorings().toJavadoc(node, nextNode);
+				return ASTHelper.DO_NOT_VISIT_SUBTREE;
+			}
 		}
 		return super.visit(node);
 	}
 
+	private boolean acceptJavadoc(final ASTNode node) {
+		if (node == null) {
+			return false;
+		}
+		return node instanceof AbstractTypeDeclaration
+				// covers annotation, enums, classes and interfaces
+				|| node instanceof AnonymousClassDeclaration
+				|| node instanceof MethodDeclaration
+				|| node instanceof FieldDeclaration
+				|| node instanceof AnnotationTypeMemberDeclaration
+				|| node instanceof EnumConstantDeclaration;
+	}
+
 	public Refactorings getRefactorings(CompilationUnit astRoot) {
+		this.astRoot = astRoot;
 		for (Comment comment : (List<Comment>) astRoot.getCommentList()) {
 			if (comment.isBlockComment()) {
 				final BlockComment bc = (BlockComment) comment;
