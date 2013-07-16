@@ -186,4 +186,24 @@ public class Refactorings {
 		this.blockCommentToJavadoc.add(blockComment);
 	}
 
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		append(sb, replacements.size(), "replacements");
+		append(sb, inserts.size(), "inserts");
+		append(sb, removals.size(), "removals");
+		append(sb, commentRemovals.size(), "commentRemovals");
+		append(sb, lineCommentsToJavadoc.size(), "lineCommentsToJavadoc");
+		append(sb, blockCommentToJavadoc.size(), "blockCommentToJavadoc");
+		return sb.toString();
+	}
+
+	private void append(StringBuilder sb, int size, String s) {
+		if (size > 0) {
+			if (sb.length() > 0) {
+				sb.append(", ");
+			}
+			sb.append(size).append(" ").append(s);
+		}
+	}
 }

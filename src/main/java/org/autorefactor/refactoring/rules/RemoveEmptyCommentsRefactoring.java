@@ -46,7 +46,6 @@ import org.eclipse.jdt.core.dom.Javadoc;
 import org.eclipse.jdt.core.dom.LineComment;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.NodeFinder;
-import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.TagElement;
 import org.eclipse.jdt.core.dom.TextElement;
 
@@ -92,7 +91,7 @@ public class RemoveEmptyCommentsRefactoring extends ASTVisitor implements
 			this.ctx.getRefactorings().toJavadoc(node);
 			return ASTHelper.DO_NOT_VISIT_SUBTREE;
 		}
-		return super.visit(node);
+		return ASTHelper.VISIT_SUBTREE;
 	}
 
 	private ASTNode getNextNode(Comment node) {
@@ -123,7 +122,7 @@ public class RemoveEmptyCommentsRefactoring extends ASTVisitor implements
 		} else if (!acceptJavadoc(getNextNode(node))) {
 			// TODO JNR convert to block comment
 		}
-		return super.visit(node);
+		return ASTHelper.VISIT_SUBTREE;
 	}
 
 	private boolean allTagsEmpty(List<TagElement> tags) {
@@ -224,7 +223,7 @@ public class RemoveEmptyCommentsRefactoring extends ASTVisitor implements
 				return ASTHelper.DO_NOT_VISIT_SUBTREE;
 			}
 		}
-		return super.visit(node);
+		return ASTHelper.VISIT_SUBTREE;
 	}
 
 	private boolean acceptJavadoc(final ASTNode node) {
