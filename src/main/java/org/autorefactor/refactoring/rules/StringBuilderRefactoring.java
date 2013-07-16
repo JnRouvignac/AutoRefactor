@@ -45,7 +45,6 @@ import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.InfixExpression.Operator;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Name;
-import org.eclipse.jdt.core.dom.StringLiteral;
 
 /**
  * StringBuilder related refactorings:
@@ -60,6 +59,15 @@ import org.eclipse.jdt.core.dom.StringLiteral;
  */
 public class StringBuilderRefactoring extends ASTVisitor implements
 		IJavaRefactoring {
+
+	private static final class BooleanHolder {
+
+		private boolean value;
+
+		public BooleanHolder(boolean defaultValue) {
+			this.value = defaultValue;
+		}
+	}
 
 	private RefactoringContext ctx;
 	private int javaMinorVersion;
@@ -88,14 +96,56 @@ public class StringBuilderRefactoring extends ASTVisitor implements
 
 	@Override
 	public boolean visit(InfixExpression node) {
+		// TODO JNR also remove valueOf() methods in these cases, etc.:
+		// String s = "" + String.valueOf(1);
+		// String s = "" + Integer.toString(1);
+		// String s = "" + Long.toString(1);
 		if (Operator.PLUS.equals(node.getOperator())
-				&& "".equals(node.getRightOperand().resolveConstantExpressionValue())
-				&& ASTHelper.hasType(node.getLeftOperand(), "java.lang.String")) {
-			Expression newE = ASTHelper.copySubtree(this.ctx.getAST(), node.getLeftOperand());
-			this.ctx.getRefactorings().replace(node, newE);
+				&& ASTHelper.hasType(node, "java.lang.String")) {
+			final LinkedList<Expression> allOperands = new LinkedList<Expression>();
+			addAllSubExpressions(node, allOperands, null);
+			boolean replaceNeeded = filterOutEmptyStringsFromStringConcat(allOperands);
+			if (replaceNeeded) {
+				this.ctx.getRefactorings().replace(node, createStringConcats(allOperands));
+			}
+			// FIXME In theory commented code down below should work better than current code above
+			// (preserving comments, etc.), but in practice it does not work at all.
+			// for (Expression operand : allOperands) {
+			// if ("".equals(operand.resolveConstantExpressionValue())) {
+			// this.ctx.getRefactorings().remove(operand);
+			// }
+			// }
 			return ASTHelper.DO_NOT_VISIT_SUBTREE;
 		}
-		return super.visit(node);
+		return ASTHelper.VISIT_SUBTREE;
+	}
+
+	private boolean filterOutEmptyStringsFromStringConcat(List<Expression> allOperands) {
+		boolean replaceNeeded = false;
+		boolean canRemoveEmptyStrings = false;
+		for (int i = 0; i < allOperands.size(); i++) {
+			Expression expr = allOperands.get(i);
+			boolean canNowRemoveEmptyStrings = canRemoveEmptyStrings
+					|| ASTHelper.hasType(expr, "java.lang.String");
+			if ("".equals(expr.resolveConstantExpressionValue())) {
+
+				boolean removeExpr = false;
+				if (canRemoveEmptyStrings) {
+					removeExpr = true;
+				} else if (canNowRemoveEmptyStrings
+						&& i + 1 < allOperands.size()
+						&& ASTHelper.hasType(allOperands.get(i + 1), "java.lang.String")) {
+					removeExpr = true;
+				}
+
+				if (removeExpr) {
+					allOperands.remove(i);
+					replaceNeeded = true;
+				}
+			}
+			canRemoveEmptyStrings = canNowRemoveEmptyStrings;
+		}
+		return replaceNeeded;
 	}
 
 	@Override
@@ -110,14 +160,17 @@ public class StringBuilderRefactoring extends ASTVisitor implements
 				// most expensive check comes last
 				&& ASTHelper.instanceOf(typeBinding, "java.lang.Appendable")) {
 			final LinkedList<Expression> allAppendedStrings = new LinkedList<Expression>();
+			final BooleanHolder foundInfixExpr = new BooleanHolder(false);
 			final Expression lastExpr = collectAllAppendedStrings(node,
-					allAppendedStrings);
+					allAppendedStrings, foundInfixExpr);
 			if (lastExpr instanceof Name || lastExpr instanceof FieldAccess) {
-				// TODO do EfficientAppendableUse
-				// TODO if content is equal to 0 + "", then drop ""
-				this.ctx.getRefactorings().replace(node,
-						createStringAppends(lastExpr, allAppendedStrings));
-				return ASTHelper.DO_NOT_VISIT_SUBTREE;
+				boolean rewriteNeeded = filterOutEmptyStrings(allAppendedStrings);
+				if (rewriteNeeded || foundInfixExpr.value) {
+					// rewrite the successive calls to append() on an Appendable
+					this.ctx.getRefactorings().replace(node,
+							createStringAppends(lastExpr, allAppendedStrings));
+					return ASTHelper.DO_NOT_VISIT_SUBTREE;
+				}
 			}
 		} else if ("toString".equals(node.getName().getIdentifier())
 				&& node.arguments().isEmpty()
@@ -125,10 +178,11 @@ public class StringBuilderRefactoring extends ASTVisitor implements
 						"java.lang.StringBuilder", "java.lang.StringBuffer")) {
 			final LinkedList<Expression> allAppendedStrings = new LinkedList<Expression>();
 			final Expression lastExpr = collectAllAppendedStrings(
-					node.getExpression(), allAppendedStrings);
+					node.getExpression(), allAppendedStrings, null);
 			// TODO new StringBuffer().append(" bla").append("bla").toString();
 			// outputs " blabla"
 			if (lastExpr instanceof ClassInstanceCreation) {
+				// replace with String concatenation
 				this.ctx.getRefactorings().replace(node,
 						createStringConcats(allAppendedStrings));
 				return ASTHelper.DO_NOT_VISIT_SUBTREE;
@@ -137,8 +191,19 @@ public class StringBuilderRefactoring extends ASTVisitor implements
 		return ASTHelper.VISIT_SUBTREE;
 	}
 
-	private ASTNode createStringAppends(Expression lastExpr,
-			List<Expression> appendedStrings) {
+	private boolean filterOutEmptyStrings(List<Expression> allExprs) {
+		boolean result = false;
+		for (Iterator<Expression> iter = allExprs.iterator(); iter.hasNext();) {
+			Expression expr = iter.next();
+			if ("".equals(expr.resolveConstantExpressionValue())) {
+				iter.remove();
+				result = true;
+			}
+		}
+		return result;
+	}
+
+	private ASTNode createStringAppends(Expression lastExpr, List<Expression> appendedStrings) {
 		Expression result = lastExpr;
 		for (Expression expr : appendedStrings) {
 			if (result == null) {
@@ -147,7 +212,7 @@ public class StringBuilderRefactoring extends ASTVisitor implements
 				final MethodInvocation mi = this.ctx.getAST().newMethodInvocation();
 				mi.setExpression(result);
 				mi.setName(this.ctx.getAST().newSimpleName("append"));
-				mi.arguments().add(expr);
+				mi.arguments().add(copy(expr));
 				result = mi;
 			}
 		}
@@ -163,27 +228,26 @@ public class StringBuilderRefactoring extends ASTVisitor implements
 
 		final Iterator<Expression> it = appendedStrings.iterator();
 		final InfixExpression ie = this.ctx.getAST().newInfixExpression();
-		ie.setLeftOperand(it.next());
+		ie.setLeftOperand(copy(it.next()));
 		ie.setOperator(Operator.PLUS);
-		ie.setRightOperand(it.next());
+		ie.setRightOperand(copy(it.next()));
 		while (it.hasNext()) {
-			ie.extendedOperands().add(it.next());
+			ie.extendedOperands().add(copy(it.next()));
 		}
 		return ie;
 	}
 
 	private Expression collectAllAppendedStrings(Expression expr,
-			final LinkedList<Expression> results) {
-		if (ASTHelper.hasType(expr, "java.lang.StringBuilder",
-				"java.lang.StringBuffer")) {
+			final LinkedList<Expression> allOperands, BooleanHolder foundInfixExpr) {
+		if (ASTHelper.hasType(expr, "java.lang.StringBuilder", "java.lang.StringBuffer")) {
 			if (expr instanceof MethodInvocation) {
 				final MethodInvocation mi = (MethodInvocation) expr;
 				if ("append".equals(mi.getName().getIdentifier())
 						&& mi.arguments().size() == 1) {
 					final Expression arg = (Expression) mi.arguments().get(0);
-					addAllAppendedString(arg, results);
-					return collectAllAppendedStrings(mi.getExpression(),
-							results);
+					addAllSubExpressions(arg, allOperands, foundInfixExpr);
+					return collectAllAppendedStrings(mi.getExpression(), allOperands,
+							foundInfixExpr);
 				}
 			} else if (expr instanceof ClassInstanceCreation) {
 				final ClassInstanceCreation cic = (ClassInstanceCreation) expr;
@@ -192,19 +256,23 @@ public class StringBuilderRefactoring extends ASTVisitor implements
 					if (ASTHelper.hasType(arg, "java.lang.String")
 							|| ASTHelper.instanceOf(arg.resolveTypeBinding(),
 									"java.lang.CharSequence")) {
-						results.addFirst(ASTHelper.copySubtree(this.ctx.getAST(), arg));
+						allOperands.addFirst(copy(arg));
 					}
 				}
-				return ASTHelper.copySubtree(this.ctx.getAST(), cic);
+				return copy(cic);
 			} else if (expr instanceof Name || expr instanceof FieldAccess) {
-				return ASTHelper.copySubtree(this.ctx.getAST(), expr);
+				return copy(expr);
 			}
 		}
 		return null;
 	}
 
-	private void addAllAppendedString(final Expression arg,
-			final LinkedList<Expression> results) {
+	private <T> T copy(T node) {
+		return ASTHelper.copySubtree(this.ctx.getAST(), node);
+	}
+
+	private void addAllSubExpressions(final Expression arg, final LinkedList<Expression> results,
+			final BooleanHolder foundInfixExpr) {
 		if (arg instanceof InfixExpression) {
 			final InfixExpression ie = (InfixExpression) arg;
 			if (InfixExpression.Operator.PLUS.equals(ie.getOperator())) {
@@ -213,21 +281,18 @@ public class StringBuilderRefactoring extends ASTVisitor implements
 							new ArrayList<Expression>(ie.extendedOperands());
 					Collections.reverse(reversed);
 					for (Expression op : reversed) {
-						addAllAppendedString(op, results);
+						addAllSubExpressions(op, results, foundInfixExpr);
 					}
 				}
-				addAllAppendedString(ie.getRightOperand(), results);
-				addAllAppendedString(ie.getLeftOperand(), results);
+				addAllSubExpressions(ie.getRightOperand(), results, foundInfixExpr);
+				addAllSubExpressions(ie.getLeftOperand(), results, foundInfixExpr);
+				if (foundInfixExpr != null) {
+					foundInfixExpr.value = true;
+				}
 				return;
 			}
 		}
-		if (arg instanceof StringLiteral) {
-			final StringLiteral sl = (StringLiteral) arg;
-			if ("".equals(sl.getLiteralValue())) {
-				return;
-			}
-		}
-		results.addFirst(ASTHelper.copySubtree(this.ctx.getAST(), arg));
+		results.addFirst(arg);
 	}
 
 	public Refactorings getRefactorings(CompilationUnit astRoot) {

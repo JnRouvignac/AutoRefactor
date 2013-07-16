@@ -47,8 +47,15 @@ public class StringBuilderSample {
     }
 
     public void removeUselessStringConcatenation() {
-        String s1 = Integer.toString(42) + "";
-        String s2 = "foo " + "" + 0 + "bar " + 1 + "";
+        String s1 = Integer.toString(42) + "" + "";
+        // FIXME First empty string is not removed.
+        // This is a bug with ASTNode.resolveConstantExpressionValue()
+        String s2 = "foo " + "" + 0 + "" + "bar " + 1 + "";
+        String s3 = 1 + "" + "foo";
+    }
+
+    public void doNotRemoveStringConcatenation() {
+        String s1 = 1 + "";
     }
 
 }
