@@ -25,7 +25,7 @@
  */
 package org.autorefactor.samples_out;
 
-public class RemoveEmptyCommentsSample {
+public class RemoveEmptyCommentsSample implements Runnable {
 
     /**
      * This is a javadoc that must be kept 
@@ -66,5 +66,13 @@ public class RemoveEmptyCommentsSample {
          * This is a blockcomment that must be kept
          */
         // This is a linecomment that must be kept
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void run()
+    {
     }
 }

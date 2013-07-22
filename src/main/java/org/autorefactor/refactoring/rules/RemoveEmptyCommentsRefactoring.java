@@ -78,8 +78,6 @@ public class RemoveEmptyCommentsRefactoring extends ASTVisitor implements
 	}
 
 	// TODO also remove commented out code
-	// TODO also transform block or line comments into javadocs where possible
-	// TODO See http://www.eclipse.org/articles/article.php?file=Article-JavaCodeManipulation_AST/index.html#sec-managing-comments
 
 	@Override
 	public boolean visit(BlockComment node) {
@@ -132,7 +130,7 @@ public class RemoveEmptyCommentsRefactoring extends ASTVisitor implements
 	/**
 	 * A tag is considered empty when it does not provide any useful information
 	 * beyond what is already in the code.
-	 * 
+	 *
 	 * @param tags the tags to look for emptiness
 	 * @param throwIfUnknown only useful for debugging. For now, default is to not remove tag or throw when unknown
 	 * @return true if any tag is not empty, false otherwise
@@ -159,18 +157,19 @@ public class RemoveEmptyCommentsRefactoring extends ASTVisitor implements
 //			} else if (TagElement.TAG_DEPRECATED.equals(tag.getTagName())) {
 //			} else if (TagElement.TAG_DOCROOT.equals(tag.getTagName())) {
 //			} else if (TagElement.TAG_EXCEPTION.equals(tag.getTagName())) {
-//			} else if (TagElement.TAG_INHERITDOC.equals(tag.getTagName())) {
+		} else if (TagElement.TAG_INHERITDOC.equals(tag.getTagName())) {
+			return true;
 //			} else if (TagElement.TAG_LINK.equals(tag.getTagName())) {
 //			} else if (TagElement.TAG_LINKPLAIN.equals(tag.getTagName())) {
 //			} else if (TagElement.TAG_LITERAL.equals(tag.getTagName())) {
 		} else if (TagElement.TAG_PARAM.equals(tag.getTagName())) {
 			if (anyTextElementNotEmpty(tag.fragments(), throwIfUnknown)) {
-				// TODO JNR a @param tag repeating the parameters of the method is useless  
+				// TODO JNR a @param tag repeating the parameters of the method is useless
 				return true;
 			}
 		} else if (TagElement.TAG_RETURN.equals(tag.getTagName())) {
 			if (anyTextElementNotEmpty(tag.fragments(), throwIfUnknown)) {
-				// TODO JNR a return tag repeating the return type of the method is useless  
+				// TODO JNR a return tag repeating the return type of the method is useless
 				return true;
 			}
 //			} else if (TagElement.TAG_SEE.equals(tag.getTagName())) {
@@ -179,7 +178,7 @@ public class RemoveEmptyCommentsRefactoring extends ASTVisitor implements
 //			} else if (TagElement.TAG_SERIALFIELD.equals(tag.getTagName())) {
 //			} else if (TagElement.TAG_SINCE.equals(tag.getTagName())) {
 //			} else if (TagElement.TAG_THROWS.equals(tag.getTagName())) {
-			// TODO JNR a @throws tag repeating the checked exceptions of the method is useless  
+			// TODO JNR a @throws tag repeating the checked exceptions of the method is useless
 //			} else if (TagElement.TAG_VALUE.equals(tag.getTagName())) {
 //			} else if (TagElement.TAG_VERSION.equals(tag.getTagName())) {
 		} else if (throwIfUnknown) {
@@ -189,13 +188,21 @@ public class RemoveEmptyCommentsRefactoring extends ASTVisitor implements
 	}
 
 	private boolean anyTextElementNotEmpty(List<?> fragments, boolean throwIfUnknown) {
-		for (Object fragment : fragments) {
+		for (/* IDocElement */ Object fragment : fragments) {
 			if (fragment instanceof TextElement) {
 				String text = ((TextElement) fragment).getText();
 				if (text != null && text.length() > 0) {
 					return true;
 				}
+			} else if (fragment instanceof TagElement) {
+				if (isNotEmpty((TagElement) fragment, throwIfUnknown)) {
+					return true;
+				}
 			} else if (throwIfUnknown) {
+				// It could be one of the following:
+				// org.eclipse.jdt.core.dom.MemberRef
+				// org.eclipse.jdt.core.dom.MethodRef
+				// org.eclipse.jdt.core.dom.Name
 				throw new RuntimeException(notImplementedFor(fragment));
 			}
 		}
