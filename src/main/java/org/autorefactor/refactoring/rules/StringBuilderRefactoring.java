@@ -45,6 +45,7 @@ import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.InfixExpression.Operator;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Name;
+import org.eclipse.jdt.core.dom.StringLiteral;
 
 /**
  * StringBuilder related refactorings:
@@ -127,7 +128,7 @@ public class StringBuilderRefactoring extends ASTVisitor implements
 			Expression expr = allOperands.get(i);
 			boolean canNowRemoveEmptyStrings = canRemoveEmptyStrings
 					|| ASTHelper.hasType(expr, "java.lang.String");
-			if ("".equals(expr.resolveConstantExpressionValue())) {
+			if (isEmptyString(expr)) {
 
 				boolean removeExpr = false;
 				if (canRemoveEmptyStrings) {
@@ -146,6 +147,14 @@ public class StringBuilderRefactoring extends ASTVisitor implements
 			canRemoveEmptyStrings = canNowRemoveEmptyStrings;
 		}
 		return replaceNeeded;
+	}
+
+	private boolean isEmptyString(Expression expr) {
+		return "".equals(expr.resolveConstantExpressionValue())
+				// Due to a bug with ASTNode.resolveConstantExpressionValue()
+				// in Eclipse 3.7.2 and 3.8.0, this second check is necessary
+				|| (expr instanceof StringLiteral
+						&& "".equals(((StringLiteral) expr).getLiteralValue()));
 	}
 
 	@Override
@@ -195,7 +204,7 @@ public class StringBuilderRefactoring extends ASTVisitor implements
 		boolean result = false;
 		for (Iterator<Expression> iter = allExprs.iterator(); iter.hasNext();) {
 			Expression expr = iter.next();
-			if ("".equals(expr.resolveConstantExpressionValue())) {
+			if (isEmptyString(expr)) {
 				iter.remove();
 				result = true;
 			}
