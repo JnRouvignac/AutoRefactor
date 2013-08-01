@@ -50,10 +50,18 @@ import org.eclipse.jdt.core.dom.TagElement;
 import org.eclipse.jdt.core.dom.TextElement;
 
 /**
- * Remove all empty comments.
+ * Refactor comments:
+ * <ul>
+ * <li>Remove empty comments</li>
+ * <li>Transform comments into javadocs</li>
+ * <li>TODO Transform javadocs into comments</li>
+ * <li>Remove IDE generated TODOs</li>
+ * <li>TODO Remove commented out code</li>
+ * <li>TODO Fix malformed/incomplete javadocs</li>
+ * <li>TODO Fix typo in comments</li>
+ * </ul>
  */
-public class RemoveEmptyCommentsRefactoring extends ASTVisitor implements
-		IJavaRefactoring {
+public class CommentsRefactoring extends ASTVisitor implements IJavaRefactoring {
 
 	private static final Pattern EMPTY_LINE_COMMENT = Pattern.compile("//\\s*");
 	private static final Pattern EMPTY_BLOCK_COMMENT = Pattern.compile("/\\*\\s*(\\*\\s*)*\\*/");
@@ -69,15 +77,13 @@ public class RemoveEmptyCommentsRefactoring extends ASTVisitor implements
 	private RefactoringContext ctx;
 	private CompilationUnit astRoot;
 
-	public RemoveEmptyCommentsRefactoring() {
+	public CommentsRefactoring() {
 		super();
 	}
 
 	public void setRefactoringContext(RefactoringContext ctx) {
 		this.ctx = ctx;
 	}
-
-	// TODO also remove commented out code
 
 	@Override
 	public boolean visit(BlockComment node) {

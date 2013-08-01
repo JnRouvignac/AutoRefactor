@@ -47,12 +47,12 @@ import org.autorefactor.refactoring.rules.AddBracketsToControlStatementRefactori
 import org.autorefactor.refactoring.rules.BigDecimalRefactorings;
 import org.autorefactor.refactoring.rules.BooleanRefactoring;
 import org.autorefactor.refactoring.rules.CollapseIfStatementRefactoring;
+import org.autorefactor.refactoring.rules.CommentsRefactoring;
 import org.autorefactor.refactoring.rules.CommonCodeInIfElseStatementRefactoring;
 import org.autorefactor.refactoring.rules.DeadCodeEliminationRefactoring;
 import org.autorefactor.refactoring.rules.InvertEqualsRefactoring;
 import org.autorefactor.refactoring.rules.PrimitiveWrapperCreationRefactoring;
 import org.autorefactor.refactoring.rules.RefactoringContext;
-import org.autorefactor.refactoring.rules.RemoveEmptyCommentsRefactoring;
 import org.autorefactor.refactoring.rules.RemoveUnnecessaryLocalBeforeReturnRefactoring;
 import org.autorefactor.refactoring.rules.RemoveUselessModifiersRefactoring;
 import org.autorefactor.refactoring.rules.SimplifyExpressionRefactoring;
@@ -305,14 +305,13 @@ public class AutoRefactorHandler extends AbstractHandler {
 	}
 
 	public Object execute(final ExecutionEvent event) throws ExecutionException {
-		// TODO JNR keep track of the job so it can be cancelled by the plugin on workspace exit
-
 		boolean useTests = false; // local variable helps switching while debugging
 		if (useTests) {
 			new ApplyRefactoringsJob(event).testWithSamples();
 			return Status.OK_STATUS;
 		}
 
+		// TODO JNR keep track of the job so it can be cancelled by the plugin on workspace exit
 		new ApplyRefactoringsJob(event).run(null);
 
 		// TODO JNR provide a maven plugin
@@ -599,7 +598,7 @@ public class AutoRefactorHandler extends AbstractHandler {
 				// TODO JNR - to be completed
 				// new ReduceVariableScopeRefactoring(),
 				new StringBuilderRefactoring(),
-				new RemoveEmptyCommentsRefactoring(),
+				new CommentsRefactoring(),
 				new RemoveUnnecessaryLocalBeforeReturnRefactoring(),
 				new RemoveUselessModifiersRefactoring());
 	}
