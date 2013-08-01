@@ -25,15 +25,15 @@
  */
 package org.autorefactor.samples_in;
 
-public class RemoveEmptyCommentsSample implements Runnable {
+public class CommentsSample implements Runnable {
 
     /**
-     * This is a javadoc that must be kept 
+     * This is a javadoc that must be kept
      */
     private int i;
 
     // Convert to a javadoc
-    public RemoveEmptyCommentsSample() {
+    public CommentsSample() {
         // TODO Auto-generated constructor stub
     }
 
@@ -80,7 +80,7 @@ public class RemoveEmptyCommentsSample implements Runnable {
          */
         // This is a linecomment that must be kept
     }
-    
+
     /**
      * {@inheritDoc}
      */
