@@ -32,6 +32,7 @@ import java.util.List;
 import org.autorefactor.refactoring.ASTHelper;
 import org.autorefactor.refactoring.IJavaRefactoring;
 import org.autorefactor.refactoring.Refactorings;
+import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
@@ -67,41 +68,59 @@ public class RemoveUselessModifiersRefactoring extends ASTVisitor implements
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public boolean visit(TypeDeclaration node) {
-		if (node.isInterface()) {
-			for (FieldDeclaration fd : node.getFields()) {
-				// remove modifiers implied by the context
-				for (Modifier m : getModifiersOnly(fd.modifiers())) {
-					if (m.isPublic() || m.isStatic() || m.isFinal()) {
-						this.ctx.getRefactorings().remove(m);
-					}
-				}
-			}
-			for (MethodDeclaration md : node.getMethods()) {
-				// remove modifiers implied by the context
-				for (Modifier m : getModifiersOnly(md.modifiers())) {
-					if (m.isPublic() || m.isAbstract()) {
-						this.ctx.getRefactorings().remove(m);
-					}
-				}
-
-				// remove useless "final" from method parameters
-				for (SingleVariableDeclaration svd : (List<SingleVariableDeclaration>) md
-						.parameters()) {
-					for (Modifier m : getModifiersOnly(svd.modifiers())) {
-						if (m.isFinal()) {
-							this.ctx.getRefactorings().remove(m);
-						}
-					}
+	public boolean visit(FieldDeclaration node) {
+		boolean result = ASTHelper.VISIT_SUBTREE;
+		if (isInterface(node.getParent())) {
+			// remove modifiers implied by the context
+			for (Modifier m : getModifiersOnly(node.modifiers())) {
+				if (m.isPublic() || m.isStatic() || m.isFinal()) {
+					this.ctx.getRefactorings().remove(m);
+					result = ASTHelper.DO_NOT_VISIT_SUBTREE;
 				}
 			}
 		}
-		return ASTHelper.DO_NOT_VISIT_SUBTREE;
+		return result;
 	}
 
+	private boolean isInterface(ASTNode node)
+	{
+		return node instanceof TypeDeclaration
+				&& ((TypeDeclaration) node).isInterface();
+	}
 
-	private List<Modifier> getModifiersOnly(
-			Collection<IExtendedModifier> modifiers) {
+	@SuppressWarnings("unchecked")
+	@Override
+	public boolean visit(MethodDeclaration node) {
+		boolean result = ASTHelper.VISIT_SUBTREE;
+		if (isInterface(node.getParent())) {
+			// remove modifiers implied by the context
+			for (Modifier m : getModifiersOnly(node.modifiers())) {
+				if (m.isPublic() || m.isAbstract()) {
+					this.ctx.getRefactorings().remove(m);
+					result = ASTHelper.DO_NOT_VISIT_SUBTREE;
+				}
+			}
+		}
+		return result;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public boolean visit(SingleVariableDeclaration node) {
+		boolean result = ASTHelper.VISIT_SUBTREE;
+		if (isInterface(node.getParent().getParent())) {
+			// remove useless "final" from method parameters
+			for (Modifier m : getModifiersOnly(node.modifiers())) {
+				if (m.isFinal()) {
+					this.ctx.getRefactorings().remove(m);
+					result = ASTHelper.DO_NOT_VISIT_SUBTREE;
+				}
+			}
+		}
+		return result;
+	}
+
+	private List<Modifier> getModifiersOnly(Collection<IExtendedModifier> modifiers) {
 		final List<Modifier> results = new LinkedList<Modifier>();
 		for (IExtendedModifier em : modifiers) {
 			if (em.isModifier()) {
