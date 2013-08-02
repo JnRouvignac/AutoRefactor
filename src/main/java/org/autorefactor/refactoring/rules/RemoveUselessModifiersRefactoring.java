@@ -25,19 +25,28 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.autorefactor.refactoring.ASTHelper;
 import org.autorefactor.refactoring.IJavaRefactoring;
 import org.autorefactor.refactoring.Refactorings;
+import org.eclipse.jdt.core.dom.AnnotationTypeDeclaration;
+import org.eclipse.jdt.core.dom.AnnotationTypeMemberDeclaration;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
+import org.eclipse.jdt.core.dom.BodyDeclaration;
 import org.eclipse.jdt.core.dom.CompilationUnit;
+import org.eclipse.jdt.core.dom.EnumDeclaration;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.IExtendedModifier;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
+import org.eclipse.jdt.core.dom.Modifier.ModifierKeyword;
 import org.eclipse.jdt.core.dom.Modifier;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
@@ -50,11 +59,41 @@ import org.eclipse.jdt.core.dom.TypeDeclaration;
  * <li><code>public</code> and <code>abstract</code> for interfaces methods</li>
  * <li><code>final</code> for parameters in interface method declarations</li>
  * </ul>
- * TODO JNR can we also fix modifiers order? (for example
- * <code>public static final</code> instead of <code>final static public</code>)
+ * <p>
+ * Fix modifiers order.
  */
 public class RemoveUselessModifiersRefactoring extends ASTVisitor implements
 		IJavaRefactoring {
+
+	private final class ModifierOrderComparator implements Comparator<Modifier> {
+
+		public int compare(Modifier o1, Modifier o2) {
+			final int i1 = modifierOrder.indexOf(o1.getKeyword());
+			final int i2 = modifierOrder.indexOf(o2.getKeyword());
+			if (i1 == -1 ) {
+				throw new RuntimeException("Not implemented exception: cannot determine order for modifier " + o1);
+			}
+			if ( i2 == -1) {
+				throw new RuntimeException("Not implemented exception: cannot compare modifier " + o2);
+			}
+			return i1 - i2;
+		}
+
+	}
+
+	private static final List<ModifierKeyword> modifierOrder =
+			Collections.unmodifiableList(Arrays.asList(
+					ModifierKeyword.PUBLIC_KEYWORD,
+					ModifierKeyword.PROTECTED_KEYWORD,
+					ModifierKeyword.PRIVATE_KEYWORD,
+					ModifierKeyword.ABSTRACT_KEYWORD,
+					ModifierKeyword.STATIC_KEYWORD,
+					ModifierKeyword.FINAL_KEYWORD,
+					ModifierKeyword.TRANSIENT_KEYWORD,
+					ModifierKeyword.VOLATILE_KEYWORD,
+					ModifierKeyword.SYNCHRONIZED_KEYWORD,
+					ModifierKeyword.NATIVE_KEYWORD,
+					ModifierKeyword.STRICTFP_KEYWORD));
 
 	private RefactoringContext ctx;
 
@@ -78,12 +117,13 @@ public class RemoveUselessModifiersRefactoring extends ASTVisitor implements
 					result = ASTHelper.DO_NOT_VISIT_SUBTREE;
 				}
 			}
+		} else {
+			return ensureModifiersOrder(node);
 		}
 		return result;
 	}
 
-	private boolean isInterface(ASTNode node)
-	{
+	private boolean isInterface(ASTNode node) {
 		return node instanceof TypeDeclaration
 				&& ((TypeDeclaration) node).isInterface();
 	}
@@ -100,8 +140,52 @@ public class RemoveUselessModifiersRefactoring extends ASTVisitor implements
 					result = ASTHelper.DO_NOT_VISIT_SUBTREE;
 				}
 			}
+		} else {
+			return ensureModifiersOrder(node);
 		}
 		return result;
+	}
+
+	@Override
+	public boolean visit(AnnotationTypeDeclaration node) {
+		return ensureModifiersOrder(node);
+	}
+
+	@Override
+	public boolean visit(AnnotationTypeMemberDeclaration node) {
+		return ensureModifiersOrder(node);
+	}
+
+	@Override
+	public boolean visit(EnumDeclaration node) {
+		return ensureModifiersOrder(node);
+	}
+
+	@Override
+	public boolean visit(TypeDeclaration node) {
+		return ensureModifiersOrder(node);
+	}
+
+	@SuppressWarnings("unchecked")
+	private boolean ensureModifiersOrder(BodyDeclaration node) {
+		boolean result = ASTHelper.VISIT_SUBTREE;
+		List<Modifier> modifiers = node.modifiers();
+		List<Modifier> reorderedModifiers = new ArrayList<Modifier>(modifiers);
+		Collections.sort(reorderedModifiers, new ModifierOrderComparator());
+		if (!modifiers.equals(reorderedModifiers)) {
+			for (int i = 0; i < reorderedModifiers.size(); i++) {
+				insertAt(reorderedModifiers.get(i), i);
+				result = ASTHelper.DO_NOT_VISIT_SUBTREE;
+			}
+		}
+		return result;
+	}
+
+	private void insertAt(Modifier modifier, int index) {
+		final Modifier copy = ASTHelper.copySubtree(this.ctx.getAST(), modifier);
+		this.ctx.getRefactorings().insertAt(copy, index,
+				modifier.getLocationInParent(), modifier.getParent());
+		this.ctx.getRefactorings().remove(modifier);
 	}
 
 	@SuppressWarnings("unchecked")

@@ -36,7 +36,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
-import org.autorefactor.cfg.CFGBuilder;
 import org.autorefactor.refactoring.ASTCommentRewriter;
 import org.autorefactor.refactoring.IRefactoring;
 import org.autorefactor.refactoring.Refactorings;
@@ -543,8 +542,11 @@ public class AutoRefactorHandler extends AbstractHandler {
 					.getInserts().entrySet()) {
 				for (final Insert insert : entry.getValue()) {
 					final ListRewrite listRewrite = rewrite.getListRewrite(
-							insert.getElement().getParent(), entry.getKey());
-					if (InsertType.BEFORE.equals(insert.getInsertType())) {
+							insert.getListHolder(), entry.getKey());
+					if (InsertType.AT_INDEX.equals(insert.getInsertType())) {
+						listRewrite.insertAt(insert.getNodeToInsert(),
+								insert.getIndex(), null);
+					} else if (InsertType.BEFORE.equals(insert.getInsertType())) {
 						listRewrite.insertBefore(insert.getNodeToInsert(),
 								insert.getElement(), null);
 					} else if (InsertType.AFTER.equals(insert.getInsertType())) {

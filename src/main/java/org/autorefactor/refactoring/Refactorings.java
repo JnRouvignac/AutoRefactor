@@ -39,6 +39,7 @@ import org.eclipse.jdt.core.dom.BlockComment;
 import org.eclipse.jdt.core.dom.ChildListPropertyDescriptor;
 import org.eclipse.jdt.core.dom.Comment;
 import org.eclipse.jdt.core.dom.LineComment;
+import org.eclipse.jdt.core.dom.StructuralPropertyDescriptor;
 
 /**
  * Class aggregating all the refactorings performed by a refactoring rule until
@@ -67,7 +68,7 @@ public class Refactorings {
 	 * {@link ASTNode}.
 	 */
 	public static enum InsertType {
-		BEFORE, AFTER
+		AT_INDEX, BEFORE, AFTER
 	}
 
 	/**
@@ -76,16 +77,27 @@ public class Refactorings {
 	 */
 	public static class Insert {
 
-		public Insert(ASTNode nodeToInsert, ASTNode element,
-				InsertType insertType) {
+		public Insert(ASTNode nodeToInsert, ASTNode element, InsertType insertType) {
 			this.nodeToInsert = nodeToInsert;
-			this.element = element;
 			this.insertType = insertType;
+			this.element = element;
+			this.listHolder = element.getParent();
+			this.index = 0;
+		}
+
+		public Insert(ASTNode nodeToInsert, ASTNode listHolder, int index) {
+			this.nodeToInsert = nodeToInsert;
+			this.insertType = InsertType.AT_INDEX;
+			this.element = null;
+			this.listHolder = listHolder;
+			this.index = index;
 		}
 
 		private final ASTNode nodeToInsert;
-		private final ASTNode element;
 		private final InsertType insertType;
+		private final ASTNode element;
+		private final ASTNode listHolder;
+		private final int index;
 
 		public ASTNode getNodeToInsert() {
 			return nodeToInsert;
@@ -97,6 +109,14 @@ public class Refactorings {
 
 		public InsertType getInsertType() {
 			return insertType;
+		}
+
+		public ASTNode getListHolder() {
+			return listHolder;
+		}
+
+		public int getIndex() {
+			return index;
 		}
 	}
 
@@ -153,18 +173,21 @@ public class Refactorings {
 				|| !this.blockCommentToJavadoc.isEmpty();
 	}
 
-	public void insertBefore(ASTNode node, ASTNode element) {
-		insert(element, new Insert(node, element, InsertType.BEFORE));
+	public void insertAt(ASTNode nodeToInsert, int index, StructuralPropertyDescriptor locationInParent, ASTNode listHolder) {
+		insert(locationInParent, new Insert(nodeToInsert, listHolder, index));
 	}
 
-	public void insertAfter(ASTNode node, ASTNode element) {
-		insert(element, new Insert(node, element, InsertType.AFTER));
+	public void insertBefore(ASTNode nodeToInsert, ASTNode element) {
+		insert(element.getLocationInParent(), new Insert(nodeToInsert, element, InsertType.BEFORE));
 	}
 
-	private void insert(ASTNode element, Insert insert) {
+	public void insertAfter(ASTNode nodeToInsert, ASTNode element) {
+		insert(element.getLocationInParent(), new Insert(nodeToInsert, element, InsertType.AFTER));
+	}
+
+	private void insert(StructuralPropertyDescriptor locationInParent, Insert insert) {
 		// FIXME JNR else if case
-		final ChildListPropertyDescriptor clpd = (ChildListPropertyDescriptor) element
-				.getLocationInParent();
+		final ChildListPropertyDescriptor clpd = (ChildListPropertyDescriptor) locationInParent;
 		List<Insert> inserts = this.inserts.get(clpd);
 		if (inserts == null) {
 			inserts = new LinkedList<Insert>();
@@ -206,4 +229,5 @@ public class Refactorings {
 			sb.append(size).append(" ").append(s);
 		}
 	}
+
 }

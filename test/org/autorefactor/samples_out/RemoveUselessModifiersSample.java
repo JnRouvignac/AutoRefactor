@@ -31,4 +31,21 @@ public interface RemoveUselessModifiersSample {
 
     void myMethod(String myArg);
 
+    public static final class FixModifierOrderSampleClass {
+
+        public static final String MY_FIELD = "";
+
+        public static final void myMethod(final String myArg) {
+        }
+
+    }
+
+    public static enum FixModifierOrderSampleEnum {
+        VALUE1, VALUE2
+    }
+
+    public static @interface FixModifierOrderSampleAnnotation {
+        public abstract int fixModifierOrder();
+    }
+
 }
