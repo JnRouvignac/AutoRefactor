@@ -31,40 +31,33 @@ import org.eclipse.jdt.core.ICompilationUnit;
 /**
  * Holds a test case with all the necessary data.
  */
-public class TestCase
-{
+public class TestCase {
 
 	public final String sampleName;
 	public ICompilationUnit sampleIn;
 	public ICompilationUnit sampleOut;
 	public IRefactoring refactoring;
 
-	public TestCase(String sampleName)
-	{
+	public TestCase(String sampleName) {
 		this.sampleName = sampleName;
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public String toString()
-	{
+	public String toString() {
 		return "Tests for sample: " + sampleName + " (" + getINAndOUT(true)
 				+ ") with refactoring: "
 				+ (refactoring == null ? "" : refactoring.getClass().getSimpleName());
 	}
 
-	public String getINAndOUT(boolean presence)
-	{
-		if ((presence && sampleIn != null) || (!presence && sampleIn == null))
-		{
-			if ((presence && sampleOut != null) || (!presence && sampleOut == null))
-			{
+	public String getINAndOUT(boolean presence) {
+		if ((presence && sampleIn != null) || (!presence && sampleIn == null)) {
+			if ((presence && sampleOut != null) || (!presence && sampleOut == null)) {
 				return "IN and OUT";
 			}
 			return "IN";
 		}
-		if ((presence && sampleOut != null) || (!presence && sampleOut == null))
-		{
+		if ((presence && sampleOut != null) || (!presence && sampleOut == null)) {
 			return "OUT";
 		}
 		return "no sample";
