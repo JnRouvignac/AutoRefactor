@@ -25,6 +25,7 @@
  */
 package org.autorefactor;
 
+import org.autorefactor.ui.preferences.PreferenceHelper;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
@@ -35,10 +36,12 @@ import org.osgi.framework.BundleContext;
 public class AutoRefactorPlugin extends AbstractUIPlugin {
 
 	/** The plug-in ID */
-	public static final String PLUGIN_ID = "AutoRefactor";
+	public static final String PLUGIN_ID = "org.autorefactor.plugin";
 
 	/** The shared instance */
 	private static AutoRefactorPlugin plugin;
+
+	private static PreferenceHelper preferenceHelper;
 
 	@Override
 	public void start(final BundleContext context) throws Exception {
@@ -58,7 +61,22 @@ public class AutoRefactorPlugin extends AbstractUIPlugin {
 	 * @return the shared instance
 	 */
 	public static AutoRefactorPlugin getDefault() {
+		// Deprecated. Replaced by IEclipsePreferences.
+		// Preferences are now stored according to scopes in the IPreferencesService.
+		// The return value of this method corresponds to a combination of the InstanceScope and the DefaultScope.
+		// To set preferences for your plug-in, use new InstanceScope().getNode(<&yourPluginId>).
+		// To set default preferences for your plug-in, use new DefaultScope().getNode(<yourPluginId>).
+		// To lookup an integer preference value for your plug-in, use
+		// Platform.getPreferencesService().getInt(<yourPluginId>, <preferenceKey>, <defaultValue>, null).
+		// Similar methods exist on IPreferencesService for obtaining other kinds of preference values (strings, booleans, etc).
 		return plugin;
+	}
+
+	public static PreferenceHelper getPreferenceHelper() {
+		if (preferenceHelper == null) {
+			preferenceHelper = new PreferenceHelper(getDefault().getPreferenceStore());
+		}
+		return preferenceHelper;
 	}
 
 	/**

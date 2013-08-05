@@ -68,9 +68,10 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
 
 	private RefactoringContext ctx;
 	private int javaMinorVersion;
+	private final boolean removeThisForNonStaticMethodAccess;
 
-	public SimplifyExpressionRefactoring() {
-		super();
+	public SimplifyExpressionRefactoring(boolean removeThisForNonStaticMethodAccess) {
+		this.removeThisForNonStaticMethodAccess = removeThisForNonStaticMethodAccess;
 	}
 
 	public void setRefactoringContext(RefactoringContext ctx) {
@@ -146,7 +147,7 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
 			}
 		} else if (parent instanceof PrefixExpression
 				&& (innerExpr instanceof InstanceofExpression
-				    || innerExpr instanceof Assignment)) {
+					|| innerExpr instanceof Assignment)) {
 			// Cannot remove parentheses around these negated expressions or there will be compile errors
 			return node;
 		} else if (parent instanceof ConditionalExpression && isHardToRead(innerExpr)) {
@@ -285,7 +286,7 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
 				&& node.arguments().size() == 1) {
 			replaceInfixExpressionIfNeeded(node.getParent());
 			return ASTHelper.DO_NOT_VISIT_SUBTREE;
-		} else {
+		} else if (this.removeThisForNonStaticMethodAccess) {
 			ThisExpression te = ASTHelper.as(node.getExpression(),
 					ThisExpression.class);
 			if (te != null

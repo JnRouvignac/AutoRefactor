@@ -78,7 +78,7 @@
 				commandId="org.autorefactor.ui.handler"
 				contextId="org.eclipse.ui.contexts.window"
 				sequence="M2+M3+Y"
-				schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"/>
+				schemeId="org.eclipse.ui.defaultAcceleratorConfiguration" />
 	</extension>
 
     <extension point="org.eclipse.ui.commands">
@@ -88,4 +88,19 @@
                 name="Refactor">
         </command>
     </extension>
+
+
+
+  <!-- Workspace wide preferences -->
+  <extension point="org.eclipse.ui.preferencePages">
+      <page
+            category="org.eclipse.jdt.ui.preferences.CodeStylePreferencePage"
+            class="org.autorefactor.ui.preferences.WorkspacePreferencePage"
+            id   ="org.autorefactor.ui.preferences.PreferencePage"
+            name="AutoRefactor" />
+  </extension>
+
+  <extension point="org.eclipse.core.runtime.preferences">
+      <initializer class="org.autorefactor.ui.preferences.PreferenceInitializer" />
+  </extension>
 </plugin>

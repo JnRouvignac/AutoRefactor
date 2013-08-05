@@ -36,6 +36,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
+import org.autorefactor.AutoRefactorPlugin;
 import org.autorefactor.refactoring.ASTCommentRewriter;
 import org.autorefactor.refactoring.IRefactoring;
 import org.autorefactor.refactoring.Refactorings;
@@ -58,6 +59,7 @@ import org.autorefactor.refactoring.rules.SimplifyExpressionRefactoring;
 import org.autorefactor.refactoring.rules.StringBuilderRefactoring;
 import org.autorefactor.refactoring.rules.StringRefactorings;
 import org.autorefactor.ui.GrowableArrayList.GrowableListIterator;
+import org.autorefactor.ui.preferences.PreferenceHelper;
 import org.autorefactor.util.Pair;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
@@ -576,12 +578,13 @@ public class AutoRefactorHandler extends AbstractHandler {
 	}
 
 	private static GrowableArrayList<IRefactoring> getAllRefactorings() {
+		PreferenceHelper prefs = AutoRefactorPlugin.getPreferenceHelper();
 		return new GrowableArrayList<IRefactoring>(
 				new PrimitiveWrapperCreationRefactoring(),
 				new BooleanRefactoring(),
-				new AddBracketsToControlStatementRefactoring(),
+				new AddBracketsToControlStatementRefactoring(prefs.addAngleBracketsToStatementBodies()),
 				new InvertEqualsRefactoring(),
-				new SimplifyExpressionRefactoring(),
+				new SimplifyExpressionRefactoring(prefs.removeThisForNonStaticMethodAccess()),
 				new StringRefactorings(),
 				new BigDecimalRefactorings(),
 				// TODO JNR implement
