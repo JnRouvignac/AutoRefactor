@@ -53,6 +53,30 @@ public class BooleanSample {
         }
     }
 
+    public boolean returnIfConditionWithInfixExpressionBooleanPrimitive(int i) {
+        if (0 < i && i < 12) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    public boolean returnIfConditionWithInstanceofExpressionBooleanPrimitive(Object o) {
+        if (o instanceof String) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    public boolean returnIfConditionThatRevertsInstanceofExpressionBooleanPrimitive(Object o) {
+        if (!(o instanceof String)) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
     public Boolean returnIfConditionBooleanObject(boolean b) {
         if (b) {
             return Boolean.TRUE;

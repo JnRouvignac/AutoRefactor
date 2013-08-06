@@ -94,11 +94,32 @@ public class ASTHelper {
 		return (T) ASTNode.copySubtree(ast, (ASTNode) node);
 	}
 
-	public static Expression negate(AST ast, Expression condition) {
+	public static Expression negate(AST ast, Expression condition, boolean doCopy) {
+		if (condition instanceof PrefixExpression) {
+			final PrefixExpression pe = (PrefixExpression) condition;
+			if (Operator.NOT.equals(pe.getOperator())) {
+				return possiblyCopy(ast, removeParentheses(pe.getOperand()), doCopy);
+			}
+		}
+
 		final PrefixExpression pe = ast.newPrefixExpression();
 		pe.setOperator(Operator.NOT);
-		pe.setOperand(parenthesize(ast, condition));
+		pe.setOperand(parenthesize(ast, possiblyCopy(ast, condition, doCopy)));
 		return pe;
+	}
+
+	private static Expression removeParentheses(Expression expr) {
+		if (expr instanceof ParenthesizedExpression) {
+			return ((ParenthesizedExpression) expr).getExpression();
+		}
+		return expr;
+	}
+
+	private static <T extends ASTNode> T possiblyCopy(AST ast, T node, boolean doCopy) {
+		if (doCopy) {
+			return copySubtree(ast, node);
+		}
+		return node;
 	}
 
 	private static Expression parenthesize(AST ast, Expression condition) {
@@ -116,8 +137,7 @@ public class ASTHelper {
 		if (node.getParent() == null) {
 			throw new IllegalArgumentException();
 		}
-		final StructuralPropertyDescriptor locationInParent = node
-				.getLocationInParent();
+		final StructuralPropertyDescriptor locationInParent = node.getLocationInParent();
 		if (locationInParent instanceof ChildPropertyDescriptor) {
 			final ChildPropertyDescriptor cpd = (ChildPropertyDescriptor) locationInParent;
 			node.getParent().setStructuralProperty(cpd, replacement);

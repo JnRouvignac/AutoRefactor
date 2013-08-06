@@ -313,25 +313,24 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
 				if (nb.doubleValue() == 0) {
 					return;
 				}
-				if (InfixExpression.Operator.EQUALS.equals(ie.getOperator())) {
+				if (Operator.EQUALS.equals(ie.getOperator())) {
 					if (nb.doubleValue() < 0) {
 						final InfixExpression newIe = getNewInfixExpression(ie);
-						newIe.setOperator(InfixExpression.Operator.LESS);
+						newIe.setOperator(Operator.LESS);
 						this.ctx.getRefactorings().replace(ie, newIe);
 					} else if (nb.doubleValue() > 0) {
 						final InfixExpression newIe = getNewInfixExpression(ie);
-						newIe.setOperator(InfixExpression.Operator.GREATER);
+						newIe.setOperator(Operator.GREATER);
 						this.ctx.getRefactorings().replace(ie, newIe);
 					}
-				} else if (InfixExpression.Operator.NOT_EQUALS.equals(ie
-						.getOperator())) {
+				} else if (Operator.NOT_EQUALS.equals(ie.getOperator())) {
 					if (nb.doubleValue() < 0) {
 						final InfixExpression newIe = getNewInfixExpression(ie);
-						newIe.setOperator(InfixExpression.Operator.GREATER_EQUALS);
+						newIe.setOperator(Operator.GREATER_EQUALS);
 						this.ctx.getRefactorings().replace(ie, newIe);
 					} else if (nb.doubleValue() > 0) {
 						final InfixExpression newIe = getNewInfixExpression(ie);
-						newIe.setOperator(InfixExpression.Operator.LESS_EQUALS);
+						newIe.setOperator(Operator.LESS_EQUALS);
 						this.ctx.getRefactorings().replace(ie, newIe);
 					}
 				}
@@ -445,23 +444,9 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
 		if (negate) {
 			operand = ASTHelper.copySubtree(this.ctx.getAST(), exprToCopy);
 		} else {
-
-			operand = negate(exprToCopy);
+			operand = ASTHelper.negate(this.ctx.getAST(), exprToCopy, true);
 		}
 		this.ctx.getRefactorings().replace(node, operand);
-	}
-
-	private Expression negate(Expression expr) {
-		if (expr instanceof PrefixExpression) {
-			final PrefixExpression pe = (PrefixExpression) expr;
-			if (PrefixExpression.Operator.NOT.equals(pe.getOperator())) {
-				return ASTHelper.copySubtree(this.ctx.getAST(), pe.getOperand());
-			}
-		}
-		final PrefixExpression pe = this.ctx.getAST().newPrefixExpression();
-		pe.setOperator(PrefixExpression.Operator.NOT);
-		pe.setOperand(ASTHelper.copySubtree(this.ctx.getAST(), expr));
-		return pe;
 	}
 
 	private void replaceByCopy(InfixExpression node, final Expression expr) {

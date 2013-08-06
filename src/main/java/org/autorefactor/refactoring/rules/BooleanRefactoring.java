@@ -54,7 +54,6 @@ import org.eclipse.jdt.core.dom.InfixExpression.Operator;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Name;
-import org.eclipse.jdt.core.dom.PrefixExpression;
 import org.eclipse.jdt.core.dom.PrimitiveType;
 import org.eclipse.jdt.core.dom.QualifiedName;
 import org.eclipse.jdt.core.dom.ReturnStatement;
@@ -188,14 +187,12 @@ public class BooleanRefactoring extends ASTVisitor implements IJavaRefactoring {
 				node.getElseStatement())) {
 			// Then and else statement are matching, bar the boolean values
 			// which are opposite
-			final Expression ifCondition = ASTHelper.copySubtree(this.ctx.getAST(),
-					node.getExpression());
-			final Statement copyStmt = ASTHelper.copySubtree(this.ctx.getAST(),
-					node.getThenStatement());
+			final Statement copyStmt = copySubtree(node.getThenStatement());
 			// identify the node that need to be replaced after the copy
 			final BooleanASTMatcher matcher2 = new BooleanASTMatcher(
 					matcher.matches);
 			if (ASTHelper.match(matcher2, copyStmt, node.getElseStatement())) {
+				final Expression ifCondition = node.getExpression();
 				copyStmt.accept(new BooleanReplaceVisitor(ifCondition,
 						matcher2.matches.values(), getBooleanName(node)));
 				if (copyStmt instanceof Block
@@ -324,13 +321,12 @@ public class BooleanRefactoring extends ASTVisitor implements IJavaRefactoring {
 	private ReturnStatement getReturnStatement(IfStatement node,
 			final Boolean thenBool, final Boolean elseBool,
 			final Expression thenExpr, final Expression elseExpr) {
-		final Expression copiedIfCondition = ASTHelper.copySubtree(this.ctx.getAST(),
-				node.getExpression());
+		final Expression copiedIfCondition = copySubtree(node.getExpression());
 		if (thenBool == null && elseBool != null) {
 			final InfixExpression ie = this.ctx.getAST().newInfixExpression();
 			ie.setLeftOperand(copiedIfCondition);
 			ie.setOperator(getConditionalOperator(!elseBool.booleanValue()));
-			ie.setRightOperand(ASTHelper.copySubtree(this.ctx.getAST(), thenExpr));
+			ie.setRightOperand(copySubtree(thenExpr));
 
 			final ReturnStatement rs = this.ctx.getAST().newReturnStatement();
 			rs.setExpression(getBooleanExpression(ie, !elseBool.booleanValue()));
@@ -339,13 +335,17 @@ public class BooleanRefactoring extends ASTVisitor implements IJavaRefactoring {
 			final InfixExpression ie = this.ctx.getAST().newInfixExpression();
 			ie.setLeftOperand(copiedIfCondition);
 			ie.setOperator(getConditionalOperator(!thenBool.booleanValue()));
-			ie.setRightOperand(ASTHelper.copySubtree(this.ctx.getAST(), elseExpr));
+			ie.setRightOperand(copySubtree(elseExpr));
 
 			final ReturnStatement rs = this.ctx.getAST().newReturnStatement();
 			rs.setExpression(getBooleanExpression(ie, thenBool.booleanValue()));
 			return rs;
 		}
 		return null;
+	}
+
+	private <T extends ASTNode> T copySubtree(T node) {
+		return ASTHelper.copySubtree(this.ctx.getAST(), node);
 	}
 
 	private Operator getConditionalOperator(boolean isAndOperator) {
@@ -357,12 +357,8 @@ public class BooleanRefactoring extends ASTVisitor implements IJavaRefactoring {
 			boolean doNotRevertExpression) {
 		if (doNotRevertExpression) {
 			return ie;
-		} else {
-			final PrefixExpression pe = this.ctx.getAST().newPrefixExpression();
-			pe.setOperator(PrefixExpression.Operator.NOT);
-			pe.setOperand(ie);
-			return pe;
 		}
+		return ASTHelper.negate(this.ctx.getAST(), ie, false);
 	}
 
 	private VariableDeclarationFragment getVariableDeclarationFragment(
@@ -387,32 +383,19 @@ public class BooleanRefactoring extends ASTVisitor implements IJavaRefactoring {
 			final Boolean returnThenLiteral, final Boolean returnElseLiteral) {
 		if (returnThenLiteral != null && returnElseLiteral != null
 				&& returnThenLiteral == !returnElseLiteral) {
-			final MethodDeclaration md = ASTHelper.getAncestor(node,
-					MethodDeclaration.class);
-			final Expression copiedIfCondition = ASTHelper.copySubtree(
-					this.ctx.getAST(), node.getExpression());
-			if (returnThenLiteral) {
-				final Expression returnExpr = getReturnExpression(md,
-						copiedIfCondition);
-				if (returnExpr == null) {
-					return null;
-				}
-				final ReturnStatement rs = this.ctx.getAST().newReturnStatement();
-				rs.setExpression(returnExpr);
-				return rs;
-			} else {
-				final PrefixExpression pe = this.ctx.getAST().newPrefixExpression();
-				pe.setOperator(PrefixExpression.Operator.NOT);
-				pe.setOperand(copiedIfCondition);
-
-				final Expression returnExpr = getReturnExpression(md, pe);
-				if (returnExpr == null) {
-					return null;
-				}
-				final ReturnStatement rs = this.ctx.getAST().newReturnStatement();
-				rs.setExpression(returnExpr);
-				return rs;
+			Expression exprToReturn = copySubtree(node.getExpression());
+			if (!returnThenLiteral) {
+				exprToReturn = ASTHelper.negate(this.ctx.getAST(), exprToReturn, false);
 			}
+
+			final MethodDeclaration md = ASTHelper.getAncestor(node, MethodDeclaration.class);
+			final Expression returnExpr = getReturnExpression(md, exprToReturn);
+			if (returnExpr == null) {
+				return null;
+			}
+			final ReturnStatement rs = this.ctx.getAST().newReturnStatement();
+			rs.setExpression(returnExpr);
+			return rs;
 		}
 		return null;
 	}
@@ -442,8 +425,7 @@ public class BooleanRefactoring extends ASTVisitor implements IJavaRefactoring {
 			final Boolean elseBoolLiteral) {
 		if (thenBoolLiteral != null && elseBoolLiteral != null
 				&& thenBoolLiteral == !elseBoolLiteral) {
-			final Expression copiedIfCondition = ASTHelper.copySubtree(
-					this.ctx.getAST(), ifCondition);
+			final Expression copiedIfCondition = copySubtree(ifCondition);
 			final Expression booleanName = getBooleanName(ifCondition);
 			return getExpression(thenBoolLiteral, copiedIfCondition,
 					expressionName, booleanName);
@@ -451,18 +433,14 @@ public class BooleanRefactoring extends ASTVisitor implements IJavaRefactoring {
 		return null;
 	}
 
-	private Expression getExpression(final boolean isTrue,
+	private Expression getExpression(final boolean doNotNegate,
 			final Expression ifCondition, String expressionName,
 			final Expression booleanName) {
-		if (isTrue) {
-			return getExpression(ifCondition, expressionName, booleanName);
-		} else {
-			final PrefixExpression pe = this.ctx.getAST().newPrefixExpression();
-			pe.setOperator(PrefixExpression.Operator.NOT);
-			pe.setOperand(ifCondition);
-
-			return getExpression(pe, expressionName, booleanName);
+		if (doNotNegate) {
+			return getExpression(copySubtree(ifCondition), expressionName, booleanName);
 		}
+		final Expression negatedIfCondition = ASTHelper.negate(this.ctx.getAST(), ifCondition, true);
+		return getExpression(negatedIfCondition, expressionName, booleanName);
 	}
 
 	private Expression getExpression(final Expression ifCondition,
