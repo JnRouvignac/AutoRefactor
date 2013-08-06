@@ -45,7 +45,7 @@ public interface RemoveUselessModifiersSample {
     }
 
     public static @interface FixModifierOrderSampleAnnotation {
-        public abstract int fixModifierOrder();
+        int fixModifierOrder();
     }
 
 }

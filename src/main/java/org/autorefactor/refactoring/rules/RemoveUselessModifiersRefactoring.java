@@ -108,19 +108,18 @@ public class RemoveUselessModifiersRefactoring extends ASTVisitor implements
 	@SuppressWarnings("unchecked")
 	@Override
 	public boolean visit(FieldDeclaration node) {
-		boolean result = ASTHelper.VISIT_SUBTREE;
 		if (isInterface(node.getParent())) {
 			// remove modifiers implied by the context
+			boolean result = ASTHelper.VISIT_SUBTREE;
 			for (Modifier m : getModifiersOnly(node.modifiers())) {
 				if (m.isPublic() || m.isStatic() || m.isFinal()) {
 					this.ctx.getRefactorings().remove(m);
 					result = ASTHelper.DO_NOT_VISIT_SUBTREE;
 				}
 			}
-		} else {
-			return ensureModifiersOrder(node);
+			return result;
 		}
-		return result;
+		return ensureModifiersOrder(node);
 	}
 
 	private boolean isInterface(ASTNode node) {
@@ -128,20 +127,23 @@ public class RemoveUselessModifiersRefactoring extends ASTVisitor implements
 				&& ((TypeDeclaration) node).isInterface();
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public boolean visit(MethodDeclaration node) {
-		boolean result = ASTHelper.VISIT_SUBTREE;
 		if (isInterface(node.getParent())) {
 			// remove modifiers implied by the context
-			for (Modifier m : getModifiersOnly(node.modifiers())) {
-				if (m.isPublic() || m.isAbstract()) {
-					this.ctx.getRefactorings().remove(m);
-					result = ASTHelper.DO_NOT_VISIT_SUBTREE;
-				}
+			return removePublicAbstractModifiers(node);
+		}
+		return ensureModifiersOrder(node);
+	}
+
+	@SuppressWarnings("unchecked")
+	private boolean removePublicAbstractModifiers(BodyDeclaration node) {
+		boolean result = ASTHelper.VISIT_SUBTREE;
+		for (Modifier m : getModifiersOnly(node.modifiers())) {
+			if (m.isPublic() || m.isAbstract()) {
+				this.ctx.getRefactorings().remove(m);
+				result = ASTHelper.DO_NOT_VISIT_SUBTREE;
 			}
-		} else {
-			return ensureModifiersOrder(node);
 		}
 		return result;
 	}
@@ -153,7 +155,7 @@ public class RemoveUselessModifiersRefactoring extends ASTVisitor implements
 
 	@Override
 	public boolean visit(AnnotationTypeMemberDeclaration node) {
-		return ensureModifiersOrder(node);
+		return removePublicAbstractModifiers(node);
 	}
 
 	@Override
@@ -169,8 +171,8 @@ public class RemoveUselessModifiersRefactoring extends ASTVisitor implements
 	@SuppressWarnings("unchecked")
 	private boolean ensureModifiersOrder(BodyDeclaration node) {
 		boolean result = ASTHelper.VISIT_SUBTREE;
-		List<Modifier> modifiers = node.modifiers();
-		List<Modifier> reorderedModifiers = new ArrayList<Modifier>(modifiers);
+		final List<Modifier> modifiers = node.modifiers();
+		final List<Modifier> reorderedModifiers = new ArrayList<Modifier>(modifiers);
 		Collections.sort(reorderedModifiers, new ModifierOrderComparator());
 		if (!modifiers.equals(reorderedModifiers)) {
 			for (int i = 0; i < reorderedModifiers.size(); i++) {
