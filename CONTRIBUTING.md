@@ -29,6 +29,6 @@ You can run tests by:
 
 ### JDT Gotchas
 
-# JDT sometimes represent consecutive additions into only one ```InfixExpression``` node and stores the additional operands into the ```extendedOperands``` attribute.
-# JDT does not check the validity of programmer built ASTs: For example, adding an ```InfixExpression``` inside a NOT ```PrefixExpresion``` MUST be enclosed in a ```ParenthezisedExpression``` by the programmer, otherwise the resulting code will not be what was expected. For example, adding ```a && b``` to a not expression will result in ```!a && b``` instead of the expected ```!(a && b)```.
-# Despite calling ```ASTParser.setResolveBindings(true);```, using one of the ```ASTNode.resolve*()``` methods can return null at any time, so be prepared to handle nulls.
+* JDT sometimes represent consecutive additions into only one ```InfixExpression``` node and stores the additional operands into the ```extendedOperands``` attribute.
+* JDT does not check the validity of programmer built ASTs: For example, adding an ```InfixExpression``` inside a NOT ```PrefixExpresion``` MUST be enclosed in a ```ParenthezisedExpression``` by the programmer, otherwise the resulting code will not be what was expected. For example, adding ```a && b``` to a not expression will result in ```!a && b``` instead of the expected ```!(a && b)```.
+* Despite calling ```ASTParser.setResolveBindings(true);```, using one of the ```ASTNode.resolve*()``` methods can return null at any time, so be prepared to handle nulls.
