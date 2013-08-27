@@ -27,13 +27,26 @@ package org.autorefactor.ui.preferences;
 
 public interface PreferenceConstants {
 
-	String ADD_ANGLE_BRACKETS_TO_STATEMENT_BODIES         = "add_angle_brackets_to_statement_bodies";
-	String ADD_ANGLE_BRACKETS_TO_STATEMENT_BODIES_LABEL   = "Add angle brackets '{' and '}' to statement bodies";
+	class Preference {
+		final String name;
+		final String description;
 
-	String REMOVE_THIS_FOR_NON_STATIC_METHOD_ACCESS       = "remove_this_for_non_static_method_access";
-	String REMOVE_THIS_FOR_NON_STATIC_METHOD_ACCESS_LABEL = "Remove 'this' qualifier for non static method accesses";
+		public Preference(String name, String description) {
+			this.name = name;
+			this.description = description;
+		}
+	}
 
-	String JDT__ALWAYS_USE_THIS_FOR_NON_STATIC_METHOD_ACCESS       = "cleanup.always_use_this_for_non_static_method_access";
-	String JDT__ALWAYS_USE_THIS_FOR_NON_STATIC_METHOD_ACCESS_LABEL = "Use 'this' qualifier for method accesses";
+	Preference ADD_ANGLE_BRACKETS_TO_STATEMENT_BODIES = new Preference(
+		"add_angle_brackets_to_statement_bodies",
+		"Add angle brackets '{' and '}' to statement bodies");
+
+	Preference REMOVE_THIS_FOR_NON_STATIC_METHOD_ACCESS = new Preference(
+		"remove_this_for_non_static_method_access",
+		"Remove 'this' qualifier for non static method accesses");
+
+	/** TODO use this for preferences initialization */
+	String JDT__ALWAYS_USE_THIS_FOR_NON_STATIC_METHOD_ACCESS =
+		"cleanup.always_use_this_for_non_static_method_access";
 
 }

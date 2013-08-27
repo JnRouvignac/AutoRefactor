@@ -25,15 +25,14 @@
  */
 package org.autorefactor.ui.preferences;
 
-import static org.autorefactor.ui.preferences.PreferenceConstants.*;
-
 import org.autorefactor.AutoRefactorPlugin;
+import org.autorefactor.ui.preferences.PreferenceConstants.Preference;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
+
+import static org.autorefactor.ui.preferences.PreferenceConstants.*;
 
 public class WorkspacePreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
@@ -45,15 +44,12 @@ public class WorkspacePreferencePage extends FieldEditorPreferencePage implement
 
 	@Override
 	protected void createFieldEditors() {
-		Composite parent = getFieldEditorParent();
+		addBooleanField(REMOVE_THIS_FOR_NON_STATIC_METHOD_ACCESS);
+		addBooleanField(ADD_ANGLE_BRACKETS_TO_STATEMENT_BODIES);
+	}
 
-		addField(new BooleanFieldEditor(
-				JDT__ALWAYS_USE_THIS_FOR_NON_STATIC_METHOD_ACCESS,
-				JDT__ALWAYS_USE_THIS_FOR_NON_STATIC_METHOD_ACCESS_LABEL, SWT.NONE, parent));
-
-		addField(new BooleanFieldEditor(
-				ADD_ANGLE_BRACKETS_TO_STATEMENT_BODIES,
-				ADD_ANGLE_BRACKETS_TO_STATEMENT_BODIES_LABEL, SWT.NONE, parent));
+	private void addBooleanField(Preference pref) {
+		addField(new BooleanFieldEditor(pref.name, pref.description, getFieldEditorParent()));
 	}
 
 	public void init(IWorkbench workbench) {

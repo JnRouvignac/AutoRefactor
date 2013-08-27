@@ -37,11 +37,15 @@ public class PreferenceHelper {
 		this.preferenceStore = preferenceStore;
 	}
 
+	private boolean getBoolean(Preference pref) {
+		return preferenceStore.getBoolean(ADD_ANGLE_BRACKETS_TO_STATEMENT_BODIES.name);
+	}
+
 	public boolean removeThisForNonStaticMethodAccess() {
-		return preferenceStore.getBoolean(REMOVE_THIS_FOR_NON_STATIC_METHOD_ACCESS);
+		return getBoolean(REMOVE_THIS_FOR_NON_STATIC_METHOD_ACCESS);
 	}
 
 	public boolean addAngleBracketsToStatementBodies() {
-		return preferenceStore.getBoolean(ADD_ANGLE_BRACKETS_TO_STATEMENT_BODIES);
+		return getBoolean(ADD_ANGLE_BRACKETS_TO_STATEMENT_BODIES);
 	}
 }
