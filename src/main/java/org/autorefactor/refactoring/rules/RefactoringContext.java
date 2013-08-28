@@ -51,8 +51,7 @@ public class RefactoringContext {
 		return ast;
 	}
 
-	public ICompilationUnit getCompilationUnit()
-	{
+	public ICompilationUnit getCompilationUnit() {
 		return compilationUnit;
 	}
 
