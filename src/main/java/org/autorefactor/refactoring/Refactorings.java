@@ -60,6 +60,7 @@ public class Refactorings {
 	 */
 	private final List<ASTNode> removals = new LinkedList<ASTNode>();
 	private final List<Comment> commentRemovals = new LinkedList<Comment>();
+	private final List<Pair<Comment, String>> commentReplacements = new LinkedList<Pair<Comment, String>>();
 	private final Map<ASTNode, List<LineComment>> lineCommentsToJavadoc = new HashMap<ASTNode, List<LineComment>>();
 	private final List<BlockComment> blockCommentToJavadoc = new LinkedList<BlockComment>();
 
@@ -135,6 +136,10 @@ public class Refactorings {
 	public List<Comment> getCommentRemovals() {
 		return this.commentRemovals;
 	}
+	
+	public List<Pair<Comment, String>> getCommentReplacements() {
+		return this.commentReplacements;
+	}
 
 	public List<BlockComment> getBlockCommentToJavadoc() {
 		return blockCommentToJavadoc;
@@ -146,6 +151,10 @@ public class Refactorings {
 
 	public void replace(ASTNode node, ASTNode replacement) {
 		this.replacements.add(Pair.of(node, replacement));
+	}
+
+	public void replace(Comment comment, String replacement) {
+		this.commentReplacements.add(Pair.of(comment, replacement));
 	}
 
 	public void remove(ASTNode node) {
@@ -169,6 +178,7 @@ public class Refactorings {
 	public boolean hasRefactorings() {
 		return !this.replacements.isEmpty() || !this.removals.isEmpty()
 				|| !this.inserts.isEmpty() || !this.commentRemovals.isEmpty()
+				|| !this.commentReplacements.isEmpty()
 				|| !this.lineCommentsToJavadoc.isEmpty()
 				|| !this.blockCommentToJavadoc.isEmpty();
 	}

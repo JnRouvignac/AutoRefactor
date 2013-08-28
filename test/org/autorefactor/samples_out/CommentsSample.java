@@ -68,9 +68,7 @@ public class CommentsSample implements Runnable {
         // This is a linecomment that must be kept
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public void run()
     {

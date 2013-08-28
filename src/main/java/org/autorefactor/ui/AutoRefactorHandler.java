@@ -86,6 +86,7 @@ import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.BlockComment;
 import org.eclipse.jdt.core.dom.ChildListPropertyDescriptor;
+import org.eclipse.jdt.core.dom.Comment;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.LineComment;
 import org.eclipse.jdt.core.dom.rewrite.ASTRewrite;
@@ -568,6 +569,9 @@ public class AutoRefactorHandler extends AbstractHandler {
 		final ASTCommentRewriter commentRewriter = new ASTCommentRewriter();
 		for (ASTNode toRemove : refactorings.getCommentRemovals()) {
 			commentRewriter.remove(toRemove);
+		}
+		for (Pair<Comment, String> toReplace : refactorings.getCommentReplacements()) {
+			commentRewriter.replace(toReplace.getFirst(), toReplace.getSecond());
 		}
 		for (BlockComment toJavadoc : refactorings.getBlockCommentToJavadoc()) {
 			commentRewriter.toJavadoc(toJavadoc);

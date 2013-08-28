@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.autorefactor.util.Pair;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.BlockComment;
+import org.eclipse.jdt.core.dom.Comment;
 import org.eclipse.jdt.core.dom.LineComment;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.text.edits.DeleteEdit;
@@ -16,6 +18,7 @@ import org.eclipse.text.edits.TextEdit;
 public class ASTCommentRewriter {
 
 	private List<ASTNode> removals = new ArrayList<ASTNode>();
+	private List<Pair<Comment, String>> replacements = new ArrayList<Pair<Comment, String>>();
 	private List<BlockComment> blockCommentToJavadoc = new ArrayList<BlockComment>();
 	private List<List<LineComment>> lineCommentsToJavadoc = new ArrayList<List<LineComment>>();
 
@@ -24,6 +27,10 @@ public class ASTCommentRewriter {
 
 	public void remove(ASTNode node) {
 		this.removals.add(node);
+	}
+
+	public void replace(Comment comment, String replacement) {
+		this.replacements.add(Pair.of(comment, replacement));
 	}
 
 	public void toJavadoc(BlockComment comment) {
@@ -35,15 +42,16 @@ public class ASTCommentRewriter {
 	}
 
 	public void addEdits(IDocument document, TextEdit edits) {
-		addRemovalEdits(document, edits);
-		addToJavadocEdits(document, edits);
+		final String text = document.get();
+		addRemovalEdits(text, edits);
+		addReplacementEdits(text, edits);
+		addToJavadocEdits(text, edits);
 	}
 
-	private void addRemovalEdits(IDocument document, TextEdit edits) {
+	private void addRemovalEdits(String text, TextEdit edits) {
 		if (this.removals.isEmpty()) {
 			return;
 		}
-		final String text = document.get();
 		for (ASTNode node : this.removals) {
 			final int start = node.getStartPosition();
 			final int length = node.getLength();
@@ -57,7 +65,20 @@ public class ASTCommentRewriter {
 		}
 	}
 
-	private void addToJavadocEdits(IDocument document, TextEdit edits) {
+	private void addReplacementEdits(String text, TextEdit edits) {
+		if (this.replacements.isEmpty()) {
+			return;
+		}
+		for (Pair<Comment, String> pair : this.replacements) {
+			final Comment node = pair.getFirst();
+			final int start = node.getStartPosition();
+			final int length = node.getLength();
+
+			edits.addChild(new ReplaceEdit(start, length, pair.getSecond()));
+		}
+	}
+
+	private void addToJavadocEdits(String text, TextEdit edits) {
 		for (BlockComment blockComment : this.blockCommentToJavadoc) {
 			final int offset = blockComment.getStartPosition() + "/*".length();
 			edits.addChild(new InsertEdit(offset, "*"));
@@ -79,7 +100,7 @@ public class ASTCommentRewriter {
 			boolean isFirst = true;
 			for (Iterator<LineComment> iter = lineComments.iterator(); iter
 					.hasNext();) {
-				LineComment lineComment = (LineComment) iter.next();
+				LineComment lineComment = iter.next();
 				if (isFirst) {
 					edits.addChild(new ReplaceEdit(lineComment.getStartPosition(), "//".length(), "/**"));
 					// TODO JNR how to obey configured indentation?
@@ -88,7 +109,7 @@ public class ASTCommentRewriter {
 				} else {
 					edits.addChild(new ReplaceEdit(lineComment.getStartPosition(), "//".length(), " *"));
 				}
-				if (!iter.hasNext())  {
+				if (!iter.hasNext()) {
 					// this was the last line comment to transform
 					// TODO JNR how to get access to configured newline?
 					// TODO JNR how to obey configured indentation?

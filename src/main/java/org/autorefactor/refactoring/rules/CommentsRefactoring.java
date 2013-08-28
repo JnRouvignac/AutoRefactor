@@ -68,6 +68,7 @@ public class CommentsRefactoring extends ASTVisitor implements IJavaRefactoring 
 	private static final Pattern EMPTY_LINE_COMMENT = Pattern.compile("//\\s*");
 	private static final Pattern EMPTY_BLOCK_COMMENT = Pattern.compile("/\\*\\s*(\\*\\s*)*\\*/");
 	private static final Pattern EMPTY_JAVADOC = Pattern.compile("/\\*\\*\\s*(\\*\\s*)*\\*/");
+	private static final Pattern ONLY_INHERITDOC_JAVADOC = Pattern.compile("/\\*\\*\\s*(\\*\\s*)*\\{@inheritDoc\\}\\s*(\\*\\s*)*\\*/");
 	private static final Pattern ECLIPSE_GENERATED_TODOS = Pattern.compile("//\\s*"
 			+ "(:?"
 			+   "(?:TODO Auto-generated (?:(?:(?:method|constructor) stub)|(?:catch block)))"
@@ -125,6 +126,13 @@ public class CommentsRefactoring extends ASTVisitor implements IJavaRefactoring 
 		} else if (allTagsEmpty(node.tags())) {
 			this.ctx.getRefactorings().remove(node);
 			return DO_NOT_VISIT_SUBTREE;
+		} else if (ONLY_INHERITDOC_JAVADOC.matcher(comment).matches()) {
+			// Put on one line only to augment vertical density of code
+			int startLine = this.astRoot.getLineNumber(node.getStartPosition());
+			int endLine = this.astRoot.getLineNumber(node.getStartPosition() + node.getLength());
+			if (startLine != endLine) {
+				this.ctx.getRefactorings().replace(node, "/** {@inheritDoc} */");
+			}
 		} else if (!acceptJavadoc(getNextNode(node))) {
 			// TODO JNR convert to block comment
 		}

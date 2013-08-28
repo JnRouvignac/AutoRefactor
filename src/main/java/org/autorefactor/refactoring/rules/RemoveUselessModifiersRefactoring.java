@@ -174,16 +174,23 @@ public class RemoveUselessModifiersRefactoring extends ASTVisitor implements
 	@SuppressWarnings("unchecked")
 	private boolean ensureModifiersOrder(BodyDeclaration node) {
 		boolean result = VISIT_SUBTREE;
-		final List<Modifier> modifiers = node.modifiers();
+		final List<Modifier> modifiers = getModifiersOnly(node.modifiers());
 		final List<Modifier> reorderedModifiers = new ArrayList<Modifier>(modifiers);
 		Collections.sort(reorderedModifiers, new ModifierOrderComparator());
 		if (!modifiers.equals(reorderedModifiers)) {
-			for (int i = 0; i < reorderedModifiers.size(); i++) {
+			final int startSize = getStartSize(node.modifiers(), modifiers);
+			for (int i = startSize; i < reorderedModifiers.size(); i++) {
 				insertAt(reorderedModifiers.get(i), i);
 				result = DO_NOT_VISIT_SUBTREE;
 			}
 		}
 		return result;
+	}
+
+	private <T> int getStartSize(List<T> initialList, final List<T> filteredList) {
+		final List<T> l = new ArrayList<T>(initialList);
+		l.removeAll(filteredList);
+		return l.size();
 	}
 
 	private void insertAt(Modifier modifier, int index) {
