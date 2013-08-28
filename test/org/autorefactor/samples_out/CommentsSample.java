@@ -42,6 +42,7 @@ public class CommentsSample implements Runnable {
         return false;
     }
 
+    // Do not convert this line comment to javadoc
     /**
      * Convert to a javadoc
      */
@@ -59,7 +60,7 @@ public class CommentsSample implements Runnable {
      * This is a javadoc that must be kept
      */
     public void test() {
-        /**
+        /*
          * This is a javadoc that must be transformed to a blockcomment
          */
         /*

@@ -48,6 +48,7 @@ public class CommentsSample implements Runnable {
         return false;
     }
 
+    // Do not convert this line comment to javadoc
     /*
      * Convert to a javadoc
      */
