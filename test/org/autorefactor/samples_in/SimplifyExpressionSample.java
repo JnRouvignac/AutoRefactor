@@ -290,4 +290,11 @@ public class SimplifyExpressionSample {
         }
     }
 
+    public boolean addParentheses(int i, boolean b1, boolean b2, boolean b3) {
+        if (i == 0) {
+            return b1 && b2 || b3;
+        }
+        return b1 || b2 && b3;
+    }
+
 }

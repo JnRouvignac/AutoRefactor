@@ -166,8 +166,15 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
 	 */
 	private boolean isHardToRead(final Expression innerExpr, final ASTNode parent) {
 		if (parent instanceof InfixExpression) {
-			return ((InfixExpression) parent).getOperator().equals(Operator.EQUALS)
-				&& innerExpr instanceof InfixExpression;
+			if (innerExpr instanceof InfixExpression) {
+				final Operator innerOp = ((InfixExpression) innerExpr).getOperator();
+				final Operator parentOp = ((InfixExpression) parent).getOperator();
+				return Operator.EQUALS.equals(parentOp)
+					|| (Operator.CONDITIONAL_AND.equals(innerOp) && Operator.CONDITIONAL_OR.equals(parentOp))
+					|| (Operator.AND.equals(innerOp) && Operator.OR.equals(parentOp))
+					|| (Operator.AND.equals(innerOp) && Operator.XOR.equals(parentOp))
+					|| (Operator.XOR.equals(innerOp) && Operator.OR.equals(parentOp));
+			}
 		} else if (parent instanceof ConditionalExpression) {
 			return innerExpr instanceof ConditionalExpression
 				|| innerExpr instanceof Assignment
@@ -331,26 +338,59 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
 				}
 			}
 		} else if (Operator.EQUALS.equals(operator)) {
+			boolean result = VISIT_SUBTREE;
 			final Boolean blo = ASTHelper.getBooleanLiteral(lhs);
 			final Boolean bro = ASTHelper.getBooleanLiteral(rhs);
 			if (blo != null) {
 				checkNoExtendedOperands(node);
-				replace(node, blo.booleanValue(), rhs);
+				result = replace(node, blo.booleanValue(), rhs);
 			} else if (bro != null) {
-				replace(node, bro.booleanValue(), lhs);
+				result = replace(node, bro.booleanValue(), lhs);
+			}
+			if (result == DO_NOT_VISIT_SUBTREE) {
+				return DO_NOT_VISIT_SUBTREE;
 			}
 		} else if (Operator.NOT_EQUALS.equals(operator)) {
+			boolean continueVisit = VISIT_SUBTREE;
 			final Boolean blo = ASTHelper.getBooleanLiteral(lhs);
 			final Boolean bro = ASTHelper.getBooleanLiteral(rhs);
 			if (blo != null) {
 				checkNoExtendedOperands(node);
-				replace(node, !blo.booleanValue(), rhs);
+				continueVisit = replace(node, !blo.booleanValue(), rhs);
 			} else if (bro != null) {
-				replace(node, !bro.booleanValue(), lhs);
+				continueVisit = replace(node, !bro.booleanValue(), lhs);
+			}
+			if (!continueVisit) {
+				return DO_NOT_VISIT_SUBTREE;
 			}
 		}
 
+		if (shouldAddParentheses(node, Operator.CONDITIONAL_AND, Operator.CONDITIONAL_OR)
+				|| shouldAddParentheses(node, Operator.AND, Operator.XOR)
+				|| shouldAddParentheses(node, Operator.AND, Operator.OR)
+				|| shouldAddParentheses(node, Operator.XOR, Operator.OR)) {
+			addParentheses(node);
+			return DO_NOT_VISIT_SUBTREE;
+		}
 		return VISIT_SUBTREE;
+	}
+
+	private boolean shouldAddParentheses(InfixExpression node, Operator opNode, Operator opParent) {
+		final Operator operator = node.getOperator();
+		if (opNode.equals(operator)) {
+			if (node.getParent() instanceof InfixExpression) {
+				InfixExpression ie = (InfixExpression) node.getParent();
+				return opParent.equals(ie.getOperator());
+			}
+		}
+		return false;
+	}
+
+	private void addParentheses(Expression e) {
+		final AST ast = this.ctx.getAST();
+		final ParenthesizedExpression pe = ast.newParenthesizedExpression();
+		pe.setExpression(ASTHelper.copySubtree(ast, e));
+		this.ctx.getRefactorings().replace(e, pe);
 	}
 
 	/**
@@ -373,12 +413,12 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
 				&& "boolean".equals(typeBinding.getQualifiedName());
 	}
 
-	private void replace(InfixExpression node, boolean negate,
+	private boolean replace(InfixExpression node, boolean negate,
 			Expression exprToCopy) {
 		checkNoExtendedOperands(node);
 		if (!isPrimitiveBool(node.getLeftOperand())
 				&& !isPrimitiveBool(node.getRightOperand())) {
-			return;
+			return VISIT_SUBTREE;
 		}
 		// Either:
 		// - Two boolean primitives: no possible NPE
@@ -392,6 +432,7 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
 			operand = ASTHelper.negate(this.ctx.getAST(), exprToCopy, true);
 		}
 		this.ctx.getRefactorings().replace(node, operand);
+		return DO_NOT_VISIT_SUBTREE;
 	}
 
 	private void replaceByCopy(InfixExpression node, final Expression expr) {
