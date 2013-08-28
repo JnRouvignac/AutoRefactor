@@ -188,12 +188,12 @@ public class ASTHelper {
 	}
 
 	public static Boolean getBooleanLiteral(Expression node) {
-		final BooleanLiteral bl = ASTHelper.as(node, BooleanLiteral.class);
+		final BooleanLiteral bl = as(node, BooleanLiteral.class);
 		if (bl != null) {
 			return bl.booleanValue();
 		}
-		final QualifiedName qn = ASTHelper.as(node, QualifiedName.class);
-		if (ASTHelper.hasType(qn, "java.lang.Boolean")) {
+		final QualifiedName qn = as(node, QualifiedName.class);
+		if (hasType(qn, "java.lang.Boolean")) {
 			return getBooleanObjectAsLiteral(qn);
 		}
 		return null;
@@ -285,8 +285,14 @@ public class ASTHelper {
 		return false;
 	}
 
-	public static boolean instanceOf(ITypeBinding typeBinding,
-			String qualifiedTypeName) {
+	public static boolean instanceOf(Expression expr, String qualifiedTypeName) {
+		if (expr == null) {
+			return false;
+		}
+		return instanceOf(expr.resolveTypeBinding(), qualifiedTypeName);
+	}
+
+	public static boolean instanceOf(ITypeBinding typeBinding, String qualifiedTypeName) {
 		if (typeBinding == null) {
 			return false;
 		}
@@ -358,8 +364,7 @@ public class ASTHelper {
 
 	public static boolean thisExpressionRefersToCurrentType(Name name,
 			ASTNode node) {
-		final TypeDeclaration ancestor = ASTHelper.getAncestor(node,
-				TypeDeclaration.class);
+		final TypeDeclaration ancestor = getAncestor(node, TypeDeclaration.class);
 		if (name == null) {
 			return true;
 		} else if (name instanceof SimpleName) {

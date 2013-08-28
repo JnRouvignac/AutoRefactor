@@ -105,7 +105,7 @@ public class StringBuilderRefactoring extends ASTVisitor implements
 		// String s = "" + Integer.toString(1);
 		// String s = "" + Long.toString(1);
 		if (Operator.PLUS.equals(node.getOperator())
-				&& ASTHelper.hasType(node, "java.lang.String")) {
+				&& hasType(node, "java.lang.String")) {
 			final LinkedList<Expression> allOperands = new LinkedList<Expression>();
 			addAllSubExpressions(node, allOperands, null);
 			boolean replaceNeeded = filterOutEmptyStringsFromStringConcat(allOperands);
@@ -129,8 +129,7 @@ public class StringBuilderRefactoring extends ASTVisitor implements
 		boolean canRemoveEmptyStrings = false;
 		for (int i = 0; i < allOperands.size(); i++) {
 			Expression expr = allOperands.get(i);
-			boolean canNowRemoveEmptyStrings = canRemoveEmptyStrings
-					|| ASTHelper.hasType(expr, "java.lang.String");
+			boolean canNowRemoveEmptyStrings = canRemoveEmptyStrings || hasType(expr, "java.lang.String");
 			if (isEmptyString(expr)) {
 
 				boolean removeExpr = false;
@@ -138,7 +137,7 @@ public class StringBuilderRefactoring extends ASTVisitor implements
 					removeExpr = true;
 				} else if (canNowRemoveEmptyStrings
 						&& i + 1 < allOperands.size()
-						&& ASTHelper.hasType(allOperands.get(i + 1), "java.lang.String")) {
+						&& hasType(allOperands.get(i + 1), "java.lang.String")) {
 					removeExpr = true;
 				}
 
@@ -165,12 +164,11 @@ public class StringBuilderRefactoring extends ASTVisitor implements
 		if (node.getExpression() == null) {
 			return VISIT_SUBTREE;
 		}
-		final ITypeBinding typeBinding = node.getExpression()
-				.resolveTypeBinding();
+		final ITypeBinding typeBinding = node.getExpression().resolveTypeBinding();
 		if ("append".equals(node.getName().getIdentifier())
 				&& node.arguments().size() == 1
 				// most expensive check comes last
-				&& ASTHelper.instanceOf(typeBinding, "java.lang.Appendable")) {
+				&& instanceOf(typeBinding, "java.lang.Appendable")) {
 			final LinkedList<Expression> allAppendedStrings = new LinkedList<Expression>();
 			final BooleanHolder foundInfixExpr = new BooleanHolder(false);
 			final Expression lastExpr = collectAllAppendedStrings(node,
@@ -186,7 +184,7 @@ public class StringBuilderRefactoring extends ASTVisitor implements
 			}
 		} else if ("toString".equals(node.getName().getIdentifier())
 				&& node.arguments().isEmpty()
-				&& ASTHelper.hasType(node.getExpression(),
+				&& hasType(node.getExpression(),
 						"java.lang.StringBuilder", "java.lang.StringBuffer")) {
 			final LinkedList<Expression> allAppendedStrings = new LinkedList<Expression>();
 			final Expression lastExpr = collectAllAppendedStrings(
@@ -251,7 +249,7 @@ public class StringBuilderRefactoring extends ASTVisitor implements
 
 	private Expression collectAllAppendedStrings(Expression expr,
 			final LinkedList<Expression> allOperands, BooleanHolder foundInfixExpr) {
-		if (ASTHelper.hasType(expr, "java.lang.StringBuilder", "java.lang.StringBuffer")) {
+		if (instanceOf(expr, "java.lang.Appendable")) {
 			if (expr instanceof MethodInvocation) {
 				final MethodInvocation mi = (MethodInvocation) expr;
 				if ("append".equals(mi.getName().getIdentifier())
@@ -265,9 +263,8 @@ public class StringBuilderRefactoring extends ASTVisitor implements
 				final ClassInstanceCreation cic = (ClassInstanceCreation) expr;
 				if (cic.arguments().size() == 1) {
 					final Expression arg = (Expression) cic.arguments().get(0);
-					if (ASTHelper.hasType(arg, "java.lang.String")
-							|| ASTHelper.instanceOf(arg.resolveTypeBinding(),
-									"java.lang.CharSequence")) {
+					if (hasType(arg, "java.lang.String")
+							|| instanceOf(arg, "java.lang.CharSequence")) {
 						allOperands.addFirst(copy(arg));
 					}
 				}

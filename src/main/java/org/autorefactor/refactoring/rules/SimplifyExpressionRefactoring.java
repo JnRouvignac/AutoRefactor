@@ -220,21 +220,20 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
 			// TODO JNR handle same class calls and sub classes
 			return VISIT_SUBTREE;
 		}
-		final ITypeBinding typeBinding = node.getExpression()
-				.resolveTypeBinding();
+		final ITypeBinding typeBinding = node.getExpression().resolveTypeBinding();
 		if ("compareTo".equals(node.getName().getIdentifier())) {
-			if (ASTHelper.instanceOf(typeBinding, "java.lang.Comparable")
+			if (instanceOf(typeBinding, "java.lang.Comparable")
 					&& node.arguments().size() == 1) {
 				replaceInfixExpressionIfNeeded(node.getParent());
 				return DO_NOT_VISIT_SUBTREE;
-			} else if (ASTHelper.instanceOf(typeBinding, "java.lang.Comparator")
+			} else if (instanceOf(typeBinding, "java.lang.Comparator")
 					&& node.arguments().size() == 2) {
 				replaceInfixExpressionIfNeeded(node.getParent());
 				return DO_NOT_VISIT_SUBTREE;
 			}
 		} else if (javaMinorVersion >= 2
 				&& "compareToIgnoreCase".equals(node.getName().getIdentifier())
-				&& ASTHelper.instanceOf(typeBinding, "java.lang.String")
+				&& instanceOf(typeBinding, "java.lang.String")
 				&& node.arguments().size() == 1) {
 			replaceInfixExpressionIfNeeded(node.getParent());
 			return DO_NOT_VISIT_SUBTREE;

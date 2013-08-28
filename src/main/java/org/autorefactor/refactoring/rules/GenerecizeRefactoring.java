@@ -25,7 +25,6 @@
  */
 package org.autorefactor.refactoring.rules;
 
-import org.autorefactor.refactoring.ASTHelper;
 import org.autorefactor.refactoring.IJavaRefactoring;
 import org.autorefactor.refactoring.Refactorings;
 import org.eclipse.jdt.core.dom.ASTVisitor;
@@ -33,6 +32,8 @@ import org.eclipse.jdt.core.dom.CastExpression;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Type;
+
+import static org.autorefactor.refactoring.ASTHelper.*;
 
 /**
  * Add generics, be more assertive about generics that what Eclipse does.
@@ -79,8 +80,7 @@ public class GenerecizeRefactoring extends ASTVisitor implements
 		if ("next".equals(node.getName().getIdentifier())
 				&& node.arguments().size() == 0
 				&& node.getExpression() != null
-				&& ASTHelper.instanceOf(node.getExpression()
-						.resolveTypeBinding(), "java.util.Iterator")) {
+				&& instanceOf(node.getExpression(), "java.util.Iterator")) {
 			if (node.getParent() instanceof CastExpression) {
 				CastExpression cast = (CastExpression) node.getParent();
 				Type type = cast.getType();
@@ -88,7 +88,7 @@ public class GenerecizeRefactoring extends ASTVisitor implements
 				// find variable declaration and include with the type above
 			}
 		}
-		return ASTHelper.VISIT_SUBTREE;
+		return VISIT_SUBTREE;
 	}
 
 	public Refactorings getRefactorings(CompilationUnit astRoot) {
