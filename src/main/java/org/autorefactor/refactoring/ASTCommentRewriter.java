@@ -98,8 +98,7 @@ public class ASTCommentRewriter {
 			}
 
 			boolean isFirst = true;
-			for (Iterator<LineComment> iter = lineComments.iterator(); iter
-					.hasNext();) {
+			for (Iterator<LineComment> iter = lineComments.iterator(); iter.hasNext();) {
 				LineComment lineComment = iter.next();
 				if (isFirst) {
 					edits.addChild(new ReplaceEdit(lineComment.getStartPosition(), "//".length(), "/**"));
@@ -111,7 +110,7 @@ public class ASTCommentRewriter {
 				}
 				if (!iter.hasNext()) {
 					// this was the last line comment to transform
-					// TODO JNR how to get access to configured newline?
+					// TODO JNR how to get access to configured newline? @see #getNewline();
 					// TODO JNR how to obey configured indentation?
 					edits.addChild(new InsertEdit(lineComment.getStartPosition() + lineComment.getLength(), "\n*/"));
 				}
@@ -119,13 +118,16 @@ public class ASTCommentRewriter {
 		}
 	}
 
+	private void getNewline() {
+		// TODO how to get access to configured newline
+		// Answer: use ICompilationUnit.findRecommendedLineSeparator()
+	}
+
 	private int chompWhitespacesBefore(final String text, int start) {
 		int i = start - 1;
 		while (i >= 0) {
 			final char c = text.charAt(i);
-			// TODO JNR how to get project specific newline separator??
-			// Platform.PREF_LINE_SEPARATOR ??
-			// See org.eclipse.ui.internal.ide.LineDelimiterEditor
+			// TODO JNR how to get project specific newline separator?? @see #getNewline();
 			if (!Character.isWhitespace(c) || c == '\n') {
 				break;
 			}
@@ -144,7 +146,7 @@ public class ASTCommentRewriter {
 			}
 			i++;
 			end = i;
-			// TODO JNR how to get project specific newline separator??
+			// TODO JNR how to get project specific newline separator?? @see #getNewline();
 			if (c == '\n') {
 				// we chomped the newline character, do not chomp on the next line
 				break;
