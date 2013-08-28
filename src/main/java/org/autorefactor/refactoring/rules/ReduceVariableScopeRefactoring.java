@@ -34,6 +34,7 @@ import java.util.Map.Entry;
 import org.autorefactor.refactoring.ASTHelper;
 import org.autorefactor.refactoring.IJavaRefactoring;
 import org.autorefactor.refactoring.Refactorings;
+import org.autorefactor.util.NotImplementedException;
 import org.autorefactor.util.Pair;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
@@ -246,7 +247,7 @@ public class ReduceVariableScopeRefactoring extends ASTVisitor implements
 		} else if (parent instanceof PostfixExpression) {
 			return Pair.of(READ | WRITE, getScope(parent.getParent()));
 		}
-		throw p(parent);
+		throw new NotImplementedException(parent);
 	}
 
 	private ASTNode getScope(ASTNode node) {
@@ -258,12 +259,7 @@ public class ReduceVariableScopeRefactoring extends ASTVisitor implements
 				|| node instanceof VariableDeclaration) {
 			return getScope(node.getParent());
 		}
-		throw p(node);
-	}
-
-	private IllegalStateException p(final ASTNode node) {
-		return new IllegalStateException("Not implemented for "
-				+ node.getClass().getName());
+		throw new NotImplementedException(node);
 	}
 
 	public Refactorings getRefactorings(CompilationUnit astRoot) {
@@ -348,8 +344,7 @@ public class ReduceVariableScopeRefactoring extends ASTVisitor implements
 				// newFs.setBody(copy(fs.getBody()));
 				// }
 			} else {
-				throw new IllegalStateException(
-						"Unhandled case: more than one initializer in for loop.");
+				throw new NotImplementedException("for more than one initializer in for loop.");
 			}
 		} else if (scope instanceof WhileStatement) {
 			final WhileStatement ws = (WhileStatement) scope;
@@ -391,7 +386,7 @@ public class ReduceVariableScopeRefactoring extends ASTVisitor implements
 								+ is);
 			}
 		} else {
-			throw p(scope);
+			throw new NotImplementedException(scope);
 		}
 	}
 
@@ -405,13 +400,13 @@ public class ReduceVariableScopeRefactoring extends ASTVisitor implements
 				b.statements().add(
 						this.ctx.getAST().newVariableDeclarationStatement(vdf));
 			} else {
-				throw p(stmtToCopy);
+				throw new NotImplementedException(stmtToCopy);
 			}
 			return b;
 		}
 		// We should never come here if we had a Block statement, see the
 		// replace() method
-		throw new IllegalStateException("Not implemented for " + stmtToCopy);
+		throw new NotImplementedException(stmtToCopy);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -447,9 +442,9 @@ public class ReduceVariableScopeRefactoring extends ASTVisitor implements
 					return vdf;
 				}
 			}
-			throw p(a.getLeftHandSide());
+			throw new NotImplementedException(a.getLeftHandSide());
 		}
-		throw p(exprToReplace);
+		throw new NotImplementedException(exprToReplace);
 	}
 
 	private void remove(ASTNode node) {

@@ -28,9 +28,9 @@ package org.autorefactor.refactoring.rules;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import org.autorefactor.refactoring.ASTHelper;
 import org.autorefactor.refactoring.IJavaRefactoring;
 import org.autorefactor.refactoring.Refactorings;
+import org.autorefactor.util.NotImplementedException;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
@@ -48,6 +48,8 @@ import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.NodeFinder;
 import org.eclipse.jdt.core.dom.TagElement;
 import org.eclipse.jdt.core.dom.TextElement;
+
+import static org.autorefactor.refactoring.ASTHelper.*;
 
 /**
  * Refactor comments:
@@ -90,12 +92,12 @@ public class CommentsRefactoring extends ASTVisitor implements IJavaRefactoring 
 		final String comment = getComment(node);
 		if (EMPTY_BLOCK_COMMENT.matcher(comment).matches()) {
 			this.ctx.getRefactorings().remove(node);
-			return ASTHelper.DO_NOT_VISIT_SUBTREE;
+			return DO_NOT_VISIT_SUBTREE;
 		} else if (acceptJavadoc(getNextNode(node))) {
 			this.ctx.getRefactorings().toJavadoc(node);
-			return ASTHelper.DO_NOT_VISIT_SUBTREE;
+			return DO_NOT_VISIT_SUBTREE;
 		}
-		return ASTHelper.VISIT_SUBTREE;
+		return VISIT_SUBTREE;
 	}
 
 	private ASTNode getNextNode(Comment node) {
@@ -119,14 +121,14 @@ public class CommentsRefactoring extends ASTVisitor implements IJavaRefactoring 
 		final String comment = getComment(node);
 		if (EMPTY_JAVADOC.matcher(comment).matches()) {
 			this.ctx.getRefactorings().remove(node);
-			return ASTHelper.DO_NOT_VISIT_SUBTREE;
+			return DO_NOT_VISIT_SUBTREE;
 		} else if (allTagsEmpty(node.tags())) {
 			this.ctx.getRefactorings().remove(node);
-			return ASTHelper.DO_NOT_VISIT_SUBTREE;
+			return DO_NOT_VISIT_SUBTREE;
 		} else if (!acceptJavadoc(getNextNode(node))) {
 			// TODO JNR convert to block comment
 		}
-		return ASTHelper.VISIT_SUBTREE;
+		return VISIT_SUBTREE;
 	}
 
 	private boolean allTagsEmpty(List<TagElement> tags) {
@@ -188,7 +190,7 @@ public class CommentsRefactoring extends ASTVisitor implements IJavaRefactoring 
 //			} else if (TagElement.TAG_VALUE.equals(tag.getTagName())) {
 //			} else if (TagElement.TAG_VERSION.equals(tag.getTagName())) {
 		} else if (throwIfUnknown) {
-			throw new RuntimeException("Not implemented for tagName " + tag.getTagName());
+			throw new NotImplementedException("for tagName " + tag.getTagName());
 		}
 		return false;
 	}
@@ -209,15 +211,10 @@ public class CommentsRefactoring extends ASTVisitor implements IJavaRefactoring 
 				// org.eclipse.jdt.core.dom.MemberRef
 				// org.eclipse.jdt.core.dom.MethodRef
 				// org.eclipse.jdt.core.dom.Name
-				throw new RuntimeException(notImplementedFor(fragment));
+				throw new NotImplementedException(fragment);
 			}
 		}
 		return false;
-	}
-
-	private String notImplementedFor(Object fragment) {
-		return "Not implemented for an object of type "
-				+ (fragment != null ? fragment.getClass().getSimpleName() : null);
 	}
 
 	@Override
@@ -225,18 +222,18 @@ public class CommentsRefactoring extends ASTVisitor implements IJavaRefactoring 
 		final String comment = getComment(node);
 		if (EMPTY_LINE_COMMENT.matcher(comment).matches()) {
 			this.ctx.getRefactorings().remove(node);
-			return ASTHelper.DO_NOT_VISIT_SUBTREE;
+			return DO_NOT_VISIT_SUBTREE;
 		} else if (ECLIPSE_GENERATED_TODOS.matcher(comment).matches()) {
 			this.ctx.getRefactorings().remove(node);
-			return ASTHelper.DO_NOT_VISIT_SUBTREE;
+			return DO_NOT_VISIT_SUBTREE;
 		} else {
 			final ASTNode nextNode = getNextNode(node);
 			if (acceptJavadoc(nextNode)) {
 				this.ctx.getRefactorings().toJavadoc(node, nextNode);
-				return ASTHelper.DO_NOT_VISIT_SUBTREE;
+				return DO_NOT_VISIT_SUBTREE;
 			}
 		}
-		return ASTHelper.VISIT_SUBTREE;
+		return VISIT_SUBTREE;
 	}
 
 	private boolean acceptJavadoc(final ASTNode node) {

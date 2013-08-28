@@ -33,6 +33,7 @@ import java.util.Map;
 import org.autorefactor.refactoring.ASTHelper;
 import org.autorefactor.refactoring.IJavaRefactoring;
 import org.autorefactor.refactoring.Refactorings;
+import org.autorefactor.util.NotImplementedException;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTMatcher;
 import org.eclipse.jdt.core.dom.ASTNode;
@@ -61,6 +62,8 @@ import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
+
+import static org.autorefactor.refactoring.ASTHelper.*;
 
 /**
  * <ul>
@@ -135,7 +138,7 @@ public class BooleanRefactoring extends ASTVisitor implements IJavaRefactoring {
 						"boolean", null);
 				ASTHelper.replaceInParent(node, expr);
 			}
-			return ASTHelper.DO_NOT_VISIT_SUBTREE;
+			return DO_NOT_VISIT_SUBTREE;
 		}
 
 		@Override
@@ -148,7 +151,7 @@ public class BooleanRefactoring extends ASTVisitor implements IJavaRefactoring {
 						this.ifCondition, "java.lang.Boolean", this.booleanName);
 				ASTHelper.replaceInParent(node, expr);
 			}
-			return ASTHelper.DO_NOT_VISIT_SUBTREE;
+			return DO_NOT_VISIT_SUBTREE;
 		}
 
 	}
@@ -177,7 +180,7 @@ public class BooleanRefactoring extends ASTVisitor implements IJavaRefactoring {
 				this.ctx.getRefactorings().replace(node, newE);
 			}
 		}
-		return ASTHelper.VISIT_SUBTREE;
+		return VISIT_SUBTREE;
 	}
 
 	@Override
@@ -202,7 +205,7 @@ public class BooleanRefactoring extends ASTVisitor implements IJavaRefactoring {
 				} else {
 					this.ctx.getRefactorings().replace(node, copyStmt);
 				}
-				return ASTHelper.DO_NOT_VISIT_SUBTREE;
+				return DO_NOT_VISIT_SUBTREE;
 			}
 		}
 
@@ -264,13 +267,13 @@ public class BooleanRefactoring extends ASTVisitor implements IJavaRefactoring {
 						final VariableDeclarationFragment vdf = getVariableDeclarationFragment(
 								vds, thenA.getLeftHandSide());
 						if (vdf == null) {
-							return ASTHelper.VISIT_SUBTREE;
+							return VISIT_SUBTREE;
 						}
 
 						final ITypeBinding typeBinding = vds.getType()
 								.resolveBinding();
 						if (typeBinding == null) {
-							return ASTHelper.VISIT_SUBTREE;
+							return VISIT_SUBTREE;
 						}
 						final String expressionTypeName = typeBinding
 								.getQualifiedName();
@@ -296,7 +299,7 @@ public class BooleanRefactoring extends ASTVisitor implements IJavaRefactoring {
 							final ITypeBinding typeBinding = elseA
 									.resolveTypeBinding();
 							if (typeBinding == null) {
-								return ASTHelper.VISIT_SUBTREE;
+								return VISIT_SUBTREE;
 							}
 							final String expressionTypeName = typeBinding
 									.getQualifiedName();
@@ -315,7 +318,7 @@ public class BooleanRefactoring extends ASTVisitor implements IJavaRefactoring {
 				}
 			}
 		}
-		return ASTHelper.VISIT_SUBTREE;
+		return VISIT_SUBTREE;
 	}
 
 	private ReturnStatement getReturnStatement(IfStatement node,
@@ -475,8 +478,7 @@ public class BooleanRefactoring extends ASTVisitor implements IJavaRefactoring {
 					return true;
 				}
 			} else {
-				throw new IllegalStateException("Not implemented for "
-						+ id.getName().getClass());
+				throw new NotImplementedException(id.getName());
 			}
 		}
 		return false;
@@ -499,11 +501,11 @@ public class BooleanRefactoring extends ASTVisitor implements IJavaRefactoring {
 							node,
 							getRefactoring(typeBinding.getName(), node,
 									l.booleanValue()));
-					return ASTHelper.DO_NOT_VISIT_SUBTREE;
+					return DO_NOT_VISIT_SUBTREE;
 				}
 			}
 		}
-		return ASTHelper.VISIT_SUBTREE;
+		return VISIT_SUBTREE;
 	}
 
 	private FieldAccess getRefactoring(String typeName, MethodInvocation node,

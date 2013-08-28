@@ -28,6 +28,7 @@ package org.autorefactor.refactoring.rules;
 import org.autorefactor.refactoring.ASTHelper;
 import org.autorefactor.refactoring.IJavaRefactoring;
 import org.autorefactor.refactoring.Refactorings;
+import org.autorefactor.util.NotImplementedException;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTMatcher;
 import org.eclipse.jdt.core.dom.ASTNode;
@@ -362,7 +363,7 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
 	 */
 	private void checkNoExtendedOperands(InfixExpression node) {
 		if (!hasType(node, "java.lang.String") && !node.extendedOperands().isEmpty()) {
-			throw new RuntimeException("Not implemented for extended operands");
+			throw new NotImplementedException("for extended operands");
 		}
 	}
 

@@ -32,6 +32,7 @@ import java.util.List;
 import org.autorefactor.refactoring.ASTHelper;
 import org.autorefactor.refactoring.IJavaRefactoring;
 import org.autorefactor.refactoring.Refactorings;
+import org.autorefactor.util.NotImplementedException;
 import org.eclipse.jdt.core.dom.ASTMatcher;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
@@ -39,6 +40,8 @@ import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.Statement;
+
+import static org.autorefactor.refactoring.ASTHelper.*;
 
 /**
  * Factorize common code in all if / else if / else statements either at the
@@ -67,7 +70,7 @@ public class CommonCodeInIfElseStatementRefactoring extends ASTVisitor
 	@Override
 	public boolean visit(IfStatement node) {
 		if (isElseStatementOfParentIf(node)) {
-			return ASTHelper.VISIT_SUBTREE;
+			return VISIT_SUBTREE;
 		}
 
 		final List<List<Statement>> allCasesStmts = new ArrayList<List<Statement>>();
@@ -143,7 +146,7 @@ public class CommonCodeInIfElseStatementRefactoring extends ASTVisitor
 				}
 			}
 		}
-		return ASTHelper.VISIT_SUBTREE;
+		return VISIT_SUBTREE;
 	}
 
 	private boolean isElseStatementOfParentIf(IfStatement node) {
@@ -172,8 +175,7 @@ public class CommonCodeInIfElseStatementRefactoring extends ASTVisitor
 			final Block b = (Block) parent;
 			return findNodeToRemove(b, b.getParent());
 		}
-		throw new IllegalStateException("Not implemented for parent of "
-				+ parent.getClass());
+		throw new NotImplementedException("for parent of type " + parent.getClass());
 	}
 
 	private boolean allEmpty(List<Boolean> areCasesEmpty) {

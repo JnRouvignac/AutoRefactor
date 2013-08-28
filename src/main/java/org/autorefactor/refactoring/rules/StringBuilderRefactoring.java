@@ -34,6 +34,7 @@ import java.util.List;
 import org.autorefactor.refactoring.ASTHelper;
 import org.autorefactor.refactoring.IJavaRefactoring;
 import org.autorefactor.refactoring.Refactorings;
+import org.autorefactor.util.NotImplementedException;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
@@ -46,6 +47,8 @@ import org.eclipse.jdt.core.dom.InfixExpression.Operator;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Name;
 import org.eclipse.jdt.core.dom.StringLiteral;
+
+import static org.autorefactor.refactoring.ASTHelper.*;
 
 /**
  * StringBuilder related refactorings:
@@ -92,7 +95,7 @@ public class StringBuilderRefactoring extends ASTVisitor implements
 				// do we need the CFG + live variable analysis first?
 			}
 		}
-		return ASTHelper.VISIT_SUBTREE;
+		return VISIT_SUBTREE;
 	}
 
 	@Override
@@ -116,9 +119,9 @@ public class StringBuilderRefactoring extends ASTVisitor implements
 			// this.ctx.getRefactorings().remove(operand);
 			// }
 			// }
-			return ASTHelper.DO_NOT_VISIT_SUBTREE;
+			return DO_NOT_VISIT_SUBTREE;
 		}
-		return ASTHelper.VISIT_SUBTREE;
+		return VISIT_SUBTREE;
 	}
 
 	private boolean filterOutEmptyStringsFromStringConcat(List<Expression> allOperands) {
@@ -160,7 +163,7 @@ public class StringBuilderRefactoring extends ASTVisitor implements
 	@Override
 	public boolean visit(MethodInvocation node) {
 		if (node.getExpression() == null) {
-			return ASTHelper.VISIT_SUBTREE;
+			return VISIT_SUBTREE;
 		}
 		final ITypeBinding typeBinding = node.getExpression()
 				.resolveTypeBinding();
@@ -178,7 +181,7 @@ public class StringBuilderRefactoring extends ASTVisitor implements
 					// rewrite the successive calls to append() on an Appendable
 					this.ctx.getRefactorings().replace(node,
 							createStringAppends(lastExpr, allAppendedStrings));
-					return ASTHelper.DO_NOT_VISIT_SUBTREE;
+					return DO_NOT_VISIT_SUBTREE;
 				}
 			}
 		} else if ("toString".equals(node.getName().getIdentifier())
@@ -194,10 +197,10 @@ public class StringBuilderRefactoring extends ASTVisitor implements
 				// replace with String concatenation
 				this.ctx.getRefactorings().replace(node,
 						createStringConcats(allAppendedStrings));
-				return ASTHelper.DO_NOT_VISIT_SUBTREE;
+				return DO_NOT_VISIT_SUBTREE;
 			}
 		}
-		return ASTHelper.VISIT_SUBTREE;
+		return VISIT_SUBTREE;
 	}
 
 	private boolean filterOutEmptyStrings(List<Expression> allExprs) {
@@ -230,7 +233,7 @@ public class StringBuilderRefactoring extends ASTVisitor implements
 
 	private Expression createStringConcats(List<Expression> appendedStrings) {
 		if (appendedStrings.size() == 0) {
-			throw new RuntimeException("Not implemented");
+			throw new NotImplementedException("when there are no appended strings");
 		} else if (appendedStrings.size() == 1) {
 			return appendedStrings.get(0);
 		}

@@ -31,6 +31,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.autorefactor.util.NotImplementedException;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTMatcher;
 import org.eclipse.jdt.core.dom.ASTNode;
@@ -147,9 +148,7 @@ public class ASTHelper {
 					.getStructuralProperty(clpd);
 			property.set(property.indexOf(node), replacement);
 		} else {
-			throw new RuntimeException("Not implemented for "
-					+ (locationInParent != null ? locationInParent.getClass()
-							: "null"));
+			throw new NotImplementedException(locationInParent);
 		}
 	}
 
@@ -207,8 +206,7 @@ public class ASTHelper {
 		} else if ("Boolean.FALSE".equals(fqn)) {
 			return false;
 		}
-		throw new IllegalStateException(
-				"Not implemented for fully qualified name \"" + fqn + "\"");
+		throw new NotImplementedException("for fully qualified name \"" + fqn + "\"");
 	}
 
 	// AST navigation
@@ -342,7 +340,7 @@ public class ASTHelper {
 	/**
 	 * Infers what type the parent node expects to be returned by the passed in
 	 * Expression.
-	 * 
+	 *
 	 * @param node
 	 *            the expression for which to look at the type expected by the
 	 *            context
@@ -372,8 +370,7 @@ public class ASTHelper {
 					&& thisExpressionRefersToCurrentType(qn.getQualifier(),
 							ancestor);
 		}
-		throw new RuntimeException("Not implemented for "
-				+ (name != null ? name.getClass() : "null"));
+		throw new NotImplementedException(name);
 	}
 
 	public static boolean isEqual(Name name1, Name name2) {
@@ -405,8 +402,7 @@ public class ASTHelper {
 			} else if (node1 instanceof Statement) {
 				return match(matcher, (Statement) node1, (Statement) node2);
 			}
-			throw new RuntimeException("Not implemented for "
-					+ node1.getClass());
+			throw new NotImplementedException(node1);
 		}
 		return false;
 	}
@@ -424,8 +420,7 @@ public class ASTHelper {
 				return matcher.match((QualifiedName) name1,
 						(QualifiedName) name2);
 			}
-			throw new IllegalStateException("Not implemented for "
-					+ name1.getClass());
+			throw new NotImplementedException(name1);
 		}
 		return false;
 	}
@@ -497,8 +492,7 @@ public class ASTHelper {
 				return matcher.match((WhileStatement) stmt1,
 						(WhileStatement) stmt2);
 			}
-			throw new IllegalStateException("Not implemented for "
-					+ stmt1.getClass());
+			throw new NotImplementedException(stmt1);
 		}
 		return false;
 	}

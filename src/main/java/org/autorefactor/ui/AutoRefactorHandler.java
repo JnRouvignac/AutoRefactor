@@ -60,7 +60,9 @@ import org.autorefactor.refactoring.rules.StringBuilderRefactoring;
 import org.autorefactor.refactoring.rules.StringRefactorings;
 import org.autorefactor.ui.GrowableArrayList.GrowableListIterator;
 import org.autorefactor.ui.preferences.PreferenceHelper;
+import org.autorefactor.util.NotImplementedException;
 import org.autorefactor.util.Pair;
+import org.autorefactor.util.UnhandledException;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
@@ -170,7 +172,7 @@ public class AutoRefactorHandler extends AbstractHandler {
 			try {
 				return Integer.valueOf(tabSize);
 			} catch (NumberFormatException e) {
-				throw new RuntimeException("Unhandled exception");
+				throw new UnhandledException(e);
 			}
 		}
 
@@ -427,8 +429,7 @@ public class AutoRefactorHandler extends AbstractHandler {
 		} else if (javaElement instanceof IJavaProject) {
 			return (IJavaProject) javaElement;
 		}
-		throw new RuntimeException("Not implemented for "
-				+ (javaElement != null ? javaElement.getClass() : "null"));
+		throw new NotImplementedException(javaElement);
 	}
 
 	/**

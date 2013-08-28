@@ -25,9 +25,6 @@
  */
 package org.autorefactor.cfg;
 
-import static org.autorefactor.cfg.ASTPrintHelper.*;
-import static org.autorefactor.cfg.VariableAccess.*;
-
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.Map.Entry;
@@ -36,8 +33,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.autorefactor.refactoring.ASTHelper;
+import org.autorefactor.util.NotImplementedException;
 import org.autorefactor.util.Pair;
+import org.autorefactor.util.UnhandledException;
 import org.eclipse.jdt.core.dom.*;
+
+import static org.autorefactor.cfg.ASTPrintHelper.*;
+import static org.autorefactor.cfg.VariableAccess.*;
 
 /**
  * Builds a CFG.
@@ -46,7 +48,7 @@ import org.eclipse.jdt.core.dom.*;
  * all the buildCFG(*Statement, List<CFGEdgeBuilder>, CFGBasicBlock) methods.
  * <p>
  * TODO JNR detect dead code by looking for empty live blocks list when visiting a node
- * + looking at if / while / etc. conditions and see if they resolve to a constant 
+ * + looking at if / while / etc. conditions and see if they resolve to a constant
  */
 public class CFGBuilder {
 
@@ -146,7 +148,7 @@ public class CFGBuilder {
 		} else if (node instanceof VariableDeclarationExpression) {
 			addDeclarations(basicBlock, (VariableDeclarationExpression) node);
 		} else {
-			throw new RuntimeException(notImplementedFor(node));
+			throw new NotImplementedException(node);
 		}
 	}
 
@@ -205,44 +207,44 @@ public class CFGBuilder {
 			final Method m = getClass().getMethod("buildCFG", node.getClass(), List.class, CFGBasicBlock.class);
 			return (List<CFGEdgeBuilder>) m.invoke(this, node, liveBlocks, currentBasicBlock);
 		} catch (Exception e) {
-			throw new RuntimeException("Unhandled exception", e);
+			throw new UnhandledException(e);
 		}
 	}
 
 	public void buildCFG(QualifiedName node) {
-		throw new RuntimeException("Not implemented");
+		throw new NotImplementedException();
 	}
 
 	public void buildCFG(PrimitiveType node) {
-		throw new RuntimeException("Not implemented");
+		throw new NotImplementedException();
 	}
 
 	public void buildCFG(QualifiedType node) {
-		throw new RuntimeException("Not implemented");
+		throw new NotImplementedException();
 	}
 
 	public void buildCFG(PrefixExpression node) {
-		throw new RuntimeException("Not implemented");
+		throw new NotImplementedException();
 	}
 
 	public void buildCFG(PostfixExpression node) {
-		throw new RuntimeException("Not implemented");
+		throw new NotImplementedException();
 	}
 
 	public void buildCFG(ParenthesizedExpression node) {
-		throw new RuntimeException("Not implemented");
+		throw new NotImplementedException();
 	}
 
 	public void buildCFG(SingleVariableDeclaration node) {
-		throw new RuntimeException("Not implemented");
+		throw new NotImplementedException();
 	}
 
 	public void buildCFG(SimpleType node) {
-		throw new RuntimeException("Not implemented");
+		throw new NotImplementedException();
 	}
 
 	public void buildCFG(SimpleName node) {
-		throw new RuntimeException("Not implemented");
+		throw new NotImplementedException();
 	}
 
 	public List<CFGEdgeBuilder> buildCFG(ReturnStatement node,
@@ -256,11 +258,11 @@ public class CFGBuilder {
 	}
 
 	public void buildCFG(Modifier node) {
-		throw new RuntimeException("Not implemented");
+		throw new NotImplementedException();
 	}
 
 	public void buildCFG(MethodInvocation node) {
-		throw new RuntimeException("Not implemented");
+		throw new NotImplementedException();
 	}
 
 	public CFGBasicBlock buildCFG(MethodDeclaration node) {
@@ -294,43 +296,43 @@ public class CFGBuilder {
 	}
 
 	public void buildCFG(MethodRefParameter node) {
-		throw new RuntimeException("Not implemented");
+		throw new NotImplementedException();
 	}
 
 	public void buildCFG(MethodRef node) {
-		throw new RuntimeException("Not implemented");
+		throw new NotImplementedException();
 	}
 
 	public void buildCFG(MemberValuePair node) {
-		throw new RuntimeException("Not implemented");
+		throw new NotImplementedException();
 	}
 
 	public void buildCFG(ParameterizedType node) {
-		throw new RuntimeException("Not implemented");
+		throw new NotImplementedException();
 	}
 
 	public void buildCFG(NumberLiteral node) {
-		throw new RuntimeException("Not implemented");
+		throw new NotImplementedException();
 	}
 
 	public void buildCFG(NullLiteral node) {
-		throw new RuntimeException("Not implemented");
+		throw new NotImplementedException();
 	}
 
 	public void buildCFG(UnionType node) {
-		throw new RuntimeException("Not implemented");
+		throw new NotImplementedException();
 	}
 
 	public void buildCFG(TypeParameter node) {
-		throw new RuntimeException("Not implemented");
+		throw new NotImplementedException();
 	}
 
 	public void buildCFG(TypeLiteral node) {
-		throw new RuntimeException("Not implemented");
+		throw new NotImplementedException();
 	}
 
 	public void buildCFG(TypeDeclarationStatement node) {
-		throw new RuntimeException("Not implemented");
+		throw new NotImplementedException();
 	}
 
 	public CFGBasicBlock buildCFG(TypeDeclaration node) {
@@ -353,19 +355,19 @@ public class CFGBuilder {
 	}
 
 	public void buildCFG(TryStatement node) {
-		throw new RuntimeException("Not implemented");
+		throw new NotImplementedException();
 	}
 
 	public void buildCFG(WildcardType node) {
-		throw new RuntimeException("Not implemented");
+		throw new NotImplementedException();
 	}
 
 	public void buildCFG(WhileStatement node) {
-		throw new RuntimeException("Not implemented");
+		throw new NotImplementedException();
 	}
 
 	public void buildCFG(VariableDeclarationFragment node) {
-		throw new RuntimeException("Not implemented");
+		throw new NotImplementedException();
 	}
 
 	public List<CFGEdgeBuilder> buildCFG(VariableDeclarationStatement node,
@@ -380,59 +382,59 @@ public class CFGBuilder {
 	}
 
 	public void buildCFG(VariableDeclarationExpression node) {
-		throw new RuntimeException("Not implemented");
+		throw new NotImplementedException();
 	}
 
 	public void buildCFG(SwitchStatement node) {
-		throw new RuntimeException("Not implemented");
+		throw new NotImplementedException();
 	}
 
 	public void buildCFG(SwitchCase node) {
-		throw new RuntimeException("Not implemented");
+		throw new NotImplementedException();
 	}
 
 	public void buildCFG(SuperMethodInvocation node) {
-		throw new RuntimeException("Not implemented");
+		throw new NotImplementedException();
 	}
 
 	public void buildCFG(SuperFieldAccess node) {
-		throw new RuntimeException("Not implemented");
+		throw new NotImplementedException();
 	}
 
 	public void buildCFG(SuperConstructorInvocation node) {
-		throw new RuntimeException("Not implemented");
+		throw new NotImplementedException();
 	}
 
 	public void buildCFG(StringLiteral node) {
-		throw new RuntimeException("Not implemented");
+		throw new NotImplementedException();
 	}
 
 	public void buildCFG(ThrowStatement node) {
-		throw new RuntimeException("Not implemented");
+		throw new NotImplementedException();
 	}
 
 	public void buildCFG(ThisExpression node) {
-		throw new RuntimeException("Not implemented");
+		throw new NotImplementedException();
 	}
 
 	public void buildCFG(TextElement node) {
-		throw new RuntimeException("Not implemented");
+		throw new NotImplementedException();
 	}
 
 	public void buildCFG(TagElement node) {
-		throw new RuntimeException("Not implemented");
+		throw new NotImplementedException();
 	}
 
 	public void buildCFG(SynchronizedStatement node) {
-		throw new RuntimeException("Not implemented");
+		throw new NotImplementedException();
 	}
 
 	public void buildCFG(CatchClause node) {
-		throw new RuntimeException("Not implemented");
+		throw new NotImplementedException();
 	}
 
 	public void buildCFG(CastExpression node) {
-		throw new RuntimeException("Not implemented");
+		throw new NotImplementedException();
 	}
 
 	public List<CFGEdgeBuilder> buildCFG(BreakStatement node,
@@ -471,15 +473,15 @@ public class CFGBuilder {
 	}
 
 	public void buildCFG(BooleanLiteral node) {
-		throw new RuntimeException("Not implemented");
+		throw new NotImplementedException();
 	}
 
 	public void buildCFG(ConstructorInvocation node) {
-		throw new RuntimeException("Not implemented");
+		throw new NotImplementedException();
 	}
 
 	public void buildCFG(ConditionalExpression node) {
-		throw new RuntimeException("Not implemented");
+		throw new NotImplementedException();
 	}
 
 	public List<CFGBasicBlock> buildCFG(CompilationUnit node) {
@@ -488,30 +490,30 @@ public class CFGBuilder {
 			if (decl instanceof TypeDeclaration) {
 				results.add(buildCFG((TypeDeclaration) decl));
 			} else {
-				throw new RuntimeException(notImplementedFor(node));
+				throw new NotImplementedException(node);
 			}
 		}
 		return results;
 	}
 
 	public void buildCFG(ClassInstanceCreation node) {
-		throw new RuntimeException("Not implemented");
+		throw new NotImplementedException();
 	}
 
 	public void buildCFG(CharacterLiteral node) {
-		throw new RuntimeException("Not implemented");
+		throw new NotImplementedException();
 	}
 
 	public void buildCFG(ArrayCreation node) {
-		throw new RuntimeException("Not implemented");
+		throw new NotImplementedException();
 	}
 
 	public void buildCFG(ArrayAccess node) {
-		throw new RuntimeException("Not implemented");
+		throw new NotImplementedException();
 	}
 
 	public void buildCFG(AnonymousClassDeclaration node) {
-		throw new RuntimeException("Not implemented");
+		throw new NotImplementedException();
 	}
 
 	public List<CFGEdgeBuilder> buildCFG(Block node, List<CFGEdgeBuilder> previousLiveBlocks,
@@ -572,7 +574,7 @@ public class CFGBuilder {
 					// } else if (stmt instanceof WhileStatement) {
 					// buildCFG((WhileStatement) stmt, liveBlocks, basicBlock);
 				} else {
-					throw new RuntimeException(notImplementedFor(stmt));
+					throw new NotImplementedException(stmt);
 				}
 				basicBlock = nextStmtBasicBlock;
 			}
@@ -583,31 +585,31 @@ public class CFGBuilder {
 	}
 
 	public void buildCFG(Assignment node) {
-		throw new RuntimeException("Not implemented");
+		throw new NotImplementedException();
 	}
 
 	public void buildCFG(AssertStatement node) {
-		throw new RuntimeException("Not implemented");
+		throw new NotImplementedException();
 	}
 
 	public void buildCFG(ArrayType node) {
-		throw new RuntimeException("Not implemented");
+		throw new NotImplementedException();
 	}
 
 	public void buildCFG(ArrayInitializer node) {
-		throw new RuntimeException("Not implemented");
+		throw new NotImplementedException();
 	}
 
 	public void buildCFG(Initializer node) {
-		throw new RuntimeException("Not implemented");
+		throw new NotImplementedException();
 	}
 
 	public void buildCFG(InstanceofExpression node) {
-		throw new RuntimeException("Not implemented");
+		throw new NotImplementedException();
 	}
 
 	public void buildCFG(InfixExpression node) {
-		throw new RuntimeException("Not implemented");
+		throw new NotImplementedException();
 	}
 
 	/**
@@ -698,7 +700,7 @@ public class CFGBuilder {
 	}
 
 	public void buildCFG(MemberRef node) {
-		throw new RuntimeException("Not implemented");
+		throw new NotImplementedException();
 	}
 
 	public List<CFGEdgeBuilder> buildCFG(LabeledStatement node,
@@ -723,11 +725,11 @@ public class CFGBuilder {
 	}
 
 	public void buildCFG(EmptyStatement node) {
-		throw new RuntimeException("Not implemented");
+		throw new NotImplementedException();
 	}
 
 	public void buildCFG(DoStatement node) {
-		throw new RuntimeException("Not implemented");
+		throw new NotImplementedException();
 	}
 
 	public List<CFGEdgeBuilder> buildCFG(ContinueStatement node,
@@ -782,11 +784,11 @@ public class CFGBuilder {
 	}
 
 	public void buildCFG(FieldDeclaration node) {
-		throw new RuntimeException("Not implemented");
+		throw new NotImplementedException();
 	}
 
 	public void buildCFG(FieldAccess node) {
-		throw new RuntimeException("Not implemented");
+		throw new NotImplementedException();
 	}
 
 	public List<CFGEdgeBuilder> buildCFG(ExpressionStatement node,
@@ -807,8 +809,8 @@ public class CFGBuilder {
 
 	/**
 	 * Will create and return a new CFGBasicBlock for the passed in node, if the currentBasicBlock is null, otherwise
-	 * it will return the currentBasicBlock. 
-	 * 
+	 * it will return the currentBasicBlock.
+	 *
 	 * @param node
 	 * @param currentBasicBlock the current basic block the node will be added to. Can be null to force the creation
 	 *        of a new CFGBasicBlock.
@@ -825,7 +827,7 @@ public class CFGBuilder {
 		}
 		if (currentBasicBlock != null) {
 			final CFGBasicBlock basicBlock = currentBasicBlock;
-			// TODO JNR add nodes to the basicBlock they belong to 
+			// TODO JNR add nodes to the basicBlock they belong to
 			// and adapt the CFGDotPrinter to display "..." after the first node
 			// basicBlock.addNode(node);
 			return basicBlock;
@@ -849,7 +851,7 @@ public class CFGBuilder {
 			buildWithTarget(liveBlocks, basicBlock);
 			return basicBlock;
 		}
-		throw new RuntimeException(notImplementedFor(null));
+		throw new NotImplementedException("for empty expressions list");
 	}
 
 	private CFGBasicBlock newEntryBlock(MethodDeclaration node) {
@@ -900,10 +902,6 @@ public class CFGBuilder {
 			}
 		}
 		return result;
-	}
-
-	private String notImplementedFor(ASTNode node) {
-		return "Not implemented for " + (node != null? node.getClass().getSimpleName() : null);
 	}
 
 	private boolean isNotEmpty(final Collection<?> col) {
