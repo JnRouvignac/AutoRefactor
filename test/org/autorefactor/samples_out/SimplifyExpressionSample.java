@@ -107,11 +107,13 @@ public class SimplifyExpressionSample {
     }
 
     public void borderLineParenthezisedExpressions(Integer i) throws Exception {
-        // Do not replace any because they are in a String concatenation
+        // do not replace any because they are in a String concatenation
         String s1 = ((Number) i).doubleValue() + " ";
         String s2 = (i instanceof Number) + " ";
         String s3 = (i + 0) + " ";
         String s4 = (i == null ? null : "i") + " ";
+        // do not replace
+        long l    = 2 + (i == null ? 0 : i);
 
         // replace
         boolean b1 = ((Number) i).doubleValue() == 0;
@@ -136,7 +138,7 @@ public class SimplifyExpressionSample {
     }
 
     public boolean doNotReplaceParenthesesAroundAssignmentInCondition(Reader reader, char[] cbuf, int c) throws IOException {
-	// such expressions are used a lot in while conditions
+        // such expressions are used a lot in while conditions
         return -1 != (c = reader.read(cbuf));
     }
 

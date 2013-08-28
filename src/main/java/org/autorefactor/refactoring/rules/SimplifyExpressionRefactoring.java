@@ -46,12 +46,13 @@ import org.eclipse.jdt.core.dom.InstanceofExpression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.NullLiteral;
 import org.eclipse.jdt.core.dom.ParenthesizedExpression;
-import org.eclipse.jdt.core.dom.PrefixExpression;
 import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.ThisExpression;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.WhileStatement;
+
+import static org.autorefactor.refactoring.ASTHelper.*;
 
 /**
  * Simplify Java expressions:
@@ -102,9 +103,9 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
 					innerExpr);
 			this.ctx.getRefactorings().replace(node, innerExprCopy);
 			innerExprCopy.accept(this);
-			return ASTHelper.DO_NOT_VISIT_SUBTREE;
+			return DO_NOT_VISIT_SUBTREE;
 		}
-		return ASTHelper.VISIT_SUBTREE;
+		return VISIT_SUBTREE;
 	}
 
 	private Expression getExpressionWithoutParentheses(ParenthesizedExpression node) {
@@ -117,43 +118,27 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
 			final InfixExpression parentInfixExpr = (InfixExpression) parent;
 			if (innerExpr instanceof InfixExpression) {
 				final Operator innerOp = ((InfixExpression) innerExpr).getOperator();
-				final Operator outerOp = parentInfixExpr.getOperator();
 				if (innerOp == parentInfixExpr.getOperator()
-						&& isAssociativeOperator(innerOp)
+						&& OperatorEnum.isAssociative(innerOp)
 						// Leave String concatenations with mixed type
 						// to other if statements in this method.
 						&& innerExpr.resolveTypeBinding() != null
 						&& innerExpr.resolveTypeBinding().equals(
 								parentInfixExpr.resolveTypeBinding())) {
 					return innerExpr;
-				} else if (isReadable(innerOp, outerOp)) {
-					return innerExpr;
 				}
-			} else if (innerExpr instanceof InstanceofExpression
-					&& !ASTHelper.hasType(innerExpr, "java.lang.String")
-					&& ASTHelper.hasType(parentInfixExpr, "java.lang.String")) {
-				// The parentheses hold an InfixExpression that does not resolve
-				// to String but is inside a String concatenation
-				return node;
-			} else if (innerExpr instanceof ConditionalExpression
-					&& ASTHelper.hasType(parentInfixExpr, "java.lang.String")) {
-				// The parentheses hold a ConditionalExpression that is inside a String
-				// concatenation
-				return node;
-			} else if (innerExpr instanceof Assignment
-					&& isBooleanOperator(parentInfixExpr.getOperator())) {
-				// Do not replace since code would not compile
-				return node;
 			}
-		} else if (parent instanceof PrefixExpression
-				&& (innerExpr instanceof InstanceofExpression
-					|| innerExpr instanceof Assignment)) {
-			// Cannot remove parentheses around these negated expressions or there will be compile errors
-			return node;
-		} else if (parent instanceof ConditionalExpression && isHardToRead(innerExpr)) {
+		}
+		if (isHardToRead(innerExpr, parent)) {
 			return node;
 		}
 		if (isUselessParenthesesInStatement(parent, node)) {
+			return innerExpr;
+		}
+		final int compareTo = OperatorEnum.compareTo(innerExpr, parent);
+		if (compareTo < 0) {
+			return node;
+		} else if (compareTo > 0) {
 			return innerExpr;
 		}
 		if (
@@ -161,7 +146,7 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
 		// parentheses are sometimes needed to explicit code,
 		// some like it like that
 		innerExpr instanceof InfixExpression
-		// TODO JNR add additional code to check if the cast i really required
+		// TODO JNR add additional code to check if the cast is really required
 		// or if it can be removed.
 				|| innerExpr instanceof CastExpression) {
 			return node;
@@ -172,40 +157,20 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
 	/**
 	 * Returns whether the supplied expression is complex enough to read.
 	 *
-	 * @param expr
-	 *          the expression to tests for ease of read
+	 * @param innerExpr
+	 *          the inner expression to test for ease of read
+	 * @param parent
+	 *          the parent node to test for ease of read
 	 * @return true if the expressions is hard to read, false otherwise
 	 */
-	private boolean isHardToRead(Expression expr) {
-		return expr instanceof ConditionalExpression
-				|| expr instanceof Assignment
-				|| expr instanceof InstanceofExpression;
-	}
-
-	/**
-	 * Returns whether a condition using the specified inner operation within the
-	 * specified outer operation remains easily readable.
-	 *
-	 * @param innerOp
-	 *          the inner operation
-	 * @param outerOp
-	 *          the outer operation
-	 * @return true if the made up condition would still be readable, false
-	 *         otherwise
-	 */
-	private boolean isReadable(Operator innerOp, Operator outerOp) {
-		if (Operator.CONDITIONAL_AND.equals(outerOp)
-				|| Operator.CONDITIONAL_OR.equals(outerOp)) {
-			if (Operator.EQUALS.equals(innerOp)
-					|| Operator.NOT_EQUALS.equals(innerOp)
-					|| Operator.GREATER.equals(innerOp)
-					|| Operator.GREATER_EQUALS.equals(innerOp)
-					|| Operator.LESS.equals(innerOp)
-					|| Operator.LESS_EQUALS.equals(innerOp)
-					|| Operator.CONDITIONAL_AND.equals(innerOp)
-					|| Operator.CONDITIONAL_OR.equals(innerOp)) {
-				return true;
-			}
+	private boolean isHardToRead(final Expression innerExpr, final ASTNode parent) {
+		if (parent instanceof InfixExpression) {
+			return ((InfixExpression) parent).getOperator().equals(Operator.EQUALS)
+				&& innerExpr instanceof InfixExpression;
+		} else if (parent instanceof ConditionalExpression) {
+			return innerExpr instanceof ConditionalExpression
+				|| innerExpr instanceof Assignment
+				|| innerExpr instanceof InstanceofExpression;
 		}
 		return false;
 	}
@@ -241,32 +206,11 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
 		return false;
 	}
 
-	private boolean isAssociativeOperator(final Operator op) {
-		return op == Operator.CONDITIONAL_AND
-				|| op == Operator.CONDITIONAL_OR
-				|| op == Operator.PLUS
-				|| op == Operator.TIMES
-				|| op == Operator.AND
-				|| op == Operator.OR
-				|| op == Operator.XOR;
-	}
-
-	private boolean isBooleanOperator(Operator op) {
-		return op == Operator.CONDITIONAL_AND
-				|| op == Operator.CONDITIONAL_OR
-				|| op == Operator.EQUALS
-				|| op == Operator.GREATER
-				|| op == Operator.GREATER_EQUALS
-				|| op == Operator.LESS
-				|| op == Operator.LESS_EQUALS
-				|| op == Operator.NOT_EQUALS;
-	}
-
 	@Override
 	public boolean visit(MethodInvocation node) {
 		if (node.getExpression() == null) {
 			// TODO JNR handle same class calls and sub classes
-			return ASTHelper.VISIT_SUBTREE;
+			return VISIT_SUBTREE;
 		}
 		final ITypeBinding typeBinding = node.getExpression()
 				.resolveTypeBinding();
@@ -274,18 +218,18 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
 			if (ASTHelper.instanceOf(typeBinding, "java.lang.Comparable")
 					&& node.arguments().size() == 1) {
 				replaceInfixExpressionIfNeeded(node.getParent());
-				return ASTHelper.DO_NOT_VISIT_SUBTREE;
+				return DO_NOT_VISIT_SUBTREE;
 			} else if (ASTHelper.instanceOf(typeBinding, "java.lang.Comparator")
 					&& node.arguments().size() == 2) {
 				replaceInfixExpressionIfNeeded(node.getParent());
-				return ASTHelper.DO_NOT_VISIT_SUBTREE;
+				return DO_NOT_VISIT_SUBTREE;
 			}
 		} else if (javaMinorVersion >= 2
 				&& "compareToIgnoreCase".equals(node.getName().getIdentifier())
 				&& ASTHelper.instanceOf(typeBinding, "java.lang.String")
 				&& node.arguments().size() == 1) {
 			replaceInfixExpressionIfNeeded(node.getParent());
-			return ASTHelper.DO_NOT_VISIT_SUBTREE;
+			return DO_NOT_VISIT_SUBTREE;
 		} else if (this.removeThisForNonStaticMethodAccess) {
 			ThisExpression te = ASTHelper.as(node.getExpression(),
 					ThisExpression.class);
@@ -294,10 +238,10 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
 							te.getQualifier(), node)) {
 				// remove useless thisExpressions
 				this.ctx.getRefactorings().remove(node.getExpression());
-				return ASTHelper.DO_NOT_VISIT_SUBTREE;
+				return DO_NOT_VISIT_SUBTREE;
 			}
 		}
-		return ASTHelper.VISIT_SUBTREE;
+		return VISIT_SUBTREE;
 	}
 
 	private void replaceInfixExpressionIfNeeded(ASTNode expr) {
@@ -355,33 +299,33 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
 		if (Operator.CONDITIONAL_OR.equals(operator)) {
 			if (Boolean.TRUE.equals(lhsConstantValue)) {
 				replaceByCopy(node, lhs);
-				return ASTHelper.DO_NOT_VISIT_SUBTREE;
+				return DO_NOT_VISIT_SUBTREE;
 			} else if (Boolean.FALSE.equals(lhsConstantValue)) {
 				checkNoExtendedOperands(node);
 				replaceByCopy(node, rhs);
-				return ASTHelper.DO_NOT_VISIT_SUBTREE;
+				return DO_NOT_VISIT_SUBTREE;
 			}
 		} else if (Operator.CONDITIONAL_AND.equals(operator)) {
 			if (Boolean.TRUE.equals(lhsConstantValue)) {
 				checkNoExtendedOperands(node);
 				replaceByCopy(node, rhs);
-				return ASTHelper.DO_NOT_VISIT_SUBTREE;
+				return DO_NOT_VISIT_SUBTREE;
 			} else if (Boolean.FALSE.equals(lhsConstantValue)) {
 				replaceByCopy(node, lhs);
-				return ASTHelper.DO_NOT_VISIT_SUBTREE;
+				return DO_NOT_VISIT_SUBTREE;
 			} else {
 				Expression nullCheckedExpression = getNullCheckedExpression(lhs);
 				if (nullCheckedExpression != null) {
 					if (isNullCheckRedundant(rhs, nullCheckedExpression)) {
 						checkNoExtendedOperands(node);
 						replaceByCopy(node, rhs);
-						return ASTHelper.DO_NOT_VISIT_SUBTREE;
+						return DO_NOT_VISIT_SUBTREE;
 					}
 				} else {
 					nullCheckedExpression = getNullCheckedExpression(rhs);
 					if (isNullCheckRedundant(lhs, nullCheckedExpression)) {
 						replaceByCopy(node, lhs);
-						return ASTHelper.DO_NOT_VISIT_SUBTREE;
+						return DO_NOT_VISIT_SUBTREE;
 					}
 				}
 			}
@@ -405,7 +349,7 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
 			}
 		}
 
-		return ASTHelper.VISIT_SUBTREE;
+		return VISIT_SUBTREE;
 	}
 
 	/**
@@ -413,11 +357,11 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
 	 * <p>
 	 * This will be implemented only if somebody comes up with code where the runtime exception is thrown.
 	 * </p>
-	 * 
+	 *
 	 * @see <a href="http://publib.boulder.ibm.com/infocenter/iadthelp/v6r0/topic/org.eclipse.jdt.doc.isv/reference/api/org/eclipse/jdt/core/dom/InfixExpression.html#extendedOperands()">
 	 */
 	private void checkNoExtendedOperands(InfixExpression node) {
-		if (!ASTHelper.hasType(node, "java.lang.String") && !node.extendedOperands().isEmpty()) {
+		if (!hasType(node, "java.lang.String") && !node.extendedOperands().isEmpty()) {
 			throw new RuntimeException("Not implemented for extended operands");
 		}
 	}
@@ -466,8 +410,7 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
 	 * @param nullCheckedExpression
 	 * @return
 	 */
-	private boolean isNullCheckRedundant(Expression e,
-			Expression nullCheckedExpression) {
+	private boolean isNullCheckRedundant(Expression e, Expression nullCheckedExpression) {
 		if (nullCheckedExpression == null) {
 			return false;
 		} else if (e instanceof InstanceofExpression) {
@@ -483,9 +426,8 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
 				// Did we invoke java.lang.Object.equals()?
 				// Did we invoke java.lang.String.equalsIgnoreCase()?
 				return "equals".equals(expr.getName().getIdentifier())
-						|| (ASTHelper.hasType(expr.getExpression(),
-								"java.lang.String") && "equalsIgnoreCase"
-								.equals(expr.getName().getIdentifier()));
+						|| (hasType(expr.getExpression(), "java.lang.String")
+							&& "equalsIgnoreCase".equals(expr.getName().getIdentifier()));
 			}
 		}
 		return false;
