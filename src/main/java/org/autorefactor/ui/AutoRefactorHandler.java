@@ -486,6 +486,13 @@ public class AutoRefactorHandler extends AbstractHandler {
 		// tabSize).buildCFG(astRoot);
 
 		for (GrowableListIterator iter = refactoringsToApply.iterator(); iter.hasNext();) {
+			if (refactoringsToApply.size() > 10000) {
+				// Oops! Something went wrong.
+				throw new IllegalStateException("An infinite loop has been detected."
+						+ " A possible cause is that code is being incorrectly "
+						+ " refactored one way then refactored back to what it was.");
+			}
+
 			IRefactoring refactoring = (IRefactoring) iter.next();
 			try {
 				final RefactoringContext ctx = new RefactoringContext(compilationUnit,

@@ -25,27 +25,27 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
 
 import org.autorefactor.refactoring.IJavaRefactoring;
 import org.autorefactor.refactoring.Refactorings;
+import org.autorefactor.refactoring.SourceLocation;
 import org.autorefactor.util.NotImplementedException;
+import org.autorefactor.util.Pair;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
-import org.eclipse.jdt.core.dom.AbstractTypeDeclaration;
-import org.eclipse.jdt.core.dom.AnnotationTypeMemberDeclaration;
-import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
 import org.eclipse.jdt.core.dom.BlockComment;
+import org.eclipse.jdt.core.dom.BodyDeclaration;
 import org.eclipse.jdt.core.dom.Comment;
 import org.eclipse.jdt.core.dom.CompilationUnit;
-import org.eclipse.jdt.core.dom.EnumConstantDeclaration;
-import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.Javadoc;
 import org.eclipse.jdt.core.dom.LineComment;
-import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.NodeFinder;
+import org.eclipse.jdt.core.dom.PackageDeclaration;
 import org.eclipse.jdt.core.dom.TagElement;
 import org.eclipse.jdt.core.dom.TextElement;
 
@@ -56,7 +56,7 @@ import static org.autorefactor.refactoring.ASTHelper.*;
  * <ul>
  * <li>Remove empty comments</li>
  * <li>Transform comments into javadocs</li>
- * <li>TODO Transform javadocs into comments</li>
+ * <li>Transform javadocs into block comments</li>
  * <li>Remove IDE generated TODOs</li>
  * <li>TODO Remove commented out code</li>
  * <li>TODO Fix malformed/incomplete javadocs</li>
@@ -79,6 +79,7 @@ public class CommentsRefactoring extends ASTVisitor implements IJavaRefactoring 
 
 	private RefactoringContext ctx;
 	private CompilationUnit astRoot;
+	private List<Pair<SourceLocation, Comment>> comments = new ArrayList<Pair<SourceLocation, Comment>>();
 
 	public CommentsRefactoring() {
 		super();
@@ -94,11 +95,14 @@ public class CommentsRefactoring extends ASTVisitor implements IJavaRefactoring 
 		if (EMPTY_BLOCK_COMMENT.matcher(comment).matches()) {
 			this.ctx.getRefactorings().remove(node);
 			return DO_NOT_VISIT_SUBTREE;
-		} else if (acceptJavadoc(getNextNode(node))) {
-			this.ctx.getRefactorings().toJavadoc(node);
-			return DO_NOT_VISIT_SUBTREE;
+		} else {
+			final ASTNode nextNode = getNextNode(node);
+			if (acceptJavadoc(nextNode) && !betterCommentExist(node, nextNode)) {
+				this.ctx.getRefactorings().toJavadoc(node);
+				return DO_NOT_VISIT_SUBTREE;
+			}
+			return VISIT_SUBTREE;
 		}
-		return VISIT_SUBTREE;
 	}
 
 	private ASTNode getNextNode(Comment node) {
@@ -107,13 +111,25 @@ public class CommentsRefactoring extends ASTVisitor implements IJavaRefactoring 
 		final int parentNodeEndPosition = root.getStartPosition() + root.getLength();
 		final NodeFinder finder = new NodeFinder(root,
 				nodeEndPosition, parentNodeEndPosition - nodeEndPosition);
+		if (node instanceof Javadoc) {
+			return finder.getCoveringNode();
+		}
 		return finder.getCoveredNode();
 	}
 
 	private ASTNode getCoveringNode(Comment node) {
+		final int start = node.getStartPosition();
+		final int length = node.getLength();
+		final ASTNode coveringNode = getCoveringNode(start, length);
+		if (coveringNode != node) {
+			return coveringNode;
+		}
+		return getCoveringNode(start, length + 1);
+	}
+
+	private ASTNode getCoveringNode(int start, int length) {
 		final ASTNode root = this.astRoot;
-		final NodeFinder finder = new NodeFinder(root, node.getStartPosition(),
-				node.getLength());
+		final NodeFinder finder = new NodeFinder(root, start, length);
 		return finder.getCoveringNode();
 	}
 
@@ -134,7 +150,7 @@ public class CommentsRefactoring extends ASTVisitor implements IJavaRefactoring 
 				this.ctx.getRefactorings().replace(node, "/** {@inheritDoc} */");
 			}
 		} else if (!acceptJavadoc(getNextNode(node))) {
-			// TODO JNR convert to block comment
+			this.ctx.getRefactorings().replace(node, comment.replace("/**", "/*"));
 		}
 		return VISIT_SUBTREE;
 	}
@@ -236,7 +252,7 @@ public class CommentsRefactoring extends ASTVisitor implements IJavaRefactoring 
 			return DO_NOT_VISIT_SUBTREE;
 		} else {
 			final ASTNode nextNode = getNextNode(node);
-			if (acceptJavadoc(nextNode)) {
+			if (acceptJavadoc(nextNode) && !betterCommentExist(node, nextNode)) {
 				this.ctx.getRefactorings().toJavadoc(node, nextNode);
 				return DO_NOT_VISIT_SUBTREE;
 			}
@@ -244,21 +260,66 @@ public class CommentsRefactoring extends ASTVisitor implements IJavaRefactoring 
 		return VISIT_SUBTREE;
 	}
 
-	private boolean acceptJavadoc(final ASTNode node) {
-		if (node == null) {
-			return false;
+	private boolean betterCommentExist(Comment comment,
+			ASTNode nodeWhereToAddJavadoc) {
+		if (hasJavadoc(nodeWhereToAddJavadoc)) {
+			return true;
 		}
-		return node instanceof AbstractTypeDeclaration
-				// covers annotation, enums, classes and interfaces
-				|| node instanceof AnonymousClassDeclaration
-				|| node instanceof MethodDeclaration
-				|| node instanceof FieldDeclaration
-				|| node instanceof AnnotationTypeMemberDeclaration
-				|| node instanceof EnumConstantDeclaration;
+
+		final SourceLocation nodeLoc = new SourceLocation(nodeWhereToAddJavadoc);
+		SourceLocation bestLoc = new SourceLocation(comment);
+		Comment bestComment = comment;
+		for (Iterator<Pair<SourceLocation, Comment>> iter = this.comments.iterator(); iter.hasNext();) {
+			final Pair<SourceLocation, Comment> pair = iter.next();
+			final SourceLocation newLoc = pair.getFirst();
+			final Comment newComment = pair.getSecond();
+			if (newLoc.compareTo(bestLoc) < 0) {
+				// since comments are visited in ascending order,
+				// we can forget this comment.
+				iter.remove();
+				continue;
+			}
+			if (nodeLoc.compareTo(newLoc) < 0) {
+				break;
+			}
+			if (bestLoc.compareTo(newLoc) < 0) {
+				if (!(newComment instanceof LineComment)) {
+					// new comment is a BlockComment or a Javadoc
+					bestLoc = newLoc;
+					bestComment = newComment;
+					continue;
+				} else  if (!(bestComment instanceof LineComment)) {
+					// new comment is a line comment and best comment is not
+					bestLoc = newLoc;
+					bestComment = newComment;
+					continue;					
+				}
+			}
+		}
+		return bestComment != null && bestComment != comment;
+	}
+
+	private boolean hasJavadoc(ASTNode node) {
+		if (node instanceof BodyDeclaration) {
+			return ((BodyDeclaration) node).getJavadoc() != null;
+		} else if (node instanceof PackageDeclaration) {
+			return ((PackageDeclaration) node).getJavadoc() != null;
+		}
+		return false;
+	}
+
+	private boolean acceptJavadoc(final ASTNode node) {
+		// PackageDeclaration node accept javadoc in package-info.java files,
+		// but they are useless everywhere else, so do not include them at all for now. 
+		return node instanceof BodyDeclaration;
 	}
 
 	public Refactorings getRefactorings(CompilationUnit astRoot) {
 		this.astRoot = astRoot;
+		for (Comment comment : (List<Comment>) astRoot.getCommentList()) {
+			comments.add(Pair.of(new SourceLocation(comment.getStartPosition(), comment.getLength()), comment));
+		}
+
 		for (Comment comment : (List<Comment>) astRoot.getCommentList()) {
 			if (comment.isBlockComment()) {
 				final BlockComment bc = (BlockComment) comment;
