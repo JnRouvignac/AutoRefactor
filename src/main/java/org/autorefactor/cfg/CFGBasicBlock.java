@@ -34,8 +34,8 @@ import org.eclipse.jdt.core.dom.ASTNode;
  * Control Flow Graph Basic Block. Basic blocks here are a little different from
  * the normal definition of "all adjacent statements not separated by a jump".
  * Here, things like for statement initializers, if conditions, while conditions
- * all receive their own basic block in order to be able to link variable use to
- * one basic block.
+ * all receive their own basic block in order to be able to link variable uses to
+ * one basic block. It also mixes in lexical scoping.
  *
  * @author jnrouvignac
  * @see <a href="http://en.wikipedia.org/wiki/Control_flow_graph">Control flow

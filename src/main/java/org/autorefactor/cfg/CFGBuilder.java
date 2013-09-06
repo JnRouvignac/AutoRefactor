@@ -374,25 +374,36 @@ public class CFGBuilder {
 			List<CFGEdgeBuilder> liveBlocks, CFGBasicBlock currentBasicBlock) {
 		final CFGBasicBlock basicBlock = getCFGBasicBlock(node, currentBasicBlock, liveBlocks);
 		addDeclarations(basicBlock, node.fragments(), node.getType());
-		if (currentBasicBlock == null) {
-			return newList(new CFGEdgeBuilder(basicBlock));
-		} else {
-			return liveBlocks;
-		}
+		return getInBlockStmtResult(liveBlocks, currentBasicBlock, basicBlock);
 	}
 
 	public void buildCFG(VariableDeclarationExpression node) {
 		throw new NotImplementedException();
 	}
 
-	public void buildCFG(SwitchStatement node) {
-		throw new NotImplementedException();
+	public List<CFGEdgeBuilder> buildCFG(SwitchStatement node, List<CFGEdgeBuilder> liveBlocks,
+			CFGBasicBlock currentBasicBlock) {
+		final CFGBasicBlock basicBlock = getCFGBasicBlock(node, currentBasicBlock, liveBlocks);
+		final List<CFGEdgeBuilder> liveBeforeBody = newList(new CFGEdgeBuilder(basicBlock));
+		final List<CFGEdgeBuilder> liveAfterBody = buildCFG(node.statements(), basicBlock, liveBeforeBody);
+		liveAfterBody.add(new CFGEdgeBuilder(basicBlock));
+
+		buildEdgesAfterBranchableStmt(node, liveAfterBody, basicBlock);
+		return liveAfterBody;
 	}
 
-	public void buildCFG(SwitchCase node) {
-		throw new NotImplementedException();
+	public List<CFGEdgeBuilder> buildCFG(SwitchCase node, List<CFGEdgeBuilder> liveBlocks,
+			CFGBasicBlock currentBasicBlock) {
+		// the current live blocks will be empty if there was a break,
+		// or populated in case of fall-through.
+		// copy the list to avoid adding to unmodifiable lists
+		liveBlocks = new ArrayList<CFGEdgeBuilder>(liveBlocks);
+		// add an edge going from the condition of the switch
+		// (startBlock is the condition of the switch)
+		liveBlocks.add(new CFGEdgeBuilder(node.getExpression(), true, currentBasicBlock));
+		return liveBlocks;
 	}
-
+	
 	public void buildCFG(SuperMethodInvocation node) {
 		throw new NotImplementedException();
 	}
@@ -520,66 +531,73 @@ public class CFGBuilder {
 			CFGBasicBlock currentBasicBlock) {
 		List<CFGEdgeBuilder> liveBlocks = previousLiveBlocks;
 		try {
-			// always create a new basicBlock for Blocks. This is not a strict CFG
-			// (where only jumps create new basic blocks), but it is necessary for lexical scoping
-			CFGBasicBlock basicBlock = currentBasicBlock;
-			for (Statement stmt : (List<Statement>) node.statements()) {
-				CFGBasicBlock nextStmtBasicBlock = basicBlock;
-				// if (stmt instanceof AssertStatement) {
-				// buildCFG((AssertStatement) stmt, liveBlocks, basicBlock);
-				// } else if (stmt instanceof Block) {
-				// buildCFG((Block) stmt, liveBlocks, basicBlock);
-				// } else
-				if (stmt instanceof BreakStatement) {
-					liveBlocks = buildCFG((BreakStatement) stmt, liveBlocks, basicBlock);
-				// } else if (stmt instanceof ConstructorInvocation) {
-				// buildCFG((ConstructorInvocation) stmt, liveBlocks, basicBlock);
-				} else if (stmt instanceof ContinueStatement) {
-					liveBlocks = buildCFG((ContinueStatement) stmt, liveBlocks, basicBlock);
-				// } else if (stmt instanceof DoStatement) {
-				// buildCFG((DoStatement) stmt, liveBlocks, basicBlock);
-				// } else if (stmt instanceof EmptyStatement) {
-				// buildCFG((EmptyStatement) stmt, liveBlocks, basicBlock);
-				} else if (stmt instanceof EnhancedForStatement) {
-					liveBlocks = buildCFG((EnhancedForStatement) stmt, liveBlocks, basicBlock);
-					nextStmtBasicBlock = null;
-				} else if (stmt instanceof ExpressionStatement) {
-					liveBlocks = buildCFG((ExpressionStatement) stmt, liveBlocks, basicBlock);
-				} else if (stmt instanceof ForStatement) {
-					liveBlocks = buildCFG((ForStatement) stmt, liveBlocks, basicBlock);
-					nextStmtBasicBlock = null;
-				} else if (stmt instanceof IfStatement) {
-					liveBlocks = buildCFG((IfStatement) stmt, liveBlocks, basicBlock);
-					nextStmtBasicBlock = null;
-				} else if (stmt instanceof LabeledStatement) {
-					liveBlocks = buildCFG((LabeledStatement) stmt, liveBlocks, basicBlock);
-				} else if (stmt instanceof ReturnStatement) {
-					liveBlocks = buildCFG((ReturnStatement) stmt, liveBlocks, basicBlock);
-					// } else if (stmt instanceof SuperConstructorInvocation) {
-					// buildCFG((SuperConstructorInvocation) stmt, liveBlocks, basicBlock);
-					// } else if (stmt instanceof SwitchCase) {
-					// buildCFG((SwitchCase) stmt, liveBlocks, basicBlock);
-					// } else if (stmt instanceof SwitchStatement) {
-					// buildCFG((SwitchStatement) stmt, liveBlocks, basicBlock);
-					// } else if (stmt instanceof SynchronizedStatement) {
-					// buildCFG((SynchronizedStatement) stmt, liveBlocks, basicBlock);
-					// } else if (stmt instanceof ThrowStatement) {
-					// buildCFG((ThrowStatement) stmt, liveBlocks, basicBlock);
-					// } else if (stmt instanceof TryStatement) {
-					// buildCFG((TryStatement) stmt, liveBlocks, basicBlock);
-					// } else if (stmt instanceof TypeDeclarationStatement) {
-					// buildCFG((TypeDeclarationStatement) stmt, liveBlocks, basicBlock);
-				} else if (stmt instanceof VariableDeclarationStatement) {
-					liveBlocks = buildCFG((VariableDeclarationStatement) stmt, liveBlocks, basicBlock);
-					// } else if (stmt instanceof WhileStatement) {
-					// buildCFG((WhileStatement) stmt, liveBlocks, basicBlock);
-				} else {
-					throw new NotImplementedException(stmt);
-				}
-				basicBlock = nextStmtBasicBlock;
-			}
+			liveBlocks = buildCFG((List<Statement>) node.statements(), currentBasicBlock, liveBlocks);
 		} finally {
 			moveAllEdgesToBuild(node, liveBlocks);
+		}
+		return liveBlocks;
+	}
+
+	private List<CFGEdgeBuilder> buildCFG(List<Statement> stmts,
+			CFGBasicBlock startBlock, List<CFGEdgeBuilder> liveBlocks) {
+		CFGBasicBlock basicBlock = startBlock;
+		for (Statement stmt : stmts) {
+			CFGBasicBlock nextStmtBasicBlock = basicBlock;
+			// if (stmt instanceof AssertStatement) {
+			// buildCFG((AssertStatement) stmt, liveBlocks, basicBlock);
+			// } else if (stmt instanceof Block) {
+			// buildCFG((Block) stmt, liveBlocks, basicBlock);
+			// } else
+			if (stmt instanceof BreakStatement) {
+				liveBlocks = buildCFG((BreakStatement) stmt, liveBlocks, basicBlock);
+			// } else if (stmt instanceof ConstructorInvocation) {
+			// buildCFG((ConstructorInvocation) stmt, liveBlocks, basicBlock);
+			} else if (stmt instanceof ContinueStatement) {
+				liveBlocks = buildCFG((ContinueStatement) stmt, liveBlocks, basicBlock);
+			// } else if (stmt instanceof DoStatement) {
+			// buildCFG((DoStatement) stmt, liveBlocks, basicBlock);
+			} else if (stmt instanceof EmptyStatement) {
+				liveBlocks = buildCFG((EmptyStatement) stmt, liveBlocks, basicBlock);
+			} else if (stmt instanceof EnhancedForStatement) {
+				liveBlocks = buildCFG((EnhancedForStatement) stmt, liveBlocks, basicBlock);
+				nextStmtBasicBlock = null;
+			} else if (stmt instanceof ExpressionStatement) {
+				liveBlocks = buildCFG((ExpressionStatement) stmt, liveBlocks, basicBlock);
+			} else if (stmt instanceof ForStatement) {
+				liveBlocks = buildCFG((ForStatement) stmt, liveBlocks, basicBlock);
+				nextStmtBasicBlock = null;
+			} else if (stmt instanceof IfStatement) {
+				liveBlocks = buildCFG((IfStatement) stmt, liveBlocks, basicBlock);
+				nextStmtBasicBlock = null;
+			} else if (stmt instanceof LabeledStatement) {
+				liveBlocks = buildCFG((LabeledStatement) stmt, liveBlocks, basicBlock);
+			} else if (stmt instanceof ReturnStatement) {
+				liveBlocks = buildCFG((ReturnStatement) stmt, liveBlocks, basicBlock);
+				// } else if (stmt instanceof SuperConstructorInvocation) {
+				// buildCFG((SuperConstructorInvocation) stmt, liveBlocks, basicBlock);
+			} else if (stmt instanceof SwitchCase) {
+				liveBlocks = buildCFG((SwitchCase) stmt, liveBlocks, startBlock);
+				// next statement will always create a new basicBlock 
+				nextStmtBasicBlock = null;
+			} else if (stmt instanceof SwitchStatement) {
+				liveBlocks = buildCFG((SwitchStatement) stmt, liveBlocks, basicBlock);
+				nextStmtBasicBlock = null;
+				// } else if (stmt instanceof SynchronizedStatement) {
+				// buildCFG((SynchronizedStatement) stmt, liveBlocks, basicBlock);
+				// } else if (stmt instanceof ThrowStatement) {
+				// buildCFG((ThrowStatement) stmt, liveBlocks, basicBlock);
+				// } else if (stmt instanceof TryStatement) {
+				// buildCFG((TryStatement) stmt, liveBlocks, basicBlock);
+				// } else if (stmt instanceof TypeDeclarationStatement) {
+				// buildCFG((TypeDeclarationStatement) stmt, liveBlocks, basicBlock);
+			} else if (stmt instanceof VariableDeclarationStatement) {
+				liveBlocks = buildCFG((VariableDeclarationStatement) stmt, liveBlocks, basicBlock);
+				// } else if (stmt instanceof WhileStatement) {
+				// buildCFG((WhileStatement) stmt, liveBlocks, basicBlock);
+			} else {
+				throw new NotImplementedException(stmt);
+			}
+			basicBlock = nextStmtBasicBlock;
 		}
 		return liveBlocks;
 	}
@@ -674,7 +692,7 @@ public class CFGBuilder {
 		}
 	}
 
-	private void buildWithTarget(final Collection<CFGEdgeBuilder> toBuild,
+	private void buildEdges(final Collection<CFGEdgeBuilder> toBuild,
 			final CFGBasicBlock targetBlock) {
 		if (isNotEmpty(toBuild)) {
 			for (CFGEdgeBuilder builder : toBuild) {
@@ -683,8 +701,8 @@ public class CFGBuilder {
 		}
 	}
 
-	private void buildWithTargetForLoop(Statement node, final CFGBasicBlock whereToLoopBlock,
-			final Collection<CFGEdgeBuilder> liveAfterLoop) {
+	private void buildEdgesAfterBranchableStmt(Statement node,
+			final Collection<CFGEdgeBuilder> liveAfterLoop, final CFGBasicBlock whereToBranchBlock) {
 		final Map<CFGEdgeBuilder, Boolean> toBuild = this.edgesToBuild.remove(node);
 		if (isNotEmpty(toBuild)) {
 			for (Entry<CFGEdgeBuilder, Boolean> entry : toBuild.entrySet()) {
@@ -693,7 +711,7 @@ public class CFGBuilder {
 				if (isBreakStmt) {
 					liveAfterLoop.add(builder);
 				} else { // this is a continue statement
-					builder.withTarget(whereToLoopBlock).build();
+					builder.withTarget(whereToBranchBlock).build();
 				}
 			}
 		}
@@ -717,23 +735,34 @@ public class CFGBuilder {
 
 		final List<CFGEdgeBuilder> newLiveBlocks = newList(new CFGEdgeBuilder(basicBlock));
 		List<CFGEdgeBuilder> liveAfterBody = buildCFG(node.getBody(), newLiveBlocks, null);
-		buildWithTarget(liveAfterBody, basicBlock);
+		buildEdges(liveAfterBody, basicBlock);
 
 		final List<CFGEdgeBuilder> liveAfterStmt = newList(new CFGEdgeBuilder(basicBlock));
-		buildWithTargetForLoop(node, basicBlock, liveAfterStmt);
+		buildEdgesAfterBranchableStmt(node, liveAfterStmt, basicBlock);
 		return liveAfterStmt;
 	}
 
-	public void buildCFG(EmptyStatement node) {
-		throw new NotImplementedException();
+	public List<CFGEdgeBuilder> buildCFG(EmptyStatement node, List<CFGEdgeBuilder> liveBlocks,
+			CFGBasicBlock currentBasicBlock) {
+		CFGBasicBlock basicBlock = getCFGBasicBlock(node, currentBasicBlock, liveBlocks);
+		return getInBlockStmtResult(liveBlocks, currentBasicBlock, basicBlock);
+	}
+
+	private List<CFGEdgeBuilder> getInBlockStmtResult(List<CFGEdgeBuilder> liveBlocks,
+			CFGBasicBlock currentBasicBlock, CFGBasicBlock basicBlock) {
+		if (currentBasicBlock == null) {
+			// new block was created for current node
+			return newList(new CFGEdgeBuilder(basicBlock));
+		}
+		return liveBlocks;
 	}
 
 	public void buildCFG(DoStatement node) {
 		throw new NotImplementedException();
 	}
 
-	public List<CFGEdgeBuilder> buildCFG(ContinueStatement node,
-			List<CFGEdgeBuilder> liveBlocks, CFGBasicBlock currentBasicBlock) {
+	public List<CFGEdgeBuilder> buildCFG(ContinueStatement node, List<CFGEdgeBuilder> liveBlocks,
+			CFGBasicBlock currentBasicBlock) {
 		final CFGBasicBlock basicBlock = getCFGBasicBlock(node, currentBasicBlock, liveBlocks);
 		final Statement targetStmt;
 		if (node.getLabel() != null) {
@@ -775,11 +804,11 @@ public class CFGBuilder {
 		CFGEdgeBuilder liveBlock = new CFGEdgeBuilder(node.getExpression(), true, exprBlock);
 
 		final List<CFGEdgeBuilder> liveAfterBody = buildCFG(node.getBody(), newList(liveBlock), null);
-		buildWithTarget(liveAfterBody, updatersBlock);
+		buildEdges(liveAfterBody, updatersBlock);
 
 		final List<CFGEdgeBuilder> liveAfterStmt = newList(new CFGEdgeBuilder(
 				node.getExpression(), false, exprBlock));
-		buildWithTargetForLoop(node, updatersBlock, liveAfterStmt);
+		buildEdgesAfterBranchableStmt(node, liveAfterStmt, updatersBlock);
 		return liveAfterStmt;
 	}
 
@@ -795,11 +824,7 @@ public class CFGBuilder {
 			List<CFGEdgeBuilder> liveBlocks, CFGBasicBlock currentBasicBlock) {
 		final CFGBasicBlock basicBlock = getCFGBasicBlock(node, currentBasicBlock, liveBlocks);
 		addVariableAccess(basicBlock, node.getExpression(), READ);
-		if (basicBlock != currentBasicBlock) {
-			return newList(new CFGEdgeBuilder(basicBlock));
-		} else {
-			return liveBlocks;
-		}
+		return getInBlockStmtResult(liveBlocks, currentBasicBlock, basicBlock);
 	}
 
 	private CFGBasicBlock getCFGBasicBlock(ASTNode node, CFGBasicBlock currentBasicBlock,
@@ -836,7 +861,7 @@ public class CFGBuilder {
 		final CFGBasicBlock basicBlock = new CFGBasicBlock(node,
 				getFileName(node), codeExcerpt(node), isDecision,
 				lineCol.getFirst(), lineCol.getSecond());
-		buildWithTarget(liveBlocks, basicBlock);
+		buildEdges(liveBlocks, basicBlock);
 		return basicBlock;
 	}
 
@@ -848,7 +873,7 @@ public class CFGBuilder {
 			final CFGBasicBlock basicBlock = new CFGBasicBlock(expressions.get(0),
 					getFileName(firstExpr), codeExcerpt(expressions), false,
 					lineCol.getFirst(), lineCol.getSecond());
-			buildWithTarget(liveBlocks, basicBlock);
+			buildEdges(liveBlocks, basicBlock);
 			return basicBlock;
 		}
 		throw new NotImplementedException("for empty expressions list");
@@ -872,6 +897,8 @@ public class CFGBuilder {
 
 	private Pair<Integer, Integer> getLineAndColumn(final int position) {
 		// TODO Use CompilationUnit.getLineNumber() and CompilationUnit.getColumnNumber()
+		// Return SourceLocation class with also startNodePosition to be used for graph node names 
+		// line number and column number are then used as comments for the node
 		// file starts with line 1
 		int lineNo = 1;
 		int lastMatchPosition = 0;

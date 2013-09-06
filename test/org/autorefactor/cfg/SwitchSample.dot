@@ -1,0 +1,48 @@
+digraph SwitchSample {
+label="SwitchSample";
+
+Entry -> _32_8
+_32_8 -> _34_10
+_32_8 -> _54_10 [label="true"];
+_32_8 -> _62_8
+_34_10 -> _37_11
+_34_10 -> _40_11 [label="true"];
+_34_10 -> _45_11 [label="true"];
+_34_10 -> _48_11 [label="true"];
+_34_10 -> _54_10
+_37_11 -> _40_11
+_40_11 -> _41_11
+_41_11 -> _54_10
+_45_11 -> _46_11
+_46_11 -> _62_8
+_48_11 -> _49_11
+_49_11 -> _54_10
+_54_10 -> _62_8
+_62_8 -> Exit
+
+subgraph cluster_1152_public_boolean_sample_int_i_int_j__ {
+label="public boolean sample(int i,int j){";
+Entry [style="filled" fillcolor="red"   fontcolor="white"];
+_62_8 [label="return true;\n(62,8)"];
+Exit  [style="filled" fillcolor="black" fontcolor="white"];
+
+subgraph cluster_1201_switch__i___ {
+label="switch (i) {";
+_32_8 [label="switch (i) {\n(32,8)"];
+_54_10 [label="int k=0;\n(54,10)"];
+
+subgraph cluster_1227_switch__j___ {
+label="switch (j) {";
+_34_10 [label="switch (j) {\n(34,10)"];
+_37_11 [label="boolean b=false;\n(37,11)"];
+_40_11 [label="b=true;\n(40,11)"];
+_41_11 [label="break;\n(41,11)"];
+_45_11 [label="boolean b2=true;\n(45,11)"];
+_46_11 [label="break outer;\n(46,11)"];
+_48_11 [label=";\n(48,11)"];
+_49_11 [label="break;\n(49,11)"];
+}
+}
+}
+}
+
