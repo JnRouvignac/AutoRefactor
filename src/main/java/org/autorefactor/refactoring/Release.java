@@ -37,9 +37,24 @@ public class Release {
 	private final int[] version;
 	private final String releaseName;
 
-	private Release(String releaseName, int[] versionNumbers) {
+	private Release(String releaseName, int... versionNumbers) {
 		this.releaseName = releaseName;
-		this.version = versionNumbers;
+		this.version = normalize(versionNumbers);
+	}
+
+	private int[] normalize(int[] versionNumbers) {
+		int i;
+		for (i = versionNumbers.length - 1; i >= 0; i--) {
+			if (versionNumbers[i] != 0) {
+				break;
+			}
+		}
+		if (i == versionNumbers.length - 1) {
+			return versionNumbers;
+		}
+		int[] newVersionNumbers = new int[i + 1];
+		System.arraycopy(versionNumbers, 0, newVersionNumbers, 0, i + 1);
+		return newVersionNumbers;
 	}
 
 	public static Release javaSE(String version) {
@@ -57,7 +72,7 @@ public class Release {
 	private boolean isVersionValid() {
 		boolean result = false;
 		if (this.releaseName.equals("JavaSE")) {
-			if (this.version.length == 2) {
+			if (this.version.length >= 2) {
 				result = this.version[0] == 1 && 0 <= this.version[1]
 						&& this.version[1] <= 8;
 			}
@@ -84,8 +99,10 @@ public class Release {
 		for (int i = 0; i < min; i++) {
 			final int nb = this.version[i];
 			final int requiredNb = requiredRelease.version[i];
-			if (requiredNb > nb) {
+			if (nb < requiredNb) {
 				return false;
+			} else  if (nb > requiredNb) {
+				return true;
 			}
 		}
 		return this.version.length >= requiredRelease.version.length;
@@ -107,7 +124,7 @@ public class Release {
 		if (this.version.length >= i + 1) {
 			return this.version[i];
 		}
-		return -1;
+		return 0;
 	}
 
 }

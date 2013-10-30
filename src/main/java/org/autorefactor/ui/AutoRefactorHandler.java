@@ -51,6 +51,7 @@ import org.autorefactor.refactoring.rules.CommentsRefactoring;
 import org.autorefactor.refactoring.rules.CommonCodeInIfElseStatementRefactoring;
 import org.autorefactor.refactoring.rules.DeadCodeEliminationRefactoring;
 import org.autorefactor.refactoring.rules.InvertEqualsRefactoring;
+import org.autorefactor.refactoring.rules.VectorOldToNewAPIRefactoring;
 import org.autorefactor.refactoring.rules.PrimitiveWrapperCreationRefactoring;
 import org.autorefactor.refactoring.rules.RefactoringContext;
 import org.autorefactor.refactoring.rules.RemoveUnnecessaryLocalBeforeReturnRefactoring;
@@ -251,6 +252,7 @@ public class AutoRefactorHandler extends AbstractHandler {
 				}
 			}
 
+			// TODO JNR run this with Display.getCurrent().asyncExec()
 			final Shell shell = HandlerUtil.getActiveShell(event);
 			if (success) {
 				MessageDialog.openInformation(shell, "Tests Success!!", result.toString());
@@ -539,7 +541,7 @@ public class AutoRefactorHandler extends AbstractHandler {
 					iter.reloop();
 				}
 			} catch (Exception e) {
-				// TODO JNR add UI error reporting
+				// TODO JNR add UI error reporting with Display.getCurrent().asyncExec()
 				throw new RuntimeException("Unexpected exception", e);
 			}
 		}
@@ -592,6 +594,7 @@ public class AutoRefactorHandler extends AbstractHandler {
 	private static GrowableArrayList<IRefactoring> getAllRefactorings() {
 		PreferenceHelper prefs = AutoRefactorPlugin.getPreferenceHelper();
 		return new GrowableArrayList<IRefactoring>(
+				new VectorOldToNewAPIRefactoring(),
 				new PrimitiveWrapperCreationRefactoring(),
 				new BooleanRefactoring(),
 				new AddBracketsToControlStatementRefactoring(prefs.addAngleBracketsToStatementBodies()),
