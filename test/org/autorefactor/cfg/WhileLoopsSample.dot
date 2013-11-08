@@ -1,0 +1,40 @@
+digraph WhileLoopsSample {
+label="WhileLoopsSample";
+
+Entry -> _43_16
+_43_16 -> _44_23
+_44_23 -> _45_22 [label="true"];
+_44_23 -> _55_16 [label="false"];
+_45_22 -> _46_22
+_46_22 -> _47_27
+_47_27 -> _49_31
+_49_31 -> _51_27
+_51_27 -> _53_29
+_53_29 -> _46_22 [label="true"];
+_53_29 -> _55_16 [label="false"];
+_55_16 -> Exit
+
+subgraph cluster_1281__Override_public_int_sample_boolean_b1_boolean_b2__ {
+label="@Override public int sample(boolean b1,boolean b2){";
+Entry [style="filled" fillcolor="red"   fontcolor="white"];
+_43_16 [label="hashCode();\n(43,16)"];
+_55_16 [label="return super.hashCode();\n(55,16)"];
+Exit  [style="filled" fillcolor="black" fontcolor="white"];
+
+subgraph cluster_1353_while__b1___ {
+label="while (b1) {";
+_44_23 [label="b1\n(44,23)"];
+_45_22 [label="assert b1;\n(45,22)"];
+
+subgraph cluster_1383_do__ {
+label="do {";
+_46_22 [label="do {\n(46,22)"];
+_47_27 [label="synchronized (this) {\n(47,27)"];
+_49_31 [label="super.superField++;\n(49,31)"];
+_51_27 [label="this.superField++;\n(51,27)"];
+_53_29 [label="b2\n(53,29)"];
+}
+}
+}
+}
+
