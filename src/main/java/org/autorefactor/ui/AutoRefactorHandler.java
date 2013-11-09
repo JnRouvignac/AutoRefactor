@@ -50,6 +50,7 @@ import org.autorefactor.refactoring.rules.CollapseIfStatementRefactoring;
 import org.autorefactor.refactoring.rules.CommentsRefactoring;
 import org.autorefactor.refactoring.rules.CommonCodeInIfElseStatementRefactoring;
 import org.autorefactor.refactoring.rules.DeadCodeEliminationRefactoring;
+import org.autorefactor.refactoring.rules.IfStatementRefactoring;
 import org.autorefactor.refactoring.rules.InvertEqualsRefactoring;
 import org.autorefactor.refactoring.rules.VectorOldToNewAPIRefactoring;
 import org.autorefactor.refactoring.rules.PrimitiveWrapperCreationRefactoring;
@@ -609,8 +610,7 @@ public class AutoRefactorHandler extends AbstractHandler {
 				new CommonCodeInIfElseStatementRefactoring(),
 				// TODO JNR complete it
 				// new GenerecizeRefactoring(),
-				// TODO JNR implement
-				// new IfStatementRefactoring(),
+				new IfStatementRefactoring(),
 				// TODO JNR implement
 				// new RemoveStupidIdiomaticPatternRefactoring(),
 				// TODO JNR test for Eclipse bug fix - remove
