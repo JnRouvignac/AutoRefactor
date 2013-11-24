@@ -60,6 +60,12 @@ public class DeadCodeEliminationRefactoring extends ASTVisitor implements
 	// Remove Empty try block?
 	// do this by resolvingConstantValue
 
+	// TODO JNR remove such code:
+	// public void myMethod() {
+	// super.myMethod();
+	// }
+	// only do it when there are no annotations attached to the overriding method.
+
 	@Override
 	public boolean visit(Block node) {
 		if (!node.statements().isEmpty()) {

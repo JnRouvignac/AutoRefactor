@@ -62,14 +62,12 @@ public class DeadCodeEliminationSample {
 		return i + j;
 	}
 
-	private int removeWhileWithoutIterations()
-	{
+	private int removeWhileWithoutIterations() {
 		int i = 0;
 		return i;
 	}
 
-	private int removeEmptyTry()
-	{
+	private int removeEmptyTry() {
 		int i = 0;
 		return i;
 	}

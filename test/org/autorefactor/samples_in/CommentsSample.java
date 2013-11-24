@@ -86,7 +86,6 @@ public class CommentsSample implements Runnable {
      * {@inheritDoc}
      */
     @Override
-    public void run()
-    {
+    public void run() {
     }
 }

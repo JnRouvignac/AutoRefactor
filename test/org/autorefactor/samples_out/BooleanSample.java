@@ -188,11 +188,11 @@ public class BooleanSample {
     }
 
     public boolean removeUselessIfInBooleanPrimitiveAssignment8(boolean bo) {
-        return !bo || aMethodThatReturnsBoolean();
+        return !(bo || aMethodThatReturnsBoolean());
     }
 
     public boolean removeUselessIfInBooleanPrimitiveAssignment9(boolean bo) {
-        return !bo && aMethodThatReturnsBoolean();
+        return !(bo && aMethodThatReturnsBoolean());
     }
 
     public boolean removeUselessIfInBooleanPrimitiveAssignment10(boolean bo) {

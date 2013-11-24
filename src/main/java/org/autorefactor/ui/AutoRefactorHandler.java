@@ -28,6 +28,8 @@ package org.autorefactor.ui;
 import static org.eclipse.jdt.core.JavaCore.*;
 import static org.eclipse.jdt.core.formatter.DefaultCodeFormatterConstants.*;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -43,24 +45,7 @@ import org.autorefactor.refactoring.Refactorings;
 import org.autorefactor.refactoring.Refactorings.Insert;
 import org.autorefactor.refactoring.Refactorings.InsertType;
 import org.autorefactor.refactoring.Release;
-import org.autorefactor.refactoring.rules.AddBracketsToControlStatementRefactoring;
-import org.autorefactor.refactoring.rules.BigDecimalRefactorings;
-import org.autorefactor.refactoring.rules.BooleanRefactoring;
-import org.autorefactor.refactoring.rules.CollapseIfStatementRefactoring;
-import org.autorefactor.refactoring.rules.CommentsRefactoring;
-import org.autorefactor.refactoring.rules.CommonCodeInIfElseStatementRefactoring;
-import org.autorefactor.refactoring.rules.DeadCodeEliminationRefactoring;
-import org.autorefactor.refactoring.rules.IfStatementRefactoring;
-import org.autorefactor.refactoring.rules.InvertEqualsRefactoring;
-import org.autorefactor.refactoring.rules.VectorOldToNewAPIRefactoring;
-import org.autorefactor.refactoring.rules.PrimitiveWrapperCreationRefactoring;
-import org.autorefactor.refactoring.rules.RefactoringContext;
-import org.autorefactor.refactoring.rules.RemoveUnnecessaryLocalBeforeReturnRefactoring;
-import org.autorefactor.refactoring.rules.RemoveUselessModifiersRefactoring;
-import org.autorefactor.refactoring.rules.SimplifyExpressionRefactoring;
-import org.autorefactor.refactoring.rules.StringBuilderRefactoring;
-import org.autorefactor.refactoring.rules.StringRefactorings;
-import org.autorefactor.ui.GrowableArrayList.GrowableListIterator;
+import org.autorefactor.refactoring.rules.*;
 import org.autorefactor.ui.preferences.PreferenceHelper;
 import org.autorefactor.util.NotImplementedException;
 import org.autorefactor.util.Pair;
@@ -152,8 +137,8 @@ public class AutoRefactorHandler extends AbstractHandler {
 						if (monitor != null) {
 							monitor.subTask("Applying refactorings to " + className);
 						}
-						applyRefactorings(compilationUnit, javaSERelease,
-								tabSize, getAllRefactorings());
+						applyRefactoring(compilationUnit, javaSERelease,
+								tabSize, new AggregateASTVisitor(getAllRefactorings()));
 					} catch (Exception e) {
 						throw new RuntimeException(e);
 					} finally {
@@ -235,14 +220,17 @@ public class AutoRefactorHandler extends AbstractHandler {
 					continue;
 				}
 
-				applyRefactorings(testCase.sampleIn, javaSERelease, tabSize,
-						new GrowableArrayList<IRefactoring>(testCase.refactoring));
+				applyRefactoring(testCase.sampleIn, javaSERelease, tabSize, testCase.refactoring);
 
 				// Change the package to be the same as the sampleOut
-				// and ignore insignificant space characters
+				// ignore insignificant space characters
+				// harmonize the resulting style too
 				String actualSource = testCase.sampleIn.getSource()
 						.replaceAll(samplesInPkg, samplesOutPkg)
-						.replaceAll("\\s\\s+", "\n");
+						.replaceAll("\\s\\s+", "\n")
+						.replaceAll("\\)(\\r\\n|\\r|\\n)\\{", ") {")
+						.replaceAll("else(\\r\\n|\\r|\\n)\\{", "else {")
+						.replaceAll("}(\\r\\n|\\r|\\n)else", "} else");
 				String expectedSource = testCase.sampleOut.getSource()
 						.replaceAll("\\s\\s+", "\n");
 				if (actualSource.equals(expectedSource)) {
@@ -437,15 +425,9 @@ public class AutoRefactorHandler extends AbstractHandler {
 	}
 
 	/**
-	 * @param compilationUnit
-	 * @param javaSERelease
-	 * @param tabSize
-	 * @param isInMemory
-	 * @throws Exception
 	 * @see <a
 	 *      href="http://help.eclipse.org/indigo/index.jsp?topic=%2Forg.eclipse.jdt.doc.isv%2Fguide%2Fjdt_api_manip.htm">Eclipse
 	 *      JDT core - Manipulating Java code</a>
-	 *
 	 * @see <a
 	 *      href="http://help.eclipse.org/indigo/index.jsp?topic=/org.eclipse.platform.doc.isv/guide/workbench_cmd_menus.htm">
 	 *      Eclipse Platform Plug-in Developer Guide > Plugging into the
@@ -455,9 +437,9 @@ public class AutoRefactorHandler extends AbstractHandler {
 	 *      href="http://www.eclipse.org/articles/article.php?file=Article-JavaCodeManipulation_AST/index.html#sec-write-it-down">
 	 *      Abstract Syntax Tree > Write it down</a>
 	 */
-	private static void applyRefactorings(ICompilationUnit compilationUnit,
+	private static void applyRefactoring(ICompilationUnit compilationUnit,
 			Release javaSERelease, int tabSize,
-			GrowableArrayList<IRefactoring> refactoringsToApply) throws Exception {
+			IRefactoring refactoringToApply) throws Exception {
 		final ITextFileBufferManager bufferManager = FileBuffers.getTextFileBufferManager();
 		final IPath path = compilationUnit.getPath();
 		final LocationKind locationKind = LocationKind.NORMALIZE;
@@ -466,17 +448,17 @@ public class AutoRefactorHandler extends AbstractHandler {
 			final ITextFileBuffer textFileBuffer = bufferManager
 					.getTextFileBuffer(path, locationKind);
 			final IDocument document = textFileBuffer.getDocument();
-			applyRefactorings(document, compilationUnit,
-					javaSERelease, tabSize, refactoringsToApply);
+			applyRefactoring(document, compilationUnit,
+					javaSERelease, tabSize, refactoringToApply);
 			textFileBuffer.commit(null, false);
 		} finally {
 			bufferManager.disconnect(path, locationKind, null);
 		}
 	}
 
-	private static void applyRefactorings(IDocument document,
+	private static void applyRefactoring(IDocument document,
 			ICompilationUnit compilationUnit, Release javaSERelease,
-			int tabSize, GrowableArrayList<IRefactoring> refactoringsToApply)
+			int tabSize, IRefactoring refactoring)
 					throws JavaModelException {
 		// creation of DOM/AST from a ICompilationUnit
 		final ASTParser parser = ASTParser.newParser(AST.JLS4);
@@ -488,59 +470,59 @@ public class AutoRefactorHandler extends AbstractHandler {
 		// new CFGBuilder(compilationUnit.getSource(),
 		// tabSize).buildCFG(astRoot);
 
-		for (GrowableListIterator iter = refactoringsToApply.iterator(); iter.hasNext();) {
-			if (refactoringsToApply.size() > 10000) {
+		int nbLoops = 0;
+		while (true) {
+			if (nbLoops > 10000) {
 				// Oops! Something went wrong.
 				throw new IllegalStateException("An infinite loop has been detected."
 						+ " A possible cause is that code is being incorrectly "
 						+ " refactored one way then refactored back to what it was.");
 			}
 
-			IRefactoring refactoring = (IRefactoring) iter.next();
 			try {
 				final RefactoringContext ctx = new RefactoringContext(compilationUnit,
 						astRoot.getAST(), javaSERelease);
 				refactoring.setRefactoringContext(ctx);
 
 				final Refactorings refactorings = refactoring.getRefactorings(astRoot);
-				if (refactorings.hasRefactorings()) {
-					// Describing the rewrite
-					final Pair<ASTRewrite, ASTCommentRewriter> rewrites = getASTRewrite(astRoot, refactorings);
-					final ASTCommentRewriter commentRewriter = rewrites.getSecond();
-
-					// apply the text edits and save the compilation unit
-					final TextEdit edits = rewrites.getFirst().rewriteAST(document, null);
-					commentRewriter.addEdits(document, edits);
-					edits.apply(document);
-					boolean hadUnsavedChanges = compilationUnit.hasUnsavedChanges();
-					compilationUnit.getBuffer().setContents(document.get());
-					// http://wiki.eclipse.org/FAQ_What_is_a_working_copy%3F
-					// compilationUnit.reconcile(AST.JLS4,
-					// ICompilationUnit.ENABLE_BINDINGS_RECOVERY |
-					// ICompilationUnit.ENABLE_STATEMENTS_RECOVERY |
-					// ICompilationUnit.FORCE_PROBLEM_DETECTION
-					// /** can be useful to back off a change that does not
-					// compile*/
-					// , null, null);
-					if (!hadUnsavedChanges) {
-						compilationUnit.save(null, true);
-					}
-
-					// I did not find any other way to directly modify the AST
-					// while still keeping the resolved type bindings working.
-					// Using astRoot.recordModifications() did not work:
-					// type bindings were lost. Is there a way to recover them?
-					// FIXME we should find a way to apply all the changes at
-					// the AST level only (transactional-like feature) and
-					// refresh the bindings
-					parser.setSource(compilationUnit);
-					parser.setResolveBindings(true);
-					astRoot = (CompilationUnit) parser.createAST(null);
-
-					// Append the already done refactorings to see if more refactorings
-					// were enabled after applying the current refactoring.
-					iter.reloop();
+				if (!refactorings.hasRefactorings()) {
+					// no new refactorings have been applied,
+					// we are done with applying the refactorings.
+					return;
 				}
+
+				// Describing the rewrite
+				final Pair<ASTRewrite, ASTCommentRewriter> rewrites = getASTRewrite(astRoot, refactorings);
+				final ASTCommentRewriter commentRewriter = rewrites.getSecond();
+
+				// apply the text edits and save the compilation unit
+				final TextEdit edits = rewrites.getFirst().rewriteAST(document, null);
+				commentRewriter.addEdits(document, edits);
+				edits.apply(document);
+				boolean hadUnsavedChanges = compilationUnit.hasUnsavedChanges();
+				compilationUnit.getBuffer().setContents(document.get());
+				// http://wiki.eclipse.org/FAQ_What_is_a_working_copy%3F
+				// compilationUnit.reconcile(AST.JLS4,
+				// ICompilationUnit.ENABLE_BINDINGS_RECOVERY |
+				// ICompilationUnit.ENABLE_STATEMENTS_RECOVERY |
+				// ICompilationUnit.FORCE_PROBLEM_DETECTION
+				// /** can be useful to back off a change that does not
+				// compile*/
+				// , null, null);
+				if (!hadUnsavedChanges) {
+					compilationUnit.save(null, true);
+				}
+				// I did not find any other way to directly modify the AST
+				// while still keeping the resolved type bindings working.
+				// Using astRoot.recordModifications() did not work:
+				// type bindings were lost. Is there a way to recover them?
+				// FIXME we should find a way to apply all the changes at
+				// the AST level only (transactional-like feature) and
+				// refresh the bindings
+				parser.setSource(compilationUnit);
+				parser.setResolveBindings(true);
+				astRoot = (CompilationUnit) parser.createAST(null);
+				++nbLoops;
 			} catch (Exception e) {
 				// TODO JNR add UI error reporting with Display.getCurrent().asyncExec()
 				throw new RuntimeException("Unexpected exception", e);
@@ -592,9 +574,9 @@ public class AutoRefactorHandler extends AbstractHandler {
 		return Pair.of(rewrite, commentRewriter);
 	}
 
-	private static GrowableArrayList<IRefactoring> getAllRefactorings() {
+	private static List<IRefactoring> getAllRefactorings() {
 		PreferenceHelper prefs = AutoRefactorPlugin.getPreferenceHelper();
-		return new GrowableArrayList<IRefactoring>(
+		return new ArrayList<IRefactoring>(Arrays.asList(
 				new VectorOldToNewAPIRefactoring(),
 				new PrimitiveWrapperCreationRefactoring(),
 				new BooleanRefactoring(),
@@ -620,7 +602,7 @@ public class AutoRefactorHandler extends AbstractHandler {
 				new StringBuilderRefactoring(),
 				new CommentsRefactoring(),
 				new RemoveUnnecessaryLocalBeforeReturnRefactoring(),
-				new RemoveUselessModifiersRefactoring());
+				new RemoveUselessModifiersRefactoring()));
 	}
 
 }

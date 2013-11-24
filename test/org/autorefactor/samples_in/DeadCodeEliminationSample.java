@@ -73,8 +73,7 @@ public class DeadCodeEliminationSample {
 		return i + j;
 	}
 
-	private int removeWhileWithoutIterations()
-	{
+	private int removeWhileWithoutIterations() {
 		int i = 0;
 		while (false) {
 			i++;
@@ -84,8 +83,7 @@ public class DeadCodeEliminationSample {
 		return i;
 	}
 
-	private int removeEmptyTry()
-	{
+	private int removeEmptyTry() {
 		int i = 0;
 		try {
 		} catch (Exception e) {
