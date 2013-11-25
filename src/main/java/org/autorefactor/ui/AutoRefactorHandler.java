@@ -475,7 +475,7 @@ public class AutoRefactorHandler extends AbstractHandler {
 			if (nbLoops > 10000) {
 				// Oops! Something went wrong.
 				throw new IllegalStateException("An infinite loop has been detected."
-						+ " A possible cause is that code is being incorrectly "
+						+ " A possible cause is that code is being incorrectly"
 						+ " refactored one way then refactored back to what it was.");
 			}
 

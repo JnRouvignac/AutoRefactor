@@ -28,6 +28,7 @@ package org.autorefactor.refactoring.rules;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.autorefactor.refactoring.IJavaRefactoring;
@@ -76,6 +77,7 @@ public class CommentsRefactoring extends ASTVisitor implements IJavaRefactoring 
 			+   "(?:TODO: handle exception)"
 			+ ")"
 			+ "\\s*");
+	private static final Pattern JAVADOC_WITHOUT_FINAL_DOT = Pattern.compile("(.*?)((?:\\s*(?:\\r|\\n|\\r\\n)*\\s*)*\\*/)", Pattern.DOTALL);
 
 	private RefactoringContext ctx;
 	private CompilationUnit astRoot;
@@ -151,6 +153,12 @@ public class CommentsRefactoring extends ASTVisitor implements IJavaRefactoring 
 			}
 		} else if (!acceptJavadoc(getNextNode(node))) {
 			this.ctx.getRefactorings().replace(node, comment.replace("/**", "/*"));
+		} else if (!comment.contains(".")) {
+			Matcher matcher = JAVADOC_WITHOUT_FINAL_DOT.matcher(comment);
+			if (matcher.matches()) {
+				String newComment = matcher.group(1) + "." + matcher.group(2);
+				this.ctx.getRefactorings().replace(node, newComment);
+			}
 		}
 		return VISIT_SUBTREE;
 	}
@@ -292,7 +300,7 @@ public class CommentsRefactoring extends ASTVisitor implements IJavaRefactoring 
 					// new comment is a line comment and best comment is not
 					bestLoc = newLoc;
 					bestComment = newComment;
-					continue;					
+					continue;
 				}
 			}
 		}
@@ -310,7 +318,7 @@ public class CommentsRefactoring extends ASTVisitor implements IJavaRefactoring 
 
 	private boolean acceptJavadoc(final ASTNode node) {
 		// PackageDeclaration node accept javadoc in package-info.java files,
-		// but they are useless everywhere else, so do not include them at all for now. 
+		// but they are useless everywhere else, so do not include them at all for now.
 		return node instanceof BodyDeclaration;
 	}
 

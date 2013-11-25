@@ -28,15 +28,15 @@ package org.autorefactor.samples_out;
 public class CommentsSample implements Runnable {
 
     /**
-     * This is a javadoc that must be kept
+     * This is a javadoc that must be kept.
      */
     private int i;
 
-    /** Convert to a javadoc */
+    /** Convert to a javadoc. */
     public CommentsSample() {
     }
 
-    /** Remove javadoc below, current comment will be converted to javadoc */
+    /** Remove javadoc below, current comment will be converted to javadoc. */
     private boolean test2(int j) {
         // Remove comment line just below
         return false;
@@ -44,7 +44,7 @@ public class CommentsSample implements Runnable {
 
     // Do not convert this line comment to javadoc
     /**
-     * Convert to a javadoc
+     * Convert to a javadoc.
      */
     public static void main(String[] args) {
         // remove block comment just below
@@ -57,7 +57,7 @@ public class CommentsSample implements Runnable {
     }
 
     /**
-     * This is a javadoc that must be kept
+     * This is a javadoc that must be kept.
      */
     public void test() {
         /*
