@@ -27,11 +27,9 @@ package org.autorefactor.refactoring.rules;
 
 import java.util.List;
 
-import org.autorefactor.refactoring.ASTHelper;
 import org.autorefactor.refactoring.IJavaRefactoring;
 import org.autorefactor.refactoring.Refactorings;
 import org.eclipse.jdt.core.dom.AST;
-import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.CompilationUnit;

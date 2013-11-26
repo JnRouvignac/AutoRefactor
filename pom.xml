@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project
+        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+        xmlns="http://maven.apache.org/POM/4.0.0"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.autorefactor.plugin</groupId>
+  <artifactId>org.autorefactor.plugin</artifactId>
+  <version>0.0.2-SNAPSHOT</version>
+  <packaging>eclipse-plugin</packaging>
+
+  <properties>
+    <tycho-version>0.19.0</tycho-version>
+  </properties>
+
+  <repositories>
+   <repository>
+     <id>indigo</id>
+     <layout>p2</layout>
+     <url>http://download.eclipse.org/releases/indigo</url>
+   </repository>
+  </repositories>
+
+  <build>
+    <plugins>
+      <!-- More information for Tycho based builds:
+            http://wiki.eclipse.org/Tycho/Reference_Card
+            http://wiki.eclipse.org/Tycho/FAQ
+            http://wiki.eclipse.org/Tycho/Packaging_Types
+            http://wiki.eclipse.org/Tycho/Migration_Howto
+            http://wiki.eclipse.org/Category:Tycho
+            http://eclipse.org/tycho/documentation.php
+            http://www.eclipse.org/tycho/sitedocs/index.html
+            http://www.eclipsecon.org/2013/sessions/building-eclipse-plug-ins-and-rcp-applications-tycho
+            https://github.com/jeffmaury/eclipsecon2013-tycho
+            http://git.eclipse.org/c/tycho/org.eclipse.tycho-demo.git/tree/
+      -->
+      <plugin>
+        <groupId>org.eclipse.tycho</groupId>
+        <artifactId>tycho-maven-plugin</artifactId>
+        <version>${tycho-version}</version>
+        <extensions>true</extensions>
+      </plugin>
+      <plugin>
+        <groupId>org.eclipse.tycho</groupId>
+        <artifactId>target-platform-configuration</artifactId>
+        <version>${tycho-version}</version>
+        <configuration>
+          <environments>
+            <environment>
+              <os>linux</os>
+              <ws>gtk</ws>
+              <arch>x86</arch>
+            </environment>
+            <environment>
+              <os>linux</os>
+              <ws>gtk</ws>
+              <arch>x86_64</arch>
+            </environment>
+            <environment>
+              <os>win32</os>
+              <ws>win32</ws>
+              <arch>x86</arch>
+            </environment>
+            <environment>
+              <os>win32</os>
+              <ws>win32</ws>
+              <arch>x86_64</arch>
+            </environment>
+            <environment>
+              <os>macosx</os>
+              <ws>cocoa</ws>
+              <arch>x86_64</arch>
+            </environment>
+          </environments>
+        </configuration>
+      </plugin>
+<!-- TODO JNR
+      <plugin>
+        <groupId>org.eclipse.tycho</groupId>
+        <artifactId>tycho-surefire-plugin</artifactId>
+        <version>${tycho-version}</version>
+        <configuration>
+          <testSuite>Bundle-SymbolicName-of-bundleContaining-Tests</testSuite>
+          <testClass>FullyQualifiedNameOfTheTestClass</testClass>
+          <parallel>classes|methods|both</parallel>
+        </configuration>
+      </plugin>
+-->
+<!-- TODO JNR Alternatively, if you have per-project JDT preferences, you may advise the compiler to use these:
+      <plugin>
+        <groupId>org.eclipse.tycho</groupId>
+        <artifactId>tycho-compiler-plugin</artifactId>
+        <version>${tycho-version}</version>
+        <configuration>
+          <compilerArguments>
+            <properties>${project.basedir}/.settings/org.eclipse.jdt.core.prefs</properties>
+          </compilerArguments>
+        </configuration>
+      </plugin>
+-->
+    </plugins>
+  </build>
+
+</project>
