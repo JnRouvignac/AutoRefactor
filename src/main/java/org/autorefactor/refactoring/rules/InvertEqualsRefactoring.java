@@ -25,7 +25,6 @@
  */
 package org.autorefactor.refactoring.rules;
 
-import org.autorefactor.refactoring.ASTHelper;
 import org.autorefactor.refactoring.IJavaRefactoring;
 import org.autorefactor.refactoring.Refactorings;
 import org.eclipse.jdt.core.dom.*;
@@ -56,21 +55,17 @@ public class InvertEqualsRefactoring extends ASTVisitor implements
 
 	@Override
 	public boolean visit(MethodInvocation node) {
-		if (node.getExpression() == null || node.arguments().size() != 1) {
+		if (node.getExpression() == null) {
 			return VISIT_SUBTREE;
 		}
-		final boolean isEquals = "equals"
-				.equals(node.getName().getIdentifier());
-		final boolean isStringEqualsIgnoreCase = hasType(
-				node.getExpression(), "java.lang.String")
-				&& "equalsIgnoreCase".equals(node.getName().getIdentifier());
+		boolean isEquals = isMethod(node, "java.lang.Object", "equals", "java.lang.Object");
+		boolean isStringEqualsIgnoreCase =
+				isMethod(node, "java.lang.String", "equalsIgnoreCase", "java.lang.String");
 		if (isEquals || isStringEqualsIgnoreCase) {
 			final Expression expr = node.getExpression();
-			final Object exprConstantValue = expr
-					.resolveConstantExpressionValue();
+			final Object exprConstantValue = expr.resolveConstantExpressionValue();
 			final Expression arg = (Expression) node.arguments().get(0);
-			final Object argConstantValue = arg
-					.resolveConstantExpressionValue();
+			final Object argConstantValue = arg.resolveConstantExpressionValue();
 			// TODO JNR make it work for enums
 			if (exprConstantValue == null && argConstantValue != null) {
 				this.ctx.getRefactorings().replace(node,

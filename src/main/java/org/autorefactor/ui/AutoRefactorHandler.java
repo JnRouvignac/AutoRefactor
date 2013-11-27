@@ -588,7 +588,7 @@ public class AutoRefactorHandler extends AbstractHandler {
 			rewrite.remove(toRemove, null);
 		}
 		final ASTCommentRewriter commentRewriter = new ASTCommentRewriter();
-		for (ASTNode toRemove : refactorings.getCommentRemovals()) {
+		for (Comment toRemove : refactorings.getCommentRemovals()) {
 			commentRewriter.remove(toRemove);
 		}
 		for (Pair<Comment, String> toReplace : refactorings.getCommentReplacements()) {

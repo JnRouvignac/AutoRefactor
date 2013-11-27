@@ -32,50 +32,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.autorefactor.util.NotImplementedException;
-import org.eclipse.jdt.core.dom.AST;
-import org.eclipse.jdt.core.dom.ASTMatcher;
-import org.eclipse.jdt.core.dom.ASTNode;
-import org.eclipse.jdt.core.dom.AssertStatement;
-import org.eclipse.jdt.core.dom.Block;
-import org.eclipse.jdt.core.dom.BooleanLiteral;
-import org.eclipse.jdt.core.dom.BreakStatement;
-import org.eclipse.jdt.core.dom.ChildListPropertyDescriptor;
-import org.eclipse.jdt.core.dom.ChildPropertyDescriptor;
-import org.eclipse.jdt.core.dom.ConstructorInvocation;
-import org.eclipse.jdt.core.dom.ContinueStatement;
-import org.eclipse.jdt.core.dom.DoStatement;
-import org.eclipse.jdt.core.dom.EmptyStatement;
-import org.eclipse.jdt.core.dom.EnhancedForStatement;
-import org.eclipse.jdt.core.dom.Expression;
-import org.eclipse.jdt.core.dom.ExpressionStatement;
-import org.eclipse.jdt.core.dom.FieldAccess;
-import org.eclipse.jdt.core.dom.ForStatement;
-import org.eclipse.jdt.core.dom.IBinding;
-import org.eclipse.jdt.core.dom.ITypeBinding;
-import org.eclipse.jdt.core.dom.IfStatement;
-import org.eclipse.jdt.core.dom.InfixExpression;
-import org.eclipse.jdt.core.dom.InstanceofExpression;
-import org.eclipse.jdt.core.dom.LabeledStatement;
-import org.eclipse.jdt.core.dom.Name;
-import org.eclipse.jdt.core.dom.ParenthesizedExpression;
-import org.eclipse.jdt.core.dom.PrefixExpression;
+import org.eclipse.jdt.core.dom.*;
 import org.eclipse.jdt.core.dom.PrefixExpression.Operator;
-import org.eclipse.jdt.core.dom.QualifiedName;
-import org.eclipse.jdt.core.dom.ReturnStatement;
-import org.eclipse.jdt.core.dom.SimpleName;
-import org.eclipse.jdt.core.dom.Statement;
-import org.eclipse.jdt.core.dom.StructuralPropertyDescriptor;
-import org.eclipse.jdt.core.dom.SuperConstructorInvocation;
-import org.eclipse.jdt.core.dom.SwitchCase;
-import org.eclipse.jdt.core.dom.SwitchStatement;
-import org.eclipse.jdt.core.dom.SynchronizedStatement;
-import org.eclipse.jdt.core.dom.ThisExpression;
-import org.eclipse.jdt.core.dom.ThrowStatement;
-import org.eclipse.jdt.core.dom.TryStatement;
-import org.eclipse.jdt.core.dom.TypeDeclaration;
-import org.eclipse.jdt.core.dom.TypeDeclarationStatement;
-import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
-import org.eclipse.jdt.core.dom.WhileStatement;
 
 /**
  * Helper class for manipulating, converting, navigating and checking {@link ASTNode}s.
@@ -109,9 +67,16 @@ public class ASTHelper {
 		return pe;
 	}
 
-	private static Expression removeParentheses(Expression expr) {
+	public static ASTNode removeParentheses(ASTNode node) {
+		if (node instanceof Expression) {
+			return removeParentheses((Expression) node);
+		}
+		return node;
+	}
+
+	public static Expression removeParentheses(Expression expr) {
 		if (expr instanceof ParenthesizedExpression) {
-			return ((ParenthesizedExpression) expr).getExpression();
+			return removeParentheses(((ParenthesizedExpression) expr).getExpression());
 		}
 		return expr;
 	}
@@ -341,6 +306,87 @@ public class ASTHelper {
 
 	public static boolean isBreakable(ASTNode node) {
 		return isLoop(node) || node instanceof SwitchStatement;
+	}
+
+	public static boolean isMethod(MethodInvocation node, String typeQualifiedName,
+			String methodName, String... parameterTypesQualifiedNames) {
+		final IMethodBinding binding = node.resolveMethodBinding();
+		// let's do the fast checks first
+		if (binding == null
+				|| !methodName.equals(binding.getName())
+				|| binding.getParameterTypes().length != parameterTypesQualifiedNames.length) {
+			return false;
+		}
+		// ok more heavy checks now
+		if (instanceOf(binding.getDeclaringClass().getErasure(), typeQualifiedName)
+				&& typesMatch(binding.getParameterTypes(), parameterTypesQualifiedNames)) {
+			return true;
+		}
+		// a lot more heavy checks
+		// FIXME find a more efficient way to do this. It would be awesome
+		// if an API to directly find the overridenMethod IMethodBinding existed 
+		IMethodBinding overridenMethod = findOverridenMethod(binding.getDeclaringClass(), typeQualifiedName,
+				methodName, parameterTypesQualifiedNames);
+		return overridenMethod != null && binding.overrides(overridenMethod);
+	}
+
+	private static IMethodBinding findOverridenMethod(ITypeBinding typeBinding, String typeQualifiedName,
+			String methodName, String[] parameterTypesQualifiedNames) {
+		// superclass
+		ITypeBinding superclassBinding = typeBinding.getSuperclass();
+		if (superclassBinding != null) {
+			superclassBinding = superclassBinding.getErasure();
+			if (typeQualifiedName.equals(superclassBinding.getErasure().getQualifiedName())) {
+				// found the type
+				return findOverridenMethod(methodName, parameterTypesQualifiedNames,
+						superclassBinding.getDeclaredMethods());
+			}
+			IMethodBinding overridenMethod = findOverridenMethod(superclassBinding, typeQualifiedName,
+					methodName, parameterTypesQualifiedNames);
+			if (overridenMethod != null) {
+				return overridenMethod;
+			}
+		}
+		// interfaces
+		for (ITypeBinding itfBinding : typeBinding.getInterfaces()) {
+			itfBinding = itfBinding.getErasure();
+			if (typeQualifiedName.equals(itfBinding.getQualifiedName())) {
+				// found the type
+				return findOverridenMethod(methodName, parameterTypesQualifiedNames,
+						itfBinding.getDeclaredMethods());
+			}
+			IMethodBinding overridenMethod = findOverridenMethod(itfBinding, typeQualifiedName,
+				methodName, parameterTypesQualifiedNames);
+			if (overridenMethod != null) {
+				return overridenMethod;
+			}
+		}
+		return null;
+	}
+
+	private static IMethodBinding findOverridenMethod(String methodName, String[] parameterTypesQualifiedNames,
+			IMethodBinding[] declaredMethods) {
+		for (IMethodBinding methodBinding : declaredMethods) {
+			if (methodBinding.getName().equals(methodName)
+					&& typesMatch(methodBinding.getMethodDeclaration()
+						.getParameterTypes(), parameterTypesQualifiedNames)) {
+				return methodBinding;
+			}
+		}
+		return null;
+	}
+	
+	private static boolean typesMatch(ITypeBinding[] typeBindings,
+			String... typesQualifiedNames) {
+		if (typeBindings.length != typesQualifiedNames.length) {
+			return false;
+		}
+		for (int i = 0; i < typesQualifiedNames.length; i++) {
+			if (!typesQualifiedNames[i].equals(typeBindings[i].getErasure().getQualifiedName())) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	/**
@@ -603,7 +649,7 @@ public class ASTHelper {
 	/**
 	 * @return the parent node filtering out ParenthesizedExpression and Blocks.
 	 */
-	public static Object getParent(ASTNode node) {
+	public static ASTNode getParent(ASTNode node) {
 		ASTNode parent = node.getParent();
 		if (parent instanceof ParenthesizedExpression) {
 			return getParent(((ParenthesizedExpression) parent).getParent());

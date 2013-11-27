@@ -2,10 +2,11 @@ package org.autorefactor.refactoring;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.autorefactor.util.Pair;
-import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.BlockComment;
 import org.eclipse.jdt.core.dom.Comment;
 import org.eclipse.jdt.core.dom.LineComment;
@@ -17,15 +18,20 @@ import org.eclipse.text.edits.TextEdit;
 
 public class ASTCommentRewriter {
 
-	private List<ASTNode> removals = new ArrayList<ASTNode>();
-	private List<Pair<Comment, String>> replacements = new ArrayList<Pair<Comment, String>>();
+  	/**
+	 * Using a Set to avoid duplicates because Javadocs are visited twice via
+	 * CompilationUnit.getCommentList() and visit(Javadoc).
+	 */
+	private Set<Comment> removals = new LinkedHashSet<Comment>();
+	private Set<Pair<Comment, String>> replacements = new LinkedHashSet<Pair<Comment, String>>();
 	private List<BlockComment> blockCommentToJavadoc = new ArrayList<BlockComment>();
 	private List<List<LineComment>> lineCommentsToJavadoc = new ArrayList<List<LineComment>>();
 
 	public ASTCommentRewriter() {
+		super();
 	}
 
-	public void remove(ASTNode node) {
+	public void remove(Comment node) {
 		this.removals.add(node);
 	}
 
@@ -52,7 +58,7 @@ public class ASTCommentRewriter {
 		if (this.removals.isEmpty()) {
 			return;
 		}
-		for (ASTNode node : this.removals) {
+		for (Comment node : this.removals) {
 			final int start = node.getStartPosition();
 			final int length = node.getLength();
 

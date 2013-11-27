@@ -76,36 +76,6 @@ public class VectorOldToNewAPIRefactoring extends ASTVisitor implements
 		return VISIT_SUBTREE;
 	}
 
-	private boolean isMethod(MethodInvocation node, String qualifiedTypeName,
-			String methodName, String... paramTypes) {
-		// 1- infer from MethodBinding
-		// 2- if not possible, infer from actual types/parameters
-		final IMethodBinding methodDeclaration = node.resolveMethodBinding();
-		if (methodDeclaration == null) {
-			return false;
-		}
-		final ITypeBinding type = methodDeclaration.getDeclaringClass();
-		return type.getErasure().getQualifiedName().equals(qualifiedTypeName)
-				&& methodDeclaration.getName().equals(methodName)
-				&& parameterTypesEqual(paramTypes, methodDeclaration
-						.getMethodDeclaration().getParameterTypes());
-	}
-
-	private boolean parameterTypesEqual(String[] paramTypes,
-			ITypeBinding[] parameterTypes) {
-		if (paramTypes.length != parameterTypes.length) {
-			return false;
-		}
-		for (int i = 0; i < paramTypes.length; i++) {
-			String paramType = paramTypes[i];
-			String parameterType = parameterTypes[i].getErasure().getQualifiedName();
-			if (!parameterType.equals(paramType)) {
-				return false;
-			}
-		}
-		return true;
-	}
-
 	private void replaceWith(MethodInvocation node, String newMethodName) {
 		AST ast = this.ctx.getAST();
 		MethodInvocation mi = ast.newMethodInvocation();

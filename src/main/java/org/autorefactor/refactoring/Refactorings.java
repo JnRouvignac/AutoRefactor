@@ -29,17 +29,14 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.autorefactor.util.Pair;
-import org.eclipse.jdt.core.dom.ASTNode;
-import org.eclipse.jdt.core.dom.BlockComment;
-import org.eclipse.jdt.core.dom.ChildListPropertyDescriptor;
-import org.eclipse.jdt.core.dom.Comment;
-import org.eclipse.jdt.core.dom.LineComment;
-import org.eclipse.jdt.core.dom.StructuralPropertyDescriptor;
+import org.eclipse.jdt.core.dom.*;
 
 /**
  * Class aggregating all the refactorings performed by a refactoring rule until
@@ -59,8 +56,8 @@ public class Refactorings {
 	 * The refactorings removing code from the AST tree.
 	 */
 	private final List<ASTNode> removals = new LinkedList<ASTNode>();
-	private final List<Comment> commentRemovals = new LinkedList<Comment>();
-	private final List<Pair<Comment, String>> commentReplacements = new LinkedList<Pair<Comment, String>>();
+	private final Set<Comment> commentRemovals = new LinkedHashSet<Comment>();
+	private final Set<Pair<Comment, String>> commentReplacements = new LinkedHashSet<Pair<Comment, String>>();
 	private final Map<ASTNode, List<LineComment>> lineCommentsToJavadoc = new HashMap<ASTNode, List<LineComment>>();
 	private final List<BlockComment> blockCommentToJavadoc = new LinkedList<BlockComment>();
 
@@ -133,11 +130,11 @@ public class Refactorings {
 		return this.inserts;
 	}
 
-	public List<Comment> getCommentRemovals() {
+	public Set<Comment> getCommentRemovals() {
 		return this.commentRemovals;
 	}
-	
-	public List<Pair<Comment, String>> getCommentReplacements() {
+
+	public Set<Pair<Comment, String>> getCommentReplacements() {
 		return this.commentReplacements;
 	}
 

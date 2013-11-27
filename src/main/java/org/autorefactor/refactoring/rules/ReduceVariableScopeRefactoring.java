@@ -28,7 +28,6 @@ package org.autorefactor.refactoring.rules;
 import java.util.*;
 import java.util.Map.Entry;
 
-import org.autorefactor.refactoring.ASTHelper;
 import org.autorefactor.refactoring.IJavaRefactoring;
 import org.autorefactor.refactoring.Refactorings;
 import org.autorefactor.util.NotImplementedException;

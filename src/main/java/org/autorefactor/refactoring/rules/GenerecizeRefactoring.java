@@ -73,16 +73,12 @@ public class GenerecizeRefactoring extends ASTVisitor implements
 
 	@Override
 	public boolean visit(MethodInvocation node) {
-		if ("next".equals(node.getName().getIdentifier())
-				&& node.arguments().size() == 0
-				&& node.getExpression() != null
-				&& instanceOf(node.getExpression(), "java.util.Iterator")) {
-			if (node.getParent() instanceof CastExpression) {
-				CastExpression cast = (CastExpression) node.getParent();
-				Type type = cast.getType();
+		if (isMethod(node, "java.util.Iterator", "next")
+				&& node.getParent() instanceof CastExpression) {
+			CastExpression cast = (CastExpression) node.getParent();
+			Type type = cast.getType();
 
-				// find variable declaration and include with the type above
-			}
+			// TODO JNR find variable declaration and include with the type above
 		}
 		return VISIT_SUBTREE;
 	}

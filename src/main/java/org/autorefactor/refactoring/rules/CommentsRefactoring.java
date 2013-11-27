@@ -86,14 +86,13 @@ public class CommentsRefactoring extends ASTVisitor implements IJavaRefactoring 
 		if (EMPTY_BLOCK_COMMENT.matcher(comment).matches()) {
 			this.ctx.getRefactorings().remove(node);
 			return DO_NOT_VISIT_SUBTREE;
-		} else {
-			final ASTNode nextNode = getNextNode(node);
-			if (acceptJavadoc(nextNode) && !betterCommentExist(node, nextNode)) {
-				this.ctx.getRefactorings().toJavadoc(node);
-				return DO_NOT_VISIT_SUBTREE;
-			}
-			return VISIT_SUBTREE;
 		}
+		final ASTNode nextNode = getNextNode(node);
+		if (acceptJavadoc(nextNode) && !betterCommentExist(node, nextNode)) {
+			this.ctx.getRefactorings().toJavadoc(node);
+			return DO_NOT_VISIT_SUBTREE;
+		}
+		return VISIT_SUBTREE;
 	}
 
 	private ASTNode getNextNode(Comment node) {
@@ -139,14 +138,17 @@ public class CommentsRefactoring extends ASTVisitor implements IJavaRefactoring 
 			int endLine = this.astRoot.getLineNumber(node.getStartPosition() + node.getLength());
 			if (startLine != endLine) {
 				this.ctx.getRefactorings().replace(node, "/** {@inheritDoc} */");
+	                        return DO_NOT_VISIT_SUBTREE;
 			}
 		} else if (!acceptJavadoc(getNextNode(node))) {
 			this.ctx.getRefactorings().replace(node, comment.replace("/**", "/*"));
+                        return DO_NOT_VISIT_SUBTREE;
 		} else if (!comment.contains(".")) {
 			Matcher matcher = JAVADOC_WITHOUT_FINAL_DOT.matcher(comment);
 			if (matcher.matches()) {
 				String newComment = matcher.group(1) + "." + matcher.group(2);
 				this.ctx.getRefactorings().replace(node, newComment);
+	                        return DO_NOT_VISIT_SUBTREE;
 			}
 		}
 		return VISIT_SUBTREE;
@@ -311,8 +313,9 @@ public class CommentsRefactoring extends ASTVisitor implements IJavaRefactoring 
 		return node instanceof BodyDeclaration;
 	}
 
-	public Refactorings getRefactorings(CompilationUnit astRoot) {
-		this.astRoot = astRoot;
+	@Override
+	public boolean visit(CompilationUnit node) {
+		this.astRoot = node;
 		for (Comment comment : (List<Comment>) astRoot.getCommentList()) {
 			comments.add(Pair.of(new SourceLocation(comment.getStartPosition(), comment.getLength()), comment));
 		}
@@ -327,8 +330,14 @@ public class CommentsRefactoring extends ASTVisitor implements IJavaRefactoring 
 			} else if (comment.isDocComment()) {
 				final Javadoc jc = (Javadoc) comment;
 				jc.accept(this);
+			} else {
+				throw new NotImplementedException(comment);
 			}
 		}
+		return VISIT_SUBTREE;
+	}
+
+	public Refactorings getRefactorings(CompilationUnit astRoot) {
 		return this.ctx.getRefactorings();
 	}
 

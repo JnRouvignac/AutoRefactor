@@ -100,6 +100,7 @@ public class StringBuilderRefactoring extends ASTVisitor implements
 			boolean replaceNeeded = filterOutEmptyStringsFromStringConcat(allOperands);
 			if (replaceNeeded) {
 				this.ctx.getRefactorings().replace(node, createStringConcats(allOperands));
+				return DO_NOT_VISIT_SUBTREE;
 			}
 			// FIXME In theory commented code down below should work better than current code above
 			// (preserving comments, etc.), but in practice it does not work at all.
@@ -108,7 +109,6 @@ public class StringBuilderRefactoring extends ASTVisitor implements
 			// this.ctx.getRefactorings().remove(operand);
 			// }
 			// }
-			return DO_NOT_VISIT_SUBTREE;
 		}
 		return VISIT_SUBTREE;
 	}
@@ -171,10 +171,8 @@ public class StringBuilderRefactoring extends ASTVisitor implements
 					return DO_NOT_VISIT_SUBTREE;
 				}
 			}
-		} else if ("toString".equals(node.getName().getIdentifier())
-				&& node.arguments().isEmpty()
-				&& hasType(node.getExpression(),
-						"java.lang.StringBuilder", "java.lang.StringBuffer")) {
+		} else if (isMethod(node, "java.lang.StringBuilder", "toString")
+				|| isMethod(node, "java.lang.StringBuffer", "toString")) {
 			final LinkedList<Expression> allAppendedStrings = new LinkedList<Expression>();
 			final Expression lastExpr = collectAllAppendedStrings(
 					node.getExpression(), allAppendedStrings, null);

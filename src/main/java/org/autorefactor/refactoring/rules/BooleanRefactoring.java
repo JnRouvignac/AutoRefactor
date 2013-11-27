@@ -337,10 +337,6 @@ public class BooleanRefactoring extends ASTVisitor implements IJavaRefactoring {
 		return null;
 	}
 
-	private static Boolean getBooleanLiteral(Expression node) {
-		return getBooleanLiteral(node);
-	}
-
 	private ReturnStatement getReturnStatement(IfStatement node,
 			final Boolean returnThenLiteral, final Boolean returnElseLiteral) {
 		if (returnThenLiteral != null && returnElseLiteral != null
@@ -444,33 +440,25 @@ public class BooleanRefactoring extends ASTVisitor implements IJavaRefactoring {
 
 	@Override
 	public boolean visit(MethodInvocation node) {
-		if (node.getExpression() != null) {
-			final ITypeBinding typeBinding = node.getExpression()
-					.resolveTypeBinding();
-			if (typeBinding != null
-					&& "java.lang.Boolean".equals(typeBinding
-							.getQualifiedName())
-					&& "valueOf".equals(node.getName().getIdentifier())
-					&& node.arguments().size() == 1) {
-				final BooleanLiteral l = as((Expression) node
-						.arguments().get(0), BooleanLiteral.class);
-				if (l != null) {
-					this.ctx.getRefactorings().replace(
-							node,
-							getRefactoring(typeBinding.getName(), node,
-									l.booleanValue()));
-					return DO_NOT_VISIT_SUBTREE;
-				}
+		if (isMethod(node, "java.lang.Boolean", "valueOf", "java.lang.String")
+				|| isMethod(node, "java.lang.Boolean", "valueOf", "boolean")) {
+			final BooleanLiteral l = as((Expression) node
+					.arguments().get(0), BooleanLiteral.class);
+			if (l != null) {
+				this.ctx.getRefactorings().replace(node,
+						getRefactoring(node, l.booleanValue()));
+				return DO_NOT_VISIT_SUBTREE;
 			}
 		}
 		return VISIT_SUBTREE;
 	}
 
-	private FieldAccess getRefactoring(String typeName, MethodInvocation node,
-			boolean booleanLiteral) {
+	private FieldAccess getRefactoring(MethodInvocation node, boolean booleanLiteral) {
 		final AST ast = this.ctx.getAST();
 		final FieldAccess fa = ast.newFieldAccess();
-		fa.setExpression(ast.newSimpleName(typeName));
+		if (node.getExpression() instanceof Name) {
+			fa.setExpression(copySubtree(node.getExpression()));
+		}
 		fa.setName(ast.newSimpleName(booleanLiteral ? "TRUE" : "FALSE"));
 		return fa;
 	}

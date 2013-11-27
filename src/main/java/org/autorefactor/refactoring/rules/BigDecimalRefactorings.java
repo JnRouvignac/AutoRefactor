@@ -135,42 +135,39 @@ public class BigDecimalRefactorings extends ASTVisitor implements
 		if (node.getExpression() == null) {
 			return VISIT_SUBTREE;
 		}
-		if (hasType(node.getExpression(), "java.math.BigDecimal")) {
-			if (javaMinorVersion >= 5
-					&& "valueOf".equals(node.getName().getIdentifier())
-					&& node.arguments().size() == 1) {
-				final ITypeBinding typeBinding = node.getExpression()
-						.resolveTypeBinding();
-				final Expression arg = (Expression) node.arguments().get(0);
-				if (arg instanceof NumberLiteral) {
-					final NumberLiteral nb = (NumberLiteral) arg;
-					if (nb.getToken().contains(".")) {
-						this.ctx.getRefactorings().replace(node,
-								getClassInstanceCreatorNode(
-										(Name) node.getExpression(),
-										nb.getToken()));
-					} else if (ZERO_LONG_LITERAL_RE.matcher(nb.getToken()).matches()) {
-						replaceWithQualifiedName(node, typeBinding.getName(), "ZERO");
-					} else if (ONE_LONG_LITERAL_RE.matcher(nb.getToken()).matches()) {
-						replaceWithQualifiedName(node, typeBinding.getName(), "ONE");
-					} else if (TEN_LONG_LITERAL_RE.matcher(nb.getToken()).matches()) {
-						replaceWithQualifiedName(node, typeBinding.getName(), "TEN");
-					}
-					return DO_NOT_VISIT_SUBTREE;
+		if (javaMinorVersion >= 5
+				&& (isMethod(node, "java.math.BigDecimal", "valueOf", "long")
+					|| isMethod(node, "java.math.BigDecimal", "valueOf", "double"))) {
+			final ITypeBinding typeBinding = node.getExpression().resolveTypeBinding();
+			final Expression arg = (Expression) node.arguments().get(0);
+			if (arg instanceof NumberLiteral) {
+				final NumberLiteral nb = (NumberLiteral) arg;
+				if (nb.getToken().contains(".")) {
+					this.ctx.getRefactorings().replace(node,
+							getClassInstanceCreatorNode(
+									(Name) node.getExpression(),
+									nb.getToken()));
+				} else if (ZERO_LONG_LITERAL_RE.matcher(nb.getToken()).matches()) {
+					replaceWithQualifiedName(node, typeBinding.getName(), "ZERO");
+				} else if (ONE_LONG_LITERAL_RE.matcher(nb.getToken()).matches()) {
+					replaceWithQualifiedName(node, typeBinding.getName(), "ONE");
+				} else if (TEN_LONG_LITERAL_RE.matcher(nb.getToken()).matches()) {
+					replaceWithQualifiedName(node, typeBinding.getName(), "TEN");
+				} else {
+					return VISIT_SUBTREE;
 				}
-			} else if ("equals".equals(node.getName().getIdentifier())
-					&& node.arguments().size() == 1) {
-				final Expression arg = (Expression) node.arguments().get(0);
-				if (hasType(arg, "java.math.BigDecimal")) {
-					if (isInStringAppend(node.getParent())) {
-						this.ctx.getRefactorings().replace(node,
-								getParenthesizedExpression(getCompareToNode(node)));
-						return DO_NOT_VISIT_SUBTREE;
-					} else {
-						this.ctx.getRefactorings().replace(node, getCompareToNode(node));
-						return DO_NOT_VISIT_SUBTREE;
-					}
+				return DO_NOT_VISIT_SUBTREE;
+			}
+		} else if (isMethod(node, "java.math.BigDecimal", "equals", "java.lang.Object")) {
+			final Expression arg = (Expression) node.arguments().get(0);
+			if (hasType(arg, "java.math.BigDecimal")) {
+				if (isInStringAppend(node.getParent())) {
+					this.ctx.getRefactorings().replace(node,
+							getParenthesizedExpression(getCompareToNode(node)));
+				} else {
+					this.ctx.getRefactorings().replace(node, getCompareToNode(node));
 				}
+				return DO_NOT_VISIT_SUBTREE;
 			}
 		}
 		return VISIT_SUBTREE;
