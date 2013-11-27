@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -71,6 +72,7 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTParser;
+import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.BlockComment;
 import org.eclipse.jdt.core.dom.ChildListPropertyDescriptor;
 import org.eclipse.jdt.core.dom.Comment;
@@ -96,8 +98,8 @@ import org.eclipse.ui.handlers.HandlerUtil;
  * invoked from the Eclipse UI.
  *
  * @see <a
- *      href="http://www.vogella.com/articles/EclipsePlugIn/article.html#contribute">Extending
- *      Eclipse - Plug-in Development Tutorial</a>
+ * href="http://www.vogella.com/articles/EclipsePlugIn/article.html#contribute"
+ * >Extending Eclipse - Plug-in Development Tutorial</a>
  */
 public class AutoRefactorHandler extends AbstractHandler {
 
@@ -137,8 +139,9 @@ public class AutoRefactorHandler extends AbstractHandler {
 						if (monitor != null) {
 							monitor.subTask("Applying refactorings to " + className);
 						}
-						applyRefactoring(compilationUnit, javaSERelease,
-								tabSize, new AggregateASTVisitor(getAllRefactorings()));
+						AggregateASTVisitor refactoring = new AggregateASTVisitor(
+							getAllRefactorings(), AutoRefactorPlugin.getPreferenceHelper().debugModeOn());
+						applyRefactoring(compilationUnit, javaSERelease, tabSize, refactoring);
 					} catch (Exception e) {
 						throw new RuntimeException(e);
 					} finally {
@@ -220,7 +223,8 @@ public class AutoRefactorHandler extends AbstractHandler {
 					continue;
 				}
 
-				applyRefactoring(testCase.sampleIn, javaSERelease, tabSize, testCase.refactoring);
+				AggregateASTVisitor v = new AggregateASTVisitor(testCase.refactoring);
+				applyRefactoring(testCase.sampleIn, javaSERelease, tabSize, v);
 
 				// Change the package to be the same as the sampleOut
 				// ignore insignificant space characters
@@ -426,20 +430,18 @@ public class AutoRefactorHandler extends AbstractHandler {
 
 	/**
 	 * @see <a
-	 *      href="http://help.eclipse.org/indigo/index.jsp?topic=%2Forg.eclipse.jdt.doc.isv%2Fguide%2Fjdt_api_manip.htm">Eclipse
-	 *      JDT core - Manipulating Java code</a>
+	 * href="http://help.eclipse.org/indigo/index.jsp?topic=%2Forg.eclipse.jdt.doc.isv%2Fguide%2Fjdt_api_manip.htm"
+	 * >Eclipse JDT core - Manipulating Java code</a>
 	 * @see <a
-	 *      href="http://help.eclipse.org/indigo/index.jsp?topic=/org.eclipse.platform.doc.isv/guide/workbench_cmd_menus.htm">
-	 *      Eclipse Platform Plug-in Developer Guide > Plugging into the
-	 *      workbench > Basic workbench extension points using commands >
-	 *      org.eclipse.ui.menus</a>
+	 * href="http://help.eclipse.org/indigo/index.jsp?topic=/org.eclipse.platform.doc.isv/guide/workbench_cmd_menus.htm"
+	 * > Eclipse Platform Plug-in Developer Guide > Plugging into the workbench > Basic workbench extension points using commands > org.eclipse.ui.menus</a>
 	 * @see <a
-	 *      href="http://www.eclipse.org/articles/article.php?file=Article-JavaCodeManipulation_AST/index.html#sec-write-it-down">
-	 *      Abstract Syntax Tree > Write it down</a>
+	 * href="http://www.eclipse.org/articles/article.php?file=Article-JavaCodeManipulation_AST/index.html#sec-write-it-down"
+	 * >Abstract Syntax Tree > Write it down</a>
 	 */
 	private static void applyRefactoring(ICompilationUnit compilationUnit,
 			Release javaSERelease, int tabSize,
-			IRefactoring refactoringToApply) throws Exception {
+			AggregateASTVisitor refactoringToApply) throws Exception {
 		final ITextFileBufferManager bufferManager = FileBuffers.getTextFileBufferManager();
 		final IPath path = compilationUnit.getPath();
 		final LocationKind locationKind = LocationKind.NORMALIZE;
@@ -458,7 +460,7 @@ public class AutoRefactorHandler extends AbstractHandler {
 
 	private static void applyRefactoring(IDocument document,
 			ICompilationUnit compilationUnit, Release javaSERelease,
-			int tabSize, IRefactoring refactoring)
+			int tabSize, AggregateASTVisitor refactoring)
 					throws JavaModelException {
 		// creation of DOM/AST from a ICompilationUnit
 		final ASTParser parser = ASTParser.newParser(AST.JLS4);
@@ -470,13 +472,17 @@ public class AutoRefactorHandler extends AbstractHandler {
 		// new CFGBuilder(compilationUnit.getSource(),
 		// tabSize).buildCFG(astRoot);
 
-		int nbLoops = 0;
+		int totalNbLoops = 0;
+		List<ASTVisitor> lastLoopVisitors = Collections.emptyList();
+		int nbLoopsWithSameVisitors = 0;
 		while (true) {
-			if (nbLoops > 10000) {
+			if (totalNbLoops > 10000) {
 				// Oops! Something went wrong.
+				final String message = getPossibleCulprits(nbLoopsWithSameVisitors, lastLoopVisitors);
 				throw new IllegalStateException("An infinite loop has been detected."
 						+ " A possible cause is that code is being incorrectly"
-						+ " refactored one way then refactored back to what it was.");
+						+ " refactored one way then refactored back to what it was."
+						+ message);
 			}
 
 			try {
@@ -522,12 +528,35 @@ public class AutoRefactorHandler extends AbstractHandler {
 				parser.setSource(compilationUnit);
 				parser.setResolveBindings(true);
 				astRoot = (CompilationUnit) parser.createAST(null);
-				++nbLoops;
+				++totalNbLoops;
+
+
+				final List<ASTVisitor> thisLoopVisitors = refactoring.getVisitorsContributingRefactoring();
+				if (!thisLoopVisitors.equals(lastLoopVisitors)) {
+					lastLoopVisitors = new ArrayList<ASTVisitor>(thisLoopVisitors);
+					nbLoopsWithSameVisitors = 0;
+				} else {
+					++nbLoopsWithSameVisitors;
+				}
 			} catch (Exception e) {
 				// TODO JNR add UI error reporting with Display.getCurrent().asyncExec()
 				throw new RuntimeException("Unexpected exception", e);
 			}
 		}
+	}
+
+	private static String getPossibleCulprits(int nbLoopsWithSameVisitors,
+			List<ASTVisitor> lastLoopVisitors) {
+		if (nbLoopsWithSameVisitors < 100 || lastLoopVisitors.isEmpty()) {
+			return "";
+		}
+		final StringBuilder sb = new StringBuilder(" Possible culprit ASTVisitor classes are: ");
+		final Iterator<ASTVisitor> iter = lastLoopVisitors.iterator();
+		sb.append(iter.next().getClass().getName());
+		for (; iter.hasNext();) {
+			sb.append(", ").append(iter.next().getClass().getName());
+		}
+		return sb.toString();
 	}
 
 	private static Pair<ASTRewrite, ASTCommentRewriter> getASTRewrite(

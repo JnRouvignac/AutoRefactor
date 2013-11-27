@@ -46,6 +46,8 @@ public class WorkspacePreferencePage extends FieldEditorPreferencePage implement
 	protected void createFieldEditors() {
 		addBooleanField(REMOVE_THIS_FOR_NON_STATIC_METHOD_ACCESS);
 		addBooleanField(ADD_ANGLE_BRACKETS_TO_STATEMENT_BODIES);
+
+		addBooleanField(DEBUG_MODE_ON);
 	}
 
 	private void addBooleanField(Preference pref) {

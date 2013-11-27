@@ -41,6 +41,10 @@ public class PreferenceHelper {
 		return preferenceStore.getBoolean(ADD_ANGLE_BRACKETS_TO_STATEMENT_BODIES.name);
 	}
 
+	public boolean debugModeOn() {
+		return getBoolean(DEBUG_MODE_ON);
+	}
+
 	public boolean removeThisForNonStaticMethodAccess() {
 		return getBoolean(REMOVE_THIS_FOR_NON_STATIC_METHOD_ACCESS);
 	}

@@ -37,6 +37,10 @@ public interface PreferenceConstants {
 		}
 	}
 
+	Preference DEBUG_MODE_ON = new Preference(
+		"debug_mode_on",
+		"Enable debug mode (for developers only)");
+
 	Preference ADD_ANGLE_BRACKETS_TO_STATEMENT_BODIES = new Preference(
 		"add_angle_brackets_to_statement_bodies",
 		"Add angle brackets '{' and '}' to statement bodies");
