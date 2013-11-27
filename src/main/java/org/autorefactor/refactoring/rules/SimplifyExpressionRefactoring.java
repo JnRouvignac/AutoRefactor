@@ -25,33 +25,11 @@
  */
 package org.autorefactor.refactoring.rules;
 
-import org.autorefactor.refactoring.ASTHelper;
 import org.autorefactor.refactoring.IJavaRefactoring;
 import org.autorefactor.refactoring.Refactorings;
 import org.autorefactor.util.NotImplementedException;
-import org.eclipse.jdt.core.dom.AST;
-import org.eclipse.jdt.core.dom.ASTMatcher;
-import org.eclipse.jdt.core.dom.ASTNode;
-import org.eclipse.jdt.core.dom.ASTVisitor;
-import org.eclipse.jdt.core.dom.Assignment;
-import org.eclipse.jdt.core.dom.CastExpression;
-import org.eclipse.jdt.core.dom.CompilationUnit;
-import org.eclipse.jdt.core.dom.ConditionalExpression;
-import org.eclipse.jdt.core.dom.DoStatement;
-import org.eclipse.jdt.core.dom.Expression;
-import org.eclipse.jdt.core.dom.ITypeBinding;
-import org.eclipse.jdt.core.dom.IfStatement;
-import org.eclipse.jdt.core.dom.InfixExpression;
+import org.eclipse.jdt.core.dom.*;
 import org.eclipse.jdt.core.dom.InfixExpression.Operator;
-import org.eclipse.jdt.core.dom.InstanceofExpression;
-import org.eclipse.jdt.core.dom.MethodInvocation;
-import org.eclipse.jdt.core.dom.NullLiteral;
-import org.eclipse.jdt.core.dom.ParenthesizedExpression;
-import org.eclipse.jdt.core.dom.ReturnStatement;
-import org.eclipse.jdt.core.dom.Statement;
-import org.eclipse.jdt.core.dom.ThisExpression;
-import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
-import org.eclipse.jdt.core.dom.WhileStatement;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
 
@@ -100,8 +78,7 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
 	public boolean visit(ParenthesizedExpression node) {
 		final Expression innerExpr = getExpressionWithoutParentheses(node);
 		if (innerExpr != node) {
-			final Expression innerExprCopy = ASTHelper.copySubtree(this.ctx.getAST(),
-					innerExpr);
+			final Expression innerExprCopy = copySubtree(this.ctx.getAST(), innerExpr);
 			this.ctx.getRefactorings().replace(node, innerExprCopy);
 			innerExprCopy.accept(this);
 			return DO_NOT_VISIT_SUBTREE;
@@ -238,10 +215,9 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
 			replaceInfixExpressionIfNeeded(node.getParent());
 			return DO_NOT_VISIT_SUBTREE;
 		} else if (this.removeThisForNonStaticMethodAccess) {
-			ThisExpression te = ASTHelper.as(node.getExpression(),
-					ThisExpression.class);
+			ThisExpression te = as(node.getExpression(), ThisExpression.class);
 			if (te != null
-					&& ASTHelper.thisExpressionRefersToCurrentType(
+					&& thisExpressionRefersToCurrentType(
 							te.getQualifier(), node)) {
 				// remove useless thisExpressions
 				this.ctx.getRefactorings().remove(node.getExpression());
@@ -292,7 +268,7 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
 	private InfixExpression getNewInfixExpression(final InfixExpression ie) {
 		final AST ast = this.ctx.getAST();
 		final InfixExpression newIe = ast.newInfixExpression();
-		newIe.setLeftOperand(ASTHelper.copySubtree(ast, ie.getLeftOperand()));
+		newIe.setLeftOperand(copySubtree(ast, ie.getLeftOperand()));
 		newIe.setRightOperand(ast.newNumberLiteral("0"));
 		return newIe;
 	}
@@ -338,8 +314,8 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
 			}
 		} else if (Operator.EQUALS.equals(operator)) {
 			boolean result = VISIT_SUBTREE;
-			final Boolean blo = ASTHelper.getBooleanLiteral(lhs);
-			final Boolean bro = ASTHelper.getBooleanLiteral(rhs);
+			final Boolean blo = getBooleanLiteral(lhs);
+			final Boolean bro = getBooleanLiteral(rhs);
 			if (blo != null) {
 				checkNoExtendedOperands(node);
 				result = replace(node, blo.booleanValue(), rhs);
@@ -351,8 +327,8 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
 			}
 		} else if (Operator.NOT_EQUALS.equals(operator)) {
 			boolean continueVisit = VISIT_SUBTREE;
-			final Boolean blo = ASTHelper.getBooleanLiteral(lhs);
-			final Boolean bro = ASTHelper.getBooleanLiteral(rhs);
+			final Boolean blo = getBooleanLiteral(lhs);
+			final Boolean bro = getBooleanLiteral(rhs);
 			if (blo != null) {
 				checkNoExtendedOperands(node);
 				continueVisit = replace(node, !blo.booleanValue(), rhs);
@@ -388,7 +364,7 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
 	private void addParentheses(Expression e) {
 		final AST ast = this.ctx.getAST();
 		final ParenthesizedExpression pe = ast.newParenthesizedExpression();
-		pe.setExpression(ASTHelper.copySubtree(ast, e));
+		pe.setExpression(copySubtree(ast, e));
 		this.ctx.getRefactorings().replace(e, pe);
 	}
 
@@ -426,16 +402,16 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
 		// fearing we would introduce a previously non existing NPE.
 		Expression operand;
 		if (negate) {
-			operand = ASTHelper.copySubtree(this.ctx.getAST(), exprToCopy);
+			operand = copySubtree(this.ctx.getAST(), exprToCopy);
 		} else {
-			operand = ASTHelper.negate(this.ctx.getAST(), exprToCopy, true);
+			operand = negate(this.ctx.getAST(), exprToCopy, true);
 		}
 		this.ctx.getRefactorings().replace(node, operand);
 		return DO_NOT_VISIT_SUBTREE;
 	}
 
 	private void replaceByCopy(InfixExpression node, final Expression expr) {
-		this.ctx.getRefactorings().replace(node, ASTHelper.copySubtree(this.ctx.getAST(), expr));
+		this.ctx.getRefactorings().replace(node, copySubtree(this.ctx.getAST(), expr));
 	}
 
 	/**
@@ -446,10 +422,6 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
 	 * object equality against an expression that resolves to a non null
 	 * constant</li>
 	 * </ul>
-	 *
-	 * @param e
-	 * @param nullCheckedExpression
-	 * @return
 	 */
 	private boolean isNullCheckRedundant(Expression e, Expression nullCheckedExpression) {
 		if (nullCheckedExpression == null) {

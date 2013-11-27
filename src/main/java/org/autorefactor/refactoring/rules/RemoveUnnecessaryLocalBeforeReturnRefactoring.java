@@ -25,21 +25,11 @@
  */
 package org.autorefactor.refactoring.rules;
 
-import org.autorefactor.refactoring.ASTHelper;
 import org.autorefactor.refactoring.IJavaRefactoring;
 import org.autorefactor.refactoring.Refactorings;
-import org.eclipse.jdt.core.dom.ASTNode;
-import org.eclipse.jdt.core.dom.ASTVisitor;
-import org.eclipse.jdt.core.dom.Assignment;
-import org.eclipse.jdt.core.dom.CompilationUnit;
-import org.eclipse.jdt.core.dom.Expression;
-import org.eclipse.jdt.core.dom.ExpressionStatement;
-import org.eclipse.jdt.core.dom.IVariableBinding;
-import org.eclipse.jdt.core.dom.ReturnStatement;
-import org.eclipse.jdt.core.dom.SimpleName;
-import org.eclipse.jdt.core.dom.Statement;
-import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
-import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
+import org.eclipse.jdt.core.dom.*;
+
+import static org.autorefactor.refactoring.ASTHelper.*;
 
 /**
  * Removes unnecessary local variable declaration or unnecessary variable
@@ -60,7 +50,7 @@ public class RemoveUnnecessaryLocalBeforeReturnRefactoring extends ASTVisitor
 
 	@Override
 	public boolean visit(ReturnStatement node) {
-		final Statement previousSibling = ASTHelper.getPreviousSibling(node);
+		final Statement previousSibling = getPreviousSibling(node);
 		if (previousSibling instanceof VariableDeclarationStatement) {
 			final VariableDeclarationStatement vds = (VariableDeclarationStatement) previousSibling;
 			if (vds.fragments().size() == 1) {
@@ -75,8 +65,7 @@ public class RemoveUnnecessaryLocalBeforeReturnRefactoring extends ASTVisitor
 		} else if (previousSibling instanceof ExpressionStatement) {
 			final Expression origExpr = node.getExpression();
 			final ExpressionStatement es = (ExpressionStatement) previousSibling;
-			final Assignment as = ASTHelper.as(es.getExpression(),
-					Assignment.class);
+			final Assignment as = as(es.getExpression(), Assignment.class);
 			if (as != null
 					&& Assignment.Operator.ASSIGN.equals(as.getOperator())) {
 				final Expression newExpr = as.getLeftHandSide();
@@ -84,7 +73,7 @@ public class RemoveUnnecessaryLocalBeforeReturnRefactoring extends ASTVisitor
 						as.getRightHandSide());
 			}
 		}
-		return ASTHelper.VISIT_SUBTREE;
+		return VISIT_SUBTREE;
 	}
 
 	private void replaceReturnStatement(ReturnStatement node,
@@ -113,7 +102,7 @@ public class RemoveUnnecessaryLocalBeforeReturnRefactoring extends ASTVisitor
 	private ASTNode getReturnStatement(ReturnStatement node,
 			Expression initializer) {
 		final ReturnStatement rs = this.ctx.getAST().newReturnStatement();
-		rs.setExpression(ASTHelper.copySubtree(this.ctx.getAST(), initializer));
+		rs.setExpression(copySubtree(this.ctx.getAST(), initializer));
 		return rs;
 	}
 

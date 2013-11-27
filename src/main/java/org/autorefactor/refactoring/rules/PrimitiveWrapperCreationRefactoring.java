@@ -27,16 +27,11 @@ package org.autorefactor.refactoring.rules;
 
 import java.util.List;
 
-import org.autorefactor.refactoring.ASTHelper;
 import org.autorefactor.refactoring.IJavaRefactoring;
 import org.autorefactor.refactoring.Refactorings;
-import org.eclipse.jdt.core.dom.AST;
-import org.eclipse.jdt.core.dom.ASTVisitor;
-import org.eclipse.jdt.core.dom.ClassInstanceCreation;
-import org.eclipse.jdt.core.dom.CompilationUnit;
-import org.eclipse.jdt.core.dom.Expression;
-import org.eclipse.jdt.core.dom.ITypeBinding;
-import org.eclipse.jdt.core.dom.MethodInvocation;
+import org.eclipse.jdt.core.dom.*;
+
+import static org.autorefactor.refactoring.ASTHelper.*;
 
 /**
  * Replaces unnecessary primitive wrappers instance creations by using static
@@ -64,7 +59,7 @@ public class PrimitiveWrapperCreationRefactoring extends ASTVisitor implements
 	@Override
 	public boolean visit(MethodInvocation node) {
 		if (node.getExpression() == null) {
-			return ASTHelper.VISIT_SUBTREE;
+			return VISIT_SUBTREE;
 		}
 		final ITypeBinding typeBinding = node.getExpression()
 				.resolveTypeBinding();
@@ -94,7 +89,7 @@ public class PrimitiveWrapperCreationRefactoring extends ASTVisitor implements
 				}
 			}
 		}
-		return ASTHelper.VISIT_SUBTREE;
+		return VISIT_SUBTREE;
 	}
 
 	private String getMethodName(final String typeName,
@@ -139,10 +134,10 @@ public class PrimitiveWrapperCreationRefactoring extends ASTVisitor implements
 						node,
 						newMethodInvocation(typeBinding.getName(), "valueOf",
 								(Expression) node.arguments().get(0)));
-				return ASTHelper.DO_NOT_VISIT_SUBTREE;
+				return DO_NOT_VISIT_SUBTREE;
 			}
 		}
-		return ASTHelper.VISIT_SUBTREE;
+		return VISIT_SUBTREE;
 	}
 
 	private MethodInvocation newMethodInvocation(String typeName,
@@ -151,7 +146,7 @@ public class PrimitiveWrapperCreationRefactoring extends ASTVisitor implements
 		final MethodInvocation mi = ast.newMethodInvocation();
 		mi.setExpression(ast.newSimpleName(typeName));
 		mi.setName(ast.newSimpleName(methodName));
-		mi.arguments().add(ASTHelper.copySubtree(ast, arg));
+		mi.arguments().add(copySubtree(ast, arg));
 		return mi;
 	}
 

@@ -34,34 +34,8 @@ import org.autorefactor.refactoring.ASTHelper;
 import org.autorefactor.refactoring.IJavaRefactoring;
 import org.autorefactor.refactoring.Refactorings;
 import org.autorefactor.util.NotImplementedException;
-import org.eclipse.jdt.core.dom.AST;
-import org.eclipse.jdt.core.dom.ASTMatcher;
-import org.eclipse.jdt.core.dom.ASTNode;
-import org.eclipse.jdt.core.dom.ASTVisitor;
-import org.eclipse.jdt.core.dom.Assignment;
-import org.eclipse.jdt.core.dom.Block;
-import org.eclipse.jdt.core.dom.BooleanLiteral;
-import org.eclipse.jdt.core.dom.CompilationUnit;
-import org.eclipse.jdt.core.dom.ConditionalExpression;
-import org.eclipse.jdt.core.dom.Expression;
-import org.eclipse.jdt.core.dom.ExpressionStatement;
-import org.eclipse.jdt.core.dom.FieldAccess;
-import org.eclipse.jdt.core.dom.IMethodBinding;
-import org.eclipse.jdt.core.dom.ITypeBinding;
-import org.eclipse.jdt.core.dom.IfStatement;
-import org.eclipse.jdt.core.dom.ImportDeclaration;
-import org.eclipse.jdt.core.dom.InfixExpression;
+import org.eclipse.jdt.core.dom.*;
 import org.eclipse.jdt.core.dom.InfixExpression.Operator;
-import org.eclipse.jdt.core.dom.MethodDeclaration;
-import org.eclipse.jdt.core.dom.MethodInvocation;
-import org.eclipse.jdt.core.dom.Name;
-import org.eclipse.jdt.core.dom.PrimitiveType;
-import org.eclipse.jdt.core.dom.QualifiedName;
-import org.eclipse.jdt.core.dom.ReturnStatement;
-import org.eclipse.jdt.core.dom.Statement;
-import org.eclipse.jdt.core.dom.Type;
-import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
-import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
 
@@ -134,9 +108,9 @@ public class BooleanRefactoring extends ASTVisitor implements IJavaRefactoring {
 		public boolean visit(BooleanLiteral node) {
 			if (this.nodesToReplace.contains(node)) {
 				final Expression expr = getExpression(
-						ASTHelper.getBooleanLiteral(node), this.ifCondition,
+						getBooleanLiteral(node), this.ifCondition,
 						"boolean", null);
-				ASTHelper.replaceInParent(node, expr);
+				replaceInParent(node, expr);
 			}
 			return DO_NOT_VISIT_SUBTREE;
 		}
@@ -147,9 +121,9 @@ public class BooleanRefactoring extends ASTVisitor implements IJavaRefactoring {
 				final QualifiedName qn = ASTHelper
 						.as(node, QualifiedName.class);
 				final Expression expr = getExpression(
-						ASTHelper.getBooleanObjectAsLiteral(qn),
+						getBooleanObjectAsLiteral(qn),
 						this.ifCondition, "java.lang.Boolean", this.booleanName);
-				ASTHelper.replaceInParent(node, expr);
+				replaceInParent(node, expr);
 			}
 			return DO_NOT_VISIT_SUBTREE;
 		}
@@ -186,22 +160,19 @@ public class BooleanRefactoring extends ASTVisitor implements IJavaRefactoring {
 	@Override
 	public boolean visit(IfStatement node) {
 		final BooleanASTMatcher matcher = new BooleanASTMatcher();
-		if (ASTHelper.match(matcher, node.getThenStatement(),
-				node.getElseStatement())) {
+		if (match(matcher, node.getThenStatement(), node.getElseStatement())) {
 			// Then and else statement are matching, bar the boolean values
 			// which are opposite
 			final Statement copyStmt = copySubtree(node.getThenStatement());
 			// identify the node that need to be replaced after the copy
 			final BooleanASTMatcher matcher2 = new BooleanASTMatcher(
 					matcher.matches);
-			if (ASTHelper.match(matcher2, copyStmt, node.getElseStatement())) {
+			if (match(matcher2, copyStmt, node.getElseStatement())) {
 				final Expression ifCondition = node.getExpression();
 				copyStmt.accept(new BooleanReplaceVisitor(ifCondition,
 						matcher2.matches.values(), getBooleanName(node)));
-				if (copyStmt instanceof Block
-						&& ASTHelper.asList(copyStmt).size() == 1) {
-					this.ctx.getRefactorings().replace(node, ASTHelper.asList(copyStmt)
-							.get(0));
+				if (copyStmt instanceof Block && asList(copyStmt).size() == 1) {
+					this.ctx.getRefactorings().replace(node, asList(copyStmt).get(0));
 				} else {
 					this.ctx.getRefactorings().replace(node, copyStmt);
 				}
@@ -209,28 +180,21 @@ public class BooleanRefactoring extends ASTVisitor implements IJavaRefactoring {
 			}
 		}
 
-		final ReturnStatement thenRs = ASTHelper.as(node.getThenStatement(),
-				ReturnStatement.class);
-		final ReturnStatement elseRs = ASTHelper.as(node.getElseStatement(),
-				ReturnStatement.class);
+		final ReturnStatement thenRs = as(node.getThenStatement(), ReturnStatement.class);
+		final ReturnStatement elseRs = as(node.getElseStatement(), ReturnStatement.class);
 		if (thenRs != null) {
 			if (elseRs == null) {
 				// The != null case is handled with the matcher above
-				final ReturnStatement rs = ASTHelper.as(
-						ASTHelper.getNextSibling(node), ReturnStatement.class);
+				final ReturnStatement rs = as(getNextSibling(node), ReturnStatement.class);
 				if (rs != null) {
-					final Boolean thenBool = getBooleanLiteral(thenRs
-							.getExpression());
-					final Boolean elseBool = getBooleanLiteral(rs
-							.getExpression());
-					ReturnStatement newRs = getReturnStatement(node, thenBool,
-							elseBool);
+					final Boolean thenBool = getBooleanLiteral(thenRs.getExpression());
+					final Boolean elseBool = getBooleanLiteral(rs.getExpression());
+					ReturnStatement newRs = getReturnStatement(node, thenBool, elseBool);
 					if (newRs != null) {
 						this.ctx.getRefactorings().replace(node, newRs);
 						this.ctx.getRefactorings().remove(rs);
 					} else {
-						final MethodDeclaration md = ASTHelper.getAncestor(
-								node, MethodDeclaration.class);
+						MethodDeclaration md = getAncestor(node, MethodDeclaration.class);
 						final Type returnType = md.getReturnType2();
 						if (returnType != null && returnType.isPrimitiveType()) {
 							final PrimitiveType pt = (PrimitiveType) returnType;
@@ -249,19 +213,15 @@ public class BooleanRefactoring extends ASTVisitor implements IJavaRefactoring {
 				}
 			}
 		} else {
-			final ExpressionStatement thenEs = ASTHelper.as(
-					node.getThenStatement(), ExpressionStatement.class);
-			if (thenEs != null
-					&& ASTHelper.asList(node.getElseStatement()).isEmpty()) {
-				final Assignment thenA = ASTHelper.as(thenEs.getExpression(),
-						Assignment.class);
+			ExpressionStatement thenEs = as(node.getThenStatement(), ExpressionStatement.class);
+			if (thenEs != null && asList(node.getElseStatement()).isEmpty()) {
+				final Assignment thenA = as(thenEs.getExpression(), Assignment.class);
 				if (thenA != null
 						&& Assignment.Operator.ASSIGN.equals(thenA
 								.getOperator())
 						&& (thenA.getLeftHandSide() instanceof Name || thenA
 								.getLeftHandSide() instanceof FieldAccess)) {
-					final Statement previousSibling = ASTHelper
-							.getPreviousSibling(node);
+					final Statement previousSibling = getPreviousSibling(node);
 					if (previousSibling instanceof VariableDeclarationStatement) {
 						final VariableDeclarationStatement vds = (VariableDeclarationStatement) previousSibling;
 						final VariableDeclarationFragment vdf = getVariableDeclarationFragment(
@@ -287,13 +247,12 @@ public class BooleanRefactoring extends ASTVisitor implements IJavaRefactoring {
 							this.ctx.getRefactorings().remove(node);
 						}
 					} else if (previousSibling instanceof ExpressionStatement) {
-						final ExpressionStatement elseEs = (ExpressionStatement) previousSibling;
-						final Assignment elseA = ASTHelper.as(
-								elseEs.getExpression(), Assignment.class);
+						ExpressionStatement elseEs = (ExpressionStatement) previousSibling;
+						final Assignment elseA = as(elseEs.getExpression(), Assignment.class);
 						if (elseA != null
 								&& Assignment.Operator.ASSIGN.equals(elseA
 										.getOperator())
-								&& ASTHelper.isSameVariable(
+								&& isSameVariable(
 										thenA.getLeftHandSide(),
 										elseA.getLeftHandSide())) {
 							final ITypeBinding typeBinding = elseA
@@ -361,7 +320,7 @@ public class BooleanRefactoring extends ASTVisitor implements IJavaRefactoring {
 		if (doNotRevertExpression) {
 			return ie;
 		}
-		return ASTHelper.negate(this.ctx.getAST(), ie, false);
+		return negate(this.ctx.getAST(), ie, false);
 	}
 
 	private VariableDeclarationFragment getVariableDeclarationFragment(
@@ -371,7 +330,7 @@ public class BooleanRefactoring extends ASTVisitor implements IJavaRefactoring {
 		}
 		for (VariableDeclarationFragment vdf : (List<VariableDeclarationFragment>) vds
 				.fragments()) {
-			if (ASTHelper.isSameVariable(expr, vdf.getName())) {
+			if (isSameVariable(expr, vdf.getName())) {
 				return vdf;
 			}
 		}
@@ -379,7 +338,7 @@ public class BooleanRefactoring extends ASTVisitor implements IJavaRefactoring {
 	}
 
 	private static Boolean getBooleanLiteral(Expression node) {
-		return ASTHelper.getBooleanLiteral(node);
+		return getBooleanLiteral(node);
 	}
 
 	private ReturnStatement getReturnStatement(IfStatement node,
@@ -388,10 +347,10 @@ public class BooleanRefactoring extends ASTVisitor implements IJavaRefactoring {
 				&& returnThenLiteral == !returnElseLiteral) {
 			Expression exprToReturn = copySubtree(node.getExpression());
 			if (!returnThenLiteral) {
-				exprToReturn = ASTHelper.negate(this.ctx.getAST(), exprToReturn, false);
+				exprToReturn = negate(this.ctx.getAST(), exprToReturn, false);
 			}
 
-			final MethodDeclaration md = ASTHelper.getAncestor(node, MethodDeclaration.class);
+			final MethodDeclaration md = getAncestor(node, MethodDeclaration.class);
 			final Expression returnExpr = getReturnExpression(md, exprToReturn);
 			if (returnExpr == null) {
 				return null;
@@ -442,7 +401,7 @@ public class BooleanRefactoring extends ASTVisitor implements IJavaRefactoring {
 		if (doNotNegate) {
 			return getExpression(copySubtree(ifCondition), expressionName, booleanName);
 		}
-		final Expression negatedIfCondition = ASTHelper.negate(this.ctx.getAST(), ifCondition, true);
+		final Expression negatedIfCondition = negate(this.ctx.getAST(), ifCondition, true);
 		return getExpression(negatedIfCondition, expressionName, booleanName);
 	}
 
@@ -462,8 +421,7 @@ public class BooleanRefactoring extends ASTVisitor implements IJavaRefactoring {
 	}
 
 	private Expression getBooleanName(ASTNode node) {
-		if (!isSimpleNameAlreadyUsed("Boolean",
-				ASTHelper.getAncestor(node, CompilationUnit.class))) {
+		if (!isSimpleNameAlreadyUsed("Boolean", getAncestor(node, CompilationUnit.class))) {
 			return this.ctx.getAST().newSimpleName("Boolean");
 		}
 		return this.ctx.getAST().newName("java.lang.Boolean");
@@ -494,7 +452,7 @@ public class BooleanRefactoring extends ASTVisitor implements IJavaRefactoring {
 							.getQualifiedName())
 					&& "valueOf".equals(node.getName().getIdentifier())
 					&& node.arguments().size() == 1) {
-				final BooleanLiteral l = ASTHelper.as((Expression) node
+				final BooleanLiteral l = as((Expression) node
 						.arguments().get(0), BooleanLiteral.class);
 				if (l != null) {
 					this.ctx.getRefactorings().replace(

@@ -25,18 +25,13 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import static org.autorefactor.refactoring.ASTHelper.*;
+
 import java.util.List;
 
 import org.autorefactor.refactoring.IJavaRefactoring;
 import org.autorefactor.refactoring.Refactorings;
-import org.eclipse.jdt.core.dom.AST;
-import org.eclipse.jdt.core.dom.ASTVisitor;
-import org.eclipse.jdt.core.dom.Block;
-import org.eclipse.jdt.core.dom.CompilationUnit;
-import org.eclipse.jdt.core.dom.IfStatement;
-import org.eclipse.jdt.core.dom.Statement;
-
-import static org.autorefactor.refactoring.ASTHelper.*;
+import org.eclipse.jdt.core.dom.*;
 
 public class IfStatementRefactoring extends ASTVisitor implements
 		IJavaRefactoring {

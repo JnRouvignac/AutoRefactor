@@ -25,15 +25,11 @@
  */
 package org.autorefactor.refactoring.rules;
 
-import org.autorefactor.refactoring.ASTHelper;
 import org.autorefactor.refactoring.IJavaRefactoring;
 import org.autorefactor.refactoring.Refactorings;
-import org.eclipse.jdt.core.dom.ASTVisitor;
-import org.eclipse.jdt.core.dom.ClassInstanceCreation;
-import org.eclipse.jdt.core.dom.CompilationUnit;
-import org.eclipse.jdt.core.dom.Expression;
-import org.eclipse.jdt.core.dom.ITypeBinding;
-import org.eclipse.jdt.core.dom.MethodInvocation;
+import org.eclipse.jdt.core.dom.*;
+
+import static org.autorefactor.refactoring.ASTHelper.*;
 
 /**
  * Removes:
@@ -68,11 +64,11 @@ public class StringRefactorings extends ASTVisitor implements IJavaRefactoring {
 			final Expression arg = (Expression) node.arguments().get(0);
 			if (arg.resolveConstantExpressionValue() != null) {
 				this.ctx.getRefactorings().replace(node,
-						ASTHelper.copySubtree(this.ctx.getAST(), arg));
-				return ASTHelper.DO_NOT_VISIT_SUBTREE;
+						copySubtree(this.ctx.getAST(), arg));
+				return DO_NOT_VISIT_SUBTREE;
 			}
 		}
-		return ASTHelper.VISIT_SUBTREE;
+		return VISIT_SUBTREE;
 	}
 
 	@Override
@@ -83,20 +79,18 @@ public class StringRefactorings extends ASTVisitor implements IJavaRefactoring {
 				&& node.arguments().isEmpty()
 				&& canRemoveToStringMethodCall(node, expression)) {
 			this.ctx.getRefactorings().replace(node,
-					ASTHelper.copySubtree(this.ctx.getAST(), expression));
-			return ASTHelper.DO_NOT_VISIT_SUBTREE;
+					copySubtree(this.ctx.getAST(), expression));
+			return DO_NOT_VISIT_SUBTREE;
 		}
-		return ASTHelper.VISIT_SUBTREE;
+		return VISIT_SUBTREE;
 	}
 
 	private boolean canRemoveToStringMethodCall(MethodInvocation node,
 			final Expression expression) {
-		if (ASTHelper.hasType(
-				ASTHelper.resolveTypeBindingForcedFromContext(node),
-				"java.lang.String")) {
+		if (hasType(resolveTypeBindingForcedFromContext(node), "java.lang.String")) {
 			// We are in a String context, no need to call toString()
 			return true;
-		} else if (ASTHelper.hasType(expression, "java.lang.String")) {
+		} else if (hasType(expression, "java.lang.String")) {
 			// It's already a String, no need to call toString()
 			return true;
 		}

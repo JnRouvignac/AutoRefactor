@@ -25,17 +25,12 @@
  */
 package org.autorefactor.refactoring.rules;
 
-import org.autorefactor.refactoring.ASTHelper;
 import org.autorefactor.refactoring.IJavaRefactoring;
 import org.autorefactor.refactoring.Refactorings;
-import org.eclipse.jdt.core.dom.AST;
-import org.eclipse.jdt.core.dom.ASTVisitor;
-import org.eclipse.jdt.core.dom.CompilationUnit;
-import org.eclipse.jdt.core.dom.Expression;
-import org.eclipse.jdt.core.dom.IfStatement;
-import org.eclipse.jdt.core.dom.InfixExpression;
+import org.eclipse.jdt.core.dom.*;
 import org.eclipse.jdt.core.dom.InfixExpression.Operator;
-import org.eclipse.jdt.core.dom.ParenthesizedExpression;
+
+import static org.autorefactor.refactoring.ASTHelper.*;
 
 /**
  * Collapses two consecutive if statements into just one.
@@ -56,26 +51,23 @@ public class CollapseIfStatementRefactoring extends ASTVisitor implements
 	@Override
 	public boolean visit(IfStatement node) {
 		if (node.getElseStatement() == null) {
-			final IfStatement is = ASTHelper.as(node.getThenStatement(),
-					IfStatement.class);
+			final IfStatement is = as(node.getThenStatement(), IfStatement.class);
 			if (is != null) {
 				replaceIfNoElseStatement(node, is);
 			}
 		}
-		return ASTHelper.VISIT_SUBTREE;
+		return VISIT_SUBTREE;
 	}
 
 	private boolean replaceIfNoElseStatement(IfStatement outerIf,
 			IfStatement innerIf) {
 		if (innerIf.getElseStatement() != null) {
-			return ASTHelper.VISIT_SUBTREE;
+			return VISIT_SUBTREE;
 		}
 
 		final AST ast = this.ctx.getAST();
-		final Expression leftOperand = ASTHelper.copySubtree(ast,
-				outerIf.getExpression());
-		final Expression rightOperand = ASTHelper.copySubtree(ast,
-				innerIf.getExpression());
+		final Expression leftOperand = copySubtree(ast, outerIf.getExpression());
+		final Expression rightOperand = copySubtree(ast, innerIf.getExpression());
 
 		final InfixExpression ie = ast.newInfixExpression();
 		ie.setLeftOperand(parenthesizeInfixExpr(leftOperand));
@@ -84,9 +76,9 @@ public class CollapseIfStatementRefactoring extends ASTVisitor implements
 
 		final IfStatement is = ast.newIfStatement();
 		is.setExpression(ie);
-		is.setThenStatement(ASTHelper.copySubtree(ast, innerIf.getThenStatement()));
+		is.setThenStatement(copySubtree(ast, innerIf.getThenStatement()));
 		this.ctx.getRefactorings().replace(outerIf, is);
-		return ASTHelper.DO_NOT_VISIT_SUBTREE;
+		return DO_NOT_VISIT_SUBTREE;
 	}
 
 	private Expression parenthesizeInfixExpr(Expression expr) {

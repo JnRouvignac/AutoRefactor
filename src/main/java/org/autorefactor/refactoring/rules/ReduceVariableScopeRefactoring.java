@@ -25,10 +25,7 @@
  */
 package org.autorefactor.refactoring.rules;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 
 import org.autorefactor.refactoring.ASTHelper;
@@ -36,35 +33,9 @@ import org.autorefactor.refactoring.IJavaRefactoring;
 import org.autorefactor.refactoring.Refactorings;
 import org.autorefactor.util.NotImplementedException;
 import org.autorefactor.util.Pair;
-import org.eclipse.jdt.core.dom.AST;
-import org.eclipse.jdt.core.dom.ASTNode;
-import org.eclipse.jdt.core.dom.ASTVisitor;
-import org.eclipse.jdt.core.dom.Assignment;
-import org.eclipse.jdt.core.dom.Block;
-import org.eclipse.jdt.core.dom.CompilationUnit;
-import org.eclipse.jdt.core.dom.EnhancedForStatement;
-import org.eclipse.jdt.core.dom.Expression;
-import org.eclipse.jdt.core.dom.ExpressionStatement;
-import org.eclipse.jdt.core.dom.ForStatement;
-import org.eclipse.jdt.core.dom.IfStatement;
-import org.eclipse.jdt.core.dom.ImportDeclaration;
-import org.eclipse.jdt.core.dom.InfixExpression;
-import org.eclipse.jdt.core.dom.MethodDeclaration;
-import org.eclipse.jdt.core.dom.MethodInvocation;
-import org.eclipse.jdt.core.dom.Name;
-import org.eclipse.jdt.core.dom.PackageDeclaration;
-import org.eclipse.jdt.core.dom.PostfixExpression;
-import org.eclipse.jdt.core.dom.QualifiedName;
-import org.eclipse.jdt.core.dom.SimpleName;
-import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
-import org.eclipse.jdt.core.dom.Statement;
-import org.eclipse.jdt.core.dom.Type;
-import org.eclipse.jdt.core.dom.TypeDeclaration;
-import org.eclipse.jdt.core.dom.VariableDeclaration;
-import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
-import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
-import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
-import org.eclipse.jdt.core.dom.WhileStatement;
+import org.eclipse.jdt.core.dom.*;
+
+import static org.autorefactor.refactoring.ASTHelper.*;
 
 /**
  * Reduces the scope of local variables.
@@ -94,7 +65,7 @@ public class ReduceVariableScopeRefactoring extends ASTVisitor implements
 				final VariableName other = (VariableName) obj;
 				if (this.name instanceof SimpleName
 						&& other.name instanceof SimpleName) {
-					return ASTHelper.isEqual((SimpleName) this.name,
+					return isEqual((SimpleName) this.name,
 							(SimpleName) other.name);
 				}
 				// if (this.name instanceof QualifiedName
@@ -313,12 +284,9 @@ public class ReduceVariableScopeRefactoring extends ASTVisitor implements
 			}
 		} else if (scope instanceof EnhancedForStatement) {
 			final EnhancedForStatement efs = (EnhancedForStatement) scope;
-			final EnhancedForStatement newEfs = ASTHelper.copySubtree(ast,
-					efs);
-			newEfs.setParameter(ASTHelper.copySubtree(ast,
-					efs.getParameter()));
-			newEfs.setExpression(ASTHelper.copySubtree(ast,
-					efs.getExpression()));
+			final EnhancedForStatement newEfs = copySubtree(ast, efs);
+			newEfs.setParameter(copySubtree(ast, efs.getParameter()));
+			newEfs.setExpression(copySubtree(ast, efs.getExpression()));
 			final Statement parentStmt = getParentOfType(varName,
 					Statement.class);
 			if (efs.getBody() != null && efs.getBody().equals(parentStmt)) {
@@ -327,7 +295,7 @@ public class ReduceVariableScopeRefactoring extends ASTVisitor implements
 			this.ctx.getRefactorings().replace(efs, newEfs);
 		} else if (scope instanceof ForStatement) {
 			final ForStatement fs = (ForStatement) scope;
-			final ForStatement newFs = ASTHelper.copySubtree(ast, fs);
+			final ForStatement newFs = copySubtree(ast, fs);
 			final List<Expression> initializers = newFs.initializers();
 			if (initializers.size() == 1) {
 				final Expression init = initializers.remove(0);
@@ -349,8 +317,7 @@ public class ReduceVariableScopeRefactoring extends ASTVisitor implements
 		} else if (scope instanceof WhileStatement) {
 			final WhileStatement ws = (WhileStatement) scope;
 			final WhileStatement newWs = ast.newWhileStatement();
-			newWs.setExpression(ASTHelper.copySubtree(ast,
-					ws.getExpression()));
+			newWs.setExpression(copySubtree(ast, ws.getExpression()));
 			final Statement parentStmt = getParentOfType(varName,
 					Statement.class);
 			if (ws.getBody() != null && ws.getBody().equals(parentStmt)) {
@@ -360,23 +327,20 @@ public class ReduceVariableScopeRefactoring extends ASTVisitor implements
 		} else if (scope instanceof IfStatement) {
 			final IfStatement is = (IfStatement) scope;
 			final IfStatement newIs = ast.newIfStatement();
-			newIs.setExpression(ASTHelper.copySubtree(ast,
-					is.getExpression()));
+			newIs.setExpression(copySubtree(ast, is.getExpression()));
 			final Statement parentStmt = getParentOfType(varName,
 					Statement.class);
 			if (is.getThenStatement() != null
 					&& is.getThenStatement().equals(parentStmt)) {
 				newIs.setThenStatement(copy(is.getThenStatement(), varName));
 				if (is.getElseStatement() != null) {
-					newIs.setElseStatement(ASTHelper.copySubtree(ast,
-							is.getElseStatement()));
+					newIs.setElseStatement(copySubtree(ast, is.getElseStatement()));
 				}
 				this.ctx.getRefactorings().replace(is, newIs);
 			} else if (is.getElseStatement() != null
 					&& is.getElseStatement().equals(parentStmt)) {
 				if (is.getThenStatement() != null) {
-					newIs.setThenStatement(ASTHelper.copySubtree(ast,
-							is.getThenStatement()));
+					newIs.setThenStatement(copySubtree(ast, is.getThenStatement()));
 				}
 				newIs.setElseStatement(copy(is.getElseStatement(), varName));
 				this.ctx.getRefactorings().replace(is, newIs);
@@ -421,7 +385,7 @@ public class ReduceVariableScopeRefactoring extends ASTVisitor implements
 	private Type getType(ASTNode node) {
 		if (node instanceof VariableDeclarationStatement) {
 			final VariableDeclarationStatement vds = (VariableDeclarationStatement) node;
-			return ASTHelper.copySubtree(this.ctx.getAST(), vds.getType());
+			return copySubtree(this.ctx.getAST(), vds.getType());
 		}
 		return getType(node.getParent());
 	}
@@ -436,9 +400,9 @@ public class ReduceVariableScopeRefactoring extends ASTVisitor implements
 						varName.getFullyQualifiedName())) {
 					final VariableDeclarationFragment vdf = this.ctx.getAST()
 							.newVariableDeclarationFragment();
-					vdf.setInitializer(ASTHelper.copySubtree(this.ctx.getAST(),
+					vdf.setInitializer(copySubtree(this.ctx.getAST(),
 							a.getRightHandSide()));
-					vdf.setName(ASTHelper.copySubtree(this.ctx.getAST(), sn));
+					vdf.setName(copySubtree(this.ctx.getAST(), sn));
 					return vdf;
 				}
 			}

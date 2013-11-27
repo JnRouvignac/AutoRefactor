@@ -25,18 +25,11 @@
  */
 package org.autorefactor.refactoring.rules;
 
-import org.autorefactor.refactoring.ASTHelper;
 import org.autorefactor.refactoring.IJavaRefactoring;
 import org.autorefactor.refactoring.Refactorings;
-import org.eclipse.jdt.core.dom.ASTVisitor;
-import org.eclipse.jdt.core.dom.Block;
-import org.eclipse.jdt.core.dom.CompilationUnit;
-import org.eclipse.jdt.core.dom.DoStatement;
-import org.eclipse.jdt.core.dom.EnhancedForStatement;
-import org.eclipse.jdt.core.dom.ForStatement;
-import org.eclipse.jdt.core.dom.IfStatement;
-import org.eclipse.jdt.core.dom.Statement;
-import org.eclipse.jdt.core.dom.WhileStatement;
+import org.eclipse.jdt.core.dom.*;
+
+import static org.autorefactor.refactoring.ASTHelper.*;
 
 /**
  * Add brackets to:
@@ -63,7 +56,7 @@ public class AddBracketsToControlStatementRefactoring extends ASTVisitor
 
 	@Override
 	public boolean visit(IfStatement node) {
-		boolean result = ASTHelper.VISIT_SUBTREE;
+		boolean result = VISIT_SUBTREE;
 		if (node.getThenStatement() != null
 				&& !(node.getThenStatement() instanceof Block)) {
 			result = setBlock(node.getThenStatement());
@@ -73,7 +66,7 @@ public class AddBracketsToControlStatementRefactoring extends ASTVisitor
 				&& !(node.getElseStatement() instanceof IfStatement)) {
 			return setBlock(node.getElseStatement()) || result;
 		}
-		return ASTHelper.VISIT_SUBTREE;
+		return VISIT_SUBTREE;
 	}
 
 	@Override
@@ -81,7 +74,7 @@ public class AddBracketsToControlStatementRefactoring extends ASTVisitor
 		if (node.getBody() != null && !(node.getBody() instanceof Block)) {
 			return setBlock(node.getBody());
 		}
-		return ASTHelper.VISIT_SUBTREE;
+		return VISIT_SUBTREE;
 	}
 
 	@Override
@@ -89,7 +82,7 @@ public class AddBracketsToControlStatementRefactoring extends ASTVisitor
 		if (node.getBody() != null && !(node.getBody() instanceof Block)) {
 			return setBlock(node.getBody());
 		}
-		return ASTHelper.VISIT_SUBTREE;
+		return VISIT_SUBTREE;
 	}
 
 	@Override
@@ -97,7 +90,7 @@ public class AddBracketsToControlStatementRefactoring extends ASTVisitor
 		if (node.getBody() != null && !(node.getBody() instanceof Block)) {
 			return setBlock(node.getBody());
 		}
-		return ASTHelper.VISIT_SUBTREE;
+		return VISIT_SUBTREE;
 	}
 
 	@Override
@@ -105,18 +98,18 @@ public class AddBracketsToControlStatementRefactoring extends ASTVisitor
 		if (node.getBody() != null && !(node.getBody() instanceof Block)) {
 			return setBlock(node.getBody());
 		}
-		return ASTHelper.VISIT_SUBTREE;
+		return VISIT_SUBTREE;
 	}
 
 	private boolean setBlock(Statement statement) {
 		if (!this.addAngleBracketsToStatementBodies || statement == null) {
-			return ASTHelper.VISIT_SUBTREE;
+			return VISIT_SUBTREE;
 		}
 		final Block block = this.ctx.getAST().newBlock();
-		block.statements().add(ASTHelper.copySubtree(this.ctx.getAST(), statement));
+		block.statements().add(copySubtree(this.ctx.getAST(), statement));
 		block.accept(this);
 		this.ctx.getRefactorings().replace(statement, block);
-		return ASTHelper.DO_NOT_VISIT_SUBTREE;
+		return DO_NOT_VISIT_SUBTREE;
 	}
 
 	public Refactorings getRefactorings(CompilationUnit astRoot) {

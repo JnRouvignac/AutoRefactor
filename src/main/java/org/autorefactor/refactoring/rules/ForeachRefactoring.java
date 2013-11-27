@@ -27,17 +27,11 @@ package org.autorefactor.refactoring.rules;
 
 import java.util.Map;
 
-import org.autorefactor.refactoring.ASTHelper;
 import org.autorefactor.refactoring.IJavaRefactoring;
 import org.autorefactor.refactoring.Refactorings;
-import org.eclipse.jdt.core.dom.ASTNode;
-import org.eclipse.jdt.core.dom.ASTVisitor;
-import org.eclipse.jdt.core.dom.CompilationUnit;
-import org.eclipse.jdt.core.dom.FieldAccess;
-import org.eclipse.jdt.core.dom.ForStatement;
-import org.eclipse.jdt.core.dom.QualifiedName;
-import org.eclipse.jdt.core.dom.SimpleName;
-import org.eclipse.jdt.core.dom.WhileStatement;
+import org.eclipse.jdt.core.dom.*;
+
+import static org.autorefactor.refactoring.ASTHelper.*;
 
 /**
  * Replace while/for with iterator/for with index loops into foreach loops.
@@ -65,9 +59,9 @@ public class ForeachRefactoring extends ASTVisitor implements IJavaRefactoring {
 			ASTNode parent = node.getParent();
 			if (parent instanceof QualifiedName
 					|| parent instanceof FieldAccess) {
-				return ASTHelper.DO_NOT_VISIT_SUBTREE;
+				return DO_NOT_VISIT_SUBTREE;
 			}
-			return ASTHelper.DO_NOT_VISIT_SUBTREE;
+			return DO_NOT_VISIT_SUBTREE;
 		}
 	}
 
@@ -94,7 +88,7 @@ public class ForeachRefactoring extends ASTVisitor implements IJavaRefactoring {
 		// TODO JNR iterate over col with ListIterator with generics
 		// TODO JNR iterate over col with ListIterator without generics
 		// be careful with use of index/iterator inside the loop
-		return ASTHelper.VISIT_SUBTREE;
+		return VISIT_SUBTREE;
 	}
 
 	@Override
@@ -112,7 +106,7 @@ public class ForeachRefactoring extends ASTVisitor implements IJavaRefactoring {
 		// TODO JNR iterate over col with ListIterator with generics
 		// TODO JNR iterate over col with ListIterator without generics
 		// be careful with use of index/iterator inside the loop
-		return ASTHelper.VISIT_SUBTREE;
+		return VISIT_SUBTREE;
 	}
 
 	public Refactorings getRefactorings(CompilationUnit astRoot) {

@@ -27,17 +27,11 @@ package org.autorefactor.refactoring.rules;
 
 import java.util.List;
 
-import org.autorefactor.refactoring.ASTHelper;
 import org.autorefactor.refactoring.IJavaRefactoring;
 import org.autorefactor.refactoring.Refactorings;
-import org.eclipse.jdt.core.dom.ASTNode;
-import org.eclipse.jdt.core.dom.ASTVisitor;
-import org.eclipse.jdt.core.dom.Block;
-import org.eclipse.jdt.core.dom.CompilationUnit;
-import org.eclipse.jdt.core.dom.IfStatement;
-import org.eclipse.jdt.core.dom.Statement;
-import org.eclipse.jdt.core.dom.TryStatement;
-import org.eclipse.jdt.core.dom.WhileStatement;
+import org.eclipse.jdt.core.dom.*;
+
+import static org.autorefactor.refactoring.ASTHelper.*;
 
 /**
  * Removes dead code. Use variable values analysis for determining where code is dead.
@@ -69,17 +63,17 @@ public class DeadCodeEliminationRefactoring extends ASTVisitor implements
 	@Override
 	public boolean visit(Block node) {
 		if (!node.statements().isEmpty()) {
-			return ASTHelper.VISIT_SUBTREE;
+			return VISIT_SUBTREE;
 		}
 		final ASTNode parent = node.getParent();
 		if (parent instanceof IfStatement) {
 			final IfStatement is = (IfStatement) parent;
 			if (is.getElseStatement() == node) {
 				this.ctx.getRefactorings().remove(node);
-				return ASTHelper.DO_NOT_VISIT_SUBTREE;
+				return DO_NOT_VISIT_SUBTREE;
 			} // TODO handle empty then clause
 		}
-		return ASTHelper.VISIT_SUBTREE;
+		return VISIT_SUBTREE;
 	}
 
 	@Override
@@ -87,15 +81,15 @@ public class DeadCodeEliminationRefactoring extends ASTVisitor implements
 		final Object constantCondition =
 				node.getExpression().resolveConstantExpressionValue();
 		if (Boolean.TRUE.equals(constantCondition)) {
-			this.ctx.getRefactorings().replace(node, ASTHelper.copySubtree(this.ctx.getAST(), node
+			this.ctx.getRefactorings().replace(node, copySubtree(this.ctx.getAST(), node
 					.getThenStatement()));
-			return ASTHelper.DO_NOT_VISIT_SUBTREE;
+			return DO_NOT_VISIT_SUBTREE;
 		} else if (Boolean.FALSE.equals(constantCondition)) {
-			this.ctx.getRefactorings().replace(node, ASTHelper.copySubtree(this.ctx.getAST(), node
+			this.ctx.getRefactorings().replace(node, copySubtree(this.ctx.getAST(), node
 					.getElseStatement()));
-			return ASTHelper.DO_NOT_VISIT_SUBTREE;
+			return DO_NOT_VISIT_SUBTREE;
 		}
-		return ASTHelper.VISIT_SUBTREE;
+		return VISIT_SUBTREE;
 	}
 
 	@Override
@@ -104,22 +98,21 @@ public class DeadCodeEliminationRefactoring extends ASTVisitor implements
 				node.getExpression().resolveConstantExpressionValue();
 		if (Boolean.FALSE.equals(constantCondition)) {
 			this.ctx.getRefactorings().remove(node);
-			return ASTHelper.DO_NOT_VISIT_SUBTREE;
+			return DO_NOT_VISIT_SUBTREE;
 		}
-		return ASTHelper.VISIT_SUBTREE;
+		return VISIT_SUBTREE;
 	}
 
 	@Override
 	public boolean visit(TryStatement node) {
-		final List<Statement> stmts = ASTHelper.asList(node.getBody());
+		final List<Statement> stmts = asList(node.getBody());
 		if (stmts.isEmpty()) {
 			this.ctx.getRefactorings().remove(node);
-			return ASTHelper.DO_NOT_VISIT_SUBTREE;
+			return DO_NOT_VISIT_SUBTREE;
 		}
 	// }else {
 	// for (CatchClause catchClause : (List<CatchClause>) node.catchClauses()) {
-	// final List<Statement> finallyStmts =
-	// ASTHelper.asList(catchClause.getBody());
+	// final List<Statement> finallyStmts = asList(catchClause.getBody());
 	// if (finallyStmts.isEmpty()) {
 	// // TODO cannot remove without checking what subsequent catch clauses are
 	// catching
@@ -127,15 +120,15 @@ public class DeadCodeEliminationRefactoring extends ASTVisitor implements
 	// }
 	// }
 	//
-	// final List<Statement> finallyStmts = ASTHelper.asList(node.getFinally());
+	// final List<Statement> finallyStmts = asList(node.getFinally());
 	// if (finallyStmts.isEmpty()) {
 	// this.ctx.getRefactorings().remove(node.getFinally());
 	// }
 	// // TODO If all finally and catch clauses have been removed,
 	// // then we can remove the whole try statement and replace it with a simple block
-	// return ASTHelper.DO_NOT_VISIT_SUBTREE; // TODO JNR is this correct?
+	// return DO_NOT_VISIT_SUBTREE; // TODO JNR is this correct?
 	// }
-		return ASTHelper.VISIT_SUBTREE;
+		return VISIT_SUBTREE;
 	}
 
 	public Refactorings getRefactorings(CompilationUnit astRoot) {

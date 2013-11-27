@@ -25,27 +25,15 @@
  */
 package org.autorefactor.refactoring.rules;
 
-import static org.autorefactor.refactoring.JavaConstants.*;
-
 import java.math.BigDecimal;
 
-import org.autorefactor.refactoring.ASTHelper;
 import org.autorefactor.refactoring.IJavaRefactoring;
 import org.autorefactor.refactoring.Refactorings;
-import org.eclipse.jdt.core.dom.AST;
-import org.eclipse.jdt.core.dom.ASTNode;
-import org.eclipse.jdt.core.dom.ASTVisitor;
-import org.eclipse.jdt.core.dom.ClassInstanceCreation;
-import org.eclipse.jdt.core.dom.CompilationUnit;
-import org.eclipse.jdt.core.dom.Expression;
-import org.eclipse.jdt.core.dom.ITypeBinding;
-import org.eclipse.jdt.core.dom.InfixExpression;
+import org.eclipse.jdt.core.dom.*;
 import org.eclipse.jdt.core.dom.InfixExpression.Operator;
-import org.eclipse.jdt.core.dom.MethodInvocation;
-import org.eclipse.jdt.core.dom.Name;
-import org.eclipse.jdt.core.dom.NumberLiteral;
-import org.eclipse.jdt.core.dom.ParenthesizedExpression;
-import org.eclipse.jdt.core.dom.StringLiteral;
+
+import static org.autorefactor.refactoring.JavaConstants.*;
+import static org.autorefactor.refactoring.ASTHelper.*;
 
 /**
  * Refactors to a proper use of BigDecimals:
@@ -86,7 +74,7 @@ public class BigDecimalRefactorings extends ASTVisitor implements
 							getStringLiteral(nb.getToken()));
 				} else {
 					if (javaMinorVersion < 5) {
-						return ASTHelper.VISIT_SUBTREE;
+						return VISIT_SUBTREE;
 					}
 					if (ZERO_LONG_LITERAL_RE.matcher(nb.getToken()).matches()) {
 						replaceWithQualifiedName(node, typeBinding.getName(), "ZERO");
@@ -99,10 +87,10 @@ public class BigDecimalRefactorings extends ASTVisitor implements
 								getValueOf(typeBinding.getName(), nb));
 					}
 				}
-				return ASTHelper.DO_NOT_VISIT_SUBTREE;
+				return DO_NOT_VISIT_SUBTREE;
 			} else if (arg instanceof StringLiteral) {
 				if (javaMinorVersion < 5) {
-					return ASTHelper.VISIT_SUBTREE;
+					return VISIT_SUBTREE;
 				}
 				final String literalValue = ((StringLiteral) arg).getLiteralValue();
 				if (literalValue.matches("0+")) {
@@ -119,11 +107,10 @@ public class BigDecimalRefactorings extends ASTVisitor implements
 				}
 			}
 		}
-		return ASTHelper.VISIT_SUBTREE;
+		return VISIT_SUBTREE;
 	}
 
-  private void replaceWithQualifiedName(ASTNode node, String className,
-			String field) {
+	private void replaceWithQualifiedName(ASTNode node, String className, String field) {
 		this.ctx.getRefactorings().replace(node,
 				this.ctx.getAST().newName(new String[] { className, field }));
 	}
@@ -133,7 +120,7 @@ public class BigDecimalRefactorings extends ASTVisitor implements
 		final MethodInvocation mi = ast.newMethodInvocation();
 		mi.setExpression(ast.newName(name));
 		mi.setName(ast.newSimpleName("valueOf"));
-		mi.arguments().add(ASTHelper.copySubtree(ast, nb));
+		mi.arguments().add(copySubtree(ast, nb));
 		return mi;
 	}
 
@@ -146,9 +133,9 @@ public class BigDecimalRefactorings extends ASTVisitor implements
 	@Override
 	public boolean visit(MethodInvocation node) {
 		if (node.getExpression() == null) {
-			return ASTHelper.VISIT_SUBTREE;
+			return VISIT_SUBTREE;
 		}
-		if (ASTHelper.hasType(node.getExpression(), "java.math.BigDecimal")) {
+		if (hasType(node.getExpression(), "java.math.BigDecimal")) {
 			if (javaMinorVersion >= 5
 					&& "valueOf".equals(node.getName().getIdentifier())
 					&& node.arguments().size() == 1) {
@@ -169,24 +156,24 @@ public class BigDecimalRefactorings extends ASTVisitor implements
 					} else if (TEN_LONG_LITERAL_RE.matcher(nb.getToken()).matches()) {
 						replaceWithQualifiedName(node, typeBinding.getName(), "TEN");
 					}
-					return ASTHelper.DO_NOT_VISIT_SUBTREE;
+					return DO_NOT_VISIT_SUBTREE;
 				}
 			} else if ("equals".equals(node.getName().getIdentifier())
 					&& node.arguments().size() == 1) {
 				final Expression arg = (Expression) node.arguments().get(0);
-				if (ASTHelper.hasType(arg, "java.math.BigDecimal")) {
+				if (hasType(arg, "java.math.BigDecimal")) {
 					if (isInStringAppend(node.getParent())) {
 						this.ctx.getRefactorings().replace(node,
 								getParenthesizedExpression(getCompareToNode(node)));
-						return ASTHelper.DO_NOT_VISIT_SUBTREE;
+						return DO_NOT_VISIT_SUBTREE;
 					} else {
 						this.ctx.getRefactorings().replace(node, getCompareToNode(node));
-						return ASTHelper.DO_NOT_VISIT_SUBTREE;
+						return DO_NOT_VISIT_SUBTREE;
 					}
 				}
 			}
 		}
-		return ASTHelper.VISIT_SUBTREE;
+		return VISIT_SUBTREE;
 	}
 
 	private ParenthesizedExpression getParenthesizedExpression(
@@ -201,9 +188,8 @@ public class BigDecimalRefactorings extends ASTVisitor implements
 		if (node instanceof InfixExpression) {
 			final InfixExpression expr = (InfixExpression) node;
 			if (Operator.PLUS.equals(expr.getOperator())
-					|| (ASTHelper.hasType(expr.getLeftOperand(),
-							"java.lang.String") || ASTHelper.hasType(
-							expr.getRightOperand(), "java.lang.String"))) {
+					|| hasType(expr.getLeftOperand(), "java.lang.String")
+					|| hasType(expr.getRightOperand(), "java.lang.String")) {
 				return true;
 			}
 		}
@@ -213,8 +199,7 @@ public class BigDecimalRefactorings extends ASTVisitor implements
 	private ASTNode getClassInstanceCreatorNode(Name className,
 			String numberListeral) {
 		final ClassInstanceCreation cic = this.ctx.getAST().newClassInstanceCreation();
-		cic.setType(this.ctx.getAST().newSimpleType(ASTHelper.copySubtree(this.ctx.getAST(),
-				className)));
+		cic.setType(this.ctx.getAST().newSimpleType(copySubtree(this.ctx.getAST(), className)));
 		cic.arguments().add(getStringLiteral(numberListeral));
 		return cic;
 	}
@@ -223,8 +208,8 @@ public class BigDecimalRefactorings extends ASTVisitor implements
 		final AST ast = this.ctx.getAST();
 		final MethodInvocation mi = ast.newMethodInvocation();
 		mi.setName(ast.newSimpleName("compareTo"));
-		mi.setExpression(ASTHelper.copySubtree(ast, node.getExpression()));
-		mi.arguments().add(ASTHelper.copySubtree(ast, node.arguments().get(0)));
+		mi.setExpression(copySubtree(ast, node.getExpression()));
+		mi.arguments().add(copySubtree(ast, node.arguments().get(0)));
 
 		final NumberLiteral nl = ast.newNumberLiteral();
 		nl.setToken("0");

@@ -27,19 +27,10 @@ package org.autorefactor.refactoring.rules;
 
 import java.util.List;
 
-import org.autorefactor.refactoring.ASTHelper;
 import org.autorefactor.refactoring.IJavaRefactoring;
 import org.autorefactor.refactoring.Refactorings;
 import org.autorefactor.refactoring.Release;
-import org.eclipse.jdt.core.dom.AST;
-import org.eclipse.jdt.core.dom.ASTNode;
-import org.eclipse.jdt.core.dom.ASTVisitor;
-import org.eclipse.jdt.core.dom.CastExpression;
-import org.eclipse.jdt.core.dom.CompilationUnit;
-import org.eclipse.jdt.core.dom.Expression;
-import org.eclipse.jdt.core.dom.IMethodBinding;
-import org.eclipse.jdt.core.dom.ITypeBinding;
-import org.eclipse.jdt.core.dom.MethodInvocation;
+import org.eclipse.jdt.core.dom.*;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
 
@@ -82,7 +73,7 @@ public class VectorOldToNewAPIRefactoring extends ASTVisitor implements
 				replaceWith(node, "set");
 			}
 		}
-		return ASTHelper.VISIT_SUBTREE;
+		return VISIT_SUBTREE;
 	}
 
 	private boolean isMethod(MethodInvocation node, String qualifiedTypeName,
@@ -119,7 +110,7 @@ public class VectorOldToNewAPIRefactoring extends ASTVisitor implements
 		AST ast = this.ctx.getAST();
 		MethodInvocation mi = ast.newMethodInvocation();
 		mi.setName(ast.newSimpleName(newMethodName));
-		mi.setExpression(ASTHelper.copySubtree(ast, node.getExpression()));
+		mi.setExpression(copySubtree(ast, node.getExpression()));
 		if (node.arguments() != null) {
 			mi.arguments().addAll(ASTNode.copySubtrees(ast, node.arguments()));
 		}
@@ -133,7 +124,7 @@ public class VectorOldToNewAPIRefactoring extends ASTVisitor implements
 		mi.setExpression(copySubtree(ast, node.getExpression()));
 		final List<Expression> args = node.arguments();
 		assertSize(args, 1);
-		if (ASTHelper.hasType((Expression) args.get(0), "int", "short", "byte")) {
+		if (hasType(args.get(0), "int", "short", "byte")) {
 			final CastExpression ce = ast.newCastExpression();
 			ce.setType(ast.newSimpleType(ast.newSimpleName("Object")));
 			ce.setExpression(copySubtree(ast, args.get(0)));

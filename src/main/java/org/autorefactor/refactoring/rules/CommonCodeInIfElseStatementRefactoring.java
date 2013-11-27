@@ -33,13 +33,7 @@ import org.autorefactor.refactoring.ASTHelper;
 import org.autorefactor.refactoring.IJavaRefactoring;
 import org.autorefactor.refactoring.Refactorings;
 import org.autorefactor.util.NotImplementedException;
-import org.eclipse.jdt.core.dom.ASTMatcher;
-import org.eclipse.jdt.core.dom.ASTNode;
-import org.eclipse.jdt.core.dom.ASTVisitor;
-import org.eclipse.jdt.core.dom.Block;
-import org.eclipse.jdt.core.dom.CompilationUnit;
-import org.eclipse.jdt.core.dom.IfStatement;
-import org.eclipse.jdt.core.dom.Statement;
+import org.eclipse.jdt.core.dom.*;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
 
@@ -95,7 +89,7 @@ public class CommonCodeInIfElseStatementRefactoring extends ASTVisitor
 					break;
 				}
 				this.ctx.getRefactorings().insertBefore(
-						ASTHelper.copySubtree(this.ctx.getAST(),
+						copySubtree(this.ctx.getAST(),
 								caseStmts.get(stmtIndex)), node);
 				removeStmts(allCasesStmts, true, stmtIndex, removedCaseStmts);
 			}
@@ -109,7 +103,7 @@ public class CommonCodeInIfElseStatementRefactoring extends ASTVisitor
 					break;
 				}
 				this.ctx.getRefactorings().insertAfter(
-						ASTHelper.copySubtree(this.ctx.getAST(),
+						copySubtree(this.ctx.getAST(),
 								caseStmts.get(caseStmts.size() - stmtIndex)),
 						node);
 				removeStmts(allCasesStmts, false, stmtIndex, removedCaseStmts);
@@ -282,8 +276,8 @@ public class CommonCodeInIfElseStatementRefactoring extends ASTVisitor
 	 */
 	private boolean collectAllCases(List<List<Statement>> allCases,
 			IfStatement node) {
-		final List<Statement> thenStmts = ASTHelper.asList(node.getThenStatement());
-		final List<Statement> elseStmts = ASTHelper.asList(node.getElseStatement());
+		final List<Statement> thenStmts = asList(node.getThenStatement());
+		final List<Statement> elseStmts = asList(node.getElseStatement());
 		if (thenStmts.isEmpty() || elseStmts.isEmpty()) {
 			// if the then or else clause is empty, then there is no common code whatsoever.
 			// let other refactorings take care of removing empty blocks.
@@ -292,7 +286,7 @@ public class CommonCodeInIfElseStatementRefactoring extends ASTVisitor
 
 		allCases.add(thenStmts);
 		if (elseStmts.size() == 1) {
-			final IfStatement is = ASTHelper.as(elseStmts.get(0), IfStatement.class);
+			final IfStatement is = as(elseStmts.get(0), IfStatement.class);
 			if (is != null) {
 				return collectAllCases(allCases, is);
 			}
