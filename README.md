@@ -12,3 +12,7 @@ AutoRefactor is distributed under the terms of both the
 Eclipse Public License v1.0 and the GNU GPLv3+.
 
 See LICENSE-ECLIPSE, LICENSE-GNUGPL, and COPYRIGHT for details.
+
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/JnRouvignac/autorefactor/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
