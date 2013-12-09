@@ -5,16 +5,11 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.autorefactor.plugin</groupId>
-  <artifactId>parent</artifactId>
+  <artifactId>org.autorefactor.plugin</artifactId>
   <version>0.0.2-SNAPSHOT</version>
-  <packaging>pom</packaging>
-  <modules>
-    <module>plugin</module>
-    <module>plugin.tests</module>
-  </modules>
+  <packaging>eclipse-plugin</packaging>
 
   <properties>
-    <tycho.scmUrl>scm:git:https://github.com/JnRouvignac/AutoRefactor.git</tycho.scmUrl>
     <tycho-version>0.19.0</tycho-version>
   </properties>
 

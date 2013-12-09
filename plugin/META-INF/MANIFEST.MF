@@ -15,3 +15,5 @@ Bundle-ActivationPolicy: lazy
 Comment1: Need to follow Eclipse's supported JRE unless dictated by
 Comment2: functionalities required from Eclipse or JRE.
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Export-Package: org.autorefactor.refactoring;x-friends:="org.autorefactor.plugin.tests",
+ org.autorefactor.refactoring.rules;x-friends:="org.autorefactor.plugin.tests"
