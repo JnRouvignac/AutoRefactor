@@ -40,7 +40,7 @@ import static org.testng.Assert.*;
 public class OperatorEnumTest {
 
 	@DataProvider
-	public Iterator<Object[]> getPairsOfOperatorsWithSamePrecendence() {
+	public Iterator<Object[]> getPairsOfOperatorsWithSamePrecedence() {
 		final List<Object[]> results = new ArrayList<Object[]>();
 		for (int i = 0; i < OperatorEnum.values().length; i++) {
 			OperatorEnum op1 = OperatorEnum.values()[i];
@@ -55,7 +55,7 @@ public class OperatorEnumTest {
 	}
 
 	@DataProvider
-	public Iterator<Object[]> getPairsOfOperatorsWithDifferentPrecendence() {
+	public Iterator<Object[]> getPairsOfOperatorsWithDifferentPrecedence() {
 		final List<Object[]> results = new ArrayList<Object[]>();
 		for (int i = 0; i < OperatorEnum.values().length; i++) {
 			OperatorEnum op1 = OperatorEnum.values()[i];
@@ -69,13 +69,13 @@ public class OperatorEnumTest {
 		return results.iterator();
 	}
 
-	@Test(dataProvider = "getPairsOfOperatorsWithSamePrecendence")
-	public void compareSamePrecendenceOperators(OperatorEnum op1, OperatorEnum op2) {
+	@Test(dataProvider = "getPairsOfOperatorsWithSamePrecedence")
+	public void compareSamePrecedenceOperators(OperatorEnum op1, OperatorEnum op2) {
 		assertTrue(OperatorEnum.compareTo(op1, op2) == 0, "Expected but did not get: " + op1 + " == " + op2);
 	}
 
-	@Test(dataProvider = "getPairsOfOperatorsWithDifferentPrecendence")
-	public void compareDifferentPrecendenceOperators(OperatorEnum op1, OperatorEnum op2) {
+	@Test(dataProvider = "getPairsOfOperatorsWithDifferentPrecedence")
+	public void compareDifferentPrecedenceOperators(OperatorEnum op1, OperatorEnum op2) {
 		assertTrue(OperatorEnum.compareTo(op1, op2) > 0, "Expected but did not get: " + op1 + " > " + op2);
 		assertTrue(OperatorEnum.compareTo(op2, op1) < 0, "Expected but did not get: " + op1 + " < " + op2);
 	}
