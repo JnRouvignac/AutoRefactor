@@ -28,7 +28,7 @@ package org.autorefactor.samples_in;
 public class CommentsSample implements Runnable {
 
     /**
-     * This is a javadoc that must be kept
+     * uppercase first word.
      */
     private int i;
 
@@ -70,7 +70,7 @@ public class CommentsSample implements Runnable {
     }
 
     /**
-     * This is a javadoc that must be kept
+     * This javadoc must have a period added at the end of this sentence
      */
     public void test() {
         /**

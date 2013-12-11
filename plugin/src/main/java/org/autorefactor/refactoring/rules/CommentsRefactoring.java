@@ -58,7 +58,7 @@ public class CommentsRefactoring extends ASTVisitor implements IJavaRefactoring 
 	private static final Pattern EMPTY_LINE_COMMENT = Pattern.compile("//\\s*");
 	private static final Pattern EMPTY_BLOCK_COMMENT = Pattern.compile("/\\*\\s*(\\*\\s*)*\\*/");
 	private static final Pattern EMPTY_JAVADOC = Pattern.compile("/\\*\\*\\s*(\\*\\s*)*\\*/");
-	private static final Pattern ONLY_INHERITDOC_JAVADOC = Pattern.compile("/\\*\\*\\s*(\\*\\s*)*\\{@inheritDoc\\}\\s*(\\*\\s*)*\\*/");
+	private static final Pattern JAVADOC_ONLY_INHERITDOC = Pattern.compile("/\\*\\*\\s*(\\*\\s*)*\\{@inheritDoc\\}\\s*(\\*\\s*)*\\*/");
 	private static final Pattern ECLIPSE_GENERATED_TODOS = Pattern.compile("//\\s*"
 			+ "(:?"
 			+   "(?:TODO Auto-generated (?:(?:(?:method|constructor) stub)|(?:catch block)))"
@@ -67,6 +67,7 @@ public class CommentsRefactoring extends ASTVisitor implements IJavaRefactoring 
 			+ ")"
 			+ "\\s*");
 	private static final Pattern JAVADOC_WITHOUT_FINAL_DOT = Pattern.compile("(.*?)((?:\\s*(?:\\r|\\n|\\r\\n)*\\s*)*\\*/)", Pattern.DOTALL);
+	private static final Pattern JAVADOC_FIRST_LETTER_LOWERCASE = Pattern.compile("(/\\*\\*(?:\\s*\\*(?:\\r|\\n|\\r\\n|\\s)))*(\\w)(.*)", Pattern.DOTALL);
 
 	private RefactoringContext ctx;
 	private CompilationUnit astRoot;
@@ -132,23 +133,32 @@ public class CommentsRefactoring extends ASTVisitor implements IJavaRefactoring 
 		} else if (allTagsEmpty(node.tags())) {
 			this.ctx.getRefactorings().remove(node);
 			return DO_NOT_VISIT_SUBTREE;
-		} else if (ONLY_INHERITDOC_JAVADOC.matcher(comment).matches()) {
+		} else if (JAVADOC_ONLY_INHERITDOC.matcher(comment).matches()) {
 			// Put on one line only to augment vertical density of code
 			int startLine = this.astRoot.getLineNumber(node.getStartPosition());
 			int endLine = this.astRoot.getLineNumber(node.getStartPosition() + node.getLength());
 			if (startLine != endLine) {
 				this.ctx.getRefactorings().replace(node, "/** {@inheritDoc} */");
-	                        return DO_NOT_VISIT_SUBTREE;
+				return DO_NOT_VISIT_SUBTREE;
 			}
 		} else if (!acceptJavadoc(getNextNode(node))) {
 			this.ctx.getRefactorings().replace(node, comment.replace("/**", "/*"));
-                        return DO_NOT_VISIT_SUBTREE;
+			return DO_NOT_VISIT_SUBTREE;
 		} else if (!comment.contains(".")) {
 			Matcher matcher = JAVADOC_WITHOUT_FINAL_DOT.matcher(comment);
 			if (matcher.matches()) {
 				String newComment = matcher.group(1) + "." + matcher.group(2);
 				this.ctx.getRefactorings().replace(node, newComment);
-	                        return DO_NOT_VISIT_SUBTREE;
+				return DO_NOT_VISIT_SUBTREE;
+			}
+		} else {
+			Matcher m = JAVADOC_FIRST_LETTER_LOWERCASE.matcher(comment);
+			if (m.matches() && Character.isLowerCase(m.group(2).charAt(0))) {
+				String newComment = m.group(1) + m.group(2).toUpperCase() + m.group(3);
+				if (!newComment.equals(comment)) {
+					this.ctx.getRefactorings().replace(node, newComment);
+					return DO_NOT_VISIT_SUBTREE;
+				}
 			}
 		}
 		return VISIT_SUBTREE;
@@ -287,7 +297,7 @@ public class CommentsRefactoring extends ASTVisitor implements IJavaRefactoring 
 					bestLoc = newLoc;
 					bestComment = newComment;
 					continue;
-				} else  if (!(bestComment instanceof LineComment)) {
+				} else if (!(bestComment instanceof LineComment)) {
 					// new comment is a line comment and best comment is not
 					bestLoc = newLoc;
 					bestComment = newComment;
