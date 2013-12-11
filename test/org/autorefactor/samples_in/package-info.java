@@ -23,42 +23,7 @@
  * which accompanies this distribution under LICENSE-ECLIPSE, and is
  * available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.autorefactor.cfg;
-
-import java.util.Iterator;
-import java.util.List;
-
-import org.eclipse.jdt.core.dom.ASTNode;
-import org.eclipse.jdt.core.dom.Expression;
-
-public class ASTPrintHelper {
-
-	private ASTPrintHelper() {
-		// hide utility class ctor
-	}
-
-	static String codeExcerpt(List<Expression> expressions) {
-		final StringBuilder sb = new StringBuilder();
-		for (final Iterator<Expression> iter = expressions.iterator(); iter.hasNext();) {
-			final Expression expr = iter.next();
-			sb.append(expr.toString());
-			if (iter.hasNext()) {
-				sb.append(", ");
-			}
-		}
-		return sb.toString();
-	}
-
-	static String codeExcerpt(ASTNode node) {
-		final String nodeString = node.toString();
-		final String[] nodeLines = nodeString.split("\n");
-		final String codeExcerpt;
-		if (nodeLines[0].matches("\\s*\\{\\s*")) {
-			codeExcerpt = nodeLines[0] + " " + nodeLines[1] + " ...";
-		} else {
-			codeExcerpt = nodeLines[0];
-		}
-		return codeExcerpt.replaceAll("\\s+", " ");
-	}
-
-}
+/**
+ * Leave untouched.
+ */
+package org.autorefactor.samples_in;

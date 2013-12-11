@@ -659,4 +659,12 @@ public class ASTHelper {
 		return parent;
 	}
 
+	public static String getFileName(ASTNode node) {
+		if (node.getRoot() instanceof CompilationUnit) {
+			CompilationUnit cu = (CompilationUnit) node.getRoot();
+			return cu.getTypeRoot().getElementName();
+		}
+		return null;
+	}
+
 }

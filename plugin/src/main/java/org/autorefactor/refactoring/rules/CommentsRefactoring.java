@@ -319,8 +319,10 @@ public class CommentsRefactoring extends ASTVisitor implements IJavaRefactoring 
 
 	private boolean acceptJavadoc(final ASTNode node) {
 		// PackageDeclaration node accept javadoc in package-info.java files,
-		// but they are useless everywhere else, so do not include them at all for now.
-		return node instanceof BodyDeclaration;
+		// but they are useless everywhere else.
+		return node instanceof BodyDeclaration
+		    || (node instanceof PackageDeclaration
+		        && "package-info.java".equals(getFileName(node)));
 	}
 
 	@Override
