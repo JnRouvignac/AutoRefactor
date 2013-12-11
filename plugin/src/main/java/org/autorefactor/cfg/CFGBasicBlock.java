@@ -43,47 +43,41 @@ import org.eclipse.jdt.core.dom.ASTNode;
  * @see <a href="http://en.wikipedia.org/wiki/Basic_block">Basic block on
  *      wikipedia</a>
  */
-public class CFGBasicBlock {
+public class CFGBasicBlock implements Comparable<CFGBasicBlock> {
 
 	private final ASTNode node;
 	private final String fileName;
 	private final String codeExcerpt;
 	private final boolean isDecision;
 	private final Boolean isEntryBlock;
-	private final int line;
-	private final int column;
+	private final LineAndColumn lineAndColumn;
 	private final Collection<CFGEdge> incomingEdges = new LinkedList<CFGEdge>();
 	private final Collection<Object> outgoingEdgesAndVariableAccesses = new LinkedList<Object>();
 
 	private CFGBasicBlock(ASTNode node, String fileName, String codeExcerpt, boolean isDecision, Boolean isEntryBlock,
-			int line, int column) {
+			LineAndColumn lineAndColumn) {
 		this.node = node;
 		this.fileName = fileName;
 		this.codeExcerpt = codeExcerpt;
 		this.isDecision = isDecision;
 		this.isEntryBlock = isEntryBlock;
-		this.line = line;
-		this.column = column;
+		this.lineAndColumn = lineAndColumn;
 	}
 
-	public CFGBasicBlock(ASTNode node, String fileName, String codeExcerpt, boolean isDecision, int lineNumber, int column) {
-		this(node, fileName, codeExcerpt, isDecision, null, lineNumber, column);
+	public CFGBasicBlock(ASTNode node, String fileName, String codeExcerpt, boolean isDecision, LineAndColumn lineAndColumn) {
+		this(node, fileName, codeExcerpt, isDecision, null, lineAndColumn);
 	}
 
 	public static CFGBasicBlock buildEntryBlock(ASTNode node, String fileName, String codeExcerpt) {
-		return new CFGBasicBlock(node, fileName, codeExcerpt, false, true, 1, 1);
+		return new CFGBasicBlock(node, fileName, codeExcerpt, false, true, new LineAndColumn(0, 1, 1));
 	}
 
-	public static CFGBasicBlock buildExitBlock(ASTNode node, String fileName, String codeExcerpt, int line, int column) {
-		return new CFGBasicBlock(node, fileName, codeExcerpt, false, false, line, column);
+	public static CFGBasicBlock buildExitBlock(ASTNode node, String fileName, String codeExcerpt, LineAndColumn lineAndColumn) {
+		return new CFGBasicBlock(node, fileName, codeExcerpt, false, false, lineAndColumn);
 	}
 
-	public int getLine() {
-		return line;
-	}
-
-	public int getColumn() {
-		return column;
+	public LineAndColumn getLineAndColumn() {
+		return lineAndColumn;
 	}
 
 	public ASTNode getNode() {
@@ -138,8 +132,7 @@ public class CFGBasicBlock {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((fileName == null) ? 0 : fileName.hashCode());
-		result = prime * result + line;
-		result = prime * result + column;
+		result = prime * result + ((lineAndColumn == null) ? 0 : lineAndColumn.hashCode());;
 		result = prime * result
 				+ ((isEntryBlock == null) ? 0 : isEntryBlock.hashCode());
 		return result;
@@ -159,9 +152,10 @@ public class CFGBasicBlock {
 				return false;
 		} else if (!fileName.equals(other.fileName))
 			return false;
-		if (line != other.line)
-			return false;
-		if (column != other.column)
+		if (lineAndColumn == null) {
+			if (other.lineAndColumn != null)
+				return false;
+		} else if (!lineAndColumn.equals(other.lineAndColumn))
 			return false;
 		if (isEntryBlock == null) {
 			if (other.isEntryBlock != null)
@@ -169,6 +163,13 @@ public class CFGBasicBlock {
 		} else if (!isEntryBlock.equals(other.isEntryBlock))
 			return false;
 		return true;
+	}
+
+	/** {@inheritDoc} */
+	public int compareTo(CFGBasicBlock o)
+	{
+		final Integer startPosition = lineAndColumn.getStartPosition();
+		return startPosition.compareTo(o.lineAndColumn.getStartPosition());
 	}
 
 	public String getFileName() {
@@ -191,14 +192,22 @@ public class CFGBasicBlock {
 		} else if (isExitBlock()) {
 			sb.append("Exit");
 		} else {
-			sb.append("_").append(this.line).append("_").append(this.column);
+			LineAndColumn lal = this.lineAndColumn;
+			sb.append("_").append(lal.getLine()).append("_").append(lal.getColumn());
 		}
 		return sb;
 	}
 
 	StringBuilder appendDotNodeLabel(StringBuilder sb) {
 		sb.append(this.codeExcerpt).append("\\n(");
-		sb.append(this.line).append(",").append(this.column).append(")");
+		LineAndColumn lal = this.lineAndColumn;
+		sb.append(lal.getLine()).append(",").append(lal.getColumn()).append(")");
+		return sb;
+	}
+
+	StringBuilder appendDotNodeSourcePosition(StringBuilder sb) {
+//		LineAndColumn lal = this.lineAndColumn;
+//		sb.append("(").append(lal.getLine()).append(",").append(lal.getColumn()).append(")");
 		return sb;
 	}
 

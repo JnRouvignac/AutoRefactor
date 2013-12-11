@@ -64,8 +64,7 @@ public class CFGDotPrinter {
 
 		private final String codeExcerpt;
 		private final int startPosition;
-		final Set<CFGBasicBlock> blocks = new TreeSet<CFGBasicBlock>(
-				new CFGBasicBlockComparator());
+		final Set<CFGBasicBlock> blocks = new TreeSet<CFGBasicBlock>();
 		final List<CFGSubGraph> subGraphs = new ArrayList<CFGDotPrinter.CFGSubGraph>();
 
 		public CFGSubGraph(String codeExcerpt, int startPosition) {
@@ -74,33 +73,14 @@ public class CFGDotPrinter {
 		}
 	}
 
-	private final class CFGBasicBlockComparator implements
-			Comparator<CFGBasicBlock> {
-		public int compare(CFGBasicBlock o1, CFGBasicBlock o2) {
-			if (o1.getLine() < o2.getLine()) {
-				return -1;
-			} else if (o1.getLine() > o2.getLine()) {
-				return 1;
-			}
-			if (o1.getColumn() < o2.getColumn()) {
-				return -1;
-			} else if (o1.getColumn() > o2.getColumn()) {
-				return 1;
-			}
-			return 0;
-		}
-	}
-
 	private final class CFGEdgeComparator implements Comparator<CFGEdge> {
 
-		private CFGBasicBlockComparator c = new CFGBasicBlockComparator();
-
 		public int compare(CFGEdge e1, CFGEdge e2) {
-			final int cmp = c.compare(e1.getSourceBlock(), e2.getSourceBlock());
+			final int cmp = e1.getSourceBlock().compareTo(e2.getSourceBlock());
 			if (cmp != 0) {
 				return cmp;
 			}
-			return c.compare(e1.getTargetBlock(), e2.getTargetBlock());
+			return e1.getTargetBlock().compareTo(e2.getTargetBlock());
 		}
 	}
 
@@ -238,11 +218,12 @@ public class CFGDotPrinter {
 			sb.append("Exit  [style=\"filled\" fillcolor=\"black\" fontcolor=\"white\"];\n");
 		} else {
 			block.appendDotNodeId(sb);
-			sb.append(" [label=\"").append(escape(block.getDotNodeLabel()))
-					.append("\"");
+			sb.append(" [label=\"").append(escape(block.getDotNodeLabel())).append("\"");
 			if (block.isDecision()) {
 				sb.append(",shape=\"triangle\"");
 			}
+			sb.append("]; // ");
+			block.appendDotNodeSourcePosition(sb);
 			sb.append("];\n");
 		}
 	}

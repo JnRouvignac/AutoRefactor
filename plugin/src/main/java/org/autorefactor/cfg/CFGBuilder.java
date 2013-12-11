@@ -34,7 +34,6 @@ import java.util.regex.Pattern;
 
 import org.autorefactor.refactoring.ASTHelper;
 import org.autorefactor.util.NotImplementedException;
-import org.autorefactor.util.Pair;
 import org.autorefactor.util.UnhandledException;
 import org.eclipse.jdt.core.dom.*;
 
@@ -118,6 +117,8 @@ public class CFGBuilder {
 					+ ", liveEdges=" + liveEdges + "]";
 		}
 	}
+
+	private static final Pattern NEWLINE = Pattern.compile("\r\n|\r|\n");
 
 	private String source;
 	private int tabSize;
@@ -932,10 +933,9 @@ public class CFGBuilder {
 			// basicBlock.addNode(node);
 			return basicBlock;
 		}
-		final Pair<Integer, Integer> lineCol = getLineAndColumn(node);
+		final LineAndColumn lineCol = getLineAndColumn(node);
 		final CFGBasicBlock basicBlock = new CFGBasicBlock(node,
-				getFileName(node), codeExcerpt(node), isDecision,
-				lineCol.getFirst(), lineCol.getSecond());
+				getFileName(node), codeExcerpt(node), isDecision, lineCol);
 		buildEdges(state, basicBlock);
 		return basicBlock;
 	}
@@ -943,11 +943,9 @@ public class CFGBuilder {
 	private CFGBasicBlock getCFGBasicBlock(List<Expression> expressions, LivenessState state) {
 		if (isNotEmpty(expressions)) {
 			final Expression firstExpr = expressions.get(0);
-			final Pair<Integer, Integer> lineCol = getLineAndColumn(firstExpr
-					.getStartPosition());
+			final LineAndColumn lineCol = getLineAndColumn(firstExpr.getStartPosition());
 			final CFGBasicBlock basicBlock = new CFGBasicBlock(expressions.get(0),
-					getFileName(firstExpr), codeExcerpt(expressions), false,
-					lineCol.getFirst(), lineCol.getSecond());
+					getFileName(firstExpr), codeExcerpt(expressions), false, lineCol);
 			buildEdges(state, basicBlock);
 			return basicBlock;
 		}
@@ -960,24 +958,24 @@ public class CFGBuilder {
 	}
 
 	private CFGBasicBlock newExitBlock(MethodDeclaration node) {
-		final Pair<Integer, Integer> lineCol = getLineAndColumn(node
+		final LineAndColumn lineCol = getLineAndColumn(node
 				.getStartPosition() + node.getLength());
 		return CFGBasicBlock.buildExitBlock(node, getFileName(node),
-				codeExcerpt(node), lineCol.getFirst(), lineCol.getSecond());
+				codeExcerpt(node), lineCol);
 	}
 
-	private Pair<Integer, Integer> getLineAndColumn(ASTNode node) {
+	private LineAndColumn getLineAndColumn(ASTNode node) {
 		return getLineAndColumn(node.getStartPosition());
 	}
 
-	private Pair<Integer, Integer> getLineAndColumn(final int position) {
+	private LineAndColumn getLineAndColumn(final int position) {
 		// TODO Use CompilationUnit.getLineNumber() and CompilationUnit.getColumnNumber()
 		// Return SourceLocation class with also startNodePosition to be used for graph node names
 		// line number and column number are then used as comments for the node
 		// file starts with line 1
 		int lineNo = 1;
 		int lastMatchPosition = 0;
-		final Matcher matcher = Pattern.compile("\r\n|\r|\n").matcher(source);
+		final Matcher matcher = NEWLINE.matcher(source);
 		while (matcher.find()) {
 			final MatchResult matchResult = matcher.toMatchResult();
 			if (matchResult.end() >= position) {
@@ -985,7 +983,7 @@ public class CFGBuilder {
 						lastMatchPosition, position);
 				final int nbChars = countCharacters(startOfLine, tabSize);
 				// + 1 because line starts with column 1
-				return Pair.of(lineNo, nbChars + 1);
+				return new LineAndColumn(position, lineNo, nbChars + 1);
 			}
 			lastMatchPosition = matchResult.end();
 			++lineNo;
