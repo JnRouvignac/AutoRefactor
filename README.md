@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/JnRouvignac/AutoRefactor.png)](https://travis-ci.org/JnRouvignac/AutoRefactor)
+
 # AutoRefactor
 
 The AutoRefactor project delivers free software that automatically refactor code bases.

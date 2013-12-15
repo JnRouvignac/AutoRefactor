@@ -1,9 +1,8 @@
 package org.autorefactor.refactoring;
 
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
+import org.junit.Test;
 
-import static org.testng.Assert.*;
+import static org.junit.Assert.*;
 
 public class ReleaseTest {
 
@@ -31,7 +30,7 @@ public class ReleaseTest {
 		assertEquals(release2.getPatchVersion(), 0);
 	}
 
-	@DataProvider
+	// @DataProvider
 	public Object[][] getIsCompatibleWith() {
 		return new Object[][] {
 				// @formatter:off
@@ -48,9 +47,14 @@ public class ReleaseTest {
 		};
 	}
 
-	@Test(dataProvider="getIsCompatibleWith")
-	public void isCompatibleWith(String version1, String version2,
-			boolean expected) {
+	@Test
+	public void isCompatibleWith() {
+		for (Object[] args : getIsCompatibleWith()) {
+			isCompatibleWith((String) args[0], (String) args[1], (Boolean) args[2]);
+		}
+	}
+
+	public void isCompatibleWith(String version1, String version2, boolean expected) {
 		Release r1 = Release.javaSE(version1);
 		Release r2 = Release.javaSE(version2);
 		assertEquals(r1.isCompatibleWith(r2), expected);

@@ -26,14 +26,13 @@
 package org.autorefactor.refactoring;
 
 import static org.autorefactor.refactoring.JavaConstants.*;
-import static org.testng.Assert.*;
+import static org.junit.Assert.*;
 
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
+import org.junit.Test;
 
 public class JavaConstantsTest {
 
-	@DataProvider(name = "validLongZeroLiteral")
+	// @DataProvider
 	public Object[][] getValidLongZeroLiteral() {
 		return new Object[][] {
 			// @formatter:off
@@ -57,7 +56,7 @@ public class JavaConstantsTest {
 		};
 	}
 
-	@DataProvider(name = "validIntegerZeroLiteral")
+	// @DataProvider
 	public Object[][] getValidIntegerZeroLiteral() {
 		return new Object[][] {
 			// @formatter:off
@@ -75,7 +74,7 @@ public class JavaConstantsTest {
 		};
 	}
 
-	@DataProvider(name = "invalidIntegerZeroLiteral")
+	// @DataProvider
 	public Object[][] getInvalidIntegerZeroLiteral() {
 		return new Object[][] {
 			// @formatter:off
@@ -104,7 +103,7 @@ public class JavaConstantsTest {
 
 
 
-	@DataProvider(name = "validLongOneLiteral")
+	// @DataProvider
 	public Object[][] getValidLongOneLiteral() {
 		return new Object[][] {
 			// @formatter:off
@@ -128,7 +127,7 @@ public class JavaConstantsTest {
 		};
 	}
 
-	@DataProvider(name = "validIntegerOneLiteral")
+	// @DataProvider
 	public Object[][] getValidIntegerOneLiteral() {
 		return new Object[][] {
 			// @formatter:off
@@ -146,7 +145,7 @@ public class JavaConstantsTest {
 		};
 	}
 
-	@DataProvider(name = "invalidIntegerOneLiteral")
+	// @DataProvider
 	public Object[][] getInvalidIntegerOneLiteral() {
 		return new Object[][] {
 			// @formatter:off
@@ -175,7 +174,7 @@ public class JavaConstantsTest {
 
 
 
-	@DataProvider(name = "validLongTenLiteral")
+	// @DataProvider
 	public Object[][] getValidLongTenLiteral() {
 		return new Object[][] {
 			// @formatter:off
@@ -203,7 +202,7 @@ public class JavaConstantsTest {
 		};
 	}
 
-	@DataProvider(name = "validIntegerTenLiteral")
+	// @DataProvider
 	public Object[][] getValidIntegerTenLiteral() {
 		return new Object[][] {
 			// @formatter:off
@@ -223,7 +222,7 @@ public class JavaConstantsTest {
 		};
 	}
 
-	@DataProvider(name = "invalidIntegerTenLiteral")
+	// @DataProvider
 	public Object[][] getInvalidIntegerTenLiteral() {
 		return new Object[][] {
 			// @formatter:off
@@ -255,7 +254,7 @@ public class JavaConstantsTest {
 
 
 
-	@DataProvider(name = "validIntegerLiteral")
+	// @DataProvider
 	public Object[][] getValidIntegerLiteral() {
 		Object[][] zeros = getValidIntegerZeroLiteral();
 		Object[][] ones = getValidIntegerOneLiteral();
@@ -263,7 +262,7 @@ public class JavaConstantsTest {
 		return collate(zeros, ones, tens);
 	}
 
-	@DataProvider(name = "invalidIntegerLiteral")
+	// @DataProvider
 	public Object[][] getInvalidIntegerLiteral() {
 		Object[][] zeros = getInvalidIntegerZeroLiteral();
 		Object[][] ones = getInvalidIntegerOneLiteral();
@@ -271,7 +270,7 @@ public class JavaConstantsTest {
 		return collate(zeros, ones, tens);
 	}
 
-	@DataProvider(name = "validLongLiteral")
+	// @DataProvider
 	public Object[][] getValidLongLiteral() {
 		Object[][] zeros = getValidLongZeroLiteral();
 		Object[][] ones = getValidLongOneLiteral();
@@ -292,70 +291,141 @@ public class JavaConstantsTest {
 
 
 
-	@Test(dataProvider = "validIntegerZeroLiteral")
+	@Test
+	public void validIntegerZeroLongLiteralRegexp() {
+		for (Object[] args : getValidIntegerZeroLiteral()) {
+			validIntegerZeroLongLiteralRegexp((String) args[0]);
+		}
+	}
+	
 	public void validIntegerZeroLongLiteralRegexp(String literal) {
 		assertTrue(ZERO_LONG_LITERAL_RE.matcher(literal).matches());
 	}
 
-	@Test(dataProvider = "invalidIntegerZeroLiteral")
+	@Test
+	public void invalidIntegerZeroLongLiteralRegexp() {
+		for (Object[] args : getInvalidIntegerZeroLiteral()) {
+			invalidIntegerZeroLongLiteralRegexp((String) args[0]);
+		}
+	}
+
 	public void invalidIntegerZeroLongLiteralRegexp(String literal) {
 		assertFalse(ZERO_LONG_LITERAL_RE.matcher(literal).matches());
 	}
 
-	@Test(dataProvider = "validLongZeroLiteral")
+	@Test
+	public void validLongZeroLongLiteralRegexp() {
+		for (Object[] args : getValidLongZeroLiteral()) {
+			validLongZeroLongLiteralRegexp((String) args[0]);
+		}
+	}
+
 	public void validLongZeroLongLiteralRegexp(String literal) {
 		assertTrue(ZERO_LONG_LITERAL_RE.matcher(literal).matches());
 	}
 
 
 
-	@Test(dataProvider = "validIntegerOneLiteral")
+	@Test
+	public void validIntegerOneLongLiteralRegexp() {
+		for (Object[] args : getValidIntegerOneLiteral()) {
+			validIntegerOneLongLiteralRegexp((String) args[0]);
+		}
+	}
+
 	public void validIntegerOneLongLiteralRegexp(String literal) {
 		assertTrue(ONE_LONG_LITERAL_RE.matcher(literal).matches());
 	}
 
-	@Test(dataProvider = "invalidIntegerOneLiteral")
+	@Test
+	public void invalidIntegerOneLongLiteralRegexp() {
+		for (Object[] args : getInvalidIntegerOneLiteral()) {
+			invalidIntegerOneLongLiteralRegexp((String) args[0]);
+		}
+	}
+
 	public void invalidIntegerOneLongLiteralRegexp(String literal) {
 		assertFalse(ONE_LONG_LITERAL_RE.matcher(literal).matches());
 	}
 
-	@Test(dataProvider = "validLongOneLiteral")
+	@Test
+	public void validLongOneLongLiteralRegexp() {
+		for (Object[] args : getValidLongOneLiteral()) {
+			validLongOneLongLiteralRegexp((String) args[0]);
+		}
+	}
+
 	public void validLongOneLongLiteralRegexp(String literal) {
 		assertTrue(ONE_LONG_LITERAL_RE.matcher(literal).matches());
 	}
 
 
 
-	@Test(dataProvider = "validIntegerTenLiteral")
+	@Test
+	public void validIntegerTenLongLiteralRegexp() {
+		for (Object[] args : getValidIntegerTenLiteral()) {
+			validIntegerTenLongLiteralRegexp((String) args[0]);
+		}
+	}
+
 	public void validIntegerTenLongLiteralRegexp(String literal) {
 		assertTrue(TEN_LONG_LITERAL_RE.matcher(literal).matches());
 	}
 
-	@Test(dataProvider = "invalidIntegerTenLiteral")
+	@Test
+	public void invalidIntegerTenLongLiteralRegexp() {
+		for (Object[] args : getInvalidIntegerTenLiteral()) {
+			invalidIntegerTenLongLiteralRegexp((String) args[0]);
+		}
+	}
+
 	public void invalidIntegerTenLongLiteralRegexp(String literal) {
 		assertFalse(TEN_LONG_LITERAL_RE.matcher(literal).matches());
 	}
 
-	@Test(dataProvider = "validLongTenLiteral")
+	@Test
+	public void validLongTenLongLiteralRegexp() {
+		for (Object[] args : getValidLongTenLiteral()) {
+			validLongTenLongLiteralRegexp((String) args[0]);
+		}
+	}
+
 	public void validLongTenLongLiteralRegexp(String literal) {
 		assertTrue(TEN_LONG_LITERAL_RE.matcher(literal).matches());
 	}
 
 
 
-	@Test(dataProvider = "validIntegerLiteral")
+	@Test
+	public void validIntegerLiteralRegexp() {
+		for (Object[] args : getValidIntegerLiteral()) {
+			validIntegerLiteralRegexp((String) args[0]);
+		}
+	}
+
 	public void validIntegerLiteralRegexp(String literal) {
 		assertTrue(INTEGER_LITERAL_COMPATIBLE_RE.matcher(literal).matches());
 	}
 
-	@Test(dataProvider = "invalidIntegerLiteral")
+	@Test
+	public void invalidIntegerLiteralRegexp() {
+		for (Object[] args : getInvalidIntegerLiteral()) {
+			invalidIntegerLiteralRegexp((String) args[0]);
+		}
+	}
+
 	public void invalidIntegerLiteralRegexp(String literal) {
 		assertFalse(INTEGER_LITERAL_COMPATIBLE_RE.matcher(literal).matches());
 	}
 
-	@Test(dataProvider = "validLongLiteral")
+	@Test
+	public void validLongLiteralRegexp() {
+		for (Object[] args : getValidLongLiteral()) {
+			validLongLiteralRegexp((String) args[0]);
+		}
+	}
+
 	public void validLongLiteralRegexp(String literal) {
 		assertTrue(LONG_LITERAL_COMPATIBLE_RE.matcher(literal).matches());
 	}
-
 }

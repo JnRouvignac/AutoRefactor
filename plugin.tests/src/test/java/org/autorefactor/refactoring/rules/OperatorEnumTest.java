@@ -32,14 +32,13 @@ import java.util.List;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.InfixExpression;
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
+import org.junit.Test;
 
-import static org.testng.Assert.*;
+import static org.junit.Assert.*;
 
 public class OperatorEnumTest {
 
-	@DataProvider
+	// @DataProvider
 	public Iterator<Object[]> getPairsOfOperatorsWithSamePrecedence() {
 		final List<Object[]> results = new ArrayList<Object[]>();
 		for (int i = 0; i < OperatorEnum.values().length; i++) {
@@ -54,7 +53,7 @@ public class OperatorEnumTest {
 		return results.iterator();
 	}
 
-	@DataProvider
+	// @DataProvider
 	public Iterator<Object[]> getPairsOfOperatorsWithDifferentPrecedence() {
 		final List<Object[]> results = new ArrayList<Object[]>();
 		for (int i = 0; i < OperatorEnum.values().length; i++) {
@@ -69,15 +68,31 @@ public class OperatorEnumTest {
 		return results.iterator();
 	}
 
-	@Test(dataProvider = "getPairsOfOperatorsWithSamePrecedence")
-	public void compareSamePrecedenceOperators(OperatorEnum op1, OperatorEnum op2) {
-		assertTrue(OperatorEnum.compareTo(op1, op2) == 0, "Expected but did not get: " + op1 + " == " + op2);
+	@Test
+	public void compareSamePrecedenceOperators() {
+		final Iterator<Object[]> iter = getPairsOfOperatorsWithSamePrecedence();
+		while (iter.hasNext()) {
+			final Object[] args = (Object[]) iter.next();
+			compareSamePrecedenceOperators((OperatorEnum) args[0], (OperatorEnum) args[1]);
+		}
 	}
 
-	@Test(dataProvider = "getPairsOfOperatorsWithDifferentPrecedence")
+	public void compareSamePrecedenceOperators(OperatorEnum op1,OperatorEnum op2) {
+		assertTrue("Expected but did not get: " + op1 + " == " + op2, OperatorEnum.compareTo(op1, op2) == 0);
+	}
+
+	@Test
+	public void compareDifferentPrecedenceOperators() {
+		final Iterator<Object[]> iter = getPairsOfOperatorsWithDifferentPrecedence();
+		while (iter.hasNext()) {
+			final Object[] args = (Object[]) iter.next();
+			compareDifferentPrecedenceOperators((OperatorEnum) args[0], (OperatorEnum) args[1]);
+		}
+	}
+
 	public void compareDifferentPrecedenceOperators(OperatorEnum op1, OperatorEnum op2) {
-		assertTrue(OperatorEnum.compareTo(op1, op2) > 0, "Expected but did not get: " + op1 + " > " + op2);
-		assertTrue(OperatorEnum.compareTo(op2, op1) < 0, "Expected but did not get: " + op1 + " < " + op2);
+		assertTrue("Expected but did not get: " + op1 + " > " + op2, OperatorEnum.compareTo(op1, op2) > 0);
+		assertTrue("Expected but did not get: " + op1 + " < " + op2, OperatorEnum.compareTo(op2, op1) < 0);
 	}
 
 	@Test
@@ -90,6 +105,6 @@ public class OperatorEnumTest {
 
 		assertTrue(OperatorEnum.compareTo(op1, op2) < 0);
 
-		assertEquals(OperatorEnum.compareTo(op1, null), 0, "Comparing unknown objects result in no decision");
+		assertEquals("Comparing unknown objects result in no decision", 0, OperatorEnum.compareTo(op1, null));
 	}
 }

@@ -40,6 +40,7 @@ import org.eclipse.jdt.core.dom.*;
 import static org.autorefactor.cfg.ASTPrintHelper.*;
 import static org.autorefactor.cfg.CFGEdgeBuilder.*;
 import static org.autorefactor.cfg.VariableAccess.*;
+import static org.autorefactor.refactoring.ASTHelper.*;
 
 /**
  * Builds a CFG.
