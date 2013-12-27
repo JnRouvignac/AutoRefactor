@@ -99,6 +99,18 @@ public class CFGBuilder {
 			return LivenessState.of(liveEdges);
 		}
 
+		private LivenessState nextStmtWillCreateNewBlock() {
+			return copyLiveEdges();
+		}
+
+		private LivenessState nextStmtsAreDeadCode() {
+			return copyLiveEdges();
+		}
+
+		private boolean requireNewBlock() {
+			return liveBasicBlock == null;
+		}
+
 		private void add(CFGEdgeBuilder edge) {
 			liveEdges.add(edge);
 		}
@@ -278,7 +290,7 @@ public class CFGBuilder {
 
 	private LivenessState buildCFG(Statement node, LivenessState state) {
 		if (node == null) {
-			return state.copyLiveBasicBlock();
+			return state.nextStmtWillCreateNewBlock();
 		}
 		try {
 			final Method m = getClass().getMethod("buildCFG", node.getClass(), LivenessState.class);
@@ -330,7 +342,7 @@ public class CFGBuilder {
 			addVariableAccess(basicBlock, node.getExpression(), READ);
 		}
 		buildEdge(basicBlock, this.exitBlock);
-		return state.copyLiveBasicBlock();
+		return state.nextStmtsAreDeadCode();
 	}
 
 	public void buildCFG(Modifier node) {
@@ -439,14 +451,14 @@ public class CFGBuilder {
 	}
 
 	public LivenessState buildCFG(WhileStatement node, LivenessState state) {
-		final CFGBasicBlock conditionBlock = getCFGBasicBlock(node.getExpression(), state.copyLiveEdges());
+		final CFGBasicBlock conditionBlock = getCFGBasicBlock(node.getExpression(), state.nextStmtWillCreateNewBlock());
 		addVariableAccess(conditionBlock, node.getExpression(), READ);
 
 		final CFGEdgeBuilder liveEdge = new CFGEdgeBuilder(node.getExpression(), true, conditionBlock);
 		final LivenessState liveAfterStmt = buildCFG(node.getBody(), LivenessState.of(liveEdge));
 		liveAfterStmt.add(new CFGEdgeBuilder(node.getExpression(), false, conditionBlock));
 		buildEdgesAfterBranchableStmt(node, liveAfterStmt, conditionBlock);
-		return liveAfterStmt.copyLiveEdges();
+		return liveAfterStmt.nextStmtWillCreateNewBlock();
 	}
 
 	public void buildCFG(VariableDeclarationFragment node) {
@@ -470,7 +482,7 @@ public class CFGBuilder {
 		liveAfterBody.add(new CFGEdgeBuilder(basicBlock));
 
 		buildEdgesAfterBranchableStmt(node, liveAfterBody, basicBlock);
-		return liveAfterBody.copyLiveEdges();
+		return liveAfterBody.nextStmtWillCreateNewBlock();
 	}
 
 	public LivenessState buildCFG(SwitchCase node, CFGBasicBlock switchConditionBasicBlock, LivenessState state) {
@@ -480,7 +492,7 @@ public class CFGBuilder {
 		// add an edge going from the condition of the switch
 		// (state.liveBasicBlock is the condition of the switch)
 		state.add(new CFGEdgeBuilder(node.getExpression(), true, switchConditionBasicBlock));
-		return state.copyLiveEdges();
+		return state.nextStmtWillCreateNewBlock();
 	}
 
 	public void buildCFG(SuperMethodInvocation node) {
@@ -518,11 +530,11 @@ public class CFGBuilder {
 	}
 
 	public LivenessState buildCFG(SynchronizedStatement node, LivenessState state) {
-		CFGBasicBlock basicBlock = getCFGBasicBlock(node, state.copyLiveEdges());
+		CFGBasicBlock basicBlock = getCFGBasicBlock(node, state.nextStmtWillCreateNewBlock());
 		addVariableAccess(basicBlock, node.getExpression(), READ);
 		CFGEdgeBuilder liveEdge = new CFGEdgeBuilder(basicBlock);
 		LivenessState result = buildCFG(node.getBody(), LivenessState.of(liveEdge));
-		return result.copyLiveEdges();
+		return result.nextStmtWillCreateNewBlock();
 	}
 
 	public void buildCFG(CatchClause node) {
@@ -726,7 +738,7 @@ public class CFGBuilder {
 	 * @return the new live state after the current statement
 	 */
 	public LivenessState buildCFG(IfStatement node, LivenessState state) {
-		final CFGBasicBlock exprBlock = getCFGBasicBlock(node, state.copyLiveEdges(), true);
+		final CFGBasicBlock exprBlock = getCFGBasicBlock(node, state.nextStmtWillCreateNewBlock(), true);
 		try {
 			addVariableAccess(exprBlock, node.getExpression(), READ);
 
@@ -741,7 +753,7 @@ public class CFGBuilder {
 			} else {
 				result.add(elseEdge);
 			}
-			return result.copyLiveEdges();
+			return result.nextStmtWillCreateNewBlock();
 		} finally {
 			moveAllEdgesToBuild(node, state);
 		}
@@ -804,7 +816,7 @@ public class CFGBuilder {
 	}
 
 	public LivenessState buildCFG(EnhancedForStatement node, LivenessState state) {
-		final CFGBasicBlock basicBlock = getCFGBasicBlock(node, state.copyLiveEdges());
+		final CFGBasicBlock basicBlock = getCFGBasicBlock(node, state.nextStmtWillCreateNewBlock());
 
 		addDeclaration(basicBlock, node.getParameter(), DECL_INIT | WRITE);
 
@@ -814,7 +826,7 @@ public class CFGBuilder {
 
 		final LivenessState liveAfterStmt = LivenessState.of(new CFGEdgeBuilder(basicBlock));
 		buildEdgesAfterBranchableStmt(node, liveAfterStmt, basicBlock);
-		return liveAfterStmt.copyLiveEdges();
+		return liveAfterStmt.nextStmtWillCreateNewBlock();
 	}
 
 	public LivenessState buildCFG(EmptyStatement node, LivenessState state) {
@@ -831,10 +843,10 @@ public class CFGBuilder {
 	}
 
 	public LivenessState buildCFG(DoStatement node, LivenessState state) {
-		final CFGBasicBlock basicBlock = getCFGBasicBlock(node, state.copyLiveEdges());
+		final CFGBasicBlock basicBlock = getCFGBasicBlock(node, state.nextStmtWillCreateNewBlock());
 		final LivenessState newLiveState = new LivenessState(basicBlock, new CFGEdgeBuilder(basicBlock));
 		final LivenessState liveAfterLoop = buildCFG(node.getBody(), newLiveState);
-		CFGBasicBlock conditionBlock = getCFGBasicBlock(node.getExpression(), liveAfterLoop.copyLiveEdges());
+		CFGBasicBlock conditionBlock = getCFGBasicBlock(node.getExpression(), liveAfterLoop.nextStmtWillCreateNewBlock());
 		addVariableAccess(conditionBlock, node.getExpression(), READ);
 
 		buildEdge(node.getExpression(), true, conditionBlock, basicBlock);
@@ -889,7 +901,7 @@ public class CFGBuilder {
 		final LivenessState liveAfterStmt = LivenessState.of(new CFGEdgeBuilder(
 				node.getExpression(), false, exprBlock));
 		buildEdgesAfterBranchableStmt(node, liveAfterStmt, updatersBlock);
-		return liveAfterStmt.copyLiveEdges();
+		return liveAfterStmt.nextStmtWillCreateNewBlock();
 	}
 
 	public void buildCFG(FieldDeclaration node) {
@@ -927,7 +939,7 @@ public class CFGBuilder {
 			throw new RuntimeException("No edges to build should exist for node \"" + node
 				+ "\" before a CFGBasicBlock is created for it. Found the following edges to build " + toBuild);
 		}
-		if (state.liveBasicBlock != null) {
+		if (!state.requireNewBlock()) {
 			final CFGBasicBlock basicBlock = state.liveBasicBlock;
 			// TODO JNR add nodes to the basicBlock they belong to
 			// and adapt the CFGDotPrinter to display "..." after the first node
