@@ -40,6 +40,9 @@ public interface RemoveUselessModifiersSample {
 
     }
 
+    public static abstract class AbstractSampleClass {
+    }
+
     public static enum FixModifierOrderSampleEnum {
         VALUE1, VALUE2
     }
