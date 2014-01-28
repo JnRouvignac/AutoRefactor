@@ -39,6 +39,58 @@ public class RemoveUnnecessaryLocalBeforeReturnSample {
         return i;
     }
 
+    /**
+     * No need to check for array variable assignments.
+     * <p>
+     * Trying to use it reports compile error "Array constants can only be used in initializers"
+     * <p>
+     * FIXME little bug: the return type should be String instead of java.lang.String 
+     */
+    public String[] inlineStringArrayVariableDeclaration() {
+        String[] array = { "test" };
+        return array;
+    }
+
+    public boolean[] inlineBooleanArrayVariableDeclaration() {
+        boolean[] array = { true };
+        return array;
+    }
+
+    public char[] inlineCharArrayVariableDeclaration() {
+        char[] array = { 'a' };
+        return array;
+    }
+
+    public byte[] inlineByteArrayVariableDeclaration() {
+        byte[] array = { 42 };
+        return array;
+    }
+
+    public short[] inlineShortArrayVariableDeclaration() {
+        short[] array = { 42 };
+        return array;
+    }
+
+    public int[] inlineIntArrayVariableDeclaration() {
+        int[] array = { 42 };
+        return array;
+    }
+
+    public long[] inlineLongArrayVariableDeclaration() {
+        long[] array = { 42 };
+        return array;
+    }
+
+    public float[] inlineFloatArrayVariableDeclaration() {
+        float[] array = { 42.42f };
+        return array;
+    }
+
+    public double[] inlineDoubleArrayVariableDeclaration() {
+        double[] array = { 42.42 };
+        return array;
+    }
+
     public int notInlineFieldAssignment1() {
         i = 0;
         return i;

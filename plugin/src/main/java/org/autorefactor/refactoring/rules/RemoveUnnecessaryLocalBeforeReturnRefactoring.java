@@ -66,8 +66,7 @@ public class RemoveUnnecessaryLocalBeforeReturnRefactoring extends ASTVisitor
 			final Expression origExpr = node.getExpression();
 			final ExpressionStatement es = (ExpressionStatement) previousSibling;
 			final Assignment as = as(es.getExpression(), Assignment.class);
-			if (as != null
-					&& Assignment.Operator.ASSIGN.equals(as.getOperator())) {
+			if (as != null && Assignment.Operator.ASSIGN.equals(as.getOperator())) {
 				final Expression newExpr = as.getLeftHandSide();
 				replaceReturnStatement(node, es, origExpr, newExpr,
 						as.getRightHandSide());
@@ -78,29 +77,43 @@ public class RemoveUnnecessaryLocalBeforeReturnRefactoring extends ASTVisitor
 
 	private void replaceReturnStatement(ReturnStatement node,
 			final ASTNode previousSibling, Expression expr1, Expression expr2,
-			Expression returnEpr) {
+			Expression returnExpr) {
 		if (expr1 instanceof SimpleName && expr2 instanceof SimpleName) {
-			final SimpleName sn1 = (SimpleName) expr2;
-			final SimpleName sn2 = (SimpleName) expr1;
-			final IVariableBinding bnd1 = (IVariableBinding) sn1
-					.resolveBinding();
-			final IVariableBinding bnd2 = (IVariableBinding) sn2
-					.resolveBinding();
+			final SimpleName sn1 = (SimpleName) expr1;
+			final SimpleName sn2 = (SimpleName) expr2;
+			final IVariableBinding bnd1 = (IVariableBinding) sn1.resolveBinding();
+			final IVariableBinding bnd2 = (IVariableBinding) sn2.resolveBinding();
 			if (bnd1 == null || bnd2 == null) {
 				return;
 			}
+			// to avoid changing the class's behaviour,
+			// we must not remove field's assignment
 			if (!bnd1.isField() && !bnd2.isField() && bnd1.isEqualTo(bnd2)) {
-				// to avoid changing the class's behaviour,
-				// we must not prevent field's assignment
 				this.ctx.getRefactorings().remove(previousSibling);
-				this.ctx.getRefactorings().replace(node,
-						getReturnStatement(node, returnEpr));
+				if (returnExpr instanceof ArrayInitializer && bnd1.getType().isArray()) {
+					this.ctx.getRefactorings().replace(node,
+						getReturnStatementForArray((ArrayInitializer) returnExpr, bnd1.getType()));
+				} else {
+					this.ctx.getRefactorings().replace(node,
+						getReturnStatement(returnExpr));
+				}
 			}
 		}
 	}
 
-	private ASTNode getReturnStatement(ReturnStatement node,
-			Expression initializer) {
+	private ReturnStatement getReturnStatementForArray(ArrayInitializer returnAI, ITypeBinding typeBinding) {
+		final AST ast = this.ctx.getAST();
+		final ArrayInitializer ai = ast.newArrayInitializer();
+		ai.expressions().addAll(ASTNode.copySubtrees(ast, returnAI.expressions()));
+		final ArrayCreation ac = ast.newArrayCreation();
+		ac.setType((ArrayType) toType(ast, typeBinding));
+		ac.setInitializer(ai);
+		final ReturnStatement rs = ast.newReturnStatement();
+		rs.setExpression(ac);
+		return rs;
+	}
+
+	private ASTNode getReturnStatement(Expression initializer) {
 		final ReturnStatement rs = this.ctx.getAST().newReturnStatement();
 		rs.setExpression(copySubtree(this.ctx.getAST(), initializer));
 		return rs;

@@ -174,6 +174,57 @@ public class ASTHelper {
 		throw new NotImplementedException("for fully qualified name \"" + fqn + "\"");
 	}
 
+	public static Type toType(final AST ast, final ITypeBinding typeBinding) {
+		if (typeBinding == null) {
+			return null;
+		} else if (typeBinding.isArray()) {
+			return ast.newArrayType(toType(ast, typeBinding.getComponentType()));
+		} else if (typeBinding.isPrimitive()) {
+			if (typeBinding.getName().equals("boolean")) {
+				return ast.newPrimitiveType(PrimitiveType.BOOLEAN);
+			} else if (typeBinding.getName().equals("byte")) {
+				return ast.newPrimitiveType(PrimitiveType.BYTE);
+			} else if (typeBinding.getName().equals("char")) {
+				return ast.newPrimitiveType(PrimitiveType.CHAR);
+			} else if (typeBinding.getName().equals("short")) {
+				return ast.newPrimitiveType(PrimitiveType.SHORT);
+			} else if (typeBinding.getName().equals("int")) {
+				return ast.newPrimitiveType(PrimitiveType.INT);
+			} else if (typeBinding.getName().equals("long")) {
+				return ast.newPrimitiveType(PrimitiveType.LONG);
+			} else if (typeBinding.getName().equals("float")) {
+				return ast.newPrimitiveType(PrimitiveType.FLOAT);
+			} else if (typeBinding.getName().equals("double")) {
+				return ast.newPrimitiveType(PrimitiveType.DOUBLE);
+			}
+		} else if (typeBinding.isClass() || typeBinding.isInterface()) {
+			final String[] qualifiedName = typeBinding.getQualifiedName().split("\\.");
+			if (qualifiedName.length == 0) {
+				throw new IllegalStateException("Cannot create a new type from an ITypeBinding without qualified name: " + typeBinding);
+			}
+			final SimpleType simpleType = ast.newSimpleType(ast.newSimpleName(qualifiedName[0]));
+			if (qualifiedName.length == 1) {
+				return simpleType;
+			}
+			Type result = simpleType;
+			for (int i = 1; i < qualifiedName.length; i++)
+			{
+				result = ast.newQualifiedType(result, ast.newSimpleName(qualifiedName[i]));
+			}
+			return result;
+		}
+		throw new NotImplementedException("Unknown type for typeBinding " + typeBinding.getQualifiedName()
+				+ ", isAnnotation()=" + typeBinding.isAnnotation()
+				+ ", isAnonymous()=" + typeBinding.isAnonymous()
+				+ ", isCapture()=" + typeBinding.isCapture()
+				+ ", isEnum()=" + typeBinding.isEnum()
+				+ ", isGenericType()=" + typeBinding.isGenericType()
+				+ ", isParameterizedType()=" + typeBinding.isParameterizedType()
+				+ ", isTypeVariable()=" + typeBinding.isTypeVariable()
+				+ ", isRawType()=" + typeBinding.isRawType()
+				+ ", isWildcardType()=" + typeBinding.isWildcardType());
+	}
+
 	// AST navigation
 
 	public static <T extends ASTNode> T getAncestor(ASTNode node,
@@ -201,8 +252,7 @@ public class ASTHelper {
 	}
 
 	/**
-	 * @return the next statement in the source file if it exists, null
-	 *         otherwise
+	 * @return the next statement in the source file if it exists, null otherwise
 	 */
 	public static Statement getNextStatement(Statement node) {
 		final Statement nextSibling = getNextSibling(node);
@@ -324,7 +374,7 @@ public class ASTHelper {
 		}
 		// a lot more heavy checks
 		// FIXME find a more efficient way to do this. It would be awesome
-		// if an API to directly find the overridenMethod IMethodBinding existed 
+		// if an API to directly find the overridenMethod IMethodBinding existed
 		IMethodBinding overridenMethod = findOverridenMethod(binding.getDeclaringClass(), typeQualifiedName,
 				methodName, parameterTypesQualifiedNames);
 		return overridenMethod != null && binding.overrides(overridenMethod);
@@ -375,7 +425,7 @@ public class ASTHelper {
 		}
 		return null;
 	}
-	
+
 	private static boolean typesMatch(ITypeBinding[] typeBindings,
 			String... typesQualifiedNames) {
 		if (typeBindings.length != typesQualifiedNames.length) {
@@ -394,8 +444,8 @@ public class ASTHelper {
 	 * Expression.
 	 *
 	 * @param node
-	 *            the expression for which to look at the type expected by the
-	 *            context
+	 *		the expression for which to look at the type expected by the
+	 *		context
 	 * @return the type expected by the context of the current node
 	 */
 	public static ITypeBinding resolveTypeBindingForcedFromContext(
