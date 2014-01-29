@@ -15,6 +15,32 @@
     <version>0.0.2-SNAPSHOT</version>
   </parent>
 
+<repositories>
+  <repository>
+    <id>orbit</id>
+    <url>http://download.eclipse.org/tools/orbit/downloads/drops/S20131206110810/repository/</url>
+    <layout>p2</layout>
+  </repository>
+</repositories>
+
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.11</version>
+    </dependency>
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-core</artifactId>
+      <version>1.8.4</version>
+    </dependency>
+    <dependency>
+      <groupId>org.assertj</groupId>
+      <artifactId>assertj-core</artifactId>
+      <version>1.5.0</version>
+    </dependency>
+  </dependencies>
+
   <build>
     <plugins>
       <plugin>
@@ -23,6 +49,7 @@
         <version>${tycho-version}</version>
         <!--configuration>
           <useUIHarness>true</useUIHarness>
+          <useUIThread>false</useUIThread>
         </configuration-->
       </plugin>
     </plugins>

@@ -163,8 +163,7 @@ public class CFGDotPrinter {
 					|| node instanceof IfStatement
 					|| node instanceof SwitchStatement
 					|| node instanceof MethodDeclaration) {
-				// such statements need their own subgraph to ease reading the
-				// CFG
+				// such statements need their own subgraph to ease reading the CFG
 				subGraph = new CFGSubGraph(ASTPrintHelper.codeExcerpt(node),
 						node.getStartPosition());
 				subGraphs.put(node, subGraph);
@@ -222,9 +221,8 @@ public class CFGDotPrinter {
 			if (block.isDecision()) {
 				sb.append(",shape=\"triangle\"");
 			}
-			sb.append("]; // ");
-			block.appendDotNodeSourcePosition(sb);
 			sb.append("];\n");
+			// block.appendDotNodeSourcePosition(sb);
 		}
 	}
 

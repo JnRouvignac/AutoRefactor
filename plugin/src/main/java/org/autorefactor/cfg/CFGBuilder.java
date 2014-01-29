@@ -365,6 +365,7 @@ public class CFGBuilder {
 			final LivenessState liveAfterBody = buildCFG(node.getBody(), LivenessState.of(liveEdge));
 			if (!liveAfterBody.liveEdges.isEmpty()) {
 				if (node.getReturnType2() == null
+						|| node.getReturnType2().resolveBinding() == null // added for unit tests
 						|| "void".equals(node.getReturnType2().resolveBinding().getName())) {
 					buildEdges(liveAfterBody, exitBlock);
 				} else {
@@ -423,13 +424,14 @@ public class CFGBuilder {
 		throw new NotImplementedException();
 	}
 
-	public CFGBasicBlock buildCFG(TypeDeclaration node) {
+	public List<CFGBasicBlock> buildCFG(TypeDeclaration node) {
 		if (!node.isInterface()) {
+			List<CFGBasicBlock> results = new LinkedList<CFGBasicBlock>();
 			for (FieldDeclaration fieldDecl : node.getFields()) {
 				buildCFG(fieldDecl);
 			}
 			for (MethodDeclaration methodDecl : node.getMethods()) {
-				buildCFG(methodDecl);
+				results.add(buildCFG(methodDecl));
 			}
 			for (TypeDeclaration typeDeclaration : node.getTypes()) {
 				buildCFG(typeDeclaration);
@@ -438,8 +440,9 @@ public class CFGBuilder {
 			// node.bodyDeclarations()) {
 			// buildCFG(bodyDeclaration);
 			// }
+			return results;
 		}
-		return null;
+		return Collections.emptyList();
 	}
 
 	public void buildCFG(TryStatement node) {
@@ -597,7 +600,7 @@ public class CFGBuilder {
 		List<CFGBasicBlock> results = new LinkedList<CFGBasicBlock>();
 		for (AbstractTypeDeclaration decl : (List<AbstractTypeDeclaration>) node.types()) {
 			if (decl instanceof TypeDeclaration) {
-				results.add(buildCFG((TypeDeclaration) decl));
+				results.addAll(buildCFG((TypeDeclaration) decl));
 			} else {
 				throw new NotImplementedException(node);
 			}
