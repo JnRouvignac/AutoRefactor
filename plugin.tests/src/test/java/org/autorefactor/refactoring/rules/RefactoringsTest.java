@@ -58,21 +58,21 @@ public class RefactoringsTest {
 	public static Collection<Object[]> data() {
 		return Arrays.asList(new Object[][] {
 				{ "AddBracketsToControlStatement" },
-				// { "BigDecimal" },
+				{ "BigDecimal" },
 				// { "Boolean" },
 				{ "CollapseIfStatement" },
 				{ "Comments" },
 				{ "CommonCodeInIfElseStatement" },
 				{ "DeadCodeElimination" },
 				{ "IfStatement" },
-				// { "InvertEquals" },
+				{ "InvertEquals" },
 				{ "PrimitiveWrapperCreation" },
-				// { "ReduceVariableScope" },
+				// { "ReduceVariableScope" }, // To be completed
 				{ "RemoveUnnecessaryLocalBeforeReturn" },
 				// { "RemoveUselessModifiers" },
 				// { "SimplifyExpression" },
 				{ "StringBuilder" },
-				// { "String" },
+				{ "String" },
 				// { "VectorOldToNewAPI" },
 		});
 	}
@@ -109,7 +109,7 @@ public class RefactoringsTest {
 		final String actual = normalize(
 				doc.get().replaceAll("samples_in", "samples_out"));
 		final String expected = normalize(sampleOutSource);
-		assertEquals(testName + ": refactored code did not match expected output", expected, actual);
+		assertEquals(testName + ": wrong output;", expected, actual);
 	}
 
 	private void autoRefactorHandler_ApplyRefactoring(Object... params) throws Exception {

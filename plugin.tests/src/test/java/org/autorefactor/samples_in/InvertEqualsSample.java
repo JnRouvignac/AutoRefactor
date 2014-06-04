@@ -40,6 +40,8 @@ public class InvertEqualsSample {
     public boolean invertEquals(Object obj) {
         return obj.equals("") && obj.equals(Itf.constant);
                 // && obj.equals(MyEnum.NOT_NULL) && obj.equals(Itf.enumConstant);
+                // should become:
+                // && MyEnum.NOT_NULL.equals(obj) && Itf.enumConstant.equals(obj);
     }
 
     public boolean doNotInvertEquals(Object obj) {

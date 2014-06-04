@@ -41,11 +41,11 @@ import static org.autorefactor.refactoring.ASTHelper.*;
  *
  * @author jnrouvignac
  */
-public class StringRefactorings extends ASTVisitor implements IJavaRefactoring {
+public class StringRefactoring extends ASTVisitor implements IJavaRefactoring {
 
 	private RefactoringContext ctx;
 
-	public StringRefactorings() {
+	public StringRefactoring() {
 		super();
 	}
 

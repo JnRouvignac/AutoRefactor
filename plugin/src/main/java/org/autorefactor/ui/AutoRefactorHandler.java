@@ -612,8 +612,8 @@ public class AutoRefactorHandler extends AbstractHandler {
 				new AddBracketsToControlStatementRefactoring(prefs.addAngleBracketsToStatementBodies()),
 				new InvertEqualsRefactoring(),
 				new SimplifyExpressionRefactoring(prefs.removeThisForNonStaticMethodAccess()),
-				new StringRefactorings(),
-				new BigDecimalRefactorings(),
+				new StringRefactoring(),
+				new BigDecimalRefactoring(),
 				// TODO JNR implement
 				// new ForeachRefactoring(),
 				new DeadCodeEliminationRefactoring(),

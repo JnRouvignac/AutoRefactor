@@ -44,13 +44,13 @@ import static org.autorefactor.refactoring.ASTHelper.*;
  * {@link BigDecimal#compareTo(BigDecimal)}</li>
  * </ul>
  */
-public class BigDecimalRefactorings extends ASTVisitor implements
+public class BigDecimalRefactoring extends ASTVisitor implements
 		IJavaRefactoring {
 
 	private RefactoringContext ctx;
 	private int javaMinorVersion;
 
-	public BigDecimalRefactorings() {
+	public BigDecimalRefactoring() {
 		super();
 	}
 
