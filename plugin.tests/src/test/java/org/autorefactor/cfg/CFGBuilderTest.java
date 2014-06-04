@@ -25,25 +25,20 @@
  */
 package org.autorefactor.cfg;
 
+import static org.autorefactor.cfg.test.TestUtils.*;
+import static org.junit.Assert.*;
+
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FilenameFilter;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
 
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.junit.Test;
-
-import static org.assertj.core.api.Assertions.*;
 
 public class CFGBuilderTest {
 
@@ -80,9 +75,8 @@ public class CFGBuilderTest {
 
 	public Collection<TestCase> collectTestCases() throws Exception {
 		final Map<String, TestCase> testCases = new HashMap<String, TestCase>();
-
-		final ClassLoader cl = getClass().getClassLoader();
-		final File cfgDir = new File(cl.getResource("org/autorefactor/cfg").toURI());
+		final File f = new File("src/test/java/");
+		final File cfgDir = new File(f, "org/autorefactor/cfg");
 		final File[] dotFiles = cfgDir.listFiles(new FileExtensionFilter(".dot"));
 		for (File dotFile : dotFiles) {
 			final String key = dotFile.getName().replace(".dot", "");
@@ -106,8 +100,6 @@ public class CFGBuilderTest {
 
 	@Test
 	public void testProut() throws Exception {
-		System.out.println(getClass().getName());
-		System.out.println("  +-- testProut()");
 		for (TestCase tc : collectTestCases()) {
 			System.out.println("    +-- " + tc.testName + ".java");
 			final String javaSource = readAll(tc.javaFile);
@@ -123,25 +115,8 @@ public class CFGBuilderTest {
 
 			dotSource = dotSource.replaceAll(tc.testName, "FakeClass").trim();
 			String actual = new CFGDotPrinter().toDot(blocks.get(0)).trim();
-			assertThat(actual).isEqualTo(dotSource);
+			assertEquals(dotSource, actual);
 		}
 	}
 
-	private String readAll(File file) throws IOException {
-		FileInputStream fis = null;
-		try {
-			fis = new FileInputStream(file);
-			final InputStreamReader reader = new InputStreamReader(fis);
-			final StringBuilder sb = new StringBuilder();
-			final char[] buf = new char[4096];
-			while (reader.read(buf) != -1) {
-				sb.append(buf);
-			}
-			return sb.toString();
-		} finally {
-			if (fis != null) {
-				fis.close();
-			}
-		}
-	}
 }
