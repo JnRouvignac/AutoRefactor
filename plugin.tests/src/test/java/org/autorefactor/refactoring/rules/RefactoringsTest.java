@@ -58,23 +58,38 @@ public class RefactoringsTest {
 	public static Collection<Object[]> data() {
 		return Arrays.asList(new Object[][] {
 				{ "AddBracketsToControlStatement" },
+				// { "BigDecimal" },
+				// { "Boolean" },
+				{ "CollapseIfStatement" },
+				{ "Comments" },
+				{ "CommonCodeInIfElseStatement" },
+				{ "DeadCodeElimination" },
+				{ "IfStatement" },
+				// { "InvertEquals" },
+				{ "PrimitiveWrapperCreation" },
+				// { "ReduceVariableScope" },
+				{ "RemoveUnnecessaryLocalBeforeReturn" },
+				// { "RemoveUselessModifiers" },
+				// { "SimplifyExpression" },
+				{ "StringBuilder" },
+				// { "String" },
+				// { "VectorOldToNewAPI" },
 		});
 	}
-	 
+
 	@Test
 	public void testRefactoring() throws Exception {
 		final String fileName = testName + "Sample.java";
 		final File samplesDir = new File("src/test/java/org/autorefactor");
 		final File sampleIn = new File(samplesDir, "samples_in/" + fileName);
-		assertNotNull("Missing sample in for test case " + testName, sampleIn);
-		assertTrue("Missing sample in for test case " + testName, sampleIn.exists());
+		assertTrue(testName + ": sample in file " + sampleIn + " should exist", sampleIn.exists());
 		final File sampleOut = new File(samplesDir, "samples_out/" + fileName);
-		assertNotNull("Missing sample out for test case " + testName, sampleOut);
-		assertTrue("Missing sample out for test case " + testName, sampleOut.exists());
+		assertTrue(testName + ": sample out file " + sampleOut + " should exist", sampleOut.exists());
 
+		final String refactoringClassname = testName + "Refactoring";
 		final AutoRefactorHandler handler = new AutoRefactorHandler();
-		final IRefactoring refactoring = getRefactoringClass(testName, handler);
-		assertNotNull("Missing refactoring for test case " + testName, refactoring);
+		final IRefactoring refactoring = getRefactoringClass(refactoringClassname, handler);
+		assertNotNull(testName + ": refactoring class " + refactoringClassname + " should exist", refactoring);
 
 		final String sampleInSource = readAll(sampleIn);
 		final String sampleOutSource = readAll(sampleOut);
@@ -94,7 +109,7 @@ public class RefactoringsTest {
 		final String actual = normalize(
 				doc.get().replaceAll("samples_in", "samples_out"));
 		final String expected = normalize(sampleOutSource);
-		assertEquals(testName, expected, actual);
+		assertEquals(testName + ": refactored code did not match expected output", expected, actual);
 	}
 
 	private void autoRefactorHandler_ApplyRefactoring(Object... params) throws Exception {
@@ -107,16 +122,15 @@ public class RefactoringsTest {
 		m.invoke(null, params);
 	}
 
-	private IRefactoring getRefactoringClass(String testName,
+	private IRefactoring getRefactoringClass(final String refactoringClassName,
 			final AutoRefactorHandler handler) throws Exception {
-		final String refactoringClassName = testName + "Refactoring";
 		Collection<IRefactoring> refactorings = getAllRefactorings(handler);
 		for (IRefactoring refactoring : refactorings) {
 			if (refactoring.getClass().getSimpleName().equals(refactoringClassName)) {
 				return refactoring;
 			}
 		}
-		throw new IllegalStateException("Could not find refactoring named " + refactoringClassName);
+		return null;
 	}
 
 	@SuppressWarnings("unchecked")
