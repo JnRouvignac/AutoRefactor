@@ -29,94 +29,58 @@ import static org.autorefactor.cfg.test.TestUtils.*;
 import static org.junit.Assert.*;
 
 import java.io.File;
-import java.io.FilenameFilter;
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 
+@RunWith(value = Parameterized.class)
 public class CFGBuilderTest {
 
-	private static final class TestCase {
+	private String testName;
 
-		private String testName;
-		private File dotFile;
-		private File javaFile;
-
-		public TestCase(String testName) {
-			this.testName = testName;
-		}
-
-		@Override
-		public String toString() {
-			return getClass().getSimpleName() + " testName=" + testName
-					+ ", dotFile=" + dotFile + ", javaFile=" + javaFile;
-		}
+	public CFGBuilderTest(String testName) {
+		this.testName = testName;
 	}
 
-	private static final class FileExtensionFilter implements FilenameFilter {
-
-		private String extension;
-
-		public FileExtensionFilter(String extension) {
-			this.extension = extension;
-		}
-
-		@Override
-		public boolean accept(File dir, String name) {
-			return name.endsWith(extension);
-		}
-	}
-
-	public Collection<TestCase> collectTestCases() throws Exception {
-		final Map<String, TestCase> testCases = new HashMap<String, TestCase>();
-		final File f = new File("src/test/java/");
-		final File cfgDir = new File(f, "org/autorefactor/cfg");
-		final File[] dotFiles = cfgDir.listFiles(new FileExtensionFilter(".dot"));
-		for (File dotFile : dotFiles) {
-			final String key = dotFile.getName().replace(".dot", "");
-			final TestCase tc = new TestCase(key);
-			tc.dotFile = dotFile;
-			testCases.put(key, tc);
-		}
-
-		final File javaDir = new File("src/test/java/org/autorefactor/cfg");
-		final File[] javaFiles = javaDir.listFiles(new FileExtensionFilter(".java"));
-		for (File javaFile : javaFiles) {
-			final String key = javaFile.getName().replace(".java", "");
-			final TestCase tc = testCases.get(key);
-			if (tc != null) {
-				tc.javaFile = javaFile;
-			}
-		}
-
-		return testCases.values();
+	@Parameters(name = "{index}: {0}")
+	public static Collection<Object[]> data() {
+		return Arrays.asList(new Object[][] {
+				{ "ForWithIfToEndLoopSample" },
+				{ "IfElseIfSample" },
+				{ "LabelsSample" },
+				{ "SwitchSample" },
+				// { "WhileLoopsSample" },
+		});
 	}
 
 	@Test
-	public void testProut() throws Exception {
-		for (TestCase tc : collectTestCases()) {
-			System.out.println("    +-- " + tc.testName + ".java");
-			final String javaSource = readAll(tc.javaFile);
-			String dotSource = readAll(tc.dotFile);
+	public void testCFGBuilder() throws Exception {
+		final File javaFile = new File("src/test/java/org/autorefactor/cfg", testName + ".java");
+		assertTrue(testName + ": sample in java file " + javaFile + " should exist", javaFile.exists());
+		final File dotFile = new File("src/test/resources/org/autorefactor/cfg", testName + ".dot");
+		assertTrue(testName + ": sample out dot file " + dotFile + " should exist", dotFile.exists());
 
-			final ASTParser parser = ASTParser.newParser(AST.JLS4);
-			parser.setSource(javaSource.toCharArray());
-			parser.setResolveBindings(true);
+		final String dotSource = readAll(dotFile).replaceAll(testName, "FakeClass").trim();
+		final String javaSource = readAll(javaFile);
 
-			final CompilationUnit astRoot = (CompilationUnit) parser.createAST(null);
-			final CFGBuilder builder = new CFGBuilder(javaSource, 4);
-			List<CFGBasicBlock> blocks = builder.buildCFG(astRoot);
+		final ASTParser parser = ASTParser.newParser(AST.JLS4);
+		parser.setSource(javaSource.toCharArray());
+		parser.setResolveBindings(true);
 
-			dotSource = dotSource.replaceAll(tc.testName, "FakeClass").trim();
-			String actual = new CFGDotPrinter().toDot(blocks.get(0)).trim();
-			assertEquals(dotSource, actual);
-		}
+		final CompilationUnit astRoot = (CompilationUnit) parser.createAST(null);
+		final CFGBuilder builder = new CFGBuilder(javaSource, 4);
+		final List<CFGBasicBlock> blocks = builder.buildCFG(astRoot);
+
+		final String actual = new CFGDotPrinter().toDot(blocks.get(0)).trim();
+		assertEquals(testName + ": wrong output;", dotSource, actual);
 	}
 
 }
