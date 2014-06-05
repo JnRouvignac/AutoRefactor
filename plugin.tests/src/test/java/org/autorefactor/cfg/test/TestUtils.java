@@ -16,8 +16,9 @@ public class TestUtils {
 			final InputStreamReader reader = new InputStreamReader(fis);
 			final StringBuilder sb = new StringBuilder();
 			final char[] buf = new char[4096];
-			while (reader.read(buf) != -1) {
-				sb.append(buf);
+			int nbRead;
+			while ((nbRead = reader.read(buf)) != -1) {
+				sb.append(buf, 0, nbRead);
 			}
 			return sb.toString();
 		} finally {

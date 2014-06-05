@@ -120,7 +120,6 @@ public class StringBuilderRefactoring extends ASTVisitor implements
 			Expression expr = allOperands.get(i);
 			boolean canNowRemoveEmptyStrings = canRemoveEmptyStrings || hasType(expr, "java.lang.String");
 			if (isEmptyString(expr)) {
-
 				boolean removeExpr = false;
 				if (canRemoveEmptyStrings) {
 					removeExpr = true;

@@ -59,7 +59,7 @@ public class RefactoringsTest {
 		return Arrays.asList(new Object[][] {
 				{ "AddBracketsToControlStatement" },
 				{ "BigDecimal" },
-				// { "Boolean" },
+				{ "Boolean" },
 				{ "CollapseIfStatement" },
 				{ "Comments" },
 				{ "CommonCodeInIfElseStatement" },
@@ -70,7 +70,7 @@ public class RefactoringsTest {
 				// { "ReduceVariableScope" }, // To be completed
 				{ "RemoveUnnecessaryLocalBeforeReturn" },
 				// { "RemoveUselessModifiers" },
-				// { "SimplifyExpression" },
+				{ "SimplifyExpression" },
 				{ "StringBuilder" },
 				{ "String" },
 				// { "VectorOldToNewAPI" },
@@ -79,11 +79,11 @@ public class RefactoringsTest {
 
 	@Test
 	public void testRefactoring() throws Exception {
-		final String fileName = testName + "Sample.java";
+		final String sampleName = testName + "Sample.java";
 		final File samplesDir = new File("src/test/java/org/autorefactor");
-		final File sampleIn = new File(samplesDir, "samples_in/" + fileName);
+		final File sampleIn = new File(samplesDir, "samples_in/" + sampleName);
 		assertTrue(testName + ": sample in file " + sampleIn + " should exist", sampleIn.exists());
-		final File sampleOut = new File(samplesDir, "samples_out/" + fileName);
+		final File sampleOut = new File(samplesDir, "samples_out/" + sampleName);
 		assertTrue(testName + ": sample out file " + sampleOut + " should exist", sampleOut.exists());
 
 		final String refactoringClassname = testName + "Refactoring";
@@ -96,7 +96,7 @@ public class RefactoringsTest {
 
 		final IPackageFragment packageFragment = JavaCoreHelper.getPackageFragment();
 		final ICompilationUnit cu = packageFragment.createCompilationUnit(
-				fileName, sampleInSource, true, null);
+				sampleName, sampleInSource, true, null);
 		cu.getBuffer().setContents(sampleInSource);
 		cu.save(null, true);
 
