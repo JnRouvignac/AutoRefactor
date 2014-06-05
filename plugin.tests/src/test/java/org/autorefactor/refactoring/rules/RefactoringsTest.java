@@ -69,7 +69,7 @@ public class RefactoringsTest {
 				{ "PrimitiveWrapperCreation" },
 				// { "ReduceVariableScope" }, // To be completed
 				{ "RemoveUnnecessaryLocalBeforeReturn" },
-				// { "RemoveUselessModifiers" },
+				{ "RemoveUselessModifiers" },
 				{ "SimplifyExpression" },
 				{ "StringBuilder" },
 				{ "String" },

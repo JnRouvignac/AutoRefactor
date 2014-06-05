@@ -68,6 +68,7 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
+import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
@@ -464,8 +465,7 @@ public class AutoRefactorHandler extends AbstractHandler {
 					throws JavaModelException {
 		// creation of DOM/AST from a ICompilationUnit
 		final ASTParser parser = ASTParser.newParser(AST.JLS4);
-		parser.setSource(compilationUnit);
-		parser.setResolveBindings(true);
+		resetParser(compilationUnit, parser, javaSERelease);
 
 		CompilationUnit astRoot = (CompilationUnit) parser.createAST(null);
 
@@ -525,8 +525,7 @@ public class AutoRefactorHandler extends AbstractHandler {
 				// FIXME we should find a way to apply all the changes at
 				// the AST level only (transactional-like feature) and
 				// refresh the bindings
-				parser.setSource(compilationUnit);
-				parser.setResolveBindings(true);
+				resetParser(compilationUnit, parser, javaSERelease);
 				astRoot = (CompilationUnit) parser.createAST(null);
 				++totalNbLoops;
 
@@ -543,6 +542,20 @@ public class AutoRefactorHandler extends AbstractHandler {
 				throw new RuntimeException("Unexpected exception", e);
 			}
 		}
+	}
+
+	private static void resetParser(ICompilationUnit compilationUnit,
+			ASTParser parser, Release javaSERelease) {
+		parser.setSource(compilationUnit);
+		parser.setResolveBindings(true);
+		parser.setCompilerOptions(getCompilerOptions(javaSERelease));
+	}
+
+	private static Map<String, String> getCompilerOptions(Release javaSERelease) {
+		final Map<String, String> options = JavaCore.getOptions();
+		final String v = javaSERelease.getMajorVersion() + "."+ javaSERelease.getMinorVersion();
+		JavaCore.setComplianceOptions(v, options);
+		return options;
 	}
 
 	private static String getPossibleCulprits(int nbLoopsWithSameVisitors,
