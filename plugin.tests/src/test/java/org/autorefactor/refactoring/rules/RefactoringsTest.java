@@ -73,7 +73,7 @@ public class RefactoringsTest {
 				{ "SimplifyExpression" },
 				{ "StringBuilder" },
 				{ "String" },
-				// { "VectorOldToNewAPI" },
+				{ "VectorOldToNewAPI" },
 		});
 	}
 

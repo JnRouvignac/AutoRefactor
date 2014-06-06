@@ -27,8 +27,10 @@ package org.autorefactor.refactoring;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.autorefactor.util.NotImplementedException;
@@ -308,43 +310,51 @@ public class ASTHelper {
 	}
 
 	public static boolean instanceOf(ITypeBinding typeBinding, String qualifiedTypeName) {
-		if (typeBinding == null) {
-			return false;
-		}
-		if (qualifiedTypeName.equals(typeBinding.getQualifiedName())) {
-			return true;
-		}
-		final Set<String> visitedClasses = new HashSet<String>();
-		visitedClasses.add(typeBinding.getErasure().getQualifiedName());
-		return instanceOf(typeBinding, qualifiedTypeName, visitedClasses);
+		return findImplementedType(typeBinding, qualifiedTypeName) != null;
 	}
 
-	private static boolean instanceOf(ITypeBinding typeBinding,
+	public static ITypeBinding findImplementedType(ITypeBinding typeBinding, String qualifiedTypeName) {
+		if (typeBinding == null) {
+			return null;
+		}
+		final ITypeBinding typeErasure = typeBinding.getErasure();
+		if (qualifiedTypeName.equals(typeBinding.getQualifiedName())
+				|| qualifiedTypeName.equals(typeErasure.getQualifiedName())) {
+			return typeBinding;
+		}
+		final Set<String> visitedClasses = new HashSet<String>();
+		visitedClasses.add(typeErasure.getQualifiedName());
+		return findImplementedType(typeBinding, qualifiedTypeName, visitedClasses);
+	}
+
+	private static ITypeBinding findImplementedType(ITypeBinding typeBinding,
 			String qualifiedTypeName, Set<String> visitedInterfaces) {
 		final ITypeBinding superclass = typeBinding.getSuperclass();
 		if (superclass != null) {
-			final String superClassQualifiedName = superclass.getErasure()
-					.getQualifiedName();
+			final String superClassQualifiedName = superclass.getErasure().getQualifiedName();
 			if (qualifiedTypeName.equals(superClassQualifiedName)) {
-				return true;
+				return superclass;
 			}
 			visitedInterfaces.add(superClassQualifiedName);
-			if (instanceOf(superclass, qualifiedTypeName, visitedInterfaces)) {
-				return true;
+			final ITypeBinding implementedType =
+					findImplementedType(superclass, qualifiedTypeName, visitedInterfaces);
+			if (implementedType != null) {
+				return implementedType;
 			}
 		}
 		for (ITypeBinding itfBinding : typeBinding.getInterfaces()) {
-			final String itfQualifiedName = itfBinding.getErasure()
-					.getQualifiedName();
+			final String itfQualifiedName = itfBinding.getErasure().getQualifiedName();
 			if (qualifiedTypeName.equals(itfQualifiedName)) {
-				return true;
+				return itfBinding;
 			}
 			visitedInterfaces.add(itfQualifiedName);
-			if (instanceOf(itfBinding, qualifiedTypeName, visitedInterfaces)) {
-				return true;
+			final ITypeBinding implementedType =
+					findImplementedType(itfBinding, qualifiedTypeName, visitedInterfaces);
+			if (implementedType != null) {
+				return implementedType;
 			}
 		}
-		return false;
+		return null;
 	}
 
 	public static boolean isLoop(ASTNode node) {
@@ -368,16 +378,89 @@ public class ASTHelper {
 			return false;
 		}
 		// ok more heavy checks now
-		if (instanceOf(binding.getDeclaringClass().getErasure(), typeQualifiedName)
-				&& typesMatch(binding.getParameterTypes(), parameterTypesQualifiedNames)) {
+		final ITypeBinding declaringClazz = binding.getDeclaringClass();
+		final ITypeBinding implementedType =
+				findImplementedType(declaringClazz, typeQualifiedName);
+		if (parameterTypesMatch(implementedType, binding, parameterTypesQualifiedNames)) {
 			return true;
 		}
 		// a lot more heavy checks
 		// FIXME find a more efficient way to do this. It would be awesome
 		// if an API to directly find the overridenMethod IMethodBinding existed
-		IMethodBinding overridenMethod = findOverridenMethod(binding.getDeclaringClass(), typeQualifiedName,
+		IMethodBinding overridenMethod = findOverridenMethod(declaringClazz, typeQualifiedName,
 				methodName, parameterTypesQualifiedNames);
 		return overridenMethod != null && binding.overrides(overridenMethod);
+	}
+
+	private static boolean parameterTypesMatch(ITypeBinding implementedType,
+			IMethodBinding methodBinding, String[] parameterTypesQualifiedNames) {
+		if (implementedType != null) {
+			final ITypeBinding erasure = implementedType.getErasure();
+			if (erasure.isGenericType() || erasure.isParameterizedType()) {
+				return parameterizedTypesMatch(implementedType, erasure, methodBinding);
+			}
+		}
+		return concreteTypesMatch(methodBinding.getParameterTypes(), parameterTypesQualifiedNames);
+	}
+
+	private static boolean concreteTypesMatch(ITypeBinding[] typeBindings,
+			String... typesQualifiedNames) {
+		if (typeBindings.length != typesQualifiedNames.length) {
+			return false;
+		}
+		for (int i = 0; i < typesQualifiedNames.length; i++) {
+			if (!typesQualifiedNames[i].equals(typeBindings[i].getQualifiedName())) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	private static boolean parameterizedTypesMatch(final ITypeBinding clazz,
+			final ITypeBinding clazzErasure, IMethodBinding methodBinding) {
+		if (clazz.isParameterizedType() && !clazz.equals(clazzErasure)) {
+			final Map<ITypeBinding, ITypeBinding> genericToConcreteTypeParams =
+					getGenericToConcreteTypeParamsMap(clazz, clazzErasure);
+			for (IMethodBinding declaredMethod : clazzErasure.getDeclaredMethods()) {
+				if (declaredMethod.getName().equals(methodBinding.getName())
+						&& parameterizedTypesMatch2(genericToConcreteTypeParams, methodBinding, declaredMethod)) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	private static Map<ITypeBinding, ITypeBinding> getGenericToConcreteTypeParamsMap(
+			final ITypeBinding clazz, final ITypeBinding clazzErasure) {
+		final ITypeBinding[] typeParams = clazz.getTypeArguments();
+		final ITypeBinding[] genericTypeParams = clazzErasure.getTypeParameters();
+		final Map<ITypeBinding, ITypeBinding> results = new HashMap<ITypeBinding, ITypeBinding>();
+		for (int i = 0; i < typeParams.length; i++) {
+			results.put(genericTypeParams[i], typeParams[i]);
+		}
+		return results;
+	}
+
+	private static boolean parameterizedTypesMatch2(
+			Map<ITypeBinding, ITypeBinding> genericToConcreteTypeParams,
+			IMethodBinding parameterizedMethod, IMethodBinding genericMethod) {
+		final ITypeBinding[] paramTypes = parameterizedMethod.getParameterTypes();
+		final ITypeBinding[] genericParamTypes = genericMethod.getParameterTypes();
+		if (paramTypes.length != genericParamTypes.length) {
+			return false;
+		}
+		for (int i = 0; i < genericParamTypes.length; i++) {
+			ITypeBinding genericParamType = genericParamTypes[i];
+			ITypeBinding concreteParamType = genericToConcreteTypeParams.get(genericParamType);
+			if (concreteParamType == null) {
+				concreteParamType = genericParamType;
+			}
+			if (!paramTypes[i].equals(concreteParamType)){
+				return false;
+			}
+		}
+		return true;
 	}
 
 	private static IMethodBinding findOverridenMethod(ITypeBinding typeBinding, String typeQualifiedName,
@@ -418,25 +501,12 @@ public class ASTHelper {
 			IMethodBinding[] declaredMethods) {
 		for (IMethodBinding methodBinding : declaredMethods) {
 			if (methodBinding.getName().equals(methodName)
-					&& typesMatch(methodBinding.getMethodDeclaration()
+					&& concreteTypesMatch(methodBinding.getMethodDeclaration()
 						.getParameterTypes(), parameterTypesQualifiedNames)) {
 				return methodBinding;
 			}
 		}
 		return null;
-	}
-
-	private static boolean typesMatch(ITypeBinding[] typeBindings,
-			String... typesQualifiedNames) {
-		if (typeBindings.length != typesQualifiedNames.length) {
-			return false;
-		}
-		for (int i = 0; i < typesQualifiedNames.length; i++) {
-			if (!typesQualifiedNames[i].equals(typeBindings[i].getErasure().getQualifiedName())) {
-				return false;
-			}
-		}
-		return true;
 	}
 
 	/**
