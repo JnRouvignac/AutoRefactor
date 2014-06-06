@@ -15,13 +15,13 @@
     <version>0.0.2-SNAPSHOT</version>
   </parent>
 
-<repositories>
-  <repository>
-    <id>orbit</id>
-    <url>http://download.eclipse.org/tools/orbit/downloads/drops/S20131206110810/repository/</url>
-    <layout>p2</layout>
-  </repository>
-</repositories>
+  <repositories>
+    <repository>
+      <id>orbit</id>
+      <url>http://download.eclipse.org/tools/orbit/downloads/drops/R20130827064939/repository/</url>
+      <layout>p2</layout>
+    </repository>
+  </repositories>
 
   <dependencies>
     <dependency>
