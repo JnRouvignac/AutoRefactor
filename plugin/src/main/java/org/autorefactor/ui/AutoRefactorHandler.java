@@ -30,14 +30,12 @@ import static org.eclipse.jdt.core.formatter.DefaultCodeFormatterConstants.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.TreeMap;
 
 import org.autorefactor.AutoRefactorPlugin;
 import org.autorefactor.refactoring.ASTCommentRewriter;
@@ -81,8 +79,6 @@ import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.LineComment;
 import org.eclipse.jdt.core.dom.rewrite.ASTRewrite;
 import org.eclipse.jdt.core.dom.rewrite.ListRewrite;
-import org.eclipse.jdt.internal.core.ExternalPackageFragmentRoot;
-import org.eclipse.jdt.internal.core.JarPackageFragmentRoot;
 import org.eclipse.jdt.ui.JavaUI;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.text.IDocument;
@@ -167,150 +163,9 @@ public class AutoRefactorHandler extends AbstractHandler {
 				throw new UnhandledException(e);
 			}
 		}
-
-		private void testWithSamples() {
-			try {
-				final IJavaProject javaProject = getIJavaProject(getSelectedJavaElement(event));
-				final Map<String, String> options = getJavaProjectOptions(javaProject);
-				final String javaSourceCompatibility = options.get(COMPILER_SOURCE);
-				final int tabSize = getTabSize(options);
-				final Release javaSERelease = Release.javaSE(javaSourceCompatibility);
-				for (IPackageFragmentRoot packageFragmentRoot : javaProject
-						.getPackageFragmentRoots()) {
-					if (packageFragmentRoot instanceof JarPackageFragmentRoot
-							|| packageFragmentRoot instanceof ExternalPackageFragmentRoot) {
-						continue;
-					}
-
-					String samplesInPkg = "org.autorefactor.samples_in";
-					String samplesOutPkg = "org.autorefactor.samples_out";
-					final List<ICompilationUnit> samplesIn = getSamples(
-							packageFragmentRoot, samplesInPkg);
-					final List<ICompilationUnit> samplesOut = getSamples(
-							packageFragmentRoot, samplesOutPkg);
-
-					Collection<TestCase> testCases = buildTestCases(samplesIn, samplesOut);
-					runTests(testCases, samplesInPkg, samplesOutPkg,
-							javaSERelease, tabSize);
-				}
-			} catch (Exception e) {
-				throw new RuntimeException("Unexpected exception", e);
-			}
-		}
-
-		private void runTests(Collection<TestCase> testCases,
-				String samplesInPkg, String samplesOutPkg,
-				final Release javaSERelease, int tabSize) throws Exception {
-			boolean success = true;
-			final StringBuilder result = new StringBuilder();
-
-			for (TestCase testCase : testCases) {
-				result.append(testCase.sampleName).append(".java: ");
-
-				if (testCase.refactoring == null
-						|| testCase.sampleIn == null
-						|| testCase.sampleOut == null) {
-					result.append("MISSING ");
-					if (testCase.sampleIn == null || testCase.sampleOut == null) {
-						result.append(testCase.getINAndOUT(false));
-						if (testCase.refactoring == null) {
-							result.append(" and Refactoring");
-						}
-					} else if (testCase.refactoring == null) {
-						result.append("Refactoring");
-					}
-					result.append("\n");
-					success = false;
-					continue;
-				}
-
-				AggregateASTVisitor v = new AggregateASTVisitor(testCase.refactoring);
-				applyRefactoring(testCase.sampleIn, javaSERelease, tabSize, v);
-
-				// Change the package to be the same as the sampleOut
-				// ignore insignificant space characters
-				// harmonize the resulting style too
-				String actualSource = testCase.sampleIn.getSource()
-						.replaceAll(samplesInPkg, samplesOutPkg)
-						.replaceAll("\\s\\s+", "\n")
-						.replaceAll("\\)(\\r\\n|\\r|\\n)\\{", ") {")
-						.replaceAll("else(\\r\\n|\\r|\\n)\\{", "else {")
-						.replaceAll("}(\\r\\n|\\r|\\n)else", "} else");
-				String expectedSource = testCase.sampleOut.getSource()
-						.replaceAll("\\s\\s+", "\n");
-				if (actualSource.equals(expectedSource)) {
-					result.append("Success\n");
-				} else {
-					result.append("FAILURE\n");
-					success = false;
-				}
-			}
-
-			// TODO JNR run this with Display.getCurrent().asyncExec()
-			final Shell shell = HandlerUtil.getActiveShell(event);
-			if (success) {
-				MessageDialog.openInformation(shell, "Tests Success!!", result.toString());
-			} else {
-				MessageDialog.openError(shell, "Tests ERROR", result.toString());
-			}
-		}
-
-		private Collection<TestCase> buildTestCases(
-				final List<ICompilationUnit> samplesIn,
-				final List<ICompilationUnit> samplesOut) {
-			Map<String, TestCase> testCases = new TreeMap<String, TestCase>();
-			for (ICompilationUnit sampleIn : samplesIn) {
-				final String sampleName = getSampleName(sampleIn);
-				TestCase testCase = getTestCase(testCases, sampleName);
-				testCase.sampleIn = sampleIn;
-			}
-			for (ICompilationUnit sampleOut : samplesOut) {
-				final String sampleName = getSampleName(sampleOut);
-				TestCase testCase = getTestCase(testCases, sampleName);
-				testCase.sampleOut = sampleOut;
-			}
-			for (IRefactoring refactoring : getAllRefactorings()) {
-				String name = refactoring.getClass().getSimpleName();
-				String sampleName = name.substring(0, name.indexOf("Refactoring")) + "Sample";
-				TestCase testCase = getTestCase(testCases, sampleName);
-				testCase.refactoring = refactoring;
-			}
-			return testCases.values();
-		}
-
-		private TestCase getTestCase(Map<String, TestCase> testContexts,
-				String sampleName) {
-			TestCase testCase = testContexts.get(sampleName);
-			if (testCase == null) {
-				testCase = new TestCase(sampleName);
-				testContexts.put(sampleName, testCase);
-			}
-			return testCase;
-		}
-
-		private String getSampleName(ICompilationUnit compilationUnit) {
-			final String elementName = compilationUnit.getElementName();
-			return elementName.substring(0, elementName.indexOf('.'));
-		}
-
-		private List<ICompilationUnit> getSamples(
-				IPackageFragmentRoot packageFragmentRoot, String packageName) {
-			final IPackageFragment packag = packageFragmentRoot
-					.getPackageFragment(packageName);
-			if (packag != null) {
-				return collectCompilationUnits(packag);
-			}
-			return Collections.emptyList();
-		}
 	}
 
 	public Object execute(final ExecutionEvent event) throws ExecutionException {
-		boolean useTests = false; // local variable helps switching while debugging
-		if (useTests) {
-			new ApplyRefactoringsJob(event).testWithSamples();
-			return Status.OK_STATUS;
-		}
-
 		// TODO JNR keep track of the job so it can be cancelled by the plugin on workspace exit
 		new ApplyRefactoringsJob(event).run(null);
 
