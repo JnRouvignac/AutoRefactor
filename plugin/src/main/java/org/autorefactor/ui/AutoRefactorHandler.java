@@ -499,7 +499,8 @@ public class AutoRefactorHandler extends AbstractHandler {
 				new StringBuilderRefactoring(),
 				new CommentsRefactoring(),
 				new RemoveUnnecessaryLocalBeforeReturnRefactoring(),
-				new RemoveUselessModifiersRefactoring()));
+				new RemoveUselessModifiersRefactoring(),
+				new HotSpotIntrinsicedAPIsRefactoring()));
 	}
 
 }

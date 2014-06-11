@@ -64,6 +64,7 @@ public class RefactoringsTest {
 				{ "Comments" },
 				{ "CommonCodeInIfElseStatement" },
 				{ "DeadCodeElimination" },
+				{ "HotSpotIntrinsicedAPIs" },
 				{ "IfStatement" },
 				{ "InvertEquals" },
 				{ "PrimitiveWrapperCreation" },

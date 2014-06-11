@@ -313,6 +313,18 @@ public class ASTHelper {
 		return findImplementedType(typeBinding, qualifiedTypeName) != null;
 	}
 
+	public static boolean isPrimitive(Expression expr, String primitiveName) {
+		if (expr == null) {
+			return false;
+		}
+		return isPrimitive(expr.resolveTypeBinding(), primitiveName);
+	}
+
+	public static boolean isPrimitive(ITypeBinding typeBinding, String primitiveName) {
+		return typeBinding != null
+				&& typeBinding.getQualifiedName().equals(primitiveName);
+	}
+
 	public static ITypeBinding findImplementedType(ITypeBinding typeBinding, String qualifiedTypeName) {
 		if (typeBinding == null) {
 			return null;
