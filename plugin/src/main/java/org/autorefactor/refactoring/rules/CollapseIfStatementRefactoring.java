@@ -25,12 +25,13 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.IJavaRefactoring;
 import org.autorefactor.refactoring.Refactorings;
 import org.eclipse.jdt.core.dom.*;
-import org.eclipse.jdt.core.dom.InfixExpression.Operator;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
+import static org.eclipse.jdt.core.dom.InfixExpression.Operator.*;
 
 /**
  * Collapses two consecutive if statements into just one.
@@ -65,18 +66,17 @@ public class CollapseIfStatementRefactoring extends ASTVisitor implements
 			return VISIT_SUBTREE;
 		}
 
-		final AST ast = this.ctx.getAST();
-		final Expression leftOperand = copySubtree(ast, outerIf.getExpression());
-		final Expression rightOperand = copySubtree(ast, innerIf.getExpression());
+		final ASTBuilder b = this.ctx.getASTBuilder();
+		final Expression leftOperand = b.copyExpr(outerIf.getExpression());
+		final Expression rightOperand = b.copyExpr(innerIf.getExpression());
 
-		final InfixExpression ie = ast.newInfixExpression();
-		ie.setLeftOperand(parenthesizeInfixExpr(leftOperand));
-		ie.setOperator(Operator.CONDITIONAL_AND);
-		ie.setRightOperand(parenthesizeInfixExpr(rightOperand));
+		final InfixExpression ie = b.infixExpr(
+		    parenthesizeInfixExpr(leftOperand),
+		    CONDITIONAL_AND,
+		    parenthesizeInfixExpr(rightOperand));
 
-		final IfStatement is = ast.newIfStatement();
-		is.setExpression(ie);
-		is.setThenStatement(copySubtree(ast, innerIf.getThenStatement()));
+		final IfStatement is = b.if0(ie,
+		    b.copyStmt(innerIf.getThenStatement()));
 		this.ctx.getRefactorings().replace(outerIf, is);
 		return DO_NOT_VISIT_SUBTREE;
 	}
@@ -84,12 +84,8 @@ public class CollapseIfStatementRefactoring extends ASTVisitor implements
 	private Expression parenthesizeInfixExpr(Expression expr) {
 		if (expr instanceof InfixExpression) {
 			final InfixExpression ie = (InfixExpression) expr;
-			if (InfixExpression.Operator.CONDITIONAL_OR
-					.equals(ie.getOperator())) {
-				final ParenthesizedExpression pe = this.ctx.getAST()
-						.newParenthesizedExpression();
-				pe.setExpression(ie);
-				return pe;
+			if (CONDITIONAL_OR.equals(ie.getOperator())) {
+				return this.ctx.getASTBuilder().parenthesize(ie);
 			}
 		}
 		return expr;

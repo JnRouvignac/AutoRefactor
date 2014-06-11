@@ -27,6 +27,7 @@ package org.autorefactor.refactoring.rules;
 
 import java.util.List;
 
+import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.IJavaRefactoring;
 import org.autorefactor.refactoring.Refactorings;
 import org.eclipse.jdt.core.dom.*;
@@ -142,12 +143,8 @@ public class PrimitiveWrapperCreationRefactoring extends ASTVisitor implements
 
 	private MethodInvocation newMethodInvocation(String typeName,
 			String methodName, Expression arg) {
-		final AST ast = this.ctx.getAST();
-		final MethodInvocation mi = ast.newMethodInvocation();
-		mi.setExpression(ast.newSimpleName(typeName));
-		mi.setName(ast.newSimpleName(methodName));
-		mi.arguments().add(copySubtree(ast, arg));
-		return mi;
+		final ASTBuilder b = this.ctx.getASTBuilder();
+		return b.invoke(typeName, methodName, b.copyExpr(arg));
 	}
 
 	public Refactorings getRefactorings(CompilationUnit astRoot) {

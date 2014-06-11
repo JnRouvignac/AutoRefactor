@@ -25,6 +25,7 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.Refactorings;
 import org.autorefactor.refactoring.Release;
 import org.eclipse.jdt.core.ICompilationUnit;
@@ -49,6 +50,10 @@ public class RefactoringContext {
 
 	public AST getAST() {
 		return ast;
+	}
+
+	public ASTBuilder getASTBuilder() {
+		return new ASTBuilder(ast);
 	}
 
 	public ICompilationUnit getCompilationUnit() {

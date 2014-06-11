@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.ASTHelper;
 import org.autorefactor.refactoring.IJavaRefactoring;
 import org.autorefactor.refactoring.Refactorings;
@@ -67,6 +68,8 @@ public class CommonCodeInIfElseStatementRefactoring extends ASTVisitor
 			return VISIT_SUBTREE;
 		}
 
+		final ASTBuilder b = this.ctx.getASTBuilder();
+
 		final List<List<Statement>> allCasesStmts = new ArrayList<List<Statement>>();
 		final List<List<ASTNode>> removedCaseStmts = new LinkedList<List<ASTNode>>();
 
@@ -81,16 +84,14 @@ public class CommonCodeInIfElseStatementRefactoring extends ASTVisitor
 			final int minSize = minSize(allCasesStmts);
 			final List<Statement> caseStmts = allCasesStmts.get(0);
 
-			// identify matching statements starting from the beginning of each
-			// case
+			// identify matching statements starting from the beginning of each case
 			for (int stmtIndex = 0; stmtIndex < minSize; stmtIndex++) {
 				if (!match(matcher, allCasesStmts, true, stmtIndex, 0,
 						allCasesStmts.size())) {
 					break;
 				}
 				this.ctx.getRefactorings().insertBefore(
-						copySubtree(this.ctx.getAST(),
-								caseStmts.get(stmtIndex)), node);
+						b.copyStmt(caseStmts.get(stmtIndex)), node);
 				removeStmts(allCasesStmts, true, stmtIndex, removedCaseStmts);
 			}
 
@@ -103,8 +104,7 @@ public class CommonCodeInIfElseStatementRefactoring extends ASTVisitor
 					break;
 				}
 				this.ctx.getRefactorings().insertAfter(
-						copySubtree(this.ctx.getAST(),
-								caseStmts.get(caseStmts.size() - stmtIndex)),
+						b.copyStmt(caseStmts.get(caseStmts.size() - stmtIndex)),
 						node);
 				removeStmts(allCasesStmts, false, stmtIndex, removedCaseStmts);
 			}
@@ -129,7 +129,7 @@ public class CommonCodeInIfElseStatementRefactoring extends ASTVisitor
 				if (areCasesEmpty.get(0)) {
 					// TODO JNR then clause is empty => revert if statement
 					this.ctx.getRefactorings().replace(node.getThenStatement(),
-							this.ctx.getAST().newBlock());
+							b.body());
 				}
 				for (int i = 1; i < areCasesEmpty.size(); i++) {
 					if (areCasesEmpty.get(i)) {

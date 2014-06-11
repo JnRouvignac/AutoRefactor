@@ -25,6 +25,7 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.IJavaRefactoring;
 import org.autorefactor.refactoring.Refactorings;
 import org.eclipse.jdt.core.dom.*;
@@ -105,8 +106,8 @@ public class AddBracketsToControlStatementRefactoring extends ASTVisitor
 		if (!this.addAngleBracketsToStatementBodies || statement == null) {
 			return VISIT_SUBTREE;
 		}
-		final Block block = this.ctx.getAST().newBlock();
-		block.statements().add(copySubtree(this.ctx.getAST(), statement));
+		final ASTBuilder b = this.ctx.getASTBuilder();
+		final Block block = b.body(b.copyStmt(statement));
 		block.accept(this);
 		this.ctx.getRefactorings().replace(statement, block);
 		return DO_NOT_VISIT_SUBTREE;

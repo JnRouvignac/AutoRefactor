@@ -25,6 +25,7 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.IJavaRefactoring;
 import org.autorefactor.refactoring.Refactorings;
 import org.eclipse.jdt.core.dom.*;
@@ -78,12 +79,8 @@ public class InvertEqualsRefactoring extends ASTVisitor implements
 
 	private ASTNode invertEqualsInvocation(Expression lhs, Expression rhs, boolean isEquals) {
 		final String methodName = isEquals ? "equals" : "equalsIgnoreCase";
-		final AST ast = this.ctx.getAST();
-		final MethodInvocation mi = ast.newMethodInvocation();
-		mi.setExpression(copySubtree(ast, rhs));
-		mi.setName(ast.newSimpleName(methodName));
-		mi.arguments().add(copySubtree(ast, lhs));
-		return mi;
+		final ASTBuilder b = this.ctx.getASTBuilder();
+		return b.invoke(b.copyExpr(rhs), methodName, b.copyExpr(lhs));
 	}
 
 	public Refactorings getRefactorings(CompilationUnit astRoot) {

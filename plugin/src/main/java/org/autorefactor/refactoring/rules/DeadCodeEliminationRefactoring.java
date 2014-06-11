@@ -27,6 +27,7 @@ package org.autorefactor.refactoring.rules;
 
 import java.util.List;
 
+import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.IJavaRefactoring;
 import org.autorefactor.refactoring.Refactorings;
 import org.eclipse.jdt.core.dom.*;
@@ -80,13 +81,12 @@ public class DeadCodeEliminationRefactoring extends ASTVisitor implements
 	public boolean visit(IfStatement node) {
 		final Object constantCondition =
 				node.getExpression().resolveConstantExpressionValue();
+		final ASTBuilder b = this.ctx.getASTBuilder();
 		if (Boolean.TRUE.equals(constantCondition)) {
-			this.ctx.getRefactorings().replace(node, copySubtree(this.ctx.getAST(), node
-					.getThenStatement()));
+			this.ctx.getRefactorings().replace(node, b.copyStmt(node.getThenStatement()));
 			return DO_NOT_VISIT_SUBTREE;
 		} else if (Boolean.FALSE.equals(constantCondition)) {
-			this.ctx.getRefactorings().replace(node, copySubtree(this.ctx.getAST(), node
-					.getElseStatement()));
+			this.ctx.getRefactorings().replace(node, b.copyStmt(node.getElseStatement()));
 			return DO_NOT_VISIT_SUBTREE;
 		}
 		return VISIT_SUBTREE;

@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.ASTHelper;
 import org.autorefactor.refactoring.IJavaRefactoring;
 import org.autorefactor.refactoring.Refactorings;
@@ -283,25 +284,20 @@ public class BooleanRefactoring extends ASTVisitor implements IJavaRefactoring {
 	private ReturnStatement getReturnStatement(IfStatement node,
 			final Boolean thenBool, final Boolean elseBool,
 			final Expression thenExpr, final Expression elseExpr) {
-		final Expression copiedIfCondition = copySubtree(node.getExpression());
+		final ASTBuilder b = this.ctx.getASTBuilder();
+		final Expression copiedIfCondition = b.copyExpr(node.getExpression());
 		if (thenBool == null && elseBool != null) {
-			final InfixExpression ie = this.ctx.getAST().newInfixExpression();
-			ie.setLeftOperand(copiedIfCondition);
-			ie.setOperator(getConditionalOperator(!elseBool.booleanValue()));
-			ie.setRightOperand(copySubtree(thenExpr));
-
-			final ReturnStatement rs = this.ctx.getAST().newReturnStatement();
-			rs.setExpression(getBooleanExpression(ie, !elseBool.booleanValue()));
-			return rs;
+			final InfixExpression ie = b.infixExpr(
+					copiedIfCondition,
+					getConditionalOperator(!elseBool.booleanValue()),
+					b.copyExpr(thenExpr));
+			return b.return0(getBooleanExpression(ie, !elseBool.booleanValue()));
 		} else if (thenBool != null && elseBool == null) {
-			final InfixExpression ie = this.ctx.getAST().newInfixExpression();
-			ie.setLeftOperand(copiedIfCondition);
-			ie.setOperator(getConditionalOperator(!thenBool.booleanValue()));
-			ie.setRightOperand(copySubtree(elseExpr));
-
-			final ReturnStatement rs = this.ctx.getAST().newReturnStatement();
-			rs.setExpression(getBooleanExpression(ie, thenBool.booleanValue()));
-			return rs;
+			final InfixExpression ie = b.infixExpr(
+					copiedIfCondition,
+					getConditionalOperator(!thenBool.booleanValue()),
+					b.copyExpr(elseExpr));
+			return b.return0(getBooleanExpression(ie, thenBool.booleanValue()));
 		}
 		return null;
 	}
@@ -351,9 +347,7 @@ public class BooleanRefactoring extends ASTVisitor implements IJavaRefactoring {
 			if (returnExpr == null) {
 				return null;
 			}
-			final ReturnStatement rs = this.ctx.getAST().newReturnStatement();
-			rs.setExpression(returnExpr);
-			return rs;
+			return this.ctx.getASTBuilder().return0(returnExpr);
 		}
 		return null;
 	}
@@ -407,20 +401,17 @@ public class BooleanRefactoring extends ASTVisitor implements IJavaRefactoring {
 			return ifCondition;
 		} else if (javaMinorVersion >= 4
 				&& "java.lang.Boolean".equals(expressionTypeName)) {
-			final MethodInvocation mi = this.ctx.getAST().newMethodInvocation();
-			mi.setExpression(booleanName);
-			mi.setName(this.ctx.getAST().newSimpleName("valueOf"));
-			mi.arguments().add(ifCondition);
-			return mi;
+			return this.ctx.getASTBuilder().invoke(booleanName, "valueOf", ifCondition);
 		}
 		return null;
 	}
 
 	private Expression getBooleanName(ASTNode node) {
+		final ASTBuilder b = this.ctx.getASTBuilder();
 		if (!isSimpleNameAlreadyUsed("Boolean", getAncestor(node, CompilationUnit.class))) {
-			return this.ctx.getAST().newSimpleName("Boolean");
+			return b.name("Boolean");
 		}
-		return this.ctx.getAST().newName("java.lang.Boolean");
+		return b.name("java.lang.Boolean");
 	}
 
 	private boolean isSimpleNameAlreadyUsed(String simpleName,

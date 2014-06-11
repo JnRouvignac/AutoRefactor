@@ -31,6 +31,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.IJavaRefactoring;
 import org.autorefactor.refactoring.Refactorings;
 import org.autorefactor.util.NotImplementedException;
@@ -205,11 +206,8 @@ public class StringBuilderRefactoring extends ASTVisitor implements
 			if (result == null) {
 				result = expr;
 			} else {
-				final MethodInvocation mi = this.ctx.getAST().newMethodInvocation();
-				mi.setExpression(result);
-				mi.setName(this.ctx.getAST().newSimpleName("append"));
-				mi.arguments().add(copy(expr));
-				result = mi;
+				final ASTBuilder b = this.ctx.getASTBuilder();
+				result = b.invoke(result, "append", b.copyExpr(expr));
 			}
 		}
 		return result;
@@ -223,18 +221,19 @@ public class StringBuilderRefactoring extends ASTVisitor implements
 		}
 
 		final Iterator<Expression> it = appendedStrings.iterator();
-		final InfixExpression ie = this.ctx.getAST().newInfixExpression();
-		ie.setLeftOperand(copy(it.next()));
-		ie.setOperator(Operator.PLUS);
-		ie.setRightOperand(copy(it.next()));
+		final ASTBuilder b = this.ctx.getASTBuilder();
+		final Expression expr1 = b.copyExpr(it.next());
+		final Expression expr2 = b.copyExpr(it.next());
+		final InfixExpression ie = b.infixExpr(expr1, Operator.PLUS, expr2);
 		while (it.hasNext()) {
-			ie.extendedOperands().add(copy(it.next()));
+			ie.extendedOperands().add(b.copyExpr(it.next()));
 		}
 		return ie;
 	}
 
 	private Expression collectAllAppendedStrings(Expression expr,
 			final LinkedList<Expression> allOperands, BooleanHolder foundInfixExpr) {
+		final ASTBuilder b = this.ctx.getASTBuilder();
 		if (instanceOf(expr, "java.lang.Appendable")) {
 			if (expr instanceof MethodInvocation) {
 				final MethodInvocation mi = (MethodInvocation) expr;
@@ -251,19 +250,15 @@ public class StringBuilderRefactoring extends ASTVisitor implements
 					final Expression arg = (Expression) cic.arguments().get(0);
 					if (hasType(arg, "java.lang.String")
 							|| instanceOf(arg, "java.lang.CharSequence")) {
-						allOperands.addFirst(copy(arg));
+						allOperands.addFirst(b.copyExpr(arg));
 					}
 				}
-				return copy(cic);
+				return b.copyExpr(cic);
 			} else if (expr instanceof Name || expr instanceof FieldAccess) {
-				return copy(expr);
+				return b.copyExpr(expr);
 			}
 		}
 		return null;
-	}
-
-	private <T> T copy(T node) {
-		return copySubtree(this.ctx.getAST(), node);
 	}
 
 	private void addAllSubExpressions(final Expression arg, final LinkedList<Expression> results,

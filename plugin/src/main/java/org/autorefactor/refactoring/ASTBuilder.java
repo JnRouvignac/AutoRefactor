@@ -62,6 +62,38 @@ public class ASTBuilder {
 		return cc;
 	}
 
+	public <T extends Expression> T copyExpr(T node) {
+		return ASTHelper.copySubtree(ast, node);
+	}
+
+	public <T extends Statement> T copyStmt(T node) {
+		return ASTHelper.copySubtree(ast, node);
+	}
+	
+	public IfStatement if0(Expression condition, Statement thenStatement) {
+		return if0(condition, thenStatement, null);
+	}
+	
+	public IfStatement if0(Expression condition, Statement thenStatement, Statement elseStatement) {
+		final IfStatement is = ast.newIfStatement();
+		is.setExpression(condition);
+		is.setThenStatement(thenStatement);
+		is.setElseStatement(elseStatement);
+		return is;
+	}
+
+	public InfixExpression infixExpr(Expression leftOperand, InfixExpression.Operator operator, Expression rightOperand) {
+		final InfixExpression ie = ast.newInfixExpression();
+		ie.setLeftOperand(leftOperand);
+		ie.setOperator(operator);
+		ie.setRightOperand(rightOperand);
+		return ie;
+	}
+
+	public NumberLiteral int0(int i) {
+		return ast.newNumberLiteral(Integer.toString(i));
+	}
+
 	public MethodInvocation invoke(String expression, String methodName, Expression... arguments) {
 		final MethodInvocation mi = ast.newMethodInvocation();
 		mi.setExpression(ast.newSimpleName(expression));
@@ -72,6 +104,26 @@ public class ASTBuilder {
 		return mi;
 	}
 
+	public MethodInvocation invoke(Expression expression, String methodName, Expression... arguments) {
+		final MethodInvocation mi = ast.newMethodInvocation();
+		mi.setExpression(expression);
+		mi.setName(ast.newSimpleName(methodName));
+		for (Expression argument : arguments) {
+			mi.arguments().add(argument);
+		}
+		return mi;
+	}
+
+	public Name name(String... names) {
+		if (names.length == 0) {
+			throw new IllegalArgumentException("Expected at least one name, but was given 0 names");
+		}
+		if (names.length == 1) {
+			return ast.newSimpleName(names[0]);
+		}
+		return ast.newName(names);
+	}
+
 	public ClassInstanceCreation new0(String className, Expression... arguments) {
 		final ClassInstanceCreation cic = ast.newClassInstanceCreation();
 		cic.setType(ast.newSimpleType(ast.newSimpleName(className)));
@@ -79,6 +131,28 @@ public class ASTBuilder {
 			cic.arguments().add(argument);
 		}
 		return cic;
+	}
+
+	public NumberLiteral number(String s) {
+		return ast.newNumberLiteral(s);
+	}
+
+	public ParenthesizedExpression parenthesize(Expression expression) {
+		final ParenthesizedExpression pe = ast.newParenthesizedExpression();
+		pe.setExpression(expression);
+		return pe;
+	}
+
+	public ReturnStatement return0(Expression expression) {
+		final ReturnStatement rs = ast.newReturnStatement();
+		rs.setExpression(expression);
+		return rs;
+	}
+
+	public StringLiteral string(String s) {
+		final StringLiteral sl = ast.newStringLiteral();
+		sl.setLiteralValue(s);
+		return sl;
 	}
 
 	public ThrowStatement throw0(final Expression expression) {

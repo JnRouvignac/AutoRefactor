@@ -25,6 +25,7 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.IJavaRefactoring;
 import org.autorefactor.refactoring.Refactorings;
 import org.autorefactor.util.NotImplementedException;
@@ -353,10 +354,8 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
 	}
 
 	private void addParentheses(Expression e) {
-		final AST ast = this.ctx.getAST();
-		final ParenthesizedExpression pe = ast.newParenthesizedExpression();
-		pe.setExpression(copySubtree(ast, e));
-		this.ctx.getRefactorings().replace(e, pe);
+		final ASTBuilder b = this.ctx.getASTBuilder();
+		this.ctx.getRefactorings().replace(e, b.parenthesize(b.copyExpr(e)));
 	}
 
 	/**

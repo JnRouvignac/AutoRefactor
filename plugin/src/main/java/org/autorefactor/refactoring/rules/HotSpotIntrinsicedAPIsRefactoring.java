@@ -122,24 +122,23 @@ public class HotSpotIntrinsicedAPIsRefactoring extends ASTVisitor implements
 	}
 
 	private Expression plus(Expression expr1, Expression expr2) {
-		final AST ast = this.ctx.getAST();
+		final ASTBuilder b = this.ctx.getASTBuilder();
 
 		final Integer expr1Value = intValue(expr1);
 		final Integer expr2Value = intValue(expr2);
 		if (expr1Value != null && expr2Value != null) {
-			return ast.newNumberLiteral(Integer.toString(expr1Value + expr2Value));
+			return b.int0(expr1Value + expr2Value);
 		}
 		else if (expr1Value != null && expr1Value == 0) {
-			return copySubtree(ast, expr2);
+			return b.copyExpr(expr2);
 		}
 		else if (expr2Value != null && expr2Value == 0) {
-			return copySubtree(ast, expr1);
+			return b.copyExpr(expr1);
 		}
-		final InfixExpression ie = ast.newInfixExpression();
-		ie.setLeftOperand(copySubtree(ast, expr1));
-		ie.setOperator(InfixExpression.Operator.PLUS);
-		ie.setRightOperand(copySubtree(ast, expr2));
-		return ie;
+		return b.infixExpr(
+				b.copyExpr(expr1),
+				InfixExpression.Operator.PLUS,
+				b.copyExpr(expr2));
 	}
 
 	private Integer intValue(Expression expr) {
@@ -175,20 +174,20 @@ public class HotSpotIntrinsicedAPIsRefactoring extends ASTVisitor implements
 				|| params.endPos == null) {
 			return DO_NOT_VISIT_SUBTREE;
 		}
-		final AST ast = this.ctx.getAST();
+		final ASTBuilder b = this.ctx.getASTBuilder();
 		return replaceWithSystemArrayCopy(node,
-				copySubtree(ast, params.srcArrayExpr),
-				copySubtree(ast, params.srcPos),
-				copySubtree(ast, params.destArrayExpr),
-				copySubtree(ast, params.destPos),
-				copySubtree(ast, params.endPos));
+				b.copyExpr(params.srcArrayExpr),
+				b.copyExpr(params.srcPos),
+				b.copyExpr(params.destArrayExpr),
+				b.copyExpr(params.destPos),
+				b.copyExpr(params.endPos));
 	}
 
 	private boolean replaceWithSystemArrayCopy(ForStatement node,
 			Expression srcArrayExpr, Expression srcPos,
 			Expression destArrayExpr, Expression destPos,
 			Expression length) {
-		final ASTBuilder b = new ASTBuilder(this.ctx.getAST());
+		final ASTBuilder b = this.ctx.getASTBuilder();
 		final TryStatement tryS = b.try0(
 				b.body(
 						b.toStmt(
