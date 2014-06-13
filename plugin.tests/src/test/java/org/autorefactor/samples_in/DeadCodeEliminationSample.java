@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2013 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2013-2014 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -73,15 +73,22 @@ public class DeadCodeEliminationSample {
 		return i + j;
 	}
 
-	private int removeWhileWithoutIterations() {
-		int i = 0;
-		while (false) {
-			i++;
-		}
-		while (false)
-			i++;
-		return i;
-	}
+// FIXME compilation error.
+// Following code:
+//	private int removeWhileWithoutIterations() {
+//		int i = 0;
+//		while (false) {
+//			i++;
+//		}
+//		while (false)
+//			i++;
+//		return i;
+//	}
+// Should become
+//	private int removeWhileWithoutIterations() {
+//		int i = 0;
+//		return i;
+//	}
 
 	private int removeEmptyTry() {
 		int i = 0;
