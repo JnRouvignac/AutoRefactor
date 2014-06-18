@@ -56,4 +56,47 @@ public class StringBuilderSample {
         String s1 = 1 + "";
     }
 
+    public void removeUselessCallsToValueOfWithStringBuilderAppend(
+        Object o, boolean b, char c, int i, long l, float f, double d) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(o);
+        sb.append(b);
+        sb.append(b);
+        sb.append(c);
+        sb.append(c);
+        sb.append(i);
+        sb.append(i);
+        sb.append(l);
+        sb.append(l);
+        sb.append(f);
+        sb.append(f);
+        sb.append(d);
+        sb.append(d);
+    }
+
+    public void removeUselessCallsToValueOfWithStringBufferAppend(
+            Object o, boolean b, char c, int i, long l, float f, double d) {
+        StringBuffer sb = new StringBuffer();
+        sb.append(o);
+        sb.append(b);
+        sb.append(b);
+        sb.append(c);
+        sb.append(c);
+        sb.append(i);
+        sb.append(i);
+        sb.append(l);
+        sb.append(l);
+        sb.append(f);
+        sb.append(f);
+        sb.append(d);
+        sb.append(d);
+    }
+
+
+    public void removeUselessCallsWithAppend(String s) {
+        new StringBuilder().append(s, 0, 1);
+        new StringBuffer().append(s, 0, 1);
+        new StringBuilder().append(s, 0, 1);
+        new StringBuffer().append(s, 0, 1);
+    }
 }

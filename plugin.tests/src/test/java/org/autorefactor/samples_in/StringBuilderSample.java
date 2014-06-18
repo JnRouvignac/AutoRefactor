@@ -56,4 +56,47 @@ public class StringBuilderSample {
         String s1 = 1 + "";
     }
 
+    public void removeUselessCallsToValueOfWithStringBuilderAppend(
+        Object o, boolean b, char c, int i, long l, float f, double d) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(String.valueOf(o));
+        sb.append(String.valueOf(b));
+        sb.append(Boolean.valueOf(b));
+        sb.append(String.valueOf(c));
+        sb.append(Character.valueOf(c));
+        sb.append(String.valueOf(i));
+        sb.append(Integer.valueOf(i));
+        sb.append(String.valueOf(l));
+        sb.append(Long.valueOf(l));
+        sb.append(String.valueOf(f));
+        sb.append(Float.valueOf(f));
+        sb.append(String.valueOf(d));
+        sb.append(Double.valueOf(d));
+    }
+
+    public void removeUselessCallsToValueOfWithStringBufferAppend(
+            Object o, boolean b, char c, int i, long l, float f, double d) {
+        StringBuffer sb = new StringBuffer();
+        sb.append(String.valueOf(o));
+        sb.append(String.valueOf(b));
+        sb.append(Boolean.valueOf(b));
+        sb.append(String.valueOf(c));
+        sb.append(Character.valueOf(c));
+        sb.append(String.valueOf(i));
+        sb.append(Integer.valueOf(i));
+        sb.append(String.valueOf(l));
+        sb.append(Long.valueOf(l));
+        sb.append(String.valueOf(f));
+        sb.append(Float.valueOf(f));
+        sb.append(String.valueOf(d));
+        sb.append(Double.valueOf(d));
+    }
+
+
+    public void removeUselessCallsWithAppend(String s) {
+        new StringBuilder().append(s.substring(0, 1));
+        new StringBuffer().append(s.substring(0, 1));
+        new StringBuilder().append(s.subSequence(0, 1));
+        new StringBuffer().append(s.subSequence(0, 1));
+    }
 }

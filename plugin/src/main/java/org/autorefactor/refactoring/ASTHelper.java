@@ -382,18 +382,22 @@ public class ASTHelper {
 
 	public static boolean isMethod(MethodInvocation node, String typeQualifiedName,
 			String methodName, String... parameterTypesQualifiedNames) {
-		final IMethodBinding binding = node.resolveMethodBinding();
+		if (node == null) {
+			return false;
+		}
+		final IMethodBinding methodbinding = node.resolveMethodBinding();
 		// let's do the fast checks first
-		if (binding == null
-				|| !methodName.equals(binding.getName())
-				|| binding.getParameterTypes().length != parameterTypesQualifiedNames.length) {
+		if (methodbinding == null
+				|| !methodName.equals(methodbinding.getName())
+				|| methodbinding.getParameterTypes().length != parameterTypesQualifiedNames.length) {
 			return false;
 		}
 		// ok more heavy checks now
-		final ITypeBinding declaringClazz = binding.getDeclaringClass();
+		final ITypeBinding declaringClazz = methodbinding.getDeclaringClass();
 		final ITypeBinding implementedType =
 				findImplementedType(declaringClazz, typeQualifiedName);
-		if (parameterTypesMatch(implementedType, binding, parameterTypesQualifiedNames)) {
+		final boolean isInstanceOf = instanceOf(declaringClazz, typeQualifiedName);
+		if (parameterTypesMatch(implementedType, isInstanceOf, methodbinding, parameterTypesQualifiedNames)) {
 			return true;
 		}
 		// a lot more heavy checks
@@ -401,18 +405,18 @@ public class ASTHelper {
 		// if an API to directly find the overridenMethod IMethodBinding existed
 		IMethodBinding overridenMethod = findOverridenMethod(declaringClazz, typeQualifiedName,
 				methodName, parameterTypesQualifiedNames);
-		return overridenMethod != null && binding.overrides(overridenMethod);
+		return overridenMethod != null && methodbinding.overrides(overridenMethod);
 	}
 
 	private static boolean parameterTypesMatch(ITypeBinding implementedType,
-			IMethodBinding methodBinding, String[] parameterTypesQualifiedNames) {
+			boolean isInstanceOf, IMethodBinding methodBinding, String[] parameterTypesQualifiedNames) {
 		if (implementedType != null) {
 			final ITypeBinding erasure = implementedType.getErasure();
 			if (erasure.isGenericType() || erasure.isParameterizedType()) {
 				return parameterizedTypesMatch(implementedType, erasure, methodBinding);
 			}
 		}
-		return concreteTypesMatch(methodBinding.getParameterTypes(), parameterTypesQualifiedNames);
+		return isInstanceOf && concreteTypesMatch(methodBinding.getParameterTypes(), parameterTypesQualifiedNames);
 	}
 
 	private static boolean concreteTypesMatch(ITypeBinding[] typeBindings,

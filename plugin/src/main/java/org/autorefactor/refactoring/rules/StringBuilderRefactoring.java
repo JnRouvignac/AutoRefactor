@@ -26,6 +26,8 @@
 package org.autorefactor.refactoring.rules;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -171,6 +173,30 @@ public class StringBuilderRefactoring extends ASTVisitor implements
 					return DO_NOT_VISIT_SUBTREE;
 				}
 			}
+
+			final MethodInvocation embeddedMI = as0(allAppendedStrings, MethodInvocation.class);
+			if (isStringValueOf(embeddedMI)
+				&& (instanceOf(typeBinding, "java.lang.StringBuilder")
+					|| instanceOf(typeBinding, "java.lang.StringBuffer"))) {
+				final Expression arg = (Expression) embeddedMI.arguments().get(0);
+				this.ctx.getRefactorings().replace(node,
+						createStringAppends(lastExpr, Arrays.asList(arg)));
+				return DO_NOT_VISIT_SUBTREE;
+			}
+			final boolean substringWithOneArg =
+				isMethod(embeddedMI, "java.lang.String", "substring", "int");
+			final boolean substringWithTwoArgs =
+				isMethod(embeddedMI, "java.lang.String", "substring", "int", "int")
+				|| isMethod(embeddedMI, "java.lang.CharSequence", "subSequence", "int", "int");
+			if (substringWithOneArg || substringWithTwoArgs) {
+				final ASTBuilder b = this.ctx.getASTBuilder();
+				final Expression stringVar = b.copyExpr(embeddedMI.getExpression());
+				final List<Expression> args = embeddedMI.arguments();
+				final Expression arg0 = b.copyExpr(args.get(0));
+				final Expression arg1 = substringWithTwoArgs ? b.copyExpr(args.get(1)) : null;
+				this.ctx.getRefactorings().replace(node,
+						createAppendSubstring(b, lastExpr, stringVar, arg0, arg1));
+			}
 		} else if (isMethod(node, "java.lang.StringBuilder", "toString")
 				|| isMethod(node, "java.lang.StringBuffer", "toString")) {
 			final LinkedList<Expression> allAppendedStrings = new LinkedList<Expression>();
@@ -188,6 +214,22 @@ public class StringBuilderRefactoring extends ASTVisitor implements
 		return VISIT_SUBTREE;
 	}
 
+	public static <T extends Expression> T as0(Collection<?> nodes, Class<T> exprClazz) {
+		if (nodes != null && nodes.size() == 1) {
+			return as((Expression) nodes.iterator().next(), exprClazz);
+		}
+		return null;
+	}
+
+
+	private MethodInvocation createAppendSubstring(ASTBuilder b, Expression lastExpr,
+			Expression stringVar, Expression substringArg0, Expression substringArg1) {
+		if (substringArg1 == null) {
+			return b.invoke(lastExpr, "append", stringVar, substringArg0);
+		}
+		return b.invoke(lastExpr, "append", stringVar, substringArg0, substringArg1);
+	}
+
 	private boolean filterOutEmptyStrings(List<Expression> allExprs) {
 		boolean result = false;
 		for (Iterator<Expression> iter = allExprs.iterator(); iter.hasNext();) {
@@ -198,6 +240,22 @@ public class StringBuilderRefactoring extends ASTVisitor implements
 			}
 		}
 		return result;
+	}
+
+	private boolean isStringValueOf(MethodInvocation mi) {
+		return isMethod(mi, "java.lang.String", "valueOf", "java.lang.Object")
+				|| isMethod(mi, "java.lang.String", "valueOf", "boolean")
+				|| isMethod(mi, "java.lang.Boolean", "valueOf", "boolean")
+				|| isMethod(mi, "java.lang.String", "valueOf", "char")
+				|| isMethod(mi, "java.lang.Character", "valueOf", "char")
+				|| isMethod(mi, "java.lang.String", "valueOf", "int")
+				|| isMethod(mi, "java.lang.Integer", "valueOf", "int")
+				|| isMethod(mi, "java.lang.String", "valueOf", "long")
+				|| isMethod(mi, "java.lang.Long", "valueOf", "long")
+				|| isMethod(mi, "java.lang.String", "valueOf", "float")
+				|| isMethod(mi, "java.lang.Float", "valueOf", "float")
+				|| isMethod(mi, "java.lang.String", "valueOf", "double")
+				|| isMethod(mi, "java.lang.Double", "valueOf", "double");
 	}
 
 	private ASTNode createStringAppends(Expression lastExpr, List<Expression> appendedStrings) {
