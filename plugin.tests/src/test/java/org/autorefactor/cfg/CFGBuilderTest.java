@@ -45,19 +45,27 @@ import org.junit.runners.Parameterized.Parameters;
 public class CFGBuilderTest {
 
 	private String testName;
+	private int methodDeclarationNb;
 
-	public CFGBuilderTest(String testName) {
+	public CFGBuilderTest(String testName, int methodDeclarationNb) {
 		this.testName = testName;
+		this.methodDeclarationNb = methodDeclarationNb;
+	}
+
+	@Override
+	public String toString() {
+		return getClass().getSimpleName()
+				+ "[" + testName + ", methodNb=" + methodDeclarationNb + "]";
 	}
 
 	@Parameters(name = "{index}: {0}")
 	public static Collection<Object[]> data() {
 		return Arrays.asList(new Object[][] {
-				{ "ForWithIfToEndLoopSample" },
-				{ "IfElseIfSample" },
-				{ "LabelsSample" },
-				{ "SwitchSample" },
-				// { "WhileLoopsSample" },
+				{ "ForWithIfToEndLoopSample", 0 },
+				{ "IfElseIfSample", 0 },
+				{ "LabelsSample", 0 },
+				{ "SwitchSample", 0 },
+				{ "WhileLoopsSample", 2 },
 		});
 	}
 
@@ -79,7 +87,8 @@ public class CFGBuilderTest {
 		final CFGBuilder builder = new CFGBuilder(javaSource, 4);
 		final List<CFGBasicBlock> blocks = builder.buildCFG(astRoot);
 
-		final String actual = new CFGDotPrinter().toDot(blocks.get(0)).trim();
+		final CFGBasicBlock block = blocks.get(methodDeclarationNb);
+		final String actual = new CFGDotPrinter().toDot(block).trim();
 		assertEquals(testName + ": wrong output;", dotSource, actual);
 	}
 
