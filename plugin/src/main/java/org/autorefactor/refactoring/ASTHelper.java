@@ -26,6 +26,7 @@
 package org.autorefactor.refactoring;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -150,6 +151,14 @@ public class ASTHelper {
 				return as(((ParenthesizedExpression) node).getExpression(),
 						exprClazz);
 			}
+		}
+		return null;
+	}
+
+	public static <T extends Expression> T as(Collection<? extends Expression> nodes,
+			Class<T> exprClazz) {
+		if (nodes != null && nodes.size() == 1) {
+			return as((Expression) nodes.iterator().next(), exprClazz);
 		}
 		return null;
 	}

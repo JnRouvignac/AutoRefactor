@@ -212,6 +212,42 @@ public class BooleanSample {
         aMethodThatAcceptsABoolean(!bo);
     }
 
+    public void removeUselessIfInBooleanPrimitiveExpression12(boolean bo) {
+        if (bo) {
+            aMethodThatAcceptsABoolean(true);
+        } else {
+            aMethodThatAcceptsABoolean(aMethodThatReturnsBoolean());
+        }
+        // FIXME This should be converted to aMethodThatAcceptsABoolean(bo || aMethodThatReturnsBoolean());
+    }
+
+    public void removeUselessIfInBooleanPrimitiveExpression13(boolean bo) {
+        if (bo) {
+            aMethodThatAcceptsABoolean(false);
+        } else {
+            aMethodThatAcceptsABoolean(aMethodThatReturnsBoolean());
+        }
+        // FIXME This should be converted to aMethodThatAcceptsABoolean(!bo && aMethodThatReturnsBoolean());
+    }
+
+    public void removeUselessIfInBooleanPrimitiveExpression14(boolean bo) {
+        if (bo) {
+            aMethodThatAcceptsABoolean(aMethodThatReturnsBoolean());
+        } else {
+            aMethodThatAcceptsABoolean(true);
+        }
+        // FIXME This should be converted to aMethodThatAcceptsABoolean(!bo || aMethodThatReturnsBoolean());
+    }
+
+    public void removeUselessIfInBooleanPrimitiveExpression15(boolean bo) {
+        if (bo) {
+            aMethodThatAcceptsABoolean(aMethodThatReturnsBoolean());
+        } else {
+            aMethodThatAcceptsABoolean(false);
+        }
+        // FIXME This should be converted to aMethodThatAcceptsABoolean(bo && aMethodThatReturnsBoolean());
+    }
+
     private boolean aMethodThatReturnsBoolean() {
         return false;
     }

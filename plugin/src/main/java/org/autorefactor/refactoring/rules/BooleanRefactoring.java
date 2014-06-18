@@ -26,6 +26,7 @@
 package org.autorefactor.refactoring.rules;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -58,18 +59,22 @@ public class BooleanRefactoring extends ASTVisitor implements IJavaRefactoring {
 		final Map<ASTNode, ASTNode> previousMatches;
 
 		public BooleanASTMatcher() {
-			this.previousMatches = null;
+			this(null);
 		}
 
 		public BooleanASTMatcher(Map<ASTNode, ASTNode> previousMatches) {
-			this.previousMatches = previousMatches;
+			if (previousMatches != null) {
+				this.previousMatches = previousMatches;
+			} else {
+				this.previousMatches = Collections.emptyMap();
+			}
 		}
 
 		@Override
 		public boolean match(BooleanLiteral node, Object other) {
 			if (other instanceof Expression) {
 				final Expression expr = (Expression) other;
-				if (getBooleanLiteral(node) != getBooleanLiteral(expr)) {
+				if (areOppositeValues(node, expr)) {
 					matches.put(expr, node);
 					return true;
 				}
@@ -77,13 +82,18 @@ public class BooleanRefactoring extends ASTVisitor implements IJavaRefactoring {
 			return false;
 		}
 
+		private boolean areOppositeValues(Expression expr1, Expression expr2) {
+			final Boolean b1 = getBooleanLiteral(expr1);
+			final Boolean b2 = getBooleanLiteral(expr2);
+			return b1 != null && b2 != null && b1 != b2;
+		}
+
 		@Override
 		public boolean match(QualifiedName node, Object other) {
 			if (other instanceof Expression) {
 				final Expression expr = (Expression) other;
-				if ((this.previousMatches != null && this.previousMatches
-						.containsKey(other))
-						|| (getBooleanLiteral(node) != getBooleanLiteral(expr))) {
+				if (this.previousMatches.containsKey(other)
+						|| areOppositeValues(node, expr)) {
 					matches.put(expr, node);
 					return true;
 				}
@@ -166,17 +176,12 @@ public class BooleanRefactoring extends ASTVisitor implements IJavaRefactoring {
 			// which are opposite
 			final Statement copyStmt = copySubtree(node.getThenStatement());
 			// identify the node that need to be replaced after the copy
-			final BooleanASTMatcher matcher2 = new BooleanASTMatcher(
-					matcher.matches);
+			final BooleanASTMatcher matcher2 = new BooleanASTMatcher(matcher.matches);
 			if (match(matcher2, copyStmt, node.getElseStatement())) {
 				final Expression ifCondition = node.getExpression();
 				copyStmt.accept(new BooleanReplaceVisitor(ifCondition,
 						matcher2.matches.values(), getBooleanName(node)));
-				if (copyStmt instanceof Block && asList(copyStmt).size() == 1) {
-					this.ctx.getRefactorings().replace(node, asList(copyStmt).get(0));
-				} else {
-					this.ctx.getRefactorings().replace(node, copyStmt);
-				}
+				this.ctx.getRefactorings().replace(node, toSingleStmt(copyStmt));
 				return DO_NOT_VISIT_SUBTREE;
 			}
 		}
@@ -279,6 +284,16 @@ public class BooleanRefactoring extends ASTVisitor implements IJavaRefactoring {
 			}
 		}
 		return VISIT_SUBTREE;
+	}
+
+	private Statement toSingleStmt(final Statement stmt) {
+		if (stmt instanceof Block) {
+			final List<Statement> stmts = asList(stmt);
+			if (stmts.size() == 1) {
+				return stmts.get(0);
+			}
+		}
+		return stmt;
 	}
 
 	private ReturnStatement getReturnStatement(IfStatement node,
@@ -433,8 +448,7 @@ public class BooleanRefactoring extends ASTVisitor implements IJavaRefactoring {
 	public boolean visit(MethodInvocation node) {
 		if (isMethod(node, "java.lang.Boolean", "valueOf", "java.lang.String")
 				|| isMethod(node, "java.lang.Boolean", "valueOf", "boolean")) {
-			final BooleanLiteral l = as((Expression) node
-					.arguments().get(0), BooleanLiteral.class);
+			final BooleanLiteral l = as(node.arguments(), BooleanLiteral.class);
 			if (l != null) {
 				this.ctx.getRefactorings().replace(node,
 						getRefactoring(node, l.booleanValue()));

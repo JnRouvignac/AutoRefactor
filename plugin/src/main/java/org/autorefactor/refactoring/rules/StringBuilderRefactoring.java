@@ -27,7 +27,6 @@ package org.autorefactor.refactoring.rules;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -174,7 +173,7 @@ public class StringBuilderRefactoring extends ASTVisitor implements
 				}
 			}
 
-			final MethodInvocation embeddedMI = as0(allAppendedStrings, MethodInvocation.class);
+			final MethodInvocation embeddedMI = as(allAppendedStrings, MethodInvocation.class);
 			if (isStringValueOf(embeddedMI)
 				&& (instanceOf(typeBinding, "java.lang.StringBuilder")
 					|| instanceOf(typeBinding, "java.lang.StringBuffer"))) {
@@ -213,14 +212,6 @@ public class StringBuilderRefactoring extends ASTVisitor implements
 		}
 		return VISIT_SUBTREE;
 	}
-
-	public static <T extends Expression> T as0(Collection<?> nodes, Class<T> exprClazz) {
-		if (nodes != null && nodes.size() == 1) {
-			return as((Expression) nodes.iterator().next(), exprClazz);
-		}
-		return null;
-	}
-
 
 	private MethodInvocation createAppendSubstring(ASTBuilder b, Expression lastExpr,
 			Expression stringVar, Expression substringArg0, Expression substringArg1) {
