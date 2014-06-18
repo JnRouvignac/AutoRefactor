@@ -25,10 +25,8 @@
  */
 package org.autorefactor.refactoring.rules;
 
-import static org.autorefactor.cfg.test.TestUtils.*;
-import static org.junit.Assert.*;
-
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collection;
@@ -44,6 +42,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
+
+import static org.autorefactor.cfg.test.TestUtils.*;
+import static org.junit.Assert.*;
 
 @RunWith(value = Parameterized.class)
 public class RefactoringsTest {
@@ -114,13 +115,32 @@ public class RefactoringsTest {
 	}
 
 	private void autoRefactorHandler_ApplyRefactoring(Object... params) throws Exception {
-		final Method m = AutoRefactorHandler.class.getDeclaredMethod("applyRefactoring",
-				IDocument.class, ICompilationUnit.class,
-				Release.class,
-				Integer.TYPE,
-				AggregateASTVisitor.class);
-		m.setAccessible(true);
-		m.invoke(null, params);
+		try {
+			final Method m = AutoRefactorHandler.class.getDeclaredMethod("applyRefactoring",
+					IDocument.class, ICompilationUnit.class,
+					Release.class,
+					Integer.TYPE,
+					AggregateASTVisitor.class);
+			m.setAccessible(true);
+			m.invoke(null, params);
+		} catch (InvocationTargetException e) {
+			throw getExceptionToThrow(e);
+		}
+	}
+
+	private Exception getExceptionToThrow(Exception e) {
+		final Throwable cause = e.getCause();
+		if (cause instanceof Exception) {
+			final Exception ex = (Exception) cause;
+			if (ex instanceof RuntimeException) {
+				final RuntimeException re = (RuntimeException) ex;
+				if ("Unexpected exception".equals(re.getMessage())) {
+					return getExceptionToThrow((Exception) re);
+				}
+			}
+			return ex;
+		}
+		return e;
 	}
 
 	private IRefactoring getRefactoringClass(final String refactoringClassName,
