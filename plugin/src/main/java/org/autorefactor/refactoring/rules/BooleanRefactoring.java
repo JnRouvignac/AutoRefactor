@@ -85,7 +85,7 @@ public class BooleanRefactoring extends ASTVisitor implements IJavaRefactoring {
 		private boolean areOppositeValues(Expression expr1, Expression expr2) {
 			final Boolean b1 = getBooleanLiteral(expr1);
 			final Boolean b2 = getBooleanLiteral(expr2);
-			return b1 != null && b2 != null && b1 != b2;
+			return b1 != null && b2 != null && !b1.equals(b2);
 		}
 
 		@Override
