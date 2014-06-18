@@ -36,9 +36,11 @@ import java.util.TreeSet;
 
 import org.autorefactor.refactoring.ASTHelper;
 import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.CatchClause;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.SwitchStatement;
+import org.eclipse.jdt.core.dom.TryStatement;
 
 /**
  * Outputs a string representing the CFG in the dot format.
@@ -162,7 +164,9 @@ public class CFGDotPrinter {
 			if (ASTHelper.isLoop(node)
 					|| node instanceof IfStatement
 					|| node instanceof SwitchStatement
-					|| node instanceof MethodDeclaration) {
+					|| node instanceof MethodDeclaration
+					|| node instanceof TryStatement
+					|| node instanceof CatchClause) {
 				// such statements need their own subgraph to ease reading the CFG
 				subGraph = new CFGSubGraph(ASTPrintHelper.codeExcerpt(node),
 						node.getStartPosition());

@@ -25,12 +25,24 @@
  */
 package org.autorefactor.cfg;
 
+import static org.autorefactor.cfg.test.TestUtils.*;
+import static org.junit.Assert.*;
+
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
 import org.autorefactor.refactoring.Release;
+import org.autorefactor.refactoring.rules.JavaCoreHelper;
+import org.autorefactor.ui.AutoRefactorHandler;
+import org.eclipse.jdt.core.ICompilationUnit;
+import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.CompilationUnit;
@@ -38,10 +50,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
-
-import static org.autorefactor.cfg.test.TestUtils.*;
-import static org.autorefactor.ui.ApplyRefactoringsJob.*;
-import static org.junit.Assert.*;
 
 @RunWith(value = Parameterized.class)
 public class CFGBuilderTest {
@@ -68,23 +76,29 @@ public class CFGBuilderTest {
 				{ "LabelsSample", 0 },
 				{ "SwitchSample", 0 },
 				{ "WhileLoopsSample", 2 },
+				{ "TryCatchThrowSample", 0 },
 		});
 	}
 
 	@Test
 	public void testCFGBuilder() throws Exception {
-		final File javaFile = new File("src/test/java/org/autorefactor/cfg", testName + ".java");
+		final String sampleName = testName + ".java";
+		final File javaFile = new File("src/test/java/org/autorefactor/cfg", sampleName);
 		assertTrue(testName + ": sample in java file " + javaFile + " should exist", javaFile.exists());
 		final File dotFile = new File("src/test/resources/org/autorefactor/cfg", testName + ".dot");
 		assertTrue(testName + ": sample out dot file " + dotFile + " should exist", dotFile.exists());
 
-		final String dotSource = readAll(dotFile).replaceAll(testName, "FakeClass").trim();
+		final String dotSource = readAll(dotFile).trim();
 		final String javaSource = readAll(javaFile);
 
+		final IPackageFragment packageFragment = JavaCoreHelper.getPackageFragment();
+		final ICompilationUnit cu = packageFragment.createCompilationUnit(
+				sampleName, javaSource, true, null);
+		cu.getBuffer().setContents(javaSource);
+		cu.save(null, true);
+
 		final ASTParser parser = ASTParser.newParser(AST.JLS4);
-		parser.setSource(javaSource.toCharArray());
-		parser.setResolveBindings(true);
-		parser.setCompilerOptions(getCompilerOptions(Release.javaSE("1.5.0")));
+		autoRefactorHandler_resetParser(cu, parser, Release.javaSE("1.7"));
 
 		final CompilationUnit astRoot = (CompilationUnit) parser.createAST(null);
 		final CFGBuilder builder = new CFGBuilder(javaSource, 4);
@@ -92,7 +106,34 @@ public class CFGBuilderTest {
 
 		final CFGBasicBlock block = blocks.get(methodDeclarationNb);
 		final String actual = new CFGDotPrinter().toDot(block).trim();
+		final File dotFileOut = new File("src/test/resources/org/autorefactor/cfg", testName + "_out.dot");
+		writeAll(dotFileOut, actual);
 		assertEquals(testName + ": wrong output;", dotSource, actual);
+	}
+
+	private void writeAll(File file, String fileContent) throws Exception {
+		FileOutputStream fos = null;
+		Writer writer = null;
+		try {
+			fos = new FileOutputStream(file);
+			writer = new BufferedWriter(new OutputStreamWriter(fos));
+			writer.append(fileContent);
+		} finally {
+			if (writer != null) {
+				writer.close();
+			}
+			if (fos != null) {
+				fos.close();
+			}
+		}
+	}
+
+	private void autoRefactorHandler_resetParser(ICompilationUnit cu, ASTParser parser,
+			Release javaSE) throws Exception {
+		final Method m = AutoRefactorHandler.class.getDeclaredMethod(
+				"resetParser", ICompilationUnit.class, ASTParser.class, Release.class);
+		m.setAccessible(true);
+		m.invoke(null, cu, parser, javaSE);
 	}
 
 }
