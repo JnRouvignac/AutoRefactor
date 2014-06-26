@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>AutoRefactor sample refactorings</title>
+    <script type="text/javascript" src="../js/base64codec.js"></script>
+    <!--
+     ! Following line does not work because it does not have the proper Content-Type header
+     ! <link rel="stylesheet" type="text/css" href="https://raw.github.com/cemerick/jsdifflib/master/diffview.css">
+     !
+     ! See line below to get the proper Content-Type.
+     ! See also http://cdnjs.com, http://raw.githack.com
+     ! Another alternative is to push website to github pages on every commit:
+     ! http://stackoverflow.com/questions/7180099/including-js-from-raw-github-com
+    -->
+    <link rel="stylesheet" type="text/css" href="https://rawgit.com/cemerick/jsdifflib/master/diffview.css">
+    <script type="text/javascript" src="https://raw.github.com/cemerick/jsdifflib/master/difflib.js"></script>
+    <script type="text/javascript" src="https://raw.github.com/cemerick/jsdifflib/master/diffview.js"></script>
+    <!--
+     ! JS diff libs (http://stackoverflow.com/questions/4462609/looking-for-a-javascript-visual-diff-lib):
+     ! - https://github.com/cemerick/jsdifflib (Used here)
+     ! - http://code.google.com/p/google-diff-match-patch/
+     ! - http://prettydiff.com
+     ! - http://ejohn.org/projects/javascript-diff-algorithm/
+     ! - http://jsfiddle.net/pfYtu/
+    -->
+    <style type="text/css">
+      body {
+        font-size: 12px;
+        font-family: Sans-Serif;
+      }
+      h2 {
+        margin: 0.5em 0 0.1em;
+        text-align: center;
+      }
+      .top {
+        text-align: center;
+      }
+      .textInput {
+        display: block;
+        width: 49%;
+        float: left;
+      }
+      textarea {
+        width:100%;
+        height:300px;
+      }
+      label:hover {
+        text-decoration: underline;
+        cursor: pointer;
+      }
+      .spacer {
+        margin-left: 10px;
+      }
+      .viewType {
+        font-size: 16px;
+        clear: both;
+        text-align: center;
+        padding: 1em;
+      }
+      #diffoutput {
+        width: 100%;
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- See https://developer.github.com/v3/repos/contents/#get-contents -->
+    <div style="display: inline;">
+      Choose sample:&nbsp;
+      <select id="samples" onchange="sampleSelected()"></select>
+    </div>
+    <span>&nbsp;&nbsp;</span>
+    <div style="display: inline;">
+      Lines of context:&nbsp;
+      <input type="number" id="contextLines" value="3" min="0" onchange="sampleSelected()" style="width: 3.5em;">
+    </div>
+    <span>&nbsp;&nbsp;</span>
+    <div style="display: inline;">
+      View:
+      <input type="radio" name="viewType" value="1" onchange="sampleSelected()">Inline
+      <input type="radio" name="viewType" value="0" onchange="sampleSelected()" checked="checked">Side-by-side
+    </div>
+    <br>
+    <br>
+    <div id="diffoutput"></div>
+
+
+    <script type="text/javascript">
+      var base_dir = "https://api.github.com/repos/JnRouvignac/AutoRefactor/contents/plugin.tests/src/test/java/org/autorefactor/";
+      var sample_in;
+      var sample_out;
+
+      function $(id) {
+          return document.getElementById(id);
+      }
+
+      function viewType() {
+          var radioButtons = document.getElementsByName("viewType");
+          var array = Array.prototype.slice.call(radioButtons, 0);
+          var res = array.filter( function(radio) { return radio.checked; } );
+          return parseInt(res[0].value);
+      }
+
+      function sampleSelected() {
+          var samplesSelect = $('samples');
+          var selectedOption = samplesSelect.options[samplesSelect.selectedIndex];
+          var sampleFileName = selectedOption.value;
+          loadSampleContent(sampleFileName, true);
+          loadSampleContent(sampleFileName, false);
+      }
+
+      function loadSampleNames(sampleIn) {
+          var xmlhttp = new XMLHttpRequest();
+          xmlhttp.open("GET", base_dir + "samples_in", true);
+          xmlhttp.onreadystatechange = function() {
+              if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                  var samplesResponse = JSON.parse(xmlhttp.responseText);
+                  var samples = samplesResponse.map    ( function(item) { return item.name; } )
+                                               .filter ( function(sampleName) { return sampleName != "package-info.java"; } )
+                                               .forEach( function(sampleName) { createOption(sampleName); } );
+                  sampleSelected();
+              }
+          }
+          xmlhttp.send();
+      }
+
+      function createOption(sampleName) {
+          var opt = document.createElement("option");
+          opt.value = sampleName;
+          opt.innerHTML = sampleName;
+          $("samples").appendChild(opt);
+      }
+
+      function decodeFileContentGithubAPIv3(xmlhttp) {
+          return UTF8ArrToStr(base64DecToArr(JSON.parse(xmlhttp.responseText).content));
+      }
+
+      function loadSampleContent(sampleName, sampleIn) {
+          var xmlhttp = new XMLHttpRequest();
+          xmlhttp.open("GET", base_dir + (sampleIn ? "samples_in" : "samples_out")  + "/" + sampleName, true);
+          xmlhttp.onreadystatechange = function() {
+              if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                  var fileContent = decodeFileContentGithubAPIv3(xmlhttp);
+                  if (sampleIn) {
+                      sample_in = fileContent;
+                  } else {
+                      sample_out = fileContent;
+                  }
+
+                  if (sample_in) {
+                      if (sample_out) {
+                          diffUsingJS();
+                      }
+                  }
+              }
+          }
+          xmlhttp.send();
+      }
+
+      function diffUsingJS() {
+          var sample_in_lines = difflib.stringAsLines(sample_in);
+          var sample_out_lines = difflib.stringAsLines(sample_out);
+
+          // create a SequenceMatcher instance that diffs the two sets of lines
+          var sm = new difflib.SequenceMatcher(sample_in_lines, sample_out_lines);
+
+          // get the opcodes from the SequenceMatcher instance
+          // opcodes is a list of 3-tuples describing what changes should be made to the base text
+          // in order to yield the new text
+          var opcodes = sm.get_opcodes();
+          var diffoutputdiv = $("diffoutput");
+          while (diffoutputdiv.firstChild) diffoutputdiv.removeChild(diffoutputdiv.firstChild);
+
+          // build the diff view and add it to the current DOM
+          diffoutputdiv.appendChild(diffview.buildView({
+              baseTextLines: sample_in_lines,
+              newTextLines: sample_out_lines,
+              opcodes: opcodes,
+              // set the display titles for each resource
+              baseTextName: "Before automatic refactoring",
+              newTextName: "After automatic refactoring",
+              contextSize: $("contextLines").value,
+              viewType: viewType()
+          }));
+      }
+
+
+      loadSampleNames();
+</script>
+
+  </body>
+</html>
