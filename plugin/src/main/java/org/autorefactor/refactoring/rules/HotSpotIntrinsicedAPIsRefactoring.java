@@ -30,6 +30,7 @@ import java.util.List;
 import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.IJavaRefactoring;
 import org.autorefactor.refactoring.Refactorings;
+import org.autorefactor.util.NotImplementedException;
 import org.eclipse.jdt.core.dom.*;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
@@ -78,11 +79,11 @@ public class HotSpotIntrinsicedAPIsRefactoring extends ASTVisitor implements
 					if (lhs instanceof ArrayAccess && rhs instanceof ArrayAccess) {
 						final ArrayAccess aaLHS = (ArrayAccess) lhs;
 						params.destArrayExpr = aaLHS.getArray();
-						params.destPos = pp(aaLHS.getIndex(), params);
+						params.destPos = calcIndex(aaLHS.getIndex(), params);
 
 						final ArrayAccess aaRHS = (ArrayAccess) rhs;
 						params.srcArrayExpr = aaRHS.getArray();
-						params.srcPos = pp(aaRHS.getIndex(), params);
+						params.srcPos = calcIndex(aaRHS.getIndex(), params);
 						return replaceWithSystemArrayCopyCloneAll(node, params);
 					}
 				}
@@ -91,15 +92,13 @@ public class HotSpotIntrinsicedAPIsRefactoring extends ASTVisitor implements
 		return VISIT_SUBTREE;
 	}
 
-	private Expression pp(final Expression index,
-			final SystemArrayCopyParams params) {
+	private Expression calcIndex(Expression index, SystemArrayCopyParams params) {
 		if (index instanceof SimpleName) {
 			final IVariableBinding idxVar = getVariableBinding(index);
 			if (equalsNotNull(params.indexVarBinding, idxVar)) {
 				return params.indexStartPos;
 			}
-		}
-		else if (index instanceof InfixExpression) {
+		} else if (index instanceof InfixExpression) {
 			final InfixExpression ie = (InfixExpression) index;
 			if (InfixExpression.Operator.PLUS.equals(ie.getOperator())) {
 				final Expression leftOp = ie.getLeftOperand();
@@ -119,6 +118,27 @@ public class HotSpotIntrinsicedAPIsRefactoring extends ASTVisitor implements
 			}
 		}
 		return null;
+	}
+
+	private Expression minus(Expression expr1, Expression expr2) {
+		final ASTBuilder b = this.ctx.getASTBuilder();
+
+		final Integer expr1Value = intValue(expr1);
+		final Integer expr2Value = intValue(expr2);
+		if (expr1Value != null && expr2Value != null) {
+			return b.int0(expr1Value - expr2Value);
+		}
+		else if (expr1Value != null && expr1Value == 0) {
+			// TODO negate expr2
+			throw new NotImplementedException();
+		}
+		else if (expr2Value != null && expr2Value == 0) {
+			return b.copyExpr(expr1);
+		}
+		return b.infixExpr(
+				b.copyExpr(expr1),
+				InfixExpression.Operator.MINUS,
+				b.copyExpr(expr2));
 	}
 
 	private Expression plus(Expression expr1, Expression expr2) {
@@ -142,8 +162,12 @@ public class HotSpotIntrinsicedAPIsRefactoring extends ASTVisitor implements
 	}
 
 	private Integer intValue(Expression expr) {
-		if (expr instanceof NumberLiteral && isPrimitive(expr, "int")) {
-			return Integer.parseInt(((NumberLiteral) expr).getToken());
+		if (expr instanceof NumberLiteral) {
+			try {
+				return Integer.parseInt(((NumberLiteral) expr).getToken());
+			} catch (NumberFormatException ignored) {
+				// this is not an int, nothing to do
+			}
 		}
 		return null;
 	}
@@ -151,11 +175,30 @@ public class HotSpotIntrinsicedAPIsRefactoring extends ASTVisitor implements
 	private void collectLength(final Expression condition,
 			final IVariableBinding incrementedIdx, final SystemArrayCopyParams params) {
 		if (condition instanceof InfixExpression) {
-			InfixExpression ie = (InfixExpression) condition;
+			final InfixExpression ie = (InfixExpression) condition;
 			if (InfixExpression.Operator.LESS.equals(ie.getOperator())) {
 				IVariableBinding conditionIdx = getVariableBinding(ie.getLeftOperand());
 				if (equalsNotNull(incrementedIdx, conditionIdx)) {
 					params.endPos = ie.getRightOperand();
+				}
+			} else if (InfixExpression.Operator.LESS_EQUALS.equals(ie.getOperator())) {
+				IVariableBinding conditionIdx = getVariableBinding(ie.getLeftOperand());
+				if (equalsNotNull(incrementedIdx, conditionIdx)) {
+					params.endPos = minus(
+							plus(ie.getRightOperand(), ctx.getAST().newNumberLiteral("1")),
+							params.indexStartPos);
+				}
+			} else if (InfixExpression.Operator.GREATER.equals(ie.getOperator())) {
+				IVariableBinding conditionIdx = getVariableBinding(ie.getRightOperand());
+				if (equalsNotNull(incrementedIdx, conditionIdx)) {
+					params.endPos = ie.getLeftOperand();
+				}
+			} else if (InfixExpression.Operator.GREATER_EQUALS.equals(ie.getOperator())) {
+				IVariableBinding conditionIdx = getVariableBinding(ie.getRightOperand());
+				if (equalsNotNull(incrementedIdx, conditionIdx)) {
+					params.endPos = minus(
+							plus(ie.getLeftOperand(), ctx.getAST().newNumberLiteral("1")),
+							params.indexStartPos);
 				}
 			}
 		}
@@ -172,7 +215,7 @@ public class HotSpotIntrinsicedAPIsRefactoring extends ASTVisitor implements
 				|| params.destArrayExpr == null
 				|| params.destPos == null
 				|| params.endPos == null) {
-			return DO_NOT_VISIT_SUBTREE;
+			return VISIT_SUBTREE;
 		}
 		final ASTBuilder b = this.ctx.getASTBuilder();
 		return replaceWithSystemArrayCopy(node,

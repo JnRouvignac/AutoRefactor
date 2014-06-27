@@ -67,6 +67,30 @@ public class HotSpotIntrinsicedAPIsSample {
 		}
 	}
 
+	private void replaceBySystemArrayCopyWithLowerBound(int[] src, int[] dest) {
+		try {
+			System.arraycopy(src, 2, dest, 3, 3);
+		} catch (IndexOutOfBoundsException e) {
+			throw new ArrayIndexOutOfBoundsException(e.getMessage());
+		}
+	}
+
+	private void replaceBySystemArrayCopyRevertedCondition(int[] src, int[] dest) {
+		try {
+			System.arraycopy(src, 0, dest, 0, 3);
+		} catch (IndexOutOfBoundsException e) {
+			throw new ArrayIndexOutOfBoundsException(e.getMessage());
+		}
+	}
+
+	private void replaceBySystemArrayCopyRevertedCondition2(int[] src, int[] dest) {
+		try {
+			System.arraycopy(src, 0, dest, 0, 4);
+		} catch (IndexOutOfBoundsException e) {
+			throw new ArrayIndexOutOfBoundsException(e.getMessage());
+		}
+	}
+
 	private void replaceWithArraysCopyOf(int[] src, int[] dest) {
 		// FIXME Should use java.util.Arrays.copyOf()
 	}

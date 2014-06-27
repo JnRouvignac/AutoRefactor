@@ -57,6 +57,24 @@ public class HotSpotIntrinsicedAPIsSample {
 		}
 	}
 
+	private void replaceBySystemArrayCopyWithLowerBound(int[] src, int[] dest) {
+		for (int i = 1; i <= 3; i++) {
+			dest[i + 2] = src[i + 1];
+		}
+	}
+
+	private void replaceBySystemArrayCopyRevertedCondition(int[] src, int[] dest) {
+		for (int i = 0; 3 > i; i++) {
+			dest[i] = src[i];
+		}
+	}
+
+	private void replaceBySystemArrayCopyRevertedCondition2(int[] src, int[] dest) {
+		for (int i = 0; 3 >= i; i++) {
+			dest[i] = src[i];
+		}
+	}
+
 	private void replaceWithArraysCopyOf(int[] src, int[] dest) {
 		// FIXME Should use java.util.Arrays.copyOf()
 	}
