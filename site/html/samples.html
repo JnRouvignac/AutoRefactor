@@ -5,17 +5,16 @@
     <title>AutoRefactor sample refactorings</title>
     <script type="text/javascript" src="../js/base64codec.js"></script>
     <!--
-     ! Following line does not work because it does not have the proper Content-Type header
-     ! <link rel="stylesheet" type="text/css" href="https://raw.github.com/cemerick/jsdifflib/master/diffview.css">
+     ! Following JS/CSS files need to be served with correct Content-Type header.
+     ! Directly accessing https://raw.github.com/cemerick/jsdifflib/master/ does not send that header.
+     ! Need to go through a proxy that adds the relevant header like https://rawgit.com, http://cdnjs.com, http://raw.githack.com
      !
-     ! See line below to get the proper Content-Type.
-     ! See also http://cdnjs.com, http://raw.githack.com
-     ! Another alternative is to push website to github pages on every commit:
+     ! Another alternative is to push website to github pages on every commit, might do that in the future:
      ! http://stackoverflow.com/questions/7180099/including-js-from-raw-github-com
     -->
-    <link rel="stylesheet" type="text/css" href="https://rawgit.com/cemerick/jsdifflib/master/diffview.css">
-    <script type="text/javascript" src="https://raw.github.com/cemerick/jsdifflib/master/difflib.js"></script>
-    <script type="text/javascript" src="https://raw.github.com/cemerick/jsdifflib/master/diffview.js"></script>
+    <link rel="stylesheet" type="text/css" href="http://rawgit.com/cemerick/jsdifflib/master/diffview.css">
+    <script type="text/javascript" src="http://rawgit.com/cemerick/jsdifflib/master/difflib.js"></script>
+    <script type="text/javascript" src="http://rawgit.com/cemerick/jsdifflib/master/diffview.js"></script>
     <!--
      ! JS diff libs (http://stackoverflow.com/questions/4462609/looking-for-a-javascript-visual-diff-lib):
      ! - https://github.com/cemerick/jsdifflib (Used here)
