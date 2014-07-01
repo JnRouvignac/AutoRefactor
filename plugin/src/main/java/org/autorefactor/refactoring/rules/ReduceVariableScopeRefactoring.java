@@ -357,9 +357,9 @@ public class ReduceVariableScopeRefactoring extends ASTVisitor implements
 		if (stmtToCopy != null && !(stmtToCopy instanceof Block)) {
 			final Block b = this.ctx.getAST().newBlock();
 			if (stmtToCopy instanceof ExpressionStatement) {
-				final ExpressionStatement es = (ExpressionStatement) stmtToCopy;
+				final Assignment a = asExpression(stmtToCopy, Assignment.class);
 				final VariableDeclarationFragment vdf = getVariableDeclarationFragment(
-						es.getExpression(), varName);
+						a, varName);
 				statements(b).add(this.ctx.getAST().newVariableDeclarationStatement(vdf));
 			} else {
 				throw new NotImplementedException(stmtToCopy);

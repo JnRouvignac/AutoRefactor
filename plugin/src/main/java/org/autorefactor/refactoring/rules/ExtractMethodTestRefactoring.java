@@ -39,7 +39,6 @@ import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.Expression;
-import org.eclipse.jdt.core.dom.ExpressionStatement;
 import org.eclipse.jdt.core.dom.FieldAccess;
 import org.eclipse.jdt.core.dom.IBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;
@@ -312,8 +311,8 @@ public class ExtractMethodTestRefactoring extends ASTVisitor implements
 		return null;
 	}
 
-	private Expression getOperand(Statement s) {
-		Assignment pe = (Assignment) ((ExpressionStatement) s).getExpression();
+	private Expression getOperand(Statement stmt) {
+		Assignment pe = asExpression(stmt, Assignment.class);
 		return pe.getRightHandSide();
 	}
 

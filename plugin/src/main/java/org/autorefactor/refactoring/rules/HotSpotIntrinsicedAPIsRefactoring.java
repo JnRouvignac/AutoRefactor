@@ -71,21 +71,18 @@ public class HotSpotIntrinsicedAPIsRefactoring extends ASTVisitor implements
 
 			final Statement stmt = stmts.get(0);
 			if (stmt instanceof ExpressionStatement) {
-				final Expression e = ((ExpressionStatement) stmt).getExpression();
-				if (e instanceof Assignment) {
-					final Assignment as = (Assignment) e;
-					final Expression lhs = as.getLeftHandSide();
-					final Expression rhs = as.getRightHandSide();
-					if (lhs instanceof ArrayAccess && rhs instanceof ArrayAccess) {
-						final ArrayAccess aaLHS = (ArrayAccess) lhs;
-						params.destArrayExpr = aaLHS.getArray();
-						params.destPos = calcIndex(aaLHS.getIndex(), params);
+				final Assignment as = asExpression(stmt, Assignment.class);
+				final Expression lhs = as.getLeftHandSide();
+				final Expression rhs = as.getRightHandSide();
+				if (lhs instanceof ArrayAccess && rhs instanceof ArrayAccess) {
+					final ArrayAccess aaLHS = (ArrayAccess) lhs;
+					params.destArrayExpr = aaLHS.getArray();
+					params.destPos = calcIndex(aaLHS.getIndex(), params);
 
-						final ArrayAccess aaRHS = (ArrayAccess) rhs;
-						params.srcArrayExpr = aaRHS.getArray();
-						params.srcPos = calcIndex(aaRHS.getIndex(), params);
-						return replaceWithSystemArrayCopyCloneAll(node, params);
-					}
+					final ArrayAccess aaRHS = (ArrayAccess) rhs;
+					params.srcArrayExpr = aaRHS.getArray();
+					params.srcPos = calcIndex(aaRHS.getIndex(), params);
+					return replaceWithSystemArrayCopyCloneAll(node, params);
 				}
 			}
 		}

@@ -219,65 +219,50 @@ public class BooleanRefactoring extends ASTVisitor implements IJavaRefactoring {
 				}
 			}
 		} else {
-			ExpressionStatement thenEs = as(node.getThenStatement(), ExpressionStatement.class);
-			if (thenEs != null && asList(node.getElseStatement()).isEmpty()) {
-				final Assignment thenA = as(thenEs.getExpression(), Assignment.class);
-				if (thenA != null
-						&& Assignment.Operator.ASSIGN.equals(thenA
-								.getOperator())
-						&& (thenA.getLeftHandSide() instanceof Name || thenA
-								.getLeftHandSide() instanceof FieldAccess)) {
-					final Statement previousSibling = getPreviousSibling(node);
-					if (previousSibling instanceof VariableDeclarationStatement) {
-						final VariableDeclarationStatement vds = (VariableDeclarationStatement) previousSibling;
-						final VariableDeclarationFragment vdf = getVariableDeclarationFragment(
-								vds, thenA.getLeftHandSide());
-						if (vdf == null) {
-							return VISIT_SUBTREE;
-						}
-
-						final ITypeBinding typeBinding = vds.getType()
-								.resolveBinding();
+			final Assignment thenA = asExpression(node.getThenStatement(), Assignment.class);
+			if (thenA != null
+					&& asList(node.getElseStatement()).isEmpty()
+					&& Assignment.Operator.ASSIGN.equals(thenA.getOperator())
+					&& (thenA.getLeftHandSide() instanceof Name
+						|| thenA.getLeftHandSide() instanceof FieldAccess)) {
+				final Statement previousSibling = getPreviousSibling(node);
+				if (previousSibling instanceof VariableDeclarationStatement) {
+					final VariableDeclarationStatement vds = (VariableDeclarationStatement) previousSibling;
+					final VariableDeclarationFragment vdf = getVariableDeclarationFragment(
+							vds, thenA.getLeftHandSide());
+					final ITypeBinding typeBinding = vds.getType().resolveBinding();
+					if (vdf == null || typeBinding == null) {
+						return VISIT_SUBTREE;
+					}
+					final String expressionTypeName = typeBinding.getQualifiedName();
+					final Expression newE = maybeGetExpression(
+							expressionTypeName, node.getExpression(),
+							getBooleanLiteral(thenA.getRightHandSide()),
+							getBooleanLiteral(vdf.getInitializer()));
+					if (newE != null) {
+						this.ctx.getRefactorings().replace(vdf.getInitializer(), newE);
+						this.ctx.getRefactorings().remove(node);
+					}
+				} else if (previousSibling instanceof ExpressionStatement) {
+					final Assignment elseA = asExpression(previousSibling, Assignment.class);
+					if (elseA != null
+							&& Assignment.Operator.ASSIGN.equals(elseA.getOperator())
+							&& isSameVariable(
+									thenA.getLeftHandSide(),
+									elseA.getLeftHandSide())) {
+						final ITypeBinding typeBinding = elseA.resolveTypeBinding();
 						if (typeBinding == null) {
 							return VISIT_SUBTREE;
 						}
-						final String expressionTypeName = typeBinding
-								.getQualifiedName();
+						final String expressionTypeName = typeBinding.getQualifiedName();
 						final Expression newE = maybeGetExpression(
-								expressionTypeName, node.getExpression(),
+								expressionTypeName,
+								node.getExpression(),
 								getBooleanLiteral(thenA.getRightHandSide()),
-								getBooleanLiteral(vdf.getInitializer()));
+								getBooleanLiteral(elseA.getRightHandSide()));
 						if (newE != null) {
-							this.ctx.getRefactorings().replace(vdf.getInitializer(),
-									newE);
+							this.ctx.getRefactorings().replace(elseA.getRightHandSide(), newE);
 							this.ctx.getRefactorings().remove(node);
-						}
-					} else if (previousSibling instanceof ExpressionStatement) {
-						ExpressionStatement elseEs = (ExpressionStatement) previousSibling;
-						final Assignment elseA = as(elseEs.getExpression(), Assignment.class);
-						if (elseA != null
-								&& Assignment.Operator.ASSIGN.equals(elseA
-										.getOperator())
-								&& isSameVariable(
-										thenA.getLeftHandSide(),
-										elseA.getLeftHandSide())) {
-							final ITypeBinding typeBinding = elseA
-									.resolveTypeBinding();
-							if (typeBinding == null) {
-								return VISIT_SUBTREE;
-							}
-							final String expressionTypeName = typeBinding
-									.getQualifiedName();
-							final Expression newE = maybeGetExpression(
-									expressionTypeName,
-									node.getExpression(),
-									getBooleanLiteral(thenA.getRightHandSide()),
-									getBooleanLiteral(elseA.getRightHandSide()));
-							if (newE != null) {
-								this.ctx.getRefactorings().replace(
-										elseA.getRightHandSide(), newE);
-								this.ctx.getRefactorings().remove(node);
-							}
 						}
 					}
 				}

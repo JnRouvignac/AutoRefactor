@@ -62,12 +62,11 @@ public class RemoveUnnecessaryLocalBeforeReturnRefactoring extends ASTVisitor
 				}
 			}
 		} else if (previousSibling instanceof ExpressionStatement) {
+			final Assignment as = asExpression(previousSibling, Assignment.class);
 			final Expression origExpr = node.getExpression();
-			final ExpressionStatement es = (ExpressionStatement) previousSibling;
-			final Assignment as = as(es.getExpression(), Assignment.class);
 			if (as != null && Assignment.Operator.ASSIGN.equals(as.getOperator())) {
 				final Expression newExpr = as.getLeftHandSide();
-				replaceReturnStatement(node, es, origExpr, newExpr,
+				replaceReturnStatement(node, previousSibling, origExpr, newExpr,
 						as.getRightHandSide());
 			}
 		}

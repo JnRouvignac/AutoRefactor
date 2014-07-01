@@ -167,6 +167,17 @@ public class ASTHelper {
 		return null;
 	}
 
+	/**
+	 * Returns the {@link Expression} of a specified type out of an {@link ExpressionStatement}.
+	 */
+	public static <T extends Expression> T asExpression(Statement stmt, Class<T> exprClazz) {
+		final ExpressionStatement es = as(stmt, ExpressionStatement.class);
+		if (es != null) {
+			return as(es.getExpression(), exprClazz);
+		}
+		return null;
+	}
+
 	@SuppressWarnings("unchecked")
 	public static List<Expression> arguments(ClassInstanceCreation node) {
 		return node.arguments();
