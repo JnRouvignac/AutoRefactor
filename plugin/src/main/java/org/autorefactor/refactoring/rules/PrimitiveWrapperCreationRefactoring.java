@@ -25,8 +25,6 @@
  */
 package org.autorefactor.refactoring.rules;
 
-import java.util.List;
-
 import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.IJavaRefactoring;
 import org.autorefactor.refactoring.Refactorings;
@@ -68,24 +66,22 @@ public class PrimitiveWrapperCreationRefactoring extends ASTVisitor implements
 				&& node.getExpression() instanceof ClassInstanceCreation) {
 			final ClassInstanceCreation cic = (ClassInstanceCreation) node
 					.getExpression();
-			List<Expression> arguments = cic.arguments();
-			if (arguments.size() == 1) {
-				ITypeBinding argTypeBinding = arguments.get(0)
+			if (arguments(cic).size() == 1) {
+				ITypeBinding argTypeBinding = arguments(cic).get(0)
 						.resolveTypeBinding();
 				if (argTypeBinding != null
-						&& node.arguments().size() == 0
+						&& arguments(node).size() == 0
 						&& "java.lang.String".equals(argTypeBinding
 								.getQualifiedName())) {
 					final String methodName = getMethodName(
 							typeBinding.getQualifiedName(), node.getName()
 									.getIdentifier());
 					if (methodName != null) {
-						final Expression arg = (Expression) cic.arguments()
-								.get(0);
+						final Expression arg0 = arguments(cic).get(0);
 						this.ctx.getRefactorings().replace(
 								node,
 								newMethodInvocation(typeBinding.getName(),
-										methodName, arg));
+										methodName, arg0));
 					}
 				}
 			}
@@ -121,7 +117,7 @@ public class PrimitiveWrapperCreationRefactoring extends ASTVisitor implements
 	public boolean visit(ClassInstanceCreation node) {
 		final ITypeBinding typeBinding = node.getType().resolveBinding();
 		if (javaMinorVersion >= 5 && typeBinding != null
-				&& node.arguments().size() == 1) {
+				&& arguments(node).size() == 1) {
 			final String qualifiedName = typeBinding.getQualifiedName();
 			if ("java.lang.Boolean".equals(qualifiedName)
 					|| "java.lang.Byte".equals(qualifiedName)
@@ -134,7 +130,7 @@ public class PrimitiveWrapperCreationRefactoring extends ASTVisitor implements
 				this.ctx.getRefactorings().replace(
 						node,
 						newMethodInvocation(typeBinding.getName(), "valueOf",
-								(Expression) node.arguments().get(0)));
+								arguments(node).get(0)));
 				return DO_NOT_VISIT_SUBTREE;
 			}
 		}

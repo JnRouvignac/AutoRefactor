@@ -71,7 +71,7 @@ public class IfStatementRefactoring extends ASTVisitor implements
 	public boolean visit(IfStatement node) {
 		final Statement elseStmt = node.getElseStatement();
 		if (elseStmt instanceof Block) {
-			List<Statement> elseStmts = ((Block) elseStmt).statements();
+			List<Statement> elseStmts = statements((Block) elseStmt);
 			if (elseStmts.size() == 1
 					&& elseStmts.get(0) instanceof IfStatement) {
 				final AST ast = this.ctx.getAST();

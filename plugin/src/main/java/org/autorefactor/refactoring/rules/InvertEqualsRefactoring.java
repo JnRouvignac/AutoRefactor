@@ -65,12 +65,12 @@ public class InvertEqualsRefactoring extends ASTVisitor implements
 		if (isEquals || isStringEqualsIgnoreCase) {
 			final Expression expr = node.getExpression();
 			final Object exprConstantValue = expr.resolveConstantExpressionValue();
-			final Expression arg = (Expression) node.arguments().get(0);
-			final Object argConstantValue = arg.resolveConstantExpressionValue();
+			final Expression arg0 = arguments(node).get(0);
+			final Object argConstantValue = arg0.resolveConstantExpressionValue();
 			// TODO JNR make it work for enums
 			if (exprConstantValue == null && argConstantValue != null) {
 				this.ctx.getRefactorings().replace(node,
-						invertEqualsInvocation(expr, arg, isEquals));
+						invertEqualsInvocation(expr, arg0, isEquals));
 				return DO_NOT_VISIT_SUBTREE;
 			}
 		}

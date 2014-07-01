@@ -156,7 +156,7 @@ public class StringBuilderRefactoring extends ASTVisitor implements
 		}
 		final ITypeBinding typeBinding = node.getExpression().resolveTypeBinding();
 		if ("append".equals(node.getName().getIdentifier())
-				&& node.arguments().size() == 1
+				&& arguments(node).size() == 1
 				// most expensive check comes last
 				&& instanceOf(typeBinding, "java.lang.Appendable")) {
 			final LinkedList<Expression> allAppendedStrings = new LinkedList<Expression>();
@@ -177,9 +177,9 @@ public class StringBuilderRefactoring extends ASTVisitor implements
 			if (isStringValueOf(embeddedMI)
 				&& (instanceOf(typeBinding, "java.lang.StringBuilder")
 					|| instanceOf(typeBinding, "java.lang.StringBuffer"))) {
-				final Expression arg = (Expression) embeddedMI.arguments().get(0);
+				final Expression arg0 = arguments(embeddedMI).get(0);
 				this.ctx.getRefactorings().replace(node,
-						createStringAppends(lastExpr, Arrays.asList(arg)));
+						createStringAppends(lastExpr, Arrays.asList(arg0)));
 				return DO_NOT_VISIT_SUBTREE;
 			}
 			final boolean substringWithOneArg =
@@ -190,7 +190,7 @@ public class StringBuilderRefactoring extends ASTVisitor implements
 			if (substringWithOneArg || substringWithTwoArgs) {
 				final ASTBuilder b = this.ctx.getASTBuilder();
 				final Expression stringVar = b.copyExpr(embeddedMI.getExpression());
-				final List<Expression> args = embeddedMI.arguments();
+				final List<Expression> args = arguments(embeddedMI);
 				final Expression arg0 = b.copyExpr(args.get(0));
 				final Expression arg1 = substringWithTwoArgs ? b.copyExpr(args.get(1)) : null;
 				this.ctx.getRefactorings().replace(node,
@@ -275,7 +275,7 @@ public class StringBuilderRefactoring extends ASTVisitor implements
 		final Expression expr2 = b.copyExpr(it.next());
 		final InfixExpression ie = b.infixExpr(expr1, Operator.PLUS, expr2);
 		while (it.hasNext()) {
-			ie.extendedOperands().add(b.copyExpr(it.next()));
+			extendedOperands(ie).add(b.copyExpr(it.next()));
 		}
 		return ie;
 	}
@@ -287,19 +287,19 @@ public class StringBuilderRefactoring extends ASTVisitor implements
 			if (expr instanceof MethodInvocation) {
 				final MethodInvocation mi = (MethodInvocation) expr;
 				if ("append".equals(mi.getName().getIdentifier())
-						&& mi.arguments().size() == 1) {
-					final Expression arg = (Expression) mi.arguments().get(0);
-					addAllSubExpressions(arg, allOperands, foundInfixExpr);
+						&& arguments(mi).size() == 1) {
+					final Expression arg0 = arguments(mi).get(0);
+					addAllSubExpressions(arg0, allOperands, foundInfixExpr);
 					return collectAllAppendedStrings(mi.getExpression(), allOperands,
 							foundInfixExpr);
 				}
 			} else if (expr instanceof ClassInstanceCreation) {
 				final ClassInstanceCreation cic = (ClassInstanceCreation) expr;
-				if (cic.arguments().size() == 1) {
-					final Expression arg = (Expression) cic.arguments().get(0);
-					if (hasType(arg, "java.lang.String")
-							|| instanceOf(arg, "java.lang.CharSequence")) {
-						allOperands.addFirst(b.copyExpr(arg));
+				if (arguments(cic).size() == 1) {
+					final Expression arg0 = arguments(cic).get(0);
+					if (hasType(arg0, "java.lang.String")
+							|| instanceOf(arg0, "java.lang.CharSequence")) {
+						allOperands.addFirst(b.copyExpr(arg0));
 					}
 				}
 				return b.copyExpr(cic);
@@ -317,7 +317,7 @@ public class StringBuilderRefactoring extends ASTVisitor implements
 			if (InfixExpression.Operator.PLUS.equals(ie.getOperator())) {
 				if (ie.hasExtendedOperands()) {
 					final List<Expression> reversed =
-							new ArrayList<Expression>(ie.extendedOperands());
+							new ArrayList<Expression>(extendedOperands(ie));
 					Collections.reverse(reversed);
 					for (Expression op : reversed) {
 						addAllSubExpressions(op, results, foundInfixExpr);

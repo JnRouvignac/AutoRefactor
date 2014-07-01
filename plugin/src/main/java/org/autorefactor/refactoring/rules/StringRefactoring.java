@@ -60,11 +60,11 @@ public class StringRefactoring extends ASTVisitor implements IJavaRefactoring {
 		final ITypeBinding typeBinding = node.getType().resolveBinding();
 		if (typeBinding != null
 				&& "java.lang.String".equals(typeBinding.getQualifiedName())
-				&& node.arguments().size() == 1) {
-			final Expression arg = (Expression) node.arguments().get(0);
-			if (arg.resolveConstantExpressionValue() != null) {
+				&& arguments(node).size() == 1) {
+			final Expression arg0 = arguments(node).get(0);
+			if (arg0.resolveConstantExpressionValue() != null) {
 				this.ctx.getRefactorings().replace(node,
-						copySubtree(this.ctx.getAST(), arg));
+						copySubtree(this.ctx.getAST(), arg0));
 				return DO_NOT_VISIT_SUBTREE;
 			}
 		}
@@ -76,7 +76,7 @@ public class StringRefactoring extends ASTVisitor implements IJavaRefactoring {
 		final Expression expression = node.getExpression();
 		if (expression != null
 				&& "toString".equals(node.getName().getIdentifier())
-				&& node.arguments().isEmpty()
+				&& arguments(node).isEmpty()
 				&& canRemoveToStringMethodCall(node, expression)) {
 			this.ctx.getRefactorings().replace(node,
 					copySubtree(this.ctx.getAST(), expression));

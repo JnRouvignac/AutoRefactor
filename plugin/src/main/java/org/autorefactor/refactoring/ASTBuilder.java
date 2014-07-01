@@ -27,6 +27,8 @@ package org.autorefactor.refactoring;
 
 import org.eclipse.jdt.core.dom.*;
 
+import static org.autorefactor.refactoring.ASTHelper.*;
+
 /**
  * Helper class for building AST note in a somewhat fluent API.
  * Method names which are also java keywords are postfixed with a "0".
@@ -42,7 +44,7 @@ public class ASTBuilder {
 	public Block body(final Statement... stmts) {
 		final Block tryBody = ast.newBlock();
 		for (Statement stmt : stmts) {
-			tryBody.statements().add(stmt);
+			statements(tryBody).add(stmt);
 		}
 		return tryBody;
 	}
@@ -56,7 +58,7 @@ public class ASTBuilder {
 
 		final Block block = ast.newBlock();
 		for (Statement stmt : stmts) {
-			block.statements().add(stmt);
+			statements(block).add(stmt);
 		}
 		cc.setBody(block);
 		return cc;
@@ -69,11 +71,11 @@ public class ASTBuilder {
 	public <T extends Statement> T copyStmt(T node) {
 		return ASTHelper.copySubtree(ast, node);
 	}
-	
+
 	public IfStatement if0(Expression condition, Statement thenStatement) {
 		return if0(condition, thenStatement, null);
 	}
-	
+
 	public IfStatement if0(Expression condition, Statement thenStatement, Statement elseStatement) {
 		final IfStatement is = ast.newIfStatement();
 		is.setExpression(condition);
@@ -99,7 +101,7 @@ public class ASTBuilder {
 		mi.setExpression(ast.newSimpleName(expression));
 		mi.setName(ast.newSimpleName(methodName));
 		for (Expression argument : arguments) {
-			mi.arguments().add(argument);
+			arguments(mi).add(argument);
 		}
 		return mi;
 	}
@@ -109,7 +111,7 @@ public class ASTBuilder {
 		mi.setExpression(expression);
 		mi.setName(ast.newSimpleName(methodName));
 		for (Expression argument : arguments) {
-			mi.arguments().add(argument);
+			arguments(mi).add(argument);
 		}
 		return mi;
 	}
@@ -128,7 +130,7 @@ public class ASTBuilder {
 		final ClassInstanceCreation cic = ast.newClassInstanceCreation();
 		cic.setType(ast.newSimpleType(ast.newSimpleName(className)));
 		for (Expression argument : arguments) {
-			cic.arguments().add(argument);
+			arguments(cic).add(argument);
 		}
 		return cic;
 	}
@@ -169,7 +171,7 @@ public class ASTBuilder {
 		final TryStatement tryS = ast.newTryStatement();
 		tryS.setBody(body);
 		for (CatchClause catchCause : catchClauses) {
-			tryS.catchClauses().add(catchCause);
+			catchClauses(tryS).add(catchCause);
 		}
 		return tryS;
 	}

@@ -263,9 +263,9 @@ public class ReduceVariableScopeRefactoring extends ASTVisitor implements
 		final Type varType = getType(varDecl.getVariableName().getParent());
 		if (scope instanceof Block) {
 			final Block b = (Block) scope;
-			final List<Statement> statements = b.statements();
-			for (int i = 0; i < statements.size(); i++) {
-				final Statement stmt = statements.get(i);
+			final List<Statement> stmts = statements(b);
+			for (int i = 0; i < stmts.size(); i++) {
+				final Statement stmt = stmts.get(i);
 				final Expression parentExpr = getParentOfType(varName,
 						Expression.class);// FIXME i=0
 				final Statement parentStmt = getParentOfType(parentExpr,
@@ -295,7 +295,7 @@ public class ReduceVariableScopeRefactoring extends ASTVisitor implements
 		} else if (scope instanceof ForStatement) {
 			final ForStatement fs = (ForStatement) scope;
 			final ForStatement newFs = copySubtree(ast, fs);
-			final List<Expression> initializers = newFs.initializers();
+			final List<Expression> initializers = initializers(newFs);
 			if (initializers.size() == 1) {
 				final Expression init = initializers.remove(0);
 				final VariableDeclarationFragment vdf = getVariableDeclarationFragment(
@@ -360,8 +360,7 @@ public class ReduceVariableScopeRefactoring extends ASTVisitor implements
 				final ExpressionStatement es = (ExpressionStatement) stmtToCopy;
 				final VariableDeclarationFragment vdf = getVariableDeclarationFragment(
 						es.getExpression(), varName);
-				b.statements().add(
-						this.ctx.getAST().newVariableDeclarationStatement(vdf));
+				statements(b).add(this.ctx.getAST().newVariableDeclarationStatement(vdf));
 			} else {
 				throw new NotImplementedException(stmtToCopy);
 			}
@@ -375,7 +374,7 @@ public class ReduceVariableScopeRefactoring extends ASTVisitor implements
 	@SuppressWarnings("unchecked")
 	private <T extends ASTNode> T getParentOfType(ASTNode node, Class<T> clazz) {
 		final ASTNode parent = node.getParent();
-		if (node != null && clazz.isAssignableFrom(parent.getClass())) {
+		if (clazz.isAssignableFrom(parent.getClass())) {
 			return (T) parent;
 		}
 		return getParentOfType(parent, clazz);

@@ -51,6 +51,8 @@ import org.eclipse.jdt.core.dom.ThisExpression;
 import org.eclipse.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jdt.internal.corext.dom.Bindings;
 
+import static org.autorefactor.refactoring.ASTHelper.*;
+
 public class ExtractMethodTestRefactoring extends ASTVisitor implements
 		IJavaRefactoring {
 
@@ -231,7 +233,7 @@ public class ExtractMethodTestRefactoring extends ASTVisitor implements
 	 */
 	public boolean visit(org.eclipse.jdt.core.dom.Block node) {
 		// TODO JNR remove
-		List<Statement> stmts = node.statements();
+		List<Statement> stmts = statements(node);
 		if (stmts.size() == 14) {
 			int idx = 1;
 
@@ -249,7 +251,7 @@ public class ExtractMethodTestRefactoring extends ASTVisitor implements
 			operands.add(getOperand(stmts.get(idx++)));
 			operands.add(getOperand(stmts.get(idx++)));
 			final Block b = (Block) stmts.get(idx++);
-			operands.add(getOperand((ExpressionStatement) b.statements().get(1)));
+			operands.add(getOperand(statements(b).get(1)));
 
 			try {
 				PrintStream os = new PrintStream(

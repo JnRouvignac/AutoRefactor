@@ -53,9 +53,8 @@ public class RemoveUnnecessaryLocalBeforeReturnRefactoring extends ASTVisitor
 		final Statement previousSibling = getPreviousSibling(node);
 		if (previousSibling instanceof VariableDeclarationStatement) {
 			final VariableDeclarationStatement vds = (VariableDeclarationStatement) previousSibling;
-			if (vds.fragments().size() == 1) {
-				final VariableDeclarationFragment vdf = (VariableDeclarationFragment) vds
-						.fragments().get(0);
+			if (fragments(vds).size() == 1) {
+				final VariableDeclarationFragment vdf = fragments(vds).get(0);
 				final Expression origExpr = node.getExpression();
 				if (origExpr instanceof SimpleName) {
 					replaceReturnStatement(node, vds, origExpr, vdf.getName(),
@@ -104,7 +103,7 @@ public class RemoveUnnecessaryLocalBeforeReturnRefactoring extends ASTVisitor
 	private ReturnStatement getReturnStatementForArray(ArrayInitializer returnAI, ITypeBinding typeBinding) {
 		final AST ast = this.ctx.getAST();
 		final ArrayInitializer ai = ast.newArrayInitializer();
-		ai.expressions().addAll(ASTNode.copySubtrees(ast, returnAI.expressions()));
+		expressions(ai).addAll(copySubtrees(ast, expressions(returnAI)));
 		final ArrayCreation ac = ast.newArrayCreation();
 		ac.setType((ArrayType) toType(ast, typeBinding));
 		ac.setInitializer(ai);

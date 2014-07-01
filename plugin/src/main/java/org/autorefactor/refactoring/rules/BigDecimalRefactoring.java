@@ -65,10 +65,10 @@ public class BigDecimalRefactoring extends ASTVisitor implements
 		final ITypeBinding typeBinding = node.getType().resolveBinding();
 		if (typeBinding != null
 				&& "java.math.BigDecimal".equals(typeBinding.getQualifiedName())
-				&& node.arguments().size() == 1) {
-			final Expression arg = (Expression) node.arguments().get(0);
-			if (arg instanceof NumberLiteral) {
-				final NumberLiteral nb = (NumberLiteral) arg;
+				&& arguments(node).size() == 1) {
+			final Expression arg0 = arguments(node).get(0);
+			if (arg0 instanceof NumberLiteral) {
+				final NumberLiteral nb = (NumberLiteral) arg0;
 				if (nb.getToken().contains(".")) {
 					// Only instantiation from double, not from integer
 					this.ctx.getRefactorings().replace(nb,
@@ -78,28 +78,28 @@ public class BigDecimalRefactoring extends ASTVisitor implements
 						return VISIT_SUBTREE;
 					}
 					if (ZERO_LONG_LITERAL_RE.matcher(nb.getToken()).matches()) {
-						replaceWithQualifiedName(node, typeBinding.getName(), "ZERO");
+						replaceWithQualifiedName(node, typeBinding, "ZERO");
 					} else if (ONE_LONG_LITERAL_RE.matcher(nb.getToken()).matches()) {
-						replaceWithQualifiedName(node, typeBinding.getName(), "ONE");
+						replaceWithQualifiedName(node, typeBinding, "ONE");
 					} else if (TEN_LONG_LITERAL_RE.matcher(nb.getToken()).matches()) {
-						replaceWithQualifiedName(node, typeBinding.getName(), "TEN");
+						replaceWithQualifiedName(node, typeBinding, "TEN");
 					} else {
 						this.ctx.getRefactorings().replace(node,
 								getValueOf(typeBinding.getName(), nb.getToken()));
 					}
 				}
 				return DO_NOT_VISIT_SUBTREE;
-			} else if (arg instanceof StringLiteral) {
+			} else if (arg0 instanceof StringLiteral) {
 				if (javaMinorVersion < 5) {
 					return VISIT_SUBTREE;
 				}
-				final String literalValue = ((StringLiteral) arg).getLiteralValue();
+				final String literalValue = ((StringLiteral) arg0).getLiteralValue();
 				if (literalValue.matches("0+")) {
-					replaceWithQualifiedName(node, typeBinding.getName(), "ZERO");
+					replaceWithQualifiedName(node, typeBinding, "ZERO");
 				} else if (literalValue.matches("0+1")) {
-					replaceWithQualifiedName(node, typeBinding.getName(), "ONE");
+					replaceWithQualifiedName(node, typeBinding, "ONE");
 				} else if (literalValue.matches("0+10")) {
-					replaceWithQualifiedName(node, typeBinding.getName(), "TEN");
+					replaceWithQualifiedName(node, typeBinding, "TEN");
 				} else if (literalValue.matches("\\d+")) {
 					this.ctx.getRefactorings().replace(node,
 							getValueOf(typeBinding.getName(), literalValue));
@@ -109,9 +109,9 @@ public class BigDecimalRefactoring extends ASTVisitor implements
 		return VISIT_SUBTREE;
 	}
 
-	private void replaceWithQualifiedName(ASTNode node, String className, String field) {
+	private void replaceWithQualifiedName(ASTNode node, ITypeBinding typeBinding, String field) {
 		this.ctx.getRefactorings().replace(node,
-				this.ctx.getASTBuilder().name(className, field));
+				this.ctx.getASTBuilder().name(typeBinding.getName(), field));
 	}
 
 	private ASTNode getValueOf(String name, String numberLiteral) {
@@ -132,28 +132,28 @@ public class BigDecimalRefactoring extends ASTVisitor implements
 				&& (isMethod(node, "java.math.BigDecimal", "valueOf", "long")
 					|| isMethod(node, "java.math.BigDecimal", "valueOf", "double"))) {
 			final ITypeBinding typeBinding = node.getExpression().resolveTypeBinding();
-			final Expression arg = (Expression) node.arguments().get(0);
-			if (arg instanceof NumberLiteral) {
-				final NumberLiteral nb = (NumberLiteral) arg;
+			final Expression arg0 = arguments(node).get(0);
+			if (arg0 instanceof NumberLiteral) {
+				final NumberLiteral nb = (NumberLiteral) arg0;
 				if (nb.getToken().contains(".")) {
 					this.ctx.getRefactorings().replace(node,
 							getClassInstanceCreatorNode(
 									(Name) node.getExpression(),
 									nb.getToken()));
 				} else if (ZERO_LONG_LITERAL_RE.matcher(nb.getToken()).matches()) {
-					replaceWithQualifiedName(node, typeBinding.getName(), "ZERO");
+					replaceWithQualifiedName(node, typeBinding, "ZERO");
 				} else if (ONE_LONG_LITERAL_RE.matcher(nb.getToken()).matches()) {
-					replaceWithQualifiedName(node, typeBinding.getName(), "ONE");
+					replaceWithQualifiedName(node, typeBinding, "ONE");
 				} else if (TEN_LONG_LITERAL_RE.matcher(nb.getToken()).matches()) {
-					replaceWithQualifiedName(node, typeBinding.getName(), "TEN");
+					replaceWithQualifiedName(node, typeBinding, "TEN");
 				} else {
 					return VISIT_SUBTREE;
 				}
 				return DO_NOT_VISIT_SUBTREE;
 			}
 		} else if (isMethod(node, "java.math.BigDecimal", "equals", "java.lang.Object")) {
-			final Expression arg = (Expression) node.arguments().get(0);
-			if (hasType(arg, "java.math.BigDecimal")) {
+			final Expression arg0 = arguments(node).get(0);
+			if (hasType(arg0, "java.math.BigDecimal")) {
 				if (isInStringAppend(node.getParent())) {
 					this.ctx.getRefactorings().replace(node,
 							parenthesize(getCompareToNode(node)));
@@ -190,7 +190,7 @@ public class BigDecimalRefactoring extends ASTVisitor implements
 	private InfixExpression getCompareToNode(MethodInvocation node) {
 		final ASTBuilder b = this.ctx.getASTBuilder();
 		final MethodInvocation mi = b.invoke(
-				b.copyExpr(node.getExpression()), "compareTo", b.copyExpr((Expression) node.arguments().get(0)));
+				b.copyExpr(node.getExpression()), "compareTo", b.copyExpr(arguments(node).get(0)));
 
 		return b.infixExpr(mi, Operator.EQUALS, b.int0(0));
 	}

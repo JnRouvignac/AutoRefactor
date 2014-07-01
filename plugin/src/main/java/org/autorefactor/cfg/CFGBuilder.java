@@ -266,7 +266,7 @@ public class CFGBuilder {
 
 	private void addDeclarations(CFGBasicBlock basicBlock,
 			final VariableDeclarationExpression vde) {
-		addDeclarations(basicBlock, vde.fragments(), vde.getType());
+		addDeclarations(basicBlock, fragments(vde), vde.getType());
 
 	}
 
@@ -358,7 +358,7 @@ public class CFGBuilder {
 		final CFGBasicBlock entryBlock = newEntryBlock(node);
 		this.exitBlock = newExitBlock(node);
 
-		addDeclarations(entryBlock, node.parameters());
+		addDeclarations(entryBlock, parameters(node));
 
 		try {
 			final CFGEdgeBuilder liveEdge = new CFGEdgeBuilder(entryBlock);
@@ -470,7 +470,7 @@ public class CFGBuilder {
 
 	public LivenessState buildCFG(VariableDeclarationStatement node, LivenessState state) {
 		final CFGBasicBlock basicBlock = getCFGBasicBlock(node, state);
-		addDeclarations(basicBlock, node.fragments(), node.getType());
+		addDeclarations(basicBlock, fragments(node), node.getType());
 		return getInBlockStmtResult(state, basicBlock);
 	}
 
@@ -481,7 +481,7 @@ public class CFGBuilder {
 	public LivenessState buildCFG(SwitchStatement node, LivenessState state) {
 		final CFGBasicBlock basicBlock = getCFGBasicBlock(node, state);
 		final LivenessState liveBeforeBody = new LivenessState(basicBlock, new CFGEdgeBuilder(basicBlock));
-		final LivenessState liveAfterBody = buildCFG(node.statements(), liveBeforeBody);
+		final LivenessState liveAfterBody = buildCFG(statements(node), liveBeforeBody);
 		liveAfterBody.add(new CFGEdgeBuilder(basicBlock));
 
 		buildEdgesAfterBranchableStmt(node, liveAfterBody, basicBlock);
@@ -508,7 +508,7 @@ public class CFGBuilder {
 
 	public LivenessState buildCFG(SuperConstructorInvocation node, LivenessState state) {
 		final CFGBasicBlock basicBlock = getCFGBasicBlock(node, state);
-		addVariableAccesses(basicBlock, node.arguments(), READ);
+		addVariableAccesses(basicBlock, arguments(node), READ);
 		return getInBlockStmtResult(state, basicBlock);
 	}
 
@@ -588,7 +588,7 @@ public class CFGBuilder {
 
 	public LivenessState buildCFG(ConstructorInvocation node, LivenessState state) {
 		final CFGBasicBlock basicBlock = getCFGBasicBlock(node, state);
-		addVariableAccesses(basicBlock, node.arguments(), READ);
+		addVariableAccesses(basicBlock, arguments(node), READ);
 		return getInBlockStmtResult(state, basicBlock);
 	}
 
@@ -631,7 +631,7 @@ public class CFGBuilder {
 	public LivenessState buildCFG(Block node, LivenessState state) {
 		LivenessState liveState = state;
 		try {
-			liveState = buildCFG(node.statements(), state);
+			liveState = buildCFG(statements(node), state);
 		} finally {
 			moveAllEdgesToBuild(node, liveState);
 		}
@@ -883,13 +883,13 @@ public class CFGBuilder {
 	}
 
 	public LivenessState buildCFG(ForStatement node, LivenessState state) {
-		final CFGBasicBlock initBlock = getCFGBasicBlock(node.initializers(), state);
+		final CFGBasicBlock initBlock = getCFGBasicBlock(initializers(node), state);
 		final LivenessState initLiveBlock = LivenessState.of(new CFGEdgeBuilder(initBlock));
 		final CFGBasicBlock exprBlock = getCFGBasicBlock(node.getExpression(), initLiveBlock, true);
 		final CFGBasicBlock updatersBlock = getCFGBasicBlock(node.updaters(), new LivenessState());
 		buildEdge(updatersBlock, exprBlock);
 
-		for (Expression expression : (List<Expression>) node.initializers()) {
+		for (Expression expression : initializers(node)) {
 			if (expression instanceof VariableDeclarationExpression) {
 				addDeclarations(initBlock, (VariableDeclarationExpression) expression);
 			}

@@ -63,7 +63,7 @@ public class DeadCodeEliminationRefactoring extends ASTVisitor implements
 
 	@Override
 	public boolean visit(Block node) {
-		if (!node.statements().isEmpty()) {
+		if (!statements(node).isEmpty()) {
 			return VISIT_SUBTREE;
 		}
 		final ASTNode parent = node.getParent();

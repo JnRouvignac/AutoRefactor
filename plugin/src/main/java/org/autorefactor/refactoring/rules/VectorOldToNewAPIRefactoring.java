@@ -81,8 +81,8 @@ public class VectorOldToNewAPIRefactoring extends ASTVisitor implements
 		MethodInvocation mi = ast.newMethodInvocation();
 		mi.setName(ast.newSimpleName(newMethodName));
 		mi.setExpression(copySubtree(ast, node.getExpression()));
-		if (node.arguments() != null) {
-			mi.arguments().addAll(ASTNode.copySubtrees(ast, node.arguments()));
+		if (arguments(node) != null) {
+			arguments(mi).addAll(copySubtrees(ast, arguments(node)));
 		}
 		this.ctx.getRefactorings().replace(node, mi);
 	}
@@ -92,15 +92,15 @@ public class VectorOldToNewAPIRefactoring extends ASTVisitor implements
 		MethodInvocation mi = ast.newMethodInvocation();
 		mi.setName(ast.newSimpleName(newMethodName));
 		mi.setExpression(copySubtree(ast, node.getExpression()));
-		final List<Expression> args = node.arguments();
+		final List<Expression> args = arguments(node);
 		assertSize(args, 1);
 		if (hasType(args.get(0), "int", "short", "byte")) {
 			final CastExpression ce = ast.newCastExpression();
 			ce.setType(ast.newSimpleType(ast.newSimpleName("Object")));
 			ce.setExpression(copySubtree(ast, args.get(0)));
-			mi.arguments().add(ce);
+			arguments(mi).add(ce);
 		} else {
-			mi.arguments().add(copySubtree(ast, args.get(0)));
+			arguments(mi).add(copySubtree(ast, args.get(0)));
 		}
 		this.ctx.getRefactorings().replace(node, mi);
 	}
@@ -111,10 +111,10 @@ public class VectorOldToNewAPIRefactoring extends ASTVisitor implements
 		MethodInvocation mi = ast.newMethodInvocation();
 		mi.setName(ast.newSimpleName(newMethodName));
 		mi.setExpression(copySubtree(ast, node.getExpression()));
-		final List<Expression> args = node.arguments();
+		final List<Expression> args = arguments(node);
 		assertSize(args, 2);
-		mi.arguments().add(copySubtree(ast, args.get(1)));
-		mi.arguments().add(copySubtree(ast, args.get(0)));
+		arguments(mi).add(copySubtree(ast, args.get(1)));
+		arguments(mi).add(copySubtree(ast, args.get(0)));
 		this.ctx.getRefactorings().replace(node, mi);
 	}
 

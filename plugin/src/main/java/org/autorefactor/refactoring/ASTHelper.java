@@ -56,6 +56,10 @@ public class ASTHelper {
 		return (T) ASTNode.copySubtree(ast, (ASTNode) node);
 	}
 
+	public static <T extends ASTNode> List<T> copySubtrees(AST ast, List<T> nodes) {
+		return ASTNode.copySubtrees(ast, nodes);
+	}
+
 	public static Expression negate(AST ast, Expression condition, boolean doCopy) {
 		if (condition instanceof PrefixExpression) {
 			final PrefixExpression pe = (PrefixExpression) condition;
@@ -126,7 +130,7 @@ public class ASTHelper {
 		if (node == null) {
 			return Collections.emptyList();
 		} else if (node instanceof Block) {
-			return ((Block) node).statements();
+			return statements((Block) node);
 		}
 		return Arrays.asList(node);
 	}
@@ -158,9 +162,99 @@ public class ASTHelper {
 	public static <T extends Expression> T as(Collection<? extends Expression> nodes,
 			Class<T> exprClazz) {
 		if (nodes != null && nodes.size() == 1) {
-			return as((Expression) nodes.iterator().next(), exprClazz);
+			return as(nodes.iterator().next(), exprClazz);
 		}
 		return null;
+	}
+
+	@SuppressWarnings("unchecked")
+	public static List<Expression> arguments(ClassInstanceCreation node) {
+		return node.arguments();
+	}
+
+	@SuppressWarnings("unchecked")
+	public static List<Expression> arguments(ConstructorInvocation node) {
+		return node.arguments();
+	}
+
+	@SuppressWarnings("unchecked")
+	public static List<Expression> arguments(MethodInvocation node) {
+		return node.arguments();
+	}
+
+	@SuppressWarnings("unchecked")
+	public static List<Expression> arguments(SuperConstructorInvocation node) {
+		return node.arguments();
+	}
+
+	@SuppressWarnings("unchecked")
+	public static List<Expression> arguments(SuperMethodInvocation node) {
+		return node.arguments();
+	}
+
+	@SuppressWarnings("unchecked")
+	public static List<CatchClause> catchClauses(TryStatement node) {
+		return node.catchClauses();
+	}
+
+	@SuppressWarnings("unchecked")
+	public static List<Expression> expressions(ArrayInitializer node) {
+		return node.expressions();
+	}
+
+	@SuppressWarnings("unchecked")
+	public static List<Expression> extendedOperands(InfixExpression node) {
+		return node.extendedOperands();
+	}
+
+	@SuppressWarnings("unchecked")
+	public static List<Expression> initializers(ForStatement node) {
+		return node.initializers();
+	}
+
+	@SuppressWarnings("unchecked")
+	public static List<Expression> updaters(ForStatement node) {
+		return node.updaters();
+	}
+
+	@SuppressWarnings("unchecked")
+	public static List<VariableDeclarationFragment> fragments(VariableDeclarationExpression node) {
+		return node.fragments();
+	}
+
+	@SuppressWarnings("unchecked")
+	public static List<VariableDeclarationFragment> fragments(VariableDeclarationStatement node) {
+		return node.fragments();
+	}
+
+	@SuppressWarnings("unchecked")
+	public static List<Comment> getCommentList(CompilationUnit node) {
+		return node.getCommentList();
+	}
+
+	@SuppressWarnings("unchecked")
+	public static List<ImportDeclaration> imports(CompilationUnit node) {
+		return node.imports();
+	}
+
+	@SuppressWarnings("unchecked")
+	public static List<SingleVariableDeclaration> parameters(MethodDeclaration node) {
+		return node.parameters();
+	}
+
+	@SuppressWarnings("unchecked")
+	public static List<Statement> statements(Block node) {
+		return node.statements();
+	}
+
+	@SuppressWarnings("unchecked")
+	public static List<Statement> statements(SwitchStatement node) {
+		return node.statements();
+	}
+
+	@SuppressWarnings("unchecked")
+	public static List<TagElement> tags(Javadoc node) {
+		return node.tags();
 	}
 
 	public static Boolean getBooleanLiteral(Expression node) {
@@ -302,8 +396,9 @@ public class ASTHelper {
 	public static boolean hasType(final ITypeBinding typeBinding,
 			String... qualifiedTypeNames) {
 		if (typeBinding != null) {
+			final String qualifiedName = typeBinding.getErasure().getQualifiedName();
 			for (String qualifiedTypeName : qualifiedTypeNames) {
-				if (qualifiedTypeName.equals(typeBinding.getQualifiedName())) {
+				if (qualifiedTypeName.equals(qualifiedName)) {
 					return true;
 				}
 			}

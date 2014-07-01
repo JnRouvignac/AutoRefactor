@@ -70,12 +70,12 @@ public class ForeachRefactoring extends ASTVisitor implements IJavaRefactoring {
 		final VariableUseVisitor variableUseVisitor = new VariableUseVisitor();
 		node.accept(variableUseVisitor);
 
-		if (node.initializers().size() == 1) {
-			node.initializers();
+		if (initializers(node).size() == 1) {
+			initializers(node);
 		}
 
 		node.getExpression();
-		node.updaters();
+		updaters(node);
 		node.getBody();
 		// TODO JNR iterate over array with index
 		// TODO JNR iterate over array with temporary variable with generics

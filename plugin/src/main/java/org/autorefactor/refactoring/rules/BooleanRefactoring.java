@@ -339,8 +339,7 @@ public class BooleanRefactoring extends ASTVisitor implements IJavaRefactoring {
 		if (vds == null) {
 			return null;
 		}
-		for (VariableDeclarationFragment vdf : (List<VariableDeclarationFragment>) vds
-				.fragments()) {
+		for (VariableDeclarationFragment vdf : fragments(vds)) {
 			if (isSameVariable(expr, vdf.getName())) {
 				return vdf;
 			}
@@ -431,7 +430,7 @@ public class BooleanRefactoring extends ASTVisitor implements IJavaRefactoring {
 
 	private boolean isSimpleNameAlreadyUsed(String simpleName,
 			CompilationUnit cu) {
-		for (ImportDeclaration id : (List<ImportDeclaration>) cu.imports()) {
+		for (ImportDeclaration id : imports(cu)) {
 			if (id.getName() instanceof QualifiedName) {
 				QualifiedName f = (QualifiedName) id.getName();
 				if (simpleName.equals(f.getName())) {
@@ -448,7 +447,7 @@ public class BooleanRefactoring extends ASTVisitor implements IJavaRefactoring {
 	public boolean visit(MethodInvocation node) {
 		if (isMethod(node, "java.lang.Boolean", "valueOf", "java.lang.String")
 				|| isMethod(node, "java.lang.Boolean", "valueOf", "boolean")) {
-			final BooleanLiteral l = as(node.arguments(), BooleanLiteral.class);
+			final BooleanLiteral l = as(arguments(node), BooleanLiteral.class);
 			if (l != null) {
 				this.ctx.getRefactorings().replace(node,
 						getRefactoring(node, l.booleanValue()));

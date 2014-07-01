@@ -153,8 +153,8 @@ public class CommonCodeInIfElseStatementRefactoring extends ASTVisitor
 		} else if (parent instanceof Block) {
 			final Block b = (Block) parent;
 			if (b.getParent() instanceof IfStatement
-					&& b.statements().size() == 1
-					&& b.statements().get(0) == node) {
+					&& statements(b).size() == 1
+					&& statements(b).get(0) == node) {
 				return true;
 			}
 		}

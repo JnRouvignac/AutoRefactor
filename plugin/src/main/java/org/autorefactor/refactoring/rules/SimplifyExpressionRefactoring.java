@@ -169,7 +169,7 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
 				return node.equals(a.getRightHandSide());
 			} else if (parent instanceof MethodInvocation) {
 				MethodInvocation mi = (MethodInvocation) parent;
-				return mi.arguments().contains(node);
+				return arguments(mi).contains(node);
 			}
 		} else if (parent instanceof Statement) {
 			if (parent instanceof IfStatement) {
@@ -423,8 +423,8 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
 			final MethodInvocation expr = (MethodInvocation) e;
 			if (expr.getExpression() != null
 					&& expr.getExpression().resolveConstantExpressionValue() != null
-					&& expr.arguments().size() == 1
-					&& ((Expression) expr.arguments().get(0)).subtreeMatch(
+					&& arguments(expr).size() == 1
+					&& arguments(expr).get(0).subtreeMatch(
 							new ASTMatcher(), nullCheckedExpression)) {
 				// Did we invoke java.lang.Object.equals()?
 				// Did we invoke java.lang.String.equalsIgnoreCase()?

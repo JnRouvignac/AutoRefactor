@@ -130,7 +130,7 @@ public class CommentsRefactoring extends ASTVisitor implements IJavaRefactoring 
 		if (EMPTY_JAVADOC.matcher(comment).matches()) {
 			this.ctx.getRefactorings().remove(node);
 			return DO_NOT_VISIT_SUBTREE;
-		} else if (allTagsEmpty(node.tags())) {
+		} else if (allTagsEmpty(tags(node))) {
 			this.ctx.getRefactorings().remove(node);
 			return DO_NOT_VISIT_SUBTREE;
 		} else if (JAVADOC_ONLY_INHERITDOC.matcher(comment).matches()) {
@@ -328,11 +328,11 @@ public class CommentsRefactoring extends ASTVisitor implements IJavaRefactoring 
 	@Override
 	public boolean visit(CompilationUnit node) {
 		this.astRoot = node;
-		for (Comment comment : (List<Comment>) astRoot.getCommentList()) {
+		for (Comment comment : getCommentList(astRoot)) {
 			comments.add(Pair.of(new SourceLocation(comment.getStartPosition(), comment.getLength()), comment));
 		}
 
-		for (Comment comment : (List<Comment>) astRoot.getCommentList()) {
+		for (Comment comment : getCommentList(astRoot)) {
 			if (comment.isBlockComment()) {
 				final BlockComment bc = (BlockComment) comment;
 				bc.accept(this);

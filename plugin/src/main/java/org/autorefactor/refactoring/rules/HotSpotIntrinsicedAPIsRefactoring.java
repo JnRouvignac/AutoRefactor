@@ -247,16 +247,16 @@ public class HotSpotIntrinsicedAPIsRefactoring extends ASTVisitor implements
 
 	private void collectUniqueIndex(ForStatement node,
 			SystemArrayCopyParams params) {
-		if (node.initializers().size() != 1) {
+		if (initializers(node).size() != 1) {
 			return;
 		}
-		final Expression initializer = (Expression) node.initializers().get(0);
-		if (initializer instanceof VariableDeclarationExpression) {
+		final Expression initializer0 = initializers(node).get(0);
+		if (initializer0 instanceof VariableDeclarationExpression) {
 			final VariableDeclarationExpression vde =
-					(VariableDeclarationExpression) initializer;
-			if (isPrimitive(vde, "int") && vde.fragments().size() == 1) {
+					(VariableDeclarationExpression) initializer0;
+			if (isPrimitive(vde, "int") && fragments(vde).size() == 1) {
 				// this must be the array index
-				VariableDeclarationFragment vdf = (VariableDeclarationFragment) vde.fragments().get(0);
+				VariableDeclarationFragment vdf = fragments(vde).get(0);
 				if (vdf.getExtraDimensions() == 0) {
 					params.indexStartPos = vdf.getInitializer();
 					params.indexVarBinding = vdf.resolveBinding();
@@ -264,8 +264,8 @@ public class HotSpotIntrinsicedAPIsRefactoring extends ASTVisitor implements
 				}
 			}
 		}
-		else if (initializer instanceof Assignment) {
-			final Assignment as = (Assignment) initializer;
+		else if (initializer0 instanceof Assignment) {
+			final Assignment as = (Assignment) initializer0;
 			if (Assignment.Operator.ASSIGN.equals(as.getOperator())
 					&& isPrimitive(as.resolveTypeBinding(), "int")) {
 				// this must be the array index
@@ -283,18 +283,18 @@ public class HotSpotIntrinsicedAPIsRefactoring extends ASTVisitor implements
 	}
 
 	private IVariableBinding getUniqueIncrementedVariable(ForStatement node) {
-		if (node.updaters().size() != 1) {
+		if (updaters(node).size() != 1) {
 			return null;
 		}
-		final Expression updater = (Expression) node.updaters().get(0);
-		if (updater instanceof PostfixExpression) {
-			final PostfixExpression pe = (PostfixExpression) updater;
+		final Expression updater0 = updaters(node).get(0);
+		if (updater0 instanceof PostfixExpression) {
+			final PostfixExpression pe = (PostfixExpression) updater0;
 			if (PostfixExpression.Operator.INCREMENT.equals(pe.getOperator())) {
 				return getVariableBinding(pe.getOperand());
 			}
 		}
-		else if (updater instanceof PrefixExpression) {
-			final PrefixExpression pe = (PrefixExpression) updater;
+		else if (updater0 instanceof PrefixExpression) {
+			final PrefixExpression pe = (PrefixExpression) updater0;
 			if (PrefixExpression.Operator.INCREMENT.equals(pe.getOperator())) {
 				return getVariableBinding(pe.getOperand());
 			}
