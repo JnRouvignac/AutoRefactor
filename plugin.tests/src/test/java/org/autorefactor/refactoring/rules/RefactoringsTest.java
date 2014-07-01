@@ -28,8 +28,10 @@ package org.autorefactor.refactoring.rules;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 import org.autorefactor.refactoring.IRefactoring;
 import org.autorefactor.refactoring.Release;
@@ -57,26 +59,18 @@ public class RefactoringsTest {
 
 	@Parameters(name = "{0}Refactoring")
 	public static Collection<Object[]> data() {
-		return Arrays.asList(new Object[][] {
-				{ "AddBracketsToControlStatement" },
-				{ "BigDecimal" },
-				{ "Boolean" },
-				{ "CollapseIfStatement" },
-				{ "Comments" },
-				{ "CommonCodeInIfElseStatement" },
-				{ "DeadCodeElimination" },
-				{ "HotSpotIntrinsicedAPIs" },
-				{ "IfStatement" },
-				{ "InvertEquals" },
-				{ "PrimitiveWrapperCreation" },
-				// { "ReduceVariableScope" }, // To be completed
-				{ "RemoveUnnecessaryLocalBeforeReturn" },
-				{ "RemoveUselessModifiers" },
-				{ "SimplifyExpression" },
-				{ "StringBuilder" },
-				{ "String" },
-				{ "VectorOldToNewAPI" },
-		});
+		final File samplesDir = new File("src/test/java/org/autorefactor/samples_in");
+		final File[] sampleFiles = samplesDir.listFiles(new EndsWithFileFilter("Sample.java"));
+		Arrays.sort(sampleFiles);
+
+		final List<Object[]> output = new ArrayList<Object[]>(sampleFiles.length);
+		for (File file : sampleFiles) {
+			final String fileName = file.getName();
+			if (!"ReduceVariableScopeSample.java".equals(fileName)) { // To be completed
+				output.add(new Object[] { fileName.replace("Sample.java", "") });
+			}
+		}
+		return output;
 	}
 
 	@Test
@@ -135,7 +129,7 @@ public class RefactoringsTest {
 			if (ex instanceof RuntimeException) {
 				final RuntimeException re = (RuntimeException) ex;
 				if ("Unexpected exception".equals(re.getMessage())) {
-					return getExceptionToThrow((Exception) re);
+					return getExceptionToThrow(re);
 				}
 			}
 			return ex;
