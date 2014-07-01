@@ -441,8 +441,18 @@ public class CFGBuilder {
 				throw new IllegalStateException(
 						"At this point, there should not be any edges left to build. Left edges: " + this.edgesToBuild);
 			}
-			// new CFGDotPrinter().toDot(entryBlock);
-			// new CodePathCollector().getPaths(entryBlock);
+			List<CFGBasicBlock> throwingBlocks = throwers.selectBlocksThrowing(null);
+			if (!throwingBlocks.isEmpty()) {
+				for (CFGBasicBlock throwingBlock : throwingBlocks) {
+					// TODO JNR
+				}
+			}
+			List<CFGEdgeBuilder> throwingEdges = throwers.selectEdgesThrowing(null);
+			if (!throwingEdges.isEmpty()) {
+				for (CFGEdgeBuilder throwingEdge : throwingEdges) {
+					// TODO JNR
+				}
+			}
 			return entryBlock;
 		} finally {
 			this.exitBlock = null;
@@ -542,8 +552,12 @@ public class CFGBuilder {
 		}
 
 		// TODO JNR move uncaught exceptions from localThrowers to throwers
-		for (CFGBasicBlock throwingBlock : localThrowers.selectBlocksThrowingOtherThan(caughtExceptions)) {
-			liveAfterCatchClauses.add(new CFGEdgeBuilder(throwingBlock));
+		final Map<CFGBasicBlock, Set<ITypeBinding>> throwUncaughtExceptions =
+				localThrowers.selectBlocksThrowingOtherThan(caughtExceptions);
+		for (Entry<CFGBasicBlock, Set<ITypeBinding>> throwing : throwUncaughtExceptions.entrySet()) {
+			final CFGEdgeBuilder uncaughtExceptionEdge = new CFGEdgeBuilder(throwing.getKey(), true);
+			liveAfterCatchClauses.add(uncaughtExceptionEdge);
+			throwers.addThrow(uncaughtExceptionEdge, throwing.getValue());
 		}
 
 		if (node.getFinally() != null) {

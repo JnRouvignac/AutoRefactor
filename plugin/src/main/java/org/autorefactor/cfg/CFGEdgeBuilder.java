@@ -9,8 +9,10 @@ public class CFGEdgeBuilder {
 	private boolean evaluationResult;
 	private CFGBasicBlock sourceBlock;
 	private CFGBasicBlock targetBlock;
+	/** Marks a "jumping" edge: and edge built because of an exception escaping a try statement */
+	private boolean jumping;
 	/** Prevents building twice */
-	private boolean built;
+	private CFGEdge built;
 
 	public CFGEdgeBuilder(CFGBasicBlock sourceBlock) {
 		this(null, false, sourceBlock);
@@ -21,6 +23,11 @@ public class CFGEdgeBuilder {
 		this.condition = condition;
 		this.evaluationResult = evaluationResult;
 		this.sourceBlock = sourceBlock;
+	}
+
+	public CFGEdgeBuilder(CFGBasicBlock throwingBlock, boolean jumping) {
+		this.sourceBlock = throwingBlock;
+		this.jumping = jumping;
 	}
 
 	@Override
@@ -78,15 +85,16 @@ public class CFGEdgeBuilder {
 		if (targetBlock == null) {
 			throw new IllegalStateException("targetBlock is mandatory");
 		}
-		if (built) {
+		if (built != null) {
 			throw new IllegalStateException("CFGEdgeBuilder " + this
 					+ " has already been built");
 		}
-		this.built = true;
 		if (condition != null) {
-			return buildEdge(condition, evaluationResult, sourceBlock, targetBlock);
+			built = buildEdge(condition, evaluationResult, sourceBlock, targetBlock);
+		} else {
+			built = buildEdge(sourceBlock, targetBlock);
 		}
-		return buildEdge(sourceBlock, targetBlock);
+		return built;
 	}
 
 	public static CFGEdge buildEdge(CFGBasicBlock source, CFGBasicBlock target) {
