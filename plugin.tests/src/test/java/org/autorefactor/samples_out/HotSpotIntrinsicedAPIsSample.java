@@ -27,7 +27,7 @@ package org.autorefactor.samples_out;
 
 public class HotSpotIntrinsicedAPIsSample {
 
-	private void replaceBySystemArrayCopyBasic(int[] src, int[] dest) {
+	public static void replaceBySystemArrayCopyBasic(int[] src, int[] dest) {
 		try {
 			System.arraycopy(src, 0, dest, 0, 3);
 		} catch (IndexOutOfBoundsException e) {
@@ -35,7 +35,7 @@ public class HotSpotIntrinsicedAPIsSample {
 		}
 	}
 
-	private void replaceBySystemArrayCopyComplexUpperBound(int[] src, int[] dest) {
+	public static void replaceBySystemArrayCopyComplexUpperBound(int[] src, int[] dest) {
 		try {
 			System.arraycopy(src, 0, dest, 0, src.length);
 		} catch (IndexOutOfBoundsException e) {
@@ -43,7 +43,7 @@ public class HotSpotIntrinsicedAPIsSample {
 		}
 	}
 
-	private void replaceBySystemArrayCopyAssignIndexVariable(int[] src, int[] dest, int i) {
+	public static void replaceBySystemArrayCopyAssignIndexVariable(int[] src, int[] dest, int i) {
 		try {
 			System.arraycopy(src, 0, dest, 0, 3);
 		} catch (IndexOutOfBoundsException e) {
@@ -51,7 +51,7 @@ public class HotSpotIntrinsicedAPIsSample {
 		}
 	}
 
-	private void replaceBySystemArrayCopyWithSrcPos(int[] src, int[] dest) {
+	public static void replaceBySystemArrayCopyWithSrcPos(int[] src, int[] dest) {
 		try {
 			System.arraycopy(src, 1, dest, 0, src.length - 1);
 		} catch (IndexOutOfBoundsException e) {
@@ -59,7 +59,7 @@ public class HotSpotIntrinsicedAPIsSample {
 		}
 	}
 
-	private void replaceBySystemArrayCopyWithDestPos(int[] src, int[] dest) {
+	public static void replaceBySystemArrayCopyWithDestPos(int[] src, int[] dest) {
 		try {
 			System.arraycopy(src, 0, dest, 1, src.length - 1);
 		} catch (IndexOutOfBoundsException e) {
@@ -67,7 +67,7 @@ public class HotSpotIntrinsicedAPIsSample {
 		}
 	}
 
-	private void replaceBySystemArrayCopyWithLowerBound(int[] src, int[] dest) {
+	public static void replaceBySystemArrayCopyWithLowerBound(int[] src, int[] dest) {
 		try {
 			System.arraycopy(src, 2, dest, 3, 3);
 		} catch (IndexOutOfBoundsException e) {
@@ -75,7 +75,7 @@ public class HotSpotIntrinsicedAPIsSample {
 		}
 	}
 
-	private void replaceBySystemArrayCopyRevertedCondition(int[] src, int[] dest) {
+	public static void replaceBySystemArrayCopyRevertedCondition(int[] src, int[] dest) {
 		try {
 			System.arraycopy(src, 0, dest, 0, 3);
 		} catch (IndexOutOfBoundsException e) {
@@ -83,7 +83,7 @@ public class HotSpotIntrinsicedAPIsSample {
 		}
 	}
 
-	private void replaceBySystemArrayCopyRevertedCondition2(int[] src, int[] dest) {
+	public static void replaceBySystemArrayCopyRevertedCondition2(int[] src, int[] dest) {
 		try {
 			System.arraycopy(src, 0, dest, 0, 4);
 		} catch (IndexOutOfBoundsException e) {
@@ -91,15 +91,15 @@ public class HotSpotIntrinsicedAPIsSample {
 		}
 	}
 
-	private void replaceWithArraysCopyOf(int[] src, int[] dest) {
+	public static void replaceWithArraysCopyOf(int[] src, int[] dest) {
 		// FIXME Should use java.util.Arrays.copyOf()
 	}
 
-	private void replaceWithArraysCopyOfRange(int[] src, int[] dest) {
+	public static void replaceWithArraysCopyOfRange(int[] src, int[] dest) {
 		// FIXME Should use java.util.Arrays.copyOfRange()
 	}
 
-	private boolean replaceWithArraysEquals(int[] src, int[] dest) {
+	public static boolean replaceWithArraysEquals(int[] src, int[] dest) {
 		if (dest.length != src.length) {
 			return false;
 		}
@@ -112,7 +112,7 @@ public class HotSpotIntrinsicedAPIsSample {
 		// FIXME Should use java.util.Arrays.equals()
 	}
 
-	private boolean replaceWithArraysEquals2(int[] src, int[] dest) {
+	public static boolean replaceWithArraysEquals2(int[] src, int[] dest) {
 		if (dest.length == src.length) {
 			for (int i = 0; i < src.length; i++) {
 				if (dest[i] != src[i]) {
@@ -125,7 +125,7 @@ public class HotSpotIntrinsicedAPIsSample {
 		// FIXME Should use java.util.Arrays.equals()
 	}
 
-	private void replaceWithStringIndexOf(String s) {
+	public static void replaceWithStringIndexOf(String s) {
 		// FIXME Should use java.lang.String.indexOf()
 	}
 

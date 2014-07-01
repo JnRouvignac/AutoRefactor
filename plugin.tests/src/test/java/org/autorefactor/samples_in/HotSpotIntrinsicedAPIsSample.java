@@ -27,63 +27,63 @@ package org.autorefactor.samples_in;
 
 public class HotSpotIntrinsicedAPIsSample {
 
-	private void replaceBySystemArrayCopyBasic(int[] src, int[] dest) {
+	public static void replaceBySystemArrayCopyBasic(int[] src, int[] dest) {
 		for (int i = 0; i < 3; i++) {
 			dest[i] = src[i];
 		}
 	}
 
-	private void replaceBySystemArrayCopyComplexUpperBound(int[] src, int[] dest) {
+	public static void replaceBySystemArrayCopyComplexUpperBound(int[] src, int[] dest) {
 		for (int i = 0; i < src.length; i++) {
 			dest[i] = src[i];
 		}
 	}
 
-	private void replaceBySystemArrayCopyAssignIndexVariable(int[] src, int[] dest, int i) {
+	public static void replaceBySystemArrayCopyAssignIndexVariable(int[] src, int[] dest, int i) {
 		for (i = 0; i < 3; i++) {
 			dest[i] = src[i];
 		}
 	}
 
-	private void replaceBySystemArrayCopyWithSrcPos(int[] src, int[] dest) {
+	public static void replaceBySystemArrayCopyWithSrcPos(int[] src, int[] dest) {
 		for (int i = 0; i < src.length - 1; i++) {
 			dest[i] = src[i + 1];
 		}
 	}
 
-	private void replaceBySystemArrayCopyWithDestPos(int[] src, int[] dest) {
+	public static void replaceBySystemArrayCopyWithDestPos(int[] src, int[] dest) {
 		for (int i = 0; i < src.length - 1; i++) {
 			dest[i + 1] = src[i];
 		}
 	}
 
-	private void replaceBySystemArrayCopyWithLowerBound(int[] src, int[] dest) {
+	public static void replaceBySystemArrayCopyWithLowerBound(int[] src, int[] dest) {
 		for (int i = 1; i <= 3; i++) {
 			dest[i + 2] = src[i + 1];
 		}
 	}
 
-	private void replaceBySystemArrayCopyRevertedCondition(int[] src, int[] dest) {
+	public static void replaceBySystemArrayCopyRevertedCondition(int[] src, int[] dest) {
 		for (int i = 0; 3 > i; i++) {
 			dest[i] = src[i];
 		}
 	}
 
-	private void replaceBySystemArrayCopyRevertedCondition2(int[] src, int[] dest) {
+	public static void replaceBySystemArrayCopyRevertedCondition2(int[] src, int[] dest) {
 		for (int i = 0; 3 >= i; i++) {
 			dest[i] = src[i];
 		}
 	}
 
-	private void replaceWithArraysCopyOf(int[] src, int[] dest) {
+	public static void replaceWithArraysCopyOf(int[] src, int[] dest) {
 		// FIXME Should use java.util.Arrays.copyOf()
 	}
 
-	private void replaceWithArraysCopyOfRange(int[] src, int[] dest) {
+	public static void replaceWithArraysCopyOfRange(int[] src, int[] dest) {
 		// FIXME Should use java.util.Arrays.copyOfRange()
 	}
 
-	private boolean replaceWithArraysEquals(int[] src, int[] dest) {
+	public static boolean replaceWithArraysEquals(int[] src, int[] dest) {
 		if (dest.length != src.length) {
 			return false;
 		}
@@ -96,7 +96,7 @@ public class HotSpotIntrinsicedAPIsSample {
 		// FIXME Should use java.util.Arrays.equals()
 	}
 
-	private boolean replaceWithArraysEquals2(int[] src, int[] dest) {
+	public static boolean replaceWithArraysEquals2(int[] src, int[] dest) {
 		if (dest.length == src.length) {
 			for (int i = 0; i < src.length; i++) {
 				if (dest[i] != src[i]) {
@@ -109,7 +109,7 @@ public class HotSpotIntrinsicedAPIsSample {
 		// FIXME Should use java.util.Arrays.equals()
 	}
 
-	private void replaceWithStringIndexOf(String s) {
+	public static void replaceWithStringIndexOf(String s) {
 		// FIXME Should use java.lang.String.indexOf()
 	}
 
