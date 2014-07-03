@@ -498,6 +498,7 @@ public class AutoRefactorHandler extends AbstractHandler {
 				// new ReduceVariableScopeRefactoring(),
 				new StringBuilderRefactoring(),
 				new CommentsRefactoring(),
+				new RemoveFieldsDefaultValuesRefactoring(),
 				new RemoveUnnecessaryLocalBeforeReturnRefactoring(),
 				new RemoveUselessModifiersRefactoring(),
 				new HotSpotIntrinsicedAPIsRefactoring()));

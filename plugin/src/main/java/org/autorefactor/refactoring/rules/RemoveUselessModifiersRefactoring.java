@@ -95,13 +95,12 @@ public class RemoveUselessModifiersRefactoring extends ASTVisitor implements
 		this.ctx = ctx;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public boolean visit(FieldDeclaration node) {
 		if (isInterface(node.getParent())) {
 			// remove modifiers implied by the context
 			boolean result = VISIT_SUBTREE;
-			for (Modifier m : getModifiersOnly(node.modifiers())) {
+			for (Modifier m : getModifiersOnly(modifiers(node))) {
 				if (m.isPublic() || m.isStatic() || m.isFinal()) {
 					this.ctx.getRefactorings().remove(m);
 					result = DO_NOT_VISIT_SUBTREE;
@@ -126,10 +125,9 @@ public class RemoveUselessModifiersRefactoring extends ASTVisitor implements
 		return ensureModifiersOrder(node);
 	}
 
-	@SuppressWarnings("unchecked")
 	private boolean removePublicAbstractModifiers(BodyDeclaration node) {
 		boolean result = VISIT_SUBTREE;
-		for (Modifier m : getModifiersOnly(node.modifiers())) {
+		for (Modifier m : getModifiersOnly(modifiers(node))) {
 			if (m.isPublic() || m.isAbstract()) {
 				this.ctx.getRefactorings().remove(m);
 				result = DO_NOT_VISIT_SUBTREE;
@@ -161,7 +159,7 @@ public class RemoveUselessModifiersRefactoring extends ASTVisitor implements
 	@SuppressWarnings("unchecked")
 	private boolean ensureModifiersOrder(BodyDeclaration node) {
 		boolean result = VISIT_SUBTREE;
-		final List<Modifier> modifiers = getModifiersOnly(node.modifiers());
+		final List<Modifier> modifiers = getModifiersOnly(modifiers(node));
 		final List<Modifier> reorderedModifiers = new ArrayList<Modifier>(modifiers);
 		Collections.sort(reorderedModifiers, new ModifierOrderComparator());
 		if (!modifiers.equals(reorderedModifiers)) {

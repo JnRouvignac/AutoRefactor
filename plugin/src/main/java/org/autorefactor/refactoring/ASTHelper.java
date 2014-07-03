@@ -229,6 +229,11 @@ public class ASTHelper {
 	}
 
 	@SuppressWarnings("unchecked")
+	public static List<VariableDeclarationFragment> fragments(FieldDeclaration node) {
+		return node.fragments();
+	}
+
+	@SuppressWarnings("unchecked")
 	public static List<VariableDeclarationFragment> fragments(VariableDeclarationExpression node) {
 		return node.fragments();
 	}
@@ -246,6 +251,11 @@ public class ASTHelper {
 	@SuppressWarnings("unchecked")
 	public static List<ImportDeclaration> imports(CompilationUnit node) {
 		return node.imports();
+	}
+
+	@SuppressWarnings("unchecked")
+	public static List<IExtendedModifier> modifiers(BodyDeclaration node) {
+		return node.modifiers();
 	}
 
 	@SuppressWarnings("unchecked")
