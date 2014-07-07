@@ -25,6 +25,8 @@
  */
 package org.autorefactor.refactoring;
 
+import java.util.List;
+
 import org.eclipse.jdt.core.dom.*;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
@@ -43,23 +45,19 @@ public class ASTBuilder {
 
 	public Block body(final Statement... stmts) {
 		final Block tryBody = ast.newBlock();
-		for (Statement stmt : stmts) {
-			statements(tryBody).add(stmt);
-		}
+		addAll(statements(tryBody), stmts);
 		return tryBody;
 	}
 
 	public CatchClause catch0(String exceptionType, String exceptionName, Statement... stmts) {
 		final CatchClause cc = ast.newCatchClause();
 		final SingleVariableDeclaration svd = ast.newSingleVariableDeclaration();
-		svd.setType(ast.newSimpleType(ast.newSimpleName(exceptionType)));
+		svd.setType(newSimpleType(exceptionType));
 		svd.setName(ast.newSimpleName(exceptionName));
 		cc.setException(svd);
 
 		final Block block = ast.newBlock();
-		for (Statement stmt : stmts) {
-			statements(block).add(stmt);
-		}
+		addAll(statements(block), stmts);
 		cc.setBody(block);
 		return cc;
 	}
@@ -100,9 +98,7 @@ public class ASTBuilder {
 		final MethodInvocation mi = ast.newMethodInvocation();
 		mi.setExpression(ast.newSimpleName(expression));
 		mi.setName(ast.newSimpleName(methodName));
-		for (Expression argument : arguments) {
-			arguments(mi).add(argument);
-		}
+		addAll(arguments(mi), arguments);
 		return mi;
 	}
 
@@ -110,9 +106,7 @@ public class ASTBuilder {
 		final MethodInvocation mi = ast.newMethodInvocation();
 		mi.setExpression(expression);
 		mi.setName(ast.newSimpleName(methodName));
-		for (Expression argument : arguments) {
-			arguments(mi).add(argument);
-		}
+		addAll(arguments(mi), arguments);
 		return mi;
 	}
 
@@ -128,11 +122,42 @@ public class ASTBuilder {
 
 	public ClassInstanceCreation new0(String className, Expression... arguments) {
 		final ClassInstanceCreation cic = ast.newClassInstanceCreation();
-		cic.setType(ast.newSimpleType(ast.newSimpleName(className)));
-		for (Expression argument : arguments) {
-			arguments(cic).add(argument);
-		}
+		cic.setType(newSimpleType(className));
+		addAll(arguments(cic), arguments);
 		return cic;
+	}
+
+	public ClassInstanceCreation new0(ITypeBinding binding, Expression... arguments) {
+		final String className = binding.getName();
+		final int ltIdx = className.indexOf('<');
+		if (ltIdx == -1) {
+			final ClassInstanceCreation cic = ast.newClassInstanceCreation();
+			cic.setType(newSimpleType(className));
+			addAll(arguments(cic), arguments);
+			return cic;
+		}
+		final String erasedClassName = className.substring(0, ltIdx);
+		final int gtIdx = className.indexOf('>', ltIdx);
+		final String typeParam = className.substring(ltIdx + 1, gtIdx);
+
+		final ClassInstanceCreation cic = ast.newClassInstanceCreation();
+		final ParameterizedType type = ast.newParameterizedType(
+				newSimpleType(erasedClassName));
+		typeArguments(type).add(newSimpleType(typeParam));
+		cic.setType(type);
+		addAll(arguments(cic), arguments);
+		return cic;
+	}
+
+	private <T extends ASTNode> void addAll(List<T> whereToAdd,
+			@SuppressWarnings("unchecked") T... toAdd) {
+		for (T e : toAdd) {
+			whereToAdd.add(e);
+		}
+	}
+
+	private SimpleType newSimpleType(final String erasedClassName) {
+		return ast.newSimpleType(ast.newName(erasedClassName));
 	}
 
 	public NumberLiteral number(String s) {
@@ -163,16 +188,14 @@ public class ASTBuilder {
 		return throwS;
 	}
 
-	public ExpressionStatement toStmt(final MethodInvocation sysCopy) {
-		return ast.newExpressionStatement(sysCopy);
+	public ExpressionStatement toStmt(final Expression expression) {
+		return ast.newExpressionStatement(expression);
 	}
 
 	public TryStatement try0(final Block body, CatchClause... catchClauses) {
 		final TryStatement tryS = ast.newTryStatement();
 		tryS.setBody(body);
-		for (CatchClause catchCause : catchClauses) {
-			catchClauses(tryS).add(catchCause);
-		}
+		addAll(catchClauses(tryS), catchClauses);
 		return tryS;
 	}
 

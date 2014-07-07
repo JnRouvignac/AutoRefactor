@@ -278,6 +278,11 @@ public class ASTHelper {
 		return node.tags();
 	}
 
+	@SuppressWarnings("unchecked")
+	public static List<Type> typeArguments(ParameterizedType node) {
+		return node.typeArguments();
+	}
+
 	public static Boolean getBooleanLiteral(Expression node) {
 		final BooleanLiteral bl = as(node, BooleanLiteral.class);
 		if (bl != null) {
@@ -597,7 +602,9 @@ public class ASTHelper {
 			if (concreteParamType == null) {
 				concreteParamType = genericParamType;
 			}
-			if (!paramTypes[i].equals(concreteParamType)){
+			final ITypeBinding erasure1 = paramTypes[i].getErasure();
+			final ITypeBinding erasure2 = concreteParamType.getErasure();
+			if (!erasure1.equals(erasure2)) {
 				return false;
 			}
 		}

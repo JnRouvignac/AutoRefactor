@@ -489,6 +489,7 @@ public class AutoRefactorHandler extends AbstractHandler {
 				new CommonCodeInIfElseStatementRefactoring(),
 				// TODO JNR complete it
 				// new GenerecizeRefactoring(),
+				new CollectionAddAllRefactoring(),
 				new IfStatementRefactoring(),
 				// TODO JNR implement
 				// new RemoveStupidIdiomaticPatternRefactoring(),
