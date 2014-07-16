@@ -27,8 +27,8 @@ package org.autorefactor.samples_out;
 
 public class BooleanSample {
 
-    private boolean f;
-    private Boolean g;
+    public boolean f;
+    public Boolean g;
 
     public void useBooleanConstants() {
         Boolean b1 = Boolean.TRUE;
@@ -192,7 +192,7 @@ public class BooleanSample {
     }
 
     public boolean removeUselessIfInBooleanPrimitiveAssignment9(boolean bo) {
-        return !(bo && aMethodThatReturnsBoolean());
+        return !bo && aMethodThatReturnsBoolean();
     }
 
     public boolean removeUselessIfInBooleanPrimitiveAssignment10(boolean bo) {
@@ -252,7 +252,7 @@ public class BooleanSample {
         return false;
     }
 
-    private void aMethodThatAcceptsABoolean(boolean b) {
+    protected void aMethodThatAcceptsABoolean(boolean b) {
     }
 
 }

@@ -285,19 +285,20 @@ public class BooleanRefactoring extends ASTVisitor implements IJavaRefactoring {
 			final Boolean thenBool, final Boolean elseBool,
 			final Expression thenExpr, final Expression elseExpr) {
 		final ASTBuilder b = this.ctx.getASTBuilder();
-		final Expression copiedIfCondition = b.copyExpr(node.getExpression());
 		if (thenBool == null && elseBool != null) {
 			final InfixExpression ie = b.infixExpr(
-					copiedIfCondition,
+					b.copyExpr(node.getExpression()),
 					getConditionalOperator(!elseBool.booleanValue()),
 					b.copyExpr(thenExpr));
 			return b.return0(getBooleanExpression(ie, !elseBool.booleanValue()));
 		} else if (thenBool != null && elseBool == null) {
+			final Expression leftOp = getBooleanExpression(
+					b.copyExpr(node.getExpression()), thenBool.booleanValue());
 			final InfixExpression ie = b.infixExpr(
-					copiedIfCondition,
+					leftOp,
 					getConditionalOperator(!thenBool.booleanValue()),
 					b.copyExpr(elseExpr));
-			return b.return0(getBooleanExpression(ie, thenBool.booleanValue()));
+			return b.return0(ie);
 		}
 		return null;
 	}
@@ -311,8 +312,7 @@ public class BooleanRefactoring extends ASTVisitor implements IJavaRefactoring {
 				: InfixExpression.Operator.CONDITIONAL_OR;
 	}
 
-	private Expression getBooleanExpression(final InfixExpression ie,
-			boolean doNotRevertExpression) {
+	private Expression getBooleanExpression(Expression ie, boolean doNotRevertExpression) {
 		if (doNotRevertExpression) {
 			return ie;
 		}

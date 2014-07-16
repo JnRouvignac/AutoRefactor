@@ -27,8 +27,8 @@ package org.autorefactor.samples_in;
 
 public class BooleanSample {
 
-    private boolean f;
-    private Boolean g;
+    public boolean f;
+    public Boolean g;
 
     public void useBooleanConstants() {
         Boolean b1 = Boolean.valueOf(true);
@@ -359,7 +359,7 @@ public class BooleanSample {
         return false;
     }
 
-    private void aMethodThatAcceptsABoolean(boolean b) {
+    protected void aMethodThatAcceptsABoolean(boolean b) {
     }
 
 }
