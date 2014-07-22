@@ -73,7 +73,9 @@ public class ForLoopHelper {
 			final Name init = getInitializerOperand(initializers.get(0));
 			final ForLoopContent forContent = getIndexOnCollection(condition);
 			final Name updater = getUpdaterOperand(updaters.get(0));
-			if (isSameVariable(init, forContent.loopVariable) && isSameVariable(init, updater)) {
+			if (forContent != null
+					&& isSameVariable(init, forContent.loopVariable)
+					&& isSameVariable(init, updater)) {
 				return forContent;
 			}
 		}
@@ -139,15 +141,15 @@ public class ForLoopHelper {
 			final Expression lo = ie.getLeftOperand();
 			final Expression ro = ie.getRightOperand();
 			if (InfixExpression.Operator.LESS.equals(ie.getOperator())) {
-				return ppp(lo, ro);
+				return buildForLoopContent(lo, ro);
 			} else if (InfixExpression.Operator.GREATER.equals(ie.getOperator())) {
-				return ppp(ro, lo);
+				return buildForLoopContent(ro, lo);
 			}
 		}
 		return null;
 	}
 
-	private static ForLoopContent ppp(final Expression loopVar, final Expression containerVar) {
+	private static ForLoopContent buildForLoopContent(final Expression loopVar, final Expression containerVar) {
 		if (containerVar instanceof MethodInvocation
 				&& loopVar instanceof Name) {
 			final MethodInvocation mi = (MethodInvocation) containerVar;
