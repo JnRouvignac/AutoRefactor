@@ -26,7 +26,6 @@
 package org.autorefactor.refactoring.rules;
 
 import java.io.File;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,6 +34,7 @@ import java.util.List;
 
 import org.autorefactor.refactoring.IRefactoring;
 import org.autorefactor.refactoring.Release;
+import org.autorefactor.ui.ApplyRefactoringsJob;
 import org.autorefactor.ui.AutoRefactorHandler;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IPackageFragment;
@@ -97,7 +97,7 @@ public class RefactoringsTest {
 		cu.save(null, true);
 
 		final IDocument doc = new Document(sampleInSource);
-		autoRefactorHandler_ApplyRefactoring(
+		new ApplyRefactoringsJob(null, null).applyRefactoring(
 				doc, cu,
 				Release.javaSE("1.5.0"), 4,
 				new AggregateASTVisitor(refactoring));
@@ -106,35 +106,6 @@ public class RefactoringsTest {
 				doc.get().replaceAll("samples_in", "samples_out"));
 		final String expected = normalize(sampleOutSource);
 		assertEquals(testName + ": wrong output;", expected, actual);
-	}
-
-	private void autoRefactorHandler_ApplyRefactoring(Object... params) throws Exception {
-		try {
-			final Method m = AutoRefactorHandler.class.getDeclaredMethod("applyRefactoring",
-					IDocument.class, ICompilationUnit.class,
-					Release.class,
-					Integer.TYPE,
-					AggregateASTVisitor.class);
-			m.setAccessible(true);
-			m.invoke(null, params);
-		} catch (InvocationTargetException e) {
-			throw getExceptionToThrow(e);
-		}
-	}
-
-	private Exception getExceptionToThrow(Exception e) {
-		final Throwable cause = e.getCause();
-		if (cause instanceof Exception) {
-			final Exception ex = (Exception) cause;
-			if (ex instanceof RuntimeException) {
-				final RuntimeException re = (RuntimeException) ex;
-				if ("Unexpected exception".equals(re.getMessage())) {
-					return getExceptionToThrow(re);
-				}
-			}
-			return ex;
-		}
-		return e;
 	}
 
 	private IRefactoring getRefactoringClass(final String refactoringClassName,
