@@ -45,11 +45,6 @@ public class AddBracketsToControlStatementRefactoring extends ASTVisitor
 		implements IJavaRefactoring {
 
 	private RefactoringContext ctx;
-	private final boolean addAngleBracketsToStatementBodies;
-
-	public AddBracketsToControlStatementRefactoring(boolean addAngleBracketsToStatementBodies) {
-		this.addAngleBracketsToStatementBodies = addAngleBracketsToStatementBodies;
-	}
 
 	public void setRefactoringContext(RefactoringContext ctx) {
 		this.ctx = ctx;
@@ -103,7 +98,7 @@ public class AddBracketsToControlStatementRefactoring extends ASTVisitor
 	}
 
 	private boolean setBlock(Statement statement) {
-		if (!this.addAngleBracketsToStatementBodies || statement == null) {
+		if (statement == null) {
 			return VISIT_SUBTREE;
 		}
 		final ASTBuilder b = this.ctx.getASTBuilder();

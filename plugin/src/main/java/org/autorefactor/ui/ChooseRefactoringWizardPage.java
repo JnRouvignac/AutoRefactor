@@ -33,6 +33,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.autorefactor.refactoring.IRefactoring;
+import org.autorefactor.refactoring.rules.AllRefactorings;
 import org.autorefactor.util.UnhandledException;
 import org.eclipse.jface.viewers.*;
 import org.eclipse.jface.viewers.StyledString.Styler;
@@ -51,30 +52,6 @@ import org.eclipse.swt.widgets.*;
 import static org.eclipse.jface.viewers.CheckboxTableViewer.*;
 
 public class ChooseRefactoringWizardPage extends WizardPage {
-
-	/** TODO JNR replace this it is not good enough. */
-	private enum ModelProvider {
-		INSTANCE;
-
-		private List<IRefactoring> refactorings;
-
-		@SuppressWarnings("unchecked")
-		private ModelProvider() {
-			try {
-				final Method m = AutoRefactorHandler.class.getDeclaredMethod("getAllRefactorings");
-				m.setAccessible(true);
-				refactorings = (List<IRefactoring>) m.invoke(null);
-			}
-			catch (Exception e) {
-				throw new UnhandledException(e);
-			}
-		}
-
-		public List<IRefactoring> getRefactorings() {
-			return refactorings;
-		}
-
-	}
 
 	private final class CheckStateProvider implements ICheckStateProvider {
 
@@ -190,7 +167,7 @@ public class ChooseRefactoringWizardPage extends WizardPage {
 				SWT.BORDER | SWT.H_SCROLL | SWT.CHECK | SWT.NO_FOCUS | SWT.HIDE_SELECTION);
 		createColumns(tableViewer);
 		tableViewer.setContentProvider(new ArrayContentProvider());
-		final List<IRefactoring> refactorings = ModelProvider.INSTANCE.getRefactorings();
+		final List<IRefactoring> refactorings = AllRefactorings.getAllRefactorings();
 		tableViewer.setInput(refactorings);
 		tableViewer.setCheckStateProvider(new CheckStateProvider(refactorings));
 		tableViewer.setComparator(new ViewerComparator() {

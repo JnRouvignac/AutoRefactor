@@ -25,14 +25,7 @@
  */
 package org.autorefactor.ui;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import org.autorefactor.AutoRefactorPlugin;
-import org.autorefactor.refactoring.IRefactoring;
-import org.autorefactor.refactoring.rules.*;
-import org.autorefactor.ui.preferences.PreferenceHelper;
+import org.autorefactor.refactoring.rules.AllRefactorings;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
@@ -62,7 +55,7 @@ public class AutoRefactorHandler extends AbstractHandler {
 	public Object execute(final ExecutionEvent event) throws ExecutionException {
 		new ApplyRefactoringsJob(
 				getSelectedJavaElement(event),
-				getAllRefactorings()).run(null);
+				AllRefactorings.getConfiguredRefactorings()).run(null);
 
 		// TODO JNR provide a maven plugin
 		// TODO JNR provide a gradle plugin
@@ -120,40 +113,6 @@ public class AutoRefactorHandler extends AbstractHandler {
 			}
 		}
 		return null;
-	}
-
-	private static List<IRefactoring> getAllRefactorings() {
-		PreferenceHelper prefs = AutoRefactorPlugin.getPreferenceHelper();
-		return new ArrayList<IRefactoring>(Arrays.asList(
-				new VectorOldToNewAPIRefactoring(),
-				new PrimitiveWrapperCreationRefactoring(),
-				new BooleanRefactoring(),
-				new AddBracketsToControlStatementRefactoring(prefs.addAngleBracketsToStatementBodies()),
-				new InvertEqualsRefactoring(),
-				new SimplifyExpressionRefactoring(prefs.removeThisForNonStaticMethodAccess()),
-				new StringRefactoring(),
-				new BigDecimalRefactoring(),
-				// TODO JNR implement
-				// new ForeachRefactoring(),
-				new DeadCodeEliminationRefactoring(),
-				new CollapseIfStatementRefactoring(),
-				new CommonCodeInIfElseStatementRefactoring(),
-				// TODO JNR complete it
-				// new GenerecizeRefactoring(),
-				new CollectionAddAllRefactoring(),
-				new IfStatementRefactoring(),
-				// TODO JNR implement
-				// new RemoveStupidIdiomaticPatternRefactoring(),
-				// TODO JNR test for Eclipse bug fix - remove
-				// new ExtractMethodTestRefactoring(),
-				// TODO JNR - to be completed
-				// new ReduceVariableScopeRefactoring(),
-				new StringBuilderRefactoring(),
-				new CommentsRefactoring(),
-				new RemoveFieldsDefaultValuesRefactoring(),
-				new RemoveUnnecessaryLocalBeforeReturnRefactoring(),
-				new RemoveUselessModifiersRefactoring(),
-				new HotSpotIntrinsicedAPIsRefactoring()));
 	}
 
 }

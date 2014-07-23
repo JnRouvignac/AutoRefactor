@@ -26,7 +26,6 @@
 package org.autorefactor.refactoring.rules;
 
 import java.io.File;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -35,7 +34,6 @@ import java.util.List;
 import org.autorefactor.refactoring.IRefactoring;
 import org.autorefactor.refactoring.Release;
 import org.autorefactor.ui.ApplyRefactoringsJob;
-import org.autorefactor.ui.AutoRefactorHandler;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jface.text.Document;
@@ -83,8 +81,7 @@ public class RefactoringsTest {
 		assertTrue(testName + ": sample out file " + sampleOut + " should exist", sampleOut.exists());
 
 		final String refactoringClassname = testName + "Refactoring";
-		final AutoRefactorHandler handler = new AutoRefactorHandler();
-		final IRefactoring refactoring = getRefactoringClass(refactoringClassname, handler);
+		final IRefactoring refactoring = getRefactoringClass(refactoringClassname);
 		assertNotNull(testName + ": refactoring class " + refactoringClassname + " should exist", refactoring);
 
 		final String sampleInSource = readAll(sampleIn);
@@ -108,22 +105,14 @@ public class RefactoringsTest {
 		assertEquals(testName + ": wrong output;", expected, actual);
 	}
 
-	private IRefactoring getRefactoringClass(final String refactoringClassName,
-			final AutoRefactorHandler handler) throws Exception {
-		Collection<IRefactoring> refactorings = getAllRefactorings(handler);
+	private IRefactoring getRefactoringClass(final String refactoringClassName) throws Exception {
+		Collection<IRefactoring> refactorings = AllRefactorings.getAllRefactorings();
 		for (IRefactoring refactoring : refactorings) {
 			if (refactoring.getClass().getSimpleName().equals(refactoringClassName)) {
 				return refactoring;
 			}
 		}
 		return null;
-	}
-
-	@SuppressWarnings("unchecked")
-	private <T> T getAllRefactorings(Object obj) throws Exception {
-		final Method m = obj.getClass().getDeclaredMethod("getAllRefactorings");
-		m.setAccessible(true);
-		return (T) m.invoke(obj);
 	}
 
 	private String normalize(String s) {
