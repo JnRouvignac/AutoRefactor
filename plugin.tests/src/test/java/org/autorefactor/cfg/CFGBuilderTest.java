@@ -25,14 +25,12 @@
  */
 package org.autorefactor.cfg;
 
-import static org.autorefactor.cfg.test.TestUtils.*;
-import static org.junit.Assert.*;
-
 import java.io.File;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import org.autorefactor.refactoring.Release;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.CompilationUnit;
@@ -40,6 +38,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
+
+import static org.autorefactor.cfg.test.TestUtils.*;
+import static org.autorefactor.ui.ApplyRefactoringsJob.*;
+import static org.junit.Assert.*;
 
 @RunWith(value = Parameterized.class)
 public class CFGBuilderTest {
@@ -82,6 +84,7 @@ public class CFGBuilderTest {
 		final ASTParser parser = ASTParser.newParser(AST.JLS4);
 		parser.setSource(javaSource.toCharArray());
 		parser.setResolveBindings(true);
+		parser.setCompilerOptions(getCompilerOptions(Release.javaSE("1.5.0")));
 
 		final CompilationUnit astRoot = (CompilationUnit) parser.createAST(null);
 		final CFGBuilder builder = new CFGBuilder(javaSource, 4);

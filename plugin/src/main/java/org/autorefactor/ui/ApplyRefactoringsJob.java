@@ -318,7 +318,8 @@ public class ApplyRefactoringsJob extends Job {
 		parser.setCompilerOptions(getCompilerOptions(javaSERelease));
 	}
 
-	private Map<String, String> getCompilerOptions(Release javaSERelease) {
+	@SuppressWarnings("unchecked")
+	public static Map<String, String> getCompilerOptions(Release javaSERelease) {
 		final Map<String, String> options = JavaCore.getOptions();
 		final String v = javaSERelease.getMajorVersion() + "."+ javaSERelease.getMinorVersion();
 		JavaCore.setComplianceOptions(v, options);
