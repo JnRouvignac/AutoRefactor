@@ -25,6 +25,7 @@
  */
 package org.autorefactor.cfg;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.Map.Entry;
@@ -45,8 +46,8 @@ import static org.autorefactor.refactoring.ASTHelper.*;
 /**
  * Builds a CFG.
  * <p>
- * Look at {@link #buildCFG(IfStatement, LivenessState)} for a javadoc for
- * all the buildCFG(*Statement, LivenessState) methods.
+ * Look at {@link #buildCFG(IfStatement, LivenessState, ThrowerBlocks)} for a
+ * javadoc for all the buildCFG() methods.
  * <p>
  * TODO JNR detect dead code by looking for empty live blocks list when visiting a node
  * + looking at if / while / etc. conditions and see if they resolve to a constant
@@ -151,6 +152,15 @@ public class CFGBuilder {
 	/** The exit block for the CFG being built */
 	private CFGBasicBlock exitBlock;
 
+	/**
+	 * Cache of "manually" resolved type bindings.
+	 * <p>
+	 * Cannot be made static because for {@link ITypeBinding#equals(Object)} to
+	 * work, all type bindings must have been loaded from the same
+	 * CompilationUnit.
+	 */
+	private final Map<String, ITypeBinding> typeBindingsCache = new HashMap<String, ITypeBinding>();
+
 	public CFGBuilder(String source, int tabSize) {
 		this.source = source;
 		this.tabSize = tabSize;
@@ -168,7 +178,7 @@ public class CFGBuilder {
 			ArrayAccess aa = (ArrayAccess) node;
 			addVariableAccess(basicBlock, aa.getArray(), flags, throwers);
 			addVariableAccess(basicBlock, aa.getIndex(), flags, throwers);
-			throwers.addThrow(aa, newExceptions(null, "java.lang.ArrayIndexOutOfBoundsException"));
+			throwers.addThrow(aa, newException(node, "java.lang.ArrayIndexOutOfBoundsException"));
 			return true;
 		} else if (node instanceof ArrayCreation) {
 			ArrayCreation ac = (ArrayCreation) node;
@@ -210,7 +220,7 @@ public class CFGBuilder {
 			boolean mightThrow = addVariableAccess(basicBlock, fa.getExpression(), flags, throwers);
 			basicBlock.addVariableAccess(new VariableAccess(fa, flags));
 			if (is(flags, READ)) {
-				throwers.addThrow(fa, newExceptions(null, "java.lang.NullPointerException"));
+				throwers.addThrow(fa, newException(node, "java.lang.NullPointerException"));
 				mightThrow = true;
 			}
 			return mightThrow;
@@ -233,14 +243,14 @@ public class CFGBuilder {
 			SimpleName sn = (SimpleName) node;
 			basicBlock.addVariableAccess(new VariableAccess(sn, flags));
 			if (is(flags, READ)) {
-				throwers.addThrow(sn, newExceptions(null, "java.lang.NullPointerException"));
+				throwers.addThrow(sn, newException(node, "java.lang.NullPointerException"));
 				return true;
 			}
 			return false;
 		} else if (node instanceof QualifiedName) {
 			QualifiedName qn = (QualifiedName) node;
 			basicBlock.addVariableAccess(new VariableAccess(qn, flags));
-			throwers.addThrow(qn, newExceptions(null, "java.lang.NullPointerException"));
+			throwers.addThrow(qn, newException(node, "java.lang.NullPointerException"));
 			return true;
 		} else if (node instanceof ParenthesizedExpression) {
 			ParenthesizedExpression pe = (ParenthesizedExpression) node;
@@ -278,21 +288,58 @@ public class CFGBuilder {
 		return (flags & flag) == flag;
 	}
 
-	private ITypeBinding[] newExceptions(AST ast, String fullyQualifiedName) {
-		if (true) {
-			return null; // TODO JNR remove this code
+	private ITypeBinding newException(Expression node, String fullyQualifiedName) {
+		ITypeBinding typeBinding = typeBindingsCache.get(fullyQualifiedName);
+		if (typeBinding == null) {
+			typeBinding = resolveWellKnownType(node, fullyQualifiedName);
+			typeBindingsCache.put(typeBinding.getQualifiedName(), typeBinding);
 		}
-		final Type type = newType(ast, fullyQualifiedName.split("\\."));
-		return new ITypeBinding[] { type.resolveBinding() };
+		return typeBinding;
 	}
 
-	private Type newType(AST ast, String... strings) {
-		Name name = ast.newSimpleName(strings[0]);
-		for (int i = 1; i < strings.length; i++) {
-			final SimpleName sn = ast.newSimpleName(strings[i]);
-			name = ast.newQualifiedName(name, sn);
+	/**
+	 * FIXME Horribly brittle hack that uses reflection to resolve type bindings.
+	 * <p>
+	 * But how could I do otherwise?
+	 * <p>
+	 *
+	 * @see org.eclipse.jdt.core.dom.DefaultBindingResolver#resolveWellKnownType(String)
+	 */
+	private ITypeBinding resolveWellKnownType(Expression node, String fullyQualifiedName) {
+		try {
+			final ITypeBinding typeBinding = node.resolveTypeBinding();
+
+			final Field f1 = typeBinding.getClass().getDeclaredField("resolver");
+			f1.setAccessible(true);
+			Object bindingResolver = f1.get(typeBinding);
+
+			final Field f2 = bindingResolver.getClass().getDeclaredField("scope");
+			f2.setAccessible(true);
+			Object compilationUnitScope = f2.get(bindingResolver);
+
+			final Method m2 = compilationUnitScope.getClass().getSuperclass()
+					.getDeclaredMethod("getType", char[][].class, int.class);
+			m2.setAccessible(true);
+			final char[][] simpleNamesArray = toSimpleNamesArray(fullyQualifiedName);
+			final Object internalTypeBinding =
+					m2.invoke(compilationUnitScope, simpleNamesArray, 3);
+
+			final Method m1 = bindingResolver.getClass().getDeclaredMethod("getTypeBinding",
+					internalTypeBinding.getClass().getSuperclass().getSuperclass());
+			m1.setAccessible(true);
+			return (ITypeBinding) m1.invoke(bindingResolver, internalTypeBinding);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
 		}
-		return ast.newSimpleType(name);
+	}
+
+	private char[][] toSimpleNamesArray(String fullyQualifiedName) {
+		final String[] simpleNames = fullyQualifiedName.split("\\.");
+		final char[][] result = new char[simpleNames.length][];
+		for (int i = 0; i < simpleNames.length; i++) {
+			result[i] = simpleNames[i].toCharArray();
+		}
+		return result;
 	}
 
 	/**
@@ -301,8 +348,8 @@ public class CFGBuilder {
 	private boolean addVariableAccesses(CFGBasicBlock basicBlock,
 			List<Expression> expressions, int flags, ThrowerBlocks throwers) {
 		boolean mightThrow = false;
-		for (Expression exor : expressions) {
-			if (addVariableAccess(basicBlock, exor, flags, throwers)) {
+		for (Expression expr : expressions) {
+			if (addVariableAccess(basicBlock, expr, flags, throwers)) {
 				mightThrow = true;
 			}
 		}
@@ -538,7 +585,7 @@ public class CFGBuilder {
 
 			final List<CFGBasicBlock> throwingBlocksInTry = localThrowers.selectBlocksThrowing(caughtException);
 			if (throwingBlocksInTry.isEmpty()) {
-				// TODO JNR dead code found!! 
+				// TODO JNR dead code found!!
 			}
 			final List<CFGEdgeBuilder> liveBeforeCatchClause = new LinkedList<CFGEdgeBuilder>();
 			for (CFGBasicBlock throwingBlockInTry : throwingBlocksInTry) {
@@ -907,7 +954,7 @@ public class CFGBuilder {
 		}
 	}
 
-	// TODO JNR interesting code for AutoRefactor to "fix" 
+	// TODO JNR interesting code for AutoRefactor to "fix"
 	// http://www.javaworld.com/article/2077609/core-java/try-finally-clauses-defined-and-demonstrated.html
 	private void buildEdges(final LivenessState toBuild, final CFGBasicBlock targetBlock) {
 		if (isNotEmpty(toBuild.liveEdges)) {
