@@ -29,14 +29,27 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>org.autorefactor.feature</groupId>
-  <artifactId>org.autorefactor.feature</artifactId>
-  <packaging>eclipse-feature</packaging>
+  <groupId>org.autorefactor.repository</groupId>
+  <artifactId>org.autorefactor.repository</artifactId>
+  <packaging>eclipse-repository</packaging>
 
   <parent>
     <groupId>org.autorefactor.plugin</groupId>
     <artifactId>parent</artifactId>
     <version>0.0.2-SNAPSHOT</version>
   </parent>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.eclipse.tycho</groupId>
+        <artifactId>tycho-p2-repository-plugin</artifactId>
+        <version>${tycho-version}</version>
+        <configuration>
+          <compress>true</compress>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 
 </project>
