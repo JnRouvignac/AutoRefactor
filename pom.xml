@@ -9,6 +9,7 @@
   <version>0.0.2-SNAPSHOT</version>
   <packaging>pom</packaging>
   <modules>
+    <module>feature</module>
     <module>plugin</module>
     <module>plugin.tests</module>
   </modules>
