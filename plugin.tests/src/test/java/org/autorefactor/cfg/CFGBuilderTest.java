@@ -40,6 +40,7 @@ import java.util.List;
 
 import org.autorefactor.refactoring.Release;
 import org.autorefactor.refactoring.rules.JavaCoreHelper;
+import org.autorefactor.ui.ApplyRefactoringsJob;
 import org.autorefactor.ui.AutoRefactorHandler;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IPackageFragment;
@@ -130,7 +131,7 @@ public class CFGBuilderTest {
 
 	private void autoRefactorHandler_resetParser(ICompilationUnit cu, ASTParser parser,
 			Release javaSE) throws Exception {
-		final Method m = AutoRefactorHandler.class.getDeclaredMethod(
+		final Method m = ApplyRefactoringsJob.class.getDeclaredMethod(
 				"resetParser", ICompilationUnit.class, ASTParser.class, Release.class);
 		m.setAccessible(true);
 		m.invoke(null, cu, parser, javaSE);

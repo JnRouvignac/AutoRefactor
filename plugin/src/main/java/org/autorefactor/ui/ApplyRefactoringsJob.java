@@ -306,7 +306,7 @@ public class ApplyRefactoringsJob extends Job {
 		}
 	}
 
-	private void resetParser(ICompilationUnit compilationUnit,
+	private static void resetParser(ICompilationUnit compilationUnit,
 			ASTParser parser, Release javaSERelease) {
 		parser.setSource(compilationUnit);
 		parser.setResolveBindings(true);
