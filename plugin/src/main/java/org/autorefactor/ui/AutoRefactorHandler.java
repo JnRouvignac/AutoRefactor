@@ -29,6 +29,7 @@ import org.autorefactor.refactoring.rules.AllRefactorings;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
@@ -55,7 +56,7 @@ public class AutoRefactorHandler extends AbstractHandler {
 	public Object execute(final ExecutionEvent event) throws ExecutionException {
 		new ApplyRefactoringsJob(
 				getSelectedJavaElement(event),
-				AllRefactorings.getConfiguredRefactorings()).run(null);
+				AllRefactorings.getConfiguredRefactorings()).run(new NullProgressMonitor());
 
 		// TODO JNR provide a maven plugin
 		// TODO JNR provide a gradle plugin

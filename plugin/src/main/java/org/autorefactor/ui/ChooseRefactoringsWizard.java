@@ -29,6 +29,7 @@ import java.util.List;
 
 import org.autorefactor.refactoring.IRefactoring;
 import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jface.wizard.Wizard;
 
@@ -58,7 +59,7 @@ public class ChooseRefactoringsWizard extends Wizard {
 	@Override
 	public boolean performFinish() {
 		final List<IRefactoring> refactorings = chooseRefactoringsPage.getSelectedRefactorings();
-		new ApplyRefactoringsJob(javaElement, refactorings).run(null);
+		new ApplyRefactoringsJob(javaElement, refactorings).run(new NullProgressMonitor());
 		return !refactorings.isEmpty();
 	}
 }

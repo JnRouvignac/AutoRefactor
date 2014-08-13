@@ -92,6 +92,7 @@ public class ApplyRefactoringsJob extends Job {
 		this.refactoringsToApply = refactoringsToApply;
 	}
 
+	/** {@inheritDoc} */
 	@Override
 	protected IStatus run(IProgressMonitor monitor) {
 		if (javaElement == null) {
@@ -103,9 +104,7 @@ public class ApplyRefactoringsJob extends Job {
 		final String javaSourceCompatibility = options.get(COMPILER_SOURCE);
 		final int tabSize = getTabSize(options);
 
-		if (monitor != null) {
-			monitor.beginTask("", compilationUnits.size());
-		}
+		monitor.beginTask("", compilationUnits.size());
 		try {
 			final Release javaSERelease = Release.javaSE(javaSourceCompatibility);
 			for (final ICompilationUnit compilationUnit : compilationUnits) {
@@ -114,24 +113,20 @@ public class ApplyRefactoringsJob extends Job {
 					final String simpleName = elName.substring(0, elName.lastIndexOf('.'));
 					final String className =
 						compilationUnit.getParent().getElementName() + "." + simpleName;
-					if (monitor != null) {
-						monitor.subTask("Applying refactorings to " + className);
-					}
+
+					monitor.subTask("Applying refactorings to " + className);
+
 					AggregateASTVisitor refactoring = new AggregateASTVisitor(
 						refactoringsToApply, AutoRefactorPlugin.getPreferenceHelper().debugModeOn());
 					applyRefactoring(compilationUnit, javaSERelease, tabSize, refactoring);
 				} catch (Exception e) {
 					throw new RuntimeException(e);
 				} finally {
-					if (monitor != null) {
-						monitor.worked(1);
-					}
+					monitor.worked(1);
 				}
 			}
 		} finally {
-			if (monitor != null) {
-				monitor.done();
-			}
+			monitor.done();
 		}
 		return Status.OK_STATUS;
 	}
