@@ -75,8 +75,6 @@ public class AllRefactorings {
 				new IfStatementRefactoring(),
 				// TODO JNR implement
 				// new RemoveStupidIdiomaticPatternRefactoring(),
-				// TODO JNR test for Eclipse bug fix - remove
-				// new ExtractMethodTestRefactoring(),
 				// TODO JNR - to be completed
 				// new ReduceVariableScopeRefactoring(),
 				new StringBuilderRefactoring(),
