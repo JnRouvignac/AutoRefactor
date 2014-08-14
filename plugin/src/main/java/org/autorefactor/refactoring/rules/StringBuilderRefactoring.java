@@ -71,11 +71,13 @@ public class StringBuilderRefactoring extends ASTVisitor implements
         super();
     }
 
+    /** {@inheritDoc} */
     public void setRefactoringContext(RefactoringContext ctx) {
         this.ctx = ctx;
         this.javaMinorVersion = this.ctx.getJavaSERelease().getMinorVersion();
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean visit(ClassInstanceCreation node) {
         final ITypeBinding typeBinding = node.getType().resolveBinding();
@@ -89,6 +91,7 @@ public class StringBuilderRefactoring extends ASTVisitor implements
         return VISIT_SUBTREE;
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean visit(InfixExpression node) {
         // TODO JNR also remove valueOf() methods in these cases, etc.:
@@ -149,6 +152,7 @@ public class StringBuilderRefactoring extends ASTVisitor implements
                         && "".equals(((StringLiteral) expr).getLiteralValue()));
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean visit(MethodInvocation node) {
         if (node.getExpression() == null) {
@@ -334,6 +338,7 @@ public class StringBuilderRefactoring extends ASTVisitor implements
         results.addFirst(arg);
     }
 
+    /** {@inheritDoc} */
     public Refactorings getRefactorings(CompilationUnit astRoot) {
         astRoot.accept(this);
         return this.ctx.getRefactorings();

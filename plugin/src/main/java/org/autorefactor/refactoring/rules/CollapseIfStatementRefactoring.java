@@ -45,10 +45,12 @@ public class CollapseIfStatementRefactoring extends ASTVisitor implements
         super();
     }
 
+    /** {@inheritDoc} */
     public void setRefactoringContext(RefactoringContext ctx) {
         this.ctx = ctx;
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean visit(IfStatement node) {
         if (node.getElseStatement() == null) {
@@ -91,6 +93,7 @@ public class CollapseIfStatementRefactoring extends ASTVisitor implements
         return expr;
     }
 
+    /** {@inheritDoc} */
     public Refactorings getRefactorings(CompilationUnit astRoot) {
         astRoot.accept(this);
         return this.ctx.getRefactorings();

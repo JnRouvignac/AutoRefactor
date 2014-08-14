@@ -50,10 +50,12 @@ public class InvertEqualsRefactoring extends ASTVisitor implements
         super();
     }
 
+    /** {@inheritDoc} */
     public void setRefactoringContext(RefactoringContext ctx) {
         this.ctx = ctx;
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean visit(MethodInvocation node) {
         if (node.getExpression() == null) {
@@ -83,6 +85,7 @@ public class InvertEqualsRefactoring extends ASTVisitor implements
         return b.invoke(b.copyExpr(rhs), methodName, b.copyExpr(lhs));
     }
 
+    /** {@inheritDoc} */
     public Refactorings getRefactorings(CompilationUnit astRoot) {
         astRoot.accept(this);
         return this.ctx.getRefactorings();

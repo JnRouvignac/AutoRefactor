@@ -149,11 +149,13 @@ public class BooleanRefactoring extends ASTVisitor implements IJavaRefactoring {
         super();
     }
 
+    /** {@inheritDoc} */
     public void setRefactoringContext(RefactoringContext ctx) {
         this.ctx = ctx;
         this.javaMinorVersion = this.ctx.getJavaSERelease().getMinorVersion();
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean visit(ConditionalExpression node) {
         final ITypeBinding typeBinding = node.resolveTypeBinding();
@@ -169,6 +171,7 @@ public class BooleanRefactoring extends ASTVisitor implements IJavaRefactoring {
         return VISIT_SUBTREE;
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean visit(IfStatement node) {
         final BooleanASTMatcher matcher = new BooleanASTMatcher();
@@ -429,6 +432,7 @@ public class BooleanRefactoring extends ASTVisitor implements IJavaRefactoring {
         return false;
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean visit(MethodInvocation node) {
         if (isMethod(node, "java.lang.Boolean", "valueOf", "java.lang.String")
@@ -453,6 +457,7 @@ public class BooleanRefactoring extends ASTVisitor implements IJavaRefactoring {
         return fa;
     }
 
+    /** {@inheritDoc} */
     public Refactorings getRefactorings(CompilationUnit astRoot) {
         astRoot.accept(this);
         return this.ctx.getRefactorings();

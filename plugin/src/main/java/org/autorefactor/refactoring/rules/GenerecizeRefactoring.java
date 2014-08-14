@@ -43,6 +43,7 @@ public class GenerecizeRefactoring extends ASTVisitor implements
         super();
     }
 
+    /** {@inheritDoc} */
     public void setRefactoringContext(RefactoringContext ctx) {
         this.ctx = ctx;
     }
@@ -71,6 +72,7 @@ public class GenerecizeRefactoring extends ASTVisitor implements
     // Class.getMethod / Class.getDeclaredMethod remove now useless array
     // creation
 
+    /** {@inheritDoc} */
     @Override
     public boolean visit(MethodInvocation node) {
         if (isMethod(node, "java.util.Iterator", "next")
@@ -83,6 +85,7 @@ public class GenerecizeRefactoring extends ASTVisitor implements
         return VISIT_SUBTREE;
     }
 
+    /** {@inheritDoc} */
     public Refactorings getRefactorings(CompilationUnit astRoot) {
         astRoot.accept(this);
         return this.ctx.getRefactorings();

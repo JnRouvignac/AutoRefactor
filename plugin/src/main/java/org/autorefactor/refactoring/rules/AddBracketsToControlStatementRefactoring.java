@@ -46,10 +46,12 @@ public class AddBracketsToControlStatementRefactoring extends ASTVisitor
 
     private RefactoringContext ctx;
 
+    /** {@inheritDoc} */
     public void setRefactoringContext(RefactoringContext ctx) {
         this.ctx = ctx;
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean visit(IfStatement node) {
         boolean result = VISIT_SUBTREE;
@@ -65,6 +67,7 @@ public class AddBracketsToControlStatementRefactoring extends ASTVisitor
         return VISIT_SUBTREE;
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean visit(EnhancedForStatement node) {
         if (node.getBody() != null && !(node.getBody() instanceof Block)) {
@@ -73,6 +76,7 @@ public class AddBracketsToControlStatementRefactoring extends ASTVisitor
         return VISIT_SUBTREE;
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean visit(ForStatement node) {
         if (node.getBody() != null && !(node.getBody() instanceof Block)) {
@@ -81,6 +85,7 @@ public class AddBracketsToControlStatementRefactoring extends ASTVisitor
         return VISIT_SUBTREE;
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean visit(WhileStatement node) {
         if (node.getBody() != null && !(node.getBody() instanceof Block)) {
@@ -89,6 +94,7 @@ public class AddBracketsToControlStatementRefactoring extends ASTVisitor
         return VISIT_SUBTREE;
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean visit(DoStatement node) {
         if (node.getBody() != null && !(node.getBody() instanceof Block)) {
@@ -108,6 +114,7 @@ public class AddBracketsToControlStatementRefactoring extends ASTVisitor
         return DO_NOT_VISIT_SUBTREE;
     }
 
+    /** {@inheritDoc} */
     public Refactorings getRefactorings(CompilationUnit astRoot) {
         astRoot.accept(this);
         return this.ctx.getRefactorings();

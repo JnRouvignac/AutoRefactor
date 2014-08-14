@@ -64,6 +64,7 @@ public class RefactoringContext {
         return javaSERelease;
     }
 
+    /** {@inheritDoc} */
     public Refactorings getRefactorings() {
         return refactorings;
     }

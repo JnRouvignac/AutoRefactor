@@ -77,10 +77,12 @@ public class CommentsRefactoring extends ASTVisitor implements IJavaRefactoring 
         super();
     }
 
+    /** {@inheritDoc} */
     public void setRefactoringContext(RefactoringContext ctx) {
         this.ctx = ctx;
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean visit(BlockComment node) {
         final String comment = getComment(node);
@@ -124,6 +126,7 @@ public class CommentsRefactoring extends ASTVisitor implements IJavaRefactoring 
         return finder.getCoveringNode();
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean visit(Javadoc node) {
         final String comment = getComment(node);
@@ -250,6 +253,7 @@ public class CommentsRefactoring extends ASTVisitor implements IJavaRefactoring 
         return false;
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean visit(LineComment node) {
         final String comment = getComment(node);
@@ -325,6 +329,7 @@ public class CommentsRefactoring extends ASTVisitor implements IJavaRefactoring 
                 && "package-info.java".equals(getFileName(node)));
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean visit(CompilationUnit node) {
         this.astRoot = node;
@@ -349,6 +354,7 @@ public class CommentsRefactoring extends ASTVisitor implements IJavaRefactoring 
         return VISIT_SUBTREE;
     }
 
+    /** {@inheritDoc} */
     public Refactorings getRefactorings(CompilationUnit astRoot) {
         return this.ctx.getRefactorings();
     }

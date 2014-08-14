@@ -42,6 +42,7 @@ public class IfStatementRefactoring extends ASTVisitor implements
         super();
     }
 
+    /** {@inheritDoc} */
     public void setRefactoringContext(RefactoringContext ctx) {
         this.ctx = ctx;
     }
@@ -67,6 +68,7 @@ public class IfStatementRefactoring extends ASTVisitor implements
     // }
     // return l;
 
+    /** {@inheritDoc} */
     @Override
     public boolean visit(IfStatement node) {
         final Statement elseStmt = node.getElseStatement();
@@ -84,6 +86,7 @@ public class IfStatementRefactoring extends ASTVisitor implements
         return VISIT_SUBTREE;
     }
 
+    /** {@inheritDoc} */
     public Refactorings getRefactorings(CompilationUnit astRoot) {
         astRoot.accept(this);
         return this.ctx.getRefactorings();

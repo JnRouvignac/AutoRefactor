@@ -68,6 +68,7 @@ public class RemoveStupidIdiomaticPatternRefactoring extends ASTVisitor
         super();
     }
 
+    /** {@inheritDoc} */
     public void setRefactoringContext(RefactoringContext ctx) {
         this.ctx = ctx;
     }
@@ -88,6 +89,7 @@ public class RemoveStupidIdiomaticPatternRefactoring extends ASTVisitor
         return null;
     }
 
+    /** {@inheritDoc} */
     public Refactorings getRefactorings(CompilationUnit astRoot) {
         astRoot.accept(this);
         return this.ctx.getRefactorings();

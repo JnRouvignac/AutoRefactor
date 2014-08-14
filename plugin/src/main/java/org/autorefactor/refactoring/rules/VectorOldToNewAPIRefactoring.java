@@ -42,10 +42,12 @@ public class VectorOldToNewAPIRefactoring extends ASTVisitor implements
 
     private RefactoringContext ctx;
 
+    /** {@inheritDoc} */
     public void setRefactoringContext(RefactoringContext ctx) {
         this.ctx = ctx;
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean visit(MethodInvocation node) {
         if (this.ctx.getJavaSERelease().isCompatibleWith(
@@ -130,6 +132,7 @@ public class VectorOldToNewAPIRefactoring extends ASTVisitor implements
         }
     }
 
+    /** {@inheritDoc} */
     public Refactorings getRefactorings(CompilationUnit astRoot) {
         astRoot.accept(this);
         return this.ctx.getRefactorings();

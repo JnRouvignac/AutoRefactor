@@ -153,16 +153,19 @@ public class ReduceVariableScopeRefactoring extends ASTVisitor implements
         super();
     }
 
+    /** {@inheritDoc} */
     public void setRefactoringContext(RefactoringContext ctx) {
         this.ctx = ctx;
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean visit(SimpleName node) {
         findVariableAccesses(node);
         return true;
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean visit(QualifiedName node) {
         findVariableAccesses(node);
@@ -232,6 +235,7 @@ public class ReduceVariableScopeRefactoring extends ASTVisitor implements
         throw new NotImplementedException(node);
     }
 
+    /** {@inheritDoc} */
     public Refactorings getRefactorings(CompilationUnit astRoot) {
         astRoot.accept(this);
 

@@ -55,6 +55,7 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
         this.removeThisForNonStaticMethodAccess = removeThisForNonStaticMethodAccess;
     }
 
+    /** {@inheritDoc} */
     public void setRefactoringContext(RefactoringContext ctx) {
         this.ctx = ctx;
         this.javaMinorVersion = this.ctx.getJavaSERelease().getMinorVersion();
@@ -75,6 +76,7 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
 
     // TODO JNR String s = "some " + " string " + "" + ( "fhj" + "prout" );
 
+    /** {@inheritDoc} */
     @Override
     public boolean visit(ParenthesizedExpression node) {
         final Expression innerExpr = getExpressionWithoutParentheses(node);
@@ -192,6 +194,7 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
         return false;
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean visit(MethodInvocation node) {
         if (node.getExpression() == null) {
@@ -267,6 +270,7 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
         return newIe;
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean visit(InfixExpression node) {
         final Expression lhs = node.getLeftOperand();
@@ -452,6 +456,7 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
         return null;
     }
 
+    /** {@inheritDoc} */
     public Refactorings getRefactorings(CompilationUnit astRoot) {
         astRoot.accept(this);
         return this.ctx.getRefactorings();

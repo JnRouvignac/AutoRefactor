@@ -44,10 +44,12 @@ public class RemoveUnnecessaryLocalBeforeReturnRefactoring extends ASTVisitor
         super();
     }
 
+    /** {@inheritDoc} */
     public void setRefactoringContext(RefactoringContext ctx) {
         this.ctx = ctx;
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean visit(ReturnStatement node) {
         final Statement previousSibling = getPreviousSibling(node);
@@ -117,6 +119,7 @@ public class RemoveUnnecessaryLocalBeforeReturnRefactoring extends ASTVisitor
         return rs;
     }
 
+    /** {@inheritDoc} */
     public Refactorings getRefactorings(CompilationUnit astRoot) {
         astRoot.accept(this);
         return this.ctx.getRefactorings();

@@ -54,6 +54,7 @@ public class HotSpotIntrinsicedAPIsRefactoring extends ASTVisitor implements
         super();
     }
 
+    /** {@inheritDoc} */
     public void setRefactoringContext(RefactoringContext ctx) {
         this.ctx = ctx;
     }
@@ -311,6 +312,7 @@ public class HotSpotIntrinsicedAPIsRefactoring extends ASTVisitor implements
         return null;
     }
 
+    /** {@inheritDoc} */
     public Refactorings getRefactorings(CompilationUnit astRoot) {
         astRoot.accept(this);
         return this.ctx.getRefactorings();

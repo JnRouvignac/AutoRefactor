@@ -91,10 +91,12 @@ public class RemoveUselessModifiersRefactoring extends ASTVisitor implements
         super();
     }
 
+    /** {@inheritDoc} */
     public void setRefactoringContext(RefactoringContext ctx) {
         this.ctx = ctx;
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean visit(FieldDeclaration node) {
         if (isInterface(node.getParent())) {
@@ -116,6 +118,7 @@ public class RemoveUselessModifiersRefactoring extends ASTVisitor implements
                 && ((TypeDeclaration) node).isInterface();
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean visit(MethodDeclaration node) {
         if (isInterface(node.getParent())) {
@@ -136,21 +139,25 @@ public class RemoveUselessModifiersRefactoring extends ASTVisitor implements
         return result;
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean visit(AnnotationTypeDeclaration node) {
         return ensureModifiersOrder(node);
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean visit(AnnotationTypeMemberDeclaration node) {
         return removePublicAbstractModifiers(node);
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean visit(EnumDeclaration node) {
         return ensureModifiersOrder(node);
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean visit(TypeDeclaration node) {
         return ensureModifiersOrder(node);
@@ -186,6 +193,7 @@ public class RemoveUselessModifiersRefactoring extends ASTVisitor implements
     }
 
     @SuppressWarnings("unchecked")
+    /** {@inheritDoc} */
     @Override
     public boolean visit(SingleVariableDeclaration node) {
         boolean result = VISIT_SUBTREE;
@@ -211,6 +219,7 @@ public class RemoveUselessModifiersRefactoring extends ASTVisitor implements
         return results;
     }
 
+    /** {@inheritDoc} */
     public Refactorings getRefactorings(CompilationUnit astRoot) {
         astRoot.accept(this);
         return this.ctx.getRefactorings();

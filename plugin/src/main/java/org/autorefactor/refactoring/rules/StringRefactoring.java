@@ -49,12 +49,14 @@ public class StringRefactoring extends ASTVisitor implements IJavaRefactoring {
         super();
     }
 
+    /** {@inheritDoc} */
     public void setRefactoringContext(RefactoringContext ctx) {
         this.ctx = ctx;
     }
 
     // TODO JNR remove calls to toString() inside string concatenation
 
+    /** {@inheritDoc} */
     @Override
     public boolean visit(ClassInstanceCreation node) {
         final ITypeBinding typeBinding = node.getType().resolveBinding();
@@ -71,6 +73,7 @@ public class StringRefactoring extends ASTVisitor implements IJavaRefactoring {
         return VISIT_SUBTREE;
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean visit(MethodInvocation node) {
         final Expression expression = node.getExpression();
@@ -97,6 +100,7 @@ public class StringRefactoring extends ASTVisitor implements IJavaRefactoring {
         return false;
     }
 
+    /** {@inheritDoc} */
     public Refactorings getRefactorings(CompilationUnit astRoot) {
         astRoot.accept(this);
         return this.ctx.getRefactorings();

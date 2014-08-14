@@ -52,6 +52,7 @@ public class CommonCodeInIfElseStatementRefactoring extends ASTVisitor
         super();
     }
 
+    /** {@inheritDoc} */
     public void setRefactoringContext(RefactoringContext ctx) {
         this.ctx = ctx;
     }
@@ -62,6 +63,7 @@ public class CommonCodeInIfElseStatementRefactoring extends ASTVisitor
     // TODO also handle ternary operator, ConditionalExpression
     // TODO move to IfStatementRefactoring??
 
+    /** {@inheritDoc} */
     @Override
     public boolean visit(IfStatement node) {
         if (isElseStatementOfParentIf(node)) {
@@ -295,6 +297,7 @@ public class CommonCodeInIfElseStatementRefactoring extends ASTVisitor
         return true;
     }
 
+    /** {@inheritDoc} */
     public Refactorings getRefactorings(CompilationUnit astRoot) {
         astRoot.accept(this);
         return this.ctx.getRefactorings();

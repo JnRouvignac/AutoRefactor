@@ -51,10 +51,12 @@ public class RemoveFieldsDefaultValuesRefactoring extends ASTVisitor implements
         super();
     }
 
+    /** {@inheritDoc} */
     public void setRefactoringContext(RefactoringContext ctx) {
         this.ctx = ctx;
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean visit(FieldDeclaration node) {
         final ITypeBinding fieldType = node.getType().resolveBinding();
@@ -108,6 +110,7 @@ public class RemoveFieldsDefaultValuesRefactoring extends ASTVisitor implements
         return false;
     }
 
+    /** {@inheritDoc} */
     public Refactorings getRefactorings(CompilationUnit astRoot) {
         astRoot.accept(this);
         return this.ctx.getRefactorings();

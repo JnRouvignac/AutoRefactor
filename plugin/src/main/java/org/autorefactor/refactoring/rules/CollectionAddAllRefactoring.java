@@ -62,10 +62,12 @@ public class CollectionAddAllRefactoring extends ASTVisitor implements
         super();
     }
 
+    /** {@inheritDoc} */
     public void setRefactoringContext(RefactoringContext ctx) {
         this.ctx = ctx;
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean visit(ExpressionStatement node) {
         final MethodInvocation mi = asExpression(node, MethodInvocation.class);
@@ -155,6 +157,7 @@ public class CollectionAddAllRefactoring extends ASTVisitor implements
         return false;
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean visit(EnhancedForStatement node) {
         final Expression collectionVar = node.getExpression();
@@ -175,6 +178,7 @@ public class CollectionAddAllRefactoring extends ASTVisitor implements
         return VISIT_SUBTREE;
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean visit(ForStatement node) {
         final ForLoopContent loopContent = iterateOverContainer(node);
@@ -227,6 +231,7 @@ public class CollectionAddAllRefactoring extends ASTVisitor implements
         return false;
     }
 
+    /** {@inheritDoc} */
     public Refactorings getRefactorings(CompilationUnit astRoot) {
         astRoot.accept(this);
         return this.ctx.getRefactorings();

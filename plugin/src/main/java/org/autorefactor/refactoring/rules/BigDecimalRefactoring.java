@@ -55,11 +55,13 @@ public class BigDecimalRefactoring extends ASTVisitor implements
         super();
     }
 
+    /** {@inheritDoc} */
     public void setRefactoringContext(RefactoringContext ctx) {
         this.ctx = ctx;
         this.javaMinorVersion = this.ctx.getJavaSERelease().getMinorVersion();
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean visit(ClassInstanceCreation node) {
         final ITypeBinding typeBinding = node.getType().resolveBinding();
@@ -123,6 +125,7 @@ public class BigDecimalRefactoring extends ASTVisitor implements
         return this.ctx.getASTBuilder().string(numberLiteral);
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean visit(MethodInvocation node) {
         if (node.getExpression() == null) {
@@ -195,6 +198,7 @@ public class BigDecimalRefactoring extends ASTVisitor implements
         return b.infixExpr(mi, Operator.EQUALS, b.int0(0));
     }
 
+    /** {@inheritDoc} */
     public Refactorings getRefactorings(CompilationUnit astRoot) {
         astRoot.accept(this);
         return this.ctx.getRefactorings();

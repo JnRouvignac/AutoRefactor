@@ -48,6 +48,7 @@ public class ForeachRefactoring extends ASTVisitor implements IJavaRefactoring {
         super();
     }
 
+    /** {@inheritDoc} */
     public void setRefactoringContext(RefactoringContext ctx) {
         this.ctx = ctx;
     }
@@ -65,6 +66,7 @@ public class ForeachRefactoring extends ASTVisitor implements IJavaRefactoring {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean visit(ForStatement node) {
         final VariableUseVisitor variableUseVisitor = new VariableUseVisitor();
@@ -91,6 +93,7 @@ public class ForeachRefactoring extends ASTVisitor implements IJavaRefactoring {
         return VISIT_SUBTREE;
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean visit(WhileStatement node) {
         node.getExpression();
@@ -109,6 +112,7 @@ public class ForeachRefactoring extends ASTVisitor implements IJavaRefactoring {
         return VISIT_SUBTREE;
     }
 
+    /** {@inheritDoc} */
     public Refactorings getRefactorings(CompilationUnit astRoot) {
         astRoot.accept(this);
         return this.ctx.getRefactorings();

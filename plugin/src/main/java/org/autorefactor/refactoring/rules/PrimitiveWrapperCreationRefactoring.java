@@ -46,6 +46,7 @@ public class PrimitiveWrapperCreationRefactoring extends ASTVisitor implements
         super();
     }
 
+    /** {@inheritDoc} */
     public void setRefactoringContext(RefactoringContext ctx) {
         this.ctx = ctx;
         this.javaMinorVersion = this.ctx.getJavaSERelease().getMinorVersion();
@@ -55,6 +56,7 @@ public class PrimitiveWrapperCreationRefactoring extends ASTVisitor implements
     // fix autoboxing and unboxing (returning boxed value in primitve
     // context)
 
+    /** {@inheritDoc} */
     @Override
     public boolean visit(MethodInvocation node) {
         if (node.getExpression() == null) {
@@ -113,6 +115,7 @@ public class PrimitiveWrapperCreationRefactoring extends ASTVisitor implements
         return null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean visit(ClassInstanceCreation node) {
         final ITypeBinding typeBinding = node.getType().resolveBinding();
@@ -143,6 +146,7 @@ public class PrimitiveWrapperCreationRefactoring extends ASTVisitor implements
         return b.invoke(typeName, methodName, b.copyExpr(arg));
     }
 
+    /** {@inheritDoc} */
     public Refactorings getRefactorings(CompilationUnit astRoot) {
         astRoot.accept(this);
         return this.ctx.getRefactorings();
