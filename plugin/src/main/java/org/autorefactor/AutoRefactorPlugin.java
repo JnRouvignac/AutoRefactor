@@ -35,59 +35,58 @@ import org.osgi.framework.BundleContext;
  */
 public class AutoRefactorPlugin extends AbstractUIPlugin {
 
-	/** The plug-in ID */
-	public static final String PLUGIN_ID = "org.autorefactor.plugin";
+    /** The plug-in ID. */
+    public static final String PLUGIN_ID = "org.autorefactor.plugin";
 
-	/** The shared instance */
-	private static AutoRefactorPlugin plugin;
+    /** The shared instance. */
+    private static AutoRefactorPlugin plugin;
 
-	private static PreferenceHelper preferenceHelper;
+    private static PreferenceHelper preferenceHelper;
 
-	@Override
-	public void start(final BundleContext context) throws Exception {
-		super.start(context);
-		plugin = this;
-	}
+    @Override
+    public void start(final BundleContext context) throws Exception {
+        super.start(context);
+        plugin = this;
+    }
 
-	@Override
-	public void stop(final BundleContext context) throws Exception {
-		plugin = null;
-		super.stop(context);
-	}
+    @Override
+    public void stop(final BundleContext context) throws Exception {
+        plugin = null;
+        super.stop(context);
+    }
 
-	/**
-	 * Returns the shared instance
-	 *
-	 * @return the shared instance
-	 */
-	public static AutoRefactorPlugin getDefault() {
-		// Deprecated. Replaced by IEclipsePreferences.
-		// Preferences are now stored according to scopes in the IPreferencesService.
-		// The return value of this method corresponds to a combination of the InstanceScope and the DefaultScope.
-		// To set preferences for your plug-in, use new InstanceScope().getNode(<&yourPluginId>).
-		// To set default preferences for your plug-in, use new DefaultScope().getNode(<yourPluginId>).
-		// To lookup an integer preference value for your plug-in, use
-		// Platform.getPreferencesService().getInt(<yourPluginId>, <preferenceKey>, <defaultValue>, null).
-		// Similar methods exist on IPreferencesService for obtaining other kinds of preference values (strings, booleans, etc).
-		return plugin;
-	}
+    /**
+     * Returns the shared instance.
+     *
+     * @return the shared instance
+     */
+    public static AutoRefactorPlugin getDefault() {
+        // Deprecated. Replaced by IEclipsePreferences.
+        // Preferences are now stored according to scopes in the IPreferencesService.
+        // The return value of this method corresponds to a combination of the InstanceScope and the DefaultScope.
+        // To set preferences for your plug-in, use new InstanceScope().getNode(<&yourPluginId>).
+        // To set default preferences for your plug-in, use new DefaultScope().getNode(<yourPluginId>).
+        // To lookup an integer preference value for your plug-in, use
+        // Platform.getPreferencesService().getInt(<yourPluginId>, <preferenceKey>, <defaultValue>, null).
+        // Similar methods exist on IPreferencesService for obtaining other kinds of preference values (strings, booleans, etc).
+        return plugin;
+    }
 
-	public static PreferenceHelper getPreferenceHelper() {
-		if (preferenceHelper == null) {
-			preferenceHelper = new PreferenceHelper(getDefault().getPreferenceStore());
-		}
-		return preferenceHelper;
-	}
+    public static PreferenceHelper getPreferenceHelper() {
+        if (preferenceHelper == null) {
+            preferenceHelper = new PreferenceHelper(getDefault().getPreferenceStore());
+        }
+        return preferenceHelper;
+    }
 
-	/**
-	 * Returns an image descriptor for the image file at the given plug-in
-	 * relative path
-	 *
-	 * @param path
-	 *            the path
-	 * @return the image descriptor
-	 */
-	public static ImageDescriptor getImageDescriptor(final String path) {
-		return imageDescriptorFromPlugin(PLUGIN_ID, path);
-	}
+    /**
+     * Returns an image descriptor for the image file at the given plug-in relative path.
+     *
+     * @param path
+     *            the path
+     * @return the image descriptor
+     */
+    public static ImageDescriptor getImageDescriptor(final String path) {
+        return imageDescriptorFromPlugin(PLUGIN_ID, path);
+    }
 }

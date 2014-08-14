@@ -31,25 +31,25 @@ import org.eclipse.jface.preference.IPreferenceStore;
 
 public class PreferenceHelper {
 
-	private final IPreferenceStore preferenceStore;
+    private final IPreferenceStore preferenceStore;
 
-	public PreferenceHelper(IPreferenceStore preferenceStore) {
-		this.preferenceStore = preferenceStore;
-	}
+    public PreferenceHelper(IPreferenceStore preferenceStore) {
+        this.preferenceStore = preferenceStore;
+    }
 
-	private boolean getBoolean(Preference pref) {
-		return preferenceStore.getBoolean(ADD_ANGLE_BRACKETS_TO_STATEMENT_BODIES.name);
-	}
+    private boolean getBoolean(Preference pref) {
+        return preferenceStore.getBoolean(ADD_ANGLE_BRACKETS_TO_STATEMENT_BODIES.name);
+    }
 
-	public boolean debugModeOn() {
-		return getBoolean(DEBUG_MODE_ON);
-	}
+    public boolean debugModeOn() {
+        return getBoolean(DEBUG_MODE_ON);
+    }
 
-	public boolean removeThisForNonStaticMethodAccess() {
-		return getBoolean(REMOVE_THIS_FOR_NON_STATIC_METHOD_ACCESS);
-	}
+    public boolean removeThisForNonStaticMethodAccess() {
+        return getBoolean(REMOVE_THIS_FOR_NON_STATIC_METHOD_ACCESS);
+    }
 
-	public boolean addAngleBracketsToStatementBodies() {
-		return getBoolean(ADD_ANGLE_BRACKETS_TO_STATEMENT_BODIES);
-	}
+    public boolean addAngleBracketsToStatementBodies() {
+        return getBoolean(ADD_ANGLE_BRACKETS_TO_STATEMENT_BODIES);
+    }
 }

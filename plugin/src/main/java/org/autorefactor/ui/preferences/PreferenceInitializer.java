@@ -33,13 +33,13 @@ import org.eclipse.jface.preference.IPreferenceStore;
 
 public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
-	@Override
-	public void initializeDefaultPreferences() {
-		// TODO initialize preferences from the JDT preferences like:
-		// code style/cleanup/formatting
-		IPreferenceStore store = AutoRefactorPlugin.getDefault().getPreferenceStore();
-		store.setDefault(REMOVE_THIS_FOR_NON_STATIC_METHOD_ACCESS.name, true);
-		store.setDefault(ADD_ANGLE_BRACKETS_TO_STATEMENT_BODIES.name, true);
-	}
+    @Override
+    public void initializeDefaultPreferences() {
+        // TODO initialize preferences from the JDT preferences like:
+        // code style/cleanup/formatting
+        IPreferenceStore store = AutoRefactorPlugin.getDefault().getPreferenceStore();
+        store.setDefault(REMOVE_THIS_FOR_NON_STATIC_METHOD_ACCESS.name, true);
+        store.setDefault(ADD_ANGLE_BRACKETS_TO_STATEMENT_BODIES.name, true);
+    }
 
 }

@@ -31,44 +31,44 @@ import java.util.List;
 
 public class CollectionAddAllSample {
 
-	public void replaceNewNoArgsAssignmentThenAddAll(List<String> col, List<String> output) {
-		output = new ArrayList<String>();
-		output.addAll(col);
-	}
+    public void replaceNewNoArgsAssignmentThenAddAll(List<String> col, List<String> output) {
+        output = new ArrayList<String>();
+        output.addAll(col);
+    }
 
-	public List<String> replaceNewNoArgsThenAddAll(List<String> col) {
-		final List<String> output = new ArrayList<String>();
-		output.addAll(col);
-		return output;
-	}
+    public List<String> replaceNewNoArgsThenAddAll(List<String> col) {
+        final List<String> output = new ArrayList<String>();
+        output.addAll(col);
+        return output;
+    }
 
-	public List<String> replaceNew0ArgThenAddAll(List<String> col) {
-		final List<String> output = new ArrayList<String>(0);
-		output.addAll(col);
-		return output;
-	}
+    public List<String> replaceNew0ArgThenAddAll(List<String> col) {
+        final List<String> output = new ArrayList<String>(0);
+        output.addAll(col);
+        return output;
+    }
 
-	public List<String> replaceNew1ArgThenAddAll(List<String> col) {
-		final List<String> output = new ArrayList<String>(0);
-		output.addAll(col);
-		return output;
-	}
+    public List<String> replaceNew1ArgThenAddAll(List<String> col) {
+        final List<String> output = new ArrayList<String>(0);
+        output.addAll(col);
+        return output;
+    }
 
-	public List<String> replaceNewCollectionSizeThenAddAll(List<String> col) {
-		final List<String> output = new ArrayList<String>(col.size());
-		output.addAll(col);
-		return output;
-	}
+    public List<String> replaceNewCollectionSizeThenAddAll(List<String> col) {
+        final List<String> output = new ArrayList<String>(col.size());
+        output.addAll(col);
+        return output;
+    }
 
-	public void replaceForLoop(List<String> col, List<String> output) {
-		for (int i = 0; i < col.size(); i++) {
-			output.add(col.get(i));
-		}
-	}
+    public void replaceForLoop(List<String> col, List<String> output) {
+        for (int i = 0; i < col.size(); i++) {
+            output.add(col.get(i));
+        }
+    }
 
-	public void replaceForEach(Collection<String> col, List<String> output) {
-		for (String s : col) {
-			output.add(s);
-		}
-	}
+    public void replaceForEach(Collection<String> col, List<String> output) {
+        for (String s : col) {
+            output.add(s);
+        }
+    }
 }

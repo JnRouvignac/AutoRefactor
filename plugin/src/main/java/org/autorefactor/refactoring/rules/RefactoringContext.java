@@ -36,36 +36,36 @@ import org.eclipse.jdt.core.dom.AST;
  */
 public class RefactoringContext {
 
-	private final Refactorings refactorings = new Refactorings();
-	private final ICompilationUnit compilationUnit;
-	private final AST ast;
-	private final Release javaSERelease;
+    private final Refactorings refactorings = new Refactorings();
+    private final ICompilationUnit compilationUnit;
+    private final AST ast;
+    private final Release javaSERelease;
 
-	public RefactoringContext(ICompilationUnit compilationUnit, AST ast,
-			Release javaSERelease) {
-		this.ast = ast;
-		this.javaSERelease = javaSERelease;
-		this.compilationUnit = compilationUnit;
-	}
+    public RefactoringContext(ICompilationUnit compilationUnit, AST ast,
+            Release javaSERelease) {
+        this.ast = ast;
+        this.javaSERelease = javaSERelease;
+        this.compilationUnit = compilationUnit;
+    }
 
-	public AST getAST() {
-		return ast;
-	}
+    public AST getAST() {
+        return ast;
+    }
 
-	public ASTBuilder getASTBuilder() {
-		return new ASTBuilder(ast);
-	}
+    public ASTBuilder getASTBuilder() {
+        return new ASTBuilder(ast);
+    }
 
-	public ICompilationUnit getCompilationUnit() {
-		return compilationUnit;
-	}
+    public ICompilationUnit getCompilationUnit() {
+        return compilationUnit;
+    }
 
-	public Release getJavaSERelease() {
-		return javaSERelease;
-	}
+    public Release getJavaSERelease() {
+        return javaSERelease;
+    }
 
-	public Refactorings getRefactorings() {
-		return refactorings;
-	}
+    public Refactorings getRefactorings() {
+        return refactorings;
+    }
 
 }

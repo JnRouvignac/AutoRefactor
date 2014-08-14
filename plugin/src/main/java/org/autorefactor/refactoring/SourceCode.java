@@ -37,59 +37,59 @@ import org.eclipse.jdt.core.dom.CompilationUnit;
 
 public class SourceCode {
 
-	public class Line extends SourceLocation {
+    public class Line extends SourceLocation {
 
-		private String lineText;
-		private SourceCode sourceCode;
+        private String lineText;
+        private SourceCode sourceCode;
 
-		public Line(String lineText, int offset, int length, SourceCode sourceCode) {
-			super(offset, length);
-			this.lineText = lineText;
-			this.sourceCode = sourceCode;
-		}
+        public Line(String lineText, int offset, int length, SourceCode sourceCode) {
+            super(offset, length);
+            this.lineText = lineText;
+            this.sourceCode = sourceCode;
+        }
 
-		public String getLineText() {
-			return lineText;
-		}
+        public String getLineText() {
+            return lineText;
+        }
 
-		@Override
-		public String toString() {
-			return "[(" + sourceCode.astRoot.getLineNumber(getStart()) + ","
-					+ sourceCode.astRoot.getColumnNumber(getStart()) + ")"
-					+ " => (" + sourceCode.astRoot.getLineNumber(getEnd())
-					+ "," + sourceCode.astRoot.getColumnNumber(getEnd()) + ")]";
-		}
+        @Override
+        public String toString() {
+            return "[(" + sourceCode.astRoot.getLineNumber(getStart()) + ","
+                    + sourceCode.astRoot.getColumnNumber(getStart()) + ")"
+                    + " => (" + sourceCode.astRoot.getLineNumber(getEnd())
+                    + "," + sourceCode.astRoot.getColumnNumber(getEnd()) + ")]";
+        }
 
-	}
+    }
 
-	private CompilationUnit astRoot;
-	private String text;
-	private ICompilationUnit compilationUnit;
-	private List<Line> lines = new ArrayList<Line>();
+    private CompilationUnit astRoot;
+    private String text;
+    private ICompilationUnit compilationUnit;
+    private List<Line> lines = new ArrayList<Line>();
 
-	public SourceCode(String text, CompilationUnit astRoot,
-			ICompilationUnit compilationUnit) {
-		this.astRoot = astRoot;
-		this.text = text;
-		this.compilationUnit = compilationUnit;
-		computeLines();
-	}
+    public SourceCode(String text, CompilationUnit astRoot,
+            ICompilationUnit compilationUnit) {
+        this.astRoot = astRoot;
+        this.text = text;
+        this.compilationUnit = compilationUnit;
+        computeLines();
+    }
 
-	private void computeLines() {
-		try {
-			final String lineSeparator = this.compilationUnit.findRecommendedLineSeparator();
-			int fromIndex = 0;
-			Matcher matcher = Pattern.compile(".*?" + lineSeparator).matcher(this.text);
-			while (fromIndex < this.text.length() && matcher.find(fromIndex)) {
-				String lineText = matcher.group();
-				int offset = this.text.indexOf(lineText, fromIndex);
-				int length = lineText.length();
-				this.lines.add(new Line(lineText, offset, length, this));
-				fromIndex += offset + length;
-			}
-		} catch (JavaModelException e) {
-			throw new UnhandledException(e);
-		}
-	}
+    private void computeLines() {
+        try {
+            final String lineSeparator = this.compilationUnit.findRecommendedLineSeparator();
+            int fromIndex = 0;
+            Matcher matcher = Pattern.compile(".*?" + lineSeparator).matcher(this.text);
+            while (fromIndex < this.text.length() && matcher.find(fromIndex)) {
+                String lineText = matcher.group();
+                int offset = this.text.indexOf(lineText, fromIndex);
+                int length = lineText.length();
+                this.lines.add(new Line(lineText, offset, length, this));
+                fromIndex += offset + length;
+            }
+        } catch (JavaModelException e) {
+            throw new UnhandledException(e);
+        }
+    }
 
 }

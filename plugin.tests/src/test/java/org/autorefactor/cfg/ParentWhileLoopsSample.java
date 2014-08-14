@@ -27,8 +27,8 @@ package org.autorefactor.cfg;
 
 public abstract class ParentWhileLoopsSample {
 
-	protected int superField = 0;
+    protected int superField = 0;
 
-	public abstract int sample(boolean b1, boolean b2);
+    public abstract int sample(boolean b1, boolean b2);
 
 }

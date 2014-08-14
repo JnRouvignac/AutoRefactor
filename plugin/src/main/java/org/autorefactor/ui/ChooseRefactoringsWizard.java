@@ -35,31 +35,31 @@ import org.eclipse.jface.wizard.Wizard;
 
 public class ChooseRefactoringsWizard extends Wizard {
 
-	private final ChooseRefactoringWizardPage chooseRefactoringsPage = new ChooseRefactoringWizardPage();
-	private IJavaElement javaElement;
+    private final ChooseRefactoringWizardPage chooseRefactoringsPage = new ChooseRefactoringWizardPage();
+    private IJavaElement javaElement;
 
-	public ChooseRefactoringsWizard(ExecutionEvent event) {
-		setNeedsProgressMonitor(true);
-		// retrieve the targeted java element before the menu item is disposed by the framework
-		javaElement = AutoRefactorHandler.getSelectedJavaElement(event);
-	}
+    public ChooseRefactoringsWizard(ExecutionEvent event) {
+        setNeedsProgressMonitor(true);
+        // retrieve the targeted java element before the menu item is disposed by the framework
+        javaElement = AutoRefactorHandler.getSelectedJavaElement(event);
+    }
 
-	@Override
-	public String getWindowTitle() {
-		return "Choose refactorings...";
-	}
+    @Override
+    public String getWindowTitle() {
+        return "Choose refactorings...";
+    }
 
-	/** {@inheritDoc} */
-	@Override
-	public void addPages() {
-		addPage(chooseRefactoringsPage);
-	}
+    /** {@inheritDoc} */
+    @Override
+    public void addPages() {
+        addPage(chooseRefactoringsPage);
+    }
 
-	/** {@inheritDoc} */
-	@Override
-	public boolean performFinish() {
-		final List<IRefactoring> refactorings = chooseRefactoringsPage.getSelectedRefactorings();
-		new ApplyRefactoringsJob(javaElement, refactorings).run(new NullProgressMonitor());
-		return !refactorings.isEmpty();
-	}
+    /** {@inheritDoc} */
+    @Override
+    public boolean performFinish() {
+        final List<IRefactoring> refactorings = chooseRefactoringsPage.getSelectedRefactorings();
+        new ApplyRefactoringsJob(javaElement, refactorings).run(new NullProgressMonitor());
+        return !refactorings.isEmpty();
+    }
 }

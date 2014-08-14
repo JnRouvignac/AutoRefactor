@@ -27,78 +27,78 @@ package org.autorefactor.samples_in;
 
 public class DeadCodeEliminationSample {
 
-	private int removeEmptyElseClause(boolean b) {
-		int i = 0;
-		if (b) {
-			i++;
-		} else {
-		}
-		return i;
-	}
+    private int removeEmptyElseClause(boolean b) {
+        int i = 0;
+        if (b) {
+            i++;
+        } else {
+        }
+        return i;
+    }
 
-	private int doesNotKnowHowToRemoveEmptyThenClause(boolean b) {
-		int i = 0;
-		if (b) {
-		} else {
-			i++;
-		}
-		return i;
-	}
+    private int doesNotKnowHowToRemoveEmptyThenClause(boolean b) {
+        int i = 0;
+        if (b) {
+        } else {
+            i++;
+        }
+        return i;
+    }
 
-	private int removeImpossibleIfClauses() {
-		int i = 0;
-		int j = 0;
-		if (true) {
-			i++;
-		} else {
-			j++;
-		}
+    private int removeImpossibleIfClauses() {
+        int i = 0;
+        int j = 0;
+        if (true) {
+            i++;
+        } else {
+            j++;
+        }
 
-		if (true)
-			i++;
-		else
-			j++;
+        if (true)
+            i++;
+        else
+            j++;
 
-		if (false) {
-			i++;
-		} else {
-			j++;
-		}
+        if (false) {
+            i++;
+        } else {
+            j++;
+        }
 
-		if (false)
-			i++;
-		else
-			j++;
+        if (false)
+            i++;
+        else
+            j++;
 
-		return i + j;
-	}
+        return i + j;
+    }
 
 // FIXME compilation error.
 // Following code:
-//	private int removeWhileWithoutIterations() {
-//		int i = 0;
-//		while (false) {
-//			i++;
-//		}
-//		while (false)
-//			i++;
-//		return i;
-//	}
+//    private int removeWhileWithoutIterations() {
+//        int i = 0;
+//        while (false) {
+//            i++;
+//        }
+//        while (false)
+//            i++;
+//        return i;
+//    }
 // Should become
-//	private int removeWhileWithoutIterations() {
-//		int i = 0;
-//		return i;
-//	}
+//    private int removeWhileWithoutIterations() {
+//        int i = 0;
+//        return i;
+//    }
 
-	private int removeEmptyTry() {
-		int i = 0;
-		try {
-		} catch (Exception e) {
-			i++;
-		} finally {
-			i++;
-		}
-		return i;
-	}
+    private int removeEmptyTry() {
+        int i = 0;
+        try {
+        } catch (Exception e) {
+            i++;
+        } finally {
+            i++;
+        }
+        return i;
+    }
 
 }

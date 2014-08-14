@@ -30,87 +30,87 @@ import org.eclipse.jdt.core.dom.ASTNode;
 
 public class SourceLocation implements ISourceRange, Comparable<ISourceRange> {
 
-	private int offset;
-	private int length;
+    private int offset;
+    private int length;
 
-	public SourceLocation(int offset, int length) {
-		this.offset = offset;
-		this.length = length;
-	}
+    public SourceLocation(int offset, int length) {
+        this.offset = offset;
+        this.length = length;
+    }
 
-	public SourceLocation(int start, int end, boolean todoRemove) {
-		this(start, end - start);
-	}
+    public SourceLocation(int start, int end, boolean todoRemove) {
+        this(start, end - start);
+    }
 
-	public SourceLocation(int start) {
-		this(start, 0);
-	}
+    public SourceLocation(int start) {
+        this(start, 0);
+    }
 
-	public SourceLocation(ASTNode node) {
-		this(node.getStartPosition(), node.getLength());
-	}
+    public SourceLocation(ASTNode node) {
+        this(node.getStartPosition(), node.getLength());
+    }
 
-	public int getLength() {
-		return this.length;
-	}
+    public int getLength() {
+        return this.length;
+    }
 
-	public int getOffset() {
-		return this.offset;
-	}
+    public int getOffset() {
+        return this.offset;
+    }
 
-	public int getStart() {
-		return this.offset;
-	}
+    public int getStart() {
+        return this.offset;
+    }
 
-	public int getEnd() {
-		return this.offset + this.length;
-	}
+    public int getEnd() {
+        return this.offset + this.length;
+    }
 
-	public boolean contains(int position) {
-		return getStart() <= position && position <= getEnd();
-	}
+    public boolean contains(int position) {
+        return getStart() <= position && position <= getEnd();
+    }
 
-	public boolean contains(ISourceRange sourceRange) {
-		return getStart() <= sourceRange.getOffset()
-				&& sourceRange.getOffset() + sourceRange.getLength() <= getEnd();
-	}
+    public boolean contains(ISourceRange sourceRange) {
+        return getStart() <= sourceRange.getOffset()
+                && sourceRange.getOffset() + sourceRange.getLength() <= getEnd();
+    }
 
-	public int compareTo(ISourceRange sourceRange) {
-		final int offsetDiff = this.offset - sourceRange.getOffset();
-		if (offsetDiff != 0) {
-			return offsetDiff;
-		}
-		return this.length - sourceRange.getLength();
-	}
+    public int compareTo(ISourceRange sourceRange) {
+        final int offsetDiff = this.offset - sourceRange.getOffset();
+        if (offsetDiff != 0) {
+            return offsetDiff;
+        }
+        return this.length - sourceRange.getLength();
+    }
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + length;
-		result = prime * result + offset;
-		return result;
-	}
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + length;
+        result = prime * result + offset;
+        return result;
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		SourceLocation other = (SourceLocation) obj;
-		if (length != other.length)
-			return false;
-		if (offset != other.offset)
-			return false;
-		return true;
-	}
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        SourceLocation other = (SourceLocation) obj;
+        if (length != other.length)
+            return false;
+        if (offset != other.offset)
+            return false;
+        return true;
+    }
 
-	@Override
-	public String toString() {
-		return "SourceLocation [offset=" + offset + ", length=" + length + "]";
-	}
+    @Override
+    public String toString() {
+        return "SourceLocation [offset=" + offset + ", length=" + length + "]";
+    }
 
 }

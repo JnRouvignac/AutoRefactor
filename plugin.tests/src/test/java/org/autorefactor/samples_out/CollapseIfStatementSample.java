@@ -35,8 +35,8 @@ public class CollapseIfStatementSample {
 
     public void collapseIfStatementsAddParenthesesIfDifferentConditionalOperator(boolean b1, boolean b2, boolean b3) {
         if (b1 && (b2 || b3)) {
-			int i = 0;
-		}
+            int i = 0;
+        }
     }
 
     public void doNotCollapseOuterIfWithElseStatement(boolean b1, boolean b2) {

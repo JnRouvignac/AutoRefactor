@@ -38,101 +38,101 @@ import static org.autorefactor.refactoring.ASTHelper.*;
  * Replaces Vector pre Collections API with equivalent Collections API.
  */
 public class VectorOldToNewAPIRefactoring extends ASTVisitor implements
-		IJavaRefactoring {
+        IJavaRefactoring {
 
-	private RefactoringContext ctx;
+    private RefactoringContext ctx;
 
-	public void setRefactoringContext(RefactoringContext ctx) {
-		this.ctx = ctx;
-	}
+    public void setRefactoringContext(RefactoringContext ctx) {
+        this.ctx = ctx;
+    }
 
-	@Override
-	public boolean visit(MethodInvocation node) {
-		if (this.ctx.getJavaSERelease().isCompatibleWith(
-				Release.javaSE("1.2.0"))) {
-			if (isMethod(node, "java.util.Vector", "elementAt", "int")) {
-				replaceWith(node, "get");
-			} else if (isMethod(node, "java.util.Vector", "addElement",
-					"java.lang.Object")) {
-				replaceWith(node, "add");
-			} else if (isMethod(node, "java.util.Vector", "insertElementAt",
-					"java.lang.Object", "int")) {
-				replaceWithAndSwapArguments(node, "add");
-			} else if (isMethod(node, "java.util.Vector", "copyInto",
-					"java.lang.Object[]")) {
-				replaceWith(node, "toArray");
-			} else if (isMethod(node, "java.util.Vector", "removeAllElements")) {
-				replaceWith(node, "clear");
-			} else if (isMethod(node, "java.util.Vector", "removeElement",
-					"java.lang.Object")) {
-				replaceWithSpecial(node, "remove");
-			} else if (isMethod(node, "java.util.Vector", "removeElementAt", "int")) {
-				replaceWith(node, "remove");
-			} else if (isMethod(node, "java.util.Vector", "setElementAt",
-					"java.lang.Object", "int")) {
-				replaceWith(node, "set");
-			}
-		}
-		return VISIT_SUBTREE;
-	}
+    @Override
+    public boolean visit(MethodInvocation node) {
+        if (this.ctx.getJavaSERelease().isCompatibleWith(
+                Release.javaSE("1.2.0"))) {
+            if (isMethod(node, "java.util.Vector", "elementAt", "int")) {
+                replaceWith(node, "get");
+            } else if (isMethod(node, "java.util.Vector", "addElement",
+                    "java.lang.Object")) {
+                replaceWith(node, "add");
+            } else if (isMethod(node, "java.util.Vector", "insertElementAt",
+                    "java.lang.Object", "int")) {
+                replaceWithAndSwapArguments(node, "add");
+            } else if (isMethod(node, "java.util.Vector", "copyInto",
+                    "java.lang.Object[]")) {
+                replaceWith(node, "toArray");
+            } else if (isMethod(node, "java.util.Vector", "removeAllElements")) {
+                replaceWith(node, "clear");
+            } else if (isMethod(node, "java.util.Vector", "removeElement",
+                    "java.lang.Object")) {
+                replaceWithSpecial(node, "remove");
+            } else if (isMethod(node, "java.util.Vector", "removeElementAt", "int")) {
+                replaceWith(node, "remove");
+            } else if (isMethod(node, "java.util.Vector", "setElementAt",
+                    "java.lang.Object", "int")) {
+                replaceWith(node, "set");
+            }
+        }
+        return VISIT_SUBTREE;
+    }
 
-	private void replaceWith(MethodInvocation node, String newMethodName) {
-		AST ast = this.ctx.getAST();
-		MethodInvocation mi = ast.newMethodInvocation();
-		mi.setName(ast.newSimpleName(newMethodName));
-		mi.setExpression(copySubtree(ast, node.getExpression()));
-		if (arguments(node) != null) {
-			arguments(mi).addAll(copySubtrees(ast, arguments(node)));
-		}
-		this.ctx.getRefactorings().replace(node, mi);
-	}
+    private void replaceWith(MethodInvocation node, String newMethodName) {
+        AST ast = this.ctx.getAST();
+        MethodInvocation mi = ast.newMethodInvocation();
+        mi.setName(ast.newSimpleName(newMethodName));
+        mi.setExpression(copySubtree(ast, node.getExpression()));
+        if (arguments(node) != null) {
+            arguments(mi).addAll(copySubtrees(ast, arguments(node)));
+        }
+        this.ctx.getRefactorings().replace(node, mi);
+    }
 
-	private void replaceWithSpecial(MethodInvocation node, String newMethodName) {
-		AST ast = this.ctx.getAST();
-		MethodInvocation mi = ast.newMethodInvocation();
-		mi.setName(ast.newSimpleName(newMethodName));
-		mi.setExpression(copySubtree(ast, node.getExpression()));
-		final List<Expression> args = arguments(node);
-		assertSize(args, 1);
-		if (hasType(args.get(0), "int", "short", "byte")) {
-			final CastExpression ce = ast.newCastExpression();
-			ce.setType(ast.newSimpleType(ast.newSimpleName("Object")));
-			ce.setExpression(copySubtree(ast, args.get(0)));
-			arguments(mi).add(ce);
-		} else {
-			arguments(mi).add(copySubtree(ast, args.get(0)));
-		}
-		this.ctx.getRefactorings().replace(node, mi);
-	}
+    private void replaceWithSpecial(MethodInvocation node, String newMethodName) {
+        AST ast = this.ctx.getAST();
+        MethodInvocation mi = ast.newMethodInvocation();
+        mi.setName(ast.newSimpleName(newMethodName));
+        mi.setExpression(copySubtree(ast, node.getExpression()));
+        final List<Expression> args = arguments(node);
+        assertSize(args, 1);
+        if (hasType(args.get(0), "int", "short", "byte")) {
+            final CastExpression ce = ast.newCastExpression();
+            ce.setType(ast.newSimpleType(ast.newSimpleName("Object")));
+            ce.setExpression(copySubtree(ast, args.get(0)));
+            arguments(mi).add(ce);
+        } else {
+            arguments(mi).add(copySubtree(ast, args.get(0)));
+        }
+        this.ctx.getRefactorings().replace(node, mi);
+    }
 
-	private void replaceWithAndSwapArguments(MethodInvocation node,
-			String newMethodName) {
-		AST ast = this.ctx.getAST();
-		MethodInvocation mi = ast.newMethodInvocation();
-		mi.setName(ast.newSimpleName(newMethodName));
-		mi.setExpression(copySubtree(ast, node.getExpression()));
-		final List<Expression> args = arguments(node);
-		assertSize(args, 2);
-		arguments(mi).add(copySubtree(ast, args.get(1)));
-		arguments(mi).add(copySubtree(ast, args.get(0)));
-		this.ctx.getRefactorings().replace(node, mi);
-	}
+    private void replaceWithAndSwapArguments(MethodInvocation node,
+            String newMethodName) {
+        AST ast = this.ctx.getAST();
+        MethodInvocation mi = ast.newMethodInvocation();
+        mi.setName(ast.newSimpleName(newMethodName));
+        mi.setExpression(copySubtree(ast, node.getExpression()));
+        final List<Expression> args = arguments(node);
+        assertSize(args, 2);
+        arguments(mi).add(copySubtree(ast, args.get(1)));
+        arguments(mi).add(copySubtree(ast, args.get(0)));
+        this.ctx.getRefactorings().replace(node, mi);
+    }
 
-	private void assertSize(final List<Expression> args, int expectedSize) {
-		if (args == null) {
-			throw new IllegalArgumentException("Expected " + args
-					+ "to not be null");
-		}
-		if (args.size() != expectedSize) {
-			throw new IllegalArgumentException("Expected " + args
-					+ " to have size <" + expectedSize + ">, but found <"
-					+ args.size() + ">");
-		}
-	}
+    private void assertSize(final List<Expression> args, int expectedSize) {
+        if (args == null) {
+            throw new IllegalArgumentException("Expected " + args
+                    + "to not be null");
+        }
+        if (args.size() != expectedSize) {
+            throw new IllegalArgumentException("Expected " + args
+                    + " to have size <" + expectedSize + ">, but found <"
+                    + args.size() + ">");
+        }
+    }
 
-	public Refactorings getRefactorings(CompilationUnit astRoot) {
-		astRoot.accept(this);
-		return this.ctx.getRefactorings();
-	}
+    public Refactorings getRefactorings(CompilationUnit astRoot) {
+        astRoot.accept(this);
+        return this.ctx.getRefactorings();
+    }
 
 }

@@ -27,38 +27,38 @@ package org.autorefactor.cfg;
 
 public class LabelsSample {
 
-	public void sample(String[] strings, boolean b1, boolean b2, boolean b3) {
-		outerLoop: for (String s : strings) {
-			for (String s2 : strings) {
-				if (b1 && b2 && b3) {
-					break outerLoop;
-				}
-				if (b1 && b2) {
-					continue outerLoop;
-				}
-				if (b1) {
-					break;
-				}
-				if (b2) {
-					continue;
-				}
-				if (b3) {
-					return;
-				}
-			}
-		}
+    public void sample(String[] strings, boolean b1, boolean b2, boolean b3) {
+        outerLoop: for (String s : strings) {
+            for (String s2 : strings) {
+                if (b1 && b2 && b3) {
+                    break outerLoop;
+                }
+                if (b1 && b2) {
+                    continue outerLoop;
+                }
+                if (b1) {
+                    break;
+                }
+                if (b2) {
+                    continue;
+                }
+                if (b3) {
+                    return;
+                }
+            }
+        }
 
-		disguisedGoto: {
-			int i = 0;
-			if (b1) {
-				break disguisedGoto;
-			}
-			i++;
-			if (b2) {
-				return;
-			}
-			i++;
-		}
-	}
+        disguisedGoto: {
+            int i = 0;
+            if (b1) {
+                break disguisedGoto;
+            }
+            i++;
+            if (b2) {
+                return;
+            }
+            i++;
+        }
+    }
 
 }

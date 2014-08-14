@@ -27,39 +27,39 @@ package org.autorefactor.cfg;
 
 public class SwitchSample {
 
-	public boolean sample(int i, int j) {
-		outer:
-		switch (i) {
-		case 0:
-			switch (j) {
-			case 0: // fall through
-			case 1:
-				boolean b = false;
-				// fall through
-			case 2:
-				b = true;
-				break;
-//			case 3:
-//				return b;
-			case 4:
-				boolean b2 = true;
-				break outer;
-			case 5:
-				;
-				break;
-			default:
-			}
-			// fall through
-		case 1:
-			int k = 0;
-			// fall through
-//		case 2:
-//			k++;
-//			// fall through
-//		case 3:
-//			return k == 0;
-		}
-		return true;
-	}
+    public boolean sample(int i, int j) {
+        outer:
+        switch (i) {
+        case 0:
+            switch (j) {
+            case 0: // fall through
+            case 1:
+                boolean b = false;
+                // fall through
+            case 2:
+                b = true;
+                break;
+//            case 3:
+//                return b;
+            case 4:
+                boolean b2 = true;
+                break outer;
+            case 5:
+                ;
+                break;
+            default:
+            }
+            // fall through
+        case 1:
+            int k = 0;
+            // fall through
+//        case 2:
+//            k++;
+//            // fall through
+//        case 3:
+//            return k == 0;
+        }
+        return true;
+    }
 
 }

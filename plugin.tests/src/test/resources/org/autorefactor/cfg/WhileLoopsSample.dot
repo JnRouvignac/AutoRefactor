@@ -1,39 +1,40 @@
 digraph WhileLoopsSample {
 label="WhileLoopsSample";
 
-Entry -> _43_8
-_43_8 -> _44_15
-_44_15 -> _45_10 [label="true"];
-_44_15 -> _55_8 [label="false"];
-_45_10 -> _46_10
-_46_10 -> _47_11
-_47_11 -> _49_15
-_49_15 -> _51_11
-_51_11 -> _53_17
-_53_17 -> _46_10 [label="true"];
-_53_17 -> _55_8 [label="false"];
-_55_8 -> Exit
+Entry -> _43_9
+_43_9 -> _44_16
+_44_16 -> _45_13 [label="true"];
+_44_16 -> _55_9 [label="false"];
+_45_13 -> _46_13
+_46_13 -> _47_17
+_47_17 -> _49_21
+_49_21 -> _51_17
+_51_17 -> _53_20
+_53_20 -> _46_13 [label="true"];
+_53_20 -> _55_9 [label="false"];
+_55_9 -> Exit
 
-subgraph cluster_1282__Override_public_int_sample_boolean_b1_boolean_b2__ {
+subgraph cluster_1315__Override_public_int_sample_boolean_b1_boolean_b2__ {
 label="@Override public int sample(boolean b1,boolean b2){";
 Entry [style="filled" fillcolor="red"   fontcolor="white"];
-_43_8 [label="hashCode();\n(43,8)"];
-_55_8 [label="return super.hashCode();\n(55,8)"];
+_43_9 [label="hashCode();\n(43,9)"];
+_55_9 [label="return super.hashCode();\n(55,9)"];
 Exit  [style="filled" fillcolor="black" fontcolor="white"];
 
-subgraph cluster_1354_while__b1___ {
+subgraph cluster_1405_while__b1___ {
 label="while (b1) {";
-_44_15 [label="b1\n(44,15)"];
-_45_10 [label="assert b1;\n(45,10)"];
+_44_16 [label="b1\n(44,16)"];
+_45_13 [label="assert b1;\n(45,13)"];
 
-subgraph cluster_1384_do__ {
+subgraph cluster_1453_do__ {
 label="do {";
-_46_10 [label="do {\n(46,10)"];
-_47_11 [label="synchronized (this) {\n(47,11)"];
-_49_15 [label="super.superField++;\n(49,15)"];
-_51_11 [label="this.superField++;\n(51,11)"];
-_53_17 [label="b2\n(53,17)"];
+_46_13 [label="do {\n(46,13)"];
+_47_17 [label="synchronized (this) {\n(47,17)"];
+_49_21 [label="super.superField++;\n(49,21)"];
+_51_17 [label="this.superField++;\n(51,17)"];
+_53_20 [label="b2\n(53,20)"];
 }
 }
 }
 }
+

@@ -55,86 +55,86 @@ import org.junit.runners.Parameterized.Parameters;
 @RunWith(value = Parameterized.class)
 public class CFGBuilderTest {
 
-	private String testName;
-	private int methodDeclarationNb;
+    private String testName;
+    private int methodDeclarationNb;
 
-	public CFGBuilderTest(String testName, int methodDeclarationNb) {
-		this.testName = testName;
-		this.methodDeclarationNb = methodDeclarationNb;
-	}
+    public CFGBuilderTest(String testName, int methodDeclarationNb) {
+        this.testName = testName;
+        this.methodDeclarationNb = methodDeclarationNb;
+    }
 
-	@Override
-	public String toString() {
-		return getClass().getSimpleName()
-				+ "[" + testName + ", methodNb=" + methodDeclarationNb + "]";
-	}
+    @Override
+    public String toString() {
+        return getClass().getSimpleName()
+                + "[" + testName + ", methodNb=" + methodDeclarationNb + "]";
+    }
 
-	@Parameters(name = "{index}: {0}")
-	public static Collection<Object[]> data() {
-		return Arrays.asList(new Object[][] {
-				{ "ForWithIfToEndLoopSample", 0 },
-				{ "IfElseIfSample", 0 },
-				{ "LabelsSample", 0 },
-				{ "SwitchSample", 0 },
-				{ "WhileLoopsSample", 2 },
-				{ "TryCatchThrowSample", 0 },
-		});
-	}
+    @Parameters(name = "{index}: {0}")
+    public static Collection<Object[]> data() {
+        return Arrays.asList(new Object[][] {
+                { "ForWithIfToEndLoopSample", 0 },
+                { "IfElseIfSample", 0 },
+                { "LabelsSample", 0 },
+                { "SwitchSample", 0 },
+                { "WhileLoopsSample", 2 },
+                { "TryCatchThrowSample", 0 },
+        });
+    }
 
-	@Test
-	public void testCFGBuilder() throws Exception {
-		final String sampleName = testName + ".java";
-		final File javaFile = new File("src/test/java/org/autorefactor/cfg", sampleName);
-		assertTrue(testName + ": sample in java file " + javaFile + " should exist", javaFile.exists());
-		final File dotFile = new File("src/test/resources/org/autorefactor/cfg", testName + ".dot");
-		assertTrue(testName + ": sample out dot file " + dotFile + " should exist", dotFile.exists());
+    @Test
+    public void testCFGBuilder() throws Exception {
+        final String sampleName = testName + ".java";
+        final File javaFile = new File("src/test/java/org/autorefactor/cfg", sampleName);
+        assertTrue(testName + ": sample in java file " + javaFile + " should exist", javaFile.exists());
+        final File dotFile = new File("src/test/resources/org/autorefactor/cfg", testName + ".dot");
+        assertTrue(testName + ": sample out dot file " + dotFile + " should exist", dotFile.exists());
 
-		final String dotSource = readAll(dotFile).trim();
-		final String javaSource = readAll(javaFile);
+        final String dotSource = readAll(dotFile).trim();
+        final String javaSource = readAll(javaFile);
 
-		final IPackageFragment packageFragment = JavaCoreHelper.getPackageFragment();
-		final ICompilationUnit cu = packageFragment.createCompilationUnit(
-				sampleName, javaSource, true, null);
-		cu.getBuffer().setContents(javaSource);
-		cu.save(null, true);
+        final IPackageFragment packageFragment = JavaCoreHelper.getPackageFragment();
+        final ICompilationUnit cu = packageFragment.createCompilationUnit(
+                sampleName, javaSource, true, null);
+        cu.getBuffer().setContents(javaSource);
+        cu.save(null, true);
 
-		final ASTParser parser = ASTParser.newParser(AST.JLS4);
-		autoRefactorHandler_resetParser(cu, parser, Release.javaSE("1.7"));
+        final ASTParser parser = ASTParser.newParser(AST.JLS4);
+        autoRefactorHandler_resetParser(cu, parser, Release.javaSE("1.7"));
 
-		final CompilationUnit astRoot = (CompilationUnit) parser.createAST(null);
-		final CFGBuilder builder = new CFGBuilder(javaSource, 4);
-		final List<CFGBasicBlock> blocks = builder.buildCFG(astRoot);
+        final CompilationUnit astRoot = (CompilationUnit) parser.createAST(null);
+        final CFGBuilder builder = new CFGBuilder(javaSource, 4);
+        final List<CFGBasicBlock> blocks = builder.buildCFG(astRoot);
 
-		final CFGBasicBlock block = blocks.get(methodDeclarationNb);
-		final String actual = new CFGDotPrinter().toDot(block).trim();
-		final File dotFileOut = new File("src/test/resources/org/autorefactor/cfg", testName + "_out.dot");
-		writeAll(dotFileOut, actual);
-		assertEquals(testName + ": wrong output;", dotSource, actual);
-	}
+        final CFGBasicBlock block = blocks.get(methodDeclarationNb);
+        final String actual = new CFGDotPrinter().toDot(block).trim();
+        final File dotFileOut = new File("src/test/resources/org/autorefactor/cfg", testName + "_out.dot");
+        writeAll(dotFileOut, actual);
+        assertEquals(testName + ": wrong output;", dotSource, actual);
+    }
 
-	private void writeAll(File file, String fileContent) throws Exception {
-		FileOutputStream fos = null;
-		Writer writer = null;
-		try {
-			fos = new FileOutputStream(file);
-			writer = new BufferedWriter(new OutputStreamWriter(fos));
-			writer.append(fileContent);
-		} finally {
-			if (writer != null) {
-				writer.close();
-			}
-			if (fos != null) {
-				fos.close();
-			}
-		}
-	}
+    private void writeAll(File file, String fileContent) throws Exception {
+        FileOutputStream fos = null;
+        Writer writer = null;
+        try {
+            fos = new FileOutputStream(file);
+            writer = new BufferedWriter(new OutputStreamWriter(fos));
+            writer.append(fileContent);
+        } finally {
+            if (writer != null) {
+                writer.close();
+            }
+            if (fos != null) {
+                fos.close();
+            }
+        }
+    }
 
-	private void autoRefactorHandler_resetParser(ICompilationUnit cu, ASTParser parser,
-			Release javaSE) throws Exception {
-		final Method m = ApplyRefactoringsJob.class.getDeclaredMethod(
-				"resetParser", ICompilationUnit.class, ASTParser.class, Release.class);
-		m.setAccessible(true);
-		m.invoke(null, cu, parser, javaSE);
-	}
+    private void autoRefactorHandler_resetParser(ICompilationUnit cu, ASTParser parser,
+            Release javaSE) throws Exception {
+        final Method m = ApplyRefactoringsJob.class.getDeclaredMethod(
+                "resetParser", ICompilationUnit.class, ASTParser.class, Release.class);
+        m.setAccessible(true);
+        m.invoke(null, cu, parser, javaSE);
+    }
 
 }

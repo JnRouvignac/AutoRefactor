@@ -27,90 +27,90 @@ package org.autorefactor.samples_in;
 
 public class HotSpotIntrinsicedAPIsSample {
 
-	public static void replaceBySystemArrayCopyBasic(int[] src, int[] dest) {
-		for (int i = 0; i < 3; i++) {
-			dest[i] = src[i];
-		}
-	}
+    public static void replaceBySystemArrayCopyBasic(int[] src, int[] dest) {
+        for (int i = 0; i < 3; i++) {
+            dest[i] = src[i];
+        }
+    }
 
-	public static void replaceBySystemArrayCopyComplexUpperBound(int[] src, int[] dest) {
-		for (int i = 0; i < src.length; i++) {
-			dest[i] = src[i];
-		}
-	}
+    public static void replaceBySystemArrayCopyComplexUpperBound(int[] src, int[] dest) {
+        for (int i = 0; i < src.length; i++) {
+            dest[i] = src[i];
+        }
+    }
 
-	public static void replaceBySystemArrayCopyAssignIndexVariable(int[] src, int[] dest, int i) {
-		for (i = 0; i < 3; i++) {
-			dest[i] = src[i];
-		}
-	}
+    public static void replaceBySystemArrayCopyAssignIndexVariable(int[] src, int[] dest, int i) {
+        for (i = 0; i < 3; i++) {
+            dest[i] = src[i];
+        }
+    }
 
-	public static void replaceBySystemArrayCopyWithSrcPos(int[] src, int[] dest) {
-		for (int i = 0; i < src.length - 1; i++) {
-			dest[i] = src[i + 1];
-		}
-	}
+    public static void replaceBySystemArrayCopyWithSrcPos(int[] src, int[] dest) {
+        for (int i = 0; i < src.length - 1; i++) {
+            dest[i] = src[i + 1];
+        }
+    }
 
-	public static void replaceBySystemArrayCopyWithDestPos(int[] src, int[] dest) {
-		for (int i = 0; i < src.length - 1; i++) {
-			dest[i + 1] = src[i];
-		}
-	}
+    public static void replaceBySystemArrayCopyWithDestPos(int[] src, int[] dest) {
+        for (int i = 0; i < src.length - 1; i++) {
+            dest[i + 1] = src[i];
+        }
+    }
 
-	public static void replaceBySystemArrayCopyWithLowerBound(int[] src, int[] dest) {
-		for (int i = 1; i <= 3; i++) {
-			dest[i + 2] = src[i + 1];
-		}
-	}
+    public static void replaceBySystemArrayCopyWithLowerBound(int[] src, int[] dest) {
+        for (int i = 1; i <= 3; i++) {
+            dest[i + 2] = src[i + 1];
+        }
+    }
 
-	public static void replaceBySystemArrayCopyRevertedCondition(int[] src, int[] dest) {
-		for (int i = 0; 3 > i; i++) {
-			dest[i] = src[i];
-		}
-	}
+    public static void replaceBySystemArrayCopyRevertedCondition(int[] src, int[] dest) {
+        for (int i = 0; 3 > i; i++) {
+            dest[i] = src[i];
+        }
+    }
 
-	public static void replaceBySystemArrayCopyRevertedCondition2(int[] src, int[] dest) {
-		for (int i = 0; 3 >= i; i++) {
-			dest[i] = src[i];
-		}
-	}
+    public static void replaceBySystemArrayCopyRevertedCondition2(int[] src, int[] dest) {
+        for (int i = 0; 3 >= i; i++) {
+            dest[i] = src[i];
+        }
+    }
 
-	public static void replaceWithArraysCopyOf(int[] src, int[] dest) {
-		// FIXME Should use java.util.Arrays.copyOf()
-	}
+    public static void replaceWithArraysCopyOf(int[] src, int[] dest) {
+        // FIXME Should use java.util.Arrays.copyOf()
+    }
 
-	public static void replaceWithArraysCopyOfRange(int[] src, int[] dest) {
-		// FIXME Should use java.util.Arrays.copyOfRange()
-	}
+    public static void replaceWithArraysCopyOfRange(int[] src, int[] dest) {
+        // FIXME Should use java.util.Arrays.copyOfRange()
+    }
 
-	public static boolean replaceWithArraysEquals(int[] src, int[] dest) {
-		if (dest.length != src.length) {
-			return false;
-		}
-		for (int i = 0; i < src.length; i++) {
-			if (dest[i] != src[i]) {
-				return false;
-			}
-		}
-		return true;
-		// FIXME Should use java.util.Arrays.equals()
-	}
+    public static boolean replaceWithArraysEquals(int[] src, int[] dest) {
+        if (dest.length != src.length) {
+            return false;
+        }
+        for (int i = 0; i < src.length; i++) {
+            if (dest[i] != src[i]) {
+                return false;
+            }
+        }
+        return true;
+        // FIXME Should use java.util.Arrays.equals()
+    }
 
-	public static boolean replaceWithArraysEquals2(int[] src, int[] dest) {
-		if (dest.length == src.length) {
-			for (int i = 0; i < src.length; i++) {
-				if (dest[i] != src[i]) {
-					return false;
-				}
-			}
-			return true;
-		}
-		return false;
-		// FIXME Should use java.util.Arrays.equals()
-	}
+    public static boolean replaceWithArraysEquals2(int[] src, int[] dest) {
+        if (dest.length == src.length) {
+            for (int i = 0; i < src.length; i++) {
+                if (dest[i] != src[i]) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        return false;
+        // FIXME Should use java.util.Arrays.equals()
+    }
 
-	public static void replaceWithStringIndexOf(String s) {
-		// FIXME Should use java.lang.String.indexOf()
-	}
+    public static void replaceWithStringIndexOf(String s) {
+        // FIXME Should use java.lang.String.indexOf()
+    }
 
 }

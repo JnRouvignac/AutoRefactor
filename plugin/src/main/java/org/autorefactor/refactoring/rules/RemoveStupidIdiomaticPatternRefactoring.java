@@ -34,62 +34,62 @@ import org.eclipse.jdt.core.dom.CompilationUnit;
 
 /**
  * TODO JNR
- * 
+ *
  * <pre>
  * public myMethod() throws MyException {
- * 	int result;
- * 	try {
- * 		result = someOtherMethod();
- * 	} catch (MyException2 e) {
- * 		throw new MyException(e);
- * 	}
- * 	return result;
+ *     int result;
+ *     try {
+ *         result = someOtherMethod();
+ *     } catch (MyException2 e) {
+ *         throw new MyException(e);
+ *     }
+ *     return result;
  * }
  * </pre>
- * 
+ *
  * should be transformed into:
- * 
+ *
  * <pre>
  * public myMethod() throws MyException {
- * 	try {
- * 		return someOtherMethod();
- * 	} catch (MyException2 e) {
- * 		throw new MyException(e);
- * 	}
+ *     try {
+ *         return someOtherMethod();
+ *     } catch (MyException2 e) {
+ *         throw new MyException(e);
+ *     }
  * }
  * </pre>
  */
 public class RemoveStupidIdiomaticPatternRefactoring extends ASTVisitor
-		implements IJavaRefactoring {
+        implements IJavaRefactoring {
 
-	private RefactoringContext ctx;
+    private RefactoringContext ctx;
 
-	public RemoveStupidIdiomaticPatternRefactoring() {
-		super();
-	}
+    public RemoveStupidIdiomaticPatternRefactoring() {
+        super();
+    }
 
-	public void setRefactoringContext(RefactoringContext ctx) {
-		this.ctx = ctx;
-	}
+    public void setRefactoringContext(RefactoringContext ctx) {
+        this.ctx = ctx;
+    }
 
-	// TODO JNR
+    // TODO JNR
 
-	// public Object myMethod() {
-	// Object result = null;
-	// try {
-	// result = myOtherMethod();
-	// } catch (Exception e) {
-	// throw e;
-	// }
-	// return result;
-	// }
+    // public Object myMethod() {
+    // Object result = null;
+    // try {
+    // result = myOtherMethod();
+    // } catch (Exception e) {
+    // throw e;
+    // }
+    // return result;
+    // }
 
-	private Object getModifiersOnly(List modifiers) {
-		return null;
-	}
+    private Object getModifiersOnly(List modifiers) {
+        return null;
+    }
 
-	public Refactorings getRefactorings(CompilationUnit astRoot) {
-		astRoot.accept(this);
-		return this.ctx.getRefactorings();
-	}
+    public Refactorings getRefactorings(CompilationUnit astRoot) {
+        astRoot.accept(this);
+        return this.ctx.getRefactorings();
+    }
 }

@@ -34,58 +34,58 @@ import org.autorefactor.refactoring.Refactorings;
 import org.eclipse.jdt.core.dom.*;
 
 public class IfStatementRefactoring extends ASTVisitor implements
-		IJavaRefactoring {
+        IJavaRefactoring {
 
-	private RefactoringContext ctx;
+    private RefactoringContext ctx;
 
-	public IfStatementRefactoring() {
-		super();
-	}
+    public IfStatementRefactoring() {
+        super();
+    }
 
-	public void setRefactoringContext(RefactoringContext ctx) {
-		this.ctx = ctx;
-	}
+    public void setRefactoringContext(RefactoringContext ctx) {
+        this.ctx = ctx;
+    }
 
-	// TODO JNR
+    // TODO JNR
 
-	// RemoveUselessElseRefactoring
-	// if (true) {
-	// return s;
-	// } else {
-	// return null;
-	// }
+    // RemoveUselessElseRefactoring
+    // if (true) {
+    // return s;
+    // } else {
+    // return null;
+    // }
 
-	// UseIfElseIfRefactoring
-	// if (b) {
-	// return i;
-	// }
-	// if (c) {
-	// return j;
-	// }
-	// if (d) {
-	// return k;
-	// }
-	// return l;
+    // UseIfElseIfRefactoring
+    // if (b) {
+    // return i;
+    // }
+    // if (c) {
+    // return j;
+    // }
+    // if (d) {
+    // return k;
+    // }
+    // return l;
 
-	@Override
-	public boolean visit(IfStatement node) {
-		final Statement elseStmt = node.getElseStatement();
-		if (elseStmt instanceof Block) {
-			List<Statement> elseStmts = statements((Block) elseStmt);
-			if (elseStmts.size() == 1
-					&& elseStmts.get(0) instanceof IfStatement) {
-				final AST ast = this.ctx.getAST();
-				final IfStatement newIS = copySubtree(ast, node);
-				newIS.setElseStatement(copySubtree(ast, elseStmts.get(0)));
-				this.ctx.getRefactorings().replace(node, newIS);
-				return DO_NOT_VISIT_SUBTREE;
-			}
-		}
-		return VISIT_SUBTREE;
-	}
+    @Override
+    public boolean visit(IfStatement node) {
+        final Statement elseStmt = node.getElseStatement();
+        if (elseStmt instanceof Block) {
+            List<Statement> elseStmts = statements((Block) elseStmt);
+            if (elseStmts.size() == 1
+                    && elseStmts.get(0) instanceof IfStatement) {
+                final AST ast = this.ctx.getAST();
+                final IfStatement newIS = copySubtree(ast, node);
+                newIS.setElseStatement(copySubtree(ast, elseStmts.get(0)));
+                this.ctx.getRefactorings().replace(node, newIS);
+                return DO_NOT_VISIT_SUBTREE;
+            }
+        }
+        return VISIT_SUBTREE;
+    }
 
-	public Refactorings getRefactorings(CompilationUnit astRoot) {
-		astRoot.accept(this);
-		return this.ctx.getRefactorings();
-	}
+    public Refactorings getRefactorings(CompilationUnit astRoot) {
+        astRoot.accept(this);
+        return this.ctx.getRefactorings();
+    }
 }

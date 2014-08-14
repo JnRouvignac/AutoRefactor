@@ -27,18 +27,18 @@ package org.autorefactor.util;
 
 public class NotImplementedException extends RuntimeException {
 
-	private static final String DEFAULT_MESSAGE = "Code is not implemented";
+    private static final String DEFAULT_MESSAGE = "Code is not implemented";
 
-	public NotImplementedException() {
-		this(DEFAULT_MESSAGE);
-	}
+    public NotImplementedException() {
+        this(DEFAULT_MESSAGE);
+    }
 
-	public NotImplementedException(Object cause) {
-		this("for an object of type " + (cause != null ? cause.getClass() : null));
-	}
+    public NotImplementedException(Object cause) {
+        this("for an object of type " + (cause != null ? cause.getClass() : null));
+    }
 
-	public NotImplementedException(String reason) {
-		super(DEFAULT_MESSAGE + " " + (reason != null ? reason : ""));
-	}
+    public NotImplementedException(String reason) {
+        super(DEFAULT_MESSAGE + " " + (reason != null ? reason : ""));
+    }
 
 }

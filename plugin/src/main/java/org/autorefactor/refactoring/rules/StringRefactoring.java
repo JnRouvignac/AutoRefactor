@@ -43,62 +43,62 @@ import static org.autorefactor.refactoring.ASTHelper.*;
  */
 public class StringRefactoring extends ASTVisitor implements IJavaRefactoring {
 
-	private RefactoringContext ctx;
+    private RefactoringContext ctx;
 
-	public StringRefactoring() {
-		super();
-	}
+    public StringRefactoring() {
+        super();
+    }
 
-	public void setRefactoringContext(RefactoringContext ctx) {
-		this.ctx = ctx;
-	}
+    public void setRefactoringContext(RefactoringContext ctx) {
+        this.ctx = ctx;
+    }
 
-	// TODO JNR remove calls to toString() inside string concatenation
+    // TODO JNR remove calls to toString() inside string concatenation
 
-	@Override
-	public boolean visit(ClassInstanceCreation node) {
-		final ITypeBinding typeBinding = node.getType().resolveBinding();
-		if (typeBinding != null
-				&& "java.lang.String".equals(typeBinding.getQualifiedName())
-				&& arguments(node).size() == 1) {
-			final Expression arg0 = arguments(node).get(0);
-			if (arg0.resolveConstantExpressionValue() != null) {
-				this.ctx.getRefactorings().replace(node,
-						copySubtree(this.ctx.getAST(), arg0));
-				return DO_NOT_VISIT_SUBTREE;
-			}
-		}
-		return VISIT_SUBTREE;
-	}
+    @Override
+    public boolean visit(ClassInstanceCreation node) {
+        final ITypeBinding typeBinding = node.getType().resolveBinding();
+        if (typeBinding != null
+                && "java.lang.String".equals(typeBinding.getQualifiedName())
+                && arguments(node).size() == 1) {
+            final Expression arg0 = arguments(node).get(0);
+            if (arg0.resolveConstantExpressionValue() != null) {
+                this.ctx.getRefactorings().replace(node,
+                        copySubtree(this.ctx.getAST(), arg0));
+                return DO_NOT_VISIT_SUBTREE;
+            }
+        }
+        return VISIT_SUBTREE;
+    }
 
-	@Override
-	public boolean visit(MethodInvocation node) {
-		final Expression expression = node.getExpression();
-		if (expression != null
-				&& "toString".equals(node.getName().getIdentifier())
-				&& arguments(node).isEmpty()
-				&& canRemoveToStringMethodCall(node, expression)) {
-			this.ctx.getRefactorings().replace(node,
-					copySubtree(this.ctx.getAST(), expression));
-			return DO_NOT_VISIT_SUBTREE;
-		}
-		return VISIT_SUBTREE;
-	}
+    @Override
+    public boolean visit(MethodInvocation node) {
+        final Expression expression = node.getExpression();
+        if (expression != null
+                && "toString".equals(node.getName().getIdentifier())
+                && arguments(node).isEmpty()
+                && canRemoveToStringMethodCall(node, expression)) {
+            this.ctx.getRefactorings().replace(node,
+                    copySubtree(this.ctx.getAST(), expression));
+            return DO_NOT_VISIT_SUBTREE;
+        }
+        return VISIT_SUBTREE;
+    }
 
-	private boolean canRemoveToStringMethodCall(MethodInvocation node,
-			final Expression expression) {
-		if (hasType(resolveTypeBindingForcedFromContext(node), "java.lang.String")) {
-			// We are in a String context, no need to call toString()
-			return true;
-		} else if (hasType(expression, "java.lang.String")) {
-			// It's already a String, no need to call toString()
-			return true;
-		}
-		return false;
-	}
+    private boolean canRemoveToStringMethodCall(MethodInvocation node,
+            final Expression expression) {
+        if (hasType(resolveTypeBindingForcedFromContext(node), "java.lang.String")) {
+            // We are in a String context, no need to call toString()
+            return true;
+        } else if (hasType(expression, "java.lang.String")) {
+            // It's already a String, no need to call toString()
+            return true;
+        }
+        return false;
+    }
 
-	public Refactorings getRefactorings(CompilationUnit astRoot) {
-		astRoot.accept(this);
-		return this.ctx.getRefactorings();
-	}
+    public Refactorings getRefactorings(CompilationUnit astRoot) {
+        astRoot.accept(this);
+        return this.ctx.getRefactorings();
+    }
 }

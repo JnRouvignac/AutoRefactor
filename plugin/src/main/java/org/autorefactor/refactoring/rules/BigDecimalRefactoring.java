@@ -46,157 +46,157 @@ import static org.autorefactor.refactoring.JavaConstants.*;
  * </ul>
  */
 public class BigDecimalRefactoring extends ASTVisitor implements
-		IJavaRefactoring {
+        IJavaRefactoring {
 
-	private RefactoringContext ctx;
-	private int javaMinorVersion;
+    private RefactoringContext ctx;
+    private int javaMinorVersion;
 
-	public BigDecimalRefactoring() {
-		super();
-	}
+    public BigDecimalRefactoring() {
+        super();
+    }
 
-	public void setRefactoringContext(RefactoringContext ctx) {
-		this.ctx = ctx;
-		this.javaMinorVersion = this.ctx.getJavaSERelease().getMinorVersion();
-	}
+    public void setRefactoringContext(RefactoringContext ctx) {
+        this.ctx = ctx;
+        this.javaMinorVersion = this.ctx.getJavaSERelease().getMinorVersion();
+    }
 
-	@Override
-	public boolean visit(ClassInstanceCreation node) {
-		final ITypeBinding typeBinding = node.getType().resolveBinding();
-		if (typeBinding != null
-				&& "java.math.BigDecimal".equals(typeBinding.getQualifiedName())
-				&& arguments(node).size() == 1) {
-			final Expression arg0 = arguments(node).get(0);
-			if (arg0 instanceof NumberLiteral) {
-				final NumberLiteral nb = (NumberLiteral) arg0;
-				if (nb.getToken().contains(".")) {
-					// Only instantiation from double, not from integer
-					this.ctx.getRefactorings().replace(nb,
-							getStringLiteral(nb.getToken()));
-				} else {
-					if (javaMinorVersion < 5) {
-						return VISIT_SUBTREE;
-					}
-					if (ZERO_LONG_LITERAL_RE.matcher(nb.getToken()).matches()) {
-						replaceWithQualifiedName(node, typeBinding, "ZERO");
-					} else if (ONE_LONG_LITERAL_RE.matcher(nb.getToken()).matches()) {
-						replaceWithQualifiedName(node, typeBinding, "ONE");
-					} else if (TEN_LONG_LITERAL_RE.matcher(nb.getToken()).matches()) {
-						replaceWithQualifiedName(node, typeBinding, "TEN");
-					} else {
-						this.ctx.getRefactorings().replace(node,
-								getValueOf(typeBinding.getName(), nb.getToken()));
-					}
-				}
-				return DO_NOT_VISIT_SUBTREE;
-			} else if (arg0 instanceof StringLiteral) {
-				if (javaMinorVersion < 5) {
-					return VISIT_SUBTREE;
-				}
-				final String literalValue = ((StringLiteral) arg0).getLiteralValue();
-				if (literalValue.matches("0+")) {
-					replaceWithQualifiedName(node, typeBinding, "ZERO");
-				} else if (literalValue.matches("0+1")) {
-					replaceWithQualifiedName(node, typeBinding, "ONE");
-				} else if (literalValue.matches("0+10")) {
-					replaceWithQualifiedName(node, typeBinding, "TEN");
-				} else if (literalValue.matches("\\d+")) {
-					this.ctx.getRefactorings().replace(node,
-							getValueOf(typeBinding.getName(), literalValue));
-				}
-			}
-		}
-		return VISIT_SUBTREE;
-	}
+    @Override
+    public boolean visit(ClassInstanceCreation node) {
+        final ITypeBinding typeBinding = node.getType().resolveBinding();
+        if (typeBinding != null
+                && "java.math.BigDecimal".equals(typeBinding.getQualifiedName())
+                && arguments(node).size() == 1) {
+            final Expression arg0 = arguments(node).get(0);
+            if (arg0 instanceof NumberLiteral) {
+                final NumberLiteral nb = (NumberLiteral) arg0;
+                if (nb.getToken().contains(".")) {
+                    // Only instantiation from double, not from integer
+                    this.ctx.getRefactorings().replace(nb,
+                            getStringLiteral(nb.getToken()));
+                } else {
+                    if (javaMinorVersion < 5) {
+                        return VISIT_SUBTREE;
+                    }
+                    if (ZERO_LONG_LITERAL_RE.matcher(nb.getToken()).matches()) {
+                        replaceWithQualifiedName(node, typeBinding, "ZERO");
+                    } else if (ONE_LONG_LITERAL_RE.matcher(nb.getToken()).matches()) {
+                        replaceWithQualifiedName(node, typeBinding, "ONE");
+                    } else if (TEN_LONG_LITERAL_RE.matcher(nb.getToken()).matches()) {
+                        replaceWithQualifiedName(node, typeBinding, "TEN");
+                    } else {
+                        this.ctx.getRefactorings().replace(node,
+                                getValueOf(typeBinding.getName(), nb.getToken()));
+                    }
+                }
+                return DO_NOT_VISIT_SUBTREE;
+            } else if (arg0 instanceof StringLiteral) {
+                if (javaMinorVersion < 5) {
+                    return VISIT_SUBTREE;
+                }
+                final String literalValue = ((StringLiteral) arg0).getLiteralValue();
+                if (literalValue.matches("0+")) {
+                    replaceWithQualifiedName(node, typeBinding, "ZERO");
+                } else if (literalValue.matches("0+1")) {
+                    replaceWithQualifiedName(node, typeBinding, "ONE");
+                } else if (literalValue.matches("0+10")) {
+                    replaceWithQualifiedName(node, typeBinding, "TEN");
+                } else if (literalValue.matches("\\d+")) {
+                    this.ctx.getRefactorings().replace(node,
+                            getValueOf(typeBinding.getName(), literalValue));
+                }
+            }
+        }
+        return VISIT_SUBTREE;
+    }
 
-	private void replaceWithQualifiedName(ASTNode node, ITypeBinding typeBinding, String field) {
-		this.ctx.getRefactorings().replace(node,
-				this.ctx.getASTBuilder().name(typeBinding.getName(), field));
-	}
+    private void replaceWithQualifiedName(ASTNode node, ITypeBinding typeBinding, String field) {
+        this.ctx.getRefactorings().replace(node,
+                this.ctx.getASTBuilder().name(typeBinding.getName(), field));
+    }
 
-	private ASTNode getValueOf(String name, String numberLiteral) {
-		final ASTBuilder b = this.ctx.getASTBuilder();
-		return b.invoke(name, "valueOf", b.number(numberLiteral));
-	}
+    private ASTNode getValueOf(String name, String numberLiteral) {
+        final ASTBuilder b = this.ctx.getASTBuilder();
+        return b.invoke(name, "valueOf", b.number(numberLiteral));
+    }
 
-	private StringLiteral getStringLiteral(String numberLiteral) {
-		return this.ctx.getASTBuilder().string(numberLiteral);
-	}
+    private StringLiteral getStringLiteral(String numberLiteral) {
+        return this.ctx.getASTBuilder().string(numberLiteral);
+    }
 
-	@Override
-	public boolean visit(MethodInvocation node) {
-		if (node.getExpression() == null) {
-			return VISIT_SUBTREE;
-		}
-		if (javaMinorVersion >= 5
-				&& (isMethod(node, "java.math.BigDecimal", "valueOf", "long")
-					|| isMethod(node, "java.math.BigDecimal", "valueOf", "double"))) {
-			final ITypeBinding typeBinding = node.getExpression().resolveTypeBinding();
-			final Expression arg0 = arguments(node).get(0);
-			if (arg0 instanceof NumberLiteral) {
-				final NumberLiteral nb = (NumberLiteral) arg0;
-				if (nb.getToken().contains(".")) {
-					this.ctx.getRefactorings().replace(node,
-							getClassInstanceCreatorNode(
-									(Name) node.getExpression(),
-									nb.getToken()));
-				} else if (ZERO_LONG_LITERAL_RE.matcher(nb.getToken()).matches()) {
-					replaceWithQualifiedName(node, typeBinding, "ZERO");
-				} else if (ONE_LONG_LITERAL_RE.matcher(nb.getToken()).matches()) {
-					replaceWithQualifiedName(node, typeBinding, "ONE");
-				} else if (TEN_LONG_LITERAL_RE.matcher(nb.getToken()).matches()) {
-					replaceWithQualifiedName(node, typeBinding, "TEN");
-				} else {
-					return VISIT_SUBTREE;
-				}
-				return DO_NOT_VISIT_SUBTREE;
-			}
-		} else if (isMethod(node, "java.math.BigDecimal", "equals", "java.lang.Object")) {
-			final Expression arg0 = arguments(node).get(0);
-			if (hasType(arg0, "java.math.BigDecimal")) {
-				if (isInStringAppend(node.getParent())) {
-					this.ctx.getRefactorings().replace(node,
-							parenthesize(getCompareToNode(node)));
-				} else {
-					this.ctx.getRefactorings().replace(node, getCompareToNode(node));
-				}
-				return DO_NOT_VISIT_SUBTREE;
-			}
-		}
-		return VISIT_SUBTREE;
-	}
+    @Override
+    public boolean visit(MethodInvocation node) {
+        if (node.getExpression() == null) {
+            return VISIT_SUBTREE;
+        }
+        if (javaMinorVersion >= 5
+                && (isMethod(node, "java.math.BigDecimal", "valueOf", "long")
+                    || isMethod(node, "java.math.BigDecimal", "valueOf", "double"))) {
+            final ITypeBinding typeBinding = node.getExpression().resolveTypeBinding();
+            final Expression arg0 = arguments(node).get(0);
+            if (arg0 instanceof NumberLiteral) {
+                final NumberLiteral nb = (NumberLiteral) arg0;
+                if (nb.getToken().contains(".")) {
+                    this.ctx.getRefactorings().replace(node,
+                            getClassInstanceCreatorNode(
+                                    (Name) node.getExpression(),
+                                    nb.getToken()));
+                } else if (ZERO_LONG_LITERAL_RE.matcher(nb.getToken()).matches()) {
+                    replaceWithQualifiedName(node, typeBinding, "ZERO");
+                } else if (ONE_LONG_LITERAL_RE.matcher(nb.getToken()).matches()) {
+                    replaceWithQualifiedName(node, typeBinding, "ONE");
+                } else if (TEN_LONG_LITERAL_RE.matcher(nb.getToken()).matches()) {
+                    replaceWithQualifiedName(node, typeBinding, "TEN");
+                } else {
+                    return VISIT_SUBTREE;
+                }
+                return DO_NOT_VISIT_SUBTREE;
+            }
+        } else if (isMethod(node, "java.math.BigDecimal", "equals", "java.lang.Object")) {
+            final Expression arg0 = arguments(node).get(0);
+            if (hasType(arg0, "java.math.BigDecimal")) {
+                if (isInStringAppend(node.getParent())) {
+                    this.ctx.getRefactorings().replace(node,
+                            parenthesize(getCompareToNode(node)));
+                } else {
+                    this.ctx.getRefactorings().replace(node, getCompareToNode(node));
+                }
+                return DO_NOT_VISIT_SUBTREE;
+            }
+        }
+        return VISIT_SUBTREE;
+    }
 
-	private ParenthesizedExpression parenthesize(Expression compareToNode) {
-		return this.ctx.getASTBuilder().parenthesize(compareToNode);
-	}
+    private ParenthesizedExpression parenthesize(Expression compareToNode) {
+        return this.ctx.getASTBuilder().parenthesize(compareToNode);
+    }
 
-	private boolean isInStringAppend(ASTNode node) {
-		if (node instanceof InfixExpression) {
-			final InfixExpression expr = (InfixExpression) node;
-			if (Operator.PLUS.equals(expr.getOperator())
-					|| hasType(expr.getLeftOperand(), "java.lang.String")
-					|| hasType(expr.getRightOperand(), "java.lang.String")) {
-				return true;
-			}
-		}
-		return false;
-	}
+    private boolean isInStringAppend(ASTNode node) {
+        if (node instanceof InfixExpression) {
+            final InfixExpression expr = (InfixExpression) node;
+            if (Operator.PLUS.equals(expr.getOperator())
+                    || hasType(expr.getLeftOperand(), "java.lang.String")
+                    || hasType(expr.getRightOperand(), "java.lang.String")) {
+                return true;
+            }
+        }
+        return false;
+    }
 
-	private ASTNode getClassInstanceCreatorNode(Name className, String numberLiteral) {
-		final ASTBuilder b = this.ctx.getASTBuilder();
-		return b.new0(className.getFullyQualifiedName(), b.string(numberLiteral));
-	}
+    private ASTNode getClassInstanceCreatorNode(Name className, String numberLiteral) {
+        final ASTBuilder b = this.ctx.getASTBuilder();
+        return b.new0(className.getFullyQualifiedName(), b.string(numberLiteral));
+    }
 
-	private InfixExpression getCompareToNode(MethodInvocation node) {
-		final ASTBuilder b = this.ctx.getASTBuilder();
-		final MethodInvocation mi = b.invoke(
-				b.copyExpr(node.getExpression()), "compareTo", b.copyExpr(arguments(node).get(0)));
+    private InfixExpression getCompareToNode(MethodInvocation node) {
+        final ASTBuilder b = this.ctx.getASTBuilder();
+        final MethodInvocation mi = b.invoke(
+                b.copyExpr(node.getExpression()), "compareTo", b.copyExpr(arguments(node).get(0)));
 
-		return b.infixExpr(mi, Operator.EQUALS, b.int0(0));
-	}
+        return b.infixExpr(mi, Operator.EQUALS, b.int0(0));
+    }
 
-	public Refactorings getRefactorings(CompilationUnit astRoot) {
-		astRoot.accept(this);
-		return this.ctx.getRefactorings();
-	}
+    public Refactorings getRefactorings(CompilationUnit astRoot) {
+        astRoot.accept(this);
+        return this.ctx.getRefactorings();
+    }
 }

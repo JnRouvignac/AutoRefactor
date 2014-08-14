@@ -44,197 +44,197 @@ import org.eclipse.jdt.core.dom.*;
  */
 public class Refactorings {
 
-	/**
-	 * The refactorings replacing existing code from the AST tree.
-	 */
-	private final List<Pair<ASTNode, ASTNode>> replacements = new LinkedList<Pair<ASTNode, ASTNode>>();
-	/**
-	 * The refactorings inserting code into the AST tree.
-	 */
-	private final Map<ChildListPropertyDescriptor, List<Insert>> inserts = new LinkedHashMap<ChildListPropertyDescriptor, List<Insert>>();
-	/**
-	 * The refactorings removing code from the AST tree.
-	 */
-	private final List<ASTNode> removals = new LinkedList<ASTNode>();
-	private final Set<Comment> commentRemovals = new LinkedHashSet<Comment>();
-	private final Set<Pair<Comment, String>> commentReplacements = new LinkedHashSet<Pair<Comment, String>>();
-	private final Map<ASTNode, List<LineComment>> lineCommentsToJavadoc = new HashMap<ASTNode, List<LineComment>>();
-	private final List<BlockComment> blockCommentToJavadoc = new LinkedList<BlockComment>();
+    /**
+     * The refactorings replacing existing code from the AST tree.
+     */
+    private final List<Pair<ASTNode, ASTNode>> replacements = new LinkedList<Pair<ASTNode, ASTNode>>();
+    /**
+     * The refactorings inserting code into the AST tree.
+     */
+    private final Map<ChildListPropertyDescriptor, List<Insert>> inserts = new LinkedHashMap<ChildListPropertyDescriptor, List<Insert>>();
+    /**
+     * The refactorings removing code from the AST tree.
+     */
+    private final List<ASTNode> removals = new LinkedList<ASTNode>();
+    private final Set<Comment> commentRemovals = new LinkedHashSet<Comment>();
+    private final Set<Pair<Comment, String>> commentReplacements = new LinkedHashSet<Pair<Comment, String>>();
+    private final Map<ASTNode, List<LineComment>> lineCommentsToJavadoc = new HashMap<ASTNode, List<LineComment>>();
+    private final List<BlockComment> blockCommentToJavadoc = new LinkedList<BlockComment>();
 
-	/**
-	 * Describes where to insert new code: before or after an existing
-	 * {@link ASTNode}.
-	 */
-	public static enum InsertType {
-		AT_INDEX, BEFORE, AFTER
-	}
+    /**
+     * Describes where to insert new code: before or after an existing
+     * {@link ASTNode}.
+     */
+    public static enum InsertType {
+        AT_INDEX, BEFORE, AFTER
+    }
 
-	/**
-	 * Describes how to insert new code: which code, before or after an existing
-	 * {@link ASTNode} and which ASTNode.
-	 */
-	public static class Insert {
+    /**
+     * Describes how to insert new code: which code, before or after an existing
+     * {@link ASTNode} and which ASTNode.
+     */
+    public static class Insert {
 
-		public Insert(ASTNode nodeToInsert, ASTNode element, InsertType insertType) {
-			this.nodeToInsert = nodeToInsert;
-			this.insertType = insertType;
-			this.element = element;
-			this.listHolder = element.getParent();
-			this.index = 0;
-		}
+        public Insert(ASTNode nodeToInsert, ASTNode element, InsertType insertType) {
+            this.nodeToInsert = nodeToInsert;
+            this.insertType = insertType;
+            this.element = element;
+            this.listHolder = element.getParent();
+            this.index = 0;
+        }
 
-		public Insert(ASTNode nodeToInsert, ASTNode listHolder, int index) {
-			this.nodeToInsert = nodeToInsert;
-			this.insertType = InsertType.AT_INDEX;
-			this.element = null;
-			this.listHolder = listHolder;
-			this.index = index;
-		}
+        public Insert(ASTNode nodeToInsert, ASTNode listHolder, int index) {
+            this.nodeToInsert = nodeToInsert;
+            this.insertType = InsertType.AT_INDEX;
+            this.element = null;
+            this.listHolder = listHolder;
+            this.index = index;
+        }
 
-		private final ASTNode nodeToInsert;
-		private final InsertType insertType;
-		private final ASTNode element;
-		private final ASTNode listHolder;
-		private final int index;
+        private final ASTNode nodeToInsert;
+        private final InsertType insertType;
+        private final ASTNode element;
+        private final ASTNode listHolder;
+        private final int index;
 
-		public ASTNode getNodeToInsert() {
-			return nodeToInsert;
-		}
+        public ASTNode getNodeToInsert() {
+            return nodeToInsert;
+        }
 
-		public ASTNode getElement() {
-			return element;
-		}
+        public ASTNode getElement() {
+            return element;
+        }
 
-		public InsertType getInsertType() {
-			return insertType;
-		}
+        public InsertType getInsertType() {
+            return insertType;
+        }
 
-		public ASTNode getListHolder() {
-			return listHolder;
-		}
+        public ASTNode getListHolder() {
+            return listHolder;
+        }
 
-		public int getIndex() {
-			return index;
-		}
-	}
+        public int getIndex() {
+            return index;
+        }
+    }
 
-	public List<Pair<ASTNode, ASTNode>> getReplacements() {
-		return this.replacements;
-	}
+    public List<Pair<ASTNode, ASTNode>> getReplacements() {
+        return this.replacements;
+    }
 
-	public List<ASTNode> getRemovals() {
-		return removals;
-	}
+    public List<ASTNode> getRemovals() {
+        return removals;
+    }
 
-	public Map<ChildListPropertyDescriptor, List<Insert>> getInserts() {
-		return this.inserts;
-	}
+    public Map<ChildListPropertyDescriptor, List<Insert>> getInserts() {
+        return this.inserts;
+    }
 
-	public Set<Comment> getCommentRemovals() {
-		return this.commentRemovals;
-	}
+    public Set<Comment> getCommentRemovals() {
+        return this.commentRemovals;
+    }
 
-	public Set<Pair<Comment, String>> getCommentReplacements() {
-		return this.commentReplacements;
-	}
+    public Set<Pair<Comment, String>> getCommentReplacements() {
+        return this.commentReplacements;
+    }
 
-	public List<BlockComment> getBlockCommentToJavadoc() {
-		return blockCommentToJavadoc;
-	}
+    public List<BlockComment> getBlockCommentToJavadoc() {
+        return blockCommentToJavadoc;
+    }
 
-	public Collection<List<LineComment>> getLineCommentsToJavadoc() {
-		return lineCommentsToJavadoc.values();
-	}
+    public Collection<List<LineComment>> getLineCommentsToJavadoc() {
+        return lineCommentsToJavadoc.values();
+    }
 
-	public void replace(ASTNode node, ASTNode replacement) {
-		this.replacements.add(Pair.of(node, replacement));
-	}
+    public void replace(ASTNode node, ASTNode replacement) {
+        this.replacements.add(Pair.of(node, replacement));
+    }
 
-	public void replace(Comment comment, String replacement) {
-		this.commentReplacements.add(Pair.of(comment, replacement));
-	}
+    public void replace(Comment comment, String replacement) {
+        this.commentReplacements.add(Pair.of(comment, replacement));
+    }
 
-	public void remove(ASTNode node) {
-		if (node instanceof Comment) {
-			this.commentRemovals.add((Comment) node);
-		} else {
-			this.removals.add(node);
-		}
-	}
+    public void remove(ASTNode node) {
+        if (node instanceof Comment) {
+            this.commentRemovals.add((Comment) node);
+        } else {
+            this.removals.add(node);
+        }
+    }
 
-	public void remove(ASTNode... nodes) {
-		remove(Arrays.asList(nodes));
-	}
+    public void remove(ASTNode... nodes) {
+        remove(Arrays.asList(nodes));
+    }
 
-	public void remove(Collection<ASTNode> nodes) {
-		for (ASTNode node : nodes) {
-			remove(node);
-		}
-	}
+    public void remove(Collection<ASTNode> nodes) {
+        for (ASTNode node : nodes) {
+            remove(node);
+        }
+    }
 
-	public boolean hasRefactorings() {
-		return !this.replacements.isEmpty() || !this.removals.isEmpty()
-				|| !this.inserts.isEmpty() || !this.commentRemovals.isEmpty()
-				|| !this.commentReplacements.isEmpty()
-				|| !this.lineCommentsToJavadoc.isEmpty()
-				|| !this.blockCommentToJavadoc.isEmpty();
-	}
+    public boolean hasRefactorings() {
+        return !this.replacements.isEmpty() || !this.removals.isEmpty()
+                || !this.inserts.isEmpty() || !this.commentRemovals.isEmpty()
+                || !this.commentReplacements.isEmpty()
+                || !this.lineCommentsToJavadoc.isEmpty()
+                || !this.blockCommentToJavadoc.isEmpty();
+    }
 
-	public void insertAt(ASTNode nodeToInsert, int index, StructuralPropertyDescriptor locationInParent, ASTNode listHolder) {
-		insert(locationInParent, new Insert(nodeToInsert, listHolder, index));
-	}
+    public void insertAt(ASTNode nodeToInsert, int index, StructuralPropertyDescriptor locationInParent, ASTNode listHolder) {
+        insert(locationInParent, new Insert(nodeToInsert, listHolder, index));
+    }
 
-	public void insertBefore(ASTNode nodeToInsert, ASTNode element) {
-		insert(element.getLocationInParent(), new Insert(nodeToInsert, element, InsertType.BEFORE));
-	}
+    public void insertBefore(ASTNode nodeToInsert, ASTNode element) {
+        insert(element.getLocationInParent(), new Insert(nodeToInsert, element, InsertType.BEFORE));
+    }
 
-	public void insertAfter(ASTNode nodeToInsert, ASTNode element) {
-		insert(element.getLocationInParent(), new Insert(nodeToInsert, element, InsertType.AFTER));
-	}
+    public void insertAfter(ASTNode nodeToInsert, ASTNode element) {
+        insert(element.getLocationInParent(), new Insert(nodeToInsert, element, InsertType.AFTER));
+    }
 
-	private void insert(StructuralPropertyDescriptor locationInParent, Insert insert) {
-		// FIXME JNR else if case
-		final ChildListPropertyDescriptor clpd = (ChildListPropertyDescriptor) locationInParent;
-		List<Insert> inserts = this.inserts.get(clpd);
-		if (inserts == null) {
-			inserts = new LinkedList<Insert>();
-			this.inserts.put(clpd, inserts);
-		}
-		inserts.add(insert);
-	}
+    private void insert(StructuralPropertyDescriptor locationInParent, Insert insert) {
+        // FIXME JNR else if case
+        final ChildListPropertyDescriptor clpd = (ChildListPropertyDescriptor) locationInParent;
+        List<Insert> inserts = this.inserts.get(clpd);
+        if (inserts == null) {
+            inserts = new LinkedList<Insert>();
+            this.inserts.put(clpd, inserts);
+        }
+        inserts.add(insert);
+    }
 
-	public void toJavadoc(LineComment lineComment, ASTNode nextNode) {
-		List<LineComment> comments = this.lineCommentsToJavadoc.get(nextNode);
-		if (comments == null) {
-			comments = new LinkedList<LineComment>();
-			this.lineCommentsToJavadoc.put(nextNode, comments);
-		}
-		comments.add(lineComment);
-	}
+    public void toJavadoc(LineComment lineComment, ASTNode nextNode) {
+        List<LineComment> comments = this.lineCommentsToJavadoc.get(nextNode);
+        if (comments == null) {
+            comments = new LinkedList<LineComment>();
+            this.lineCommentsToJavadoc.put(nextNode, comments);
+        }
+        comments.add(lineComment);
+    }
 
-	public void toJavadoc(BlockComment blockComment) {
-		this.blockCommentToJavadoc.add(blockComment);
-	}
+    public void toJavadoc(BlockComment blockComment) {
+        this.blockCommentToJavadoc.add(blockComment);
+    }
 
-	@Override
-	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		append(sb, replacements.size(), "replacements");
-		append(sb, inserts.size(), "inserts");
-		append(sb, removals.size(), "removals");
-		append(sb, commentRemovals.size(), "commentRemovals");
-		append(sb, lineCommentsToJavadoc.size(), "lineCommentsToJavadoc");
-		append(sb, blockCommentToJavadoc.size(), "blockCommentToJavadoc");
-		return sb.toString();
-	}
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        append(sb, replacements.size(), "replacements");
+        append(sb, inserts.size(), "inserts");
+        append(sb, removals.size(), "removals");
+        append(sb, commentRemovals.size(), "commentRemovals");
+        append(sb, lineCommentsToJavadoc.size(), "lineCommentsToJavadoc");
+        append(sb, blockCommentToJavadoc.size(), "blockCommentToJavadoc");
+        return sb.toString();
+    }
 
-	private void append(StringBuilder sb, int size, String s) {
-		if (size > 0) {
-			if (sb.length() > 0) {
-				sb.append(", ");
-			}
-			sb.append(size).append(" ").append(s);
-		}
-	}
+    private void append(StringBuilder sb, int size, String s) {
+        if (size > 0) {
+            if (sb.length() > 0) {
+                sb.append(", ");
+            }
+            sb.append(size).append(" ").append(s);
+        }
+    }
 
 }

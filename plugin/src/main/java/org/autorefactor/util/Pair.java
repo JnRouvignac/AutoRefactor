@@ -35,96 +35,96 @@ package org.autorefactor.util;
  */
 public final class Pair<F, S> {
 
-	/** first object */
-	private final F first;
-	/** second object */
-	private final S second;
+    /** first object. */
+    private final F first;
+    /** second object. */
+    private final S second;
 
-	/**
-	 * Returns an immutable pair made of the two objects.
-	 *
-	 * @param <F>
-	 *            the first element type
-	 * @param <S>
-	 *            the second element type
-	 * @param first
-	 *            the first element, can be null
-	 * @param second
-	 *            the second element, can be null
-	 * @return an immutable pair made of the two objects.
-	 */
-	public static <F, S> Pair<F, S> of(F first, S second) {
-		return new Pair<F, S>(first, second);
-	}
+    /**
+     * Returns an immutable pair made of the two objects.
+     *
+     * @param <F>
+     *            the first element type
+     * @param <S>
+     *            the second element type
+     * @param first
+     *            the first element, can be null
+     * @param second
+     *            the second element, can be null
+     * @return an immutable pair made of the two objects.
+     */
+    public static <F, S> Pair<F, S> of(F first, S second) {
+        return new Pair<F, S>(first, second);
+    }
 
-	/**
-	 * Creates a new pair.
-	 *
-	 * @param first
-	 *            the first element, can be null
-	 * @param second
-	 *            the second element, can be null
-	 */
-	private Pair(F first, S second) {
-		super();
-		this.first = first;
-		this.second = second;
-	}
+    /**
+     * Creates a new pair.
+     *
+     * @param first
+     *            the first element, can be null
+     * @param second
+     *            the second element, can be null
+     */
+    private Pair(F first, S second) {
+        super();
+        this.first = first;
+        this.second = second;
+    }
 
-	/**
-	 * Gets the first element of this pair.
-	 *
-	 * @return the first element, can be null
-	 */
-	public F getFirst() {
-		return first;
-	}
+    /**
+     * Gets the first element of this pair.
+     *
+     * @return the first element, can be null
+     */
+    public F getFirst() {
+        return first;
+    }
 
-	/**
-	 * Gets the second element of this pair.
-	 *
-	 * @return the second element, can be null
-	 */
-	public S getSecond() {
-		return second;
-	}
+    /**
+     * Gets the second element of this pair.
+     *
+     * @return the second element, can be null
+     */
+    public S getSecond() {
+        return second;
+    }
 
-	/** {@inheritDoc} */
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((first == null) ? 0 : first.hashCode());
-		result = prime * result + ((second == null) ? 0 : second.hashCode());
-		return result;
-	}
-	
-	/** {@inheritDoc} */
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		final Pair other = (Pair) obj;
-		if (first == null) {
-			if (other.first != null)
-				return false;
-		} else if (!first.equals(other.first))
-			return false;
-		if (second == null) {
-			if (other.second != null)
-				return false;
-		} else if (!second.equals(other.second))
-			return false;
-		return true;
-	}
+    /** {@inheritDoc} */
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((first == null) ? 0 : first.hashCode());
+        result = prime * result + ((second == null) ? 0 : second.hashCode());
+        return result;
+    }
 
-	@Override
-	public String toString() {
-		return "FIRST: " + first + " SECOND: " + second;
-	}
+    /** {@inheritDoc} */
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        final Pair other = (Pair) obj;
+        if (first == null) {
+            if (other.first != null)
+                return false;
+        } else if (!first.equals(other.first))
+            return false;
+        if (second == null) {
+            if (other.second != null)
+                return false;
+        } else if (!second.equals(other.second))
+            return false;
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return "FIRST: " + first + " SECOND: " + second;
+    }
 
 }

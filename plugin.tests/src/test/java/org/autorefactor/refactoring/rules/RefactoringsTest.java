@@ -49,75 +49,75 @@ import static org.junit.Assert.*;
 @RunWith(value = Parameterized.class)
 public class RefactoringsTest {
 
-	private String testName;
+    private String testName;
 
-	public RefactoringsTest(String testName) {
-		this.testName = testName;
-	}
+    public RefactoringsTest(String testName) {
+        this.testName = testName;
+    }
 
-	@Parameters(name = "{0}Refactoring")
-	public static Collection<Object[]> data() {
-		final File samplesDir = new File("src/test/java/org/autorefactor/samples_in");
-		final File[] sampleFiles = samplesDir.listFiles(new EndsWithFileFilter("Sample.java"));
-		Arrays.sort(sampleFiles);
+    @Parameters(name = "{0}Refactoring")
+    public static Collection<Object[]> data() {
+        final File samplesDir = new File("src/test/java/org/autorefactor/samples_in");
+        final File[] sampleFiles = samplesDir.listFiles(new EndsWithFileFilter("Sample.java"));
+        Arrays.sort(sampleFiles);
 
-		final List<Object[]> output = new ArrayList<Object[]>(sampleFiles.length);
-		for (File file : sampleFiles) {
-			final String fileName = file.getName();
-			if (!"ReduceVariableScopeSample.java".equals(fileName)) { // To be completed
-				output.add(new Object[] { fileName.replace("Sample.java", "") });
-			}
-		}
-		return output;
-	}
+        final List<Object[]> output = new ArrayList<Object[]>(sampleFiles.length);
+        for (File file : sampleFiles) {
+            final String fileName = file.getName();
+            if (!"ReduceVariableScopeSample.java".equals(fileName)) { // To be completed
+                output.add(new Object[] { fileName.replace("Sample.java", "") });
+            }
+        }
+        return output;
+    }
 
-	@Test
-	public void testRefactoring() throws Exception {
-		final String sampleName = testName + "Sample.java";
-		final File samplesDir = new File("src/test/java/org/autorefactor");
-		final File sampleIn = new File(samplesDir, "samples_in/" + sampleName);
-		assertTrue(testName + ": sample in file " + sampleIn + " should exist", sampleIn.exists());
-		final File sampleOut = new File(samplesDir, "samples_out/" + sampleName);
-		assertTrue(testName + ": sample out file " + sampleOut + " should exist", sampleOut.exists());
+    @Test
+    public void testRefactoring() throws Exception {
+        final String sampleName = testName + "Sample.java";
+        final File samplesDir = new File("src/test/java/org/autorefactor");
+        final File sampleIn = new File(samplesDir, "samples_in/" + sampleName);
+        assertTrue(testName + ": sample in file " + sampleIn + " should exist", sampleIn.exists());
+        final File sampleOut = new File(samplesDir, "samples_out/" + sampleName);
+        assertTrue(testName + ": sample out file " + sampleOut + " should exist", sampleOut.exists());
 
-		final String refactoringClassname = testName + "Refactoring";
-		final IRefactoring refactoring = getRefactoringClass(refactoringClassname);
-		assertNotNull(testName + ": refactoring class " + refactoringClassname + " should exist", refactoring);
+        final String refactoringClassname = testName + "Refactoring";
+        final IRefactoring refactoring = getRefactoringClass(refactoringClassname);
+        assertNotNull(testName + ": refactoring class " + refactoringClassname + " should exist", refactoring);
 
-		final String sampleInSource = readAll(sampleIn);
-		final String sampleOutSource = readAll(sampleOut);
+        final String sampleInSource = readAll(sampleIn);
+        final String sampleOutSource = readAll(sampleOut);
 
-		final IPackageFragment packageFragment = JavaCoreHelper.getPackageFragment();
-		final ICompilationUnit cu = packageFragment.createCompilationUnit(
-				sampleName, sampleInSource, true, null);
-		cu.getBuffer().setContents(sampleInSource);
-		cu.save(null, true);
+        final IPackageFragment packageFragment = JavaCoreHelper.getPackageFragment();
+        final ICompilationUnit cu = packageFragment.createCompilationUnit(
+                sampleName, sampleInSource, true, null);
+        cu.getBuffer().setContents(sampleInSource);
+        cu.save(null, true);
 
-		final IDocument doc = new Document(sampleInSource);
-		new ApplyRefactoringsJob(null, null).applyRefactoring(
-				doc, cu,
-				Release.javaSE("1.5.0"), 4,
-				new AggregateASTVisitor(refactoring));
+        final IDocument doc = new Document(sampleInSource);
+        new ApplyRefactoringsJob(null, null).applyRefactoring(
+                doc, cu,
+                Release.javaSE("1.5.0"), 4,
+                new AggregateASTVisitor(refactoring));
 
-		final String actual = normalize(
-				doc.get().replaceAll("samples_in", "samples_out"));
-		final String expected = normalize(sampleOutSource);
-		assertEquals(testName + ": wrong output;", expected, actual);
-	}
+        final String actual = normalize(
+                doc.get().replaceAll("samples_in", "samples_out"));
+        final String expected = normalize(sampleOutSource);
+        assertEquals(testName + ": wrong output;", expected, actual);
+    }
 
-	private IRefactoring getRefactoringClass(final String refactoringClassName) throws Exception {
-		Collection<IRefactoring> refactorings = AllRefactorings.getAllRefactorings();
-		for (IRefactoring refactoring : refactorings) {
-			if (refactoring.getClass().getSimpleName().equals(refactoringClassName)) {
-				return refactoring;
-			}
-		}
-		return null;
-	}
+    private IRefactoring getRefactoringClass(final String refactoringClassName) throws Exception {
+        Collection<IRefactoring> refactorings = AllRefactorings.getAllRefactorings();
+        for (IRefactoring refactoring : refactorings) {
+            if (refactoring.getClass().getSimpleName().equals(refactoringClassName)) {
+                return refactoring;
+            }
+        }
+        return null;
+    }
 
-	private String normalize(String s) {
-		return s.replaceAll("\t", "    ")
-				.replaceAll("(\r\n|\r|\n)", "\n")
-				.trim();
-	}
+    private String normalize(String s) {
+        return s.replaceAll("\t", "    ")
+                .replaceAll("(\r\n|\r|\n)", "\n")
+                .trim();
+    }
 }

@@ -33,8 +33,8 @@ import org.eclipse.jdt.core.dom.CompilationUnit;
  */
 public interface IRefactoring {
 
-	Refactorings getRefactorings(CompilationUnit astRoot);
+    Refactorings getRefactorings(CompilationUnit astRoot);
 
-	void setRefactoringContext(RefactoringContext ctx);
+    void setRefactoringContext(RefactoringContext ctx);
 
 }

@@ -1,34 +1,34 @@
 digraph IfElseIfSample {
 label="IfElseIfSample";
 
-Entry -> _31_8
-_31_8 -> _32_8
-_32_8 -> _33_10 [label="true"];
-_32_8 -> _34_15 [label="false"];
-_33_10 -> _39_8
-_34_15 -> _35_10 [label="true"];
-_34_15 -> _37_10 [label="false"];
-_35_10 -> _39_8
-_37_10 -> _39_8
-_39_8 -> Exit
+Entry -> _31_9
+_31_9 -> _32_9
+_32_9 -> _33_13 [label="true"];
+_32_9 -> _34_16 [label="false"];
+_33_13 -> _39_9
+_34_16 -> _35_13 [label="true"];
+_34_16 -> _37_13 [label="false"];
+_35_13 -> _39_9
+_37_13 -> _39_9
+_39_9 -> Exit
 
-subgraph cluster_1154_public_int_sample_boolean_b1_boolean_b2__ {
+subgraph cluster_1157_public_int_sample_boolean_b1_boolean_b2__ {
 label="public int sample(boolean b1,boolean b2){";
 Entry [style="filled" fillcolor="red"   fontcolor="white"];
-_31_8 [label="int i;\n(31,8)"];
-_39_8 [label="return i;\n(39,8)"];
+_31_9 [label="int i;\n(31,9)"];
+_39_9 [label="return i;\n(39,9)"];
 Exit  [style="filled" fillcolor="black" fontcolor="white"];
 
-subgraph cluster_1209_if__b1___ {
+subgraph cluster_1224_if__b1___ {
 label="if (b1) {";
-_32_8 [label="if (b1) {\n(32,8)",shape="triangle"];
-_33_10 [label="i=0;\n(33,10)"];
+_32_9 [label="if (b1) {\n(32,9)",shape="triangle"];
+_33_13 [label="i=0;\n(33,13)"];
 
-subgraph cluster_1238_if__b2___ {
+subgraph cluster_1268_if__b2___ {
 label="if (b2) {";
-_34_15 [label="if (b2) {\n(34,15)",shape="triangle"];
-_35_10 [label="i=1;\n(35,10)"];
-_37_10 [label="i=2;\n(37,10)"];
+_34_16 [label="if (b2) {\n(34,16)",shape="triangle"];
+_35_13 [label="i=1;\n(35,13)"];
+_37_13 [label="i=2;\n(37,13)"];
 }
 }
 }

@@ -43,74 +43,74 @@ import org.eclipse.jdt.core.dom.Modifier.ModifierKeyword;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
 public class RemoveFieldsDefaultValuesRefactoring extends ASTVisitor implements
-		IJavaRefactoring {
+        IJavaRefactoring {
 
-	private RefactoringContext ctx;
+    private RefactoringContext ctx;
 
-	public RemoveFieldsDefaultValuesRefactoring() {
-		super();
-	}
+    public RemoveFieldsDefaultValuesRefactoring() {
+        super();
+    }
 
-	public void setRefactoringContext(RefactoringContext ctx) {
-		this.ctx = ctx;
-	}
+    public void setRefactoringContext(RefactoringContext ctx) {
+        this.ctx = ctx;
+    }
 
-	@Override
-	public boolean visit(FieldDeclaration node) {
-		final ITypeBinding fieldType = node.getType().resolveBinding();
-		if (fieldType == null || isConstant(node)) {
-			return VISIT_SUBTREE;
-		}
-		boolean visitSubtree = VISIT_SUBTREE;
-		for (VariableDeclarationFragment vdf : fragments(node)) {
-			if (vdf.getInitializer() != null) {
-				final Object val = vdf.getInitializer().resolveConstantExpressionValue();
-				if (val == null
-						&& !fieldType.isPrimitive()) {
-					this.ctx.getRefactorings().remove(vdf.getInitializer());
-					visitSubtree = DO_NOT_VISIT_SUBTREE;
-				} else if (val != null
-						&& fieldType.isPrimitive()
-						&& isPrimitiveDefaultValue(val)) {
-					this.ctx.getRefactorings().remove(vdf.getInitializer());
-					visitSubtree = DO_NOT_VISIT_SUBTREE;
-				}
-			}
-		}
-		return visitSubtree;
-	}
+    @Override
+    public boolean visit(FieldDeclaration node) {
+        final ITypeBinding fieldType = node.getType().resolveBinding();
+        if (fieldType == null || isConstant(node)) {
+            return VISIT_SUBTREE;
+        }
+        boolean visitSubtree = VISIT_SUBTREE;
+        for (VariableDeclarationFragment vdf : fragments(node)) {
+            if (vdf.getInitializer() != null) {
+                final Object val = vdf.getInitializer().resolveConstantExpressionValue();
+                if (val == null
+                        && !fieldType.isPrimitive()) {
+                    this.ctx.getRefactorings().remove(vdf.getInitializer());
+                    visitSubtree = DO_NOT_VISIT_SUBTREE;
+                } else if (val != null
+                        && fieldType.isPrimitive()
+                        && isPrimitiveDefaultValue(val)) {
+                    this.ctx.getRefactorings().remove(vdf.getInitializer());
+                    visitSubtree = DO_NOT_VISIT_SUBTREE;
+                }
+            }
+        }
+        return visitSubtree;
+    }
 
-	private boolean isConstant(FieldDeclaration node) {
-		final List<ModifierKeyword> toFind = new LinkedList<ModifierKeyword>();
-		toFind.add(STATIC_KEYWORD);
-		toFind.add(FINAL_KEYWORD);
-		for (IExtendedModifier em : modifiers(node)) {
-			if (em.isModifier()) {
-				toFind.remove(((Modifier) em).getKeyword());
-			}
-		}
-		return toFind.isEmpty();
-	}
+    private boolean isConstant(FieldDeclaration node) {
+        final List<ModifierKeyword> toFind = new LinkedList<ModifierKeyword>();
+        toFind.add(STATIC_KEYWORD);
+        toFind.add(FINAL_KEYWORD);
+        for (IExtendedModifier em : modifiers(node)) {
+            if (em.isModifier()) {
+                toFind.remove(((Modifier) em).getKeyword());
+            }
+        }
+        return toFind.isEmpty();
+    }
 
-	private boolean isPrimitiveDefaultValue(Object val) {
-		if (val instanceof Short
-				|| val instanceof Integer
-				|| val instanceof Long) {
-			return ((Number) val).longValue() == 0;
-		} else if (val instanceof Double
-				|| val instanceof Float) {
-			return ((Number) val).doubleValue() == 0;
-		} else if (val instanceof Boolean) {
-			return Boolean.FALSE.equals(val);
-		} else if (val instanceof Character) {
-			return ((Character) val).charValue() == '\u0000';
-		}
-		return false;
-	}
+    private boolean isPrimitiveDefaultValue(Object val) {
+        if (val instanceof Short
+                || val instanceof Integer
+                || val instanceof Long) {
+            return ((Number) val).longValue() == 0;
+        } else if (val instanceof Double
+                || val instanceof Float) {
+            return ((Number) val).doubleValue() == 0;
+        } else if (val instanceof Boolean) {
+            return Boolean.FALSE.equals(val);
+        } else if (val instanceof Character) {
+            return ((Character) val).charValue() == '\u0000';
+        }
+        return false;
+    }
 
-	public Refactorings getRefactorings(CompilationUnit astRoot) {
-		astRoot.accept(this);
-		return this.ctx.getRefactorings();
-	}
+    public Refactorings getRefactorings(CompilationUnit astRoot) {
+        astRoot.accept(this);
+        return this.ctx.getRefactorings();
+    }
 
 }

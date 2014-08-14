@@ -39,50 +39,50 @@ import org.autorefactor.ui.preferences.PreferenceHelper;
  */
 public class AllRefactorings {
 
-	public static List<IRefactoring> getConfiguredRefactorings() {
-		final PreferenceHelper prefs = AutoRefactorPlugin.getPreferenceHelper();
-		final List<IRefactoring> refactorings = getAllRefactorings();
-		for (final Iterator<IRefactoring> iter = refactorings.iterator(); iter.hasNext();) {
-			final IRefactoring refactoring = iter.next();
-			if (!prefs.addAngleBracketsToStatementBodies()
-				&& refactoring instanceof AddBracketsToControlStatementRefactoring) {
-				iter.remove();
-			}
-		}
-		return refactorings;
-	}
+    public static List<IRefactoring> getConfiguredRefactorings() {
+        final PreferenceHelper prefs = AutoRefactorPlugin.getPreferenceHelper();
+        final List<IRefactoring> refactorings = getAllRefactorings();
+        for (final Iterator<IRefactoring> iter = refactorings.iterator(); iter.hasNext();) {
+            final IRefactoring refactoring = iter.next();
+            if (!prefs.addAngleBracketsToStatementBodies()
+                && refactoring instanceof AddBracketsToControlStatementRefactoring) {
+                iter.remove();
+            }
+        }
+        return refactorings;
+    }
 
-	public static List<IRefactoring> getAllRefactorings() {
-		// TODO JNR Remove reference to Preferences from this method
-		final PreferenceHelper prefs = AutoRefactorPlugin.getPreferenceHelper();
-		return new ArrayList<IRefactoring>(Arrays.<IRefactoring> asList(
-				new VectorOldToNewAPIRefactoring(),
-				new PrimitiveWrapperCreationRefactoring(),
-				new BooleanRefactoring(),
-				new AddBracketsToControlStatementRefactoring(),
-				new InvertEqualsRefactoring(),
-				new SimplifyExpressionRefactoring(prefs.removeThisForNonStaticMethodAccess()),
-				new StringRefactoring(),
-				new BigDecimalRefactoring(),
-				// TODO JNR implement
-				// new ForeachRefactoring(),
-				new DeadCodeEliminationRefactoring(),
-				new CollapseIfStatementRefactoring(),
-				new CommonCodeInIfElseStatementRefactoring(),
-				// TODO JNR complete it
-				// new GenerecizeRefactoring(),
-				new CollectionAddAllRefactoring(),
-				new IfStatementRefactoring(),
-				// TODO JNR implement
-				// new RemoveStupidIdiomaticPatternRefactoring(),
-				// TODO JNR - to be completed
-				// new ReduceVariableScopeRefactoring(),
-				new StringBuilderRefactoring(),
-				new CommentsRefactoring(),
-				new RemoveFieldsDefaultValuesRefactoring(),
-				new RemoveUnnecessaryLocalBeforeReturnRefactoring(),
-				new RemoveUselessModifiersRefactoring(),
-				new HotSpotIntrinsicedAPIsRefactoring()));
-	}
+    public static List<IRefactoring> getAllRefactorings() {
+        // TODO JNR Remove reference to Preferences from this method
+        final PreferenceHelper prefs = AutoRefactorPlugin.getPreferenceHelper();
+        return new ArrayList<IRefactoring>(Arrays.<IRefactoring> asList(
+                new VectorOldToNewAPIRefactoring(),
+                new PrimitiveWrapperCreationRefactoring(),
+                new BooleanRefactoring(),
+                new AddBracketsToControlStatementRefactoring(),
+                new InvertEqualsRefactoring(),
+                new SimplifyExpressionRefactoring(prefs.removeThisForNonStaticMethodAccess()),
+                new StringRefactoring(),
+                new BigDecimalRefactoring(),
+                // TODO JNR implement
+                // new ForeachRefactoring(),
+                new DeadCodeEliminationRefactoring(),
+                new CollapseIfStatementRefactoring(),
+                new CommonCodeInIfElseStatementRefactoring(),
+                // TODO JNR complete it
+                // new GenerecizeRefactoring(),
+                new CollectionAddAllRefactoring(),
+                new IfStatementRefactoring(),
+                // TODO JNR implement
+                // new RemoveStupidIdiomaticPatternRefactoring(),
+                // TODO JNR - to be completed
+                // new ReduceVariableScopeRefactoring(),
+                new StringBuilderRefactoring(),
+                new CommentsRefactoring(),
+                new RemoveFieldsDefaultValuesRefactoring(),
+                new RemoveUnnecessaryLocalBeforeReturnRefactoring(),
+                new RemoveUselessModifiersRefactoring(),
+                new HotSpotIntrinsicedAPIsRefactoring()));
+    }
 
 }

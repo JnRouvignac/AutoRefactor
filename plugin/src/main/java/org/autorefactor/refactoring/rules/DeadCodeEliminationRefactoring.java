@@ -38,101 +38,101 @@ import static org.autorefactor.refactoring.ASTHelper.*;
  * Removes dead code. Use variable values analysis for determining where code is dead.
  */
 public class DeadCodeEliminationRefactoring extends ASTVisitor implements
-		IJavaRefactoring {
+        IJavaRefactoring {
 
-	private RefactoringContext ctx;
+    private RefactoringContext ctx;
 
-	public DeadCodeEliminationRefactoring() {
-		super();
-	}
+    public DeadCodeEliminationRefactoring() {
+        super();
+    }
 
-	public void setRefactoringContext(RefactoringContext ctx) {
-		this.ctx = ctx;
-	}
+    public void setRefactoringContext(RefactoringContext ctx) {
+        this.ctx = ctx;
+    }
 
-	// TODO JNR
-	// for (false) // impossible iterations
-	// Remove Empty try block?
-	// do this by resolvingConstantValue
+    // TODO JNR
+    // for (false) // impossible iterations
+    // Remove Empty try block?
+    // do this by resolvingConstantValue
 
-	// TODO JNR remove such code:
-	// public void myMethod() {
-	// super.myMethod();
-	// }
-	// only do it when there are no annotations attached to the overriding method.
+    // TODO JNR remove such code:
+    // public void myMethod() {
+    // super.myMethod();
+    // }
+    // only do it when there are no annotations attached to the overriding method.
 
-	@Override
-	public boolean visit(Block node) {
-		if (!statements(node).isEmpty()) {
-			return VISIT_SUBTREE;
-		}
-		final ASTNode parent = node.getParent();
-		if (parent instanceof IfStatement) {
-			final IfStatement is = (IfStatement) parent;
-			if (is.getElseStatement() == node) {
-				this.ctx.getRefactorings().remove(node);
-				return DO_NOT_VISIT_SUBTREE;
-			} // TODO handle empty then clause
-		}
-		return VISIT_SUBTREE;
-	}
+    @Override
+    public boolean visit(Block node) {
+        if (!statements(node).isEmpty()) {
+            return VISIT_SUBTREE;
+        }
+        final ASTNode parent = node.getParent();
+        if (parent instanceof IfStatement) {
+            final IfStatement is = (IfStatement) parent;
+            if (is.getElseStatement() == node) {
+                this.ctx.getRefactorings().remove(node);
+                return DO_NOT_VISIT_SUBTREE;
+            } // TODO handle empty then clause
+        }
+        return VISIT_SUBTREE;
+    }
 
-	@Override
-	public boolean visit(IfStatement node) {
-		final Object constantCondition =
-				node.getExpression().resolveConstantExpressionValue();
-		final ASTBuilder b = this.ctx.getASTBuilder();
-		if (Boolean.TRUE.equals(constantCondition)) {
-			this.ctx.getRefactorings().replace(node, b.copyStmt(node.getThenStatement()));
-			return DO_NOT_VISIT_SUBTREE;
-		} else if (Boolean.FALSE.equals(constantCondition)) {
-			this.ctx.getRefactorings().replace(node, b.copyStmt(node.getElseStatement()));
-			return DO_NOT_VISIT_SUBTREE;
-		}
-		return VISIT_SUBTREE;
-	}
+    @Override
+    public boolean visit(IfStatement node) {
+        final Object constantCondition =
+                node.getExpression().resolveConstantExpressionValue();
+        final ASTBuilder b = this.ctx.getASTBuilder();
+        if (Boolean.TRUE.equals(constantCondition)) {
+            this.ctx.getRefactorings().replace(node, b.copyStmt(node.getThenStatement()));
+            return DO_NOT_VISIT_SUBTREE;
+        } else if (Boolean.FALSE.equals(constantCondition)) {
+            this.ctx.getRefactorings().replace(node, b.copyStmt(node.getElseStatement()));
+            return DO_NOT_VISIT_SUBTREE;
+        }
+        return VISIT_SUBTREE;
+    }
 
-	@Override
-	public boolean visit(WhileStatement node) {
-		final Object constantCondition =
-				node.getExpression().resolveConstantExpressionValue();
-		if (Boolean.FALSE.equals(constantCondition)) {
-			this.ctx.getRefactorings().remove(node);
-			return DO_NOT_VISIT_SUBTREE;
-		}
-		return VISIT_SUBTREE;
-	}
+    @Override
+    public boolean visit(WhileStatement node) {
+        final Object constantCondition =
+                node.getExpression().resolveConstantExpressionValue();
+        if (Boolean.FALSE.equals(constantCondition)) {
+            this.ctx.getRefactorings().remove(node);
+            return DO_NOT_VISIT_SUBTREE;
+        }
+        return VISIT_SUBTREE;
+    }
 
-	@Override
-	public boolean visit(TryStatement node) {
-		final List<Statement> stmts = asList(node.getBody());
-		if (stmts.isEmpty()) {
-			this.ctx.getRefactorings().remove(node);
-			return DO_NOT_VISIT_SUBTREE;
-		}
-	// }else {
-	// for (CatchClause catchClause : (List<CatchClause>) node.catchClauses()) {
-	// final List<Statement> finallyStmts = asList(catchClause.getBody());
-	// if (finallyStmts.isEmpty()) {
-	// // TODO cannot remove without checking what subsequent catch clauses are
-	// catching
-	// this.ctx.getRefactorings().remove(catchClause);
-	// }
-	// }
-	//
-	// final List<Statement> finallyStmts = asList(node.getFinally());
-	// if (finallyStmts.isEmpty()) {
-	// this.ctx.getRefactorings().remove(node.getFinally());
-	// }
-	// // TODO If all finally and catch clauses have been removed,
-	// // then we can remove the whole try statement and replace it with a simple block
-	// return DO_NOT_VISIT_SUBTREE; // TODO JNR is this correct?
-	// }
-		return VISIT_SUBTREE;
-	}
+    @Override
+    public boolean visit(TryStatement node) {
+        final List<Statement> stmts = asList(node.getBody());
+        if (stmts.isEmpty()) {
+            this.ctx.getRefactorings().remove(node);
+            return DO_NOT_VISIT_SUBTREE;
+        }
+    // }else {
+    // for (CatchClause catchClause : (List<CatchClause>) node.catchClauses()) {
+    // final List<Statement> finallyStmts = asList(catchClause.getBody());
+    // if (finallyStmts.isEmpty()) {
+    // // TODO cannot remove without checking what subsequent catch clauses are
+    // catching
+    // this.ctx.getRefactorings().remove(catchClause);
+    // }
+    // }
+    //
+    // final List<Statement> finallyStmts = asList(node.getFinally());
+    // if (finallyStmts.isEmpty()) {
+    // this.ctx.getRefactorings().remove(node.getFinally());
+    // }
+    // // TODO If all finally and catch clauses have been removed,
+    // // then we can remove the whole try statement and replace it with a simple block
+    // return DO_NOT_VISIT_SUBTREE; // TODO JNR is this correct?
+    // }
+        return VISIT_SUBTREE;
+    }
 
-	public Refactorings getRefactorings(CompilationUnit astRoot) {
-		astRoot.accept(this);
-		return this.ctx.getRefactorings();
-	}
+    public Refactorings getRefactorings(CompilationUnit astRoot) {
+        astRoot.accept(this);
+        return this.ctx.getRefactorings();
+    }
 }

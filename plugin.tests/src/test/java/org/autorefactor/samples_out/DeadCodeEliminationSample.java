@@ -27,61 +27,61 @@ package org.autorefactor.samples_out;
 
 public class DeadCodeEliminationSample {
 
-	private int removeEmptyElseClause(boolean b) {
-		int i = 0;
-		if (b) {
-			i++;
-		}
-		return i;
-	}
+    private int removeEmptyElseClause(boolean b) {
+        int i = 0;
+        if (b) {
+            i++;
+        }
+        return i;
+    }
 
-	private int doesNotKnowHowToRemoveEmptyThenClause(boolean b) {
-		int i = 0;
-		if (b) {
-		} else {
-			i++;
-		}
-		return i;
-	}
+    private int doesNotKnowHowToRemoveEmptyThenClause(boolean b) {
+        int i = 0;
+        if (b) {
+        } else {
+            i++;
+        }
+        return i;
+    }
 
-	private int removeImpossibleIfClauses() {
-		int i = 0;
-		int j = 0;
-		{
-			i++;
-		}
+    private int removeImpossibleIfClauses() {
+        int i = 0;
+        int j = 0;
+        {
+            i++;
+        }
 
-		i++;
+        i++;
 
-		{
-			j++;
-		}
+        {
+            j++;
+        }
 
-		j++;
+        j++;
 
-		return i + j;
-	}
+        return i + j;
+    }
 
 // FIXME compilation error.
 // Following code:
-//	private int removeWhileWithoutIterations() {
-//		int i = 0;
-//		while (false) {
-//			i++;
-//		}
-//		while (false)
-//			i++;
-//		return i;
-//	}
+//    private int removeWhileWithoutIterations() {
+//        int i = 0;
+//        while (false) {
+//            i++;
+//        }
+//        while (false)
+//            i++;
+//        return i;
+//    }
 // Should become
-//	private int removeWhileWithoutIterations() {
-//		int i = 0;
-//		return i;
-//	}
+//    private int removeWhileWithoutIterations() {
+//        int i = 0;
+//        return i;
+//    }
 
-	private int removeEmptyTry() {
-		int i = 0;
-		return i;
-	}
+    private int removeEmptyTry() {
+        int i = 0;
+        return i;
+    }
 
 }

@@ -33,34 +33,34 @@ import org.eclipse.jdt.core.ICompilationUnit;
  */
 public class TestCase {
 
-	public final String sampleName;
-	public ICompilationUnit sampleIn;
-	public ICompilationUnit sampleOut;
-	public IRefactoring refactoring;
+    public final String sampleName;
+    public ICompilationUnit sampleIn;
+    public ICompilationUnit sampleOut;
+    public IRefactoring refactoring;
 
-	public TestCase(String sampleName) {
-		this.sampleName = sampleName;
-	}
+    public TestCase(String sampleName) {
+        this.sampleName = sampleName;
+    }
 
-	/** {@inheritDoc} */
-	@Override
-	public String toString() {
-		return "Tests for sample: " + sampleName + " (" + getINAndOUT(true)
-				+ ") with refactoring: "
-				+ (refactoring == null ? "" : refactoring.getClass().getSimpleName());
-	}
+    /** {@inheritDoc} */
+    @Override
+    public String toString() {
+        return "Tests for sample: " + sampleName + " (" + getINAndOUT(true)
+                + ") with refactoring: "
+                + (refactoring == null ? "" : refactoring.getClass().getSimpleName());
+    }
 
-	public String getINAndOUT(boolean presence) {
-		if ((presence && sampleIn != null) || (!presence && sampleIn == null)) {
-			if ((presence && sampleOut != null) || (!presence && sampleOut == null)) {
-				return "IN and OUT";
-			}
-			return "IN";
-		}
-		if ((presence && sampleOut != null) || (!presence && sampleOut == null)) {
-			return "OUT";
-		}
-		return "no sample";
-	}
+    public String getINAndOUT(boolean presence) {
+        if ((presence && sampleIn != null) || (!presence && sampleIn == null)) {
+            if ((presence && sampleOut != null) || (!presence && sampleOut == null)) {
+                return "IN and OUT";
+            }
+            return "IN";
+        }
+        if ((presence && sampleOut != null) || (!presence && sampleOut == null)) {
+            return "OUT";
+        }
+        return "no sample";
+    }
 
 }

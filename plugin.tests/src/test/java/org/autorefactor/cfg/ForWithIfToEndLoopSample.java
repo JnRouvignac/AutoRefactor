@@ -27,15 +27,15 @@ package org.autorefactor.cfg;
 
 public class ForWithIfToEndLoopSample {
 
-	public int sample(String[] strings, boolean b) {
-		int i = 0;
-		for (int j = 0; j < strings.length; j++) {
-			i++;
-			if (b) {
-				j++;
-			}
-		}
-		return i;
-	}
+    public int sample(String[] strings, boolean b) {
+        int i = 0;
+        for (int j = 0; j < strings.length; j++) {
+            i++;
+            if (b) {
+                j++;
+            }
+        }
+        return i;
+    }
 
 }

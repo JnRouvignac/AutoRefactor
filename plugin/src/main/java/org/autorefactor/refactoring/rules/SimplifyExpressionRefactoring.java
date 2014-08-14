@@ -45,415 +45,415 @@ import static org.autorefactor.refactoring.ASTHelper.*;
  * </ul>
  */
 public class SimplifyExpressionRefactoring extends ASTVisitor implements
-		IJavaRefactoring {
+        IJavaRefactoring {
 
-	private RefactoringContext ctx;
-	private int javaMinorVersion;
-	private final boolean removeThisForNonStaticMethodAccess;
+    private RefactoringContext ctx;
+    private int javaMinorVersion;
+    private final boolean removeThisForNonStaticMethodAccess;
 
-	public SimplifyExpressionRefactoring(boolean removeThisForNonStaticMethodAccess) {
-		this.removeThisForNonStaticMethodAccess = removeThisForNonStaticMethodAccess;
-	}
+    public SimplifyExpressionRefactoring(boolean removeThisForNonStaticMethodAccess) {
+        this.removeThisForNonStaticMethodAccess = removeThisForNonStaticMethodAccess;
+    }
 
-	public void setRefactoringContext(RefactoringContext ctx) {
-		this.ctx = ctx;
-		this.javaMinorVersion = this.ctx.getJavaSERelease().getMinorVersion();
-	}
+    public void setRefactoringContext(RefactoringContext ctx) {
+        this.ctx = ctx;
+        this.javaMinorVersion = this.ctx.getJavaSERelease().getMinorVersion();
+    }
 
-	// TODO JNR remove avoidable boxing / unboxing
+    // TODO JNR remove avoidable boxing / unboxing
 
-	// TODO Very few parenthesized expressions are actually needed. They are:
-	// 1) inside InfixExpressions with logical operators (&&, ||, etc.)
-	// Sometimes needed to explicit code, some like it like that too
-	// 2) Inside String concatenations if they hold an InfixExpression that does
-	// not resolve to String (what about PrefixExpression and
-	// PostFixExpression?)
-	// 3) Around CastExpression
-	// Any others?
+    // TODO Very few parenthesized expressions are actually needed. They are:
+    // 1) inside InfixExpressions with logical operators (&&, ||, etc.)
+    // Sometimes needed to explicit code, some like it like that too
+    // 2) Inside String concatenations if they hold an InfixExpression that does
+    // not resolve to String (what about PrefixExpression and
+    // PostFixExpression?)
+    // 3) Around CastExpression
+    // Any others?
 
-	// TODO JNR !true => false and !false => true
+    // TODO JNR !true => false and !false => true
 
-	// TODO JNR String s = "some " + " string " + "" + ( "fhj" + "prout" );
+    // TODO JNR String s = "some " + " string " + "" + ( "fhj" + "prout" );
 
-	@Override
-	public boolean visit(ParenthesizedExpression node) {
-		final Expression innerExpr = getExpressionWithoutParentheses(node);
-		if (innerExpr != node) {
-			final Expression innerExprCopy = copySubtree(this.ctx.getAST(), innerExpr);
-			this.ctx.getRefactorings().replace(node, innerExprCopy);
-			innerExprCopy.accept(this);
-			return DO_NOT_VISIT_SUBTREE;
-		}
-		return VISIT_SUBTREE;
-	}
+    @Override
+    public boolean visit(ParenthesizedExpression node) {
+        final Expression innerExpr = getExpressionWithoutParentheses(node);
+        if (innerExpr != node) {
+            final Expression innerExprCopy = copySubtree(this.ctx.getAST(), innerExpr);
+            this.ctx.getRefactorings().replace(node, innerExprCopy);
+            innerExprCopy.accept(this);
+            return DO_NOT_VISIT_SUBTREE;
+        }
+        return VISIT_SUBTREE;
+    }
 
-	private Expression getExpressionWithoutParentheses(ParenthesizedExpression node) {
-		final ASTNode parent = node.getParent();
-		final Expression innerExpr = node.getExpression();
-		if (innerExpr instanceof ParenthesizedExpression) {
-			return getExpressionWithoutParentheses((ParenthesizedExpression) innerExpr);
-		}
-		if (parent instanceof InfixExpression) {
-			final InfixExpression parentInfixExpr = (InfixExpression) parent;
-			if (innerExpr instanceof InfixExpression) {
-				final Operator innerOp = ((InfixExpression) innerExpr).getOperator();
-				if (innerOp == parentInfixExpr.getOperator()
-						&& OperatorEnum.isAssociative(innerOp)
-						// Leave String concatenations with mixed type
-						// to other if statements in this method.
-						&& innerExpr.resolveTypeBinding() != null
-						&& innerExpr.resolveTypeBinding().equals(
-								parentInfixExpr.resolveTypeBinding())) {
-					return innerExpr;
-				}
-			}
-		}
-		if (isHardToRead(innerExpr, parent)) {
-			return node;
-		}
-		if (isUselessParenthesesInStatement(parent, node)) {
-			return innerExpr;
-		}
-		final int compareTo = OperatorEnum.compareTo(innerExpr, parent);
-		if (compareTo < 0) {
-			return node;
-		} else if (compareTo > 0) {
-			return innerExpr;
-		}
-		if (
-		// TODO JNR can we revert the condition in the InfixExpression?
-		// parentheses are sometimes needed to explicit code,
-		// some like it like that
-		innerExpr instanceof InfixExpression
-		// TODO JNR add additional code to check if the cast is really required
-		// or if it can be removed.
-				|| innerExpr instanceof CastExpression) {
-			return node;
-		}
-		return innerExpr;
-	}
+    private Expression getExpressionWithoutParentheses(ParenthesizedExpression node) {
+        final ASTNode parent = node.getParent();
+        final Expression innerExpr = node.getExpression();
+        if (innerExpr instanceof ParenthesizedExpression) {
+            return getExpressionWithoutParentheses((ParenthesizedExpression) innerExpr);
+        }
+        if (parent instanceof InfixExpression) {
+            final InfixExpression parentInfixExpr = (InfixExpression) parent;
+            if (innerExpr instanceof InfixExpression) {
+                final Operator innerOp = ((InfixExpression) innerExpr).getOperator();
+                if (innerOp == parentInfixExpr.getOperator()
+                        && OperatorEnum.isAssociative(innerOp)
+                        // Leave String concatenations with mixed type
+                        // to other if statements in this method.
+                        && innerExpr.resolveTypeBinding() != null
+                        && innerExpr.resolveTypeBinding().equals(
+                                parentInfixExpr.resolveTypeBinding())) {
+                    return innerExpr;
+                }
+            }
+        }
+        if (isHardToRead(innerExpr, parent)) {
+            return node;
+        }
+        if (isUselessParenthesesInStatement(parent, node)) {
+            return innerExpr;
+        }
+        final int compareTo = OperatorEnum.compareTo(innerExpr, parent);
+        if (compareTo < 0) {
+            return node;
+        } else if (compareTo > 0) {
+            return innerExpr;
+        }
+        if (
+        // TODO JNR can we revert the condition in the InfixExpression?
+        // parentheses are sometimes needed to explicit code,
+        // some like it like that
+        innerExpr instanceof InfixExpression
+        // TODO JNR add additional code to check if the cast is really required
+        // or if it can be removed.
+                || innerExpr instanceof CastExpression) {
+            return node;
+        }
+        return innerExpr;
+    }
 
-	/**
-	 * Returns whether the supplied expression is complex enough to read.
-	 *
-	 * @param innerExpr
-	 *          the inner expression to test for ease of read
-	 * @param parent
-	 *          the parent node to test for ease of read
-	 * @return true if the expressions is hard to read, false otherwise
-	 */
-	private boolean isHardToRead(final Expression innerExpr, final ASTNode parent) {
-		if (parent instanceof InfixExpression) {
-			if (innerExpr instanceof InfixExpression) {
-				final Operator innerOp = ((InfixExpression) innerExpr).getOperator();
-				final Operator parentOp = ((InfixExpression) parent).getOperator();
-				return Operator.EQUALS.equals(parentOp)
-					|| (Operator.CONDITIONAL_AND.equals(innerOp) && Operator.CONDITIONAL_OR.equals(parentOp))
-					|| (Operator.AND.equals(innerOp) && Operator.OR.equals(parentOp))
-					|| (Operator.AND.equals(innerOp) && Operator.XOR.equals(parentOp))
-					|| (Operator.XOR.equals(innerOp) && Operator.OR.equals(parentOp));
-			}
-		} else if (parent instanceof ConditionalExpression) {
-			return innerExpr instanceof ConditionalExpression
-				|| innerExpr instanceof Assignment
-				|| innerExpr instanceof InstanceofExpression;
-		}
-		return false;
-	}
+    /**
+     * Returns whether the supplied expression is complex enough to read.
+     *
+     * @param innerExpr
+     *          the inner expression to test for ease of read
+     * @param parent
+     *          the parent node to test for ease of read
+     * @return true if the expressions is hard to read, false otherwise
+     */
+    private boolean isHardToRead(final Expression innerExpr, final ASTNode parent) {
+        if (parent instanceof InfixExpression) {
+            if (innerExpr instanceof InfixExpression) {
+                final Operator innerOp = ((InfixExpression) innerExpr).getOperator();
+                final Operator parentOp = ((InfixExpression) parent).getOperator();
+                return Operator.EQUALS.equals(parentOp)
+                    || (Operator.CONDITIONAL_AND.equals(innerOp) && Operator.CONDITIONAL_OR.equals(parentOp))
+                    || (Operator.AND.equals(innerOp) && Operator.OR.equals(parentOp))
+                    || (Operator.AND.equals(innerOp) && Operator.XOR.equals(parentOp))
+                    || (Operator.XOR.equals(innerOp) && Operator.OR.equals(parentOp));
+            }
+        } else if (parent instanceof ConditionalExpression) {
+            return innerExpr instanceof ConditionalExpression
+                || innerExpr instanceof Assignment
+                || innerExpr instanceof InstanceofExpression;
+        }
+        return false;
+    }
 
-	private boolean isUselessParenthesesInStatement(final ASTNode parent,
-			ParenthesizedExpression node) {
-		if (parent instanceof Expression) {
-			if (parent instanceof Assignment) {
-				Assignment a = (Assignment) parent;
-				return node.equals(a.getRightHandSide());
-			} else if (parent instanceof MethodInvocation) {
-				MethodInvocation mi = (MethodInvocation) parent;
-				return arguments(mi).contains(node);
-			}
-		} else if (parent instanceof Statement) {
-			if (parent instanceof IfStatement) {
-				IfStatement is = (IfStatement) parent;
-				return node.equals(is.getExpression());
-			} else if (parent instanceof WhileStatement) {
-				WhileStatement ws = (WhileStatement) parent;
-				return node.equals(ws.getExpression());
-			} else if (parent instanceof DoStatement) {
-				DoStatement ds = (DoStatement) parent;
-				return node.equals(ds.getExpression());
-			} else if (parent instanceof ReturnStatement) {
-				ReturnStatement rs = (ReturnStatement) parent;
-				return node.equals(rs.getExpression());
-			}
-		} else if (parent instanceof VariableDeclarationFragment) {
-			VariableDeclarationFragment vdf = (VariableDeclarationFragment) parent;
-			return node.equals(vdf.getInitializer());
-		}
-		return false;
-	}
+    private boolean isUselessParenthesesInStatement(final ASTNode parent,
+            ParenthesizedExpression node) {
+        if (parent instanceof Expression) {
+            if (parent instanceof Assignment) {
+                Assignment a = (Assignment) parent;
+                return node.equals(a.getRightHandSide());
+            } else if (parent instanceof MethodInvocation) {
+                MethodInvocation mi = (MethodInvocation) parent;
+                return arguments(mi).contains(node);
+            }
+        } else if (parent instanceof Statement) {
+            if (parent instanceof IfStatement) {
+                IfStatement is = (IfStatement) parent;
+                return node.equals(is.getExpression());
+            } else if (parent instanceof WhileStatement) {
+                WhileStatement ws = (WhileStatement) parent;
+                return node.equals(ws.getExpression());
+            } else if (parent instanceof DoStatement) {
+                DoStatement ds = (DoStatement) parent;
+                return node.equals(ds.getExpression());
+            } else if (parent instanceof ReturnStatement) {
+                ReturnStatement rs = (ReturnStatement) parent;
+                return node.equals(rs.getExpression());
+            }
+        } else if (parent instanceof VariableDeclarationFragment) {
+            VariableDeclarationFragment vdf = (VariableDeclarationFragment) parent;
+            return node.equals(vdf.getInitializer());
+        }
+        return false;
+    }
 
-	@Override
-	public boolean visit(MethodInvocation node) {
-		if (node.getExpression() == null) {
-			// TODO JNR handle same class calls and sub classes
-			return VISIT_SUBTREE;
-		}
-		if (isMethod(node, "java.lang.Comparable", "compareTo", "java.lang.Object")) {
-			return replaceInfixExpressionIfNeeded(node.getParent());
-		} else if (isMethod(node, "java.lang.Comparator", "compare", "java.lang.Object", "java.lang.Object")) {
-			return replaceInfixExpressionIfNeeded(node.getParent());
-		} else if (javaMinorVersion >= 2
-				&& isMethod(node, "java.lang.String", "compareToIgnoreCase", "java.lang.String")) {
-			return replaceInfixExpressionIfNeeded(node.getParent());
-		} else if (this.removeThisForNonStaticMethodAccess) {
-			ThisExpression te = as(node.getExpression(), ThisExpression.class);
-			if (te != null && thisExpressionRefersToCurrentType(te.getQualifier(), node)) {
-				// remove useless thisExpressions
-				this.ctx.getRefactorings().remove(node.getExpression());
-				return DO_NOT_VISIT_SUBTREE;
-			}
-		}
-		return VISIT_SUBTREE;
-	}
+    @Override
+    public boolean visit(MethodInvocation node) {
+        if (node.getExpression() == null) {
+            // TODO JNR handle same class calls and sub classes
+            return VISIT_SUBTREE;
+        }
+        if (isMethod(node, "java.lang.Comparable", "compareTo", "java.lang.Object")) {
+            return replaceInfixExpressionIfNeeded(node.getParent());
+        } else if (isMethod(node, "java.lang.Comparator", "compare", "java.lang.Object", "java.lang.Object")) {
+            return replaceInfixExpressionIfNeeded(node.getParent());
+        } else if (javaMinorVersion >= 2
+                && isMethod(node, "java.lang.String", "compareToIgnoreCase", "java.lang.String")) {
+            return replaceInfixExpressionIfNeeded(node.getParent());
+        } else if (this.removeThisForNonStaticMethodAccess) {
+            ThisExpression te = as(node.getExpression(), ThisExpression.class);
+            if (te != null && thisExpressionRefersToCurrentType(te.getQualifier(), node)) {
+                // remove useless thisExpressions
+                this.ctx.getRefactorings().remove(node.getExpression());
+                return DO_NOT_VISIT_SUBTREE;
+            }
+        }
+        return VISIT_SUBTREE;
+    }
 
-	private boolean replaceInfixExpressionIfNeeded(ASTNode expr) {
-		if (expr instanceof ParenthesizedExpression) {
-			return replaceInfixExpressionIfNeeded(expr.getParent());
-		} else if (expr instanceof InfixExpression) {
-			final InfixExpression ie = (InfixExpression) expr;
-			checkNoExtendedOperands(ie);
-			final Object value = ie.getRightOperand()
-					.resolveConstantExpressionValue();
-			if (value instanceof Number) {
-				final Number nb = (Integer) value;
-				if (nb.doubleValue() == 0) {
-					return VISIT_SUBTREE;
-				}
-				if (Operator.EQUALS.equals(ie.getOperator())) {
-					if (nb.doubleValue() < 0) {
-						final InfixExpression newIe = getNewInfixExpression(ie);
-						newIe.setOperator(Operator.LESS);
-						this.ctx.getRefactorings().replace(ie, newIe);
-						return DO_NOT_VISIT_SUBTREE;
-					} else if (nb.doubleValue() > 0) {
-						final InfixExpression newIe = getNewInfixExpression(ie);
-						newIe.setOperator(Operator.GREATER);
-						this.ctx.getRefactorings().replace(ie, newIe);
-						return DO_NOT_VISIT_SUBTREE;
-					}
-				} else if (Operator.NOT_EQUALS.equals(ie.getOperator())) {
-					if (nb.doubleValue() < 0) {
-						final InfixExpression newIe = getNewInfixExpression(ie);
-						newIe.setOperator(Operator.GREATER_EQUALS);
-						this.ctx.getRefactorings().replace(ie, newIe);
-						return DO_NOT_VISIT_SUBTREE;
-					} else if (nb.doubleValue() > 0) {
-						final InfixExpression newIe = getNewInfixExpression(ie);
-						newIe.setOperator(Operator.LESS_EQUALS);
-						this.ctx.getRefactorings().replace(ie, newIe);
-						return DO_NOT_VISIT_SUBTREE;
-					}
-				}
-			}
-		}
-		return VISIT_SUBTREE;
-	}
+    private boolean replaceInfixExpressionIfNeeded(ASTNode expr) {
+        if (expr instanceof ParenthesizedExpression) {
+            return replaceInfixExpressionIfNeeded(expr.getParent());
+        } else if (expr instanceof InfixExpression) {
+            final InfixExpression ie = (InfixExpression) expr;
+            checkNoExtendedOperands(ie);
+            final Object value = ie.getRightOperand()
+                    .resolveConstantExpressionValue();
+            if (value instanceof Number) {
+                final Number nb = (Integer) value;
+                if (nb.doubleValue() == 0) {
+                    return VISIT_SUBTREE;
+                }
+                if (Operator.EQUALS.equals(ie.getOperator())) {
+                    if (nb.doubleValue() < 0) {
+                        final InfixExpression newIe = getNewInfixExpression(ie);
+                        newIe.setOperator(Operator.LESS);
+                        this.ctx.getRefactorings().replace(ie, newIe);
+                        return DO_NOT_VISIT_SUBTREE;
+                    } else if (nb.doubleValue() > 0) {
+                        final InfixExpression newIe = getNewInfixExpression(ie);
+                        newIe.setOperator(Operator.GREATER);
+                        this.ctx.getRefactorings().replace(ie, newIe);
+                        return DO_NOT_VISIT_SUBTREE;
+                    }
+                } else if (Operator.NOT_EQUALS.equals(ie.getOperator())) {
+                    if (nb.doubleValue() < 0) {
+                        final InfixExpression newIe = getNewInfixExpression(ie);
+                        newIe.setOperator(Operator.GREATER_EQUALS);
+                        this.ctx.getRefactorings().replace(ie, newIe);
+                        return DO_NOT_VISIT_SUBTREE;
+                    } else if (nb.doubleValue() > 0) {
+                        final InfixExpression newIe = getNewInfixExpression(ie);
+                        newIe.setOperator(Operator.LESS_EQUALS);
+                        this.ctx.getRefactorings().replace(ie, newIe);
+                        return DO_NOT_VISIT_SUBTREE;
+                    }
+                }
+            }
+        }
+        return VISIT_SUBTREE;
+    }
 
-	private InfixExpression getNewInfixExpression(final InfixExpression ie) {
-		final AST ast = this.ctx.getAST();
-		final InfixExpression newIe = ast.newInfixExpression();
-		newIe.setLeftOperand(copySubtree(ast, ie.getLeftOperand()));
-		newIe.setRightOperand(ast.newNumberLiteral("0"));
-		return newIe;
-	}
+    private InfixExpression getNewInfixExpression(final InfixExpression ie) {
+        final AST ast = this.ctx.getAST();
+        final InfixExpression newIe = ast.newInfixExpression();
+        newIe.setLeftOperand(copySubtree(ast, ie.getLeftOperand()));
+        newIe.setRightOperand(ast.newNumberLiteral("0"));
+        return newIe;
+    }
 
-	@Override
-	public boolean visit(InfixExpression node) {
-		final Expression lhs = node.getLeftOperand();
-		final Expression rhs = node.getRightOperand();
-		final Operator operator = node.getOperator();
-		final Object lhsConstantValue = lhs.resolveConstantExpressionValue();
-		if (Operator.CONDITIONAL_OR.equals(operator)) {
-			if (Boolean.TRUE.equals(lhsConstantValue)) {
-				replaceByCopy(node, lhs);
-				return DO_NOT_VISIT_SUBTREE;
-			} else if (Boolean.FALSE.equals(lhsConstantValue)) {
-				checkNoExtendedOperands(node);
-				replaceByCopy(node, rhs);
-				return DO_NOT_VISIT_SUBTREE;
-			}
-		} else if (Operator.CONDITIONAL_AND.equals(operator)) {
-			if (Boolean.TRUE.equals(lhsConstantValue)) {
-				checkNoExtendedOperands(node);
-				replaceByCopy(node, rhs);
-				return DO_NOT_VISIT_SUBTREE;
-			} else if (Boolean.FALSE.equals(lhsConstantValue)) {
-				replaceByCopy(node, lhs);
-				return DO_NOT_VISIT_SUBTREE;
-			} else {
-				Expression nullCheckedExpression = getNullCheckedExpression(lhs);
-				if (nullCheckedExpression != null) {
-					if (isNullCheckRedundant(rhs, nullCheckedExpression)) {
-						checkNoExtendedOperands(node);
-						replaceByCopy(node, rhs);
-						return DO_NOT_VISIT_SUBTREE;
-					}
-				} else {
-					nullCheckedExpression = getNullCheckedExpression(rhs);
-					if (isNullCheckRedundant(lhs, nullCheckedExpression)) {
-						replaceByCopy(node, lhs);
-						return DO_NOT_VISIT_SUBTREE;
-					}
-				}
-			}
-		} else if (Operator.EQUALS.equals(operator)) {
-			boolean result = VISIT_SUBTREE;
-			final Boolean blo = getBooleanLiteral(lhs);
-			final Boolean bro = getBooleanLiteral(rhs);
-			if (blo != null) {
-				checkNoExtendedOperands(node);
-				result = replace(node, blo.booleanValue(), rhs);
-			} else if (bro != null) {
-				result = replace(node, bro.booleanValue(), lhs);
-			}
-			if (result == DO_NOT_VISIT_SUBTREE) {
-				return DO_NOT_VISIT_SUBTREE;
-			}
-		} else if (Operator.NOT_EQUALS.equals(operator)) {
-			boolean continueVisit = VISIT_SUBTREE;
-			final Boolean blo = getBooleanLiteral(lhs);
-			final Boolean bro = getBooleanLiteral(rhs);
-			if (blo != null) {
-				checkNoExtendedOperands(node);
-				continueVisit = replace(node, !blo.booleanValue(), rhs);
-			} else if (bro != null) {
-				continueVisit = replace(node, !bro.booleanValue(), lhs);
-			}
-			if (!continueVisit) {
-				return DO_NOT_VISIT_SUBTREE;
-			}
-		}
+    @Override
+    public boolean visit(InfixExpression node) {
+        final Expression lhs = node.getLeftOperand();
+        final Expression rhs = node.getRightOperand();
+        final Operator operator = node.getOperator();
+        final Object lhsConstantValue = lhs.resolveConstantExpressionValue();
+        if (Operator.CONDITIONAL_OR.equals(operator)) {
+            if (Boolean.TRUE.equals(lhsConstantValue)) {
+                replaceByCopy(node, lhs);
+                return DO_NOT_VISIT_SUBTREE;
+            } else if (Boolean.FALSE.equals(lhsConstantValue)) {
+                checkNoExtendedOperands(node);
+                replaceByCopy(node, rhs);
+                return DO_NOT_VISIT_SUBTREE;
+            }
+        } else if (Operator.CONDITIONAL_AND.equals(operator)) {
+            if (Boolean.TRUE.equals(lhsConstantValue)) {
+                checkNoExtendedOperands(node);
+                replaceByCopy(node, rhs);
+                return DO_NOT_VISIT_SUBTREE;
+            } else if (Boolean.FALSE.equals(lhsConstantValue)) {
+                replaceByCopy(node, lhs);
+                return DO_NOT_VISIT_SUBTREE;
+            } else {
+                Expression nullCheckedExpression = getNullCheckedExpression(lhs);
+                if (nullCheckedExpression != null) {
+                    if (isNullCheckRedundant(rhs, nullCheckedExpression)) {
+                        checkNoExtendedOperands(node);
+                        replaceByCopy(node, rhs);
+                        return DO_NOT_VISIT_SUBTREE;
+                    }
+                } else {
+                    nullCheckedExpression = getNullCheckedExpression(rhs);
+                    if (isNullCheckRedundant(lhs, nullCheckedExpression)) {
+                        replaceByCopy(node, lhs);
+                        return DO_NOT_VISIT_SUBTREE;
+                    }
+                }
+            }
+        } else if (Operator.EQUALS.equals(operator)) {
+            boolean result = VISIT_SUBTREE;
+            final Boolean blo = getBooleanLiteral(lhs);
+            final Boolean bro = getBooleanLiteral(rhs);
+            if (blo != null) {
+                checkNoExtendedOperands(node);
+                result = replace(node, blo.booleanValue(), rhs);
+            } else if (bro != null) {
+                result = replace(node, bro.booleanValue(), lhs);
+            }
+            if (result == DO_NOT_VISIT_SUBTREE) {
+                return DO_NOT_VISIT_SUBTREE;
+            }
+        } else if (Operator.NOT_EQUALS.equals(operator)) {
+            boolean continueVisit = VISIT_SUBTREE;
+            final Boolean blo = getBooleanLiteral(lhs);
+            final Boolean bro = getBooleanLiteral(rhs);
+            if (blo != null) {
+                checkNoExtendedOperands(node);
+                continueVisit = replace(node, !blo.booleanValue(), rhs);
+            } else if (bro != null) {
+                continueVisit = replace(node, !bro.booleanValue(), lhs);
+            }
+            if (!continueVisit) {
+                return DO_NOT_VISIT_SUBTREE;
+            }
+        }
 
-		if (shouldAddParentheses(node, Operator.CONDITIONAL_AND, Operator.CONDITIONAL_OR)
-				|| shouldAddParentheses(node, Operator.AND, Operator.XOR)
-				|| shouldAddParentheses(node, Operator.AND, Operator.OR)
-				|| shouldAddParentheses(node, Operator.XOR, Operator.OR)) {
-			addParentheses(node);
-			return DO_NOT_VISIT_SUBTREE;
-		}
-		return VISIT_SUBTREE;
-	}
+        if (shouldAddParentheses(node, Operator.CONDITIONAL_AND, Operator.CONDITIONAL_OR)
+                || shouldAddParentheses(node, Operator.AND, Operator.XOR)
+                || shouldAddParentheses(node, Operator.AND, Operator.OR)
+                || shouldAddParentheses(node, Operator.XOR, Operator.OR)) {
+            addParentheses(node);
+            return DO_NOT_VISIT_SUBTREE;
+        }
+        return VISIT_SUBTREE;
+    }
 
-	private boolean shouldAddParentheses(InfixExpression node, Operator opNode, Operator opParent) {
-		final Operator operator = node.getOperator();
-		if (opNode.equals(operator) && node.getParent() instanceof InfixExpression) {
-			InfixExpression ie = (InfixExpression) node.getParent();
-			return opParent.equals(ie.getOperator());
-		}
-		return false;
-	}
+    private boolean shouldAddParentheses(InfixExpression node, Operator opNode, Operator opParent) {
+        final Operator operator = node.getOperator();
+        if (opNode.equals(operator) && node.getParent() instanceof InfixExpression) {
+            InfixExpression ie = (InfixExpression) node.getParent();
+            return opParent.equals(ie.getOperator());
+        }
+        return false;
+    }
 
-	private void addParentheses(Expression e) {
-		final ASTBuilder b = this.ctx.getASTBuilder();
-		this.ctx.getRefactorings().replace(e, b.parenthesize(b.copyExpr(e)));
-	}
+    private void addParentheses(Expression e) {
+        final ASTBuilder b = this.ctx.getASTBuilder();
+        this.ctx.getRefactorings().replace(e, b.parenthesize(b.copyExpr(e)));
+    }
 
-	/**
-	 * Extended operands are used for deeply nested expressions, mostly string concatenation expressions.
-	 * <p>
-	 * This will be implemented only if somebody comes up with code where the runtime exception is thrown.
-	 * </p>
-	 *
-	 * @see <a href="http://publib.boulder.ibm.com/infocenter/iadthelp/v6r0/topic/org.eclipse.jdt.doc.isv/reference/api/org/eclipse/jdt/core/dom/InfixExpression.html#extendedOperands()">
-	 */
-	private void checkNoExtendedOperands(InfixExpression node) {
-		if (!hasType(node, "java.lang.String") && !node.extendedOperands().isEmpty()) {
-			throw new NotImplementedException("for extended operands");
-		}
-	}
+    /**
+     * Extended operands are used for deeply nested expressions, mostly string concatenation expressions.
+     * <p>
+     * This will be implemented only if somebody comes up with code where the runtime exception is thrown.
+     * </p>
+     *
+     * @see <a href="http://publib.boulder.ibm.com/infocenter/iadthelp/v6r0/topic/org.eclipse.jdt.doc.isv/reference/api/org/eclipse/jdt/core/dom/InfixExpression.html#extendedOperands()">
+     */
+    private void checkNoExtendedOperands(InfixExpression node) {
+        if (!hasType(node, "java.lang.String") && !node.extendedOperands().isEmpty()) {
+            throw new NotImplementedException("for extended operands");
+        }
+    }
 
-	private boolean isPrimitiveBool(Expression expr) {
-		ITypeBinding typeBinding = expr.resolveTypeBinding();
-		return typeBinding.isPrimitive()
-				&& "boolean".equals(typeBinding.getQualifiedName());
-	}
+    private boolean isPrimitiveBool(Expression expr) {
+        ITypeBinding typeBinding = expr.resolveTypeBinding();
+        return typeBinding.isPrimitive()
+                && "boolean".equals(typeBinding.getQualifiedName());
+    }
 
-	private boolean replace(InfixExpression node, boolean negate,
-			Expression exprToCopy) {
-		checkNoExtendedOperands(node);
-		if (!isPrimitiveBool(node.getLeftOperand())
-				&& !isPrimitiveBool(node.getRightOperand())) {
-			return VISIT_SUBTREE;
-		}
-		// Either:
-		// - Two boolean primitives: no possible NPE
-		// - One boolean primitive and one Boolean object, this code already run
-		// the risk of an NPE, so we can replace the infix expression without
-		// fearing we would introduce a previously non existing NPE.
-		Expression operand;
-		if (negate) {
-			operand = copySubtree(this.ctx.getAST(), exprToCopy);
-		} else {
-			operand = negate(this.ctx.getAST(), exprToCopy, true);
-		}
-		this.ctx.getRefactorings().replace(node, operand);
-		return DO_NOT_VISIT_SUBTREE;
-	}
+    private boolean replace(InfixExpression node, boolean negate,
+            Expression exprToCopy) {
+        checkNoExtendedOperands(node);
+        if (!isPrimitiveBool(node.getLeftOperand())
+                && !isPrimitiveBool(node.getRightOperand())) {
+            return VISIT_SUBTREE;
+        }
+        // Either:
+        // - Two boolean primitives: no possible NPE
+        // - One boolean primitive and one Boolean object, this code already run
+        // the risk of an NPE, so we can replace the infix expression without
+        // fearing we would introduce a previously non existing NPE.
+        Expression operand;
+        if (negate) {
+            operand = copySubtree(this.ctx.getAST(), exprToCopy);
+        } else {
+            operand = negate(this.ctx.getAST(), exprToCopy, true);
+        }
+        this.ctx.getRefactorings().replace(node, operand);
+        return DO_NOT_VISIT_SUBTREE;
+    }
 
-	private void replaceByCopy(InfixExpression node, final Expression expr) {
-		this.ctx.getRefactorings().replace(node, copySubtree(this.ctx.getAST(), expr));
-	}
+    private void replaceByCopy(InfixExpression node, final Expression expr) {
+        this.ctx.getRefactorings().replace(node, copySubtree(this.ctx.getAST(), expr));
+    }
 
-	/**
-	 * The previous null check is redundant if:
-	 * <ul>
-	 * <li>the null checked expression is reused in an instanceof expression</li>
-	 * <li>the null checked expression is reused in an expression checking for
-	 * object equality against an expression that resolves to a non null
-	 * constant</li>
-	 * </ul>
-	 */
-	private boolean isNullCheckRedundant(Expression e, Expression nullCheckedExpression) {
-		if (nullCheckedExpression == null) {
-			return false;
-		} else if (e instanceof InstanceofExpression) {
-			return ((InstanceofExpression) e).getLeftOperand().subtreeMatch(
-					new ASTMatcher(), nullCheckedExpression);
-		} else if (e instanceof MethodInvocation) {
-			final MethodInvocation expr = (MethodInvocation) e;
-			if (expr.getExpression() != null
-					&& expr.getExpression().resolveConstantExpressionValue() != null
-					&& arguments(expr).size() == 1
-					&& arguments(expr).get(0).subtreeMatch(
-							new ASTMatcher(), nullCheckedExpression)) {
-				// Did we invoke java.lang.Object.equals()?
-				// Did we invoke java.lang.String.equalsIgnoreCase()?
-				boolean isEquals = isMethod(expr, "java.lang.Object", "equals", "java.lang.Object");
-				boolean isStringEqualsIgnoreCase =
-						isMethod(expr, "java.lang.String", "equalsIgnoreCase", "java.lang.String");
-				return isEquals || isStringEqualsIgnoreCase;
-			}
-		}
-		return false;
-	}
+    /**
+     * The previous null check is redundant if:
+     * <ul>
+     * <li>the null checked expression is reused in an instanceof expression</li>
+     * <li>the null checked expression is reused in an expression checking for
+     * object equality against an expression that resolves to a non null
+     * constant</li>
+     * </ul>
+     */
+    private boolean isNullCheckRedundant(Expression e, Expression nullCheckedExpression) {
+        if (nullCheckedExpression == null) {
+            return false;
+        } else if (e instanceof InstanceofExpression) {
+            return ((InstanceofExpression) e).getLeftOperand().subtreeMatch(
+                    new ASTMatcher(), nullCheckedExpression);
+        } else if (e instanceof MethodInvocation) {
+            final MethodInvocation expr = (MethodInvocation) e;
+            if (expr.getExpression() != null
+                    && expr.getExpression().resolveConstantExpressionValue() != null
+                    && arguments(expr).size() == 1
+                    && arguments(expr).get(0).subtreeMatch(
+                            new ASTMatcher(), nullCheckedExpression)) {
+                // Did we invoke java.lang.Object.equals()?
+                // Did we invoke java.lang.String.equalsIgnoreCase()?
+                boolean isEquals = isMethod(expr, "java.lang.Object", "equals", "java.lang.Object");
+                boolean isStringEqualsIgnoreCase =
+                        isMethod(expr, "java.lang.String", "equalsIgnoreCase", "java.lang.String");
+                return isEquals || isStringEqualsIgnoreCase;
+            }
+        }
+        return false;
+    }
 
-	private Expression getNullCheckedExpression(Expression e) {
-		if (e instanceof InfixExpression) {
-			final InfixExpression expr = (InfixExpression) e;
-			checkNoExtendedOperands(expr);
-			if (Operator.NOT_EQUALS.equals(expr.getOperator())) {
-				if (expr.getLeftOperand() instanceof NullLiteral) {
-					return expr.getRightOperand();
-				} else if (expr.getRightOperand() instanceof NullLiteral) {
-					return expr.getLeftOperand();
-				}
-			}
-		}
-		return null;
-	}
+    private Expression getNullCheckedExpression(Expression e) {
+        if (e instanceof InfixExpression) {
+            final InfixExpression expr = (InfixExpression) e;
+            checkNoExtendedOperands(expr);
+            if (Operator.NOT_EQUALS.equals(expr.getOperator())) {
+                if (expr.getLeftOperand() instanceof NullLiteral) {
+                    return expr.getRightOperand();
+                } else if (expr.getRightOperand() instanceof NullLiteral) {
+                    return expr.getLeftOperand();
+                }
+            }
+        }
+        return null;
+    }
 
-	public Refactorings getRefactorings(CompilationUnit astRoot) {
-		astRoot.accept(this);
-		return this.ctx.getRefactorings();
-	}
+    public Refactorings getRefactorings(CompilationUnit astRoot) {
+        astRoot.accept(this);
+        return this.ctx.getRefactorings();
+    }
 }

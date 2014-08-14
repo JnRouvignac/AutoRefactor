@@ -35,56 +35,56 @@ import org.eclipse.jdt.core.dom.*;
  * Add generics, be more assertive about generics that what Eclipse does.
  */
 public class GenerecizeRefactoring extends ASTVisitor implements
-		IJavaRefactoring {
+        IJavaRefactoring {
 
-	private RefactoringContext ctx;
+    private RefactoringContext ctx;
 
-	public GenerecizeRefactoring() {
-		super();
-	}
+    public GenerecizeRefactoring() {
+        super();
+    }
 
-	public void setRefactoringContext(RefactoringContext ctx) {
-		this.ctx = ctx;
-	}
+    public void setRefactoringContext(RefactoringContext ctx) {
+        this.ctx = ctx;
+    }
 
-	// TODO JNR where are we doing casts?
-	// Generics
-	// Collection.iterator
-	// List.listIterator
-	// List.get
-	// List.add
-	// Map.entries
-	// Map.Entry.getKey
-	// Map.Entry.getValue
-	// Map.values
-	// Map.keys
-	// Map.get
-	// Map.put
-	// Iterator.next
-	// Comparator.compareTo
-	// Comparable.compareTo
-	// Class.newInstance
+    // TODO JNR where are we doing casts?
+    // Generics
+    // Collection.iterator
+    // List.listIterator
+    // List.get
+    // List.add
+    // Map.entries
+    // Map.Entry.getKey
+    // Map.Entry.getValue
+    // Map.values
+    // Map.keys
+    // Map.get
+    // Map.put
+    // Iterator.next
+    // Comparator.compareTo
+    // Comparable.compareTo
+    // Class.newInstance
 
-	// Varargs
-	// Arrays.asList remove now useless array creations + add generics to it
-	// Method.invoke remove now useless array creation
-	// Class.getMethod / Class.getDeclaredMethod remove now useless array
-	// creation
+    // Varargs
+    // Arrays.asList remove now useless array creations + add generics to it
+    // Method.invoke remove now useless array creation
+    // Class.getMethod / Class.getDeclaredMethod remove now useless array
+    // creation
 
-	@Override
-	public boolean visit(MethodInvocation node) {
-		if (isMethod(node, "java.util.Iterator", "next")
-				&& node.getParent() instanceof CastExpression) {
-			CastExpression cast = (CastExpression) node.getParent();
-			Type type = cast.getType();
+    @Override
+    public boolean visit(MethodInvocation node) {
+        if (isMethod(node, "java.util.Iterator", "next")
+                && node.getParent() instanceof CastExpression) {
+            CastExpression cast = (CastExpression) node.getParent();
+            Type type = cast.getType();
 
-			// TODO JNR find variable declaration and include with the type above
-		}
-		return VISIT_SUBTREE;
-	}
+            // TODO JNR find variable declaration and include with the type above
+        }
+        return VISIT_SUBTREE;
+    }
 
-	public Refactorings getRefactorings(CompilationUnit astRoot) {
-		astRoot.accept(this);
-		return this.ctx.getRefactorings();
-	}
+    public Refactorings getRefactorings(CompilationUnit astRoot) {
+        astRoot.accept(this);
+        return this.ctx.getRefactorings();
+    }
 }

@@ -18,147 +18,147 @@ import org.eclipse.text.edits.TextEdit;
 
 public class ASTCommentRewriter {
 
-  	/**
-	 * Using a Set to avoid duplicates because Javadocs are visited twice via
-	 * CompilationUnit.getCommentList() and visit(Javadoc).
-	 */
-	private Set<Comment> removals = new LinkedHashSet<Comment>();
-	private Set<Pair<Comment, String>> replacements = new LinkedHashSet<Pair<Comment, String>>();
-	private List<BlockComment> blockCommentToJavadoc = new ArrayList<BlockComment>();
-	private List<List<LineComment>> lineCommentsToJavadoc = new ArrayList<List<LineComment>>();
+      /**
+     * Using a Set to avoid duplicates because Javadocs are visited twice via
+     * CompilationUnit.getCommentList() and visit(Javadoc).
+     */
+    private Set<Comment> removals = new LinkedHashSet<Comment>();
+    private Set<Pair<Comment, String>> replacements = new LinkedHashSet<Pair<Comment, String>>();
+    private List<BlockComment> blockCommentToJavadoc = new ArrayList<BlockComment>();
+    private List<List<LineComment>> lineCommentsToJavadoc = new ArrayList<List<LineComment>>();
 
-	public ASTCommentRewriter() {
-		super();
-	}
+    public ASTCommentRewriter() {
+        super();
+    }
 
-	public void remove(Comment node) {
-		this.removals.add(node);
-	}
+    public void remove(Comment node) {
+        this.removals.add(node);
+    }
 
-	public void replace(Comment comment, String replacement) {
-		this.replacements.add(Pair.of(comment, replacement));
-	}
+    public void replace(Comment comment, String replacement) {
+        this.replacements.add(Pair.of(comment, replacement));
+    }
 
-	public void toJavadoc(BlockComment comment) {
-		this.blockCommentToJavadoc.add(comment);
-	}
+    public void toJavadoc(BlockComment comment) {
+        this.blockCommentToJavadoc.add(comment);
+    }
 
-	public void toJavadoc(List<LineComment> comments) {
-		this.lineCommentsToJavadoc.add(comments);
-	}
+    public void toJavadoc(List<LineComment> comments) {
+        this.lineCommentsToJavadoc.add(comments);
+    }
 
-	public void addEdits(IDocument document, TextEdit edits) {
-		final String text = document.get();
-		addRemovalEdits(text, edits);
-		addReplacementEdits(text, edits);
-		addToJavadocEdits(text, edits);
-	}
+    public void addEdits(IDocument document, TextEdit edits) {
+        final String text = document.get();
+        addRemovalEdits(text, edits);
+        addReplacementEdits(text, edits);
+        addToJavadocEdits(text, edits);
+    }
 
-	private void addRemovalEdits(String text, TextEdit edits) {
-		if (this.removals.isEmpty()) {
-			return;
-		}
-		for (Comment node : this.removals) {
-			final int start = node.getStartPosition();
-			final int length = node.getLength();
+    private void addRemovalEdits(String text, TextEdit edits) {
+        if (this.removals.isEmpty()) {
+            return;
+        }
+        for (Comment node : this.removals) {
+            final int start = node.getStartPosition();
+            final int length = node.getLength();
 
-			// chomp from the end before the start variable gets modified
-			final int startToRemove = chompWhitespacesBefore(text, start);
-			final int endToRemove = chompWhitespacesAfter(text, start + length);
-			final int lengthToRemove = endToRemove - startToRemove;
+            // chomp from the end before the start variable gets modified
+            final int startToRemove = chompWhitespacesBefore(text, start);
+            final int endToRemove = chompWhitespacesAfter(text, start + length);
+            final int lengthToRemove = endToRemove - startToRemove;
 
-			edits.addChild(new DeleteEdit(startToRemove, lengthToRemove));
-		}
-	}
+            edits.addChild(new DeleteEdit(startToRemove, lengthToRemove));
+        }
+    }
 
-	private void addReplacementEdits(String text, TextEdit edits) {
-		if (this.replacements.isEmpty()) {
-			return;
-		}
-		for (Pair<Comment, String> pair : this.replacements) {
-			final Comment node = pair.getFirst();
-			final int start = node.getStartPosition();
-			final int length = node.getLength();
+    private void addReplacementEdits(String text, TextEdit edits) {
+        if (this.replacements.isEmpty()) {
+            return;
+        }
+        for (Pair<Comment, String> pair : this.replacements) {
+            final Comment node = pair.getFirst();
+            final int start = node.getStartPosition();
+            final int length = node.getLength();
 
-			edits.addChild(new ReplaceEdit(start, length, pair.getSecond()));
-		}
-	}
+            edits.addChild(new ReplaceEdit(start, length, pair.getSecond()));
+        }
+    }
 
-	private void addToJavadocEdits(String text, TextEdit edits) {
-		for (BlockComment blockComment : this.blockCommentToJavadoc) {
-			final int offset = blockComment.getStartPosition() + "/*".length();
-			edits.addChild(new InsertEdit(offset, "*"));
-		}
-		for (List<LineComment> lineComments : this.lineCommentsToJavadoc) {
-			// TODO Collect all words from the line comments,
-			// then get access to indent settings, line length and newline chars
-			// then spread them across several lines if needed or folded on one line only
-			if (lineComments.size() == 1) {
-				final LineComment lineComment = lineComments.get(0);
-				final int start = lineComment.getStartPosition();
-				// TODO JNR how to obey configured indentation?
-				// TODO JNR how to obey configured line length?
-				edits.addChild(new ReplaceEdit(start, "//".length(), "/**"));
-				edits.addChild(new InsertEdit(start + lineComment.getLength(), " */"));
-				continue;
-			}
+    private void addToJavadocEdits(String text, TextEdit edits) {
+        for (BlockComment blockComment : this.blockCommentToJavadoc) {
+            final int offset = blockComment.getStartPosition() + "/*".length();
+            edits.addChild(new InsertEdit(offset, "*"));
+        }
+        for (List<LineComment> lineComments : this.lineCommentsToJavadoc) {
+            // TODO Collect all words from the line comments,
+            // then get access to indent settings, line length and newline chars
+            // then spread them across several lines if needed or folded on one line only
+            if (lineComments.size() == 1) {
+                final LineComment lineComment = lineComments.get(0);
+                final int start = lineComment.getStartPosition();
+                // TODO JNR how to obey configured indentation?
+                // TODO JNR how to obey configured line length?
+                edits.addChild(new ReplaceEdit(start, "//".length(), "/**"));
+                edits.addChild(new InsertEdit(start + lineComment.getLength(), " */"));
+                continue;
+            }
 
-			boolean isFirst = true;
-			for (Iterator<LineComment> iter = lineComments.iterator(); iter.hasNext();) {
-				LineComment lineComment = iter.next();
-				if (isFirst) {
-					edits.addChild(new ReplaceEdit(lineComment.getStartPosition(), "//".length(), "/**"));
-					// TODO JNR how to obey configured indentation?
-					// TODO JNR how to obey configured line length?
-					isFirst = false;
-				} else {
-					edits.addChild(new ReplaceEdit(lineComment.getStartPosition(), "//".length(), " *"));
-				}
-				if (!iter.hasNext()) {
-					// this was the last line comment to transform
-					// TODO JNR how to get access to configured newline? @see #getNewline();
-					// TODO JNR how to obey configured indentation?
-					edits.addChild(new InsertEdit(lineComment.getStartPosition() + lineComment.getLength(), "\n*/"));
-				}
-			}
-		}
-	}
+            boolean isFirst = true;
+            for (Iterator<LineComment> iter = lineComments.iterator(); iter.hasNext();) {
+                LineComment lineComment = iter.next();
+                if (isFirst) {
+                    edits.addChild(new ReplaceEdit(lineComment.getStartPosition(), "//".length(), "/**"));
+                    // TODO JNR how to obey configured indentation?
+                    // TODO JNR how to obey configured line length?
+                    isFirst = false;
+                } else {
+                    edits.addChild(new ReplaceEdit(lineComment.getStartPosition(), "//".length(), " *"));
+                }
+                if (!iter.hasNext()) {
+                    // this was the last line comment to transform
+                    // TODO JNR how to get access to configured newline? @see #getNewline();
+                    // TODO JNR how to obey configured indentation?
+                    edits.addChild(new InsertEdit(lineComment.getStartPosition() + lineComment.getLength(), "\n*/"));
+                }
+            }
+        }
+    }
 
-	private void getNewline() {
-		// TODO how to get access to configured newline
-		// Answer: use ICompilationUnit.findRecommendedLineSeparator()
-	}
+    private void getNewline() {
+        // TODO how to get access to configured newline
+        // Answer: use ICompilationUnit.findRecommendedLineSeparator()
+    }
 
-	private int chompWhitespacesBefore(final String text, int start) {
-		int i = start - 1;
-		while (i >= 0) {
-			final char c = text.charAt(i);
-			// TODO JNR how to get project specific newline separator?? @see #getNewline();
-			if (!Character.isWhitespace(c) || c == '\n') {
-				break;
-			}
-			start = i;
-			i--;
-		}
-		return start;
-	}
+    private int chompWhitespacesBefore(final String text, int start) {
+        int i = start - 1;
+        while (i >= 0) {
+            final char c = text.charAt(i);
+            // TODO JNR how to get project specific newline separator?? @see #getNewline();
+            if (!Character.isWhitespace(c) || c == '\n') {
+                break;
+            }
+            start = i;
+            i--;
+        }
+        return start;
+    }
 
-	private int chompWhitespacesAfter(final String text, int end) {
-		int i = end;
-		while (i < text.length()) {
-			final char c = text.charAt(i);
-			if (!Character.isWhitespace(c)) {
-				break;
-			}
-			i++;
-			end = i;
-			// TODO JNR how to get project specific newline separator?? @see #getNewline();
-			if (c == '\n') {
-				// we chomped the newline character, do not chomp on the next line
-				break;
-			}
-		}
-		return end;
-	}
+    private int chompWhitespacesAfter(final String text, int end) {
+        int i = end;
+        while (i < text.length()) {
+            final char c = text.charAt(i);
+            if (!Character.isWhitespace(c)) {
+                break;
+            }
+            i++;
+            end = i;
+            // TODO JNR how to get project specific newline separator?? @see #getNewline();
+            if (c == '\n') {
+                // we chomped the newline character, do not chomp on the next line
+                break;
+            }
+        }
+        return end;
+    }
 
 }

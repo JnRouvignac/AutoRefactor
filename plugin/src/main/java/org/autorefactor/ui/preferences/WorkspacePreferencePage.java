@@ -36,25 +36,25 @@ import static org.autorefactor.ui.preferences.PreferenceConstants.*;
 
 public class WorkspacePreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
-	public WorkspacePreferencePage() {
-		super(GRID);
-		setPreferenceStore(AutoRefactorPlugin.getDefault().getPreferenceStore());
-		setDescription("AutoRefactor workbench preferences");
-	}
+    public WorkspacePreferencePage() {
+        super(GRID);
+        setPreferenceStore(AutoRefactorPlugin.getDefault().getPreferenceStore());
+        setDescription("AutoRefactor workbench preferences");
+    }
 
-	@Override
-	protected void createFieldEditors() {
-		addBooleanField(REMOVE_THIS_FOR_NON_STATIC_METHOD_ACCESS);
-		addBooleanField(ADD_ANGLE_BRACKETS_TO_STATEMENT_BODIES);
+    @Override
+    protected void createFieldEditors() {
+        addBooleanField(REMOVE_THIS_FOR_NON_STATIC_METHOD_ACCESS);
+        addBooleanField(ADD_ANGLE_BRACKETS_TO_STATEMENT_BODIES);
 
-		addBooleanField(DEBUG_MODE_ON);
-	}
+        addBooleanField(DEBUG_MODE_ON);
+    }
 
-	private void addBooleanField(Preference pref) {
-		addField(new BooleanFieldEditor(pref.name, pref.description, getFieldEditorParent()));
-	}
+    private void addBooleanField(Preference pref) {
+        addField(new BooleanFieldEditor(pref.name, pref.description, getFieldEditorParent()));
+    }
 
-	public void init(IWorkbench workbench) {
-	}
+    public void init(IWorkbench workbench) {
+    }
 
 }

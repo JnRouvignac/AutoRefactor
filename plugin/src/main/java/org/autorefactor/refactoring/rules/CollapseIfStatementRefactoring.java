@@ -37,62 +37,62 @@ import static org.eclipse.jdt.core.dom.InfixExpression.Operator.*;
  * Collapses two consecutive if statements into just one.
  */
 public class CollapseIfStatementRefactoring extends ASTVisitor implements
-		IJavaRefactoring {
+        IJavaRefactoring {
 
-	private RefactoringContext ctx;
+    private RefactoringContext ctx;
 
-	public CollapseIfStatementRefactoring() {
-		super();
-	}
+    public CollapseIfStatementRefactoring() {
+        super();
+    }
 
-	public void setRefactoringContext(RefactoringContext ctx) {
-		this.ctx = ctx;
-	}
+    public void setRefactoringContext(RefactoringContext ctx) {
+        this.ctx = ctx;
+    }
 
-	@Override
-	public boolean visit(IfStatement node) {
-		if (node.getElseStatement() == null) {
-			final IfStatement is = as(node.getThenStatement(), IfStatement.class);
-			if (is != null) {
-				replaceIfNoElseStatement(node, is);
-			}
-		}
-		return VISIT_SUBTREE;
-	}
+    @Override
+    public boolean visit(IfStatement node) {
+        if (node.getElseStatement() == null) {
+            final IfStatement is = as(node.getThenStatement(), IfStatement.class);
+            if (is != null) {
+                replaceIfNoElseStatement(node, is);
+            }
+        }
+        return VISIT_SUBTREE;
+    }
 
-	private boolean replaceIfNoElseStatement(IfStatement outerIf,
-			IfStatement innerIf) {
-		if (innerIf.getElseStatement() != null) {
-			return VISIT_SUBTREE;
-		}
+    private boolean replaceIfNoElseStatement(IfStatement outerIf,
+            IfStatement innerIf) {
+        if (innerIf.getElseStatement() != null) {
+            return VISIT_SUBTREE;
+        }
 
-		final ASTBuilder b = this.ctx.getASTBuilder();
-		final Expression leftOperand = b.copyExpr(outerIf.getExpression());
-		final Expression rightOperand = b.copyExpr(innerIf.getExpression());
+        final ASTBuilder b = this.ctx.getASTBuilder();
+        final Expression leftOperand = b.copyExpr(outerIf.getExpression());
+        final Expression rightOperand = b.copyExpr(innerIf.getExpression());
 
-		final InfixExpression ie = b.infixExpr(
-		    parenthesizeInfixExpr(leftOperand),
-		    CONDITIONAL_AND,
-		    parenthesizeInfixExpr(rightOperand));
+        final InfixExpression ie = b.infixExpr(
+            parenthesizeInfixExpr(leftOperand),
+            CONDITIONAL_AND,
+            parenthesizeInfixExpr(rightOperand));
 
-		final IfStatement is = b.if0(ie,
-		    b.copyStmt(innerIf.getThenStatement()));
-		this.ctx.getRefactorings().replace(outerIf, is);
-		return DO_NOT_VISIT_SUBTREE;
-	}
+        final IfStatement is = b.if0(ie,
+            b.copyStmt(innerIf.getThenStatement()));
+        this.ctx.getRefactorings().replace(outerIf, is);
+        return DO_NOT_VISIT_SUBTREE;
+    }
 
-	private Expression parenthesizeInfixExpr(Expression expr) {
-		if (expr instanceof InfixExpression) {
-			final InfixExpression ie = (InfixExpression) expr;
-			if (CONDITIONAL_OR.equals(ie.getOperator())) {
-				return this.ctx.getASTBuilder().parenthesize(ie);
-			}
-		}
-		return expr;
-	}
+    private Expression parenthesizeInfixExpr(Expression expr) {
+        if (expr instanceof InfixExpression) {
+            final InfixExpression ie = (InfixExpression) expr;
+            if (CONDITIONAL_OR.equals(ie.getOperator())) {
+                return this.ctx.getASTBuilder().parenthesize(ie);
+            }
+        }
+        return expr;
+    }
 
-	public Refactorings getRefactorings(CompilationUnit astRoot) {
-		astRoot.accept(this);
-		return this.ctx.getRefactorings();
-	}
+    public Refactorings getRefactorings(CompilationUnit astRoot) {
+        astRoot.accept(this);
+        return this.ctx.getRefactorings();
+    }
 }

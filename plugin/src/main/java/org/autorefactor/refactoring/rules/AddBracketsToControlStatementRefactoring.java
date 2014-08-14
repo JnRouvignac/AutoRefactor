@@ -42,75 +42,75 @@ import static org.autorefactor.refactoring.ASTHelper.*;
  * </ul>
  */
 public class AddBracketsToControlStatementRefactoring extends ASTVisitor
-		implements IJavaRefactoring {
+        implements IJavaRefactoring {
 
-	private RefactoringContext ctx;
+    private RefactoringContext ctx;
 
-	public void setRefactoringContext(RefactoringContext ctx) {
-		this.ctx = ctx;
-	}
+    public void setRefactoringContext(RefactoringContext ctx) {
+        this.ctx = ctx;
+    }
 
-	@Override
-	public boolean visit(IfStatement node) {
-		boolean result = VISIT_SUBTREE;
-		if (node.getThenStatement() != null
-				&& !(node.getThenStatement() instanceof Block)) {
-			result = setBlock(node.getThenStatement());
-		}
-		if (node.getElseStatement() != null
-				&& !(node.getElseStatement() instanceof Block)
-				&& !(node.getElseStatement() instanceof IfStatement)) {
-			return setBlock(node.getElseStatement()) || result;
-		}
-		return VISIT_SUBTREE;
-	}
+    @Override
+    public boolean visit(IfStatement node) {
+        boolean result = VISIT_SUBTREE;
+        if (node.getThenStatement() != null
+                && !(node.getThenStatement() instanceof Block)) {
+            result = setBlock(node.getThenStatement());
+        }
+        if (node.getElseStatement() != null
+                && !(node.getElseStatement() instanceof Block)
+                && !(node.getElseStatement() instanceof IfStatement)) {
+            return setBlock(node.getElseStatement()) || result;
+        }
+        return VISIT_SUBTREE;
+    }
 
-	@Override
-	public boolean visit(EnhancedForStatement node) {
-		if (node.getBody() != null && !(node.getBody() instanceof Block)) {
-			return setBlock(node.getBody());
-		}
-		return VISIT_SUBTREE;
-	}
+    @Override
+    public boolean visit(EnhancedForStatement node) {
+        if (node.getBody() != null && !(node.getBody() instanceof Block)) {
+            return setBlock(node.getBody());
+        }
+        return VISIT_SUBTREE;
+    }
 
-	@Override
-	public boolean visit(ForStatement node) {
-		if (node.getBody() != null && !(node.getBody() instanceof Block)) {
-			return setBlock(node.getBody());
-		}
-		return VISIT_SUBTREE;
-	}
+    @Override
+    public boolean visit(ForStatement node) {
+        if (node.getBody() != null && !(node.getBody() instanceof Block)) {
+            return setBlock(node.getBody());
+        }
+        return VISIT_SUBTREE;
+    }
 
-	@Override
-	public boolean visit(WhileStatement node) {
-		if (node.getBody() != null && !(node.getBody() instanceof Block)) {
-			return setBlock(node.getBody());
-		}
-		return VISIT_SUBTREE;
-	}
+    @Override
+    public boolean visit(WhileStatement node) {
+        if (node.getBody() != null && !(node.getBody() instanceof Block)) {
+            return setBlock(node.getBody());
+        }
+        return VISIT_SUBTREE;
+    }
 
-	@Override
-	public boolean visit(DoStatement node) {
-		if (node.getBody() != null && !(node.getBody() instanceof Block)) {
-			return setBlock(node.getBody());
-		}
-		return VISIT_SUBTREE;
-	}
+    @Override
+    public boolean visit(DoStatement node) {
+        if (node.getBody() != null && !(node.getBody() instanceof Block)) {
+            return setBlock(node.getBody());
+        }
+        return VISIT_SUBTREE;
+    }
 
-	private boolean setBlock(Statement statement) {
-		if (statement == null) {
-			return VISIT_SUBTREE;
-		}
-		final ASTBuilder b = this.ctx.getASTBuilder();
-		final Block block = b.body(b.copyStmt(statement));
-		block.accept(this);
-		this.ctx.getRefactorings().replace(statement, block);
-		return DO_NOT_VISIT_SUBTREE;
-	}
+    private boolean setBlock(Statement statement) {
+        if (statement == null) {
+            return VISIT_SUBTREE;
+        }
+        final ASTBuilder b = this.ctx.getASTBuilder();
+        final Block block = b.body(b.copyStmt(statement));
+        block.accept(this);
+        this.ctx.getRefactorings().replace(statement, block);
+        return DO_NOT_VISIT_SUBTREE;
+    }
 
-	public Refactorings getRefactorings(CompilationUnit astRoot) {
-		astRoot.accept(this);
-		return this.ctx.getRefactorings();
-	}
+    public Refactorings getRefactorings(CompilationUnit astRoot) {
+        astRoot.accept(this);
+        return this.ctx.getRefactorings();
+    }
 
 }

@@ -37,166 +37,166 @@ import static org.autorefactor.refactoring.ASTHelper.*;
  */
 public class ASTBuilder {
 
-	private final AST ast;
+    private final AST ast;
 
-	public ASTBuilder(final AST ast) {
-		this.ast = ast;
-	}
+    public ASTBuilder(final AST ast) {
+        this.ast = ast;
+    }
 
-	public Block body(final Statement... stmts) {
-		final Block tryBody = ast.newBlock();
-		addAll(statements(tryBody), stmts);
-		return tryBody;
-	}
+    public Block body(final Statement... stmts) {
+        final Block tryBody = ast.newBlock();
+        addAll(statements(tryBody), stmts);
+        return tryBody;
+    }
 
-	public CatchClause catch0(String exceptionType, String exceptionName, Statement... stmts) {
-		final CatchClause cc = ast.newCatchClause();
-		final SingleVariableDeclaration svd = ast.newSingleVariableDeclaration();
-		svd.setType(newSimpleType(exceptionType));
-		svd.setName(ast.newSimpleName(exceptionName));
-		cc.setException(svd);
+    public CatchClause catch0(String exceptionType, String exceptionName, Statement... stmts) {
+        final CatchClause cc = ast.newCatchClause();
+        final SingleVariableDeclaration svd = ast.newSingleVariableDeclaration();
+        svd.setType(newSimpleType(exceptionType));
+        svd.setName(ast.newSimpleName(exceptionName));
+        cc.setException(svd);
 
-		final Block block = ast.newBlock();
-		addAll(statements(block), stmts);
-		cc.setBody(block);
-		return cc;
-	}
+        final Block block = ast.newBlock();
+        addAll(statements(block), stmts);
+        cc.setBody(block);
+        return cc;
+    }
 
-	public <T extends Expression> T copyExpr(T node) {
-		return ASTHelper.copySubtree(ast, node);
-	}
+    public <T extends Expression> T copyExpr(T node) {
+        return ASTHelper.copySubtree(ast, node);
+    }
 
-	public <T extends Statement> T copyStmt(T node) {
-		return ASTHelper.copySubtree(ast, node);
-	}
+    public <T extends Statement> T copyStmt(T node) {
+        return ASTHelper.copySubtree(ast, node);
+    }
 
-	public IfStatement if0(Expression condition, Statement thenStatement) {
-		return if0(condition, thenStatement, null);
-	}
+    public IfStatement if0(Expression condition, Statement thenStatement) {
+        return if0(condition, thenStatement, null);
+    }
 
-	public IfStatement if0(Expression condition, Statement thenStatement, Statement elseStatement) {
-		final IfStatement is = ast.newIfStatement();
-		is.setExpression(condition);
-		is.setThenStatement(thenStatement);
-		is.setElseStatement(elseStatement);
-		return is;
-	}
+    public IfStatement if0(Expression condition, Statement thenStatement, Statement elseStatement) {
+        final IfStatement is = ast.newIfStatement();
+        is.setExpression(condition);
+        is.setThenStatement(thenStatement);
+        is.setElseStatement(elseStatement);
+        return is;
+    }
 
-	public InfixExpression infixExpr(Expression leftOperand, InfixExpression.Operator operator, Expression rightOperand) {
-		final InfixExpression ie = ast.newInfixExpression();
-		ie.setLeftOperand(leftOperand);
-		ie.setOperator(operator);
-		ie.setRightOperand(rightOperand);
-		return ie;
-	}
+    public InfixExpression infixExpr(Expression leftOperand, InfixExpression.Operator operator, Expression rightOperand) {
+        final InfixExpression ie = ast.newInfixExpression();
+        ie.setLeftOperand(leftOperand);
+        ie.setOperator(operator);
+        ie.setRightOperand(rightOperand);
+        return ie;
+    }
 
-	public NumberLiteral int0(int i) {
-		return ast.newNumberLiteral(Integer.toString(i));
-	}
+    public NumberLiteral int0(int i) {
+        return ast.newNumberLiteral(Integer.toString(i));
+    }
 
-	public MethodInvocation invoke(String expression, String methodName, Expression... arguments) {
-		final MethodInvocation mi = ast.newMethodInvocation();
-		mi.setExpression(ast.newSimpleName(expression));
-		mi.setName(ast.newSimpleName(methodName));
-		addAll(arguments(mi), arguments);
-		return mi;
-	}
+    public MethodInvocation invoke(String expression, String methodName, Expression... arguments) {
+        final MethodInvocation mi = ast.newMethodInvocation();
+        mi.setExpression(ast.newSimpleName(expression));
+        mi.setName(ast.newSimpleName(methodName));
+        addAll(arguments(mi), arguments);
+        return mi;
+    }
 
-	public MethodInvocation invoke(Expression expression, String methodName, Expression... arguments) {
-		final MethodInvocation mi = ast.newMethodInvocation();
-		mi.setExpression(expression);
-		mi.setName(ast.newSimpleName(methodName));
-		addAll(arguments(mi), arguments);
-		return mi;
-	}
+    public MethodInvocation invoke(Expression expression, String methodName, Expression... arguments) {
+        final MethodInvocation mi = ast.newMethodInvocation();
+        mi.setExpression(expression);
+        mi.setName(ast.newSimpleName(methodName));
+        addAll(arguments(mi), arguments);
+        return mi;
+    }
 
-	public Name name(String... names) {
-		if (names.length == 0) {
-			throw new IllegalArgumentException("Expected at least one name, but was given 0 names");
-		}
-		if (names.length == 1) {
-			return ast.newSimpleName(names[0]);
-		}
-		return ast.newName(names);
-	}
+    public Name name(String... names) {
+        if (names.length == 0) {
+            throw new IllegalArgumentException("Expected at least one name, but was given 0 names");
+        }
+        if (names.length == 1) {
+            return ast.newSimpleName(names[0]);
+        }
+        return ast.newName(names);
+    }
 
-	public ClassInstanceCreation new0(String className, Expression... arguments) {
-		final ClassInstanceCreation cic = ast.newClassInstanceCreation();
-		cic.setType(newSimpleType(className));
-		addAll(arguments(cic), arguments);
-		return cic;
-	}
+    public ClassInstanceCreation new0(String className, Expression... arguments) {
+        final ClassInstanceCreation cic = ast.newClassInstanceCreation();
+        cic.setType(newSimpleType(className));
+        addAll(arguments(cic), arguments);
+        return cic;
+    }
 
-	public ClassInstanceCreation new0(ITypeBinding binding, Expression... arguments) {
-		final String className = binding.getName();
-		final int ltIdx = className.indexOf('<');
-		if (ltIdx == -1) {
-			final ClassInstanceCreation cic = ast.newClassInstanceCreation();
-			cic.setType(newSimpleType(className));
-			addAll(arguments(cic), arguments);
-			return cic;
-		}
-		final String erasedClassName = className.substring(0, ltIdx);
-		final int gtIdx = className.indexOf('>', ltIdx);
-		final String typeParam = className.substring(ltIdx + 1, gtIdx);
+    public ClassInstanceCreation new0(ITypeBinding binding, Expression... arguments) {
+        final String className = binding.getName();
+        final int ltIdx = className.indexOf('<');
+        if (ltIdx == -1) {
+            final ClassInstanceCreation cic = ast.newClassInstanceCreation();
+            cic.setType(newSimpleType(className));
+            addAll(arguments(cic), arguments);
+            return cic;
+        }
+        final String erasedClassName = className.substring(0, ltIdx);
+        final int gtIdx = className.indexOf('>', ltIdx);
+        final String typeParam = className.substring(ltIdx + 1, gtIdx);
 
-		final ClassInstanceCreation cic = ast.newClassInstanceCreation();
-		final ParameterizedType type = ast.newParameterizedType(
-				newSimpleType(erasedClassName));
-		typeArguments(type).add(newSimpleType(typeParam));
-		cic.setType(type);
-		addAll(arguments(cic), arguments);
-		return cic;
-	}
+        final ClassInstanceCreation cic = ast.newClassInstanceCreation();
+        final ParameterizedType type = ast.newParameterizedType(
+                newSimpleType(erasedClassName));
+        typeArguments(type).add(newSimpleType(typeParam));
+        cic.setType(type);
+        addAll(arguments(cic), arguments);
+        return cic;
+    }
 
-	private <T extends ASTNode> void addAll(List<T> whereToAdd,
-			@SuppressWarnings("unchecked") T... toAdd) {
-		for (T e : toAdd) {
-			whereToAdd.add(e);
-		}
-	}
+    private <T extends ASTNode> void addAll(List<T> whereToAdd,
+            @SuppressWarnings("unchecked") T... toAdd) {
+        for (T e : toAdd) {
+            whereToAdd.add(e);
+        }
+    }
 
-	private SimpleType newSimpleType(final String erasedClassName) {
-		return ast.newSimpleType(ast.newName(erasedClassName));
-	}
+    private SimpleType newSimpleType(final String erasedClassName) {
+        return ast.newSimpleType(ast.newName(erasedClassName));
+    }
 
-	public NumberLiteral number(String s) {
-		return ast.newNumberLiteral(s);
-	}
+    public NumberLiteral number(String s) {
+        return ast.newNumberLiteral(s);
+    }
 
-	public ParenthesizedExpression parenthesize(Expression expression) {
-		final ParenthesizedExpression pe = ast.newParenthesizedExpression();
-		pe.setExpression(expression);
-		return pe;
-	}
+    public ParenthesizedExpression parenthesize(Expression expression) {
+        final ParenthesizedExpression pe = ast.newParenthesizedExpression();
+        pe.setExpression(expression);
+        return pe;
+    }
 
-	public ReturnStatement return0(Expression expression) {
-		final ReturnStatement rs = ast.newReturnStatement();
-		rs.setExpression(expression);
-		return rs;
-	}
+    public ReturnStatement return0(Expression expression) {
+        final ReturnStatement rs = ast.newReturnStatement();
+        rs.setExpression(expression);
+        return rs;
+    }
 
-	public StringLiteral string(String s) {
-		final StringLiteral sl = ast.newStringLiteral();
-		sl.setLiteralValue(s);
-		return sl;
-	}
+    public StringLiteral string(String s) {
+        final StringLiteral sl = ast.newStringLiteral();
+        sl.setLiteralValue(s);
+        return sl;
+    }
 
-	public ThrowStatement throw0(final Expression expression) {
-		final ThrowStatement throwS = ast.newThrowStatement();
-		throwS.setExpression(expression);
-		return throwS;
-	}
+    public ThrowStatement throw0(final Expression expression) {
+        final ThrowStatement throwS = ast.newThrowStatement();
+        throwS.setExpression(expression);
+        return throwS;
+    }
 
-	public ExpressionStatement toStmt(final Expression expression) {
-		return ast.newExpressionStatement(expression);
-	}
+    public ExpressionStatement toStmt(final Expression expression) {
+        return ast.newExpressionStatement(expression);
+    }
 
-	public TryStatement try0(final Block body, CatchClause... catchClauses) {
-		final TryStatement tryS = ast.newTryStatement();
-		tryS.setBody(body);
-		addAll(catchClauses(tryS), catchClauses);
-		return tryS;
-	}
+    public TryStatement try0(final Block body, CatchClause... catchClauses) {
+        final TryStatement tryS = ast.newTryStatement();
+        tryS.setBody(body);
+        addAll(catchClauses(tryS), catchClauses);
+        return tryS;
+    }
 
 }

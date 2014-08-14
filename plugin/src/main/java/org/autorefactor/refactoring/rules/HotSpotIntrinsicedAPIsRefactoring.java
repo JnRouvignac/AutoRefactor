@@ -36,283 +36,283 @@ import org.eclipse.jdt.core.dom.*;
 import static org.autorefactor.refactoring.ASTHelper.*;
 
 public class HotSpotIntrinsicedAPIsRefactoring extends ASTVisitor implements
-		IJavaRefactoring {
+        IJavaRefactoring {
 
-	private class SystemArrayCopyParams {
-		private IVariableBinding indexVarBinding;
-		private Expression indexStartPos;
-		private Expression srcArrayExpr;
-		private Expression srcPos;
-		private Expression destArrayExpr;
-		private Expression destPos;
-		private Expression endPos;
-	}
+    private class SystemArrayCopyParams {
+        private IVariableBinding indexVarBinding;
+        private Expression indexStartPos;
+        private Expression srcArrayExpr;
+        private Expression srcPos;
+        private Expression destArrayExpr;
+        private Expression destPos;
+        private Expression endPos;
+    }
 
-	private RefactoringContext ctx;
+    private RefactoringContext ctx;
 
-	public HotSpotIntrinsicedAPIsRefactoring() {
-		super();
-	}
+    public HotSpotIntrinsicedAPIsRefactoring() {
+        super();
+    }
 
-	public void setRefactoringContext(RefactoringContext ctx) {
-		this.ctx = ctx;
-	}
+    public void setRefactoringContext(RefactoringContext ctx) {
+        this.ctx = ctx;
+    }
 
-	/** {@inheritDoc} */
-	@Override
-	public boolean visit(ForStatement node) {
-		final SystemArrayCopyParams params = new SystemArrayCopyParams();
-		collectUniqueIndex(node, params);
-		final IVariableBinding incrementedIdx = getUniqueIncrementedVariable(node);
-		final List<Statement> stmts = asList(node.getBody());
-		if (equalsNotNull(params.indexVarBinding, incrementedIdx)
-				&& stmts.size() == 1) {
-			collectLength(node.getExpression(), incrementedIdx, params);
+    /** {@inheritDoc} */
+    @Override
+    public boolean visit(ForStatement node) {
+        final SystemArrayCopyParams params = new SystemArrayCopyParams();
+        collectUniqueIndex(node, params);
+        final IVariableBinding incrementedIdx = getUniqueIncrementedVariable(node);
+        final List<Statement> stmts = asList(node.getBody());
+        if (equalsNotNull(params.indexVarBinding, incrementedIdx)
+                && stmts.size() == 1) {
+            collectLength(node.getExpression(), incrementedIdx, params);
 
-			final Statement stmt = stmts.get(0);
-			if (stmt instanceof ExpressionStatement) {
-				final Assignment as = asExpression(stmt, Assignment.class);
-				final Expression lhs = as.getLeftHandSide();
-				final Expression rhs = as.getRightHandSide();
-				if (lhs instanceof ArrayAccess && rhs instanceof ArrayAccess) {
-					final ArrayAccess aaLHS = (ArrayAccess) lhs;
-					params.destArrayExpr = aaLHS.getArray();
-					params.destPos = calcIndex(aaLHS.getIndex(), params);
+            final Statement stmt = stmts.get(0);
+            if (stmt instanceof ExpressionStatement) {
+                final Assignment as = asExpression(stmt, Assignment.class);
+                final Expression lhs = as.getLeftHandSide();
+                final Expression rhs = as.getRightHandSide();
+                if (lhs instanceof ArrayAccess && rhs instanceof ArrayAccess) {
+                    final ArrayAccess aaLHS = (ArrayAccess) lhs;
+                    params.destArrayExpr = aaLHS.getArray();
+                    params.destPos = calcIndex(aaLHS.getIndex(), params);
 
-					final ArrayAccess aaRHS = (ArrayAccess) rhs;
-					params.srcArrayExpr = aaRHS.getArray();
-					params.srcPos = calcIndex(aaRHS.getIndex(), params);
-					return replaceWithSystemArrayCopyCloneAll(node, params);
-				}
-			}
-		}
-		return VISIT_SUBTREE;
-	}
+                    final ArrayAccess aaRHS = (ArrayAccess) rhs;
+                    params.srcArrayExpr = aaRHS.getArray();
+                    params.srcPos = calcIndex(aaRHS.getIndex(), params);
+                    return replaceWithSystemArrayCopyCloneAll(node, params);
+                }
+            }
+        }
+        return VISIT_SUBTREE;
+    }
 
-	private Expression calcIndex(Expression index, SystemArrayCopyParams params) {
-		if (index instanceof SimpleName) {
-			final IVariableBinding idxVar = getVariableBinding(index);
-			if (equalsNotNull(params.indexVarBinding, idxVar)) {
-				return params.indexStartPos;
-			}
-		} else if (index instanceof InfixExpression) {
-			final InfixExpression ie = (InfixExpression) index;
-			if (InfixExpression.Operator.PLUS.equals(ie.getOperator())) {
-				final Expression leftOp = ie.getLeftOperand();
-				final Expression rightOp = ie.getRightOperand();
-				if (leftOp instanceof SimpleName) {
-					final IVariableBinding idxVar = getVariableBinding(leftOp);
-					if (equalsNotNull(params.indexVarBinding, idxVar)) {
-						return plus(rightOp, params.indexStartPos);
-					}
-				}
-				if (rightOp instanceof SimpleName) {
-					final IVariableBinding idxVar = getVariableBinding(rightOp);
-					if (equalsNotNull(params.indexVarBinding, idxVar)) {
-						return plus(leftOp, params.indexStartPos);
-					}
-				}
-			}
-		}
-		return null;
-	}
+    private Expression calcIndex(Expression index, SystemArrayCopyParams params) {
+        if (index instanceof SimpleName) {
+            final IVariableBinding idxVar = getVariableBinding(index);
+            if (equalsNotNull(params.indexVarBinding, idxVar)) {
+                return params.indexStartPos;
+            }
+        } else if (index instanceof InfixExpression) {
+            final InfixExpression ie = (InfixExpression) index;
+            if (InfixExpression.Operator.PLUS.equals(ie.getOperator())) {
+                final Expression leftOp = ie.getLeftOperand();
+                final Expression rightOp = ie.getRightOperand();
+                if (leftOp instanceof SimpleName) {
+                    final IVariableBinding idxVar = getVariableBinding(leftOp);
+                    if (equalsNotNull(params.indexVarBinding, idxVar)) {
+                        return plus(rightOp, params.indexStartPos);
+                    }
+                }
+                if (rightOp instanceof SimpleName) {
+                    final IVariableBinding idxVar = getVariableBinding(rightOp);
+                    if (equalsNotNull(params.indexVarBinding, idxVar)) {
+                        return plus(leftOp, params.indexStartPos);
+                    }
+                }
+            }
+        }
+        return null;
+    }
 
-	private Expression minus(Expression expr1, Expression expr2) {
-		final ASTBuilder b = this.ctx.getASTBuilder();
+    private Expression minus(Expression expr1, Expression expr2) {
+        final ASTBuilder b = this.ctx.getASTBuilder();
 
-		final Integer expr1Value = intValue(expr1);
-		final Integer expr2Value = intValue(expr2);
-		if (expr1Value != null && expr2Value != null) {
-			return b.int0(expr1Value - expr2Value);
-		}
-		else if (expr1Value != null && expr1Value == 0) {
-			// TODO negate expr2
-			throw new NotImplementedException();
-		}
-		else if (expr2Value != null && expr2Value == 0) {
-			return b.copyExpr(expr1);
-		}
-		return b.infixExpr(
-				b.copyExpr(expr1),
-				InfixExpression.Operator.MINUS,
-				b.copyExpr(expr2));
-	}
+        final Integer expr1Value = intValue(expr1);
+        final Integer expr2Value = intValue(expr2);
+        if (expr1Value != null && expr2Value != null) {
+            return b.int0(expr1Value - expr2Value);
+        }
+        else if (expr1Value != null && expr1Value == 0) {
+            // TODO negate expr2
+            throw new NotImplementedException();
+        }
+        else if (expr2Value != null && expr2Value == 0) {
+            return b.copyExpr(expr1);
+        }
+        return b.infixExpr(
+                b.copyExpr(expr1),
+                InfixExpression.Operator.MINUS,
+                b.copyExpr(expr2));
+    }
 
-	private Expression plus(Expression expr1, Expression expr2) {
-		final ASTBuilder b = this.ctx.getASTBuilder();
+    private Expression plus(Expression expr1, Expression expr2) {
+        final ASTBuilder b = this.ctx.getASTBuilder();
 
-		final Integer expr1Value = intValue(expr1);
-		final Integer expr2Value = intValue(expr2);
-		if (expr1Value != null && expr2Value != null) {
-			return b.int0(expr1Value + expr2Value);
-		}
-		else if (expr1Value != null && expr1Value == 0) {
-			return b.copyExpr(expr2);
-		}
-		else if (expr2Value != null && expr2Value == 0) {
-			return b.copyExpr(expr1);
-		}
-		return b.infixExpr(
-				b.copyExpr(expr1),
-				InfixExpression.Operator.PLUS,
-				b.copyExpr(expr2));
-	}
+        final Integer expr1Value = intValue(expr1);
+        final Integer expr2Value = intValue(expr2);
+        if (expr1Value != null && expr2Value != null) {
+            return b.int0(expr1Value + expr2Value);
+        }
+        else if (expr1Value != null && expr1Value == 0) {
+            return b.copyExpr(expr2);
+        }
+        else if (expr2Value != null && expr2Value == 0) {
+            return b.copyExpr(expr1);
+        }
+        return b.infixExpr(
+                b.copyExpr(expr1),
+                InfixExpression.Operator.PLUS,
+                b.copyExpr(expr2));
+    }
 
-	private Integer intValue(Expression expr) {
-		if (expr instanceof NumberLiteral) {
-			try {
-				return Integer.parseInt(((NumberLiteral) expr).getToken());
-			} catch (NumberFormatException ignored) {
-				// this is not an int, nothing to do
-			}
-		}
-		return null;
-	}
+    private Integer intValue(Expression expr) {
+        if (expr instanceof NumberLiteral) {
+            try {
+                return Integer.parseInt(((NumberLiteral) expr).getToken());
+            } catch (NumberFormatException ignored) {
+                // this is not an int, nothing to do
+            }
+        }
+        return null;
+    }
 
-	private void collectLength(final Expression condition,
-			final IVariableBinding incrementedIdx, final SystemArrayCopyParams params) {
-		if (condition instanceof InfixExpression) {
-			final InfixExpression ie = (InfixExpression) condition;
-			if (InfixExpression.Operator.LESS.equals(ie.getOperator())) {
-				IVariableBinding conditionIdx = getVariableBinding(ie.getLeftOperand());
-				if (equalsNotNull(incrementedIdx, conditionIdx)) {
-					params.endPos = ie.getRightOperand();
-				}
-			} else if (InfixExpression.Operator.LESS_EQUALS.equals(ie.getOperator())) {
-				IVariableBinding conditionIdx = getVariableBinding(ie.getLeftOperand());
-				if (equalsNotNull(incrementedIdx, conditionIdx)) {
-					params.endPos = minus(
-							plus(ie.getRightOperand(), ctx.getAST().newNumberLiteral("1")),
-							params.indexStartPos);
-				}
-			} else if (InfixExpression.Operator.GREATER.equals(ie.getOperator())) {
-				IVariableBinding conditionIdx = getVariableBinding(ie.getRightOperand());
-				if (equalsNotNull(incrementedIdx, conditionIdx)) {
-					params.endPos = ie.getLeftOperand();
-				}
-			} else if (InfixExpression.Operator.GREATER_EQUALS.equals(ie.getOperator())) {
-				IVariableBinding conditionIdx = getVariableBinding(ie.getRightOperand());
-				if (equalsNotNull(incrementedIdx, conditionIdx)) {
-					params.endPos = minus(
-							plus(ie.getLeftOperand(), ctx.getAST().newNumberLiteral("1")),
-							params.indexStartPos);
-				}
-			}
-		}
-	}
+    private void collectLength(final Expression condition,
+            final IVariableBinding incrementedIdx, final SystemArrayCopyParams params) {
+        if (condition instanceof InfixExpression) {
+            final InfixExpression ie = (InfixExpression) condition;
+            if (InfixExpression.Operator.LESS.equals(ie.getOperator())) {
+                IVariableBinding conditionIdx = getVariableBinding(ie.getLeftOperand());
+                if (equalsNotNull(incrementedIdx, conditionIdx)) {
+                    params.endPos = ie.getRightOperand();
+                }
+            } else if (InfixExpression.Operator.LESS_EQUALS.equals(ie.getOperator())) {
+                IVariableBinding conditionIdx = getVariableBinding(ie.getLeftOperand());
+                if (equalsNotNull(incrementedIdx, conditionIdx)) {
+                    params.endPos = minus(
+                            plus(ie.getRightOperand(), ctx.getAST().newNumberLiteral("1")),
+                            params.indexStartPos);
+                }
+            } else if (InfixExpression.Operator.GREATER.equals(ie.getOperator())) {
+                IVariableBinding conditionIdx = getVariableBinding(ie.getRightOperand());
+                if (equalsNotNull(incrementedIdx, conditionIdx)) {
+                    params.endPos = ie.getLeftOperand();
+                }
+            } else if (InfixExpression.Operator.GREATER_EQUALS.equals(ie.getOperator())) {
+                IVariableBinding conditionIdx = getVariableBinding(ie.getRightOperand());
+                if (equalsNotNull(incrementedIdx, conditionIdx)) {
+                    params.endPos = minus(
+                            plus(ie.getLeftOperand(), ctx.getAST().newNumberLiteral("1")),
+                            params.indexStartPos);
+                }
+            }
+        }
+    }
 
-	private boolean equalsNotNull(final Object o1, final Object o2) {
-		return o1 != null && o1.equals(o2);
-	}
+    private boolean equalsNotNull(final Object o1, final Object o2) {
+        return o1 != null && o1.equals(o2);
+    }
 
-	private boolean replaceWithSystemArrayCopyCloneAll(ForStatement node,
-			SystemArrayCopyParams params) {
-		if (params.srcArrayExpr == null
-				|| params.srcPos == null
-				|| params.destArrayExpr == null
-				|| params.destPos == null
-				|| params.endPos == null) {
-			return VISIT_SUBTREE;
-		}
-		final ASTBuilder b = this.ctx.getASTBuilder();
-		return replaceWithSystemArrayCopy(node,
-				b.copyExpr(params.srcArrayExpr),
-				b.copyExpr(params.srcPos),
-				b.copyExpr(params.destArrayExpr),
-				b.copyExpr(params.destPos),
-				b.copyExpr(params.endPos));
-	}
+    private boolean replaceWithSystemArrayCopyCloneAll(ForStatement node,
+            SystemArrayCopyParams params) {
+        if (params.srcArrayExpr == null
+                || params.srcPos == null
+                || params.destArrayExpr == null
+                || params.destPos == null
+                || params.endPos == null) {
+            return VISIT_SUBTREE;
+        }
+        final ASTBuilder b = this.ctx.getASTBuilder();
+        return replaceWithSystemArrayCopy(node,
+                b.copyExpr(params.srcArrayExpr),
+                b.copyExpr(params.srcPos),
+                b.copyExpr(params.destArrayExpr),
+                b.copyExpr(params.destPos),
+                b.copyExpr(params.endPos));
+    }
 
-	private boolean replaceWithSystemArrayCopy(ForStatement node,
-			Expression srcArrayExpr, Expression srcPos,
-			Expression destArrayExpr, Expression destPos,
-			Expression length) {
-		final ASTBuilder b = this.ctx.getASTBuilder();
-		final TryStatement tryS = b.try0(
-				b.body(
-						b.toStmt(
-								b.invoke("System", "arraycopy",
-										srcArrayExpr, srcPos, destArrayExpr, destPos, length))),
-				b.catch0("IndexOutOfBoundsException", "e",
-						b.throw0(
-								b.new0("ArrayIndexOutOfBoundsException",
-										b.invoke("e", "getMessage")))));
+    private boolean replaceWithSystemArrayCopy(ForStatement node,
+            Expression srcArrayExpr, Expression srcPos,
+            Expression destArrayExpr, Expression destPos,
+            Expression length) {
+        final ASTBuilder b = this.ctx.getASTBuilder();
+        final TryStatement tryS = b.try0(
+                b.body(
+                        b.toStmt(
+                                b.invoke("System", "arraycopy",
+                                        srcArrayExpr, srcPos, destArrayExpr, destPos, length))),
+                b.catch0("IndexOutOfBoundsException", "e",
+                        b.throw0(
+                                b.new0("ArrayIndexOutOfBoundsException",
+                                        b.invoke("e", "getMessage")))));
 
-		this.ctx.getRefactorings().replace(node, tryS);
-		return DO_NOT_VISIT_SUBTREE;
-	}
+        this.ctx.getRefactorings().replace(node, tryS);
+        return DO_NOT_VISIT_SUBTREE;
+    }
 
-	private void collectUniqueIndex(ForStatement node,
-			SystemArrayCopyParams params) {
-		if (initializers(node).size() != 1) {
-			return;
-		}
-		final Expression initializer0 = initializers(node).get(0);
-		if (initializer0 instanceof VariableDeclarationExpression) {
-			final VariableDeclarationExpression vde =
-					(VariableDeclarationExpression) initializer0;
-			if (isPrimitive(vde, "int") && fragments(vde).size() == 1) {
-				// this must be the array index
-				VariableDeclarationFragment vdf = fragments(vde).get(0);
-				if (vdf.getExtraDimensions() == 0) {
-					params.indexStartPos = vdf.getInitializer();
-					params.indexVarBinding = vdf.resolveBinding();
-					return;
-				}
-			}
-		}
-		else if (initializer0 instanceof Assignment) {
-			final Assignment as = (Assignment) initializer0;
-			if (Assignment.Operator.ASSIGN.equals(as.getOperator())
-					&& isPrimitive(as.resolveTypeBinding(), "int")) {
-				// this must be the array index
-				params.indexStartPos = as.getRightHandSide();
-				final Expression lhs = as.getLeftHandSide();
-				if (lhs instanceof SimpleName) {
-					final IBinding binding = ((SimpleName) lhs).resolveBinding();
-					if (binding instanceof IVariableBinding) {
-						params.indexVarBinding = (IVariableBinding) binding;
-						return;
-					}
-				}
-			}
-		}
-	}
+    private void collectUniqueIndex(ForStatement node,
+            SystemArrayCopyParams params) {
+        if (initializers(node).size() != 1) {
+            return;
+        }
+        final Expression initializer0 = initializers(node).get(0);
+        if (initializer0 instanceof VariableDeclarationExpression) {
+            final VariableDeclarationExpression vde =
+                    (VariableDeclarationExpression) initializer0;
+            if (isPrimitive(vde, "int") && fragments(vde).size() == 1) {
+                // this must be the array index
+                VariableDeclarationFragment vdf = fragments(vde).get(0);
+                if (vdf.getExtraDimensions() == 0) {
+                    params.indexStartPos = vdf.getInitializer();
+                    params.indexVarBinding = vdf.resolveBinding();
+                    return;
+                }
+            }
+        }
+        else if (initializer0 instanceof Assignment) {
+            final Assignment as = (Assignment) initializer0;
+            if (Assignment.Operator.ASSIGN.equals(as.getOperator())
+                    && isPrimitive(as.resolveTypeBinding(), "int")) {
+                // this must be the array index
+                params.indexStartPos = as.getRightHandSide();
+                final Expression lhs = as.getLeftHandSide();
+                if (lhs instanceof SimpleName) {
+                    final IBinding binding = ((SimpleName) lhs).resolveBinding();
+                    if (binding instanceof IVariableBinding) {
+                        params.indexVarBinding = (IVariableBinding) binding;
+                        return;
+                    }
+                }
+            }
+        }
+    }
 
-	private IVariableBinding getUniqueIncrementedVariable(ForStatement node) {
-		if (updaters(node).size() != 1) {
-			return null;
-		}
-		final Expression updater0 = updaters(node).get(0);
-		if (updater0 instanceof PostfixExpression) {
-			final PostfixExpression pe = (PostfixExpression) updater0;
-			if (PostfixExpression.Operator.INCREMENT.equals(pe.getOperator())) {
-				return getVariableBinding(pe.getOperand());
-			}
-		}
-		else if (updater0 instanceof PrefixExpression) {
-			final PrefixExpression pe = (PrefixExpression) updater0;
-			if (PrefixExpression.Operator.INCREMENT.equals(pe.getOperator())) {
-				return getVariableBinding(pe.getOperand());
-			}
-		}
-		return null;
-	}
+    private IVariableBinding getUniqueIncrementedVariable(ForStatement node) {
+        if (updaters(node).size() != 1) {
+            return null;
+        }
+        final Expression updater0 = updaters(node).get(0);
+        if (updater0 instanceof PostfixExpression) {
+            final PostfixExpression pe = (PostfixExpression) updater0;
+            if (PostfixExpression.Operator.INCREMENT.equals(pe.getOperator())) {
+                return getVariableBinding(pe.getOperand());
+            }
+        }
+        else if (updater0 instanceof PrefixExpression) {
+            final PrefixExpression pe = (PrefixExpression) updater0;
+            if (PrefixExpression.Operator.INCREMENT.equals(pe.getOperator())) {
+                return getVariableBinding(pe.getOperand());
+            }
+        }
+        return null;
+    }
 
-	// TODO JNR verify that client code null checks the result of calling this method
-	private IVariableBinding getVariableBinding(final Expression e) {
-		if (e instanceof SimpleName) {
-			final SimpleName sn = (SimpleName) e;
-			final IBinding binding = sn.resolveBinding();
-			if (binding instanceof IVariableBinding) { // this is a local variable or a field
-				return (IVariableBinding) binding;
-			}
-		}
-		return null;
-	}
+    // TODO JNR verify that client code null checks the result of calling this method
+    private IVariableBinding getVariableBinding(final Expression e) {
+        if (e instanceof SimpleName) {
+            final SimpleName sn = (SimpleName) e;
+            final IBinding binding = sn.resolveBinding();
+            if (binding instanceof IVariableBinding) { // this is a local variable or a field
+                return (IVariableBinding) binding;
+            }
+        }
+        return null;
+    }
 
-	public Refactorings getRefactorings(CompilationUnit astRoot) {
-		astRoot.accept(this);
-		return this.ctx.getRefactorings();
-	}
+    public Refactorings getRefactorings(CompilationUnit astRoot) {
+        astRoot.accept(this);
+        return this.ctx.getRefactorings();
+    }
 }

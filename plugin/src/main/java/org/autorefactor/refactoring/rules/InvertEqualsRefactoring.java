@@ -42,49 +42,49 @@ import static org.autorefactor.refactoring.ASTHelper.*;
  * </p>
  */
 public class InvertEqualsRefactoring extends ASTVisitor implements
-		IJavaRefactoring {
+        IJavaRefactoring {
 
-	private RefactoringContext ctx;
+    private RefactoringContext ctx;
 
-	public InvertEqualsRefactoring() {
-		super();
-	}
+    public InvertEqualsRefactoring() {
+        super();
+    }
 
-	public void setRefactoringContext(RefactoringContext ctx) {
-		this.ctx = ctx;
-	}
+    public void setRefactoringContext(RefactoringContext ctx) {
+        this.ctx = ctx;
+    }
 
-	@Override
-	public boolean visit(MethodInvocation node) {
-		if (node.getExpression() == null) {
-			return VISIT_SUBTREE;
-		}
-		boolean isEquals = isMethod(node, "java.lang.Object", "equals", "java.lang.Object");
-		boolean isStringEqualsIgnoreCase =
-				isMethod(node, "java.lang.String", "equalsIgnoreCase", "java.lang.String");
-		if (isEquals || isStringEqualsIgnoreCase) {
-			final Expression expr = node.getExpression();
-			final Object exprConstantValue = expr.resolveConstantExpressionValue();
-			final Expression arg0 = arguments(node).get(0);
-			final Object argConstantValue = arg0.resolveConstantExpressionValue();
-			// TODO JNR make it work for enums
-			if (exprConstantValue == null && argConstantValue != null) {
-				this.ctx.getRefactorings().replace(node,
-						invertEqualsInvocation(expr, arg0, isEquals));
-				return DO_NOT_VISIT_SUBTREE;
-			}
-		}
-		return VISIT_SUBTREE;
-	}
+    @Override
+    public boolean visit(MethodInvocation node) {
+        if (node.getExpression() == null) {
+            return VISIT_SUBTREE;
+        }
+        boolean isEquals = isMethod(node, "java.lang.Object", "equals", "java.lang.Object");
+        boolean isStringEqualsIgnoreCase =
+                isMethod(node, "java.lang.String", "equalsIgnoreCase", "java.lang.String");
+        if (isEquals || isStringEqualsIgnoreCase) {
+            final Expression expr = node.getExpression();
+            final Object exprConstantValue = expr.resolveConstantExpressionValue();
+            final Expression arg0 = arguments(node).get(0);
+            final Object argConstantValue = arg0.resolveConstantExpressionValue();
+            // TODO JNR make it work for enums
+            if (exprConstantValue == null && argConstantValue != null) {
+                this.ctx.getRefactorings().replace(node,
+                        invertEqualsInvocation(expr, arg0, isEquals));
+                return DO_NOT_VISIT_SUBTREE;
+            }
+        }
+        return VISIT_SUBTREE;
+    }
 
-	private ASTNode invertEqualsInvocation(Expression lhs, Expression rhs, boolean isEquals) {
-		final String methodName = isEquals ? "equals" : "equalsIgnoreCase";
-		final ASTBuilder b = this.ctx.getASTBuilder();
-		return b.invoke(b.copyExpr(rhs), methodName, b.copyExpr(lhs));
-	}
+    private ASTNode invertEqualsInvocation(Expression lhs, Expression rhs, boolean isEquals) {
+        final String methodName = isEquals ? "equals" : "equalsIgnoreCase";
+        final ASTBuilder b = this.ctx.getASTBuilder();
+        return b.invoke(b.copyExpr(rhs), methodName, b.copyExpr(lhs));
+    }
 
-	public Refactorings getRefactorings(CompilationUnit astRoot) {
-		astRoot.accept(this);
-		return this.ctx.getRefactorings();
-	}
+    public Refactorings getRefactorings(CompilationUnit astRoot) {
+        astRoot.accept(this);
+        return this.ctx.getRefactorings();
+    }
 }

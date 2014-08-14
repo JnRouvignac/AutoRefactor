@@ -41,11 +41,11 @@ import org.eclipse.ui.handlers.HandlerUtil;
  */
 public class ChooseRefactoringsWizardHandler extends AbstractHandler {
 
-	public Object execute(final ExecutionEvent event) throws ExecutionException {
-		final Shell shell = HandlerUtil.getActiveShell(event);
-		final WizardDialog dialog = new WizardDialog(shell, new ChooseRefactoringsWizard(event));
-		dialog.open();
-		return null;
-	}
+    public Object execute(final ExecutionEvent event) throws ExecutionException {
+        final Shell shell = HandlerUtil.getActiveShell(event);
+        final WizardDialog dialog = new WizardDialog(shell, new ChooseRefactoringsWizard(event));
+        dialog.open();
+        return null;
+    }
 
 }

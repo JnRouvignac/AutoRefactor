@@ -42,75 +42,75 @@ import static org.autorefactor.refactoring.ASTHelper.*;
  */
 public class ForeachRefactoring extends ASTVisitor implements IJavaRefactoring {
 
-	private RefactoringContext ctx;
+    private RefactoringContext ctx;
 
-	public ForeachRefactoring() {
-		super();
-	}
+    public ForeachRefactoring() {
+        super();
+    }
 
-	public void setRefactoringContext(RefactoringContext ctx) {
-		this.ctx = ctx;
-	}
+    public void setRefactoringContext(RefactoringContext ctx) {
+        this.ctx = ctx;
+    }
 
-	private static class VariableUseVisitor extends ASTVisitor {
+    private static class VariableUseVisitor extends ASTVisitor {
 
-		@Override
-		public boolean visit(SimpleName node) {
-			ASTNode parent = node.getParent();
-			if (parent instanceof QualifiedName
-					|| parent instanceof FieldAccess) {
-				return DO_NOT_VISIT_SUBTREE;
-			}
-			return DO_NOT_VISIT_SUBTREE;
-		}
-	}
+        @Override
+        public boolean visit(SimpleName node) {
+            ASTNode parent = node.getParent();
+            if (parent instanceof QualifiedName
+                    || parent instanceof FieldAccess) {
+                return DO_NOT_VISIT_SUBTREE;
+            }
+            return DO_NOT_VISIT_SUBTREE;
+        }
+    }
 
-	@Override
-	public boolean visit(ForStatement node) {
-		final VariableUseVisitor variableUseVisitor = new VariableUseVisitor();
-		node.accept(variableUseVisitor);
+    @Override
+    public boolean visit(ForStatement node) {
+        final VariableUseVisitor variableUseVisitor = new VariableUseVisitor();
+        node.accept(variableUseVisitor);
 
-		if (initializers(node).size() == 1) {
-			initializers(node);
-		}
+        if (initializers(node).size() == 1) {
+            initializers(node);
+        }
 
-		node.getExpression();
-		updaters(node);
-		node.getBody();
-		// TODO JNR iterate over array with index
-		// TODO JNR iterate over array with temporary variable with generics
-		// TODO JNR iterate over array with temporary variable without generics
-		// TODO JNR iterate over col with index
-		// TODO JNR iterate over col with temporary variable with generics
-		// TODO JNR iterate over col with temporary variable without generics
-		// TODO JNR iterate over col with Iterator with generics
-		// TODO JNR iterate over col with Iterator without generics
-		// TODO JNR iterate over col with ListIterator with generics
-		// TODO JNR iterate over col with ListIterator without generics
-		// be careful with use of index/iterator inside the loop
-		return VISIT_SUBTREE;
-	}
+        node.getExpression();
+        updaters(node);
+        node.getBody();
+        // TODO JNR iterate over array with index
+        // TODO JNR iterate over array with temporary variable with generics
+        // TODO JNR iterate over array with temporary variable without generics
+        // TODO JNR iterate over col with index
+        // TODO JNR iterate over col with temporary variable with generics
+        // TODO JNR iterate over col with temporary variable without generics
+        // TODO JNR iterate over col with Iterator with generics
+        // TODO JNR iterate over col with Iterator without generics
+        // TODO JNR iterate over col with ListIterator with generics
+        // TODO JNR iterate over col with ListIterator without generics
+        // be careful with use of index/iterator inside the loop
+        return VISIT_SUBTREE;
+    }
 
-	@Override
-	public boolean visit(WhileStatement node) {
-		node.getExpression();
-		node.getBody();
-		// TODO JNR iterate over array with index
-		// TODO JNR iterate over array with temporary variable with generics
-		// TODO JNR iterate over array with temporary variable without generics
-		// TODO JNR iterate over col with index
-		// TODO JNR iterate over col with temporary variable with generics
-		// TODO JNR iterate over col with temporary variable without generics
-		// TODO JNR iterate over col with Iterator with generics
-		// TODO JNR iterate over col with Iterator without generics
-		// TODO JNR iterate over col with ListIterator with generics
-		// TODO JNR iterate over col with ListIterator without generics
-		// be careful with use of index/iterator inside the loop
-		return VISIT_SUBTREE;
-	}
+    @Override
+    public boolean visit(WhileStatement node) {
+        node.getExpression();
+        node.getBody();
+        // TODO JNR iterate over array with index
+        // TODO JNR iterate over array with temporary variable with generics
+        // TODO JNR iterate over array with temporary variable without generics
+        // TODO JNR iterate over col with index
+        // TODO JNR iterate over col with temporary variable with generics
+        // TODO JNR iterate over col with temporary variable without generics
+        // TODO JNR iterate over col with Iterator with generics
+        // TODO JNR iterate over col with Iterator without generics
+        // TODO JNR iterate over col with ListIterator with generics
+        // TODO JNR iterate over col with ListIterator without generics
+        // be careful with use of index/iterator inside the loop
+        return VISIT_SUBTREE;
+    }
 
-	public Refactorings getRefactorings(CompilationUnit astRoot) {
-		astRoot.accept(this);
-		return this.ctx.getRefactorings();
-	}
+    public Refactorings getRefactorings(CompilationUnit astRoot) {
+        astRoot.accept(this);
+        return this.ctx.getRefactorings();
+    }
 }

@@ -27,17 +27,17 @@ package org.autorefactor.samples_in;
 
 public class RemoveFieldsDefaultValuesSample {
 
-	private static final int MY_CONSTANT = 0;
+    private static final int MY_CONSTANT = 0;
 
-	private Object obj = null;
-	private String st = null;
-	private byte by1 = 0x0, by2 = 0;
-	private boolean bo = false;
-	private char c1 = 0, c2 = '\u0000';
-	private short sh = 0;
-	private int i = 0;
-	private long l1 = 0, l2 = 0l, l3 = 0L;
-	private float f1 = 0, f2 = 0f, f3 = 0F, f4 = 0.0f;
-	private double d1 = 0, d2 = 0.0;
+    private Object obj = null;
+    private String st = null;
+    private byte by1 = 0x0, by2 = 0;
+    private boolean bo = false;
+    private char c1 = 0, c2 = '\u0000';
+    private short sh = 0;
+    private int i = 0;
+    private long l1 = 0, l2 = 0l, l3 = 0L;
+    private float f1 = 0, f2 = 0f, f3 = 0F, f4 = 0.0f;
+    private double d1 = 0, d2 = 0.0;
 
 }

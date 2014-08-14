@@ -29,30 +29,30 @@ import java.io.UnsupportedEncodingException;
 
 public class TryCatchThrowSample {
 
-	public String sample(boolean bo, byte[] by) {
-		String result = null;
-		try {
-			if (bo) {
-				result = null;
-				methodThatThrowsIllegalStateException();
-			}
-			if (by[0] != 8) {
-				throw new RuntimeException();
-			}
-			{
-				result = new String(by, "UTF-8");
-			}
-			by[0] = 0;
-		} catch (IllegalStateException e) {
-			e.printStackTrace();
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		} finally {
-			System.out.println(result);
-		}
-		return result;
-	}
+    public String sample(boolean bo, byte[] by) {
+        String result = null;
+        try {
+            if (bo) {
+                result = null;
+                methodThatThrowsIllegalStateException();
+            }
+            if (by[0] != 8) {
+                throw new RuntimeException();
+            }
+            {
+                result = new String(by, "UTF-8");
+            }
+            by[0] = 0;
+        } catch (IllegalStateException e) {
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        } finally {
+            System.out.println(result);
+        }
+        return result;
+    }
 
-	public void methodThatThrowsIllegalStateException() throws IllegalStateException {
-	}
+    public void methodThatThrowsIllegalStateException() throws IllegalStateException {
+    }
 }

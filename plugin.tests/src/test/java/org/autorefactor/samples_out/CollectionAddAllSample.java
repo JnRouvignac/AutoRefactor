@@ -31,35 +31,35 @@ import java.util.List;
 
 public class CollectionAddAllSample {
 
-	public void replaceNewNoArgsAssignmentThenAddAll(List<String> col, List<String> output) {
-		output = new ArrayList<String>(col);
-	}
+    public void replaceNewNoArgsAssignmentThenAddAll(List<String> col, List<String> output) {
+        output = new ArrayList<String>(col);
+    }
 
-	public List<String> replaceNewNoArgsThenAddAll(List<String> col) {
-		final List<String> output = new ArrayList<String>(col);
-		return output;
-	}
+    public List<String> replaceNewNoArgsThenAddAll(List<String> col) {
+        final List<String> output = new ArrayList<String>(col);
+        return output;
+    }
 
-	public List<String> replaceNew0ArgThenAddAll(List<String> col) {
-		final List<String> output = new ArrayList<String>(col);
-		return output;
-	}
+    public List<String> replaceNew0ArgThenAddAll(List<String> col) {
+        final List<String> output = new ArrayList<String>(col);
+        return output;
+    }
 
-	public List<String> replaceNew1ArgThenAddAll(List<String> col) {
-		final List<String> output = new ArrayList<String>(col);
-		return output;
-	}
+    public List<String> replaceNew1ArgThenAddAll(List<String> col) {
+        final List<String> output = new ArrayList<String>(col);
+        return output;
+    }
 
-	public List<String> replaceNewCollectionSizeThenAddAll(List<String> col) {
-		final List<String> output = new ArrayList<String>(col);
-		return output;
-	}
+    public List<String> replaceNewCollectionSizeThenAddAll(List<String> col) {
+        final List<String> output = new ArrayList<String>(col);
+        return output;
+    }
 
-	public void replaceForLoop(List<String> col, List<String> output) {
-		output.addAll(col);
-	}
+    public void replaceForLoop(List<String> col, List<String> output) {
+        output.addAll(col);
+    }
 
-	public void replaceForEach(Collection<String> col, List<String> output) {
-		output.addAll(col);
-	}
+    public void replaceForEach(Collection<String> col, List<String> output) {
+        output.addAll(col);
+    }
 }

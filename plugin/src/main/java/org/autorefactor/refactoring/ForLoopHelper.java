@@ -45,125 +45,125 @@ import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
  */
 public class ForLoopHelper {
 
-	private ForLoopHelper() {
-		super();
-	}
+    private ForLoopHelper() {
+        super();
+    }
 
-	public static enum ContainerType {
-		ARRAY, COLLECTION
-	}
+    public static enum ContainerType {
+        ARRAY, COLLECTION
+    }
 
-	public static enum IterationType {
-		INDEX, ITERATOR, FOREACH
-	}
+    public static enum IterationType {
+        INDEX, ITERATOR, FOREACH
+    }
 
-	public static final class ForLoopContent {
-		public Name loopVariable;
-		public Name elementVariable;
-		public Name containerVariable;
-		public ContainerType containerType;
-		public IterationType iterationType;
-	}
+    public static final class ForLoopContent {
+        public Name loopVariable;
+        public Name elementVariable;
+        public Name containerVariable;
+        public ContainerType containerType;
+        public IterationType iterationType;
+    }
 
-	public static ForLoopContent iterateOverContainer(ForStatement node) {
-		final List<Expression> initializers = initializers(node);
-		final Expression condition = node.getExpression();
-		final List<Expression> updaters = updaters(node);
-		if (initializers.size() == 1 && updaters.size() == 1) {
-			final Name init = getInitializerOperand(initializers.get(0));
-			final ForLoopContent forContent = getIndexOnCollection(condition);
-			final Name updater = getUpdaterOperand(updaters.get(0));
-			if (forContent != null
-					&& isSameVariable(init, forContent.loopVariable)
-					&& isSameVariable(init, updater)) {
-				return forContent;
-			}
-		}
-		return null;
-	}
+    public static ForLoopContent iterateOverContainer(ForStatement node) {
+        final List<Expression> initializers = initializers(node);
+        final Expression condition = node.getExpression();
+        final List<Expression> updaters = updaters(node);
+        if (initializers.size() == 1 && updaters.size() == 1) {
+            final Name init = getInitializerOperand(initializers.get(0));
+            final ForLoopContent forContent = getIndexOnCollection(condition);
+            final Name updater = getUpdaterOperand(updaters.get(0));
+            if (forContent != null
+                    && isSameVariable(init, forContent.loopVariable)
+                    && isSameVariable(init, updater)) {
+                return forContent;
+            }
+        }
+        return null;
+    }
 
-	private static Name getUpdaterOperand(Expression updater) {
-		Expression updaterOperand = null;
-		if (updater instanceof PostfixExpression) {
-			final PostfixExpression pe = (PostfixExpression) updater;
-			if (PostfixExpression.Operator.INCREMENT.equals(pe.getOperator())) {
-				updaterOperand = pe.getOperand();
-			}
-		} else if (updater instanceof PrefixExpression) {
-			final PrefixExpression pe = (PrefixExpression) updater;
-			if (PrefixExpression.Operator.INCREMENT.equals(pe.getOperator())) {
-				updaterOperand = pe.getOperand();
-			}
-		}
-		if (updaterOperand instanceof Name) {
-			return ((Name) updaterOperand);
-		}
-		return null;
-	}
+    private static Name getUpdaterOperand(Expression updater) {
+        Expression updaterOperand = null;
+        if (updater instanceof PostfixExpression) {
+            final PostfixExpression pe = (PostfixExpression) updater;
+            if (PostfixExpression.Operator.INCREMENT.equals(pe.getOperator())) {
+                updaterOperand = pe.getOperand();
+            }
+        } else if (updater instanceof PrefixExpression) {
+            final PrefixExpression pe = (PrefixExpression) updater;
+            if (PrefixExpression.Operator.INCREMENT.equals(pe.getOperator())) {
+                updaterOperand = pe.getOperand();
+            }
+        }
+        if (updaterOperand instanceof Name) {
+            return ((Name) updaterOperand);
+        }
+        return null;
+    }
 
-	private static Name getInitializerOperand(Expression init) {
-		if (!isPrimitive(init, "int")) {
-			return null;
-		}
-		if (init instanceof VariableDeclarationExpression) {
-			final VariableDeclarationExpression vde = (VariableDeclarationExpression) init;
-			final List<VariableDeclarationFragment> fragments = fragments(vde);
-			if (fragments.size() == 1) {
-				final VariableDeclarationFragment fragment = fragments.get(0);
-				if (isZero(fragment.getInitializer())) {
-					return fragment.getName();
-				}
-			}
-		} else if (init instanceof Assignment) {
-			final Assignment as = (Assignment) init;
-			if (Assignment.Operator.ASSIGN.equals(as.getOperator())
-					&& isZero(as.getRightHandSide())
-					&& as.getLeftHandSide() instanceof Name) {
-				return (Name) as.getLeftHandSide();
-			}
-		}
-		return null;
-	}
+    private static Name getInitializerOperand(Expression init) {
+        if (!isPrimitive(init, "int")) {
+            return null;
+        }
+        if (init instanceof VariableDeclarationExpression) {
+            final VariableDeclarationExpression vde = (VariableDeclarationExpression) init;
+            final List<VariableDeclarationFragment> fragments = fragments(vde);
+            if (fragments.size() == 1) {
+                final VariableDeclarationFragment fragment = fragments.get(0);
+                if (isZero(fragment.getInitializer())) {
+                    return fragment.getName();
+                }
+            }
+        } else if (init instanceof Assignment) {
+            final Assignment as = (Assignment) init;
+            if (Assignment.Operator.ASSIGN.equals(as.getOperator())
+                    && isZero(as.getRightHandSide())
+                    && as.getLeftHandSide() instanceof Name) {
+                return (Name) as.getLeftHandSide();
+            }
+        }
+        return null;
+    }
 
-	private static boolean isZero(final Expression expr) {
-		if (expr != null) {
-			final Object val = expr.resolveConstantExpressionValue();
-			if (val instanceof Integer) {
-				return ((Integer) val).intValue() == 0;
-			}
-		}
-		return false;
-	}
+    private static boolean isZero(final Expression expr) {
+        if (expr != null) {
+            final Object val = expr.resolveConstantExpressionValue();
+            if (val instanceof Integer) {
+                return ((Integer) val).intValue() == 0;
+            }
+        }
+        return false;
+    }
 
-	private static ForLoopContent getIndexOnCollection(final Expression condition) {
-		final InfixExpression ie = as(condition, InfixExpression.class);
-		if (ie != null) {
-			final Expression lo = ie.getLeftOperand();
-			final Expression ro = ie.getRightOperand();
-			if (InfixExpression.Operator.LESS.equals(ie.getOperator())) {
-				return buildForLoopContent(lo, ro);
-			} else if (InfixExpression.Operator.GREATER.equals(ie.getOperator())) {
-				return buildForLoopContent(ro, lo);
-			}
-		}
-		return null;
-	}
+    private static ForLoopContent getIndexOnCollection(final Expression condition) {
+        final InfixExpression ie = as(condition, InfixExpression.class);
+        if (ie != null) {
+            final Expression lo = ie.getLeftOperand();
+            final Expression ro = ie.getRightOperand();
+            if (InfixExpression.Operator.LESS.equals(ie.getOperator())) {
+                return buildForLoopContent(lo, ro);
+            } else if (InfixExpression.Operator.GREATER.equals(ie.getOperator())) {
+                return buildForLoopContent(ro, lo);
+            }
+        }
+        return null;
+    }
 
-	private static ForLoopContent buildForLoopContent(final Expression loopVar, final Expression containerVar) {
-		if (containerVar instanceof MethodInvocation
-				&& loopVar instanceof Name) {
-			final MethodInvocation mi = (MethodInvocation) containerVar;
-			if (isMethod(mi, "java.util.Collection", "size")
-					&& mi.getExpression() instanceof Name) {
-				final ForLoopContent content = new ForLoopContent();
-				content.loopVariable = (Name) loopVar;
-				content.containerVariable = (Name) mi.getExpression();
-				content.containerType = ContainerType.COLLECTION;
-				content.iterationType = IterationType.INDEX;
-				return content;
-			}
-		}
-		return null;
-	}
+    private static ForLoopContent buildForLoopContent(final Expression loopVar, final Expression containerVar) {
+        if (containerVar instanceof MethodInvocation
+                && loopVar instanceof Name) {
+            final MethodInvocation mi = (MethodInvocation) containerVar;
+            if (isMethod(mi, "java.util.Collection", "size")
+                    && mi.getExpression() instanceof Name) {
+                final ForLoopContent content = new ForLoopContent();
+                content.loopVariable = (Name) loopVar;
+                content.containerVariable = (Name) mi.getExpression();
+                content.containerType = ContainerType.COLLECTION;
+                content.iterationType = IterationType.INDEX;
+                return content;
+            }
+        }
+        return null;
+    }
 
 }
