@@ -69,7 +69,8 @@ public class CommentsRefactoring extends ASTVisitor implements IJavaRefactoring 
     private static final Pattern EMPTY_LINE_COMMENT = Pattern.compile("//\\s*");
     private static final Pattern EMPTY_BLOCK_COMMENT = Pattern.compile("/\\*\\s*(\\*\\s*)*\\*/");
     private static final Pattern EMPTY_JAVADOC = Pattern.compile("/\\*\\*\\s*(\\*\\s*)*\\*/");
-    private static final Pattern JAVADOC_ONLY_INHERITDOC = Pattern.compile("/\\*\\*\\s*(\\*\\s*)*\\{@inheritDoc\\}\\s*(\\*\\s*)*\\*/");
+    private static final Pattern JAVADOC_ONLY_INHERITDOC =
+            Pattern.compile("/\\*\\*\\s*(\\*\\s*)*\\{@inheritDoc\\}\\s*(\\*\\s*)*\\*/");
     private static final Pattern ECLIPSE_GENERATED_TODOS = Pattern.compile("//\\s*"
             + "(:?"
             +   "(?:TODO Auto-generated (?:(?:(?:method|constructor) stub)|(?:catch block)))"
@@ -77,13 +78,16 @@ public class CommentsRefactoring extends ASTVisitor implements IJavaRefactoring 
             +   "(?:TODO: handle exception)"
             + ")"
             + "\\s*");
-    private static final Pattern JAVADOC_WITHOUT_FINAL_DOT = Pattern.compile("(.*?)((?:\\s*(?:\\r|\\n|\\r\\n)*\\s*)*\\*/)", Pattern.DOTALL);
-    private static final Pattern JAVADOC_FIRST_LETTER_LOWERCASE = Pattern.compile("(/\\*\\*(?:\\s*\\*(?:\\r|\\n|\\r\\n|\\s)))*(\\w)(.*)", Pattern.DOTALL);
+    private static final Pattern JAVADOC_WITHOUT_FINAL_DOT =
+            Pattern.compile("(.*?)((?:\\s*(?:\\r|\\n|\\r\\n)*\\s*)*\\*/)", Pattern.DOTALL);
+    private static final Pattern JAVADOC_FIRST_LETTER_LOWERCASE =
+            Pattern.compile("(/\\*\\*(?:\\s*\\*(?:\\r|\\n|\\r\\n|\\s)))*(\\w)(.*)", Pattern.DOTALL);
 
     private RefactoringContext ctx;
     private CompilationUnit astRoot;
     private List<Pair<SourceLocation, Comment>> comments = new ArrayList<Pair<SourceLocation, Comment>>();
 
+    /** Class constructor. */
     public CommentsRefactoring() {
         super();
     }
@@ -345,7 +349,7 @@ public class CommentsRefactoring extends ASTVisitor implements IJavaRefactoring 
     public boolean visit(CompilationUnit node) {
         this.astRoot = node;
         for (Comment comment : getCommentList(astRoot)) {
-            comments.add(Pair.of(new SourceLocation(comment.getStartPosition(), comment.getLength()), comment));
+            comments.add(Pair.of(new SourceLocation(comment), comment));
         }
 
         for (Comment comment : getCommentList(astRoot)) {

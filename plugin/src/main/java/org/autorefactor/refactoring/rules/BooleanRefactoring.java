@@ -171,6 +171,7 @@ public class BooleanRefactoring extends ASTVisitor implements IJavaRefactoring {
     private RefactoringContext ctx;
     private int javaMinorVersion;
 
+    /** Class constructor. */
     public BooleanRefactoring() {
         super();
     }

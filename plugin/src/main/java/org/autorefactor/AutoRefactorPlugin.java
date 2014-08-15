@@ -68,10 +68,16 @@ public class AutoRefactorPlugin extends AbstractUIPlugin {
         // To set default preferences for your plug-in, use new DefaultScope().getNode(<yourPluginId>).
         // To lookup an integer preference value for your plug-in, use
         // Platform.getPreferencesService().getInt(<yourPluginId>, <preferenceKey>, <defaultValue>, null).
-        // Similar methods exist on IPreferencesService for obtaining other kinds of preference values (strings, booleans, etc).
+        // Similar methods exist on IPreferencesService for obtaining other kinds of preference values
+        // (strings, booleans, etc).
         return plugin;
     }
 
+    /**
+     * Returns a helper object for the preferences.
+     *
+     * @return a helper object for the preferences
+     */
     public static PreferenceHelper getPreferenceHelper() {
         if (preferenceHelper == null) {
             preferenceHelper = new PreferenceHelper(getDefault().getPreferenceStore());

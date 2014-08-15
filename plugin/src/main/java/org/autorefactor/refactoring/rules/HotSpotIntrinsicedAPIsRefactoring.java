@@ -52,6 +52,11 @@ import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
 
+/**
+ * Refactors code patterns to use intrinsiced APIs in Hotspot JVM.
+ * intrinsics are APIs that receive special treatment when JITed:
+ * they can be compiled down to use very efficient CPU instructions.
+ */
 public class HotSpotIntrinsicedAPIsRefactoring extends ASTVisitor implements
         IJavaRefactoring {
 
@@ -67,6 +72,7 @@ public class HotSpotIntrinsicedAPIsRefactoring extends ASTVisitor implements
 
     private RefactoringContext ctx;
 
+    /** Class constructor. */
     public HotSpotIntrinsicedAPIsRefactoring() {
         super();
     }
@@ -142,12 +148,10 @@ public class HotSpotIntrinsicedAPIsRefactoring extends ASTVisitor implements
         final Integer expr2Value = intValue(expr2);
         if (expr1Value != null && expr2Value != null) {
             return b.int0(expr1Value - expr2Value);
-        }
-        else if (expr1Value != null && expr1Value == 0) {
+        } else if (expr1Value != null && expr1Value == 0) {
             // TODO negate expr2
             throw new NotImplementedException();
-        }
-        else if (expr2Value != null && expr2Value == 0) {
+        } else if (expr2Value != null && expr2Value == 0) {
             return b.copyExpr(expr1);
         }
         return b.infixExpr(
@@ -163,11 +167,9 @@ public class HotSpotIntrinsicedAPIsRefactoring extends ASTVisitor implements
         final Integer expr2Value = intValue(expr2);
         if (expr1Value != null && expr2Value != null) {
             return b.int0(expr1Value + expr2Value);
-        }
-        else if (expr1Value != null && expr1Value == 0) {
+        } else if (expr1Value != null && expr1Value == 0) {
             return b.copyExpr(expr2);
-        }
-        else if (expr2Value != null && expr2Value == 0) {
+        } else if (expr2Value != null && expr2Value == 0) {
             return b.copyExpr(expr1);
         }
         return b.infixExpr(
@@ -278,8 +280,7 @@ public class HotSpotIntrinsicedAPIsRefactoring extends ASTVisitor implements
                     return;
                 }
             }
-        }
-        else if (initializer0 instanceof Assignment) {
+        } else if (initializer0 instanceof Assignment) {
             final Assignment as = (Assignment) initializer0;
             if (Assignment.Operator.ASSIGN.equals(as.getOperator())
                     && isPrimitive(as.resolveTypeBinding(), "int")) {
@@ -307,8 +308,7 @@ public class HotSpotIntrinsicedAPIsRefactoring extends ASTVisitor implements
             if (PostfixExpression.Operator.INCREMENT.equals(pe.getOperator())) {
                 return getVariableBinding(pe.getOperand());
             }
-        }
-        else if (updater0 instanceof PrefixExpression) {
+        } else if (updater0 instanceof PrefixExpression) {
             final PrefixExpression pe = (PrefixExpression) updater0;
             if (PrefixExpression.Operator.INCREMENT.equals(pe.getOperator())) {
                 return getVariableBinding(pe.getOperand());

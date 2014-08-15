@@ -35,29 +35,48 @@ import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 
+/**
+ * Represents a source file.
+ */
 public class SourceCode {
 
+    /**
+     * Represents a line in a source file.
+     */
     public class Line extends SourceLocation {
 
         private String lineText;
         private SourceCode sourceCode;
 
+        /**
+         * Builds an instance of this class.
+         *
+         * @param lineText the text of this line
+         * @param offset the start position of this line in the source file
+         * @param length the length of this line
+         * @param sourceCode the enclosing source file
+         */
         public Line(String lineText, int offset, int length, SourceCode sourceCode) {
             super(offset, length);
             this.lineText = lineText;
             this.sourceCode = sourceCode;
         }
 
+        /**
+         * Returns the line text as a String.
+         *
+         * @return the line text as a String.
+         */
         public String getLineText() {
             return lineText;
         }
 
         @Override
         public String toString() {
-            return "[(" + sourceCode.astRoot.getLineNumber(getStart()) + ","
-                    + sourceCode.astRoot.getColumnNumber(getStart()) + ")"
-                    + " => (" + sourceCode.astRoot.getLineNumber(getEnd())
-                    + "," + sourceCode.astRoot.getColumnNumber(getEnd()) + ")]";
+            return "[(" + sourceCode.astRoot.getLineNumber(getStartPosition()) + ","
+                    + sourceCode.astRoot.getColumnNumber(getStartPosition()) + ")"
+                    + " => (" + sourceCode.astRoot.getLineNumber(getEndPosition())
+                    + "," + sourceCode.astRoot.getColumnNumber(getEndPosition()) + ")]";
         }
 
     }
@@ -67,6 +86,13 @@ public class SourceCode {
     private ICompilationUnit compilationUnit;
     private List<Line> lines = new ArrayList<Line>();
 
+    /**
+     * Builds an instance of this class.
+     *
+     * @param text the text of the source file.
+     * @param astRoot the AST root of the source file
+     * @param compilationUnit the compilation unit of the source file
+     */
     public SourceCode(String text, CompilationUnit astRoot,
             ICompilationUnit compilationUnit) {
         this.astRoot = astRoot;
