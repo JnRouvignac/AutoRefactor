@@ -65,7 +65,8 @@ public class CFGBasicBlock implements Comparable<CFGBasicBlock> {
         this.lineAndColumn = lineAndColumn;
     }
 
-    public CFGBasicBlock(ASTNode node, String fileName, String codeExcerpt, boolean isDecision, LineAndColumn lineAndColumn) {
+    public CFGBasicBlock(ASTNode node, String fileName, String codeExcerpt, boolean isDecision,
+            LineAndColumn lineAndColumn) {
         this(node, fileName, codeExcerpt, isDecision, null, lineAndColumn);
     }
 
@@ -73,7 +74,8 @@ public class CFGBasicBlock implements Comparable<CFGBasicBlock> {
         return new CFGBasicBlock(node, fileName, codeExcerpt, false, true, new LineAndColumn(0, 1, 1));
     }
 
-    public static CFGBasicBlock buildExitBlock(ASTNode node, String fileName, String codeExcerpt, LineAndColumn lineAndColumn) {
+    public static CFGBasicBlock buildExitBlock(ASTNode node, String fileName, String codeExcerpt,
+            LineAndColumn lineAndColumn) {
         return new CFGBasicBlock(node, fileName, codeExcerpt, false, false, lineAndColumn);
     }
 
@@ -81,6 +83,11 @@ public class CFGBasicBlock implements Comparable<CFGBasicBlock> {
         return lineAndColumn;
     }
 
+    /**
+     * Returns the AST node represented by this basic block.
+     *
+     * @return the AST node represented by this basic block
+     */
     public ASTNode getNode() {
         return node;
     }
@@ -89,18 +96,38 @@ public class CFGBasicBlock implements Comparable<CFGBasicBlock> {
         return this.isDecision;
     }
 
+    /**
+     * Returns whether this basic block is the entry block of a method.
+     *
+     * @return true if this basic block is an entry block, false otherwise
+     */
     public boolean isEntryBlock() {
         return Boolean.TRUE.equals(this.isEntryBlock);
     }
 
+    /**
+     * Returns whether this basic block is the exit block of a method.
+     *
+     * @return true if this basic block is an exit block, false otherwise
+     */
     public boolean isExitBlock() {
         return Boolean.FALSE.equals(this.isEntryBlock);
     }
 
+    /**
+     * Returns a collection of the outgoing edges and variable accesses of this basic block.
+     *
+     * @return a collection of the outgoing edges and variable accesses of this basic block.
+     */
     public Collection<Object> getOutgoingEdgesAndVariableAccesses() {
         return outgoingEdgesAndVariableAccesses;
     }
 
+    /**
+     * Adds an incoming edge to this basic block.
+     *
+     * @param edge an incoming edge to this basic block
+     */
     public void addIncomingEdge(CFGEdge edge) {
         if (edge.getTargetBlock() != this) {
             throw new IllegalArgumentException(
@@ -113,6 +140,11 @@ public class CFGBasicBlock implements Comparable<CFGBasicBlock> {
         }
     }
 
+    /**
+     * Adds an outgoing edge to this basic block.
+     *
+     * @param edge an outgoing edge from this basic block
+     */
     public void addOutgoingEdge(CFGEdge edge) {
         if (edge.getSourceBlock() != this) {
             throw new IllegalArgumentException(
@@ -124,6 +156,11 @@ public class CFGBasicBlock implements Comparable<CFGBasicBlock> {
         }
     }
 
+    /**
+     * Adds a variable access to this basic block.
+     *
+     * @param varAccess the variable access to add to this basic block
+     */
     public void addVariableAccess(VariableAccess varAccess) {
         this.outgoingEdgesAndVariableAccesses.add(varAccess);
     }
@@ -133,7 +170,7 @@ public class CFGBasicBlock implements Comparable<CFGBasicBlock> {
         final int prime = 31;
         int result = 1;
         result = prime * result + ((fileName == null) ? 0 : fileName.hashCode());
-        result = prime * result + ((lineAndColumn == null) ? 0 : lineAndColumn.hashCode());;
+        result = prime * result + ((lineAndColumn == null) ? 0 : lineAndColumn.hashCode());
         result = prime * result
                 + ((isEntryBlock == null) ? 0 : isEntryBlock.hashCode());
         return result;
@@ -152,16 +189,25 @@ public class CFGBasicBlock implements Comparable<CFGBasicBlock> {
     }
 
     /** {@inheritDoc} */
-    public int compareTo(CFGBasicBlock o)
-    {
+    public int compareTo(CFGBasicBlock o) {
         final Integer startPosition = lineAndColumn.getStartPosition();
         return startPosition.compareTo(o.lineAndColumn.getStartPosition());
     }
 
+    /**
+     * Returns the file name containing this basic block.
+     *
+     * @return the file name containing this basic block
+     */
     public String getFileName() {
         return this.fileName;
     }
 
+    /**
+     * Returns a code excerpt for this basic block.
+     *
+     * @return a code excerpt for this basic block
+     */
     public String getCodeExcerpt() {
         return codeExcerpt;
     }

@@ -25,12 +25,19 @@
  */
 package org.autorefactor.util;
 
-public class UnhandledException extends RuntimeException
-{
+/**
+ * Exception thrown when an exception could not be handled.
+ * The cause is the unhandled exception.
+ */
+public class UnhandledException extends RuntimeException {
 
-  public UnhandledException(Throwable cause)
-  {
-    super(cause);
-  }
+    /**
+     * Class constructor.
+     *
+     * @param unhandled the unhandled exception.
+     */
+    public UnhandledException(Throwable unhandled) {
+        super(unhandled);
+    }
 
 }

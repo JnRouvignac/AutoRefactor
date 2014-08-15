@@ -25,18 +25,32 @@
  */
 package org.autorefactor.util;
 
+/**
+ * Exception thrown when some code is not implemented, or when some conditions are not handled.
+ */
 public class NotImplementedException extends RuntimeException {
 
     private static final String DEFAULT_MESSAGE = "Code is not implemented";
 
+    /** Class constructor to use when some code is not implemented. */
     public NotImplementedException() {
         this(DEFAULT_MESSAGE);
     }
 
+    /**
+     * Class constructor to use when the provided object was not expected.
+     *
+     * @param cause the unexpected object
+     */
     public NotImplementedException(Object cause) {
         this("for an object of type " + (cause != null ? cause.getClass() : null));
     }
 
+    /**
+     * Class constructor to use with a provided reason.
+     *
+     * @param reason an additional message
+     */
     public NotImplementedException(String reason) {
         super(DEFAULT_MESSAGE + " " + (reason != null ? reason : ""));
     }

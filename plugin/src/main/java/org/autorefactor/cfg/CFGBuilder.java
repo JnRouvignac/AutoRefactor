@@ -489,7 +489,8 @@ public class CFGBuilder {
             return state.nextStmtWillCreateNewBlock();
         }
         try {
-            final Method m = getClass().getMethod("buildCFG", node.getClass(), LivenessState.class, ThrowerBlocks.class);
+            final Method m = getClass().getMethod(
+                    "buildCFG", node.getClass(), LivenessState.class, ThrowerBlocks.class);
             return (LivenessState) m.invoke(this, node, state, throwers);
         } catch (Exception e) {
             throw new UnhandledException(e);
@@ -566,7 +567,8 @@ public class CFGBuilder {
                         || "void".equals(node.getReturnType2().resolveBinding().getName())) {
                     buildEdges(liveAfterBody, exitBlock);
                 } else {
-                    throw new IllegalStateException("Did not expect to find any edges to build for a constructor or a non void method return type.");
+                    throw new IllegalStateException("Did not expect to find any edges to build "
+                        + "for a constructor or a non void method return type.");
                 }
             }
             if (!this.edgesToBuild.isEmpty()) {
@@ -679,7 +681,7 @@ public class CFGBuilder {
                 liveBeforeCatchClause.add(new CFGEdgeBuilder(throwingBlockInTry));
             }
 
-            final LivenessState liveAfterCatchClause = buildCFG(catchClause.getBody(), catchState, new ThrowerBlocks()); // TODO JNR fix new P()
+            final LivenessState liveAfterCatchClause = buildCFG(catchClause.getBody(), catchState, new ThrowerBlocks());
             liveAfterCatchClauses.addAll(liveAfterCatchClause);
         }
 
@@ -1109,7 +1111,8 @@ public class CFGBuilder {
         final CFGBasicBlock basicBlock = getCFGBasicBlock(node, state.nextStmtWillCreateNewBlock());
         final LivenessState newLiveState = new LivenessState(basicBlock, new CFGEdgeBuilder(basicBlock));
         final LivenessState liveAfterLoop = buildCFG(node.getBody(), newLiveState, throwers);
-        CFGBasicBlock conditionBlock = getCFGBasicBlock(node.getExpression(), liveAfterLoop.nextStmtWillCreateNewBlock());
+        CFGBasicBlock conditionBlock =
+                getCFGBasicBlock(node.getExpression(), liveAfterLoop.nextStmtWillCreateNewBlock());
         addVariableAccess(conditionBlock, node.getExpression(), READ, throwers);
 
         buildEdge(node.getExpression(), true, conditionBlock, basicBlock);
