@@ -26,6 +26,8 @@
  */
 package org.autorefactor.cfg;
 
+import static org.autorefactor.util.Utils.*;
+
 /**
  * Contains a position in the source code with the start position from the start
  * of the file, the line number and the column number.
@@ -57,16 +59,12 @@ class LineAndColumn {
     /** {@inheritDoc} */
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        LineAndColumn other = (LineAndColumn) obj;
-        if (startPosition != other.startPosition)
-            return false;
-        return true;
+        final Boolean equal = basicEqual(this, obj);
+        if (equal != null) {
+            return equal;
+        }
+        final LineAndColumn other = (LineAndColumn) obj;
+        return equal(startPosition, other.startPosition);
     }
 
     /** {@inheritDoc} */

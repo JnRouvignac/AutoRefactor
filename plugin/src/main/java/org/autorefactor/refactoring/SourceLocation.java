@@ -28,6 +28,8 @@ package org.autorefactor.refactoring;
 import org.eclipse.jdt.core.ISourceRange;
 import org.eclipse.jdt.core.dom.ASTNode;
 
+import static org.autorefactor.util.Utils.*;
+
 public class SourceLocation implements ISourceRange, Comparable<ISourceRange> {
 
     private int offset;
@@ -94,18 +96,13 @@ public class SourceLocation implements ISourceRange, Comparable<ISourceRange> {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        SourceLocation other = (SourceLocation) obj;
-        if (length != other.length)
-            return false;
-        if (offset != other.offset)
-            return false;
-        return true;
+        final Boolean equal = basicEqual(this, obj);
+        if (equal != null) {
+            return equal;
+        }
+        final SourceLocation other = (SourceLocation) obj;
+        return equal(length, other.length)
+                && equal(offset, other.offset);
     }
 
     @Override

@@ -25,6 +25,8 @@
  */
 package org.autorefactor.util;
 
+import static org.autorefactor.util.Utils.*;
+
 /**
  * An immutable pair of objects.
  *
@@ -102,24 +104,13 @@ public final class Pair<F, S> {
     /** {@inheritDoc} */
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        final Pair other = (Pair) obj;
-        if (first == null) {
-            if (other.first != null)
-                return false;
-        } else if (!first.equals(other.first))
-            return false;
-        if (second == null) {
-            if (other.second != null)
-                return false;
-        } else if (!second.equals(other.second))
-            return false;
-        return true;
+        final Boolean equal = basicEqual(this, obj);
+        if (equal != null) {
+            return equal;
+        }
+        final Pair<?, ?> other = (Pair<?, ?>) obj;
+        return equal(first, other.first)
+                && equal(second, other.second);
     }
 
     @Override

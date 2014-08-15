@@ -858,8 +858,9 @@ public class ASTHelper {
     public static boolean isSameVariable(QualifiedName name1, FieldAccess name2) {
         IBinding sb = name1.resolveBinding();
         IBinding cb = name2.resolveFieldBinding();
-        if (cb == null || sb == null)
+        if (cb == null || sb == null) {
             return false;
+        }
         if (cb.isEqualTo(sb)) {
             return isSameVariable(name2.getExpression(), name1.getQualifier());
         }
@@ -869,8 +870,9 @@ public class ASTHelper {
     public static boolean isSameVariable(FieldAccess name1, FieldAccess name2) {
         IBinding cb = name1.resolveFieldBinding();
         IBinding sb = name2.resolveFieldBinding();
-        if (cb == null || sb == null)
+        if (cb == null || sb == null) {
             return false;
+        }
         if (cb.isEqualTo(sb)) {
             return isSameVariable(name1.getExpression(), name2.getExpression());
         }

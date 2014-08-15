@@ -30,6 +30,8 @@ import java.util.LinkedList;
 
 import org.eclipse.jdt.core.dom.ASTNode;
 
+import static org.autorefactor.util.Utils.*;
+
 /**
  * Control Flow Graph Basic Block. Basic blocks here are a little different from
  * the normal definition of "all adjacent statements not separated by a jump".
@@ -37,7 +39,6 @@ import org.eclipse.jdt.core.dom.ASTNode;
  * all receive their own basic block in order to be able to link variable uses to
  * one basic block. It also mixes in lexical scoping.
  *
- * @author jnrouvignac
  * @see <a href="http://en.wikipedia.org/wiki/Control_flow_graph">Control flow
  *      graph on wikipedia</a>
  * @see <a href="http://en.wikipedia.org/wiki/Basic_block">Basic block on
@@ -140,29 +141,14 @@ public class CFGBasicBlock implements Comparable<CFGBasicBlock> {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        CFGBasicBlock other = (CFGBasicBlock) obj;
-        if (fileName == null) {
-            if (other.fileName != null)
-                return false;
-        } else if (!fileName.equals(other.fileName))
-            return false;
-        if (lineAndColumn == null) {
-            if (other.lineAndColumn != null)
-                return false;
-        } else if (!lineAndColumn.equals(other.lineAndColumn))
-            return false;
-        if (isEntryBlock == null) {
-            if (other.isEntryBlock != null)
-                return false;
-        } else if (!isEntryBlock.equals(other.isEntryBlock))
-            return false;
-        return true;
+        final Boolean equal = basicEqual(this, obj);
+        if (equal != null) {
+            return equal;
+        }
+        final CFGBasicBlock other = (CFGBasicBlock) obj;
+        return equal(fileName, other.fileName)
+                && equal(lineAndColumn, other.lineAndColumn)
+                && equal(isEntryBlock, other.isEntryBlock);
     }
 
     /** {@inheritDoc} */

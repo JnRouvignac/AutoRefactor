@@ -24,6 +24,7 @@
  * available at http://www.eclipse.org/legal/epl-v10.html
  */
 /**
- * Leave untouched.
+ * Output java code samples used to test refactoring rules.
+ * Refactoring rules are run on the samples in org.autorefactor.samples_in and the refactored output is compared against these samples. 
  */
 package org.autorefactor.samples_out;

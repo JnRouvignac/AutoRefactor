@@ -41,7 +41,6 @@ import java.util.List;
 import org.autorefactor.refactoring.Release;
 import org.autorefactor.refactoring.rules.JavaCoreHelper;
 import org.autorefactor.ui.ApplyRefactoringsJob;
-import org.autorefactor.ui.AutoRefactorHandler;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.dom.AST;

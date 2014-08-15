@@ -2,6 +2,8 @@ package org.autorefactor.cfg;
 
 import org.eclipse.jdt.core.dom.Expression;
 
+import static org.autorefactor.util.Utils.*;
+
 public class CFGEdgeBuilder {
 
     private Expression condition;
@@ -46,31 +48,15 @@ public class CFGEdgeBuilder {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        CFGEdgeBuilder other = (CFGEdgeBuilder) obj;
-        if (condition == null) {
-            if (other.condition != null)
-                return false;
-        } else if (!condition.equals(other.condition))
-            return false;
-        if (evaluationResult != other.evaluationResult)
-            return false;
-        if (sourceBlock == null) {
-            if (other.sourceBlock != null)
-                return false;
-        } else if (!sourceBlock.equals(other.sourceBlock))
-            return false;
-        if (targetBlock == null) {
-            if (other.targetBlock != null)
-                return false;
-        } else if (!targetBlock.equals(other.targetBlock))
-            return false;
-        return true;
+        final Boolean equal = basicEqual(this, obj);
+        if (equal != null) {
+            return equal;
+        }
+        final CFGEdgeBuilder other = (CFGEdgeBuilder) obj;
+        return equal(condition, other.condition)
+                && equal(evaluationResult, other.evaluationResult)
+                && equal(sourceBlock, other.sourceBlock)
+                && equal(targetBlock, other.targetBlock);
     }
 
     public CFGEdgeBuilder withTarget(CFGBasicBlock target) {
