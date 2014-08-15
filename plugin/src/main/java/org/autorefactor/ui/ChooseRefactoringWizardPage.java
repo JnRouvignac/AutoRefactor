@@ -35,8 +35,24 @@ import java.util.regex.Pattern;
 import org.autorefactor.refactoring.IRefactoring;
 import org.autorefactor.refactoring.rules.AllRefactorings;
 import org.autorefactor.util.UnhandledException;
-import org.eclipse.jface.viewers.*;
+import org.eclipse.jface.viewers.ArrayContentProvider;
+import org.eclipse.jface.viewers.CheckboxTableViewer;
+import org.eclipse.jface.viewers.ColumnLabelProvider;
+import org.eclipse.jface.viewers.ICheckStateProvider;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.StructuredViewer;
+import org.eclipse.jface.viewers.StyledCellLabelProvider;
+import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.StyledString.Styler;
+import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.viewers.TableViewerColumn;
+import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerCell;
+import org.eclipse.jface.viewers.ViewerComparator;
+import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyleRange;
@@ -47,7 +63,11 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.TextStyle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.*;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.widgets.Text;
 
 import static org.eclipse.jface.viewers.CheckboxTableViewer.*;
 
@@ -149,8 +169,7 @@ public class ChooseRefactoringWizardPage extends WizardPage {
                     Method m = clazz.getDeclaredMethod("filter", Object[].class);
                     m.setAccessible(true);
                     return (Object[]) m.invoke(viewer, (Object) ((List<?>) input).toArray());
-                }
-                catch (Exception e) {
+                } catch (Exception e) {
                     throw new UnhandledException(e);
                 }
             }

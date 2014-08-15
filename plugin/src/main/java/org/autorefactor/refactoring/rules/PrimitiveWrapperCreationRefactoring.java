@@ -28,7 +28,12 @@ package org.autorefactor.refactoring.rules;
 import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.IJavaRefactoring;
 import org.autorefactor.refactoring.Refactorings;
-import org.eclipse.jdt.core.dom.*;
+import org.eclipse.jdt.core.dom.ASTVisitor;
+import org.eclipse.jdt.core.dom.ClassInstanceCreation;
+import org.eclipse.jdt.core.dom.CompilationUnit;
+import org.eclipse.jdt.core.dom.Expression;
+import org.eclipse.jdt.core.dom.ITypeBinding;
+import org.eclipse.jdt.core.dom.MethodInvocation;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
 
@@ -62,12 +67,10 @@ public class PrimitiveWrapperCreationRefactoring extends ASTVisitor implements
         if (node.getExpression() == null) {
             return VISIT_SUBTREE;
         }
-        final ITypeBinding typeBinding = node.getExpression()
-                .resolveTypeBinding();
+        final ITypeBinding typeBinding = node.getExpression().resolveTypeBinding();
         if (typeBinding != null
                 && node.getExpression() instanceof ClassInstanceCreation) {
-            final ClassInstanceCreation cic = (ClassInstanceCreation) node
-                    .getExpression();
+            final ClassInstanceCreation cic = (ClassInstanceCreation) node.getExpression();
             if (arguments(cic).size() == 1) {
                 ITypeBinding argTypeBinding = arguments(cic).get(0)
                         .resolveTypeBinding();

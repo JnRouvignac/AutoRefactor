@@ -25,14 +25,45 @@
  */
 package org.autorefactor.refactoring.rules;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import org.autorefactor.refactoring.IJavaRefactoring;
 import org.autorefactor.refactoring.Refactorings;
 import org.autorefactor.util.NotImplementedException;
 import org.autorefactor.util.Pair;
-import org.eclipse.jdt.core.dom.*;
+import org.eclipse.jdt.core.dom.AST;
+import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.ASTVisitor;
+import org.eclipse.jdt.core.dom.Assignment;
+import org.eclipse.jdt.core.dom.Block;
+import org.eclipse.jdt.core.dom.CompilationUnit;
+import org.eclipse.jdt.core.dom.EnhancedForStatement;
+import org.eclipse.jdt.core.dom.Expression;
+import org.eclipse.jdt.core.dom.ExpressionStatement;
+import org.eclipse.jdt.core.dom.ForStatement;
+import org.eclipse.jdt.core.dom.IfStatement;
+import org.eclipse.jdt.core.dom.ImportDeclaration;
+import org.eclipse.jdt.core.dom.InfixExpression;
+import org.eclipse.jdt.core.dom.MethodDeclaration;
+import org.eclipse.jdt.core.dom.MethodInvocation;
+import org.eclipse.jdt.core.dom.Name;
+import org.eclipse.jdt.core.dom.PackageDeclaration;
+import org.eclipse.jdt.core.dom.PostfixExpression;
+import org.eclipse.jdt.core.dom.QualifiedName;
+import org.eclipse.jdt.core.dom.SimpleName;
+import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
+import org.eclipse.jdt.core.dom.Statement;
+import org.eclipse.jdt.core.dom.Type;
+import org.eclipse.jdt.core.dom.TypeDeclaration;
+import org.eclipse.jdt.core.dom.VariableDeclaration;
+import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
+import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
+import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
+import org.eclipse.jdt.core.dom.WhileStatement;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
 
@@ -194,17 +225,20 @@ public class ReduceVariableScopeRefactoring extends ASTVisitor implements
 
     private Pair<Integer, ASTNode> getAccessTypeAndScope(ASTNode node) {
         final ASTNode parent = node.getParent();
-        if (parent instanceof Block || parent instanceof InfixExpression
+        if (parent instanceof Block
+                || parent instanceof InfixExpression
                 || parent instanceof EnhancedForStatement
                 || parent instanceof ExpressionStatement
-                || parent instanceof ForStatement || parent instanceof Name
+                || parent instanceof ForStatement
+                || parent instanceof Name
                 || parent instanceof WhileStatement) {
             return getAccessTypeAndScope(parent);
         } else if (parent instanceof ImportDeclaration
                 || parent instanceof MethodDeclaration
                 || parent instanceof MethodInvocation
                 || parent instanceof PackageDeclaration
-                || parent instanceof Type || parent instanceof TypeDeclaration) {
+                || parent instanceof Type
+                || parent instanceof TypeDeclaration) {
             return nullPair;
         } else if (parent instanceof SingleVariableDeclaration) {
             final SingleVariableDeclaration var = (SingleVariableDeclaration) parent;

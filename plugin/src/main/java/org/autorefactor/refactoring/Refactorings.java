@@ -36,7 +36,12 @@ import java.util.Map;
 import java.util.Set;
 
 import org.autorefactor.util.Pair;
-import org.eclipse.jdt.core.dom.*;
+import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.BlockComment;
+import org.eclipse.jdt.core.dom.ChildListPropertyDescriptor;
+import org.eclipse.jdt.core.dom.Comment;
+import org.eclipse.jdt.core.dom.LineComment;
+import org.eclipse.jdt.core.dom.StructuralPropertyDescriptor;
 
 /**
  * Class aggregating all the refactorings performed by a refactoring rule until
