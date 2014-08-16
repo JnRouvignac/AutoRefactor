@@ -43,13 +43,12 @@ import static org.autorefactor.refactoring.ASTHelper.*;
  * literal.</li>
  * <li>Calling {@link String#toString()} on a {@link String} instance</li>
  * </ul>
- *
- * @author jnrouvignac
  */
 public class StringRefactoring extends ASTVisitor implements IJavaRefactoring {
 
     private RefactoringContext ctx;
 
+    /** Default constructor. */
     public StringRefactoring() {
         super();
     }

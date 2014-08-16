@@ -86,6 +86,12 @@ public class ApplyRefactoringsJob extends Job {
     private final IJavaElement javaElement;
     private final List<IRefactoring> refactoringsToApply;
 
+    /**
+     * Builds an instance of this class.
+     *
+     * @param javaElement a java element from where to extract the project options
+     * @param refactoringsToApply the refactorings to apply
+     */
     public ApplyRefactoringsJob(IJavaElement javaElement, List<IRefactoring> refactoringsToApply) {
         super("Auto Refactor");
         this.javaElement = javaElement;
@@ -194,7 +200,32 @@ public class ApplyRefactoringsJob extends Job {
         throw new NotImplementedException(javaElement);
     }
 
+    private void applyRefactoring(ICompilationUnit compilationUnit, Release javaSERelease, int tabSize,
+            AggregateASTVisitor refactoringToApply) throws Exception {
+        final ITextFileBufferManager bufferManager = FileBuffers.getTextFileBufferManager();
+        final IPath path = compilationUnit.getPath();
+        final LocationKind locationKind = LocationKind.NORMALIZE;
+        try {
+            bufferManager.connect(path, locationKind, null);
+            final ITextFileBuffer textFileBuffer = bufferManager.getTextFileBuffer(path, locationKind);
+            final IDocument document = textFileBuffer.getDocument();
+            applyRefactoring(document, compilationUnit, javaSERelease, tabSize, refactoringToApply);
+            textFileBuffer.commit(null, false);
+        } finally {
+            bufferManager.disconnect(path, locationKind, null);
+        }
+    }
+
     /**
+     * Applies the refactorings provided inside the {@link AggregateASTVisitor} to the provided
+     * {@link ICompilationUnit}.
+     *
+     * @param document the document where the compilation unit comes from
+     * @param compilationUnit the compilation unit to refactor
+     * @param javaSERelease the Java SE version used to compile the compilation unit
+     * @param tabSize the tabulation size in use in the current java project
+     * @param refactoring the {@link AggregateASTVisitor} to apply to the compilation unit
+     *
      * @see <a
      * href="http://help.eclipse.org/indigo/index.jsp?topic=%2Forg.eclipse.jdt.doc.isv%2Fguide%2Fjdt_api_manip.htm"
      * >Eclipse JDT core - Manipulating Java code</a>
@@ -206,26 +237,8 @@ public class ApplyRefactoringsJob extends Job {
      * href="http://www.eclipse.org/articles/article.php?file=Article-JavaCodeManipulation_AST/index.html"
      * >Abstract Syntax Tree > Write it down</a>
      */
-    private void applyRefactoring(ICompilationUnit compilationUnit, Release javaSERelease, int tabSize,
-            AggregateASTVisitor refactoringToApply) throws Exception {
-        final ITextFileBufferManager bufferManager = FileBuffers.getTextFileBufferManager();
-        final IPath path = compilationUnit.getPath();
-        final LocationKind locationKind = LocationKind.NORMALIZE;
-        try {
-            bufferManager.connect(path, locationKind, null);
-            final ITextFileBuffer textFileBuffer = bufferManager
-                    .getTextFileBuffer(path, locationKind);
-            final IDocument document = textFileBuffer.getDocument();
-            applyRefactoring(document, compilationUnit,
-                    javaSERelease, tabSize, refactoringToApply);
-            textFileBuffer.commit(null, false);
-        } finally {
-            bufferManager.disconnect(path, locationKind, null);
-        }
-    }
-
     public void applyRefactoring(IDocument document, ICompilationUnit compilationUnit, Release javaSERelease,
-            int tabSize, AggregateASTVisitor refactoring) throws JavaModelException {
+            int tabSize, AggregateASTVisitor refactoring) {
         // creation of DOM/AST from a ICompilationUnit
         final ASTParser parser = ASTParser.newParser(AST.JLS4);
         resetParser(compilationUnit, parser, javaSERelease);
@@ -312,7 +325,7 @@ public class ApplyRefactoringsJob extends Job {
     }
 
     @SuppressWarnings("unchecked")
-    public static Map<String, String> getCompilerOptions(Release javaSERelease) {
+    private static Map<String, String> getCompilerOptions(Release javaSERelease) {
         final Map<String, String> options = JavaCore.getOptions();
         final String v = javaSERelease.getMajorVersion() + "." + javaSERelease.getMinorVersion();
         JavaCore.setComplianceOptions(v, options);

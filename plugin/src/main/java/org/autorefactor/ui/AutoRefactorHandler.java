@@ -53,6 +53,7 @@ import org.eclipse.ui.handlers.HandlerUtil;
  */
 public class AutoRefactorHandler extends AbstractHandler {
 
+    /** {@inheritDoc} */
     public Object execute(final ExecutionEvent event) throws ExecutionException {
         new ApplyRefactoringsJob(
                 getSelectedJavaElement(event),

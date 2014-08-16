@@ -71,6 +71,9 @@ import org.eclipse.swt.widgets.Text;
 
 import static org.eclipse.jface.viewers.CheckboxTableViewer.*;
 
+/**
+ * Wizard page which allows the user to choose which refactorings to apply to the selected java elements.
+ */
 public class ChooseRefactoringWizardPage extends WizardPage {
 
     private final class CheckStateProvider implements ICheckStateProvider {
@@ -116,6 +119,11 @@ public class ChooseRefactoringWizardPage extends WizardPage {
         setDescription("Choose the refactorings to perform automatically");
     }
 
+    /**
+     * Returns the refactorings (selected by the user) to apply to the selected elements.
+     *
+     * @return the refactorings (selected by the user) to apply to the selected elements
+     */
     public List<IRefactoring> getSelectedRefactorings() {
         final ArrayList<IRefactoring> results = new ArrayList<IRefactoring>();
         for (Object o : tableViewer.getCheckedElements()) {

@@ -32,7 +32,7 @@ import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.dom.AST;
 
 /**
- * @author jnrouvignac
+ * Class holding necessary data for a refactoring.
  */
 public class RefactoringContext {
 
@@ -41,6 +41,7 @@ public class RefactoringContext {
     private final AST ast;
     private final Release javaSERelease;
 
+    /** Constructor. */
     public RefactoringContext(ICompilationUnit compilationUnit, AST ast,
             Release javaSERelease) {
         this.ast = ast;
@@ -48,23 +49,47 @@ public class RefactoringContext {
         this.compilationUnit = compilationUnit;
     }
 
+    /**
+     * Returns the {@link AST} object to use in the refactoring.
+     *
+     * @return the {@link AST} object to use in the refactoring
+     */
     public AST getAST() {
         return ast;
     }
 
+    /**
+     * Returns a new {@link ASTBuilder} object to use in the refactoring.
+     *
+     * @return a new {@link ASTBuilder} object to use in the refactoring
+     */
     public ASTBuilder getASTBuilder() {
         return new ASTBuilder(ast);
     }
 
+    /**
+     * Returns the compilation unit to refactor.
+     *
+     * @return the compilation unit to refactor
+     */
     public ICompilationUnit getCompilationUnit() {
         return compilationUnit;
     }
 
+    /**
+     * Returns the Java SE version that is used to compile the compilation unit.
+     *
+     * @return the Java SE version that is used to compile the compilation unit
+     */
     public Release getJavaSERelease() {
         return javaSERelease;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * Returns the {@link Refactorings} object containing the changes that must be applied to the AST.
+     *
+     * @return the {@link Refactorings} object containing the changes that must be applied to the AST
+     */
     public Refactorings getRefactorings() {
         return refactorings;
     }

@@ -57,10 +57,24 @@ public final class Release {
         return newVersionNumbers;
     }
 
+    /**
+     * Factory method that builds a release instance for Java SE with the version provided as a string.
+     *
+     * @param version the string representation of the version
+     * @return a release instance for Java SE
+     * @throws RuntimeException if the provided version is not valid
+     */
     public static Release javaSE(String version) {
         return javaSE(toIntegerArray(version));
     }
 
+    /**
+     * Factory method that builds a release instance for Java SE with the version provided as integer varargs.
+     *
+     * @param version the integer varargs representation of the version
+     * @return a release instance for Java SE
+     * @throws RuntimeException if the provided version is not valid
+     */
     public static Release javaSE(int... version) {
         final Release release = new Release("JavaSE", version);
         if (!release.isVersionValid()) {
@@ -70,14 +84,10 @@ public final class Release {
     }
 
     private boolean isVersionValid() {
-        boolean result = false;
-        if (this.releaseName.equals("JavaSE")) {
-            if (this.version.length >= 2) {
-                result = this.version[0] == 1 && 0 <= this.version[1]
-                        && this.version[1] <= 8;
-            }
-        }
-        return result;
+        return this.releaseName.equals("JavaSE")
+                && this.version.length >= 2
+                && this.version[0] == 1
+                && 0 <= this.version[1] && this.version[1] <= 8;
     }
 
     private static int[] toIntegerArray(String version) {
@@ -90,12 +100,18 @@ public final class Release {
         return result;
     }
 
+    /**
+     * Returns whether the current release is compatible with the required release.
+     * Newer releases are considered compatible with older releases.
+     *
+     * @param requiredRelease the required release
+     * @return true if the current release is compatible with the required release, false otherwise
+     */
     public boolean isCompatibleWith(Release requiredRelease) {
         if (!this.releaseName.equals(requiredRelease.releaseName)) {
             return false;
         }
-        final int min = Math.min(this.version.length,
-                requiredRelease.version.length);
+        final int min = Math.min(this.version.length, requiredRelease.version.length);
         for (int i = 0; i < min; i++) {
             final int nb = this.version[i];
             final int requiredNb = requiredRelease.version[i];
@@ -108,14 +124,32 @@ public final class Release {
         return this.version.length >= requiredRelease.version.length;
     }
 
+    /**
+     * Returns the major version of a release.
+     * For example, if the release version is "1.3.5", then this method will return "1".
+     *
+     * @return the major version of a release
+     */
     public int getMajorVersion() {
         return getVersionNumber(0);
     }
 
+    /**
+     * Returns the minor version of a release.
+     * For example, if the release version is "1.3.5", then this method will return "3".
+     *
+     * @return the minor version of a release
+     */
     public int getMinorVersion() {
         return getVersionNumber(1);
     }
 
+    /**
+     * Returns the patch version of a release.
+     * For example, if the release version is "1.3.5", then this method will return "5".
+     *
+     * @return the patch version of a release
+     */
     public int getPatchVersion() {
         return getVersionNumber(2);
     }

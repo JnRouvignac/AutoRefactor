@@ -28,22 +28,29 @@ package org.autorefactor.ui;
 import java.util.List;
 
 import org.autorefactor.refactoring.IRefactoring;
-import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jface.wizard.Wizard;
 
+/**
+ * Wizard which allows the user to choose which refactorings to apply to the selected java elements.
+ */
 public class ChooseRefactoringsWizard extends Wizard {
 
     private final ChooseRefactoringWizardPage chooseRefactoringsPage = new ChooseRefactoringWizardPage();
     private IJavaElement javaElement;
 
-    public ChooseRefactoringsWizard(ExecutionEvent event) {
+    /**
+     * Builds an instance of this class, with the provided java element.
+     *
+     * @param javaElement a java element from where to extract the project options
+     */
+    public ChooseRefactoringsWizard(IJavaElement javaElement) {
         setNeedsProgressMonitor(true);
-        // retrieve the targeted java element before the menu item is disposed by the framework
-        javaElement = AutoRefactorHandler.getSelectedJavaElement(event);
+        this.javaElement = javaElement;
     }
 
+    /** {@inheritDoc} */
     @Override
     public String getWindowTitle() {
         return "Choose refactorings...";
