@@ -50,7 +50,7 @@ public interface PreferenceConstants {
         "Remove 'this' qualifier for non static method accesses");
 
     /** TODO use this for preferences initialization. */
-    String JDT__ALWAYS_USE_THIS_FOR_NON_STATIC_METHOD_ACCESS =
+    String JDT_ALWAYS_USE_THIS_FOR_NON_STATIC_METHOD_ACCESS =
         "cleanup.always_use_this_for_non_static_method_access";
 
 }

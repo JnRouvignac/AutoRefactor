@@ -144,12 +144,12 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
             return innerExpr;
         }
         if (
-        // TODO JNR can we revert the condition in the InfixExpression?
-        // parentheses are sometimes needed to explicit code,
-        // some like it like that
-        innerExpr instanceof InfixExpression
-        // TODO JNR add additional code to check if the cast is really required
-        // or if it can be removed.
+                // TODO JNR can we revert the condition in the InfixExpression?
+                // parentheses are sometimes needed to explicit code,
+                // some like it like that
+                innerExpr instanceof InfixExpression
+                // TODO JNR add additional code to check if the cast is really required
+                // or if it can be removed.
                 || innerExpr instanceof CastExpression) {
             return node;
         }
@@ -389,7 +389,7 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
      * This will be implemented only if somebody comes up with code where the runtime exception is thrown.
      * </p>
      *
-     * @see <a href="http://publib.boulder.ibm.com/infocenter/iadthelp/v6r0/topic/org.eclipse.jdt.doc.isv/reference/api/org/eclipse/jdt/core/dom/InfixExpression.html#extendedOperands()">
+     * @see InfixExpression#extendedOperands()
      */
     private void checkNoExtendedOperands(InfixExpression node) {
         if (!hasType(node, "java.lang.String") && !node.extendedOperands().isEmpty()) {

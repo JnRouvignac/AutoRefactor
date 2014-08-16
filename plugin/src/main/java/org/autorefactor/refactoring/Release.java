@@ -32,7 +32,7 @@ package org.autorefactor.refactoring;
  * TODO should we use artifactId, groupId and version like maven does?
  * </p>
  */
-public class Release {
+public final class Release {
 
     private final int[] version;
     private final String releaseName;

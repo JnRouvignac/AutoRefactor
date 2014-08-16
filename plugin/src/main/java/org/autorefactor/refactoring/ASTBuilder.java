@@ -103,7 +103,8 @@ public class ASTBuilder {
         return is;
     }
 
-    public InfixExpression infixExpr(Expression leftOperand, InfixExpression.Operator operator, Expression rightOperand) {
+    public InfixExpression infixExpr(Expression leftOperand, InfixExpression.Operator operator,
+            Expression rightOperand) {
         final InfixExpression ie = ast.newInfixExpression();
         ie.setLeftOperand(leftOperand);
         ie.setOperator(operator);

@@ -37,7 +37,11 @@ import org.autorefactor.ui.preferences.PreferenceHelper;
 /**
  * Lists all the available refactorings.
  */
-public class AllRefactorings {
+public final class AllRefactorings {
+
+    private AllRefactorings() {
+        super();
+    }
 
     public static List<IRefactoring> getConfiguredRefactorings() {
         final PreferenceHelper prefs = AutoRefactorPlugin.getPreferenceHelper();

@@ -70,12 +70,12 @@ public class RemoveUselessModifiersRefactoring extends ASTVisitor implements
     private final class ModifierOrderComparator implements Comparator<Modifier> {
 
         public int compare(Modifier o1, Modifier o2) {
-            final int i1 = modifierOrder.indexOf(o1.getKeyword());
-            final int i2 = modifierOrder.indexOf(o2.getKeyword());
-            if (i1 == -1 ) {
+            final int i1 = ORDERED_MODIFIERS.indexOf(o1.getKeyword());
+            final int i2 = ORDERED_MODIFIERS.indexOf(o2.getKeyword());
+            if (i1 == -1) {
                 throw new NotImplementedException("cannot determine order for modifier " + o1);
             }
-            if ( i2 == -1) {
+            if (i2 == -1) {
                 throw new NotImplementedException("cannot compare modifier " + o2);
             }
             return i1 - i2;
@@ -83,7 +83,7 @@ public class RemoveUselessModifiersRefactoring extends ASTVisitor implements
 
     }
 
-    private static final List<ModifierKeyword> modifierOrder =
+    private static final List<ModifierKeyword> ORDERED_MODIFIERS =
             Collections.unmodifiableList(Arrays.asList(
                     ModifierKeyword.PUBLIC_KEYWORD,
                     ModifierKeyword.PROTECTED_KEYWORD,

@@ -56,7 +56,8 @@ public class Refactorings {
     /**
      * The refactorings inserting code into the AST tree.
      */
-    private final Map<ChildListPropertyDescriptor, List<Insert>> inserts = new LinkedHashMap<ChildListPropertyDescriptor, List<Insert>>();
+    private final Map<ChildListPropertyDescriptor, List<Insert>> inserts =
+            new LinkedHashMap<ChildListPropertyDescriptor, List<Insert>>();
     /**
      * The refactorings removing code from the AST tree.
      */
@@ -185,7 +186,8 @@ public class Refactorings {
                 || !this.blockCommentToJavadoc.isEmpty();
     }
 
-    public void insertAt(ASTNode nodeToInsert, int index, StructuralPropertyDescriptor locationInParent, ASTNode listHolder) {
+    public void insertAt(ASTNode nodeToInsert, int index, StructuralPropertyDescriptor locationInParent,
+            ASTNode listHolder) {
         insert(locationInParent, new Insert(nodeToInsert, listHolder, index));
     }
 

@@ -105,7 +105,7 @@ import org.eclipse.jdt.core.dom.WhileStatement;
 /**
  * Helper class for manipulating, converting, navigating and checking {@link ASTNode}s.
  */
-public class ASTHelper {
+public final class ASTHelper {
 
     public static final boolean DO_NOT_VISIT_SUBTREE = false;
     public static final boolean VISIT_SUBTREE = true;
@@ -395,15 +395,15 @@ public class ASTHelper {
         } else if (typeBinding.isClass() || typeBinding.isInterface()) {
             final String[] qualifiedName = typeBinding.getQualifiedName().split("\\.");
             if (qualifiedName.length == 0) {
-                throw new IllegalStateException("Cannot create a new type from an ITypeBinding without qualified name: " + typeBinding);
+                throw new IllegalStateException(
+                        "Cannot create a new type from an ITypeBinding without qualified name: " + typeBinding);
             }
             final SimpleType simpleType = ast.newSimpleType(ast.newSimpleName(qualifiedName[0]));
             if (qualifiedName.length == 1) {
                 return simpleType;
             }
             Type result = simpleType;
-            for (int i = 1; i < qualifiedName.length; i++)
-            {
+            for (int i = 1; i < qualifiedName.length; i++) {
                 result = ast.newQualifiedType(result, ast.newSimpleName(qualifiedName[i]));
             }
             return result;

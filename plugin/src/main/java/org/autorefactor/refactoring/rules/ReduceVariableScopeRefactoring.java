@@ -76,7 +76,9 @@ import static org.autorefactor.refactoring.ASTHelper.*;
 public class ReduceVariableScopeRefactoring extends ASTVisitor implements
         IJavaRefactoring {
 
-    private static final int DECL = 1 << 0, READ = 1 << 1, WRITE = 1 << 2;
+    private static final int DECL  = 1 << 0;
+    private static final int READ  = 1 << 1;
+    private static final int WRITE = 1 << 2;
 
     private static final class VariableName {
 
@@ -177,8 +179,9 @@ public class ReduceVariableScopeRefactoring extends ASTVisitor implements
     }
 
     private RefactoringContext ctx;
-    private final Map<VariableName, List<VariableAccess>> allVariableAccesses = new HashMap<VariableName, List<VariableAccess>>();
-    private static final Pair<Integer, ASTNode> nullPair = Pair.of(0, null);
+    private final Map<VariableName, List<VariableAccess>> allVariableAccesses =
+            new HashMap<VariableName, List<VariableAccess>>();
+    private static final Pair<Integer, ASTNode> NULL_PAIR = Pair.of(0, null);
 
     public ReduceVariableScopeRefactoring() {
         super();
@@ -239,7 +242,7 @@ public class ReduceVariableScopeRefactoring extends ASTVisitor implements
                 || parent instanceof PackageDeclaration
                 || parent instanceof Type
                 || parent instanceof TypeDeclaration) {
-            return nullPair;
+            return NULL_PAIR;
         } else if (parent instanceof SingleVariableDeclaration) {
             final SingleVariableDeclaration var = (SingleVariableDeclaration) parent;
             return getAccessTypeAndScope(var.getParent());
@@ -283,7 +286,7 @@ public class ReduceVariableScopeRefactoring extends ASTVisitor implements
                 for (VariableAccess varAccess : variableAccesses) {
                     if (varAccess.getAccessType() == WRITE) {
                         replace(varDecl, varAccess);
-                    }// TODO JNR if (varAccess.getAccessType() & WRITE) {
+                    } // TODO JNR if (varAccess.getAccessType() & WRITE) {
                 }
             }
         }
@@ -304,10 +307,8 @@ public class ReduceVariableScopeRefactoring extends ASTVisitor implements
             final List<Statement> stmts = statements(b);
             for (int i = 0; i < stmts.size(); i++) {
                 final Statement stmt = stmts.get(i);
-                final Expression parentExpr = getParentOfType(varName,
-                        Expression.class);// FIXME i=0
-                final Statement parentStmt = getParentOfType(parentExpr,
-                        Statement.class);// FIXME i=0;
+                final Expression parentExpr = getParentOfType(varName, Expression.class);  // FIXME i=0
+                final Statement parentStmt = getParentOfType(parentExpr, Statement.class); // FIXME i=0
                 if (stmt.equals(parentStmt)) {
                     final VariableDeclarationFragment vdf = getVariableDeclarationFragment(
                             parentExpr, varName);

@@ -30,18 +30,20 @@ import java.util.regex.Pattern;
 public interface JavaConstants {
 
     /**
-     * @see <a href="http://docs.oracle.com/javase/7/docs/technotes/guides/language/binary-literals.html">Binary Literals</a>
-     * @see <a href="http://docs.oracle.com/javase/7/docs/technotes/guides/language/underscores-literals.html">Underscores in Numeric Literals</a>
+     * @see <a href="http://docs.oracle.com/javase/7/docs/technotes/guides/language/binary-literals.html">
+     *      Binary Literals</a>
+     * @see <a href="http://docs.oracle.com/javase/7/docs/technotes/guides/language/underscores-literals.html">
+     *      Underscores in Numeric Literals</a>
      */
-    public String INTEGER_LITERAL_COMPATIBLE_PATTERN = "" + "(?:" +
+    public String INTEGER_LITERAL_COMPATIBLE_PATTERN = "" + "(?:"
             // binary literal
-            "(?:0b|0B)(?:[0-1][0-1_]*)?[0-1]" + ")|(?:" +
+            + "(?:0b|0B)(?:[0-1][0-1_]*)?[0-1]" + ")|(?:"
             // octal literal
-            "0(?:[0-7_]*)?[0-7]" + ")|(?:" +
+            + "0(?:[0-7_]*)?[0-7]" + ")|(?:"
             // decimal literal
-            "[0-9]([0-9_]*[0-9])?" + ")|(?:" +
+            + "[0-9]([0-9_]*[0-9])?" + ")|(?:"
             // hexadecimal literal
-            "(?:0x|0X)([0-9a-fA-F][0-9a-fA-F_]*)?[0-9a-fA-F]" + ")";
+            + "(?:0x|0X)([0-9a-fA-F][0-9a-fA-F_]*)?[0-9a-fA-F]" + ")";
 
     public Pattern INTEGER_LITERAL_COMPATIBLE_RE = Pattern
             .compile(INTEGER_LITERAL_COMPATIBLE_PATTERN);
@@ -52,34 +54,34 @@ public interface JavaConstants {
     public Pattern LONG_LITERAL_COMPATIBLE_RE = Pattern
             .compile(LONG_LITERAL_COMPATIBLE_PATTERN);
 
-    public Pattern ZERO_LONG_LITERAL_RE = Pattern.compile("(?:" + "(?:" +
+    public Pattern ZERO_LONG_LITERAL_RE = Pattern.compile("(?:" + "(?:"
             // binary literal
-            "(?:0b|0B)(?:0[0_]*)?0" + ")|(?:" +
+            + "(?:0b|0B)(?:0[0_]*)?0" + ")|(?:"
             // octal literal
-            "0[0_]*0" + ")|(?:" +
+            + "0[0_]*0" + ")|(?:"
             // decimal literal
-            "0(?:[0_]*0)?" + ")|(?:" +
+            + "0(?:[0_]*0)?" + ")|(?:"
             // hexadecimal literal
-            "(?:0x|0X)(?:0[0_]*)?0" + ")" + ")(?:l|L)?");
+            + "(?:0x|0X)(?:0[0_]*)?0" + ")" + ")(?:l|L)?");
 
-    public Pattern ONE_LONG_LITERAL_RE = Pattern.compile("(?:" + "(?:" +
+    public Pattern ONE_LONG_LITERAL_RE = Pattern.compile("(?:" + "(?:"
             // binary literal
-            "(?:0b|0B)(?:0[0_]*)?1" + ")|(?:" +
+            + "(?:0b|0B)(?:0[0_]*)?1" + ")|(?:"
             // octal literal
-            "0[0_]*1" + ")|(?:" +
+            + "0[0_]*1" + ")|(?:"
             // decimal literal
-            "1" + ")|(?:" +
+            + "1" + ")|(?:"
             // hexadecimal literal
-            "(?:0x|0X)(?:0[0_]*)?1" + ")" + ")(?:l|L)?");
+            + "(?:0x|0X)(?:0[0_]*)?1" + ")" + ")(?:l|L)?");
 
-    public Pattern TEN_LONG_LITERAL_RE = Pattern.compile("(?:" + "(?:" +
+    public Pattern TEN_LONG_LITERAL_RE = Pattern.compile("(?:" + "(?:"
             // binary literal
-            "(?:0b|0B)(?:0[0_]*)?1_*0_*1_*0" + ")|(?:" +
+            + "(?:0b|0B)(?:0[0_]*)?1_*0_*1_*0" + ")|(?:"
             // octal literal
-            "0[0_]*1_*3" + ")|(?:" +
+            + "0[0_]*1_*3" + ")|(?:"
             // decimal literal
-            "1_*0" + ")|(?:" +
+            + "1_*0" + ")|(?:"
             // hexadecimal literal
-            "(?:0x|0X)(?:0[0_]*)?(?:a|A)" + ")" + ")(?:l|L)?");
+            + "(?:0x|0X)(?:0[0_]*)?(?:a|A)" + ")" + ")(?:l|L)?");
 
 }

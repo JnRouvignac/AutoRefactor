@@ -43,7 +43,7 @@ import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 /**
  * Helper class for dealing with loops.
  */
-public class ForLoopHelper {
+public final class ForLoopHelper {
 
     private ForLoopHelper() {
         super();
@@ -58,11 +58,31 @@ public class ForLoopHelper {
     }
 
     public static final class ForLoopContent {
-        public Name loopVariable;
-        public Name elementVariable;
-        public Name containerVariable;
-        public ContainerType containerType;
-        public IterationType iterationType;
+        private Name loopVariable;
+        private Name elementVariable;
+        private Name containerVariable;
+        private ContainerType containerType;
+        private IterationType iterationType;
+
+        public Name getLoopVariable() {
+            return loopVariable;
+        }
+
+        public Name getElementVariable() {
+            return elementVariable;
+        }
+
+        public Name getContainerVariable() {
+            return containerVariable;
+        }
+
+        public ContainerType getContainerType() {
+            return containerType;
+        }
+
+        public IterationType getIterationType() {
+            return iterationType;
+        }
     }
 
     public static ForLoopContent iterateOverContainer(ForStatement node) {

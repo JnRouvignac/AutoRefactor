@@ -192,7 +192,7 @@ public class CollectionAddAllRefactoring extends ASTVisitor implements
                         && getMI.getExpression() instanceof Name) {
                     final Expression getArg0 = arguments(getMI).get(0);
                     if (getArg0 instanceof Name
-                            && isSameLocalVariable(getArg0, loopContent.loopVariable)) {
+                            && isSameLocalVariable(getArg0, loopContent.getLoopVariable())) {
                         return replaceWithCollectionAddAll(
                                 node, addMI.getExpression(), getMI.getExpression());
                     }

@@ -140,15 +140,17 @@ import static org.autorefactor.refactoring.ASTHelper.*;
  */
 public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring {
 
-    private Map<Class<?>, List<ASTVisitor>> visitorsMap = new HashMap<Class<?>, List<ASTVisitor>>();
-    private Map<Class<?>, List<ASTVisitor>> endVisitorsMap = new HashMap<Class<?>, List<ASTVisitor>>();
-    private List<ASTVisitor> preVisitors = new ArrayList<ASTVisitor>();
-    private List<ASTVisitor> preVisitors2 = new ArrayList<ASTVisitor>();
-    private List<ASTVisitor> postVisitors = new ArrayList<ASTVisitor>();
+    private final Map<Class<?>, List<ASTVisitor>> visitorsMap = new HashMap<Class<?>, List<ASTVisitor>>();
+    private final Map<Class<?>, List<ASTVisitor>> endVisitorsMap = new HashMap<Class<?>, List<ASTVisitor>>();
+    private final List<ASTVisitor> preVisitors = new ArrayList<ASTVisitor>();
+    private final List<ASTVisitor> preVisitors2 = new ArrayList<ASTVisitor>();
+    private final List<ASTVisitor> postVisitors = new ArrayList<ASTVisitor>();
+
     private final List<ASTVisitor> visitors;
-    private boolean debugModeOn;
+    private final boolean debugModeOn;
+
     private RefactoringContext ctx;
-    private List<ASTVisitor> visitorsContributingRefactoring = new ArrayList<ASTVisitor>();
+    private final List<ASTVisitor> visitorsContributingRefactoring = new ArrayList<ASTVisitor>();
 
     @SuppressWarnings("rawtypes")
     public AggregateASTVisitor(List<IRefactoring> visitors, boolean debugModeOn) {
@@ -220,6 +222,7 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
     }
 
     /** {@inheritDoc} */
+    @Override
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public void setRefactoringContext(RefactoringContext ctx) {
         this.ctx = ctx;
@@ -230,6 +233,7 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
     }
 
     /** {@inheritDoc} */
+    @Override
     public Refactorings getRefactorings(CompilationUnit astRoot) {
         astRoot.accept(this);
         return this.ctx.getRefactorings();
@@ -274,7 +278,8 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
     }
 
     private void logFaultyVisitor(final ASTVisitor v, Exception e) {
-        String message = "Visitor " + v.getClass().getName() + " is faulty, it will be disabled for the rest of this run.";
+        String message = "Visitor " + v.getClass().getName()
+                + " is faulty, it will be disabled for the rest of this run.";
         if (debugModeOn) {
             if (e instanceof RuntimeException) {
                 throw (RuntimeException) e;
@@ -291,12 +296,14 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
     public static void main(String[] args) {
         final Method[] mm = ASTVisitor.class.getDeclaredMethods();
         Arrays.sort(mm, new Comparator<Method>() {
-
+            /** {@inheritDoc} */
+            @Override
             public int compare(Method o1, Method o2) {
                 return o1.getName().compareTo(o2.getName());
             }
         });
         for (Method m : mm) {
+            System.out.println("/** {@inheritDoc} */");
             System.out.println("@Override");
             System.out.print("public " + m.getReturnType() + " ");
             System.out.print(m.getName() + "(");
@@ -309,17 +316,22 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
                 System.out.print(paramType.getSimpleName() + " node");
             }
             System.out.println(") {");
-            System.out.print("\tfor (Iterator<ASTVisitor> iter = " );
+            final boolean isVisit = isVisit(m);
+            final boolean isEndVisit = isEndVisit(m);
+            if (isVisit || isEndVisit) {
+                System.out.print("\tfinal List<ASTVisitor> visitorList = getVisitors(");
+                System.out.print((isVisit ? "visitorsMap" : "endVisitorsMap") + ", ");
+                System.out.println(m.getParameterTypes()[0].getSimpleName() + ".class);");
+            }
+            System.out.print("\tfor (Iterator<ASTVisitor> iter = ");
             if (is("preVisit", m)) {
                 System.out.print("preVisitors");
             } else if (is("preVisit2", m)) {
                 System.out.print("preVisitors2");
             } else if (is("postVisit", m)) {
                 System.out.print("postVisitors");
-            } else if (isVisit(m)) {
-                System.out.print("getVisitors(visitorsMap, " + m.getParameterTypes()[0].getSimpleName() + ".class)");
-            } else if (isEndVisit(m)) {
-                System.out.print("getVisitors(endVisitorsMap, " + m.getParameterTypes()[0].getSimpleName() + ".class)");
+            } else if (isVisit || isEndVisit) {
+                System.out.print("visitorList");
             } else {
                 throw new NotImplementedException("for method " + m);
             }
@@ -346,373 +358,11 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
         }
     }
 
-    @Override
-    public void endVisit(ExpressionStatement node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(endVisitorsMap, ExpressionStatement.class).iterator(); iter.hasNext();) {
-            final ASTVisitor v = iter.next();
-            try {
-                v.endVisit(node);
-            } catch (Exception e) {
-                logFaultyVisitor(v, e);
-                iter.remove();
-            }
-        }
-    }
-
-    @Override
-    public void endVisit(FieldAccess node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(endVisitorsMap, FieldAccess.class).iterator(); iter.hasNext();) {
-            final ASTVisitor v = iter.next();
-            try {
-                v.endVisit(node);
-            } catch (Exception e) {
-                logFaultyVisitor(v, e);
-                iter.remove();
-            }
-        }
-    }
-
-    @Override
-    public void endVisit(EnumDeclaration node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(endVisitorsMap, EnumDeclaration.class).iterator(); iter.hasNext();) {
-            final ASTVisitor v = iter.next();
-            try {
-                v.endVisit(node);
-            } catch (Exception e) {
-                logFaultyVisitor(v, e);
-                iter.remove();
-            }
-        }
-    }
-
-    @Override
-    public void endVisit(FieldDeclaration node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(endVisitorsMap, FieldDeclaration.class).iterator(); iter.hasNext();) {
-            final ASTVisitor v = iter.next();
-            try {
-                v.endVisit(node);
-            } catch (Exception e) {
-                logFaultyVisitor(v, e);
-                iter.remove();
-            }
-        }
-    }
-
-    @Override
-    public void endVisit(ForStatement node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(endVisitorsMap, ForStatement.class).iterator(); iter.hasNext();) {
-            final ASTVisitor v = iter.next();
-            try {
-                v.endVisit(node);
-            } catch (Exception e) {
-                logFaultyVisitor(v, e);
-                iter.remove();
-            }
-        }
-    }
-
-    @Override
-    public void endVisit(IfStatement node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(endVisitorsMap, IfStatement.class).iterator(); iter.hasNext();) {
-            final ASTVisitor v = iter.next();
-            try {
-                v.endVisit(node);
-            } catch (Exception e) {
-                logFaultyVisitor(v, e);
-                iter.remove();
-            }
-        }
-    }
-
-    @Override
-    public void endVisit(ContinueStatement node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(endVisitorsMap, ContinueStatement.class).iterator(); iter.hasNext();) {
-            final ASTVisitor v = iter.next();
-            try {
-                v.endVisit(node);
-            } catch (Exception e) {
-                logFaultyVisitor(v, e);
-                iter.remove();
-            }
-        }
-    }
-
-    @Override
-    public void endVisit(DoStatement node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(endVisitorsMap, DoStatement.class).iterator(); iter.hasNext();) {
-            final ASTVisitor v = iter.next();
-            try {
-                v.endVisit(node);
-            } catch (Exception e) {
-                logFaultyVisitor(v, e);
-                iter.remove();
-            }
-        }
-    }
-
-    @Override
-    public void endVisit(EmptyStatement node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(endVisitorsMap, EmptyStatement.class).iterator(); iter.hasNext();) {
-            final ASTVisitor v = iter.next();
-            try {
-                v.endVisit(node);
-            } catch (Exception e) {
-                logFaultyVisitor(v, e);
-                iter.remove();
-            }
-        }
-    }
-
-    @Override
-    public void endVisit(EnhancedForStatement node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(endVisitorsMap, EnhancedForStatement.class).iterator(); iter.hasNext();) {
-            final ASTVisitor v = iter.next();
-            try {
-                v.endVisit(node);
-            } catch (Exception e) {
-                logFaultyVisitor(v, e);
-                iter.remove();
-            }
-        }
-    }
-
-    @Override
-    public void endVisit(EnumConstantDeclaration node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(endVisitorsMap, EnumConstantDeclaration.class).iterator(); iter.hasNext();) {
-            final ASTVisitor v = iter.next();
-            try {
-                v.endVisit(node);
-            } catch (Exception e) {
-                logFaultyVisitor(v, e);
-                iter.remove();
-            }
-        }
-    }
-
-    @Override
-    public void endVisit(LabeledStatement node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(endVisitorsMap, LabeledStatement.class).iterator(); iter.hasNext();) {
-            final ASTVisitor v = iter.next();
-            try {
-                v.endVisit(node);
-            } catch (Exception e) {
-                logFaultyVisitor(v, e);
-                iter.remove();
-            }
-        }
-    }
-
-    @Override
-    public void endVisit(LineComment node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(endVisitorsMap, LineComment.class).iterator(); iter.hasNext();) {
-            final ASTVisitor v = iter.next();
-            try {
-                v.endVisit(node);
-            } catch (Exception e) {
-                logFaultyVisitor(v, e);
-                iter.remove();
-            }
-        }
-    }
-
-    @Override
-    public void endVisit(MarkerAnnotation node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(endVisitorsMap, MarkerAnnotation.class).iterator(); iter.hasNext();) {
-            final ASTVisitor v = iter.next();
-            try {
-                v.endVisit(node);
-            } catch (Exception e) {
-                logFaultyVisitor(v, e);
-                iter.remove();
-            }
-        }
-    }
-
-    @Override
-    public void endVisit(MemberRef node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(endVisitorsMap, MemberRef.class).iterator(); iter.hasNext();) {
-            final ASTVisitor v = iter.next();
-            try {
-                v.endVisit(node);
-            } catch (Exception e) {
-                logFaultyVisitor(v, e);
-                iter.remove();
-            }
-        }
-    }
-
-    @Override
-    public void endVisit(MemberValuePair node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(endVisitorsMap, MemberValuePair.class).iterator(); iter.hasNext();) {
-            final ASTVisitor v = iter.next();
-            try {
-                v.endVisit(node);
-            } catch (Exception e) {
-                logFaultyVisitor(v, e);
-                iter.remove();
-            }
-        }
-    }
-
-    @Override
-    public void endVisit(ImportDeclaration node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(endVisitorsMap, ImportDeclaration.class).iterator(); iter.hasNext();) {
-            final ASTVisitor v = iter.next();
-            try {
-                v.endVisit(node);
-            } catch (Exception e) {
-                logFaultyVisitor(v, e);
-                iter.remove();
-            }
-        }
-    }
-
-    @Override
-    public void endVisit(InfixExpression node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(endVisitorsMap, InfixExpression.class).iterator(); iter.hasNext();) {
-            final ASTVisitor v = iter.next();
-            try {
-                v.endVisit(node);
-            } catch (Exception e) {
-                logFaultyVisitor(v, e);
-                iter.remove();
-            }
-        }
-    }
-
-    @Override
-    public void endVisit(InstanceofExpression node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(endVisitorsMap, InstanceofExpression.class).iterator(); iter.hasNext();) {
-            final ASTVisitor v = iter.next();
-            try {
-                v.endVisit(node);
-            } catch (Exception e) {
-                logFaultyVisitor(v, e);
-                iter.remove();
-            }
-        }
-    }
-
-    @Override
-    public void endVisit(Initializer node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(endVisitorsMap, Initializer.class).iterator(); iter.hasNext();) {
-            final ASTVisitor v = iter.next();
-            try {
-                v.endVisit(node);
-            } catch (Exception e) {
-                logFaultyVisitor(v, e);
-                iter.remove();
-            }
-        }
-    }
-
-    @Override
-    public void endVisit(Javadoc node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(endVisitorsMap, Javadoc.class).iterator(); iter.hasNext();) {
-            final ASTVisitor v = iter.next();
-            try {
-                v.endVisit(node);
-            } catch (Exception e) {
-                logFaultyVisitor(v, e);
-                iter.remove();
-            }
-        }
-    }
-
-    @Override
-    public void endVisit(ArrayCreation node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(endVisitorsMap, ArrayCreation.class).iterator(); iter.hasNext();) {
-            final ASTVisitor v = iter.next();
-            try {
-                v.endVisit(node);
-            } catch (Exception e) {
-                logFaultyVisitor(v, e);
-                iter.remove();
-            }
-        }
-    }
-
-    @Override
-    public void endVisit(ArrayInitializer node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(endVisitorsMap, ArrayInitializer.class).iterator(); iter.hasNext();) {
-            final ASTVisitor v = iter.next();
-            try {
-                v.endVisit(node);
-            } catch (Exception e) {
-                logFaultyVisitor(v, e);
-                iter.remove();
-            }
-        }
-    }
-
-    @Override
-    public void endVisit(ArrayType node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(endVisitorsMap, ArrayType.class).iterator(); iter.hasNext();) {
-            final ASTVisitor v = iter.next();
-            try {
-                v.endVisit(node);
-            } catch (Exception e) {
-                logFaultyVisitor(v, e);
-                iter.remove();
-            }
-        }
-    }
-
-    @Override
-    public void endVisit(AssertStatement node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(endVisitorsMap, AssertStatement.class).iterator(); iter.hasNext();) {
-            final ASTVisitor v = iter.next();
-            try {
-                v.endVisit(node);
-            } catch (Exception e) {
-                logFaultyVisitor(v, e);
-                iter.remove();
-            }
-        }
-    }
-
-    @Override
-    public void endVisit(Assignment node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(endVisitorsMap, Assignment.class).iterator(); iter.hasNext();) {
-            final ASTVisitor v = iter.next();
-            try {
-                v.endVisit(node);
-            } catch (Exception e) {
-                logFaultyVisitor(v, e);
-                iter.remove();
-            }
-        }
-    }
-
-    @Override
-    public void endVisit(Block node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(endVisitorsMap, Block.class).iterator(); iter.hasNext();) {
-            final ASTVisitor v = iter.next();
-            try {
-                v.endVisit(node);
-            } catch (Exception e) {
-                logFaultyVisitor(v, e);
-                iter.remove();
-            }
-        }
-    }
-
-    @Override
-    public void endVisit(WildcardType node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(endVisitorsMap, WildcardType.class).iterator(); iter.hasNext();) {
-            final ASTVisitor v = iter.next();
-            try {
-                v.endVisit(node);
-            } catch (Exception e) {
-                logFaultyVisitor(v, e);
-                iter.remove();
-            }
-        }
-    }
-
+    /** {@inheritDoc} */
     @Override
     public void endVisit(AnnotationTypeDeclaration node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(endVisitorsMap, AnnotationTypeDeclaration.class).iterator(); iter.hasNext();) {
+        final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, AnnotationTypeDeclaration.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 v.endVisit(node);
@@ -723,9 +373,11 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public void endVisit(AnnotationTypeMemberDeclaration node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(endVisitorsMap, AnnotationTypeMemberDeclaration.class).iterator(); iter.hasNext();) {
+        final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, AnnotationTypeMemberDeclaration.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 v.endVisit(node);
@@ -736,9 +388,11 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public void endVisit(AnonymousClassDeclaration node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(endVisitorsMap, AnonymousClassDeclaration.class).iterator(); iter.hasNext();) {
+        final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, AnonymousClassDeclaration.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 v.endVisit(node);
@@ -749,9 +403,11 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public void endVisit(ArrayAccess node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(endVisitorsMap, ArrayAccess.class).iterator(); iter.hasNext();) {
+        final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, ArrayAccess.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 v.endVisit(node);
@@ -762,9 +418,11 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
         }
     }
 
+    /** {@inheritDoc} */
     @Override
-    public void endVisit(CharacterLiteral node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(endVisitorsMap, CharacterLiteral.class).iterator(); iter.hasNext();) {
+    public void endVisit(ArrayCreation node) {
+        final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, ArrayCreation.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 v.endVisit(node);
@@ -775,9 +433,11 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
         }
     }
 
+    /** {@inheritDoc} */
     @Override
-    public void endVisit(ClassInstanceCreation node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(endVisitorsMap, ClassInstanceCreation.class).iterator(); iter.hasNext();) {
+    public void endVisit(ArrayInitializer node) {
+        final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, ArrayInitializer.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 v.endVisit(node);
@@ -788,9 +448,11 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
         }
     }
 
+    /** {@inheritDoc} */
     @Override
-    public void endVisit(CompilationUnit node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(endVisitorsMap, CompilationUnit.class).iterator(); iter.hasNext();) {
+    public void endVisit(ArrayType node) {
+        final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, ArrayType.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 v.endVisit(node);
@@ -801,9 +463,11 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
         }
     }
 
+    /** {@inheritDoc} */
     @Override
-    public void endVisit(ConditionalExpression node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(endVisitorsMap, ConditionalExpression.class).iterator(); iter.hasNext();) {
+    public void endVisit(AssertStatement node) {
+        final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, AssertStatement.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 v.endVisit(node);
@@ -814,9 +478,11 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
         }
     }
 
+    /** {@inheritDoc} */
     @Override
-    public void endVisit(ConstructorInvocation node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(endVisitorsMap, ConstructorInvocation.class).iterator(); iter.hasNext();) {
+    public void endVisit(Assignment node) {
+        final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, Assignment.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 v.endVisit(node);
@@ -827,9 +493,26 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
         }
     }
 
+    /** {@inheritDoc} */
+    @Override
+    public void endVisit(Block node) {
+        final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, Block.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
+            final ASTVisitor v = iter.next();
+            try {
+                v.endVisit(node);
+            } catch (Exception e) {
+                logFaultyVisitor(v, e);
+                iter.remove();
+            }
+        }
+    }
+
+    /** {@inheritDoc} */
     @Override
     public void endVisit(BlockComment node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(endVisitorsMap, BlockComment.class).iterator(); iter.hasNext();) {
+        final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, BlockComment.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 v.endVisit(node);
@@ -840,9 +523,11 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public void endVisit(BooleanLiteral node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(endVisitorsMap, BooleanLiteral.class).iterator(); iter.hasNext();) {
+        final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, BooleanLiteral.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 v.endVisit(node);
@@ -853,9 +538,11 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public void endVisit(BreakStatement node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(endVisitorsMap, BreakStatement.class).iterator(); iter.hasNext();) {
+        final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, BreakStatement.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 v.endVisit(node);
@@ -866,9 +553,11 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public void endVisit(CastExpression node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(endVisitorsMap, CastExpression.class).iterator(); iter.hasNext();) {
+        final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, CastExpression.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 v.endVisit(node);
@@ -879,9 +568,11 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public void endVisit(CatchClause node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(endVisitorsMap, CatchClause.class).iterator(); iter.hasNext();) {
+        final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, CatchClause.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 v.endVisit(node);
@@ -892,9 +583,11 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
         }
     }
 
+    /** {@inheritDoc} */
     @Override
-    public void endVisit(SwitchStatement node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(endVisitorsMap, SwitchStatement.class).iterator(); iter.hasNext();) {
+    public void endVisit(CharacterLiteral node) {
+        final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, CharacterLiteral.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 v.endVisit(node);
@@ -905,9 +598,11 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
         }
     }
 
+    /** {@inheritDoc} */
     @Override
-    public void endVisit(SynchronizedStatement node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(endVisitorsMap, SynchronizedStatement.class).iterator(); iter.hasNext();) {
+    public void endVisit(ClassInstanceCreation node) {
+        final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, ClassInstanceCreation.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 v.endVisit(node);
@@ -918,9 +613,11 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
         }
     }
 
+    /** {@inheritDoc} */
     @Override
-    public void endVisit(TagElement node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(endVisitorsMap, TagElement.class).iterator(); iter.hasNext();) {
+    public void endVisit(CompilationUnit node) {
+        final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, CompilationUnit.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 v.endVisit(node);
@@ -931,9 +628,11 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
         }
     }
 
+    /** {@inheritDoc} */
     @Override
-    public void endVisit(TextElement node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(endVisitorsMap, TextElement.class).iterator(); iter.hasNext();) {
+    public void endVisit(ConditionalExpression node) {
+        final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, ConditionalExpression.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 v.endVisit(node);
@@ -944,9 +643,11 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
         }
     }
 
+    /** {@inheritDoc} */
     @Override
-    public void endVisit(ThisExpression node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(endVisitorsMap, ThisExpression.class).iterator(); iter.hasNext();) {
+    public void endVisit(ConstructorInvocation node) {
+        final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, ConstructorInvocation.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 v.endVisit(node);
@@ -957,9 +658,11 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
         }
     }
 
+    /** {@inheritDoc} */
     @Override
-    public void endVisit(ThrowStatement node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(endVisitorsMap, ThrowStatement.class).iterator(); iter.hasNext();) {
+    public void endVisit(ContinueStatement node) {
+        final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, ContinueStatement.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 v.endVisit(node);
@@ -970,9 +673,11 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
         }
     }
 
+    /** {@inheritDoc} */
     @Override
-    public void endVisit(StringLiteral node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(endVisitorsMap, StringLiteral.class).iterator(); iter.hasNext();) {
+    public void endVisit(DoStatement node) {
+        final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, DoStatement.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 v.endVisit(node);
@@ -983,9 +688,11 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
         }
     }
 
+    /** {@inheritDoc} */
     @Override
-    public void endVisit(SuperConstructorInvocation node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(endVisitorsMap, SuperConstructorInvocation.class).iterator(); iter.hasNext();) {
+    public void endVisit(EmptyStatement node) {
+        final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, EmptyStatement.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 v.endVisit(node);
@@ -996,9 +703,11 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
         }
     }
 
+    /** {@inheritDoc} */
     @Override
-    public void endVisit(SuperFieldAccess node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(endVisitorsMap, SuperFieldAccess.class).iterator(); iter.hasNext();) {
+    public void endVisit(EnhancedForStatement node) {
+        final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, EnhancedForStatement.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 v.endVisit(node);
@@ -1009,9 +718,11 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
         }
     }
 
+    /** {@inheritDoc} */
     @Override
-    public void endVisit(SuperMethodInvocation node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(endVisitorsMap, SuperMethodInvocation.class).iterator(); iter.hasNext();) {
+    public void endVisit(EnumConstantDeclaration node) {
+        final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, EnumConstantDeclaration.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 v.endVisit(node);
@@ -1022,9 +733,11 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
         }
     }
 
+    /** {@inheritDoc} */
     @Override
-    public void endVisit(SwitchCase node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(endVisitorsMap, SwitchCase.class).iterator(); iter.hasNext();) {
+    public void endVisit(EnumDeclaration node) {
+        final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, EnumDeclaration.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 v.endVisit(node);
@@ -1035,9 +748,11 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
         }
     }
 
+    /** {@inheritDoc} */
     @Override
-    public void endVisit(UnionType node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(endVisitorsMap, UnionType.class).iterator(); iter.hasNext();) {
+    public void endVisit(ExpressionStatement node) {
+        final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, ExpressionStatement.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 v.endVisit(node);
@@ -1048,9 +763,11 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
         }
     }
 
+    /** {@inheritDoc} */
     @Override
-    public void endVisit(VariableDeclarationExpression node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(endVisitorsMap, VariableDeclarationExpression.class).iterator(); iter.hasNext();) {
+    public void endVisit(FieldAccess node) {
+        final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, FieldAccess.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 v.endVisit(node);
@@ -1061,9 +778,11 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
         }
     }
 
+    /** {@inheritDoc} */
     @Override
-    public void endVisit(VariableDeclarationStatement node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(endVisitorsMap, VariableDeclarationStatement.class).iterator(); iter.hasNext();) {
+    public void endVisit(FieldDeclaration node) {
+        final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, FieldDeclaration.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 v.endVisit(node);
@@ -1074,9 +793,11 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
         }
     }
 
+    /** {@inheritDoc} */
     @Override
-    public void endVisit(VariableDeclarationFragment node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(endVisitorsMap, VariableDeclarationFragment.class).iterator(); iter.hasNext();) {
+    public void endVisit(ForStatement node) {
+        final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, ForStatement.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 v.endVisit(node);
@@ -1087,9 +808,11 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
         }
     }
 
+    /** {@inheritDoc} */
     @Override
-    public void endVisit(WhileStatement node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(endVisitorsMap, WhileStatement.class).iterator(); iter.hasNext();) {
+    public void endVisit(IfStatement node) {
+        final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, IfStatement.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 v.endVisit(node);
@@ -1100,9 +823,11 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
         }
     }
 
+    /** {@inheritDoc} */
     @Override
-    public void endVisit(TryStatement node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(endVisitorsMap, TryStatement.class).iterator(); iter.hasNext();) {
+    public void endVisit(ImportDeclaration node) {
+        final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, ImportDeclaration.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 v.endVisit(node);
@@ -1113,9 +838,11 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
         }
     }
 
+    /** {@inheritDoc} */
     @Override
-    public void endVisit(TypeDeclaration node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(endVisitorsMap, TypeDeclaration.class).iterator(); iter.hasNext();) {
+    public void endVisit(InfixExpression node) {
+        final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, InfixExpression.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 v.endVisit(node);
@@ -1126,9 +853,11 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
         }
     }
 
+    /** {@inheritDoc} */
     @Override
-    public void endVisit(TypeDeclarationStatement node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(endVisitorsMap, TypeDeclarationStatement.class).iterator(); iter.hasNext();) {
+    public void endVisit(Initializer node) {
+        final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, Initializer.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 v.endVisit(node);
@@ -1139,9 +868,11 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
         }
     }
 
+    /** {@inheritDoc} */
     @Override
-    public void endVisit(TypeLiteral node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(endVisitorsMap, TypeLiteral.class).iterator(); iter.hasNext();) {
+    public void endVisit(InstanceofExpression node) {
+        final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, InstanceofExpression.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 v.endVisit(node);
@@ -1152,9 +883,11 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
         }
     }
 
+    /** {@inheritDoc} */
     @Override
-    public void endVisit(TypeParameter node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(endVisitorsMap, TypeParameter.class).iterator(); iter.hasNext();) {
+    public void endVisit(Javadoc node) {
+        final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, Javadoc.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 v.endVisit(node);
@@ -1165,9 +898,11 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
         }
     }
 
+    /** {@inheritDoc} */
     @Override
-    public void endVisit(NormalAnnotation node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(endVisitorsMap, NormalAnnotation.class).iterator(); iter.hasNext();) {
+    public void endVisit(LabeledStatement node) {
+        final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, LabeledStatement.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 v.endVisit(node);
@@ -1178,9 +913,11 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
         }
     }
 
+    /** {@inheritDoc} */
     @Override
-    public void endVisit(NullLiteral node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(endVisitorsMap, NullLiteral.class).iterator(); iter.hasNext();) {
+    public void endVisit(LineComment node) {
+        final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, LineComment.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 v.endVisit(node);
@@ -1191,9 +928,11 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
         }
     }
 
+    /** {@inheritDoc} */
     @Override
-    public void endVisit(NumberLiteral node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(endVisitorsMap, NumberLiteral.class).iterator(); iter.hasNext();) {
+    public void endVisit(MarkerAnnotation node) {
+        final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, MarkerAnnotation.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 v.endVisit(node);
@@ -1204,9 +943,11 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
         }
     }
 
+    /** {@inheritDoc} */
     @Override
-    public void endVisit(PackageDeclaration node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(endVisitorsMap, PackageDeclaration.class).iterator(); iter.hasNext();) {
+    public void endVisit(MemberRef node) {
+        final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, MemberRef.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 v.endVisit(node);
@@ -1217,9 +958,11 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
         }
     }
 
+    /** {@inheritDoc} */
     @Override
-    public void endVisit(ParameterizedType node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(endVisitorsMap, ParameterizedType.class).iterator(); iter.hasNext();) {
+    public void endVisit(MemberValuePair node) {
+        final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, MemberValuePair.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 v.endVisit(node);
@@ -1230,48 +973,11 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
         }
     }
 
-    @Override
-    public void endVisit(ParenthesizedExpression node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(endVisitorsMap, ParenthesizedExpression.class).iterator(); iter.hasNext();) {
-            final ASTVisitor v = iter.next();
-            try {
-                v.endVisit(node);
-            } catch (Exception e) {
-                logFaultyVisitor(v, e);
-                iter.remove();
-            }
-        }
-    }
-
-    @Override
-    public void endVisit(MethodRef node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(endVisitorsMap, MethodRef.class).iterator(); iter.hasNext();) {
-            final ASTVisitor v = iter.next();
-            try {
-                v.endVisit(node);
-            } catch (Exception e) {
-                logFaultyVisitor(v, e);
-                iter.remove();
-            }
-        }
-    }
-
-    @Override
-    public void endVisit(MethodRefParameter node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(endVisitorsMap, MethodRefParameter.class).iterator(); iter.hasNext();) {
-            final ASTVisitor v = iter.next();
-            try {
-                v.endVisit(node);
-            } catch (Exception e) {
-                logFaultyVisitor(v, e);
-                iter.remove();
-            }
-        }
-    }
-
+    /** {@inheritDoc} */
     @Override
     public void endVisit(MethodDeclaration node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(endVisitorsMap, MethodDeclaration.class).iterator(); iter.hasNext();) {
+        final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, MethodDeclaration.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 v.endVisit(node);
@@ -1282,9 +988,11 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public void endVisit(MethodInvocation node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(endVisitorsMap, MethodInvocation.class).iterator(); iter.hasNext();) {
+        final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, MethodInvocation.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 v.endVisit(node);
@@ -1295,9 +1003,41 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
         }
     }
 
+    /** {@inheritDoc} */
+    @Override
+    public void endVisit(MethodRef node) {
+        final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, MethodRef.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
+            final ASTVisitor v = iter.next();
+            try {
+                v.endVisit(node);
+            } catch (Exception e) {
+                logFaultyVisitor(v, e);
+                iter.remove();
+            }
+        }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void endVisit(MethodRefParameter node) {
+        final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, MethodRefParameter.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
+            final ASTVisitor v = iter.next();
+            try {
+                v.endVisit(node);
+            } catch (Exception e) {
+                logFaultyVisitor(v, e);
+                iter.remove();
+            }
+        }
+    }
+
+    /** {@inheritDoc} */
     @Override
     public void endVisit(Modifier node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(endVisitorsMap, Modifier.class).iterator(); iter.hasNext();) {
+        final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, Modifier.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 v.endVisit(node);
@@ -1308,9 +1048,11 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
         }
     }
 
+    /** {@inheritDoc} */
     @Override
-    public void endVisit(ReturnStatement node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(endVisitorsMap, ReturnStatement.class).iterator(); iter.hasNext();) {
+    public void endVisit(NormalAnnotation node) {
+        final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, NormalAnnotation.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 v.endVisit(node);
@@ -1321,9 +1063,11 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
         }
     }
 
+    /** {@inheritDoc} */
     @Override
-    public void endVisit(SimpleName node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(endVisitorsMap, SimpleName.class).iterator(); iter.hasNext();) {
+    public void endVisit(NullLiteral node) {
+        final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, NullLiteral.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 v.endVisit(node);
@@ -1334,9 +1078,11 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
         }
     }
 
+    /** {@inheritDoc} */
     @Override
-    public void endVisit(SimpleType node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(endVisitorsMap, SimpleType.class).iterator(); iter.hasNext();) {
+    public void endVisit(NumberLiteral node) {
+        final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, NumberLiteral.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 v.endVisit(node);
@@ -1347,9 +1093,11 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
         }
     }
 
+    /** {@inheritDoc} */
     @Override
-    public void endVisit(SingleMemberAnnotation node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(endVisitorsMap, SingleMemberAnnotation.class).iterator(); iter.hasNext();) {
+    public void endVisit(PackageDeclaration node) {
+        final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, PackageDeclaration.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 v.endVisit(node);
@@ -1360,9 +1108,11 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
         }
     }
 
+    /** {@inheritDoc} */
     @Override
-    public void endVisit(SingleVariableDeclaration node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(endVisitorsMap, SingleVariableDeclaration.class).iterator(); iter.hasNext();) {
+    public void endVisit(ParameterizedType node) {
+        final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, ParameterizedType.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 v.endVisit(node);
@@ -1373,9 +1123,26 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
         }
     }
 
+    /** {@inheritDoc} */
+    @Override
+    public void endVisit(ParenthesizedExpression node) {
+        final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, ParenthesizedExpression.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
+            final ASTVisitor v = iter.next();
+            try {
+                v.endVisit(node);
+            } catch (Exception e) {
+                logFaultyVisitor(v, e);
+                iter.remove();
+            }
+        }
+    }
+
+    /** {@inheritDoc} */
     @Override
     public void endVisit(PostfixExpression node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(endVisitorsMap, PostfixExpression.class).iterator(); iter.hasNext();) {
+        final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, PostfixExpression.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 v.endVisit(node);
@@ -1386,9 +1153,11 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public void endVisit(PrefixExpression node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(endVisitorsMap, PrefixExpression.class).iterator(); iter.hasNext();) {
+        final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, PrefixExpression.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 v.endVisit(node);
@@ -1399,9 +1168,11 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public void endVisit(PrimitiveType node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(endVisitorsMap, PrimitiveType.class).iterator(); iter.hasNext();) {
+        final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, PrimitiveType.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 v.endVisit(node);
@@ -1412,9 +1183,11 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public void endVisit(QualifiedName node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(endVisitorsMap, QualifiedName.class).iterator(); iter.hasNext();) {
+        final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, QualifiedName.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 v.endVisit(node);
@@ -1425,9 +1198,11 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public void endVisit(QualifiedType node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(endVisitorsMap, QualifiedType.class).iterator(); iter.hasNext();) {
+        final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, QualifiedType.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 v.endVisit(node);
@@ -1438,6 +1213,412 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
         }
     }
 
+    /** {@inheritDoc} */
+    @Override
+    public void endVisit(ReturnStatement node) {
+        final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, ReturnStatement.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
+            final ASTVisitor v = iter.next();
+            try {
+                v.endVisit(node);
+            } catch (Exception e) {
+                logFaultyVisitor(v, e);
+                iter.remove();
+            }
+        }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void endVisit(SimpleName node) {
+        final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, SimpleName.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
+            final ASTVisitor v = iter.next();
+            try {
+                v.endVisit(node);
+            } catch (Exception e) {
+                logFaultyVisitor(v, e);
+                iter.remove();
+            }
+        }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void endVisit(SimpleType node) {
+        final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, SimpleType.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
+            final ASTVisitor v = iter.next();
+            try {
+                v.endVisit(node);
+            } catch (Exception e) {
+                logFaultyVisitor(v, e);
+                iter.remove();
+            }
+        }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void endVisit(SingleMemberAnnotation node) {
+        final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, SingleMemberAnnotation.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
+            final ASTVisitor v = iter.next();
+            try {
+                v.endVisit(node);
+            } catch (Exception e) {
+                logFaultyVisitor(v, e);
+                iter.remove();
+            }
+        }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void endVisit(SingleVariableDeclaration node) {
+        final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, SingleVariableDeclaration.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
+            final ASTVisitor v = iter.next();
+            try {
+                v.endVisit(node);
+            } catch (Exception e) {
+                logFaultyVisitor(v, e);
+                iter.remove();
+            }
+        }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void endVisit(StringLiteral node) {
+        final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, StringLiteral.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
+            final ASTVisitor v = iter.next();
+            try {
+                v.endVisit(node);
+            } catch (Exception e) {
+                logFaultyVisitor(v, e);
+                iter.remove();
+            }
+        }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void endVisit(SuperConstructorInvocation node) {
+        final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, SuperConstructorInvocation.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
+            final ASTVisitor v = iter.next();
+            try {
+                v.endVisit(node);
+            } catch (Exception e) {
+                logFaultyVisitor(v, e);
+                iter.remove();
+            }
+        }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void endVisit(SuperFieldAccess node) {
+        final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, SuperFieldAccess.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
+            final ASTVisitor v = iter.next();
+            try {
+                v.endVisit(node);
+            } catch (Exception e) {
+                logFaultyVisitor(v, e);
+                iter.remove();
+            }
+        }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void endVisit(SuperMethodInvocation node) {
+        final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, SuperMethodInvocation.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
+            final ASTVisitor v = iter.next();
+            try {
+                v.endVisit(node);
+            } catch (Exception e) {
+                logFaultyVisitor(v, e);
+                iter.remove();
+            }
+        }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void endVisit(SwitchCase node) {
+        final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, SwitchCase.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
+            final ASTVisitor v = iter.next();
+            try {
+                v.endVisit(node);
+            } catch (Exception e) {
+                logFaultyVisitor(v, e);
+                iter.remove();
+            }
+        }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void endVisit(SwitchStatement node) {
+        final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, SwitchStatement.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
+            final ASTVisitor v = iter.next();
+            try {
+                v.endVisit(node);
+            } catch (Exception e) {
+                logFaultyVisitor(v, e);
+                iter.remove();
+            }
+        }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void endVisit(SynchronizedStatement node) {
+        final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, SynchronizedStatement.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
+            final ASTVisitor v = iter.next();
+            try {
+                v.endVisit(node);
+            } catch (Exception e) {
+                logFaultyVisitor(v, e);
+                iter.remove();
+            }
+        }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void endVisit(TagElement node) {
+        final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, TagElement.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
+            final ASTVisitor v = iter.next();
+            try {
+                v.endVisit(node);
+            } catch (Exception e) {
+                logFaultyVisitor(v, e);
+                iter.remove();
+            }
+        }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void endVisit(TextElement node) {
+        final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, TextElement.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
+            final ASTVisitor v = iter.next();
+            try {
+                v.endVisit(node);
+            } catch (Exception e) {
+                logFaultyVisitor(v, e);
+                iter.remove();
+            }
+        }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void endVisit(ThisExpression node) {
+        final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, ThisExpression.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
+            final ASTVisitor v = iter.next();
+            try {
+                v.endVisit(node);
+            } catch (Exception e) {
+                logFaultyVisitor(v, e);
+                iter.remove();
+            }
+        }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void endVisit(ThrowStatement node) {
+        final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, ThrowStatement.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
+            final ASTVisitor v = iter.next();
+            try {
+                v.endVisit(node);
+            } catch (Exception e) {
+                logFaultyVisitor(v, e);
+                iter.remove();
+            }
+        }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void endVisit(TryStatement node) {
+        final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, TryStatement.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
+            final ASTVisitor v = iter.next();
+            try {
+                v.endVisit(node);
+            } catch (Exception e) {
+                logFaultyVisitor(v, e);
+                iter.remove();
+            }
+        }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void endVisit(TypeDeclaration node) {
+        final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, TypeDeclaration.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
+            final ASTVisitor v = iter.next();
+            try {
+                v.endVisit(node);
+            } catch (Exception e) {
+                logFaultyVisitor(v, e);
+                iter.remove();
+            }
+        }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void endVisit(TypeDeclarationStatement node) {
+        final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, TypeDeclarationStatement.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
+            final ASTVisitor v = iter.next();
+            try {
+                v.endVisit(node);
+            } catch (Exception e) {
+                logFaultyVisitor(v, e);
+                iter.remove();
+            }
+        }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void endVisit(TypeLiteral node) {
+        final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, TypeLiteral.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
+            final ASTVisitor v = iter.next();
+            try {
+                v.endVisit(node);
+            } catch (Exception e) {
+                logFaultyVisitor(v, e);
+                iter.remove();
+            }
+        }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void endVisit(TypeParameter node) {
+        final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, TypeParameter.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
+            final ASTVisitor v = iter.next();
+            try {
+                v.endVisit(node);
+            } catch (Exception e) {
+                logFaultyVisitor(v, e);
+                iter.remove();
+            }
+        }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void endVisit(UnionType node) {
+        final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, UnionType.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
+            final ASTVisitor v = iter.next();
+            try {
+                v.endVisit(node);
+            } catch (Exception e) {
+                logFaultyVisitor(v, e);
+                iter.remove();
+            }
+        }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void endVisit(VariableDeclarationExpression node) {
+        final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, VariableDeclarationExpression.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
+            final ASTVisitor v = iter.next();
+            try {
+                v.endVisit(node);
+            } catch (Exception e) {
+                logFaultyVisitor(v, e);
+                iter.remove();
+            }
+        }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void endVisit(VariableDeclarationFragment node) {
+        final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, VariableDeclarationFragment.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
+            final ASTVisitor v = iter.next();
+            try {
+                v.endVisit(node);
+            } catch (Exception e) {
+                logFaultyVisitor(v, e);
+                iter.remove();
+            }
+        }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void endVisit(VariableDeclarationStatement node) {
+        final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, VariableDeclarationStatement.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
+            final ASTVisitor v = iter.next();
+            try {
+                v.endVisit(node);
+            } catch (Exception e) {
+                logFaultyVisitor(v, e);
+                iter.remove();
+            }
+        }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void endVisit(WhileStatement node) {
+        final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, WhileStatement.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
+            final ASTVisitor v = iter.next();
+            try {
+                v.endVisit(node);
+            } catch (Exception e) {
+                logFaultyVisitor(v, e);
+                iter.remove();
+            }
+        }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void endVisit(WildcardType node) {
+        final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, WildcardType.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
+            final ASTVisitor v = iter.next();
+            try {
+                v.endVisit(node);
+            } catch (Exception e) {
+                logFaultyVisitor(v, e);
+                iter.remove();
+            }
+        }
+    }
+
+    /** {@inheritDoc} */
     @Override
     public void postVisit(ASTNode node) {
         for (Iterator<ASTVisitor> iter = postVisitors.iterator(); iter.hasNext();) {
@@ -1451,6 +1632,7 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public void preVisit(ASTNode node) {
         for (Iterator<ASTVisitor> iter = preVisitors.iterator(); iter.hasNext();) {
@@ -1464,6 +1646,7 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean preVisit2(ASTNode node) {
         for (Iterator<ASTVisitor> iter = preVisitors2.iterator(); iter.hasNext();) {
@@ -1482,484 +1665,9 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
 
     /** {@inheritDoc} */
     @Override
-    public boolean visit(EnumDeclaration node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(visitorsMap, EnumDeclaration.class).iterator(); iter.hasNext();) {
-            final ASTVisitor v = iter.next();
-            try {
-                if (!continueVisiting(v.visit(node), v)) {
-                    return DO_NOT_VISIT_SUBTREE;
-                }
-            } catch (Exception e) {
-                logFaultyVisitor(v, e);
-                iter.remove();
-            }
-        }
-        return VISIT_SUBTREE;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean visit(ExpressionStatement node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(visitorsMap, ExpressionStatement.class).iterator(); iter.hasNext();) {
-            final ASTVisitor v = iter.next();
-            try {
-                if (!continueVisiting(v.visit(node), v)) {
-                    return DO_NOT_VISIT_SUBTREE;
-                }
-            } catch (Exception e) {
-                logFaultyVisitor(v, e);
-                iter.remove();
-            }
-        }
-        return VISIT_SUBTREE;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean visit(FieldAccess node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(visitorsMap, FieldAccess.class).iterator(); iter.hasNext();) {
-            final ASTVisitor v = iter.next();
-            try {
-                if (!continueVisiting(v.visit(node), v)) {
-                    return DO_NOT_VISIT_SUBTREE;
-                }
-            } catch (Exception e) {
-                logFaultyVisitor(v, e);
-                iter.remove();
-            }
-        }
-        return VISIT_SUBTREE;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean visit(FieldDeclaration node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(visitorsMap, FieldDeclaration.class).iterator(); iter.hasNext();) {
-            final ASTVisitor v = iter.next();
-            try {
-                if (!continueVisiting(v.visit(node), v)) {
-                    return DO_NOT_VISIT_SUBTREE;
-                }
-            } catch (Exception e) {
-                logFaultyVisitor(v, e);
-                iter.remove();
-            }
-        }
-        return VISIT_SUBTREE;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean visit(ForStatement node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(visitorsMap, ForStatement.class).iterator(); iter.hasNext();) {
-            final ASTVisitor v = iter.next();
-            try {
-                if (!continueVisiting(v.visit(node), v)) {
-                    return DO_NOT_VISIT_SUBTREE;
-                }
-            } catch (Exception e) {
-                logFaultyVisitor(v, e);
-                iter.remove();
-            }
-        }
-        return VISIT_SUBTREE;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean visit(IfStatement node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(visitorsMap, IfStatement.class).iterator(); iter.hasNext();) {
-            final ASTVisitor v = iter.next();
-            try {
-                if (!continueVisiting(v.visit(node), v)) {
-                    return DO_NOT_VISIT_SUBTREE;
-                }
-            } catch (Exception e) {
-                logFaultyVisitor(v, e);
-                iter.remove();
-            }
-        }
-        return VISIT_SUBTREE;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean visit(ContinueStatement node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(visitorsMap, ContinueStatement.class).iterator(); iter.hasNext();) {
-            final ASTVisitor v = iter.next();
-            try {
-                if (!continueVisiting(v.visit(node), v)) {
-                    return DO_NOT_VISIT_SUBTREE;
-                }
-            } catch (Exception e) {
-                logFaultyVisitor(v, e);
-                iter.remove();
-            }
-        }
-        return VISIT_SUBTREE;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean visit(DoStatement node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(visitorsMap, DoStatement.class).iterator(); iter.hasNext();) {
-            final ASTVisitor v = iter.next();
-            try {
-                if (!continueVisiting(v.visit(node), v)) {
-                    return DO_NOT_VISIT_SUBTREE;
-                }
-            } catch (Exception e) {
-                logFaultyVisitor(v, e);
-                iter.remove();
-            }
-        }
-        return VISIT_SUBTREE;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean visit(EmptyStatement node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(visitorsMap, EmptyStatement.class).iterator(); iter.hasNext();) {
-            final ASTVisitor v = iter.next();
-            try {
-                if (!continueVisiting(v.visit(node), v)) {
-                    return DO_NOT_VISIT_SUBTREE;
-                }
-            } catch (Exception e) {
-                logFaultyVisitor(v, e);
-                iter.remove();
-            }
-        }
-        return VISIT_SUBTREE;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean visit(EnhancedForStatement node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(visitorsMap, EnhancedForStatement.class).iterator(); iter.hasNext();) {
-            final ASTVisitor v = iter.next();
-            try {
-                if (!continueVisiting(v.visit(node), v)) {
-                    return DO_NOT_VISIT_SUBTREE;
-                }
-            } catch (Exception e) {
-                logFaultyVisitor(v, e);
-                iter.remove();
-            }
-        }
-        return VISIT_SUBTREE;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean visit(EnumConstantDeclaration node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(visitorsMap, EnumConstantDeclaration.class).iterator(); iter.hasNext();) {
-            final ASTVisitor v = iter.next();
-            try {
-                if (!continueVisiting(v.visit(node), v)) {
-                    return DO_NOT_VISIT_SUBTREE;
-                }
-            } catch (Exception e) {
-                logFaultyVisitor(v, e);
-                iter.remove();
-            }
-        }
-        return VISIT_SUBTREE;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean visit(LabeledStatement node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(visitorsMap, LabeledStatement.class).iterator(); iter.hasNext();) {
-            final ASTVisitor v = iter.next();
-            try {
-                if (!continueVisiting(v.visit(node), v)) {
-                    return DO_NOT_VISIT_SUBTREE;
-                }
-            } catch (Exception e) {
-                logFaultyVisitor(v, e);
-                iter.remove();
-            }
-        }
-        return VISIT_SUBTREE;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean visit(LineComment node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(visitorsMap, LineComment.class).iterator(); iter.hasNext();) {
-            final ASTVisitor v = iter.next();
-            try {
-                if (!continueVisiting(v.visit(node), v)) {
-                    return DO_NOT_VISIT_SUBTREE;
-                }
-            } catch (Exception e) {
-                logFaultyVisitor(v, e);
-                iter.remove();
-            }
-        }
-        return VISIT_SUBTREE;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean visit(MarkerAnnotation node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(visitorsMap, MarkerAnnotation.class).iterator(); iter.hasNext();) {
-            final ASTVisitor v = iter.next();
-            try {
-                if (!continueVisiting(v.visit(node), v)) {
-                    return DO_NOT_VISIT_SUBTREE;
-                }
-            } catch (Exception e) {
-                logFaultyVisitor(v, e);
-                iter.remove();
-            }
-        }
-        return VISIT_SUBTREE;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean visit(MemberRef node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(visitorsMap, MemberRef.class).iterator(); iter.hasNext();) {
-            final ASTVisitor v = iter.next();
-            try {
-                if (!continueVisiting(v.visit(node), v)) {
-                    return DO_NOT_VISIT_SUBTREE;
-                }
-            } catch (Exception e) {
-                logFaultyVisitor(v, e);
-                iter.remove();
-            }
-        }
-        return VISIT_SUBTREE;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean visit(MemberValuePair node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(visitorsMap, MemberValuePair.class).iterator(); iter.hasNext();) {
-            final ASTVisitor v = iter.next();
-            try {
-                if (!continueVisiting(v.visit(node), v)) {
-                    return DO_NOT_VISIT_SUBTREE;
-                }
-            } catch (Exception e) {
-                logFaultyVisitor(v, e);
-                iter.remove();
-            }
-        }
-        return VISIT_SUBTREE;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean visit(ImportDeclaration node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(visitorsMap, ImportDeclaration.class).iterator(); iter.hasNext();) {
-            final ASTVisitor v = iter.next();
-            try {
-                if (!continueVisiting(v.visit(node), v)) {
-                    return DO_NOT_VISIT_SUBTREE;
-                }
-            } catch (Exception e) {
-                logFaultyVisitor(v, e);
-                iter.remove();
-            }
-        }
-        return VISIT_SUBTREE;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean visit(InfixExpression node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(visitorsMap, InfixExpression.class).iterator(); iter.hasNext();) {
-            final ASTVisitor v = iter.next();
-            try {
-                if (!continueVisiting(v.visit(node), v)) {
-                    return DO_NOT_VISIT_SUBTREE;
-                }
-            } catch (Exception e) {
-                logFaultyVisitor(v, e);
-                iter.remove();
-            }
-        }
-        return VISIT_SUBTREE;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean visit(InstanceofExpression node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(visitorsMap, InstanceofExpression.class).iterator(); iter.hasNext();) {
-            final ASTVisitor v = iter.next();
-            try {
-                if (!continueVisiting(v.visit(node), v)) {
-                    return DO_NOT_VISIT_SUBTREE;
-                }
-            } catch (Exception e) {
-                logFaultyVisitor(v, e);
-                iter.remove();
-            }
-        }
-        return VISIT_SUBTREE;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean visit(Initializer node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(visitorsMap, Initializer.class).iterator(); iter.hasNext();) {
-            final ASTVisitor v = iter.next();
-            try {
-                if (!continueVisiting(v.visit(node), v)) {
-                    return DO_NOT_VISIT_SUBTREE;
-                }
-            } catch (Exception e) {
-                logFaultyVisitor(v, e);
-                iter.remove();
-            }
-        }
-        return VISIT_SUBTREE;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean visit(Javadoc node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(visitorsMap, Javadoc.class).iterator(); iter.hasNext();) {
-            final ASTVisitor v = iter.next();
-            try {
-                if (!continueVisiting(v.visit(node), v)) {
-                    return DO_NOT_VISIT_SUBTREE;
-                }
-            } catch (Exception e) {
-                logFaultyVisitor(v, e);
-                iter.remove();
-            }
-        }
-        return VISIT_SUBTREE;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean visit(ArrayCreation node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(visitorsMap, ArrayCreation.class).iterator(); iter.hasNext();) {
-            final ASTVisitor v = iter.next();
-            try {
-                if (!continueVisiting(v.visit(node), v)) {
-                    return DO_NOT_VISIT_SUBTREE;
-                }
-            } catch (Exception e) {
-                logFaultyVisitor(v, e);
-                iter.remove();
-            }
-        }
-        return VISIT_SUBTREE;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean visit(ArrayInitializer node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(visitorsMap, ArrayInitializer.class).iterator(); iter.hasNext();) {
-            final ASTVisitor v = iter.next();
-            try {
-                if (!continueVisiting(v.visit(node), v)) {
-                    return DO_NOT_VISIT_SUBTREE;
-                }
-            } catch (Exception e) {
-                logFaultyVisitor(v, e);
-                iter.remove();
-            }
-        }
-        return VISIT_SUBTREE;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean visit(ArrayType node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(visitorsMap, ArrayType.class).iterator(); iter.hasNext();) {
-            final ASTVisitor v = iter.next();
-            try {
-                if (!continueVisiting(v.visit(node), v)) {
-                    return DO_NOT_VISIT_SUBTREE;
-                }
-            } catch (Exception e) {
-                logFaultyVisitor(v, e);
-                iter.remove();
-            }
-        }
-        return VISIT_SUBTREE;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean visit(AssertStatement node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(visitorsMap, AssertStatement.class).iterator(); iter.hasNext();) {
-            final ASTVisitor v = iter.next();
-            try {
-                if (!continueVisiting(v.visit(node), v)) {
-                    return DO_NOT_VISIT_SUBTREE;
-                }
-            } catch (Exception e) {
-                logFaultyVisitor(v, e);
-                iter.remove();
-            }
-        }
-        return VISIT_SUBTREE;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean visit(Assignment node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(visitorsMap, Assignment.class).iterator(); iter.hasNext();) {
-            final ASTVisitor v = iter.next();
-            try {
-                if (!continueVisiting(v.visit(node), v)) {
-                    return DO_NOT_VISIT_SUBTREE;
-                }
-            } catch (Exception e) {
-                logFaultyVisitor(v, e);
-                iter.remove();
-            }
-        }
-        return VISIT_SUBTREE;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean visit(Block node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(visitorsMap, Block.class).iterator(); iter.hasNext();) {
-            final ASTVisitor v = iter.next();
-            try {
-                if (!continueVisiting(v.visit(node), v)) {
-                    return DO_NOT_VISIT_SUBTREE;
-                }
-            } catch (Exception e) {
-                logFaultyVisitor(v, e);
-                iter.remove();
-            }
-        }
-        return VISIT_SUBTREE;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean visit(VariableDeclarationFragment node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(visitorsMap, VariableDeclarationFragment.class).iterator(); iter.hasNext();) {
-            final ASTVisitor v = iter.next();
-            try {
-                if (!continueVisiting(v.visit(node), v)) {
-                    return DO_NOT_VISIT_SUBTREE;
-                }
-            } catch (Exception e) {
-                logFaultyVisitor(v, e);
-                iter.remove();
-            }
-        }
-        return VISIT_SUBTREE;
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public boolean visit(AnnotationTypeDeclaration node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(visitorsMap, AnnotationTypeDeclaration.class).iterator(); iter.hasNext();) {
+        final List<ASTVisitor> visitorList = getVisitors(visitorsMap, AnnotationTypeDeclaration.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 if (!continueVisiting(v.visit(node), v)) {
@@ -1976,7 +1684,8 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
     /** {@inheritDoc} */
     @Override
     public boolean visit(AnnotationTypeMemberDeclaration node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(visitorsMap, AnnotationTypeMemberDeclaration.class).iterator(); iter.hasNext();) {
+        final List<ASTVisitor> visitorList = getVisitors(visitorsMap, AnnotationTypeMemberDeclaration.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 if (!continueVisiting(v.visit(node), v)) {
@@ -1993,7 +1702,8 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
     /** {@inheritDoc} */
     @Override
     public boolean visit(AnonymousClassDeclaration node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(visitorsMap, AnonymousClassDeclaration.class).iterator(); iter.hasNext();) {
+        final List<ASTVisitor> visitorList = getVisitors(visitorsMap, AnonymousClassDeclaration.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 if (!continueVisiting(v.visit(node), v)) {
@@ -2010,7 +1720,8 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
     /** {@inheritDoc} */
     @Override
     public boolean visit(ArrayAccess node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(visitorsMap, ArrayAccess.class).iterator(); iter.hasNext();) {
+        final List<ASTVisitor> visitorList = getVisitors(visitorsMap, ArrayAccess.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 if (!continueVisiting(v.visit(node), v)) {
@@ -2026,8 +1737,9 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
 
     /** {@inheritDoc} */
     @Override
-    public boolean visit(CharacterLiteral node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(visitorsMap, CharacterLiteral.class).iterator(); iter.hasNext();) {
+    public boolean visit(ArrayCreation node) {
+        final List<ASTVisitor> visitorList = getVisitors(visitorsMap, ArrayCreation.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 if (!continueVisiting(v.visit(node), v)) {
@@ -2043,8 +1755,9 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
 
     /** {@inheritDoc} */
     @Override
-    public boolean visit(ClassInstanceCreation node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(visitorsMap, ClassInstanceCreation.class).iterator(); iter.hasNext();) {
+    public boolean visit(ArrayInitializer node) {
+        final List<ASTVisitor> visitorList = getVisitors(visitorsMap, ArrayInitializer.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 if (!continueVisiting(v.visit(node), v)) {
@@ -2060,8 +1773,9 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
 
     /** {@inheritDoc} */
     @Override
-    public boolean visit(CompilationUnit node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(visitorsMap, CompilationUnit.class).iterator(); iter.hasNext();) {
+    public boolean visit(ArrayType node) {
+        final List<ASTVisitor> visitorList = getVisitors(visitorsMap, ArrayType.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 if (!continueVisiting(v.visit(node), v)) {
@@ -2077,8 +1791,9 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
 
     /** {@inheritDoc} */
     @Override
-    public boolean visit(ConditionalExpression node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(visitorsMap, ConditionalExpression.class).iterator(); iter.hasNext();) {
+    public boolean visit(AssertStatement node) {
+        final List<ASTVisitor> visitorList = getVisitors(visitorsMap, AssertStatement.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 if (!continueVisiting(v.visit(node), v)) {
@@ -2094,8 +1809,27 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
 
     /** {@inheritDoc} */
     @Override
-    public boolean visit(ConstructorInvocation node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(visitorsMap, ConstructorInvocation.class).iterator(); iter.hasNext();) {
+    public boolean visit(Assignment node) {
+        final List<ASTVisitor> visitorList = getVisitors(visitorsMap, Assignment.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
+            final ASTVisitor v = iter.next();
+            try {
+                if (!continueVisiting(v.visit(node), v)) {
+                    return DO_NOT_VISIT_SUBTREE;
+                }
+            } catch (Exception e) {
+                logFaultyVisitor(v, e);
+                iter.remove();
+            }
+        }
+        return VISIT_SUBTREE;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean visit(Block node) {
+        final List<ASTVisitor> visitorList = getVisitors(visitorsMap, Block.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 if (!continueVisiting(v.visit(node), v)) {
@@ -2112,7 +1846,8 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
     /** {@inheritDoc} */
     @Override
     public boolean visit(BlockComment node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(visitorsMap, BlockComment.class).iterator(); iter.hasNext();) {
+        final List<ASTVisitor> visitorList = getVisitors(visitorsMap, BlockComment.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 if (!continueVisiting(v.visit(node), v)) {
@@ -2129,7 +1864,8 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
     /** {@inheritDoc} */
     @Override
     public boolean visit(BooleanLiteral node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(visitorsMap, BooleanLiteral.class).iterator(); iter.hasNext();) {
+        final List<ASTVisitor> visitorList = getVisitors(visitorsMap, BooleanLiteral.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 if (!continueVisiting(v.visit(node), v)) {
@@ -2146,7 +1882,8 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
     /** {@inheritDoc} */
     @Override
     public boolean visit(BreakStatement node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(visitorsMap, BreakStatement.class).iterator(); iter.hasNext();) {
+        final List<ASTVisitor> visitorList = getVisitors(visitorsMap, BreakStatement.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 if (!continueVisiting(v.visit(node), v)) {
@@ -2163,7 +1900,8 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
     /** {@inheritDoc} */
     @Override
     public boolean visit(CastExpression node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(visitorsMap, CastExpression.class).iterator(); iter.hasNext();) {
+        final List<ASTVisitor> visitorList = getVisitors(visitorsMap, CastExpression.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 if (!continueVisiting(v.visit(node), v)) {
@@ -2180,7 +1918,8 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
     /** {@inheritDoc} */
     @Override
     public boolean visit(CatchClause node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(visitorsMap, CatchClause.class).iterator(); iter.hasNext();) {
+        final List<ASTVisitor> visitorList = getVisitors(visitorsMap, CatchClause.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 if (!continueVisiting(v.visit(node), v)) {
@@ -2196,8 +1935,9 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
 
     /** {@inheritDoc} */
     @Override
-    public boolean visit(SwitchStatement node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(visitorsMap, SwitchStatement.class).iterator(); iter.hasNext();) {
+    public boolean visit(CharacterLiteral node) {
+        final List<ASTVisitor> visitorList = getVisitors(visitorsMap, CharacterLiteral.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 if (!continueVisiting(v.visit(node), v)) {
@@ -2213,8 +1953,9 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
 
     /** {@inheritDoc} */
     @Override
-    public boolean visit(SynchronizedStatement node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(visitorsMap, SynchronizedStatement.class).iterator(); iter.hasNext();) {
+    public boolean visit(ClassInstanceCreation node) {
+        final List<ASTVisitor> visitorList = getVisitors(visitorsMap, ClassInstanceCreation.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 if (!continueVisiting(v.visit(node), v)) {
@@ -2230,8 +1971,9 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
 
     /** {@inheritDoc} */
     @Override
-    public boolean visit(TagElement node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(visitorsMap, TagElement.class).iterator(); iter.hasNext();) {
+    public boolean visit(CompilationUnit node) {
+        final List<ASTVisitor> visitorList = getVisitors(visitorsMap, CompilationUnit.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 if (!continueVisiting(v.visit(node), v)) {
@@ -2247,8 +1989,9 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
 
     /** {@inheritDoc} */
     @Override
-    public boolean visit(TextElement node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(visitorsMap, TextElement.class).iterator(); iter.hasNext();) {
+    public boolean visit(ConditionalExpression node) {
+        final List<ASTVisitor> visitorList = getVisitors(visitorsMap, ConditionalExpression.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 if (!continueVisiting(v.visit(node), v)) {
@@ -2264,8 +2007,9 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
 
     /** {@inheritDoc} */
     @Override
-    public boolean visit(ThisExpression node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(visitorsMap, ThisExpression.class).iterator(); iter.hasNext();) {
+    public boolean visit(ConstructorInvocation node) {
+        final List<ASTVisitor> visitorList = getVisitors(visitorsMap, ConstructorInvocation.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 if (!continueVisiting(v.visit(node), v)) {
@@ -2281,8 +2025,9 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
 
     /** {@inheritDoc} */
     @Override
-    public boolean visit(ThrowStatement node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(visitorsMap, ThrowStatement.class).iterator(); iter.hasNext();) {
+    public boolean visit(ContinueStatement node) {
+        final List<ASTVisitor> visitorList = getVisitors(visitorsMap, ContinueStatement.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 if (!continueVisiting(v.visit(node), v)) {
@@ -2298,8 +2043,9 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
 
     /** {@inheritDoc} */
     @Override
-    public boolean visit(StringLiteral node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(visitorsMap, StringLiteral.class).iterator(); iter.hasNext();) {
+    public boolean visit(DoStatement node) {
+        final List<ASTVisitor> visitorList = getVisitors(visitorsMap, DoStatement.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 if (!continueVisiting(v.visit(node), v)) {
@@ -2315,8 +2061,9 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
 
     /** {@inheritDoc} */
     @Override
-    public boolean visit(SuperConstructorInvocation node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(visitorsMap, SuperConstructorInvocation.class).iterator(); iter.hasNext();) {
+    public boolean visit(EmptyStatement node) {
+        final List<ASTVisitor> visitorList = getVisitors(visitorsMap, EmptyStatement.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 if (!continueVisiting(v.visit(node), v)) {
@@ -2332,8 +2079,9 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
 
     /** {@inheritDoc} */
     @Override
-    public boolean visit(SuperFieldAccess node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(visitorsMap, SuperFieldAccess.class).iterator(); iter.hasNext();) {
+    public boolean visit(EnhancedForStatement node) {
+        final List<ASTVisitor> visitorList = getVisitors(visitorsMap, EnhancedForStatement.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 if (!continueVisiting(v.visit(node), v)) {
@@ -2349,8 +2097,9 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
 
     /** {@inheritDoc} */
     @Override
-    public boolean visit(SuperMethodInvocation node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(visitorsMap, SuperMethodInvocation.class).iterator(); iter.hasNext();) {
+    public boolean visit(EnumConstantDeclaration node) {
+        final List<ASTVisitor> visitorList = getVisitors(visitorsMap, EnumConstantDeclaration.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 if (!continueVisiting(v.visit(node), v)) {
@@ -2366,8 +2115,9 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
 
     /** {@inheritDoc} */
     @Override
-    public boolean visit(SwitchCase node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(visitorsMap, SwitchCase.class).iterator(); iter.hasNext();) {
+    public boolean visit(EnumDeclaration node) {
+        final List<ASTVisitor> visitorList = getVisitors(visitorsMap, EnumDeclaration.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 if (!continueVisiting(v.visit(node), v)) {
@@ -2383,8 +2133,9 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
 
     /** {@inheritDoc} */
     @Override
-    public boolean visit(UnionType node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(visitorsMap, UnionType.class).iterator(); iter.hasNext();) {
+    public boolean visit(ExpressionStatement node) {
+        final List<ASTVisitor> visitorList = getVisitors(visitorsMap, ExpressionStatement.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 if (!continueVisiting(v.visit(node), v)) {
@@ -2400,8 +2151,9 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
 
     /** {@inheritDoc} */
     @Override
-    public boolean visit(VariableDeclarationExpression node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(visitorsMap, VariableDeclarationExpression.class).iterator(); iter.hasNext();) {
+    public boolean visit(FieldAccess node) {
+        final List<ASTVisitor> visitorList = getVisitors(visitorsMap, FieldAccess.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 if (!continueVisiting(v.visit(node), v)) {
@@ -2417,8 +2169,9 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
 
     /** {@inheritDoc} */
     @Override
-    public boolean visit(WildcardType node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(visitorsMap, WildcardType.class).iterator(); iter.hasNext();) {
+    public boolean visit(FieldDeclaration node) {
+        final List<ASTVisitor> visitorList = getVisitors(visitorsMap, FieldDeclaration.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 if (!continueVisiting(v.visit(node), v)) {
@@ -2434,8 +2187,9 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
 
     /** {@inheritDoc} */
     @Override
-    public boolean visit(WhileStatement node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(visitorsMap, WhileStatement.class).iterator(); iter.hasNext();) {
+    public boolean visit(ForStatement node) {
+        final List<ASTVisitor> visitorList = getVisitors(visitorsMap, ForStatement.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 if (!continueVisiting(v.visit(node), v)) {
@@ -2451,8 +2205,9 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
 
     /** {@inheritDoc} */
     @Override
-    public boolean visit(VariableDeclarationStatement node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(visitorsMap, VariableDeclarationStatement.class).iterator(); iter.hasNext();) {
+    public boolean visit(IfStatement node) {
+        final List<ASTVisitor> visitorList = getVisitors(visitorsMap, IfStatement.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 if (!continueVisiting(v.visit(node), v)) {
@@ -2468,8 +2223,9 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
 
     /** {@inheritDoc} */
     @Override
-    public boolean visit(TryStatement node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(visitorsMap, TryStatement.class).iterator(); iter.hasNext();) {
+    public boolean visit(ImportDeclaration node) {
+        final List<ASTVisitor> visitorList = getVisitors(visitorsMap, ImportDeclaration.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 if (!continueVisiting(v.visit(node), v)) {
@@ -2485,8 +2241,9 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
 
     /** {@inheritDoc} */
     @Override
-    public boolean visit(TypeDeclaration node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(visitorsMap, TypeDeclaration.class).iterator(); iter.hasNext();) {
+    public boolean visit(InfixExpression node) {
+        final List<ASTVisitor> visitorList = getVisitors(visitorsMap, InfixExpression.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 if (!continueVisiting(v.visit(node), v)) {
@@ -2502,8 +2259,9 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
 
     /** {@inheritDoc} */
     @Override
-    public boolean visit(TypeDeclarationStatement node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(visitorsMap, TypeDeclarationStatement.class).iterator(); iter.hasNext();) {
+    public boolean visit(Initializer node) {
+        final List<ASTVisitor> visitorList = getVisitors(visitorsMap, Initializer.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 if (!continueVisiting(v.visit(node), v)) {
@@ -2519,8 +2277,9 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
 
     /** {@inheritDoc} */
     @Override
-    public boolean visit(TypeLiteral node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(visitorsMap, TypeLiteral.class).iterator(); iter.hasNext();) {
+    public boolean visit(InstanceofExpression node) {
+        final List<ASTVisitor> visitorList = getVisitors(visitorsMap, InstanceofExpression.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 if (!continueVisiting(v.visit(node), v)) {
@@ -2536,8 +2295,9 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
 
     /** {@inheritDoc} */
     @Override
-    public boolean visit(TypeParameter node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(visitorsMap, TypeParameter.class).iterator(); iter.hasNext();) {
+    public boolean visit(Javadoc node) {
+        final List<ASTVisitor> visitorList = getVisitors(visitorsMap, Javadoc.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 if (!continueVisiting(v.visit(node), v)) {
@@ -2553,8 +2313,9 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
 
     /** {@inheritDoc} */
     @Override
-    public boolean visit(NormalAnnotation node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(visitorsMap, NormalAnnotation.class).iterator(); iter.hasNext();) {
+    public boolean visit(LabeledStatement node) {
+        final List<ASTVisitor> visitorList = getVisitors(visitorsMap, LabeledStatement.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 if (!continueVisiting(v.visit(node), v)) {
@@ -2570,8 +2331,9 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
 
     /** {@inheritDoc} */
     @Override
-    public boolean visit(NullLiteral node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(visitorsMap, NullLiteral.class).iterator(); iter.hasNext();) {
+    public boolean visit(LineComment node) {
+        final List<ASTVisitor> visitorList = getVisitors(visitorsMap, LineComment.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 if (!continueVisiting(v.visit(node), v)) {
@@ -2587,8 +2349,9 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
 
     /** {@inheritDoc} */
     @Override
-    public boolean visit(NumberLiteral node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(visitorsMap, NumberLiteral.class).iterator(); iter.hasNext();) {
+    public boolean visit(MarkerAnnotation node) {
+        final List<ASTVisitor> visitorList = getVisitors(visitorsMap, MarkerAnnotation.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 if (!continueVisiting(v.visit(node), v)) {
@@ -2604,8 +2367,9 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
 
     /** {@inheritDoc} */
     @Override
-    public boolean visit(PackageDeclaration node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(visitorsMap, PackageDeclaration.class).iterator(); iter.hasNext();) {
+    public boolean visit(MemberRef node) {
+        final List<ASTVisitor> visitorList = getVisitors(visitorsMap, MemberRef.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 if (!continueVisiting(v.visit(node), v)) {
@@ -2621,59 +2385,9 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
 
     /** {@inheritDoc} */
     @Override
-    public boolean visit(ParameterizedType node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(visitorsMap, ParameterizedType.class).iterator(); iter.hasNext();) {
-            final ASTVisitor v = iter.next();
-            try {
-                if (!continueVisiting(v.visit(node), v)) {
-                    return DO_NOT_VISIT_SUBTREE;
-                }
-            } catch (Exception e) {
-                logFaultyVisitor(v, e);
-                iter.remove();
-            }
-        }
-        return VISIT_SUBTREE;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean visit(ParenthesizedExpression node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(visitorsMap, ParenthesizedExpression.class).iterator(); iter.hasNext();) {
-            final ASTVisitor v = iter.next();
-            try {
-                if (!continueVisiting(v.visit(node), v)) {
-                    return DO_NOT_VISIT_SUBTREE;
-                }
-            } catch (Exception e) {
-                logFaultyVisitor(v, e);
-                iter.remove();
-            }
-        }
-        return VISIT_SUBTREE;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean visit(MethodRef node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(visitorsMap, MethodRef.class).iterator(); iter.hasNext();) {
-            final ASTVisitor v = iter.next();
-            try {
-                if (!continueVisiting(v.visit(node), v)) {
-                    return DO_NOT_VISIT_SUBTREE;
-                }
-            } catch (Exception e) {
-                logFaultyVisitor(v, e);
-                iter.remove();
-            }
-        }
-        return VISIT_SUBTREE;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean visit(MethodRefParameter node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(visitorsMap, MethodRefParameter.class).iterator(); iter.hasNext();) {
+    public boolean visit(MemberValuePair node) {
+        final List<ASTVisitor> visitorList = getVisitors(visitorsMap, MemberValuePair.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 if (!continueVisiting(v.visit(node), v)) {
@@ -2690,7 +2404,8 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
     /** {@inheritDoc} */
     @Override
     public boolean visit(MethodDeclaration node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(visitorsMap, MethodDeclaration.class).iterator(); iter.hasNext();) {
+        final List<ASTVisitor> visitorList = getVisitors(visitorsMap, MethodDeclaration.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 if (!continueVisiting(v.visit(node), v)) {
@@ -2707,7 +2422,44 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
     /** {@inheritDoc} */
     @Override
     public boolean visit(MethodInvocation node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(visitorsMap, MethodInvocation.class).iterator(); iter.hasNext();) {
+        final List<ASTVisitor> visitorList = getVisitors(visitorsMap, MethodInvocation.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
+            final ASTVisitor v = iter.next();
+            try {
+                if (!continueVisiting(v.visit(node), v)) {
+                    return DO_NOT_VISIT_SUBTREE;
+                }
+            } catch (Exception e) {
+                logFaultyVisitor(v, e);
+                iter.remove();
+            }
+        }
+        return VISIT_SUBTREE;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean visit(MethodRef node) {
+        final List<ASTVisitor> visitorList = getVisitors(visitorsMap, MethodRef.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
+            final ASTVisitor v = iter.next();
+            try {
+                if (!continueVisiting(v.visit(node), v)) {
+                    return DO_NOT_VISIT_SUBTREE;
+                }
+            } catch (Exception e) {
+                logFaultyVisitor(v, e);
+                iter.remove();
+            }
+        }
+        return VISIT_SUBTREE;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean visit(MethodRefParameter node) {
+        final List<ASTVisitor> visitorList = getVisitors(visitorsMap, MethodRefParameter.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 if (!continueVisiting(v.visit(node), v)) {
@@ -2724,7 +2476,8 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
     /** {@inheritDoc} */
     @Override
     public boolean visit(Modifier node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(visitorsMap, Modifier.class).iterator(); iter.hasNext();) {
+        final List<ASTVisitor> visitorList = getVisitors(visitorsMap, Modifier.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 if (!continueVisiting(v.visit(node), v)) {
@@ -2740,8 +2493,9 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
 
     /** {@inheritDoc} */
     @Override
-    public boolean visit(ReturnStatement node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(visitorsMap, ReturnStatement.class).iterator(); iter.hasNext();) {
+    public boolean visit(NormalAnnotation node) {
+        final List<ASTVisitor> visitorList = getVisitors(visitorsMap, NormalAnnotation.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 if (!continueVisiting(v.visit(node), v)) {
@@ -2757,8 +2511,9 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
 
     /** {@inheritDoc} */
     @Override
-    public boolean visit(SimpleName node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(visitorsMap, SimpleName.class).iterator(); iter.hasNext();) {
+    public boolean visit(NullLiteral node) {
+        final List<ASTVisitor> visitorList = getVisitors(visitorsMap, NullLiteral.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 if (!continueVisiting(v.visit(node), v)) {
@@ -2774,8 +2529,9 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
 
     /** {@inheritDoc} */
     @Override
-    public boolean visit(SimpleType node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(visitorsMap, SimpleType.class).iterator(); iter.hasNext();) {
+    public boolean visit(NumberLiteral node) {
+        final List<ASTVisitor> visitorList = getVisitors(visitorsMap, NumberLiteral.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 if (!continueVisiting(v.visit(node), v)) {
@@ -2791,8 +2547,9 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
 
     /** {@inheritDoc} */
     @Override
-    public boolean visit(SingleMemberAnnotation node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(visitorsMap, SingleMemberAnnotation.class).iterator(); iter.hasNext();) {
+    public boolean visit(PackageDeclaration node) {
+        final List<ASTVisitor> visitorList = getVisitors(visitorsMap, PackageDeclaration.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 if (!continueVisiting(v.visit(node), v)) {
@@ -2808,8 +2565,27 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
 
     /** {@inheritDoc} */
     @Override
-    public boolean visit(SingleVariableDeclaration node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(visitorsMap, SingleVariableDeclaration.class).iterator(); iter.hasNext();) {
+    public boolean visit(ParameterizedType node) {
+        final List<ASTVisitor> visitorList = getVisitors(visitorsMap, ParameterizedType.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
+            final ASTVisitor v = iter.next();
+            try {
+                if (!continueVisiting(v.visit(node), v)) {
+                    return DO_NOT_VISIT_SUBTREE;
+                }
+            } catch (Exception e) {
+                logFaultyVisitor(v, e);
+                iter.remove();
+            }
+        }
+        return VISIT_SUBTREE;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean visit(ParenthesizedExpression node) {
+        final List<ASTVisitor> visitorList = getVisitors(visitorsMap, ParenthesizedExpression.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 if (!continueVisiting(v.visit(node), v)) {
@@ -2826,7 +2602,8 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
     /** {@inheritDoc} */
     @Override
     public boolean visit(PostfixExpression node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(visitorsMap, PostfixExpression.class).iterator(); iter.hasNext();) {
+        final List<ASTVisitor> visitorList = getVisitors(visitorsMap, PostfixExpression.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 if (!continueVisiting(v.visit(node), v)) {
@@ -2843,7 +2620,8 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
     /** {@inheritDoc} */
     @Override
     public boolean visit(PrefixExpression node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(visitorsMap, PrefixExpression.class).iterator(); iter.hasNext();) {
+        final List<ASTVisitor> visitorList = getVisitors(visitorsMap, PrefixExpression.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 if (!continueVisiting(v.visit(node), v)) {
@@ -2860,7 +2638,8 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
     /** {@inheritDoc} */
     @Override
     public boolean visit(PrimitiveType node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(visitorsMap, PrimitiveType.class).iterator(); iter.hasNext();) {
+        final List<ASTVisitor> visitorList = getVisitors(visitorsMap, PrimitiveType.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 if (!continueVisiting(v.visit(node), v)) {
@@ -2877,7 +2656,8 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
     /** {@inheritDoc} */
     @Override
     public boolean visit(QualifiedName node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(visitorsMap, QualifiedName.class).iterator(); iter.hasNext();) {
+        final List<ASTVisitor> visitorList = getVisitors(visitorsMap, QualifiedName.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 if (!continueVisiting(v.visit(node), v)) {
@@ -2894,7 +2674,494 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
     /** {@inheritDoc} */
     @Override
     public boolean visit(QualifiedType node) {
-        for (Iterator<ASTVisitor> iter = getVisitors(visitorsMap, QualifiedType.class).iterator(); iter.hasNext();) {
+        final List<ASTVisitor> visitorList = getVisitors(visitorsMap, QualifiedType.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
+            final ASTVisitor v = iter.next();
+            try {
+                if (!continueVisiting(v.visit(node), v)) {
+                    return DO_NOT_VISIT_SUBTREE;
+                }
+            } catch (Exception e) {
+                logFaultyVisitor(v, e);
+                iter.remove();
+            }
+        }
+        return VISIT_SUBTREE;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean visit(ReturnStatement node) {
+        final List<ASTVisitor> visitorList = getVisitors(visitorsMap, ReturnStatement.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
+            final ASTVisitor v = iter.next();
+            try {
+                if (!continueVisiting(v.visit(node), v)) {
+                    return DO_NOT_VISIT_SUBTREE;
+                }
+            } catch (Exception e) {
+                logFaultyVisitor(v, e);
+                iter.remove();
+            }
+        }
+        return VISIT_SUBTREE;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean visit(SimpleName node) {
+        final List<ASTVisitor> visitorList = getVisitors(visitorsMap, SimpleName.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
+            final ASTVisitor v = iter.next();
+            try {
+                if (!continueVisiting(v.visit(node), v)) {
+                    return DO_NOT_VISIT_SUBTREE;
+                }
+            } catch (Exception e) {
+                logFaultyVisitor(v, e);
+                iter.remove();
+            }
+        }
+        return VISIT_SUBTREE;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean visit(SimpleType node) {
+        final List<ASTVisitor> visitorList = getVisitors(visitorsMap, SimpleType.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
+            final ASTVisitor v = iter.next();
+            try {
+                if (!continueVisiting(v.visit(node), v)) {
+                    return DO_NOT_VISIT_SUBTREE;
+                }
+            } catch (Exception e) {
+                logFaultyVisitor(v, e);
+                iter.remove();
+            }
+        }
+        return VISIT_SUBTREE;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean visit(SingleMemberAnnotation node) {
+        final List<ASTVisitor> visitorList = getVisitors(visitorsMap, SingleMemberAnnotation.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
+            final ASTVisitor v = iter.next();
+            try {
+                if (!continueVisiting(v.visit(node), v)) {
+                    return DO_NOT_VISIT_SUBTREE;
+                }
+            } catch (Exception e) {
+                logFaultyVisitor(v, e);
+                iter.remove();
+            }
+        }
+        return VISIT_SUBTREE;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean visit(SingleVariableDeclaration node) {
+        final List<ASTVisitor> visitorList = getVisitors(visitorsMap, SingleVariableDeclaration.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
+            final ASTVisitor v = iter.next();
+            try {
+                if (!continueVisiting(v.visit(node), v)) {
+                    return DO_NOT_VISIT_SUBTREE;
+                }
+            } catch (Exception e) {
+                logFaultyVisitor(v, e);
+                iter.remove();
+            }
+        }
+        return VISIT_SUBTREE;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean visit(StringLiteral node) {
+        final List<ASTVisitor> visitorList = getVisitors(visitorsMap, StringLiteral.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
+            final ASTVisitor v = iter.next();
+            try {
+                if (!continueVisiting(v.visit(node), v)) {
+                    return DO_NOT_VISIT_SUBTREE;
+                }
+            } catch (Exception e) {
+                logFaultyVisitor(v, e);
+                iter.remove();
+            }
+        }
+        return VISIT_SUBTREE;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean visit(SuperConstructorInvocation node) {
+        final List<ASTVisitor> visitorList = getVisitors(visitorsMap, SuperConstructorInvocation.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
+            final ASTVisitor v = iter.next();
+            try {
+                if (!continueVisiting(v.visit(node), v)) {
+                    return DO_NOT_VISIT_SUBTREE;
+                }
+            } catch (Exception e) {
+                logFaultyVisitor(v, e);
+                iter.remove();
+            }
+        }
+        return VISIT_SUBTREE;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean visit(SuperFieldAccess node) {
+        final List<ASTVisitor> visitorList = getVisitors(visitorsMap, SuperFieldAccess.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
+            final ASTVisitor v = iter.next();
+            try {
+                if (!continueVisiting(v.visit(node), v)) {
+                    return DO_NOT_VISIT_SUBTREE;
+                }
+            } catch (Exception e) {
+                logFaultyVisitor(v, e);
+                iter.remove();
+            }
+        }
+        return VISIT_SUBTREE;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean visit(SuperMethodInvocation node) {
+        final List<ASTVisitor> visitorList = getVisitors(visitorsMap, SuperMethodInvocation.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
+            final ASTVisitor v = iter.next();
+            try {
+                if (!continueVisiting(v.visit(node), v)) {
+                    return DO_NOT_VISIT_SUBTREE;
+                }
+            } catch (Exception e) {
+                logFaultyVisitor(v, e);
+                iter.remove();
+            }
+        }
+        return VISIT_SUBTREE;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean visit(SwitchCase node) {
+        final List<ASTVisitor> visitorList = getVisitors(visitorsMap, SwitchCase.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
+            final ASTVisitor v = iter.next();
+            try {
+                if (!continueVisiting(v.visit(node), v)) {
+                    return DO_NOT_VISIT_SUBTREE;
+                }
+            } catch (Exception e) {
+                logFaultyVisitor(v, e);
+                iter.remove();
+            }
+        }
+        return VISIT_SUBTREE;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean visit(SwitchStatement node) {
+        final List<ASTVisitor> visitorList = getVisitors(visitorsMap, SwitchStatement.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
+            final ASTVisitor v = iter.next();
+            try {
+                if (!continueVisiting(v.visit(node), v)) {
+                    return DO_NOT_VISIT_SUBTREE;
+                }
+            } catch (Exception e) {
+                logFaultyVisitor(v, e);
+                iter.remove();
+            }
+        }
+        return VISIT_SUBTREE;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean visit(SynchronizedStatement node) {
+        final List<ASTVisitor> visitorList = getVisitors(visitorsMap, SynchronizedStatement.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
+            final ASTVisitor v = iter.next();
+            try {
+                if (!continueVisiting(v.visit(node), v)) {
+                    return DO_NOT_VISIT_SUBTREE;
+                }
+            } catch (Exception e) {
+                logFaultyVisitor(v, e);
+                iter.remove();
+            }
+        }
+        return VISIT_SUBTREE;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean visit(TagElement node) {
+        final List<ASTVisitor> visitorList = getVisitors(visitorsMap, TagElement.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
+            final ASTVisitor v = iter.next();
+            try {
+                if (!continueVisiting(v.visit(node), v)) {
+                    return DO_NOT_VISIT_SUBTREE;
+                }
+            } catch (Exception e) {
+                logFaultyVisitor(v, e);
+                iter.remove();
+            }
+        }
+        return VISIT_SUBTREE;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean visit(TextElement node) {
+        final List<ASTVisitor> visitorList = getVisitors(visitorsMap, TextElement.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
+            final ASTVisitor v = iter.next();
+            try {
+                if (!continueVisiting(v.visit(node), v)) {
+                    return DO_NOT_VISIT_SUBTREE;
+                }
+            } catch (Exception e) {
+                logFaultyVisitor(v, e);
+                iter.remove();
+            }
+        }
+        return VISIT_SUBTREE;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean visit(ThisExpression node) {
+        final List<ASTVisitor> visitorList = getVisitors(visitorsMap, ThisExpression.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
+            final ASTVisitor v = iter.next();
+            try {
+                if (!continueVisiting(v.visit(node), v)) {
+                    return DO_NOT_VISIT_SUBTREE;
+                }
+            } catch (Exception e) {
+                logFaultyVisitor(v, e);
+                iter.remove();
+            }
+        }
+        return VISIT_SUBTREE;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean visit(ThrowStatement node) {
+        final List<ASTVisitor> visitorList = getVisitors(visitorsMap, ThrowStatement.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
+            final ASTVisitor v = iter.next();
+            try {
+                if (!continueVisiting(v.visit(node), v)) {
+                    return DO_NOT_VISIT_SUBTREE;
+                }
+            } catch (Exception e) {
+                logFaultyVisitor(v, e);
+                iter.remove();
+            }
+        }
+        return VISIT_SUBTREE;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean visit(TryStatement node) {
+        final List<ASTVisitor> visitorList = getVisitors(visitorsMap, TryStatement.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
+            final ASTVisitor v = iter.next();
+            try {
+                if (!continueVisiting(v.visit(node), v)) {
+                    return DO_NOT_VISIT_SUBTREE;
+                }
+            } catch (Exception e) {
+                logFaultyVisitor(v, e);
+                iter.remove();
+            }
+        }
+        return VISIT_SUBTREE;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean visit(TypeDeclaration node) {
+        final List<ASTVisitor> visitorList = getVisitors(visitorsMap, TypeDeclaration.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
+            final ASTVisitor v = iter.next();
+            try {
+                if (!continueVisiting(v.visit(node), v)) {
+                    return DO_NOT_VISIT_SUBTREE;
+                }
+            } catch (Exception e) {
+                logFaultyVisitor(v, e);
+                iter.remove();
+            }
+        }
+        return VISIT_SUBTREE;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean visit(TypeDeclarationStatement node) {
+        final List<ASTVisitor> visitorList = getVisitors(visitorsMap, TypeDeclarationStatement.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
+            final ASTVisitor v = iter.next();
+            try {
+                if (!continueVisiting(v.visit(node), v)) {
+                    return DO_NOT_VISIT_SUBTREE;
+                }
+            } catch (Exception e) {
+                logFaultyVisitor(v, e);
+                iter.remove();
+            }
+        }
+        return VISIT_SUBTREE;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean visit(TypeLiteral node) {
+        final List<ASTVisitor> visitorList = getVisitors(visitorsMap, TypeLiteral.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
+            final ASTVisitor v = iter.next();
+            try {
+                if (!continueVisiting(v.visit(node), v)) {
+                    return DO_NOT_VISIT_SUBTREE;
+                }
+            } catch (Exception e) {
+                logFaultyVisitor(v, e);
+                iter.remove();
+            }
+        }
+        return VISIT_SUBTREE;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean visit(TypeParameter node) {
+        final List<ASTVisitor> visitorList = getVisitors(visitorsMap, TypeParameter.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
+            final ASTVisitor v = iter.next();
+            try {
+                if (!continueVisiting(v.visit(node), v)) {
+                    return DO_NOT_VISIT_SUBTREE;
+                }
+            } catch (Exception e) {
+                logFaultyVisitor(v, e);
+                iter.remove();
+            }
+        }
+        return VISIT_SUBTREE;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean visit(UnionType node) {
+        final List<ASTVisitor> visitorList = getVisitors(visitorsMap, UnionType.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
+            final ASTVisitor v = iter.next();
+            try {
+                if (!continueVisiting(v.visit(node), v)) {
+                    return DO_NOT_VISIT_SUBTREE;
+                }
+            } catch (Exception e) {
+                logFaultyVisitor(v, e);
+                iter.remove();
+            }
+        }
+        return VISIT_SUBTREE;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean visit(VariableDeclarationExpression node) {
+        final List<ASTVisitor> visitorList = getVisitors(visitorsMap, VariableDeclarationExpression.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
+            final ASTVisitor v = iter.next();
+            try {
+                if (!continueVisiting(v.visit(node), v)) {
+                    return DO_NOT_VISIT_SUBTREE;
+                }
+            } catch (Exception e) {
+                logFaultyVisitor(v, e);
+                iter.remove();
+            }
+        }
+        return VISIT_SUBTREE;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean visit(VariableDeclarationFragment node) {
+        final List<ASTVisitor> visitorList = getVisitors(visitorsMap, VariableDeclarationFragment.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
+            final ASTVisitor v = iter.next();
+            try {
+                if (!continueVisiting(v.visit(node), v)) {
+                    return DO_NOT_VISIT_SUBTREE;
+                }
+            } catch (Exception e) {
+                logFaultyVisitor(v, e);
+                iter.remove();
+            }
+        }
+        return VISIT_SUBTREE;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean visit(VariableDeclarationStatement node) {
+        final List<ASTVisitor> visitorList = getVisitors(visitorsMap, VariableDeclarationStatement.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
+            final ASTVisitor v = iter.next();
+            try {
+                if (!continueVisiting(v.visit(node), v)) {
+                    return DO_NOT_VISIT_SUBTREE;
+                }
+            } catch (Exception e) {
+                logFaultyVisitor(v, e);
+                iter.remove();
+            }
+        }
+        return VISIT_SUBTREE;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean visit(WhileStatement node) {
+        final List<ASTVisitor> visitorList = getVisitors(visitorsMap, WhileStatement.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
+            final ASTVisitor v = iter.next();
+            try {
+                if (!continueVisiting(v.visit(node), v)) {
+                    return DO_NOT_VISIT_SUBTREE;
+                }
+            } catch (Exception e) {
+                logFaultyVisitor(v, e);
+                iter.remove();
+            }
+        }
+        return VISIT_SUBTREE;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean visit(WildcardType node) {
+        final List<ASTVisitor> visitorList = getVisitors(visitorsMap, WildcardType.class);
+        for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
                 if (!continueVisiting(v.visit(node), v)) {
