@@ -41,7 +41,13 @@ public class RefactoringContext {
     private final AST ast;
     private final Release javaSERelease;
 
-    /** Constructor. */
+    /**
+     * Builds an instance of this class.
+     *
+     * @param compilationUnit the compilation unit to refactor
+     * @param ast the {@link AST} object to use in the refactoring
+     * @param javaSERelease the Java SE version that is used to compile the compilation unit
+     */
     public RefactoringContext(ICompilationUnit compilationUnit, AST ast,
             Release javaSERelease) {
         this.ast = ast;

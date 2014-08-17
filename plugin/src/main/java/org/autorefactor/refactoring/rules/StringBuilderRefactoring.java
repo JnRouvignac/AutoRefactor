@@ -77,6 +77,7 @@ public class StringBuilderRefactoring extends ASTVisitor implements
     private RefactoringContext ctx;
     private int javaMinorVersion;
 
+    /** Default constructor. */
     public StringBuilderRefactoring() {
         super();
     }

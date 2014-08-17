@@ -54,6 +54,7 @@ public class CommonCodeInIfElseStatementRefactoring extends ASTVisitor
 
     private RefactoringContext ctx;
 
+    /** Default constructor. */
     public CommonCodeInIfElseStatementRefactoring() {
         super();
     }
@@ -277,8 +278,10 @@ public class CommonCodeInIfElseStatementRefactoring extends ASTVisitor
     }
 
     /**
-     * @param allCases
-     * @param node
+     * Collects all cases (if/else, if/else if/else, etc.) and returns whether all are covered.
+     *
+     * @param allCases the output collection for all the cases
+     * @param node the {@link IfStatement} to examine
      * @return true if all cases (if/else, if/else if/else, etc.) are covered,
      *         false otherwise
      */

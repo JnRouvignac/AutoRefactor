@@ -31,8 +31,12 @@ import org.autorefactor.AutoRefactorPlugin;
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.jface.preference.IPreferenceStore;
 
+/**
+ * Initializes the Eclipse preferences for AutoRefactor.
+ */
 public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
+    /** {@inheritDoc} */
     @Override
     public void initializeDefaultPreferences() {
         // TODO initialize preferences from the JDT preferences like:

@@ -62,6 +62,7 @@ public class BigDecimalRefactoring extends ASTVisitor implements
     private RefactoringContext ctx;
     private int javaMinorVersion;
 
+    /** Default constructor. */
     public BigDecimalRefactoring() {
         super();
     }

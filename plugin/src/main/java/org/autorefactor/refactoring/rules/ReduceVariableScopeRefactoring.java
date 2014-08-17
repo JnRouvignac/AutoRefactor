@@ -183,6 +183,7 @@ public class ReduceVariableScopeRefactoring extends ASTVisitor implements
             new HashMap<VariableName, List<VariableAccess>>();
     private static final Pair<Integer, ASTNode> NULL_PAIR = Pair.of(0, null);
 
+    /** Default constructor. */
     public ReduceVariableScopeRefactoring() {
         super();
     }
@@ -206,7 +207,7 @@ public class ReduceVariableScopeRefactoring extends ASTVisitor implements
         return false;
     }
 
-    public void findVariableAccesses(Name node) {
+    private void findVariableAccesses(Name node) {
         final Pair<Integer, ASTNode> accessTypeAndScope = getAccessTypeAndScope(node);
         if (accessTypeAndScope.getFirst().intValue() != 0) {
             final VariableName varName = new VariableName(node);

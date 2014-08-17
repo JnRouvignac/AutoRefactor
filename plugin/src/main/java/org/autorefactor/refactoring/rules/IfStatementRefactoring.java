@@ -38,11 +38,27 @@ import org.eclipse.jdt.core.dom.Statement;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
 
+/**
+ * Refactors <pre>
+ * if {
+ *   ...
+ * } else {
+ *   if {
+ *      ...
+ *   }
+ * }</pre> into <pre>
+ * if {
+ *   ...
+ * } else if {
+ *   ...
+ * }</pre>.
+ */
 public class IfStatementRefactoring extends ASTVisitor implements
         IJavaRefactoring {
 
     private RefactoringContext ctx;
 
+    /** Default constructor. */
     public IfStatementRefactoring() {
         super();
     }

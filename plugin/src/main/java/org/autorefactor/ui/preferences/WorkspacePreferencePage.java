@@ -34,14 +34,19 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 import static org.autorefactor.ui.preferences.PreferenceConstants.*;
 
+/**
+ * The Eclipse preference page for AutoRefactor.
+ */
 public class WorkspacePreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
+    /** Default constructor. */
     public WorkspacePreferencePage() {
         super(GRID);
         setPreferenceStore(AutoRefactorPlugin.getDefault().getPreferenceStore());
         setDescription("AutoRefactor workbench preferences");
     }
 
+    /** {@inheritDoc} */
     @Override
     protected void createFieldEditors() {
         addBooleanField(REMOVE_THIS_FOR_NON_STATIC_METHOD_ACCESS);
@@ -54,6 +59,7 @@ public class WorkspacePreferencePage extends FieldEditorPreferencePage implement
         addField(new BooleanFieldEditor(pref.name, pref.description, getFieldEditorParent()));
     }
 
+    /** {@inheritDoc} */
     public void init(IWorkbench workbench) {
     }
 

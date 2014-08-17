@@ -50,6 +50,7 @@ public class InvertEqualsRefactoring extends ASTVisitor implements
 
     private RefactoringContext ctx;
 
+    /** Default constructor. */
     public InvertEqualsRefactoring() {
         super();
     }

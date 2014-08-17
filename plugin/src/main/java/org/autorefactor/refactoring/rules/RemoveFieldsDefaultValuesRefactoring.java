@@ -42,11 +42,18 @@ import org.eclipse.jdt.core.dom.Modifier;
 import org.eclipse.jdt.core.dom.Modifier.ModifierKeyword;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
+/**
+ * Remove field initializers when they are the default value of the field's types.
+ * For example, the initializer will be removed for integer fields initialized to <code>0</code>.
+ * Likewise, the initializer will be removed for non primitive fields initialized to <code>null</code>.
+ * etc.
+ */
 public class RemoveFieldsDefaultValuesRefactoring extends ASTVisitor implements
         IJavaRefactoring {
 
     private RefactoringContext ctx;
 
+    /** Default constructor. */
     public RemoveFieldsDefaultValuesRefactoring() {
         super();
     }

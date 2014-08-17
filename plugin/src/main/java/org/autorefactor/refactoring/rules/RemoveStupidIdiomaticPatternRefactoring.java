@@ -64,6 +64,7 @@ public class RemoveStupidIdiomaticPatternRefactoring extends ASTVisitor
 
     private RefactoringContext ctx;
 
+    /** Default constructor. */
     public RemoveStupidIdiomaticPatternRefactoring() {
         super();
     }

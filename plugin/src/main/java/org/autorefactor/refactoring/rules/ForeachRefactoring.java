@@ -51,6 +51,7 @@ public class ForeachRefactoring extends ASTVisitor implements IJavaRefactoring {
 
     private RefactoringContext ctx;
 
+    /** Default constructor. */
     public ForeachRefactoring() {
         super();
     }

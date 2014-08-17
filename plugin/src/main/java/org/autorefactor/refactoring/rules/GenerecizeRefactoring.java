@@ -43,6 +43,7 @@ public class GenerecizeRefactoring extends ASTVisitor implements
 
     private RefactoringContext ctx;
 
+    /** Default constructor. */
     public GenerecizeRefactoring() {
         super();
     }

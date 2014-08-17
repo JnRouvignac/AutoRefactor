@@ -28,6 +28,7 @@ package org.autorefactor.refactoring.rules;
 import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.autorefactor.refactoring.ForLoopHelper.*;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.autorefactor.refactoring.ASTBuilder;
@@ -53,11 +54,16 @@ import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
+/**
+ * Converts code to use {@link Collection#addAll(Collection)} when for or foreach loops are iterating over a collection
+ * and add all its elements to another collection.
+ */
 public class CollectionAddAllRefactoring extends ASTVisitor implements
         IJavaRefactoring {
 
     private RefactoringContext ctx;
 
+    /** Default constructor. */
     public CollectionAddAllRefactoring() {
         super();
     }

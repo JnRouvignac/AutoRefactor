@@ -43,6 +43,11 @@ public final class AllRefactorings {
         super();
     }
 
+    /**
+     * Returns the refactorings which have been enabled from the Eclipse preferences.
+     *
+     * @return the refactorings which have been enabled from the Eclipse preferences
+     */
     public static List<IRefactoring> getConfiguredRefactorings() {
         final PreferenceHelper prefs = AutoRefactorPlugin.getPreferenceHelper();
         final List<IRefactoring> refactorings = getAllRefactorings();
@@ -56,6 +61,11 @@ public final class AllRefactorings {
         return refactorings;
     }
 
+    /**
+     * Returns all the available refactorings.
+     *
+     * @return all the available refactorings
+     */
     public static List<IRefactoring> getAllRefactorings() {
         // TODO JNR Remove reference to Preferences from this method
         final PreferenceHelper prefs = AutoRefactorPlugin.getPreferenceHelper();

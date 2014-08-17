@@ -99,6 +99,7 @@ public class RemoveUselessModifiersRefactoring extends ASTVisitor implements
 
     private RefactoringContext ctx;
 
+    /** Default constructor. */
     public RemoveUselessModifiersRefactoring() {
         super();
     }

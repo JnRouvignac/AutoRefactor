@@ -47,6 +47,7 @@ public class PrimitiveWrapperCreationRefactoring extends ASTVisitor implements
     private RefactoringContext ctx;
     private int javaMinorVersion;
 
+    /** Default constructor. */
     public PrimitiveWrapperCreationRefactoring() {
         super();
     }

@@ -45,6 +45,7 @@ public class CollapseIfStatementRefactoring extends ASTVisitor implements
 
     private RefactoringContext ctx;
 
+    /** Default constructor. */
     public CollapseIfStatementRefactoring() {
         super();
     }

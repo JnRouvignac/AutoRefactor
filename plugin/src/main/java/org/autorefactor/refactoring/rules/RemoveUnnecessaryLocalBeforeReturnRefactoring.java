@@ -56,6 +56,7 @@ public class RemoveUnnecessaryLocalBeforeReturnRefactoring extends ASTVisitor
 
     private RefactoringContext ctx;
 
+    /** Default constructor. */
     public RemoveUnnecessaryLocalBeforeReturnRefactoring() {
         super();
     }

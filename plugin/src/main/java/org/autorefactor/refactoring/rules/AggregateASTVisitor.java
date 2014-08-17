@@ -152,6 +152,12 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
     private RefactoringContext ctx;
     private final List<ASTVisitor> visitorsContributingRefactoring = new ArrayList<ASTVisitor>();
 
+    /**
+     * Builds an instance of this class.
+     *
+     * @param visitors the visitors that will be executed by this {@link AggregateASTVisitor}
+     * @param debugModeOn whether to log errors
+     */
     @SuppressWarnings("rawtypes")
     public AggregateASTVisitor(List<IRefactoring> visitors, boolean debugModeOn) {
         this.visitors = (List) visitors;
@@ -159,6 +165,11 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
         analyzeVisitors();
     }
 
+    /**
+     * Builds an instance of this class.
+     *
+     * @param visitor the visitor that will be executed by this {@link AggregateASTVisitor}
+     */
     public AggregateASTVisitor(IRefactoring visitor) {
         this.visitors = Arrays.asList((ASTVisitor) visitor);
         this.debugModeOn = true;
@@ -239,6 +250,11 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
         return this.ctx.getRefactorings();
     }
 
+    /**
+     * Returns the visitors that contributed refactorings in the last run.
+     *
+     * @return the visitors that contributed refactorings in the last run
+     */
     public List<ASTVisitor> getVisitorsContributingRefactoring() {
         return visitorsContributingRefactoring;
     }
@@ -292,6 +308,8 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
 
     /**
      * Generates the code for all the ASTVisitor methods that delegate to the underlying visitors.
+     *
+     * @param args the arguments of the Java program
      */
     public static void main(String[] args) {
         final Method[] mm = ASTVisitor.class.getDeclaredMethods();

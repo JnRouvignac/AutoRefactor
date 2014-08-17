@@ -72,6 +72,11 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
     private int javaMinorVersion;
     private final boolean removeThisForNonStaticMethodAccess;
 
+    /**
+     * Builds an instance of this class.
+     *
+     * @param removeThisForNonStaticMethodAccess whether to remove 'this' keyword for accesses to non static methods
+     */
     public SimplifyExpressionRefactoring(boolean removeThisForNonStaticMethodAccess) {
         this.removeThisForNonStaticMethodAccess = removeThisForNonStaticMethodAccess;
     }

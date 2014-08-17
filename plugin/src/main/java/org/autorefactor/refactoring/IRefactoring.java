@@ -29,12 +29,26 @@ import org.autorefactor.refactoring.rules.RefactoringContext;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 
 /**
- * Interface for all refactorings.
+ * Interface that all refactorings must implement.
+ * <p>
+ * First, {@link #setRefactoringContext(RefactoringContext)} is called, then {@link #getRefactorings(CompilationUnit)}
+ * is called next.
  */
 public interface IRefactoring {
 
+    /**
+     * Returns all the refactorings determined for the provided compilation unit after analysis.
+     *
+     * @param astRoot the compilation unit to refactor
+     * @return all the determined refactorings
+     */
     Refactorings getRefactorings(CompilationUnit astRoot);
 
+    /**
+     * Sets the refactoring context before analysis.
+     *
+     * @param ctx the refactoring context
+     */
     void setRefactoringContext(RefactoringContext ctx);
 
 }

@@ -49,6 +49,7 @@ public class DeadCodeEliminationRefactoring extends ASTVisitor implements
 
     private RefactoringContext ctx;
 
+    /** Default constructor. */
     public DeadCodeEliminationRefactoring() {
         super();
     }
