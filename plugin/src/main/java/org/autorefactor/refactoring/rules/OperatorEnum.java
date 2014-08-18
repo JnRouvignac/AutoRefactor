@@ -240,7 +240,16 @@ public enum OperatorEnum {
         return compareTo(op1, op2);
     }
 
-    static int compareTo(OperatorEnum operator1, OperatorEnum operator2) {
+    /**
+     * Compares the provided OperatorEnums according to the Java operator precedence rules.
+     *
+     * @param operator1 the first operator to compare
+     * @param operator2 the second operator to compare
+     * @return a value smaller than 0 if the first operator is less than the second node,
+     *         0 if the two operators are equal or cannot be compared,
+     *         a value greater than 0 if the first operator is greater than the second node
+     */
+    public static int compareTo(OperatorEnum operator1, OperatorEnum operator2) {
         final Integer prec1 = operator1.precedence;
         final Integer prec2 = operator2.precedence;
         // Reverse the precedence because of the values we are assigning
