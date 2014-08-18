@@ -38,23 +38,36 @@ import org.autorefactor.util.NotImplementedException;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTMatcher;
 import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.AnnotationTypeDeclaration;
+import org.eclipse.jdt.core.dom.AnnotationTypeMemberDeclaration;
+import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
+import org.eclipse.jdt.core.dom.ArrayAccess;
+import org.eclipse.jdt.core.dom.ArrayCreation;
 import org.eclipse.jdt.core.dom.ArrayInitializer;
+import org.eclipse.jdt.core.dom.ArrayType;
 import org.eclipse.jdt.core.dom.AssertStatement;
+import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Block;
+import org.eclipse.jdt.core.dom.BlockComment;
 import org.eclipse.jdt.core.dom.BodyDeclaration;
 import org.eclipse.jdt.core.dom.BooleanLiteral;
 import org.eclipse.jdt.core.dom.BreakStatement;
+import org.eclipse.jdt.core.dom.CastExpression;
 import org.eclipse.jdt.core.dom.CatchClause;
+import org.eclipse.jdt.core.dom.CharacterLiteral;
 import org.eclipse.jdt.core.dom.ChildListPropertyDescriptor;
 import org.eclipse.jdt.core.dom.ChildPropertyDescriptor;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.Comment;
 import org.eclipse.jdt.core.dom.CompilationUnit;
+import org.eclipse.jdt.core.dom.ConditionalExpression;
 import org.eclipse.jdt.core.dom.ConstructorInvocation;
 import org.eclipse.jdt.core.dom.ContinueStatement;
 import org.eclipse.jdt.core.dom.DoStatement;
 import org.eclipse.jdt.core.dom.EmptyStatement;
 import org.eclipse.jdt.core.dom.EnhancedForStatement;
+import org.eclipse.jdt.core.dom.EnumConstantDeclaration;
+import org.eclipse.jdt.core.dom.EnumDeclaration;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ExpressionStatement;
 import org.eclipse.jdt.core.dom.FieldAccess;
@@ -67,15 +80,32 @@ import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.ImportDeclaration;
 import org.eclipse.jdt.core.dom.InfixExpression;
+import org.eclipse.jdt.core.dom.Initializer;
 import org.eclipse.jdt.core.dom.InstanceofExpression;
 import org.eclipse.jdt.core.dom.Javadoc;
 import org.eclipse.jdt.core.dom.LabeledStatement;
+import org.eclipse.jdt.core.dom.LineComment;
+import org.eclipse.jdt.core.dom.MarkerAnnotation;
+import org.eclipse.jdt.core.dom.MemberRef;
+import org.eclipse.jdt.core.dom.MemberValuePair;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
+import org.eclipse.jdt.core.dom.MethodRef;
+import org.eclipse.jdt.core.dom.MethodRefParameter;
+import org.eclipse.jdt.core.dom.Modifier;
 import org.eclipse.jdt.core.dom.Name;
+import org.eclipse.jdt.core.dom.NormalAnnotation;
+import org.eclipse.jdt.core.dom.NullLiteral;
+import org.eclipse.jdt.core.dom.NumberLiteral;
+import org.eclipse.jdt.core.dom.PackageDeclaration;
 import org.eclipse.jdt.core.dom.ParameterizedType;
 import org.eclipse.jdt.core.dom.ParenthesizedExpression;
+import org.eclipse.jdt.core.dom.PostfixExpression;
 import org.eclipse.jdt.core.dom.PrefixExpression;
+import org.eclipse.jdt.core.dom.QualifiedType;
+import org.eclipse.jdt.core.dom.SingleMemberAnnotation;
+import org.eclipse.jdt.core.dom.StringLiteral;
+import org.eclipse.jdt.core.dom.SuperFieldAccess;
 import org.eclipse.jdt.core.dom.PrefixExpression.Operator;
 import org.eclipse.jdt.core.dom.PrimitiveType;
 import org.eclipse.jdt.core.dom.QualifiedName;
@@ -91,16 +121,21 @@ import org.eclipse.jdt.core.dom.SwitchCase;
 import org.eclipse.jdt.core.dom.SwitchStatement;
 import org.eclipse.jdt.core.dom.SynchronizedStatement;
 import org.eclipse.jdt.core.dom.TagElement;
+import org.eclipse.jdt.core.dom.TextElement;
 import org.eclipse.jdt.core.dom.ThisExpression;
 import org.eclipse.jdt.core.dom.ThrowStatement;
 import org.eclipse.jdt.core.dom.TryStatement;
 import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.TypeDeclarationStatement;
+import org.eclipse.jdt.core.dom.TypeLiteral;
+import org.eclipse.jdt.core.dom.TypeParameter;
+import org.eclipse.jdt.core.dom.UnionType;
 import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 import org.eclipse.jdt.core.dom.WhileStatement;
+import org.eclipse.jdt.core.dom.WildcardType;
 
 /**
  * Helper class for manipulating, converting, navigating and checking {@link ASTNode}s.
@@ -777,105 +812,190 @@ public final class ASTHelper {
         return false;
     }
 
+    private static boolean sameClass(ASTNode node1, ASTNode node2) {
+        return node1 != null && node2 != null
+                && node1.getClass().equals(node2.getClass());
+    }
+
     public static boolean match(ASTMatcher matcher, ASTNode node1, ASTNode node2) {
-        if (node1 != null && node2 != null
-                && node1.getClass().equals(node2.getClass())) {
-            if (node1 instanceof Name) {
-                return match(matcher, (Name) node1, (Name) node2);
-            } else if (node1 instanceof Statement) {
-                return match(matcher, (Statement) node1, (Statement) node2);
+        if (sameClass(node1, node2)) {
+            // FIXME JNR implement all expressions
+            // TODO JNR
+            // can we match "this.ast" and the unqualified "ast" for example?
+            // can we match "MyClass.CONSTANT" and the unqualified "CONSTANT" for example?
+            // can we use IVariableBindings to compare them?
+            switch (node1.getNodeType()) {
+            case ASTNode.ANNOTATION_TYPE_DECLARATION:
+                return matcher.match((AnnotationTypeDeclaration) node1, node2);
+            case ASTNode.ANNOTATION_TYPE_MEMBER_DECLARATION:
+                return matcher.match((AnnotationTypeMemberDeclaration) node1, node2);
+            case ASTNode.ANONYMOUS_CLASS_DECLARATION:
+                return matcher.match((AnonymousClassDeclaration) node1, node2);
+            case ASTNode.ARRAY_ACCESS:
+                return matcher.match((ArrayAccess) node1, node2);
+            case ASTNode.ARRAY_CREATION:
+                return matcher.match((ArrayCreation) node1, node2);
+            case ASTNode.ARRAY_INITIALIZER:
+                return matcher.match((ArrayInitializer) node1, node2);
+            case ASTNode.ARRAY_TYPE:
+                return matcher.match((ArrayType) node1, node2);
+            case ASTNode.ASSERT_STATEMENT:
+                return matcher.match((AssertStatement) node1, node2);
+            case ASTNode.ASSIGNMENT:
+                return matcher.match((Assignment) node1, node2);
+            case ASTNode.BLOCK:
+                return matcher.match((Block) node1, node2);
+            case ASTNode.BLOCK_COMMENT:
+                return matcher.match((BlockComment) node1, node2);
+            case ASTNode.BOOLEAN_LITERAL:
+                return matcher.match((BooleanLiteral) node1, node2);
+            case ASTNode.BREAK_STATEMENT:
+                return matcher.match((BreakStatement) node1, node2);
+            case ASTNode.CAST_EXPRESSION:
+                return matcher.match((CastExpression) node1, node2);
+            case ASTNode.CATCH_CLAUSE:
+                return matcher.match((CatchClause) node1, node2);
+            case ASTNode.CHARACTER_LITERAL:
+                return matcher.match((CharacterLiteral) node1, node2);
+            case ASTNode.CLASS_INSTANCE_CREATION:
+                return matcher.match((ClassInstanceCreation) node1, node2);
+            case ASTNode.COMPILATION_UNIT:
+                return matcher.match((CompilationUnit) node1, node2);
+            case ASTNode.CONDITIONAL_EXPRESSION:
+                return matcher.match((ConditionalExpression) node1, node2);
+            case ASTNode.CONSTRUCTOR_INVOCATION:
+                return matcher.match((ConstructorInvocation) node1, node2);
+            case ASTNode.CONTINUE_STATEMENT:
+                return matcher.match((ContinueStatement) node1, node2);
+            case ASTNode.DO_STATEMENT:
+                return matcher.match((DoStatement) node1, node2);
+            case ASTNode.EMPTY_STATEMENT:
+                return matcher.match((EmptyStatement) node1, node2);
+            case ASTNode.ENHANCED_FOR_STATEMENT:
+                return matcher.match((EnhancedForStatement) node1, node2);
+            case ASTNode.ENUM_DECLARATION:
+                return matcher.match((EnumDeclaration) node1, node2);
+            case ASTNode.ENUM_CONSTANT_DECLARATION:
+                return matcher.match((EnumConstantDeclaration) node1, node2);
+            case ASTNode.EXPRESSION_STATEMENT:
+                return matcher.match((ExpressionStatement) node1, node2);
+            case ASTNode.FIELD_ACCESS:
+                return matcher.match((FieldAccess) node1, node2);
+            case ASTNode.FIELD_DECLARATION:
+                return matcher.match((FieldDeclaration) node1, node2);
+            case ASTNode.FOR_STATEMENT:
+                return matcher.match((ForStatement) node1, node2);
+            case ASTNode.IF_STATEMENT:
+                return matcher.match((IfStatement) node1, node2);
+            case ASTNode.IMPORT_DECLARATION:
+                return matcher.match((ImportDeclaration) node1, node2);
+            case ASTNode.INFIX_EXPRESSION:
+                return matcher.match((InfixExpression) node1, node2);
+            case ASTNode.INITIALIZER:
+                return matcher.match((Initializer) node1, node2);
+            case ASTNode.INSTANCEOF_EXPRESSION:
+                return matcher.match((InstanceofExpression) node1, node2);
+            case ASTNode.JAVADOC:
+                return matcher.match((Javadoc) node1, node2);
+            case ASTNode.LABELED_STATEMENT:
+                return matcher.match((LabeledStatement) node1, node2);
+            case ASTNode.LINE_COMMENT:
+                return matcher.match((LineComment) node1, node2);
+            case ASTNode.MARKER_ANNOTATION:
+                return matcher.match((MarkerAnnotation) node1, node2);
+            case ASTNode.MEMBER_REF:
+                return matcher.match((MemberRef) node1, node2);
+            case ASTNode.MEMBER_VALUE_PAIR:
+                return matcher.match((MemberValuePair) node1, node2);
+            case ASTNode.METHOD_DECLARATION:
+                return matcher.match((MethodDeclaration) node1, node2);
+            case ASTNode.METHOD_INVOCATION:
+                return matcher.match((MethodInvocation) node1, node2);
+            case ASTNode.METHOD_REF:
+                return matcher.match((MethodRef) node1, node2);
+            case ASTNode.METHOD_REF_PARAMETER:
+                return matcher.match((MethodRefParameter) node1, node2);
+            case ASTNode.MODIFIER:
+                return matcher.match((Modifier) node1, node2);
+            case ASTNode.NORMAL_ANNOTATION:
+                return matcher.match((NormalAnnotation) node1, node2);
+            case ASTNode.NULL_LITERAL:
+                return matcher.match((NullLiteral) node1, node2);
+            case ASTNode.NUMBER_LITERAL:
+                return matcher.match((NumberLiteral) node1, node2);
+            case ASTNode.PACKAGE_DECLARATION:
+                return matcher.match((PackageDeclaration) node1, node2);
+            case ASTNode.PARAMETERIZED_TYPE:
+                return matcher.match((ParameterizedType) node1, node2);
+            case ASTNode.PARENTHESIZED_EXPRESSION:
+                return matcher.match((ParenthesizedExpression) node1, node2);
+            case ASTNode.POSTFIX_EXPRESSION:
+                return matcher.match((PostfixExpression) node1, node2);
+            case ASTNode.PREFIX_EXPRESSION:
+                return matcher.match((PrefixExpression) node1, node2);
+            case ASTNode.PRIMITIVE_TYPE:
+                return matcher.match((PrimitiveType) node1, node2);
+            case ASTNode.QUALIFIED_NAME:
+                return matcher.match((QualifiedName) node1, node2);
+            case ASTNode.QUALIFIED_TYPE:
+                return matcher.match((QualifiedType) node1, node2);
+            case ASTNode.RETURN_STATEMENT:
+                return matcher.match((ReturnStatement) node1, node2);
+            case ASTNode.SIMPLE_NAME:
+                return matcher.match((SimpleName) node1, node2);
+            case ASTNode.SIMPLE_TYPE:
+                return matcher.match((SimpleType) node1, node2);
+            case ASTNode.SINGLE_MEMBER_ANNOTATION:
+                return matcher.match((SingleMemberAnnotation) node1, node2);
+            case ASTNode.SINGLE_VARIABLE_DECLARATION:
+                return matcher.match((SingleVariableDeclaration) node1, node2);
+            case ASTNode.STRING_LITERAL:
+                return matcher.match((StringLiteral) node1, node2);
+            case ASTNode.SUPER_CONSTRUCTOR_INVOCATION:
+                return matcher.match((SuperConstructorInvocation) node1, node2);
+            case ASTNode.SUPER_FIELD_ACCESS:
+                return matcher.match((SuperFieldAccess) node1, node2);
+            case ASTNode.SUPER_METHOD_INVOCATION:
+                return matcher.match((SuperMethodInvocation) node1, node2);
+            case ASTNode.SWITCH_CASE:
+                return matcher.match((SwitchCase) node1, node2);
+            case ASTNode.SWITCH_STATEMENT:
+                return matcher.match((SwitchStatement) node1, node2);
+            case ASTNode.SYNCHRONIZED_STATEMENT:
+                return matcher.match((SynchronizedStatement) node1, node2);
+            case ASTNode.TAG_ELEMENT:
+                return matcher.match((TagElement) node1, node2);
+            case ASTNode.TEXT_ELEMENT:
+                return matcher.match((TextElement) node1, node2);
+            case ASTNode.THIS_EXPRESSION:
+                return matcher.match((ThisExpression) node1, node2);
+            case ASTNode.THROW_STATEMENT:
+                return matcher.match((ThrowStatement) node1, node2);
+            case ASTNode.TRY_STATEMENT:
+                return matcher.match((TryStatement) node1, node2);
+            case ASTNode.TYPE_DECLARATION:
+                return matcher.match((TypeDeclaration) node1, node2);
+            case ASTNode.TYPE_DECLARATION_STATEMENT:
+                return matcher.match((TypeDeclarationStatement) node1, node2);
+            case ASTNode.TYPE_LITERAL:
+                return matcher.match((TypeLiteral) node1, node2);
+            case ASTNode.TYPE_PARAMETER:
+                return matcher.match((TypeParameter) node1, node2);
+            case ASTNode.UNION_TYPE:
+                return matcher.match((UnionType) node1, node2);
+            case ASTNode.VARIABLE_DECLARATION_EXPRESSION:
+                return matcher.match((VariableDeclarationExpression) node1, node2);
+            case ASTNode.VARIABLE_DECLARATION_FRAGMENT:
+                return matcher.match((VariableDeclarationFragment) node1, node2);
+            case ASTNode.VARIABLE_DECLARATION_STATEMENT:
+                return matcher.match((VariableDeclarationStatement) node1, node2);
+            case ASTNode.WHILE_STATEMENT:
+                return matcher.match((WhileStatement) node1, node2);
+            case ASTNode.WILDCARD_TYPE:
+                return matcher.match((WildcardType) node1, node2);
+            default:
+                throw new NotImplementedException(node1);
             }
-            throw new NotImplementedException(node1);
-        }
-        return false;
-    }
-
-    public static boolean match(ASTMatcher matcher, Name name1, Name name2) {
-        if (name1 != null && name2 != null
-                && name1.getClass().equals(name2.getClass())) {
-            // TODO JNR can we match here "this.ast" and the unqualified "ast"
-            // for example?
-            // can we match here "MyClass.CONSTANT" and the unqualified
-            // "CONSTANT" for example?
-            if (name1 instanceof SimpleName) {
-                return matcher.match((SimpleName) name1, (SimpleName) name2);
-            } else if (name1 instanceof QualifiedName) {
-                return matcher.match((QualifiedName) name1,
-                        (QualifiedName) name2);
-            }
-            throw new NotImplementedException(name1);
-        }
-        return false;
-    }
-
-    public static boolean match(ASTMatcher matcher, Statement stmt1,
-            Statement stmt2) {
-        if (stmt1 != null && stmt2 != null
-                && stmt1.getClass().equals(stmt2.getClass())) {
-            if (stmt1 instanceof AssertStatement) {
-                return matcher.match((AssertStatement) stmt1,
-                        (AssertStatement) stmt2);
-            } else if (stmt1 instanceof BreakStatement) {
-                return matcher.match((BreakStatement) stmt1,
-                        (BreakStatement) stmt2);
-            } else if (stmt1 instanceof Block) {
-                return matcher.match((Block) stmt1, (Block) stmt2);
-            } else if (stmt1 instanceof ConstructorInvocation) {
-                return matcher.match((ConstructorInvocation) stmt1,
-                        (ConstructorInvocation) stmt2);
-            } else if (stmt1 instanceof ContinueStatement) {
-                return matcher.match((ContinueStatement) stmt1,
-                        (ContinueStatement) stmt2);
-            } else if (stmt1 instanceof DoStatement) {
-                return matcher.match((DoStatement) stmt1, (DoStatement) stmt2);
-            } else if (stmt1 instanceof EmptyStatement) {
-                return matcher.match((EmptyStatement) stmt1,
-                        (EmptyStatement) stmt2);
-            } else if (stmt1 instanceof EnhancedForStatement) {
-                return matcher.match((EnhancedForStatement) stmt1,
-                        (EnhancedForStatement) stmt2);
-            } else if (stmt1 instanceof ExpressionStatement) {
-                return matcher.match((ExpressionStatement) stmt1,
-                        (ExpressionStatement) stmt2);
-            } else if (stmt1 instanceof ForStatement) {
-                return matcher
-                        .match((ForStatement) stmt1, (ForStatement) stmt2);
-            } else if (stmt1 instanceof IfStatement) {
-                return matcher.match((IfStatement) stmt1, (IfStatement) stmt2);
-            } else if (stmt1 instanceof LabeledStatement) {
-                return matcher.match((LabeledStatement) stmt1,
-                        (LabeledStatement) stmt2);
-            } else if (stmt1 instanceof ReturnStatement) {
-                return matcher.match((ReturnStatement) stmt1,
-                        (ReturnStatement) stmt2);
-            } else if (stmt1 instanceof SuperConstructorInvocation) {
-                return matcher.match((SuperConstructorInvocation) stmt1,
-                        (SuperConstructorInvocation) stmt2);
-            } else if (stmt1 instanceof SwitchCase) {
-                return matcher.match((SwitchCase) stmt1, (SwitchCase) stmt2);
-            } else if (stmt1 instanceof SwitchStatement) {
-                return matcher.match((SwitchStatement) stmt1,
-                        (SwitchStatement) stmt2);
-            } else if (stmt1 instanceof SynchronizedStatement) {
-                return matcher.match((SynchronizedStatement) stmt1,
-                        (SynchronizedStatement) stmt2);
-            } else if (stmt1 instanceof ThrowStatement) {
-                return matcher.match((ThrowStatement) stmt1,
-                        (ThrowStatement) stmt2);
-            } else if (stmt1 instanceof TryStatement) {
-                return matcher
-                        .match((TryStatement) stmt1, (TryStatement) stmt2);
-            } else if (stmt1 instanceof TypeDeclarationStatement) {
-                return matcher.match((TypeDeclarationStatement) stmt1,
-                        (TypeDeclarationStatement) stmt2);
-            } else if (stmt1 instanceof VariableDeclarationStatement) {
-                return matcher.match((VariableDeclarationStatement) stmt1,
-                        (VariableDeclarationStatement) stmt2);
-            } else if (stmt1 instanceof WhileStatement) {
-                return matcher.match((WhileStatement) stmt1,
-                        (WhileStatement) stmt2);
-            }
-            throw new NotImplementedException(stmt1);
         }
         return false;
     }

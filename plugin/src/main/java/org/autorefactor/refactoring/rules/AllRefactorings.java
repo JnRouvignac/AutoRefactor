@@ -70,6 +70,7 @@ public final class AllRefactorings {
         // TODO JNR Remove reference to Preferences from this method
         final PreferenceHelper prefs = AutoRefactorPlugin.getPreferenceHelper();
         return new ArrayList<IRefactoring>(Arrays.<IRefactoring> asList(
+                new RemoveUselessNullCheckRefactoring(),
                 new VectorOldToNewAPIRefactoring(),
                 new PrimitiveWrapperCreationRefactoring(),
                 new BooleanRefactoring(),

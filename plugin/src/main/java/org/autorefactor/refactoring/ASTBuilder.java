@@ -29,6 +29,8 @@ import java.util.List;
 
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.Assignment;
+import org.eclipse.jdt.core.dom.Assignment.Operator;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.CatchClause;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
@@ -62,6 +64,14 @@ public class ASTBuilder {
 
     public ASTBuilder(final AST ast) {
         this.ast = ast;
+    }
+
+    public Assignment assign(final Expression lhs, final Operator operator, final Expression rhs) {
+        final Assignment assign = ast.newAssignment();
+        assign.setLeftHandSide(lhs);
+        assign.setOperator(operator);
+        assign.setRightHandSide(rhs);
+        return assign;
     }
 
     public Block body(final Statement... stmts) {
