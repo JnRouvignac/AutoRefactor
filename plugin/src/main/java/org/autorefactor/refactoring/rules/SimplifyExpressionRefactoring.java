@@ -29,7 +29,6 @@ import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.IJavaRefactoring;
 import org.autorefactor.refactoring.Refactorings;
 import org.autorefactor.util.NotImplementedException;
-import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTMatcher;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
@@ -82,6 +81,7 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
     }
 
     /** {@inheritDoc} */
+    @Override
     public void setRefactoringContext(RefactoringContext ctx) {
         this.ctx = ctx;
         this.javaMinorVersion = this.ctx.getJavaSERelease().getMinorVersion();
@@ -130,8 +130,7 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
                         // Leave String concatenations with mixed type
                         // to other if statements in this method.
                         && innerExpr.resolveTypeBinding() != null
-                        && innerExpr.resolveTypeBinding().equals(
-                                parentInfixExpr.resolveTypeBinding())) {
+                        && innerExpr.resolveTypeBinding().equals(parentInfixExpr.resolveTypeBinding())) {
                     return innerExpr;
                 }
             }
@@ -236,7 +235,7 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
             return replaceInfixExpressionIfNeeded(node.getParent());
         } else if (this.removeThisForNonStaticMethodAccess) {
             ThisExpression te = as(node.getExpression(), ThisExpression.class);
-            if (te != null && thisExpressionRefersToCurrentType(te.getQualifier(), node)) {
+            if (thisExpressionRefersToSurroundingType(te)) {
                 // remove useless thisExpressions
                 this.ctx.getRefactorings().remove(node.getExpression());
                 return DO_NOT_VISIT_SUBTREE;
@@ -251,8 +250,7 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
         } else if (expr instanceof InfixExpression) {
             final InfixExpression ie = (InfixExpression) expr;
             checkNoExtendedOperands(ie);
-            final Object value = ie.getRightOperand()
-                    .resolveConstantExpressionValue();
+            final Object value = ie.getRightOperand().resolveConstantExpressionValue();
             if (value instanceof Number) {
                 final Number nb = (Integer) value;
                 if (nb.doubleValue() == 0) {
@@ -260,27 +258,15 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
                 }
                 if (Operator.EQUALS.equals(ie.getOperator())) {
                     if (nb.doubleValue() < 0) {
-                        final InfixExpression newIe = getNewInfixExpression(ie);
-                        newIe.setOperator(Operator.LESS);
-                        this.ctx.getRefactorings().replace(ie, newIe);
-                        return DO_NOT_VISIT_SUBTREE;
+                        return replaceWithCorrectCheckOnCompareTo(ie, Operator.LESS);
                     } else if (nb.doubleValue() > 0) {
-                        final InfixExpression newIe = getNewInfixExpression(ie);
-                        newIe.setOperator(Operator.GREATER);
-                        this.ctx.getRefactorings().replace(ie, newIe);
-                        return DO_NOT_VISIT_SUBTREE;
+                        return replaceWithCorrectCheckOnCompareTo(ie, Operator.GREATER);
                     }
                 } else if (Operator.NOT_EQUALS.equals(ie.getOperator())) {
                     if (nb.doubleValue() < 0) {
-                        final InfixExpression newIe = getNewInfixExpression(ie);
-                        newIe.setOperator(Operator.GREATER_EQUALS);
-                        this.ctx.getRefactorings().replace(ie, newIe);
-                        return DO_NOT_VISIT_SUBTREE;
+                        return replaceWithCorrectCheckOnCompareTo(ie, Operator.GREATER_EQUALS);
                     } else if (nb.doubleValue() > 0) {
-                        final InfixExpression newIe = getNewInfixExpression(ie);
-                        newIe.setOperator(Operator.LESS_EQUALS);
-                        this.ctx.getRefactorings().replace(ie, newIe);
-                        return DO_NOT_VISIT_SUBTREE;
+                        return replaceWithCorrectCheckOnCompareTo(ie, Operator.LESS_EQUALS);
                     }
                 }
             }
@@ -288,12 +274,14 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
         return VISIT_SUBTREE;
     }
 
-    private InfixExpression getNewInfixExpression(final InfixExpression ie) {
-        final AST ast = this.ctx.getAST();
-        final InfixExpression newIe = ast.newInfixExpression();
-        newIe.setLeftOperand(copySubtree(ast, ie.getLeftOperand()));
-        newIe.setRightOperand(ast.newNumberLiteral("0"));
-        return newIe;
+    private boolean replaceWithCorrectCheckOnCompareTo(final InfixExpression ie, final Operator operator) {
+        final ASTBuilder b = this.ctx.getASTBuilder();
+        this.ctx.getRefactorings().replace(ie,
+            b.infixExpr(
+                b.copyExpr(ie.getLeftOperand()),
+                operator,
+                b.number("0")));
+        return DO_NOT_VISIT_SUBTREE;
     }
 
     /** {@inheritDoc} */
@@ -456,12 +444,9 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
                     && arguments(expr).size() == 1
                     && arguments(expr).get(0).subtreeMatch(
                             new ASTMatcher(), nullCheckedExpression)) {
-                // Did we invoke java.lang.Object.equals()?
-                // Did we invoke java.lang.String.equalsIgnoreCase()?
-                boolean isEquals = isMethod(expr, "java.lang.Object", "equals", "java.lang.Object");
-                boolean isStringEqualsIgnoreCase =
-                        isMethod(expr, "java.lang.String", "equalsIgnoreCase", "java.lang.String");
-                return isEquals || isStringEqualsIgnoreCase;
+                // Did we invoke java.lang.Object.equals() or java.lang.String.equalsIgnoreCase()?
+                return isMethod(expr, "java.lang.Object", "equals", "java.lang.Object")
+                        || isMethod(expr, "java.lang.String", "equalsIgnoreCase", "java.lang.String");
             }
         }
         return false;
@@ -483,6 +468,7 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
     }
 
     /** {@inheritDoc} */
+    @Override
     public Refactorings getRefactorings(CompilationUnit astRoot) {
         astRoot.accept(this);
         return this.ctx.getRefactorings();

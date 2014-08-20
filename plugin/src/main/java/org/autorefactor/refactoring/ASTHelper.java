@@ -1122,11 +1122,17 @@ public final class ASTHelper {
     /**
      * Returns whether <code>this</code> is referring to the currently surrounding type.
      *
-     * @param thisQualifierName the <code>this</code> qualifier name
-     * @param node the AST node
+     * @param thisExpression the <code>this</code> expression
      * @return true if <code>this</code> is referring to the currently surrounding type, false otherwise
      */
-    public static boolean thisExpressionRefersToCurrentType(Name thisQualifierName, ASTNode node) {
+    public static boolean thisExpressionRefersToSurroundingType(ThisExpression thisExpression) {
+        if (thisExpression == null) {
+            return false;
+        }
+        return thisExpressionRefersToSurroundingType(thisExpression.getQualifier(), thisExpression);
+    }
+
+    private static boolean thisExpressionRefersToSurroundingType(Name thisQualifierName, ASTNode node) {
         final TypeDeclaration ancestor = getAncestor(node, TypeDeclaration.class);
         if (thisQualifierName == null) {
             return true;
@@ -1135,7 +1141,7 @@ public final class ASTHelper {
         } else if (thisQualifierName instanceof QualifiedName) {
             final QualifiedName qn = (QualifiedName) thisQualifierName;
             return isEqual(qn.getName(), ancestor.getName())
-                    && thisExpressionRefersToCurrentType(qn.getQualifier(), ancestor);
+                    && thisExpressionRefersToSurroundingType(qn.getQualifier(), ancestor);
         }
         throw new NotImplementedException(thisQualifierName);
     }

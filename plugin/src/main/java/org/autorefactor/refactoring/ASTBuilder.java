@@ -27,6 +27,9 @@ package org.autorefactor.refactoring;
 
 import java.util.List;
 
+import org.eclipse.jdt.core.dom.ArrayCreation;
+import org.eclipse.jdt.core.dom.ArrayInitializer;
+import org.eclipse.jdt.core.dom.ArrayType;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Assignment;
@@ -142,6 +145,17 @@ public class ASTBuilder {
     }
 
     /**
+     * Returns a copy of the provided {@link Expression} list.
+     *
+     * @param <E> the actual expression's type
+     * @param expressions the expression list to copy
+     * @return a copy of the expression list
+     */
+    public <E extends Expression> List<E> copyAll(List<E> expressions) {
+        return ASTHelper.copySubtrees(ast, expressions);
+    }
+
+    /**
      * Builds a new {@link IfStatement} instance.
      *
      * @param condition the if condition
@@ -228,6 +242,23 @@ public class ASTBuilder {
     }
 
     /**
+     * Builds a new {@link MethodInvocation} instance.
+     *
+     * @param <E> the arguments type
+     * @param expression the method invocation expression
+     * @param methodName the name of the invoked method
+     * @param arguments the arguments for the method invocation
+     * @return a new method invocation
+     */
+    public <E extends Expression> MethodInvocation invoke(Expression expression, String methodName, List<E> arguments) {
+        final MethodInvocation mi = ast.newMethodInvocation();
+        mi.setExpression(expression);
+        mi.setName(ast.newSimpleName(methodName));
+        arguments(mi).addAll(arguments);
+        return mi;
+    }
+
+    /**
      * Builds a new {@link Name} instance. If only a single name is provided then a {@link SimpleName} is returned,
      * if several names are provided then a {@link QualifiedName} is built.
      *
@@ -293,6 +324,24 @@ public class ASTBuilder {
         for (T e : toAdd) {
             whereToAdd.add(e);
         }
+    }
+
+    /**
+     * Builds a new {@link ArrayCreation} instance.
+     *
+     * @param <E> the type of the expressions
+     * @param typeBinding the type binding of the instantiated type
+     * @param arrayInitializers the expressions forming the array initializer
+     * @return a new array creation instance
+     */
+    public <E extends Expression> ArrayCreation newArray(ITypeBinding typeBinding, List<E> arrayInitializers) {
+        final ArrayInitializer ai = ast.newArrayInitializer();
+        expressions(ai).addAll(arrayInitializers);
+
+        final ArrayCreation ac = ast.newArrayCreation();
+        ac.setType((ArrayType) toType(ast, typeBinding));
+        ac.setInitializer(ai);
+        return ac;
     }
 
     private SimpleType newSimpleType(final String typeName) {

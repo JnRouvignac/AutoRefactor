@@ -27,6 +27,7 @@ package org.autorefactor.refactoring.rules;
 
 import java.util.List;
 
+import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.IJavaRefactoring;
 import org.autorefactor.refactoring.Refactorings;
 import org.autorefactor.refactoring.Release;
@@ -84,14 +85,12 @@ public class VectorOldToNewAPIRefactoring extends ASTVisitor implements
     }
 
     private void replaceWith(MethodInvocation node, String newMethodName) {
-        AST ast = this.ctx.getAST();
-        MethodInvocation mi = ast.newMethodInvocation();
-        mi.setName(ast.newSimpleName(newMethodName));
-        mi.setExpression(copySubtree(ast, node.getExpression()));
-        if (arguments(node) != null) {
-            arguments(mi).addAll(copySubtrees(ast, arguments(node)));
-        }
-        this.ctx.getRefactorings().replace(node, mi);
+        final ASTBuilder b = this.ctx.getASTBuilder();
+        this.ctx.getRefactorings().replace(node,
+            b.invoke(
+                b.copyExpr(node.getExpression()),
+                newMethodName,
+                b.copyAll(arguments(node))));
     }
 
     private void replaceWithSpecial(MethodInvocation node, String newMethodName) {

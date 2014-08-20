@@ -25,14 +25,12 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.IJavaRefactoring;
 import org.autorefactor.refactoring.Refactorings;
-import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
-import org.eclipse.jdt.core.dom.ArrayCreation;
 import org.eclipse.jdt.core.dom.ArrayInitializer;
-import org.eclipse.jdt.core.dom.ArrayType;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.Expression;
@@ -62,6 +60,7 @@ public class RemoveUnnecessaryLocalBeforeReturnRefactoring extends ASTVisitor
     }
 
     /** {@inheritDoc} */
+    @Override
     public void setRefactoringContext(RefactoringContext ctx) {
         this.ctx = ctx;
     }
@@ -119,24 +118,17 @@ public class RemoveUnnecessaryLocalBeforeReturnRefactoring extends ASTVisitor
     }
 
     private ReturnStatement getReturnStatementForArray(ArrayInitializer returnAI, ITypeBinding typeBinding) {
-        final AST ast = this.ctx.getAST();
-        final ArrayInitializer ai = ast.newArrayInitializer();
-        expressions(ai).addAll(copySubtrees(ast, expressions(returnAI)));
-        final ArrayCreation ac = ast.newArrayCreation();
-        ac.setType((ArrayType) toType(ast, typeBinding));
-        ac.setInitializer(ai);
-        final ReturnStatement rs = ast.newReturnStatement();
-        rs.setExpression(ac);
-        return rs;
+        final ASTBuilder b = this.ctx.getASTBuilder();
+        return b.return0(b.newArray(typeBinding, b.copyAll(expressions(returnAI))));
     }
 
     private ASTNode getReturnStatement(Expression initializer) {
-        final ReturnStatement rs = this.ctx.getAST().newReturnStatement();
-        rs.setExpression(copySubtree(this.ctx.getAST(), initializer));
-        return rs;
+        final ASTBuilder b = this.ctx.getASTBuilder();
+        return b.return0(b.copyExpr(initializer));
     }
 
     /** {@inheritDoc} */
+    @Override
     public Refactorings getRefactorings(CompilationUnit astRoot) {
         astRoot.accept(this);
         return this.ctx.getRefactorings();
