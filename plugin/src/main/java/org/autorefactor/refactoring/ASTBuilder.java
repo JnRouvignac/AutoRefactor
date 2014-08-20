@@ -30,7 +30,6 @@ import java.util.List;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Assignment;
-import org.eclipse.jdt.core.dom.Assignment.Operator;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.CatchClause;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
@@ -62,11 +61,24 @@ public class ASTBuilder {
 
     private final AST ast;
 
+    /**
+     * Class constructor.
+     *
+     * @param ast the AST
+     */
     public ASTBuilder(final AST ast) {
         this.ast = ast;
     }
 
-    public Assignment assign(final Expression lhs, final Operator operator, final Expression rhs) {
+    /**
+     * Builds a new {@link Assignment} instance.
+     *
+     * @param lhs the left hand side expression
+     * @param operator the assignment operator
+     * @param rhs the right hand side expression
+     * @return a new Block
+     */
+    public Assignment assign(final Expression lhs, final Assignment.Operator operator, final Expression rhs) {
         final Assignment assign = ast.newAssignment();
         assign.setLeftHandSide(lhs);
         assign.setOperator(operator);
@@ -74,17 +86,31 @@ public class ASTBuilder {
         return assign;
     }
 
+    /**
+     * Builds a new {@link Block} instance.
+     *
+     * @param stmts the statements to add to the block
+     * @return a new Block
+     */
     public Block body(final Statement... stmts) {
         final Block tryBody = ast.newBlock();
         addAll(statements(tryBody), stmts);
         return tryBody;
     }
 
-    public CatchClause catch0(String exceptionType, String exceptionName, Statement... stmts) {
+    /**
+     * Builds a new {@link CatchClause} instance.
+     *
+     * @param exceptionTypeName the exception type name
+     * @param caughtExceptionName the local name for the caught exception
+     * @param stmts the statements to add to the catch clause
+     * @return a new catch clause
+     */
+    public CatchClause catch0(String exceptionTypeName, String caughtExceptionName, Statement... stmts) {
         final CatchClause cc = ast.newCatchClause();
         final SingleVariableDeclaration svd = ast.newSingleVariableDeclaration();
-        svd.setType(newSimpleType(exceptionType));
-        svd.setName(ast.newSimpleName(exceptionName));
+        svd.setType(newSimpleType(exceptionTypeName));
+        svd.setName(ast.newSimpleName(caughtExceptionName));
         cc.setException(svd);
 
         final Block block = ast.newBlock();
@@ -93,18 +119,47 @@ public class ASTBuilder {
         return cc;
     }
 
-    public <T extends Expression> T copyExpr(T node) {
-        return ASTHelper.copySubtree(ast, node);
+    /**
+     * Returns a copy of the provided {@link Expression}.
+     *
+     * @param <T> the actual expression type
+     * @param exprToCopy the expression to copy
+     * @return a copy of the expression
+     */
+    public <T extends Expression> T copyExpr(T exprToCopy) {
+        return ASTHelper.copySubtree(ast, exprToCopy);
     }
 
-    public <T extends Statement> T copyStmt(T node) {
-        return ASTHelper.copySubtree(ast, node);
+    /**
+     * Returns a copy of the provided {@link Statement}.
+     *
+     * @param <T> the actual statement type
+     * @param stmtToCopy the statement to copy
+     * @return a copy of the statement
+     */
+    public <T extends Statement> T copyStmt(T stmtToCopy) {
+        return ASTHelper.copySubtree(ast, stmtToCopy);
     }
 
+    /**
+     * Builds a new {@link IfStatement} instance.
+     *
+     * @param condition the if condition
+     * @param thenStatement the then statement
+     * @return a new if statement
+     */
     public IfStatement if0(Expression condition, Statement thenStatement) {
         return if0(condition, thenStatement, null);
     }
 
+    /**
+     * Builds a new {@link IfStatement} instance.
+     *
+     * @param condition the if condition
+     * @param thenStatement the statement of the then clause
+     * @param elseStatement the statement of the else clause
+     * @return a new if statement
+     */
     public IfStatement if0(Expression condition, Statement thenStatement, Statement elseStatement) {
         final IfStatement is = ast.newIfStatement();
         is.setExpression(condition);
@@ -113,6 +168,14 @@ public class ASTBuilder {
         return is;
     }
 
+    /**
+     * Builds a new {@link InfixExpression} instance.
+     *
+     * @param leftOperand the left operand
+     * @param operator the infix operator
+     * @param rightOperand the right operand
+     * @return a new infix expression
+     */
     public InfixExpression infixExpr(Expression leftOperand, InfixExpression.Operator operator,
             Expression rightOperand) {
         final InfixExpression ie = ast.newInfixExpression();
@@ -122,10 +185,24 @@ public class ASTBuilder {
         return ie;
     }
 
+    /**
+     * Builds a new {@link NumberLiteral} instance.
+     *
+     * @param i the number literal value
+     * @return a new number literal
+     */
     public NumberLiteral int0(int i) {
         return ast.newNumberLiteral(Integer.toString(i));
     }
 
+    /**
+     * Builds a new {@link MethodInvocation} instance.
+     *
+     * @param expression the method invocation expression
+     * @param methodName the name of the invoked method
+     * @param arguments the arguments for the method invocation
+     * @return a new method invocation
+     */
     public MethodInvocation invoke(String expression, String methodName, Expression... arguments) {
         final MethodInvocation mi = ast.newMethodInvocation();
         mi.setExpression(ast.newSimpleName(expression));
@@ -134,6 +211,14 @@ public class ASTBuilder {
         return mi;
     }
 
+    /**
+     * Builds a new {@link MethodInvocation} instance.
+     *
+     * @param expression the method invocation expression
+     * @param methodName the name of the invoked method
+     * @param arguments the arguments for the method invocation
+     * @return a new method invocation
+     */
     public MethodInvocation invoke(Expression expression, String methodName, Expression... arguments) {
         final MethodInvocation mi = ast.newMethodInvocation();
         mi.setExpression(expression);
@@ -142,6 +227,14 @@ public class ASTBuilder {
         return mi;
     }
 
+    /**
+     * Builds a new {@link Name} instance. If only a single name is provided then a {@link SimpleName} is returned,
+     * if several names are provided then a {@link QualifiedName} is built.
+     *
+     * @param names the qualified or simple name
+     * @return a new name
+     * @throws IllegalStateException if no names are provided
+     */
     public Name name(String... names) {
         if (names.length == 0) {
             throw new IllegalArgumentException("Expected at least one name, but was given 0 names");
@@ -152,15 +245,29 @@ public class ASTBuilder {
         return ast.newName(names);
     }
 
-    public ClassInstanceCreation new0(String className, Expression... arguments) {
+    /**
+     * Builds a new {@link ClassInstanceCreation} instance.
+     *
+     * @param typeName the instantiated type name
+     * @param arguments the constructor invocation arguments
+     * @return a new class instance creation
+     */
+    public ClassInstanceCreation new0(String typeName, Expression... arguments) {
         final ClassInstanceCreation cic = ast.newClassInstanceCreation();
-        cic.setType(newSimpleType(className));
+        cic.setType(newSimpleType(typeName));
         addAll(arguments(cic), arguments);
         return cic;
     }
 
-    public ClassInstanceCreation new0(ITypeBinding binding, Expression... arguments) {
-        final String className = binding.getName();
+    /**
+     * Builds a new {@link ClassInstanceCreation} instance.
+     *
+     * @param typeBinding the type binding of the instantiated type
+     * @param arguments the constructor invocation arguments
+     * @return a new class instance creation
+     */
+    public ClassInstanceCreation new0(ITypeBinding typeBinding, Expression... arguments) {
+        final String className = typeBinding.getName();
         final int ltIdx = className.indexOf('<');
         if (ltIdx == -1) {
             final ClassInstanceCreation cic = ast.newClassInstanceCreation();
@@ -188,42 +295,85 @@ public class ASTBuilder {
         }
     }
 
-    private SimpleType newSimpleType(final String erasedClassName) {
-        return ast.newSimpleType(ast.newName(erasedClassName));
+    private SimpleType newSimpleType(final String typeName) {
+        return ast.newSimpleType(ast.newName(typeName));
     }
 
+    /**
+     * Builds a new {@link NumberLiteral} instance.
+     *
+     * @param s the number literal value
+     * @return a new number literal
+     */
     public NumberLiteral number(String s) {
         return ast.newNumberLiteral(s);
     }
 
+    /**
+     * Builds a new {@link ParenthesizedExpression} instance.
+     *
+     * @param expression the expression to wrap with parentheses
+     * @return a new parenthesized expression
+     */
     public ParenthesizedExpression parenthesize(Expression expression) {
         final ParenthesizedExpression pe = ast.newParenthesizedExpression();
         pe.setExpression(expression);
         return pe;
     }
 
+    /**
+     * Builds a new {@link ReturnStatement} instance.
+     *
+     * @param expression the expression to return
+     * @return a new return statement
+     */
     public ReturnStatement return0(Expression expression) {
         final ReturnStatement rs = ast.newReturnStatement();
         rs.setExpression(expression);
         return rs;
     }
 
+    /**
+     * Builds a new {@link StringLiteral} instance.
+     *
+     * @param s the string literal value
+     * @return a new string literal
+     */
     public StringLiteral string(String s) {
         final StringLiteral sl = ast.newStringLiteral();
         sl.setLiteralValue(s);
         return sl;
     }
 
+    /**
+     * Builds a new {@link ThrowStatement} instance.
+     *
+     * @param expression the expression to throw
+     * @return a new throw statement
+     */
     public ThrowStatement throw0(final Expression expression) {
         final ThrowStatement throwS = ast.newThrowStatement();
         throwS.setExpression(expression);
         return throwS;
     }
 
+    /**
+     * Builds a new {@link ExpressionStatement} instance.
+     *
+     * @param expression the expression to transform into a statement
+     * @return a new expression statement
+     */
     public ExpressionStatement toStmt(final Expression expression) {
         return ast.newExpressionStatement(expression);
     }
 
+    /**
+     * Builds a new {@link TryStatement} instance.
+     *
+     * @param body the try body
+     * @param catchClauses the catch clauses for the try
+     * @return a new try statement
+     */
     public TryStatement try0(final Block body, CatchClause... catchClauses) {
         final TryStatement tryS = ast.newTryStatement();
         tryS.setBody(body);

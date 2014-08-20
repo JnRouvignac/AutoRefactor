@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2013 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2013-2014 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,6 +29,9 @@ import org.eclipse.jdt.core.dom.Expression;
 
 import static org.autorefactor.util.Utils.*;
 
+/**
+ * This class represents an edge of the control flow graph.
+ */
 public class CFGEdge {
 
     private final Expression condition;
@@ -37,30 +40,59 @@ public class CFGEdge {
     private final CFGBasicBlock sourceBlock;
     private final CFGBasicBlock targetBlock;
 
+    /**
+     * Builds an instance of this class.
+     *
+     * @param condition the decision condition that led to the creation of this edge.
+     * @param evaluationResult the condition evaluation result
+     * @param sourceBlock the source block
+     * @param targetBlock the target block
+     */
     public CFGEdge(Expression condition, boolean evaluationResult,
-            CFGBasicBlock source, CFGBasicBlock target) {
+            CFGBasicBlock sourceBlock, CFGBasicBlock targetBlock) {
         this.condition = condition;
         this.evaluationResult = evaluationResult;
-        this.sourceBlock = source;
-        this.targetBlock = target;
+        this.sourceBlock = sourceBlock;
+        this.targetBlock = targetBlock;
     }
 
+    /**
+     * Returns the decision condition that led to the creation of this edge.
+     *
+     * @return the decision condition that led to the creation of this edge
+     */
     public Expression getCondition() {
         return this.condition;
     }
 
+    /**
+     * Returns the source block of the edge.
+     *
+     * @return the source block of the edge
+     */
     public CFGBasicBlock getSourceBlock() {
         return this.sourceBlock;
     }
 
+    /**
+     * Returns the target block of the edge.
+     *
+     * @return the target block of the edge
+     */
     public CFGBasicBlock getTargetBlock() {
         return this.targetBlock;
     }
 
+    /**
+     * Returns the condition evaluation result.
+     *
+     * @return the condition evaluation result
+     */
     public boolean getEvaluationResult() {
         return evaluationResult;
     }
 
+    /** {@inheritDoc} */
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("EDGE[");
@@ -70,6 +102,7 @@ public class CFGEdge {
         return sb.append("]").toString();
     }
 
+    /** {@inheritDoc} */
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -84,6 +117,7 @@ public class CFGEdge {
         return result;
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean equals(Object obj) {
         final Boolean equal = basicEqual(this, obj);

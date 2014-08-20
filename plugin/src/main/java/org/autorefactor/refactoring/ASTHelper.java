@@ -142,7 +142,15 @@ import org.eclipse.jdt.core.dom.WildcardType;
  */
 public final class ASTHelper {
 
+    /**
+     * Boolean constant to use when returning from an {@link ASTVisitor} {{visit(*)}} method
+     * to indicate that the visitor does not want to visit a node's subtree. This helps readability.
+     */
     public static final boolean DO_NOT_VISIT_SUBTREE = false;
+    /**
+     * Boolean constant to use when returning from an {@link ASTVisitor} {{visit(*)}} method
+     * to indicate that the visitor wants to visit a node's subtree. This helps readability.
+     */
     public static final boolean VISIT_SUBTREE = true;
 
     private ASTHelper() {
@@ -151,17 +159,43 @@ public final class ASTHelper {
 
     // AST nodes manipulation
 
-    public static <T> T copySubtree(AST ast, T node) {
+    /**
+     * Returns a copy of the provided node typecasted to the same type as the provided node.
+     *
+     * @param <T> the type of the node to copy.
+     * @param ast the {@link AST} object
+     * @param node the node to copy
+     * @return a copy of the provided node typecasted to the same type as the provided node
+     * @see ASTNode#copySubtree(AST, ASTNode)
+     */
+    public static <T extends ASTNode> T copySubtree(AST ast, T node) {
         return (T) ASTNode.copySubtree(ast, (ASTNode) node);
     }
 
+    /**
+     * Returns a copy of the provided nodes typecasted to the same generic type as the provided nodes.
+     *
+     * @param <T> the type of the nodes to copy.
+     * @param ast the {@link AST} object
+     * @param nodes the nodes to copy
+     * @return a copy of the provided nodes typecasted to the same generic type as the provided nodes
+     * @see ASTNode#copySubtrees(AST, List)
+     */
     public static <T extends ASTNode> List<T> copySubtrees(AST ast, List<T> nodes) {
         return ASTNode.copySubtrees(ast, nodes);
     }
 
-    public static Expression negate(AST ast, Expression condition, boolean doCopy) {
-        if (condition instanceof PrefixExpression) {
-            final PrefixExpression pe = (PrefixExpression) condition;
+    /**
+     * Returns the provided expression after negating and optionally copying it.
+     *
+     * @param ast the {@link AST} object
+     * @param expression the expression to negate
+     * @param doCopy whether the expression should be copied
+     * @return the provided expression after negating and optionally copying it
+     */
+    public static Expression negate(AST ast, Expression expression, boolean doCopy) {
+        if (expression instanceof PrefixExpression) {
+            final PrefixExpression pe = (PrefixExpression) expression;
             if (Operator.NOT.equals(pe.getOperator())) {
                 return possiblyCopy(ast, removeParentheses(pe.getOperand()), doCopy);
             }
@@ -169,10 +203,17 @@ public final class ASTHelper {
 
         final PrefixExpression pe = ast.newPrefixExpression();
         pe.setOperator(Operator.NOT);
-        pe.setOperand(parenthesize(ast, possiblyCopy(ast, condition, doCopy)));
+        pe.setOperand(parenthesize(ast, possiblyCopy(ast, expression, doCopy)));
         return pe;
     }
 
+    /**
+     * Returns the same node after removing any parentheses around it.
+     *
+     * @param node the node around which parentheses must be removed
+     * @return the same node after removing any parentheses around it.
+     *         If there are no parentheses around it then the exact same node is returned
+     */
     public static ASTNode removeParentheses(ASTNode node) {
         if (node instanceof Expression) {
             return removeParentheses((Expression) node);
@@ -180,6 +221,13 @@ public final class ASTHelper {
         return node;
     }
 
+    /**
+     * Returns the same expression after removing any parentheses around it.
+     *
+     * @param expr the expression around which parentheses must be removed
+     * @return the same expression after removing any parentheses around it
+     *         If there are no parentheses around it then the exact same expression is returned
+     */
     public static Expression removeParentheses(Expression expr) {
         if (expr instanceof ParenthesizedExpression) {
             return removeParentheses(((ParenthesizedExpression) expr).getExpression());
@@ -205,19 +253,24 @@ public final class ASTHelper {
         return condition;
     }
 
-    public static void replaceInParent(ASTNode node, ASTNode replacement) {
-        if (node.getParent() == null) {
+    /**
+     * Replaces the provided node inside its parent by a provided replacement node.
+     *
+     * @param nodeToReplace the node to replace inside its parent
+     * @param replacementNode the replacement node
+     */
+    public static void replaceInParent(ASTNode nodeToReplace, ASTNode replacementNode) {
+        if (nodeToReplace.getParent() == null) {
             throw new IllegalArgumentException();
         }
-        final StructuralPropertyDescriptor locationInParent = node.getLocationInParent();
+        final StructuralPropertyDescriptor locationInParent = nodeToReplace.getLocationInParent();
         if (locationInParent instanceof ChildPropertyDescriptor) {
             final ChildPropertyDescriptor cpd = (ChildPropertyDescriptor) locationInParent;
-            node.getParent().setStructuralProperty(cpd, replacement);
+            nodeToReplace.getParent().setStructuralProperty(cpd, replacementNode);
         } else if (locationInParent instanceof ChildListPropertyDescriptor) {
             final ChildListPropertyDescriptor clpd = (ChildListPropertyDescriptor) locationInParent;
-            final List<ASTNode> property = (List<ASTNode>) node.getParent()
-                    .getStructuralProperty(clpd);
-            property.set(property.indexOf(node), replacement);
+            final List<ASTNode> property = (List<ASTNode>) nodeToReplace.getParent().getStructuralProperty(clpd);
+            property.set(property.indexOf(nodeToReplace), replacementNode);
         } else {
             throw new NotImplementedException(locationInParent);
         }
@@ -225,18 +278,37 @@ public final class ASTHelper {
 
     // AST nodes conversions
 
-    public static List<Statement> asList(Statement node) {
-        if (node == null) {
+    /**
+     * Returns the provided statement as a non null list of statements:
+     * <ul>
+     * <li>if the statement is null, then an empty list is returned</li>
+     * <li>if the statement is a {@link Block}, then its children are returned</li>
+     * <li>otherwise, the current node is returned wrapped in a list</li>
+     * </ul>
+     *
+     * @param stmt the statement to analyze
+     * @return the provided statement as a non null list of statements
+     */
+    public static List<Statement> asList(Statement stmt) {
+        if (stmt == null) {
             return Collections.emptyList();
-        } else if (node instanceof Block) {
-            return statements((Block) node);
+        } else if (stmt instanceof Block) {
+            return statements((Block) stmt);
         }
-        return Arrays.asList(node);
+        return Arrays.asList(stmt);
     }
 
-    public static <T extends Statement> T as(Statement node, Class<T> stmtClazz) {
-        if (node != null) {
-            final List<Statement> stmts = asList(node);
+    /**
+     * Casts the provided statement to an object of the provided type if type matches.
+     *
+     * @param <T> the required statement type
+     * @param stmt the statement to cast
+     * @param stmtClazz the class representing the required statement type
+     * @return the provided statement as an object of the provided type if type matches, null otherwise
+     */
+    public static <T extends Statement> T as(Statement stmt, Class<T> stmtClazz) {
+        if (stmt != null) {
+            final List<Statement> stmts = asList(stmt);
             if (stmts.size() == 1
                     && stmtClazz.isAssignableFrom(stmts.get(0).getClass())) {
                 return (T) stmts.get(0);
@@ -245,29 +317,49 @@ public final class ASTHelper {
         return null;
     }
 
-    public static <T extends Expression> T as(Expression node,
-            Class<T> exprClazz) {
-        if (node != null) {
-            if (exprClazz.isAssignableFrom(node.getClass())) {
-                return (T) node;
-            } else if (node instanceof ParenthesizedExpression) {
-                return as(((ParenthesizedExpression) node).getExpression(),
-                        exprClazz);
+    /**
+     * Casts the provided expression to an object of the provided type if type matches.
+     *
+     * @param <T> the required expression type
+     * @param expr the expression to cast
+     * @param exprClazz the class representing the required expression type
+     * @return the provided expression as an object of the provided type if type matches, null otherwise
+     */
+    public static <T extends Expression> T as(Expression expr, Class<T> exprClazz) {
+        if (expr != null) {
+            if (exprClazz.isAssignableFrom(expr.getClass())) {
+                return (T) expr;
+            } else if (expr instanceof ParenthesizedExpression) {
+                return as(((ParenthesizedExpression) expr).getExpression(), exprClazz);
             }
         }
         return null;
     }
 
-    public static <T extends Expression> T as(Collection<? extends Expression> nodes,
+    /**
+     * If the provided expression collection only has one element,
+     * then that unique expression is cast to an object of the provided type if type matches.
+     *
+     * @param <T> the required expression type
+     * @param exprs the singleton expression to cast
+     * @param exprClazz the class representing the required expression type
+     * @return the provided singleton expression as an object of the provided type if type matches, null otherwise
+     */
+    public static <T extends Expression> T as(Collection<? extends Expression> exprs,
             Class<T> exprClazz) {
-        if (nodes != null && nodes.size() == 1) {
-            return as(nodes.iterator().next(), exprClazz);
+        if (exprs != null && exprs.size() == 1) {
+            return as(exprs.iterator().next(), exprClazz);
         }
         return null;
     }
 
     /**
      * Returns the {@link Expression} of a specified type out of an {@link ExpressionStatement}.
+     *
+     * @param <T> the required expression type
+     * @param stmt the statement
+     * @param exprClazz the class representing the required expression type
+     * @return the {@link Expression} of a specified type out of an {@link ExpressionStatement}
      */
     public static <T extends Expression> T asExpression(Statement stmt, Class<T> exprClazz) {
         final ExpressionStatement es = as(stmt, ExpressionStatement.class);
@@ -277,125 +369,286 @@ public final class ASTHelper {
         return null;
     }
 
+    /**
+     * Generecized version of the equivalent JDT method.
+     *
+     * @param node the node on which to call the equivalent JDT method
+     * @return a List of expressions
+     * @see ClassInstanceCreation#arguments()
+     */
     @SuppressWarnings("unchecked")
     public static List<Expression> arguments(ClassInstanceCreation node) {
         return node.arguments();
     }
 
+    /**
+     * Generecized version of the equivalent JDT method.
+     *
+     * @param node the node on which to call the equivalent JDT method
+     * @return a List of expressions
+     * @see ConstructorInvocation#arguments()
+     */
     @SuppressWarnings("unchecked")
     public static List<Expression> arguments(ConstructorInvocation node) {
         return node.arguments();
     }
 
+    /**
+     * Generecized version of the equivalent JDT method.
+     *
+     * @param node the node on which to call the equivalent JDT method
+     * @return a List of expressions
+     * @see MethodInvocation#arguments()
+     */
     @SuppressWarnings("unchecked")
     public static List<Expression> arguments(MethodInvocation node) {
         return node.arguments();
     }
 
+    /**
+     * Generecized version of the equivalent JDT method.
+     *
+     * @param node the node on which to call the equivalent JDT method
+     * @return a List of expressions
+     * @see SuperConstructorInvocation#arguments()
+     */
     @SuppressWarnings("unchecked")
     public static List<Expression> arguments(SuperConstructorInvocation node) {
         return node.arguments();
     }
 
+    /**
+     * Generecized version of the equivalent JDT method.
+     *
+     * @param node the node on which to call the equivalent JDT method
+     * @return a List of expressions
+     * @see SuperMethodInvocation#arguments()
+     */
     @SuppressWarnings("unchecked")
     public static List<Expression> arguments(SuperMethodInvocation node) {
         return node.arguments();
     }
 
+    /**
+     * Generecized version of the equivalent JDT method.
+     *
+     * @param node the node on which to call the equivalent JDT method
+     * @return a List of expressions
+     * @see TryStatement#catchClauses()
+     */
     @SuppressWarnings("unchecked")
     public static List<CatchClause> catchClauses(TryStatement node) {
         return node.catchClauses();
     }
 
+    /**
+     * Generecized version of the equivalent JDT method.
+     *
+     * @param node the node on which to call the equivalent JDT method
+     * @return a List of expressions
+     * @see ArrayInitializer#expressions()
+     */
     @SuppressWarnings("unchecked")
     public static List<Expression> expressions(ArrayInitializer node) {
         return node.expressions();
     }
 
+    /**
+     * Generecized version of the equivalent JDT method.
+     *
+     * @param node the node on which to call the equivalent JDT method
+     * @return a List of expressions
+     * @see InfixExpression#extendedOperands()
+     */
     @SuppressWarnings("unchecked")
     public static List<Expression> extendedOperands(InfixExpression node) {
         return node.extendedOperands();
     }
 
+    /**
+     * Generecized version of the equivalent JDT method.
+     *
+     * @param node the node on which to call the equivalent JDT method
+     * @return a List of expressions
+     * @see ForStatement#initializers()
+     */
     @SuppressWarnings("unchecked")
     public static List<Expression> initializers(ForStatement node) {
         return node.initializers();
     }
 
+    /**
+     * Generecized version of the equivalent JDT method.
+     *
+     * @param node the node on which to call the equivalent JDT method
+     * @return a List of expressions
+     * @see ForStatement#updaters()
+     */
     @SuppressWarnings("unchecked")
     public static List<Expression> updaters(ForStatement node) {
         return node.updaters();
     }
 
+    /**
+     * Generecized version of the equivalent JDT method.
+     *
+     * @param node the node on which to call the equivalent JDT method
+     * @return a List of expressions
+     * @see FieldDeclaration#fragments()
+     */
     @SuppressWarnings("unchecked")
     public static List<VariableDeclarationFragment> fragments(FieldDeclaration node) {
         return node.fragments();
     }
 
+    /**
+     * Generecized version of the equivalent JDT method.
+     *
+     * @param node the node on which to call the equivalent JDT method
+     * @return a List of expressions
+     * @see VariableDeclarationExpression#fragments()
+     */
     @SuppressWarnings("unchecked")
     public static List<VariableDeclarationFragment> fragments(VariableDeclarationExpression node) {
         return node.fragments();
     }
 
+    /**
+     * Generecized version of the equivalent JDT method.
+     *
+     * @param node the node on which to call the equivalent JDT method
+     * @return a List of expressions
+     * @see VariableDeclarationStatement#fragments()
+     */
     @SuppressWarnings("unchecked")
     public static List<VariableDeclarationFragment> fragments(VariableDeclarationStatement node) {
         return node.fragments();
     }
 
+    /**
+     * Generecized version of the equivalent JDT method.
+     *
+     * @param node the node on which to call the equivalent JDT method
+     * @return a List of expressions
+     * @see CompilationUnit#getCommentList()
+     */
     @SuppressWarnings("unchecked")
     public static List<Comment> getCommentList(CompilationUnit node) {
         return node.getCommentList();
     }
 
+    /**
+     * Generecized version of the equivalent JDT method.
+     *
+     * @param node the node on which to call the equivalent JDT method
+     * @return a List of expressions
+     * @see CompilationUnit#imports()
+     */
     @SuppressWarnings("unchecked")
     public static List<ImportDeclaration> imports(CompilationUnit node) {
         return node.imports();
     }
 
+    /**
+     * Generecized version of the equivalent JDT method.
+     *
+     * @param node the node on which to call the equivalent JDT method
+     * @return a List of expressions
+     * @see BodyDeclaration#modifiers()
+     */
     @SuppressWarnings("unchecked")
     public static List<IExtendedModifier> modifiers(BodyDeclaration node) {
         return node.modifiers();
     }
 
+    /**
+     * Generecized version of the equivalent JDT method.
+     *
+     * @param node the node on which to call the equivalent JDT method
+     * @return a List of expressions
+     * @see MethodDeclaration#parameters()
+     */
     @SuppressWarnings("unchecked")
     public static List<SingleVariableDeclaration> parameters(MethodDeclaration node) {
         return node.parameters();
     }
 
+    /**
+     * Generecized version of the equivalent JDT method.
+     *
+     * @param node the node on which to call the equivalent JDT method
+     * @return a List of expressions
+     * @see Block#statements()
+     */
     @SuppressWarnings("unchecked")
     public static List<Statement> statements(Block node) {
         return node.statements();
     }
 
+    /**
+     * Generecized version of the equivalent JDT method.
+     *
+     * @param node the node on which to call the equivalent JDT method
+     * @return a List of expressions
+     * @see SwitchStatement#statements()
+     */
     @SuppressWarnings("unchecked")
     public static List<Statement> statements(SwitchStatement node) {
         return node.statements();
     }
 
+    /**
+     * Generecized version of the equivalent JDT method.
+     *
+     * @param node the node on which to call the equivalent JDT method
+     * @return a List of expressions
+     * @see Javadoc#tags()
+     */
     @SuppressWarnings("unchecked")
     public static List<TagElement> tags(Javadoc node) {
         return node.tags();
     }
 
+    /**
+     * Generecized version of the equivalent JDT method.
+     *
+     * @param node the node on which to call the equivalent JDT method
+     * @return a List of expressions
+     * @see ParameterizedType#typeArguments()
+     */
     @SuppressWarnings("unchecked")
     public static List<Type> typeArguments(ParameterizedType node) {
         return node.typeArguments();
     }
 
-    public static Boolean getBooleanLiteral(Expression node) {
-        final BooleanLiteral bl = as(node, BooleanLiteral.class);
+    /**
+     * Returns the {@link Boolean} object value represented by the provided expression.
+     *
+     * @param expr the expression to analyze
+     * @return the {@link Boolean} object value if the provided expression represents one, null otherwise
+     */
+    public static Boolean getBooleanLiteral(Expression expr) {
+        final BooleanLiteral bl = as(expr, BooleanLiteral.class);
         if (bl != null) {
             return bl.booleanValue();
         }
-        final QualifiedName qn = as(node, QualifiedName.class);
+        final QualifiedName qn = as(expr, QualifiedName.class);
         if (hasType(qn, "java.lang.Boolean")) {
             return getBooleanObjectAsLiteral(qn);
         }
         return null;
     }
 
-    public static boolean getBooleanObjectAsLiteral(final QualifiedName node) {
-        final String fqn = node.getFullyQualifiedName();
+    /**
+     * Returns the boolean primitive value of the {@link Boolean} object value
+     * represented by the provided qualified name.
+     *
+     * @param qualifiedName the qualified name that must represent a Boolean object literal
+     * @return the boolean primitive value of the {@link Boolean} object value
+     *         represented by the provided qualified name.
+     */
+    public static boolean getBooleanObjectAsLiteral(final QualifiedName qualifiedName) {
+        final String fqn = qualifiedName.getFullyQualifiedName();
         if ("Boolean.TRUE".equals(fqn)) {
             return true;
         } else if ("Boolean.FALSE".equals(fqn)) {
@@ -404,6 +657,13 @@ public final class ASTHelper {
         throw new NotImplementedException("for fully qualified name \"" + fqn + "\"");
     }
 
+    /**
+     * Converts the provided type binding to a new {@link Type} object.
+     *
+     * @param ast the {@link AST}
+     * @param typeBinding the type binding
+     * @return a new {@link Type} object
+     */
     public static Type toType(final AST ast, final ITypeBinding typeBinding) {
         if (typeBinding == null) {
             return null;
@@ -457,8 +717,15 @@ public final class ASTHelper {
 
     // AST navigation
 
-    public static <T extends ASTNode> T getAncestor(ASTNode node,
-            Class<T> ancestorClazz) {
+    /**
+     * Returns the first ancestor of the provided node which has the required type.
+     *
+     * @param <T> the required ancestor's type
+     * @param node the start node
+     * @param ancestorClazz the required ancestor's type
+     * @return the first ancestor of the provided node which has the required type
+     */
+    public static <T extends ASTNode> T getAncestor(ASTNode node, Class<T> ancestorClazz) {
         if (node == null || node.getParent() == null) {
             throw new IllegalStateException("Could not find any ancestor for "
                     + ancestorClazz + "and node " + node);
@@ -470,26 +737,38 @@ public final class ASTHelper {
         return getAncestor(parent, ancestorClazz);
     }
 
-    public static Statement getPreviousSibling(Statement node) {
-        return getSibling(node, true);
+    /**
+     * Returns the previous statement in the same block if it exists.
+     *
+     * @param startNode the start node
+     * @return the previous statement in the same block if it exists, null otherwise
+     */
+    public static Statement getPreviousSibling(Statement startNode) {
+        return getSibling(startNode, true);
     }
 
     /**
+     * Returns the next statement in the same block if it exists.
+     *
+     * @param startNode the start node
      * @return the next statement in the same block if it exists, null otherwise
      */
-    public static Statement getNextSibling(Statement node) {
-        return getSibling(node, false);
+    public static Statement getNextSibling(Statement startNode) {
+        return getSibling(startNode, false);
     }
 
     /**
+     * Returns the next statement in the source file if it exists.
+     *
+     * @param startNode the start node
      * @return the next statement in the source file if it exists, null otherwise
      */
-    public static Statement getNextStatement(Statement node) {
-        final Statement nextSibling = getNextSibling(node);
+    public static Statement getNextStatement(Statement startNode) {
+        final Statement nextSibling = getNextSibling(startNode);
         if (nextSibling != null) {
             return nextSibling;
         }
-        final ASTNode parent = node.getParent();
+        final ASTNode parent = startNode.getParent();
         if (parent instanceof Statement) {
             return getNextStatement((Statement) parent);
         }
@@ -511,18 +790,33 @@ public final class ASTHelper {
 
     // AST checks
 
-    public static boolean hasType(Expression expr, String... qualifiedTypeNames) {
+    /**
+     * Returns whether the provided expression evaluates to exactly one of the provided type.
+     *
+     * @param expr the expression to analyze
+     * @param oneOfQualifiedTypeNames
+     *          the type binding qualified name must be equal to one of these qualified type names
+     * @return true if the provided expression evaluates to exactly one of the provided type, false otherwise
+     */
+    public static boolean hasType(Expression expr, String... oneOfQualifiedTypeNames) {
         if (expr == null) {
             return false;
         }
-        return hasType(expr.resolveTypeBinding(), qualifiedTypeNames);
+        return hasType(expr.resolveTypeBinding(), oneOfQualifiedTypeNames);
     }
 
-    public static boolean hasType(final ITypeBinding typeBinding,
-            String... qualifiedTypeNames) {
+    /**
+     * Returns whether the provided type binding is exactly one of the provided type.
+     *
+     * @param typeBinding the type binding to analyze
+     * @param oneOfQualifiedTypeNames
+     *          the type binding qualified name must be equal to one of these qualified type names
+     * @return true if the provided type binding is exactly one of the provided type, false otherwise
+     */
+    public static boolean hasType(final ITypeBinding typeBinding, String... oneOfQualifiedTypeNames) {
         if (typeBinding != null) {
             final String qualifiedName = typeBinding.getErasure().getQualifiedName();
-            for (String qualifiedTypeName : qualifiedTypeNames) {
+            for (String qualifiedTypeName : oneOfQualifiedTypeNames) {
                 if (qualifiedTypeName.equals(qualifiedName)) {
                     return true;
                 }
@@ -531,6 +825,13 @@ public final class ASTHelper {
         return false;
     }
 
+    /**
+     * Returns whether the provided expression is an instance of the qualified type name.
+     *
+     * @param expr the expression to analyze
+     * @param qualifiedTypeName the qualified type name
+     * @return true if the provided expression is an instance of the qualified type name, false otherwise
+     */
     public static boolean instanceOf(Expression expr, String qualifiedTypeName) {
         if (expr == null) {
             return false;
@@ -538,23 +839,44 @@ public final class ASTHelper {
         return instanceOf(expr.resolveTypeBinding(), qualifiedTypeName);
     }
 
+    /**
+     * Returns whether the provided type binding is an instance of the qualified type name.
+     *
+     * @param typeBinding the type binding to analyze
+     * @param qualifiedTypeName the qualified type name
+     * @return true if the provided type binding is an instance of the qualified type name, false otherwise
+     */
     public static boolean instanceOf(ITypeBinding typeBinding, String qualifiedTypeName) {
         return findImplementedType(typeBinding, qualifiedTypeName) != null;
     }
 
-    public static boolean isPrimitive(Expression expr, String primitiveName) {
+    /**
+     * Returns whether the provided expression evaluates to a primitive type.
+     *
+     * @param expr the expression to analyze
+     * @param primitiveTypeName the primitive type name
+     * @return true if the provided expression evaluates to a primitive type, false otherwise
+     */
+    public static boolean isPrimitive(Expression expr, String primitiveTypeName) {
         if (expr == null) {
             return false;
         }
-        return isPrimitive(expr.resolveTypeBinding(), primitiveName);
+        return isPrimitive(expr.resolveTypeBinding(), primitiveTypeName);
     }
 
-    public static boolean isPrimitive(ITypeBinding typeBinding, String primitiveName) {
+    /**
+     * Returns whether the provided type binding represents a primitive type.
+     *
+     * @param typeBinding the type binding to analyze
+     * @param primitiveTypeName the primitive type name
+     * @return true if the provided type binding represents a primitive type, false otherwise
+     */
+    public static boolean isPrimitive(ITypeBinding typeBinding, String primitiveTypeName) {
         return typeBinding != null
-                && typeBinding.getQualifiedName().equals(primitiveName);
+                && typeBinding.getQualifiedName().equals(primitiveTypeName);
     }
 
-    public static ITypeBinding findImplementedType(ITypeBinding typeBinding, String qualifiedTypeName) {
+    private static ITypeBinding findImplementedType(ITypeBinding typeBinding, String qualifiedTypeName) {
         if (typeBinding == null) {
             return null;
         }
@@ -598,6 +920,12 @@ public final class ASTHelper {
         return null;
     }
 
+    /**
+     * Returns whether the provided node defines a loop.
+     *
+     * @param node the node
+     * @return true if the provided node defines a loop, false otherwise
+     */
     public static boolean isLoop(ASTNode node) {
         return node instanceof DoStatement
                 || node instanceof EnhancedForStatement
@@ -605,10 +933,26 @@ public final class ASTHelper {
                 || node instanceof WhileStatement;
     }
 
+    /**
+     * Returns whether the provided node is breakable.
+     *
+     * @param node the node
+     * @return true if the provided node is breakable, false otherwise
+     */
     public static boolean isBreakable(ASTNode node) {
         return isLoop(node) || node instanceof SwitchStatement;
     }
 
+    /**
+     * Returns whether the provided method invocation invokes a method with the provided method signature.
+     * The method signature is compared against the erasure of the invoked method.
+     *
+     * @param node the method invocation to compare
+     * @param typeQualifiedName the qualified name of the type declaring the method
+     * @param methodName the method name
+     * @param parameterTypesQualifiedNames the qualified names of the parameter types
+     * @return true if the provided method invocation matches the provided method signature, false otherwise
+     */
     public static boolean isMethod(MethodInvocation node, String typeQualifiedName,
             String methodName, String... parameterTypesQualifiedNames) {
         if (node == null) {
@@ -775,22 +1119,34 @@ public final class ASTHelper {
         return null;
     }
 
-    public static boolean thisExpressionRefersToCurrentType(Name name,
-            ASTNode node) {
+    /**
+     * Returns whether <code>this</code> is referring to the currently surrounding type.
+     *
+     * @param thisQualifierName the <code>this</code> qualifier name
+     * @param node the AST node
+     * @return true if <code>this</code> is referring to the currently surrounding type, false otherwise
+     */
+    public static boolean thisExpressionRefersToCurrentType(Name thisQualifierName, ASTNode node) {
         final TypeDeclaration ancestor = getAncestor(node, TypeDeclaration.class);
-        if (name == null) {
+        if (thisQualifierName == null) {
             return true;
-        } else if (name instanceof SimpleName) {
-            return isEqual((SimpleName) name, ancestor.getName());
-        } else if (name instanceof QualifiedName) {
-            final QualifiedName qn = (QualifiedName) name;
+        } else if (thisQualifierName instanceof SimpleName) {
+            return isEqual((SimpleName) thisQualifierName, ancestor.getName());
+        } else if (thisQualifierName instanceof QualifiedName) {
+            final QualifiedName qn = (QualifiedName) thisQualifierName;
             return isEqual(qn.getName(), ancestor.getName())
-                    && thisExpressionRefersToCurrentType(qn.getQualifier(),
-                            ancestor);
+                    && thisExpressionRefersToCurrentType(qn.getQualifier(), ancestor);
         }
-        throw new NotImplementedException(name);
+        throw new NotImplementedException(thisQualifierName);
     }
 
+    /**
+     * Returns whether the two names are equal.
+     *
+     * @param name1 the first name to compare
+     * @param name2 the second name to compare
+     * @return true if the two names are equal, false otherwise.
+     */
     public static boolean isEqual(Name name1, Name name2) {
         if (name1 instanceof SimpleName && name2 instanceof SimpleName) {
             return isEqual((SimpleName) name1, (SimpleName) name2);
@@ -801,10 +1157,24 @@ public final class ASTHelper {
         return false;
     }
 
+    /**
+     * Returns whether the two simple names are equal.
+     *
+     * @param name1 the first simple name to compare
+     * @param name2 the second simple name to compare
+     * @return true if the two simple names are equal, false otherwise.
+     */
     public static boolean isEqual(SimpleName name1, SimpleName name2) {
         return name1.getIdentifier().equals(name2.getIdentifier());
     }
 
+    /**
+     * Returns whether the two qualified names are equal.
+     *
+     * @param name1 the first qualified name to compare
+     * @param name2 the second qualified name to compare
+     * @return true if the two qualified names are equal, false otherwise.
+     */
     public static boolean isEqual(QualifiedName name1, QualifiedName name2) {
         if (isEqual(name1.getName(), name2.getName())) {
             return isEqual(name1.getQualifier(), name2.getQualifier());
@@ -817,6 +1187,14 @@ public final class ASTHelper {
                 && node1.getClass().equals(node2.getClass());
     }
 
+    /**
+     * Returns whether the two provided nodes structurally match.
+     *
+     * @param matcher the AST matcher
+     * @param node1 the first node to compare
+     * @param node2 the second node to compare
+     * @return true if the two provided nodes structurally match, false otherwise
+     */
     public static boolean match(ASTMatcher matcher, ASTNode node1, ASTNode node2) {
         if (sameClass(node1, node2)) {
             // FIXME JNR implement all expressions
@@ -1000,6 +1378,13 @@ public final class ASTHelper {
         return false;
     }
 
+    /**
+     * Returns whether the two provided simple names represent the same variable.
+     *
+     * @param name1 the first simple name to compare
+     * @param name2 the second simple name to compare
+     * @return true if the two provided simple names represent the same variable, false otherwise
+     */
     public static boolean isSameVariable(SimpleName name1, SimpleName name2) {
         final IBinding bnd1 = name1.resolveBinding();
         final IBinding bnd2 = name2.resolveBinding();
@@ -1009,25 +1394,45 @@ public final class ASTHelper {
         return bnd1.isEqualTo(bnd2);
     }
 
+    /**
+     * Returns whether the two provided names represent the same variable.
+     *
+     * @param name1 the first name to compare
+     * @param name2 the second name to compare
+     * @return true if the two provided names represent the same variable, false otherwise
+     */
     public static boolean isSameVariable(SimpleName name1, QualifiedName name2) {
         return false;
     }
 
-    public static boolean isSameVariable(SimpleName name1, FieldAccess name2) {
-        if (!(name2.getExpression() instanceof ThisExpression)) {
+    /**
+     * Returns whether the two provided expressions represent the same variable.
+     *
+     * @param name1 the first expression to compare
+     * @param field2 the second expression to compare
+     * @return true if the two provided expressions represent the same variable, false otherwise
+     */
+    public static boolean isSameVariable(SimpleName name1, FieldAccess field2) {
+        if (!(field2.getExpression() instanceof ThisExpression)) {
             // TODO JNR parenthesized expr??
             return false;
         }
         IBinding cb = name1.resolveBinding();
-        IBinding sb = name2.resolveFieldBinding();
+        IBinding sb = field2.resolveFieldBinding();
         if (cb == null || sb == null) {
             return false;
         }
         return cb.isEqualTo(sb);
     }
 
-    public static boolean isSameVariable(QualifiedName name1,
-            QualifiedName name2) {
+    /**
+     * Returns whether the two provided qualified names represent the same variable.
+     *
+     * @param name1 the first qualified name to compare
+     * @param name2 the second qualified name to compare
+     * @return true if the two provided qualified names represent the same variable, false otherwise
+     */
+    public static boolean isSameVariable(QualifiedName name1, QualifiedName name2) {
         IBinding cb = name1.resolveBinding();
         IBinding sb = name2.resolveBinding();
         if (cb == null || sb == null) {
@@ -1039,69 +1444,93 @@ public final class ASTHelper {
         return false;
     }
 
-    public static boolean isSameVariable(QualifiedName name1, FieldAccess name2) {
+    /**
+     * Returns whether the two provided expressions represent the same variable.
+     *
+     * @param name1 the first expression to compare
+     * @param field2 the second expression to compare
+     * @return true if the two provided expressions represent the same variable, false otherwise
+     */
+    public static boolean isSameVariable(QualifiedName name1, FieldAccess field2) {
         IBinding sb = name1.resolveBinding();
-        IBinding cb = name2.resolveFieldBinding();
+        IBinding cb = field2.resolveFieldBinding();
         if (cb == null || sb == null) {
             return false;
         }
         if (cb.isEqualTo(sb)) {
-            return isSameVariable(name2.getExpression(), name1.getQualifier());
+            return isSameVariable(field2.getExpression(), name1.getQualifier());
         }
         return false;
     }
 
-    public static boolean isSameVariable(FieldAccess name1, FieldAccess name2) {
-        IBinding cb = name1.resolveFieldBinding();
-        IBinding sb = name2.resolveFieldBinding();
+    /**
+     * Returns whether the two provided field accesses represent the same variable.
+     *
+     * @param field1 the first field access to compare
+     * @param field2 the second field access to compare
+     * @return true if the two provided field accesses represent the same variable, false otherwise
+     */
+    public static boolean isSameVariable(FieldAccess field1, FieldAccess field2) {
+        IBinding cb = field1.resolveFieldBinding();
+        IBinding sb = field2.resolveFieldBinding();
         if (cb == null || sb == null) {
             return false;
         }
         if (cb.isEqualTo(sb)) {
-            return isSameVariable(name1.getExpression(), name2.getExpression());
+            return isSameVariable(field1.getExpression(), field2.getExpression());
         }
         return false;
     }
 
-    public static boolean isSameVariable(Expression name1, Expression name2) {
-        if (name1 instanceof ThisExpression) {
+    /**
+     * Returns whether the two provided expressions represent the same variable.
+     *
+     * @param expr1 the first expression to compare
+     * @param expr2 the second expression to compare
+     * @return true if the two provided expressions represent the same variable, false otherwise
+     */
+    public static boolean isSameVariable(Expression expr1, Expression expr2) {
+        if (expr1 instanceof ThisExpression) {
             // TODO JNR
             // ThisExpression te = (ThisExpression) name1;
             // te.getQualifier();
-            return name2 instanceof ThisExpression;
-        } else if (name1 instanceof SimpleName) {
-            final SimpleName sn = (SimpleName) name1;
-            if (name2 instanceof SimpleName) {
-                return isSameVariable(sn, (SimpleName) name2);
-            } else if (name2 instanceof QualifiedName) {
-                return isSameVariable(sn, (QualifiedName) name2);
-            } else if (name2 instanceof FieldAccess) {
-                return isSameVariable(sn, (FieldAccess) name2);
+            return expr2 instanceof ThisExpression;
+        } else if (expr1 instanceof SimpleName) {
+            final SimpleName sn = (SimpleName) expr1;
+            if (expr2 instanceof SimpleName) {
+                return isSameVariable(sn, (SimpleName) expr2);
+            } else if (expr2 instanceof QualifiedName) {
+                return isSameVariable(sn, (QualifiedName) expr2);
+            } else if (expr2 instanceof FieldAccess) {
+                return isSameVariable(sn, (FieldAccess) expr2);
             }
-        } else if (name1 instanceof QualifiedName) {
-            final QualifiedName qn = (QualifiedName) name1;
-            if (name2 instanceof SimpleName) {
-                return isSameVariable((SimpleName) name2, qn);
-            } else if (name2 instanceof QualifiedName) {
-                return isSameVariable(qn, (QualifiedName) name2);
-            } else if (name2 instanceof FieldAccess) {
-                return isSameVariable(qn, (FieldAccess) name2);
+        } else if (expr1 instanceof QualifiedName) {
+            final QualifiedName qn = (QualifiedName) expr1;
+            if (expr2 instanceof SimpleName) {
+                return isSameVariable((SimpleName) expr2, qn);
+            } else if (expr2 instanceof QualifiedName) {
+                return isSameVariable(qn, (QualifiedName) expr2);
+            } else if (expr2 instanceof FieldAccess) {
+                return isSameVariable(qn, (FieldAccess) expr2);
             }
-        } else if (name1 instanceof FieldAccess) {
-            final FieldAccess fa = (FieldAccess) name1;
-            if (name2 instanceof SimpleName) {
-                return isSameVariable((SimpleName) name2, fa);
-            } else if (name2 instanceof QualifiedName) {
-                return isSameVariable((QualifiedName) name2, fa);
-            } else if (name2 instanceof FieldAccess) {
-                return isSameVariable(fa, (FieldAccess) name2);
+        } else if (expr1 instanceof FieldAccess) {
+            final FieldAccess fa = (FieldAccess) expr1;
+            if (expr2 instanceof SimpleName) {
+                return isSameVariable((SimpleName) expr2, fa);
+            } else if (expr2 instanceof QualifiedName) {
+                return isSameVariable((QualifiedName) expr2, fa);
+            } else if (expr2 instanceof FieldAccess) {
+                return isSameVariable(fa, (FieldAccess) expr2);
             }
         }
         return false;
     }
 
     /**
-     * @return the parent node filtering out ParenthesizedExpression and Blocks.
+     * Returns the parent node filtering out ParenthesizedExpression and Blocks.
+     *
+     * @param node the node
+     * @return the parent node filtering out ParenthesizedExpression and Blocks
      */
     public static ASTNode getParent(ASTNode node) {
         ASTNode parent = node.getParent();
@@ -1113,6 +1542,12 @@ public final class ASTHelper {
         return parent;
     }
 
+    /**
+     * Returns the file name where the node comes from, or "FakeClass.java" if this is a fake node.
+     *
+     * @param node the node
+     * @return the file name where the node comes from, or "FakeClass.java" if this is a fake node.
+     */
     public static String getFileName(ASTNode node) {
         if (node.getRoot() instanceof CompilationUnit) {
             CompilationUnit cu = (CompilationUnit) node.getRoot();

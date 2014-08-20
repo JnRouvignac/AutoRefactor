@@ -1,3 +1,28 @@
+/*
+ * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
+ *
+ * Copyright (C) 2013-2014 Jean-Noël Rouvignac - initial API and implementation
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.    See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program under LICENSE-GNUGPL.    If not, see
+ * <http://www.gnu.org/licenses/>.
+ *
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution under LICENSE-ECLIPSE, and is
+ * available at http://www.eclipse.org/legal/epl-v10.html
+ */
 package org.autorefactor.refactoring;
 
 import java.util.ArrayList;
@@ -16,9 +41,12 @@ import org.eclipse.text.edits.InsertEdit;
 import org.eclipse.text.edits.ReplaceEdit;
 import org.eclipse.text.edits.TextEdit;
 
+/**
+ * This class rewrites AST comments.
+ */
 public class ASTCommentRewriter {
 
-      /**
+    /**
      * Using a Set to avoid duplicates because Javadocs are visited twice via
      * CompilationUnit.getCommentList() and visit(Javadoc).
      */
@@ -27,34 +55,61 @@ public class ASTCommentRewriter {
     private List<BlockComment> blockCommentToJavadoc = new ArrayList<BlockComment>();
     private List<List<LineComment>> lineCommentsToJavadoc = new ArrayList<List<LineComment>>();
 
+    /** Default constructor. */
     public ASTCommentRewriter() {
         super();
     }
 
-    public void remove(Comment node) {
-        this.removals.add(node);
+    /**
+     * Removes the provided comment.
+     *
+     * @param comment the comment to remove
+     */
+    public void remove(Comment comment) {
+        this.removals.add(comment);
     }
 
+    /**
+     * Replaces the provided comment with the provided replacement text.
+     *
+     * @param comment the comment to replace
+     * @param replacement the replacement text
+     */
     public void replace(Comment comment, String replacement) {
         this.replacements.add(Pair.of(comment, replacement));
     }
 
+    /**
+     * Converts the provided block comment into a javadoc.
+     *
+     * @param comment the block comment to convert into a javadoc
+     */
     public void toJavadoc(BlockComment comment) {
         this.blockCommentToJavadoc.add(comment);
     }
 
+    /**
+     * Converts the provided list of line comments into a javadoc.
+     *
+     * @param comments the list of line comments to convert into a javadoc
+     */
     public void toJavadoc(List<LineComment> comments) {
         this.lineCommentsToJavadoc.add(comments);
     }
 
+    /**
+     * Adds the edits contained in the current instance to the provided edits for the provided document.
+     *
+     * @param document the provided document to edit
+     * @param edits where to add edits
+     */
     public void addEdits(IDocument document, TextEdit edits) {
-        final String text = document.get();
-        addRemovalEdits(text, edits);
-        addReplacementEdits(text, edits);
-        addToJavadocEdits(text, edits);
+        addRemovalEdits(edits, document.get());
+        addReplacementEdits(edits);
+        addToJavadocEdits(edits);
     }
 
-    private void addRemovalEdits(String text, TextEdit edits) {
+    private void addRemovalEdits(TextEdit edits, String text) {
         if (this.removals.isEmpty()) {
             return;
         }
@@ -71,7 +126,7 @@ public class ASTCommentRewriter {
         }
     }
 
-    private void addReplacementEdits(String text, TextEdit edits) {
+    private void addReplacementEdits(TextEdit edits) {
         if (this.replacements.isEmpty()) {
             return;
         }
@@ -84,7 +139,7 @@ public class ASTCommentRewriter {
         }
     }
 
-    private void addToJavadocEdits(String text, TextEdit edits) {
+    private void addToJavadocEdits(TextEdit edits) {
         for (BlockComment blockComment : this.blockCommentToJavadoc) {
             final int offset = blockComment.getStartPosition() + "/*".length();
             edits.addChild(new InsertEdit(offset, "*"));

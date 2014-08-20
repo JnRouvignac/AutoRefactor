@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2013 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2013-2014 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,15 +27,20 @@ package org.autorefactor.refactoring;
 
 import java.util.regex.Pattern;
 
+/**
+ * Interface holding java constants.
+ */
 public interface JavaConstants {
 
     /**
+     * String pattern identifying number literal for an integer.
+     *
      * @see <a href="http://docs.oracle.com/javase/7/docs/technotes/guides/language/binary-literals.html">
      *      Binary Literals</a>
      * @see <a href="http://docs.oracle.com/javase/7/docs/technotes/guides/language/underscores-literals.html">
      *      Underscores in Numeric Literals</a>
      */
-    public String INTEGER_LITERAL_COMPATIBLE_PATTERN = "" + "(?:"
+    String INTEGER_LITERAL_COMPATIBLE_PATTERN = "" + "(?:"
             // binary literal
             + "(?:0b|0B)(?:[0-1][0-1_]*)?[0-1]" + ")|(?:"
             // octal literal
@@ -45,16 +50,20 @@ public interface JavaConstants {
             // hexadecimal literal
             + "(?:0x|0X)([0-9a-fA-F][0-9a-fA-F_]*)?[0-9a-fA-F]" + ")";
 
-    public Pattern INTEGER_LITERAL_COMPATIBLE_RE = Pattern
+    /** Pattern identifying number literal for an integer. */
+    Pattern INTEGER_LITERAL_COMPATIBLE_RE = Pattern
             .compile(INTEGER_LITERAL_COMPATIBLE_PATTERN);
 
-    public String LONG_LITERAL_COMPATIBLE_PATTERN = ""
+    /** String pattern identifying number literal for a long. */
+    String LONG_LITERAL_COMPATIBLE_PATTERN = ""
             + ("(?:" + INTEGER_LITERAL_COMPATIBLE_PATTERN + ")(?:l|L)?");
 
-    public Pattern LONG_LITERAL_COMPATIBLE_RE = Pattern
+    /** Pattern identifying number literal for a long. */
+    Pattern LONG_LITERAL_COMPATIBLE_RE = Pattern
             .compile(LONG_LITERAL_COMPATIBLE_PATTERN);
 
-    public Pattern ZERO_LONG_LITERAL_RE = Pattern.compile("(?:" + "(?:"
+    /** Pattern identifying number literal for long "0". */
+    Pattern ZERO_LONG_LITERAL_RE = Pattern.compile("(?:" + "(?:"
             // binary literal
             + "(?:0b|0B)(?:0[0_]*)?0" + ")|(?:"
             // octal literal
@@ -64,7 +73,8 @@ public interface JavaConstants {
             // hexadecimal literal
             + "(?:0x|0X)(?:0[0_]*)?0" + ")" + ")(?:l|L)?");
 
-    public Pattern ONE_LONG_LITERAL_RE = Pattern.compile("(?:" + "(?:"
+    /** Pattern identifying number literal for long "1". */
+    Pattern ONE_LONG_LITERAL_RE = Pattern.compile("(?:" + "(?:"
             // binary literal
             + "(?:0b|0B)(?:0[0_]*)?1" + ")|(?:"
             // octal literal
@@ -74,7 +84,8 @@ public interface JavaConstants {
             // hexadecimal literal
             + "(?:0x|0X)(?:0[0_]*)?1" + ")" + ")(?:l|L)?");
 
-    public Pattern TEN_LONG_LITERAL_RE = Pattern.compile("(?:" + "(?:"
+    /** Pattern identifying number literal for long "10". */
+    Pattern TEN_LONG_LITERAL_RE = Pattern.compile("(?:" + "(?:"
             // binary literal
             + "(?:0b|0B)(?:0[0_]*)?1_*0_*1_*0" + ")|(?:"
             // octal literal

@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2013 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2013-2014 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,6 +29,9 @@ import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Name;
 import org.eclipse.jdt.core.dom.Type;
 
+/**
+ * Represents an access to a variable.
+ */
 public class VariableAccess {
 
     /** A declaration which value is already initialized. */
@@ -45,19 +48,32 @@ public class VariableAccess {
     private final Type type;
     private final int accessType;
 
-    public VariableAccess(ASTNode astNode, Name name, Type type,
-            int accessType) {
+    /**
+     * Class constructor.
+     *
+     * @param astNode the AST node of the variable
+     * @param name the name of the variable
+     * @param type the type of the variable
+     * @param accessType the access type to the variable
+     */
+    public VariableAccess(ASTNode astNode, Name name, Type type, int accessType) {
         this.astNode = astNode;
         this.name = name;
         this.type = type;
         this.accessType = accessType;
     }
 
+    /**
+     * Class constructor.
+     *
+     * @param astNode the AST node of the variable
+     * @param accessType the access type to the variable
+     */
     public VariableAccess(ASTNode astNode, int accessType) {
-        this(astNode, astNode instanceof Name ? (Name) astNode : null, null,
-                accessType);
+        this(astNode, astNode instanceof Name ? (Name) astNode : null, null, accessType);
     }
 
+    /** {@inheritDoc} */
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("VAR_ACCESS[");

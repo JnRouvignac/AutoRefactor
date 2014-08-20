@@ -246,6 +246,12 @@ public class CFGBuilder {
      */
     private final Map<String, ITypeBinding> typeBindingsCache = new HashMap<String, ITypeBinding>();
 
+    /**
+     * Builds an instance of this class.
+     *
+     * @param source the java source code to work from
+     * @param tabSize the tabulation size
+     */
     public CFGBuilder(String source, int tabSize) {
         this.source = source;
         this.tabSize = tabSize;
@@ -497,42 +503,95 @@ public class CFGBuilder {
         }
     }
 
+    /**
+     * Builds a CFG for the provided node.
+     *
+     * @param node the node for which to build a CFG.
+     */
     public void buildCFG(QualifiedName node) {
-        throw new NotImplementedException();
+        throw new NotImplementedException(node);
     }
 
+    /**
+     * Builds a CFG for the provided node.
+     *
+     * @param node the node for which to build a CFG.
+     */
     public void buildCFG(PrimitiveType node) {
-        throw new NotImplementedException();
+        throw new NotImplementedException(node);
     }
 
+    /**
+     * Builds a CFG for the provided node.
+     *
+     * @param node the node for which to build a CFG.
+     */
     public void buildCFG(QualifiedType node) {
-        throw new NotImplementedException();
+        throw new NotImplementedException(node);
     }
 
+    /**
+     * Builds a CFG for the provided node.
+     *
+     * @param node the node for which to build a CFG.
+     */
     public void buildCFG(PrefixExpression node) {
-        throw new NotImplementedException();
+        throw new NotImplementedException(node);
     }
 
+    /**
+     * Builds a CFG for the provided node.
+     *
+     * @param node the node for which to build a CFG.
+     */
     public void buildCFG(PostfixExpression node) {
-        throw new NotImplementedException();
+        throw new NotImplementedException(node);
     }
 
+    /**
+     * Builds a CFG for the provided node.
+     *
+     * @param node the node for which to build a CFG.
+     */
     public void buildCFG(ParenthesizedExpression node) {
-        throw new NotImplementedException();
+        throw new NotImplementedException(node);
     }
 
+    /**
+     * Builds a CFG for the provided node.
+     *
+     * @param node the node for which to build a CFG.
+     */
     public void buildCFG(SingleVariableDeclaration node) {
-        throw new NotImplementedException();
+        throw new NotImplementedException(node);
     }
 
+    /**
+     * Builds a CFG for the provided node.
+     *
+     * @param node the node for which to build a CFG.
+     */
     public void buildCFG(SimpleType node) {
-        throw new NotImplementedException();
+        throw new NotImplementedException(node);
     }
 
+    /**
+     * Builds a CFG for the provided node.
+     *
+     * @param node the node for which to build a CFG.
+     */
     public void buildCFG(SimpleName node) {
-        throw new NotImplementedException();
+        throw new NotImplementedException(node);
     }
 
+    /**
+     * Builds a CFG for the provided node.
+     *
+     * @param node the node for which to build a CFG.
+     * @param state the blocks liveness state before current node
+     * @param throwers the thrower blocks information
+     * @return the blocks liveness state after current node
+     */
     public LivenessState buildCFG(ReturnStatement node, LivenessState state, ThrowerBlocks throwers) {
         final CFGBasicBlock basicBlock = getCFGBasicBlock(node, state);
         if (node.getExpression() != null) {
@@ -542,15 +601,31 @@ public class CFGBuilder {
         return state.nextStmtsAreDeadCode();
     }
 
+    /**
+     * Builds a CFG for the provided node.
+     *
+     * @param node the node for which to build a CFG.
+     */
     public void buildCFG(Modifier node) {
-        throw new NotImplementedException();
+        throw new NotImplementedException(node);
     }
 
+    /**
+     * Builds a CFG for the provided node.
+     *
+     * @param node the node for which to build a CFG.
+     */
     public void buildCFG(MethodInvocation node) {
         // TODO JNR add variable access to "this"
-        throw new NotImplementedException();
+        throw new NotImplementedException(node);
     }
 
+    /**
+     * Builds a CFG for the provided node.
+     *
+     * @param node the node for which to build a CFG.
+     * @return the entry block to the CFG of this method declaration
+     */
     public CFGBasicBlock buildCFG(MethodDeclaration node) {
         final CFGBasicBlock entryBlock = newEntryBlock(node);
         this.exitBlock = newExitBlock(node);
@@ -593,46 +668,102 @@ public class CFGBuilder {
         }
     }
 
+    /**
+     * Builds a CFG for the provided node.
+     *
+     * @param node the node for which to build a CFG.
+     */
     public void buildCFG(MethodRefParameter node) {
-        throw new NotImplementedException();
+        throw new NotImplementedException(node);
     }
 
+    /**
+     * Builds a CFG for the provided node.
+     *
+     * @param node the node for which to build a CFG.
+     */
     public void buildCFG(MethodRef node) {
-        throw new NotImplementedException();
+        throw new NotImplementedException(node);
     }
 
+    /**
+     * Builds a CFG for the provided node.
+     *
+     * @param node the node for which to build a CFG.
+     */
     public void buildCFG(MemberValuePair node) {
-        throw new NotImplementedException();
+        throw new NotImplementedException(node);
     }
 
+    /**
+     * Builds a CFG for the provided node.
+     *
+     * @param node the node for which to build a CFG.
+     */
     public void buildCFG(ParameterizedType node) {
-        throw new NotImplementedException();
+        throw new NotImplementedException(node);
     }
 
+    /**
+     * Builds a CFG for the provided node.
+     *
+     * @param node the node for which to build a CFG.
+     */
     public void buildCFG(NumberLiteral node) {
-        throw new NotImplementedException();
+        throw new NotImplementedException(node);
     }
 
+    /**
+     * Builds a CFG for the provided node.
+     *
+     * @param node the node for which to build a CFG.
+     */
     public void buildCFG(NullLiteral node) {
-        throw new NotImplementedException();
+        throw new NotImplementedException(node);
     }
 
+    /**
+     * Builds a CFG for the provided node.
+     *
+     * @param node the node for which to build a CFG.
+     */
     public void buildCFG(UnionType node) {
-        throw new NotImplementedException();
+        throw new NotImplementedException(node);
     }
 
+    /**
+     * Builds a CFG for the provided node.
+     *
+     * @param node the node for which to build a CFG.
+     */
     public void buildCFG(TypeParameter node) {
-        throw new NotImplementedException();
+        throw new NotImplementedException(node);
     }
 
+    /**
+     * Builds a CFG for the provided node.
+     *
+     * @param node the node for which to build a CFG.
+     */
     public void buildCFG(TypeLiteral node) {
-        throw new NotImplementedException();
+        throw new NotImplementedException(node);
     }
 
+    /**
+     * Builds a CFG for the provided node.
+     *
+     * @param node the node for which to build a CFG.
+     */
     public void buildCFG(TypeDeclarationStatement node) {
-        throw new NotImplementedException();
+        throw new NotImplementedException(node);
     }
 
+    /**
+     * Builds a CFG for the provided node.
+     *
+     * @param node the node for which to build a CFG.
+     * @return the list of basic blocks representing CFGs for each method in this type declaration
+     */
     public List<CFGBasicBlock> buildCFG(TypeDeclaration node) {
         if (!node.isInterface()) {
             List<CFGBasicBlock> results = new LinkedList<CFGBasicBlock>();
@@ -654,6 +785,14 @@ public class CFGBuilder {
         return Collections.emptyList();
     }
 
+    /**
+     * Builds a CFG for the provided node.
+     *
+     * @param node the node for which to build a CFG.
+     * @param state the blocks liveness state before current node
+     * @param throwers the thrower blocks information
+     * @return the blocks liveness state after current node
+     */
     public LivenessState buildCFG(TryStatement node, LivenessState state, ThrowerBlocks throwers) {
         final ThrowerBlocks localThrowers = new ThrowerBlocks();
 
@@ -705,10 +844,23 @@ public class CFGBuilder {
         }
     }
 
+    /**
+     * Builds a CFG for the provided node.
+     *
+     * @param node the node for which to build a CFG.
+     */
     public void buildCFG(WildcardType node) {
-        throw new NotImplementedException();
+        throw new NotImplementedException(node);
     }
 
+    /**
+     * Builds a CFG for the provided node.
+     *
+     * @param node the node for which to build a CFG.
+     * @param state the blocks liveness state before current node
+     * @param throwers the thrower blocks information
+     * @return the blocks liveness state after current node
+     */
     public LivenessState buildCFG(WhileStatement node, LivenessState state, ThrowerBlocks throwers) {
         final CFGBasicBlock conditionBlock = getCFGBasicBlock(node.getExpression(), state.nextStmtWillCreateNewBlock());
         addVariableAccess(conditionBlock, node.getExpression(), READ, throwers);
@@ -720,20 +872,46 @@ public class CFGBuilder {
         return liveAfterStmt.nextStmtWillCreateNewBlock();
     }
 
+    /**
+     * Builds a CFG for the provided node.
+     *
+     * @param node the node for which to build a CFG.
+     */
     public void buildCFG(VariableDeclarationFragment node) {
-        throw new NotImplementedException();
+        throw new NotImplementedException(node);
     }
 
+    /**
+     * Builds a CFG for the provided node.
+     *
+     * @param node the node for which to build a CFG.
+     * @param state the blocks liveness state before current node
+     * @param throwers the thrower blocks information
+     * @return the blocks liveness state after current node
+     */
     public LivenessState buildCFG(VariableDeclarationStatement node, LivenessState state, ThrowerBlocks throwers) {
         final CFGBasicBlock basicBlock = getCFGBasicBlock(node, state);
         addDeclarations(basicBlock, fragments(node), node.getType(), throwers);
         return getInBlockStmtResult(state, basicBlock);
     }
 
+    /**
+     * Builds a CFG for the provided node.
+     *
+     * @param node the node for which to build a CFG.
+     */
     public void buildCFG(VariableDeclarationExpression node) {
-        throw new NotImplementedException();
+        throw new NotImplementedException(node);
     }
 
+    /**
+     * Builds a CFG for the provided node.
+     *
+     * @param node the node for which to build a CFG.
+     * @param state the blocks liveness state before current node
+     * @param throwers the thrower blocks information
+     * @return the blocks liveness state after current node
+     */
     public LivenessState buildCFG(SwitchStatement node, LivenessState state, ThrowerBlocks throwers) {
         final CFGBasicBlock basicBlock = getCFGBasicBlock(node, state);
         final LivenessState liveBeforeBody = new LivenessState(basicBlock, new CFGEdgeBuilder(basicBlock));
@@ -744,6 +922,15 @@ public class CFGBuilder {
         return liveAfterBody.nextStmtWillCreateNewBlock();
     }
 
+    /**
+     * Builds a CFG for the provided node.
+     *
+     * @param node the node for which to build a CFG.
+     * @param switchConditionBasicBlock the basic block for the switch condition
+     * @param state the blocks liveness state before current node
+     * @param throwers the thrower blocks information
+     * @return the blocks liveness state after current node
+     */
     public LivenessState buildCFG(SwitchCase node, CFGBasicBlock switchConditionBasicBlock,
             LivenessState state, ThrowerBlocks throwers) {
         // the current live blocks will be empty if there was a break,
@@ -755,14 +942,32 @@ public class CFGBuilder {
         return state.nextStmtWillCreateNewBlock();
     }
 
+    /**
+     * Builds a CFG for the provided node.
+     *
+     * @param node the node for which to build a CFG.
+     */
     public void buildCFG(SuperMethodInvocation node) {
-        throw new NotImplementedException();
+        throw new NotImplementedException(node);
     }
 
+    /**
+     * Builds a CFG for the provided node.
+     *
+     * @param node the node for which to build a CFG.
+     */
     public void buildCFG(SuperFieldAccess node) {
-        throw new NotImplementedException();
+        throw new NotImplementedException(node);
     }
 
+    /**
+     * Builds a CFG for the provided node.
+     *
+     * @param node the node for which to build a CFG.
+     * @param state the blocks liveness state before current node
+     * @param throwers the thrower blocks information
+     * @return the blocks liveness state after current node
+     */
     public LivenessState buildCFG(SuperConstructorInvocation node, LivenessState state,
             ThrowerBlocks throwers) {
         final CFGBasicBlock basicBlock = getCFGBasicBlock(node, state);
@@ -770,10 +975,23 @@ public class CFGBuilder {
         return getInBlockStmtResult(state, basicBlock);
     }
 
+    /**
+     * Builds a CFG for the provided node.
+     *
+     * @param node the node for which to build a CFG.
+     */
     public void buildCFG(StringLiteral node) {
-        throw new NotImplementedException();
+        throw new NotImplementedException(node);
     }
 
+    /**
+     * Builds a CFG for the provided node.
+     *
+     * @param node the node for which to build a CFG.
+     * @param state the blocks liveness state before current node
+     * @param throwers the thrower blocks information
+     * @return the blocks liveness state after current node
+     */
     public LivenessState buildCFG(ThrowStatement node, LivenessState state, ThrowerBlocks throwers) {
         CFGBasicBlock basicBlock = getCFGBasicBlock(node, state);
         final Expression throwingExpr = node.getExpression();
@@ -782,18 +1000,41 @@ public class CFGBuilder {
         return state.nextStmtsAreDeadCode();
     }
 
+    /**
+     * Builds a CFG for the provided node.
+     *
+     * @param node the node for which to build a CFG.
+     */
     public void buildCFG(ThisExpression node) {
-        throw new NotImplementedException();
+        throw new NotImplementedException(node);
     }
 
+    /**
+     * Builds a CFG for the provided node.
+     *
+     * @param node the node for which to build a CFG.
+     */
     public void buildCFG(TextElement node) {
-        throw new NotImplementedException();
+        throw new NotImplementedException(node);
     }
 
+    /**
+     * Builds a CFG for the provided node.
+     *
+     * @param node the node for which to build a CFG.
+     */
     public void buildCFG(TagElement node) {
-        throw new NotImplementedException();
+        throw new NotImplementedException(node);
     }
 
+    /**
+     * Builds a CFG for the provided node.
+     *
+     * @param node the node for which to build a CFG.
+     * @param state the blocks liveness state before current node
+     * @param throwers the thrower blocks information
+     * @return the blocks liveness state after current node
+     */
     public LivenessState buildCFG(SynchronizedStatement node, LivenessState state, ThrowerBlocks throwers) {
         CFGBasicBlock basicBlock = getCFGBasicBlock(node, state.nextStmtWillCreateNewBlock());
         addVariableAccess(basicBlock, node.getExpression(), READ, throwers);
@@ -802,14 +1043,32 @@ public class CFGBuilder {
         return result.nextStmtWillCreateNewBlock();
     }
 
+    /**
+     * Builds a CFG for the provided node.
+     *
+     * @param node the node for which to build a CFG.
+     */
     public void buildCFG(CatchClause node) {
-        throw new NotImplementedException();
+        throw new NotImplementedException(node);
     }
 
+    /**
+     * Builds a CFG for the provided node.
+     *
+     * @param node the node for which to build a CFG.
+     */
     public void buildCFG(CastExpression node) {
-        throw new NotImplementedException();
+        throw new NotImplementedException(node);
     }
 
+    /**
+     * Builds a CFG for the provided node.
+     *
+     * @param node the node for which to build a CFG.
+     * @param state the blocks liveness state before current node
+     * @param throwers the thrower blocks information
+     * @return the blocks liveness state after current node
+     */
     public LivenessState buildCFG(BreakStatement node, LivenessState state, ThrowerBlocks throwers) {
         final CFGBasicBlock basicBlock = getCFGBasicBlock(node, state);
         final Statement targetStmt;
@@ -844,20 +1103,44 @@ public class CFGBuilder {
         return null;
     }
 
+    /**
+     * Builds a CFG for the provided node.
+     *
+     * @param node the node for which to build a CFG.
+     */
     public void buildCFG(BooleanLiteral node) {
-        throw new NotImplementedException();
+        throw new NotImplementedException(node);
     }
 
+    /**
+     * Builds a CFG for the provided node.
+     *
+     * @param node the node for which to build a CFG.
+     * @param state the blocks liveness state before current node
+     * @param throwers the thrower blocks information
+     * @return the blocks liveness state after current node
+     */
     public LivenessState buildCFG(ConstructorInvocation node, LivenessState state, ThrowerBlocks throwers) {
         final CFGBasicBlock basicBlock = getCFGBasicBlock(node, state);
         addVariableAccesses(basicBlock, arguments(node), READ, throwers);
         return getInBlockStmtResult(state, basicBlock);
     }
 
+    /**
+     * Builds a CFG for the provided node.
+     *
+     * @param node the node for which to build a CFG.
+     */
     public void buildCFG(ConditionalExpression node) {
-        throw new NotImplementedException();
+        throw new NotImplementedException(node);
     }
 
+    /**
+     * Builds a CFG for the provided node.
+     *
+     * @param node the node for which to build a CFG.
+     * @return the list of basic blocks representing CFGs for each method in this compilation unit
+     */
     public List<CFGBasicBlock> buildCFG(CompilationUnit node) {
         List<CFGBasicBlock> results = new LinkedList<CFGBasicBlock>();
         for (AbstractTypeDeclaration decl : (List<AbstractTypeDeclaration>) node.types()) {
@@ -870,26 +1153,59 @@ public class CFGBuilder {
         return results;
     }
 
+    /**
+     * Builds a CFG for the provided node.
+     *
+     * @param node the node for which to build a CFG.
+     */
     public void buildCFG(ClassInstanceCreation node) {
-        throw new NotImplementedException();
+        throw new NotImplementedException(node);
     }
 
+    /**
+     * Builds a CFG for the provided node.
+     *
+     * @param node the node for which to build a CFG.
+     */
     public void buildCFG(CharacterLiteral node) {
-        throw new NotImplementedException();
+        throw new NotImplementedException(node);
     }
 
+    /**
+     * Builds a CFG for the provided node.
+     *
+     * @param node the node for which to build a CFG.
+     */
     public void buildCFG(ArrayCreation node) {
-        throw new NotImplementedException();
+        throw new NotImplementedException(node);
     }
 
+    /**
+     * Builds a CFG for the provided node.
+     *
+     * @param node the node for which to build a CFG.
+     */
     public void buildCFG(ArrayAccess node) {
-        throw new NotImplementedException();
+        throw new NotImplementedException(node);
     }
 
+    /**
+     * Builds a CFG for the provided node.
+     *
+     * @param node the node for which to build a CFG.
+     */
     public void buildCFG(AnonymousClassDeclaration node) {
-        throw new NotImplementedException();
+        throw new NotImplementedException(node);
     }
 
+    /**
+     * Builds a CFG for the provided node.
+     *
+     * @param node the node for which to build a CFG.
+     * @param state the blocks liveness state before current node
+     * @param throwers the thrower blocks information
+     * @return the blocks liveness state after current node
+     */
     public LivenessState buildCFG(Block node, LivenessState state, ThrowerBlocks throwers) {
         LivenessState liveState = state;
         try {
@@ -956,10 +1272,23 @@ public class CFGBuilder {
         return liveState;
     }
 
+    /**
+     * Builds a CFG for the provided node.
+     *
+     * @param node the node for which to build a CFG.
+     */
     public void buildCFG(Assignment node) {
-        throw new NotImplementedException();
+        throw new NotImplementedException(node);
     }
 
+    /**
+     * Builds a CFG for the provided node.
+     *
+     * @param node the node for which to build a CFG.
+     * @param state the blocks liveness state before current node
+     * @param throwers the thrower blocks information
+     * @return the blocks liveness state after current node
+     */
     public LivenessState buildCFG(AssertStatement node, LivenessState state, ThrowerBlocks throwers) {
         CFGBasicBlock basicBlock = getCFGBasicBlock(node, state);
         addVariableAccess(basicBlock, node.getExpression(), READ, throwers);
@@ -967,38 +1296,60 @@ public class CFGBuilder {
         return getInBlockStmtResult(state, basicBlock);
     }
 
+    /**
+     * Builds a CFG for the provided node.
+     *
+     * @param node the node for which to build a CFG.
+     */
     public void buildCFG(ArrayType node) {
-        throw new NotImplementedException();
+        throw new NotImplementedException(node);
     }
 
+    /**
+     * Builds a CFG for the provided node.
+     *
+     * @param node the node for which to build a CFG.
+     */
     public void buildCFG(ArrayInitializer node) {
-        throw new NotImplementedException();
+        throw new NotImplementedException(node);
     }
 
+    /**
+     * Builds a CFG for the provided node.
+     *
+     * @param node the node for which to build a CFG.
+     */
     public void buildCFG(Initializer node) {
-        throw new NotImplementedException();
+        throw new NotImplementedException(node);
     }
 
+    /**
+     * Builds a CFG for the provided node.
+     *
+     * @param node the node for which to build a CFG.
+     */
     public void buildCFG(InstanceofExpression node) {
-        throw new NotImplementedException();
+        throw new NotImplementedException(node);
     }
 
+    /**
+     * Builds a CFG for the provided node.
+     *
+     * @param node the node for which to build a CFG.
+     */
     public void buildCFG(InfixExpression node) {
-        throw new NotImplementedException();
+        throw new NotImplementedException(node);
     }
 
     /**
      * Builds a CFG for the passed in statement.
      *
-     * @param node
-     *          the statement for which to build a CFG
-     * @param state
-     *          the liveness state before the current statement.
+     * @param node the statement for which to build a CFG
+     * @param state the liveness state before the current statement.
      *          It contains: the live edges before the current statement,
-     *          the live basic block to which the current statement might be
-     *          added.
-     *          If null, then the new basic block must be created for the
-     *          current statement.
+     *          the live basic block to which the current statement might be added.
+     *          If null, then the new basic block must be created for the current statement.
+     * @param throwers the thrower blocks information
      * @return the new live state after the current statement
      */
     public LivenessState buildCFG(IfStatement node, LivenessState state, ThrowerBlocks throwers) {
@@ -1071,15 +1422,36 @@ public class CFGBuilder {
         }
     }
 
+    /**
+     * Builds a CFG for the provided node.
+     *
+     * @param node the node for which to build a CFG.
+     */
     public void buildCFG(MemberRef node) {
-        throw new NotImplementedException();
+        throw new NotImplementedException(node);
     }
 
+    /**
+     * Builds a CFG for the provided node.
+     *
+     * @param node the node for which to build a CFG.
+     * @param state the blocks liveness state before current node
+     * @param throwers the thrower blocks information
+     * @return the blocks liveness state after current node
+     */
     public LivenessState buildCFG(LabeledStatement node, LivenessState state, ThrowerBlocks throwers) {
         // does not count as an executable node, so do not get a basic block for it
         return buildCFG(node.getBody(), state, throwers);
     }
 
+    /**
+     * Builds a CFG for the provided node.
+     *
+     * @param node the node for which to build a CFG.
+     * @param state the blocks liveness state before current node
+     * @param throwers the thrower blocks information
+     * @return the blocks liveness state after current node
+     */
     public LivenessState buildCFG(EnhancedForStatement node, LivenessState state, ThrowerBlocks throwers) {
         final CFGBasicBlock basicBlock = getCFGBasicBlock(node, state.nextStmtWillCreateNewBlock());
 
@@ -1094,6 +1466,14 @@ public class CFGBuilder {
         return liveAfterStmt.nextStmtWillCreateNewBlock();
     }
 
+    /**
+     * Builds a CFG for the provided node.
+     *
+     * @param node the node for which to build a CFG.
+     * @param state the blocks liveness state before current node
+     * @param throwers the thrower blocks information
+     * @return the blocks liveness state after current node
+     */
     public LivenessState buildCFG(EmptyStatement node, LivenessState state, ThrowerBlocks throwers) {
         CFGBasicBlock basicBlock = getCFGBasicBlock(node, state);
         return getInBlockStmtResult(state, basicBlock);
@@ -1107,6 +1487,14 @@ public class CFGBuilder {
         return state;
     }
 
+    /**
+     * Builds a CFG for the provided node.
+     *
+     * @param node the node for which to build a CFG.
+     * @param state the blocks liveness state before current node
+     * @param throwers the thrower blocks information
+     * @return the blocks liveness state after current node
+     */
     public LivenessState buildCFG(DoStatement node, LivenessState state, ThrowerBlocks throwers) {
         final CFGBasicBlock basicBlock = getCFGBasicBlock(node, state.nextStmtWillCreateNewBlock());
         final LivenessState newLiveState = new LivenessState(basicBlock, new CFGEdgeBuilder(basicBlock));
@@ -1122,6 +1510,14 @@ public class CFGBuilder {
         return liveAfterStmt;
     }
 
+    /**
+     * Builds a CFG for the provided node.
+     *
+     * @param node the node for which to build a CFG.
+     * @param state the blocks liveness state before current node
+     * @param throwers the thrower blocks information
+     * @return the blocks liveness state after current node
+     */
     public LivenessState buildCFG(ContinueStatement node, LivenessState state, ThrowerBlocks throwers) {
         final CFGBasicBlock basicBlock = getCFGBasicBlock(node, state);
         final Statement targetStmt;
@@ -1145,6 +1541,14 @@ public class CFGBuilder {
         return null;
     }
 
+    /**
+     * Builds a CFG for the provided node.
+     *
+     * @param node the node for which to build a CFG.
+     * @param state the blocks liveness state before current node
+     * @param throwers the thrower blocks information
+     * @return the blocks liveness state after current node
+     */
     public LivenessState buildCFG(ForStatement node, LivenessState state, ThrowerBlocks throwers) {
         final CFGBasicBlock initBlock = getCFGBasicBlock(initializers(node), state);
         final LivenessState initLiveBlock = LivenessState.of(new CFGEdgeBuilder(initBlock));
@@ -1170,14 +1574,32 @@ public class CFGBuilder {
         return liveAfterStmt.nextStmtWillCreateNewBlock();
     }
 
+    /**
+     * Builds a CFG for the provided node.
+     *
+     * @param node the node for which to build a CFG.
+     */
     public void buildCFG(FieldDeclaration node) {
-        throw new NotImplementedException();
+        throw new NotImplementedException(node);
     }
 
+    /**
+     * Builds a CFG for the provided node.
+     *
+     * @param node the node for which to build a CFG.
+     */
     public void buildCFG(FieldAccess node) {
-        throw new NotImplementedException();
+        throw new NotImplementedException(node);
     }
 
+    /**
+     * Builds a CFG for the provided node.
+     *
+     * @param node the node for which to build a CFG.
+     * @param state the blocks liveness state before current node
+     * @param throwers the thrower blocks information
+     * @return the blocks liveness state after current node
+     */
     public LivenessState buildCFG(ExpressionStatement node, LivenessState state, ThrowerBlocks throwers) {
         boolean isNewBlock = state.requireNewBlock();
         final CFGBasicBlock basicBlock = getCFGBasicBlock(node, state);

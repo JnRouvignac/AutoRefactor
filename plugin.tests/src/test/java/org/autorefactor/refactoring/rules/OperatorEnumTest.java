@@ -70,9 +70,8 @@ public class OperatorEnumTest {
 
     @Test
     public void compareSamePrecedenceOperators() {
-        final Iterator<Object[]> iter = getPairsOfOperatorsWithSamePrecedence();
-        while (iter.hasNext()) {
-            final Object[] args = (Object[]) iter.next();
+        for (final Iterator<Object[]> iter = getPairsOfOperatorsWithSamePrecedence(); iter.hasNext();) {
+            final Object[] args = iter.next();
             compareSamePrecedenceOperators((OperatorEnum) args[0], (OperatorEnum) args[1]);
         }
     }
@@ -83,9 +82,8 @@ public class OperatorEnumTest {
 
     @Test
     public void compareDifferentPrecedenceOperators() {
-        final Iterator<Object[]> iter = getPairsOfOperatorsWithDifferentPrecedence();
-        while (iter.hasNext()) {
-            final Object[] args = (Object[]) iter.next();
+        for (final Iterator<Object[]> iter = getPairsOfOperatorsWithDifferentPrecedence(); iter.hasNext();) {
+            final Object[] args = iter.next();
             compareDifferentPrecedenceOperators((OperatorEnum) args[0], (OperatorEnum) args[1]);
         }
     }

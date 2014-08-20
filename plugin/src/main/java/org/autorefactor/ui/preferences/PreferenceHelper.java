@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2013 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2013-2014 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,14 +25,23 @@
  */
 package org.autorefactor.ui.preferences;
 
-import static org.autorefactor.ui.preferences.PreferenceConstants.*;
-
+import org.autorefactor.ui.preferences.PreferenceConstants.Preference;
 import org.eclipse.jface.preference.IPreferenceStore;
 
+import static org.autorefactor.ui.preferences.PreferenceConstants.*;
+
+/**
+ * Helper class for Eclipse preferences.
+ */
 public class PreferenceHelper {
 
     private final IPreferenceStore preferenceStore;
 
+    /**
+     * Builds an instance of this class.
+     *
+     * @param preferenceStore the preference store
+     */
     public PreferenceHelper(IPreferenceStore preferenceStore) {
         this.preferenceStore = preferenceStore;
     }
@@ -41,14 +50,29 @@ public class PreferenceHelper {
         return preferenceStore.getBoolean(ADD_ANGLE_BRACKETS_TO_STATEMENT_BODIES.name);
     }
 
+    /**
+     * Returns whether debug mode is on.
+     *
+     * @return true if debug mode is on, false otherwise.
+     */
     public boolean debugModeOn() {
         return getBoolean(DEBUG_MODE_ON);
     }
 
+    /**
+     * Returns whether to remove 'this' keyword for accesses to non static methods.
+     *
+     * @return true if must remove 'this' keyword for accesses to non static methods, false otherwise
+     */
     public boolean removeThisForNonStaticMethodAccess() {
         return getBoolean(REMOVE_THIS_FOR_NON_STATIC_METHOD_ACCESS);
     }
 
+    /**
+     * Returns whether debug mode is on.
+     *
+     * @return true if debug mode is on, false otherwise.
+     */
     public boolean addAngleBracketsToStatementBodies() {
         return getBoolean(ADD_ANGLE_BRACKETS_TO_STATEMENT_BODIES);
     }

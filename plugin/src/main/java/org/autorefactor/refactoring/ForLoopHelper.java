@@ -49,14 +49,27 @@ public final class ForLoopHelper {
         super();
     }
 
+    /** The element container that the for loop iterates over. */
     public static enum ContainerType {
-        ARRAY, COLLECTION
+        /** Means the for loop iterates over an array. */
+        ARRAY,
+        /** Means the for loop iterates over a collection. */
+        COLLECTION
     }
 
+    /** The for loop iteration type. */
     public static enum IterationType {
-        INDEX, ITERATOR, FOREACH
+        /** The for loop iterates using an integer index. */
+        INDEX,
+        /** The for loop iterates using an iterator. */
+        ITERATOR,
+        /** The for loop iterates via a foreach. Technically this could be desugared by using an iterator. */
+        FOREACH
     }
 
+    /**
+     * The content of the for loop.
+     */
     public static final class ForLoopContent {
         private Name loopVariable;
         private Name elementVariable;
@@ -64,27 +77,58 @@ public final class ForLoopHelper {
         private ContainerType containerType;
         private IterationType iterationType;
 
+        /**
+         * Returns the name of the index variable.
+         *
+         * @return the name of the index variable
+         */
         public Name getLoopVariable() {
             return loopVariable;
         }
 
+        /**
+         * Returns the name of each elements extracted from the container.
+         *
+         * @return the name of each elements extracted from the container
+         */
         public Name getElementVariable() {
             return elementVariable;
         }
 
+        /**
+         * Returns the name of the container variable.
+         *
+         * @return the name of the container variable
+         */
         public Name getContainerVariable() {
             return containerVariable;
         }
 
+        /**
+         * Returns the container type.
+         *
+         * @return the container type
+         */
         public ContainerType getContainerType() {
             return containerType;
         }
 
+        /**
+         * Returns the for loop's iteration type.
+         *
+         * @return the for loop's iteration type
+         */
         public IterationType getIterationType() {
             return iterationType;
         }
     }
 
+    /**
+     * Returns the {@link ForLoopContent} if this for loop iterates over a container.
+     *
+     * @param node the for statement
+     * @return the {@link ForLoopContent} if this for loop iterates over a container, null otherwise
+     */
     public static ForLoopContent iterateOverContainer(ForStatement node) {
         final List<Expression> initializers = initializers(node);
         final Expression condition = node.getExpression();
@@ -158,12 +202,12 @@ public final class ForLoopHelper {
     private static ForLoopContent getIndexOnCollection(final Expression condition) {
         final InfixExpression ie = as(condition, InfixExpression.class);
         if (ie != null) {
-            final Expression lo = ie.getLeftOperand();
-            final Expression ro = ie.getRightOperand();
+            final Expression leftOp = ie.getLeftOperand();
+            final Expression rightOp = ie.getRightOperand();
             if (InfixExpression.Operator.LESS.equals(ie.getOperator())) {
-                return buildForLoopContent(lo, ro);
+                return buildForLoopContent(leftOp, rightOp);
             } else if (InfixExpression.Operator.GREATER.equals(ie.getOperator())) {
-                return buildForLoopContent(ro, lo);
+                return buildForLoopContent(rightOp, leftOp);
             }
         }
         return null;
@@ -173,11 +217,12 @@ public final class ForLoopHelper {
         if (containerVar instanceof MethodInvocation
                 && loopVar instanceof Name) {
             final MethodInvocation mi = (MethodInvocation) containerVar;
+            final Name containerVarName = as(mi.getExpression(), Name.class);
             if (isMethod(mi, "java.util.Collection", "size")
-                    && mi.getExpression() instanceof Name) {
+                    && containerVarName != null) {
                 final ForLoopContent content = new ForLoopContent();
                 content.loopVariable = (Name) loopVar;
-                content.containerVariable = (Name) mi.getExpression();
+                content.containerVariable = containerVarName;
                 content.containerType = ContainerType.COLLECTION;
                 content.iterationType = IterationType.INDEX;
                 return content;

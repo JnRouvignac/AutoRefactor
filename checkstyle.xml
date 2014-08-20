@@ -82,7 +82,7 @@
   </module>
   
   <!-- Require package-info.java for all packages -->
-  <!--module name="JavadocPackage" /-->
+  <module name="JavadocPackage" />
 
   <!--  Use header file template passed in from Maven -->
   <!--module name="RegexpHeader">
@@ -102,14 +102,14 @@
     
         JAVADOC COMMENTS
     
-    >
-TODO reenable
-    <!  Require Javadoc for all types regardless of scope >
+    -->
+
+    <!--  Require Javadoc for all types regardless of scope -->
     <module name="JavadocType">
       <property name="scope" value="protected" />
     </module>
     
-    <!  Require valid Javadoc for all protected and public members >
+    <!--  Require valid Javadoc for all protected and public members -->
     <module name="JavadocMethod">
       <property name="scope" value="protected" />
       <property name="allowUndeclaredRTE" value="true" />
@@ -119,23 +119,23 @@ TODO reenable
       <property name="scope" value="protected" />
     </module>
     
-    <!  If Javadoc is present then it must be valid >
+    <!--  If Javadoc is present then it must be valid -->
     <module name="JavadocStyle">
-      <property name="scope" value="private" />
+      <property name="scope" value="protected" />
       <property name="checkEmptyJavadoc" value="true" />
       <property name="endOfSentenceFormat" value="([.?!:][ \t\n\r\f&lt;])|([.?!:]$)" />
     </module>
 
-    <!  Javadoc should not contain author annotations >
+    <!--  Javadoc should not contain author annotations -->
     <module name="WriteTag">
       <property name="tag" value="@author"/>
       <property name="tagFormat" value="\S"/>
-      <! Ignore when not present >
+      <!-- Ignore when not present -->
       <property name="severity" value="ignore"/>
-      <! Warn when present >
+      <!-- Warn when present -->
       <property name="tagSeverity" value="error"/>
     </module>
--->
+
     <!--
     
         NAMING CONVENTIONS
