@@ -72,6 +72,7 @@ import org.eclipse.jdt.core.dom.ExpressionStatement;
 import org.eclipse.jdt.core.dom.FieldAccess;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.ForStatement;
+import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.InfixExpression;
@@ -297,9 +298,13 @@ public class CFGBuilder {
             ClassInstanceCreation cic = (ClassInstanceCreation) node;
             addVariableAccess(basicBlock, cic.getExpression(), flags, throwers);
             addVariableAccesses(basicBlock, cic.arguments(), flags, throwers);
-            ITypeBinding[] declaredThrows = cic.resolveConstructorBinding().getExceptionTypes();
-            throwers.addThrow(cic, declaredThrows);
-            return declaredThrows.length > 0;
+            IMethodBinding methodBinding = cic.resolveConstructorBinding();
+            if (methodBinding != null) {
+                ITypeBinding[] declaredThrows = methodBinding.getExceptionTypes();
+                throwers.addThrow(cic, declaredThrows);
+                return declaredThrows.length > 0;
+            }
+            return false;
         } else if (node instanceof ConditionalExpression) {
             ConditionalExpression ce = (ConditionalExpression) node;
             boolean mightThrow1 = addVariableAccess(basicBlock, ce.getExpression(), flags, throwers);
@@ -327,9 +332,13 @@ public class CFGBuilder {
             MethodInvocation mi = (MethodInvocation) node;
             addVariableAccess(basicBlock, mi.getExpression(), flags, throwers);
             addVariableAccesses(basicBlock, mi.arguments(), flags, throwers);
-            ITypeBinding[] declaredThrows = mi.resolveMethodBinding().getExceptionTypes();
-            throwers.addThrow(mi, declaredThrows);
-            return declaredThrows.length > 0;
+            IMethodBinding methodBinding = mi.resolveMethodBinding();
+            if (methodBinding != null) {
+                ITypeBinding[] declaredThrows = methodBinding.getExceptionTypes();
+                throwers.addThrow(mi, declaredThrows);
+                return declaredThrows.length > 0;
+            }
+            return false;
         } else if (node instanceof SimpleName) {
             SimpleName sn = (SimpleName) node;
             basicBlock.addVariableAccess(new VariableAccess(sn, flags));
@@ -361,9 +370,13 @@ public class CFGBuilder {
             SuperMethodInvocation smi = (SuperMethodInvocation) node;
             addVariableAccess(basicBlock, smi.getQualifier(), flags, throwers);
             addVariableAccess(basicBlock, smi.getName(), flags, throwers);
-            ITypeBinding[] declaredThrows = smi.resolveMethodBinding().getExceptionTypes();
-            throwers.addThrow(smi, declaredThrows);
-            return declaredThrows.length > 0;
+            IMethodBinding methodBinding = smi.resolveMethodBinding();
+            if (methodBinding != null) {
+                ITypeBinding[] declaredThrows = methodBinding.getExceptionTypes();
+                throwers.addThrow(smi, declaredThrows);
+                return declaredThrows.length > 0;
+            }
+            return false;
         } else if (node instanceof ThisExpression) {
             ThisExpression te = (ThisExpression) node;
             // TODO JNR remember use of "this" here

@@ -1,3 +1,28 @@
+/*
+ * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
+ *
+ * Copyright (C) 2014 Jean-Noël Rouvignac - initial API and implementation
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program under LICENSE-GNUGPL.  If not, see
+ * <http://www.gnu.org/licenses/>.
+ *
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution under LICENSE-ECLIPSE, and is
+ * available at http://www.eclipse.org/legal/epl-v10.html
+ */
 package org.autorefactor.util;
 
 /**
@@ -10,27 +35,6 @@ public final class Utils {
     }
 
     /**
-     * Returns whether the two provided objects are equal according to some basic checks.
-     *
-     * @param obj1 the first object to compare for equality
-     * @param obj2 the second object to compare for equality
-     * @return {@link Boolean#TRUE} if the two provided objects are equal according to some basic checks,
-     *         {@link Boolean#FALSE} if they are not equal,
-     *         and <code>null</code> if test is unconclusive.
-     */
-    public static Boolean basicEqual(Object obj1, Object obj2) {
-        if (obj1 == obj2) {
-            return Boolean.TRUE;
-        }
-        if (obj1 == null
-                || obj2 == null
-                ||  obj1.getClass() != obj2.getClass()) {
-            return Boolean.FALSE;
-        }
-        return null;
-    }
-
-    /**
      * Returns whether the two provided objects are equal.
      *
      * @param obj1 the first object to compare for equality
@@ -38,6 +42,20 @@ public final class Utils {
      * @return true if the two provided objects are equal, false otherwise.
      */
     public static boolean equal(Object obj1, Object obj2) {
+        if (obj1 == null) {
+            return obj2 == null;
+        }
+        return obj1.equals(obj2);
+    }
+
+    /**
+     * Returns whether the two provided objects are equal and not null.
+     *
+     * @param obj1 the first object to compare for equality
+     * @param obj2 the second object to compare for equality
+     * @return true if the two provided objects are equal and not null, false otherwise.
+     */
+    public static boolean equalNotNull(Object obj1, Object obj2) {
         return obj1 != null && obj1.equals(obj2);
     }
 

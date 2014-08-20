@@ -120,9 +120,11 @@ public class CFGEdge {
     /** {@inheritDoc} */
     @Override
     public boolean equals(Object obj) {
-        final Boolean equal = basicEqual(this, obj);
-        if (equal != null) {
-            return equal;
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
         }
         final CFGEdge other = (CFGEdge) obj;
         return equal(condition, other.condition)

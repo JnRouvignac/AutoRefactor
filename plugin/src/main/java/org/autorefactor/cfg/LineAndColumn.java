@@ -1,28 +1,27 @@
 /*
- * CDDL HEADER START
+ * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * The contents of this file are subject to the terms of the
- * Common Development and Distribution License, Version 1.0 only
- * (the "License").    You may not use this file except in compliance
- * with the License.
+ * Copyright (C) 2014 Jean-Noël Rouvignac - initial API and implementation
  *
- * You can obtain a copy of the license at
- * trunk/opends/resource/legal-notices/OpenDS.LICENSE
- * or https://OpenDS.dev.java.net/OpenDS.LICENSE.
- * See the License for the specific language governing permissions
- * and limitations under the License.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * any later version.
  *
- * When distributing Covered Code, include this CDDL HEADER in each
- * file and include the License file at
- * trunk/opends/resource/legal-notices/OpenDS.LICENSE.    If applicable,
- * add the following below this CDDL HEADER, with the fields enclosed
- * by brackets "[]" replaced with your own identifying information:
- *            Portions Copyright [yyyy] [name of copyright owner]
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * CDDL HEADER END
+ * You should have received a copy of the GNU General Public License
+ * along with this program under LICENSE-GNUGPL.  If not, see
+ * <http://www.gnu.org/licenses/>.
  *
  *
- *            Copyright 2013 ForgeRock AS
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution under LICENSE-ECLIPSE, and is
+ * available at http://www.eclipse.org/legal/epl-v10.html
  */
 package org.autorefactor.cfg;
 
@@ -59,9 +58,11 @@ class LineAndColumn {
     /** {@inheritDoc} */
     @Override
     public boolean equals(Object obj) {
-        final Boolean equal = basicEqual(this, obj);
-        if (equal != null) {
-            return equal;
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
         }
         final LineAndColumn other = (LineAndColumn) obj;
         return equal(startPosition, other.startPosition);

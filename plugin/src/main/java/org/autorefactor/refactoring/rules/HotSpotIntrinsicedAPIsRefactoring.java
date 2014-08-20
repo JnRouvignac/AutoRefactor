@@ -36,7 +36,6 @@ import org.eclipse.jdt.core.dom.ArrayAccess;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.Expression;
-import org.eclipse.jdt.core.dom.ExpressionStatement;
 import org.eclipse.jdt.core.dom.ForStatement;
 import org.eclipse.jdt.core.dom.IBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;
@@ -60,7 +59,7 @@ import static org.autorefactor.refactoring.ASTHelper.*;
 public class HotSpotIntrinsicedAPIsRefactoring extends ASTVisitor implements
         IJavaRefactoring {
 
-    private class SystemArrayCopyParams {
+    private static class SystemArrayCopyParams {
         private IVariableBinding indexVarBinding;
         private Expression indexStartPos;
         private Expression srcArrayExpr;
@@ -93,9 +92,8 @@ public class HotSpotIntrinsicedAPIsRefactoring extends ASTVisitor implements
                 && stmts.size() == 1) {
             collectLength(node.getExpression(), incrementedIdx, params);
 
-            final Statement stmt = stmts.get(0);
-            if (stmt instanceof ExpressionStatement) {
-                final Assignment as = asExpression(stmt, Assignment.class);
+            final Assignment as = asExpression(stmts.get(0), Assignment.class);
+            if (as != null) {
                 final Expression lhs = as.getLeftHandSide();
                 final Expression rhs = as.getRightHandSide();
                 if (lhs instanceof ArrayAccess && rhs instanceof ArrayAccess) {

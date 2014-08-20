@@ -34,7 +34,6 @@ import org.eclipse.jdt.core.dom.ArrayInitializer;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.Expression;
-import org.eclipse.jdt.core.dom.ExpressionStatement;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.ReturnStatement;
@@ -79,7 +78,7 @@ public class RemoveUnnecessaryLocalBeforeReturnRefactoring extends ASTVisitor
                             vdf.getInitializer());
                 }
             }
-        } else if (previousSibling instanceof ExpressionStatement) {
+        } else {
             final Assignment as = asExpression(previousSibling, Assignment.class);
             final Expression origExpr = node.getExpression();
             if (as != null && Assignment.Operator.ASSIGN.equals(as.getOperator())) {

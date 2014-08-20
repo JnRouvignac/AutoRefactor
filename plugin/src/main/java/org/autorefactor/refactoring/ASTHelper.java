@@ -354,7 +354,8 @@ public final class ASTHelper {
     }
 
     /**
-     * Returns the {@link Expression} of a specified type out of an {@link ExpressionStatement}.
+     * Returns the {@link Expression} of a specified type out of the provided {@link Statement}.
+     * Note the provided statement is first converted to an {@link ExpressionStatement} if possible.
      *
      * @param <T> the required expression type
      * @param stmt the statement

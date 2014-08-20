@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2013 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2013-2014 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -150,9 +150,11 @@ public class SourceLocation implements ISourceRange, Comparable<ISourceRange> {
     /** {@inheritDoc} */
     @Override
     public boolean equals(Object obj) {
-        final Boolean equal = basicEqual(this, obj);
-        if (equal != null) {
-            return equal;
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
         }
         final SourceLocation other = (SourceLocation) obj;
         return equal(length, other.length)

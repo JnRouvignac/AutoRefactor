@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2013 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2013-2014 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -66,6 +66,7 @@ import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 import org.eclipse.jdt.core.dom.WhileStatement;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
+import static org.autorefactor.util.Utils.*;
 
 /**
  * Reduces the scope of local variables.
@@ -217,12 +218,9 @@ public class ReduceVariableScopeRefactoring extends ASTVisitor implements
                 this.allVariableAccesses.put(varName, list);
             }
             if (list.size() == 0
-                    || !list.get(list.size() - 1).getScope()
-                            .equals(accessTypeAndScope.getSecond())) {
+                    || !list.get(list.size() - 1).getScope().equals(accessTypeAndScope.getSecond())) {
                 // only keep first write in scope
-                list.add(new VariableAccess(node,
-                        accessTypeAndScope.getFirst(), accessTypeAndScope
-                                .getSecond()));
+                list.add(new VariableAccess(node, accessTypeAndScope.getFirst(), accessTypeAndScope.getSecond()));
             }
         }
     }
@@ -311,11 +309,8 @@ public class ReduceVariableScopeRefactoring extends ASTVisitor implements
                 final Expression parentExpr = getParentOfType(varName, Expression.class);  // FIXME i=0
                 final Statement parentStmt = getParentOfType(parentExpr, Statement.class); // FIXME i=0
                 if (stmt.equals(parentStmt)) {
-                    final VariableDeclarationFragment vdf = getVariableDeclarationFragment(
-                            parentExpr, varName);
-
-                    final VariableDeclarationStatement vds = ast
-                            .newVariableDeclarationStatement(vdf);
+                    final VariableDeclarationFragment vdf = getVariableDeclarationFragment(parentExpr, varName);
+                    final VariableDeclarationStatement vds = ast.newVariableDeclarationStatement(vdf);
                     vds.setType(varType);
                     this.ctx.getRefactorings().replace(stmt, vds);
                     break;
@@ -326,9 +321,8 @@ public class ReduceVariableScopeRefactoring extends ASTVisitor implements
             final EnhancedForStatement newEfs = copySubtree(ast, efs);
             newEfs.setParameter(copySubtree(ast, efs.getParameter()));
             newEfs.setExpression(copySubtree(ast, efs.getExpression()));
-            final Statement parentStmt = getParentOfType(varName,
-                    Statement.class);
-            if (efs.getBody() != null && efs.getBody().equals(parentStmt)) {
+            final Statement parentStmt = getParentOfType(varName, Statement.class);
+            if (equalNotNull(efs.getBody(), parentStmt)) {
                 newEfs.setBody(copy(efs.getBody(), varName));
             }
             this.ctx.getRefactorings().replace(efs, newEfs);
@@ -338,16 +332,13 @@ public class ReduceVariableScopeRefactoring extends ASTVisitor implements
             final List<Expression> initializers = initializers(newFs);
             if (initializers.size() == 1) {
                 final Expression init = initializers.remove(0);
-                final VariableDeclarationFragment vdf = getVariableDeclarationFragment(
-                        init, varName);
-                final VariableDeclarationExpression vde = ast
-                        .newVariableDeclarationExpression(vdf);
+                final VariableDeclarationFragment vdf = getVariableDeclarationFragment(init, varName);
+                final VariableDeclarationExpression vde = ast.newVariableDeclarationExpression(vdf);
                 vde.setType(varType);
                 initializers.add(vde);
                 this.ctx.getRefactorings().replace(fs, newFs);
                 // TODO JNR
-                // if (fs.getBody() != null && fs.getBody().equals(parentStmt))
-                // {
+                // if (equalNotNull(fs.getBody(), parentStmt)) {
                 // newFs.setBody(copy(fs.getBody()));
                 // }
             } else {
@@ -357,9 +348,8 @@ public class ReduceVariableScopeRefactoring extends ASTVisitor implements
             final WhileStatement ws = (WhileStatement) scope;
             final WhileStatement newWs = ast.newWhileStatement();
             newWs.setExpression(copySubtree(ast, ws.getExpression()));
-            final Statement parentStmt = getParentOfType(varName,
-                    Statement.class);
-            if (ws.getBody() != null && ws.getBody().equals(parentStmt)) {
+            final Statement parentStmt = getParentOfType(varName, Statement.class);
+            if (equalNotNull(ws.getBody(), parentStmt)) {
                 newWs.setBody(copy(ws.getBody(), varName));
             }
             this.ctx.getRefactorings().replace(ws, newWs);
@@ -367,17 +357,14 @@ public class ReduceVariableScopeRefactoring extends ASTVisitor implements
             final IfStatement is = (IfStatement) scope;
             final IfStatement newIs = ast.newIfStatement();
             newIs.setExpression(copySubtree(ast, is.getExpression()));
-            final Statement parentStmt = getParentOfType(varName,
-                    Statement.class);
-            if (is.getThenStatement() != null
-                    && is.getThenStatement().equals(parentStmt)) {
+            final Statement parentStmt = getParentOfType(varName, Statement.class);
+            if (equalNotNull(is.getThenStatement(), parentStmt)) {
                 newIs.setThenStatement(copy(is.getThenStatement(), varName));
                 if (is.getElseStatement() != null) {
                     newIs.setElseStatement(copySubtree(ast, is.getElseStatement()));
                 }
                 this.ctx.getRefactorings().replace(is, newIs);
-            } else if (is.getElseStatement() != null
-                    && is.getElseStatement().equals(parentStmt)) {
+            } else if (equalNotNull(is.getElseStatement(), parentStmt)) {
                 if (is.getThenStatement() != null) {
                     newIs.setThenStatement(copySubtree(ast, is.getThenStatement()));
                 }
@@ -385,8 +372,7 @@ public class ReduceVariableScopeRefactoring extends ASTVisitor implements
                 this.ctx.getRefactorings().replace(is, newIs);
             } else {
                 throw new IllegalStateException(
-                        "Parent statement should be inside the then or else statement of this if statement: "
-                                + is);
+                        "Parent statement should be inside the then or else statement of this if statement: " + is);
             }
         } else {
             throw new NotImplementedException(scope);
@@ -396,18 +382,16 @@ public class ReduceVariableScopeRefactoring extends ASTVisitor implements
     private Block copy(Statement stmtToCopy, Name varName) {
         if (stmtToCopy != null && !(stmtToCopy instanceof Block)) {
             final Block b = this.ctx.getAST().newBlock();
-            if (stmtToCopy instanceof ExpressionStatement) {
-                final Assignment a = asExpression(stmtToCopy, Assignment.class);
-                final VariableDeclarationFragment vdf = getVariableDeclarationFragment(
-                        a, varName);
+            final Assignment a = asExpression(stmtToCopy, Assignment.class);
+            if (a != null) {
+                final VariableDeclarationFragment vdf = getVariableDeclarationFragment(a, varName);
                 statements(b).add(this.ctx.getAST().newVariableDeclarationStatement(vdf));
             } else {
                 throw new NotImplementedException(stmtToCopy);
             }
             return b;
         }
-        // We should never come here if we had a Block statement, see the
-        // replace() method
+        // We should never come here if we had a Block statement, see the replace() method
         throw new NotImplementedException(stmtToCopy);
     }
 
@@ -428,19 +412,16 @@ public class ReduceVariableScopeRefactoring extends ASTVisitor implements
         return getType(node.getParent());
     }
 
-    private VariableDeclarationFragment getVariableDeclarationFragment(
-            final Expression exprToReplace, final Name varName) {
+    private VariableDeclarationFragment getVariableDeclarationFragment(Expression exprToReplace, Name varName) {
         if (exprToReplace instanceof Assignment) {
             final Assignment a = (Assignment) exprToReplace;
             if (a.getLeftHandSide() instanceof SimpleName) {
                 final SimpleName sn = (SimpleName) a.getLeftHandSide();
-                if (sn.getFullyQualifiedName().equals(
-                        varName.getFullyQualifiedName())) {
-                    final VariableDeclarationFragment vdf = this.ctx.getAST()
-                            .newVariableDeclarationFragment();
-                    vdf.setInitializer(copySubtree(this.ctx.getAST(),
-                            a.getRightHandSide()));
-                    vdf.setName(copySubtree(this.ctx.getAST(), sn));
+                if (sn.getFullyQualifiedName().equals(varName.getFullyQualifiedName())) {
+                    final AST ast = this.ctx.getAST();
+                    final VariableDeclarationFragment vdf = ast.newVariableDeclarationFragment();
+                    vdf.setInitializer(copySubtree(ast, a.getRightHandSide()));
+                    vdf.setName(copySubtree(ast, sn));
                     return vdf;
                 }
             }
@@ -457,8 +438,7 @@ public class ReduceVariableScopeRefactoring extends ASTVisitor implements
         }
     }
 
-    private boolean canReduceVariableScope(
-            final List<VariableAccess> variableAccesses) {
+    private boolean canReduceVariableScope(final List<VariableAccess> variableAccesses) {
         final VariableAccess varDecl = variableAccesses.get(0);
 
         VariableAccess lastWrite = null;
@@ -470,8 +450,7 @@ public class ReduceVariableScopeRefactoring extends ASTVisitor implements
                 // is read
                 if (lastWrite != null
                         && !isReadDominatedByWriteInScopeMoreReducedThanVariableScope(
-                                varAccess.getScope(), lastWrite.getScope(),
-                                varDecl.getScope())) {
+                                varAccess.getScope(), lastWrite.getScope(), varDecl.getScope())) {
                     // TODO JNR return sublist of reduceable scope
                     return false;
                 }

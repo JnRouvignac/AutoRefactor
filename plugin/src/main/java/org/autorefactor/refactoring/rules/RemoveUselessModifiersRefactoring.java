@@ -67,7 +67,7 @@ import static org.autorefactor.refactoring.ASTHelper.*;
 public class RemoveUselessModifiersRefactoring extends ASTVisitor implements
         IJavaRefactoring {
 
-    private final class ModifierOrderComparator implements Comparator<Modifier> {
+    private static final class ModifierOrderComparator implements Comparator<Modifier> {
 
         public int compare(Modifier o1, Modifier o2) {
             final int i1 = ORDERED_MODIFIERS.indexOf(o1.getKeyword());

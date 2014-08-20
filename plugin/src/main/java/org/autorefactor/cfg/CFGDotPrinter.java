@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2013 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2013-2014 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -61,7 +61,7 @@ public class CFGDotPrinter {
     // - node label of the form: var name + line, column + R, W, Decl
     // - use separate colors?
 
-    private final class CFGSubGraph {
+    private static final class CFGSubGraph {
 
         private final String codeExcerpt;
         private final int startPosition;
@@ -74,7 +74,7 @@ public class CFGDotPrinter {
         }
     }
 
-    private final class CFGEdgeComparator implements Comparator<CFGEdge> {
+    private static final class CFGEdgeComparator implements Comparator<CFGEdge> {
 
         public int compare(CFGEdge e1, CFGEdge e2) {
             final int cmp = e1.getSourceBlock().compareTo(e2.getSourceBlock());
