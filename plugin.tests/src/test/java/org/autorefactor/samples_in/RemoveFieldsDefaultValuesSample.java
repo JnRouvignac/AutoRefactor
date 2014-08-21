@@ -29,6 +29,8 @@ public class RemoveFieldsDefaultValuesSample {
 
     private static final int MY_CONSTANT = 0;
 
+    private Object doNotRemoveInitializer = new Object();
+
     private Object obj = null;
     private String st = null;
     private byte by1 = 0x0, by2 = 0;

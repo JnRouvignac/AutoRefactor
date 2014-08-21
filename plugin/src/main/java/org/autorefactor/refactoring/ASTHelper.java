@@ -337,6 +337,16 @@ public final class ASTHelper {
     }
 
     /**
+     * Returns whether the provided expression represents a {@link NullLiteral} ignoring parentheses.
+     *
+     * @param expr the expression to check
+     * @return true if the provided expression represents a {@link NullLiteral} ignoring parentheses, false otherwise
+     */
+    public static boolean isNullLiteral(Expression expr) {
+        return as(expr, NullLiteral.class) != null;
+    }
+
+    /**
      * If the provided expression collection only has one element,
      * then that unique expression is cast to an object of the provided type if type matches.
      *

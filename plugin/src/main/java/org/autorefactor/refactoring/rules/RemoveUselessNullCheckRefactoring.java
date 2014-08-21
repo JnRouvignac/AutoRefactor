@@ -40,7 +40,6 @@ import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.InfixExpression;
-import org.eclipse.jdt.core.dom.NullLiteral;
 import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.Statement;
 
@@ -82,13 +81,11 @@ public class RemoveUselessNullCheckRefactoring extends ASTVisitor implements
                     && ASSIGN.equals(thenAs.getOperator())
                     && ASSIGN.equals(elseAs.getOperator())
                     && match(matcher, thenAs.getLeftHandSide(), elseAs.getLeftHandSide())) {
-                boolean thenStmtAssignsNull = as(thenAs.getRightHandSide(), NullLiteral.class) != null;
-                boolean elseStmtAssignsNull = as(elseAs.getRightHandSide(), NullLiteral.class) != null;
                 if (InfixExpression.Operator.EQUALS.equals(condition.getOperator())
-                        && thenStmtAssignsNull) {
+                        && isNullLiteral(thenAs.getRightHandSide())) {
                     return replaceWithStraightAssign(node, condition, elseAs);
                 } else if (InfixExpression.Operator.NOT_EQUALS.equals(condition.getOperator())
-                        && elseStmtAssignsNull) {
+                        && isNullLiteral(elseAs.getRightHandSide())) {
                     return replaceWithStraightAssign(node, condition, thenAs);
                 }
             } else {
@@ -107,12 +104,10 @@ public class RemoveUselessNullCheckRefactoring extends ASTVisitor implements
     }
 
     private boolean replaceWithStraightAssign(IfStatement node, InfixExpression condition, Assignment as) {
-        boolean conditionLeftOpIsNull = as(condition.getLeftOperand(), NullLiteral.class) != null;
-        boolean conditionRightOpIsNull = as(condition.getRightOperand(), NullLiteral.class) != null;
-        if (conditionRightOpIsNull
+        if (isNullLiteral(condition.getRightOperand())
                 && match(matcher, condition.getLeftOperand(), as.getRightHandSide())) {
             return replaceWithStraightAssign(node, as.getLeftHandSide(), condition.getLeftOperand());
-        } else if (conditionLeftOpIsNull
+        } else if (isNullLiteral(condition.getLeftOperand())
                 && match(matcher, condition.getRightOperand(), as.getRightHandSide())) {
             return replaceWithStraightAssign(node, as.getLeftHandSide(), condition.getRightOperand());
         }
@@ -131,12 +126,10 @@ public class RemoveUselessNullCheckRefactoring extends ASTVisitor implements
     }
 
     private boolean replaceWithStraightReturn(IfStatement node, InfixExpression condition, ReturnStatement rs) {
-        boolean conditionLeftOpIsNull = as(condition.getLeftOperand(), NullLiteral.class) != null;
-        boolean conditionRightOpIsNull = as(condition.getRightOperand(), NullLiteral.class) != null;
-        if (conditionRightOpIsNull
+        if (isNullLiteral(condition.getRightOperand())
                 && match(matcher, condition.getLeftOperand(), rs.getExpression())) {
             return replaceWithStraightReturn(node, condition.getLeftOperand());
-        } else if (conditionLeftOpIsNull
+        } else if (isNullLiteral(condition.getLeftOperand())
                 && match(matcher, condition.getRightOperand(), rs.getExpression())) {
             return replaceWithStraightReturn(node, condition.getRightOperand());
         }

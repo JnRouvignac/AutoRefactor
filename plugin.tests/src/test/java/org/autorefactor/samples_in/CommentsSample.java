@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2013 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2013-2014 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -55,9 +55,9 @@ public class CommentsSample implements Runnable {
     public static void main(String[] args) {
         // remove block comment just below
         /*
-         * 
+         *
          */
-        //    
+        //
         // remove comment lines just above and below
         //
 
@@ -80,6 +80,21 @@ public class CommentsSample implements Runnable {
          * This is a blockcomment that must be kept
          */
         // This is a linecomment that must be kept
+    }
+
+    /**
+     * Add period at the end of this line
+     * @param i an integer argument
+     */
+    public int test3(int i) {
+        return i;
+    }
+
+    /**
+     * Do not add period at the end of this
+     * line!
+     */
+    public void test4() {
     }
 
     /**

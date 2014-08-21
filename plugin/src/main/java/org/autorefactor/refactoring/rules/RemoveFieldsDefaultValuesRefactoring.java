@@ -35,6 +35,7 @@ import org.autorefactor.refactoring.IJavaRefactoring;
 import org.autorefactor.refactoring.Refactorings;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.CompilationUnit;
+import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.IExtendedModifier;
 import org.eclipse.jdt.core.dom.ITypeBinding;
@@ -72,16 +73,18 @@ public class RemoveFieldsDefaultValuesRefactoring extends ASTVisitor implements
         }
         boolean visitSubtree = VISIT_SUBTREE;
         for (VariableDeclarationFragment vdf : fragments(node)) {
-            if (vdf.getInitializer() != null) {
-                final Object val = vdf.getInitializer().resolveConstantExpressionValue();
-                if (val == null
-                        && !fieldType.isPrimitive()) {
-                    this.ctx.getRefactorings().remove(vdf.getInitializer());
+            final Expression initializer = vdf.getInitializer();
+            if (initializer != null) {
+                final Object val = initializer.resolveConstantExpressionValue();
+                if (val == null // Only means that no constant value could be determined
+                        && !fieldType.isPrimitive()
+                        && isNullLiteral(initializer)) {
+                    this.ctx.getRefactorings().remove(initializer);
                     visitSubtree = DO_NOT_VISIT_SUBTREE;
                 } else if (val != null
                         && fieldType.isPrimitive()
                         && isPrimitiveDefaultValue(val)) {
-                    this.ctx.getRefactorings().remove(vdf.getInitializer());
+                    this.ctx.getRefactorings().remove(initializer);
                     visitSubtree = DO_NOT_VISIT_SUBTREE;
                 }
             }

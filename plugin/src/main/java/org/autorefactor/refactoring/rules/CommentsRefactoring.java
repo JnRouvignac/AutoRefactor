@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2013 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2013-2014 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -78,7 +78,8 @@ public class CommentsRefactoring extends ASTVisitor implements IJavaRefactoring 
             +   "(?:TODO: handle exception)"
             + ")"
             + "\\s*");
-    private static final Pattern JAVADOC_WITHOUT_FINAL_DOT =
+    private static final Pattern JAVADOC_HAS_PUNCTUATION = Pattern.compile("\\.|\\?|!|:");
+    private static final Pattern JAVADOC_WITHOUT_PUNCTUATION =
             Pattern.compile("(.*?)((?:\\s*(?:\\r|\\n|\\r\\n)*\\s*)*\\*/)", Pattern.DOTALL);
     private static final Pattern JAVADOC_FIRST_LETTER_LOWERCASE =
             Pattern.compile("(/\\*\\*(?:\\s*\\*(?:\\r|\\n|\\r\\n|\\s)))*(\\w)(.*)", Pattern.DOTALL);
@@ -93,6 +94,7 @@ public class CommentsRefactoring extends ASTVisitor implements IJavaRefactoring 
     }
 
     /** {@inheritDoc} */
+    @Override
     public void setRefactoringContext(RefactoringContext ctx) {
         this.ctx = ctx;
     }
@@ -162,15 +164,14 @@ public class CommentsRefactoring extends ASTVisitor implements IJavaRefactoring 
         } else if (!acceptJavadoc(getNextNode(node))) {
             this.ctx.getRefactorings().replace(node, comment.replace("/**", "/*"));
             return DO_NOT_VISIT_SUBTREE;
-        } else if (!comment.contains(".")) {
-            Matcher matcher = JAVADOC_WITHOUT_FINAL_DOT.matcher(comment);
-            if (matcher.matches()) {
-                String newComment = matcher.group(1) + "." + matcher.group(2);
+        } else if (!JAVADOC_HAS_PUNCTUATION.matcher(comment).find()) {
+            final String newComment = addPeriodAtEndOfFirstLine(node, comment);
+            if (newComment != null) {
                 this.ctx.getRefactorings().replace(node, newComment);
                 return DO_NOT_VISIT_SUBTREE;
             }
         } else {
-            Matcher m = JAVADOC_FIRST_LETTER_LOWERCASE.matcher(comment);
+            final Matcher m = JAVADOC_FIRST_LETTER_LOWERCASE.matcher(comment);
             if (m.matches() && Character.isLowerCase(m.group(2).charAt(0))) {
                 String newComment = m.group(1) + m.group(2).toUpperCase() + m.group(3);
                 if (!newComment.equals(comment)) {
@@ -180,6 +181,21 @@ public class CommentsRefactoring extends ASTVisitor implements IJavaRefactoring 
             }
         }
         return VISIT_SUBTREE;
+    }
+
+    private String addPeriodAtEndOfFirstLine(Javadoc node, String comment) {
+        final Matcher matcher = JAVADOC_WITHOUT_PUNCTUATION.matcher(comment);
+        if (matcher.matches()) {
+            final List<TagElement> tagElements = tags(node);
+            if (tagElements.size() >= 2) {
+                final TagElement firstLine = tagElements.get(0);
+                final int relativeStart = firstLine.getStartPosition() - node.getStartPosition();
+                final int endOfFirstLine = relativeStart + firstLine.getLength();
+                return comment.substring(0, endOfFirstLine) + "." + comment.substring(endOfFirstLine);
+            }
+            return matcher.group(1) + "." + matcher.group(2);
+        }
+        return null;
     }
 
     private boolean allTagsEmpty(List<TagElement> tags) {
@@ -370,6 +386,7 @@ public class CommentsRefactoring extends ASTVisitor implements IJavaRefactoring 
     }
 
     /** {@inheritDoc} */
+    @Override
     public Refactorings getRefactorings(CompilationUnit astRoot) {
         return this.ctx.getRefactorings();
     }
