@@ -1102,9 +1102,10 @@ public final class ASTHelper {
     private static IMethodBinding findOverridenMethod(String methodName, String[] parameterTypesQualifiedNames,
             IMethodBinding[] declaredMethods) {
         for (IMethodBinding methodBinding : declaredMethods) {
+            final IMethodBinding methodDecl = methodBinding.getMethodDeclaration();
             if (methodBinding.getName().equals(methodName)
-                    && concreteTypesMatch(methodBinding.getMethodDeclaration()
-                        .getParameterTypes(), parameterTypesQualifiedNames)) {
+                    && methodDecl != null
+                    && concreteTypesMatch(methodDecl.getParameterTypes(), parameterTypesQualifiedNames)) {
                 return methodBinding;
             }
         }

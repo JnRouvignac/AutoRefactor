@@ -43,7 +43,7 @@ public class SourceCode {
     /**
      * Represents a line in a source file.
      */
-    public class Line extends SourceLocation {
+    public static class Line extends SourceLocation {
 
         private String lineText;
         private SourceCode sourceCode;
