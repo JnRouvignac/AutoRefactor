@@ -26,12 +26,16 @@
 package org.autorefactor.refactoring;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.autorefactor.util.Pair;
+import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.BlockComment;
 import org.eclipse.jdt.core.dom.Comment;
 import org.eclipse.jdt.core.dom.LineComment;
@@ -50,10 +54,10 @@ public class ASTCommentRewriter {
      * Using a Set to avoid duplicates because Javadocs are visited twice via
      * CompilationUnit.getCommentList() and visit(Javadoc).
      */
-    private Set<Comment> removals = new LinkedHashSet<Comment>();
-    private Set<Pair<Comment, String>> replacements = new LinkedHashSet<Pair<Comment, String>>();
-    private List<BlockComment> blockCommentToJavadoc = new ArrayList<BlockComment>();
-    private List<List<LineComment>> lineCommentsToJavadoc = new ArrayList<List<LineComment>>();
+    private final Set<Comment> removals = new LinkedHashSet<Comment>();
+    private final Set<Pair<Comment, String>> replacements = new LinkedHashSet<Pair<Comment, String>>();
+    private final List<BlockComment> blockCommentToJavadoc = new ArrayList<BlockComment>();
+    private final Map<ASTNode, List<LineComment>> lineCommentsToJavadoc = new HashMap<ASTNode, List<LineComment>>();
 
     /** Default constructor. */
     public ASTCommentRewriter() {
@@ -89,12 +93,18 @@ public class ASTCommentRewriter {
     }
 
     /**
-     * Converts the provided list of line comments into a javadoc.
+     * Adds the provided line comment to convert to javadoc.
      *
-     * @param comments the list of line comments to convert into a javadoc
+     * @param lineComment the line comment to convert to javadoc
+     * @param nextNode the AST node immediately following the line comment
      */
-    public void toJavadoc(List<LineComment> comments) {
-        this.lineCommentsToJavadoc.add(comments);
+    public void toJavadoc(LineComment lineComment, ASTNode nextNode) {
+        List<LineComment> comments = lineCommentsToJavadoc.get(nextNode);
+        if (comments == null) {
+            comments = new LinkedList<LineComment>();
+            lineCommentsToJavadoc.put(nextNode, comments);
+        }
+        comments.add(lineComment);
     }
 
     /**
@@ -144,7 +154,7 @@ public class ASTCommentRewriter {
             final int offset = blockComment.getStartPosition() + "/*".length();
             edits.addChild(new InsertEdit(offset, "*"));
         }
-        for (List<LineComment> lineComments : this.lineCommentsToJavadoc) {
+        for (List<LineComment> lineComments : this.lineCommentsToJavadoc.values()) {
             // TODO Collect all words from the line comments,
             // then get access to indent settings, line length and newline chars
             // then spread them across several lines if needed or folded on one line only

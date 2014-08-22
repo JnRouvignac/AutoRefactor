@@ -31,19 +31,14 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.autorefactor.AutoRefactorPlugin;
-import org.autorefactor.refactoring.ASTCommentRewriter;
 import org.autorefactor.refactoring.IRefactoring;
 import org.autorefactor.refactoring.Refactorings;
-import org.autorefactor.refactoring.Refactorings.Insert;
-import org.autorefactor.refactoring.Refactorings.InsertType;
 import org.autorefactor.refactoring.Release;
 import org.autorefactor.refactoring.rules.AggregateASTVisitor;
 import org.autorefactor.refactoring.rules.RefactoringContext;
 import org.autorefactor.util.NotImplementedException;
-import org.autorefactor.util.Pair;
 import org.autorefactor.util.UnhandledException;
 import org.eclipse.core.filebuffers.FileBuffers;
 import org.eclipse.core.filebuffers.ITextFileBuffer;
@@ -62,18 +57,10 @@ import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.AST;
-import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.ASTVisitor;
-import org.eclipse.jdt.core.dom.BlockComment;
-import org.eclipse.jdt.core.dom.ChildListPropertyDescriptor;
-import org.eclipse.jdt.core.dom.Comment;
 import org.eclipse.jdt.core.dom.CompilationUnit;
-import org.eclipse.jdt.core.dom.LineComment;
-import org.eclipse.jdt.core.dom.rewrite.ASTRewrite;
-import org.eclipse.jdt.core.dom.rewrite.ListRewrite;
 import org.eclipse.jface.text.IDocument;
-import org.eclipse.text.edits.TextEdit;
 
 import static org.eclipse.jdt.core.JavaCore.*;
 import static org.eclipse.jdt.core.formatter.DefaultCodeFormatterConstants.*;
@@ -270,15 +257,9 @@ public class ApplyRefactoringsJob extends Job {
                     return;
                 }
 
-                // Describing the rewrite
-                final Pair<ASTRewrite, ASTCommentRewriter> rewrites = getASTRewrite(astRoot, refactorings);
-                final ASTCommentRewriter commentRewriter = rewrites.getSecond();
-
-                // apply the text edits and save the compilation unit
-                final TextEdit edits = rewrites.getFirst().rewriteAST(document, null);
-                commentRewriter.addEdits(document, edits);
-                edits.apply(document);
-                boolean hadUnsavedChanges = compilationUnit.hasUnsavedChanges();
+                // apply the refactorings and save the compilation unit
+                refactorings.applyTo(document);
+                final boolean hadUnsavedChanges = compilationUnit.hasUnsavedChanges();
                 compilationUnit.getBuffer().setContents(document.get());
                 // http://wiki.eclipse.org/FAQ_What_is_a_working_copy%3F
                 // compilationUnit.reconcile(AST.JLS4,
@@ -344,49 +325,5 @@ public class ApplyRefactoringsJob extends Job {
             sb.append(", ").append(iter.next().getClass().getName());
         }
         return sb.toString();
-    }
-
-    private Pair<ASTRewrite, ASTCommentRewriter> getASTRewrite(
-            final CompilationUnit astRoot, final Refactorings refactorings) {
-        final ASTRewrite rewrite = ASTRewrite.create(astRoot.getAST());
-        if (!refactorings.getInserts().isEmpty()) {
-            for (Entry<ChildListPropertyDescriptor, List<Insert>> entry : refactorings
-                    .getInserts().entrySet()) {
-                for (final Insert insert : entry.getValue()) {
-                    final ListRewrite listRewrite = rewrite.getListRewrite(
-                            insert.getListHolder(), entry.getKey());
-                    if (InsertType.AT_INDEX.equals(insert.getInsertType())) {
-                        listRewrite.insertAt(insert.getNodeToInsert(),
-                                insert.getIndex(), null);
-                    } else if (InsertType.BEFORE.equals(insert.getInsertType())) {
-                        listRewrite.insertBefore(insert.getNodeToInsert(),
-                                insert.getElement(), null);
-                    } else if (InsertType.AFTER.equals(insert.getInsertType())) {
-                        listRewrite.insertAfter(insert.getNodeToInsert(),
-                                insert.getElement(), null);
-                    }
-                }
-            }
-        }
-        for (Pair<ASTNode, ASTNode> entry : refactorings.getReplacements()) {
-            rewrite.replace(entry.getFirst(), entry.getSecond(), null);
-        }
-        for (ASTNode toRemove : refactorings.getRemovals()) {
-            rewrite.remove(toRemove, null);
-        }
-        final ASTCommentRewriter commentRewriter = new ASTCommentRewriter();
-        for (Comment toRemove : refactorings.getCommentRemovals()) {
-            commentRewriter.remove(toRemove);
-        }
-        for (Pair<Comment, String> toReplace : refactorings.getCommentReplacements()) {
-            commentRewriter.replace(toReplace.getFirst(), toReplace.getSecond());
-        }
-        for (BlockComment toJavadoc : refactorings.getBlockCommentToJavadoc()) {
-            commentRewriter.toJavadoc(toJavadoc);
-        }
-        for (List<LineComment> toJavadoc : refactorings.getLineCommentsToJavadoc()) {
-            commentRewriter.toJavadoc(toJavadoc);
-        }
-        return Pair.of(rewrite, commentRewriter);
     }
 }

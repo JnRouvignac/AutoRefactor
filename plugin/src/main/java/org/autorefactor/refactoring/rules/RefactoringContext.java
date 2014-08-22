@@ -36,9 +36,8 @@ import org.eclipse.jdt.core.dom.AST;
  */
 public class RefactoringContext {
 
-    private final Refactorings refactorings = new Refactorings();
+    private final Refactorings refactorings;
     private final ICompilationUnit compilationUnit;
-    private final AST ast;
     private final Release javaSERelease;
 
     /**
@@ -50,7 +49,7 @@ public class RefactoringContext {
      */
     public RefactoringContext(ICompilationUnit compilationUnit, AST ast,
             Release javaSERelease) {
-        this.ast = ast;
+        this.refactorings = new Refactorings(ast);
         this.javaSERelease = javaSERelease;
         this.compilationUnit = compilationUnit;
     }
@@ -61,7 +60,7 @@ public class RefactoringContext {
      * @return the {@link AST} object to use in the refactoring
      */
     public AST getAST() {
-        return ast;
+        return refactorings.getAST();
     }
 
     /**
@@ -70,7 +69,7 @@ public class RefactoringContext {
      * @return a new {@link ASTBuilder} object to use in the refactoring
      */
     public ASTBuilder getASTBuilder() {
-        return new ASTBuilder(ast);
+        return new ASTBuilder(refactorings.getAST());
     }
 
     /**
