@@ -36,8 +36,15 @@ public class CommentsSample implements Runnable {
     public CommentsSample() {
     }
 
+    /**
+     * Convert to a javadoc
+     * and correctly indent characters closing the javadoc.
+     */
+    public void test0() {
+    }
+
     /** Remove javadoc below, current comment will be converted to javadoc. */
-    private boolean test2(int j) {
+    private boolean test1(int j) {
         // Remove comment line just below
         return false;
     }
@@ -59,7 +66,7 @@ public class CommentsSample implements Runnable {
     /**
      * This javadoc must have a period added at the end of this sentence.
      */
-    public void test() {
+    public void test2() {
         /*
          * This is a javadoc that must be transformed to a blockcomment
          */

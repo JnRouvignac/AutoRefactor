@@ -27,12 +27,14 @@ package org.autorefactor.refactoring;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.autorefactor.util.Pair;
 import org.eclipse.jdt.core.dom.ASTNode;
@@ -116,10 +118,11 @@ public class ASTCommentRewriter {
     public void addEdits(IDocument document, TextEdit edits) {
         addRemovalEdits(edits, document.get());
         addReplacementEdits(edits);
-        addToJavadocEdits(edits);
+        addBlockCommentToJavadocEdits(edits);
+        addLineCommentsToJavadocEdits(edits, document.get());
     }
 
-    private void addRemovalEdits(TextEdit edits, String text) {
+    private void addRemovalEdits(TextEdit edits, String source) {
         if (this.removals.isEmpty()) {
             return;
         }
@@ -128,8 +131,8 @@ public class ASTCommentRewriter {
             final int length = node.getLength();
 
             // chomp from the end before the start variable gets modified
-            final int startToRemove = chompWhitespacesBefore(text, start);
-            final int endToRemove = chompWhitespacesAfter(text, start + length);
+            final int startToRemove = chompWhitespacesBefore(source, start);
+            final int endToRemove = chompWhitespacesAfter(source, start + length);
             final int lengthToRemove = endToRemove - startToRemove;
 
             edits.addChild(new DeleteEdit(startToRemove, lengthToRemove));
@@ -149,44 +152,90 @@ public class ASTCommentRewriter {
         }
     }
 
-    private void addToJavadocEdits(TextEdit edits) {
+    private void addBlockCommentToJavadocEdits(TextEdit edits) {
         for (BlockComment blockComment : this.blockCommentToJavadoc) {
             final int offset = blockComment.getStartPosition() + "/*".length();
             edits.addChild(new InsertEdit(offset, "*"));
         }
+    }
+
+    private void addLineCommentsToJavadocEdits(TextEdit edits, String source) {
+        if (this.lineCommentsToJavadoc.values().isEmpty()) {
+            return;
+        }
+        final TreeSet<Integer> lineStarts = getLineStarts(source);
         for (List<LineComment> lineComments : this.lineCommentsToJavadoc.values()) {
             // TODO Collect all words from the line comments,
             // then get access to indent settings, line length and newline chars
             // then spread them across several lines if needed or folded on one line only
             if (lineComments.size() == 1) {
-                final LineComment lineComment = lineComments.get(0);
-                final int start = lineComment.getStartPosition();
-                // TODO JNR how to obey configured indentation?
-                // TODO JNR how to obey configured line length?
-                edits.addChild(new ReplaceEdit(start, "//".length(), "/**"));
-                edits.addChild(new InsertEdit(start + lineComment.getLength(), " */"));
-                continue;
-            }
-
-            boolean isFirst = true;
-            for (Iterator<LineComment> iter = lineComments.iterator(); iter.hasNext();) {
-                LineComment lineComment = iter.next();
-                if (isFirst) {
-                    edits.addChild(new ReplaceEdit(lineComment.getStartPosition(), "//".length(), "/**"));
-                    // TODO JNR how to obey configured indentation?
-                    // TODO JNR how to obey configured line length?
-                    isFirst = false;
-                } else {
-                    edits.addChild(new ReplaceEdit(lineComment.getStartPosition(), "//".length(), " *"));
-                }
-                if (!iter.hasNext()) {
-                    // this was the last line comment to transform
-                    // TODO JNR how to get access to configured newline? @see #getNewline();
-                    // TODO JNR how to obey configured indentation?
-                    edits.addChild(new InsertEdit(lineComment.getStartPosition() + lineComment.getLength(), "\n*/"));
-                }
+                addSingleLineCommentToJavadocEdits(edits, lineComments);
+            } else {
+                addMultiLineCommentsToJavadocEdits(edits, lineComments, source, lineStarts);
             }
         }
+    }
+
+    private TreeSet<Integer> getLineStarts(String source) {
+        final TreeSet<Integer> lineStarts = new TreeSet<Integer>();
+        lineStarts.add(0);
+
+        final Matcher matcher = Pattern.compile("\\r\\n|\\r|\\n").matcher(source);
+        while (matcher.find()) {
+            lineStarts.add(matcher.end());
+        }
+        return lineStarts;
+    }
+
+    private void addSingleLineCommentToJavadocEdits(TextEdit edits, List<LineComment> lineComments) {
+        final LineComment lineComment = lineComments.get(0);
+        final int start = lineComment.getStartPosition();
+        // TODO JNR how to obey configured indentation?
+        // TODO JNR how to obey configured line length?
+        edits.addChild(new ReplaceEdit(start, "//".length(), "/**"));
+        edits.addChild(new InsertEdit(start + lineComment.getLength(), " */"));
+    }
+
+    private void addMultiLineCommentsToJavadocEdits(TextEdit edits, List<LineComment> lineComments, String source,
+            TreeSet<Integer> lineStarts) {
+        final String newline = "\n";
+        for (int i = 0; i < lineComments.size(); i++) {
+            final LineComment lineComment = lineComments.get(i);
+            final String replacementText;
+            final boolean isFirst = i == 0;
+            if (isFirst) {
+                // TODO JNR how to get access to configured newline? @see #getNewline();
+                // TODO JNR how to obey configured indentation?
+                replacementText = "/**" + newline + getIndent(lineComment, source, lineStarts) + "*";
+            } else {
+                replacementText = " *";
+            }
+            edits.addChild(new ReplaceEdit(lineComment.getStartPosition(), "//".length(), replacementText));
+
+            final boolean isLast = i == lineComments.size() - 1;
+            if (isLast) {
+                // TODO JNR how to get access to configured newline? @see #getNewline();
+                // TODO JNR how to obey configured indentation?
+                final int position = lineComment.getStartPosition() + lineComment.getLength();
+                final String indent = getIndent(lineComment, source, lineStarts);
+                edits.addChild(new InsertEdit(position, newline + indent + "*/"));
+            }
+        }
+    }
+
+    private String getIndent(LineComment lineComment, String source, TreeSet<Integer> lineStarts) {
+        if (lineStarts.isEmpty()) {
+            return "";
+        }
+
+        final int commentStart = lineComment.getStartPosition();
+        final int previousLineStart = findPreviousLineStart(lineStarts, commentStart);
+        final String indent = source.substring(previousLineStart, commentStart);
+        return indent + " ";
+    }
+
+    private int findPreviousLineStart(TreeSet<Integer> lineStarts, final int commentStart) {
+        return lineStarts.headSet(commentStart).last();
     }
 
     private void getNewline() {
