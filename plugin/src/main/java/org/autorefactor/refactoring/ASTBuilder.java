@@ -130,6 +130,7 @@ public class ASTBuilder {
      * @param <T> the actual expression type
      * @param exprToCopy the expression to copy
      * @return a copy of the expression
+     * @deprecated use {@link #copy(ASTNode)}
      */
     public <T extends Expression> T copyExpr(T exprToCopy) {
         return copySubtree(ast, exprToCopy);

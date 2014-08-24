@@ -205,7 +205,7 @@ public class BigDecimalRefactoring extends ASTVisitor implements
     private InfixExpression getCompareToNode(MethodInvocation node) {
         final ASTBuilder b = this.ctx.getASTBuilder();
         final MethodInvocation mi = b.invoke(
-                b.copyExpr(node.getExpression()), "compareTo", b.copyExpr(arguments(node).get(0)));
+                b.copy(node.getExpression()), "compareTo", b.copy(arguments(node).get(0)));
 
         return b.infixExpr(mi, Operator.EQUALS, b.int0(0));
     }

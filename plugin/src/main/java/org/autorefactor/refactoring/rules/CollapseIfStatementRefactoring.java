@@ -51,6 +51,7 @@ public class CollapseIfStatementRefactoring extends ASTVisitor implements
     }
 
     /** {@inheritDoc} */
+    @Override
     public void setRefactoringContext(RefactoringContext ctx) {
         this.ctx = ctx;
     }
@@ -73,13 +74,10 @@ public class CollapseIfStatementRefactoring extends ASTVisitor implements
         }
 
         final ASTBuilder b = this.ctx.getASTBuilder();
-        final Expression leftOperand = b.copyExpr(outerIf.getExpression());
-        final Expression rightOperand = b.copyExpr(innerIf.getExpression());
-
         final InfixExpression ie = b.infixExpr(
-            parenthesizeInfixExpr(b, leftOperand),
+            parenthesizeInfixExpr(b, outerIf.getExpression()),
             CONDITIONAL_AND,
-            parenthesizeInfixExpr(b, rightOperand));
+            parenthesizeInfixExpr(b, innerIf.getExpression()));
 
         final IfStatement is = b.if0(ie,
             b.copy(innerIf.getThenStatement()));
@@ -91,13 +89,14 @@ public class CollapseIfStatementRefactoring extends ASTVisitor implements
         if (expr instanceof InfixExpression) {
             final InfixExpression ie = (InfixExpression) expr;
             if (CONDITIONAL_OR.equals(ie.getOperator())) {
-                return b.parenthesize(ie);
+                return b.parenthesize(b.copy(ie));
             }
         }
-        return expr;
+        return b.copy(expr);
     }
 
     /** {@inheritDoc} */
+    @Override
     public Refactorings getRefactorings(CompilationUnit astRoot) {
         astRoot.accept(this);
         return this.ctx.getRefactorings();

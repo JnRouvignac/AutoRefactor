@@ -83,6 +83,7 @@ public class StringBuilderRefactoring extends ASTVisitor implements
     }
 
     /** {@inheritDoc} */
+    @Override
     public void setRefactoringContext(RefactoringContext ctx) {
         this.ctx = ctx;
         this.javaMinorVersion = this.ctx.getJavaSERelease().getMinorVersion();
@@ -176,8 +177,7 @@ public class StringBuilderRefactoring extends ASTVisitor implements
                 && instanceOf(typeBinding, "java.lang.Appendable")) {
             final LinkedList<Expression> allAppendedStrings = new LinkedList<Expression>();
             final BooleanHolder foundInfixExpr = new BooleanHolder(false);
-            final Expression lastExpr = collectAllAppendedStrings(node,
-                    allAppendedStrings, foundInfixExpr);
+            final Expression lastExpr = collectAllAppendedStrings(node, allAppendedStrings, foundInfixExpr);
             if (lastExpr instanceof Name || lastExpr instanceof FieldAccess) {
                 boolean rewriteNeeded = filterOutEmptyStrings(allAppendedStrings);
                 if (rewriteNeeded || foundInfixExpr.value) {
@@ -204,18 +204,17 @@ public class StringBuilderRefactoring extends ASTVisitor implements
                 || isMethod(embeddedMI, "java.lang.CharSequence", "subSequence", "int", "int");
             if (substringWithOneArg || substringWithTwoArgs) {
                 final ASTBuilder b = this.ctx.getASTBuilder();
-                final Expression stringVar = b.copyExpr(embeddedMI.getExpression());
+                final Expression stringVar = b.copy(embeddedMI.getExpression());
                 final List<Expression> args = arguments(embeddedMI);
-                final Expression arg0 = b.copyExpr(args.get(0));
-                final Expression arg1 = substringWithTwoArgs ? b.copyExpr(args.get(1)) : null;
+                final Expression arg0 = b.copy(args.get(0));
+                final Expression arg1 = substringWithTwoArgs ? b.copy(args.get(1)) : null;
                 this.ctx.getRefactorings().replace(node,
                         createAppendSubstring(b, lastExpr, stringVar, arg0, arg1));
             }
         } else if (isMethod(node, "java.lang.StringBuilder", "toString")
                 || isMethod(node, "java.lang.StringBuffer", "toString")) {
             final LinkedList<Expression> allAppendedStrings = new LinkedList<Expression>();
-            final Expression lastExpr = collectAllAppendedStrings(
-                    node.getExpression(), allAppendedStrings, null);
+            final Expression lastExpr = collectAllAppendedStrings(node.getExpression(), allAppendedStrings, null);
             // TODO new StringBuffer().append(" bla").append("bla").toString();
             // outputs " blabla"
             if (lastExpr instanceof ClassInstanceCreation) {
@@ -271,7 +270,7 @@ public class StringBuilderRefactoring extends ASTVisitor implements
                 result = expr;
             } else {
                 final ASTBuilder b = this.ctx.getASTBuilder();
-                result = b.invoke(result, "append", b.copyExpr(expr));
+                result = b.invoke(result, "append", b.copy(expr));
             }
         }
         return result;
@@ -305,8 +304,7 @@ public class StringBuilderRefactoring extends ASTVisitor implements
                         && arguments(mi).size() == 1) {
                     final Expression arg0 = arguments(mi).get(0);
                     addAllSubExpressions(arg0, allOperands, foundInfixExpr);
-                    return collectAllAppendedStrings(mi.getExpression(), allOperands,
-                            foundInfixExpr);
+                    return collectAllAppendedStrings(mi.getExpression(), allOperands, foundInfixExpr);
                 }
             } else if (expr instanceof ClassInstanceCreation) {
                 final ClassInstanceCreation cic = (ClassInstanceCreation) expr;
@@ -331,8 +329,7 @@ public class StringBuilderRefactoring extends ASTVisitor implements
             final InfixExpression ie = (InfixExpression) arg;
             if (InfixExpression.Operator.PLUS.equals(ie.getOperator())) {
                 if (ie.hasExtendedOperands()) {
-                    final List<Expression> reversed =
-                            new ArrayList<Expression>(extendedOperands(ie));
+                    final List<Expression> reversed = new ArrayList<Expression>(extendedOperands(ie));
                     Collections.reverse(reversed);
                     for (Expression op : reversed) {
                         addAllSubExpressions(op, results, foundInfixExpr);
@@ -350,6 +347,7 @@ public class StringBuilderRefactoring extends ASTVisitor implements
     }
 
     /** {@inheritDoc} */
+    @Override
     public Refactorings getRefactorings(CompilationUnit astRoot) {
         astRoot.accept(this);
         return this.ctx.getRefactorings();

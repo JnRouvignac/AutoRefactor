@@ -88,7 +88,7 @@ public class VectorOldToNewAPIRefactoring extends ASTVisitor implements
         final ASTBuilder b = this.ctx.getASTBuilder();
         this.ctx.getRefactorings().replace(node,
             b.invoke(
-                b.copyExpr(node.getExpression()),
+                b.copy(node.getExpression()),
                 newMethodName,
                 b.copyAll(arguments(node))));
     }

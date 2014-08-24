@@ -119,9 +119,9 @@ public class RemoveUselessNullCheckRefactoring extends ASTVisitor implements
         final ASTBuilder b = this.ctx.getASTBuilder();
         this.ctx.getRefactorings().replace(node,
                 b.toStmt(b.assign(
-                        b.copyExpr(leftHandSide),
+                        b.copy(leftHandSide),
                         Assignment.Operator.ASSIGN,
-                        b.copyExpr(rightHandSide))));
+                        b.copy(rightHandSide))));
         return DO_NOT_VISIT_SUBTREE;
     }
 
@@ -139,7 +139,7 @@ public class RemoveUselessNullCheckRefactoring extends ASTVisitor implements
     private boolean replaceWithStraightReturn(IfStatement node, Expression returnedExpr) {
         final ASTBuilder b = this.ctx.getASTBuilder();
         this.ctx.getRefactorings().replace(node,
-                b.return0(b.copyExpr(returnedExpr)));
+                b.return0(b.copy(returnedExpr)));
         return DO_NOT_VISIT_SUBTREE;
     }
 

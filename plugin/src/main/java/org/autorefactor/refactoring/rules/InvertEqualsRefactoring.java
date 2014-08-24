@@ -87,7 +87,7 @@ public class InvertEqualsRefactoring extends ASTVisitor implements
     private ASTNode invertEqualsInvocation(Expression lhs, Expression rhs, boolean isEquals) {
         final String methodName = isEquals ? "equals" : "equalsIgnoreCase";
         final ASTBuilder b = this.ctx.getASTBuilder();
-        return b.invoke(b.copyExpr(rhs), methodName, b.copyExpr(lhs));
+        return b.invoke(b.copy(rhs), methodName, b.copy(lhs));
     }
 
     /** {@inheritDoc} */

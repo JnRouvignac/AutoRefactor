@@ -145,7 +145,7 @@ public class PrimitiveWrapperCreationRefactoring extends ASTVisitor implements
     private MethodInvocation newMethodInvocation(String typeName,
             String methodName, Expression arg) {
         final ASTBuilder b = this.ctx.getASTBuilder();
-        return b.invoke(typeName, methodName, b.copyExpr(arg));
+        return b.invoke(typeName, methodName, b.copy(arg));
     }
 
     /** {@inheritDoc} */

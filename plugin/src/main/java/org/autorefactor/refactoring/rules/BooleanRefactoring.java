@@ -313,17 +313,17 @@ public class BooleanRefactoring extends ASTVisitor implements IJavaRefactoring {
         final ASTBuilder b = this.ctx.getASTBuilder();
         if (thenBool == null && elseBool != null) {
             final InfixExpression ie = b.infixExpr(
-                    b.copyExpr(node.getExpression()),
+                    b.copy(node.getExpression()),
                     getConditionalOperator(!elseBool.booleanValue()),
-                    b.copyExpr(thenExpr));
+                    b.copy(thenExpr));
             return b.return0(getBooleanExpression(ie, !elseBool.booleanValue()));
         } else if (thenBool != null && elseBool == null) {
             final Expression leftOp = getBooleanExpression(
-                    b.copyExpr(node.getExpression()), thenBool.booleanValue());
+                    b.copy(node.getExpression()), thenBool.booleanValue());
             final InfixExpression ie = b.infixExpr(
                     leftOp,
                     getConditionalOperator(!thenBool.booleanValue()),
-                    b.copyExpr(elseExpr));
+                    b.copy(elseExpr));
             return b.return0(ie);
         }
         return null;

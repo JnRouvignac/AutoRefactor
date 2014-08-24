@@ -150,12 +150,12 @@ public class HotSpotIntrinsicedAPIsRefactoring extends ASTVisitor implements
             // TODO negate expr2
             throw new NotImplementedException();
         } else if (expr2Value != null && expr2Value == 0) {
-            return b.copyExpr(expr1);
+            return b.copy(expr1);
         }
         return b.infixExpr(
-                b.copyExpr(expr1),
+                b.copy(expr1),
                 InfixExpression.Operator.MINUS,
-                b.copyExpr(expr2));
+                b.copy(expr2));
     }
 
     private Expression plus(Expression expr1, Expression expr2) {
@@ -166,14 +166,14 @@ public class HotSpotIntrinsicedAPIsRefactoring extends ASTVisitor implements
         if (expr1Value != null && expr2Value != null) {
             return b.int0(expr1Value + expr2Value);
         } else if (expr1Value != null && expr1Value == 0) {
-            return b.copyExpr(expr2);
+            return b.copy(expr2);
         } else if (expr2Value != null && expr2Value == 0) {
-            return b.copyExpr(expr1);
+            return b.copy(expr1);
         }
         return b.infixExpr(
-                b.copyExpr(expr1),
+                b.copy(expr1),
                 InfixExpression.Operator.PLUS,
-                b.copyExpr(expr2));
+                b.copy(expr2));
     }
 
     private Integer intValue(Expression expr) {
@@ -234,11 +234,11 @@ public class HotSpotIntrinsicedAPIsRefactoring extends ASTVisitor implements
         }
         final ASTBuilder b = this.ctx.getASTBuilder();
         return replaceWithSystemArrayCopy(node,
-                b.copyExpr(params.srcArrayExpr),
-                b.copyExpr(params.srcPos),
-                b.copyExpr(params.destArrayExpr),
-                b.copyExpr(params.destPos),
-                b.copyExpr(params.endPos));
+                b.copy(params.srcArrayExpr),
+                b.copy(params.srcPos),
+                b.copy(params.destArrayExpr),
+                b.copy(params.destPos),
+                b.copy(params.endPos));
     }
 
     private boolean replaceWithSystemArrayCopy(ForStatement node,

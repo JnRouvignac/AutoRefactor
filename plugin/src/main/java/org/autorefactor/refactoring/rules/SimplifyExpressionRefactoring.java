@@ -278,7 +278,7 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
         final ASTBuilder b = this.ctx.getASTBuilder();
         this.ctx.getRefactorings().replace(ie,
             b.infixExpr(
-                b.copyExpr(ie.getLeftOperand()),
+                b.copy(ie.getLeftOperand()),
                 operator,
                 b.number("0")));
         return DO_NOT_VISIT_SUBTREE;
@@ -373,7 +373,7 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
 
     private void addParentheses(Expression e) {
         final ASTBuilder b = this.ctx.getASTBuilder();
-        this.ctx.getRefactorings().replace(e, b.parenthesize(b.copyExpr(e)));
+        this.ctx.getRefactorings().replace(e, b.parenthesize(b.copy(e)));
     }
 
     /**

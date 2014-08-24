@@ -110,7 +110,7 @@ public class CollectionAddAllRefactoring extends ASTVisitor implements
             final ASTBuilder b = this.ctx.getASTBuilder();
             this.ctx.getRefactorings().replace(nodeToReplace,
                     b.new0(cic.resolveTypeBinding(),
-                            b.copyExpr(arg0)));
+                            b.copy(arg0)));
             this.ctx.getRefactorings().remove(nodeToRemove);
             return DO_NOT_VISIT_SUBTREE;
         }
@@ -213,9 +213,9 @@ public class CollectionAddAllRefactoring extends ASTVisitor implements
         final ASTBuilder b = this.ctx.getASTBuilder();
         this.ctx.getRefactorings().replace(toReplace,
                 b.toStmt(b.invoke(
-                        b.copyExpr(colWhereToAddAll),
+                        b.copy(colWhereToAddAll),
                         "addAll",
-                        b.copyExpr(colToAddAll))));
+                        b.copy(colToAddAll))));
         return DO_NOT_VISIT_SUBTREE;
     }
 

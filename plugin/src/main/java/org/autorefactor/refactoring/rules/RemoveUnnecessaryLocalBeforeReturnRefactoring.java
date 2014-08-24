@@ -123,7 +123,7 @@ public class RemoveUnnecessaryLocalBeforeReturnRefactoring extends ASTVisitor
 
     private ASTNode getReturnStatement(Expression initializer) {
         final ASTBuilder b = this.ctx.getASTBuilder();
-        return b.return0(b.copyExpr(initializer));
+        return b.return0(b.copy(initializer));
     }
 
     /** {@inheritDoc} */
