@@ -55,6 +55,7 @@ public class DeadCodeEliminationRefactoring extends ASTVisitor implements
     }
 
     /** {@inheritDoc} */
+    @Override
     public void setRefactoringContext(RefactoringContext ctx) {
         this.ctx = ctx;
     }
@@ -118,9 +119,15 @@ public class DeadCodeEliminationRefactoring extends ASTVisitor implements
     /** {@inheritDoc} */
     @Override
     public boolean visit(TryStatement node) {
-        final List<Statement> stmts = asList(node.getBody());
-        if (stmts.isEmpty()) {
-            this.ctx.getRefactorings().remove(node);
+        final List<Statement> tryStmts = asList(node.getBody());
+        if (tryStmts.isEmpty()) {
+            final List<Statement> finallyStmts = asList(node.getFinally());
+            if (!finallyStmts.isEmpty()) {
+                final ASTBuilder b = this.ctx.getASTBuilder();
+                this.ctx.getRefactorings().replace(node, b.copyStmt(node.getFinally()));
+            } else {
+                this.ctx.getRefactorings().remove(node);
+            }
             return DO_NOT_VISIT_SUBTREE;
         }
     // }else {
@@ -145,6 +152,7 @@ public class DeadCodeEliminationRefactoring extends ASTVisitor implements
     }
 
     /** {@inheritDoc} */
+    @Override
     public Refactorings getRefactorings(CompilationUnit astRoot) {
         astRoot.accept(this);
         return this.ctx.getRefactorings();

@@ -90,7 +90,17 @@ public class DeadCodeEliminationSample {
 //        return i;
 //    }
 
-    private int removeEmptyTry() {
+    private int removeEmptyTryEmptyFinally() {
+        int i = 0;
+        try {
+        } catch (Exception e) {
+            i++;
+        } finally {
+        }
+        return i;
+    }
+
+    private int removeEmptyTryNonEmptyFinally() {
         int i = 0;
         try {
         } catch (Exception e) {
@@ -100,5 +110,4 @@ public class DeadCodeEliminationSample {
         }
         return i;
     }
-
 }

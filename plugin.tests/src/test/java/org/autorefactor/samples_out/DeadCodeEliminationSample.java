@@ -79,9 +79,16 @@ public class DeadCodeEliminationSample {
 //        return i;
 //    }
 
-    private int removeEmptyTry() {
+    private int removeEmptyTryEmptyFinally() {
         int i = 0;
         return i;
     }
 
+    private int removeEmptyTryNonEmptyFinally() {
+        int i = 0;
+        {
+            i++;
+        }
+        return i;
+    }
 }
