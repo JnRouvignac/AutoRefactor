@@ -277,8 +277,7 @@ public class ApplyRefactoringsJob extends Job {
                 // Using astRoot.recordModifications() did not work:
                 // type bindings were lost. Is there a way to recover them?
                 // FIXME we should find a way to apply all the changes at
-                // the AST level only (transactional-like feature) and
-                // refresh the bindings
+                // the AST level and refresh the bindings
                 resetParser(compilationUnit, parser, javaSERelease);
                 astRoot = (CompilationUnit) parser.createAST(null);
                 ++totalNbLoops;

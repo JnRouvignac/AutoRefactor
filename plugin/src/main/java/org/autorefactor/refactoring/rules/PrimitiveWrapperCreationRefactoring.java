@@ -25,6 +25,8 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import java.util.List;
+
 import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.IJavaRefactoring;
 import org.autorefactor.refactoring.Refactorings;
@@ -71,23 +73,19 @@ public class PrimitiveWrapperCreationRefactoring extends ASTVisitor implements
         final ITypeBinding typeBinding = node.getExpression().resolveTypeBinding();
         if (typeBinding != null
                 && node.getExpression() instanceof ClassInstanceCreation) {
-            final ClassInstanceCreation cic = (ClassInstanceCreation) node.getExpression();
-            if (arguments(cic).size() == 1) {
-                ITypeBinding argTypeBinding = arguments(cic).get(0)
-                        .resolveTypeBinding();
-                if (argTypeBinding != null
-                        && arguments(node).size() == 0
-                        && "java.lang.String".equals(argTypeBinding
-                                .getQualifiedName())) {
+            final List<Expression> cicArgs = arguments((ClassInstanceCreation) node.getExpression());
+            if (cicArgs.size() == 1) {
+                final Expression arg0 = cicArgs.get(0);
+                final ITypeBinding arg0TypeBinding = arg0.resolveTypeBinding();
+                if (arguments(node).size() == 0
+                        && arg0TypeBinding != null
+                        && "java.lang.String".equals(arg0TypeBinding.getQualifiedName())) {
                     final String methodName = getMethodName(
-                            typeBinding.getQualifiedName(), node.getName()
-                                    .getIdentifier());
+                            typeBinding.getQualifiedName(), node.getName().getIdentifier());
                     if (methodName != null) {
-                        final Expression arg0 = arguments(cic).get(0);
                         this.ctx.getRefactorings().replace(
                                 node,
-                                newMethodInvocation(typeBinding.getName(),
-                                        methodName, arg0));
+                                newMethodInvocation(typeBinding.getName(), methodName, arg0));
                     }
                 }
             }
@@ -123,7 +121,8 @@ public class PrimitiveWrapperCreationRefactoring extends ASTVisitor implements
     @Override
     public boolean visit(ClassInstanceCreation node) {
         final ITypeBinding typeBinding = node.getType().resolveBinding();
-        if (javaMinorVersion >= 5 && typeBinding != null
+        if (javaMinorVersion >= 5
+                && typeBinding != null
                 && arguments(node).size() == 1) {
             final String qualifiedName = typeBinding.getQualifiedName();
             if ("java.lang.Boolean".equals(qualifiedName)
@@ -136,8 +135,7 @@ public class PrimitiveWrapperCreationRefactoring extends ASTVisitor implements
                     || "java.lang.Integer".equals(qualifiedName)) {
                 this.ctx.getRefactorings().replace(
                         node,
-                        newMethodInvocation(typeBinding.getName(), "valueOf",
-                                arguments(node).get(0)));
+                        newMethodInvocation(typeBinding.getName(), "valueOf", arguments(node).get(0)));
                 return DO_NOT_VISIT_SUBTREE;
             }
         }

@@ -67,8 +67,7 @@ public class CollapseIfStatementRefactoring extends ASTVisitor implements
         return VISIT_SUBTREE;
     }
 
-    private boolean replaceIfNoElseStatement(IfStatement outerIf,
-            IfStatement innerIf) {
+    private boolean replaceIfNoElseStatement(IfStatement outerIf, IfStatement innerIf) {
         if (innerIf.getElseStatement() != null) {
             return VISIT_SUBTREE;
         }
@@ -78,9 +77,9 @@ public class CollapseIfStatementRefactoring extends ASTVisitor implements
         final Expression rightOperand = b.copyExpr(innerIf.getExpression());
 
         final InfixExpression ie = b.infixExpr(
-            parenthesizeInfixExpr(leftOperand),
+            parenthesizeInfixExpr(b, leftOperand),
             CONDITIONAL_AND,
-            parenthesizeInfixExpr(rightOperand));
+            parenthesizeInfixExpr(b, rightOperand));
 
         final IfStatement is = b.if0(ie,
             b.copyStmt(innerIf.getThenStatement()));
@@ -88,11 +87,11 @@ public class CollapseIfStatementRefactoring extends ASTVisitor implements
         return DO_NOT_VISIT_SUBTREE;
     }
 
-    private Expression parenthesizeInfixExpr(Expression expr) {
+    private Expression parenthesizeInfixExpr(ASTBuilder b, Expression expr) {
         if (expr instanceof InfixExpression) {
             final InfixExpression ie = (InfixExpression) expr;
             if (CONDITIONAL_OR.equals(ie.getOperator())) {
-                return this.ctx.getASTBuilder().parenthesize(ie);
+                return b.parenthesize(ie);
             }
         }
         return expr;
