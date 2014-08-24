@@ -82,7 +82,7 @@ public class CollapseIfStatementRefactoring extends ASTVisitor implements
             parenthesizeInfixExpr(b, rightOperand));
 
         final IfStatement is = b.if0(ie,
-            b.copyStmt(innerIf.getThenStatement()));
+            b.copy(innerIf.getThenStatement()));
         this.ctx.getRefactorings().replace(outerIf, is);
         return DO_NOT_VISIT_SUBTREE;
     }

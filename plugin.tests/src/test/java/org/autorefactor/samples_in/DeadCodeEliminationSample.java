@@ -49,12 +49,14 @@ public class DeadCodeEliminationSample {
         int i = 0;
         int j = 0;
         if (true) {
+            // keep this comment
             i++;
         } else {
             j++;
         }
 
         if (true)
+            // keep this comment
             i++;
         else
             j++;
@@ -62,12 +64,14 @@ public class DeadCodeEliminationSample {
         if (false) {
             i++;
         } else {
+            // keep this comment
             j++;
         }
 
         if (false)
             i++;
         else
+            // keep this comment
             j++;
 
         return i + j;
@@ -106,6 +110,7 @@ public class DeadCodeEliminationSample {
         } catch (Exception e) {
             i++;
         } finally {
+            // keep this comment
             i++;
         }
         return i;

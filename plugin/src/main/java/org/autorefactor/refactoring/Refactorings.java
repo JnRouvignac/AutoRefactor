@@ -74,6 +74,21 @@ public class Refactorings {
         return rewrite.getAST();
     }
 
+    /**
+     * Creates and returns a placeholder node for a copy of the source code of the provided node.<br>
+     * The placeholder node can be used like any new node created via the AST class.<br>
+     * When the document is rewritten, a copy of the source code for the provided node is inserted
+     * into the output document at the position corresponding to the placeholder (indentation is adjusted).
+     *
+     * @param <T> the type of the provided node
+     * @param node the node for which to create a copy placeholder
+     * @return the new placeholder node
+     * @see ASTRewrite#createCopyTarget(ASTNode)
+     */
+    public <T extends ASTNode> T createCopyTarget(T node) {
+        return (T) rewrite.createCopyTarget(node);
+    }
+
     private ListRewrite getListRewrite(ASTNode element) {
         return getListRewrite(element.getParent(), (ChildListPropertyDescriptor) element.getLocationInParent());
     }

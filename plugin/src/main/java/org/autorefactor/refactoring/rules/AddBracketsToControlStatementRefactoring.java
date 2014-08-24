@@ -116,7 +116,7 @@ public class AddBracketsToControlStatementRefactoring extends ASTVisitor
             return VISIT_SUBTREE;
         }
         final ASTBuilder b = this.ctx.getASTBuilder();
-        final Block block = b.body(b.copyStmt(statement));
+        final Block block = b.body(b.copy(statement));
         block.accept(this);
         this.ctx.getRefactorings().replace(statement, block);
         return DO_NOT_VISIT_SUBTREE;

@@ -100,7 +100,7 @@ public class CommonCodeInIfElseStatementRefactoring extends ASTVisitor
                     break;
                 }
                 this.ctx.getRefactorings().insertBefore(
-                        b.copyStmt(caseStmts.get(stmtIndex)), node);
+                        b.copy(caseStmts.get(stmtIndex)), node);
                 removeStmts(allCasesStmts, true, stmtIndex, removedCaseStmts);
             }
 
@@ -113,7 +113,7 @@ public class CommonCodeInIfElseStatementRefactoring extends ASTVisitor
                     break;
                 }
                 this.ctx.getRefactorings().insertAfter(
-                        b.copyStmt(caseStmts.get(caseStmts.size() - stmtIndex)),
+                        b.copy(caseStmts.get(caseStmts.size() - stmtIndex)),
                         node);
                 removeStmts(allCasesStmts, false, stmtIndex, removedCaseStmts);
             }

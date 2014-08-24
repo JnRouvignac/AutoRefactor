@@ -95,10 +95,10 @@ public class DeadCodeEliminationRefactoring extends ASTVisitor implements
                 node.getExpression().resolveConstantExpressionValue();
         final ASTBuilder b = this.ctx.getASTBuilder();
         if (Boolean.TRUE.equals(constantCondition)) {
-            this.ctx.getRefactorings().replace(node, b.copyStmt(node.getThenStatement()));
+            this.ctx.getRefactorings().replace(node, b.copy(node.getThenStatement()));
             return DO_NOT_VISIT_SUBTREE;
         } else if (Boolean.FALSE.equals(constantCondition)) {
-            this.ctx.getRefactorings().replace(node, b.copyStmt(node.getElseStatement()));
+            this.ctx.getRefactorings().replace(node, b.copy(node.getElseStatement()));
             return DO_NOT_VISIT_SUBTREE;
         }
         return VISIT_SUBTREE;
@@ -124,7 +124,7 @@ public class DeadCodeEliminationRefactoring extends ASTVisitor implements
             final List<Statement> finallyStmts = asList(node.getFinally());
             if (!finallyStmts.isEmpty()) {
                 final ASTBuilder b = this.ctx.getASTBuilder();
-                this.ctx.getRefactorings().replace(node, b.copyStmt(node.getFinally()));
+                this.ctx.getRefactorings().replace(node, b.copy(node.getFinally()));
             } else {
                 this.ctx.getRefactorings().remove(node);
             }

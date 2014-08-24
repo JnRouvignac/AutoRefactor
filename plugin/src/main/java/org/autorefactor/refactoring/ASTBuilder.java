@@ -63,14 +63,16 @@ import static org.autorefactor.refactoring.ASTHelper.*;
 public class ASTBuilder {
 
     private final AST ast;
+    private final Refactorings refactorings;
 
     /**
      * Class constructor.
      *
-     * @param ast the AST
+     * @param refactorings the refactorings
      */
-    public ASTBuilder(final AST ast) {
-        this.ast = ast;
+    public ASTBuilder(final Refactorings refactorings) {
+        this.refactorings = refactorings;
+        this.ast = refactorings.getAST();
     }
 
     /**
@@ -130,18 +132,21 @@ public class ASTBuilder {
      * @return a copy of the expression
      */
     public <T extends Expression> T copyExpr(T exprToCopy) {
-        return ASTHelper.copySubtree(ast, exprToCopy);
+        return copySubtree(ast, exprToCopy);
     }
 
     /**
-     * Returns a copy of the provided {@link Statement}.
+     * Returns a copy of the provided {@link ASTNode}.
      *
-     * @param <T> the actual statement type
-     * @param stmtToCopy the statement to copy
-     * @return a copy of the statement
+     * @param <T> the actual node type
+     * @param nodeToCopy the node to copy
+     * @return a copy of the node
      */
-    public <T extends Statement> T copyStmt(T stmtToCopy) {
-        return ASTHelper.copySubtree(ast, stmtToCopy);
+    public <T extends ASTNode> T copy(T nodeToCopy) {
+        if (isValidInCurrentAST(nodeToCopy)) {
+            return refactorings.createCopyTarget(nodeToCopy);
+        }
+        return copySubtree(ast, nodeToCopy);
     }
 
     /**
@@ -152,7 +157,12 @@ public class ASTBuilder {
      * @return a copy of the expression list
      */
     public <E extends Expression> List<E> copyAll(List<E> expressions) {
-        return ASTHelper.copySubtrees(ast, expressions);
+        return copySubtrees(ast, expressions);
+    }
+
+    private boolean isValidInCurrentAST(ASTNode node) {
+        return node.getAST() == ast
+                && node.getStartPosition() != -1;
     }
 
     /**

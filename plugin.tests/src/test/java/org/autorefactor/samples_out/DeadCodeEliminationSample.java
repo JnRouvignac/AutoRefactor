@@ -48,15 +48,19 @@ public class DeadCodeEliminationSample {
         int i = 0;
         int j = 0;
         {
+            // keep this comment
             i++;
         }
 
+        // keep this comment
         i++;
 
         {
+            // keep this comment
             j++;
         }
 
+        // keep this comment
         j++;
 
         return i + j;
@@ -87,6 +91,7 @@ public class DeadCodeEliminationSample {
     private int removeEmptyTryNonEmptyFinally() {
         int i = 0;
         {
+            // keep this comment
             i++;
         }
         return i;

@@ -69,7 +69,7 @@ public class RefactoringContext {
      * @return a new {@link ASTBuilder} object to use in the refactoring
      */
     public ASTBuilder getASTBuilder() {
-        return new ASTBuilder(refactorings.getAST());
+        return new ASTBuilder(refactorings);
     }
 
     /**
