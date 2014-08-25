@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2013 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2013-2014 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,14 +31,13 @@ import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.IJavaRefactoring;
 import org.autorefactor.refactoring.Refactorings;
 import org.autorefactor.refactoring.Release;
-import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTVisitor;
-import org.eclipse.jdt.core.dom.CastExpression;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
+import static org.eclipse.jdt.core.dom.MethodInvocation.*;
 
 /**
  * Replaces Vector pre Collections API with equivalent Collections API.
@@ -49,6 +48,7 @@ public class VectorOldToNewAPIRefactoring extends ASTVisitor implements
     private RefactoringContext ctx;
 
     /** {@inheritDoc} */
+    @Override
     public void setRefactoringContext(RefactoringContext ctx) {
         this.ctx = ctx;
     }
@@ -56,28 +56,22 @@ public class VectorOldToNewAPIRefactoring extends ASTVisitor implements
     /** {@inheritDoc} */
     @Override
     public boolean visit(MethodInvocation node) {
-        if (this.ctx.getJavaSERelease().isCompatibleWith(
-                Release.javaSE("1.2.0"))) {
+        if (this.ctx.getJavaSERelease().isCompatibleWith(Release.javaSE("1.2.0"))) {
             if (isMethod(node, "java.util.Vector", "elementAt", "int")) {
                 replaceWith(node, "get");
-            } else if (isMethod(node, "java.util.Vector", "addElement",
-                    "java.lang.Object")) {
+            } else if (isMethod(node, "java.util.Vector", "addElement", "java.lang.Object")) {
                 replaceWith(node, "add");
-            } else if (isMethod(node, "java.util.Vector", "insertElementAt",
-                    "java.lang.Object", "int")) {
+            } else if (isMethod(node, "java.util.Vector", "insertElementAt", "java.lang.Object", "int")) {
                 replaceWithAndSwapArguments(node, "add");
-            } else if (isMethod(node, "java.util.Vector", "copyInto",
-                    "java.lang.Object[]")) {
+            } else if (isMethod(node, "java.util.Vector", "copyInto", "java.lang.Object[]")) {
                 replaceWith(node, "toArray");
             } else if (isMethod(node, "java.util.Vector", "removeAllElements")) {
                 replaceWith(node, "clear");
-            } else if (isMethod(node, "java.util.Vector", "removeElement",
-                    "java.lang.Object")) {
+            } else if (isMethod(node, "java.util.Vector", "removeElement", "java.lang.Object")) {
                 replaceWithSpecial(node, "remove");
             } else if (isMethod(node, "java.util.Vector", "removeElementAt", "int")) {
                 replaceWith(node, "remove");
-            } else if (isMethod(node, "java.util.Vector", "setElementAt",
-                    "java.lang.Object", "int")) {
+            } else if (isMethod(node, "java.util.Vector", "setElementAt", "java.lang.Object", "int")) {
                 replaceWith(node, "set");
             }
         }
@@ -94,34 +88,27 @@ public class VectorOldToNewAPIRefactoring extends ASTVisitor implements
     }
 
     private void replaceWithSpecial(MethodInvocation node, String newMethodName) {
-        AST ast = this.ctx.getAST();
-        MethodInvocation mi = ast.newMethodInvocation();
-        mi.setName(ast.newSimpleName(newMethodName));
-        mi.setExpression(copySubtree(ast, node.getExpression()));
         final List<Expression> args = arguments(node);
         assertSize(args, 1);
-        if (hasType(args.get(0), "int", "short", "byte")) {
-            final CastExpression ce = ast.newCastExpression();
-            ce.setType(ast.newSimpleType(ast.newSimpleName("Object")));
-            ce.setExpression(copySubtree(ast, args.get(0)));
-            arguments(mi).add(ce);
-        } else {
-            arguments(mi).add(copySubtree(ast, args.get(0)));
+        final Expression arg0 = args.get(0);
+
+        final ASTBuilder b = this.ctx.getASTBuilder();
+        final Refactorings r = this.ctx.getRefactorings();
+        r.set(node, NAME_PROPERTY, b.simpleName(newMethodName));
+        if (hasType(arg0, "int", "short", "byte")) {
+            r.replace(arg0, b.cast("Object", b.move(arg0)));
         }
-        this.ctx.getRefactorings().replace(node, mi);
     }
 
-    private void replaceWithAndSwapArguments(MethodInvocation node,
-            String newMethodName) {
-        AST ast = this.ctx.getAST();
-        MethodInvocation mi = ast.newMethodInvocation();
-        mi.setName(ast.newSimpleName(newMethodName));
-        mi.setExpression(copySubtree(ast, node.getExpression()));
+    private void replaceWithAndSwapArguments(MethodInvocation node, String newMethodName) {
         final List<Expression> args = arguments(node);
         assertSize(args, 2);
-        arguments(mi).add(copySubtree(ast, args.get(1)));
-        arguments(mi).add(copySubtree(ast, args.get(0)));
-        this.ctx.getRefactorings().replace(node, mi);
+        final Expression arg1 = args.get(1);
+
+        final ASTBuilder b = this.ctx.getASTBuilder();
+        final Refactorings r = this.ctx.getRefactorings();
+        r.set(node, NAME_PROPERTY, b.simpleName(newMethodName));
+        r.insertAt(b.move(arg1), 0, arg1.getLocationInParent(), arg1.getParent());
     }
 
     private void assertSize(final List<Expression> args, int expectedSize) {
@@ -137,6 +124,7 @@ public class VectorOldToNewAPIRefactoring extends ASTVisitor implements
     }
 
     /** {@inheritDoc} */
+    @Override
     public Refactorings getRefactorings(CompilationUnit astRoot) {
         astRoot.accept(this);
         return this.ctx.getRefactorings();

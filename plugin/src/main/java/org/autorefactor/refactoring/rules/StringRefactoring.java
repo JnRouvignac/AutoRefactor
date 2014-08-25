@@ -25,6 +25,7 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.IJavaRefactoring;
 import org.autorefactor.refactoring.Refactorings;
 import org.eclipse.jdt.core.dom.ASTVisitor;
@@ -54,6 +55,7 @@ public class StringRefactoring extends ASTVisitor implements IJavaRefactoring {
     }
 
     /** {@inheritDoc} */
+    @Override
     public void setRefactoringContext(RefactoringContext ctx) {
         this.ctx = ctx;
     }
@@ -69,8 +71,8 @@ public class StringRefactoring extends ASTVisitor implements IJavaRefactoring {
                 && arguments(node).size() == 1) {
             final Expression arg0 = arguments(node).get(0);
             if (arg0.resolveConstantExpressionValue() != null) {
-                this.ctx.getRefactorings().replace(node,
-                        copySubtree(this.ctx.getAST(), arg0));
+                final ASTBuilder b = this.ctx.getASTBuilder();
+                this.ctx.getRefactorings().replace(node, b.copy(arg0));
                 return DO_NOT_VISIT_SUBTREE;
             }
         }
@@ -85,8 +87,8 @@ public class StringRefactoring extends ASTVisitor implements IJavaRefactoring {
                 && "toString".equals(node.getName().getIdentifier())
                 && arguments(node).isEmpty()
                 && canRemoveToStringMethodCall(node, expression)) {
-            this.ctx.getRefactorings().replace(node,
-                    copySubtree(this.ctx.getAST(), expression));
+            final ASTBuilder b = this.ctx.getASTBuilder();
+            this.ctx.getRefactorings().replace(node, b.copy(expression));
             return DO_NOT_VISIT_SUBTREE;
         }
         return VISIT_SUBTREE;
@@ -105,6 +107,7 @@ public class StringRefactoring extends ASTVisitor implements IJavaRefactoring {
     }
 
     /** {@inheritDoc} */
+    @Override
     public Refactorings getRefactorings(CompilationUnit astRoot) {
         astRoot.accept(this);
         return this.ctx.getRefactorings();

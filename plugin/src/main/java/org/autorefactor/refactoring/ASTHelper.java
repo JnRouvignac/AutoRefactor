@@ -168,8 +168,9 @@ public final class ASTHelper {
      * @return a copy of the provided node typecasted to the same type as the provided node
      * @see ASTNode#copySubtree(AST, ASTNode)
      */
+    @SuppressWarnings("unchecked")
     public static <T extends ASTNode> T copySubtree(AST ast, T node) {
-        return (T) ASTNode.copySubtree(ast, (ASTNode) node);
+        return (T) ASTNode.copySubtree(ast, node);
     }
 
     /**
@@ -181,6 +182,7 @@ public final class ASTHelper {
      * @return a copy of the provided nodes typecasted to the same generic type as the provided nodes
      * @see ASTNode#copySubtrees(AST, List)
      */
+    @SuppressWarnings("unchecked")
     public static <T extends ASTNode> List<T> copySubtrees(AST ast, List<T> nodes) {
         return ASTNode.copySubtrees(ast, nodes);
     }
@@ -269,6 +271,7 @@ public final class ASTHelper {
             nodeToReplace.getParent().setStructuralProperty(cpd, replacementNode);
         } else if (locationInParent instanceof ChildListPropertyDescriptor) {
             final ChildListPropertyDescriptor clpd = (ChildListPropertyDescriptor) locationInParent;
+            @SuppressWarnings("unchecked")
             final List<ASTNode> property = (List<ASTNode>) nodeToReplace.getParent().getStructuralProperty(clpd);
             property.set(property.indexOf(nodeToReplace), replacementNode);
         } else {
@@ -306,6 +309,7 @@ public final class ASTHelper {
      * @param stmtClazz the class representing the required statement type
      * @return the provided statement as an object of the provided type if type matches, null otherwise
      */
+    @SuppressWarnings("unchecked")
     public static <T extends Statement> T as(Statement stmt, Class<T> stmtClazz) {
         if (stmt != null) {
             final List<Statement> stmts = asList(stmt);
@@ -325,6 +329,7 @@ public final class ASTHelper {
      * @param exprClazz the class representing the required expression type
      * @return the provided expression as an object of the provided type if type matches, null otherwise
      */
+    @SuppressWarnings("unchecked")
     public static <T extends Expression> T as(Expression expr, Class<T> exprClazz) {
         if (expr != null) {
             if (exprClazz.isAssignableFrom(expr.getClass())) {
@@ -736,6 +741,7 @@ public final class ASTHelper {
      * @param ancestorClazz the required ancestor's type
      * @return the first ancestor of the provided node which has the required type
      */
+    @SuppressWarnings("unchecked")
     public static <T extends ASTNode> T getAncestor(ASTNode node, Class<T> ancestorClazz) {
         if (node == null || node.getParent() == null) {
             throw new IllegalStateException("Could not find any ancestor for "

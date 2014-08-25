@@ -25,14 +25,15 @@
  */
 package org.autorefactor.refactoring.rules;
 
-import java.util.Arrays;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.IJavaRefactoring;
 import org.autorefactor.refactoring.Refactorings;
 import org.autorefactor.util.NotImplementedException;
@@ -69,6 +70,7 @@ public class RemoveUselessModifiersRefactoring extends ASTVisitor implements
 
     private static final class ModifierOrderComparator implements Comparator<Modifier> {
 
+        @Override
         public int compare(Modifier o1, Modifier o2) {
             final int i1 = ORDERED_MODIFIERS.indexOf(o1.getKeyword());
             final int i2 = ORDERED_MODIFIERS.indexOf(o2.getKeyword());
@@ -105,6 +107,7 @@ public class RemoveUselessModifiersRefactoring extends ASTVisitor implements
     }
 
     /** {@inheritDoc} */
+    @Override
     public void setRefactoringContext(RefactoringContext ctx) {
         this.ctx = ctx;
     }
@@ -198,11 +201,9 @@ public class RemoveUselessModifiersRefactoring extends ASTVisitor implements
         return l.size();
     }
 
-    private void insertAt(Modifier modifier, int index) {
-        final Modifier copy = copySubtree(this.ctx.getAST(), modifier);
-        this.ctx.getRefactorings().insertAt(copy, index,
-                modifier.getLocationInParent(), modifier.getParent());
-        this.ctx.getRefactorings().remove(modifier);
+    private void insertAt(Modifier m, int index) {
+        final ASTBuilder b = this.ctx.getASTBuilder();
+        this.ctx.getRefactorings().insertAt(b.move(m), index, m.getLocationInParent(), m.getParent());
     }
 
     @SuppressWarnings("unchecked")
@@ -233,6 +234,7 @@ public class RemoveUselessModifiersRefactoring extends ASTVisitor implements
     }
 
     /** {@inheritDoc} */
+    @Override
     public Refactorings getRefactorings(CompilationUnit astRoot) {
         astRoot.accept(this);
         return this.ctx.getRefactorings();

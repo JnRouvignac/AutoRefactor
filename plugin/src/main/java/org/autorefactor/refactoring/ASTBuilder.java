@@ -27,6 +27,7 @@ package org.autorefactor.refactoring;
 
 import java.util.List;
 
+import org.autorefactor.util.NotImplementedException;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ArrayCreation;
@@ -34,6 +35,7 @@ import org.eclipse.jdt.core.dom.ArrayInitializer;
 import org.eclipse.jdt.core.dom.ArrayType;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Block;
+import org.eclipse.jdt.core.dom.CastExpression;
 import org.eclipse.jdt.core.dom.CatchClause;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.Expression;
@@ -55,6 +57,7 @@ import org.eclipse.jdt.core.dom.StringLiteral;
 import org.eclipse.jdt.core.dom.StructuralPropertyDescriptor;
 import org.eclipse.jdt.core.dom.ThrowStatement;
 import org.eclipse.jdt.core.dom.TryStatement;
+import org.eclipse.jdt.core.dom.Type;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.autorefactor.util.Utils.*;
@@ -104,6 +107,29 @@ public class ASTBuilder {
         final Block tryBody = ast.newBlock();
         addAll(statements(tryBody), stmts);
         return tryBody;
+    }
+
+    /**
+     * Builds a new {@link CastExpression} instance.
+     *
+     * @param typeName the name of the type being cast to
+     * @param expr the expression being cast
+     * @return a new CastExpression
+     */
+    public CastExpression cast(String typeName, Expression expr) {
+        final CastExpression ce = ast.newCastExpression();
+        ce.setType(type(typeName));
+        ce.setExpression(expr);
+        return ce;
+    }
+
+    private Type type(String typeName) {
+        final String[] names = typeName.split("\\.");
+        if (names.length == 1) {
+            return ast.newSimpleType(ast.newSimpleName(names[0]));
+        } else {
+            throw new NotImplementedException();
+        }
     }
 
     /**
@@ -318,21 +344,42 @@ public class ASTBuilder {
     }
 
     /**
+     * Returns a placeholder where to move the provided {@link ASTNode}.
+     *
+     * @param <T> the actual node type
+     * @param nodeToMove the node to move
+     * @return a placeholder for the moved node
+     */
+    public <T extends ASTNode> T move(T nodeToMove) {
+        return refactorings.createMoveTarget(nodeToMove);
+    }
+
+    /**
      * Builds a new {@link Name} instance. If only a single name is provided then a {@link SimpleName} is returned,
      * if several names are provided then a {@link QualifiedName} is built.
      *
      * @param names the qualified or simple name
      * @return a new name
-     * @throws IllegalStateException if no names are provided
+     * @throws IllegalArgumentException if no names are provided
      */
     public Name name(String... names) {
         if (names.length == 0) {
             throw new IllegalArgumentException("Expected at least one name, but was given 0 names");
         }
         if (names.length == 1) {
-            return ast.newSimpleName(names[0]);
+            return simpleName(names[0]);
         }
         return ast.newName(names);
+    }
+
+    /**
+     * Builds a new {@link SimpleName} instance.
+     *
+     * @param simpleName the simple name
+     * @return a new simple name
+     */
+    public SimpleName simpleName(String simpleName) {
+        return ast.newSimpleName(simpleName);
     }
 
     /**
