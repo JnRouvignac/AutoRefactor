@@ -27,14 +27,16 @@ package org.autorefactor.refactoring.rules;
 
 import java.util.List;
 
+import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.IJavaRefactoring;
 import org.autorefactor.refactoring.Refactorings;
-import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.Statement;
+
+import static org.eclipse.jdt.core.dom.IfStatement.*;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
 
@@ -64,6 +66,7 @@ public class IfStatementRefactoring extends ASTVisitor implements
     }
 
     /** {@inheritDoc} */
+    @Override
     public void setRefactoringContext(RefactoringContext ctx) {
         this.ctx = ctx;
     }
@@ -97,10 +100,8 @@ public class IfStatementRefactoring extends ASTVisitor implements
             List<Statement> elseStmts = statements((Block) elseStmt);
             if (elseStmts.size() == 1
                     && elseStmts.get(0) instanceof IfStatement) {
-                final AST ast = this.ctx.getAST();
-                final IfStatement newIS = copySubtree(ast, node);
-                newIS.setElseStatement(copySubtree(ast, elseStmts.get(0)));
-                this.ctx.getRefactorings().replace(node, newIS);
+                final ASTBuilder b = this.ctx.getASTBuilder();
+                this.ctx.getRefactorings().set(node, ELSE_STATEMENT_PROPERTY, b.copy(elseStmts.get(0)));
                 return DO_NOT_VISIT_SUBTREE;
             }
         }
@@ -108,6 +109,7 @@ public class IfStatementRefactoring extends ASTVisitor implements
     }
 
     /** {@inheritDoc} */
+    @Override
     public Refactorings getRefactorings(CompilationUnit astRoot) {
         astRoot.accept(this);
         return this.ctx.getRefactorings();

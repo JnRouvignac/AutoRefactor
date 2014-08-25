@@ -293,6 +293,19 @@ public class Refactorings {
     }
 
     /**
+     * Sets the node's property to the provided value.
+     *
+     * @param node the node where to set the property
+     * @param property the property to be set
+     * @param value the value to set
+     * @see ASTRewrite#set(ASTNode, StructuralPropertyDescriptor, Object, TextEditGroup)
+     */
+    public void set(ASTNode node, StructuralPropertyDescriptor property, Object value) {
+        hasRefactorings = true;
+        rewrite.set(node, property, value, null);
+    }
+
+    /**
      * Applies the accumulated refactorings to the provided document.
      *
      * @param document the document to refactor
