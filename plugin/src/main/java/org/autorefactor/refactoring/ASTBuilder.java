@@ -154,18 +154,6 @@ public class ASTBuilder {
     }
 
     /**
-     * Returns a copy of the provided {@link Expression}.
-     *
-     * @param <T> the actual expression type
-     * @param exprToCopy the expression to copy
-     * @return a copy of the expression
-     * @deprecated use {@link #copy(ASTNode)}
-     */
-    public <T extends Expression> T copyExpr(T exprToCopy) {
-        return copySubtree(ast, exprToCopy);
-    }
-
-    /**
      * Returns a copy of the provided {@link ASTNode}.
      *
      * @param <T> the actual node type
@@ -176,18 +164,7 @@ public class ASTBuilder {
         if (isValidInCurrentAST(nodeToCopy)) {
             return refactorings.createCopyTarget(nodeToCopy);
         }
-        return copySubtree(ast, nodeToCopy);
-    }
-
-    /**
-     * Returns a copy of the provided {@link Expression} list.
-     *
-     * @param <E> the actual expression's type
-     * @param expressions the expression list to copy
-     * @return a copy of the expression list
-     */
-    public <E extends Expression> List<E> copyAll(List<E> expressions) {
-        return copySubtrees(ast, expressions);
+        return copySubtree(nodeToCopy);
     }
 
     private boolean isValidInCurrentAST(ASTNode node) {
@@ -233,10 +210,36 @@ public class ASTBuilder {
     }
 
     /**
+     * Returns a copy of the provided {@link ASTNode}.
+     * This method loses code comments. Prefer using {@link #copy(ASTNode)}.
+     *
+     * @param <T> the actual node type
+     * @param node the node to copy
+     * @return a copy of the node
+     */
+    public <T extends ASTNode> T copySubtree(T node) {
+        return ASTHelper.copySubtree(ast, node);
+    }
+
+    /**
+     * Returns a copy of the provided {@link ASTNode} list.
+     * This method loses code comments. Prefer using {@link #copyRange(List)}.
+     *
+     * @param <T> the actual node's type
+     * @param nodes the node list to copy
+     * @return a copy of the node list
+     */
+    public <T extends ASTNode> List<T> copySubtrees(List<T> nodes) {
+        return ASTHelper.copySubtrees(ast, nodes);
+    }
+
+    /**
      * Builds a new {@link IfStatement} instance.
      *
-     * @param condition the if condition
-     * @param thenStatement the then statement
+     * @param condition
+     *            the if condition
+     * @param thenStatement
+     *            the then statement
      * @return a new if statement
      */
     public IfStatement if0(Expression condition, Statement thenStatement) {

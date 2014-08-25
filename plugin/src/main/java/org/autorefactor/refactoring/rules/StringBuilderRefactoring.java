@@ -285,11 +285,11 @@ public class StringBuilderRefactoring extends ASTVisitor implements
 
         final Iterator<Expression> it = appendedStrings.iterator();
         final ASTBuilder b = this.ctx.getASTBuilder();
-        final Expression expr1 = b.copyExpr(it.next());
-        final Expression expr2 = b.copyExpr(it.next());
+        final Expression expr1 = b.copySubtree(it.next());
+        final Expression expr2 = b.copySubtree(it.next());
         final InfixExpression ie = b.infixExpr(expr1, Operator.PLUS, expr2);
         while (it.hasNext()) {
-            extendedOperands(ie).add(b.copyExpr(it.next()));
+            extendedOperands(ie).add(b.copySubtree(it.next()));
         }
         return ie;
     }
@@ -312,12 +312,12 @@ public class StringBuilderRefactoring extends ASTVisitor implements
                     final Expression arg0 = arguments(cic).get(0);
                     if (hasType(arg0, "java.lang.String")
                             || instanceOf(arg0, "java.lang.CharSequence")) {
-                        allOperands.addFirst(b.copyExpr(arg0));
+                        allOperands.addFirst(b.copySubtree(arg0));
                     }
                 }
-                return b.copyExpr(cic);
+                return b.copySubtree(cic);
             } else if (expr instanceof Name || expr instanceof FieldAccess) {
-                return b.copyExpr(expr);
+                return b.copySubtree(expr);
             }
         }
         return null;
