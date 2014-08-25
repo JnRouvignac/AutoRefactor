@@ -47,7 +47,7 @@ public class PreferenceHelper {
     }
 
     private boolean getBoolean(Preference pref) {
-        return preferenceStore.getBoolean(ADD_ANGLE_BRACKETS_TO_STATEMENT_BODIES.name);
+        return preferenceStore.getBoolean(pref.name);
     }
 
     /**

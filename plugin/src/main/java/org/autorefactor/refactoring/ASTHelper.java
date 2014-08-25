@@ -1577,4 +1577,24 @@ public final class ASTHelper {
         return null;
     }
 
+    /**
+     * Returns a string suitable for identifying a location in the source.
+     *
+     * @param node the node from which to retrieve the source location
+     * @return a string suitable for identifying a location in the source
+     */
+    public static String getSourceLocation(ASTNode node) {
+        final ASTNode root = node.getRoot();
+        if (root instanceof CompilationUnit) {
+            final CompilationUnit cu = (CompilationUnit) root;
+            final int position = node.getStartPosition();
+            if (cu.getTypeRoot() != null) {
+                return cu.getTypeRoot().getElementName()
+                    + ":" + cu.getLineNumber(position) + ":" + cu.getColumnNumber(position);
+            }
+            // it was not created from a file
+            return cu.getLineNumber(position) + ":" + cu.getColumnNumber(position);
+        }
+        return "";
+    }
 }

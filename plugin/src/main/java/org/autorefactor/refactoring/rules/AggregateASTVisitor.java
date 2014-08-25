@@ -165,17 +165,6 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
         analyzeVisitors();
     }
 
-    /**
-     * Builds an instance of this class.
-     *
-     * @param visitor the visitor that will be executed by this {@link AggregateASTVisitor}
-     */
-    public AggregateASTVisitor(IRefactoring visitor) {
-        this.visitors = Arrays.asList((ASTVisitor) visitor);
-        this.debugModeOn = true;
-        analyzeVisitors();
-    }
-
     private void analyzeVisitors() {
         for (ASTVisitor v : this.visitors) {
             for (Method m : v.getClass().getDeclaredMethods()) {
@@ -286,24 +275,24 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
     private void logBadlyBehavedVisitor(ASTVisitor v) {
         String message = "Visitor " + v.getClass().getName() + " is badly behaved:"
             + " it reported doing a refactoring, but it did not actually contribute any refactoring.";
+        final ILog log = AutoRefactorPlugin.getDefault().getLog();
+        log.log(new Status(IStatus.ERROR, PLUGIN_ID, message));
         if (debugModeOn) {
             throw new RuntimeException(message);
         }
-        final ILog log = AutoRefactorPlugin.getDefault().getLog();
-        log.log(new Status(IStatus.ERROR, PLUGIN_ID, message));
     }
 
     private void logFaultyVisitor(final ASTVisitor v, Exception e) {
         String message = "Visitor " + v.getClass().getName()
                 + " is faulty, it will be disabled for the rest of this run.";
+        final ILog log = AutoRefactorPlugin.getDefault().getLog();
+        log.log(new Status(IStatus.ERROR, PLUGIN_ID, message, e));
         if (debugModeOn) {
             if (e instanceof RuntimeException) {
                 throw (RuntimeException) e;
             }
             throw new RuntimeException(message, e);
         }
-        final ILog log = AutoRefactorPlugin.getDefault().getLog();
-        log.log(new Status(IStatus.ERROR, PLUGIN_ID, message, e));
     }
 
     /**

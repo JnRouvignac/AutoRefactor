@@ -43,12 +43,17 @@ import org.eclipse.ui.handlers.HandlerUtil;
 public class ChooseRefactoringsWizardHandler extends AbstractHandler {
 
     /** {@inheritDoc} */
+    @Override
     public Object execute(final ExecutionEvent event) throws ExecutionException {
         final Shell shell = HandlerUtil.getActiveShell(event);
-        // retrieve the targeted java element before the menu item is disposed by the framework
-        final IJavaElement javaElement = AutoRefactorHandler.getSelectedJavaElement(event);
-        final WizardDialog dialog = new WizardDialog(shell, new ChooseRefactoringsWizard(javaElement));
-        dialog.open();
+        try {
+            // retrieve the targeted java element before the menu item is disposed by the framework
+            final IJavaElement javaElement = AutoRefactorHandler.getSelectedJavaElement(event);
+            final WizardDialog dialog = new WizardDialog(shell, new ChooseRefactoringsWizard(javaElement));
+            dialog.open();
+        } catch (Exception e) {
+            UIHelper.showErrorDialog(shell, e);
+        }
         return null;
     }
 

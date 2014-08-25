@@ -97,7 +97,7 @@ public class RefactoringsTest {
         new ApplyRefactoringsJob(null, null).applyRefactoring(
                 doc, cu,
                 Release.javaSE("1.5.0"), 4,
-                new AggregateASTVisitor(refactoring));
+                new AggregateASTVisitor(Arrays.asList(refactoring), true));
 
         final String actual = normalize(
                 doc.get().replaceAll("samples_in", "samples_out"));

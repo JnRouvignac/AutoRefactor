@@ -25,6 +25,7 @@
  */
 package org.autorefactor.ui;
 
+
 import org.autorefactor.refactoring.rules.AllRefactorings;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
@@ -54,10 +55,17 @@ import org.eclipse.ui.handlers.HandlerUtil;
 public class AutoRefactorHandler extends AbstractHandler {
 
     /** {@inheritDoc} */
+    @Override
     public Object execute(final ExecutionEvent event) throws ExecutionException {
-        new ApplyRefactoringsJob(
-                getSelectedJavaElement(event),
-                AllRefactorings.getConfiguredRefactorings()).run(new NullProgressMonitor());
+        final Shell shell = HandlerUtil.getActiveShell(event);
+        try {
+            new ApplyRefactoringsJob(
+                    getSelectedJavaElement(event),
+                    AllRefactorings.getConfiguredRefactorings()).run(new NullProgressMonitor());
+        } catch (Exception e) {
+            UIHelper.showErrorDialog(shell, e);
+        }
+
 
         // TODO JNR provide a maven plugin
         // TODO JNR provide a gradle plugin
@@ -67,7 +75,6 @@ public class AutoRefactorHandler extends AbstractHandler {
         // TODO JNR provide from the UI the ability to execute groovy (other
         // scripts? rhino?) scripts for refactoring.
 
-        //
         // <p> Extract method: Live variable analysis - READ WRITE variable
         // analysis (including method params).If variable used in extracted
         // method and WRITE first in selected text => do not pass it down as
@@ -88,6 +95,7 @@ public class AutoRefactorHandler extends AbstractHandler {
             }
             Display.getDefault().asyncExec(new Runnable() {
 
+                @Override
                 public void run() {
                     MessageDialog.openInformation(shell, "Info",
                             "This action only works on Java source files");
@@ -106,6 +114,7 @@ public class AutoRefactorHandler extends AbstractHandler {
             } else {
                 Display.getDefault().asyncExec(new Runnable() {
 
+                    @Override
                     public void run() {
                         MessageDialog.openInformation(shell, "Info",
                                 "Please select a Java source file, Java package or Java project");

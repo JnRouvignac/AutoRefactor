@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2013 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2013-2014 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,6 +33,10 @@ import java.util.List;
 public class SimplifyExpressionSample {
 
     private static final String NULL_CONSTANT = null;
+
+    private boolean addedToMakeCodeFail(boolean b1, boolean b2, Object o) {
+        return !b1 && b2 && o != null && addedToMakeCodeFail(b1, b2, o);
+    }
 
     public void removeUselessNullCheck(String s) {
         {
