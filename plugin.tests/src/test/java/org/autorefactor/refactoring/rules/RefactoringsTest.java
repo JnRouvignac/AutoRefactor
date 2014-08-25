@@ -49,7 +49,7 @@ import static org.junit.Assert.*;
 @RunWith(value = Parameterized.class)
 public class RefactoringsTest {
 
-    private String testName;
+    private final String testName;
 
     public RefactoringsTest(String testName) {
         this.testName = testName;
@@ -73,6 +73,17 @@ public class RefactoringsTest {
 
     @Test
     public void testRefactoring() throws Exception {
+        try {
+            testRefactoring0();
+        } catch (RuntimeException e) {
+            if ("Unexpected exception".equals(e.getMessage())) {
+                throw (Exception) e.getCause();
+            }
+            throw e;
+        }
+    }
+
+    private void testRefactoring0() throws Exception {
         final String sampleName = testName + "Sample.java";
         final File samplesDir = new File("src/test/java/org/autorefactor");
         final File sampleIn = new File(samplesDir, "samples_in/" + sampleName);

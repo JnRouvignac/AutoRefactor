@@ -27,11 +27,11 @@ package org.autorefactor.refactoring;
 
 import java.util.List;
 
+import org.eclipse.jdt.core.dom.AST;
+import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ArrayCreation;
 import org.eclipse.jdt.core.dom.ArrayInitializer;
 import org.eclipse.jdt.core.dom.ArrayType;
-import org.eclipse.jdt.core.dom.AST;
-import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.CatchClause;
@@ -47,14 +47,17 @@ import org.eclipse.jdt.core.dom.NumberLiteral;
 import org.eclipse.jdt.core.dom.ParameterizedType;
 import org.eclipse.jdt.core.dom.ParenthesizedExpression;
 import org.eclipse.jdt.core.dom.ReturnStatement;
+import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.SimpleType;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.StringLiteral;
+import org.eclipse.jdt.core.dom.StructuralPropertyDescriptor;
 import org.eclipse.jdt.core.dom.ThrowStatement;
 import org.eclipse.jdt.core.dom.TryStatement;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
+import static org.autorefactor.util.Utils.*;
 
 /**
  * Helper class for building AST note in a somewhat fluent API.
@@ -167,6 +170,43 @@ public class ASTBuilder {
     }
 
     /**
+     * Returns a copy of the provided nodes list.
+     *
+     * @param <T> the actual nodes's type
+     * @param nodes the nodes list to copy
+     * @return a single node, representing a copy of the nodes list
+     */
+    public <T extends ASTNode> T copyRange(List<T> nodes) {
+        if (nodes.isEmpty()) {
+            return null;
+        }
+        if (!isValidForRangeCopy(nodes)) {
+            throw new IllegalArgumentException();
+        }
+        return refactorings.createCopyTarget(nodes.get(0), nodes.get(nodes.size() - 1));
+    }
+
+    private boolean isValidForRangeCopy(List<? extends ASTNode> nodes) {
+        return nodesHaveSameParentAndLocation(nodes) && refactorings.isValidRange(nodes);
+    }
+
+    private boolean nodesHaveSameParentAndLocation(List<? extends ASTNode> nodes) {
+        if (nodes.isEmpty()) {
+            return true;
+        }
+        final ASTNode firstNode = nodes.get(0);
+        final ASTNode parent = firstNode.getParent();
+        final StructuralPropertyDescriptor locInParent = firstNode.getLocationInParent();
+        for (ASTNode node : nodes) {
+            if (!equal(node.getParent(), parent)
+                    || !equal(node.getLocationInParent(), locInParent)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
      * Builds a new {@link IfStatement} instance.
      *
      * @param condition the if condition
@@ -265,8 +305,16 @@ public class ASTBuilder {
         final MethodInvocation mi = ast.newMethodInvocation();
         mi.setExpression(expression);
         mi.setName(ast.newSimpleName(methodName));
-        arguments(mi).addAll(arguments);
+        addAll(arguments, mi);
         return mi;
+    }
+
+    private boolean isEmptyRangeCopy(ASTNode... nodes) {
+        return nodes.length == 1 && nodes[0] == null;
+    }
+
+    private <E extends ASTNode> boolean isEmptyRangeCopy(List<E> nodes) {
+        return nodes.size() == 1 && nodes.get(0) == null;
     }
 
     /**
@@ -317,6 +365,7 @@ public class ASTBuilder {
             addAll(arguments(cic), arguments);
             return cic;
         }
+
         final String erasedClassName = className.substring(0, ltIdx);
         final int gtIdx = className.indexOf('>', ltIdx);
         final String typeParam = className.substring(ltIdx + 1, gtIdx);
@@ -332,22 +381,29 @@ public class ASTBuilder {
 
     private <T extends ASTNode> void addAll(List<T> whereToAdd,
             @SuppressWarnings("unchecked") T... toAdd) {
-        for (T e : toAdd) {
-            whereToAdd.add(e);
+        if (!isEmptyRangeCopy(toAdd)) {
+            for (T e : toAdd) {
+                whereToAdd.add(e);
+            }
+        }
+    }
+
+    private <E extends Expression> void addAll(List<E> arguments, MethodInvocation mi) {
+        if (!isEmptyRangeCopy(arguments)) {
+            arguments(mi).addAll(arguments);
         }
     }
 
     /**
      * Builds a new {@link ArrayCreation} instance.
      *
-     * @param <E> the type of the expressions
      * @param typeBinding the type binding of the instantiated type
      * @param arrayInitializers the expressions forming the array initializer
      * @return a new array creation instance
      */
-    public <E extends Expression> ArrayCreation newArray(ITypeBinding typeBinding, List<E> arrayInitializers) {
+    public ArrayCreation newArray(ITypeBinding typeBinding, Expression arrayInitializers) {
         final ArrayInitializer ai = ast.newArrayInitializer();
-        expressions(ai).addAll(arrayInitializers);
+        expressions(ai).add(arrayInitializers);
 
         final ArrayCreation ac = ast.newArrayCreation();
         ac.setType((ArrayType) toType(ast, typeBinding));

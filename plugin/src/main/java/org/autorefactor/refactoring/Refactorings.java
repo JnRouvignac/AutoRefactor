@@ -28,6 +28,8 @@ package org.autorefactor.refactoring;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import org.autorefactor.util.Pair;
@@ -85,12 +87,30 @@ public class Refactorings {
      * @return the new placeholder node
      * @see ASTRewrite#createCopyTarget(ASTNode)
      */
+    @SuppressWarnings("unchecked")
     public <T extends ASTNode> T createCopyTarget(T node) {
         return (T) rewrite.createCopyTarget(node);
     }
 
-    private ListRewrite getListRewrite(ASTNode element) {
-        return getListRewrite(element.getParent(), (ChildListPropertyDescriptor) element.getLocationInParent());
+    /**
+     * Creates and returns a placeholder node for a copy of the source code of the provided range of nodes.<br>
+     * The placeholder node can be used like any new node created via the AST class.<br>
+     * When the document is rewritten, a copy of the source code for the provided range of nodes is inserted
+     * into the output document at the position corresponding to the placeholder (indentation is adjusted).
+     *
+     * @param <T> the type of the provided nodes
+     * @param first the first node of the range
+     * @param last the first node of the range
+     * @return the new placeholder node
+     * @see ListRewrite#createCopyTarget(ASTNode, ASTNode)
+     */
+    @SuppressWarnings("unchecked")
+    public <T extends ASTNode> T createCopyTarget(T first, T last) {
+        return (T) getListRewrite(first).createCopyTarget(first, last);
+    }
+
+    private ListRewrite getListRewrite(ASTNode child) {
+        return getListRewrite(child.getParent(), (ChildListPropertyDescriptor) child.getLocationInParent());
     }
 
     private ListRewrite getListRewrite(ASTNode node, ChildListPropertyDescriptor listProperty) {
@@ -101,6 +121,40 @@ public class Refactorings {
             listRewriteCache.put(key, listRewrite);
         }
         return listRewrite;
+    }
+
+    /**
+     * Returns whether the provided nodes are a valid existing range.
+     *
+     * @param nodes the node range to validate
+     * @return true if the provided nodes are a valid existing range, false otherwise
+     */
+    public boolean isValidRange(List<? extends ASTNode> nodes) {
+        if (nodes.isEmpty()) {
+            return true;
+        }
+        @SuppressWarnings("unchecked")
+        final List<ASTNode> originalList = getListRewrite(nodes.get(0)).getOriginalList();
+        final Iterator<ASTNode> origIter = originalList.iterator();
+        while (origIter.hasNext()) {
+            ASTNode origNode = origIter.next();
+            final Iterator<? extends ASTNode> currIter = nodes.iterator();
+            while (currIter.hasNext()) {
+                ASTNode currNode = currIter.next();
+                if (origNode.equals(currNode)) {
+                    // all current nodes must be found in the original list now
+                    while (origIter.hasNext() && currIter.hasNext()) {
+                        origNode = origIter.next();
+                        currNode = currIter.next();
+                        if (!origNode.equals(currNode)) {
+                            return false;
+                        }
+                    }
+                    return !currIter.hasNext();
+                } // else iterate until finding the correct node
+            }
+        }
+        return true;
     }
 
     /**

@@ -90,7 +90,7 @@ public class VectorOldToNewAPIRefactoring extends ASTVisitor implements
             b.invoke(
                 b.copy(node.getExpression()),
                 newMethodName,
-                b.copyAll(arguments(node))));
+                b.copyRange(arguments(node))));
     }
 
     private void replaceWithSpecial(MethodInvocation node, String newMethodName) {

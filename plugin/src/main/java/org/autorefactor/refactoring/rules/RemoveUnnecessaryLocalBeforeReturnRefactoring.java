@@ -118,7 +118,7 @@ public class RemoveUnnecessaryLocalBeforeReturnRefactoring extends ASTVisitor
 
     private ReturnStatement getReturnStatementForArray(ArrayInitializer returnAI, ITypeBinding typeBinding) {
         final ASTBuilder b = this.ctx.getASTBuilder();
-        return b.return0(b.newArray(typeBinding, b.copyAll(expressions(returnAI))));
+        return b.return0(b.newArray(typeBinding, b.copyRange(expressions(returnAI))));
     }
 
     private ASTNode getReturnStatement(Expression initializer) {
