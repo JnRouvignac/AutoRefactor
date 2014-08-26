@@ -70,30 +70,30 @@ import static org.eclipse.jdt.core.formatter.DefaultCodeFormatterConstants.*;
  */
 public class ApplyRefactoringsJob extends Job {
 
-    private final IJavaElement javaElement;
+    private final List<IJavaElement> javaElements;
     private final List<IRefactoring> refactoringsToApply;
 
     /**
      * Builds an instance of this class.
      *
-     * @param javaElement a java element from where to extract the project options
+     * @param javaElements a java element from where to extract the project options
      * @param refactoringsToApply the refactorings to apply
      */
-    public ApplyRefactoringsJob(IJavaElement javaElement, List<IRefactoring> refactoringsToApply) {
+    public ApplyRefactoringsJob(List<IJavaElement> javaElements, List<IRefactoring> refactoringsToApply) {
         super("Auto Refactor");
-        this.javaElement = javaElement;
+        this.javaElements = javaElements;
         this.refactoringsToApply = refactoringsToApply;
     }
 
     /** {@inheritDoc} */
     @Override
     protected IStatus run(IProgressMonitor monitor) {
-        if (javaElement == null) {
+        if (javaElements.isEmpty()) {
             // No java project exists.
             return Status.OK_STATUS;
         }
-        final List<ICompilationUnit> compilationUnits = collectCompilationUnits(javaElement);
-        final Map<String, String> options = getJavaProjectOptions(javaElement);
+        final List<ICompilationUnit> compilationUnits = collectCompilationUnits(javaElements);
+        final Map<String, String> options = getJavaProjectOptions(javaElements);
         final String javaSourceCompatibility = options.get(COMPILER_SOURCE);
         final int tabSize = getTabSize(options);
 
@@ -133,18 +133,20 @@ public class ApplyRefactoringsJob extends Job {
         }
     }
 
-    private List<ICompilationUnit> collectCompilationUnits(IJavaElement javaElement) {
+    private List<ICompilationUnit> collectCompilationUnits(List<IJavaElement> javaElements) {
         try {
             final List<ICompilationUnit> results = new LinkedList<ICompilationUnit>();
-            if (javaElement instanceof ICompilationUnit) {
-                add(results, (ICompilationUnit) javaElement);
-            } else if (javaElement instanceof IPackageFragment) {
-                final IPackageFragment pf = (IPackageFragment) javaElement;
-                addAll(results, pf.getCompilationUnits());
-            } else if (javaElement instanceof IJavaProject) {
-                IJavaProject javaProject = (IJavaProject) javaElement;
-                for (IPackageFragment pf : javaProject.getPackageFragments()) {
+            for (IJavaElement javaElement : javaElements) {
+                if (javaElement instanceof ICompilationUnit) {
+                    add(results, (ICompilationUnit) javaElement);
+                } else if (javaElement instanceof IPackageFragment) {
+                    final IPackageFragment pf = (IPackageFragment) javaElement;
                     addAll(results, pf.getCompilationUnits());
+                } else if (javaElement instanceof IJavaProject) {
+                    IJavaProject javaProject = (IJavaProject) javaElement;
+                    for (IPackageFragment pf : javaProject.getPackageFragments()) {
+                        addAll(results, pf.getCompilationUnits());
+                    }
                 }
             }
             return results;
@@ -153,15 +155,13 @@ public class ApplyRefactoringsJob extends Job {
         }
     }
 
-    private void addAll(final List<ICompilationUnit> results,
-            ICompilationUnit[] compilationUnits) throws JavaModelException {
-        for (ICompilationUnit cu : compilationUnits) {
+    private void addAll(final List<ICompilationUnit> results, ICompilationUnit[] cus) throws JavaModelException {
+        for (ICompilationUnit cu : cus) {
             add(results, cu);
         }
     }
 
-    private void add(final List<ICompilationUnit> results,
-            ICompilationUnit cu) throws JavaModelException {
+    private void add(final List<ICompilationUnit> results, ICompilationUnit cu) throws JavaModelException {
         if (!cu.isConsistent()) {
             cu.makeConsistent(null);
         }
@@ -171,8 +171,8 @@ public class ApplyRefactoringsJob extends Job {
     }
 
     @SuppressWarnings("unchecked")
-    private Map<String, String> getJavaProjectOptions(IJavaElement javaElement) {
-        final IJavaProject javaProject = getIJavaProject(javaElement);
+    private Map<String, String> getJavaProjectOptions(List<IJavaElement> javaElements) {
+        final IJavaProject javaProject = getIJavaProject(javaElements.get(0));
         return javaProject.getOptions(true);
     }
 
@@ -266,8 +266,7 @@ public class ApplyRefactoringsJob extends Job {
                 // ICompilationUnit.ENABLE_BINDINGS_RECOVERY |
                 // ICompilationUnit.ENABLE_STATEMENTS_RECOVERY |
                 // ICompilationUnit.FORCE_PROBLEM_DETECTION
-                // /** can be useful to back off a change that does not
-                // compile*/
+                // /** can be useful to back out a change that does not compile*/
                 // , null, null);
                 if (!hadUnsavedChanges) {
                     compilationUnit.save(null, true);
@@ -292,14 +291,14 @@ public class ApplyRefactoringsJob extends Job {
                 }
             } catch (Exception e) {
                 // TODO JNR add UI error reporting with Display.getCurrent().asyncExec()
-                throw new RuntimeException("Unexpected exception", e);
+                throw new UnhandledException(
+                    "Unexpected exception while applying refactorings to " + compilationUnit.getElementName(), e);
             }
         }
     }
 
-    private static void resetParser(ICompilationUnit compilationUnit,
-            ASTParser parser, Release javaSERelease) {
-        parser.setSource(compilationUnit);
+    private static void resetParser(ICompilationUnit cu, ASTParser parser, Release javaSERelease) {
+        parser.setSource(cu);
         parser.setResolveBindings(true);
         parser.setCompilerOptions(getCompilerOptions(javaSERelease));
     }
@@ -312,15 +311,14 @@ public class ApplyRefactoringsJob extends Job {
         return options;
     }
 
-    private String getPossibleCulprits(int nbLoopsWithSameVisitors,
-            List<ASTVisitor> lastLoopVisitors) {
+    private String getPossibleCulprits(int nbLoopsWithSameVisitors, List<ASTVisitor> lastLoopVisitors) {
         if (nbLoopsWithSameVisitors < 100 || lastLoopVisitors.isEmpty()) {
             return "";
         }
         final StringBuilder sb = new StringBuilder(" Possible culprit ASTVisitor classes are: ");
         final Iterator<ASTVisitor> iter = lastLoopVisitors.iterator();
         sb.append(iter.next().getClass().getName());
-        for (; iter.hasNext();) {
+        while (iter.hasNext()) {
             sb.append(", ").append(iter.next().getClass().getName());
         }
         return sb.toString();

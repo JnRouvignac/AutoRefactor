@@ -40,4 +40,14 @@ public class UnhandledException extends RuntimeException {
         super(unhandled);
     }
 
+    /**
+     * Class constructor.
+     *
+     * @param message the message to report
+     * @param unhandled the unhandled exception.
+     */
+    public UnhandledException(String message, Throwable unhandled) {
+        super(message, unhandled);
+    }
+
 }

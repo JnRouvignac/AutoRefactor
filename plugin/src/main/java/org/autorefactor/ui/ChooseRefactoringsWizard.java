@@ -38,16 +38,16 @@ import org.eclipse.jface.wizard.Wizard;
 public class ChooseRefactoringsWizard extends Wizard {
 
     private final ChooseRefactoringWizardPage chooseRefactoringsPage = new ChooseRefactoringWizardPage();
-    private IJavaElement javaElement;
+    private List<IJavaElement> javaElements;
 
     /**
      * Builds an instance of this class, with the provided java element.
      *
-     * @param javaElement a java element from where to extract the project options
+     * @param javaElements the java elements from where to extract the project options
      */
-    public ChooseRefactoringsWizard(IJavaElement javaElement) {
+    public ChooseRefactoringsWizard(List<IJavaElement> javaElements) {
         setNeedsProgressMonitor(true);
-        this.javaElement = javaElement;
+        this.javaElements = javaElements;
     }
 
     /** {@inheritDoc} */
@@ -66,7 +66,7 @@ public class ChooseRefactoringsWizard extends Wizard {
     @Override
     public boolean performFinish() {
         final List<IRefactoring> refactorings = chooseRefactoringsPage.getSelectedRefactorings();
-        new ApplyRefactoringsJob(javaElement, refactorings).run(new NullProgressMonitor());
+        new ApplyRefactoringsJob(javaElements, refactorings).run(new NullProgressMonitor());
         return !refactorings.isEmpty();
     }
 }

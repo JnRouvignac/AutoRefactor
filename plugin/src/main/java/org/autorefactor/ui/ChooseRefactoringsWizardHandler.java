@@ -28,7 +28,7 @@ package org.autorefactor.ui;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.jdt.core.IJavaElement;
+import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.handlers.HandlerUtil;
@@ -48,8 +48,8 @@ public class ChooseRefactoringsWizardHandler extends AbstractHandler {
         final Shell shell = HandlerUtil.getActiveShell(event);
         try {
             // retrieve the targeted java element before the menu item is disposed by the framework
-            final IJavaElement javaElement = AutoRefactorHandler.getSelectedJavaElement(event);
-            final WizardDialog dialog = new WizardDialog(shell, new ChooseRefactoringsWizard(javaElement));
+            final Wizard wizard = new ChooseRefactoringsWizard(AutoRefactorHandler.getSelectedJavaElements(event));
+            final WizardDialog dialog = new WizardDialog(shell, wizard);
             dialog.open();
         } catch (Exception e) {
             UIHelper.showErrorDialog(shell, e);

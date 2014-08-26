@@ -26,6 +26,11 @@
 package org.autorefactor.ui;
 
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+
 import org.autorefactor.refactoring.rules.AllRefactorings;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
@@ -36,13 +41,13 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.ui.JavaUI;
-import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.handlers.HandlerUtil;
+
+import static org.eclipse.jface.dialogs.MessageDialog.*;
 
 /**
  * This is the Eclipse handler for launching the automated refactorings. This is
@@ -60,12 +65,11 @@ public class AutoRefactorHandler extends AbstractHandler {
         final Shell shell = HandlerUtil.getActiveShell(event);
         try {
             new ApplyRefactoringsJob(
-                    getSelectedJavaElement(event),
+                    getSelectedJavaElements(event),
                     AllRefactorings.getConfiguredRefactorings()).run(new NullProgressMonitor());
         } catch (Exception e) {
             UIHelper.showErrorDialog(shell, e);
         }
-
 
         // TODO JNR provide a maven plugin
         // TODO JNR provide a gradle plugin
@@ -83,45 +87,42 @@ public class AutoRefactorHandler extends AbstractHandler {
         return null;
     }
 
-    static IJavaElement getSelectedJavaElement(ExecutionEvent event) {
+    static List<IJavaElement> getSelectedJavaElements(ExecutionEvent event) {
         final Shell shell = HandlerUtil.getActiveShell(event);
         final String activePartId = HandlerUtil.getActivePartId(event);
         if ("org.eclipse.jdt.ui.CompilationUnitEditor".equals(activePartId)) {
-            IEditorPart activeEditor = HandlerUtil.getActiveEditor(event);
-            IJavaElement javaElement = JavaUI
-                    .getEditorInputJavaElement(activeEditor.getEditorInput());
+            final IEditorInput editorInput = HandlerUtil.getActiveEditor(event).getEditorInput();
+            final IJavaElement javaElement = JavaUI.getEditorInputJavaElement(editorInput);
             if (javaElement instanceof ICompilationUnit) {
-                return javaElement;
+                return Collections.singletonList(javaElement);
             }
             Display.getDefault().asyncExec(new Runnable() {
-
                 @Override
                 public void run() {
-                    MessageDialog.openInformation(shell, "Info",
-                            "This action only works on Java source files");
+                    openInformation(shell, "Info", "This action only works on Java source files");
                 }
             });
         } else if ("org.eclipse.jdt.ui.PackageExplorer".equals(activePartId)) {
-            final ISelection sel = HandlerUtil.getCurrentSelection(event);
-            final IStructuredSelection selection = (IStructuredSelection) sel;
-            final Object firstElement = selection.getFirstElement();
-            if (firstElement instanceof ICompilationUnit) {
-                return (ICompilationUnit) firstElement;
-            } else if (firstElement instanceof IPackageFragment) {
-                return (IPackageFragment) firstElement;
-            } else if (firstElement instanceof IJavaProject) {
-                return (IJavaProject) firstElement;
-            } else {
-                Display.getDefault().asyncExec(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        MessageDialog.openInformation(shell, "Info",
+            final IStructuredSelection selection = (IStructuredSelection) HandlerUtil.getCurrentSelection(event);
+            final List<IJavaElement> results = new ArrayList<IJavaElement>();
+            final Iterator<?> it = selection.iterator();
+            while (it.hasNext()) {
+                final Object el = it.next();
+                if (el instanceof ICompilationUnit
+                        || el instanceof IPackageFragment
+                        || el instanceof IJavaProject) {
+                    results.add((IJavaElement) el);
+                } else {
+                    Display.getDefault().asyncExec(new Runnable() {
+                        @Override
+                        public void run() {
+                            openInformation(shell, "Info",
                                 "Please select a Java source file, Java package or Java project");
-                    }
-
-                });
+                        }
+                    });
+                }
             }
+            return results;
         }
         return null;
     }
