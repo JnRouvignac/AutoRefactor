@@ -321,9 +321,9 @@ public class ReduceVariableScopeRefactoring extends ASTVisitor implements
             }
         } else if (scope instanceof EnhancedForStatement) {
             final EnhancedForStatement efs = (EnhancedForStatement) scope;
-            final EnhancedForStatement newEfs = b.copySubtree(efs);
-            newEfs.setParameter(b.copySubtree(efs.getParameter()));
-            newEfs.setExpression(b.copySubtree(efs.getExpression()));
+            final EnhancedForStatement newEfs = b.copy(efs);
+            newEfs.setParameter(b.copy(efs.getParameter()));
+            newEfs.setExpression(b.copy(efs.getExpression()));
             final Statement parentStmt = getAncestor(varName, Statement.class);
             if (equalNotNull(efs.getBody(), parentStmt)) {
                 newEfs.setBody(copy(efs.getBody(), varName));
@@ -331,7 +331,7 @@ public class ReduceVariableScopeRefactoring extends ASTVisitor implements
             this.ctx.getRefactorings().replace(efs, newEfs);
         } else if (scope instanceof ForStatement) {
             final ForStatement fs = (ForStatement) scope;
-            final ForStatement newFs = b.copySubtree(fs);
+            final ForStatement newFs = b.copy(fs);
             final List<Expression> initializers = initializers(newFs);
             if (initializers.size() == 1) {
                 final Expression init = initializers.remove(0);
@@ -350,7 +350,7 @@ public class ReduceVariableScopeRefactoring extends ASTVisitor implements
         } else if (scope instanceof WhileStatement) {
             final WhileStatement ws = (WhileStatement) scope;
             final WhileStatement newWs = ast.newWhileStatement();
-            newWs.setExpression(b.copySubtree(ws.getExpression()));
+            newWs.setExpression(b.copy(ws.getExpression()));
             final Statement parentStmt = getAncestor(varName, Statement.class);
             if (equalNotNull(ws.getBody(), parentStmt)) {
                 newWs.setBody(copy(ws.getBody(), varName));
@@ -359,17 +359,17 @@ public class ReduceVariableScopeRefactoring extends ASTVisitor implements
         } else if (scope instanceof IfStatement) {
             final IfStatement is = (IfStatement) scope;
             final IfStatement newIs = ast.newIfStatement();
-            newIs.setExpression(b.copySubtree(is.getExpression()));
+            newIs.setExpression(b.copy(is.getExpression()));
             final Statement parentStmt = getAncestor(varName, Statement.class);
             if (equalNotNull(is.getThenStatement(), parentStmt)) {
                 newIs.setThenStatement(copy(is.getThenStatement(), varName));
                 if (is.getElseStatement() != null) {
-                    newIs.setElseStatement(b.copySubtree(is.getElseStatement()));
+                    newIs.setElseStatement(b.copy(is.getElseStatement()));
                 }
                 this.ctx.getRefactorings().replace(is, newIs);
             } else if (equalNotNull(is.getElseStatement(), parentStmt)) {
                 if (is.getThenStatement() != null) {
-                    newIs.setThenStatement(b.copySubtree(is.getThenStatement()));
+                    newIs.setThenStatement(b.copy(is.getThenStatement()));
                 }
                 newIs.setElseStatement(copy(is.getElseStatement(), varName));
                 this.ctx.getRefactorings().replace(is, newIs);
@@ -401,7 +401,7 @@ public class ReduceVariableScopeRefactoring extends ASTVisitor implements
     private Type getType(ASTNode node) {
         if (node instanceof VariableDeclarationStatement) {
             final VariableDeclarationStatement vds = (VariableDeclarationStatement) node;
-            return this.ctx.getASTBuilder().copySubtree(vds.getType());
+            return this.ctx.getASTBuilder().copy(vds.getType());
         }
         return getType(node.getParent());
     }
@@ -414,8 +414,8 @@ public class ReduceVariableScopeRefactoring extends ASTVisitor implements
                 if (sn.getFullyQualifiedName().equals(varName.getFullyQualifiedName())) {
                     final ASTBuilder b = this.ctx.getASTBuilder();
                     final VariableDeclarationFragment vdf = b.getAST().newVariableDeclarationFragment();
-                    vdf.setInitializer(b.copySubtree(a.getRightHandSide()));
-                    vdf.setName(b.copySubtree(sn));
+                    vdf.setInitializer(b.copy(a.getRightHandSide()));
+                    vdf.setName(b.copy(sn));
                     return vdf;
                 }
             }
