@@ -45,6 +45,7 @@ import org.eclipse.jdt.core.dom.InfixExpression.Operator;
 import org.eclipse.jdt.core.dom.InstanceofExpression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.ParenthesizedExpression;
+import org.eclipse.jdt.core.dom.PrefixExpression;
 import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.ThisExpression;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
@@ -313,10 +314,9 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
             final Boolean blo = getBooleanLiteral(lhs);
             final Boolean bro = getBooleanLiteral(rhs);
             if (blo != null) {
-                checkNoExtendedOperands(node);
-                result = replace(node, blo.booleanValue(), rhs);
+                result = replace(node, !blo.booleanValue(), rhs);
             } else if (bro != null) {
-                result = replace(node, bro.booleanValue(), lhs);
+                result = replace(node, !bro.booleanValue(), lhs);
             }
             if (result == DO_NOT_VISIT_SUBTREE) {
                 return DO_NOT_VISIT_SUBTREE;
@@ -326,10 +326,9 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
             final Boolean blo = getBooleanLiteral(lhs);
             final Boolean bro = getBooleanLiteral(rhs);
             if (blo != null) {
-                checkNoExtendedOperands(node);
-                continueVisit = replace(node, !blo.booleanValue(), rhs);
+                continueVisit = replace(node, blo.booleanValue(), rhs);
             } else if (bro != null) {
-                continueVisit = replace(node, !bro.booleanValue(), lhs);
+                continueVisit = replace(node, bro.booleanValue(), lhs);
             }
             if (!continueVisit) {
                 return DO_NOT_VISIT_SUBTREE;
@@ -394,12 +393,24 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
         final ASTBuilder b = this.ctx.getASTBuilder();
         Expression operand;
         if (negate) {
-            operand = b.copySubtree(exprToCopy);
+            operand = negate(b, exprToCopy);
         } else {
-            operand = negate(b, exprToCopy, true);
+            operand = b.copy(exprToCopy);
         }
         this.ctx.getRefactorings().replace(node, operand);
         return DO_NOT_VISIT_SUBTREE;
+    }
+
+    private Expression negate(ASTBuilder b, Expression expr) {
+        if (expr instanceof PrefixExpression) {
+            final PrefixExpression pe = (PrefixExpression) expr;
+            if (PrefixExpression.Operator.NOT.equals(pe.getOperator())) {
+                return b.copy(removeParentheses(pe.getOperand()));
+            }
+        }
+
+        return b.prefixExpr(PrefixExpression.Operator.NOT,
+                parenthesizeIfNeeded(b, b.copy(expr)));
     }
 
     private boolean replaceByCopy(ASTNode node, Expression expr) {

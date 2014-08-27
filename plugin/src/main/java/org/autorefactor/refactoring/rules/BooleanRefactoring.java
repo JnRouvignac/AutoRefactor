@@ -41,6 +41,8 @@ import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.BooleanLiteral;
+import org.eclipse.jdt.core.dom.ChildListPropertyDescriptor;
+import org.eclipse.jdt.core.dom.ChildPropertyDescriptor;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.ConditionalExpression;
 import org.eclipse.jdt.core.dom.Expression;
@@ -55,10 +57,12 @@ import org.eclipse.jdt.core.dom.InfixExpression.Operator;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Name;
+import org.eclipse.jdt.core.dom.PrefixExpression;
 import org.eclipse.jdt.core.dom.PrimitiveType;
 import org.eclipse.jdt.core.dom.QualifiedName;
 import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.Statement;
+import org.eclipse.jdt.core.dom.StructuralPropertyDescriptor;
 import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
@@ -160,6 +164,24 @@ public class BooleanRefactoring extends ASTVisitor implements IJavaRefactoring {
                 replaceInParent(node, expr);
             }
             return DO_NOT_VISIT_SUBTREE;
+        }
+
+        private void replaceInParent(ASTNode nodeToReplace, ASTNode replacementNode) {
+            if (nodeToReplace.getParent() == null) {
+                throw new IllegalArgumentException();
+            }
+            final StructuralPropertyDescriptor locationInParent = nodeToReplace.getLocationInParent();
+            if (locationInParent instanceof ChildPropertyDescriptor) {
+                final ChildPropertyDescriptor cpd = (ChildPropertyDescriptor) locationInParent;
+                nodeToReplace.getParent().setStructuralProperty(cpd, replacementNode);
+            } else if (locationInParent instanceof ChildListPropertyDescriptor) {
+                final ChildListPropertyDescriptor clpd = (ChildListPropertyDescriptor) locationInParent;
+                @SuppressWarnings("unchecked")
+                final List<ASTNode> property = (List<ASTNode>) nodeToReplace.getParent().getStructuralProperty(clpd);
+                property.set(property.indexOf(nodeToReplace), replacementNode);
+            } else {
+                throw new NotImplementedException(locationInParent);
+            }
         }
 
     }
@@ -310,15 +332,15 @@ public class BooleanRefactoring extends ASTVisitor implements IJavaRefactoring {
         if (thenBool == null && elseBool != null) {
             final InfixExpression ie = b.infixExpr(
                     b.copy(node.getExpression()),
-                    getConditionalOperator(!elseBool.booleanValue()),
+                    getConditionalOperator(elseBool.booleanValue()),
                     b.copy(thenExpr));
-            return b.return0(getBooleanExpression(ie, !elseBool.booleanValue()));
+            return b.return0(negateIfNeeded(ie, elseBool.booleanValue()));
         } else if (thenBool != null && elseBool == null) {
-            final Expression leftOp = getBooleanExpression(
-                    b.copy(node.getExpression()), thenBool.booleanValue());
+            final Expression leftOp = negateIfNeeded(
+                    b.copy(node.getExpression()), !thenBool.booleanValue());
             final InfixExpression ie = b.infixExpr(
                     leftOp,
-                    getConditionalOperator(!thenBool.booleanValue()),
+                    getConditionalOperator(thenBool.booleanValue()),
                     b.copy(elseExpr));
             return b.return0(ie);
         }
@@ -329,16 +351,16 @@ public class BooleanRefactoring extends ASTVisitor implements IJavaRefactoring {
         return this.ctx.getASTBuilder().copySubtree(node);
     }
 
-    private Operator getConditionalOperator(boolean isAndOperator) {
-        return isAndOperator ? InfixExpression.Operator.CONDITIONAL_AND
-                : InfixExpression.Operator.CONDITIONAL_OR;
+    private Operator getConditionalOperator(boolean isOrOperator) {
+        return isOrOperator ? InfixExpression.Operator.CONDITIONAL_OR
+                : InfixExpression.Operator.CONDITIONAL_AND;
     }
 
-    private Expression getBooleanExpression(Expression ie, boolean doNotRevertExpression) {
-        if (doNotRevertExpression) {
-            return ie;
+    private Expression negateIfNeeded(Expression ie, boolean negate) {
+        if (negate) {
+            return negate(ie, false);
         }
-        return negate(this.ctx.getASTBuilder(), ie, false);
+        return ie;
     }
 
     private VariableDeclarationFragment getVariableDeclarationFragment(
@@ -359,16 +381,15 @@ public class BooleanRefactoring extends ASTVisitor implements IJavaRefactoring {
         if (areOppositeValues(returnThenLiteral, returnElseLiteral)) {
             final ASTBuilder b = this.ctx.getASTBuilder();
             Expression exprToReturn = b.copy(node.getExpression());
-            if (!returnThenLiteral) {
-                exprToReturn = negate(b, exprToReturn, false);
+            if (returnElseLiteral) {
+                exprToReturn = negate(exprToReturn, false);
             }
 
             final MethodDeclaration md = getAncestor(node, MethodDeclaration.class);
             final Expression returnExpr = getReturnExpression(md, exprToReturn);
-            if (returnExpr == null) {
-                return null;
+            if (returnExpr != null) {
+                return b.return0(returnExpr);
             }
-            return b.return0(returnExpr);
         }
         return null;
     }
@@ -378,12 +399,12 @@ public class BooleanRefactoring extends ASTVisitor implements IJavaRefactoring {
     }
 
     private Expression getReturnExpression(MethodDeclaration md, Expression ifCondition) {
-        final IMethodBinding typeBinding = md.resolveBinding();
-        if (typeBinding == null) {
+        final IMethodBinding methodBinding = md.resolveBinding();
+        if (methodBinding == null) {
             return null;
         }
-        final Expression newE = getExpression(ifCondition, typeBinding
-                .getReturnType().getQualifiedName(), getBooleanName(md));
+        final String qualifiedName = methodBinding.getReturnType().getQualifiedName();
+        final Expression newE = getExpression(ifCondition, qualifiedName, getBooleanName(md));
         if (newE != null) {
             return newE;
         }
@@ -391,9 +412,7 @@ public class BooleanRefactoring extends ASTVisitor implements IJavaRefactoring {
         // compilationUnit.java:line number: error message
         throw new IllegalStateException(
                 "Did not expect any other return type than boolean or java.lang.Boolean for method "
-                        + md.getName().getIdentifier()
-                        + ", but found "
-                        + typeBinding.getReturnType().getQualifiedName());
+                        + md.getName().getIdentifier() + ", but found " + qualifiedName);
     }
 
     private Expression maybeGetExpression(String expressionName, Expression ifCondition, Boolean thenBoolLiteral,
@@ -412,8 +431,28 @@ public class BooleanRefactoring extends ASTVisitor implements IJavaRefactoring {
         if (doNotNegate) {
             return getExpression(b.copySubtree(ifCondition), expressionName, booleanName);
         }
-        final Expression negatedIfCondition = negate(b, ifCondition, true);
+        final Expression negatedIfCondition = negate(ifCondition, true);
         return getExpression(negatedIfCondition, expressionName, booleanName);
+    }
+
+    private Expression negate(Expression expression, boolean doCopy) {
+        final ASTBuilder b = this.ctx.getASTBuilder();
+        if (expression instanceof PrefixExpression) {
+            final PrefixExpression pe = (PrefixExpression) expression;
+            if (PrefixExpression.Operator.NOT.equals(pe.getOperator())) {
+                return possiblyCopy(b, removeParentheses(pe.getOperand()), doCopy);
+            }
+        }
+
+        return b.prefixExpr(PrefixExpression.Operator.NOT,
+                parenthesizeIfNeeded(b, possiblyCopy(b, expression, doCopy)));
+    }
+
+    private <T extends ASTNode> T possiblyCopy(ASTBuilder b, T node, boolean doCopy) {
+        if (doCopy) {
+            return b.copySubtree(node);
+        }
+        return node;
     }
 
     private Expression getExpression(Expression ifCondition, String expressionTypeName, Name booleanName) {

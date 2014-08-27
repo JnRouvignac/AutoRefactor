@@ -48,6 +48,7 @@ import org.eclipse.jdt.core.dom.Name;
 import org.eclipse.jdt.core.dom.NumberLiteral;
 import org.eclipse.jdt.core.dom.ParameterizedType;
 import org.eclipse.jdt.core.dom.ParenthesizedExpression;
+import org.eclipse.jdt.core.dom.PrefixExpression;
 import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.SimpleType;
@@ -226,6 +227,7 @@ public class ASTBuilder {
      * @param node the node to copy
      * @return a copy of the node
      */
+    @SuppressWarnings("unchecked")
     public <T extends ASTNode> T copySubtree(T node) {
         return (T) ASTNode.copySubtree(ast, node);
     }
@@ -238,6 +240,7 @@ public class ASTBuilder {
      * @param nodes the node list to copy
      * @return a copy of the node list
      */
+    @SuppressWarnings("unchecked")
     public <T extends ASTNode> List<T> copySubtrees(List<T> nodes) {
         return ASTNode.copySubtrees(ast, nodes);
     }
@@ -493,6 +496,20 @@ public class ASTBuilder {
     public ParenthesizedExpression parenthesize(Expression expression) {
         final ParenthesizedExpression pe = ast.newParenthesizedExpression();
         pe.setExpression(expression);
+        return pe;
+    }
+
+    /**
+     * Builds a new {@link PrefixExpression} instance.
+     *
+     * @param operator the prefix operator
+     * @param operand the operand expression
+     * @return a new prefix expression
+     */
+    public Expression prefixExpr(PrefixExpression.Operator operator, Expression operand) {
+        final PrefixExpression pe = ast.newPrefixExpression();
+        pe.setOperator(operator);
+        pe.setOperand(operand);
         return pe;
     }
 

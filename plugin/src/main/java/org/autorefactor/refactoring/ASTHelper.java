@@ -55,8 +55,6 @@ import org.eclipse.jdt.core.dom.BreakStatement;
 import org.eclipse.jdt.core.dom.CastExpression;
 import org.eclipse.jdt.core.dom.CatchClause;
 import org.eclipse.jdt.core.dom.CharacterLiteral;
-import org.eclipse.jdt.core.dom.ChildListPropertyDescriptor;
-import org.eclipse.jdt.core.dom.ChildPropertyDescriptor;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.Comment;
 import org.eclipse.jdt.core.dom.CompilationUnit;
@@ -106,7 +104,6 @@ import org.eclipse.jdt.core.dom.QualifiedType;
 import org.eclipse.jdt.core.dom.SingleMemberAnnotation;
 import org.eclipse.jdt.core.dom.StringLiteral;
 import org.eclipse.jdt.core.dom.SuperFieldAccess;
-import org.eclipse.jdt.core.dom.PrefixExpression.Operator;
 import org.eclipse.jdt.core.dom.PrimitiveType;
 import org.eclipse.jdt.core.dom.QualifiedName;
 import org.eclipse.jdt.core.dom.ReturnStatement;
@@ -114,7 +111,6 @@ import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.SimpleType;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.Statement;
-import org.eclipse.jdt.core.dom.StructuralPropertyDescriptor;
 import org.eclipse.jdt.core.dom.SuperConstructorInvocation;
 import org.eclipse.jdt.core.dom.SuperMethodInvocation;
 import org.eclipse.jdt.core.dom.SwitchCase;
@@ -160,28 +156,6 @@ public final class ASTHelper {
     // AST nodes manipulation
 
     /**
-     * Returns the provided expression after negating and optionally copying it.
-     *
-     * @param b the {@link ASTBuilder} object
-     * @param expression the expression to negate
-     * @param doCopy whether the expression should be copied
-     * @return the provided expression after negating and optionally copying it
-     */
-    public static Expression negate(ASTBuilder b, Expression expression, boolean doCopy) {
-        if (expression instanceof PrefixExpression) {
-            final PrefixExpression pe = (PrefixExpression) expression;
-            if (Operator.NOT.equals(pe.getOperator())) {
-                return possiblyCopy(b, removeParentheses(pe.getOperand()), doCopy);
-            }
-        }
-
-        final PrefixExpression pe = b.getAST().newPrefixExpression();
-        pe.setOperator(Operator.NOT);
-        pe.setOperand(parenthesize(b, possiblyCopy(b, expression, doCopy)));
-        return pe;
-    }
-
-    /**
      * Returns the same node after removing any parentheses around it.
      *
      * @param node the node around which parentheses must be removed
@@ -209,43 +183,19 @@ public final class ASTHelper {
         return expr;
     }
 
-    private static <T extends ASTNode> T possiblyCopy(ASTBuilder b, T node, boolean doCopy) {
-        if (doCopy) {
-            return b.copySubtree(node);
-        }
-        return node;
-    }
-
-    private static Expression parenthesize(ASTBuilder b, Expression condition) {
-        if (condition instanceof InfixExpression
-                || condition instanceof InstanceofExpression) {
-            return b.parenthesize(condition);
-        }
-        return condition;
-    }
-
     /**
-     * Replaces the provided node inside its parent by a provided replacement node.
+     * Parenthesizes the provided expression if its type requires it.
      *
-     * @param nodeToReplace the node to replace inside its parent
-     * @param replacementNode the replacement node
+     * @param b the {@link ASTBuilder}
+     * @param expr the expression to conditionally parenthesize
+     * @return the parenthesized expression or the expression itself
      */
-    public static void replaceInParent(ASTNode nodeToReplace, ASTNode replacementNode) {
-        if (nodeToReplace.getParent() == null) {
-            throw new IllegalArgumentException();
+    public static Expression parenthesizeIfNeeded(ASTBuilder b, Expression expr) {
+        if (expr instanceof InfixExpression
+                || expr instanceof InstanceofExpression) {
+            return b.parenthesize(expr);
         }
-        final StructuralPropertyDescriptor locationInParent = nodeToReplace.getLocationInParent();
-        if (locationInParent instanceof ChildPropertyDescriptor) {
-            final ChildPropertyDescriptor cpd = (ChildPropertyDescriptor) locationInParent;
-            nodeToReplace.getParent().setStructuralProperty(cpd, replacementNode);
-        } else if (locationInParent instanceof ChildListPropertyDescriptor) {
-            final ChildListPropertyDescriptor clpd = (ChildListPropertyDescriptor) locationInParent;
-            @SuppressWarnings("unchecked")
-            final List<ASTNode> property = (List<ASTNode>) nodeToReplace.getParent().getStructuralProperty(clpd);
-            property.set(property.indexOf(nodeToReplace), replacementNode);
-        } else {
-            throw new NotImplementedException(locationInParent);
-        }
+        return expr;
     }
 
     // AST nodes conversions
