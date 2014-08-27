@@ -160,52 +160,24 @@ public final class ASTHelper {
     // AST nodes manipulation
 
     /**
-     * Returns a copy of the provided node typecasted to the same type as the provided node.
-     *
-     * @param <T> the type of the node to copy.
-     * @param ast the {@link AST} object
-     * @param node the node to copy
-     * @return a copy of the provided node typecasted to the same type as the provided node
-     * @see ASTNode#copySubtree(AST, ASTNode)
-     */
-    @SuppressWarnings("unchecked")
-    public static <T extends ASTNode> T copySubtree(AST ast, T node) {
-        return (T) ASTNode.copySubtree(ast, node);
-    }
-
-    /**
-     * Returns a copy of the provided nodes typecasted to the same generic type as the provided nodes.
-     *
-     * @param <T> the type of the nodes to copy.
-     * @param ast the {@link AST} object
-     * @param nodes the nodes to copy
-     * @return a copy of the provided nodes typecasted to the same generic type as the provided nodes
-     * @see ASTNode#copySubtrees(AST, List)
-     */
-    @SuppressWarnings("unchecked")
-    public static <T extends ASTNode> List<T> copySubtrees(AST ast, List<T> nodes) {
-        return ASTNode.copySubtrees(ast, nodes);
-    }
-
-    /**
      * Returns the provided expression after negating and optionally copying it.
      *
-     * @param ast the {@link AST} object
+     * @param b the {@link ASTBuilder} object
      * @param expression the expression to negate
      * @param doCopy whether the expression should be copied
      * @return the provided expression after negating and optionally copying it
      */
-    public static Expression negate(AST ast, Expression expression, boolean doCopy) {
+    public static Expression negate(ASTBuilder b, Expression expression, boolean doCopy) {
         if (expression instanceof PrefixExpression) {
             final PrefixExpression pe = (PrefixExpression) expression;
             if (Operator.NOT.equals(pe.getOperator())) {
-                return possiblyCopy(ast, removeParentheses(pe.getOperand()), doCopy);
+                return possiblyCopy(b, removeParentheses(pe.getOperand()), doCopy);
             }
         }
 
-        final PrefixExpression pe = ast.newPrefixExpression();
+        final PrefixExpression pe = b.getAST().newPrefixExpression();
         pe.setOperator(Operator.NOT);
-        pe.setOperand(parenthesize(ast, possiblyCopy(ast, expression, doCopy)));
+        pe.setOperand(parenthesize(b, possiblyCopy(b, expression, doCopy)));
         return pe;
     }
 
@@ -237,20 +209,17 @@ public final class ASTHelper {
         return expr;
     }
 
-    private static <T extends ASTNode> T possiblyCopy(AST ast, T node, boolean doCopy) {
+    private static <T extends ASTNode> T possiblyCopy(ASTBuilder b, T node, boolean doCopy) {
         if (doCopy) {
-            return copySubtree(ast, node);
+            return b.copySubtree(node);
         }
         return node;
     }
 
-    private static Expression parenthesize(AST ast, Expression condition) {
+    private static Expression parenthesize(ASTBuilder b, Expression condition) {
         if (condition instanceof InfixExpression
                 || condition instanceof InstanceofExpression) {
-            final ParenthesizedExpression newPe = ast
-                    .newParenthesizedExpression();
-            newPe.setExpression(condition);
-            return newPe;
+            return b.parenthesize(condition);
         }
         return condition;
     }

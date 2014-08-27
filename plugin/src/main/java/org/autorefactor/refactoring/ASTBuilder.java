@@ -82,6 +82,15 @@ public class ASTBuilder {
     }
 
     /**
+     * Returns the {@link AST}.
+     *
+     * @return the {@link AST}
+     */
+    public AST getAST() {
+        return ast;
+    }
+
+    /**
      * Builds a new {@link Assignment} instance.
      *
      * @param lhs the left hand side expression
@@ -218,7 +227,7 @@ public class ASTBuilder {
      * @return a copy of the node
      */
     public <T extends ASTNode> T copySubtree(T node) {
-        return ASTHelper.copySubtree(ast, node);
+        return (T) ASTNode.copySubtree(ast, node);
     }
 
     /**
@@ -230,7 +239,7 @@ public class ASTBuilder {
      * @return a copy of the node list
      */
     public <T extends ASTNode> List<T> copySubtrees(List<T> nodes) {
-        return ASTHelper.copySubtrees(ast, nodes);
+        return ASTNode.copySubtrees(ast, nodes);
     }
 
     /**

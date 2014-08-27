@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.IJavaRefactoring;
 import org.autorefactor.refactoring.Refactorings;
 import org.autorefactor.util.NotImplementedException;
@@ -190,6 +191,7 @@ public class ReduceVariableScopeRefactoring extends ASTVisitor implements
     }
 
     /** {@inheritDoc} */
+    @Override
     public void setRefactoringContext(RefactoringContext ctx) {
         this.ctx = ctx;
     }
@@ -198,14 +200,14 @@ public class ReduceVariableScopeRefactoring extends ASTVisitor implements
     @Override
     public boolean visit(SimpleName node) {
         findVariableAccesses(node);
-        return true;
+        return VISIT_SUBTREE;
     }
 
     /** {@inheritDoc} */
     @Override
     public boolean visit(QualifiedName node) {
         findVariableAccesses(node);
-        return false;
+        return VISIT_SUBTREE;
     }
 
     private void findVariableAccesses(Name node) {
@@ -272,6 +274,7 @@ public class ReduceVariableScopeRefactoring extends ASTVisitor implements
     }
 
     /** {@inheritDoc} */
+    @Override
     public Refactorings getRefactorings(CompilationUnit astRoot) {
         astRoot.accept(this);
 
@@ -297,17 +300,17 @@ public class ReduceVariableScopeRefactoring extends ASTVisitor implements
     }
 
     private void replace(VariableAccess varDecl, VariableAccess varAccess) {
-        final AST ast = this.ctx.getAST();
+        final ASTBuilder b = this.ctx.getASTBuilder();
+        final AST ast = b.getAST();
         final ASTNode scope = varAccess.getScope();
         final Name varName = varAccess.getVariableName();
         final Type varType = getType(varDecl.getVariableName().getParent());
         if (scope instanceof Block) {
-            final Block b = (Block) scope;
-            final List<Statement> stmts = statements(b);
+            final List<Statement> stmts = statements((Block) scope);
             for (int i = 0; i < stmts.size(); i++) {
                 final Statement stmt = stmts.get(i);
-                final Expression parentExpr = getParentOfType(varName, Expression.class);  // FIXME i=0
-                final Statement parentStmt = getParentOfType(parentExpr, Statement.class); // FIXME i=0
+                final Expression parentExpr = getAncestor(varName, Expression.class);  // FIXME i=0
+                final Statement parentStmt = getAncestor(parentExpr, Statement.class); // FIXME i=0
                 if (stmt.equals(parentStmt)) {
                     final VariableDeclarationFragment vdf = getVariableDeclarationFragment(parentExpr, varName);
                     final VariableDeclarationStatement vds = ast.newVariableDeclarationStatement(vdf);
@@ -318,17 +321,17 @@ public class ReduceVariableScopeRefactoring extends ASTVisitor implements
             }
         } else if (scope instanceof EnhancedForStatement) {
             final EnhancedForStatement efs = (EnhancedForStatement) scope;
-            final EnhancedForStatement newEfs = copySubtree(ast, efs);
-            newEfs.setParameter(copySubtree(ast, efs.getParameter()));
-            newEfs.setExpression(copySubtree(ast, efs.getExpression()));
-            final Statement parentStmt = getParentOfType(varName, Statement.class);
+            final EnhancedForStatement newEfs = b.copySubtree(efs);
+            newEfs.setParameter(b.copySubtree(efs.getParameter()));
+            newEfs.setExpression(b.copySubtree(efs.getExpression()));
+            final Statement parentStmt = getAncestor(varName, Statement.class);
             if (equalNotNull(efs.getBody(), parentStmt)) {
                 newEfs.setBody(copy(efs.getBody(), varName));
             }
             this.ctx.getRefactorings().replace(efs, newEfs);
         } else if (scope instanceof ForStatement) {
             final ForStatement fs = (ForStatement) scope;
-            final ForStatement newFs = copySubtree(ast, fs);
+            final ForStatement newFs = b.copySubtree(fs);
             final List<Expression> initializers = initializers(newFs);
             if (initializers.size() == 1) {
                 final Expression init = initializers.remove(0);
@@ -347,8 +350,8 @@ public class ReduceVariableScopeRefactoring extends ASTVisitor implements
         } else if (scope instanceof WhileStatement) {
             final WhileStatement ws = (WhileStatement) scope;
             final WhileStatement newWs = ast.newWhileStatement();
-            newWs.setExpression(copySubtree(ast, ws.getExpression()));
-            final Statement parentStmt = getParentOfType(varName, Statement.class);
+            newWs.setExpression(b.copySubtree(ws.getExpression()));
+            final Statement parentStmt = getAncestor(varName, Statement.class);
             if (equalNotNull(ws.getBody(), parentStmt)) {
                 newWs.setBody(copy(ws.getBody(), varName));
             }
@@ -356,17 +359,17 @@ public class ReduceVariableScopeRefactoring extends ASTVisitor implements
         } else if (scope instanceof IfStatement) {
             final IfStatement is = (IfStatement) scope;
             final IfStatement newIs = ast.newIfStatement();
-            newIs.setExpression(copySubtree(ast, is.getExpression()));
-            final Statement parentStmt = getParentOfType(varName, Statement.class);
+            newIs.setExpression(b.copySubtree(is.getExpression()));
+            final Statement parentStmt = getAncestor(varName, Statement.class);
             if (equalNotNull(is.getThenStatement(), parentStmt)) {
                 newIs.setThenStatement(copy(is.getThenStatement(), varName));
                 if (is.getElseStatement() != null) {
-                    newIs.setElseStatement(copySubtree(ast, is.getElseStatement()));
+                    newIs.setElseStatement(b.copySubtree(is.getElseStatement()));
                 }
                 this.ctx.getRefactorings().replace(is, newIs);
             } else if (equalNotNull(is.getElseStatement(), parentStmt)) {
                 if (is.getThenStatement() != null) {
-                    newIs.setThenStatement(copySubtree(ast, is.getThenStatement()));
+                    newIs.setThenStatement(b.copySubtree(is.getThenStatement()));
                 }
                 newIs.setElseStatement(copy(is.getElseStatement(), varName));
                 this.ctx.getRefactorings().replace(is, newIs);
@@ -395,19 +398,10 @@ public class ReduceVariableScopeRefactoring extends ASTVisitor implements
         throw new NotImplementedException(stmtToCopy);
     }
 
-    @SuppressWarnings("unchecked")
-    private <T extends ASTNode> T getParentOfType(ASTNode node, Class<T> clazz) {
-        final ASTNode parent = node.getParent();
-        if (clazz.isAssignableFrom(parent.getClass())) {
-            return (T) parent;
-        }
-        return getParentOfType(parent, clazz);
-    }
-
     private Type getType(ASTNode node) {
         if (node instanceof VariableDeclarationStatement) {
             final VariableDeclarationStatement vds = (VariableDeclarationStatement) node;
-            return copySubtree(this.ctx.getAST(), vds.getType());
+            return this.ctx.getASTBuilder().copySubtree(vds.getType());
         }
         return getType(node.getParent());
     }
@@ -418,10 +412,10 @@ public class ReduceVariableScopeRefactoring extends ASTVisitor implements
             if (a.getLeftHandSide() instanceof SimpleName) {
                 final SimpleName sn = (SimpleName) a.getLeftHandSide();
                 if (sn.getFullyQualifiedName().equals(varName.getFullyQualifiedName())) {
-                    final AST ast = this.ctx.getAST();
-                    final VariableDeclarationFragment vdf = ast.newVariableDeclarationFragment();
-                    vdf.setInitializer(copySubtree(ast, a.getRightHandSide()));
-                    vdf.setName(copySubtree(ast, sn));
+                    final ASTBuilder b = this.ctx.getASTBuilder();
+                    final VariableDeclarationFragment vdf = b.getAST().newVariableDeclarationFragment();
+                    vdf.setInitializer(b.copySubtree(a.getRightHandSide()));
+                    vdf.setName(b.copySubtree(sn));
                     return vdf;
                 }
             }

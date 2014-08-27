@@ -38,27 +38,23 @@ public class ReduceVariableScopeSample {
         for (i = 0; i < args.length; i++) {
             i = 0;
         }
-        for (i = 0; i < args.length; i++) {
+        for (i = 0; i < args.length; i++)
             i = 0;
-        }
         for (Object obj : (List) null) {
             i = 0;
         }
-        for (Object obj : (List) null) {
+        for (Object obj : (List) null)
             i = 0;
-        }
         if (isOk()) {
             i = 0;
         }
-        if (isOk()) {
+        if (isOk())
             i = 0;
-        }
         while (isOk()) {
             i = 0;
         }
-        while (isOk()) {
+        while (isOk())
             i = 0;
-        }
     }
 
     private static boolean isOk() {

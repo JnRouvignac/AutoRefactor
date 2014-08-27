@@ -391,11 +391,12 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
         // - One boolean primitive and one Boolean object, this code already run
         // the risk of an NPE, so we can replace the infix expression without
         // fearing we would introduce a previously non existing NPE.
+        final ASTBuilder b = this.ctx.getASTBuilder();
         Expression operand;
         if (negate) {
-            operand = copySubtree(this.ctx.getAST(), exprToCopy);
+            operand = b.copySubtree(exprToCopy);
         } else {
-            operand = negate(this.ctx.getAST(), exprToCopy, true);
+            operand = negate(b, exprToCopy, true);
         }
         this.ctx.getRefactorings().replace(node, operand);
         return DO_NOT_VISIT_SUBTREE;
