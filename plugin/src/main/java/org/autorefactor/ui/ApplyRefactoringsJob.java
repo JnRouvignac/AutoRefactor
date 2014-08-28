@@ -66,7 +66,7 @@ import static org.eclipse.jdt.core.JavaCore.*;
 import static org.eclipse.jdt.core.formatter.DefaultCodeFormatterConstants.*;
 
 /**
- * TODO JNR keep track of the job so it can be cancelled by the plugin on workspace exit.
+ * Eclipse job that applies the provided refactorings in background.
  */
 public class ApplyRefactoringsJob extends Job {
 
@@ -81,6 +81,7 @@ public class ApplyRefactoringsJob extends Job {
      */
     public ApplyRefactoringsJob(List<IJavaElement> javaElements, List<IRefactoring> refactoringsToApply) {
         super("Auto Refactor");
+        setPriority(Job.LONG);
         this.javaElements = javaElements;
         this.refactoringsToApply = refactoringsToApply;
     }
@@ -88,6 +89,21 @@ public class ApplyRefactoringsJob extends Job {
     /** {@inheritDoc} */
     @Override
     protected IStatus run(IProgressMonitor monitor) {
+        AutoRefactorPlugin.register(this);
+        try {
+            return run0(monitor);
+        } catch (Exception e) {
+            final String msg = "Error while applying refactorings.\n\n"
+                    + "Please look at the Eclipse workspace logs and "
+                    + "report the stacktrace to the AutoRefactor project.\n"
+                    + "Please provide sample java code that triggers the error.\n\n";
+            return new Status(IStatus.ERROR, AutoRefactorPlugin.PLUGIN_ID, msg, e);
+        } finally {
+            AutoRefactorPlugin.unregister(this);
+        }
+    }
+
+    private IStatus run0(IProgressMonitor monitor) throws Exception {
         if (javaElements.isEmpty()) {
             // No java project exists.
             return Status.OK_STATUS;
@@ -101,6 +117,9 @@ public class ApplyRefactoringsJob extends Job {
         try {
             final Release javaSERelease = Release.javaSE(javaSourceCompatibility);
             for (final ICompilationUnit compilationUnit : compilationUnits) {
+                if (monitor.isCanceled()) {
+                    return Status.CANCEL_STATUS;
+                }
                 try {
                     final String elName = compilationUnit.getElementName();
                     final String simpleName = elName.substring(0, elName.lastIndexOf('.'));
@@ -112,8 +131,6 @@ public class ApplyRefactoringsJob extends Job {
                     AggregateASTVisitor refactoring = new AggregateASTVisitor(
                         refactoringsToApply, AutoRefactorPlugin.getPreferenceHelper().debugModeOn());
                     applyRefactoring(compilationUnit, javaSERelease, tabSize, refactoring);
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
                 } finally {
                     monitor.worked(1);
                 }
@@ -212,6 +229,7 @@ public class ApplyRefactoringsJob extends Job {
      * @param javaSERelease the Java SE version used to compile the compilation unit
      * @param tabSize the tabulation size in use in the current java project
      * @param refactoring the {@link AggregateASTVisitor} to apply to the compilation unit
+     * @throws Exception if any problem occurs
      *
      * @see <a
      * href="http://help.eclipse.org/indigo/index.jsp?topic=%2Forg.eclipse.jdt.doc.isv%2Fguide%2Fjdt_api_manip.htm"
@@ -225,7 +243,7 @@ public class ApplyRefactoringsJob extends Job {
      * >Abstract Syntax Tree > Write it down</a>
      */
     public void applyRefactoring(IDocument document, ICompilationUnit compilationUnit, Release javaSERelease,
-            int tabSize, AggregateASTVisitor refactoring) {
+            int tabSize, AggregateASTVisitor refactoring) throws Exception {
         // creation of DOM/AST from a ICompilationUnit
         final ASTParser parser = ASTParser.newParser(AST.JLS4);
         resetParser(compilationUnit, parser, javaSERelease);
@@ -242,57 +260,52 @@ public class ApplyRefactoringsJob extends Job {
                 throw new IllegalStateException("An infinite loop has been detected."
                         + " A possible cause is that code is being incorrectly"
                         + " refactored one way then refactored back to what it was."
+                        + " Fix the code before pursuing."
                         + message);
             }
 
-            try {
-                final RefactoringContext ctx = new RefactoringContext(compilationUnit,
-                        astRoot.getAST(), javaSERelease);
-                refactoring.setRefactoringContext(ctx);
+            final RefactoringContext ctx = new RefactoringContext(compilationUnit,
+                    astRoot.getAST(), javaSERelease);
+            refactoring.setRefactoringContext(ctx);
 
-                final Refactorings refactorings = refactoring.getRefactorings(astRoot);
-                if (!refactorings.hasRefactorings()) {
-                    // no new refactorings have been applied,
-                    // we are done with applying the refactorings.
-                    return;
-                }
+            final Refactorings refactorings = refactoring.getRefactorings(astRoot);
+            if (!refactorings.hasRefactorings()) {
+                // no new refactorings have been applied,
+                // we are done with applying the refactorings.
+                return;
+            }
 
-                // apply the refactorings and save the compilation unit
-                refactorings.applyTo(document);
-                final boolean hadUnsavedChanges = compilationUnit.hasUnsavedChanges();
-                compilationUnit.getBuffer().setContents(document.get());
-                // http://wiki.eclipse.org/FAQ_What_is_a_working_copy%3F
-                // compilationUnit.reconcile(AST.JLS4,
-                // ICompilationUnit.ENABLE_BINDINGS_RECOVERY |
-                // ICompilationUnit.ENABLE_STATEMENTS_RECOVERY |
-                // ICompilationUnit.FORCE_PROBLEM_DETECTION
-                // /** can be useful to back out a change that does not compile*/
-                // , null, null);
-                if (!hadUnsavedChanges) {
-                    compilationUnit.save(null, true);
-                }
-                // I did not find any other way to directly modify the AST
-                // while still keeping the resolved type bindings working.
-                // Using astRoot.recordModifications() did not work:
-                // type bindings were lost. Is there a way to recover them?
-                // FIXME we should find a way to apply all the changes at
-                // the AST level and refresh the bindings
-                resetParser(compilationUnit, parser, javaSERelease);
-                astRoot = (CompilationUnit) parser.createAST(null);
-                ++totalNbLoops;
+            // apply the refactorings and save the compilation unit
+            refactorings.applyTo(document);
+            final boolean hadUnsavedChanges = compilationUnit.hasUnsavedChanges();
+            compilationUnit.getBuffer().setContents(document.get());
+            // http://wiki.eclipse.org/FAQ_What_is_a_working_copy%3F
+            // compilationUnit.reconcile(AST.JLS4,
+            // ICompilationUnit.ENABLE_BINDINGS_RECOVERY |
+            // ICompilationUnit.ENABLE_STATEMENTS_RECOVERY |
+            // ICompilationUnit.FORCE_PROBLEM_DETECTION
+            // /** can be useful to back out a change that does not compile */
+            // , null, null);
+            if (!hadUnsavedChanges) {
+                compilationUnit.save(null, true);
+            }
+            // I did not find any other way to directly modify the AST
+            // while still keeping the resolved type bindings working.
+            // Using astRoot.recordModifications() did not work:
+            // type bindings were lost. Is there a way to recover them?
+            // FIXME we should find a way to apply all the changes at
+            // the AST level and refresh the bindings
+            resetParser(compilationUnit, parser, javaSERelease);
+            astRoot = (CompilationUnit) parser.createAST(null);
+            ++totalNbLoops;
 
 
-                final List<ASTVisitor> thisLoopVisitors = refactoring.getVisitorsContributingRefactoring();
-                if (!thisLoopVisitors.equals(lastLoopVisitors)) {
-                    lastLoopVisitors = new ArrayList<ASTVisitor>(thisLoopVisitors);
-                    nbLoopsWithSameVisitors = 0;
-                } else {
-                    ++nbLoopsWithSameVisitors;
-                }
-            } catch (Exception e) {
-                // TODO JNR add UI error reporting with Display.getCurrent().asyncExec()
-                throw new UnhandledException(
-                    "Unexpected exception while applying refactorings to " + compilationUnit.getElementName(), e);
+            final List<ASTVisitor> thisLoopVisitors = refactoring.getVisitorsContributingRefactoring();
+            if (!thisLoopVisitors.equals(lastLoopVisitors)) {
+                lastLoopVisitors = new ArrayList<ASTVisitor>(thisLoopVisitors);
+                nbLoopsWithSameVisitors = 0;
+            } else {
+                ++nbLoopsWithSameVisitors;
             }
         }
     }

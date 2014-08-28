@@ -28,7 +28,6 @@ package org.autorefactor.ui;
 import java.util.List;
 
 import org.autorefactor.refactoring.IRefactoring;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jface.wizard.Wizard;
 
@@ -38,7 +37,7 @@ import org.eclipse.jface.wizard.Wizard;
 public class ChooseRefactoringsWizard extends Wizard {
 
     private final ChooseRefactoringWizardPage chooseRefactoringsPage = new ChooseRefactoringWizardPage();
-    private List<IJavaElement> javaElements;
+    private final List<IJavaElement> javaElements;
 
     /**
      * Builds an instance of this class, with the provided java element.
@@ -66,7 +65,7 @@ public class ChooseRefactoringsWizard extends Wizard {
     @Override
     public boolean performFinish() {
         final List<IRefactoring> refactorings = chooseRefactoringsPage.getSelectedRefactorings();
-        new ApplyRefactoringsJob(javaElements, refactorings).run(new NullProgressMonitor());
+        new ApplyRefactoringsJob(javaElements, refactorings).schedule();
         return !refactorings.isEmpty();
     }
 }

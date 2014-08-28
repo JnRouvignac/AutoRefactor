@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.autorefactor.util.Pair;
 import org.eclipse.jdt.core.dom.AST;
@@ -44,6 +45,7 @@ import org.eclipse.jdt.core.dom.rewrite.ASTRewrite;
 import org.eclipse.jdt.core.dom.rewrite.ListRewrite;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.text.edits.TextEdit;
 
 /**
@@ -323,10 +325,30 @@ public class Refactorings {
      * @param document the document to refactor
      * @throws BadLocationException if trying to access a non existing position
      */
-    public void applyTo(IDocument document) throws BadLocationException {
+    public void applyTo(final IDocument document) throws BadLocationException {
         final TextEdit edits = rewrite.rewriteAST(document, null);
         commentRewriter.addEdits(document, edits);
-        edits.apply(document);
+        applyEditsToDocument(edits, document);
+    }
+
+    private void applyEditsToDocument(final TextEdit edits, final IDocument document) throws BadLocationException {
+        // Call this operation on the SWT Display Thread with syncExec(),
+        // because it changes or adds something to the GUI.
+        // Otherwise it would throw an Invalid thread access Exception.
+        final AtomicReference<BadLocationException> ex = new AtomicReference<BadLocationException>();
+        Display.getDefault().syncExec(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    edits.apply(document);
+                } catch (BadLocationException e) {
+                    ex.set(e);
+                }
+            }
+        });
+        if (ex.get() != null) {
+            throw ex.get();
+        }
     }
 
 }

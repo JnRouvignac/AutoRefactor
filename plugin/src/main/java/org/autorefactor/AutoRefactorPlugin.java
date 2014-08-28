@@ -25,7 +25,10 @@
  */
 package org.autorefactor;
 
+import java.util.Vector;
+
 import org.autorefactor.ui.preferences.PreferenceHelper;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
@@ -42,6 +45,7 @@ public class AutoRefactorPlugin extends AbstractUIPlugin {
     private static AutoRefactorPlugin plugin;
 
     private static PreferenceHelper preferenceHelper;
+    private static Vector<Job> jobs = new Vector<Job>();
 
     @Override
     public void start(final BundleContext context) throws Exception {
@@ -52,6 +56,10 @@ public class AutoRefactorPlugin extends AbstractUIPlugin {
     @Override
     public void stop(final BundleContext context) throws Exception {
         plugin = null;
+        for (Job job : jobs) {
+            job.cancel();
+        }
+        jobs.clear();
         super.stop(context);
     }
 
@@ -94,5 +102,23 @@ public class AutoRefactorPlugin extends AbstractUIPlugin {
      */
     public static ImageDescriptor getImageDescriptor(final String path) {
         return imageDescriptorFromPlugin(PLUGIN_ID, path);
+    }
+
+    /**
+     * Registers the provided job against this plugin.
+     *
+     * @param job the job to register
+     */
+    public static void register(Job job) {
+        jobs.add(job);
+    }
+
+    /**
+     * Unregisters the provided job from this plugin.
+     *
+     * @param job the job to unregister
+     */
+    public static void unregister(Job job) {
+        jobs.remove(job);
     }
 }
