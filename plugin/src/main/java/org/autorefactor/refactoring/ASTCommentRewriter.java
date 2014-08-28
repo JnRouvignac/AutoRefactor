@@ -116,13 +116,31 @@ public class ASTCommentRewriter {
      * @param edits where to add edits
      */
     public void addEdits(IDocument document, TextEdit edits) {
-        addRemovalEdits(edits, document.get());
-        addReplacementEdits(edits);
-        addBlockCommentToJavadocEdits(edits);
-        addLineCommentsToJavadocEdits(edits, document.get());
+        final String source = document.get();
+        final List<TextEdit> commentEdits = new LinkedList<TextEdit>();
+        addRemovalEdits(commentEdits, source);
+        addReplacementEdits(commentEdits);
+        addBlockCommentToJavadocEdits(commentEdits);
+        addLineCommentsToJavadocEdits(commentEdits, source);
+        if (!anyCommentEditIsCovered(edits, commentEdits)) {
+            edits.addChildren(commentEdits.toArray(new TextEdit[0]));
+        }
+        // else code edits take priority. Give up applying current text edits.
+        // They will be retried in the next refactoring loop.
     }
 
-    private void addRemovalEdits(TextEdit edits, String source) {
+    private boolean anyCommentEditIsCovered(TextEdit edits, List<TextEdit> commentEdits) {
+        if (edits.getChildren().length > 0) {
+            for (TextEdit commentEdit : commentEdits) {
+                if (edits.covers(commentEdit)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private void addRemovalEdits(List<TextEdit> commentEdits, String source) {
         if (this.removals.isEmpty()) {
             return;
         }
@@ -135,11 +153,11 @@ public class ASTCommentRewriter {
             final int endToRemove = chompWhitespacesAfter(source, start + length);
             final int lengthToRemove = endToRemove - startToRemove;
 
-            edits.addChild(new DeleteEdit(startToRemove, lengthToRemove));
+            commentEdits.add(new DeleteEdit(startToRemove, lengthToRemove));
         }
     }
 
-    private void addReplacementEdits(TextEdit edits) {
+    private void addReplacementEdits(List<TextEdit> commentEdits) {
         if (this.replacements.isEmpty()) {
             return;
         }
@@ -147,19 +165,18 @@ public class ASTCommentRewriter {
             final Comment node = pair.getFirst();
             final int start = node.getStartPosition();
             final int length = node.getLength();
-
-            edits.addChild(new ReplaceEdit(start, length, pair.getSecond()));
+            commentEdits.add(new ReplaceEdit(start, length, pair.getSecond()));
         }
     }
 
-    private void addBlockCommentToJavadocEdits(TextEdit edits) {
+    private void addBlockCommentToJavadocEdits(List<TextEdit> commentEdits) {
         for (BlockComment blockComment : this.blockCommentToJavadoc) {
             final int offset = blockComment.getStartPosition() + "/*".length();
-            edits.addChild(new InsertEdit(offset, "*"));
+            commentEdits.add(new InsertEdit(offset, "*"));
         }
     }
 
-    private void addLineCommentsToJavadocEdits(TextEdit edits, String source) {
+    private void addLineCommentsToJavadocEdits(List<TextEdit> commentEdits, String source) {
         if (this.lineCommentsToJavadoc.values().isEmpty()) {
             return;
         }
@@ -169,9 +186,9 @@ public class ASTCommentRewriter {
             // then get access to indent settings, line length and newline chars
             // then spread them across several lines if needed or folded on one line only
             if (lineComments.size() == 1) {
-                addSingleLineCommentToJavadocEdits(edits, lineComments);
+                addSingleLineCommentToJavadocEdits(commentEdits, lineComments);
             } else {
-                addMultiLineCommentsToJavadocEdits(edits, lineComments, source, lineStarts);
+                addMultiLineCommentsToJavadocEdits(commentEdits, lineComments, source, lineStarts);
             }
         }
     }
@@ -187,17 +204,17 @@ public class ASTCommentRewriter {
         return lineStarts;
     }
 
-    private void addSingleLineCommentToJavadocEdits(TextEdit edits, List<LineComment> lineComments) {
+    private void addSingleLineCommentToJavadocEdits(List<TextEdit> commentEdits, List<LineComment> lineComments) {
         final LineComment lineComment = lineComments.get(0);
         final int start = lineComment.getStartPosition();
         // TODO JNR how to obey configured indentation?
         // TODO JNR how to obey configured line length?
-        edits.addChild(new ReplaceEdit(start, "//".length(), "/**"));
-        edits.addChild(new InsertEdit(start + lineComment.getLength(), " */"));
+        commentEdits.add(new ReplaceEdit(start, "//".length(), "/**"));
+        commentEdits.add(new InsertEdit(start + lineComment.getLength(), " */"));
     }
 
-    private void addMultiLineCommentsToJavadocEdits(TextEdit edits, List<LineComment> lineComments, String source,
-            TreeSet<Integer> lineStarts) {
+    private void addMultiLineCommentsToJavadocEdits(List<TextEdit> commentEdits, List<LineComment> lineComments,
+             String source, TreeSet<Integer> lineStarts) {
         final String newline = "\n";
         for (int i = 0; i < lineComments.size(); i++) {
             final LineComment lineComment = lineComments.get(i);
@@ -210,7 +227,7 @@ public class ASTCommentRewriter {
             } else {
                 replacementText = " *";
             }
-            edits.addChild(new ReplaceEdit(lineComment.getStartPosition(), "//".length(), replacementText));
+            commentEdits.add(new ReplaceEdit(lineComment.getStartPosition(), "//".length(), replacementText));
 
             final boolean isLast = i == lineComments.size() - 1;
             if (isLast) {
@@ -218,7 +235,7 @@ public class ASTCommentRewriter {
                 // TODO JNR how to obey configured indentation?
                 final int position = lineComment.getStartPosition() + lineComment.getLength();
                 final String indent = getIndent(lineComment, source, lineStarts);
-                edits.addChild(new InsertEdit(position, newline + indent + "*/"));
+                commentEdits.add(new InsertEdit(position, newline + indent + "*/"));
             }
         }
     }
