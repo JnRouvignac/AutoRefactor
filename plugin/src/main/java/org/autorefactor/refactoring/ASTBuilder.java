@@ -43,6 +43,7 @@ import org.eclipse.jdt.core.dom.ExpressionStatement;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.InfixExpression;
+import org.eclipse.jdt.core.dom.InstanceofExpression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Name;
 import org.eclipse.jdt.core.dom.NumberLiteral;
@@ -574,6 +575,21 @@ public class ASTBuilder {
         tryS.setBody(body);
         addAll(catchClauses(tryS), catchClauses);
         return tryS;
+    }
+
+    /**
+     * Parenthesizes the provided expression if its type requires it.
+     *
+     * @param origExpr the original expression to conditionally parenthesize
+     * @param exprToReturn the expression to conditionally return parenthesized
+     * @return the parenthesized expression of the provided expression to return or this expression itself
+     */
+    public Expression parenthesizeIfNeeded(Expression origExpr, Expression exprToReturn) {
+        if (origExpr instanceof InfixExpression
+                || origExpr instanceof InstanceofExpression) {
+            return parenthesize(exprToReturn);
+        }
+        return exprToReturn;
     }
 
 }

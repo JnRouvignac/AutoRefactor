@@ -30,22 +30,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.jdt.core.dom.ASTNode;
-import org.eclipse.jdt.core.dom.ArrayAccess;
-import org.eclipse.jdt.core.dom.ArrayCreation;
 import org.eclipse.jdt.core.dom.Assignment;
-import org.eclipse.jdt.core.dom.CastExpression;
-import org.eclipse.jdt.core.dom.ClassInstanceCreation;
-import org.eclipse.jdt.core.dom.ConditionalExpression;
-import org.eclipse.jdt.core.dom.FieldAccess;
 import org.eclipse.jdt.core.dom.InfixExpression;
-import org.eclipse.jdt.core.dom.InstanceofExpression;
-import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.PostfixExpression;
 import org.eclipse.jdt.core.dom.PrefixExpression;
-import org.eclipse.jdt.core.dom.SuperFieldAccess;
-import org.eclipse.jdt.core.dom.SuperMethodInvocation;
-import org.eclipse.jdt.core.dom.ThisExpression;
-import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
 /**
  * Enum listing all the Java operators in the operator precedence order.
@@ -110,20 +98,26 @@ public enum OperatorEnum {
     INFIX_RIGHT_SHIFT_UNSIGNED (InfixExpression.Operator.RIGHT_SHIFT_UNSIGNED,    7, false, false),
 
     /** The infix less than operator '<'. For example <code>1 < 2</code>. */
-    INFIX_LESS                 (InfixExpression.Operator.LESS,                    8, false,  true),
+    INFIX_LESS                 (InfixExpression.Operator.LESS,                    8, false,
+                                InfixExpression.Operator.GREATER_EQUALS),
     /** The infix less than or equals operator '<='. For example <code>1 <= 2</code>. */
-    INFIX_LESS_EQUALS          (InfixExpression.Operator.LESS_EQUALS,             8, false,  true),
+    INFIX_LESS_EQUALS          (InfixExpression.Operator.LESS_EQUALS,             8, false,
+                                InfixExpression.Operator.GREATER),
     /** The infix greater than operator '>'. For example <code>1 > 2</code>. */
-    INFIX_GREATER              (InfixExpression.Operator.GREATER,                 8, false,  true),
+    INFIX_GREATER              (InfixExpression.Operator.GREATER,                 8, false,
+                                InfixExpression.Operator.LESS_EQUALS),
     /** The infix greater than or equals operator '>='. For example <code>1 >= 2</code>. */
-    INFIX_GREATER_EQUALS       (InfixExpression.Operator.GREATER_EQUALS,          8, false,  true),
+    INFIX_GREATER_EQUALS       (InfixExpression.Operator.GREATER_EQUALS,          8, false,
+                                InfixExpression.Operator.LESS),
     /** The instanceof operator 'instanceof'. For example <code>o instanceof String</code>. */
     INSTANCEOF                 (null,                                             8, false,  true),
 
     /** The infix equals operator '=='. For example <code>1 == 2</code>. */
-    INFIX_EQUALS               (InfixExpression.Operator.EQUALS,                  9, false,  true),
+    INFIX_EQUALS               (InfixExpression.Operator.EQUALS,                  9, false,
+                                InfixExpression.Operator.NOT_EQUALS),
     /** The infix not equals operator '=='. For example <code>1 != 2</code>. */
-    INFIX_NOT_EQUALS           (InfixExpression.Operator.NOT_EQUALS,              9, false,  true),
+    INFIX_NOT_EQUALS           (InfixExpression.Operator.NOT_EQUALS,              9, false,
+                                InfixExpression.Operator.EQUALS),
 
     /** The infix bitwise and operator '&'. For example <code>1 & 2</code>. */
     INFIX_BIT_AND              (InfixExpression.Operator.AND,                    10,  true, false),
@@ -135,10 +129,12 @@ public enum OperatorEnum {
     INFIX_BIT_OR               (InfixExpression.Operator.OR,                     12,  true, false),
 
     /** The infix conditional and operator '&&'. For example <code>true && false</code>. */
-    INFIX_CONDITIONAL_AND      (InfixExpression.Operator.CONDITIONAL_AND,        13,  true,  true),
+    INFIX_CONDITIONAL_AND      (InfixExpression.Operator.CONDITIONAL_AND,        13,  true,
+                                InfixExpression.Operator.CONDITIONAL_OR),
 
     /** The infix conditional or operator '||'. For example <code>true || false</code>. */
-    INFIX_CONDITIONAL_OR       (InfixExpression.Operator.CONDITIONAL_OR,         14,  true,  true),
+    INFIX_CONDITIONAL_OR       (InfixExpression.Operator.CONDITIONAL_OR,         14,  true,
+                                InfixExpression.Operator.CONDITIONAL_AND),
 
     /** The ternary operator '?:'. For example <code>b ? 1 : 2</code>. */
     TERNARY                    (null,                                            15, false, false),
@@ -171,6 +167,7 @@ public enum OperatorEnum {
     /** The comma operator ','. For example <code>i++, j++</code>. */
     COMMA                      (null,                                            17, false, false);
 
+
     private static final Map<Object, OperatorEnum> OPERATORS;
     static {
         final Map<Object, OperatorEnum> m = new HashMap<Object, OperatorEnum>();
@@ -184,12 +181,22 @@ public enum OperatorEnum {
     private final int precedence;
     private final boolean isAssociative;
     private final boolean isBoolean;
+    private final Object reverseBooleanOperator;
 
     private OperatorEnum(Object operator, int precedence, boolean isAssociative, boolean isBoolean) {
         this.operator = operator;
         this.precedence = precedence;
         this.isAssociative = isAssociative;
         this.isBoolean = isBoolean;
+        this.reverseBooleanOperator = null;
+    }
+
+    private OperatorEnum(Object operator, int precedence, boolean isAssociative, Object reverseBooleanOperator) {
+        this.operator = operator;
+        this.precedence = precedence;
+        this.isAssociative = isAssociative;
+        this.isBoolean = true;
+        this.reverseBooleanOperator = reverseBooleanOperator;
     }
 
     /**
@@ -219,6 +226,15 @@ public enum OperatorEnum {
      */
     public static boolean isBoolean(InfixExpression.Operator operator) {
         return OPERATORS.get(operator).isBoolean;
+    }
+
+    /**
+     * Returns the reverse boolean operator if it exists.
+     *
+     * @return the reverse boolean operator if it exists, false if none exist
+     */
+    public Object getReverseBooleanOperator() {
+        return reverseBooleanOperator;
     }
 
     /**
@@ -256,36 +272,52 @@ public enum OperatorEnum {
         return -prec1.compareTo(prec2);
     }
 
-    private static OperatorEnum getOperator(ASTNode expr) {
-        if (expr instanceof PrefixExpression) {
-            return OPERATORS.get(((PrefixExpression) expr).getOperator());
-        } else if (expr instanceof PostfixExpression) {
-            return OPERATORS.get(((PostfixExpression) expr).getOperator());
-        } else if (expr instanceof InfixExpression) {
-            return OPERATORS.get(((InfixExpression) expr).getOperator());
-        } else if (expr instanceof MethodInvocation
-                || expr instanceof SuperMethodInvocation) {
-            return PARENTHESES;
-        } else if (expr instanceof Assignment) {
-            return OPERATORS.get(((Assignment) expr).getOperator());
-        } else if (expr instanceof VariableDeclarationFragment) {
-            return ASSIGN;
-        } else if (expr instanceof FieldAccess
-                || expr instanceof SuperFieldAccess
-                || expr instanceof ThisExpression) {
-            return DOT;
-        } else if (expr instanceof InstanceofExpression) {
-            return INSTANCEOF;
-        } else if (expr instanceof CastExpression) {
-            return CAST;
-        } else if (expr instanceof ClassInstanceCreation
-                || expr instanceof ArrayCreation) {
-            return NEW;
-        } else if (expr instanceof ArrayAccess) {
-            return ARRAY_ACCESS;
-        } else if (expr instanceof ConditionalExpression) {
-            return TERNARY;
+    /**
+     * Returns the equivalent {@link OperatorEnum} for the operator used inside
+     * the supplied node. Although this method accepts an {@link ASTNode}, the
+     * provided node must be an expression.
+     *
+     * @param expr
+     *            the expression node
+     * @return the equivalent {@link OperatorEnum} for the operator used inside
+     *         the supplied node, null if the supplied node is not an expression
+     *         or if it does not use an operator
+     */
+    public static OperatorEnum getOperator(ASTNode expr) {
+        if (expr == null) {
+            return null;
         }
-        return null;
+        switch (expr.getNodeType()) {
+        case ASTNode.PREFIX_EXPRESSION:
+            return OPERATORS.get(((PrefixExpression) expr).getOperator());
+        case ASTNode.POSTFIX_EXPRESSION:
+            return OPERATORS.get(((PostfixExpression) expr).getOperator());
+        case ASTNode.INFIX_EXPRESSION:
+            return OPERATORS.get(((InfixExpression) expr).getOperator());
+        case ASTNode.METHOD_INVOCATION:
+        case ASTNode.SUPER_METHOD_INVOCATION:
+            return PARENTHESES;
+        case ASTNode.ASSIGNMENT:
+            return OPERATORS.get(((Assignment) expr).getOperator());
+        case ASTNode.VARIABLE_DECLARATION_FRAGMENT:
+            return ASSIGN;
+        case ASTNode.FIELD_ACCESS:
+        case ASTNode.SUPER_FIELD_ACCESS:
+        case ASTNode.THIS_EXPRESSION:
+            return DOT;
+        case ASTNode.INSTANCEOF_EXPRESSION:
+            return INSTANCEOF;
+        case ASTNode.CAST_EXPRESSION:
+            return CAST;
+        case ASTNode.CLASS_INSTANCE_CREATION:
+        case ASTNode.ARRAY_CREATION:
+            return NEW;
+        case ASTNode.ARRAY_ACCESS:
+            return ARRAY_ACCESS;
+        case ASTNode.CONDITIONAL_EXPRESSION:
+            return TERNARY;
+        default:
+            return null;
+        }
     }
 }

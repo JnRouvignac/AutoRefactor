@@ -100,18 +100,18 @@ import org.eclipse.jdt.core.dom.ParameterizedType;
 import org.eclipse.jdt.core.dom.ParenthesizedExpression;
 import org.eclipse.jdt.core.dom.PostfixExpression;
 import org.eclipse.jdt.core.dom.PrefixExpression;
-import org.eclipse.jdt.core.dom.QualifiedType;
-import org.eclipse.jdt.core.dom.SingleMemberAnnotation;
-import org.eclipse.jdt.core.dom.StringLiteral;
-import org.eclipse.jdt.core.dom.SuperFieldAccess;
 import org.eclipse.jdt.core.dom.PrimitiveType;
 import org.eclipse.jdt.core.dom.QualifiedName;
+import org.eclipse.jdt.core.dom.QualifiedType;
 import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.SimpleType;
+import org.eclipse.jdt.core.dom.SingleMemberAnnotation;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.Statement;
+import org.eclipse.jdt.core.dom.StringLiteral;
 import org.eclipse.jdt.core.dom.SuperConstructorInvocation;
+import org.eclipse.jdt.core.dom.SuperFieldAccess;
 import org.eclipse.jdt.core.dom.SuperMethodInvocation;
 import org.eclipse.jdt.core.dom.SwitchCase;
 import org.eclipse.jdt.core.dom.SwitchStatement;
@@ -179,21 +179,6 @@ public final class ASTHelper {
     public static Expression removeParentheses(Expression expr) {
         if (expr instanceof ParenthesizedExpression) {
             return removeParentheses(((ParenthesizedExpression) expr).getExpression());
-        }
-        return expr;
-    }
-
-    /**
-     * Parenthesizes the provided expression if its type requires it.
-     *
-     * @param b the {@link ASTBuilder}
-     * @param expr the expression to conditionally parenthesize
-     * @return the parenthesized expression or the expression itself
-     */
-    public static Expression parenthesizeIfNeeded(ASTBuilder b, Expression expr) {
-        if (expr instanceof InfixExpression
-                || expr instanceof InstanceofExpression) {
-            return b.parenthesize(expr);
         }
         return expr;
     }

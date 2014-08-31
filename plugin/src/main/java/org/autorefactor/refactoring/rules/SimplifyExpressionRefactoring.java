@@ -409,7 +409,7 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
             }
         }
 
-        return b.not(parenthesizeIfNeeded(b, b.copy(expr)));
+        return b.not(b.parenthesizeIfNeeded(expr, b.copy(expr)));
     }
 
     private boolean replaceByCopy(ASTNode node, Expression expr) {

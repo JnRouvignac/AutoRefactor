@@ -429,22 +429,16 @@ public class BooleanRefactoring extends ASTVisitor implements IJavaRefactoring {
         return getExpression(negatedIfCondition, expressionName, booleanName);
     }
 
-    private Expression negate(Expression expression, boolean doCopy) {
-        if (expression instanceof PrefixExpression) {
-            final PrefixExpression pe = (PrefixExpression) expression;
+    private Expression negate(Expression expr, boolean doCopy) {
+        if (expr instanceof PrefixExpression) {
+            final PrefixExpression pe = (PrefixExpression) expr;
             if (PrefixExpression.Operator.NOT.equals(pe.getOperator())) {
-                return possiblyCopy(b, removeParentheses(pe.getOperand()), doCopy);
+                final Expression expr2 = removeParentheses(pe.getOperand());
+                return doCopy ? b.copy(expr2) : expr2;
             }
         }
 
-        return b.not(parenthesizeIfNeeded(b, possiblyCopy(b, expression, doCopy)));
-    }
-
-    private <T extends ASTNode> T possiblyCopy(ASTBuilder b, T node, boolean doCopy) {
-        if (doCopy) {
-            return b.copy(node);
-        }
-        return node;
+        return b.not(b.parenthesizeIfNeeded(expr, doCopy ? b.copy(expr) : expr));
     }
 
     private Expression getExpression(Expression ifCondition, String expressionTypeName, Name booleanName) {
