@@ -409,8 +409,7 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
             }
         }
 
-        return b.prefixExpr(PrefixExpression.Operator.NOT,
-                parenthesizeIfNeeded(b, b.copy(expr)));
+        return b.not(parenthesizeIfNeeded(b, b.copy(expr)));
     }
 
     private boolean replaceByCopy(ASTNode node, Expression expr) {

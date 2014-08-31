@@ -70,7 +70,7 @@ public class BooleanSample {
     }
 
     public boolean returnIfConditionThatRevertsInstanceofExpressionBooleanPrimitive(Object o) {
-        if (!(o instanceof String)) {
+        if (!(/* do not lose me */o instanceof String)) {
             return false;
         } else {
             return true;

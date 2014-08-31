@@ -103,7 +103,7 @@ public class BooleanRefactoring extends ASTVisitor implements IJavaRefactoring {
         public boolean match(BooleanLiteral node, Object other) {
             if (other instanceof Expression) {
                 final Expression expr = (Expression) other;
-                if (areOppositeValues(node, expr)) {
+                if (areOppositeBooleanValues(node, expr)) {
                     matches.put(expr, node);
                     return true;
                 }
@@ -111,7 +111,8 @@ public class BooleanRefactoring extends ASTVisitor implements IJavaRefactoring {
             return false;
         }
 
-        private boolean areOppositeValues(Expression expr1, Expression expr2) {
+        /** Compares mixed boolean literal and Boolean object values against each other. */
+        private boolean areOppositeBooleanValues(Expression expr1, Expression expr2) {
             final Boolean b1 = getBooleanLiteral(expr1);
             final Boolean b2 = getBooleanLiteral(expr2);
             return b1 != null && b2 != null && !b1.equals(b2);
@@ -122,7 +123,7 @@ public class BooleanRefactoring extends ASTVisitor implements IJavaRefactoring {
             if (other instanceof Expression) {
                 final Expression expr = (Expression) other;
                 if (this.previousMatches.containsKey(other)
-                        || areOppositeValues(node, expr)) {
+                        || areOppositeBooleanValues(node, expr)) {
                     matches.put(expr, node);
                     return true;
                 }
@@ -158,8 +159,7 @@ public class BooleanRefactoring extends ASTVisitor implements IJavaRefactoring {
         public boolean visit(QualifiedName node) {
             if (this.nodesToReplace.contains(node)) {
                 final QualifiedName qn = as(node, QualifiedName.class);
-                final Expression expr = getExpression(
-                        getBooleanObjectAsLiteral(qn),
+                final Expression expr = getExpression(getBooleanObjectAsLiteral(qn),
                         this.ifCondition, "java.lang.Boolean", this.booleanName);
                 replaceInParent(node, expr);
             }
@@ -188,6 +188,7 @@ public class BooleanRefactoring extends ASTVisitor implements IJavaRefactoring {
 
     private RefactoringContext ctx;
     private int javaMinorVersion;
+    private ASTBuilder b;
 
     /** Class constructor. */
     public BooleanRefactoring() {
@@ -198,6 +199,7 @@ public class BooleanRefactoring extends ASTVisitor implements IJavaRefactoring {
     @Override
     public void setRefactoringContext(RefactoringContext ctx) {
         this.ctx = ctx;
+        this.b = this.ctx.getASTBuilder();
         this.javaMinorVersion = this.ctx.getJavaSERelease().getMinorVersion();
     }
 
@@ -224,7 +226,7 @@ public class BooleanRefactoring extends ASTVisitor implements IJavaRefactoring {
         if (match(matcher, node.getThenStatement(), node.getElseStatement())) {
             // Then and else statement are matching, bar the boolean values
             // which are opposite
-            final Statement copyStmt = copySubtree(node.getThenStatement());
+            final Statement copyStmt = b.copySubtree(node.getThenStatement());
             // identify the node that need to be replaced after the copy
             final BooleanASTMatcher matcher2 = new BooleanASTMatcher(matcher.matches);
             if (match(matcher2, copyStmt, node.getElseStatement())) {
@@ -328,7 +330,6 @@ public class BooleanRefactoring extends ASTVisitor implements IJavaRefactoring {
 
     private ReturnStatement getReturnStatement(IfStatement node,
             Boolean thenBool, Boolean elseBool, Expression thenExpr, Expression elseExpr) {
-        final ASTBuilder b = this.ctx.getASTBuilder();
         if (thenBool == null && elseBool != null) {
             final InfixExpression ie = b.infixExpr(
                     b.copy(node.getExpression()),
@@ -345,10 +346,6 @@ public class BooleanRefactoring extends ASTVisitor implements IJavaRefactoring {
             return b.return0(ie);
         }
         return null;
-    }
-
-    private <T extends ASTNode> T copySubtree(T node) {
-        return this.ctx.getASTBuilder().copySubtree(node);
     }
 
     private Operator getConditionalOperator(boolean isOrOperator) {
@@ -379,7 +376,6 @@ public class BooleanRefactoring extends ASTVisitor implements IJavaRefactoring {
     private ReturnStatement getReturnStatement(IfStatement node,
             final Boolean returnThenLiteral, final Boolean returnElseLiteral) {
         if (areOppositeValues(returnThenLiteral, returnElseLiteral)) {
-            final ASTBuilder b = this.ctx.getASTBuilder();
             Expression exprToReturn = b.copy(node.getExpression());
             if (returnElseLiteral) {
                 exprToReturn = negate(exprToReturn, false);
@@ -418,25 +414,22 @@ public class BooleanRefactoring extends ASTVisitor implements IJavaRefactoring {
     private Expression maybeGetExpression(String expressionName, Expression ifCondition, Boolean thenBoolLiteral,
             Boolean elseBoolLiteral) {
         if (areOppositeValues(thenBoolLiteral, elseBoolLiteral)) {
-            final Expression copiedIfCondition = copySubtree(ifCondition);
             final Name booleanName = getBooleanName(ifCondition);
-            return getExpression(thenBoolLiteral, copiedIfCondition, expressionName, booleanName);
+            return getExpression(thenBoolLiteral, ifCondition, expressionName, booleanName);
         }
         return null;
     }
 
     private Expression getExpression(final boolean doNotNegate, final Expression ifCondition, String expressionName,
             final Name booleanName) {
-        final ASTBuilder b = this.ctx.getASTBuilder();
         if (doNotNegate) {
-            return getExpression(b.copySubtree(ifCondition), expressionName, booleanName);
+            return getExpression(b.copy(ifCondition), expressionName, booleanName);
         }
         final Expression negatedIfCondition = negate(ifCondition, true);
         return getExpression(negatedIfCondition, expressionName, booleanName);
     }
 
     private Expression negate(Expression expression, boolean doCopy) {
-        final ASTBuilder b = this.ctx.getASTBuilder();
         if (expression instanceof PrefixExpression) {
             final PrefixExpression pe = (PrefixExpression) expression;
             if (PrefixExpression.Operator.NOT.equals(pe.getOperator())) {
@@ -444,13 +437,12 @@ public class BooleanRefactoring extends ASTVisitor implements IJavaRefactoring {
             }
         }
 
-        return b.prefixExpr(PrefixExpression.Operator.NOT,
-                parenthesizeIfNeeded(b, possiblyCopy(b, expression, doCopy)));
+        return b.not(parenthesizeIfNeeded(b, possiblyCopy(b, expression, doCopy)));
     }
 
     private <T extends ASTNode> T possiblyCopy(ASTBuilder b, T node, boolean doCopy) {
         if (doCopy) {
-            return b.copySubtree(node);
+            return b.copy(node);
         }
         return node;
     }
@@ -460,13 +452,12 @@ public class BooleanRefactoring extends ASTVisitor implements IJavaRefactoring {
             return ifCondition;
         } else if (javaMinorVersion >= 4
                 && "java.lang.Boolean".equals(expressionTypeName)) {
-            return this.ctx.getASTBuilder().invoke(booleanName, "valueOf", ifCondition);
+            return b.invoke(booleanName, "valueOf", ifCondition);
         }
         return null;
     }
 
     private Name getBooleanName(ASTNode node) {
-        final ASTBuilder b = this.ctx.getASTBuilder();
         if (!isSimpleNameAlreadyUsed("Boolean", getAncestor(node, CompilationUnit.class))) {
             return b.name("Boolean");
         }
@@ -503,7 +494,6 @@ public class BooleanRefactoring extends ASTVisitor implements IJavaRefactoring {
     }
 
     private FieldAccess getRefactoring(MethodInvocation node, boolean booleanLiteral) {
-        final ASTBuilder b = this.ctx.getASTBuilder();
         final FieldAccess fa = b.getAST().newFieldAccess();
         if (node.getExpression() instanceof Name) {
             fa.setExpression(b.copy(node.getExpression()));

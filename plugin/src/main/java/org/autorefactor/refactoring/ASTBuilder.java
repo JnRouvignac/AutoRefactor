@@ -478,6 +478,16 @@ public class ASTBuilder {
     }
 
     /**
+     * Builds a new {@link PrefixExpression} instance using the not operator ('!').
+     *
+     * @param expr the expression to negate
+     * @return a new prefix expression
+     */
+    public Expression not(Expression expr) {
+        return prefixExpr(PrefixExpression.Operator.NOT, expr);
+    }
+
+    /**
      * Builds a new {@link NumberLiteral} instance.
      *
      * @param s the number literal value
@@ -499,14 +509,7 @@ public class ASTBuilder {
         return pe;
     }
 
-    /**
-     * Builds a new {@link PrefixExpression} instance.
-     *
-     * @param operator the prefix operator
-     * @param operand the operand expression
-     * @return a new prefix expression
-     */
-    public Expression prefixExpr(PrefixExpression.Operator operator, Expression operand) {
+    private Expression prefixExpr(PrefixExpression.Operator operator, Expression operand) {
         final PrefixExpression pe = ast.newPrefixExpression();
         pe.setOperator(operator);
         pe.setOperand(operand);

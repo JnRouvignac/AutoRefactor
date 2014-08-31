@@ -54,7 +54,7 @@ public class BooleanSample {
     }
 
     public boolean returnIfConditionThatRevertsInstanceofExpressionBooleanPrimitive(Object o) {
-        return o instanceof String;
+        return /* do not lose me */o instanceof String;
     }
 
     public Boolean returnIfConditionBooleanObject(boolean b) {
