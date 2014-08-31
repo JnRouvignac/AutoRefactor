@@ -28,6 +28,8 @@ package org.autorefactor.refactoring.rules;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map.Entry;
+import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -49,6 +51,7 @@ import org.eclipse.jdt.core.dom.NodeFinder;
 import org.eclipse.jdt.core.dom.PackageDeclaration;
 import org.eclipse.jdt.core.dom.TagElement;
 import org.eclipse.jdt.core.dom.TextElement;
+import org.eclipse.jdt.core.dom.TypeDeclaration;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
 
@@ -86,7 +89,7 @@ public class CommentsRefactoring extends ASTVisitor implements IJavaRefactoring 
 
     private RefactoringContext ctx;
     private CompilationUnit astRoot;
-    private List<Pair<SourceLocation, Comment>> comments = new ArrayList<Pair<SourceLocation, Comment>>();
+    private final List<Pair<SourceLocation, Comment>> comments = new ArrayList<Pair<SourceLocation, Comment>>();
 
     /** Class constructor. */
     public CommentsRefactoring() {
@@ -117,9 +120,9 @@ public class CommentsRefactoring extends ASTVisitor implements IJavaRefactoring 
 
     private ASTNode getNextNode(Comment node) {
         final int nodeEndPosition = node.getStartPosition() + node.getLength();
-        final ASTNode root = getCoveringNode(node);
-        final int parentNodeEndPosition = root.getStartPosition() + root.getLength();
-        final NodeFinder finder = new NodeFinder(root,
+        final ASTNode coveringNode = getCoveringNode(node);
+        final int parentNodeEndPosition = coveringNode.getStartPosition() + coveringNode.getLength();
+        final NodeFinder finder = new NodeFinder(coveringNode,
                 nodeEndPosition, parentNodeEndPosition - nodeEndPosition);
         if (node instanceof Javadoc) {
             return finder.getCoveringNode();
@@ -138,8 +141,7 @@ public class CommentsRefactoring extends ASTVisitor implements IJavaRefactoring 
     }
 
     private ASTNode getCoveringNode(int start, int length) {
-        final ASTNode root = this.astRoot;
-        final NodeFinder finder = new NodeFinder(root, start, length);
+        final NodeFinder finder = new NodeFinder(this.astRoot, start, length);
         return finder.getCoveringNode();
     }
 
@@ -296,7 +298,11 @@ public class CommentsRefactoring extends ASTVisitor implements IJavaRefactoring 
             return DO_NOT_VISIT_SUBTREE;
         } else {
             final ASTNode nextNode = getNextNode(node);
-            if (acceptJavadoc(nextNode) && !betterCommentExist(node, nextNode)) {
+            final ASTNode previousNode = getPreviousSibling(nextNode);
+            if (previousNode != null && isSameLineNumber(node, previousNode)) {
+                this.ctx.getRefactorings().toJavadoc(node, previousNode);
+                return DO_NOT_VISIT_SUBTREE;
+            } else if (acceptJavadoc(nextNode) && !betterCommentExist(node, nextNode)) {
                 this.ctx.getRefactorings().toJavadoc(node, nextNode);
                 return DO_NOT_VISIT_SUBTREE;
             }
@@ -304,8 +310,41 @@ public class CommentsRefactoring extends ASTVisitor implements IJavaRefactoring 
         return VISIT_SUBTREE;
     }
 
-    private boolean betterCommentExist(Comment comment,
-            ASTNode nodeWhereToAddJavadoc) {
+    private boolean isSameLineNumber(LineComment node, ASTNode previousNode) {
+        final CompilationUnit root = (CompilationUnit) previousNode.getRoot();
+        final int lineNb1 = root.getLineNumber(node.getStartPosition());
+        final int lineNb2 = root.getLineNumber(previousNode.getStartPosition());
+        return lineNb1 == lineNb2;
+    }
+
+    private ASTNode getPreviousSibling(ASTNode node) {
+        boolean isPrevious = true;
+        if (node != null && node.getParent() instanceof TypeDeclaration) {
+            final TypeDeclaration typeDecl = (TypeDeclaration) node.getParent();
+
+            final TreeMap<Integer, ASTNode> nodes = new TreeMap<Integer, ASTNode>();
+            addAll(nodes, typeDecl.getFields());
+            addAll(nodes, typeDecl.getMethods());
+            addAll(nodes, typeDecl.getTypes());
+
+            Entry<Integer, ASTNode> entry;
+            if (isPrevious) {
+                entry = nodes.floorEntry(node.getStartPosition() - 1);
+            } else {
+                entry = nodes.ceilingEntry(node.getStartPosition() + 1);
+            }
+            return entry.getValue();
+        }
+        return null;
+    }
+
+    private <T extends ASTNode> void addAll(TreeMap<Integer, ASTNode> nodeMap, T[] nodes) {
+        for (T node : nodes) {
+            nodeMap.put(node.getStartPosition(), node);
+        }
+    }
+
+    private boolean betterCommentExist(Comment comment, ASTNode nodeWhereToAddJavadoc) {
         if (hasJavadoc(nodeWhereToAddJavadoc)) {
             return true;
         }

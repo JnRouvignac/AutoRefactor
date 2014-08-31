@@ -31,11 +31,13 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.autorefactor.util.NotImplementedException;
 import org.autorefactor.util.Pair;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.BlockComment;
@@ -177,18 +179,19 @@ public class ASTCommentRewriter {
     }
 
     private void addLineCommentsToJavadocEdits(List<TextEdit> commentEdits, String source) {
-        if (this.lineCommentsToJavadoc.values().isEmpty()) {
+        if (this.lineCommentsToJavadoc.isEmpty()) {
             return;
         }
         final TreeSet<Integer> lineStarts = getLineStarts(source);
-        for (List<LineComment> lineComments : this.lineCommentsToJavadoc.values()) {
+        for (Entry<ASTNode, List<LineComment>> entry : this.lineCommentsToJavadoc.entrySet()) {
+            final List<LineComment> lineComments = entry.getValue();
             // TODO Collect all words from the line comments,
             // then get access to indent settings, line length and newline chars
             // then spread them across several lines if needed or folded on one line only
             if (lineComments.size() == 1) {
-                addSingleLineCommentToJavadocEdits(commentEdits, lineComments);
+                addSingleLineCommentToJavadocEdits(commentEdits, entry.getKey(), lineComments, source, lineStarts);
             } else {
-                addMultiLineCommentsToJavadocEdits(commentEdits, lineComments, source, lineStarts);
+                addMultiLineCommentsToJavadocEdits(commentEdits, entry.getKey(), lineComments, source, lineStarts);
             }
         }
     }
@@ -204,26 +207,54 @@ public class ASTCommentRewriter {
         return lineStarts;
     }
 
-    private void addSingleLineCommentToJavadocEdits(List<TextEdit> commentEdits, List<LineComment> lineComments) {
+    private void addSingleLineCommentToJavadocEdits(List<TextEdit> commentEdits,
+            ASTNode nextNode, List<LineComment> lineComments, String source, TreeSet<Integer> lineStarts) {
+        final int nodeStart = nextNode.getStartPosition();
         final LineComment lineComment = lineComments.get(0);
-        final int start = lineComment.getStartPosition();
+        final int commentStart = lineComment.getStartPosition();
+        final int commentLength = lineComment.getLength();
         // TODO JNR how to obey configured indentation?
         // TODO JNR how to obey configured line length?
-        commentEdits.add(new ReplaceEdit(start, "//".length(), "/**"));
-        commentEdits.add(new InsertEdit(start + lineComment.getLength(), " */"));
+        if (commentStart < nodeStart) {
+            // assume comment is situated exactly before target node for javadoc
+            commentEdits.add(new ReplaceEdit(commentStart, "//".length(), "/**"));
+            commentEdits.add(new InsertEdit(commentStart + commentLength, " */"));
+        } else {
+            // assume comment is situated exactly after target node for javadoc
+            final String comment = source.substring(commentStart, commentStart + commentLength);
+            final String indent = getIndent(nextNode, source, lineStarts);
+            final String commentText = comment.substring(2);
+            final boolean addSpace = !Character.isWhitespace(commentText.charAt(0));
+            final String newJavadoc = "/**" + (addSpace ? " " : "") + commentText + " */\r\n" + indent;
+            final int nbWhiteSpaces = nbTrailingSpaces(source, commentStart);
+            commentEdits.add(new InsertEdit(nodeStart, newJavadoc));
+            commentEdits.add(new DeleteEdit(commentStart - nbWhiteSpaces, nbWhiteSpaces + commentLength));
+        }
     }
 
-    private void addMultiLineCommentsToJavadocEdits(List<TextEdit> commentEdits, List<LineComment> lineComments,
+    private int nbTrailingSpaces(String source, int commentStart) {
+        int result = 0;
+        while (Character.isWhitespace(source.charAt(commentStart - result - 1))) {
+            ++result;
+        }
+        return result;
+    }
+
+    private void addMultiLineCommentsToJavadocEdits(List<TextEdit> commentEdits, ASTNode node,
+            List<LineComment> lineComments,
              String source, TreeSet<Integer> lineStarts) {
         final String newline = "\n";
         for (int i = 0; i < lineComments.size(); i++) {
             final LineComment lineComment = lineComments.get(i);
+            if (node.getStartPosition() < lineComment.getStartPosition()) {
+                throw new NotImplementedException(" for comments situated after the target node for the Javadoc");
+            }
             final String replacementText;
             final boolean isFirst = i == 0;
             if (isFirst) {
                 // TODO JNR how to get access to configured newline? @see #getNewline();
                 // TODO JNR how to obey configured indentation?
-                replacementText = "/**" + newline + getIndent(lineComment, source, lineStarts) + "*";
+                replacementText = "/**" + newline + getIndentForJavadoc(lineComment, source, lineStarts) + "*";
             } else {
                 replacementText = " *";
             }
@@ -234,21 +265,28 @@ public class ASTCommentRewriter {
                 // TODO JNR how to get access to configured newline? @see #getNewline();
                 // TODO JNR how to obey configured indentation?
                 final int position = lineComment.getStartPosition() + lineComment.getLength();
-                final String indent = getIndent(lineComment, source, lineStarts);
+                final String indent = getIndentForJavadoc(lineComment, source, lineStarts);
                 commentEdits.add(new InsertEdit(position, newline + indent + "*/"));
             }
         }
     }
 
-    private String getIndent(LineComment lineComment, String source, TreeSet<Integer> lineStarts) {
+    private String getIndentForJavadoc(final LineComment lineComment, String source, TreeSet<Integer> lineStarts) {
+        final String indent = getIndent(lineComment, source, lineStarts);
+        if (indent.matches("\\s+")) {
+            return indent + " ";
+        }
+        return "";
+    }
+
+    private String getIndent(ASTNode node, String source, TreeSet<Integer> lineStarts) {
         if (lineStarts.isEmpty()) {
             return "";
         }
 
-        final int commentStart = lineComment.getStartPosition();
+        final int commentStart = node.getStartPosition();
         final int previousLineStart = findPreviousLineStart(lineStarts, commentStart);
-        final String indent = source.substring(previousLineStart, commentStart);
-        return indent + " ";
+        return source.substring(previousLineStart, commentStart);
     }
 
     private int findPreviousLineStart(TreeSet<Integer> lineStarts, final int commentStart) {
