@@ -179,7 +179,8 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
         } else if (parent instanceof ConditionalExpression) {
             return innerExpr instanceof ConditionalExpression
                 || innerExpr instanceof Assignment
-                || innerExpr instanceof InstanceofExpression;
+                || innerExpr instanceof InstanceofExpression
+                || innerExpr instanceof InfixExpression;
         }
         return false;
     }

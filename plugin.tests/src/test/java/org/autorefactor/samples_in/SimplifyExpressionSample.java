@@ -117,7 +117,8 @@ public class SimplifyExpressionSample {
         String s3 = (i + 0) + " ";
         String s4 = (i == null ? null : "i") + " ";
         // do not replace
-        long l    = 2 + (i == null ? 0 : i);
+        long l1   = 2 + (i == null ? 0 : i);
+        long l2   = (i != null && i == 0) ? 0 : i;
 
         // replace
         boolean b1 = ((Number) i).doubleValue() == 0;
