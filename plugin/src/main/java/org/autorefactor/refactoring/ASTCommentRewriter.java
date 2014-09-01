@@ -34,6 +34,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -46,8 +47,13 @@ import org.eclipse.jdt.core.dom.LineComment;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.text.edits.DeleteEdit;
 import org.eclipse.text.edits.InsertEdit;
+import org.eclipse.text.edits.MultiTextEdit;
+import org.eclipse.text.edits.RangeMarker;
 import org.eclipse.text.edits.ReplaceEdit;
 import org.eclipse.text.edits.TextEdit;
+import org.eclipse.text.edits.TextEditVisitor;
+
+import static org.autorefactor.refactoring.ASTHelper.*;
 
 /**
  * This class rewrites AST comments.
@@ -124,22 +130,42 @@ public class ASTCommentRewriter {
         addReplacementEdits(commentEdits);
         addBlockCommentToJavadocEdits(commentEdits);
         addLineCommentsToJavadocEdits(commentEdits, source);
-        if (!anyCommentEditIsCovered(edits, commentEdits)) {
+        if (!commentEdits.isEmpty() && !anyCommentEditIsCovered(edits, commentEdits)) {
             edits.addChildren(commentEdits.toArray(new TextEdit[0]));
         }
-        // else code edits take priority. Give up applying current text edits.
+        // else, code edits take priority. Give up applying current text edits.
         // They will be retried in the next refactoring loop.
     }
 
     private boolean anyCommentEditIsCovered(TextEdit edits, List<TextEdit> commentEdits) {
-        if (edits.getChildren().length > 0) {
-            for (TextEdit commentEdit : commentEdits) {
-                if (edits.covers(commentEdit)) {
-                    return true;
-                }
+        for (TextEdit commentEdit : commentEdits) {
+            if (covers(edits, commentEdit.getOffset(), commentEdit.getLength())) {
+                return true;
             }
         }
         return false;
+    }
+
+    private boolean covers(TextEdit edits, int startPosition, int length) {
+        final TextEdit range = new RangeMarker(startPosition, length);
+        final AtomicBoolean covers = new AtomicBoolean();
+        edits.accept(new TextEditVisitor() {
+            @Override
+            public boolean visit(MultiTextEdit edit) {
+                // move on there is nothing to check here
+                return VISIT_SUBTREE;
+            }
+
+            @Override
+            public boolean visitNode(TextEdit edit) {
+                if (!covers.get()) {
+                    // is it covered now?
+                    covers.set(edit.covers(range));
+                }
+                return !covers.get();
+            }
+        });
+        return covers.get();
     }
 
     private void addRemovalEdits(List<TextEdit> commentEdits, String source) {
