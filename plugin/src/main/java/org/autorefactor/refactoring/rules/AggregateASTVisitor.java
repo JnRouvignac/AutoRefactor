@@ -26,14 +26,14 @@
 package org.autorefactor.refactoring.rules;
 
 import java.lang.reflect.Method;
-import java.util.Arrays;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Iterator;
 
 import org.autorefactor.AutoRefactorPlugin;
 import org.autorefactor.refactoring.IJavaRefactoring;
@@ -325,6 +325,7 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
             System.out.println(") {");
             final boolean isVisit = isVisit(m);
             final boolean isEndVisit = isEndVisit(m);
+            final boolean isPrevisit2 = is("preVisit2", m);
             if (isVisit || isEndVisit) {
                 System.out.print("\tfinal List<ASTVisitor> visitorList = getVisitors(");
                 System.out.print((isVisit ? "visitorsMap" : "endVisitorsMap") + ", ");
@@ -333,7 +334,7 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
             System.out.print("\tfor (Iterator<ASTVisitor> iter = ");
             if (is("preVisit", m)) {
                 System.out.print("preVisitors");
-            } else if (is("preVisit2", m)) {
+            } else if (isPrevisit2) {
                 System.out.print("preVisitors2");
             } else if (is("postVisit", m)) {
                 System.out.print("postVisitors");
@@ -345,7 +346,11 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
             System.out.println(".iterator(); iter.hasNext();) {");
             System.out.println("\t\tfinal ASTVisitor v = iter.next();");
             System.out.println("\t\ttry {");
-            if (Boolean.TYPE.equals(m.getReturnType())) {
+            if (isPrevisit2) {
+                System.out.println("\t\t\tif (!v." + m.getName() + "(node)) {");
+                System.out.println("\t\t\t\treturn DO_NOT_VISIT_SUBTREE;");
+                System.out.println("\t\t\t}");
+            } else if (Boolean.TYPE.equals(m.getReturnType())) {
                 System.out.println("\t\t\tif (!continueVisiting(v." + m.getName() + "(node), v)) {");
                 System.out.println("\t\t\t\treturn DO_NOT_VISIT_SUBTREE;");
                 System.out.println("\t\t\t}");
@@ -1659,7 +1664,7 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
         for (Iterator<ASTVisitor> iter = preVisitors2.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
-                if (!continueVisiting(v.preVisit2(node), v)) {
+                if (!v.preVisit2(node)) {
                     return DO_NOT_VISIT_SUBTREE;
                 }
             } catch (Exception e) {
