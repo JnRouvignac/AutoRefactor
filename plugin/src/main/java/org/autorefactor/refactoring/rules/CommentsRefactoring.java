@@ -333,7 +333,9 @@ public class CommentsRefactoring extends ASTVisitor implements IJavaRefactoring 
             } else {
                 entry = nodes.ceilingEntry(node.getStartPosition() + 1);
             }
-            return entry.getValue();
+            if (entry != null) {
+                return entry.getValue();
+            }
         }
         return null;
     }

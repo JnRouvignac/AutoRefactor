@@ -254,7 +254,7 @@ public class ApplyRefactoringsJob extends Job {
         List<ASTVisitor> lastLoopVisitors = Collections.emptyList();
         int nbLoopsWithSameVisitors = 0;
         while (true) {
-            if (totalNbLoops > 10000) {
+            if (totalNbLoops > 1000) {
                 // Oops! Something went wrong.
                 final String message = getPossibleCulprits(nbLoopsWithSameVisitors, lastLoopVisitors);
                 throw new IllegalStateException("An infinite loop has been detected."
