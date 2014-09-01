@@ -75,17 +75,15 @@ public class CollapseIfStatementRefactoring extends ASTVisitor implements
 
         final ASTBuilder b = this.ctx.getASTBuilder();
         final InfixExpression ie = b.infixExpr(
-            parenthesizeInfixExpr(b, outerIf.getExpression()),
-            CONDITIONAL_AND,
-            parenthesizeInfixExpr(b, innerIf.getExpression()));
-
-        final IfStatement is = b.if0(ie,
-            b.copy(innerIf.getThenStatement()));
-        this.ctx.getRefactorings().replace(outerIf, is);
+                parenthesizeOrExpr(b, outerIf.getExpression()),
+                CONDITIONAL_AND,
+                parenthesizeOrExpr(b, innerIf.getExpression()));
+        this.ctx.getRefactorings().replace(outerIf.getExpression(), ie);
+        this.ctx.getRefactorings().replace(outerIf.getThenStatement(), b.copy(innerIf.getThenStatement()));
         return DO_NOT_VISIT_SUBTREE;
     }
 
-    private Expression parenthesizeInfixExpr(ASTBuilder b, Expression expr) {
+    private Expression parenthesizeOrExpr(ASTBuilder b, Expression expr) {
         if (expr instanceof InfixExpression) {
             final InfixExpression ie = (InfixExpression) expr;
             if (CONDITIONAL_OR.equals(ie.getOperator())) {
