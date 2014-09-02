@@ -25,23 +25,17 @@
  */
 package org.autorefactor.refactoring.rules;
 
-import static org.autorefactor.refactoring.ASTHelper.*;
-import static org.eclipse.jdt.core.dom.Modifier.ModifierKeyword.*;
-
-import java.util.LinkedList;
-import java.util.List;
-
 import org.autorefactor.refactoring.IJavaRefactoring;
 import org.autorefactor.refactoring.Refactorings;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
-import org.eclipse.jdt.core.dom.IExtendedModifier;
 import org.eclipse.jdt.core.dom.ITypeBinding;
-import org.eclipse.jdt.core.dom.Modifier;
-import org.eclipse.jdt.core.dom.Modifier.ModifierKeyword;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
+
+import static org.autorefactor.refactoring.ASTHelper.*;
+import static org.eclipse.jdt.core.dom.Modifier.*;
 
 /**
  * Remove field initializers when they are the default value of the field's types.
@@ -60,6 +54,7 @@ public class RemoveFieldsDefaultValuesRefactoring extends ASTVisitor implements
     }
 
     /** {@inheritDoc} */
+    @Override
     public void setRefactoringContext(RefactoringContext ctx) {
         this.ctx = ctx;
     }
@@ -68,7 +63,7 @@ public class RemoveFieldsDefaultValuesRefactoring extends ASTVisitor implements
     @Override
     public boolean visit(FieldDeclaration node) {
         final ITypeBinding fieldType = node.getType().resolveBinding();
-        if (fieldType == null || isConstant(node)) {
+        if (fieldType == null || isFinal(node.getModifiers())) {
             return VISIT_SUBTREE;
         }
         boolean visitSubtree = VISIT_SUBTREE;
@@ -92,18 +87,6 @@ public class RemoveFieldsDefaultValuesRefactoring extends ASTVisitor implements
         return visitSubtree;
     }
 
-    private boolean isConstant(FieldDeclaration node) {
-        final List<ModifierKeyword> toFind = new LinkedList<ModifierKeyword>();
-        toFind.add(STATIC_KEYWORD);
-        toFind.add(FINAL_KEYWORD);
-        for (IExtendedModifier em : modifiers(node)) {
-            if (em.isModifier()) {
-                toFind.remove(((Modifier) em).getKeyword());
-            }
-        }
-        return toFind.isEmpty();
-    }
-
     private boolean isPrimitiveDefaultValue(Object val) {
         if (val instanceof Short
                 || val instanceof Integer
@@ -121,6 +104,7 @@ public class RemoveFieldsDefaultValuesRefactoring extends ASTVisitor implements
     }
 
     /** {@inheritDoc} */
+    @Override
     public Refactorings getRefactorings(CompilationUnit astRoot) {
         astRoot.accept(this);
         return this.ctx.getRefactorings();

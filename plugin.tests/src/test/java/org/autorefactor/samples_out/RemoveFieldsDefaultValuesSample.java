@@ -29,6 +29,8 @@ public class RemoveFieldsDefaultValuesSample {
 
     private static final int MY_CONSTANT = 0;
 
+    private final boolean final_bo = false;
+
     private Object doNotRemoveInitializer = new Object();
 
     private Object obj;
