@@ -31,7 +31,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import org.autorefactor.refactoring.IRefactoring;
 import org.autorefactor.refactoring.Release;
 import org.autorefactor.ui.ApplyRefactoringsJob;
 import org.eclipse.jdt.core.ICompilationUnit;
@@ -47,30 +46,27 @@ import static org.autorefactor.cfg.test.TestUtils.*;
 import static org.junit.Assert.*;
 
 /**
- * Tests each refactoring rule in isolation. Each refactoring rule is run in a
- * loop until it cannot apply any more changes to the sample file.
+ * Tests all refactoring rules at the same time. This test verifies that all the
+ * refactoring rules work together and do not introduce problems.
  */
 @RunWith(value = Parameterized.class)
-public class RefactoringsTest {
+public class AllRefactoringsTest {
 
-    private final String testName;
+    private final String sampleName;
 
-    public RefactoringsTest(String testName) {
-        this.testName = testName;
+    public AllRefactoringsTest(String testName) {
+        this.sampleName = testName;
     }
 
     @Parameters(name = "{0}Refactoring")
     public static Collection<Object[]> data() {
-        final File samplesDir = new File("src/test/java/org/autorefactor/samples_in");
+        final File samplesDir = new File("src/test/java/org/autorefactor/rules/all/samples_in");
         final File[] sampleFiles = samplesDir.listFiles(new EndsWithFileFilter("Sample.java"));
         Arrays.sort(sampleFiles);
 
         final List<Object[]> output = new ArrayList<Object[]>(sampleFiles.length);
-        for (File file : sampleFiles) {
-            final String fileName = file.getName();
-            if (!"ReduceVariableScopeSample.java".equals(fileName)) { // To be completed
-                output.add(new Object[] { fileName.replace("Sample.java", "") });
-            }
+        for (File sampleFile : sampleFiles) {
+            output.add(new Object[] { sampleFile.getName() });
         }
         return output;
     }
@@ -88,16 +84,11 @@ public class RefactoringsTest {
     }
 
     private void testRefactoring0() throws Exception {
-        final String sampleName = testName + "Sample.java";
-        final File samplesDir = new File("src/test/java/org/autorefactor");
+        final File samplesDir = new File("src/test/java/org/autorefactor/rules/all");
         final File sampleIn = new File(samplesDir, "samples_in/" + sampleName);
-        assertTrue(testName + ": sample in file " + sampleIn + " should exist", sampleIn.exists());
+        assertTrue(sampleName + ": sample in file " + sampleIn + " should exist", sampleIn.exists());
         final File sampleOut = new File(samplesDir, "samples_out/" + sampleName);
-        assertTrue(testName + ": sample out file " + sampleOut + " should exist", sampleOut.exists());
-
-        final String refactoringClassname = testName + "Refactoring";
-        final IRefactoring refactoring = getRefactoringClass(refactoringClassname);
-        assertNotNull(testName + ": refactoring class " + refactoringClassname + " should exist", refactoring);
+        assertTrue(sampleName + ": sample out file " + sampleOut + " should exist", sampleOut.exists());
 
         final String sampleInSource = readAll(sampleIn);
         final String sampleOutSource = readAll(sampleOut);
@@ -112,22 +103,12 @@ public class RefactoringsTest {
         new ApplyRefactoringsJob(null, null).applyRefactoring(
                 doc, cu,
                 Release.javaSE("1.5.0"), 4,
-                new AggregateASTVisitor(Arrays.asList(refactoring), true));
+                new AggregateASTVisitor(AllRefactorings.getAllRefactorings(), true));
 
         final String actual = normalize(
                 doc.get().replaceAll("samples_in", "samples_out"));
         final String expected = normalize(sampleOutSource);
-        assertEquals(testName + ": wrong output;", expected, actual);
-    }
-
-    private IRefactoring getRefactoringClass(final String refactoringClassName) throws Exception {
-        Collection<IRefactoring> refactorings = AllRefactorings.getAllRefactorings();
-        for (IRefactoring refactoring : refactorings) {
-            if (refactoring.getClass().getSimpleName().equals(refactoringClassName)) {
-                return refactoring;
-            }
-        }
-        return null;
+        assertEquals(sampleName + ": wrong output;", expected, actual);
     }
 
     private String normalize(String s) {
