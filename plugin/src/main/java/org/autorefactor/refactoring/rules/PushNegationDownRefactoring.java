@@ -49,6 +49,7 @@ public class PushNegationDownRefactoring extends ASTVisitor implements IJavaRefa
         this.ctx = ctx;
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean visit(PrefixExpression node) {
         if (!PrefixExpression.Operator.NOT.equals(node.getOperator())) {
@@ -65,14 +66,16 @@ public class PushNegationDownRefactoring extends ASTVisitor implements IJavaRefa
             }
         } else if (operand instanceof InfixExpression) {
             final InfixExpression ie = (InfixExpression) operand;
-            final Object reverseOp = OperatorEnum.getOperator(ie).getReverseBooleanOperator();
-            if (reverseOp != null) {
-                this.ctx.getRefactorings().replace(node,
-                        b.parenthesize(b.infixExpr(
-                                negate(b, ie.getLeftOperand()),
-                                (InfixExpression.Operator) reverseOp,
-                                negate(b, ie.getRightOperand()))));
-                return DO_NOT_VISIT_SUBTREE;
+            if (hasType(ie.getLeftOperand(), "boolean", "java.lang.Boolean")) {
+                final Object reverseOp = OperatorEnum.getOperator(ie).getReverseBooleanOperator();
+                if (reverseOp != null) {
+                    this.ctx.getRefactorings().replace(node,
+                            b.parenthesize(b.infixExpr(
+                                    negate(b, ie.getLeftOperand()),
+                                    (InfixExpression.Operator) reverseOp,
+                                    negate(b, ie.getRightOperand()))));
+                    return DO_NOT_VISIT_SUBTREE;
+                }
             }
         }
         return VISIT_SUBTREE;

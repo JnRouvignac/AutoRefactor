@@ -51,4 +51,8 @@ public class PushNegationDownSample {
     public boolean replaceNegationRemoveParentheses(boolean b1, boolean b2) {
         return !((!b1) && (!b2));
     }
+
+    public boolean doNotReplaceNonBooleanExprs(Object o1) {
+        return !(o1 != null);
+    }
 }
