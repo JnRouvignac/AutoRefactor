@@ -54,14 +54,21 @@ public class PushNegationDownRefactoring extends AbstractRefactoring {
             }
         } else if (operand instanceof InfixExpression) {
             final InfixExpression ie = (InfixExpression) operand;
-            if (hasType(ie.getLeftOperand(), "boolean", "java.lang.Boolean")) {
-                final Object reverseOp = OperatorEnum.getOperator(ie).getReverseBooleanOperator();
-                if (reverseOp != null) {
+            final Object reverseOp = OperatorEnum.getOperator(ie).getReverseBooleanOperator();
+            if (reverseOp != null) {
+                if (hasType(ie.getLeftOperand(), "boolean", "java.lang.Boolean")) {
                     this.ctx.getRefactorings().replace(node,
                             b.parenthesize(b.infixExpr(
                                     negate(b, ie.getLeftOperand()),
                                     (InfixExpression.Operator) reverseOp,
                                     negate(b, ie.getRightOperand()))));
+                    return DO_NOT_VISIT_SUBTREE;
+                } else {
+                    this.ctx.getRefactorings().replace(node,
+                            b.parenthesize(b.infixExpr(
+                                    b.copy(ie.getLeftOperand()),
+                                    (InfixExpression.Operator) reverseOp,
+                                    b.copy(ie.getRightOperand()))));
                     return DO_NOT_VISIT_SUBTREE;
                 }
             }

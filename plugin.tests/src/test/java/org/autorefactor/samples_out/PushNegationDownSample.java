@@ -52,7 +52,7 @@ public class PushNegationDownSample {
         return (b1 || b2);
     }
 
-    public boolean doNotReplaceNonBooleanExprs(Object o1) {
-        return !(o1 != null);
+    public boolean doNotNegateNonBooleanExprs(Object o1) {
+        return (o1 == null /* another refactoring removes the parentheses */);
     }
 }
