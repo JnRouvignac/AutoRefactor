@@ -39,10 +39,6 @@ import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.ICheckStateProvider;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.jface.viewers.StyledCellLabelProvider;
 import org.eclipse.jface.viewers.StyledString;
@@ -84,10 +80,12 @@ public class ChooseRefactoringWizardPage extends WizardPage {
             }
         }
 
+        @Override
         public boolean isChecked(Object element) {
             return Boolean.TRUE.equals(checkedState.get(element));
         }
 
+        @Override
         public boolean isGrayed(Object element) {
             return false;
         }
@@ -133,6 +131,7 @@ public class ChooseRefactoringWizardPage extends WizardPage {
     }
 
     /** {@inheritDoc} */
+    @Override
     public void createControl(Composite parent) {
         parent.setLayout(new GridLayout());
 
@@ -235,18 +234,6 @@ public class ChooseRefactoringWizardPage extends WizardPage {
                 return null;
             }
         });
-        tableViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-            public void selectionChanged(SelectionChangedEvent event) {
-                final ISelection sel = event.getSelection();
-                if (sel instanceof IStructuredSelection) {
-                    final IStructuredSelection sel2 = (IStructuredSelection) sel;
-                    if (!sel2.isEmpty()) {
-                        final Object element = sel2.getFirstElement();
-                        setChecked(element, !tableViewer.getChecked(element));
-                    }
-                }
-            }
-        });
 
         final Table table = tableViewer.getTable();
         table.setLinesVisible(true);
@@ -275,7 +262,7 @@ public class ChooseRefactoringWizardPage extends WizardPage {
         }
 
         final StringBuilder sb = new StringBuilder();
-        final Pattern p = Pattern.compile("([A-Z][^A-Z]+)");
+        final Pattern p = Pattern.compile("([A-Z][^A-Z]*)");
         final Matcher m = p.matcher(name);
         boolean isFirst = true;
         int lastMatchIdx = 0;
@@ -292,7 +279,9 @@ public class ChooseRefactoringWizardPage extends WizardPage {
             if (Character.isUpperCase(firtChar)) {
                 sb.append(Character.toLowerCase(firtChar));
                 sb.append(matched, 1, matched.length());
-                sb.append(" ");
+                if (matched.length() > 1) {
+                    sb.append(" ");
+                }
             }
         }
         if (lastMatchIdx < name.length()) {
