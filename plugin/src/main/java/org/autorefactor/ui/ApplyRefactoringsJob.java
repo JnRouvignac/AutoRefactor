@@ -52,6 +52,7 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.IOpenable;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaCore;
@@ -133,6 +134,7 @@ public class ApplyRefactoringsJob extends Job {
                     applyRefactoring(compilationUnit, javaSERelease, tabSize, refactoring);
                 } finally {
                     monitor.worked(1);
+                    compilationUnit.close();
                 }
             }
         } finally {
@@ -188,16 +190,26 @@ public class ApplyRefactoringsJob extends Job {
     }
 
     @SuppressWarnings("unchecked")
-    private Map<String, String> getJavaProjectOptions(List<IJavaElement> javaElements) {
+    private Map<String, String> getJavaProjectOptions(List<IJavaElement> javaElements) throws JavaModelException {
         final IJavaProject javaProject = getIJavaProject(javaElements.get(0));
-        return javaProject.getOptions(true);
+        try {
+            return javaProject.getOptions(true);
+        } finally {
+            javaProject.close();
+        }
     }
 
-    private IJavaProject getIJavaProject(IJavaElement javaElement) {
+    private IJavaProject getIJavaProject(IJavaElement javaElement) throws JavaModelException {
         if (javaElement instanceof ICompilationUnit
                 || javaElement instanceof IPackageFragment
                 || javaElement instanceof IPackageFragmentRoot) {
-            return getIJavaProject(javaElement.getParent());
+            try {
+                return getIJavaProject(javaElement.getParent());
+            } finally {
+                if (javaElement instanceof IOpenable) {
+                    ((IOpenable) javaElement).close();
+                }
+            }
         } else if (javaElement instanceof IJavaProject) {
             return (IJavaProject) javaElement;
         }
