@@ -25,23 +25,19 @@
  */
 package org.autorefactor.refactoring.rules;
 
-import static org.autorefactor.refactoring.ASTHelper.*;
-import static org.eclipse.jdt.core.dom.Assignment.Operator.*;
-
 import java.util.List;
 
 import org.autorefactor.refactoring.ASTBuilder;
-import org.autorefactor.refactoring.IJavaRefactoring;
-import org.autorefactor.refactoring.Refactorings;
 import org.eclipse.jdt.core.dom.ASTMatcher;
-import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.Assignment;
-import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.Statement;
+
+import static org.autorefactor.refactoring.ASTHelper.*;
+import static org.eclipse.jdt.core.dom.Assignment.Operator.*;
 
 /**
  * Refactoring removing useless null checks before assignments or return statements.
@@ -49,21 +45,9 @@ import org.eclipse.jdt.core.dom.Statement;
  * then either assigning null or the expression depending on the result of the null check.
  * It is simpler to directly assign the expression.
  */
-public class RemoveUselessNullCheckRefactoring extends ASTVisitor implements
-        IJavaRefactoring {
+public class RemoveUselessNullCheckRefactoring extends AbstractRefactoring {
 
-    private RefactoringContext ctx;
     private final ASTMatcher matcher = new ASTMatcher();
-
-    /** Default constructor. */
-    public RemoveUselessNullCheckRefactoring() {
-        super();
-    }
-
-    /** {@inheritDoc} */
-    public void setRefactoringContext(RefactoringContext ctx) {
-        this.ctx = ctx;
-    }
 
     /** {@inheritDoc} */
     @Override
@@ -141,11 +125,5 @@ public class RemoveUselessNullCheckRefactoring extends ASTVisitor implements
         this.ctx.getRefactorings().replace(node,
                 b.return0(b.copy(returnedExpr)));
         return DO_NOT_VISIT_SUBTREE;
-    }
-
-    /** {@inheritDoc} */
-    public Refactorings getRefactorings(CompilationUnit astRoot) {
-        astRoot.accept(this);
-        return this.ctx.getRefactorings();
     }
 }

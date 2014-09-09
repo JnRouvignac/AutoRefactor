@@ -26,11 +26,7 @@
 package org.autorefactor.refactoring.rules;
 
 import org.autorefactor.refactoring.ASTBuilder;
-import org.autorefactor.refactoring.IJavaRefactoring;
-import org.autorefactor.refactoring.Refactorings;
 import org.eclipse.jdt.core.dom.ASTNode;
-import org.eclipse.jdt.core.dom.ASTVisitor;
-import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 
@@ -45,20 +41,7 @@ import static org.autorefactor.refactoring.ASTHelper.*;
  * expression nullness.
  * </p>
  */
-public class InvertEqualsRefactoring extends ASTVisitor implements
-        IJavaRefactoring {
-
-    private RefactoringContext ctx;
-
-    /** Default constructor. */
-    public InvertEqualsRefactoring() {
-        super();
-    }
-
-    /** {@inheritDoc} */
-    public void setRefactoringContext(RefactoringContext ctx) {
-        this.ctx = ctx;
-    }
+public class InvertEqualsRefactoring extends AbstractRefactoring {
 
     /** {@inheritDoc} */
     @Override
@@ -88,11 +71,5 @@ public class InvertEqualsRefactoring extends ASTVisitor implements
         final String methodName = isEquals ? "equals" : "equalsIgnoreCase";
         final ASTBuilder b = this.ctx.getASTBuilder();
         return b.invoke(b.copy(rhs), methodName, b.copy(lhs));
-    }
-
-    /** {@inheritDoc} */
-    public Refactorings getRefactorings(CompilationUnit astRoot) {
-        astRoot.accept(this);
-        return this.ctx.getRefactorings();
     }
 }

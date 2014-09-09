@@ -32,13 +32,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.autorefactor.refactoring.ASTBuilder;
-import org.autorefactor.refactoring.IJavaRefactoring;
 import org.autorefactor.refactoring.Refactorings;
 import org.autorefactor.util.NotImplementedException;
 import org.autorefactor.util.Pair;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
-import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.CompilationUnit;
@@ -75,8 +73,7 @@ import static org.autorefactor.util.Utils.*;
  * TODO JNR can we also transform singular fields into local variables?
  * </p>
  */
-public class ReduceVariableScopeRefactoring extends ASTVisitor implements
-        IJavaRefactoring {
+public class ReduceVariableScopeRefactoring extends AbstractRefactoring {
 
     private static final int DECL  = 1 << 0;
     private static final int READ  = 1 << 1;
@@ -180,21 +177,9 @@ public class ReduceVariableScopeRefactoring extends ASTVisitor implements
         }
     }
 
-    private RefactoringContext ctx;
     private final Map<VariableName, List<VariableAccess>> allVariableAccesses =
             new HashMap<VariableName, List<VariableAccess>>();
     private static final Pair<Integer, ASTNode> NULL_PAIR = Pair.of(0, null);
-
-    /** Default constructor. */
-    public ReduceVariableScopeRefactoring() {
-        super();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void setRefactoringContext(RefactoringContext ctx) {
-        this.ctx = ctx;
-    }
 
     /** {@inheritDoc} */
     @Override
@@ -278,8 +263,7 @@ public class ReduceVariableScopeRefactoring extends ASTVisitor implements
     public Refactorings getRefactorings(CompilationUnit astRoot) {
         astRoot.accept(this);
 
-        for (Entry<VariableName, List<VariableAccess>> entry : this.allVariableAccesses
-                .entrySet()) {
+        for (Entry<VariableName, List<VariableAccess>> entry : this.allVariableAccesses.entrySet()) {
             final List<VariableAccess> variableAccesses = entry.getValue();
             if (canReduceVariableScope(variableAccesses)) {
                 final VariableAccess varDecl = variableAccesses.get(0);

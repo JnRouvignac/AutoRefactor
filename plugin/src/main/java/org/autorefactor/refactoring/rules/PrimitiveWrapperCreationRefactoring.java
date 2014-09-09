@@ -28,11 +28,7 @@ package org.autorefactor.refactoring.rules;
 import java.util.List;
 
 import org.autorefactor.refactoring.ASTBuilder;
-import org.autorefactor.refactoring.IJavaRefactoring;
-import org.autorefactor.refactoring.Refactorings;
-import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
-import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.MethodInvocation;
@@ -43,26 +39,14 @@ import static org.autorefactor.refactoring.ASTHelper.*;
  * Replaces unnecessary primitive wrappers instance creations by using static
  * factory methods or existing constants.
  */
-public class PrimitiveWrapperCreationRefactoring extends ASTVisitor implements
-        IJavaRefactoring {
+public class PrimitiveWrapperCreationRefactoring extends AbstractRefactoring {
 
-    private RefactoringContext ctx;
-    private int javaMinorVersion;
-
-    /** Default constructor. */
-    public PrimitiveWrapperCreationRefactoring() {
-        super();
-    }
-
-    /** {@inheritDoc} */
-    public void setRefactoringContext(RefactoringContext ctx) {
-        this.ctx = ctx;
-        this.javaMinorVersion = this.ctx.getJavaSERelease().getMinorVersion();
+    private int getJavaMinorVersion() {
+        return ctx.getJavaSERelease().getMinorVersion();
     }
 
     // TODO Can we reduce bad effects of autoboxing / unboxing
-    // fix autoboxing and unboxing (returning boxed value in primitve
-    // context)
+    // fix autoboxing and unboxing (returning boxed value in primitve context)
 
     /** {@inheritDoc} */
     @Override
@@ -121,7 +105,7 @@ public class PrimitiveWrapperCreationRefactoring extends ASTVisitor implements
     @Override
     public boolean visit(ClassInstanceCreation node) {
         final ITypeBinding typeBinding = node.getType().resolveBinding();
-        if (javaMinorVersion >= 5
+        if (getJavaMinorVersion() >= 5
                 && typeBinding != null
                 && arguments(node).size() == 1) {
             final String qualifiedName = typeBinding.getQualifiedName();
@@ -146,11 +130,5 @@ public class PrimitiveWrapperCreationRefactoring extends ASTVisitor implements
             String methodName, Expression arg) {
         final ASTBuilder b = this.ctx.getASTBuilder();
         return b.invoke(typeName, methodName, b.copy(arg));
-    }
-
-    /** {@inheritDoc} */
-    public Refactorings getRefactorings(CompilationUnit astRoot) {
-        astRoot.accept(this);
-        return this.ctx.getRefactorings();
     }
 }

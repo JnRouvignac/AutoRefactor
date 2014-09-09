@@ -25,21 +25,14 @@
  */
 package org.autorefactor.refactoring.rules;
 
-import static org.autorefactor.refactoring.ASTHelper.*;
-import static org.autorefactor.refactoring.ForLoopHelper.*;
-
 import java.util.Collection;
 import java.util.List;
 
 import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.ForLoopHelper.ForLoopContent;
-import org.autorefactor.refactoring.IJavaRefactoring;
-import org.autorefactor.refactoring.Refactorings;
 import org.eclipse.jdt.core.dom.ASTNode;
-import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
-import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.EnhancedForStatement;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ExpressionStatement;
@@ -54,30 +47,14 @@ import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
+import static org.autorefactor.refactoring.ASTHelper.*;
+import static org.autorefactor.refactoring.ForLoopHelper.*;
+
 /**
  * Converts code to use {@link Collection#addAll(Collection)} when for or foreach loops are iterating over a collection
  * and add all its elements to another collection.
  */
-public class CollectionAddAllRefactoring extends ASTVisitor implements
-        IJavaRefactoring {
-
-    private RefactoringContext ctx;
-
-    /** Default constructor. */
-    public CollectionAddAllRefactoring() {
-        super();
-    }
-
-    /** {@inheritDoc} */
-    public void setRefactoringContext(RefactoringContext ctx) {
-        this.ctx = ctx;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean preVisit2(ASTNode node) {
-        return ctx.getRefactorings().canVisit(node);
-    }
+public class CollectionAddAllRefactoring extends AbstractRefactoring {
 
     /** {@inheritDoc} */
     @Override
@@ -241,12 +218,6 @@ public class CollectionAddAllRefactoring extends ASTVisitor implements
             }
         }
         return false;
-    }
-
-    /** {@inheritDoc} */
-    public Refactorings getRefactorings(CompilationUnit astRoot) {
-        astRoot.accept(this);
-        return this.ctx.getRefactorings();
     }
 
 }

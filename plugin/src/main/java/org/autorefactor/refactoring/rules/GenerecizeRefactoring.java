@@ -25,33 +25,16 @@
  */
 package org.autorefactor.refactoring.rules;
 
-import static org.autorefactor.refactoring.ASTHelper.*;
-
-import org.autorefactor.refactoring.IJavaRefactoring;
-import org.autorefactor.refactoring.Refactorings;
-import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.CastExpression;
-import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Type;
+
+import static org.autorefactor.refactoring.ASTHelper.*;
 
 /**
  * Add generics, be more assertive about generics that what Eclipse does.
  */
-public class GenerecizeRefactoring extends ASTVisitor implements
-        IJavaRefactoring {
-
-    private RefactoringContext ctx;
-
-    /** Default constructor. */
-    public GenerecizeRefactoring() {
-        super();
-    }
-
-    /** {@inheritDoc} */
-    public void setRefactoringContext(RefactoringContext ctx) {
-        this.ctx = ctx;
-    }
+public class GenerecizeRefactoring extends AbstractRefactoring {
 
     // TODO JNR where are we doing casts?
     // Generics
@@ -88,11 +71,5 @@ public class GenerecizeRefactoring extends ASTVisitor implements
             // TODO JNR find variable declaration and include with the type above
         }
         return VISIT_SUBTREE;
-    }
-
-    /** {@inheritDoc} */
-    public Refactorings getRefactorings(CompilationUnit astRoot) {
-        astRoot.accept(this);
-        return this.ctx.getRefactorings();
     }
 }

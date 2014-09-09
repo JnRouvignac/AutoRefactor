@@ -34,15 +34,11 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.autorefactor.refactoring.ASTBuilder;
-import org.autorefactor.refactoring.IJavaRefactoring;
-import org.autorefactor.refactoring.Refactorings;
 import org.autorefactor.util.NotImplementedException;
 import org.eclipse.jdt.core.dom.ASTNode;
-import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.AnnotationTypeDeclaration;
 import org.eclipse.jdt.core.dom.AnnotationTypeMemberDeclaration;
 import org.eclipse.jdt.core.dom.BodyDeclaration;
-import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.EnumDeclaration;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.IExtendedModifier;
@@ -65,8 +61,7 @@ import static org.autorefactor.refactoring.ASTHelper.*;
  * <p>
  * Fix modifiers order.
  */
-public class RemoveUselessModifiersRefactoring extends ASTVisitor implements
-        IJavaRefactoring {
+public class RemoveUselessModifiersRefactoring extends AbstractRefactoring {
 
     private static final class ModifierOrderComparator implements Comparator<Modifier> {
 
@@ -98,19 +93,6 @@ public class RemoveUselessModifiersRefactoring extends ASTVisitor implements
                     ModifierKeyword.SYNCHRONIZED_KEYWORD,
                     ModifierKeyword.NATIVE_KEYWORD,
                     ModifierKeyword.STRICTFP_KEYWORD));
-
-    private RefactoringContext ctx;
-
-    /** Default constructor. */
-    public RemoveUselessModifiersRefactoring() {
-        super();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void setRefactoringContext(RefactoringContext ctx) {
-        this.ctx = ctx;
-    }
 
     /** {@inheritDoc} */
     @Override
@@ -230,12 +212,5 @@ public class RemoveUselessModifiersRefactoring extends ASTVisitor implements
             }
         }
         return results;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Refactorings getRefactorings(CompilationUnit astRoot) {
-        astRoot.accept(this);
-        return this.ctx.getRefactorings();
     }
 }

@@ -28,12 +28,8 @@ package org.autorefactor.refactoring.rules;
 import java.math.BigDecimal;
 
 import org.autorefactor.refactoring.ASTBuilder;
-import org.autorefactor.refactoring.IJavaRefactoring;
-import org.autorefactor.refactoring.Refactorings;
 import org.eclipse.jdt.core.dom.ASTNode;
-import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
-import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.InfixExpression;
@@ -56,21 +52,10 @@ import static org.autorefactor.refactoring.JavaConstants.*;
  * {@link BigDecimal#compareTo(BigDecimal)}</li>
  * </ul>
  */
-public class BigDecimalRefactoring extends ASTVisitor implements
-        IJavaRefactoring {
+public class BigDecimalRefactoring extends AbstractRefactoring {
 
-    private RefactoringContext ctx;
-    private int javaMinorVersion;
-
-    /** Default constructor. */
-    public BigDecimalRefactoring() {
-        super();
-    }
-
-    /** {@inheritDoc} */
-    public void setRefactoringContext(RefactoringContext ctx) {
-        this.ctx = ctx;
-        this.javaMinorVersion = this.ctx.getJavaSERelease().getMinorVersion();
+    private int getJavaMinorVersion() {
+        return ctx.getJavaSERelease().getMinorVersion();
     }
 
     /** {@inheritDoc} */
@@ -88,7 +73,7 @@ public class BigDecimalRefactoring extends ASTVisitor implements
                     this.ctx.getRefactorings().replace(nb,
                             getStringLiteral(nb.getToken()));
                 } else {
-                    if (javaMinorVersion < 5) {
+                    if (getJavaMinorVersion() < 5) {
                         return VISIT_SUBTREE;
                     }
                     if (ZERO_LONG_LITERAL_RE.matcher(nb.getToken()).matches()) {
@@ -104,7 +89,7 @@ public class BigDecimalRefactoring extends ASTVisitor implements
                 }
                 return DO_NOT_VISIT_SUBTREE;
             } else if (arg0 instanceof StringLiteral) {
-                if (javaMinorVersion < 5) {
+                if (getJavaMinorVersion() < 5) {
                     return VISIT_SUBTREE;
                 }
                 final String literalValue = ((StringLiteral) arg0).getLiteralValue();
@@ -143,7 +128,7 @@ public class BigDecimalRefactoring extends ASTVisitor implements
         if (node.getExpression() == null) {
             return VISIT_SUBTREE;
         }
-        if (javaMinorVersion >= 5
+        if (getJavaMinorVersion() >= 5
                 && (isMethod(node, "java.math.BigDecimal", "valueOf", "long")
                     || isMethod(node, "java.math.BigDecimal", "valueOf", "double"))) {
             final ITypeBinding typeBinding = node.getExpression().resolveTypeBinding();
@@ -208,11 +193,5 @@ public class BigDecimalRefactoring extends ASTVisitor implements
                 b.copy(node.getExpression()), "compareTo", b.copy(arguments(node).get(0)));
 
         return b.infixExpr(mi, Operator.EQUALS, b.int0(0));
-    }
-
-    /** {@inheritDoc} */
-    public Refactorings getRefactorings(CompilationUnit astRoot) {
-        astRoot.accept(this);
-        return this.ctx.getRefactorings();
     }
 }

@@ -28,11 +28,8 @@ package org.autorefactor.refactoring.rules;
 import java.util.List;
 
 import org.autorefactor.refactoring.ASTBuilder;
-import org.autorefactor.refactoring.IJavaRefactoring;
 import org.autorefactor.refactoring.Refactorings;
 import org.autorefactor.refactoring.Release;
-import org.eclipse.jdt.core.dom.ASTVisitor;
-import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 
@@ -42,16 +39,7 @@ import static org.eclipse.jdt.core.dom.MethodInvocation.*;
 /**
  * Replaces Vector pre Collections API with equivalent Collections API.
  */
-public class VectorOldToNewAPIRefactoring extends ASTVisitor implements
-        IJavaRefactoring {
-
-    private RefactoringContext ctx;
-
-    /** {@inheritDoc} */
-    @Override
-    public void setRefactoringContext(RefactoringContext ctx) {
-        this.ctx = ctx;
-    }
+public class VectorOldToNewAPIRefactoring extends AbstractRefactoring {
 
     /** {@inheritDoc} */
     @Override
@@ -121,13 +109,6 @@ public class VectorOldToNewAPIRefactoring extends ASTVisitor implements
                     + " to have size <" + expectedSize + ">, but found <"
                     + args.size() + ">");
         }
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Refactorings getRefactorings(CompilationUnit astRoot) {
-        astRoot.accept(this);
-        return this.ctx.getRefactorings();
     }
 
 }

@@ -26,13 +26,9 @@
 package org.autorefactor.refactoring.rules;
 
 import org.autorefactor.refactoring.ASTBuilder;
-import org.autorefactor.refactoring.IJavaRefactoring;
-import org.autorefactor.refactoring.Refactorings;
 import org.eclipse.jdt.core.dom.ASTNode;
-import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.ArrayInitializer;
 import org.eclipse.jdt.core.dom.Assignment;
-import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;
@@ -48,27 +44,7 @@ import static org.autorefactor.refactoring.ASTHelper.*;
  * Removes unnecessary local variable declaration or unnecessary variable
  * assignment before a return statement.
  */
-public class RemoveUnnecessaryLocalBeforeReturnRefactoring extends ASTVisitor
-        implements IJavaRefactoring {
-
-    private RefactoringContext ctx;
-
-    /** Default constructor. */
-    public RemoveUnnecessaryLocalBeforeReturnRefactoring() {
-        super();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void setRefactoringContext(RefactoringContext ctx) {
-        this.ctx = ctx;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean preVisit2(ASTNode node) {
-        return ctx.getRefactorings().canVisit(node);
-    }
+public class RemoveUnnecessaryLocalBeforeReturnRefactoring extends AbstractRefactoring {
 
     /** {@inheritDoc} */
     @Override
@@ -130,12 +106,5 @@ public class RemoveUnnecessaryLocalBeforeReturnRefactoring extends ASTVisitor
     private ASTNode getReturnStatement(Expression initializer) {
         final ASTBuilder b = this.ctx.getASTBuilder();
         return b.return0(b.copy(initializer));
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Refactorings getRefactorings(CompilationUnit astRoot) {
-        astRoot.accept(this);
-        return this.ctx.getRefactorings();
     }
 }

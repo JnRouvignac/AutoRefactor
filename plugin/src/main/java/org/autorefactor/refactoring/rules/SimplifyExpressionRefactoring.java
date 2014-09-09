@@ -26,15 +26,11 @@
 package org.autorefactor.refactoring.rules;
 
 import org.autorefactor.refactoring.ASTBuilder;
-import org.autorefactor.refactoring.IJavaRefactoring;
-import org.autorefactor.refactoring.Refactorings;
 import org.autorefactor.util.NotImplementedException;
 import org.eclipse.jdt.core.dom.ASTMatcher;
 import org.eclipse.jdt.core.dom.ASTNode;
-import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.CastExpression;
-import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.ConditionalExpression;
 import org.eclipse.jdt.core.dom.DoStatement;
 import org.eclipse.jdt.core.dom.Expression;
@@ -64,11 +60,8 @@ import static org.autorefactor.util.Utils.*;
  * <li>Directly check boolean values instead of comparing against true / false</li>
  * </ul>
  */
-public class SimplifyExpressionRefactoring extends ASTVisitor implements
-        IJavaRefactoring {
+public class SimplifyExpressionRefactoring extends AbstractRefactoring {
 
-    private RefactoringContext ctx;
-    private int javaMinorVersion;
     private final boolean removeThisForNonStaticMethodAccess;
 
     /**
@@ -80,17 +73,8 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
         this.removeThisForNonStaticMethodAccess = removeThisForNonStaticMethodAccess;
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public void setRefactoringContext(RefactoringContext ctx) {
-        this.ctx = ctx;
-        this.javaMinorVersion = this.ctx.getJavaSERelease().getMinorVersion();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean preVisit2(ASTNode node) {
-        return ctx.getRefactorings().canVisit(node);
+    private int getJavaMinorVersion() {
+        return ctx.getJavaSERelease().getMinorVersion();
     }
 
     // TODO JNR remove avoidable boxing / unboxing
@@ -230,7 +214,7 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
             return replaceInfixExpressionIfNeeded(node.getParent());
         } else if (isMethod(node, "java.lang.Comparator", "compare", "java.lang.Object", "java.lang.Object")) {
             return replaceInfixExpressionIfNeeded(node.getParent());
-        } else if (javaMinorVersion >= 2
+        } else if (getJavaMinorVersion() >= 2
                 && isMethod(node, "java.lang.String", "compareToIgnoreCase", "java.lang.String")) {
             return replaceInfixExpressionIfNeeded(node.getParent());
         } else if (this.removeThisForNonStaticMethodAccess) {
@@ -467,12 +451,5 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
             }
         }
         return null;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Refactorings getRefactorings(CompilationUnit astRoot) {
-        astRoot.accept(this);
-        return this.ctx.getRefactorings();
     }
 }

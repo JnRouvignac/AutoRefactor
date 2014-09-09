@@ -28,17 +28,12 @@ package org.autorefactor.refactoring.rules;
 import java.util.List;
 
 import org.autorefactor.refactoring.ASTBuilder;
-import org.autorefactor.refactoring.IJavaRefactoring;
-import org.autorefactor.refactoring.Refactorings;
-import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.Block;
-import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.Statement;
 
-import static org.eclipse.jdt.core.dom.IfStatement.*;
-
 import static org.autorefactor.refactoring.ASTHelper.*;
+import static org.eclipse.jdt.core.dom.IfStatement.*;
 
 /**
  * Refactors <pre>
@@ -55,21 +50,7 @@ import static org.autorefactor.refactoring.ASTHelper.*;
  *   ...
  * }</pre>.
  */
-public class IfStatementRefactoring extends ASTVisitor implements
-        IJavaRefactoring {
-
-    private RefactoringContext ctx;
-
-    /** Default constructor. */
-    public IfStatementRefactoring() {
-        super();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void setRefactoringContext(RefactoringContext ctx) {
-        this.ctx = ctx;
-    }
+public class IfStatementRefactoring extends AbstractRefactoring {
 
     // TODO JNR
 
@@ -106,12 +87,5 @@ public class IfStatementRefactoring extends ASTVisitor implements
             }
         }
         return VISIT_SUBTREE;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Refactorings getRefactorings(CompilationUnit astRoot) {
-        astRoot.accept(this);
-        return this.ctx.getRefactorings();
     }
 }

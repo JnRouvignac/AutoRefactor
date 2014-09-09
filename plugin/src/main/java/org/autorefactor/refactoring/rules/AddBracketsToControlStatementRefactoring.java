@@ -26,11 +26,7 @@
 package org.autorefactor.refactoring.rules;
 
 import org.autorefactor.refactoring.ASTBuilder;
-import org.autorefactor.refactoring.IJavaRefactoring;
-import org.autorefactor.refactoring.Refactorings;
-import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.Block;
-import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.DoStatement;
 import org.eclipse.jdt.core.dom.EnhancedForStatement;
 import org.eclipse.jdt.core.dom.ForStatement;
@@ -49,15 +45,7 @@ import static org.autorefactor.refactoring.ASTHelper.*;
  * <li><code>do ... while</code> loop body</li>
  * </ul>
  */
-public class AddBracketsToControlStatementRefactoring extends ASTVisitor
-        implements IJavaRefactoring {
-
-    private RefactoringContext ctx;
-
-    /** {@inheritDoc} */
-    public void setRefactoringContext(RefactoringContext ctx) {
-        this.ctx = ctx;
-    }
+public class AddBracketsToControlStatementRefactoring extends AbstractRefactoring {
 
     /** {@inheritDoc} */
     @Override
@@ -120,12 +108,6 @@ public class AddBracketsToControlStatementRefactoring extends ASTVisitor
         block.accept(this);
         this.ctx.getRefactorings().replace(statement, block);
         return DO_NOT_VISIT_SUBTREE;
-    }
-
-    /** {@inheritDoc} */
-    public Refactorings getRefactorings(CompilationUnit astRoot) {
-        astRoot.accept(this);
-        return this.ctx.getRefactorings();
     }
 
 }

@@ -33,14 +33,11 @@ import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.autorefactor.refactoring.IJavaRefactoring;
-import org.autorefactor.refactoring.Refactorings;
 import org.autorefactor.refactoring.SourceLocation;
 import org.autorefactor.util.NotImplementedException;
 import org.autorefactor.util.Pair;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.ASTNode;
-import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.BlockComment;
 import org.eclipse.jdt.core.dom.BodyDeclaration;
 import org.eclipse.jdt.core.dom.Comment;
@@ -67,7 +64,7 @@ import static org.autorefactor.refactoring.ASTHelper.*;
  * <li>TODO Fix typo in comments</li>
  * </ul>
  */
-public class CommentsRefactoring extends ASTVisitor implements IJavaRefactoring {
+public class CommentsRefactoring extends AbstractRefactoring {
 
     private static final Pattern EMPTY_LINE_COMMENT = Pattern.compile("//\\s*");
     private static final Pattern EMPTY_BLOCK_COMMENT = Pattern.compile("/\\*\\s*(\\*\\s*)*\\*/");
@@ -87,19 +84,12 @@ public class CommentsRefactoring extends ASTVisitor implements IJavaRefactoring 
     private static final Pattern JAVADOC_FIRST_LETTER_LOWERCASE =
             Pattern.compile("(/\\*\\*(?:\\s*\\*(?:\\r|\\n|\\r\\n|\\s)))*(\\w)(.*)", Pattern.DOTALL);
 
-    private RefactoringContext ctx;
     private CompilationUnit astRoot;
     private final List<Pair<SourceLocation, Comment>> comments = new ArrayList<Pair<SourceLocation, Comment>>();
 
     /** Class constructor. */
     public CommentsRefactoring() {
         super();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void setRefactoringContext(RefactoringContext ctx) {
-        this.ctx = ctx;
     }
 
     /** {@inheritDoc} */
@@ -424,12 +414,6 @@ public class CommentsRefactoring extends ASTVisitor implements IJavaRefactoring 
             }
         }
         return VISIT_SUBTREE;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Refactorings getRefactorings(CompilationUnit astRoot) {
-        return this.ctx.getRefactorings();
     }
 
     private String getComment(Comment node) {

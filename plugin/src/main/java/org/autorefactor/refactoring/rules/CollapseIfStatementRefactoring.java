@@ -26,10 +26,6 @@
 package org.autorefactor.refactoring.rules;
 
 import org.autorefactor.refactoring.ASTBuilder;
-import org.autorefactor.refactoring.IJavaRefactoring;
-import org.autorefactor.refactoring.Refactorings;
-import org.eclipse.jdt.core.dom.ASTVisitor;
-import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.InfixExpression;
@@ -40,21 +36,7 @@ import static org.eclipse.jdt.core.dom.InfixExpression.Operator.*;
 /**
  * Collapses two consecutive if statements into just one.
  */
-public class CollapseIfStatementRefactoring extends ASTVisitor implements
-        IJavaRefactoring {
-
-    private RefactoringContext ctx;
-
-    /** Default constructor. */
-    public CollapseIfStatementRefactoring() {
-        super();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void setRefactoringContext(RefactoringContext ctx) {
-        this.ctx = ctx;
-    }
+public class CollapseIfStatementRefactoring extends AbstractRefactoring {
 
     /** {@inheritDoc} */
     @Override
@@ -91,12 +73,5 @@ public class CollapseIfStatementRefactoring extends ASTVisitor implements
             }
         }
         return b.copy(expr);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Refactorings getRefactorings(CompilationUnit astRoot) {
-        astRoot.accept(this);
-        return this.ctx.getRefactorings();
     }
 }

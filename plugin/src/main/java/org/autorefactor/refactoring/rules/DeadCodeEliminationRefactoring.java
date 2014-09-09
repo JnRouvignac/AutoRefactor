@@ -28,12 +28,8 @@ package org.autorefactor.refactoring.rules;
 import java.util.List;
 
 import org.autorefactor.refactoring.ASTBuilder;
-import org.autorefactor.refactoring.IJavaRefactoring;
-import org.autorefactor.refactoring.Refactorings;
 import org.eclipse.jdt.core.dom.ASTNode;
-import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.Block;
-import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.TryStatement;
@@ -44,21 +40,7 @@ import static org.autorefactor.refactoring.ASTHelper.*;
 /**
  * Removes dead code. Use variable values analysis for determining where code is dead.
  */
-public class DeadCodeEliminationRefactoring extends ASTVisitor implements
-        IJavaRefactoring {
-
-    private RefactoringContext ctx;
-
-    /** Default constructor. */
-    public DeadCodeEliminationRefactoring() {
-        super();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void setRefactoringContext(RefactoringContext ctx) {
-        this.ctx = ctx;
-    }
+public class DeadCodeEliminationRefactoring extends AbstractRefactoring {
 
     // TODO JNR
     // for (false) // impossible iterations
@@ -149,12 +131,5 @@ public class DeadCodeEliminationRefactoring extends ASTVisitor implements
     // return DO_NOT_VISIT_SUBTREE; // TODO JNR is this correct?
     // }
         return VISIT_SUBTREE;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Refactorings getRefactorings(CompilationUnit astRoot) {
-        astRoot.accept(this);
-        return this.ctx.getRefactorings();
     }
 }

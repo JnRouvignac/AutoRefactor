@@ -28,13 +28,9 @@ package org.autorefactor.refactoring.rules;
 import java.util.List;
 
 import org.autorefactor.refactoring.ASTBuilder;
-import org.autorefactor.refactoring.IJavaRefactoring;
-import org.autorefactor.refactoring.Refactorings;
 import org.autorefactor.util.NotImplementedException;
-import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.ArrayAccess;
 import org.eclipse.jdt.core.dom.Assignment;
-import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ForStatement;
 import org.eclipse.jdt.core.dom.IBinding;
@@ -56,8 +52,7 @@ import static org.autorefactor.refactoring.ASTHelper.*;
  * intrinsics are APIs that receive special treatment when JITed:
  * they can be compiled down to use very efficient CPU instructions.
  */
-public class HotSpotIntrinsicedAPIsRefactoring extends ASTVisitor implements
-        IJavaRefactoring {
+public class HotSpotIntrinsicedAPIsRefactoring extends AbstractRefactoring {
 
     private static class SystemArrayCopyParams {
         private IVariableBinding indexVarBinding;
@@ -69,16 +64,9 @@ public class HotSpotIntrinsicedAPIsRefactoring extends ASTVisitor implements
         private Expression endPos;
     }
 
-    private RefactoringContext ctx;
-
     /** Class constructor. */
     public HotSpotIntrinsicedAPIsRefactoring() {
         super();
-    }
-
-    /** {@inheritDoc} */
-    public void setRefactoringContext(RefactoringContext ctx) {
-        this.ctx = ctx;
     }
 
     /** {@inheritDoc} */
@@ -325,11 +313,5 @@ public class HotSpotIntrinsicedAPIsRefactoring extends ASTVisitor implements
             }
         }
         return null;
-    }
-
-    /** {@inheritDoc} */
-    public Refactorings getRefactorings(CompilationUnit astRoot) {
-        astRoot.accept(this);
-        return this.ctx.getRefactorings();
     }
 }

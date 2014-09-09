@@ -27,11 +27,8 @@ package org.autorefactor.refactoring.rules;
 
 import java.util.Map;
 
-import org.autorefactor.refactoring.IJavaRefactoring;
-import org.autorefactor.refactoring.Refactorings;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
-import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.FieldAccess;
 import org.eclipse.jdt.core.dom.ForStatement;
 import org.eclipse.jdt.core.dom.QualifiedName;
@@ -47,19 +44,7 @@ import static org.autorefactor.refactoring.ASTHelper.*;
  * over {@link Map#entrySet()}
  * </p>
  */
-public class ForeachRefactoring extends ASTVisitor implements IJavaRefactoring {
-
-    private RefactoringContext ctx;
-
-    /** Default constructor. */
-    public ForeachRefactoring() {
-        super();
-    }
-
-    /** {@inheritDoc} */
-    public void setRefactoringContext(RefactoringContext ctx) {
-        this.ctx = ctx;
-    }
+public class ForeachRefactoring extends AbstractRefactoring {
 
     private static class VariableUseVisitor extends ASTVisitor {
 
@@ -118,11 +103,5 @@ public class ForeachRefactoring extends ASTVisitor implements IJavaRefactoring {
         // TODO JNR iterate over col with ListIterator without generics
         // be careful with use of index/iterator inside the loop
         return VISIT_SUBTREE;
-    }
-
-    /** {@inheritDoc} */
-    public Refactorings getRefactorings(CompilationUnit astRoot) {
-        astRoot.accept(this);
-        return this.ctx.getRefactorings();
     }
 }

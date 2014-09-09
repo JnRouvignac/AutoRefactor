@@ -34,13 +34,9 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.autorefactor.refactoring.ASTBuilder;
-import org.autorefactor.refactoring.IJavaRefactoring;
-import org.autorefactor.refactoring.Refactorings;
 import org.autorefactor.util.NotImplementedException;
 import org.eclipse.jdt.core.dom.ASTNode;
-import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
-import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.FieldAccess;
 import org.eclipse.jdt.core.dom.ITypeBinding;
@@ -63,29 +59,17 @@ import static org.autorefactor.refactoring.ASTHelper.*;
  * '+'</li>
  * </ul>
  */
-public class StringBuilderRefactoring extends ASTVisitor implements
-        IJavaRefactoring {
+public class StringBuilderRefactoring extends AbstractRefactoring {
 
-    private RefactoringContext ctx;
-    private int javaMinorVersion;
-
-    /** Default constructor. */
-    public StringBuilderRefactoring() {
-        super();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void setRefactoringContext(RefactoringContext ctx) {
-        this.ctx = ctx;
-        this.javaMinorVersion = this.ctx.getJavaSERelease().getMinorVersion();
+    private int getJavaMinorVersion() {
+        return ctx.getJavaSERelease().getMinorVersion();
     }
 
     /** {@inheritDoc} */
     @Override
     public boolean visit(ClassInstanceCreation node) {
         final ITypeBinding typeBinding = node.getType().resolveBinding();
-        if (this.javaMinorVersion >= 5 && typeBinding != null) {
+        if (this.getJavaMinorVersion() >= 5 && typeBinding != null) {
             if ("java.lang.StringBuffer".equals(typeBinding.getQualifiedName())) {
                 // TODO JNR replace with StringBuilder
                 // check that the current method return type is not StringBuffer
@@ -335,12 +319,5 @@ public class StringBuilderRefactoring extends ASTVisitor implements
             }
         }
         results.addFirst(arg);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Refactorings getRefactorings(CompilationUnit astRoot) {
-        astRoot.accept(this);
-        return this.ctx.getRefactorings();
     }
 }

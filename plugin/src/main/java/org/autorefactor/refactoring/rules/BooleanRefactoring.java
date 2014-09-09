@@ -32,8 +32,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.autorefactor.refactoring.ASTBuilder;
-import org.autorefactor.refactoring.IJavaRefactoring;
-import org.autorefactor.refactoring.Refactorings;
 import org.autorefactor.util.NotImplementedException;
 import org.eclipse.jdt.core.dom.ASTMatcher;
 import org.eclipse.jdt.core.dom.ASTNode;
@@ -80,7 +78,7 @@ import static org.eclipse.jdt.core.dom.ASTNode.*;
  * opposite boolean values</li>
  * </ul>
  */
-public class BooleanRefactoring extends ASTVisitor implements IJavaRefactoring {
+public class BooleanRefactoring extends AbstractRefactoring {
 
     private static class BooleanASTMatcher extends ASTMatcher {
 
@@ -184,30 +182,19 @@ public class BooleanRefactoring extends ASTVisitor implements IJavaRefactoring {
                 throw new NotImplementedException(locationInParent);
             }
         }
-
     }
 
-    private RefactoringContext ctx;
-    private int javaMinorVersion;
     private ASTBuilder b;
-
-    /** Class constructor. */
-    public BooleanRefactoring() {
-        super();
-    }
 
     /** {@inheritDoc} */
     @Override
     public void setRefactoringContext(RefactoringContext ctx) {
-        this.ctx = ctx;
-        this.b = ctx.getASTBuilder();
-        this.javaMinorVersion = ctx.getJavaSERelease().getMinorVersion();
+        super.setRefactoringContext(ctx);
+        b = ctx.getASTBuilder();
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public boolean preVisit2(ASTNode node) {
-        return ctx.getRefactorings().canVisit(node);
+    private int getJavaMinorVersion() {
+        return ctx.getJavaSERelease().getMinorVersion();
     }
 
     /** {@inheritDoc} */
@@ -451,7 +438,7 @@ public class BooleanRefactoring extends ASTVisitor implements IJavaRefactoring {
     private Expression getExpression(Expression ifCondition, String expressionTypeName, Name booleanName) {
         if ("boolean".equals(expressionTypeName)) {
             return ifCondition;
-        } else if (javaMinorVersion >= 4
+        } else if (getJavaMinorVersion() >= 4
                 && "java.lang.Boolean".equals(expressionTypeName)) {
             return b.invoke(booleanName, "valueOf", ifCondition);
         }
@@ -501,12 +488,5 @@ public class BooleanRefactoring extends ASTVisitor implements IJavaRefactoring {
         }
         fa.setName(b.simpleName(booleanLiteral ? "TRUE" : "FALSE"));
         return fa;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Refactorings getRefactorings(CompilationUnit astRoot) {
-        astRoot.accept(this);
-        return ctx.getRefactorings();
     }
 }

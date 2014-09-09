@@ -27,10 +27,6 @@ package org.autorefactor.refactoring.rules;
 
 import java.util.List;
 
-import org.autorefactor.refactoring.IJavaRefactoring;
-import org.autorefactor.refactoring.Refactorings;
-import org.eclipse.jdt.core.dom.ASTVisitor;
-import org.eclipse.jdt.core.dom.CompilationUnit;
 
 /**
  * TODO JNR
@@ -59,20 +55,7 @@ import org.eclipse.jdt.core.dom.CompilationUnit;
  * }
  * </pre>
  */
-public class RemoveStupidIdiomaticPatternRefactoring extends ASTVisitor
-        implements IJavaRefactoring {
-
-    private RefactoringContext ctx;
-
-    /** Default constructor. */
-    public RemoveStupidIdiomaticPatternRefactoring() {
-        super();
-    }
-
-    /** {@inheritDoc} */
-    public void setRefactoringContext(RefactoringContext ctx) {
-        this.ctx = ctx;
-    }
+public class RemoveStupidIdiomaticPatternRefactoring extends AbstractRefactoring {
 
     // TODO JNR
 
@@ -88,11 +71,5 @@ public class RemoveStupidIdiomaticPatternRefactoring extends ASTVisitor
 
     private Object getModifiersOnly(List modifiers) {
         return null;
-    }
-
-    /** {@inheritDoc} */
-    public Refactorings getRefactorings(CompilationUnit astRoot) {
-        astRoot.accept(this);
-        return this.ctx.getRefactorings();
     }
 }

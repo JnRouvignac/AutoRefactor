@@ -25,11 +25,6 @@
  */
 package org.autorefactor.refactoring.rules;
 
-import org.autorefactor.refactoring.IJavaRefactoring;
-import org.autorefactor.refactoring.Refactorings;
-import org.eclipse.jdt.core.dom.ASTNode;
-import org.eclipse.jdt.core.dom.ASTVisitor;
-import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.ITypeBinding;
@@ -44,27 +39,7 @@ import static org.eclipse.jdt.core.dom.Modifier.*;
  * Likewise, the initializer will be removed for non primitive fields initialized to <code>null</code>.
  * etc.
  */
-public class RemoveFieldsDefaultValuesRefactoring extends ASTVisitor implements
-        IJavaRefactoring {
-
-    private RefactoringContext ctx;
-
-    /** Default constructor. */
-    public RemoveFieldsDefaultValuesRefactoring() {
-        super();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void setRefactoringContext(RefactoringContext ctx) {
-        this.ctx = ctx;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean preVisit2(ASTNode node) {
-        return ctx.getRefactorings().canVisit(node);
-    }
+public class RemoveFieldsDefaultValuesRefactoring extends AbstractRefactoring {
 
     /** {@inheritDoc} */
     @Override
@@ -108,13 +83,6 @@ public class RemoveFieldsDefaultValuesRefactoring extends ASTVisitor implements
             return ((Character) val).charValue() == '\u0000';
         }
         return false;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Refactorings getRefactorings(CompilationUnit astRoot) {
-        astRoot.accept(this);
-        return this.ctx.getRefactorings();
     }
 
 }

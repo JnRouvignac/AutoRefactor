@@ -26,11 +26,7 @@
 package org.autorefactor.refactoring.rules;
 
 import org.autorefactor.refactoring.ASTBuilder;
-import org.autorefactor.refactoring.IJavaRefactoring;
-import org.autorefactor.refactoring.Refactorings;
-import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
-import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.MethodInvocation;
@@ -45,20 +41,7 @@ import static org.autorefactor.refactoring.ASTHelper.*;
  * <li>Calling {@link String#toString()} on a {@link String} instance</li>
  * </ul>
  */
-public class StringRefactoring extends ASTVisitor implements IJavaRefactoring {
-
-    private RefactoringContext ctx;
-
-    /** Default constructor. */
-    public StringRefactoring() {
-        super();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void setRefactoringContext(RefactoringContext ctx) {
-        this.ctx = ctx;
-    }
+public class StringRefactoring extends AbstractRefactoring {
 
     // TODO JNR remove calls to toString() inside string concatenation
 
@@ -104,12 +87,5 @@ public class StringRefactoring extends ASTVisitor implements IJavaRefactoring {
             return true;
         }
         return false;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public Refactorings getRefactorings(CompilationUnit astRoot) {
-        astRoot.accept(this);
-        return this.ctx.getRefactorings();
     }
 }

@@ -31,14 +31,10 @@ import java.util.List;
 
 import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.ASTHelper;
-import org.autorefactor.refactoring.IJavaRefactoring;
-import org.autorefactor.refactoring.Refactorings;
 import org.autorefactor.util.NotImplementedException;
 import org.eclipse.jdt.core.dom.ASTMatcher;
 import org.eclipse.jdt.core.dom.ASTNode;
-import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.Block;
-import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.Statement;
 
@@ -49,26 +45,7 @@ import static org.autorefactor.refactoring.ASTHelper.*;
  * start of each blocks or at the end. Could actually end up completely removing
  * an if statement.
  */
-public class CommonCodeInIfElseStatementRefactoring extends ASTVisitor
-        implements IJavaRefactoring {
-
-    private RefactoringContext ctx;
-
-    /** Default constructor. */
-    public CommonCodeInIfElseStatementRefactoring() {
-        super();
-    }
-
-    /** {@inheritDoc} */
-    public void setRefactoringContext(RefactoringContext ctx) {
-        this.ctx = ctx;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean preVisit2(ASTNode node) {
-        return ctx.getRefactorings().canVisit(node);
-    }
+public class CommonCodeInIfElseStatementRefactoring extends AbstractRefactoring {
 
     // TODO handle switch statements
     // TODO handle clauses in catch blocks (also useful for java 7 with
@@ -310,11 +287,5 @@ public class CommonCodeInIfElseStatementRefactoring extends ASTVisitor
         }
         allCases.add(elseStmts);
         return true;
-    }
-
-    /** {@inheritDoc} */
-    public Refactorings getRefactorings(CompilationUnit astRoot) {
-        astRoot.accept(this);
-        return this.ctx.getRefactorings();
     }
 }
