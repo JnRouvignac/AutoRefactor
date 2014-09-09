@@ -206,14 +206,13 @@ public class RemoveUselessModifiersRefactoring extends ASTVisitor implements
         this.ctx.getRefactorings().insertAt(b.move(m), index, m.getLocationInParent(), m.getParent());
     }
 
-    @SuppressWarnings("unchecked")
     /** {@inheritDoc} */
     @Override
     public boolean visit(SingleVariableDeclaration node) {
         boolean result = VISIT_SUBTREE;
         if (isInterface(node.getParent().getParent())) {
             // remove useless "final" from method parameters
-            for (Modifier m : getModifiersOnly(node.modifiers())) {
+            for (Modifier m : getModifiersOnly(modifiers(node))) {
                 if (m.isFinal()) {
                     this.ctx.getRefactorings().remove(m);
                     result = DO_NOT_VISIT_SUBTREE;

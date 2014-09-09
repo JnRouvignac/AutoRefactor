@@ -43,7 +43,6 @@ import org.eclipse.jdt.core.dom.ExpressionStatement;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.InfixExpression;
-import org.eclipse.jdt.core.dom.InstanceofExpression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Name;
 import org.eclipse.jdt.core.dom.NumberLiteral;
@@ -63,6 +62,7 @@ import org.eclipse.jdt.core.dom.Type;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.autorefactor.util.Utils.*;
+import static org.eclipse.jdt.core.dom.ASTNode.*;
 
 /**
  * Helper class for building AST note in a somewhat fluent API.
@@ -585,8 +585,8 @@ public class ASTBuilder {
      * @return the parenthesized expression of the provided expression to return or this expression itself
      */
     public Expression parenthesizeIfNeeded(Expression origExpr, Expression exprToReturn) {
-        if (origExpr instanceof InfixExpression
-                || origExpr instanceof InstanceofExpression) {
+        if (origExpr.getNodeType() == INFIX_EXPRESSION
+                || origExpr.getNodeType() == INSTANCEOF_EXPRESSION) {
             return parenthesize(exprToReturn);
         }
         return exprToReturn;

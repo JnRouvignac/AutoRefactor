@@ -66,6 +66,12 @@ public class RemoveUnnecessaryLocalBeforeReturnRefactoring extends ASTVisitor
 
     /** {@inheritDoc} */
     @Override
+    public boolean preVisit2(ASTNode node) {
+        return ctx.getRefactorings().canVisit(node);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public boolean visit(ReturnStatement node) {
         final Statement previousSibling = getPreviousSibling(node);
         if (previousSibling instanceof VariableDeclarationStatement) {

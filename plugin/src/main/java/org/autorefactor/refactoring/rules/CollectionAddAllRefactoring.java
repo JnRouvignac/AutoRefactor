@@ -75,6 +75,12 @@ public class CollectionAddAllRefactoring extends ASTVisitor implements
 
     /** {@inheritDoc} */
     @Override
+    public boolean preVisit2(ASTNode node) {
+        return ctx.getRefactorings().canVisit(node);
+    }
+
+    /** {@inheritDoc} */
+    @Override
     public boolean visit(ExpressionStatement node) {
         final MethodInvocation mi = asExpression(node, MethodInvocation.class);
         if (isMethod(mi, "java.util.Collection", "addAll", "java.util.Collection")) {

@@ -27,6 +27,7 @@ package org.autorefactor.refactoring.rules;
 
 import org.autorefactor.refactoring.IJavaRefactoring;
 import org.autorefactor.refactoring.Refactorings;
+import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.Expression;
@@ -57,6 +58,12 @@ public class RemoveFieldsDefaultValuesRefactoring extends ASTVisitor implements
     @Override
     public void setRefactoringContext(RefactoringContext ctx) {
         this.ctx = ctx;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean preVisit2(ASTNode node) {
+        return ctx.getRefactorings().canVisit(node);
     }
 
     /** {@inheritDoc} */

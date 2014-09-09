@@ -28,9 +28,11 @@ package org.autorefactor.refactoring;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.autorefactor.util.Pair;
@@ -59,6 +61,8 @@ public class Refactorings {
     private final Map<Pair<ASTNode, ChildListPropertyDescriptor>, ListRewrite> listRewriteCache =
             new HashMap<Pair<ASTNode, ChildListPropertyDescriptor>, ListRewrite>();
     private final ASTCommentRewriter commentRewriter = new ASTCommentRewriter();
+    /** Nodes that cannot be visited. */
+    private final Set<ASTNode> forbiddenNodes = new HashSet<ASTNode>();
 
     /**
      * Builds an instance of this class.
@@ -76,6 +80,16 @@ public class Refactorings {
      */
     public AST getAST() {
         return rewrite.getAST();
+    }
+
+    /**
+     * Returns whether the provided node can be visited.
+     *
+     * @param node the node that might be visited
+     * @return true if the provided node can be visited, false otherwise
+     */
+    public boolean canVisit(ASTNode node) {
+        return !forbiddenNodes.contains(node);
     }
 
     /**
@@ -211,6 +225,7 @@ public class Refactorings {
             commentRewriter.remove((Comment) node);
         } else {
             rewrite.remove(node, null);
+            forbiddenNodes.add(node);
         }
     }
 

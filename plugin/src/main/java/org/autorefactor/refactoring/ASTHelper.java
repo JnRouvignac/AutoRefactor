@@ -133,6 +133,8 @@ import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 import org.eclipse.jdt.core.dom.WhileStatement;
 import org.eclipse.jdt.core.dom.WildcardType;
 
+import static org.eclipse.jdt.core.dom.ASTNode.*;
+
 /**
  * Helper class for manipulating, converting, navigating and checking {@link ASTNode}s.
  */
@@ -177,7 +179,7 @@ public final class ASTHelper {
      *         If there are no parentheses around it then the exact same expression is returned
      */
     public static Expression removeParentheses(Expression expr) {
-        if (expr instanceof ParenthesizedExpression) {
+        if (expr.getNodeType() == PARENTHESIZED_EXPRESSION) {
             return removeParentheses(((ParenthesizedExpression) expr).getExpression());
         }
         return expr;
@@ -478,6 +480,18 @@ public final class ASTHelper {
      */
     @SuppressWarnings("unchecked")
     public static List<IExtendedModifier> modifiers(BodyDeclaration node) {
+        return node.modifiers();
+    }
+
+    /**
+     * Generecized version of the equivalent JDT method.
+     *
+     * @param node the node on which to call the equivalent JDT method
+     * @return a List of expressions
+     * @see BodyDeclaration#modifiers()
+     */
+    @SuppressWarnings("unchecked")
+    public static List<IExtendedModifier> modifiers(SingleVariableDeclaration node) {
         return node.modifiers();
     }
 

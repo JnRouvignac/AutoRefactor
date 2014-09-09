@@ -64,6 +64,12 @@ public class CommonCodeInIfElseStatementRefactoring extends ASTVisitor
         this.ctx = ctx;
     }
 
+    /** {@inheritDoc} */
+    @Override
+    public boolean preVisit2(ASTNode node) {
+        return ctx.getRefactorings().canVisit(node);
+    }
+
     // TODO handle switch statements
     // TODO handle clauses in catch blocks (also useful for java 7 with
     // multi-catch)

@@ -87,6 +87,12 @@ public class SimplifyExpressionRefactoring extends ASTVisitor implements
         this.javaMinorVersion = this.ctx.getJavaSERelease().getMinorVersion();
     }
 
+    /** {@inheritDoc} */
+    @Override
+    public boolean preVisit2(ASTNode node) {
+        return ctx.getRefactorings().canVisit(node);
+    }
+
     // TODO JNR remove avoidable boxing / unboxing
 
     // TODO Very few parenthesized expressions are actually needed. They are:

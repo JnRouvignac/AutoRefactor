@@ -68,6 +68,7 @@ import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
+import static org.eclipse.jdt.core.dom.ASTNode.*;
 
 /**
  * Boolean related refactorings:
@@ -199,8 +200,14 @@ public class BooleanRefactoring extends ASTVisitor implements IJavaRefactoring {
     @Override
     public void setRefactoringContext(RefactoringContext ctx) {
         this.ctx = ctx;
-        this.b = this.ctx.getASTBuilder();
-        this.javaMinorVersion = this.ctx.getJavaSERelease().getMinorVersion();
+        this.b = ctx.getASTBuilder();
+        this.javaMinorVersion = ctx.getJavaSERelease().getMinorVersion();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean preVisit2(ASTNode node) {
+        return ctx.getRefactorings().canVisit(node);
     }
 
     /** {@inheritDoc} */
@@ -213,7 +220,7 @@ public class BooleanRefactoring extends ASTVisitor implements IJavaRefactoring {
                     getBooleanLiteral(node.getThenExpression()),
                     getBooleanLiteral(node.getElseExpression()));
             if (newE != null) {
-                this.ctx.getRefactorings().replace(node, newE);
+                ctx.getRefactorings().replace(node, newE);
             }
         }
         return VISIT_SUBTREE;
@@ -233,7 +240,7 @@ public class BooleanRefactoring extends ASTVisitor implements IJavaRefactoring {
                 final Expression ifCondition = node.getExpression();
                 copyStmt.accept(new BooleanReplaceVisitor(ifCondition,
                         matcher2.matches.values(), getBooleanName(node)));
-                this.ctx.getRefactorings().replace(node, toSingleStmt(copyStmt));
+                ctx.getRefactorings().replace(node, toSingleStmt(copyStmt));
                 return DO_NOT_VISIT_SUBTREE;
             }
         }
@@ -249,8 +256,9 @@ public class BooleanRefactoring extends ASTVisitor implements IJavaRefactoring {
                     final Boolean elseBool = getBooleanLiteral(rs.getExpression());
                     ReturnStatement newRs = getReturnStatement(node, thenBool, elseBool);
                     if (newRs != null) {
-                        this.ctx.getRefactorings().replace(node, newRs);
-                        this.ctx.getRefactorings().remove(rs);
+                        ctx.getRefactorings().replace(node, newRs);
+                        ctx.getRefactorings().remove(rs);
+                        return DO_NOT_VISIT_SUBTREE;
                     } else {
                         MethodDeclaration md = getAncestor(node, MethodDeclaration.class);
                         final Type returnType = md.getReturnType2();
@@ -260,8 +268,8 @@ public class BooleanRefactoring extends ASTVisitor implements IJavaRefactoring {
                                 newRs = getReturnStatement(node, thenBool, elseBool,
                                         thenRs.getExpression(), rs.getExpression());
                                 if (newRs != null) {
-                                    this.ctx.getRefactorings().replace(node, newRs);
-                                    this.ctx.getRefactorings().remove(rs);
+                                    ctx.getRefactorings().replace(node, newRs);
+                                    ctx.getRefactorings().remove(rs);
                                     return DO_NOT_VISIT_SUBTREE;
                                 }
                             }
@@ -311,8 +319,8 @@ public class BooleanRefactoring extends ASTVisitor implements IJavaRefactoring {
                 getBooleanLiteral(a.getRightHandSide()),
                 getBooleanLiteral(rightHandSide));
         if (newE != null) {
-            this.ctx.getRefactorings().replace(rightHandSide, newE);
-            this.ctx.getRefactorings().remove(node);
+            ctx.getRefactorings().replace(rightHandSide, newE);
+            ctx.getRefactorings().remove(node);
             return DO_NOT_VISIT_SUBTREE;
         }
         return VISIT_SUBTREE;
@@ -339,11 +347,10 @@ public class BooleanRefactoring extends ASTVisitor implements IJavaRefactoring {
         } else if (thenBool != null && elseBool == null) {
             final Expression leftOp = negateIfNeeded(
                     b.copy(node.getExpression()), !thenBool.booleanValue());
-            final InfixExpression ie = b.infixExpr(
+            return b.return0(b.infixExpr(
                     leftOp,
                     getConditionalOperator(thenBool.booleanValue()),
-                    b.copy(elseExpr));
-            return b.return0(ie);
+                    b.copy(elseExpr)));
         }
         return null;
     }
@@ -430,7 +437,7 @@ public class BooleanRefactoring extends ASTVisitor implements IJavaRefactoring {
     }
 
     private Expression negate(Expression expr, boolean doCopy) {
-        if (expr instanceof PrefixExpression) {
+        if (expr.getNodeType() == PREFIX_EXPRESSION) {
             final PrefixExpression pe = (PrefixExpression) expr;
             if (PrefixExpression.Operator.NOT.equals(pe.getOperator())) {
                 final Expression expr2 = removeParentheses(pe.getOperand());
@@ -479,7 +486,7 @@ public class BooleanRefactoring extends ASTVisitor implements IJavaRefactoring {
                 || isMethod(node, "java.lang.Boolean", "valueOf", "boolean")) {
             final BooleanLiteral l = as(arguments(node), BooleanLiteral.class);
             if (l != null) {
-                this.ctx.getRefactorings().replace(node,
+                ctx.getRefactorings().replace(node,
                         getRefactoring(node, l.booleanValue()));
                 return DO_NOT_VISIT_SUBTREE;
             }
@@ -500,6 +507,6 @@ public class BooleanRefactoring extends ASTVisitor implements IJavaRefactoring {
     @Override
     public Refactorings getRefactorings(CompilationUnit astRoot) {
         astRoot.accept(this);
-        return this.ctx.getRefactorings();
+        return ctx.getRefactorings();
     }
 }
