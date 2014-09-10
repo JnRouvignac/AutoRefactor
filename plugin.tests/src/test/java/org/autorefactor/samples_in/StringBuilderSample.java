@@ -39,6 +39,14 @@ public class StringBuilderSample {
         String s2 = new StringBuilder("foo ").append("bar ").append("baz").toString();
         String s3 = new StringBuffer().append(0).append(1).append("bar").toString();
         String s4 = new StringBuilder().append(0).append(1).append("bar").toString();
+        String s5 = new StringBuffer("foo").toString();
+        String s6 = new StringBuilder("foo").toString();
+        String s7 = new StringBuffer(0).toString();
+        String s8 = new StringBuilder(0).toString();
+        String s9 = new StringBuffer().toString();
+        String s10 = new StringBuilder().toString();
+        String s11 = new StringBuffer().append(0).toString();
+        String s12 = new StringBuilder().append(0).toString();
     }
 
     public void doNotReplaceWithStringAppend(StringBuffer sbuf, StringBuilder sbui) {

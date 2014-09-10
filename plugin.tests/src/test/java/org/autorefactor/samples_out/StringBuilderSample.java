@@ -37,8 +37,16 @@ public class StringBuilderSample {
     public void replaceWithStringAppend() {
         String s1 = "foo " + "bar " + "baz";
         String s2 = "foo " + "bar " + "baz";
-        String s3 = 0 + 1 + "bar";
-        String s4 = 0 + 1 + "bar";
+        String s3 = "" + 0 + 1 + "bar";
+        String s4 = "" + 0 + 1 + "bar";
+        String s5 = "foo";
+        String s6 = "foo";
+        String s7 = "";
+        String s8 = "";
+        String s9 = "";
+        String s10 = "";
+        String s11 = String.valueOf(0);
+        String s12 = String.valueOf(0);
     }
 
     public void doNotReplaceWithStringAppend(StringBuffer sbuf, StringBuilder sbui) {

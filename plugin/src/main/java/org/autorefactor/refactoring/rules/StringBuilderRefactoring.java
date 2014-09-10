@@ -34,7 +34,6 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.autorefactor.refactoring.ASTBuilder;
-import org.autorefactor.util.NotImplementedException;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.Expression;
@@ -253,16 +252,29 @@ public class StringBuilderRefactoring extends AbstractRefactoring {
     }
 
     private Expression createStringConcats(List<Expression> appendedStrings) {
+        final ASTBuilder b = this.ctx.getASTBuilder();
         if (appendedStrings.size() == 0) {
-            throw new NotImplementedException("when there are no appended strings");
+            return b.string("");
         } else if (appendedStrings.size() == 1) {
-            return appendedStrings.get(0);
+            final Expression expr = appendedStrings.get(0);
+            if (hasType(expr, "java.lang.String")) {
+                return b.copy(expr);
+            }
+            return b.invoke("String", "valueOf", b.copy(expr));
         }
 
         final Iterator<Expression> it = appendedStrings.iterator();
-        final ASTBuilder b = this.ctx.getASTBuilder();
-        final Expression expr1 = b.copy(it.next());
-        final Expression expr2 = b.copy(it.next());
+        final Expression arg0 = it.next();
+        final Expression arg1 = it.next();
+
+        final Expression expr1;
+        if (hasType(arg0, "java.lang.String")
+                || hasType(arg1, "java.lang.String")) {
+            expr1 = b.copy(arg0);
+        } else {
+            expr1 = b.infixExpr(b.string(""), Operator.PLUS, b.copy(arg0));
+        }
+        final Expression expr2 = b.copy(arg1);
         final InfixExpression ie = b.infixExpr(expr1, Operator.PLUS, expr2);
         while (it.hasNext()) {
             extendedOperands(ie).add(b.copy(it.next()));
@@ -285,8 +297,9 @@ public class StringBuilderRefactoring extends AbstractRefactoring {
                 final ClassInstanceCreation cic = (ClassInstanceCreation) expr;
                 if (arguments(cic).size() == 1) {
                     final Expression arg0 = arguments(cic).get(0);
-                    if (hasType(arg0, "java.lang.String")
-                            || instanceOf(arg0, "java.lang.CharSequence")) {
+                    if (hasType(cic, "java.lang.StringBuffer", "java.lang.StringBuilder")
+                        && (hasType(arg0, "java.lang.String")
+                                || instanceOf(arg0, "java.lang.CharSequence"))) {
                         allOperands.addFirst(arg0);
                     }
                 }
