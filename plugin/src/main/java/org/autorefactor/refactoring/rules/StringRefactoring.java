@@ -26,12 +26,14 @@
 package org.autorefactor.refactoring.rules;
 
 import org.autorefactor.refactoring.ASTBuilder;
+import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.Expression;
-import org.eclipse.jdt.core.dom.ITypeBinding;
+import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
+import static org.eclipse.jdt.core.dom.ASTNode.*;
 
 /**
  * Removes:
@@ -39,18 +41,16 @@ import static org.autorefactor.refactoring.ASTHelper.*;
  * <li>Creating a {@link String} instance from a {@link String} constant or
  * literal.</li>
  * <li>Calling {@link String#toString()} on a {@link String} instance</li>
+ * <li>Remove calls to {@link String#toString()} inside String concatenations</li>
  * </ul>
  */
 public class StringRefactoring extends AbstractRefactoring {
 
-    // TODO JNR remove calls to toString() inside string concatenation
 
     /** {@inheritDoc} */
     @Override
     public boolean visit(ClassInstanceCreation node) {
-        final ITypeBinding typeBinding = node.getType().resolveBinding();
-        if (typeBinding != null
-                && "java.lang.String".equals(typeBinding.getQualifiedName())
+        if (hasType(node.getType(), "java.lang.String")
                 && arguments(node).size() == 1) {
             final Expression arg0 = arguments(node).get(0);
             if (arg0.resolveConstantExpressionValue() != null) {
@@ -66,26 +66,37 @@ public class StringRefactoring extends AbstractRefactoring {
     @Override
     public boolean visit(MethodInvocation node) {
         final Expression expression = node.getExpression();
-        if (expression != null
-                && "toString".equals(node.getName().getIdentifier())
-                && arguments(node).isEmpty()
-                && canRemoveToStringMethodCall(node, expression)) {
-            final ASTBuilder b = this.ctx.getASTBuilder();
-            this.ctx.getRefactorings().replace(node, b.copy(expression));
-            return DO_NOT_VISIT_SUBTREE;
+        final ASTNode parent = node.getParent();
+        final ASTBuilder b = this.ctx.getASTBuilder();
+        if (isToStringInvocation(node)) {
+            if (hasType(expression, "java.lang.String")) {
+                // if node is already a String, no need to call toString()
+                this.ctx.getRefactorings().replace(node, b.move(expression));
+                return DO_NOT_VISIT_SUBTREE;
+            } else if (parent.getNodeType() == INFIX_EXPRESSION) {
+                // if node is in a String context, no need to call toString()
+                final InfixExpression ie = (InfixExpression) node.getParent();
+                final Expression lo = ie.getLeftOperand();
+                final Expression ro = ie.getRightOperand();
+                final MethodInvocation lmi = as(lo, MethodInvocation.class);
+                final MethodInvocation rmi = as(ro, MethodInvocation.class);
+                final boolean leftIsToString = isToStringInvocation(lmi);
+                final boolean rightIsToString = isToStringInvocation(rmi);
+                if (hasType(lo, "java.lang.String") && rightIsToString) {
+                    this.ctx.getRefactorings().replace(rmi, b.move(rmi.getExpression()));
+                    return VISIT_SUBTREE;
+                } else if (hasType(ro, "java.lang.String") && leftIsToString) {
+                    this.ctx.getRefactorings().replace(lmi, b.move(lmi.getExpression()));
+                    return DO_NOT_VISIT_SUBTREE;
+                }
+            }
         }
         return VISIT_SUBTREE;
     }
 
-    private boolean canRemoveToStringMethodCall(MethodInvocation node,
-            final Expression expression) {
-        if (hasType(resolveTypeBindingForcedFromContext(node), "java.lang.String")) {
-            // We are in a String context, no need to call toString()
-            return true;
-        } else if (hasType(expression, "java.lang.String")) {
-            // It's already a String, no need to call toString()
-            return true;
-        }
-        return false;
+    private boolean isToStringInvocation(MethodInvocation node) {
+        return node != null
+                && "toString".equals(node.getName().getIdentifier())
+                && arguments(node).isEmpty();
     }
 }

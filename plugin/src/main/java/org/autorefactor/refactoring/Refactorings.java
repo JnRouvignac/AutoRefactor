@@ -92,6 +92,10 @@ public class Refactorings {
         return !forbiddenNodes.contains(node);
     }
 
+    private void doNotVisit(ASTNode node) {
+        forbiddenNodes.add(node);
+    }
+
     /**
      * Creates and returns a placeholder node for a copy of the source code of the provided node.<br>
      * The placeholder node can be used like any new node created via the AST class.<br>
@@ -200,6 +204,7 @@ public class Refactorings {
     public void replace(ASTNode node, ASTNode replacement) {
         hasRefactorings = true;
         rewrite.replace(node, replacement, null);
+        doNotVisit(node);
     }
 
     /**
@@ -225,8 +230,8 @@ public class Refactorings {
             commentRewriter.remove((Comment) node);
         } else {
             rewrite.remove(node, null);
-            forbiddenNodes.add(node);
         }
+        doNotVisit(node);
     }
 
     /**

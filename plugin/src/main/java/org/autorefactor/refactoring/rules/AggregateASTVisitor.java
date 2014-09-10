@@ -167,20 +167,28 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
 
     private void analyzeVisitors() {
         for (ASTVisitor v : this.visitors) {
-            for (Method m : v.getClass().getDeclaredMethods()) {
-                if (is("preVisit", m)) {
-                    preVisitors.add(v);
-                } else if (is("preVisit2", m)) {
-                    preVisitors2.add(v);
-                } else if (is("postVisit", m)) {
-                    postVisitors.add(v);
-                } else if (isVisit(m)) {
-                    put(visitorsMap, m.getParameterTypes()[0], v);
-                } else if (isEndVisit(m)) {
-                    put(endVisitorsMap, m.getParameterTypes()[0], v);
-                }
+            analyzeVisitor(v, v.getClass());
+        }
+    }
+
+    private void analyzeVisitor(ASTVisitor v, Class<?> clazz) {
+        if (ASTVisitor.class.equals(clazz)) {
+            return;
+        }
+        for (Method m : clazz.getDeclaredMethods()) {
+            if (is("preVisit", m)) {
+                preVisitors.add(v);
+            } else if (is("preVisit2", m)) {
+                preVisitors2.add(v);
+            } else if (is("postVisit", m)) {
+                postVisitors.add(v);
+            } else if (isVisit(m)) {
+                put(visitorsMap, m.getParameterTypes()[0], v);
+            } else if (isEndVisit(m)) {
+                put(endVisitorsMap, m.getParameterTypes()[0], v);
             }
         }
+        analyzeVisitor(v, clazz.getSuperclass());
     }
 
     private static boolean is(String methodName, Method m) {

@@ -27,19 +27,27 @@ package org.autorefactor.samples_in;
 
 public class StringSample {
 
-    public String main() {
-        // replace
-        String s = new String("");
+    public String replaceNewString() {
+        return new String("");
+    }
 
-        // replace
-        String s2 = s.toString();
-        String s3 = "".toString();
-        String s4 = getS().toString();
-        // replace
-        String s5 = "" + Boolean.TRUE.toString();
-        // do not replace
-        String s6 = Boolean.TRUE.toString();
+    public void replaceStringToString(String s) {
+        String s1 = s.toString();
+        String s2 = "".toString();
+        String s3 = getS().toString();
+    }
+
+    public void replaceToStringCallInStringConcat() {
+        String s1 = "" + Boolean.TRUE.toString();
+        String s2 = Boolean.TRUE.toString() + "";
+    }
+
+    public String doNotReplaceToStringCallOutsideStringConcat() {
         return Boolean.TRUE.toString();
+    }
+
+    public String doNotReplaceTwoConsecutiveToStringCalls() {
+        return Boolean.TRUE.toString() + Boolean.FALSE.toString();
     }
 
     private static String getS() {

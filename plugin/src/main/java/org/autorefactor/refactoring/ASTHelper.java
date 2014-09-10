@@ -741,6 +741,21 @@ public final class ASTHelper {
     }
 
     /**
+     * Returns whether the provided type evaluates to exactly one of the provided type.
+     *
+     * @param type the type to analyze
+     * @param oneOfQualifiedTypeNames
+     *          the type binding qualified name must be equal to one of these qualified type names
+     * @return true if the provided type evaluates to exactly one of the provided type, false otherwise
+     */
+    public static boolean hasType(Type type, String... oneOfQualifiedTypeNames) {
+        if (type == null) {
+            return false;
+        }
+        return hasType(type.resolveBinding(), oneOfQualifiedTypeNames);
+    }
+
+    /**
      * Returns whether the provided type binding is exactly one of the provided type.
      *
      * @param typeBinding the type binding to analyze
@@ -1032,25 +1047,6 @@ public final class ASTHelper {
                     && concreteTypesMatch(methodDecl.getParameterTypes(), parameterTypesQualifiedNames)) {
                 return methodBinding;
             }
-        }
-        return null;
-    }
-
-    /**
-     * Infers what type the parent node expects to be returned by the passed in
-     * Expression.
-     *
-     * @param node
-     *        the expression for which to look at the type expected by the
-     *        context
-     * @return the type expected by the context of the current node
-     */
-    public static ITypeBinding resolveTypeBindingForcedFromContext(
-            Expression node) {
-        final ASTNode parent = node.getParent();
-        if (parent instanceof InfixExpression) {
-            final InfixExpression ie = (InfixExpression) parent;
-            return ie.resolveTypeBinding();
         }
         return null;
     }
