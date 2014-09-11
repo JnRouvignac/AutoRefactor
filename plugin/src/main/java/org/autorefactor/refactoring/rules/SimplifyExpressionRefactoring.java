@@ -158,13 +158,18 @@ public class SimplifyExpressionRefactoring extends AbstractRefactoring {
     private boolean isHardToRead(final Expression innerExpr, final ASTNode parent) {
         if (parent instanceof InfixExpression) {
             if (innerExpr instanceof InfixExpression) {
-                final Operator innerOp = ((InfixExpression) innerExpr).getOperator();
+                final InfixExpression innerIe = (InfixExpression) innerExpr;
+                final Operator innerOp = innerIe.getOperator();
                 final Operator parentOp = ((InfixExpression) parent).getOperator();
-                return Operator.EQUALS.equals(parentOp)
-                    || (Operator.CONDITIONAL_OR.equals(parentOp) && Operator.CONDITIONAL_AND.equals(innerOp))
-                    || (Operator.OR.equals(parentOp) && Operator.AND.equals(innerOp))
-                    || (Operator.XOR.equals(parentOp) && Operator.AND.equals(innerOp))
-                    || (Operator.OR.equals(parentOp) && Operator.XOR.equals(innerOp));
+                if (Operator.EQUALS.equals(parentOp)
+                        || (Operator.CONDITIONAL_OR.equals(parentOp) && Operator.CONDITIONAL_AND.equals(innerOp))
+                        || (Operator.OR.equals(parentOp) && Operator.AND.equals(innerOp))
+                        || (Operator.XOR.equals(parentOp) && Operator.AND.equals(innerOp))
+                        || (Operator.OR.equals(parentOp) && Operator.XOR.equals(innerOp))) {
+                    return true;
+                }
+                return as(innerIe.getLeftOperand(), Assignment.class) != null
+                        || as(innerIe.getRightOperand(), Assignment.class) != null;
             }
         } else if (parent instanceof ConditionalExpression) {
             return innerExpr instanceof ConditionalExpression

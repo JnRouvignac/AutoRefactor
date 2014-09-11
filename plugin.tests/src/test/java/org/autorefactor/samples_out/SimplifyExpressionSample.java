@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.Collection;
 import java.util.List;
+import java.util.Random;
 
 public class SimplifyExpressionSample {
 
@@ -140,6 +141,9 @@ public class SimplifyExpressionSample {
         boolean b8 = b1 ? (b2 ? b3 : b4) : (b5 ? b6 : true);
         boolean b9 = b1 ? (b2 = true) : (b3 = true);
         boolean b10 = b1 ? (i instanceof Number) : (i instanceof Object);
+        final Random rand = new Random();
+        boolean b11 =  (i = rand.nextInt()) != i + 1;
+        boolean b12 = ((i = rand.nextInt()) != i + 1) && ((i = rand.nextInt()) != i + 1);
     }
 
     public boolean doNotReplaceParenthesesAroundAssignmentInCondition(Reader reader, char[] cbuf, int c) throws IOException {
