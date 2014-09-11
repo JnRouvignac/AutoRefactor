@@ -80,7 +80,12 @@ public class DeadCodeEliminationRefactoring extends AbstractRefactoring {
             this.ctx.getRefactorings().replace(node, b.copy(node.getThenStatement()));
             return DO_NOT_VISIT_SUBTREE;
         } else if (Boolean.FALSE.equals(constantCondition)) {
-            this.ctx.getRefactorings().replace(node, b.copy(node.getElseStatement()));
+            final Statement elseStmt = node.getElseStatement();
+            if (elseStmt != null) {
+                this.ctx.getRefactorings().replace(node, b.copy(elseStmt));
+            } else {
+                this.ctx.getRefactorings().remove(node);
+            }
             return DO_NOT_VISIT_SUBTREE;
         }
         return VISIT_SUBTREE;

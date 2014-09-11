@@ -63,6 +63,10 @@ public class DeadCodeEliminationSample {
 
         if (false) {
             i++;
+        }
+
+        if (false) {
+            i++;
         } else {
             // keep this comment
             j++;
