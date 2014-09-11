@@ -233,9 +233,8 @@ public class BooleanRefactoring extends AbstractRefactoring {
         }
 
         final ReturnStatement thenRs = as(node.getThenStatement(), ReturnStatement.class);
-        final ReturnStatement elseRs = as(node.getElseStatement(), ReturnStatement.class);
         if (thenRs != null) {
-            if (elseRs == null) {
+            if (node.getElseStatement() == null) {
                 // The != null case is handled with the matcher above
                 final ReturnStatement rs = as(getNextSibling(node), ReturnStatement.class);
                 if (rs != null) {

@@ -248,6 +248,15 @@ public class BooleanSample {
         // FIXME This should be converted to aMethodThatAcceptsABoolean(bo && aMethodThatReturnsBoolean());
     }
 
+    public boolean doNotRefactor(Object o) {
+        if (o instanceof Double) {
+            return ((Double) o).doubleValue() != 0;
+        } else if (o instanceof Float) {
+            return ((Float) o).floatValue() != 0;
+        }
+        return false;
+    }
+
     private boolean aMethodThatReturnsBoolean() {
         return false;
     }
