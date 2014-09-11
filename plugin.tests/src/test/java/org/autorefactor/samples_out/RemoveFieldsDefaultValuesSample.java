@@ -27,6 +27,10 @@ package org.autorefactor.samples_out;
 
 public class RemoveFieldsDefaultValuesSample {
 
+    private interface Constants {
+        String NULL = null;
+    }
+
     private static final int MY_CONSTANT = 0;
 
     private final boolean final_bo = false;

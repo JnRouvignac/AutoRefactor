@@ -28,6 +28,7 @@ package org.autorefactor.refactoring.rules;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.ITypeBinding;
+import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
@@ -44,10 +45,17 @@ public class RemoveFieldsDefaultValuesRefactoring extends AbstractRefactoring {
     /** {@inheritDoc} */
     @Override
     public boolean visit(FieldDeclaration node) {
+        final TypeDeclaration td = (TypeDeclaration) node.getParent();
+        if (td.isInterface()) {
+            // Do not remove default values from interface fields
+            // because they are final by default
+            return VISIT_SUBTREE;
+        }
         final ITypeBinding fieldType = node.getType().resolveBinding();
         if (fieldType == null || isFinal(node.getModifiers())) {
             return VISIT_SUBTREE;
         }
+
         boolean visitSubtree = VISIT_SUBTREE;
         for (VariableDeclarationFragment vdf : fragments(node)) {
             final Expression initializer = vdf.getInitializer();
