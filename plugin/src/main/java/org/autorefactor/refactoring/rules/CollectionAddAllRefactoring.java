@@ -75,7 +75,7 @@ public class CollectionAddAllRefactoring extends AbstractRefactoring {
                 }
             } else if (previousStmt instanceof VariableDeclarationStatement) {
                 final VariableDeclarationStatement vds = (VariableDeclarationStatement) previousStmt;
-                if (vds != null && vds.fragments().size() == 1) {
+                if (vds.fragments().size() == 1) {
                     final VariableDeclarationFragment vdf = fragments(vds).get(0);
                     if (isSameLocalVariable(mi.getExpression(), vdf.resolveBinding())) {
                         return replaceInitializer(vdf.getInitializer(), arg0, node);
@@ -203,10 +203,8 @@ public class CollectionAddAllRefactoring extends AbstractRefactoring {
     }
 
     private boolean isSameLocalVariable(Expression expr, IBinding varBinding) {
-        if (expr instanceof SimpleName && varBinding instanceof IVariableBinding) {
-            return ((SimpleName) expr).resolveBinding().equals(varBinding);
-        }
-        return false;
+        return expr instanceof SimpleName && varBinding instanceof IVariableBinding
+            && ((SimpleName) expr).resolveBinding().equals(varBinding);
     }
 
     private boolean isSameLocalVariable(Expression expr1, Expression expr2) {

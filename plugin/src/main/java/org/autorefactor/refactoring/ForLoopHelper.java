@@ -160,7 +160,7 @@ public final class ForLoopHelper {
             }
         }
         if (updaterOperand instanceof Name) {
-            return ((Name) updaterOperand);
+            return (Name) updaterOperand;
         }
         return null;
     }

@@ -67,13 +67,11 @@ public class StringBuilderRefactoring extends AbstractRefactoring {
     /** {@inheritDoc} */
     @Override
     public boolean visit(ClassInstanceCreation node) {
-        final ITypeBinding typeBinding = node.getType().resolveBinding();
-        if (this.getJavaMinorVersion() >= 5 && typeBinding != null) {
-            if ("java.lang.StringBuffer".equals(typeBinding.getQualifiedName())) {
-                // TODO JNR replace with StringBuilder
-                // check that the current method return type is not StringBuffer
-                // do we need the CFG + live variable analysis first?
-            }
+        if (getJavaMinorVersion() >= 5
+                && hasType(node.getType(), "java.lang.StringBuffer")) {
+            // TODO JNR replace with StringBuilder
+            // check that the current method return type is not StringBuffer
+            // do we need the CFG + live variable analysis first?
         }
         return VISIT_SUBTREE;
     }
