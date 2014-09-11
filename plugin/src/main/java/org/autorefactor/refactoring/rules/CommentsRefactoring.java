@@ -426,4 +426,9 @@ public class CommentsRefactoring extends AbstractRefactoring {
         }
     }
 
+    /** {@inheritDoc} */
+    @Override
+    public void endVisit(CompilationUnit node) {
+        comments.clear();
+    }
 }
