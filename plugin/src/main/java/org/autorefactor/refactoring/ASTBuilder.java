@@ -25,6 +25,8 @@
  */
 package org.autorefactor.refactoring;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import org.autorefactor.util.NotImplementedException;
@@ -281,15 +283,31 @@ public class ASTBuilder {
      * @param leftOperand the left operand
      * @param operator the infix operator
      * @param rightOperand the right operand
+     * @param extendedOperands the extended operands
      * @return a new infix expression
      */
     public InfixExpression infixExpr(Expression leftOperand, InfixExpression.Operator operator,
-            Expression rightOperand) {
+            Expression rightOperand, Collection<? extends Expression> extendedOperands) {
         final InfixExpression ie = ast.newInfixExpression();
         ie.setLeftOperand(leftOperand);
         ie.setOperator(operator);
         ie.setRightOperand(rightOperand);
+        extendedOperands(ie).addAll(extendedOperands);
         return ie;
+    }
+
+    /**
+     * Builds a new {@link InfixExpression} instance.
+     *
+     * @param leftOperand the left operand
+     * @param operator the infix operator
+     * @param rightOperand the right operand
+     * @param extendedOperands the extended operands
+     * @return a new infix expression
+     */
+    public InfixExpression infixExpr(Expression leftOperand, InfixExpression.Operator operator,
+            Expression rightOperand, Expression... extendedOperands) {
+        return infixExpr(leftOperand, operator, rightOperand, Arrays.asList(extendedOperands));
     }
 
     /**

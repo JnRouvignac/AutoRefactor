@@ -36,8 +36,8 @@ public class PushNegationDownSample {
         return !(!(b /* another refactoring removes the parentheses */));
     }
 
-    public boolean replaceNegationWithInfixAndOperator(boolean b1, boolean b2) {
-        return !(b1 && b2); // another refactoring removes the parentheses
+    public boolean replaceNegationWithInfixAndOperator(boolean b1, boolean b2, boolean b3) {
+        return !(b1 && b2 && b3); // another refactoring removes the parentheses
     }
 
     public boolean replaceNegationRevertInnerExpressions(boolean b1, boolean b2) {

@@ -25,6 +25,10 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ListIterator;
+
 import org.autorefactor.refactoring.ASTBuilder;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.InfixExpression;
@@ -56,19 +60,28 @@ public class PushNegationDownRefactoring extends AbstractRefactoring {
             final InfixExpression ie = (InfixExpression) operand;
             final Object reverseOp = OperatorEnum.getOperator(ie).getReverseBooleanOperator();
             if (reverseOp != null) {
+                final List<Expression> extendedOperands = new ArrayList<Expression>(extendedOperands(ie));
                 if (hasType(ie.getLeftOperand(), "boolean", "java.lang.Boolean")) {
+                    for (ListIterator<Expression> it = extendedOperands.listIterator(); it.hasNext();) {
+                        it.set(negate(b, it.next()));
+                    }
                     this.ctx.getRefactorings().replace(node,
                             b.parenthesize(b.infixExpr(
                                     negate(b, ie.getLeftOperand()),
                                     (InfixExpression.Operator) reverseOp,
-                                    negate(b, ie.getRightOperand()))));
+                                    negate(b, ie.getRightOperand()),
+                                    extendedOperands)));
                     return DO_NOT_VISIT_SUBTREE;
                 } else {
+                    for (ListIterator<Expression> it = extendedOperands.listIterator(); it.hasNext();) {
+                        it.set(b.move(it.next()));
+                    }
                     this.ctx.getRefactorings().replace(node,
                             b.parenthesize(b.infixExpr(
-                                    b.copy(ie.getLeftOperand()),
+                                    b.move(ie.getLeftOperand()),
                                     (InfixExpression.Operator) reverseOp,
-                                    b.copy(ie.getRightOperand()))));
+                                    b.move(ie.getRightOperand()),
+                                    extendedOperands)));
                     return DO_NOT_VISIT_SUBTREE;
                 }
             }
