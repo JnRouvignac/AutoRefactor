@@ -97,6 +97,7 @@ public final class AllRefactorings {
                 new CommentsRefactoring(),
                 new RemoveFieldsDefaultValuesRefactoring(),
                 new RemoveUnnecessaryLocalBeforeReturnRefactoring(),
+                new RemoveUnnecessaryCastRefactoring(),
                 new RemoveUselessModifiersRefactoring(),
                 new HotSpotIntrinsicedAPIsRefactoring()));
     }
