@@ -39,6 +39,7 @@ import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragment;
+import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.ui.JavaUI;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.widgets.Display;
@@ -104,6 +105,7 @@ public class AutoRefactorHandler extends AbstractHandler {
                 final Object el = it.next();
                 if (el instanceof ICompilationUnit
                         || el instanceof IPackageFragment
+                        || el instanceof IPackageFragmentRoot
                         || el instanceof IJavaProject) {
                     results.add((IJavaElement) el);
                 } else {

@@ -26,6 +26,7 @@
 package org.autorefactor.ui;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -153,22 +154,29 @@ public class ApplyRefactoringsJob extends Job {
     private List<ICompilationUnit> collectCompilationUnits(List<IJavaElement> javaElements) {
         try {
             final List<ICompilationUnit> results = new LinkedList<ICompilationUnit>();
-            for (IJavaElement javaElement : javaElements) {
-                if (javaElement instanceof ICompilationUnit) {
-                    add(results, (ICompilationUnit) javaElement);
-                } else if (javaElement instanceof IPackageFragment) {
-                    final IPackageFragment pf = (IPackageFragment) javaElement;
-                    addAll(results, pf.getCompilationUnits());
-                } else if (javaElement instanceof IJavaProject) {
-                    IJavaProject javaProject = (IJavaProject) javaElement;
-                    for (IPackageFragment pf : javaProject.getPackageFragments()) {
-                        addAll(results, pf.getCompilationUnits());
-                    }
-                }
-            }
+            addAll(results, javaElements);
             return results;
         } catch (Exception e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    private void addAll(List<ICompilationUnit> results, List<IJavaElement> javaElements) throws JavaModelException {
+        for (IJavaElement javaElement : javaElements) {
+            if (javaElement instanceof ICompilationUnit) {
+                add(results, (ICompilationUnit) javaElement);
+            } else if (javaElement instanceof IPackageFragment) {
+                final IPackageFragment pf = (IPackageFragment) javaElement;
+                addAll(results, pf.getCompilationUnits());
+            } else if (javaElement instanceof IPackageFragmentRoot) {
+                final IPackageFragmentRoot pfr = (IPackageFragmentRoot) javaElement;
+                addAll(results, Arrays.asList(pfr.getChildren()));
+            } else if (javaElement instanceof IJavaProject) {
+                IJavaProject javaProject = (IJavaProject) javaElement;
+                for (IPackageFragment pf : javaProject.getPackageFragments()) {
+                    addAll(results, pf.getCompilationUnits());
+                }
+            }
         }
     }
 
