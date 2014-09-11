@@ -25,19 +25,25 @@
  */
 package org.autorefactor.samples_in;
 
+import java.io.Closeable;
+
 public interface RemoveUselessModifiersSample {
 
     public static final String MY_FIELD = "";
 
     public abstract void myMethod(final String myArg);
 
-    static public final class FixModifierOrderSampleClass {
+    abstract static public class FixModifierOrderSampleClass implements Closeable {
 
         final public static String MY_FIELD = "";
 
         final public static void myMethod(final String myArg) {
         }
 
+        // FIXME JDT bug? uncomment next line
+        // @Override
+        synchronized public void close() {
+        }
     }
 
     static public abstract class AbstractSampleClass {

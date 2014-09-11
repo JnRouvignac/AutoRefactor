@@ -33,7 +33,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.Callable;
+import java.util.concurrent.FutureTask;
 
 import org.autorefactor.util.Pair;
 import org.eclipse.jdt.core.dom.AST;
@@ -355,19 +356,27 @@ public class Refactorings {
         // Call this operation on the SWT Display Thread with syncExec(),
         // because it changes or adds something to the GUI.
         // Otherwise it would throw an Invalid thread access Exception.
-        final AtomicReference<BadLocationException> ex = new AtomicReference<BadLocationException>();
-        Display.getDefault().syncExec(new Runnable() {
+        final Callable<BadLocationException> call = new Callable<BadLocationException>() {
             @Override
-            public void run() {
+            public BadLocationException call() throws Exception {
                 try {
                     edits.apply(document);
+                    return null;
                 } catch (BadLocationException e) {
-                    ex.set(e);
+                    return e;
                 }
             }
-        });
-        if (ex.get() != null) {
-            throw ex.get();
+        };
+        final FutureTask<BadLocationException> future = new FutureTask<BadLocationException>(call);
+        Display.getDefault().syncExec(future);
+        final BadLocationException ex;
+        try {
+            ex = future.get();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        if (ex != null) {
+            throw ex;
         }
     }
 

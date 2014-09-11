@@ -63,6 +63,7 @@ import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jface.text.IDocument;
 
+import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.eclipse.jdt.core.JavaCore.*;
 import static org.eclipse.jdt.core.formatter.DefaultCodeFormatterConstants.*;
 
@@ -265,7 +266,8 @@ public class ApplyRefactoringsJob extends Job {
             if (totalNbLoops > 1000) {
                 // Oops! Something went wrong.
                 final String message = getPossibleCulprits(nbLoopsWithSameVisitors, lastLoopVisitors);
-                throw new IllegalStateException("An infinite loop has been detected."
+                throw new IllegalStateException("An infinite loop has been detected for file "
+                        + getFileName(astRoot) + "."
                         + " A possible cause is that code is being incorrectly"
                         + " refactored one way then refactored back to what it was."
                         + " Fix the code before pursuing."
