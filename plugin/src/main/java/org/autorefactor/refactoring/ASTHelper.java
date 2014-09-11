@@ -604,21 +604,22 @@ public final class ASTHelper {
         } else if (typeBinding.isArray()) {
             return ast.newArrayType(toType(ast, typeBinding.getComponentType()));
         } else if (typeBinding.isPrimitive()) {
-            if (typeBinding.getName().equals("boolean")) {
+            final String primitiveName = typeBinding.getName();
+            if ("boolean".equals(primitiveName)) {
                 return ast.newPrimitiveType(PrimitiveType.BOOLEAN);
-            } else if (typeBinding.getName().equals("byte")) {
+            } else if ("byte".equals(primitiveName)) {
                 return ast.newPrimitiveType(PrimitiveType.BYTE);
-            } else if (typeBinding.getName().equals("char")) {
+            } else if ("char".equals(primitiveName)) {
                 return ast.newPrimitiveType(PrimitiveType.CHAR);
-            } else if (typeBinding.getName().equals("short")) {
+            } else if ("short".equals(primitiveName)) {
                 return ast.newPrimitiveType(PrimitiveType.SHORT);
-            } else if (typeBinding.getName().equals("int")) {
+            } else if ("int".equals(primitiveName)) {
                 return ast.newPrimitiveType(PrimitiveType.INT);
-            } else if (typeBinding.getName().equals("long")) {
+            } else if ("long".equals(primitiveName)) {
                 return ast.newPrimitiveType(PrimitiveType.LONG);
-            } else if (typeBinding.getName().equals("float")) {
+            } else if ("float".equals(primitiveName)) {
                 return ast.newPrimitiveType(PrimitiveType.FLOAT);
-            } else if (typeBinding.getName().equals("double")) {
+            } else if ("double".equals(primitiveName)) {
                 return ast.newPrimitiveType(PrimitiveType.DOUBLE);
             }
         } else if (typeBinding.isClass() || typeBinding.isInterface()) {
@@ -734,10 +735,7 @@ public final class ASTHelper {
      * @return true if the provided expression evaluates to exactly one of the provided type, false otherwise
      */
     public static boolean hasType(Expression expr, String... oneOfQualifiedTypeNames) {
-        if (expr == null) {
-            return false;
-        }
-        return hasType(expr.resolveTypeBinding(), oneOfQualifiedTypeNames);
+        return expr != null && hasType(expr.resolveTypeBinding(), oneOfQualifiedTypeNames);
     }
 
     /**
@@ -749,10 +747,7 @@ public final class ASTHelper {
      * @return true if the provided type evaluates to exactly one of the provided type, false otherwise
      */
     public static boolean hasType(Type type, String... oneOfQualifiedTypeNames) {
-        if (type == null) {
-            return false;
-        }
-        return hasType(type.resolveBinding(), oneOfQualifiedTypeNames);
+        return type != null && hasType(type.resolveBinding(), oneOfQualifiedTypeNames);
     }
 
     /**
@@ -783,10 +778,7 @@ public final class ASTHelper {
      * @return true if the provided expression is an instance of the qualified type name, false otherwise
      */
     public static boolean instanceOf(Expression expr, String qualifiedTypeName) {
-        if (expr == null) {
-            return false;
-        }
-        return instanceOf(expr.resolveTypeBinding(), qualifiedTypeName);
+        return expr != null && instanceOf(expr.resolveTypeBinding(), qualifiedTypeName);
     }
 
     /**
@@ -808,10 +800,7 @@ public final class ASTHelper {
      * @return true if the provided expression evaluates to a primitive type, false otherwise
      */
     public static boolean isPrimitive(Expression expr, String primitiveTypeName) {
-        if (expr == null) {
-            return false;
-        }
-        return isPrimitive(expr.resolveTypeBinding(), primitiveTypeName);
+        return expr != null && isPrimitive(expr.resolveTypeBinding(), primitiveTypeName);
     }
 
     /**
@@ -991,6 +980,7 @@ public final class ASTHelper {
         }
         for (int i = 0; i < genericParamTypes.length; i++) {
             ITypeBinding genericParamType = genericParamTypes[i];
+
             ITypeBinding concreteParamType = genericToConcreteTypeParams.get(genericParamType);
             if (concreteParamType == null) {
                 concreteParamType = genericParamType;
@@ -1058,10 +1048,8 @@ public final class ASTHelper {
      * @return true if <code>this</code> is referring to the currently surrounding type, false otherwise
      */
     public static boolean thisExpressionRefersToSurroundingType(ThisExpression thisExpression) {
-        if (thisExpression == null) {
-            return false;
-        }
-        return thisExpressionRefersToSurroundingType(thisExpression.getQualifier(), thisExpression);
+        return thisExpression != null
+                && thisExpressionRefersToSurroundingType(thisExpression.getQualifier(), thisExpression);
     }
 
     private static boolean thisExpressionRefersToSurroundingType(Name thisQualifierName, ASTNode node) {
@@ -1114,10 +1102,8 @@ public final class ASTHelper {
      * @return true if the two qualified names are equal, false otherwise.
      */
     public static boolean isEqual(QualifiedName name1, QualifiedName name2) {
-        if (isEqual(name1.getName(), name2.getName())) {
-            return isEqual(name1.getQualifier(), name2.getQualifier());
-        }
-        return false;
+        return isEqual(name1.getName(), name2.getName())
+                && isEqual(name1.getQualifier(), name2.getQualifier());
     }
 
     private static boolean sameClass(ASTNode node1, ASTNode node2) {
@@ -1324,12 +1310,7 @@ public final class ASTHelper {
      * @return true if the two provided simple names represent the same variable, false otherwise
      */
     public static boolean isSameVariable(SimpleName name1, SimpleName name2) {
-        final IBinding bnd1 = name1.resolveBinding();
-        final IBinding bnd2 = name2.resolveBinding();
-        if (bnd1 == null || bnd2 == null) {
-            return false;
-        }
-        return bnd1.isEqualTo(bnd2);
+        return isEqualTo(name1.resolveBinding(), name2.resolveBinding());
     }
 
     /**
@@ -1355,12 +1336,11 @@ public final class ASTHelper {
             // TODO JNR parenthesized expr??
             return false;
         }
-        IBinding cb = name1.resolveBinding();
-        IBinding sb = field2.resolveFieldBinding();
-        if (cb == null || sb == null) {
-            return false;
-        }
-        return cb.isEqualTo(sb);
+        return isEqualTo(field2.resolveFieldBinding(), name1.resolveBinding());
+    }
+
+    private static boolean isEqualTo(IBinding b1, IBinding b2) {
+        return b1 != null && b2 != null && b1.isEqualTo(b2);
     }
 
     /**
@@ -1371,15 +1351,9 @@ public final class ASTHelper {
      * @return true if the two provided qualified names represent the same variable, false otherwise
      */
     public static boolean isSameVariable(QualifiedName name1, QualifiedName name2) {
-        IBinding cb = name1.resolveBinding();
-        IBinding sb = name2.resolveBinding();
-        if (cb == null || sb == null) {
-            return false;
-        }
-        if (cb.isEqualTo(sb)) {
-            return isSameVariable(name1.getQualifier(), name2.getQualifier());
-        }
-        return false;
+        IBinding b1 = name1.resolveBinding();
+        IBinding b2 = name2.resolveBinding();
+        return isEqualTo(b2, b1) && isSameVariable(name1.getQualifier(), name2.getQualifier());
     }
 
     /**
@@ -1390,15 +1364,9 @@ public final class ASTHelper {
      * @return true if the two provided expressions represent the same variable, false otherwise
      */
     public static boolean isSameVariable(QualifiedName name1, FieldAccess field2) {
-        IBinding sb = name1.resolveBinding();
-        IBinding cb = field2.resolveFieldBinding();
-        if (cb == null || sb == null) {
-            return false;
-        }
-        if (cb.isEqualTo(sb)) {
-            return isSameVariable(field2.getExpression(), name1.getQualifier());
-        }
-        return false;
+        IBinding b1 = name1.resolveBinding();
+        IBinding b2 = field2.resolveFieldBinding();
+        return isEqualTo(b1, b2) && isSameVariable(field2.getExpression(), name1.getQualifier());
     }
 
     /**
@@ -1409,15 +1377,9 @@ public final class ASTHelper {
      * @return true if the two provided field accesses represent the same variable, false otherwise
      */
     public static boolean isSameVariable(FieldAccess field1, FieldAccess field2) {
-        IBinding cb = field1.resolveFieldBinding();
-        IBinding sb = field2.resolveFieldBinding();
-        if (cb == null || sb == null) {
-            return false;
-        }
-        if (cb.isEqualTo(sb)) {
-            return isSameVariable(field1.getExpression(), field2.getExpression());
-        }
-        return false;
+        IBinding b1 = field1.resolveFieldBinding();
+        IBinding b2 = field2.resolveFieldBinding();
+        return isEqualTo(b2, b1) && isSameVariable(field1.getExpression(), field2.getExpression());
     }
 
     /**
