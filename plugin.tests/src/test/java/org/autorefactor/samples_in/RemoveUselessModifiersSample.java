@@ -40,7 +40,7 @@ public interface RemoveUselessModifiersSample {
         final public static void myMethod(final String myArg) {
         }
 
-        // FIXME JDT bug? uncomment next line
+        // FIXME JDT bug? (still failing with juno) uncomment next line
         // @Override
         synchronized public void close() {
         }
