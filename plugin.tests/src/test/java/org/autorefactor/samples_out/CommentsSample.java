@@ -40,6 +40,8 @@ public class CommentsSample implements Runnable {
     private int i;
     /** This must be attached as a javadoc to field 'j'. */
     private int j;
+    /** Uppercase. */
+    private int k;
 
     /** Convert to a javadoc. */
     public CommentsSample() {

@@ -86,7 +86,7 @@ public class CommentsRefactoring extends AbstractRefactoring {
     private static final Pattern FIRST_JAVADOC_TAG =
             Pattern.compile("(^|\\/\\*\\*)\\s*(?:\\*\\s*)?@\\w+", Pattern.MULTILINE);
     private static final Pattern JAVADOC_FIRST_LETTER_LOWERCASE =
-            Pattern.compile("(/\\*\\*(?:\\s*\\*(?:\\r|\\n|\\r\\n|\\s)))*(\\w)(.*)", Pattern.DOTALL);
+            Pattern.compile("(/\\*\\*\\s*(?:(?:\\r|\\n|\\r\\n|\\s)\\s*\\*)*\\s*)(\\w)(.*)", Pattern.DOTALL);
 
     private CompilationUnit astRoot;
     private final List<Pair<SourceLocation, Comment>> comments = new ArrayList<Pair<SourceLocation, Comment>>();
