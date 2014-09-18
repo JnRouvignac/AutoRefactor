@@ -27,6 +27,28 @@ package org.autorefactor.samples_in;
 
 public class CommentsSample implements Runnable {
 
+    /** @NonNull */
+    public Object o = new Object();
+
+    /**
+     * @param i
+     * @author
+     * @exception Exception
+     * @param
+     * @return
+     * @throws Exception
+     * @deprecated
+     * @see
+     * @serial
+     * @serialField
+     * @serialData
+     * @since
+     * @version
+     */
+    public Object f(int i) throws Exception {
+        return null;
+    }
+
     /**
      * uppercase first word.
      */
@@ -97,10 +119,18 @@ public class CommentsSample implements Runnable {
     }
 
     /**
+      Add period at the end of this line
+      @param i an integer argument
+     */
+    public int test4(int i) {
+        return i;
+    }
+
+    /**
      * Do not add period at the end of this
      * line!
      */
-    public void test4() {
+    public void test5() {
     }
 
     /**

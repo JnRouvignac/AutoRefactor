@@ -46,11 +46,13 @@ import org.eclipse.jdt.core.dom.Javadoc;
 import org.eclipse.jdt.core.dom.LineComment;
 import org.eclipse.jdt.core.dom.NodeFinder;
 import org.eclipse.jdt.core.dom.PackageDeclaration;
+import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.TagElement;
 import org.eclipse.jdt.core.dom.TextElement;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
+import static org.eclipse.jdt.core.dom.TagElement.*;
 
 /**
  * Refactor comments:
@@ -80,7 +82,9 @@ public class CommentsRefactoring extends AbstractRefactoring {
             + "\\s*");
     private static final Pattern JAVADOC_HAS_PUNCTUATION = Pattern.compile("\\.|\\?|!|:");
     private static final Pattern JAVADOC_WITHOUT_PUNCTUATION =
-            Pattern.compile("(.*?)((?:\\s*(?:\\r|\\n|\\r\\n)*\\s*)*\\*/)", Pattern.DOTALL);
+            Pattern.compile("(.*?)((?:\\s*(?:\\r|\\n|\\r\\n)*\\s*)*(?:\\*/)?)", Pattern.DOTALL);
+    private static final Pattern FIRST_JAVADOC_TAG =
+            Pattern.compile("(^|\\/\\*\\*)\\s*(?:\\*\\s*)?@\\w+", Pattern.MULTILINE);
     private static final Pattern JAVADOC_FIRST_LETTER_LOWERCASE =
             Pattern.compile("(/\\*\\*(?:\\s*\\*(?:\\r|\\n|\\r\\n|\\s)))*(\\w)(.*)", Pattern.DOTALL);
 
@@ -176,7 +180,17 @@ public class CommentsRefactoring extends AbstractRefactoring {
     }
 
     private String addPeriodAtEndOfFirstLine(Javadoc node, String comment) {
-        final Matcher matcher = JAVADOC_WITHOUT_PUNCTUATION.matcher(comment);
+        String beforeFirstTag = comment;
+        String afterFirstTag = "";
+        final Matcher m = FIRST_JAVADOC_TAG.matcher(comment);
+        if (m.find()) {
+            if (m.start() == 0) {
+                return null;
+            }
+            beforeFirstTag = comment.substring(0, m.start());
+            afterFirstTag = comment.substring(m.start());
+        }
+        final Matcher matcher = JAVADOC_WITHOUT_PUNCTUATION.matcher(beforeFirstTag);
         if (matcher.matches()) {
             final List<TagElement> tagElements = tags(node);
             if (tagElements.size() >= 2) {
@@ -184,8 +198,9 @@ public class CommentsRefactoring extends AbstractRefactoring {
                 final int relativeStart = firstLine.getStartPosition() - node.getStartPosition();
                 final int endOfFirstLine = relativeStart + firstLine.getLength();
                 return comment.substring(0, endOfFirstLine) + "." + comment.substring(endOfFirstLine);
+                // TODO JNR do the replace here, not outside this method
             }
-            return matcher.group(1) + "." + matcher.group(2);
+            return matcher.group(1) + "." + matcher.group(2) + afterFirstTag;
         }
         return null;
     }
@@ -215,41 +230,44 @@ public class CommentsRefactoring extends AbstractRefactoring {
     }
 
     private boolean isNotEmpty(TagElement tag, boolean throwIfUnknown) {
-        if (tag.getTagName() == null) {
-            if (anyTextElementNotEmpty(tag.fragments(), throwIfUnknown)) {
-                return true;
-            }
-//            } else if (TagElement.TAG_AUTHOR.equals(tag.getTagName())) {
-//            } else if (TagElement.TAG_CODE.equals(tag.getTagName())) {
-//            } else if (TagElement.TAG_DEPRECATED.equals(tag.getTagName())) {
-//            } else if (TagElement.TAG_DOCROOT.equals(tag.getTagName())) {
-//            } else if (TagElement.TAG_EXCEPTION.equals(tag.getTagName())) {
-        } else if (TagElement.TAG_INHERITDOC.equals(tag.getTagName())) {
-            return true;
-//            } else if (TagElement.TAG_LINK.equals(tag.getTagName())) {
-//            } else if (TagElement.TAG_LINKPLAIN.equals(tag.getTagName())) {
-//            } else if (TagElement.TAG_LITERAL.equals(tag.getTagName())) {
-        } else if (TagElement.TAG_PARAM.equals(tag.getTagName())) {
-            if (anyTextElementNotEmpty(tag.fragments(), throwIfUnknown)) {
-                // TODO JNR a @param tag repeating the parameters of the method is useless
-                return true;
-            }
-        } else if (TagElement.TAG_RETURN.equals(tag.getTagName())) {
-            if (anyTextElementNotEmpty(tag.fragments(), throwIfUnknown)) {
-                // TODO JNR a return tag repeating the return type of the method is useless
-                return true;
-            }
-//            } else if (TagElement.TAG_SEE.equals(tag.getTagName())) {
-//            } else if (TagElement.TAG_SERIAL.equals(tag.getTagName())) {
-//            } else if (TagElement.TAG_SERIALDATA.equals(tag.getTagName())) {
-//            } else if (TagElement.TAG_SERIALFIELD.equals(tag.getTagName())) {
-//            } else if (TagElement.TAG_SINCE.equals(tag.getTagName())) {
-//            } else if (TagElement.TAG_THROWS.equals(tag.getTagName())) {
+        final String tagName = tag.getTagName();
+        if (tagName == null
+                || TAG_AUTHOR.equals(tagName)
+                // || TAG_CODE.equals(tagName)
+                || TAG_DEPRECATED.equals(tagName)
+                // || TAG_DOCROOT.equals(tagName)
+                // || TAG_LINK.equals(tagName)
+                // || TAG_LINKPLAIN.equals(tagName)
+                // || TAG_LITERAL.equals(tagName)
+                || TAG_RETURN.equals(tagName)
+                || TAG_SEE.equals(tagName)
+                || TAG_SERIAL.equals(tagName)
+                || TAG_SERIALDATA.equals(tagName)
+                || TAG_SERIALFIELD.equals(tagName)
+                || TAG_SINCE.equals(tagName)
+                // || TAG_VALUE.equals(tagName)
+                || TAG_VERSION.equals(tagName)) {
+            // TODO JNR a return tag repeating the return type of the method is useless
+            return anyTextElementNotEmpty(tag.fragments(), throwIfUnknown);
+        } else if (TAG_EXCEPTION.equals(tagName)
+                || TAG_PARAM.equals(tagName)
+                || TAG_THROWS.equals(tagName)) {
             // TODO JNR a @throws tag repeating the checked exceptions of the method is useless
-//            } else if (TagElement.TAG_VALUE.equals(tag.getTagName())) {
-//            } else if (TagElement.TAG_VERSION.equals(tag.getTagName())) {
+            return !isTagEmptyOrWithSimpleNameOnly(tag);
+        } else if (TAG_INHERITDOC.equals(tagName)) {
+            return true;
         } else if (throwIfUnknown) {
-            throw new NotImplementedException("for tagName " + tag.getTagName());
+            throw new NotImplementedException("for tagName " + tagName);
+        }
+        return true;
+    }
+
+    private boolean isTagEmptyOrWithSimpleNameOnly(TagElement tag) {
+        if (tag.fragments().size() == 0) {
+            return true;
+        }
+        if (tag.fragments().size() == 1) {
+            return tag.fragments().get(0) instanceof SimpleName;
         }
         return false;
     }
