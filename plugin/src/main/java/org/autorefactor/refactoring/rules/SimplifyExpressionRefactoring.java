@@ -362,7 +362,7 @@ public class SimplifyExpressionRefactoring extends AbstractRefactoring {
      * </p>
      */
     private boolean checkNoExtendedOperands(InfixExpression node) {
-        if (!hasType(node, "java.lang.String") && !node.extendedOperands().isEmpty()) {
+        if (!hasType(node, "java.lang.String") && node.hasExtendedOperands()) {
             throw new NotImplementedException("for extended operands. " + getSourceLocation(node));
         }
         return true;

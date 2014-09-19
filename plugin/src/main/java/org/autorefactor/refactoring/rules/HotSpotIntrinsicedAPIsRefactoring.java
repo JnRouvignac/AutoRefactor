@@ -107,7 +107,8 @@ public class HotSpotIntrinsicedAPIsRefactoring extends AbstractRefactoring {
             }
         } else if (index instanceof InfixExpression) {
             final InfixExpression ie = (InfixExpression) index;
-            if (InfixExpression.Operator.PLUS.equals(ie.getOperator())) {
+            if (!ie.hasExtendedOperands()
+                    && InfixExpression.Operator.PLUS.equals(ie.getOperator())) {
                 final Expression leftOp = ie.getLeftOperand();
                 final Expression rightOp = ie.getRightOperand();
                 if (leftOp instanceof SimpleName) {

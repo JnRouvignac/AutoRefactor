@@ -201,7 +201,7 @@ public final class ForLoopHelper {
 
     private static ForLoopContent getIndexOnCollection(final Expression condition) {
         final InfixExpression ie = as(condition, InfixExpression.class);
-        if (ie != null) {
+        if (ie != null && !ie.hasExtendedOperands()) {
             final Expression leftOp = ie.getLeftOperand();
             final Expression rightOp = ie.getRightOperand();
             if (InfixExpression.Operator.LESS.equals(ie.getOperator())) {

@@ -76,7 +76,7 @@ public class RemoveUnnecessaryCastRefactoring extends AbstractRefactoring {
 
         case INFIX_EXPRESSION:
             final InfixExpression ie = (InfixExpression) parent;
-            if (extendedOperands(ie).isEmpty()) {
+            if (!ie.hasExtendedOperands()) {
                 final Expression lo = ie.getLeftOperand();
                 final Expression ro = ie.getRightOperand();
                 if (node.equals(lo)) {

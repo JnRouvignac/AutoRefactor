@@ -56,6 +56,7 @@ public class RemoveUselessNullCheckRefactoring extends AbstractRefactoring {
         final List<Statement> thenStmts = asList(node.getThenStatement());
         final List<Statement> elseStmts = asList(node.getElseStatement());
         if (condition != null
+                && !condition.hasExtendedOperands()
                 && thenStmts.size() == 1
                 && elseStmts.size() == 1) {
             final Assignment thenAs = asExpression(thenStmts.get(0), Assignment.class);
