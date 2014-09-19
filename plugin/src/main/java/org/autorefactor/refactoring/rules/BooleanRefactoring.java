@@ -431,7 +431,7 @@ public class BooleanRefactoring extends AbstractRefactoring {
             }
         }
 
-        return b.not(b.parenthesizeIfNeeded(expr, doCopy ? b.copy(expr) : expr));
+        return b.not(b.parenthesizeIfNeeded(doCopy ? b.copy(expr) : expr));
     }
 
     private Expression getExpression(Expression ifCondition, String expressionTypeName, Name booleanName) {

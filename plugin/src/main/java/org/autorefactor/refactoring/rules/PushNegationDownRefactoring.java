@@ -98,7 +98,7 @@ public class PushNegationDownRefactoring extends AbstractRefactoring {
             }
         }
 
-        return b.not(b.parenthesizeIfNeeded(expr, b.move(expr)));
+        return b.not(b.parenthesizeIfNeeded(b.move(expr)));
     }
 
 }

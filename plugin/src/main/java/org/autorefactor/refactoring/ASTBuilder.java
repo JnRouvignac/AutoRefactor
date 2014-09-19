@@ -598,16 +598,15 @@ public class ASTBuilder {
     /**
      * Parenthesizes the provided expression if its type requires it.
      *
-     * @param origExpr the original expression to conditionally parenthesize
-     * @param exprToReturn the expression to conditionally return parenthesized
+     * @param expr the expression to conditionally return parenthesized
      * @return the parenthesized expression of the provided expression to return or this expression itself
      */
-    public Expression parenthesizeIfNeeded(Expression origExpr, Expression exprToReturn) {
-        if (origExpr.getNodeType() == INFIX_EXPRESSION
-                || origExpr.getNodeType() == INSTANCEOF_EXPRESSION) {
-            return parenthesize(exprToReturn);
+    public Expression parenthesizeIfNeeded(Expression expr) {
+        if (expr.getNodeType() == INFIX_EXPRESSION
+                || expr.getNodeType() == INSTANCEOF_EXPRESSION) {
+            return parenthesize(expr);
         }
-        return exprToReturn;
+        return expr;
     }
 
 }

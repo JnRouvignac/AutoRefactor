@@ -405,7 +405,7 @@ public class SimplifyExpressionRefactoring extends AbstractRefactoring {
             }
         }
 
-        return b.not(b.parenthesizeIfNeeded(expr, b.copy(expr)));
+        return b.not(b.parenthesizeIfNeeded(b.copy(expr)));
     }
 
     private boolean replaceByCopy(ASTNode node, Expression expr) {
