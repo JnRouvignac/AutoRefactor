@@ -2,7 +2,18 @@ package org.autorefactor.samples_out;
 
 public class RemoveUselessNullCheckSample {
 
+    private final String DEFAULT = "";
     private String s;
+
+    public String doNotRefactorLocalVariable(String s) throws Exception {
+        String st;
+        if (s == null) {
+            st = DEFAULT;
+        } else {
+            st = s;
+        }
+        return st;
+    }
 
     public String refactorLocalVariable1(String s) throws Exception {
         String st;
@@ -36,6 +47,14 @@ public class RemoveUselessNullCheckSample {
         }
     }
 
+    public void doNotRefactorFieldAssign(String s) throws Exception {
+        if (s == null) {
+            this.s = DEFAULT;
+        } else {
+            this.s = s;
+        }
+    }
+
     public void refactorFieldAssign1(String s) throws Exception {
         this.s = s;
     }
@@ -50,6 +69,14 @@ public class RemoveUselessNullCheckSample {
 
     public void refactorFieldAssign4(String s) throws Exception {
         this.s = s;
+    }
+
+    public String doNotRefactorReturn(String s) throws Exception {
+        if (null != s) {
+            return s;
+        } else {
+            return DEFAULT;
+        }
     }
 
     public String refactorReturn1(String s) throws Exception {

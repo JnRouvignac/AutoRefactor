@@ -77,9 +77,9 @@ public class RemoveUselessNullCheckRefactoring extends AbstractRefactoring {
                 final ReturnStatement elseRS = as(elseStmts.get(0), ReturnStatement.class);
                 if (thenRS != null && elseRS != null) {
                     if (InfixExpression.Operator.EQUALS.equals(condition.getOperator())) {
-                        return replaceWithStraightReturn(node, condition, elseRS);
+                        return replaceWithStraightReturn(node, condition, elseRS, thenRS);
                     } else if (InfixExpression.Operator.NOT_EQUALS.equals(condition.getOperator())) {
-                        return replaceWithStraightReturn(node, condition, thenRS);
+                        return replaceWithStraightReturn(node, condition, thenRS, elseRS);
                     }
                 }
             }
@@ -109,13 +109,16 @@ public class RemoveUselessNullCheckRefactoring extends AbstractRefactoring {
         return DO_NOT_VISIT_SUBTREE;
     }
 
-    private boolean replaceWithStraightReturn(IfStatement node, InfixExpression condition, ReturnStatement rs) {
-        if (isNullLiteral(condition.getRightOperand())
-                && match(matcher, condition.getLeftOperand(), rs.getExpression())) {
-            return replaceWithStraightReturn(node, condition.getLeftOperand());
-        } else if (isNullLiteral(condition.getLeftOperand())
-                && match(matcher, condition.getRightOperand(), rs.getExpression())) {
-            return replaceWithStraightReturn(node, condition.getRightOperand());
+    private boolean replaceWithStraightReturn(IfStatement node, InfixExpression condition,
+            ReturnStatement rs, ReturnStatement otherRs) {
+        if (isNullLiteral(otherRs.getExpression())) {
+            if (isNullLiteral(condition.getRightOperand())
+                    && match(matcher, condition.getLeftOperand(), rs.getExpression())) {
+                return replaceWithStraightReturn(node, condition.getLeftOperand());
+            } else if (isNullLiteral(condition.getLeftOperand())
+                    && match(matcher, condition.getRightOperand(), rs.getExpression())) {
+                return replaceWithStraightReturn(node, condition.getRightOperand());
+            }
         }
         return VISIT_SUBTREE;
     }
