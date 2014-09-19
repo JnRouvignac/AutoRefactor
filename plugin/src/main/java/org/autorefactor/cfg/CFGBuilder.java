@@ -128,6 +128,7 @@ import static org.autorefactor.cfg.ASTPrintHelper.*;
 import static org.autorefactor.cfg.CFGEdgeBuilder.*;
 import static org.autorefactor.cfg.VariableAccess.*;
 import static org.autorefactor.refactoring.ASTHelper.*;
+import static org.eclipse.jdt.core.dom.ASTNode.*;
 
 /**
  * Builds a CFG.
@@ -266,52 +267,56 @@ public class CFGBuilder {
             int flags, ThrowerBlocks throwers) {
         if (node == null) {
             return false;
-        } else if (node instanceof ArrayAccess) {
+        }
+        switch (node.getNodeType()) {
+        case ARRAY_ACCESS:
             ArrayAccess aa = (ArrayAccess) node;
             addVariableAccess(basicBlock, aa.getArray(), flags, throwers);
             addVariableAccess(basicBlock, aa.getIndex(), flags, throwers);
             throwers.addThrow(aa, newException(node, "java.lang.ArrayIndexOutOfBoundsException"));
             return true;
-        } else if (node instanceof ArrayCreation) {
+        case ARRAY_CREATION:
             ArrayCreation ac = (ArrayCreation) node;
-            boolean mightThrow1 = addVariableAccess(basicBlock, ac.getInitializer(), flags, throwers);
-            boolean mightThrow2 = addVariableAccesses(basicBlock, ac.dimensions(), flags, throwers);
-            return mightThrow1 || mightThrow2;
-        } else if (node instanceof ArrayInitializer) {
+            boolean acMightThrow1 = addVariableAccess(basicBlock, ac.getInitializer(), flags, throwers);
+            boolean acMightThrow2 = addVariableAccesses(basicBlock, ac.dimensions(), flags, throwers);
+            return acMightThrow1 || acMightThrow2;
+        case ARRAY_INITIALIZER:
             ArrayInitializer ai = (ArrayInitializer) node;
             return addVariableAccesses(basicBlock, ai.expressions(), flags, throwers);
-        } else if (node instanceof Assignment) {
+        case ASSIGNMENT:
             Assignment a = (Assignment) node;
-            boolean mightThrow1 = addVariableAccess(basicBlock, a.getLeftHandSide(), WRITE, throwers);
-            boolean mightThrow2 = addVariableAccess(basicBlock, a.getRightHandSide(), READ, throwers);
-            return mightThrow1 || mightThrow2;
-        } else if (node instanceof BooleanLiteral
-                || node instanceof CharacterLiteral
-                || node instanceof NullLiteral || node instanceof NumberLiteral
-                || node instanceof StringLiteral || node instanceof TypeLiteral) {
+            boolean aMightThrow1 = addVariableAccess(basicBlock, a.getLeftHandSide(), WRITE, throwers);
+            boolean aMightThrow2 = addVariableAccess(basicBlock, a.getRightHandSide(), READ, throwers);
+            return aMightThrow1 || aMightThrow2;
+        case BOOLEAN_LITERAL:
+        case CHARACTER_LITERAL:
+        case NULL_LITERAL:
+        case NUMBER_LITERAL:
+        case STRING_LITERAL:
+        case TYPE_LITERAL:
             // nothing to do
             return false;
-        } else if (node instanceof CastExpression) {
-            CastExpression ce = (CastExpression) node;
-            return addVariableAccess(basicBlock, ce.getExpression(), flags, throwers);
-        } else if (node instanceof ClassInstanceCreation) {
+        case CAST_EXPRESSION:
+            CastExpression cae = (CastExpression) node;
+            return addVariableAccess(basicBlock, cae.getExpression(), flags, throwers);
+        case CLASS_INSTANCE_CREATION:
             ClassInstanceCreation cic = (ClassInstanceCreation) node;
             addVariableAccess(basicBlock, cic.getExpression(), flags, throwers);
             addVariableAccesses(basicBlock, cic.arguments(), flags, throwers);
-            IMethodBinding methodBinding = cic.resolveConstructorBinding();
-            if (methodBinding != null) {
-                ITypeBinding[] declaredThrows = methodBinding.getExceptionTypes();
+            IMethodBinding cicBinding = cic.resolveConstructorBinding();
+            if (cicBinding != null) {
+                ITypeBinding[] declaredThrows = cicBinding.getExceptionTypes();
                 throwers.addThrow(cic, declaredThrows);
                 return declaredThrows.length > 0;
             }
             return false;
-        } else if (node instanceof ConditionalExpression) {
-            ConditionalExpression ce = (ConditionalExpression) node;
-            boolean mightThrow1 = addVariableAccess(basicBlock, ce.getExpression(), flags, throwers);
-            boolean mightThrow2 = addVariableAccess(basicBlock, ce.getThenExpression(), flags, throwers);
-            boolean mightThrow3 = addVariableAccess(basicBlock, ce.getElseExpression(), flags, throwers);
+        case CONDITIONAL_EXPRESSION:
+            ConditionalExpression coe = (ConditionalExpression) node;
+            boolean mightThrow1 = addVariableAccess(basicBlock, coe.getExpression(), flags, throwers);
+            boolean mightThrow2 = addVariableAccess(basicBlock, coe.getThenExpression(), flags, throwers);
+            boolean mightThrow3 = addVariableAccess(basicBlock, coe.getElseExpression(), flags, throwers);
             return mightThrow1 || mightThrow2 || mightThrow3;
-        } else if (node instanceof FieldAccess) {
+        case FIELD_ACCESS:
             FieldAccess fa = (FieldAccess) node;
             boolean mightThrow = addVariableAccess(basicBlock, fa.getExpression(), flags, throwers);
             basicBlock.addVariableAccess(new VariableAccess(fa, flags));
@@ -320,15 +325,15 @@ public class CFGBuilder {
                 mightThrow = true;
             }
             return mightThrow;
-        } else if (node instanceof InfixExpression) {
+        case INFIX_EXPRESSION:
             InfixExpression ie = (InfixExpression) node;
-            boolean mightThrow1 = addVariableAccess(basicBlock, ie.getLeftOperand(), flags, throwers);
-            boolean mightThrow2 = addVariableAccess(basicBlock, ie.getRightOperand(), flags, throwers);
-            return mightThrow1 || mightThrow2;
-        } else if (node instanceof InstanceofExpression) {
-            InstanceofExpression ie = (InstanceofExpression) node;
-            return addVariableAccess(basicBlock, ie.getLeftOperand(), flags, throwers);
-        } else if (node instanceof MethodInvocation) {
+            boolean ieMightThrow1 = addVariableAccess(basicBlock, ie.getLeftOperand(), flags, throwers);
+            boolean ieMightThrow2 = addVariableAccess(basicBlock, ie.getRightOperand(), flags, throwers);
+            return ieMightThrow1 || ieMightThrow2;
+        case INSTANCEOF_EXPRESSION:
+            InstanceofExpression ioe = (InstanceofExpression) node;
+            return addVariableAccess(basicBlock, ioe.getLeftOperand(), flags, throwers);
+        case METHOD_INVOCATION:
             MethodInvocation mi = (MethodInvocation) node;
             addVariableAccess(basicBlock, mi.getExpression(), flags, throwers);
             addVariableAccesses(basicBlock, mi.arguments(), flags, throwers);
@@ -339,7 +344,7 @@ public class CFGBuilder {
                 return declaredThrows.length > 0;
             }
             return false;
-        } else if (node instanceof SimpleName) {
+        case SIMPLE_NAME:
             SimpleName sn = (SimpleName) node;
             basicBlock.addVariableAccess(new VariableAccess(sn, flags));
             if (is(flags, READ)) {
@@ -347,43 +352,43 @@ public class CFGBuilder {
                 return true;
             }
             return false;
-        } else if (node instanceof QualifiedName) {
+        case QUALIFIED_NAME:
             QualifiedName qn = (QualifiedName) node;
             basicBlock.addVariableAccess(new VariableAccess(qn, flags));
             throwers.addThrow(qn, newException(node, "java.lang.NullPointerException"));
             return true;
-        } else if (node instanceof ParenthesizedExpression) {
+        case PARENTHESIZED_EXPRESSION:
             ParenthesizedExpression pe = (ParenthesizedExpression) node;
             return addVariableAccess(basicBlock, pe.getExpression(), flags, throwers);
-        } else if (node instanceof PostfixExpression) {
-            PostfixExpression pe = (PostfixExpression) node;
-            return addVariableAccess(basicBlock, pe.getOperand(), flags, throwers);
-        } else if (node instanceof PrefixExpression) {
-            PrefixExpression pe = (PrefixExpression) node;
-            return addVariableAccess(basicBlock, pe.getOperand(), flags, throwers);
-        } else if (node instanceof SuperFieldAccess) {
+        case POSTFIX_EXPRESSION:
+            PostfixExpression poe = (PostfixExpression) node;
+            return addVariableAccess(basicBlock, poe.getOperand(), flags, throwers);
+        case PREFIX_EXPRESSION:
+            PrefixExpression pre = (PrefixExpression) node;
+            return addVariableAccess(basicBlock, pre.getOperand(), flags, throwers);
+        case SUPER_FIELD_ACCESS:
             SuperFieldAccess sfa = (SuperFieldAccess) node;
-            boolean mightThrow1 = addVariableAccess(basicBlock, sfa.getQualifier(), flags, throwers);
-            boolean mightThrow2 = addVariableAccess(basicBlock, sfa.getName(), flags, throwers);
-            return mightThrow1 || mightThrow2;
-        } else if (node instanceof SuperMethodInvocation) {
+            boolean sfaMightThrow1 = addVariableAccess(basicBlock, sfa.getQualifier(), flags, throwers);
+            boolean sfaMightThrow2 = addVariableAccess(basicBlock, sfa.getName(), flags, throwers);
+            return sfaMightThrow1 || sfaMightThrow2;
+        case SUPER_METHOD_INVOCATION:
             SuperMethodInvocation smi = (SuperMethodInvocation) node;
             addVariableAccess(basicBlock, smi.getQualifier(), flags, throwers);
             addVariableAccess(basicBlock, smi.getName(), flags, throwers);
-            IMethodBinding methodBinding = smi.resolveMethodBinding();
-            if (methodBinding != null) {
-                ITypeBinding[] declaredThrows = methodBinding.getExceptionTypes();
+            IMethodBinding sMethodBinding = smi.resolveMethodBinding();
+            if (sMethodBinding != null) {
+                ITypeBinding[] declaredThrows = sMethodBinding.getExceptionTypes();
                 throwers.addThrow(smi, declaredThrows);
                 return declaredThrows.length > 0;
             }
             return false;
-        } else if (node instanceof ThisExpression) {
+        case THIS_EXPRESSION:
             ThisExpression te = (ThisExpression) node;
             // TODO JNR remember use of "this" here
             return addVariableAccess(basicBlock, te.getQualifier(), flags, throwers);
-        } else if (node instanceof VariableDeclarationExpression) {
+        case VARIABLE_DECLARATION_EXPRESSION:
             return addDeclarations(basicBlock, (VariableDeclarationExpression) node, throwers);
-        } else {
+        default:
             throw new NotImplementedException(node);
         }
     }
@@ -1096,7 +1101,7 @@ public class CFGBuilder {
 
     private Statement findLabeledParentStmt(ASTNode node) {
         ASTNode n = node;
-        while (n != null && !(n instanceof LabeledStatement)) {
+        while (n != null && n.getNodeType() != LABELED_STATEMENT) {
             n = n.getParent();
         }
         if (n != null) {
@@ -1157,7 +1162,7 @@ public class CFGBuilder {
     public List<CFGBasicBlock> buildCFG(CompilationUnit node) {
         List<CFGBasicBlock> results = new LinkedList<CFGBasicBlock>();
         for (AbstractTypeDeclaration decl : (List<AbstractTypeDeclaration>) node.types()) {
-            if (decl instanceof TypeDeclaration) {
+            if (decl.getNodeType() == TYPE_DECLARATION) {
                 results.addAll(buildCFG((TypeDeclaration) decl));
             } else {
                 throw new NotImplementedException(node);
@@ -1232,53 +1237,75 @@ public class CFGBuilder {
     private LivenessState buildCFG(List<Statement> stmts, final LivenessState startState, ThrowerBlocks throwers) {
         LivenessState liveState = startState;
         for (Statement stmt : stmts) {
-            if (stmt instanceof AssertStatement) {
+            switch (stmt.getNodeType()) {
+            case ASSERT_STATEMENT:
                 liveState = buildCFG((AssertStatement) stmt, liveState, throwers);
-            } else if (stmt instanceof Block) {
+                break;
+            case BLOCK:
                 liveState = buildCFG((Block) stmt, liveState, throwers);
-            } else if (stmt instanceof BreakStatement) {
+                break;
+            case BREAK_STATEMENT:
                 liveState = buildCFG((BreakStatement) stmt, liveState, throwers);
-            } else if (stmt instanceof ConstructorInvocation) {
+                break;
+            case CONSTRUCTOR_INVOCATION:
                 liveState = buildCFG(stmt, liveState, throwers);
-            } else if (stmt instanceof ContinueStatement) {
+                break;
+            case CONTINUE_STATEMENT:
                 liveState = buildCFG((ContinueStatement) stmt, liveState, throwers);
-            } else if (stmt instanceof DoStatement) {
+                break;
+            case DO_STATEMENT:
                 liveState = buildCFG((DoStatement) stmt, liveState, throwers);
-            } else if (stmt instanceof EmptyStatement) {
+                break;
+            case EMPTY_STATEMENT:
                 liveState = buildCFG((EmptyStatement) stmt, liveState, throwers);
-            } else if (stmt instanceof EnhancedForStatement) {
+                break;
+            case ENHANCED_FOR_STATEMENT:
                 liveState = buildCFG((EnhancedForStatement) stmt, liveState, throwers);
-            } else if (stmt instanceof ExpressionStatement) {
+                break;
+            case EXPRESSION_STATEMENT:
                 liveState = buildCFG((ExpressionStatement) stmt, liveState, throwers);
-            } else if (stmt instanceof ForStatement) {
+                break;
+            case FOR_STATEMENT:
                 liveState = buildCFG((ForStatement) stmt, liveState, throwers);
-            } else if (stmt instanceof IfStatement) {
+                break;
+            case IF_STATEMENT:
                 liveState = buildCFG((IfStatement) stmt, liveState, throwers);
-            } else if (stmt instanceof LabeledStatement) {
+                break;
+            case LABELED_STATEMENT:
                 liveState = buildCFG((LabeledStatement) stmt, liveState, throwers);
-            } else if (stmt instanceof ReturnStatement) {
+                break;
+            case RETURN_STATEMENT:
                 liveState = buildCFG((ReturnStatement) stmt, liveState, throwers);
-            } else if (stmt instanceof SuperConstructorInvocation) {
+                break;
+            case SUPER_CONSTRUCTOR_INVOCATION:
                 liveState = buildCFG(stmt, liveState, throwers);
-            } else if (stmt instanceof SwitchCase) {
+                break;
+            case SWITCH_CASE:
                 // Here, use startState.liveBasicBlock to build an edge
                 // from the switch condition to the case statement
                 liveState = buildCFG((SwitchCase) stmt, startState.liveBasicBlock, liveState, throwers);
-            } else if (stmt instanceof SwitchStatement) {
+                break;
+            case SWITCH_STATEMENT:
                 liveState = buildCFG((SwitchStatement) stmt, liveState, throwers);
-            } else if (stmt instanceof SynchronizedStatement) {
+                break;
+            case SYNCHRONIZED_STATEMENT:
                 liveState = buildCFG((SynchronizedStatement) stmt, liveState, throwers);
-            } else if (stmt instanceof ThrowStatement) {
+                break;
+            case THROW_STATEMENT:
                 liveState = buildCFG((ThrowStatement) stmt, liveState, throwers);
-            } else if (stmt instanceof TryStatement) {
+                break;
+            case TRY_STATEMENT:
                 liveState = buildCFG((TryStatement) stmt, liveState, throwers);
-                // } else if (stmt instanceof TypeDeclarationStatement) {
+                // break;case TYPE_DECLARATION_STATEMENT:
                 // buildCFG((TypeDeclarationStatement) stmt, liveState, throwers);
-            } else if (stmt instanceof VariableDeclarationStatement) {
+                break;
+            case VARIABLE_DECLARATION_STATEMENT:
                 liveState = buildCFG((VariableDeclarationStatement) stmt, liveState, throwers);
-            } else if (stmt instanceof WhileStatement) {
+                break;
+            case WHILE_STATEMENT:
                 liveState = buildCFG((WhileStatement) stmt, liveState, throwers);
-            } else {
+                break;
+            default:
                 throw new NotImplementedException(stmt);
             }
         }
