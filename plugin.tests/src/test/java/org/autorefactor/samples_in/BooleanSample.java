@@ -364,7 +364,7 @@ public class BooleanSample {
         return false;
     }
 
-    private boolean aMethodThatReturnsBoolean() {
+    protected boolean aMethodThatReturnsBoolean() {
         return false;
     }
 

@@ -245,19 +245,18 @@ public class BooleanRefactoring extends AbstractRefactoring {
                         ctx.getRefactorings().replace(node, newRs);
                         ctx.getRefactorings().remove(rs);
                         return DO_NOT_VISIT_SUBTREE;
-                    } else {
-                        MethodDeclaration md = getAncestor(node, MethodDeclaration.class);
-                        final Type returnType = md.getReturnType2();
-                        if (returnType != null && returnType.isPrimitiveType()) {
-                            final PrimitiveType pt = (PrimitiveType) returnType;
-                            if (PrimitiveType.BOOLEAN.equals(pt.getPrimitiveTypeCode())) {
-                                newRs = getReturnStatement(node, thenBool, elseBool,
-                                        thenRs.getExpression(), rs.getExpression());
-                                if (newRs != null) {
-                                    ctx.getRefactorings().replace(node, newRs);
-                                    ctx.getRefactorings().remove(rs);
-                                    return DO_NOT_VISIT_SUBTREE;
-                                }
+                    }
+                    final MethodDeclaration md = getAncestor(node, MethodDeclaration.class);
+                    final Type returnType = md.getReturnType2();
+                    if (returnType != null && returnType.isPrimitiveType()) {
+                        final PrimitiveType pt = (PrimitiveType) returnType;
+                        if (PrimitiveType.BOOLEAN.equals(pt.getPrimitiveTypeCode())) {
+                            newRs = getReturnStatement(node, thenBool, elseBool,
+                                    thenRs.getExpression(), rs.getExpression());
+                            if (newRs != null) {
+                                ctx.getRefactorings().replace(node, newRs);
+                                ctx.getRefactorings().remove(rs);
+                                return DO_NOT_VISIT_SUBTREE;
                             }
                         }
                     }
@@ -325,11 +324,12 @@ public class BooleanRefactoring extends AbstractRefactoring {
     private ReturnStatement getReturnStatement(IfStatement node,
             Boolean thenBool, Boolean elseBool, Expression thenExpr, Expression elseExpr) {
         if (thenBool == null && elseBool != null) {
-            final InfixExpression ie = b.infixExpr(
-                    b.parenthesize(b.copy(node.getExpression())),
+            final Expression leftOp = negateIfNeeded(
+                    b.parenthesize(b.copy(node.getExpression())), elseBool.booleanValue());
+            return b.return0(b.infixExpr(
+                    leftOp,
                     getConditionalOperator(elseBool.booleanValue()),
-                    b.parenthesize(b.copy(thenExpr)));
-            return b.return0(negateIfNeeded(ie, elseBool.booleanValue()));
+                    b.parenthesize(b.copy(thenExpr))));
         } else if (thenBool != null && elseBool == null) {
             final Expression leftOp = negateIfNeeded(
                     b.parenthesize(b.copy(node.getExpression())), !thenBool.booleanValue());

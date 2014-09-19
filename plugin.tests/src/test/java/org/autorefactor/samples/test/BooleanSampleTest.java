@@ -37,25 +37,15 @@ import org.junit.runners.Parameterized.Parameters;
 
 import static org.junit.Assert.*;
 
+@SuppressWarnings("javadoc")
 @RunWith(value = Parameterized.class)
 public class BooleanSampleTest {
 
+    private boolean samplesReturn;
     private boolean sampleInResult;
-    private org.autorefactor.samples_in.BooleanSample sampleIn =
-            new org.autorefactor.samples_in.BooleanSample() {
-                @Override
-                protected void aMethodThatAcceptsABoolean(boolean b) {
-                    sampleInResult = b;
-                }
-            };
+    private org.autorefactor.samples_in.BooleanSample sampleIn;
     private boolean sampleOutResult;
-    private org.autorefactor.samples_out.BooleanSample sampleOut =
-            new org.autorefactor.samples_out.BooleanSample() {
-                @Override
-                protected void aMethodThatAcceptsABoolean(boolean b) {
-                    sampleOutResult = b;
-                };
-            };
+    private org.autorefactor.samples_out.BooleanSample sampleOut;
     private final String methodName;
     private final Object arg;
 
@@ -66,8 +56,26 @@ public class BooleanSampleTest {
 
     @Before
     public void setUp() {
-        sampleIn = new org.autorefactor.samples_in.BooleanSample();
-        sampleOut = new org.autorefactor.samples_out.BooleanSample();
+        sampleIn = new org.autorefactor.samples_in.BooleanSample() {
+            @Override
+            protected void aMethodThatAcceptsABoolean(boolean b) {
+                sampleInResult = b;
+            }
+            @Override
+            protected boolean aMethodThatReturnsBoolean() {
+                return samplesReturn;
+            }
+        };
+        sampleOut = new org.autorefactor.samples_out.BooleanSample() {
+            @Override
+            protected void aMethodThatAcceptsABoolean(boolean b) {
+                sampleOutResult = b;
+            }
+            @Override
+            protected boolean aMethodThatReturnsBoolean() {
+                return samplesReturn;
+            }
+        };
     }
 
     @Parameters(name = "{0}Refactoring")
@@ -126,6 +134,12 @@ public class BooleanSampleTest {
 
     @Test
     public void assertInvokeEquals() throws Exception {
+        assertInvokeEquals(true);
+        assertInvokeEquals(false);
+    }
+
+    private void assertInvokeEquals(boolean sampleReturn) throws Exception {
+        samplesReturn = sampleReturn;
         final Boolean resIn = invoke(sampleIn, methodName, arg);
         final Boolean resOut = invoke(sampleOut, methodName, arg);
         assertEquals(resIn, resOut);
