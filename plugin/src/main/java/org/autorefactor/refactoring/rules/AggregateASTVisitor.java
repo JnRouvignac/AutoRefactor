@@ -35,14 +35,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.autorefactor.AutoRefactorPlugin;
 import org.autorefactor.refactoring.IJavaRefactoring;
 import org.autorefactor.refactoring.IRefactoring;
 import org.autorefactor.refactoring.Refactorings;
 import org.autorefactor.util.NotImplementedException;
-import org.eclipse.core.runtime.ILog;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.AnnotationTypeDeclaration;
@@ -284,8 +280,7 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
     private void logBadlyBehavedVisitor(ASTVisitor v, ASTNode node) {
         String message = "Visitor " + v.getClass().getName() + " is badly behaved for file " + getFileName(node) + ":"
             + " it reported doing a refactoring, but it did not actually contribute any refactoring.";
-        final ILog log = AutoRefactorPlugin.getDefault().getLog();
-        log.log(new Status(IStatus.ERROR, PLUGIN_ID, message));
+        logError(message);
         if (debugModeOn) {
             throw new RuntimeException(message);
         }
@@ -294,8 +289,7 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
     private void logFaultyVisitor(ASTVisitor v, ASTNode node, Exception e) {
         String message = "Visitor " + v.getClass().getName() + " is faulty for file " + getFileName(node)
                 + ", it will be disabled for the rest of this run.";
-        final ILog log = AutoRefactorPlugin.getDefault().getLog();
-        log.log(new Status(IStatus.ERROR, PLUGIN_ID, message, e));
+        logError(message, e);
         if (debugModeOn) {
             if (e instanceof RuntimeException) {
                 throw (RuntimeException) e;

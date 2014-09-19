@@ -28,6 +28,9 @@ package org.autorefactor;
 import java.util.Vector;
 
 import org.autorefactor.ui.preferences.PreferenceHelper;
+import org.eclipse.core.runtime.ILog;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
@@ -61,6 +64,39 @@ public class AutoRefactorPlugin extends AbstractUIPlugin {
         }
         jobs.clear();
         super.stop(context);
+    }
+
+    private static void log(int severity, String message, Exception e) {
+        final ILog log = getDefault().getLog();
+        log.log(new Status(severity, PLUGIN_ID, message, e));
+    }
+
+    /**
+     * Logs a warning into Eclipse workspace logs.
+     *
+     * @param message the message to log
+     */
+    public static void logWarning(String message) {
+        log(IStatus.WARNING, message, null);
+    }
+
+    /**
+     * Logs an error into Eclipse workspace logs.
+     *
+     * @param message the message to log
+     */
+    public static void logError(String message) {
+        log(IStatus.ERROR, message, null);
+    }
+
+    /**
+     * Logs an error with an exception into Eclipse workspace logs.
+     *
+     * @param message the message to log
+     * @param e the exception to log
+     */
+    public static void logError(String message, Exception e) {
+        log(IStatus.ERROR, message, e);
     }
 
     /**

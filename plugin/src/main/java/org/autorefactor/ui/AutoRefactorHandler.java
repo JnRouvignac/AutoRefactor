@@ -47,6 +47,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.handlers.HandlerUtil;
 
+import static org.autorefactor.AutoRefactorPlugin.*;
 import static org.eclipse.jface.dialogs.MessageDialog.*;
 
 /**
@@ -119,8 +120,10 @@ public class AutoRefactorHandler extends AbstractHandler {
                 }
             }
             return results;
+        } else {
+            logWarning("Code is not implemented for activePartId '" + activePartId + "'.");
         }
-        return null;
+        return Collections.emptyList();
     }
 
 }
