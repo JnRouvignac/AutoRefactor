@@ -326,17 +326,17 @@ public class BooleanRefactoring extends AbstractRefactoring {
             Boolean thenBool, Boolean elseBool, Expression thenExpr, Expression elseExpr) {
         if (thenBool == null && elseBool != null) {
             final InfixExpression ie = b.infixExpr(
-                    b.copy(node.getExpression()),
+                    b.parenthesize(b.copy(node.getExpression())),
                     getConditionalOperator(elseBool.booleanValue()),
-                    b.copy(thenExpr));
+                    b.parenthesize(b.copy(thenExpr)));
             return b.return0(negateIfNeeded(ie, elseBool.booleanValue()));
         } else if (thenBool != null && elseBool == null) {
             final Expression leftOp = negateIfNeeded(
-                    b.copy(node.getExpression()), !thenBool.booleanValue());
+                    b.parenthesize(b.copy(node.getExpression())), !thenBool.booleanValue());
             return b.return0(b.infixExpr(
                     leftOp,
                     getConditionalOperator(thenBool.booleanValue()),
-                    b.copy(elseExpr)));
+                    b.parenthesize(b.copy(elseExpr))));
         }
         return null;
     }

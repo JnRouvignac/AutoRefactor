@@ -31,8 +31,8 @@ public class DoNotVisitNodesThatAreBeingChangedSample {
     public Integer i;
 
     public boolean isEqualTo(DoNotVisitNodesThatAreBeingChangedSample other) {
-        return (other != null && this == other) || (b.equals(other.b)
-            && i.equals(other.i));
+        return other != null && (this == other || (b.equals(other.b)
+            && i.equals(other.i)));
     }
 
 }

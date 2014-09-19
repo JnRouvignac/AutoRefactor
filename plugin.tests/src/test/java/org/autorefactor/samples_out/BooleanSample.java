@@ -184,19 +184,19 @@ public class BooleanSample {
     // TODO redo the next 4 with Boolean object
 
     public boolean removeUselessIfInBooleanPrimitiveAssignment7(boolean bo) {
-        return bo && aMethodThatReturnsBoolean();
+        return (bo) && (aMethodThatReturnsBoolean());
     }
 
     public boolean removeUselessIfInBooleanPrimitiveAssignment8(boolean bo) {
-        return !(bo || aMethodThatReturnsBoolean());
+        return !((bo) || (aMethodThatReturnsBoolean()));
     }
 
     public boolean removeUselessIfInBooleanPrimitiveAssignment9(boolean bo) {
-        return !bo && aMethodThatReturnsBoolean();
+        return !(bo) && (aMethodThatReturnsBoolean());
     }
 
     public boolean removeUselessIfInBooleanPrimitiveAssignment10(boolean bo) {
-        return bo || aMethodThatReturnsBoolean();
+        return (bo) || (aMethodThatReturnsBoolean());
     }
 
     // TODO aMethodThatAcceptsABoolean(bo ? true : false);
