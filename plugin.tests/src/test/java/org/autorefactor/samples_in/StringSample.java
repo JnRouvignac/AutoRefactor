@@ -50,6 +50,31 @@ public class StringSample {
         return Boolean.TRUE.toString() + Boolean.FALSE.toString();
     }
 
+    public void removeUselessToString() {
+        byte b = 42;
+        short s = 42;
+        String s1 = Boolean.toString(true) + " foo";
+        String s2 = Character.toString('c') + " foo";
+        String s3 = Byte.toString(b) + " foo";
+        String s4 = Short.toString(s) + " foo";
+        String s5 = Integer.toString(42) + " foo";
+        String s6 = Long.toString(42l) + " foo";
+        String s7 = Float.toString(42.42f) + " foo";
+        String s8 = Double.toString(42.42) + " foo";
+
+        String s11 = String.valueOf(true) + " foo";
+        String s12 = String.valueOf('c') + " foo";
+        String s13 = String.valueOf(b) + " foo";
+        String s14 = String.valueOf(s) + " foo";
+        String s15 = String.valueOf(42) + " foo";
+        String s16 = String.valueOf(42l) + " foo";
+        String s17 = String.valueOf(42.42f) + " foo";
+        String s18 = String.valueOf(42.42) + " foo";
+    }
+
+    // TODO JNR which operand must be removed here?
+    // String s = "" + Integer.toString(42);
+
     private static String getS() {
         return null;
     }

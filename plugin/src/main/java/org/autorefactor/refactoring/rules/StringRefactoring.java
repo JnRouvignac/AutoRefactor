@@ -25,6 +25,8 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import java.util.List;
+
 import org.autorefactor.refactoring.ASTBuilder;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
@@ -68,7 +70,7 @@ public class StringRefactoring extends AbstractRefactoring {
         final Expression expression = node.getExpression();
         final ASTNode parent = node.getParent();
         final ASTBuilder b = this.ctx.getASTBuilder();
-        if (isToStringInvocation(node)) {
+        if (isMethod(node, "java.lang.Object", "toString")) {
             if (hasType(expression, "java.lang.String")) {
                 // if node is already a String, no need to call toString()
                 this.ctx.getRefactorings().replace(node, b.move(expression));
@@ -80,13 +82,28 @@ public class StringRefactoring extends AbstractRefactoring {
                 final Expression ro = ie.getRightOperand();
                 final MethodInvocation lmi = as(lo, MethodInvocation.class);
                 final MethodInvocation rmi = as(ro, MethodInvocation.class);
-                final boolean leftIsToString = isToStringInvocation(lmi);
-                final boolean rightIsToString = isToStringInvocation(rmi);
-                if (hasType(lo, "java.lang.String") && rightIsToString) {
+                if (hasType(lo, "java.lang.String")
+                        && isMethod(rmi, "java.lang.Object", "toString")) {
                     this.ctx.getRefactorings().replace(rmi, b.move(rmi.getExpression()));
                     return VISIT_SUBTREE;
-                } else if (hasType(ro, "java.lang.String") && leftIsToString) {
+                } else if (hasType(ro, "java.lang.String") && node.equals(lmi)) {
                     this.ctx.getRefactorings().replace(lmi, b.move(lmi.getExpression()));
+                    return DO_NOT_VISIT_SUBTREE;
+                }
+            }
+        } else if (isToStringForPrimitive(node) || isStringValueOfForPrimitive(node)) {
+            if (parent.getNodeType() == INFIX_EXPRESSION) {
+                // if node is in a String context, no need to call toString()
+                final InfixExpression ie = (InfixExpression) node.getParent();
+                final Expression lo = ie.getLeftOperand();
+                final Expression ro = ie.getRightOperand();
+                final MethodInvocation lmi = as(lo, MethodInvocation.class);
+                final MethodInvocation rmi = as(ro, MethodInvocation.class);
+                if (hasType(lo, "java.lang.String") && node.equals(rmi)) {
+                    this.ctx.getRefactorings().replace(rmi, b.move(arg0(rmi)));
+                    return VISIT_SUBTREE;
+                } else if (hasType(ro, "java.lang.String") && node.equals(lmi)) {
+                    this.ctx.getRefactorings().replace(lmi, b.move(arg0(lmi)));
                     return DO_NOT_VISIT_SUBTREE;
                 }
             }
@@ -94,9 +111,35 @@ public class StringRefactoring extends AbstractRefactoring {
         return VISIT_SUBTREE;
     }
 
-    private boolean isToStringInvocation(MethodInvocation node) {
-        return node != null
-                && "toString".equals(node.getName().getIdentifier())
-                && arguments(node).isEmpty();
+    private boolean isToStringForPrimitive(MethodInvocation node) {
+        return "toString".equals(node.getName().getIdentifier()) // fast-path
+                && (isMethod(node, "java.lang.Boolean", "toString", "boolean")
+                      || isMethod(node, "java.lang.Character", "toString", "char")
+                      || isMethod(node, "java.lang.Byte", "toString", "byte")
+                      || isMethod(node, "java.lang.Short", "toString", "short")
+                      || isMethod(node, "java.lang.Integer", "toString", "int")
+                      || isMethod(node, "java.lang.Long", "toString", "long")
+                      || isMethod(node, "java.lang.Float", "toString", "float")
+                      || isMethod(node, "java.lang.Double", "toString", "double"));
+    }
+
+    private boolean isStringValueOfForPrimitive(MethodInvocation node) {
+        return hasType(node.getExpression(), "java.lang.String") // fast-path
+                && (isMethod(node, "java.lang.String", "valueOf", "boolean")
+                      || isMethod(node, "java.lang.String", "valueOf", "char")
+                      || isMethod(node, "java.lang.String", "valueOf", "byte")
+                      || isMethod(node, "java.lang.String", "valueOf", "short")
+                      || isMethod(node, "java.lang.String", "valueOf", "int")
+                      || isMethod(node, "java.lang.String", "valueOf", "long")
+                      || isMethod(node, "java.lang.String", "valueOf", "float")
+                      || isMethod(node, "java.lang.String", "valueOf", "double"));
+    }
+
+    private Expression arg0(final MethodInvocation mi) {
+        final List<Expression> args = arguments(mi);
+        if (args.isEmpty()) {
+            throw new IllegalArgumentException();
+        }
+        return args.get(0);
     }
 }
