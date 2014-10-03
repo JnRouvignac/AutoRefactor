@@ -53,18 +53,16 @@ public class RemoveUselessNullCheckRefactoring extends AbstractRefactoring {
     @Override
     public boolean visit(IfStatement node) {
         final InfixExpression condition = as(node.getExpression(), InfixExpression.class);
-        final List<Statement> thenStmts = asList(node.getThenStatement());
-        final List<Statement> elseStmts = asList(node.getElseStatement());
+        final Statement thenStmt = getThenStatement(node);
+        final Statement elseStmt = getElseStatement(node, thenStmt);
         if (condition != null
                 && !condition.hasExtendedOperands()
-                && thenStmts.size() == 1
-                && elseStmts.size() == 1) {
-            final Assignment thenAs = asExpression(thenStmts.get(0), Assignment.class);
-            final Assignment elseAs = asExpression(elseStmts.get(0), Assignment.class);
-            if (thenAs != null
-                    && elseAs != null
-                    && ASSIGN.equals(thenAs.getOperator())
-                    && ASSIGN.equals(elseAs.getOperator())
+                && thenStmt != null
+                && elseStmt != null) {
+            final Assignment thenAs = asExpression(thenStmt, Assignment.class);
+            final Assignment elseAs = asExpression(elseStmt, Assignment.class);
+            if (isAssign(thenAs)
+                    && isAssign(elseAs)
                     && match(matcher, thenAs.getLeftHandSide(), elseAs.getLeftHandSide())) {
                 if (InfixExpression.Operator.EQUALS.equals(condition.getOperator())
                         && isNullLiteral(thenAs.getRightHandSide())) {
@@ -74,18 +72,42 @@ public class RemoveUselessNullCheckRefactoring extends AbstractRefactoring {
                     return replaceWithStraightAssign(node, condition, thenAs);
                 }
             } else {
-                final ReturnStatement thenRS = as(thenStmts.get(0), ReturnStatement.class);
-                final ReturnStatement elseRS = as(elseStmts.get(0), ReturnStatement.class);
+                final ReturnStatement thenRS = as(thenStmt, ReturnStatement.class);
+                final ReturnStatement elseRS = as(elseStmt, ReturnStatement.class);
                 if (thenRS != null && elseRS != null) {
                     if (InfixExpression.Operator.EQUALS.equals(condition.getOperator())) {
-                        return replaceWithStraightReturn(node, condition, elseRS, thenRS);
+                        return replaceWithStraightReturn(node, condition, elseRS, thenRS, elseRS);
                     } else if (InfixExpression.Operator.NOT_EQUALS.equals(condition.getOperator())) {
-                        return replaceWithStraightReturn(node, condition, thenRS, elseRS);
+                        return replaceWithStraightReturn(node, condition, thenRS, elseRS, elseRS);
                     }
                 }
             }
         }
         return VISIT_SUBTREE;
+    }
+
+    private Statement getThenStatement(IfStatement node) {
+        final List<Statement> thenStmts = asList(node.getThenStatement());
+        if (thenStmts.size() == 1) {
+            return thenStmts.get(0);
+        }
+        return null;
+    }
+
+    private Statement getElseStatement(IfStatement node, Statement thenStmt) {
+        final List<Statement> elseStmts = asList(node.getElseStatement());
+        if (elseStmts.size() == 1) {
+            return elseStmts.get(0);
+        }
+        final ReturnStatement thenRS = as(thenStmt, ReturnStatement.class);
+        if (thenRS != null) {
+            return getNextSibling(node);
+        }
+        return null;
+    }
+
+    private boolean isAssign(final Assignment as) {
+        return as != null && ASSIGN.equals(as.getOperator());
     }
 
     private boolean replaceWithStraightAssign(IfStatement node, InfixExpression condition, Assignment as) {
@@ -111,13 +133,15 @@ public class RemoveUselessNullCheckRefactoring extends AbstractRefactoring {
     }
 
     private boolean replaceWithStraightReturn(IfStatement node, InfixExpression condition,
-            ReturnStatement rs, ReturnStatement otherRs) {
+            ReturnStatement rs, ReturnStatement otherRs, Statement toRemove) {
         if (isNullLiteral(otherRs.getExpression())) {
             if (isNullLiteral(condition.getRightOperand())
                     && match(matcher, condition.getLeftOperand(), rs.getExpression())) {
+                this.ctx.getRefactorings().remove(toRemove);
                 return replaceWithStraightReturn(node, condition.getLeftOperand());
             } else if (isNullLiteral(condition.getLeftOperand())
                     && match(matcher, condition.getRightOperand(), rs.getExpression())) {
+                this.ctx.getRefactorings().remove(toRemove);
                 return replaceWithStraightReturn(node, condition.getRightOperand());
             }
         }

@@ -1,5 +1,8 @@
 package org.autorefactor.samples_out;
 
+import java.util.Collection;
+import java.util.Collections;
+
 public class RemoveUselessNullCheckSample {
 
     private final String DEFAULT = "";
@@ -71,11 +74,19 @@ public class RemoveUselessNullCheckSample {
         this.s = s;
     }
 
-    public String doNotRefactorReturn(String s) throws Exception {
+    public String doNotRefactorReturn1(String s) throws Exception {
         if (null != s) {
             return s;
         } else {
             return DEFAULT;
+        }
+    }
+
+    public Collection<?> doNotRefactorReturn2(Collection<?> c) throws Exception {
+        if (c == null) {
+            return Collections.emptySet();
+        } else {
+            return c;
         }
     }
 
@@ -92,6 +103,22 @@ public class RemoveUselessNullCheckSample {
     }
 
     public String refactorReturn4(String s) throws Exception {
+        return s;
+    }
+
+    public String refactorReturnNoElse1(String s) throws Exception {
+        return s;
+    }
+
+    public String refactorReturnNoElse2(String s) throws Exception {
+        return s;
+    }
+
+    public String refactorReturnNoElse3(String s) throws Exception {
+        return s;
+    }
+
+    public String refactorReturnNoElse4(String s) throws Exception {
         return s;
     }
 
