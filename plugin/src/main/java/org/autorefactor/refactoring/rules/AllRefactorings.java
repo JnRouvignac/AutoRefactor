@@ -71,6 +71,7 @@ public final class AllRefactorings {
         final PreferenceHelper prefs = AutoRefactorPlugin.getPreferenceHelper();
         return new ArrayList<IRefactoring>(Arrays.<IRefactoring> asList(
                 new RemoveUselessNullCheckRefactoring(),
+                new WorkWithNullCheckedExpressionFirstRefactoring(),
                 new VectorOldToNewAPIRefactoring(),
                 new PrimitiveWrapperCreationRefactoring(),
                 new BooleanRefactoring(),
