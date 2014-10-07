@@ -29,6 +29,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import org.autorefactor.util.IllegalArgumentException;
 import org.autorefactor.util.NotImplementedException;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
@@ -141,7 +142,7 @@ public class ASTBuilder {
         if (names.length == 1) {
             return ast.newSimpleType(ast.newSimpleName(names[0]));
         } else {
-            throw new NotImplementedException();
+            throw new NotImplementedException(null);
         }
     }
 
@@ -197,7 +198,8 @@ public class ASTBuilder {
             return null;
         }
         if (!isValidForRangeCopy(nodes)) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException(nodes.get(0),
+                    "The provided nodes are not valid for doing a range copy: " + nodes);
         }
         return refactorings.createCopyTarget(nodes.get(0), nodes.get(nodes.size() - 1));
     }
@@ -398,7 +400,7 @@ public class ASTBuilder {
      */
     public Name name(String... names) {
         if (names.length == 0) {
-            throw new IllegalArgumentException("Expected at least one name, but was given 0 names");
+            throw new IllegalArgumentException(null, "Expected at least one name, but was given 0 names");
         }
         if (names.length == 1) {
             return simpleName(names[0]);

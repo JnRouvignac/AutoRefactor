@@ -177,7 +177,7 @@ public class ChooseRefactoringWizardPage extends WizardPage {
                     m.setAccessible(true);
                     return (Object[]) m.invoke(viewer, (Object) ((List<?>) input).toArray());
                 } catch (Exception e) {
-                    throw new UnhandledException(e);
+                    throw new UnhandledException(null, e);
                 }
             }
         });

@@ -39,6 +39,7 @@ import org.autorefactor.refactoring.Refactorings;
 import org.autorefactor.refactoring.Release;
 import org.autorefactor.refactoring.rules.AggregateASTVisitor;
 import org.autorefactor.refactoring.rules.RefactoringContext;
+import org.autorefactor.util.IllegalStateException;
 import org.autorefactor.util.NotImplementedException;
 import org.autorefactor.util.UnhandledException;
 import org.eclipse.core.filebuffers.FileBuffers;
@@ -148,7 +149,7 @@ public class ApplyRefactoringsJob extends Job {
         try {
             return Integer.valueOf(tabSize);
         } catch (NumberFormatException e) {
-            throw new UnhandledException(e);
+            throw new UnhandledException(null, e);
         }
     }
 
@@ -158,7 +159,7 @@ public class ApplyRefactoringsJob extends Job {
             addAll(results, javaElements);
             return results;
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new UnhandledException(null, e);
         }
     }
 
@@ -210,7 +211,7 @@ public class ApplyRefactoringsJob extends Job {
         } else if (javaElement instanceof IJavaProject) {
             return (IJavaProject) javaElement;
         }
-        throw new NotImplementedException(javaElement);
+        throw new NotImplementedException(null, javaElement);
     }
 
     private void applyRefactoring(ICompilationUnit compilationUnit, Release javaSERelease, int tabSize,
@@ -266,7 +267,7 @@ public class ApplyRefactoringsJob extends Job {
             if (totalNbLoops > 1000) {
                 // Oops! Something went wrong.
                 final String message = getPossibleCulprits(nbLoopsWithSameVisitors, lastLoopVisitors);
-                throw new IllegalStateException("An infinite loop has been detected for file "
+                throw new IllegalStateException(astRoot, "An infinite loop has been detected for file "
                         + getFileName(astRoot) + "."
                         + " A possible cause is that code is being incorrectly"
                         + " refactored one way then refactored back to what it was."

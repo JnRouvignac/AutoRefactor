@@ -31,6 +31,8 @@ import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.autorefactor.util.IllegalStateException;
+
 /**
  * Collects code paths into the CFG.
  */
@@ -73,7 +75,7 @@ public class CodePathCollector {
                 }
             }
             if (!foundAtLeastOneEdge) {
-                throw new IllegalStateException(
+                throw new IllegalStateException(block.getNode(),
                         "Path should have ended with an exit block: " + stack);
             }
         } finally {

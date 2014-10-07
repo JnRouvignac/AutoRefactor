@@ -25,6 +25,7 @@
  */
 package org.autorefactor.cfg;
 
+import org.autorefactor.util.IllegalStateException;
 import org.eclipse.jdt.core.dom.Expression;
 
 import static org.autorefactor.util.Utils.*;
@@ -37,7 +38,7 @@ public class CFGEdgeBuilder {
     private Expression condition;
     /** TODO JNR rename. */
     private boolean evaluationResult;
-    private CFGBasicBlock sourceBlock;
+    private final CFGBasicBlock sourceBlock;
     private CFGBasicBlock targetBlock;
     /** Marks a "jumping" edge: and edge built because of an exception escaping a try statement. */
     private boolean jumping;
@@ -127,14 +128,13 @@ public class CFGEdgeBuilder {
      */
     public CFGEdge build() {
         if (sourceBlock == null) {
-            throw new IllegalStateException("sourceBlock is mandatory");
+            throw new IllegalStateException(this.condition, "sourceBlock is mandatory");
         }
         if (targetBlock == null) {
-            throw new IllegalStateException("targetBlock is mandatory");
+            throw new IllegalStateException(this.condition, "targetBlock is mandatory");
         }
         if (built != null) {
-            throw new IllegalStateException("CFGEdgeBuilder " + this
-                    + " has already been built");
+            throw new IllegalStateException(this.condition, "CFGEdgeBuilder " + this + " has already been built");
         }
         if (condition != null) {
             built = buildEdge(condition, evaluationResult, sourceBlock, targetBlock);

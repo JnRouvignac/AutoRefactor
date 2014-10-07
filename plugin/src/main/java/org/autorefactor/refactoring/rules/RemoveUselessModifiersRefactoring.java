@@ -70,10 +70,10 @@ public class RemoveUselessModifiersRefactoring extends AbstractRefactoring {
             final int i1 = ORDERED_MODIFIERS.indexOf(o1.getKeyword());
             final int i2 = ORDERED_MODIFIERS.indexOf(o2.getKeyword());
             if (i1 == -1) {
-                throw new NotImplementedException("cannot determine order for modifier " + o1);
+                throw new NotImplementedException(o1, "cannot determine order for modifier " + o1);
             }
             if (i2 == -1) {
-                throw new NotImplementedException("cannot compare modifier " + o2);
+                throw new NotImplementedException(o2, "cannot compare modifier " + o2);
             }
             return i1 - i2;
         }

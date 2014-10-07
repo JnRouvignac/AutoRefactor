@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2013 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2013-2014 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -45,8 +45,8 @@ public class SourceCode {
      */
     public static class Line extends SourceLocation {
 
-        private String lineText;
-        private SourceCode sourceCode;
+        private final String lineText;
+        private final SourceCode sourceCode;
 
         /**
          * Builds an instance of this class.
@@ -81,10 +81,10 @@ public class SourceCode {
 
     }
 
-    private CompilationUnit astRoot;
-    private String text;
-    private ICompilationUnit compilationUnit;
-    private List<Line> lines = new ArrayList<Line>();
+    private final CompilationUnit astRoot;
+    private final String text;
+    private final ICompilationUnit compilationUnit;
+    private final List<Line> lines = new ArrayList<Line>();
 
     /**
      * Builds an instance of this class.
@@ -114,7 +114,7 @@ public class SourceCode {
                 fromIndex += offset + length;
             }
         } catch (JavaModelException e) {
-            throw new UnhandledException(e);
+            throw new UnhandledException(astRoot, e);
         }
     }
 

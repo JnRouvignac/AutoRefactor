@@ -33,6 +33,8 @@ import java.util.Map.Entry;
 
 import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.Refactorings;
+import org.autorefactor.util.IllegalArgumentException;
+import org.autorefactor.util.IllegalStateException;
 import org.autorefactor.util.NotImplementedException;
 import org.autorefactor.util.Pair;
 import org.eclipse.jdt.core.dom.AST;
@@ -96,8 +98,7 @@ public class ReduceVariableScopeRefactoring extends AbstractRefactoring {
                 final VariableName other = (VariableName) obj;
                 if (this.name instanceof SimpleName
                         && other.name instanceof SimpleName) {
-                    return isEqual((SimpleName) this.name,
-                            (SimpleName) other.name);
+                    return isEqual((SimpleName) this.name, (SimpleName) other.name);
                 }
                 // if (this.name instanceof QualifiedName
                 // && other.name instanceof QualifiedName) {
@@ -105,7 +106,7 @@ public class ReduceVariableScopeRefactoring extends AbstractRefactoring {
                 // }
             }
             // return false;
-            throw new IllegalStateException();
+            throw new NotImplementedException(name, name);
         }
 
         @Override
@@ -116,7 +117,7 @@ public class ReduceVariableScopeRefactoring extends AbstractRefactoring {
             // if (this.name instanceof QualifiedName) {
             // throw new IllegalStateException();
             // }
-            throw new IllegalStateException();
+            throw new NotImplementedException(name, name);
         }
 
         @Override
@@ -133,8 +134,7 @@ public class ReduceVariableScopeRefactoring extends AbstractRefactoring {
 
         public VariableAccess(Name variableName, int accessType, ASTNode scope) {
             if (accessType == 0) {
-                throw new IllegalArgumentException(
-                        "accessType must not be null");
+                throw new IllegalArgumentException(null, "accessType must not be null");
             }
             this.variableName = variableName;
             this.accessType = accessType;
@@ -329,7 +329,7 @@ public class ReduceVariableScopeRefactoring extends AbstractRefactoring {
                 // newFs.setBody(copy(fs.getBody()));
                 // }
             } else {
-                throw new NotImplementedException("for more than one initializer in for loop.");
+                throw new NotImplementedException(scope, "for more than one initializer in for loop.");
             }
         } else if (scope instanceof WhileStatement) {
             final WhileStatement ws = (WhileStatement) scope;
@@ -358,7 +358,7 @@ public class ReduceVariableScopeRefactoring extends AbstractRefactoring {
                 newIs.setElseStatement(copy(is.getElseStatement(), varName));
                 this.ctx.getRefactorings().replace(is, newIs);
             } else {
-                throw new IllegalStateException(
+                throw new IllegalStateException(is,
                         "Parent statement should be inside the then or else statement of this if statement: " + is);
             }
         } else {

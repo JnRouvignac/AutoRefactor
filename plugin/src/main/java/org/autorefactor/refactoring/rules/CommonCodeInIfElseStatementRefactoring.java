@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2013 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2013-2014 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,6 +31,7 @@ import java.util.List;
 
 import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.ASTHelper;
+import org.autorefactor.util.IllegalStateException;
 import org.autorefactor.util.NotImplementedException;
 import org.eclipse.jdt.core.dom.ASTMatcher;
 import org.eclipse.jdt.core.dom.ASTNode;
@@ -161,7 +162,7 @@ public class CommonCodeInIfElseStatementRefactoring extends AbstractRefactoring 
             final Block b = (Block) parent;
             return findNodeToRemove(b, b.getParent());
         }
-        throw new NotImplementedException("for parent of type " + parent.getClass());
+        throw new NotImplementedException(parent, "for parent of type " + parent.getClass());
     }
 
     private boolean allEmpty(List<Boolean> areCasesEmpty) {
@@ -246,15 +247,14 @@ public class CommonCodeInIfElseStatementRefactoring extends AbstractRefactoring 
 
     private int minSize(List<List<Statement>> allCasesStmts) {
         if (allCasesStmts.size() == 0) {
-            throw new IllegalStateException(
-                    "allCasesStmts List must not be empty");
+            throw new IllegalStateException(null, "allCasesStmts List must not be empty");
         }
         int min = Integer.MAX_VALUE;
         for (List<Statement> stmts : allCasesStmts) {
             min = Math.min(min, stmts.size());
         }
         if (min == Integer.MAX_VALUE) {
-            throw new IllegalStateException(
+            throw new IllegalStateException(null,
                     "The minimum size should never have been equal to Integer.MAX_VALUE");
         }
         return min;

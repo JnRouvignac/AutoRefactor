@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.autorefactor.util.IllegalStateException;
 import org.autorefactor.util.NotImplementedException;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTMatcher;
@@ -588,7 +589,7 @@ public final class ASTHelper {
         } else if ("Boolean.FALSE".equals(fqn)) {
             return false;
         }
-        throw new NotImplementedException("for fully qualified name \"" + fqn + "\"");
+        throw new NotImplementedException(qualifiedName, "for fully qualified name \"" + fqn + "\"");
     }
 
     /**
@@ -625,7 +626,7 @@ public final class ASTHelper {
         } else if (typeBinding.isClass() || typeBinding.isInterface()) {
             final String[] qualifiedName = typeBinding.getQualifiedName().split("\\.");
             if (qualifiedName.length == 0) {
-                throw new IllegalStateException(
+                throw new IllegalStateException(null,
                         "Cannot create a new type from an ITypeBinding without qualified name: " + typeBinding);
             }
             final SimpleType simpleType = ast.newSimpleType(ast.newSimpleName(qualifiedName[0]));
@@ -638,7 +639,7 @@ public final class ASTHelper {
             }
             return result;
         }
-        throw new NotImplementedException("Unknown type for typeBinding " + typeBinding.getQualifiedName()
+        throw new NotImplementedException(null, "Unknown type for typeBinding " + typeBinding.getQualifiedName()
                 + ", isAnnotation()=" + typeBinding.isAnnotation()
                 + ", isAnonymous()=" + typeBinding.isAnonymous()
                 + ", isCapture()=" + typeBinding.isCapture()
@@ -663,8 +664,8 @@ public final class ASTHelper {
     @SuppressWarnings("unchecked")
     public static <T extends ASTNode> T getAncestor(ASTNode node, Class<T> ancestorClazz) {
         if (node == null || node.getParent() == null) {
-            throw new IllegalStateException("Could not find any ancestor for "
-                    + ancestorClazz + "and node " + node);
+            throw new IllegalStateException(node,
+                    "Could not find any ancestor for " + ancestorClazz + "and node " + node);
         }
         final ASTNode parent = node.getParent();
         if (ancestorClazz.isAssignableFrom(parent.getClass())) {

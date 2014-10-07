@@ -30,6 +30,7 @@ import java.util.List;
 import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.Refactorings;
 import org.autorefactor.refactoring.Release;
+import org.autorefactor.util.IllegalArgumentException;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 
@@ -101,11 +102,12 @@ public class VectorOldToNewAPIRefactoring extends AbstractRefactoring {
 
     private void assertSize(final List<Expression> args, int expectedSize) {
         if (args == null) {
-            throw new IllegalArgumentException("Expected " + args
-                    + "to not be null");
+            throw new IllegalArgumentException(null, "Expected " + args + "to not be null");
         }
         if (args.size() != expectedSize) {
-            throw new IllegalArgumentException("Expected " + args
+            final Expression node = !args.isEmpty() ? args.get(0) : null;
+            throw new IllegalArgumentException(node,
+                    "Expected " + args
                     + " to have size <" + expectedSize + ">, but found <"
                     + args.size() + ">");
         }

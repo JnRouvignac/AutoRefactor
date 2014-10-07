@@ -28,6 +28,7 @@ package org.autorefactor.refactoring.rules;
 import java.util.List;
 
 import org.autorefactor.refactoring.ASTBuilder;
+import org.autorefactor.util.IllegalArgumentException;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.Expression;
@@ -138,7 +139,7 @@ public class StringRefactoring extends AbstractRefactoring {
     private Expression arg0(final MethodInvocation mi) {
         final List<Expression> args = arguments(mi);
         if (args.isEmpty()) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException(mi, "The arguments must not be empty for method " + mi);
         }
         return args.get(0);
     }

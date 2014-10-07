@@ -32,6 +32,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.autorefactor.refactoring.ASTBuilder;
+import org.autorefactor.util.IllegalArgumentException;
+import org.autorefactor.util.IllegalStateException;
 import org.autorefactor.util.NotImplementedException;
 import org.eclipse.jdt.core.dom.ASTMatcher;
 import org.eclipse.jdt.core.dom.ASTNode;
@@ -167,7 +169,7 @@ public class BooleanRefactoring extends AbstractRefactoring {
 
         private void replaceInParent(ASTNode nodeToReplace, ASTNode replacementNode) {
             if (nodeToReplace.getParent() == null) {
-                throw new IllegalArgumentException();
+                throw new IllegalArgumentException(nodeToReplace, "The node to replace does not have a parent");
             }
             final StructuralPropertyDescriptor locationInParent = nodeToReplace.getLocationInParent();
             if (locationInParent instanceof ChildPropertyDescriptor) {
@@ -179,7 +181,7 @@ public class BooleanRefactoring extends AbstractRefactoring {
                 final List<ASTNode> property = (List<ASTNode>) nodeToReplace.getParent().getStructuralProperty(clpd);
                 property.set(property.indexOf(nodeToReplace), replacementNode);
             } else {
-                throw new NotImplementedException(locationInParent);
+                throw new NotImplementedException(nodeToReplace, locationInParent);
             }
         }
     }
@@ -399,7 +401,7 @@ public class BooleanRefactoring extends AbstractRefactoring {
         }
         // TODO JNR rejuggle exception messages like this:
         // compilationUnit.java:line number: error message
-        throw new IllegalStateException(
+        throw new IllegalStateException(md,
                 "Did not expect any other return type than boolean or java.lang.Boolean for method "
                         + md.getName().getIdentifier() + ", but found " + qualifiedName);
     }

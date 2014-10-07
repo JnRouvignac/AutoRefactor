@@ -42,6 +42,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.autorefactor.refactoring.ASTHelper;
+import org.autorefactor.util.IllegalStateException;
 import org.autorefactor.util.NotImplementedException;
 import org.autorefactor.util.UnhandledException;
 import org.eclipse.jdt.core.dom.ASTNode;
@@ -221,8 +222,8 @@ public class CFGBuilder {
 
     private static final Pattern NEWLINE = Pattern.compile("\r\n|\r|\n");
 
-    private String source;
-    private int tabSize;
+    private final String source;
+    private final int tabSize;
     /**
      * Edges to be built after visiting the statement used as the key.
      * <p>
@@ -438,7 +439,7 @@ public class CFGBuilder {
             m1.setAccessible(true);
             return (ITypeBinding) m1.invoke(bindingResolver, internalTypeBinding);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new UnhandledException(node, e);
         }
     }
 
@@ -517,7 +518,7 @@ public class CFGBuilder {
                     "buildCFG", node.getClass(), LivenessState.class, ThrowerBlocks.class);
             return (LivenessState) m.invoke(this, node, state, throwers);
         } catch (Exception e) {
-            throw new UnhandledException(e);
+            throw new UnhandledException(node, e);
         }
     }
 
@@ -660,12 +661,12 @@ public class CFGBuilder {
                         || "void".equals(node.getReturnType2().resolveBinding().getName())) {
                     buildEdges(liveAfterBody, exitBlock);
                 } else {
-                    throw new IllegalStateException("Did not expect to find any edges to build "
+                    throw new IllegalStateException(node, "Did not expect to find any edges to build "
                         + "for a constructor or a non void method return type.");
                 }
             }
             if (!this.edgesToBuild.isEmpty()) {
-                throw new IllegalStateException(
+                throw new IllegalStateException(node,
                         "At this point, there should not be any edges left to build. Left edges: " + this.edgesToBuild);
             }
             List<CFGBasicBlock> throwingBlocks = throwers.selectBlocksThrowing(null);
@@ -1670,7 +1671,7 @@ public class CFGBuilder {
     private CFGBasicBlock getCFGBasicBlock(ASTNode node, LivenessState state, boolean isDecision) {
         final Map<CFGEdgeBuilder, Boolean> toBuild = this.edgesToBuild.remove(node);
         if (isNotEmpty(toBuild)) {
-            throw new RuntimeException("No edges to build should exist for node \"" + node
+            throw new IllegalStateException(node, "No edges to build should exist for node \"" + node
                 + "\" before a CFGBasicBlock is created for it. Found the following edges to build " + toBuild);
         }
         if (!state.requireNewBlock()) {
@@ -1696,7 +1697,7 @@ public class CFGBuilder {
             buildEdges(state, basicBlock);
             return basicBlock;
         }
-        throw new NotImplementedException("for empty expressions list");
+        throw new NotImplementedException(null, "for empty expressions list");
     }
 
     private CFGBasicBlock newEntryBlock(MethodDeclaration node) {
@@ -1735,8 +1736,7 @@ public class CFGBuilder {
             lastMatchPosition = matchResult.end();
             ++lineNo;
         }
-        throw new IllegalStateException(
-                "A line and column number should have been found");
+        throw new IllegalStateException(null, "A line and column number should have been found");
     }
 
     private int countCharacters(String s, int tabSize) {

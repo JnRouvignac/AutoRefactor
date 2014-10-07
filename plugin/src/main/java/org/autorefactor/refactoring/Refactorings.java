@@ -37,6 +37,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.FutureTask;
 
 import org.autorefactor.util.Pair;
+import org.autorefactor.util.UnhandledException;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.BlockComment;
@@ -373,7 +374,7 @@ public class Refactorings {
         try {
             ex = future.get();
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new UnhandledException(null, e);
         }
         if (ex != null) {
             throw ex;

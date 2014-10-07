@@ -28,6 +28,7 @@ package org.autorefactor.cfg;
 import java.util.Collection;
 import java.util.LinkedList;
 
+import org.autorefactor.util.IllegalArgumentException;
 import org.eclipse.jdt.core.dom.ASTNode;
 
 import static org.autorefactor.util.Utils.*;
@@ -167,12 +168,12 @@ public class CFGBasicBlock implements Comparable<CFGBasicBlock> {
      */
     public void addIncomingEdge(CFGEdge edge) {
         if (edge.getTargetBlock() != this) {
-            throw new IllegalArgumentException(
+            throw new IllegalArgumentException(null,
                     "Error: the target block of this incoming edge is not the current block: "
                             + edge);
         }
         if (!this.incomingEdges.add(edge)) {
-            throw new IllegalArgumentException(
+            throw new IllegalArgumentException(null,
                     "Error: duplicate incoming edge:" + edge);
         }
     }
@@ -184,11 +185,11 @@ public class CFGBasicBlock implements Comparable<CFGBasicBlock> {
      */
     public void addOutgoingEdge(CFGEdge edge) {
         if (edge.getSourceBlock() != this) {
-            throw new IllegalArgumentException(
+            throw new IllegalArgumentException(null,
                     "Error: the source block of this outgoing edge is not the current block");
         }
         if (!this.outgoingEdgesAndVariableAccesses.add(edge)) {
-            throw new IllegalArgumentException(
+            throw new IllegalArgumentException(null,
                     "Error: duplicate outgoing edge:" + edge);
         }
     }

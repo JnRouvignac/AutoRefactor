@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2013-2014 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2014 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,40 +27,53 @@ package org.autorefactor.util;
 
 import org.eclipse.jdt.core.dom.ASTNode;
 
+import static org.autorefactor.refactoring.ASTHelper.*;
+
 /**
- * Exception thrown when some code is not implemented, or when some conditions are not handled.
+ * This is the base class for exceptions used in AutoRefactor.
+ * <p>
+ * It provides services for locating the closest possible source code location
+ * that caused a failure.
  */
-public class NotImplementedException extends AutoRefactorException {
-
-    private static final String DEFAULT_MESSAGE = "Code is not implemented";
+public class AutoRefactorException extends RuntimeException {
 
     /**
-     * Class constructor to use when some code is not implemented.
+     * Constructor.
      *
      * @param node the node from which to retrieve the source location
      */
-    public NotImplementedException(ASTNode node) {
-        this(node, DEFAULT_MESSAGE);
+    public AutoRefactorException(ASTNode node) {
+        super(getSourceLocation(node));
     }
 
     /**
-     * Constructor to use when the provided object was not expected.
+     * Constructor.
      *
      * @param node the node from which to retrieve the source location
-     * @param cause the unexpected object
+     * @param message the exception message
      */
-    public NotImplementedException(ASTNode node, Object cause) {
-        this(node, "for an object of type " + (cause != null ? cause.getClass() : null));
+    public AutoRefactorException(ASTNode node, String message) {
+        super(getSourceLocation(node) + ":" + message);
     }
 
     /**
-     * Constructor to use with a provided reason.
+     * Constructor.
      *
      * @param node the node from which to retrieve the source location
-     * @param reason an additional message
+     * @param cause the cause
      */
-    public NotImplementedException(ASTNode node, String reason) {
-        super(node, DEFAULT_MESSAGE + " " + (reason != null ? reason : ""));
+    public AutoRefactorException(ASTNode node, Throwable cause) {
+        super(getSourceLocation(node), cause);
     }
 
+    /**
+     * Constructor.
+     *
+     * @param node the node from which to retrieve the source location
+     * @param message the exception message
+     * @param cause the cause
+     */
+    public AutoRefactorException(ASTNode node, String message, Throwable cause) {
+        super(getSourceLocation(node) + ":" + message, cause);
+    }
 }

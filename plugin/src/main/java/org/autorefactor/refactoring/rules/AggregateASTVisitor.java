@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2013 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2013-2014 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -38,7 +38,9 @@ import java.util.Map;
 import org.autorefactor.refactoring.IJavaRefactoring;
 import org.autorefactor.refactoring.IRefactoring;
 import org.autorefactor.refactoring.Refactorings;
+import org.autorefactor.util.AutoRefactorException;
 import org.autorefactor.util.NotImplementedException;
+import org.autorefactor.util.UnhandledException;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.AnnotationTypeDeclaration;
@@ -278,23 +280,23 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
     }
 
     private void logBadlyBehavedVisitor(ASTVisitor v, ASTNode node) {
-        String message = "Visitor " + v.getClass().getName() + " is badly behaved for file " + getFileName(node) + ":"
-            + " it reported doing a refactoring, but it did not actually contribute any refactoring.";
+        String message = "Visitor " + v.getClass().getName() + " is badly behaved:"
+                + " it reported doing a refactoring, but it did not actually contribute any refactoring.";
         logError(message);
         if (debugModeOn) {
-            throw new RuntimeException(message);
+            throw new AutoRefactorException(null, message);
         }
     }
 
     private void logFaultyVisitor(ASTVisitor v, ASTNode node, Exception e) {
-        String message = "Visitor " + v.getClass().getName() + " is faulty for file " + getFileName(node)
-                + ", it will be disabled for the rest of this run.";
+        String message = "Visitor " + v.getClass().getName() + " is faulty,"
+                + " it will be disabled for the rest of this run.";
         logError(message, e);
         if (debugModeOn) {
             if (e instanceof RuntimeException) {
-                throw (RuntimeException) e;
+                throw new AutoRefactorException(node, e);
             }
-            throw new RuntimeException(message, e);
+            throw new UnhandledException(node, message, e);
         }
     }
 
@@ -344,7 +346,7 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
             } else if (isVisit || isEndVisit) {
                 System.out.print("visitorList");
             } else {
-                throw new NotImplementedException("for method " + m);
+                throw new NotImplementedException(null, "for method " + m);
             }
             System.out.println(".iterator(); iter.hasNext();) {");
             System.out.println("\t\tfinal ASTVisitor v = iter.next();");

@@ -273,7 +273,8 @@ public class ASTCommentRewriter {
         for (int i = 0; i < lineComments.size(); i++) {
             final LineComment lineComment = lineComments.get(i);
             if (node.getStartPosition() < lineComment.getStartPosition()) {
-                throw new NotImplementedException(" for comments situated after the target node for the Javadoc");
+                throw new NotImplementedException(lineComment,
+                        " for comments situated after the target node for the Javadoc");
             }
             final String replacementText;
             final boolean isFirst = i == 0;

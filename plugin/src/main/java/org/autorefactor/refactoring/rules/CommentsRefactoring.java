@@ -36,6 +36,7 @@ import java.util.regex.Pattern;
 import org.autorefactor.refactoring.SourceLocation;
 import org.autorefactor.util.NotImplementedException;
 import org.autorefactor.util.Pair;
+import org.autorefactor.util.UnhandledException;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.BlockComment;
@@ -257,7 +258,7 @@ public class CommentsRefactoring extends AbstractRefactoring {
         } else if (TAG_INHERITDOC.equals(tagName)) {
             return true;
         } else if (throwIfUnknown) {
-            throw new NotImplementedException("for tagName " + tagName);
+            throw new NotImplementedException(tag, "for tagName " + tagName);
         }
         return true;
     }
@@ -288,7 +289,8 @@ public class CommentsRefactoring extends AbstractRefactoring {
                 // org.eclipse.jdt.core.dom.MemberRef
                 // org.eclipse.jdt.core.dom.MethodRef
                 // org.eclipse.jdt.core.dom.Name
-                throw new NotImplementedException(fragment);
+                final ASTNode node = fragment instanceof ASTNode ? (ASTNode) fragment : null;
+                throw new NotImplementedException(node, fragment);
             }
         }
         return false;
@@ -440,7 +442,7 @@ public class CommentsRefactoring extends AbstractRefactoring {
             final int start = node.getStartPosition();
             return source.substring(start, start + node.getLength());
         } catch (JavaModelException e) {
-            throw new RuntimeException(e);
+            throw new UnhandledException(node, e);
         }
     }
 

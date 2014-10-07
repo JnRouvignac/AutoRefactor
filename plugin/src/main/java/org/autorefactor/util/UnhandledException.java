@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2013 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2013-2014 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,29 +25,33 @@
  */
 package org.autorefactor.util;
 
+import org.eclipse.jdt.core.dom.ASTNode;
+
 /**
  * Exception thrown when an exception could not be handled.
  * The cause is the unhandled exception.
  */
-public class UnhandledException extends RuntimeException {
+public class UnhandledException extends AutoRefactorException {
 
     /**
-     * Class constructor.
+     * Constructor.
      *
+     * @param node the node from which to retrieve the source location
      * @param unhandled the unhandled exception.
      */
-    public UnhandledException(Throwable unhandled) {
-        super(unhandled);
+    public UnhandledException(ASTNode node, Throwable unhandled) {
+        super(node, unhandled);
     }
 
     /**
-     * Class constructor.
+     * Constructor.
      *
+     * @param node the node from which to retrieve the source location
      * @param message the message to report
      * @param unhandled the unhandled exception.
      */
-    public UnhandledException(String message, Throwable unhandled) {
-        super(message, unhandled);
+    public UnhandledException(ASTNode node, String message, Throwable unhandled) {
+        super(node, message, unhandled);
     }
 
 }

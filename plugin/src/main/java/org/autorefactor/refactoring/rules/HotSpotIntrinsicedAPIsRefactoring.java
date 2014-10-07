@@ -137,7 +137,7 @@ public class HotSpotIntrinsicedAPIsRefactoring extends AbstractRefactoring {
             return b.int0(expr1Value - expr2Value);
         } else if (expr1Value != null && expr1Value == 0) {
             // TODO negate expr2
-            throw new NotImplementedException();
+            throw new NotImplementedException(expr2, "Code is not implemented for negating expr2: " + expr2);
         } else if (expr2Value != null && expr2Value == 0) {
             return b.copy(expr1);
         }
