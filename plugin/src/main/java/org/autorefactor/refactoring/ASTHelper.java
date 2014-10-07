@@ -102,6 +102,7 @@ import org.eclipse.jdt.core.dom.ParenthesizedExpression;
 import org.eclipse.jdt.core.dom.PostfixExpression;
 import org.eclipse.jdt.core.dom.PrefixExpression;
 import org.eclipse.jdt.core.dom.PrimitiveType;
+import org.eclipse.jdt.core.dom.PrimitiveType.Code;
 import org.eclipse.jdt.core.dom.QualifiedName;
 import org.eclipse.jdt.core.dom.QualifiedType;
 import org.eclipse.jdt.core.dom.ReturnStatement;
@@ -605,23 +606,9 @@ public final class ASTHelper {
         } else if (typeBinding.isArray()) {
             return ast.newArrayType(toType(ast, typeBinding.getComponentType()));
         } else if (typeBinding.isPrimitive()) {
-            final String primitiveName = typeBinding.getName();
-            if ("boolean".equals(primitiveName)) {
-                return ast.newPrimitiveType(PrimitiveType.BOOLEAN);
-            } else if ("byte".equals(primitiveName)) {
-                return ast.newPrimitiveType(PrimitiveType.BYTE);
-            } else if ("char".equals(primitiveName)) {
-                return ast.newPrimitiveType(PrimitiveType.CHAR);
-            } else if ("short".equals(primitiveName)) {
-                return ast.newPrimitiveType(PrimitiveType.SHORT);
-            } else if ("int".equals(primitiveName)) {
-                return ast.newPrimitiveType(PrimitiveType.INT);
-            } else if ("long".equals(primitiveName)) {
-                return ast.newPrimitiveType(PrimitiveType.LONG);
-            } else if ("float".equals(primitiveName)) {
-                return ast.newPrimitiveType(PrimitiveType.FLOAT);
-            } else if ("double".equals(primitiveName)) {
-                return ast.newPrimitiveType(PrimitiveType.DOUBLE);
+            final Code primitiveTypeCode = PrimitiveType.toCode(typeBinding.getName());
+            if (primitiveTypeCode != null) {
+                return ast.newPrimitiveType(primitiveTypeCode);
             }
         } else if (typeBinding.isClass() || typeBinding.isInterface()) {
             final String[] qualifiedName = typeBinding.getQualifiedName().split("\\.");

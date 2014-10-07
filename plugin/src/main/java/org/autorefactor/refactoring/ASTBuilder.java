@@ -462,8 +462,7 @@ public class ASTBuilder {
         return cic;
     }
 
-    private <T extends ASTNode> void addAll(List<T> whereToAdd,
-            @SuppressWarnings("unchecked") T... toAdd) {
+    private <T extends ASTNode> void addAll(List<T> whereToAdd, T... toAdd) {
         if (!isEmptyRangeCopy(toAdd)) {
             for (T e : toAdd) {
                 whereToAdd.add(e);
