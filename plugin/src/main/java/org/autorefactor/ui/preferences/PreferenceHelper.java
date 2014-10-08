@@ -25,10 +25,9 @@
  */
 package org.autorefactor.ui.preferences;
 
-import org.autorefactor.ui.preferences.PreferenceConstants.Preference;
 import org.eclipse.jface.preference.IPreferenceStore;
 
-import static org.autorefactor.ui.preferences.PreferenceConstants.*;
+import static org.autorefactor.ui.preferences.Preferences.*;
 
 /**
  * Helper class for Eclipse preferences.
@@ -46,7 +45,7 @@ public class PreferenceHelper {
         this.preferenceStore = preferenceStore;
     }
 
-    private boolean getBoolean(Preference pref) {
+    private boolean getBoolean(Preferences pref) {
         return preferenceStore.getBoolean(pref.name);
     }
 

@@ -31,6 +31,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import org.autorefactor.AutoRefactorPlugin;
 import org.autorefactor.refactoring.IRefactoring;
 import org.autorefactor.refactoring.Release;
 import org.autorefactor.ui.ApplyRefactoringsJob;
@@ -77,6 +78,7 @@ public class RefactoringsTest {
 
     @Test
     public void testRefactoring() throws Exception {
+        AutoRefactorPlugin.turnDebugModeOn();
         try {
             testRefactoring0();
         } catch (RuntimeException e) {
@@ -112,7 +114,7 @@ public class RefactoringsTest {
         new ApplyRefactoringsJob(null, null).applyRefactoring(
                 doc, cu,
                 Release.javaSE("1.5.0"), 4,
-                new AggregateASTVisitor(Arrays.asList(refactoring), true));
+                new AggregateASTVisitor(Arrays.asList(refactoring)));
 
         final String actual = normalize(
                 doc.get().replaceAll("samples_in", "samples_out"));

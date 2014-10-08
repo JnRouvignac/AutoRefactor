@@ -145,7 +145,6 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
     private final List<ASTVisitor> postVisitors = new ArrayList<ASTVisitor>();
 
     private final List<ASTVisitor> visitors;
-    private final boolean debugModeOn;
 
     private RefactoringContext ctx;
     private final List<ASTVisitor> visitorsContributingRefactoring = new ArrayList<ASTVisitor>();
@@ -154,12 +153,10 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
      * Builds an instance of this class.
      *
      * @param visitors the visitors that will be executed by this {@link AggregateASTVisitor}
-     * @param debugModeOn whether to log errors
      */
     @SuppressWarnings("rawtypes")
-    public AggregateASTVisitor(List<IRefactoring> visitors, boolean debugModeOn) {
+    public AggregateASTVisitor(List<IRefactoring> visitors) {
         this.visitors = (List) visitors;
-        this.debugModeOn = debugModeOn;
         analyzeVisitors();
     }
 
@@ -282,22 +279,13 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
     private void logBadlyBehavedVisitor(ASTVisitor v, ASTNode node) {
         String message = "Visitor " + v.getClass().getName() + " is badly behaved:"
                 + " it reported doing a refactoring, but it did not actually contribute any refactoring.";
-        logError(message);
-        if (debugModeOn) {
-            throw new AutoRefactorException(null, message);
-        }
+        logError(message, new AutoRefactorException(node, message));
     }
 
     private void logFaultyVisitor(ASTVisitor v, ASTNode node, Exception e) {
         String message = "Visitor " + v.getClass().getName() + " is faulty,"
                 + " it will be disabled for the rest of this run.";
-        logError(message, e);
-        if (debugModeOn) {
-            if (e instanceof RuntimeException) {
-                throw new AutoRefactorException(node, e);
-            }
-            throw new UnhandledException(node, message, e);
-        }
+        logError(message, new UnhandledException(node, message, e));
     }
 
     /**

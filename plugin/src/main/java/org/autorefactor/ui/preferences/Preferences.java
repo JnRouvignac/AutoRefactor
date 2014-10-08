@@ -28,44 +28,43 @@ package org.autorefactor.ui.preferences;
 /**
  * Interface holding preference constants.
  */
-public interface PreferenceConstants {
-
-    /** Class that groups preference related data. */
-    class Preference {
-        /** The preference name (not shown to the user). */
-        final String name;
-        /** The preference description (shown to the user). */
-        final String description;
-
-        /**
-         * Builds an instance of this class.
-         *
-         * @param name the preference name
-         * @param description the preference description
-         */
-        public Preference(String name, String description) {
-            this.name = name;
-            this.description = description;
-        }
-    }
+public enum Preferences {
 
     /** Preference that turns debug mode on or off. */
-    Preference DEBUG_MODE_ON = new Preference(
-        "debug_mode_on",
-        "Enable debug mode (for developers only)");
+    DEBUG_MODE_ON(
+            "debug_mode_on",
+            "Enable debug mode (for developers only)"),
 
     /** Preference that configures whether to add brackets to statement bodies. */
-    Preference ADD_ANGLE_BRACKETS_TO_STATEMENT_BODIES = new Preference(
-        "add_angle_brackets_to_statement_bodies",
-        "Add angle brackets '{' and '}' to statement bodies");
+    ADD_ANGLE_BRACKETS_TO_STATEMENT_BODIES(
+            "add_angle_brackets_to_statement_bodies",
+            "Add angle brackets '{' and '}' to statement bodies"),
 
     /** Preference that configures whether to remove <code>this</code> for non static method accesses. */
-    Preference REMOVE_THIS_FOR_NON_STATIC_METHOD_ACCESS = new Preference(
-        "remove_this_for_non_static_method_access",
-        "Remove 'this' qualifier for non static method accesses");
+    REMOVE_THIS_FOR_NON_STATIC_METHOD_ACCESS(
+            "remove_this_for_non_static_method_access",
+            "Remove 'this' qualifier for non static method accesses");
+
+    /**
+     * Builds an instance of this class.
+     *
+     * @param name
+     *            the preference name
+     * @param description
+     *            the preference description
+     */
+    Preferences(String name, String description) {
+        this.name = name;
+        this.description = description;
+    }
+
+    /** The preference name (not shown to the user). */
+    final String name;
+    /** The preference description (shown to the user). */
+    final String description;
 
     /** TODO use this for preferences initialization. */
-    String JDT_ALWAYS_USE_THIS_FOR_NON_STATIC_METHOD_ACCESS =
+    private static final String JDT_ALWAYS_USE_THIS_FOR_NON_STATIC_METHOD_ACCESS =
         "cleanup.always_use_this_for_non_static_method_access";
 
 }

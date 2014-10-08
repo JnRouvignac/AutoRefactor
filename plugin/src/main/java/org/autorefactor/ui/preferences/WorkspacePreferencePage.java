@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2013 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2013-2014 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,13 +26,12 @@
 package org.autorefactor.ui.preferences;
 
 import org.autorefactor.AutoRefactorPlugin;
-import org.autorefactor.ui.preferences.PreferenceConstants.Preference;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
-import static org.autorefactor.ui.preferences.PreferenceConstants.*;
+import static org.autorefactor.ui.preferences.Preferences.*;
 
 /**
  * The Eclipse preference page for AutoRefactor.
@@ -55,11 +54,12 @@ public class WorkspacePreferencePage extends FieldEditorPreferencePage implement
         addBooleanField(DEBUG_MODE_ON);
     }
 
-    private void addBooleanField(Preference pref) {
+    private void addBooleanField(Preferences pref) {
         addField(new BooleanFieldEditor(pref.name, pref.description, getFieldEditorParent()));
     }
 
     /** {@inheritDoc} */
+    @Override
     public void init(IWorkbench workbench) {
     }
 

@@ -131,8 +131,7 @@ public class ApplyRefactoringsJob extends Job {
 
                     monitor.subTask("Applying refactorings to " + className);
 
-                    AggregateASTVisitor refactoring = new AggregateASTVisitor(
-                        refactoringsToApply, AutoRefactorPlugin.getPreferenceHelper().debugModeOn());
+                    AggregateASTVisitor refactoring = new AggregateASTVisitor(refactoringsToApply);
                     applyRefactoring(compilationUnit, javaSERelease, tabSize, refactoring);
                 } finally {
                     monitor.worked(1);
@@ -264,15 +263,16 @@ public class ApplyRefactoringsJob extends Job {
         List<ASTVisitor> lastLoopVisitors = Collections.emptyList();
         int nbLoopsWithSameVisitors = 0;
         while (true) {
-            if (totalNbLoops > 1000) {
+            if (totalNbLoops > 100) {
                 // Oops! Something went wrong.
-                final String message = getPossibleCulprits(nbLoopsWithSameVisitors, lastLoopVisitors);
-                throw new IllegalStateException(astRoot, "An infinite loop has been detected for file "
+                final String errorMsg = "An infinite loop has been detected for file "
                         + getFileName(astRoot) + "."
                         + " A possible cause is that code is being incorrectly"
                         + " refactored one way then refactored back to what it was."
                         + " Fix the code before pursuing."
-                        + message);
+                        + getPossibleCulprits(nbLoopsWithSameVisitors, lastLoopVisitors);
+                AutoRefactorPlugin.logError(errorMsg, new IllegalStateException(astRoot, errorMsg));
+                break;
             }
 
             final RefactoringContext ctx = new RefactoringContext(compilationUnit,

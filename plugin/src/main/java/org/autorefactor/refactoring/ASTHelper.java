@@ -1458,12 +1458,13 @@ public final class ASTHelper {
         if (root instanceof CompilationUnit) {
             final CompilationUnit cu = (CompilationUnit) root;
             final int position = node.getStartPosition();
+            final int line = cu.getLineNumber(position);
+            final int column = cu.getColumnNumber(position) + 1;
             if (cu.getTypeRoot() != null) {
-                return cu.getTypeRoot().getElementName()
-                    + ":" + cu.getLineNumber(position) + ":" + cu.getColumnNumber(position);
+                return cu.getTypeRoot().getElementName() + ":" + line + ":" + column;
             }
             // it was not created from a file
-            return cu.getLineNumber(position) + ":" + cu.getColumnNumber(position);
+            return line + ":" + column;
         }
         return "";
     }

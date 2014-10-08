@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2013 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2013-2014 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,7 +27,9 @@ package org.autorefactor;
 
 import java.util.Vector;
 
+import org.autorefactor.ui.preferences.Preferences;
 import org.autorefactor.ui.preferences.PreferenceHelper;
+import org.autorefactor.util.UnhandledException;
 import org.eclipse.core.runtime.ILog;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -67,6 +69,13 @@ public class AutoRefactorPlugin extends AbstractUIPlugin {
     }
 
     private static void log(int severity, String message, Exception e) {
+        if (getPreferenceHelper().debugModeOn()) {
+            if (e instanceof RuntimeException) {
+                throw (RuntimeException) e;
+            }
+            throw new UnhandledException(null, message, e);
+        }
+
         final ILog log = getDefault().getLog();
         log.log(new Status(severity, PLUGIN_ID, message, e));
     }
@@ -127,6 +136,15 @@ public class AutoRefactorPlugin extends AbstractUIPlugin {
             preferenceHelper = new PreferenceHelper(getDefault().getPreferenceStore());
         }
         return preferenceHelper;
+    }
+
+    /**
+     * Turns on the debug mode.
+     *
+     * This method is only for internal use.
+     */
+    public static void turnDebugModeOn() {
+        getDefault().getPreferenceStore().setValue(Preferences.DEBUG_MODE_ON.name(), Boolean.TRUE.toString());
     }
 
     /**
