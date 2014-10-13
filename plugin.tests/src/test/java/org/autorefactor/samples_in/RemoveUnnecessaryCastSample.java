@@ -27,31 +27,31 @@ package org.autorefactor.samples_in;
 
 public class RemoveUnnecessaryCastSample {
 
-    private Object removeCast(Integer i) {
+    public Object removeCastToSameType(Integer i) {
         return (Integer) i;
     }
 
-    private Object removeCast(int i) {
+    public Object removeCastToIntegerWrapper(int i) {
         return (Integer) i;
     }
 
-    private Integer doNotRemoveCast(Object o) {
+    public Integer doNotRemoveNarrowingCast1(Object o) {
         return (Integer) o;
     }
 
-    private int doNotRemoveNarrowingCast(Object o) {
+    public int doNotRemoveNarrowingCast2(Object o) {
         return (Integer) o;
     }
 
-    private long removeWideningPrimitiveCast(int i) {
+    public long removeWideningPrimitiveCast(int i) {
         return (long) i;
     }
 
-    private int doNotRemoveNarrowingCast(long l) {
+    public int doNotRemovePrimitiveNarrowingCast(long l) {
         return (int) l;
     }
 
-    private void removeAssignmentCasts(Integer oi, int pi, Object o) {
+    public void removeAssignmentCasts(Integer oi, int pi, Object o) {
         Object o1;
         long l;
         o1 = (Integer) oi;
@@ -59,7 +59,7 @@ public class RemoveUnnecessaryCastSample {
         l = (long) pi;
     }
 
-    private void doNotRemoveAssignmentCasts(Object o, long l) {
+    public void doNotRemoveAssignmentCasts(Object o, long l) {
         Integer oi;
         int i;
         oi = (Integer) o;
@@ -67,19 +67,19 @@ public class RemoveUnnecessaryCastSample {
         i = (int) l;
     }
 
-    private void removeVariableDeclarationFragmentCasts(Integer oi, int pi, Object o) {
+    public void removeVariableDeclarationFragmentCasts(Integer oi, int pi, Object o) {
         Object o1 = (Integer) oi;
         Object o2 = (Integer) pi;
         long l = (long) pi;
     }
 
-    private void doNotRemoveVariableDeclarationFragmentCasts(Object o, long l) {
+    public void doNotRemoveVariableDeclarationFragmentCasts(Object o, long l) {
         Integer oi1 = (Integer) o;
         int pi2 = (Integer) o;
         int pi3 = (int) l;
     }
 
-    private boolean removeCasts(Integer oi, int pi, long l) {
+    public boolean removeCasts(Integer oi, int pi, long l) {
         return oi != (Integer) pi
             && (Integer) pi != oi
             && (int) oi != pi
@@ -88,7 +88,7 @@ public class RemoveUnnecessaryCastSample {
             && (long) pi != l;
     }
 
-    private boolean doNotRemoveCasts(Integer oi, int pi, long l, Object o) {
+    public boolean doNotRemoveCasts(Integer oi, int pi, long l, Object o) {
         return (int) l != pi
             && pi != (int) l
             && (Integer) o != pi // FIXME cast to (int) after moving to Java 7 builds
