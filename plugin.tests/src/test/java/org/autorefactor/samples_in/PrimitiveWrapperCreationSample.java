@@ -50,4 +50,39 @@ public class PrimitiveWrapperCreationSample {
         new Float("42.42").floatValue();
         new Double("42.42").doubleValue();
     }
+
+    public static void convertValueOfCallsToParseCallsInPrimitiveContext() {
+        byte by1 = Byte.valueOf("0");
+        byte by2 = Byte.valueOf("0", 10);
+        boolean bo = Boolean.valueOf("true");
+        int i1 = Integer.valueOf("42");
+        int i2 = Integer.valueOf("42", 10);
+        long l1 = Long.valueOf("42");
+        long l2 = Long.valueOf("42", 10);
+        short s1 = Short.valueOf("42");
+        short s2 = Short.valueOf("42", 10);
+        float f = Float.valueOf("42.42");
+        double d = Double.valueOf("42.42");
+    }
+
+    public static void removeUnnecessaryValueOfCallsInPrimitiveContext() {
+        byte by = Byte.valueOf((byte) 0);
+        boolean bo1 = Boolean.valueOf(true);
+        boolean bo2 = Boolean.TRUE;
+        int i = Integer.valueOf(42);
+        long l = Long.valueOf(42);
+        short s = Short.valueOf((short) 42);
+        float f = Float.valueOf(42.42F);
+        double d = Double.valueOf(42.42);
+    }
+
+    public static void removeUnnecessaryConstructorInvocationsInPrimitiveContext() {
+        byte by = new Byte((byte) 0);
+        boolean bo = new Boolean(true);
+        int i = new Integer(42);
+        long l = new Long(42);
+        short s = new Short((short) 42);
+        float f = new Float(42.42F);
+        double d = new Double(42.42);
+    }
 }

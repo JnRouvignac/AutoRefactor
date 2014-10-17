@@ -34,9 +34,7 @@ import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.Type;
-import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
-import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.eclipse.jdt.core.dom.ASTNode.*;
@@ -89,18 +87,6 @@ public class RemoveUnnecessaryCastRefactoring extends AbstractRefactoring {
 
         }
         return false;
-    }
-
-    private Type getType(final VariableDeclarationFragment vdf) {
-        final ASTNode parent = vdf.getParent();
-        if (parent instanceof VariableDeclarationStatement) {
-            final VariableDeclarationStatement vds = (VariableDeclarationStatement) parent;
-            return vds.getType();
-        } else if (parent instanceof VariableDeclarationExpression) {
-            final VariableDeclarationExpression vde = (VariableDeclarationExpression) parent;
-            return vde.getType();
-        }
-        return null;
     }
 
     private boolean isAssignmentCompatible(Expression expr, Type type) {

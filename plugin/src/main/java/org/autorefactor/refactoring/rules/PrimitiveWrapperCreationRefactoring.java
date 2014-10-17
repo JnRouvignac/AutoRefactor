@@ -28,12 +28,20 @@ package org.autorefactor.refactoring.rules;
 import java.util.List;
 
 import org.autorefactor.refactoring.ASTBuilder;
+import org.autorefactor.util.NotImplementedException;
+import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.BooleanLiteral;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.MethodInvocation;
+import org.eclipse.jdt.core.dom.QualifiedName;
+import org.eclipse.jdt.core.dom.SimpleName;
+import org.eclipse.jdt.core.dom.Type;
+import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
+import static org.autorefactor.util.Utils.*;
 
 /**
  * Replaces unnecessary primitive wrappers instance creations by using static
@@ -46,7 +54,7 @@ public class PrimitiveWrapperCreationRefactoring extends AbstractRefactoring {
     }
 
     // TODO Can we reduce bad effects of autoboxing / unboxing
-    // fix autoboxing and unboxing (returning boxed value in primitve context)
+    // fix autoboxing and unboxing (returning boxed value in primitive context)
 
     /** {@inheritDoc} */
     @Override
@@ -54,6 +62,46 @@ public class PrimitiveWrapperCreationRefactoring extends AbstractRefactoring {
         if (node.getExpression() == null) {
             return VISIT_SUBTREE;
         }
+
+        final ASTNode parent = removeParentheses(node.getParent());
+        if (parent instanceof VariableDeclarationFragment) {
+            final Type type = getType((VariableDeclarationFragment) parent);
+            if (type.isPrimitiveType()
+                    && "valueOf".equals(node.getName().getIdentifier())) {
+                if (isMethod(node, "java.lang.Boolean", "valueOf", "boolean")
+                        || isMethod(node, "java.lang.Byte", "valueOf", "byte")
+                        || isMethod(node, "java.lang.Character", "valueOf", "char")
+                        || isMethod(node, "java.lang.Short", "valueOf", "short")
+                        || isMethod(node, "java.lang.Integer", "valueOf", "int")
+                        || isMethod(node, "java.lang.Long", "valueOf", "long")
+                        || isMethod(node, "java.lang.Float", "valueOf", "float")
+                        || isMethod(node, "java.lang.Double", "valueOf", "double")) {
+                    return replaceWithTheSingleArgument(node);
+                }
+                if (is(node, "java.lang.Byte")) {
+                    return replaceMethodName(node, "parseByte");
+                }
+                if (is(node, "java.lang.Short")) {
+                    return replaceMethodName(node, "parseShort");
+                }
+                if (is(node, "java.lang.Integer")) {
+                    return replaceMethodName(node, "parseInt");
+                }
+                if (is(node, "java.lang.Long")) {
+                    return replaceMethodName(node, "parseLong");
+                }
+                if (isMethod(node, "java.lang.Boolean", "valueOf", "java.lang.String")) {
+                    return replaceMethodName(node, "parseBoolean");
+                }
+                if (is(node, "java.lang.Float")) {
+                    return replaceMethodName(node, "parseFloat");
+                }
+                if (is(node, "java.lang.Double")) {
+                    return replaceMethodName(node, "parseDouble");
+                }
+            }
+        }
+
         final ITypeBinding typeBinding = node.getExpression().resolveTypeBinding();
         if (typeBinding != null
                 && node.getExpression() instanceof ClassInstanceCreation) {
@@ -75,6 +123,28 @@ public class PrimitiveWrapperCreationRefactoring extends AbstractRefactoring {
             }
         }
         return VISIT_SUBTREE;
+    }
+
+    private boolean is(MethodInvocation node, String declaringTypeQualifiedName) {
+        return isMethod(node, declaringTypeQualifiedName, "valueOf", "java.lang.String")
+                || (isMethod(node, declaringTypeQualifiedName, "valueOf", "java.lang.String", "int")
+                        && equal(10, arguments(node).get(1).resolveConstantExpressionValue()));
+    }
+
+    private boolean replaceMethodName(MethodInvocation node, String methodName) {
+        final SimpleName name = this.ctx.getASTBuilder().simpleName(methodName);
+        this.ctx.getRefactorings().set(node, MethodInvocation.NAME_PROPERTY, name);
+        return DO_NOT_VISIT_SUBTREE;
+    }
+
+    private boolean replaceWithTheSingleArgument(MethodInvocation node) {
+        final List<Expression> args = arguments(node);
+        if (args.size() != 1) {
+            throw new NotImplementedException(node, "expected 1 argument, but got " + args.size());
+        }
+        final ASTBuilder b = this.ctx.getASTBuilder();
+        this.ctx.getRefactorings().replace(node, b.copy(args.get(0)));
+        return DO_NOT_VISIT_SUBTREE;
     }
 
     private String getMethodName(final String typeName,
@@ -130,5 +200,28 @@ public class PrimitiveWrapperCreationRefactoring extends AbstractRefactoring {
             String methodName, Expression arg) {
         final ASTBuilder b = this.ctx.getASTBuilder();
         return b.invoke(typeName, methodName, b.copy(arg));
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean visit(QualifiedName node) {
+        final ASTNode parent = removeParentheses(node.getParent());
+        if (parent instanceof VariableDeclarationFragment) {
+            final Type type = getType((VariableDeclarationFragment) parent);
+            if (type.isPrimitiveType()) {
+                if (isField(node, "java.lang.Boolean", "TRUE")) {
+                    return replaceWithBooleanLiteral(node, true);
+                } else if (isField(node, "java.lang.Boolean", "FALSE")) {
+                    return replaceWithBooleanLiteral(node, false);
+                }
+            }
+        }
+        return VISIT_SUBTREE;
+    }
+
+    private boolean replaceWithBooleanLiteral(QualifiedName node, boolean val) {
+        final BooleanLiteral booleanLiteral = this.ctx.getASTBuilder().boolean0(val);
+        this.ctx.getRefactorings().replace(node, booleanLiteral);
+        return DO_NOT_VISIT_SUBTREE;
     }
 }

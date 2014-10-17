@@ -712,6 +712,24 @@ public final class ASTHelper {
         return null;
     }
 
+    /**
+     * Returns the {@link Type} declared by the parent of a {@link VariableDeclarationFragment}.
+     *
+     * @param vdf the variable declaration fragment
+     * @return the fragment's type
+     */
+    public static Type getType(final VariableDeclarationFragment vdf) {
+        final ASTNode parent = vdf.getParent();
+        if (parent instanceof VariableDeclarationStatement) {
+            final VariableDeclarationStatement vds = (VariableDeclarationStatement) parent;
+            return vds.getType();
+        } else if (parent instanceof VariableDeclarationExpression) {
+            final VariableDeclarationExpression vde = (VariableDeclarationExpression) parent;
+            return vde.getType();
+        }
+        return null;
+    }
+
     // AST checks
 
     /**
@@ -868,6 +886,19 @@ public final class ASTHelper {
      */
     public static boolean isBreakable(ASTNode node) {
         return isLoop(node) || node instanceof SwitchStatement;
+    }
+
+    /**
+     * Returns whether the provided qualified name accesses a field with the provided signature.
+     *
+     * @param node the qualified name to compare
+     * @param qualifiedTypeName the qualified name of the type declaring the field
+     * @param fieldName the field name
+     * @return true if the provided qualified name matches the provided field signature, false otherwise
+     */
+    public static boolean isField(QualifiedName node, String qualifiedTypeName, String fieldName) {
+        return instanceOf(node, qualifiedTypeName)
+                && node.getName().getIdentifier().equals(fieldName);
     }
 
     /**

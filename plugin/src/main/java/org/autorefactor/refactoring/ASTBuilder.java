@@ -38,6 +38,7 @@ import org.eclipse.jdt.core.dom.ArrayInitializer;
 import org.eclipse.jdt.core.dom.ArrayType;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Block;
+import org.eclipse.jdt.core.dom.BooleanLiteral;
 import org.eclipse.jdt.core.dom.CastExpression;
 import org.eclipse.jdt.core.dom.CatchClause;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
@@ -121,6 +122,16 @@ public class ASTBuilder {
         final Block tryBody = ast.newBlock();
         addAll(statements(tryBody), stmts);
         return tryBody;
+    }
+
+    /**
+     * Builds a new {@link BooleanLiteral} instance.
+     *
+     * @param boolValue the boolean literal value
+     * @return a new boolean literal
+     */
+    public BooleanLiteral boolean0(boolean boolValue) {
+        return ast.newBooleanLiteral(boolValue);
     }
 
     /**
@@ -315,11 +326,11 @@ public class ASTBuilder {
     /**
      * Builds a new {@link NumberLiteral} instance.
      *
-     * @param i the number literal value
+     * @param intValue the number literal value
      * @return a new number literal
      */
-    public NumberLiteral int0(int i) {
-        return ast.newNumberLiteral(Integer.toString(i));
+    public NumberLiteral int0(int intValue) {
+        return ast.newNumberLiteral(Integer.toString(intValue));
     }
 
     /**
