@@ -170,17 +170,13 @@ public class StringBuilderRefactoring extends AbstractRefactoring {
                         createStringAppends(lastExpr, Arrays.asList(arg0)));
                 return DO_NOT_VISIT_SUBTREE;
             }
-            final boolean substringWithOneArg =
-                isMethod(embeddedMI, "java.lang.String", "substring", "int");
-            final boolean substringWithTwoArgs =
-                isMethod(embeddedMI, "java.lang.String", "substring", "int", "int")
-                || isMethod(embeddedMI, "java.lang.CharSequence", "subSequence", "int", "int");
-            if (substringWithOneArg || substringWithTwoArgs) {
+            if (isMethod(embeddedMI, "java.lang.String", "substring", "int", "int")
+                    || isMethod(embeddedMI, "java.lang.CharSequence", "subSequence", "int", "int")) {
                 final ASTBuilder b = this.ctx.getASTBuilder();
                 final Expression stringVar = b.copy(embeddedMI.getExpression());
                 final List<Expression> args = arguments(embeddedMI);
                 final Expression arg0 = b.copy(args.get(0));
-                final Expression arg1 = substringWithTwoArgs ? b.copy(args.get(1)) : null;
+                final Expression arg1 = b.copy(args.get(1));
                 this.ctx.getRefactorings().replace(node,
                         createAppendSubstring(b, b.copy(lastExpr), stringVar, arg0, arg1));
             }

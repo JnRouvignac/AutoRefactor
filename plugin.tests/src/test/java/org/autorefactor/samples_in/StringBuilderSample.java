@@ -100,11 +100,15 @@ public class StringBuilderSample {
         sb.append(Double.valueOf(d));
     }
 
-
-    public void removeUselessCallsWithAppend(String s) {
+    public void removeSubstringDoubleArgsCallsWithAppend(String s) {
         new StringBuilder().append(s.substring(0, 1));
         new StringBuffer().append(s.substring(0, 1));
         new StringBuilder().append(s.subSequence(0, 1));
         new StringBuffer().append(s.subSequence(0, 1));
+    }
+
+    public void doNotRemoveSubstringSingleArgCallsWithAppend(String s) {
+        new StringBuilder().append(s.substring(1));
+        new StringBuffer().append(s.substring(1));
     }
 }
