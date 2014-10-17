@@ -54,9 +54,11 @@ public class RemoveUnnecessaryCastSample {
     public void removeAssignmentCasts(Integer oi, int pi, Object o) {
         Object o1;
         long l;
+        int i;
         o1 = oi;
         o1 = pi;
         l = pi;
+        i = pi;
     }
 
     public void doNotRemoveAssignmentCasts(Object o, long l) {

@@ -885,19 +885,19 @@ public final class ASTHelper {
         if (node == null) {
             return false;
         }
-        final IMethodBinding methodbinding = node.resolveMethodBinding();
+        final IMethodBinding methodBinding = node.resolveMethodBinding();
         // let's do the fast checks first
-        if (methodbinding == null
-                || !methodName.equals(methodbinding.getName())
-                || methodbinding.getParameterTypes().length != parameterTypesQualifiedNames.length) {
+        if (methodBinding == null
+                || !methodName.equals(methodBinding.getName())
+                || methodBinding.getParameterTypes().length != parameterTypesQualifiedNames.length) {
             return false;
         }
         // ok more heavy checks now
-        final ITypeBinding declaringClazz = methodbinding.getDeclaringClass();
+        final ITypeBinding declaringClazz = methodBinding.getDeclaringClass();
         final ITypeBinding implementedType =
                 findImplementedType(declaringClazz, typeQualifiedName);
         final boolean isInstanceOf = instanceOf(declaringClazz, typeQualifiedName);
-        if (parameterTypesMatch(implementedType, isInstanceOf, methodbinding, parameterTypesQualifiedNames)) {
+        if (parameterTypesMatch(implementedType, isInstanceOf, methodBinding, parameterTypesQualifiedNames)) {
             return true;
         }
         // a lot more heavy checks
@@ -905,7 +905,7 @@ public final class ASTHelper {
         // if an API to directly find the overridenMethod IMethodBinding existed
         IMethodBinding overridenMethod = findOverridenMethod(declaringClazz, typeQualifiedName,
                 methodName, parameterTypesQualifiedNames);
-        return overridenMethod != null && methodbinding.overrides(overridenMethod);
+        return overridenMethod != null && methodBinding.overrides(overridenMethod);
     }
 
     private static boolean parameterTypesMatch(ITypeBinding implementedType,
