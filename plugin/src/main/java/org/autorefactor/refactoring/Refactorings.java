@@ -159,6 +159,7 @@ public class Refactorings {
      */
     @SuppressWarnings("unchecked")
     public <T extends ASTNode> T createMoveTarget(T node) {
+        this.forbiddenNodes.equals(node);
         return (T) rewrite.createMoveTarget(node);
     }
 

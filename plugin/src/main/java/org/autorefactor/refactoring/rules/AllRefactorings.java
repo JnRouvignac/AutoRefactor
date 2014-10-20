@@ -94,6 +94,7 @@ public final class AllRefactorings {
                 // TODO JNR - to be completed
                 // new ReduceVariableScopeRefactoring(),
                 new StringBuilderRefactoring(),
+                new UseStringContainsRefactoring(),
                 new PushNegationDownRefactoring(),
                 new CommentsRefactoring(),
                 new RemoveFieldsDefaultValuesRefactoring(),
