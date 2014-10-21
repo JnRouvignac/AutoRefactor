@@ -727,7 +727,7 @@ public final class ASTHelper {
         } else if (parent instanceof FieldDeclaration) {
             return ((FieldDeclaration) parent).getType();
         }
-        return null;
+        throw new NotImplementedException(vdf, vdf);
     }
 
     // AST checks
