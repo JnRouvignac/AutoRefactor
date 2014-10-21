@@ -25,6 +25,7 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.ITypeBinding;
@@ -45,10 +46,7 @@ public class RemoveFieldsDefaultValuesRefactoring extends AbstractRefactoring {
     /** {@inheritDoc} */
     @Override
     public boolean visit(FieldDeclaration node) {
-        final TypeDeclaration td = (TypeDeclaration) node.getParent();
-        if (td.isInterface()) {
-            // Do not remove default values from interface fields
-            // because they are final by default
+        if (canProceed(node.getParent())) {
             return VISIT_SUBTREE;
         }
         final ITypeBinding fieldType = node.getType().resolveBinding();
@@ -75,6 +73,15 @@ public class RemoveFieldsDefaultValuesRefactoring extends AbstractRefactoring {
             }
         }
         return visitSubtree;
+    }
+
+    private boolean canProceed(final ASTNode parent) {
+        if (parent instanceof TypeDeclaration) {
+            // Do not remove default values from interface fields
+            // because they are final by default
+            return ((TypeDeclaration) parent).isInterface();
+        }
+        return true;
     }
 
     private boolean isPrimitiveDefaultValue(Object val) {
