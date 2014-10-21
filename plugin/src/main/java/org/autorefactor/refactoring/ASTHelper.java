@@ -721,11 +721,11 @@ public final class ASTHelper {
     public static Type getType(final VariableDeclarationFragment vdf) {
         final ASTNode parent = vdf.getParent();
         if (parent instanceof VariableDeclarationStatement) {
-            final VariableDeclarationStatement vds = (VariableDeclarationStatement) parent;
-            return vds.getType();
+            return ((VariableDeclarationStatement) parent).getType();
         } else if (parent instanceof VariableDeclarationExpression) {
-            final VariableDeclarationExpression vde = (VariableDeclarationExpression) parent;
-            return vde.getType();
+            return ((VariableDeclarationExpression) parent).getType();
+        } else if (parent instanceof FieldDeclaration) {
+            return ((FieldDeclaration) parent).getType();
         }
         return null;
     }
