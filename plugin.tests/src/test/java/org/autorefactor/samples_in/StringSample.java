@@ -38,8 +38,8 @@ public class StringSample {
     }
 
     public void replaceToStringCallInStringConcat() {
-        String s1 = "" + Boolean.TRUE.toString();
-        String s2 = Boolean.TRUE.toString() + "";
+        String s1 = "" + Boolean.TRUE.toString() + Boolean.FALSE.toString();
+        String s2 = Boolean.TRUE.toString() + "" + Boolean.FALSE.toString();
     }
 
     public String doNotReplaceToStringCallOutsideStringConcat() {

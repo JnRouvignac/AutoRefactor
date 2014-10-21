@@ -79,15 +79,22 @@ public class StringRefactoring extends AbstractRefactoring {
             } else if (parent.getNodeType() == INFIX_EXPRESSION) {
                 // if node is in a String context, no need to call toString()
                 final InfixExpression ie = (InfixExpression) node.getParent();
-                final Expression lo = ie.getLeftOperand();
-                final Expression ro = ie.getRightOperand();
-                final MethodInvocation lmi = as(lo, MethodInvocation.class);
-                final MethodInvocation rmi = as(ro, MethodInvocation.class);
-                if (hasType(lo, "java.lang.String")
-                        && isMethod(rmi, "java.lang.Object", "toString")) {
+                final Expression leftOp = ie.getLeftOperand();
+                final Expression rightOp = ie.getRightOperand();
+                final boolean leftOpIsString = hasType(leftOp, "java.lang.String");
+                final boolean rightOpIsString = hasType(rightOp, "java.lang.String");
+                final MethodInvocation lmi = as(leftOp, MethodInvocation.class);
+                final MethodInvocation rmi = as(rightOp, MethodInvocation.class);
+                if (!node.equals(lmi)
+                        && !node.equals(rmi)
+                        && (leftOpIsString || rightOpIsString)) {
+                    // node is in the extended operands
+                    this.ctx.getRefactorings().replace(node, b.move(node.getExpression()));
+                    return VISIT_SUBTREE;
+                } else if (leftOpIsString && isMethod(rmi, "java.lang.Object", "toString")) {
                     this.ctx.getRefactorings().replace(rmi, b.move(rmi.getExpression()));
                     return VISIT_SUBTREE;
-                } else if (hasType(ro, "java.lang.String") && node.equals(lmi)) {
+                } else if (rightOpIsString && node.equals(lmi)) {
                     this.ctx.getRefactorings().replace(lmi, b.move(lmi.getExpression()));
                     return DO_NOT_VISIT_SUBTREE;
                 }
