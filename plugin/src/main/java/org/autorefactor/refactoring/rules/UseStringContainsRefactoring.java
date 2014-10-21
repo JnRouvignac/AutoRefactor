@@ -57,7 +57,7 @@ public class UseStringContainsRefactoring extends AbstractRefactoring {
                 return replaceWithStringContains(ie, node, true);
             }
         }
-        return DO_NOT_VISIT_SUBTREE;
+        return VISIT_SUBTREE;
     }
 
     private boolean replaceWithStringContains(InfixExpression ie, MethodInvocation node, boolean negate) {
