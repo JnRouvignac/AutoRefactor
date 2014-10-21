@@ -239,19 +239,22 @@ public class ASTCommentRewriter {
         final LineComment lineComment = lineComments.get(0);
         final int commentStart = lineComment.getStartPosition();
         final int commentLength = lineComment.getLength();
+        final String comment = source.substring(commentStart, commentStart + commentLength);
+        final String commentText = comment.substring(2);
+        // add a starting and ending space?
+        final String spaceAtStart = !Character.isWhitespace(commentText.charAt(0)) ? " " : "";
+        final String spaceAtEnd = !Character.isWhitespace(commentText.charAt(commentText.length() - 1)) ? " " : "";
+
         // TODO JNR how to obey configured indentation?
         // TODO JNR how to obey configured line length?
         if (commentStart < nodeStart) {
             // assume comment is situated exactly before target node for javadoc
-            commentEdits.add(new ReplaceEdit(commentStart, "//".length(), "/**"));
-            commentEdits.add(new InsertEdit(commentStart + commentLength, " */"));
+            commentEdits.add(new ReplaceEdit(commentStart, "//".length(), "/**" + spaceAtStart));
+            commentEdits.add(new InsertEdit(commentStart + commentLength, spaceAtEnd + "*/"));
         } else {
             // assume comment is situated exactly after target node for javadoc
-            final String comment = source.substring(commentStart, commentStart + commentLength);
             final String indent = getIndent(nextNode, source, lineStarts);
-            final String commentText = comment.substring(2);
-            final boolean addSpace = !Character.isWhitespace(commentText.charAt(0));
-            final String newJavadoc = "/**" + (addSpace ? " " : "") + commentText + " */\r\n" + indent;
+            final String newJavadoc = "/**" + spaceAtStart + commentText + spaceAtEnd + "*/\r\n" + indent;
             final int nbWhiteSpaces = nbTrailingSpaces(source, commentStart);
             commentEdits.add(new InsertEdit(nodeStart, newJavadoc));
             commentEdits.add(new DeleteEdit(commentStart - nbWhiteSpaces, nbWhiteSpaces + commentLength));
