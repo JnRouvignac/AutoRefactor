@@ -22,13 +22,9 @@ For testing and coherency purposes, the name of the refactoring class and the sa
 * The sample classes must be named XXXSample
 
 You can run tests by:
-1. Go to AutoRefactorHandler.execute() method, and change "if (false) {" to "if (true) {"
-2. Run "Eclipse application"
-3. In package explorer view, select the "samples_in" package and hit Shift+Ctrl+Y
-4. Once tests have run, revert the changes to the "sample_in" package with using git
+* Running ```mvn clean install```
+* Or running JUnit tests directly from Eclipse
 
 ### JDT Gotchas
 
-* JDT sometimes represent consecutive additions into only one ```InfixExpression``` node and stores the additional operands into the ```extendedOperands``` attribute.
-* JDT does not check the validity of programmer built ASTs: For example, adding an ```InfixExpression``` inside a NOT ```PrefixExpresion``` MUST be enclosed in a ```ParenthezisedExpression``` by the programmer, otherwise the resulting code will not be what was expected. For example, adding ```a && b``` to a not expression will result in ```!a && b``` instead of the expected ```!(a && b)```.
-* Despite calling ```ASTParser.setResolveBindings(true);```, using one of the ```ASTNode.resolve*()``` methods can return null at any time, so be prepared to handle nulls.
+See [JDT Gotchas](https://github.com/JnRouvignac/AutoRefactor/wiki/JDT-Gotchas)
