@@ -321,11 +321,16 @@ public class SimplifyExpressionSample {
         return b1 || (b2 && b3);
     }
 
-    public int addParenthesesToMixedAndOrBitwiseOperators(int i, int b1, int b2, int b3) {
-        if (i == 0) {
-            return (b1 & b2) | b3;
-        }
-        return b1 | (b2 & b3);
+    public int addParenthesesToMixedBitwiseOperators(int b1, int b2, int b3) {
+        int i = (b1 & b2) | b3;
+        int j = b1 | (b2 & b3);
+        int k = (b1 << b2) | b3;
+        int l = b1 | (b2 << b3);
+        int m = (b1 >> b2) | b3;
+        int n = b1 | (b2 >> b3);
+        int o = (b1 >>> b2) | b3;
+        int p = b1 | (b2 >>> b3);
+        return i + j + k + l + m + n + o + p;
     }
 
 }

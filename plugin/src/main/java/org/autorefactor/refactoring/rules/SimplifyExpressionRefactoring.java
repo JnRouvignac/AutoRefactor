@@ -25,11 +25,13 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.util.IllegalStateException;
 import org.autorefactor.util.NotImplementedException;
+import org.autorefactor.util.Pair;
 import org.eclipse.jdt.core.dom.ASTMatcher;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
@@ -60,6 +62,7 @@ import org.eclipse.jdt.core.dom.WhileStatement;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.autorefactor.util.Utils.*;
+import static org.eclipse.jdt.core.dom.InfixExpression.Operator.*;
 
 /**
  * Simplify Java expressions:
@@ -72,6 +75,19 @@ import static org.autorefactor.util.Utils.*;
  * </ul>
  */
 public class SimplifyExpressionRefactoring extends AbstractRefactoring {
+
+    /** A mapping of child operation to parent operation that mandates using parentheses. */
+    private static final List<Pair<Operator, Operator>> SHOULD_HAVE_PARENTHESES = Arrays.asList(
+            Pair.of(CONDITIONAL_AND, CONDITIONAL_OR),
+            Pair.of(AND, XOR),
+            Pair.of(AND, OR),
+            Pair.of(XOR, OR),
+            Pair.of(LEFT_SHIFT, OR),
+            Pair.of(LEFT_SHIFT, AND),
+            Pair.of(RIGHT_SHIFT_SIGNED, OR),
+            Pair.of(RIGHT_SHIFT_SIGNED, AND),
+            Pair.of(RIGHT_SHIFT_UNSIGNED, OR),
+            Pair.of(RIGHT_SHIFT_UNSIGNED, AND));
 
     private final boolean removeThisForNonStaticMethodAccess;
 
@@ -172,11 +188,7 @@ public class SimplifyExpressionRefactoring extends AbstractRefactoring {
                 final InfixExpression innerIe = (InfixExpression) innerExpr;
                 final Operator innerOp = innerIe.getOperator();
                 final Operator parentOp = ((InfixExpression) parent).getOperator();
-                if (Operator.EQUALS.equals(parentOp)
-                        || (Operator.CONDITIONAL_OR.equals(parentOp) && Operator.CONDITIONAL_AND.equals(innerOp))
-                        || (Operator.OR.equals(parentOp) && Operator.AND.equals(innerOp))
-                        || (Operator.XOR.equals(parentOp) && Operator.AND.equals(innerOp))
-                        || (Operator.OR.equals(parentOp) && Operator.XOR.equals(innerOp))) {
+                if (Operator.EQUALS.equals(parentOp) || shouldHaveParentheses(innerOp, parentOp)) {
                     return true;
                 }
                 return as(innerIe.getLeftOperand(), Assignment.class) != null
@@ -257,17 +269,17 @@ public class SimplifyExpressionRefactoring extends AbstractRefactoring {
                 if (nb.doubleValue() == 0) {
                     return VISIT_SUBTREE;
                 }
-                if (Operator.EQUALS.equals(ie.getOperator())) {
+                if (EQUALS.equals(ie.getOperator())) {
                     if (nb.doubleValue() < 0) {
-                        return replaceWithCorrectCheckOnCompareTo(ie, Operator.LESS);
+                        return replaceWithCorrectCheckOnCompareTo(ie, LESS);
                     } else if (nb.doubleValue() > 0) {
-                        return replaceWithCorrectCheckOnCompareTo(ie, Operator.GREATER);
+                        return replaceWithCorrectCheckOnCompareTo(ie, GREATER);
                     }
-                } else if (Operator.NOT_EQUALS.equals(ie.getOperator())) {
+                } else if (NOT_EQUALS.equals(ie.getOperator())) {
                     if (nb.doubleValue() < 0) {
-                        return replaceWithCorrectCheckOnCompareTo(ie, Operator.GREATER_EQUALS);
+                        return replaceWithCorrectCheckOnCompareTo(ie, GREATER_EQUALS);
                     } else if (nb.doubleValue() > 0) {
-                        return replaceWithCorrectCheckOnCompareTo(ie, Operator.LESS_EQUALS);
+                        return replaceWithCorrectCheckOnCompareTo(ie, LESS_EQUALS);
                     }
                 }
             }
@@ -359,14 +371,14 @@ public class SimplifyExpressionRefactoring extends AbstractRefactoring {
         final Expression rhs = node.getRightOperand();
         final Operator operator = node.getOperator();
         final Object lhsConstantValue = lhs.resolveConstantExpressionValue();
-        if (Operator.CONDITIONAL_OR.equals(operator)) {
+        if (CONDITIONAL_OR.equals(operator)) {
             if (Boolean.TRUE.equals(lhsConstantValue)) {
                 return replaceByCopy(node, lhs);
             } else if (Boolean.FALSE.equals(lhsConstantValue)) {
                 checkNoExtendedOperands(node);
                 return replaceByCopy(node, rhs);
             }
-        } else if (Operator.CONDITIONAL_AND.equals(operator)) {
+        } else if (CONDITIONAL_AND.equals(operator)) {
             if (Boolean.TRUE.equals(lhsConstantValue)) {
                 checkNoExtendedOperands(node);
                 return replaceByCopy(node, rhs);
@@ -384,7 +396,7 @@ public class SimplifyExpressionRefactoring extends AbstractRefactoring {
                     return replaceByCopy(node, lhs);
                 }
             }
-        } else if (Operator.EQUALS.equals(operator)) {
+        } else if (EQUALS.equals(operator)) {
             boolean result = VISIT_SUBTREE;
             final Boolean blo = getBooleanLiteral(lhs);
             final Boolean bro = getBooleanLiteral(rhs);
@@ -396,7 +408,7 @@ public class SimplifyExpressionRefactoring extends AbstractRefactoring {
             if (result == DO_NOT_VISIT_SUBTREE) {
                 return DO_NOT_VISIT_SUBTREE;
             }
-        } else if (Operator.NOT_EQUALS.equals(operator)) {
+        } else if (NOT_EQUALS.equals(operator)) {
             boolean continueVisit = VISIT_SUBTREE;
             final Boolean blo = getBooleanLiteral(lhs);
             final Boolean bro = getBooleanLiteral(rhs);
@@ -410,21 +422,29 @@ public class SimplifyExpressionRefactoring extends AbstractRefactoring {
             }
         }
 
-        if (shouldAddParentheses(node, Operator.CONDITIONAL_AND, Operator.CONDITIONAL_OR)
-                || shouldAddParentheses(node, Operator.AND, Operator.XOR)
-                || shouldAddParentheses(node, Operator.AND, Operator.OR)
-                || shouldAddParentheses(node, Operator.XOR, Operator.OR)) {
+        if (shouldHaveParentheses(node)) {
             addParentheses(node);
             return DO_NOT_VISIT_SUBTREE;
         }
         return VISIT_SUBTREE;
     }
 
-    private boolean shouldAddParentheses(InfixExpression node, Operator opNode, Operator opParent) {
-        final Operator operator = node.getOperator();
-        if (opNode.equals(operator) && node.getParent() instanceof InfixExpression) {
-            InfixExpression ie = (InfixExpression) node.getParent();
-            return opParent.equals(ie.getOperator());
+    private boolean shouldHaveParentheses(InfixExpression node) {
+        final Operator childOp = node.getOperator();
+        if (node.getParent() instanceof InfixExpression) {
+            final InfixExpression ie = (InfixExpression) node.getParent();
+            return shouldHaveParentheses(childOp, ie.getOperator());
+        }
+        return false;
+    }
+
+    private boolean shouldHaveParentheses(Operator actualChildOp, Operator actualParentOp) {
+        for (Pair<Operator, Operator> pair : SHOULD_HAVE_PARENTHESES) {
+            final Operator childOp = pair.getFirst();
+            final Operator parentOp = pair.getSecond();
+            if (childOp.equals(actualChildOp) && parentOp.equals(actualParentOp)) {
+                return true;
+            }
         }
         return false;
     }
@@ -526,7 +546,7 @@ public class SimplifyExpressionRefactoring extends AbstractRefactoring {
     private Expression getNullCheckedExpression(Expression e) {
         if (e instanceof InfixExpression) {
             final InfixExpression expr = (InfixExpression) e;
-            if (Operator.NOT_EQUALS.equals(expr.getOperator()) && checkNoExtendedOperands(expr)) {
+            if (NOT_EQUALS.equals(expr.getOperator()) && checkNoExtendedOperands(expr)) {
                 if (isNullLiteral(expr.getLeftOperand())) {
                     return expr.getRightOperand();
                 } else if (isNullLiteral(expr.getRightOperand())) {
