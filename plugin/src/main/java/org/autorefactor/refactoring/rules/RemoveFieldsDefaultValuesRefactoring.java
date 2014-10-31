@@ -66,7 +66,8 @@ public class RemoveFieldsDefaultValuesRefactoring extends AbstractRefactoring {
                     visitSubtree = DO_NOT_VISIT_SUBTREE;
                 } else if (val != null
                         && fieldType.isPrimitive()
-                        && isPrimitiveDefaultValue(val)) {
+                        && isPrimitiveDefaultValue(val)
+                        && isPrimitiveLiteral(initializer)) {
                     this.ctx.getRefactorings().remove(initializer);
                     visitSubtree = DO_NOT_VISIT_SUBTREE;
                 }
@@ -98,6 +99,18 @@ public class RemoveFieldsDefaultValuesRefactoring extends AbstractRefactoring {
             return ((Character) val).charValue() == '\u0000';
         }
         return false;
+    }
+
+    private boolean isPrimitiveLiteral(Expression initializer) {
+        switch (initializer.getNodeType()) {
+        case ASTNode.BOOLEAN_LITERAL:
+        case ASTNode.CHARACTER_LITERAL:
+        case ASTNode.NUMBER_LITERAL:
+            return true;
+
+        default: // including string and null literal
+            return false;
+        }
     }
 
 }
