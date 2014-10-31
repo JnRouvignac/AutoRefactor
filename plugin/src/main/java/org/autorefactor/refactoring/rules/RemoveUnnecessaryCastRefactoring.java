@@ -78,9 +78,11 @@ public class RemoveUnnecessaryCastRefactoring extends AbstractRefactoring {
                 final Expression lo = ie.getLeftOperand();
                 final Expression ro = ie.getRightOperand();
                 if (node.equals(lo)) {
-                    return isAssignmentCompatible(node.getExpression(), ro);
+                    return isAssignmentCompatible(node.getExpression(), ro)
+                            && !isPrimitiveTypeNarrowingWithComparison(node, ie);
                 } else if (node.equals(ro)) {
-                    return isAssignmentCompatible(node.getExpression(), lo);
+                    return isAssignmentCompatible(node.getExpression(), lo)
+                            && !isPrimitiveTypeNarrowingWithComparison(node, ie);
                 }
             } // TODO JNR support extended operands
             break;
@@ -89,24 +91,34 @@ public class RemoveUnnecessaryCastRefactoring extends AbstractRefactoring {
         return false;
     }
 
+    private boolean isPrimitiveTypeNarrowingWithComparison(CastExpression node, InfixExpression parent) {
+        if (OperatorEnum.isBoolean(parent.getOperator())) {
+            final ITypeBinding typeBinding1 = node.getType().resolveBinding();
+            final ITypeBinding typeBinding2 = node.getExpression().resolveTypeBinding();
+            return isPrimitive(typeBinding1)
+                    && isPrimitive(typeBinding2)
+                    && isAssignmentCompatible(typeBinding1, typeBinding2);
+        }
+        return false;
+    }
+
     private boolean isAssignmentCompatible(Expression expr, Type type) {
         if (expr != null && type != null) {
-            final ITypeBinding binding1 = expr.resolveTypeBinding();
-            final ITypeBinding binding2 = type.resolveBinding();
-            if (binding1 != null && binding2 != null) {
-                return binding1.isAssignmentCompatible(binding2);
-            }
+            return isAssignmentCompatible(expr.resolveTypeBinding(), type.resolveBinding());
         }
         return false;
     }
 
     private boolean isAssignmentCompatible(Expression expr1, Expression expr2) {
         if (expr1 != null && expr2 != null) {
-            final ITypeBinding binding1 = expr1.resolveTypeBinding();
-            final ITypeBinding binding2 = expr2.resolveTypeBinding();
-            if (binding1 != null && binding2 != null) {
-                return binding1.isAssignmentCompatible(binding2);
-            }
+            return isAssignmentCompatible(expr1.resolveTypeBinding(), expr2.resolveTypeBinding());
+        }
+        return false;
+    }
+
+    private boolean isAssignmentCompatible(final ITypeBinding binding1, final ITypeBinding binding2) {
+        if (binding1 != null && binding2 != null) {
+            return binding1.isAssignmentCompatible(binding2);
         }
         return false;
     }

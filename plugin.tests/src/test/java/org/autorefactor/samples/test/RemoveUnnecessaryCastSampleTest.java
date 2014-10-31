@@ -43,6 +43,50 @@ public class RemoveUnnecessaryCastSampleTest {
     }
 
     @Test
+    public void removeCasts() throws Exception {
+        Integer oi = 1;
+        int pi = 2;
+        long l = 3;
+        assertEquals(sampleIn.removeCasts(oi, pi, l), sampleOut.removeCasts(oi, pi, l));
+    }
+
+    @Test
+    public void removeCastToIntegerWrapper() throws Exception {
+        int pi = 0;
+        assertEquals(sampleIn.removeCastToIntegerWrapper(pi), sampleOut.removeCastToIntegerWrapper(pi));
+    }
+
+    @Test
+    public void removeCastToSameType() throws Exception {
+        Integer oi = 0;
+        assertEquals(sampleIn.removeCastToSameType(oi), sampleOut.removeCastToSameType(oi));
+    }
+
+    @Test
+    public void doNotRemoveNarrowingCast1() throws Exception {
+        Integer oi = 0;
+        assertEquals(sampleIn.doNotRemoveNarrowingCast1(oi), sampleOut.doNotRemoveNarrowingCast1(oi));
+    }
+
+    @Test
+    public void doNotRemoveNarrowingCast2() throws Exception {
+        Integer oi = 0;
+        assertEquals(sampleIn.doNotRemoveNarrowingCast2(oi), sampleOut.doNotRemoveNarrowingCast2(oi));
+    }
+
+    @Test
+    public void removeWideningPrimitiveCast() throws Exception {
+        int pi = 0;
+        assertEquals(sampleIn.removeWideningPrimitiveCast(pi), sampleOut.removeWideningPrimitiveCast(pi));
+    }
+
+    @Test
+    public void doNotRemovePrimitiveNarrowingCast() throws Exception {
+        int pi = 0;
+        assertEquals(sampleIn.doNotRemovePrimitiveNarrowingCast(pi), sampleOut.doNotRemovePrimitiveNarrowingCast(pi));
+    }
+
+    @Test
     public void doNotRemoveCasts() throws Exception {
         Integer oi = 1;
         int pi = 2;
@@ -50,48 +94,18 @@ public class RemoveUnnecessaryCastSampleTest {
         Object o = 4;
         assertEquals(sampleIn.doNotRemoveCasts(oi, pi, l, o), sampleOut.doNotRemoveCasts(oi, pi, l, o));
     }
-  
+
     @Test
-    public void removeCasts() throws Exception {
-        Integer oi = 1;
-        int pi = 2;
-        long l = 3;
-        assertEquals(sampleIn.removeCasts(oi, pi, l), sampleOut.removeCasts(oi, pi, l));
+    public void doNotRemovePrimitiveNarrowingCastsWithComparison() throws Exception {
+        assertDoNotRemovePrimitiveNarrowingCastsWithComparison(0);
+        assertDoNotRemovePrimitiveNarrowingCastsWithComparison(1);
+        final int i = 2 << 8;
+        assertEquals((byte) 0, (byte) i);
+        assertDoNotRemovePrimitiveNarrowingCastsWithComparison(i);
     }
-  
-    @Test
-    public void removeCastToIntegerWrapper() throws Exception {
-        int pi = 0;
-        assertEquals(sampleIn.removeCastToIntegerWrapper(pi), sampleOut.removeCastToIntegerWrapper(pi));
-    }
-  
-    @Test
-    public void removeCastToSameType() throws Exception {
-        Integer oi = 0;
-        assertEquals(sampleIn.removeCastToSameType(oi), sampleOut.removeCastToSameType(oi));
-    }
-  
-    @Test
-    public void doNotRemoveNarrowingCast1() throws Exception {
-        Integer oi = 0;
-        assertEquals(sampleIn.doNotRemoveNarrowingCast1(oi), sampleOut.doNotRemoveNarrowingCast1(oi));
-    }
-  
-    @Test
-    public void doNotRemoveNarrowingCast2() throws Exception {
-        Integer oi = 0;
-        assertEquals(sampleIn.doNotRemoveNarrowingCast2(oi), sampleOut.doNotRemoveNarrowingCast2(oi));
-    }
-  
-    @Test
-    public void removeWideningPrimitiveCast() throws Exception {
-        int pi = 0;
-        assertEquals(sampleIn.removeWideningPrimitiveCast(pi), sampleOut.removeWideningPrimitiveCast(pi));
-    }
-  
-    @Test
-    public void doNotRemovePrimitiveNarrowingCast() throws Exception {
-        int pi = 0;
-        assertEquals(sampleIn.doNotRemovePrimitiveNarrowingCast(pi), sampleOut.doNotRemovePrimitiveNarrowingCast(pi));
+
+    private void assertDoNotRemovePrimitiveNarrowingCastsWithComparison(int i) {
+        assertEquals(sampleIn.doNotRemovePrimitiveNarrowingCastsWithComparison(i),
+            sampleOut.doNotRemovePrimitiveNarrowingCastsWithComparison(i));
     }
 }

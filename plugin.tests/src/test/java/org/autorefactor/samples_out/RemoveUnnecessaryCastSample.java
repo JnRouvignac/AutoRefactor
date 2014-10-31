@@ -99,4 +99,12 @@ public class RemoveUnnecessaryCastSample {
             && oi != (Integer) o; // FIXME cast to (int) after moving to Java 7 builds
     }
 
+    public boolean doNotRemovePrimitiveNarrowingCastsWithComparison(int i) {
+        return (byte) i == 0
+            && 0 == (byte) i
+            && (char) i == 0
+            && 0 == (char) i
+            && (short) i == 0
+            && 0 == (short) i;
+    }
 }

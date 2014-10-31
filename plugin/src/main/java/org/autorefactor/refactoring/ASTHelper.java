@@ -834,15 +834,27 @@ public final class ASTHelper {
     }
 
     /**
-     * Returns whether the provided type binding represents a primitive type.
+     * Returns whether the provided type binding represents the provided primitive type.
      *
      * @param typeBinding the type binding to analyze
      * @param primitiveTypeName the primitive type name
-     * @return true if the provided type binding represents a primitive type, false otherwise
+     * @return true if the provided type binding represents the provided primitive type, false otherwise
      */
     public static boolean isPrimitive(ITypeBinding typeBinding, String primitiveTypeName) {
         return typeBinding != null
                 && typeBinding.getQualifiedName().equals(primitiveTypeName);
+    }
+
+    /**
+     * Returns whether the provided type binding represents a primitive type.
+     *
+     * @param typeBinding the type binding to analyze
+     * @return true if the provided type binding represents a primitive type, false otherwise
+     */
+    public static boolean isPrimitive(ITypeBinding typeBinding) {
+        return typeBinding != null
+                && Arrays.asList("boolean", "byte", "char", "short", "int", "long", "float", "double")
+                    .contains(typeBinding.getQualifiedName());
     }
 
     private static ITypeBinding findImplementedType(ITypeBinding typeBinding, String qualifiedTypeName) {
