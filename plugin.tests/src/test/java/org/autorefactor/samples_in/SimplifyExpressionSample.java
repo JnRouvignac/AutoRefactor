@@ -225,6 +225,22 @@ public class SimplifyExpressionSample {
         SimplifyExpressionSample.this.simplifyPrimitiveBooleanExpression(false);
     }
 
+    public void removeThisExpressionForAnonymousClass() {
+        new Object() {
+            public void simplifyPrimitiveBooleanExpression(boolean b) {
+                this.simplifyPrimitiveBooleanExpression(b);
+            }
+        }.simplifyPrimitiveBooleanExpression(false);
+    }
+
+    public void doNotRemoveThisExpressionForAnonymousClass() {
+        new Object() {
+            public void simplifyPrimitiveBooleanExpression(boolean b) {
+                SimplifyExpressionSample.this.simplifyPrimitiveBooleanExpression(b);
+            }
+        }.simplifyPrimitiveBooleanExpression(false);
+    }
+
     public class InnerClass {
 
         public void removeThisExpression() {
@@ -299,11 +315,18 @@ public class SimplifyExpressionSample {
         }
     }
 
-    public boolean addParentheses(int i, boolean b1, boolean b2, boolean b3) {
+    public boolean addParenthesesToMixedAndOrBooleanOperators(int i, boolean b1, boolean b2, boolean b3) {
         if (i == 0) {
             return b1 && b2 || b3;
         }
         return b1 || b2 && b3;
+    }
+
+    public int addParenthesesToMixedAndOrBitwiseOperators(int i, int b1, int b2, int b3) {
+        if (i == 0) {
+            return b1 & b2 | b3;
+        }
+        return b1 | b2 & b3;
     }
 
 }

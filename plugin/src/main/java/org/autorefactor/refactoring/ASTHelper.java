@@ -357,6 +357,30 @@ public final class ASTHelper {
      * Generecized version of the equivalent JDT method.
      *
      * @param node the node on which to call the equivalent JDT method
+     * @return a List of body declarations
+     * @see AnonymousClassDeclaration#bodyDeclarations()
+     */
+    @SuppressWarnings("unchecked")
+    public static List<BodyDeclaration> bodyDeclarations(AnonymousClassDeclaration node) {
+        return node.bodyDeclarations();
+    }
+
+    /**
+     * Generecized version of the equivalent JDT method.
+     *
+     * @param node the node on which to call the equivalent JDT method
+     * @return a List of body declarations
+     * @see TypeDeclaration#bodyDeclarations()
+     */
+    @SuppressWarnings("unchecked")
+    public static List<BodyDeclaration> bodyDeclarations(TypeDeclaration node) {
+        return node.bodyDeclarations();
+    }
+
+    /**
+     * Generecized version of the equivalent JDT method.
+     *
+     * @param node the node on which to call the equivalent JDT method
      * @return a List of expressions
      * @see TryStatement#catchClauses()
      */
@@ -1058,31 +1082,6 @@ public final class ASTHelper {
             }
         }
         return null;
-    }
-
-    /**
-     * Returns whether <code>this</code> is referring to the currently surrounding type.
-     *
-     * @param thisExpression the <code>this</code> expression
-     * @return true if <code>this</code> is referring to the currently surrounding type, false otherwise
-     */
-    public static boolean thisExpressionRefersToSurroundingType(ThisExpression thisExpression) {
-        return thisExpression != null
-                && thisExpressionRefersToSurroundingType(thisExpression.getQualifier(), thisExpression);
-    }
-
-    private static boolean thisExpressionRefersToSurroundingType(Name thisQualifierName, ASTNode node) {
-        final TypeDeclaration ancestor = getAncestor(node, TypeDeclaration.class);
-        if (thisQualifierName == null) {
-            return true;
-        } else if (thisQualifierName instanceof SimpleName) {
-            return isEqual((SimpleName) thisQualifierName, ancestor.getName());
-        } else if (thisQualifierName instanceof QualifiedName) {
-            final QualifiedName qn = (QualifiedName) thisQualifierName;
-            return isEqual(qn.getName(), ancestor.getName())
-                    && thisExpressionRefersToSurroundingType(qn.getQualifier(), ancestor);
-        }
-        throw new NotImplementedException(thisQualifierName);
     }
 
     /**

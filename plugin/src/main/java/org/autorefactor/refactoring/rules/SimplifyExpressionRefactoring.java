@@ -25,25 +25,36 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import java.util.List;
+
 import org.autorefactor.refactoring.ASTBuilder;
+import org.autorefactor.util.IllegalStateException;
 import org.autorefactor.util.NotImplementedException;
 import org.eclipse.jdt.core.dom.ASTMatcher;
 import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
 import org.eclipse.jdt.core.dom.Assignment;
+import org.eclipse.jdt.core.dom.BodyDeclaration;
 import org.eclipse.jdt.core.dom.CastExpression;
 import org.eclipse.jdt.core.dom.ConditionalExpression;
 import org.eclipse.jdt.core.dom.DoStatement;
 import org.eclipse.jdt.core.dom.Expression;
+import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.InfixExpression.Operator;
 import org.eclipse.jdt.core.dom.InstanceofExpression;
+import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
+import org.eclipse.jdt.core.dom.Name;
 import org.eclipse.jdt.core.dom.ParenthesizedExpression;
 import org.eclipse.jdt.core.dom.PrefixExpression;
+import org.eclipse.jdt.core.dom.QualifiedName;
 import org.eclipse.jdt.core.dom.ReturnStatement;
+import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.ThisExpression;
+import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.WhileStatement;
 
@@ -224,7 +235,8 @@ public class SimplifyExpressionRefactoring extends AbstractRefactoring {
             return replaceInfixExpressionIfNeeded(node.getParent());
         } else if (this.removeThisForNonStaticMethodAccess) {
             final ThisExpression te = as(node.getExpression(), ThisExpression.class);
-            if (thisExpressionRefersToSurroundingType(te)) {
+            if (thisExpressionRefersToSurroundingType(te)
+                    && isCallingMethodDeclaredInSurroundingType(node)) {
                 // remove useless thisExpressions
                 this.ctx.getRefactorings().remove(node.getExpression());
                 return DO_NOT_VISIT_SUBTREE;
@@ -271,6 +283,73 @@ public class SimplifyExpressionRefactoring extends AbstractRefactoring {
                 operator,
                 b.number("0")));
         return DO_NOT_VISIT_SUBTREE;
+    }
+
+    private static boolean thisExpressionRefersToSurroundingType(ThisExpression thisExpression) {
+        return thisExpression != null
+                && thisExpressionRefersToSurroundingType(thisExpression.getQualifier(), thisExpression);
+    }
+
+    private static boolean thisExpressionRefersToSurroundingType(Name thisQualifierName, ASTNode node) {
+        if (thisQualifierName == null) {
+            return true;
+        }
+        final ASTNode surroundingType = getSurroundingType(node);
+        if (surroundingType instanceof AnonymousClassDeclaration) {
+            return false;
+        }
+        final TypeDeclaration ancestor = (TypeDeclaration) surroundingType;
+        if (thisQualifierName instanceof SimpleName) {
+            return isEqual((SimpleName) thisQualifierName, ancestor.getName());
+        } else if (thisQualifierName instanceof QualifiedName) {
+            final QualifiedName qn = (QualifiedName) thisQualifierName;
+            return isEqual(qn.getName(), ancestor.getName())
+                    && thisExpressionRefersToSurroundingType(qn.getQualifier(), ancestor);
+        }
+        throw new NotImplementedException(thisQualifierName);
+    }
+
+    private boolean isCallingMethodDeclaredInSurroundingType(MethodInvocation node) {
+        final ASTNode currentType = getSurroundingType(node);
+        final IMethodBinding mb = node.resolveMethodBinding();
+        if (currentType instanceof AnonymousClassDeclaration) {
+            final AnonymousClassDeclaration c = (AnonymousClassDeclaration) currentType;
+            return containsMethodDeclaration(mb, bodyDeclarations(c));
+        } else if (currentType instanceof TypeDeclaration) {
+            final TypeDeclaration td = (TypeDeclaration) currentType;
+            return containsMethodDeclaration(mb, bodyDeclarations(td));
+        }
+        throw new NotImplementedException(node, node);
+    }
+
+    private boolean containsMethodDeclaration(IMethodBinding methodBinding, List<BodyDeclaration> declarations) {
+        for (BodyDeclaration decl : declarations) {
+            if (decl instanceof MethodDeclaration) {
+                final MethodDeclaration md = (MethodDeclaration) decl;
+                if (methodBinding.equals(md.resolveBinding())) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private static ASTNode getSurroundingType(ASTNode node) {
+        return getFirstAncestor(node, TypeDeclaration.class, AnonymousClassDeclaration.class);
+    }
+
+    private static ASTNode getFirstAncestor(ASTNode node, Class<?>... ancestorClasses) {
+        if (node == null || node.getParent() == null) {
+            throw new IllegalStateException(node,
+                    "Could not find any ancestor for " + ancestorClasses + "and node " + node);
+        }
+        final ASTNode parent = node.getParent();
+        for (Class<?> ancestorClazz : ancestorClasses) {
+            if (ancestorClazz.isAssignableFrom(parent.getClass())) {
+                return parent;
+            }
+        }
+        return getFirstAncestor(parent, ancestorClasses);
     }
 
     /** {@inheritDoc} */
