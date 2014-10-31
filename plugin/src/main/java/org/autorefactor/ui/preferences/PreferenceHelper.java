@@ -72,7 +72,7 @@ public class PreferenceHelper {
      *
      * @return true if debug mode is on, false otherwise.
      */
-    public boolean addAngleBracketsToStatementBodies() {
-        return getBoolean(ADD_ANGLE_BRACKETS_TO_STATEMENT_BODIES);
+    public boolean addCurlyBracketsToStatementBodies() {
+        return getBoolean(ADD_CURLY_BRACKETS_TO_STATEMENT_BODIES);
     }
 }

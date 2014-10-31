@@ -53,7 +53,7 @@ public final class AllRefactorings {
         final List<IRefactoring> refactorings = getAllRefactorings();
         for (final Iterator<IRefactoring> iter = refactorings.iterator(); iter.hasNext();) {
             final IRefactoring refactoring = iter.next();
-            if (!prefs.addAngleBracketsToStatementBodies()
+            if (!prefs.addCurlyBracketsToStatementBodies()
                 && refactoring instanceof AddBracketsToControlStatementRefactoring) {
                 iter.remove();
             }

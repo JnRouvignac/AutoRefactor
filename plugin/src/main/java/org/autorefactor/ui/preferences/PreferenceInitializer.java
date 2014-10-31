@@ -43,7 +43,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
         // code style/cleanup/formatting
         IPreferenceStore store = AutoRefactorPlugin.getDefault().getPreferenceStore();
         store.setDefault(REMOVE_THIS_FOR_NON_STATIC_METHOD_ACCESS.name, true);
-        store.setDefault(ADD_ANGLE_BRACKETS_TO_STATEMENT_BODIES.name, true);
+        store.setDefault(ADD_CURLY_BRACKETS_TO_STATEMENT_BODIES.name, true);
     }
 
 }

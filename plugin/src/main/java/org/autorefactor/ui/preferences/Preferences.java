@@ -35,10 +35,10 @@ public enum Preferences {
             "debug_mode_on",
             "Enable debug mode (for developers only)"),
 
-    /** Preference that configures whether to add brackets to statement bodies. */
-    ADD_ANGLE_BRACKETS_TO_STATEMENT_BODIES(
-            "add_angle_brackets_to_statement_bodies",
-            "Add angle brackets '{' and '}' to statement bodies"),
+    /** Preference that configures whether to add curly brackets to statement bodies. */
+    ADD_CURLY_BRACKETS_TO_STATEMENT_BODIES(
+            "add_curly_brackets_to_statement_bodies",
+            "Add curly brackets '{' and '}' to statement bodies"),
 
     /** Preference that configures whether to remove <code>this</code> for non static method accesses. */
     REMOVE_THIS_FOR_NON_STATIC_METHOD_ACCESS(
