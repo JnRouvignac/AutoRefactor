@@ -175,4 +175,22 @@ public class WorkWithNullCheckedExpressionFirstSample {
         return emptyList();
     }
 
+    private String doNotRefactorComplexStatement(Object o, boolean b) {
+        String s = null;
+        if (o == null) {
+            if (b) {
+                s = "null ok";
+            } else {
+                s = "null not ok";
+            }
+        } else {
+            if (b) {
+                s = "not null ok";
+            } else {
+                s = "not null not ok";
+            }
+        }
+        return s;
+    }
+
 }

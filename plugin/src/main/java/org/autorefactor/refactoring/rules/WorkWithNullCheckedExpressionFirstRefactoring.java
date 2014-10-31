@@ -29,6 +29,7 @@ import java.util.List;
 
 import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.Refactorings;
+import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.InfixExpression;
@@ -54,7 +55,8 @@ public class WorkWithNullCheckedExpressionFirstRefactoring extends AbstractRefac
         if (isNullCheck(node.getExpression())
                 && thenStmt != null
                 && elseStmt != null
-                && thenStmt.getNodeType() == elseStmt.getNodeType()) {
+                && thenStmt.getNodeType() == elseStmt.getNodeType()
+                && simpleStmt(thenStmt)) {
             return revertIfStatement(node, thenStmt, elseStmt);
         }
         return VISIT_SUBTREE;
@@ -86,6 +88,21 @@ public class WorkWithNullCheckedExpressionFirstRefactoring extends AbstractRefac
                 && !condition.hasExtendedOperands()
                 && EQUALS.equals(condition.getOperator())
                 && (isNullLiteral(condition.getLeftOperand()) || isNullLiteral(condition.getRightOperand()));
+    }
+
+    private boolean simpleStmt(Statement stmt) {
+        switch (stmt.getNodeType()) {
+        case ASTNode.IF_STATEMENT:
+        case ASTNode.DO_STATEMENT:
+        case ASTNode.WHILE_STATEMENT:
+        case ASTNode.FOR_STATEMENT:
+        case ASTNode.ENHANCED_FOR_STATEMENT:
+        case ASTNode.TRY_STATEMENT:
+            return false;
+
+        default:
+            return true;
+        }
     }
 
     /** Revert condition + swap then and else statements.  */
