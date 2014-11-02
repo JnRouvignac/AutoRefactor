@@ -32,6 +32,7 @@ import org.eclipse.jdt.core.dom.CastExpression;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.InfixExpression;
+import org.eclipse.jdt.core.dom.InfixExpression.Operator;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
@@ -77,15 +78,25 @@ public class RemoveUnnecessaryCastRefactoring extends AbstractRefactoring {
             final Expression lo = ie.getLeftOperand();
             final Expression ro = ie.getRightOperand();
             if (node.equals(lo)) {
-                return isAssignmentCompatible(node.getExpression(), ro)
-                        && !isPrimitiveTypeNarrowing(node, ie);
+                return (isAssignmentCompatible(node.getExpression(), ro) || isStringConcat(ie))
+                        && !isPrimitiveTypeNarrowing(node, ie)
+                        && !isFloatDivision(ie);
             } else {
-                return isAssignmentCompatible(node.getExpression(), lo)
-                        && !isPrimitiveTypeNarrowing(node, ie);
+                return (isAssignmentCompatible(node.getExpression(), lo) || isStringConcat(ie))
+                        && !isPrimitiveTypeNarrowing(node, ie)
+                        && !isFloatDivision(ie);
             }
 
         }
         return false;
+    }
+
+    private boolean isStringConcat(InfixExpression ie) {
+        return hasType(ie, "java.lang.String");
+    }
+
+    private boolean isFloatDivision(InfixExpression ie) {
+        return Operator.DIVIDE.equals(ie.getOperator());
     }
 
     private boolean isPrimitiveTypeNarrowing(CastExpression node, InfixExpression parent) {

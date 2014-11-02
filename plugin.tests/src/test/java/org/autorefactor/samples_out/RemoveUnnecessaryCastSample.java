@@ -123,4 +123,32 @@ public class RemoveUnnecessaryCastSample {
     public int doNotRemovePrimitiveNarrowingCastsWithExtendedOperands(int i, int j) {
         return (byte) i + j + (byte) i;
     }
+
+    public String removeCastsFromStringAppend(Integer oi, int pi, Object o) {
+        return "" + oi + oi + oi + pi + pi + o;
+    }
+
+    public String doNotRemoveCastsFromStringAppend(int pi, long l, float f) {
+        return "" + (byte) pi + (int) f;
+    }
+
+    public double removeSomeCastsFromDivisionWithDifferentTypes(int i, long l, float f) {
+        return (double) i / (double) l; // TODO last cast can be removed
+    }
+
+    public double removeSomeCastsFromDivisionWithDifferentTypesWithExtendedOperands(int i, long l, float f) {
+        return (double) i / (double) l / (double) 100; // TODO last cast can be removed
+    }
+
+    public double removeCastsFromAdditionWhenResultIsWidened(Integer oi, int pi, long l) {
+        return oi + pi + l;
+    }
+
+    public double removeCastsFromSoustractionWhenResultIsWidened(Integer oi, int pi, long l) {
+        return oi - pi - l;
+    }
+
+    public boolean removeCastsFromBooleanOperations(boolean b1, boolean b2) {
+        return b1 && b2;
+    }
 }

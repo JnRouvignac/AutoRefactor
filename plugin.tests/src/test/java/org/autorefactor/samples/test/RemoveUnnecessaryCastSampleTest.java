@@ -120,4 +120,38 @@ public class RemoveUnnecessaryCastSampleTest {
                 sampleOut.doNotRemovePrimitiveNarrowingCasts(i, j));
     }
 
+    @Test
+    public void removeCastsFromStringAppend() throws Exception {
+        Integer oi = 1;
+        int pi = 2;
+        Object o = "";
+        assertEquals(sampleIn.removeCastsFromStringAppend(oi, pi, o), sampleOut.removeCastsFromStringAppend(oi, pi, o));
+    }
+
+    @Test
+    public void doNotRemoveCastsFromStringAppend() throws Exception {
+        int pi = 1;
+        long l = 2;
+        float f = 3;
+        assertEquals(sampleIn.doNotRemoveCastsFromStringAppend(pi, l, f),
+                sampleOut.doNotRemoveCastsFromStringAppend(pi, l, f));
+    }
+
+    @Test
+    public void doNotRemoveCastsFromDivisionWithDifferentTypes() throws Exception {
+        int pi = 1;
+        long l = 2;
+        float f = 3;
+        assertEquals(sampleIn.removeSomeCastsFromDivisionWithDifferentTypes(pi, l, f),
+                sampleOut.removeSomeCastsFromDivisionWithDifferentTypes(pi, l, f), 0.0);
+    }
+
+    @Test
+    public void doNotRemoveCastsFromDivisionWithDifferentTypesWithExtendedOperands() throws Exception {
+        int pi = 1;
+        long l = 2;
+        float f = 3;
+        assertEquals(sampleIn.removeSomeCastsFromDivisionWithDifferentTypesWithExtendedOperands(pi, l, f),
+                sampleOut.removeSomeCastsFromDivisionWithDifferentTypesWithExtendedOperands(pi, l, f), 0.0);
+    }
 }
