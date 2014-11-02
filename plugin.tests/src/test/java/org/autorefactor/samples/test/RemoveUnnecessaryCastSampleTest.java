@@ -106,6 +106,18 @@ public class RemoveUnnecessaryCastSampleTest {
 
     private void assertDoNotRemovePrimitiveNarrowingCastsWithComparison(int i) {
         assertEquals(sampleIn.doNotRemovePrimitiveNarrowingCastsWithComparison(i),
-            sampleOut.doNotRemovePrimitiveNarrowingCastsWithComparison(i));
+                sampleOut.doNotRemovePrimitiveNarrowingCastsWithComparison(i));
     }
+
+    @Test
+    public void doNotRemovePrimitiveNarrowingCasts() {
+        assertDoNotRemovePrimitiveNarrowingCasts(1, 1);
+        assertDoNotRemovePrimitiveNarrowingCasts(256, 1);
+    }
+
+    private void assertDoNotRemovePrimitiveNarrowingCasts(int i, int j) {
+        assertEquals(sampleIn.doNotRemovePrimitiveNarrowingCasts(i, j),
+                sampleOut.doNotRemovePrimitiveNarrowingCasts(i, j));
+    }
+
 }

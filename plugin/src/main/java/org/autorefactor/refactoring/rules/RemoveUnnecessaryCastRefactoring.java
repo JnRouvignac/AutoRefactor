@@ -74,32 +74,26 @@ public class RemoveUnnecessaryCastRefactoring extends AbstractRefactoring {
 
         case INFIX_EXPRESSION:
             final InfixExpression ie = (InfixExpression) parent;
-            if (!ie.hasExtendedOperands()) {
-                final Expression lo = ie.getLeftOperand();
-                final Expression ro = ie.getRightOperand();
-                if (node.equals(lo)) {
-                    return isAssignmentCompatible(node.getExpression(), ro)
-                            && !isPrimitiveTypeNarrowingWithComparison(node, ie);
-                } else if (node.equals(ro)) {
-                    return isAssignmentCompatible(node.getExpression(), lo)
-                            && !isPrimitiveTypeNarrowingWithComparison(node, ie);
-                }
-            } // TODO JNR support extended operands
-            break;
+            final Expression lo = ie.getLeftOperand();
+            final Expression ro = ie.getRightOperand();
+            if (node.equals(lo)) {
+                return isAssignmentCompatible(node.getExpression(), ro)
+                        && !isPrimitiveTypeNarrowing(node, ie);
+            } else {
+                return isAssignmentCompatible(node.getExpression(), lo)
+                        && !isPrimitiveTypeNarrowing(node, ie);
+            }
 
         }
         return false;
     }
 
-    private boolean isPrimitiveTypeNarrowingWithComparison(CastExpression node, InfixExpression parent) {
-        if (OperatorEnum.isBoolean(parent.getOperator())) {
-            final ITypeBinding typeBinding1 = node.getType().resolveBinding();
-            final ITypeBinding typeBinding2 = node.getExpression().resolveTypeBinding();
-            return isPrimitive(typeBinding1)
-                    && isPrimitive(typeBinding2)
-                    && isAssignmentCompatible(typeBinding1, typeBinding2);
-        }
-        return false;
+    private boolean isPrimitiveTypeNarrowing(CastExpression node, InfixExpression parent) {
+        final ITypeBinding typeBinding1 = node.getType().resolveBinding();
+        final ITypeBinding typeBinding2 = node.getExpression().resolveTypeBinding();
+        return isPrimitive(typeBinding1)
+                && isPrimitive(typeBinding2)
+                && isAssignmentCompatible(typeBinding1, typeBinding2);
     }
 
     private boolean isAssignmentCompatible(Expression expr, Type type) {

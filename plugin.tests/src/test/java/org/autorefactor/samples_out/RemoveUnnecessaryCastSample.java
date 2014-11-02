@@ -107,4 +107,20 @@ public class RemoveUnnecessaryCastSample {
             && (short) i == 0
             && 0 == (short) i;
     }
+
+    public long removeWideningCast(int i, int j) {
+        return i + j;
+    }
+
+    public long removeWideningCastsWithExtendedOperands(int i, int j) {
+        return i + j + i;
+    }
+
+    public int doNotRemovePrimitiveNarrowingCasts(int i, int j) {
+        return (byte) i + j;
+    }
+
+    public int doNotRemovePrimitiveNarrowingCastsWithExtendedOperands(int i, int j) {
+        return (byte) i + j + (byte) i;
+    }
 }
