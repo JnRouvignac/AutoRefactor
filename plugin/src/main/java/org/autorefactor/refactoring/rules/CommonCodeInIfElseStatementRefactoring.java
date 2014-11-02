@@ -79,32 +79,25 @@ public class CommonCodeInIfElseStatementRefactoring extends AbstractRefactoring 
 
             // identify matching statements starting from the beginning of each case
             for (int stmtIndex = 0; stmtIndex < minSize; stmtIndex++) {
-                if (!match(matcher, allCasesStmts, true, stmtIndex, 0,
-                        allCasesStmts.size())) {
+                if (!match(matcher, allCasesStmts, true, stmtIndex, 0, allCasesStmts.size())) {
                     break;
                 }
-                this.ctx.getRefactorings().insertBefore(
-                        b.copy(caseStmts.get(stmtIndex)), node);
+                this.ctx.getRefactorings().insertBefore(b.copy(caseStmts.get(stmtIndex)), node);
                 removeStmts(allCasesStmts, true, stmtIndex, removedCaseStmts);
             }
 
             // identify matching statements starting from the end of each case
             for (int stmtIndex = 1; 0 <= minSize - stmtIndex; stmtIndex++) {
-                if (!match(matcher, allCasesStmts, false, stmtIndex, 0,
-                        allCasesStmts.size())
-                        || anyContains(removedCaseStmts, allCasesStmts,
-                                stmtIndex)) {
+                if (!match(matcher, allCasesStmts, false, stmtIndex, 0, allCasesStmts.size())
+                        || anyContains(removedCaseStmts, allCasesStmts, stmtIndex)) {
                     break;
                 }
-                this.ctx.getRefactorings().insertAfter(
-                        b.copy(caseStmts.get(caseStmts.size() - stmtIndex)),
-                        node);
+                this.ctx.getRefactorings().insertAfter(b.copy(caseStmts.get(caseStmts.size() - stmtIndex)), node);
                 removeStmts(allCasesStmts, false, stmtIndex, removedCaseStmts);
             }
 
             // remove the nodes common to all cases
-            final List<Boolean> areCasesEmpty = new ArrayList<Boolean>(
-                    allCasesStmts.size());
+            final List<Boolean> areCasesEmpty = new ArrayList<Boolean>(allCasesStmts.size());
             for (int i = 0; i < allCasesStmts.size(); i++) {
                 areCasesEmpty.add(Boolean.FALSE);
             }
@@ -121,14 +114,12 @@ public class CommonCodeInIfElseStatementRefactoring extends AbstractRefactoring 
                 // remove empty cases
                 if (areCasesEmpty.get(0)) {
                     // TODO JNR then clause is empty => revert if statement
-                    this.ctx.getRefactorings().replace(node.getThenStatement(),
-                            b.body());
+                    this.ctx.getRefactorings().replace(node.getThenStatement(), b.body());
                 }
                 for (int i = 1; i < areCasesEmpty.size(); i++) {
                     if (areCasesEmpty.get(i)) {
                         final Statement firstStmt = allCasesStmts.get(i).get(0);
-                        this.ctx.getRefactorings().remove(findNodeToRemove(firstStmt,
-                                firstStmt.getParent()));
+                        this.ctx.getRefactorings().remove(findNodeToRemove(firstStmt, firstStmt.getParent()));
                     }
                 }
             }
@@ -174,8 +165,8 @@ public class CommonCodeInIfElseStatementRefactoring extends AbstractRefactoring 
         return true;
     }
 
-    private void removeStmtsFromCases(List<List<Statement>> allCasesStmts,
-            List<List<ASTNode>> removedCaseStmts, List<Boolean> areCasesEmpty) {
+    private void removeStmtsFromCases(List<List<Statement>> allCasesStmts, List<List<ASTNode>> removedCaseStmts,
+            List<Boolean> areCasesEmpty) {
         for (int i = 0; i < allCasesStmts.size(); i++) {
             final List<ASTNode> removedStmts = removedCaseStmts.get(i);
             if (removedStmts.containsAll(allCasesStmts.get(i))) {
@@ -186,20 +177,17 @@ public class CommonCodeInIfElseStatementRefactoring extends AbstractRefactoring 
         }
     }
 
-    private boolean anyContains(List<List<ASTNode>> removedCaseStmts,
-            List<List<Statement>> allCasesStmts, int stmtIndex) {
+    private boolean anyContains(List<List<ASTNode>> removedCaseStmts, List<List<Statement>> allCasesStmts, int stmtIndex) {
         for (int i = 0; i < allCasesStmts.size(); i++) {
             final List<Statement> caseStmts = allCasesStmts.get(i);
-            if (removedCaseStmts.get(i).contains(
-                    caseStmts.get(caseStmts.size() - stmtIndex))) {
+            if (removedCaseStmts.get(i).contains(caseStmts.get(caseStmts.size() - stmtIndex))) {
                 return true;
             }
         }
         return false;
     }
 
-    private void removeStmts(List<List<Statement>> allCasesStmts,
-            boolean forwardCase, int stmtIndex,
+    private void removeStmts(List<List<Statement>> allCasesStmts, boolean forwardCase, int stmtIndex,
             List<List<ASTNode>> removedCaseStmts) {
         for (int i = 0; i < allCasesStmts.size(); i++) {
             final List<Statement> caseStmts = allCasesStmts.get(i);
@@ -213,19 +201,16 @@ public class CommonCodeInIfElseStatementRefactoring extends AbstractRefactoring 
         }
     }
 
-    private boolean match(ASTMatcher matcher,
-            List<List<Statement>> allCasesStmts, boolean matchForward,
-            int stmtIndex, int startIndex, int endIndex) {
+    private boolean match(ASTMatcher matcher, List<List<Statement>> allCasesStmts, boolean matchForward, int stmtIndex,
+            int startIndex, int endIndex) {
         if (startIndex == endIndex || startIndex == endIndex - 1) {
             return true;
         }
         final int comparisonIndex;
         if (endIndex - startIndex > 1) {
             final int pivotIndex = (endIndex + startIndex + 1) / 2;
-            if (!match(matcher, allCasesStmts, matchForward, stmtIndex,
-                    startIndex, pivotIndex)
-                    || !match(matcher, allCasesStmts, matchForward, stmtIndex,
-                            pivotIndex, endIndex)) {
+            if (!match(matcher, allCasesStmts, matchForward, stmtIndex, startIndex, pivotIndex)
+                    || !match(matcher, allCasesStmts, matchForward, stmtIndex, pivotIndex, endIndex)) {
                 return false;
             }
             comparisonIndex = pivotIndex;
@@ -236,11 +221,9 @@ public class CommonCodeInIfElseStatementRefactoring extends AbstractRefactoring 
         final List<Statement> caseStmts1 = allCasesStmts.get(startIndex);
         final List<Statement> caseStmts2 = allCasesStmts.get(comparisonIndex);
         if (matchForward) {
-            return ASTHelper.match(matcher, caseStmts1.get(stmtIndex),
-                    caseStmts2.get(stmtIndex));
+            return ASTHelper.match(matcher, caseStmts1.get(stmtIndex), caseStmts2.get(stmtIndex));
         } else {
-            return ASTHelper.match(matcher,
-                    caseStmts1.get(caseStmts1.size() - stmtIndex),
+            return ASTHelper.match(matcher, caseStmts1.get(caseStmts1.size() - stmtIndex),
                     caseStmts2.get(caseStmts2.size() - stmtIndex));
         }
     }
@@ -254,8 +237,7 @@ public class CommonCodeInIfElseStatementRefactoring extends AbstractRefactoring 
             min = Math.min(min, stmts.size());
         }
         if (min == Integer.MAX_VALUE) {
-            throw new IllegalStateException(null,
-                    "The minimum size should never have been equal to Integer.MAX_VALUE");
+            throw new IllegalStateException(null, "The minimum size should never have been equal to Integer.MAX_VALUE");
         }
         return min;
     }
@@ -268,8 +250,7 @@ public class CommonCodeInIfElseStatementRefactoring extends AbstractRefactoring 
      * @return true if all cases (if/else, if/else if/else, etc.) are covered,
      *         false otherwise
      */
-    private boolean collectAllCases(List<List<Statement>> allCases,
-            IfStatement node) {
+    private boolean collectAllCases(List<List<Statement>> allCases, IfStatement node) {
         final List<Statement> thenStmts = asList(node.getThenStatement());
         final List<Statement> elseStmts = asList(node.getElseStatement());
         if (thenStmts.isEmpty() || elseStmts.isEmpty()) {
