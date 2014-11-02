@@ -58,16 +58,13 @@ public class RemoveFieldsDefaultValuesRefactoring extends AbstractRefactoring {
         for (VariableDeclarationFragment vdf : fragments(node)) {
             final Expression initializer = vdf.getInitializer();
             if (initializer != null) {
-                final Object val = initializer.resolveConstantExpressionValue();
-                if (val == null // Only means that no constant value could be determined
-                        && !fieldType.isPrimitive()
+                if (!fieldType.isPrimitive()
                         && isNullLiteral(initializer)) {
                     this.ctx.getRefactorings().remove(initializer);
                     visitSubtree = DO_NOT_VISIT_SUBTREE;
-                } else if (val != null
-                        && fieldType.isPrimitive()
-                        && isPrimitiveDefaultValue(val)
-                        && isPrimitiveLiteral(initializer)) {
+                } else if (fieldType.isPrimitive()
+                        && isPrimitiveLiteral(initializer)
+                        && isPrimitiveDefaultValue(initializer.resolveConstantExpressionValue())) {
                     this.ctx.getRefactorings().remove(initializer);
                     visitSubtree = DO_NOT_VISIT_SUBTREE;
                 }
