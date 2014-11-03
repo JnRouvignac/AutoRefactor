@@ -132,12 +132,12 @@ public class RemoveUnnecessaryCastSample {
         return "" + (byte) pi + (int) f;
     }
 
-    public double removeSomeCastsFromDivisionWithDifferentTypes(int i, long l, float f) {
-        return (double) i / (double) l; // TODO last cast can be removed
+    public double removeSomeCastsFromDivisionWithDifferentTypes(int i, long l) {
+        return (double) i / (double) l;
     }
 
-    public double removeSomeCastsFromDivisionWithDifferentTypesWithExtendedOperands(int i, long l, float f) {
-        return (double) i / (double) l / (double) 100; // TODO last cast can be removed
+    public double removeSomeCastsFromDivisionWithDifferentTypesWithExtendedOperands(int i, long l, short s) {
+        return (double) i / (double) l / (double) s;
     }
 
     public double removeCastsFromAdditionWhenResultIsWidened(Integer oi, int pi, long l) {

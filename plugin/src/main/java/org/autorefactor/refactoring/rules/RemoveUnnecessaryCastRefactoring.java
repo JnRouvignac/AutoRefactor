@@ -83,10 +83,9 @@ public class RemoveUnnecessaryCastRefactoring extends AbstractRefactoring {
                         && !isFloatDivision(ie);
             } else {
                 return (isAssignmentCompatible(node.getExpression(), lo) || isStringConcat(ie))
-                        && !isPrimitiveTypeNarrowing(node, ie)
-                        && !isFloatDivision(ie);
+                        && !isPrimitiveTypeNarrowing(node, ie);
+                        // it can be removed because this is never the first operand of a division
             }
-
         }
         return false;
     }

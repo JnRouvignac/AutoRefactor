@@ -138,20 +138,19 @@ public class RemoveUnnecessaryCastSampleTest {
     }
 
     @Test
-    public void doNotRemoveCastsFromDivisionWithDifferentTypes() throws Exception {
-        int pi = 1;
+    public void removeSomeCastsFromDivisionWithDifferentTypes() throws Exception {
+        int i = 1;
         long l = 2;
-        float f = 3;
-        assertEquals(sampleIn.removeSomeCastsFromDivisionWithDifferentTypes(pi, l, f),
-                sampleOut.removeSomeCastsFromDivisionWithDifferentTypes(pi, l, f), 0.0);
+        assertEquals(sampleIn.removeSomeCastsFromDivisionWithDifferentTypes(i, l),
+                sampleOut.removeSomeCastsFromDivisionWithDifferentTypes(i, l), 0.0);
     }
 
     @Test
-    public void doNotRemoveCastsFromDivisionWithDifferentTypesWithExtendedOperands() throws Exception {
-        int pi = 1;
+    public void removeSomeCastsFromDivisionWithDifferentTypesWithExtendedOperands() throws Exception {
+        int i = 1;
         long l = 2;
-        float f = 3;
-        assertEquals(sampleIn.removeSomeCastsFromDivisionWithDifferentTypesWithExtendedOperands(pi, l, f),
-                sampleOut.removeSomeCastsFromDivisionWithDifferentTypesWithExtendedOperands(pi, l, f), 0.0);
+        short s = 3;
+        assertEquals(sampleIn.removeSomeCastsFromDivisionWithDifferentTypesWithExtendedOperands(i, l, s),
+                sampleOut.removeSomeCastsFromDivisionWithDifferentTypesWithExtendedOperands(i, l, s), 0.0);
     }
 }
