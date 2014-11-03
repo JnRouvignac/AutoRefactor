@@ -81,6 +81,14 @@ public class CommentsRefactoring extends AbstractRefactoring {
             +   "(?:TODO: handle exception)"
             + ")"
             + "\\s*");
+    /**
+     * Ignore special instructions to locally enable/disable tools working on java code:
+     * <ul>
+     * <li>checkstyle</li>
+     * <li>JDT</li>
+     * </ul>
+     */
+    private static final Pattern TOOLS_CONTROL_INSTRUCTIONS = Pattern.compile("//\\s*@\\w+:\\w+");
     private static final Pattern JAVADOC_HAS_PUNCTUATION = Pattern.compile("\\.|\\?|!|:");
     private static final Pattern JAVADOC_WITHOUT_PUNCTUATION =
             Pattern.compile("(.*?)((?:\\s*(?:\\r|\\n|\\r\\n)*\\s*)*(?:\\*/)?)", Pattern.DOTALL);
@@ -306,6 +314,8 @@ public class CommentsRefactoring extends AbstractRefactoring {
         } else if (ECLIPSE_GENERATED_TODOS.matcher(comment).matches()) {
             this.ctx.getRefactorings().remove(node);
             return DO_NOT_VISIT_SUBTREE;
+        } else if (TOOLS_CONTROL_INSTRUCTIONS.matcher(comment).matches()) {
+            return VISIT_SUBTREE;
         } else {
             final ASTNode nextNode = getNextNode(node);
             final ASTNode previousNode = getPreviousSibling(nextNode);
