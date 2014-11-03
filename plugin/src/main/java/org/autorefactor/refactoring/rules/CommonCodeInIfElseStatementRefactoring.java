@@ -49,8 +49,7 @@ import static org.autorefactor.refactoring.ASTHelper.*;
 public class CommonCodeInIfElseStatementRefactoring extends AbstractRefactoring {
 
     // TODO handle switch statements
-    // TODO handle clauses in catch blocks (also useful for java 7 with
-    // multi-catch)
+    // TODO handle clauses in catch blocks (also useful for java 7 with multi-catch)
     // TODO also handle ternary operator, ConditionalExpression
     // TODO move to IfStatementRefactoring??
 
@@ -106,15 +105,19 @@ public class CommonCodeInIfElseStatementRefactoring extends AbstractRefactoring 
             if (allEmpty(areCasesEmpty)) {
                 // TODO JNR keep comments
                 this.ctx.getRefactorings().remove(node);
-                // } else if (areCasesEmpty.get(0)) {
-                // // TODO JNR then clause is empty => revert if statement
-                // this.ctx.getRefactorings().replace(node.getThenStatement(),
-                // this.ctx.getAST().newBlock());
             } else {
                 // remove empty cases
                 if (areCasesEmpty.get(0)) {
-                    // TODO JNR then clause is empty => revert if statement
-                    this.ctx.getRefactorings().replace(node.getThenStatement(), b.body());
+                    if (areCasesEmpty.size() == 2
+                            && !areCasesEmpty.get(1)) {
+                        // then clause is empty and there is only one else clause
+                        // => revert if statement
+                        this.ctx.getRefactorings().replace(node,
+                                b.if0(b.not(b.parenthesizeIfNeeded(b.move(node.getExpression()))),
+                                        b.move(node.getElseStatement())));
+                    } else {
+                        this.ctx.getRefactorings().replace(node.getThenStatement(), b.block());
+                    }
                 }
                 for (int i = 1; i < areCasesEmpty.size(); i++) {
                     if (areCasesEmpty.get(i)) {
@@ -177,7 +180,8 @@ public class CommonCodeInIfElseStatementRefactoring extends AbstractRefactoring 
         }
     }
 
-    private boolean anyContains(List<List<ASTNode>> removedCaseStmts, List<List<Statement>> allCasesStmts, int stmtIndex) {
+    private boolean anyContains(List<List<ASTNode>> removedCaseStmts, List<List<Statement>> allCasesStmts,
+            int stmtIndex) {
         for (int i = 0; i < allCasesStmts.size(); i++) {
             final List<Statement> caseStmts = allCasesStmts.get(i);
             if (removedCaseStmts.get(i).contains(caseStmts.get(caseStmts.size() - stmtIndex))) {

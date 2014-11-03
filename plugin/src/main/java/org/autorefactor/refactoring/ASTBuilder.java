@@ -118,10 +118,10 @@ public class ASTBuilder {
      * @param stmts the statements to add to the block
      * @return a new Block
      */
-    public Block body(final Statement... stmts) {
-        final Block tryBody = ast.newBlock();
-        addAll(statements(tryBody), stmts);
-        return tryBody;
+    public Block block(final Statement... stmts) {
+        final Block block = ast.newBlock();
+        addAll(statements(block), stmts);
+        return block;
     }
 
     /**

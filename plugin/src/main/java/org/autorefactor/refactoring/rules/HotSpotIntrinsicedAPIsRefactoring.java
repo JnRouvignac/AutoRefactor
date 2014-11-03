@@ -136,7 +136,6 @@ public class HotSpotIntrinsicedAPIsRefactoring extends AbstractRefactoring {
         if (expr1Value != null && expr2Value != null) {
             return b.int0(expr1Value - expr2Value);
         } else if (expr1Value != null && expr1Value == 0) {
-            // TODO negate expr2
             throw new NotImplementedException(expr2, "Code is not implemented for negating expr2: " + expr2);
         } else if (expr2Value != null && expr2Value == 0) {
             return b.copy(expr1);
@@ -236,7 +235,7 @@ public class HotSpotIntrinsicedAPIsRefactoring extends AbstractRefactoring {
             Expression length) {
         final ASTBuilder b = this.ctx.getASTBuilder();
         final TryStatement tryS = b.try0(
-                b.body(
+                b.block(
                         b.toStmt(
                                 b.invoke("System", "arraycopy",
                                         srcArrayExpr, srcPos, destArrayExpr, destPos, length))),
@@ -304,7 +303,6 @@ public class HotSpotIntrinsicedAPIsRefactoring extends AbstractRefactoring {
         return null;
     }
 
-    // TODO JNR verify that client code null checks the result of calling this method
     private IVariableBinding getVariableBinding(final Expression e) {
         if (e instanceof SimpleName) {
             final SimpleName sn = (SimpleName) e;

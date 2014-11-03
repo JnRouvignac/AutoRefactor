@@ -61,8 +61,7 @@ public class CommonCodeInIfElseStatementSample
     public void ifElseRemoveThen(Boolean b, int i, int j) {
         // keep this comment
         i++;
-        if (b.booleanValue()) {
-        } else {
+        if (!b.booleanValue()) {
             j++;
         }
     }
