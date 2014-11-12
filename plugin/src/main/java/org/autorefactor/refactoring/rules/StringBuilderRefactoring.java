@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2013 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2013-2014 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,6 +31,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.autorefactor.refactoring.ASTBuilder;
@@ -149,16 +150,14 @@ public class StringBuilderRefactoring extends AbstractRefactoring {
                 // most expensive check comes last
                 && instanceOf(typeBinding, "java.lang.Appendable")) {
             final LinkedList<Expression> allAppendedStrings = new LinkedList<Expression>();
-            final AtomicBoolean foundInfixExpr = new AtomicBoolean(false);
-            final Expression lastExpr = collectAllAppendedStrings(node, allAppendedStrings, foundInfixExpr);
-            if (lastExpr instanceof Name || lastExpr instanceof FieldAccess) {
-                boolean rewriteNeeded = filterOutEmptyStrings(allAppendedStrings);
-                if (rewriteNeeded || foundInfixExpr.get()) {
-                    // rewrite the successive calls to append() on an Appendable
-                    this.ctx.getRefactorings().replace(node,
-                            createStringAppends(lastExpr, allAppendedStrings));
-                    return DO_NOT_VISIT_SUBTREE;
-                }
+            final AtomicBoolean hasStringConcat = new AtomicBoolean(false);
+            final Expression lastExpr = collectAllAppendedStrings(node, allAppendedStrings, hasStringConcat);
+            if ((lastExpr instanceof Name || lastExpr instanceof FieldAccess)
+                    && isRewriteNeeded(allAppendedStrings, hasStringConcat)) {
+                // rewrite the successive calls to append() on an Appendable
+                this.ctx.getRefactorings().replace(node,
+                        createStringAppends(lastExpr, allAppendedStrings));
+                return DO_NOT_VISIT_SUBTREE;
             }
 
             final MethodInvocation embeddedMI = as(allAppendedStrings, MethodInvocation.class);
@@ -204,6 +203,12 @@ public class StringBuilderRefactoring extends AbstractRefactoring {
         return b.invoke(lastExpr, "append", stringVar, substringArg0, substringArg1);
     }
 
+    private boolean isRewriteNeeded(final LinkedList<Expression> allAppendedStrings, AtomicBoolean hasStringConcat) {
+        final boolean res1 = filterOutEmptyStrings(allAppendedStrings);
+        final boolean res2 = removeCallsToToString(allAppendedStrings);
+        return res1 || res2 || hasStringConcat.get();
+    }
+
     private boolean filterOutEmptyStrings(List<Expression> allExprs) {
         boolean result = false;
         for (Iterator<Expression> iter = allExprs.iterator(); iter.hasNext();) {
@@ -211,6 +216,31 @@ public class StringBuilderRefactoring extends AbstractRefactoring {
             if (isEmptyString(expr)) {
                 iter.remove();
                 result = true;
+            }
+        }
+        return result;
+    }
+
+    private boolean removeCallsToToString(List<Expression> allExprs) {
+        boolean result = false;
+        for (ListIterator<Expression> iter = allExprs.listIterator(); iter.hasNext();) {
+            final Expression expr = iter.next();
+            if (expr.getNodeType() == ASTNode.METHOD_INVOCATION) {
+                final MethodInvocation mi = (MethodInvocation) expr;
+                if (isMethod(mi, "java.lang.Object", "toString")) {
+                    iter.set(mi.getExpression());
+                    result = true;
+                } else if (isMethod(mi, "java.lang.Boolean", "toString", "boolean")
+                        || isMethod(mi, "java.lang.Byte", "toString", "byte")
+                        || isMethod(mi, "java.lang.Character", "toString", "char")
+                        || isMethod(mi, "java.lang.Short", "toString", "short")
+                        || isMethod(mi, "java.lang.Integer", "toString", "int")
+                        || isMethod(mi, "java.lang.Long", "toString", "long")
+                        || isMethod(mi, "java.lang.Float", "toString", "float")
+                        || isMethod(mi, "java.lang.Double", "toString", "double")) {
+                    iter.set(arguments(mi).get(0));
+                    result = true;
+                }
             }
         }
         return result;
@@ -277,15 +307,15 @@ public class StringBuilderRefactoring extends AbstractRefactoring {
     }
 
     private Expression collectAllAppendedStrings(Expression expr,
-            final LinkedList<Expression> allOperands, AtomicBoolean foundInfixExpr) {
+            final LinkedList<Expression> allOperands, AtomicBoolean hasStringConcat) {
         if (instanceOf(expr, "java.lang.Appendable")) {
             if (expr instanceof MethodInvocation) {
                 final MethodInvocation mi = (MethodInvocation) expr;
                 if ("append".equals(mi.getName().getIdentifier())
                         && arguments(mi).size() == 1) {
                     final Expression arg0 = arguments(mi).get(0);
-                    addAllSubExpressions(arg0, allOperands, foundInfixExpr);
-                    return collectAllAppendedStrings(mi.getExpression(), allOperands, foundInfixExpr);
+                    addAllSubExpressions(arg0, allOperands, hasStringConcat);
+                    return collectAllAppendedStrings(mi.getExpression(), allOperands, hasStringConcat);
                 }
             } else if (expr instanceof ClassInstanceCreation) {
                 final ClassInstanceCreation cic = (ClassInstanceCreation) expr;
@@ -306,21 +336,22 @@ public class StringBuilderRefactoring extends AbstractRefactoring {
     }
 
     private void addAllSubExpressions(final Expression arg, final LinkedList<Expression> results,
-            final AtomicBoolean foundInfixExpr) {
+            final AtomicBoolean hasStringConcat) {
         if (arg instanceof InfixExpression) {
             final InfixExpression ie = (InfixExpression) arg;
-            if (InfixExpression.Operator.PLUS.equals(ie.getOperator())) {
+            if (hasType(ie, "java.lang.String")
+                    && InfixExpression.Operator.PLUS.equals(ie.getOperator())) {
                 if (ie.hasExtendedOperands()) {
                     final List<Expression> reversed = new ArrayList<Expression>(extendedOperands(ie));
                     Collections.reverse(reversed);
                     for (Expression op : reversed) {
-                        addAllSubExpressions(op, results, foundInfixExpr);
+                        addAllSubExpressions(op, results, hasStringConcat);
                     }
                 }
-                addAllSubExpressions(ie.getRightOperand(), results, foundInfixExpr);
-                addAllSubExpressions(ie.getLeftOperand(), results, foundInfixExpr);
-                if (foundInfixExpr != null) {
-                    foundInfixExpr.set(true);
+                addAllSubExpressions(ie.getRightOperand(), results, hasStringConcat);
+                addAllSubExpressions(ie.getLeftOperand(), results, hasStringConcat);
+                if (hasStringConcat != null) {
+                    hasStringConcat.set(true);
                 }
                 return;
             }

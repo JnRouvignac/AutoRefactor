@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2013 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2013-2014 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -98,6 +98,34 @@ public class StringBuilderSample {
         sb.append(Float.valueOf(f));
         sb.append(String.valueOf(d));
         sb.append(Double.valueOf(d));
+    }
+
+    public void removeUselessCallsToToStringOfWithStringBuilderAppend(
+            Object o, boolean bo, byte by, char c, short s, int i, long l, float f, double d) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(o.toString());
+        sb.append(Boolean.toString(bo));
+        sb.append(Byte.toString(by));
+        sb.append(Character.toString(c));
+        sb.append(Short.toString(s));
+        sb.append(Integer.toString(i));
+        sb.append(Long.toString(l));
+        sb.append(Float.toString(f));
+        sb.append(Double.toString(d));
+    }
+
+    public void removeUselessCallsToToStringOfWithStringBufferAppend(
+            Object o, boolean bo, byte by, char c, short s, int i, long l, float f, double d) {
+        StringBuffer sb = new StringBuffer();
+        sb.append(o.toString());
+        sb.append(Boolean.toString(bo));
+        sb.append(Byte.toString(by));
+        sb.append(Character.toString(c));
+        sb.append(Short.toString(s));
+        sb.append(Integer.toString(i));
+        sb.append(Long.toString(l));
+        sb.append(Float.toString(f));
+        sb.append(Double.toString(d));
     }
 
     public void removeSubstringDoubleArgsCallsWithAppend(String s) {

@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2013 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2013-2014 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -97,6 +97,34 @@ public class StringBuilderSample {
         sb.append(f);
         sb.append(f);
         sb.append(d);
+        sb.append(d);
+    }
+
+    public void removeUselessCallsToToStringOfWithStringBuilderAppend(
+            Object o, boolean bo, byte by, char c, short s, int i, long l, float f, double d) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(o);
+        sb.append(bo);
+        sb.append(by);
+        sb.append(c);
+        sb.append(s);
+        sb.append(i);
+        sb.append(l);
+        sb.append(f);
+        sb.append(d);
+    }
+
+    public void removeUselessCallsToToStringOfWithStringBufferAppend(
+            Object o, boolean bo, byte by, char c, short s, int i, long l, float f, double d) {
+        StringBuffer sb = new StringBuffer();
+        sb.append(o);
+        sb.append(bo);
+        sb.append(by);
+        sb.append(c);
+        sb.append(s);
+        sb.append(i);
+        sb.append(l);
+        sb.append(f);
         sb.append(d);
     }
 
