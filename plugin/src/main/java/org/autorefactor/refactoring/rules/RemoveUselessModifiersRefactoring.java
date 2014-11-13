@@ -49,6 +49,7 @@ import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
+import static org.eclipse.jdt.core.dom.Modifier.*;
 
 /**
  * Remove modifiers implied by the context:
@@ -119,6 +120,15 @@ public class RemoveUselessModifiersRefactoring extends AbstractRefactoring {
     /** {@inheritDoc} */
     @Override
     public boolean visit(MethodDeclaration node) {
+        final int modifierFlags = node.getModifiers();
+        if (isStatic(modifierFlags) && isFinal(modifierFlags)) {
+            for (Modifier m : getModifiersOnly(modifiers(node))) {
+                if (m.isFinal()) {
+                    this.ctx.getRefactorings().remove(m);
+                    return DO_NOT_VISIT_SUBTREE;
+                }
+            }
+        }
         if (isInterface(node.getParent())) {
             // remove modifiers implied by the context
             return removePublicAbstractModifiers(node);
