@@ -103,6 +103,7 @@ public class StringBuilderSample {
     public void removeUselessCallsToToStringOfWithStringBuilderAppend(
             Object o, boolean bo, byte by, char c, short s, int i, long l, float f, double d) {
         StringBuilder sb = new StringBuilder();
+        sb.append(this);
         sb.append(o);
         sb.append(bo);
         sb.append(by);
@@ -117,6 +118,7 @@ public class StringBuilderSample {
     public void removeUselessCallsToToStringOfWithStringBufferAppend(
             Object o, boolean bo, byte by, char c, short s, int i, long l, float f, double d) {
         StringBuffer sb = new StringBuffer();
+        sb.append(this);
         sb.append(o);
         sb.append(bo);
         sb.append(by);

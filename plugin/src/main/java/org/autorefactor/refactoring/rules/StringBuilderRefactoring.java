@@ -228,7 +228,11 @@ public class StringBuilderRefactoring extends AbstractRefactoring {
             if (expr.getNodeType() == ASTNode.METHOD_INVOCATION) {
                 final MethodInvocation mi = (MethodInvocation) expr;
                 if (isMethod(mi, "java.lang.Object", "toString")) {
-                    iter.set(mi.getExpression());
+                    if (mi.getExpression() != null) {
+                        iter.set(mi.getExpression());
+                    } else {
+                        iter.set(this.ctx.getAST().newThisExpression());
+                    }
                     result = true;
                 } else if (isMethod(mi, "java.lang.Boolean", "toString", "boolean")
                         || isMethod(mi, "java.lang.Byte", "toString", "byte")
