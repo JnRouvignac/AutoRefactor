@@ -27,6 +27,11 @@ package org.autorefactor.samples_out;
 
 public class RemoveUnnecessaryCastSample {
 
+    private static final int ONE = 1;
+    private byte b;
+    private char c;
+    private short s;
+
     public Object removeCastToSameType(Integer i) {
         return i;
     }
@@ -150,5 +155,52 @@ public class RemoveUnnecessaryCastSample {
 
     public boolean removeCastsFromBooleanOperations(boolean b1, boolean b2) {
         return b1 && b2;
+    }
+
+    public int removeCastsFromAssignmentsToByte() {
+        byte b1 = -1;
+        byte b2 = 127;
+        byte b3 = -128;
+        byte b4 = ONE;
+        Byte b5 = -1;
+        Byte b6 = 127;
+        Byte b7 = -128;
+        Byte b8 = ONE;
+        b = 1;
+        return b1 + b2 + b3 + b4 + b5 + b6 + b7 + b8 + b;
+    }
+
+    public int removeCastsFromAssignmentsToChar() {
+        char c1 = 0;
+        char c2 = 65535;
+        char c3 = ONE;
+        Character c4 = 0;
+        Character c5 = 65535;
+        Character c6 = ONE;
+        c = 1;
+        return c1 + c2 + c3 + c4 + c5 + c6 + c;
+    }
+
+    public int removeCastsFromAssignmentsToShort() {
+        short s1 = -1;
+        short s2 = 32767;
+        short s3 = -32768;
+        short s4 = ONE;
+        Short s5 = -1;
+        Short s6 = 32767;
+        Short s7 = -32768;
+        Short s8 = ONE;
+        s = 1;
+        return s1 + s2 + s3 + s4 + s5 + s6 + s7 + s8 + s;
+    }
+
+    public int doNotRemoveCastsFromPrimitiveAssignments() {
+        byte b1 = (byte) 128;
+        byte b2 = (byte) -129;
+        char c1 = (char) -1;
+        char c2 = (char) 65536;
+        short s1 = (short) 32768;
+        short s2 = (short) -32769;
+        return b1 + b2 + c1 + c2 + s1 + s2;
     }
 }

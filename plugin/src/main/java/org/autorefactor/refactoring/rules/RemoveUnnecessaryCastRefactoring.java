@@ -67,11 +67,13 @@ public class RemoveUnnecessaryCastRefactoring extends AbstractRefactoring {
 
         case ASSIGNMENT:
             final Assignment as = (Assignment) parent;
-            return isAssignmentCompatible(node.getExpression(), as);
+            return isAssignmentCompatible(node.getExpression(), as)
+                    || isConstantExpressionAssignmentConversion(node);
 
         case VARIABLE_DECLARATION_FRAGMENT:
             final VariableDeclarationFragment vdf = (VariableDeclarationFragment) parent;
-            return isAssignmentCompatible(node.getExpression(), getType(vdf));
+            return isAssignmentCompatible(node.getExpression(), getType(vdf))
+                    || isConstantExpressionAssignmentConversion(node);
 
         case INFIX_EXPRESSION:
             final InfixExpression ie = (InfixExpression) parent;
@@ -86,6 +88,18 @@ public class RemoveUnnecessaryCastRefactoring extends AbstractRefactoring {
                         && !isPrimitiveTypeNarrowing(node, ie);
                         // it can be removed because this is never the first operand of a division
             }
+        }
+        return false;
+    }
+
+    /** @see JLS, section 5.2 Assignment Conversion */
+    private boolean isConstantExpressionAssignmentConversion(CastExpression node) {
+        final Object value = node.getExpression().resolveConstantExpressionValue();
+        if (value instanceof Integer) {
+            final int val = (Integer) value;
+            return     (hasType(node, "byte")  &&   -128 <= val && val <= 127)
+                    || (hasType(node, "short") && -32768 <= val && val <= 32767)
+                    || (hasType(node, "char")  &&      0 <= val && val <= 65535);
         }
         return false;
     }
