@@ -36,7 +36,6 @@ import org.eclipse.jdt.core.dom.ASTMatcher;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
 import org.eclipse.jdt.core.dom.Assignment;
-import org.eclipse.jdt.core.dom.BodyDeclaration;
 import org.eclipse.jdt.core.dom.CastExpression;
 import org.eclipse.jdt.core.dom.ConditionalExpression;
 import org.eclipse.jdt.core.dom.DoStatement;
@@ -47,7 +46,6 @@ import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.InfixExpression.Operator;
 import org.eclipse.jdt.core.dom.InstanceofExpression;
-import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Name;
 import org.eclipse.jdt.core.dom.ParenthesizedExpression;
@@ -326,24 +324,14 @@ public class SimplifyExpressionRefactoring extends AbstractRefactoring {
         final IMethodBinding mb = node.resolveMethodBinding();
         if (currentType instanceof AnonymousClassDeclaration) {
             final AnonymousClassDeclaration c = (AnonymousClassDeclaration) currentType;
-            return containsMethodDeclaration(mb, bodyDeclarations(c));
+            final ITypeBinding surroundingTypeBinding = c.resolveBinding();
+            return surroundingTypeBinding.isSubTypeCompatible(mb.getDeclaringClass());
         } else if (currentType instanceof TypeDeclaration) {
             final TypeDeclaration td = (TypeDeclaration) currentType;
-            return containsMethodDeclaration(mb, bodyDeclarations(td));
+            final ITypeBinding surroundingTypeBinding = td.resolveBinding();
+            return surroundingTypeBinding.isSubTypeCompatible(mb.getDeclaringClass());
         }
         throw new NotImplementedException(node, node);
-    }
-
-    private boolean containsMethodDeclaration(IMethodBinding methodBinding, List<BodyDeclaration> declarations) {
-        for (BodyDeclaration decl : declarations) {
-            if (decl instanceof MethodDeclaration) {
-                final MethodDeclaration md = (MethodDeclaration) decl;
-                if (methodBinding.equals(md.resolveBinding())) {
-                    return true;
-                }
-            }
-        }
-        return false;
     }
 
     private static ASTNode getSurroundingType(ASTNode node) {

@@ -221,39 +221,64 @@ public class SimplifyExpressionSample {
     }
 
     public void removeThisExpression() {
-        simplifyPrimitiveBooleanExpression(false);
-        simplifyPrimitiveBooleanExpression(false);
+        testRemoveThisExpression(42);
+        testRemoveThisExpression(42);
+        hashCode();
     }
 
     public void removeThisExpressionForAnonymousClass() {
         new Object() {
-            public void simplifyPrimitiveBooleanExpression(boolean b) {
-                simplifyPrimitiveBooleanExpression(b);
+            public void testRemoveThisExpression(int i) {
+                testRemoveThisExpression(i);
             }
-        }.simplifyPrimitiveBooleanExpression(false);
+        }.testRemoveThisExpression(42);
     }
 
     public void doNotRemoveThisExpressionForAnonymousClass() {
         new Object() {
-            public void simplifyPrimitiveBooleanExpression(boolean b) {
-                SimplifyExpressionSample.this.simplifyPrimitiveBooleanExpression(b);
+            public void testRemoveThisExpression(int i) {
+                SimplifyExpressionSample.this.testRemoveThisExpression(i);
             }
-        }.simplifyPrimitiveBooleanExpression(false);
+        }.testRemoveThisExpression(42);
+    }
+
+    public void doNotRemoveThisExpressionForAnonymousClassWithPrimitiveOverloadedMethod() {
+        new Object() {
+            public void doNotRemoveThisExpression(int i) {
+                SimplifyExpressionSample.this.testRemoveThisExpression(i);
+            }
+
+            public void testRemoveThisExpression(long l) {
+                System.out.println(l);
+            }
+        }.doNotRemoveThisExpression(42);
+    }
+
+    public void doNotRemoveThisExpressionForAnonymousClassWithObjectOverloadedMethod() {
+        new Object() {
+            public void doNotRemoveThisExpression(int i) {
+                SimplifyExpressionSample.this.testRemoveThisExpression(i);
+            }
+
+            public void testRemoveThisExpression(Integer i) {
+                System.out.println(i);
+            }
+        }.doNotRemoveThisExpression(42);
     }
 
     public class InnerClass {
 
         public void removeThisExpression() {
-            simplifyBooleanExpression(false);
-            simplifyBooleanExpression(false);
-            simplifyBooleanExpression(false);
+            testRemoveThisExpression(42);
+            testRemoveThisExpression(42);
+            testRemoveThisExpression(42);
         }
 
         public void doNotRemoveThisExpression() {
-            SimplifyExpressionSample.this.simplifyPrimitiveBooleanExpression(false);
+            SimplifyExpressionSample.this.testRemoveThisExpression(42);
         }
 
-        public void simplifyBooleanExpression(boolean b) {
+        public void testRemoveThisExpression(int i) {
         }
     }
 
@@ -333,4 +358,6 @@ public class SimplifyExpressionSample {
         return i + j + k + l + m + n + o + p;
     }
 
+    private void testRemoveThisExpression(int i) {
+    }
 }
