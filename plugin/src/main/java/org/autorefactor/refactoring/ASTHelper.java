@@ -582,6 +582,18 @@ public final class ASTHelper {
     }
 
     /**
+     * Generecized version of the equivalent JDT method.
+     *
+     * @param node the node on which to call the equivalent JDT method
+     * @return a List of expressions
+     * @see NormalAnnotation#values()
+     */
+    @SuppressWarnings("unchecked")
+    public static List<MemberValuePair> values(NormalAnnotation node) {
+        return node.values();
+    }
+
+    /**
      * Returns the {@link Boolean} object value represented by the provided expression.
      *
      * @param expr the expression to analyze

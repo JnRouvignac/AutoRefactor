@@ -101,7 +101,8 @@ public final class AllRefactorings {
                 new RemoveUnnecessaryLocalBeforeReturnRefactoring(),
                 new RemoveUnnecessaryCastRefactoring(),
                 new RemoveUselessModifiersRefactoring(),
-                new HotSpotIntrinsicedAPIsRefactoring()));
+                new HotSpotIntrinsicedAPIsRefactoring(),
+                new AnnotationRefactoring()));
     }
 
 }

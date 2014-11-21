@@ -47,6 +47,7 @@ import org.eclipse.jdt.core.dom.ExpressionStatement;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.InfixExpression;
+import org.eclipse.jdt.core.dom.MarkerAnnotation;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Name;
 import org.eclipse.jdt.core.dom.NumberLiteral;
@@ -56,6 +57,7 @@ import org.eclipse.jdt.core.dom.PrefixExpression;
 import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.SimpleType;
+import org.eclipse.jdt.core.dom.SingleMemberAnnotation;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.StringLiteral;
@@ -557,6 +559,32 @@ public class ASTBuilder {
         final ReturnStatement rs = ast.newReturnStatement();
         rs.setExpression(expression);
         return rs;
+    }
+
+    /**
+     * Builds a new {@link MarkerAnnotation} instance.
+     *
+     * @param typeName the annotation type name
+     * @return a new marker annotation
+     */
+    public MarkerAnnotation markerAnnotation(Name typeName) {
+        final MarkerAnnotation ma = ast.newMarkerAnnotation();
+        ma.setTypeName(typeName);
+        return ma;
+    }
+
+    /**
+     * Builds a new {@link SingleMemberAnnotation} instance.
+     *
+     * @param typeName the annotation type name
+     * @param value the annotation single value
+     * @return a new single member annotation
+     */
+    public SingleMemberAnnotation singleValueAnnotation(Name typeName, Expression value) {
+        final SingleMemberAnnotation sma = ast.newSingleMemberAnnotation();
+        sma.setTypeName(typeName);
+        sma.setValue(value);
+        return sma;
     }
 
     /**
