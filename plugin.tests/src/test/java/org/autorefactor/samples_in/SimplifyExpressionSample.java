@@ -220,68 +220,6 @@ public class SimplifyExpressionSample {
         System.out.println((i1 + i2) / i3);
     }
 
-    public void removeThisExpression() {
-        this.testRemoveThisExpression(42);
-        SimplifyExpressionSample.this.testRemoveThisExpression(42);
-        this.hashCode();
-    }
-
-    public void removeThisExpressionForAnonymousClass() {
-        new Object() {
-            public void testRemoveThisExpression(int i) {
-                this.testRemoveThisExpression(i);
-            }
-        }.testRemoveThisExpression(42);
-    }
-
-    public void doNotRemoveThisExpressionForAnonymousClass() {
-        new Object() {
-            public void testRemoveThisExpression(int i) {
-                SimplifyExpressionSample.this.testRemoveThisExpression(i);
-            }
-        }.testRemoveThisExpression(42);
-    }
-
-    public void doNotRemoveThisExpressionForAnonymousClassWithPrimitiveOverloadedMethod() {
-        new Object() {
-            public void doNotRemoveThisExpression(int i) {
-                SimplifyExpressionSample.this.testRemoveThisExpression(i);
-            }
-
-            public void testRemoveThisExpression(long l) {
-                System.out.println(l);
-            }
-        }.doNotRemoveThisExpression(42);
-    }
-
-    public void doNotRemoveThisExpressionForAnonymousClassWithObjectOverloadedMethod() {
-        new Object() {
-            public void doNotRemoveThisExpression(int i) {
-                SimplifyExpressionSample.this.testRemoveThisExpression(i);
-            }
-
-            public void testRemoveThisExpression(Integer i) {
-                System.out.println(i);
-            }
-        }.doNotRemoveThisExpression(42);
-    }
-
-    public class InnerClass {
-
-        public void removeThisExpression() {
-            this.testRemoveThisExpression(42);
-            InnerClass.this.testRemoveThisExpression(42);
-            SimplifyExpressionSample.InnerClass.this.testRemoveThisExpression(42);
-        }
-
-        public void doNotRemoveThisExpression() {
-            SimplifyExpressionSample.this.testRemoveThisExpression(42);
-        }
-
-        public void testRemoveThisExpression(int i) {
-        }
-    }
-
     public void simplifyPrimitiveBooleanExpression(boolean b) {
         if (b == true) {
             int i = 0;
@@ -356,8 +294,5 @@ public class SimplifyExpressionSample {
         int o = b1 >>> b2 | b3;
         int p = b1 | b2 >>> b3;
         return i + j + k + l + m + n + o + p;
-    }
-
-    private void testRemoveThisExpression(int i) {
     }
 }

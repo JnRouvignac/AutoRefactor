@@ -26,7 +26,6 @@
 package org.autorefactor.refactoring.rules;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -69,7 +68,7 @@ public final class AllRefactorings {
     public static List<IRefactoring> getAllRefactorings() {
         // TODO JNR Remove reference to Preferences from this method
         final PreferenceHelper prefs = AutoRefactorPlugin.getPreferenceHelper();
-        return new ArrayList<IRefactoring>(Arrays.<IRefactoring> asList(
+        return newArrayList(
                 new RemoveUselessNullCheckRefactoring(),
                 new WorkWithNullCheckedExpressionFirstRefactoring(),
                 new VectorOldToNewAPIRefactoring(),
@@ -77,7 +76,8 @@ public final class AllRefactorings {
                 new BooleanRefactoring(),
                 new AddBracketsToControlStatementRefactoring(),
                 new InvertEqualsRefactoring(),
-                new SimplifyExpressionRefactoring(prefs.removeThisForNonStaticMethodAccess()),
+                new SimplifyExpressionRefactoring(),
+                prefs.removeThisForNonStaticMethodAccess() ? new RemoveUnneededThisExpressionRefactoring() : null,
                 new StringRefactoring(),
                 new BigDecimalRefactoring(),
                 // TODO JNR implement
@@ -102,7 +102,17 @@ public final class AllRefactorings {
                 new RemoveUnnecessaryCastRefactoring(),
                 new RemoveUselessModifiersRefactoring(),
                 new HotSpotIntrinsicedAPIsRefactoring(),
-                new AnnotationRefactoring()));
+                new AnnotationRefactoring());
+    }
+
+    private static List<IRefactoring> newArrayList(IRefactoring... refactorings) {
+        final List<IRefactoring> results = new ArrayList<IRefactoring>(refactorings.length);
+        for (IRefactoring r : refactorings) {
+            if (r != null) {
+                results.add(r);
+            }
+        }
+        return results;
     }
 
 }
