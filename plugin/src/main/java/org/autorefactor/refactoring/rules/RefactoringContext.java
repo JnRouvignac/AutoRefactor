@@ -26,8 +26,8 @@
 package org.autorefactor.refactoring.rules;
 
 import org.autorefactor.refactoring.ASTBuilder;
+import org.autorefactor.refactoring.JavaProjectOptions;
 import org.autorefactor.refactoring.Refactorings;
-import org.autorefactor.refactoring.Release;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.dom.AST;
 
@@ -38,7 +38,7 @@ public class RefactoringContext {
 
     private final Refactorings refactorings;
     private final ICompilationUnit compilationUnit;
-    private final Release javaSERelease;
+    private final JavaProjectOptions options;
     private final ASTBuilder astBuilder;
 
     /**
@@ -46,13 +46,13 @@ public class RefactoringContext {
      *
      * @param compilationUnit the compilation unit to refactor
      * @param ast the {@link AST} object to use in the refactoring
-     * @param javaSERelease the Java SE version that is used to compile the compilation unit
+     * @param options the Java project options used to compile the project
      */
     public RefactoringContext(ICompilationUnit compilationUnit, AST ast,
-            Release javaSERelease) {
+            JavaProjectOptions options) {
         this.refactorings = new Refactorings(ast);
         this.astBuilder = new ASTBuilder(refactorings);
-        this.javaSERelease = javaSERelease;
+        this.options = options;
         this.compilationUnit = compilationUnit;
     }
 
@@ -84,12 +84,12 @@ public class RefactoringContext {
     }
 
     /**
-     * Returns the Java SE version that is used to compile the compilation unit.
+     * Returns the Java project options used to compile the project.
      *
-     * @return the Java SE version that is used to compile the compilation unit
+     * @return the Java project options used to compile the project
      */
-    public Release getJavaSERelease() {
-        return javaSERelease;
+    public JavaProjectOptions getJavaProjectOptions() {
+        return options;
     }
 
     /**

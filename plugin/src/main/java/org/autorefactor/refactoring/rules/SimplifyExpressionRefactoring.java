@@ -80,7 +80,7 @@ public class SimplifyExpressionRefactoring extends AbstractRefactoring {
             Pair.of(RIGHT_SHIFT_UNSIGNED, AND));
 
     private int getJavaMinorVersion() {
-        return ctx.getJavaSERelease().getMinorVersion();
+        return ctx.getJavaProjectOptions().getJavaSERelease().getMinorVersion();
     }
 
     // TODO JNR remove avoidable boxing / unboxing

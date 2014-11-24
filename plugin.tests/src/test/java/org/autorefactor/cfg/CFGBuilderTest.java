@@ -25,9 +25,6 @@
  */
 package org.autorefactor.cfg;
 
-import static org.autorefactor.cfg.test.TestUtils.*;
-import static org.junit.Assert.*;
-
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -38,9 +35,11 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import org.autorefactor.refactoring.JavaProjectOptions;
 import org.autorefactor.refactoring.Release;
 import org.autorefactor.refactoring.rules.JavaCoreHelper;
 import org.autorefactor.ui.ApplyRefactoringsJob;
+import org.autorefactor.ui.JavaProjectOptionsImpl;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.dom.AST;
@@ -50,6 +49,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
+
+import static org.autorefactor.cfg.test.TestUtils.*;
+import static org.junit.Assert.*;
 
 @RunWith(value = Parameterized.class)
 public class CFGBuilderTest {
@@ -97,11 +99,12 @@ public class CFGBuilderTest {
         cu.getBuffer().setContents(javaSource);
         cu.save(null, true);
 
+        final JavaProjectOptions options = newJavaProjectOptions(Release.javaSE("1.7"), 4);
         final ASTParser parser = ASTParser.newParser(AST.JLS4);
-        autoRefactorHandler_resetParser(cu, parser, Release.javaSE("1.7"));
+        autoRefactorHandler_resetParser(cu, parser, options);
 
         final CompilationUnit astRoot = (CompilationUnit) parser.createAST(null);
-        final CFGBuilder builder = new CFGBuilder(javaSource, 4);
+        final CFGBuilder builder = new CFGBuilder(javaSource, options);
         final List<CFGBasicBlock> blocks = builder.buildCFG(astRoot);
 
         final CFGBasicBlock block = blocks.get(methodDeclarationNb);
@@ -128,12 +131,19 @@ public class CFGBuilderTest {
         }
     }
 
+    private JavaProjectOptions newJavaProjectOptions(Release javaSERelease, int tabSize) {
+        JavaProjectOptionsImpl options = new JavaProjectOptionsImpl();
+        options.setJavaSERelease(javaSERelease);
+        options.setTabSize(tabSize);
+        return options;
+    }
+
     private void autoRefactorHandler_resetParser(ICompilationUnit cu, ASTParser parser,
-            Release javaSE) throws Exception {
+            JavaProjectOptions options) throws Exception {
         final Method m = ApplyRefactoringsJob.class.getDeclaredMethod(
-                "resetParser", ICompilationUnit.class, ASTParser.class, Release.class);
+                "resetParser", ICompilationUnit.class, ASTParser.class, JavaProjectOptions.class);
         m.setAccessible(true);
-        m.invoke(null, cu, parser, javaSE);
+        m.invoke(null, cu, parser, options);
     }
 
 }

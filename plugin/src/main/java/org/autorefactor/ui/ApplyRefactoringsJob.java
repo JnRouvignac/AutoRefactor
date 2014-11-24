@@ -31,12 +31,11 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import org.autorefactor.AutoRefactorPlugin;
 import org.autorefactor.refactoring.IRefactoring;
+import org.autorefactor.refactoring.JavaProjectOptions;
 import org.autorefactor.refactoring.Refactorings;
-import org.autorefactor.refactoring.Release;
 import org.autorefactor.refactoring.rules.AggregateASTVisitor;
 import org.autorefactor.refactoring.rules.RefactoringContext;
 import org.autorefactor.util.IllegalStateException;
@@ -56,7 +55,6 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
-import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTParser;
@@ -65,8 +63,6 @@ import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jface.text.IDocument;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
-import static org.eclipse.jdt.core.JavaCore.*;
-import static org.eclipse.jdt.core.formatter.DefaultCodeFormatterConstants.*;
 
 /**
  * Eclipse job that applies the provided refactorings in background.
@@ -112,13 +108,10 @@ public class ApplyRefactoringsJob extends Job {
             return Status.OK_STATUS;
         }
         final List<ICompilationUnit> compilationUnits = collectCompilationUnits(javaElements);
-        final Map<String, String> options = getJavaProjectOptions(javaElements);
-        final String javaSourceCompatibility = options.get(COMPILER_SOURCE);
-        final int tabSize = getTabSize(options);
+        final JavaProjectOptions options = getJavaProjectOptions(javaElements);
 
         monitor.beginTask("", compilationUnits.size());
         try {
-            final Release javaSERelease = Release.javaSE(javaSourceCompatibility);
             for (final ICompilationUnit compilationUnit : compilationUnits) {
                 if (monitor.isCanceled()) {
                     return Status.CANCEL_STATUS;
@@ -132,7 +125,7 @@ public class ApplyRefactoringsJob extends Job {
                     monitor.subTask("Applying refactorings to " + className);
 
                     AggregateASTVisitor refactoring = new AggregateASTVisitor(refactoringsToApply);
-                    applyRefactoring(compilationUnit, javaSERelease, tabSize, refactoring);
+                    applyRefactoring(compilationUnit, refactoring, options);
                 } finally {
                     monitor.worked(1);
                 }
@@ -141,15 +134,6 @@ public class ApplyRefactoringsJob extends Job {
             monitor.done();
         }
         return Status.OK_STATUS;
-    }
-
-    private int getTabSize(final Map<String, String> options) {
-        String tabSize = options.get(FORMATTER_INDENTATION_SIZE);
-        try {
-            return Integer.valueOf(tabSize);
-        } catch (NumberFormatException e) {
-            throw new UnhandledException(null, e);
-        }
     }
 
     private List<ICompilationUnit> collectCompilationUnits(List<IJavaElement> javaElements) {
@@ -197,9 +181,9 @@ public class ApplyRefactoringsJob extends Job {
     }
 
     @SuppressWarnings("unchecked")
-    private Map<String, String> getJavaProjectOptions(List<IJavaElement> javaElements) {
+    private JavaProjectOptions getJavaProjectOptions(List<IJavaElement> javaElements) {
         final IJavaProject javaProject = getIJavaProject(javaElements.get(0));
-        return javaProject.getOptions(true);
+        return new JavaProjectOptionsImpl(javaProject.getOptions(true));
     }
 
     private IJavaProject getIJavaProject(IJavaElement javaElement) {
@@ -213,8 +197,8 @@ public class ApplyRefactoringsJob extends Job {
         throw new NotImplementedException(null, javaElement);
     }
 
-    private void applyRefactoring(ICompilationUnit compilationUnit, Release javaSERelease, int tabSize,
-            AggregateASTVisitor refactoringToApply) throws Exception {
+    private void applyRefactoring(ICompilationUnit compilationUnit, AggregateASTVisitor refactoringToApply,
+            JavaProjectOptions options) throws Exception {
         final ITextFileBufferManager bufferManager = FileBuffers.getTextFileBufferManager();
         final IPath path = compilationUnit.getPath();
         final LocationKind locationKind = LocationKind.NORMALIZE;
@@ -222,7 +206,7 @@ public class ApplyRefactoringsJob extends Job {
             bufferManager.connect(path, locationKind, null);
             final ITextFileBuffer textFileBuffer = bufferManager.getTextFileBuffer(path, locationKind);
             final IDocument document = textFileBuffer.getDocument();
-            applyRefactoring(document, compilationUnit, javaSERelease, tabSize, refactoringToApply);
+            applyRefactoring(document, compilationUnit, refactoringToApply, options);
             textFileBuffer.commit(null, false);
         } finally {
             bufferManager.disconnect(path, locationKind, null);
@@ -235,9 +219,8 @@ public class ApplyRefactoringsJob extends Job {
      *
      * @param document the document where the compilation unit comes from
      * @param compilationUnit the compilation unit to refactor
-     * @param javaSERelease the Java SE version used to compile the compilation unit
-     * @param tabSize the tabulation size in use in the current java project
      * @param refactoring the {@link AggregateASTVisitor} to apply to the compilation unit
+     * @param options the Java project options used to compile the project
      * @throws Exception if any problem occurs
      *
      * @see <a
@@ -251,11 +234,11 @@ public class ApplyRefactoringsJob extends Job {
      * href="http://www.eclipse.org/articles/article.php?file=Article-JavaCodeManipulation_AST/index.html"
      * >Abstract Syntax Tree > Write it down</a>
      */
-    public void applyRefactoring(IDocument document, ICompilationUnit compilationUnit, Release javaSERelease,
-            int tabSize, AggregateASTVisitor refactoring) throws Exception {
+    public void applyRefactoring(IDocument document, ICompilationUnit compilationUnit, AggregateASTVisitor refactoring,
+            JavaProjectOptions options) throws Exception {
         // creation of DOM/AST from a ICompilationUnit
         final ASTParser parser = ASTParser.newParser(AST.JLS4);
-        resetParser(compilationUnit, parser, javaSERelease);
+        resetParser(compilationUnit, parser, options);
 
         CompilationUnit astRoot = (CompilationUnit) parser.createAST(null);
 
@@ -275,8 +258,7 @@ public class ApplyRefactoringsJob extends Job {
                 break;
             }
 
-            final RefactoringContext ctx = new RefactoringContext(compilationUnit,
-                    astRoot.getAST(), javaSERelease);
+            final RefactoringContext ctx = new RefactoringContext(compilationUnit, astRoot.getAST(), options);
             refactoring.setRefactoringContext(ctx);
 
             final Refactorings refactorings = refactoring.getRefactorings(astRoot);
@@ -306,7 +288,7 @@ public class ApplyRefactoringsJob extends Job {
             // type bindings were lost. Is there a way to recover them?
             // FIXME we should find a way to apply all the changes at
             // the AST level and refresh the bindings
-            resetParser(compilationUnit, parser, javaSERelease);
+            resetParser(compilationUnit, parser, options);
             astRoot = (CompilationUnit) parser.createAST(null);
             ++totalNbLoops;
 
@@ -321,18 +303,10 @@ public class ApplyRefactoringsJob extends Job {
         }
     }
 
-    private static void resetParser(ICompilationUnit cu, ASTParser parser, Release javaSERelease) {
+    private static void resetParser(ICompilationUnit cu, ASTParser parser, JavaProjectOptions options) {
         parser.setSource(cu);
         parser.setResolveBindings(true);
-        parser.setCompilerOptions(getCompilerOptions(javaSERelease));
-    }
-
-    @SuppressWarnings("unchecked")
-    private static Map<String, String> getCompilerOptions(Release javaSERelease) {
-        final Map<String, String> options = JavaCore.getOptions();
-        final String v = javaSERelease.getMajorVersion() + "." + javaSERelease.getMinorVersion();
-        JavaCore.setComplianceOptions(v, options);
-        return options;
+        parser.setCompilerOptions(options.getCompilerOptions());
     }
 
     private String getPossibleCulprits(int nbLoopsWithSameVisitors, List<ASTVisitor> lastLoopVisitors) {

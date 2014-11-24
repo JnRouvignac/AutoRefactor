@@ -62,7 +62,7 @@ import static org.autorefactor.refactoring.ASTHelper.*;
 public class StringBuilderRefactoring extends AbstractRefactoring {
 
     private int getJavaMinorVersion() {
-        return ctx.getJavaSERelease().getMinorVersion();
+        return ctx.getJavaProjectOptions().getJavaSERelease().getMinorVersion();
     }
 
     /** {@inheritDoc} */

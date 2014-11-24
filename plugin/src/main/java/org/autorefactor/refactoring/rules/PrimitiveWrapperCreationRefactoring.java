@@ -50,7 +50,7 @@ import static org.autorefactor.util.Utils.*;
 public class PrimitiveWrapperCreationRefactoring extends AbstractRefactoring {
 
     private int getJavaMinorVersion() {
-        return ctx.getJavaSERelease().getMinorVersion();
+        return ctx.getJavaProjectOptions().getJavaSERelease().getMinorVersion();
     }
 
     // TODO Can we reduce bad effects of autoboxing / unboxing

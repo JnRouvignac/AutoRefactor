@@ -45,7 +45,7 @@ public class VectorOldToNewAPIRefactoring extends AbstractRefactoring {
     /** {@inheritDoc} */
     @Override
     public boolean visit(MethodInvocation node) {
-        if (this.ctx.getJavaSERelease().isCompatibleWith(Release.javaSE("1.2.0"))) {
+        if (ctx.getJavaProjectOptions().getJavaSERelease().isCompatibleWith(Release.javaSE("1.2.0"))) {
             if (isMethod(node, "java.util.Vector", "elementAt", "int")) {
                 replaceWith(node, "get");
             } else if (isMethod(node, "java.util.Vector", "addElement", "java.lang.Object")) {

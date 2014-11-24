@@ -42,6 +42,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.autorefactor.refactoring.ASTHelper;
+import org.autorefactor.refactoring.JavaProjectOptions;
 import org.autorefactor.util.IllegalStateException;
 import org.autorefactor.util.NotImplementedException;
 import org.autorefactor.util.UnhandledException;
@@ -253,11 +254,11 @@ public class CFGBuilder {
      * Builds an instance of this class.
      *
      * @param source the java source code to work from
-     * @param tabSize the tabulation size
+     * @param options the Java project options used to compile the project
      */
-    public CFGBuilder(String source, int tabSize) {
+    public CFGBuilder(String source, JavaProjectOptions options) {
         this.source = source;
-        this.tabSize = tabSize;
+        this.tabSize = options.getTabSize();
     }
 
     /**

@@ -32,8 +32,10 @@ import java.util.Collection;
 import java.util.List;
 
 import org.autorefactor.AutoRefactorPlugin;
+import org.autorefactor.refactoring.JavaProjectOptions;
 import org.autorefactor.refactoring.Release;
 import org.autorefactor.ui.ApplyRefactoringsJob;
+import org.autorefactor.ui.JavaProjectOptionsImpl;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jface.text.Document;
@@ -104,13 +106,20 @@ public class AllRefactoringsTest {
         final IDocument doc = new Document(sampleInSource);
         new ApplyRefactoringsJob(null, null).applyRefactoring(
                 doc, cu,
-                Release.javaSE("1.5.0"), 4,
-                new AggregateASTVisitor(AllRefactorings.getAllRefactorings()));
+                new AggregateASTVisitor(AllRefactorings.getAllRefactorings()),
+                newJavaProjectOptions(Release.javaSE("1.5.0"), 4));
 
         final String actual = normalize(
                 doc.get().replaceAll("samples_in", "samples_out"));
         final String expected = normalize(sampleOutSource);
         assertEquals(sampleName + ": wrong output;", expected, actual);
+    }
+
+    private JavaProjectOptions newJavaProjectOptions(Release javaSE, int tabSize) {
+        final JavaProjectOptionsImpl options = new JavaProjectOptionsImpl();
+        options.setTabSize(tabSize);
+        options.setJavaSERelease(javaSE);
+        return options;
     }
 
     private String normalize(String s) {
