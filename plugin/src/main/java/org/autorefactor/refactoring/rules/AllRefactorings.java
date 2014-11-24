@@ -74,7 +74,7 @@ public final class AllRefactorings {
                 new VectorOldToNewAPIRefactoring(),
                 new PrimitiveWrapperCreationRefactoring(),
                 new BooleanRefactoring(),
-                new AddBracketsToControlStatementRefactoring(),
+                prefs.addCurlyBracketsToStatementBodies() ? new AddBracketsToControlStatementRefactoring() : null,
                 new InvertEqualsRefactoring(),
                 new SimplifyExpressionRefactoring(),
                 prefs.removeThisForNonStaticMethodAccess() ? new RemoveUnneededThisExpressionRefactoring() : null,

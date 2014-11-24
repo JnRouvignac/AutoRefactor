@@ -25,30 +25,45 @@
  */
 package org.autorefactor.ui.preferences;
 
+import org.eclipse.jface.preference.IPreferenceStore;
+
+import static org.autorefactor.ui.preferences.Preferences.*;
+
 /**
- * Helper interface for preferences.
+ * Helper implementation for Eclipse preferences.
  */
-public interface PreferenceHelper {
+public class PreferenceHelperImpl implements PreferenceHelper {
+
+    private final IPreferenceStore preferenceStore;
 
     /**
-     * Returns whether debug mode is on.
+     * Builds an instance of this class.
      *
-     * @return true if debug mode is on, false otherwise.
+     * @param preferenceStore the preference store
      */
-    boolean debugModeOn();
+    public PreferenceHelperImpl(IPreferenceStore preferenceStore) {
+        this.preferenceStore = preferenceStore;
+    }
 
-    /**
-     * Returns whether to remove 'this' keyword for accesses to non static methods.
-     *
-     * @return true if must remove 'this' keyword for accesses to non static methods, false otherwise
-     */
-    boolean removeThisForNonStaticMethodAccess();
+    private boolean getBoolean(Preferences pref) {
+        return preferenceStore.getBoolean(pref.name);
+    }
 
-    /**
-     * Returns whether debug mode is on.
-     *
-     * @return true if debug mode is on, false otherwise.
-     */
-    boolean addCurlyBracketsToStatementBodies();
+    /** {@inheritDoc} */
+    @Override
+    public boolean debugModeOn() {
+        return getBoolean(DEBUG_MODE_ON);
+    }
 
+    /** {@inheritDoc} */
+    @Override
+    public boolean removeThisForNonStaticMethodAccess() {
+        return getBoolean(REMOVE_THIS_FOR_NON_STATIC_METHOD_ACCESS);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean addCurlyBracketsToStatementBodies() {
+        return getBoolean(ADD_CURLY_BRACKETS_TO_STATEMENT_BODIES);
+    }
 }

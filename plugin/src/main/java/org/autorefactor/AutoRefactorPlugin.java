@@ -27,8 +27,9 @@ package org.autorefactor;
 
 import java.util.Vector;
 
-import org.autorefactor.ui.preferences.Preferences;
 import org.autorefactor.ui.preferences.PreferenceHelper;
+import org.autorefactor.ui.preferences.PreferenceHelperImpl;
+import org.autorefactor.ui.preferences.Preferences;
 import org.autorefactor.util.UnhandledException;
 import org.eclipse.core.runtime.ILog;
 import org.eclipse.core.runtime.IStatus;
@@ -133,7 +134,7 @@ public class AutoRefactorPlugin extends AbstractUIPlugin {
      */
     public static PreferenceHelper getPreferenceHelper() {
         if (preferenceHelper == null) {
-            preferenceHelper = new PreferenceHelper(getDefault().getPreferenceStore());
+            preferenceHelper = new PreferenceHelperImpl(getDefault().getPreferenceStore());
         }
         return preferenceHelper;
     }
