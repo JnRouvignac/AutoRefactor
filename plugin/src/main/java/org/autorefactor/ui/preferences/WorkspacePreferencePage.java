@@ -26,12 +26,14 @@
 package org.autorefactor.ui.preferences;
 
 import org.autorefactor.AutoRefactorPlugin;
+import org.autorefactor.preferences.PreferenceConstants;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
-import static org.autorefactor.ui.preferences.Preferences.*;
+import static org.autorefactor.preferences.PreferenceConstants.*;
+
 
 /**
  * The Eclipse preference page for AutoRefactor.
@@ -54,8 +56,8 @@ public class WorkspacePreferencePage extends FieldEditorPreferencePage implement
         addBooleanField(DEBUG_MODE_ON);
     }
 
-    private void addBooleanField(Preferences pref) {
-        addField(new BooleanFieldEditor(pref.name, pref.description, getFieldEditorParent()));
+    private void addBooleanField(PreferenceConstants pref) {
+        addField(new BooleanFieldEditor(pref.getName(), pref.getDescription(), getFieldEditorParent()));
     }
 
     /** {@inheritDoc} */

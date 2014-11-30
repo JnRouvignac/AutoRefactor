@@ -25,11 +25,13 @@
  */
 package org.autorefactor.ui.preferences;
 
-import static org.autorefactor.ui.preferences.Preferences.*;
-
 import org.autorefactor.AutoRefactorPlugin;
+import org.autorefactor.preferences.PreferenceConstants;
+import org.autorefactor.util.NotImplementedException;
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.jface.preference.IPreferenceStore;
+
+import static org.autorefactor.preferences.PreferenceConstants.*;
 
 /**
  * Initializes the Eclipse preferences for AutoRefactor.
@@ -42,8 +44,25 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
         // TODO initialize preferences from the JDT preferences like:
         // code style/cleanup/formatting
         IPreferenceStore store = AutoRefactorPlugin.getDefault().getPreferenceStore();
-        store.setDefault(REMOVE_THIS_FOR_NON_STATIC_METHOD_ACCESS.name, true);
-        store.setDefault(ADD_CURLY_BRACKETS_TO_STATEMENT_BODIES.name, true);
+        for (PreferenceConstants preference : PreferenceConstants.values()) {
+            final String name = preference.getName();
+            final Object defaultValue = preference.getDefaultValue();
+            if (defaultValue instanceof Boolean) {
+                store.setDefault(name, (Boolean) defaultValue);
+            } else if (defaultValue instanceof Integer) {
+                store.setDefault(name, (Integer) defaultValue);
+            } else if (defaultValue instanceof Long) {
+                store.setDefault(name, (Long) defaultValue);
+            } else if (defaultValue instanceof Double) {
+                store.setDefault(name, (Double) defaultValue);
+            } else if (defaultValue instanceof Float) {
+                store.setDefault(name, (Float) defaultValue);
+            } else if (defaultValue instanceof String) {
+                store.setDefault(name, (String) defaultValue);
+            }
+            throw new NotImplementedException(null, defaultValue);
+        }
+        store.setDefault(ADD_CURLY_BRACKETS_TO_STATEMENT_BODIES.getName(), true);
     }
 
 }

@@ -25,6 +25,7 @@
  */
 package org.autorefactor.refactoring;
 
+import org.autorefactor.preferences.Preferences;
 import org.autorefactor.refactoring.rules.RefactoringContext;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 
@@ -43,6 +44,15 @@ public interface IRefactoring {
      * @return all the determined refactorings
      */
     Refactorings getRefactorings(CompilationUnit astRoot);
+
+    /**
+     * Returns whether the current refactoring is enabled by the preferences.
+     *
+     * @param preferences the preferences
+     * @return true if the current refactoring is enabled by the preferences,
+     *         false otherwise.
+     */
+    boolean isEnabled(Preferences preferences);
 
     /**
      * Sets the refactoring context before analysis.

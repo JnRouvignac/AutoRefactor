@@ -25,14 +25,16 @@
  */
 package org.autorefactor.ui.preferences;
 
+import org.autorefactor.preferences.PreferenceConstants;
+import org.autorefactor.preferences.Preferences;
 import org.eclipse.jface.preference.IPreferenceStore;
 
-import static org.autorefactor.ui.preferences.Preferences.*;
+import static org.autorefactor.preferences.PreferenceConstants.*;
 
 /**
  * Helper implementation for Eclipse preferences.
  */
-public class PreferenceHelperImpl implements PreferenceHelper {
+public class EclipsePreferences implements Preferences {
 
     private final IPreferenceStore preferenceStore;
 
@@ -41,12 +43,12 @@ public class PreferenceHelperImpl implements PreferenceHelper {
      *
      * @param preferenceStore the preference store
      */
-    public PreferenceHelperImpl(IPreferenceStore preferenceStore) {
+    public EclipsePreferences(IPreferenceStore preferenceStore) {
         this.preferenceStore = preferenceStore;
     }
 
-    private boolean getBoolean(Preferences pref) {
-        return preferenceStore.getBoolean(pref.name);
+    private boolean getBoolean(PreferenceConstants pref) {
+        return preferenceStore.getBoolean(pref.getName());
     }
 
     /** {@inheritDoc} */

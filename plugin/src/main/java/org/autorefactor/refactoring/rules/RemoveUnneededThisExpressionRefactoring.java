@@ -25,6 +25,7 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import org.autorefactor.preferences.Preferences;
 import org.autorefactor.util.IllegalStateException;
 import org.autorefactor.util.NotImplementedException;
 import org.eclipse.jdt.core.dom.ASTNode;
@@ -44,6 +45,12 @@ import static org.autorefactor.refactoring.ASTHelper.*;
  * Remove useless use of "this" from method calls.
  */
 public class RemoveUnneededThisExpressionRefactoring extends AbstractRefactoring {
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean isEnabled(Preferences preferences) {
+        return preferences.removeThisForNonStaticMethodAccess();
+    }
 
     /** {@inheritDoc} */
     @Override

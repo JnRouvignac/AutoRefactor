@@ -27,9 +27,9 @@ package org.autorefactor;
 
 import java.util.Vector;
 
-import org.autorefactor.ui.preferences.PreferenceHelper;
-import org.autorefactor.ui.preferences.PreferenceHelperImpl;
-import org.autorefactor.ui.preferences.Preferences;
+import org.autorefactor.preferences.PreferenceConstants;
+import org.autorefactor.preferences.Preferences;
+import org.autorefactor.ui.preferences.EclipsePreferences;
 import org.autorefactor.util.UnhandledException;
 import org.eclipse.core.runtime.ILog;
 import org.eclipse.core.runtime.IStatus;
@@ -50,7 +50,7 @@ public class AutoRefactorPlugin extends AbstractUIPlugin {
     /** The shared instance. */
     private static AutoRefactorPlugin plugin;
 
-    private static PreferenceHelper preferenceHelper;
+    private static Preferences preferenceHelper;
     private static Vector<Job> jobs = new Vector<Job>();
 
     @Override
@@ -132,9 +132,9 @@ public class AutoRefactorPlugin extends AbstractUIPlugin {
      *
      * @return a helper object for the preferences
      */
-    public static PreferenceHelper getPreferenceHelper() {
+    public static Preferences getPreferenceHelper() {
         if (preferenceHelper == null) {
-            preferenceHelper = new PreferenceHelperImpl(getDefault().getPreferenceStore());
+            preferenceHelper = new EclipsePreferences(getDefault().getPreferenceStore());
         }
         return preferenceHelper;
     }
@@ -145,7 +145,7 @@ public class AutoRefactorPlugin extends AbstractUIPlugin {
      * This method is only for internal use.
      */
     public static void turnDebugModeOn() {
-        getDefault().getPreferenceStore().setValue(Preferences.DEBUG_MODE_ON.name(), Boolean.TRUE.toString());
+        getDefault().getPreferenceStore().setValue(PreferenceConstants.DEBUG_MODE_ON.name(), Boolean.TRUE.toString());
     }
 
     /**

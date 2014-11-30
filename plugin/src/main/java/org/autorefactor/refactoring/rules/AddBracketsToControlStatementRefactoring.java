@@ -25,6 +25,7 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import org.autorefactor.preferences.Preferences;
 import org.autorefactor.refactoring.ASTBuilder;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.DoStatement;
@@ -46,6 +47,11 @@ import static org.autorefactor.refactoring.ASTHelper.*;
  * </ul>
  */
 public class AddBracketsToControlStatementRefactoring extends AbstractRefactoring {
+
+    @Override
+    public boolean isEnabled(final Preferences prefs) {
+        return prefs.addCurlyBracketsToStatementBodies();
+    }
 
     /** {@inheritDoc} */
     @Override

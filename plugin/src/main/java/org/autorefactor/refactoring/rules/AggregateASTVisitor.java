@@ -35,6 +35,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.autorefactor.preferences.Preferences;
 import org.autorefactor.refactoring.IJavaRefactoring;
 import org.autorefactor.refactoring.IRefactoring;
 import org.autorefactor.refactoring.Refactorings;
@@ -158,6 +159,12 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
     public AggregateASTVisitor(List<IRefactoring> visitors) {
         this.visitors = (List) visitors;
         analyzeVisitors();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean isEnabled(Preferences preferences) {
+        return true;
     }
 
     private void analyzeVisitors() {

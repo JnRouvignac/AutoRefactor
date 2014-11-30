@@ -25,6 +25,7 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import org.autorefactor.preferences.Preferences;
 import org.autorefactor.refactoring.IJavaRefactoring;
 import org.autorefactor.refactoring.Refactorings;
 import org.eclipse.jdt.core.dom.ASTNode;
@@ -39,6 +40,12 @@ public abstract class AbstractRefactoring extends ASTVisitor implements IJavaRef
 
     /** The refactoring context of the current visitor. */
     protected RefactoringContext ctx;
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean isEnabled(Preferences preferences) {
+        return true;
+    }
 
     /** {@inheritDoc} */
     @Override

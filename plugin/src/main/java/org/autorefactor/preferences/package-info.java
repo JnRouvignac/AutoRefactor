@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2013-2014 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2014 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,32 +23,7 @@
  * which accompanies this distribution under LICENSE-ECLIPSE, and is
  * available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.autorefactor.ui.preferences;
-
 /**
- * Helper interface for preferences.
+ * Provides interfaces and data for querying AutoRefactor preferences.
  */
-public interface PreferenceHelper {
-
-    /**
-     * Returns whether debug mode is on.
-     *
-     * @return true if debug mode is on, false otherwise.
-     */
-    boolean debugModeOn();
-
-    /**
-     * Returns whether to remove 'this' keyword for accesses to non static methods.
-     *
-     * @return true if must remove 'this' keyword for accesses to non static methods, false otherwise
-     */
-    boolean removeThisForNonStaticMethodAccess();
-
-    /**
-     * Returns whether debug mode is on.
-     *
-     * @return true if debug mode is on, false otherwise.
-     */
-    boolean addCurlyBracketsToStatementBodies();
-
-}
+package org.autorefactor.preferences;

@@ -30,8 +30,8 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.autorefactor.AutoRefactorPlugin;
+import org.autorefactor.preferences.Preferences;
 import org.autorefactor.refactoring.IRefactoring;
-import org.autorefactor.ui.preferences.PreferenceHelper;
 
 /**
  * Lists all the available refactorings.
@@ -48,12 +48,11 @@ public final class AllRefactorings {
      * @return the refactorings which have been enabled from the Eclipse preferences
      */
     public static List<IRefactoring> getConfiguredRefactorings() {
-        final PreferenceHelper prefs = AutoRefactorPlugin.getPreferenceHelper();
+        final Preferences prefs = AutoRefactorPlugin.getPreferenceHelper();
         final List<IRefactoring> refactorings = getAllRefactorings();
         for (final Iterator<IRefactoring> iter = refactorings.iterator(); iter.hasNext();) {
             final IRefactoring refactoring = iter.next();
-            if (!prefs.addCurlyBracketsToStatementBodies()
-                && refactoring instanceof AddBracketsToControlStatementRefactoring) {
+            if (!refactoring.isEnabled(prefs)) {
                 iter.remove();
             }
         }
@@ -66,18 +65,16 @@ public final class AllRefactorings {
      * @return all the available refactorings
      */
     public static List<IRefactoring> getAllRefactorings() {
-        // TODO JNR Remove reference to Preferences from this method
-        final PreferenceHelper prefs = AutoRefactorPlugin.getPreferenceHelper();
         return newArrayList(
                 new RemoveUselessNullCheckRefactoring(),
                 new WorkWithNullCheckedExpressionFirstRefactoring(),
                 new VectorOldToNewAPIRefactoring(),
                 new PrimitiveWrapperCreationRefactoring(),
                 new BooleanRefactoring(),
-                prefs.addCurlyBracketsToStatementBodies() ? new AddBracketsToControlStatementRefactoring() : null,
+                new AddBracketsToControlStatementRefactoring(),
                 new InvertEqualsRefactoring(),
                 new SimplifyExpressionRefactoring(),
-                prefs.removeThisForNonStaticMethodAccess() ? new RemoveUnneededThisExpressionRefactoring() : null,
+                new RemoveUnneededThisExpressionRefactoring(),
                 new StringRefactoring(),
                 new BigDecimalRefactoring(),
                 // TODO JNR implement
