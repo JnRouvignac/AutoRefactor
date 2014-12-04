@@ -25,10 +25,13 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import java.util.Arrays;
+
 import org.autorefactor.preferences.Preferences;
 import org.autorefactor.util.IllegalStateException;
 import org.autorefactor.util.NotImplementedException;
 import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.AbstractTypeDeclaration;
 import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
 import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
@@ -37,7 +40,6 @@ import org.eclipse.jdt.core.dom.Name;
 import org.eclipse.jdt.core.dom.QualifiedName;
 import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.ThisExpression;
-import org.eclipse.jdt.core.dom.TypeDeclaration;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
 
@@ -78,7 +80,7 @@ public class RemoveUnneededThisExpressionRefactoring extends AbstractRefactoring
         if (surroundingType instanceof AnonymousClassDeclaration) {
             return false;
         }
-        final TypeDeclaration ancestor = (TypeDeclaration) surroundingType;
+        final AbstractTypeDeclaration ancestor = (AbstractTypeDeclaration) surroundingType;
         if (thisQualifierName instanceof SimpleName) {
             return isEqual((SimpleName) thisQualifierName, ancestor.getName());
         } else if (thisQualifierName instanceof QualifiedName) {
@@ -96,22 +98,24 @@ public class RemoveUnneededThisExpressionRefactoring extends AbstractRefactoring
             final AnonymousClassDeclaration c = (AnonymousClassDeclaration) currentType;
             final ITypeBinding surroundingTypeBinding = c.resolveBinding();
             return surroundingTypeBinding.isSubTypeCompatible(mb.getDeclaringClass());
-        } else if (currentType instanceof TypeDeclaration) {
-            final TypeDeclaration td = (TypeDeclaration) currentType;
-            final ITypeBinding surroundingTypeBinding = td.resolveBinding();
+        } else if (currentType instanceof AbstractTypeDeclaration) {
+            final AbstractTypeDeclaration ed = (AbstractTypeDeclaration) currentType;
+            final ITypeBinding surroundingTypeBinding = ed.resolveBinding();
             return surroundingTypeBinding.isSubTypeCompatible(mb.getDeclaringClass());
         }
         throw new NotImplementedException(node, node);
     }
 
     private static ASTNode getSurroundingType(ASTNode node) {
-        return getFirstAncestor(node, TypeDeclaration.class, AnonymousClassDeclaration.class);
+        return getFirstAncestor(node, AbstractTypeDeclaration.class, AnonymousClassDeclaration.class);
     }
 
     private static ASTNode getFirstAncestor(ASTNode node, Class<?>... ancestorClasses) {
         if (node == null || node.getParent() == null) {
             throw new IllegalStateException(node,
-                    "Could not find any ancestor for " + ancestorClasses + "and node " + node);
+                    "Could not find any ancestor for " + Arrays.toString(ancestorClasses)
+                    + " and node type " + (node != null ? node.getClass().getSimpleName() : null)
+                    + " node.toString() " + node);
         }
         final ASTNode parent = node.getParent();
         for (Class<?> ancestorClazz : ancestorClasses) {
