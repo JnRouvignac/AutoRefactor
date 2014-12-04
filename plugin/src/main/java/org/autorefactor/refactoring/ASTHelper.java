@@ -1344,15 +1344,24 @@ public final class ASTHelper {
         return false;
     }
 
-    /**
-     * Returns whether the two provided simple names represent the same variable.
-     *
-     * @param name1 the first simple name to compare
-     * @param name2 the second simple name to compare
-     * @return true if the two provided simple names represent the same variable, false otherwise
-     */
-    public static boolean isSameVariable(SimpleName name1, SimpleName name2) {
-        return isEqualTo(name1.resolveBinding(), name2.resolveBinding());
+    private static boolean areVariableBindingsEqual(ASTNode node1, ASTNode node2) {
+        final IBinding b1 = varBinding(node1);
+        final IBinding b2 = varBinding(node2);
+        return b1 != null && b2 != null && b1.isEqualTo(b2);
+    }
+
+    private static IBinding varBinding(ASTNode node) {
+        switch (node.getNodeType()) {
+        case FIELD_ACCESS:
+            return ((FieldAccess) node).resolveFieldBinding();
+        case QUALIFIED_NAME:
+            return ((QualifiedName) node).resolveBinding();
+        case SIMPLE_NAME:
+            return ((SimpleName) node).resolveBinding();
+        case VARIABLE_DECLARATION_FRAGMENT:
+            return ((VariableDeclarationFragment) node).resolveBinding();
+        }
+        return null;
     }
 
     /**
@@ -1374,15 +1383,8 @@ public final class ASTHelper {
      * @return true if the two provided expressions represent the same variable, false otherwise
      */
     public static boolean isSameVariable(SimpleName name1, FieldAccess field2) {
-        if (!(field2.getExpression() instanceof ThisExpression)) {
-            // TODO JNR parenthesized expr??
-            return false;
-        }
-        return isEqualTo(field2.resolveFieldBinding(), name1.resolveBinding());
-    }
-
-    private static boolean isEqualTo(IBinding b1, IBinding b2) {
-        return b1 != null && b2 != null && b1.isEqualTo(b2);
+        return as(field2.getExpression(), ThisExpression.class) != null
+                && areVariableBindingsEqual(field2, name1);
     }
 
     /**
@@ -1393,9 +1395,8 @@ public final class ASTHelper {
      * @return true if the two provided qualified names represent the same variable, false otherwise
      */
     public static boolean isSameVariable(QualifiedName name1, QualifiedName name2) {
-        IBinding b1 = name1.resolveBinding();
-        IBinding b2 = name2.resolveBinding();
-        return isEqualTo(b2, b1) && isSameVariable(name1.getQualifier(), name2.getQualifier());
+        return areVariableBindingsEqual(name1, name2)
+                && isSameVariable(name1.getQualifier(), name2.getQualifier());
     }
 
     /**
@@ -1406,9 +1407,8 @@ public final class ASTHelper {
      * @return true if the two provided expressions represent the same variable, false otherwise
      */
     public static boolean isSameVariable(QualifiedName name1, FieldAccess field2) {
-        IBinding b1 = name1.resolveBinding();
-        IBinding b2 = field2.resolveFieldBinding();
-        return isEqualTo(b1, b2) && isSameVariable(field2.getExpression(), name1.getQualifier());
+        return areVariableBindingsEqual(name1, field2)
+                && isSameVariable(field2.getExpression(), name1.getQualifier());
     }
 
     /**
@@ -1419,69 +1419,76 @@ public final class ASTHelper {
      * @return true if the two provided field accesses represent the same variable, false otherwise
      */
     public static boolean isSameVariable(FieldAccess field1, FieldAccess field2) {
-        IBinding b1 = field1.resolveFieldBinding();
-        IBinding b2 = field2.resolveFieldBinding();
-        return isEqualTo(b2, b1) && isSameVariable(field1.getExpression(), field2.getExpression());
+        return areVariableBindingsEqual(field1, field2)
+                && isSameVariable(field1.getExpression(), field2.getExpression());
     }
 
     /**
-     * Returns whether the two provided expressions represent the same variable.
+     * Returns whether the two provided nodes represent the same variable.
      *
-     * @param expr1 the first expression to compare
-     * @param expr2 the second expression to compare
-     * @return true if the two provided expressions represent the same variable, false otherwise
+     * @param node1 the first node to compare
+     * @param node2 the second node to compare
+     * @return true if the two provided nodes represent the same variable, false otherwise
      */
-    public static boolean isSameVariable(Expression expr1, Expression expr2) {
-        if (expr1 instanceof ThisExpression) {
-            // TODO JNR
-            // ThisExpression te = (ThisExpression) name1;
-            // te.getQualifier();
-            return expr2 instanceof ThisExpression;
-        } else if (expr1 instanceof SimpleName) {
-            final SimpleName sn = (SimpleName) expr1;
-            if (expr2 instanceof SimpleName) {
-                return isSameVariable(sn, (SimpleName) expr2);
-            } else if (expr2 instanceof QualifiedName) {
-                return isSameVariable(sn, (QualifiedName) expr2);
-            } else if (expr2 instanceof FieldAccess) {
-                return isSameVariable(sn, (FieldAccess) expr2);
+    public static boolean isSameVariable(ASTNode node1, ASTNode node2) {
+        if (node1 == null || node2 == null) {
+            return false;
+        }
+        switch (node1.getNodeType()) {
+        case THIS_EXPRESSION:
+            return node2.getNodeType() == THIS_EXPRESSION;
+        case SIMPLE_NAME:
+            final SimpleName sn = (SimpleName) node1;
+            switch (node2.getNodeType()) {
+            case QUALIFIED_NAME:
+                return isSameVariable(sn, (QualifiedName) node2);
+            case FIELD_ACCESS:
+                return isSameVariable(sn, (FieldAccess) node2);
             }
-        } else if (expr1 instanceof QualifiedName) {
-            final QualifiedName qn = (QualifiedName) expr1;
-            if (expr2 instanceof SimpleName) {
-                return isSameVariable((SimpleName) expr2, qn);
-            } else if (expr2 instanceof QualifiedName) {
-                return isSameVariable(qn, (QualifiedName) expr2);
-            } else if (expr2 instanceof FieldAccess) {
-                return isSameVariable(qn, (FieldAccess) expr2);
+            break;
+        case QUALIFIED_NAME:
+            final QualifiedName qn = (QualifiedName) node1;
+            switch (node2.getNodeType()) {
+            case SIMPLE_NAME:
+                return isSameVariable((SimpleName) node2, qn);
+            case QUALIFIED_NAME:
+                return isSameVariable(qn, (QualifiedName) node2);
+            case FIELD_ACCESS:
+                return isSameVariable(qn, (FieldAccess) node2);
             }
-        } else if (expr1 instanceof FieldAccess) {
-            final FieldAccess fa = (FieldAccess) expr1;
-            if (expr2 instanceof SimpleName) {
-                return isSameVariable((SimpleName) expr2, fa);
-            } else if (expr2 instanceof QualifiedName) {
-                return isSameVariable((QualifiedName) expr2, fa);
-            } else if (expr2 instanceof FieldAccess) {
-                return isSameVariable(fa, (FieldAccess) expr2);
+            break;
+        case FIELD_ACCESS:
+            final FieldAccess fa = (FieldAccess) node1;
+            switch (node2.getNodeType()) {
+            case SIMPLE_NAME:
+                return isSameVariable((SimpleName) node2, fa);
+            case QUALIFIED_NAME:
+                return isSameVariable((QualifiedName) node2, fa);
+            case FIELD_ACCESS:
+                return isSameVariable(fa, (FieldAccess) node2);
             }
         }
-        return false;
+        return areVariableBindingsEqual(node1, node2);
     }
 
     /**
-     * Returns the parent node filtering out ParenthesizedExpression and Blocks.
+     * Returns the parent node by ignoring the provided types.
      *
      * @param node the node
-     * @return the parent node filtering out ParenthesizedExpression and Blocks
+     * @param ignoredClasses the classes to ignore when looking for the parent node
+     * @return the parent node by ignoring the provided types
      */
-    public static ASTNode getParent(ASTNode node) {
+    public static ASTNode getParentIgnoring(ASTNode node, Class<?>... ignoredClasses) {
         ASTNode parent = node.getParent();
-        if (parent instanceof ParenthesizedExpression) {
-            return getParent(((ParenthesizedExpression) parent).getParent());
-        } else if (parent instanceof Block) {
-            return getParent(((Block) parent).getParent());
+        if (parent == null) {
+            return null;
         }
-        return parent;
+        for (Class<?> ignoredClass : ignoredClasses) {
+            if (ignoredClass.isAssignableFrom(parent.getClass())) {
+                return getParentIgnoring(parent, ignoredClasses);
+            }
+        }
+        return node;
     }
 
     /**

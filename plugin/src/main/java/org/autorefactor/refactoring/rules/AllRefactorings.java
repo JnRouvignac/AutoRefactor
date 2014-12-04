@@ -85,6 +85,7 @@ public final class AllRefactorings {
                 // TODO JNR complete it
                 // new GenerecizeRefactoring(),
                 new CollectionAddAllRefactoring(),
+                new NoAssignmentInIfConditionRefactoring(),
                 new IfStatementRefactoring(),
                 // TODO JNR implement
                 // new RemoveStupidIdiomaticPatternRefactoring(),
