@@ -28,7 +28,10 @@ package org.autorefactor.refactoring.rules;
 import org.autorefactor.refactoring.ASTBuilder;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Expression;
+import org.eclipse.jdt.core.dom.IBinding;
+import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.MethodInvocation;
+import org.eclipse.jdt.core.dom.Name;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
 
@@ -54,11 +57,8 @@ public class InvertEqualsRefactoring extends AbstractRefactoring {
                 isMethod(node, "java.lang.String", "equalsIgnoreCase", "java.lang.String");
         if (isEquals || isStringEqualsIgnoreCase) {
             final Expression expr = node.getExpression();
-            final Object exprConstantValue = expr.resolveConstantExpressionValue();
             final Expression arg0 = arguments(node).get(0);
-            final Object argConstantValue = arg0.resolveConstantExpressionValue();
-            // TODO JNR make it work for enums
-            if (exprConstantValue == null && argConstantValue != null) {
+            if (!isConstant(expr) && isConstant(arg0)) {
                 this.ctx.getRefactorings().replace(node,
                         invertEqualsInvocation(expr, arg0, isEquals));
                 return DO_NOT_VISIT_SUBTREE;
@@ -67,9 +67,25 @@ public class InvertEqualsRefactoring extends AbstractRefactoring {
         return VISIT_SUBTREE;
     }
 
+    private boolean isConstant(final Expression expr) {
+        return (expr != null && expr.resolveConstantExpressionValue() != null)
+                || isEnumConstant(expr);
+    }
+
+    private boolean isEnumConstant(final Expression expr) {
+        // TODO JNR make it work for enums fields which are static final, but not null
+        if (expr instanceof Name) {
+            final IBinding binding = ((Name) expr).resolveBinding();
+            if (binding instanceof IVariableBinding) {
+                return ((IVariableBinding) binding).isEnumConstant();
+            }
+        }
+        return false;
+    }
+
     private ASTNode invertEqualsInvocation(Expression lhs, Expression rhs, boolean isEquals) {
         final String methodName = isEquals ? "equals" : "equalsIgnoreCase";
         final ASTBuilder b = this.ctx.getASTBuilder();
-        return b.invoke(b.copy(rhs), methodName, b.copy(lhs));
+        return b.invoke(b.parenthesizeIfNeeded(b.copy(rhs)), methodName, b.copy(lhs));
     }
 }

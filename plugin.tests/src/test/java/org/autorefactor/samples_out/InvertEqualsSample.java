@@ -31,6 +31,7 @@ public class InvertEqualsSample {
         String constant = "fkjfkjf";
         String nullConstant = null;
         MyEnum enumConstant = MyEnum.NOT_NULL;
+        MyEnum enumNullConstant = null;
     }
 
     private static enum MyEnum {
@@ -38,18 +39,23 @@ public class InvertEqualsSample {
     }
 
     public boolean invertEquals(Object obj) {
-        return "".equals(obj) && Itf.constant.equals(obj);
-                // && obj.equals(MyEnum.NOT_NULL) && obj.equals(Itf.enumConstant);
+        return "".equals(obj)
+                && Itf.constant.equals(obj)
+                && ("" + Itf.constant).equals(obj)
+                && MyEnum.NOT_NULL.equals(obj);
+                // && obj.equals(Itf.enumConstant);
                 // should become:
-                // && MyEnum.NOT_NULL.equals(obj) && Itf.enumConstant.equals(obj);
+                // && Itf.enumConstant.equals(obj);
     }
 
     public boolean doNotInvertEquals(Object obj) {
-        return obj.equals(Itf.nullConstant);
+        return obj.equals(Itf.nullConstant) && obj.equals(Itf.enumNullConstant);
     }
 
     public boolean invertEqualsIgnoreCase(String s) {
-        return "".equalsIgnoreCase(s) && Itf.constant.equalsIgnoreCase(s);
+        return "".equalsIgnoreCase(s)
+                && Itf.constant.equalsIgnoreCase(s)
+                && ("" + Itf.constant).equalsIgnoreCase(s);
     }
 
     public boolean doNotInvertEqualsIgnoreCase(String s) {
