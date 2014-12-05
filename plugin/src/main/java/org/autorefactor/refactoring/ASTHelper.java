@@ -981,10 +981,10 @@ public final class ASTHelper {
         }
         // a lot more heavy checks
         // FIXME find a more efficient way to do this. It would be awesome
-        // if an API to directly find the overridenMethod IMethodBinding existed
-        IMethodBinding overridenMethod = findOverridenMethod(declaringClazz, typeQualifiedName,
+        // if an API to directly find the overriddenMethod IMethodBinding existed
+        IMethodBinding overriddenMethod = findOverridenMethod(declaringClazz, typeQualifiedName,
                 methodName, parameterTypesQualifiedNames);
-        return overridenMethod != null && methodBinding.overrides(overridenMethod);
+        return overriddenMethod != null && methodBinding.overrides(overriddenMethod);
     }
 
     private static boolean parameterTypesMatch(ITypeBinding implementedType,
@@ -1515,7 +1515,7 @@ public final class ASTHelper {
      * @return a string suitable for identifying a location in the source
      */
     public static String getSourceLocation(ASTNode node) {
-        final ASTNode root = node.getRoot();
+        final ASTNode root = node != null ? node.getRoot() : null;
         if (root instanceof CompilationUnit) {
             final CompilationUnit cu = (CompilationUnit) root;
             final int position = node.getStartPosition();

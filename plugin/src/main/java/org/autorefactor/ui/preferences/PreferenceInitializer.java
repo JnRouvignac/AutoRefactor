@@ -43,7 +43,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
     public void initializeDefaultPreferences() {
         // TODO initialize preferences from the JDT preferences like:
         // code style/cleanup/formatting
-        IPreferenceStore store = AutoRefactorPlugin.getDefault().getPreferenceStore();
+        final IPreferenceStore store = AutoRefactorPlugin.getDefault().getPreferenceStore();
         for (PreferenceConstants preference : PreferenceConstants.values()) {
             final String name = preference.getName();
             final Object defaultValue = preference.getDefaultValue();
@@ -59,8 +59,9 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
                 store.setDefault(name, (Float) defaultValue);
             } else if (defaultValue instanceof String) {
                 store.setDefault(name, (String) defaultValue);
+            } else {
+                throw new NotImplementedException(null, defaultValue);
             }
-            throw new NotImplementedException(null, defaultValue);
         }
         store.setDefault(ADD_CURLY_BRACKETS_TO_STATEMENT_BODIES.getName(), true);
     }
