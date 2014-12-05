@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2013 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2013-2014 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,15 +31,17 @@ public class StringSample {
         return "";
     }
 
-    public void replaceStringToString(String s) {
+    public String replaceStringToString(String s) {
         String s1 = s;
         String s2 = "";
         String s3 = getS();
+        return s1 + s2 + s3;
     }
 
-    public void replaceToStringCallInStringConcat() {
+    public String replaceToStringCallInStringConcat() {
         String s1 = "" + Boolean.TRUE + Boolean.FALSE;
         String s2 = Boolean.TRUE + "" + Boolean.FALSE;
+        return s1 + s2;
     }
 
     public String doNotReplaceToStringCallOutsideStringConcat() {
@@ -50,7 +52,7 @@ public class StringSample {
         return Boolean.TRUE.toString() + Boolean.FALSE;
     }
 
-    public void removeUselessToString() {
+    public String removeUselessToString() {
         byte b = 42;
         short s = 42;
         String s1 = true + " foo";
@@ -61,15 +63,22 @@ public class StringSample {
         String s6 = 42l + " foo";
         String s7 = 42.42f + " foo";
         String s8 = 42.42 + " foo";
+        return s1 + s2 + s3 + s4 + s5 + s6 + s7 + s8;
+    }
 
-        String s11 = true + " foo";
-        String s12 = 'c' + " foo";
-        String s13 = b + " foo";
-        String s14 = s + " foo";
-        String s15 = 42 + " foo";
-        String s16 = 42l + " foo";
-        String s17 = 42.42f + " foo";
-        String s18 = 42.42 + " foo";
+    public String removeUselessValueOf() {
+        byte b = 42;
+        short s = 42;
+        String s1 = true + " foo";
+        String s2 = 'c' + " foo";
+        String s3 = b + " foo";
+        String s4 = s + " foo";
+        String s5 = 42 + " foo";
+        String s6 = 42l + " foo";
+        String s7 = 42.42f + " foo";
+        String s8 = 42.42 + " foo";
+        String s9 = new Object() + " foo";
+        return s1 + s2 + s3 + s4 + s5 + s6 + s7 + s8 + s9;
     }
 
     // TODO JNR which operand must be removed here?

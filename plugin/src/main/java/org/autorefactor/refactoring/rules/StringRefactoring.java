@@ -49,7 +49,6 @@ import static org.eclipse.jdt.core.dom.ASTNode.*;
  */
 public class StringRefactoring extends AbstractRefactoring {
 
-
     /** {@inheritDoc} */
     @Override
     public boolean visit(ClassInstanceCreation node) {
@@ -99,7 +98,7 @@ public class StringRefactoring extends AbstractRefactoring {
                     return DO_NOT_VISIT_SUBTREE;
                 }
             }
-        } else if (isToStringForPrimitive(node) || isStringValueOfForPrimitive(node)) {
+        } else if (isToStringForPrimitive(node) || isStringValueOf(node)) {
             if (parent.getNodeType() == INFIX_EXPRESSION) {
                 // if node is in a String context, no need to call toString()
                 final InfixExpression ie = (InfixExpression) node.getParent();
@@ -131,7 +130,7 @@ public class StringRefactoring extends AbstractRefactoring {
                       || isMethod(node, "java.lang.Double", "toString", "double"));
     }
 
-    private boolean isStringValueOfForPrimitive(MethodInvocation node) {
+    private boolean isStringValueOf(MethodInvocation node) {
         return hasType(node.getExpression(), "java.lang.String") // fast-path
                 && (isMethod(node, "java.lang.String", "valueOf", "boolean")
                       || isMethod(node, "java.lang.String", "valueOf", "char")
@@ -140,7 +139,8 @@ public class StringRefactoring extends AbstractRefactoring {
                       || isMethod(node, "java.lang.String", "valueOf", "int")
                       || isMethod(node, "java.lang.String", "valueOf", "long")
                       || isMethod(node, "java.lang.String", "valueOf", "float")
-                      || isMethod(node, "java.lang.String", "valueOf", "double"));
+                      || isMethod(node, "java.lang.String", "valueOf", "double")
+                      || isMethod(node, "java.lang.String", "valueOf", "java.lang.Object"));
     }
 
     private Expression arg0(final MethodInvocation mi) {
