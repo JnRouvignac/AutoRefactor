@@ -157,6 +157,14 @@ public class RemoveUnnecessaryCastSample {
         return b1 && (Boolean) b2;
     }
 
+    public double doNotRemoveCastInFloatingPointDivision(int i, int j) {
+        return i / (double) j;
+    }
+
+    public long removeCastInIntegralDivision(int i, int j) {
+        return i / (long) j;
+    }
+
     public int removeCastsFromAssignmentsToByte() {
         byte b1 = (byte) -1;
         byte b2 = (byte) 127;

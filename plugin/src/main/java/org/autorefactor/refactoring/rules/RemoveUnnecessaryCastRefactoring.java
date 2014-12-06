@@ -77,19 +77,28 @@ public class RemoveUnnecessaryCastRefactoring extends AbstractRefactoring {
 
         case INFIX_EXPRESSION:
             final InfixExpression ie = (InfixExpression) parent;
+            final boolean isDivision = Operator.DIVIDE.equals(ie.getOperator());
             final Expression lo = ie.getLeftOperand();
             final Expression ro = ie.getRightOperand();
             if (node.equals(lo)) {
                 return (isAssignmentCompatible(node.getExpression(), ro) || isStringConcat(ie))
                         && !isPrimitiveTypeNarrowing(node, ie)
-                        && !isFloatDivision(ie);
+                        && !isDivision;
             } else {
                 return (isAssignmentCompatible(node.getExpression(), lo) || isStringConcat(ie))
-                        && !isPrimitiveTypeNarrowing(node, ie);
-                        // it can be removed because this is never the first operand of a division
+                        && !isPrimitiveTypeNarrowing(node, ie)
+                        && !(isDivision && isIntegralType(lo) && isFloatingPointType(ro));
             }
         }
         return false;
+    }
+
+    private boolean isIntegralType(final Expression expr) {
+        return hasType(expr, "byte", "char", "short", "int", "long");
+    }
+
+    private boolean isFloatingPointType(final Expression expr) {
+        return hasType(expr, "float", "double");
     }
 
     /** @see JLS, section 5.2 Assignment Conversion */
@@ -106,10 +115,6 @@ public class RemoveUnnecessaryCastRefactoring extends AbstractRefactoring {
 
     private boolean isStringConcat(InfixExpression ie) {
         return hasType(ie, "java.lang.String");
-    }
-
-    private boolean isFloatDivision(InfixExpression ie) {
-        return Operator.DIVIDE.equals(ie.getOperator());
     }
 
     private boolean isPrimitiveTypeNarrowing(CastExpression node, InfixExpression parent) {
