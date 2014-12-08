@@ -87,7 +87,7 @@ public class RemoveUnnecessaryCastRefactoring extends AbstractRefactoring {
             } else {
                 return (isAssignmentCompatible(node.getExpression(), lo) || isStringConcat(ie))
                         && !isPrimitiveTypeNarrowing(node, ie)
-                        && !(isDivision && isIntegralType(lo) && isFloatingPointType(ro));
+                        && !(isIntegralType(lo) && isDivision && isFloatingPointType(ro) && node.equals(ro));
             }
         }
         return false;
