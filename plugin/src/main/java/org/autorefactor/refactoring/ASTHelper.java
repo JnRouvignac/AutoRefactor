@@ -1472,23 +1472,34 @@ public final class ASTHelper {
     }
 
     /**
-     * Returns the parent node by ignoring the provided types.
+     * Returns the first parent node whose type is not part of the included classes list.
      *
      * @param node the node
-     * @param ignoredClasses the classes to ignore when looking for the parent node
-     * @return the parent node by ignoring the provided types
+     * @param includedClasses the classes to include when looking for the parent node
+     * @return the parent node by including the provided types
      */
-    public static ASTNode getParentIgnoring(ASTNode node, Class<?>... ignoredClasses) {
-        ASTNode parent = node.getParent();
-        if (parent == null) {
-            return null;
-        }
-        for (Class<?> ignoredClass : ignoredClasses) {
-            if (ignoredClass.isAssignableFrom(parent.getClass())) {
-                return getParentIgnoring(parent, ignoredClasses);
-            }
+    public static ASTNode getParentIncluding(ASTNode node, Class<?>... includedClasses) {
+        return include(node.getParent(), includedClasses);
+    }
+
+    private static ASTNode include(ASTNode node, Class<?>... includedClasses) {
+        if (hasType(node, includedClasses)
+                && hasType(node.getParent(), includedClasses)) {
+            return include(node.getParent(), includedClasses);
         }
         return node;
+    }
+
+    private static boolean hasType(ASTNode node, Class<?>... includedClasses) {
+        if (node == null) {
+            return false;
+        }
+        for (Class<?> ignoredClass : includedClasses) {
+            if (ignoredClass.isAssignableFrom(node.getClass())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
