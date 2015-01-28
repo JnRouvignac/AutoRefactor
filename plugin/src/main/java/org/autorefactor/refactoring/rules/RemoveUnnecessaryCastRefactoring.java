@@ -25,20 +25,25 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import org.autorefactor.refactoring.ASTBuilder;
+import org.autorefactor.util.NotImplementedException;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.CastExpression;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.InfixExpression;
-import org.eclipse.jdt.core.dom.InfixExpression.Operator;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.eclipse.jdt.core.dom.ASTNode.*;
+import static org.eclipse.jdt.core.dom.InfixExpression.Operator.*;
 
 /**
  * Removes unnecessary widening casts from return statements, assignments and
@@ -77,20 +82,118 @@ public class RemoveUnnecessaryCastRefactoring extends AbstractRefactoring {
 
         case INFIX_EXPRESSION:
             final InfixExpression ie = (InfixExpression) parent;
-            final boolean isDivision = Operator.DIVIDE.equals(ie.getOperator());
             final Expression lo = ie.getLeftOperand();
             final Expression ro = ie.getRightOperand();
             if (node.equals(lo)) {
-                return (isAssignmentCompatible(node.getExpression(), ro) || isStringConcat(ie))
+                return (isStringConcat(ie) || isAssignmentCompatible(node.getExpression(), ro))
                         && !isPrimitiveTypeNarrowing(node, ie)
-                        && !isDivision;
+                        && !DIVIDE.equals(ie.getOperator())
+                        && !PLUS.equals(ie.getOperator())
+                        && !MINUS.equals(ie.getOperator());
             } else {
-                return (isAssignmentCompatible(node.getExpression(), lo) || isStringConcat(ie))
+                final boolean integralDivision = isIntegralDivision(ie);
+                return ((isNotRefactored(lo) && isStringConcat(ie))
+                            || (!integralDivision && isAssignmentCompatibleInInfixExpression(node, ie))
+                            || (integralDivision && canRemoveCastInIntegralDivision(node, ie)))
                         && !isPrimitiveTypeNarrowing(node, ie)
-                        && !(isIntegralType(lo) && isDivision && isFloatingPointType(ro) && node.equals(ro));
+                        && !isIntegralDividedByFloatingPoint(node, ie);
             }
         }
         return false;
+    }
+
+    private boolean canRemoveCastInIntegralDivision(CastExpression node, InfixExpression ie) {
+        final ITypeBinding leftOperandType = getLeftOperandType(ie, node);
+        return isIntegralDivision(ie) // safety check
+                && isAssignmentCompatible(node.getExpression().resolveTypeBinding(), leftOperandType)
+                && compareTo(node.resolveTypeBinding(), leftOperandType) >= 0;
+    }
+
+    private boolean isIntegralDivision(final InfixExpression ie) {
+        return isIntegralType(ie) && DIVIDE.equals(ie.getOperator());
+    }
+
+    private boolean isAssignmentCompatibleInInfixExpression(final CastExpression node, final InfixExpression ie) {
+        final ITypeBinding leftOpType = getLeftOperandType(ie, node);
+        return isAssignmentCompatible(node.getExpression().resolveTypeBinding(), leftOpType)
+                && isAssignmentCompatible(node.resolveTypeBinding(), leftOpType);
+    }
+
+    private ITypeBinding getLeftOperandType(InfixExpression ie, CastExpression node) {
+        final ArrayList<Expression> operands = allOperands(ie);
+        final List<Expression> previousOperands = operands.subList(0, operands.indexOf(node));
+        if (isAnyRefactored(previousOperands)) {
+            return null;
+        }
+        return getTypeBinding(previousOperands);
+    }
+
+    private ITypeBinding getTypeBinding(final List<Expression> previousOperands) {
+        final Iterator<Expression> it = previousOperands.iterator();
+        ITypeBinding maxTypeBinding = it.next().resolveTypeBinding();
+        while (it.hasNext()) {
+            final ITypeBinding typeBinding = it.next().resolveTypeBinding();
+            if (compareTo(maxTypeBinding, typeBinding) < 0) {
+                maxTypeBinding = typeBinding;
+            }
+        }
+        return maxTypeBinding;
+    }
+
+    private int compareTo(ITypeBinding binding1, ITypeBinding binding2) {
+        final int rank1 = toPseudoEnum(binding1.getQualifiedName());
+        final int rank2 = toPseudoEnum(binding2.getQualifiedName());
+        return rank1 - rank2;
+    }
+
+    private int toPseudoEnum(String name) {
+        if (name.equals("byte") || name.equals("java.lang.Byte")) {
+            return 1;
+        } else if (name.equals("short") || name.equals("java.lang.Short")) {
+            return 2;
+        } else if (name.equals("char") || name.equals("java.lang.Character")) {
+            return 3;
+        } else if (name.equals("int") || name.equals("java.lang.Integer")) {
+            return 4;
+        } else if (name.equals("long") || name.equals("java.lang.Long")) {
+            return 5;
+        } else if (name.equals("float") || name.equals("java.lang.Float")) {
+            return 6;
+        } else if (name.equals("double") || name.equals("java.lang.Double")) {
+            return 7;
+        }
+        throw new NotImplementedException(null, "for type '" + name + "'");
+    }
+
+    private boolean isAnyRefactored(final List<Expression> operands) {
+        for (Expression operand : operands) {
+            if (!isNotRefactored(operand)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private ArrayList<Expression> allOperands(InfixExpression ie) {
+        final List<Expression> eo = extendedOperands(ie);
+        final ArrayList<Expression> results = new ArrayList<Expression>(2 + eo.size());
+        results.add(ie.getLeftOperand());
+        results.add(ie.getRightOperand());
+        results.addAll(eo);
+        return results;
+    }
+
+    /** If left operand is refactored, we cannot easily make inferences about right operand. Wait for next iteration. */
+    private boolean isNotRefactored(Expression leftOperand) {
+        return preVisit2(leftOperand);
+    }
+
+    private boolean isIntegralDividedByFloatingPoint(CastExpression node, InfixExpression ie) {
+        final Expression rightOp = ie.getRightOperand();
+        return isIntegralType(ie.getLeftOperand())
+                && DIVIDE.equals(ie.getOperator())
+                && isFloatingPointType(rightOp)
+                && node.equals(rightOp);
     }
 
     private boolean isIntegralType(final Expression expr) {

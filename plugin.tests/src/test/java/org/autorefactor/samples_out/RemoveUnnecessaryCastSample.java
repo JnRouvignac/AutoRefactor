@@ -98,10 +98,10 @@ public class RemoveUnnecessaryCastSample {
     public boolean doNotRemoveCasts(Integer oi, int pi, long l, Object o) {
         return (int) l != pi
             && pi != (int) l
-            && (Integer) o != pi // FIXME cast to (int) after moving to Java 7 builds
-            && pi != (Integer) o // FIXME cast to (int) after moving to Java 7 builds
-            && (Integer) o != oi // FIXME cast to (int) after moving to Java 7 builds
-            && oi != (Integer) o; // FIXME cast to (int) after moving to Java 7 builds
+            && (Integer) o != pi // TODO test cast to (int) after moving to Java 7 builds
+            && pi != (Integer) o // TODO test cast to (int) after moving to Java 7 builds
+            && (Integer) o != oi // TODO test cast to (int) after moving to Java 7 builds
+            && oi != (Integer) o; // TODO test cast to (int) after moving to Java 7 builds
     }
 
     public boolean doNotRemovePrimitiveNarrowingCastsWithComparison(int i) {
@@ -113,12 +113,12 @@ public class RemoveUnnecessaryCastSample {
             && 0 == (short) i;
     }
 
-    public long removeWideningCast(int i, int j) {
-        return i + j;
+    public long doNotRemoveWideningCast(int i, int j) {
+        return (long) i + j;
     }
 
-    public long removeWideningCastsWithExtendedOperands(int i, int j) {
-        return i + j + i;
+    public long doNotRemoveWideningCastsWithExtendedOperands(int i, int j, int k) {
+        return (long) i + j + k;
     }
 
     public int doNotRemovePrimitiveNarrowingCasts(int i, int j) {
@@ -145,12 +145,12 @@ public class RemoveUnnecessaryCastSample {
         return (double) i / l / s;
     }
 
-    public double removeCastsFromAdditionWhenResultIsWidened(Integer oi, int pi, long l) {
-        return oi + pi + l;
+    public double doNotRemoveCastsFromAdditionWhenResultIsWidened(Integer oi, int pi, long l) {
+        return (long) oi + pi + (double) l;
     }
 
-    public double removeCastsFromSoustractionWhenResultIsWidened(Integer oi, int pi, long l) {
-        return oi - pi - l;
+    public double doNotRemoveCastsFromSoustractionWhenResultIsWidened(Integer oi, int pi, long l) {
+        return (long) oi - pi - (double) l;
     }
 
     public boolean removeCastsFromBooleanOperations(boolean b1, boolean b2) {

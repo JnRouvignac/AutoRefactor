@@ -81,6 +81,21 @@ public class RemoveUnnecessaryCastSampleTest {
     }
 
     @Test
+    public void doNotRemoveWideningCast() {
+    	int i = Integer.MAX_VALUE;
+    	int j = Integer.MAX_VALUE;
+        assertEquals(sampleIn.doNotRemoveWideningCast(i, j), sampleOut.doNotRemoveWideningCast(i, j));
+    }
+
+    @Test
+    public void doNotRemoveWideningCastsWithExtendedOperands() {
+    	int i = Integer.MAX_VALUE;
+    	int j = Integer.MAX_VALUE;
+    	int k = Integer.MAX_VALUE;
+        assertEquals(sampleIn.doNotRemoveWideningCastsWithExtendedOperands(i, j, k), sampleOut.doNotRemoveWideningCastsWithExtendedOperands(i, j, k));
+    }
+
+    @Test
     public void doNotRemovePrimitiveNarrowingCast() throws Exception {
         int pi = 0;
         assertEquals(sampleIn.doNotRemovePrimitiveNarrowingCast(pi), sampleOut.doNotRemovePrimitiveNarrowingCast(pi));
@@ -152,5 +167,23 @@ public class RemoveUnnecessaryCastSampleTest {
         short s = 3;
         assertEquals(sampleIn.removeSomeCastsFromDivisionWithDifferentTypesWithExtendedOperands(i, l, s),
                 sampleOut.removeSomeCastsFromDivisionWithDifferentTypesWithExtendedOperands(i, l, s), 0.0);
+    }
+
+    @Test
+    public void doNotRemoveCastsFromAdditionWhenResultIsWidened() {
+    	Integer oi = Integer.MAX_VALUE;
+    	int pi = Integer.MAX_VALUE;
+    	long l = Long.MAX_VALUE;
+        assertEquals(sampleIn.doNotRemoveCastsFromAdditionWhenResultIsWidened(oi, pi, l),
+                sampleOut.doNotRemoveCastsFromAdditionWhenResultIsWidened(oi, pi, l), 0.0);
+    }
+
+    @Test
+    public void doNotRemoveCastsFromSoustractionWhenResultIsWidened() {
+    	Integer oi = Integer.MIN_VALUE;
+    	int pi = Integer.MAX_VALUE;
+    	long l = Long.MIN_VALUE;
+        assertEquals(sampleIn.doNotRemoveCastsFromSoustractionWhenResultIsWidened(oi, pi, l),
+                sampleOut.doNotRemoveCastsFromSoustractionWhenResultIsWidened(oi, pi, l), 0.0);
     }
 }
