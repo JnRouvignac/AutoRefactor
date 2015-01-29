@@ -108,6 +108,9 @@
         </configuration>
       </plugin>
 <!-- TODO JNR
+Read and apply:
+http://www.sebastianbauer.info/index.php?page=tutorials&which=justify
+http://www.solutionsiq.com/developing-eclipse-plug-ins-program-to-publish/
       <plugin>
         <groupId>org.eclipse.tycho</groupId>
         <artifactId>tycho-surefire-plugin</artifactId>
