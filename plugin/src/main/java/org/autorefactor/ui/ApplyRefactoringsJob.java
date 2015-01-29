@@ -209,6 +209,18 @@ public class ApplyRefactoringsJob extends Job {
         try {
             bufferManager.connect(path, locationKind, null);
             final ITextFileBuffer textFileBuffer = bufferManager.getTextFileBuffer(path, locationKind);
+            if (!textFileBuffer.isSynchronized()) {
+                /*
+                 * Cannot read the source when a file is not synchronized,
+                 * Let's ignore this file to avoid problems when:
+                 * - doing string manipulation with the source text
+                 * - applying automated refactorings to such files
+                 */
+                AutoRefactorPlugin.logError(
+                    "File \"" + compilationUnit.getPath() + "\" is not synchronized with the file system."
+                        + " Automated refactorings will not be applied to it.");
+                return;
+            }
             final IDocument document = textFileBuffer.getDocument();
             applyRefactoring(document, compilationUnit, refactoringToApply, options);
             textFileBuffer.commit(null, false);
