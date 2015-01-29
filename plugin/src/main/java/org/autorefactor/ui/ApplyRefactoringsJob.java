@@ -126,6 +126,10 @@ public class ApplyRefactoringsJob extends Job {
 
                     AggregateASTVisitor refactoring = new AggregateASTVisitor(refactoringsToApply);
                     applyRefactoring(compilationUnit, refactoring, options);
+                } catch (Exception e) {
+                    final String msg = "Exception when applying refactorings to file \""
+                            + compilationUnit.getPath() + "\": " + e.getMessage();
+                    throw new UnhandledException(null, msg, e);
                 } finally {
                     monitor.worked(1);
                 }
