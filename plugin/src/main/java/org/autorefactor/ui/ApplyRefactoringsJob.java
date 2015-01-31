@@ -223,7 +223,6 @@ public class ApplyRefactoringsJob extends Job {
             }
             final IDocument document = textFileBuffer.getDocument();
             applyRefactoring(document, compilationUnit, refactoringToApply, options);
-            textFileBuffer.commit(null, false);
         } finally {
             bufferManager.disconnect(path, locationKind, null);
         }
