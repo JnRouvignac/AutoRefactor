@@ -1434,8 +1434,6 @@ public class CFGBuilder {
         }
     }
 
-    // TODO JNR interesting code for AutoRefactor to "fix"
-    // http://www.javaworld.com/article/2077609/core-java/try-finally-clauses-defined-and-demonstrated.html
     private void buildEdges(final LivenessState toBuild, final CFGBasicBlock targetBlock) {
         if (isNotEmpty(toBuild.liveEdges)) {
             for (CFGEdgeBuilder builder : toBuild.liveEdges) {
