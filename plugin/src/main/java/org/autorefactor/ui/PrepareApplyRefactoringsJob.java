@@ -115,12 +115,14 @@ public class PrepareApplyRefactoringsJob extends Job {
     }
 
     private int computeNbWorkers(int nbWorkItems, int nbCores) {
-        for (int i = nbCores; i > 0; i++) {
-            if (nbWorkItems / i > 5) {
-                return i;
-            }
+        final int nbPartitions = nbWorkItems / 10;
+        if (nbPartitions >= nbCores) {
+            return nbCores;
+        } else if (nbPartitions > 0) {
+            return nbPartitions;
+        } else {
+            return 1;
         }
-        return 1;
     }
 
     private Queue<RefactoringUnit> collectRefactoringUnits(List<IJavaElement> javaElements) {
