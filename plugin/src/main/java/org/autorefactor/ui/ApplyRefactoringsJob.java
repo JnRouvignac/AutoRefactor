@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2014 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2014-2015 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,11 +26,10 @@
 package org.autorefactor.ui;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
 import org.autorefactor.AutoRefactorPlugin;
 import org.autorefactor.refactoring.IRefactoring;
@@ -39,7 +38,6 @@ import org.autorefactor.refactoring.Refactorings;
 import org.autorefactor.refactoring.rules.AggregateASTVisitor;
 import org.autorefactor.refactoring.rules.RefactoringContext;
 import org.autorefactor.util.IllegalStateException;
-import org.autorefactor.util.NotImplementedException;
 import org.autorefactor.util.UnhandledException;
 import org.eclipse.core.filebuffers.FileBuffers;
 import org.eclipse.core.filebuffers.ITextFileBuffer;
@@ -51,11 +49,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.ICompilationUnit;
-import org.eclipse.jdt.core.IJavaElement;
-import org.eclipse.jdt.core.IJavaProject;
-import org.eclipse.jdt.core.IPackageFragment;
-import org.eclipse.jdt.core.IPackageFragmentRoot;
-import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.ASTVisitor;
@@ -66,22 +59,25 @@ import static org.autorefactor.refactoring.ASTHelper.*;
 
 /**
  * Eclipse job that applies the provided refactorings in background.
+ * Several such jobs might be started and run in parallel to form a worker pool,
+ * with all workers accepting work items ({@link RefactoringUnit}) from a queue provided by the partitioner
+ * ({@link PrepareApplyRefactoringsJob}).
  */
 public class ApplyRefactoringsJob extends Job {
 
-    private final List<IJavaElement> javaElements;
+    private final Queue<RefactoringUnit> refactoringUnits;
     private final List<IRefactoring> refactoringsToApply;
 
     /**
      * Builds an instance of this class.
      *
-     * @param javaElements a java element from where to extract the project options
+     * @param refactoringUnits the units to automatically refactor
      * @param refactoringsToApply the refactorings to apply
      */
-    public ApplyRefactoringsJob(List<IJavaElement> javaElements, List<IRefactoring> refactoringsToApply) {
+    public ApplyRefactoringsJob(Queue<RefactoringUnit> refactoringUnits, List<IRefactoring> refactoringsToApply) {
         super("Auto Refactor");
         setPriority(Job.LONG);
-        this.javaElements = javaElements;
+        this.refactoringUnits = refactoringUnits;
         this.refactoringsToApply = refactoringsToApply;
     }
 
@@ -103,35 +99,35 @@ public class ApplyRefactoringsJob extends Job {
     }
 
     private IStatus run0(IProgressMonitor monitor) throws Exception {
-        if (javaElements.isEmpty()) {
+        if (refactoringUnits.isEmpty()) {
             // No java project exists.
             return Status.OK_STATUS;
         }
-        final List<ICompilationUnit> compilationUnits = collectCompilationUnits(javaElements);
-        final JavaProjectOptions options = getJavaProjectOptions(javaElements);
 
-        monitor.beginTask("", compilationUnits.size());
+        final int startSize = refactoringUnits.size();
+        monitor.beginTask("", startSize);
+        int previousSize = startSize;
         try {
-            for (final ICompilationUnit compilationUnit : compilationUnits) {
+            RefactoringUnit toRefactor;
+            while ((toRefactor = refactoringUnits.poll()) != null) {
                 if (monitor.isCanceled()) {
                     return Status.CANCEL_STATUS;
                 }
+                final ICompilationUnit compilationUnit = toRefactor.getCompilationUnit();
+                final JavaProjectOptions options = toRefactor.getOptions();
                 try {
-                    final String elName = compilationUnit.getElementName();
-                    final String simpleName = elName.substring(0, elName.lastIndexOf('.'));
-                    final String className =
-                        compilationUnit.getParent().getElementName() + "." + simpleName;
+                    monitor.subTask("Applying refactorings to " + getClassName(compilationUnit));
 
-                    monitor.subTask("Applying refactorings to " + className);
-
-                    AggregateASTVisitor refactoring = new AggregateASTVisitor(refactoringsToApply);
+                    final AggregateASTVisitor refactoring = new AggregateASTVisitor(refactoringsToApply);
                     applyRefactoring(compilationUnit, refactoring, options);
                 } catch (Exception e) {
                     final String msg = "Exception when applying refactorings to file \""
                             + compilationUnit.getPath() + "\": " + e.getMessage();
                     throw new UnhandledException(null, msg, e);
                 } finally {
-                    monitor.worked(1);
+                    final int remaining = refactoringUnits.size();
+                    monitor.worked(previousSize - remaining);
+                    previousSize = remaining;
                 }
             }
         } finally {
@@ -140,65 +136,10 @@ public class ApplyRefactoringsJob extends Job {
         return Status.OK_STATUS;
     }
 
-    private List<ICompilationUnit> collectCompilationUnits(List<IJavaElement> javaElements) {
-        try {
-            final List<ICompilationUnit> results = new LinkedList<ICompilationUnit>();
-            addAll(results, javaElements);
-            return results;
-        } catch (Exception e) {
-            throw new UnhandledException(null, e);
-        }
-    }
-
-    private void addAll(List<ICompilationUnit> results, List<IJavaElement> javaElements) throws JavaModelException {
-        for (IJavaElement javaElement : javaElements) {
-            if (javaElement instanceof ICompilationUnit) {
-                add(results, (ICompilationUnit) javaElement);
-            } else if (javaElement instanceof IPackageFragment) {
-                final IPackageFragment pf = (IPackageFragment) javaElement;
-                addAll(results, pf.getCompilationUnits());
-            } else if (javaElement instanceof IPackageFragmentRoot) {
-                final IPackageFragmentRoot pfr = (IPackageFragmentRoot) javaElement;
-                addAll(results, Arrays.asList(pfr.getChildren()));
-            } else if (javaElement instanceof IJavaProject) {
-                IJavaProject javaProject = (IJavaProject) javaElement;
-                for (IPackageFragment pf : javaProject.getPackageFragments()) {
-                    addAll(results, pf.getCompilationUnits());
-                }
-            }
-        }
-    }
-
-    private void addAll(final List<ICompilationUnit> results, ICompilationUnit[] cus) throws JavaModelException {
-        for (ICompilationUnit cu : cus) {
-            add(results, cu);
-        }
-    }
-
-    private void add(final List<ICompilationUnit> results, ICompilationUnit cu) throws JavaModelException {
-        if (!cu.isConsistent()) {
-            cu.makeConsistent(null);
-        }
-        if (!cu.isReadOnly()) {
-            results.add(cu);
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    private JavaProjectOptions getJavaProjectOptions(List<IJavaElement> javaElements) {
-        final IJavaProject javaProject = getIJavaProject(javaElements.get(0));
-        return new JavaProjectOptionsImpl(javaProject.getOptions(true));
-    }
-
-    private IJavaProject getIJavaProject(IJavaElement javaElement) {
-        if (javaElement instanceof ICompilationUnit
-                || javaElement instanceof IPackageFragment
-                || javaElement instanceof IPackageFragmentRoot) {
-            return getIJavaProject(javaElement.getParent());
-        } else if (javaElement instanceof IJavaProject) {
-            return (IJavaProject) javaElement;
-        }
-        throw new NotImplementedException(null, javaElement);
+    private String getClassName(final ICompilationUnit compilationUnit) {
+        final String elName = compilationUnit.getElementName();
+        final String simpleName = elName.substring(0, elName.lastIndexOf('.'));
+        return compilationUnit.getParent().getElementName() + "." + simpleName;
     }
 
     private void applyRefactoring(ICompilationUnit compilationUnit, AggregateASTVisitor refactoringToApply,
