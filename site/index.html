@@ -3,7 +3,7 @@
   <head>
     <title>Automatically refactor entire code bases!</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <meta name="keywords" content="refactoring, refactor, automatic, automatically, automated, java">
+    <meta name="keywords" content="refactoring, refactor, automatic, automatically, automated, java, modernize">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style type="text/css">
       body {
@@ -56,9 +56,19 @@ I decided I had spent too much time on manually doing these changes, so I tried 
     <h2>Features</h2>
 Look at the <a href="html/samples.html">samples</a> showcasing each refactorings available in AutoRefactor.<br>
 The samples are extracted from the unit tests suite.
-    <h2>How to use it</h2>
-Open a Java file you want to automatically refactor in Eclipse and type Shift+Alt+Y.
-In the package explorer, you can also select one or several Java files, packages or Java projects and type Shift+Alt+Y. The AutoRefactor plugin will apply the refactorings to all the selected Java files, or to the Java files located under the selected packages or under the Java projects.
+    <h2>Usage</h2>
+      There are several ways to use AutoRefactor:
+      <ul>
+        <li>Open a Java file, then type <code>Shift+Alt+Y</code> to automatically refactor the code</li>
+        <li>In the package explorer, you can also select one or several Java files, packages or Java projects and type <code>Shift+Alt+Y</code>. The AutoRefactor plugin will apply the refactorings to all the selected Java files, or to the Java files located under the selected packages or under the Java projects.</li>
+      </ul>
+      Alternatively, you can open a Java file, or select one or several files, packages or Java project, then right-click > <code>AutoRefactor</code>, then:
+      <ul>
+        <li><code>Automatic refactoring</code> will automatically refactor the code</li>
+        <li><code>Choose refactorings...</code> will allow to choose which refactorings to automatically apply</li>
+      </ul>
+      You can see which changes have been applied in the "<a href="http://wiki.eclipse.org/EGit/User_Guide#Git_Perspective_and_Views">Git Perspective</a>" (git) or the "<a href="http://help.eclipse.org/luna/index.jsp?topic=%2Forg.eclipse.platform.doc.user%2Ftasks%2Ftasks-115.htm&cp=0_3_16_2">Team Synchronizing</a>" perspective (CVS, Subversion).
+      You can also see which changes have been applied by looking at individual files <a href="http://help.eclipse.org/luna/index.jsp?topic=%2Forg.eclipse.platform.doc.user%2FgettingStarted%2Fqs-55.htm">Local history</a>.
     <h2>News</h2>
 TODO Publish first version
     <h2>Install</h2>
