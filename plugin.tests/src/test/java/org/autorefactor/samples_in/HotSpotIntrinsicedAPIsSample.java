@@ -33,6 +33,12 @@ public class HotSpotIntrinsicedAPIsSample {
         }
     }
 
+    public static void doNotReplaceBySystemArrayCopyWhenTypeDiffers(byte[] src, int[] dest) {
+        for (int i = 0; i < 3; i++) {
+            dest[i] = src[i];
+        }
+    }
+
     public static void replaceBySystemArrayCopyComplexUpperBound(int[] src, int[] dest) {
         for (int i = 0; i < src.length; i++) {
             dest[i] = src[i];

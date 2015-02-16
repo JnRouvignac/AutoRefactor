@@ -96,13 +96,14 @@ public class HotSpotIntrinsicedAPIsRefactoring extends AbstractRefactoring {
                 final Expression rhs = as.getRightHandSide();
                 if (lhs instanceof ArrayAccess && rhs instanceof ArrayAccess) {
                     final ArrayAccess aaLHS = (ArrayAccess) lhs;
-                    params.destArrayExpr = aaLHS.getArray();
-                    params.destPos = calcIndex(aaLHS.getIndex(), params);
-
                     final ArrayAccess aaRHS = (ArrayAccess) rhs;
+                    params.destArrayExpr = aaLHS.getArray();
                     params.srcArrayExpr = aaRHS.getArray();
-                    params.srcPos = calcIndex(aaRHS.getIndex(), params);
-                    return replaceWithSystemArrayCopyCloneAll(node, params);
+                    if (haveSameType(params.srcArrayExpr, params.destArrayExpr)) {
+                        params.destPos = calcIndex(aaLHS.getIndex(), params);
+                        params.srcPos = calcIndex(aaRHS.getIndex(), params);
+                        return replaceWithSystemArrayCopyCloneAll(node, params);
+                    }
                 }
             }
         }
@@ -215,6 +216,11 @@ public class HotSpotIntrinsicedAPIsRefactoring extends AbstractRefactoring {
                 }
             }
         }
+    }
+
+    private static boolean haveSameType(Expression a1, Expression a2) {
+        return a1 != null && a2 != null
+                && equalNotNull(a1.resolveTypeBinding(), a2.resolveTypeBinding());
     }
 
     private boolean replaceWithSystemArrayCopyCloneAll(ForStatement node,
