@@ -229,7 +229,9 @@ public class BooleanRefactoring extends AbstractRefactoring {
                 final Expression ifCondition = node.getExpression();
                 copyStmt.accept(new BooleanReplaceVisitor(ifCondition,
                         matcher2.matches.values(), getBooleanName(node)));
-                ctx.getRefactorings().replace(node, toSingleStmt(copyStmt));
+                // make sure to keep curly braces if the node is an else statement
+                ctx.getRefactorings().replace(node,
+                    isElseStatementOfParent(node) ? copyStmt : toSingleStmt(copyStmt));
                 return DO_NOT_VISIT_SUBTREE;
             }
         }
@@ -293,6 +295,15 @@ public class BooleanRefactoring extends AbstractRefactoring {
             }
         }
         return VISIT_SUBTREE;
+    }
+
+    private boolean isElseStatementOfParent(IfStatement node) {
+        final ASTNode parent = node.getParent();
+        if (parent instanceof IfStatement) {
+            final IfStatement is = (IfStatement) parent;
+            return is.getElseStatement().equals(node);
+        }
+        return false;
     }
 
     private boolean replace(IfStatement node, Assignment a, ITypeBinding typeBinding, Expression rightHandSide) {
