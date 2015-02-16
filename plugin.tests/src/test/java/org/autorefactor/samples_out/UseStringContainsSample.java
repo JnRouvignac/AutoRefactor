@@ -35,6 +35,10 @@ public class UseStringContainsSample {
         return !s.contains("test");
     }
 
+    private boolean replaceStringIndexOfNotEqualsMinusOne(String s) {
+        return s.contains("test");
+    }
+
     private boolean replaceStringIndexOfEqualsMinusOne(String s) {
         return !s.contains("test");
     }
@@ -45,6 +49,10 @@ public class UseStringContainsSample {
 
     private boolean replaceStringLastIndexOfLesserThan(String s) {
         return !s.contains("test");
+    }
+
+    private boolean replaceStringLastIndexOfNotEqualsMinusOne(String s) {
+        return s.contains("test");
     }
 
     private boolean replaceStringLastIndexOfEqualsMinusOne(String s) {

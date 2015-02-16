@@ -53,6 +53,8 @@ public class UseStringContainsRefactoring extends AbstractRefactoring {
                 return replaceWithStringContains(ie, node, false);
             } else if (is(ie, node, Operator.LESS, 0)) {
                 return replaceWithStringContains(ie, node, true);
+            } else if (is(ie, node, Operator.NOT_EQUALS, -1)) {
+                return replaceWithStringContains(ie, node, false);
             } else if (is(ie, node, Operator.EQUALS, -1)) {
                 return replaceWithStringContains(ie, node, true);
             }
