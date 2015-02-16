@@ -54,11 +54,7 @@ public class BooleanSample {
     }
 
     public boolean returnIfConditionAddCurlyBraces(Object o) {
-        if (o instanceof Integer) {
-            return true;
-        } else {
-            return !(o instanceof String);
-        }
+        return (o instanceof Integer) || (!(o instanceof String));
     }
 
     public boolean returnIfConditionThatRevertsInstanceofExpressionBooleanPrimitive(Object o) {

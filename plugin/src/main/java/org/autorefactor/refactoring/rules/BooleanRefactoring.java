@@ -238,59 +238,69 @@ public class BooleanRefactoring extends AbstractRefactoring {
 
         final ReturnStatement thenRs = as(node.getThenStatement(), ReturnStatement.class);
         if (thenRs != null) {
-            if (node.getElseStatement() == null) {
-                // The != null case is handled with the matcher above
-                final ReturnStatement rs = as(getNextSibling(node), ReturnStatement.class);
-                if (rs != null) {
-                    final Boolean thenBool = getBooleanLiteral(thenRs.getExpression());
-                    final Boolean elseBool = getBooleanLiteral(rs.getExpression());
-                    ReturnStatement newRs = getReturnStatement(node, thenBool, elseBool);
-                    if (newRs != null) {
-                        ctx.getRefactorings().replace(node, newRs);
-                        ctx.getRefactorings().remove(rs);
-                        return DO_NOT_VISIT_SUBTREE;
-                    }
-                    final MethodDeclaration md = getAncestor(node, MethodDeclaration.class);
-                    final Type returnType = md.getReturnType2();
-                    if (returnType != null && returnType.isPrimitiveType()) {
-                        final PrimitiveType pt = (PrimitiveType) returnType;
-                        if (PrimitiveType.BOOLEAN.equals(pt.getPrimitiveTypeCode())) {
-                            newRs = getReturnStatement(node, thenBool, elseBool,
-                                    thenRs.getExpression(), rs.getExpression());
-                            if (newRs != null) {
-                                ctx.getRefactorings().replace(node, newRs);
-                                ctx.getRefactorings().remove(rs);
-                                return DO_NOT_VISIT_SUBTREE;
-                            }
-                        }
-                    }
+            final Statement elseStmt = node.getElseStatement() != null
+                    ? node.getElseStatement()
+                    : getNextSibling(node);
+            final ReturnStatement elseRs = as(elseStmt, ReturnStatement.class);
+            if (elseRs != null) {
+                return withThenReturnStmt(node, thenRs, elseRs);
+            }
+            return VISIT_SUBTREE;
+        } else {
+            return noThenReturnStmt(node);
+        }
+    }
+
+    private boolean withThenReturnStmt(IfStatement node, ReturnStatement thenRs, ReturnStatement elseRs) {
+        final Boolean thenBool = getBooleanLiteral(thenRs.getExpression());
+        final Boolean elseBool = getBooleanLiteral(elseRs.getExpression());
+        ReturnStatement newRs = getReturnStatement(node, thenBool, elseBool);
+        if (newRs != null) {
+            ctx.getRefactorings().replace(node, newRs);
+            ctx.getRefactorings().remove(elseRs);
+            return DO_NOT_VISIT_SUBTREE;
+        }
+        final MethodDeclaration md = getAncestor(node, MethodDeclaration.class);
+        final Type returnType = md.getReturnType2();
+        if (returnType != null && returnType.isPrimitiveType()) {
+            final PrimitiveType pt = (PrimitiveType) returnType;
+            if (PrimitiveType.BOOLEAN.equals(pt.getPrimitiveTypeCode())) {
+                newRs = getReturnStatement(node, thenBool, elseBool,
+                        thenRs.getExpression(), elseRs.getExpression());
+                if (newRs != null) {
+                    ctx.getRefactorings().replace(node, newRs);
+                    ctx.getRefactorings().remove(elseRs);
+                    return DO_NOT_VISIT_SUBTREE;
                 }
             }
-        } else {
-            final Assignment thenA = asExpression(node.getThenStatement(), Assignment.class);
-            if (thenA != null
-                    && asList(node.getElseStatement()).isEmpty()
-                    && Assignment.Operator.ASSIGN.equals(thenA.getOperator())
-                    && (thenA.getLeftHandSide() instanceof Name
-                        || thenA.getLeftHandSide() instanceof FieldAccess)) {
-                final Statement previousSibling = getPreviousSibling(node);
-                if (previousSibling instanceof VariableDeclarationStatement) {
-                    final VariableDeclarationStatement vds = (VariableDeclarationStatement) previousSibling;
-                    VariableDeclarationFragment vdf = getVariableDeclarationFragment(vds, thenA.getLeftHandSide());
-                    if (vdf != null) {
-                        final ITypeBinding typeBinding = vds.getType().resolveBinding();
-                        return replace(node, thenA, typeBinding, vdf.getInitializer());
-                    }
-                } else if (previousSibling instanceof ExpressionStatement) {
-                    final Assignment elseA = asExpression(previousSibling, Assignment.class);
-                    if (elseA != null
-                            && Assignment.Operator.ASSIGN.equals(elseA.getOperator())
-                            && isSameVariable(
-                                    thenA.getLeftHandSide(),
-                                    elseA.getLeftHandSide())) {
-                        final ITypeBinding typeBinding = elseA.resolveTypeBinding();
-                        return replace(node, thenA, typeBinding, elseA.getRightHandSide());
-                    }
+        }
+        return VISIT_SUBTREE;
+    }
+
+    private boolean noThenReturnStmt(final IfStatement node) {
+        final Assignment thenA = asExpression(node.getThenStatement(), Assignment.class);
+        if (thenA != null
+                && asList(node.getElseStatement()).isEmpty()
+                && Assignment.Operator.ASSIGN.equals(thenA.getOperator())
+                && (thenA.getLeftHandSide() instanceof Name
+                    || thenA.getLeftHandSide() instanceof FieldAccess)) {
+            final Statement previousSibling = getPreviousSibling(node);
+            if (previousSibling instanceof VariableDeclarationStatement) {
+                final VariableDeclarationStatement vds = (VariableDeclarationStatement) previousSibling;
+                VariableDeclarationFragment vdf = getVariableDeclarationFragment(vds, thenA.getLeftHandSide());
+                if (vdf != null) {
+                    final ITypeBinding typeBinding = vds.getType().resolveBinding();
+                    return replace(node, thenA, typeBinding, vdf.getInitializer());
+                }
+            } else if (previousSibling instanceof ExpressionStatement) {
+                final Assignment elseA = asExpression(previousSibling, Assignment.class);
+                if (elseA != null
+                        && Assignment.Operator.ASSIGN.equals(elseA.getOperator())
+                        && isSameVariable(
+                                thenA.getLeftHandSide(),
+                                elseA.getLeftHandSide())) {
+                    final ITypeBinding typeBinding = elseA.resolveTypeBinding();
+                    return replace(node, thenA, typeBinding, elseA.getRightHandSide());
                 }
             }
         }
