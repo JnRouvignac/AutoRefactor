@@ -46,6 +46,7 @@ import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
+import static org.autorefactor.util.Utils.*;
 
 /**
  * Refactors code patterns to use intrinsiced APIs in Hotspot JVM.
@@ -61,7 +62,16 @@ public class HotSpotIntrinsicedAPIsRefactoring extends AbstractRefactoring {
         private Expression srcPos;
         private Expression destArrayExpr;
         private Expression destPos;
-        private Expression endPos;
+        private Expression length;
+
+        /** {@inheritDoc} */
+        @Override
+        public String toString() {
+            return "System.arraycopy("
+                    + srcArrayExpr + ", " + srcPos + ", "
+                    + destArrayExpr + ", " + destPos + ", "
+                    + length + ")";
+        }
     }
 
     /** Class constructor. */
@@ -76,7 +86,7 @@ public class HotSpotIntrinsicedAPIsRefactoring extends AbstractRefactoring {
         collectUniqueIndex(node, params);
         final IVariableBinding incrementedIdx = getUniqueIncrementedVariable(node);
         final List<Statement> stmts = asList(node.getBody());
-        if (equalsNotNull(params.indexVarBinding, incrementedIdx)
+        if (equalNotNull(params.indexVarBinding, incrementedIdx)
                 && stmts.size() == 1) {
             collectLength(node.getExpression(), incrementedIdx, params);
 
@@ -102,7 +112,7 @@ public class HotSpotIntrinsicedAPIsRefactoring extends AbstractRefactoring {
     private Expression calcIndex(Expression index, SystemArrayCopyParams params) {
         if (index instanceof SimpleName) {
             final IVariableBinding idxVar = getVariableBinding(index);
-            if (equalsNotNull(params.indexVarBinding, idxVar)) {
+            if (equalNotNull(params.indexVarBinding, idxVar)) {
                 return params.indexStartPos;
             }
         } else if (index instanceof InfixExpression) {
@@ -113,13 +123,13 @@ public class HotSpotIntrinsicedAPIsRefactoring extends AbstractRefactoring {
                 final Expression rightOp = ie.getRightOperand();
                 if (leftOp instanceof SimpleName) {
                     final IVariableBinding idxVar = getVariableBinding(leftOp);
-                    if (equalsNotNull(params.indexVarBinding, idxVar)) {
+                    if (equalNotNull(params.indexVarBinding, idxVar)) {
                         return plus(rightOp, params.indexStartPos);
                     }
                 }
                 if (rightOp instanceof SimpleName) {
                     final IVariableBinding idxVar = getVariableBinding(rightOp);
-                    if (equalsNotNull(params.indexVarBinding, idxVar)) {
+                    if (equalNotNull(params.indexVarBinding, idxVar)) {
                         return plus(leftOp, params.indexStartPos);
                     }
                 }
@@ -181,34 +191,30 @@ public class HotSpotIntrinsicedAPIsRefactoring extends AbstractRefactoring {
             final InfixExpression ie = (InfixExpression) condition;
             if (InfixExpression.Operator.LESS.equals(ie.getOperator())) {
                 IVariableBinding conditionIdx = getVariableBinding(ie.getLeftOperand());
-                if (equalsNotNull(incrementedIdx, conditionIdx)) {
-                    params.endPos = ie.getRightOperand();
+                if (equalNotNull(incrementedIdx, conditionIdx)) {
+                    params.length = ie.getRightOperand();
                 }
             } else if (InfixExpression.Operator.LESS_EQUALS.equals(ie.getOperator())) {
                 IVariableBinding conditionIdx = getVariableBinding(ie.getLeftOperand());
-                if (equalsNotNull(incrementedIdx, conditionIdx)) {
-                    params.endPos = minus(
+                if (equalNotNull(incrementedIdx, conditionIdx)) {
+                    params.length = minus(
                             plus(ie.getRightOperand(), ctx.getAST().newNumberLiteral("1")),
                             params.indexStartPos);
                 }
             } else if (InfixExpression.Operator.GREATER.equals(ie.getOperator())) {
                 IVariableBinding conditionIdx = getVariableBinding(ie.getRightOperand());
-                if (equalsNotNull(incrementedIdx, conditionIdx)) {
-                    params.endPos = ie.getLeftOperand();
+                if (equalNotNull(incrementedIdx, conditionIdx)) {
+                    params.length = ie.getLeftOperand();
                 }
             } else if (InfixExpression.Operator.GREATER_EQUALS.equals(ie.getOperator())) {
                 IVariableBinding conditionIdx = getVariableBinding(ie.getRightOperand());
-                if (equalsNotNull(incrementedIdx, conditionIdx)) {
-                    params.endPos = minus(
+                if (equalNotNull(incrementedIdx, conditionIdx)) {
+                    params.length = minus(
                             plus(ie.getLeftOperand(), ctx.getAST().newNumberLiteral("1")),
                             params.indexStartPos);
                 }
             }
         }
-    }
-
-    private boolean equalsNotNull(final Object o1, final Object o2) {
-        return o1 != null && o1.equals(o2);
     }
 
     private boolean replaceWithSystemArrayCopyCloneAll(ForStatement node,
@@ -217,7 +223,7 @@ public class HotSpotIntrinsicedAPIsRefactoring extends AbstractRefactoring {
                 || params.srcPos == null
                 || params.destArrayExpr == null
                 || params.destPos == null
-                || params.endPos == null) {
+                || params.length == null) {
             return VISIT_SUBTREE;
         }
         final ASTBuilder b = this.ctx.getASTBuilder();
@@ -226,7 +232,7 @@ public class HotSpotIntrinsicedAPIsRefactoring extends AbstractRefactoring {
                 b.copy(params.srcPos),
                 b.copy(params.destArrayExpr),
                 b.copy(params.destPos),
-                b.copy(params.endPos));
+                b.copy(params.length));
     }
 
     private boolean replaceWithSystemArrayCopy(ForStatement node,
