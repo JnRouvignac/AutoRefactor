@@ -52,6 +52,11 @@ public class RemoveUnnecessaryCastSample {
         return (long) i;
     }
 
+    public Object[] doNotRemoveCastToArray(Object o) {
+        Object array[] = (Object[]) o;
+        return array;
+    }
+
     public int doNotRemovePrimitiveNarrowingCast(long l) {
         return (int) l;
     }

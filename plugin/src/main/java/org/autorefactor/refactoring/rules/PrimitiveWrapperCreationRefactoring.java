@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2013 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2013-2015 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -37,7 +37,6 @@ import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.QualifiedName;
 import org.eclipse.jdt.core.dom.SimpleName;
-import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
@@ -65,8 +64,8 @@ public class PrimitiveWrapperCreationRefactoring extends AbstractRefactoring {
 
         final ASTNode parent = removeParentheses(node.getParent());
         if (parent instanceof VariableDeclarationFragment) {
-            final Type type = getType((VariableDeclarationFragment) parent);
-            if (type.isPrimitiveType()
+            final ITypeBinding typeBinding = resolveTypeBinding((VariableDeclarationFragment) parent);
+            if (typeBinding.isPrimitive()
                     && "valueOf".equals(node.getName().getIdentifier())) {
                 if (isMethod(node, "java.lang.Boolean", "valueOf", "boolean")
                         || isMethod(node, "java.lang.Byte", "valueOf", "byte")
@@ -207,8 +206,8 @@ public class PrimitiveWrapperCreationRefactoring extends AbstractRefactoring {
     public boolean visit(QualifiedName node) {
         final ASTNode parent = removeParentheses(node.getParent());
         if (parent instanceof VariableDeclarationFragment) {
-            final Type type = getType((VariableDeclarationFragment) parent);
-            if (type.isPrimitiveType()) {
+            final ITypeBinding typeBinding = resolveTypeBinding((VariableDeclarationFragment) parent);
+            if (typeBinding.isPrimitive()) {
                 if (isField(node, "java.lang.Boolean", "TRUE")) {
                     return replaceWithBooleanLiteral(node, true);
                 } else if (isField(node, "java.lang.Boolean", "FALSE")) {

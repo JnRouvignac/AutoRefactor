@@ -76,6 +76,7 @@ import org.eclipse.jdt.core.dom.IBinding;
 import org.eclipse.jdt.core.dom.IExtendedModifier;
 import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
+import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.ImportDeclaration;
 import org.eclipse.jdt.core.dom.InfixExpression;
@@ -749,21 +750,19 @@ public final class ASTHelper {
     }
 
     /**
-     * Returns the {@link Type} declared by the parent of a {@link VariableDeclarationFragment}.
+     * Returns the {@link ITypeBinding} of the {@link VariableDeclarationFragment}.
      *
      * @param vdf the variable declaration fragment
-     * @return the fragment's type
+     * @return the fragment's type binding, or null if none can be found
      */
-    public static Type getType(final VariableDeclarationFragment vdf) {
-        final ASTNode parent = vdf.getParent();
-        if (parent instanceof VariableDeclarationStatement) {
-            return ((VariableDeclarationStatement) parent).getType();
-        } else if (parent instanceof VariableDeclarationExpression) {
-            return ((VariableDeclarationExpression) parent).getType();
-        } else if (parent instanceof FieldDeclaration) {
-            return ((FieldDeclaration) parent).getType();
+    public static ITypeBinding resolveTypeBinding(final VariableDeclarationFragment vdf) {
+        if (vdf != null) {
+            final IVariableBinding varBinding = vdf.resolveBinding();
+            if (varBinding != null) {
+                return varBinding.getType();
+            }
         }
-        throw new NotImplementedException(vdf, vdf);
+        return null;
     }
 
     // AST checks

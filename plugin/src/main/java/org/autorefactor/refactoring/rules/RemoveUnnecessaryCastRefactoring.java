@@ -77,7 +77,7 @@ public class RemoveUnnecessaryCastRefactoring extends AbstractRefactoring {
 
         case VARIABLE_DECLARATION_FRAGMENT:
             final VariableDeclarationFragment vdf = (VariableDeclarationFragment) parent;
-            return isAssignmentCompatible(node.getExpression(), getType(vdf))
+            return isAssignmentCompatible(node.getExpression(), resolveTypeBinding(vdf))
                     || isConstantExpressionAssignmentConversion(node);
 
         case INFIX_EXPRESSION:
@@ -86,7 +86,7 @@ public class RemoveUnnecessaryCastRefactoring extends AbstractRefactoring {
             final Expression ro = ie.getRightOperand();
             if (node.equals(lo)) {
                 return (isStringConcat(ie) || isAssignmentCompatible(node.getExpression(), ro))
-                        && !isPrimitiveTypeNarrowing(node, ie)
+                        && !isPrimitiveTypeNarrowing(node)
                         && !DIVIDE.equals(ie.getOperator())
                         && !PLUS.equals(ie.getOperator())
                         && !MINUS.equals(ie.getOperator());
@@ -95,7 +95,7 @@ public class RemoveUnnecessaryCastRefactoring extends AbstractRefactoring {
                 return ((isNotRefactored(lo) && isStringConcat(ie))
                             || (!integralDivision && isAssignmentCompatibleInInfixExpression(node, ie))
                             || (integralDivision && canRemoveCastInIntegralDivision(node, ie)))
-                        && !isPrimitiveTypeNarrowing(node, ie)
+                        && !isPrimitiveTypeNarrowing(node)
                         && !isIntegralDividedByFloatingPoint(node, ie);
             }
         }
@@ -220,7 +220,7 @@ public class RemoveUnnecessaryCastRefactoring extends AbstractRefactoring {
         return hasType(ie, "java.lang.String");
     }
 
-    private boolean isPrimitiveTypeNarrowing(CastExpression node, InfixExpression parent) {
+    private boolean isPrimitiveTypeNarrowing(CastExpression node) {
         final ITypeBinding typeBinding1 = node.getType().resolveBinding();
         final ITypeBinding typeBinding2 = node.getExpression().resolveTypeBinding();
         return isPrimitive(typeBinding1)
@@ -231,6 +231,13 @@ public class RemoveUnnecessaryCastRefactoring extends AbstractRefactoring {
     private boolean isAssignmentCompatible(Expression expr, Type type) {
         if (expr != null && type != null) {
             return isAssignmentCompatible(expr.resolveTypeBinding(), type.resolveBinding());
+        }
+        return false;
+    }
+
+    private boolean isAssignmentCompatible(Expression expr, ITypeBinding typeBinding) {
+        if (expr != null && typeBinding != null) {
+            return isAssignmentCompatible(expr.resolveTypeBinding(), typeBinding);
         }
         return false;
     }
