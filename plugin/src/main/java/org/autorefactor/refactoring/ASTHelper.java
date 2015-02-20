@@ -781,18 +781,6 @@ public final class ASTHelper {
     }
 
     /**
-     * Returns whether the provided type evaluates to exactly one of the provided type.
-     *
-     * @param type the type to analyze
-     * @param oneOfQualifiedTypeNames
-     *          the type binding qualified name must be equal to one of these qualified type names
-     * @return true if the provided type evaluates to exactly one of the provided type, false otherwise
-     */
-    public static boolean hasType(Type type, String... oneOfQualifiedTypeNames) {
-        return type != null && hasType(type.resolveBinding(), oneOfQualifiedTypeNames);
-    }
-
-    /**
      * Returns whether the provided type binding is exactly one of the provided type.
      *
      * @param typeBinding the type binding to analyze

@@ -52,10 +52,10 @@ public class StringRefactoring extends AbstractRefactoring {
     /** {@inheritDoc} */
     @Override
     public boolean visit(ClassInstanceCreation node) {
-        if (hasType(node.getType(), "java.lang.String")
+        if (hasType(node, "java.lang.String")
                 && arguments(node).size() == 1) {
             final Expression arg0 = arguments(node).get(0);
-            if (arg0.resolveConstantExpressionValue() != null) {
+            if (hasType(arg0, "java.lang.String")) {
                 final ASTBuilder b = this.ctx.getASTBuilder();
                 this.ctx.getRefactorings().replace(node, b.copy(arg0));
                 return DO_NOT_VISIT_SUBTREE;

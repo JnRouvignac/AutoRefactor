@@ -69,7 +69,7 @@ public class StringBuilderRefactoring extends AbstractRefactoring {
     @Override
     public boolean visit(ClassInstanceCreation node) {
         if (getJavaMinorVersion() >= 5
-                && hasType(node.getType(), "java.lang.StringBuffer")) {
+                && hasType(node, "java.lang.StringBuffer")) {
             // TODO JNR replace with StringBuilder
             // check that the current method return type is not StringBuffer
             // do we need the CFG + live variable analysis first?

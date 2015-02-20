@@ -31,6 +31,10 @@ public class StringSample {
         return new String("");
     }
 
+    public String replaceNewStringFromStringExpression(String s) {
+        return new String(s);
+    }
+
     public String replaceStringToString(String s) {
         String s1 = s.toString();
         String s2 = "".toString();
