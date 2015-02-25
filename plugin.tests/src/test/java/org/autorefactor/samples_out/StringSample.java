@@ -56,9 +56,7 @@ public class StringSample {
         return Boolean.TRUE.toString() + Boolean.FALSE;
     }
 
-    public String removeUselessToString() {
-        byte b = 42;
-        short s = 42;
+    public String removeUselessToStringLeftOperand(byte b, short s) {
         String s1 = true + " foo";
         String s2 = 'c' + " foo";
         String s3 = b + " foo";
@@ -70,9 +68,31 @@ public class StringSample {
         return s1 + s2 + s3 + s4 + s5 + s6 + s7 + s8;
     }
 
-    public String removeUselessValueOf() {
-        byte b = 42;
-        short s = 42;
+    public String removeUselessToStringRightOperand(byte b, short s) {
+        String s1 = "foo " + true;
+        String s2 = "foo " + 'c';
+        String s3 = "foo " + b;
+        String s4 = "foo " + s;
+        String s5 = "foo " + 42;
+        String s6 = "foo " + 42l;
+        String s7 = "foo " + 42.42f;
+        String s8 = "foo " + 42.42;
+        return s1 + s2 + s3 + s4 + s5 + s6 + s7 + s8;
+    }
+
+    public String removeUselessToStringExtendedOperand(byte b, short s) {
+        String s1 = "foo " + true + " bar";
+        String s2 = "foo " + 'c' + " bar";
+        String s3 = "foo " + b + " bar";
+        String s4 = "foo " + s + " bar";
+        String s5 = "foo " + 42 + " bar";
+        String s6 = "foo " + 42l + " bar";
+        String s7 = "foo " + 42.42f + " bar";
+        String s8 = "foo " + 42.42 + " bar";
+        return s1 + s2 + s3 + s4 + s5 + s6 + s7 + s8;
+    }
+
+    public String removeUselessValueOfLeftOperand(byte b, short s) {
         String s1 = true + " foo";
         String s2 = 'c' + " foo";
         String s3 = b + " foo";
@@ -82,6 +102,32 @@ public class StringSample {
         String s7 = 42.42f + " foo";
         String s8 = 42.42 + " foo";
         String s9 = new Object() + " foo";
+        return s1 + s2 + s3 + s4 + s5 + s6 + s7 + s8 + s9;
+    }
+
+    public String removeUselessValueOfRightOperand(byte b, short s) {
+        String s1 = "foo " + true;
+        String s2 = "foo " + 'c';
+        String s3 = "foo " + b;
+        String s4 = "foo " + s;
+        String s5 = "foo " + 42;
+        String s6 = "foo " + 42l;
+        String s7 = "foo " + 42.42f;
+        String s8 = "foo " + 42.42;
+        String s9 = "foo " + new Object();
+        return s1 + s2 + s3 + s4 + s5 + s6 + s7 + s8 + s9;
+    }
+
+    public String removeUselessValueOfExtendedOperand(byte b, short s) {
+        String s1 = "foo " + true + " bar";
+        String s2 = "foo " + 'c' + " bar";
+        String s3 = "foo " + b + " bar";
+        String s4 = "foo " + s + " bar";
+        String s5 = "foo " + 42 + " bar";
+        String s6 = "foo " + 42l + " bar";
+        String s7 = "foo " + 42.42f + " bar";
+        String s8 = "foo " + 42.42 + " bar";
+        String s9 = "foo " + new Object() + " bar";
         return s1 + s2 + s3 + s4 + s5 + s6 + s7 + s8 + s9;
     }
 

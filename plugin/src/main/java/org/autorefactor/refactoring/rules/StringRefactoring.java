@@ -112,6 +112,10 @@ public class StringRefactoring extends AbstractRefactoring {
                 } else if (hasType(ro, "java.lang.String") && node.equals(lmi)) {
                     this.ctx.getRefactorings().replace(lmi, b.move(arg0(lmi)));
                     return DO_NOT_VISIT_SUBTREE;
+                } else {
+                    // left or right operation is necessarily a string, so just replace
+                    this.ctx.getRefactorings().replace(node, b.move(arg0(node)));
+                    return DO_NOT_VISIT_SUBTREE;
                 }
             }
         }

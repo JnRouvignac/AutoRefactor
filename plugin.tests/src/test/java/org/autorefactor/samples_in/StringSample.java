@@ -56,9 +56,7 @@ public class StringSample {
         return Boolean.TRUE.toString() + Boolean.FALSE.toString();
     }
 
-    public String removeUselessToString() {
-        byte b = 42;
-        short s = 42;
+    public String removeUselessToStringLeftOperand(byte b, short s) {
         String s1 = Boolean.toString(true) + " foo";
         String s2 = Character.toString('c') + " foo";
         String s3 = Byte.toString(b) + " foo";
@@ -70,9 +68,31 @@ public class StringSample {
         return s1 + s2 + s3 + s4 + s5 + s6 + s7 + s8;
     }
 
-    public String removeUselessValueOf() {
-        byte b = 42;
-        short s = 42;
+    public String removeUselessToStringRightOperand(byte b, short s) {
+        String s1 = "foo " + Boolean.toString(true);
+        String s2 = "foo " + Character.toString('c');
+        String s3 = "foo " + Byte.toString(b);
+        String s4 = "foo " + Short.toString(s);
+        String s5 = "foo " + Integer.toString(42);
+        String s6 = "foo " + Long.toString(42l);
+        String s7 = "foo " + Float.toString(42.42f);
+        String s8 = "foo " + Double.toString(42.42);
+        return s1 + s2 + s3 + s4 + s5 + s6 + s7 + s8;
+    }
+
+    public String removeUselessToStringExtendedOperand(byte b, short s) {
+        String s1 = "foo " + Boolean.toString(true) + " bar";
+        String s2 = "foo " + Character.toString('c') + " bar";
+        String s3 = "foo " + Byte.toString(b) + " bar";
+        String s4 = "foo " + Short.toString(s) + " bar";
+        String s5 = "foo " + Integer.toString(42) + " bar";
+        String s6 = "foo " + Long.toString(42l) + " bar";
+        String s7 = "foo " + Float.toString(42.42f) + " bar";
+        String s8 = "foo " + Double.toString(42.42) + " bar";
+        return s1 + s2 + s3 + s4 + s5 + s6 + s7 + s8;
+    }
+
+    public String removeUselessValueOfLeftOperand(byte b, short s) {
         String s1 = String.valueOf(true) + " foo";
         String s2 = String.valueOf('c') + " foo";
         String s3 = String.valueOf(b) + " foo";
@@ -82,6 +102,32 @@ public class StringSample {
         String s7 = String.valueOf(42.42f) + " foo";
         String s8 = String.valueOf(42.42) + " foo";
         String s9 = String.valueOf(new Object()) + " foo";
+        return s1 + s2 + s3 + s4 + s5 + s6 + s7 + s8 + s9;
+    }
+
+    public String removeUselessValueOfRightOperand(byte b, short s) {
+        String s1 = "foo " + String.valueOf(true);
+        String s2 = "foo " + String.valueOf('c');
+        String s3 = "foo " + String.valueOf(b);
+        String s4 = "foo " + String.valueOf(s);
+        String s5 = "foo " + String.valueOf(42);
+        String s6 = "foo " + String.valueOf(42l);
+        String s7 = "foo " + String.valueOf(42.42f);
+        String s8 = "foo " + String.valueOf(42.42);
+        String s9 = "foo " + String.valueOf(new Object());
+        return s1 + s2 + s3 + s4 + s5 + s6 + s7 + s8 + s9;
+    }
+
+    public String removeUselessValueOfExtendedOperand(byte b, short s) {
+        String s1 = "foo " + String.valueOf(true) + " bar";
+        String s2 = "foo " + String.valueOf('c') + " bar";
+        String s3 = "foo " + String.valueOf(b) + " bar";
+        String s4 = "foo " + String.valueOf(s) + " bar";
+        String s5 = "foo " + String.valueOf(42) + " bar";
+        String s6 = "foo " + String.valueOf(42l) + " bar";
+        String s7 = "foo " + String.valueOf(42.42f) + " bar";
+        String s8 = "foo " + String.valueOf(42.42) + " bar";
+        String s9 = "foo " + String.valueOf(new Object()) + " bar";
         return s1 + s2 + s3 + s4 + s5 + s6 + s7 + s8 + s9;
     }
 
