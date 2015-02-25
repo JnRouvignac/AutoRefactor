@@ -70,6 +70,7 @@ public class StringRefactoring extends AbstractRefactoring {
         final Expression expression = node.getExpression();
         final ASTNode parent = node.getParent();
         final ASTBuilder b = this.ctx.getASTBuilder();
+        final boolean isStringValueOf = isStringValueOf(node);
         if (isMethod(node, "java.lang.Object", "toString")) {
             if (hasType(expression, "java.lang.String")) {
                 // if node is already a String, no need to call toString()
@@ -98,25 +99,27 @@ public class StringRefactoring extends AbstractRefactoring {
                     return DO_NOT_VISIT_SUBTREE;
                 }
             }
-        } else if (isToStringForPrimitive(node) || isStringValueOf(node)) {
-            if (parent.getNodeType() == INFIX_EXPRESSION) {
-                // if node is in a String context, no need to call toString()
-                final InfixExpression ie = (InfixExpression) node.getParent();
-                final Expression lo = ie.getLeftOperand();
-                final Expression ro = ie.getRightOperand();
-                final MethodInvocation lmi = as(lo, MethodInvocation.class);
-                final MethodInvocation rmi = as(ro, MethodInvocation.class);
-                if (hasType(lo, "java.lang.String") && node.equals(rmi)) {
-                    this.ctx.getRefactorings().replace(rmi, b.move(arg0(rmi)));
-                    return VISIT_SUBTREE;
-                } else if (hasType(ro, "java.lang.String") && node.equals(lmi)) {
-                    this.ctx.getRefactorings().replace(lmi, b.move(arg0(lmi)));
-                    return DO_NOT_VISIT_SUBTREE;
-                } else {
-                    // left or right operation is necessarily a string, so just replace
-                    this.ctx.getRefactorings().replace(node, b.move(arg0(node)));
-                    return DO_NOT_VISIT_SUBTREE;
-                }
+        } else if (isStringValueOf && hasType(arg0(node), "java.lang.String")) {
+            this.ctx.getRefactorings().replace(node, b.move(arg0(node)));
+            return DO_NOT_VISIT_SUBTREE;
+        } else if ((isToStringForPrimitive(node) || isStringValueOf)
+                && parent.getNodeType() == INFIX_EXPRESSION) {
+            // if node is in a String context, no need to call toString()
+            final InfixExpression ie = (InfixExpression) node.getParent();
+            final Expression lo = ie.getLeftOperand();
+            final Expression ro = ie.getRightOperand();
+            final MethodInvocation lmi = as(lo, MethodInvocation.class);
+            final MethodInvocation rmi = as(ro, MethodInvocation.class);
+            if (hasType(lo, "java.lang.String") && node.equals(rmi)) {
+                this.ctx.getRefactorings().replace(rmi, b.move(arg0(rmi)));
+                return VISIT_SUBTREE;
+            } else if (hasType(ro, "java.lang.String") && node.equals(lmi)) {
+                this.ctx.getRefactorings().replace(lmi, b.move(arg0(lmi)));
+                return DO_NOT_VISIT_SUBTREE;
+            } else {
+                // left or right operation is necessarily a string, so just replace
+                this.ctx.getRefactorings().replace(node, b.move(arg0(node)));
+                return DO_NOT_VISIT_SUBTREE;
             }
         }
         return VISIT_SUBTREE;

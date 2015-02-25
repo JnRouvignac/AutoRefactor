@@ -35,6 +35,10 @@ public class StringSample {
         return s;
     }
 
+    public String replaceStringValueOfOnAString(String s) {
+        return s;
+    }
+
     public String replaceStringToString(String s) {
         String s1 = s;
         String s2 = "";
