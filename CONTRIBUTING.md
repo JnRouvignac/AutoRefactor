@@ -2,9 +2,10 @@ To be expanded!
 
 # Testers
 Take the (not so) nightly builds and execute the plugin on your code base.
-Report any exceptions or plugin's misbehaviour in GitHub issue tracker.
+Report any exceptions or plugin's misbehaviour in GitHub issue tracker. 
 Also report any suggestions there.
-Suggestions for new refactorings are welcome. Please make sure they contain 2 code samples:
+
+Suggestions for new refactorings are welcome. Please make sure they contain two code samples:
 One that shows the code before the refactoring and one that shows it after.
 
 # Testers + Developers
