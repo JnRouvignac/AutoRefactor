@@ -93,7 +93,17 @@ The samples are extracted from the unit tests suite.
         <li><code>Choose refactorings...</code> will allow to choose which refactorings to automatically apply</li>
       </ul>
       You can see which changes have been applied in the "<a href="http://wiki.eclipse.org/EGit/User_Guide#Git_Perspective_and_Views">Git Perspective</a>" (git) or the "<a href="http://help.eclipse.org/luna/index.jsp?topic=%2Forg.eclipse.platform.doc.user%2Ftasks%2Ftasks-115.htm&cp=0_3_16_2">Team Synchronizing</a>" perspective (CVS, Subversion).
-      You can also see which changes have been applied by looking at individual files <a href="http://help.eclipse.org/luna/index.jsp?topic=%2Forg.eclipse.platform.doc.user%2FgettingStarted%2Fqs-55.htm">Local history</a>.
+      You can also see which changes have been applied by looking at individual files <a href="http://help.eclipse.org/luna/index.jsp?topic=%2Forg.eclipse.platform.doc.user%2FgettingStarted%2Fqs-55.htm">Local history</a>, and comparing the last revision with the previous revision.
+      <h3>Best practices</h3>
+      <p>Developers are responsible for what they commit.</p>
+      <p>
+        Since <em><a href="https://homes.cs.washington.edu/~mernst/advice/version-control.html">each commit should have a single purpose</a></em>, it is recommended to <u>separate</u> code refactorings from features/bug fixes, and commit them separately from each other. See Martin Fowler's <a href="http://martinfowler.com/articles/workflowsOfRefactoring/#preparatory">Preparatory refactoring</a> from <a href="http://martinfowler.com/articles/workflowsOfRefactoring">Workflows of Refactoring</a>.
+      </p>
+      <h4>How to do mass refactorings?</h4>
+      <p>
+        The suggested approach is to run only one refactoring rule at a time to do single purpose commits. Once the refactoring rule has finished running, do a pre-commit code review to check all the changes are approved by the developer. Commit the change, then move on to run the next refactoring rule and start the same process until all rules have been applied and all the changes have been committed.<br>
+        From now on, a developer can run the whole suite of refactorings without being overwhelmed by all the changes to review.
+      </p>
     <h2>News</h2>
 TODO Publish first version
     <h2>Install</h2>
@@ -166,6 +176,7 @@ How to <a href="https://github.com/JnRouvignac/AutoRefactor/blob/master/CONTRIBU
         <li><a href="http://checkstyle.sourceforge.net">Checkstyle</a>, coding conventions checker for Java programs</li>
         <li><a href="http://pmd.sourceforge.net">PMD</a>, source-based software flaw finder for Java programs</li>
         <li><a href="http://www.sonarqube.org">SonarQube&trade;</a> aggregates the results of the precedent three software in a unified and coherent interface. It adds code coverage measurement and computes a lot of useful source code metrics. It is very useful for managing the health of source code and technical debt.</li>
+        <li><a href="http://walkmod.com/">walkmod</a>, a tool for Java source code that share common goals with AutoRefactor
         <li><a href="http://coccinelle.lip6.fr/">Coccinelle</a>, a fantastic source of inspiration for automated source-to-source transformations</li>
       </ul>
     <h4>Library</h4>
@@ -180,6 +191,8 @@ How to <a href="https://github.com/JnRouvignac/AutoRefactor/blob/master/CONTRIBU
 <a href="http://www.cs.helsinki.fi/u/luontola/tdd-2009/ext/ObjectCalisthenics.pdf>Jeff Bay's chapter</a> in <a href="http://www.amazon.com/The-Thoughtworks-Anthology-Technology-Programmers/dp/193435614X">The Thoughtworks Anthology: Essays on Software Technology and Innovation</a>
 <a href="http://www.slideshare.net/rdohms/bettercode-phpbenelux212alternate">Your code sucks, let's fix it! Object Calisthenics and Code readability</a>
 <a href="http://williamdurand.fr/2013/06/03/object-calisthenics/">Object Calisthenics</a>
+<a href="http://www.infoq.com/articles/natural-course-refactoring">Natural Course of Refactoring – a Refactoring Workflow</a>, by Mariusz Sieraczkiewicz, 30 November 2014
+<a href="http://martinfowler.com/articles/refactoring-external-service.html">Refactoring code that accesses external services</a>, by Martin Fowler, 17 February 2015
 -->
       </ul>
     <h6>Trademarks</h6>
