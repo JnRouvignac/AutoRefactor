@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/JnRouvignac/AutoRefactor.png)](https://travis-ci.org/JnRouvignac/AutoRefactor)
+[![Join the chat at https://gitter.im/JnRouvignac/AutoRefactor](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/JnRouvignac/AutoRefactor?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 # AutoRefactor
 
