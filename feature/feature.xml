@@ -2,7 +2,7 @@
 <feature
       id="org.autorefactor.feature"
       label="AutoRefactor"
-      version="1.0.0">
+      version="1.1.0.qualifier">
 
    <description url="http://autorefactor.org">
       AutoRefactor - Eclipse plugin to automatically refactor Java code bases.

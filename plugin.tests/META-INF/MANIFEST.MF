@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: AutoRefactor Tests
 Bundle-SymbolicName: org.autorefactor.plugin.tests;singleton:=true
-Bundle-Version: 1.0.0
+Bundle-Version: 1.1.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Require-Bundle: org.junit4,
  org.autorefactor.plugin,
