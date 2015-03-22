@@ -31,7 +31,7 @@
 
   <groupId>org.autorefactor.plugin</groupId>
   <artifactId>parent</artifactId>
-  <version>0.0.2-SNAPSHOT</version>
+  <version>1.0.0</version>
   <packaging>pom</packaging>
   <modules>
     <module>feature</module>

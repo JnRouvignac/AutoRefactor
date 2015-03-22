@@ -31,13 +31,13 @@
 
   <groupId>org.autorefactor.plugin</groupId>
   <artifactId>org.autorefactor.plugin</artifactId>
-  <version>0.0.2-SNAPSHOT</version>
+  <version>1.0.0</version>
   <packaging>eclipse-plugin</packaging>
 
   <parent>
     <groupId>org.autorefactor.plugin</groupId>
     <artifactId>parent</artifactId>
-    <version>0.0.2-SNAPSHOT</version>
+    <version>1.0.0</version>
   </parent>
 
 </project>
