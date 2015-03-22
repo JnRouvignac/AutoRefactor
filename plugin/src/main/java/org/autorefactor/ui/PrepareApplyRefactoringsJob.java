@@ -34,8 +34,8 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.autorefactor.AutoRefactorPlugin;
-import org.autorefactor.refactoring.IRefactoring;
 import org.autorefactor.refactoring.JavaProjectOptions;
+import org.autorefactor.refactoring.RefactoringRule;
 import org.autorefactor.util.NotImplementedException;
 import org.autorefactor.util.UnhandledException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -55,20 +55,20 @@ import org.eclipse.jdt.core.JavaModelException;
 public class PrepareApplyRefactoringsJob extends Job {
 
     private final List<IJavaElement> javaElements;
-    private final List<IRefactoring> refactoringsToApply;
+    private final List<RefactoringRule> refactoringRulesToApply;
     private final Map<IJavaElement, JavaProjectOptions> javaProjects = new HashMap<IJavaElement, JavaProjectOptions>();
 
     /**
      * Builds an instance of this class.
      *
      * @param javaElements the java elements selected for automatic refactoring
-     * @param refactoringsToApply the refactorings to apply
+     * @param refactoringRulesToApply the refactorings to apply
      */
-    public PrepareApplyRefactoringsJob(List<IJavaElement> javaElements, List<IRefactoring> refactoringsToApply) {
+    public PrepareApplyRefactoringsJob(List<IJavaElement> javaElements, List<RefactoringRule> refactoringRulesToApply) {
         super("Prepare Auto Refactor");
         setPriority(Job.SHORT);
         this.javaElements = javaElements;
-        this.refactoringsToApply = refactoringsToApply;
+        this.refactoringRulesToApply = refactoringRulesToApply;
     }
 
     /** {@inheritDoc} */
@@ -96,7 +96,7 @@ public class PrepareApplyRefactoringsJob extends Job {
             for (int i = 0; i < nbWorkers; i++) {
                 new ApplyRefactoringsJob(
                         toRefactor,
-                        clone(refactoringsToApply)).schedule();
+                        clone(refactoringRulesToApply)).schedule();
             }
         }
         return Status.OK_STATUS;
@@ -106,9 +106,9 @@ public class PrepareApplyRefactoringsJob extends Job {
      * Clones all the refactorings to apply.
      * In fairness, this method is only useful for stateful refactorings.
      */
-    private List<IRefactoring> clone(List<IRefactoring> refactorings) throws Exception {
-        final List<IRefactoring> res = new ArrayList<IRefactoring>(refactorings.size());
-        for (IRefactoring refactoring : refactorings) {
+    private List<RefactoringRule> clone(List<RefactoringRule> refactorings) throws Exception {
+        final List<RefactoringRule> res = new ArrayList<RefactoringRule>(refactorings.size());
+        for (RefactoringRule refactoring : refactorings) {
             res.add(refactoring.getClass().newInstance());
         }
         return res;

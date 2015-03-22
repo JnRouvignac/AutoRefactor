@@ -26,7 +26,7 @@
 package org.autorefactor.refactoring.rules;
 
 import org.autorefactor.preferences.Preferences;
-import org.autorefactor.refactoring.IJavaRefactoring;
+import org.autorefactor.refactoring.JavaRefactoringRule;
 import org.autorefactor.refactoring.Refactorings;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
@@ -36,7 +36,7 @@ import org.eclipse.jdt.core.dom.CompilationUnit;
  * Abstract class to extend when writing refactorings as {@link ASTVisitor}s.
  * It centralizes useful features for refactorings.
  */
-public abstract class AbstractRefactoring extends ASTVisitor implements IJavaRefactoring {
+public abstract class AbstractRefactoring extends ASTVisitor implements JavaRefactoringRule {
 
     /** The refactoring context of the current visitor. */
     protected RefactoringContext ctx;

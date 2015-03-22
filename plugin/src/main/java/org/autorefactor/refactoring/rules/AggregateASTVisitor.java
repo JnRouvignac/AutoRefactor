@@ -36,8 +36,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.autorefactor.preferences.Preferences;
-import org.autorefactor.refactoring.IJavaRefactoring;
-import org.autorefactor.refactoring.IRefactoring;
+import org.autorefactor.refactoring.JavaRefactoringRule;
+import org.autorefactor.refactoring.RefactoringRule;
 import org.autorefactor.refactoring.Refactorings;
 import org.autorefactor.util.AutoRefactorException;
 import org.autorefactor.util.NotImplementedException;
@@ -137,7 +137,7 @@ import static org.autorefactor.refactoring.ASTHelper.*;
  * When one visitor refactors a subtree of the AST, visitors coming after will not be able to visit it.
  * Visitors throwing exceptions are isolated and ignored for the rest of a run for stability.
  */
-public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring {
+public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRule {
 
     private final Map<Class<?>, List<ASTVisitor>> visitorsMap = new HashMap<Class<?>, List<ASTVisitor>>();
     private final Map<Class<?>, List<ASTVisitor>> endVisitorsMap = new HashMap<Class<?>, List<ASTVisitor>>();
@@ -156,7 +156,7 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
      * @param visitors the visitors that will be executed by this {@link AggregateASTVisitor}
      */
     @SuppressWarnings("rawtypes")
-    public AggregateASTVisitor(List<IRefactoring> visitors) {
+    public AggregateASTVisitor(List<RefactoringRule> visitors) {
         this.visitors = (List) visitors;
         analyzeVisitors();
     }
@@ -236,7 +236,7 @@ public class AggregateASTVisitor extends ASTVisitor implements IJavaRefactoring 
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public void setRefactoringContext(RefactoringContext ctx) {
         this.ctx = ctx;
-        for (IRefactoring v : (List<IRefactoring>) (List) visitors) {
+        for (RefactoringRule v : (List<RefactoringRule>) (List) visitors) {
             v.setRefactoringContext(ctx);
         }
         this.visitorsContributingRefactoring.clear();

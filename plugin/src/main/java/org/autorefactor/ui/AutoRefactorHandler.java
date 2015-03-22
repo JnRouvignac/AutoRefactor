@@ -65,7 +65,7 @@ public class AutoRefactorHandler extends AbstractHandler {
     public Object execute(final ExecutionEvent event) throws ExecutionException {
         new PrepareApplyRefactoringsJob(
                 getSelectedJavaElements(event),
-                AllRefactorings.getConfiguredRefactorings()).schedule();
+                AllRefactorings.getConfiguredRefactoringRules()).schedule();
 
         // TODO JNR provide a maven plugin
         // TODO JNR provide a gradle plugin

@@ -32,8 +32,8 @@ import java.util.List;
 import java.util.Queue;
 
 import org.autorefactor.AutoRefactorPlugin;
-import org.autorefactor.refactoring.IRefactoring;
 import org.autorefactor.refactoring.JavaProjectOptions;
+import org.autorefactor.refactoring.RefactoringRule;
 import org.autorefactor.refactoring.Refactorings;
 import org.autorefactor.refactoring.rules.AggregateASTVisitor;
 import org.autorefactor.refactoring.rules.RefactoringContext;
@@ -58,7 +58,7 @@ import org.eclipse.jface.text.IDocument;
 import static org.autorefactor.refactoring.ASTHelper.*;
 
 /**
- * Eclipse job that applies the provided refactorings in background.
+ * Eclipse job that applies the provided refactoring rules in background.
  * Several such jobs might be started and run in parallel to form a worker pool,
  * with all workers accepting work items ({@link RefactoringUnit}) from a queue provided by the partitioner
  * ({@link PrepareApplyRefactoringsJob}).
@@ -66,19 +66,20 @@ import static org.autorefactor.refactoring.ASTHelper.*;
 public class ApplyRefactoringsJob extends Job {
 
     private final Queue<RefactoringUnit> refactoringUnits;
-    private final List<IRefactoring> refactoringsToApply;
+    private final List<RefactoringRule> refactoringRulesToApply;
 
     /**
      * Builds an instance of this class.
      *
      * @param refactoringUnits the units to automatically refactor
-     * @param refactoringsToApply the refactorings to apply
+     * @param refactoringRulesToApply the refactorings to apply
      */
-    public ApplyRefactoringsJob(Queue<RefactoringUnit> refactoringUnits, List<IRefactoring> refactoringsToApply) {
+    public ApplyRefactoringsJob(
+            Queue<RefactoringUnit> refactoringUnits, List<RefactoringRule> refactoringRulesToApply) {
         super("Auto Refactor");
         setPriority(Job.LONG);
         this.refactoringUnits = refactoringUnits;
-        this.refactoringsToApply = refactoringsToApply;
+        this.refactoringRulesToApply = refactoringRulesToApply;
     }
 
     /** {@inheritDoc} */
@@ -118,7 +119,7 @@ public class ApplyRefactoringsJob extends Job {
                 try {
                     monitor.subTask("Applying refactorings to " + getClassName(compilationUnit));
 
-                    final AggregateASTVisitor refactoring = new AggregateASTVisitor(refactoringsToApply);
+                    final AggregateASTVisitor refactoring = new AggregateASTVisitor(refactoringRulesToApply);
                     applyRefactoring(compilationUnit, refactoring, options);
                 } catch (Exception e) {
                     final String msg = "Exception when applying refactorings to file \""

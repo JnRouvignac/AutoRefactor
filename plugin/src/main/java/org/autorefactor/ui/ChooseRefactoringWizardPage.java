@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.autorefactor.refactoring.IRefactoring;
+import org.autorefactor.refactoring.RefactoringRule;
 import org.autorefactor.refactoring.rules.AllRefactorings;
 import org.autorefactor.util.UnhandledException;
 import org.eclipse.jface.viewers.ArrayContentProvider;
@@ -122,10 +122,10 @@ public class ChooseRefactoringWizardPage extends WizardPage {
      *
      * @return the refactorings (selected by the user) to apply to the selected elements
      */
-    public List<IRefactoring> getSelectedRefactorings() {
-        final ArrayList<IRefactoring> results = new ArrayList<IRefactoring>();
+    public List<RefactoringRule> getSelectedRefactorings() {
+        final ArrayList<RefactoringRule> results = new ArrayList<RefactoringRule>();
         for (Object o : tableViewer.getCheckedElements()) {
-            results.add((IRefactoring) o);
+            results.add((RefactoringRule) o);
         }
         return results;
     }
@@ -193,7 +193,7 @@ public class ChooseRefactoringWizardPage extends WizardPage {
                 SWT.BORDER | SWT.H_SCROLL | SWT.CHECK | SWT.NO_FOCUS | SWT.HIDE_SELECTION);
         createColumns(tableViewer);
         tableViewer.setContentProvider(new ArrayContentProvider());
-        final List<IRefactoring> refactorings = AllRefactorings.getAllRefactorings();
+        final List<RefactoringRule> refactorings = AllRefactorings.getAllRefactoringRules();
         tableViewer.setInput(refactorings);
         tableViewer.setCheckStateProvider(new CheckStateProvider(refactorings));
         tableViewer.setComparator(new ViewerComparator() {

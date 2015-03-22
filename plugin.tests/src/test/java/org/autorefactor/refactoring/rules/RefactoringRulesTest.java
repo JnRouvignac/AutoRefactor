@@ -32,7 +32,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.autorefactor.AutoRefactorPlugin;
-import org.autorefactor.refactoring.IRefactoring;
+import org.autorefactor.refactoring.RefactoringRule;
 import org.autorefactor.refactoring.JavaProjectOptions;
 import org.autorefactor.refactoring.Release;
 import org.autorefactor.ui.ApplyRefactoringsJob;
@@ -54,11 +54,11 @@ import static org.junit.Assert.*;
  * loop until it cannot apply any more changes to the sample file.
  */
 @RunWith(value = Parameterized.class)
-public class RefactoringsTest {
+public class RefactoringRulesTest {
 
     private final String testName;
 
-    public RefactoringsTest(String testName) {
+    public RefactoringRulesTest(String testName) {
         this.testName = testName;
     }
 
@@ -100,7 +100,7 @@ public class RefactoringsTest {
         assertTrue(testName + ": sample out file " + sampleOut + " should exist", sampleOut.exists());
 
         final String refactoringClassname = testName + "Refactoring";
-        final IRefactoring refactoring = getRefactoringClass(refactoringClassname);
+        final RefactoringRule refactoring = getRefactoringClass(refactoringClassname);
         assertNotNull(testName + ": refactoring class " + refactoringClassname + " should exist", refactoring);
 
         final String sampleInSource = readAll(sampleIn);
@@ -124,9 +124,9 @@ public class RefactoringsTest {
         assertEquals(testName + ": wrong output;", expected, actual);
     }
 
-    private IRefactoring getRefactoringClass(final String refactoringClassName) throws Exception {
-        Collection<IRefactoring> refactorings = AllRefactorings.getAllRefactorings();
-        for (IRefactoring refactoring : refactorings) {
+    private RefactoringRule getRefactoringClass(final String refactoringClassName) throws Exception {
+        Collection<RefactoringRule> refactorings = AllRefactorings.getAllRefactoringRules();
+        for (RefactoringRule refactoring : refactorings) {
             if (refactoring.getClass().getSimpleName().equals(refactoringClassName)) {
                 return refactoring;
             }

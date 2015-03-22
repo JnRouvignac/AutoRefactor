@@ -27,7 +27,7 @@ package org.autorefactor.ui;
 
 import java.util.List;
 
-import org.autorefactor.refactoring.IRefactoring;
+import org.autorefactor.refactoring.RefactoringRule;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jface.wizard.Wizard;
 
@@ -64,8 +64,8 @@ public class ChooseRefactoringsWizard extends Wizard {
     /** {@inheritDoc} */
     @Override
     public boolean performFinish() {
-        final List<IRefactoring> refactorings = chooseRefactoringsPage.getSelectedRefactorings();
-        new PrepareApplyRefactoringsJob(javaElements, refactorings).schedule();
-        return !refactorings.isEmpty();
+        final List<RefactoringRule> refactoringRules = chooseRefactoringsPage.getSelectedRefactorings();
+        new PrepareApplyRefactoringsJob(javaElements, refactoringRules).schedule();
+        return !refactoringRules.isEmpty();
     }
 }

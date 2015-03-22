@@ -106,7 +106,7 @@ public class AllRefactoringsTest {
         final IDocument doc = new Document(sampleInSource);
         new ApplyRefactoringsJob(null, null).applyRefactoring(
                 doc, cu,
-                new AggregateASTVisitor(AllRefactorings.getAllRefactorings()),
+                new AggregateASTVisitor(AllRefactorings.getAllRefactoringRules()),
                 newJavaProjectOptions(Release.javaSE("1.5.0"), 4));
 
         final String actual = normalize(

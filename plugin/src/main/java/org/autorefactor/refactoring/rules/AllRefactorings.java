@@ -31,10 +31,10 @@ import java.util.List;
 
 import org.autorefactor.AutoRefactorPlugin;
 import org.autorefactor.preferences.Preferences;
-import org.autorefactor.refactoring.IRefactoring;
+import org.autorefactor.refactoring.RefactoringRule;
 
 /**
- * Lists all the available refactorings.
+ * Lists all the available refactoring rules.
  */
 public final class AllRefactorings {
 
@@ -43,15 +43,15 @@ public final class AllRefactorings {
     }
 
     /**
-     * Returns the refactorings which have been enabled from the Eclipse preferences.
+     * Returns the refactoring rules which have been enabled from the Eclipse preferences.
      *
-     * @return the refactorings which have been enabled from the Eclipse preferences
+     * @return the refactoring rules which have been enabled from the Eclipse preferences
      */
-    public static List<IRefactoring> getConfiguredRefactorings() {
+    public static List<RefactoringRule> getConfiguredRefactoringRules() {
         final Preferences prefs = AutoRefactorPlugin.getPreferenceHelper();
-        final List<IRefactoring> refactorings = getAllRefactorings();
-        for (final Iterator<IRefactoring> iter = refactorings.iterator(); iter.hasNext();) {
-            final IRefactoring refactoring = iter.next();
+        final List<RefactoringRule> refactorings = getAllRefactoringRules();
+        for (final Iterator<RefactoringRule> iter = refactorings.iterator(); iter.hasNext();) {
+            final RefactoringRule refactoring = iter.next();
             if (!refactoring.isEnabled(prefs)) {
                 iter.remove();
             }
@@ -60,11 +60,11 @@ public final class AllRefactorings {
     }
 
     /**
-     * Returns all the available refactorings.
+     * Returns all the available refactoring rules.
      *
-     * @return all the available refactorings
+     * @return all the available refactoring rules
      */
-    public static List<IRefactoring> getAllRefactorings() {
+    public static List<RefactoringRule> getAllRefactoringRules() {
         return newArrayList(
                 new RemoveUselessNullCheckRefactoring(),
                 new WorkWithNullCheckedExpressionFirstRefactoring(),
@@ -103,9 +103,9 @@ public final class AllRefactorings {
                 new AnnotationRefactoring());
     }
 
-    private static List<IRefactoring> newArrayList(IRefactoring... refactorings) {
-        final List<IRefactoring> results = new ArrayList<IRefactoring>(refactorings.length);
-        for (IRefactoring r : refactorings) {
+    private static List<RefactoringRule> newArrayList(RefactoringRule... refactorings) {
+        final List<RefactoringRule> results = new ArrayList<RefactoringRule>(refactorings.length);
+        for (RefactoringRule r : refactorings) {
             if (r != null) {
                 results.add(r);
             }
