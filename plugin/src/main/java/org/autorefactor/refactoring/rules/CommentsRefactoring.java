@@ -152,13 +152,15 @@ public class CommentsRefactoring extends AbstractRefactoring {
     @Override
     public boolean visit(Javadoc node) {
         final String comment = getComment(node);
+        final boolean isWelFormattedInheritDoc = "/** {@inheritDoc} */".equals(comment);
         if (EMPTY_JAVADOC.matcher(comment).matches()) {
             this.ctx.getRefactorings().remove(node);
             return DO_NOT_VISIT_SUBTREE;
         } else if (allTagsEmpty(tags(node))) {
             this.ctx.getRefactorings().remove(node);
             return DO_NOT_VISIT_SUBTREE;
-        } else if (JAVADOC_ONLY_INHERITDOC.matcher(comment).matches()) {
+        } else if (!isWelFormattedInheritDoc
+                && JAVADOC_ONLY_INHERITDOC.matcher(comment).matches()) {
             // Put on one line only to augment vertical density of code
             int startLine = this.astRoot.getLineNumber(node.getStartPosition());
             int endLine = this.astRoot.getLineNumber(node.getStartPosition() + node.getLength());
@@ -169,7 +171,8 @@ public class CommentsRefactoring extends AbstractRefactoring {
         } else if (!acceptJavadoc(getNextNode(node))) {
             this.ctx.getRefactorings().replace(node, comment.replace("/**", "/*"));
             return DO_NOT_VISIT_SUBTREE;
-        } else if (!JAVADOC_HAS_PUNCTUATION.matcher(comment).find()) {
+        } else if (!isWelFormattedInheritDoc
+                && !JAVADOC_HAS_PUNCTUATION.matcher(comment).find()) {
             final String newComment = addPeriodAtEndOfFirstLine(node, comment);
             if (newComment != null) {
                 this.ctx.getRefactorings().replace(node, newComment);
