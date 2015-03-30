@@ -25,6 +25,9 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import static org.autorefactor.cfg.test.TestUtils.*;
+import static org.junit.Assert.*;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -32,8 +35,8 @@ import java.util.Collection;
 import java.util.List;
 
 import org.autorefactor.AutoRefactorPlugin;
-import org.autorefactor.refactoring.RefactoringRule;
 import org.autorefactor.refactoring.JavaProjectOptions;
+import org.autorefactor.refactoring.RefactoringRule;
 import org.autorefactor.refactoring.Release;
 import org.autorefactor.ui.ApplyRefactoringsJob;
 import org.autorefactor.ui.JavaProjectOptionsImpl;
@@ -46,9 +49,6 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
-import static org.autorefactor.cfg.test.TestUtils.*;
-import static org.junit.Assert.*;
-
 /**
  * Tests each refactoring rule in isolation. Each refactoring rule is run in a
  * loop until it cannot apply any more changes to the sample file.
@@ -56,6 +56,7 @@ import static org.junit.Assert.*;
 @RunWith(value = Parameterized.class)
 public class RefactoringRulesTest {
 
+    private static final String SAMPLES_BASE_DIR = "../samples/src/test/java/org/autorefactor/refactoring/rules/";
     private final String testName;
 
     public RefactoringRulesTest(String testName) {
@@ -64,7 +65,7 @@ public class RefactoringRulesTest {
 
     @Parameters(name = "{0}Refactoring")
     public static Collection<Object[]> data() {
-        final File samplesDir = new File("src/test/java/org/autorefactor/samples_in");
+        final File samplesDir = new File(SAMPLES_BASE_DIR, "samples_in");
         final File[] sampleFiles = samplesDir.listFiles(new EndsWithFileFilter("Sample.java"));
         Arrays.sort(sampleFiles);
 
@@ -93,10 +94,9 @@ public class RefactoringRulesTest {
 
     private void testRefactoring0() throws Exception {
         final String sampleName = testName + "Sample.java";
-        final File samplesDir = new File("src/test/java/org/autorefactor");
-        final File sampleIn = new File(samplesDir, "samples_in/" + sampleName);
+        final File sampleIn = new File(SAMPLES_BASE_DIR, "samples_in/" + sampleName);
         assertTrue(testName + ": sample in file " + sampleIn + " should exist", sampleIn.exists());
-        final File sampleOut = new File(samplesDir, "samples_out/" + sampleName);
+        final File sampleOut = new File(SAMPLES_BASE_DIR, "samples_out/" + sampleName);
         assertTrue(testName + ": sample out file " + sampleOut + " should exist", sampleOut.exists());
 
         final String refactoringClassname = testName + "Refactoring";

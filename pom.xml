@@ -36,6 +36,7 @@
   <modules>
     <module>feature</module>
     <module>plugin</module>
+    <module>samples</module>
     <module>plugin.tests</module>
     <module>repository</module>
   </modules>

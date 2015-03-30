@@ -55,6 +55,7 @@ import static org.junit.Assert.*;
 @RunWith(value = Parameterized.class)
 public class AllRefactoringsTest {
 
+    private static final String SAMPLES_ALL_BASE_DIR = "../samples/src/test/java/org/autorefactor/refactoring/rules/all";
     private final String sampleName;
 
     public AllRefactoringsTest(String testName) {
@@ -63,7 +64,7 @@ public class AllRefactoringsTest {
 
     @Parameters(name = "{0}Refactoring")
     public static Collection<Object[]> data() {
-        final File samplesDir = new File("src/test/java/org/autorefactor/rules/all/samples_in");
+        final File samplesDir = new File(SAMPLES_ALL_BASE_DIR, "samples_in");
         final File[] sampleFiles = samplesDir.listFiles(new EndsWithFileFilter("Sample.java"));
         Arrays.sort(sampleFiles);
 
@@ -88,7 +89,7 @@ public class AllRefactoringsTest {
     }
 
     private void testRefactoring0() throws Exception {
-        final File samplesDir = new File("src/test/java/org/autorefactor/rules/all");
+        final File samplesDir = new File(SAMPLES_ALL_BASE_DIR);
         final File sampleIn = new File(samplesDir, "samples_in/" + sampleName);
         assertTrue(sampleName + ": sample in file " + sampleIn + " should exist", sampleIn.exists());
         final File sampleOut = new File(samplesDir, "samples_out/" + sampleName);
