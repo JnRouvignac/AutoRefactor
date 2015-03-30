@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2013-2014 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2013-2015 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,8 +32,10 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.autorefactor.preferences.Preferences;
 import org.autorefactor.refactoring.JavaRefactoringRule;
@@ -141,9 +143,9 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
 
     private final Map<Class<?>, List<ASTVisitor>> visitorsMap = new HashMap<Class<?>, List<ASTVisitor>>();
     private final Map<Class<?>, List<ASTVisitor>> endVisitorsMap = new HashMap<Class<?>, List<ASTVisitor>>();
-    private final List<ASTVisitor> preVisitors = new ArrayList<ASTVisitor>();
-    private final List<ASTVisitor> preVisitors2 = new ArrayList<ASTVisitor>();
-    private final List<ASTVisitor> postVisitors = new ArrayList<ASTVisitor>();
+    private final Set<ASTVisitor> preVisitors = new LinkedHashSet<ASTVisitor>();
+    private final Set<ASTVisitor> preVisitors2 = new LinkedHashSet<ASTVisitor>();
+    private final Set<ASTVisitor> postVisitors = new LinkedHashSet<ASTVisitor>();
 
     private final List<ASTVisitor> visitors;
 
