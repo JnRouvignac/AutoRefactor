@@ -34,7 +34,7 @@ import static org.autorefactor.refactoring.ASTHelper.*;
 /**
  * Add generics, be more assertive about generics that what Eclipse does.
  */
-public class GenerecizeRefactoring extends AbstractRefactoring {
+public class GenerecizeRefactoring extends AbstractRefactoringRule {
 
     // TODO JNR where are we doing casts?
     // Generics

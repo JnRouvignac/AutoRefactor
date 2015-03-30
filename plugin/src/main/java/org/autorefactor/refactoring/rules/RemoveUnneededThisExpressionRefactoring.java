@@ -46,7 +46,7 @@ import static org.autorefactor.refactoring.ASTHelper.*;
 /**
  * Remove useless use of "this" from method calls.
  */
-public class RemoveUnneededThisExpressionRefactoring extends AbstractRefactoring {
+public class RemoveUnneededThisExpressionRefactoring extends AbstractRefactoringRule {
 
     /** {@inheritDoc} */
     @Override

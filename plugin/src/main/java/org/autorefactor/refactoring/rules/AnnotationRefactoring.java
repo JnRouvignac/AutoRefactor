@@ -42,7 +42,7 @@ import static org.autorefactor.refactoring.ASTHelper.*;
  * the value will be left.</li>
  * </ul>
  */
-public class AnnotationRefactoring extends AbstractRefactoring {
+public class AnnotationRefactoring extends AbstractRefactoringRule {
 
     /** {@inheritDoc} */
     @Override

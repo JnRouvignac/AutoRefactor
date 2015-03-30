@@ -52,7 +52,7 @@ import static org.autorefactor.util.Utils.*;
  * intrinsics are APIs that receive special treatment when JITed:
  * they can be compiled down to use very efficient CPU instructions.
  */
-public class HotSpotIntrinsicedAPIsRefactoring extends AbstractRefactoring {
+public class HotSpotIntrinsicedAPIsRefactoring extends AbstractRefactoringRule {
 
     private static class SystemArrayCopyParams {
         private IVariableBinding indexVarBinding;

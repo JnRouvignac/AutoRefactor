@@ -54,7 +54,7 @@ import static org.autorefactor.refactoring.ForLoopHelper.*;
  * Converts code to use {@link Collection#addAll(Collection)} when for or foreach loops are iterating over a collection
  * and add all its elements to another collection.
  */
-public class CollectionAddAllRefactoring extends AbstractRefactoring {
+public class CollectionAddAllRefactoring extends AbstractRefactoringRule {
 
     /** {@inheritDoc} */
     @Override

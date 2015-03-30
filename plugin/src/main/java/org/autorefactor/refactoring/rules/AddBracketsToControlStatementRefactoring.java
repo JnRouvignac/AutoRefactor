@@ -46,7 +46,7 @@ import static org.autorefactor.refactoring.ASTHelper.*;
  * <li><code>do ... while</code> loop body</li>
  * </ul>
  */
-public class AddBracketsToControlStatementRefactoring extends AbstractRefactoring {
+public class AddBracketsToControlStatementRefactoring extends AbstractRefactoringRule {
 
     @Override
     public boolean isEnabled(final Preferences prefs) {

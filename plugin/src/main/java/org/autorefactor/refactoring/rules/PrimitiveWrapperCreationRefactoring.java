@@ -46,7 +46,7 @@ import static org.autorefactor.util.Utils.*;
  * Replaces unnecessary primitive wrappers instance creations by using static
  * factory methods or existing constants.
  */
-public class PrimitiveWrapperCreationRefactoring extends AbstractRefactoring {
+public class PrimitiveWrapperCreationRefactoring extends AbstractRefactoringRule {
 
     private int getJavaMinorVersion() {
         return ctx.getJavaProjectOptions().getJavaSERelease().getMinorVersion();

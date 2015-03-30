@@ -44,7 +44,7 @@ import static org.autorefactor.refactoring.ASTHelper.*;
  * Removes unnecessary local variable declaration or unnecessary variable
  * assignment before a return statement.
  */
-public class RemoveUnnecessaryLocalBeforeReturnRefactoring extends AbstractRefactoring {
+public class RemoveUnnecessaryLocalBeforeReturnRefactoring extends AbstractRefactoringRule {
 
     /** {@inheritDoc} */
     @Override

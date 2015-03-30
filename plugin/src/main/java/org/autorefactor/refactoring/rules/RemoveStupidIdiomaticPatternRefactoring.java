@@ -55,7 +55,7 @@ import java.util.List;
  * }
  * </pre>
  */
-public class RemoveStupidIdiomaticPatternRefactoring extends AbstractRefactoring {
+public class RemoveStupidIdiomaticPatternRefactoring extends AbstractRefactoringRule {
 
     // TODO JNR
 

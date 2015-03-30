@@ -41,7 +41,7 @@ import static org.eclipse.jdt.core.dom.Modifier.*;
  * Likewise, the initializer will be removed for non primitive fields initialized to <code>null</code>.
  * etc.
  */
-public class RemoveFieldsDefaultValuesRefactoring extends AbstractRefactoring {
+public class RemoveFieldsDefaultValuesRefactoring extends AbstractRefactoringRule {
 
     /** {@inheritDoc} */
     @Override

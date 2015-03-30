@@ -39,7 +39,7 @@ import static org.autorefactor.refactoring.ASTHelper.*;
 /**
  * Pushes negations down, inside the expressions.
  */
-public class PushNegationDownRefactoring extends AbstractRefactoring {
+public class PushNegationDownRefactoring extends AbstractRefactoringRule {
 
     /** {@inheritDoc} */
     @Override

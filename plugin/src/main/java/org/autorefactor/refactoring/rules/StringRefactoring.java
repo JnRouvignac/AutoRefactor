@@ -47,7 +47,7 @@ import static org.eclipse.jdt.core.dom.ASTNode.*;
  * <li>Remove calls to {@link String#toString()} inside String concatenations</li>
  * </ul>
  */
-public class StringRefactoring extends AbstractRefactoring {
+public class StringRefactoring extends AbstractRefactoringRule {
 
     /** {@inheritDoc} */
     @Override

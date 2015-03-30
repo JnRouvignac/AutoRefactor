@@ -59,7 +59,7 @@ import static org.autorefactor.refactoring.ASTHelper.*;
  * '+'</li>
  * </ul>
  */
-public class StringBuilderRefactoring extends AbstractRefactoring {
+public class StringBuilderRefactoring extends AbstractRefactoringRule {
 
     private int getJavaMinorVersion() {
         return ctx.getJavaProjectOptions().getJavaSERelease().getMinorVersion();

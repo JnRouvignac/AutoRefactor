@@ -53,12 +53,12 @@ import static org.junit.Assert.*;
  * refactoring rules work together and do not introduce problems.
  */
 @RunWith(value = Parameterized.class)
-public class AllRefactoringsTest {
+public class AllRefactoringRulesTest {
 
     private static final String SAMPLES_ALL_BASE_DIR = "../samples/src/test/java/org/autorefactor/refactoring/rules/all";
     private final String sampleName;
 
-    public AllRefactoringsTest(String testName) {
+    public AllRefactoringRulesTest(String testName) {
         this.sampleName = testName;
     }
 
@@ -107,7 +107,7 @@ public class AllRefactoringsTest {
         final IDocument doc = new Document(sampleInSource);
         new ApplyRefactoringsJob(null, null).applyRefactoring(
                 doc, cu,
-                new AggregateASTVisitor(AllRefactorings.getAllRefactoringRules()),
+                new AggregateASTVisitor(AllRefactoringRules.getAllRefactoringRules()),
                 newJavaProjectOptions(Release.javaSE("1.5.0"), 4));
 
         final String actual = normalize(

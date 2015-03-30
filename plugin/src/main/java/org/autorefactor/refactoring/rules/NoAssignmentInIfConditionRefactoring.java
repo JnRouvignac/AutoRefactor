@@ -43,7 +43,7 @@ import static org.eclipse.jdt.core.dom.VariableDeclarationFragment.*;
 /**
  * Moves assignments inside an if condition before the if node.
  */
-public class NoAssignmentInIfConditionRefactoring extends AbstractRefactoring {
+public class NoAssignmentInIfConditionRefactoring extends AbstractRefactoringRule {
 
     /** {@inheritDoc} */
     @Override

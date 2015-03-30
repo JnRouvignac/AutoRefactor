@@ -45,7 +45,7 @@ import static org.eclipse.jdt.core.dom.InfixExpression.Operator.*;
  * null case in the then clause and then work on the null case in the else
  * clause. This is more readable.
  */
-public class WorkWithNullCheckedExpressionFirstRefactoring extends AbstractRefactoring {
+public class WorkWithNullCheckedExpressionFirstRefactoring extends AbstractRefactoringRule {
 
     /** {@inheritDoc} */
     @Override

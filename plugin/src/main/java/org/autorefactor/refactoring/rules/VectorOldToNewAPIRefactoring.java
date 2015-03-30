@@ -40,7 +40,7 @@ import static org.eclipse.jdt.core.dom.MethodInvocation.*;
 /**
  * Replaces Vector pre Collections API with equivalent Collections API.
  */
-public class VectorOldToNewAPIRefactoring extends AbstractRefactoring {
+public class VectorOldToNewAPIRefactoring extends AbstractRefactoringRule {
 
     /** {@inheritDoc} */
     @Override

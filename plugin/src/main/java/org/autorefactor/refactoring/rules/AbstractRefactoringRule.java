@@ -33,10 +33,10 @@ import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 
 /**
- * Abstract class to extend when writing refactorings as {@link ASTVisitor}s.
- * It centralizes useful features for refactorings.
+ * Abstract class to extend when writing refactoring rules as {@link ASTVisitor}s.
+ * It centralizes useful features for refactoring rules.
  */
-public abstract class AbstractRefactoring extends ASTVisitor implements JavaRefactoringRule {
+public abstract class AbstractRefactoringRule extends ASTVisitor implements JavaRefactoringRule {
 
     /** The refactoring context of the current visitor. */
     protected RefactoringContext ctx;

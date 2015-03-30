@@ -80,7 +80,7 @@ import static org.eclipse.jdt.core.dom.ASTNode.*;
  * opposite boolean values</li>
  * </ul>
  */
-public class BooleanRefactoring extends AbstractRefactoring {
+public class BooleanRefactoring extends AbstractRefactoringRule {
 
     private static class BooleanASTMatcher extends ASTMatcher {
 

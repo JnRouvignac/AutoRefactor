@@ -125,7 +125,7 @@ public class RefactoringRulesTest {
     }
 
     private RefactoringRule getRefactoringClass(final String refactoringClassName) throws Exception {
-        Collection<RefactoringRule> refactorings = AllRefactorings.getAllRefactoringRules();
+        Collection<RefactoringRule> refactorings = AllRefactoringRules.getAllRefactoringRules();
         for (RefactoringRule refactoring : refactorings) {
             if (refactoring.getClass().getSimpleName().equals(refactoringClassName)) {
                 return refactoring;

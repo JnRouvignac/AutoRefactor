@@ -49,7 +49,7 @@ import static org.eclipse.jdt.core.dom.InfixExpression.Operator.*;
  * Removes unnecessary widening casts from return statements, assignments and
  * infix expressions.
  */
-public class RemoveUnnecessaryCastRefactoring extends AbstractRefactoring {
+public class RemoveUnnecessaryCastRefactoring extends AbstractRefactoringRule {
 
     // TODO JNR remove casts from method parameters
 

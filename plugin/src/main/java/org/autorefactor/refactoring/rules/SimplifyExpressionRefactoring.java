@@ -64,7 +64,7 @@ import static org.eclipse.jdt.core.dom.InfixExpression.Operator.*;
  * <li>Directly check boolean values instead of comparing against true / false</li>
  * </ul>
  */
-public class SimplifyExpressionRefactoring extends AbstractRefactoring {
+public class SimplifyExpressionRefactoring extends AbstractRefactoringRule {
 
     /** A mapping of child operation to parent operation that mandates using parentheses. */
     private static final List<Pair<Operator, Operator>> SHOULD_HAVE_PARENTHESES = Arrays.asList(

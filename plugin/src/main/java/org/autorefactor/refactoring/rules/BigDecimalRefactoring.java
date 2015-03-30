@@ -52,7 +52,7 @@ import static org.autorefactor.refactoring.JavaConstants.*;
  * {@link BigDecimal#compareTo(BigDecimal)}</li>
  * </ul>
  */
-public class BigDecimalRefactoring extends AbstractRefactoring {
+public class BigDecimalRefactoring extends AbstractRefactoringRule {
 
     private int getJavaMinorVersion() {
         return ctx.getJavaProjectOptions().getJavaSERelease().getMinorVersion();

@@ -67,7 +67,7 @@ import static org.eclipse.jdt.core.dom.TagElement.*;
  * <li>TODO Fix typo in comments</li>
  * </ul>
  */
-public class CommentsRefactoring extends AbstractRefactoring {
+public class CommentsRefactoring extends AbstractRefactoringRule {
 
     private static final Pattern EMPTY_LINE_COMMENT = Pattern.compile("//\\s*");
     private static final Pattern EMPTY_BLOCK_COMMENT = Pattern.compile("/\\*\\s*(\\*\\s*)*\\*/");

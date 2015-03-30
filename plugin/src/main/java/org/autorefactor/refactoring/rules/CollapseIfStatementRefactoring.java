@@ -36,7 +36,7 @@ import static org.eclipse.jdt.core.dom.InfixExpression.Operator.*;
 /**
  * Collapses two consecutive if statements into just one.
  */
-public class CollapseIfStatementRefactoring extends AbstractRefactoring {
+public class CollapseIfStatementRefactoring extends AbstractRefactoringRule {
 
     /** {@inheritDoc} */
     @Override

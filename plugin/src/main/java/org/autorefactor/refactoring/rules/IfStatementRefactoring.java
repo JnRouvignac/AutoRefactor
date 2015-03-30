@@ -50,7 +50,7 @@ import static org.eclipse.jdt.core.dom.IfStatement.*;
  *   ...
  * }</pre>.
  */
-public class IfStatementRefactoring extends AbstractRefactoring {
+public class IfStatementRefactoring extends AbstractRefactoringRule {
 
     // TODO JNR
 

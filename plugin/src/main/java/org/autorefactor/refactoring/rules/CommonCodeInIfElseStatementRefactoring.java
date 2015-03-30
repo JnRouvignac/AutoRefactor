@@ -46,7 +46,7 @@ import static org.autorefactor.refactoring.ASTHelper.*;
  * start of each blocks or at the end. Could actually end up completely removing
  * an if statement.
  */
-public class CommonCodeInIfElseStatementRefactoring extends AbstractRefactoring {
+public class CommonCodeInIfElseStatementRefactoring extends AbstractRefactoringRule {
 
     // TODO handle switch statements
     // TODO handle clauses in catch blocks (also useful for java 7 with multi-catch)

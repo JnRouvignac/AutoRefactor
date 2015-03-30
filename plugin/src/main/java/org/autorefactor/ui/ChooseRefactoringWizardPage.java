@@ -33,7 +33,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.autorefactor.refactoring.RefactoringRule;
-import org.autorefactor.refactoring.rules.AllRefactorings;
+import org.autorefactor.refactoring.rules.AllRefactoringRules;
 import org.autorefactor.util.UnhandledException;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
@@ -193,7 +193,7 @@ public class ChooseRefactoringWizardPage extends WizardPage {
                 SWT.BORDER | SWT.H_SCROLL | SWT.CHECK | SWT.NO_FOCUS | SWT.HIDE_SELECTION);
         createColumns(tableViewer);
         tableViewer.setContentProvider(new ArrayContentProvider());
-        final List<RefactoringRule> refactorings = AllRefactorings.getAllRefactoringRules();
+        final List<RefactoringRule> refactorings = AllRefactoringRules.getAllRefactoringRules();
         tableViewer.setInput(refactorings);
         tableViewer.setCheckStateProvider(new CheckStateProvider(refactorings));
         tableViewer.setComparator(new ViewerComparator() {

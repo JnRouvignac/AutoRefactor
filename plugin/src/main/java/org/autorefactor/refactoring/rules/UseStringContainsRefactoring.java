@@ -40,7 +40,7 @@ import static org.autorefactor.refactoring.ASTHelper.*;
  * {@link String#lastIndexOf(String)} with {@link String#contains(CharSequence)}
  * where appropriate.
  */
-public class UseStringContainsRefactoring extends AbstractRefactoring {
+public class UseStringContainsRefactoring extends AbstractRefactoringRule {
 
     @Override
     public boolean visit(MethodInvocation node) {

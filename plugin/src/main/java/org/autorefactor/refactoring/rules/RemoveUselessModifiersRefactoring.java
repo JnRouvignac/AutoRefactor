@@ -62,7 +62,7 @@ import static org.eclipse.jdt.core.dom.Modifier.*;
  * <p>
  * Fix modifiers order.
  */
-public class RemoveUselessModifiersRefactoring extends AbstractRefactoring {
+public class RemoveUselessModifiersRefactoring extends AbstractRefactoringRule {
 
     private static final class ModifierOrderComparator implements Comparator<Modifier> {
 

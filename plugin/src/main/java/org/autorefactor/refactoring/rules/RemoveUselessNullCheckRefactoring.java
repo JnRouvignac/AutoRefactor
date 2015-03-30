@@ -45,7 +45,7 @@ import static org.eclipse.jdt.core.dom.Assignment.Operator.*;
  * then either assigning null or the expression depending on the result of the null check.
  * It is simpler to directly assign the expression.
  */
-public class RemoveUselessNullCheckRefactoring extends AbstractRefactoring {
+public class RemoveUselessNullCheckRefactoring extends AbstractRefactoringRule {
 
     private final ASTMatcher matcher = new ASTMatcher();
 

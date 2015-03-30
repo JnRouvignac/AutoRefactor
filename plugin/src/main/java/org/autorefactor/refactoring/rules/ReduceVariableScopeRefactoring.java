@@ -75,7 +75,7 @@ import static org.autorefactor.util.Utils.*;
  * TODO JNR can we also transform singular fields into local variables?
  * </p>
  */
-public class ReduceVariableScopeRefactoring extends AbstractRefactoring {
+public class ReduceVariableScopeRefactoring extends AbstractRefactoringRule {
 
     private static final int DECL  = 1 << 0;
     private static final int READ  = 1 << 1;

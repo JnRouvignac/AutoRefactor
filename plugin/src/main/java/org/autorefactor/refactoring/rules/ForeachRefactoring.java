@@ -44,7 +44,7 @@ import static org.autorefactor.refactoring.ASTHelper.*;
  * over {@link Map#entrySet()}
  * </p>
  */
-public class ForeachRefactoring extends AbstractRefactoring {
+public class ForeachRefactoring extends AbstractRefactoringRule {
 
     private static class VariableUseVisitor extends ASTVisitor {
 

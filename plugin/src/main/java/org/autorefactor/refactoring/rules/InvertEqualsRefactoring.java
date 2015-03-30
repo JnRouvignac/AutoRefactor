@@ -44,7 +44,7 @@ import static org.autorefactor.refactoring.ASTHelper.*;
  * expression nullness.
  * </p>
  */
-public class InvertEqualsRefactoring extends AbstractRefactoring {
+public class InvertEqualsRefactoring extends AbstractRefactoringRule {
 
     /** {@inheritDoc} */
     @Override

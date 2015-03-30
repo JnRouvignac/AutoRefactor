@@ -40,7 +40,7 @@ import static org.autorefactor.refactoring.ASTHelper.*;
 /**
  * Removes dead code. Use variable values analysis for determining where code is dead.
  */
-public class DeadCodeEliminationRefactoring extends AbstractRefactoring {
+public class DeadCodeEliminationRefactoring extends AbstractRefactoringRule {
 
     // TODO JNR
     // for (false) // impossible iterations

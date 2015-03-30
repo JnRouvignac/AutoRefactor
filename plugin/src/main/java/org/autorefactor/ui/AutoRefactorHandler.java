@@ -31,7 +31,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import org.autorefactor.refactoring.rules.AllRefactorings;
+import org.autorefactor.refactoring.rules.AllRefactoringRules;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
@@ -65,7 +65,7 @@ public class AutoRefactorHandler extends AbstractHandler {
     public Object execute(final ExecutionEvent event) throws ExecutionException {
         new PrepareApplyRefactoringsJob(
                 getSelectedJavaElements(event),
-                AllRefactorings.getConfiguredRefactoringRules()).schedule();
+                AllRefactoringRules.getConfiguredRefactoringRules()).schedule();
 
         // TODO JNR provide a maven plugin
         // TODO JNR provide a gradle plugin
