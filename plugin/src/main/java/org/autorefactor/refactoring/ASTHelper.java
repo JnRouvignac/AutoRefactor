@@ -28,14 +28,17 @@ package org.autorefactor.refactoring;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.autorefactor.util.IllegalStateException;
 import org.autorefactor.util.NotImplementedException;
+import org.eclipse.jdt.core.dom.AbstractTypeDeclaration;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTMatcher;
 import org.eclipse.jdt.core.dom.ASTNode;
@@ -142,6 +145,14 @@ import static org.eclipse.jdt.core.dom.ASTNode.*;
  * Helper class for manipulating, converting, navigating and checking {@link ASTNode}s.
  */
 public final class ASTHelper {
+
+    /** Compares {@link ASTNode}s according to their start position. */
+    public static final class NodeStartPositionComparator implements Comparator<ASTNode> {
+        @Override
+        public int compare(ASTNode o1, ASTNode o2) {
+            return o1.getStartPosition() - o2.getStartPosition();
+        }
+    }
 
     /**
      * Boolean constant to use when returning from an {@link ASTVisitor} {{visit(*)}} method
@@ -586,6 +597,18 @@ public final class ASTHelper {
      * Generecized version of the equivalent JDT method.
      *
      * @param node the node on which to call the equivalent JDT method
+     * @return a List of abstract type declarations
+     * @see CompilationUnit#types()
+     */
+    @SuppressWarnings("unchecked")
+    public static List<AbstractTypeDeclaration> types(CompilationUnit node) {
+        return node.types();
+    }
+
+    /**
+     * Generecized version of the equivalent JDT method.
+     *
+     * @param node the node on which to call the equivalent JDT method
      * @return a List of expressions
      * @see NormalAnnotation#values()
      */
@@ -699,6 +722,16 @@ public final class ASTHelper {
     }
 
     /**
+     * Returns the previous body declaration in the same block if it exists.
+     *
+     * @param startNode the start node
+     * @return the previous body declaration in the same block if it exists, null otherwise
+     */
+    public static BodyDeclaration getPreviousSibling(BodyDeclaration startNode) {
+        return getSibling(startNode, true);
+    }
+
+    /**
      * Returns the previous statement in the same block if it exists.
      *
      * @param startNode the start node
@@ -706,6 +739,16 @@ public final class ASTHelper {
      */
     public static Statement getPreviousSibling(Statement startNode) {
         return getSibling(startNode, true);
+    }
+
+    /**
+     * Returns the next body declaration in the same block if it exists.
+     *
+     * @param startNode the start node
+     * @return the next body declaration in the same block if it exists, null otherwise
+     */
+    public static BodyDeclaration getNextSibling(BodyDeclaration startNode) {
+        return getSibling(startNode, false);
     }
 
     /**
@@ -732,6 +775,55 @@ public final class ASTHelper {
         final ASTNode parent = startNode.getParent();
         if (parent instanceof Statement) {
             return getNextStatement((Statement) parent);
+        }
+        return null;
+    }
+
+    private static BodyDeclaration getSibling(BodyDeclaration node, boolean lookForPrevious) {
+        if (node.getParent() instanceof TypeDeclaration) {
+            final TypeDeclaration parent = (TypeDeclaration) node.getParent();
+            return getSibling(node, parent, lookForPrevious);
+        } else if (node.getParent() instanceof CompilationUnit) {
+            final CompilationUnit cu = (CompilationUnit) node.getParent();
+            final List<AbstractTypeDeclaration> types = types(cu);
+            final int index = types.indexOf(node);
+            if (index != -1 && index + 1 < types.size()) {
+                return types.get(index + 1);
+            }
+        }
+        return null;
+    }
+
+    private static BodyDeclaration getSibling(BodyDeclaration node,
+            final TypeDeclaration parent, boolean lookForPrevious) {
+        final TreeSet<BodyDeclaration> children = new TreeSet<BodyDeclaration>(new NodeStartPositionComparator());
+        for (FieldDeclaration fieldDecl : parent.getFields()) {
+            children.add(fieldDecl);
+        }
+        for (MethodDeclaration methodDecl : parent.getMethods()) {
+            children.add(methodDecl);
+        }
+        for (BodyDeclaration decl : bodyDeclarations(parent)) {
+            children.add(decl);
+        }
+        for (TypeDeclaration typeDecl : parent.getTypes()) {
+            children.add(typeDecl);
+        }
+
+        BodyDeclaration previous = null;
+        boolean returnNext = false;
+        for (BodyDeclaration child : children) {
+            if (lookForPrevious) {
+                if (child.equals(node)) {
+                    return previous;
+                }
+            } else {
+                if (returnNext) {
+                    return child;
+                }
+            }
+            previous = child;
+            returnNext = child.equals(node);
         }
         return null;
     }

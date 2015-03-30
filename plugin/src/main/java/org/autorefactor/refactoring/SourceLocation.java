@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2013-2014 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2013-2015 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,8 +35,8 @@ import static org.autorefactor.util.Utils.*;
  */
 public class SourceLocation implements ISourceRange, Comparable<ISourceRange> {
 
-    private int offset;
-    private int length;
+    private final int offset;
+    private final int length;
 
     /**
      * Builds a source location instance from an offset and a length in a source file.
@@ -65,7 +65,11 @@ public class SourceLocation implements ISourceRange, Comparable<ISourceRange> {
      * @param endPos the end position in the file
      * @return a source location instance representing a range in a source file.
      */
-    public SourceLocation fromPositions(int startPos, int endPos) {
+    public static SourceLocation fromPositions(int startPos, int endPos) {
+        if (startPos > endPos) {
+            throw new IllegalArgumentException("start position (" + startPos
+                    + ") should be situated before end position (" + startPos + ")");
+        }
         return new SourceLocation(startPos, endPos - startPos);
     }
 
@@ -75,16 +79,28 @@ public class SourceLocation implements ISourceRange, Comparable<ISourceRange> {
      * @param startPosition the start position in the file
      * @return a source location instance representing a point in a source file.
      */
-    public SourceLocation fromStartPosition(int startPosition) {
+    public static SourceLocation fromStartPosition(int startPosition) {
         return new SourceLocation(startPosition, 0);
     }
 
+    /**
+     * Returns the end position of the provided {@link ASTNode} (start position + length).
+     *
+     * @param node the node for which to compute the end position
+     * @return the end position of the provided {@link ASTNode}
+     */
+    public static int getEndPosition(ASTNode node) {
+        return node.getStartPosition() + node.getLength();
+    }
+
     /** {@inheritDoc} */
+    @Override
     public int getLength() {
         return this.length;
     }
 
     /** {@inheritDoc} */
+    @Override
     public int getOffset() {
         return this.offset;
     }
@@ -129,6 +145,7 @@ public class SourceLocation implements ISourceRange, Comparable<ISourceRange> {
     }
 
     /** {@inheritDoc} */
+    @Override
     public int compareTo(ISourceRange sourceRange) {
         final int offsetDiff = this.offset - sourceRange.getOffset();
         if (offsetDiff != 0) {

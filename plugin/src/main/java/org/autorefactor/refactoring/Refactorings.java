@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2013-2014 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2013-2015 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -63,6 +63,7 @@ public class Refactorings {
     private final Map<Pair<ASTNode, ChildListPropertyDescriptor>, ListRewrite> listRewriteCache =
             new HashMap<Pair<ASTNode, ChildListPropertyDescriptor>, ListRewrite>();
     private final ASTCommentRewriter commentRewriter = new ASTCommentRewriter();
+    private final SourceRewriter sourceRewriter = new SourceRewriter();
     /** Nodes that cannot be visited. */
     private final Set<ASTNode> forbiddenNodes = new HashSet<ASTNode>();
 
@@ -238,6 +239,16 @@ public class Refactorings {
     }
 
     /**
+     * Removes the provided source location from the source.
+     *
+     * @param toRemove the source location to remove
+     */
+    public void remove(SourceLocation toRemove) {
+        hasRefactorings = true;
+        sourceRewriter.remove(toRemove);
+    }
+
+    /**
      * Removes the provided nodes from the AST.
      *
      * @param nodes the nodes to remove
@@ -351,6 +362,7 @@ public class Refactorings {
     public void applyTo(final IDocument document) throws BadLocationException {
         final TextEdit edits = rewrite.rewriteAST(document, null);
         commentRewriter.addEdits(document, edits);
+        sourceRewriter.addEdits(document, edits);
         applyEditsToDocument(edits, document);
     }
 
@@ -381,5 +393,4 @@ public class Refactorings {
             throw ex;
         }
     }
-
 }
