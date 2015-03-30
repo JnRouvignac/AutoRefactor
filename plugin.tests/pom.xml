@@ -43,6 +43,14 @@
     <repository>
       <id>orbit</id>
       <url>http://download.eclipse.org/tools/orbit/downloads/drops/R20130827064939/repository/</url>
+<!--
+      <id>orbit Juno SR2</id>
+      <url>http://download.eclipse.org/tools/orbit/downloads/drops/R20130118183705/repository/</url>
+      <id>orbit Kepler SR2</id>
+      <url>http://download.eclipse.org/tools/orbit/downloads/drops/R20140114142710/repository/</url>
+      <id>orbit Luna SR2</id>
+      <url>http://download.eclipse.org/tools/orbit/downloads/drops/R20150124073747/repository/</url>
+-->
       <layout>p2</layout>
     </repository>
   </repositories>
