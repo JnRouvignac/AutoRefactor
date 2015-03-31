@@ -182,4 +182,88 @@ public class TestNGAssertSample {
         assertNotEquals(o, null);
         assertNotEquals(o, null, "Failure message to keep");
     }
+
+    public void shouldRefactorIfPrimitiveThenFail(int i1, int i2) throws Exception {
+        if (i1 == i2) {
+            Assert.fail();
+        }
+        if (i1 == i2) {
+            Assert.fail("Failure message to keep");
+        }
+        if (i1 != i2) {
+            Assert.fail();
+        }
+        if (i1 != i2) {
+            Assert.fail("Failure message to keep");
+        }
+
+        if (i1 == i2) {
+            fail();
+        }
+        if (i1 == i2) {
+            fail("Failure message to keep");
+        }
+        if (i1 != i2) {
+            fail();
+        }
+        if (i1 != i2) {
+            fail("Failure message to keep");
+        }
+    }
+
+    public void shouldRefactorIfSameObjectThenFail(Object o1, Object o2) throws Exception {
+        if (o1 == o2) {
+            Assert.fail();
+        }
+        if (o1 == o2) {
+            Assert.fail("Failure message to keep");
+        }
+        if (o1 != o2) {
+            Assert.fail();
+        }
+        if (o1 != o2) {
+            Assert.fail("Failure message to keep");
+        }
+
+        if (o1 == o2) {
+            fail();
+        }
+        if (o1 == o2) {
+            fail("Failure message to keep");
+        }
+        if (o1 != o2) {
+            fail();
+        }
+        if (o1 != o2) {
+            fail("Failure message to keep");
+        }
+    }
+
+    public void shouldRefactorIfObjectThenFail(Object o1, Object o2) throws Exception {
+        if (o1.equals(o2)) {
+            Assert.fail();
+        }
+        if (o1.equals(o2)) {
+            Assert.fail("Failure message to keep");
+        }
+        if (!o1.equals(o2)) {
+            Assert.fail();
+        }
+        if (!o1.equals(o2)) {
+            Assert.fail("Failure message to keep");
+        }
+
+        if (o1.equals(o2)) {
+            fail();
+        }
+        if (o1.equals(o2)) {
+            fail("Failure message to keep");
+        }
+        if (!o1.equals(o2)) {
+            fail();
+        }
+        if (!o1.equals(o2)) {
+            fail("Failure message to keep");
+        }
+    }
 }

@@ -34,10 +34,13 @@ import org.autorefactor.refactoring.Refactorings;
 import org.autorefactor.util.NotImplementedException;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Expression;
+import org.eclipse.jdt.core.dom.ExpressionStatement;
+import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.InfixExpression.Operator;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.PrefixExpression;
+import org.eclipse.jdt.core.dom.Statement;
 
 /**
  * Refactors the use of TestNG assertions.
@@ -48,6 +51,8 @@ import org.eclipse.jdt.core.dom.PrefixExpression;
  */
 public class TestNGAssertRefactoring extends AbstractRefactoringRule {
 
+    private static final String OBJECT = "java.lang.Object";
+
     /** {@inheritDoc} */
     @Override
     public boolean visit(MethodInvocation node) {
@@ -57,11 +62,11 @@ public class TestNGAssertRefactoring extends AbstractRefactoringRule {
         } else if (isMethod(node, "org.testng.Assert", "assertFalse", "boolean")
                 || isMethod(node, "org.testng.Assert", "assertFalse", "boolean", "java.lang.String")) {
             return maybeRefactorAssertTrue(node, false);
-        } else if (isMethod(node, "org.testng.Assert", "assertEquals", "java.lang.Object", "java.lang.Object")
-                || isMethod(node, "org.testng.Assert", "assertEquals", "java.lang.Object", "java.lang.Object", "java.lang.String")) {
+        } else if (isMethod(node, "org.testng.Assert", "assertEquals", OBJECT, OBJECT)
+                || isMethod(node, "org.testng.Assert", "assertEquals", OBJECT, OBJECT, "java.lang.String")) {
             return maybeRefactorAssertEquals(node, true);
-        } else if (isMethod(node, "org.testng.Assert", "assertNotEquals", "java.lang.Object", "java.lang.Object")
-                || isMethod(node, "org.testng.Assert", "assertNotEquals", "java.lang.Object", "java.lang.Object", "java.lang.String")) {
+        } else if (isMethod(node, "org.testng.Assert", "assertNotEquals", OBJECT, OBJECT)
+                || isMethod(node, "org.testng.Assert", "assertNotEquals", OBJECT, OBJECT, "java.lang.String")) {
             return maybeRefactorAssertEquals(node, false);
         }
         return VISIT_SUBTREE;
@@ -80,13 +85,13 @@ public class TestNGAssertRefactoring extends AbstractRefactoringRule {
             } else if (Operator.NOT_EQUALS.equals(arg0Ie.getOperator())) {
                 return invokeAssert(node, arg0Ie, isAssertTrue);
             }
-        } else if (isMethod(arg0mi, "java.lang.Object", "equals", "java.lang.Object")) {
+        } else if (isMethod(arg0mi, OBJECT, "equals", OBJECT)) {
             r.replace(node,
                     invokeAssertEquals(node, arg0mi, !isAssertTrue));
             return DO_NOT_VISIT_SUBTREE;
         } else if (arg0pe != null && PrefixExpression.Operator.NOT.equals(arg0pe.getOperator())) {
             final MethodInvocation negatedMi = as(arg0pe.getOperand(), MethodInvocation.class);
-            if (isMethod(negatedMi, "java.lang.Object", "equals", "java.lang.Object")) {
+            if (isMethod(negatedMi, OBJECT, "equals", OBJECT)) {
                 r.replace(node,
                         invokeAssertEquals(node, negatedMi, isAssertTrue));
                 return DO_NOT_VISIT_SUBTREE;
@@ -170,7 +175,7 @@ public class TestNGAssertRefactoring extends AbstractRefactoringRule {
     private MethodInvocation invokeAssert(MethodInvocation node, String methodName,
             Expression actual, Expression expected) {
         final ASTBuilder b = this.ctx.getASTBuilder();
-        return invokeAssertPriv(node, methodName, b.copy(actual), b.copy(expected));
+        return invokeAssertPriv(node, methodName, b.copy(actual), b.copy(expected), getMessageArg(node, 1));
     }
 
     private MethodInvocation invokeAssertEquals(MethodInvocation node, final MethodInvocation arg0mi, boolean isNot) {
@@ -180,20 +185,17 @@ public class TestNGAssertRefactoring extends AbstractRefactoringRule {
     private MethodInvocation invokeAssert(MethodInvocation node, String methodName,
             Expression actual, List<Expression> expected) {
         final ASTBuilder b = this.ctx.getASTBuilder();
-        return invokeAssertPriv(node, methodName, b.copy(actual), b.copyRange(expected));
+        return invokeAssertPriv(node, methodName, b.copy(actual), b.copyRange(expected), getMessageArg(node, 1));
     }
 
     private MethodInvocation invokeAssertPriv(MethodInvocation node, String methodName,
-            Expression copyOfActual, Expression copyOfExpected) {
+        Expression copyOfActual, Expression copyOfExpected, Expression msgArg) {
         final ASTBuilder b = this.ctx.getASTBuilder();
         final Expression copyOfExpr = node.getExpression() != null ? b.copy(node.getExpression()) : null;
-        final List<Expression> args = arguments(node);
-        if (args.size() == 1) {
+        if (msgArg == null) {
             return b.invoke(copyOfExpr, methodName, copyOfActual, copyOfExpected);
-        } else if (args.size() == 2) {
-            return b.invoke(copyOfExpr, methodName, copyOfActual, copyOfExpected, b.copy(args.get(1)));
         } else {
-            throw new NotImplementedException(node);
+            return b.invoke(copyOfExpr, methodName, copyOfActual, copyOfExpected, b.copy(msgArg));
         }
     }
 
@@ -208,5 +210,61 @@ public class TestNGAssertRefactoring extends AbstractRefactoringRule {
         } else {
             throw new NotImplementedException(node);
         }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean visit(IfStatement node) {
+        final List<Statement> stmts = asList(node.getThenStatement());
+        if (stmts.size() == 1) {
+            final MethodInvocation mi = asExpression(stmts.get(0), MethodInvocation.class);
+            if (isMethod(mi, "org.testng.Assert", "fail")
+                    || isMethod(mi, "org.testng.Assert", "fail", "java.lang.String")) {
+                final InfixExpression conditionIe = as(node.getExpression(), InfixExpression.class);
+                final MethodInvocation conditionMi = as(node.getExpression(), MethodInvocation.class);
+                final PrefixExpression conditionPe = as(node.getExpression(), PrefixExpression.class);
+                final Refactorings r = this.ctx.getRefactorings();
+                if (conditionIe != null) {
+                    if (Operator.EQUALS.equals(conditionIe.getOperator())) {
+                        return invokeAssertForFail(node, mi, conditionIe, true);
+                    } else if (Operator.NOT_EQUALS.equals(conditionIe.getOperator())) {
+                        return invokeAssertForFail(node, mi, conditionIe, false);
+                    }
+                } else if (isMethod(conditionMi, OBJECT, "equals", OBJECT)) {
+                    r.replace(node,
+                            invokeAssertForFail(mi, "assertNotEquals",
+                                    conditionMi.getExpression(), arguments(conditionMi).get(0)));
+                    return DO_NOT_VISIT_SUBTREE;
+                } else if (conditionPe != null && PrefixExpression.Operator.NOT.equals(conditionPe.getOperator())) {
+                    final MethodInvocation negatedMi = as(conditionPe.getOperand(), MethodInvocation.class);
+                    if (isMethod(negatedMi, OBJECT, "equals", OBJECT)) {
+                        r.replace(node,
+                                invokeAssertForFail(mi, "assertEquals",
+                                        negatedMi.getExpression(), arguments(negatedMi).get(0)));
+                        return DO_NOT_VISIT_SUBTREE;
+                    }
+                }
+            }
+        }
+        return VISIT_SUBTREE;
+    }
+
+    private boolean invokeAssertForFail(IfStatement toReplace, MethodInvocation mi, InfixExpression ie, boolean isNot) {
+        final Refactorings r = this.ctx.getRefactorings();
+        if (isComparingObjects(ie)) {
+            r.replace(toReplace,
+                    invokeAssertForFail(mi, getAssertName(isNot, "Same"), ie.getLeftOperand(), ie.getRightOperand()));
+        } else {
+            r.replace(toReplace,
+                    invokeAssertForFail(mi, getAssertName(isNot, "Equals"), ie.getLeftOperand(), ie.getRightOperand()));
+        }
+        return DO_NOT_VISIT_SUBTREE;
+    }
+
+    private ExpressionStatement invokeAssertForFail(MethodInvocation mi, String methodName,
+            Expression actual, Expression expected) {
+        final ASTBuilder b = this.ctx.getASTBuilder();
+        return b.toStmt(
+                invokeAssertPriv(mi, methodName, b.copy(actual), b.copy(expected), getMessageArg(mi, 0)));
     }
 }
