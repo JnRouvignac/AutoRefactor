@@ -925,6 +925,16 @@ public final class ASTHelper {
     }
 
     /**
+     * Returns whether the provided expression evaluates to a primitive type.
+     *
+     * @param expr the expression to analyze
+     * @return true if the provided expression evaluates to a primitive type, false otherwise
+     */
+    public static boolean isPrimitive(Expression expr) {
+        return expr != null && isPrimitive(expr.resolveTypeBinding());
+    }
+
+    /**
      * Returns whether the provided type binding represents the provided primitive type.
      *
      * @param typeBinding the type binding to analyze

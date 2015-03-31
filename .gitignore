@@ -14,6 +14,7 @@
 # build directory
 target
 test/bin
+samples/bin
 
 # By product files
 test/org/autorefactor/cfg/*.png

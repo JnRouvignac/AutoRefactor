@@ -25,14 +25,33 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
-import org.eclipse.core.resources.*;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
+import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IProjectDescription;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.jdt.core.*;
+import org.eclipse.jdt.core.IClasspathEntry;
+import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.IPackageFragment;
+import org.eclipse.jdt.core.IPackageFragmentRoot;
+import org.eclipse.jdt.core.JavaCore;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 public class JavaCoreHelper {
 
@@ -41,12 +60,70 @@ public class JavaCoreHelper {
     public static IPackageFragment getPackageFragment() throws Exception {
         final IJavaProject javaProject = createJavaProject("projectName", "bin");
         final IPackageFragmentRoot root = addSourceContainer(javaProject, "/testRoot");
-        final IClasspathEntry srcEntry = JavaCore.newSourceEntry(
-                root.getPath(), EMPTY_PATHS, EMPTY_PATHS, null);
-        final IClasspathEntry rtJarEntry = JavaCore.newLibraryEntry(
-                getPathToRtJar(), null, null);
-        addToClasspath(javaProject, srcEntry, rtJarEntry);
+        addToClasspath(javaProject, getClasspathEntries(root));
         return root.createPackageFragment("org.autorefactor", true, null);
+    }
+
+    private static List<IClasspathEntry> getClasspathEntries(final IPackageFragmentRoot root) throws Exception {
+        final List<IClasspathEntry> entries = new ArrayList<IClasspathEntry>();
+        final IClasspathEntry srcEntry = JavaCore.newSourceEntry(root.getPath(), EMPTY_PATHS, EMPTY_PATHS, null);
+        final IClasspathEntry rtJarEntry = JavaCore.newLibraryEntry(getPathToRtJar(), null, null);
+        entries.add(srcEntry);
+        entries.add(rtJarEntry);
+
+        extractClasspathEntries(entries, "../samples/pom.xml");
+        return entries;
+    }
+
+    private static void extractClasspathEntries(List<IClasspathEntry> entries, String classpathFile) throws Exception {
+        final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        final DocumentBuilder builder = factory.newDocumentBuilder();
+        final Document document = builder.parse(new File(classpathFile));
+
+        final Node projectNode = getNodeByNodeName(document.getChildNodes(), "project");
+        final List<Node> dependencies = asList(getNodeByNodeName(projectNode.getChildNodes(), "dependencies").getChildNodes());
+        final String m2Repo = System.getProperty("user.home") + "/.m2/repository/";
+        for (Node dependency : dependencies) {
+            final NodeList children = dependency.getChildNodes();
+            String groupId = getNodeByNodeName(children, "groupId").getTextContent();
+            String artifactId = getNodeByNodeName(children, "artifactId").getTextContent();
+            String version = getNodeByNodeName(children, "version").getTextContent();
+            final String jarPath = m2Repo + toPath(groupId) + "/" + artifactId + "/" + version + "/"
+                    + artifactId + "-" + version + ".jar";
+            entries.add(JavaCore.newLibraryEntry(new Path(jarPath), null, null));
+        }
+    }
+
+    private static Node getNodeByNodeName(NodeList nodes, String nodeName) {
+        for (Node node : asList(nodes)) {
+            if (nodeName.equals(node.getNodeName())) {
+                return node;
+            }
+        }
+        return null;
+    }
+
+    private static String toPath(String groupId) {
+        final StringBuilder sb = new StringBuilder(groupId);
+        int length = sb.length();
+        for (int i = 0; i < length; i++) {
+            if (sb.charAt(i) == '.') {
+                sb.setCharAt(i, '/');
+            }
+        }
+        return sb.toString();
+    }
+
+    private static List<Node> asList(NodeList nodeList) {
+        final List<Node> results = new ArrayList<Node>();
+        int length = nodeList.getLength();
+        for (int i = 0; i < length; i++) {
+            final Node item = nodeList.item(i);
+            if (item.getNodeType() != Node.TEXT_NODE) {
+                results.add(item);
+            }
+        }
+        return results;
     }
 
     public static IJavaProject createJavaProject(String projectName,
@@ -94,9 +171,8 @@ public class JavaCoreHelper {
         createFolder(folder);
 
         IPackageFragmentRoot root = javaProject.getPackageFragmentRoot(folder);
-        IClasspathEntry cpe = JavaCore.newSourceEntry(
-                root.getPath(), EMPTY_PATHS, EMPTY_PATHS, null);
-        addToClasspath(javaProject, cpe);
+        IClasspathEntry cpe = JavaCore.newSourceEntry(root.getPath(), EMPTY_PATHS, EMPTY_PATHS, null);
+        addToClasspath(javaProject, Arrays.asList(cpe));
         return root;
     }
 
@@ -122,21 +198,20 @@ public class JavaCoreHelper {
         return new Path(classPath.substring(start, end));
     }
 
-    private static void addToClasspath(IJavaProject javaProject,
-            IClasspathEntry... entries) throws Exception {
-        if (entries.length != 0) {
+    private static void addToClasspath(IJavaProject javaProject, List<IClasspathEntry> classpathEntries) throws Exception {
+        if (!classpathEntries.isEmpty()) {
             IClasspathEntry[] oldEntries = javaProject.getRawClasspath();
             IClasspathEntry[] newEntries;
             if (oldEntries.length != 0)
             {
                 // remove duplicate entries
                 Set<IClasspathEntry> set = new HashSet<IClasspathEntry>(Arrays.asList(oldEntries));
-                set.addAll(Arrays.asList(entries));
+                set.addAll(classpathEntries);
                 newEntries = set.toArray(new IClasspathEntry[set.size()]);
             }
             else
             {
-                newEntries = entries;
+                newEntries = classpathEntries.toArray(new IClasspathEntry[classpathEntries.size()]);
             }
             javaProject.setRawClasspath(newEntries, null);
         }

@@ -101,7 +101,9 @@ public final class AllRefactoringRules {
                 new RemoveUselessModifiersRefactoring(),
                 new HotSpotIntrinsicedAPIsRefactoring(),
                 new AnnotationRefactoring(),
-                new RemoveSemiColonRefactoring());
+                new RemoveSemiColonRefactoring(),
+                // FIXME it would be nice if it was only enabled when testng jar is detected for the project
+                new TestNGAssertRefactoring());
     }
 
     private static List<RefactoringRule> newArrayList(RefactoringRule... refactorings) {
