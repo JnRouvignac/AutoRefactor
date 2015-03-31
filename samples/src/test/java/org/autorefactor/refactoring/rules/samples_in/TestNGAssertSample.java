@@ -102,4 +102,84 @@ public class TestNGAssertSample {
         assertFalse(o1.equals(o2));
         assertFalse(o1.equals(o2), "Failure message to keep");
     }
+
+    public void shouldRefactorNullCheckFirstArg(Object o) throws Exception {
+        Assert.assertTrue(null == o);
+        Assert.assertTrue(null == o, "Failure message to keep");
+        Assert.assertTrue(null != o);
+        Assert.assertTrue(null != o, "Failure message to keep");
+        Assert.assertFalse(null != o);
+        Assert.assertFalse(null != o, "Failure message to keep");
+        Assert.assertFalse(null == o);
+        Assert.assertFalse(null == o, "Failure message to keep");
+
+        assertTrue(null == o);
+        assertTrue(null == o, "Failure message to keep");
+        assertTrue(null != o);
+        assertTrue(null != o, "Failure message to keep");
+        assertFalse(null != o);
+        assertFalse(null != o, "Failure message to keep");
+        assertFalse(null == o);
+        assertFalse(null == o, "Failure message to keep");
+    }
+
+    public void shouldRefactorNullCheckSecondArg(Object o) throws Exception {
+        Assert.assertTrue(o == null);
+        Assert.assertTrue(o == null, "Failure message to keep");
+        Assert.assertTrue(o != null);
+        Assert.assertTrue(o != null, "Failure message to keep");
+        Assert.assertFalse(o != null);
+        Assert.assertFalse(o != null, "Failure message to keep");
+        Assert.assertFalse(o == null);
+        Assert.assertFalse(o == null, "Failure message to keep");
+
+        assertTrue(o == null);
+        assertTrue(o == null, "Failure message to keep");
+        assertTrue(o != null);
+        assertTrue(o != null, "Failure message to keep");
+        assertFalse(o != null);
+        assertFalse(o != null, "Failure message to keep");
+        assertFalse(o == null);
+        assertFalse(o == null, "Failure message to keep");
+    }
+
+    public void shouldRefactorNullCheckFirstArgWithEquals(Object o) throws Exception {
+        Assert.assertEquals(null, o);
+        Assert.assertEquals(null, o, "Failure message to keep");
+        Assert.assertNotEquals(null, o);
+        Assert.assertNotEquals(null, o, "Failure message to keep");
+        Assert.assertEquals(null, o);
+        Assert.assertEquals(null, o, "Failure message to keep");
+        Assert.assertNotEquals(null, o);
+        Assert.assertNotEquals(null, o, "Failure message to keep");
+
+        assertEquals(null, o);
+        assertEquals(null, o, "Failure message to keep");
+        assertNotEquals(null, o);
+        assertNotEquals(null, o, "Failure message to keep");
+        assertEquals(null, o);
+        assertEquals(null, o, "Failure message to keep");
+        assertNotEquals(null, o);
+        assertNotEquals(null, o, "Failure message to keep");
+    }
+
+    public void shouldRefactorNullCheckSecondArgWithEquals(Object o) throws Exception {
+        Assert.assertEquals(o, null);
+        Assert.assertEquals(o, null, "Failure message to keep");
+        Assert.assertNotEquals(o, null);
+        Assert.assertNotEquals(o, null, "Failure message to keep");
+        Assert.assertEquals(o, null);
+        Assert.assertEquals(o, null, "Failure message to keep");
+        Assert.assertNotEquals(o, null);
+        Assert.assertNotEquals(o, null, "Failure message to keep");
+
+        assertEquals(o, null);
+        assertEquals(o, null, "Failure message to keep");
+        assertNotEquals(o, null);
+        assertNotEquals(o, null, "Failure message to keep");
+        assertEquals(o, null);
+        assertEquals(o, null, "Failure message to keep");
+        assertNotEquals(o, null);
+        assertNotEquals(o, null, "Failure message to keep");
+    }
 }
