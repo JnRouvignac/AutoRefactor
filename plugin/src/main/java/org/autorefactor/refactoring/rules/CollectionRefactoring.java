@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2014 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2014-2015 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -51,10 +51,11 @@ import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.autorefactor.refactoring.ForLoopHelper.*;
 
 /**
- * Converts code to use {@link Collection#addAll(Collection)} when for or foreach loops are iterating over a collection
- * and add all its elements to another collection.
+ * Converts code to use {@link Collection#addAll(Collection)}, {@link Collection#containsAll(Collection)}
+ * or {@link Collection#removeAll(Collection)} when for or foreach loops are iterating over a collection
+ * and add, check contains or remove all its elements to another collection.
  */
-public class CollectionAddAllRefactoring extends AbstractRefactoringRule {
+public class CollectionRefactoring extends AbstractRefactoringRule {
 
     /** {@inheritDoc} */
     @Override
@@ -149,20 +150,30 @@ public class CollectionAddAllRefactoring extends AbstractRefactoringRule {
     /** {@inheritDoc} */
     @Override
     public boolean visit(EnhancedForStatement node) {
-        final Expression collectionVar = node.getExpression();
-        if (instanceOf(collectionVar, "java.util.Collection")) {
+        final Expression collection = node.getExpression();
+        if (instanceOf(collection, "java.util.Collection")) {
             final List<Statement> stmts = asList(node.getBody());
             if (stmts.size() == 1) {
-                final MethodInvocation addMI = asExpression(stmts.get(0), MethodInvocation.class);
-                if (isMethod(addMI, "java.util.Collection", "add", "java.lang.Object")) {
-                    final Expression arg0 = arguments(addMI).get(0);
-                    final SingleVariableDeclaration foreachVariable = node.getParameter();
-                    if (isSameLocalVariable(arg0, foreachVariable.resolveBinding())) {
-                        return replaceWithCollectionAddAll(
-                                node, addMI.getExpression(), collectionVar);
-                    }
+                final MethodInvocation mi = asExpression(stmts.get(0), MethodInvocation.class);
+                if (isMethod(mi, "java.util.Collection", "add", "java.lang.Object")) {
+                    return replaceWithCollectionMethod(node, collection, "addAll", mi);
+                } else if (isMethod(mi, "java.util.Collection", "contains", "java.lang.Object")) {
+                    return replaceWithCollectionMethod(node, collection, "containsAll", mi);
+                } else if (isMethod(mi, "java.util.Collection", "remove", "java.lang.Object")) {
+                    return replaceWithCollectionMethod(node, collection, "removeAll", mi);
                 }
             }
+        }
+        return VISIT_SUBTREE;
+    }
+
+    private boolean replaceWithCollectionMethod(EnhancedForStatement node,
+            Expression collection, String methodName, MethodInvocation colMI) {
+        final Expression arg0 = arguments(colMI).get(0);
+        final SingleVariableDeclaration foreachVariable = node.getParameter();
+        if (isSameLocalVariable(arg0, foreachVariable.resolveBinding())) {
+            return replaceWithCollectionMethod(node, methodName,
+                    colMI.getExpression(), collection);
         }
         return VISIT_SUBTREE;
     }
@@ -173,31 +184,41 @@ public class CollectionAddAllRefactoring extends AbstractRefactoringRule {
         final ForLoopContent loopContent = iterateOverContainer(node);
         final List<Statement> stmts = asList(node.getBody());
         if (loopContent != null && stmts.size() == 1) {
-            final MethodInvocation addMI = asExpression(stmts.get(0), MethodInvocation.class);
-            if (isMethod(addMI, "java.util.Collection", "add", "java.lang.Object")) {
-                final Expression addArg0 = arguments(addMI).get(0);
-                final MethodInvocation getMI = as(addArg0, MethodInvocation.class);
-                if (isMethod(getMI, "java.util.List", "get", "int")
-                        && getMI.getExpression() instanceof Name) {
-                    final Expression getArg0 = arguments(getMI).get(0);
-                    if (getArg0 instanceof Name
-                            && isSameLocalVariable(getArg0, loopContent.getLoopVariable())) {
-                        return replaceWithCollectionAddAll(
-                                node, addMI.getExpression(), getMI.getExpression());
-                    }
-                }
+            final MethodInvocation mi = asExpression(stmts.get(0), MethodInvocation.class);
+            if (isMethod(mi, "java.util.Collection", "add", "java.lang.Object")) {
+                return replaceWithCollectionMethod(node, loopContent, "addAll", mi);
+            } else if (isMethod(mi, "java.util.Collection", "contains", "java.lang.Object")) {
+                return replaceWithCollectionMethod(node, loopContent, "containsAll", mi);
+            } else if (isMethod(mi, "java.util.Collection", "remove", "java.lang.Object")) {
+                return replaceWithCollectionMethod(node, loopContent, "removeAll", mi);
             }
         }
         return VISIT_SUBTREE;
     }
 
-    private boolean replaceWithCollectionAddAll(ASTNode toReplace,
+    private boolean replaceWithCollectionMethod(ForStatement node, ForLoopContent loopContent,
+            String methodName, MethodInvocation colMI) {
+        final Expression addArg0 = arguments(colMI).get(0);
+        final MethodInvocation getMI = as(addArg0, MethodInvocation.class);
+        if (isMethod(getMI, "java.util.List", "get", "int")
+                && getMI.getExpression() instanceof Name) {
+            final Expression getArg0 = arguments(getMI).get(0);
+            if (getArg0 instanceof Name
+                    && isSameLocalVariable(getArg0, loopContent.getLoopVariable())) {
+                return replaceWithCollectionMethod(node, methodName,
+                        colMI.getExpression(), getMI.getExpression());
+            }
+        }
+        return VISIT_SUBTREE;
+    }
+
+    private boolean replaceWithCollectionMethod(ASTNode toReplace, String methodName,
             Expression colWhereToAddAll, Expression colToAddAll) {
         final ASTBuilder b = this.ctx.getASTBuilder();
         this.ctx.getRefactorings().replace(toReplace,
                 b.toStmt(b.invoke(
                         b.copy(colWhereToAddAll),
-                        "addAll",
+                        methodName,
                         b.copy(colToAddAll))));
         return DO_NOT_VISIT_SUBTREE;
     }

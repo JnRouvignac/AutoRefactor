@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2014 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2014-2015 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class CollectionAddAllSample {
+public class CollectionSample {
 
     public void replaceNewNoArgsAssignmentThenAddAll(List<String> col, List<String> output) {
         output = new ArrayList<String>(col);
@@ -55,11 +55,27 @@ public class CollectionAddAllSample {
         return output;
     }
 
-    public void replaceForLoop(List<String> col, List<String> output) {
+    public void replaceAddWithForLoop(List<String> col, List<String> output) {
         output.addAll(col);
     }
 
-    public void replaceForEach(Collection<String> col, List<String> output) {
+    public void replaceAddWithForEach(Collection<String> col, List<String> output) {
         output.addAll(col);
+    }
+
+    public void replaceContainsWithForLoop(List<String> col, List<String> output) {
+        output.containsAll(col);
+    }
+
+    public void replaceContainsWithForEach(Collection<String> col, List<String> output) {
+        output.containsAll(col);
+    }
+
+    public void replaceRemoveWithForLoop(List<String> col, List<String> output) {
+        output.removeAll(col);
+    }
+
+    public void replaceRemoveWithForEach(Collection<String> col, List<String> output) {
+        output.removeAll(col);
     }
 }
