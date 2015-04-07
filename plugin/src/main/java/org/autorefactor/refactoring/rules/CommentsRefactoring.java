@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2013-2014 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2013-2015 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -62,6 +62,7 @@ import static org.eclipse.jdt.core.dom.TagElement.*;
  * <li>Transform comments into javadocs</li>
  * <li>Transform javadocs into block comments</li>
  * <li>Remove IDE generated TODOs</li>
+ * <li>Remove empty lines at end of javadocs and block comments</li>
  * <li>TODO Remove commented out code</li>
  * <li>TODO Fix malformed/incomplete javadocs</li>
  * <li>TODO Fix typo in comments</li>
@@ -72,6 +73,7 @@ public class CommentsRefactoring extends AbstractRefactoringRule {
     private static final Pattern EMPTY_LINE_COMMENT = Pattern.compile("//\\s*");
     private static final Pattern EMPTY_BLOCK_COMMENT = Pattern.compile("/\\*\\s*(\\*\\s*)*\\*/");
     private static final Pattern EMPTY_JAVADOC = Pattern.compile("/\\*\\*\\s*(\\*\\s*)*\\*/");
+    private static final Pattern EMPTY_LINE_AT_END_OF_BLOCK_COMMENT = Pattern.compile("(?:\\s*\\*)*\\s*\\*(\\s*\\*/)");
     private static final Pattern JAVADOC_ONLY_INHERITDOC =
             Pattern.compile("/\\*\\*\\s*(\\*\\s*)*\\{@inheritDoc\\}\\s*(\\*\\s*)*\\*/");
     private static final Pattern ECLIPSE_GENERATED_TODOS = Pattern.compile("//\\s*"
@@ -118,6 +120,10 @@ public class CommentsRefactoring extends AbstractRefactoringRule {
             this.ctx.getRefactorings().toJavadoc(node);
             return DO_NOT_VISIT_SUBTREE;
         }
+        final Matcher emptyLineMatcher = EMPTY_LINE_AT_END_OF_BLOCK_COMMENT.matcher(comment);
+        if (emptyLineMatcher.find()) {
+            return replaceEmptyLineAtEndOfComment(node, emptyLineMatcher);
+        }
         return VISIT_SUBTREE;
     }
 
@@ -153,9 +159,12 @@ public class CommentsRefactoring extends AbstractRefactoringRule {
     public boolean visit(Javadoc node) {
         final String comment = getComment(node);
         final boolean isWelFormattedInheritDoc = "/** {@inheritDoc} */".equals(comment);
+        final Matcher emptyLineMatcher = EMPTY_LINE_AT_END_OF_BLOCK_COMMENT.matcher(comment);
         if (EMPTY_JAVADOC.matcher(comment).matches()) {
             this.ctx.getRefactorings().remove(node);
             return DO_NOT_VISIT_SUBTREE;
+        } else if (emptyLineMatcher.find()) {
+            return replaceEmptyLineAtEndOfComment(node, emptyLineMatcher);
         } else if (allTagsEmpty(tags(node))) {
             this.ctx.getRefactorings().remove(node);
             return DO_NOT_VISIT_SUBTREE;
@@ -189,6 +198,12 @@ public class CommentsRefactoring extends AbstractRefactoringRule {
             }
         }
         return VISIT_SUBTREE;
+    }
+
+    private boolean replaceEmptyLineAtEndOfComment(Comment node, Matcher emptyLineMatcher) {
+        final String replacement = emptyLineMatcher.replaceFirst(emptyLineMatcher.group(1));
+        this.ctx.getRefactorings().replace(node, replacement);
+        return DO_NOT_VISIT_SUBTREE;
     }
 
     private String addPeriodAtEndOfFirstLine(Javadoc node, String comment) {
