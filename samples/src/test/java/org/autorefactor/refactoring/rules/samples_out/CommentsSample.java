@@ -116,11 +116,11 @@ public class CommentsSample implements Runnable {
     }
 
     /**
-     * Remove empty line at end of this javadoc.
+     * Remove empty line at start and end of this javadoc.
      */
     public void removeEmptyLineAtEndOfJavadoc() {
         /*
-         * Remove empty line at end of this comment.
+         * Remove empty line at start and end of this block comment.
          */
     }
 }

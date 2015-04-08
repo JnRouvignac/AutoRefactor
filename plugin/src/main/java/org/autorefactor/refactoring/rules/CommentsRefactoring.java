@@ -73,7 +73,9 @@ public class CommentsRefactoring extends AbstractRefactoringRule {
     private static final Pattern EMPTY_LINE_COMMENT = Pattern.compile("//\\s*");
     private static final Pattern EMPTY_BLOCK_COMMENT = Pattern.compile("/\\*\\s*(\\*\\s*)*\\*/");
     private static final Pattern EMPTY_JAVADOC = Pattern.compile("/\\*\\*\\s*(\\*\\s*)*\\*/");
-    private static final Pattern EMPTY_LINE_AT_END_OF_BLOCK_COMMENT = Pattern.compile("(?:\\s*\\*)*\\s*\\*(\\s*\\*/)");
+    private static final Pattern EMPTY_LINE_AT_START_OF_BLOCK_COMMENT = Pattern.compile("(/\\*)(?:\\s*\\*)+(\\s*\\*)");
+    private static final Pattern EMPTY_LINE_AT_START_OF_JAVADOC = Pattern.compile("(/\\*\\*)(?:\\s*\\*)+(\\s*\\*)");
+    private static final Pattern EMPTY_LINE_AT_END_OF_BLOCK_COMMENT = Pattern.compile("(?:\\*\\s*)*\\*\\s*(\\*/)");
     private static final Pattern JAVADOC_ONLY_INHERITDOC =
             Pattern.compile("/\\*\\*\\s*(\\*\\s*)*\\{@inheritDoc\\}\\s*(\\*\\s*)*\\*/");
     private static final Pattern ECLIPSE_GENERATED_TODOS = Pattern.compile("//\\s*"
@@ -120,9 +122,13 @@ public class CommentsRefactoring extends AbstractRefactoringRule {
             this.ctx.getRefactorings().toJavadoc(node);
             return DO_NOT_VISIT_SUBTREE;
         }
-        final Matcher emptyLineMatcher = EMPTY_LINE_AT_END_OF_BLOCK_COMMENT.matcher(comment);
-        if (emptyLineMatcher.find()) {
-            return replaceEmptyLineAtEndOfComment(node, emptyLineMatcher);
+        final Matcher emptyLineAtStartMatcher = EMPTY_LINE_AT_START_OF_BLOCK_COMMENT.matcher(comment);
+        if (emptyLineAtStartMatcher.find()) {
+            return replaceEmptyLineAtStartOfComment(node, emptyLineAtStartMatcher);
+        }
+        final Matcher emptyLineAtEndMatcher = EMPTY_LINE_AT_END_OF_BLOCK_COMMENT.matcher(comment);
+        if (emptyLineAtEndMatcher.find()) {
+            return replaceEmptyLineAtEndOfComment(node, emptyLineAtEndMatcher);
         }
         return VISIT_SUBTREE;
     }
@@ -159,12 +165,15 @@ public class CommentsRefactoring extends AbstractRefactoringRule {
     public boolean visit(Javadoc node) {
         final String comment = getComment(node);
         final boolean isWelFormattedInheritDoc = "/** {@inheritDoc} */".equals(comment);
-        final Matcher emptyLineMatcher = EMPTY_LINE_AT_END_OF_BLOCK_COMMENT.matcher(comment);
+        final Matcher emptyLineAtStartMatcher = EMPTY_LINE_AT_START_OF_JAVADOC.matcher(comment);
+        final Matcher emptyLineAtEndMatcher = EMPTY_LINE_AT_END_OF_BLOCK_COMMENT.matcher(comment);
         if (EMPTY_JAVADOC.matcher(comment).matches()) {
             this.ctx.getRefactorings().remove(node);
             return DO_NOT_VISIT_SUBTREE;
-        } else if (emptyLineMatcher.find()) {
-            return replaceEmptyLineAtEndOfComment(node, emptyLineMatcher);
+        } else if (emptyLineAtStartMatcher.find()) {
+            return replaceEmptyLineAtStartOfComment(node, emptyLineAtStartMatcher);
+        } else if (emptyLineAtEndMatcher.find()) {
+            return replaceEmptyLineAtEndOfComment(node, emptyLineAtEndMatcher);
         } else if (allTagsEmpty(tags(node))) {
             this.ctx.getRefactorings().remove(node);
             return DO_NOT_VISIT_SUBTREE;
@@ -200,8 +209,14 @@ public class CommentsRefactoring extends AbstractRefactoringRule {
         return VISIT_SUBTREE;
     }
 
-    private boolean replaceEmptyLineAtEndOfComment(Comment node, Matcher emptyLineMatcher) {
-        final String replacement = emptyLineMatcher.replaceFirst(emptyLineMatcher.group(1));
+    private boolean replaceEmptyLineAtStartOfComment(Comment node, Matcher matcher) {
+        final String replacement = matcher.replaceFirst(matcher.group(1) + matcher.group(2));
+        this.ctx.getRefactorings().replace(node, replacement);
+        return DO_NOT_VISIT_SUBTREE;
+    }
+
+    private boolean replaceEmptyLineAtEndOfComment(Comment node, Matcher matcher) {
+        final String replacement = matcher.replaceFirst(matcher.group(1));
         this.ctx.getRefactorings().replace(node, replacement);
         return DO_NOT_VISIT_SUBTREE;
     }
