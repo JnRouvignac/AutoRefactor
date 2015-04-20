@@ -75,6 +75,18 @@ public class TestNGAssertSample {
         assertFalse(false, "Failure message to keep");
     }
 
+    public void shouldRefactorNegatedConditions(boolean b) throws Exception {
+        Assert.assertTrue(!b);
+        Assert.assertTrue(!b, "Failure message to keep");
+        Assert.assertFalse(!b);
+        Assert.assertFalse(!b, "Failure message to keep");
+
+        assertTrue(!b);
+        assertTrue(!b, "Failure message to keep");
+        assertFalse(!b);
+        assertFalse(!b, "Failure message to keep");
+    }
+
     public void shouldRefactorWithObjectReferences(Object o1, Object o2) throws Exception {
         Assert.assertTrue(o1 == o2);
         Assert.assertTrue(o1 == o2, "Failure message to keep");

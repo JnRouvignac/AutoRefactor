@@ -66,6 +66,18 @@ public class TestNGAssertSample {
     public void shouldRemoveDeadChecks() throws Exception {
     }
 
+    public void shouldRefactorNegatedConditions(boolean b) throws Exception {
+        Assert.assertFalse(b);
+        Assert.assertFalse(b, "Failure message to keep");
+        Assert.assertTrue(b);
+        Assert.assertTrue(b, "Failure message to keep");
+
+        assertFalse(b);
+        assertFalse(b, "Failure message to keep");
+        assertTrue(b);
+        assertTrue(b, "Failure message to keep");
+    }
+
     public void shouldRefactorWithObjectReferences(Object o1, Object o2) throws Exception {
         Assert.assertSame(o1, o2);
         Assert.assertSame(o1, o2, "Failure message to keep");

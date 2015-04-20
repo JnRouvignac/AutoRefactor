@@ -95,6 +95,10 @@ public class TestNGAssertRefactoring extends AbstractRefactoringRule {
                 r.replace(node,
                         invokeAssertEquals(node, negatedMi, isAssertTrue));
                 return DO_NOT_VISIT_SUBTREE;
+            } else {
+                r.replace(node,
+                        invertAssert(node, isAssertTrue, arg0pe.getOperand()));
+                return DO_NOT_VISIT_SUBTREE;
             }
         } else {
             Object constantValue = arg0.resolveConstantExpressionValue();
@@ -105,6 +109,18 @@ public class TestNGAssertRefactoring extends AbstractRefactoringRule {
             }
         }
         return VISIT_SUBTREE;
+    }
+
+    private MethodInvocation invertAssert(MethodInvocation node, boolean isAssertTrue, Expression arg) {
+        final ASTBuilder b = this.ctx.getASTBuilder();
+        final Expression copyOfExpr = node.getExpression() != null ? b.copy(node.getExpression()) : null;
+        final String methodName = isAssertTrue ? "assertFalse" : "assertTrue";
+        final Expression msgArg = getMessageArg(node, 1);
+        if (msgArg == null) {
+            return b.invoke(copyOfExpr, methodName, b.copy(arg));
+        } else  {
+            return b.invoke(copyOfExpr, methodName, b.copy(arg), b.copy(msgArg));
+        }
     }
 
     private boolean replaceOrRemove(MethodInvocation node, boolean replace) {
