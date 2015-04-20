@@ -30,6 +30,7 @@ import java.util.List;
 import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.Refactorings;
 import org.autorefactor.util.NotImplementedException;
+import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ExpressionStatement;
 import org.eclipse.jdt.core.dom.IfStatement;
@@ -97,11 +98,23 @@ public class TestNGAssertRefactoring extends AbstractRefactoringRule {
             }
         } else {
             Object constantValue = arg0.resolveConstantExpressionValue();
-            if ((!isAssertTrue && Boolean.TRUE.equals(constantValue))
-                    || (isAssertTrue && Boolean.FALSE.equals(constantValue))) {
-                r.replace(node, invokeFail(node));
-                return DO_NOT_VISIT_SUBTREE;
+            if (Boolean.TRUE.equals(constantValue)) {
+                return replaceOrRemove(node, !isAssertTrue);
+            } else if (Boolean.FALSE.equals(constantValue)) {
+                return replaceOrRemove(node, isAssertTrue);
             }
+        }
+        return VISIT_SUBTREE;
+    }
+
+    private boolean replaceOrRemove(MethodInvocation node, boolean replace) {
+        final Refactorings r = this.ctx.getRefactorings();
+        if (replace) {
+            r.replace(node, invokeFail(node));
+            return DO_NOT_VISIT_SUBTREE;
+        } else if (node.getParent().getNodeType() == ASTNode.EXPRESSION_STATEMENT) {
+            r.remove(node.getParent());
+            return DO_NOT_VISIT_SUBTREE;
         }
         return VISIT_SUBTREE;
     }
