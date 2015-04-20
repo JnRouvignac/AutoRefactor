@@ -207,6 +207,26 @@ public class TestNGAssertSample {
         assertSame(o1, o2, "Failure message to keep");
     }
 
+    public void shouldRefactorIfNullThenFail(Object o1) throws Exception {
+        Assert.assertNotNull(o1);
+        Assert.assertNotNull(o1, "Failure message to keep");
+        Assert.assertNull(o1);
+        Assert.assertNull(o1, "Failure message to keep");
+        Assert.assertNotNull(o1);
+        Assert.assertNotNull(o1, "Failure message to keep");
+        Assert.assertNull(o1);
+        Assert.assertNull(o1, "Failure message to keep");
+
+        assertNotNull(o1);
+        assertNotNull(o1, "Failure message to keep");
+        assertNull(o1);
+        assertNull(o1, "Failure message to keep");
+        assertNotNull(o1);
+        assertNotNull(o1, "Failure message to keep");
+        assertNull(o1);
+        assertNull(o1, "Failure message to keep");
+    }
+
     public void shouldRefactorIfObjectThenFail(Object o1, Object o2) throws Exception {
         Assert.assertNotEquals(o1, o2);
         Assert.assertNotEquals(o1, o2, "Failure message to keep");

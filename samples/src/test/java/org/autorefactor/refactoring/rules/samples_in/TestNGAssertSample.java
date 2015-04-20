@@ -239,6 +239,58 @@ public class TestNGAssertSample {
         }
     }
 
+    public void shouldRefactorIfNullThenFail(Object o1) throws Exception {
+        if (o1 == null) {
+            Assert.fail();
+        }
+        if (o1 == null) {
+            Assert.fail("Failure message to keep");
+        }
+        if (o1 != null) {
+            Assert.fail();
+        }
+        if (o1 != null) {
+            Assert.fail("Failure message to keep");
+        }
+        if (null == o1) {
+            Assert.fail();
+        }
+        if (null == o1) {
+            Assert.fail("Failure message to keep");
+        }
+        if (null != o1) {
+            Assert.fail();
+        }
+        if (null != o1) {
+            Assert.fail("Failure message to keep");
+        }
+
+        if (o1 == null) {
+            fail();
+        }
+        if (o1 == null) {
+            fail("Failure message to keep");
+        }
+        if (o1 != null) {
+            fail();
+        }
+        if (o1 != null) {
+            fail("Failure message to keep");
+        }
+        if (null == o1) {
+            fail();
+        }
+        if (null == o1) {
+            fail("Failure message to keep");
+        }
+        if (null != o1) {
+            fail();
+        }
+        if (null != o1) {
+            fail("Failure message to keep");
+        }
+    }
+
     public void shouldRefactorIfObjectThenFail(Object o1, Object o2) throws Exception {
         if (o1.equals(o2)) {
             Assert.fail();

@@ -25,14 +25,11 @@
  */
 package org.autorefactor.refactoring.rules;
 
-import static org.autorefactor.refactoring.ASTHelper.*;
-
 import java.util.List;
 
 import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.Refactorings;
 import org.autorefactor.util.NotImplementedException;
-import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ExpressionStatement;
 import org.eclipse.jdt.core.dom.IfStatement;
@@ -41,6 +38,8 @@ import org.eclipse.jdt.core.dom.InfixExpression.Operator;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.PrefixExpression;
 import org.eclipse.jdt.core.dom.Statement;
+
+import static org.autorefactor.refactoring.ASTHelper.*;
 
 /**
  * Refactors the use of TestNG assertions.
@@ -156,7 +155,8 @@ public class TestNGAssertRefactoring extends AbstractRefactoringRule {
         return null;
     }
 
-    private ASTNode invokeAssertNull(MethodInvocation node, boolean isNot, Expression expr, Expression msgArg) {
+    private MethodInvocation invokeAssertNull(
+            MethodInvocation node, boolean isNot, Expression expr, Expression msgArg) {
         final ASTBuilder b = this.ctx.getASTBuilder();
         final Expression copyOfExpr = node.getExpression() != null ? b.copy(node.getExpression()) : null;
         final String methodName = getAssertName(isNot, "Null");
@@ -175,7 +175,7 @@ public class TestNGAssertRefactoring extends AbstractRefactoringRule {
     private MethodInvocation invokeAssert(MethodInvocation node, String methodName,
             Expression actual, Expression expected) {
         final ASTBuilder b = this.ctx.getASTBuilder();
-        return invokeAssertPriv(node, methodName, b.copy(actual), b.copy(expected), getMessageArg(node, 1));
+        return invokeAssert0(node, methodName, b.copy(actual), b.copy(expected), getMessageArg(node, 1));
     }
 
     private MethodInvocation invokeAssertEquals(MethodInvocation node, final MethodInvocation arg0mi, boolean isNot) {
@@ -185,11 +185,11 @@ public class TestNGAssertRefactoring extends AbstractRefactoringRule {
     private MethodInvocation invokeAssert(MethodInvocation node, String methodName,
             Expression actual, List<Expression> expected) {
         final ASTBuilder b = this.ctx.getASTBuilder();
-        return invokeAssertPriv(node, methodName, b.copy(actual), b.copyRange(expected), getMessageArg(node, 1));
+        return invokeAssert0(node, methodName, b.copy(actual), b.copyRange(expected), getMessageArg(node, 1));
     }
 
-    private MethodInvocation invokeAssertPriv(MethodInvocation node, String methodName,
-        Expression copyOfActual, Expression copyOfExpected, Expression msgArg) {
+    private MethodInvocation invokeAssert0(MethodInvocation node, String methodName,
+            Expression copyOfActual, Expression copyOfExpected, Expression msgArg) {
         final ASTBuilder b = this.ctx.getASTBuilder();
         final Expression copyOfExpr = node.getExpression() != null ? b.copy(node.getExpression()) : null;
         if (msgArg == null) {
@@ -251,7 +251,15 @@ public class TestNGAssertRefactoring extends AbstractRefactoringRule {
 
     private boolean invokeAssertForFail(IfStatement toReplace, MethodInvocation mi, InfixExpression ie, boolean isNot) {
         final Refactorings r = this.ctx.getRefactorings();
-        if (isComparingObjects(ie)) {
+        if (isNullLiteral(ie.getLeftOperand())) {
+            final ASTBuilder b = this.ctx.getASTBuilder();
+            r.replace(toReplace,
+                    b.toStmt(invokeAssertNull(mi, isNot, ie.getRightOperand(), getMessageArg(mi, 0))));
+        } else if (isNullLiteral(ie.getRightOperand())) {
+            final ASTBuilder b = this.ctx.getASTBuilder();
+            r.replace(toReplace,
+                    b.toStmt(invokeAssertNull(mi, isNot, ie.getLeftOperand(), getMessageArg(mi, 0))));
+        } else if (isComparingObjects(ie)) {
             r.replace(toReplace,
                     invokeAssertForFail(mi, getAssertName(isNot, "Same"), ie.getLeftOperand(), ie.getRightOperand()));
         } else {
@@ -265,6 +273,6 @@ public class TestNGAssertRefactoring extends AbstractRefactoringRule {
             Expression actual, Expression expected) {
         final ASTBuilder b = this.ctx.getASTBuilder();
         return b.toStmt(
-                invokeAssertPriv(mi, methodName, b.copy(actual), b.copy(expected), getMessageArg(mi, 0)));
+                invokeAssert0(mi, methodName, b.copy(actual), b.copy(expected), getMessageArg(mi, 0)));
     }
 }
