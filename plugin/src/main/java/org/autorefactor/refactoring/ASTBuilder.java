@@ -200,6 +200,16 @@ public class ASTBuilder {
     }
 
     /**
+     * Returns a copy of the expression of the provided {@link MethodInvocation} or null if no such expression exists.
+     *
+     * @param node the {@link MethodInvocation} for which to copy the expression
+     * @return a copy of the expression, or false if no such expression exists
+     */
+    public Expression copyExpression(MethodInvocation node) {
+        return node.getExpression() != null ? copy(node.getExpression()) : null;
+    }
+
+    /**
      * Returns a copy of the provided nodes list.
      *
      * @param <T> the actual nodes's type

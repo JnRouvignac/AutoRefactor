@@ -113,7 +113,7 @@ public class TestNGAssertRefactoring extends AbstractRefactoringRule {
 
     private MethodInvocation invertAssert(MethodInvocation node, boolean isAssertTrue, Expression arg) {
         final ASTBuilder b = this.ctx.getASTBuilder();
-        final Expression copyOfExpr = node.getExpression() != null ? b.copy(node.getExpression()) : null;
+        final Expression copyOfExpr = b.copyExpression(node);
         final String methodName = isAssertTrue ? "assertFalse" : "assertTrue";
         final Expression msgArg = getMessageArg(node, 1);
         if (msgArg == null) {
@@ -187,7 +187,7 @@ public class TestNGAssertRefactoring extends AbstractRefactoringRule {
     private MethodInvocation invokeAssertNull(
             MethodInvocation node, boolean isNot, Expression expr, Expression msgArg) {
         final ASTBuilder b = this.ctx.getASTBuilder();
-        final Expression copyOfExpr = node.getExpression() != null ? b.copy(node.getExpression()) : null;
+        final Expression copyOfExpr = b.copyExpression(node);
         final String methodName = getAssertName(isNot, "Null");
         final Expression copyOfActual = b.copy(expr);
         if (msgArg == null) {
@@ -220,7 +220,7 @@ public class TestNGAssertRefactoring extends AbstractRefactoringRule {
     private MethodInvocation invokeAssert0(MethodInvocation node, String methodName,
             Expression copyOfActual, Expression copyOfExpected, Expression msgArg) {
         final ASTBuilder b = this.ctx.getASTBuilder();
-        final Expression copyOfExpr = node.getExpression() != null ? b.copy(node.getExpression()) : null;
+        final Expression copyOfExpr = b.copyExpression(node);
         if (msgArg == null) {
             return b.invoke(copyOfExpr, methodName, copyOfActual, copyOfExpected);
         } else {
@@ -231,7 +231,7 @@ public class TestNGAssertRefactoring extends AbstractRefactoringRule {
     private MethodInvocation invokeFail(MethodInvocation node) {
         final ASTBuilder b = this.ctx.getASTBuilder();
         final List<Expression> args = arguments(node);
-        final Expression copyOfExpr = node.getExpression() != null ? b.copy(node.getExpression()) : null;
+        final Expression copyOfExpr = b.copyExpression(node);
         if (args.size() == 1) {
             return b.invoke(copyOfExpr, "fail");
         } else if (args.size() == 2) {

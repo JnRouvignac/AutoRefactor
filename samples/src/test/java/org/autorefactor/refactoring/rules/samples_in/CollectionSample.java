@@ -95,4 +95,18 @@ public class CollectionSample {
             output.remove(s);
         }
     }
+
+    public void replaceChecksOnSize(Collection<String> col) {
+        System.out.println(col.size() > 0);
+        System.out.println(col.size() >= 0);
+        System.out.println(col.size() == 0);
+        System.out.println(col.size() <= 0);
+        System.out.println(col.size() < 0);
+
+        System.out.println(0 < col.size());
+        System.out.println(0 <= col.size());
+        System.out.println(0 == col.size());
+        System.out.println(0 >= col.size());
+        System.out.println(0 > col.size());
+    }
 }

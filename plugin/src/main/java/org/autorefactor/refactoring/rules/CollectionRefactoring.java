@@ -30,6 +30,7 @@ import java.util.List;
 
 import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.ForLoopHelper.ForLoopContent;
+import org.autorefactor.refactoring.Refactorings;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
@@ -39,6 +40,8 @@ import org.eclipse.jdt.core.dom.ExpressionStatement;
 import org.eclipse.jdt.core.dom.ForStatement;
 import org.eclipse.jdt.core.dom.IBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;
+import org.eclipse.jdt.core.dom.InfixExpression;
+import org.eclipse.jdt.core.dom.InfixExpression.Operator;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Name;
 import org.eclipse.jdt.core.dom.SimpleName;
@@ -239,4 +242,85 @@ public class CollectionRefactoring extends AbstractRefactoringRule {
         return false;
     }
 
+    @Override
+    public boolean visit(InfixExpression node) {
+        final MethodInvocation leftMi = as(node.getLeftOperand(), MethodInvocation.class);
+        final MethodInvocation rightMi = as(node.getRightOperand(), MethodInvocation.class);
+        if (isMethod(leftMi, "java.util.Collection", "size")
+                && isZero(node.getRightOperand())) {
+            return replaceCollectionSize(node, leftMi);
+        } else if (isMethod(rightMi, "java.util.Collection", "size")
+                && isZero(node.getLeftOperand())) {
+            return replaceInverseCollectionSize(node, rightMi);
+        }
+        return VISIT_SUBTREE;
+    }
+
+    private boolean replaceCollectionSize(InfixExpression node, MethodInvocation miToReplace) {
+        final Refactorings r = this.ctx.getRefactorings();
+        final ASTBuilder b = this.ctx.getASTBuilder();
+        final Expression copyOfExpr = b.copyExpression(miToReplace);
+        final Operator op = node.getOperator();
+        if (Operator.GREATER.equals(op)) {
+            r.replace(node,
+                    b.not(b.invoke(copyOfExpr, "isEmpty")));
+            return DO_NOT_VISIT_SUBTREE;
+        } else if (Operator.GREATER_EQUALS.equals(op)) {
+            r.replace(node,
+                    b.boolean0(true));
+            return DO_NOT_VISIT_SUBTREE;
+        } else if (Operator.EQUALS.equals(op)) {
+            r.replace(node,
+                    b.invoke(copyOfExpr, "isEmpty"));
+            return DO_NOT_VISIT_SUBTREE;
+        } else if (Operator.LESS_EQUALS.equals(op)) {
+            r.replace(node,
+                    b.invoke(copyOfExpr, "isEmpty"));
+            return DO_NOT_VISIT_SUBTREE;
+        } else if (Operator.LESS.equals(op)) {
+            r.replace(node,
+                    b.boolean0(false));
+        }
+        return VISIT_SUBTREE;
+    }
+
+    private boolean replaceInverseCollectionSize(InfixExpression node, MethodInvocation miToReplace) {
+        final Refactorings r = this.ctx.getRefactorings();
+        final ASTBuilder b = this.ctx.getASTBuilder();
+        final Expression copyOfExpr = b.copyExpression(miToReplace);
+        final Operator op = node.getOperator();
+        if (Operator.LESS.equals(op)) {
+            r.replace(node,
+                    b.not(b.invoke(copyOfExpr, "isEmpty")));
+            return DO_NOT_VISIT_SUBTREE;
+        } else if (Operator.LESS_EQUALS.equals(op)) {
+            r.replace(node,
+                    b.boolean0(true));
+            return DO_NOT_VISIT_SUBTREE;
+        } else if (Operator.EQUALS.equals(op)) {
+            r.replace(node,
+                    b.invoke(copyOfExpr, "isEmpty"));
+            return DO_NOT_VISIT_SUBTREE;
+        } else if (Operator.GREATER_EQUALS.equals(op)) {
+            r.replace(node,
+                    b.invoke(copyOfExpr, "isEmpty"));
+            return DO_NOT_VISIT_SUBTREE;
+        } else if (Operator.GREATER.equals(op)) {
+            r.replace(node,
+                    b.boolean0(false));
+        }
+        return VISIT_SUBTREE;
+    }
+
+    private boolean isZero(Expression expr) {
+        if (expr != null) {
+            final Object val = expr.resolveConstantExpressionValue();
+            if (val instanceof Integer) {
+                return ((Integer) val).intValue() == 0;
+            } else if (val instanceof Long) {
+                return ((Long) val).longValue() == 0;
+            }
+        }
+        return false;
+    }
 }

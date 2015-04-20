@@ -78,4 +78,18 @@ public class CollectionSample {
     public void replaceRemoveWithForEach(Collection<String> col, List<String> output) {
         output.removeAll(col);
     }
+
+    public void replaceChecksOnSize(Collection<String> col) {
+        System.out.println(!col.isEmpty());
+        System.out.println(true);
+        System.out.println(col.isEmpty());
+        System.out.println(col.isEmpty());
+        System.out.println(false);
+
+        System.out.println(!col.isEmpty());
+        System.out.println(true);
+        System.out.println(col.isEmpty());
+        System.out.println(col.isEmpty());
+        System.out.println(false);
+    }
 }
