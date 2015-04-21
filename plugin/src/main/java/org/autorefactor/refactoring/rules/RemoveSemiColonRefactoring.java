@@ -38,8 +38,6 @@ import java.util.regex.Pattern;
 import org.autorefactor.refactoring.ASTHelper.NodeStartPositionComparator;
 import org.autorefactor.refactoring.SourceLocation;
 import org.autorefactor.util.NotImplementedException;
-import org.autorefactor.util.UnhandledException;
-import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.AnnotationTypeDeclaration;
 import org.eclipse.jdt.core.dom.BodyDeclaration;
@@ -105,7 +103,7 @@ public class RemoveSemiColonRefactoring extends AbstractRefactoringRule {
 
     private boolean removeSuperfluousCommas(ASTNode node, int start, int end) {
         boolean result = VISIT_SUBTREE;
-        final String source = getSource(node);
+        final String source = ctx.getSource(node);
         final ASTNode root = node.getRoot();
         if (root instanceof CompilationUnit) {
             final CompilationUnit cu = (CompilationUnit) root;
@@ -123,14 +121,6 @@ public class RemoveSemiColonRefactoring extends AbstractRefactoringRule {
             }
         }
         return result;
-    }
-
-    private String getSource(ASTNode node) {
-        try {
-            return this.ctx.getCompilationUnit().getSource();
-        } catch (JavaModelException e) {
-            throw new UnhandledException(node, e);
-        }
     }
 
     private Map<String, SourceLocation> getNonCommentsStrings(

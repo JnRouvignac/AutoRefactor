@@ -36,8 +36,6 @@ import java.util.regex.Pattern;
 import org.autorefactor.refactoring.SourceLocation;
 import org.autorefactor.util.NotImplementedException;
 import org.autorefactor.util.Pair;
-import org.autorefactor.util.UnhandledException;
-import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.BlockComment;
 import org.eclipse.jdt.core.dom.BodyDeclaration;
@@ -480,13 +478,9 @@ public class CommentsRefactoring extends AbstractRefactoringRule {
     }
 
     private String getComment(Comment node) {
-        try {
-            final String source = this.ctx.getCompilationUnit().getSource();
-            final int start = node.getStartPosition();
-            return source.substring(start, start + node.getLength());
-        } catch (JavaModelException e) {
-            throw new UnhandledException(node, e);
-        }
+        final String source = this.ctx.getSource(node);
+        final int start = node.getStartPosition();
+        return source.substring(start, start + node.getLength());
     }
 
     /** {@inheritDoc} */

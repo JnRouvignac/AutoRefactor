@@ -28,8 +28,11 @@ package org.autorefactor.refactoring.rules;
 import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.JavaProjectOptions;
 import org.autorefactor.refactoring.Refactorings;
+import org.autorefactor.util.UnhandledException;
 import org.eclipse.jdt.core.ICompilationUnit;
+import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.AST;
+import org.eclipse.jdt.core.dom.ASTNode;
 
 /**
  * Class holding necessary data for a refactoring.
@@ -99,6 +102,14 @@ public class RefactoringContext {
      */
     public Refactorings getRefactorings() {
         return refactorings;
+    }
+
+    String getSource(ASTNode node) {
+        try {
+            return compilationUnit.getSource();
+        } catch (JavaModelException e) {
+            throw new UnhandledException(node, e);
+        }
     }
 
 }
