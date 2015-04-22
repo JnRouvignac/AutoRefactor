@@ -38,9 +38,12 @@ import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.InfixExpression.Operator;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.PrefixExpression;
+import org.eclipse.jdt.core.dom.QualifiedName;
+import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.Statement;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
+import static org.eclipse.jdt.core.dom.ASTNode.*;
 
 /**
  * Refactors the use of TestNG assertions.
@@ -137,6 +140,7 @@ public class TestNGAssertRefactoring extends AbstractRefactoringRule {
 
     private boolean maybeRefactorAssertEquals(MethodInvocation node, boolean isAssertEquals) {
         final Refactorings r = this.ctx.getRefactorings();
+        final ASTBuilder b = this.ctx.getASTBuilder();
         final List<Expression> args = arguments(node);
         final Expression arg0 = args.get(0);
         final Expression arg1 = args.get(1);
@@ -148,8 +152,68 @@ public class TestNGAssertRefactoring extends AbstractRefactoringRule {
             r.replace(node,
                     invokeAssertNull(node, !isAssertEquals, arg0, getMessageArg(node, 2)));
             return DO_NOT_VISIT_SUBTREE;
+        } else if (isConstant(arg0) && !isConstant(arg1)) {
+            r.replace(arg0, b.copy(arg1));
+            r.replace(arg1, b.copy(arg0));
+            return DO_NOT_VISIT_SUBTREE;
+        } else if (isVariableNamedExpected(arg0) && !isVariableNamedExpected(arg1)) {
+            r.replace(arg0, b.copy(arg1));
+            r.replace(arg1, b.copy(arg0));
+            return DO_NOT_VISIT_SUBTREE;
         }
         return VISIT_SUBTREE;
+    }
+
+    private boolean isVariableNamedExpected(Expression expr) {
+        switch (expr.getNodeType()) {
+        case SIMPLE_NAME:
+            final SimpleName sn = (SimpleName) expr;
+            return levenshteinDistance(sn.getIdentifier().toLowerCase(), "expected") <= 3;
+
+        case QUALIFIED_NAME:
+            final QualifiedName qn = (QualifiedName) expr;
+            return isVariableNamedExpected(qn.getName());
+
+        default:
+            return false;
+        }
+    }
+
+    /**
+     * Returns the levenstein distance between the two provided strings.
+     * <p>
+     * Note: Implementation comes from wikipedia.
+     *
+     * @param s1 the first string to compare
+     * @param s2 the second string to compare
+     * @return the levenshtein distance between the two strings
+     * @see <a href="https://en.wikipedia.org/wiki/Levenshtein_distance#Iterative_with_full_matrix">
+     * Iterative implementation with full matrix</a>
+     */
+    private static int levenshteinDistance(String s1, String s2) {
+        int s1Length = s1.length() + 1;
+        int s2Length = s2.length() + 1;
+
+        int[][] d = new int[s1Length][s2Length];
+        for (int i = 0; i < s1Length; i++) {
+            d[i][0] = i;
+        }
+        for (int j = 0; j < s2Length; j++) {
+            d[0][j] = j;
+        }
+
+        for (int i = 1; i < s1Length; i++) {
+            for (int j = 1; j < s2Length; j++) {
+                int cost = s1.charAt(i - 1) == s2.charAt(j - 1) ? 0 : 1;
+
+                int deleteCost = d[i - 1][j] + 1;
+                int insertCost = d[i][j - 1] + 1;
+                int substitutionCost = d[i - 1][j - 1] + cost;
+                d[i][j] = Math.min(Math.min(deleteCost, insertCost), substitutionCost);
+            }
+        }
+
+        return d[s1Length - 1][s2Length - 1];
     }
 
     private String getAssertName(boolean isNot, String assertType) {

@@ -172,15 +172,7 @@ public class TestNGAssertSample {
         Assert.assertEquals(null, o, "Failure message to keep");
         Assert.assertNotEquals(null, o);
         Assert.assertNotEquals(null, o, "Failure message to keep");
-        Assert.assertEquals(null, o);
-        Assert.assertEquals(null, o, "Failure message to keep");
-        Assert.assertNotEquals(null, o);
-        Assert.assertNotEquals(null, o, "Failure message to keep");
 
-        assertEquals(null, o);
-        assertEquals(null, o, "Failure message to keep");
-        assertNotEquals(null, o);
-        assertNotEquals(null, o, "Failure message to keep");
         assertEquals(null, o);
         assertEquals(null, o, "Failure message to keep");
         assertNotEquals(null, o);
@@ -192,19 +184,39 @@ public class TestNGAssertSample {
         Assert.assertEquals(o, null, "Failure message to keep");
         Assert.assertNotEquals(o, null);
         Assert.assertNotEquals(o, null, "Failure message to keep");
-        Assert.assertEquals(o, null);
-        Assert.assertEquals(o, null, "Failure message to keep");
-        Assert.assertNotEquals(o, null);
-        Assert.assertNotEquals(o, null, "Failure message to keep");
 
         assertEquals(o, null);
         assertEquals(o, null, "Failure message to keep");
         assertNotEquals(o, null);
         assertNotEquals(o, null, "Failure message to keep");
-        assertEquals(o, null);
-        assertEquals(o, null, "Failure message to keep");
-        assertNotEquals(o, null);
-        assertNotEquals(o, null, "Failure message to keep");
+    }
+
+    public void shouldMoveConstantAsExpectedArgInWithEquals(Object o) throws Exception {
+        Assert.assertEquals(42, o);
+        Assert.assertEquals(42, o, "Failure message to keep");
+        Assert.assertNotEquals(42, o);
+        Assert.assertNotEquals(42, o, "Failure message to keep");
+
+        assertEquals(42, o);
+        assertEquals(42, o, "Failure message to keep");
+        assertNotEquals(42, o);
+        assertNotEquals(42, o, "Failure message to keep");
+    }
+
+    public void shouldMoveExpectedVariableAsExpectedArgWithEquals(Object o, int expected) throws Exception {
+        Assert.assertEquals(expected, o);
+        Assert.assertEquals(expected, o, "Failure message to keep");
+        Assert.assertNotEquals(expected, o);
+        Assert.assertNotEquals(expected, o, "Failure message to keep");
+
+        assertEquals(expected, o);
+        assertEquals(expected, o, "Failure message to keep");
+        assertNotEquals(expected, o);
+        assertNotEquals(expected, o, "Failure message to keep");
+
+        // tests that this works according to levenshtein distance 
+        int expceted = 0;
+        assertEquals(expceted, o);
     }
 
     public void shouldRefactorIfPrimitiveThenFail(int i1, int i2) throws Exception {

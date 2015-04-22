@@ -914,6 +914,28 @@ public final class ASTHelper {
     }
 
     /**
+     * Returns whether the provided expression represents a constant value.
+     *
+     * @param expr the expression to analyze
+     * @return true the provided expression represents a constant value, false otherwise
+     */
+    public static boolean isConstant(final Expression expr) {
+        return (expr != null && expr.resolveConstantExpressionValue() != null)
+                || isEnumConstant(expr);
+    }
+
+    private static boolean isEnumConstant(final Expression expr) {
+        // TODO JNR make it work for enums fields which are static final, but not null
+        if (expr instanceof Name) {
+            final IBinding binding = ((Name) expr).resolveBinding();
+            if (binding instanceof IVariableBinding) {
+                return ((IVariableBinding) binding).isEnumConstant();
+            }
+        }
+        return false;
+    }
+
+    /**
      * Returns whether the provided expression evaluates to a primitive type.
      *
      * @param expr the expression to analyze

@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2013 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2013-2015 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,10 +28,7 @@ package org.autorefactor.refactoring.rules;
 import org.autorefactor.refactoring.ASTBuilder;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Expression;
-import org.eclipse.jdt.core.dom.IBinding;
-import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.MethodInvocation;
-import org.eclipse.jdt.core.dom.Name;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
 
@@ -65,22 +62,6 @@ public class InvertEqualsRefactoring extends AbstractRefactoringRule {
             }
         }
         return VISIT_SUBTREE;
-    }
-
-    private boolean isConstant(final Expression expr) {
-        return (expr != null && expr.resolveConstantExpressionValue() != null)
-                || isEnumConstant(expr);
-    }
-
-    private boolean isEnumConstant(final Expression expr) {
-        // TODO JNR make it work for enums fields which are static final, but not null
-        if (expr instanceof Name) {
-            final IBinding binding = ((Name) expr).resolveBinding();
-            if (binding instanceof IVariableBinding) {
-                return ((IVariableBinding) binding).isEnumConstant();
-            }
-        }
-        return false;
     }
 
     private ASTNode invertEqualsInvocation(Expression lhs, Expression rhs, boolean isEquals) {
