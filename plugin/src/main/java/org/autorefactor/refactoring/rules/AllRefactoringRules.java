@@ -84,6 +84,7 @@ public final class AllRefactoringRules {
                 new CommonCodeInIfElseStatementRefactoring(),
                 // TODO JNR complete it
                 // new GenerecizeRefactoring(),
+                new UseDiamondOperatorRefactoring(),
                 new CollectionRefactoring(),
                 new NoAssignmentInIfConditionRefactoring(),
                 new IfStatementRefactoring(),
