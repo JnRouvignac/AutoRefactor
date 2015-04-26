@@ -34,9 +34,7 @@ public class CommentsSample implements Runnable {
         return null;
     }
 
-    /**
-     * Uppercase first word.
-     */
+    /** Uppercase first word. */
     private int i;
     /** This must be attached as a javadoc to field 'j'. */
     private int j;
@@ -61,9 +59,7 @@ public class CommentsSample implements Runnable {
     }
 
     // Do not convert this line comment to javadoc
-    /**
-     * Convert to a javadoc.
-     */
+    /** Convert to a javadoc. */
     public static void main(String[] args) {
         // remove block comment just below
         // remove comment lines just above and below
@@ -74,16 +70,10 @@ public class CommentsSample implements Runnable {
         }
     }
 
-    /**
-     * This javadoc must have a period added at the end of this sentence.
-     */
+    /** This javadoc must have a period added at the end of this sentence. */
     public void test2() {
-        /*
-         * This is a javadoc that must be transformed to a blockcomment
-         */
-        /*
-         * This is a blockcomment that must be kept
-         */
+        /* This is a javadoc that must be transformed to a blockcomment */
+        /* This is a blockcomment that must be kept */
         // This is a linecomment that must be kept
     }
 
@@ -103,10 +93,7 @@ public class CommentsSample implements Runnable {
         return i;
     }
 
-    /**
-     * Do not add period at the end of this
-     * line!
-     */
+    /** Do not add period at the end of this line! */
     public void test5() {
     }
 
@@ -115,12 +102,8 @@ public class CommentsSample implements Runnable {
     public void run() {
     }
 
-    /**
-     * Remove empty line at start and end of this javadoc.
-     */
+    /** Remove empty line at start and end of this javadoc. */
     public void removeEmptyLineAtEndOfJavadoc() {
-        /*
-         * Remove empty line at start and end of this block comment.
-         */
+        /* Remove empty line at start and end of this block comment. */
     }
 }

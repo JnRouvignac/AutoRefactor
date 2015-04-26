@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2014 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2014-2015 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,6 +32,7 @@ import org.autorefactor.refactoring.JavaProjectOptions;
 import org.autorefactor.refactoring.Release;
 import org.autorefactor.util.UnhandledException;
 import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.jdt.core.formatter.DefaultCodeFormatterConstants;
 
 import static org.eclipse.jdt.core.JavaCore.*;
 import static org.eclipse.jdt.core.formatter.DefaultCodeFormatterConstants.*;
@@ -43,7 +44,6 @@ public class JavaProjectOptionsImpl implements JavaProjectOptions {
 
     private final Map<String, String> options;
     private Release javaSERelease;
-    private int tabSize;
 
     /** Builds a new instance of this class. */
     public JavaProjectOptionsImpl() {
@@ -58,13 +58,15 @@ public class JavaProjectOptionsImpl implements JavaProjectOptions {
     public JavaProjectOptionsImpl(Map<String, String> options) {
         this.options = options;
         this.javaSERelease = Release.javaSE(options.get(COMPILER_SOURCE));
-        this.tabSize = computeTabSize();
     }
 
-    private int computeTabSize() {
-        String tabSize = options.get(FORMATTER_INDENTATION_SIZE);
+    private Integer asInteger(String preference) {
         try {
-            return Integer.valueOf(tabSize);
+            String value = options.get(preference);
+            if (value != null) {
+                return Integer.parseInt(value);
+            }
+            return null;
         } catch (NumberFormatException e) {
             throw new UnhandledException(null, e);
         }
@@ -88,9 +90,20 @@ public class JavaProjectOptionsImpl implements JavaProjectOptions {
 
     /** {@inheritDoc} */
     @Override
-    public int getTabSize() {
-        return tabSize;
+    public Integer getTabSize() {
+        return asInteger(FORMATTER_INDENTATION_SIZE);
     }
+
+    /** {@inheritDoc} */
+    @Override
+    public int getCommentLineLength() {
+        Integer result = asInteger(FORMATTER_COMMENT_LINE_LENGTH);
+        if (result == null) {
+            result = asInteger(DefaultCodeFormatterConstants.FORMATTER_LINE_SPLIT);
+        }
+        return result != null ? result : 80;
+    }
+
     /**
      * Sets the Java SE release.
      *
@@ -106,8 +119,7 @@ public class JavaProjectOptionsImpl implements JavaProjectOptions {
      * @param tabSize the tabulation Size to set
      */
     public void setTabSize(int tabSize) {
-        this.tabSize = tabSize;
+        options.put(FORMATTER_INDENTATION_SIZE, String.valueOf(tabSize));
     }
-
 
 }

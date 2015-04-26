@@ -128,7 +128,23 @@ public class CommentsRefactoring extends AbstractRefactoringRule {
         if (emptyLineAtEndMatcher.find()) {
             return replaceEmptyLineAtEndOfComment(node, emptyLineAtEndMatcher);
         }
+        final String replacement = getReplacement(comment, false);
+        if (replacement != null && !replacement.equals(comment)) {
+            this.ctx.getRefactorings().replace(node, replacement);
+            return DO_NOT_VISIT_SUBTREE;
+        }
         return VISIT_SUBTREE;
+    }
+
+    private String getReplacement(String comment, boolean isJavadoc) {
+        int commentLineLength = this.ctx.getJavaProjectOptions().getCommentLineLength();
+        String commentNoStartNorEnd = comment.substring(0, comment.length() - 2).substring(isJavadoc ? 3 : 2);
+        String commentWithSpaces = commentNoStartNorEnd.replaceAll("\\s*(\\r\\n|\\r|\\n)\\s*\\*", " ");
+        String commentContent = commentWithSpaces.replaceAll("\\s+", " ").trim();
+        if (commentContent.length() + (isJavadoc ? 7 : 6) < commentLineLength) {
+            return (isJavadoc ? "/** " : "/* ") + commentContent + " */";
+        }
+        return null;
     }
 
     private ASTNode getNextNode(Comment node) {
@@ -204,7 +220,23 @@ public class CommentsRefactoring extends AbstractRefactoringRule {
                 }
             }
         }
+        if (hasNoTags(node)) {
+            final String replacement = getReplacement(comment, true);
+            if (replacement != null && !replacement.equals(comment)) {
+                this.ctx.getRefactorings().replace(node, replacement);
+                return DO_NOT_VISIT_SUBTREE;
+            }
+        }
         return VISIT_SUBTREE;
+    }
+
+    private boolean hasNoTags(Javadoc node) {
+        for (TagElement tag : tags(node)) {
+            if (tag.getTagName() != null) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private boolean replaceEmptyLineAtStartOfComment(Comment node, Matcher matcher) {

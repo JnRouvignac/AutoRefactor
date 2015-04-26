@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2013-2014 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2013-2015 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -131,7 +131,7 @@ public class ASTCommentRewriter {
         addBlockCommentToJavadocEdits(commentEdits);
         addLineCommentsToJavadocEdits(commentEdits, source);
         if (!commentEdits.isEmpty() && !anyCommentEditIsCovered(edits, commentEdits)) {
-            edits.addChildren(commentEdits.toArray(new TextEdit[0]));
+            edits.addChildren(commentEdits.toArray(new TextEdit[commentEdits.size()]));
         }
         // else, code edits take priority. Give up applying current text edits.
         // They will be retried in the next refactoring loop.

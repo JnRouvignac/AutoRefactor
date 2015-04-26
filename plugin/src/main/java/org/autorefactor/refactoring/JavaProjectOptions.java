@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2014 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2014-2015 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,7 +27,6 @@ package org.autorefactor.refactoring;
 
 import java.util.Map;
 
-
 /**
  * The java project options.
  */
@@ -52,6 +51,13 @@ public interface JavaProjectOptions {
      *
      * @return the tabulation size in use for the current project.
      */
-    int getTabSize();
+    Integer getTabSize();
+
+    /**
+     * Returns the comment line length in use for the current project.
+     *
+     * @return the comment line length in use for the current project.
+     */
+    int getCommentLineLength();
 
 }
