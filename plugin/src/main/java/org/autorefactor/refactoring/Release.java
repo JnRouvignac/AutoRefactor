@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2013-2014 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2013-2015 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,6 +24,8 @@
  * available at http://www.eclipse.org/legal/epl-v10.html
  */
 package org.autorefactor.refactoring;
+
+import java.util.Arrays;
 
 import org.autorefactor.util.IllegalArgumentException;
 
@@ -163,4 +165,8 @@ public final class Release {
         return 0;
     }
 
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + "(" + releaseName + " " + Arrays.toString(version) + ")";
+    }
 }
