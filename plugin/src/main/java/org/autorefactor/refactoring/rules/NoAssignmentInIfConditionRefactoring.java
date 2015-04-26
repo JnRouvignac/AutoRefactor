@@ -76,12 +76,12 @@ public class NoAssignmentInIfConditionRefactoring extends AbstractRefactoringRul
         final VariableDeclarationFragment vdf = findVariableDeclarationFragment(vds, lhs);
         if (vdf != null) {
             r.set(vdf, INITIALIZER_PROPERTY, a.getRightHandSide());
-            r.replace(getParentIncluding(a, ParenthesizedExpression.class),
+            r.replace(getFirstParentOfType(a, ParenthesizedExpression.class),
                 b.copy(lhs));
             return DO_NOT_VISIT_SUBTREE;
         } else if (!isAnElseIf(node)) {
             r.insertBefore(b.toStmt(b.move(a)), node);
-            r.replace(getParentIncluding(a, ParenthesizedExpression.class),
+            r.replace(getFirstParentOfType(a, ParenthesizedExpression.class),
                 b.copy(lhs));
             return DO_NOT_VISIT_SUBTREE;
         }

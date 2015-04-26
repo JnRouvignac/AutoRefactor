@@ -57,7 +57,7 @@ public class UseDiamondOperatorRefactoring extends AbstractRefactoringRule {
     }
 
     private boolean canUseDiamondOperator(ClassInstanceCreation node) {
-        final ASTNode parentInfo = getParentInfo(node);
+        final ASTNode parentInfo = getFirstParentOfType(node, ParenthesizedExpression.class);
         final StructuralPropertyDescriptor locationInParent = parentInfo.getLocationInParent();
 
         switch (parentInfo.getParent().getNodeType()) {
@@ -71,15 +71,6 @@ public class UseDiamondOperatorRefactoring extends AbstractRefactoringRule {
             return VariableDeclarationFragment.INITIALIZER_PROPERTY.equals(locationInParent);
         default:
             return false;
-        }
-    }
-
-    private ASTNode getParentInfo(ASTNode node) {
-        ASTNode parentIncluding = getParentIncluding(node, ParenthesizedExpression.class);
-        if (parentIncluding instanceof ParenthesizedExpression) {
-            return parentIncluding;
-        } else {
-            return node;
         }
     }
 

@@ -38,10 +38,10 @@ import java.util.TreeSet;
 
 import org.autorefactor.util.IllegalStateException;
 import org.autorefactor.util.NotImplementedException;
-import org.eclipse.jdt.core.dom.AbstractTypeDeclaration;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTMatcher;
 import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.AbstractTypeDeclaration;
 import org.eclipse.jdt.core.dom.AnnotationTypeDeclaration;
 import org.eclipse.jdt.core.dom.AnnotationTypeMemberDeclaration;
 import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
@@ -1583,20 +1583,17 @@ public final class ASTHelper {
     }
 
     /**
-     * Returns the first parent node whose type is not part of the included classes list.
+     * Returns the last parent node whose class is part of the included classes list
+     * or the provided node otherwise.
      *
      * @param node the node
      * @param includedClasses the classes to include when looking for the parent node
-     * @return the parent node by including the provided types
+     * @return the last parent node of the provided classes, or the current node otherwise
      */
-    public static ASTNode getParentIncluding(ASTNode node, Class<?>... includedClasses) {
-        return include(node.getParent(), includedClasses);
-    }
-
-    private static ASTNode include(ASTNode node, Class<?>... includedClasses) {
-        if (instanceOf(node, includedClasses)
-                && instanceOf(node.getParent(), includedClasses)) {
-            return include(node.getParent(), includedClasses);
+    public static ASTNode getFirstParentOfType(ASTNode node, Class<?>... includedClasses) {
+        final ASTNode parent = node.getParent();
+        if (instanceOf(parent, includedClasses)) {
+            return getFirstParentOfType(parent, includedClasses);
         }
         return node;
     }
