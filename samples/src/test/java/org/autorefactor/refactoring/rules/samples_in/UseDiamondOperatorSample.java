@@ -38,6 +38,11 @@ public class UseDiamondOperatorSample {
         return l;
     }
 
+    public List<String> refactorVariableDeclarationStatementWithParentheses() {
+        List<String> l = ((new ArrayList<String>()));
+        return l;
+    }
+
     public List<String> refactorAssignment() {
         List<String> l;
         l = new ArrayList<String>();
@@ -55,6 +60,33 @@ public class UseDiamondOperatorSample {
     public void doNotRefactorMethodArgument() {
         List<String> list2 = Collections.synchronizedList(new ArrayList<String>());
         System.out.println(list2);
+    }
+
+    /**
+     * @see <a href="https://stuartmarks.wordpress.com/2011/04/29/when-should-diamond-be-used/">
+     * When Should Diamond Be Used?</a>
+     */
+    public void refactorMethodArgumentInferToObject() {
+        List<Object> list3 = Collections.synchronizedList(new ArrayList<Object>()); // FIXME refactor
+        System.out.println(list3);
+    }
+
+    /**
+     * @see <a href="https://stuartmarks.wordpress.com/2011/04/29/when-should-diamond-be-used/">
+     * When Should Diamond Be Used?</a>
+     */
+    public void refactorMethodArgumentInferTypeFromOutside(List<String> l) {
+        List<String> list4 = Collections.synchronizedList(new ArrayList<String>(l)); // FIXME refactor
+        System.out.println(list4);
+    }
+
+    /**
+     * @see <a href="https://stuartmarks.wordpress.com/2011/04/29/when-should-diamond-be-used/">
+     * When Should Diamond Be Used?</a>
+     */
+    public void refactorMethodArgumentInferTypeFromOutside2(List<String> l) {
+        List<? extends String> list6 = Collections.synchronizedList(new ArrayList<String>(l)); // FIXME refactor
+        System.out.println(list6);
     }
 
     /**

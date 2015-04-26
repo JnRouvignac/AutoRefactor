@@ -28,9 +28,11 @@ package org.autorefactor.refactoring.rules;
 import java.util.List;
 
 import org.autorefactor.refactoring.Release;
+import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.ParameterizedType;
+import org.eclipse.jdt.core.dom.ParenthesizedExpression;
 import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.StructuralPropertyDescriptor;
 import org.eclipse.jdt.core.dom.Type;
@@ -55,17 +57,29 @@ public class UseDiamondOperatorRefactoring extends AbstractRefactoringRule {
     }
 
     private boolean canUseDiamondOperator(ClassInstanceCreation node) {
-        final StructuralPropertyDescriptor locationInParent = node.getLocationInParent();
+        final ASTNode parentInfo = getParentInfo(node);
+        final StructuralPropertyDescriptor locationInParent = parentInfo.getLocationInParent();
 
-        switch (node.getParent().getNodeType()) {
+        switch (parentInfo.getParent().getNodeType()) {
         case ASSIGNMENT:
             return Assignment.RIGHT_HAND_SIDE_PROPERTY.equals(locationInParent);
+        case METHOD_INVOCATION:
+            return false; // FIXME some of them can be refactored
         case RETURN_STATEMENT:
             return ReturnStatement.EXPRESSION_PROPERTY.equals(locationInParent);
         case VARIABLE_DECLARATION_FRAGMENT:
             return VariableDeclarationFragment.INITIALIZER_PROPERTY.equals(locationInParent);
         default:
             return false;
+        }
+    }
+
+    private ASTNode getParentInfo(ASTNode node) {
+        ASTNode parentIncluding = getParentIncluding(node, ParenthesizedExpression.class);
+        if (parentIncluding instanceof ParenthesizedExpression) {
+            return parentIncluding;
+        } else {
+            return node;
         }
     }
 
