@@ -98,4 +98,13 @@ public class UseDiamondOperatorSample {
         list.addAll(new ArrayList<String>());
         return list;
     }
+
+    public List<String> doNotRefactorAnonymousClass() {
+        return new ArrayList<String>() {
+            @Override
+            public String toString() {
+                return super.toString();
+            }
+        };
+    }
 }

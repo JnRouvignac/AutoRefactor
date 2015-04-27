@@ -49,6 +49,7 @@ public class UseDiamondOperatorRefactoring extends AbstractRefactoringRule {
         if (this.ctx.getJavaProjectOptions().getJavaSERelease().isCompatibleWith(Release.javaSE("1.7.0"))) {
             final Type type = node.getType();
             if (type.isParameterizedType()
+                    && node.getAnonymousClassDeclaration() == null
                     && canUseDiamondOperator(node)) {
                 return removeAllTypeArguments((ParameterizedType) type);
             }
