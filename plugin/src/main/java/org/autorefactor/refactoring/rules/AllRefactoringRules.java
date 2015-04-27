@@ -88,6 +88,7 @@ public final class AllRefactoringRules {
                 new CollectionRefactoring(),
                 new NoAssignmentInIfConditionRefactoring(),
                 new IfElseIfRefactoring(),
+                new CommonIfInIfElseRefactoring(),
                 // TODO JNR implement
                 // new RemoveStupidIdiomaticPatternRefactoring(),
                 // TODO JNR - to be completed
