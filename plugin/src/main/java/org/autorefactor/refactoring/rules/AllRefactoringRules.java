@@ -87,7 +87,7 @@ public final class AllRefactoringRules {
                 new UseDiamondOperatorRefactoring(),
                 new CollectionRefactoring(),
                 new NoAssignmentInIfConditionRefactoring(),
-                new IfStatementRefactoring(),
+                new IfElseIfRefactoring(),
                 // TODO JNR implement
                 // new RemoveStupidIdiomaticPatternRefactoring(),
                 // TODO JNR - to be completed

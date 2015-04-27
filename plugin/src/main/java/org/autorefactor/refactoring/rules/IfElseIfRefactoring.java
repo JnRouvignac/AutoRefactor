@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2013 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2013-2015 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -50,16 +50,9 @@ import static org.eclipse.jdt.core.dom.IfStatement.*;
  *   ...
  * }</pre>.
  */
-public class IfStatementRefactoring extends AbstractRefactoringRule {
+public class IfElseIfRefactoring extends AbstractRefactoringRule {
 
     // TODO JNR
-
-    // RemoveUselessElseRefactoring
-    // if (true) {
-    // return s;
-    // } else {
-    // return null;
-    // }
 
     // UseIfElseIfRefactoring
     // if (b) {
