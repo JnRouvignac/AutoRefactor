@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 
 import org.autorefactor.util.Pair;
@@ -223,6 +224,17 @@ public class Refactorings {
     }
 
     /**
+     * Replaces the provided source location with the replacement string in the source.
+     *
+     * @param toReplace the source location to replace
+     * @param replacement the replacement string
+     */
+    public void replace(SourceLocation toReplace, String replacement) {
+        hasRefactorings = true;
+        this.sourceRewriter.replace(toReplace, replacement);
+    }
+
+    /**
      * Removes the provided node from the AST.
      *
      * @param node the node to remove
@@ -386,6 +398,8 @@ public class Refactorings {
         final BadLocationException ex;
         try {
             ex = future.get();
+        } catch (ExecutionException e) {
+            throw new UnhandledException(null, e.getCause());
         } catch (Exception e) {
             throw new UnhandledException(null, e);
         }

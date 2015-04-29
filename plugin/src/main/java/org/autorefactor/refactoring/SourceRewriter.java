@@ -25,17 +25,22 @@
  */
 package org.autorefactor.refactoring;
 
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.text.edits.DeleteEdit;
+import org.eclipse.text.edits.ReplaceEdit;
 import org.eclipse.text.edits.TextEdit;
 
 /** Directly rewrites source code. */
 public class SourceRewriter {
 
     private final Set<SourceLocation> removals = new LinkedHashSet<SourceLocation>();
+    private final Map<SourceLocation, String> replacements = new LinkedHashMap<SourceLocation, String>();
 
     /**
      * Removes the provided source location from the source.
@@ -47,6 +52,16 @@ public class SourceRewriter {
     }
 
     /**
+     * Replaces the provided source location with the replacement string in the source.
+     *
+     * @param toReplace the source location to replace
+     * @param replacement the replacement string
+     */
+    public void replace(SourceLocation toReplace, String replacement) {
+        this.replacements.put(toReplace, replacement);
+    }
+
+    /**
      * Adds the edits contained in the current instance to the provided edits for the provided document.
      *
      * @param document the document to edit
@@ -54,9 +69,12 @@ public class SourceRewriter {
      */
     public void addEdits(IDocument document, TextEdit edits) {
         for (SourceLocation loc : this.removals) {
-            edits.addChild(new DeleteEdit(loc.getStartPosition(), loc
-                    .getLength()));
+            edits.addChild(new DeleteEdit(loc.getStartPosition(), loc.getLength()));
+        }
+        for (Entry<SourceLocation, String> entry : this.replacements.entrySet()) {
+            SourceLocation loc = entry.getKey();
+            String replacement = entry.getValue();
+            edits.addChild(new ReplaceEdit(loc.getStartPosition(), loc.getLength(), replacement));
         }
     }
-
 }

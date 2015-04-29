@@ -105,7 +105,8 @@ public final class AllRefactoringRules {
                 new AnnotationRefactoring(),
                 new RemoveSemiColonRefactoring(),
                 // FIXME it would be nice if it was only enabled when testng jar is detected for the project
-                new TestNGAssertRefactoring());
+                new TestNGAssertRefactoring(),
+                new RemoveEmptyLinesRefactoring());
     }
 
     private static List<RefactoringRule> newArrayList(RefactoringRule... refactorings) {
