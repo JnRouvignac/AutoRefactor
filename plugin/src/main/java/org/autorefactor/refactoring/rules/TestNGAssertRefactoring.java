@@ -230,7 +230,7 @@ public class TestNGAssertRefactoring extends AbstractRefactoringRule {
     }
 
     /**
-     * Returns the levenstein distance between the two provided strings.
+     * Returns the levenshtein distance between the two provided strings.
      * <p>
      * Note: Implementation comes from wikipedia.
      *
