@@ -215,7 +215,7 @@ public class ApplyRefactoringsJob extends Job {
                 break;
             }
 
-            final RefactoringContext ctx = new RefactoringContext(compilationUnit, astRoot.getAST(), options);
+            final RefactoringContext ctx = new RefactoringContext(compilationUnit, astRoot, options);
             refactoring.setRefactoringContext(ctx);
 
             final Refactorings refactorings = refactoring.getRefactorings(astRoot);

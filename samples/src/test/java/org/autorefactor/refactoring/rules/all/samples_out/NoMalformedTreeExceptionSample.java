@@ -26,7 +26,6 @@
 package org.autorefactor.refactoring.rules.all.samples_out;
 
 public class NoMalformedTreeExceptionSample {
-
     public void commentRefactoringsInteractsWithCodeRefactoring(Object o) {
         if (o == null) {
             System.out.println("null");
@@ -35,5 +34,4 @@ public class NoMalformedTreeExceptionSample {
             System.out.println("true");
         }
     }
-
 }

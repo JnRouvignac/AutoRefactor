@@ -33,30 +33,36 @@ import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.Comment;
+import org.eclipse.jdt.core.dom.CompilationUnit;
+
+import static org.autorefactor.refactoring.ASTHelper.*;
+import static org.autorefactor.refactoring.SourceLocation.*;
 
 /**
  * Class holding necessary data for a refactoring.
  */
 public class RefactoringContext {
 
-    private final Refactorings refactorings;
     private final ICompilationUnit compilationUnit;
-    private final JavaProjectOptions options;
+    private final CompilationUnit astRoot;
+    private final Refactorings refactorings;
     private final ASTBuilder astBuilder;
+    private final JavaProjectOptions options;
 
     /**
      * Builds an instance of this class.
      *
      * @param compilationUnit the compilation unit to refactor
-     * @param ast the {@link AST} object to use in the refactoring
+     * @param astRoot the compilation unit, root of the AST
      * @param options the Java project options used to compile the project
      */
-    public RefactoringContext(ICompilationUnit compilationUnit, AST ast,
-            JavaProjectOptions options) {
-        this.refactorings = new Refactorings(ast);
+    public RefactoringContext(ICompilationUnit compilationUnit, CompilationUnit astRoot, JavaProjectOptions options) {
+        this.compilationUnit = compilationUnit;
+        this.astRoot = astRoot;
+        this.refactorings = new Refactorings(astRoot.getAST());
         this.astBuilder = new ASTBuilder(refactorings);
         this.options = options;
-        this.compilationUnit = compilationUnit;
     }
 
     /**
@@ -112,4 +118,16 @@ public class RefactoringContext {
         }
     }
 
+    boolean isInComment(int position) {
+        for (Comment comment : getCommentList(astRoot)) {
+            if (comment.getStartPosition() <= position && position <= getEndPosition(comment)) {
+                return true;
+            } else if (position < comment.getStartPosition()) {
+                // since comment list is "arranged in order of increasing source position"
+                // it is impossible for this position to be surrounded by a comment
+                return false;
+            }
+        }
+        return false;
+    }
 }

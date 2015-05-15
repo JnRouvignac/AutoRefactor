@@ -143,7 +143,7 @@ public class RemoveEmptyLinesRefactoring extends AbstractRefactoringRule {
 
     private boolean visit(AbstractTypeDeclaration node) {
         final String source = this.ctx.getSource(node);
-        int openingCurlyIndex = source.indexOf("{", node.getStartPosition());
+        int openingCurlyIndex = findOpeningCurlyForTypeBody(node, source);
         int newLineBeforeOpeningCurly = source.lastIndexOf(newlineChars, openingCurlyIndex) + newlineChars.length();
         int lastNonWsIndex = getLastIndexOfNonWhitespaceChar(source, openingCurlyIndex - 1);
         int endOfLineIndex = source.indexOf(newlineChars, lastNonWsIndex);
@@ -158,6 +158,17 @@ public class RemoveEmptyLinesRefactoring extends AbstractRefactoringRule {
             return DO_NOT_VISIT_SUBTREE;
         }
         return visitNodeWithClosingCurly(node);
+    }
+
+    private int findOpeningCurlyForTypeBody(AbstractTypeDeclaration node, String source) {
+        int pos = node.getStartPosition();
+        while (true) {
+            int firstCurly = source.indexOf("{", pos);
+            if (!this.ctx.isInComment(firstCurly)) {
+                return firstCurly;
+            }
+            pos = firstCurly + 1;
+        }
     }
 
     /** {@inheritDoc} */

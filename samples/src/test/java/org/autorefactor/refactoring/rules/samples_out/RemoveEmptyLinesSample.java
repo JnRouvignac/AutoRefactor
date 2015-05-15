@@ -25,12 +25,16 @@
  */
 package org.autorefactor.refactoring.rules.samples_out;
 
+/** Ignore the '{' character in this javadoc. */
+/* And the '{' character in this block comment. */
+// And the '{' character in this line comment.
 public class RemoveEmptyLinesSample
 {
     private int aField;
 
     private int anotherField;
 
+    /** Ignore the '{' character in this javadoc. */
     public void aMethod() throws Exception
     {
         System.out.println("Remove empty line before me");

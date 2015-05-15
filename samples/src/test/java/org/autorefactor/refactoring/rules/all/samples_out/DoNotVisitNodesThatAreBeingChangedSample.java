@@ -26,7 +26,6 @@
 package org.autorefactor.refactoring.rules.all.samples_out;
 
 public class DoNotVisitNodesThatAreBeingChangedSample {
-
     public Boolean b;
     public Integer i;
 
@@ -34,5 +33,4 @@ public class DoNotVisitNodesThatAreBeingChangedSample {
         return other != null && (this == other || (b.equals(other.b)
             && i.equals(other.i)));
     }
-
 }
