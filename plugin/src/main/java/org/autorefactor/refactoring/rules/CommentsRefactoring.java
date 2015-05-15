@@ -178,7 +178,7 @@ public class CommentsRefactoring extends AbstractRefactoringRule {
     @Override
     public boolean visit(Javadoc node) {
         final String comment = getComment(node);
-        final boolean isWelFormattedInheritDoc = "/** {@inheritDoc} */".equals(comment);
+        final boolean isWellFormattedInheritDoc = "/** {@inheritDoc} */".equals(comment);
         final Matcher emptyLineAtStartMatcher = EMPTY_LINE_AT_START_OF_JAVADOC.matcher(comment);
         final Matcher emptyLineAtEndMatcher = EMPTY_LINE_AT_END_OF_BLOCK_COMMENT.matcher(comment);
         if (EMPTY_JAVADOC.matcher(comment).matches()) {
@@ -191,7 +191,7 @@ public class CommentsRefactoring extends AbstractRefactoringRule {
         } else if (allTagsEmpty(tags(node))) {
             this.ctx.getRefactorings().remove(node);
             return DO_NOT_VISIT_SUBTREE;
-        } else if (!isWelFormattedInheritDoc
+        } else if (!isWellFormattedInheritDoc
                 && JAVADOC_ONLY_INHERITDOC.matcher(comment).matches()) {
             // Put on one line only to augment vertical density of code
             int startLine = this.astRoot.getLineNumber(node.getStartPosition());
@@ -203,7 +203,7 @@ public class CommentsRefactoring extends AbstractRefactoringRule {
         } else if (!acceptJavadoc(getNextNode(node))) {
             this.ctx.getRefactorings().replace(node, comment.replace("/**", "/*"));
             return DO_NOT_VISIT_SUBTREE;
-        } else if (!isWelFormattedInheritDoc
+        } else if (!isWellFormattedInheritDoc
                 && !JAVADOC_HAS_PUNCTUATION.matcher(comment).find()) {
             final String newComment = addPeriodAtEndOfFirstLine(node, comment);
             if (newComment != null) {
@@ -394,9 +394,9 @@ public class CommentsRefactoring extends AbstractRefactoringRule {
     }
 
     private boolean isSameLineNumber(LineComment node, ASTNode previousNode) {
-        final CompilationUnit root = (CompilationUnit) previousNode.getRoot();
-        final int lineNb1 = root.getLineNumber(node.getStartPosition());
-        final int lineNb2 = root.getLineNumber(previousNode.getStartPosition());
+        final CompilationUnit cu = (CompilationUnit) previousNode.getRoot();
+        final int lineNb1 = cu.getLineNumber(node.getStartPosition());
+        final int lineNb2 = cu.getLineNumber(previousNode.getStartPosition());
         return lineNb1 == lineNb2;
     }
 
