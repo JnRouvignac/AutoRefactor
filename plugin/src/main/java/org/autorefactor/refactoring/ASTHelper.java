@@ -609,6 +609,18 @@ public final class ASTHelper {
      * Generecized version of the equivalent JDT method.
      *
      * @param node the node on which to call the equivalent JDT method
+     * @return a List of abstract type declarations
+     * @see UnionType#types()
+     */
+    @SuppressWarnings("unchecked")
+    public static List<Type> types(UnionType node) {
+        return node.types();
+    }
+
+    /**
+     * Generecized version of the equivalent JDT method.
+     *
+     * @param node the node on which to call the equivalent JDT method
      * @return a List of expressions
      * @see NormalAnnotation#values()
      */
@@ -1172,6 +1184,46 @@ public final class ASTHelper {
         return true;
     }
 
+    /**
+     * Returns a set made of all the method bindings which are overridden by the provided method binding.
+     *
+     * @param overridingMethod the overriding method binding
+     * @return a set made of all the method bindings which are overridden by the provided method binding
+     */
+    public static Set<IMethodBinding> getOverridenMethods(IMethodBinding overridingMethod) {
+        final Set<IMethodBinding> results = new HashSet<IMethodBinding>();
+        findOverridenMethods(overridingMethod, results, overridingMethod.getDeclaringClass());
+        return results;
+    }
+
+    private static void findOverridenMethods(IMethodBinding overridingMethod, Set<IMethodBinding> results,
+            ITypeBinding declaringClass) {
+        final ITypeBinding superclass = declaringClass.getSuperclass();
+        if (superclass != null) {
+            for (IMethodBinding methodFromSuperclass : superclass.getDeclaredMethods()) {
+                if (overridingMethod.overrides(methodFromSuperclass)) {
+                    if (!results.add(methodFromSuperclass)) {
+                        // type has already been visited
+                        return;
+                    }
+                }
+            }
+            findOverridenMethods(overridingMethod, results, superclass);
+        }
+
+        for (ITypeBinding itf : declaringClass.getInterfaces()) {
+            for (IMethodBinding methodFromItf : itf.getDeclaredMethods()) {
+                if (overridingMethod.overrides(methodFromItf)) {
+                    if (!results.add(methodFromItf)) {
+                        // type has already been visited
+                        return;
+                    }
+                }
+            }
+            findOverridenMethods(overridingMethod, results, itf);
+        }
+    }
+
     private static IMethodBinding findOverridenMethod(ITypeBinding typeBinding, String typeQualifiedName,
             String methodName, String[] parameterTypesQualifiedNames) {
         // superclass
@@ -1469,6 +1521,8 @@ public final class ASTHelper {
             return ((QualifiedName) node).resolveBinding();
         case SIMPLE_NAME:
             return ((SimpleName) node).resolveBinding();
+        case SINGLE_VARIABLE_DECLARATION:
+            return ((SingleVariableDeclaration) node).resolveBinding();
         case VARIABLE_DECLARATION_FRAGMENT:
             return ((VariableDeclarationFragment) node).resolveBinding();
         }

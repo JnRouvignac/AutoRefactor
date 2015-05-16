@@ -85,6 +85,7 @@ public final class AllRefactoringRules {
                 // TODO JNR complete it
                 // new GenerecizeRefactoring(),
                 new UseDiamondOperatorRefactoring(),
+                new UseMultiCatchRefactoring(),
                 new CollectionRefactoring(),
                 new NoAssignmentInIfConditionRefactoring(),
                 new IfElseIfRefactoring(),
