@@ -52,6 +52,10 @@ import static org.autorefactor.refactoring.ASTHelper.*;
 /** Refactors catch clauses with the same body to use Java 7's multi-catch. */
 public class UseMultiCatchRefactoring extends AbstractRefactoringRule {
 
+    private static enum AggregateDirection {
+        NONE, FORWARD, BACKWARD;
+    }
+
     private static final class MultiCatchASTMatcher extends ASTMatcher {
         private final CatchClause catchClause1;
         private final CatchClause catchClause2;
@@ -112,13 +116,18 @@ public class UseMultiCatchRefactoring extends AbstractRefactoringRule {
             CatchClause catchClause1 = catchClauses.get(i);
             for (int j = i + 1; j < catchClauses.size(); j++) {
                 CatchClause catchClause2 = catchClauses.get(j);
-                if (!changeInBehaviour(catchClauses, i, j)
+                AggregateDirection direction = aggregateDirection(catchClauses, i, j);
+                if (!AggregateDirection.NONE.equals(direction)
                         && matchMultiCatch(catchClause1, catchClause2)) {
                     Refactorings r = this.ctx.getRefactorings();
-                    SingleVariableDeclaration svd = catchClause1.getException();
                     UnionType ut = concat(catchClause1.getException().getType(), catchClause2.getException().getType());
-                    r.set(svd, SingleVariableDeclaration.TYPE_PROPERTY, ut);
-                    r.remove(catchClause2);
+                    if (AggregateDirection.BACKWARD.equals(direction)) {
+                        r.remove(catchClause1);
+                        r.set(catchClause2.getException(), SingleVariableDeclaration.TYPE_PROPERTY, ut);
+                    } else if (AggregateDirection.FORWARD.equals(direction)) {
+                        r.set(catchClause1.getException(), SingleVariableDeclaration.TYPE_PROPERTY, ut);
+                        r.remove(catchClause2);
+                    }
                     return DO_NOT_VISIT_SUBTREE;
                 }
             }
@@ -131,17 +140,24 @@ public class UseMultiCatchRefactoring extends AbstractRefactoringRule {
         return match(matcher, catchClause1.getBody(), catchClause2.getBody());
     }
 
-    private boolean changeInBehaviour(List<CatchClause> catchClauses, int start, int end) {
-        ITypeBinding startType = resolveTypeBinding(catchClauses, start);
-        ITypeBinding endType = resolveTypeBinding(catchClauses, end);
-        for (int i = start + 1; i < end; i++) {
-            ITypeBinding type = resolveTypeBinding(catchClauses, i);
-            if (startType.isSubTypeCompatible(type)
-                    && type.isSubTypeCompatible(endType)) {
-                return true;
+    private AggregateDirection aggregateDirection(List<CatchClause> catchClauses, int start, int end) {
+        final ITypeBinding[] types = new ITypeBinding[catchClauses.size()];
+        for (int i = start; i <= end; i++) {
+            types[i] = resolveTypeBinding(catchClauses, i);
+            if (types[i] == null) {
+                return AggregateDirection.NONE;
             }
         }
-        return false;
+
+        if (changeInBehaviour(types, start, end)) {
+            return AggregateDirection.NONE;
+        } else if (canRefactorBackward(types, start, end)) {
+            return AggregateDirection.BACKWARD;
+        } else if (canRefactorForward(types, start, end)) {
+            return AggregateDirection.FORWARD;
+        } else {
+            return AggregateDirection.NONE;
+        }
     }
 
     private ITypeBinding resolveTypeBinding(List<CatchClause> catchClauses, int pos) {
@@ -151,6 +167,42 @@ public class UseMultiCatchRefactoring extends AbstractRefactoringRule {
             return vb.getType();
         }
         return null;
+    }
+
+    private boolean changeInBehaviour(ITypeBinding[] types, int start, int end) {
+        ITypeBinding startType = types[start];
+        ITypeBinding endType = types[end];
+        for (int i = start + 1; i < end; i++) {
+            final ITypeBinding type = types[i];
+            if (type != null
+                    && startType.isSubTypeCompatible(type)
+                    && type.isSubTypeCompatible(endType)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean canRefactorBackward(final ITypeBinding[] types, int start, int end) {
+        final ITypeBinding startType = types[start];
+        for (int i = start + 1; i < end; i++) {
+            final ITypeBinding type = types[i];
+            if (startType.isSubTypeCompatible(type)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean canRefactorForward(final ITypeBinding[] types, int start, int end) {
+        final ITypeBinding endType = types[end];
+        for (int i = start + 1; i < end; i++) {
+            final ITypeBinding type = types[i];
+            if (endType.isSubTypeCompatible(type)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private UnionType concat(Type... types) {

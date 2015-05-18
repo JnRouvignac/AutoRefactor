@@ -67,40 +67,40 @@ public class UseMultiCatchSample {
     public void refactorMultiCatch(ThrowingObject<IllegalArgumentException, IOException> obj) {
         try {
             obj.throwingMethod();
-        } catch (IllegalArgumentException | IOException iae) {
-            iae.printStackTrace();
+        } catch (IllegalArgumentException | IOException ioe) {
+            ioe.printStackTrace();
         }
     }
 
     public void refactorAddToMultiCatch(ThrowingObject<IllegalArgumentException, IOException> obj) {
         try {
             obj.throwingMethod();
-        } catch (IllegalArgumentException | IllegalStateException | IOException iae) {
-            iae.printStackTrace();
+        } catch (IllegalArgumentException | IllegalStateException | IOException ioe) {
+            ioe.printStackTrace();
         }
     }
 
     public void removeMoreSpecializedException(ThrowingObject<IllegalArgumentException, RuntimeException> obj) {
         try {
             obj.throwingMethod();
-        } catch (RuntimeException iae) {
-            iae.printStackTrace();
+        } catch (RuntimeException re) {
+            re.printStackTrace();
         }
     }
 
     public void refactorMultiCatchWithOverridenMethods(ThrowingObject<IllegalArgumentException, OverridingException1> obj) {
         try {
             obj.throwingMethod();
-        } catch (IllegalArgumentException | OverridingException1 iae) {
-            iae.printStackTrace();
+        } catch (IllegalArgumentException | OverridingException1 oe1) {
+            oe1.printStackTrace();
         }
     }
 
     public void refactorMultiCatchWithOverridenMethodsFromSupertype(ThrowingObject<OverridingException1, OverridingException2> obj) {
         try {
             obj.throwingMethod();
-        } catch (OverridingException1 | OverridingException2 oe1) {
-            oe1.printStackTrace();
+        } catch (OverridingException1 | OverridingException2 oe2) {
+            oe2.printStackTrace();
         }
     }
 
@@ -124,7 +124,7 @@ public class UseMultiCatchSample {
         }
     }
 
-    public void doNotRefactorChangeInBehaviour(ThrowingObject<IllegalArgumentException, Exception> obj) {
+    public void doNotRefactorChangeInBehaviourClassHierarchy(ThrowingObject<IllegalArgumentException, Exception> obj) {
         try {
             obj.throwingMethod();
         } catch (IllegalArgumentException iae) {
@@ -133,6 +133,26 @@ public class UseMultiCatchSample {
             ioe.toString();
         } catch (Throwable t) {
             t.printStackTrace();
+        }
+    }
+
+    public void refactorForward(ThrowingObject<IllegalArgumentException, NamingException> obj) {
+        try {
+            obj.throwingMethod();
+        } catch (IllegalArgumentException | NamingException iae) {
+            iae.printStackTrace();
+        } catch (RuntimeException re) {
+            re.toString();
+        }
+    }
+
+    public void refactorBackward(ThrowingObject<NamingException, RuntimeException> obj) {
+        try {
+            obj.throwingMethod();
+        } catch (RuntimeException ioe) {
+            ioe.toString();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

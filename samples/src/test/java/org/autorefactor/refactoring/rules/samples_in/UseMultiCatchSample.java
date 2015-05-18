@@ -134,7 +134,7 @@ public class UseMultiCatchSample {
         }
     }
 
-    public void doNotRefactorChangeInBehaviour(ThrowingObject<IllegalArgumentException, Exception> obj) {
+    public void doNotRefactorChangeInBehaviourClassHierarchy(ThrowingObject<IllegalArgumentException, Exception> obj) {
         try {
             obj.throwingMethod();
         } catch (IllegalArgumentException iae) {
@@ -143,6 +143,30 @@ public class UseMultiCatchSample {
             ioe.toString();
         } catch (Throwable t) {
             t.printStackTrace();
+        }
+    }
+
+    public void refactorForward(ThrowingObject<IllegalArgumentException, NamingException> obj) {
+        try {
+            obj.throwingMethod();
+        } catch (IllegalArgumentException iae) {
+            iae.printStackTrace();
+        } catch (RuntimeException re) {
+            re.toString();
+        } catch (NamingException ne) {
+            ne.printStackTrace();
+        }
+    }
+
+    public void refactorBackward(ThrowingObject<NamingException, RuntimeException> obj) {
+        try {
+            obj.throwingMethod();
+        } catch (NamingException iae) {
+            iae.printStackTrace();
+        } catch (RuntimeException ioe) {
+            ioe.toString();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }
