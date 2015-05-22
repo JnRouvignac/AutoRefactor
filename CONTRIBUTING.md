@@ -29,3 +29,7 @@ You can run tests by:
 ### JDT Gotchas
 
 See [JDT Gotchas](https://github.com/JnRouvignac/AutoRefactor/wiki/JDT-Gotchas)
+
+# Website developers/designers
+
+* [AutoRefactor website](http://autorefactor.org) could certainly do with some love!
