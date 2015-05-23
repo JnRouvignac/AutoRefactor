@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2013-2014 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2013-2015 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -239,13 +239,13 @@ public class SimplifyExpressionRefactoring extends AbstractRefactoringRule {
                 if (nb.doubleValue() == 0) {
                     return VISIT_SUBTREE;
                 }
-                if (EQUALS.equals(ie.getOperator())) {
+                if (hasOperator(ie, EQUALS)) {
                     if (nb.doubleValue() < 0) {
                         return replaceWithCorrectCheckOnCompareTo(ie, LESS);
                     } else if (nb.doubleValue() > 0) {
                         return replaceWithCorrectCheckOnCompareTo(ie, GREATER);
                     }
-                } else if (NOT_EQUALS.equals(ie.getOperator())) {
+                } else if (hasOperator(ie, NOT_EQUALS)) {
                     if (nb.doubleValue() < 0) {
                         return replaceWithCorrectCheckOnCompareTo(ie, GREATER_EQUALS);
                     } else if (nb.doubleValue() > 0) {
@@ -272,16 +272,15 @@ public class SimplifyExpressionRefactoring extends AbstractRefactoringRule {
     public boolean visit(InfixExpression node) {
         final Expression lhs = node.getLeftOperand();
         final Expression rhs = node.getRightOperand();
-        final Operator operator = node.getOperator();
         final Object lhsConstantValue = lhs.resolveConstantExpressionValue();
-        if (CONDITIONAL_OR.equals(operator)) {
+        if (hasOperator(node, CONDITIONAL_OR)) {
             if (Boolean.TRUE.equals(lhsConstantValue)) {
                 return replaceByCopy(node, lhs);
             } else if (Boolean.FALSE.equals(lhsConstantValue)) {
                 checkNoExtendedOperands(node);
                 return replaceByCopy(node, rhs);
             }
-        } else if (CONDITIONAL_AND.equals(operator)) {
+        } else if (hasOperator(node, CONDITIONAL_AND)) {
             if (Boolean.TRUE.equals(lhsConstantValue)) {
                 checkNoExtendedOperands(node);
                 return replaceByCopy(node, rhs);
@@ -299,7 +298,7 @@ public class SimplifyExpressionRefactoring extends AbstractRefactoringRule {
                     return replaceByCopy(node, lhs);
                 }
             }
-        } else if (EQUALS.equals(operator)) {
+        } else if (hasOperator(node, EQUALS)) {
             boolean result = VISIT_SUBTREE;
             final Boolean blo = getBooleanLiteral(lhs);
             final Boolean bro = getBooleanLiteral(rhs);
@@ -311,7 +310,7 @@ public class SimplifyExpressionRefactoring extends AbstractRefactoringRule {
             if (result == DO_NOT_VISIT_SUBTREE) {
                 return DO_NOT_VISIT_SUBTREE;
             }
-        } else if (NOT_EQUALS.equals(operator)) {
+        } else if (hasOperator(node, NOT_EQUALS)) {
             boolean continueVisit = VISIT_SUBTREE;
             final Boolean blo = getBooleanLiteral(lhs);
             final Boolean bro = getBooleanLiteral(rhs);
@@ -438,7 +437,7 @@ public class SimplifyExpressionRefactoring extends AbstractRefactoringRule {
     private Expression getNullCheckedExpression(Expression e) {
         if (e instanceof InfixExpression) {
             final InfixExpression expr = (InfixExpression) e;
-            if (NOT_EQUALS.equals(expr.getOperator()) && checkNoExtendedOperands(expr)) {
+            if (hasOperator(expr, NOT_EQUALS) && checkNoExtendedOperands(expr)) {
                 if (isNullLiteral(expr.getLeftOperand())) {
                     return expr.getRightOperand();
                 } else if (isNullLiteral(expr.getRightOperand())) {

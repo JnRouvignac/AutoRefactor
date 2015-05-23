@@ -872,6 +872,50 @@ public final class ASTHelper {
     // AST checks
 
     /**
+     * Returns whether the provided operator is the same as the one of provided node.
+     *
+     * @param node the node for which to test the operator
+     * @param operator the operator to test
+     * @return true if the provided node has the provided operator, false otherwise.
+     */
+    public static boolean hasOperator(Assignment node, Assignment.Operator operator) {
+        return node != null && operator.equals(node.getOperator());
+    }
+
+    /**
+     * Returns whether the provided operator is the same as the one of provided node.
+     *
+     * @param node the node for which to test the operator
+     * @param operator the operator to test
+     * @return true if the provided node has the provided operator, false otherwise.
+     */
+    public static boolean hasOperator(InfixExpression node, InfixExpression.Operator operator) {
+        return node != null && operator.equals(node.getOperator());
+    }
+
+    /**
+     * Returns whether the provided operator is the same as the one of provided node.
+     *
+     * @param node the node for which to test the operator
+     * @param operator the operator to test
+     * @return true if the provided node has the provided operator, false otherwise.
+     */
+    public static boolean hasOperator(PostfixExpression node, PostfixExpression.Operator operator) {
+        return node != null && operator.equals(node.getOperator());
+    }
+
+    /**
+     * Returns whether the provided operator is the same as the one of provided node.
+     *
+     * @param node the node for which to test the operator
+     * @param operator the operator to test
+     * @return true if the provided node has the provided operator, false otherwise.
+     */
+    public static boolean hasOperator(PrefixExpression node, PrefixExpression.Operator operator) {
+        return node != null && operator.equals(node.getOperator());
+    }
+
+    /**
      * Returns whether the provided expression evaluates to exactly one of the provided type.
      *
      * @param expr the expression to analyze

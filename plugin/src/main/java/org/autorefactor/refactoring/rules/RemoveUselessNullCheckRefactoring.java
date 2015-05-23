@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2014 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2014-2015 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -38,6 +38,7 @@ import org.eclipse.jdt.core.dom.Statement;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.eclipse.jdt.core.dom.Assignment.Operator.*;
+import static org.eclipse.jdt.core.dom.InfixExpression.Operator.*;
 
 /**
  * Refactoring removing useless null checks before assignments or return statements.
@@ -61,13 +62,13 @@ public class RemoveUselessNullCheckRefactoring extends AbstractRefactoringRule {
                 && elseStmt != null) {
             final Assignment thenAs = asExpression(thenStmt, Assignment.class);
             final Assignment elseAs = asExpression(elseStmt, Assignment.class);
-            if (isAssign(thenAs)
-                    && isAssign(elseAs)
+            if (hasOperator(thenAs, ASSIGN)
+                    && hasOperator(elseAs, ASSIGN)
                     && match(matcher, thenAs.getLeftHandSide(), elseAs.getLeftHandSide())) {
-                if (InfixExpression.Operator.EQUALS.equals(condition.getOperator())
+                if (hasOperator(condition, EQUALS)
                         && isNullLiteral(thenAs.getRightHandSide())) {
                     return replaceWithStraightAssign(node, condition, elseAs);
-                } else if (InfixExpression.Operator.NOT_EQUALS.equals(condition.getOperator())
+                } else if (hasOperator(condition, NOT_EQUALS)
                         && isNullLiteral(elseAs.getRightHandSide())) {
                     return replaceWithStraightAssign(node, condition, thenAs);
                 }
@@ -75,9 +76,9 @@ public class RemoveUselessNullCheckRefactoring extends AbstractRefactoringRule {
                 final ReturnStatement thenRS = as(thenStmt, ReturnStatement.class);
                 final ReturnStatement elseRS = as(elseStmt, ReturnStatement.class);
                 if (thenRS != null && elseRS != null) {
-                    if (InfixExpression.Operator.EQUALS.equals(condition.getOperator())) {
+                    if (hasOperator(condition, EQUALS)) {
                         return replaceWithStraightReturn(node, condition, elseRS, thenRS, elseRS);
-                    } else if (InfixExpression.Operator.NOT_EQUALS.equals(condition.getOperator())) {
+                    } else if (hasOperator(condition, NOT_EQUALS)) {
                         return replaceWithStraightReturn(node, condition, thenRS, elseRS, elseRS);
                     }
                 }
@@ -104,10 +105,6 @@ public class RemoveUselessNullCheckRefactoring extends AbstractRefactoringRule {
             return getNextSibling(node);
         }
         return null;
-    }
-
-    private boolean isAssign(final Assignment as) {
-        return as != null && ASSIGN.equals(as.getOperator());
     }
 
     private boolean replaceWithStraightAssign(IfStatement node, InfixExpression condition, Assignment as) {

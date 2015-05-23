@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2014 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2014-2015 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,8 +25,6 @@
  */
 package org.autorefactor.refactoring;
 
-import static org.autorefactor.refactoring.ASTHelper.*;
-
 import java.util.List;
 
 import org.eclipse.jdt.core.dom.Assignment;
@@ -40,9 +38,11 @@ import org.eclipse.jdt.core.dom.PrefixExpression;
 import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
-/**
- * Helper class for dealing with loops.
- */
+import static org.autorefactor.refactoring.ASTHelper.*;
+import static org.eclipse.jdt.core.dom.Assignment.Operator.*;
+import static org.eclipse.jdt.core.dom.InfixExpression.Operator.*;
+
+/** Helper class for dealing with loops. */
 public final class ForLoopHelper {
 
     private ForLoopHelper() {
@@ -150,12 +150,12 @@ public final class ForLoopHelper {
         Expression updaterOperand = null;
         if (updater instanceof PostfixExpression) {
             final PostfixExpression pe = (PostfixExpression) updater;
-            if (PostfixExpression.Operator.INCREMENT.equals(pe.getOperator())) {
+            if (hasOperator(pe, PostfixExpression.Operator.INCREMENT)) {
                 updaterOperand = pe.getOperand();
             }
         } else if (updater instanceof PrefixExpression) {
             final PrefixExpression pe = (PrefixExpression) updater;
-            if (PrefixExpression.Operator.INCREMENT.equals(pe.getOperator())) {
+            if (hasOperator(pe, PrefixExpression.Operator.INCREMENT)) {
                 updaterOperand = pe.getOperand();
             }
         }
@@ -180,7 +180,7 @@ public final class ForLoopHelper {
             }
         } else if (init instanceof Assignment) {
             final Assignment as = (Assignment) init;
-            if (Assignment.Operator.ASSIGN.equals(as.getOperator())
+            if (hasOperator(as, ASSIGN)
                     && isZero(as.getRightHandSide())
                     && as.getLeftHandSide() instanceof Name) {
                 return (Name) as.getLeftHandSide();
@@ -204,9 +204,9 @@ public final class ForLoopHelper {
         if (ie != null && !ie.hasExtendedOperands()) {
             final Expression leftOp = ie.getLeftOperand();
             final Expression rightOp = ie.getRightOperand();
-            if (InfixExpression.Operator.LESS.equals(ie.getOperator())) {
+            if (hasOperator(ie, LESS)) {
                 return buildForLoopContent(leftOp, rightOp);
-            } else if (InfixExpression.Operator.GREATER.equals(ie.getOperator())) {
+            } else if (hasOperator(ie, GREATER)) {
                 return buildForLoopContent(rightOp, leftOp);
             }
         }

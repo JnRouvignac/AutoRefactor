@@ -41,7 +41,6 @@ import org.eclipse.jdt.core.dom.ForStatement;
 import org.eclipse.jdt.core.dom.IBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.InfixExpression;
-import org.eclipse.jdt.core.dom.InfixExpression.Operator;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Name;
 import org.eclipse.jdt.core.dom.SimpleName;
@@ -52,6 +51,7 @@ import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.autorefactor.refactoring.ForLoopHelper.*;
+import static org.eclipse.jdt.core.dom.InfixExpression.Operator.*;
 
 /**
  * Converts code to use {@link Collection#addAll(Collection)}, {@link Collection#containsAll(Collection)}
@@ -260,24 +260,23 @@ public class CollectionRefactoring extends AbstractRefactoringRule {
         final Refactorings r = this.ctx.getRefactorings();
         final ASTBuilder b = this.ctx.getASTBuilder();
         final Expression copyOfExpr = b.copyExpression(miToReplace);
-        final Operator op = node.getOperator();
-        if (Operator.GREATER.equals(op)) {
+        if (hasOperator(node, GREATER)) {
             r.replace(node,
                     b.not(b.invoke(copyOfExpr, "isEmpty")));
             return DO_NOT_VISIT_SUBTREE;
-        } else if (Operator.GREATER_EQUALS.equals(op)) {
+        } else if (hasOperator(node, GREATER_EQUALS)) {
             r.replace(node,
                     b.boolean0(true));
             return DO_NOT_VISIT_SUBTREE;
-        } else if (Operator.EQUALS.equals(op)) {
+        } else if (hasOperator(node, EQUALS)) {
             r.replace(node,
                     b.invoke(copyOfExpr, "isEmpty"));
             return DO_NOT_VISIT_SUBTREE;
-        } else if (Operator.LESS_EQUALS.equals(op)) {
+        } else if (hasOperator(node, LESS_EQUALS)) {
             r.replace(node,
                     b.invoke(copyOfExpr, "isEmpty"));
             return DO_NOT_VISIT_SUBTREE;
-        } else if (Operator.LESS.equals(op)) {
+        } else if (hasOperator(node, LESS)) {
             r.replace(node,
                     b.boolean0(false));
         }
@@ -288,24 +287,23 @@ public class CollectionRefactoring extends AbstractRefactoringRule {
         final Refactorings r = this.ctx.getRefactorings();
         final ASTBuilder b = this.ctx.getASTBuilder();
         final Expression copyOfExpr = b.copyExpression(miToReplace);
-        final Operator op = node.getOperator();
-        if (Operator.LESS.equals(op)) {
+        if (hasOperator(node, LESS)) {
             r.replace(node,
                     b.not(b.invoke(copyOfExpr, "isEmpty")));
             return DO_NOT_VISIT_SUBTREE;
-        } else if (Operator.LESS_EQUALS.equals(op)) {
+        } else if (hasOperator(node, LESS_EQUALS)) {
             r.replace(node,
                     b.boolean0(true));
             return DO_NOT_VISIT_SUBTREE;
-        } else if (Operator.EQUALS.equals(op)) {
+        } else if (hasOperator(node, EQUALS)) {
             r.replace(node,
                     b.invoke(copyOfExpr, "isEmpty"));
             return DO_NOT_VISIT_SUBTREE;
-        } else if (Operator.GREATER_EQUALS.equals(op)) {
+        } else if (hasOperator(node, GREATER_EQUALS)) {
             r.replace(node,
                     b.invoke(copyOfExpr, "isEmpty"));
             return DO_NOT_VISIT_SUBTREE;
-        } else if (Operator.GREATER.equals(op)) {
+        } else if (hasOperator(node, GREATER)) {
             r.replace(node,
                     b.boolean0(false));
         }

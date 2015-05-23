@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2013-2014 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2013-2015 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -47,6 +47,7 @@ import org.eclipse.jdt.core.dom.Name;
 import org.eclipse.jdt.core.dom.StringLiteral;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
+import static org.eclipse.jdt.core.dom.InfixExpression.Operator.*;
 
 /**
  * StringBuilder related refactorings:
@@ -84,8 +85,7 @@ public class StringBuilderRefactoring extends AbstractRefactoringRule {
         // String s = "" + String.valueOf(1);
         // String s = "" + Integer.toString(1);
         // String s = "" + Long.toString(1);
-        if (Operator.PLUS.equals(node.getOperator())
-                && hasType(node, "java.lang.String")) {
+        if (isStringConcat(node)) {
             final LinkedList<Expression> allOperands = new LinkedList<Expression>();
             addAllSubExpressions(node, allOperands, null);
             boolean replaceNeeded = filterOutEmptyStringsFromStringConcat(allOperands);
@@ -343,8 +343,7 @@ public class StringBuilderRefactoring extends AbstractRefactoringRule {
             final AtomicBoolean hasStringConcat) {
         if (arg instanceof InfixExpression) {
             final InfixExpression ie = (InfixExpression) arg;
-            if (hasType(ie, "java.lang.String")
-                    && InfixExpression.Operator.PLUS.equals(ie.getOperator())) {
+            if (isStringConcat(ie)) {
                 if (ie.hasExtendedOperands()) {
                     final List<Expression> reversed = new ArrayList<Expression>(extendedOperands(ie));
                     Collections.reverse(reversed);
@@ -361,5 +360,10 @@ public class StringBuilderRefactoring extends AbstractRefactoringRule {
             }
         }
         results.addFirst(arg);
+    }
+
+    private boolean isStringConcat(InfixExpression node) {
+        return hasOperator(node, PLUS)
+                && hasType(node, "java.lang.String");
     }
 }

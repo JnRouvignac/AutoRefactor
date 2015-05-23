@@ -87,9 +87,9 @@ public class RemoveUnnecessaryCastRefactoring extends AbstractRefactoringRule {
             if (node.equals(lo)) {
                 return (isStringConcat(ie) || isAssignmentCompatible(node.getExpression(), ro))
                         && !isPrimitiveTypeNarrowing(node)
-                        && !DIVIDE.equals(ie.getOperator())
-                        && !PLUS.equals(ie.getOperator())
-                        && !MINUS.equals(ie.getOperator());
+                        && !hasOperator(ie, DIVIDE)
+                        && !hasOperator(ie, PLUS)
+                        && !hasOperator(ie, MINUS);
             } else {
                 final boolean integralDivision = isIntegralDivision(ie);
                 return ((isNotRefactored(lo) && isStringConcat(ie))
@@ -110,7 +110,7 @@ public class RemoveUnnecessaryCastRefactoring extends AbstractRefactoringRule {
     }
 
     private boolean isIntegralDivision(final InfixExpression ie) {
-        return isIntegralType(ie) && DIVIDE.equals(ie.getOperator());
+        return isIntegralType(ie) && hasOperator(ie, DIVIDE);
     }
 
     private boolean isAssignmentCompatibleInInfixExpression(final CastExpression node, final InfixExpression ie) {
@@ -191,7 +191,7 @@ public class RemoveUnnecessaryCastRefactoring extends AbstractRefactoringRule {
     private boolean isIntegralDividedByFloatingPoint(CastExpression node, InfixExpression ie) {
         final Expression rightOp = ie.getRightOperand();
         return isIntegralType(ie.getLeftOperand())
-                && DIVIDE.equals(ie.getOperator())
+                && hasOperator(ie, DIVIDE)
                 && isFloatingPointType(rightOp)
                 && node.equals(rightOp);
     }

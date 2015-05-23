@@ -40,7 +40,6 @@ import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.ImportDeclaration;
 import org.eclipse.jdt.core.dom.InfixExpression;
-import org.eclipse.jdt.core.dom.InfixExpression.Operator;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.PrefixExpression;
 import org.eclipse.jdt.core.dom.QualifiedName;
@@ -49,6 +48,8 @@ import org.eclipse.jdt.core.dom.Statement;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.eclipse.jdt.core.dom.ASTNode.*;
+import static org.eclipse.jdt.core.dom.InfixExpression.Operator.*;
+import static org.eclipse.jdt.core.dom.PrefixExpression.Operator.*;
 
 /**
  * Refactors the use of TestNG assertions.
@@ -127,9 +128,9 @@ public class TestNGAssertRefactoring extends AbstractRefactoringRule {
         final PrefixExpression arg0pe = as(arg0, PrefixExpression.class);
         final Refactorings r = this.ctx.getRefactorings();
         if (arg0Ie != null) {
-            if (Operator.EQUALS.equals(arg0Ie.getOperator())) {
+            if (hasOperator(arg0Ie, EQUALS)) {
                 return invokeAssert(node, arg0Ie, !isAssertTrue);
-            } else if (Operator.NOT_EQUALS.equals(arg0Ie.getOperator())) {
+            } else if (hasOperator(arg0Ie, NOT_EQUALS)) {
                 return invokeAssert(node, arg0Ie, isAssertTrue);
             }
         } else if (isMethod(arg0mi, OBJECT, "equals", OBJECT)) {
@@ -139,7 +140,7 @@ public class TestNGAssertRefactoring extends AbstractRefactoringRule {
                         invokeAssert(node, assertName, arg0mi.getExpression(), arguments(arg0mi)));
                 return DO_NOT_VISIT_SUBTREE;
             }
-        } else if (arg0pe != null && PrefixExpression.Operator.NOT.equals(arg0pe.getOperator())) {
+        } else if (hasOperator(arg0pe, NOT)) {
             final MethodInvocation negatedMi = as(arg0pe.getOperand(), MethodInvocation.class);
             if (isMethod(negatedMi, OBJECT, "equals", OBJECT)) {
                 String assertName = getAssertName(isAssertTrue, "Equals");
@@ -371,9 +372,9 @@ public class TestNGAssertRefactoring extends AbstractRefactoringRule {
                 final PrefixExpression conditionPe = as(node.getExpression(), PrefixExpression.class);
                 final Refactorings r = this.ctx.getRefactorings();
                 if (conditionIe != null) {
-                    if (Operator.EQUALS.equals(conditionIe.getOperator())) {
+                    if (hasOperator(conditionIe, EQUALS)) {
                         return invokeAssertForFail(node, mi, conditionIe, true);
-                    } else if (Operator.NOT_EQUALS.equals(conditionIe.getOperator())) {
+                    } else if (hasOperator(conditionIe, NOT_EQUALS)) {
                         return invokeAssertForFail(node, mi, conditionIe, false);
                     }
                 } else if (isMethod(conditionMi, OBJECT, "equals", OBJECT)) {
@@ -383,7 +384,7 @@ public class TestNGAssertRefactoring extends AbstractRefactoringRule {
                                         conditionMi.getExpression(), arguments(conditionMi).get(0)));
                         return DO_NOT_VISIT_SUBTREE;
                     }
-                } else if (conditionPe != null && PrefixExpression.Operator.NOT.equals(conditionPe.getOperator())) {
+                } else if (hasOperator(conditionPe, NOT)) {
                     final MethodInvocation negatedMi = as(conditionPe.getOperand(), MethodInvocation.class);
                     if (isMethod(negatedMi, OBJECT, "equals", OBJECT)) {
                         r.replace(node,

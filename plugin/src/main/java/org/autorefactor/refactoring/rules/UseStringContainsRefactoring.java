@@ -77,7 +77,7 @@ public class UseStringContainsRefactoring extends AbstractRefactoringRule {
     private boolean is(final InfixExpression ie, MethodInvocation node, Operator operator, Integer constant) {
         final Expression leftOp = removeParentheses(ie.getLeftOperand());
         final Expression rightOp = removeParentheses(ie.getRightOperand());
-        if (operator.equals(ie.getOperator())) {
+        if (hasOperator(ie, operator)) {
             if (leftOp.equals(node)
                     && constant.equals(rightOp.resolveConstantExpressionValue())) {
                 return true;

@@ -68,6 +68,7 @@ import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
+import static org.eclipse.jdt.core.dom.Assignment.Operator.*;
 
 /**
  * Boolean related refactorings:
@@ -278,9 +279,8 @@ public class BooleanRefactoring extends AbstractRefactoringRule {
 
     private boolean noThenReturnStmt(final IfStatement node) {
         final Assignment thenA = asExpression(node.getThenStatement(), Assignment.class);
-        if (thenA != null
+        if (hasOperator(thenA, ASSIGN)
                 && asList(node.getElseStatement()).isEmpty()
-                && Assignment.Operator.ASSIGN.equals(thenA.getOperator())
                 && (thenA.getLeftHandSide() instanceof Name
                     || thenA.getLeftHandSide() instanceof FieldAccess)) {
             final Statement previousSibling = getPreviousSibling(node);
@@ -293,8 +293,7 @@ public class BooleanRefactoring extends AbstractRefactoringRule {
                 }
             } else if (previousSibling instanceof ExpressionStatement) {
                 final Assignment elseA = asExpression(previousSibling, Assignment.class);
-                if (elseA != null
-                        && Assignment.Operator.ASSIGN.equals(elseA.getOperator())
+                if (hasOperator(elseA, ASSIGN)
                         && isSameVariable(
                                 thenA.getLeftHandSide(),
                                 elseA.getLeftHandSide())) {

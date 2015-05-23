@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2013 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2013-2015 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -68,7 +68,7 @@ public class CollapseIfStatementRefactoring extends AbstractRefactoringRule {
     private Expression parenthesizeOrExpr(ASTBuilder b, Expression expr) {
         if (expr instanceof InfixExpression) {
             final InfixExpression ie = (InfixExpression) expr;
-            if (CONDITIONAL_OR.equals(ie.getOperator())) {
+            if (hasOperator(ie, CONDITIONAL_OR)) {
                 return b.parenthesize(b.copy(ie));
             }
         }

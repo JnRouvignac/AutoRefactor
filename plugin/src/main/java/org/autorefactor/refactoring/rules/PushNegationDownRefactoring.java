@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2014 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2014-2015 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,23 +35,22 @@ import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.PrefixExpression;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
+import static org.eclipse.jdt.core.dom.PrefixExpression.Operator.*;
 
-/**
- * Pushes negations down, inside the expressions.
- */
+/** Pushes negations down, inside the expressions. */
 public class PushNegationDownRefactoring extends AbstractRefactoringRule {
 
     /** {@inheritDoc} */
     @Override
     public boolean visit(PrefixExpression node) {
-        if (!PrefixExpression.Operator.NOT.equals(node.getOperator())) {
+        if (!hasOperator(node, NOT)) {
             return VISIT_SUBTREE;
         }
         final ASTBuilder b = this.ctx.getASTBuilder();
         final Expression operand = removeParentheses(node.getOperand());
         if (operand instanceof PrefixExpression) {
             final PrefixExpression pe = (PrefixExpression) operand;
-            if (PrefixExpression.Operator.NOT.equals(pe.getOperator())) {
+            if (hasOperator(pe, NOT)) {
                 this.ctx.getRefactorings().replace(node,
                         b.move(pe.getOperand()));
                 return DO_NOT_VISIT_SUBTREE;

@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2013-2014 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2013-2015 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -42,6 +42,7 @@ import org.eclipse.jdt.core.dom.StringLiteral;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.autorefactor.refactoring.JavaConstants.*;
+import static org.eclipse.jdt.core.dom.InfixExpression.Operator.*;
 
 /**
  * Refactors to a proper use of BigDecimals:
@@ -173,7 +174,7 @@ public class BigDecimalRefactoring extends AbstractRefactoringRule {
     private boolean isInStringAppend(ASTNode node) {
         if (node instanceof InfixExpression) {
             final InfixExpression expr = (InfixExpression) node;
-            if (Operator.PLUS.equals(expr.getOperator())
+            if (hasOperator(expr, PLUS)
                     || hasType(expr.getLeftOperand(), "java.lang.String")
                     || hasType(expr.getRightOperand(), "java.lang.String")) {
                 return true;

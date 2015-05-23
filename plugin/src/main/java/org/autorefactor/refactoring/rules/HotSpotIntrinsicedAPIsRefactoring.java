@@ -47,6 +47,9 @@ import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.autorefactor.util.Utils.*;
+import static org.eclipse.jdt.core.dom.Assignment.Operator.*;
+import static org.eclipse.jdt.core.dom.InfixExpression.Operator.*;
+
 /**
  * Refactors code patterns to use intrinsiced APIs in Hotspot JVM.
  * intrinsics are APIs that receive special treatment when JITed:
@@ -118,7 +121,7 @@ public class HotSpotIntrinsicedAPIsRefactoring extends AbstractRefactoringRule {
         } else if (index instanceof InfixExpression) {
             final InfixExpression ie = (InfixExpression) index;
             if (!ie.hasExtendedOperands()
-                    && InfixExpression.Operator.PLUS.equals(ie.getOperator())) {
+                    && hasOperator(ie, PLUS)) {
                 final Expression leftOp = ie.getLeftOperand();
                 final Expression rightOp = ie.getRightOperand();
                 if (leftOp instanceof SimpleName) {
@@ -189,24 +192,24 @@ public class HotSpotIntrinsicedAPIsRefactoring extends AbstractRefactoringRule {
             final IVariableBinding incrementedIdx, final SystemArrayCopyParams params) {
         if (condition instanceof InfixExpression) {
             final InfixExpression ie = (InfixExpression) condition;
-            if (InfixExpression.Operator.LESS.equals(ie.getOperator())) {
+            if (hasOperator(ie, LESS)) {
                 IVariableBinding conditionIdx = getVariableBinding(ie.getLeftOperand());
                 if (equalNotNull(incrementedIdx, conditionIdx)) {
                     params.length = ie.getRightOperand();
                 }
-            } else if (InfixExpression.Operator.LESS_EQUALS.equals(ie.getOperator())) {
+            } else if (hasOperator(ie, LESS_EQUALS)) {
                 IVariableBinding conditionIdx = getVariableBinding(ie.getLeftOperand());
                 if (equalNotNull(incrementedIdx, conditionIdx)) {
                     params.length = minus(
                             plus(ie.getRightOperand(), ctx.getAST().newNumberLiteral("1")),
                             params.indexStartPos);
                 }
-            } else if (InfixExpression.Operator.GREATER.equals(ie.getOperator())) {
+            } else if (hasOperator(ie, GREATER)) {
                 IVariableBinding conditionIdx = getVariableBinding(ie.getRightOperand());
                 if (equalNotNull(incrementedIdx, conditionIdx)) {
                     params.length = ie.getLeftOperand();
                 }
-            } else if (InfixExpression.Operator.GREATER_EQUALS.equals(ie.getOperator())) {
+            } else if (hasOperator(ie, GREATER_EQUALS)) {
                 IVariableBinding conditionIdx = getVariableBinding(ie.getRightOperand());
                 if (equalNotNull(incrementedIdx, conditionIdx)) {
                     params.length = minus(
@@ -279,7 +282,7 @@ public class HotSpotIntrinsicedAPIsRefactoring extends AbstractRefactoringRule {
             }
         } else if (initializer0 instanceof Assignment) {
             final Assignment as = (Assignment) initializer0;
-            if (Assignment.Operator.ASSIGN.equals(as.getOperator())
+            if (hasOperator(as, ASSIGN)
                     && isPrimitive(as.resolveTypeBinding(), "int")) {
                 // this must be the array index
                 params.indexStartPos = as.getRightHandSide();
@@ -302,12 +305,12 @@ public class HotSpotIntrinsicedAPIsRefactoring extends AbstractRefactoringRule {
         final Expression updater0 = updaters(node).get(0);
         if (updater0 instanceof PostfixExpression) {
             final PostfixExpression pe = (PostfixExpression) updater0;
-            if (PostfixExpression.Operator.INCREMENT.equals(pe.getOperator())) {
+            if (hasOperator(pe, PostfixExpression.Operator.INCREMENT)) {
                 return getVariableBinding(pe.getOperand());
             }
         } else if (updater0 instanceof PrefixExpression) {
             final PrefixExpression pe = (PrefixExpression) updater0;
-            if (PrefixExpression.Operator.INCREMENT.equals(pe.getOperator())) {
+            if (hasOperator(pe, PrefixExpression.Operator.INCREMENT)) {
                 return getVariableBinding(pe.getOperand());
             }
         }

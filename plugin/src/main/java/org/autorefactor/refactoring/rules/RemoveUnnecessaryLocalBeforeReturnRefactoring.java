@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2013-2014 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2013-2015 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -39,6 +39,7 @@ import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
+import static org.eclipse.jdt.core.dom.Assignment.Operator.*;
 
 /**
  * Removes unnecessary local variable declaration or unnecessary variable
@@ -63,7 +64,7 @@ public class RemoveUnnecessaryLocalBeforeReturnRefactoring extends AbstractRefac
         } else {
             final Assignment as = asExpression(previousSibling, Assignment.class);
             final Expression origExpr = node.getExpression();
-            if (as != null && Assignment.Operator.ASSIGN.equals(as.getOperator())) {
+            if (hasOperator(as, ASSIGN)) {
                 final Expression newExpr = as.getLeftHandSide();
                 replaceReturnStatement(node, previousSibling, origExpr, newExpr,
                         as.getRightHandSide());
