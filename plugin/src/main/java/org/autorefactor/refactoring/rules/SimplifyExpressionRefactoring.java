@@ -45,7 +45,6 @@ import org.eclipse.jdt.core.dom.InfixExpression.Operator;
 import org.eclipse.jdt.core.dom.InstanceofExpression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.ParenthesizedExpression;
-import org.eclipse.jdt.core.dom.PrefixExpression;
 import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.WhileStatement;
@@ -392,23 +391,12 @@ public class SimplifyExpressionRefactoring extends AbstractRefactoringRule {
         final ASTBuilder b = this.ctx.getASTBuilder();
         Expression operand;
         if (negate) {
-            operand = negate(b, exprToCopy);
+            operand = b.negate(exprToCopy);
         } else {
             operand = b.copy(exprToCopy);
         }
         this.ctx.getRefactorings().replace(node, operand);
         return DO_NOT_VISIT_SUBTREE;
-    }
-
-    private Expression negate(ASTBuilder b, Expression expr) {
-        if (expr instanceof PrefixExpression) {
-            final PrefixExpression pe = (PrefixExpression) expr;
-            if (PrefixExpression.Operator.NOT.equals(pe.getOperator())) {
-                return b.copy(removeParentheses(pe.getOperand()));
-            }
-        }
-
-        return b.not(b.parenthesizeIfNeeded(b.copy(expr)));
     }
 
     private boolean replaceByCopy(ASTNode node, Expression expr) {

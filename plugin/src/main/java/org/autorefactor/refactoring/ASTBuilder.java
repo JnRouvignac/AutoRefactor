@@ -69,12 +69,48 @@ import org.eclipse.jdt.core.dom.Type;
 import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.autorefactor.util.Utils.*;
 import static org.eclipse.jdt.core.dom.ASTNode.*;
+import static org.eclipse.jdt.core.dom.PrefixExpression.Operator.*;
 
 /**
  * Helper class for building AST note in a somewhat fluent API.
  * Method names which are also java keywords are postfixed with a "0".
  */
 public class ASTBuilder {
+
+    /** Copy operations to be performed deeply into {@link ASTBuilder} methods. */
+    public enum Copy {
+        /** Do not perform any copy. Returns the node as is. */
+        NONE {
+            @Override
+            protected <T extends ASTNode> T perform(ASTBuilder b, T node) {
+                return node;
+            }
+        },
+        /** Delegates to {@link ASTBuilder#copy(ASTNode)}. */
+        COPY {
+            @Override
+            protected <T extends ASTNode> T perform(ASTBuilder b, T node) {
+                return b.copy(node);
+            }
+        },
+        /** Delegates to {@link ASTBuilder#move(ASTNode)}. */
+        MOVE {
+            @Override
+            protected <T extends ASTNode> T perform(ASTBuilder b, T node) {
+                return b.move(node);
+            }
+        };
+
+        /**
+         * Performs the copy operation on the provided node  with the provided {@link ASTBuilder}.
+         *
+         * @param b the {@link ASTBuilder} allowing to copy the provided node
+         * @param node the node on which to perform the copy operation
+         * @param <T> the node type
+         * @return the copied node
+         */
+        protected abstract <T extends ASTNode> T perform(ASTBuilder b, T node);
+    }
 
     private final AST ast;
     private final Refactorings refactorings;
@@ -527,7 +563,36 @@ public class ASTBuilder {
      * @return a new prefix expression
      */
     public Expression not(Expression expr) {
-        return prefixExpr(PrefixExpression.Operator.NOT, expr);
+        return prefixExpr(NOT, expr);
+    }
+
+    /**
+     * Negates the provided expression by moving it in the AST.
+     *
+     * @param expr the expression to negate
+     * @return the negated expression, moved in the AST
+     */
+    public Expression negate(Expression expr) {
+        return negate(expr, Copy.MOVE);
+    }
+
+    /**
+     * Negates the provided expression and applies the provided copy operation on the returned expression.
+     *
+     * @param expr the expression to negate
+     * @param copy the copy operation to perform
+     * @return the negated expression, copied according to the copy operation
+     */
+    public Expression negate(Expression expr, Copy copy) {
+        final Expression exprNoParen = removeParentheses(expr);
+        if (exprNoParen.getNodeType() == PREFIX_EXPRESSION) {
+            final PrefixExpression pe = (PrefixExpression) exprNoParen;
+            if (NOT.equals(pe.getOperator())) {
+                return copy.perform(this, removeParentheses(pe.getOperand()));
+            }
+        }
+
+        return not(parenthesizeIfNeeded(copy.perform(this, expr)));
     }
 
     /**
@@ -658,5 +723,4 @@ public class ASTBuilder {
         }
         return expr;
     }
-
 }

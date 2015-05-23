@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.autorefactor.refactoring.ASTBuilder;
+import org.autorefactor.refactoring.ASTBuilder.Copy;
 import org.autorefactor.util.IllegalArgumentException;
 import org.autorefactor.util.IllegalStateException;
 import org.autorefactor.util.NotImplementedException;
@@ -57,7 +58,6 @@ import org.eclipse.jdt.core.dom.InfixExpression.Operator;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Name;
-import org.eclipse.jdt.core.dom.PrefixExpression;
 import org.eclipse.jdt.core.dom.PrimitiveType;
 import org.eclipse.jdt.core.dom.QualifiedName;
 import org.eclipse.jdt.core.dom.ReturnStatement;
@@ -68,7 +68,6 @@ import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
-import static org.eclipse.jdt.core.dom.ASTNode.*;
 
 /**
  * Boolean related refactorings:
@@ -371,7 +370,7 @@ public class BooleanRefactoring extends AbstractRefactoringRule {
 
     private Expression negateIfNeeded(Expression ie, boolean negate) {
         if (negate) {
-            return negate(ie, false);
+            return b.negate(ie, Copy.NONE);
         }
         return ie;
     }
@@ -394,7 +393,7 @@ public class BooleanRefactoring extends AbstractRefactoringRule {
         if (areOppositeValues(returnThenLiteral, returnElseLiteral)) {
             Expression exprToReturn = b.copy(node.getExpression());
             if (returnElseLiteral) {
-                exprToReturn = negate(exprToReturn, false);
+                exprToReturn = b.negate(exprToReturn, Copy.NONE);
             }
 
             final MethodDeclaration md = getAncestor(node, MethodDeclaration.class);
@@ -441,20 +440,8 @@ public class BooleanRefactoring extends AbstractRefactoringRule {
         if (doNotNegate) {
             return getExpression(b.copy(ifCondition), expressionName, booleanName);
         }
-        final Expression negatedIfCondition = negate(ifCondition, true);
+        final Expression negatedIfCondition = b.negate(ifCondition, Copy.COPY);
         return getExpression(negatedIfCondition, expressionName, booleanName);
-    }
-
-    private Expression negate(Expression expr, boolean doCopy) {
-        if (expr.getNodeType() == PREFIX_EXPRESSION) {
-            final PrefixExpression pe = (PrefixExpression) expr;
-            if (PrefixExpression.Operator.NOT.equals(pe.getOperator())) {
-                final Expression expr2 = removeParentheses(pe.getOperand());
-                return doCopy ? b.copy(expr2) : expr2;
-            }
-        }
-
-        return b.not(b.parenthesizeIfNeeded(doCopy ? b.copy(expr) : expr));
     }
 
     private Expression getExpression(Expression ifCondition, String expressionTypeName, Name booleanName) {

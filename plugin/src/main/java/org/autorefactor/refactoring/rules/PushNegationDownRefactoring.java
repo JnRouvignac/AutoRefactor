@@ -63,13 +63,13 @@ public class PushNegationDownRefactoring extends AbstractRefactoringRule {
                 final List<Expression> extendedOperands = new ArrayList<Expression>(extendedOperands(ie));
                 if (hasType(ie.getLeftOperand(), "boolean", "java.lang.Boolean")) {
                     for (ListIterator<Expression> it = extendedOperands.listIterator(); it.hasNext();) {
-                        it.set(negate(b, it.next()));
+                        it.set(b.negate(it.next()));
                     }
                     this.ctx.getRefactorings().replace(node,
                             b.parenthesize(b.infixExpr(
-                                    negate(b, ie.getLeftOperand()),
+                                    b.negate(ie.getLeftOperand()),
                                     (InfixExpression.Operator) reverseOp,
-                                    negate(b, ie.getRightOperand()),
+                                    b.negate(ie.getRightOperand()),
                                     extendedOperands)));
                     return DO_NOT_VISIT_SUBTREE;
                 } else {
@@ -88,17 +88,4 @@ public class PushNegationDownRefactoring extends AbstractRefactoringRule {
         }
         return VISIT_SUBTREE;
     }
-
-    private Expression negate(final ASTBuilder b, Expression expr) {
-        final Expression expr2 = removeParentheses(expr);
-        if (expr2 instanceof PrefixExpression) {
-            final PrefixExpression pe = (PrefixExpression) expr2;
-            if (PrefixExpression.Operator.NOT.equals(pe.getOperator())) {
-                return b.move(pe.getOperand());
-            }
-        }
-
-        return b.not(b.parenthesizeIfNeeded(b.move(expr)));
-    }
-
 }
