@@ -169,8 +169,8 @@ public class SimplifyExpressionRefactoring extends AbstractRefactoringRule {
                 if (Operator.EQUALS.equals(parentOp) || shouldHaveParentheses(innerOp, parentOp)) {
                     return true;
                 }
-                return as(innerIe.getLeftOperand(), Assignment.class) != null
-                        || as(innerIe.getRightOperand(), Assignment.class) != null;
+                return is(innerIe.getLeftOperand(), Assignment.class)
+                        || is(innerIe.getRightOperand(), Assignment.class);
             }
         } else if (parent instanceof ConditionalExpression) {
             return innerExpr instanceof ConditionalExpression

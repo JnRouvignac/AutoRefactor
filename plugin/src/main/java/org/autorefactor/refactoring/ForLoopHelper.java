@@ -218,8 +218,8 @@ public final class ForLoopHelper {
                 && loopVar instanceof Name) {
             final MethodInvocation mi = (MethodInvocation) containerVar;
             final Name containerVarName = as(mi.getExpression(), Name.class);
-            if (isMethod(mi, "java.util.Collection", "size")
-                    && containerVarName != null) {
+            if (containerVarName != null
+                    && isMethod(mi, "java.util.Collection", "size")) {
                 final ForLoopContent content = new ForLoopContent();
                 content.loopVariable = (Name) loopVar;
                 content.containerVariable = containerVarName;

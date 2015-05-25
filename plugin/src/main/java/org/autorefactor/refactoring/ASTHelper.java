@@ -242,6 +242,17 @@ public final class ASTHelper {
     }
 
     /**
+     * Returns whether the provided statement has the provided type.
+     *
+     * @param stmt the statement to test
+     * @param stmtClazz the type to test the statement against
+     * @return {@code true} if the provided statement has the provided type, {@code false} otherwise
+     */
+    public static boolean is(Statement stmt, Class<? extends Statement> stmtClazz) {
+        return as(stmt, stmtClazz) != null;
+    }
+
+    /**
      * Casts the provided expression to an object of the provided type if type matches.
      *
      * @param <T> the required expression type
@@ -262,13 +273,24 @@ public final class ASTHelper {
     }
 
     /**
+     * Returns whether the provided expression has the provided type.
+     *
+     * @param expr the expression to test
+     * @param exprClazz the type to test the expression against
+     * @return {@code true} if the provided expression has the provided type, {@code false} otherwise
+     */
+    public static boolean is(Expression expr, Class<? extends Expression> exprClazz) {
+        return as(expr, exprClazz) != null;
+    }
+
+    /**
      * Returns whether the provided expression represents a {@link NullLiteral} ignoring parentheses.
      *
      * @param expr the expression to check
      * @return true if the provided expression represents a {@link NullLiteral} ignoring parentheses, false otherwise
      */
     public static boolean isNullLiteral(Expression expr) {
-        return as(expr, NullLiteral.class) != null;
+        return is(expr, NullLiteral.class);
     }
 
     /**

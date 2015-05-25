@@ -153,8 +153,8 @@ public class DeadCodeEliminationRefactoring extends AbstractRefactoringRule {
             IfStatement is = (IfStatement) parent;
             List<Statement> thenStmts = asList(is.getThenStatement());
             List<Statement> elseStmts = asList(is.getElseStatement());
-            boolean thenIsEmptyStmt = thenStmts.size() == 1 && as(thenStmts.get(0), EmptyStatement.class) != null;
-            boolean elseIsEmptyStmt = elseStmts.size() == 1 && as(elseStmts.get(0), EmptyStatement.class) != null;
+            boolean thenIsEmptyStmt = thenStmts.size() == 1 && is(thenStmts.get(0), EmptyStatement.class);
+            boolean elseIsEmptyStmt = elseStmts.size() == 1 && is(elseStmts.get(0), EmptyStatement.class);
             if (thenIsEmptyStmt && elseIsEmptyStmt) {
                 this.ctx.getRefactorings().remove(parent);
                 return DO_NOT_VISIT_SUBTREE;
