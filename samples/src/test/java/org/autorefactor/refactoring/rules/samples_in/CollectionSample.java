@@ -28,6 +28,7 @@ package org.autorefactor.refactoring.rules.samples_in;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 public class CollectionSample {
 
@@ -108,5 +109,39 @@ public class CollectionSample {
         System.out.println(0 == col.size());
         System.out.println(0 >= col.size());
         System.out.println(0 > col.size());
+    }
+
+    public void replaceCheckOnSetContainsBeforeAdd(Set<String> col, String s) {
+        if (!col.contains(s)) {
+            col.add(s);
+            System.out.println("OK");
+        } else {
+            System.out.println("KO");
+        }
+    }
+
+    public void replaceCheckOnSetContainsBeforeAdd2(Set<String> col, String s) {
+        if (col.contains(s)) {
+            System.out.println("KO");
+        } else {
+            col.add(s);
+            System.out.println("OK");
+        }
+    }
+
+    public void doNotReplaceWhenCheckedValueIsDifferent(Set<String> col) {
+        if (!col.contains("this")) {
+            col.add("that");
+            System.out.println("OK");
+        }
+    }
+
+    public void doNotReplaceCheckOnListContainsBeforeAdd(List<String> col, String s) {
+        if (!col.contains(s)) {
+            col.add(s);
+            System.out.println("OK");
+        } else {
+            System.out.println("KO");
+        }
     }
 }

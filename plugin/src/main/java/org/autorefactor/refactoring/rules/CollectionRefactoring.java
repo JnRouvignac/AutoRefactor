@@ -29,8 +29,10 @@ import java.util.Collection;
 import java.util.List;
 
 import org.autorefactor.refactoring.ASTBuilder;
+import org.autorefactor.refactoring.ASTBuilder.Copy;
 import org.autorefactor.refactoring.ForLoopHelper.ForLoopContent;
 import org.autorefactor.refactoring.Refactorings;
+import org.eclipse.jdt.core.dom.ASTMatcher;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
@@ -40,9 +42,11 @@ import org.eclipse.jdt.core.dom.ExpressionStatement;
 import org.eclipse.jdt.core.dom.ForStatement;
 import org.eclipse.jdt.core.dom.IBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;
+import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Name;
+import org.eclipse.jdt.core.dom.PrefixExpression;
 import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.Statement;
@@ -52,6 +56,7 @@ import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.autorefactor.refactoring.ForLoopHelper.*;
 import static org.eclipse.jdt.core.dom.InfixExpression.Operator.*;
+import static org.eclipse.jdt.core.dom.PrefixExpression.Operator.*;
 
 /**
  * Converts code to use {@link Collection#addAll(Collection)}, {@link Collection#containsAll(Collection)}
@@ -65,7 +70,7 @@ public class CollectionRefactoring extends AbstractRefactoringRule {
     public boolean visit(ExpressionStatement node) {
         final MethodInvocation mi = asExpression(node, MethodInvocation.class);
         if (isMethod(mi, "java.util.Collection", "addAll", "java.util.Collection")) {
-            final Expression arg0 = arguments(mi).get(0);
+            final Expression arg0 = arg0(mi);
             final Statement previousStmt = getPreviousSibling(node);
 
             final Assignment as = asExpression(previousStmt, Assignment.class);
@@ -172,9 +177,8 @@ public class CollectionRefactoring extends AbstractRefactoringRule {
 
     private boolean replaceWithCollectionMethod(EnhancedForStatement node,
             Expression collection, String methodName, MethodInvocation colMI) {
-        final Expression arg0 = arguments(colMI).get(0);
         final SingleVariableDeclaration foreachVariable = node.getParameter();
-        if (isSameLocalVariable(arg0, foreachVariable.resolveBinding())) {
+        if (isSameLocalVariable(arg0(colMI), foreachVariable.resolveBinding())) {
             return replaceWithCollectionMethod(node, methodName,
                     colMI.getExpression(), collection);
         }
@@ -201,11 +205,11 @@ public class CollectionRefactoring extends AbstractRefactoringRule {
 
     private boolean replaceWithCollectionMethod(ForStatement node, ForLoopContent loopContent,
             String methodName, MethodInvocation colMI) {
-        final Expression addArg0 = arguments(colMI).get(0);
+        final Expression addArg0 = arg0(colMI);
         final MethodInvocation getMI = as(addArg0, MethodInvocation.class);
         if (isMethod(getMI, "java.util.List", "get", "int")
                 && getMI.getExpression() instanceof Name) {
-            final Expression getArg0 = arguments(getMI).get(0);
+            final Expression getArg0 = arg0(getMI);
             if (getArg0 instanceof Name
                     && isSameLocalVariable(getArg0, loopContent.getLoopVariable())) {
                 return replaceWithCollectionMethod(node, methodName,
@@ -320,5 +324,49 @@ public class CollectionRefactoring extends AbstractRefactoringRule {
             }
         }
         return false;
+    }
+
+    @Override
+    public boolean visit(IfStatement node) {
+        final PrefixExpression pe = as(node.getExpression(), PrefixExpression.class);
+        if (hasOperator(pe, NOT)) {
+            final MethodInvocation miContains = as(pe.getOperand(), MethodInvocation.class);
+            return maybeReplaceSetContains(miContains, node.getThenStatement(), pe, false);
+        } else {
+            final MethodInvocation miContains = as(node.getExpression(), MethodInvocation.class);
+            return maybeReplaceSetContains(miContains, node.getElseStatement(), miContains, true);
+        }
+    }
+
+    private boolean maybeReplaceSetContains(
+            MethodInvocation miContains, Statement stmt, Expression toReplace, boolean negate) {
+        if (isMethod(miContains, "java.util.Set", "contains", "java.lang.Object")) {
+            Statement firstStmt = getAsList(stmt, 0);
+            MethodInvocation miAdd = asExpression(firstStmt, MethodInvocation.class);
+            if (isMethod(miAdd, "java.util.Set", "add", "java.lang.Object")
+                    && match(new ASTMatcher(), arg0(miContains), arg0(miAdd))) {
+                ASTBuilder b = this.ctx.getASTBuilder();
+                Refactorings r = this.ctx.getRefactorings();
+                r.replace(toReplace, negate ? b.negate(miAdd, Copy.COPY.MOVE) : b.move(miAdd));
+                r.remove(firstStmt);
+                return DO_NOT_VISIT_SUBTREE;
+            }
+        }
+        return VISIT_SUBTREE;
+    }
+
+    private Statement getAsList(Statement stmt, int index) {
+        if (index < 0) {
+            throw new IllegalArgumentException("A list index cannot be negative. Given: " + index);
+        }
+        final List<Statement> stmts = asList(stmt);
+        if (stmts.size() > index) {
+            return stmts.get(index);
+        }
+        return null;
+    }
+
+    private Expression arg0(MethodInvocation miContains) {
+        return arguments(miContains).get(0);
     }
 }
