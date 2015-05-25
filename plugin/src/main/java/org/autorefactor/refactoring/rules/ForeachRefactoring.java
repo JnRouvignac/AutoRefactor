@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2013 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2013-2015 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -38,7 +38,8 @@ import org.eclipse.jdt.core.dom.WhileStatement;
 import static org.autorefactor.refactoring.ASTHelper.*;
 
 /**
- * Replace while/for with iterator/for with index loops into foreach loops.
+ * Replace while/for with iterator/for with index loops into foreach loops
+ * (applicable to arrays or {@link Iterable}).
  * <p>
  * Also Replace Map keys iteration + {@link Map#get(Object)} with iterations
  * over {@link Map#entrySet()}
