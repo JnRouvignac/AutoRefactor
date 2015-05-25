@@ -36,7 +36,7 @@ public class DeadCodeEliminationSample {
         return i;
     }
 
-    private int doesNotKnowHowToRemoveEmptyThenClause(boolean b) {
+    private int removeEmptyThenClause(boolean b) {
         int i = 0;
         if (b) {
         } else {

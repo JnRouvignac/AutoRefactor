@@ -28,6 +28,7 @@ package org.autorefactor.refactoring.rules;
 import java.util.List;
 
 import org.autorefactor.refactoring.ASTBuilder;
+import org.autorefactor.refactoring.Refactorings;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.EmptyStatement;
@@ -58,36 +59,31 @@ public class DeadCodeEliminationRefactoring extends AbstractRefactoringRule {
 
     /** {@inheritDoc} */
     @Override
-    public boolean visit(Block node) {
-        if (!statements(node).isEmpty()) {
-            return VISIT_SUBTREE;
-        }
-        final ASTNode parent = node.getParent();
-        if (parent instanceof IfStatement) {
-            final IfStatement is = (IfStatement) parent;
-            if (is.getElseStatement() == node) {
-                this.ctx.getRefactorings().remove(node);
-                return DO_NOT_VISIT_SUBTREE;
-            } // TODO handle empty then clause
-        }
-        return VISIT_SUBTREE;
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public boolean visit(IfStatement node) {
-        final Object constantCondition =
-                node.getExpression().resolveConstantExpressionValue();
         final ASTBuilder b = this.ctx.getASTBuilder();
+        final Refactorings r = this.ctx.getRefactorings();
+
+        final Statement thenStmt = node.getThenStatement();
+        final Statement elseStmt = node.getElseStatement();
+        if (elseStmt != null && asList(elseStmt).isEmpty()) {
+            r.remove(elseStmt);
+            return DO_NOT_VISIT_SUBTREE;
+        } else if (thenStmt != null && asList(thenStmt).isEmpty()) {
+            r.replace(node,
+                    b.if0(b.negate(node.getExpression()),
+                            b.move(elseStmt)));
+            return DO_NOT_VISIT_SUBTREE;
+        }
+
+        final Object constantCondition = node.getExpression().resolveConstantExpressionValue();
         if (Boolean.TRUE.equals(constantCondition)) {
-            this.ctx.getRefactorings().replace(node, b.copy(node.getThenStatement()));
+            r.replace(node, b.copy(node.getThenStatement()));
             return DO_NOT_VISIT_SUBTREE;
         } else if (Boolean.FALSE.equals(constantCondition)) {
-            final Statement elseStmt = node.getElseStatement();
             if (elseStmt != null) {
-                this.ctx.getRefactorings().replace(node, b.copy(elseStmt));
+                r.replace(node, b.copy(elseStmt));
             } else {
-                this.ctx.getRefactorings().remove(node);
+                r.remove(node);
             }
             return DO_NOT_VISIT_SUBTREE;
         }
