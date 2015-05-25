@@ -365,8 +365,4 @@ public class CollectionRefactoring extends AbstractRefactoringRule {
         }
         return null;
     }
-
-    private Expression arg0(MethodInvocation miContains) {
-        return arguments(miContains).get(0);
-    }
 }

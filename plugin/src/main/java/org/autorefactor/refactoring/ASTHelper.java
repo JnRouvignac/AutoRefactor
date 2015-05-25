@@ -36,6 +36,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.autorefactor.util.IllegalArgumentException;
 import org.autorefactor.util.IllegalStateException;
 import org.autorefactor.util.NotImplementedException;
 import org.eclipse.jdt.core.dom.AST;
@@ -385,6 +386,26 @@ public final class ASTHelper {
     @SuppressWarnings("unchecked")
     public static List<Expression> arguments(SuperMethodInvocation node) {
         return node.arguments();
+    }
+
+    /**
+     * Returns the first argument of the provided method invocation.
+     * <p>
+     * Equivalent to:
+     * <pre>
+     * ASTHelper.arguments(methodInvocation).get(0)
+     * </pre>
+     *
+     * @param node the method invocation for which to get the first argument
+     * @return the first argument if it exists
+     * @throws IllegalArgumentException if this method invocation has no arguments
+     */
+    public static Expression arg0(final MethodInvocation node) {
+        final List<Expression> args = arguments(node);
+        if (args.isEmpty()) {
+            throw new IllegalArgumentException(node, "The arguments must not be empty for method " + node);
+        }
+        return args.get(0);
     }
 
     /**

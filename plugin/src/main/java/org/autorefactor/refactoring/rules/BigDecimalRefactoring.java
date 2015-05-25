@@ -133,7 +133,7 @@ public class BigDecimalRefactoring extends AbstractRefactoringRule {
                 && (isMethod(node, "java.math.BigDecimal", "valueOf", "long")
                     || isMethod(node, "java.math.BigDecimal", "valueOf", "double"))) {
             final ITypeBinding typeBinding = node.getExpression().resolveTypeBinding();
-            final Expression arg0 = arguments(node).get(0);
+            final Expression arg0 = arg0(node);
             if (arg0 instanceof NumberLiteral) {
                 final NumberLiteral nb = (NumberLiteral) arg0;
                 if (nb.getToken().contains(".")) {
@@ -153,7 +153,7 @@ public class BigDecimalRefactoring extends AbstractRefactoringRule {
                 return DO_NOT_VISIT_SUBTREE;
             }
         } else if (isMethod(node, "java.math.BigDecimal", "equals", "java.lang.Object")) {
-            final Expression arg0 = arguments(node).get(0);
+            final Expression arg0 = arg0(node);
             if (hasType(arg0, "java.math.BigDecimal")) {
                 if (isInStringAppend(node.getParent())) {
                     this.ctx.getRefactorings().replace(node,
@@ -191,7 +191,7 @@ public class BigDecimalRefactoring extends AbstractRefactoringRule {
     private InfixExpression getCompareToNode(MethodInvocation node) {
         final ASTBuilder b = this.ctx.getASTBuilder();
         final MethodInvocation mi = b.invoke(
-                b.copy(node.getExpression()), "compareTo", b.copy(arguments(node).get(0)));
+                b.copy(node.getExpression()), "compareTo", b.copy(arg0(node)));
 
         return b.infixExpr(mi, Operator.EQUALS, b.int0(0));
     }

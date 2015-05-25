@@ -28,7 +28,6 @@ package org.autorefactor.refactoring.rules;
 import java.util.List;
 
 import org.autorefactor.refactoring.ASTBuilder;
-import org.autorefactor.util.NotImplementedException;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.BooleanLiteral;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
@@ -108,7 +107,7 @@ public class PrimitiveWrapperCreationRefactoring extends AbstractRefactoringRule
             if (cicArgs.size() == 1) {
                 final Expression arg0 = cicArgs.get(0);
                 final ITypeBinding arg0TypeBinding = arg0.resolveTypeBinding();
-                if (arguments(node).size() == 0
+                if (arguments(node).isEmpty()
                         && arg0TypeBinding != null
                         && "java.lang.String".equals(arg0TypeBinding.getQualifiedName())) {
                     final String methodName = getMethodName(
@@ -137,12 +136,8 @@ public class PrimitiveWrapperCreationRefactoring extends AbstractRefactoringRule
     }
 
     private boolean replaceWithTheSingleArgument(MethodInvocation node) {
-        final List<Expression> args = arguments(node);
-        if (args.size() != 1) {
-            throw new NotImplementedException(node, "expected 1 argument, but got " + args.size());
-        }
         final ASTBuilder b = this.ctx.getASTBuilder();
-        this.ctx.getRefactorings().replace(node, b.copy(args.get(0)));
+        this.ctx.getRefactorings().replace(node, b.copy(arg0(node)));
         return DO_NOT_VISIT_SUBTREE;
     }
 

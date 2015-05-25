@@ -164,7 +164,7 @@ public class StringBuilderRefactoring extends AbstractRefactoringRule {
             if (isStringValueOf(embeddedMI)
                 && (instanceOf(typeBinding, "java.lang.StringBuilder")
                     || instanceOf(typeBinding, "java.lang.StringBuffer"))) {
-                final Expression arg0 = arguments(embeddedMI).get(0);
+                final Expression arg0 = arg0(embeddedMI);
                 this.ctx.getRefactorings().replace(node,
                         createStringAppends(lastExpr, Arrays.asList(arg0)));
                 return DO_NOT_VISIT_SUBTREE;
@@ -242,7 +242,7 @@ public class StringBuilderRefactoring extends AbstractRefactoringRule {
                         || isMethod(mi, "java.lang.Long", "toString", "long")
                         || isMethod(mi, "java.lang.Float", "toString", "float")
                         || isMethod(mi, "java.lang.Double", "toString", "double")) {
-                    iter.set(arguments(mi).get(0));
+                    iter.set(arg0(mi));
                     result = true;
                 }
             }

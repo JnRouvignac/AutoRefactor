@@ -54,7 +54,7 @@ public class InvertEqualsRefactoring extends AbstractRefactoringRule {
                 isMethod(node, "java.lang.String", "equalsIgnoreCase", "java.lang.String");
         if (isEquals || isStringEqualsIgnoreCase) {
             final Expression expr = node.getExpression();
-            final Expression arg0 = arguments(node).get(0);
+            final Expression arg0 = arg0(node);
             if (!isConstant(expr) && isConstant(arg0)) {
                 this.ctx.getRefactorings().replace(node,
                         invertEqualsInvocation(expr, arg0, isEquals));

@@ -121,8 +121,7 @@ public class TestNGAssertRefactoring extends AbstractRefactoringRule {
     }
 
     private boolean maybeRefactorAssertTrue(MethodInvocation node, boolean isAssertTrue) {
-        final List<Expression> args = arguments(node);
-        final Expression arg0 = args.get(0);
+        final Expression arg0 = arg0(node);
         final InfixExpression arg0Ie = as(arg0, InfixExpression.class);
         final MethodInvocation arg0mi = as(arg0, MethodInvocation.class);
         final PrefixExpression arg0pe = as(arg0, PrefixExpression.class);
@@ -381,7 +380,7 @@ public class TestNGAssertRefactoring extends AbstractRefactoringRule {
                     if (canUseAssertNotEquals) {
                         r.replace(node,
                                 invokeAssertForFail(mi, "assertNotEquals",
-                                        conditionMi.getExpression(), arguments(conditionMi).get(0)));
+                                        conditionMi.getExpression(), arg0(conditionMi)));
                         return DO_NOT_VISIT_SUBTREE;
                     }
                 } else if (hasOperator(conditionPe, NOT)) {
@@ -389,7 +388,7 @@ public class TestNGAssertRefactoring extends AbstractRefactoringRule {
                     if (isMethod(negatedMi, OBJECT, "equals", OBJECT)) {
                         r.replace(node,
                                 invokeAssertForFail(mi, "assertEquals",
-                                        negatedMi.getExpression(), arguments(negatedMi).get(0)));
+                                        negatedMi.getExpression(), arg0(negatedMi)));
                         return DO_NOT_VISIT_SUBTREE;
                     }
                 }
