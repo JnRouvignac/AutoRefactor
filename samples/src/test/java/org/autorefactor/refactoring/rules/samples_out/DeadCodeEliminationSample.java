@@ -27,6 +27,23 @@ package org.autorefactor.refactoring.rules.samples_out;
 
 public class DeadCodeEliminationSample {
 
+    private class Parent {
+        void removeUselessOverride() {
+        }
+        void removeOverrideWithInsignificantAnnotations() {
+        }
+        void doNotRemoveSignificantAnnotation() {
+        }
+    }
+
+    private class Child extends Parent {
+        @Deprecated
+        @Override
+        void doNotRemoveSignificantAnnotation() {
+            super.doNotRemoveSignificantAnnotation();
+        }
+    }
+
     private int removeEmptyElseClause(boolean b) {
         int i = 0;
         if (b) {

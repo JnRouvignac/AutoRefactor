@@ -34,8 +34,13 @@ import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.EmptyStatement;
 import org.eclipse.jdt.core.dom.EnhancedForStatement;
 import org.eclipse.jdt.core.dom.ForStatement;
+import org.eclipse.jdt.core.dom.IAnnotationBinding;
+import org.eclipse.jdt.core.dom.IMethodBinding;
+import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IfStatement;
+import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.Statement;
+import org.eclipse.jdt.core.dom.SuperMethodInvocation;
 import org.eclipse.jdt.core.dom.TryStatement;
 import org.eclipse.jdt.core.dom.WhileStatement;
 
@@ -50,12 +55,6 @@ public class DeadCodeEliminationRefactoring extends AbstractRefactoringRule {
     // for (false) // impossible iterations
     // Remove Empty try block?
     // do this by resolvingConstantValue
-
-    // TODO JNR remove such code:
-    // public void myMethod() {
-    // super.myMethod();
-    // }
-    // only do it when there are no annotations attached to the overriding method.
 
     /** {@inheritDoc} */
     @Override
@@ -184,5 +183,33 @@ public class DeadCodeEliminationRefactoring extends AbstractRefactoringRule {
             return DO_NOT_VISIT_SUBTREE;
         }
         return VISIT_SUBTREE;
+    }
+
+    @Override
+    public boolean visit(MethodDeclaration node) {
+        List<Statement> bodyStmts = statements(node.getBody());
+        if (bodyStmts.size() == 1) {
+            SuperMethodInvocation bodyMi = asExpression(bodyStmts.get(0), SuperMethodInvocation.class);
+            if (bodyMi != null) {
+                IMethodBinding bodyMethodBinding = bodyMi.resolveMethodBinding();
+                IMethodBinding declMethodBinding = node.resolveBinding();
+                if (declMethodBinding.overrides(bodyMethodBinding)
+                        && !hasSignificantAnnotations(declMethodBinding)) {
+                    this.ctx.getRefactorings().remove(node);
+                    return DO_NOT_VISIT_SUBTREE;
+                }
+            }
+        }
+        return VISIT_SUBTREE;
+    }
+
+    private boolean hasSignificantAnnotations(IMethodBinding methodBinding) {
+        for (IAnnotationBinding annotation : methodBinding.getAnnotations()) {
+            ITypeBinding annotationType = annotation.getAnnotationType();
+            if (!hasType(annotationType, "java.lang.Override", "java.lang.SuppressWarnings")) {
+                return true;
+            }
+        }
+        return false;
     }
 }
