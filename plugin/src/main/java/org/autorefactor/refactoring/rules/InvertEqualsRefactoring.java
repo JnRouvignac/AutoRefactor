@@ -55,7 +55,7 @@ public class InvertEqualsRefactoring extends AbstractRefactoringRule {
         if (isEquals || isStringEqualsIgnoreCase) {
             final Expression expr = node.getExpression();
             final Expression arg0 = arg0(node);
-            if (!isConstant(expr) && isConstant(arg0)) {
+            if (!isConstant(expr) && isConstant(arg0) && !isPrimitive(arg0)) {
                 this.ctx.getRefactorings().replace(node,
                         invertEqualsInvocation(expr, arg0, isEquals));
                 return DO_NOT_VISIT_SUBTREE;

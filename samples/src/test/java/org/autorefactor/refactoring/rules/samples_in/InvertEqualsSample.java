@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2013-2014 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2013-2015 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,8 +28,9 @@ package org.autorefactor.refactoring.rules.samples_in;
 public class InvertEqualsSample {
 
     public static interface Itf {
-        String constant = "fkjfkjf";
-        String nullConstant = null;
+        int primitiveConstant = 1;
+        String objConstant = "fkjfkjf";
+        String objNullConstant = null;
         MyEnum enumConstant = MyEnum.NOT_NULL;
         MyEnum enumNullConstant = null;
     }
@@ -38,28 +39,35 @@ public class InvertEqualsSample {
         NOT_NULL
     }
 
+    private int primitiveField;
+
     public boolean invertEquals(Object obj) {
         return obj.equals("")
-                && obj.equals(Itf.constant)
-                && obj.equals("" + Itf.constant)
+                && obj.equals(Itf.objConstant)
+                && obj.equals("" + Itf.objConstant)
                 && obj.equals(MyEnum.NOT_NULL);
                 // && obj.equals(Itf.enumConstant);
                 // should become:
                 // && Itf.enumConstant.equals(obj);
     }
 
-    public boolean doNotInvertEquals(Object obj) {
-        return obj.equals(Itf.nullConstant) && obj.equals(Itf.enumNullConstant);
+    public boolean doNotInvertEqualsWhenParameterIsNull(Object obj) {
+        return obj.equals(Itf.objNullConstant) && obj.equals(Itf.enumNullConstant);
+    }
+
+    public boolean doNotInvertEqualsWithPrimitiveParameter(Object obj) {
+        return obj.equals(1)
+            && obj.equals(Itf.primitiveConstant)
+            && obj.equals(primitiveField);
     }
 
     public boolean invertEqualsIgnoreCase(String s) {
         return s.equalsIgnoreCase("")
-                && s.equalsIgnoreCase(Itf.constant)
-                && s.equalsIgnoreCase("" + Itf.constant);
+                && s.equalsIgnoreCase(Itf.objConstant)
+                && s.equalsIgnoreCase("" + Itf.objConstant);
     }
 
-    public boolean doNotInvertEqualsIgnoreCase(String s) {
-        return s.equalsIgnoreCase(Itf.nullConstant);
+    public boolean doNotInvertEqualsIgnoreCaseWhenParameterIsNull(String s) {
+        return s.equalsIgnoreCase(Itf.objNullConstant);
     }
-
 }
