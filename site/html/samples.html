@@ -171,7 +171,10 @@
                   if (sampleIn) {
                       sample_in = fileContent;
                   } else {
-                      sample_out = fileContent;
+                      sample_out = fileContent.replace(
+                          "package org.autorefactor.refactoring.rules.samples_out",
+                          "package org.autorefactor.refactoring.rules.samples_in"
+                      );
                   }
 
                   if (sample_in) {
