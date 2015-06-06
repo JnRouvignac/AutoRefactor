@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2014 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2014-2015 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -43,10 +43,14 @@ import org.eclipse.jdt.core.dom.ThisExpression;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
 
-/**
- * Remove useless use of "this" from method calls.
- */
+/** See {@link #getDescription()} method. */
 public class RemoveUnneededThisExpressionRefactoring extends AbstractRefactoringRule {
+
+    /** {@inheritDoc} */
+    @Override
+    public String getDescription() {
+        return "Remove useless use of \"this\" from method calls.";
+    }
 
     /** {@inheritDoc} */
     @Override

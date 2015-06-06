@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2014 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2014-2015 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,13 +35,17 @@ import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.eclipse.jdt.core.dom.Modifier.*;
 
-/**
- * Remove field initializers when they are the default value of the field's types.
- * For example, the initializer will be removed for integer fields initialized to <code>0</code>.
- * Likewise, the initializer will be removed for non primitive fields initialized to <code>null</code>.
- * etc.
- */
+/** See {@link #getDescription()} method. */
 public class RemoveFieldsDefaultValuesRefactoring extends AbstractRefactoringRule {
+
+    /** {@inheritDoc} */
+    @Override
+    public String getDescription() {
+        return ""
+            + "Removes field initializers when they are the default value of the field's types.\n"
+            + "For example, the initializer will be removed for integer fields initialized to \"0\".\n"
+            + "Likewise, the initializer will be removed for non primitive fields initialized to \"null\".";
+    }
 
     /** {@inheritDoc} */
     @Override

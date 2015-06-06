@@ -40,10 +40,14 @@ import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.eclipse.jdt.core.dom.VariableDeclarationFragment.*;
 
-/**
- * Moves assignments inside an if condition before the if node.
- */
+/** See {@link #getDescription()} method. */
 public class NoAssignmentInIfConditionRefactoring extends AbstractRefactoringRule {
+
+    /** {@inheritDoc} */
+    @Override
+    public String getDescription() {
+        return "Moves assignments inside an if condition before the if node.";
+    }
 
     /** {@inheritDoc} */
     @Override

@@ -43,10 +43,18 @@ import org.eclipse.jdt.core.dom.EnumDeclaration;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 
-/**
- * TODO JNR.
- */
+/** See {@link #getDescription()} method. */
 public class RemoveEmptyLinesRefactoring extends AbstractRefactoringRule {
+
+    /** {@inheritDoc} */
+    @Override
+    public String getDescription() {
+        return ""
+            + "Removes unnecessary empty lines from source code:\n"
+            + "- empty lines after opening braces,\n"
+            + "- empty lines before closing braces,\n"
+            + "- two consecutive empty lines are converted to a single empty line.";
+    }
 
     private String newlineChars;
 

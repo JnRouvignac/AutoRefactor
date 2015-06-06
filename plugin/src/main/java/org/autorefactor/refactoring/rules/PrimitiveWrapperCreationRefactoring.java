@@ -41,11 +41,16 @@ import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.autorefactor.util.Utils.*;
 
-/**
- * Replaces unnecessary primitive wrappers instance creations by using static
- * factory methods or existing constants.
- */
+/** See {@link #getDescription()} method. */
 public class PrimitiveWrapperCreationRefactoring extends AbstractRefactoringRule {
+
+    /** {@inheritDoc} */
+    @Override
+    public String getDescription() {
+        return ""
+            + "Replaces unnecessary primitive wrappers instance creations"
+            + " by using static factory methods (\"valueOf()\") or existing constants.";
+    }
 
     private int getJavaMinorVersion() {
         return ctx.getJavaProjectOptions().getJavaSERelease().getMinorVersion();

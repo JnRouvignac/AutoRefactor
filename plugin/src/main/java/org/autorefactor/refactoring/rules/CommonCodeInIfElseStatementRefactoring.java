@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2013-2014 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2013-2015 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -41,17 +41,20 @@ import org.eclipse.jdt.core.dom.Statement;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
 
-/**
- * Factorize common code in all if / else if / else statements either at the
- * start of each blocks or at the end. Could actually end up completely removing
- * an if statement.
- */
+/** See {@link #getDescription()} method. */
 public class CommonCodeInIfElseStatementRefactoring extends AbstractRefactoringRule {
 
+    /** {@inheritDoc} */
+    @Override
+    public String getDescription() {
+        return ""
+            + "Factorizes common code in all if / else if / else statements"
+            + " either at the start of each blocks or at the end.\n"
+            + "Ultimately it can completely remove the if statement condition.";
+    }
+
     // TODO handle switch statements
-    // TODO handle clauses in catch blocks (also useful for java 7 with multi-catch)
     // TODO also handle ternary operator, ConditionalExpression
-    // TODO move to IfStatementRefactoring??
 
     /** {@inheritDoc} */
     @Override

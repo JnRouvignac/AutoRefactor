@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2013-2014 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2013-2015 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -37,12 +37,15 @@ import org.eclipse.jdt.core.dom.MethodInvocation;
 import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.eclipse.jdt.core.dom.MethodInvocation.*;
 
-/**
- * Replaces Vector pre Collections API with equivalent Collections API.
- */
+/** See {@link #getDescription()} method. */
+@SuppressWarnings("javadoc")
 public class VectorOldToNewAPIRefactoring extends AbstractRefactoringRule {
 
-    /** {@inheritDoc} */
+    @Override
+    public String getDescription() {
+        return "Replaces Vector pre-Collections APIs with equivalent Collections APIs.";
+    }
+
     @Override
     public boolean visit(MethodInvocation node) {
         if (ctx.getJavaProjectOptions().getJavaSERelease().isCompatibleWith(Release.javaSE("1.2.0"))) {
@@ -112,5 +115,4 @@ public class VectorOldToNewAPIRefactoring extends AbstractRefactoringRule {
                     + args.size() + ">");
         }
     }
-
 }

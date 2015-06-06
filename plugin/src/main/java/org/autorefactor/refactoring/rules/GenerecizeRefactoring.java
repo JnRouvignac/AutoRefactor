@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2013 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2013-2015 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,9 +32,17 @@ import org.eclipse.jdt.core.dom.Type;
 import static org.autorefactor.refactoring.ASTHelper.*;
 
 /**
- * Add generics, be more assertive about generics that what Eclipse does.
+ * TODO be more assertive about generics than what Eclipse does.
+ *
+ * @see {@link #getDescription()}
  */
+@SuppressWarnings("javadoc")
 public class GenerecizeRefactoring extends AbstractRefactoringRule {
+
+    @Override
+    public String getDescription() {
+        return "Adds generic parameters to generic types.";
+    }
 
     // TODO JNR where are we doing casts?
     // Generics
@@ -60,7 +68,6 @@ public class GenerecizeRefactoring extends AbstractRefactoringRule {
     // Class.getMethod / Class.getDeclaredMethod remove now useless array
     // creation
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(MethodInvocation node) {
         if (isMethod(node, "java.util.Iterator", "next")

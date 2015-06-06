@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2013 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2013-2015 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -37,16 +37,19 @@ import org.eclipse.jdt.core.dom.WhileStatement;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
 
-/**
- * Add brackets to:
- * <ul>
- * <li><code>if</code> then/else clauses</li>
- * <li><code>for</code> loop body</li>
- * <li><code>while</code> loop body</li>
- * <li><code>do ... while</code> loop body</li>
- * </ul>
- */
+/** See {@link #getDescription()} method. */
 public class AddBracketsToControlStatementRefactoring extends AbstractRefactoringRule {
+
+    /** {@inheritDoc} */
+    @Override
+    public String getDescription() {
+        return ""
+            + "Adds brackets to:\n"
+            + "- if then/else clauses,\n"
+            + "- for loop body,\n"
+            + "- do ... while loop body,\n"
+            + "- while loop body.";
+    }
 
     @Override
     public boolean isEnabled(final Preferences prefs) {

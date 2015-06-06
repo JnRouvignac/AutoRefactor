@@ -47,16 +47,24 @@ import org.eclipse.jdt.core.dom.WhileStatement;
 import static org.autorefactor.refactoring.ASTHelper.*;
 
 /**
- * Removes dead code. Use variable values analysis for determining where code is dead.
+ * TODO Use variable values analysis for determining where code is dead.
+ *
+ * @see #getDescription()
  */
+@SuppressWarnings("javadoc")
 public class DeadCodeEliminationRefactoring extends AbstractRefactoringRule {
+
+    /** {@inheritDoc} */
+    @Override
+    public String getDescription() {
+        return "Removes dead code.";
+    }
 
     // TODO JNR
     // for (false) // impossible iterations
     // Remove Empty try block?
     // do this by resolvingConstantValue
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(IfStatement node) {
         final ASTBuilder b = this.ctx.getASTBuilder();
@@ -89,7 +97,6 @@ public class DeadCodeEliminationRefactoring extends AbstractRefactoringRule {
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(WhileStatement node) {
         final Object constantCondition =
@@ -101,7 +108,6 @@ public class DeadCodeEliminationRefactoring extends AbstractRefactoringRule {
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(TryStatement node) {
         final List<Statement> tryStmts = asList(node.getBody());

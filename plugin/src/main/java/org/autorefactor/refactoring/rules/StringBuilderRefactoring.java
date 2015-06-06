@@ -49,18 +49,20 @@ import org.eclipse.jdt.core.dom.StringLiteral;
 import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.eclipse.jdt.core.dom.InfixExpression.Operator.*;
 
-/**
- * StringBuilder related refactorings:
- * <ul>
- * <li>StringBuffer to StringBuilder conversions</li>
- * <li>Remove String appends using operator '+' as parameters of
- * StringBuffer/StringBuilder.append()</li>
- * <li>Replace calls to StringBuffer/StringBuilder constructor + calls to
- * append() + calls toString() with straight String concatenation with operator
- * '+'</li>
- * </ul>
- */
+/** See {@link #getDescription()} method. */
 public class StringBuilderRefactoring extends AbstractRefactoringRule {
+
+    /** {@inheritDoc} */
+    @Override
+    public String getDescription() {
+        return ""
+            + "Refactors to a proper use of StringBuilders:\n"
+            + "- convert StringBuffer to StringBuilder,\n"
+            + "- replace String concatenations using operator '+' as parameters"
+            + " of StringBuffer/StringBuilder.append(),\n"
+            + "- replace chained call to StringBuffer/StringBuilder constructor followed by calls to append()"
+            + " and call toString() with straight String concatenation using operator '+'.";
+    }
 
     private int getJavaMinorVersion() {
         return ctx.getJavaProjectOptions().getJavaSERelease().getMinorVersion();

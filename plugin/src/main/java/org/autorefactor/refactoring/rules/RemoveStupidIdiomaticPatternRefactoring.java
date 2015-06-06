@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2013 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2013-2015 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -55,7 +55,19 @@ import java.util.List;
  * }
  * </pre>
  */
+/** See {@link #getDescription()} method. */
 public class RemoveStupidIdiomaticPatternRefactoring extends AbstractRefactoringRule {
+
+    /** {@inheritDoc} */
+    @Override
+    public String getDescription() {
+        return ""
+            + "Refactors to a proper use of BigDecimals:\n"
+            + "- create BigDecimals from Strings rather than floating point values,\n"
+            + "- create BigDecimals from integers rather than String representing integers,\n"
+            + "- use BigDecimal constants,\n"
+            + "- replace calls to BigDecimal.equals(Object) with calls to BigDecimal.compareTo(BigDecimal).";
+    }
 
     // TODO JNR
 

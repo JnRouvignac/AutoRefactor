@@ -41,11 +41,16 @@ import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.eclipse.jdt.core.dom.Assignment.Operator.*;
 
-/**
- * Removes unnecessary local variable declaration or unnecessary variable
- * assignment before a return statement.
- */
+/** See {@link #getDescription()} method. */
 public class RemoveUnnecessaryLocalBeforeReturnRefactoring extends AbstractRefactoringRule {
+
+    /** {@inheritDoc} */
+    @Override
+    public String getDescription() {
+        return ""
+            + "Removes unnecessary local variable declaration"
+            + " or unnecessary variable assignment before a return statement.";
+    }
 
     /** {@inheritDoc} */
     @Override

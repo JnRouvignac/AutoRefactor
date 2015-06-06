@@ -50,12 +50,17 @@ import static org.autorefactor.util.Utils.*;
 import static org.eclipse.jdt.core.dom.Assignment.Operator.*;
 import static org.eclipse.jdt.core.dom.InfixExpression.Operator.*;
 
-/**
- * Refactors code patterns to use intrinsiced APIs in Hotspot JVM.
- * intrinsics are APIs that receive special treatment when JITed:
- * they can be compiled down to use very efficient CPU instructions.
- */
+/** See {@link #getDescription()} method. */
 public class HotSpotIntrinsicedAPIsRefactoring extends AbstractRefactoringRule {
+
+    /** {@inheritDoc} */
+    @Override
+    public String getDescription() {
+        return ""
+            + "Refactors code patterns to use intrinsiced APIs in Hotspot JVM.\n"
+            + "Intrinsics are APIs that receive special treatment when JITed:"
+            + " they can be compiled down to use very efficient CPU instructions.";
+    }
 
     private static class SystemArrayCopyParams {
         private IVariableBinding indexVarBinding;

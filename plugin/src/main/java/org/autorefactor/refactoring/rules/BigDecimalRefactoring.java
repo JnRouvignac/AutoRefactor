@@ -25,8 +25,6 @@
  */
 package org.autorefactor.refactoring.rules;
 
-import java.math.BigDecimal;
-
 import org.autorefactor.refactoring.ASTBuilder;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
@@ -44,16 +42,19 @@ import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.autorefactor.refactoring.JavaConstants.*;
 import static org.eclipse.jdt.core.dom.InfixExpression.Operator.*;
 
-/**
- * Refactors to a proper use of BigDecimals:
- * <ul>
- * <li>Use Strings with floating point values</li>
- * <li>Use integer constructors with integers</li>
- * <li>Replace calls to {@link BigDecimal#equals(Object)} with calls to
- * {@link BigDecimal#compareTo(BigDecimal)}</li>
- * </ul>
- */
+/** See {@link #getDescription()} method. */
 public class BigDecimalRefactoring extends AbstractRefactoringRule {
+
+    /** {@inheritDoc} */
+    @Override
+    public String getDescription() {
+        return ""
+            + "Refactors to a proper use of BigDecimals:\n"
+            + "- create BigDecimals from Strings rather than floating point values,\n"
+            + "- create BigDecimals from integers rather than String representing integers,\n"
+            + "- use BigDecimal constants,\n"
+            + "- replace calls to BigDecimal.equals(Object) with calls to BigDecimal.compareTo(BigDecimal).";
+    }
 
     private int getJavaMinorVersion() {
         return ctx.getJavaProjectOptions().getJavaSERelease().getMinorVersion();

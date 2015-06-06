@@ -40,13 +40,18 @@ import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.eclipse.jdt.core.dom.Assignment.Operator.*;
 import static org.eclipse.jdt.core.dom.InfixExpression.Operator.*;
 
-/**
- * Refactoring removing useless null checks before assignments or return statements.
- * Such useless null checks are comparing an expression against null,
- * then either assigning null or the expression depending on the result of the null check.
- * It is simpler to directly assign the expression.
- */
+/** See {@link #getDescription()} method. */
 public class RemoveUselessNullCheckRefactoring extends AbstractRefactoringRule {
+
+    /** {@inheritDoc} */
+    @Override
+    public String getDescription() {
+        return ""
+            + "Removes useless null checks before assignments or return statements.\n"
+            + "Such useless null checks are comparing an expression against null,\n"
+            + "then either assigning null or the expression depending on the result of the null check.\n"
+            + "It is simpler to directly assign the expression.";
+    }
 
     private final ASTMatcher matcher = new ASTMatcher();
 

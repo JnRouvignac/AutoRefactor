@@ -49,8 +49,14 @@ import org.eclipse.jdt.core.dom.UnionType;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
 
-/** Refactors catch clauses with the same body to use Java 7's multi-catch. */
+/** See {@link #getDescription()} method. */
+@SuppressWarnings("javadoc")
 public class UseMultiCatchRefactoring extends AbstractRefactoringRule {
+
+    @Override
+    public String getDescription() {
+        return "Refactors catch clauses with the same body to use Java 7's multi-catch.";
+    }
 
     private static enum AggregateDirection {
         NONE, FORWARD, BACKWARD;

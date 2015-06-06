@@ -33,15 +33,20 @@ import org.eclipse.jdt.core.dom.MethodInvocation;
 import static org.autorefactor.refactoring.ASTHelper.*;
 
 /**
- * Inverts calls to {@link Object#equals(Object)} and
- * {@link String#equalsIgnoreCase(String)} when it is known that the second
- * operand is not null and the first can be null.
+ * See {@link #getDescription()} method.
  * <p>
- * TODO JNR use CFG and expression analysis to find extra information about
- * expression nullness.
+ * TODO JNR use CFG and expression analysis to find extra information about expression nullness.
  * </p>
  */
 public class InvertEqualsRefactoring extends AbstractRefactoringRule {
+
+    /** {@inheritDoc} */
+    @Override
+    public String getDescription() {
+        return ""
+            + "Inverts calls to Object.equals(Object) and String.equalsIgnoreCase(String)"
+            + " when it is known that the second operand is not null and the first can be null.";
+    }
 
     /** {@inheritDoc} */
     @Override

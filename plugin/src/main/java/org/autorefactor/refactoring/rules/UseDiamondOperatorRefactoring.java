@@ -41,8 +41,14 @@ import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.eclipse.jdt.core.dom.ASTNode.*;
 
-/** Change class instance creations to use the diamond operator wherever possible. */
+/** See {@link #getDescription()} method. */
+@SuppressWarnings("javadoc")
 public class UseDiamondOperatorRefactoring extends AbstractRefactoringRule {
+
+    @Override
+    public String getDescription() {
+        return "Refactors class instance creations to use the diamond operator wherever possible.";
+    }
 
     @Override
     public boolean visit(ClassInstanceCreation node) {

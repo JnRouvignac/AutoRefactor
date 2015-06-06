@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2013-2014 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2013-2015 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,16 +35,18 @@ import org.eclipse.jdt.core.dom.MethodInvocation;
 import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.eclipse.jdt.core.dom.ASTNode.*;
 
-/**
- * Removes:
- * <ul>
- * <li>Creating a {@link String} instance from a {@link String} constant or
- * literal.</li>
- * <li>Calling {@link String#toString()} on a {@link String} instance</li>
- * <li>Remove calls to {@link String#toString()} inside String concatenations</li>
- * </ul>
- */
+/** See {@link #getDescription()} method. */
 public class StringRefactoring extends AbstractRefactoringRule {
+
+    /** {@inheritDoc} */
+    @Override
+    public String getDescription() {
+        return ""
+            + "Removes:\n"
+            + "- creating a String instance from a String constant or literal,\n"
+            + "- calling String.toString() on a String instance,\n"
+            + "- remove calls to String.toString() inside String concatenations.";
+    }
 
     /** {@inheritDoc} */
     @Override

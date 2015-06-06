@@ -54,19 +54,30 @@ import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.eclipse.jdt.core.dom.TagElement.*;
 
 /**
- * Refactor comments:
+ * See {@link #getDescription()} method.
+ *
  * <ul>
- * <li>Remove empty comments</li>
- * <li>Transform comments into javadocs</li>
- * <li>Transform javadocs into block comments</li>
- * <li>Remove IDE generated TODOs</li>
- * <li>Remove empty lines at end of javadocs and block comments</li>
  * <li>TODO Remove commented out code</li>
  * <li>TODO Fix malformed/incomplete javadocs</li>
  * <li>TODO Fix typo in comments</li>
  * </ul>
  */
 public class CommentsRefactoring extends AbstractRefactoringRule {
+
+    /** {@inheritDoc} */
+    @Override
+    public String getDescription() {
+        return ""
+            + "Refactors comments:\n"
+            + "- remove empty comments and javadocs,\n"
+            + "- transform comments applicable to java elements into javadocs,\n"
+            + "- transform javadocs that are not attached to any java elements into block comments,\n"
+            + "- remove IDE generated TODOs,\n"
+            + "- remove empty lines at start and end of javadocs and block comments,\n"
+            + "- uppercase first letter of javadocs,\n"
+            + "- collapse javadocs on a single line when allowed by Eclipse settings for formatting,\n"
+            + "- add final '.' to javadocs that do not have any.";
+    }
 
     private static final Pattern EMPTY_LINE_COMMENT = Pattern.compile("//\\s*");
     private static final Pattern EMPTY_BLOCK_COMMENT = Pattern.compile("/\\*\\s*(\\*\\s*)*\\*/");

@@ -139,6 +139,7 @@ import static org.autorefactor.refactoring.ASTHelper.*;
  * When one visitor refactors a subtree of the AST, visitors coming after will not be able to visit it.
  * Visitors throwing exceptions are isolated and ignored for the rest of a run for stability.
  */
+@SuppressWarnings("javadoc")
 public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRule {
 
     private final Map<Class<?>, List<ASTVisitor>> visitorsMap = new HashMap<Class<?>, List<ASTVisitor>>();
@@ -163,7 +164,11 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         analyzeVisitors();
     }
 
-    /** {@inheritDoc} */
+    @Override
+    public String getDescription() {
+        return getClass().getSimpleName();
+    }
+
     @Override
     public boolean isEnabled(Preferences preferences) {
         return true;
@@ -233,7 +238,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         return Collections.emptyList();
     }
 
-    /** {@inheritDoc} */
     @Override
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public void setRefactoringContext(RefactoringContext ctx) {
@@ -244,7 +248,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         this.visitorsContributingRefactoring.clear();
     }
 
-    /** {@inheritDoc} */
     @Override
     public Refactorings getRefactorings(CompilationUnit astRoot) {
         astRoot.accept(this);
@@ -305,14 +308,12 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     public static void main(String[] args) {
         final Method[] mm = ASTVisitor.class.getDeclaredMethods();
         Arrays.sort(mm, new Comparator<Method>() {
-            /** {@inheritDoc} */
             @Override
             public int compare(Method o1, Method o2) {
                 return o1.getName().compareTo(o2.getName());
             }
         });
         for (Method m : mm) {
-            System.out.println("/** {@inheritDoc} */");
             System.out.println("@Override");
             System.out.print("public " + m.getReturnType() + " ");
             System.out.print(m.getName() + "(");
@@ -372,7 +373,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void endVisit(AnnotationTypeDeclaration node) {
         final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, AnnotationTypeDeclaration.class);
@@ -387,7 +387,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void endVisit(AnnotationTypeMemberDeclaration node) {
         final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, AnnotationTypeMemberDeclaration.class);
@@ -402,7 +401,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void endVisit(AnonymousClassDeclaration node) {
         final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, AnonymousClassDeclaration.class);
@@ -417,7 +415,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void endVisit(ArrayAccess node) {
         final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, ArrayAccess.class);
@@ -432,7 +429,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void endVisit(ArrayCreation node) {
         final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, ArrayCreation.class);
@@ -447,7 +443,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void endVisit(ArrayInitializer node) {
         final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, ArrayInitializer.class);
@@ -462,7 +457,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void endVisit(ArrayType node) {
         final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, ArrayType.class);
@@ -477,7 +471,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void endVisit(AssertStatement node) {
         final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, AssertStatement.class);
@@ -492,7 +485,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void endVisit(Assignment node) {
         final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, Assignment.class);
@@ -507,7 +499,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void endVisit(Block node) {
         final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, Block.class);
@@ -522,7 +513,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void endVisit(BlockComment node) {
         final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, BlockComment.class);
@@ -537,7 +527,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void endVisit(BooleanLiteral node) {
         final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, BooleanLiteral.class);
@@ -552,7 +541,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void endVisit(BreakStatement node) {
         final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, BreakStatement.class);
@@ -567,7 +555,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void endVisit(CastExpression node) {
         final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, CastExpression.class);
@@ -582,7 +569,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void endVisit(CatchClause node) {
         final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, CatchClause.class);
@@ -597,7 +583,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void endVisit(CharacterLiteral node) {
         final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, CharacterLiteral.class);
@@ -612,7 +597,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void endVisit(ClassInstanceCreation node) {
         final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, ClassInstanceCreation.class);
@@ -627,7 +611,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void endVisit(CompilationUnit node) {
         final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, CompilationUnit.class);
@@ -642,7 +625,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void endVisit(ConditionalExpression node) {
         final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, ConditionalExpression.class);
@@ -657,7 +639,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void endVisit(ConstructorInvocation node) {
         final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, ConstructorInvocation.class);
@@ -672,7 +653,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void endVisit(ContinueStatement node) {
         final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, ContinueStatement.class);
@@ -687,7 +667,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void endVisit(DoStatement node) {
         final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, DoStatement.class);
@@ -702,7 +681,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void endVisit(EmptyStatement node) {
         final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, EmptyStatement.class);
@@ -717,7 +695,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void endVisit(EnhancedForStatement node) {
         final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, EnhancedForStatement.class);
@@ -732,7 +709,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void endVisit(EnumConstantDeclaration node) {
         final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, EnumConstantDeclaration.class);
@@ -747,7 +723,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void endVisit(EnumDeclaration node) {
         final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, EnumDeclaration.class);
@@ -762,7 +737,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void endVisit(ExpressionStatement node) {
         final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, ExpressionStatement.class);
@@ -777,7 +751,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void endVisit(FieldAccess node) {
         final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, FieldAccess.class);
@@ -792,7 +765,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void endVisit(FieldDeclaration node) {
         final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, FieldDeclaration.class);
@@ -807,7 +779,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void endVisit(ForStatement node) {
         final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, ForStatement.class);
@@ -822,7 +793,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void endVisit(IfStatement node) {
         final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, IfStatement.class);
@@ -837,7 +807,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void endVisit(ImportDeclaration node) {
         final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, ImportDeclaration.class);
@@ -852,7 +821,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void endVisit(InfixExpression node) {
         final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, InfixExpression.class);
@@ -867,7 +835,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void endVisit(Initializer node) {
         final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, Initializer.class);
@@ -882,7 +849,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void endVisit(InstanceofExpression node) {
         final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, InstanceofExpression.class);
@@ -897,7 +863,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void endVisit(Javadoc node) {
         final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, Javadoc.class);
@@ -912,7 +877,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void endVisit(LabeledStatement node) {
         final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, LabeledStatement.class);
@@ -927,7 +891,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void endVisit(LineComment node) {
         final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, LineComment.class);
@@ -942,7 +905,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void endVisit(MarkerAnnotation node) {
         final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, MarkerAnnotation.class);
@@ -957,7 +919,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void endVisit(MemberRef node) {
         final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, MemberRef.class);
@@ -972,7 +933,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void endVisit(MemberValuePair node) {
         final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, MemberValuePair.class);
@@ -987,7 +947,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void endVisit(MethodDeclaration node) {
         final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, MethodDeclaration.class);
@@ -1002,7 +961,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void endVisit(MethodInvocation node) {
         final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, MethodInvocation.class);
@@ -1017,7 +975,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void endVisit(MethodRef node) {
         final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, MethodRef.class);
@@ -1032,7 +989,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void endVisit(MethodRefParameter node) {
         final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, MethodRefParameter.class);
@@ -1047,7 +1003,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void endVisit(Modifier node) {
         final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, Modifier.class);
@@ -1062,7 +1017,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void endVisit(NormalAnnotation node) {
         final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, NormalAnnotation.class);
@@ -1077,7 +1031,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void endVisit(NullLiteral node) {
         final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, NullLiteral.class);
@@ -1092,7 +1045,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void endVisit(NumberLiteral node) {
         final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, NumberLiteral.class);
@@ -1107,7 +1059,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void endVisit(PackageDeclaration node) {
         final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, PackageDeclaration.class);
@@ -1122,7 +1073,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void endVisit(ParameterizedType node) {
         final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, ParameterizedType.class);
@@ -1137,7 +1087,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void endVisit(ParenthesizedExpression node) {
         final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, ParenthesizedExpression.class);
@@ -1152,7 +1101,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void endVisit(PostfixExpression node) {
         final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, PostfixExpression.class);
@@ -1167,7 +1115,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void endVisit(PrefixExpression node) {
         final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, PrefixExpression.class);
@@ -1182,7 +1129,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void endVisit(PrimitiveType node) {
         final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, PrimitiveType.class);
@@ -1197,7 +1143,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void endVisit(QualifiedName node) {
         final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, QualifiedName.class);
@@ -1212,7 +1157,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void endVisit(QualifiedType node) {
         final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, QualifiedType.class);
@@ -1227,7 +1171,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void endVisit(ReturnStatement node) {
         final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, ReturnStatement.class);
@@ -1242,7 +1185,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void endVisit(SimpleName node) {
         final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, SimpleName.class);
@@ -1257,7 +1199,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void endVisit(SimpleType node) {
         final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, SimpleType.class);
@@ -1272,7 +1213,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void endVisit(SingleMemberAnnotation node) {
         final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, SingleMemberAnnotation.class);
@@ -1287,7 +1227,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void endVisit(SingleVariableDeclaration node) {
         final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, SingleVariableDeclaration.class);
@@ -1302,7 +1241,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void endVisit(StringLiteral node) {
         final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, StringLiteral.class);
@@ -1317,7 +1255,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void endVisit(SuperConstructorInvocation node) {
         final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, SuperConstructorInvocation.class);
@@ -1332,7 +1269,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void endVisit(SuperFieldAccess node) {
         final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, SuperFieldAccess.class);
@@ -1347,7 +1283,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void endVisit(SuperMethodInvocation node) {
         final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, SuperMethodInvocation.class);
@@ -1362,7 +1297,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void endVisit(SwitchCase node) {
         final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, SwitchCase.class);
@@ -1377,7 +1311,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void endVisit(SwitchStatement node) {
         final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, SwitchStatement.class);
@@ -1392,7 +1325,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void endVisit(SynchronizedStatement node) {
         final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, SynchronizedStatement.class);
@@ -1407,7 +1339,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void endVisit(TagElement node) {
         final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, TagElement.class);
@@ -1422,7 +1353,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void endVisit(TextElement node) {
         final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, TextElement.class);
@@ -1437,7 +1367,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void endVisit(ThisExpression node) {
         final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, ThisExpression.class);
@@ -1452,7 +1381,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void endVisit(ThrowStatement node) {
         final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, ThrowStatement.class);
@@ -1467,7 +1395,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void endVisit(TryStatement node) {
         final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, TryStatement.class);
@@ -1482,7 +1409,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void endVisit(TypeDeclaration node) {
         final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, TypeDeclaration.class);
@@ -1497,7 +1423,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void endVisit(TypeDeclarationStatement node) {
         final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, TypeDeclarationStatement.class);
@@ -1512,7 +1437,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void endVisit(TypeLiteral node) {
         final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, TypeLiteral.class);
@@ -1527,7 +1451,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void endVisit(TypeParameter node) {
         final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, TypeParameter.class);
@@ -1542,7 +1465,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void endVisit(UnionType node) {
         final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, UnionType.class);
@@ -1557,7 +1479,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void endVisit(VariableDeclarationExpression node) {
         final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, VariableDeclarationExpression.class);
@@ -1572,7 +1493,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void endVisit(VariableDeclarationFragment node) {
         final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, VariableDeclarationFragment.class);
@@ -1587,7 +1507,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void endVisit(VariableDeclarationStatement node) {
         final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, VariableDeclarationStatement.class);
@@ -1602,7 +1521,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void endVisit(WhileStatement node) {
         final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, WhileStatement.class);
@@ -1617,7 +1535,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void endVisit(WildcardType node) {
         final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, WildcardType.class);
@@ -1632,7 +1549,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void postVisit(ASTNode node) {
         for (Iterator<ASTVisitor> iter = postVisitors.iterator(); iter.hasNext();) {
@@ -1646,7 +1562,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void preVisit(ASTNode node) {
         for (Iterator<ASTVisitor> iter = preVisitors.iterator(); iter.hasNext();) {
@@ -1660,7 +1575,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean preVisit2(ASTNode node) {
         for (Iterator<ASTVisitor> iter = preVisitors2.iterator(); iter.hasNext();) {
@@ -1677,7 +1591,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(AnnotationTypeDeclaration node) {
         final List<ASTVisitor> visitorList = getVisitors(visitorsMap, AnnotationTypeDeclaration.class);
@@ -1695,7 +1608,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(AnnotationTypeMemberDeclaration node) {
         final List<ASTVisitor> visitorList = getVisitors(visitorsMap, AnnotationTypeMemberDeclaration.class);
@@ -1713,7 +1625,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(AnonymousClassDeclaration node) {
         final List<ASTVisitor> visitorList = getVisitors(visitorsMap, AnonymousClassDeclaration.class);
@@ -1731,7 +1642,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(ArrayAccess node) {
         final List<ASTVisitor> visitorList = getVisitors(visitorsMap, ArrayAccess.class);
@@ -1749,7 +1659,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(ArrayCreation node) {
         final List<ASTVisitor> visitorList = getVisitors(visitorsMap, ArrayCreation.class);
@@ -1767,7 +1676,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(ArrayInitializer node) {
         final List<ASTVisitor> visitorList = getVisitors(visitorsMap, ArrayInitializer.class);
@@ -1785,7 +1693,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(ArrayType node) {
         final List<ASTVisitor> visitorList = getVisitors(visitorsMap, ArrayType.class);
@@ -1803,7 +1710,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(AssertStatement node) {
         final List<ASTVisitor> visitorList = getVisitors(visitorsMap, AssertStatement.class);
@@ -1821,7 +1727,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(Assignment node) {
         final List<ASTVisitor> visitorList = getVisitors(visitorsMap, Assignment.class);
@@ -1839,7 +1744,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(Block node) {
         final List<ASTVisitor> visitorList = getVisitors(visitorsMap, Block.class);
@@ -1857,7 +1761,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(BlockComment node) {
         final List<ASTVisitor> visitorList = getVisitors(visitorsMap, BlockComment.class);
@@ -1875,7 +1778,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(BooleanLiteral node) {
         final List<ASTVisitor> visitorList = getVisitors(visitorsMap, BooleanLiteral.class);
@@ -1893,7 +1795,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(BreakStatement node) {
         final List<ASTVisitor> visitorList = getVisitors(visitorsMap, BreakStatement.class);
@@ -1911,7 +1812,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(CastExpression node) {
         final List<ASTVisitor> visitorList = getVisitors(visitorsMap, CastExpression.class);
@@ -1929,7 +1829,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(CatchClause node) {
         final List<ASTVisitor> visitorList = getVisitors(visitorsMap, CatchClause.class);
@@ -1947,7 +1846,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(CharacterLiteral node) {
         final List<ASTVisitor> visitorList = getVisitors(visitorsMap, CharacterLiteral.class);
@@ -1965,7 +1863,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(ClassInstanceCreation node) {
         final List<ASTVisitor> visitorList = getVisitors(visitorsMap, ClassInstanceCreation.class);
@@ -1983,7 +1880,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(CompilationUnit node) {
         final List<ASTVisitor> visitorList = getVisitors(visitorsMap, CompilationUnit.class);
@@ -2001,7 +1897,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(ConditionalExpression node) {
         final List<ASTVisitor> visitorList = getVisitors(visitorsMap, ConditionalExpression.class);
@@ -2019,7 +1914,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(ConstructorInvocation node) {
         final List<ASTVisitor> visitorList = getVisitors(visitorsMap, ConstructorInvocation.class);
@@ -2037,7 +1931,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(ContinueStatement node) {
         final List<ASTVisitor> visitorList = getVisitors(visitorsMap, ContinueStatement.class);
@@ -2055,7 +1948,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(DoStatement node) {
         final List<ASTVisitor> visitorList = getVisitors(visitorsMap, DoStatement.class);
@@ -2073,7 +1965,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(EmptyStatement node) {
         final List<ASTVisitor> visitorList = getVisitors(visitorsMap, EmptyStatement.class);
@@ -2091,7 +1982,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(EnhancedForStatement node) {
         final List<ASTVisitor> visitorList = getVisitors(visitorsMap, EnhancedForStatement.class);
@@ -2109,7 +1999,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(EnumConstantDeclaration node) {
         final List<ASTVisitor> visitorList = getVisitors(visitorsMap, EnumConstantDeclaration.class);
@@ -2127,7 +2016,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(EnumDeclaration node) {
         final List<ASTVisitor> visitorList = getVisitors(visitorsMap, EnumDeclaration.class);
@@ -2145,7 +2033,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(ExpressionStatement node) {
         final List<ASTVisitor> visitorList = getVisitors(visitorsMap, ExpressionStatement.class);
@@ -2163,7 +2050,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(FieldAccess node) {
         final List<ASTVisitor> visitorList = getVisitors(visitorsMap, FieldAccess.class);
@@ -2181,7 +2067,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(FieldDeclaration node) {
         final List<ASTVisitor> visitorList = getVisitors(visitorsMap, FieldDeclaration.class);
@@ -2199,7 +2084,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(ForStatement node) {
         final List<ASTVisitor> visitorList = getVisitors(visitorsMap, ForStatement.class);
@@ -2217,7 +2101,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(IfStatement node) {
         final List<ASTVisitor> visitorList = getVisitors(visitorsMap, IfStatement.class);
@@ -2235,7 +2118,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(ImportDeclaration node) {
         final List<ASTVisitor> visitorList = getVisitors(visitorsMap, ImportDeclaration.class);
@@ -2253,7 +2135,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(InfixExpression node) {
         final List<ASTVisitor> visitorList = getVisitors(visitorsMap, InfixExpression.class);
@@ -2271,7 +2152,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(Initializer node) {
         final List<ASTVisitor> visitorList = getVisitors(visitorsMap, Initializer.class);
@@ -2289,7 +2169,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(InstanceofExpression node) {
         final List<ASTVisitor> visitorList = getVisitors(visitorsMap, InstanceofExpression.class);
@@ -2307,7 +2186,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(Javadoc node) {
         final List<ASTVisitor> visitorList = getVisitors(visitorsMap, Javadoc.class);
@@ -2325,7 +2203,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(LabeledStatement node) {
         final List<ASTVisitor> visitorList = getVisitors(visitorsMap, LabeledStatement.class);
@@ -2343,7 +2220,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(LineComment node) {
         final List<ASTVisitor> visitorList = getVisitors(visitorsMap, LineComment.class);
@@ -2361,7 +2237,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(MarkerAnnotation node) {
         final List<ASTVisitor> visitorList = getVisitors(visitorsMap, MarkerAnnotation.class);
@@ -2379,7 +2254,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(MemberRef node) {
         final List<ASTVisitor> visitorList = getVisitors(visitorsMap, MemberRef.class);
@@ -2397,7 +2271,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(MemberValuePair node) {
         final List<ASTVisitor> visitorList = getVisitors(visitorsMap, MemberValuePair.class);
@@ -2415,7 +2288,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(MethodDeclaration node) {
         final List<ASTVisitor> visitorList = getVisitors(visitorsMap, MethodDeclaration.class);
@@ -2433,7 +2305,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(MethodInvocation node) {
         final List<ASTVisitor> visitorList = getVisitors(visitorsMap, MethodInvocation.class);
@@ -2451,7 +2322,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(MethodRef node) {
         final List<ASTVisitor> visitorList = getVisitors(visitorsMap, MethodRef.class);
@@ -2469,7 +2339,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(MethodRefParameter node) {
         final List<ASTVisitor> visitorList = getVisitors(visitorsMap, MethodRefParameter.class);
@@ -2487,7 +2356,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(Modifier node) {
         final List<ASTVisitor> visitorList = getVisitors(visitorsMap, Modifier.class);
@@ -2505,7 +2373,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(NormalAnnotation node) {
         final List<ASTVisitor> visitorList = getVisitors(visitorsMap, NormalAnnotation.class);
@@ -2523,7 +2390,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(NullLiteral node) {
         final List<ASTVisitor> visitorList = getVisitors(visitorsMap, NullLiteral.class);
@@ -2541,7 +2407,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(NumberLiteral node) {
         final List<ASTVisitor> visitorList = getVisitors(visitorsMap, NumberLiteral.class);
@@ -2559,7 +2424,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(PackageDeclaration node) {
         final List<ASTVisitor> visitorList = getVisitors(visitorsMap, PackageDeclaration.class);
@@ -2577,7 +2441,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(ParameterizedType node) {
         final List<ASTVisitor> visitorList = getVisitors(visitorsMap, ParameterizedType.class);
@@ -2595,7 +2458,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(ParenthesizedExpression node) {
         final List<ASTVisitor> visitorList = getVisitors(visitorsMap, ParenthesizedExpression.class);
@@ -2613,7 +2475,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(PostfixExpression node) {
         final List<ASTVisitor> visitorList = getVisitors(visitorsMap, PostfixExpression.class);
@@ -2631,7 +2492,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(PrefixExpression node) {
         final List<ASTVisitor> visitorList = getVisitors(visitorsMap, PrefixExpression.class);
@@ -2649,7 +2509,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(PrimitiveType node) {
         final List<ASTVisitor> visitorList = getVisitors(visitorsMap, PrimitiveType.class);
@@ -2667,7 +2526,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(QualifiedName node) {
         final List<ASTVisitor> visitorList = getVisitors(visitorsMap, QualifiedName.class);
@@ -2685,7 +2543,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(QualifiedType node) {
         final List<ASTVisitor> visitorList = getVisitors(visitorsMap, QualifiedType.class);
@@ -2703,7 +2560,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(ReturnStatement node) {
         final List<ASTVisitor> visitorList = getVisitors(visitorsMap, ReturnStatement.class);
@@ -2721,7 +2577,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(SimpleName node) {
         final List<ASTVisitor> visitorList = getVisitors(visitorsMap, SimpleName.class);
@@ -2739,7 +2594,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(SimpleType node) {
         final List<ASTVisitor> visitorList = getVisitors(visitorsMap, SimpleType.class);
@@ -2757,7 +2611,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(SingleMemberAnnotation node) {
         final List<ASTVisitor> visitorList = getVisitors(visitorsMap, SingleMemberAnnotation.class);
@@ -2775,7 +2628,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(SingleVariableDeclaration node) {
         final List<ASTVisitor> visitorList = getVisitors(visitorsMap, SingleVariableDeclaration.class);
@@ -2793,7 +2645,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(StringLiteral node) {
         final List<ASTVisitor> visitorList = getVisitors(visitorsMap, StringLiteral.class);
@@ -2811,7 +2662,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(SuperConstructorInvocation node) {
         final List<ASTVisitor> visitorList = getVisitors(visitorsMap, SuperConstructorInvocation.class);
@@ -2829,7 +2679,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(SuperFieldAccess node) {
         final List<ASTVisitor> visitorList = getVisitors(visitorsMap, SuperFieldAccess.class);
@@ -2847,7 +2696,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(SuperMethodInvocation node) {
         final List<ASTVisitor> visitorList = getVisitors(visitorsMap, SuperMethodInvocation.class);
@@ -2865,7 +2713,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(SwitchCase node) {
         final List<ASTVisitor> visitorList = getVisitors(visitorsMap, SwitchCase.class);
@@ -2883,7 +2730,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(SwitchStatement node) {
         final List<ASTVisitor> visitorList = getVisitors(visitorsMap, SwitchStatement.class);
@@ -2901,7 +2747,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(SynchronizedStatement node) {
         final List<ASTVisitor> visitorList = getVisitors(visitorsMap, SynchronizedStatement.class);
@@ -2919,7 +2764,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(TagElement node) {
         final List<ASTVisitor> visitorList = getVisitors(visitorsMap, TagElement.class);
@@ -2937,7 +2781,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(TextElement node) {
         final List<ASTVisitor> visitorList = getVisitors(visitorsMap, TextElement.class);
@@ -2955,7 +2798,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(ThisExpression node) {
         final List<ASTVisitor> visitorList = getVisitors(visitorsMap, ThisExpression.class);
@@ -2973,7 +2815,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(ThrowStatement node) {
         final List<ASTVisitor> visitorList = getVisitors(visitorsMap, ThrowStatement.class);
@@ -2991,7 +2832,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(TryStatement node) {
         final List<ASTVisitor> visitorList = getVisitors(visitorsMap, TryStatement.class);
@@ -3009,7 +2849,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(TypeDeclaration node) {
         final List<ASTVisitor> visitorList = getVisitors(visitorsMap, TypeDeclaration.class);
@@ -3027,7 +2866,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(TypeDeclarationStatement node) {
         final List<ASTVisitor> visitorList = getVisitors(visitorsMap, TypeDeclarationStatement.class);
@@ -3045,7 +2883,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(TypeLiteral node) {
         final List<ASTVisitor> visitorList = getVisitors(visitorsMap, TypeLiteral.class);
@@ -3063,7 +2900,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(TypeParameter node) {
         final List<ASTVisitor> visitorList = getVisitors(visitorsMap, TypeParameter.class);
@@ -3081,7 +2917,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(UnionType node) {
         final List<ASTVisitor> visitorList = getVisitors(visitorsMap, UnionType.class);
@@ -3099,7 +2934,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(VariableDeclarationExpression node) {
         final List<ASTVisitor> visitorList = getVisitors(visitorsMap, VariableDeclarationExpression.class);
@@ -3117,7 +2951,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(VariableDeclarationFragment node) {
         final List<ASTVisitor> visitorList = getVisitors(visitorsMap, VariableDeclarationFragment.class);
@@ -3135,7 +2968,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(VariableDeclarationStatement node) {
         final List<ASTVisitor> visitorList = getVisitors(visitorsMap, VariableDeclarationStatement.class);
@@ -3153,7 +2985,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(WhileStatement node) {
         final List<ASTVisitor> visitorList = getVisitors(visitorsMap, WhileStatement.class);
@@ -3171,7 +3002,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(WildcardType node) {
         final List<ASTVisitor> visitorList = getVisitors(visitorsMap, WildcardType.class);
@@ -3188,5 +3018,4 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         }
         return VISIT_SUBTREE;
     }
-
 }

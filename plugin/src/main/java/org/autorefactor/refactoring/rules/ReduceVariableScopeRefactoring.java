@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2013-2014 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2013-2015 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -70,12 +70,17 @@ import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.autorefactor.util.Utils.*;
 
 /**
- * Reduces the scope of local variables.
- * <p>
  * TODO JNR can we also transform singular fields into local variables?
- * </p>
+ *
+ * @see {@link #getDescription()}
  */
 public class ReduceVariableScopeRefactoring extends AbstractRefactoringRule {
+
+    /** {@inheritDoc} */
+    @Override
+    public String getDescription() {
+        return "Reduces the scope of local variables.";
+    }
 
     private static final int DECL  = 1 << 0;
     private static final int READ  = 1 << 1;

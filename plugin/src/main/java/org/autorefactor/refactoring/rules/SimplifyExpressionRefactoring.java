@@ -53,17 +53,19 @@ import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.autorefactor.util.Utils.*;
 import static org.eclipse.jdt.core.dom.InfixExpression.Operator.*;
 
-/**
- * Simplify Java expressions:
- * <ul>
- * <li>Remove redundant null checks or useless RHS or LHS operands</li>
- * <li>Fixing compareTo() usage</li>
- * <li>Removed useless parentheses</li>
- * <li>Removed "this." from method calls</li>
- * <li>Directly check boolean values instead of comparing against true / false</li>
- * </ul>
- */
+/** See {@link #getDescription()} method. */
 public class SimplifyExpressionRefactoring extends AbstractRefactoringRule {
+
+    /** {@inheritDoc} */
+    @Override
+    public String getDescription() {
+        return ""
+            + "Simplifies Java expressions:\n"
+            + "- remove redundant null checks or useless right-hand side or left-hand sie operands,\n"
+            + "- fix Comparable.compareTo() usage,\n"
+            + "- remove useless parentheses,\n"
+            + "- directly check boolean values instead of comparing tham with true/false.";
+    }
 
     /** A mapping of child operation to parent operation that mandates using parentheses. */
     private static final List<Pair<Operator, Operator>> SHOULD_HAVE_PARENTHESES = Arrays.asList(

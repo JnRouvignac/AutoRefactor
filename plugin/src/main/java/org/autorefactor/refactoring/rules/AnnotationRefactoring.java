@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2014 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2014-2015 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,15 +34,17 @@ import org.eclipse.jdt.core.dom.NormalAnnotation;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
 
-/**
- * Simplifies annotation uses:
- * <ul>
- * <li>Empty parentheses will be removed from annotations</li>
- * <li>Single members named "value" will be removed from annotations and only
- * the value will be left.</li>
- * </ul>
- */
+/** See {@link #getDescription()} method. */
 public class AnnotationRefactoring extends AbstractRefactoringRule {
+
+    /** {@inheritDoc} */
+    @Override
+    public String getDescription() {
+        return ""
+            + "Simplifies annotation uses:\n"
+            + "- empty parentheses will be removed from annotations,\n"
+            + "- single members named \"value\" will be removed from annotations and only the value will be left.";
+    }
 
     /** {@inheritDoc} */
     @Override

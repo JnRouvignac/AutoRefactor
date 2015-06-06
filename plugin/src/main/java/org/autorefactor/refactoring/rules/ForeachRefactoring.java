@@ -25,8 +25,6 @@
  */
 package org.autorefactor.refactoring.rules;
 
-import java.util.Map;
-
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.FieldAccess;
@@ -37,18 +35,19 @@ import org.eclipse.jdt.core.dom.WhileStatement;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
 
-/**
- * Replace while/for with iterator/for with index loops into foreach loops
- * (applicable to arrays or {@link Iterable}).
- * <p>
- * Also Replace Map keys iteration + {@link Map#get(Object)} with iterations
- * over {@link Map#entrySet()}
- * </p>
- */
+/** See {@link #getDescription()} method. */
+@SuppressWarnings("javadoc")
 public class ForeachRefactoring extends AbstractRefactoringRule {
 
-    private static class VariableUseVisitor extends ASTVisitor {
+    @Override
+    public String getDescription() {
+        return ""
+            + "Replaces \"while\"/\"for with iterator\"/\"for with index loops\" into foreach loops"
+            + " (applicable to arrays or Iterable)."
+            + "Replaces Map.keySet() iteration with calls to Map.get()} into iterations over Map.entrySet().";
+    }
 
+    private static class VariableUseVisitor extends ASTVisitor {
         @Override
         public boolean visit(SimpleName node) {
             ASTNode parent = node.getParent();
@@ -60,7 +59,6 @@ public class ForeachRefactoring extends AbstractRefactoringRule {
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(ForStatement node) {
         final VariableUseVisitor variableUseVisitor = new VariableUseVisitor();
@@ -87,7 +85,6 @@ public class ForeachRefactoring extends AbstractRefactoringRule {
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(WhileStatement node) {
         node.getExpression();

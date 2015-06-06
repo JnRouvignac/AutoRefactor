@@ -40,14 +40,18 @@ import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.eclipse.jdt.core.dom.InfixExpression.*;
 import static org.eclipse.jdt.core.dom.InfixExpression.Operator.*;
 
-/**
- * Refactors if statements with a null checked expression to work on the not
- * null case in the then clause and then work on the null case in the else
- * clause. This is more readable.
- */
+/** See {@link #getDescription()} method. */
+@SuppressWarnings("javadoc")
 public class WorkWithNullCheckedExpressionFirstRefactoring extends AbstractRefactoringRule {
 
-    /** {@inheritDoc} */
+    @Override
+    public String getDescription() {
+        return ""
+            + "Refactors if statements with a null checked expression"
+            + " to work with the not null case in the then clause"
+            + " and then work with the null case in the else clause.";
+    }
+
     @Override
     public boolean visit(IfStatement node) {
         final Statement thenStmt = getThenStatement(node);

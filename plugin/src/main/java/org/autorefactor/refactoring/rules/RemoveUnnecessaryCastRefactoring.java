@@ -46,12 +46,17 @@ import static org.eclipse.jdt.core.dom.ASTNode.*;
 import static org.eclipse.jdt.core.dom.InfixExpression.Operator.*;
 
 /**
- * Removes unnecessary widening casts from return statements, assignments and
- * infix expressions.
+ * See {@link #getDescription()} method.
+ * <p>
+ * TODO JNR remove casts from method parameters
  */
 public class RemoveUnnecessaryCastRefactoring extends AbstractRefactoringRule {
 
-    // TODO JNR remove casts from method parameters
+    /** {@inheritDoc} */
+    @Override
+    public String getDescription() {
+        return "Removes unnecessary widening casts from return statements, assignments and infix expressions.";
+    }
 
     /** {@inheritDoc} */
     @Override

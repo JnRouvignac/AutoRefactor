@@ -52,13 +52,19 @@ import static org.eclipse.jdt.core.dom.InfixExpression.Operator.*;
 import static org.eclipse.jdt.core.dom.PrefixExpression.Operator.*;
 
 /**
- * Refactors the use of TestNG assertions.
+ * See {@link #getDescription()} method.
  * <p>
- * FIXME: Assert.assertNotEquals() exists only since TestNG 6.1.
- * This refactoring should be made conditional on TestNG version.
+ * FIXME: Assert.assertNotEquals() exists only since TestNG 6.1. This refactoring should be made
+ * conditional on TestNG version.
  * </p>
  */
+@SuppressWarnings("javadoc")
 public class TestNGAssertRefactoring extends AbstractRefactoringRule {
+
+    @Override
+    public String getDescription() {
+        return "Refactors to a proper use of TestNG assertions.";
+    }
 
     private static final String OBJECT = "java.lang.Object";
     private boolean canUseAssertNotEquals;

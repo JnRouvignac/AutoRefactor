@@ -32,25 +32,45 @@ import org.eclipse.jdt.core.dom.IfStatement;
 import static org.autorefactor.refactoring.ASTHelper.*;
 
 /**
- * Refactors <pre>
+ * Refactors:
+ *
+ * <pre>
  * if (a) {
- *   if (b) {
+ *   if (moveAroundIfElse()) {
  *     ...
  *   }
  * } else {
- *   if (b) {
+ *   if (moveAroundIfElse()) {
  *     ...
  *   }
- * }</pre> into <pre>
- * if (b) {
+ * }
+ * </pre>
+ *
+ * into
+ *
+ * <pre>
+ * if (moveAroundIfElse()) {
  *   if (a) {
  *     ...
  *   } else {
  *     ...
  *   }
- * }</pre>.
+ * }
+ * </pre>
+ *
+ * TODO do this for else ifs too.
+ *
+ * @see #getDescription()
  */
 public class CommonIfInIfElseRefactoring extends AbstractRefactoringRule {
+
+    /** {@inheritDoc} */
+    @Override
+    public String getDescription() {
+        return ""
+            + "Moves an inner if statement around the outer if condition,"
+            + " when the inner if condition is common to both if/else clauses of the outer if statement.";
+    }
 
     /** {@inheritDoc} */
     @Override

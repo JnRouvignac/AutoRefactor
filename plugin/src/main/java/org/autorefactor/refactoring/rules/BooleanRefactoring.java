@@ -70,17 +70,18 @@ import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.eclipse.jdt.core.dom.Assignment.Operator.*;
 
-/**
- * Boolean related refactorings:
- * <ul>
- * <li>Use boolean constants when possible</li>
- * <li>Remove if statements when each clause does similar things with opposite
- * boolean values</li>
- * <li>Remove ternary operators when each clause does similar things with
- * opposite boolean values</li>
- * </ul>
- */
+/** See {@link #getDescription()} method. */
 public class BooleanRefactoring extends AbstractRefactoringRule {
+
+    /** {@inheritDoc} */
+    @Override
+    public String getDescription() {
+        return ""
+            + "Boolean related refactorings:\n"
+            + "- use boolean constants,\n"
+            + "- remove if statements when then and else clauses do similar things with opposite boolean values,\n"
+            + "- remove ternary operators when then and else clauses do similar things with opposite boolean values.";
+    }
 
     private static class BooleanASTMatcher extends ASTMatcher {
 

@@ -25,7 +25,6 @@
  */
 package org.autorefactor.refactoring.rules;
 
-import java.util.Collection;
 import java.util.List;
 
 import org.autorefactor.refactoring.ASTBuilder;
@@ -58,12 +57,22 @@ import static org.autorefactor.refactoring.ForLoopHelper.*;
 import static org.eclipse.jdt.core.dom.InfixExpression.Operator.*;
 import static org.eclipse.jdt.core.dom.PrefixExpression.Operator.*;
 
-/**
- * Converts code to use {@link Collection#addAll(Collection)}, {@link Collection#containsAll(Collection)}
- * or {@link Collection#removeAll(Collection)} when for or foreach loops are iterating over a collection
- * and add, check contains or remove all its elements to another collection.
- */
+/** See {@link #getDescription()} method. */
 public class CollectionRefactoring extends AbstractRefactoringRule {
+
+    /** {@inheritDoc} */
+    @Override
+    public String getDescription() {
+        return ""
+            + "Collection related refactorings:\n"
+            + "- replaces for/foreach loops to use Collection.addAll() where possible,\n"
+            + "- replaces for/foreach loops to use Collection.containsAll() where possible,\n"
+            + "- replaces for/foreach loops to use Collection.removeAll() where possible,\n"
+            + "- replaces creating a new Collection, then invoking Collection.addAll() on it,"
+            + " by creating the new Collection with the other Collection as parameter,\n"
+            + "- replaces some checks on Collection.size() with checks on Collection.isEmpty(),\n"
+            + "- replaces calls to Set.contains() immediately followed by Set.add() with straight calls to Set.add().";
+    }
 
     /** {@inheritDoc} */
     @Override

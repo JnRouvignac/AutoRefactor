@@ -33,10 +33,14 @@ import org.eclipse.jdt.core.dom.InfixExpression;
 import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.eclipse.jdt.core.dom.InfixExpression.Operator.*;
 
-/**
- * Collapses two consecutive if statements into just one.
- */
+/** See {@link #getDescription()} method. */
 public class CollapseIfStatementRefactoring extends AbstractRefactoringRule {
+
+    /** {@inheritDoc} */
+    @Override
+    public String getDescription() {
+        return "Collapses two consecutive if statements into just one.";
+    }
 
     /** {@inheritDoc} */
     @Override

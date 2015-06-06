@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2014 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2014-2015 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -38,6 +38,7 @@ import org.autorefactor.util.UnhandledException;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
+import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
 import org.eclipse.jface.viewers.ICheckStateProvider;
 import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.jface.viewers.StyledCellLabelProvider;
@@ -49,6 +50,7 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.viewers.ViewerFilter;
+import org.eclipse.jface.window.ToolTip;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyleRange;
@@ -56,6 +58,7 @@ import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.TextStyle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -66,6 +69,7 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Text;
 
 import static org.eclipse.jface.viewers.CheckboxTableViewer.*;
+import static org.eclipse.swt.SWT.*;
 
 /**
  * Wizard page which allows the user to choose which refactorings to apply to the selected java elements.
@@ -190,7 +194,7 @@ public class ChooseRefactoringWizardPage extends WizardPage {
 
     private void createRefactoringsTable(Composite parent) {
         tableViewer = newCheckList(parent,
-                SWT.BORDER | SWT.H_SCROLL | SWT.CHECK | SWT.NO_FOCUS | SWT.HIDE_SELECTION);
+                BORDER | H_SCROLL | CHECK | NO_FOCUS | HIDE_SELECTION);
         createColumns(tableViewer);
         tableViewer.setContentProvider(new ArrayContentProvider());
         final List<RefactoringRule> refactorings = AllRefactoringRules.getAllRefactoringRules();
@@ -212,6 +216,7 @@ public class ChooseRefactoringWizardPage extends WizardPage {
                 return cellText.toLowerCase().indexOf(filter) != -1;
             }
         });
+        ColumnViewerToolTipSupport.enableFor(tableViewer, ToolTip.NO_RECREATE);
         tableViewer.setLabelProvider(new StyledCellLabelProvider() {
             @Override
             public void update(ViewerCell cell) {
@@ -222,30 +227,36 @@ public class ChooseRefactoringWizardPage extends WizardPage {
                 cell.setStyleRanges(getStyleRanges(cellText, filter, idx));
             }
 
-            private StyleRange[] getStyleRanges(String text, String filter,
-                    int matchIndex) {
+            private StyleRange[] getStyleRanges(String text, String filter, int matchIndex) {
                 final int matchLength = filter.length();
                 if (matchIndex != -1 && matchLength != 0) {
-                    final StyledString styledString =
-                            new StyledString(text, defaultStyler);
+                    final StyledString styledString = new StyledString(text, defaultStyler);
                     styledString.setStyle(matchIndex, matchLength, underlineStyler);
                     return styledString.getStyleRanges();
                 }
                 return null;
             }
+
+            @Override
+            public String getToolTipText(Object element) {
+                return ((RefactoringRule) element).getDescription();
+            }
+
+            @Override
+            public Point getToolTipShift(Object object) {
+                return new Point(10, 20);
+            }
         });
 
         final Table table = tableViewer.getTable();
         table.setLinesVisible(true);
-        tableViewer.getControl().setLayoutData(
-                new GridData(SWT.FILL, SWT.TOP, true, false));
+        tableViewer.getControl().setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
         packColumns(table);
         table.setFocus();
     }
 
     private void createColumns(final TableViewer tableViewer) {
-        TableViewerColumn refactoringColumn =
-                createTableViewerColumn(tableViewer);
+        TableViewerColumn refactoringColumn = createTableViewerColumn(tableViewer);
         refactoringColumn.setLabelProvider(new ColumnLabelProvider() {
             @Override
             public String getText(Object element) {
@@ -291,8 +302,7 @@ public class ChooseRefactoringWizardPage extends WizardPage {
     }
 
     private TableViewerColumn createTableViewerColumn(TableViewer tableViewer) {
-        final TableViewerColumn viewerColumn =
-                new TableViewerColumn(tableViewer, SWT.NONE);
+        final TableViewerColumn viewerColumn = new TableViewerColumn(tableViewer, SWT.NONE);
         final TableColumn column = viewerColumn.getColumn();
         column.setResizable(true);
         column.setMoveable(true);

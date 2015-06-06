@@ -52,8 +52,18 @@ import org.eclipse.jdt.core.dom.TypeDeclaration;
 import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.autorefactor.refactoring.SourceLocation.*;
 
-/** Removes superfluous semi-colon after body declarations type declarations. */
+/**
+ * See {@link #getDescription()} method.
+ * <p>
+ * TODO remove superfluous semi-colons in try-with-resources
+ */
+@SuppressWarnings("javadoc")
 public class RemoveSemiColonRefactoring extends AbstractRefactoringRule {
+
+    @Override
+    public String getDescription() {
+        return "Removes superfluous semi-colon after body declarations in type declarations.";
+    }
 
     @Override
     public boolean visit(AnnotationTypeDeclaration node) {

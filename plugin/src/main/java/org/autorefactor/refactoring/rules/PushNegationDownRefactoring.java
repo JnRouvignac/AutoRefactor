@@ -37,8 +37,14 @@ import org.eclipse.jdt.core.dom.PrefixExpression;
 import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.eclipse.jdt.core.dom.PrefixExpression.Operator.*;
 
-/** Pushes negations down, inside the expressions. */
+/** See {@link #getDescription()} method. */
 public class PushNegationDownRefactoring extends AbstractRefactoringRule {
+
+    /** {@inheritDoc} */
+    @Override
+    public String getDescription() {
+        return "Pushes negations down, inside the negated expressions.";
+    }
 
     /** {@inheritDoc} */
     @Override

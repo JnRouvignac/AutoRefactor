@@ -35,12 +35,16 @@ import org.eclipse.jdt.core.dom.MethodInvocation;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
 
-/**
- * Replaces uses of {@link String#indexOf(String)} or
- * {@link String#lastIndexOf(String)} with {@link String#contains(CharSequence)}
- * where appropriate.
- */
+/** See {@link #getDescription()} method. */
+@SuppressWarnings("javadoc")
 public class UseStringContainsRefactoring extends AbstractRefactoringRule {
+
+    @Override
+    public String getDescription() {
+        return ""
+            + "Replaces uses of String.indexOf(String) String.lastIndexOf(String)"
+            + " with String.contains(CharSequence) where appropriate.";
+    }
 
     @Override
     public boolean visit(MethodInvocation node) {

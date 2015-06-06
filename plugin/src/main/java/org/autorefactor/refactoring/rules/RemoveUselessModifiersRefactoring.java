@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2013-2014 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2013-2015 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -51,21 +51,21 @@ import org.eclipse.jdt.core.dom.TypeDeclaration;
 import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.eclipse.jdt.core.dom.Modifier.*;
 
-/**
- * Remove modifiers implied by the context:
- * <ul>
- * <li><code>public</code>, <code>static</code> and <code>final</code> for
- * interfaces fields</li>
- * <li><code>public</code> and <code>abstract</code> for interfaces methods</li>
- * <li><code>final</code> for parameters in interface method declarations</li>
- * </ul>
- * <p>
- * Fix modifiers order.
- */
+/** See {@link #getDescription()} method. */
 public class RemoveUselessModifiersRefactoring extends AbstractRefactoringRule {
 
-    private static final class ModifierOrderComparator implements Comparator<Modifier> {
+    /** {@inheritDoc} */
+    @Override
+    public String getDescription() {
+        return ""
+            + "Fixes modifier order.\n"
+            + "Also removes modifiers implied by the context:\n"
+            + "- \"public\", \"static\" and \"final\" for interfaces fields,\n"
+            + "- \"public\" and \"abstract\" for interfaces methods,\n"
+            + "- \"final\" for parameters in interface method declarations.";
+    }
 
+    private static final class ModifierOrderComparator implements Comparator<Modifier> {
         @Override
         public int compare(Modifier o1, Modifier o2) {
             final int i1 = ORDERED_MODIFIERS.indexOf(o1.getKeyword());
@@ -78,7 +78,6 @@ public class RemoveUselessModifiersRefactoring extends AbstractRefactoringRule {
             }
             return i1 - i2;
         }
-
     }
 
     private static final List<ModifierKeyword> ORDERED_MODIFIERS =
