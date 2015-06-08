@@ -50,9 +50,9 @@ import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.eclipse.jdt.core.dom.InfixExpression.Operator.*;
 
 /** See {@link #getDescription()} method. */
+@SuppressWarnings("javadoc")
 public class StringBuilderRefactoring extends AbstractRefactoringRule {
 
-    /** {@inheritDoc} */
     @Override
     public String getDescription() {
         return ""
@@ -64,11 +64,15 @@ public class StringBuilderRefactoring extends AbstractRefactoringRule {
             + " and call toString() with straight String concatenation using operator '+'.";
     }
 
+    @Override
+    public String getName() {
+        return "StringBuilder";
+    }
+
     private int getJavaMinorVersion() {
         return ctx.getJavaProjectOptions().getJavaSERelease().getMinorVersion();
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(ClassInstanceCreation node) {
         if (getJavaMinorVersion() >= 5
@@ -80,7 +84,6 @@ public class StringBuilderRefactoring extends AbstractRefactoringRule {
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(InfixExpression node) {
         // TODO JNR also remove valueOf() methods in these cases, etc.:
@@ -140,7 +143,6 @@ public class StringBuilderRefactoring extends AbstractRefactoringRule {
                         && "".equals(((StringLiteral) expr).getLiteralValue()));
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(MethodInvocation node) {
         if (node.getExpression() == null) {

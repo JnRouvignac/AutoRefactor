@@ -62,9 +62,9 @@ import static org.autorefactor.refactoring.ASTHelper.*;
  *
  * @see #getDescription()
  */
+@SuppressWarnings("javadoc")
 public class CommonIfInIfElseRefactoring extends AbstractRefactoringRule {
 
-    /** {@inheritDoc} */
     @Override
     public String getDescription() {
         return ""
@@ -72,7 +72,11 @@ public class CommonIfInIfElseRefactoring extends AbstractRefactoringRule {
             + " when the inner if condition is common to both if/else clauses of the outer if statement.";
     }
 
-    /** {@inheritDoc} */
+    @Override
+    public String getName() {
+        return "Move common inner if statement from then/else clauses around outer if statement";
+    }
+
     @Override
     public boolean visit(IfStatement node) {
         final IfStatement thenInnerIfStmt = as(node.getThenStatement(), IfStatement.class);

@@ -66,6 +66,11 @@ public class TestNGAssertRefactoring extends AbstractRefactoringRule {
         return "Refactors to a proper use of TestNG assertions.";
     }
 
+    @Override
+    public String getName() {
+        return "TestNG asserts";
+    }
+
     private static final String OBJECT = "java.lang.Object";
     private boolean canUseAssertNotEquals;
 

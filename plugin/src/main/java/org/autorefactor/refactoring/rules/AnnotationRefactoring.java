@@ -35,9 +35,9 @@ import org.eclipse.jdt.core.dom.NormalAnnotation;
 import static org.autorefactor.refactoring.ASTHelper.*;
 
 /** See {@link #getDescription()} method. */
+@SuppressWarnings("javadoc")
 public class AnnotationRefactoring extends AbstractRefactoringRule {
 
-    /** {@inheritDoc} */
     @Override
     public String getDescription() {
         return ""
@@ -46,7 +46,11 @@ public class AnnotationRefactoring extends AbstractRefactoringRule {
             + "- single members named \"value\" will be removed from annotations and only the value will be left.";
     }
 
-    /** {@inheritDoc} */
+    @Override
+    public String getName() {
+        return "Annotation";
+    }
+
     @Override
     public boolean visit(NormalAnnotation node) {
         final Refactorings r = this.ctx.getRefactorings();

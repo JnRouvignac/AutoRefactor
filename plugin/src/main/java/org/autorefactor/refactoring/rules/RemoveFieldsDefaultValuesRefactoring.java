@@ -36,9 +36,9 @@ import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.eclipse.jdt.core.dom.Modifier.*;
 
 /** See {@link #getDescription()} method. */
+@SuppressWarnings("javadoc")
 public class RemoveFieldsDefaultValuesRefactoring extends AbstractRefactoringRule {
 
-    /** {@inheritDoc} */
     @Override
     public String getDescription() {
         return ""
@@ -47,7 +47,11 @@ public class RemoveFieldsDefaultValuesRefactoring extends AbstractRefactoringRul
             + "Likewise, the initializer will be removed for non primitive fields initialized to \"null\".";
     }
 
-    /** {@inheritDoc} */
+    @Override
+    public String getName() {
+        return "Remove fields default values";
+    }
+
     @Override
     public boolean visit(FieldDeclaration node) {
         if (canProceed(node.getParent())) {

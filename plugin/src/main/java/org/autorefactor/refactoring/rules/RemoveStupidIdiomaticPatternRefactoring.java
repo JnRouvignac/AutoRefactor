@@ -27,7 +27,6 @@ package org.autorefactor.refactoring.rules;
 
 import java.util.List;
 
-
 /**
  * TODO JNR
  *
@@ -58,15 +57,14 @@ import java.util.List;
 /** See {@link #getDescription()} method. */
 public class RemoveStupidIdiomaticPatternRefactoring extends AbstractRefactoringRule {
 
-    /** {@inheritDoc} */
     @Override
     public String getDescription() {
-        return ""
-            + "Refactors to a proper use of BigDecimals:\n"
-            + "- create BigDecimals from Strings rather than floating point values,\n"
-            + "- create BigDecimals from integers rather than String representing integers,\n"
-            + "- use BigDecimal constants,\n"
-            + "- replace calls to BigDecimal.equals(Object) with calls to BigDecimal.compareTo(BigDecimal).";
+        return "Refactors to a proper use of try statements and return statements.";
+    }
+
+    @Override
+    public String getName() {
+        return "Try statement then return";
     }
 
     // TODO JNR

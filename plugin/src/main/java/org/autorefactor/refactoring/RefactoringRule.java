@@ -45,6 +45,13 @@ public interface RefactoringRule {
     String getDescription();
 
     /**
+     * Returns the name of the refactoring rule suitable for displaying to the user.
+     *
+     * @return the name of the refactoring rule suitable for displaying to the user
+     */
+    String getName();
+
+    /**
      * Returns all the refactorings determined for the provided compilation unit after analysis.
      *
      * @param astRoot the compilation unit to refactor

@@ -42,9 +42,9 @@ import org.eclipse.jdt.core.dom.Statement;
 import static org.autorefactor.refactoring.ASTHelper.*;
 
 /** See {@link #getDescription()} method. */
+@SuppressWarnings("javadoc")
 public class CommonCodeInIfElseStatementRefactoring extends AbstractRefactoringRule {
 
-    /** {@inheritDoc} */
     @Override
     public String getDescription() {
         return ""
@@ -53,10 +53,14 @@ public class CommonCodeInIfElseStatementRefactoring extends AbstractRefactoringR
             + "Ultimately it can completely remove the if statement condition.";
     }
 
+    @Override
+    public String getName() {
+        return "Extract common code in if else statement";
+    }
+
     // TODO handle switch statements
     // TODO also handle ternary operator, ConditionalExpression
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(IfStatement node) {
         if (isElseStatementOfParentIf(node)) {

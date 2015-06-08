@@ -36,9 +36,9 @@ import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.eclipse.jdt.core.dom.ASTNode.*;
 
 /** See {@link #getDescription()} method. */
+@SuppressWarnings("javadoc")
 public class StringRefactoring extends AbstractRefactoringRule {
 
-    /** {@inheritDoc} */
     @Override
     public String getDescription() {
         return ""
@@ -48,7 +48,11 @@ public class StringRefactoring extends AbstractRefactoringRule {
             + "- remove calls to String.toString() inside String concatenations.";
     }
 
-    /** {@inheritDoc} */
+    @Override
+    public String getName() {
+        return "String";
+    }
+
     @Override
     public boolean visit(ClassInstanceCreation node) {
         if (hasType(node, "java.lang.String")
@@ -63,7 +67,6 @@ public class StringRefactoring extends AbstractRefactoringRule {
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(MethodInvocation node) {
         final Expression expression = node.getExpression();

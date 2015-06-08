@@ -42,14 +42,19 @@ import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.autorefactor.util.Utils.*;
 
 /** See {@link #getDescription()} method. */
+@SuppressWarnings("javadoc")
 public class PrimitiveWrapperCreationRefactoring extends AbstractRefactoringRule {
 
-    /** {@inheritDoc} */
     @Override
     public String getDescription() {
         return ""
             + "Replaces unnecessary primitive wrappers instance creations"
             + " by using static factory methods (\"valueOf()\") or existing constants.";
+    }
+
+    @Override
+    public String getName() {
+        return "Primitive wrapper creation";
     }
 
     private int getJavaMinorVersion() {
@@ -59,7 +64,6 @@ public class PrimitiveWrapperCreationRefactoring extends AbstractRefactoringRule
     // TODO Can we reduce bad effects of autoboxing / unboxing
     // fix autoboxing and unboxing (returning boxed value in primitive context)
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(MethodInvocation node) {
         if (node.getExpression() == null) {
@@ -170,7 +174,6 @@ public class PrimitiveWrapperCreationRefactoring extends AbstractRefactoringRule
         return null;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(ClassInstanceCreation node) {
         final ITypeBinding typeBinding = node.getType().resolveBinding();
@@ -201,7 +204,6 @@ public class PrimitiveWrapperCreationRefactoring extends AbstractRefactoringRule
         return b.invoke(typeName, methodName, b.copy(arg));
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(QualifiedName node) {
         final ASTNode parent = removeParentheses(node.getParent());

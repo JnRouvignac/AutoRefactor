@@ -42,9 +42,9 @@ import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.eclipse.jdt.core.dom.Assignment.Operator.*;
 
 /** See {@link #getDescription()} method. */
+@SuppressWarnings("javadoc")
 public class RemoveUnnecessaryLocalBeforeReturnRefactoring extends AbstractRefactoringRule {
 
-    /** {@inheritDoc} */
     @Override
     public String getDescription() {
         return ""
@@ -52,7 +52,11 @@ public class RemoveUnnecessaryLocalBeforeReturnRefactoring extends AbstractRefac
             + " or unnecessary variable assignment before a return statement.";
     }
 
-    /** {@inheritDoc} */
+    @Override
+    public String getName() {
+        return "Remove unnecessary local before return";
+    }
+
     @Override
     public boolean visit(ReturnStatement node) {
         final Statement previousSibling = getPreviousSibling(node);

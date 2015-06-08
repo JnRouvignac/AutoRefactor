@@ -44,6 +44,11 @@ public class GenerecizeRefactoring extends AbstractRefactoringRule {
         return "Adds generic parameters to generic types.";
     }
 
+    @Override
+    public String getName() {
+        return "Generics";
+    }
+
     // TODO JNR where are we doing casts?
     // Generics
     // Collection.iterator

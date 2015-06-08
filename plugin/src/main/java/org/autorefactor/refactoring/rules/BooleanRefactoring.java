@@ -73,7 +73,6 @@ import static org.eclipse.jdt.core.dom.Assignment.Operator.*;
 /** See {@link #getDescription()} method. */
 public class BooleanRefactoring extends AbstractRefactoringRule {
 
-    /** {@inheritDoc} */
     @Override
     public String getDescription() {
         return ""
@@ -81,6 +80,11 @@ public class BooleanRefactoring extends AbstractRefactoringRule {
             + "- use boolean constants,\n"
             + "- remove if statements when then and else clauses do similar things with opposite boolean values,\n"
             + "- remove ternary operators when then and else clauses do similar things with opposite boolean values.";
+    }
+
+    @Override
+    public String getName() {
+        return "Boolean";
     }
 
     private static class BooleanASTMatcher extends ASTMatcher {
@@ -189,7 +193,6 @@ public class BooleanRefactoring extends AbstractRefactoringRule {
 
     private ASTBuilder b;
 
-    /** {@inheritDoc} */
     @Override
     public void setRefactoringContext(RefactoringContext ctx) {
         super.setRefactoringContext(ctx);
@@ -200,7 +203,6 @@ public class BooleanRefactoring extends AbstractRefactoringRule {
         return ctx.getJavaProjectOptions().getJavaSERelease().getMinorVersion();
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(ConditionalExpression node) {
         final ITypeBinding typeBinding = node.resolveTypeBinding();
@@ -216,7 +218,6 @@ public class BooleanRefactoring extends AbstractRefactoringRule {
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(IfStatement node) {
         final BooleanASTMatcher matcher = new BooleanASTMatcher();
@@ -475,7 +476,6 @@ public class BooleanRefactoring extends AbstractRefactoringRule {
         return false;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(MethodInvocation node) {
         if (isMethod(node, "java.lang.Boolean", "valueOf", "java.lang.String")

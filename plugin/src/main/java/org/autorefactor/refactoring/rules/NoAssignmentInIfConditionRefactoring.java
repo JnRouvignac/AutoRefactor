@@ -41,15 +41,19 @@ import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.eclipse.jdt.core.dom.VariableDeclarationFragment.*;
 
 /** See {@link #getDescription()} method. */
+@SuppressWarnings("javadoc")
 public class NoAssignmentInIfConditionRefactoring extends AbstractRefactoringRule {
 
-    /** {@inheritDoc} */
     @Override
     public String getDescription() {
         return "Moves assignments inside an if condition before the if node.";
     }
 
-    /** {@inheritDoc} */
+    @Override
+    public String getName() {
+        return "No assignment in if condition";
+    }
+
     @Override
     public boolean visit(IfStatement node) {
         final InfixExpression ie = as(node.getExpression(), InfixExpression.class);

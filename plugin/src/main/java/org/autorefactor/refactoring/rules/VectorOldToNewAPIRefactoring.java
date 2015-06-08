@@ -47,6 +47,11 @@ public class VectorOldToNewAPIRefactoring extends AbstractRefactoringRule {
     }
 
     @Override
+    public String getName() {
+        return "Vector old-to-new APIs";
+    }
+
+    @Override
     public boolean visit(MethodInvocation node) {
         if (ctx.getJavaProjectOptions().getJavaSERelease().isCompatibleWith(Release.javaSE("1.2.0"))) {
             if (isMethod(node, "java.util.Vector", "elementAt", "int")) {

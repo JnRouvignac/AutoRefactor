@@ -62,9 +62,9 @@ import static org.eclipse.jdt.core.dom.TagElement.*;
  * <li>TODO Fix typo in comments</li>
  * </ul>
  */
+@SuppressWarnings("javadoc")
 public class CommentsRefactoring extends AbstractRefactoringRule {
 
-    /** {@inheritDoc} */
     @Override
     public String getDescription() {
         return ""
@@ -77,6 +77,11 @@ public class CommentsRefactoring extends AbstractRefactoringRule {
             + "- uppercase first letter of javadocs,\n"
             + "- collapse javadocs on a single line when allowed by Eclipse settings for formatting,\n"
             + "- add final '.' to javadocs that do not have any.";
+    }
+
+    @Override
+    public String getName() {
+        return "Comments";
     }
 
     private static final Pattern EMPTY_LINE_COMMENT = Pattern.compile("//\\s*");
@@ -118,7 +123,6 @@ public class CommentsRefactoring extends AbstractRefactoringRule {
         super();
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(BlockComment node) {
         final String comment = getComment(node);
@@ -185,7 +189,6 @@ public class CommentsRefactoring extends AbstractRefactoringRule {
         return finder.getCoveringNode();
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(Javadoc node) {
         final String comment = getComment(node);
@@ -378,7 +381,6 @@ public class CommentsRefactoring extends AbstractRefactoringRule {
         return false;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(LineComment node) {
         final String comment = getComment(node);
@@ -495,7 +497,6 @@ public class CommentsRefactoring extends AbstractRefactoringRule {
                 && "package-info.java".equals(getFileName(node)));
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(CompilationUnit node) {
         this.astRoot = node;
@@ -526,7 +527,6 @@ public class CommentsRefactoring extends AbstractRefactoringRule {
         return source.substring(start, start + node.getLength());
     }
 
-    /** {@inheritDoc} */
     @Override
     public void endVisit(CompilationUnit node) {
         comments.clear();

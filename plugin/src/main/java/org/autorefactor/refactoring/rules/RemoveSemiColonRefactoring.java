@@ -66,6 +66,11 @@ public class RemoveSemiColonRefactoring extends AbstractRefactoringRule {
     }
 
     @Override
+    public String getName() {
+        return "Remove semi-colons";
+    }
+
+    @Override
     public boolean visit(AnnotationTypeDeclaration node) {
         return visit((BodyDeclaration) node);
     }

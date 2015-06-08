@@ -25,9 +25,6 @@
  */
 package org.autorefactor.refactoring.rules;
 
-import static org.autorefactor.refactoring.ASTHelper.*;
-import static org.autorefactor.refactoring.SourceLocation.*;
-
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -43,10 +40,13 @@ import org.eclipse.jdt.core.dom.EnumDeclaration;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 
+import static org.autorefactor.refactoring.ASTHelper.*;
+import static org.autorefactor.refactoring.SourceLocation.*;
+
 /** See {@link #getDescription()} method. */
+@SuppressWarnings("javadoc")
 public class RemoveEmptyLinesRefactoring extends AbstractRefactoringRule {
 
-    /** {@inheritDoc} */
     @Override
     public String getDescription() {
         return ""
@@ -56,9 +56,13 @@ public class RemoveEmptyLinesRefactoring extends AbstractRefactoringRule {
             + "- two consecutive empty lines are converted to a single empty line.";
     }
 
+    @Override
+    public String getName() {
+        return "Remove empty lines";
+    }
+
     private String newlineChars;
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(CompilationUnit node) {
         final String source = this.ctx.getSource(node);
@@ -131,19 +135,16 @@ public class RemoveEmptyLinesRefactoring extends AbstractRefactoringRule {
         return s.substring(m.start(groupNumber), m.end(groupNumber));
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(AnnotationTypeDeclaration node) {
         return visit((AbstractTypeDeclaration) node);
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(EnumDeclaration node) {
         return visit((AbstractTypeDeclaration) node);
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(TypeDeclaration node) {
         return visit((AbstractTypeDeclaration) node);
@@ -179,7 +180,6 @@ public class RemoveEmptyLinesRefactoring extends AbstractRefactoringRule {
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(MethodDeclaration node) {
         final String source = this.ctx.getSource(node);
@@ -193,7 +193,6 @@ public class RemoveEmptyLinesRefactoring extends AbstractRefactoringRule {
         return visit(node.getBody());
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(Block node) {
         final String source = this.ctx.getSource(node);

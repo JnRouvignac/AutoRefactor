@@ -44,21 +44,24 @@ import org.eclipse.jdt.core.dom.ThisExpression;
 import static org.autorefactor.refactoring.ASTHelper.*;
 
 /** See {@link #getDescription()} method. */
+@SuppressWarnings("javadoc")
 public class RemoveUnneededThisExpressionRefactoring extends AbstractRefactoringRule {
 
-    /** {@inheritDoc} */
     @Override
     public String getDescription() {
         return "Remove useless use of \"this\" from method calls.";
     }
 
-    /** {@inheritDoc} */
+    @Override
+    public String getName() {
+        return "Remove unneeded this expressions";
+    }
+
     @Override
     public boolean isEnabled(Preferences preferences) {
         return preferences.removeThisForNonStaticMethodAccess();
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(MethodInvocation node) {
         final ThisExpression te = as(node.getExpression(), ThisExpression.class);

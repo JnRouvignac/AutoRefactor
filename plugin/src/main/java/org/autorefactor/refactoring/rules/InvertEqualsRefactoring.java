@@ -38,9 +38,9 @@ import static org.autorefactor.refactoring.ASTHelper.*;
  * TODO JNR use CFG and expression analysis to find extra information about expression nullness.
  * </p>
  */
+@SuppressWarnings("javadoc")
 public class InvertEqualsRefactoring extends AbstractRefactoringRule {
 
-    /** {@inheritDoc} */
     @Override
     public String getDescription() {
         return ""
@@ -48,7 +48,11 @@ public class InvertEqualsRefactoring extends AbstractRefactoringRule {
             + " when it is known that the second operand is not null and the first can be null.";
     }
 
-    /** {@inheritDoc} */
+    @Override
+    public String getName() {
+        return "Invert equals";
+    }
+
     @Override
     public boolean visit(MethodInvocation node) {
         if (node.getExpression() == null) {

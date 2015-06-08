@@ -38,15 +38,19 @@ import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.eclipse.jdt.core.dom.PrefixExpression.Operator.*;
 
 /** See {@link #getDescription()} method. */
+@SuppressWarnings("javadoc")
 public class PushNegationDownRefactoring extends AbstractRefactoringRule {
 
-    /** {@inheritDoc} */
     @Override
     public String getDescription() {
         return "Pushes negations down, inside the negated expressions.";
     }
 
-    /** {@inheritDoc} */
+    @Override
+    public String getName() {
+        return "Push negation down";
+    }
+
     @Override
     public boolean visit(PrefixExpression node) {
         if (!hasOperator(node, NOT)) {

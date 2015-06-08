@@ -41,9 +41,9 @@ import static org.eclipse.jdt.core.dom.Assignment.Operator.*;
 import static org.eclipse.jdt.core.dom.InfixExpression.Operator.*;
 
 /** See {@link #getDescription()} method. */
+@SuppressWarnings("javadoc")
 public class RemoveUselessNullCheckRefactoring extends AbstractRefactoringRule {
 
-    /** {@inheritDoc} */
     @Override
     public String getDescription() {
         return ""
@@ -53,9 +53,13 @@ public class RemoveUselessNullCheckRefactoring extends AbstractRefactoringRule {
             + "It is simpler to directly assign the expression.";
     }
 
+    @Override
+    public String getName() {
+        return "Remove useless null checks";
+    }
+
     private final ASTMatcher matcher = new ASTMatcher();
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(IfStatement node) {
         final InfixExpression condition = as(node.getExpression(), InfixExpression.class);

@@ -29,8 +29,6 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.autorefactor.refactoring.RefactoringRule;
 import org.autorefactor.refactoring.rules.AllRefactoringRules;
@@ -212,7 +210,7 @@ public class ChooseRefactoringWizardPage extends WizardPage {
             @Override
             public boolean select(Viewer viewer, Object parentElement, Object refactoring) {
                 final String filter = filterText.getText().toLowerCase();
-                final String cellText = classnameToText(refactoring);
+                final String cellText = ((RefactoringRule) refactoring).getDescription();
                 return cellText.toLowerCase().indexOf(filter) != -1;
             }
         });
@@ -221,13 +219,13 @@ public class ChooseRefactoringWizardPage extends WizardPage {
             @Override
             public void update(ViewerCell cell) {
                 final String filter = filterText.getText().toLowerCase();
-                final String cellText = classnameToText(cell.getElement());
-                final int idx = cellText.toLowerCase().indexOf(filter);
+                final String cellText = ((RefactoringRule) cell.getElement()).getName();
                 cell.setText(cellText);
-                cell.setStyleRanges(getStyleRanges(cellText, filter, idx));
+                cell.setStyleRanges(getStyleRanges(cellText, filter));
             }
 
-            private StyleRange[] getStyleRanges(String text, String filter, int matchIndex) {
+            private StyleRange[] getStyleRanges(String text, String filter) {
+                final int matchIndex = text.toLowerCase().indexOf(filter);
                 final int matchLength = filter.length();
                 if (matchIndex != -1 && matchLength != 0) {
                     final StyledString styledString = new StyledString(text, defaultStyler);
@@ -238,8 +236,8 @@ public class ChooseRefactoringWizardPage extends WizardPage {
             }
 
             @Override
-            public String getToolTipText(Object element) {
-                return ((RefactoringRule) element).getDescription();
+            public String getToolTipText(Object refactoring) {
+                return ((RefactoringRule) refactoring).getDescription();
             }
 
             @Override
@@ -260,45 +258,9 @@ public class ChooseRefactoringWizardPage extends WizardPage {
         refactoringColumn.setLabelProvider(new ColumnLabelProvider() {
             @Override
             public String getText(Object element) {
-                return classnameToText(element);
+                return ((RefactoringRule) element).getName();
             }
         });
-    }
-
-    private String classnameToText(final Object r) {
-        String name = r.getClass().getSimpleName();
-        final int idx = name.indexOf("Refactoring");
-        if (idx >= 0) {
-            name = name.substring(0, idx);
-        }
-
-        final StringBuilder sb = new StringBuilder();
-        final Pattern p = Pattern.compile("([A-Z][^A-Z]*)");
-        final Matcher m = p.matcher(name);
-        boolean isFirst = true;
-        int lastMatchIdx = 0;
-        while (m.find()) {
-            final String matched = m.group();
-            lastMatchIdx = m.end();
-            if (isFirst) {
-                sb.append(matched);
-                sb.append(" ");
-                isFirst = false;
-                continue;
-            }
-            final char firtChar = matched.charAt(0);
-            if (Character.isUpperCase(firtChar)) {
-                sb.append(Character.toLowerCase(firtChar));
-                sb.append(matched, 1, matched.length());
-                if (matched.length() > 1) {
-                    sb.append(" ");
-                }
-            }
-        }
-        if (lastMatchIdx < name.length()) {
-            sb.append(name, lastMatchIdx, name.length());
-        }
-        return sb.toString();
     }
 
     private TableViewerColumn createTableViewerColumn(TableViewer tableViewer) {

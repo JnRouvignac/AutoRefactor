@@ -51,15 +51,20 @@ import static org.eclipse.jdt.core.dom.Assignment.Operator.*;
 import static org.eclipse.jdt.core.dom.InfixExpression.Operator.*;
 
 /** See {@link #getDescription()} method. */
+@SuppressWarnings("javadoc")
 public class HotSpotIntrinsicedAPIsRefactoring extends AbstractRefactoringRule {
 
-    /** {@inheritDoc} */
     @Override
     public String getDescription() {
         return ""
             + "Refactors code patterns to use intrinsiced APIs in Hotspot JVM.\n"
             + "Intrinsics are APIs that receive special treatment when JITed:"
             + " they can be compiled down to use very efficient CPU instructions.";
+    }
+
+    @Override
+    public String getName() {
+        return "HotSpot intrinsiced APIs";
     }
 
     private static class SystemArrayCopyParams {
@@ -86,7 +91,6 @@ public class HotSpotIntrinsicedAPIsRefactoring extends AbstractRefactoringRule {
         super();
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(ForStatement node) {
         final SystemArrayCopyParams params = new SystemArrayCopyParams();

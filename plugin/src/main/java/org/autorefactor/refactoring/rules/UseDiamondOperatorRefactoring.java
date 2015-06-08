@@ -51,6 +51,11 @@ public class UseDiamondOperatorRefactoring extends AbstractRefactoringRule {
     }
 
     @Override
+    public String getName() {
+        return "Diamond operator";
+    }
+
+    @Override
     public boolean visit(ClassInstanceCreation node) {
         if (this.ctx.getJavaProjectOptions().getJavaSERelease().isCompatibleWith(Release.javaSE("1.7.0"))) {
             final Type type = node.getType();

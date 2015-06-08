@@ -54,10 +54,14 @@ import static org.autorefactor.refactoring.ASTHelper.*;
 @SuppressWarnings("javadoc")
 public class DeadCodeEliminationRefactoring extends AbstractRefactoringRule {
 
-    /** {@inheritDoc} */
     @Override
     public String getDescription() {
         return "Removes dead code.";
+    }
+
+    @Override
+    public String getName() {
+        return "Dead code elimination";
     }
 
     // TODO JNR

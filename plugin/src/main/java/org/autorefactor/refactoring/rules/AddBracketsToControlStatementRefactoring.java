@@ -38,9 +38,9 @@ import org.eclipse.jdt.core.dom.WhileStatement;
 import static org.autorefactor.refactoring.ASTHelper.*;
 
 /** See {@link #getDescription()} method. */
+@SuppressWarnings("javadoc")
 public class AddBracketsToControlStatementRefactoring extends AbstractRefactoringRule {
 
-    /** {@inheritDoc} */
     @Override
     public String getDescription() {
         return ""
@@ -52,11 +52,15 @@ public class AddBracketsToControlStatementRefactoring extends AbstractRefactorin
     }
 
     @Override
+    public String getName() {
+        return "Add brackets to control statement";
+    }
+
+    @Override
     public boolean isEnabled(final Preferences prefs) {
         return prefs.addCurlyBracketsToStatementBodies();
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(IfStatement node) {
         boolean result = VISIT_SUBTREE;

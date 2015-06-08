@@ -50,15 +50,19 @@ import static org.eclipse.jdt.core.dom.InfixExpression.Operator.*;
  * <p>
  * TODO JNR remove casts from method parameters
  */
+@SuppressWarnings("javadoc")
 public class RemoveUnnecessaryCastRefactoring extends AbstractRefactoringRule {
 
-    /** {@inheritDoc} */
     @Override
     public String getDescription() {
         return "Removes unnecessary widening casts from return statements, assignments and infix expressions.";
     }
 
-    /** {@inheritDoc} */
+    @Override
+    public String getName() {
+        return "Remove unnecessary casts";
+    }
+
     @Override
     public boolean visit(CastExpression node) {
         if (canRemoveCast(node)) {

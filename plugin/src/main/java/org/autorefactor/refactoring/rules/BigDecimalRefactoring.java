@@ -43,9 +43,9 @@ import static org.autorefactor.refactoring.JavaConstants.*;
 import static org.eclipse.jdt.core.dom.InfixExpression.Operator.*;
 
 /** See {@link #getDescription()} method. */
+@SuppressWarnings("javadoc")
 public class BigDecimalRefactoring extends AbstractRefactoringRule {
 
-    /** {@inheritDoc} */
     @Override
     public String getDescription() {
         return ""
@@ -56,11 +56,15 @@ public class BigDecimalRefactoring extends AbstractRefactoringRule {
             + "- replace calls to BigDecimal.equals(Object) with calls to BigDecimal.compareTo(BigDecimal).";
     }
 
+    @Override
+    public String getName() {
+        return "BigDecimal";
+    }
+
     private int getJavaMinorVersion() {
         return ctx.getJavaProjectOptions().getJavaSERelease().getMinorVersion();
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(ClassInstanceCreation node) {
         final ITypeBinding typeBinding = node.getType().resolveBinding();
@@ -124,7 +128,6 @@ public class BigDecimalRefactoring extends AbstractRefactoringRule {
         return this.ctx.getASTBuilder().string(numberLiteral);
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(MethodInvocation node) {
         if (node.getExpression() == null) {

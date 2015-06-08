@@ -34,15 +34,19 @@ import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.eclipse.jdt.core.dom.InfixExpression.Operator.*;
 
 /** See {@link #getDescription()} method. */
+@SuppressWarnings("javadoc")
 public class CollapseIfStatementRefactoring extends AbstractRefactoringRule {
 
-    /** {@inheritDoc} */
     @Override
     public String getDescription() {
         return "Collapses two consecutive if statements into just one.";
     }
 
-    /** {@inheritDoc} */
+    @Override
+    public String getName() {
+        return "Collapse if statements";
+    }
+
     @Override
     public boolean visit(IfStatement node) {
         if (node.getElseStatement() == null) {

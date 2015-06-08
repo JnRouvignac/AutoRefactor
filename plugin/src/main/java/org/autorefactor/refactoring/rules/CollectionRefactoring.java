@@ -58,9 +58,9 @@ import static org.eclipse.jdt.core.dom.InfixExpression.Operator.*;
 import static org.eclipse.jdt.core.dom.PrefixExpression.Operator.*;
 
 /** See {@link #getDescription()} method. */
+@SuppressWarnings("javadoc")
 public class CollectionRefactoring extends AbstractRefactoringRule {
 
-    /** {@inheritDoc} */
     @Override
     public String getDescription() {
         return ""
@@ -74,7 +74,11 @@ public class CollectionRefactoring extends AbstractRefactoringRule {
             + "- replaces calls to Set.contains() immediately followed by Set.add() with straight calls to Set.add().";
     }
 
-    /** {@inheritDoc} */
+    @Override
+    public String getName() {
+        return "Collection";
+    }
+
     @Override
     public boolean visit(ExpressionStatement node) {
         final MethodInvocation mi = asExpression(node, MethodInvocation.class);
@@ -164,7 +168,6 @@ public class CollectionRefactoring extends AbstractRefactoringRule {
         return false;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(EnhancedForStatement node) {
         final Expression collection = node.getExpression();
@@ -194,7 +197,6 @@ public class CollectionRefactoring extends AbstractRefactoringRule {
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(ForStatement node) {
         final ForLoopContent loopContent = iterateOverContainer(node);

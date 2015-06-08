@@ -47,6 +47,11 @@ public class ForeachRefactoring extends AbstractRefactoringRule {
             + "Replaces Map.keySet() iteration with calls to Map.get()} into iterations over Map.entrySet().";
     }
 
+    @Override
+    public String getName() {
+        return "Foreach";
+    }
+
     private static class VariableUseVisitor extends ASTVisitor {
         @Override
         public boolean visit(SimpleName node) {

@@ -54,9 +54,9 @@ import static org.autorefactor.util.Utils.*;
 import static org.eclipse.jdt.core.dom.InfixExpression.Operator.*;
 
 /** See {@link #getDescription()} method. */
+@SuppressWarnings("javadoc")
 public class SimplifyExpressionRefactoring extends AbstractRefactoringRule {
 
-    /** {@inheritDoc} */
     @Override
     public String getDescription() {
         return ""
@@ -65,6 +65,11 @@ public class SimplifyExpressionRefactoring extends AbstractRefactoringRule {
             + "- fix Comparable.compareTo() usage,\n"
             + "- remove useless parentheses,\n"
             + "- directly check boolean values instead of comparing tham with true/false.";
+    }
+
+    @Override
+    public String getName() {
+        return "Simplify expressions";
     }
 
     /** A mapping of child operation to parent operation that mandates using parentheses. */
@@ -99,7 +104,6 @@ public class SimplifyExpressionRefactoring extends AbstractRefactoringRule {
 
     // TODO JNR String s = "some " + " string " + "" + ( "fhj" + "prout" );
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(ParenthesizedExpression node) {
         final Expression innerExpr = getExpressionWithoutParentheses(node);
@@ -211,7 +215,6 @@ public class SimplifyExpressionRefactoring extends AbstractRefactoringRule {
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(MethodInvocation node) {
         if (node.getExpression() == null) {
@@ -269,7 +272,6 @@ public class SimplifyExpressionRefactoring extends AbstractRefactoringRule {
         return DO_NOT_VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(InfixExpression node) {
         final Expression lhs = node.getLeftOperand();

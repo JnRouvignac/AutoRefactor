@@ -25,15 +25,15 @@
  */
 package org.autorefactor.refactoring.rules;
 
-import static org.autorefactor.refactoring.ASTHelper.*;
-import static org.eclipse.jdt.core.dom.IfStatement.*;
-
 import java.util.List;
 
 import org.autorefactor.refactoring.ASTBuilder;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.Statement;
+
+import static org.autorefactor.refactoring.ASTHelper.*;
+import static org.eclipse.jdt.core.dom.IfStatement.*;
 
 /**
  * Refactors:
@@ -60,12 +60,17 @@ import org.eclipse.jdt.core.dom.Statement;
  *
  * @see #getDescription()
  */
+@SuppressWarnings("javadoc")
 public class IfElseIfRefactoring extends AbstractRefactoringRule {
 
-    /** {@inheritDoc} */
     @Override
     public String getDescription() {
         return "Refactors \"else { if (...) {} }\" to \"else if (...) {}\" to.";
+    }
+
+    @Override
+    public String getName() {
+        return "if-elseif";
     }
 
     // TODO JNR
@@ -82,7 +87,6 @@ public class IfElseIfRefactoring extends AbstractRefactoringRule {
     // }
     // return l;
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(IfStatement node) {
         final Statement elseStmt = node.getElseStatement();

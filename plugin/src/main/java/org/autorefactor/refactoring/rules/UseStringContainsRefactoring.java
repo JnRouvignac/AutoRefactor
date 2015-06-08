@@ -47,6 +47,11 @@ public class UseStringContainsRefactoring extends AbstractRefactoringRule {
     }
 
     @Override
+    public String getName() {
+        return "Use String.contains()";
+    }
+
+    @Override
     public boolean visit(MethodInvocation node) {
         final ASTNode parent = getFirstAncestorWithoutParentheses(node);
         if (parent instanceof InfixExpression

@@ -52,9 +52,9 @@ import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.eclipse.jdt.core.dom.Modifier.*;
 
 /** See {@link #getDescription()} method. */
+@SuppressWarnings("javadoc")
 public class RemoveUselessModifiersRefactoring extends AbstractRefactoringRule {
 
-    /** {@inheritDoc} */
     @Override
     public String getDescription() {
         return ""
@@ -63,6 +63,11 @@ public class RemoveUselessModifiersRefactoring extends AbstractRefactoringRule {
             + "- \"public\", \"static\" and \"final\" for interfaces fields,\n"
             + "- \"public\" and \"abstract\" for interfaces methods,\n"
             + "- \"final\" for parameters in interface method declarations.";
+    }
+
+    @Override
+    public String getName() {
+        return "Remove useless modifiers";
     }
 
     private static final class ModifierOrderComparator implements Comparator<Modifier> {
@@ -94,7 +99,6 @@ public class RemoveUselessModifiersRefactoring extends AbstractRefactoringRule {
                     ModifierKeyword.NATIVE_KEYWORD,
                     ModifierKeyword.STRICTFP_KEYWORD));
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(FieldDeclaration node) {
         if (isInterface(node.getParent())) {
@@ -116,7 +120,6 @@ public class RemoveUselessModifiersRefactoring extends AbstractRefactoringRule {
                 && ((TypeDeclaration) node).isInterface();
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(MethodDeclaration node) {
         final int modifierFlags = node.getModifiers();
@@ -146,25 +149,21 @@ public class RemoveUselessModifiersRefactoring extends AbstractRefactoringRule {
         return result;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(AnnotationTypeDeclaration node) {
         return ensureModifiersOrder(node);
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(AnnotationTypeMemberDeclaration node) {
         return removePublicAbstractModifiers(node);
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(EnumDeclaration node) {
         return ensureModifiersOrder(node);
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(TypeDeclaration node) {
         return ensureModifiersOrder(node);
@@ -197,7 +196,6 @@ public class RemoveUselessModifiersRefactoring extends AbstractRefactoringRule {
         this.ctx.getRefactorings().insertAt(b.move(m), index, m.getLocationInParent(), m.getParent());
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(SingleVariableDeclaration node) {
         boolean result = VISIT_SUBTREE;

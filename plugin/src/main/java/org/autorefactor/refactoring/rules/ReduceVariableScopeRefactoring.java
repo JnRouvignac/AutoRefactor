@@ -74,12 +74,17 @@ import static org.autorefactor.util.Utils.*;
  *
  * @see {@link #getDescription()}
  */
+@SuppressWarnings("javadoc")
 public class ReduceVariableScopeRefactoring extends AbstractRefactoringRule {
 
-    /** {@inheritDoc} */
     @Override
     public String getDescription() {
         return "Reduces the scope of local variables.";
+    }
+
+    @Override
+    public String getName() {
+        return "Reduce scope of variable";
     }
 
     private static final int DECL  = 1 << 0;
@@ -186,14 +191,12 @@ public class ReduceVariableScopeRefactoring extends AbstractRefactoringRule {
             new HashMap<VariableName, List<VariableAccess>>();
     private static final Pair<Integer, ASTNode> NULL_PAIR = Pair.of(0, null);
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(SimpleName node) {
         findVariableAccesses(node);
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(QualifiedName node) {
         findVariableAccesses(node);
@@ -263,7 +266,6 @@ public class ReduceVariableScopeRefactoring extends AbstractRefactoringRule {
         throw new NotImplementedException(node);
     }
 
-    /** {@inheritDoc} */
     @Override
     public Refactorings getRefactorings(CompilationUnit astRoot) {
         astRoot.accept(this);

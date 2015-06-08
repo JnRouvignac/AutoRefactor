@@ -58,6 +58,11 @@ public class UseMultiCatchRefactoring extends AbstractRefactoringRule {
         return "Refactors catch clauses with the same body to use Java 7's multi-catch.";
     }
 
+    @Override
+    public String getName() {
+        return "Multi-catch";
+    }
+
     private static enum AggregateDirection {
         NONE, FORWARD, BACKWARD;
     }

@@ -53,6 +53,11 @@ public class WorkWithNullCheckedExpressionFirstRefactoring extends AbstractRefac
     }
 
     @Override
+    public String getName() {
+        return "Work with null checked expressions first";
+    }
+
+    @Override
     public boolean visit(IfStatement node) {
         final Statement thenStmt = getThenStatement(node);
         final Statement elseStmt = getElseStatement(node, thenStmt);
