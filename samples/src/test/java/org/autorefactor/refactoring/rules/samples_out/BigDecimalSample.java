@@ -29,46 +29,50 @@ import java.math.BigDecimal;
 
 public class BigDecimalSample {
 
-    public static void main(String[] args) {
-        {
-            // should use a string to initialize
-            BigDecimal bd1 = new BigDecimal("123.345");
-            BigDecimal bd2 = new BigDecimal("123.345");
-            // should not be touched
-            BigDecimal bd3 = BigDecimal.valueOf(123);
-            BigDecimal bd4 = BigDecimal.valueOf(123);
-
-            // should use compareTo() == 0
-            boolean b = bd1.compareTo(bd2) == 0;
-            // should use compareTo() == 0 with parentheses
-            String s = "" + (bd1.compareTo(bd2) == 0);
-            // should use compareTo() == 0 with parentheses
-            String s2 = "" + 1 + (bd1.compareTo(bd2) == 0) + 2;
-            // should use compareTo() == 0 with parentheses
-            String s3 = "" + 1 + (bd1.compareTo(bd2) == 0);
-        }
-
-        {
-            BigDecimal bd1 = BigDecimal.ZERO;
-            BigDecimal bd2 = BigDecimal.ONE;
-            BigDecimal bd3 = BigDecimal.TEN;
-            BigDecimal bd4 = BigDecimal.valueOf(5);
-            BigDecimal bd5 = new BigDecimal("5.4");
-        }
-        {
-            BigDecimal bd1 = BigDecimal.ZERO;
-            BigDecimal bd2 = BigDecimal.ONE;
-            BigDecimal bd3 = BigDecimal.TEN;
-            BigDecimal bd4 = BigDecimal.valueOf(5);
-            BigDecimal bd5 = new BigDecimal("5.4");
-        }
-        {
-            BigDecimal bd1 = BigDecimal.ZERO;
-            BigDecimal bd2 = BigDecimal.ONE;
-            BigDecimal bd3 = BigDecimal.TEN;
-            BigDecimal bd4 = BigDecimal.valueOf(5);
-            BigDecimal bd5 = new BigDecimal("5.4");
-        }
+    private static String useConstructorWithStringArg() {
+        BigDecimal bd1 = new BigDecimal("123.345");
+        BigDecimal bd2 = new BigDecimal("123.345");
+        return "" + bd1 + bd2;
     }
 
+    private static boolean refactorToCompareToEqualsZero(BigDecimal bd1, BigDecimal bd2) {
+        return bd1.compareTo(bd2) == 0;
+    }
+
+    private static String refactorToCompareToEqualsZeroSurroundWithParentheses(BigDecimal bd1, BigDecimal bd2) {
+        String s = "" + (bd1.compareTo(bd2) == 0);
+        String s2 = "" + 1 + (bd1.compareTo(bd2) == 0) + 2;
+        String s3 = "" + 1 + (bd1.compareTo(bd2) == 0);
+        return s + s2 + s3;
+    }
+
+    private static String useBigDecimalConstants() {
+        BigDecimal bd1 = BigDecimal.ZERO;
+        BigDecimal bd2 = BigDecimal.ONE;
+        BigDecimal bd3 = BigDecimal.TEN;
+
+        BigDecimal bd4 = BigDecimal.ZERO;
+        BigDecimal bd5 = BigDecimal.ONE;
+        BigDecimal bd6 = BigDecimal.TEN;
+
+        BigDecimal bd7 = BigDecimal.ZERO;
+        BigDecimal bd8 = BigDecimal.ONE;
+        BigDecimal bd9 = BigDecimal.TEN;
+
+        return "" + bd1 + bd2 + bd3 + bd4 + bd5 + bd6 + bd7 + bd8 + bd9;
+    }
+
+    private static String useValueOf() {
+        BigDecimal bd1 = BigDecimal.valueOf(5);
+        BigDecimal bd2 = BigDecimal.valueOf(5);
+        return "" + bd1 + bd2;
+    }
+
+    private static BigDecimal doNotRefactorCorrectUseOfValueOf() {
+        return BigDecimal.valueOf(5);
+    }
+
+    private static BigDecimal doNotRefactorCorrectUseOfCtorWithStringArg() {
+        return new BigDecimal("5.4");
+    }
 }
