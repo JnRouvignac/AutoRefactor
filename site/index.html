@@ -58,7 +58,7 @@
     <p>The first software will be an Eclipse plugin to automatically refactor Java code bases. License will be dual licensed under EPLv1.0 and GPLv3+.</p>
     <h2>Why?</h2>
 After years working in different large code bases, I (Jean-No&euml;l Rouvignac) got tired of spending too much time applying the same code cleanups again and again.
-In addition, tools like <a href="http://www.sonarqube.org">SonarQube&trade;</a> (aggregating <a href="http://findbugs.sourceforge.net">FindBugs&trade;</a>, <a href="http://checkstyle.sourceforge.net">Checkstyle</a> and <a href="http://pmd.sourceforge.net">PMD</a>) are fantastic, but they do not not help fix the thousand warnings you can find in legacy code bases.
+In addition, tools like <a href="http://www.sonarqube.org">SonarQube&trade;</a> (providing their own Java analyzer and also supporting the aggregation of <a href="http://findbugs.sourceforge.net">FindBugs&trade;</a>, <a href="http://checkstyle.sourceforge.net">Checkstyle</a> and <a href="http://pmd.sourceforge.net">PMD</a>) are fantastic, but they do not not help fix the thousand warnings you can find in legacy code bases.
     <p>
 I decided I had spent too much time on manually doing these changes, so I tried using <a href="http://en.wikipedia.org/wiki/Regular_expression">regular expressions</a>. They work great for some code transforms, but can only do so much: they do not understand the language semantics, reapplying them again and again consumes time, they sometimes fail to execute due to too much complexity. I then sought for better and libre solutions, but found none. This is when I started AutoRefactor.
     </p>
@@ -177,7 +177,7 @@ How to <a href="https://github.com/JnRouvignac/AutoRefactor/blob/master/CONTRIBU
         <li><a href="http://findbugs.sourceforge.net">FindBugs&trade;</a> and <a href="http://fb-contrib.sourceforge.net">fb-contrib&trade;</a>, bytecode-based software flaw finder for Java programs</li>
         <li><a href="http://checkstyle.sourceforge.net">Checkstyle</a>, coding conventions checker for Java programs</li>
         <li><a href="http://pmd.sourceforge.net">PMD</a>, source-based software flaw finder for Java programs</li>
-        <li><a href="http://www.sonarqube.org">SonarQube&trade;</a> aggregates the results of the precedent three software in a unified and coherent interface. It adds code coverage measurement and computes a lot of useful source code metrics. It is very useful for managing the health of source code and technical debt.</li>
+        <li><a href="http://www.sonarqube.org">SonarQube&trade;</a> provides its own Java static analyzer and also support the aggregation of the results of the precedent three software in a unified and coherent interface. It adds code coverage measurement and computes a lot of useful source code metrics. It is very useful for managing the health of source code and technical debt.</li>
         <li><a href="http://walkmod.com/">walkmod</a>, a tool for Java source code that share common goals with AutoRefactor
         <li><a href="http://coccinelle.lip6.fr/">Coccinelle</a>, a fantastic source of inspiration for automated source-to-source transformations</li>
       </ul>
