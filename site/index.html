@@ -108,6 +108,11 @@ The samples are extracted from the unit tests suite.
       <h3>2015-03-23 - v1.0.0 is out!</h3>
       <p>Many refactoring rules based on pattern matching are part of the release. Give it a try!</p>
     <h2>Install</h2>
+      <h4>From the Eclipse marketplace</h4>
+      <p>Drag to your running Eclipse workspace to install AutoRefactor: <a href="http://marketplace.eclipse.org/marketplace-client-intro?mpc_install=2254782" class="drag" title="Drag to your running Eclipse workspace to install AutoRefactor"><img src="https://marketplace.eclipse.org/sites/all/themes/solstice/_themes/solstice_marketplace/public/images/btn-install.png" alt="Drag to your running Eclipse workspace to install AutoRefactor" style="vertical-align: middle;"/></a>
+      </p>
+      <h4>From AutoRefactor update site</h4>
+      <h5>stable release</h5>
       <ul>
         <li>Go to <code>Menu</code> > <code>Help</code> > <code>Install New Software...</code></li>
         <li>Click the <code>Add...</code> button on the right</li>
@@ -119,6 +124,7 @@ The samples are extracted from the unit tests suite.
         <li>Accept the terms of the license agreement</li>
         <li>Click the <code>Finish</code> button at the bottom.</li>
       </ul>
+      <h5>nightly (maybe unstable)</h5>
       <p>For more adventurous users, nightlies (potentially unstable) are available at "<em><a href="http://autorefactor.org/nightly/">http://autorefactor.org/nightly/</a></em>".</p>
     <h2>Contribute</h2>
 How to <a href="https://github.com/JnRouvignac/AutoRefactor/blob/master/CONTRIBUTING.md">Contribute</a>
@@ -174,12 +180,15 @@ How to <a href="https://github.com/JnRouvignac/AutoRefactor/blob/master/CONTRIBU
     <h4>Tools</h4>
       <ul>
         <li><a href="http://www.eclipse.org/jdt/">Eclipse Java development tools (JDT)</a>, the base for this plugin</li>
+        <li><a href="http://www.ucdetector.org/">UCDetector: Unnecessary Code Detector</a>, eclipse plugin that finds unnecessary (dead) public java code; suggests to the reduce visibility of methods, fields, classes; and make fields final. It offers to fix the reported issues in a batch mode.</li>
         <li><a href="http://findbugs.sourceforge.net">FindBugs&trade;</a> and <a href="http://fb-contrib.sourceforge.net">fb-contrib&trade;</a>, bytecode-based software flaw finder for Java programs</li>
         <li><a href="http://checkstyle.sourceforge.net">Checkstyle</a>, coding conventions checker for Java programs</li>
         <li><a href="http://pmd.sourceforge.net">PMD</a>, source-based software flaw finder for Java programs</li>
         <li><a href="http://www.sonarqube.org">SonarQube&trade;</a> provides its own Java static analyzer and also support the aggregation of the results of the precedent three software in a unified and coherent interface. It adds code coverage measurement and computes a lot of useful source code metrics. It is very useful for managing the health of source code and technical debt.</li>
         <li><a href="http://walkmod.com/">walkmod</a>, a tool for Java source code that share common goals with AutoRefactor
-        <li><a href="http://coccinelle.lip6.fr/">Coccinelle</a>, a fantastic source of inspiration for automated source-to-source transformations</li>
+        <li><a href="http://coccinelle.lip6.fr/">Coccinelle</a>, a fantastic source of inspiration for automated source-to-source transformations
+          <ul><li><a href="https://github.com/facebook/pfff">Pfff</a>, a continuation of Coccinelle that can be used with several languages</ul>
+        </li>
       </ul>
     <h4>Library</h4>
       Find here several books inspiring everyday how and why this plugin is written:
