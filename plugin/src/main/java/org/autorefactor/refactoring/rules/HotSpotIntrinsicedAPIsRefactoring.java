@@ -102,7 +102,7 @@ public class HotSpotIntrinsicedAPIsRefactoring extends AbstractRefactoringRule {
             collectLength(node.getExpression(), incrementedIdx, params);
 
             final Assignment as = asExpression(stmts.get(0), Assignment.class);
-            if (as != null) {
+            if (hasOperator(as, ASSIGN)) {
                 final Expression lhs = as.getLeftHandSide();
                 final Expression rhs = as.getRightHandSide();
                 if (lhs instanceof ArrayAccess && rhs instanceof ArrayAccess) {

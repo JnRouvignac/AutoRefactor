@@ -35,6 +35,12 @@ public class HotSpotIntrinsicedAPIsSample {
         }
     }
 
+    public static void doNotRefactorWrongOperator(int[] a1, int[] a2) {
+        for (int i = 0; i < 3; i++) {
+            a2[i] += a1[i];
+        }
+    }
+
     public static void doNotReplaceBySystemArrayCopyWhenTypeDiffers(byte[] src, int[] dest) {
         for (int i = 0; i < 3; i++) {
             dest[i] = src[i];
