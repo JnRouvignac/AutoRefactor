@@ -43,4 +43,9 @@ public class RemoveEmptyLinesSample
     public void anotherMethod() throws Exception
     {
     }
+
+    public void doNotRefactorMultipleBracesSameLine() throws Exception {
+        try {
+        } catch (Exception e) { }
+    }
 }
