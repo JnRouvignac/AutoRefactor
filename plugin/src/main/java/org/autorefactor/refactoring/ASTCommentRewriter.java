@@ -48,7 +48,6 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.text.edits.DeleteEdit;
 import org.eclipse.text.edits.InsertEdit;
 import org.eclipse.text.edits.MultiTextEdit;
-import org.eclipse.text.edits.RangeMarker;
 import org.eclipse.text.edits.ReplaceEdit;
 import org.eclipse.text.edits.TextEdit;
 import org.eclipse.text.edits.TextEditVisitor;
@@ -139,16 +138,16 @@ public class ASTCommentRewriter {
 
     private boolean anyCommentEditIsCovered(TextEdit edits, List<TextEdit> commentEdits) {
         for (TextEdit commentEdit : commentEdits) {
-            if (covers(edits, commentEdit.getOffset(), commentEdit.getLength())) {
+            if (covers(edits, commentEdit)) {
                 return true;
             }
         }
         return false;
     }
 
-    private boolean covers(TextEdit edits, int startPosition, int length) {
-        final TextEdit range = new RangeMarker(startPosition, length);
-        final AtomicBoolean covers = new AtomicBoolean();
+    private boolean covers(TextEdit edits, TextEdit edit2) {
+        final SourceLocation range = toSourceLoc(edit2);
+        final AtomicBoolean overlaps = new AtomicBoolean();
         edits.accept(new TextEditVisitor() {
             @Override
             public boolean visit(MultiTextEdit edit) {
@@ -158,14 +157,21 @@ public class ASTCommentRewriter {
 
             @Override
             public boolean visitNode(TextEdit edit) {
-                if (!covers.get()) {
-                    // is it covered now?
-                    covers.set(edit.covers(range));
+                if (!overlaps.get()) {
+                    overlaps.set(overlapsWith(range, edit));
                 }
-                return !covers.get();
+                return !overlaps.get();
+            }
+
+            private boolean overlapsWith(SourceLocation loc1, TextEdit edit) {
+                return loc1.overlapsWith(toSourceLoc(edit));
             }
         });
-        return covers.get();
+        return overlaps.get();
+    }
+
+    private SourceLocation toSourceLoc(TextEdit edit) {
+        return new SourceLocation(edit.getOffset(), edit.getLength());
     }
 
     private void addRemovalEdits(List<TextEdit> commentEdits, String source) {

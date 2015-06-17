@@ -93,13 +93,15 @@ public class SourceLocation implements ISourceRange, Comparable<ISourceRange> {
         return node.getStartPosition() + node.getLength();
     }
 
-    /** {@inheritDoc} */
+    private static int getEndPosition(ISourceRange range) {
+        return range.getOffset() + range.getLength();
+    }
+
     @Override
     public int getLength() {
         return this.length;
     }
 
-    /** {@inheritDoc} */
     @Override
     public int getOffset() {
         return this.offset;
@@ -144,7 +146,26 @@ public class SourceLocation implements ISourceRange, Comparable<ISourceRange> {
                 && sourceRange.getOffset() + sourceRange.getLength() <= getEndPosition();
     }
 
-    /** {@inheritDoc} */
+    /**
+     * Whether the provided source range overlaps with the current source location.
+     *
+     * @param sourceRange the provided source range
+     * @return true if the provided source range overlaps with the current source location, false otherwise
+     */
+    public boolean overlapsWith(ISourceRange sourceRange) {
+        return overlapsLeft(sourceRange) || overlapsRight(sourceRange);
+    }
+
+    private boolean overlapsLeft(ISourceRange range) {
+        return getStartPosition() <= range.getOffset()
+                && range.getOffset() <= getEndPosition();
+    }
+
+    private boolean overlapsRight(ISourceRange range) {
+        return range.getOffset() <= getStartPosition()
+                && getStartPosition() <= getEndPosition(range);
+    }
+
     @Override
     public int compareTo(ISourceRange sourceRange) {
         final int offsetDiff = this.offset - sourceRange.getOffset();
@@ -154,7 +175,6 @@ public class SourceLocation implements ISourceRange, Comparable<ISourceRange> {
         return this.length - sourceRange.getLength();
     }
 
-    /** {@inheritDoc} */
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -164,7 +184,6 @@ public class SourceLocation implements ISourceRange, Comparable<ISourceRange> {
         return result;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
@@ -178,10 +197,8 @@ public class SourceLocation implements ISourceRange, Comparable<ISourceRange> {
                 && equal(offset, other.offset);
     }
 
-    /** {@inheritDoc} */
     @Override
     public String toString() {
         return "SourceLocation [offset=" + offset + ", length=" + length + "]";
     }
-
 }

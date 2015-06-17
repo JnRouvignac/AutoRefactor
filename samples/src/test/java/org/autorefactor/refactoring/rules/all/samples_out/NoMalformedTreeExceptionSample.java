@@ -34,4 +34,11 @@ public class NoMalformedTreeExceptionSample {
             System.out.println("true");
         }
     }
+
+    public void commentRefactoringsInteractsWithCodeRefactoring2(
+            boolean b, Object something, Object somethingElse) {
+        StringBuffer sql = new StringBuffer();
+        sql.append(b ? something : somethingElse
+        );
+    }
 }
