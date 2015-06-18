@@ -117,6 +117,9 @@ public class RemoveSemiColonRefactoring extends AbstractRefactoringRule {
     }
 
     private boolean removeSuperfluousCommas(ASTNode node, int start, int end) {
+        if (end <= start) {
+            return VISIT_SUBTREE;
+        }
         boolean result = VISIT_SUBTREE;
         final String source = ctx.getSource(node);
         final ASTNode root = node.getRoot();

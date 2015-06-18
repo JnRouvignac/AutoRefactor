@@ -53,6 +53,7 @@ import org.eclipse.text.edits.TextEdit;
 import org.eclipse.text.edits.TextEditVisitor;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
+import static org.autorefactor.refactoring.SourceLocation.*;
 
 /**
  * This class rewrites AST comments.
@@ -261,10 +262,17 @@ public class ASTCommentRewriter {
             // assume comment is situated exactly after target node for javadoc
             final String indent = getIndent(nextNode, source, lineStarts);
             final String newJavadoc = "/**" + spaceAtStart + commentText + spaceAtEnd + "*/\r\n" + indent;
-            final int nbWhiteSpaces = nbTrailingSpaces(source, commentStart);
             commentEdits.add(new InsertEdit(nodeStart, newJavadoc));
-            commentEdits.add(new DeleteEdit(commentStart - nbWhiteSpaces, nbWhiteSpaces + commentLength));
+            deleteLineCommentAfterNode(commentEdits, source, lineComment);
         }
+    }
+
+    private void deleteLineCommentAfterNode(List<TextEdit> commentEdits,
+            String source, LineComment lineComment) {
+        final int commentStart = lineComment.getStartPosition();
+        final int commentLength = lineComment.getLength();
+        final int nbWhiteSpaces = nbTrailingSpaces(source, commentStart);
+        commentEdits.add(new DeleteEdit(commentStart - nbWhiteSpaces, nbWhiteSpaces + commentLength));
     }
 
     private int nbTrailingSpaces(String source, int commentStart) {
@@ -276,35 +284,62 @@ public class ASTCommentRewriter {
     }
 
     private void addMultiLineCommentsToJavadocEdits(List<TextEdit> commentEdits, ASTNode node,
-            List<LineComment> lineComments,
-             String source, TreeSet<Integer> lineStarts) {
+            List<LineComment> lineComments, String source, TreeSet<Integer> lineStarts) {
         final String newline = "\n";
         for (int i = 0; i < lineComments.size(); i++) {
             final LineComment lineComment = lineComments.get(i);
-            if (node.getStartPosition() < lineComment.getStartPosition()) {
-                throw new NotImplementedException(lineComment,
-                        " for comments situated after the target node for the Javadoc");
-            }
-            final String replacementText;
-            final boolean isFirst = i == 0;
-            if (isFirst) {
-                // TODO JNR how to get access to configured newline? @see #getNewline();
-                // TODO JNR how to obey configured indentation?
-                replacementText = "/**" + newline + getIndentForJavadoc(lineComment, source, lineStarts) + "*";
+            if (lineComment.getStartPosition() <= node.getStartPosition()) {
+                replaceLineCommentBeforeJavaElement(
+                        commentEdits, lineComment, lineComments, i, source, lineStarts, newline);
             } else {
-                replacementText = " *";
-            }
-            commentEdits.add(new ReplaceEdit(lineComment.getStartPosition(), "//".length(), replacementText));
-
-            final boolean isLast = i == lineComments.size() - 1;
-            if (isLast) {
-                // TODO JNR how to get access to configured newline? @see #getNewline();
-                // TODO JNR how to obey configured indentation?
-                final int position = lineComment.getStartPosition() + lineComment.getLength();
-                final String indent = getIndentForJavadoc(lineComment, source, lineStarts);
-                commentEdits.add(new InsertEdit(position, newline + indent + "*/"));
+                replaceLineCommentAfterJavaElement(
+                        commentEdits, lineComment, lineComments, i, source, lineStarts, newline);
             }
         }
+    }
+
+    private void replaceLineCommentBeforeJavaElement(List<TextEdit> commentEdits,
+            LineComment lineComment, List<LineComment> lineComments, int i,
+            String source, TreeSet<Integer> lineStarts, String newline) {
+        final boolean isFirst = i == 0;
+        final String replacementText;
+        if (isFirst) {
+            // TODO JNR how to get access to configured newline? @see #getNewline();
+            // TODO JNR how to obey configured indentation?
+            replacementText = "/**" + newline + getIndentForJavadoc(lineComment, source, lineStarts) + "*";
+        } else {
+            replacementText = " *";
+        }
+        commentEdits.add(new ReplaceEdit(lineComment.getStartPosition(), "//".length(), replacementText));
+
+        final boolean isLast = i == lineComments.size() - 1;
+        if (isLast) {
+            // TODO JNR how to get access to configured newline? @see #getNewline();
+            // TODO JNR how to obey configured indentation?
+            final int position = getEndPosition(lineComment);
+            final String indent = getIndentForJavadoc(lineComment, source, lineStarts);
+            commentEdits.add(new InsertEdit(position, newline + indent + "*/"));
+        }
+    }
+
+    private void replaceLineCommentAfterJavaElement(List<TextEdit> commentEdits,
+            LineComment lineComment, List<LineComment> lineComments, int i,
+            String source, TreeSet<Integer> lineStarts, String newline) {
+        if (i - 1 < 0) {
+            throw new NotImplementedException(lineComment,
+                    "for a line comment situated after the java elements that it documents,"
+                            + " and this line comment is not the last line comment to add to the javadoc.");
+        }
+
+        final String commentText = source.substring(
+                lineComment.getStartPosition() + "//".length(), getEndPosition(lineComment));
+        final LineComment previousLineComment = lineComments.get(i - 1);
+        final int position = getEndPosition(previousLineComment);
+        final String indent = getIndentForJavadoc(previousLineComment, source, lineStarts);
+        commentEdits.add(new InsertEdit(position,
+                newline + indent + " *" + commentText
+                + newline + indent + " */"));
+        deleteLineCommentAfterNode(commentEdits, source, lineComment);
     }
 
     private String getIndentForJavadoc(final LineComment lineComment, String source, TreeSet<Integer> lineStarts) {
