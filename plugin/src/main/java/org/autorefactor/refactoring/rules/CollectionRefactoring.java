@@ -87,7 +87,7 @@ public class CollectionRefactoring extends AbstractRefactoringRule {
             final Statement previousStmt = getPreviousSibling(node);
 
             final Assignment as = asExpression(previousStmt, Assignment.class);
-            if (as != null) {
+            if (hasOperator(as, Assignment.Operator.ASSIGN)) {
                 final Expression lhs = as.getLeftHandSide();
                 if (lhs instanceof SimpleName) {
                     final SimpleName sn = (SimpleName) lhs;

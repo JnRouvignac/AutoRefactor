@@ -69,6 +69,8 @@ public class RemoveUnnecessaryCastSample {
         o1 = pi;
         l = pi;
         i = pi;
+        l += pi;
+        i += pi;
     }
 
     public void doNotRemoveAssignmentCasts(Object o, long l) {
@@ -77,6 +79,7 @@ public class RemoveUnnecessaryCastSample {
         oi = (Integer) o;
         i = (Integer) o;
         i = (int) l;
+        i += (int) l;
     }
 
     public void removeVariableDeclarationFragmentCasts(Integer oi, int pi, Object o) {
