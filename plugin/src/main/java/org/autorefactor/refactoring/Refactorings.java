@@ -276,7 +276,7 @@ public class Refactorings {
      * @param nodes the nodes to remove
      * @see #remove(ASTNode)
      */
-    public void remove(Collection<ASTNode> nodes) {
+    public void remove(Collection<? extends ASTNode> nodes) {
         for (ASTNode node : nodes) {
             remove(node);
         }

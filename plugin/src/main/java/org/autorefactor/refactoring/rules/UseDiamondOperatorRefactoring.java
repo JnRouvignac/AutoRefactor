@@ -89,9 +89,7 @@ public class UseDiamondOperatorRefactoring extends AbstractRefactoringRule {
     private boolean removeAllTypeArguments(ParameterizedType pt) {
         final List<Type> typeArguments = typeArguments(pt);
         if (!typeArguments.isEmpty()) {
-            for (Type type : typeArguments) {
-                this.ctx.getRefactorings().remove(type);
-            }
+            this.ctx.getRefactorings().remove(typeArguments);
             return DO_NOT_VISIT_SUBTREE;
         }
         return VISIT_SUBTREE;
