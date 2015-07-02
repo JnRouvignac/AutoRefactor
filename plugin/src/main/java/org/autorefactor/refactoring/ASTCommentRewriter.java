@@ -130,23 +130,23 @@ public class ASTCommentRewriter {
         addReplacementEdits(commentEdits);
         addBlockCommentToJavadocEdits(commentEdits);
         addLineCommentsToJavadocEdits(commentEdits, source);
-        if (!commentEdits.isEmpty() && !anyCommentEditIsCovered(edits, commentEdits)) {
+        if (!commentEdits.isEmpty() && !anyOverlaps(edits, commentEdits)) {
             edits.addChildren(commentEdits.toArray(new TextEdit[commentEdits.size()]));
         }
         // else, code edits take priority. Give up applying current text edits.
         // They will be retried in the next refactoring loop.
     }
 
-    private boolean anyCommentEditIsCovered(TextEdit edits, List<TextEdit> commentEdits) {
+    private boolean anyOverlaps(TextEdit edits, List<TextEdit> commentEdits) {
         for (TextEdit commentEdit : commentEdits) {
-            if (covers(edits, commentEdit)) {
+            if (overlaps(edits, commentEdit)) {
                 return true;
             }
         }
         return false;
     }
 
-    private boolean covers(TextEdit edits, TextEdit edit2) {
+    private boolean overlaps(TextEdit edits, TextEdit edit2) {
         final SourceLocation range = toSourceLoc(edit2);
         final AtomicBoolean overlaps = new AtomicBoolean();
         edits.accept(new TextEditVisitor() {
@@ -159,13 +159,9 @@ public class ASTCommentRewriter {
             @Override
             public boolean visitNode(TextEdit edit) {
                 if (!overlaps.get()) {
-                    overlaps.set(overlapsWith(range, edit));
+                    overlaps.set(range.overlapsWith(toSourceLoc(edit)));
                 }
                 return !overlaps.get();
-            }
-
-            private boolean overlapsWith(SourceLocation loc1, TextEdit edit) {
-                return loc1.overlapsWith(toSourceLoc(edit));
             }
         });
         return overlaps.get();
