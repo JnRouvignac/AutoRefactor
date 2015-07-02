@@ -40,6 +40,7 @@ import org.autorefactor.refactoring.SourceLocation;
 import org.autorefactor.util.NotImplementedException;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.AnnotationTypeDeclaration;
+import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.BodyDeclaration;
 import org.eclipse.jdt.core.dom.Comment;
 import org.eclipse.jdt.core.dom.CompilationUnit;
@@ -47,7 +48,9 @@ import org.eclipse.jdt.core.dom.EnumDeclaration;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.Initializer;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
+import org.eclipse.jdt.core.dom.TryStatement;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
+import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.autorefactor.refactoring.SourceLocation.*;
@@ -57,7 +60,6 @@ import static org.autorefactor.refactoring.SourceLocation.*;
  * <p>
  * TODO remove superfluous semi-colons in try-with-resources
  */
-@SuppressWarnings("javadoc")
 public class RemoveSemiColonRefactoring extends AbstractRefactoringRule {
 
     @Override
@@ -104,45 +106,41 @@ public class RemoveSemiColonRefactoring extends AbstractRefactoringRule {
         final BodyDeclaration nextSibling = getNextSibling(node);
         final ASTNode parent = node.getParent();
         if (nextSibling != null) {
-            return removeSuperfluousCommas(node, getEndPosition(node), nextSibling.getStartPosition());
+            return removeSuperfluousSemiColons(node, getEndPosition(node), nextSibling.getStartPosition());
         } else if (parent instanceof TypeDeclaration) {
             final TypeDeclaration typeDecl = (TypeDeclaration) parent;
-            return removeSuperfluousCommas(node, getEndPosition(node), getEndPosition(typeDecl) - 1);
+            return removeSuperfluousSemiColons(node, getEndPosition(node), getEndPosition(typeDecl) - 1);
         } else if (parent instanceof CompilationUnit) {
             final CompilationUnit cu = (CompilationUnit) parent;
-            return removeSuperfluousCommas(node, getEndPosition(node), getEndPosition(cu) - 1);
+            return removeSuperfluousSemiColons(node, getEndPosition(node), getEndPosition(cu) - 1);
         }
         throw new NotImplementedException(node,
                 "for a parent of type " + (parent != null ? parent.getClass().getSimpleName() : null));
     }
 
-    private boolean removeSuperfluousCommas(ASTNode node, int start, int end) {
+    private boolean removeSuperfluousSemiColons(ASTNode node, int start, int end) {
         if (end <= start) {
             return VISIT_SUBTREE;
         }
         boolean result = VISIT_SUBTREE;
-        final String source = ctx.getSource(node);
-        final ASTNode root = node.getRoot();
-        if (root instanceof CompilationUnit) {
-            final CompilationUnit cu = (CompilationUnit) root;
-            final List<Comment> comments = filterCommentsInRange(start, end, getCommentList(cu));
-            final Map<String, SourceLocation> nonCommentsStrings = getNonCommentsStrings(source, start, end, comments);
-            for (Entry<String, SourceLocation> entry : nonCommentsStrings.entrySet()) {
-                final String s = entry.getKey();
-                final Matcher m = Pattern.compile("\\s*(;+)\\s*").matcher(s);
-                while (m.find()) {
-                    int startPos = entry.getValue().getStartPosition();
-                    SourceLocation toRemove = fromPositions(startPos + m.start(1), startPos + m.end(1));
-                    this.ctx.getRefactorings().remove(toRemove);
-                    result = DO_NOT_VISIT_SUBTREE;
-                }
+        final Map<String, SourceLocation> nonCommentsStrings = getNonCommentsStrings(node, start, end);
+        for (Entry<String, SourceLocation> entry : nonCommentsStrings.entrySet()) {
+            final String s = entry.getKey();
+            final Matcher m = Pattern.compile("\\s*(;+)\\s*").matcher(s);
+            while (m.find()) {
+                int startPos = entry.getValue().getStartPosition();
+                SourceLocation toRemove = fromPositions(startPos + m.start(1), startPos + m.end(1));
+                this.ctx.getRefactorings().remove(toRemove);
+                result = DO_NOT_VISIT_SUBTREE;
             }
         }
         return result;
     }
 
-    private Map<String, SourceLocation> getNonCommentsStrings(
-            String source, int start, int end, List<Comment> comments) {
+    private Map<String, SourceLocation> getNonCommentsStrings(ASTNode node, int start, int end) {
+        final List<Comment> comments = filterCommentsInRange(start, end, node.getRoot());
+
+        final String source = ctx.getSource(node);
         final LinkedHashMap<String, SourceLocation> results = new LinkedHashMap<String, SourceLocation>();
         if (comments.isEmpty()) {
             putResult(source, start, end, results);
@@ -165,6 +163,14 @@ public class RemoveSemiColonRefactoring extends AbstractRefactoringRule {
         results.put(s, loc);
     }
 
+    private List<Comment> filterCommentsInRange(int start, int end, final ASTNode root) {
+        if (root instanceof CompilationUnit) {
+            final CompilationUnit cu = (CompilationUnit) root;
+            return filterCommentsInRange(start, end, getCommentList(cu));
+        }
+        return Collections.emptyList();
+    }
+
     private List<Comment> filterCommentsInRange(int start, int end, List<Comment> commentList) {
         if (commentList.isEmpty()) {
             return Collections.emptyList();
@@ -181,5 +187,16 @@ public class RemoveSemiColonRefactoring extends AbstractRefactoringRule {
             }
         }
         return comments;
+    }
+
+    @Override
+    public boolean visit(TryStatement node) {
+        final List<VariableDeclarationExpression> resources = resources(node);
+        if (resources.isEmpty()) {
+            return VISIT_SUBTREE;
+        }
+        VariableDeclarationExpression lastResource = resources.get(resources.size() - 1);
+        Block body = node.getBody();
+        return removeSuperfluousSemiColons(node, getEndPosition(lastResource), body.getStartPosition());
     }
 }

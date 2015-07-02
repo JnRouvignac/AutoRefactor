@@ -592,6 +592,18 @@ public final class ASTHelper {
      * Generecized version of the equivalent JDT method.
      *
      * @param node the node on which to call the equivalent JDT method
+     * @return a List of variable declaration expressions
+     * @see TryStatement#resources()
+     */
+    @SuppressWarnings("unchecked")
+    public static List<VariableDeclarationExpression> resources(TryStatement node) {
+        return node.resources();
+    }
+
+    /**
+     * Generecized version of the equivalent JDT method.
+     *
+     * @param node the node on which to call the equivalent JDT method
      * @return a List of expressions
      * @see Block#statements()
      */

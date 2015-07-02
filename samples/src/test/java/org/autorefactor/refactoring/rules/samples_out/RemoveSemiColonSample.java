@@ -1,5 +1,8 @@
 package org.autorefactor.refactoring.rules.samples_out;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+
 public abstract class RemoveSemiColonSample {
 
     static {
@@ -19,6 +22,13 @@ public abstract class RemoveSemiColonSample {
     public abstract void anAbstractMethod();
 
     public abstract void removeComments();/**;*//*;*///;
+
+    public int removeLastSemiColonInTryWithResources() throws IOException {
+        try (FileInputStream fis = new FileInputStream("dummy.txt")/*;)*//*;)*/)/*;)*/
+        /*;)*/{
+          return fis.read();
+        }
+    }
 }
 
 class Unused {
