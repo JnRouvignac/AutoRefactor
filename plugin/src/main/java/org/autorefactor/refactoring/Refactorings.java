@@ -25,6 +25,8 @@
  */
 package org.autorefactor.refactoring;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -338,9 +340,44 @@ public class Refactorings {
         hasRefactorings = true;
         final ListRewrite listRewrite = getListRewrite(listHolder, (ChildListPropertyDescriptor) locationInParent);
         listRewrite.insertAt(nodeToInsert, index, txn);
+        hackToAddRewriteEventsToTransaction(listRewrite, transaction, listHolder);
         if (txn != transaction) {
             txn.commit();
         }
+    }
+
+    /**
+     * JDT does not track with TextEditGroups the original nodes from a list. So add them ourselves.
+     * FIXME Report bug the to JDT. Fix the bug?
+     */
+    private void hackToAddRewriteEventsToTransaction(
+            ListRewrite listRewrite, Transaction transaction, ASTNode listHolder) {
+        try {
+            Object listRewriteEvent = invoke(listRewrite, "getEvent");
+            Object[] rewriteEventArray = (Object[]) invoke(listRewriteEvent, "getChildren");
+            Object rewriteStore = invoke(listRewrite, "getRewriteStore");
+
+            for (Object rewriteEvent : rewriteEventArray) {
+                invoke(rewriteStore, "setEventEditGroup", rewriteEvent, transaction);
+            }
+        } catch (Exception e) {
+            throw new UnhandledException(listHolder, e);
+        }
+    }
+
+    private void invoke(Object rewriteStore, String methodName, Object rewriteEvent, Transaction transaction)
+            throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, ClassNotFoundException {
+        Class<?> forName = Class.forName("org.eclipse.jdt.internal.core.dom.rewrite.RewriteEvent");
+        Method m = rewriteStore.getClass().getDeclaredMethod(methodName, forName, TextEditGroup.class);
+        m.setAccessible(true);
+        m.invoke(rewriteStore, rewriteEvent, transaction);
+    }
+
+    private Object invoke(Object listRewrite, String methodName)
+            throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+        final Method m = listRewrite.getClass().getDeclaredMethod(methodName);
+        m.setAccessible(true);
+        return m.invoke(listRewrite);
     }
 
     /**
@@ -434,39 +471,33 @@ public class Refactorings {
         final TextEdit edits = rewrite.rewriteAST(document, null);
         commentRewriter.addEdits(document, edits);
         sourceRewriter.addEdits(document, edits);
+        final TextEdit[] textRewrites = edits.removeChildren();
         filterOutIncompleteRefactorings(transactions);
-        Collection<Transaction> refactoringsToApply = getRefactoringsApplicableToSelection(transactions, selection);
-        if (!refactoringsToApply.isEmpty()) {
-            applyEditsToDocument(toTextEdit(refactoringsToApply, edits), document);
+        Collection<Transaction> txnsToApply = getRefactoringsApplicableToSelection(transactions, selection);
+        if (!txnsToApply.isEmpty()) {
+            final TextEdit toApply = toMultiTextEdit(txnsToApply, textRewrites);
+            applyEditsToDocument(toApply, document);
             return true;
         }
         return false;
     }
 
-    private TextEdit toTextEdit(Collection<Transaction> refactoringsToApply, TextEdit edits) {
+    private TextEdit toMultiTextEdit(Collection<Transaction> txnsToApply, TextEdit[] textRewrites) {
         MultiTextEdit result = new MultiTextEdit();
-        for (Transaction txn : refactoringsToApply) {
-            result.addChildren(removeParents(txn.getTextEdits(), edits));
+        for (Transaction txn : txnsToApply) {
+            result.addChildren(removeParents(txn.getTextEdits(), textRewrites));
         }
         return result;
     }
 
-    private TextEdit[] removeParents(TextEdit[] textEdits, TextEdit edits) {
+    private TextEdit[] removeParents(TextEdit[] txnTextEdits, TextEdit[] textRewrites) {
         final List<TextEdit> results = new ArrayList<TextEdit>();
-        TextEdit[] children = edits.getChildren();
-        List<TextEdit> l = Arrays.asList(textEdits);
-        for (TextEdit textEdit : children) {
-            if (l.contains(textEdit)) {
-              edits.removeChild(textEdit);
-              results.add(textEdit);
+        List<TextEdit> txnTextEditsCol = Arrays.asList(txnTextEdits);
+        for (TextEdit rewrite : textRewrites) {
+            if (txnTextEditsCol.contains(rewrite)) {
+              results.add(rewrite);
             }
         }
-//        for (TextEdit textEdit : textEdits) {
-//            if (edits.equals(textEdit.getParent())) {
-//                textEdit.getParent().removeChild(textEdit);
-//                results.add(textEdit);
-//            }
-//        }
         return results.toArray(new TextEdit[results.size()]);
     }
 

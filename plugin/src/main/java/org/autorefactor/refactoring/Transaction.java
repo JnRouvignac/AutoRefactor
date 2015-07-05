@@ -28,34 +28,10 @@ public class Transaction extends TextEditGroup {
 
     @Override
     public String toString() {
-        final TextEdit[] textEdits = getTextEdits();
-        final TextEdit[] parents = removeParents(textEdits);
-        final String result = toString(textEdits);
-        addParentsBack(textEdits, parents);
-        return result;
-    }
-
-    private TextEdit[] removeParents(TextEdit[] textEdits) {
-        TextEdit[] parents = new TextEdit[textEdits.length];
-        for (int i = 0; i < textEdits.length; i++) {
-            parents[i] = textEdits[i].getParent();
-            parents[i].removeChild(textEdits[i]);
-        }
-        return parents;
-    }
-
-    private void addParentsBack(TextEdit[] textEdits, TextEdit[] parents) {
-        for (int i = 0; i < textEdits.length; i++) {
-            parents[i].addChild(textEdits[i]);
-        }
-    }
-
-    private String toString(TextEdit[] textEdits) {
         final MultiTextEdit multiTextEdit = new MultiTextEdit();
-        multiTextEdit.addChildren(textEdits);
-        final String result = multiTextEdit.toString()
-                .replaceFirst("\\{MultiTextEdit\\}", "{" + getClass().getSimpleName() + "}");
+        multiTextEdit.addChildren(getTextEdits());
+        final String result = multiTextEdit.toString();
         multiTextEdit.removeChildren();
-        return result;
+        return result.replaceFirst("\\{MultiTextEdit\\}", "{" + getClass().getSimpleName() + "}");
     }
 }
