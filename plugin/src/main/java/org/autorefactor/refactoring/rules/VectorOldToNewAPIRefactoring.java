@@ -77,11 +77,7 @@ public class VectorOldToNewAPIRefactoring extends AbstractRefactoringRule {
 
     private void replaceWith(MethodInvocation node, String newMethodName) {
         final ASTBuilder b = this.ctx.getASTBuilder();
-        this.ctx.getRefactorings().replace(node,
-            b.invoke(
-                b.copy(node.getExpression()),
-                newMethodName,
-                b.copyRange(arguments(node))));
+        ctx.getRefactorings().set(node, NAME_PROPERTY, b.simpleName(newMethodName));
     }
 
     private void replaceWithSpecial(MethodInvocation node, String newMethodName) {
