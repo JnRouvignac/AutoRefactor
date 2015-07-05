@@ -56,6 +56,7 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.text.edits.MalformedTreeException;
 import org.eclipse.text.edits.MultiTextEdit;
 import org.eclipse.text.edits.TextEdit;
 import org.eclipse.text.edits.TextEditGroup;
@@ -466,8 +467,9 @@ public class Refactorings {
      * @param document the document to refactor
      * @return true if any refactoring could be applied, false otherwise
      * @throws BadLocationException if trying to access a non existing position
+     * @throws InterruptedException if interrupted
      */
-    public boolean applyTo(final IDocument document) throws BadLocationException {
+    public boolean applyTo(final IDocument document) throws BadLocationException, InterruptedException {
         final TextEdit edits = rewrite.rewriteAST(document, null);
         commentRewriter.addEdits(document, edits);
         sourceRewriter.addEdits(document, edits);
@@ -525,33 +527,33 @@ public class Refactorings {
         return results;
     }
 
-    private void applyEditsToDocument(final TextEdit edits, final IDocument document) throws BadLocationException {
+    private void applyEditsToDocument(final TextEdit edits, final IDocument document)
+            throws BadLocationException, InterruptedException {
         // Call this operation on the SWT Display Thread with syncExec(),
         // because it changes or adds something to the GUI.
         // Otherwise it would throw an Invalid thread access Exception.
-        final Callable<BadLocationException> call = new Callable<BadLocationException>() {
+        final FutureTask<Void> future = new FutureTask<Void>(new Callable<Void>() {
             @Override
-            public BadLocationException call() throws Exception {
-                try {
-                    edits.apply(document);
-                    return null;
-                } catch (BadLocationException e) {
-                    return e;
-                }
+            public Void call() throws Exception {
+                edits.apply(document);
+                return null;
             }
-        };
-        final FutureTask<BadLocationException> future = new FutureTask<BadLocationException>(call);
+        });
         Display.getDefault().syncExec(future);
-        final BadLocationException ex;
+
         try {
-            ex = future.get();
+            future.get();
         } catch (ExecutionException e) {
-            throw new UnhandledException(null, e.getCause());
-        } catch (Exception e) {
+            Throwable cause = e.getCause();
+            if (cause instanceof BadLocationException) {
+                throw (BadLocationException) cause;
+            } else  if (cause instanceof MalformedTreeException) {
+                throw (MalformedTreeException) cause;
+            }
             throw new UnhandledException(null, e);
-        }
-        if (ex != null) {
-            throw ex;
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw e;
         }
     }
 

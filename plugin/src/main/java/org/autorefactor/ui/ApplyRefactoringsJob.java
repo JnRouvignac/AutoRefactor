@@ -220,17 +220,7 @@ public class ApplyRefactoringsJob extends Job {
                 break;
             }
 
-            final RefactoringRule refactoringRule;
-            if (selection != null) {
-                refactoringRule = new ForwardingASTVisitor(refactoring) {
-                    @Override
-                    public boolean preVisit2(ASTNode node) {
-                        return selection.overlapsWith(node);
-                    }
-                };
-            } else {
-                refactoringRule = refactoring;
-            }
+            final RefactoringRule refactoringRule = wrapForSelection(refactoring);
             final RefactoringContext ctx = new RefactoringContext(compilationUnit, astRoot, options, selection);
             refactoringRule.setRefactoringContext(ctx);
 
@@ -278,6 +268,18 @@ public class ApplyRefactoringsJob extends Job {
                 ++nbLoopsWithSameVisitors;
             }
         }
+    }
+
+    private RefactoringRule wrapForSelection(AggregateASTVisitor refactoring) {
+        if (selection != null) {
+            return new ForwardingASTVisitor(refactoring) {
+                @Override
+                public boolean preVisit2(ASTNode node) {
+                    return selection.overlapsWith(node);
+                }
+            };
+        }
+        return refactoring;
     }
 
     private static void resetParser(ICompilationUnit cu, ASTParser parser, JavaProjectOptions options) {
