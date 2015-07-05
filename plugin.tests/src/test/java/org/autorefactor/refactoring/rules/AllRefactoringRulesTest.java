@@ -105,7 +105,7 @@ public class AllRefactoringRulesTest {
         cu.save(null, true);
 
         final IDocument doc = new Document(sampleInSource);
-        new ApplyRefactoringsJob(null, null).applyRefactoring(
+        new ApplyRefactoringsJob(null, null, null).applyRefactoring(
                 doc, cu,
                 new AggregateASTVisitor(AllRefactoringRules.getAllRefactoringRules()),
                 newJavaProjectOptions(Release.javaSE("1.5.0"), 4));

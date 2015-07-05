@@ -26,29 +26,31 @@
 package org.autorefactor.refactoring;
 
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
+import org.autorefactor.util.Pair;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.text.edits.DeleteEdit;
 import org.eclipse.text.edits.ReplaceEdit;
 import org.eclipse.text.edits.TextEdit;
+import org.eclipse.text.edits.TextEditGroup;
 
 /** Directly rewrites source code. */
 public class SourceRewriter {
 
-    private final Set<SourceLocation> removals = new LinkedHashSet<SourceLocation>();
-    private final Map<SourceLocation, String> replacements = new LinkedHashMap<SourceLocation, String>();
+    private final Map<SourceLocation, TextEditGroup> removals = new LinkedHashMap<SourceLocation, TextEditGroup>();
+    private final Map<SourceLocation, Pair<String, TextEditGroup>> replacements =
+            new LinkedHashMap<SourceLocation, Pair<String, TextEditGroup>>();
 
     /**
      * Removes the provided source location from the source.
      *
      * @param toRemove the source location to remove
+     * @param textEditGroup
      */
-    public void remove(SourceLocation toRemove) {
-        this.removals.add(toRemove);
+    public void remove(SourceLocation toRemove, TextEditGroup textEditGroup) {
+        this.removals.put(toRemove, textEditGroup);
     }
 
     /**
@@ -56,9 +58,10 @@ public class SourceRewriter {
      *
      * @param toReplace the source location to replace
      * @param replacement the replacement string
+     * @param textEditGroup
      */
-    public void replace(SourceLocation toReplace, String replacement) {
-        this.replacements.put(toReplace, replacement);
+    public void replace(SourceLocation toReplace, String replacement, TextEditGroup textEditGroup) {
+        this.replacements.put(toReplace, Pair.of(replacement, textEditGroup));
     }
 
     /**
@@ -68,13 +71,22 @@ public class SourceRewriter {
      * @param edits where to add edits
      */
     public void addEdits(IDocument document, TextEdit edits) {
-        for (SourceLocation loc : this.removals) {
-            edits.addChild(new DeleteEdit(loc.getStartPosition(), loc.getLength()));
-        }
-        for (Entry<SourceLocation, String> entry : this.replacements.entrySet()) {
+        for (Entry<SourceLocation, TextEditGroup> entry : this.removals.entrySet()) {
             SourceLocation loc = entry.getKey();
-            String replacement = entry.getValue();
-            edits.addChild(new ReplaceEdit(loc.getStartPosition(), loc.getLength(), replacement));
+            DeleteEdit textEdit = new DeleteEdit(loc.getStartPosition(), loc.getLength());
+            addTextEdit(edits, entry.getValue(), textEdit);
         }
+        for (Entry<SourceLocation, Pair<String, TextEditGroup>> entry : this.replacements.entrySet()) {
+            Pair<String, TextEditGroup> value = entry.getValue();
+            SourceLocation loc = entry.getKey();
+            String replacement = value.getFirst();
+            ReplaceEdit textEdit = new ReplaceEdit(loc.getStartPosition(), loc.getLength(), replacement);
+            addTextEdit(edits, value.getSecond(), textEdit);
+        }
+    }
+
+    private void addTextEdit(TextEdit edits, TextEditGroup textEditGroup, TextEdit textEdit) {
+        edits.addChild(textEdit);
+        textEditGroup.addTextEdit(textEdit);
     }
 }

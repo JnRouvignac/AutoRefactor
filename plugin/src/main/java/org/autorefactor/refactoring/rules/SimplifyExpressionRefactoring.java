@@ -263,12 +263,13 @@ public class SimplifyExpressionRefactoring extends AbstractRefactoringRule {
     }
 
     private boolean replaceWithCorrectCheckOnCompareTo(final InfixExpression ie, final Operator operator) {
-        final ASTBuilder b = this.ctx.getASTBuilder();
-        this.ctx.getRefactorings().replace(ie,
+        final ASTBuilder b = ctx.getASTBuilder();
+        ctx.getRefactorings().replace(ie,
             b.infixExpr(
                 b.copy(ie.getLeftOperand()),
                 operator,
-                b.number("0")));
+                b.number("0")),
+            null);
         return DO_NOT_VISIT_SUBTREE;
     }
 
@@ -356,8 +357,8 @@ public class SimplifyExpressionRefactoring extends AbstractRefactoringRule {
     }
 
     private void addParentheses(Expression e) {
-        final ASTBuilder b = this.ctx.getASTBuilder();
-        this.ctx.getRefactorings().replace(e, b.parenthesize(b.copy(e)));
+        final ASTBuilder b = ctx.getASTBuilder();
+        ctx.getRefactorings().replace(e, b.parenthesize(b.copy(e)), null);
     }
 
     /**
@@ -391,20 +392,20 @@ public class SimplifyExpressionRefactoring extends AbstractRefactoringRule {
         // - One boolean primitive and one Boolean object, this code already run
         // the risk of an NPE, so we can replace the infix expression without
         // fearing we would introduce a previously non existing NPE.
-        final ASTBuilder b = this.ctx.getASTBuilder();
+        final ASTBuilder b = ctx.getASTBuilder();
         Expression operand;
         if (negate) {
             operand = b.negate(exprToCopy);
         } else {
             operand = b.copy(exprToCopy);
         }
-        this.ctx.getRefactorings().replace(node, operand);
+        ctx.getRefactorings().replace(node, operand, null);
         return DO_NOT_VISIT_SUBTREE;
     }
 
     private boolean replaceByCopy(ASTNode node, Expression expr) {
-        final ASTBuilder b = this.ctx.getASTBuilder();
-        this.ctx.getRefactorings().replace(node, b.copy(expr));
+        final ASTBuilder b = ctx.getASTBuilder();
+        ctx.getRefactorings().replace(node, b.copy(expr), null);
         return DO_NOT_VISIT_SUBTREE;
     }
 

@@ -92,7 +92,7 @@ public class CommonIfInIfElseRefactoring extends AbstractRefactoringRule {
                             b.block(
                                     b.if0(b.copy(node.getExpression()),
                                             b.copy(thenInnerIfStmt.getThenStatement()),
-                                            b.copy(elseInnerIfStmt.getThenStatement())))));
+                                            b.copy(elseInnerIfStmt.getThenStatement())))), null);
             return DO_NOT_VISIT_SUBTREE;
         }
         return VISIT_SUBTREE;

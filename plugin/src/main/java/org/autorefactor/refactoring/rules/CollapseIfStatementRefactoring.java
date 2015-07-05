@@ -26,6 +26,8 @@
 package org.autorefactor.refactoring.rules;
 
 import org.autorefactor.refactoring.ASTBuilder;
+import org.autorefactor.refactoring.Refactorings;
+import org.autorefactor.refactoring.Transaction;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.InfixExpression;
@@ -68,8 +70,11 @@ public class CollapseIfStatementRefactoring extends AbstractRefactoringRule {
                 parenthesizeOrExpr(b, outerIf.getExpression()),
                 CONDITIONAL_AND,
                 parenthesizeOrExpr(b, innerIf.getExpression()));
-        this.ctx.getRefactorings().replace(outerIf.getExpression(), ie);
-        this.ctx.getRefactorings().replace(outerIf.getThenStatement(), b.copy(innerIf.getThenStatement()));
+        Refactorings r = ctx.getRefactorings();
+        Transaction txn = r.newTransaction(this);
+        r.replace(outerIf.getExpression(), ie, txn);
+        r.replace(outerIf.getThenStatement(), b.copy(innerIf.getThenStatement()), txn);
+        txn.commit();
         return DO_NOT_VISIT_SUBTREE;
     }
 

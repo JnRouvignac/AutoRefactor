@@ -28,6 +28,8 @@ package org.autorefactor.refactoring.rules;
 import java.util.List;
 
 import org.autorefactor.refactoring.ASTBuilder;
+import org.autorefactor.refactoring.Refactorings;
+import org.autorefactor.refactoring.Transaction;
 import org.eclipse.jdt.core.dom.ASTMatcher;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Expression;
@@ -128,35 +130,40 @@ public class RemoveUselessNullCheckRefactoring extends AbstractRefactoringRule {
 
     private boolean replaceWithStraightAssign(IfStatement node,
             Expression leftHandSide, Expression rightHandSide) {
-        final ASTBuilder b = this.ctx.getASTBuilder();
-        this.ctx.getRefactorings().replace(node,
+        final ASTBuilder b = ctx.getASTBuilder();
+        ctx.getRefactorings().replace(node,
                 b.toStmt(b.assign(
                         b.copy(leftHandSide),
                         Assignment.Operator.ASSIGN,
-                        b.copy(rightHandSide))));
+                        b.copy(rightHandSide))),
+                null);
         return DO_NOT_VISIT_SUBTREE;
     }
 
     private boolean replaceWithStraightReturn(IfStatement node, InfixExpression condition,
             ReturnStatement rs, ReturnStatement otherRs, Statement toRemove) {
         if (isNullLiteral(otherRs.getExpression())) {
+            final Refactorings r = ctx.getRefactorings();
+            final Transaction txn = r.newTransaction(this);
             if (isNullLiteral(condition.getRightOperand())
                     && match(matcher, condition.getLeftOperand(), rs.getExpression())) {
-                this.ctx.getRefactorings().remove(toRemove);
-                return replaceWithStraightReturn(node, condition.getLeftOperand());
+                r.remove(toRemove, txn);
+                return replaceWithStraightReturn(node, condition.getLeftOperand(), txn);
             } else if (isNullLiteral(condition.getLeftOperand())
                     && match(matcher, condition.getRightOperand(), rs.getExpression())) {
-                this.ctx.getRefactorings().remove(toRemove);
-                return replaceWithStraightReturn(node, condition.getRightOperand());
+                r.remove(toRemove, txn);
+                return replaceWithStraightReturn(node, condition.getRightOperand(), txn);
             }
         }
         return VISIT_SUBTREE;
     }
 
-    private boolean replaceWithStraightReturn(IfStatement node, Expression returnedExpr) {
-        final ASTBuilder b = this.ctx.getASTBuilder();
-        this.ctx.getRefactorings().replace(node,
-                b.return0(b.copy(returnedExpr)));
+    private boolean replaceWithStraightReturn(IfStatement node, Expression returnedExpr, Transaction txn) {
+        final ASTBuilder b = ctx.getASTBuilder();
+        ctx.getRefactorings().replace(node,
+                b.return0(b.copy(returnedExpr)),
+                txn);
+        txn.commit();
         return DO_NOT_VISIT_SUBTREE;
     }
 }

@@ -40,6 +40,7 @@ import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.autorefactor.util.Utils.*;
+import static org.eclipse.jdt.core.dom.MethodInvocation.*;
 
 /** See {@link #getDescription()} method. */
 @SuppressWarnings("javadoc")
@@ -122,9 +123,11 @@ public class PrimitiveWrapperCreationRefactoring extends AbstractRefactoringRule
                     final String methodName = getMethodName(
                             typeBinding.getQualifiedName(), node.getName().getIdentifier());
                     if (methodName != null) {
-                        this.ctx.getRefactorings().replace(
+                        ctx.getRefactorings().replace(
                                 node,
-                                newMethodInvocation(typeBinding.getName(), methodName, arg0));
+                                newMethodInvocation(typeBinding.getName(), methodName, arg0),
+                                null);
+                        return DO_NOT_VISIT_SUBTREE;
                     }
                 }
             }
@@ -139,14 +142,14 @@ public class PrimitiveWrapperCreationRefactoring extends AbstractRefactoringRule
     }
 
     private boolean replaceMethodName(MethodInvocation node, String methodName) {
-        final SimpleName name = this.ctx.getASTBuilder().simpleName(methodName);
-        this.ctx.getRefactorings().set(node, MethodInvocation.NAME_PROPERTY, name);
+        final SimpleName name = ctx.getASTBuilder().simpleName(methodName);
+        ctx.getRefactorings().set(node, NAME_PROPERTY, name, null);
         return DO_NOT_VISIT_SUBTREE;
     }
 
     private boolean replaceWithTheSingleArgument(MethodInvocation node) {
-        final ASTBuilder b = this.ctx.getASTBuilder();
-        this.ctx.getRefactorings().replace(node, b.copy(arg0(node)));
+        final ASTBuilder b = ctx.getASTBuilder();
+        ctx.getRefactorings().replace(node, b.copy(arg0(node)), null);
         return DO_NOT_VISIT_SUBTREE;
     }
 
@@ -189,9 +192,10 @@ public class PrimitiveWrapperCreationRefactoring extends AbstractRefactoringRule
                     || "java.lang.Long".equals(qualifiedName)
                     || "java.lang.Short".equals(qualifiedName)
                     || "java.lang.Integer".equals(qualifiedName)) {
-                this.ctx.getRefactorings().replace(
+                ctx.getRefactorings().replace(
                         node,
-                        newMethodInvocation(typeBinding.getName(), "valueOf", arguments(node).get(0)));
+                        newMethodInvocation(typeBinding.getName(), "valueOf", arguments(node).get(0)),
+                        null);
                 return DO_NOT_VISIT_SUBTREE;
             }
         }
@@ -221,8 +225,8 @@ public class PrimitiveWrapperCreationRefactoring extends AbstractRefactoringRule
     }
 
     private boolean replaceWithBooleanLiteral(QualifiedName node, boolean val) {
-        final BooleanLiteral booleanLiteral = this.ctx.getASTBuilder().boolean0(val);
-        this.ctx.getRefactorings().replace(node, booleanLiteral);
+        final BooleanLiteral booleanLiteral = ctx.getASTBuilder().boolean0(val);
+        ctx.getRefactorings().replace(node, booleanLiteral, null);
         return DO_NOT_VISIT_SUBTREE;
     }
 }

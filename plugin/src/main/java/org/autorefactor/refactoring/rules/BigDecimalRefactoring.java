@@ -76,8 +76,8 @@ public class BigDecimalRefactoring extends AbstractRefactoringRule {
                 final NumberLiteral nb = (NumberLiteral) arg0;
                 if (nb.getToken().contains(".")) {
                     // Only instantiation from double, not from integer
-                    this.ctx.getRefactorings().replace(nb,
-                            getStringLiteral(nb.getToken()));
+                    ctx.getRefactorings().replace(nb,
+                            getStringLiteral(nb.getToken()), null);
                 } else {
                     if (getJavaMinorVersion() < 5) {
                         return VISIT_SUBTREE;
@@ -89,8 +89,8 @@ public class BigDecimalRefactoring extends AbstractRefactoringRule {
                     } else if (TEN_LONG_LITERAL_RE.matcher(nb.getToken()).matches()) {
                         replaceWithQualifiedName(node, typeBinding, "TEN");
                     } else {
-                        this.ctx.getRefactorings().replace(node,
-                                getValueOf(typeBinding.getName(), nb.getToken()));
+                        ctx.getRefactorings().replace(node,
+                                getValueOf(typeBinding.getName(), nb.getToken()), null);
                     }
                 }
                 return DO_NOT_VISIT_SUBTREE;
@@ -100,23 +100,26 @@ public class BigDecimalRefactoring extends AbstractRefactoringRule {
                 }
                 final String literalValue = ((StringLiteral) arg0).getLiteralValue();
                 if (literalValue.matches("0+")) {
-                    replaceWithQualifiedName(node, typeBinding, "ZERO");
+                    return replaceWithQualifiedName(node, typeBinding, "ZERO");
                 } else if (literalValue.matches("0+1")) {
-                    replaceWithQualifiedName(node, typeBinding, "ONE");
+                    return replaceWithQualifiedName(node, typeBinding, "ONE");
                 } else if (literalValue.matches("0+10")) {
-                    replaceWithQualifiedName(node, typeBinding, "TEN");
+                    return replaceWithQualifiedName(node, typeBinding, "TEN");
                 } else if (literalValue.matches("\\d+")) {
-                    this.ctx.getRefactorings().replace(node,
-                            getValueOf(typeBinding.getName(), literalValue));
+                    ctx.getRefactorings().replace(node,
+                            getValueOf(typeBinding.getName(), literalValue), null);
+                    return DO_NOT_VISIT_SUBTREE;
                 }
             }
         }
         return VISIT_SUBTREE;
     }
 
-    private void replaceWithQualifiedName(ASTNode node, ITypeBinding typeBinding, String field) {
-        this.ctx.getRefactorings().replace(node,
-                this.ctx.getASTBuilder().name(typeBinding.getName(), field));
+    private boolean replaceWithQualifiedName(ASTNode node, ITypeBinding typeBinding, String field) {
+        final ASTBuilder b = this.ctx.getASTBuilder();
+        ctx.getRefactorings().replace(node,
+                b.name(typeBinding.getName(), field), null);
+        return DO_NOT_VISIT_SUBTREE;
     }
 
     private ASTNode getValueOf(String name, String numberLiteral) {
@@ -141,10 +144,9 @@ public class BigDecimalRefactoring extends AbstractRefactoringRule {
             if (arg0 instanceof NumberLiteral) {
                 final NumberLiteral nb = (NumberLiteral) arg0;
                 if (nb.getToken().contains(".")) {
-                    this.ctx.getRefactorings().replace(node,
-                            getClassInstanceCreatorNode(
-                                    (Name) node.getExpression(),
-                                    nb.getToken()));
+                    ctx.getRefactorings().replace(node,
+                            getClassInstanceCreatorNode((Name) node.getExpression(), nb.getToken()),
+                            null);
                 } else if (ZERO_LONG_LITERAL_RE.matcher(nb.getToken()).matches()) {
                     replaceWithQualifiedName(node, typeBinding, "ZERO");
                 } else if (ONE_LONG_LITERAL_RE.matcher(nb.getToken()).matches()) {
@@ -159,12 +161,11 @@ public class BigDecimalRefactoring extends AbstractRefactoringRule {
         } else if (isMethod(node, "java.math.BigDecimal", "equals", "java.lang.Object")) {
             final Expression arg0 = arg0(node);
             if (hasType(arg0, "java.math.BigDecimal")) {
+                Expression replacement = getCompareToNode(node);
                 if (isInStringAppend(node.getParent())) {
-                    this.ctx.getRefactorings().replace(node,
-                            parenthesize(getCompareToNode(node)));
-                } else {
-                    this.ctx.getRefactorings().replace(node, getCompareToNode(node));
+                    replacement = parenthesize(replacement);
                 }
+                ctx.getRefactorings().replace(node, replacement, null);
                 return DO_NOT_VISIT_SUBTREE;
             }
         }

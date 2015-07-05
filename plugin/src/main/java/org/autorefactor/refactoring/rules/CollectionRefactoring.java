@@ -31,6 +31,7 @@ import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.ASTBuilder.Copy;
 import org.autorefactor.refactoring.ForLoopHelper.ForLoopContent;
 import org.autorefactor.refactoring.Refactorings;
+import org.autorefactor.refactoring.Transaction;
 import org.eclipse.jdt.core.dom.ASTMatcher;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Assignment;
@@ -112,11 +113,14 @@ public class CollectionRefactoring extends AbstractRefactoringRule {
             final Expression arg0, ExpressionStatement nodeToRemove) {
         final ClassInstanceCreation cic = as(nodeToReplace, ClassInstanceCreation.class);
         if (canReplaceInitializer(cic)) {
-            final ASTBuilder b = this.ctx.getASTBuilder();
-            this.ctx.getRefactorings().replace(nodeToReplace,
-                    b.new0(cic.resolveTypeBinding(),
-                            b.copy(arg0)));
-            this.ctx.getRefactorings().remove(nodeToRemove);
+            final Refactorings r = ctx.getRefactorings();
+            final Transaction txn = r.newTransaction(this);
+            final ASTBuilder b = ctx.getASTBuilder();
+            r.replace(nodeToReplace,
+                    b.new0(cic.resolveTypeBinding(), b.copy(arg0)),
+                    txn);
+            r.remove(nodeToRemove, txn);
+            txn.commit();
             return DO_NOT_VISIT_SUBTREE;
         }
         return VISIT_SUBTREE;
@@ -232,12 +236,13 @@ public class CollectionRefactoring extends AbstractRefactoringRule {
 
     private boolean replaceWithCollectionMethod(ASTNode toReplace, String methodName,
             Expression colWhereToAddAll, Expression colToAddAll) {
-        final ASTBuilder b = this.ctx.getASTBuilder();
-        this.ctx.getRefactorings().replace(toReplace,
+        final ASTBuilder b = ctx.getASTBuilder();
+        ctx.getRefactorings().replace(toReplace,
                 b.toStmt(b.invoke(
                         b.copy(colWhereToAddAll),
                         methodName,
-                        b.copy(colToAddAll))));
+                        b.copy(colToAddAll))),
+                null);
         return DO_NOT_VISIT_SUBTREE;
     }
 
@@ -272,57 +277,53 @@ public class CollectionRefactoring extends AbstractRefactoringRule {
     }
 
     private boolean replaceCollectionSize(InfixExpression node, MethodInvocation miToReplace) {
-        final Refactorings r = this.ctx.getRefactorings();
-        final ASTBuilder b = this.ctx.getASTBuilder();
+        final Refactorings r = ctx.getRefactorings();
+        final ASTBuilder b = ctx.getASTBuilder();
         final Expression copyOfExpr = b.copyExpression(miToReplace);
         if (hasOperator(node, GREATER)) {
             r.replace(node,
-                    b.not(b.invoke(copyOfExpr, "isEmpty")));
-            return DO_NOT_VISIT_SUBTREE;
+                    b.not(b.invoke(copyOfExpr, "isEmpty")), null);
         } else if (hasOperator(node, GREATER_EQUALS)) {
             r.replace(node,
-                    b.boolean0(true));
-            return DO_NOT_VISIT_SUBTREE;
+                    b.boolean0(true), null);
         } else if (hasOperator(node, EQUALS)) {
             r.replace(node,
-                    b.invoke(copyOfExpr, "isEmpty"));
-            return DO_NOT_VISIT_SUBTREE;
+                    b.invoke(copyOfExpr, "isEmpty"), null);
         } else if (hasOperator(node, LESS_EQUALS)) {
             r.replace(node,
-                    b.invoke(copyOfExpr, "isEmpty"));
-            return DO_NOT_VISIT_SUBTREE;
+                    b.invoke(copyOfExpr, "isEmpty"), null);
         } else if (hasOperator(node, LESS)) {
             r.replace(node,
-                    b.boolean0(false));
+                    b.boolean0(false), null);
+        } else {
+            return VISIT_SUBTREE;
         }
-        return VISIT_SUBTREE;
+        return DO_NOT_VISIT_SUBTREE;
     }
 
     private boolean replaceInverseCollectionSize(InfixExpression node, MethodInvocation miToReplace) {
-        final Refactorings r = this.ctx.getRefactorings();
-        final ASTBuilder b = this.ctx.getASTBuilder();
+        final Refactorings r = ctx.getRefactorings();
+        final ASTBuilder b = ctx.getASTBuilder();
         final Expression copyOfExpr = b.copyExpression(miToReplace);
         if (hasOperator(node, LESS)) {
             r.replace(node,
-                    b.not(b.invoke(copyOfExpr, "isEmpty")));
-            return DO_NOT_VISIT_SUBTREE;
+                    b.not(b.invoke(copyOfExpr, "isEmpty")), null);
         } else if (hasOperator(node, LESS_EQUALS)) {
             r.replace(node,
-                    b.boolean0(true));
-            return DO_NOT_VISIT_SUBTREE;
+                    b.boolean0(true), null);
         } else if (hasOperator(node, EQUALS)) {
             r.replace(node,
-                    b.invoke(copyOfExpr, "isEmpty"));
-            return DO_NOT_VISIT_SUBTREE;
+                    b.invoke(copyOfExpr, "isEmpty"), null);
         } else if (hasOperator(node, GREATER_EQUALS)) {
             r.replace(node,
-                    b.invoke(copyOfExpr, "isEmpty"));
-            return DO_NOT_VISIT_SUBTREE;
+                    b.invoke(copyOfExpr, "isEmpty"), null);
         } else if (hasOperator(node, GREATER)) {
             r.replace(node,
-                    b.boolean0(false));
+                    b.boolean0(false), null);
+        } else {
+            return VISIT_SUBTREE;
         }
-        return VISIT_SUBTREE;
+        return DO_NOT_VISIT_SUBTREE;
     }
 
     private boolean isZero(Expression expr) {
@@ -356,10 +357,12 @@ public class CollectionRefactoring extends AbstractRefactoringRule {
             MethodInvocation miAdd = asExpression(firstStmt, MethodInvocation.class);
             if (isMethod(miAdd, "java.util.Set", "add", "java.lang.Object")
                     && match(new ASTMatcher(), arg0(miContains), arg0(miAdd))) {
-                ASTBuilder b = this.ctx.getASTBuilder();
-                Refactorings r = this.ctx.getRefactorings();
-                r.replace(toReplace, negate ? b.negate(miAdd, Copy.COPY.MOVE) : b.move(miAdd));
-                r.remove(firstStmt);
+                ASTBuilder b = ctx.getASTBuilder();
+                Refactorings r = ctx.getRefactorings();
+                Transaction txn = r.newTransaction(this);
+                r.replace(toReplace, negate ? b.negate(miAdd, Copy.MOVE) : b.move(miAdd), txn);
+                r.remove(firstStmt, txn);
+                txn.commit();
                 return DO_NOT_VISIT_SUBTREE;
             }
         }

@@ -25,12 +25,12 @@
  */
 package org.autorefactor.ui;
 
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import org.autorefactor.refactoring.SourceLocation;
 import org.autorefactor.refactoring.rules.AllRefactoringRules;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
@@ -41,6 +41,8 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.ui.JavaUI;
+import org.eclipse.jface.text.TextSelection;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
@@ -60,11 +62,11 @@ import static org.eclipse.jface.dialogs.MessageDialog.*;
  */
 public class AutoRefactorHandler extends AbstractHandler {
 
-    /** {@inheritDoc} */
     @Override
     public Object execute(final ExecutionEvent event) throws ExecutionException {
         new PrepareApplyRefactoringsJob(
                 getSelectedJavaElements(event),
+                getSelectedSourceLocation(event),
                 AllRefactoringRules.getConfiguredRefactoringRules()).schedule();
 
         // TODO JNR provide a maven plugin
@@ -84,46 +86,69 @@ public class AutoRefactorHandler extends AbstractHandler {
     }
 
     static List<IJavaElement> getSelectedJavaElements(ExecutionEvent event) {
-        final Shell shell = HandlerUtil.getActiveShell(event);
         final String activePartId = HandlerUtil.getActivePartId(event);
         if ("org.eclipse.jdt.ui.CompilationUnitEditor".equals(activePartId)) {
-            final IEditorInput editorInput = HandlerUtil.getActiveEditor(event).getEditorInput();
-            final IJavaElement javaElement = JavaUI.getEditorInputJavaElement(editorInput);
-            if (javaElement instanceof ICompilationUnit) {
-                return Collections.singletonList(javaElement);
-            }
-            Display.getDefault().asyncExec(new Runnable() {
-                @Override
-                public void run() {
-                    openInformation(shell, "Info", "This action only works on Java source files");
-                }
-            });
+            return getFromJavaEditor(event);
         } else if ("org.eclipse.jdt.ui.PackageExplorer".equals(activePartId)) {
-            final IStructuredSelection selection = (IStructuredSelection) HandlerUtil.getCurrentSelection(event);
-            final List<IJavaElement> results = new ArrayList<IJavaElement>();
-            final Iterator<?> it = selection.iterator();
-            while (it.hasNext()) {
-                final Object el = it.next();
-                if (el instanceof ICompilationUnit
-                        || el instanceof IPackageFragment
-                        || el instanceof IPackageFragmentRoot
-                        || el instanceof IJavaProject) {
-                    results.add((IJavaElement) el);
-                } else {
-                    Display.getDefault().asyncExec(new Runnable() {
-                        @Override
-                        public void run() {
-                            openInformation(shell, "Info",
-                                "Please select a Java source file, Java package or Java project");
-                        }
-                    });
-                }
-            }
-            return results;
+            return getFromPackageExplorer(event);
         } else {
             logWarning("Code is not implemented for activePartId '" + activePartId + "'.");
+            return Collections.emptyList();
         }
+    }
+
+    private static List<IJavaElement> getFromJavaEditor(ExecutionEvent event) {
+        final Shell shell = HandlerUtil.getActiveShell(event);
+        final IEditorInput editorInput = HandlerUtil.getActiveEditor(event).getEditorInput();
+        final IJavaElement javaElement = JavaUI.getEditorInputJavaElement(editorInput);
+        if (javaElement instanceof ICompilationUnit) {
+            return Collections.singletonList(javaElement);
+        }
+        Display.getDefault().asyncExec(new Runnable() {
+            @Override
+            public void run() {
+                openInformation(shell, "Info", "This action only works on Java source files");
+            }
+        });
         return Collections.emptyList();
     }
 
+    private static List<IJavaElement> getFromPackageExplorer(ExecutionEvent event) {
+        final Shell shell = HandlerUtil.getActiveShell(event);
+        final IStructuredSelection selection = (IStructuredSelection) HandlerUtil.getCurrentSelection(event);
+        final List<IJavaElement> results = new ArrayList<IJavaElement>();
+        final Iterator<?> it = selection.iterator();
+        while (it.hasNext()) {
+            final Object el = it.next();
+            if (el instanceof ICompilationUnit
+                    || el instanceof IPackageFragment
+                    || el instanceof IPackageFragmentRoot
+                    || el instanceof IJavaProject) {
+                results.add((IJavaElement) el);
+            } else {
+                Display.getDefault().asyncExec(new Runnable() {
+                    @Override
+                    public void run() {
+                        openInformation(shell, "Info",
+                            "Please select a Java source file, Java package or Java project");
+                    }
+                });
+            }
+        }
+        return results;
+    }
+
+    static SourceLocation getSelectedSourceLocation(ExecutionEvent event) {
+        final String activePartId = HandlerUtil.getActivePartId(event);
+        if (!"org.eclipse.jdt.ui.CompilationUnitEditor".equals(activePartId)) {
+            logWarning("Code is not implemented for activePartId '" + activePartId + "'.");
+            return null;
+        }
+        final ISelection selection = HandlerUtil.getCurrentSelection(event);
+        if (selection instanceof TextSelection) {
+            final TextSelection sel = (TextSelection) selection;
+            return new SourceLocation(sel.getOffset(), sel.getLength());
+        }
+        return null;
+    }
 }

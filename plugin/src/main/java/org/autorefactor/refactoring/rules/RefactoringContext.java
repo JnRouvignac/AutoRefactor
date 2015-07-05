@@ -28,6 +28,7 @@ package org.autorefactor.refactoring.rules;
 import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.JavaProjectOptions;
 import org.autorefactor.refactoring.Refactorings;
+import org.autorefactor.refactoring.SourceLocation;
 import org.autorefactor.util.UnhandledException;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.JavaModelException;
@@ -56,11 +57,12 @@ public class RefactoringContext {
      * @param compilationUnit the compilation unit to refactor
      * @param astRoot the compilation unit, root of the AST
      * @param options the Java project options used to compile the project
+     * @param selection
      */
-    public RefactoringContext(ICompilationUnit compilationUnit, CompilationUnit astRoot, JavaProjectOptions options) {
+    public RefactoringContext(ICompilationUnit compilationUnit, CompilationUnit astRoot, JavaProjectOptions options, SourceLocation selection) {
         this.compilationUnit = compilationUnit;
         this.astRoot = astRoot;
-        this.refactorings = new Refactorings(astRoot.getAST());
+        this.refactorings = new Refactorings(astRoot.getAST(), selection);
         this.astBuilder = new ASTBuilder(refactorings);
         this.options = options;
     }

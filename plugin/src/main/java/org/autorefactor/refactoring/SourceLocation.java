@@ -27,6 +27,7 @@ package org.autorefactor.refactoring;
 
 import org.eclipse.jdt.core.ISourceRange;
 import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jface.text.IRegion;
 
 import static org.autorefactor.util.Utils.*;
 
@@ -56,6 +57,15 @@ public class SourceLocation implements ISourceRange, Comparable<ISourceRange> {
      */
     public SourceLocation(ASTNode node) {
         this(node.getStartPosition(), node.getLength());
+    }
+
+    /**
+     * Builds a source location instance from an {@link IRegion}.
+     *
+     * @param node the {@link IRegion} where to read positions from
+     */
+    public SourceLocation(IRegion region) {
+        this(region.getOffset(), region.getLength());
     }
 
     /**
@@ -138,22 +148,46 @@ public class SourceLocation implements ISourceRange, Comparable<ISourceRange> {
     /**
      * Whether the provided source range is inside the current source location.
      *
-     * @param sourceRange the provided source range
+     * @param range the provided source range
      * @return true if the provided source range is inside the current source location, false otherwise
      */
-    public boolean contains(ISourceRange sourceRange) {
-        return getStartPosition() <= sourceRange.getOffset()
-                && sourceRange.getOffset() + sourceRange.getLength() <= getEndPosition();
+    public boolean contains(ISourceRange range) {
+        return getOffset() <= range.getOffset()
+                && getEndPosition(range) <= getEndPosition();
+    }
+
+    public boolean contains(ASTNode node) {
+        return getStartPosition() <= node.getStartPosition()
+                && getEndPosition(node) <= getEndPosition();
+    }
+
+    public boolean isContainedInto(ASTNode node) {
+        return node.getStartPosition() <= getStartPosition()
+                && getEndPosition() <= getEndPosition(node);
+    }
+
+    public boolean overlapsWith(ASTNode node) {
+        return overlapsLeft(node) || overlapsRight(node);
+    }
+
+    private boolean overlapsLeft(ASTNode node) {
+        return getStartPosition() <= node.getStartPosition()
+                && node.getStartPosition() <= getEndPosition();
+    }
+
+    private boolean overlapsRight(ASTNode node) {
+        return node.getStartPosition() <= getStartPosition()
+                && getStartPosition() <= getEndPosition(node);
     }
 
     /**
      * Whether the provided source range overlaps with the current source location.
      *
-     * @param sourceRange the provided source range
+     * @param range the provided source range
      * @return true if the provided source range overlaps with the current source location, false otherwise
      */
-    public boolean overlapsWith(ISourceRange sourceRange) {
-        return overlapsLeft(sourceRange) || overlapsRight(sourceRange);
+    public boolean overlapsWith(ISourceRange range) {
+        return overlapsLeft(range) || overlapsRight(range);
     }
 
     private boolean overlapsLeft(ISourceRange range) {
@@ -167,12 +201,12 @@ public class SourceLocation implements ISourceRange, Comparable<ISourceRange> {
     }
 
     @Override
-    public int compareTo(ISourceRange sourceRange) {
-        final int offsetDiff = this.offset - sourceRange.getOffset();
+    public int compareTo(ISourceRange range) {
+        final int offsetDiff = this.offset - range.getOffset();
         if (offsetDiff != 0) {
             return offsetDiff;
         }
-        return this.length - sourceRange.getLength();
+        return this.length - range.getLength();
     }
 
     @Override

@@ -25,11 +25,13 @@
  */
 package org.autorefactor.refactoring;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -50,8 +52,11 @@ import org.eclipse.jdt.core.dom.rewrite.ASTRewrite;
 import org.eclipse.jdt.core.dom.rewrite.ListRewrite;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.IRegion;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.text.edits.MultiTextEdit;
 import org.eclipse.text.edits.TextEdit;
+import org.eclipse.text.edits.TextEditGroup;
 
 /**
  * Class aggregating all the refactorings performed by a refactoring rule until
@@ -61,20 +66,23 @@ public class Refactorings {
 
     private boolean hasRefactorings;
     private final ASTRewrite rewrite;
+    private final SourceLocation selection;
     private final Map<Pair<ASTNode, ChildListPropertyDescriptor>, ListRewrite> listRewriteCache =
             new HashMap<Pair<ASTNode, ChildListPropertyDescriptor>, ListRewrite>();
     private final ASTCommentRewriter commentRewriter = new ASTCommentRewriter();
     private final SourceRewriter sourceRewriter = new SourceRewriter();
     /** Nodes that cannot be visited. */
     private final Set<ASTNode> forbiddenNodes = new HashSet<ASTNode>();
+    private final Set<Transaction> transactions = new LinkedHashSet<Transaction>();
 
     /**
      * Builds an instance of this class.
      *
      * @param ast the AST
      */
-    public Refactorings(AST ast) {
+    public Refactorings(AST ast, SourceLocation selection) {
         this.rewrite = ASTRewrite.create(ast);
+        this.selection = selection;
     }
 
     /**
@@ -204,11 +212,16 @@ public class Refactorings {
      *
      * @param node the node to remove
      * @param replacement the replacement node
-     * @see ASTRewrite#replace(ASTNode, ASTNode, org.eclipse.text.edits.TextEditGroup)
+     * @param transaction TODO
+     * @see ASTRewrite#replace(ASTNode, ASTNode, TextEditGroup)
      */
-    public void replace(ASTNode node, ASTNode replacement) {
+    public void replace(ASTNode node, ASTNode replacement, Transaction transaction) {
+        final Transaction txn = getTxn(transaction);
         hasRefactorings = true;
-        rewrite.replace(node, replacement, null);
+        rewrite.replace(node, replacement, txn);
+        if (txn != transaction) {
+            txn.commit();
+        }
         doNotVisit(node);
     }
 
@@ -217,10 +230,16 @@ public class Refactorings {
      *
      * @param comment the comment to replace
      * @param replacement the replacement text
+     * @param transaction TODO
      */
-    public void replace(Comment comment, String replacement) {
+    public void replace(Comment comment, String replacement, Transaction transaction) {
+        final Transaction txn = getTxn(transaction);
         hasRefactorings = true;
-        commentRewriter.replace(comment, replacement);
+        commentRewriter.replace(comment, replacement, txn);
+        if (txn != transaction) {
+            txn.commit();
+        }
+        doNotVisit(comment);
     }
 
     /**
@@ -228,24 +247,34 @@ public class Refactorings {
      *
      * @param toReplace the source location to replace
      * @param replacement the replacement string
+     * @param transaction TODO
      */
-    public void replace(SourceLocation toReplace, String replacement) {
+    public void replace(SourceLocation toReplace, String replacement, Transaction transaction) {
+        final Transaction txn = getTxn(transaction);
         hasRefactorings = true;
-        this.sourceRewriter.replace(toReplace, replacement);
+        sourceRewriter.replace(toReplace, replacement, txn);
+        if (txn != transaction) {
+            txn.commit();
+        }
     }
 
     /**
      * Removes the provided node from the AST.
      *
      * @param node the node to remove
-     * @see ASTRewrite#remove(ASTNode, org.eclipse.text.edits.TextEditGroup)
+     * @param transaction TODO
+     * @see ASTRewrite#remove(ASTNode, TextEditGroup)
      */
-    public void remove(ASTNode node) {
+    public void remove(ASTNode node, Transaction transaction) {
+        final Transaction txn = getTxn(transaction);
         hasRefactorings = true;
         if (node instanceof Comment) {
-            commentRewriter.remove((Comment) node);
+            commentRewriter.remove((Comment) node, txn);
         } else {
-            rewrite.remove(node, null);
+            rewrite.remove(node, txn);
+        }
+        if (txn != transaction) {
+            txn.commit();
         }
         doNotVisit(node);
     }
@@ -254,31 +283,34 @@ public class Refactorings {
      * Removes the provided source location from the source.
      *
      * @param toRemove the source location to remove
+     * @param transaction TODO
      */
-    public void remove(SourceLocation toRemove) {
+    public void remove(SourceLocation toRemove, Transaction transaction) {
+        final Transaction txn = getTxn(transaction);
         hasRefactorings = true;
-        sourceRewriter.remove(toRemove);
+        sourceRewriter.remove(toRemove, txn);
+        if (txn != transaction) {
+            txn.commit();
+        }
     }
 
     /**
      * Removes the provided nodes from the AST.
      *
      * @param nodes the nodes to remove
-     * @see #remove(ASTNode)
+     * @param transaction
+     * @see #remove(ASTNode, TextEditGroup)
      */
-    public void remove(ASTNode... nodes) {
-        remove(Arrays.asList(nodes));
-    }
-
-    /**
-     * Removes the provided nodes from the AST.
-     *
-     * @param nodes the nodes to remove
-     * @see #remove(ASTNode)
-     */
-    public void remove(Collection<? extends ASTNode> nodes) {
+    public void remove(Collection<? extends ASTNode> nodes, Transaction transaction) {
+        if (nodes.isEmpty()) {
+            throw new IllegalArgumentException("The provided nodes cannot be empty");
+        }
+        final Transaction txn = getTxn(transaction);
         for (ASTNode node : nodes) {
-            remove(node);
+            remove(node, txn);
+        }
+        if (txn != transaction) {
+            txn.commit();
         }
     }
 
@@ -298,13 +330,17 @@ public class Refactorings {
      * @param index the index where to insert the node in the list
      * @param locationInParent the insert location description
      * @param listHolder the node holding the list where to insert
-     * @see ListRewrite#insertAt(ASTNode, int, org.eclipse.text.edits.TextEditGroup)
+     * @see ListRewrite#insertAt(ASTNode, int, TextEditGroup)
      */
     public void insertAt(ASTNode nodeToInsert, int index, StructuralPropertyDescriptor locationInParent,
-            ASTNode listHolder) {
+            ASTNode listHolder, Transaction transaction) {
+        final Transaction txn = getTxn(transaction);
         hasRefactorings = true;
         final ListRewrite listRewrite = getListRewrite(listHolder, (ChildListPropertyDescriptor) locationInParent);
-        listRewrite.insertAt(nodeToInsert, index, null);
+        listRewrite.insertAt(nodeToInsert, index, txn);
+        if (txn != transaction) {
+            txn.commit();
+        }
     }
 
     /**
@@ -312,11 +348,15 @@ public class Refactorings {
      *
      * @param nodeToInsert the node to insert
      * @param element the node serving as a reference location
-     * @see ListRewrite#insertBefore(ASTNode, ASTNode, org.eclipse.text.edits.TextEditGroup)
+     * @see ListRewrite#insertBefore(ASTNode, ASTNode, TextEditGroup)
      */
-    public void insertBefore(ASTNode nodeToInsert, ASTNode element) {
+    public void insertBefore(ASTNode nodeToInsert, ASTNode element, Transaction transaction) {
+        final Transaction txn = getTxn(transaction);
         hasRefactorings = true;
-        getListRewrite(element).insertBefore(nodeToInsert, element, null);
+        getListRewrite(element).insertBefore(nodeToInsert, element, txn);
+        if (txn != transaction) {
+            txn.commit();
+        }
     }
 
     /**
@@ -324,11 +364,15 @@ public class Refactorings {
      *
      * @param nodeToInsert the node to insert
      * @param element the node serving as a reference location
-     * @see ListRewrite#insertAfter(ASTNode, ASTNode, org.eclipse.text.edits.TextEditGroup)
+     * @see ListRewrite#insertAfter(ASTNode, ASTNode, TextEditGroup)
      */
-    public void insertAfter(ASTNode nodeToInsert, ASTNode element) {
+    public void insertAfter(ASTNode nodeToInsert, ASTNode element, Transaction transaction) {
+        final Transaction txn = getTxn(transaction);
         hasRefactorings = true;
-        getListRewrite(element).insertAfter(nodeToInsert, element, null);
+        getListRewrite(element).insertAfter(nodeToInsert, element, txn);
+        if (txn != transaction) {
+            txn.commit();
+        }
     }
 
     /**
@@ -336,20 +380,30 @@ public class Refactorings {
      *
      * @param lineComment the line comment to convert to javadoc
      * @param nextNode the AST node immediately following the line comment
+     * @param transaction TODO
      */
-    public void toJavadoc(LineComment lineComment, ASTNode nextNode) {
+    public void toJavadoc(LineComment lineComment, ASTNode nextNode, Transaction transaction) {
+        final Transaction txn = getTxn(transaction);
         hasRefactorings = true;
-        commentRewriter.toJavadoc(lineComment, nextNode);
+        commentRewriter.toJavadoc(lineComment, nextNode, txn);
+        if (txn != transaction) {
+            txn.commit();
+        }
     }
 
     /**
      * Adds the provided block comment to convert to javadoc.
      *
      * @param blockComment the block comment to convert to javadoc
+     * @param transaction TODO
      */
-    public void toJavadoc(BlockComment blockComment) {
+    public void toJavadoc(BlockComment blockComment, Transaction transaction) {
+        final Transaction txn = getTxn(transaction);
         hasRefactorings = true;
-        commentRewriter.toJavadoc(blockComment);
+        commentRewriter.toJavadoc(blockComment, txn);
+        if (txn != transaction) {
+            txn.commit();
+        }
     }
 
     /**
@@ -358,24 +412,86 @@ public class Refactorings {
      * @param node the node where to set the property
      * @param property the property to be set
      * @param value the value to set
-     * @see ASTRewrite#set(ASTNode, StructuralPropertyDescriptor, Object, org.eclipse.text.edits.TextEditGroup)
+     * @see ASTRewrite#set(ASTNode, StructuralPropertyDescriptor, Object, TextEditGroup)
      */
-    public void set(ASTNode node, StructuralPropertyDescriptor property, Object value) {
+    public void set(ASTNode node, StructuralPropertyDescriptor property, Object value, Transaction transaction) {
+        final Transaction txn = getTxn(transaction);
         hasRefactorings = true;
-        rewrite.set(node, property, value, null);
+        rewrite.set(node, property, value, txn);
+        if (txn != transaction) {
+            txn.commit();
+        }
     }
 
     /**
      * Applies the accumulated refactorings to the provided document.
      *
      * @param document the document to refactor
+     * @return true if any refactoring could be applied, false otherwise
      * @throws BadLocationException if trying to access a non existing position
      */
-    public void applyTo(final IDocument document) throws BadLocationException {
+    public boolean applyTo(final IDocument document) throws BadLocationException {
         final TextEdit edits = rewrite.rewriteAST(document, null);
         commentRewriter.addEdits(document, edits);
         sourceRewriter.addEdits(document, edits);
-        applyEditsToDocument(edits, document);
+        filterOutIncompleteRefactorings(transactions);
+        Collection<Transaction> refactoringsToApply = getRefactoringsApplicableToSelection(transactions, selection);
+        if (!refactoringsToApply.isEmpty()) {
+            applyEditsToDocument(toTextEdit(refactoringsToApply, edits), document);
+            return true;
+        }
+        return false;
+    }
+
+    private TextEdit toTextEdit(Collection<Transaction> refactoringsToApply, TextEdit edits) {
+        MultiTextEdit result = new MultiTextEdit();
+        for (Transaction txn : refactoringsToApply) {
+            result.addChildren(removeParents(txn.getTextEdits(), edits));
+        }
+        return result;
+    }
+
+    private TextEdit[] removeParents(TextEdit[] textEdits, TextEdit edits) {
+        final List<TextEdit> results = new ArrayList<TextEdit>();
+        TextEdit[] children = edits.getChildren();
+        List<TextEdit> l = Arrays.asList(textEdits);
+        for (TextEdit textEdit : children) {
+            if (l.contains(textEdit)) {
+              edits.removeChild(textEdit);
+              results.add(textEdit);
+            }
+        }
+//        for (TextEdit textEdit : textEdits) {
+//            if (edits.equals(textEdit.getParent())) {
+//                textEdit.getParent().removeChild(textEdit);
+//                results.add(textEdit);
+//            }
+//        }
+        return results.toArray(new TextEdit[results.size()]);
+    }
+
+    private void filterOutIncompleteRefactorings(Collection<Transaction> txns) {
+        for (Iterator<Transaction> it = txns.iterator(); it.hasNext();) {
+            Transaction txn = it.next();
+            if (!txn.isCommitted()) {
+                // do not apply incomplete refactorings
+                it.remove();
+            }
+        }
+    }
+
+    private Collection<Transaction> getRefactoringsApplicableToSelection(Collection<Transaction> txns, SourceLocation selection) {
+        if (selection == null) {
+            return txns;
+        }
+        final List<Transaction> results = new ArrayList<Transaction>();
+        for (Transaction txn : txns) {
+            IRegion region = txn.getRegion();
+            if (selection.contains(new SourceLocation(region))) {
+                results.add(txn);
+            }
+        }
+        return results;
     }
 
     private void applyEditsToDocument(final TextEdit edits, final IDocument document) throws BadLocationException {
@@ -406,5 +522,15 @@ public class Refactorings {
         if (ex != null) {
             throw ex;
         }
+    }
+
+    private Transaction getTxn(Transaction txn) {
+        final Transaction result = txn != null ? txn : new Transaction();
+        transactions.add(result);
+        return result;
+    }
+
+    public Transaction newTransaction(RefactoringRule refactoringRule) {
+        return new Transaction(refactoringRule.getClass().getSimpleName().toString());
     }
 }

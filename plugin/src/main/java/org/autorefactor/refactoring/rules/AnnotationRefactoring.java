@@ -53,17 +53,18 @@ public class AnnotationRefactoring extends AbstractRefactoringRule {
 
     @Override
     public boolean visit(NormalAnnotation node) {
-        final Refactorings r = this.ctx.getRefactorings();
-        final ASTBuilder b = this.ctx.getASTBuilder();
+        final Refactorings r = ctx.getRefactorings();
+        final ASTBuilder b = ctx.getASTBuilder();
         final List<MemberValuePair> values = values(node);
         if (values.isEmpty()) {
-            r.replace(node, b.markerAnnotation(b.move(node.getTypeName())));
+            r.replace(node, b.markerAnnotation(b.move(node.getTypeName())), null);
             return DO_NOT_VISIT_SUBTREE;
         } else if (values.size() == 1) {
             MemberValuePair pair = values.get(0);
             if ("value".equals(pair.getName().getIdentifier())) {
                 r.replace(node,
-                        b.singleValueAnnotation(b.move(node.getTypeName()), b.move(pair.getValue())));
+                        b.singleValueAnnotation(b.move(node.getTypeName()), b.move(pair.getValue())),
+                        null);
                 return DO_NOT_VISIT_SUBTREE;
             }
         }

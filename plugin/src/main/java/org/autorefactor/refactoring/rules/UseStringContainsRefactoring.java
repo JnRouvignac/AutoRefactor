@@ -27,6 +27,7 @@ package org.autorefactor.refactoring.rules;
 
 import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.Refactorings;
+import org.autorefactor.refactoring.Transaction;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.InfixExpression;
@@ -34,6 +35,7 @@ import org.eclipse.jdt.core.dom.InfixExpression.Operator;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
+import static org.eclipse.jdt.core.dom.MethodInvocation.*;
 
 /** See {@link #getDescription()} method. */
 @SuppressWarnings("javadoc")
@@ -72,14 +74,16 @@ public class UseStringContainsRefactoring extends AbstractRefactoringRule {
     }
 
     private boolean replaceWithStringContains(InfixExpression ie, MethodInvocation node, boolean negate) {
-        final Refactorings r = this.ctx.getRefactorings();
-        final ASTBuilder b = this.ctx.getASTBuilder();
-        r.set(node, MethodInvocation.NAME_PROPERTY, b.simpleName("contains"));
+        final Refactorings r = ctx.getRefactorings();
+        final Transaction txn = r.newTransaction(this);
+        final ASTBuilder b = ctx.getASTBuilder();
+        r.set(node, NAME_PROPERTY, b.simpleName("contains"), txn);
         if (negate) {
-            r.replace(ie, b.not(b.move(node)));
+            r.replace(ie, b.not(b.move(node)), txn);
         } else {
-            r.replace(ie, b.move(node));
+            r.replace(ie, b.move(node), txn);
         }
+        txn.commit();
         return DO_NOT_VISIT_SUBTREE;
     }
 

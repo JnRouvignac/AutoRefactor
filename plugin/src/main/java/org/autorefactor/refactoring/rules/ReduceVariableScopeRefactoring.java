@@ -291,7 +291,7 @@ public class ReduceVariableScopeRefactoring extends AbstractRefactoringRule {
     }
 
     private void replace(VariableAccess varDecl, VariableAccess varAccess) {
-        final ASTBuilder b = this.ctx.getASTBuilder();
+        final ASTBuilder b = ctx.getASTBuilder();
         final AST ast = b.getAST();
         final ASTNode scope = varAccess.getScope();
         final Name varName = varAccess.getVariableName();
@@ -306,7 +306,7 @@ public class ReduceVariableScopeRefactoring extends AbstractRefactoringRule {
                     final VariableDeclarationFragment vdf = getVariableDeclarationFragment(parentExpr, varName);
                     final VariableDeclarationStatement vds = ast.newVariableDeclarationStatement(vdf);
                     vds.setType(varType);
-                    this.ctx.getRefactorings().replace(stmt, vds);
+                    this.ctx.getRefactorings().replace(stmt, vds, null);
                     break;
                 }
             }
@@ -319,7 +319,7 @@ public class ReduceVariableScopeRefactoring extends AbstractRefactoringRule {
             if (equalNotNull(efs.getBody(), parentStmt)) {
                 newEfs.setBody(copy(efs.getBody(), varName));
             }
-            this.ctx.getRefactorings().replace(efs, newEfs);
+            this.ctx.getRefactorings().replace(efs, newEfs, null);
         } else if (scope instanceof ForStatement) {
             final ForStatement fs = (ForStatement) scope;
             final ForStatement newFs = b.copy(fs);
@@ -330,7 +330,7 @@ public class ReduceVariableScopeRefactoring extends AbstractRefactoringRule {
                 final VariableDeclarationExpression vde = ast.newVariableDeclarationExpression(vdf);
                 vde.setType(varType);
                 initializers.add(vde);
-                this.ctx.getRefactorings().replace(fs, newFs);
+                this.ctx.getRefactorings().replace(fs, newFs, null);
                 // TODO JNR
                 // if (equalNotNull(fs.getBody(), parentStmt)) {
                 // newFs.setBody(copy(fs.getBody()));
@@ -346,7 +346,7 @@ public class ReduceVariableScopeRefactoring extends AbstractRefactoringRule {
             if (equalNotNull(ws.getBody(), parentStmt)) {
                 newWs.setBody(copy(ws.getBody(), varName));
             }
-            this.ctx.getRefactorings().replace(ws, newWs);
+            this.ctx.getRefactorings().replace(ws, newWs, null);
         } else if (scope instanceof IfStatement) {
             final IfStatement is = (IfStatement) scope;
             final IfStatement newIs = ast.newIfStatement();
@@ -357,13 +357,13 @@ public class ReduceVariableScopeRefactoring extends AbstractRefactoringRule {
                 if (is.getElseStatement() != null) {
                     newIs.setElseStatement(b.copy(is.getElseStatement()));
                 }
-                this.ctx.getRefactorings().replace(is, newIs);
+                this.ctx.getRefactorings().replace(is, newIs, null);
             } else if (equalNotNull(is.getElseStatement(), parentStmt)) {
                 if (is.getThenStatement() != null) {
                     newIs.setThenStatement(b.copy(is.getThenStatement()));
                 }
                 newIs.setElseStatement(copy(is.getElseStatement(), varName));
-                this.ctx.getRefactorings().replace(is, newIs);
+                this.ctx.getRefactorings().replace(is, newIs, null);
             } else {
                 throw new IllegalStateException(is,
                         "Parent statement should be inside the then or else statement of this if statement: " + is);
@@ -403,7 +403,7 @@ public class ReduceVariableScopeRefactoring extends AbstractRefactoringRule {
             if (a.getLeftHandSide() instanceof SimpleName) {
                 final SimpleName sn = (SimpleName) a.getLeftHandSide();
                 if (sn.getFullyQualifiedName().equals(varName.getFullyQualifiedName())) {
-                    final ASTBuilder b = this.ctx.getASTBuilder();
+                    final ASTBuilder b = ctx.getASTBuilder();
                     final VariableDeclarationFragment vdf = b.getAST().newVariableDeclarationFragment();
                     vdf.setInitializer(b.copy(a.getRightHandSide()));
                     vdf.setName(b.copy(sn));
@@ -417,7 +417,7 @@ public class ReduceVariableScopeRefactoring extends AbstractRefactoringRule {
 
     private void remove(ASTNode node) {
         if (node instanceof VariableDeclarationFragment) {
-            this.ctx.getRefactorings().remove(node.getParent());
+            ctx.getRefactorings().remove(node.getParent(), null);
         } else {
             remove(node.getParent());
         }

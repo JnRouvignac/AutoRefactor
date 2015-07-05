@@ -27,6 +27,7 @@ package org.autorefactor.refactoring.rules;
 
 import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.Refactorings;
+import org.autorefactor.refactoring.Transaction;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Expression;
@@ -77,20 +78,23 @@ public class NoAssignmentInIfConditionRefactoring extends AbstractRefactoringRul
     }
 
     private boolean moveAssignmentBeforeIfStatement(final IfStatement node, final Assignment a) {
-        final Refactorings r = this.ctx.getRefactorings();
-        final ASTBuilder b = this.ctx.getASTBuilder();
+        final Refactorings r = ctx.getRefactorings();
+        final Transaction txn = r.newTransaction(this);
+        final ASTBuilder b = ctx.getASTBuilder();
         final VariableDeclarationStatement vds = as(getPreviousSibling(node), VariableDeclarationStatement.class);
         final Expression lhs = removeParentheses(a.getLeftHandSide());
         final VariableDeclarationFragment vdf = findVariableDeclarationFragment(vds, lhs);
         if (vdf != null) {
-            r.set(vdf, INITIALIZER_PROPERTY, a.getRightHandSide());
+            r.set(vdf, INITIALIZER_PROPERTY, a.getRightHandSide(), txn);
             r.replace(getFirstParentOfType(a, ParenthesizedExpression.class),
-                b.copy(lhs));
+                b.copy(lhs), txn);
+            txn.commit();
             return DO_NOT_VISIT_SUBTREE;
         } else if (!isAnElseIf(node)) {
-            r.insertBefore(b.toStmt(b.move(a)), node);
+            r.insertBefore(b.toStmt(b.move(a)), node, txn);
             r.replace(getFirstParentOfType(a, ParenthesizedExpression.class),
-                b.copy(lhs));
+                b.copy(lhs), txn);
+            txn.commit();
             return DO_NOT_VISIT_SUBTREE;
         }
         return VISIT_SUBTREE;

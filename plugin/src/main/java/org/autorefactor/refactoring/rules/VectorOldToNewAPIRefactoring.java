@@ -30,6 +30,7 @@ import java.util.List;
 import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.Refactorings;
 import org.autorefactor.refactoring.Release;
+import org.autorefactor.refactoring.Transaction;
 import org.autorefactor.util.IllegalArgumentException;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
@@ -55,57 +56,61 @@ public class VectorOldToNewAPIRefactoring extends AbstractRefactoringRule {
     public boolean visit(MethodInvocation node) {
         if (ctx.getJavaProjectOptions().getJavaSERelease().isCompatibleWith(Release.javaSE("1.2.0"))) {
             if (isMethod(node, "java.util.Vector", "elementAt", "int")) {
-                replaceWith(node, "get");
+                return replaceWith(node, "get");
             } else if (isMethod(node, "java.util.Vector", "addElement", "java.lang.Object")) {
-                replaceWith(node, "add");
+                return replaceWith(node, "add");
             } else if (isMethod(node, "java.util.Vector", "insertElementAt", "java.lang.Object", "int")) {
-                replaceWithAndSwapArguments(node, "add");
+                return replaceWithAndSwapArguments(node, "add");
             } else if (isMethod(node, "java.util.Vector", "copyInto", "java.lang.Object[]")) {
-                replaceWith(node, "toArray");
+                return replaceWith(node, "toArray");
             } else if (isMethod(node, "java.util.Vector", "removeAllElements")) {
-                replaceWith(node, "clear");
+                return replaceWith(node, "clear");
             } else if (isMethod(node, "java.util.Vector", "removeElement", "java.lang.Object")) {
-                replaceWithSpecial(node, "remove");
+                return replaceWithSpecial(node, "remove");
             } else if (isMethod(node, "java.util.Vector", "removeElementAt", "int")) {
-                replaceWith(node, "remove");
+                return replaceWith(node, "remove");
             } else if (isMethod(node, "java.util.Vector", "setElementAt", "java.lang.Object", "int")) {
-                replaceWith(node, "set");
+                return replaceWith(node, "set");
             }
         }
         return VISIT_SUBTREE;
     }
 
-    private void replaceWith(MethodInvocation node, String newMethodName) {
-        final ASTBuilder b = this.ctx.getASTBuilder();
-        this.ctx.getRefactorings().replace(node,
-            b.invoke(
-                b.copy(node.getExpression()),
-                newMethodName,
-                b.copyRange(arguments(node))));
+    private boolean replaceWith(MethodInvocation node, String newMethodName) {
+        final ASTBuilder b = ctx.getASTBuilder();
+        final Refactorings r = ctx.getRefactorings();
+        r.set(node, NAME_PROPERTY, b.simpleName(newMethodName), null);
+        return DO_NOT_VISIT_SUBTREE;
     }
 
-    private void replaceWithSpecial(MethodInvocation node, String newMethodName) {
+    private boolean replaceWithSpecial(MethodInvocation node, String newMethodName) {
         final List<Expression> args = arguments(node);
         assertSize(args, 1);
         final Expression arg0 = args.get(0);
 
-        final ASTBuilder b = this.ctx.getASTBuilder();
-        final Refactorings r = this.ctx.getRefactorings();
-        r.set(node, NAME_PROPERTY, b.simpleName(newMethodName));
+        final ASTBuilder b = ctx.getASTBuilder();
+        final Refactorings r = ctx.getRefactorings();
+        final Transaction txn = r.newTransaction(this);
+        r.set(node, NAME_PROPERTY, b.simpleName(newMethodName), txn);
         if (hasType(arg0, "int", "short", "byte")) {
-            r.replace(arg0, b.cast("Object", b.move(arg0)));
+            r.replace(arg0, b.cast("Object", b.move(arg0)), txn);
         }
+        txn.commit();
+        return DO_NOT_VISIT_SUBTREE;
     }
 
-    private void replaceWithAndSwapArguments(MethodInvocation node, String newMethodName) {
+    private boolean replaceWithAndSwapArguments(MethodInvocation node, String newMethodName) {
         final List<Expression> args = arguments(node);
         assertSize(args, 2);
         final Expression arg1 = args.get(1);
 
-        final ASTBuilder b = this.ctx.getASTBuilder();
-        final Refactorings r = this.ctx.getRefactorings();
-        r.set(node, NAME_PROPERTY, b.simpleName(newMethodName));
-        r.insertAt(b.move(arg1), 0, arg1.getLocationInParent(), arg1.getParent());
+        final ASTBuilder b = ctx.getASTBuilder();
+        final Refactorings r = ctx.getRefactorings();
+        final Transaction txn = r.newTransaction(this);
+        r.set(node, NAME_PROPERTY, b.simpleName(newMethodName), txn);
+        r.insertAt(b.move(arg1), 0, arg1.getLocationInParent(), arg1.getParent(), txn);
+        txn.commit();
+        return DO_NOT_VISIT_SUBTREE;
     }
 
     private void assertSize(final List<Expression> args, int expectedSize) {

@@ -77,24 +77,24 @@ public class DeadCodeEliminationRefactoring extends AbstractRefactoringRule {
         final Statement thenStmt = node.getThenStatement();
         final Statement elseStmt = node.getElseStatement();
         if (elseStmt != null && asList(elseStmt).isEmpty()) {
-            r.remove(elseStmt);
+            r.remove(elseStmt, null);
             return DO_NOT_VISIT_SUBTREE;
         } else if (thenStmt != null && asList(thenStmt).isEmpty()) {
             r.replace(node,
                     b.if0(b.negate(node.getExpression()),
-                            b.move(elseStmt)));
+                            b.move(elseStmt)), null);
             return DO_NOT_VISIT_SUBTREE;
         }
 
         final Object constantCondition = node.getExpression().resolveConstantExpressionValue();
         if (Boolean.TRUE.equals(constantCondition)) {
-            r.replace(node, b.copy(node.getThenStatement()));
+            r.replace(node, b.copy(node.getThenStatement()), null);
             return DO_NOT_VISIT_SUBTREE;
         } else if (Boolean.FALSE.equals(constantCondition)) {
             if (elseStmt != null) {
-                r.replace(node, b.copy(elseStmt));
+                r.replace(node, b.copy(elseStmt), null);
             } else {
-                r.remove(node);
+                r.remove(node, null);
             }
             return DO_NOT_VISIT_SUBTREE;
         }
@@ -106,7 +106,7 @@ public class DeadCodeEliminationRefactoring extends AbstractRefactoringRule {
         final Object constantCondition =
                 node.getExpression().resolveConstantExpressionValue();
         if (Boolean.FALSE.equals(constantCondition)) {
-            this.ctx.getRefactorings().remove(node);
+            this.ctx.getRefactorings().remove(node, null);
             return DO_NOT_VISIT_SUBTREE;
         }
         return VISIT_SUBTREE;
@@ -119,9 +119,9 @@ public class DeadCodeEliminationRefactoring extends AbstractRefactoringRule {
             final List<Statement> finallyStmts = asList(node.getFinally());
             if (!finallyStmts.isEmpty()) {
                 final ASTBuilder b = this.ctx.getASTBuilder();
-                this.ctx.getRefactorings().replace(node, b.copy(node.getFinally()));
+                this.ctx.getRefactorings().replace(node, b.copy(node.getFinally()), null);
             } else {
-                this.ctx.getRefactorings().remove(node);
+                this.ctx.getRefactorings().remove(node, null);
             }
             return DO_NOT_VISIT_SUBTREE;
         }
@@ -150,7 +150,7 @@ public class DeadCodeEliminationRefactoring extends AbstractRefactoringRule {
     public boolean visit(EmptyStatement node) {
         ASTNode parent = node.getParent();
         if (parent instanceof Block) {
-            this.ctx.getRefactorings().remove(node);
+            this.ctx.getRefactorings().remove(node, null);
             return DO_NOT_VISIT_SUBTREE;
         }
         parent = getParentIgnoring(node, Block.class);
@@ -161,13 +161,13 @@ public class DeadCodeEliminationRefactoring extends AbstractRefactoringRule {
             boolean thenIsEmptyStmt = thenStmts.size() == 1 && is(thenStmts.get(0), EmptyStatement.class);
             boolean elseIsEmptyStmt = elseStmts.size() == 1 && is(elseStmts.get(0), EmptyStatement.class);
             if (thenIsEmptyStmt && elseIsEmptyStmt) {
-                this.ctx.getRefactorings().remove(parent);
+                this.ctx.getRefactorings().remove(parent, null);
                 return DO_NOT_VISIT_SUBTREE;
             } else if (thenIsEmptyStmt && is.getElseStatement() == null) {
-                this.ctx.getRefactorings().remove(is);
+                this.ctx.getRefactorings().remove(is, null);
                 return DO_NOT_VISIT_SUBTREE;
             } else if (elseIsEmptyStmt) {
-                this.ctx.getRefactorings().remove(is.getElseStatement());
+                this.ctx.getRefactorings().remove(is.getElseStatement(), null);
                 return DO_NOT_VISIT_SUBTREE;
             }
         } else if (parent instanceof TryStatement) {
@@ -189,7 +189,7 @@ public class DeadCodeEliminationRefactoring extends AbstractRefactoringRule {
     private boolean removeEmptyStmtBody(EmptyStatement node, Statement stmt, Statement body) {
         List<Statement> bodyStmts = asList(body);
         if (bodyStmts.size() == 1 && bodyStmts.contains(node)) {
-            this.ctx.getRefactorings().remove(stmt);
+            this.ctx.getRefactorings().remove(stmt, null);
             return DO_NOT_VISIT_SUBTREE;
         }
         return VISIT_SUBTREE;
@@ -205,7 +205,7 @@ public class DeadCodeEliminationRefactoring extends AbstractRefactoringRule {
                 IMethodBinding declMethodBinding = node.resolveBinding();
                 if (declMethodBinding.overrides(bodyMethodBinding)
                         && !hasSignificantAnnotations(declMethodBinding)) {
-                    this.ctx.getRefactorings().remove(node);
+                    this.ctx.getRefactorings().remove(node, null);
                     return DO_NOT_VISIT_SUBTREE;
                 }
             }

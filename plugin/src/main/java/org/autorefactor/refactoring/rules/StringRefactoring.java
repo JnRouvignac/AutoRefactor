@@ -59,8 +59,8 @@ public class StringRefactoring extends AbstractRefactoringRule {
                 && arguments(node).size() == 1) {
             final Expression arg0 = arguments(node).get(0);
             if (hasType(arg0, "java.lang.String")) {
-                final ASTBuilder b = this.ctx.getASTBuilder();
-                this.ctx.getRefactorings().replace(node, b.copy(arg0));
+                final ASTBuilder b = ctx.getASTBuilder();
+                ctx.getRefactorings().replace(node, b.copy(arg0), null);
                 return DO_NOT_VISIT_SUBTREE;
             }
         }
@@ -71,12 +71,12 @@ public class StringRefactoring extends AbstractRefactoringRule {
     public boolean visit(MethodInvocation node) {
         final Expression expression = node.getExpression();
         final ASTNode parent = node.getParent();
-        final ASTBuilder b = this.ctx.getASTBuilder();
+        final ASTBuilder b = ctx.getASTBuilder();
         final boolean isStringValueOf = isStringValueOf(node);
         if (isMethod(node, "java.lang.Object", "toString")) {
             if (hasType(expression, "java.lang.String")) {
                 // if node is already a String, no need to call toString()
-                this.ctx.getRefactorings().replace(node, b.move(expression));
+                ctx.getRefactorings().replace(node, b.move(expression), null);
                 return DO_NOT_VISIT_SUBTREE;
             } else if (parent.getNodeType() == INFIX_EXPRESSION) {
                 // if node is in a String context, no need to call toString()
@@ -91,18 +91,18 @@ public class StringRefactoring extends AbstractRefactoringRule {
                         && !node.equals(rmi)
                         && (leftOpIsString || rightOpIsString)) {
                     // node is in the extended operands
-                    this.ctx.getRefactorings().replace(node, b.move(node.getExpression()));
+                    ctx.getRefactorings().replace(node, b.move(node.getExpression()), null);
                     return VISIT_SUBTREE;
                 } else if (leftOpIsString && isMethod(rmi, "java.lang.Object", "toString")) {
-                    this.ctx.getRefactorings().replace(rmi, b.move(rmi.getExpression()));
+                    ctx.getRefactorings().replace(rmi, b.move(rmi.getExpression()), null);
                     return VISIT_SUBTREE;
                 } else if (rightOpIsString && node.equals(lmi)) {
-                    this.ctx.getRefactorings().replace(lmi, b.move(lmi.getExpression()));
+                    ctx.getRefactorings().replace(lmi, b.move(lmi.getExpression()), null);
                     return DO_NOT_VISIT_SUBTREE;
                 }
             }
         } else if (isStringValueOf && hasType(arg0(node), "java.lang.String")) {
-            this.ctx.getRefactorings().replace(node, b.move(arg0(node)));
+            ctx.getRefactorings().replace(node, b.move(arg0(node)), null);
             return DO_NOT_VISIT_SUBTREE;
         } else if ((isToStringForPrimitive(node) || isStringValueOf)
                 && parent.getNodeType() == INFIX_EXPRESSION) {
@@ -113,14 +113,14 @@ public class StringRefactoring extends AbstractRefactoringRule {
             final MethodInvocation lmi = as(lo, MethodInvocation.class);
             final MethodInvocation rmi = as(ro, MethodInvocation.class);
             if (hasType(lo, "java.lang.String") && node.equals(rmi)) {
-                this.ctx.getRefactorings().replace(rmi, b.move(arg0(rmi)));
+                ctx.getRefactorings().replace(rmi, b.move(arg0(rmi)), null);
                 return VISIT_SUBTREE;
             } else if (hasType(ro, "java.lang.String") && node.equals(lmi)) {
-                this.ctx.getRefactorings().replace(lmi, b.move(arg0(lmi)));
+                ctx.getRefactorings().replace(lmi, b.move(arg0(lmi)), null);
                 return DO_NOT_VISIT_SUBTREE;
             } else {
                 // left or right operation is necessarily a string, so just replace
-                this.ctx.getRefactorings().replace(node, b.move(arg0(node)));
+                ctx.getRefactorings().replace(node, b.move(arg0(node)), null);
                 return DO_NOT_VISIT_SUBTREE;
             }
         }

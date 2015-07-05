@@ -95,7 +95,7 @@ public class StringBuilderRefactoring extends AbstractRefactoringRule {
             addAllSubExpressions(node, allOperands, null);
             boolean replaceNeeded = filterOutEmptyStringsFromStringConcat(allOperands);
             if (replaceNeeded) {
-                this.ctx.getRefactorings().replace(node, createStringConcats(allOperands));
+                ctx.getRefactorings().replace(node, createStringConcats(allOperands), null);
                 return DO_NOT_VISIT_SUBTREE;
             }
             // FIXME In theory commented code down below should work better than current code above
@@ -159,8 +159,8 @@ public class StringBuilderRefactoring extends AbstractRefactoringRule {
             if ((lastExpr instanceof Name || lastExpr instanceof FieldAccess)
                     && isRewriteNeeded(allAppendedStrings, hasStringConcat)) {
                 // rewrite the successive calls to append() on an Appendable
-                this.ctx.getRefactorings().replace(node,
-                        createStringAppends(lastExpr, allAppendedStrings));
+                ctx.getRefactorings().replace(node,
+                        createStringAppends(lastExpr, allAppendedStrings), null);
                 return DO_NOT_VISIT_SUBTREE;
             }
 
@@ -169,8 +169,8 @@ public class StringBuilderRefactoring extends AbstractRefactoringRule {
                 && (instanceOf(typeBinding, "java.lang.StringBuilder")
                     || instanceOf(typeBinding, "java.lang.StringBuffer"))) {
                 final Expression arg0 = arg0(embeddedMI);
-                this.ctx.getRefactorings().replace(node,
-                        createStringAppends(lastExpr, Arrays.asList(arg0)));
+                ctx.getRefactorings().replace(node,
+                        createStringAppends(lastExpr, Arrays.asList(arg0)), null);
                 return DO_NOT_VISIT_SUBTREE;
             }
             if (isMethod(embeddedMI, "java.lang.String", "substring", "int", "int")
@@ -180,8 +180,9 @@ public class StringBuilderRefactoring extends AbstractRefactoringRule {
                 final List<Expression> args = arguments(embeddedMI);
                 final Expression arg0 = b.copy(args.get(0));
                 final Expression arg1 = b.copy(args.get(1));
-                this.ctx.getRefactorings().replace(node,
-                        createAppendSubstring(b, b.copy(lastExpr), stringVar, arg0, arg1));
+                ctx.getRefactorings().replace(node,
+                        createAppendSubstring(b, b.copy(lastExpr), stringVar, arg0, arg1), null);
+                return DO_NOT_VISIT_SUBTREE;
             }
         } else if (isMethod(node, "java.lang.StringBuilder", "toString")
                 || isMethod(node, "java.lang.StringBuffer", "toString")) {
@@ -191,8 +192,8 @@ public class StringBuilderRefactoring extends AbstractRefactoringRule {
             // outputs " blabla"
             if (lastExpr instanceof ClassInstanceCreation) {
                 // replace with String concatenation
-                this.ctx.getRefactorings().replace(node,
-                        createStringConcats(allAppendedStrings));
+                ctx.getRefactorings().replace(node,
+                        createStringConcats(allAppendedStrings), null);
                 return DO_NOT_VISIT_SUBTREE;
             }
         }

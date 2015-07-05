@@ -133,7 +133,7 @@ public class RemoveSemiColonRefactoring extends AbstractRefactoringRule {
                 while (m.find()) {
                     int startPos = entry.getValue().getStartPosition();
                     SourceLocation toRemove = fromPositions(startPos + m.start(1), startPos + m.end(1));
-                    this.ctx.getRefactorings().remove(toRemove);
+                    ctx.getRefactorings().remove(toRemove, null);
                     result = DO_NOT_VISIT_SUBTREE;
                 }
             }

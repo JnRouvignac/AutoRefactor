@@ -29,6 +29,7 @@ import java.util.List;
 
 import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.Refactorings;
+import org.autorefactor.refactoring.Transaction;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.IfStatement;
@@ -114,11 +115,13 @@ public class WorkWithNullCheckedExpressionFirstRefactoring extends AbstractRefac
 
     /** Revert condition + swap then and else statements.  */
     private boolean revertIfStatement(IfStatement node, Statement thenStmt, Statement elseStmt) {
-        final ASTBuilder b = this.ctx.getASTBuilder();
-        final Refactorings r = this.ctx.getRefactorings();
-        r.set(node.getExpression(), OPERATOR_PROPERTY, NOT_EQUALS);
-        r.replace(thenStmt, b.move(elseStmt));
-        r.replace(elseStmt, b.move(thenStmt));
+        final ASTBuilder b = ctx.getASTBuilder();
+        final Refactorings r = ctx.getRefactorings();
+        final Transaction txn = r.newTransaction(this);
+        r.set(node.getExpression(), OPERATOR_PROPERTY, NOT_EQUALS, txn);
+        r.replace(thenStmt, b.move(elseStmt), txn);
+        r.replace(elseStmt, b.move(thenStmt), txn);
+        txn.commit();
         return DO_NOT_VISIT_SUBTREE;
     }
 }

@@ -34,6 +34,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.autorefactor.refactoring.ASTBuilder;
+import org.autorefactor.refactoring.Transaction;
 import org.autorefactor.util.NotImplementedException;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.AnnotationTypeDeclaration;
@@ -106,7 +107,7 @@ public class RemoveUselessModifiersRefactoring extends AbstractRefactoringRule {
             boolean result = VISIT_SUBTREE;
             for (Modifier m : getModifiersOnly(modifiers(node))) {
                 if (m.isPublic() || m.isStatic() || m.isFinal()) {
-                    this.ctx.getRefactorings().remove(m);
+                    ctx.getRefactorings().remove(m, null);
                     result = DO_NOT_VISIT_SUBTREE;
                 }
             }
@@ -126,7 +127,7 @@ public class RemoveUselessModifiersRefactoring extends AbstractRefactoringRule {
         if (isStatic(modifierFlags) && isFinal(modifierFlags)) {
             for (Modifier m : getModifiersOnly(modifiers(node))) {
                 if (m.isFinal()) {
-                    this.ctx.getRefactorings().remove(m);
+                    ctx.getRefactorings().remove(m, null);
                     return DO_NOT_VISIT_SUBTREE;
                 }
             }
@@ -142,7 +143,7 @@ public class RemoveUselessModifiersRefactoring extends AbstractRefactoringRule {
         boolean result = VISIT_SUBTREE;
         for (Modifier m : getModifiersOnly(modifiers(node))) {
             if (m.isPublic() || m.isAbstract()) {
-                this.ctx.getRefactorings().remove(m);
+                ctx.getRefactorings().remove(m, null);
                 result = DO_NOT_VISIT_SUBTREE;
             }
         }
@@ -176,11 +177,13 @@ public class RemoveUselessModifiersRefactoring extends AbstractRefactoringRule {
         final List<Modifier> reorderedModifiers = new ArrayList<Modifier>(modifiers);
         Collections.sort(reorderedModifiers, new ModifierOrderComparator());
         if (!modifiers.equals(reorderedModifiers)) {
+            final Transaction txn = ctx.getRefactorings().newTransaction(this);
             final int startSize = getStartSize(node.modifiers(), modifiers);
             for (int i = startSize; i < reorderedModifiers.size(); i++) {
-                insertAt(reorderedModifiers.get(i), i);
+                insertAt(reorderedModifiers.get(i), i, txn);
                 result = DO_NOT_VISIT_SUBTREE;
             }
+            txn.commit();
         }
         return result;
     }
@@ -191,9 +194,9 @@ public class RemoveUselessModifiersRefactoring extends AbstractRefactoringRule {
         return l.size();
     }
 
-    private void insertAt(Modifier m, int index) {
-        final ASTBuilder b = this.ctx.getASTBuilder();
-        this.ctx.getRefactorings().insertAt(b.move(m), index, m.getLocationInParent(), m.getParent());
+    private void insertAt(Modifier m, int index, Transaction txn) {
+        final ASTBuilder b = ctx.getASTBuilder();
+        ctx.getRefactorings().insertAt(b.move(m), index, m.getLocationInParent(), m.getParent(), txn);
     }
 
     @Override
@@ -203,7 +206,7 @@ public class RemoveUselessModifiersRefactoring extends AbstractRefactoringRule {
             // remove useless "final" from method parameters
             for (Modifier m : getModifiersOnly(modifiers(node))) {
                 if (m.isFinal()) {
-                    this.ctx.getRefactorings().remove(m);
+                    ctx.getRefactorings().remove(m, null);
                     result = DO_NOT_VISIT_SUBTREE;
                 }
             }

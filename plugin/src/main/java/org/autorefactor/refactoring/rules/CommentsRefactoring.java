@@ -127,12 +127,12 @@ public class CommentsRefactoring extends AbstractRefactoringRule {
     public boolean visit(BlockComment node) {
         final String comment = getComment(node);
         if (EMPTY_BLOCK_COMMENT.matcher(comment).matches()) {
-            this.ctx.getRefactorings().remove(node);
+            ctx.getRefactorings().remove(node, null);
             return DO_NOT_VISIT_SUBTREE;
         }
         final ASTNode nextNode = getNextNode(node);
         if (acceptJavadoc(nextNode) && !betterCommentExist(node, nextNode)) {
-            this.ctx.getRefactorings().toJavadoc(node);
+            ctx.getRefactorings().toJavadoc(node, null);
             return DO_NOT_VISIT_SUBTREE;
         }
         final Matcher emptyLineAtStartMatcher = EMPTY_LINE_AT_START_OF_BLOCK_COMMENT.matcher(comment);
@@ -145,7 +145,7 @@ public class CommentsRefactoring extends AbstractRefactoringRule {
         }
         final String replacement = getReplacement(comment, false);
         if (replacement != null && !replacement.equals(comment)) {
-            this.ctx.getRefactorings().replace(node, replacement);
+            ctx.getRefactorings().replace(node, replacement, null);
             return DO_NOT_VISIT_SUBTREE;
         }
         return VISIT_SUBTREE;
@@ -196,14 +196,14 @@ public class CommentsRefactoring extends AbstractRefactoringRule {
         final Matcher emptyLineAtStartMatcher = EMPTY_LINE_AT_START_OF_JAVADOC.matcher(comment);
         final Matcher emptyLineAtEndMatcher = EMPTY_LINE_AT_END_OF_BLOCK_COMMENT.matcher(comment);
         if (EMPTY_JAVADOC.matcher(comment).matches()) {
-            this.ctx.getRefactorings().remove(node);
+            ctx.getRefactorings().remove(node, null);
             return DO_NOT_VISIT_SUBTREE;
         } else if (emptyLineAtStartMatcher.find()) {
             return replaceEmptyLineAtStartOfComment(node, emptyLineAtStartMatcher);
         } else if (emptyLineAtEndMatcher.find()) {
             return replaceEmptyLineAtEndOfComment(node, emptyLineAtEndMatcher);
         } else if (allTagsEmpty(tags(node))) {
-            this.ctx.getRefactorings().remove(node);
+            ctx.getRefactorings().remove(node, null);
             return DO_NOT_VISIT_SUBTREE;
         } else if (!isWellFormattedInheritDoc
                 && JAVADOC_ONLY_INHERITDOC.matcher(comment).matches()) {
@@ -211,17 +211,17 @@ public class CommentsRefactoring extends AbstractRefactoringRule {
             int startLine = this.astRoot.getLineNumber(node.getStartPosition());
             int endLine = this.astRoot.getLineNumber(node.getStartPosition() + node.getLength());
             if (startLine != endLine) {
-                this.ctx.getRefactorings().replace(node, "/** {@inheritDoc} */");
+                ctx.getRefactorings().replace(node, "/** {@inheritDoc} */", null);
                 return DO_NOT_VISIT_SUBTREE;
             }
         } else if (!acceptJavadoc(getNextNode(node))) {
-            this.ctx.getRefactorings().replace(node, comment.replace("/**", "/*"));
+            ctx.getRefactorings().replace(node, comment.replace("/**", "/*"), null);
             return DO_NOT_VISIT_SUBTREE;
         } else if (!isWellFormattedInheritDoc
                 && !JAVADOC_HAS_PUNCTUATION.matcher(comment).find()) {
             final String newComment = addPeriodAtEndOfFirstLine(node, comment);
             if (newComment != null) {
-                this.ctx.getRefactorings().replace(node, newComment);
+                ctx.getRefactorings().replace(node, newComment, null);
                 return DO_NOT_VISIT_SUBTREE;
             }
         } else {
@@ -229,7 +229,7 @@ public class CommentsRefactoring extends AbstractRefactoringRule {
             if (m.matches() && Character.isLowerCase(m.group(2).charAt(0))) {
                 String newComment = m.group(1) + m.group(2).toUpperCase() + m.group(3);
                 if (!newComment.equals(comment)) {
-                    this.ctx.getRefactorings().replace(node, newComment);
+                    ctx.getRefactorings().replace(node, newComment, null);
                     return DO_NOT_VISIT_SUBTREE;
                 }
             }
@@ -237,7 +237,7 @@ public class CommentsRefactoring extends AbstractRefactoringRule {
         if (hasNoTags(node)) {
             final String replacement = getReplacement(comment, true);
             if (replacement != null && !replacement.equals(comment)) {
-                this.ctx.getRefactorings().replace(node, replacement);
+                ctx.getRefactorings().replace(node, replacement, null);
                 return DO_NOT_VISIT_SUBTREE;
             }
         }
@@ -255,13 +255,13 @@ public class CommentsRefactoring extends AbstractRefactoringRule {
 
     private boolean replaceEmptyLineAtStartOfComment(Comment node, Matcher matcher) {
         final String replacement = matcher.replaceFirst(matcher.group(1) + matcher.group(2));
-        this.ctx.getRefactorings().replace(node, replacement);
+        ctx.getRefactorings().replace(node, replacement, null);
         return DO_NOT_VISIT_SUBTREE;
     }
 
     private boolean replaceEmptyLineAtEndOfComment(Comment node, Matcher matcher) {
         final String replacement = matcher.replaceFirst(matcher.group(1));
-        this.ctx.getRefactorings().replace(node, replacement);
+        ctx.getRefactorings().replace(node, replacement, null);
         return DO_NOT_VISIT_SUBTREE;
     }
 
@@ -385,10 +385,10 @@ public class CommentsRefactoring extends AbstractRefactoringRule {
     public boolean visit(LineComment node) {
         final String comment = getComment(node);
         if (EMPTY_LINE_COMMENT.matcher(comment).matches()) {
-            this.ctx.getRefactorings().remove(node);
+            ctx.getRefactorings().remove(node, null);
             return DO_NOT_VISIT_SUBTREE;
         } else if (ECLIPSE_GENERATED_TODOS.matcher(comment).matches()) {
-            this.ctx.getRefactorings().remove(node);
+            ctx.getRefactorings().remove(node, null);
             return DO_NOT_VISIT_SUBTREE;
         } else if (TOOLS_CONTROL_INSTRUCTIONS.matcher(comment).matches()) {
             return VISIT_SUBTREE;
@@ -396,10 +396,10 @@ public class CommentsRefactoring extends AbstractRefactoringRule {
             final ASTNode nextNode = getNextNode(node);
             final ASTNode previousNode = getPreviousSibling(nextNode);
             if (previousNode != null && isSameLineNumber(node, previousNode)) {
-                this.ctx.getRefactorings().toJavadoc(node, previousNode);
+                ctx.getRefactorings().toJavadoc(node, previousNode, null);
                 return DO_NOT_VISIT_SUBTREE;
             } else if (acceptJavadoc(nextNode) && !betterCommentExist(node, nextNode)) {
-                this.ctx.getRefactorings().toJavadoc(node, nextNode);
+                ctx.getRefactorings().toJavadoc(node, nextNode, null);
                 return DO_NOT_VISIT_SUBTREE;
             }
         }

@@ -26,6 +26,8 @@
 package org.autorefactor.refactoring.rules;
 
 import org.autorefactor.refactoring.ASTBuilder;
+import org.autorefactor.refactoring.Refactorings;
+import org.autorefactor.refactoring.Transaction;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ArrayInitializer;
 import org.eclipse.jdt.core.dom.Assignment;
@@ -96,14 +98,19 @@ public class RemoveUnnecessaryLocalBeforeReturnRefactoring extends AbstractRefac
             // to avoid changing the class's behaviour,
             // we must not remove field's assignment
             if (!bnd1.isField() && !bnd2.isField() && bnd1.isEqualTo(bnd2)) {
-                this.ctx.getRefactorings().remove(previousSibling);
+                final Refactorings r = this.ctx.getRefactorings();
+                final Transaction txn = r.newTransaction(this);
+                r.remove(previousSibling, txn);
                 if (returnExpr instanceof ArrayInitializer && bnd1.getType().isArray()) {
-                    this.ctx.getRefactorings().replace(node,
-                        getReturnStatementForArray((ArrayInitializer) returnExpr, bnd1.getType()));
+                    r.replace(node,
+                        getReturnStatementForArray((ArrayInitializer) returnExpr, bnd1.getType()),
+                        txn);
                 } else {
-                    this.ctx.getRefactorings().replace(node,
-                        getReturnStatement(returnExpr));
+                    r.replace(node,
+                        getReturnStatement(returnExpr),
+                        txn);
                 }
+                txn.commit();
             }
         }
     }

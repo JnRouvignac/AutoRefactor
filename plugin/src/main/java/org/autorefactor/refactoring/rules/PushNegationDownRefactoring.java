@@ -56,13 +56,14 @@ public class PushNegationDownRefactoring extends AbstractRefactoringRule {
         if (!hasOperator(node, NOT)) {
             return VISIT_SUBTREE;
         }
-        final ASTBuilder b = this.ctx.getASTBuilder();
+        final ASTBuilder b = ctx.getASTBuilder();
         final Expression operand = removeParentheses(node.getOperand());
         if (operand instanceof PrefixExpression) {
             final PrefixExpression pe = (PrefixExpression) operand;
             if (hasOperator(pe, NOT)) {
-                this.ctx.getRefactorings().replace(node,
-                        b.move(pe.getOperand()));
+                ctx.getRefactorings().replace(node,
+                        b.move(pe.getOperand()),
+                        null);
                 return DO_NOT_VISIT_SUBTREE;
             }
         } else if (operand instanceof InfixExpression) {
@@ -74,23 +75,25 @@ public class PushNegationDownRefactoring extends AbstractRefactoringRule {
                     for (ListIterator<Expression> it = extendedOperands.listIterator(); it.hasNext();) {
                         it.set(b.negate(it.next()));
                     }
-                    this.ctx.getRefactorings().replace(node,
+                    ctx.getRefactorings().replace(node,
                             b.parenthesize(b.infixExpr(
                                     b.negate(ie.getLeftOperand()),
                                     (InfixExpression.Operator) reverseOp,
                                     b.negate(ie.getRightOperand()),
-                                    extendedOperands)));
+                                    extendedOperands)),
+                            null);
                     return DO_NOT_VISIT_SUBTREE;
                 } else {
                     for (ListIterator<Expression> it = extendedOperands.listIterator(); it.hasNext();) {
                         it.set(b.move(it.next()));
                     }
-                    this.ctx.getRefactorings().replace(node,
+                    ctx.getRefactorings().replace(node,
                             b.parenthesize(b.infixExpr(
                                     b.move(ie.getLeftOperand()),
                                     (InfixExpression.Operator) reverseOp,
                                     b.move(ie.getRightOperand()),
-                                    extendedOperands)));
+                                    extendedOperands)),
+                            null);
                     return DO_NOT_VISIT_SUBTREE;
                 }
             }

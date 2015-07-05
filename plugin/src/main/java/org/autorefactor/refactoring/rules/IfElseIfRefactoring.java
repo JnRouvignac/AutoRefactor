@@ -28,6 +28,7 @@ package org.autorefactor.refactoring.rules;
 import java.util.List;
 
 import org.autorefactor.refactoring.ASTBuilder;
+import org.autorefactor.refactoring.Refactorings;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.Statement;
@@ -94,8 +95,8 @@ public class IfElseIfRefactoring extends AbstractRefactoringRule {
             List<Statement> elseStmts = statements((Block) elseStmt);
             if (elseStmts.size() == 1
                     && elseStmts.get(0) instanceof IfStatement) {
-                final ASTBuilder b = this.ctx.getASTBuilder();
-                this.ctx.getRefactorings().set(node, ELSE_STATEMENT_PROPERTY, b.copy(elseStmts.get(0)));
+                final ASTBuilder b = ctx.getASTBuilder();
+                ctx.getRefactorings().set(node, ELSE_STATEMENT_PROPERTY, b.copy(elseStmts.get(0)), null);
                 return DO_NOT_VISIT_SUBTREE;
             }
         }

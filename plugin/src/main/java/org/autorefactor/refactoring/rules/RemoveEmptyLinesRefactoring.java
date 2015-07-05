@@ -65,13 +65,13 @@ public class RemoveEmptyLinesRefactoring extends AbstractRefactoringRule {
 
     @Override
     public boolean visit(CompilationUnit node) {
-        final String source = this.ctx.getSource(node);
+        final String source = ctx.getSource(node);
         newlineChars = getNewlineChars(source);
-        final Refactorings r = this.ctx.getRefactorings();
+        final Refactorings r = ctx.getRefactorings();
 
         int index = getIndexOfFirstNonWhitespaceChar(source, 0);
         if (index != -1) {
-            r.remove(SourceLocation.fromPositions(0, index));
+            r.remove(SourceLocation.fromPositions(0, index), null);
             return DO_NOT_VISIT_SUBTREE;
         }
 
@@ -89,7 +89,7 @@ public class RemoveEmptyLinesRefactoring extends AbstractRefactoringRule {
         Matcher m = Pattern.compile("(" + newline + "\\s*?" + newline + "\\s*?" + ")" + "(?:" + newline + "\\s*?)+")
                 .matcher(source);
         while (m.find()) {
-            r.replace(toSourceLocation(m, 0), substring(source, m, 1));
+            r.replace(toSourceLocation(m, 0), substring(source, m, 1), null);
             result = DO_NOT_VISIT_SUBTREE;
         }
         return result;
@@ -224,9 +224,9 @@ public class RemoveEmptyLinesRefactoring extends AbstractRefactoringRule {
     private boolean maybeRemoveEmptyLines(String source, int endOfLineIndex, int newLineIndex) {
         if (endOfLineIndex < newLineIndex
                 && !equals(source, endOfLineIndex, newLineIndex, newlineChars)) {
-            this.ctx.getRefactorings().replace(
+            ctx.getRefactorings().replace(
                     SourceLocation.fromPositions(endOfLineIndex, newLineIndex),
-                    newlineChars);
+                    newlineChars, null);
             return true;
         }
         return false;

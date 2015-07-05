@@ -34,6 +34,7 @@ import java.util.Set;
 
 import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.Refactorings;
+import org.autorefactor.refactoring.Transaction;
 import org.eclipse.jdt.core.dom.ASTMatcher;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.CatchClause;
@@ -48,6 +49,7 @@ import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.UnionType;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
+import static org.eclipse.jdt.core.dom.SingleVariableDeclaration.*;
 
 /** See {@link #getDescription()} method. */
 @SuppressWarnings("javadoc")
@@ -130,15 +132,17 @@ public class UseMultiCatchRefactoring extends AbstractRefactoringRule {
                 AggregateDirection direction = aggregateDirection(catchClauses, i, j);
                 if (!AggregateDirection.NONE.equals(direction)
                         && matchMultiCatch(catchClause1, catchClause2)) {
-                    Refactorings r = this.ctx.getRefactorings();
+                    final Refactorings r = ctx.getRefactorings();
+                    final Transaction txn = r.newTransaction(this);
                     UnionType ut = concat(catchClause1.getException().getType(), catchClause2.getException().getType());
                     if (AggregateDirection.BACKWARD.equals(direction)) {
-                        r.remove(catchClause1);
-                        r.set(catchClause2.getException(), SingleVariableDeclaration.TYPE_PROPERTY, ut);
+                        r.remove(catchClause1, txn);
+                        r.set(catchClause2.getException(), TYPE_PROPERTY, ut, txn);
                     } else if (AggregateDirection.FORWARD.equals(direction)) {
-                        r.set(catchClause1.getException(), SingleVariableDeclaration.TYPE_PROPERTY, ut);
-                        r.remove(catchClause2);
+                        r.set(catchClause1.getException(), TYPE_PROPERTY, ut, txn);
+                        r.remove(catchClause2, txn);
                     }
+                    txn.commit();
                     return DO_NOT_VISIT_SUBTREE;
                 }
             }

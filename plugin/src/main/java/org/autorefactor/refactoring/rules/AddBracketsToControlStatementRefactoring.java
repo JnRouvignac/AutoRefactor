@@ -116,10 +116,10 @@ public class AddBracketsToControlStatementRefactoring extends AbstractRefactorin
         if (statement == null) {
             return VISIT_SUBTREE;
         }
-        final ASTBuilder b = this.ctx.getASTBuilder();
+        final ASTBuilder b = ctx.getASTBuilder();
         final Block block = b.block(b.copy(statement));
         block.accept(this);
-        this.ctx.getRefactorings().replace(statement, block);
+        ctx.getRefactorings().replace(statement, block, null);
         return DO_NOT_VISIT_SUBTREE;
     }
 

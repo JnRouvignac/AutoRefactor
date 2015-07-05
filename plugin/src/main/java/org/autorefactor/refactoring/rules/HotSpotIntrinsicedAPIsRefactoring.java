@@ -267,7 +267,7 @@ public class HotSpotIntrinsicedAPIsRefactoring extends AbstractRefactoringRule {
                                 b.new0("ArrayIndexOutOfBoundsException",
                                         b.invoke("e", "getMessage")))));
 
-        this.ctx.getRefactorings().replace(node, tryS);
+        ctx.getRefactorings().replace(node, tryS, null);
         return DO_NOT_VISIT_SUBTREE;
     }
 

@@ -26,6 +26,7 @@
 package org.autorefactor.refactoring.rules;
 
 import org.autorefactor.refactoring.ASTBuilder;
+import org.autorefactor.refactoring.Refactorings;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
@@ -65,8 +66,9 @@ public class InvertEqualsRefactoring extends AbstractRefactoringRule {
             final Expression expr = node.getExpression();
             final Expression arg0 = arg0(node);
             if (!isConstant(expr) && isConstant(arg0) && !isPrimitive(arg0)) {
-                this.ctx.getRefactorings().replace(node,
-                        invertEqualsInvocation(expr, arg0, isEquals));
+                ctx.getRefactorings().replace(node,
+                        invertEqualsInvocation(expr, arg0, isEquals),
+                        null);
                 return DO_NOT_VISIT_SUBTREE;
             }
         }

@@ -68,7 +68,7 @@ public class RemoveUnneededThisExpressionRefactoring extends AbstractRefactoring
         if (thisExpressionRefersToSurroundingType(te)
                 && isCallingMethodDeclaredInSurroundingType(node)) {
             // remove useless thisExpressions
-            this.ctx.getRefactorings().remove(node.getExpression());
+            ctx.getRefactorings().remove(node.getExpression(), null);
             return DO_NOT_VISIT_SUBTREE;
         }
         return VISIT_SUBTREE;

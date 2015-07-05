@@ -29,6 +29,7 @@ import java.util.List;
 
 import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.Refactorings;
+import org.autorefactor.refactoring.Transaction;
 import org.autorefactor.util.NotImplementedException;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.CompilationUnit;
@@ -136,7 +137,7 @@ public class TestNGAssertRefactoring extends AbstractRefactoringRule {
         final InfixExpression arg0Ie = as(arg0, InfixExpression.class);
         final MethodInvocation arg0mi = as(arg0, MethodInvocation.class);
         final PrefixExpression arg0pe = as(arg0, PrefixExpression.class);
-        final Refactorings r = this.ctx.getRefactorings();
+        final Refactorings r = ctx.getRefactorings();
         if (arg0Ie != null) {
             if (hasOperator(arg0Ie, EQUALS)) {
                 return invokeAssert(node, arg0Ie, !isAssertTrue);
@@ -147,7 +148,8 @@ public class TestNGAssertRefactoring extends AbstractRefactoringRule {
             String assertName = getAssertName(!isAssertTrue, "Equals");
             if (canUseAssertNotEquals || isAssertEquals(assertName)) {
                 r.replace(node,
-                        invokeAssert(node, assertName, arg0mi.getExpression(), arguments(arg0mi)));
+                        invokeAssert(node, assertName, arg0mi.getExpression(), arguments(arg0mi)),
+                        null);
                 return DO_NOT_VISIT_SUBTREE;
             }
         } else if (hasOperator(arg0pe, NOT)) {
@@ -156,12 +158,14 @@ public class TestNGAssertRefactoring extends AbstractRefactoringRule {
                 String assertName = getAssertName(isAssertTrue, "Equals");
                 if (canUseAssertNotEquals || isAssertEquals(assertName)) {
                     r.replace(node,
-                            invokeAssert(node, assertName, negatedMi.getExpression(), arguments(negatedMi)));
+                            invokeAssert(node, assertName, negatedMi.getExpression(), arguments(negatedMi)),
+                            null);
                     return DO_NOT_VISIT_SUBTREE;
                 }
             } else {
                 r.replace(node,
-                        invertAssert(node, isAssertTrue, arg0pe.getOperand()));
+                        invertAssert(node, isAssertTrue, arg0pe.getOperand()),
+                        null);
                 return DO_NOT_VISIT_SUBTREE;
             }
         } else {
@@ -188,38 +192,43 @@ public class TestNGAssertRefactoring extends AbstractRefactoringRule {
     }
 
     private boolean replaceOrRemove(MethodInvocation node, boolean replace) {
-        final Refactorings r = this.ctx.getRefactorings();
         if (replace) {
-            r.replace(node, invokeFail(node));
+            ctx.getRefactorings().replace(node, invokeFail(node), null);
             return DO_NOT_VISIT_SUBTREE;
         } else if (node.getParent().getNodeType() == ASTNode.EXPRESSION_STATEMENT) {
-            r.remove(node.getParent());
+            ctx.getRefactorings().remove(node.getParent(), null);
             return DO_NOT_VISIT_SUBTREE;
         }
         return VISIT_SUBTREE;
     }
 
     private boolean maybeRefactorAssertEquals(MethodInvocation node, boolean isAssertEquals) {
-        final Refactorings r = this.ctx.getRefactorings();
-        final ASTBuilder b = this.ctx.getASTBuilder();
+        final Refactorings r = ctx.getRefactorings();
+        final ASTBuilder b = ctx.getASTBuilder();
         final List<Expression> args = arguments(node);
         final Expression arg0 = args.get(0);
         final Expression arg1 = args.get(1);
         if (isNullLiteral(arg0)) {
             r.replace(node,
-                    invokeAssertNull(node, !isAssertEquals, arg1, getMessageArg(node, 2)));
+                    invokeAssertNull(node, !isAssertEquals, arg1, getMessageArg(node, 2)),
+                    null);
             return DO_NOT_VISIT_SUBTREE;
         } else if (isNullLiteral(arg1)) {
             r.replace(node,
-                    invokeAssertNull(node, !isAssertEquals, arg0, getMessageArg(node, 2)));
+                    invokeAssertNull(node, !isAssertEquals, arg0, getMessageArg(node, 2)),
+                    null);
             return DO_NOT_VISIT_SUBTREE;
         } else if (isConstant(arg0) && !isConstant(arg1)) {
-            r.replace(arg0, b.copy(arg1));
-            r.replace(arg1, b.copy(arg0));
+            final Transaction txn = r.newTransaction(this);
+            r.replace(arg0, b.copy(arg1), txn);
+            r.replace(arg1, b.copy(arg0), txn);
+            txn.commit();
             return DO_NOT_VISIT_SUBTREE;
         } else if (isVariableNamedExpected(arg0) && !isVariableNamedExpected(arg1)) {
-            r.replace(arg0, b.copy(arg1));
-            r.replace(arg1, b.copy(arg0));
+            final Transaction txn = r.newTransaction(this);
+            r.replace(arg0, b.copy(arg1), txn);
+            r.replace(arg1, b.copy(arg0), txn);
+            txn.commit();
             return DO_NOT_VISIT_SUBTREE;
         }
         return VISIT_SUBTREE;
@@ -286,22 +295,26 @@ public class TestNGAssertRefactoring extends AbstractRefactoringRule {
         if (isComparingObjects(ie)) {
             if (isNullLiteral(ie.getLeftOperand())) {
                 r.replace(node,
-                        invokeAssertNull(node, isNot, ie.getRightOperand(), getMessageArg(node, 1)));
+                        invokeAssertNull(node, isNot, ie.getRightOperand(), getMessageArg(node, 1)),
+                        null);
                 return DO_NOT_VISIT_SUBTREE;
             } else if (isNullLiteral(ie.getRightOperand())) {
                 r.replace(node,
-                        invokeAssertNull(node, isNot, ie.getLeftOperand(), getMessageArg(node, 1)));
+                        invokeAssertNull(node, isNot, ie.getLeftOperand(), getMessageArg(node, 1)),
+                        null);
                 return DO_NOT_VISIT_SUBTREE;
             } else {
                 r.replace(node,
-                        invokeAssert(node, getAssertName(isNot, "Same"), ie.getLeftOperand(), ie.getRightOperand()));
+                        invokeAssert(node, getAssertName(isNot, "Same"), ie.getLeftOperand(), ie.getRightOperand()),
+                        null);
                 return DO_NOT_VISIT_SUBTREE;
             }
         } else {
             String assertName = getAssertName(isNot, "Equals");
             if (canUseAssertNotEquals || isAssertEquals(assertName)) {
                 r.replace(node,
-                        invokeAssert(node, assertName, ie.getLeftOperand(), ie.getRightOperand()));
+                        invokeAssert(node, assertName, ie.getLeftOperand(), ie.getRightOperand()),
+                        null);
                 return DO_NOT_VISIT_SUBTREE;
             }
         }
@@ -380,7 +393,7 @@ public class TestNGAssertRefactoring extends AbstractRefactoringRule {
                 final InfixExpression conditionIe = as(node.getExpression(), InfixExpression.class);
                 final MethodInvocation conditionMi = as(node.getExpression(), MethodInvocation.class);
                 final PrefixExpression conditionPe = as(node.getExpression(), PrefixExpression.class);
-                final Refactorings r = this.ctx.getRefactorings();
+                final Refactorings r = ctx.getRefactorings();
                 if (conditionIe != null) {
                     if (hasOperator(conditionIe, EQUALS)) {
                         return invokeAssertForFail(node, mi, conditionIe, true);
@@ -391,7 +404,8 @@ public class TestNGAssertRefactoring extends AbstractRefactoringRule {
                     if (canUseAssertNotEquals) {
                         r.replace(node,
                                 invokeAssertForFail(mi, "assertNotEquals",
-                                        conditionMi.getExpression(), arg0(conditionMi)));
+                                        conditionMi.getExpression(), arg0(conditionMi)),
+                                null);
                         return DO_NOT_VISIT_SUBTREE;
                     }
                 } else if (hasOperator(conditionPe, NOT)) {
@@ -399,7 +413,8 @@ public class TestNGAssertRefactoring extends AbstractRefactoringRule {
                     if (isMethod(negatedMi, OBJECT, "equals", OBJECT)) {
                         r.replace(node,
                                 invokeAssertForFail(mi, "assertEquals",
-                                        negatedMi.getExpression(), arg0(negatedMi)));
+                                        negatedMi.getExpression(), arg0(negatedMi)),
+                                null);
                         return DO_NOT_VISIT_SUBTREE;
                     }
                 }
@@ -409,25 +424,29 @@ public class TestNGAssertRefactoring extends AbstractRefactoringRule {
     }
 
     private boolean invokeAssertForFail(IfStatement toReplace, MethodInvocation mi, InfixExpression ie, boolean isNot) {
-        final Refactorings r = this.ctx.getRefactorings();
-        final ASTBuilder b = this.ctx.getASTBuilder();
+        final Refactorings r = ctx.getRefactorings();
+        final ASTBuilder b = ctx.getASTBuilder();
         if (isNullLiteral(ie.getLeftOperand())) {
             r.replace(toReplace,
-                    b.toStmt(invokeAssertNull(mi, isNot, ie.getRightOperand(), getMessageArg(mi, 0))));
+                    b.toStmt(invokeAssertNull(mi, isNot, ie.getRightOperand(), getMessageArg(mi, 0))),
+                    null);
             return DO_NOT_VISIT_SUBTREE;
         } else if (isNullLiteral(ie.getRightOperand())) {
             r.replace(toReplace,
-                    b.toStmt(invokeAssertNull(mi, isNot, ie.getLeftOperand(), getMessageArg(mi, 0))));
+                    b.toStmt(invokeAssertNull(mi, isNot, ie.getLeftOperand(), getMessageArg(mi, 0))),
+                    null);
             return DO_NOT_VISIT_SUBTREE;
         } else if (isComparingObjects(ie)) {
             r.replace(toReplace,
-                    invokeAssertForFail(mi, getAssertName(isNot, "Same"), ie.getLeftOperand(), ie.getRightOperand()));
+                    invokeAssertForFail(mi, getAssertName(isNot, "Same"), ie.getLeftOperand(), ie.getRightOperand()),
+                    null);
             return DO_NOT_VISIT_SUBTREE;
         } else {
             String assertName = getAssertName(isNot, "Equals");
             if (canUseAssertNotEquals || isAssertEquals(assertName)) {
                 r.replace(toReplace,
-                        invokeAssertForFail(mi, assertName, ie.getLeftOperand(), ie.getRightOperand()));
+                        invokeAssertForFail(mi, assertName, ie.getLeftOperand(), ie.getRightOperand()),
+                        null);
                 return DO_NOT_VISIT_SUBTREE;
             }
         }

@@ -33,6 +33,8 @@ import java.util.Map;
 
 import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.ASTBuilder.Copy;
+import org.autorefactor.refactoring.Refactorings;
+import org.autorefactor.refactoring.Transaction;
 import org.autorefactor.util.IllegalArgumentException;
 import org.autorefactor.util.IllegalStateException;
 import org.autorefactor.util.NotImplementedException;
@@ -212,7 +214,7 @@ public class BooleanRefactoring extends AbstractRefactoringRule {
                     getBooleanLiteral(node.getThenExpression()),
                     getBooleanLiteral(node.getElseExpression()));
             if (newE != null) {
-                ctx.getRefactorings().replace(node, newE);
+                ctx.getRefactorings().replace(node, newE, null);
             }
         }
         return VISIT_SUBTREE;
@@ -233,7 +235,8 @@ public class BooleanRefactoring extends AbstractRefactoringRule {
                         matcher2.matches.values(), getBooleanName(node)));
                 // make sure to keep curly braces if the node is an else statement
                 ctx.getRefactorings().replace(node,
-                    isElseStatementOfParent(node) ? copyStmt : toSingleStmt(copyStmt));
+                    isElseStatementOfParent(node) ? copyStmt : toSingleStmt(copyStmt),
+                    null);
                 return DO_NOT_VISIT_SUBTREE;
             }
         }
@@ -257,9 +260,12 @@ public class BooleanRefactoring extends AbstractRefactoringRule {
         final Boolean thenBool = getBooleanLiteral(thenRs.getExpression());
         final Boolean elseBool = getBooleanLiteral(elseRs.getExpression());
         ReturnStatement newRs = getReturnStatement(node, thenBool, elseBool);
+        Refactorings r = ctx.getRefactorings();
+        Transaction txn = r.newTransaction(this);
         if (newRs != null) {
-            ctx.getRefactorings().replace(node, newRs);
-            ctx.getRefactorings().remove(elseRs);
+            r.replace(node, newRs, txn);
+            r.remove(elseRs, txn);
+            txn.commit();
             return DO_NOT_VISIT_SUBTREE;
         }
         final MethodDeclaration md = getAncestor(node, MethodDeclaration.class);
@@ -270,8 +276,9 @@ public class BooleanRefactoring extends AbstractRefactoringRule {
                 newRs = getReturnStatement(node, thenBool, elseBool,
                         thenRs.getExpression(), elseRs.getExpression());
                 if (newRs != null) {
-                    ctx.getRefactorings().replace(node, newRs);
-                    ctx.getRefactorings().remove(elseRs);
+                    r.replace(node, newRs, txn);
+                    r.remove(elseRs, txn);
+                    txn.commit();
                     return DO_NOT_VISIT_SUBTREE;
                 }
             }
@@ -327,8 +334,11 @@ public class BooleanRefactoring extends AbstractRefactoringRule {
                 getBooleanLiteral(a.getRightHandSide()),
                 getBooleanLiteral(rightHandSide));
         if (newE != null) {
-            ctx.getRefactorings().replace(rightHandSide, newE);
-            ctx.getRefactorings().remove(node);
+            Refactorings r = ctx.getRefactorings();
+            Transaction txn = r.newTransaction(this);
+            r.replace(rightHandSide, newE, txn);
+            r.remove(node, txn);
+            txn.commit();
             return DO_NOT_VISIT_SUBTREE;
         }
         return VISIT_SUBTREE;
@@ -483,7 +493,7 @@ public class BooleanRefactoring extends AbstractRefactoringRule {
             final BooleanLiteral l = as(arguments(node), BooleanLiteral.class);
             if (l != null) {
                 ctx.getRefactorings().replace(node,
-                        getRefactoring(node, l.booleanValue()));
+                        getRefactoring(node, l.booleanValue()), null);
                 return DO_NOT_VISIT_SUBTREE;
             }
         }

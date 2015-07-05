@@ -35,7 +35,9 @@ import org.autorefactor.AutoRefactorPlugin;
 import org.autorefactor.refactoring.JavaProjectOptions;
 import org.autorefactor.refactoring.RefactoringRule;
 import org.autorefactor.refactoring.Refactorings;
+import org.autorefactor.refactoring.SourceLocation;
 import org.autorefactor.refactoring.rules.AggregateASTVisitor;
+import org.autorefactor.refactoring.rules.ForwardingASTVisitor;
 import org.autorefactor.refactoring.rules.RefactoringContext;
 import org.autorefactor.util.IllegalStateException;
 import org.autorefactor.util.UnhandledException;
@@ -50,6 +52,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.dom.AST;
+import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.CompilationUnit;
@@ -67,22 +70,24 @@ public class ApplyRefactoringsJob extends Job {
 
     private final Queue<RefactoringUnit> refactoringUnits;
     private final List<RefactoringRule> refactoringRulesToApply;
+    private final SourceLocation selection;
 
     /**
      * Builds an instance of this class.
      *
      * @param refactoringUnits the units to automatically refactor
+     * @param selection the selected source location
      * @param refactoringRulesToApply the refactorings to apply
      */
-    public ApplyRefactoringsJob(
-            Queue<RefactoringUnit> refactoringUnits, List<RefactoringRule> refactoringRulesToApply) {
+    public ApplyRefactoringsJob(Queue<RefactoringUnit> refactoringUnits, List<RefactoringRule> refactoringRulesToApply,
+            SourceLocation selection) {
         super("Auto Refactor");
         setPriority(Job.LONG);
         this.refactoringUnits = refactoringUnits;
         this.refactoringRulesToApply = refactoringRulesToApply;
+        this.selection = selection;
     }
 
-    /** {@inheritDoc} */
     @Override
     protected IStatus run(IProgressMonitor monitor) {
         AutoRefactorPlugin.register(this);
@@ -215,18 +220,33 @@ public class ApplyRefactoringsJob extends Job {
                 break;
             }
 
-            final RefactoringContext ctx = new RefactoringContext(compilationUnit, astRoot, options);
-            refactoring.setRefactoringContext(ctx);
+            final RefactoringRule refactoringRule;
+            if (selection != null) {
+                refactoringRule = new ForwardingASTVisitor(refactoring) {
+                    @Override
+                    public boolean preVisit2(ASTNode node) {
+                        return selection.overlapsWith(node);
+                    }
+                };
+            } else {
+                refactoringRule = refactoring;
+            }
+            final RefactoringContext ctx = new RefactoringContext(compilationUnit, astRoot, options, selection);
+            refactoringRule.setRefactoringContext(ctx);
 
-            final Refactorings refactorings = refactoring.getRefactorings(astRoot);
+            final Refactorings refactorings = refactoringRule.getRefactorings(astRoot);
             if (!refactorings.hasRefactorings()) {
                 // no new refactorings have been applied,
-                // we are done with applying the refactorings.
+                // we are done with applying the refactoring rules.
                 return;
             }
 
             // apply the refactorings and save the compilation unit
-            refactorings.applyTo(document);
+            if (!refactorings.applyTo(document)) {
+                // no refactorings have been applied in the provided selection,
+                // we are done with applying the refactoring rules.
+                return;
+            }
             final boolean hadUnsavedChanges = compilationUnit.hasUnsavedChanges();
             compilationUnit.getBuffer().setContents(document.get());
             // http://wiki.eclipse.org/FAQ_What_is_a_working_copy%3F

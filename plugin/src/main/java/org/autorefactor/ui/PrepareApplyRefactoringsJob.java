@@ -36,6 +36,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import org.autorefactor.AutoRefactorPlugin;
 import org.autorefactor.refactoring.JavaProjectOptions;
 import org.autorefactor.refactoring.RefactoringRule;
+import org.autorefactor.refactoring.SourceLocation;
 import org.autorefactor.util.NotImplementedException;
 import org.autorefactor.util.UnhandledException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -55,6 +56,7 @@ import org.eclipse.jdt.core.JavaModelException;
 public class PrepareApplyRefactoringsJob extends Job {
 
     private final List<IJavaElement> javaElements;
+    private final SourceLocation selection;
     private final List<RefactoringRule> refactoringRulesToApply;
     private final Map<IJavaElement, JavaProjectOptions> javaProjects = new HashMap<IJavaElement, JavaProjectOptions>();
 
@@ -62,16 +64,17 @@ public class PrepareApplyRefactoringsJob extends Job {
      * Builds an instance of this class.
      *
      * @param javaElements the java elements selected for automatic refactoring
+     * @param selection the selected source location
      * @param refactoringRulesToApply the refactorings to apply
      */
-    public PrepareApplyRefactoringsJob(List<IJavaElement> javaElements, List<RefactoringRule> refactoringRulesToApply) {
+    public PrepareApplyRefactoringsJob(List<IJavaElement> javaElements, SourceLocation selection, List<RefactoringRule> refactoringRulesToApply) {
         super("Prepare Auto Refactor");
         setPriority(Job.SHORT);
         this.javaElements = javaElements;
+        this.selection = selection;
         this.refactoringRulesToApply = refactoringRulesToApply;
     }
 
-    /** {@inheritDoc} */
     @Override
     protected IStatus run(IProgressMonitor monitor) {
         AutoRefactorPlugin.register(this);
@@ -96,7 +99,8 @@ public class PrepareApplyRefactoringsJob extends Job {
             for (int i = 0; i < nbWorkers; i++) {
                 new ApplyRefactoringsJob(
                         toRefactor,
-                        clone(refactoringRulesToApply)).schedule();
+                        clone(refactoringRulesToApply),
+                        selection).schedule();
             }
         }
         return Status.OK_STATUS;

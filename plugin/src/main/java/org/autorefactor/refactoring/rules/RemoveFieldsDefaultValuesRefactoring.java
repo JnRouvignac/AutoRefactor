@@ -68,12 +68,12 @@ public class RemoveFieldsDefaultValuesRefactoring extends AbstractRefactoringRul
             if (initializer != null) {
                 if (!fieldType.isPrimitive()
                         && isNullLiteral(initializer)) {
-                    this.ctx.getRefactorings().remove(initializer);
+                    ctx.getRefactorings().remove(initializer, null);
                     visitSubtree = DO_NOT_VISIT_SUBTREE;
                 } else if (fieldType.isPrimitive()
                         && isPrimitiveLiteral(initializer)
                         && isPrimitiveDefaultValue(initializer.resolveConstantExpressionValue())) {
-                    this.ctx.getRefactorings().remove(initializer);
+                    ctx.getRefactorings().remove(initializer, null);
                     visitSubtree = DO_NOT_VISIT_SUBTREE;
                 }
             }

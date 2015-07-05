@@ -49,23 +49,20 @@ public class ChooseRefactoringsWizard extends Wizard {
         this.javaElements = javaElements;
     }
 
-    /** {@inheritDoc} */
     @Override
     public String getWindowTitle() {
         return "Choose refactorings...";
     }
 
-    /** {@inheritDoc} */
     @Override
     public void addPages() {
         addPage(chooseRefactoringsPage);
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean performFinish() {
         final List<RefactoringRule> refactoringRules = chooseRefactoringsPage.getSelectedRefactorings();
-        new PrepareApplyRefactoringsJob(javaElements, refactoringRules).schedule();
+        new PrepareApplyRefactoringsJob(javaElements, null, refactoringRules).schedule();//TODO JNR
         return !refactoringRules.isEmpty();
     }
 }
