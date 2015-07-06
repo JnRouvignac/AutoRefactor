@@ -510,15 +510,22 @@ public class ASTBuilder {
 
         final String erasedClassName = className.substring(0, ltIdx);
         final int gtIdx = className.indexOf('>', ltIdx);
-        final String typeParam = className.substring(ltIdx + 1, gtIdx);
+        final String typeParams = className.substring(ltIdx + 1, gtIdx);
 
         final ClassInstanceCreation cic = ast.newClassInstanceCreation();
         final ParameterizedType type = ast.newParameterizedType(
                 newSimpleType(erasedClassName));
-        typeArguments(type).add(newSimpleType(typeParam));
+        addNewTypesFromTypeParameters(typeArguments(type), typeParams);
         cic.setType(type);
         addAll(arguments(cic), arguments);
         return cic;
+    }
+
+    private void addNewTypesFromTypeParameters(List<Type> typeArguments, String typeParams) {
+        String[] typeParamsArray = typeParams.split(",");
+        for (String typeParam : typeParamsArray) {
+            typeArguments.add(newSimpleType(typeParam));
+        }
     }
 
     private <T extends ASTNode> void addAll(List<T> whereToAdd, T... toAdd) {

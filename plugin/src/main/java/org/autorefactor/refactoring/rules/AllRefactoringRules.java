@@ -87,6 +87,7 @@ public final class AllRefactoringRules {
                 new UseDiamondOperatorRefactoring(),
                 new UseMultiCatchRefactoring(),
                 new CollectionRefactoring(),
+                new MapRefactoring(),
                 new NoAssignmentInIfConditionRefactoring(),
                 new IfElseIfRefactoring(),
                 new CommonIfInIfElseRefactoring(),
