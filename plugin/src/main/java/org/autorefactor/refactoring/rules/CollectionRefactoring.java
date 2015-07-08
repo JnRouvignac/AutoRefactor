@@ -28,7 +28,6 @@ package org.autorefactor.refactoring.rules;
 import java.util.List;
 
 import org.autorefactor.refactoring.ASTBuilder;
-import org.autorefactor.refactoring.ASTBuilder.Copy;
 import org.autorefactor.refactoring.ForLoopHelper.ForLoopContent;
 import org.autorefactor.refactoring.Refactorings;
 import org.eclipse.jdt.core.dom.ASTMatcher;
@@ -53,6 +52,7 @@ import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
+import static org.autorefactor.refactoring.ASTBuilder.Copy.*;
 import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.autorefactor.refactoring.ForLoopHelper.*;
 import static org.autorefactor.refactoring.ForLoopHelper.ContainerType.*;
@@ -392,11 +392,13 @@ public class CollectionRefactoring extends AbstractRefactoringRule {
         if (isMethod(miContains, "java.util.Set", "contains", "java.lang.Object")) {
             Statement firstStmt = getAsList(stmt, 0);
             MethodInvocation miAdd = asExpression(firstStmt, MethodInvocation.class);
+            final ASTMatcher astMatcher = new ASTMatcher();
             if (isMethod(miAdd, "java.util.Set", "add", "java.lang.Object")
-                    && match(new ASTMatcher(), arg0(miContains), arg0(miAdd))) {
+                    && match(astMatcher, miContains.getExpression(), miAdd.getExpression())
+                    && match(astMatcher, arg0(miContains), arg0(miAdd))) {
                 ASTBuilder b = this.ctx.getASTBuilder();
                 Refactorings r = this.ctx.getRefactorings();
-                r.replace(toReplace, negate ? b.negate(miAdd, Copy.COPY.MOVE) : b.move(miAdd));
+                r.replace(toReplace, negate ? b.negate(miAdd, COPY.MOVE) : b.move(miAdd));
                 r.remove(firstStmt);
                 return DO_NOT_VISIT_SUBTREE;
             }

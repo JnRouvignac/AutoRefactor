@@ -129,6 +129,13 @@ public class CollectionSample {
         }
     }
 
+    public void doNotReplaceWhenCollectionsAreDifferent(Set<String> col1, Set<String> col2) {
+        if (!col1.contains("that")) {
+            col2.add("that");
+            System.out.println("OK");
+        }
+    }
+
     public void doNotReplaceCheckOnListContainsBeforeAdd(List<String> col, String s) {
         if (!col.contains(s)) {
             col.add(s);
