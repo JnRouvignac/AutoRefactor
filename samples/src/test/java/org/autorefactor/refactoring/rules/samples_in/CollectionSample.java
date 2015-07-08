@@ -81,6 +81,18 @@ public class CollectionSample {
         }
     }
 
+    public void doNotRefactorForLoopAddMethodResult(List<String> output, String[] elems) {
+        for (int i = 0; i < elems.length; i++) {
+            output.add(doSomething(elems[i]));
+        }
+    }
+
+    public void doNotRefactorForEachAddMethodResult(List<String> output, String[] elems) {
+        for (String s : elems) {
+            output.add(doSomething(s));
+        }
+    }
+
     public void replaceAddWithForLoopByAddAll(List<String> col, List<String> output) {
         for (int i = 0; i < col.size(); i++) {
             output.add(col.get(i));
@@ -115,6 +127,22 @@ public class CollectionSample {
         for (String s : col) {
             output.remove(s);
         }
+    }
+
+    public void doNotRefactorForLoopAddMethodResult(List<String> output, List<String> col) {
+        for (int i = 0; i < col.size(); i++) {
+            output.add(doSomething(col.get(i)));
+        }
+    }
+
+    public void doNotRefactorForEachAddMethodResult(List<String> output, List<String> col) {
+        for (String s : col) {
+            output.add(doSomething(s));
+        }
+    }
+  
+    private String doSomething(String s) {
+        return null;
     }
 
     public void replaceChecksOnSize(Collection<String> col) {

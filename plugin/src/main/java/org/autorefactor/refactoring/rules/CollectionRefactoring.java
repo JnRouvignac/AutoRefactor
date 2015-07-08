@@ -32,6 +32,7 @@ import org.autorefactor.refactoring.ForLoopHelper.ForLoopContent;
 import org.autorefactor.refactoring.Refactorings;
 import org.eclipse.jdt.core.dom.ASTMatcher;
 import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.ArrayAccess;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.EnhancedForStatement;
@@ -60,7 +61,6 @@ import static org.eclipse.jdt.core.dom.InfixExpression.Operator.*;
 import static org.eclipse.jdt.core.dom.PrefixExpression.Operator.*;
 
 /** See {@link #getDescription()} method. */
-@SuppressWarnings("javadoc")
 public class CollectionRefactoring extends AbstractRefactoringRule {
 
     @Override
@@ -70,6 +70,7 @@ public class CollectionRefactoring extends AbstractRefactoringRule {
             + "- replaces for/foreach loops to use Collection.addAll() where possible,\n"
             + "- replaces for/foreach loops to use Collection.containsAll() where possible,\n"
             + "- replaces for/foreach loops to use Collection.removeAll() where possible,\n"
+            + "- replaces for/foreach loops to use Collections.addAll() where possible,\n"
             + "- replaces creating a new Collection, then invoking Collection.addAll() on it,"
             + " by creating the new Collection with the other Collection as parameter,\n"
             + "- replaces some checks on Collection.size() with checks on Collection.isEmpty(),\n"
@@ -188,7 +189,8 @@ public class CollectionRefactoring extends AbstractRefactoringRule {
             }
         } else if (isArray(iterable)) {
             if (isMethod(mi, "java.util.Collection", "add", "java.lang.Object")
-                    && areTypeCompatible(mi.getExpression(), iterable)) {
+                    && areTypeCompatible(mi.getExpression(), iterable)
+                    && isSameLocalVariable(arg0(mi), node.getParameter().resolveBinding())) {
                 return replaceWithCollectionsAddAll(node, iterable, mi);
             }
         }
@@ -234,11 +236,21 @@ public class CollectionRefactoring extends AbstractRefactoringRule {
             } else if (ARRAY.equals(loopContent.getContainerType())) {
                 if (isMethod(mi, "java.util.Collection", "add", "java.lang.Object")
                         && areTypeCompatible(mi.getExpression(), loopContent.getContainerVariable())) {
-                    return replaceWithCollectionsAddAll(node, loopContent.getContainerVariable(), mi);
+                    final Expression addArg0 = arg0(mi);
+                    final ArrayAccess aa = as(addArg0, ArrayAccess.class);
+                    if (isSameVariable(loopContent, aa)) {
+                        return replaceWithCollectionsAddAll(node, loopContent.getContainerVariable(), mi);
+                    }
                 }
             }
         }
         return VISIT_SUBTREE;
+    }
+
+    private boolean isSameVariable(ForLoopContent loopContent, ArrayAccess aa) {
+        return aa != null
+            && isSameLocalVariable(aa.getArray(), loopContent.getContainerVariable())
+            && isSameLocalVariable(aa.getIndex(), loopContent.getLoopVariable());
     }
 
     private boolean areTypeCompatible(Expression colExpr, Expression arrayExpr) {
@@ -256,16 +268,21 @@ public class CollectionRefactoring extends AbstractRefactoringRule {
             String methodName, MethodInvocation colMI) {
         final Expression addArg0 = arg0(colMI);
         final MethodInvocation getMI = as(addArg0, MethodInvocation.class);
+        if (isSameVariable(loopContent, getMI)) {
+            return replaceWithCollectionMethod(node, methodName,
+                    colMI.getExpression(), getMI.getExpression());
+        }
+        return VISIT_SUBTREE;
+    }
+
+    private boolean isSameVariable(ForLoopContent loopContent, final MethodInvocation getMI) {
         if (isMethod(getMI, "java.util.List", "get", "int")
                 && getMI.getExpression() instanceof Name) {
             final Expression getArg0 = arg0(getMI);
-            if (getArg0 instanceof Name
-                    && isSameLocalVariable(getArg0, loopContent.getLoopVariable())) {
-                return replaceWithCollectionMethod(node, methodName,
-                        colMI.getExpression(), getMI.getExpression());
-            }
+            return getArg0 instanceof Name
+                    && isSameLocalVariable(getArg0, loopContent.getLoopVariable());
         }
-        return VISIT_SUBTREE;
+        return false;
     }
 
     private boolean replaceWithCollectionMethod(ASTNode toReplace, String methodName,
