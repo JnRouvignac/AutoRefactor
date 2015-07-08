@@ -58,7 +58,6 @@ import static org.eclipse.jdt.core.dom.PrefixExpression.Operator.*;
  * conditional on TestNG version.
  * </p>
  */
-@SuppressWarnings("javadoc")
 public class TestNGAssertRefactoring extends AbstractRefactoringRule {
 
     @Override
@@ -112,7 +111,6 @@ public class TestNGAssertRefactoring extends AbstractRefactoringRule {
         return null;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(MethodInvocation node) {
         if (isMethod(node, "org.testng.Assert", "assertTrue", "boolean")
@@ -369,11 +367,10 @@ public class TestNGAssertRefactoring extends AbstractRefactoringRule {
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(IfStatement node) {
         final List<Statement> stmts = asList(node.getThenStatement());
-        if (stmts.size() == 1) {
+        if (node.getElseStatement() == null && stmts.size() == 1) {
             final MethodInvocation mi = asExpression(stmts.get(0), MethodInvocation.class);
             if (isMethod(mi, "org.testng.Assert", "fail")
                     || isMethod(mi, "org.testng.Assert", "fail", "java.lang.String")) {

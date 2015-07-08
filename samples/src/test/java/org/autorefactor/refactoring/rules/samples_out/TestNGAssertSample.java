@@ -205,7 +205,7 @@ public class TestNGAssertSample {
         assertNotEquals(o, expected);
         assertNotEquals(o, expected, "Failure message to keep");
 
-        // tests that this works according to levenshtein distance 
+        // tests that this works according to levenshtein distance
         int expceted = 0;
         assertEquals(o, expceted);
     }
@@ -264,5 +264,29 @@ public class TestNGAssertSample {
         assertNotEquals(o1, o2, "Failure message to keep");
         assertEquals(o1, o2);
         assertEquals(o1, o2, "Failure message to keep");
+    }
+
+    public void doNotRefactorBecauseOfElseStatement(int i1, int i2, Object o1) throws Exception {
+        if (i1 == i2) {
+            Assert.fail();
+        } else {
+            System.out.println("keep me!");
+        }
+        if (o1 == null) {
+            Assert.fail();
+        } else {
+            System.out.println("keep me!");
+        }
+        Object o2 = i2;
+        if (o1 == o2) {
+            Assert.fail();
+        } else {
+            System.out.println("keep me!");
+        }
+        if (o1.equals(o2)) {
+            Assert.fail();
+        } else {
+            System.out.println("keep me!");
+        }
     }
 }
