@@ -40,6 +40,7 @@ import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ExpressionStatement;
 import org.eclipse.jdt.core.dom.ForStatement;
 import org.eclipse.jdt.core.dom.IBinding;
+import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.InfixExpression;
@@ -54,6 +55,7 @@ import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.autorefactor.refactoring.ForLoopHelper.*;
+import static org.autorefactor.refactoring.ForLoopHelper.ContainerType.*;
 import static org.eclipse.jdt.core.dom.InfixExpression.Operator.*;
 import static org.eclipse.jdt.core.dom.PrefixExpression.Operator.*;
 
@@ -170,21 +172,38 @@ public class CollectionRefactoring extends AbstractRefactoringRule {
 
     @Override
     public boolean visit(EnhancedForStatement node) {
-        final Expression collection = node.getExpression();
-        if (instanceOf(collection, "java.util.Collection")) {
-            final List<Statement> stmts = asList(node.getBody());
-            if (stmts.size() == 1) {
-                final MethodInvocation mi = asExpression(stmts.get(0), MethodInvocation.class);
-                if (isMethod(mi, "java.util.Collection", "add", "java.lang.Object")) {
-                    return replaceWithCollectionMethod(node, collection, "addAll", mi);
-                } else if (isMethod(mi, "java.util.Collection", "contains", "java.lang.Object")) {
-                    return replaceWithCollectionMethod(node, collection, "containsAll", mi);
-                } else if (isMethod(mi, "java.util.Collection", "remove", "java.lang.Object")) {
-                    return replaceWithCollectionMethod(node, collection, "removeAll", mi);
-                }
+        final Expression iterable = node.getExpression();
+        final List<Statement> stmts = asList(node.getBody());
+        if (stmts.size() != 1) {
+            return VISIT_SUBTREE;
+        }
+        final MethodInvocation mi = asExpression(stmts.get(0), MethodInvocation.class);
+        if (instanceOf(iterable, "java.util.Collection")) {
+            if (isMethod(mi, "java.util.Collection", "add", "java.lang.Object")) {
+                return replaceWithCollectionMethod(node, iterable, "addAll", mi);
+            } else if (isMethod(mi, "java.util.Collection", "contains", "java.lang.Object")) {
+                return replaceWithCollectionMethod(node, iterable, "containsAll", mi);
+            } else if (isMethod(mi, "java.util.Collection", "remove", "java.lang.Object")) {
+                return replaceWithCollectionMethod(node, iterable, "removeAll", mi);
+            }
+        } else if (isArray(iterable)) {
+            if (isMethod(mi, "java.util.Collection", "add", "java.lang.Object")
+                    && areTypeCompatible(mi.getExpression(), iterable)) {
+                return replaceWithCollectionsAddAll(node, iterable, mi);
             }
         }
         return VISIT_SUBTREE;
+    }
+
+    private boolean replaceWithCollectionsAddAll(Statement node, Expression iterable, MethodInvocation mi) {
+        ASTBuilder b = ctx.getASTBuilder();
+        ctx.getRefactorings().replace(node,
+                b.toStmt(b.invoke(
+                        b.name("java", "util", "Collections"),
+                        "addAll",
+                        b.copy(mi.getExpression()),
+                        b.copy(iterable))));
+        return DO_NOT_VISIT_SUBTREE;
     }
 
     private boolean replaceWithCollectionMethod(EnhancedForStatement node,
@@ -201,17 +220,36 @@ public class CollectionRefactoring extends AbstractRefactoringRule {
     public boolean visit(ForStatement node) {
         final ForLoopContent loopContent = iterateOverContainer(node);
         final List<Statement> stmts = asList(node.getBody());
-        if (loopContent != null && stmts.size() == 1) {
+        if (loopContent != null
+                && stmts.size() == 1) {
             final MethodInvocation mi = asExpression(stmts.get(0), MethodInvocation.class);
-            if (isMethod(mi, "java.util.Collection", "add", "java.lang.Object")) {
-                return replaceWithCollectionMethod(node, loopContent, "addAll", mi);
-            } else if (isMethod(mi, "java.util.Collection", "contains", "java.lang.Object")) {
-                return replaceWithCollectionMethod(node, loopContent, "containsAll", mi);
-            } else if (isMethod(mi, "java.util.Collection", "remove", "java.lang.Object")) {
-                return replaceWithCollectionMethod(node, loopContent, "removeAll", mi);
+            if (COLLECTION.equals(loopContent.getContainerType())) {
+                if (isMethod(mi, "java.util.Collection", "add", "java.lang.Object")) {
+                    return replaceWithCollectionMethod(node, loopContent, "addAll", mi);
+                } else if (isMethod(mi, "java.util.Collection", "contains", "java.lang.Object")) {
+                    return replaceWithCollectionMethod(node, loopContent, "containsAll", mi);
+                } else if (isMethod(mi, "java.util.Collection", "remove", "java.lang.Object")) {
+                    return replaceWithCollectionMethod(node, loopContent, "removeAll", mi);
+                }
+            } else if (ARRAY.equals(loopContent.getContainerType())) {
+                if (isMethod(mi, "java.util.Collection", "add", "java.lang.Object")
+                        && areTypeCompatible(mi.getExpression(), loopContent.getContainerVariable())) {
+                    return replaceWithCollectionsAddAll(node, loopContent.getContainerVariable(), mi);
+                }
             }
         }
         return VISIT_SUBTREE;
+    }
+
+    private boolean areTypeCompatible(Expression colExpr, Expression arrayExpr) {
+        ITypeBinding arrayTypeBinding = arrayExpr.resolveTypeBinding();
+        ITypeBinding colTypeBinding = colExpr.resolveTypeBinding();
+        if (arrayTypeBinding != null && colTypeBinding != null) {
+            ITypeBinding componentType = arrayTypeBinding.getComponentType();
+            ITypeBinding colTypeArgument = colTypeBinding.getTypeArguments()[0];
+            return componentType.isSubTypeCompatible(colTypeArgument);
+        }
+        return false;
     }
 
     private boolean replaceWithCollectionMethod(ForStatement node, ForLoopContent loopContent,

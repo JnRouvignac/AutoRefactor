@@ -1025,6 +1025,20 @@ public final class ASTHelper {
     }
 
     /**
+     * Returns whether the provided expression represents an array.
+     *
+     * @param expr the expression to analyze
+     * @return true the provided expression represents an array, false otherwise
+     */
+    public static boolean isArray(Expression expr) {
+        if (expr != null) {
+            final ITypeBinding typeBinding = expr.resolveTypeBinding();
+            return typeBinding != null && typeBinding.isArray();
+        }
+        return false;
+    }
+
+    /**
      * Returns whether the provided expression represents a constant value.
      *
      * @param expr the expression to analyze

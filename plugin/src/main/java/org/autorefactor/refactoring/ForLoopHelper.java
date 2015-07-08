@@ -35,6 +35,7 @@ import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Name;
 import org.eclipse.jdt.core.dom.PostfixExpression;
 import org.eclipse.jdt.core.dom.PrefixExpression;
+import org.eclipse.jdt.core.dom.QualifiedName;
 import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
@@ -67,9 +68,7 @@ public final class ForLoopHelper {
         FOREACH
     }
 
-    /**
-     * The content of the for loop.
-     */
+    /** The content of the for loop. */
     public static final class ForLoopContent {
         private Name loopVariable;
         private Name elementVariable;
@@ -120,6 +119,17 @@ public final class ForLoopHelper {
          */
         public IterationType getIterationType() {
             return iterationType;
+        }
+
+        @Override
+        public String toString() {
+            return getClass().getSimpleName() + "("
+                    + "iterationType=" + iterationType
+                    + ", containerType=" + containerType
+                    + ", containerVariable=" + containerVariable
+                    + ", loopVariable=" + loopVariable
+                    + ", elementVariable=" + elementVariable
+                    + ")";
         }
     }
 
@@ -214,8 +224,10 @@ public final class ForLoopHelper {
     }
 
     private static ForLoopContent buildForLoopContent(final Expression loopVar, final Expression containerVar) {
-        if (containerVar instanceof MethodInvocation
-                && loopVar instanceof Name) {
+        if (!(loopVar instanceof Name)) {
+            return null;
+        }
+        if (containerVar instanceof MethodInvocation) {
             final MethodInvocation mi = (MethodInvocation) containerVar;
             final Name containerVarName = as(mi.getExpression(), Name.class);
             if (containerVarName != null
@@ -227,8 +239,22 @@ public final class ForLoopHelper {
                 content.iterationType = IterationType.INDEX;
                 return content;
             }
+        } else if (containerVar instanceof QualifiedName) {
+            final QualifiedName containerVarName = (QualifiedName) containerVar;
+            if (isArrayLength(containerVarName)) {
+                final ForLoopContent content = new ForLoopContent();
+                content.loopVariable = (Name) loopVar;
+                content.containerVariable = ((QualifiedName) containerVar).getQualifier();
+                content.containerType = ContainerType.ARRAY;
+                content.iterationType = IterationType.INDEX;
+                return content;
+            }
         }
         return null;
     }
 
+    private static boolean isArrayLength(final QualifiedName containerVarName) {
+        return isArray(containerVarName.getQualifier())
+                && containerVarName.getName().getIdentifier().equals("length");
+    }
 }

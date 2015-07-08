@@ -56,27 +56,39 @@ public class CollectionSample {
         return output;
     }
 
-    public void replaceAddWithForLoop(List<String> col, List<String> output) {
+    public void replaceAddWithForLoopByCollectionsAddAll(
+            List<? super java.util.Date> output, java.util.Date[] elems1, java.sql.Date[] elems2) {
+        java.util.Collections.addAll(output, elems1);
+        java.util.Collections.addAll(output, elems2);
+    }
+
+    public void replaceAddWithForEachByCollectionsAddAll(
+            List<? super java.util.Date> output, java.util.Date[] elems1, java.sql.Date[] elems2) {
+        java.util.Collections.addAll(output, elems1);
+        java.util.Collections.addAll(output, elems2);
+    }
+
+    public void replaceAddWithForLoopByAddAll(List<String> col, List<String> output) {
         output.addAll(col);
     }
 
-    public void replaceAddWithForEach(Collection<String> col, List<String> output) {
+    public void replaceAddWithForEachByAddAll(Collection<String> col, List<String> output) {
         output.addAll(col);
     }
 
-    public void replaceContainsWithForLoop(List<String> col, List<String> output) {
+    public void replaceContainsWithForLoopByContainsAll(List<String> col, List<String> output) {
         output.containsAll(col);
     }
 
-    public void replaceContainsWithForEach(Collection<String> col, List<String> output) {
+    public void replaceContainsWithForEachByContainsAll(Collection<String> col, List<String> output) {
         output.containsAll(col);
     }
 
-    public void replaceRemoveWithForLoop(List<String> col, List<String> output) {
+    public void replaceRemoveWithForLoopByRemoveAll(List<String> col, List<String> output) {
         output.removeAll(col);
     }
 
-    public void replaceRemoveWithForEach(Collection<String> col, List<String> output) {
+    public void replaceRemoveWithForEachByRemoveAll(Collection<String> col, List<String> output) {
         output.removeAll(col);
     }
 

@@ -61,37 +61,57 @@ public class CollectionSample {
         return output;
     }
 
-    public void replaceAddWithForLoop(List<String> col, List<String> output) {
+    public void replaceAddWithForLoopByCollectionsAddAll(
+            List<? super java.util.Date> output, java.util.Date[] elems1, java.sql.Date[] elems2) {
+        for (int i = 0; i < elems1.length; i++) {
+            output.add(elems1[i]);
+        }
+        for (int i = 0; i < elems2.length; i++) {
+            output.add(elems2[i]);
+        }
+    }
+
+    public void replaceAddWithForEachByCollectionsAddAll(
+            List<? super java.util.Date> output, java.util.Date[] elems1, java.sql.Date[] elems2) {
+        for (java.util.Date d : elems1) {
+            output.add(d);
+        }
+        for (java.sql.Date d : elems2) {
+            output.add(d);
+        }
+    }
+
+    public void replaceAddWithForLoopByAddAll(List<String> col, List<String> output) {
         for (int i = 0; i < col.size(); i++) {
             output.add(col.get(i));
         }
     }
 
-    public void replaceAddWithForEach(Collection<String> col, List<String> output) {
+    public void replaceAddWithForEachByAddAll(Collection<String> col, List<String> output) {
         for (String s : col) {
             output.add(s);
         }
     }
 
-    public void replaceContainsWithForLoop(List<String> col, List<String> output) {
+    public void replaceContainsWithForLoopByContainsAll(List<String> col, List<String> output) {
         for (int i = 0; i < col.size(); i++) {
             output.contains(col.get(i));
         }
     }
 
-    public void replaceContainsWithForEach(Collection<String> col, List<String> output) {
+    public void replaceContainsWithForEachByContainsAll(Collection<String> col, List<String> output) {
         for (String s : col) {
             output.contains(s);
         }
     }
 
-    public void replaceRemoveWithForLoop(List<String> col, List<String> output) {
+    public void replaceRemoveWithForLoopByRemoveAll(List<String> col, List<String> output) {
         for (int i = 0; i < col.size(); i++) {
             output.remove(col.get(i));
         }
     }
 
-    public void replaceRemoveWithForEach(Collection<String> col, List<String> output) {
+    public void replaceRemoveWithForEachByRemoveAll(Collection<String> col, List<String> output) {
         for (String s : col) {
             output.remove(s);
         }
