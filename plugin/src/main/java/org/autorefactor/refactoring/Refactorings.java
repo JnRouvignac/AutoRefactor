@@ -41,6 +41,8 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 
+import org.autorefactor.AutoRefactorPlugin;
+import org.autorefactor.preferences.Preferences;
 import org.autorefactor.util.Pair;
 import org.autorefactor.util.UnhandledException;
 import org.eclipse.jdt.core.dom.AST;
@@ -473,15 +475,22 @@ public class Refactorings {
         final TextEdit edits = rewrite.rewriteAST(document, null);
         commentRewriter.addEdits(document, edits);
         sourceRewriter.addEdits(document, edits);
-        final TextEdit[] textRewrites = edits.removeChildren();
-        filterOutIncompleteRefactorings(transactions);
-        Collection<Transaction> txnsToApply = getRefactoringsApplicableToSelection(transactions, selection);
-        if (!txnsToApply.isEmpty()) {
-            final TextEdit toApply = toMultiTextEdit(txnsToApply, textRewrites);
-            applyEditsToDocument(toApply, document);
+
+        final Preferences prefs = AutoRefactorPlugin.getPreferenceHelper();
+        if (prefs.applyRefactoringsWithTextEditGroup()) {
+            final TextEdit[] textRewrites = edits.removeChildren();
+            filterOutIncompleteRefactorings(transactions);
+            Collection<Transaction> txnsToApply = getRefactoringsApplicableToSelection(transactions, selection);
+            if (!txnsToApply.isEmpty()) {
+                final TextEdit toApply = toMultiTextEdit(txnsToApply, textRewrites);
+                applyEditsToDocument(toApply, document);
+                return true;
+            }
+            return false;
+        } else {
+            applyEditsToDocument(edits, document);
             return true;
         }
-        return false;
     }
 
     private TextEdit toMultiTextEdit(Collection<Transaction> txnsToApply, TextEdit[] textRewrites) {

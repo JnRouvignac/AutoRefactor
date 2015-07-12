@@ -25,9 +25,7 @@
  */
 package org.autorefactor.preferences;
 
-/**
- * Helper interface for preferences.
- */
+/** Helper interface for preferences. */
 public interface Preferences {
 
     /**
@@ -51,4 +49,10 @@ public interface Preferences {
      */
     boolean addCurlyBracketsToStatementBodies();
 
+    /**
+     * Returns whether to use {@link TextEditGroup} Eclipse API when applying refactorings.
+     *
+     * @return true if {@link TextEditGroup} must be used, false otherwise.
+     */
+    boolean applyRefactoringsWithTextEditGroup() ;
 }

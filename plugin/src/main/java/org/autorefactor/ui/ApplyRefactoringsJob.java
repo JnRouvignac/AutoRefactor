@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Queue;
 
 import org.autorefactor.AutoRefactorPlugin;
+import org.autorefactor.preferences.Preferences;
 import org.autorefactor.refactoring.JavaProjectOptions;
 import org.autorefactor.refactoring.RefactoringRule;
 import org.autorefactor.refactoring.Refactorings;
@@ -271,7 +272,8 @@ public class ApplyRefactoringsJob extends Job {
     }
 
     private RefactoringRule wrapForSelection(AggregateASTVisitor refactoring) {
-        if (selection != null) {
+        final Preferences prefs = AutoRefactorPlugin.getPreferenceHelper();
+        if (prefs.applyRefactoringsWithTextEditGroup() && selection != null) {
             return new ForwardingASTVisitor(refactoring) {
                 @Override
                 public boolean preVisit2(ASTNode node) {

@@ -25,15 +25,19 @@
  */
 package org.autorefactor.preferences;
 
-/**
- * Interface holding preference constants.
- */
+/** Interface holding preference constants. */
 public enum PreferenceConstants {
 
     /** Preference that turns debug mode on or off. */
     DEBUG_MODE_ON(
             "debug_mode_on",
             "Enable debug mode (for developers only)",
+            Boolean.FALSE),
+
+    /** Preference that turns debug mode on or off. */
+    APPLY_REFACTORINGS_WITH_TEXTEDITGROUP(
+            "apply_refactorings_with_texteditgroup",
+            "Use TestEditGroup eclipse API to apply refactorings",
             Boolean.FALSE),
 
     /** Preference that configures whether to add curly brackets to statement bodies. */
@@ -102,5 +106,4 @@ public enum PreferenceConstants {
     public String getName() {
         return name;
     }
-
 }
