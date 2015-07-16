@@ -54,7 +54,6 @@ import static org.autorefactor.util.Utils.*;
 import static org.eclipse.jdt.core.dom.InfixExpression.Operator.*;
 
 /** See {@link #getDescription()} method. */
-@SuppressWarnings("javadoc")
 public class SimplifyExpressionRefactoring extends AbstractRefactoringRule {
 
     @Override
@@ -194,7 +193,7 @@ public class SimplifyExpressionRefactoring extends AbstractRefactoringRule {
             return node.equals(a.getRightHandSide());
         case ASTNode.METHOD_INVOCATION:
             final MethodInvocation mi = (MethodInvocation) parent;
-            return arguments(mi).contains(node);
+            return arguments(mi).contains(node) || canRemoveParenthesesAroundExpression(mi, node);
         case ASTNode.IF_STATEMENT:
             final IfStatement is = (IfStatement) parent;
             return node.equals(is.getExpression());
@@ -213,6 +212,20 @@ public class SimplifyExpressionRefactoring extends AbstractRefactoringRule {
         default:
             return false;
         }
+    }
+
+    private boolean canRemoveParenthesesAroundExpression(MethodInvocation mi, ParenthesizedExpression node) {
+        if (node.equals(mi.getExpression())) {
+            switch (node.getExpression().getNodeType()) {
+            case ASTNode.ASSIGNMENT:
+            case ASTNode.CAST_EXPRESSION:
+            case ASTNode.INFIX_EXPRESSION:
+                return false;
+            default:
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
