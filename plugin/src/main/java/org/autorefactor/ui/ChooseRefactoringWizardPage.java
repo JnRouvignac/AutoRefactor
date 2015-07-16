@@ -210,8 +210,11 @@ public class ChooseRefactoringWizardPage extends WizardPage {
             @Override
             public boolean select(Viewer viewer, Object parentElement, Object refactoring) {
                 final String filter = filterText.getText().toLowerCase();
-                final String cellText = ((RefactoringRule) refactoring).getDescription();
-                return cellText.toLowerCase().indexOf(filter) != -1;
+                final RefactoringRule rule = (RefactoringRule) refactoring;
+                final String description = rule.getDescription().toLowerCase();
+                final String name = rule.getName().toLowerCase();
+                return description.contains(filter)
+                    || name.contains(filter);
             }
         });
         ColumnViewerToolTipSupport.enableFor(tableViewer, ToolTip.NO_RECREATE);
@@ -219,9 +222,9 @@ public class ChooseRefactoringWizardPage extends WizardPage {
             @Override
             public void update(ViewerCell cell) {
                 final String filter = filterText.getText().toLowerCase();
-                final String cellText = ((RefactoringRule) cell.getElement()).getName();
-                cell.setText(cellText);
-                cell.setStyleRanges(getStyleRanges(cellText, filter));
+                final String name = ((RefactoringRule) cell.getElement()).getName();
+                cell.setText(name);
+                cell.setStyleRanges(getStyleRanges(name, filter));
             }
 
             private StyleRange[] getStyleRanges(String text, String filter) {
