@@ -50,7 +50,6 @@ import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.eclipse.jdt.core.dom.InfixExpression.Operator.*;
 
 /** See {@link #getDescription()} method. */
-@SuppressWarnings("javadoc")
 public class StringBuilderRefactoring extends AbstractRefactoringRule {
 
     @Override
@@ -316,17 +315,18 @@ public class StringBuilderRefactoring extends AbstractRefactoringRule {
 
     private Expression collectAllAppendedStrings(Expression expr,
             final LinkedList<Expression> allOperands, AtomicBoolean hasStringConcat) {
-        if (instanceOf(expr, "java.lang.Appendable")) {
-            if (expr instanceof MethodInvocation) {
-                final MethodInvocation mi = (MethodInvocation) expr;
+        final Expression exp = removeParentheses(expr);
+        if (instanceOf(exp, "java.lang.Appendable")) {
+            if (exp instanceof MethodInvocation) {
+                final MethodInvocation mi = (MethodInvocation) exp;
                 if ("append".equals(mi.getName().getIdentifier())
                         && arguments(mi).size() == 1) {
                     final Expression arg0 = arguments(mi).get(0);
                     addAllSubExpressions(arg0, allOperands, hasStringConcat);
                     return collectAllAppendedStrings(mi.getExpression(), allOperands, hasStringConcat);
                 }
-            } else if (expr instanceof ClassInstanceCreation) {
-                final ClassInstanceCreation cic = (ClassInstanceCreation) expr;
+            } else if (exp instanceof ClassInstanceCreation) {
+                final ClassInstanceCreation cic = (ClassInstanceCreation) exp;
                 if (arguments(cic).size() == 1) {
                     final Expression arg0 = arguments(cic).get(0);
                     if (hasType(cic, "java.lang.StringBuffer", "java.lang.StringBuilder")
@@ -336,8 +336,8 @@ public class StringBuilderRefactoring extends AbstractRefactoringRule {
                     }
                 }
                 return cic;
-            } else if (expr instanceof Name || expr instanceof FieldAccess) {
-                return expr;
+            } else if (exp instanceof Name || exp instanceof FieldAccess) {
+                return exp;
             }
         }
         return null;
