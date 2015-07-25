@@ -60,6 +60,11 @@ public class DeadCodeEliminationSample {
         return i;
     }
 
+    private int removeEmptyIfStatement(boolean b) {
+        int i = 0;
+        return i;
+    }
+
     private int removeImpossibleIfClauses() {
         int i = 0;
         int j = 0;

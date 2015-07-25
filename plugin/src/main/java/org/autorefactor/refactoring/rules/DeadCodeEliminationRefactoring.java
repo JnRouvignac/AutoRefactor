@@ -80,9 +80,13 @@ public class DeadCodeEliminationRefactoring extends AbstractRefactoringRule {
             r.remove(elseStmt);
             return DO_NOT_VISIT_SUBTREE;
         } else if (thenStmt != null && asList(thenStmt).isEmpty()) {
-            r.replace(node,
-                    b.if0(b.negate(node.getExpression()),
-                            b.move(elseStmt)));
+            if (elseStmt != null) {
+                r.replace(node,
+                        b.if0(b.negate(node.getExpression()),
+                                b.move(elseStmt)));
+            } else {
+                r.remove(node);
+            }
             return DO_NOT_VISIT_SUBTREE;
         }
 
