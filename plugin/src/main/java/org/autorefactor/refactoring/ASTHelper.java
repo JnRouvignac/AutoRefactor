@@ -428,7 +428,7 @@ public final class ASTHelper {
      * @see TypeDeclaration#bodyDeclarations()
      */
     @SuppressWarnings("unchecked")
-    public static List<BodyDeclaration> bodyDeclarations(TypeDeclaration node) {
+    public static List<BodyDeclaration> bodyDeclarations(AbstractTypeDeclaration node) {
         return node.bodyDeclarations();
     }
 
@@ -847,11 +847,15 @@ public final class ASTHelper {
     }
 
     private static BodyDeclaration getSibling(BodyDeclaration node, boolean lookForPrevious) {
-        if (node.getParent() instanceof TypeDeclaration) {
-            final TypeDeclaration parent = (TypeDeclaration) node.getParent();
-            return getSibling(node, parent, lookForPrevious);
-        } else if (node.getParent() instanceof CompilationUnit) {
-            final CompilationUnit cu = (CompilationUnit) node.getParent();
+        final ASTNode parent = node.getParent();
+        if (parent instanceof AbstractTypeDeclaration) {
+            final AbstractTypeDeclaration typeDecl = (AbstractTypeDeclaration) parent;
+            return getSibling(node, typeDecl, lookForPrevious);
+        } else if (parent instanceof AnonymousClassDeclaration) {
+            final AnonymousClassDeclaration classDecl = (AnonymousClassDeclaration) parent;
+            return getSibling(node, classDecl, lookForPrevious);
+        } else if (parent instanceof CompilationUnit) {
+            final CompilationUnit cu = (CompilationUnit) parent;
             final List<AbstractTypeDeclaration> types = types(cu);
             final int index = types.indexOf(node);
             if (index != -1 && index + 1 < types.size()) {
@@ -862,20 +866,20 @@ public final class ASTHelper {
     }
 
     private static BodyDeclaration getSibling(BodyDeclaration node,
-            final TypeDeclaration parent, boolean lookForPrevious) {
+            AbstractTypeDeclaration parent, boolean lookForPrevious) {
+        return getSibling(node, bodyDeclarations(parent), lookForPrevious);
+    }
+
+
+    private static BodyDeclaration getSibling(BodyDeclaration node,
+            AnonymousClassDeclaration parent, boolean lookForPrevious) {
+        return getSibling(node, bodyDeclarations(parent), lookForPrevious);
+    }
+
+    private static BodyDeclaration getSibling(BodyDeclaration node,
+            List<BodyDeclaration> bodyDeclarations, boolean lookForPrevious) {
         final TreeSet<BodyDeclaration> children = new TreeSet<BodyDeclaration>(new NodeStartPositionComparator());
-        for (FieldDeclaration fieldDecl : parent.getFields()) {
-            children.add(fieldDecl);
-        }
-        for (MethodDeclaration methodDecl : parent.getMethods()) {
-            children.add(methodDecl);
-        }
-        for (BodyDeclaration decl : bodyDeclarations(parent)) {
-            children.add(decl);
-        }
-        for (TypeDeclaration typeDecl : parent.getTypes()) {
-            children.add(typeDecl);
-        }
+        children.addAll(bodyDeclarations);
 
         BodyDeclaration previous = null;
         boolean returnNext = false;

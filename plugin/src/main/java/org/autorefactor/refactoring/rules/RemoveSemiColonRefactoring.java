@@ -39,7 +39,9 @@ import org.autorefactor.refactoring.ASTHelper.NodeStartPositionComparator;
 import org.autorefactor.refactoring.SourceLocation;
 import org.autorefactor.util.NotImplementedException;
 import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.AbstractTypeDeclaration;
 import org.eclipse.jdt.core.dom.AnnotationTypeDeclaration;
+import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.BodyDeclaration;
 import org.eclipse.jdt.core.dom.Comment;
@@ -107,9 +109,12 @@ public class RemoveSemiColonRefactoring extends AbstractRefactoringRule {
         final ASTNode parent = node.getParent();
         if (nextSibling != null) {
             return removeSuperfluousSemiColons(node, getEndPosition(node), nextSibling.getStartPosition());
-        } else if (parent instanceof TypeDeclaration) {
-            final TypeDeclaration typeDecl = (TypeDeclaration) parent;
+        } else if (parent instanceof AbstractTypeDeclaration) {
+            final AbstractTypeDeclaration typeDecl = (AbstractTypeDeclaration) parent;
             return removeSuperfluousSemiColons(node, getEndPosition(node), getEndPosition(typeDecl) - 1);
+        } else if (parent instanceof AnonymousClassDeclaration) {
+            final AnonymousClassDeclaration classDecl = (AnonymousClassDeclaration) parent;
+            return removeSuperfluousSemiColons(node, getEndPosition(node), getEndPosition(classDecl) - 1);
         } else if (parent instanceof CompilationUnit) {
             final CompilationUnit cu = (CompilationUnit) parent;
             return removeSuperfluousSemiColons(node, getEndPosition(node), getEndPosition(cu) - 1);
