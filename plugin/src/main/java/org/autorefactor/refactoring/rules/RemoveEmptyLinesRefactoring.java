@@ -182,15 +182,19 @@ public class RemoveEmptyLinesRefactoring extends AbstractRefactoringRule {
 
     @Override
     public boolean visit(MethodDeclaration node) {
+        final Block body = node.getBody();
+        if (body == null) {
+            return VISIT_SUBTREE;
+        }
         final String source = this.ctx.getSource(node);
-        int openingCurlyIndex = node.getBody().getStartPosition();
+        int openingCurlyIndex = body.getStartPosition();
         int newLineBeforeOpeningCurly = source.lastIndexOf(newlineChars, openingCurlyIndex) + newlineChars.length();
         int lastNonWsIndex = getLastIndexOfNonWhitespaceChar(source, openingCurlyIndex - 1);
         int endOfLineIndex = source.indexOf(newlineChars, lastNonWsIndex);
         if (maybeRemoveEmptyLines(source, endOfLineIndex, newLineBeforeOpeningCurly)) {
             return DO_NOT_VISIT_SUBTREE;
         }
-        return visit(node.getBody());
+        return visit(body);
     }
 
     @Override

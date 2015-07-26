@@ -37,6 +37,7 @@ public class DeadCodeEliminationSample {
     }
 
     private class Child extends Parent {
+        @Override
         void removeUselessOverride() {
             super.removeUselessOverride();
         }
@@ -176,5 +177,9 @@ public class DeadCodeEliminationSample {
     void doNotRemoveEmptyStatement(boolean b) {
         if (b);
         else System.out.println(b);
+    }
+
+    private interface MethodDeclarationWithoutBody {
+        void aMethod();
     }
 }

@@ -127,4 +127,8 @@ public class DeadCodeEliminationSample {
         if (b);
         else System.out.println(b);
     }
+
+    private interface MethodDeclarationWithoutBody {
+        void aMethod();
+    }
 }

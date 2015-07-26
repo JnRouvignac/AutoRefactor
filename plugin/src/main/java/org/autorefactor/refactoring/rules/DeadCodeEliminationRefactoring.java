@@ -201,6 +201,9 @@ public class DeadCodeEliminationRefactoring extends AbstractRefactoringRule {
 
     @Override
     public boolean visit(MethodDeclaration node) {
+        if (node.getBody() == null) {
+            return VISIT_SUBTREE;
+        }
         List<Statement> bodyStmts = statements(node.getBody());
         if (bodyStmts.size() == 1) {
             SuperMethodInvocation bodyMi = asExpression(bodyStmts.get(0), SuperMethodInvocation.class);

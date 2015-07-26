@@ -82,6 +82,28 @@ public class RemoveEmptyLinesSample
         } catch (Exception e) { }
     }
 
+
+
+    private interface MethodDeclarationsWithoutBody
+
+
+    {
+
+
+        void aMethod();
+
+
+
+        boolean aBoolean();
+
+
+
+        int anInt();
+
+
+    }
+
+
 }
 
 
