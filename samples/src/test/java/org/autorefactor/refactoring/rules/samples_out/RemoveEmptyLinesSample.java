@@ -57,4 +57,6 @@ public class RemoveEmptyLinesSample
 
         int anInt();
     }
+
+    private static enum WeekOfDay { MONDAY, TUESDAY, WEDNESDAY, THRUSDAY, FRIDAY, SATURDAY, SUNDAY }
 }
