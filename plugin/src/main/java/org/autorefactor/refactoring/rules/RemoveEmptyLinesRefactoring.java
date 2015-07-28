@@ -25,12 +25,13 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import java.util.NavigableSet;
+import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.autorefactor.refactoring.Refactorings;
 import org.autorefactor.refactoring.SourceLocation;
-import org.autorefactor.util.IllegalStateException;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.AbstractTypeDeclaration;
 import org.eclipse.jdt.core.dom.AnnotationTypeDeclaration;
@@ -61,12 +62,14 @@ public class RemoveEmptyLinesRefactoring extends AbstractRefactoringRule {
         return "Remove empty lines";
     }
 
-    private String newlineChars;
+    private static final Pattern NEWLINE_PATTERN = Pattern.compile("\\r\\n|\\n|\\r");
+    private final NavigableSet<Integer> lineEnds = new TreeSet<Integer>();
 
     @Override
     public boolean visit(CompilationUnit node) {
+        computeLineEnds(node);
+
         final String source = this.ctx.getSource(node);
-        newlineChars = getNewlineChars(source);
         final Refactorings r = this.ctx.getRefactorings();
 
         int index = getIndexOfFirstNonWhitespaceChar(source, 0);
@@ -78,21 +81,38 @@ public class RemoveEmptyLinesRefactoring extends AbstractRefactoringRule {
         if (node.getPackage() != null) {
             int lastIndex = node.getPackage().getStartPosition();
             int lastNonWsIndex = getLastIndexOfNonWhitespaceChar(source, lastIndex - 1);
-            int endOfLineIndex = source.indexOf(newlineChars, lastNonWsIndex);
+            int endOfLineIndex = beforeNewlineChars(source, lastNonWsIndex);
             if (maybeRemoveEmptyLines(source, endOfLineIndex, lastIndex)) {
                 return DO_NOT_VISIT_SUBTREE;
             }
         }
 
         boolean result = VISIT_SUBTREE;
-        final String newline = "(?:" + newlineChars + ")";
+        final String newline = "(?:" + NEWLINE_PATTERN + ")";
         Matcher m = Pattern.compile("(" + newline + "\\s*?" + newline + "\\s*?" + ")" + "(?:" + newline + "\\s*?)+")
                 .matcher(source);
         while (m.find()) {
-            r.replace(toSourceLocation(m, 0), substring(source, m, 1));
-            result = DO_NOT_VISIT_SUBTREE;
+            final String matchedString = m.group(0);
+            if (!"\r\n\r\n".equals(matchedString)
+                    && !"\n\n".equals(matchedString)
+                    && !"\r\r".equals(matchedString)) {
+                r.replace(toSourceLocation(m, 0), substring(source, m, 1));
+                result = DO_NOT_VISIT_SUBTREE;
+            }
         }
         return result;
+    }
+
+    private void computeLineEnds(CompilationUnit node) {
+        final Matcher matcher = NEWLINE_PATTERN.matcher(ctx.getSource(node));
+        while (matcher.find()) {
+            lineEnds.add(matcher.end());
+        }
+    }
+
+    @Override
+    public void endVisit(CompilationUnit node) {
+        lineEnds.clear();
     }
 
     private int getIndexOfFirstNonWhitespaceChar(String s, int offset) {
@@ -113,18 +133,6 @@ public class RemoveEmptyLinesRefactoring extends AbstractRefactoringRule {
             }
         }
         return fromIndex;
-    }
-
-    private String getNewlineChars(String source) {
-        if (source.contains("\r\n")) {
-            return "\r\n";
-        } else if (source.contains("\n")) {
-            return "\n";
-        } else if (source.contains("\r")) {
-            return "\r";
-        }
-        throw new IllegalStateException(null,
-                "Cannot determine end of line encoding for source " + this.ctx.getCompilationUnit());
     }
 
     private SourceLocation toSourceLocation(Matcher m, int groupNumber) {
@@ -153,16 +161,16 @@ public class RemoveEmptyLinesRefactoring extends AbstractRefactoringRule {
     private boolean visit(AbstractTypeDeclaration node) {
         final String source = this.ctx.getSource(node);
         int openingCurlyIndex = findOpeningCurlyForTypeBody(node, source);
-        int newLineBeforeOpeningCurly = source.lastIndexOf(newlineChars, openingCurlyIndex) + newlineChars.length();
+        int newLineBeforeOpeningCurly = previousLineEnd(openingCurlyIndex);
         int lastNonWsIndex = getLastIndexOfNonWhitespaceChar(source, openingCurlyIndex - 1);
-        int endOfLineIndex = source.indexOf(newlineChars, lastNonWsIndex);
+        int endOfLineIndex = beforeNewlineChars(source, lastNonWsIndex);
         if (maybeRemoveEmptyLines(source, endOfLineIndex, newLineBeforeOpeningCurly)) {
             return DO_NOT_VISIT_SUBTREE;
         }
 
-        int newLineAfterOpeningCurly = source.indexOf(newlineChars, openingCurlyIndex) + newlineChars.length();
+        int newLineAfterOpeningCurly = nextLineEnd(openingCurlyIndex);
         int lastNonWsIndex2 = getIndexOfFirstNonWhitespaceChar(source, newLineAfterOpeningCurly);
-        int endOfLineIndex2 = source.lastIndexOf(newlineChars, lastNonWsIndex2) + newlineChars.length();
+        int endOfLineIndex2 = previousLineEnd(lastNonWsIndex2);
         if (maybeRemoveEmptyLines(source, openingCurlyIndex + 1, endOfLineIndex2)) {
             return DO_NOT_VISIT_SUBTREE;
         }
@@ -188,9 +196,9 @@ public class RemoveEmptyLinesRefactoring extends AbstractRefactoringRule {
         }
         final String source = this.ctx.getSource(node);
         int openingCurlyIndex = body.getStartPosition();
-        int newLineBeforeOpeningCurly = source.lastIndexOf(newlineChars, openingCurlyIndex) + newlineChars.length();
+        int newLineBeforeOpeningCurly = previousLineEnd(openingCurlyIndex);
         int lastNonWsIndex = getLastIndexOfNonWhitespaceChar(source, openingCurlyIndex - 1);
-        int endOfLineIndex = source.indexOf(newlineChars, lastNonWsIndex);
+        int endOfLineIndex = beforeNewlineChars(source, lastNonWsIndex);
         if (maybeRemoveEmptyLines(source, endOfLineIndex, newLineBeforeOpeningCurly)) {
             return DO_NOT_VISIT_SUBTREE;
         }
@@ -201,10 +209,10 @@ public class RemoveEmptyLinesRefactoring extends AbstractRefactoringRule {
     public boolean visit(Block node) {
         final String source = this.ctx.getSource(node);
         int openingCurlyIndex = node.getStartPosition();
-        int newLineAfterOpeningCurly = source.indexOf(newlineChars, openingCurlyIndex) + newlineChars.length();
+        int newLineAfterOpeningCurly = nextLineEnd(openingCurlyIndex);
         if (newLineAfterOpeningCurly < getEndPosition(node)) {
             int lastNonWsIndex = getIndexOfFirstNonWhitespaceChar(source, newLineAfterOpeningCurly);
-            int endOfLineIndex = source.lastIndexOf(newlineChars, lastNonWsIndex) + newlineChars.length();
+            int endOfLineIndex = previousLineEnd(lastNonWsIndex);
             if (maybeRemoveEmptyLines(source, openingCurlyIndex + 1, endOfLineIndex)) {
                 return DO_NOT_VISIT_SUBTREE;
             }
@@ -216,9 +224,9 @@ public class RemoveEmptyLinesRefactoring extends AbstractRefactoringRule {
         final String source = this.ctx.getSource(node);
 
         int closingCurlyIndex = source.lastIndexOf('}', getEndPosition(node));
-        int newLineBeforeClosingCurly = source.lastIndexOf(newlineChars, closingCurlyIndex) + newlineChars.length();
+        int newLineBeforeClosingCurly = previousLineEnd(closingCurlyIndex);
         int lastNonWsIndex = getLastIndexOfNonWhitespaceChar(source, closingCurlyIndex - 1);
-        int endOfLineIndex = source.indexOf(newlineChars, lastNonWsIndex);
+        int endOfLineIndex = beforeNewlineChars(source, lastNonWsIndex);
         if (maybeRemoveEmptyLines(source, endOfLineIndex, newLineBeforeClosingCurly)) {
             return DO_NOT_VISIT_SUBTREE;
         }
@@ -226,33 +234,35 @@ public class RemoveEmptyLinesRefactoring extends AbstractRefactoringRule {
     }
 
     private boolean maybeRemoveEmptyLines(String source, int endOfLineIndex, int newLineIndex) {
-        if (endOfLineIndex < newLineIndex
-                && !equals(source, endOfLineIndex, newLineIndex, newlineChars)) {
-            this.ctx.getRefactorings().replace(
-                    SourceLocation.fromPositions(endOfLineIndex, newLineIndex),
-                    newlineChars);
-            return true;
+        if (endOfLineIndex < newLineIndex) {
+            Matcher matcher = NEWLINE_PATTERN.matcher(source).region(endOfLineIndex, newLineIndex);
+            boolean isEqualToNewline = matcher.matches();
+            if (!isEqualToNewline && matcher.find()) {
+                String newlineChars = matcher.group();
+                this.ctx.getRefactorings().replace(
+                        SourceLocation.fromPositions(endOfLineIndex, newLineIndex),
+                        newlineChars);
+                return true;
+            }
         }
         return false;
     }
 
-    /**
-     * Equivalent to (but without allocations)
-     *
-     * <pre>
-     * s1.substring(beginIndex, endIndex).equals(s2)
-     * </pre>
-     */
-    private boolean equals(String s1, int beginIndex, int endIndex, String s2) {
-        int length = endIndex - beginIndex;
-        if (s2.length() != length) {
-            return false;
+    private int nextLineEnd(int fromIndex) {
+        final Integer ceiling = lineEnds.higher(fromIndex);
+        return ceiling != null ? ceiling : -1;
+    }
+
+    private int previousLineEnd(int fromIndex) {
+        final Integer floor = lineEnds.floor(fromIndex);
+        return floor != null ? floor : -1;
+    }
+
+    private int beforeNewlineChars(final String source, int fromIndex) {
+        Matcher matcher = NEWLINE_PATTERN.matcher(source);
+        if (matcher.find(fromIndex)) {
+            return matcher.start();
         }
-        for (int i = 0; i < length; i++) {
-            if (s1.charAt(beginIndex + i) != s2.charAt(i)) {
-                return false;
-            }
-        }
-        return true;
+        return -1;
     }
 }
