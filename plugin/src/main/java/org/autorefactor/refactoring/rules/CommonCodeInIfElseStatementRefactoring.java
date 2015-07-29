@@ -36,14 +36,38 @@ import org.autorefactor.util.NotImplementedException;
 import org.eclipse.jdt.core.dom.ASTMatcher;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Block;
+import org.eclipse.jdt.core.dom.IBinding;
+import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.IfStatement;
+import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.Statement;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
+import static org.autorefactor.util.Utils.*;
 
 /** See {@link #getDescription()} method. */
-@SuppressWarnings("javadoc")
 public class CommonCodeInIfElseStatementRefactoring extends AbstractRefactoringRule {
+
+    /** ASTMatcher that matches two piece of code only if the variables in use are the same. */
+    private static final class ASTMatcherSameVariables extends ASTMatcher {
+        @Override
+        public boolean match(SimpleName node, Object other) {
+            return super.match(node, other)
+                    && sameVariable(node, (SimpleName) other);
+        }
+
+        private boolean sameVariable(SimpleName node1, SimpleName node2) {
+            return equalNotNull(getVariableDeclaration(node1), getVariableDeclaration(node2));
+        }
+
+        private IVariableBinding getVariableDeclaration(SimpleName node) {
+            final IBinding b = node.resolveBinding();
+            if (b.getKind() == IBinding.VARIABLE) {
+                return ((IVariableBinding) b).getVariableDeclaration();
+            }
+            return null;
+        }
+    }
 
     @Override
     public String getDescription() {
@@ -79,7 +103,7 @@ public class CommonCodeInIfElseStatementRefactoring extends AbstractRefactoringR
                 removedCaseStmts.add(new LinkedList<ASTNode>());
             }
             // if all cases exist
-            final ASTMatcher matcher = new ASTMatcher();
+            final ASTMatcher matcher = new ASTMatcherSameVariables();
             final int minSize = minSize(allCasesStmts);
             final List<Statement> caseStmts = allCasesStmts.get(0);
 
