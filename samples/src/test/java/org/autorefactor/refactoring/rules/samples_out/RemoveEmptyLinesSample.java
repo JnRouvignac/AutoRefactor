@@ -49,6 +49,14 @@ public class RemoveEmptyLinesSample
         } catch (Exception e) { }
     }
 
+    public void doNotRemoveCodeOnSameLineAsTry() {
+        try { Thread.sleep(100);
+        }
+        catch (InterruptedException e) {
+          Thread.currentThread().interrupt();
+        }
+    }
+
     private interface MethodDeclarationsWithoutBody
     {
         void aMethod();

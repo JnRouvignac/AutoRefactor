@@ -168,8 +168,7 @@ public class RemoveEmptyLinesRefactoring extends AbstractRefactoringRule {
             return DO_NOT_VISIT_SUBTREE;
         }
 
-        int newLineAfterOpeningCurly = nextLineEnd(openingCurlyIndex);
-        int lastNonWsIndex2 = getIndexOfFirstNonWhitespaceChar(source, newLineAfterOpeningCurly);
+        int lastNonWsIndex2 = getIndexOfFirstNonWhitespaceChar(source, openingCurlyIndex + 1);
         int endOfLineIndex2 = previousLineEnd(lastNonWsIndex2);
         if (maybeRemoveEmptyLines(source, openingCurlyIndex + 1, endOfLineIndex2)) {
             return DO_NOT_VISIT_SUBTREE;
@@ -208,13 +207,13 @@ public class RemoveEmptyLinesRefactoring extends AbstractRefactoringRule {
     public boolean visit(Block node) {
         final String source = this.ctx.getSource(node);
         int openingCurlyIndex = node.getStartPosition();
-        int newLineAfterOpeningCurly = nextLineEnd(openingCurlyIndex);
-        if (newLineAfterOpeningCurly < getEndPosition(node)) {
-            int lastNonWsIndex = getIndexOfFirstNonWhitespaceChar(source, newLineAfterOpeningCurly);
-            int endOfLineIndex = previousLineEnd(lastNonWsIndex);
-            if (maybeRemoveEmptyLines(source, openingCurlyIndex + 1, endOfLineIndex)) {
-                return DO_NOT_VISIT_SUBTREE;
-            }
+        if (openingCurlyOnSameLineAsEndOfNode(node, openingCurlyIndex)) {
+            return VISIT_SUBTREE;
+        }
+        int lastNonWsIndex = getIndexOfFirstNonWhitespaceChar(source, openingCurlyIndex + 1);
+        int endOfLineIndex = previousLineEnd(lastNonWsIndex);
+        if (maybeRemoveEmptyLines(source, openingCurlyIndex + 1, endOfLineIndex)) {
+            return DO_NOT_VISIT_SUBTREE;
         }
         return visitNodeWithClosingCurly(node);
     }
