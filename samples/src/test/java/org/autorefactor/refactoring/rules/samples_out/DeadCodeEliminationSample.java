@@ -34,6 +34,8 @@ public class DeadCodeEliminationSample {
         }
         void doNotRemoveSignificantAnnotation() {
         }
+        protected void doNotRemoveVisibilityChange() {
+        }
     }
 
     private class Child extends Parent {
@@ -41,6 +43,11 @@ public class DeadCodeEliminationSample {
         @Override
         void doNotRemoveSignificantAnnotation() {
             super.doNotRemoveSignificantAnnotation();
+        }
+
+        @Override
+        public void doNotRemoveVisibilityChange() {
+            super.doNotRemoveVisibilityChange();
         }
     }
 

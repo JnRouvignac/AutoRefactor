@@ -211,13 +211,19 @@ public class DeadCodeEliminationRefactoring extends AbstractRefactoringRule {
                 IMethodBinding bodyMethodBinding = bodyMi.resolveMethodBinding();
                 IMethodBinding declMethodBinding = node.resolveBinding();
                 if (declMethodBinding.overrides(bodyMethodBinding)
-                        && !hasSignificantAnnotations(declMethodBinding)) {
+                        && !hasSignificantAnnotations(declMethodBinding)
+                        && haveSameModifiers(bodyMethodBinding, declMethodBinding)) {
                     this.ctx.getRefactorings().remove(node);
                     return DO_NOT_VISIT_SUBTREE;
                 }
             }
         }
         return VISIT_SUBTREE;
+    }
+
+    private boolean haveSameModifiers(IMethodBinding overriding, IMethodBinding overridden) {
+        // UCDetector can suggest to reduce visibility where possible
+        return overriding.getModifiers() == overridden.getModifiers();
     }
 
     private boolean hasSignificantAnnotations(IMethodBinding methodBinding) {
