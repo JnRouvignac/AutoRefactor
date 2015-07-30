@@ -62,7 +62,7 @@ public class ChooseRefactoringsWizard extends Wizard {
     @Override
     public boolean performFinish() {
         final List<RefactoringRule> refactoringRules = chooseRefactoringsPage.getSelectedRefactorings();
-        new PrepareApplyRefactoringsJob(javaElements, null, refactoringRules).schedule();//TODO JNR
+        new PrepareApplyRefactoringsJob(javaElements, null, refactoringRules).schedule(); //TODO JNR
         return !refactoringRules.isEmpty();
     }
 }

@@ -79,7 +79,7 @@ public class ASTCommentRewriter {
      * Removes the provided comment.
      *
      * @param comment the comment to remove
-     * @param textEditGroup
+     * @param textEditGroup the text edit group
      */
     public void remove(Comment comment, TextEditGroup textEditGroup) {
         this.removals.put(comment, textEditGroup);
@@ -90,7 +90,7 @@ public class ASTCommentRewriter {
      *
      * @param comment the comment to replace
      * @param replacement the replacement text
-     * @param textEditGroup
+     * @param textEditGroup the text edit group
      */
     public void replace(Comment comment, String replacement, TextEditGroup textEditGroup) {
         this.replacements.put(Pair.of(comment, replacement), textEditGroup);
@@ -100,7 +100,7 @@ public class ASTCommentRewriter {
      * Converts the provided block comment into a javadoc.
      *
      * @param comment the block comment to convert into a javadoc
-     * @param textEditGroup
+     * @param textEditGroup the text edit group
      */
     public void toJavadoc(BlockComment comment, TextEditGroup textEditGroup) {
         this.blockCommentToJavadoc.put(comment, textEditGroup);
@@ -111,7 +111,7 @@ public class ASTCommentRewriter {
      *
      * @param lineComment the line comment to convert to javadoc
      * @param nextNode the AST node immediately following the line comment
-     * @param textEditGroup
+     * @param textEditGroup the text edit group
      */
     public void toJavadoc(LineComment lineComment, ASTNode nextNode, TextEditGroup textEditGroup) {
         List<LineComment> comments;

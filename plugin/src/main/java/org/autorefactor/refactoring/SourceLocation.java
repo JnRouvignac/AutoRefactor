@@ -62,7 +62,7 @@ public class SourceLocation implements ISourceRange, Comparable<ISourceRange> {
     /**
      * Builds a source location instance from an {@link IRegion}.
      *
-     * @param node the {@link IRegion} where to read positions from
+     * @param region the {@link IRegion} where to read positions from
      */
     public SourceLocation(IRegion region) {
         this(region.getOffset(), region.getLength());
@@ -156,16 +156,34 @@ public class SourceLocation implements ISourceRange, Comparable<ISourceRange> {
                 && getEndPosition(range) <= getEndPosition();
     }
 
+    /**
+     * Whether the current source location contains the provided node.
+     *
+     * @param node the node
+     * @return true if the current source location contains the provided node, false otherwise
+     */
     public boolean contains(ASTNode node) {
         return getStartPosition() <= node.getStartPosition()
                 && getEndPosition(node) <= getEndPosition();
     }
 
+    /**
+     * Whether the current source location is contained into the provided node.
+     *
+     * @param node the node
+     * @return true if the current source location is contained into the provided node, false otherwise
+     */
     public boolean isContainedInto(ASTNode node) {
         return node.getStartPosition() <= getStartPosition()
                 && getEndPosition() <= getEndPosition(node);
     }
 
+    /**
+     * Whether the current source location overlaps with the provided node.
+     *
+     * @param node the node
+     * @return true if the current source location overlaps with the provided node, false otherwise
+     */
     public boolean overlapsWith(ASTNode node) {
         return overlapsLeft(node) || overlapsRight(node);
     }

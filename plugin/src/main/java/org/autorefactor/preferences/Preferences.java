@@ -54,5 +54,5 @@ public interface Preferences {
      *
      * @return true if {@link TextEditGroup} must be used, false otherwise.
      */
-    boolean applyRefactoringsWithTextEditGroup() ;
+    boolean applyRefactoringsWithTextEditGroup();
 }

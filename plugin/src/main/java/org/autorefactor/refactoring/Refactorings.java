@@ -84,6 +84,7 @@ public class Refactorings {
      * Builds an instance of this class.
      *
      * @param ast the AST
+     * @param selection the selected text in the source editor where refactorings will be applied
      */
     public Refactorings(AST ast, SourceLocation selection) {
         this.rewrite = ASTRewrite.create(ast);
@@ -217,7 +218,7 @@ public class Refactorings {
      *
      * @param node the node to remove
      * @param replacement the replacement node
-     * @param transaction TODO
+     * @param transaction the refactoring transaction
      * @see ASTRewrite#replace(ASTNode, ASTNode, TextEditGroup)
      */
     public void replace(ASTNode node, ASTNode replacement, Transaction transaction) {
@@ -235,7 +236,7 @@ public class Refactorings {
      *
      * @param comment the comment to replace
      * @param replacement the replacement text
-     * @param transaction TODO
+     * @param transaction the refactoring transaction
      */
     public void replace(Comment comment, String replacement, Transaction transaction) {
         final Transaction txn = getTxn(transaction);
@@ -252,7 +253,7 @@ public class Refactorings {
      *
      * @param toReplace the source location to replace
      * @param replacement the replacement string
-     * @param transaction TODO
+     * @param transaction the refactoring transaction
      */
     public void replace(SourceLocation toReplace, String replacement, Transaction transaction) {
         final Transaction txn = getTxn(transaction);
@@ -267,7 +268,7 @@ public class Refactorings {
      * Removes the provided node from the AST.
      *
      * @param node the node to remove
-     * @param transaction TODO
+     * @param transaction the refactoring transaction
      * @see ASTRewrite#remove(ASTNode, TextEditGroup)
      */
     public void remove(ASTNode node, Transaction transaction) {
@@ -288,7 +289,7 @@ public class Refactorings {
      * Removes the provided source location from the source.
      *
      * @param toRemove the source location to remove
-     * @param transaction TODO
+     * @param transaction the refactoring transaction
      */
     public void remove(SourceLocation toRemove, Transaction transaction) {
         final Transaction txn = getTxn(transaction);
@@ -303,7 +304,7 @@ public class Refactorings {
      * Removes the provided nodes from the AST.
      *
      * @param nodes the nodes to remove
-     * @param transaction
+     * @param transaction the refactoring transaction
      * @see #remove(ASTNode, TextEditGroup)
      */
     public void remove(Collection<? extends ASTNode> nodes, Transaction transaction) {
@@ -335,6 +336,7 @@ public class Refactorings {
      * @param index the index where to insert the node in the list
      * @param locationInParent the insert location description
      * @param listHolder the node holding the list where to insert
+     * @param transaction the refactoring transaction
      * @see ListRewrite#insertAt(ASTNode, int, TextEditGroup)
      */
     public void insertAt(ASTNode nodeToInsert, int index, StructuralPropertyDescriptor locationInParent,
@@ -388,6 +390,7 @@ public class Refactorings {
      *
      * @param nodeToInsert the node to insert
      * @param element the node serving as a reference location
+     * @param transaction the refactoring transaction
      * @see ListRewrite#insertBefore(ASTNode, ASTNode, TextEditGroup)
      */
     public void insertBefore(ASTNode nodeToInsert, ASTNode element, Transaction transaction) {
@@ -404,6 +407,7 @@ public class Refactorings {
      *
      * @param nodeToInsert the node to insert
      * @param element the node serving as a reference location
+     * @param transaction the refactoring transaction
      * @see ListRewrite#insertAfter(ASTNode, ASTNode, TextEditGroup)
      */
     public void insertAfter(ASTNode nodeToInsert, ASTNode element, Transaction transaction) {
@@ -420,7 +424,7 @@ public class Refactorings {
      *
      * @param lineComment the line comment to convert to javadoc
      * @param nextNode the AST node immediately following the line comment
-     * @param transaction TODO
+     * @param transaction the refactoring transaction
      */
     public void toJavadoc(LineComment lineComment, ASTNode nextNode, Transaction transaction) {
         final Transaction txn = getTxn(transaction);
@@ -435,7 +439,7 @@ public class Refactorings {
      * Adds the provided block comment to convert to javadoc.
      *
      * @param blockComment the block comment to convert to javadoc
-     * @param transaction TODO
+     * @param transaction the refactoring transaction
      */
     public void toJavadoc(BlockComment blockComment, Transaction transaction) {
         final Transaction txn = getTxn(transaction);
@@ -452,6 +456,7 @@ public class Refactorings {
      * @param node the node where to set the property
      * @param property the property to be set
      * @param value the value to set
+     * @param transaction the refactoring transaction
      * @see ASTRewrite#set(ASTNode, StructuralPropertyDescriptor, Object, TextEditGroup)
      */
     public void set(ASTNode node, StructuralPropertyDescriptor property, Object value, Transaction transaction) {
@@ -506,7 +511,7 @@ public class Refactorings {
         List<TextEdit> txnTextEditsCol = Arrays.asList(txnTextEdits);
         for (TextEdit rewrite : textRewrites) {
             if (txnTextEditsCol.contains(rewrite)) {
-              results.add(rewrite);
+                results.add(rewrite);
             }
         }
         return results.toArray(new TextEdit[results.size()]);
@@ -522,7 +527,8 @@ public class Refactorings {
         }
     }
 
-    private Collection<Transaction> getRefactoringsApplicableToSelection(Collection<Transaction> txns, SourceLocation selection) {
+    private Collection<Transaction> getRefactoringsApplicableToSelection(
+            Collection<Transaction> txns, SourceLocation selection) {
         if (selection == null) {
             return txns;
         }
@@ -572,6 +578,12 @@ public class Refactorings {
         return result;
     }
 
+    /**
+     * Returns a new refactoring transaction object.
+     *
+     * @param refactoringRule the rule for which to create the refactoring transaction object.
+     * @return a new refactoring transaction object
+     */
     public Transaction newTransaction(RefactoringRule refactoringRule) {
         return new Transaction(refactoringRule.getClass().getSimpleName().toString());
     }

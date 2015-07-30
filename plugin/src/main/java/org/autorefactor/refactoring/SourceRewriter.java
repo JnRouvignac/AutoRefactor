@@ -47,7 +47,7 @@ public class SourceRewriter {
      * Removes the provided source location from the source.
      *
      * @param toRemove the source location to remove
-     * @param textEditGroup
+     * @param textEditGroup the text edit group
      */
     public void remove(SourceLocation toRemove, TextEditGroup textEditGroup) {
         this.removals.put(toRemove, textEditGroup);
@@ -58,7 +58,7 @@ public class SourceRewriter {
      *
      * @param toReplace the source location to replace
      * @param replacement the replacement string
-     * @param textEditGroup
+     * @param textEditGroup the text edit group
      */
     public void replace(SourceLocation toReplace, String replacement, TextEditGroup textEditGroup) {
         this.replacements.put(toReplace, Pair.of(replacement, textEditGroup));

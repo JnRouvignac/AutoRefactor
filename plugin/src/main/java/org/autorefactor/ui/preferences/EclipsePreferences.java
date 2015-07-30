@@ -64,6 +64,7 @@ public class EclipsePreferences implements Preferences {
         return getBoolean(ADD_CURLY_BRACKETS_TO_STATEMENT_BODIES);
     }
 
+    @Override
     public boolean applyRefactoringsWithTextEditGroup() {
         return getBoolean(PreferenceConstants.APPLY_REFACTORINGS_WITH_TEXTEDITGROUP);
     }

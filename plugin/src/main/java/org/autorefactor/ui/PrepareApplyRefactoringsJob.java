@@ -67,7 +67,8 @@ public class PrepareApplyRefactoringsJob extends Job {
      * @param selection the selected source location
      * @param refactoringRulesToApply the refactorings to apply
      */
-    public PrepareApplyRefactoringsJob(List<IJavaElement> javaElements, SourceLocation selection, List<RefactoringRule> refactoringRulesToApply) {
+    public PrepareApplyRefactoringsJob(List<IJavaElement> javaElements, SourceLocation selection,
+            List<RefactoringRule> refactoringRulesToApply) {
         super("Prepare Auto Refactor");
         setPriority(Job.SHORT);
         this.javaElements = javaElements;

@@ -57,9 +57,10 @@ public class RefactoringContext {
      * @param compilationUnit the compilation unit to refactor
      * @param astRoot the compilation unit, root of the AST
      * @param options the Java project options used to compile the project
-     * @param selection
+     * @param selection the selected text in the source editor where refactorings will be applied
      */
-    public RefactoringContext(ICompilationUnit compilationUnit, CompilationUnit astRoot, JavaProjectOptions options, SourceLocation selection) {
+    public RefactoringContext(ICompilationUnit compilationUnit, CompilationUnit astRoot,
+            JavaProjectOptions options, SourceLocation selection) {
         this.compilationUnit = compilationUnit;
         this.astRoot = astRoot;
         this.refactorings = new Refactorings(astRoot.getAST(), selection);

@@ -95,6 +95,7 @@ import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 import org.eclipse.jdt.core.dom.WhileStatement;
 import org.eclipse.jdt.core.dom.WildcardType;
 
+/** Forwards method calls to a delegate ASTVisitor. */
 public class ForwardingASTVisitor extends ASTVisitor implements JavaRefactoringRule {
 
     @Override
@@ -111,6 +112,11 @@ public class ForwardingASTVisitor extends ASTVisitor implements JavaRefactoringR
     private final boolean isRefactoringRule;
     private RefactoringContext ctx;
 
+    /**
+     * Constructor.
+     *
+     * @param delegate the delegate ASTVisitor where method calls will be forwarded to.
+     */
     public ForwardingASTVisitor(ASTVisitor delegate) {
         this.delegate = delegate;
         this.isRefactoringRule = delegate instanceof RefactoringRule;
