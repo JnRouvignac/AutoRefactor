@@ -91,13 +91,13 @@ public class StringRefactoring extends AbstractRefactoringRule {
                         && !node.equals(rmi)
                         && (leftOpIsString || rightOpIsString)) {
                     // node is in the extended operands
-                    this.ctx.getRefactorings().replace(node, b.move(node.getExpression()));
+                    ctx.getRefactorings().replace(node, replaceToString(node.getExpression()));
                     return VISIT_SUBTREE;
                 } else if (leftOpIsString && isMethod(rmi, "java.lang.Object", "toString")) {
-                    this.ctx.getRefactorings().replace(rmi, b.move(rmi.getExpression()));
+                    ctx.getRefactorings().replace(rmi, replaceToString(rmi.getExpression()));
                     return VISIT_SUBTREE;
                 } else if (rightOpIsString && node.equals(lmi)) {
-                    this.ctx.getRefactorings().replace(lmi, b.move(lmi.getExpression()));
+                    ctx.getRefactorings().replace(lmi, replaceToString(lmi.getExpression()));
                     return DO_NOT_VISIT_SUBTREE;
                 }
             }
@@ -125,6 +125,15 @@ public class StringRefactoring extends AbstractRefactoringRule {
             }
         }
         return VISIT_SUBTREE;
+    }
+
+    private Expression replaceToString(Expression expression) {
+        final ASTBuilder b = ctx.getASTBuilder();
+        if (expression != null) {
+            return b.move(expression);
+        } else {
+            return b.this0();
+        }
     }
 
     private boolean isToStringForPrimitive(MethodInvocation node) {

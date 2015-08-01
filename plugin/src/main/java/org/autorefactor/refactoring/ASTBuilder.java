@@ -62,6 +62,7 @@ import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.StringLiteral;
 import org.eclipse.jdt.core.dom.StructuralPropertyDescriptor;
+import org.eclipse.jdt.core.dom.ThisExpression;
 import org.eclipse.jdt.core.dom.ThrowStatement;
 import org.eclipse.jdt.core.dom.TryStatement;
 import org.eclipse.jdt.core.dom.Type;
@@ -679,6 +680,15 @@ public class ASTBuilder {
         final StringLiteral sl = ast.newStringLiteral();
         sl.setLiteralValue(s);
         return sl;
+    }
+
+    /**
+     * Builds a new {@link ThisExpression} instance.
+     *
+     * @return a new this expression
+     */
+    public ThisExpression this0() {
+        return ast.newThisExpression();
     }
 
     /**

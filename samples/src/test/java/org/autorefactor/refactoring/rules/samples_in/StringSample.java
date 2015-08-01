@@ -52,6 +52,12 @@ public class StringSample {
         return s1 + s2;
     }
 
+    public String replaceToStringCallOnCurrentObjectInStringConcat() {
+        String s1 = "" + toString() + toString();
+        String s2 = toString() + "" + toString();
+        return s1 + s2;
+    }
+
     public String doNotReplaceToStringCallOutsideStringConcat() {
         return Boolean.TRUE.toString();
     }
