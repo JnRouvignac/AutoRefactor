@@ -81,9 +81,11 @@ public class RemoveEmptyLinesRefactoring extends AbstractRefactoringRule {
         if (node.getPackage() != null) {
             int lastIndex = node.getPackage().getStartPosition();
             int lastNonWsIndex = getLastIndexOfNonWhitespaceChar(source, lastIndex - 1);
-            int endOfLineIndex = beforeNewlineChars(source, lastNonWsIndex);
-            if (maybeRemoveEmptyLines(source, endOfLineIndex, lastIndex)) {
-                return DO_NOT_VISIT_SUBTREE;
+            if (lastNonWsIndex != -1) {
+                int endOfLineIndex = beforeNewlineChars(source, lastNonWsIndex);
+                if (maybeRemoveEmptyLines(source, endOfLineIndex, lastIndex)) {
+                    return DO_NOT_VISIT_SUBTREE;
+                }
             }
         }
 
