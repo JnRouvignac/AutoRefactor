@@ -98,7 +98,7 @@ public class RemoveEmptyLinesRefactoring extends AbstractRefactoringRule {
             if (!"\r\n\r\n".equals(matchedString)
                     && !"\n\n".equals(matchedString)
                     && !"\r\r".equals(matchedString)) {
-                r.replace(toSourceLocation(m, 0), substring(source, m, 1));
+                r.remove(SourceLocation.fromPositions(m.end(1), m.end(0)));
                 result = DO_NOT_VISIT_SUBTREE;
             }
         }
@@ -135,14 +135,6 @@ public class RemoveEmptyLinesRefactoring extends AbstractRefactoringRule {
             }
         }
         return fromIndex;
-    }
-
-    private SourceLocation toSourceLocation(Matcher m, int groupNumber) {
-        return SourceLocation.fromPositions(m.start(groupNumber), m.end(groupNumber));
-    }
-
-    private String substring(String s, Matcher m, int groupNumber) {
-        return s.substring(m.start(groupNumber), m.end(groupNumber));
     }
 
     @Override
@@ -248,10 +240,8 @@ public class RemoveEmptyLinesRefactoring extends AbstractRefactoringRule {
             Matcher matcher = NEWLINE_PATTERN.matcher(source).region(endOfLineIndex, newLineIndex);
             boolean isEqualToNewline = matcher.matches();
             if (!isEqualToNewline && matcher.find()) {
-                String newlineChars = matcher.group();
-                this.ctx.getRefactorings().replace(
-                        SourceLocation.fromPositions(endOfLineIndex, newLineIndex),
-                        newlineChars);
+                final SourceLocation toRemove = SourceLocation.fromPositions(matcher.end(), newLineIndex);
+                this.ctx.getRefactorings().remove(toRemove);
                 return true;
             }
         }
