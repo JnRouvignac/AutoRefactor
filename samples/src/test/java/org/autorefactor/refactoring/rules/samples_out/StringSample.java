@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2013-2014 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2013-2015 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -56,6 +56,14 @@ public class StringSample {
         String s1 = "" + this + this;
         String s2 = this + "" + this;
         return s1 + s2;
+    }
+
+    public class TestWithQualifiedToString {
+        public String replaceToStringCallOnCurrentObjectInStringConcat() {
+            String s1 = "" + StringSample.this + StringSample.this + this;
+            String s2 = StringSample.this + "" + this;
+            return s1 + s2;
+        }
     }
 
     public String doNotReplaceToStringCallOutsideStringConcat() {
