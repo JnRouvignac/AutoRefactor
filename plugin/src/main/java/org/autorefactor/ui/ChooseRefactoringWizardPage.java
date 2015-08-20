@@ -201,9 +201,8 @@ public class ChooseRefactoringWizardPage extends WizardPage {
         tableViewer.setComparator(new ViewerComparator() {
             @Override
             public int compare(Viewer viewer, Object o1, Object o2) {
-                // o1 and o2 are IRefactoring objects
-                return o1.getClass().getSimpleName().compareTo(
-                        o2.getClass().getSimpleName());
+                return ((RefactoringRule) o1).getName().compareTo(
+                        ((RefactoringRule) o2).getName());
             }
         });
         tableViewer.addFilter(new ViewerFilter() {
