@@ -17,3 +17,6 @@ AutoRefactor is distributed under the terms of both the
 Eclipse Public License v1.0 and the GNU GPLv3+.
 
 See LICENSE-ECLIPSE, LICENSE-GNUGPL, and COPYRIGHT for details.
+
+
+One change to test ff merges
