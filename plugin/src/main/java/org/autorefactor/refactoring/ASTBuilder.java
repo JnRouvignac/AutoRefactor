@@ -54,6 +54,7 @@ import org.eclipse.jdt.core.dom.NumberLiteral;
 import org.eclipse.jdt.core.dom.ParameterizedType;
 import org.eclipse.jdt.core.dom.ParenthesizedExpression;
 import org.eclipse.jdt.core.dom.PrefixExpression;
+import org.eclipse.jdt.core.dom.PrimitiveType;
 import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.SimpleType;
@@ -66,6 +67,9 @@ import org.eclipse.jdt.core.dom.ThisExpression;
 import org.eclipse.jdt.core.dom.ThrowStatement;
 import org.eclipse.jdt.core.dom.TryStatement;
 import org.eclipse.jdt.core.dom.Type;
+import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
+import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
+import org.eclipse.jdt.core.dom.PrimitiveType.Code;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.autorefactor.util.Utils.*;
@@ -190,7 +194,12 @@ public class ASTBuilder {
     private Type type(String typeName) {
         final String[] names = typeName.split("\\.");
         if (names.length == 1) {
-            return ast.newSimpleType(ast.newSimpleName(names[0]));
+            final String name = names[0];
+            final Code primitiveTypeCode = PrimitiveType.toCode(name);
+            if (primitiveTypeCode != null) {
+                return ast.newPrimitiveType(primitiveTypeCode);
+            }
+            return ast.newSimpleType(ast.newSimpleName(name));
         } else {
             throw new NotImplementedException(null);
         }
@@ -308,6 +317,26 @@ public class ASTBuilder {
     @SuppressWarnings("unchecked")
     public <T extends ASTNode> List<T> copySubtrees(List<T> nodes) {
         return ASTNode.copySubtrees(ast, nodes);
+    }
+
+    /**
+     * Builds a new {@link VariableDeclarationStatement} instance.
+     *
+     * @param type
+     *            the declared variable type
+     * @param varName
+     *            the declared variable name
+     * @param initializer
+     *            the variable initializer, can be null
+     * @return a new variable declaration statement
+     */
+    public VariableDeclarationStatement declare(String type, SimpleName varName, Expression initializer) {
+        final VariableDeclarationFragment vdf = ast.newVariableDeclarationFragment();
+        vdf.setName(varName);
+        vdf.setInitializer(initializer);
+        final VariableDeclarationStatement vds = ast.newVariableDeclarationStatement(vdf);
+        vds.setType(type(type));
+        return vds;
     }
 
     /**

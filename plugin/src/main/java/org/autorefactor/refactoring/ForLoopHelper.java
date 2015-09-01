@@ -27,6 +27,7 @@ package org.autorefactor.refactoring;
 
 import java.util.List;
 
+import org.autorefactor.util.Pair;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ForStatement;
@@ -70,11 +71,43 @@ public final class ForLoopHelper {
 
     /** The content of the for loop. */
     public static final class ForLoopContent {
+        private IterationType iterationType;
+        private ContainerType containerType;
+        private Name containerVariable;
+        private Expression iteratorVariable;
         private Name loopVariable;
         private Name elementVariable;
-        private Name containerVariable;
-        private ContainerType containerType;
-        private IterationType iterationType;
+
+        private ForLoopContent() {
+           // use method factories
+        }
+
+        private static ForLoopContent indexedArray(Name containerVariable, Name loopVariable) {
+            final ForLoopContent content = new ForLoopContent();
+            content.iterationType = IterationType.INDEX;
+            content.containerType = ContainerType.ARRAY;
+            content.containerVariable = containerVariable;
+            content.loopVariable = loopVariable;
+            return content;
+        }
+
+        private static ForLoopContent indexedCollection(Name containerVariable, Name loopVariable) {
+            final ForLoopContent content = new ForLoopContent();
+            content.iterationType = IterationType.INDEX;
+            content.containerType = ContainerType.COLLECTION;
+            content.containerVariable = containerVariable;
+            content.loopVariable = loopVariable;
+            return content;
+        }
+
+        private static ForLoopContent iteratedCollection(Expression iteratorVariable, Name containerVariable) {
+            final ForLoopContent content = new ForLoopContent();
+            content.iterationType = IterationType.ITERATOR;
+            content.containerType = ContainerType.COLLECTION;
+            content.containerVariable = containerVariable;
+            content.iteratorVariable = iteratorVariable;
+            return content;
+        }
 
         /**
          * Returns the name of the index variable.
@@ -104,6 +137,15 @@ public final class ForLoopHelper {
         }
 
         /**
+         * Returns the name of the iterator variable.
+         *
+         * @return the name of the iterator variable
+         */
+        public Expression getIteratorVariable() {
+            return iteratorVariable;
+        }
+
+        /**
          * Returns the container type.
          *
          * @return the container type
@@ -127,6 +169,7 @@ public final class ForLoopHelper {
                     + "iterationType=" + iterationType
                     + ", containerType=" + containerType
                     + ", containerVariable=" + containerVariable
+                    + ", iteratorVariable=" + iteratorVariable
                     + ", loopVariable=" + loopVariable
                     + ", elementVariable=" + elementVariable
                     + ")";
@@ -143,15 +186,39 @@ public final class ForLoopHelper {
         final List<Expression> initializers = initializers(node);
         final Expression condition = node.getExpression();
         final List<Expression> updaters = updaters(node);
-        if (initializers.size() == 1 && updaters.size() == 1) {
-            final Name init = getInitializerOperand(initializers.get(0));
-            final ForLoopContent forContent = getIndexOnCollection(condition);
-            final Name updater = getUpdaterOperand(updaters.get(0));
-            if (forContent != null
-                    && isSameVariable(init, forContent.loopVariable)
-                    && isSameVariable(init, updater)) {
-                return forContent;
+        if (initializers.size() == 1) {
+            Expression firstInit = initializers.get(0);
+            if (updaters.isEmpty()) {
+                final Pair<Name, Expression> initPair = decomposeInitializer(firstInit);
+                final Name init = initPair.getFirst();
+                final MethodInvocation condMi = as(node.getExpression(), MethodInvocation.class);
+                final MethodInvocation initMi = as(initPair.getSecond(), MethodInvocation.class);
+                if (condMi != null
+                        && isSameVariable(init, condMi.getExpression())
+                        && isMethod(initMi, "java.util.Collection", "iterator")
+                        && isMethod(condMi, "java.util.Iterator", "hasNext")) {
+                    return getIteratorOnCollection(initMi.getExpression(), condMi.getExpression());
+                }
+            } else if (updaters.size() == 1
+                    && isPrimitive(firstInit, "int")) {
+                final Pair<Name, Expression> initPair = decomposeInitializer(firstInit);
+                final Name init = initPair.getFirst();
+                final ForLoopContent forContent = getIndexOnIterable(condition);
+                final Name updater = getUpdaterOperand(updaters.get(0));
+                if (forContent != null
+                        && isZero(initPair.getSecond())
+                        && isSameVariable(init, forContent.loopVariable)
+                        && isSameVariable(init, updater)) {
+                    return forContent;
+                }
             }
+        }
+        return null;
+    }
+
+    private static ForLoopContent getIteratorOnCollection(Expression containerVar, Expression iteratorVariable) {
+        if (containerVar instanceof Name) {
+            return ForLoopContent.iteratedCollection(iteratorVariable, (Name) containerVar);
         }
         return null;
     }
@@ -175,28 +242,31 @@ public final class ForLoopHelper {
         return null;
     }
 
-    private static Name getInitializerOperand(Expression init) {
-        if (!isPrimitive(init, "int")) {
-            return null;
-        }
+    /**
+     * Decomposes an initializer into a {@link Pair} with the name of the initialized variable
+     * and the initializing expression.
+     *
+     * @param init
+     *          the initializer to decompose
+     * @return a {@link Pair} with the name of the initialized variable and the initializing
+     *         expression, or {@code null} if the initializer could not be decomposed
+     */
+    public static Pair<Name, Expression> decomposeInitializer(Expression init) {
         if (init instanceof VariableDeclarationExpression) {
             final VariableDeclarationExpression vde = (VariableDeclarationExpression) init;
             final List<VariableDeclarationFragment> fragments = fragments(vde);
             if (fragments.size() == 1) {
                 final VariableDeclarationFragment fragment = fragments.get(0);
-                if (isZero(fragment.getInitializer())) {
-                    return fragment.getName();
-                }
+                return Pair.of((Name) fragment.getName(), fragment.getInitializer());
             }
         } else if (init instanceof Assignment) {
             final Assignment as = (Assignment) init;
             if (hasOperator(as, ASSIGN)
-                    && isZero(as.getRightHandSide())
                     && as.getLeftHandSide() instanceof Name) {
-                return (Name) as.getLeftHandSide();
+                return Pair.of((Name) as.getLeftHandSide(), as.getRightHandSide());
             }
         }
-        return null;
+        return Pair.empty();
     }
 
     private static boolean isZero(final Expression expr) {
@@ -209,7 +279,7 @@ public final class ForLoopHelper {
         return false;
     }
 
-    private static ForLoopContent getIndexOnCollection(final Expression condition) {
+    private static ForLoopContent getIndexOnIterable(final Expression condition) {
         final InfixExpression ie = as(condition, InfixExpression.class);
         if (ie != null && !ie.hasExtendedOperands()) {
             final Expression leftOp = ie.getLeftOperand();
@@ -232,22 +302,13 @@ public final class ForLoopHelper {
             final Name containerVarName = as(mi.getExpression(), Name.class);
             if (containerVarName != null
                     && isMethod(mi, "java.util.Collection", "size")) {
-                final ForLoopContent content = new ForLoopContent();
-                content.loopVariable = (Name) loopVar;
-                content.containerVariable = containerVarName;
-                content.containerType = ContainerType.COLLECTION;
-                content.iterationType = IterationType.INDEX;
-                return content;
+                return ForLoopContent.indexedCollection(containerVarName, (Name) loopVar);
             }
         } else if (containerVar instanceof QualifiedName) {
             final QualifiedName containerVarName = (QualifiedName) containerVar;
             if (isArrayLength(containerVarName)) {
-                final ForLoopContent content = new ForLoopContent();
-                content.loopVariable = (Name) loopVar;
-                content.containerVariable = ((QualifiedName) containerVar).getQualifier();
-                content.containerType = ContainerType.ARRAY;
-                content.iterationType = IterationType.INDEX;
-                return content;
+                Name containerVariable = ((QualifiedName) containerVar).getQualifier();
+                return ForLoopContent.indexedArray(containerVariable, (Name) loopVar);
             }
         }
         return null;

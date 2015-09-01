@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2013-2014 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2013-2015 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -41,6 +41,19 @@ public final class Pair<F, S> {
     private final F first;
     /** second object. */
     private final S second;
+
+    /**
+     * Returns an immutable empty pair.
+     *
+     * @param <F>
+     *            the first element type
+     * @param <S>
+     *            the second element type
+     * @return an immutable empty
+     */
+    public static <F, S> Pair<F, S> empty() {
+        return new Pair<F, S>(null, null);
+    }
 
     /**
      * Returns an immutable pair made of the two objects.
@@ -91,7 +104,6 @@ public final class Pair<F, S> {
         return second;
     }
 
-    /** {@inheritDoc} */
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -101,7 +113,6 @@ public final class Pair<F, S> {
         return result;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
@@ -119,5 +130,4 @@ public final class Pair<F, S> {
     public String toString() {
         return "FIRST: " + first + " SECOND: " + second;
     }
-
 }

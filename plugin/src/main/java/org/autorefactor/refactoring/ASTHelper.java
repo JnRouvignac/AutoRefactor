@@ -809,6 +809,24 @@ public final class ASTHelper {
     }
 
     /**
+     * Returns the previous statement in the source file if it exists.
+     *
+     * @param startNode the start node
+     * @return the previous statement in the source file if it exists, null otherwise
+     */
+    public static Statement getPreviousStatement(Statement startNode) {
+        final Statement previousSibling = getPreviousSibling(startNode);
+        if (previousSibling != null) {
+            return previousSibling;
+        }
+        final ASTNode parent = startNode.getParent();
+        if (parent instanceof Statement) {
+            return getPreviousStatement((Statement) parent);
+        }
+        return null;
+    }
+
+    /**
      * Returns the next body declaration in the same block if it exists.
      *
      * @param startNode the start node
