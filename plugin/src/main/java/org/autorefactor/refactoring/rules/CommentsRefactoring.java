@@ -41,9 +41,13 @@ import org.eclipse.jdt.core.dom.BlockComment;
 import org.eclipse.jdt.core.dom.BodyDeclaration;
 import org.eclipse.jdt.core.dom.Comment;
 import org.eclipse.jdt.core.dom.CompilationUnit;
+import org.eclipse.jdt.core.dom.IExtendedModifier;
 import org.eclipse.jdt.core.dom.Javadoc;
 import org.eclipse.jdt.core.dom.LineComment;
+import org.eclipse.jdt.core.dom.MarkerAnnotation;
+import org.eclipse.jdt.core.dom.Name;
 import org.eclipse.jdt.core.dom.NodeFinder;
+import org.eclipse.jdt.core.dom.NormalAnnotation;
 import org.eclipse.jdt.core.dom.PackageDeclaration;
 import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.TagElement;
@@ -62,7 +66,6 @@ import static org.eclipse.jdt.core.dom.TagElement.*;
  * <li>TODO Fix typo in comments</li>
  * </ul>
  */
-@SuppressWarnings("javadoc")
 public class CommentsRefactoring extends AbstractRefactoringRule {
 
     @Override
@@ -205,18 +208,25 @@ public class CommentsRefactoring extends AbstractRefactoringRule {
         } else if (allTagsEmpty(tags(node))) {
             this.ctx.getRefactorings().remove(node);
             return DO_NOT_VISIT_SUBTREE;
+        } else if (!acceptJavadoc(getNextNode(node))) {
+            this.ctx.getRefactorings().replace(node, comment.replace("/**", "/*"));
+            return DO_NOT_VISIT_SUBTREE;
         } else if (!isWellFormattedInheritDoc
                 && JAVADOC_ONLY_INHERITDOC.matcher(comment).matches()) {
-            // Put on one line only to augment vertical density of code
+            final ASTNode nextNode = getNextNode(node);
+            if (hasOverrideAnnotation(nextNode)) {
+                // {@inheritDoc} tag is redundant with @Override annotation
+                this.ctx.getRefactorings().remove(node);
+                return DO_NOT_VISIT_SUBTREE;
+            }
+
+            // Put on one line only, to augment vertical density of code
             int startLine = this.astRoot.getLineNumber(node.getStartPosition());
             int endLine = this.astRoot.getLineNumber(node.getStartPosition() + node.getLength());
             if (startLine != endLine) {
                 this.ctx.getRefactorings().replace(node, "/** {@inheritDoc} */");
                 return DO_NOT_VISIT_SUBTREE;
             }
-        } else if (!acceptJavadoc(getNextNode(node))) {
-            this.ctx.getRefactorings().replace(node, comment.replace("/**", "/*"));
-            return DO_NOT_VISIT_SUBTREE;
         } else if (!isWellFormattedInheritDoc
                 && !JAVADOC_HAS_PUNCTUATION.matcher(comment).find()) {
             final String newComment = addPeriodAtEndOfFirstLine(node, comment);
@@ -242,6 +252,24 @@ public class CommentsRefactoring extends AbstractRefactoringRule {
             }
         }
         return VISIT_SUBTREE;
+    }
+
+    private boolean hasOverrideAnnotation(ASTNode node) {
+        if (node instanceof BodyDeclaration) {
+            for (IExtendedModifier modifier : modifiers(((BodyDeclaration) node))) {
+                return hasType(getTypeName(modifier), "java.lang.Override");
+            }
+        }
+        return false;
+    }
+
+    private Name getTypeName(IExtendedModifier extendedModifier) {
+        if (extendedModifier instanceof MarkerAnnotation) {
+            return ((MarkerAnnotation) extendedModifier).getTypeName();
+        } else if (extendedModifier instanceof NormalAnnotation) {
+            return ((NormalAnnotation) extendedModifier).getTypeName();
+        }
+        return null;
     }
 
     private boolean hasNoTags(Javadoc node) {

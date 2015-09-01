@@ -25,7 +25,9 @@
  */
 package org.autorefactor.refactoring.rules.samples_out;
 
-public class CommentsSample implements Runnable {
+import java.util.concurrent.Callable;
+
+public class CommentsSample implements Runnable, Callable<Void> {
 
     /** @NonNull */
     public Object o = new Object();
@@ -99,9 +101,13 @@ public class CommentsSample implements Runnable {
     public void test5() {
     }
 
-    /** {@inheritDoc} */
     @Override
     public void run() {
+    }
+
+    /** {@inheritDoc} */
+    public Void call() {
+        return null;
     }
 
     /** Remove empty line at start and end of this javadoc. */
