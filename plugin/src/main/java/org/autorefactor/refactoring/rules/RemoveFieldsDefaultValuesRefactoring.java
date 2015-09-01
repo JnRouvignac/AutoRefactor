@@ -26,6 +26,8 @@
 package org.autorefactor.refactoring.rules;
 
 import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
+import org.eclipse.jdt.core.dom.EnumDeclaration;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.ITypeBinding;
@@ -36,7 +38,6 @@ import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.eclipse.jdt.core.dom.Modifier.*;
 
 /** See {@link #getDescription()} method. */
-@SuppressWarnings("javadoc")
 public class RemoveFieldsDefaultValuesRefactoring extends AbstractRefactoringRule {
 
     @Override
@@ -54,7 +55,7 @@ public class RemoveFieldsDefaultValuesRefactoring extends AbstractRefactoringRul
 
     @Override
     public boolean visit(FieldDeclaration node) {
-        if (canProceed(node.getParent())) {
+        if (!canRemoveFieldDefaultValue(node)) {
             return VISIT_SUBTREE;
         }
         final ITypeBinding fieldType = node.getType().resolveBinding();
@@ -81,13 +82,15 @@ public class RemoveFieldsDefaultValuesRefactoring extends AbstractRefactoringRul
         return visitSubtree;
     }
 
-    private boolean canProceed(final ASTNode parent) {
+    private boolean canRemoveFieldDefaultValue(final FieldDeclaration node) {
+        // Do not remove default values from interface/annotation fields
+        // because they are final by default
+        final ASTNode parent = node.getParent();
         if (parent instanceof TypeDeclaration) {
-            // Do not remove default values from interface fields
-            // because they are final by default
-            return ((TypeDeclaration) parent).isInterface();
+            return !((TypeDeclaration) parent).isInterface();
         }
-        return true;
+        return parent instanceof AnonymousClassDeclaration
+            || parent instanceof EnumDeclaration;
     }
 
     private boolean isPrimitiveDefaultValue(Object val) {
@@ -117,5 +120,4 @@ public class RemoveFieldsDefaultValuesRefactoring extends AbstractRefactoringRul
             return false;
         }
     }
-
 }

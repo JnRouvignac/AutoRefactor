@@ -25,6 +25,9 @@
  */
 package org.autorefactor.refactoring.rules.samples_in;
 
+import java.util.Collection;
+import java.util.Iterator;
+
 public class RemoveFieldsDefaultValuesSample {
 
     private interface Constants {
@@ -49,4 +52,24 @@ public class RemoveFieldsDefaultValuesSample {
     private float f1 = 0, f2 = 0f, f3 = 0F, f4 = 0.0f;
     private double d1 = 0, d2 = 0.0;
 
+    public Iterable<String> getIterable() {
+        return new Iterable<String>() {
+            private Collection<String> aField = null;
+
+            @Override
+            public Iterator<String> iterator() {
+                return aField.iterator();
+            }
+        };
+    }
+
+    private enum MyEnum {
+        ONE, TWO;
+
+        String aField = null;
+    }
+
+    private @interface MyAnnotation {
+        String aField = null;
+    }
 }
