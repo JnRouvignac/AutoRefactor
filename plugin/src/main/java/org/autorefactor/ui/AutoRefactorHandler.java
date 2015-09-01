@@ -25,7 +25,6 @@
  */
 package org.autorefactor.ui;
 
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -92,17 +91,14 @@ public class AutoRefactorHandler extends AbstractHandler {
             if (javaElement instanceof ICompilationUnit) {
                 return Collections.singletonList(javaElement);
             }
-            Display.getDefault().asyncExec(new Runnable() {
-                @Override
-                public void run() {
-                    openInformation(shell, "Info", "This action only works on Java source files");
-                }
-            });
-        } else if ("org.eclipse.jdt.ui.PackageExplorer".equals(activePartId)) {
+            openInfoBox(shell, "This action only works on Java source files");
+            return Collections.emptyList();
+        } else if ("org.eclipse.jdt.ui.PackageExplorer".equals(activePartId)
+                || "org.eclipse.search.ui.views.SearchView".equals(activePartId)
+                || "org.eclipse.ui.views.ContentOutline".equals(activePartId)) {
             final IStructuredSelection selection = (IStructuredSelection) HandlerUtil.getCurrentSelection(event);
             final List<IJavaElement> results = new ArrayList<IJavaElement>();
-            final Iterator<?> it = selection.iterator();
-            while (it.hasNext()) {
+            for (final Iterator<?> it = selection.iterator(); it.hasNext();) {
                 final Object el = it.next();
                 if (el instanceof ICompilationUnit
                         || el instanceof IPackageFragment
@@ -110,20 +106,26 @@ public class AutoRefactorHandler extends AbstractHandler {
                         || el instanceof IJavaProject) {
                     results.add((IJavaElement) el);
                 } else {
-                    Display.getDefault().asyncExec(new Runnable() {
-                        @Override
-                        public void run() {
-                            openInformation(shell, "Info",
-                                "Please select a Java source file, Java package or Java project");
-                        }
-                    });
+                    // Can be IType, IMethod, IField, etc.
+                    openInfoBox(shell,
+                            "Please select a Java source file, Java package or Java project.\n\n"
+                            + "Cannot handle this object yet:\n" + el);
+                    return Collections.emptyList();
                 }
             }
             return results;
         } else {
             logWarning("Code is not implemented for activePartId '" + activePartId + "'.");
+            return Collections.emptyList();
         }
-        return Collections.emptyList();
     }
 
+    private static void openInfoBox(final Shell shell, final String message) {
+        Display.getDefault().asyncExec(new Runnable() {
+            @Override
+            public void run() {
+                openInformation(shell, "Info", message);
+            }
+        });
+    }
 }

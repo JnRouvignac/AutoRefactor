@@ -27,7 +27,20 @@
 -->
 <plugin>
     <extension point="org.eclipse.ui.menus">
-        <menuContribution locationURI="popup:org.eclipse.jdt.ui.PackageExplorer?after=org.eclipse.jdt.ui.refactoring.menu">
+        <!-- Cannot add to Refactor sub menu: @see https://issues.jboss.org/browse/JBIDE-1077 from Alexey Kazakov:
+
+             More precisely @see https://issues.jboss.org/browse/JBIDE-1077#comment-12466929:
+             "Unfortunately we can't use this context menu... "Refactor" is assembled programmatically by JDT and it ignores any custom extensions."
+
+             and            @see https://issues.jboss.org/browse/JBIDE-1077#comment-12466953
+             "Me, Viktor and Denis tried to find a way to add any custom action in "Refactor" menu. We tried to use standard Eclipse extension points to point it to the same menu as JDT does but without success.
+             Viktor found out that JDT hard codes items for that menu and it seems that there is no way to add our item there. But it was almost a year ago and maybe JDT has changed something... I doubt that but anyway let's research it in Eclipse 3.5."
+
+             @see org.eclipse.jdt.ui.actions.RefactorActionGroup
+        -->
+        <menuContribution
+               allPopups="true"
+               locationURI="popup:org.eclipse.ui.popup.any?after=org.eclipse.jdt.ui.refactoring.menu">
             <!-- See http://blog.richclientgui.com/?p=50
                  "Eclipse RCP Commands Part 3: visibleWhen and Core Expressions"
                  http://wiki.eclipse.org/Platform_Expression_Framework
@@ -43,25 +56,6 @@
                     </or>
                 </iterate>
             </visibleWhen>
-            <menu label="AutoRefactor">
-                <command style="push"
-                         commandId="org.autorefactor.automatic.refactoring" />
-                <command style="push"
-                         commandId="org.autorefactor.choose.refactorings" />
-            </menu>
-        </menuContribution>
-        <!-- Cannot add to Refactor sub menu: @see https://issues.jboss.org/browse/JBIDE-1077 from Alexey Kazakov:
-
-             More precisely @see https://issues.jboss.org/browse/JBIDE-1077#comment-12466929:
-			"Unfortunately we can't use this context menu... "Refactor" is assembled programmatically by JDT and it ignores any custom extensions."
-
-             and            @see https://issues.jboss.org/browse/JBIDE-1077#comment-12466953
-			"Me, Viktor and Denis tried to find a way to add any custom action in "Refactor" menu. We tried to use standard Eclipse extension points to point it to the same menu as JDT does but without success.
-			Viktor found out that JDT hard codes items for that menu and it seems that there is no way to add our item there. But it was almost a year ago and maybe JDT has changed something... I doubt that but anyway let's research it in Eclipse 3.5."
-
-			@see org.eclipse.jdt.ui.actions.RefactorActionGroup
-        -->
-        <menuContribution locationURI="popup:#CompilationUnitEditorContext?after=org.eclipse.jdt.ui.refactoring.menu">
             <menu label="AutoRefactor">
                 <command style="push"
                          commandId="org.autorefactor.automatic.refactoring" />
