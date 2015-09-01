@@ -120,16 +120,32 @@ public class ChooseRefactoringWizardPage extends WizardPage {
     }
 
     /**
-     * Returns the refactorings (selected by the user) to apply to the selected elements.
+     * Returns the refactoring rules (selected by the user) to apply to the selected elements.
      *
-     * @return the refactorings (selected by the user) to apply to the selected elements
+     * @return the refactoring rules (selected by the user) to apply to the selected elements
      */
-    public List<RefactoringRule> getSelectedRefactorings() {
+    public List<RefactoringRule> getSelectedRefactoringRules() {
         final ArrayList<RefactoringRule> results = new ArrayList<RefactoringRule>();
         for (Object o : tableViewer.getCheckedElements()) {
             results.add((RefactoringRule) o);
         }
         return results;
+    }
+
+    public List<RefactoringRule> getFilteredRefactoringRules() {
+        try {
+            Method m = StructuredViewer.class.getDeclaredMethod("getFilteredChildren", Object.class);
+            m.setAccessible(true);
+            Object[] children = (Object[]) m.invoke(tableViewer, tableViewer.getInput());
+            final ArrayList<RefactoringRule> results = new ArrayList<RefactoringRule>();
+            for (int i = 0; i < children.length; i++) {
+                RefactoringRule rule = (RefactoringRule) children[i];
+                results.add(rule);
+            }
+            return results;
+        } catch (Exception e) {
+            throw new UnhandledException(null, e);
+        }
     }
 
     /** {@inheritDoc} */

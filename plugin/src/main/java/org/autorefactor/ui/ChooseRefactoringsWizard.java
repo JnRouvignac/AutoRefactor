@@ -64,8 +64,19 @@ public class ChooseRefactoringsWizard extends Wizard {
     /** {@inheritDoc} */
     @Override
     public boolean performFinish() {
-        final List<RefactoringRule> refactoringRules = chooseRefactoringsPage.getSelectedRefactorings();
-        new PrepareApplyRefactoringsJob(javaElements, refactoringRules).schedule();
-        return !refactoringRules.isEmpty();
+        final List<RefactoringRule> refactoringRules = getRefactoringRules();
+        final boolean success = !refactoringRules.isEmpty();
+        if (success) {
+            new PrepareApplyRefactoringsJob(javaElements, refactoringRules).schedule();
+        }
+        return success;
+    }
+
+    private List<RefactoringRule> getRefactoringRules() {
+        List<RefactoringRule> refactoringRules = chooseRefactoringsPage.getSelectedRefactoringRules();
+        if (refactoringRules.isEmpty()) {
+            refactoringRules = chooseRefactoringsPage.getFilteredRefactoringRules();
+        }
+        return refactoringRules;
     }
 }
