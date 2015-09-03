@@ -211,8 +211,7 @@ public class CommentsRefactoring extends AbstractRefactoringRule {
         } else if (!acceptJavadoc(getNextNode(node))) {
             this.ctx.getRefactorings().replace(node, comment.replace("/**", "/*"));
             return DO_NOT_VISIT_SUBTREE;
-        } else if (!isWellFormattedInheritDoc
-                && JAVADOC_ONLY_INHERITDOC.matcher(comment).matches()) {
+        } else if (JAVADOC_ONLY_INHERITDOC.matcher(comment).matches()) {
             final ASTNode nextNode = getNextNode(node);
             if (hasOverrideAnnotation(nextNode)) {
                 // {@inheritDoc} tag is redundant with @Override annotation
@@ -220,12 +219,14 @@ public class CommentsRefactoring extends AbstractRefactoringRule {
                 return DO_NOT_VISIT_SUBTREE;
             }
 
-            // Put on one line only, to augment vertical density of code
-            int startLine = this.astRoot.getLineNumber(node.getStartPosition());
-            int endLine = this.astRoot.getLineNumber(node.getStartPosition() + node.getLength());
-            if (startLine != endLine) {
-                this.ctx.getRefactorings().replace(node, "/** {@inheritDoc} */");
-                return DO_NOT_VISIT_SUBTREE;
+            if (!isWellFormattedInheritDoc) {
+                // Put on one line only, to augment vertical density of code
+                int startLine = this.astRoot.getLineNumber(node.getStartPosition());
+                int endLine = this.astRoot.getLineNumber(node.getStartPosition() + node.getLength());
+                if (startLine != endLine) {
+                    this.ctx.getRefactorings().replace(node, "/** {@inheritDoc} */");
+                    return DO_NOT_VISIT_SUBTREE;
+                }
             }
         } else if (!isWellFormattedInheritDoc
                 && !JAVADOC_HAS_PUNCTUATION.matcher(comment).find()) {
