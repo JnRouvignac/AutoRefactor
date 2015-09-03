@@ -45,7 +45,6 @@ import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.autorefactor.refactoring.SourceLocation.*;
 
 /** See {@link #getDescription()} method. */
-@SuppressWarnings("javadoc")
 public class RemoveEmptyLinesRefactoring extends AbstractRefactoringRule {
 
     @Override
@@ -102,7 +101,35 @@ public class RemoveEmptyLinesRefactoring extends AbstractRefactoringRule {
                 result = DO_NOT_VISIT_SUBTREE;
             }
         }
-        return result;
+        if (result == DO_NOT_VISIT_SUBTREE) {
+            return DO_NOT_VISIT_SUBTREE;
+        }
+
+        int afterLastNonWsIndex = getLastIndexOfNonWhitespaceChar(source, source.length() - 1) + 1;
+        if (substringMatchesAny(source, afterLastNonWsIndex, "\r\n", "\r", "\n")) {
+            return VISIT_SUBTREE;
+        }
+
+        Matcher endOfFileMatcher = Pattern.compile(newline + "(" + "\\s*?" + "(" + newline + "\\s*?)+)")
+                .matcher(source).region(afterLastNonWsIndex, source.length());
+        if (endOfFileMatcher.find()) {
+            r.remove(SourceLocation.fromPositions(endOfFileMatcher.start(2), endOfFileMatcher.end(2)));
+            return DO_NOT_VISIT_SUBTREE;
+        }
+        return VISIT_SUBTREE;
+    }
+
+    private boolean substringMatchesAny(String s, int offset, String... stringToMatch) {
+        for (String toMatch : stringToMatch) {
+            if (substringMatches(s, offset, toMatch)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean substringMatches(final String s, int offset, String toMatch) {
+        return s.regionMatches(offset, toMatch, 0, s.length() - offset);
     }
 
     private void computeLineEnds(CompilationUnit node) {
