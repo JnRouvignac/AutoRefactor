@@ -28,7 +28,7 @@ You can run tests by:
 
 ### JDT Gotchas
 
-See [JDT Gotchas](https://github.com/JnRouvignac/AutoRefactor/wiki/JDT-Gotchas)
+Along with some surprising APIs in JDT, there are a few things developers should keep in mind when writing refactoring rules. See [JDT Gotchas](https://github.com/JnRouvignac/AutoRefactor/wiki/JDT-Gotchas)
 
 # Website developers/designers
 
