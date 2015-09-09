@@ -27,7 +27,9 @@ package org.autorefactor.refactoring.rules;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -44,22 +46,15 @@ import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.EnhancedForStatement;
 import org.eclipse.jdt.core.dom.Expression;
-import org.eclipse.jdt.core.dom.ExpressionStatement;
 import org.eclipse.jdt.core.dom.ForStatement;
 import org.eclipse.jdt.core.dom.IfStatement;
-import org.eclipse.jdt.core.dom.ImportDeclaration;
-import org.eclipse.jdt.core.dom.InfixExpression;
-import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Name;
-import org.eclipse.jdt.core.dom.PackageDeclaration;
-import org.eclipse.jdt.core.dom.PostfixExpression;
 import org.eclipse.jdt.core.dom.QualifiedName;
 import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.Type;
-import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
@@ -68,6 +63,7 @@ import org.eclipse.jdt.core.dom.WhileStatement;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.autorefactor.util.Utils.*;
+import static org.eclipse.jdt.core.dom.ASTNode.*;
 
 /**
  * TODO JNR can we also transform singular fields into local variables?
@@ -104,30 +100,30 @@ public class ReduceVariableScopeRefactoring extends AbstractRefactoringRule {
             if (this == obj) {
                 return true;
             }
-            if (obj instanceof VariableName) {
-                final VariableName other = (VariableName) obj;
-                if (this.name instanceof SimpleName
-                        && other.name instanceof SimpleName) {
-                    return isEqual((SimpleName) this.name, (SimpleName) other.name);
-                }
-                // if (this.name instanceof QualifiedName
-                // && other.name instanceof QualifiedName) {
-                // throw new IllegalStateException();
-                // }
+            if (!(obj instanceof VariableName)) {
+                return false;
             }
-            // return false;
-            throw new NotImplementedException(name, name);
+            final VariableName other = (VariableName) obj;
+            return isEqual(this.name, other.name);
         }
 
         @Override
         public int hashCode() {
-            if (this.name instanceof SimpleName) {
-                return ((SimpleName) this.name).getIdentifier().hashCode();
+            return hashCode0(name);
+        }
+
+        private int hashCode0(Name name) {
+            switch (name.getNodeType()) {
+            case SIMPLE_NAME:
+                return ((SimpleName) name).getIdentifier().hashCode();
+
+            case QUALIFIED_NAME:
+                QualifiedName qn = (QualifiedName) name;
+                return hashCode0(qn.getQualifier()) + qn.getName().getIdentifier().hashCode();
+
+            default:
+                throw new NotImplementedException(name, name);
             }
-            // if (this.name instanceof QualifiedName) {
-            // throw new IllegalStateException();
-            // }
-            throw new NotImplementedException(name, name);
         }
 
         @Override
@@ -159,37 +155,192 @@ public class ReduceVariableScopeRefactoring extends AbstractRefactoringRule {
             return accessType;
         }
 
+        private boolean is(int accessType) {
+            return (this.accessType & accessType) != 0;
+        }
+
         public ASTNode getScope() {
             return scope;
+        }
+
+        private Statement getStatement() {
+            return getAncestor(variableName, Statement.class);
         }
 
         @Override
         public String toString() {
             final StringBuilder sb = new StringBuilder();
-            if ((this.accessType & DECL) != 0) {
-                sb.append("DECL");
-            }
-            if ((this.accessType & READ) != 0) {
-                if (sb.length() > 0) {
-                    sb.append(" | ");
-                }
-                sb.append("READ");
-            }
-            if ((this.accessType & WRITE) != 0) {
-                if (sb.length() > 0) {
-                    sb.append(" | ");
-                }
-                sb.append("WRITE");
-            }
-            sb.append("\n");
+            sb.append(variableName).append(" / ");
+            appendAccesses(sb);
+            sb.append(" / ").append(getStatement());
             sb.append(scope);
             return sb.toString();
+        }
+
+        private void appendAccesses(final StringBuilder sb) {
+            List<String> accesses = new ArrayList<String>();
+            if (is(DECL)) {
+                accesses.add("DECL");
+            }
+            if (is(READ)) {
+                accesses.add("READ");
+            }
+            if (is(WRITE)) {
+                accesses.add("WRITE");
+            }
+            Iterator<String> it = accesses.iterator();
+            sb.append(it.next());
+            while (it.hasNext()) {
+                sb.append("+").append(it.next());
+            }
         }
     }
 
     private final Map<VariableName, List<VariableAccess>> allVariableAccesses =
             new HashMap<VariableName, List<VariableAccess>>();
     private static final Pair<Integer, ASTNode> NULL_PAIR = Pair.of(0, null);
+
+    @Override
+    public void postVisit(ASTNode node) {
+        if (node.getNodeType() != BLOCK) {
+            return;
+        }
+
+        List<VariableAccess> variableAccesses = getVariablesWithScope(node);
+        List<VariableAccess> iVarAccesses = new ArrayList<VariableAccess>();
+        if (!variableAccesses.isEmpty()) {
+            for (VariableAccess access : variableAccesses) {
+                Name varName = access.variableName;
+                if (varName instanceof SimpleName) {
+                    SimpleName name = (SimpleName) varName;
+                    // TODO JNR remove this loop and this test
+                    if ("i".equals(name.getIdentifier())) {
+                        iVarAccesses.add(access);
+                    }
+                }
+            }
+        }
+
+        if (!iVarAccesses.isEmpty()) {
+            for (ListIterator<VariableAccess> it = iVarAccesses.listIterator(); it.hasNext();) {
+                VariableAccess access1 = it.next();
+                if (access1.is(WRITE)) {
+                    Statement stmt1 = access1.getStatement();
+                    if (!it.hasNext()) {
+                        if (access1.is(READ)) {
+                            // this a pre/post inc/decrement
+                            // nothing to see here
+                            continue;
+                        } else if (access1.is(DECL)) {
+                            // unused variable
+                            ASTNode toRemove = getNodeWithoutSideEffectsToRemove(access1);
+                            if (toRemove != null) {
+                                ctx.getRefactorings().remove(toRemove);
+                                continue;
+                            }
+                            // TODO JNR keep side effect assignments, i.e. only remove constants
+                            continue;
+                        } else if (access1.is(WRITE)) {
+                            // dead store (no reads)
+                            ASTNode toRemove = getNodeWithoutSideEffectsToRemove(access1);
+                            if (toRemove != null) {
+                                ctx.getRefactorings().remove(toRemove);
+                                continue;
+                            }
+                            // TODO JNR keep side effect assignments, i.e. remove constants
+                            continue;
+                        } else {
+                            throw new NotImplementedException(node, "Unknown access type: " + access1.getAccessType());
+                        }
+                    }
+
+                    VariableAccess access2 = it.next();
+                    if (!access2.is(READ)) {
+                        // dead store (overwritten before read)
+                        ASTNode toRemove = getNodeWithoutSideEffectsToRemove(access1);
+                        if (toRemove != null) {
+                            ctx.getRefactorings().remove(toRemove);
+                            continue;
+                        }
+                        // TODO JNR keep side effect assignments, i.e. remove constants
+                    }
+
+                    Statement stmt2 = access2.getStatement();
+                    boolean canReduceScopeOfVariable = canReduceScopeOfVariable((Block) node, stmt1, stmt2);
+                    if (canReduceScopeOfVariable) {
+                        // there are statements in between, reduce scope of variable
+                        ASTBuilder b = ctx.getASTBuilder();
+                        ctx.getRefactorings().insertBefore(b.move(stmt1), stmt2);
+                    }
+                    // TODO JNR do not return here
+                    return;
+                } else {
+                    // TODO JNR
+                    // throw new NotImplementedException(node);
+                }
+            }
+        }
+    }
+
+    private ASTNode getNodeWithoutSideEffectsToRemove(VariableAccess access) {
+        Name varName = access.getVariableName();
+        if (access.is(DECL)) {
+            VariableDeclarationFragment vdf = getAncestor(varName, VariableDeclarationFragment.class);
+            Expression init = vdf.getInitializer();
+            if (init != null && isConstant(init)) {
+                VariableDeclarationStatement vds = (VariableDeclarationStatement) vdf.getParent();
+                return vds.fragments().size() == 1 ? vds : vdf;
+            }
+        } else if (access.is(WRITE)) {
+            if (access.is(READ)) {
+                // this a pre/post inc/decrement
+                return getAncestor(varName, Statement.class);
+            }
+            Assignment as = getAncestor(varName, Assignment.class);
+            if (isConstant(as.getRightHandSide())) {
+                return getAncestor(as, Statement.class);
+            }
+        }
+        return null;
+    }
+
+    private boolean canReduceScopeOfVariable(Block node, Statement stmt1, Statement stmt2) {
+        List<Statement> stmts = asList(node);
+        int idx1 = stmts.indexOf(stmt1);
+        int idx2 = stmts.indexOf(stmt2);
+        return idx1 != -1 && idx2 != -1 && idx2 - idx1 > 1;
+    }
+
+    private List<VariableAccess> getVariablesWithScope(ASTNode node) {
+        List<VariableAccess> results = new ArrayList<VariableAccess>();
+        for (Entry<VariableName, List<VariableAccess>> entry : allVariableAccesses.entrySet()) {
+            for (VariableAccess varAccess : entry.getValue()) {
+                if (isSameScope(node, varAccess.getScope())) {
+                    results.add(varAccess);
+                }
+            }
+        }
+        return results;
+    }
+
+    private boolean isSameScope(ASTNode node1, ASTNode node2) {
+        return isSameLevel(node1, node2) || isParentOf(node1, node2);
+    }
+
+    private boolean isSameLevel(ASTNode node1, ASTNode node2) {
+        return node1.equals(node2);
+    }
+
+    private boolean isParentOf(ASTNode node1, ASTNode node2) {
+        ASTNode parent = node2.getParent();
+        while (parent != null) {
+            if (node1.equals(parent)) {
+                return true;
+            }
+            parent = parent.getParent();
+        }
+        return false;
+    }
 
     @Override
     public boolean visit(SimpleName node) {
@@ -205,65 +356,89 @@ public class ReduceVariableScopeRefactoring extends AbstractRefactoringRule {
 
     private void findVariableAccesses(Name node) {
         final Pair<Integer, ASTNode> accessTypeAndScope = getAccessTypeAndScope(node);
-        if (accessTypeAndScope.getFirst().intValue() != 0) {
+        if (accessTypeAndScope != NULL_PAIR) {
             final VariableName varName = new VariableName(node);
             List<VariableAccess> list = this.allVariableAccesses.get(varName);
             if (list == null) {
                 list = new ArrayList<VariableAccess>();
                 this.allVariableAccesses.put(varName, list);
             }
-            if (list.size() == 0
-                    || !list.get(list.size() - 1).getScope().equals(accessTypeAndScope.getSecond())) {
-                // only keep first write in scope
-                list.add(new VariableAccess(node, accessTypeAndScope.getFirst(), accessTypeAndScope.getSecond()));
-            }
+            list.add(new VariableAccess(node, accessTypeAndScope.getFirst(), accessTypeAndScope.getSecond()));
         }
     }
 
     private Pair<Integer, ASTNode> getAccessTypeAndScope(ASTNode node) {
         final ASTNode parent = node.getParent();
-        if (parent instanceof Block
-                || parent instanceof InfixExpression
-                || parent instanceof EnhancedForStatement
-                || parent instanceof ExpressionStatement
-                || parent instanceof ForStatement
-                || parent instanceof Name
-                || parent instanceof WhileStatement) {
+        switch (parent.getNodeType()) {
+        case BLOCK:
+        case INFIX_EXPRESSION:
+        case ENHANCED_FOR_STATEMENT:
+        case EXPRESSION_STATEMENT:
+        case FOR_STATEMENT:
+        case SIMPLE_NAME:
+        case WHILE_STATEMENT:
             return getAccessTypeAndScope(parent);
-        } else if (parent instanceof ImportDeclaration
-                || parent instanceof MethodDeclaration
-                || parent instanceof MethodInvocation
-                || parent instanceof PackageDeclaration
-                || parent instanceof Type
-                || parent instanceof TypeDeclaration) {
-            return NULL_PAIR;
-        } else if (parent instanceof SingleVariableDeclaration) {
-            final SingleVariableDeclaration var = (SingleVariableDeclaration) parent;
-            return getAccessTypeAndScope(var.getParent());
-        } else if (parent instanceof VariableDeclarationFragment) {
-            final VariableDeclarationFragment var = (VariableDeclarationFragment) parent;
-            return Pair.of(var.getInitializer() != null ? WRITE | DECL : DECL,
-                    getScope(var));
-        } else if (parent instanceof Assignment) {
+
+        case QUALIFIED_NAME:
+            if (node.equals(((QualifiedName) parent).getQualifier())) {
+                return NULL_PAIR;
+            }
+            return getAccessTypeAndScope(parent);
+
+        case SINGLE_VARIABLE_DECLARATION:
+            final SingleVariableDeclaration sVar = (SingleVariableDeclaration) parent;
+            return getAccessTypeAndScope(sVar.getParent());
+
+        case VARIABLE_DECLARATION_FRAGMENT:
+            final VariableDeclarationFragment varDecl = (VariableDeclarationFragment) parent;
+            return Pair.of(varDecl.getInitializer() != null ? WRITE | DECL : DECL, getScope(varDecl));
+
+        case ASSIGNMENT:
             return Pair.of(WRITE, getScope(parent.getParent()));
-        } else if (parent instanceof InfixExpression) {
+
+        case METHOD_INVOCATION:
+            if (node.equals(((MethodInvocation) parent).getName())) {
+                return NULL_PAIR;
+            }
             return Pair.of(READ, getScope(parent.getParent()));
-        } else if (parent instanceof PostfixExpression) {
+
+        case POSTFIX_EXPRESSION:
             return Pair.of(READ | WRITE, getScope(parent.getParent()));
+
+        case IMPORT_DECLARATION:
+        case METHOD_DECLARATION:
+        case PACKAGE_DECLARATION:
+        case TYPE_DECLARATION:
+        case ARRAY_TYPE:
+        case PARAMETERIZED_TYPE:
+        case PRIMITIVE_TYPE:
+        case QUALIFIED_TYPE:
+        case SIMPLE_TYPE:
+        case UNION_TYPE:
+        case WILDCARD_TYPE:
+            return NULL_PAIR;
+
+        default:
+            throw new NotImplementedException(parent);
         }
-        throw new NotImplementedException(parent);
     }
 
     private ASTNode getScope(ASTNode node) {
-        if (node instanceof Block || node instanceof EnhancedForStatement
-                || node instanceof ForStatement || node instanceof IfStatement
-                || node instanceof WhileStatement) {
+        switch (node.getNodeType()) {
+        case BLOCK:
+        case ENHANCED_FOR_STATEMENT:
+        case FOR_STATEMENT:
+        case IF_STATEMENT:
+        case WHILE_STATEMENT:
             return node;
-        } else if (node instanceof Expression || node instanceof Statement
-                || node instanceof VariableDeclaration) {
-            return getScope(node.getParent());
+        default:
+            if (node instanceof Expression
+                    || node instanceof Statement
+                    || node instanceof VariableDeclaration) {
+                return getScope(node.getParent());
+            }
+            throw new NotImplementedException(node);
         }
-        throw new NotImplementedException(node);
     }
 
     @Override
@@ -446,10 +621,10 @@ public class ReduceVariableScopeRefactoring extends AbstractRefactoringRule {
 
     private boolean isReadDominatedByWriteInScopeMoreReducedThanVariableScope(
             ASTNode readScope, ASTNode writeScope, ASTNode varScope) {
-        if (varScope.equals(readScope) || varScope.equals(writeScope)) {
+        if (isSameScope(varScope, readScope) || isSameScope(varScope, writeScope)) {
             return false;
         }
-        if (readScope.equals(writeScope)) {
+        if (isSameScope(readScope, writeScope)) {
             return true;
         }
         return isReadDominatedByWriteInScopeMoreReducedThanVariableScope(

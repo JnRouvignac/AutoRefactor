@@ -29,32 +29,74 @@ import java.util.List;
 
 public class ReduceVariableScopeSample {
 
+    public void reduceScopeSameScopeSameLevel(long l) {
+        int i = 0;
+        System.out.println(l);
+        System.out.println(i);
+    }
+
+    public void doNotReduceScopeSameScopeDifferentLevel(long l) {
+        int i = 0;
+        {
+            i++;
+        }
+        System.out.println(i);
+    }
+
+    public void removeUnusedVariable(long l) {
+        int i = 0;
+        System.out.println(l);
+    }
+
+    public void removeDeadVariableOnlyRemoveFragment() {
+        int i, j = 0; // TODO remove i
+        System.out.println(j);
+    }
+
+    public void removeUnusedVariableOnlyRemoveFragment() {
+        int i = 0, j = 0;
+        System.out.println(j);
+    }
+
+    public void removeDeadStoreToVariable1(int i, long l) {
+        i = 0;
+        System.out.println(l);
+    }
+
+    public void removeDeadStoreToVariable2(int i, long l) {
+        i = 0;
+        i = 1;
+        System.out.println(i);
+    }
+
     public static void main(String[] args) {
         // push variable into for loops initializers
         int i;
         {
             i = 0;
+            System.out.println(i);
         }
         for (i = 0; i < args.length; i++) {
-            i = 0;
+            System.out.println(i);
         }
         for (i = 0; i < args.length; i++)
-            i = 0;
+            System.out.println(i);
         for (Object obj : (List) null) {
-            i = 0;
+            System.out.println(i);
         }
         for (Object obj : (List) null)
-            i = 0;
+            System.out.println(i);
         if (isOk()) {
-            i = 0;
+            System.out.println(i);
         }
         if (isOk())
-            i = 0;
+            System.out.println(i = 0);
         while (isOk()) {
             i = 0;
+            System.out.println(i);
         }
         while (isOk())
-            i = 0;
+            System.out.println(i = 0);
     }
 
     private static boolean isOk() {
