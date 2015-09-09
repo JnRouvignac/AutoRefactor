@@ -28,11 +28,16 @@ package org.autorefactor.refactoring.rules;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.autorefactor.refactoring.ASTBuilder;
+import org.autorefactor.refactoring.ASTHelper;
 import org.autorefactor.refactoring.Refactorings;
 import org.eclipse.jdt.core.dom.ASTMatcher;
 import org.eclipse.jdt.core.dom.ASTNode;
@@ -46,8 +51,11 @@ import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.TryStatement;
 import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.UnionType;
+import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
+import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
+import static org.autorefactor.util.Utils.*;
 
 /** See {@link #getDescription()} method. */
 @SuppressWarnings("javadoc")
@@ -68,18 +76,52 @@ public class UseMultiCatchRefactoring extends AbstractRefactoringRule {
     }
 
     private static final class MultiCatchASTMatcher extends ASTMatcher {
-        private final CatchClause catchClause1;
-        private final CatchClause catchClause2;
+        private final Map<ASTNode, ASTNode> matchingVariables = new HashMap<ASTNode, ASTNode>();
 
         public MultiCatchASTMatcher(CatchClause catchClause1, CatchClause catchClause2) {
-            this.catchClause1 = catchClause1;
-            this.catchClause2 = catchClause2;
+            matchingVariables.put(catchClause1.getException(), catchClause2.getException());
+        }
+
+        @Override
+        public boolean match(VariableDeclarationStatement node, Object other) {
+            return super.match(node, other)
+                    || matchVariableDeclarationsWithDifferentNames(node, other);
+        }
+
+        private boolean matchVariableDeclarationsWithDifferentNames(
+                VariableDeclarationStatement node, Object other) {
+            if (!(other instanceof VariableDeclarationStatement)) {
+                return false;
+            }
+
+            VariableDeclarationStatement node2 = (VariableDeclarationStatement) other;
+            List<VariableDeclarationFragment> fragments1 = fragments(node);
+            List<VariableDeclarationFragment> fragments2 = fragments(node2);
+            if (fragments1.size() == fragments2.size()) {
+                Iterator<VariableDeclarationFragment> it1 = fragments1.iterator();
+                Iterator<VariableDeclarationFragment> it2 = fragments2.iterator();
+                // Do not make all efforts to try to reconcile fragments declared in different order
+                while (it1.hasNext() && it2.hasNext()) {
+                    VariableDeclarationFragment f1 = it1.next();
+                    VariableDeclarationFragment f2 = it2.next();
+                    if (equalNotNull(resolveTypeBinding(f1), resolveTypeBinding(f2))
+                            // This structural match is a bit dumb
+                            // It cannot reconcile 1 with 1L, true with Boolean.TRUE, etc.
+                            // Let's rely on other refactoring rules which will simplify such expressions
+                            // and convert 1L => 1 (in long context), Boolean.TRUE to true (in boolean context), etc.
+                            && ASTHelper.match(this, f1.getInitializer(), f2.getInitializer())) {
+                        this.matchingVariables.put(f1, f2);
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
 
         @Override
         public boolean match(SimpleName node, Object other) {
             return super.match(node, other)
-                    || areBothReferringToExceptionVariables(node, other);
+                    || areBothReferringToSameVariables(node, other);
         }
 
         @Override
@@ -109,12 +151,16 @@ public class UseMultiCatchRefactoring extends AbstractRefactoringRule {
             return !commonOverridenMethods.isEmpty();
         }
 
-        private boolean areBothReferringToExceptionVariables(ASTNode node, Object other) {
-            return isSameVariable(node, catchClause1.getException())
-                    && isSameVariable0(other, catchClause2.getException());
+        private boolean areBothReferringToSameVariables(ASTNode node, Object other) {
+            for (Entry<ASTNode, ASTNode> pairedVariables : matchingVariables.entrySet()) {
+                if (isSameVariable(node, pairedVariables.getKey())) {
+                    return isSameVariable0(other, pairedVariables.getValue());
+                }
+            }
+            return false;
         }
 
-        private boolean isSameVariable0(Object other, SingleVariableDeclaration node2) {
+        private boolean isSameVariable0(Object other, ASTNode node2) {
             return other instanceof ASTNode
                     && isSameVariable((ASTNode) other, node2);
         }
@@ -154,7 +200,7 @@ public class UseMultiCatchRefactoring extends AbstractRefactoringRule {
     private AggregateDirection aggregateDirection(List<CatchClause> catchClauses, int start, int end) {
         final ITypeBinding[] types = new ITypeBinding[catchClauses.size()];
         for (int i = start; i <= end; i++) {
-            types[i] = resolveTypeBinding(catchClauses, i);
+            types[i] = resolveTypeBindingOfException(catchClauses.get(i));
             if (types[i] == null) {
                 return AggregateDirection.NONE;
             }
@@ -171,8 +217,8 @@ public class UseMultiCatchRefactoring extends AbstractRefactoringRule {
         }
     }
 
-    private ITypeBinding resolveTypeBinding(List<CatchClause> catchClauses, int pos) {
-        SingleVariableDeclaration svd = catchClauses.get(pos).getException();
+    private ITypeBinding resolveTypeBindingOfException(CatchClause catchClause) {
+        SingleVariableDeclaration svd = catchClause.getException();
         IVariableBinding vb = svd.resolveBinding();
         if (vb != null) {
             return vb.getType();

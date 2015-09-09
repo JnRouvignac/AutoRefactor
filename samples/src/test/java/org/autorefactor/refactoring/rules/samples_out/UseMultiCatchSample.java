@@ -155,4 +155,14 @@ public class UseMultiCatchSample {
             e.printStackTrace();
         }
     }
+
+    public void refactorMultiCatchWithLocalVariables(ThrowingObject<IllegalArgumentException, IOException> obj) {
+        try {
+            obj.throwingMethod();
+        } catch (IllegalArgumentException | IOException ioe) {
+            String s = "[" + ioe;
+            String s2 = "]";
+            System.out.println(s + s2);
+        }
+    }
 }
