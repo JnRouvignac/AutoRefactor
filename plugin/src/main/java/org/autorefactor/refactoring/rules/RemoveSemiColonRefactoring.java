@@ -52,6 +52,7 @@ import org.eclipse.jdt.core.dom.Initializer;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.TryStatement;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
+import org.eclipse.jdt.core.dom.TypeDeclarationStatement;
 import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
@@ -118,6 +119,8 @@ public class RemoveSemiColonRefactoring extends AbstractRefactoringRule {
         } else if (parent instanceof CompilationUnit) {
             final CompilationUnit cu = (CompilationUnit) parent;
             return removeSuperfluousSemiColons(node, getEndPosition(node), getEndPosition(cu) - 1);
+        } else if (parent instanceof TypeDeclarationStatement) {
+            return VISIT_SUBTREE;
         }
         throw new NotImplementedException(node,
                 "for a parent of type " + (parent != null ? parent.getClass().getSimpleName() : null));

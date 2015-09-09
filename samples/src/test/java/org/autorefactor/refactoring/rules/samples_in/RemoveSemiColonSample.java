@@ -29,6 +29,11 @@ public abstract class RemoveSemiColonSample {
           return fis.read();
         }
     }
+
+    public void doNotThrowWithTypeDeclarationStatement() throws IOException {
+        class DoNotTriggerAThrow {
+        }
+    }
 };
 
 class Unused {
