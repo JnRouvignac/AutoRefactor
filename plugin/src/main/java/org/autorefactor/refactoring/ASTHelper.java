@@ -697,27 +697,27 @@ public final class ASTHelper {
         }
         final QualifiedName qn = as(expr, QualifiedName.class);
         if (hasType(qn, "java.lang.Boolean")) {
-            return getBooleanObjectAsLiteral(qn);
+            return getBooleanObject(qn);
         }
         return null;
     }
 
     /**
-     * Returns the boolean primitive value of the {@link Boolean} object value
-     * represented by the provided qualified name.
+     * Returns the {@link Boolean} object constant value represented by the provided qualified name.
      *
-     * @param qualifiedName the qualified name that must represent a Boolean object literal
-     * @return the boolean primitive value of the {@link Boolean} object value
-     *         represented by the provided qualified name.
+     * @param qualifiedName
+     *          the qualified name that must represent a Boolean object constant
+     * @return the {@link Boolean} object constant value represented by the provided qualified name,
+     *         or null if the qualified name does not represent a {@link Boolean} object constant value.
      */
-    public static boolean getBooleanObjectAsLiteral(final QualifiedName qualifiedName) {
+    public static Boolean getBooleanObject(final QualifiedName qualifiedName) {
         final String fqn = qualifiedName.getFullyQualifiedName();
         if ("Boolean.TRUE".equals(fqn)) {
             return true;
         } else if ("Boolean.FALSE".equals(fqn)) {
             return false;
         }
-        throw new NotImplementedException(qualifiedName, "for fully qualified name \"" + fqn + "\"");
+        return null;
     }
 
     /**
@@ -845,6 +845,7 @@ public final class ASTHelper {
     public static Statement getNextSibling(Statement startNode) {
         return getSibling(startNode, false);
     }
+
 
     /**
      * Returns the next statement in the source file if it exists.

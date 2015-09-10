@@ -154,8 +154,9 @@ public class BooleanRefactoring extends AbstractRefactoringRule {
         @Override
         public boolean visit(BooleanLiteral node) {
             if (this.nodesToReplace.contains(node)) {
-                final Expression expr = getExpression(getBooleanLiteral(node),
-                        this.ifCondition, "boolean", null);
+                Boolean booleanValue = getBooleanLiteral(node);
+                final Expression expr = getExpression(
+                        booleanValue, ifCondition, "boolean", null);
                 replaceInParent(node, expr);
             }
             return DO_NOT_VISIT_SUBTREE;
@@ -165,9 +166,12 @@ public class BooleanRefactoring extends AbstractRefactoringRule {
         public boolean visit(QualifiedName node) {
             if (this.nodesToReplace.contains(node)) {
                 final QualifiedName qn = as(node, QualifiedName.class);
-                final Expression expr = getExpression(getBooleanObjectAsLiteral(qn),
-                        this.ifCondition, "java.lang.Boolean", this.booleanName);
-                replaceInParent(node, expr);
+                Boolean booleanValue = getBooleanObject(qn);
+                if (booleanValue != null) {
+                    final Expression expr = getExpression(
+                            booleanValue, ifCondition, "java.lang.Boolean", booleanName);
+                    replaceInParent(node, expr);
+                }
             }
             return DO_NOT_VISIT_SUBTREE;
         }

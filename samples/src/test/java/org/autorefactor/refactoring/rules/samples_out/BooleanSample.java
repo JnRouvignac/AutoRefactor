@@ -261,11 +261,18 @@ public class BooleanSample {
         return false;
     }
 
+    public Boolean doNotThrowAnyException(boolean bo) {
+        class ClassWithBooleanField {
+            Boolean b;
+        }
+        ClassWithBooleanField objWithBooleanField = new ClassWithBooleanField();
+        return bo ? objWithBooleanField.b : Boolean.TRUE;
+    }
+
     protected boolean aMethodThatReturnsBoolean() {
         return false;
     }
 
     protected void aMethodThatAcceptsABoolean(boolean b) {
     }
-
 }
