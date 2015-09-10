@@ -47,6 +47,8 @@ import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.EnhancedForStatement;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ForStatement;
+import org.eclipse.jdt.core.dom.IBinding;
+import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Name;
@@ -207,22 +209,29 @@ public class ReduceVariableScopeRefactoring extends AbstractRefactoringRule {
         }
 
         List<VariableAccess> variableAccesses = getVariablesWithScope(node);
-        List<VariableAccess> iVarAccesses = new ArrayList<VariableAccess>();
+        Map<IVariableBinding, List<VariableAccess>> iVarAccesses = new HashMap<IVariableBinding, List<VariableAccess>>();
         if (!variableAccesses.isEmpty()) {
             for (VariableAccess access : variableAccesses) {
                 Name varName = access.variableName;
                 if (varName instanceof SimpleName) {
                     SimpleName name = (SimpleName) varName;
-                    // TODO JNR remove this loop and this test
-                    if ("i".equals(name.getIdentifier())) {
-                        iVarAccesses.add(access);
+                    // TODO JNR remove this loop?
+                    IBinding b = name.resolveBinding();
+                    if (b.getKind() == IBinding.VARIABLE) {
+                        IVariableBinding varB = (IVariableBinding) b;
+                        List<VariableAccess> list = iVarAccesses.get(varB);
+                        if (list == null) {
+                            list = new ArrayList<VariableAccess>();
+                            iVarAccesses.put(varB, list);
+                        }
+                        list.add(access);
                     }
                 }
             }
         }
 
-        if (!iVarAccesses.isEmpty()) {
-            for (ListIterator<VariableAccess> it = iVarAccesses.listIterator(); it.hasNext();) {
+        for (List<VariableAccess> variableAccesses2 : iVarAccesses.values()) {
+            for (ListIterator<VariableAccess> it = variableAccesses2.listIterator(); it.hasNext();) {
                 VariableAccess access1 = it.next();
                 if (access1.is(WRITE)) {
                     Statement stmt1 = access1.getStatement();
