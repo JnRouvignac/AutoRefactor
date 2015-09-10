@@ -62,7 +62,7 @@ public class CommonCodeInIfElseStatementRefactoring extends AbstractRefactoringR
 
         private IVariableBinding getVariableDeclaration(SimpleName node) {
             final IBinding b = node.resolveBinding();
-            if (b.getKind() == IBinding.VARIABLE) {
+            if (b != null && b.getKind() == IBinding.VARIABLE) {
                 return ((IVariableBinding) b).getVariableDeclaration();
             }
             return null;
