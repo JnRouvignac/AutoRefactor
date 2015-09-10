@@ -34,37 +34,26 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.autorefactor.refactoring.ASTBuilder;
-import org.autorefactor.refactoring.Refactorings;
 import org.autorefactor.util.IllegalArgumentException;
-import org.autorefactor.util.IllegalStateException;
 import org.autorefactor.util.NotImplementedException;
 import org.autorefactor.util.Pair;
-import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Block;
-import org.eclipse.jdt.core.dom.CompilationUnit;
-import org.eclipse.jdt.core.dom.EnhancedForStatement;
 import org.eclipse.jdt.core.dom.Expression;
-import org.eclipse.jdt.core.dom.ForStatement;
 import org.eclipse.jdt.core.dom.IBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;
-import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Name;
 import org.eclipse.jdt.core.dom.QualifiedName;
 import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.Statement;
-import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.VariableDeclaration;
-import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
-import org.eclipse.jdt.core.dom.WhileStatement;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
-import static org.autorefactor.util.Utils.*;
 import static org.eclipse.jdt.core.dom.ASTNode.*;
 
 /**
@@ -448,195 +437,5 @@ public class ReduceVariableScopeRefactoring extends AbstractRefactoringRule {
             }
             throw new NotImplementedException(node);
         }
-    }
-
-    @Override
-    public Refactorings getRefactorings(CompilationUnit astRoot) {
-        astRoot.accept(this);
-
-        for (Entry<VariableName, List<VariableAccess>> entry : this.allVariableAccesses.entrySet()) {
-            final List<VariableAccess> variableAccesses = entry.getValue();
-            if (canReduceVariableScope(variableAccesses)) {
-                final VariableAccess varDecl = variableAccesses.get(0);
-                remove(varDecl.getVariableName());
-
-                for (VariableAccess varAccess : variableAccesses) {
-                    if (varAccess.getAccessType() == WRITE) {
-                        replace(varDecl, varAccess);
-                    } // TODO JNR if (varAccess.getAccessType() & WRITE) {
-                }
-            }
-        }
-
-        // TODO JNR remove writes when there are no reads after
-        // TODO JNR remove double writes when there are no reads after
-
-        return this.ctx.getRefactorings();
-    }
-
-    private void replace(VariableAccess varDecl, VariableAccess varAccess) {
-        final ASTBuilder b = this.ctx.getASTBuilder();
-        final AST ast = b.getAST();
-        final ASTNode scope = varAccess.getScope();
-        final Name varName = varAccess.getVariableName();
-        final Type varType = getType(varDecl.getVariableName().getParent());
-        if (scope instanceof Block) {
-            final List<Statement> stmts = statements((Block) scope);
-            for (int i = 0; i < stmts.size(); i++) {
-                final Statement stmt = stmts.get(i);
-                final Expression parentExpr = getAncestor(varName, Expression.class);  // FIXME i=0
-                final Statement parentStmt = getAncestor(parentExpr, Statement.class); // FIXME i=0
-                if (stmt.equals(parentStmt)) {
-                    final VariableDeclarationFragment vdf = getVariableDeclarationFragment(parentExpr, varName);
-                    final VariableDeclarationStatement vds = ast.newVariableDeclarationStatement(vdf);
-                    vds.setType(varType);
-                    this.ctx.getRefactorings().replace(stmt, vds);
-                    break;
-                }
-            }
-        } else if (scope instanceof EnhancedForStatement) {
-            final EnhancedForStatement efs = (EnhancedForStatement) scope;
-            final EnhancedForStatement newEfs = b.copy(efs);
-            newEfs.setParameter(b.copy(efs.getParameter()));
-            newEfs.setExpression(b.copy(efs.getExpression()));
-            final Statement parentStmt = getAncestor(varName, Statement.class);
-            if (equalNotNull(efs.getBody(), parentStmt)) {
-                newEfs.setBody(copy(efs.getBody(), varName));
-            }
-            this.ctx.getRefactorings().replace(efs, newEfs);
-        } else if (scope instanceof ForStatement) {
-            final ForStatement fs = (ForStatement) scope;
-            final ForStatement newFs = b.copy(fs);
-            final List<Expression> initializers = initializers(newFs);
-            if (initializers.size() == 1) {
-                final Expression init = initializers.remove(0);
-                final VariableDeclarationFragment vdf = getVariableDeclarationFragment(init, varName);
-                final VariableDeclarationExpression vde = ast.newVariableDeclarationExpression(vdf);
-                vde.setType(varType);
-                initializers.add(vde);
-                this.ctx.getRefactorings().replace(fs, newFs);
-                // TODO JNR
-                // if (equalNotNull(fs.getBody(), parentStmt)) {
-                // newFs.setBody(copy(fs.getBody()));
-                // }
-            } else {
-                throw new NotImplementedException(scope, "for more than one initializer in for loop.");
-            }
-        } else if (scope instanceof WhileStatement) {
-            final WhileStatement ws = (WhileStatement) scope;
-            final WhileStatement newWs = ast.newWhileStatement();
-            newWs.setExpression(b.copy(ws.getExpression()));
-            final Statement parentStmt = getAncestor(varName, Statement.class);
-            if (equalNotNull(ws.getBody(), parentStmt)) {
-                newWs.setBody(copy(ws.getBody(), varName));
-            }
-            this.ctx.getRefactorings().replace(ws, newWs);
-        } else if (scope instanceof IfStatement) {
-            final IfStatement is = (IfStatement) scope;
-            final IfStatement newIs = ast.newIfStatement();
-            newIs.setExpression(b.copy(is.getExpression()));
-            final Statement parentStmt = getAncestor(varName, Statement.class);
-            if (equalNotNull(is.getThenStatement(), parentStmt)) {
-                newIs.setThenStatement(copy(is.getThenStatement(), varName));
-                if (is.getElseStatement() != null) {
-                    newIs.setElseStatement(b.copy(is.getElseStatement()));
-                }
-                this.ctx.getRefactorings().replace(is, newIs);
-            } else if (equalNotNull(is.getElseStatement(), parentStmt)) {
-                if (is.getThenStatement() != null) {
-                    newIs.setThenStatement(b.copy(is.getThenStatement()));
-                }
-                newIs.setElseStatement(copy(is.getElseStatement(), varName));
-                this.ctx.getRefactorings().replace(is, newIs);
-            } else {
-                throw new IllegalStateException(is,
-                        "Parent statement should be inside the then or else statement of this if statement: " + is);
-            }
-        } else {
-            throw new NotImplementedException(scope);
-        }
-    }
-
-    private Block copy(Statement stmtToCopy, Name varName) {
-        if (stmtToCopy != null && !(stmtToCopy instanceof Block)) {
-            final Block b = this.ctx.getAST().newBlock();
-            final Assignment a = asExpression(stmtToCopy, Assignment.class);
-            if (a != null) {
-                final VariableDeclarationFragment vdf = getVariableDeclarationFragment(a, varName);
-                statements(b).add(this.ctx.getAST().newVariableDeclarationStatement(vdf));
-            } else {
-                throw new NotImplementedException(stmtToCopy);
-            }
-            return b;
-        }
-        // We should never come here if we had a Block statement, see the replace() method
-        throw new NotImplementedException(stmtToCopy);
-    }
-
-    private Type getType(ASTNode node) {
-        if (node instanceof VariableDeclarationStatement) {
-            final VariableDeclarationStatement vds = (VariableDeclarationStatement) node;
-            return this.ctx.getASTBuilder().copy(vds.getType());
-        }
-        return getType(node.getParent());
-    }
-
-    private VariableDeclarationFragment getVariableDeclarationFragment(Expression exprToReplace, Name varName) {
-        if (exprToReplace instanceof Assignment) {
-            final Assignment a = (Assignment) exprToReplace;
-            if (a.getLeftHandSide() instanceof SimpleName) {
-                final SimpleName sn = (SimpleName) a.getLeftHandSide();
-                if (sn.getFullyQualifiedName().equals(varName.getFullyQualifiedName())) {
-                    final ASTBuilder b = this.ctx.getASTBuilder();
-                    final VariableDeclarationFragment vdf = b.getAST().newVariableDeclarationFragment();
-                    vdf.setInitializer(b.copy(a.getRightHandSide()));
-                    vdf.setName(b.copy(sn));
-                    return vdf;
-                }
-            }
-            throw new NotImplementedException(a.getLeftHandSide());
-        }
-        throw new NotImplementedException(exprToReplace);
-    }
-
-    private void remove(ASTNode node) {
-        if (node instanceof VariableDeclarationFragment) {
-            this.ctx.getRefactorings().remove(node.getParent());
-        } else {
-            remove(node.getParent());
-        }
-    }
-
-    private boolean canReduceVariableScope(final List<VariableAccess> variableAccesses) {
-        final VariableAccess varDecl = variableAccesses.get(0);
-
-        VariableAccess lastWrite = null;
-        for (VariableAccess varAccess : variableAccesses) {
-            if (varAccess.getAccessType() == WRITE) {
-                // is only write
-                lastWrite = varAccess;
-            } else if ((varAccess.getAccessType() & READ) != 0) {
-                // is read
-                if (lastWrite != null
-                        && !isReadDominatedByWriteInScopeMoreReducedThanVariableScope(
-                                varAccess.getScope(), lastWrite.getScope(), varDecl.getScope())) {
-                    // TODO JNR return sublist of reduceable scope
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
-    private boolean isReadDominatedByWriteInScopeMoreReducedThanVariableScope(
-            ASTNode readScope, ASTNode writeScope, ASTNode varScope) {
-        if (isSameScope(varScope, readScope) || isSameScope(varScope, writeScope)) {
-            return false;
-        }
-        if (isSameScope(readScope, writeScope)) {
-            return true;
-        }
-        return isReadDominatedByWriteInScopeMoreReducedThanVariableScope(
-                readScope.getParent(), writeScope, varScope);
     }
 }
