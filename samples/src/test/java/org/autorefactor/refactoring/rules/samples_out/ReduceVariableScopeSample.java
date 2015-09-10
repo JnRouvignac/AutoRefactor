@@ -48,7 +48,7 @@ public class ReduceVariableScopeSample {
     }
 
     public void removeDeadVariableOnlyRemoveFragment() {
-        int i, j = 0; // TODO remove i
+        int j = 0;
         System.out.println(j);
     }
 

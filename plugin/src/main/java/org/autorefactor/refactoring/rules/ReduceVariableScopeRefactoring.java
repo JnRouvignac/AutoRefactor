@@ -272,6 +272,16 @@ public class ReduceVariableScopeRefactoring extends AbstractRefactoringRule {
                     }
                     // TODO JNR do not return here
                     return;
+                } else if (access1.is(DECL)) {
+                    if (!it.hasNext()) {
+                        // dead variable (never used)
+                        ASTNode toRemove = getNodeWithoutSideEffectsToRemove(access1);
+                        if (toRemove != null) {
+                            ctx.getRefactorings().remove(toRemove);
+                            continue;
+                        }
+                        // TODO JNR keep side effect assignments, i.e. remove constants
+                    }
                 } else {
                     // TODO JNR
                     // throw new NotImplementedException(node);
@@ -285,7 +295,7 @@ public class ReduceVariableScopeRefactoring extends AbstractRefactoringRule {
         if (access.is(DECL)) {
             VariableDeclarationFragment vdf = getAncestor(varName, VariableDeclarationFragment.class);
             Expression init = vdf.getInitializer();
-            if (init != null && isConstant(init)) {
+            if (init == null || isConstant(init)) {
                 VariableDeclarationStatement vds = (VariableDeclarationStatement) vdf.getParent();
                 return vds.fragments().size() == 1 ? vds : vdf;
             }
