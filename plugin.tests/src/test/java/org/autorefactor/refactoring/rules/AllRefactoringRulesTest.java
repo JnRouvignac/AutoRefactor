@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2014 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2014-2015 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -56,6 +56,14 @@ import static org.junit.Assert.*;
 public class AllRefactoringRulesTest {
 
     private static final String SAMPLES_ALL_BASE_DIR = "../samples/src/test/java/org/autorefactor/refactoring/rules/all";
+
+    /** If not empty, then only run the test samples present in this collection. */
+    private static final Collection<String> WHITELIST = Arrays.asList(
+    );
+    /** When {@link #WHITELIST} is empty, the test samples present in this collection will never be run. */
+    private static final Collection<String> BLACKLIST = Arrays.asList(
+    );
+
     private final String sampleName;
 
     public AllRefactoringRulesTest(String testName) {
@@ -69,8 +77,13 @@ public class AllRefactoringRulesTest {
         Arrays.sort(sampleFiles);
 
         final List<Object[]> output = new ArrayList<Object[]>(sampleFiles.length);
-        for (File sampleFile : sampleFiles) {
-            output.add(new Object[] { sampleFile.getName() });
+        for (File file : sampleFiles) {
+            final String fileName = file.getName();
+            if (!WHITELIST.isEmpty()
+                    ? WHITELIST.contains(fileName)
+                    : !BLACKLIST.contains(fileName)) {
+                output.add(new Object[] { file.getName() });
+            }
         }
         return output;
     }

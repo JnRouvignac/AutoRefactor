@@ -25,9 +25,6 @@
  */
 package org.autorefactor.refactoring.rules;
 
-import static org.autorefactor.cfg.test.TestUtils.*;
-import static org.junit.Assert.*;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -49,6 +46,9 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
+import static org.autorefactor.cfg.test.TestUtils.*;
+import static org.junit.Assert.*;
+
 /**
  * Tests each refactoring rule in isolation. Each refactoring rule is run in a
  * loop until it cannot apply any more changes to the sample file.
@@ -57,6 +57,15 @@ import org.junit.runners.Parameterized.Parameters;
 public class RefactoringRulesTest {
 
     private static final String SAMPLES_BASE_DIR = "../samples/src/test/java/org/autorefactor/refactoring/rules/";
+
+    /** If not empty, then only run the test samples present in this collection. */
+    private static final Collection<String> WHITELIST = Arrays.asList(
+    );
+    /** When {@link #WHITELIST} is empty, the test samples present in this collection will never be run. */
+    private static final Collection<String> BLACKLIST = Arrays.asList(
+            "ReduceVariableScopeSample.java"
+    );
+
     private final String testName;
 
     public RefactoringRulesTest(String testName) {
@@ -72,7 +81,9 @@ public class RefactoringRulesTest {
         final List<Object[]> output = new ArrayList<Object[]>(sampleFiles.length);
         for (File file : sampleFiles) {
             final String fileName = file.getName();
-            if (!"ReduceVariableScopeSample.java".equals(fileName)) { // To be completed
+            if (!WHITELIST.isEmpty()
+                    ? WHITELIST.contains(fileName)
+                    : !BLACKLIST.contains(fileName)) {
                 output.add(new Object[] { fileName.replace("Sample.java", "") });
             }
         }
