@@ -51,7 +51,6 @@ import static org.eclipse.jdt.core.dom.Assignment.Operator.*;
 import static org.eclipse.jdt.core.dom.InfixExpression.Operator.*;
 
 /** See {@link #getDescription()} method. */
-@SuppressWarnings("javadoc")
 public class HotSpotIntrinsicedAPIsRefactoring extends AbstractRefactoringRule {
 
     @Override
@@ -76,7 +75,6 @@ public class HotSpotIntrinsicedAPIsRefactoring extends AbstractRefactoringRule {
         private Expression destPos;
         private Expression length;
 
-        /** {@inheritDoc} */
         @Override
         public String toString() {
             return "System.arraycopy("
@@ -84,11 +82,6 @@ public class HotSpotIntrinsicedAPIsRefactoring extends AbstractRefactoringRule {
                     + destArrayExpr + ", " + destPos + ", "
                     + length + ")";
         }
-    }
-
-    /** Class constructor. */
-    public HotSpotIntrinsicedAPIsRefactoring() {
-        super();
     }
 
     @Override
@@ -157,10 +150,10 @@ public class HotSpotIntrinsicedAPIsRefactoring extends AbstractRefactoringRule {
         final Integer expr2Value = intValue(expr2);
         if (expr1Value != null && expr2Value != null) {
             return b.int0(expr1Value - expr2Value);
-        } else if (expr1Value != null && expr1Value == 0) {
+        } else if (equalNotNull(expr1Value, 0)) {
             throw new NotImplementedException(expr2, "Code is not implemented for negating expr2: " + expr2);
-        } else if (expr2Value != null && expr2Value == 0) {
-            return b.copy(expr1);
+        } else if (equalNotNull(expr2Value, 0)) {
+            return expr1;
         }
         return b.infixExpr(
                 b.copy(expr1),
@@ -175,10 +168,10 @@ public class HotSpotIntrinsicedAPIsRefactoring extends AbstractRefactoringRule {
         final Integer expr2Value = intValue(expr2);
         if (expr1Value != null && expr2Value != null) {
             return b.int0(expr1Value + expr2Value);
-        } else if (expr1Value != null && expr1Value == 0) {
-            return b.copy(expr2);
-        } else if (expr2Value != null && expr2Value == 0) {
-            return b.copy(expr1);
+        } else if (equalNotNull(expr1Value, 0)) {
+            return expr2;
+        } else if (equalNotNull(expr2Value, 0)) {
+            return expr1;
         }
         return b.infixExpr(
                 b.copy(expr1),
@@ -234,8 +227,7 @@ public class HotSpotIntrinsicedAPIsRefactoring extends AbstractRefactoringRule {
                 && equalNotNull(a1.resolveTypeBinding(), a2.resolveTypeBinding());
     }
 
-    private boolean replaceWithSystemArrayCopyCloneAll(ForStatement node,
-            SystemArrayCopyParams params) {
+    private boolean replaceWithSystemArrayCopyCloneAll(ForStatement node, SystemArrayCopyParams params) {
         if (params.srcArrayExpr == null
                 || params.srcPos == null
                 || params.destArrayExpr == null
@@ -271,8 +263,7 @@ public class HotSpotIntrinsicedAPIsRefactoring extends AbstractRefactoringRule {
         return DO_NOT_VISIT_SUBTREE;
     }
 
-    private void collectUniqueIndex(ForStatement node,
-            SystemArrayCopyParams params) {
+    private void collectUniqueIndex(ForStatement node, SystemArrayCopyParams params) {
         if (initializers(node).size() != 1) {
             return;
         }

@@ -31,6 +31,9 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class HotSpotIntrinsicedAPIsSampleTest {
 
     public org.autorefactor.refactoring.rules.samples_in.HotSpotIntrinsicedAPIsSample sampleIn;
@@ -77,9 +80,16 @@ public class HotSpotIntrinsicedAPIsSampleTest {
     }
 
     @Test
-    public void replaceBySystemArrayCopyWithSrcPos() {
-        sampleIn.replaceBySystemArrayCopyWithSrcPos(src, dest1);
-        sampleOut.replaceBySystemArrayCopyWithSrcPos(src, dest2);
+    public void replaceBySystemArrayCopyWithConstantSrcPos() {
+        sampleIn.replaceBySystemArrayCopyWithConstantSrcPos(src, dest1);
+        sampleOut.replaceBySystemArrayCopyWithConstantSrcPos(src, dest2);
+        assertArrayEquals(dest1, dest2);
+    }
+
+    @Test
+    public void replaceBySystemArrayCopyWithArgumentSrcPos() {
+        sampleIn.replaceBySystemArrayCopyWithArgumentSrcPos(src, 0, dest1);
+        sampleOut.replaceBySystemArrayCopyWithArgumentSrcPos(src, 0, dest2);
         assertArrayEquals(dest1, dest2);
     }
 
@@ -111,4 +121,15 @@ public class HotSpotIntrinsicedAPIsSampleTest {
         assertArrayEquals(dest1, dest2);
     }
 
+    private void assertArrayEquals(int[] a1, int[] a2) {
+        assertEquals(toList(a1), toList(a2));
+    }
+
+    private List<Integer> toList(int[] a) {
+        final List<Integer> results = new ArrayList<Integer>(a.length);
+        for (int i : a) {
+            results.add(i);
+        }
+        return results;
+    }
 }

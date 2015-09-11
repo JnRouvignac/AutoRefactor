@@ -63,9 +63,17 @@ public class HotSpotIntrinsicedAPIsSample {
         }
     }
 
-    public static void replaceBySystemArrayCopyWithSrcPos(int[] src, int[] dest) {
+    public static void replaceBySystemArrayCopyWithConstantSrcPos(int[] src, int[] dest) {
         try {
             System.arraycopy(src, 1, dest, 0, src.length - 1);
+        } catch (IndexOutOfBoundsException e) {
+            throw new ArrayIndexOutOfBoundsException(e.getMessage());
+        }
+    }
+
+    public static void replaceBySystemArrayCopyWithArgumentSrcPos(int[] src, int startPos, int[] dest) {
+        try {
+            System.arraycopy(src, startPos, dest, 0, dest.length);
         } catch (IndexOutOfBoundsException e) {
             throw new ArrayIndexOutOfBoundsException(e.getMessage());
         }
@@ -140,5 +148,4 @@ public class HotSpotIntrinsicedAPIsSample {
     public static void replaceWithStringIndexOf(String s) {
         // FIXME Should use java.lang.String.indexOf()
     }
-
 }

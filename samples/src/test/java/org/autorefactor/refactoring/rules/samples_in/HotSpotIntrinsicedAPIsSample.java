@@ -57,9 +57,15 @@ public class HotSpotIntrinsicedAPIsSample {
         }
     }
 
-    public static void replaceBySystemArrayCopyWithSrcPos(int[] src, int[] dest) {
+    public static void replaceBySystemArrayCopyWithConstantSrcPos(int[] src, int[] dest) {
         for (int i = 0; i < src.length - 1; i++) {
             dest[i] = src[i + 1];
+        }
+    }
+
+    public static void replaceBySystemArrayCopyWithArgumentSrcPos(int[] src, int startPos, int[] dest) {
+        for (int j = 0; j < dest.length; j++) {
+            dest[j] = src[startPos + j];
         }
     }
 
@@ -124,5 +130,4 @@ public class HotSpotIntrinsicedAPIsSample {
     public static void replaceWithStringIndexOf(String s) {
         // FIXME Should use java.lang.String.indexOf()
     }
-
 }
