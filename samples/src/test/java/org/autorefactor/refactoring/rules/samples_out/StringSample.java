@@ -35,6 +35,10 @@ public class StringSample {
         return s;
     }
 
+    public String replaceNewStringInMethodInvocation(String s, int i) {
+        return (s + i).toLowerCase();
+    }
+
     public String replaceStringValueOfOnAString(String s) {
         return s;
     }

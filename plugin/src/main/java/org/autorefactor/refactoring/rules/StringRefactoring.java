@@ -36,7 +36,6 @@ import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.eclipse.jdt.core.dom.ASTNode.*;
 
 /** See {@link #getDescription()} method. */
-@SuppressWarnings("javadoc")
 public class StringRefactoring extends AbstractRefactoringRule {
 
     @Override
@@ -59,8 +58,8 @@ public class StringRefactoring extends AbstractRefactoringRule {
                 && arguments(node).size() == 1) {
             final Expression arg0 = arguments(node).get(0);
             if (hasType(arg0, "java.lang.String")) {
-                final ASTBuilder b = this.ctx.getASTBuilder();
-                this.ctx.getRefactorings().replace(node, b.copy(arg0));
+                final ASTBuilder b = ctx.getASTBuilder();
+                ctx.getRefactorings().replace(node, b.parenthesizeIfNeeded(b.copy(arg0)));
                 return DO_NOT_VISIT_SUBTREE;
             }
         }
