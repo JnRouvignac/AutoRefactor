@@ -256,6 +256,9 @@ public class Refactorings {
      * @param toRemove the source location to remove
      */
     public void remove(SourceLocation toRemove) {
+        if (toRemove.getLength() == 0) {
+            throw new IllegalArgumentException("Cannot remove an empty source range: " + toRemove);
+        }
         hasRefactorings = true;
         sourceRewriter.remove(toRemove);
     }

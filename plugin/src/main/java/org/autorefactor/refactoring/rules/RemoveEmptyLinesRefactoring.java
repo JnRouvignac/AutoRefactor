@@ -266,7 +266,9 @@ public class RemoveEmptyLinesRefactoring extends AbstractRefactoringRule {
         if (endOfLineIndex < newLineIndex) {
             Matcher matcher = NEWLINE_PATTERN.matcher(source).region(endOfLineIndex, newLineIndex);
             boolean isEqualToNewline = matcher.matches();
-            if (!isEqualToNewline && matcher.find()) {
+            if (!isEqualToNewline
+                    && matcher.find()
+                    && matcher.end() < newLineIndex) {
                 final SourceLocation toRemove = SourceLocation.fromPositions(matcher.end(), newLineIndex);
                 this.ctx.getRefactorings().remove(toRemove);
                 return true;

@@ -49,6 +49,13 @@ public class RemoveEmptyLinesSample
         } catch (Exception e) { }
     }
 
+    public void doNotRefactorTrailingWhitespaceAfterBraces() throws Exception { 
+        try { 
+          System.out.println();
+        } catch (Exception e) { 
+        }
+    }
+
     public void doNotRemoveCodeOnSameLineAsTry() {
         try { Thread.sleep(100);
         }
