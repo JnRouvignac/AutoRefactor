@@ -25,11 +25,12 @@
  */
 package org.autorefactor.ui;
 
-import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Queue;
+import java.util.Set;
 
 import org.autorefactor.AutoRefactorPlugin;
 import org.autorefactor.refactoring.JavaProjectOptions;
@@ -200,7 +201,7 @@ public class ApplyRefactoringsJob extends Job {
         CompilationUnit astRoot = (CompilationUnit) parser.createAST(null);
 
         int totalNbLoops = 0;
-        List<ASTVisitor> lastLoopVisitors = Collections.emptyList();
+        Set<ASTVisitor> lastLoopVisitors = Collections.emptySet();
         int nbLoopsWithSameVisitors = 0;
         while (true) {
             if (totalNbLoops > 100) {
@@ -250,9 +251,9 @@ public class ApplyRefactoringsJob extends Job {
             ++totalNbLoops;
 
 
-            final List<ASTVisitor> thisLoopVisitors = refactoring.getVisitorsContributingRefactoring();
+            final Set<ASTVisitor> thisLoopVisitors = refactoring.getVisitorsContributingRefactoring();
             if (!thisLoopVisitors.equals(lastLoopVisitors)) {
-                lastLoopVisitors = new ArrayList<ASTVisitor>(thisLoopVisitors);
+                lastLoopVisitors = new HashSet<ASTVisitor>(thisLoopVisitors);
                 nbLoopsWithSameVisitors = 0;
             } else {
                 ++nbLoopsWithSameVisitors;
@@ -266,7 +267,7 @@ public class ApplyRefactoringsJob extends Job {
         parser.setCompilerOptions(options.getCompilerOptions());
     }
 
-    private String getPossibleCulprits(int nbLoopsWithSameVisitors, List<ASTVisitor> lastLoopVisitors) {
+    private String getPossibleCulprits(int nbLoopsWithSameVisitors, Set<ASTVisitor> lastLoopVisitors) {
         if (nbLoopsWithSameVisitors < 100 || lastLoopVisitors.isEmpty()) {
             return "";
         }

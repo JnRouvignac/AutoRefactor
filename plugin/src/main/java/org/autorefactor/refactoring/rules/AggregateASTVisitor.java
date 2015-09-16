@@ -31,6 +31,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -139,7 +140,6 @@ import static org.autorefactor.refactoring.ASTHelper.*;
  * When one visitor refactors a subtree of the AST, visitors coming after will not be able to visit it.
  * Visitors throwing exceptions are isolated and ignored for the rest of a run for stability.
  */
-@SuppressWarnings("javadoc")
 public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRule {
 
     private final Map<Class<?>, List<ASTVisitor>> visitorsMap = new HashMap<Class<?>, List<ASTVisitor>>();
@@ -151,7 +151,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     private final List<ASTVisitor> visitors;
 
     private RefactoringContext ctx;
-    private final List<ASTVisitor> visitorsContributingRefactoring = new ArrayList<ASTVisitor>();
+    private final Set<ASTVisitor> visitorsContributingRefactoring = new HashSet<ASTVisitor>();
 
     /**
      * Builds an instance of this class.
@@ -264,7 +264,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
      *
      * @return the visitors that contributed refactorings in the last run
      */
-    public List<ASTVisitor> getVisitorsContributingRefactoring() {
+    public Set<ASTVisitor> getVisitorsContributingRefactoring() {
         return visitorsContributingRefactoring;
     }
 
