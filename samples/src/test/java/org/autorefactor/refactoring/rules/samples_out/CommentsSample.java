@@ -25,9 +25,10 @@
  */
 package org.autorefactor.refactoring.rules.samples_out;
 
+import java.io.Closeable;
 import java.util.concurrent.Callable;
 
-public class CommentsSample implements Runnable, Callable<Void> {
+public class CommentsSample implements Runnable, Callable<Void>, Closeable {
 
     /** @NonNull */
     public Object o = new Object();
@@ -110,6 +111,9 @@ public class CommentsSample implements Runnable, Callable<Void> {
     /** {@inheritDoc} */
     public Void call() {
         return null;
+    }
+
+    public void close() {
     }
 
     /** Remove empty line at start and end of this javadoc. */

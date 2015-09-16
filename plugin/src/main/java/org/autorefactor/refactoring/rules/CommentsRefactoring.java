@@ -79,7 +79,8 @@ public class CommentsRefactoring extends AbstractRefactoringRule {
             + "- remove empty lines at start and end of javadocs and block comments,\n"
             + "- uppercase first letter of javadocs,\n"
             + "- collapse javadocs on a single line when allowed by Eclipse settings for formatting,\n"
-            + "- add final '.' to javadocs that do not have any.";
+            + "- add final '.' to javadocs that do not have any,\n"
+            + "- remove Eclipse generated (non-Javadoc) block comments.";
     }
 
     @Override
@@ -102,6 +103,8 @@ public class CommentsRefactoring extends AbstractRefactoringRule {
             +   "(?:TODO: handle exception)"
             + ")"
             + "\\s*");
+    private static final Pattern ECLIPSE_GENERATED_NON_JAVADOC =
+            Pattern.compile("/\\*\\s*\\(non-Javadoc\\)\\s*\\*\\s*@see\\s*");
     private static final Pattern ECLIPSE_IGNORE_NON_EXTERNALIZED_STRINGS =
             Pattern.compile("//\\s*\\$NON-NLS-\\d\\$\\s*");
     /**
@@ -137,7 +140,11 @@ public class CommentsRefactoring extends AbstractRefactoringRule {
         }
         final ASTNode nextNode = getNextNode(node);
         if (acceptJavadoc(nextNode) && !betterCommentExist(node, nextNode)) {
-            this.ctx.getRefactorings().toJavadoc(node);
+            if (ECLIPSE_GENERATED_NON_JAVADOC.matcher(comment).find()) {
+                this.ctx.getRefactorings().remove(node);
+            } else {
+                this.ctx.getRefactorings().toJavadoc(node);
+            }
             return DO_NOT_VISIT_SUBTREE;
         }
         final Matcher emptyLineAtStartMatcher = EMPTY_LINE_AT_START_OF_BLOCK_COMMENT.matcher(comment);

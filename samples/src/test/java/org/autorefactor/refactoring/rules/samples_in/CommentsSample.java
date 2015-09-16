@@ -25,9 +25,10 @@
  */
 package org.autorefactor.refactoring.rules.samples_in;
 
+import java.io.Closeable;
 import java.util.concurrent.Callable;
 
-public class CommentsSample implements Runnable, Callable<Void> {
+public class CommentsSample implements Runnable, Callable<Void>, Closeable {
 
     /** @NonNull */
     public Object o = new Object();
@@ -153,6 +154,12 @@ public class CommentsSample implements Runnable, Callable<Void> {
      */
     public Void call() {
         return null;
+    }
+
+    /* (non-Javadoc)
+     * @see java.io.Closeable#close()
+     */
+    public void close() {
     }
 
     /***
