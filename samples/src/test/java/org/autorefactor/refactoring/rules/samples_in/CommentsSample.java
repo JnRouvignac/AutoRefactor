@@ -61,6 +61,8 @@ public class CommentsSample implements Runnable, Callable<Void> {
     // First part of javadoc
     private int l; // Second part of javadoc
 
+    private String s = "Do not refactor line comment"; //$NON-NLS-1$
+
     // Convert to a javadoc
     public CommentsSample() {
         // TODO Auto-generated constructor stub

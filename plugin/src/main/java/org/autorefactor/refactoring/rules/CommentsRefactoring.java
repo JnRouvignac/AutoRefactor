@@ -102,6 +102,8 @@ public class CommentsRefactoring extends AbstractRefactoringRule {
             +   "(?:TODO: handle exception)"
             + ")"
             + "\\s*");
+    private static final Pattern ECLIPSE_IGNORE_NON_EXTERNALIZED_STRINGS =
+            Pattern.compile("//\\s*\\$NON-NLS-\\d\\$\\s*");
     /**
      * Ignore special instructions to locally enable/disable tools working on java code:
      * <ul>
@@ -419,7 +421,8 @@ public class CommentsRefactoring extends AbstractRefactoringRule {
         } else if (ECLIPSE_GENERATED_TODOS.matcher(comment).matches()) {
             this.ctx.getRefactorings().remove(node);
             return DO_NOT_VISIT_SUBTREE;
-        } else if (TOOLS_CONTROL_INSTRUCTIONS.matcher(comment).matches()) {
+        } else if (TOOLS_CONTROL_INSTRUCTIONS.matcher(comment).matches()
+                || ECLIPSE_IGNORE_NON_EXTERNALIZED_STRINGS.matcher(comment).matches()) {
             return VISIT_SUBTREE;
         } else {
             final ASTNode nextNode = getNextNode(node);

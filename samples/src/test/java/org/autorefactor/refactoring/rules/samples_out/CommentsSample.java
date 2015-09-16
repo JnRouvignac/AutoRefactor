@@ -45,6 +45,8 @@ public class CommentsSample implements Runnable, Callable<Void> {
     /** First part of javadoc Second part of javadoc. */
     private int l;
 
+    private String s = "Do not refactor line comment"; //$NON-NLS-1$
+
     /** Convert to a javadoc. */
     public CommentsSample() {
     }
