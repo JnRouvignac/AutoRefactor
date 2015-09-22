@@ -31,14 +31,18 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.autorefactor.refactoring.rules.AllRefactoringRules;
+import org.autorefactor.util.UnhandledException;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
+import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.ui.JavaUI;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.widgets.Display;
@@ -87,7 +91,8 @@ public class AutoRefactorHandler extends AbstractHandler {
         final String activePartId = HandlerUtil.getActivePartId(event);
         if ("org.eclipse.jdt.ui.CompilationUnitEditor".equals(activePartId)) {
             return getSelectedJavaElements(shell, HandlerUtil.getActiveEditor(event));
-        } else if ("org.eclipse.jdt.ui.PackageExplorer".equals(activePartId)) {
+        } else if ("org.eclipse.jdt.ui.PackageExplorer".equals(activePartId)
+                || "org.eclipse.ui.navigator.ProjectExplorer".equals(activePartId)) {
             return getSelectedJavaElements(shell, (IStructuredSelection) HandlerUtil.getCurrentSelection(event));
         } else {
             logWarning("Code is not implemented for activePartId '" + activePartId + "'.");
@@ -106,6 +111,11 @@ public class AutoRefactorHandler extends AbstractHandler {
                     || el instanceof IPackageFragmentRoot
                     || el instanceof IJavaProject) {
                 results.add((IJavaElement) el);
+            } else if (el instanceof IProject) {
+                final IProject project = (IProject) el;
+                if (hasNature(project, JavaCore.NATURE_ID)) {
+                    results.add(JavaCore.create(project));
+                }
             } else {
                 wrongSelection = true;
             }
@@ -114,6 +124,14 @@ public class AutoRefactorHandler extends AbstractHandler {
             showMessage(shell, "Please select a Java source file, Java package or Java project");
         }
         return results;
+    }
+
+    private static boolean hasNature(final IProject project, String natureId) {
+        try {
+            return project.hasNature(natureId);
+        } catch (CoreException e) {
+            throw new UnhandledException(null, e);
+        }
     }
 
     private static List<IJavaElement> getSelectedJavaElements(Shell shell, IEditorPart activeEditor) {

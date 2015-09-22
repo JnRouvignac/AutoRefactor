@@ -50,6 +50,23 @@
                          commandId="org.autorefactor.choose.refactorings" />
             </menu>
         </menuContribution>
+        <menuContribution locationURI="popup:org.eclipse.ui.navigator.ProjectExplorer#PopupMenu?after=org.eclipse.jdt.ui.refactoring.menu">
+            <visibleWhen checkEnabled="false">
+                <iterate ifEmpty="false">
+                    <or>
+                        <instanceof value="org.eclipse.jdt.core.IJavaProject" />
+                        <instanceof value="org.eclipse.jdt.core.IPackageFragment" />
+                        <instanceof value="org.eclipse.jdt.core.ICompilationUnit" />
+                    </or>
+                </iterate>
+            </visibleWhen>
+            <menu label="AutoRefactor">
+                <command style="push"
+                         commandId="org.autorefactor.automatic.refactoring" />
+                <command style="push"
+                         commandId="org.autorefactor.choose.refactorings" />
+            </menu>
+        </menuContribution>
         <!-- Cannot add to Refactor sub menu: @see https://issues.jboss.org/browse/JBIDE-1077 from Alexey Kazakov:
 
              More precisely @see https://issues.jboss.org/browse/JBIDE-1077#comment-12466929:
