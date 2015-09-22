@@ -25,7 +25,6 @@
  */
 package org.autorefactor.ui;
 
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -45,6 +44,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 import static org.autorefactor.AutoRefactorPlugin.*;
@@ -75,11 +75,10 @@ public class AutoRefactorHandler extends AbstractHandler {
         // TODO JNR provide from the UI the ability to execute groovy (other
         // scripts? rhino?) scripts for refactoring.
 
-        // <p> Extract method: Live variable analysis - READ WRITE variable
-        // analysis (including method params).If variable used in extracted
-        // method and WRITE first in selected text => do not pass it down as
-        // parameter.Use ASTMatcher and do not compare content of expressions,
-        // compare just resolvedTypeBinding().
+        // <p> Extract method: Live variable analysis - READ WRITE variable analysis (including method params).
+        // If variable used in extracted method and WRITE first in selected text
+        // => do not pass it down as parameter
+        // Use ASTMatcher and do not compare content of expressions, compare just resolvedTypeBinding().
         return null;
     }
 
@@ -87,43 +86,52 @@ public class AutoRefactorHandler extends AbstractHandler {
         final Shell shell = HandlerUtil.getActiveShell(event);
         final String activePartId = HandlerUtil.getActivePartId(event);
         if ("org.eclipse.jdt.ui.CompilationUnitEditor".equals(activePartId)) {
-            final IEditorInput editorInput = HandlerUtil.getActiveEditor(event).getEditorInput();
-            final IJavaElement javaElement = JavaUI.getEditorInputJavaElement(editorInput);
-            if (javaElement instanceof ICompilationUnit) {
-                return Collections.singletonList(javaElement);
-            }
-            Display.getDefault().asyncExec(new Runnable() {
-                @Override
-                public void run() {
-                    openInformation(shell, "Info", "This action only works on Java source files");
-                }
-            });
+            return getSelectedJavaElements(shell, HandlerUtil.getActiveEditor(event));
         } else if ("org.eclipse.jdt.ui.PackageExplorer".equals(activePartId)) {
-            final IStructuredSelection selection = (IStructuredSelection) HandlerUtil.getCurrentSelection(event);
-            final List<IJavaElement> results = new ArrayList<IJavaElement>();
-            final Iterator<?> it = selection.iterator();
-            while (it.hasNext()) {
-                final Object el = it.next();
-                if (el instanceof ICompilationUnit
-                        || el instanceof IPackageFragment
-                        || el instanceof IPackageFragmentRoot
-                        || el instanceof IJavaProject) {
-                    results.add((IJavaElement) el);
-                } else {
-                    Display.getDefault().asyncExec(new Runnable() {
-                        @Override
-                        public void run() {
-                            openInformation(shell, "Info",
-                                "Please select a Java source file, Java package or Java project");
-                        }
-                    });
-                }
-            }
-            return results;
+            return getSelectedJavaElements(shell, (IStructuredSelection) HandlerUtil.getCurrentSelection(event));
         } else {
             logWarning("Code is not implemented for activePartId '" + activePartId + "'.");
+            return Collections.emptyList();
         }
+    }
+
+    private static List<IJavaElement> getSelectedJavaElements(Shell shell,  IStructuredSelection selection) {
+        boolean wrongSelection = false;
+        final List<IJavaElement> results = new ArrayList<IJavaElement>();
+        final Iterator<?> it = selection.iterator();
+        while (it.hasNext()) {
+            final Object el = it.next();
+            if (el instanceof ICompilationUnit
+                    || el instanceof IPackageFragment
+                    || el instanceof IPackageFragmentRoot
+                    || el instanceof IJavaProject) {
+                results.add((IJavaElement) el);
+            } else {
+                wrongSelection = true;
+            }
+        }
+        if (wrongSelection) {
+            showMessage(shell, "Please select a Java source file, Java package or Java project");
+        }
+        return results;
+    }
+
+    private static List<IJavaElement> getSelectedJavaElements(Shell shell, IEditorPart activeEditor) {
+        final IEditorInput editorInput = activeEditor.getEditorInput();
+        final IJavaElement javaElement = JavaUI.getEditorInputJavaElement(editorInput);
+        if (javaElement instanceof ICompilationUnit) {
+            return Collections.singletonList(javaElement);
+        }
+        showMessage(shell, "This action only works on Java source files");
         return Collections.emptyList();
     }
 
+    private static void showMessage(final Shell shell, final String message) {
+        Display.getDefault().asyncExec(new Runnable() {
+            @Override
+            public void run() {
+                openInformation(shell, "Info", message);
+            }
+        });
+    }
 }
