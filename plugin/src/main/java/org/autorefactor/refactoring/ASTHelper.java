@@ -142,10 +142,48 @@ import org.eclipse.jdt.core.dom.WildcardType;
 
 import static org.eclipse.jdt.core.dom.ASTNode.*;
 
-/**
- * Helper class for manipulating, converting, navigating and checking {@link ASTNode}s.
- */
+/** Helper class for manipulating, converting, navigating and checking {@link ASTNode}s. */
 public final class ASTHelper {
+
+    /** Enum representing a primitive type. */
+    public static enum PrimitiveEnum {
+        /** The {@code boolean} type. */
+        BOOLEAN("boolean"),
+        /** The {@code byte} type. */
+        BYTE("byte"),
+        /** The {@code char} type. */
+        CHAR("char"),
+        /** The {@code short} type. */
+        SHORT("short"),
+        /** The {@code int} type. */
+        INT("int"),
+        /** The {@code long} type. */
+        LONG("long"),
+        /** The {@code float} type. */
+        FLOAT("float"),
+        /** The {@code double} type. */
+        DOUBLE("double");
+
+        private final String name;
+
+        private PrimitiveEnum(String name) {
+            this.name = name;
+        }
+
+        private static PrimitiveEnum valueOf2(String name) {
+            for (PrimitiveEnum primEnum : values()) {
+                if (primEnum.name.equals(name)) {
+                    return primEnum;
+                }
+            }
+            return null;
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
+    }
 
     /** Compares {@link ASTNode}s according to their start position. */
     public static final class NodeStartPositionComparator implements Comparator<ASTNode> {
@@ -1113,6 +1151,7 @@ public final class ASTHelper {
      */
     public static boolean isPrimitive(ITypeBinding typeBinding, String primitiveTypeName) {
         return typeBinding != null
+                && typeBinding.isPrimitive()
                 && typeBinding.getQualifiedName().equals(primitiveTypeName);
     }
 
@@ -1124,8 +1163,22 @@ public final class ASTHelper {
      */
     public static boolean isPrimitive(ITypeBinding typeBinding) {
         return typeBinding != null
+                && typeBinding.isPrimitive()
                 && Arrays.asList("boolean", "byte", "char", "short", "int", "long", "float", "double")
                     .contains(typeBinding.getQualifiedName());
+    }
+
+    /**
+     * Returns an enum representing the primitive type of this type binding.
+     *
+     * @param typeBinding the type binding to analyze
+     * @return an enum representing the primitive type of this type binding,
+     *         {@code null} if the type binding is null, or if it does not a primitive type.
+     */
+    public static PrimitiveEnum getPrimitiveEnum(ITypeBinding typeBinding) {
+        return typeBinding != null && typeBinding.isPrimitive()
+            ? PrimitiveEnum.valueOf2(typeBinding.getQualifiedName())
+            : null;
     }
 
     private static ITypeBinding findImplementedType(ITypeBinding typeBinding, String qualifiedTypeName) {

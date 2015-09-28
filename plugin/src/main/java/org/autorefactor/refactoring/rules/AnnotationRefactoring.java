@@ -25,17 +25,27 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.autorefactor.refactoring.ASTBuilder;
+import org.autorefactor.refactoring.ASTHelper.PrimitiveEnum;
 import org.autorefactor.refactoring.Refactorings;
+import org.autorefactor.util.NotImplementedException;
+import org.autorefactor.util.Utils;
+import org.eclipse.jdt.core.dom.ArrayInitializer;
+import org.eclipse.jdt.core.dom.Expression;
+import org.eclipse.jdt.core.dom.IAnnotationBinding;
+import org.eclipse.jdt.core.dom.IMethodBinding;
+import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.MemberValuePair;
 import org.eclipse.jdt.core.dom.NormalAnnotation;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
+import static org.eclipse.jdt.core.dom.ASTNode.*;
 
 /** See {@link #getDescription()} method. */
-@SuppressWarnings("javadoc")
 public class AnnotationRefactoring extends AbstractRefactoringRule {
 
     @Override
@@ -67,7 +77,144 @@ public class AnnotationRefactoring extends AbstractRefactoringRule {
                 return DO_NOT_VISIT_SUBTREE;
             }
         }
-        return VISIT_SUBTREE;
+
+        boolean result = VISIT_SUBTREE;
+        Map<String, IMethodBinding> elements = toElementsMap(node.resolveAnnotationBinding());
+        for (MemberValuePair pair : values) {
+            IMethodBinding elementBinding = elements.get(pair.getName().getIdentifier());
+            if (equal(elementBinding.getReturnType(), pair.getValue(), elementBinding.getDefaultValue())) {
+                r.remove(pair);
+                result = DO_NOT_VISIT_SUBTREE;
+            } else if (pair.getValue().getNodeType() == ARRAY_INITIALIZER) {
+                ArrayInitializer arrayInit = (ArrayInitializer) pair.getValue();
+                List<Expression> exprs = expressions(arrayInit);
+                if (exprs.size() == 1) {
+                    r.replace(arrayInit, b.move(exprs.get(0)));
+                    result = DO_NOT_VISIT_SUBTREE;
+                }
+            }
+        }
+        return result;
     }
 
+    private Map<String, IMethodBinding> toElementsMap(IAnnotationBinding annotBinding) {
+        ITypeBinding annotationType = annotBinding.getAnnotationType();
+        IMethodBinding[] elements = annotationType.getDeclaredMethods();
+        Map<String, IMethodBinding> results = new HashMap<String, IMethodBinding>();
+        for (IMethodBinding element : elements) {
+            results.put(element.getName(), element);
+        }
+        return results;
+    }
+
+    private boolean equal(ITypeBinding typeBinding, Expression expr, Object javaObj2) {
+        Object javaObj1 = expr.resolveConstantExpressionValue();
+        switch (expr.getNodeType()) {
+        case ARRAY_INITIALIZER:
+            return arraysEqual(typeBinding, (ArrayInitializer) expr, javaObj2);
+        case BOOLEAN_LITERAL:
+            return Utils.equalNotNull(javaObj1, javaObj2);
+        case CHARACTER_LITERAL:
+            return Utils.equalNotNull(javaObj1, javaObj2);
+        case STRING_LITERAL:
+            return Utils.equalNotNull(javaObj1, javaObj2);
+        case NUMBER_LITERAL:
+            PrimitiveEnum primEnum = getPrimitiveEnum(typeBinding);
+            switch (primEnum) {
+            case BYTE:
+                return Utils.equalNotNull(toByte(javaObj1), toByte(javaObj2));
+            case SHORT:
+                return Utils.equalNotNull(toShort(javaObj1), toShort(javaObj2));
+            case INT:
+                return Utils.equalNotNull(toInteger(javaObj1), toInteger(javaObj2));
+            case LONG:
+                return Utils.equalNotNull(toLong(javaObj1), toLong(javaObj2));
+            case FLOAT:
+                return Utils.equalNotNull(toFloat(javaObj1), toFloat(javaObj2));
+            case DOUBLE:
+                return Utils.equalNotNull(toDouble(javaObj1), toDouble(javaObj2));
+            default:
+                throw new NotImplementedException(expr, "for primitive type \"" + primEnum + "\".");
+            }
+        default:
+            return false;
+        }
+    }
+
+    private boolean arraysEqual(ITypeBinding typeBinding, ArrayInitializer arrayInit, Object javaObj) {
+        if (javaObj instanceof Object[]) {
+            Object[] javaObjArray = (Object[]) javaObj;
+            List<Expression> exprs = expressions(arrayInit);
+            if (exprs.size() == javaObjArray.length) {
+                boolean result = true;
+                for (int i = 0; i < javaObjArray.length; i++) {
+                    result &= equal(typeBinding.getElementType(), exprs.get(i), javaObjArray[i]);
+                }
+                return result;
+            }
+        }
+        return false;
+    }
+
+    private Byte toByte(Object javaObj) {
+        // no byte literal exist
+        if (javaObj instanceof Integer) {
+            int i = (Integer) javaObj;
+            if (Byte.MIN_VALUE <= i && i <= Byte.MAX_VALUE) {
+                return (byte) i;
+            }
+        }
+        return null;
+    }
+
+    private Short toShort(Object javaObj) {
+        // no short literal exist
+        if (javaObj instanceof Integer) {
+            int i = (Integer) javaObj;
+            if (Short.MIN_VALUE <= i && i <= Short.MAX_VALUE) {
+                return (short) i;
+            }
+        }
+        return null;
+    }
+
+    private Integer toInteger(Object javaObj) {
+        if (javaObj instanceof Integer) {
+            return (Integer) javaObj;
+        }
+        return null;
+    }
+
+    private Long toLong(Object javaObj) {
+        if (javaObj instanceof Integer) {
+            return ((Integer) javaObj).longValue();
+        } else  if (javaObj instanceof Long) {
+            return (Long) javaObj;
+        }
+        return null;
+    }
+
+    private Float toFloat(Object javaObj) {
+        if (javaObj instanceof Integer) {
+            return ((Integer) javaObj).floatValue();
+        } else  if (javaObj instanceof Long) {
+            return ((Long) javaObj).floatValue();
+        } else  if (javaObj instanceof Float) {
+            return (Float) javaObj;
+        }
+        return null;
+    }
+
+    private Double toDouble(Object javaObj) {
+        if (javaObj instanceof Integer) {
+            return ((Integer) javaObj).doubleValue();
+        } else  if (javaObj instanceof Long) {
+            return ((Long) javaObj).doubleValue();
+        } else  if (javaObj instanceof Float) {
+            return ((Float) javaObj).doubleValue();
+        } else  if (javaObj instanceof Double) {
+            return (Double) javaObj;
+        }
+        return null;
+    }
 }
