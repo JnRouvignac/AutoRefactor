@@ -217,7 +217,8 @@ public class CommentsRefactoring extends AbstractRefactoringRule {
         } else if (allTagsEmpty(tags(node))) {
             this.ctx.getRefactorings().remove(node);
             return DO_NOT_VISIT_SUBTREE;
-        } else if (!acceptJavadoc(getNextNode(node))) {
+        } else if (!acceptJavadoc(getNextNode(node))
+                && node.getStartPosition() != 0) {
             this.ctx.getRefactorings().replace(node, comment.replace("/**", "/*"));
             return DO_NOT_VISIT_SUBTREE;
         } else if (JAVADOC_ONLY_INHERITDOC.matcher(comment).matches()) {

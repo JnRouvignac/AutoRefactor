@@ -1,4 +1,4 @@
-/*
+/**
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
  * Copyright (C) 2013-2015 Jean-Noël Rouvignac - initial API and implementation
