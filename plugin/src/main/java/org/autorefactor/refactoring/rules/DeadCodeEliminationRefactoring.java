@@ -124,10 +124,11 @@ public class DeadCodeEliminationRefactoring extends AbstractRefactoringRule {
             if (!finallyStmts.isEmpty()) {
                 final ASTBuilder b = this.ctx.getASTBuilder();
                 this.ctx.getRefactorings().replace(node, b.copy(node.getFinally()));
-            } else {
+                return DO_NOT_VISIT_SUBTREE;
+            } else if (node.resources().isEmpty()) {
                 this.ctx.getRefactorings().remove(node);
+                return DO_NOT_VISIT_SUBTREE;
             }
-            return DO_NOT_VISIT_SUBTREE;
         }
     // }else {
     // for (CatchClause catchClause : (List<CatchClause>) node.catchClauses()) {

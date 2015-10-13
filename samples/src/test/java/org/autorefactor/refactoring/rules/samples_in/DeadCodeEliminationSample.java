@@ -25,6 +25,9 @@
  */
 package org.autorefactor.refactoring.rules.samples_in;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+
 public class DeadCodeEliminationSample {
 
     private class Parent {
@@ -184,6 +187,11 @@ public class DeadCodeEliminationSample {
     void doNotRemoveEmptyStatement(boolean b) {
         if (b);
         else System.out.println(b);
+    }
+
+    private void doNotRemoveTryWithResources() throws IOException {
+        try (FileInputStream f = new FileInputStream("file.txt")) {
+        }
     }
 
     private interface MethodDeclarationWithoutBody {
