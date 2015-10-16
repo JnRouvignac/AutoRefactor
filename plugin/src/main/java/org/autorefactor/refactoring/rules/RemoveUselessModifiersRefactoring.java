@@ -49,10 +49,8 @@ import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
-import static org.eclipse.jdt.core.dom.Modifier.*;
 
 /** See {@link #getDescription()} method. */
-@SuppressWarnings("javadoc")
 public class RemoveUselessModifiersRefactoring extends AbstractRefactoringRule {
 
     @Override
@@ -60,8 +58,8 @@ public class RemoveUselessModifiersRefactoring extends AbstractRefactoringRule {
         return ""
             + "Fixes modifier order.\n"
             + "Also removes modifiers implied by the context:\n"
-            + "- \"public\", \"static\" and \"final\" for interfaces fields,\n"
-            + "- \"public\" and \"abstract\" for interfaces methods,\n"
+            + "- \"public\", \"static\" and \"final\" for interface fields,\n"
+            + "- \"public\" and \"abstract\" for interface methods,\n"
             + "- \"final\" for parameters in interface method declarations.";
     }
 
@@ -122,15 +120,6 @@ public class RemoveUselessModifiersRefactoring extends AbstractRefactoringRule {
 
     @Override
     public boolean visit(MethodDeclaration node) {
-        final int modifierFlags = node.getModifiers();
-        if (isStatic(modifierFlags) && isFinal(modifierFlags)) {
-            for (Modifier m : getModifiersOnly(modifiers(node))) {
-                if (m.isFinal()) {
-                    this.ctx.getRefactorings().remove(m);
-                    return DO_NOT_VISIT_SUBTREE;
-                }
-            }
-        }
         if (isInterface(node.getParent())) {
             // remove modifiers implied by the context
             return removePublicAbstractModifiers(node);

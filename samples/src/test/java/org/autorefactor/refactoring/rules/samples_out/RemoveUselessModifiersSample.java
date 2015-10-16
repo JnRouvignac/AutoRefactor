@@ -37,7 +37,7 @@ public interface RemoveUselessModifiersSample {
 
         public static final String MY_FIELD = "";
 
-        public static void myMethod(final String myArg) {
+        public static final void myMethod(final String myArg) {
         }
 
         // FIXME JDT bug? (still failing with juno) uncomment next line
