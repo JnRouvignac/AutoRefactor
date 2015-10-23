@@ -55,6 +55,7 @@ import org.eclipse.jdt.core.dom.ParameterizedType;
 import org.eclipse.jdt.core.dom.ParenthesizedExpression;
 import org.eclipse.jdt.core.dom.PrefixExpression;
 import org.eclipse.jdt.core.dom.PrimitiveType;
+import org.eclipse.jdt.core.dom.PrimitiveType.Code;
 import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.SimpleType;
@@ -69,7 +70,6 @@ import org.eclipse.jdt.core.dom.TryStatement;
 import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
-import org.eclipse.jdt.core.dom.PrimitiveType.Code;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.autorefactor.util.Utils.*;
@@ -763,10 +763,14 @@ public class ASTBuilder {
      * @return the parenthesized expression of the provided expression to return or this expression itself
      */
     public Expression parenthesizeIfNeeded(Expression expr) {
-        if (expr.getNodeType() == INFIX_EXPRESSION
-                || expr.getNodeType() == INSTANCEOF_EXPRESSION) {
+        switch (expr.getNodeType()) {
+        case ASSIGNMENT:
+        case CONDITIONAL_EXPRESSION:
+        case INFIX_EXPRESSION:
+        case INSTANCEOF_EXPRESSION:
             return parenthesize(expr);
+        default:
+            return expr;
         }
-        return expr;
     }
 }

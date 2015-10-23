@@ -365,6 +365,27 @@ public class BooleanSample {
         // FIXME This should be converted to aMethodThatAcceptsABoolean(bo && aMethodThatReturnsBoolean());
     }
 
+    public boolean invertConditionalExpression(int i, boolean res1, boolean res2) {
+        if (i == 0 ? res1 : res2) {
+            return false;
+        }
+        return true;
+    }
+
+    public boolean invertAssignment(boolean b1, boolean b2) {
+        if (b1 = b2) {
+            return false;
+        }
+        return true;
+    }
+
+    public boolean invertCast(Object o) {
+        if ((Boolean) o) {
+            return false;
+        }
+        return true;
+    }
+
     public boolean doNotRefactor(Object o) {
         if (o instanceof Double) {
             return ((Double) o).doubleValue() != 0;
