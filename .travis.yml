@@ -22,12 +22,16 @@
 # which accompanies this distribution under LICENSE-ECLIPSE, and is
 # available at http://www.eclipse.org/legal/epl-v10.html
 
-
 language: java
 jdk:
   - openjdk7
   - oraclejdk7
   - oraclejdk8
+
+sudo: false
+cache:
+  directories:
+  - $HOME/.m2
 
 #notifications:
 #  email:
