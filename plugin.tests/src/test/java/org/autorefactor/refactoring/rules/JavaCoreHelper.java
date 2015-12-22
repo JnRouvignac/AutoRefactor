@@ -202,19 +202,15 @@ public class JavaCoreHelper {
         if (!classpathEntries.isEmpty()) {
             IClasspathEntry[] oldEntries = javaProject.getRawClasspath();
             IClasspathEntry[] newEntries;
-            if (oldEntries.length != 0)
-            {
+            if (oldEntries.length != 0) {
                 // remove duplicate entries
                 Set<IClasspathEntry> set = new HashSet<IClasspathEntry>(Arrays.asList(oldEntries));
                 set.addAll(classpathEntries);
                 newEntries = set.toArray(new IClasspathEntry[set.size()]);
-            }
-            else
-            {
+            } else {
                 newEntries = classpathEntries.toArray(new IClasspathEntry[classpathEntries.size()]);
             }
             javaProject.setRawClasspath(newEntries, null);
         }
     }
-
 }

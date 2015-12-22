@@ -49,8 +49,11 @@ public interface RemoveUselessModifiersSample {
     public static abstract class AbstractSampleClass {
     }
 
-    public static enum FixModifierOrderSampleEnum {
+    public enum RemoveStaticSampleEnum {
         VALUE1, VALUE2
+    }
+
+    public interface RemoveStaticSampleInterface {
     }
 
     public static @interface FixModifierOrderSampleAnnotation {
