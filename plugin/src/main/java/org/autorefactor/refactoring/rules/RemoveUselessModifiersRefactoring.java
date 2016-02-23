@@ -198,7 +198,7 @@ public class RemoveUselessModifiersRefactoring extends AbstractRefactoringRule {
 
     private void insertAt(Modifier m, int index) {
         final ASTBuilder b = this.ctx.getASTBuilder();
-        this.ctx.getRefactorings().insertAt(b.move(m), index, m.getLocationInParent(), m.getParent());
+        this.ctx.getRefactorings().insertAt(b.copy(m), index, m.getLocationInParent(), m.getParent());
     }
 
     @Override
