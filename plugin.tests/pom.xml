@@ -2,7 +2,7 @@
 <!--
  | AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  |
- | Copyright (C) 2014 Jean-Noël Rouvignac - initial API and implementation
+ | Copyright (C) 2014-2016 Jean-Noël Rouvignac - initial API and implementation
  |
  | This program is free software: you can redistribute it and/or modify
  | it under the terms of the GNU General Public License as published by
@@ -39,28 +39,7 @@
     <version>1.1.0-SNAPSHOT</version>
   </parent>
 
-  <repositories>
-    <repository>
-      <id>orbit</id>
-      <url>http://download.eclipse.org/tools/orbit/downloads/drops/R20130827064939/repository/</url>
-<!--
-      <id>orbit Juno SR2</id>
-      <url>http://download.eclipse.org/tools/orbit/downloads/drops/R20130118183705/repository/</url>
-      <id>orbit Kepler SR2</id>
-      <url>http://download.eclipse.org/tools/orbit/downloads/drops/R20140114142710/repository/</url>
-      <id>orbit Luna SR2</id>
-      <url>http://download.eclipse.org/tools/orbit/downloads/drops/R20150124073747/repository/</url>
--->
-      <layout>p2</layout>
-    </repository>
-  </repositories>
-
   <dependencies>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>4.11</version>
-    </dependency>
     <dependency>
       <groupId>org.autorefactor.plugin</groupId>
       <artifactId>org.autorefactor.rules.samples</artifactId>
