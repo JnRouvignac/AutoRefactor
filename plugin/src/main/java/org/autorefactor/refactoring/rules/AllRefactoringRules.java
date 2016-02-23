@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2014-2015 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2014-2016 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -66,6 +66,7 @@ public final class AllRefactoringRules {
      */
     public static List<RefactoringRule> getAllRefactoringRules() {
         return newArrayList(
+                new RemoveEmptyLinesRefactoring(),
                 new RemoveUselessNullCheckRefactoring(),
                 new WorkWithNullCheckedExpressionFirstRefactoring(),
                 new VectorOldToNewAPIRefactoring(),
@@ -108,8 +109,7 @@ public final class AllRefactoringRules {
                 new AnnotationRefactoring(),
                 new RemoveSemiColonRefactoring(),
                 // FIXME it would be nice if it was only enabled when testng jar is detected for the project
-                new TestNGAssertRefactoring(),
-                new RemoveEmptyLinesRefactoring());
+                new TestNGAssertRefactoring());
     }
 
     private static List<RefactoringRule> newArrayList(RefactoringRule... refactorings) {

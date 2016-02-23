@@ -59,6 +59,7 @@ public class AllRefactoringRulesTest {
 
     /** If not empty, then only run the test samples present in this collection. */
     private static final Collection<String> WHITELIST = Arrays.asList(
+        "NoMalformedTreeException4Sample.java"
     );
     /** When {@link #WHITELIST} is empty, the test samples present in this collection will never be run. */
     private static final Collection<String> BLACKLIST = Arrays.asList(
