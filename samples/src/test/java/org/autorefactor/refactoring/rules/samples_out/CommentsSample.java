@@ -1,7 +1,7 @@
 /**
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2013-2015 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2013-2016 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -39,21 +39,21 @@ public class CommentsSample implements Runnable, Callable<Void>, Closeable {
 
     /** Uppercase first word. */
     private int i;
-    /** This must be attached as a javadoc to field 'j'. */
+    /** This must be attached as a javadoc to field 'j' * /. */
     private int j;
     /** Uppercase. */
     private int k;
-    /** First part of javadoc Second part of javadoc. */
+    /** First part of javadoc Second part of javadoc * /. */
     private int l;
 
     private String s = "Do not refactor line comment"; //$NON-NLS-1$
 
-    /** Convert to a javadoc. */
+    /** Convert to a javadoc * /. */
     public CommentsSample() {
     }
 
     /**
-     * Convert to a javadoc
+     * Convert to a javadoc * /
      * and correctly indent characters closing the javadoc.
      */
     public void test0() {

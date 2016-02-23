@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2013-2015 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2013-2016 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,6 +26,8 @@
 package org.autorefactor.refactoring;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -38,6 +40,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.autorefactor.util.IllegalStateException;
 import org.autorefactor.util.NotImplementedException;
 import org.autorefactor.util.Pair;
 import org.eclipse.jdt.core.dom.ASTNode;
@@ -125,16 +128,48 @@ public class ASTCommentRewriter {
      */
     public void addEdits(IDocument document, TextEdit edits) {
         final String source = document.get();
-        final List<TextEdit> commentEdits = new LinkedList<TextEdit>();
+        final List<TextEdit> commentEdits = new ArrayList<TextEdit>(nbEdits());
         addRemovalEdits(commentEdits, source);
         addReplacementEdits(commentEdits);
         addBlockCommentToJavadocEdits(commentEdits);
         addLineCommentsToJavadocEdits(commentEdits, source);
+        // detectPotentiallyMalformedTree(commentEdits, source);
         if (!commentEdits.isEmpty() && !anyOverlaps(edits, commentEdits)) {
             edits.addChildren(commentEdits.toArray(new TextEdit[commentEdits.size()]));
         }
         // else, code edits take priority. Give up applying current text edits.
         // They will be retried in the next refactoring loop.
+    }
+
+    private void detectPotentiallyMalformedTree(List<TextEdit> commentEdits, final String source) {
+        if (commentEdits.isEmpty()) {
+            return;
+        }
+        Collections.sort(commentEdits, new Comparator<TextEdit>() {
+            @Override
+            public int compare(TextEdit te1, TextEdit te2) {
+                final SourceLocation sourceLoc1 = toSourceLoc(te1);
+                final SourceLocation sourceLoc2 = toSourceLoc(te2);
+                if (sourceLoc1.overlapsWith(sourceLoc2)) {
+                    throw new IllegalStateException(null,
+                            "Potentially malformed tree detected:\n"
+                            + " overlapping edit 1: " + toString(te1, sourceLoc1, source)
+                            + " overlapping edit 2: " + toString(te2, sourceLoc2, source));
+                }
+                return sourceLoc1.compareTo(sourceLoc2);
+            }
+
+            private String toString(TextEdit te, SourceLocation loc, String source) {
+                return te + "\"" + source.substring(loc.getStartPosition(), loc.getEndPosition()) + "\"";
+            }
+        });
+    }
+
+    private int nbEdits() {
+        return removals.size()
+                + replacements.size()
+                + blockCommentToJavadoc.size()
+                + lineCommentsToJavadoc.size();
     }
 
     private boolean anyOverlaps(TextEdit edits, List<TextEdit> commentEdits) {
@@ -240,27 +275,53 @@ public class ASTCommentRewriter {
             ASTNode nextNode, List<LineComment> lineComments, String source, TreeSet<Integer> lineStarts) {
         final int nodeStart = nextNode.getStartPosition();
         final LineComment lineComment = lineComments.get(0);
-        final int commentStart = lineComment.getStartPosition();
-        final int commentLength = lineComment.getLength();
-        final String comment = source.substring(commentStart, commentStart + commentLength);
-        final String commentText = comment.substring(2);
-        // add a starting and ending space?
-        final String spaceAtStart = !Character.isWhitespace(commentText.charAt(0)) ? " " : "";
-        final String spaceAtEnd = !Character.isWhitespace(commentText.charAt(commentText.length() - 1)) ? " " : "";
 
         // TODO JNR how to obey configured indentation?
         // TODO JNR how to obey configured line length?
+        final int commentStart = lineComment.getStartPosition();
         if (commentStart < nodeStart) {
             // assume comment is situated exactly before target node for javadoc
+            final String spaceAtStart = getSpaceAtStart(source, lineComment);
             commentEdits.add(new ReplaceEdit(commentStart, "//".length(), "/**" + spaceAtStart));
-            commentEdits.add(new InsertEdit(commentStart + commentLength, spaceAtEnd + "*/"));
+            commentEdits.add(new InsertEdit(getEndPosition(lineComment), getSpaceAtEnd(source, lineComment) + "*/"));
+            replaceEndsOfBlockCommentFromCommentText(commentEdits, lineComment, source);
         } else {
             // assume comment is situated exactly after target node for javadoc
-            final String indent = getIndent(nextNode, source, lineStarts);
-            final String newJavadoc = "/**" + spaceAtStart + commentText + spaceAtEnd + "*/\r\n" + indent;
-            commentEdits.add(new InsertEdit(nodeStart, newJavadoc));
+            final StringBuilder newJavadoc = new StringBuilder()
+                .append("/**")
+                .append(getSpaceAtStart(source, lineComment));
+
+            appendCommentTextReplaceEndsOfBlockComment(newJavadoc, lineComment, source);
+
+            newJavadoc
+                .append(getSpaceAtEnd(source, lineComment))
+                .append("*/\r\n")
+                .append(getIndent(nextNode, source, lineStarts));
+            commentEdits.add(new InsertEdit(nodeStart, newJavadoc.toString()));
             deleteLineCommentAfterNode(commentEdits, source, lineComment);
         }
+    }
+
+    private void appendCommentTextReplaceEndsOfBlockComment(StringBuilder sb, LineComment lineComment, String source) {
+        final int commentStart = lineComment.getStartPosition();
+        int nextStart = commentStart + "//".length();
+        final Matcher matcher = endsOfBlockCommentMatcher(lineComment, source, nextStart);
+        while (matcher.find()) {
+            sb.append(source, nextStart, matcher.start());
+            sb.append("* /");
+            nextStart = matcher.end();
+        }
+        sb.append(source, nextStart, getEndPosition(lineComment));
+    }
+
+    private String getSpaceAtStart(String source, final LineComment lineComment) {
+        final char firstChar = source.charAt(lineComment.getStartPosition() + "//".length());
+        return !Character.isWhitespace(firstChar) ? " " : "";
+    }
+
+    private String getSpaceAtEnd(String source, final LineComment lineComment) {
+        final char lastChar = source.charAt(getEndPosition(lineComment) - 1);
+        return !Character.isWhitespace(lastChar) ? " " : "";
     }
 
     private void deleteLineCommentAfterNode(List<TextEdit> commentEdits,
@@ -308,6 +369,8 @@ public class ASTCommentRewriter {
         }
         commentEdits.add(new ReplaceEdit(lineComment.getStartPosition(), "//".length(), replacementText));
 
+        replaceEndsOfBlockCommentFromCommentText(commentEdits, lineComment, source);
+
         final boolean isLast = i == lineComments.size() - 1;
         if (isLast) {
             // TODO JNR how to get access to configured newline? @see #getNewline();
@@ -316,6 +379,20 @@ public class ASTCommentRewriter {
             final String indent = getIndentForJavadoc(lineComment, source, lineStarts);
             commentEdits.add(new InsertEdit(position, newline + indent + "*/"));
         }
+    }
+
+    private void replaceEndsOfBlockCommentFromCommentText(
+            List<TextEdit> commentEdits, LineComment lineComment, String source) {
+        final Matcher matcher = endsOfBlockCommentMatcher(lineComment, source, lineComment.getStartPosition());
+        while (matcher.find()) {
+            commentEdits.add(new ReplaceEdit(matcher.start(), matcher.end() - matcher.start(), "* /"));
+        }
+    }
+
+    private Matcher endsOfBlockCommentMatcher(LineComment lineComment, String source, int startPos) {
+        return Pattern.compile("\\*/")
+            .matcher(source)
+            .region(startPos, getEndPosition(lineComment));
     }
 
     private void replaceLineCommentAfterJavaElement(List<TextEdit> commentEdits,
@@ -327,14 +404,21 @@ public class ASTCommentRewriter {
                             + " and this line comment is not the last line comment to add to the javadoc.");
         }
 
-        final String commentText = source.substring(
-                lineComment.getStartPosition() + "//".length(), getEndPosition(lineComment));
         final LineComment previousLineComment = lineComments.get(i - 1);
         final int position = getEndPosition(previousLineComment);
         final String indent = getIndentForJavadoc(previousLineComment, source, lineStarts);
-        commentEdits.add(new InsertEdit(position,
-                newline + indent + " *" + commentText
-                + newline + indent + " */"));
+        final StringBuilder newJavadoc = new StringBuilder()
+            .append(newline)
+            .append(indent)
+            .append(" *");
+
+        appendCommentTextReplaceEndsOfBlockComment(newJavadoc, lineComment, source);
+
+        newJavadoc
+            .append(newline)
+            .append(indent)
+            .append(" */");
+        commentEdits.add(new InsertEdit(position, newJavadoc.toString()));
         deleteLineCommentAfterNode(commentEdits, source, lineComment);
     }
 
