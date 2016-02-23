@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2014 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2014-2016 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -82,7 +82,7 @@ public class JavaCoreHelper {
 
         final Node projectNode = getNodeByNodeName(document.getChildNodes(), "project");
         final List<Node> dependencies = asList(getNodeByNodeName(projectNode.getChildNodes(), "dependencies").getChildNodes());
-        final String m2Repo = System.getProperty("user.home") + "/.m2/repository/";
+        final String m2Repo = getM2Repository();
         for (Node dependency : dependencies) {
             final NodeList children = dependency.getChildNodes();
             String groupId = getNodeByNodeName(children, "groupId").getTextContent();
@@ -92,6 +92,31 @@ public class JavaCoreHelper {
                     + artifactId + "-" + version + ".jar";
             entries.add(JavaCore.newLibraryEntry(new Path(jarPath), null, null));
         }
+    }
+
+    private static String getM2Repository() throws Exception {
+        final String userHome = System.getProperty("user.home");
+        final File m2Settings = new File(userHome + "/.m2/settings.xml");
+        if (m2Settings.exists() && m2Settings.isFile()) {
+            final Document document = DocumentBuilderFactory.newInstance()
+                                                            .newDocumentBuilder()
+                                                            .parse(m2Settings);
+    
+            final Node settingsNode = getNodeByNodeName(document.getChildNodes(), "settings");
+            if (settingsNode != null) {
+                final Node localRepoNode = getNodeByNodeName(settingsNode.getChildNodes(), "localRepository");
+                if (localRepoNode != null) {
+                    return localRepoNode.getTextContent();
+                }
+            }
+        }
+        final File m2Repo = new File(userHome + "/.m2/repository/");
+        if (m2Repo.exists() && m2Repo.isDirectory()) {
+            return m2Repo.getPath();
+        }
+        throw new RuntimeException("Cannot determine maven repository."
+                        + " Tried \"" + m2Settings + "\" file"
+                        + " and \"" + m2Repo + "\" directory.");
     }
 
     private static Node getNodeByNodeName(NodeList nodes, String nodeName) {
