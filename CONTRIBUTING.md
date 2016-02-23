@@ -14,6 +14,9 @@ Add a line to each file you modify (including samples) with such text:
     (C) name + email + the work you did.
 
 # Developers
+
+See [Hacking AutoRefactor](https://github.com/JnRouvignac/AutoRefactor/wiki/Hacking-AutoRefactor) to setup your Eclipse environment and download the source. Then you are ready to hack AutoRefactor!
+
 TODO: Setup the eclipse/ folder for Eclipse settings.
 Make sure your code respect the overall style of the project.
 
