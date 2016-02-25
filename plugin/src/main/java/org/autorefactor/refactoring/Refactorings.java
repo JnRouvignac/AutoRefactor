@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2013-2015 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2013-2016 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -44,6 +44,7 @@ import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.BlockComment;
 import org.eclipse.jdt.core.dom.ChildListPropertyDescriptor;
 import org.eclipse.jdt.core.dom.Comment;
+import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.LineComment;
 import org.eclipse.jdt.core.dom.StructuralPropertyDescriptor;
 import org.eclipse.jdt.core.dom.rewrite.ASTRewrite;
@@ -63,7 +64,7 @@ public class Refactorings {
     private final ASTRewrite rewrite;
     private final Map<Pair<ASTNode, ChildListPropertyDescriptor>, ListRewrite> listRewriteCache =
             new HashMap<Pair<ASTNode, ChildListPropertyDescriptor>, ListRewrite>();
-    private final ASTCommentRewriter commentRewriter = new ASTCommentRewriter();
+    private final ASTCommentRewriter commentRewriter;
     private final SourceRewriter sourceRewriter = new SourceRewriter();
     /** Nodes that cannot be visited. */
     private final Set<ASTNode> forbiddenNodes = new HashSet<ASTNode>();
@@ -71,10 +72,11 @@ public class Refactorings {
     /**
      * Builds an instance of this class.
      *
-     * @param ast the AST
+     * @param astRoot the compilation unit, root of the AST
      */
-    public Refactorings(AST ast) {
-        this.rewrite = ASTRewrite.create(ast);
+    public Refactorings(CompilationUnit astRoot) {
+        this.rewrite = ASTRewrite.create(astRoot.getAST());
+        this.commentRewriter = new ASTCommentRewriter(astRoot);
     }
 
     /**

@@ -43,9 +43,12 @@ import java.util.regex.Pattern;
 import org.autorefactor.util.IllegalStateException;
 import org.autorefactor.util.NotImplementedException;
 import org.autorefactor.util.Pair;
+import org.autorefactor.util.UnhandledException;
+import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.BlockComment;
 import org.eclipse.jdt.core.dom.Comment;
+import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.LineComment;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.text.edits.DeleteEdit;
@@ -58,9 +61,7 @@ import org.eclipse.text.edits.TextEditVisitor;
 import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.autorefactor.refactoring.SourceLocation.*;
 
-/**
- * This class rewrites AST comments.
- */
+/** This class rewrites AST comments. */
 public class ASTCommentRewriter {
 
     /**
@@ -71,10 +72,29 @@ public class ASTCommentRewriter {
     private final Set<Pair<Comment, String>> replacements = new LinkedHashSet<Pair<Comment, String>>();
     private final List<BlockComment> blockCommentToJavadoc = new ArrayList<BlockComment>();
     private final Map<ASTNode, List<LineComment>> lineCommentsToJavadoc = new HashMap<ASTNode, List<LineComment>>();
+    private final String lineSeparator;
 
-    /** Default constructor. */
-    public ASTCommentRewriter() {
-        super();
+    /**
+     * Default constructor.
+     *
+     * @param astRoot
+     *          the compilation unit, root of the AST
+     */
+    public ASTCommentRewriter(CompilationUnit astRoot) {
+        this.lineSeparator = getLineSeparator(astRoot);
+    }
+
+    private String getLineSeparator(CompilationUnit astRoot) {
+        String result = findRecommendedLineSeparator(astRoot);
+        return result != null ? result : System.getProperty("line.separator");
+    }
+
+    private String findRecommendedLineSeparator(CompilationUnit astRoot) {
+        try {
+            return astRoot.getTypeRoot().findRecommendedLineSeparator();
+        } catch (JavaModelException e) {
+            throw new UnhandledException(astRoot, e);
+        }
     }
 
     /**
@@ -295,7 +315,8 @@ public class ASTCommentRewriter {
 
             newJavadoc
                 .append(getSpaceAtEnd(source, lineComment))
-                .append("*/\r\n")
+                .append("*/")
+                .append(lineSeparator)
                 .append(getIndent(nextNode, source, lineStarts));
             commentEdits.add(new InsertEdit(nodeStart, newJavadoc.toString()));
             deleteLineCommentAfterNode(commentEdits, source, lineComment);
@@ -342,28 +363,26 @@ public class ASTCommentRewriter {
 
     private void addMultiLineCommentsToJavadocEdits(List<TextEdit> commentEdits, ASTNode node,
             List<LineComment> lineComments, String source, TreeSet<Integer> lineStarts) {
-        final String newline = "\n";
         for (int i = 0; i < lineComments.size(); i++) {
             final LineComment lineComment = lineComments.get(i);
             if (lineComment.getStartPosition() <= node.getStartPosition()) {
                 replaceLineCommentBeforeJavaElement(
-                        commentEdits, lineComment, lineComments, i, source, lineStarts, newline);
+                        commentEdits, lineComment, lineComments, i, source, lineStarts);
             } else {
                 replaceLineCommentAfterJavaElement(
-                        commentEdits, lineComment, lineComments, i, source, lineStarts, newline);
+                        commentEdits, lineComment, lineComments, i, source, lineStarts);
             }
         }
     }
 
     private void replaceLineCommentBeforeJavaElement(List<TextEdit> commentEdits,
             LineComment lineComment, List<LineComment> lineComments, int i,
-            String source, TreeSet<Integer> lineStarts, String newline) {
+            String source, TreeSet<Integer> lineStarts) {
         final boolean isFirst = i == 0;
         final String replacementText;
         if (isFirst) {
-            // TODO JNR how to get access to configured newline? @see #getNewline();
             // TODO JNR how to obey configured indentation?
-            replacementText = "/**" + newline + getIndentForJavadoc(lineComment, source, lineStarts) + "*";
+            replacementText = "/**" + lineSeparator + getIndentForJavadoc(lineComment, source, lineStarts) + "*";
         } else {
             replacementText = " *";
         }
@@ -373,11 +392,10 @@ public class ASTCommentRewriter {
 
         final boolean isLast = i == lineComments.size() - 1;
         if (isLast) {
-            // TODO JNR how to get access to configured newline? @see #getNewline();
             // TODO JNR how to obey configured indentation?
             final int position = getEndPosition(lineComment);
             final String indent = getIndentForJavadoc(lineComment, source, lineStarts);
-            commentEdits.add(new InsertEdit(position, newline + indent + "*/"));
+            commentEdits.add(new InsertEdit(position, lineSeparator + indent + "*/"));
         }
     }
 
@@ -397,7 +415,7 @@ public class ASTCommentRewriter {
 
     private void replaceLineCommentAfterJavaElement(List<TextEdit> commentEdits,
             LineComment lineComment, List<LineComment> lineComments, int i,
-            String source, TreeSet<Integer> lineStarts, String newline) {
+            String source, TreeSet<Integer> lineStarts) {
         if (i - 1 < 0) {
             throw new NotImplementedException(lineComment,
                     "for a line comment situated after the java elements that it documents,"
@@ -408,14 +426,14 @@ public class ASTCommentRewriter {
         final int position = getEndPosition(previousLineComment);
         final String indent = getIndentForJavadoc(previousLineComment, source, lineStarts);
         final StringBuilder newJavadoc = new StringBuilder()
-            .append(newline)
+            .append(lineSeparator)
             .append(indent)
             .append(" *");
 
         appendCommentTextReplaceEndsOfBlockComment(newJavadoc, lineComment, source);
 
         newJavadoc
-            .append(newline)
+            .append(lineSeparator)
             .append(indent)
             .append(" */");
         commentEdits.add(new InsertEdit(position, newJavadoc.toString()));
@@ -444,16 +462,11 @@ public class ASTCommentRewriter {
         return lineStarts.headSet(commentStart).last();
     }
 
-    private void getNewline() {
-        // TODO how to get access to configured newline
-        // Answer: use ICompilationUnit.findRecommendedLineSeparator()
-    }
-
     private int chompWhitespacesBefore(final String text, int start) {
         int i = start - 1;
         while (i >= 0) {
             final char c = text.charAt(i);
-            // TODO JNR how to get project specific newline separator?? @see #getNewline();
+            // TODO JNR how to get project specific newline separator?? @see #lineSeparator
             if (!Character.isWhitespace(c) || c == '\n') {
                 break;
             }
@@ -472,7 +485,7 @@ public class ASTCommentRewriter {
             }
             i++;
             end = i;
-            // TODO JNR how to get project specific newline separator?? @see #getNewline();
+            // TODO JNR how to get project specific newline separator?? @see #lineSeparator
             if (c == '\n') {
                 // we chomped the newline character, do not chomp on the next line
                 break;
