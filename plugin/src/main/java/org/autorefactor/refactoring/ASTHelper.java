@@ -1390,24 +1390,20 @@ public final class ASTHelper {
         final ITypeBinding superclass = declaringClass.getSuperclass();
         if (superclass != null) {
             for (IMethodBinding methodFromSuperclass : superclass.getDeclaredMethods()) {
-                if (overridingMethod.overrides(methodFromSuperclass)) {
-                    if (!results.add(methodFromSuperclass)) {
-                        // type has already been visited
-                        return;
-                    }
-                }
+            	if (overridingMethod.overrides(methodFromSuperclass) && !results.add(methodFromSuperclass)) {
+            		// type has already been visited
+            		return;
+            	}
             }
             findOverridenMethods(overridingMethod, results, superclass);
         }
 
         for (ITypeBinding itf : declaringClass.getInterfaces()) {
             for (IMethodBinding methodFromItf : itf.getDeclaredMethods()) {
-                if (overridingMethod.overrides(methodFromItf)) {
-                    if (!results.add(methodFromItf)) {
-                        // type has already been visited
-                        return;
-                    }
-                }
+            	if (overridingMethod.overrides(methodFromItf) && !results.add(methodFromItf)) {
+            		// type has already been visited
+            		return;
+            	}
             }
             findOverridenMethods(overridingMethod, results, itf);
         }
