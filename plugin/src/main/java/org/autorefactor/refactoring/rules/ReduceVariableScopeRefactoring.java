@@ -212,8 +212,7 @@ public class ReduceVariableScopeRefactoring extends AbstractRefactoringRule {
                 list = new ArrayList<VariableAccess>();
                 this.allVariableAccesses.put(varName, list);
             }
-            if (list.size() == 0
-                    || !list.get(list.size() - 1).getScope().equals(accessTypeAndScope.getSecond())) {
+            if (list.isEmpty() || !list.get(list.size() - 1).getScope().equals(accessTypeAndScope.getSecond())) {
                 // only keep first write in scope
                 list.add(new VariableAccess(node, accessTypeAndScope.getFirst(), accessTypeAndScope.getSecond()));
             }

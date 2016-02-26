@@ -284,7 +284,7 @@ public class StringBuilderRefactoring extends AbstractRefactoringRule {
 
     private Expression createStringConcats(List<Expression> appendedStrings) {
         final ASTBuilder b = this.ctx.getASTBuilder();
-        if (appendedStrings.size() == 0) {
+        if (appendedStrings.isEmpty()) {
             return b.string("");
         } else if (appendedStrings.size() == 1) {
             final Expression expr = appendedStrings.get(0);

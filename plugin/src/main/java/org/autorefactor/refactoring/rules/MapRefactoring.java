@@ -111,7 +111,7 @@ public class MapRefactoring extends AbstractRefactoringRule {
             return false;
         }
         final List<Expression> args = arguments(cic);
-        final boolean noArgsCtor = args.size() == 0;
+        final boolean noArgsCtor = args.isEmpty();
         final boolean mapCapacityCtor = args.size() == 1 && isPrimitive(args.get(0), "int");
         if (noArgsCtor && hasType(cic,
                 "java.util.concurrent.ConcurrentHashMap",
