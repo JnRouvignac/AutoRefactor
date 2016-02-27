@@ -433,7 +433,7 @@ public class ReduceVariableScopeRefactoring extends AbstractRefactoringRule {
                 lastWrite = varAccess;
             } else if ((varAccess.getAccessType() & READ) != 0 && lastWrite != null
                     && !isReadDominatedByWriteInScopeMoreReducedThanVariableScope(
-                varAccess.getScope(), lastWrite.getScope(), varDecl.getScope())) {
+                    varAccess.getScope(), lastWrite.getScope(), varDecl.getScope())) {
                 // is read
                 // TODO JNR return sublist of reduceable scope
                 return false;

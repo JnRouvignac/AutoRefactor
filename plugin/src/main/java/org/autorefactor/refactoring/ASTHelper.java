@@ -1401,8 +1401,8 @@ public final class ASTHelper {
         for (ITypeBinding itf : declaringClass.getInterfaces()) {
             for (IMethodBinding methodFromItf : itf.getDeclaredMethods()) {
                 if (overridingMethod.overrides(methodFromItf) && !results.add(methodFromItf)) {
-                   // type has already been visited
-                   return;
+                    // type has already been visited
+                    return;
                 }
             }
             findOverridenMethods(overridingMethod, results, itf);

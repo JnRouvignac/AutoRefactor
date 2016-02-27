@@ -231,7 +231,7 @@ public class CollectionRefactoring extends AbstractRefactoringRule {
                 } else if (isMethod(mi, "java.util.Collection", "remove", "java.lang.Object")) {
                     return replaceWithCollectionMethod(node, loopContent, "removeAll", mi);
                 }
-            } else if (ARRAY.equals(loopContent.getContainerType()) 
+            } else if (ARRAY.equals(loopContent.getContainerType())
                    && isMethod(mi, "java.util.Collection", "add", "java.lang.Object")
                    && areTypeCompatible(mi.getExpression(), loopContent.getContainerVariable())) {
                 final Expression addArg0 = arg0(mi);
