@@ -264,7 +264,7 @@ public class CommonCodeInIfElseStatementRefactoring extends AbstractRefactoringR
     }
 
     private int minSize(List<List<Statement>> allCasesStmts) {
-    	if (allCasesStmts.isEmpty()) {
+        if (allCasesStmts.isEmpty()) {
             throw new IllegalStateException(null, "allCasesStmts List must not be empty");
         }
         int min = Integer.MAX_VALUE;
