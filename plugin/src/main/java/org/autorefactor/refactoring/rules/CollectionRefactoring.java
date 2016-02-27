@@ -187,12 +187,10 @@ public class CollectionRefactoring extends AbstractRefactoringRule {
             } else if (isMethod(mi, "java.util.Collection", "remove", "java.lang.Object")) {
                 return replaceWithCollectionMethod(node, iterable, "removeAll", mi);
             }
-        } else if (isArray(iterable)) {
-            if (isMethod(mi, "java.util.Collection", "add", "java.lang.Object")
-                    && areTypeCompatible(mi.getExpression(), iterable)
-                    && isSameLocalVariable(arg0(mi), node.getParameter().resolveBinding())) {
-                return replaceWithCollectionsAddAll(node, iterable, mi);
-            }
+        } else if (isArray(iterable) && isMethod(mi, "java.util.Collection", "add", "java.lang.Object")
+                && areTypeCompatible(mi.getExpression(), iterable)
+                && isSameLocalVariable(arg0(mi), node.getParameter().resolveBinding())) {
+            return replaceWithCollectionsAddAll(node, iterable, mi);
         }
         return VISIT_SUBTREE;
     }
@@ -233,14 +231,12 @@ public class CollectionRefactoring extends AbstractRefactoringRule {
                 } else if (isMethod(mi, "java.util.Collection", "remove", "java.lang.Object")) {
                     return replaceWithCollectionMethod(node, loopContent, "removeAll", mi);
                 }
-            } else if (ARRAY.equals(loopContent.getContainerType())) {
-                if (isMethod(mi, "java.util.Collection", "add", "java.lang.Object")
-                        && areTypeCompatible(mi.getExpression(), loopContent.getContainerVariable())) {
-                    final Expression addArg0 = arg0(mi);
-                    final ArrayAccess aa = as(addArg0, ArrayAccess.class);
-                    if (isSameVariable(loopContent, aa)) {
-                        return replaceWithCollectionsAddAll(node, loopContent.getContainerVariable(), mi);
-                    }
+            } else if (ARRAY.equals(loopContent.getContainerType()) && isMethod(mi, "java.util.Collection", "add", "java.lang.Object")
+                   && areTypeCompatible(mi.getExpression(), loopContent.getContainerVariable())) {
+                final Expression addArg0 = arg0(mi);
+                final ArrayAccess aa = as(addArg0, ArrayAccess.class);
+                if (isSameVariable(loopContent, aa)) {
+                    return replaceWithCollectionsAddAll(node, loopContent.getContainerVariable(), mi);
                 }
             }
         }
