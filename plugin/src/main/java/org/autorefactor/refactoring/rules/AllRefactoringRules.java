@@ -95,7 +95,7 @@ public final class AllRefactoringRules {
                 // TODO JNR implement
                 // new RemoveStupidIdiomaticPatternRefactoring(),
                 // TODO JNR - to be completed
-                // new ReduceVariableScopeRefactoring(),
+                new ReduceVariableScopeRefactoring(),
                 new StringBuilderRefactoring(),
                 new UseStringContainsRefactoring(),
                 new PushNegationDownRefactoring(),

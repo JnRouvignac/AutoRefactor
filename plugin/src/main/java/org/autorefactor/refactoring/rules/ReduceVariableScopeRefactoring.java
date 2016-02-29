@@ -40,21 +40,27 @@ import org.autorefactor.util.Pair;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Block;
+import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.Expression;
+import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.IBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Name;
+import org.eclipse.jdt.core.dom.PrefixExpression;
+import org.eclipse.jdt.core.dom.PrefixExpression.Operator;
 import org.eclipse.jdt.core.dom.QualifiedName;
 import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.Statement;
+import org.eclipse.jdt.core.dom.SuperMethodInvocation;
 import org.eclipse.jdt.core.dom.VariableDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.eclipse.jdt.core.dom.ASTNode.*;
+import static org.eclipse.jdt.core.dom.PrefixExpression.Operator.*;
 
 /**
  * TODO JNR can we also transform singular fields into local variables?
@@ -187,9 +193,14 @@ public class ReduceVariableScopeRefactoring extends AbstractRefactoringRule {
         }
     }
 
+    private static final Pair<Integer, ASTNode> NULL_PAIR = Pair.of(0, null);
     private final Map<VariableName, List<VariableAccess>> allVariableAccesses =
             new HashMap<VariableName, List<VariableAccess>>();
-    private static final Pair<Integer, ASTNode> NULL_PAIR = Pair.of(0, null);
+
+    @Override
+    public void endVisit(CompilationUnit node) {
+        allVariableAccesses.clear();
+    }
 
     @Override
     public void postVisit(ASTNode node) {
@@ -206,7 +217,7 @@ public class ReduceVariableScopeRefactoring extends AbstractRefactoringRule {
                     SimpleName name = (SimpleName) varName;
                     // TODO JNR remove this loop?
                     IBinding b = name.resolveBinding();
-                    if (b.getKind() == IBinding.VARIABLE) {
+                    if (b != null && b.getKind() == IBinding.VARIABLE) {
                         IVariableBinding varB = (IVariableBinding) b;
                         List<VariableAccess> list = iVarAccesses.get(varB);
                         if (list == null) {
@@ -293,11 +304,26 @@ public class ReduceVariableScopeRefactoring extends AbstractRefactoringRule {
     private ASTNode getNodeWithoutSideEffectsToRemove(VariableAccess access) {
         Name varName = access.getVariableName();
         if (access.is(DECL)) {
-            VariableDeclarationFragment vdf = getAncestor(varName, VariableDeclarationFragment.class);
-            Expression init = vdf.getInitializer();
-            if (init == null || isConstant(init)) {
-                VariableDeclarationStatement vds = (VariableDeclarationStatement) vdf.getParent();
-                return vds.fragments().size() == 1 ? vds : vdf;
+            ASTNode ancestor = getAncestor(varName, VariableDeclarationFragment.class, SingleVariableDeclaration.class);
+            if (ancestor instanceof VariableDeclarationFragment) {
+                VariableDeclarationFragment vdf = (VariableDeclarationFragment) ancestor;
+                Expression init = vdf.getInitializer();
+                if (init == null || isConstant(init)) {
+                    ASTNode parent = vdf.getParent();
+                    if (parent instanceof VariableDeclarationStatement) {
+                        VariableDeclarationStatement vds = (VariableDeclarationStatement) parent;
+                        return vds.fragments().size() == 1 ? vds : vdf;
+                    } else if (parent instanceof FieldDeclaration) {
+                        FieldDeclaration fd = (FieldDeclaration) parent;
+                        return fd.fragments().size() == 1 ? fd : vdf;
+                    }
+                }
+            } else if (ancestor instanceof SingleVariableDeclaration) {
+                SingleVariableDeclaration svd = (SingleVariableDeclaration) ancestor;
+                Expression init = svd.getInitializer();
+                if (init == null || isConstant(init)) {
+                    return svd.getParent();
+                }
             }
         } else if (access.is(WRITE)) {
             if (access.is(READ)) {
@@ -379,7 +405,6 @@ public class ReduceVariableScopeRefactoring extends AbstractRefactoringRule {
         final ASTNode parent = node.getParent();
         switch (parent.getNodeType()) {
         case BLOCK:
-        case INFIX_EXPRESSION:
         case ENHANCED_FOR_STATEMENT:
         case EXPRESSION_STATEMENT:
         case FOR_STATEMENT:
@@ -395,7 +420,7 @@ public class ReduceVariableScopeRefactoring extends AbstractRefactoringRule {
 
         case SINGLE_VARIABLE_DECLARATION:
             final SingleVariableDeclaration sVar = (SingleVariableDeclaration) parent;
-            return getAccessTypeAndScope(sVar.getParent());
+            return Pair.of(sVar.getInitializer() != null ? WRITE | DECL : DECL, getScope(sVar.getParent()));
 
         case VARIABLE_DECLARATION_FRAGMENT:
             final VariableDeclarationFragment varDecl = (VariableDeclarationFragment) parent;
@@ -404,11 +429,38 @@ public class ReduceVariableScopeRefactoring extends AbstractRefactoringRule {
         case ASSIGNMENT:
             return Pair.of(WRITE, getScope(parent.getParent()));
 
+        case ARRAY_ACCESS:
+        case ARRAY_CREATION:
+        case ARRAY_INITIALIZER:
+        case CAST_EXPRESSION:
+        case CONDITIONAL_EXPRESSION:
+        case FIELD_ACCESS:
+        case IF_STATEMENT:
+        case INFIX_EXPRESSION:
+        case INSTANCEOF_EXPRESSION:
+        case RETURN_STATEMENT:
+        case SWITCH_STATEMENT:
+        case SYNCHRONIZED_STATEMENT:
+        case THROW_STATEMENT:
+            return Pair.of(READ, getScope(parent.getParent()));
+
         case METHOD_INVOCATION:
             if (node.equals(((MethodInvocation) parent).getName())) {
                 return NULL_PAIR;
             }
             return Pair.of(READ, getScope(parent.getParent()));
+
+        case SUPER_METHOD_INVOCATION:
+            if (node.equals(((SuperMethodInvocation) parent).getName())) {
+                return NULL_PAIR;
+            }
+            return Pair.of(READ, getScope(parent.getParent()));
+
+        case PREFIX_EXPRESSION:
+            PrefixExpression pr = (PrefixExpression) parent;
+            Operator op = pr.getOperator();
+            int accessType = DECREMENT.equals(op) || INCREMENT.equals(op) ? WRITE : READ;
+            return Pair.of(accessType, getScope(parent.getParent()));
 
         case POSTFIX_EXPRESSION:
             return Pair.of(READ | WRITE, getScope(parent.getParent()));
@@ -416,14 +468,31 @@ public class ReduceVariableScopeRefactoring extends AbstractRefactoringRule {
         case IMPORT_DECLARATION:
         case METHOD_DECLARATION:
         case PACKAGE_DECLARATION:
-        case TYPE_DECLARATION:
+        case ENUM_DECLARATION:
+        case ENUM_CONSTANT_DECLARATION:
         case ARRAY_TYPE:
+        case MEMBER_REF:
+        case METHOD_REF:
         case PARAMETERIZED_TYPE:
         case PRIMITIVE_TYPE:
         case QUALIFIED_TYPE:
         case SIMPLE_TYPE:
+        case SWITCH_CASE:
+        case TAG_ELEMENT:
+        case THIS_EXPRESSION:
+        case TRY_STATEMENT: // FIXME JNR  this is wrong, but I am getting tired now
+        case TYPE_DECLARATION:
+        case TYPE_PARAMETER:
         case UNION_TYPE:
         case WILDCARD_TYPE:
+        // ignore annotations
+        case MARKER_ANNOTATION:
+        case NORMAL_ANNOTATION:
+        case SINGLE_MEMBER_ANNOTATION:
+        // class name: not a variable
+        case CLASS_INSTANCE_CREATION:
+        case CONSTRUCTOR_INVOCATION:
+        case SUPER_CONSTRUCTOR_INVOCATION:
             return NULL_PAIR;
 
         default:
@@ -433,12 +502,21 @@ public class ReduceVariableScopeRefactoring extends AbstractRefactoringRule {
 
     private ASTNode getScope(ASTNode node) {
         switch (node.getNodeType()) {
+        case ANONYMOUS_CLASS_DECLARATION:
         case BLOCK:
+        case CATCH_CLAUSE:
         case ENHANCED_FOR_STATEMENT:
+        case ENUM_DECLARATION:
         case FOR_STATEMENT:
         case IF_STATEMENT:
+        case METHOD_DECLARATION:
+        case SWITCH_STATEMENT:
+        case TYPE_DECLARATION:
         case WHILE_STATEMENT:
             return node;
+        case ENUM_CONSTANT_DECLARATION:
+        case FIELD_DECLARATION:
+            return getScope(node.getParent());
         default:
             if (node instanceof Expression
                     || node instanceof Statement
