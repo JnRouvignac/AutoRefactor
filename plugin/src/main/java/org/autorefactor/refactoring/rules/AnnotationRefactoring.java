@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2014-2015 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2014-2016 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -98,6 +99,9 @@ public class AnnotationRefactoring extends AbstractRefactoringRule {
     }
 
     private Map<String, IMethodBinding> toElementsMap(IAnnotationBinding annotBinding) {
+        if (annotBinding == null) {
+            return Collections.emptyMap();
+        }
         ITypeBinding annotationType = annotBinding.getAnnotationType();
         IMethodBinding[] elements = annotationType.getDeclaredMethods();
         Map<String, IMethodBinding> results = new HashMap<String, IMethodBinding>();
