@@ -88,7 +88,8 @@ public class JavaCoreHelper {
             String groupId = getNodeByNodeName(children, "groupId").getTextContent();
             String artifactId = getNodeByNodeName(children, "artifactId").getTextContent();
             String version = getNodeByNodeName(children, "version").getTextContent();
-            final String jarPath = m2Repo + toPath(groupId) + "/" + artifactId + "/" + version + "/"
+            String sep = File.separator;
+            final String jarPath = m2Repo + sep + toPath(groupId) + sep + artifactId + sep + version + sep
                     + artifactId + "-" + version + ".jar";
             entries.add(JavaCore.newLibraryEntry(new Path(jarPath), null, null));
         }
@@ -101,7 +102,7 @@ public class JavaCoreHelper {
             final Document document = DocumentBuilderFactory.newInstance()
                                                             .newDocumentBuilder()
                                                             .parse(m2Settings);
-    
+
             final Node settingsNode = getNodeByNodeName(document.getChildNodes(), "settings");
             if (settingsNode != null) {
                 final Node localRepoNode = getNodeByNodeName(settingsNode.getChildNodes(), "localRepository");
@@ -110,7 +111,7 @@ public class JavaCoreHelper {
                 }
             }
         }
-        final File m2Repo = new File(userHome + "/.m2/repository/");
+        final File m2Repo = new File(userHome + "/.m2/repository");
         if (m2Repo.exists() && m2Repo.isDirectory()) {
             return m2Repo.getPath();
         }
