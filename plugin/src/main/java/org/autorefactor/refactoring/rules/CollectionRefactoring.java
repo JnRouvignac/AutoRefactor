@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2014-2015 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2014-2016 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -143,14 +143,12 @@ public class CollectionRefactoring extends AbstractRefactoringRule {
                 "java.util.concurrent.LinkedBlockingQueue",
                 "java.util.concurrent.LinkedTransferQueue",
                 "java.util.concurrent.PriorityBlockingQueue",
-                "java.util.concurrent.SynchronousQueue",
                 "java.util.ArrayDeque",
                 "java.util.ArrayList",
                 "java.util.HashSet",
                 "java.util.LinkedHashSet",
                 "java.util.LinkedList",
                 "java.util.PriorityQueue",
-                "java.util.Stack",
                 "java.util.TreeSet",
                 "java.util.Vector")) {
             return true;

@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2014-2015 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2014-2016 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,11 +29,17 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.Stack;
 
 public class CollectionSample {
 
     public void replaceNewNoArgsAssignmentThenAddAll(List<String> col, List<String> output) {
         output = new ArrayList<String>(col);
+    }
+
+    public void doNotReplaceStackCtor(List<String> col, List<String> output) {
+        output = new Stack<String>();
+        output.addAll(col);
     }
 
     public List<String> replaceNewNoArgsThenAddAll(List<String> col) {
@@ -115,7 +121,7 @@ public class CollectionSample {
             output.add(doSomething(s));
         }
     }
-  
+
     private String doSomething(String s) {
         return null;
     }
