@@ -67,7 +67,7 @@ public class Refactorings {
     private final ASTCommentRewriter commentRewriter;
     private final SourceRewriter sourceRewriter = new SourceRewriter();
     /** Nodes that cannot be visited. */
-    private final Set<ASTNode> forbiddenNodes = new HashSet<ASTNode>();
+    private final Set<ASTNode> refactoredNodes = new HashSet<ASTNode>();
 
     /**
      * Builds an instance of this class.
@@ -89,17 +89,13 @@ public class Refactorings {
     }
 
     /**
-     * Returns whether the provided node can be visited.
+     * Returns whether the provided node has been the target of a refactoring.
      *
-     * @param node the node that might be visited
-     * @return true if the provided node can be visited, false otherwise
+     * @param node the node for which to make the determination
+     * @return true if the provided node has been refactored, false otherwise
      */
-    public boolean canVisit(ASTNode node) {
-        return !forbiddenNodes.contains(node);
-    }
-
-    private void doNotVisit(ASTNode node) {
-        forbiddenNodes.add(node);
+    public boolean hasBeenRefactored(ASTNode node) {
+        return refactoredNodes.contains(node);
     }
 
     /**
@@ -163,7 +159,6 @@ public class Refactorings {
      */
     @SuppressWarnings("unchecked")
     public <T extends ASTNode> T createMoveTarget(T node) {
-        this.forbiddenNodes.equals(node);
         return (T) rewrite.createMoveTarget(node);
     }
 
@@ -211,7 +206,7 @@ public class Refactorings {
     public void replace(ASTNode node, ASTNode replacement) {
         hasRefactorings = true;
         rewrite.replace(node, replacement, null);
-        doNotVisit(node);
+        refactoredNodes.add(node);
     }
 
     /**
@@ -249,7 +244,7 @@ public class Refactorings {
         } else {
             rewrite.remove(node, null);
         }
-        doNotVisit(node);
+        refactoredNodes.add(node);
     }
 
     /**

@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2014 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2014-2016 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -37,29 +37,26 @@ import org.eclipse.jdt.core.dom.CompilationUnit;
  * It centralizes useful features for refactoring rules.
  */
 public abstract class AbstractRefactoringRule extends ASTVisitor implements JavaRefactoringRule {
-
     /** The refactoring context of the current visitor. */
     protected RefactoringContext ctx;
 
-    /** {@inheritDoc} */
     @Override
     public boolean isEnabled(Preferences preferences) {
         return true;
     }
 
-    /** {@inheritDoc} */
     @Override
     public void setRefactoringContext(RefactoringContext ctx) {
         this.ctx = ctx;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean preVisit2(ASTNode node) {
-        return ctx.getRefactorings().canVisit(node);
+        // only visit nodes that have not been refactored
+        // to avoid trying to refactor twice the same node (or sub nodes)
+        return !ctx.getRefactorings().hasBeenRefactored(node);
     }
 
-    /** {@inheritDoc} */
     @Override
     public Refactorings getRefactorings(CompilationUnit astRoot) {
         astRoot.accept(this);

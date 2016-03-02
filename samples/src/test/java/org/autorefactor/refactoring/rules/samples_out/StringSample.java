@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2013-2015 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2013-2016 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -155,6 +155,18 @@ public class StringSample {
 
     // TODO JNR which operand must be removed here?
     // String s = "" + Integer.toString(42);
+
+    public String onlyRefactorFirstStringValueOf(Object o1, Object o2) {
+        return o1 + String.valueOf(o2);
+    }
+
+    public String doNotRefactorStringValueOf1(Object o) {
+        return String.valueOf(o);
+    }
+
+    public String doNotRefactorStringValueOf2(Object o) {
+        return "is null: " + (o == null);
+    }
 
     private static String getS() {
         return null;

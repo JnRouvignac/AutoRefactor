@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2013-2015 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2013-2016 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -109,21 +109,31 @@ public class StringRefactoring extends AbstractRefactoringRule {
             final InfixExpression ie = (InfixExpression) node.getParent();
             final Expression lo = ie.getLeftOperand();
             final Expression ro = ie.getRightOperand();
-            final MethodInvocation lmi = as(lo, MethodInvocation.class);
-            final MethodInvocation rmi = as(ro, MethodInvocation.class);
-            if (hasType(lo, "java.lang.String") && node.equals(rmi)) {
-                this.ctx.getRefactorings().replace(rmi, b.move(arg0(rmi)));
-                return VISIT_SUBTREE;
-            } else if (hasType(ro, "java.lang.String") && node.equals(lmi)) {
-                this.ctx.getRefactorings().replace(lmi, b.move(arg0(lmi)));
-                return DO_NOT_VISIT_SUBTREE;
+            if (node.equals(lo)) {
+                if (hasType(ro, "java.lang.String")) {
+                    replaceStringValueOfByArg0(lo, node);
+                    return DO_NOT_VISIT_SUBTREE;
+                }
+            } else if (node.equals(ro)) {
+                if (hasType(lo, "java.lang.String")
+                        // Do not refactor left and right operand at the same time
+                        // to avoid compilation errors post refactoring
+                        && !ctx.getRefactorings().hasBeenRefactored(lo)) {
+                    replaceStringValueOfByArg0(ro, node);
+                    return DO_NOT_VISIT_SUBTREE;
+                }
             } else {
                 // left or right operation is necessarily a string, so just replace
-                this.ctx.getRefactorings().replace(node, b.move(arg0(node)));
+                replaceStringValueOfByArg0(node, node);
                 return DO_NOT_VISIT_SUBTREE;
             }
         }
         return VISIT_SUBTREE;
+    }
+
+    private void replaceStringValueOfByArg0(final Expression toReplace, MethodInvocation mi) {
+        final ASTBuilder b = this.ctx.getASTBuilder();
+        ctx.getRefactorings().replace(toReplace, b.parenthesizeIfNeeded(b.move(arg0(mi))));
     }
 
     private Expression replaceToString(Expression expression) {
