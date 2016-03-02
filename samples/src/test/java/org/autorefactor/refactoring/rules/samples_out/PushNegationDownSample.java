@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2014 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2014-2016 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -52,7 +52,11 @@ public class PushNegationDownSample {
         return (b1 || b2);
     }
 
-    public boolean doNotNegateNonBooleanExprs(Object o1) {
-        return (o1 == null /* another refactoring removes the parentheses */);
+    public boolean doNotNegateNonBooleanExprs(Object o) {
+        return (o == null /* another refactoring removes the parentheses */);
+    }
+
+    public boolean doNotNegateNonBooleanPrimitiveExprs(Boolean b) {
+        return (b == null /* another refactoring removes the parentheses */);
     }
 }

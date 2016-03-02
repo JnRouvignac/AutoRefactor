@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2014-2015 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2014-2016 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,15 +30,16 @@ import java.util.List;
 import java.util.ListIterator;
 
 import org.autorefactor.refactoring.ASTBuilder;
+import org.autorefactor.refactoring.Refactorings;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.InfixExpression;
+import org.eclipse.jdt.core.dom.InfixExpression.Operator;
 import org.eclipse.jdt.core.dom.PrefixExpression;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.eclipse.jdt.core.dom.PrefixExpression.Operator.*;
 
 /** See {@link #getDescription()} method. */
-@SuppressWarnings("javadoc")
 public class PushNegationDownRefactoring extends AbstractRefactoringRule {
 
     @Override
@@ -56,28 +57,29 @@ public class PushNegationDownRefactoring extends AbstractRefactoringRule {
         if (!hasOperator(node, NOT)) {
             return VISIT_SUBTREE;
         }
-        final ASTBuilder b = this.ctx.getASTBuilder();
+        final ASTBuilder b = ctx.getASTBuilder();
+        final Refactorings r = ctx.getRefactorings();
         final Expression operand = removeParentheses(node.getOperand());
         if (operand instanceof PrefixExpression) {
             final PrefixExpression pe = (PrefixExpression) operand;
             if (hasOperator(pe, NOT)) {
-                this.ctx.getRefactorings().replace(node,
-                        b.move(pe.getOperand()));
+                r.replace(node, b.move(pe.getOperand()));
                 return DO_NOT_VISIT_SUBTREE;
             }
         } else if (operand instanceof InfixExpression) {
             final InfixExpression ie = (InfixExpression) operand;
-            final Object reverseOp = OperatorEnum.getOperator(ie).getReverseBooleanOperator();
+            final Operator reverseOp = (Operator) OperatorEnum.getOperator(ie).getReverseBooleanOperator();
             if (reverseOp != null) {
                 final List<Expression> extendedOperands = new ArrayList<Expression>(extendedOperands(ie));
-                if (hasType(ie.getLeftOperand(), "boolean", "java.lang.Boolean")) {
+                if (hasType(ie.getLeftOperand(), "boolean", "java.lang.Boolean")
+                        && hasType(ie.getRightOperand(), "boolean", "java.lang.Boolean")) {
                     for (ListIterator<Expression> it = extendedOperands.listIterator(); it.hasNext();) {
                         it.set(b.negate(it.next()));
                     }
-                    this.ctx.getRefactorings().replace(node,
+                    r.replace(node,
                             b.parenthesize(b.infixExpr(
                                     b.negate(ie.getLeftOperand()),
-                                    (InfixExpression.Operator) reverseOp,
+                                    reverseOp,
                                     b.negate(ie.getRightOperand()),
                                     extendedOperands)));
                     return DO_NOT_VISIT_SUBTREE;
@@ -85,10 +87,10 @@ public class PushNegationDownRefactoring extends AbstractRefactoringRule {
                     for (ListIterator<Expression> it = extendedOperands.listIterator(); it.hasNext();) {
                         it.set(b.move(it.next()));
                     }
-                    this.ctx.getRefactorings().replace(node,
+                    r.replace(node,
                             b.parenthesize(b.infixExpr(
                                     b.move(ie.getLeftOperand()),
-                                    (InfixExpression.Operator) reverseOp,
+                                    reverseOp,
                                     b.move(ie.getRightOperand()),
                                     extendedOperands)));
                     return DO_NOT_VISIT_SUBTREE;

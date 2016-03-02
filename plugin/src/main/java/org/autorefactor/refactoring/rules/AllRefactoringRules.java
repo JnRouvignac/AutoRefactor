@@ -67,10 +67,11 @@ public final class AllRefactoringRules {
     public static List<RefactoringRule> getAllRefactoringRules() {
         return newArrayList(
                 new RemoveUselessNullCheckRefactoring(),
-                new WorkWithNullCheckedExpressionFirstRefactoring(),
                 new VectorOldToNewAPIRefactoring(),
                 new PrimitiveWrapperCreationRefactoring(),
                 new BooleanRefactoring(),
+                // Must come after BooleanRefactoring, which may remove some targets
+                new WorkWithNullCheckedExpressionFirstRefactoring(),
                 new AddBracketsToControlStatementRefactoring(),
                 new InvertEqualsRefactoring(),
                 new SimplifyExpressionRefactoring(),
