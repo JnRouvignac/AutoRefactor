@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2015 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2015-2016 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -118,6 +118,9 @@ public class CollectionContainsRefactoring extends AbstractRefactoringRule {
     private boolean maybeReplaceWithCollectionContains0(
             Statement forNode, Expression iterable, Statement uniqueThenStmt, Expression toFind) {
         Statement previousStmt = getPreviousStatement(forNode);
+        if (previousStmt == null) {
+            return VISIT_SUBTREE;
+        }
         boolean previousStmtIsPreviousSibling = previousStmt.equals(getPreviousSibling(forNode));
         Assignment as = asExpression(uniqueThenStmt, Assignment.class);
         Pair<Name, Expression> innerInit = decomposeInitializer(as);
@@ -156,9 +159,9 @@ public class CollectionContainsRefactoring extends AbstractRefactoringRule {
             negate);
     }
 
-    private Boolean negateCollectionContains(Statement uniqueThenStmt, Statement foreachNextStmt) {
+    private Boolean negateCollectionContains(Statement uniqueThenStmt, Statement forNextStmt) {
         BooleanLiteral innerBl = getReturnedBooleanLiteral(uniqueThenStmt);
-        BooleanLiteral outerBl = getReturnedBooleanLiteral(foreachNextStmt);
+        BooleanLiteral outerBl = getReturnedBooleanLiteral(forNextStmt);
         return negateCollectionContains(innerBl, outerBl);
     }
 

@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2015 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2015-2016 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -144,5 +144,22 @@ public class CollectionContainsSample {
 
     public boolean replaceForIteratorNoLoopVariable(List<String> col, String toFind) {
         return col.contains(toFind);
+    }
+
+    public String doNotRefactor1(List<String> col, String toFind) {
+        for (String element : col) {
+            if (element.equals(toFind)) {
+                return element;
+            }
+        }
+        return null;
+    }
+
+    public void doNotRefactor2(List<String> col, String toFind) {
+        for (String element : col) {
+            if (element.equals(toFind)) {
+                element.toString();
+            }
+        }
     }
 }
