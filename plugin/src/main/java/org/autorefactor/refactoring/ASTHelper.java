@@ -148,31 +148,52 @@ public final class ASTHelper {
     /** Enum representing a primitive type. */
     public static enum PrimitiveEnum {
         /** The {@code boolean} type. */
-        BOOLEAN("boolean"),
+        BOOLEAN("boolean", "java.lang.Boolean"),
         /** The {@code byte} type. */
-        BYTE("byte"),
+        BYTE("byte", "java.lang.Byte"),
         /** The {@code char} type. */
-        CHAR("char"),
+        CHAR("char", "java.lang.Character"),
         /** The {@code short} type. */
-        SHORT("short"),
+        SHORT("short", "java.lang.Short"),
         /** The {@code int} type. */
-        INT("int"),
+        INT("int", "java.lang.Integer"),
         /** The {@code long} type. */
-        LONG("long"),
+        LONG("long", "java.lang.Long"),
         /** The {@code float} type. */
-        FLOAT("float"),
+        FLOAT("float", "java.lang.Float"),
         /** The {@code double} type. */
-        DOUBLE("double");
+        DOUBLE("double", "java.lang.Double");
 
-        private final String name;
+        private final String primitiveName;
+        private final String wrapperName;
 
-        private PrimitiveEnum(String name) {
-            this.name = name;
+        private PrimitiveEnum(String primitiveName, String wrapperName) {
+            this.primitiveName = primitiveName;
+            this.wrapperName = wrapperName;
         }
 
-        private static PrimitiveEnum valueOf2(String name) {
+        public static PrimitiveEnum valueOfPrimitive(String primitiveName) {
             for (PrimitiveEnum primEnum : values()) {
-                if (primEnum.name.equals(name)) {
+                if (primEnum.primitiveName.equals(primitiveName)) {
+                    return primEnum;
+                }
+            }
+            return null;
+        }
+
+        public static PrimitiveEnum valueOfWrapper(String wrapperName) {
+            for (PrimitiveEnum primEnum : values()) {
+                if (primEnum.wrapperName.equals(wrapperName)) {
+                    return primEnum;
+                }
+            }
+            return null;
+        }
+
+        public static PrimitiveEnum valueOfPrimitiveOrWrapper(String primitiveOrWrapperName) {
+            for (PrimitiveEnum primEnum : values()) {
+                if (primEnum.primitiveName.equals(primitiveOrWrapperName)
+                        || primEnum.wrapperName.equals(primitiveOrWrapperName)) {
                     return primEnum;
                 }
             }
@@ -181,7 +202,7 @@ public final class ASTHelper {
 
         @Override
         public String toString() {
-            return name;
+            return primitiveName;
         }
     }
 
@@ -1173,11 +1194,24 @@ public final class ASTHelper {
      *
      * @param typeBinding the type binding to analyze
      * @return an enum representing the primitive type of this type binding,
-     *         {@code null} if the type binding is null, or if it does not a primitive type.
+     *         {@code null} if the type binding is null, or if it is not a primitive type.
      */
     public static PrimitiveEnum getPrimitiveEnum(ITypeBinding typeBinding) {
         return typeBinding != null && typeBinding.isPrimitive()
-            ? PrimitiveEnum.valueOf2(typeBinding.getQualifiedName())
+            ? PrimitiveEnum.valueOfPrimitive(typeBinding.getQualifiedName())
+            : null;
+    }
+
+    /**
+     * Returns an enum representing the primitive type (or its wrapper) of this type binding.
+     *
+     * @param typeBinding the type binding to analyze
+     * @return an enum representing the primitive type (or its wrapper) of this type binding,
+     *         {@code null} if the type binding is null
+     */
+    public static PrimitiveEnum getPrimitiveEnumEquivalent(ITypeBinding typeBinding) {
+        return typeBinding != null
+            ? PrimitiveEnum.valueOfPrimitiveOrWrapper(typeBinding.getQualifiedName())
             : null;
     }
 

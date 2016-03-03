@@ -186,4 +186,11 @@ public class RemoveUnnecessaryCastSampleTest {
         assertEquals(sampleIn.doNotRemoveCastsFromSoustractionWhenResultIsWidened(oi, pi, l),
                 sampleOut.doNotRemoveCastsFromSoustractionWhenResultIsWidened(oi, pi, l), 0.0);
     }
+
+    @Test
+    public void doNotRemoveCastCharToIntInStringConcat() {
+        char c = 'a';
+        assertEquals(sampleIn.doNotRemoveCharToIntCastInStringConcat(c),
+                sampleOut.doNotRemoveCharToIntCastInStringConcat(c));
+    }
 }

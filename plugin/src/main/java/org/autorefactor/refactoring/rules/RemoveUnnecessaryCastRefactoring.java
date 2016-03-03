@@ -30,6 +30,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.autorefactor.refactoring.ASTBuilder;
+import org.autorefactor.refactoring.ASTHelper.PrimitiveEnum;
 import org.autorefactor.util.NotImplementedException;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Assignment;
@@ -101,11 +102,55 @@ public class RemoveUnnecessaryCastRefactoring extends AbstractRefactoringRule {
                         && !hasOperator(ie, MINUS);
             } else {
                 final boolean integralDivision = isIntegralDivision(ie);
-                return ((isNotRefactored(lo) && isStringConcat(ie))
+                return ((!hasBeenRefactored(lo) && isStringConcat(ie) && !removingCastWillChangeDisplay(node))
                             || (!integralDivision && isAssignmentCompatibleInInfixExpression(node, ie))
                             || (integralDivision && canRemoveCastInIntegralDivision(node, ie)))
                         && !isPrimitiveTypeNarrowing(node)
                         && !isIntegralDividedByFloatingPoint(node, ie);
+            }
+        }
+        return false;
+    }
+
+    private boolean removingCastWillChangeDisplay(CastExpression node) {
+        ITypeBinding exprBinding = node.getExpression().resolveTypeBinding();
+        ITypeBinding castBinding = node.resolveTypeBinding();
+        // FIXME how about casting primitive wrappers too?
+        PrimitiveEnum exprEnum = getPrimitiveEnumEquivalent(exprBinding);
+        PrimitiveEnum castEnum = getPrimitiveEnumEquivalent(castBinding);
+        if (exprEnum != null && castEnum != null) {
+            switch (exprEnum) {
+            case CHAR:
+                switch (castEnum) {
+                case BYTE:
+                case SHORT:
+                case INT:
+                case LONG:
+                case FLOAT:
+                case DOUBLE:
+                    return true;
+
+                default:
+                    return false;
+                }
+
+            case BYTE:
+                switch (castEnum) {
+                case BYTE:
+                case SHORT:
+                case INT:
+                case LONG:
+
+                case FLOAT:
+                case DOUBLE:
+                    return true;
+
+                default:
+                    return false;
+                }
+
+            default:
+                break;
             }
         }
         return false;
@@ -149,34 +194,23 @@ public class RemoveUnnecessaryCastRefactoring extends AbstractRefactoringRule {
         return maxTypeBinding;
     }
 
-    private int compareTo(ITypeBinding binding1, ITypeBinding binding2) {
-        final int rank1 = toPseudoEnum(binding1.getQualifiedName());
-        final int rank2 = toPseudoEnum(binding2.getQualifiedName());
+    private int compareTo(ITypeBinding primitiveBinding1, ITypeBinding primitiveBinding2) {
+        final int rank1 = getPrimitiveRank(primitiveBinding1.getQualifiedName());
+        final int rank2 = getPrimitiveRank(primitiveBinding2.getQualifiedName());
         return rank1 - rank2;
     }
 
-    private int toPseudoEnum(String name) {
-        if (name.equals("byte") || name.equals("java.lang.Byte")) {
-            return 1;
-        } else if (name.equals("short") || name.equals("java.lang.Short")) {
-            return 2;
-        } else if (name.equals("char") || name.equals("java.lang.Character")) {
-            return 3;
-        } else if (name.equals("int") || name.equals("java.lang.Integer")) {
-            return 4;
-        } else if (name.equals("long") || name.equals("java.lang.Long")) {
-            return 5;
-        } else if (name.equals("float") || name.equals("java.lang.Float")) {
-            return 6;
-        } else if (name.equals("double") || name.equals("java.lang.Double")) {
-            return 7;
+    private int getPrimitiveRank(String name) {
+        PrimitiveEnum primEnum = PrimitiveEnum.valueOfPrimitiveOrWrapper(name);
+        if (primEnum != null) {
+            return primEnum.ordinal();
         }
         throw new NotImplementedException(null, "for type '" + name + "'");
     }
 
     private boolean isAnyRefactored(final List<Expression> operands) {
         for (Expression operand : operands) {
-            if (!isNotRefactored(operand)) {
+            if (hasBeenRefactored(operand)) {
                 return true;
             }
         }
@@ -193,8 +227,8 @@ public class RemoveUnnecessaryCastRefactoring extends AbstractRefactoringRule {
     }
 
     /** If left operand is refactored, we cannot easily make inferences about right operand. Wait for next iteration. */
-    private boolean isNotRefactored(Expression leftOperand) {
-        return preVisit2(leftOperand);
+    private boolean hasBeenRefactored(Expression leftOperand) {
+        return ctx.getRefactorings().hasBeenRefactored(leftOperand);
     }
 
     private boolean isIntegralDividedByFloatingPoint(CastExpression node, InfixExpression ie) {

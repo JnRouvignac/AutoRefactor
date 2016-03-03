@@ -223,4 +223,8 @@ public class RemoveUnnecessaryCastSample {
         short s2 = (short) -32769;
         return b1 + b2 + c1 + c2 + s1 + s2;
     }
+
+    public String doNotRemoveCharToIntCastInStringConcat(char c) {
+        return "" + (int) c;
+    }
 }
