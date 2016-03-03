@@ -430,6 +430,20 @@ public class ASTBuilder {
     /**
      * Builds a new {@link MethodInvocation} instance.
      *
+     * @param methodName the name of the invoked method
+     * @param arguments the arguments for the method invocation
+     * @return a new method invocation
+     */
+    public MethodInvocation invoke(String methodName, Expression... arguments) {
+        final MethodInvocation mi = ast.newMethodInvocation();
+        mi.setName(ast.newSimpleName(methodName));
+        addAll(arguments(mi), arguments);
+        return mi;
+    }
+
+    /**
+     * Builds a new {@link MethodInvocation} instance.
+     *
      * @param expression the method invocation expression
      * @param methodName the name of the invoked method
      * @param arguments the arguments for the method invocation

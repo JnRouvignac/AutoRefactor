@@ -25,11 +25,14 @@
  */
 package org.autorefactor.refactoring.rules.samples_out;
 
+import java.util.AbstractSet;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.Stack;
+import java.util.TreeSet;
 
 public class CollectionSample {
 
@@ -176,6 +179,22 @@ public class CollectionSample {
             System.out.println("OK");
         } else {
             System.out.println("KO");
+        }
+    }
+
+    public class MySet extends AbstractSet<String> {
+        public MySet(List<String> strings) {
+            addAll(strings);
+        }
+
+        @Override
+        public Iterator<String> iterator() {
+            return null;
+        }
+
+        @Override
+        public int size() {
+            return 0;
         }
     }
 }

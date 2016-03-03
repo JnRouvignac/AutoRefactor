@@ -285,12 +285,19 @@ public class CollectionRefactoring extends AbstractRefactoringRule {
 
     private boolean replaceWithCollectionMethod(ASTNode toReplace, String methodName,
             Expression colWhereToAddAll, Expression colToAddAll) {
-        final ASTBuilder b = this.ctx.getASTBuilder();
-        this.ctx.getRefactorings().replace(toReplace,
-                b.toStmt(b.invoke(
-                        b.copy(colWhereToAddAll),
-                        methodName,
-                        b.copy(colToAddAll))));
+        final ASTBuilder b = ctx.getASTBuilder();
+        if (colWhereToAddAll != null) {
+            ctx.getRefactorings().replace(toReplace,
+                    b.toStmt(b.invoke(
+                            b.copy(colWhereToAddAll),
+                            methodName,
+                            b.copy(colToAddAll))));
+        } else {
+            ctx.getRefactorings().replace(toReplace,
+                    b.toStmt(b.invoke(
+                            methodName,
+                            b.copy(colToAddAll))));
+        }
         return DO_NOT_VISIT_SUBTREE;
     }
 
