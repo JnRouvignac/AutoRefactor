@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2015 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2015-2016 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -47,6 +47,14 @@ public class UseMultiCatchSample {
 
     private static final class Ex2 extends Exception {
         private void print() {
+        }
+    }
+
+    private static final class MyException extends RuntimeException {
+        private MyException(Ex1 ex1) {
+        }
+
+        private MyException(Ex2 ex2) {
         }
     }
 
@@ -181,6 +189,16 @@ public class UseMultiCatchSample {
             String s = "[" + ioe;
             String s2 = "]";
             System.out.println(s + s2);
+        }
+    }
+
+    public void doNotRefactorMultiCatchWhenMethodDoesNotCallCommonSupertype(ThrowingObject<Ex1, Ex2> obj) {
+        try {
+            obj.throwingMethod();
+        } catch (Ex1 ex1) {
+            throw new MyException(ex1);
+        } catch (Ex2 ex2) {
+            throw new MyException(ex2);
         }
     }
 }

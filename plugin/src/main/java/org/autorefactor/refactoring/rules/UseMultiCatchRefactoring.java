@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2015 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2015-2016 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -42,12 +42,14 @@ import org.autorefactor.refactoring.Refactorings;
 import org.eclipse.jdt.core.dom.ASTMatcher;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.CatchClause;
+import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
+import org.eclipse.jdt.core.dom.SuperMethodInvocation;
 import org.eclipse.jdt.core.dom.TryStatement;
 import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.UnionType;
@@ -128,14 +130,33 @@ public class UseMultiCatchRefactoring extends AbstractRefactoringRule {
         public boolean match(MethodInvocation mi1, Object other) {
             if (other instanceof MethodInvocation) {
                 MethodInvocation mi2 = (MethodInvocation) other;
-                return super.match(mi1, mi2) && isSameMethod(mi1, mi2);
+                return super.match(mi1, mi2)
+                        && isSameMethodBinding(mi1.resolveMethodBinding(), mi2.resolveMethodBinding());
             }
             return false;
         }
 
-        private boolean isSameMethod(MethodInvocation mi1, MethodInvocation mi2) {
-            IMethodBinding binding1 = mi1.resolveMethodBinding();
-            IMethodBinding binding2 = mi2.resolveMethodBinding();
+        @Override
+        public boolean match(SuperMethodInvocation mi1, Object other) {
+            if (other instanceof SuperMethodInvocation) {
+                SuperMethodInvocation mi2 = (SuperMethodInvocation) other;
+                return super.match(mi1, mi2)
+                        && isSameMethodBinding(mi1.resolveMethodBinding(), mi2.resolveMethodBinding());
+            }
+            return false;
+        }
+
+        @Override
+        public boolean match(ClassInstanceCreation cic1, Object other) {
+            if (other instanceof ClassInstanceCreation) {
+                ClassInstanceCreation cic2 = (ClassInstanceCreation) other;
+                return super.match(cic1, cic2)
+                        && isSameMethodBinding(cic1.resolveConstructorBinding(), cic2.resolveConstructorBinding());
+            }
+            return false;
+        }
+
+        private boolean isSameMethodBinding(IMethodBinding binding1, IMethodBinding binding2) {
             return binding1 != null
                     && binding2 != null
                     && (binding1.equals(binding2)
