@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2013-2015 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2013-2016 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -219,6 +219,7 @@ public class SimplifyExpressionRefactoring extends AbstractRefactoringRule {
             switch (node.getExpression().getNodeType()) {
             case ASTNode.ASSIGNMENT:
             case ASTNode.CAST_EXPRESSION:
+            case ASTNode.CONDITIONAL_EXPRESSION:
             case ASTNode.INFIX_EXPRESSION:
                 return false;
             default:
