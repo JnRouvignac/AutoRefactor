@@ -41,6 +41,7 @@ import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
+import static org.autorefactor.refactoring.Primitive.*;
 import static org.eclipse.jdt.core.dom.Assignment.Operator.*;
 import static org.eclipse.jdt.core.dom.InfixExpression.Operator.*;
 
@@ -200,7 +201,7 @@ public final class ForLoopHelper {
                     return getIteratorOnCollection(initMi.getExpression(), condMi.getExpression());
                 }
             } else if (updaters.size() == 1
-                    && isPrimitive(firstInit, "int")) {
+                    && INT.equals(valueOfPrimitive(firstInit))) {
                 final Pair<Name, Expression> initPair = decomposeInitializer(firstInit);
                 final Name init = initPair.getFirst();
                 final ForLoopContent forContent = getIndexOnIterable(condition);

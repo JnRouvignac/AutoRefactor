@@ -46,6 +46,7 @@ import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
+import static org.autorefactor.refactoring.Primitive.*;
 import static org.autorefactor.util.Utils.*;
 import static org.eclipse.jdt.core.dom.Assignment.Operator.*;
 import static org.eclipse.jdt.core.dom.InfixExpression.Operator.*;
@@ -271,7 +272,7 @@ public class HotSpotIntrinsicedAPIsRefactoring extends AbstractRefactoringRule {
         if (initializer0 instanceof VariableDeclarationExpression) {
             final VariableDeclarationExpression vde =
                     (VariableDeclarationExpression) initializer0;
-            if (isPrimitive(vde, "int") && fragments(vde).size() == 1) {
+            if (INT.equals(valueOfPrimitive(vde)) && fragments(vde).size() == 1) {
                 // this must be the array index
                 VariableDeclarationFragment vdf = fragments(vde).get(0);
                 if (vdf.getExtraDimensions() == 0) {
@@ -283,7 +284,7 @@ public class HotSpotIntrinsicedAPIsRefactoring extends AbstractRefactoringRule {
         } else if (initializer0 instanceof Assignment) {
             final Assignment as = (Assignment) initializer0;
             if (hasOperator(as, ASSIGN)
-                    && isPrimitive(as.resolveTypeBinding(), "int")) {
+                    && INT.equals(valueOfPrimitive(as))) {
                 // this must be the array index
                 params.indexStartPos = as.getRightHandSide();
                 final Expression lhs = as.getLeftHandSide();

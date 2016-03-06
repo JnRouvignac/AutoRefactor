@@ -225,6 +225,6 @@ public class RemoveUnnecessaryCastSample {
     }
 
     public String doNotRemoveCharToIntCastInStringConcat(char c) {
-        return "" + (int) c;
+        return "" + (int) c + (int) c;
     }
 }

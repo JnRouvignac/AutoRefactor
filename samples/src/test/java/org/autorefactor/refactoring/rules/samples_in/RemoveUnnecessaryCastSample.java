@@ -33,11 +33,11 @@ public class RemoveUnnecessaryCastSample {
     private short s;
 
     public Object removeCastToSameType(Integer i) {
-        return (Integer) i;
+        return i;
     }
 
     public Object removeCastToIntegerWrapper(int i) {
-        return (Integer) i;
+        return i;
     }
 
     public Integer doNotRemoveNarrowingCast1(Object o) {
@@ -49,7 +49,7 @@ public class RemoveUnnecessaryCastSample {
     }
 
     public long removeWideningPrimitiveCast(int i) {
-        return (long) i;
+        return i;
     }
 
     public Object[] doNotRemoveCastToArray(Object o) {
@@ -65,12 +65,12 @@ public class RemoveUnnecessaryCastSample {
         Object o1;
         long l;
         int i;
-        o1 = (Integer) oi;
-        o1 = (Integer) pi;
-        l = (long) pi;
-        i = (int) pi;
-        l += (long) pi;
-        i += (int) pi;
+        o1 = oi;
+        o1 = pi;
+        l = pi;
+        i = pi;
+        l += pi;
+        i += pi;
     }
 
     public void doNotRemoveAssignmentCasts(Object o, long l) {
@@ -83,9 +83,9 @@ public class RemoveUnnecessaryCastSample {
     }
 
     public void removeVariableDeclarationFragmentCasts(Integer oi, int pi, Object o) {
-        Object o1 = (Integer) oi;
-        Object o2 = (Integer) pi;
-        long l = (long) pi;
+        Object o1 = oi;
+        Object o2 = pi;
+        long l = pi;
     }
 
     public void doNotRemoveVariableDeclarationFragmentCasts(Object o, long l) {
@@ -95,12 +95,12 @@ public class RemoveUnnecessaryCastSample {
     }
 
     public boolean removeCasts(Integer oi, int pi, long l) {
-        return oi != (Integer) pi
-            && (Integer) pi != oi
-            && (int) oi != pi
-            && pi != (int) oi
-            && l != (long) pi
-            && (long) pi != l;
+        return oi != pi
+            && pi != oi
+            && oi != pi
+            && pi != oi
+            && l != pi
+            && pi != l;
     }
 
     public boolean doNotRemoveCasts(Integer oi, int pi, long l, Object o) {
@@ -126,7 +126,7 @@ public class RemoveUnnecessaryCastSample {
     }
 
     public long doNotRemoveWideningCastsWithExtendedOperands(int i, int j, int k) {
-        return (long) i + j + (long) k;
+        return (long) i + j + k;
     }
 
     public int doNotRemovePrimitiveNarrowingCasts(int i, int j) {
@@ -138,7 +138,7 @@ public class RemoveUnnecessaryCastSample {
     }
 
     public String removeCastsFromStringAppend(Integer oi, int pi, Object o) {
-        return "" + (Object) oi + (Number) oi + (int) oi + (Integer) pi + (long) pi + (String) o;
+        return "" + oi + oi + oi + (Integer) pi + (long) pi + (String) o;
     }
 
     public String doNotRemoveCastsFromStringAppend(int pi, long l, float f) {
@@ -150,19 +150,19 @@ public class RemoveUnnecessaryCastSample {
     }
 
     public double removeSomeCastsFromDivisionWithDifferentTypesWithExtendedOperands(int i, long l, short s) {
-        return (double) i / (double) l / (double) s;
+        return (double) i / (double) l / s;
     }
 
     public double doNotRemoveCastsFromAdditionWhenResultIsWidened(Integer oi, int pi, long l) {
-        return (long) oi + (Integer) pi + (double) l;
+        return (long) oi + pi + (double) l;
     }
 
     public double doNotRemoveCastsFromSoustractionWhenResultIsWidened(Integer oi, int pi, long l) {
-        return (long) oi - (Integer) pi - (double) l;
+        return (long) oi - pi - (double) l;
     }
 
     public boolean removeCastsFromBooleanOperations(boolean b1, boolean b2) {
-        return b1 && (Boolean) b2;
+        return b1 && b2;
     }
 
     public double doNotRemoveCastInFloatingPointDivision(int i, int j) {
@@ -170,11 +170,11 @@ public class RemoveUnnecessaryCastSample {
     }
 
     public double removeOneCastInFloatingPointDivision(int i, int j, int k) {
-        return i / (double) j / (double) k;
+        return i / (double) j / k;
     }
 
     public long removeCastsInIntegralDivision(int i, int j, int k) {
-        return i / (long) j / (long) k;
+        return i / (long) j / k;
     }
 
     public int removeCastsFromAssignmentsToByte() {
@@ -225,6 +225,6 @@ public class RemoveUnnecessaryCastSample {
     }
 
     public String doNotRemoveCharToIntCastInStringConcat(char c) {
-        return "" + (int) c;
+        return "" + (int) c + (int) c;
     }
 }

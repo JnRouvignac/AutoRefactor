@@ -57,6 +57,7 @@ import static org.autorefactor.refactoring.ASTBuilder.Copy.*;
 import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.autorefactor.refactoring.ForLoopHelper.*;
 import static org.autorefactor.refactoring.ForLoopHelper.ContainerType.*;
+import static org.autorefactor.refactoring.Primitive.*;
 import static org.eclipse.jdt.core.dom.InfixExpression.Operator.*;
 import static org.eclipse.jdt.core.dom.PrefixExpression.Operator.*;
 
@@ -131,7 +132,7 @@ public class CollectionRefactoring extends AbstractRefactoringRule {
         }
         final List<Expression> args = arguments(cic);
         final boolean noArgsCtor = args.size() == 0;
-        final boolean colCapacityCtor = args.size() == 1 && isPrimitive(args.get(0), "int");
+        final boolean colCapacityCtor = args.size() == 1 && INT.equals(valueOfPrimitive(args.get(0)));
         if (noArgsCtor && hasType(cic,
                 "java.util.concurrent.ConcurrentLinkedDeque",
                 "java.util.concurrent.ConcurrentLinkedQueue",

@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.autorefactor.refactoring.ASTBuilder;
-import org.autorefactor.refactoring.ASTHelper.PrimitiveEnum;
+import org.autorefactor.refactoring.Primitive;
 import org.autorefactor.refactoring.Refactorings;
 import org.autorefactor.util.NotImplementedException;
 import org.autorefactor.util.Utils;
@@ -123,7 +123,7 @@ public class AnnotationRefactoring extends AbstractRefactoringRule {
         case STRING_LITERAL:
             return Utils.equalNotNull(javaObj1, javaObj2);
         case NUMBER_LITERAL:
-            PrimitiveEnum primEnum = getPrimitiveEnum(typeBinding);
+            Primitive primEnum = Primitive.valueOfPrimitive(typeBinding);
             switch (primEnum) {
             case BYTE:
                 return Utils.equalNotNull(toByte(javaObj1), toByte(javaObj2));

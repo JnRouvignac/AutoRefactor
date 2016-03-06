@@ -47,6 +47,7 @@ import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.Statement;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
+import static org.autorefactor.refactoring.Primitive.*;
 import static org.eclipse.jdt.core.dom.ASTNode.*;
 import static org.eclipse.jdt.core.dom.InfixExpression.Operator.*;
 import static org.eclipse.jdt.core.dom.PrefixExpression.Operator.*;
@@ -328,7 +329,8 @@ public class TestNGAssertRefactoring extends AbstractRefactoringRule {
     }
 
     private boolean isComparingObjects(final InfixExpression ie) {
-        return !isPrimitive(ie.getLeftOperand()) || !isPrimitive(ie.getRightOperand());
+        return valueOfPrimitive(ie.getLeftOperand()) == null
+                || valueOfPrimitive(ie.getRightOperand()) == null;
     }
 
     private MethodInvocation invokeAssert(MethodInvocation node, String methodName,

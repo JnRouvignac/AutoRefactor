@@ -30,7 +30,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.autorefactor.refactoring.ASTBuilder;
-import org.autorefactor.refactoring.ASTHelper.PrimitiveEnum;
+import org.autorefactor.refactoring.Primitive;
 import org.autorefactor.util.NotImplementedException;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Assignment;
@@ -43,6 +43,7 @@ import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
+import static org.autorefactor.refactoring.Primitive.*;
 import static org.eclipse.jdt.core.dom.ASTNode.*;
 import static org.eclipse.jdt.core.dom.InfixExpression.Operator.*;
 
@@ -116,8 +117,8 @@ public class RemoveUnnecessaryCastRefactoring extends AbstractRefactoringRule {
         ITypeBinding exprBinding = node.getExpression().resolveTypeBinding();
         ITypeBinding castBinding = node.resolveTypeBinding();
         // FIXME how about casting primitive wrappers too?
-        PrimitiveEnum exprEnum = getPrimitiveEnumEquivalent(exprBinding);
-        PrimitiveEnum castEnum = getPrimitiveEnumEquivalent(castBinding);
+        Primitive exprEnum = Primitive.valueOfPrimitiveOrWrapper(exprBinding);
+        Primitive castEnum = Primitive.valueOfPrimitiveOrWrapper(castBinding);
         if (exprEnum != null && castEnum != null) {
             switch (exprEnum) {
             case CHAR:
@@ -195,17 +196,17 @@ public class RemoveUnnecessaryCastRefactoring extends AbstractRefactoringRule {
     }
 
     private int compareTo(ITypeBinding primitiveBinding1, ITypeBinding primitiveBinding2) {
-        final int rank1 = getPrimitiveRank(primitiveBinding1.getQualifiedName());
-        final int rank2 = getPrimitiveRank(primitiveBinding2.getQualifiedName());
+        final int rank1 = getPrimitiveRank(primitiveBinding1);
+        final int rank2 = getPrimitiveRank(primitiveBinding2);
         return rank1 - rank2;
     }
 
-    private int getPrimitiveRank(String name) {
-        PrimitiveEnum primEnum = PrimitiveEnum.valueOfPrimitiveOrWrapper(name);
+    private int getPrimitiveRank(ITypeBinding typeBinding) {
+        Primitive primEnum = Primitive.valueOfPrimitiveOrWrapper(typeBinding);
         if (primEnum != null) {
             return primEnum.ordinal();
         }
-        throw new NotImplementedException(null, "for type '" + name + "'");
+        throw new NotImplementedException(null, "for type '" + typeBinding.getQualifiedName() + "'");
     }
 
     private boolean isAnyRefactored(final List<Expression> operands) {
@@ -266,8 +267,8 @@ public class RemoveUnnecessaryCastRefactoring extends AbstractRefactoringRule {
     private boolean isPrimitiveTypeNarrowing(CastExpression node) {
         final ITypeBinding typeBinding1 = node.getType().resolveBinding();
         final ITypeBinding typeBinding2 = node.getExpression().resolveTypeBinding();
-        return isPrimitive(typeBinding1)
-                && isPrimitive(typeBinding2)
+        return valueOfPrimitive(typeBinding1) == null
+                && valueOfPrimitive(typeBinding2) == null
                 && isAssignmentCompatible(typeBinding1, typeBinding2);
     }
 

@@ -43,6 +43,7 @@ import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
+import static org.autorefactor.refactoring.Primitive.*;
 import static org.eclipse.jdt.core.dom.InfixExpression.Operator.*;
 
 /** See {@link #getDescription()} method. */
@@ -112,7 +113,7 @@ public class MapRefactoring extends AbstractRefactoringRule {
         }
         final List<Expression> args = arguments(cic);
         final boolean noArgsCtor = args.size() == 0;
-        final boolean mapCapacityCtor = args.size() == 1 && isPrimitive(args.get(0), "int");
+        final boolean mapCapacityCtor = args.size() == 1 && INT.equals(valueOfPrimitive(args.get(0)));
         if (noArgsCtor && hasType(cic,
                 "java.util.concurrent.ConcurrentHashMap",
                 "java.util.concurrent.ConcurrentSkipListMap",
