@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2013-2015 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2013-2016 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@
  */
 package org.autorefactor.refactoring;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -504,6 +505,21 @@ public final class ASTHelper {
     @SuppressWarnings("unchecked")
     public static List<Expression> extendedOperands(InfixExpression node) {
         return node.extendedOperands();
+    }
+
+    /**
+     * Returns all the operands from the provided infix expressions.
+     *
+     * @param node the infix expression
+     * @return a List of expressions
+     */
+    public static List<Expression> allOperands(InfixExpression node) {
+        final List<Expression> extOps = extendedOperands(node);
+        final List<Expression> results = new ArrayList<Expression>(2 + extOps.size());
+        results.add(node.getLeftOperand());
+        results.add(node.getRightOperand());
+        results.addAll(extOps);
+        return results;
     }
 
     /**

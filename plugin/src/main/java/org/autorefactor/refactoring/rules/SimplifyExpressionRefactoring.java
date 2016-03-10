@@ -27,6 +27,7 @@ package org.autorefactor.refactoring.rules;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.ListIterator;
 
 import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.util.NotImplementedException;
@@ -107,7 +108,7 @@ public class SimplifyExpressionRefactoring extends AbstractRefactoringRule {
     public boolean visit(ParenthesizedExpression node) {
         final Expression innerExpr = getExpressionWithoutParentheses(node);
         if (innerExpr != node) {
-            return replaceByCopy(node, innerExpr);
+            return replaceBy(node, innerExpr);
         }
         return VISIT_SUBTREE;
     }
@@ -290,30 +291,28 @@ public class SimplifyExpressionRefactoring extends AbstractRefactoringRule {
     public boolean visit(InfixExpression node) {
         final Expression lhs = node.getLeftOperand();
         final Expression rhs = node.getRightOperand();
-        final Object lhsConstantValue = lhs.resolveConstantExpressionValue();
         if (hasOperator(node, CONDITIONAL_OR)) {
-            if (Boolean.TRUE.equals(lhsConstantValue)) {
-                return replaceByCopy(node, lhs);
-            } else if (Boolean.FALSE.equals(lhsConstantValue)) {
-                checkNoExtendedOperands(node);
-                return replaceByCopy(node, rhs);
+            final List<Expression> remainingOperands = removeUselessOperands(node, true, false);
+            if (!remainingOperands.equals(allOperands(node))) {
+                return replaceWithNewInfixExpr(node, remainingOperands);
             }
         } else if (hasOperator(node, CONDITIONAL_AND)) {
-            if (Boolean.TRUE.equals(lhsConstantValue)) {
-                checkNoExtendedOperands(node);
-                return replaceByCopy(node, rhs);
-            } else if (Boolean.FALSE.equals(lhsConstantValue)) {
-                return replaceByCopy(node, lhs);
+            final List<Expression> remainingOperands = removeUselessOperands(node, false, true);
+            if (!remainingOperands.equals(allOperands(node))) {
+                return replaceWithNewInfixExpr(node, remainingOperands);
             } else {
+                // FIXME this should actually check anywhere in the infix expression,
+                // not only for left and right operands,
+                // said otherwise: handle extended operands
                 final Expression nullCheckedExpressionLHS = getNullCheckedExpression(lhs);
                 final Expression nullCheckedExpressionRHS = getNullCheckedExpression(rhs);
                 if (nullCheckedExpressionLHS != null) {
                     if (isNullCheckRedundant(rhs, nullCheckedExpressionLHS)) {
                         checkNoExtendedOperands(node);
-                        return replaceByCopy(node, rhs);
+                        return replaceBy(node, rhs);
                     }
                 } else if (isNullCheckRedundant(lhs, nullCheckedExpressionRHS)) {
-                    return replaceByCopy(node, lhs);
+                    return replaceBy(node, lhs);
                 }
             }
         } else if (hasOperator(node, EQUALS)) {
@@ -347,6 +346,41 @@ public class SimplifyExpressionRefactoring extends AbstractRefactoringRule {
             return DO_NOT_VISIT_SUBTREE;
         }
         return VISIT_SUBTREE;
+    }
+
+    private boolean replaceWithNewInfixExpr(InfixExpression node,
+            final List<Expression> remainingOperands) {
+        if (remainingOperands.size() == 1) {
+            replaceBy(node, remainingOperands.get(0));
+        } else {
+            final ASTBuilder b = ctx.getASTBuilder();
+            ctx.getRefactorings().replace(node,
+                    b.infixExpr(node.getOperator(), b.move(remainingOperands)));
+        }
+        return DO_NOT_VISIT_SUBTREE;
+    }
+
+    private List<Expression> removeUselessOperands(InfixExpression node,
+            Boolean shortCircuitValue, Boolean noOpValue) {
+        final List<Expression> allOperands = allOperands(node);
+        for (ListIterator<Expression> it = allOperands.listIterator(); it.hasNext();) {
+            final Expression operand = it.next();
+            final Object value = operand.resolveConstantExpressionValue();
+            if (shortCircuitValue.equals(value)) {
+                removeRemaining(it);
+                break;
+            } else if (noOpValue.equals(value)) {
+                it.remove();
+            }
+        }
+        return allOperands;
+    }
+
+    private void removeRemaining(ListIterator<Expression> it) {
+        while (it.hasNext()) {
+            it.next();
+            it.remove();
+        }
     }
 
     private boolean shouldHaveParentheses(InfixExpression node) {
@@ -416,9 +450,9 @@ public class SimplifyExpressionRefactoring extends AbstractRefactoringRule {
         return DO_NOT_VISIT_SUBTREE;
     }
 
-    private boolean replaceByCopy(ASTNode node, Expression expr) {
-        final ASTBuilder b = this.ctx.getASTBuilder();
-        this.ctx.getRefactorings().replace(node, b.copy(expr));
+    private boolean replaceBy(ASTNode node, Expression expr) {
+        final ASTBuilder b = ctx.getASTBuilder();
+        ctx.getRefactorings().replace(node, b.move(expr));
         return DO_NOT_VISIT_SUBTREE;
     }
 

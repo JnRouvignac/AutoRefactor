@@ -70,29 +70,16 @@ public class PushNegationDownRefactoring extends AbstractRefactoringRule {
             final InfixExpression ie = (InfixExpression) operand;
             final Operator reverseOp = (Operator) OperatorEnum.getOperator(ie).getReverseBooleanOperator();
             if (reverseOp != null) {
-                final List<Expression> extendedOperands = new ArrayList<Expression>(extendedOperands(ie));
+                final List<Expression> allOperands = new ArrayList<Expression>(allOperands(ie));
                 if (hasType(ie.getLeftOperand(), "boolean", "java.lang.Boolean")
                         && hasType(ie.getRightOperand(), "boolean", "java.lang.Boolean")) {
-                    for (ListIterator<Expression> it = extendedOperands.listIterator(); it.hasNext();) {
+                    for (ListIterator<Expression> it = allOperands.listIterator(); it.hasNext();) {
                         it.set(b.negate(it.next()));
                     }
-                    r.replace(node,
-                            b.parenthesize(b.infixExpr(
-                                    b.negate(ie.getLeftOperand()),
-                                    reverseOp,
-                                    b.negate(ie.getRightOperand()),
-                                    extendedOperands)));
+                    r.replace(node, b.parenthesize(b.infixExpr(reverseOp, allOperands)));
                     return DO_NOT_VISIT_SUBTREE;
                 } else {
-                    for (ListIterator<Expression> it = extendedOperands.listIterator(); it.hasNext();) {
-                        it.set(b.move(it.next()));
-                    }
-                    r.replace(node,
-                            b.parenthesize(b.infixExpr(
-                                    b.move(ie.getLeftOperand()),
-                                    reverseOp,
-                                    b.move(ie.getRightOperand()),
-                                    extendedOperands)));
+                    r.replace(node, b.parenthesize(b.infixExpr(reverseOp, b.move(allOperands))));
                     return DO_NOT_VISIT_SUBTREE;
                 }
             }

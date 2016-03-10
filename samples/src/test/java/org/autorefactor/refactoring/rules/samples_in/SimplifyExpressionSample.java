@@ -53,11 +53,17 @@ public class SimplifyExpressionSample {
             boolean b3 = null != s && s instanceof String;
         }
         {
-            // Remove redundant left / write hand side operands
+            // Remove redundant constant operands
             boolean b3 = true && s != null;
             boolean b4 = false && s != null;
             boolean b5 = true || s != null;
             boolean b6 = false || s != null;
+            boolean b7 = true && s != null && s.startsWith("");
+            boolean b8 = false || s == null || s.startsWith("");
+            boolean b9 = s != null && true && s.startsWith("");
+            boolean b10 = s == null || false || s.startsWith("");
+            boolean b11 = s != null && s.startsWith("") && true;
+            boolean b12 = s == null  || s.startsWith("") || false;
         }
     }
 
@@ -75,18 +81,14 @@ public class SimplifyExpressionSample {
         {
             // Right-hand-side left unchanged because left-hand-side can have
             // side effects
-            boolean b3 = s != null && true;
-            boolean b4 = s != null && false;
-            boolean b5 = s != null || true;
-            boolean b6 = s != null || false;
+            boolean b3 = s != null && false;
+            boolean b4 = s != null || true;
         }
         {
             // Right-hand-side left unchanged because left-hand-side can have
             // side effects
-            boolean b3 = null != s && true;
-            boolean b4 = null != s && false;
-            boolean b5 = null != s || true;
-            boolean b6 = null != s || false;
+            boolean b3 = null != s && false;
+            boolean b4 = null != s || true;
         }
     }
 

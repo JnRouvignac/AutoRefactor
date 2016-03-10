@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2014-2015 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2014-2016 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,7 +25,6 @@
  */
 package org.autorefactor.refactoring.rules;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -129,7 +128,7 @@ public class RemoveUnnecessaryCastRefactoring extends AbstractRefactoringRule {
     }
 
     private ITypeBinding getLeftOperandType(InfixExpression ie, CastExpression node) {
-        final ArrayList<Expression> operands = allOperands(ie);
+        final List<Expression> operands = allOperands(ie);
         final List<Expression> previousOperands = operands.subList(0, operands.indexOf(node));
         if (isAnyRefactored(previousOperands)) {
             return null;
@@ -181,15 +180,6 @@ public class RemoveUnnecessaryCastRefactoring extends AbstractRefactoringRule {
             }
         }
         return false;
-    }
-
-    private ArrayList<Expression> allOperands(InfixExpression ie) {
-        final List<Expression> eo = extendedOperands(ie);
-        final ArrayList<Expression> results = new ArrayList<Expression>(2 + eo.size());
-        results.add(ie.getLeftOperand());
-        results.add(ie.getRightOperand());
-        results.addAll(eo);
-        return results;
     }
 
     /** If left operand is refactored, we cannot easily make inferences about right operand. Wait for next iteration. */

@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2014-2015 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2014-2016 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,9 +25,11 @@
  */
 package org.autorefactor.refactoring;
 
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 
 import org.autorefactor.util.IllegalArgumentException;
 import org.autorefactor.util.NotImplementedException;
@@ -371,19 +373,24 @@ public class ASTBuilder {
     /**
      * Builds a new {@link InfixExpression} instance.
      *
-     * @param leftOperand the left operand
      * @param operator the infix operator
-     * @param rightOperand the right operand
-     * @param extendedOperands the extended operands
+     * @param allOperands the operands
      * @return a new infix expression
      */
-    public InfixExpression infixExpr(Expression leftOperand, InfixExpression.Operator operator,
-            Expression rightOperand, Collection<? extends Expression> extendedOperands) {
+    public InfixExpression infixExpr(InfixExpression.Operator operator,
+            Collection<? extends Expression> allOperands) {
+        if (allOperands.size() < 2) {
+            throw new IllegalArgumentException(null, "Not enough operands for an infix expression: "
+                    + "needed at least 2, but got " + allOperands.size());
+        }
+        final Iterator<? extends Expression> it = allOperands.iterator();
         final InfixExpression ie = ast.newInfixExpression();
-        ie.setLeftOperand(leftOperand);
+        ie.setLeftOperand(it.next());
         ie.setOperator(operator);
-        ie.setRightOperand(rightOperand);
-        extendedOperands(ie).addAll(extendedOperands);
+        ie.setRightOperand(it.next());
+        while (it.hasNext()) {
+            extendedOperands(ie).add(it.next());
+        }
         return ie;
     }
 
@@ -398,7 +405,12 @@ public class ASTBuilder {
      */
     public InfixExpression infixExpr(Expression leftOperand, InfixExpression.Operator operator,
             Expression rightOperand, Expression... extendedOperands) {
-        return infixExpr(leftOperand, operator, rightOperand, Arrays.asList(extendedOperands));
+        final InfixExpression ie = ast.newInfixExpression();
+        ie.setLeftOperand(leftOperand);
+        ie.setOperator(operator);
+        ie.setRightOperand(rightOperand);
+        Collections.addAll(extendedOperands(ie), extendedOperands);
+        return ie;
     }
 
     /**
@@ -491,6 +503,20 @@ public class ASTBuilder {
      */
     public <T extends ASTNode> T move(T nodeToMove) {
         return refactorings.createMoveTarget(nodeToMove);
+    }
+
+    /**
+     * Moves all the provided {@link ASTNode}s in place.
+     *
+     * @param <T> the actual nodes type
+     * @param nodes the nodes to move
+     * @return the provided list with all nodes moved
+     */
+    public <T extends ASTNode> List<T> move(final List<T> nodes) {
+        for (ListIterator<T> it = nodes.listIterator(); it.hasNext();) {
+            it.set(move(it.next()));
+        }
+        return nodes;
     }
 
     /**
