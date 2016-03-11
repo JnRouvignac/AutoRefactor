@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2013-2015 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2013-2016 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -44,9 +44,11 @@ import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.InfixExpression.Operator;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Name;
+import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.StringLiteral;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
+import static org.eclipse.jdt.core.dom.ASTNode.*;
 import static org.eclipse.jdt.core.dom.InfixExpression.Operator.*;
 
 /** See {@link #getDescription()} method. */
@@ -157,9 +159,15 @@ public class StringBuilderRefactoring extends AbstractRefactoringRule {
             final Expression lastExpr = collectAllAppendedStrings(node, allAppendedStrings, hasStringConcat);
             if ((lastExpr instanceof Name || lastExpr instanceof FieldAccess)
                     && isRewriteNeeded(allAppendedStrings, hasStringConcat)) {
-                // rewrite the successive calls to append() on an Appendable
-                this.ctx.getRefactorings().replace(node,
-                        createStringAppends(lastExpr, allAppendedStrings));
+                if (allAppendedStrings.isEmpty()
+                        && isVariable(node.getExpression())
+                        && node.getParent() instanceof Statement) {
+                    ctx.getRefactorings().remove(node.getParent());
+                } else {
+                    // rewrite the successive calls to append() on an Appendable
+                    ctx.getRefactorings().replace(node,
+                            createStringAppends(lastExpr, allAppendedStrings));
+                }
                 return DO_NOT_VISIT_SUBTREE;
             }
 
@@ -196,6 +204,18 @@ public class StringBuilderRefactoring extends AbstractRefactoringRule {
             }
         }
         return VISIT_SUBTREE;
+    }
+
+    private boolean isVariable(Expression expr) {
+        switch (removeParentheses(expr).getNodeType()) {
+        case SIMPLE_NAME:
+        case QUALIFIED_NAME:
+        case FIELD_ACCESS:
+            return true;
+
+        default:
+            return false;
+        }
     }
 
     private MethodInvocation createAppendSubstring(ASTBuilder b, Expression lastExpr,
