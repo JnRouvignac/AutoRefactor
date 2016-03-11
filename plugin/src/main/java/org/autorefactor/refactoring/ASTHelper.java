@@ -1197,7 +1197,17 @@ public final class ASTHelper {
             : null;
     }
 
-    private static ITypeBinding findImplementedType(ITypeBinding typeBinding, String qualifiedTypeName) {
+    /**
+     * Returns the type binding for the provided qualified type name
+     * if it can be found in the type hierarchy of the provided type binding.
+     *
+     * @param typeBinding the type binding to analyze
+     * @param qualifiedTypeName the qualified type name to find
+     * @return the type binding for the provided qualified type name
+     *         if it can be found in the type hierarchy of the provided type binding,
+     *         or {@code null} otherwise
+     */
+    public static ITypeBinding findImplementedType(ITypeBinding typeBinding, String qualifiedTypeName) {
         if (typeBinding == null) {
             return null;
         }

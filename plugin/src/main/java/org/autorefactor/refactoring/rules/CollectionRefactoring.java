@@ -256,7 +256,8 @@ public class CollectionRefactoring extends AbstractRefactoringRule {
         ITypeBinding colTypeBinding = colExpr.resolveTypeBinding();
         if (arrayTypeBinding != null && colTypeBinding != null) {
             ITypeBinding componentType = arrayTypeBinding.getComponentType();
-            ITypeBinding colTypeArgument = colTypeBinding.getTypeArguments()[0];
+            ITypeBinding jucTypeBinding = findImplementedType(colTypeBinding, "java.util.Collection");
+            ITypeBinding colTypeArgument = jucTypeBinding.getTypeArguments()[0];
             return componentType.isSubTypeCompatible(colTypeArgument);
         }
         return false;

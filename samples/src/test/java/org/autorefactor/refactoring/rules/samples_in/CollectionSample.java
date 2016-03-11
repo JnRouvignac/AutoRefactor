@@ -28,6 +28,7 @@ package org.autorefactor.refactoring.rules.samples_in;
 import java.util.AbstractSet;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -225,5 +226,17 @@ public class CollectionSample {
         public int size() {
             return 0;
         }
+    }
+
+    public static Set<String> refactorCollectionWithNoTypeArgument(List<String> strings) {
+        class MyHashSet extends HashSet<String> {
+            private static final long serialVersionUID = 1L;
+        }
+
+        final MyHashSet set = new MyHashSet();
+        for (String s : strings) {
+            set.add(s);
+        }
+        return set;
     }
 }
