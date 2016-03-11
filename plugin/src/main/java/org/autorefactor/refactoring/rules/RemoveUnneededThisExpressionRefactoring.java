@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2014-2015 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2014-2016 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -66,7 +66,8 @@ public class RemoveUnneededThisExpressionRefactoring extends AbstractRefactoring
     public boolean visit(MethodInvocation node) {
         final ThisExpression te = as(node.getExpression(), ThisExpression.class);
         if (thisExpressionRefersToSurroundingType(te)
-                && isCallingMethodDeclaredInSurroundingType(node)) {
+                && isCallingMethodDeclaredInSurroundingType(node)
+                && !isReturnTypeParameterized(node)) {
             // remove useless thisExpressions
             this.ctx.getRefactorings().remove(node.getExpression());
             return DO_NOT_VISIT_SUBTREE;
@@ -131,5 +132,12 @@ public class RemoveUnneededThisExpressionRefactoring extends AbstractRefactoring
             }
         }
         return getFirstAncestor(parent, ancestorClasses);
+    }
+
+    private boolean isReturnTypeParameterized(MethodInvocation node) {
+        IMethodBinding methodBinding = node.resolveMethodBinding();
+        return methodBinding != null
+                && methodBinding.isParameterizedMethod()
+                && methodBinding.getMethodDeclaration().getReturnType().isTypeVariable();
     }
 }
