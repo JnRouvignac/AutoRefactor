@@ -25,6 +25,8 @@
  */
 package org.autorefactor.refactoring.rules.samples_in;
 
+import java.io.IOException;
+
 public class StringBuilderSample {
 
     public void replaceWithEfficientStringAppend(StringBuffer sbuf, StringBuilder sbui, String s) {
@@ -147,5 +149,9 @@ public class StringBuilderSample {
     public void removeAppendEmptyString(StringBuilder builder, StringBuffer buffer) {
         builder.append("");
         buffer.append("");
+    }
+
+    public final void doNotRefactorForAppendable(Appendable buf, Object o) throws IOException {
+        buf.append(o.toString());
     }
 }

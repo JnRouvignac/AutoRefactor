@@ -39,7 +39,6 @@ import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.FieldAccess;
-import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.InfixExpression.Operator;
 import org.eclipse.jdt.core.dom.MethodInvocation;
@@ -149,11 +148,10 @@ public class StringBuilderRefactoring extends AbstractRefactoringRule {
         if (node.getExpression() == null) {
             return VISIT_SUBTREE;
         }
-        final ITypeBinding typeBinding = node.getExpression().resolveTypeBinding();
         if ("append".equals(node.getName().getIdentifier())
                 && arguments(node).size() == 1
                 // most expensive check comes last
-                && instanceOf(typeBinding, "java.lang.Appendable")) {
+                && isStringBuilderOrBuffer(node.getExpression())) {
             final LinkedList<Expression> allAppendedStrings = new LinkedList<Expression>();
             final AtomicBoolean hasStringConcat = new AtomicBoolean(false);
             final Expression lastExpr = collectAllAppendedStrings(node, allAppendedStrings, hasStringConcat);
@@ -164,7 +162,7 @@ public class StringBuilderRefactoring extends AbstractRefactoringRule {
                         && node.getParent() instanceof Statement) {
                     ctx.getRefactorings().remove(node.getParent());
                 } else {
-                    // rewrite the successive calls to append() on an Appendable
+                    // rewrite the successive calls to append()
                     ctx.getRefactorings().replace(node,
                             createStringAppends(lastExpr, allAppendedStrings));
                 }
@@ -173,8 +171,7 @@ public class StringBuilderRefactoring extends AbstractRefactoringRule {
 
             final MethodInvocation embeddedMI = as(allAppendedStrings, MethodInvocation.class);
             if (isStringValueOf(embeddedMI)
-                && (instanceOf(typeBinding, "java.lang.StringBuilder")
-                    || instanceOf(typeBinding, "java.lang.StringBuffer"))) {
+                    && isStringBuilderOrBuffer(node.getExpression())) {
                 final Expression arg0 = arg0(embeddedMI);
                 this.ctx.getRefactorings().replace(node,
                         createStringAppends(lastExpr, Arrays.asList(arg0)));
@@ -204,6 +201,10 @@ public class StringBuilderRefactoring extends AbstractRefactoringRule {
             }
         }
         return VISIT_SUBTREE;
+    }
+
+    private boolean isStringBuilderOrBuffer(final Expression expr) {
+        return hasType(expr, "java.lang.StringBuffer", "java.lang.StringBuilder");
     }
 
     private boolean isVariable(Expression expr) {
@@ -336,7 +337,7 @@ public class StringBuilderRefactoring extends AbstractRefactoringRule {
     private Expression collectAllAppendedStrings(Expression expr,
             final LinkedList<Expression> allOperands, AtomicBoolean hasStringConcat) {
         final Expression exp = removeParentheses(expr);
-        if (instanceOf(exp, "java.lang.Appendable")) {
+        if (isStringBuilderOrBuffer(exp)) {
             if (exp instanceof MethodInvocation) {
                 final MethodInvocation mi = (MethodInvocation) exp;
                 if ("append".equals(mi.getName().getIdentifier())
@@ -349,7 +350,7 @@ public class StringBuilderRefactoring extends AbstractRefactoringRule {
                 final ClassInstanceCreation cic = (ClassInstanceCreation) exp;
                 if (arguments(cic).size() == 1) {
                     final Expression arg0 = arguments(cic).get(0);
-                    if (hasType(cic, "java.lang.StringBuffer", "java.lang.StringBuilder")
+                    if (isStringBuilderOrBuffer(cic)
                         && (hasType(arg0, "java.lang.String")
                                 || instanceOf(arg0, "java.lang.CharSequence"))) {
                         allOperands.addFirst(arg0);
