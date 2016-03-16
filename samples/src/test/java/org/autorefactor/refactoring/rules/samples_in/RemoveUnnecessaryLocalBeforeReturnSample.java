@@ -101,4 +101,13 @@ public class RemoveUnnecessaryLocalBeforeReturnSample {
         return i;
     }
 
+    public Throwable[] inlineStatementWithEmptyArray() {
+        Throwable[] t = {};
+        return t;
+    }
+
+    public Throwable[] inlineExpressionWithEmptyArray(Throwable[] t) {
+        t = new Throwable[] {};
+        return t;
+    }
 }

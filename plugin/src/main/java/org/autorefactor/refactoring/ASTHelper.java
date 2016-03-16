@@ -804,18 +804,10 @@ public final class ASTHelper {
                 return ast.newPrimitiveType(primitiveTypeCode);
             }
         } else if (typeBinding.isClass() || typeBinding.isInterface()) {
-            final String[] qualifiedName = typeBinding.getQualifiedName().split("\\.");
-            if (qualifiedName.length == 0) {
+            final Type result = toType(ast, typeBinding.getQualifiedName());
+            if (result == null) {
                 throw new IllegalStateException(null,
                         "Cannot create a new type from an ITypeBinding without qualified name: " + typeBinding);
-            }
-            final SimpleType simpleType = ast.newSimpleType(ast.newSimpleName(qualifiedName[0]));
-            if (qualifiedName.length == 1) {
-                return simpleType;
-            }
-            Type result = simpleType;
-            for (int i = 1; i < qualifiedName.length; i++) {
-                result = ast.newQualifiedType(result, ast.newSimpleName(qualifiedName[i]));
             }
             return result;
         }
@@ -829,6 +821,29 @@ public final class ASTHelper {
                 + ", isTypeVariable()=" + typeBinding.isTypeVariable()
                 + ", isRawType()=" + typeBinding.isRawType()
                 + ", isWildcardType()=" + typeBinding.isWildcardType());
+    }
+
+    /**
+     * Converts the provided qualified type name to a new {@link Type} object.
+     *
+     * @param ast the {@link AST}
+     * @param qualifiedName the qualified type name
+     * @return a new {@link Type} object
+     */
+    public static Type toType(final AST ast, String qualifiedName) {
+        final String[] names = qualifiedName.split("\\.");
+        if (names.length == 0) {
+            return null;
+        }
+        final SimpleType simpleType = ast.newSimpleType(ast.newSimpleName(names[0]));
+        if (names.length == 1) {
+            return simpleType;
+        }
+        Type result = simpleType;
+        for (int i = 1; i < names.length; i++) {
+            result = ast.newQualifiedType(result, ast.newSimpleName(names[i]));
+        }
+        return result;
     }
 
     // AST navigation

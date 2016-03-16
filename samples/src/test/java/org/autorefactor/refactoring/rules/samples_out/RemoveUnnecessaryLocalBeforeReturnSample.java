@@ -45,7 +45,7 @@ public class RemoveUnnecessaryLocalBeforeReturnSample {
      * FIXME little bug: the return type should be String instead of java.lang.String
      */
     public String[] inlineStringArrayVariableDeclaration() {
-        return new java.lang.String[] { "test" };
+        return new String[] { "test" };
     }
 
     public boolean[] inlineBooleanArrayVariableDeclaration() {
@@ -90,4 +90,11 @@ public class RemoveUnnecessaryLocalBeforeReturnSample {
         return i;
     }
 
+    public Throwable[] inlineStatementWithEmptyArray() {
+        return new Throwable[] {};
+    }
+
+    public Throwable[] inlineExpressionWithEmptyArray(Throwable[] t) {
+        return new Throwable[] {};
+    }
 }

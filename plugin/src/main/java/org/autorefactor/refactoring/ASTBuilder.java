@@ -236,7 +236,9 @@ public class ASTBuilder {
      * @return a copy of the node
      */
     public <T extends ASTNode> T copy(T nodeToCopy) {
-        if (isValidInCurrentAST(nodeToCopy)) {
+        if (nodeToCopy.getNodeType() == ASTNode.ARRAY_TYPE) {
+            return (T) copyType((Type) nodeToCopy);
+        } else if (isValidInCurrentAST(nodeToCopy)) {
             return refactorings.createCopyTarget(nodeToCopy);
         }
         return copySubtree(nodeToCopy);
@@ -245,6 +247,29 @@ public class ASTBuilder {
     private boolean isValidInCurrentAST(ASTNode node) {
         return node.getAST() == ast
                 && node.getStartPosition() != -1;
+    }
+
+    private Type copyType(final Type type) {
+        switch (type.getNodeType()) {
+        case ARRAY_TYPE:
+            final ArrayType arrayType = (ArrayType) type;
+            return ast.newArrayType(
+                    copyType(arrayType.getComponentType()),
+                    arrayType.getDimensions());
+
+        case PRIMITIVE_TYPE:
+            final Code code = ((PrimitiveType) type).getPrimitiveTypeCode();
+            return ast.newPrimitiveType(code);
+
+        case QUALIFIED_TYPE:
+            return toType(ast, type.resolveBinding().getQualifiedName());
+
+        case SIMPLE_TYPE:
+            final SimpleType sType = (SimpleType) type;
+            return ast.newSimpleType(copy(sType.getName()));
+        }
+
+        throw new NotImplementedException(null, "Unknown type for type " + type);
     }
 
     /**
@@ -615,17 +640,14 @@ public class ASTBuilder {
     /**
      * Builds a new {@link ArrayCreation} instance.
      *
-     * @param typeBinding the type binding of the instantiated type
-     * @param arrayInitializers the expressions forming the array initializer
+     * @param arrayType the array type
+     * @param arrayInitializer the array initializer
      * @return a new array creation instance
      */
-    public ArrayCreation newArray(ITypeBinding typeBinding, Expression arrayInitializers) {
-        final ArrayInitializer ai = ast.newArrayInitializer();
-        expressions(ai).add(arrayInitializers);
-
+    public ArrayCreation newArray(ArrayType arrayType, ArrayInitializer arrayInitializer) {
         final ArrayCreation ac = ast.newArrayCreation();
-        ac.setType((ArrayType) toType(ast, typeBinding));
-        ac.setInitializer(ai);
+        ac.setType(arrayType);
+        ac.setInitializer(arrayInitializer);
         return ac;
     }
 

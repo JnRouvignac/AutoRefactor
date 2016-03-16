@@ -26,11 +26,13 @@
 package org.autorefactor.refactoring.rules;
 
 import org.autorefactor.refactoring.ASTBuilder;
+import org.autorefactor.refactoring.Refactorings;
 import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.ArrayCreation;
 import org.eclipse.jdt.core.dom.ArrayInitializer;
+import org.eclipse.jdt.core.dom.ArrayType;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Expression;
-import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.SimpleName;
@@ -64,57 +66,65 @@ public class RemoveUnnecessaryLocalBeforeReturnRefactoring extends AbstractRefac
             final VariableDeclarationStatement vds = (VariableDeclarationStatement) previousSibling;
             if (fragments(vds).size() == 1) {
                 final VariableDeclarationFragment vdf = fragments(vds).get(0);
-                final Expression origExpr = node.getExpression();
-                if (origExpr instanceof SimpleName) {
-                    replaceReturnStatement(node, vds, origExpr, vdf.getName(),
-                            vdf.getInitializer());
+                if (isSameLocalVariableBinding(node.getExpression(), vdf.getName())) {
+                    final Expression returnExpr = vdf.getInitializer();
+                    if (isArray(returnExpr)) {
+                        final ASTBuilder b = ctx.getASTBuilder();
+                        final ReturnStatement newReturnStmt =
+                                b.return0(b.newArray(
+                                        b.copy((ArrayType) vds.getType()),
+                                        b.move((ArrayInitializer) returnExpr)));
+                        replaceReturnStatementForArray(node, vds, newReturnStmt);
+                    } else {
+                        replaceReturnStatement(node, vds, returnExpr);
+                    }
+                    return DO_NOT_VISIT_SUBTREE;
                 }
             }
         } else {
             final Assignment as = asExpression(previousSibling, Assignment.class);
-            final Expression origExpr = node.getExpression();
-            if (hasOperator(as, ASSIGN)) {
-                final Expression newExpr = as.getLeftHandSide();
-                replaceReturnStatement(node, previousSibling, origExpr, newExpr,
-                        as.getRightHandSide());
+            if (hasOperator(as, ASSIGN)
+                    && isSameLocalVariableBinding(node.getExpression(), as.getLeftHandSide())) {
+                final Expression returnExpr = as.getRightHandSide();
+                if (isArray(returnExpr)) {
+                    final ASTBuilder b = ctx.getASTBuilder();
+                    final ReturnStatement newReturnStmt =
+                            b.return0(b.copy((ArrayCreation) returnExpr));
+                    replaceReturnStatementForArray(node, previousSibling, newReturnStmt);
+                } else {
+                    replaceReturnStatement(node, previousSibling, returnExpr);
+                }
+                return DO_NOT_VISIT_SUBTREE;
             }
         }
         return VISIT_SUBTREE;
     }
 
-    private void replaceReturnStatement(ReturnStatement node,
-            final ASTNode previousSibling, Expression expr1, Expression expr2,
+    private void replaceReturnStatementForArray(ReturnStatement node, final ASTNode previousSibling,
+            ReturnStatement newReturnStmt) {
+        final Refactorings r = ctx.getRefactorings();
+        r.remove(previousSibling);
+        r.replace(node, newReturnStmt);
+    }
+
+    private void replaceReturnStatement(ReturnStatement node, final ASTNode previousSibling,
             Expression returnExpr) {
+        final ASTBuilder b = ctx.getASTBuilder();
+        final Refactorings r = ctx.getRefactorings();
+        r.remove(previousSibling);
+        r.replace(node, b.return0(b.move(returnExpr)));
+    }
+
+    private boolean isSameLocalVariableBinding(Expression expr1, Expression expr2) {
         if (expr1 instanceof SimpleName && expr2 instanceof SimpleName) {
             final SimpleName sn1 = (SimpleName) expr1;
             final SimpleName sn2 = (SimpleName) expr2;
             final IVariableBinding bnd1 = (IVariableBinding) sn1.resolveBinding();
             final IVariableBinding bnd2 = (IVariableBinding) sn2.resolveBinding();
-            if (bnd1 == null || bnd2 == null) {
-                return;
-            }
             // to avoid changing the class's behaviour,
             // we must not remove field's assignment
-            if (!bnd1.isField() && !bnd2.isField() && bnd1.isEqualTo(bnd2)) {
-                this.ctx.getRefactorings().remove(previousSibling);
-                if (returnExpr instanceof ArrayInitializer && bnd1.getType().isArray()) {
-                    this.ctx.getRefactorings().replace(node,
-                        getReturnStatementForArray((ArrayInitializer) returnExpr, bnd1.getType()));
-                } else {
-                    this.ctx.getRefactorings().replace(node,
-                        getReturnStatement(returnExpr));
-                }
-            }
+            return bnd1 != null && bnd2 != null && !bnd1.isField() && !bnd2.isField() && bnd1.isEqualTo(bnd2);
         }
-    }
-
-    private ReturnStatement getReturnStatementForArray(ArrayInitializer returnAI, ITypeBinding typeBinding) {
-        final ASTBuilder b = this.ctx.getASTBuilder();
-        return b.return0(b.newArray(typeBinding, b.copyRange(expressions(returnAI))));
-    }
-
-    private ASTNode getReturnStatement(Expression initializer) {
-        final ASTBuilder b = this.ctx.getASTBuilder();
-        return b.return0(b.copy(initializer));
+        return false;
     }
 }
