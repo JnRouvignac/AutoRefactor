@@ -67,7 +67,7 @@ public class RemoveUnneededThisExpressionRefactoring extends AbstractRefactoring
         final ThisExpression te = as(node.getExpression(), ThisExpression.class);
         if (thisExpressionRefersToSurroundingType(te)
                 && isCallingMethodDeclaredInSurroundingType(node)
-                && !isReturnTypeParameterized(node)) {
+                && typeArguments(node).isEmpty()) {
             // remove useless thisExpressions
             this.ctx.getRefactorings().remove(node.getExpression());
             return DO_NOT_VISIT_SUBTREE;
@@ -132,12 +132,5 @@ public class RemoveUnneededThisExpressionRefactoring extends AbstractRefactoring
             }
         }
         return getFirstAncestor(parent, ancestorClasses);
-    }
-
-    private boolean isReturnTypeParameterized(MethodInvocation node) {
-        IMethodBinding methodBinding = node.resolveMethodBinding();
-        return methodBinding != null
-                && methodBinding.isParameterizedMethod()
-                && methodBinding.getMethodDeclaration().getReturnType().isTypeVariable();
     }
 }

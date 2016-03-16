@@ -698,6 +698,18 @@ public final class ASTHelper {
      * @see ParameterizedType#typeArguments()
      */
     @SuppressWarnings("unchecked")
+    public static List<Type> typeArguments(MethodInvocation node) {
+        return node.typeArguments();
+    }
+
+    /**
+     * Generecized version of the equivalent JDT method.
+     *
+     * @param node the node on which to call the equivalent JDT method
+     * @return a List of expressions
+     * @see ParameterizedType#typeArguments()
+     */
+    @SuppressWarnings("unchecked")
     public static List<Type> typeArguments(ParameterizedType node) {
         return node.typeArguments();
     }

@@ -96,7 +96,15 @@ public class RemoveUnneededThisExpressionSample {
         return this.<String>aGenericMethod();
     }
 
+    public String removeThisAndUselessTypeParameter() {
+        return this.<Class> notGenericMethod();
+    }
+
     private <T> T aGenericMethod() {
+        return null;
+    }
+
+    private String notGenericMethod() {
         return null;
     }
 }
