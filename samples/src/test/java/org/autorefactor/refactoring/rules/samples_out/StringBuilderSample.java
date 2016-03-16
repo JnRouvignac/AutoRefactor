@@ -152,4 +152,8 @@ public class StringBuilderSample {
     public final void doNotRefactorForAppendable(Appendable buf, Object o) throws IOException {
         buf.append(o.toString());
     }
+
+    public String formatTime(int hour, int min) {
+        return (hour < 10 ? "0" + hour : hour) + ":" + (min < 10 ? "0" + min : min);
+    }
 }

@@ -305,33 +305,33 @@ public class StringBuilderRefactoring extends AbstractRefactoringRule {
 
     private Expression createStringConcats(List<Expression> appendedStrings) {
         final ASTBuilder b = this.ctx.getASTBuilder();
-        if (appendedStrings.size() == 0) {
+        switch (appendedStrings.size()) {
+        case 0:
             return b.string("");
-        } else if (appendedStrings.size() == 1) {
+
+        case 1:
             final Expression expr = appendedStrings.get(0);
             if (hasType(expr, "java.lang.String")) {
                 return b.copy(expr);
             }
             return b.invoke("String", "valueOf", b.copy(expr));
-        }
 
-        final Iterator<Expression> it = appendedStrings.iterator();
-        final Expression arg0 = it.next();
-        final Expression arg1 = it.next();
+        default: // >== 2
+            final Expression arg0 = appendedStrings.get(0);
+            final Expression arg1 = appendedStrings.get(1);
+            boolean prependEmptyString = !hasType(arg0, "java.lang.String")
+                    && !hasType(arg1, "java.lang.String");
 
-        final Expression expr1;
-        if (hasType(arg0, "java.lang.String")
-                || hasType(arg1, "java.lang.String")) {
-            expr1 = b.copy(arg0);
-        } else {
-            expr1 = b.infixExpr(b.string(""), Operator.PLUS, b.copy(arg0));
+            for (ListIterator<Expression> it = appendedStrings.listIterator(); it.hasNext();) {
+                final Expression e = it.next();
+                it.set(b.parenthesizeIfNeeded(b.copy(e)));
+            }
+
+            if (prependEmptyString) {
+                appendedStrings.add(0, b.string(""));
+            }
+            return b.infixExpr(Operator.PLUS, appendedStrings);
         }
-        final Expression expr2 = b.copy(arg1);
-        final InfixExpression ie = b.infixExpr(expr1, Operator.PLUS, expr2);
-        while (it.hasNext()) {
-            extendedOperands(ie).add(b.copy(it.next()));
-        }
-        return ie;
     }
 
     private Expression collectAllAppendedStrings(Expression expr,
