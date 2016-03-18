@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2015 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2015-2016 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,6 +31,9 @@ import org.autorefactor.refactoring.Release;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
+import org.eclipse.jdt.core.dom.Expression;
+import org.eclipse.jdt.core.dom.IMethodBinding;
+import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.ParameterizedType;
 import org.eclipse.jdt.core.dom.ParenthesizedExpression;
 import org.eclipse.jdt.core.dom.ReturnStatement;
@@ -61,14 +64,57 @@ public class UseDiamondOperatorRefactoring extends AbstractRefactoringRule {
             final Type type = node.getType();
             if (type.isParameterizedType()
                     && node.getAnonymousClassDeclaration() == null
-                    && canUseDiamondOperator(node)) {
+                    && parentAllowsDiamondOperator(node)
+                    && canUseDiamondOperator(node, type)) {
                 return removeAllTypeArguments((ParameterizedType) type);
             }
         }
         return VISIT_SUBTREE;
     }
 
-    private boolean canUseDiamondOperator(ClassInstanceCreation node) {
+    private boolean canUseDiamondOperator(ClassInstanceCreation node, final Type type) {
+        List<Expression> args = arguments(node);
+        if (args.isEmpty()) {
+            return true;
+        }
+
+        ITypeBinding typeBinding = type.resolveBinding();
+        ITypeBinding[] typeArguments = typeBinding.getTypeArguments();
+        ITypeBinding typeDecl = typeBinding.getTypeDeclaration();
+        ITypeBinding[] typeParameters = typeDecl.getTypeParameters();
+
+        IMethodBinding methodBinding = node.resolveConstructorBinding();
+        IMethodBinding methodDecl = methodBinding.getMethodDeclaration();
+        ITypeBinding[] actualMethodParamTypes = methodBinding.getParameterTypes();
+        ITypeBinding[] declMethodParamTypes = methodDecl.getParameterTypes();
+        for (int i = 0; i < declMethodParamTypes.length; i++) {
+            ITypeBinding declParamType = declMethodParamTypes[i];
+            ITypeBinding actualParamType = actualMethodParamTypes[i];
+            Expression actualArg = args.get(i);
+            ITypeBinding actualArgType = actualArg.resolveTypeBinding();
+            if (declParamType.isParameterizedType()) {
+                ITypeBinding[] declParamTypeArgs = declParamType.getTypeArguments();
+                ITypeBinding[] actualParamTypeArgs = actualParamType.getTypeArguments();
+                ITypeBinding[] actualArgTypeArgs = actualArgType.getTypeArguments();
+                for (int j = 0; j < declParamTypeArgs.length; j++) {
+                    ITypeBinding declParamTypeArg = declParamTypeArgs[j];
+                    ITypeBinding actualParamTypeArg = actualParamTypeArgs[j];
+                    ITypeBinding actualArgTypeArg = actualArgTypeArgs[j];
+                    if (declParamTypeArg.isWildcardType()) {
+                        ITypeBinding declParamTypeArgBound = declParamTypeArg.getBound();
+                        ITypeBinding actualParamTypeArgBound = actualParamTypeArg.getBound();
+                        if (declParamTypeArgBound.equals(typeParameters[0])
+                                && actualArgTypeArg.equals(typeArguments[0])) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean parentAllowsDiamondOperator(ClassInstanceCreation node) {
         final ASTNode parentInfo = getFirstParentOfType(node, ParenthesizedExpression.class);
         final StructuralPropertyDescriptor locationInParent = parentInfo.getLocationInParent();
 

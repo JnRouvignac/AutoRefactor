@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2015 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2015-2016 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,7 +31,7 @@ import java.util.List;
 
 public class UseDiamondOperatorSample {
 
-    private List<String> listField = new ArrayList<>();
+    private final List<String> listField = new ArrayList<>();
 
     public List<String> refactorVariableDeclarationStatement() {
         List<String> l = new ArrayList<>();
@@ -51,6 +51,14 @@ public class UseDiamondOperatorSample {
 
     public List<String> refactorReturnStatement() {
         return new ArrayList<>();
+    }
+
+    public List<String> refactorReturnStatementWithParameter(List<String> l) {
+        return new ArrayList<>(l);
+    }
+
+    public List<Object> doNotRefactorChangeOfType(List<String> col) {
+        return new ArrayList<Object>(col);
     }
 
     /**
