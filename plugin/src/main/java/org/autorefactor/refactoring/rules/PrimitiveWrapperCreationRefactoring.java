@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2013-2015 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2013-2016 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -177,25 +177,42 @@ public class PrimitiveWrapperCreationRefactoring extends AbstractRefactoringRule
     @Override
     public boolean visit(ClassInstanceCreation node) {
         final ITypeBinding typeBinding = node.getType().resolveBinding();
+        final List<Expression> args = arguments(node);
         if (getJavaMinorVersion() >= 5
                 && typeBinding != null
-                && arguments(node).size() == 1) {
+                && args.size() == 1) {
             final String qualifiedName = typeBinding.getQualifiedName();
             if ("java.lang.Boolean".equals(qualifiedName)
                     || "java.lang.Byte".equals(qualifiedName)
                     || "java.lang.Character".equals(qualifiedName)
                     || "java.lang.Double".equals(qualifiedName)
-                    || "java.lang.Float".equals(qualifiedName)
                     || "java.lang.Long".equals(qualifiedName)
                     || "java.lang.Short".equals(qualifiedName)
                     || "java.lang.Integer".equals(qualifiedName)) {
-                this.ctx.getRefactorings().replace(
-                        node,
-                        newMethodInvocation(typeBinding.getName(), "valueOf", arguments(node).get(0)));
+                replaceWithValueOf(node, typeBinding);
                 return DO_NOT_VISIT_SUBTREE;
+            } else if ("java.lang.Float".equals(qualifiedName)) {
+                final Expression arg0 = args.get(0);
+                if (isPrimitive(arg0, "double")) {
+                    final ASTBuilder b = ctx.getASTBuilder();
+                    ctx.getRefactorings().replace(
+                            node,
+                            b.invoke(typeBinding.getName(), "valueOf", b.cast("float", b.copy(arg0))));
+                    return DO_NOT_VISIT_SUBTREE;
+                } else {
+                    replaceWithValueOf(node, typeBinding);
+                    return DO_NOT_VISIT_SUBTREE;
+                }
             }
         }
         return VISIT_SUBTREE;
+    }
+
+    private void replaceWithValueOf(ClassInstanceCreation node,
+            final ITypeBinding typeBinding) {
+        this.ctx.getRefactorings().replace(
+                node,
+                newMethodInvocation(typeBinding.getName(), "valueOf", arguments(node).get(0)));
     }
 
     private MethodInvocation newMethodInvocation(String typeName,

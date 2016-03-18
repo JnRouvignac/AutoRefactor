@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2013 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2013-2016 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,7 +34,8 @@ public class PrimitiveWrapperCreationSample {
         Boolean bo = Boolean.valueOf(true);
         Character c = Character.valueOf('c');
         Double d = Double.valueOf(1);
-        Float f = Float.valueOf(1);
+        Float f1 = Float.valueOf(1f);
+        Float f2 = Float.valueOf((float) 1d);
         Long l = Long.valueOf(1);
         short s = 1;
         Short sh = Short.valueOf(s);
@@ -44,8 +45,8 @@ public class PrimitiveWrapperCreationSample {
     public static void removeUnnecessaryObjectCreation() {
         Byte.parseByte("0");
         Boolean.valueOf("true");
-        Integer.parseInt("42"); 
-        Long.parseLong("42"); 
+        Integer.parseInt("42");
+        Long.parseLong("42");
         // nothing for Short?
         Float.parseFloat("42.42");
         Double.parseDouble("42.42");
