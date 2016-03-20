@@ -27,11 +27,11 @@ package org.autorefactor.refactoring.rules.samples_in;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class UseDiamondOperatorSample {
-
-    private final List<String> listField = new ArrayList<String>();
 
     public List<String> refactorVariableDeclarationStatement() {
         List<String> l = new ArrayList<String>();
@@ -57,8 +57,16 @@ public class UseDiamondOperatorSample {
         return new ArrayList<String>(l);
     }
 
+    public Map<String, String> refactorReturnStatementWithParameter(Map<String, String> l) {
+        return new HashMap<String, String>(l);
+    }
+
     public List<Object> doNotRefactorChangeOfType(List<String> col) {
         return new ArrayList<Object>(col);
+    }
+
+    public Map<String, Object> doNotRefactorChangeOfType(Map<String, String> col) {
+        return new HashMap<String, Object>(col);
     }
 
     /**

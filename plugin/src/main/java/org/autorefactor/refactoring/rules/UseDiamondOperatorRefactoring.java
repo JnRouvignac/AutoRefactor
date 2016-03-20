@@ -25,6 +25,8 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.autorefactor.refactoring.Release;
@@ -79,11 +81,16 @@ public class UseDiamondOperatorRefactoring extends AbstractRefactoringRule {
         }
 
         ITypeBinding typeBinding = type.resolveBinding();
-        ITypeBinding[] typeArguments = typeBinding.getTypeArguments();
-        ITypeBinding typeDecl = typeBinding.getTypeDeclaration();
-        ITypeBinding[] typeParameters = typeDecl.getTypeParameters();
-
         IMethodBinding methodBinding = node.resolveConstructorBinding();
+        if (typeBinding == null || methodBinding == null) {
+            return false;
+        }
+        List<ITypeBinding> typeArguments = new ArrayList<ITypeBinding>();
+        Collections.addAll(typeArguments, typeBinding.getTypeArguments());
+        ITypeBinding typeDecl = typeBinding.getTypeDeclaration();
+        List<ITypeBinding> typeParameters = new ArrayList<ITypeBinding>();
+        Collections.addAll(typeParameters, typeDecl.getTypeParameters());
+
         IMethodBinding methodDecl = methodBinding.getMethodDeclaration();
         ITypeBinding[] actualMethodParamTypes = methodBinding.getParameterTypes();
         ITypeBinding[] declMethodParamTypes = methodDecl.getParameterTypes();
@@ -92,7 +99,7 @@ public class UseDiamondOperatorRefactoring extends AbstractRefactoringRule {
             ITypeBinding actualParamType = actualMethodParamTypes[i];
             Expression actualArg = args.get(i);
             ITypeBinding actualArgType = actualArg.resolveTypeBinding();
-            if (declParamType.isParameterizedType()) {
+            if (actualArgType != null && declParamType.isParameterizedType()) {
                 ITypeBinding[] declParamTypeArgs = declParamType.getTypeArguments();
                 ITypeBinding[] actualParamTypeArgs = actualParamType.getTypeArguments();
                 ITypeBinding[] actualArgTypeArgs = actualArgType.getTypeArguments();
@@ -103,15 +110,19 @@ public class UseDiamondOperatorRefactoring extends AbstractRefactoringRule {
                     if (declParamTypeArg.isWildcardType()) {
                         ITypeBinding declParamTypeArgBound = declParamTypeArg.getBound();
                         ITypeBinding actualParamTypeArgBound = actualParamTypeArg.getBound();
-                        if (declParamTypeArgBound.equals(typeParameters[0])
-                                && actualArgTypeArg.equals(typeArguments[0])) {
-                            return true;
+                        int typeParamIndex = typeParameters.indexOf(declParamTypeArgBound);
+                        int typeArgIndex = typeArguments.indexOf(actualArgTypeArg);
+                        if (typeParamIndex != -1 && typeArgIndex != -1) {
+                            // the type parameter is matching
+                            typeParameters.remove(typeParamIndex);
+                            typeArguments.remove(typeArgIndex);
                         }
                     }
                 }
             }
         }
-        return false;
+        // all the type parameters are matching
+        return typeParameters.isEmpty();
     }
 
     private boolean parentAllowsDiamondOperator(ClassInstanceCreation node) {
