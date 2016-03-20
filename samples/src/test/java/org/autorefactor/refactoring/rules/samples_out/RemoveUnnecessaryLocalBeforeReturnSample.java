@@ -97,4 +97,8 @@ public class RemoveUnnecessaryLocalBeforeReturnSample {
     public Throwable[] inlineExpressionWithEmptyArray(Throwable[] t) {
         return new Throwable[] {};
     }
+
+    public char[] refactorMethodCall(String s) {
+        return s.toCharArray();
+    }
 }

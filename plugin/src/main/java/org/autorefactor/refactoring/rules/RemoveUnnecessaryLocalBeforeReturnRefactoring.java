@@ -68,7 +68,7 @@ public class RemoveUnnecessaryLocalBeforeReturnRefactoring extends AbstractRefac
                 final VariableDeclarationFragment vdf = fragments(vds).get(0);
                 if (isSameLocalVariableBinding(node.getExpression(), vdf.getName())) {
                     final Expression returnExpr = vdf.getInitializer();
-                    if (isArray(returnExpr)) {
+                    if (returnExpr instanceof ArrayInitializer) {
                         final ASTBuilder b = ctx.getASTBuilder();
                         final ReturnStatement newReturnStmt =
                                 b.return0(b.newArray(

@@ -110,4 +110,9 @@ public class RemoveUnnecessaryLocalBeforeReturnSample {
         t = new Throwable[] {};
         return t;
     }
+
+    public char[] refactorMethodCall(String s) {
+        char[] res = s.toCharArray();
+        return res;
+    }
 }
