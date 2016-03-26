@@ -66,9 +66,14 @@ public class RemoveEmptyLinesRefactoring extends AbstractRefactoringRule {
 
     @Override
     public boolean visit(CompilationUnit node) {
+        final String source = this.ctx.getSource(node);
+        if (source.length() == 0) {
+            // empty file, bail out
+            return VISIT_SUBTREE;
+        }
+
         computeLineEnds(node);
 
-        final String source = this.ctx.getSource(node);
         final Refactorings r = this.ctx.getRefactorings();
 
         int index = getIndexOfFirstNonWhitespaceChar(source, 0);
