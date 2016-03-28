@@ -144,7 +144,7 @@ public class UseMultiCatchSample {
         }
     }
 
-    public void refactorForward(ThrowingObject<IllegalArgumentException, NamingException> obj) {
+    public void refactorUp(ThrowingObject<IllegalArgumentException, NamingException> obj) {
         try {
             obj.throwingMethod();
         } catch (IllegalArgumentException | NamingException iae) {
@@ -154,7 +154,7 @@ public class UseMultiCatchSample {
         }
     }
 
-    public void refactorBackward(ThrowingObject<NamingException, RuntimeException> obj) {
+    public void refactorDown(ThrowingObject<NamingException, RuntimeException> obj) {
         try {
             obj.throwingMethod();
         } catch (RuntimeException ioe) {
@@ -182,5 +182,24 @@ public class UseMultiCatchSample {
         } catch (Ex2 ex2) {
             throw new MyException(ex2);
         }
+    }
+
+    public class EA extends Exception {}
+    public class EB extends Exception {}
+    public class EB1 extends EB {}
+    public class EC extends Exception {}
+
+    public String refactorUp2() {
+        try {
+            return throwingMethod();
+        } catch (EA | EB1 | EC e) {
+            throw new RuntimeException("v1", e);
+        } catch (EB e) {
+            throw new RuntimeException("v2", e);
+        }
+    }
+
+    private String throwingMethod() throws EA, EB1, EB, EC {
+        return null;
     }
 }

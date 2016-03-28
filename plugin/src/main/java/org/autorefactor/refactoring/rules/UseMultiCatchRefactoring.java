@@ -39,13 +39,13 @@ import java.util.Set;
 import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.ASTHelper;
 import org.autorefactor.refactoring.Refactorings;
+import org.autorefactor.util.NotImplementedException;
 import org.eclipse.jdt.core.dom.ASTMatcher;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.CatchClause;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
-import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
@@ -58,6 +58,7 @@ import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.autorefactor.util.Utils.*;
+import static org.eclipse.jdt.core.dom.ASTNode.*;
 
 /** See {@link #getDescription()} method. */
 @SuppressWarnings("javadoc")
@@ -73,8 +74,102 @@ public class UseMultiCatchRefactoring extends AbstractRefactoringRule {
         return "Multi-catch";
     }
 
-    private static enum AggregateDirection {
-        NONE, FORWARD, BACKWARD;
+    private static enum MergeDirection {
+        NONE, UP, DOWN;
+    }
+
+    private static abstract class Binding {
+        protected abstract Boolean isSubTypeCompatible(Binding type);
+    }
+
+    private static class SingleBinding extends Binding {
+        private final ITypeBinding typeBinding;
+
+        public SingleBinding(ITypeBinding typeBinding) {
+            this.typeBinding = typeBinding;
+        }
+
+        @Override
+        protected Boolean isSubTypeCompatible(Binding other) {
+            if (typeBinding == null) {
+                return false;
+            } else if (other instanceof SingleBinding) {
+                SingleBinding o = (SingleBinding) other;
+                return typeBinding.isSubTypeCompatible(o.typeBinding);
+            } else if (other instanceof MultiBinding) {
+                MultiBinding o = (MultiBinding) other;
+                for (ITypeBinding otherTypeBinding : o.typeBindings) {
+                    if (otherTypeBinding == null || !typeBinding.isSubTypeCompatible(otherTypeBinding)) {
+                        return false;
+                    }
+                }
+                return true;
+            } else {
+                throw new NotImplementedException(null, other);
+            }
+        }
+
+        @Override
+        public String toString() {
+            return typeBinding.getName();
+        }
+    }
+
+    private static class MultiBinding extends Binding {
+        private final ITypeBinding[] typeBindings;
+
+        public MultiBinding(ITypeBinding[] typeBindings) {
+            this.typeBindings = typeBindings;
+        }
+
+        @Override
+        protected Boolean isSubTypeCompatible(Binding other) {
+            if (other instanceof SingleBinding) {
+                SingleBinding o = (SingleBinding) other;
+                if (o.typeBinding == null) {
+                    return null;
+                }
+                boolean anySubTypeCompatible = false;
+                for (ITypeBinding typeBinding : typeBindings) {
+                    if (typeBinding == null) {
+                        return null;
+                    } else if (typeBinding.isSubTypeCompatible(o.typeBinding)) {
+                        anySubTypeCompatible = true;
+                    }
+                }
+                return anySubTypeCompatible;
+            } else if (other instanceof MultiBinding) {
+                MultiBinding o = (MultiBinding) other;
+                boolean anySubTypeCompatible = false;
+                for (ITypeBinding typeBinding : typeBindings) {
+                    if (typeBinding == null) {
+                        return null;
+                    }
+                    for (ITypeBinding otherTypeBinding : o.typeBindings) {
+                        if (otherTypeBinding == null) {
+                            return null;
+                        } else if (typeBinding.isSubTypeCompatible(otherTypeBinding)) {
+                            anySubTypeCompatible = true;
+                        }
+                    }
+                }
+                return anySubTypeCompatible;
+            } else {
+                throw new NotImplementedException(null, other);
+            }
+        }
+
+        @Override
+        public String toString() {
+            final StringBuilder sb = new StringBuilder();
+            for (ITypeBinding typeBinding : typeBindings) {
+                if (sb.length() > 0) {
+                    sb.append(" | ");
+                }
+                sb.append(typeBinding.getName());
+            }
+            return sb.toString();
+        }
     }
 
     private static final class MultiCatchASTMatcher extends ASTMatcher {
@@ -190,21 +285,24 @@ public class UseMultiCatchRefactoring extends AbstractRefactoringRule {
     @Override
     public boolean visit(TryStatement node) {
         List<CatchClause> catchClauses = catchClauses(node);
+        Binding[] typeBindings = resolveTypeBindings(catchClauses);
         for (int i = 0; i < catchClauses.size(); i++) {
             CatchClause catchClause1 = catchClauses.get(i);
             for (int j = i + 1; j < catchClauses.size(); j++) {
                 CatchClause catchClause2 = catchClauses.get(j);
-                AggregateDirection direction = aggregateDirection(catchClauses, i, j);
-                if (!AggregateDirection.NONE.equals(direction)
+                MergeDirection direction = mergeDirection(typeBindings, i, j);
+                if (!MergeDirection.NONE.equals(direction)
                         && matchMultiCatch(catchClause1, catchClause2)) {
                     Refactorings r = this.ctx.getRefactorings();
-                    UnionType ut = concat(catchClause1.getException().getType(), catchClause2.getException().getType());
-                    if (AggregateDirection.BACKWARD.equals(direction)) {
-                        r.remove(catchClause1);
-                        r.set(catchClause2.getException(), SingleVariableDeclaration.TYPE_PROPERTY, ut);
-                    } else if (AggregateDirection.FORWARD.equals(direction)) {
+                    UnionType ut = unionTypes(
+                            catchClause1.getException().getType(),
+                            catchClause2.getException().getType());
+                    if (MergeDirection.UP.equals(direction)) {
                         r.set(catchClause1.getException(), SingleVariableDeclaration.TYPE_PROPERTY, ut);
                         r.remove(catchClause2);
+                    } else if (MergeDirection.DOWN.equals(direction)) {
+                        r.remove(catchClause1);
+                        r.set(catchClause2.getException(), SingleVariableDeclaration.TYPE_PROPERTY, ut);
                     }
                     return DO_NOT_VISIT_SUBTREE;
                 }
@@ -213,79 +311,75 @@ public class UseMultiCatchRefactoring extends AbstractRefactoringRule {
         return VISIT_SUBTREE;
     }
 
+    private Binding[] resolveTypeBindings(List<CatchClause> catchClauses) {
+        final Binding[] results = new Binding[catchClauses.size()];
+        for (int i = 0; i < catchClauses.size(); i++) {
+            results[i] = resolveBinding(catchClauses.get(i));
+        }
+        return results;
+    }
+
+    private Binding resolveBinding(CatchClause catchClause) {
+        SingleVariableDeclaration svd = catchClause.getException();
+        Type type = svd.getType();
+        switch (type.getNodeType()) {
+        case SIMPLE_TYPE:
+            return new SingleBinding(type.resolveBinding());
+
+        case UNION_TYPE:
+            List<Type> types = types((UnionType) type);
+            ITypeBinding[] typeBindings = new ITypeBinding[types.size()];
+            for (int j = 0; j < types.size(); j++) {
+                typeBindings[j] = types.get(j).resolveBinding();
+            }
+            return new MultiBinding(typeBindings);
+
+        default:
+            // TODO JNR throw
+            return null;
+        }
+    }
+
     private boolean matchMultiCatch(CatchClause catchClause1, CatchClause catchClause2) {
         final MultiCatchASTMatcher matcher = new MultiCatchASTMatcher(catchClause1, catchClause2);
         return match(matcher, catchClause1.getBody(), catchClause2.getBody());
     }
 
-    private AggregateDirection aggregateDirection(List<CatchClause> catchClauses, int start, int end) {
-        final ITypeBinding[] types = new ITypeBinding[catchClauses.size()];
-        for (int i = start; i <= end; i++) {
-            types[i] = resolveTypeBindingOfException(catchClauses.get(i));
-            if (types[i] == null) {
-                return AggregateDirection.NONE;
-            }
-        }
-
-        if (changeInBehaviour(types, start, end)) {
-            return AggregateDirection.NONE;
-        } else if (canRefactorBackward(types, start, end)) {
-            return AggregateDirection.BACKWARD;
-        } else if (canRefactorForward(types, start, end)) {
-            return AggregateDirection.FORWARD;
+    private MergeDirection mergeDirection(Binding[] typeBindings, int start, int end) {
+        if (canMergeTypesDown(typeBindings, start, end)) {
+            return MergeDirection.DOWN;
+        } else if (canMergeTypesUp(typeBindings, start, end)) {
+            return MergeDirection.UP;
         } else {
-            return AggregateDirection.NONE;
+            return MergeDirection.NONE;
         }
     }
 
-    private ITypeBinding resolveTypeBindingOfException(CatchClause catchClause) {
-        SingleVariableDeclaration svd = catchClause.getException();
-        IVariableBinding vb = svd.resolveBinding();
-        if (vb != null) {
-            return vb.getType();
-        }
-        return null;
-    }
-
-    private boolean changeInBehaviour(ITypeBinding[] types, int start, int end) {
-        ITypeBinding startType = types[start];
-        ITypeBinding endType = types[end];
+    private boolean canMergeTypesDown(final Binding[] types, int start, int end) {
+        final Binding startType = types[start];
         for (int i = start + 1; i < end; i++) {
-            final ITypeBinding type = types[i];
-            if (type != null
-                    && startType.isSubTypeCompatible(type)
-                    && type.isSubTypeCompatible(endType)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private boolean canRefactorBackward(final ITypeBinding[] types, int start, int end) {
-        final ITypeBinding startType = types[start];
-        for (int i = start + 1; i < end; i++) {
-            final ITypeBinding type = types[i];
-            if (startType.isSubTypeCompatible(type)) {
+            final Binding type = types[i];
+            if (Boolean.TRUE.equals(startType.isSubTypeCompatible(type))) {
                 return false;
             }
         }
         return true;
     }
 
-    private boolean canRefactorForward(final ITypeBinding[] types, int start, int end) {
-        final ITypeBinding endType = types[end];
+    private boolean canMergeTypesUp(final Binding[] types, int start, int end) {
+        final Binding endType = types[end];
         for (int i = start + 1; i < end; i++) {
-            final ITypeBinding type = types[i];
-            if (endType.isSubTypeCompatible(type)) {
+            final Binding type = types[i];
+            if (Boolean.TRUE.equals(type.isSubTypeCompatible(endType))) {
                 return false;
             }
         }
         return true;
     }
 
-    private UnionType concat(Type... types) {
+    private UnionType unionTypes(Type... types) {
         final List<Type> allTypes = new ArrayList<Type>();
-        collectAllTypes(allTypes, Arrays.asList(types));
+        collectAllUnionedTypes(allTypes, Arrays.asList(types));
         removeSupersededAlternatives(allTypes);
 
         final ASTBuilder b = this.ctx.getASTBuilder();
@@ -297,11 +391,11 @@ public class UseMultiCatchRefactoring extends AbstractRefactoringRule {
         return result;
     }
 
-    private void collectAllTypes(List<Type> results, Collection<Type> types) {
+    private void collectAllUnionedTypes(List<Type> results, Collection<Type> types) {
         for (final Type type : types) {
             if (type instanceof UnionType) {
                 final UnionType ut = (UnionType) type;
-                collectAllTypes(results, types(ut));
+                collectAllUnionedTypes(results, types(ut));
             } else {
                 results.add(type);
             }
