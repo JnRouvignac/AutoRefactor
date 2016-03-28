@@ -46,14 +46,12 @@ import org.eclipse.jdt.core.dom.CatchClause;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ExpressionStatement;
-import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.MarkerAnnotation;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Name;
 import org.eclipse.jdt.core.dom.NumberLiteral;
-import org.eclipse.jdt.core.dom.ParameterizedType;
 import org.eclipse.jdt.core.dom.ParenthesizedExpression;
 import org.eclipse.jdt.core.dom.PrefixExpression;
 import org.eclipse.jdt.core.dom.PrimitiveType;
@@ -589,38 +587,15 @@ public class ASTBuilder {
     /**
      * Builds a new {@link ClassInstanceCreation} instance.
      *
-     * @param typeBinding the type binding of the instantiated type
+     * @param type the instantiated type
      * @param arguments the constructor invocation arguments
      * @return a new class instance creation
      */
-    public ClassInstanceCreation new0(ITypeBinding typeBinding, Expression... arguments) {
-        final String className = typeBinding.getName();
-        final int ltIdx = className.indexOf('<');
-        if (ltIdx == -1) {
-            final ClassInstanceCreation cic = ast.newClassInstanceCreation();
-            cic.setType(newSimpleType(className));
-            addAll(arguments(cic), arguments);
-            return cic;
-        }
-
-        final String erasedClassName = className.substring(0, ltIdx);
-        final int gtIdx = className.indexOf('>', ltIdx);
-        final String typeParams = className.substring(ltIdx + 1, gtIdx);
-
+    public ClassInstanceCreation new0(Type type, Expression... arguments) {
         final ClassInstanceCreation cic = ast.newClassInstanceCreation();
-        final ParameterizedType type = ast.newParameterizedType(
-                newSimpleType(erasedClassName));
-        addNewTypesFromTypeParameters(typeArguments(type), typeParams);
         cic.setType(type);
         addAll(arguments(cic), arguments);
         return cic;
-    }
-
-    private void addNewTypesFromTypeParameters(List<Type> typeArguments, String typeParams) {
-        String[] typeParamsArray = typeParams.split(",");
-        for (String typeParam : typeParamsArray) {
-            typeArguments.add(newSimpleType(typeParam));
-        }
     }
 
     private <T extends ASTNode> void addAll(List<T> whereToAdd, T... toAdd) {

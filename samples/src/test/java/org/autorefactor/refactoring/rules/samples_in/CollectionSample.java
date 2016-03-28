@@ -31,8 +31,10 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
+import java.util.Map.Entry;
 
 public class CollectionSample {
 
@@ -52,13 +54,7 @@ public class CollectionSample {
         return output;
     }
 
-    public List<String> replaceNew0ArgThenAddAll(List<String> col) {
-        final List<String> output = new ArrayList<String>(0);
-        output.addAll(col);
-        return output;
-    }
-
-    public List<String> replaceNew1ArgThenAddAll(List<String> col) {
+    public List<String> replaceNewOneArgThenAddAll(List<String> col) {
         final List<String> output = new ArrayList<String>(0);
         output.addAll(col);
         return output;
@@ -67,6 +63,12 @@ public class CollectionSample {
     public List<String> replaceNewCollectionSizeThenAddAll(List<String> col) {
         final List<String> output = new ArrayList<String>(col.size());
         output.addAll(col);
+        return output;
+    }
+
+    public Object replaceNewThenAddAllParameterizedType(Map<String, String> map) {
+        List<Entry<String, String>> output = new ArrayList<Entry<String, String>>();
+        output.addAll(map.entrySet());
         return output;
     }
 

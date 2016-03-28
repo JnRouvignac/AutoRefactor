@@ -117,8 +117,7 @@ public class CollectionRefactoring extends AbstractRefactoringRule {
         if (canReplaceInitializer(cic)) {
             final ASTBuilder b = this.ctx.getASTBuilder();
             this.ctx.getRefactorings().replace(nodeToReplace,
-                    b.new0(cic.resolveTypeBinding(),
-                            b.copy(arg0)));
+                    b.new0(b.copy(cic.getType()), b.copy(arg0)));
             this.ctx.getRefactorings().remove(nodeToRemove);
             return DO_NOT_VISIT_SUBTREE;
         }
