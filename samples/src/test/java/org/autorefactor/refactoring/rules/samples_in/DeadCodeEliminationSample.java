@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2013-2015 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2013-2016 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,6 +27,7 @@ package org.autorefactor.refactoring.rules.samples_in;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.AbstractList;
 
 public class DeadCodeEliminationSample {
 
@@ -196,5 +197,27 @@ public class DeadCodeEliminationSample {
 
     private interface MethodDeclarationWithoutBody {
         void aMethod();
+    }
+
+    public void doNotRemovePackageAccessedMethodOverride() {
+        MyAbstractList<String> l = new MyAbstractList<>();
+        l.removeRange(0, l.size());
+    }
+
+    private static class MyAbstractList<E> extends AbstractList<E> {
+        @Override
+        public E get(int index) {
+            return null;
+        }
+
+        @Override
+        public int size() {
+            return 0;
+        }
+
+        @Override
+        protected void removeRange(int fromIndex, int toIndex) {
+            super.removeRange(fromIndex, toIndex);
+        }
     }
 }

@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2013-2015 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2013-2016 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,9 +26,13 @@
 package org.autorefactor.refactoring.rules;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.Refactorings;
+import org.autorefactor.util.UnhandledException;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.EmptyStatement;
@@ -36,15 +40,23 @@ import org.eclipse.jdt.core.dom.EnhancedForStatement;
 import org.eclipse.jdt.core.dom.ForStatement;
 import org.eclipse.jdt.core.dom.IAnnotationBinding;
 import org.eclipse.jdt.core.dom.IMethodBinding;
+import org.eclipse.jdt.core.dom.IPackageBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
+import org.eclipse.jdt.core.dom.Modifier;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.SuperMethodInvocation;
 import org.eclipse.jdt.core.dom.TryStatement;
 import org.eclipse.jdt.core.dom.WhileStatement;
+import org.eclipse.jdt.core.search.SearchEngine;
+import org.eclipse.jdt.core.search.SearchMatch;
+import org.eclipse.jdt.core.search.SearchParticipant;
+import org.eclipse.jdt.core.search.SearchRequestor;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
+import static org.eclipse.jdt.core.search.IJavaSearchConstants.*;
+import static org.eclipse.jdt.core.search.SearchPattern.*;
 
 /**
  * TODO Use variable values analysis for determining where code is dead.
@@ -214,12 +226,53 @@ public class DeadCodeEliminationRefactoring extends AbstractRefactoringRule {
                 if (declMethodBinding.overrides(bodyMethodBinding)
                         && !hasSignificantAnnotations(declMethodBinding)
                         && haveSameModifiers(bodyMethodBinding, declMethodBinding)) {
-                    this.ctx.getRefactorings().remove(node);
-                    return DO_NOT_VISIT_SUBTREE;
+                    if (Modifier.isProtected(declMethodBinding.getModifiers())
+                            && !declaredInSamePackage(bodyMethodBinding, declMethodBinding)) {
+                        // protected also means package visibility, so check if it is required
+                        if (!isMethodUsedInItsPackage(declMethodBinding, node)) {
+                            this.ctx.getRefactorings().remove(node);
+                            return DO_NOT_VISIT_SUBTREE;
+                        }
+                    } else {
+                        this.ctx.getRefactorings().remove(node);
+                        return DO_NOT_VISIT_SUBTREE;
+                    }
                 }
             }
         }
         return VISIT_SUBTREE;
+    }
+
+    private boolean isMethodUsedInItsPackage(IMethodBinding methodBinding, MethodDeclaration node) {
+        final AtomicBoolean methodIsUsedInPackage = new AtomicBoolean(false);
+
+        final IPackageBinding methodPackage = methodBinding.getDeclaringClass().getPackage();
+
+        final SearchRequestor requestor = new SearchRequestor() {
+            @Override
+            public void acceptSearchMatch(SearchMatch match) {
+                methodIsUsedInPackage.set(true);
+            }
+        };
+
+        try {
+            final SearchEngine searchEngine = new SearchEngine();
+            searchEngine.search(
+                    createPattern(methodBinding.getJavaElement(), REFERENCES, R_EXACT_MATCH),
+                    new SearchParticipant[] { SearchEngine.getDefaultSearchParticipant() },
+                    SearchEngine.createJavaSearchScope(new IJavaElement[] { methodPackage.getJavaElement() }),
+                    requestor,
+                    null);
+            return methodIsUsedInPackage.get();
+        } catch (CoreException e) {
+            throw new UnhandledException(node, e);
+        }
+    }
+
+    private boolean declaredInSamePackage(IMethodBinding methodBinding1, IMethodBinding methodBinding2) {
+        final ITypeBinding declaringClass1 = methodBinding1.getDeclaringClass();
+        final ITypeBinding declaringClass2 = methodBinding2.getDeclaringClass();
+        return declaringClass1.getPackage().equals(declaringClass2.getPackage());
     }
 
     private boolean haveSameModifiers(IMethodBinding overriding, IMethodBinding overridden) {
