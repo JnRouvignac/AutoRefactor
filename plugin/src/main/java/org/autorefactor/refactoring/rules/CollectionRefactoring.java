@@ -114,7 +114,8 @@ public class CollectionRefactoring extends AbstractRefactoringRule {
     private boolean replaceInitializer(Expression nodeToReplace,
             final Expression arg0, ExpressionStatement nodeToRemove) {
         final ClassInstanceCreation cic = as(nodeToReplace, ClassInstanceCreation.class);
-        if (canReplaceInitializer(cic)) {
+        if (canReplaceInitializer(cic)
+                && isCastCompatible(nodeToReplace, arg0)) {
             final ASTBuilder b = this.ctx.getASTBuilder();
             this.ctx.getRefactorings().replace(nodeToReplace,
                     b.new0(b.copy(cic.getType()), b.copy(arg0)));
@@ -122,6 +123,14 @@ public class CollectionRefactoring extends AbstractRefactoringRule {
             return DO_NOT_VISIT_SUBTREE;
         }
         return VISIT_SUBTREE;
+    }
+
+    private boolean isCastCompatible(Expression expr1, Expression expr2) {
+        final ITypeBinding tb1 = expr1.resolveTypeBinding();
+        final ITypeBinding tb2 = expr2.resolveTypeBinding();
+        return tb2 != null
+                && tb1 != null
+                && tb1.isCastCompatible(tb2);
     }
 
     private boolean canReplaceInitializer(final ClassInstanceCreation cic) {

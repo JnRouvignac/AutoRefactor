@@ -66,6 +66,12 @@ public class CollectionSample {
         return output;
     }
 
+    public List<Object> doNotReplaceNewThenAddAllIncompatibleTypes(List<String> col) {
+        final List<Object> output = new ArrayList<>();
+        output.addAll(col);
+        return output;
+    }
+
     public Object replaceNewThenAddAllParameterizedType(Map<String, String> map) {
         List<Entry<String, String>> output = new ArrayList<Entry<String, String>>();
         output.addAll(map.entrySet());
