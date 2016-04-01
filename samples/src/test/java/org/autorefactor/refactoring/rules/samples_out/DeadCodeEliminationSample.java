@@ -98,6 +98,68 @@ public class DeadCodeEliminationSample {
         return i + j;
     }
 
+    public int removeDeadCodeAfterIfTrueWithReturn(int i) {
+        {
+            System.out.println(i);
+            return 1;
+        }
+    }
+
+    public int removeDeadCodeAfterEmbeddedIfTrueWithThrow(int i) {
+        {
+            {
+                System.out.println(i);
+                throw new RuntimeException();
+            }
+        }
+    }
+
+    public int removeDeadCodeAfterIfFalseWithThrow(int i) {
+        {
+            System.out.println(i);
+            throw new RuntimeException();
+        }
+    }
+
+    public int doNotRemoveDeadCodeAfterEmbeddedIfTrueNoThrowOrReturn(int i) {
+        {
+            {
+                System.out.println(i);
+            }
+        }
+        return 2;
+    }
+
+    public int doNotRemoveAfterIfFalseNoThrowOrReturn(int i) {
+        {
+            System.out.println(i);
+        }
+        return 2;
+    }
+
+    public int removeDeadCodeAfterEmbeddedIfThrowOrReturn(boolean b, int i) {
+        {
+            if (b) {
+                toString();
+                return 1;
+            } else {
+                System.out.println(i);
+                throw new RuntimeException();
+            }
+        }
+    }
+
+    public int doNotRemoveDeadCodeAfterEmbeddedIfNoThrowNOrReturn(boolean b, int i) {
+        {
+            if (b) {
+                toString();
+            } else {
+                System.out.println(i);
+            }
+        }
+        return 2;
+    }
+
 // FIXME compilation error.
 // Following code:
 //    private int removeWhileWithoutIterations() {

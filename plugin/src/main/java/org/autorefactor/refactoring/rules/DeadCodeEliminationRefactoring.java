@@ -25,6 +25,7 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -55,6 +56,7 @@ import org.eclipse.jdt.core.search.SearchParticipant;
 import org.eclipse.jdt.core.search.SearchRequestor;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
+import static org.eclipse.jdt.core.dom.ASTNode.*;
 import static org.eclipse.jdt.core.search.IJavaSearchConstants.*;
 import static org.eclipse.jdt.core.search.SearchPattern.*;
 
@@ -104,17 +106,59 @@ public class DeadCodeEliminationRefactoring extends AbstractRefactoringRule {
 
         final Object constantCondition = node.getExpression().resolveConstantExpressionValue();
         if (Boolean.TRUE.equals(constantCondition)) {
-            r.replace(node, b.copy(node.getThenStatement()));
+            r.replace(node, b.copy(thenStmt));
+            if (lastStmtIsThrowOrReturn(thenStmt)) {
+                r.remove(getNextSiblings(node));
+            }
             return DO_NOT_VISIT_SUBTREE;
         } else if (Boolean.FALSE.equals(constantCondition)) {
             if (elseStmt != null) {
                 r.replace(node, b.copy(elseStmt));
+                if (lastStmtIsThrowOrReturn(elseStmt)) {
+                    r.remove(getNextSiblings(node));
+                }
             } else {
                 r.remove(node);
             }
             return DO_NOT_VISIT_SUBTREE;
         }
         return VISIT_SUBTREE;
+    }
+
+    private boolean lastStmtIsThrowOrReturn(Statement stmt) {
+        final List<Statement> stmts = asList(stmt);
+        if (stmts.isEmpty()) {
+            return false;
+        }
+
+        final Statement lastStmt = stmts.get(stmts.size() - 1);
+        switch (lastStmt.getNodeType()) {
+        case RETURN_STATEMENT:
+        case THROW_STATEMENT:
+            return true;
+
+        case IF_STATEMENT:
+            final IfStatement ifStmt = (IfStatement) lastStmt;
+            final Statement thenStmt = ifStmt.getThenStatement();
+            final Statement elseStmt = ifStmt.getElseStatement();
+            return lastStmtIsThrowOrReturn(thenStmt)
+                    && (elseStmt == null || lastStmtIsThrowOrReturn(elseStmt));
+
+        default:
+            return false;
+        }
+    }
+
+    private List<Statement> getNextSiblings(Statement node) {
+        if (node.getParent() instanceof Block) {
+            final List<Statement> stmts = asList((Statement) node.getParent());
+            final int indexOfNode = stmts.indexOf(node);
+            final int siblingIndex = indexOfNode + 1;
+            if (0 <= siblingIndex && siblingIndex < stmts.size()) {
+                return stmts.subList(siblingIndex, stmts.size());
+            }
+        }
+        return Collections.emptyList();
     }
 
     @Override
