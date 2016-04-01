@@ -98,6 +98,14 @@ public class Refactorings {
         return refactoredNodes.contains(node);
     }
 
+    private void addRefactoredNodes(ASTNode node) {
+        hasRefactorings = true;
+        refactoredNodes.add(node);
+        if (node.getParent() != null) {
+            addRefactoredNodes(node.getParent());
+        }
+    }
+
     /**
      * Creates and returns a placeholder node for a copy of the source code of the provided node.<br>
      * The placeholder node can be used like any new node created via the AST class.<br>
@@ -204,9 +212,8 @@ public class Refactorings {
      * @see ASTRewrite#replace(ASTNode, ASTNode, org.eclipse.text.edits.TextEditGroup)
      */
     public void replace(ASTNode node, ASTNode replacement) {
-        hasRefactorings = true;
         rewrite.replace(node, replacement, null);
-        refactoredNodes.add(node);
+        addRefactoredNodes(node);
     }
 
     /**
@@ -238,13 +245,12 @@ public class Refactorings {
      * @see ASTRewrite#remove(ASTNode, org.eclipse.text.edits.TextEditGroup)
      */
     public void remove(ASTNode node) {
-        hasRefactorings = true;
         if (node instanceof Comment) {
             commentRewriter.remove((Comment) node);
         } else {
             rewrite.remove(node, null);
         }
-        refactoredNodes.add(node);
+        addRefactoredNodes(node);
     }
 
     /**
@@ -302,9 +308,9 @@ public class Refactorings {
      */
     public void insertAt(ASTNode nodeToInsert, int index, StructuralPropertyDescriptor locationInParent,
             ASTNode listHolder) {
-        hasRefactorings = true;
         final ListRewrite listRewrite = getListRewrite(listHolder, (ChildListPropertyDescriptor) locationInParent);
         listRewrite.insertAt(nodeToInsert, index, null);
+        addRefactoredNodes(listHolder);
     }
 
     /**
@@ -315,8 +321,8 @@ public class Refactorings {
      * @see ListRewrite#insertBefore(ASTNode, ASTNode, org.eclipse.text.edits.TextEditGroup)
      */
     public void insertBefore(ASTNode nodeToInsert, ASTNode element) {
-        hasRefactorings = true;
         getListRewrite(element).insertBefore(nodeToInsert, element, null);
+        addRefactoredNodes(element.getParent());
     }
 
     /**
@@ -327,8 +333,8 @@ public class Refactorings {
      * @see ListRewrite#insertAfter(ASTNode, ASTNode, org.eclipse.text.edits.TextEditGroup)
      */
     public void insertAfter(ASTNode nodeToInsert, ASTNode element) {
-        hasRefactorings = true;
         getListRewrite(element).insertAfter(nodeToInsert, element, null);
+        addRefactoredNodes(element.getParent());
     }
 
     /**
@@ -361,8 +367,8 @@ public class Refactorings {
      * @see ASTRewrite#set(ASTNode, StructuralPropertyDescriptor, Object, org.eclipse.text.edits.TextEditGroup)
      */
     public void set(ASTNode node, StructuralPropertyDescriptor property, Object value) {
-        hasRefactorings = true;
         rewrite.set(node, property, value, null);
+        addRefactoredNodes(node);
     }
 
     /**

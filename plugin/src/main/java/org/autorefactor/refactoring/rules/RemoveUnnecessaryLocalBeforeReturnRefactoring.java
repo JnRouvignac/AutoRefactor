@@ -62,7 +62,8 @@ public class RemoveUnnecessaryLocalBeforeReturnRefactoring extends AbstractRefac
     @Override
     public boolean visit(ReturnStatement node) {
         final Statement previousSibling = getPreviousSibling(node);
-        if (previousSibling instanceof VariableDeclarationStatement) {
+        if (!ctx.getRefactorings().hasBeenRefactored(previousSibling)
+                && previousSibling instanceof VariableDeclarationStatement) {
             final VariableDeclarationStatement vds = (VariableDeclarationStatement) previousSibling;
             if (fragments(vds).size() == 1) {
                 final VariableDeclarationFragment vdf = fragments(vds).get(0);
