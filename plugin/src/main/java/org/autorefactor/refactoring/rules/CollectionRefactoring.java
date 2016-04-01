@@ -125,14 +125,6 @@ public class CollectionRefactoring extends AbstractRefactoringRule {
         return VISIT_SUBTREE;
     }
 
-    private boolean isCastCompatible(Expression expr1, Expression expr2) {
-        final ITypeBinding tb1 = expr1.resolveTypeBinding();
-        final ITypeBinding tb2 = expr2.resolveTypeBinding();
-        return tb2 != null
-                && tb1 != null
-                && tb1.isCastCompatible(tb2);
-    }
-
     private boolean canReplaceInitializer(final ClassInstanceCreation cic) {
         if (cic == null) {
             return false;

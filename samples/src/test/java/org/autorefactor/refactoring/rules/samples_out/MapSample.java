@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2015 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2015-2016 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -51,6 +51,12 @@ public class MapSample {
 
     public Map<String, String> replaceNewMapSizeThenPutAll(Map<String, String> map) {
         final Map<String, String> output = new HashMap<String, String>(map);
+        return output;
+    }
+
+    public Map<Object, Object> doNotReplaceNewThenAddAllIncompatibleTypes(Map<String, String> map) {
+        final Map<Object, Object> output = new HashMap<>();
+        output.putAll(map);
         return output;
     }
 

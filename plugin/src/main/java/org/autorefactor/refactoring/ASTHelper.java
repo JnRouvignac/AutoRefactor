@@ -368,6 +368,22 @@ public final class ASTHelper {
     }
 
     /**
+     * Returns whether the two provided expressions are cast compatible.
+     *
+     * @param expr1 the first expression
+     * @param expr2 the second expression
+     * @return {@code true} if the two provided expressions are cast compatible, {@code false} otherwise
+     * @see ITypeBinding#isCastCompatible(ITypeBinding)
+     */
+    public static boolean isCastCompatible(Expression expr1, Expression expr2) {
+        final ITypeBinding tb1 = expr1.resolveTypeBinding();
+        final ITypeBinding tb2 = expr2.resolveTypeBinding();
+        return tb1 != null
+                && tb2 != null
+                && tb1.isCastCompatible(tb2);
+    }
+
+    /**
      * Generecized version of the equivalent JDT method.
      *
      * @param node the node on which to call the equivalent JDT method

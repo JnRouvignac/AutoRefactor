@@ -95,7 +95,8 @@ public class MapRefactoring extends AbstractRefactoringRule {
     private boolean replaceInitializer(Expression nodeToReplace,
             final Expression arg0, ExpressionStatement nodeToRemove) {
         final ClassInstanceCreation cic = as(nodeToReplace, ClassInstanceCreation.class);
-        if (canReplaceInitializer(cic)) {
+        if (canReplaceInitializer(cic)
+                && isCastCompatible(nodeToReplace, arg0)) {
             final ASTBuilder b = this.ctx.getASTBuilder();
             this.ctx.getRefactorings().replace(nodeToReplace,
                     b.new0(b.copy(cic.getType()), b.copy(arg0)));
