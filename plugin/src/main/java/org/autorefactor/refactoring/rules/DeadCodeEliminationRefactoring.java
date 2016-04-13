@@ -287,6 +287,7 @@ public class DeadCodeEliminationRefactoring extends AbstractRefactoringRule {
         return VISIT_SUBTREE;
     }
 
+    /** This method is extremely expensive. */
     private boolean isMethodUsedInItsPackage(IMethodBinding methodBinding, MethodDeclaration node) {
         final AtomicBoolean methodIsUsedInPackage = new AtomicBoolean(false);
 
