@@ -147,6 +147,16 @@ public class SourceLocation implements ISourceRange, Comparable<ISourceRange> {
     }
 
     /**
+     * Returns the substring of the provided String by using the current source location.
+     *
+     * @param s the string for which to provide the substring
+     * @return the substring of the provided string
+     */
+    public String substring(String s) {
+        return s.substring(getStartPosition(), getEndPosition());
+    }
+
+    /**
      * Whether the provided source range overlaps with the current source location.
      *
      * @param sourceRange the provided source range

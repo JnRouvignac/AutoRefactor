@@ -174,4 +174,15 @@ public class CommentsSample implements Runnable, Callable<Void>, Closeable {
          *
          * */
     }
+
+    //// single line starts with 4 slashes
+    public int bewareOfSlashesAfterSlashes;
+
+    //// single line starts with 4 slashes
+    public int bewareOfSlashesAfterSlashesAfterJavaElement; //// second line starts with 4 slashes too
+
+    // first line
+    //// second line starts with 4 slashes and may trigger compilation errors
+    public void bewareOfSlashesAfterSlashes2() {
+    }
 }

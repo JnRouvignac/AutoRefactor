@@ -166,9 +166,9 @@ public class RemoveSemiColonRefactoring extends AbstractRefactoringRule {
 
     private void putResult(String source, int start, int end,
             final LinkedHashMap<String, SourceLocation> results) {
-        final SourceLocation loc = fromPositions(start, end);
-        final String s = source.substring(loc.getStartPosition(), loc.getEndPosition());
-        results.put(s, loc);
+        final SourceLocation sourceLoc = fromPositions(start, end);
+        final String s = sourceLoc.substring(source);
+        results.put(s, sourceLoc);
     }
 
     private List<Comment> filterCommentsInRange(int start, int end, final ASTNode root) {

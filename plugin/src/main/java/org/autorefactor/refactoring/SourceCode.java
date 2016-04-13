@@ -73,10 +73,11 @@ public class SourceCode {
 
         @Override
         public String toString() {
-            return "[(" + sourceCode.astRoot.getLineNumber(getStartPosition()) + ","
-                    + sourceCode.astRoot.getColumnNumber(getStartPosition()) + ")"
-                    + " => (" + sourceCode.astRoot.getLineNumber(getEndPosition())
-                    + "," + sourceCode.astRoot.getColumnNumber(getEndPosition()) + ")]";
+            final CompilationUnit astRoot = sourceCode.astRoot;
+            return "[(" + astRoot.getLineNumber(getStartPosition()) + ","
+                    + astRoot.getColumnNumber(getStartPosition()) + ")"
+                    + " => (" + astRoot.getLineNumber(getEndPosition())
+                    + "," + astRoot.getColumnNumber(getEndPosition()) + ")]";
         }
 
     }

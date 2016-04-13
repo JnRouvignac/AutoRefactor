@@ -120,4 +120,20 @@ public class CommentsSample implements Runnable, Callable<Void>, Closeable {
     public void removeEmptyLineAtEndOfJavadoc() {
         /* Remove empty line at start and end of this block comment. */
     }
+
+    /** // single line starts with 4 slashes. */
+    public int bewareOfSlashesAfterSlashes;
+
+    /**
+     * // single line starts with 4 slashes
+     * // second line starts with 4 slashes too.
+     */
+    public int bewareOfSlashesAfterSlashesAfterJavaElement;
+
+    /**
+     * First line
+     * // second line starts with 4 slashes and may trigger compilation errors.
+     */
+    public void bewareOfSlashesAfterSlashes2() {
+    }
 }
