@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2013-2015 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2013-2016 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -37,6 +37,7 @@ import org.eclipse.jdt.core.dom.ASTMatcher;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.IBinding;
+import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.SimpleName;
@@ -57,13 +58,18 @@ public class CommonCodeInIfElseStatementRefactoring extends AbstractRefactoringR
         }
 
         private boolean sameVariable(SimpleName node1, SimpleName node2) {
-            return equalNotNull(getVariableDeclaration(node1), getVariableDeclaration(node2));
+            return equalNotNull(getDeclaration(node1), getDeclaration(node2));
         }
 
-        private IVariableBinding getVariableDeclaration(SimpleName node) {
+        private IBinding getDeclaration(SimpleName node) {
             final IBinding b = node.resolveBinding();
-            if (b != null && b.getKind() == IBinding.VARIABLE) {
-                return ((IVariableBinding) b).getVariableDeclaration();
+            if (b != null) {
+                switch (b.getKind()) {
+                case IBinding.VARIABLE:
+                    return ((IVariableBinding) b).getVariableDeclaration();
+                case IBinding.METHOD:
+                    return ((IMethodBinding) b).getMethodDeclaration();
+                }
             }
             return null;
         }
