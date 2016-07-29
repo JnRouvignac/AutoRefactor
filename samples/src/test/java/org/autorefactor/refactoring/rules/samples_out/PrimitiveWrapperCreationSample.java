@@ -70,6 +70,7 @@ public class PrimitiveWrapperCreationSample {
         byte by = (byte) 0;
         boolean bo1 = true;
         boolean bo2 = true;
+        bo2 = false;
         int i = 42;
         long l = 42;
         short s = (short) 42;

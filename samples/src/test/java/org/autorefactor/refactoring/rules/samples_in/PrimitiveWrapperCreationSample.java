@@ -70,6 +70,7 @@ public class PrimitiveWrapperCreationSample {
         byte by = Byte.valueOf((byte) 0);
         boolean bo1 = Boolean.valueOf(true);
         boolean bo2 = Boolean.TRUE;
+        bo2 = Boolean.FALSE;
         int i = Integer.valueOf(42);
         long l = Long.valueOf(42);
         short s = Short.valueOf((short) 42);

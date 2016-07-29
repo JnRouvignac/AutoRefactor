@@ -28,6 +28,7 @@ package org.autorefactor.refactoring.rules;
 import java.util.List;
 
 import org.autorefactor.refactoring.ASTBuilder;
+import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.BooleanLiteral;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
@@ -226,12 +227,20 @@ public class PrimitiveWrapperCreationRefactoring extends AbstractRefactoringRule
         final ASTNode parent = removeParentheses(node.getParent());
         if (parent instanceof VariableDeclarationFragment) {
             final ITypeBinding typeBinding = resolveTypeBinding((VariableDeclarationFragment) parent);
-            if (typeBinding.isPrimitive()) {
-                if (isField(node, "java.lang.Boolean", "TRUE")) {
-                    return replaceWithBooleanLiteral(node, true);
-                } else if (isField(node, "java.lang.Boolean", "FALSE")) {
-                    return replaceWithBooleanLiteral(node, false);
-                }
+            return replaceBooleanObjectByPrimitive(node, typeBinding);
+        } else if (parent instanceof Assignment) {
+            final ITypeBinding typeBinding = ((Assignment) parent).resolveTypeBinding();
+            return replaceBooleanObjectByPrimitive(node, typeBinding);
+        }
+        return VISIT_SUBTREE;
+    }
+
+    private boolean replaceBooleanObjectByPrimitive(QualifiedName node, ITypeBinding typeBinding) {
+        if (typeBinding != null && typeBinding.isPrimitive()) {
+            if (isField(node, Boolean.class.getName(), "TRUE")) {
+                return replaceWithBooleanLiteral(node, true);
+            } else if (isField(node, Boolean.class.getName(), "FALSE")) {
+                return replaceWithBooleanLiteral(node, false);
             }
         }
         return VISIT_SUBTREE;
