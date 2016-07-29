@@ -74,6 +74,10 @@ public class UseDiamondOperatorRefactoring extends AbstractRefactoringRule {
         return VISIT_SUBTREE;
     }
 
+    /**
+     * Tries to rebuild the process that leads to
+     * {@link ClassInstanceCreation#isResolvedTypeInferredFromExpectedType()}.
+     */
     private boolean canUseDiamondOperator(ClassInstanceCreation node, final Type type) {
         List<Expression> args = arguments(node);
         if (args.isEmpty()) {
@@ -81,8 +85,8 @@ public class UseDiamondOperatorRefactoring extends AbstractRefactoringRule {
         }
 
         ITypeBinding typeBinding = type.resolveBinding();
-        IMethodBinding methodBinding = node.resolveConstructorBinding();
-        if (typeBinding == null || methodBinding == null) {
+        IMethodBinding ctorBinding = node.resolveConstructorBinding();
+        if (typeBinding == null || ctorBinding == null) {
             return false;
         }
         List<ITypeBinding> typeArguments = new ArrayList<ITypeBinding>();
@@ -91,14 +95,15 @@ public class UseDiamondOperatorRefactoring extends AbstractRefactoringRule {
         List<ITypeBinding> typeParameters = new ArrayList<ITypeBinding>();
         Collections.addAll(typeParameters, typeDecl.getTypeParameters());
 
-        IMethodBinding methodDecl = methodBinding.getMethodDeclaration();
-        ITypeBinding[] actualMethodParamTypes = methodBinding.getParameterTypes();
+        IMethodBinding methodDecl = ctorBinding.getMethodDeclaration();
+        ITypeBinding[] actualCtorParamTypes = ctorBinding.getParameterTypes();
         ITypeBinding[] declMethodParamTypes = methodDecl.getParameterTypes();
         for (int i = 0; i < declMethodParamTypes.length; i++) {
             ITypeBinding declParamType = declMethodParamTypes[i];
-            ITypeBinding actualParamType = actualMethodParamTypes[i];
+            ITypeBinding actualParamType = actualCtorParamTypes[i];
+            String actualParamTypeQName = actualParamType.getErasure().getQualifiedName();
             Expression actualArg = args.get(i);
-            ITypeBinding actualArgType = actualArg.resolveTypeBinding();
+            ITypeBinding actualArgType = findImplementedType(actualArg.resolveTypeBinding(), actualParamTypeQName);
             if (actualArgType != null && declParamType.isParameterizedType()) {
                 ITypeBinding[] declParamTypeArgs = declParamType.getTypeArguments();
                 ITypeBinding[] actualParamTypeArgs = actualParamType.getTypeArguments();
