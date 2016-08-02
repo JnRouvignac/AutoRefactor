@@ -193,20 +193,32 @@ public class PrimitiveWrapperCreationRefactoring extends AbstractRefactoringRule
                 replaceWithValueOf(node, typeBinding);
                 return DO_NOT_VISIT_SUBTREE;
             } else if ("java.lang.Float".equals(qualifiedName)) {
-                final Expression arg0 = args.get(0);
-                if (isPrimitive(arg0, "double")) {
-                    final ASTBuilder b = ctx.getASTBuilder();
-                    ctx.getRefactorings().replace(
-                            node,
-                            b.invoke(typeBinding.getName(), "valueOf", b.cast("float", b.copy(arg0))));
-                    return DO_NOT_VISIT_SUBTREE;
-                } else {
-                    replaceWithValueOf(node, typeBinding);
-                    return DO_NOT_VISIT_SUBTREE;
-                }
+                return replaceFloatInstanceWithValueOf(node, typeBinding, args);
             }
         }
         return VISIT_SUBTREE;
+    }
+
+    private boolean replaceFloatInstanceWithValueOf(ClassInstanceCreation node, final ITypeBinding typeBinding,
+            final List<Expression> args) {
+        final Expression arg0 = args.get(0);
+        if (isPrimitive(arg0, "double")) {
+            final ASTBuilder b = ctx.getASTBuilder();
+            ctx.getRefactorings().replace(
+                    node,
+                    b.invoke(typeBinding.getName(), "valueOf", b.cast("float", b.copy(arg0))));
+            return DO_NOT_VISIT_SUBTREE;
+        } else if (arg0.resolveTypeBinding() != null
+                && Double.class.getName().equals(arg0.resolveTypeBinding().getQualifiedName())) {
+            final ASTBuilder b = ctx.getASTBuilder();
+            ctx.getRefactorings().replace(
+                    node,
+                    b.invoke(b.copy(arg0), "floatValue"));
+            return DO_NOT_VISIT_SUBTREE;
+        } else {
+            replaceWithValueOf(node, typeBinding);
+            return DO_NOT_VISIT_SUBTREE;
+        }
     }
 
     private void replaceWithValueOf(ClassInstanceCreation node,

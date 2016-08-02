@@ -29,17 +29,40 @@ public class PrimitiveWrapperCreationSample {
 
     public static void replaceWrapperConstructorsWithValueOf() {
         // Replace all calls to wrapper constructors with calls to .valueOf() methods
-        byte b = 4;
-        Byte by = new Byte(b);
+        byte byPrimitive = 4;
+        boolean boPrimitive = true;
+        char cPrimitive = 'c';
+        double dPrimitive = 1;
+        Double dObject = Double.valueOf(1d);
+        float fPrimitive = 1f;
+        long lPrimitive = 1;
+        short shPrimitive = 1;
+        int iPrimitive = 1;
+
+        // primitive literals
+        Byte by = new Byte((byte) 4);
         Boolean bo = new Boolean(true);
         Character c = new Character('c');
         Double d = new Double(1);
         Float f1 = new Float(1f);
         Float f2 = new Float(1d);
         Long l = new Long(1);
-        short s = 1;
-        Short sh = new Short(s);
+        Short s = new Short((short) 1);
         Integer i = new Integer(1);
+
+        // primitive variables
+        by = new Byte(byPrimitive);
+        bo = new Boolean(boPrimitive);
+        c = new Character(cPrimitive);
+        d = new Double(dPrimitive);
+        f1 = new Float(fPrimitive);
+        f2 = new Float(dPrimitive);
+        l = new Long(lPrimitive);
+        s = new Short(shPrimitive);
+        i = new Integer(iPrimitive);
+
+        // implicit object narrowing
+        Float f3 = new Float(dObject);
     }
 
     public static void removeUnnecessaryObjectCreation() {
