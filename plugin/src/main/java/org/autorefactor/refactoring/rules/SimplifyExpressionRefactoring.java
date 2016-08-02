@@ -39,7 +39,6 @@ import org.eclipse.jdt.core.dom.CastExpression;
 import org.eclipse.jdt.core.dom.ConditionalExpression;
 import org.eclipse.jdt.core.dom.DoStatement;
 import org.eclipse.jdt.core.dom.Expression;
-import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.InfixExpression.Operator;
@@ -421,17 +420,10 @@ public class SimplifyExpressionRefactoring extends AbstractRefactoringRule {
         return true;
     }
 
-    private boolean isPrimitiveBool(Expression expr) {
-        ITypeBinding typeBinding = expr.resolveTypeBinding();
-        return typeBinding != null
-                && typeBinding.isPrimitive()
-                && "boolean".equals(typeBinding.getQualifiedName());
-    }
-
     private boolean replace(InfixExpression node, boolean negate, Expression exprToCopy) {
         checkNoExtendedOperands(node);
-        if (!isPrimitiveBool(node.getLeftOperand())
-                && !isPrimitiveBool(node.getRightOperand())) {
+        if (!isPrimitive(node.getLeftOperand(), "boolean")
+                && !isPrimitive(node.getRightOperand(), "boolean")) {
             return VISIT_SUBTREE;
         }
         // Either:

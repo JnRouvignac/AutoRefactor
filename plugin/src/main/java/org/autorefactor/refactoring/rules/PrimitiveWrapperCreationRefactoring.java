@@ -116,10 +116,7 @@ public class PrimitiveWrapperCreationRefactoring extends AbstractRefactoringRule
             final List<Expression> cicArgs = arguments((ClassInstanceCreation) node.getExpression());
             if (cicArgs.size() == 1) {
                 final Expression arg0 = cicArgs.get(0);
-                final ITypeBinding arg0TypeBinding = arg0.resolveTypeBinding();
-                if (arguments(node).isEmpty()
-                        && arg0TypeBinding != null
-                        && "java.lang.String".equals(arg0TypeBinding.getQualifiedName())) {
+                if (arguments(node).isEmpty() && hasType(arg0, "java.lang.String")) {
                     final String methodName = getMethodName(
                             typeBinding.getQualifiedName(), node.getName().getIdentifier());
                     if (methodName != null) {
@@ -179,20 +176,18 @@ public class PrimitiveWrapperCreationRefactoring extends AbstractRefactoringRule
     public boolean visit(ClassInstanceCreation node) {
         final ITypeBinding typeBinding = node.getType().resolveBinding();
         final List<Expression> args = arguments(node);
-        if (getJavaMinorVersion() >= 5
-                && typeBinding != null
-                && args.size() == 1) {
-            final String qualifiedName = typeBinding.getQualifiedName();
-            if ("java.lang.Boolean".equals(qualifiedName)
-                    || "java.lang.Byte".equals(qualifiedName)
-                    || "java.lang.Character".equals(qualifiedName)
-                    || "java.lang.Double".equals(qualifiedName)
-                    || "java.lang.Long".equals(qualifiedName)
-                    || "java.lang.Short".equals(qualifiedName)
-                    || "java.lang.Integer".equals(qualifiedName)) {
+        if (getJavaMinorVersion() >= 5 && args.size() == 1) {
+            if (hasType(typeBinding,
+                    "java.lang.Boolean",
+                    "java.lang.Byte",
+                    "java.lang.Character",
+                    "java.lang.Double",
+                    "java.lang.Long",
+                    "java.lang.Short",
+                    "java.lang.Integer")) {
                 replaceWithValueOf(node, typeBinding);
                 return DO_NOT_VISIT_SUBTREE;
-            } else if ("java.lang.Float".equals(qualifiedName)) {
+            } else if (hasType(typeBinding, "java.lang.Float")) {
                 return replaceFloatInstanceWithValueOf(node, typeBinding, args);
             }
         }
@@ -208,8 +203,7 @@ public class PrimitiveWrapperCreationRefactoring extends AbstractRefactoringRule
                     node,
                     b.invoke(typeBinding.getName(), "valueOf", b.cast("float", b.copy(arg0))));
             return DO_NOT_VISIT_SUBTREE;
-        } else if (arg0.resolveTypeBinding() != null
-                && Double.class.getName().equals(arg0.resolveTypeBinding().getQualifiedName())) {
+        } else if (hasType(arg0, "java.lang.Double")) {
             final ASTBuilder b = ctx.getASTBuilder();
             ctx.getRefactorings().replace(
                     node,

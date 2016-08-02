@@ -68,8 +68,7 @@ public class BigDecimalRefactoring extends AbstractRefactoringRule {
     @Override
     public boolean visit(ClassInstanceCreation node) {
         final ITypeBinding typeBinding = node.getType().resolveBinding();
-        if (typeBinding != null
-                && "java.math.BigDecimal".equals(typeBinding.getQualifiedName())
+        if (hasType(typeBinding, "java.math.BigDecimal")
                 && arguments(node).size() == 1) {
             final Expression arg0 = arguments(node).get(0);
             if (arg0 instanceof NumberLiteral) {
