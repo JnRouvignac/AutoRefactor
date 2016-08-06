@@ -142,27 +142,29 @@ public class CommonCodeInIfElseStatementRefactoring extends AbstractRefactoringR
             if (allEmpty(areCasesEmpty)) {
                 // TODO JNR keep comments
                 this.ctx.getRefactorings().remove(node);
-            } else {
-                // remove empty cases
-                if (areCasesEmpty.get(0)) {
-                    if (areCasesEmpty.size() == 2
-                            && !areCasesEmpty.get(1)) {
-                        // then clause is empty and there is only one else clause
-                        // => revert if statement
-                        this.ctx.getRefactorings().replace(node,
-                                b.if0(b.not(b.parenthesizeIfNeeded(b.move(node.getExpression()))),
-                                        b.move(node.getElseStatement())));
-                    } else {
-                        this.ctx.getRefactorings().replace(node.getThenStatement(), b.block());
-                    }
-                }
-                for (int i = 1; i < areCasesEmpty.size(); i++) {
-                    if (areCasesEmpty.get(i)) {
-                        final Statement firstStmt = allCasesStmts.get(i).get(0);
-                        this.ctx.getRefactorings().remove(findNodeToRemove(firstStmt, firstStmt.getParent()));
-                    }
+                return DO_NOT_VISIT_SUBTREE;
+            }
+
+            // remove empty cases
+            if (areCasesEmpty.get(0)) {
+                if (areCasesEmpty.size() == 2
+                        && !areCasesEmpty.get(1)) {
+                    // then clause is empty and there is only one else clause
+                    // => revert if statement
+                    this.ctx.getRefactorings().replace(node,
+                            b.if0(b.not(b.parenthesizeIfNeeded(b.move(node.getExpression()))),
+                                    b.move(node.getElseStatement())));
+                } else {
+                    this.ctx.getRefactorings().replace(node.getThenStatement(), b.block());
                 }
             }
+            for (int i = 1; i < areCasesEmpty.size(); i++) {
+                if (areCasesEmpty.get(i)) {
+                    final Statement firstStmt = allCasesStmts.get(i).get(0);
+                    this.ctx.getRefactorings().remove(findNodeToRemove(firstStmt, firstStmt.getParent()));
+                }
+            }
+            return DO_NOT_VISIT_SUBTREE;
         }
         return VISIT_SUBTREE;
     }

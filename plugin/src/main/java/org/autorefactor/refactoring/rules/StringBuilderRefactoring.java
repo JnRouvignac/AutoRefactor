@@ -186,6 +186,7 @@ public class StringBuilderRefactoring extends AbstractRefactoringRule {
                 final Expression arg1 = b.copy(args.get(1));
                 this.ctx.getRefactorings().replace(node,
                         createAppendSubstring(b, b.copy(lastExpr), stringVar, arg0, arg1));
+                return DO_NOT_VISIT_SUBTREE;
             }
         } else if (isMethod(node, "java.lang.StringBuilder", "toString")
                 || isMethod(node, "java.lang.StringBuffer", "toString")) {

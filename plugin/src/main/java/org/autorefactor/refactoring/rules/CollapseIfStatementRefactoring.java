@@ -52,7 +52,7 @@ public class CollapseIfStatementRefactoring extends AbstractRefactoringRule {
         if (node.getElseStatement() == null) {
             final IfStatement is = as(node.getThenStatement(), IfStatement.class);
             if (is != null) {
-                replaceIfNoElseStatement(node, is);
+                return replaceIfNoElseStatement(node, is);
             }
         }
         return VISIT_SUBTREE;

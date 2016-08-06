@@ -75,47 +75,47 @@ public class BigDecimalRefactoring extends AbstractRefactoringRule {
                 final NumberLiteral nb = (NumberLiteral) arg0;
                 if (nb.getToken().contains(".")) {
                     // Only instantiation from double, not from integer
-                    this.ctx.getRefactorings().replace(nb,
+                    ctx.getRefactorings().replace(nb,
                             getStringLiteral(nb.getToken()));
+                    return DO_NOT_VISIT_SUBTREE;
+                } else if (getJavaMinorVersion() < 5) {
+                    return VISIT_SUBTREE;
+                } else if (ZERO_LONG_LITERAL_RE.matcher(nb.getToken()).matches()) {
+                    return replaceWithQualifiedName(node, typeBinding, "ZERO");
+                } else if (ONE_LONG_LITERAL_RE.matcher(nb.getToken()).matches()) {
+                    return replaceWithQualifiedName(node, typeBinding, "ONE");
+                } else if (TEN_LONG_LITERAL_RE.matcher(nb.getToken()).matches()) {
+                    return replaceWithQualifiedName(node, typeBinding, "TEN");
                 } else {
-                    if (getJavaMinorVersion() < 5) {
-                        return VISIT_SUBTREE;
-                    }
-                    if (ZERO_LONG_LITERAL_RE.matcher(nb.getToken()).matches()) {
-                        replaceWithQualifiedName(node, typeBinding, "ZERO");
-                    } else if (ONE_LONG_LITERAL_RE.matcher(nb.getToken()).matches()) {
-                        replaceWithQualifiedName(node, typeBinding, "ONE");
-                    } else if (TEN_LONG_LITERAL_RE.matcher(nb.getToken()).matches()) {
-                        replaceWithQualifiedName(node, typeBinding, "TEN");
-                    } else {
-                        this.ctx.getRefactorings().replace(node,
-                                getValueOf(typeBinding.getName(), nb.getToken()));
-                    }
+                    ctx.getRefactorings().replace(node,
+                            getValueOf(typeBinding.getName(), nb.getToken()));
+                    return DO_NOT_VISIT_SUBTREE;
                 }
-                return DO_NOT_VISIT_SUBTREE;
             } else if (arg0 instanceof StringLiteral) {
                 if (getJavaMinorVersion() < 5) {
                     return VISIT_SUBTREE;
                 }
                 final String literalValue = ((StringLiteral) arg0).getLiteralValue();
                 if (literalValue.matches("0+")) {
-                    replaceWithQualifiedName(node, typeBinding, "ZERO");
+                    return replaceWithQualifiedName(node, typeBinding, "ZERO");
                 } else if (literalValue.matches("0+1")) {
-                    replaceWithQualifiedName(node, typeBinding, "ONE");
+                    return replaceWithQualifiedName(node, typeBinding, "ONE");
                 } else if (literalValue.matches("0+10")) {
-                    replaceWithQualifiedName(node, typeBinding, "TEN");
+                    return replaceWithQualifiedName(node, typeBinding, "TEN");
                 } else if (literalValue.matches("\\d+")) {
                     this.ctx.getRefactorings().replace(node,
                             getValueOf(typeBinding.getName(), literalValue));
+                    return DO_NOT_VISIT_SUBTREE;
                 }
             }
         }
         return VISIT_SUBTREE;
     }
 
-    private void replaceWithQualifiedName(ASTNode node, ITypeBinding typeBinding, String field) {
+    private boolean replaceWithQualifiedName(ASTNode node, ITypeBinding typeBinding, String field) {
         this.ctx.getRefactorings().replace(node,
                 this.ctx.getASTBuilder().name(typeBinding.getName(), field));
+        return DO_NOT_VISIT_SUBTREE;
     }
 
     private ASTNode getValueOf(String name, String numberLiteral) {

@@ -91,10 +91,10 @@ public class StringRefactoring extends AbstractRefactoringRule {
                         && (leftOpIsString || rightOpIsString)) {
                     // node is in the extended operands
                     ctx.getRefactorings().replace(node, replaceToString(node.getExpression()));
-                    return VISIT_SUBTREE;
+                    return DO_NOT_VISIT_SUBTREE;
                 } else if (leftOpIsString && isMethod(rmi, "java.lang.Object", "toString")) {
                     ctx.getRefactorings().replace(rmi, replaceToString(rmi.getExpression()));
-                    return VISIT_SUBTREE;
+                    return DO_NOT_VISIT_SUBTREE;
                 } else if (rightOpIsString && node.equals(lmi)) {
                     ctx.getRefactorings().replace(lmi, replaceToString(lmi.getExpression()));
                     return DO_NOT_VISIT_SUBTREE;

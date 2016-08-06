@@ -120,9 +120,10 @@ public class PrimitiveWrapperCreationRefactoring extends AbstractRefactoringRule
                     final String methodName = getMethodName(
                             typeBinding.getQualifiedName(), node.getName().getIdentifier());
                     if (methodName != null) {
-                        this.ctx.getRefactorings().replace(
+                        ctx.getRefactorings().replace(
                                 node,
                                 newMethodInvocation(typeBinding.getName(), methodName, arg0));
+                        return DO_NOT_VISIT_SUBTREE;
                     }
                 }
             }

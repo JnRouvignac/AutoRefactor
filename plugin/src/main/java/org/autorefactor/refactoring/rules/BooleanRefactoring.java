@@ -217,6 +217,7 @@ public class BooleanRefactoring extends AbstractRefactoringRule {
                     getBooleanLiteral(node.getElseExpression()));
             if (newE != null) {
                 ctx.getRefactorings().replace(node, newE);
+                return DO_NOT_VISIT_SUBTREE;
             }
         }
         return VISIT_SUBTREE;

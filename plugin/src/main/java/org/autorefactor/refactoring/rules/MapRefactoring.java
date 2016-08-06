@@ -179,6 +179,7 @@ public class MapRefactoring extends AbstractRefactoringRule {
         } else if (hasOperator(node, LESS)) {
             r.replace(node,
                     b.boolean0(false));
+            return DO_NOT_VISIT_SUBTREE;
         }
         return VISIT_SUBTREE;
     }
@@ -206,6 +207,7 @@ public class MapRefactoring extends AbstractRefactoringRule {
         } else if (hasOperator(node, GREATER)) {
             r.replace(node,
                     b.boolean0(false));
+            return DO_NOT_VISIT_SUBTREE;
         }
         return VISIT_SUBTREE;
     }
