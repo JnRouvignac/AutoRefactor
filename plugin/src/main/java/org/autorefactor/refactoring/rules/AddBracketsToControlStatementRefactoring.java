@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2013-2015 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2013-2016 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -40,7 +40,6 @@ import static org.autorefactor.refactoring.ASTHelper.*;
 /** See {@link #getDescription()} method. */
 @SuppressWarnings("javadoc")
 public class AddBracketsToControlStatementRefactoring extends AbstractRefactoringRule {
-
     @Override
     public String getDescription() {
         return ""
@@ -73,10 +72,9 @@ public class AddBracketsToControlStatementRefactoring extends AbstractRefactorin
                 && !(node.getElseStatement() instanceof IfStatement)) {
             return setBlock(node.getElseStatement()) || result;
         }
-        return VISIT_SUBTREE;
+        return result;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(EnhancedForStatement node) {
         if (node.getBody() != null && !(node.getBody() instanceof Block)) {
@@ -85,7 +83,6 @@ public class AddBracketsToControlStatementRefactoring extends AbstractRefactorin
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(ForStatement node) {
         if (node.getBody() != null && !(node.getBody() instanceof Block)) {
@@ -94,7 +91,6 @@ public class AddBracketsToControlStatementRefactoring extends AbstractRefactorin
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(WhileStatement node) {
         if (node.getBody() != null && !(node.getBody() instanceof Block)) {
@@ -103,7 +99,6 @@ public class AddBracketsToControlStatementRefactoring extends AbstractRefactorin
         return VISIT_SUBTREE;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean visit(DoStatement node) {
         if (node.getBody() != null && !(node.getBody() instanceof Block)) {
@@ -122,5 +117,4 @@ public class AddBracketsToControlStatementRefactoring extends AbstractRefactorin
         this.ctx.getRefactorings().replace(statement, block);
         return DO_NOT_VISIT_SUBTREE;
     }
-
 }
