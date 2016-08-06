@@ -113,6 +113,8 @@ public class CommonCodeInIfElseStatementRefactoring extends AbstractRefactoringR
             final int minSize = minSize(allCasesStmts);
             final List<Statement> caseStmts = allCasesStmts.get(0);
 
+            boolean result = VISIT_SUBTREE;
+
             // identify matching statements starting from the beginning of each case
             for (int stmtIndex = 0; stmtIndex < minSize; stmtIndex++) {
                 if (!match(matcher, allCasesStmts, true, stmtIndex, 0, allCasesStmts.size())) {
@@ -120,6 +122,7 @@ public class CommonCodeInIfElseStatementRefactoring extends AbstractRefactoringR
                 }
                 this.ctx.getRefactorings().insertBefore(b.copy(caseStmts.get(stmtIndex)), node);
                 removeStmts(allCasesStmts, true, stmtIndex, removedCaseStmts);
+                result = DO_NOT_VISIT_SUBTREE;
             }
 
             // identify matching statements starting from the end of each case
@@ -130,6 +133,7 @@ public class CommonCodeInIfElseStatementRefactoring extends AbstractRefactoringR
                 }
                 this.ctx.getRefactorings().insertAfter(b.copy(caseStmts.get(caseStmts.size() - stmtIndex)), node);
                 removeStmts(allCasesStmts, false, stmtIndex, removedCaseStmts);
+                result = DO_NOT_VISIT_SUBTREE;
             }
 
             // remove the nodes common to all cases
@@ -157,14 +161,16 @@ public class CommonCodeInIfElseStatementRefactoring extends AbstractRefactoringR
                 } else {
                     this.ctx.getRefactorings().replace(node.getThenStatement(), b.block());
                 }
+                result = DO_NOT_VISIT_SUBTREE;
             }
             for (int i = 1; i < areCasesEmpty.size(); i++) {
                 if (areCasesEmpty.get(i)) {
                     final Statement firstStmt = allCasesStmts.get(i).get(0);
                     this.ctx.getRefactorings().remove(findNodeToRemove(firstStmt, firstStmt.getParent()));
+                    result = DO_NOT_VISIT_SUBTREE;
                 }
             }
-            return DO_NOT_VISIT_SUBTREE;
+            return result;
         }
         return VISIT_SUBTREE;
     }

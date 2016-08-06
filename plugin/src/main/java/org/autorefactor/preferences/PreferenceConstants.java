@@ -95,12 +95,11 @@ public enum PreferenceConstants {
 
     /**
      * Returns the preference name. The preference name must uniquely identify
-     * the preference in the AUtoRefactor project.
+     * the preference in the AutoRefactor project.
      *
      * @return the preference name
      */
     public String getName() {
         return name;
     }
-
 }

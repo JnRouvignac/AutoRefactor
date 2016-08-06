@@ -96,7 +96,8 @@ public class RefactoringRulesTest {
         try {
             testRefactoring0();
         } catch (RuntimeException e) {
-            if ("Unexpected exception".equals(e.getMessage())) {
+            if (e.getClass().getName().equals("org.autorefactor.util.UnhandledException")
+                    || "Unexpected exception".equals(e.getMessage())) {
                 throw (Exception) e.getCause();
             }
             throw e;

@@ -39,11 +39,8 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
-/**
- * The activator class controls the plug-in life cycle.
- */
+/** The activator class controls the plug-in life cycle. */
 public class AutoRefactorPlugin extends AbstractUIPlugin {
-
     /** The plug-in ID. */
     public static final String PLUGIN_ID = "org.autorefactor.plugin";
 
@@ -141,11 +138,11 @@ public class AutoRefactorPlugin extends AbstractUIPlugin {
 
     /**
      * Turns on the debug mode.
-     *
+     * <p>
      * This method is only for internal use.
      */
     public static void turnDebugModeOn() {
-        getDefault().getPreferenceStore().setValue(PreferenceConstants.DEBUG_MODE_ON.name(), Boolean.TRUE.toString());
+        getDefault().getPreferenceStore().setValue(PreferenceConstants.DEBUG_MODE_ON.getName(), true);
     }
 
     /**

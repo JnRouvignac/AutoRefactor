@@ -31,11 +31,8 @@ import org.eclipse.jface.preference.IPreferenceStore;
 
 import static org.autorefactor.preferences.PreferenceConstants.*;
 
-/**
- * Helper implementation for Eclipse preferences.
- */
+/** Helper implementation for Eclipse preferences. */
 public class EclipsePreferences implements Preferences {
-
     private final IPreferenceStore preferenceStore;
 
     /**
@@ -51,19 +48,16 @@ public class EclipsePreferences implements Preferences {
         return preferenceStore.getBoolean(pref.getName());
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean debugModeOn() {
         return getBoolean(DEBUG_MODE_ON);
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean removeThisForNonStaticMethodAccess() {
         return getBoolean(REMOVE_THIS_FOR_NON_STATIC_METHOD_ACCESS);
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean addCurlyBracketsToStatementBodies() {
         return getBoolean(ADD_CURLY_BRACKETS_TO_STATEMENT_BODIES);
