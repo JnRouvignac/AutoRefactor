@@ -30,12 +30,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.Callable;
 
-import org.autorefactor.AutoRefactorPlugin;
-import org.autorefactor.refactoring.JavaProjectOptions;
 import org.autorefactor.refactoring.Release;
 import org.autorefactor.ui.ApplyRefactoringsJob;
-import org.autorefactor.ui.JavaProjectOptionsImpl;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jface.text.Document;
@@ -45,7 +43,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
-import static org.autorefactor.cfg.test.TestUtils.*;
+import static org.autorefactor.test.TestHelper.*;
 import static org.junit.Assert.*;
 
 /**
@@ -90,15 +88,13 @@ public class AllRefactoringRulesTest {
 
     @Test
     public void testRefactoring() throws Exception {
-        AutoRefactorPlugin.turnDebugModeOn();
-        try {
-            testRefactoring0();
-        } catch (RuntimeException e) {
-            if ("Unexpected exception".equals(e.getMessage())) {
-                throw (Exception) e.getCause();
+        runTest(new Callable<Void>() {
+            @Override
+            public Void call() throws Exception {
+                testRefactoring0();
+                return null;
             }
-            throw e;
-        }
+        });
     }
 
     private void testRefactoring0() throws Exception {
@@ -123,22 +119,9 @@ public class AllRefactoringRulesTest {
                 new AggregateASTVisitor(AllRefactoringRules.getAllRefactoringRules()),
                 newJavaProjectOptions(Release.javaSE("1.5.0"), 4));
 
-        final String actual = normalize(
+        final String actual = normalizeJavaSourceCode(
                 doc.get().replaceAll("samples_in", "samples_out"));
-        final String expected = normalize(sampleOutSource);
+        final String expected = normalizeJavaSourceCode(sampleOutSource);
         assertEquals(sampleName + ": wrong output;", expected, actual);
-    }
-
-    private JavaProjectOptions newJavaProjectOptions(Release javaSE, int tabSize) {
-        final JavaProjectOptionsImpl options = new JavaProjectOptionsImpl();
-        options.setTabSize(tabSize);
-        options.setJavaSERelease(javaSE);
-        return options;
-    }
-
-    private String normalize(String s) {
-        return s.replaceAll("\t", "    ")
-                .replaceAll("(\r\n|\r|\n)", "\n")
-                .trim();
     }
 }

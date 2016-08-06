@@ -30,13 +30,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.Callable;
 
-import org.autorefactor.AutoRefactorPlugin;
-import org.autorefactor.refactoring.JavaProjectOptions;
 import org.autorefactor.refactoring.RefactoringRule;
 import org.autorefactor.refactoring.Release;
 import org.autorefactor.ui.ApplyRefactoringsJob;
-import org.autorefactor.ui.JavaProjectOptionsImpl;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jface.text.Document;
@@ -46,7 +44,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
-import static org.autorefactor.cfg.test.TestUtils.*;
+import static org.autorefactor.test.TestHelper.*;
 import static org.junit.Assert.*;
 
 /**
@@ -92,16 +90,13 @@ public class RefactoringRulesTest {
 
     @Test
     public void testRefactoring() throws Exception {
-        AutoRefactorPlugin.turnDebugModeOn();
-        try {
-            testRefactoring0();
-        } catch (RuntimeException e) {
-            if (e.getClass().getName().equals("org.autorefactor.util.UnhandledException")
-                    || "Unexpected exception".equals(e.getMessage())) {
-                throw (Exception) e.getCause();
-            }
-            throw e;
-        }
+    	runTest(new Callable<Void>() {
+    	    @Override
+    	    public Void call() throws Exception {
+    	        testRefactoring0();
+    	        return null;
+    	    }
+    	});
     }
 
     private void testRefactoring0() throws Exception {
@@ -130,9 +125,9 @@ public class RefactoringRulesTest {
                 new AggregateASTVisitor(Arrays.asList(refactoring)),
                 newJavaProjectOptions(Release.javaSE("1.7.0"), 4));
 
-        final String actual = normalize(
+        final String actual = normalizeJavaSourceCode(
                 doc.get().replaceAll("samples_in", "samples_out"));
-        final String expected = normalize(sampleOutSource);
+        final String expected = normalizeJavaSourceCode(sampleOutSource);
         assertEquals(testName + ": wrong output;", expected, actual);
     }
 
@@ -144,18 +139,5 @@ public class RefactoringRulesTest {
             }
         }
         return null;
-    }
-
-    private JavaProjectOptions newJavaProjectOptions(Release javaSE, int tabSize) {
-        final JavaProjectOptionsImpl options = new JavaProjectOptionsImpl();
-        options.setTabSize(tabSize);
-        options.setJavaSERelease(javaSE);
-        return options;
-    }
-
-    private String normalize(String s) {
-        return s.replaceAll("\t", "    ")
-                .replaceAll("(\r\n|\r|\n)", "\n")
-                .trim();
     }
 }

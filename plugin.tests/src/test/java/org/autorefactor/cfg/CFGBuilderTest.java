@@ -50,7 +50,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
-import static org.autorefactor.cfg.test.TestUtils.*;
+import static org.autorefactor.test.TestHelper.*;
 import static org.junit.Assert.*;
 
 @RunWith(value = Parameterized.class)
