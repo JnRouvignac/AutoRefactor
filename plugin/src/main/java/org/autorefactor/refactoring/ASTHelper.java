@@ -887,6 +887,46 @@ public final class ASTHelper {
     }
 
     /**
+     * Returns the enclosing type of the provided node.
+     * <p>
+     * i.e. this returns the most immediate type declaration surrounding the provided node.
+     *
+     * @param node the start node
+     * @return the enclosing type of the provided node, or {@code null}
+     */
+    public static ASTNode getEnclosingType(ASTNode node) {
+        final Class<?>[] ancestorClasses = { AbstractTypeDeclaration.class, AnonymousClassDeclaration.class };
+        final ASTNode ancestor = getFirstAncestorOrNull(node, ancestorClasses);
+        if (ancestor == null) {
+            throw new IllegalStateException(node,
+                    "Could not find any ancestor for " + Arrays.toString(ancestorClasses)
+                    + " and node type " + (node != null ? node.getClass().getSimpleName() : null)
+                    + " node.toString() " + node);
+        }
+        return ancestor;
+    }
+
+    /**
+     * Returns the first ancestor of the provided node which has any of the required types.
+     *
+     * @param node the start node
+     * @param ancestorClasses the required ancestor's types
+     * @return the first ancestor of the provided node which has any of the required type, or {@code null}
+     */
+    public static ASTNode getFirstAncestorOrNull(ASTNode node, Class<?>... ancestorClasses) {
+        if (node == null || node.getParent() == null) {
+            return null;
+        }
+        final ASTNode parent = node.getParent();
+        for (Class<?> ancestorClazz : ancestorClasses) {
+            if (ancestorClazz.isAssignableFrom(parent.getClass())) {
+                return parent;
+            }
+        }
+        return getFirstAncestorOrNull(parent, ancestorClasses);
+    }
+
+    /**
      * Returns the previous body declaration in the same block if it exists.
      *
      * @param startNode the start node

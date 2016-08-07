@@ -111,6 +111,7 @@ public final class AllRefactoringRules {
                 new RemoveSemiColonRefactoring(),
                 // FIXME it would be nice if it was only enabled when testng jar is detected for the project
                 new TestNGAssertRefactoring(),
+                new ReplaceQualifiedNamesBySimpleNamesRefactoring(),
                 new RemoveEmptyLinesRefactoring(),
                 new SwitchRefactoring());
     }
