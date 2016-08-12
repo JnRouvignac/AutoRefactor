@@ -2,6 +2,7 @@
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
  * Copyright (C) 2014-2016 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2016 Fabrice Tiercelin - Annoying remaining loop variable occurrence
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -83,6 +84,42 @@ public class CollectionSample {
             List<? super java.util.Date> output, java.util.Date[] elems1, java.sql.Date[] elems2) {
         java.util.Collections.addAll(output, elems1);
         java.util.Collections.addAll(output, elems2);
+    }
+
+    public void doNotRefactorForEachWithListUsingLoopVariable(
+            Map<String, List<String>> mapToFill, List<String> inputList) {
+        for (String input : inputList) {
+            mapToFill.get(input).add(input);
+        }
+    }
+
+    public void doNotRefactorForLoopWithListUsingLoopIndex(
+            Map<String, List<String>> mapToFill, List<String> inputList) {
+        for (int i = 0; i < inputList.size(); i++) {
+            mapToFill.get(inputList.get(i)).add(inputList.get(i));
+        }
+    }
+
+    public void doNotRefactorForLoopWithListUsingLoopIterator(
+            Map<String, List<String>> mapToFill, List<String> inputList) {
+        String input = null;
+        for (Iterator<String> iterator = inputList.iterator(); iterator.hasNext(); input = iterator.next()) {
+            mapToFill.get(input).add(input);
+        }
+    }
+
+    public void doNotRefactorForEachWithArrayUsingLoopVariable(
+            Map<String, List<String>> mapToFill, String[] inputArray) {
+        for (String input : inputArray) {
+            mapToFill.get(input).add(input);
+        }
+    }
+
+    public void doNotRefactorForLoopWithArrayUsingLoopIndex(
+            Map<String, List<String>> mapToFill, String[] inputArray) {
+        for (int i = 0; i < inputArray.length; i++) {
+            mapToFill.get(inputArray[i]).add(inputArray[i]);
+        }
     }
 
     public void doNotRefactorForLoopAddMethodResult(List<String> output, String[] elems) {

@@ -2,6 +2,7 @@
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
  * Copyright (C) 2014-2016 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2016 Fabrice Tiercelin - Annoying remaining loop variable occurrence
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,6 +33,7 @@ import org.autorefactor.refactoring.ForLoopHelper.ForLoopContent;
 import org.autorefactor.refactoring.Refactorings;
 import org.eclipse.jdt.core.dom.ASTMatcher;
 import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.ArrayAccess;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
@@ -62,6 +64,27 @@ import static org.eclipse.jdt.core.dom.PrefixExpression.Operator.*;
 
 /** See {@link #getDescription()} method. */
 public class CollectionRefactoring extends AbstractRefactoringRule {
+
+    private final class VariableUseCounterVisitor extends ASTVisitor {
+        private final IBinding variableBinding;
+        private int useCount = 0;
+
+        public int getUseCount() {
+            return useCount;
+        }
+
+        private VariableUseCounterVisitor(IBinding variableBinding) {
+            this.variableBinding = variableBinding;
+        }
+
+        @Override
+        public boolean visit(SimpleName node) {
+            if (isSameLocalVariable(node, variableBinding)) {
+                useCount++;
+            }
+            return VISIT_SUBTREE;
+        }
+    }
 
     @Override
     public String getDescription() {
@@ -176,20 +199,26 @@ public class CollectionRefactoring extends AbstractRefactoringRule {
         if (stmts.size() != 1) {
             return VISIT_SUBTREE;
         }
+
         final MethodInvocation mi = asExpression(stmts.get(0), MethodInvocation.class);
-        if (instanceOf(iterable, "java.util.Collection")) {
-            if (isMethod(mi, "java.util.Collection", "add", "java.lang.Object")) {
-                return replaceWithCollectionMethod(node, iterable, "addAll", mi);
-            } else if (isMethod(mi, "java.util.Collection", "contains", "java.lang.Object")) {
-                return replaceWithCollectionMethod(node, iterable, "containsAll", mi);
-            } else if (isMethod(mi, "java.util.Collection", "remove", "java.lang.Object")) {
-                return replaceWithCollectionMethod(node, iterable, "removeAll", mi);
-            }
-        } else if (isArray(iterable)) {
-            if (isMethod(mi, "java.util.Collection", "add", "java.lang.Object")
-                    && areTypeCompatible(mi.getExpression(), iterable)
-                    && isSameLocalVariable(arg0(mi), node.getParameter().resolveBinding())) {
-                return replaceWithCollectionsAddAll(node, iterable, mi);
+        final IVariableBinding foreachVariable = node.getParameter().resolveBinding();
+        // We should remove all the loop variable occurrences
+        // As we replace only one, there should be no more than one occurrence
+        if (getVariableUseCount(foreachVariable, node.getBody()) == 1) {
+            if (instanceOf(iterable, "java.util.Collection")) {
+                if (isMethod(mi, "java.util.Collection", "add", "java.lang.Object")) {
+                    return replaceWithCollectionMethod(node, iterable, "addAll", mi);
+                } else if (isMethod(mi, "java.util.Collection", "contains", "java.lang.Object")) {
+                    return replaceWithCollectionMethod(node, iterable, "containsAll", mi);
+                } else if (isMethod(mi, "java.util.Collection", "remove", "java.lang.Object")) {
+                    return replaceWithCollectionMethod(node, iterable, "removeAll", mi);
+                }
+            } else if (isArray(iterable)) {
+                if (isMethod(mi, "java.util.Collection", "add", "java.lang.Object")
+                        && areTypeCompatible(mi.getExpression(), iterable)
+                        && isSameLocalVariable(arg0(mi), node.getParameter().resolveBinding())) {
+                    return replaceWithCollectionsAddAll(node, iterable, mi);
+                }
             }
         }
         return VISIT_SUBTREE;
@@ -222,27 +251,43 @@ public class CollectionRefactoring extends AbstractRefactoringRule {
         final List<Statement> stmts = asList(node.getBody());
         if (loopContent != null
                 && stmts.size() == 1) {
-            final MethodInvocation mi = asExpression(stmts.get(0), MethodInvocation.class);
-            if (COLLECTION.equals(loopContent.getContainerType())) {
-                if (isMethod(mi, "java.util.Collection", "add", "java.lang.Object")) {
-                    return replaceWithCollectionMethod(node, loopContent, "addAll", mi);
-                } else if (isMethod(mi, "java.util.Collection", "contains", "java.lang.Object")) {
-                    return replaceWithCollectionMethod(node, loopContent, "containsAll", mi);
-                } else if (isMethod(mi, "java.util.Collection", "remove", "java.lang.Object")) {
-                    return replaceWithCollectionMethod(node, loopContent, "removeAll", mi);
-                }
-            } else if (ARRAY.equals(loopContent.getContainerType())) {
-                if (isMethod(mi, "java.util.Collection", "add", "java.lang.Object")
-                        && areTypeCompatible(mi.getExpression(), loopContent.getContainerVariable())) {
-                    final Expression addArg0 = arg0(mi);
-                    final ArrayAccess aa = as(addArg0, ArrayAccess.class);
-                    if (isSameVariable(loopContent, aa)) {
-                        return replaceWithCollectionsAddAll(node, loopContent.getContainerVariable(), mi);
+
+            final Name loopVariable = loopContent.getLoopVariable();
+            final IBinding loopVariableName = ((SimpleName) loopVariable).resolveBinding();
+            // We should remove all the loop variable occurrences
+            // As we replace only one, there should be no more than one occurrence
+            if (getVariableUseCount(loopVariableName, node.getBody()) == 1) {
+                final MethodInvocation mi = asExpression(stmts.get(0), MethodInvocation.class);
+                if (COLLECTION.equals(loopContent.getContainerType())) {
+                    if (isMethod(mi, "java.util.Collection", "add", "java.lang.Object")) {
+                        return replaceWithCollectionMethod(node, loopContent, "addAll", mi);
+                    } else if (isMethod(mi, "java.util.Collection", "contains", "java.lang.Object")) {
+                        return replaceWithCollectionMethod(node, loopContent, "containsAll", mi);
+                    } else if (isMethod(mi, "java.util.Collection", "remove", "java.lang.Object")) {
+                        return replaceWithCollectionMethod(node, loopContent, "removeAll", mi);
+                    }
+                } else if (ARRAY.equals(loopContent.getContainerType())) {
+                    if (isMethod(mi, "java.util.Collection", "add", "java.lang.Object")
+                            && areTypeCompatible(mi.getExpression(), loopContent.getContainerVariable())) {
+                        final Expression addArg0 = arg0(mi);
+                        final ArrayAccess aa = as(addArg0, ArrayAccess.class);
+                        if (isSameVariable(loopContent, aa)) {
+                            return replaceWithCollectionsAddAll(node, loopContent.getContainerVariable(), mi);
+                        }
                     }
                 }
             }
         }
         return VISIT_SUBTREE;
+    }
+
+    private int getVariableUseCount(final IBinding variableBinding, Statement toVisit) {
+        if (variableBinding != null) {
+            final VariableUseCounterVisitor variableUseVisitor = new VariableUseCounterVisitor(variableBinding);
+            toVisit.accept(variableUseVisitor);
+            return variableUseVisitor.getUseCount();
+        }
+        return 0;
     }
 
     private boolean isSameVariable(ForLoopContent loopContent, ArrayAccess aa) {
