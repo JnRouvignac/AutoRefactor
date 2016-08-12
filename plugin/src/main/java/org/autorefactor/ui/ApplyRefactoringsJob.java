@@ -39,6 +39,7 @@ import org.autorefactor.refactoring.Refactorings;
 import org.autorefactor.refactoring.rules.AggregateASTVisitor;
 import org.autorefactor.refactoring.rules.RefactoringContext;
 import org.autorefactor.util.IllegalStateException;
+import org.autorefactor.util.OnEclipseVersionUpgrade;
 import org.autorefactor.util.UnhandledException;
 import org.eclipse.core.filebuffers.FileBuffers;
 import org.eclipse.core.filebuffers.ITextFileBuffer;
@@ -48,6 +49,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.dom.AST;
@@ -65,7 +67,6 @@ import static org.autorefactor.refactoring.ASTHelper.*;
  * ({@link PrepareApplyRefactoringsJob}).
  */
 public class ApplyRefactoringsJob extends Job {
-
     private final Queue<RefactoringUnit> refactoringUnits;
     private final List<RefactoringRule> refactoringRulesToApply;
 
@@ -83,7 +84,6 @@ public class ApplyRefactoringsJob extends Job {
         this.refactoringRulesToApply = refactoringRulesToApply;
     }
 
-    /** {@inheritDoc} */
     @Override
     protected IStatus run(IProgressMonitor monitor) {
         AutoRefactorPlugin.register(this);
@@ -100,40 +100,37 @@ public class ApplyRefactoringsJob extends Job {
         }
     }
 
+    @OnEclipseVersionUpgrade({
+            "Remove the check to monitor.isCanceled()",
+            "Replace monitor.newChild(1) by monitor.split(1)" })
     private IStatus run0(IProgressMonitor monitor) throws Exception {
         if (refactoringUnits.isEmpty()) {
             // No java project exists.
             return Status.OK_STATUS;
         }
 
-        final int startSize = refactoringUnits.size();
-        monitor.beginTask("", startSize);
-        int previousSize = startSize;
+        final SubMonitor loopMonitor = SubMonitor.convert(monitor, refactoringUnits.size());
         try {
             RefactoringUnit toRefactor;
             while ((toRefactor = refactoringUnits.poll()) != null) {
-                if (monitor.isCanceled()) {
+                if (loopMonitor.isCanceled()) {
                     return Status.CANCEL_STATUS;
                 }
+
                 final ICompilationUnit compilationUnit = toRefactor.getCompilationUnit();
                 final JavaProjectOptions options = toRefactor.getOptions();
                 try {
-                    monitor.subTask("Applying refactorings to " + getClassName(compilationUnit));
-
+                    loopMonitor.subTask("Applying refactorings to " + getClassName(compilationUnit));
                     final AggregateASTVisitor refactoring = new AggregateASTVisitor(refactoringRulesToApply);
-                    applyRefactoring(compilationUnit, refactoring, options);
+                    applyRefactoring(compilationUnit, refactoring, options, loopMonitor.newChild(1));
                 } catch (Exception e) {
                     final String msg = "Exception when applying refactorings to file \""
                             + compilationUnit.getPath() + "\": " + e.getMessage();
                     throw new UnhandledException(null, msg, e);
-                } finally {
-                    final int remaining = refactoringUnits.size();
-                    monitor.worked(previousSize - remaining);
-                    previousSize = remaining;
                 }
             }
         } finally {
-            monitor.done();
+            loopMonitor.done();
         }
         return Status.OK_STATUS;
     }
@@ -145,7 +142,7 @@ public class ApplyRefactoringsJob extends Job {
     }
 
     private void applyRefactoring(ICompilationUnit compilationUnit, AggregateASTVisitor refactoringToApply,
-            JavaProjectOptions options) throws Exception {
+            JavaProjectOptions options, IProgressMonitor monitor) throws Exception {
         final ITextFileBufferManager bufferManager = FileBuffers.getTextFileBufferManager();
         final IPath path = compilationUnit.getPath();
         final LocationKind locationKind = LocationKind.NORMALIZE;
@@ -165,7 +162,7 @@ public class ApplyRefactoringsJob extends Job {
                 return;
             }
             final IDocument document = textFileBuffer.getDocument();
-            applyRefactoring(document, compilationUnit, refactoringToApply, options);
+            applyRefactoring(document, compilationUnit, refactoringToApply, options, monitor);
         } finally {
             bufferManager.disconnect(path, locationKind, null);
         }
@@ -179,6 +176,7 @@ public class ApplyRefactoringsJob extends Job {
      * @param compilationUnit the compilation unit to refactor
      * @param refactoring the {@link AggregateASTVisitor} to apply to the compilation unit
      * @param options the Java project options used to compile the project
+     * @param monitor the progress monitor of the current job
      * @throws Exception if any problem occurs
      *
      * @see <a
@@ -193,7 +191,7 @@ public class ApplyRefactoringsJob extends Job {
      * >Abstract Syntax Tree > Write it down</a>
      */
     public void applyRefactoring(IDocument document, ICompilationUnit compilationUnit, AggregateASTVisitor refactoring,
-            JavaProjectOptions options) throws Exception {
+            JavaProjectOptions options, IProgressMonitor monitor) throws Exception {
         // creation of DOM/AST from a ICompilationUnit
         final ASTParser parser = ASTParser.newParser(AST.JLS4);
         resetParser(compilationUnit, parser, options);
@@ -216,7 +214,7 @@ public class ApplyRefactoringsJob extends Job {
                 break;
             }
 
-            final RefactoringContext ctx = new RefactoringContext(compilationUnit, astRoot, options);
+            final RefactoringContext ctx = new RefactoringContext(compilationUnit, astRoot, options, monitor);
             refactoring.setRefactoringContext(ctx);
 
             final Refactorings refactorings = refactoring.getRefactorings(astRoot);
@@ -249,7 +247,6 @@ public class ApplyRefactoringsJob extends Job {
             resetParser(compilationUnit, parser, options);
             astRoot = (CompilationUnit) parser.createAST(null);
             ++totalNbLoops;
-
 
             final Set<ASTVisitor> thisLoopVisitors = refactoring.getVisitorsContributingRefactoring();
             if (!thisLoopVisitors.equals(lastLoopVisitors)) {

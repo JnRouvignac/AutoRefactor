@@ -34,6 +34,7 @@ import java.util.concurrent.Callable;
 
 import org.autorefactor.refactoring.Release;
 import org.autorefactor.ui.ApplyRefactoringsJob;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jface.text.Document;
@@ -117,7 +118,8 @@ public class AllRefactoringRulesTest {
         new ApplyRefactoringsJob(null, null).applyRefactoring(
                 doc, cu,
                 new AggregateASTVisitor(AllRefactoringRules.getAllRefactoringRules()),
-                newJavaProjectOptions(Release.javaSE("1.5.0"), 4));
+                newJavaProjectOptions(Release.javaSE("1.5.0"), 4),
+                new NullProgressMonitor());
 
         final String actual = normalizeJavaSourceCode(
                 doc.get().replaceAll("samples_in", "samples_out"));

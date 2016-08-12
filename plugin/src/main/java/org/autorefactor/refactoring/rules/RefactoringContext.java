@@ -29,6 +29,7 @@ import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.JavaProjectOptions;
 import org.autorefactor.refactoring.Refactorings;
 import org.autorefactor.util.UnhandledException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.AST;
@@ -49,6 +50,7 @@ public class RefactoringContext {
     private final Refactorings refactorings;
     private final ASTBuilder astBuilder;
     private final JavaProjectOptions options;
+    private final IProgressMonitor monitor;
 
     /**
      * Builds an instance of this class.
@@ -56,10 +58,13 @@ public class RefactoringContext {
      * @param compilationUnit the compilation unit to refactor
      * @param astRoot the compilation unit, root of the AST
      * @param options the Java project options used to compile the project
+     * @param monitor the progress monitor of the current job
      */
-    public RefactoringContext(ICompilationUnit compilationUnit, CompilationUnit astRoot, JavaProjectOptions options) {
+    public RefactoringContext(ICompilationUnit compilationUnit, CompilationUnit astRoot,
+            JavaProjectOptions options, IProgressMonitor monitor) {
         this.compilationUnit = compilationUnit;
         this.astRoot = astRoot;
+        this.monitor = monitor;
         this.refactorings = new Refactorings(astRoot);
         this.astBuilder = new ASTBuilder(refactorings);
         this.options = options;
@@ -99,6 +104,15 @@ public class RefactoringContext {
      */
     public JavaProjectOptions getJavaProjectOptions() {
         return options;
+    }
+
+    /**
+     * Returns the progress monitor of the current job.
+     *
+     * @return the progress monitor of the current job
+     */
+    public IProgressMonitor getProgressMonitor() {
+        return monitor;
     }
 
     /**

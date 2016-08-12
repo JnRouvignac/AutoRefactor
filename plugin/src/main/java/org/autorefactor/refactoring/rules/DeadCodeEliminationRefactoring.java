@@ -31,8 +31,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.Refactorings;
+import org.autorefactor.util.OnEclipseVersionUpgrade;
 import org.autorefactor.util.UnhandledException;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Block;
@@ -288,11 +290,11 @@ public class DeadCodeEliminationRefactoring extends AbstractRefactoringRule {
     }
 
     /** This method is extremely expensive. */
+    @OnEclipseVersionUpgrade("Replace monitor.newChild(1) by monitor.split(1)")
     private boolean isMethodUsedInItsPackage(IMethodBinding methodBinding, MethodDeclaration node) {
-        final AtomicBoolean methodIsUsedInPackage = new AtomicBoolean(false);
-
         final IPackageBinding methodPackage = methodBinding.getDeclaringClass().getPackage();
 
+        final AtomicBoolean methodIsUsedInPackage = new AtomicBoolean(false);
         final SearchRequestor requestor = new SearchRequestor() {
             @Override
             public void acceptSearchMatch(SearchMatch match) {
@@ -300,6 +302,8 @@ public class DeadCodeEliminationRefactoring extends AbstractRefactoringRule {
             }
         };
 
+        final SubMonitor subMonitor = SubMonitor.convert(ctx.getProgressMonitor(), 1);
+        final SubMonitor childMonitor = subMonitor.newChild(1);
         try {
             final SearchEngine searchEngine = new SearchEngine();
             searchEngine.search(
@@ -307,10 +311,12 @@ public class DeadCodeEliminationRefactoring extends AbstractRefactoringRule {
                     new SearchParticipant[] { SearchEngine.getDefaultSearchParticipant() },
                     SearchEngine.createJavaSearchScope(new IJavaElement[] { methodPackage.getJavaElement() }),
                     requestor,
-                    null);
+                    childMonitor);
             return methodIsUsedInPackage.get();
         } catch (CoreException e) {
             throw new UnhandledException(node, e);
+        } finally {
+            childMonitor.done();
         }
     }
 
