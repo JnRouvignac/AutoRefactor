@@ -2,6 +2,7 @@
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
  * Copyright (C) 2016 Fabrice Tiercelin - initial API and implementation
+ * Copyright (C) 2016 Jean-Noël Rouvignac - renamed test cases
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,7 +30,7 @@ public class SwitchSample {
 
     public int i2 = 0;
 
-    public void replaceIfWithParameter(int i1) {
+    public void replaceIfWithSwitchOnParameter(int i1) {
         int i = 0;
         if (i1 == 0) {
             // Keep this comment 2
@@ -61,7 +62,7 @@ public class SwitchSample {
         }
     }
 
-    public void replaceIfWithLocalVariable() {
+    public void replaceIfWithSwitchOnLocalVariable() {
         int i1 = 0;
         int i = 0;
         if (i1 == 0) {
@@ -75,6 +76,8 @@ public class SwitchSample {
         } else if (i1 == 3) {
             i = 25;
             i = 30;
+        } else if (i1 == 5) {
+            // do nothing
         } else if (i1 == 4)
             i = 40;
         else {
@@ -82,7 +85,7 @@ public class SwitchSample {
         }
     }
 
-    public void replaceIfWithField() {
+    public void replaceIfWithSwitchOnField() {
         int i = 0;
         if (i2 == 0) {
             // Keep this comment 2
@@ -93,7 +96,7 @@ public class SwitchSample {
         }
     }
 
-    public void replaceIfWithCharacter(char a1) {
+    public void replaceIfWithSwitchOnCharacter(char a1) {
         int i = 0;
         if (a1 == 'a') {
             // Keep this comment 2
@@ -109,7 +112,7 @@ public class SwitchSample {
             i = 40;
     }
 
-    public void replaceIfWithDuplicateConditions(char a1) {
+    public void replaceIfRemoveDuplicateConditions(char a1) {
         int i = 0;
         if (a1 == 'a') {
             i = 0;
@@ -128,7 +131,7 @@ public class SwitchSample {
         }
     }
 
-    public void replaceIfWithExistingBreaks(int i1) {
+    public void replaceIfKeepExistingControlFlowBreaks(int i1) {
         int j = 0;
         for (int i = 0; i < 10; i++) {
             if (i1 == 0) {
@@ -155,7 +158,7 @@ public class SwitchSample {
         }
     }
 
-    public void replaceIfWithCompatibleVariableDeclarations(int i1) {
+    public void replaceIfWhenNoVariableNameConflictExists(int i1) {
         int i = 0;
         if (i1 == 0) {
             int newVariable1 = 0;
@@ -169,7 +172,7 @@ public class SwitchSample {
         }
     }
 
-    public void doNotReplaceIfWithConflictedVariableDeclarations(int i1) {
+    public void doNotReplaceWhenVariableNameConflicts(int i1) {
         int i = 0;
         if (i1 == 0) {
             int integer1 = 0;
@@ -180,7 +183,7 @@ public class SwitchSample {
         }
     }
 
-    public void doNotReplaceIfWithConflictedVariableTypes(int i1) {
+    public void doNotReplaceWhenVariableTypesConflict(int i1) {
         int i = 0;
         if (i1 == 0) {
             int integer1 = 0;
@@ -191,7 +194,7 @@ public class SwitchSample {
         }
     }
 
-    public void doNotReplaceOneConditionIf(int i1) {
+    public void doNotReplaceIfWithoutElseIf(int i1) {
         int i = 0;
         if (i1 == 0) {
             i = 0;
@@ -200,14 +203,14 @@ public class SwitchSample {
         }
     }
 
-    public void doNotReplaceOneCaseIf(int i1) {
+    public void doNotReplaceIfWithoutElse(int i1) {
         int i = 0;
         if (i1 == 0) {
             i = 10;
         }
     }
 
-    public void doNotReplaceWithPrimitiveWrapper(Integer i1) {
+    public void doNotReplaceWithSwitchOnPrimitiveWrapper(Integer i1) {
         int i = 0;
         if (i1 == 0) {
             i = 0;
