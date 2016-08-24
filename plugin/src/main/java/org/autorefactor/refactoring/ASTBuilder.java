@@ -41,6 +41,7 @@ import org.eclipse.jdt.core.dom.ArrayType;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.BooleanLiteral;
+import org.eclipse.jdt.core.dom.BreakStatement;
 import org.eclipse.jdt.core.dom.CastExpression;
 import org.eclipse.jdt.core.dom.CatchClause;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
@@ -64,6 +65,8 @@ import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.StringLiteral;
 import org.eclipse.jdt.core.dom.StructuralPropertyDescriptor;
+import org.eclipse.jdt.core.dom.SwitchCase;
+import org.eclipse.jdt.core.dom.SwitchStatement;
 import org.eclipse.jdt.core.dom.ThisExpression;
 import org.eclipse.jdt.core.dom.ThrowStatement;
 import org.eclipse.jdt.core.dom.TryStatement;
@@ -175,6 +178,15 @@ public class ASTBuilder {
      */
     public BooleanLiteral boolean0(boolean boolValue) {
         return ast.newBooleanLiteral(boolValue);
+    }
+
+    /**
+     * Builds a new {@link BreakStatement} instance.
+     *
+     * @return a new break statement
+     */
+    public BreakStatement break0() {
+        return ast.newBreakStatement();
     }
 
     /**
@@ -746,6 +758,32 @@ public class ASTBuilder {
         final StringLiteral sl = ast.newStringLiteral();
         sl.setLiteralValue(s);
         return sl;
+    }
+
+    /**
+     * Builds a new {@link SwitchStatement} instance.
+     *
+     * @param expr
+     *            the switch expression
+     * @return a new switch statement
+     */
+    public SwitchStatement switch0(Expression expr) {
+        final SwitchStatement ss = ast.newSwitchStatement();
+        ss.setExpression(expr);
+        return ss;
+    }
+
+    /**
+     * Builds a new {@link SwitchCase} instance.
+     *
+     * @param expr
+     *            the case expression
+     * @return a new switch case statement
+     */
+    public SwitchCase switchCase(Expression expr) {
+        final SwitchCase sc = ast.newSwitchCase();
+        sc.setExpression(expr);
+        return sc;
     }
 
     /**
