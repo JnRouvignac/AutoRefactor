@@ -190,6 +190,19 @@ public class ASTBuilder {
     }
 
     /**
+     * Builds a new {@link SwitchCase} instance.
+     *
+     * @param expr
+     *            the case expression
+     * @return a new switch case statement
+     */
+    public SwitchCase case0(Expression expr) {
+        final SwitchCase sc = ast.newSwitchCase();
+        sc.setExpression(expr);
+        return sc;
+    }
+
+    /**
      * Builds a new {@link CastExpression} instance.
      *
      * @param typeName the name of the type being cast to
@@ -201,6 +214,15 @@ public class ASTBuilder {
         ce.setType(type(typeName));
         ce.setExpression(expr);
         return ce;
+    }
+
+    /**
+     * Builds a new {@link SwitchCase} instance which represents a {@code default} statement.
+     *
+     * @return a new switch case statement representing a {@code default} statement
+     */
+    public SwitchCase default0() {
+        return case0(null);
     }
 
     private Type type(String typeName) {
@@ -771,19 +793,6 @@ public class ASTBuilder {
         final SwitchStatement ss = ast.newSwitchStatement();
         ss.setExpression(expr);
         return ss;
-    }
-
-    /**
-     * Builds a new {@link SwitchCase} instance.
-     *
-     * @param expr
-     *            the case expression
-     * @return a new switch case statement
-     */
-    public SwitchCase switchCase(Expression expr) {
-        final SwitchCase sc = ast.newSwitchCase();
-        sc.setExpression(expr);
-        return sc;
     }
 
     /**

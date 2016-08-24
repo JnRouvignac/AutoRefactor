@@ -33,48 +33,100 @@ import java.util.List;
 import java.util.Set;
 
 import org.autorefactor.refactoring.ASTBuilder;
-import org.autorefactor.util.Pair;
+import org.autorefactor.refactoring.ASTHelper;
+import org.autorefactor.util.NotImplementedException;
 import org.eclipse.jdt.core.dom.ASTVisitor;
-import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.BreakStatement;
 import org.eclipse.jdt.core.dom.CharacterLiteral;
 import org.eclipse.jdt.core.dom.ContinueStatement;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.InfixExpression;
+import org.eclipse.jdt.core.dom.InfixExpression.Operator;
 import org.eclipse.jdt.core.dom.NumberLiteral;
-import org.eclipse.jdt.core.dom.ParenthesizedExpression;
 import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.Statement;
-import org.eclipse.jdt.core.dom.SwitchCase;
 import org.eclipse.jdt.core.dom.SwitchStatement;
 import org.eclipse.jdt.core.dom.ThrowStatement;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
+import static org.eclipse.jdt.core.dom.InfixExpression.Operator.*;
 
 /** See {@link #getDescription()} method. */
 public class SwitchRefactoring extends AbstractRefactoringRule {
 
-    private final class VariableDeclarationIdentifierVisitor extends ASTVisitor {
-        private Set<String> variableDeclarationIds = new HashSet<String>();
+    static final class Variable {
+        private final SimpleName name;
+        private final List<Expression> constantValues;
 
-        public Set<String> getVariableDeclarationIds() {
-            return variableDeclarationIds;
+        private Variable(SimpleName varName, List<Expression> constantValues) {
+            this.name = varName;
+            this.constantValues = constantValues;
+        }
+
+        private boolean isSameVariable(Variable other) {
+            return other != null && ASTHelper.isSameVariable(name, other.name);
+        }
+
+        private Variable mergeValues(final Variable other) {
+            final List<Expression> values = new ArrayList<Expression>(constantValues);
+            values.addAll(other.constantValues);
+            return new Variable(name, values);
+        }
+
+        @Override
+        public String toString() {
+            return constantValues.size() == 1
+                    ? name + " = " + constantValues.get(0)
+                    : name + " = one of " + constantValues;
+        }
+    }
+
+    private static final class RewrittenCase {
+        /** Must resolve to constant values. */
+        private List<Expression> expressions;
+        private Statement stmt;
+
+        public RewrittenCase(List<Expression> expressions, Statement stmt) {
+            this.expressions = expressions;
+            this.stmt = stmt;
+        }
+
+        @Override
+        public String toString() {
+            final StringBuilder sb = new StringBuilder();
+            for (Expression expr : expressions) {
+                sb.append("case ").append(expr).append(":\n");
+            }
+            for (Statement stmt : asList(stmt)) {
+                sb.append("    " + stmt);
+            }
+            sb.append("    break; // not needed if previous statement breaks control flow");
+            return sb.toString();
+        }
+    }
+
+    private static final class VariableDeclarationIdentifierVisitor extends ASTVisitor {
+        private Set<String> variableNames = new HashSet<String>();
+
+        public Set<String> getVariableNames() {
+            return variableNames;
         }
 
         @Override
         public boolean visit(VariableDeclarationFragment node) {
-            variableDeclarationIds.add(node.getName().getIdentifier());
+            variableNames.add(node.getName().getIdentifier());
             return VISIT_SUBTREE;
         }
     }
 
     @Override
     public String getDescription() {
-        return "" + "Switch related refactorings:\n"
-                + "- replaces if/else if/else blocks to use switch where possible.";
+        return ""
+            + "Switch related refactorings:\n"
+            + "- replaces if/else if/else blocks to use switch where possible.";
     }
 
     @Override
@@ -84,216 +136,187 @@ public class SwitchRefactoring extends AbstractRefactoringRule {
 
     @Override
     public boolean visit(final IfStatement node) {
-        Pair<SimpleName, List<Expression>> variableAndValues = getVariableAndValues(node);
-        if (variableAndValues != null) {
-            final SimpleName discriminant = variableAndValues.getFirst();
-            final List<Pair<List<Expression>, Statement>> cases = new ArrayList<Pair<List<Expression>, Statement>>();
-            Statement remainingStatements = null;
+        Variable variable = extractVariableAndValues(node);
+        if (variable == null) {
+            return VISIT_SUBTREE;
+        }
 
-            final Set<String> variableDeclarationIds = new HashSet<String>();
-            IfStatement currentNode = node;
-            boolean hasMoreCases = true;
-            while (hasMoreCases && discriminant.getIdentifier().equals(variableAndValues.getFirst().getIdentifier())
-                    && haveSameType(discriminant, variableAndValues.getFirst())) {
+        final SimpleName switchExpr = variable.name;
+        final List<RewrittenCase> cases = new ArrayList<RewrittenCase>();
+        Statement remainingStmt = null;
 
-                // You can't declare two variables with the same name in two
-                // cases
-                if (detectDeclarationConflict(currentNode.getThenStatement(), variableDeclarationIds)) {
-                    return VISIT_SUBTREE;
-                }
-
-                cases.add(Pair.<List<Expression>, Statement> of(variableAndValues.getSecond(),
-                        currentNode.getThenStatement()));
-                remainingStatements = currentNode.getElseStatement();
-
-                variableAndValues = getVariableAndValues(remainingStatements);
-                if (variableAndValues != null) {
-                    currentNode = (IfStatement) remainingStatements;
-                    hasMoreCases = true;
-                } else {
-                    hasMoreCases = false;
-                }
+        final Set<String> variableDeclarationIds = new HashSet<String>();
+        IfStatement currentNode = node;
+        while (havaSameIdentifier(switchExpr, variable.name)
+                && haveSameType(switchExpr, variable.name)) {
+            if (detectDeclarationConflicts(currentNode.getThenStatement(), variableDeclarationIds)) {
+                // Cannot declare two variables with the same name in two cases
+                return VISIT_SUBTREE;
             }
 
-            final List<Pair<List<Expression>, Statement>> filteredCases = filterDuplicateCasesAndExpressions(cases);
+            cases.add(new RewrittenCase(variable.constantValues, currentNode.getThenStatement()));
+            remainingStmt = currentNode.getElseStatement();
 
-            return maybeReplaceWithSwitchStatement(node, discriminant, filteredCases, remainingStatements);
-        }
-        return VISIT_SUBTREE;
-    }
-
-    private boolean detectDeclarationConflict(final Statement statement, final Set<String> variableDeclarationIds) {
-        final VariableDeclarationIdentifierVisitor visitor = new VariableDeclarationIdentifierVisitor();
-
-        statement.accept(visitor);
-
-        boolean hasConflict = false;
-        for (final String newIdentifier : visitor.getVariableDeclarationIds()) {
-            if (variableDeclarationIds.contains(newIdentifier)) {
-                hasConflict = true;
+            variable = extractVariableAndValues(remainingStmt);
+            if (variable == null) {
                 break;
             }
+            currentNode = (IfStatement) remainingStmt;
         }
 
-        variableDeclarationIds.addAll(visitor.getVariableDeclarationIds());
+        final List<RewrittenCase> filteredCases = filterDuplicateCaseValues(cases);
+        return maybeReplaceWithSwitchStmt(node, switchExpr, filteredCases, remainingStmt);
+    }
 
+    private boolean havaSameIdentifier(final SimpleName sn1, SimpleName sn2) {
+        return sn1.getIdentifier().equals(sn2.getIdentifier());
+    }
+
+    private boolean detectDeclarationConflicts(final Statement stmt, final Set<String> variableDeclarationIds) {
+        final VariableDeclarationIdentifierVisitor visitor = new VariableDeclarationIdentifierVisitor();
+        stmt.accept(visitor);
+
+        final Set<String> varNames = visitor.getVariableNames();
+        final boolean hasConflict = containsAny(variableDeclarationIds, varNames);
+        variableDeclarationIds.addAll(varNames);
         return hasConflict;
     }
 
-    private boolean maybeReplaceWithSwitchStatement(final IfStatement node, final Expression discriminant,
-            final List<Pair<List<Expression>, Statement>> cases, final Statement remainingStatement) {
-        if ((discriminant != null) && cases.size() > 1) {
-            replaceWithSwitchStatement(node, discriminant, cases, remainingStatement);
+    private boolean containsAny(final Set<String> variableDeclarationIds, Set<String> declIds2) {
+        for (final String newIdentifier : declIds2) {
+            if (variableDeclarationIds.contains(newIdentifier)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean maybeReplaceWithSwitchStmt(final IfStatement node, final Expression switchExpr,
+            final List<RewrittenCase> cases, final Statement remainingStmt) {
+        if (switchExpr != null && cases.size() > 1) {
+            replaceWithSwitchStmt(node, switchExpr, cases, remainingStmt);
             return DO_NOT_VISIT_SUBTREE;
         }
         return VISIT_SUBTREE;
     }
 
-    private List<Pair<List<Expression>, Statement>> filterDuplicateCasesAndExpressions(
-            final List<Pair<List<Expression>, Statement>> sourceCases) {
-        final Set<Expression> alreadyProccessedValues = new HashSet<Expression>();
-        final List<Pair<List<Expression>, Statement>> filtrdCases = new ArrayList<Pair<List<Expression>, Statement>>();
-
-        for (final Pair<List<Expression>, Statement> sourceCase : sourceCases) {
-            final List<Expression> filteredExpressions = new ArrayList<Expression>();
-            for (final Expression expression : sourceCase.getFirst()) {
-                boolean isNew = true;
-                for (final Expression alreadyProccessedValue : alreadyProccessedValues) {
-                    if (expression.toString().equals(alreadyProccessedValue.toString())
-                            && haveSameType(expression, alreadyProccessedValue)) {
-                        isNew = false;
-                        break;
-                    }
+    /** Side-effect: removes the dead branches in a chain of if-elseif. */
+    private List<RewrittenCase> filterDuplicateCaseValues(final List<RewrittenCase> sourceCases) {
+        final List<RewrittenCase> results = new ArrayList<RewrittenCase>();
+        final Set<Object> alreadyProccessedValues = new HashSet<Object>();
+        for (final RewrittenCase sourceCase : sourceCases) {
+            final List<Expression> filteredExprs = new ArrayList<Expression>();
+            for (final Expression expr : sourceCase.expressions) {
+                final Object constantValue = expr.resolveConstantExpressionValue();
+                if (constantValue == null) {
+                    throw new NotImplementedException(expr, "Cannot handle non constant expressions");
                 }
-
-                if (isNew) {
-                    filteredExpressions.add(expression);
-                    alreadyProccessedValues.add(expression);
+                if (alreadyProccessedValues.add(constantValue)) {
+                    // this is a new value (never seen before)
+                    filteredExprs.add(expr);
                 }
             }
 
-            if (!filteredExpressions.isEmpty()) {
-                filtrdCases.add(Pair.<List<Expression>, Statement> of(filteredExpressions, sourceCase.getSecond()));
+            if (!filteredExprs.isEmpty()) {
+                results.add(new RewrittenCase(filteredExprs, sourceCase.stmt));
             }
         }
-        return filtrdCases;
+        return results;
     }
 
-    private void replaceWithSwitchStatement(final IfStatement node, final Expression discriminant,
-            final List<Pair<List<Expression>, Statement>> cases, final Statement remainingStatement) {
-        final ASTBuilder b = this.ctx.getASTBuilder();
-
-        // Switch
-        final SwitchStatement switchStatement = b.switch0(b.copy(discriminant));
-
-        // Cases
-        for (final Pair<List<Expression>, Statement> oneCase : cases) {
-            addStatementsToCase(b, switchStatement, oneCase.getFirst(), oneCase.getSecond());
+    private void replaceWithSwitchStmt(final IfStatement node, final Expression switchExpr,
+            final List<RewrittenCase> cases, final Statement remainingStmt) {
+        final ASTBuilder b = ctx.getASTBuilder();
+        final SwitchStatement switchStmt = b.switch0(b.copy(switchExpr));
+        for (final RewrittenCase aCase : cases) {
+            addCaseWithStmts(switchStmt, aCase.expressions, aCase.stmt);
         }
-
-        // Default
-        if (remainingStatement != null) {
-            addStatementsToCase(b, switchStatement, null, remainingStatement);
+        if (remainingStmt != null) {
+            addDefaultWithStmts(switchStmt, remainingStmt);
         }
-        this.ctx.getRefactorings().replace(node, switchStatement);
+        ctx.getRefactorings().replace(node, switchStmt);
     }
 
-    private void addStatementsToCase(final ASTBuilder b, final SwitchStatement switchStatement,
-            final List<Expression> caseValues, final Statement innerStatement) {
-        @SuppressWarnings("unchecked")
-        final List<Statement> switchSubStatements = switchStatement.statements();
+    private void addDefaultWithStmts(final SwitchStatement switchStmt, final Statement remainingStmt) {
+        addCaseWithStmts(switchStmt, null, remainingStmt);
+    }
 
-        // Case
+    private void addCaseWithStmts(final SwitchStatement switchStmt,
+            final List<Expression> caseValues, final Statement innerStmt) {
+        final ASTBuilder b = ctx.getASTBuilder();
+        final List<Statement> switchStmts = statements(switchStmt);
+
+        // Add the case statement(s)
         if (caseValues != null) {
             for (final Expression caseValue : caseValues) {
-                SwitchCase switchCase = b.switchCase(b.copy(caseValue));
-                switchSubStatements.add(switchCase);
+                switchStmts.add(b.case0(b.copy(caseValue)));
             }
         } else {
-            final SwitchCase switchCase = b.switchCase(null);
-            switchSubStatements.add(switchCase);
+            switchStmts.add(b.default0());
         }
 
-        // Process
+        // Add the statement(s) for this case(s)
         boolean isBreakNeeded = true;
-        if (innerStatement instanceof Block) {
-            final Block innerBlock = (Block) innerStatement;
-            for (final Object statement : innerBlock.statements()) {
-                switchSubStatements.add(b.copy((Statement) statement));
+        List<Statement> innerStmts = asList(innerStmt);
+        if (!innerStmts.isEmpty()) {
+            for (final Statement stmt : innerStmts) {
+                switchStmts.add(b.copy(stmt));
             }
-
-            if (!innerBlock.statements().isEmpty()) {
-                isBreakNeeded = !isGotoStatement(innerBlock.statements().get(innerBlock.statements().size() - 1));
-            }
-        } else {
-            switchSubStatements.add(b.copy(innerStatement));
-            isBreakNeeded = !isGotoStatement(innerStatement);
+            final Statement lastStmt = innerStmts.get(innerStmts.size() - 1);
+            isBreakNeeded = !breaksControlFlow(lastStmt);
         }
-
-        // Break
+        //  when required: end with a break;
         if (isBreakNeeded) {
-            switchSubStatements.add(b.break0());
+            switchStmts.add(b.break0());
         }
     }
 
-    private boolean isGotoStatement(final Object lastStatement) {
-        return lastStatement instanceof ReturnStatement || lastStatement instanceof BreakStatement
-                || lastStatement instanceof ContinueStatement || lastStatement instanceof ThrowStatement;
+    private boolean breaksControlFlow(final Statement stmt) {
+        return stmt instanceof ReturnStatement
+                || stmt instanceof BreakStatement
+                || stmt instanceof ContinueStatement
+                || stmt instanceof ThrowStatement;
     }
 
-    private Pair<SimpleName, List<Expression>> getVariableAndValues(final Statement statement) {
-        if ((statement != null) && statement instanceof IfStatement) {
-            final IfStatement ifStatement = (IfStatement) statement;
-            return getVariableAndValue(ifStatement.getExpression());
-        }
-        return null;
-    }
-
-    private Pair<SimpleName, List<Expression>> getVariableAndValue(final Expression expression) {
-        if (expression instanceof ParenthesizedExpression) {
-            return getVariableAndValue(((ParenthesizedExpression) expression).getExpression());
-        } else if (expression instanceof InfixExpression) {
-            return getVariableAndValueFromInfixExpression((InfixExpression) expression);
+    private Variable extractVariableAndValues(final Statement stmt) {
+        if (stmt instanceof IfStatement) {
+            return extractVariableAndValues(((IfStatement) stmt).getExpression());
         }
         return null;
     }
 
-    private Pair<SimpleName, List<Expression>> getVariableAndValueFromInfixExpression(
-            final InfixExpression infixExpression) {
-        if (infixExpression.extendedOperands().isEmpty()
-                && (InfixExpression.Operator.CONDITIONAL_OR.equals(infixExpression.getOperator())
-                || InfixExpression.Operator.OR.equals(infixExpression.getOperator())
-                || InfixExpression.Operator.XOR.equals(infixExpression.getOperator()))) {
-            final Expression firstOperand = infixExpression.getLeftOperand();
-            final Expression secondOperand = infixExpression.getRightOperand();
-            final Pair<SimpleName, List<Expression>> firstVariableAndValue = getVariableAndValue(firstOperand);
-            final Pair<SimpleName, List<Expression>> secondVariableAndValue = getVariableAndValue(secondOperand);
+    private Variable extractVariableAndValues(Expression expr) {
+        final Expression exprNoParen = removeParentheses(expr);
+        return exprNoParen instanceof InfixExpression
+                ? extractVariableAndValuesFromInfixExpression((InfixExpression) exprNoParen)
+                : null;
+    }
 
-            if ((firstVariableAndValue != null) && (secondVariableAndValue != null)
-                    && firstVariableAndValue.getFirst().getIdentifier()
-                            .equals(secondVariableAndValue.getFirst().getIdentifier())
-                    && isSameVariable(firstVariableAndValue.getFirst(), secondVariableAndValue.getFirst())) {
-                final List<Expression> valueCompleteList = new ArrayList<Expression>(firstVariableAndValue.getSecond());
-                valueCompleteList.addAll(secondVariableAndValue.getSecond());
-                return Pair.<SimpleName, List<Expression>> of(firstVariableAndValue.getFirst(), valueCompleteList);
+    private Variable extractVariableAndValuesFromInfixExpression(InfixExpression infixExpr) {
+        final Operator op = infixExpr.getOperator();
+        final Expression leftOp = infixExpr.getLeftOperand();
+        final Expression rightOp = infixExpr.getRightOperand();
+        if (extendedOperands(infixExpr).isEmpty()
+                && (CONDITIONAL_OR.equals(op) || OR.equals(op) || XOR.equals(op))) {
+            final Variable leftVar = extractVariableAndValues(leftOp);
+            final Variable rightVar = extractVariableAndValues(rightOp);
+
+            if (leftVar != null && leftVar.isSameVariable(rightVar)) {
+                return leftVar.mergeValues(rightVar);
             }
-        } else if (InfixExpression.Operator.EQUALS.equals(infixExpression.getOperator())) {
-            final Expression firstOperand = infixExpression.getLeftOperand();
-            final Expression secondOperand = infixExpression.getRightOperand();
-            Pair<SimpleName, List<Expression>> variableAndValue = getVariableAndValue(firstOperand, secondOperand);
-            if (variableAndValue == null) {
-                variableAndValue = getVariableAndValue(secondOperand, firstOperand);
-            }
-            return variableAndValue;
+        } else if (EQUALS.equals(op)) {
+            Variable variable = extractVariableWithConstantValue(leftOp, rightOp);
+            return variable != null ? variable : extractVariableWithConstantValue(rightOp, leftOp);
         }
         return null;
     }
 
-    private Pair<SimpleName, List<Expression>> getVariableAndValue(final Expression firstOperand,
-            final Expression secondOperand) {
-        if (firstOperand instanceof SimpleName && isPrimitive(firstOperand)
-                && (secondOperand instanceof NumberLiteral || secondOperand instanceof CharacterLiteral)) {
-            return Pair.<SimpleName, List<Expression>> of((SimpleName) firstOperand, Arrays.asList(secondOperand));
+    private Variable extractVariableWithConstantValue(Expression firstOp, Expression secondOp) {
+        // TODO JNR handle enums
+        // TODO JNR handle strings
+        if (firstOp instanceof SimpleName && isPrimitive(firstOp)
+                && (secondOp instanceof NumberLiteral || secondOp instanceof CharacterLiteral)) {
+            return new Variable((SimpleName) firstOp, Arrays.asList(secondOp));
         }
         return null;
     }
