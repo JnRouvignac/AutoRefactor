@@ -2,6 +2,7 @@
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
  * Copyright (C) 2016 Fabrice Tiercelin - initial API and implementation
+ * Copyright (C) 2016 Jean-Noël Rouvignac - various fixes
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,9 +25,6 @@
  * available at http://www.eclipse.org/legal/epl-v10.html
  */
 package org.autorefactor.refactoring.rules;
-
-import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -53,6 +51,8 @@ import org.eclipse.jdt.core.dom.SwitchCase;
 import org.eclipse.jdt.core.dom.SwitchStatement;
 import org.eclipse.jdt.core.dom.ThrowStatement;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
+
+import static org.autorefactor.refactoring.ASTHelper.*;
 
 /** See {@link #getDescription()} method. */
 public class SwitchRefactoring extends AbstractRefactoringRule {
@@ -94,7 +94,7 @@ public class SwitchRefactoring extends AbstractRefactoringRule {
             IfStatement currentNode = node;
             boolean hasMoreCases = true;
             while (hasMoreCases && discriminant.getIdentifier().equals(variableAndValues.getFirst().getIdentifier())
-                    && discriminant.resolveTypeBinding().equals(variableAndValues.getFirst().resolveTypeBinding())) {
+                    && haveSameType(discriminant, variableAndValues.getFirst())) {
 
                 // You can't declare two variables with the same name in two
                 // cases
@@ -160,7 +160,7 @@ public class SwitchRefactoring extends AbstractRefactoringRule {
                 boolean isNew = true;
                 for (final Expression alreadyProccessedValue : alreadyProccessedValues) {
                     if (expression.toString().equals(alreadyProccessedValue.toString())
-                            && expression.resolveTypeBinding().equals(alreadyProccessedValue.resolveTypeBinding())) {
+                            && haveSameType(expression, alreadyProccessedValue)) {
                         isNew = false;
                         break;
                     }
@@ -260,19 +260,19 @@ public class SwitchRefactoring extends AbstractRefactoringRule {
 
     private Pair<SimpleName, List<Expression>> getVariableAndValueFromInfixExpression(
             final InfixExpression infixExpression) {
-        if (InfixExpression.Operator.CONDITIONAL_OR.equals(infixExpression.getOperator())
+        if (infixExpression.extendedOperands().isEmpty()
+                && (InfixExpression.Operator.CONDITIONAL_OR.equals(infixExpression.getOperator())
                 || InfixExpression.Operator.OR.equals(infixExpression.getOperator())
-                || InfixExpression.Operator.XOR.equals(infixExpression.getOperator())) {
+                || InfixExpression.Operator.XOR.equals(infixExpression.getOperator()))) {
             final Expression firstOperand = infixExpression.getLeftOperand();
             final Expression secondOperand = infixExpression.getRightOperand();
             final Pair<SimpleName, List<Expression>> firstVariableAndValue = getVariableAndValue(firstOperand);
             final Pair<SimpleName, List<Expression>> secondVariableAndValue = getVariableAndValue(secondOperand);
 
-            if ((firstVariableAndValue != null) && (firstVariableAndValue != null)
+            if ((firstVariableAndValue != null) && (secondVariableAndValue != null)
                     && firstVariableAndValue.getFirst().getIdentifier()
                             .equals(secondVariableAndValue.getFirst().getIdentifier())
-                    && firstVariableAndValue.getFirst().resolveBinding()
-                            .equals(secondVariableAndValue.getFirst().resolveBinding())) {
+                    && isSameVariable(firstVariableAndValue.getFirst(), secondVariableAndValue.getFirst())) {
                 final List<Expression> valueCompleteList = new ArrayList<Expression>(firstVariableAndValue.getSecond());
                 valueCompleteList.addAll(secondVariableAndValue.getSecond());
                 return Pair.<SimpleName, List<Expression>> of(firstVariableAndValue.getFirst(), valueCompleteList);
@@ -291,7 +291,7 @@ public class SwitchRefactoring extends AbstractRefactoringRule {
 
     private Pair<SimpleName, List<Expression>> getVariableAndValue(final Expression firstOperand,
             final Expression secondOperand) {
-        if (firstOperand instanceof SimpleName && ((SimpleName) firstOperand).resolveTypeBinding().isPrimitive()
+        if (firstOperand instanceof SimpleName && isPrimitive(firstOperand)
                 && (secondOperand instanceof NumberLiteral || secondOperand instanceof CharacterLiteral)) {
             return Pair.<SimpleName, List<Expression>> of((SimpleName) firstOperand, Arrays.asList(secondOperand));
         }

@@ -322,9 +322,7 @@ public class CollectionRefactoring extends AbstractRefactoringRule {
     private boolean isSameVariable(ForLoopContent loopContent, final MethodInvocation getMI) {
         if (isMethod(getMI, "java.util.List", "get", "int")
                 && getMI.getExpression() instanceof Name) {
-            final Expression getArg0 = arg0(getMI);
-            return getArg0 instanceof Name
-                    && isSameLocalVariable(getArg0, loopContent.getLoopVariable());
+            return isSameLocalVariable(arg0(getMI), loopContent.getLoopVariable());
         }
         return false;
     }
@@ -349,7 +347,7 @@ public class CollectionRefactoring extends AbstractRefactoringRule {
 
     private boolean isSameLocalVariable(Expression expr, IBinding varBinding) {
         return expr instanceof SimpleName && varBinding instanceof IVariableBinding
-            && ((SimpleName) expr).resolveBinding().equals(varBinding);
+            && varBinding.equals(((SimpleName) expr).resolveBinding());
     }
 
     private boolean isSameLocalVariable(Expression expr1, Expression expr2) {

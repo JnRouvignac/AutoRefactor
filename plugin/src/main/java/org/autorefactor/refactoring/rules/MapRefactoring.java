@@ -140,7 +140,7 @@ public class MapRefactoring extends AbstractRefactoringRule {
 
     private boolean isSameLocalVariable(Expression expr, IBinding varBinding) {
         return expr instanceof SimpleName && varBinding instanceof IVariableBinding
-            && ((SimpleName) expr).resolveBinding().equals(varBinding);
+            && varBinding.equals(((SimpleName) expr).resolveBinding());
     }
 
     @Override

@@ -222,11 +222,6 @@ public class HotSpotIntrinsicedAPIsRefactoring extends AbstractRefactoringRule {
         }
     }
 
-    private static boolean haveSameType(Expression a1, Expression a2) {
-        return a1 != null && a2 != null
-                && equalNotNull(a1.resolveTypeBinding(), a2.resolveTypeBinding());
-    }
-
     private boolean replaceWithSystemArrayCopyCloneAll(ForStatement node, SystemArrayCopyParams params) {
         if (params.srcArrayExpr == null
                 || params.srcPos == null

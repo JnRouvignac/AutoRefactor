@@ -141,6 +141,7 @@ import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 import org.eclipse.jdt.core.dom.WhileStatement;
 import org.eclipse.jdt.core.dom.WildcardType;
 
+import static org.autorefactor.util.Utils.*;
 import static org.eclipse.jdt.core.dom.ASTNode.*;
 
 /** Helper class for manipulating, converting, navigating and checking {@link ASTNode}s. */
@@ -1108,7 +1109,7 @@ public final class ASTHelper {
      * @param typeBinding the type binding to analyze
      * @param oneOfQualifiedTypeNames
      *          the type binding qualified name must be equal to one of these qualified type names
-     * @return true if the provided type binding is exactly one of the provided type, false otherwise
+     * @return {@code true} if the provided type binding is exactly one of the provided type, {@code false} otherwise
      */
     public static boolean hasType(final ITypeBinding typeBinding, String... oneOfQualifiedTypeNames) {
         if (typeBinding != null) {
@@ -1123,11 +1124,25 @@ public final class ASTHelper {
     }
 
     /**
+     * Returns whether the provided expressions evaluate to the same type.
+     *
+     * @param expr1 the first expression to analyze
+     * @param expr2 the second expression to analyze
+     * @return {@code true} if the provided expression evaluates to exactly one of the provided type,
+     *         {@code false} otherwise
+     */
+    public static boolean haveSameType(Expression expr1, Expression expr2) {
+        return expr1 != null && expr2 != null
+                && equalNotNull(expr1.resolveTypeBinding(), expr2.resolveTypeBinding());
+    }
+
+    /**
      * Returns whether the provided expression is an instance of the qualified type name.
      *
      * @param expr the expression to analyze
      * @param qualifiedTypeName the qualified type name
-     * @return true if the provided expression is an instance of the qualified type name, false otherwise
+     * @return {@code true} if the provided expression is an instance of the qualified type name,
+     *         {@code false} otherwise
      */
     public static boolean instanceOf(Expression expr, String qualifiedTypeName) {
         return expr != null && instanceOf(expr.resolveTypeBinding(), qualifiedTypeName);
@@ -1796,6 +1811,17 @@ public final class ASTHelper {
      */
     public static boolean isSameVariable(SimpleName name1, QualifiedName name2) {
         return false;
+    }
+
+    /**
+     * Returns whether the two provided names represent the same variable.
+     *
+     * @param name1 the first name to compare
+     * @param name2 the second name to compare
+     * @return true if the two provided names represent the same variable, false otherwise
+     */
+    public static boolean isSameVariable(SimpleName name1, SimpleName name2) {
+        return areVariableBindingsEqual(name1, name1);
     }
 
     /**
