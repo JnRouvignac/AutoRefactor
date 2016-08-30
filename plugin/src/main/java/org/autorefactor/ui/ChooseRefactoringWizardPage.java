@@ -150,6 +150,7 @@ public class ChooseRefactoringWizardPage extends WizardPage {
     private void createFilterText(Composite parent) {
         filterText = new Text(parent, SWT.BORDER | SWT.SINGLE);
         filterText.setMessage("Type in to filter refactorings");
+        filterText.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
 
         filterText.addKeyListener(new KeyAdapter() {
             @Override
@@ -250,7 +251,7 @@ public class ChooseRefactoringWizardPage extends WizardPage {
 
         final Table table = tableViewer.getTable();
         table.setLinesVisible(true);
-        tableViewer.getControl().setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
+        tableViewer.getControl().setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, true));
         packColumns(table);
         table.setFocus();
     }
