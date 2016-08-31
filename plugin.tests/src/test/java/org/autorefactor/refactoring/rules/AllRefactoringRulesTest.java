@@ -26,10 +26,8 @@
 package org.autorefactor.refactoring.rules;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 import java.util.concurrent.Callable;
 
 import org.autorefactor.refactoring.Release;
@@ -57,10 +55,10 @@ public class AllRefactoringRulesTest {
     private static final String SAMPLES_ALL_BASE_DIR = "../samples/src/test/java/org/autorefactor/refactoring/rules/all";
 
     /** If not empty, then only run the test samples present in this collection. */
-    private static final Collection<String> WHITELIST = Arrays.asList(
+    private static final Collection<Class<?>> WHITELIST = Arrays.<Class<?>> asList(
     );
     /** When {@link #WHITELIST} is empty, the test samples present in this collection will never be run. */
-    private static final Collection<String> BLACKLIST = Arrays.asList(
+    private static final Collection<Class<?>> BLACKLIST = Arrays.<Class<?>> asList(
     );
 
     private final String sampleName;
@@ -71,20 +69,7 @@ public class AllRefactoringRulesTest {
 
     @Parameters//(name = "{0}Refactoring") // requires junit 4.11
     public static Collection<Object[]> data() {
-        final File samplesDir = new File(SAMPLES_ALL_BASE_DIR, "samples_in");
-        final File[] sampleFiles = samplesDir.listFiles(new EndsWithFileFilter("Sample.java"));
-        Arrays.sort(sampleFiles);
-
-        final List<Object[]> output = new ArrayList<Object[]>(sampleFiles.length);
-        for (File file : sampleFiles) {
-            final String fileName = file.getName();
-            if (!WHITELIST.isEmpty()
-                    ? WHITELIST.contains(fileName)
-                    : !BLACKLIST.contains(fileName)) {
-                output.add(new Object[] { file.getName() });
-            }
-        }
-        return output;
+        return samples(SAMPLES_ALL_BASE_DIR, WHITELIST, BLACKLIST);
     }
 
     @Test
@@ -118,7 +103,7 @@ public class AllRefactoringRulesTest {
         new ApplyRefactoringsJob(null, null).applyRefactoring(
                 doc, cu,
                 new AggregateASTVisitor(AllRefactoringRules.getAllRefactoringRules()),
-                newJavaProjectOptions(Release.javaSE("1.5.0"), 4),
+                newJavaProjectOptions(Release.javaSE("1.7.0"), 4),
                 new NullProgressMonitor());
 
         final String actual = normalizeJavaSourceCode(

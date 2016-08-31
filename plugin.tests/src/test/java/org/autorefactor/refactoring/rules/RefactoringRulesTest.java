@@ -26,10 +26,8 @@
 package org.autorefactor.refactoring.rules;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 import java.util.concurrent.Callable;
 
 import org.autorefactor.refactoring.RefactoringRule;
@@ -57,12 +55,12 @@ public class RefactoringRulesTest {
 
     private static final String SAMPLES_BASE_DIR = "../samples/src/test/java/org/autorefactor/refactoring/rules/";
 
-    /** If not empty, then only run the test samples present in this collection. */
-    private static final Collection<String> WHITELIST = Arrays.asList(
+    /** If not empty, then only run the refactorings present in this collection. */
+    private static final Collection<Class<?>> WHITELIST = Arrays.<Class<?>> asList(
     );
-    /** When {@link #WHITELIST} is empty, the test samples present in this collection will never be run. */
-    private static final Collection<String> BLACKLIST = Arrays.asList(
-            "ReduceVariableScopeSample.java"
+    /** When {@link #WHITELIST} is empty, the refactorings present in this collection will never be run. */
+    private static final Collection<Class<?>> BLACKLIST = Arrays.<Class<?>> asList(
+            ReduceVariableScopeRefactoring.class
     );
 
     private final String testName;
@@ -73,31 +71,22 @@ public class RefactoringRulesTest {
 
     @Parameters//(name = "{0}Refactoring") // requires junit 4.11
     public static Collection<Object[]> data() {
-        final File samplesDir = new File(SAMPLES_BASE_DIR, "samples_in");
-        final File[] sampleFiles = samplesDir.listFiles(new EndsWithFileFilter("Sample.java"));
-        Arrays.sort(sampleFiles);
-
-        final List<Object[]> output = new ArrayList<Object[]>(sampleFiles.length);
-        for (File file : sampleFiles) {
-            final String fileName = file.getName();
-            if (!WHITELIST.isEmpty()
-                    ? WHITELIST.contains(fileName)
-                    : !BLACKLIST.contains(fileName)) {
-                output.add(new Object[] { fileName.replace("Sample.java", "") });
-            }
+        Collection<Object[]> samples = samples(SAMPLES_BASE_DIR, WHITELIST, BLACKLIST);
+        for (Object[] sample : samples) {
+            sample[0] = ((String) sample[0]).replace("Sample.java", "");
         }
-        return output;
+        return samples;
     }
 
     @Test
     public void testRefactoring() throws Exception {
-    	runTest(new Callable<Void>() {
-    	    @Override
-    	    public Void call() throws Exception {
-    	        testRefactoring0();
-    	        return null;
-    	    }
-    	});
+        runTest(new Callable<Void>() {
+            @Override
+            public Void call() throws Exception {
+                testRefactoring0();
+                return null;
+            }
+        });
     }
 
     private void testRefactoring0() throws Exception {
