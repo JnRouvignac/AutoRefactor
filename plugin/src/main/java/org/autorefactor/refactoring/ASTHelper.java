@@ -143,6 +143,7 @@ import org.eclipse.jdt.core.dom.WildcardType;
 
 import static org.autorefactor.util.Utils.*;
 import static org.eclipse.jdt.core.dom.ASTNode.*;
+import static org.eclipse.jdt.core.dom.IBinding.*;
 
 /** Helper class for manipulating, converting, navigating and checking {@link ASTNode}s. */
 public final class ASTHelper {
@@ -1233,6 +1234,47 @@ public final class ASTHelper {
             }
         }
         return false;
+    }
+
+    /**
+     * Returns whether the provided binding represents a local variable.
+     *
+     * @param binding the binding to analyze
+     * @return {@code true} if the provided binding represents a local variable, {@code false} otherwise
+     */
+    public static boolean isLocalVariable(IBinding binding) {
+        if (binding != null && binding.getKind() == VARIABLE) {
+            final IVariableBinding bnd = (IVariableBinding) binding;
+            return !bnd.isField() && !bnd.isEnumConstant();
+        }
+        return false;
+    }
+
+    /**
+     * Returns whether the provided binding and expression represent the same local variable.
+     *
+     * @param binding the binding to analyze
+     * @param expr the expression to analyze
+     * @return {@code true} if the provided binding and expression represent the same local variable,
+     *         {@code false} otherwise
+     */
+    public static boolean isSameLocalVariable(IBinding binding, Expression expr) {
+        return isLocalVariable(binding)
+            && expr.getNodeType() == SIMPLE_NAME
+            // no need to use IVariableBinding.isEqualTo(IBinding) since we are looking for a *local* variable
+            && binding.equals(((SimpleName) expr).resolveBinding());
+    }
+
+    /**
+     * Returns whether the provided expressions represent the same local variable.
+     *
+     * @param expr1 the first expression to analyze
+     * @param expr2 the second expression to analyze
+     * @return {@code true} if the provided expressions represent the same local variable, {@code false} otherwise
+     */
+    public static boolean isSameLocalVariable(Expression expr1, Expression expr2) {
+        return expr1.getNodeType() == SIMPLE_NAME
+                && isSameLocalVariable(((SimpleName) expr1).resolveBinding(), expr2);
     }
 
     /**

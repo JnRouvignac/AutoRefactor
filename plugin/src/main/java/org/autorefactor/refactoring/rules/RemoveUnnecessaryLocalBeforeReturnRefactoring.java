@@ -33,9 +33,7 @@ import org.eclipse.jdt.core.dom.ArrayInitializer;
 import org.eclipse.jdt.core.dom.ArrayType;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Expression;
-import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.ReturnStatement;
-import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
@@ -67,7 +65,7 @@ public class RemoveUnnecessaryLocalBeforeReturnRefactoring extends AbstractRefac
             final VariableDeclarationStatement vds = (VariableDeclarationStatement) previousSibling;
             if (fragments(vds).size() == 1) {
                 final VariableDeclarationFragment vdf = fragments(vds).get(0);
-                if (isSameLocalVariableBinding(node.getExpression(), vdf.getName())) {
+                if (isSameLocalVariable(node.getExpression(), vdf.getName())) {
                     final Expression returnExpr = vdf.getInitializer();
                     if (returnExpr instanceof ArrayInitializer) {
                         final ASTBuilder b = ctx.getASTBuilder();
@@ -85,7 +83,7 @@ public class RemoveUnnecessaryLocalBeforeReturnRefactoring extends AbstractRefac
         } else {
             final Assignment as = asExpression(previousSibling, Assignment.class);
             if (hasOperator(as, ASSIGN)
-                    && isSameLocalVariableBinding(node.getExpression(), as.getLeftHandSide())) {
+                    && isSameLocalVariable(node.getExpression(), as.getLeftHandSide())) {
                 final Expression returnExpr = as.getRightHandSide();
                 if (isArray(returnExpr)) {
                     final ASTBuilder b = ctx.getASTBuilder();
@@ -114,18 +112,5 @@ public class RemoveUnnecessaryLocalBeforeReturnRefactoring extends AbstractRefac
         final Refactorings r = ctx.getRefactorings();
         r.remove(previousSibling);
         r.replace(node, b.return0(b.move(returnExpr)));
-    }
-
-    private boolean isSameLocalVariableBinding(Expression expr1, Expression expr2) {
-        if (expr1 instanceof SimpleName && expr2 instanceof SimpleName) {
-            final SimpleName sn1 = (SimpleName) expr1;
-            final SimpleName sn2 = (SimpleName) expr2;
-            final IVariableBinding bnd1 = (IVariableBinding) sn1.resolveBinding();
-            final IVariableBinding bnd2 = (IVariableBinding) sn2.resolveBinding();
-            // to avoid changing the class's behaviour,
-            // we must not remove field's assignment
-            return bnd1 != null && bnd2 != null && !bnd1.isField() && !bnd2.isField() && bnd1.isEqualTo(bnd2);
-        }
-        return false;
     }
 }

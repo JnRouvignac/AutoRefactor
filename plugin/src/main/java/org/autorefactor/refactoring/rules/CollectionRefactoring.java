@@ -79,7 +79,7 @@ public class CollectionRefactoring extends AbstractRefactoringRule {
 
         @Override
         public boolean visit(SimpleName node) {
-            if (isSameLocalVariable(node, variableBinding)) {
+            if (isSameLocalVariable(variableBinding, node)) {
                 useCount++;
             }
             return VISIT_SUBTREE;
@@ -117,7 +117,7 @@ public class CollectionRefactoring extends AbstractRefactoringRule {
                 final Expression lhs = as.getLeftHandSide();
                 if (lhs instanceof SimpleName) {
                     final SimpleName sn = (SimpleName) lhs;
-                    if (isSameLocalVariable(mi.getExpression(), sn.resolveBinding())) {
+                    if (isSameLocalVariable(sn.resolveBinding(), mi.getExpression())) {
                         return replaceInitializer(as.getRightHandSide(), arg0, node);
                     }
                 }
@@ -125,7 +125,7 @@ public class CollectionRefactoring extends AbstractRefactoringRule {
                 final VariableDeclarationStatement vds = (VariableDeclarationStatement) previousStmt;
                 if (vds.fragments().size() == 1) {
                     final VariableDeclarationFragment vdf = fragments(vds).get(0);
-                    if (isSameLocalVariable(mi.getExpression(), vdf.resolveBinding())) {
+                    if (isSameLocalVariable(vdf.resolveBinding(), mi.getExpression())) {
                         return replaceInitializer(vdf.getInitializer(), arg0, node);
                     }
                 }
@@ -216,7 +216,7 @@ public class CollectionRefactoring extends AbstractRefactoringRule {
             } else if (isArray(iterable)) {
                 if (isMethod(mi, "java.util.Collection", "add", "java.lang.Object")
                         && areTypeCompatible(mi.getExpression(), iterable)
-                        && isSameLocalVariable(arg0(mi), node.getParameter().resolveBinding())) {
+                        && isSameLocalVariable(node.getParameter().resolveBinding(), arg0(mi))) {
                     return replaceWithCollectionsAddAll(node, iterable, mi);
                 }
             }
@@ -238,7 +238,7 @@ public class CollectionRefactoring extends AbstractRefactoringRule {
     private boolean replaceWithCollectionMethod(EnhancedForStatement node,
             Expression collection, String methodName, MethodInvocation colMI) {
         final SingleVariableDeclaration foreachVariable = node.getParameter();
-        if (isSameLocalVariable(arg0(colMI), foreachVariable.resolveBinding())) {
+        if (isSameLocalVariable(foreachVariable.resolveBinding(), arg0(colMI))) {
             return replaceWithCollectionMethod(node, methodName,
                     colMI.getExpression(), collection);
         }
@@ -343,22 +343,6 @@ public class CollectionRefactoring extends AbstractRefactoringRule {
                             b.copy(colToAddAll))));
         }
         return DO_NOT_VISIT_SUBTREE;
-    }
-
-    private boolean isSameLocalVariable(Expression expr, IBinding varBinding) {
-        return expr instanceof SimpleName && varBinding instanceof IVariableBinding
-            && varBinding.equals(((SimpleName) expr).resolveBinding());
-    }
-
-    private boolean isSameLocalVariable(Expression expr1, Expression expr2) {
-        if (expr1 instanceof SimpleName && expr2 instanceof SimpleName) {
-            final IBinding binding1 = ((SimpleName) expr1).resolveBinding();
-            final IBinding binding2 = ((SimpleName) expr2).resolveBinding();
-            if (binding1 instanceof IVariableBinding) {
-                return binding1.equals(binding2);
-            }
-        }
-        return false;
     }
 
     @Override

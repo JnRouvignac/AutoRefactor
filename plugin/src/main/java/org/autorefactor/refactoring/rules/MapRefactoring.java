@@ -34,8 +34,6 @@ import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ExpressionStatement;
-import org.eclipse.jdt.core.dom.IBinding;
-import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.SimpleName;
@@ -76,7 +74,7 @@ public class MapRefactoring extends AbstractRefactoringRule {
                 final Expression lhs = as.getLeftHandSide();
                 if (lhs instanceof SimpleName) {
                     final SimpleName sn = (SimpleName) lhs;
-                    if (isSameLocalVariable(mi.getExpression(), sn.resolveBinding())) {
+                    if (isSameLocalVariable(sn.resolveBinding(), mi.getExpression())) {
                         return replaceInitializer(as.getRightHandSide(), arg0, node);
                     }
                 }
@@ -84,7 +82,7 @@ public class MapRefactoring extends AbstractRefactoringRule {
                 final VariableDeclarationStatement vds = (VariableDeclarationStatement) previousStmt;
                 if (vds.fragments().size() == 1) {
                     final VariableDeclarationFragment vdf = fragments(vds).get(0);
-                    if (isSameLocalVariable(mi.getExpression(), vdf.resolveBinding())) {
+                    if (isSameLocalVariable(vdf.resolveBinding(), mi.getExpression())) {
                         return replaceInitializer(vdf.getInitializer(), arg0, node);
                     }
                 }
@@ -136,11 +134,6 @@ public class MapRefactoring extends AbstractRefactoringRule {
             return true;
         }
         return false;
-    }
-
-    private boolean isSameLocalVariable(Expression expr, IBinding varBinding) {
-        return expr instanceof SimpleName && varBinding instanceof IVariableBinding
-            && varBinding.equals(((SimpleName) expr).resolveBinding());
     }
 
     @Override
