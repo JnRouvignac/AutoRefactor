@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2013-2015 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2013-2016 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -45,6 +45,7 @@ import org.autorefactor.refactoring.Refactorings;
 import org.autorefactor.util.AutoRefactorException;
 import org.autorefactor.util.NotImplementedException;
 import org.autorefactor.util.UnhandledException;
+import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.AnnotationTypeDeclaration;
@@ -300,6 +301,10 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     private void logFaultyVisitor(ASTVisitor v, ASTNode node, Exception e) {
+        if (e instanceof OperationCanceledException) {
+            // let the user cancel the current operation
+            throw (OperationCanceledException) e;
+        }
         String message = "Visitor " + v.getClass().getName() + " is faulty,"
                 + " it will be disabled for the rest of this run.";
         logError(message, new UnhandledException(node, message, e));
@@ -1287,6 +1292,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
             }
         }
     }
+
 
     @Override
     public void endVisit(SuperMethodInvocation node) {
