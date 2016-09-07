@@ -1260,6 +1260,7 @@ public final class ASTHelper {
      */
     public static boolean isSameLocalVariable(IBinding binding, Expression expr) {
         return isLocalVariable(binding)
+            && expr != null
             && expr.getNodeType() == SIMPLE_NAME
             // no need to use IVariableBinding.isEqualTo(IBinding) since we are looking for a *local* variable
             && binding.equals(((SimpleName) expr).resolveBinding());
@@ -1273,7 +1274,8 @@ public final class ASTHelper {
      * @return {@code true} if the provided expressions represent the same local variable, {@code false} otherwise
      */
     public static boolean isSameLocalVariable(Expression expr1, Expression expr2) {
-        return expr1.getNodeType() == SIMPLE_NAME
+        return expr1 != null
+                && expr1.getNodeType() == SIMPLE_NAME
                 && isSameLocalVariable(((SimpleName) expr1).resolveBinding(), expr2);
     }
 
