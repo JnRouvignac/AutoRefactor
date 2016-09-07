@@ -65,7 +65,7 @@ public class ReplaceQualifiedNamesBySimpleNamesSample {
     }
 
     private void acceptListString(List<String> l) {
-    	// nothing to do
+        // nothing to do
     }
 
     public boolean removeQualifiedNameForStaticTypeImport(Entry<?, ?> e) {
@@ -149,22 +149,22 @@ public class ReplaceQualifiedNamesBySimpleNamesSample {
         }
     }
 
-	public class Z {
-	    public Integer i;
+    public class Z {
+        public Integer i;
 
-	    private Boolean b() {
-	    	return Boolean.FALSE;
-		}
+        private Boolean b() {
+            return Boolean.FALSE;
+        }
 
-	    public boolean isEqualTo(Z other) {
-	        if (other == null) {
-	            return false;
-	        }
-	        if (this == other) {
-	            return true;
-	        }
-	        return b().equals(other.b())
-	            && i.equals(other.i);
-	    }
-	}
+        public boolean isEqualTo(Z other) {
+            if (other == null) {
+                return false;
+            }
+            if (this == other) {
+                return true;
+            }
+            return b().equals(other.b())
+                && i.equals(other.i);
+        }
+    }
 }
