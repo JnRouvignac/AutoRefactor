@@ -64,10 +64,9 @@ import static org.eclipse.jdt.core.dom.PrefixExpression.Operator.*;
 
 /** See {@link #getDescription()} method. */
 public class CollectionRefactoring extends AbstractRefactoringRule {
-
     private final class VariableUseCounterVisitor extends ASTVisitor {
         private final IBinding variableBinding;
-        private int useCount = 0;
+        private int useCount;
 
         public int getUseCount() {
             return useCount;
@@ -153,7 +152,7 @@ public class CollectionRefactoring extends AbstractRefactoringRule {
             return false;
         }
         final List<Expression> args = arguments(cic);
-        final boolean noArgsCtor = args.size() == 0;
+        final boolean noArgsCtor = args.isEmpty();
         final boolean colCapacityCtor = args.size() == 1 && isPrimitive(args.get(0), "int");
         if (noArgsCtor && hasType(cic,
                 "java.util.concurrent.ConcurrentLinkedDeque",
@@ -250,15 +249,16 @@ public class CollectionRefactoring extends AbstractRefactoringRule {
         final ForLoopContent loopContent = iterateOverContainer(node);
         final List<Statement> stmts = asList(node.getBody());
         if (loopContent != null
+                && loopContent.getLoopVariable() != null
                 && stmts.size() == 1) {
-
             final Name loopVariable = loopContent.getLoopVariable();
             final IBinding loopVariableName = ((SimpleName) loopVariable).resolveBinding();
             // We should remove all the loop variable occurrences
             // As we replace only one, there should be no more than one occurrence
             if (getVariableUseCount(loopVariableName, node.getBody()) == 1) {
                 final MethodInvocation mi = asExpression(stmts.get(0), MethodInvocation.class);
-                if (COLLECTION.equals(loopContent.getContainerType())) {
+                switch (loopContent.getContainerType()) {
+                case COLLECTION:
                     if (isMethod(mi, "java.util.Collection", "add", "java.lang.Object")) {
                         return replaceWithCollectionMethod(node, loopContent, "addAll", mi);
                     } else if (isMethod(mi, "java.util.Collection", "contains", "java.lang.Object")) {
@@ -266,7 +266,8 @@ public class CollectionRefactoring extends AbstractRefactoringRule {
                     } else if (isMethod(mi, "java.util.Collection", "remove", "java.lang.Object")) {
                         return replaceWithCollectionMethod(node, loopContent, "removeAll", mi);
                     }
-                } else if (ARRAY.equals(loopContent.getContainerType())) {
+                    break;
+                case ARRAY:
                     if (isMethod(mi, "java.util.Collection", "add", "java.lang.Object")
                             && areTypeCompatible(mi.getExpression(), loopContent.getContainerVariable())) {
                         final Expression addArg0 = arg0(mi);
@@ -275,6 +276,7 @@ public class CollectionRefactoring extends AbstractRefactoringRule {
                             return replaceWithCollectionsAddAll(node, loopContent.getContainerVariable(), mi);
                         }
                     }
+                    break;
                 }
             }
         }
@@ -320,11 +322,9 @@ public class CollectionRefactoring extends AbstractRefactoringRule {
     }
 
     private boolean isSameVariable(ForLoopContent loopContent, final MethodInvocation getMI) {
-        if (isMethod(getMI, "java.util.List", "get", "int")
-                && getMI.getExpression() instanceof Name) {
-            return isSameLocalVariable(arg0(getMI), loopContent.getLoopVariable());
-        }
-        return false;
+        return isMethod(getMI, "java.util.List", "get", "int")
+                && getMI.getExpression() instanceof Name
+                && isSameLocalVariable(arg0(getMI), loopContent.getLoopVariable());
     }
 
     private boolean replaceWithCollectionMethod(ASTNode toReplace, String methodName,

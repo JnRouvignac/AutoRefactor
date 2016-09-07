@@ -103,8 +103,14 @@ public class CollectionSample {
     public void doNotRefactorForLoopWithListUsingLoopIterator(
             Map<String, List<String>> mapToFill, List<String> inputList) {
         String input = null;
-        for (Iterator<String> iterator = inputList.iterator(); iterator.hasNext(); input = iterator.next()) {
+        for (Iterator<String> it = inputList.iterator(); it.hasNext(); input = it.next()) {
             mapToFill.get(input).add(input);
+        }
+    }
+
+    public void doNotRefactorForLoopWithListUsingLoopIterator(List<String> col) {
+        for (Iterator<String> it = col.iterator(); it.hasNext();) {
+            System.out.println(it.next());
         }
     }
 
