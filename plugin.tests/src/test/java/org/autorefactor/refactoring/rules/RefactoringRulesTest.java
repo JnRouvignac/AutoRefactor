@@ -98,7 +98,10 @@ public class RefactoringRulesTest {
 
         final String refactoringClassname = testName + "Refactoring";
         final RefactoringRule refactoring = getRefactoringClass(refactoringClassname);
-        assertNotNull(testName + ": refactoring class " + refactoringClassname + " should exist", refactoring);
+        assertNotNull(testName + ": refactoring class " + refactoringClassname + " should exist.\n"
+                + "Make sure you added it to the method getAllRefactoringRules() "
+                + "of the " + AllRefactoringRules.class + ".",
+                refactoring);
 
         final String sampleInSource = readAll(sampleIn);
         final String sampleOutSource = readAll(sampleOut);
