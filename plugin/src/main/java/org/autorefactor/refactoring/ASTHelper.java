@@ -1430,10 +1430,10 @@ public final class ASTHelper {
     }
 
     /**
-     * Returns whether the provided method invocation invokes a method with the provided method signature.
+     * Returns whether the provided method has the provided method signature.
      * The method signature is compared against the erasure of the invoked method.
      *
-     * @param node the method invocation to compare
+     * @param methodBinding the method binding node to compare
      * @param typeQualifiedName the qualified name of the type declaring the method
      * @param methodName the method name
      * @param parameterTypesQualifiedNames the qualified names of the parameter types
