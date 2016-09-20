@@ -454,4 +454,13 @@ public class Refactorings {
             throw ex;
         }
     }
+
+    /**
+     * Gets the ASTRewrite rewrite object.
+     *
+     * @return the ASTRewrite rewrite
+     */
+    public ASTRewrite getRewrite() {
+        return rewrite;
+    }
 }
