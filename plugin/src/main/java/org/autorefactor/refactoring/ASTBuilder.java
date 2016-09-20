@@ -25,6 +25,7 @@
  */
 package org.autorefactor.refactoring;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -47,9 +48,11 @@ import org.eclipse.jdt.core.dom.CatchClause;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ExpressionStatement;
+import org.eclipse.jdt.core.dom.IExtendedModifier;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.MarkerAnnotation;
+import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Modifier;
 import org.eclipse.jdt.core.dom.Name;
@@ -66,6 +69,7 @@ import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.StringLiteral;
 import org.eclipse.jdt.core.dom.StructuralPropertyDescriptor;
+import org.eclipse.jdt.core.dom.SuperMethodInvocation;
 import org.eclipse.jdt.core.dom.SwitchCase;
 import org.eclipse.jdt.core.dom.SwitchStatement;
 import org.eclipse.jdt.core.dom.ThisExpression;
@@ -75,6 +79,7 @@ import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
+import org.eclipse.jdt.core.dom.Modifier.ModifierKeyword;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.autorefactor.util.Utils.*;
@@ -912,5 +917,64 @@ public class ASTBuilder {
         default:
             return expr;
         }
+    }
+
+    /**
+     * Builds a new {@link Statement} instance which is basically a newline.
+     *
+     * @return a newline statement
+     */
+    public Statement newlinePlaceholder() {
+        return (Statement) this.refactorings.getRewrite().createStringPlaceholder("\n", ASTNode.EMPTY_STATEMENT);
+    }
+
+    /**
+     * Builds a new {@link Modifier} with keyword protected.
+     *
+     * @return a protected modifier
+     */
+    public Modifier protected0() {
+        return getAST().newModifier(ModifierKeyword.PROTECTED_KEYWORD);
+    }
+
+    /**
+     * Helper to create a list of modifiers.
+     *
+     * @param modifiers the list of modifiers
+     * @return a new list of modifiers
+     */
+    public List<IExtendedModifier> modifiersList(IExtendedModifier... modifiers) {
+        return Arrays.asList(modifiers);
+    }
+
+    /**
+     * Builds a new super method invocation.
+     *
+     * @param methodName name of the method to be invoked
+     * @return expression with a method invocation
+     */
+    public Expression superInvoke(String methodName) {
+        SuperMethodInvocation smi = getAST().newSuperMethodInvocation();
+        smi.setName(simpleName(methodName));
+        return smi;
+    }
+
+    /**
+     * Builds a new {@link MethodDeclaration} node.
+     *
+     * @param modifiers list of modifiers of the method
+     * @param methodName the method name
+     * @param parameters list of parameters
+     * @param block the block of the method
+     * @return a new method declaration
+     */
+    public MethodDeclaration method(List<IExtendedModifier> modifiers, String methodName,
+            List<SingleVariableDeclaration> parameters, Block block) {
+        MethodDeclaration md = getAST().newMethodDeclaration();
+        md.modifiers().addAll(modifiers);
+        md.setName(simpleName(methodName));
+        md.parameters().addAll(parameters);
+        md.setBody(block);
+        return md;
     }
 }

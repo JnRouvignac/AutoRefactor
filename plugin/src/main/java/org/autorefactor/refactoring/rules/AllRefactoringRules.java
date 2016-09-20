@@ -115,6 +115,7 @@ public final class AllRefactoringRules {
                 new TestNGAssertRefactoring(),
                 new ReplaceQualifiedNamesBySimpleNamesRefactoring(),
                 new RemoveEmptyLinesRefactoring(),
+                new AndroidWakeLockRefactoring(),
                 new SwitchRefactoring());
     }
 
