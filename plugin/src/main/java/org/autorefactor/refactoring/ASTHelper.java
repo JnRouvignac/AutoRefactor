@@ -1439,12 +1439,8 @@ public final class ASTHelper {
      * @param parameterTypesQualifiedNames the qualified names of the parameter types
      * @return true if the provided method invocation matches the provided method signature, false otherwise
      */
-    public static boolean isMethod(MethodInvocation node, String typeQualifiedName,
+    public static boolean isMethod(IMethodBinding methodBinding, String typeQualifiedName,
             String methodName, String... parameterTypesQualifiedNames) {
-        if (node == null) {
-            return false;
-        }
-        final IMethodBinding methodBinding = node.resolveMethodBinding();
         // let's do the fast checks first
         if (methodBinding == null
                 || !methodName.equals(methodBinding.getName())
@@ -1465,6 +1461,25 @@ public final class ASTHelper {
         IMethodBinding overriddenMethod = findOverridenMethod(declaringClazz, typeQualifiedName,
                 methodName, parameterTypesQualifiedNames);
         return overriddenMethod != null && methodBinding.overrides(overriddenMethod);
+    }
+    
+    /**
+     * Returns whether the provided method invocation invokes a method with the provided method signature.
+     * The method signature is compared against the erasure of the invoked method.
+     *
+     * @param node the method invocation to compare
+     * @param typeQualifiedName the qualified name of the type declaring the method
+     * @param methodName the method name
+     * @param parameterTypesQualifiedNames the qualified names of the parameter types
+     * @return true if the provided method invocation matches the provided method signature, false otherwise
+     */
+    public static boolean isMethod(MethodInvocation node, String typeQualifiedName,
+            String methodName, String... parameterTypesQualifiedNames) {
+        if (node == null) {
+            return false;
+        }
+        final IMethodBinding methodBinding = node.resolveMethodBinding();
+        return isMethod(methodBinding, typeQualifiedName, methodName, parameterTypesQualifiedNames);
     }
 
     private static boolean parameterTypesMatch(ITypeBinding implementedType,
