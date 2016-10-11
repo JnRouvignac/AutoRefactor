@@ -831,6 +831,7 @@ public final class ASTHelper {
 
     /**
      * Returns the first ancestor of the provided node which has the required type.
+     * Throws exception if ancestor not found.
      *
      * @param <T> the required ancestor's type
      * @param node the start node
@@ -840,15 +841,34 @@ public final class ASTHelper {
      */
     @SuppressWarnings("unchecked")
     public static <T extends ASTNode> T getAncestor(ASTNode node, Class<T> ancestorClazz) {
-        if (node == null || node.getParent() == null) {
+        T ancestor = getAncestorOrNull(node, ancestorClazz);
+        if (ancestor == null) {
             throw new IllegalStateException(node,
                     "Could not find any ancestor for " + ancestorClazz + "and node " + node);
+        }
+        return ancestor;
+    }
+
+    /**
+     * Returns the first ancestor of the provided node which has the required type.
+     *
+     * @param <T> the required ancestor's type
+     * @param node the start node
+     * @param ancestorClazz the required ancestor's type
+     * @return the first ancestor of the provided node which has the required type.
+     * Returns null if ancestor not found.
+     * @see #getFirstAncestorOrNull(ASTNode, Class...)
+     */
+    @SuppressWarnings("unchecked")
+    public static <T extends ASTNode> T getAncestorOrNull(ASTNode node, Class<T> ancestorClazz) {
+        if (node == null || node.getParent() == null) {
+            return null;
         }
         final ASTNode parent = node.getParent();
         if (ancestorClazz.isAssignableFrom(parent.getClass())) {
             return (T) parent;
         }
-        return getAncestor(parent, ancestorClazz);
+        return getAncestorOrNull(parent, ancestorClazz);
     }
 
     /**
