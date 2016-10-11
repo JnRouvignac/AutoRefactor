@@ -113,6 +113,7 @@ public final class AllRefactoringRules {
                 new ReplaceQualifiedNamesBySimpleNamesRefactoring(),
                 new RemoveEmptyLinesRefactoring(),
                 new AndroidWakeLockRefactoring(),
+                new AndroidViewHolderRefactoring(),
                 new SwitchRefactoring());
     }
 

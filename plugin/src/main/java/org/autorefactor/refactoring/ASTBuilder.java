@@ -58,7 +58,9 @@ import org.eclipse.jdt.core.dom.MarkerAnnotation;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Modifier;
+import org.eclipse.jdt.core.dom.Modifier.ModifierKeyword;
 import org.eclipse.jdt.core.dom.Name;
+import org.eclipse.jdt.core.dom.NullLiteral;
 import org.eclipse.jdt.core.dom.NumberLiteral;
 import org.eclipse.jdt.core.dom.ParameterizedType;
 import org.eclipse.jdt.core.dom.ParenthesizedExpression;
@@ -1079,6 +1081,15 @@ public class ASTBuilder {
     }
 
     /**
+     * Builds a new {@link Modifier} with keyword static.
+     *
+     * @return a static modifier
+     */
+    public Modifier static0() {
+        return getAST().newModifier(ModifierKeyword.STATIC_KEYWORD);
+    }
+
+    /**
      * Builds a new super method invocation.
      *
      * @param methodName name of the method to be invoked
@@ -1107,5 +1118,14 @@ public class ASTBuilder {
         md.parameters().addAll(parameters);
         md.setBody(block);
         return md;
+    }
+
+    /**
+     * Builds a new {@link NullLiteral}.
+     *
+     * @return a null literal
+     */
+    public NullLiteral null0() {
+        return getAST().newNullLiteral();
     }
 }
