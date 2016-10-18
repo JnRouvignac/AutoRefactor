@@ -112,6 +112,7 @@ public final class AllRefactoringRules {
                 new TestNGAssertRefactoring(),
                 new ReplaceQualifiedNamesBySimpleNamesRefactoring(),
                 new RemoveEmptyLinesRefactoring(),
+                new AndroidDrawAllocationRefactoring(),
                 new AndroidWakeLockRefactoring(),
                 new AndroidViewHolderRefactoring(),
                 new SwitchRefactoring());
