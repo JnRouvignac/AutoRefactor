@@ -35,6 +35,7 @@ import java.util.Set;
 import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.ASTHelper;
 import org.autorefactor.util.NotImplementedException;
+import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.BreakStatement;
@@ -115,14 +116,13 @@ public class SwitchRefactoring extends AbstractRefactoringRule {
 
     private static final class VariableDeclarationIdentifierVisitor extends ASTVisitor {
         private Set<String> variableNames = new HashSet<String>();
-        private Statement startNode = null;
+        private Statement startNode;
 
         public Set<String> getVariableNames() {
             return variableNames;
         }
 
         public VariableDeclarationIdentifierVisitor(Statement node) {
-            super();
             startNode = node;
         }
 
@@ -134,18 +134,21 @@ public class SwitchRefactoring extends AbstractRefactoringRule {
 
         @Override
         public boolean visit(Block node) {
-            if (startNode == node) {
-                return VISIT_SUBTREE;
-            }
-            return DO_NOT_VISIT_SUBTREE;
+            return startNode == node ? VISIT_SUBTREE : DO_NOT_VISIT_SUBTREE;
         }
     }
 
     private static final class HasUnlabeledBreakVisitor extends ASTVisitor {
-        private boolean hasUnlabeledBreak = false;
+        private boolean hasUnlabeledBreak;
 
         public boolean hasUnlabeledBreak() {
             return hasUnlabeledBreak;
+        }
+
+        @Override
+        public boolean preVisit2(ASTNode node) {
+            // if an unlabeled break exists then exit has fast as possible
+            return hasUnlabeledBreak ? DO_NOT_VISIT_SUBTREE : VISIT_SUBTREE;
         }
 
         @Override
@@ -159,26 +162,31 @@ public class SwitchRefactoring extends AbstractRefactoringRule {
 
         @Override
         public boolean visit(DoStatement node) {
-            return DO_NOT_VISIT_SUBTREE;
+            return ignoreUnlabledBreaksInInnerBreakableStatement();
         }
 
         @Override
         public boolean visit(EnhancedForStatement node) {
-            return DO_NOT_VISIT_SUBTREE;
+            return ignoreUnlabledBreaksInInnerBreakableStatement();
         }
 
         @Override
         public boolean visit(ForStatement node) {
-            return DO_NOT_VISIT_SUBTREE;
+            return ignoreUnlabledBreaksInInnerBreakableStatement();
         }
 
         @Override
         public boolean visit(SwitchStatement node) {
-            return DO_NOT_VISIT_SUBTREE;
+            return ignoreUnlabledBreaksInInnerBreakableStatement();
         }
 
         @Override
         public boolean visit(WhileStatement node) {
+            return ignoreUnlabledBreaksInInnerBreakableStatement();
+        }
+
+        private boolean ignoreUnlabledBreaksInInnerBreakableStatement() {
+            // unlabeled breaks in inner loops/switchs work ok with switch refactoring rule
             return DO_NOT_VISIT_SUBTREE;
         }
     }
