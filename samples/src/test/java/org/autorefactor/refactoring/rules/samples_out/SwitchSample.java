@@ -171,7 +171,7 @@ public class SwitchSample {
 
     public void replaceIfKeepExistingControlFlowBreaks(int i1) {
         int j = 0;
-        for (int i = 0; i < 10; i++) {
+        loop: for (int i = 0; i < 10; i++) {
             switch (i1) {
             case 0:
                 j = 0;
@@ -181,7 +181,7 @@ public class SwitchSample {
                 continue;
             case 2:
                 j = 20;
-                break;
+                break loop;
             case 3:
                 j = 25;
                 j = 30;
@@ -196,6 +196,84 @@ public class SwitchSample {
                 }
                 break;
             }
+        }
+    }
+
+    public void doNotReplaceWithOuterLoopBreak(int i1) {
+        int j = 0;
+        for (int i = 0; i < 10; i++) {
+            if (i1 == 0) {
+                j = 0;
+            } else if (i1 == 1) {
+                j = 10;
+            } else if (2 == i1) {
+                j = 20;
+            } else if (i1 == 3) {
+                j = 25;
+                j = 30;
+            } else if (4 == i1) {
+                j = 40;
+            } else if (5 == i1) {
+                j = 50;
+                break;
+            }
+        }
+    }
+
+    public void replaceWithInnerLoopBreak(int i1) {
+        int j = 0;
+        switch (i1) {
+        case 0:
+            j = 0;
+            break;
+        case 1:
+            j = 10;
+            int k = 0;
+            do {
+                if (j == i1) {
+                    break;
+                }
+                k++;
+            } while (k < j);
+            break;
+        case 2:
+            j = 20;
+            for (int l = 0; l < j; l++) {
+                if (j == i1) {
+                    break;
+                }
+            }
+            break;
+        case 3:
+            j = 25;
+            j = 30;
+            int m = 0;
+            while (m < j) {
+                if (j == i1) {
+                    break;
+                }
+                m++;
+            }
+            break;
+        case 4:
+            j = 40;
+            for (int o : new int[] { 1, 2, 3 }) {
+                if (o == i1) {
+                    break;
+                }
+            }
+            break;
+        case 5:
+            j = 50;
+            switch (j) {
+            case 0:
+                j = 0;
+                break;
+            case 1:
+                j = 10;
+                break;
+            }
+            break;
         }
     }
 
@@ -225,6 +303,22 @@ public class SwitchSample {
         } else if (i1 == 1) {
             int integer1 = 10;
             i = integer1;
+        }
+    }
+
+    public void replaceWhenOutOfScopeVariableNameConflicts(int i1) {
+        int i = 0;
+        switch (i1) {
+        case 0:
+            for (int l = 0; l < i; l++) {
+                int integer1 = 0;
+                i = integer1;
+            }
+            break;
+        case 1:
+            int integer1 = 10;
+            i = integer1;
+            break;
         }
     }
 
