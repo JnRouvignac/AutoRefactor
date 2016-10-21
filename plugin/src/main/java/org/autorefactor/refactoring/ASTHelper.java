@@ -1441,11 +1441,8 @@ public final class ASTHelper {
      */
     public static boolean isMethod(MethodInvocation node, String typeQualifiedName,
             String methodName, String... parameterTypesQualifiedNames) {
-        if (node == null) {
-            return false;
-        }
-        final IMethodBinding methodBinding = node.resolveMethodBinding();
-        return isMethod(methodBinding, typeQualifiedName, methodName, parameterTypesQualifiedNames);
+        return node != null
+        		&& isMethod(node.resolveMethodBinding(), typeQualifiedName, methodName, parameterTypesQualifiedNames);
     }
     
     /**
