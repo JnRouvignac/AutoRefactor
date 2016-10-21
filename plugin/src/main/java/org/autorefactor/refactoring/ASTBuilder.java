@@ -25,6 +25,7 @@
  */
 package org.autorefactor.refactoring;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -260,6 +261,18 @@ public class ASTBuilder {
         return cc;
     }
 
+    /**
+     * Returns a copy of the provided {@link Expression} list.
+     * @param expList the list of Expressions to be copied
+     * @return copy of the list
+     */
+    public List<Expression> copyList(List<Expression> expList) {
+        List<Expression> result = new ArrayList<Expression>(expList.size());
+        for (Expression e: expList) {
+            result.add(copy(e));
+        }
+        return result;
+    }
     /**
      * Returns a copy of the provided {@link ASTNode}.
      *
