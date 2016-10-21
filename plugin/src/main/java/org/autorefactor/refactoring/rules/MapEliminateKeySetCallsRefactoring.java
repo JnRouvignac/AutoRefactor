@@ -1,7 +1,8 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2016 Zsombor Gegesy
+ * Copyright (C) 2016 Zsombor Gegesy - initial API and implementation
+ * Copyright (C) 2016 Jean-Noël Rouvignac - code cleanups
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,16 +24,13 @@
  * which accompanies this distribution under LICENSE-ECLIPSE, and is
  * available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.autorefactor.refactoring.rules;
 
-import static org.autorefactor.refactoring.ASTHelper.isMethod;
-
 import org.autorefactor.refactoring.ASTBuilder;
-import org.autorefactor.refactoring.ASTHelper;
-import org.autorefactor.refactoring.Refactorings;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
+
+import static org.autorefactor.refactoring.ASTHelper.*;
 
 /** See {@link #getDescription()} method. */
 @SuppressWarnings("javadoc")
@@ -41,52 +39,50 @@ public class MapEliminateKeySetCallsRefactoring extends AbstractRefactoringRule 
     @Override
     public String getDescription() {
         return ""
-                + "Map related refactorings:\n"
-                + "- replaces calling methods on the keySet, which are just delegate methods on the underlying Map\n";
+                + "Directly invoke methods on Map rather than on Map.keySet() where possible\n";
     }
 
     @Override
     public String getName() {
-        return "MapKeySet";
+        return "Replace useless calls to Map.keySet() when direct calls to the Map are possible";
     }
 
     @Override
     public boolean visit(MethodInvocation mi) {
-        Expression otherExpression = mi.getExpression();
-        if (otherExpression instanceof MethodInvocation) {
-            MethodInvocation parentMethodInv = (MethodInvocation) otherExpression;
-            if (isMethod(parentMethodInv, "java.util.Map", "keySet")) {
+        Expression miExpr = mi.getExpression();
+        if (miExpr instanceof MethodInvocation) {
+            MethodInvocation parentMi = (MethodInvocation) miExpr;
+            if (isMethod(parentMi, "java.util.Map", "keySet")) {
                 if (isMethod(mi, "java.util.Set", "clear")) {
-                    replace(parentMethodInv, mi, "clear");
-                    return ASTHelper.DO_NOT_VISIT_SUBTREE;
+                    removeInvocationOfMapKeySet(parentMi, mi, "clear");
+                    return DO_NOT_VISIT_SUBTREE;
                 }
                 if (isMethod(mi, "java.util.Set", "size")) {
-                    replace(parentMethodInv, mi, "size");
-                    return ASTHelper.DO_NOT_VISIT_SUBTREE;
+                    removeInvocationOfMapKeySet(parentMi, mi, "size");
+                    return DO_NOT_VISIT_SUBTREE;
                 }
                 if (isMethod(mi, "java.util.Set", "isEmpty")) {
-                    replace(parentMethodInv, mi, "isEmpty");
-                    return ASTHelper.DO_NOT_VISIT_SUBTREE;
+                    removeInvocationOfMapKeySet(parentMi, mi, "isEmpty");
+                    return DO_NOT_VISIT_SUBTREE;
                 }
                 if (isMethod(mi, "java.util.Set", "remove", "java.lang.Object")) {
-                    replace(parentMethodInv, mi, "remove");
-                    return ASTHelper.DO_NOT_VISIT_SUBTREE;
+                    removeInvocationOfMapKeySet(parentMi, mi, "remove");
+                    return DO_NOT_VISIT_SUBTREE;
                 }
                 if (isMethod(mi, "java.util.Set", "contains", "java.lang.Object")) {
-                    replace(parentMethodInv, mi, "containsKey");
-                    return ASTHelper.DO_NOT_VISIT_SUBTREE;
+                    removeInvocationOfMapKeySet(parentMi, mi, "containsKey");
+                    return DO_NOT_VISIT_SUBTREE;
                 }
             }
-
         }
-        return ASTHelper.VISIT_SUBTREE;
+        return VISIT_SUBTREE;
     }
 
-    private void replace(MethodInvocation first, MethodInvocation last, String name) {
-        final Refactorings r = this.ctx.getRefactorings();
-        final ASTBuilder b = this.ctx.getASTBuilder();
-
-        r.replace(last, b.invoke(b.copyExpression(first), name, b.copyList(last.arguments())));
+    private void removeInvocationOfMapKeySet(
+            MethodInvocation mapKeySetMi, MethodInvocation actualMi, String methodName) {
+        final ASTBuilder b = ctx.getASTBuilder();
+        ctx.getRefactorings().replace(
+                actualMi,
+                b.invoke(b.copyExpression(mapKeySetMi), methodName, b.copyRange(arguments(actualMi))));
     }
-
 }

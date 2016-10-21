@@ -1,7 +1,8 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2016 Zsombor Gegesy
+ * Copyright (C) 2016 Zsombor Gegesy - initial API and implementation
+ * Copyright (C) 2016 Jean-Noël Rouvignac - code cleanups
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,16 +24,12 @@
  * which accompanies this distribution under LICENSE-ECLIPSE, and is
  * available at http://www.eclipse.org/legal/epl-v10.html
  */
-
 package org.autorefactor.refactoring.rules.samples_out;
 
-import java.util.HashMap;
 import java.util.Map;
-import java.util.TreeMap;
 
 public class MapEliminateKeySetCallsSample {
-
-    public int avoidKeySetManipulation(Map<String, String> map) {
+    public int replaceUnnecesaryCallsToMapKeySet(Map<String, String> map) {
         int x = map.size();
         if (map.containsKey("hello")) {
             map.remove("hello");
@@ -43,29 +40,4 @@ public class MapEliminateKeySetCallsSample {
         }
         return x;
     }
-
-    public int avoidKeySetManipulationOnHashMap(HashMap<String, String> map) {
-        int x = map.size();
-        if (map.containsKey("hello")) {
-            map.remove("hello");
-        }
-        map.clear();
-        if (map.isEmpty()) {
-            x++;
-        }
-        return x;
-    }
-
-    public int avoidKeySetManipulationOnTreeMap(TreeMap<String, String> map) {
-        int x = map.size();
-        if (map.containsKey("hello")) {
-            map.remove("hello");
-        }
-        map.clear();
-        if (map.isEmpty()) {
-            x++;
-        }
-        return x;
-    }
-
 }
