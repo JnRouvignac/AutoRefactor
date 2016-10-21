@@ -91,6 +91,7 @@ public final class AllRefactoringRules {
                 new CollectionContainsRefactoring(),
                 new CollectionRefactoring(),
                 new MapRefactoring(),
+                new MapEliminateKeySetCallsRefactoring(),
                 new NoAssignmentInIfConditionRefactoring(),
                 new IfElseIfRefactoring(),
                 new CommonIfInIfElseRefactoring(),
