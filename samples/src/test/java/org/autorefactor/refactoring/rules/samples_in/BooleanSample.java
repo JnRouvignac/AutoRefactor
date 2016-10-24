@@ -147,22 +147,99 @@ public class BooleanSample {
         return Boolean.TRUE;
     }
 
-    public void removeUselessUseOfTernaryOperatorWithBooleanPrimitive1(
-            boolean bo) {
+    public void removeUselessTernaryOperatorWithBooleanPrimitive1(boolean bo) {
         boolean b = bo ? true : false;
     }
 
-    public void removeUselessUseOfTernaryOperatorWithBooleanPrimitive2(
-            boolean bo) {
+    public void removeUselessTernaryOperatorWithBooleanPrimitive2(boolean bo) {
         boolean b = bo ? false : true;
     }
 
-    public void removeUselessUseOfTernaryOperatorWithBooleanObject1(boolean bo) {
+    public void removeUselessTernaryOperatorWithBooleanObject1(boolean bo) {
         Boolean b = bo ? Boolean.TRUE : Boolean.FALSE;
     }
 
-    public void removeUselessUseOfTernaryOperatorWithBooleanObject2(boolean bo) {
+    public void removeUselessTernaryOperatorWithBooleanObject2(boolean bo) {
         Boolean b = bo ? Boolean.FALSE : Boolean.TRUE;
+    }
+
+    public void replaceTernaryOperatorByAndOperator(boolean bo1, boolean bo2) {
+        boolean b = bo1 ? bo2 : false;
+    }
+
+    public void replaceTernaryOperatorByAndOperator2(boolean bo1, boolean bo2) {
+        boolean b = bo1 ? false : bo2;
+    }
+
+    public void replaceTernaryOperatorByOrOperator(boolean bo1, boolean bo2) {
+        boolean b = bo1 ? true : bo2;
+    }
+
+    public void replaceTernaryOperatorByOrOperator2(boolean bo1, boolean bo2) {
+        boolean b = bo1 ? bo2 : true;
+    }
+
+    public void replaceTernaryOperatorByAndOperatorWithObjectConstant(
+            boolean bo1, boolean bo2) {
+        Boolean b = bo1 ? bo2 : Boolean.FALSE;
+    }
+
+    public void replaceTernaryOperatorByAndOperatorWithObjectConstant2(
+            boolean bo1, boolean bo2) {
+        Boolean b = bo1 ? Boolean.FALSE : bo2;
+    }
+
+    public void replaceTernaryOperatorByOrOperatorWithObjectConstant(
+            boolean bo1, boolean bo2) {
+        Boolean b = bo1 ? Boolean.TRUE : bo2;
+    }
+
+    public void replaceTernaryOperatorByOrOperatorWithObjectConstant2(
+            boolean bo1, boolean bo2) {
+        Boolean b = bo1 ? bo2 : Boolean.TRUE;
+    }
+
+    public void replaceTernaryOperatorByAndOperatorWithObject(
+            Boolean bo1, Boolean bo2) {
+        Boolean b = bo1 ? bo2 : false;
+    }
+
+    public void replaceTernaryOperatorByAndOperatorWithObject2(
+            Boolean bo1, Boolean bo2) {
+        Boolean b = bo1 ? false : bo2;
+    }
+
+    public void replaceTernaryOperatorByOrOperatorWithObject(
+            Boolean bo1, Boolean bo2) {
+        Boolean b = bo1 ? true : bo2;
+    }
+
+    public void replaceTernaryOperatorByOrOperatorWithObject2(
+            Boolean bo1, Boolean bo2) {
+        Boolean b = bo1 ? bo2 : true;
+    }
+
+    public void doNotReplacePossibleNullObject(Boolean bo1, Boolean bo2) {
+        Boolean b = bo1 ? bo2 : Boolean.FALSE;
+        b = bo1 ? Boolean.FALSE : bo2;
+        b = bo1 ? Boolean.TRUE : bo2;
+        b = bo1 ? bo2 : Boolean.TRUE;
+    }
+
+    public void replaceTernaryOperatorByAndOperatorWithExpression(int i1, int i2) {
+        Boolean b = (i1 == 1) ? (i2 == 2) : Boolean.FALSE;
+    }
+
+    public void replaceTernaryOperatorByAndOperatorWithExpression2(int i1, int i2) {
+        Boolean b = (i1 == 1) ? Boolean.FALSE : (i2 == 2);
+    }
+
+    public void replaceTernaryOperatorByOrOperatorWithExpression(int i1, int i2) {
+        Boolean b = (i1 == 1) ? Boolean.TRUE : (i2 == 2);
+    }
+
+    public void replaceTernaryOperatorByOrOperatorWithExpression2(int i1, int i2) {
+        Boolean b = (i1 == 1) ? (i2 == 2) : Boolean.TRUE;
     }
 
     public void doNotRemoveIfInBooleanPrimitiveAssignment1(boolean bo) {
@@ -400,7 +477,8 @@ public class BooleanSample {
             Boolean b;
         }
         ClassWithBooleanField objWithBooleanField = new ClassWithBooleanField();
-        return bo ? objWithBooleanField.b : Boolean.TRUE;
+        Boolean aBoolean = Boolean.TRUE;
+        return bo ? objWithBooleanField.b : aBoolean;
     }
 
     protected boolean aMethodThatReturnsBoolean() {
