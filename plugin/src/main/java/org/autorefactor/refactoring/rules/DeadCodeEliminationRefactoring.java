@@ -269,7 +269,9 @@ public class DeadCodeEliminationRefactoring extends AbstractRefactoringRule {
             if (bodyMi != null) {
                 IMethodBinding bodyMethodBinding = bodyMi.resolveMethodBinding();
                 IMethodBinding declMethodBinding = node.resolveBinding();
-                if (declMethodBinding.overrides(bodyMethodBinding)
+                if (declMethodBinding != null
+                        && bodyMethodBinding != null
+                        && declMethodBinding.overrides(bodyMethodBinding)
                         && !hasSignificantAnnotations(declMethodBinding)
                         && haveSameModifiers(bodyMethodBinding, declMethodBinding)) {
                     if (Modifier.isProtected(declMethodBinding.getModifiers())
