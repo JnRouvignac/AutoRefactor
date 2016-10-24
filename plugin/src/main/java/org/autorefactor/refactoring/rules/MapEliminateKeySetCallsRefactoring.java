@@ -26,11 +26,24 @@
  */
 package org.autorefactor.refactoring.rules;
 
-import org.autorefactor.refactoring.ASTBuilder;
-import org.eclipse.jdt.core.dom.Expression;
-import org.eclipse.jdt.core.dom.MethodInvocation;
+import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.arguments;
+import static org.autorefactor.refactoring.ASTHelper.isMethod;
 
-import static org.autorefactor.refactoring.ASTHelper.*;
+import org.autorefactor.refactoring.ASTBuilder;
+import org.autorefactor.refactoring.ASTHelper;
+import org.eclipse.jdt.core.dom.AST;
+import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.ASTVisitor;
+import org.eclipse.jdt.core.dom.Block;
+import org.eclipse.jdt.core.dom.EnhancedForStatement;
+import org.eclipse.jdt.core.dom.Expression;
+import org.eclipse.jdt.core.dom.ITypeBinding;
+import org.eclipse.jdt.core.dom.MethodInvocation;
+import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
+import org.eclipse.jdt.core.dom.Statement;
+import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
 /** See {@link #getDescription()} method. */
 @SuppressWarnings("javadoc")
@@ -50,39 +63,140 @@ public class MapEliminateKeySetCallsRefactoring extends AbstractRefactoringRule 
     @Override
     public boolean visit(MethodInvocation mi) {
         Expression miExpr = mi.getExpression();
-        if (miExpr instanceof MethodInvocation) {
+        if (isKeySetMethod(miExpr)) {
             MethodInvocation parentMi = (MethodInvocation) miExpr;
-            if (isMethod(parentMi, "java.util.Map", "keySet")) {
-                if (isMethod(mi, "java.util.Set", "clear")) {
-                    removeInvocationOfMapKeySet(parentMi, mi, "clear");
-                    return DO_NOT_VISIT_SUBTREE;
-                }
-                if (isMethod(mi, "java.util.Set", "size")) {
-                    removeInvocationOfMapKeySet(parentMi, mi, "size");
-                    return DO_NOT_VISIT_SUBTREE;
-                }
-                if (isMethod(mi, "java.util.Set", "isEmpty")) {
-                    removeInvocationOfMapKeySet(parentMi, mi, "isEmpty");
-                    return DO_NOT_VISIT_SUBTREE;
-                }
-                if (isMethod(mi, "java.util.Set", "remove", "java.lang.Object")) {
-                    removeInvocationOfMapKeySet(parentMi, mi, "remove");
-                    return DO_NOT_VISIT_SUBTREE;
-                }
-                if (isMethod(mi, "java.util.Set", "contains", "java.lang.Object")) {
-                    removeInvocationOfMapKeySet(parentMi, mi, "containsKey");
-                    return DO_NOT_VISIT_SUBTREE;
-                }
+            if (isMethod(mi, "java.util.Set", "clear")) {
+                removeInvocationOfMapKeySet(parentMi, mi, "clear");
+                return DO_NOT_VISIT_SUBTREE;
+            }
+            if (isMethod(mi, "java.util.Set", "size")) {
+                removeInvocationOfMapKeySet(parentMi, mi, "size");
+                return DO_NOT_VISIT_SUBTREE;
+            }
+            if (isMethod(mi, "java.util.Set", "isEmpty")) {
+                removeInvocationOfMapKeySet(parentMi, mi, "isEmpty");
+                return DO_NOT_VISIT_SUBTREE;
+            }
+            if (isMethod(mi, "java.util.Set", "remove", "java.lang.Object")) {
+                removeInvocationOfMapKeySet(parentMi, mi, "remove");
+                return DO_NOT_VISIT_SUBTREE;
+            }
+            if (isMethod(mi, "java.util.Set", "contains", "java.lang.Object")) {
+                removeInvocationOfMapKeySet(parentMi, mi, "containsKey");
+                return DO_NOT_VISIT_SUBTREE;
             }
         }
         return VISIT_SUBTREE;
     }
 
-    private void removeInvocationOfMapKeySet(
-            MethodInvocation mapKeySetMi, MethodInvocation actualMi, String methodName) {
+    private boolean isKeySetMethod(Expression expr) {
+        if (expr instanceof MethodInvocation) {
+            return isMethod((MethodInvocation) expr, "java.util.Map", "keySet");
+        }
+        return false;
+    }
+
+    @Override
+    public boolean visit(EnhancedForStatement enhancedFor) {
+        if (isKeySetMethod(enhancedFor.getExpression())) {
+            // From 'for (K key : map.keySet()) { }'
+            // -> mapExpression become 'map', parameter become 'K key'
+            final Expression mapExpression = ((MethodInvocation) enhancedFor.getExpression()).getExpression();
+            final SingleVariableDeclaration parameter = enhancedFor.getParameter();
+
+            final ITypeBinding valueType = findAndRefactor(mapExpression, parameter, enhancedFor.getBody());
+            if (valueType != null) {
+
+                final ASTBuilder b = ctx.getASTBuilder();
+                final AST ast = ctx.getAST();
+                final EnhancedForStatement newFor = ast.newEnhancedForStatement();
+                newFor.setExpression(b.invoke(b.copy(mapExpression), "entrySet"));
+                newFor.setParameter(b.declareSingleVariable(b.simpleName("entry"), "Map.Entry",
+                        getFriendlyTypeName(parameter.getType().resolveBinding()), getFriendlyTypeName(valueType)));
+
+                final Statement newBody = b.copy(enhancedFor.getBody());
+
+                // Declare 'KeyType' 'oldLoopVariable' = entry.getKey();
+                final VariableDeclarationStatement newKeyDeclaration = b.declareStmt(
+                        getFriendlyTypeName(parameter.getType().resolveBinding()),
+                        b.copy(parameter.getName()),
+                        b.invoke(b.name("entry"), "getKey"));
+
+                newFor.setBody(newBody);
+                ctx.getRefactorings().insertBefore(newKeyDeclaration,
+                        (ASTNode) ((Block) enhancedFor.getBody()).statements().get(0));
+                ctx.getRefactorings().replace(enhancedFor, newFor);
+                return DO_NOT_VISIT_SUBTREE;
+            }
+        }
+
+        return VISIT_SUBTREE;
+    }
+
+    /**
+     * @param typeBinding
+     * @return a short name, for classes in the java. packages, otherwise a fully qualified name.
+     */
+    private String getFriendlyTypeName(ITypeBinding typeBinding) {
+        final String name = typeBinding.getQualifiedName();
+        if (name.startsWith("java.")) {
+            return typeBinding.getName();
+        } else {
+            // TODO: fix to import the necessary type, if not found
+            return name;
+        }
+    }
+
+    /**
+     * Class to find map.get(loopVariable) construct in the AST tree, and collect the type of the value,
+     * which is unknown till one is located.
+     *
+     */
+    class FindExpression extends ASTVisitor {
+
+        private final Expression mapExpression;
+        private final SingleVariableDeclaration parameter;
+        private ITypeBinding valueType;
+
+        public FindExpression(Expression mapExpression, SingleVariableDeclaration parameter) {
+            this.mapExpression = mapExpression;
+            this.parameter = parameter;
+        }
+
+        @Override
+        public boolean visit(MethodInvocation node) {
+            if (ASTHelper.isSameVariable(node.getExpression(), mapExpression)) {
+                if (isMethod(node, "java.util.Map", "get", "java.util.Object")) {
+                    final ASTNode getArgument = (ASTNode) node.arguments().get(0);
+                    if (ASTHelper.isSameVariable(getArgument, parameter.getName())) {
+
+                        // collect the value type
+                        valueType = node.resolveTypeBinding();
+                        final ASTBuilder b = ctx.getASTBuilder();
+                        ctx.getRefactorings().replace(node, b.invoke(b.name("entry"), "getValue"));
+                        return DO_NOT_VISIT_SUBTREE;
+                    }
+                }
+            }
+            return VISIT_SUBTREE;
+        }
+
+        public ITypeBinding getValueType() {
+            return valueType;
+        }
+    }
+
+    private ITypeBinding findAndRefactor(Expression mapExpression, SingleVariableDeclaration parameter,
+            Statement body) {
+        final FindExpression finder = new FindExpression(mapExpression, parameter);
+        body.accept(finder);
+        return finder.getValueType();
+    }
+
+    private void removeInvocationOfMapKeySet(MethodInvocation mapKeySetMi, MethodInvocation actualMi,
+            String methodName) {
         final ASTBuilder b = ctx.getASTBuilder();
-        ctx.getRefactorings().replace(
-                actualMi,
-                b.invoke(b.copyExpression(mapKeySetMi), methodName, b.copyRange(arguments(actualMi))));
+        ctx.getRefactorings().replace(actualMi, b.invoke(b.copyExpression(mapKeySetMi), methodName,
+                b.copyRange(arguments(actualMi))));
     }
 }
