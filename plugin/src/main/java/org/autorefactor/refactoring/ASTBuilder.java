@@ -54,10 +54,12 @@ import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Modifier;
 import org.eclipse.jdt.core.dom.Name;
 import org.eclipse.jdt.core.dom.NumberLiteral;
+import org.eclipse.jdt.core.dom.ParameterizedType;
 import org.eclipse.jdt.core.dom.ParenthesizedExpression;
 import org.eclipse.jdt.core.dom.PrefixExpression;
 import org.eclipse.jdt.core.dom.PrimitiveType;
 import org.eclipse.jdt.core.dom.PrimitiveType.Code;
+import org.eclipse.jdt.core.dom.QualifiedName;
 import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.SimpleType;
@@ -238,7 +240,24 @@ public class ASTBuilder {
             }
             return ast.newSimpleType(ast.newSimpleName(name));
         } else {
-            throw new NotImplementedException(null);
+            Type type = ast.newSimpleType(ast.newSimpleName(names[0]));
+            for (int i = 1; i < names.length; i++) {
+                type = ast.newQualifiedType(type, ast.newSimpleName(names[i]));
+            }
+            return type;
+        }
+    }
+
+    private Type genericType(String typeName, String... parameterTypes) {
+        Type type = type(typeName);
+        if (parameterTypes.length > 0) {
+            ParameterizedType parameterizedType = ast.newParameterizedType(type);
+            for (String parameterType : parameterTypes) {
+                parameterizedType.typeArguments().add(type(parameterType));
+            }
+            return parameterizedType;
+        } else {
+            return type;
         }
     }
 
@@ -452,6 +471,25 @@ public class ASTBuilder {
 
     private Modifier final0() {
         return ast.newModifier(FINAL_KEYWORD);
+    }
+
+    /**
+     * Builds a new {@link SingleVariableDeclaration} instance.
+     *
+     * @param varName
+     *            the declared variable name
+     * @param typeName
+     *            the declared variable type
+     * @param parameterTypes
+     *            The generic type parameters
+     * @return a new single variable declaration, used in enhanced for loops.
+     */
+    public SingleVariableDeclaration declareSingleVariable(SimpleName varName, String typeName,
+            String... parameterTypes) {
+        final SingleVariableDeclaration svd = ast.newSingleVariableDeclaration();
+        svd.setName(varName);
+        svd.setType(genericType(typeName, parameterTypes));
+        return svd;
     }
 
     /**

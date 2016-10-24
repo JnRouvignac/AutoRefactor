@@ -26,6 +26,7 @@
  */
 package org.autorefactor.refactoring.rules.samples_in;
 
+import java.util.Iterator;
 import java.util.Map;
 
 public class MapEliminateKeySetCallsSample {
@@ -40,4 +41,29 @@ public class MapEliminateKeySetCallsSample {
         }
         return x;
     }
+
+    public void iterate(Map<String, Long> map) {
+        for (String key : map.keySet()) {
+            System.out.println("hello "+map.get("name"));
+            if (map.get(key).longValue() > 0) {
+                System.out.println("the value of "+ key + " is " + map.get(key));
+            }
+        }
+    }
+
+    public void justListKeys(Map<String, Long> map) {
+        for (String key : map.keySet()) {
+            System.out.println("key is "+key);
+        }
+    }
+
+    public void iterateOldWay(Map<String, Long> map) {
+        for (Iterator<String> iter = map.keySet().iterator(); iter.hasNext();) {
+            String key = iter.next();
+            if (map.get(key).longValue() > 0) {
+                System.out.println(map.get(key));
+            }
+        }
+    }
+
 }
