@@ -1446,6 +1446,22 @@ public final class ASTHelper {
     }
 
     /**
+     * Returns whether the provided method declaration declares a method with the provided method signature.
+     * The method signature is compared against the erasure of the declared method.
+     *
+     * @param node the method declaration to compare
+     * @param typeQualifiedName the qualified name of the type declaring the method
+     * @param methodName the method name
+     * @param parameterTypesQualifiedNames the qualified names of the parameter types
+     * @return true if the provided method declaration matches the provided method signature, false otherwise
+     */
+    public static boolean isMethod(MethodDeclaration node, String typeQualifiedName,
+            String methodName, String... parameterTypesQualifiedNames) {
+        return node != null
+                && isMethod(node.resolveBinding(), typeQualifiedName, methodName, parameterTypesQualifiedNames);
+    }
+
+    /**
      * Returns whether the provided method binding has the provided method signature.
      * The method signature is compared against the erasure of the invoked method.
      *

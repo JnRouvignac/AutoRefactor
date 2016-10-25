@@ -539,7 +539,7 @@ public class ASTBuilder {
         final MethodInvocation mi = ast.newMethodInvocation();
         mi.setExpression(expression);
         mi.setName(ast.newSimpleName(methodName));
-        addAll(arguments, mi);
+        addAll(mi, arguments);
         return mi;
     }
 
@@ -640,7 +640,7 @@ public class ASTBuilder {
         }
     }
 
-    private <E extends Expression> void addAll(List<E> arguments, MethodInvocation mi) {
+    private <E extends Expression> void addAll(MethodInvocation mi, List<E> arguments) {
         if (!isEmptyRangeCopy(arguments)) {
             arguments(mi).addAll(arguments);
         }
