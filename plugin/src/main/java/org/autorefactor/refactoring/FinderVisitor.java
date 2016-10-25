@@ -25,11 +25,10 @@
  */
 package org.autorefactor.refactoring;
 
-import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
-
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
+
+import static org.autorefactor.refactoring.ASTHelper.*;
 
 /**
  * A visitor that stops visiting as fast as possible once a result has been found.
@@ -43,33 +42,26 @@ public class FinderVisitor<R> extends ASTVisitor {
     private R result;
 
     /**
-     * Returns the result.
-     *
-     * @return the result
-     */
-    public R result() {
-        return result;
-    }
-
-    /**
-     * Sets the default result.
-     *
-     * @param result the result
-     * @return this visitor
-     */
-    public FinderVisitor<R> defaultResult(R result) {
-        this.result = result;
-        return this;
-    }
-
-    /**
      * Sets the result.
      *
      * @param result the result
      */
-    public void setResult(R result) {
+    protected void setResult(R result) {
         this.resultFound = true;
         this.result = result;
+    }
+
+    /**
+     * Calls {@link ASTNode#accept(ASTVisitor)} on the provided node
+     * and returns the found result if one exists, or the default value.
+     *
+     * @param node the node to accept
+     * @param defaultResult the default result if no result could be found
+     * @return the result found, or the default result when none exist
+     */
+    public R findOrDefault(final ASTNode node, final R defaultResult) {
+        node.accept(this);
+        return resultFound ? result : defaultResult;
     }
 
     @Override

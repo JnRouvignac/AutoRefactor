@@ -230,10 +230,7 @@ public class SwitchRefactoring extends AbstractRefactoringRule {
     }
 
     private boolean hasUnlabeledBreak(final IfStatement node) {
-        final FinderVisitor<Boolean> finderVisitor =
-                new HasUnlabeledBreakVisitor().defaultResult(false);
-        node.accept(finderVisitor);
-        return finderVisitor.result();
+        return new HasUnlabeledBreakVisitor().findOrDefault(node, false);
     }
 
     private boolean havaSameIdentifier(final SimpleName sn1, SimpleName sn2) {
