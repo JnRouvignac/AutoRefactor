@@ -143,6 +143,10 @@ public class Refactorings {
         return getListRewrite(child.getParent(), (ChildListPropertyDescriptor) child.getLocationInParent());
     }
 
+    private ListRewrite getListRewrite(ASTNode listHolder, StructuralPropertyDescriptor locationInParent) {
+        return getListRewrite(listHolder, (ChildListPropertyDescriptor) locationInParent);
+    }
+
     private ListRewrite getListRewrite(ASTNode node, ChildListPropertyDescriptor listProperty) {
         final Pair<ASTNode, ChildListPropertyDescriptor> key = Pair.of(node, listProperty);
         ListRewrite listRewrite = listRewriteCache.get(key);
@@ -298,18 +302,17 @@ public class Refactorings {
     }
 
     /**
-     * Inserts the provided node at a specified location in a node.
+     * Inserts the provided node at the specified index of the list in a node.
      *
+     * @param listHolder the node holding the list where to insert
+     * @param locationInParent the insert location description
      * @param nodeToInsert the node to insert
      * @param index the index where to insert the node in the list
-     * @param locationInParent the insert location description
-     * @param listHolder the node holding the list where to insert
      * @see ListRewrite#insertAt(ASTNode, int, org.eclipse.text.edits.TextEditGroup)
      */
-    public void insertAt(ASTNode nodeToInsert, int index, StructuralPropertyDescriptor locationInParent,
-            ASTNode listHolder) {
-        final ListRewrite listRewrite = getListRewrite(listHolder, (ChildListPropertyDescriptor) locationInParent);
-        listRewrite.insertAt(nodeToInsert, index, null);
+    public void insertAt(
+            ASTNode listHolder, StructuralPropertyDescriptor locationInParent, ASTNode nodeToInsert, int index) {
+        getListRewrite(listHolder, locationInParent).insertAt(nodeToInsert, index, null);
         addRefactoredNodes(listHolder);
     }
 
@@ -335,6 +338,44 @@ public class Refactorings {
     public void insertAfter(ASTNode nodeToInsert, ASTNode element) {
         getListRewrite(element).insertAfter(nodeToInsert, element, null);
         addRefactoredNodes(element.getParent());
+    }
+
+    /**
+     * Inserts the provided node as the first element of the list in a node.
+     *
+     * @param listHolder the node holding the list where to insert
+     * @param locationInParent the insert location description
+     * @param nodeToInsert the node to insert
+     * @see ListRewrite#insertFirst(ASTNode, int, org.eclipse.text.edits.TextEditGroup)
+     */
+    public void insertFirst(ASTNode listHolder, StructuralPropertyDescriptor locationInParent, ASTNode nodeToInsert) {
+        getListRewrite(listHolder, locationInParent).insertFirst(nodeToInsert, null);
+        addRefactoredNodes(listHolder);
+    }
+
+    /**
+     * Inserts the provided node as the last element of the list in a node.
+     *
+     * @param listHolder the node holding the list where to insert
+     * @param locationInParent the insert location description
+     * @param nodeToInsert the node to insert
+     * @see ListRewrite#insertLast(ASTNode, int, org.eclipse.text.edits.TextEditGroup)
+     */
+    public void insertLast(ASTNode listHolder, StructuralPropertyDescriptor locationInParent, ASTNode nodeToInsert) {
+        getListRewrite(listHolder, locationInParent).insertLast(nodeToInsert, null);
+        addRefactoredNodes(listHolder);
+    }
+
+    /**
+     * Moves the old node to the new index in the parents' list.
+     *
+     * @param oldNode the old node containing the old location
+     * @param newIndex the new index for the node in the parent's list
+     * @param movedNode the old node which has been moved using
+     *            {@link org.autorefactor.refactoring.ASTBuilder#move(ASTNode)}
+     */
+    public void moveToIndex(ASTNode oldNode, int newIndex, ASTNode movedNode) {
+        insertAt(oldNode.getParent(), oldNode.getLocationInParent(), movedNode, newIndex);
     }
 
     /**

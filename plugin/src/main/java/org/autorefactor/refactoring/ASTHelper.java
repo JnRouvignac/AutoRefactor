@@ -144,6 +144,7 @@ import org.eclipse.jdt.core.dom.WildcardType;
 import static org.autorefactor.util.Utils.*;
 import static org.eclipse.jdt.core.dom.ASTNode.*;
 import static org.eclipse.jdt.core.dom.IBinding.*;
+import static org.eclipse.jdt.core.dom.InfixExpression.Operator.NOT_EQUALS;
 
 /** Helper class for manipulating, converting, navigating and checking {@link ASTNode}s. */
 public final class ASTHelper {
@@ -645,6 +646,30 @@ public final class ASTHelper {
      */
     @SuppressWarnings("unchecked")
     public static List<IExtendedModifier> modifiers(SingleVariableDeclaration node) {
+        return node.modifiers();
+    }
+
+    /**
+     * Generecized version of the equivalent JDT method.
+     *
+     * @param node the node on which to call the equivalent JDT method
+     * @return a List of expressions
+     * @see VariableDeclarationExpression#modifiers()
+     */
+    @SuppressWarnings("unchecked")
+    public static List<IExtendedModifier> modifiers(VariableDeclarationExpression node) {
+        return node.modifiers();
+    }
+
+    /**
+     * Generecized version of the equivalent JDT method.
+     *
+     * @param node the node on which to call the equivalent JDT method
+     * @return a List of expressions
+     * @see VariableDeclarationStatement#modifiers()
+     */
+    @SuppressWarnings("unchecked")
+    public static List<IExtendedModifier> modifiers(VariableDeclarationStatement node) {
         return node.modifiers();
     }
 
@@ -1394,6 +1419,44 @@ public final class ASTHelper {
     }
 
     /**
+     * Returns the null-checked expression if the provided node is a null check.
+     *
+     * @param expr the suspected null-checked expression
+     * @return the null-checked expression if the provided node is a null-check,
+     *         or {@code null} otherwise.
+     */
+    public static Expression getNullCheckedExpression(Expression expr) {
+        final Expression e = removeParentheses(expr);
+        if (e instanceof InfixExpression) {
+            final InfixExpression ie = (InfixExpression) e;
+            if (hasOperator(ie, NOT_EQUALS) && checkNoExtendedOperands(ie)) {
+                if (isNullLiteral(ie.getLeftOperand())) {
+                    return ie.getRightOperand();
+                } else if (isNullLiteral(ie.getRightOperand())) {
+                    return ie.getLeftOperand();
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Extended operands are used for deeply nested expressions, mostly string concatenation expressions.
+     * <p>
+     * This will be implemented only if somebody comes up with code where the runtime exception is thrown.
+     * </p>
+     *
+     * @param node the infix expression that must not have extended operands
+     * @return {@code true}, or it throws
+     */
+    public static boolean checkNoExtendedOperands(InfixExpression node) {
+        if (!hasType(node, "java.lang.String") && node.hasExtendedOperands()) {
+            throw new NotImplementedException(node, "for extended operands");
+        }
+        return true;
+    }
+
+    /**
      * Returns whether the provided node defines a loop.
      *
      * @param node the node
@@ -1443,6 +1506,22 @@ public final class ASTHelper {
             String methodName, String... parameterTypesQualifiedNames) {
         return node != null
                 && isMethod(node.resolveMethodBinding(), typeQualifiedName, methodName, parameterTypesQualifiedNames);
+    }
+
+    /**
+     * Returns whether the provided method declaration declares a method with the provided method signature.
+     * The method signature is compared against the erasure of the declared method.
+     *
+     * @param node the method declaration to compare
+     * @param typeQualifiedName the qualified name of the type declaring the method
+     * @param methodName the method name
+     * @param parameterTypesQualifiedNames the qualified names of the parameter types
+     * @return true if the provided method declaration matches the provided method signature, false otherwise
+     */
+    public static boolean isMethod(MethodDeclaration node, String typeQualifiedName,
+            String methodName, String... parameterTypesQualifiedNames) {
+        return node != null
+                && isMethod(node.resolveBinding(), typeQualifiedName, methodName, parameterTypesQualifiedNames);
     }
 
     /**
@@ -1966,6 +2045,22 @@ public final class ASTHelper {
     public static boolean isSameVariable(FieldAccess field1, FieldAccess field2) {
         return areVariableBindingsEqual(field1, field2)
                 && isSameVariable(field1.getExpression(), field2.getExpression());
+    }
+
+    /**
+     * Returns whether the provided nodes all represent the same variable.
+     *
+     * @param node0 the first node to compare
+     * @param otherNodes the other nodes to compare
+     * @return true if all the provided nodes represent the same variable, false otherwise
+     */
+    public static boolean areSameVariables(final ASTNode node0, final ASTNode... otherNodes) {
+        for (ASTNode nodeN : otherNodes) {
+            if (!isSameVariable(node0, nodeN)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**

@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.ListIterator;
 
 import org.autorefactor.refactoring.ASTBuilder;
-import org.autorefactor.util.NotImplementedException;
 import org.autorefactor.util.Pair;
 import org.eclipse.jdt.core.dom.ASTMatcher;
 import org.eclipse.jdt.core.dom.ASTNode;
@@ -407,19 +406,6 @@ public class SimplifyExpressionRefactoring extends AbstractRefactoringRule {
         this.ctx.getRefactorings().replace(e, b.parenthesize(b.copy(e)));
     }
 
-    /**
-     * Extended operands are used for deeply nested expressions, mostly string concatenation expressions.
-     * <p>
-     * This will be implemented only if somebody comes up with code where the runtime exception is thrown.
-     * </p>
-     */
-    private boolean checkNoExtendedOperands(InfixExpression node) {
-        if (!hasType(node, "java.lang.String") && node.hasExtendedOperands()) {
-            throw new NotImplementedException(node, "for extended operands");
-        }
-        return true;
-    }
-
     private boolean replace(InfixExpression node, boolean negate, Expression exprToCopy) {
         checkNoExtendedOperands(node);
         if (!isPrimitive(node.getLeftOperand(), "boolean")
@@ -476,19 +462,5 @@ public class SimplifyExpressionRefactoring extends AbstractRefactoringRule {
             }
         }
         return false;
-    }
-
-    private Expression getNullCheckedExpression(Expression e) {
-        if (e instanceof InfixExpression) {
-            final InfixExpression expr = (InfixExpression) e;
-            if (hasOperator(expr, NOT_EQUALS) && checkNoExtendedOperands(expr)) {
-                if (isNullLiteral(expr.getLeftOperand())) {
-                    return expr.getRightOperand();
-                } else if (isNullLiteral(expr.getRightOperand())) {
-                    return expr.getLeftOperand();
-                }
-            }
-        }
-        return null;
     }
 }

@@ -172,7 +172,7 @@ public class RemoveUselessModifiersRefactoring extends AbstractRefactoringRule {
         if (!modifiers.equals(reorderedModifiers)) {
             final int startSize = getStartSize(node.modifiers(), modifiers);
             for (int i = startSize; i < reorderedModifiers.size(); i++) {
-                insertAt(reorderedModifiers.get(i), i);
+                moveToIndex(reorderedModifiers.get(i), i);
                 result = DO_NOT_VISIT_SUBTREE;
             }
         }
@@ -196,9 +196,9 @@ public class RemoveUselessModifiersRefactoring extends AbstractRefactoringRule {
         return l.size();
     }
 
-    private void insertAt(Modifier m, int index) {
-        final ASTBuilder b = this.ctx.getASTBuilder();
-        this.ctx.getRefactorings().insertAt(b.move(m), index, m.getLocationInParent(), m.getParent());
+    private void moveToIndex(Modifier m, int index) {
+        final ASTBuilder b = ctx.getASTBuilder();
+        ctx.getRefactorings().moveToIndex(m, index, b.move(m));
     }
 
     @Override

@@ -34,8 +34,8 @@ import java.util.Set;
 
 import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.ASTHelper;
+import org.autorefactor.refactoring.FinderVisitor;
 import org.autorefactor.util.NotImplementedException;
-import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.BreakStatement;
@@ -138,23 +138,11 @@ public class SwitchRefactoring extends AbstractRefactoringRule {
         }
     }
 
-    private static final class HasUnlabeledBreakVisitor extends ASTVisitor {
-        private boolean hasUnlabeledBreak;
-
-        public boolean hasUnlabeledBreak() {
-            return hasUnlabeledBreak;
-        }
-
-        @Override
-        public boolean preVisit2(ASTNode node) {
-            // if an unlabeled break exists then exit has fast as possible
-            return hasUnlabeledBreak ? DO_NOT_VISIT_SUBTREE : VISIT_SUBTREE;
-        }
-
+    private static final class HasUnlabeledBreakVisitor extends FinderVisitor<Boolean> {
         @Override
         public boolean visit(BreakStatement node) {
             if (node.getLabel() == null) {
-                hasUnlabeledBreak = true;
+                setResult(true);
                 return DO_NOT_VISIT_SUBTREE;
             }
             return VISIT_SUBTREE;
@@ -205,9 +193,7 @@ public class SwitchRefactoring extends AbstractRefactoringRule {
 
     @Override
     public boolean visit(final IfStatement node) {
-        HasUnlabeledBreakVisitor hasUnlabeledBreakVisitor = new HasUnlabeledBreakVisitor();
-        node.accept(hasUnlabeledBreakVisitor);
-        if (hasUnlabeledBreakVisitor.hasUnlabeledBreak()) {
+        if (hasUnlabeledBreak(node)) {
             return VISIT_SUBTREE;
         }
 
@@ -241,6 +227,10 @@ public class SwitchRefactoring extends AbstractRefactoringRule {
 
         final List<RewrittenCase> filteredCases = filterDuplicateCaseValues(cases);
         return maybeReplaceWithSwitchStmt(node, switchExpr, filteredCases, remainingStmt);
+    }
+
+    private boolean hasUnlabeledBreak(final IfStatement node) {
+        return new HasUnlabeledBreakVisitor().findOrDefault(node, false);
     }
 
     private boolean havaSameIdentifier(final SimpleName sn1, SimpleName sn2) {
