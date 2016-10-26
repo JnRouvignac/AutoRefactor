@@ -101,10 +101,10 @@ public class VectorOldToNewAPIRefactoring extends AbstractRefactoringRule {
         assertSize(args, 2);
         final Expression arg1 = args.get(1);
 
-        final ASTBuilder b = this.ctx.getASTBuilder();
-        final Refactorings r = this.ctx.getRefactorings();
+        final ASTBuilder b = ctx.getASTBuilder();
+        final Refactorings r = ctx.getRefactorings();
         r.set(node, NAME_PROPERTY, b.simpleName(newMethodName));
-        r.insertAt(b.move(arg1), 0, arg1.getLocationInParent(), arg1.getParent());
+        r.moveToIndex(arg1, 0, b.move(arg1));
         return DO_NOT_VISIT_SUBTREE;
     }
 
