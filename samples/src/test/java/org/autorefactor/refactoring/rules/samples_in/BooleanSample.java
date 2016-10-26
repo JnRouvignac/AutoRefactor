@@ -477,8 +477,7 @@ public class BooleanSample {
             Boolean b;
         }
         ClassWithBooleanField objWithBooleanField = new ClassWithBooleanField();
-        Boolean aBoolean = Boolean.TRUE;
-        return bo ? objWithBooleanField.b : aBoolean;
+        return bo ? objWithBooleanField.b : Boolean.TRUE;
     }
 
     protected boolean aMethodThatReturnsBoolean() {
