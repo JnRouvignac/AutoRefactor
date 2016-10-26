@@ -51,6 +51,7 @@ import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.MarkerAnnotation;
 import org.eclipse.jdt.core.dom.MethodInvocation;
+import org.eclipse.jdt.core.dom.Modifier;
 import org.eclipse.jdt.core.dom.Name;
 import org.eclipse.jdt.core.dom.NumberLiteral;
 import org.eclipse.jdt.core.dom.ParenthesizedExpression;
@@ -71,12 +72,14 @@ import org.eclipse.jdt.core.dom.ThisExpression;
 import org.eclipse.jdt.core.dom.ThrowStatement;
 import org.eclipse.jdt.core.dom.TryStatement;
 import org.eclipse.jdt.core.dom.Type;
+import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.autorefactor.util.Utils.*;
 import static org.eclipse.jdt.core.dom.ASTNode.*;
+import static org.eclipse.jdt.core.dom.Modifier.ModifierKeyword.FINAL_KEYWORD;
 import static org.eclipse.jdt.core.dom.PrefixExpression.Operator.*;
 
 /**
@@ -389,13 +392,66 @@ public class ASTBuilder {
      *            the variable initializer, can be null
      * @return a new variable declaration statement
      */
-    public VariableDeclarationStatement declare(String type, SimpleName varName, Expression initializer) {
+    public VariableDeclarationStatement declareStmt(String type, SimpleName varName, Expression initializer) {
+        final VariableDeclarationFragment fragment = declareFragment(varName, initializer);
+        final VariableDeclarationStatement vds = ast.newVariableDeclarationStatement(fragment);
+        vds.setType(type(type));
+        return vds;
+    }
+
+    /**
+     * Builds a new {@link VariableDeclarationExpression} instance.
+     *
+     * @param type
+     *            the declared variable type
+     * @param varName
+     *            the declared variable name
+     * @param initializer
+     *            the variable initializer, can be null
+     * @return a new variable declaration statement
+     */
+    public VariableDeclarationExpression declareExpr(Type type, SimpleName varName, Expression initializer) {
+        final VariableDeclarationFragment fragment = declareFragment(varName, initializer);
+        final VariableDeclarationExpression vde = ast.newVariableDeclarationExpression(fragment);
+        modifiers(vde).add(final0());
+        vde.setType(type);
+        return vde;
+    }
+
+    /**
+     * Converts a {@link VariableDeclarationStatement} into a {@link VariableDeclarationExpression}.
+     *
+     * @param toCopy the {@link VariableDeclarationStatement} to copy
+     * @return a new {@link VariableDeclarationExpression} matching the provided {@link VariableDeclarationStatement}
+     */
+    public VariableDeclarationExpression toDeclareExpr(final VariableDeclarationStatement toCopy) {
+        final List<VariableDeclarationFragment> oldFragments = fragments(toCopy);
+        final VariableDeclarationFragment fragment0 = move(oldFragments.get(0));
+
+        final VariableDeclarationExpression vde = ast.newVariableDeclarationExpression(fragment0);
+        mods(vde.modifiers()).add(copyRange(mods(toCopy.modifiers())));
+        final List<VariableDeclarationFragment> newFragments = fragments(vde);
+        for (VariableDeclarationFragment fragment : oldFragments.subList(1, oldFragments.size())) {
+            newFragments.add(move(fragment));
+        }
+        vde.setType(move(toCopy.getType()));
+        return vde;
+    }
+
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    private List<Modifier> mods(List m) {
+        return (List<Modifier>) m;
+    }
+
+    private VariableDeclarationFragment declareFragment(SimpleName varName, Expression initializer) {
         final VariableDeclarationFragment vdf = ast.newVariableDeclarationFragment();
         vdf.setName(varName);
         vdf.setInitializer(initializer);
-        final VariableDeclarationStatement vds = ast.newVariableDeclarationStatement(vdf);
-        vds.setType(type(type));
-        return vds;
+        return vdf;
+    }
+
+    private Modifier final0() {
+        return ast.newModifier(FINAL_KEYWORD);
     }
 
     /**
