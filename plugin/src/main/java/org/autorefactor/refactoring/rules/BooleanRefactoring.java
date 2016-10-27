@@ -388,7 +388,7 @@ public class BooleanRefactoring extends AbstractRefactoringRule {
             return null;
         }
         for (VariableDeclarationFragment vdf : fragments(vds)) {
-            if (isSameVariable(expr, vdf.getName())) {
+            if (isSameVariable(expr, vdf)) {
                 return vdf;
             }
         }

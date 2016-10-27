@@ -67,17 +67,15 @@ public class TryWithResourceRefactoring extends AbstractRefactoringRule {
             }
         }
 
-        final Statement previousStmt = getPreviousStatement(node);
-        final VariableDeclarationStatement previousDeclStmt = as(previousStmt, VariableDeclarationStatement.class);
+        final VariableDeclarationStatement previousDeclStmt =
+            as(getPreviousStatement(node), VariableDeclarationStatement.class);
         if (previousDeclStmt == null) {
             return VISIT_SUBTREE;
         }
 
-        final List<VariableDeclarationFragment> previousDeclFragments = fragments(previousDeclStmt);
+        final VariableDeclarationFragment previousDeclFragment = getUniqueFragment(previousDeclStmt);
         final List<Statement> finallyStmts = asList(node.getFinally());
-        if (previousDeclFragments.size() == 1 && finallyStmts.size() >= 1) {
-            final VariableDeclarationFragment previousDeclFragment = previousDeclFragments.get(0);
-
+        if (previousDeclFragment != null && finallyStmts.size() >= 1) {
             final Statement finallyStmt = finallyStmts.get(0);
             final ExpressionStatement es = as(finallyStmt, ExpressionStatement.class);
             final IfStatement is = as(finallyStmt, IfStatement.class);
@@ -88,7 +86,7 @@ public class TryWithResourceRefactoring extends AbstractRefactoringRule {
                         && isSameVariable(previousDeclFragment, miExpr)) {
                     final Refactorings r = ctx.getRefactorings();
                     final ASTBuilder b = ctx.getASTBuilder();
-                    r.remove(previousStmt);
+                    r.remove(previousDeclStmt);
                     r.insertFirst(node, TryStatement.RESOURCES_PROPERTY, b.toDeclareExpr(previousDeclStmt));
                     r.remove(finallyStmts.size() == 1 ? node.getFinally() : finallyStmt);
                     return DO_NOT_VISIT_SUBTREE;
@@ -109,7 +107,7 @@ public class TryWithResourceRefactoring extends AbstractRefactoringRule {
                                     previousDeclFragment, assignResource.getLeftHandSide(), nullCheckedExpr, miExpr)) {
                         final Refactorings r = ctx.getRefactorings();
                         final ASTBuilder b = ctx.getASTBuilder();
-                        r.remove(previousStmt);
+                        r.remove(previousDeclStmt);
                         r.insertFirst(node, TryStatement.RESOURCES_PROPERTY,
                                 b.declareExpr(b.move(previousDeclStmt.getType()),
                                               b.move(previousDeclFragment.getName()),

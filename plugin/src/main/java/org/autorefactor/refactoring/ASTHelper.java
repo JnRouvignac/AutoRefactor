@@ -198,12 +198,12 @@ public final class ASTHelper {
     }
 
     /**
-     * Boolean constant to use when returning from an {@link ASTVisitor} {{visit(*)}} method
+     * Boolean constant to use when returning from an {@link org.eclipse.jdt.core.dom.ASTVisitor} {{visit(*)}} method
      * to indicate that the visitor does not want to visit a node's subtree. This helps readability.
      */
     public static final boolean DO_NOT_VISIT_SUBTREE = false;
     /**
-     * Boolean constant to use when returning from an {@link ASTVisitor} {{visit(*)}} method
+     * Boolean constant to use when returning from an {@link org.eclipse.jdt.core.dom.ASTVisitor} {{visit(*)}} method
      * to indicate that the visitor wants to visit a node's subtree. This helps readability.
      */
     public static final boolean VISIT_SUBTREE = true;
@@ -1454,6 +1454,22 @@ public final class ASTHelper {
             throw new NotImplementedException(node, "for extended operands");
         }
         return true;
+    }
+
+    /**
+     * Returns the unique {@link VariableDeclarationFragment} declared
+     * in the provided {@link VariableDeclarationStatement}.
+     *
+     * @param node the statement from which to extract the unique fragment
+     * @return the unique fragment declared in the provided variable declaration statement,
+     *         or {@code null} if more than one exist.
+     */
+    public static VariableDeclarationFragment getUniqueFragment(VariableDeclarationStatement node) {
+        if (node == null) {
+            return null;
+        }
+        final List<VariableDeclarationFragment> fragments = fragments(node);
+        return fragments.size() == 1 ? fragments.get(0) : null;
     }
 
     /**

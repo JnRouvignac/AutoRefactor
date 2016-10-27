@@ -45,7 +45,6 @@ import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.eclipse.jdt.core.dom.InfixExpression.Operator.*;
 
 /** See {@link #getDescription()} method. */
-@SuppressWarnings("javadoc")
 public class MapRefactoring extends AbstractRefactoringRule {
 
     @Override
@@ -79,12 +78,9 @@ public class MapRefactoring extends AbstractRefactoringRule {
                     }
                 }
             } else if (previousStmt instanceof VariableDeclarationStatement) {
-                final VariableDeclarationStatement vds = (VariableDeclarationStatement) previousStmt;
-                if (vds.fragments().size() == 1) {
-                    final VariableDeclarationFragment vdf = fragments(vds).get(0);
-                    if (isSameLocalVariable(vdf.resolveBinding(), mi.getExpression())) {
-                        return replaceInitializer(vdf.getInitializer(), arg0, node);
-                    }
+                final VariableDeclarationFragment vdf = getUniqueFragment((VariableDeclarationStatement) previousStmt);
+                if (vdf != null && isSameLocalVariable(vdf.resolveBinding(), mi.getExpression())) {
+                    return replaceInitializer(vdf.getInitializer(), arg0, node);
                 }
             }
         }

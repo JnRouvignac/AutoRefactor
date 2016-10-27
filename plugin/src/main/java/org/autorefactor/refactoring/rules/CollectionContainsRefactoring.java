@@ -176,12 +176,7 @@ public class CollectionContainsRefactoring extends AbstractRefactoringRule {
 
     private Pair<Name, Expression> getInitializer(Statement stmt) {
         if (stmt instanceof VariableDeclarationStatement) {
-            VariableDeclarationStatement vds = (VariableDeclarationStatement) stmt;
-            List<VariableDeclarationFragment> fragments = fragments(vds);
-            if (fragments.size() == 1) {
-                VariableDeclarationFragment fragment = fragments.get(0);
-                return Pair.of((Name) fragment.getName(), fragment.getInitializer());
-            }
+            return uniqueVariableDeclarationFragmentName(stmt);
         } else if (stmt instanceof ExpressionStatement) {
             Assignment as = asExpression(stmt, Assignment.class);
             if (hasOperator(as, Operator.ASSIGN)
@@ -307,13 +302,9 @@ public class CollectionContainsRefactoring extends AbstractRefactoringRule {
     }
 
     private Pair<Name, Expression> uniqueVariableDeclarationFragmentName(Statement stmt) {
-        VariableDeclarationStatement vds = as(stmt, VariableDeclarationStatement.class);
-        if (vds != null) {
-            List<VariableDeclarationFragment> fragments = fragments(vds);
-            if (fragments.size() == 1) {
-                VariableDeclarationFragment vdf = fragments.get(0);
-                return Pair.of((Name) vdf.getName(), vdf.getInitializer());
-            }
+        VariableDeclarationFragment vdf = getUniqueFragment(as(stmt, VariableDeclarationStatement.class));
+        if (vdf != null) {
+            return Pair.of((Name) vdf.getName(), vdf.getInitializer());
         }
         return Pair.empty();
     }

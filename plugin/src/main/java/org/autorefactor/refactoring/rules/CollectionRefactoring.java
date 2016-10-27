@@ -58,7 +58,6 @@ import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 import static org.autorefactor.refactoring.ASTBuilder.Copy.*;
 import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.autorefactor.refactoring.ForLoopHelper.*;
-import static org.autorefactor.refactoring.ForLoopHelper.ContainerType.*;
 import static org.eclipse.jdt.core.dom.InfixExpression.Operator.*;
 import static org.eclipse.jdt.core.dom.PrefixExpression.Operator.*;
 
@@ -121,12 +120,9 @@ public class CollectionRefactoring extends AbstractRefactoringRule {
                     }
                 }
             } else if (previousStmt instanceof VariableDeclarationStatement) {
-                final VariableDeclarationStatement vds = (VariableDeclarationStatement) previousStmt;
-                if (vds.fragments().size() == 1) {
-                    final VariableDeclarationFragment vdf = fragments(vds).get(0);
-                    if (isSameLocalVariable(vdf.resolveBinding(), mi.getExpression())) {
-                        return replaceInitializer(vdf.getInitializer(), arg0, node);
-                    }
+                final VariableDeclarationFragment vdf = getUniqueFragment((VariableDeclarationStatement) previousStmt);
+                if (vdf != null && isSameLocalVariable(vdf.resolveBinding(), mi.getExpression())) {
+                    return replaceInitializer(vdf.getInitializer(), arg0, node);
                 }
             }
         }

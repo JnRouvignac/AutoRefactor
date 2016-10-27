@@ -42,7 +42,6 @@ import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.eclipse.jdt.core.dom.Assignment.Operator.*;
 
 /** See {@link #getDescription()} method. */
-@SuppressWarnings("javadoc")
 public class RemoveUnnecessaryLocalBeforeReturnRefactoring extends AbstractRefactoringRule {
 
     @Override
@@ -63,22 +62,20 @@ public class RemoveUnnecessaryLocalBeforeReturnRefactoring extends AbstractRefac
         if (!ctx.getRefactorings().hasBeenRefactored(previousSibling)
                 && previousSibling instanceof VariableDeclarationStatement) {
             final VariableDeclarationStatement vds = (VariableDeclarationStatement) previousSibling;
-            if (fragments(vds).size() == 1) {
-                final VariableDeclarationFragment vdf = fragments(vds).get(0);
-                if (isSameLocalVariable(node.getExpression(), vdf.getName())) {
-                    final Expression returnExpr = vdf.getInitializer();
-                    if (returnExpr instanceof ArrayInitializer) {
-                        final ASTBuilder b = ctx.getASTBuilder();
-                        final ReturnStatement newReturnStmt =
-                                b.return0(b.newArray(
-                                        b.copy((ArrayType) vds.getType()),
-                                        b.move((ArrayInitializer) returnExpr)));
-                        replaceReturnStatementForArray(node, vds, newReturnStmt);
-                    } else {
-                        replaceReturnStatement(node, vds, returnExpr);
-                    }
-                    return DO_NOT_VISIT_SUBTREE;
+            final VariableDeclarationFragment vdf = getUniqueFragment(vds);
+            if (vdf != null && isSameLocalVariable(node.getExpression(), vdf.getName())) {
+                final Expression returnExpr = vdf.getInitializer();
+                if (returnExpr instanceof ArrayInitializer) {
+                    final ASTBuilder b = ctx.getASTBuilder();
+                    final ReturnStatement newReturnStmt =
+                            b.return0(b.newArray(
+                                    b.copy((ArrayType) vds.getType()),
+                                    b.move((ArrayInitializer) returnExpr)));
+                    replaceReturnStatementForArray(node, vds, newReturnStmt);
+                } else {
+                    replaceReturnStatement(node, vds, returnExpr);
                 }
+                return DO_NOT_VISIT_SUBTREE;
             }
         } else {
             final Assignment as = asExpression(previousSibling, Assignment.class);
