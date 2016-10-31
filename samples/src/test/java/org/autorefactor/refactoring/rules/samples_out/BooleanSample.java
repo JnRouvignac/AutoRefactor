@@ -93,22 +93,99 @@ public class BooleanSample {
         return !b;
     }
 
-    public void removeUselessUseOfTernaryOperatorWithBooleanPrimitive1(
-            boolean bo) {
+    public void removeUselessTernaryOperatorWithBooleanPrimitive1(boolean bo) {
         boolean b = bo;
     }
 
-    public void removeUselessUseOfTernaryOperatorWithBooleanPrimitive2(
-            boolean bo) {
+    public void removeUselessTernaryOperatorWithBooleanPrimitive2(boolean bo) {
         boolean b = !bo;
     }
 
-    public void removeUselessUseOfTernaryOperatorWithBooleanObject1(boolean bo) {
+    public void removeUselessTernaryOperatorWithBooleanObject1(boolean bo) {
         Boolean b = Boolean.valueOf(bo);
     }
 
-    public void removeUselessUseOfTernaryOperatorWithBooleanObject2(boolean bo) {
+    public void removeUselessTernaryOperatorWithBooleanObject2(boolean bo) {
         Boolean b = Boolean.valueOf(!bo);
+    }
+
+    public void replaceTernaryOperatorByAndOperator(boolean bo1, boolean bo2) {
+        boolean b = bo1 && bo2;
+    }
+
+    public void replaceTernaryOperatorByAndOperator2(boolean bo1, boolean bo2) {
+        boolean b = !bo1 && bo2;
+    }
+
+    public void replaceTernaryOperatorByOrOperator(boolean bo1, boolean bo2) {
+        boolean b = bo1 || bo2;
+    }
+
+    public void replaceTernaryOperatorByOrOperator2(boolean bo1, boolean bo2) {
+        boolean b = !bo1 || bo2;
+    }
+
+    public void replaceTernaryOperatorByAndOperatorWithObjectConstant(
+            boolean bo1, boolean bo2) {
+        Boolean b = bo1 && bo2;
+    }
+
+    public void replaceTernaryOperatorByAndOperatorWithObjectConstant2(
+            boolean bo1, boolean bo2) {
+        Boolean b = !bo1 && bo2;
+    }
+
+    public void replaceTernaryOperatorByOrOperatorWithObjectConstant(
+            boolean bo1, boolean bo2) {
+        Boolean b = bo1 || bo2;
+    }
+
+    public void replaceTernaryOperatorByOrOperatorWithObjectConstant2(
+            boolean bo1, boolean bo2) {
+        Boolean b = !bo1 || bo2;
+    }
+
+    public void replaceTernaryOperatorByAndOperatorWithObject(
+            Boolean bo1, Boolean bo2) {
+        Boolean b = bo1 && bo2;
+    }
+
+    public void replaceTernaryOperatorByAndOperatorWithObject2(
+            Boolean bo1, Boolean bo2) {
+        Boolean b = !bo1 && bo2;
+    }
+
+    public void replaceTernaryOperatorByOrOperatorWithObject(
+            Boolean bo1, Boolean bo2) {
+        Boolean b = bo1 || bo2;
+    }
+
+    public void replaceTernaryOperatorByOrOperatorWithObject2(
+            Boolean bo1, Boolean bo2) {
+        Boolean b = !bo1 || bo2;
+    }
+
+    public void doNotReplacePossibleNullObject(Boolean bo1, Boolean bo2) {
+        Boolean b = bo1 ? bo2 : Boolean.FALSE;
+        b = bo1 ? Boolean.FALSE : bo2;
+        b = bo1 ? Boolean.TRUE : bo2;
+        b = bo1 ? bo2 : Boolean.TRUE;
+    }
+
+    public void replaceTernaryOperatorByAndOperatorWithExpression(int i1, int i2) {
+        Boolean b = (i1 == 1) && (i2 == 2);
+    }
+
+    public void replaceTernaryOperatorByAndOperatorWithExpression2(int i1, int i2) {
+        Boolean b = !(i1 == 1) && (i2 == 2);
+    }
+
+    public void replaceTernaryOperatorByOrOperatorWithExpression(int i1, int i2) {
+        Boolean b = (i1 == 1) || (i2 == 2);
+    }
+
+    public void replaceTernaryOperatorByOrOperatorWithExpression2(int i1, int i2) {
+        Boolean b = !(i1 == 1) || (i2 == 2);
     }
 
     public void doNotRemoveIfInBooleanPrimitiveAssignment1(boolean bo) {
