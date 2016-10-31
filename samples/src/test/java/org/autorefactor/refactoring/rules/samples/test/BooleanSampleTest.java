@@ -47,11 +47,11 @@ public class BooleanSampleTest {
     private boolean sampleOutResult;
     private org.autorefactor.refactoring.rules.samples_out.BooleanSample sampleOut;
     private final String methodName;
-    private final Object arg;
+    private final Object[] args;
 
-    public BooleanSampleTest(String methodName, Object arg) {
+    public BooleanSampleTest(String methodName, Object... args) {
         this.methodName = methodName;
-        this.arg = arg;
+        this.args = args;
     }
 
     @Before
@@ -78,58 +78,160 @@ public class BooleanSampleTest {
         };
     }
 
-    @Parameters(name = "{0}Refactoring")
+    @Parameters(name = "{0}({1})")
     public static Collection<Object[]> data() {
-        return Arrays.asList(
-                new Object[] { "returnIfConditionBooleanPrimitive", true },
-                new Object[] { "returnIfConditionBooleanPrimitive", false },
-                new Object[] { "returnIfConditionBooleanPrimitive2", true },
-                new Object[] { "returnIfConditionBooleanPrimitive2", false },
-                new Object[] { "returnIfConditionWithInfixExpressionBooleanPrimitive", 0 },
-                new Object[] { "returnIfConditionWithInfixExpressionBooleanPrimitive", 1 },
-                new Object[] { "returnIfConditionWithInstanceofExpressionBooleanPrimitive", "" },
-                new Object[] { "returnIfConditionWithInstanceofExpressionBooleanPrimitive", new Object() },
-                new Object[] { "returnIfConditionThatRevertsInstanceofExpressionBooleanPrimitive", "" },
-                new Object[] { "returnIfConditionThatRevertsInstanceofExpressionBooleanPrimitive", new Object() },
-                new Object[] { "returnIfConditionBooleanObject", true },
-                new Object[] { "returnIfConditionBooleanObject", false },
-                new Object[] { "returnIfConditionBooleanObject2", true },
-                new Object[] { "returnIfConditionBooleanObject2", false },
-                new Object[] { "returnIfConditionMixedBoolean1", true },
-                new Object[] { "returnIfConditionMixedBoolean1", false },
-                new Object[] { "returnIfConditionMixedBoolean2", true },
-                new Object[] { "returnIfConditionMixedBoolean2", false },
-                new Object[] { "returnIfConditionBooleanPrimitive3", true },
-                new Object[] { "returnIfConditionBooleanPrimitive3", false },
-                new Object[] { "returnIfConditionBooleanPrimitive4", true },
-                new Object[] { "returnIfConditionBooleanPrimitive4", false },
-                new Object[] { "returnIfConditionBooleanObject3", true },
-                new Object[] { "returnIfConditionBooleanObject3", false },
-                new Object[] { "returnIfConditionBooleanObject4", true },
-                new Object[] { "returnIfConditionBooleanObject4", false },
-                new Object[] { "removeUselessIfInBooleanPrimitiveAssignment5", true },
-                new Object[] { "removeUselessIfInBooleanPrimitiveAssignment5", false },
-                new Object[] { "removeUselessIfInBooleanObjectAssignment5", true },
-                new Object[] { "removeUselessIfInBooleanObjectAssignment5", false },
-                new Object[] { "removeUselessIfInBooleanPrimitiveAssignment6", true },
-                new Object[] { "removeUselessIfInBooleanPrimitiveAssignment6", false },
-                new Object[] { "removeUselessIfInBooleanObjectAssignment6", true },
-                new Object[] { "removeUselessIfInBooleanObjectAssignment6", false },
-                new Object[] { "removeUselessIfInBooleanObjectAssignment7", true },
-                new Object[] { "removeUselessIfInBooleanObjectAssignment7", false },
-                new Object[] { "removeUselessIfInBooleanPrimitiveAssignment7", true },
-                new Object[] { "removeUselessIfInBooleanPrimitiveAssignment7", false },
-                new Object[] { "removeUselessIfInBooleanPrimitiveAssignment8", true },
-                new Object[] { "removeUselessIfInBooleanPrimitiveAssignment8", false },
-                new Object[] { "removeUselessIfInBooleanPrimitiveAssignment9", true },
-                new Object[] { "removeUselessIfInBooleanPrimitiveAssignment9", false },
-                new Object[] { "removeUselessIfInBooleanPrimitiveAssignment10", true },
-                new Object[] { "removeUselessIfInBooleanPrimitiveAssignment10", false },
-                new Object[] { "removeUselessIfInBooleanPrimitiveExpression10", true },
-                new Object[] { "removeUselessIfInBooleanPrimitiveExpression10", false },
-                new Object[] { "removeUselessIfInBooleanPrimitiveExpression11", true },
-                new Object[] { "removeUselessIfInBooleanPrimitiveExpression11", false }
-        );
+        return Arrays.asList(new Object[][] {
+                { "returnIfConditionBooleanPrimitive", new Object[] { true } },
+                { "returnIfConditionBooleanPrimitive", new Object[] { false } },
+                { "returnIfConditionBooleanPrimitive2", new Object[] { true } },
+                { "returnIfConditionBooleanPrimitive2", new Object[] { false } },
+                { "returnIfConditionWithInfixExpressionBooleanPrimitive", new Object[] { 0 } },
+                { "returnIfConditionWithInfixExpressionBooleanPrimitive", new Object[] { 1 } },
+                { "returnIfConditionWithInstanceofExpressionBooleanPrimitive", new Object[] { "" } },
+                { "returnIfConditionWithInstanceofExpressionBooleanPrimitive", new Object[] { new Object() } },
+                { "returnIfConditionAddCurlyBraces", new Object[] { 0 } },
+                { "returnIfConditionAddCurlyBraces", new Object[] { "" } },
+                { "returnIfConditionAddCurlyBraces", new Object[] { new Object() } },
+                { "returnIfConditionThatRevertsInstanceofExpressionBooleanPrimitive", new Object[] { "" } },
+                { "returnIfConditionThatRevertsInstanceofExpressionBooleanPrimitive", new Object[] { new Object() } },
+                { "returnIfConditionBooleanObject", new Object[] { true } },
+                { "returnIfConditionBooleanObject", new Object[] { false } },
+                { "returnIfConditionBooleanObject2", new Object[] { true } },
+                { "returnIfConditionBooleanObject2", new Object[] { false } },
+                { "returnIfConditionMixedBoolean1", new Object[] { true } },
+                { "returnIfConditionMixedBoolean1", new Object[] { false } },
+                { "returnIfConditionMixedBoolean2", new Object[] { true } },
+                { "returnIfConditionMixedBoolean2", new Object[] { false } },
+                { "returnIfConditionBooleanPrimitive3", new Object[] { true } },
+                { "returnIfConditionBooleanPrimitive3", new Object[] { false } },
+                { "returnIfConditionBooleanPrimitive4", new Object[] { true } },
+                { "returnIfConditionBooleanPrimitive4", new Object[] { false } },
+                { "returnIfConditionBooleanObject3", new Object[] { true } },
+                { "returnIfConditionBooleanObject3", new Object[] { false } },
+                { "returnIfConditionBooleanObject4", new Object[] { true } },
+                { "returnIfConditionBooleanObject4", new Object[] { false } },
+                { "removeUselessTernaryOperatorWithBooleanPrimitive1", new Object[] { true } },
+                { "removeUselessTernaryOperatorWithBooleanPrimitive1", new Object[] { false } },
+                { "removeUselessTernaryOperatorWithBooleanPrimitive2", new Object[] { true } },
+                { "removeUselessTernaryOperatorWithBooleanPrimitive2", new Object[] { false } },
+                { "removeUselessTernaryOperatorWithBooleanObject1", new Object[] { true } },
+                { "removeUselessTernaryOperatorWithBooleanObject1", new Object[] { false } },
+                { "removeUselessTernaryOperatorWithBooleanObject2", new Object[] { true } },
+                { "removeUselessTernaryOperatorWithBooleanObject2", new Object[] { false } },
+
+                { "replaceTernaryOperatorByAndOperator", new Object[] { true, true } },
+                { "replaceTernaryOperatorByAndOperator", new Object[] { true, false } },
+                { "replaceTernaryOperatorByAndOperator", new Object[] { false, true } },
+                { "replaceTernaryOperatorByAndOperator", new Object[] { false, false } },
+                { "replaceTernaryOperatorByAndOperator2", new Object[] { true, true } },
+                { "replaceTernaryOperatorByAndOperator2", new Object[] { true, false } },
+                { "replaceTernaryOperatorByAndOperator2", new Object[] { false, true } },
+                { "replaceTernaryOperatorByAndOperator2", new Object[] { false, false } },
+                { "replaceTernaryOperatorByOrOperator", new Object[] { true, true } },
+                { "replaceTernaryOperatorByOrOperator", new Object[] { true, false } },
+                { "replaceTernaryOperatorByOrOperator", new Object[] { false, true } },
+                { "replaceTernaryOperatorByOrOperator", new Object[] { false, false } },
+                { "replaceTernaryOperatorByOrOperator2", new Object[] { true, true } },
+                { "replaceTernaryOperatorByOrOperator2", new Object[] { true, false } },
+                { "replaceTernaryOperatorByOrOperator2", new Object[] { false, true } },
+                { "replaceTernaryOperatorByOrOperator2", new Object[] { false, false } },
+                { "replaceTernaryOperatorByAndOperatorWithObjectConstant", new Object[] { true, true } },
+                { "replaceTernaryOperatorByAndOperatorWithObjectConstant", new Object[] { true, false } },
+                { "replaceTernaryOperatorByAndOperatorWithObjectConstant", new Object[] { false, true } },
+                { "replaceTernaryOperatorByAndOperatorWithObjectConstant", new Object[] { false, false } },
+                { "replaceTernaryOperatorByAndOperatorWithObjectConstant2", new Object[] { true, true } },
+                { "replaceTernaryOperatorByAndOperatorWithObjectConstant2", new Object[] { true, false } },
+                { "replaceTernaryOperatorByAndOperatorWithObjectConstant2", new Object[] { false, true } },
+                { "replaceTernaryOperatorByAndOperatorWithObjectConstant2", new Object[] { false, false } },
+                { "replaceTernaryOperatorByOrOperatorWithObjectConstant", new Object[] { true, true } },
+                { "replaceTernaryOperatorByOrOperatorWithObjectConstant", new Object[] { true, false } },
+                { "replaceTernaryOperatorByOrOperatorWithObjectConstant", new Object[] { false, true } },
+                { "replaceTernaryOperatorByOrOperatorWithObjectConstant", new Object[] { false, false } },
+                { "replaceTernaryOperatorByOrOperatorWithObjectConstant2", new Object[] { true, true } },
+                { "replaceTernaryOperatorByOrOperatorWithObjectConstant2", new Object[] { true, false } },
+                { "replaceTernaryOperatorByOrOperatorWithObjectConstant2", new Object[] { false, true } },
+                { "replaceTernaryOperatorByOrOperatorWithObjectConstant2", new Object[] { false, false } },
+                // FIXME JNR with null?
+                { "replaceTernaryOperatorByAndOperatorWithObject", new Object[] { true, true } },
+                { "replaceTernaryOperatorByAndOperatorWithObject", new Object[] { true, false } },
+                { "replaceTernaryOperatorByAndOperatorWithObject", new Object[] { false, true } },
+                { "replaceTernaryOperatorByAndOperatorWithObject", new Object[] { false, false } },
+                { "replaceTernaryOperatorByAndOperatorWithObject2", new Object[] { true, true } },
+                { "replaceTernaryOperatorByAndOperatorWithObject2", new Object[] { true, false } },
+                { "replaceTernaryOperatorByAndOperatorWithObject2", new Object[] { false, true } },
+                { "replaceTernaryOperatorByAndOperatorWithObject2", new Object[] { false, false } },
+                { "replaceTernaryOperatorByOrOperatorWithObject", new Object[] { true, true } },
+                { "replaceTernaryOperatorByOrOperatorWithObject", new Object[] { true, false } },
+                { "replaceTernaryOperatorByOrOperatorWithObject", new Object[] { false, true } },
+                { "replaceTernaryOperatorByOrOperatorWithObject", new Object[] { false, false } },
+                { "replaceTernaryOperatorByOrOperatorWithObject2", new Object[] { true, true } },
+                { "replaceTernaryOperatorByOrOperatorWithObject2", new Object[] { true, false } },
+                { "replaceTernaryOperatorByOrOperatorWithObject2", new Object[] { false, true } },
+                { "replaceTernaryOperatorByOrOperatorWithObject2", new Object[] { false, false } },
+                { "doNotReplacePossibleNullObject", new Object[] { true, true } },
+                { "doNotReplacePossibleNullObject", new Object[] { true, false } },
+                { "doNotReplacePossibleNullObject", new Object[] { false, true } },
+                { "doNotReplacePossibleNullObject", new Object[] { false, false } },
+                { "replaceTernaryOperatorByAndOperatorWithExpression", new Object[] { 1, 1 } },
+                { "replaceTernaryOperatorByAndOperatorWithExpression", new Object[] { 1, 2 } },
+                { "replaceTernaryOperatorByAndOperatorWithExpression", new Object[] { 2, 1 } },
+                { "replaceTernaryOperatorByAndOperatorWithExpression", new Object[] { 2, 2 } },
+                { "replaceTernaryOperatorByAndOperatorWithExpression2", new Object[] { 1, 1 } },
+                { "replaceTernaryOperatorByAndOperatorWithExpression2", new Object[] { 1, 2 } },
+                { "replaceTernaryOperatorByAndOperatorWithExpression2", new Object[] { 2, 1 } },
+                { "replaceTernaryOperatorByAndOperatorWithExpression2", new Object[] { 2, 2 } },
+                { "replaceTernaryOperatorByOrOperatorWithExpression", new Object[] { 1, 1 } },
+                { "replaceTernaryOperatorByOrOperatorWithExpression", new Object[] { 1, 2 } },
+                { "replaceTernaryOperatorByOrOperatorWithExpression", new Object[] { 2, 1 } },
+                { "replaceTernaryOperatorByOrOperatorWithExpression", new Object[] { 2, 2 } },
+                { "replaceTernaryOperatorByOrOperatorWithExpression2", new Object[] { 1, 1 } },
+                { "replaceTernaryOperatorByOrOperatorWithExpression2", new Object[] { 1, 2 } },
+                { "replaceTernaryOperatorByOrOperatorWithExpression2", new Object[] { 2, 1 } },
+                { "replaceTernaryOperatorByOrOperatorWithExpression2", new Object[] { 2, 2 } },
+
+                { "doNotRemoveIfInBooleanPrimitiveAssignment1", new Object[] { true } },
+                { "doNotRemoveIfInBooleanPrimitiveAssignment1", new Object[] { false } },
+                { "removeUselessIfInBooleanPrimitiveAssignment1", new Object[] { true } },
+                { "removeUselessIfInBooleanPrimitiveAssignment1", new Object[] { false } },
+                { "removeUselessIfInBooleanPrimitiveAssignment2", new Object[] { true } },
+                { "removeUselessIfInBooleanPrimitiveAssignment2", new Object[] { false } },
+                { "removeUselessIfInBooleanObjectAssignment1", new Object[] { true } },
+                { "removeUselessIfInBooleanObjectAssignment1", new Object[] { false } },
+                { "removeUselessIfInBooleanObjectAssignment2", new Object[] { true } },
+                { "removeUselessIfInBooleanObjectAssignment2", new Object[] { false } },
+//                { "removeUselessIfInBooleanPrimitiveAssignment3", new Object[] { true } },
+//                { "removeUselessIfInBooleanPrimitiveAssignment3", new Object[] { false } },
+//                { "removeUselessIfInBooleanPrimitiveAssignment4", new Object[] { true } },
+//                { "removeUselessIfInBooleanPrimitiveAssignment4", new Object[] { false } },
+//                { "removeUselessIfInBooleanPrimitiveAssignmentSearchFurtherAwayForPreviousSibling", new Object[] { false } },
+//                { "removeUselessIfInBooleanPrimitiveAssignmentSearchFurtherAwayForPreviousSibling", new Object[] { false } },
+//                { "removeUselessIfInBooleanObjectAssignment3", new Object[] { true } },
+//                { "removeUselessIfInBooleanObjectAssignment3", new Object[] { false } },
+//                { "removeUselessIfInBooleanObjectAssignment4", new Object[] { true } },
+//                { "removeUselessIfInBooleanObjectAssignment4", new Object[] { false } },
+                { "removeUselessIfInBooleanPrimitiveAssignment5", new Object[] { true } },
+                { "removeUselessIfInBooleanPrimitiveAssignment5", new Object[] { false } },
+                { "removeUselessIfInBooleanObjectAssignment5", new Object[] { true } },
+                { "removeUselessIfInBooleanObjectAssignment5", new Object[] { false } },
+                { "removeUselessIfInBooleanPrimitiveAssignment6", new Object[] { true } },
+                { "removeUselessIfInBooleanPrimitiveAssignment6", new Object[] { false } },
+                { "removeUselessIfInBooleanObjectAssignment6", new Object[] { true } },
+                { "removeUselessIfInBooleanObjectAssignment6", new Object[] { false } },
+                { "removeUselessIfInBooleanObjectAssignment7", new Object[] { true } },
+                { "removeUselessIfInBooleanObjectAssignment7", new Object[] { false } },
+                { "removeUselessIfInBooleanPrimitiveAssignment7", new Object[] { true } },
+                { "removeUselessIfInBooleanPrimitiveAssignment7", new Object[] { false } },
+                { "removeUselessIfInBooleanPrimitiveAssignment8", new Object[] { true } },
+                { "removeUselessIfInBooleanPrimitiveAssignment8", new Object[] { false } },
+                { "removeUselessIfInBooleanPrimitiveAssignment9", new Object[] { true } },
+                { "removeUselessIfInBooleanPrimitiveAssignment9", new Object[] { false } },
+                { "removeUselessIfInBooleanPrimitiveAssignment10", new Object[] { true } },
+                { "removeUselessIfInBooleanPrimitiveAssignment10", new Object[] { false } },
+                { "removeUselessIfInBooleanPrimitiveExpression10", new Object[] { true } },
+                { "removeUselessIfInBooleanPrimitiveExpression10", new Object[] { false } },
+                { "removeUselessIfInBooleanPrimitiveExpression11", new Object[] { true } },
+                { "removeUselessIfInBooleanPrimitiveExpression11", new Object[] { false } }
+        });
     }
 
     @Test
@@ -140,29 +242,55 @@ public class BooleanSampleTest {
 
     private void assertInvokeEquals(boolean sampleReturn) throws Exception {
         samplesReturn = sampleReturn;
-        final Boolean resIn = invoke(sampleIn, methodName, arg);
-        final Boolean resOut = invoke(sampleOut, methodName, arg);
+        final Boolean resIn = invoke(sampleIn, methodName, args);
+        final Boolean resOut = invoke(sampleOut, methodName, args);
         assertEquals(resIn, resOut);
         assertEquals(sampleIn.f, sampleOut.f);
         assertEquals(sampleIn.g, sampleOut.g);
         assertEquals(sampleInResult, sampleOutResult);
     }
 
-    private Boolean invoke(Object obj, String methodName, Object arg) throws Exception {
+    private Boolean invoke(Object obj, String methodName, Object... args) throws Exception {
         try {
-            return invoke(obj, methodName, arg, arg.getClass());
-        } catch (NoSuchMethodException e) {}
-        final Class<?> type = getPrimitiveType(arg.getClass());
-        if (type != null) {
-            try {
-                return invoke(obj, methodName, arg, type);
-            } catch (NoSuchMethodException e) {}
+            return invoke(obj, methodName, args, getClasses(args));
+        } catch (NoSuchMethodException e) {
+            // try with primitive types
         }
-        return invoke(obj, methodName, arg, Object.class);
+
+        try {
+            final Class<?>[] type = getPrimitiveTypes(args);
+            return invoke(obj, methodName, args, type);
+        } catch (NoSuchMethodException e) {
+            // try with java.lang.Object
+        }
+        return invoke(obj, methodName, args, objectsArray(args));
     }
 
-    private Boolean invoke(Object obj, String methodName, Object arg,
-            Class<?> argType) throws Exception {
+    private Class<?>[] getClasses(Object... args) {
+        final Class<?>[] results = new Class<?>[args.length];
+        for (int i = 0; i < args.length; i++) {
+            results[i] = args[i].getClass();
+        }
+        return results;
+    }
+
+    private Class<?>[] getPrimitiveTypes(Object[] args) {
+        final Class<?>[] results = new Class<?>[args.length];
+        for (int i = 0; i < args.length; i++) {
+            results[i] = getPrimitiveType(args[i].getClass());
+        }
+        return results;
+    }
+
+    private Class<?>[] objectsArray(Object[] args) {
+        final Class<?>[] results = new Class<?>[args.length];
+        for (int i = 0; i < args.length; i++) {
+            results[i] = Object.class;
+        }
+        return results;
+    }
+
+    private Boolean invoke(Object obj, String methodName, Object[] arg, Class<?>[] argType) throws Exception {
         final Method m = obj.getClass().getMethod(methodName, argType);
         return (Boolean) m.invoke(obj, arg);
     }

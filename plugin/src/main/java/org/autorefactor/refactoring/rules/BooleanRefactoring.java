@@ -388,8 +388,8 @@ public class BooleanRefactoring extends AbstractRefactoringRule {
         return null;
     }
 
-    private ReturnStatement getReturnStatement(IfStatement node, final Expression thenExpression,
-            final Expression elseExpression) {
+    private ReturnStatement getReturnStatement(
+            final IfStatement node, final Expression thenExpression, final Expression elseExpression) {
         if (areOppositeBooleanValues(thenExpression, elseExpression)) {
             Expression exprToReturn = b.copy(node.getExpression());
             if (getBooleanLiteral(elseExpression)) {
@@ -422,8 +422,8 @@ public class BooleanRefactoring extends AbstractRefactoringRule {
                         + md.getName().getIdentifier() + ", but found " + qualifiedName);
     }
 
-    private Expression newExpressionOrNull(String expressionName, Expression condition, Expression thenExpression,
-            Expression elseExpression) {
+    private Expression newExpressionOrNull(
+            String expressionName, Expression condition, Expression thenExpression, Expression elseExpression) {
         Boolean thenLiteral = getBooleanLiteral(thenExpression);
         Boolean elseLiteral = getBooleanLiteral(elseExpression);
 
@@ -431,33 +431,31 @@ public class BooleanRefactoring extends AbstractRefactoringRule {
             final Name booleanName = getBooleanName(condition);
             return getExpression(thenLiteral, condition, expressionName, booleanName);
         } else if (isPrimitive(thenExpression) || isPrimitive(elseExpression)) {
-            // If both expressions are primitive, there cannot be null pointer
-            // If only one expression is primitive, null pointer is already
-            // possible so we do not care
-
+            // If both expressions are primitive, there cannot be any NPE
+            // If only one expression is primitive, a NPE is already possible so we do not care
             if (thenLiteral != null && elseLiteral == null) {
                 if (thenLiteral) {
-                    return b.infixExpr(b.copy(condition), CONDITIONAL_OR,
-                            b.copy(elseExpression));
+                    return b.infixExpr(
+                        b.copy(condition), CONDITIONAL_OR, b.copy(elseExpression));
                 } else {
-                    return b.infixExpr(b.negate(condition, Copy.COPY), CONDITIONAL_AND,
-                            b.copy(elseExpression));
+                    return b.infixExpr(
+                        b.negate(condition, Copy.COPY), CONDITIONAL_AND, b.copy(elseExpression));
                 }
             } else if (thenLiteral == null && elseLiteral != null) {
                 if (!elseLiteral) {
-                    return b.infixExpr(b.copy(condition), CONDITIONAL_AND,
-                            b.copy(thenExpression));
+                    return b.infixExpr(
+                        b.copy(condition), CONDITIONAL_AND, b.copy(thenExpression));
                 } else {
-                    return b.infixExpr(b.negate(condition, Copy.COPY), CONDITIONAL_OR,
-                            b.copy(thenExpression));
+                    return b.infixExpr(
+                        b.negate(condition, Copy.COPY), CONDITIONAL_OR, b.copy(thenExpression));
                 }
             }
         }
         return null;
     }
 
-    private Expression getExpression(final boolean doNotNegate, final Expression condition, String expressionName,
-            final Name booleanName) {
+    private Expression getExpression(
+            boolean doNotNegate, Expression condition, String expressionName, Name booleanName) {
         if (doNotNegate) {
             return getExpression(b.copy(condition), expressionName, booleanName);
         }
@@ -465,12 +463,12 @@ public class BooleanRefactoring extends AbstractRefactoringRule {
         return getExpression(negatedIfCondition, expressionName, booleanName);
     }
 
-    private Expression getExpression(Expression ifCondition, String expressionTypeName, Name booleanName) {
+    private Expression getExpression(Expression condition, String expressionTypeName, Name booleanName) {
         if ("boolean".equals(expressionTypeName)) {
-            return ifCondition;
+            return condition;
         } else if (getJavaMinorVersion() >= 4
                 && "java.lang.Boolean".equals(expressionTypeName)) {
-            return b.invoke(booleanName, "valueOf", ifCondition);
+            return b.invoke(booleanName, "valueOf", condition);
         }
         return null;
     }
@@ -503,14 +501,14 @@ public class BooleanRefactoring extends AbstractRefactoringRule {
             final BooleanLiteral l = as(arguments(node), BooleanLiteral.class);
             if (l != null) {
                 ctx.getRefactorings().replace(node,
-                        getRefactoring(node, l.booleanValue()));
+                        toFieldAccess(node, l.booleanValue()));
                 return DO_NOT_VISIT_SUBTREE;
             }
         }
         return VISIT_SUBTREE;
     }
 
-    private FieldAccess getRefactoring(MethodInvocation node, boolean booleanLiteral) {
+    private FieldAccess toFieldAccess(MethodInvocation node, boolean booleanLiteral) {
         final FieldAccess fa = b.getAST().newFieldAccess();
         if (node.getExpression() instanceof Name) {
             fa.setExpression(b.copy(node.getExpression()));
