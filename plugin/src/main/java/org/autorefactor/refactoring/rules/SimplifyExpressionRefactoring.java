@@ -130,7 +130,9 @@ public class SimplifyExpressionRefactoring extends AbstractRefactoringRule {
                 }
             }
         }
-        if (isHardToRead(innerExpr, parent)) {
+        if (isInnerExprHardToRead(innerExpr, parent)) {
+            // FIXME This is not really that hard to read is it?
+            // return (bla != null) ? bla.getSomething() : null;
             return node;
         }
         if (isUselessParenthesesInStatement(parent, node)) {
@@ -164,7 +166,7 @@ public class SimplifyExpressionRefactoring extends AbstractRefactoringRule {
      *          the parent node to test for ease of read
      * @return true if the expressions is hard to read, false otherwise
      */
-    private boolean isHardToRead(final Expression innerExpr, final ASTNode parent) {
+    private boolean isInnerExprHardToRead(final Expression innerExpr, final ASTNode parent) {
         if (parent instanceof InfixExpression) {
             if (innerExpr instanceof InfixExpression) {
                 final InfixExpression innerIe = (InfixExpression) innerExpr;
