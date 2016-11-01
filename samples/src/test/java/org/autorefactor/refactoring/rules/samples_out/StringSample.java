@@ -171,4 +171,32 @@ public class StringSample {
     private static String getS() {
         return null;
     }
+
+    public void replaceForcedConcatenateByStringValueOf(Object o, boolean b, char c, byte by, short s, int i, long l,
+            float f, double d) {
+        String text = String.valueOf(o);
+
+        text = String.valueOf(b);
+        text = String.valueOf(c);
+        text = String.valueOf(by);
+        text = String.valueOf(s);
+        text = String.valueOf(i);
+        text = String.valueOf(l);
+        text = String.valueOf(f);
+        text = String.valueOf(d);
+
+        text = String.valueOf(o);
+        text = String.valueOf(b);
+        text = String.valueOf(c);
+        text = String.valueOf(by);
+        text = String.valueOf(s);
+        text = String.valueOf(i);
+        text = String.valueOf(l);
+        text = String.valueOf(f);
+        text = String.valueOf(d);
+    }
+
+    public void doNotReplaceConcatenateWithCharArray(char[] chars) {
+        String text = "" + chars;
+    }
 }
