@@ -34,7 +34,7 @@ import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 
 class AndroidWakeLockSample {
-    private class SimpleWakeLockActivity extends Activity {
+    class SimpleWakeLockActivity extends Activity {
         private WakeLock wl;
 
         @Override
@@ -58,7 +58,7 @@ class AndroidWakeLockSample {
         }
     }
 
-    private class SimpleWakeLockWithoutOnPauseActivity extends Activity {
+    class SimpleWakeLockWithoutOnPauseActivity extends Activity {
         private WakeLock wl;
 
         @Override
@@ -77,7 +77,7 @@ class AndroidWakeLockSample {
         }
     }
 
-    private class SimpleWakeLockWithoutReleaseActivity extends Activity {
+    class SimpleWakeLockWithoutReleaseActivity extends Activity {
         private WakeLock wl;
 
         @Override
@@ -95,7 +95,7 @@ class AndroidWakeLockSample {
         }
     }
 
-    private class SimpleWakeLockWithoutReleaseAndWithoutOnPauseActivity extends Activity {
+    class SimpleWakeLockWithoutReleaseAndWithoutOnPauseActivity extends Activity {
         private WakeLock wl;
 
         @Override

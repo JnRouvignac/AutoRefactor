@@ -28,6 +28,7 @@ package org.autorefactor.refactoring.rules;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
 
+import org.autorefactor.preferences.Preferences;
 import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.FinderVisitor;
 import org.autorefactor.refactoring.Refactorings;
@@ -55,6 +56,12 @@ public class AndroidWakeLockRefactoring extends AbstractRefactoringRule {
     @Override
     public String getName() {
         return "Android WakeLock";
+    }
+
+    @Override
+    public boolean isEnabled(Preferences preferences) {
+        // FIXME enable only when android libraries are detected
+        return super.isEnabled(preferences);
     }
 
     @Override

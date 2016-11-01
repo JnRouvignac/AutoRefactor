@@ -60,7 +60,9 @@ public class FinderVisitor<R> extends ASTVisitor {
      * @return the result found, or the default result when none exist
      */
     public R findOrDefault(final ASTNode node, final R defaultResult) {
-        node.accept(this);
+        if (node != null) {
+            node.accept(this);
+        }
         return resultFound ? result : defaultResult;
     }
 
