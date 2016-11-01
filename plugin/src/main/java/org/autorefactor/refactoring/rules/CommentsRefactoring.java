@@ -388,13 +388,14 @@ public class CommentsRefactoring extends AbstractRefactoringRule {
     }
 
     private boolean isTagEmptyOrWithSimpleNameOnly(TagElement tag) {
-        if (tag.fragments().size() == 0) {
+        switch (tag.fragments().size()) {
+        case 0:
             return true;
-        }
-        if (tag.fragments().size() == 1) {
+        case 1:
             return tag.fragments().get(0) instanceof SimpleName;
+        default:
+            return false;
         }
-        return false;
     }
 
     private boolean anyTextElementNotEmpty(List<?> fragments, boolean throwIfUnknown) {
