@@ -3,6 +3,7 @@
  *
  * Copyright (C) 2013-2016 Jean-Noël Rouvignac - initial API and implementation
  * Copyright (C) 2016 Fabrice Tiercelin - Make sure we do not visit again modified nodes
+ * Copyright (C) 2016 Sameer Misger - Make SonarQube more happy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
