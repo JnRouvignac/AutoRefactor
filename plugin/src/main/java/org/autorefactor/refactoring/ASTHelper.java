@@ -1664,28 +1664,28 @@ public final class ASTHelper {
             ITypeBinding declaringClass) {
         final ITypeBinding superclass = declaringClass.getSuperclass();
         if (superclass != null) {
-            for (IMethodBinding methodFromSuperclass : superclass.getDeclaredMethods()) {
-                if (overridingMethod.overrides(methodFromSuperclass)) {
-                    if (!results.add(methodFromSuperclass)) {
-                        // type has already been visited
-                        return;
-                    }
-                }
+            if (!addOverridenMethods(overridingMethod, superclass, results)) {
+                findOverridenMethods(overridingMethod, results, superclass);
             }
-            findOverridenMethods(overridingMethod, results, superclass);
         }
 
         for (ITypeBinding itf : declaringClass.getInterfaces()) {
-            for (IMethodBinding methodFromItf : itf.getDeclaredMethods()) {
-                if (overridingMethod.overrides(methodFromItf)) {
-                    if (!results.add(methodFromItf)) {
-                        // type has already been visited
-                        return;
-                    }
-                }
+            if (!addOverridenMethods(overridingMethod, itf, results)) {
+                findOverridenMethods(overridingMethod, results, itf);
             }
-            findOverridenMethods(overridingMethod, results, itf);
         }
+    }
+
+    private static boolean addOverridenMethods(
+            IMethodBinding overridingMethod, ITypeBinding superType, Set<IMethodBinding> results) {
+        for (IMethodBinding methodFromType : superType.getDeclaredMethods()) {
+            if (overridingMethod.overrides(methodFromType)
+                    && !results.add(methodFromType)) {
+                // type has already been visited
+                return true;
+            }
+        }
+        return false;
     }
 
     private static IMethodBinding findOverridenMethod(ITypeBinding typeBinding, String typeQualifiedName,
