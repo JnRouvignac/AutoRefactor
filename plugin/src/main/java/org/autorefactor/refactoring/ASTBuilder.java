@@ -36,6 +36,7 @@ import org.autorefactor.util.IllegalArgumentException;
 import org.autorefactor.util.NotImplementedException;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.Annotation;
 import org.eclipse.jdt.core.dom.ArrayCreation;
 import org.eclipse.jdt.core.dom.ArrayInitializer;
 import org.eclipse.jdt.core.dom.ArrayType;
@@ -148,6 +149,27 @@ public class ASTBuilder {
      */
     public AST getAST() {
         return ast;
+    }
+
+    /**
+     * Builds a new {@link Annotation} instance.
+     *
+     * @param typeName the annotation type name
+     * @return a new annotation
+     */
+    public Annotation annotation(String typeName) {
+        // TODO handle SingleMemberAnnotation and NormalAnnotation
+        return markerAnnotation(simpleName(typeName));
+    }
+
+    /**
+     * Helper to create a list of parameters.
+     *
+     * @param variableDeclarations the list of parameters
+     * @return a new list of parameters
+     */
+    public List<SingleVariableDeclaration> parameters(SingleVariableDeclaration... variableDeclarations) {
+        return Arrays.asList(variableDeclarations);
     }
 
     /**
@@ -453,6 +475,16 @@ public class ASTBuilder {
         vdf.setName(varName);
         vdf.setInitializer(initializer);
         return vdf;
+    }
+
+    /**
+     * Helper to create a list of modifiers.
+     *
+     * @param modifiers the list of modifiers
+     * @return a new list of modifiers
+     */
+    public List<IExtendedModifier> extendedModifiers(IExtendedModifier... modifiers) {
+        return Arrays.asList(modifiers);
     }
 
     private Modifier final0() {
@@ -925,7 +957,7 @@ public class ASTBuilder {
      * @return a newline statement
      */
     public Statement newlinePlaceholder() {
-        return (Statement) this.refactorings.getRewrite().createStringPlaceholder("\n", ASTNode.EMPTY_STATEMENT);
+        return (Statement) refactorings.getRewrite().createStringPlaceholder("\n", ASTNode.EMPTY_STATEMENT);
     }
 
     /**
@@ -935,16 +967,6 @@ public class ASTBuilder {
      */
     public Modifier protected0() {
         return getAST().newModifier(ModifierKeyword.PROTECTED_KEYWORD);
-    }
-
-    /**
-     * Helper to create a list of modifiers.
-     *
-     * @param modifiers the list of modifiers
-     * @return a new list of modifiers
-     */
-    public List<IExtendedModifier> modifiersList(IExtendedModifier... modifiers) {
-        return Arrays.asList(modifiers);
     }
 
     /**

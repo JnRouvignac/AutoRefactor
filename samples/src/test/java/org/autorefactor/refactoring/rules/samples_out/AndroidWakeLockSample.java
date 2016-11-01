@@ -2,6 +2,7 @@
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
  * Copyright (C) 2016 Luis Cruz - Android Refactoring
+ * Copyright (C) 2016 Jean-Noël Rouvignac - code cleanups
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,23 +26,23 @@
  */
 package org.autorefactor.refactoring.rules.samples_out;
 
+import static android.os.PowerManager.*;
+
 import android.app.Activity;
-import android.content.Context;
 import android.os.Bundle;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 
-public class AndroidWakeLockSample {
-    public class SimpleWakeLockActivity extends Activity {
+class AndroidWakeLockSample {
+    private class SimpleWakeLockActivity extends Activity {
         private WakeLock wl;
 
         @Override
         protected void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
 
-            PowerManager pm = (PowerManager) this.getSystemService(Context.POWER_SERVICE);
-            wl = pm.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK | PowerManager.ON_AFTER_RELEASE,
-                    "WakeLockSample");
+            PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
+            wl = pm.newWakeLock(SCREEN_DIM_WAKE_LOCK | ON_AFTER_RELEASE, "WakeLockSample");
             wl.acquire();
         }
 
@@ -59,16 +60,15 @@ public class AndroidWakeLockSample {
         }
     }
 
-    public class SimpleWakeLockWithoutOnPauseActivity extends Activity {
+    private class SimpleWakeLockWithoutOnPauseActivity extends Activity {
         private WakeLock wl;
 
         @Override
         protected void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
 
-            PowerManager pm = (PowerManager) this.getSystemService(Context.POWER_SERVICE);
-            wl = pm.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK | PowerManager.ON_AFTER_RELEASE,
-                    "WakeLockSample");
+            PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
+            wl = pm.newWakeLock(SCREEN_DIM_WAKE_LOCK | ON_AFTER_RELEASE, "WakeLockSample");
             wl.acquire();
         }
 
@@ -77,24 +77,24 @@ public class AndroidWakeLockSample {
             super.onDestroy();
         }
 
-		@Override protected void onPause(){
-		super.onPause();
-		if (!wl.isHeld()) {
-            wl.release();
+        @Override
+        protected void onPause() {
+            super.onPause();
+            if (!wl.isHeld()) {
+                wl.release();
+            }
         }
-		}
-	}
+    }
 
-    public class SimpleWakeLockWithoutReleaseActivity extends Activity {
+    private class SimpleWakeLockWithoutReleaseActivity extends Activity {
         private WakeLock wl;
 
         @Override
         protected void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
 
-            PowerManager pm = (PowerManager) this.getSystemService(Context.POWER_SERVICE);
-            wl = pm.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK | PowerManager.ON_AFTER_RELEASE,
-                    "WakeLockSample");
+            PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
+            wl = pm.newWakeLock(SCREEN_DIM_WAKE_LOCK | ON_AFTER_RELEASE, "WakeLockSample");
             wl.acquire();
         }
 
@@ -107,24 +107,24 @@ public class AndroidWakeLockSample {
         }
     }
 
-    public class SimpleWakeLockWithoutReleaseAndWithoutOnPauseActivity extends Activity {
+    private class SimpleWakeLockWithoutReleaseAndWithoutOnPauseActivity extends Activity {
         private WakeLock wl;
 
         @Override
         protected void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
 
-            PowerManager pm = (PowerManager) this.getSystemService(Context.POWER_SERVICE);
-            wl = pm.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK | PowerManager.ON_AFTER_RELEASE,
-                    "WakeLockSample");
+            PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
+            wl = pm.newWakeLock(SCREEN_DIM_WAKE_LOCK | ON_AFTER_RELEASE, "WakeLockSample");
             wl.acquire();
         }
 
-		@Override protected void onPause(){
-		super.onPause();
-		if (!wl.isHeld()) {
-            wl.release();
+        @Override
+        protected void onPause() {
+            super.onPause();
+            if (!wl.isHeld()) {
+                wl.release();
+            }
         }
-		}
-	}
+    }
 }
