@@ -51,21 +51,21 @@ public class StringSample {
     }
 
     public String replaceToStringCallInStringConcat() {
-        String s1 = "" + Boolean.TRUE + Boolean.FALSE;
-        String s2 = Boolean.TRUE + "" + Boolean.FALSE;
+        String s1 = " " + Boolean.TRUE + Boolean.FALSE;
+        String s2 = Boolean.TRUE + " " + Boolean.FALSE;
         return s1 + s2;
     }
 
     public String replaceToStringCallOnCurrentObjectInStringConcat() {
-        String s1 = "" + this + this;
-        String s2 = this + "" + this;
+        String s1 = " " + this + this;
+        String s2 = this + " " + this;
         return s1 + s2;
     }
 
     public class TestWithQualifiedToString {
         public String replaceToStringCallOnCurrentObjectInStringConcat() {
-            String s1 = "" + StringSample.this + StringSample.this + this;
-            String s2 = StringSample.this + "" + this;
+            String s1 = " " + StringSample.this + StringSample.this + this;
+            String s2 = StringSample.this + " " + this;
             return s1 + s2;
         }
     }
@@ -170,5 +170,33 @@ public class StringSample {
 
     private static String getS() {
         return null;
+    }
+
+    public void replaceForcedConcatenateByStringValueOf(Object o, boolean b, char c, byte by, short s, int i, long l,
+            float f, double d) {
+        String text = String.valueOf(o);
+
+        text = String.valueOf(b);
+        text = String.valueOf(c);
+        text = String.valueOf(by);
+        text = String.valueOf(s);
+        text = String.valueOf(i);
+        text = String.valueOf(l);
+        text = String.valueOf(f);
+        text = String.valueOf(d);
+
+        text = String.valueOf(o);
+        text = String.valueOf(b);
+        text = String.valueOf(c);
+        text = String.valueOf(by);
+        text = String.valueOf(s);
+        text = String.valueOf(i);
+        text = String.valueOf(l);
+        text = String.valueOf(f);
+        text = String.valueOf(d);
+    }
+
+    public void doNotReplaceConcatenateWithCharArray(char[] chars) {
+        String text = "" + chars;
     }
 }

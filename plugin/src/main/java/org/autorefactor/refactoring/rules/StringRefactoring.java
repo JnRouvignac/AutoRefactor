@@ -32,6 +32,7 @@ import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
+import org.eclipse.jdt.core.dom.StringLiteral;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.eclipse.jdt.core.dom.ASTNode.*;
@@ -169,5 +170,32 @@ public class StringRefactoring extends AbstractRefactoringRule {
                       || isMethod(node, "java.lang.String", "valueOf", "float")
                       || isMethod(node, "java.lang.String", "valueOf", "double")
                       || isMethod(node, "java.lang.String", "valueOf", "java.lang.Object"));
+    }
+
+    @Override
+    public boolean visit(InfixExpression node) {
+        if (InfixExpression.Operator.PLUS.equals(node.getOperator())) {
+            final ASTBuilder b = this.ctx.getASTBuilder();
+
+            final Expression leftOperand = node.getLeftOperand();
+            final Expression rightOperand = node.getRightOperand();
+
+            if (maybeReplaceStringConcatenate(node, b, leftOperand, rightOperand) == DO_NOT_VISIT_SUBTREE) {
+                return DO_NOT_VISIT_SUBTREE;
+            }
+
+            return maybeReplaceStringConcatenate(node, b, rightOperand, leftOperand);
+        }
+        return VISIT_SUBTREE;
+    }
+
+    private boolean maybeReplaceStringConcatenate(final InfixExpression node, final ASTBuilder b,
+            final Expression stringLiteral, final Expression variable) {
+        if ((stringLiteral instanceof StringLiteral) && ((StringLiteral) stringLiteral).getLiteralValue().matches("")
+                && !hasType(variable, "java.lang.String", "char[]")) {
+            ctx.getRefactorings().replace(node, b.invoke("String", "valueOf", b.copy(variable)));
+            return DO_NOT_VISIT_SUBTREE;
+        }
+        return VISIT_SUBTREE;
     }
 }

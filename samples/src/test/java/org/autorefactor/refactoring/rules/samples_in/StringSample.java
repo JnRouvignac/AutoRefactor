@@ -51,21 +51,21 @@ public class StringSample {
     }
 
     public String replaceToStringCallInStringConcat() {
-        String s1 = "" + Boolean.TRUE.toString() + Boolean.FALSE.toString();
-        String s2 = Boolean.TRUE.toString() + "" + Boolean.FALSE.toString();
+        String s1 = " " + Boolean.TRUE.toString() + Boolean.FALSE.toString();
+        String s2 = Boolean.TRUE.toString() + " " + Boolean.FALSE.toString();
         return s1 + s2;
     }
 
     public String replaceToStringCallOnCurrentObjectInStringConcat() {
-        String s1 = "" + toString() + toString();
-        String s2 = toString() + "" + toString();
+        String s1 = " " + toString() + toString();
+        String s2 = toString() + " " + toString();
         return s1 + s2;
     }
 
     public class TestWithQualifiedToString {
         public String replaceToStringCallOnCurrentObjectInStringConcat() {
-            String s1 = "" + StringSample.this.toString() + StringSample.this.toString() + toString();
-            String s2 = StringSample.this.toString() + "" + toString();
+            String s1 = " " + StringSample.this.toString() + StringSample.this.toString() + toString();
+            String s2 = StringSample.this.toString() + " " + toString();
             return s1 + s2;
         }
     }
@@ -170,5 +170,33 @@ public class StringSample {
 
     private static String getS() {
         return null;
+    }
+
+    public void replaceForcedConcatenateByStringValueOf(Object o, boolean b, char c, byte by, short s, int i, long l,
+            float f, double d) {
+        String text = o + "";
+
+        text = b + "";
+        text = c + "";
+        text = by + "";
+        text = s + "";
+        text = i + "";
+        text = l + "";
+        text = f + "";
+        text = d + "";
+
+        text = "" + o;
+        text = "" + b;
+        text = "" + c;
+        text = "" + by;
+        text = "" + s;
+        text = "" + i;
+        text = "" + l;
+        text = "" + f;
+        text = "" + d;
+    }
+
+    public void doNotReplaceConcatenateWithCharArray(char[] chars) {
+        String text = "" + chars;
     }
 }
