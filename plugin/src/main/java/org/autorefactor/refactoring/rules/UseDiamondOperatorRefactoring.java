@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.autorefactor.preferences.Preferences;
 import org.autorefactor.refactoring.Release;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Assignment;
@@ -47,7 +48,6 @@ import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.eclipse.jdt.core.dom.ASTNode.*;
 
 /** See {@link #getDescription()} method. */
-@SuppressWarnings("javadoc")
 public class UseDiamondOperatorRefactoring extends AbstractRefactoringRule {
 
     @Override
@@ -61,15 +61,18 @@ public class UseDiamondOperatorRefactoring extends AbstractRefactoringRule {
     }
 
     @Override
+    public boolean isEnabled(Preferences preferences) {
+        return ctx.getJavaProjectOptions().getJavaSERelease().isCompatibleWith(Release.javaSE("1.7.0"));
+    }
+
+    @Override
     public boolean visit(ClassInstanceCreation node) {
-        if (this.ctx.getJavaProjectOptions().getJavaSERelease().isCompatibleWith(Release.javaSE("1.7.0"))) {
-            final Type type = node.getType();
-            if (type.isParameterizedType()
-                    && node.getAnonymousClassDeclaration() == null
-                    && parentAllowsDiamondOperator(node)
-                    && canUseDiamondOperator(node, type)) {
-                return removeAllTypeArguments((ParameterizedType) type);
-            }
+        final Type type = node.getType();
+        if (type.isParameterizedType()
+                && node.getAnonymousClassDeclaration() == null
+                && parentAllowsDiamondOperator(node)
+                && canUseDiamondOperator(node, type)) {
+            return removeAllTypeArguments((ParameterizedType) type);
         }
         return VISIT_SUBTREE;
     }

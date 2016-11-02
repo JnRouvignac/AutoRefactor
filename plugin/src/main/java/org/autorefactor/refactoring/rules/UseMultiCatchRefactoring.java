@@ -36,6 +36,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.autorefactor.preferences.Preferences;
 import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.ASTHelper;
 import org.autorefactor.refactoring.Refactorings;
@@ -61,7 +62,6 @@ import static org.autorefactor.util.Utils.*;
 import static org.eclipse.jdt.core.dom.ASTNode.*;
 
 /** See {@link #getDescription()} method. */
-@SuppressWarnings("javadoc")
 public class UseMultiCatchRefactoring extends AbstractRefactoringRule {
 
     @Override
@@ -72,6 +72,11 @@ public class UseMultiCatchRefactoring extends AbstractRefactoringRule {
     @Override
     public String getName() {
         return "Multi-catch";
+    }
+
+    @Override
+    public boolean isEnabled(Preferences preferences) {
+        return ctx.getJavaProjectOptions().getJavaSERelease().getMinorVersion() >= 7;
     }
 
     private static enum MergeDirection {

@@ -27,6 +27,7 @@ package org.autorefactor.refactoring.rules;
 
 import java.util.List;
 
+import org.autorefactor.preferences.Preferences;
 import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.Refactorings;
 import org.eclipse.jdt.core.dom.Assignment;
@@ -47,12 +48,19 @@ public class TryWithResourceRefactoring extends AbstractRefactoringRule {
 
     @Override
     public String getDescription() {
-        return "";
+        return ""
+            + "Changes code to make use of Java 7 try-with-resources feature. "
+            + "In particular, it removes now useless finally clauses.";
     }
 
     @Override
     public String getName() {
         return "Use try-with-resource";
+    }
+
+    @Override
+    public boolean isEnabled(Preferences preferences) {
+        return ctx.getJavaProjectOptions().getJavaSERelease().getMinorVersion() >= 7;
     }
 
     @Override
