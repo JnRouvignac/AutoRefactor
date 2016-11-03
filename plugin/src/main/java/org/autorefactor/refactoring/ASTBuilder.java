@@ -56,6 +56,7 @@ import org.eclipse.jdt.core.dom.MarkerAnnotation;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Modifier;
+import org.eclipse.jdt.core.dom.Modifier.ModifierKeyword;
 import org.eclipse.jdt.core.dom.Name;
 import org.eclipse.jdt.core.dom.NumberLiteral;
 import org.eclipse.jdt.core.dom.ParenthesizedExpression;
@@ -80,7 +81,6 @@ import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
-import org.eclipse.jdt.core.dom.Modifier.ModifierKeyword;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.autorefactor.util.Utils.*;
@@ -257,16 +257,15 @@ public class ASTBuilder {
 
     private Type type(String typeName) {
         final String[] names = typeName.split("\\.");
-        if (names.length == 1) {
-            final String name = names[0];
-            final Code primitiveTypeCode = PrimitiveType.toCode(name);
-            if (primitiveTypeCode != null) {
-                return ast.newPrimitiveType(primitiveTypeCode);
-            }
-            return ast.newSimpleType(ast.newSimpleName(name));
-        } else {
+        if (names.length != 1) {
             throw new NotImplementedException(null);
         }
+        final String name = names[0];
+        final Code primitiveTypeCode = PrimitiveType.toCode(name);
+        if (primitiveTypeCode != null) {
+            return ast.newPrimitiveType(primitiveTypeCode);
+        }
+        return ast.newSimpleType(ast.newSimpleName(name));
     }
 
     /**
@@ -355,14 +354,32 @@ public class ASTBuilder {
         if (nodes.isEmpty()) {
             return null;
         }
-        if (!isValidForRangeCopy(nodes)) {
+        if (!isValidForRangeOperation(nodes)) {
             throw new IllegalArgumentException(nodes.get(0),
                     "The provided nodes are not valid for doing a range copy: " + nodes);
         }
         return refactorings.createCopyTarget(nodes.get(0), nodes.get(nodes.size() - 1));
     }
 
-    private boolean isValidForRangeCopy(List<? extends ASTNode> nodes) {
+    /**
+     * Returns a move for the provided nodes list.
+     *
+     * @param <T> the actual nodes's type
+     * @param nodes the nodes list to move
+     * @return a single node, representing a move of the nodes list
+     */
+    public <T extends ASTNode> T moveRange(List<T> nodes) {
+        if (nodes.isEmpty()) {
+            return null;
+        }
+        if (!isValidForRangeOperation(nodes)) {
+            throw new IllegalArgumentException(nodes.get(0),
+                    "The provided nodes are not valid for doing a range move: " + nodes);
+        }
+        return refactorings.createMoveTarget(nodes.get(0), nodes.get(nodes.size() - 1));
+    }
+
+    private boolean isValidForRangeOperation(List<? extends ASTNode> nodes) {
         return nodesHaveSameParentAndLocation(nodes) && refactorings.isValidRange(nodes);
     }
 
@@ -435,7 +452,7 @@ public class ASTBuilder {
      *            the declared variable name
      * @param initializer
      *            the variable initializer, can be null
-     * @return a new variable declaration statement
+     * @return a new variable declaration expression
      */
     public VariableDeclarationExpression declareExpr(Type type, SimpleName varName, Expression initializer) {
         final VariableDeclarationFragment fragment = declareFragment(varName, initializer);
@@ -446,31 +463,30 @@ public class ASTBuilder {
     }
 
     /**
-     * Converts a {@link VariableDeclarationStatement} into a {@link VariableDeclarationExpression}.
+     * Builds a new {@link VariableDeclarationExpression} instance.
      *
-     * @param toCopy the {@link VariableDeclarationStatement} to copy
-     * @return a new {@link VariableDeclarationExpression} matching the provided {@link VariableDeclarationStatement}
+     * @param type
+     *            the declared variable type
+     * @param fragment
+     *            the variable declaration fragment
+     * @return a new variable declaration expression
      */
-    public VariableDeclarationExpression toDeclareExpr(final VariableDeclarationStatement toCopy) {
-        final List<VariableDeclarationFragment> oldFragments = fragments(toCopy);
-        final VariableDeclarationFragment fragment0 = move(oldFragments.get(0));
-
-        final VariableDeclarationExpression vde = ast.newVariableDeclarationExpression(fragment0);
-        mods(vde.modifiers()).add(copyRange(mods(toCopy.modifiers())));
-        final List<VariableDeclarationFragment> newFragments = fragments(vde);
-        for (VariableDeclarationFragment fragment : oldFragments.subList(1, oldFragments.size())) {
-            newFragments.add(move(fragment));
-        }
-        vde.setType(move(toCopy.getType()));
+    public VariableDeclarationExpression declareExpr(Type type, VariableDeclarationFragment fragment) {
+        final VariableDeclarationExpression vde = ast.newVariableDeclarationExpression(fragment);
+        vde.setType(type);
         return vde;
     }
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-    private List<Modifier> mods(List m) {
-        return (List<Modifier>) m;
-    }
-
-    private VariableDeclarationFragment declareFragment(SimpleName varName, Expression initializer) {
+    /**
+     * Builds a new {@link VariableDeclarationFragment} instance.
+     *
+     * @param varName
+     *            the declared variable name
+     * @param initializer
+     *            the variable initializer
+     * @return a new variable declaration fragment
+     */
+    public VariableDeclarationFragment declareFragment(SimpleName varName, Expression initializer) {
         final VariableDeclarationFragment vdf = ast.newVariableDeclarationFragment();
         vdf.setName(varName);
         vdf.setInitializer(initializer);
@@ -992,8 +1008,8 @@ public class ASTBuilder {
      */
     public MethodDeclaration method(List<IExtendedModifier> modifiers, String methodName,
             List<SingleVariableDeclaration> parameters, Block block) {
-        MethodDeclaration md = getAST().newMethodDeclaration();
-        md.modifiers().addAll(modifiers);
+        final MethodDeclaration md = getAST().newMethodDeclaration();
+        modifiers(md).addAll(modifiers);
         md.setName(simpleName(methodName));
         md.parameters().addAll(parameters);
         md.setBody(block);

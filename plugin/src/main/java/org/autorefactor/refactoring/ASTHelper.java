@@ -135,6 +135,7 @@ import org.eclipse.jdt.core.dom.TypeDeclarationStatement;
 import org.eclipse.jdt.core.dom.TypeLiteral;
 import org.eclipse.jdt.core.dom.TypeParameter;
 import org.eclipse.jdt.core.dom.UnionType;
+import org.eclipse.jdt.core.dom.VariableDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
@@ -1096,14 +1097,14 @@ public final class ASTHelper {
     }
 
     /**
-     * Returns the {@link ITypeBinding} of the {@link VariableDeclarationFragment}.
+     * Returns the {@link ITypeBinding} of the {@link VariableDeclaration}.
      *
-     * @param vdf the variable declaration fragment
+     * @param varDecl the variable declaration
      * @return the fragment's type binding, or null if none can be found
      */
-    public static ITypeBinding resolveTypeBinding(final VariableDeclarationFragment vdf) {
-        if (vdf != null) {
-            final IVariableBinding varBinding = vdf.resolveBinding();
+    public static ITypeBinding resolveTypeBinding(final VariableDeclaration varDecl) {
+        if (varDecl != null) {
+            final IVariableBinding varBinding = varDecl.resolveBinding();
             if (varBinding != null) {
                 return varBinding.getType();
             }
@@ -1302,6 +1303,17 @@ public final class ASTHelper {
         return expr1 != null
                 && expr1.getNodeType() == SIMPLE_NAME
                 && isSameLocalVariable(((SimpleName) expr1).resolveBinding(), expr2);
+    }
+
+    /**
+     * Returns whether the provided variable declaration and expression represent the same local variable.
+     *
+     * @param varDecl the variable declaration to analyze
+     * @param expr the expression to analyze
+     * @return {@code true} if the provided nodes represent the same local variable, {@code false} otherwise
+     */
+    public static boolean isSameLocalVariable(VariableDeclaration varDecl, Expression expr) {
+        return varDecl != null && isSameLocalVariable(varDecl.resolveBinding(), expr);
     }
 
     /**
@@ -1982,13 +1994,11 @@ public final class ASTHelper {
         case FIELD_ACCESS:
             return ((FieldAccess) node).resolveFieldBinding();
         case QUALIFIED_NAME:
-            return ((QualifiedName) node).resolveBinding();
         case SIMPLE_NAME:
-            return ((SimpleName) node).resolveBinding();
+            return ((Name) node).resolveBinding();
         case SINGLE_VARIABLE_DECLARATION:
-            return ((SingleVariableDeclaration) node).resolveBinding();
         case VARIABLE_DECLARATION_FRAGMENT:
-            return ((VariableDeclarationFragment) node).resolveBinding();
+            return ((VariableDeclaration) node).resolveBinding();
         }
         return null;
     }
@@ -2012,7 +2022,7 @@ public final class ASTHelper {
      * @return true if the two provided names represent the same variable, false otherwise
      */
     public static boolean isSameVariable(SimpleName name1, SimpleName name2) {
-        return areVariableBindingsEqual(name1, name1);
+        return areVariableBindingsEqual(name1, name2);
     }
 
     /**

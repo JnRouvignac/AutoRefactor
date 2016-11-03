@@ -72,14 +72,13 @@ public class MapRefactoring extends AbstractRefactoringRule {
             if (hasOperator(as, Assignment.Operator.ASSIGN)) {
                 final Expression lhs = as.getLeftHandSide();
                 if (lhs instanceof SimpleName) {
-                    final SimpleName sn = (SimpleName) lhs;
-                    if (isSameLocalVariable(sn.resolveBinding(), mi.getExpression())) {
+                    if (isSameLocalVariable(lhs, mi.getExpression())) {
                         return replaceInitializer(as.getRightHandSide(), arg0, node);
                     }
                 }
             } else if (previousStmt instanceof VariableDeclarationStatement) {
                 final VariableDeclarationFragment vdf = getUniqueFragment((VariableDeclarationStatement) previousStmt);
-                if (vdf != null && isSameLocalVariable(vdf.resolveBinding(), mi.getExpression())) {
+                if (vdf != null && isSameLocalVariable(vdf, mi.getExpression())) {
                     return replaceInitializer(vdf.getInitializer(), arg0, node);
                 }
             }

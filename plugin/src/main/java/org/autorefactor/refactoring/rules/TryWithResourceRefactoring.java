@@ -25,18 +25,30 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.autorefactor.preferences.Preferences;
 import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.Refactorings;
+import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.Assignment;
+import org.eclipse.jdt.core.dom.Block;
+import org.eclipse.jdt.core.dom.ChildPropertyDescriptor;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ExpressionStatement;
+import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.MethodInvocation;
+import org.eclipse.jdt.core.dom.SimpleName;
+import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.TryStatement;
+import org.eclipse.jdt.core.dom.TypeDeclaration;
+import org.eclipse.jdt.core.dom.VariableDeclaration;
+import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
@@ -84,50 +96,157 @@ public class TryWithResourceRefactoring extends AbstractRefactoringRule {
         final VariableDeclarationFragment previousDeclFragment = getUniqueFragment(previousDeclStmt);
         final List<Statement> finallyStmts = asList(node.getFinally());
         if (previousDeclFragment != null && finallyStmts.size() >= 1) {
-            final Statement finallyStmt = finallyStmts.get(0);
-            final ExpressionStatement es = as(finallyStmt, ExpressionStatement.class);
-            final IfStatement is = as(finallyStmt, IfStatement.class);
-            if (es != null) {
-                final MethodInvocation mi = as(es.getExpression(), MethodInvocation.class);
-                final Expression miExpr = mi.getExpression();
-                if (isMethod(mi, "java.io.Closeable", "close")
-                        && isSameVariable(previousDeclFragment, miExpr)) {
-                    final Refactorings r = ctx.getRefactorings();
-                    final ASTBuilder b = ctx.getASTBuilder();
-                    r.remove(previousDeclStmt);
-                    r.insertFirst(node, TryStatement.RESOURCES_PROPERTY, b.toDeclareExpr(previousDeclStmt));
-                    r.remove(finallyStmts.size() == 1 ? node.getFinally() : finallyStmt);
-                    return DO_NOT_VISIT_SUBTREE;
-                }
-            } else if (is != null
-                    && asList(is.getThenStatement()).size() == 1
-                    && asList(is.getElseStatement()).isEmpty()) {
-                final Statement tryStmt = tryStmts.get(0);
-                final Assignment assignResource = asExpression(tryStmt, Assignment.class);
-                if (assignResource != null) {
-                    final Expression nullCheckedExpr = getNullCheckedExpression(is.getExpression());
+            final List<ASTNode> nodesToRemove = new ArrayList<ASTNode>();
+            final VariableDeclarationExpression newResource =
+                newResource(tryStmts, previousDeclStmt, previousDeclFragment, nodesToRemove);
+            if (newResource == null) {
+                return VISIT_SUBTREE;
+            }
 
-                    final Statement thenStmt = asList(is.getThenStatement()).get(0);
-                    final MethodInvocation mi = asExpression(thenStmt, MethodInvocation.class);
-                    final Expression miExpr = mi.getExpression();
-                    if (isMethod(mi, "java.io.Closeable", "close")
-                            && areSameVariables(
-                                    previousDeclFragment, assignResource.getLeftHandSide(), nullCheckedExpr, miExpr)) {
-                        final Refactorings r = ctx.getRefactorings();
-                        final ASTBuilder b = ctx.getASTBuilder();
-                        r.remove(previousDeclStmt);
-                        r.insertFirst(node, TryStatement.RESOURCES_PROPERTY,
-                                b.declareExpr(b.move(previousDeclStmt.getType()),
-                                              b.move(previousDeclFragment.getName()),
-                                              b.move(assignResource.getRightHandSide())));
-                        r.remove(tryStmt);
-                        r.remove(finallyStmts.size() == 1 ? node.getFinally() : finallyStmt);
-                        return DO_NOT_VISIT_SUBTREE;
-                    }
+            nodesToRemove.add(previousDeclStmt);
+
+            final Statement finallyStmt = finallyStmts.get(0);
+            nodesToRemove.add(finallyStmts.size() == 1 ? node.getFinally() : finallyStmt);
+
+            final ExpressionStatement finallyEs = as(finallyStmt, ExpressionStatement.class);
+            final IfStatement finallyIs = as(finallyStmt, IfStatement.class);
+            if (finallyEs != null) {
+                final MethodInvocation mi = as(finallyEs.getExpression(), MethodInvocation.class);
+                if (isMethod(mi, "java.io.Closeable", "close")
+                        && areSameVariables(previousDeclFragment, mi.getExpression())) {
+                    return refactorToTryWithResources(node, newResource, nodesToRemove);
+                }
+            } else if (finallyIs != null
+                    && asList(finallyIs.getThenStatement()).size() == 1
+                    && asList(finallyIs.getElseStatement()).isEmpty()) {
+                final Expression nullCheckedExpr = getNullCheckedExpression(finallyIs.getExpression());
+
+                final Statement thenStmt = asList(finallyIs.getThenStatement()).get(0);
+                final MethodInvocation mi = asExpression(thenStmt, MethodInvocation.class);
+                if (isMethod(mi, "java.io.Closeable", "close")
+                        && areSameVariables(previousDeclFragment, nullCheckedExpr, mi.getExpression())) {
+                    return refactorToTryWithResources(node, newResource, nodesToRemove);
                 }
             }
         }
         return VISIT_SUBTREE;
+    }
+
+    private boolean refactorToTryWithResources(
+            TryStatement node, VariableDeclarationExpression newResource, List<ASTNode> nodesToRemove) {
+        final Refactorings r = ctx.getRefactorings();
+        r.insertFirst(node, TryStatement.RESOURCES_PROPERTY, newResource);
+        r.remove(nodesToRemove);
+        return DO_NOT_VISIT_SUBTREE;
+    }
+
+    private VariableDeclarationExpression newResource(
+            List<Statement> tryStmts,
+            VariableDeclarationStatement previousDeclStmt,
+            VariableDeclarationFragment previousDeclFragment,
+            List<ASTNode> nodesToRemove) {
+        final ASTBuilder b = ctx.getASTBuilder();
+        final VariableDeclarationFragment fragment = newFragment(tryStmts, previousDeclFragment, nodesToRemove);
+        return fragment != null
+            ? b.declareExpr(b.move(previousDeclStmt.getType()), fragment)
+            : null;
+    }
+
+    private VariableDeclarationFragment newFragment(
+            List<Statement> tryStmts,
+            VariableDeclarationFragment existingFragment,
+            List<ASTNode> nodesToRemove) {
+        final VariableDefinitionsUsesVisitor visitor = new VariableDefinitionsUsesVisitor(existingFragment).find();
+        final List<SimpleName> definitions = visitor.getDefinitions();
+
+        final ASTBuilder b = ctx.getASTBuilder();
+        if (!tryStmts.isEmpty()) {
+            final Statement tryStmt = tryStmts.get(0);
+            final Assignment assignResource = asExpression(tryStmt, Assignment.class);
+            if (assignResource != null
+                    && isSameVariable(existingFragment, assignResource.getLeftHandSide())) {
+                nodesToRemove.add(tryStmt);
+                if (containsOnly(definitions, assignResource.getLeftHandSide(), existingFragment.getName())) {
+                    return b.declareFragment(
+                        b.move(existingFragment.getName()),
+                        b.move(assignResource.getRightHandSide()));
+                }
+                return null;
+            }
+        }
+        return containsOnly(definitions, existingFragment.getName())
+            ? b.move(existingFragment)
+            : null;
+    }
+
+    private boolean containsOnly(Collection<SimpleName> definitions, Expression... simpleNames) {
+        if (definitions.size() != simpleNames.length) {
+            return false;
+        }
+        for (Expression simpleName : simpleNames) {
+            if (!definitions.contains(simpleName)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private static final class VariableDefinitionsUsesVisitor extends ASTVisitor {
+        private final VariableDeclaration variableDeclaration;
+        private final IVariableBinding variableBinding;
+        private final List<SimpleName> definitions = new ArrayList<SimpleName>();
+        private final List<SimpleName> uses = new ArrayList<SimpleName>();
+
+        private VariableDefinitionsUsesVisitor(VariableDeclaration variableDeclaration) {
+            this.variableDeclaration = variableDeclaration;
+            this.variableBinding = variableDeclaration.resolveBinding();
+        }
+
+        public VariableDefinitionsUsesVisitor find() {
+            if (variableBinding != null) {
+                final ASTNode scopeNode =
+                        getFirstAncestorOrNull(variableDeclaration, Block.class, TypeDeclaration.class);
+                if (scopeNode != null) {
+                    scopeNode.accept(this);
+                }
+            }
+            return this;
+        }
+
+        @Override
+        public boolean visit(SimpleName node) {
+            if (isSameLocalVariable(variableDeclaration, node)) {
+                switch (node.getParent().getNodeType()) {
+                case ASSIGNMENT:
+                    return addDefinitionOrUse(node, Assignment.LEFT_HAND_SIDE_PROPERTY);
+                case VARIABLE_DECLARATION_FRAGMENT:
+                    return addDefinitionOrUse(node, VariableDeclarationFragment.NAME_PROPERTY);
+                case SINGLE_VARIABLE_DECLARATION:
+                    return addDefinitionOrUse(node, SingleVariableDeclaration.NAME_PROPERTY);
+                default:
+                    uses.add(node);
+                    break;
+                }
+            }
+            return VISIT_SUBTREE;
+        }
+
+        private boolean addDefinitionOrUse(SimpleName node, ChildPropertyDescriptor definitionPropertyDescriptor) {
+            if (node.getLocationInParent() == definitionPropertyDescriptor) {
+                definitions.add(node);
+            } else {
+                uses.add(node);
+            }
+            return VISIT_SUBTREE;
+        }
+
+        public List<SimpleName> getDefinitions() {
+            return definitions;
+        }
+
+        public List<SimpleName> getUses() {
+            return uses;
+        }
     }
 
     private boolean collapseTryStatements(TryStatement outerTryStmt, TryStatement innerTryStmt) {

@@ -28,31 +28,48 @@ package org.autorefactor.refactoring.rules.samples_out;
 import java.io.FileInputStream;
 
 public class TryWithResourceSample {
-    public void refactorFullyInitializedVariableRemoveFinally() throws Exception {
-        try (final FileInputStream inputStream = new FileInputStream("out.txt")) {
+    public void refactorFullyInitializedResourceRemoveFinally() throws Exception {
+        try (FileInputStream inputStream = new FileInputStream("out.txt")) {
             System.out.println(inputStream.read());
         }
     }
 
-    public void refactorFullyInitializedVariableDoNotRemoveFinally() throws Exception {
-        try (final FileInputStream inputStream = new FileInputStream("out.txt")) {
+    public void refactorFullyInitializedResourceDoNotRemoveFinally() throws Exception {
+        try (FileInputStream inputStream = new FileInputStream("out.txt")) {
             System.out.println(inputStream.read());
         } finally {
             System.out.println("Done");
         }
     }
 
-    public void refactorNullInitializedVariableRemoveFinally() throws Exception {
-        try (final FileInputStream inputStream = new FileInputStream("out.txt")) {
+    public void refactorNullInitializedResourceRemoveFinally() throws Exception {
+        try (FileInputStream inputStream = new FileInputStream("out.txt")) {
             System.out.println(inputStream.read());
         }
     }
 
-    public void refactorNullInitializedVariableDoNotRemoveFinally() throws Exception {
-        try (final FileInputStream inputStream = new FileInputStream("out.txt")) {
+    public void refactorNullInitializedResourceDoNotRemoveFinally() throws Exception {
+        try (FileInputStream inputStream = new FileInputStream("out.txt")) {
             System.out.println(inputStream.read());
         } finally {
             System.out.println("Done");
+        }
+    }
+
+    public void doNotRefactorNonEffectivelyFinalResource() throws Exception {
+        try (FileInputStream inputStream = new FileInputStream("out.txt")) {
+            System.out.println(inputStream.read());
+        }
+    }
+
+    public void doNotRefactorFurtherAssignmentsToResource() throws Exception {
+        FileInputStream inputStream = null;
+        try {
+            inputStream = new FileInputStream("out.txt");
+            System.out.println(inputStream.read());
+            inputStream = new FileInputStream("out.txt");
+        } finally {
+            inputStream.close();
         }
     }
 

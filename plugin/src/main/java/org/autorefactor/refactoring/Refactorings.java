@@ -175,6 +175,32 @@ public class Refactorings {
     }
 
     /**
+     * Creates and returns a placeholder node for a move of a range of nodes of the current list.<br>
+     * The placeholder node can either be inserted as new or used to replace an existing node.<br>
+     * When the document is rewritten, a copy of the source code for the given node range is inserted
+     * into the output document at the position corresponding to the placeholder (indentation is
+     * adjusted).
+     *
+     * @param <T>
+     *          the type of the provided node
+     * @param first
+     *          the node that starts the range
+     * @param last
+     *          the node that ends the range
+     * @return the new placeholder node
+     * @throws IllegalArgumentException
+     *           An exception is thrown if the first or last node are null, if a node is not a child
+     *           of the current list or if the first node is not before the last node. An
+     *           IllegalArgumentException is also thrown if the moved range is overlapping with an
+     *           other moved or copied range.
+     * @see ListRewrite#createMoveTarget(ASTNode, ASTNode)
+     */
+    @SuppressWarnings("unchecked")
+    public <T extends ASTNode> T createMoveTarget(T first, T last) {
+        return (T) getListRewrite(first).createMoveTarget(first, last);
+    }
+
+    /**
      * Returns whether the provided nodes are a valid existing range.
      *
      * @param nodes the node range to validate
@@ -346,7 +372,7 @@ public class Refactorings {
      * @param listHolder the node holding the list where to insert
      * @param locationInParent the insert location description
      * @param nodeToInsert the node to insert
-     * @see ListRewrite#insertFirst(ASTNode, int, org.eclipse.text.edits.TextEditGroup)
+     * @see ListRewrite#insertFirst(ASTNode, org.eclipse.text.edits.TextEditGroup)
      */
     public void insertFirst(ASTNode listHolder, StructuralPropertyDescriptor locationInParent, ASTNode nodeToInsert) {
         getListRewrite(listHolder, locationInParent).insertFirst(nodeToInsert, null);
@@ -359,7 +385,7 @@ public class Refactorings {
      * @param listHolder the node holding the list where to insert
      * @param locationInParent the insert location description
      * @param nodeToInsert the node to insert
-     * @see ListRewrite#insertLast(ASTNode, int, org.eclipse.text.edits.TextEditGroup)
+     * @see ListRewrite#insertLast(ASTNode, org.eclipse.text.edits.TextEditGroup)
      */
     public void insertLast(ASTNode listHolder, StructuralPropertyDescriptor locationInParent, ASTNode nodeToInsert) {
         getListRewrite(listHolder, locationInParent).insertLast(nodeToInsert, null);

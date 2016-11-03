@@ -50,7 +50,6 @@ import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Name;
 import org.eclipse.jdt.core.dom.PrefixExpression;
 import org.eclipse.jdt.core.dom.SimpleName;
-import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
@@ -60,7 +59,6 @@ import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.autorefactor.refactoring.ForLoopHelper.*;
 import static org.eclipse.jdt.core.dom.InfixExpression.Operator.*;
 import static org.eclipse.jdt.core.dom.PrefixExpression.Operator.*;
-
 /** See {@link #getDescription()} method. */
 public class CollectionRefactoring extends AbstractRefactoringRule {
     private final class VariableUseCounterVisitor extends ASTVisitor {
@@ -114,14 +112,13 @@ public class CollectionRefactoring extends AbstractRefactoringRule {
             if (hasOperator(as, Assignment.Operator.ASSIGN)) {
                 final Expression lhs = as.getLeftHandSide();
                 if (lhs instanceof SimpleName) {
-                    final SimpleName sn = (SimpleName) lhs;
-                    if (isSameLocalVariable(sn.resolveBinding(), mi.getExpression())) {
+                    if (isSameLocalVariable(lhs, mi.getExpression())) {
                         return replaceInitializer(as.getRightHandSide(), arg0, node);
                     }
                 }
             } else if (previousStmt instanceof VariableDeclarationStatement) {
                 final VariableDeclarationFragment vdf = getUniqueFragment((VariableDeclarationStatement) previousStmt);
-                if (vdf != null && isSameLocalVariable(vdf.resolveBinding(), mi.getExpression())) {
+                if (vdf != null && isSameLocalVariable(vdf, mi.getExpression())) {
                     return replaceInitializer(vdf.getInitializer(), arg0, node);
                 }
             }
@@ -211,7 +208,7 @@ public class CollectionRefactoring extends AbstractRefactoringRule {
             } else if (isArray(iterable)) {
                 if (isMethod(mi, "java.util.Collection", "add", "java.lang.Object")
                         && areTypeCompatible(mi.getExpression(), iterable)
-                        && isSameLocalVariable(node.getParameter().resolveBinding(), arg0(mi))) {
+                        && isSameLocalVariable(foreachVariable, arg0(mi))) {
                     return replaceWithCollectionsAddAll(node, iterable, mi);
                 }
             }
@@ -232,10 +229,8 @@ public class CollectionRefactoring extends AbstractRefactoringRule {
 
     private boolean replaceWithCollectionMethod(EnhancedForStatement node,
             Expression collection, String methodName, MethodInvocation colMI) {
-        final SingleVariableDeclaration foreachVariable = node.getParameter();
-        if (isSameLocalVariable(foreachVariable.resolveBinding(), arg0(colMI))) {
-            return replaceWithCollectionMethod(node, methodName,
-                    colMI.getExpression(), collection);
+        if (isSameLocalVariable(node.getParameter(), arg0(colMI))) {
+            return replaceWithCollectionMethod(node, methodName, colMI.getExpression(), collection);
         }
         return VISIT_SUBTREE;
     }
