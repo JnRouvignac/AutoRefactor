@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2013-2015 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2013-2016 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,7 +25,6 @@
  */
 package org.autorefactor.cfg;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.Collections;
@@ -43,6 +42,7 @@ import java.util.regex.Pattern;
 
 import org.autorefactor.refactoring.ASTHelper;
 import org.autorefactor.refactoring.JavaProjectOptions;
+import org.autorefactor.refactoring.TypeNameDecider;
 import org.autorefactor.util.IllegalStateException;
 import org.autorefactor.util.NotImplementedException;
 import org.autorefactor.util.UnhandledException;
@@ -402,55 +402,10 @@ public class CFGBuilder {
     private ITypeBinding newException(Expression node, String fullyQualifiedName) {
         ITypeBinding typeBinding = typeBindingsCache.get(fullyQualifiedName);
         if (typeBinding == null) {
-            typeBinding = resolveWellKnownType(node, fullyQualifiedName);
+            typeBinding = new TypeNameDecider(node).resolveTypeBinding(fullyQualifiedName);
             typeBindingsCache.put(typeBinding.getQualifiedName(), typeBinding);
         }
         return typeBinding;
-    }
-
-    /**
-     * FIXME Horribly brittle hack that uses reflection to resolve type bindings.
-     * <p>
-     * But how could I do otherwise?
-     * <p>
-     *
-     * @see org.eclipse.jdt.core.dom.DefaultBindingResolver#resolveWellKnownType(String)
-     */
-    private ITypeBinding resolveWellKnownType(Expression node, String fullyQualifiedName) {
-        try {
-            final ITypeBinding typeBinding = node.resolveTypeBinding();
-
-            final Field f1 = typeBinding.getClass().getDeclaredField("resolver");
-            f1.setAccessible(true);
-            Object bindingResolver = f1.get(typeBinding);
-
-            final Field f2 = bindingResolver.getClass().getDeclaredField("scope");
-            f2.setAccessible(true);
-            Object compilationUnitScope = f2.get(bindingResolver);
-
-            final Method m2 = compilationUnitScope.getClass().getSuperclass()
-                    .getDeclaredMethod("getType", char[][].class, int.class);
-            m2.setAccessible(true);
-            final char[][] simpleNamesArray = toSimpleNamesArray(fullyQualifiedName);
-            final Object internalTypeBinding =
-                    m2.invoke(compilationUnitScope, simpleNamesArray, 3);
-
-            final Method m1 = bindingResolver.getClass().getDeclaredMethod("getTypeBinding",
-                    internalTypeBinding.getClass().getSuperclass().getSuperclass());
-            m1.setAccessible(true);
-            return (ITypeBinding) m1.invoke(bindingResolver, internalTypeBinding);
-        } catch (Exception e) {
-            throw new UnhandledException(node, e);
-        }
-    }
-
-    private char[][] toSimpleNamesArray(String fullyQualifiedName) {
-        final String[] simpleNames = fullyQualifiedName.split("\\.");
-        final char[][] result = new char[simpleNames.length][];
-        for (int i = 0; i < simpleNames.length; i++) {
-            result[i] = simpleNames[i].toCharArray();
-        }
-        return result;
     }
 
     /**

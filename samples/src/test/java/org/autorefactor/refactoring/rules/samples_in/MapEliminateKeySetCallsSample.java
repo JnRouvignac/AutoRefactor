@@ -27,9 +27,13 @@
 package org.autorefactor.refactoring.rules.samples_in;
 
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 public class MapEliminateKeySetCallsSample {
+    private Map<String, Long> mapField;
+    private long entry;
+
     public int replaceUnnecesaryCallsToMapKeySet(Map<String, String> map) {
         int x = map.keySet().size();
         if (map.keySet().contains("hello")) {
@@ -44,8 +48,67 @@ public class MapEliminateKeySetCallsSample {
 
     public void iterate(Map<String, Long> map) {
         for (String key : map.keySet()) {
-            System.out.println("hello "+map.get("name"));
+            System.out.println("hello " + map.get("name"));
             if (map.get(key).longValue() > 0) {
+                System.out.println("the value of "+ key + " is " + map.get(key));
+            }
+        }
+    }
+
+    public void iterate2(Map<String, List<Map<Integer, List<Long>>>> map) {
+        for (String key : map.keySet()) {
+            System.out.println("hello " + map.get("name"));
+            if (!map.get(key).isEmpty()) {
+                System.out.println("the value of "+ key + " is " + map.get(key));
+            }
+        }
+    }
+
+    public void iterateVDS(Map<String, Long> map) {
+        Map<String, Long> map2 = map;
+        for (String key : map2.keySet()) {
+            System.out.println("hello " + map2.get("name"));
+            if (map2.get(key).longValue() > 0) {
+                System.out.println("the value of "+ key + " is " + map2.get(key));
+            }
+        }
+    }
+
+    public void iterateVDE(Map<String, Long> map) {
+        int i = 0;
+        for (Map<String, Long> map2 = map; i <= 0; i++) {
+            for (String key : map2.keySet()) {
+                System.out.println("hello " + map2.get("name"));
+                if (map2.get(key).longValue() > 0) {
+                    System.out.println("the value of "+ key + " is " + map2.get(key));
+                }
+            }
+        }
+    }
+
+    public void iterateField() {
+        for (String key : mapField.keySet()) {
+            System.out.println("hello " + mapField.get("name"));
+            if (mapField.get(key).longValue() > 0) {
+                System.out.println("the value of "+ key + " is " + mapField.get(key));
+            }
+        }
+    }
+
+    public void iterateMethod() {
+        ProcessBuilder pb = new ProcessBuilder();
+        for (String key : pb.environment().keySet()) {
+            System.out.println("hello " + pb.environment().get("name"));
+            if (pb.environment().get(key) != null) {
+                System.out.println("the value of "+ key + " is " + pb.environment().get(key));
+            }
+        }
+    }
+
+    public void doNotRefactorRawMap(Map map) {
+        for (Object key : map.keySet()) {
+            System.out.println("hello " + map.get("name"));
+            if (((Long) map.get(key)).longValue() > 0) {
                 System.out.println("the value of "+ key + " is " + map.get(key));
             }
         }
@@ -66,4 +129,24 @@ public class MapEliminateKeySetCallsSample {
         }
     }
 
+    public void newNameConflictsWithExistingVariableBefore(Map<String, Long> map, long entry) {
+        for (String key : map.keySet()) {
+            System.out.println(map.get(key));
+        }
+    }
+
+    public void newNameConflictsWithExistingVariableAfter(Map<String, Long> map) {
+        for (String key : map.keySet()) {
+            System.out.println(map.get(key));
+        }
+        long entry = 0;
+        System.out.println(entry);
+    }
+
+    public void newNameWouldShadowExistingVariableUse(Map<String, Long> map, long entry) {
+        for (String key : map.keySet()) {
+            System.out.println(map.get(key));
+        }
+        System.out.println(entry);
+    }
 }

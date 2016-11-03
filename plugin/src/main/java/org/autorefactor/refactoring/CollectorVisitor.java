@@ -25,30 +25,39 @@
  */
 package org.autorefactor.refactoring;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 
-import static org.autorefactor.refactoring.ASTHelper.*;
-
 /**
- * A visitor that stops visiting as fast as possible once a result has been found.
+ * A visitor that collects a list of results.
  *
- * @param <R> type of the results returned by this finder visitor
+ * @param <R>
+ *          type of the results returned by this finder visitor
  */
-public class FinderVisitor<R> extends ASTVisitor {
-    /** Whether the result has been found. */
-    private boolean resultFound;
+public class CollectorVisitor<R> extends ASTVisitor {
     /** The actual boolean result. */
-    private R result;
+    private final List<R> results = new ArrayList<R>();
 
     /**
-     * Sets the result.
+     * Adds the provided result to the list of results.
      *
-     * @param result the result
+     * @param result a new result
      */
-    protected void setResult(R result) {
-        this.resultFound = true;
-        this.result = result;
+    protected void addResult(R result) {
+        this.results.add(result);
+    }
+
+    /**
+     * Adds the provided result to the list of results.
+     *
+     * @param results the new results
+     */
+    protected void addResults(Collection<R> results) {
+        this.results.addAll(results);
     }
 
     /**
@@ -56,19 +65,10 @@ public class FinderVisitor<R> extends ASTVisitor {
      * and returns the found result if one exists, or the default value.
      *
      * @param nodeToVisit the node to visit
-     * @param defaultResult the default result if no result could be found
-     * @return the result found, or the default result when none exist
+     * @return the results found, may be empty
      */
-    public R findOrDefault(final ASTNode nodeToVisit, final R defaultResult) {
-        if (nodeToVisit != null) {
-            nodeToVisit.accept(this);
-        }
-        return resultFound ? result : defaultResult;
-    }
-
-    @Override
-    public boolean preVisit2(ASTNode node) {
-        // exit has fast as possible when the result is found
-        return resultFound ? DO_NOT_VISIT_SUBTREE : VISIT_SUBTREE;
+    public List<R> collect(final ASTNode nodeToVisit) {
+        nodeToVisit.accept(this);
+        return results;
     }
 }

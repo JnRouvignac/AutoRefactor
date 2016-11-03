@@ -25,8 +25,8 @@ AutoRefactor contributors (sorted alphabeticaly)
 * **[Fabrice Tiercelin](https://github.com/Fabrice-TIERCELIN)**
 
   * Fixed several bugs, made plenty of enhancements
-	
-* **[Zsombor](https://github.com/gzsombor)**
+
+* **[Zsombor Gegesy](https://github.com/gzsombor)**
 
   * Contributed the rule cleaning Map.keySet() usage
 

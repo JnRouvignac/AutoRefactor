@@ -134,7 +134,7 @@ public class CollectionContainsRefactoring extends AbstractRefactoringRule {
                 Statement replacement;
                 if (previousStmtIsPreviousSibling
                         && previousStmt instanceof VariableDeclarationStatement) {
-                    replacement = b.declareStmt("boolean", b.copy((SimpleName) initName),
+                    replacement = b.declareStmt(b.type("boolean"), b.move((SimpleName) initName),
                         collectionContains(iterable, toFind, negate2, b));
                 } else if (!previousStmtIsPreviousSibling
                         || previousStmt instanceof ExpressionStatement) {

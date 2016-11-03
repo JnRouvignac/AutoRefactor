@@ -50,6 +50,7 @@ import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ExpressionStatement;
 import org.eclipse.jdt.core.dom.IExtendedModifier;
+import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.MarkerAnnotation;
@@ -83,11 +84,12 @@ import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
+import org.eclipse.jdt.core.dom.WildcardType;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.autorefactor.util.Utils.*;
 import static org.eclipse.jdt.core.dom.ASTNode.*;
-import static org.eclipse.jdt.core.dom.Modifier.ModifierKeyword.FINAL_KEYWORD;
+import static org.eclipse.jdt.core.dom.Modifier.ModifierKeyword.*;
 import static org.eclipse.jdt.core.dom.PrefixExpression.Operator.*;
 
 /**
@@ -95,7 +97,6 @@ import static org.eclipse.jdt.core.dom.PrefixExpression.Operator.*;
  * Method names which are also java keywords are postfixed with a "0".
  */
 public class ASTBuilder {
-
     /** Copy operations to be performed deeply into {@link ASTBuilder} methods. */
     public enum Copy {
         /** Do not perform any copy. Returns the node as is. */
@@ -257,16 +258,34 @@ public class ASTBuilder {
         return case0(null);
     }
 
-    private Type type(String typeName) {
-        final String[] names = typeName.split("\\.");
-        if (names.length == 1) {
-            final String name = names[0];
-            final Code primitiveTypeCode = PrimitiveType.toCode(name);
-            if (primitiveTypeCode != null) {
-                return ast.newPrimitiveType(primitiveTypeCode);
-            }
-            return ast.newSimpleType(ast.newSimpleName(name));
-        } else {
+    /**
+     * Returns a type for the provided type name (simple or qualified name).
+     *
+     * @param typeName the type name (simple or qualified name)
+     * @return a type for the provided type name
+     */
+    public Type type(String typeName) {
+        if (typeName.indexOf('.') == -1) {
+            return simpleType(typeName);
+        }
+        return qualifiedType(typeName.split("\\."));
+    }
+
+    private Type simpleType(final String name) {
+        final Code primitiveTypeCode = PrimitiveType.toCode(name);
+        if (primitiveTypeCode != null) {
+            return ast.newPrimitiveType(primitiveTypeCode);
+        }
+        return ast.newSimpleType(ast.newSimpleName(name));
+    }
+
+    private Type qualifiedType(String... names) {
+        switch (names.length) {
+        case 0:
+            throw new IllegalArgumentException(null, "Expected one or more names, but got 0");
+        case 1:
+            return simpleType(names[0]);
+        default:
             Type type = ast.newSimpleType(ast.newSimpleName(names[0]));
             for (int i = 1; i < names.length; i++) {
                 type = ast.newQualifiedType(type, ast.newSimpleName(names[i]));
@@ -275,17 +294,22 @@ public class ASTBuilder {
         }
     }
 
-    private Type genericType(String typeName, String... parameterTypes) {
-        Type type = type(typeName);
-        if (parameterTypes.length > 0) {
-            ParameterizedType parameterizedType = ast.newParameterizedType(type);
-            for (String parameterType : parameterTypes) {
-                parameterizedType.typeArguments().add(type(parameterType));
-            }
-            return parameterizedType;
-        } else {
+    /**
+     * Returns a parameterized type with the provided type name and type arguments.
+     *
+     * @param typeName the type name (simple or qualified name)
+     * @param typeArguments the type arguments
+     * @return a new parameterized type
+     */
+    public Type genericType(String typeName, Type... typeArguments) {
+        final Type type = type(typeName);
+        if (typeArguments.length == 0) {
             return type;
         }
+
+        final ParameterizedType parameterizedType = ast.newParameterizedType(type);
+        Collections.addAll(typeArguments(parameterizedType), typeArguments);
+        return parameterizedType;
     }
 
     /**
@@ -299,7 +323,7 @@ public class ASTBuilder {
     public CatchClause catch0(String exceptionTypeName, String caughtExceptionName, Statement... stmts) {
         final CatchClause cc = ast.newCatchClause();
         final SingleVariableDeclaration svd = ast.newSingleVariableDeclaration();
-        svd.setType(newSimpleType(exceptionTypeName));
+        svd.setType(simpleType(exceptionTypeName));
         svd.setName(ast.newSimpleName(caughtExceptionName));
         cc.setException(svd);
 
@@ -330,6 +354,51 @@ public class ASTBuilder {
                 && node.getStartPosition() != -1;
     }
 
+    /**
+     * Creates a type by copying the type binding of the provided expression.
+     *
+     * @param expr the expression whose type must be copied
+     * @param typeNameDecider decides on how the type should be referenced
+     * @return a new type
+     */
+    public Type copyType(Expression expr, TypeNameDecider typeNameDecider) {
+        return toType(expr.resolveTypeBinding(), typeNameDecider);
+    }
+
+    private Type toType(ITypeBinding binding, TypeNameDecider typeNameDecider) {
+        if (binding == null) {
+            throw new IllegalArgumentException(null, "typeBinding cannot be null");
+        }
+
+        if (binding.isParameterizedType()) {
+            final ParameterizedType type = ast.newParameterizedType(toType(binding.getErasure(), typeNameDecider));
+            final List<Type> typeArgs = typeArguments(type);
+            for (ITypeBinding typeArg : binding.getTypeArguments()) {
+                typeArgs.add(toType(typeArg, typeNameDecider));
+            }
+            return type;
+        } else if (binding.isClass()
+                || binding.isInterface()
+                || binding.isEnum()
+                || binding.isAnnotation()
+                || binding.isPrimitive()
+                || binding.isNullType()
+                || binding.isRawType()) {
+            return type(typeNameDecider.useSimplestPossibleName(binding));
+        } else  if (binding.isArray()) {
+            return ast.newArrayType(toType(binding.getElementType(), typeNameDecider));
+        } else if (binding.isWildcardType()) {
+            final WildcardType type = ast.newWildcardType();
+            type.setBound(toType(binding.getBound(), typeNameDecider), binding.isUpperbound());
+            return type;
+        } else if (binding.isTypeVariable()) {
+            throw new NotImplementedException(null, " for the type variable binding '" + binding + "'");
+        } else if (binding.isCapture()) {
+            throw new NotImplementedException(null, " for the capture type binding '" + binding + "'");
+        }
+        throw new NotImplementedException(null, " for the type binding '" + binding + "'");
+    }
+
     private Type copyType(final Type type) {
         switch (type.getNodeType()) {
         case ARRAY_TYPE:
@@ -343,7 +412,7 @@ public class ASTBuilder {
             return ast.newPrimitiveType(code);
 
         case QUALIFIED_TYPE:
-            return toType(ast, type.resolveBinding().getQualifiedName());
+            return type(type.resolveBinding().getQualifiedName());
 
         case SIMPLE_TYPE:
             final SimpleType sType = (SimpleType) type;
@@ -433,33 +502,20 @@ public class ASTBuilder {
     }
 
     /**
-     * Returns a copy of the provided {@link ASTNode} list.
-     * This method loses code comments. Prefer using {@link #copyRange(List)}.
-     *
-     * @param <T> the actual node's type
-     * @param nodes the node list to copy
-     * @return a copy of the node list
-     */
-    @SuppressWarnings("unchecked")
-    public <T extends ASTNode> List<T> copySubtrees(List<T> nodes) {
-        return ASTNode.copySubtrees(ast, nodes);
-    }
-
-    /**
      * Builds a new {@link VariableDeclarationStatement} instance.
      *
      * @param type
-     *            the declared variable type
+     *            the type of the variable being declared
      * @param varName
-     *            the declared variable name
+     *            the name of the variable being declared
      * @param initializer
      *            the variable initializer, can be null
      * @return a new variable declaration statement
      */
-    public VariableDeclarationStatement declareStmt(String type, SimpleName varName, Expression initializer) {
+    public VariableDeclarationStatement declareStmt(Type type, SimpleName varName, Expression initializer) {
         final VariableDeclarationFragment fragment = declareFragment(varName, initializer);
         final VariableDeclarationStatement vds = ast.newVariableDeclarationStatement(fragment);
-        vds.setType(type(type));
+        vds.setType(type);
         return vds;
     }
 
@@ -467,9 +523,9 @@ public class ASTBuilder {
      * Builds a new {@link VariableDeclarationExpression} instance.
      *
      * @param type
-     *            the declared variable type
+     *            the type of the variable being declared
      * @param varName
-     *            the declared variable name
+     *            the name of the variable being declared
      * @param initializer
      *            the variable initializer, can be null
      * @return a new variable declaration expression
@@ -531,18 +587,15 @@ public class ASTBuilder {
      * Builds a new {@link SingleVariableDeclaration} instance.
      *
      * @param varName
-     *            the declared variable name
-     * @param typeName
-     *            the declared variable type
-     * @param parameterTypes
-     *            The generic type parameters
-     * @return a new single variable declaration, used in enhanced for loops.
+     *            the name of the variable being declared
+     * @param type
+     *            the type of the variable being declared
+     * @return a new single variable declaration
      */
-    public SingleVariableDeclaration declareSingleVariable(SimpleName varName, String typeName,
-            String... parameterTypes) {
+    public SingleVariableDeclaration declareSingleVariable(String varName, Type type) {
         final SingleVariableDeclaration svd = ast.newSingleVariableDeclaration();
-        svd.setName(varName);
-        svd.setType(genericType(typeName, parameterTypes));
+        svd.setName(simpleName(varName));
+        svd.setType(type);
         return svd;
     }
 
@@ -761,7 +814,7 @@ public class ASTBuilder {
      */
     public ClassInstanceCreation new0(String typeName, Expression... arguments) {
         final ClassInstanceCreation cic = ast.newClassInstanceCreation();
-        cic.setType(newSimpleType(typeName));
+        cic.setType(simpleType(typeName));
         addAll(arguments(cic), arguments);
         return cic;
     }
@@ -782,9 +835,7 @@ public class ASTBuilder {
 
     private <T extends ASTNode> void addAll(List<T> whereToAdd, T... toAdd) {
         if (!isEmptyRangeCopy(toAdd)) {
-            for (T e : toAdd) {
-                whereToAdd.add(e);
-            }
+            Collections.addAll(whereToAdd, toAdd);
         }
     }
 
@@ -806,10 +857,6 @@ public class ASTBuilder {
         ac.setType(arrayType);
         ac.setInitializer(arrayInitializer);
         return ac;
-    }
-
-    private SimpleType newSimpleType(final String typeName) {
-        return ast.newSimpleType(ast.newName(typeName));
     }
 
     /**

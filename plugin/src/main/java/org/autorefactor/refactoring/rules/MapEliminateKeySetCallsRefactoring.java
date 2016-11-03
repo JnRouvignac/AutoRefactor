@@ -26,33 +26,46 @@
  */
 package org.autorefactor.refactoring.rules;
 
-import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
-import static org.autorefactor.refactoring.ASTHelper.arguments;
-import static org.autorefactor.refactoring.ASTHelper.isMethod;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 import org.autorefactor.refactoring.ASTBuilder;
-import org.autorefactor.refactoring.ASTHelper;
-import org.eclipse.jdt.core.dom.AST;
+import org.autorefactor.refactoring.CollectorVisitor;
+import org.autorefactor.refactoring.Refactorings;
+import org.autorefactor.refactoring.TypeNameDecider;
+import org.autorefactor.util.IllegalStateException;
 import org.eclipse.jdt.core.dom.ASTNode;
-import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.EnhancedForStatement;
 import org.eclipse.jdt.core.dom.Expression;
+import org.eclipse.jdt.core.dom.IBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
+import org.eclipse.jdt.core.dom.IVariableBinding;
+import org.eclipse.jdt.core.dom.Initializer;
+import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
+import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.Statement;
+import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
+import static org.autorefactor.refactoring.ASTHelper.*;
+import static org.eclipse.jdt.core.dom.ASTNode.*;
+import static org.eclipse.jdt.core.dom.EnhancedForStatement.*;
+
 /** See {@link #getDescription()} method. */
-@SuppressWarnings("javadoc")
 public class MapEliminateKeySetCallsRefactoring extends AbstractRefactoringRule {
 
     @Override
     public String getDescription() {
         return ""
-                + "Directly invoke methods on Map rather than on Map.keySet() where possible\n";
+                + "Directly invoke methods on Map rather than on Map.keySet() where possible,\n"
+                + "also convert for loops iterating on Map.keySet() to iterate on Map.entrySet() where possible.";
     }
 
     @Override
@@ -60,72 +73,193 @@ public class MapEliminateKeySetCallsRefactoring extends AbstractRefactoringRule 
         return "Replace useless calls to Map.keySet() when direct calls to the Map are possible";
     }
 
+    /**
+     * This class helps decide which name to give to a new variable.
+     * <p>
+     * When creating a new variable, its name may shadow another variable or field used in the local
+     * scope.
+     * <p>
+     * Does JDT provide a public API for naming local variables? I could not find any.
+     */
+    private static final class VariableNameDecider {
+        private final ASTNode scope;
+        private final int insertionPoint;
+        private final ASTNode namingScope;
+
+        private VariableNameDecider(ASTNode scope, int insertionPoint) {
+            this.scope = scope;
+            this.insertionPoint = insertionPoint;
+            this.namingScope = getNamingScope(scope);
+        }
+
+        private ASTNode getNamingScope(ASTNode scope) {
+            Class<?>[] ancestorClasses = new Class<?>[] { MethodDeclaration.class, Initializer.class };
+            ASTNode ancestor = getFirstAncestorOrNull(scope, ancestorClasses);
+            if (ancestor == null) {
+                throw new IllegalStateException(scope, "Expected to find an ancestor among the types "
+                    + Arrays.toString(ancestorClasses) + " but could not find any");
+            }
+            return ancestor;
+        }
+
+        /**
+         * Returns a name suggestion suitable for use when inserting a new variable declaration. This
+         * name:
+         * <ul>
+         * <li>will not shadow any variable name in use after the insertion point</li>
+         * <li>and will not conflict with local variables declared before the insertion point.</li>
+         * </ul>
+         *
+         * @param candidateNames
+         *          the suggestion will be one of the candidate names, maybe suffixed by a number
+         * @return the suggestion for a variable name
+         */
+        public String suggest(String... candidateNames) {
+            final Set<String> declaredLocalVarNames = new HashSet<String>(collectDeclaredLocalVariableNames());
+            final Set<String> varNamesUsedAfter = new HashSet<String>(collectVariableNamesUsedAfter());
+            int i = 0;
+            while (true) {
+                for (String candidateName : candidateNames) {
+                    final String candidate = i == 0 ? candidateName : candidateName + i;
+                    if (// no variable declaration conflict
+                        !declaredLocalVarNames.contains(candidate)
+                        // new variable does not shadow use of other variables/fields with the same name
+                            && !varNamesUsedAfter.contains(candidate)) {
+                        return candidate;
+                    }
+                }
+                i++;
+            }
+        }
+
+        private Collection<String> collectDeclaredLocalVariableNames() {
+            return new CollectorVisitor<String>() {
+                @Override
+                public boolean preVisit2(ASTNode node) {
+                    return !isTypeDeclaration(node);
+                }
+
+                @Override
+                public boolean visit(SimpleName node) {
+                    final IBinding binding = node.resolveBinding();
+                    if (binding.getKind() == IBinding.VARIABLE) {
+                        addResult(((IVariableBinding) binding).getName());
+                    }
+                    return VISIT_SUBTREE;
+                }
+            } .collect(namingScope);
+        }
+
+        private List<String> collectVariableNamesUsedAfter() {
+            return new CollectorVisitor<String>() {
+                @Override
+                public boolean preVisit2(ASTNode node) {
+                    return node.getStartPosition() > insertionPoint
+                            && !isTypeDeclaration(node);
+                }
+
+                @Override
+                public boolean visit(SimpleName node) {
+                    final IBinding binding = node.resolveBinding();
+                    if (binding.getKind() == IBinding.VARIABLE) {
+                        addResult(((IVariableBinding) binding).getName());
+                    }
+                    return VISIT_SUBTREE;
+                }
+            } .collect(scope);
+        }
+
+        private boolean isTypeDeclaration(ASTNode node) {
+            switch (node.getNodeType()) {
+            case ANNOTATION_TYPE_DECLARATION:
+            case ANONYMOUS_CLASS_DECLARATION:
+            case ENUM_DECLARATION:
+            case TYPE_DECLARATION:
+                return true;
+
+            default:
+                return false;
+            }
+        }
+    }
+
     @Override
     public boolean visit(MethodInvocation mi) {
         Expression miExpr = mi.getExpression();
         if (isKeySetMethod(miExpr)) {
-            MethodInvocation parentMi = (MethodInvocation) miExpr;
+            MethodInvocation mapKeySetMi = (MethodInvocation) miExpr;
             if (isMethod(mi, "java.util.Set", "clear")) {
-                removeInvocationOfMapKeySet(parentMi, mi, "clear");
-                return DO_NOT_VISIT_SUBTREE;
+                return removeInvocationOfMapKeySet(mapKeySetMi, mi, "clear");
             }
             if (isMethod(mi, "java.util.Set", "size")) {
-                removeInvocationOfMapKeySet(parentMi, mi, "size");
-                return DO_NOT_VISIT_SUBTREE;
+                return removeInvocationOfMapKeySet(mapKeySetMi, mi, "size");
             }
             if (isMethod(mi, "java.util.Set", "isEmpty")) {
-                removeInvocationOfMapKeySet(parentMi, mi, "isEmpty");
-                return DO_NOT_VISIT_SUBTREE;
+                return removeInvocationOfMapKeySet(mapKeySetMi, mi, "isEmpty");
             }
             if (isMethod(mi, "java.util.Set", "remove", "java.lang.Object")) {
-                removeInvocationOfMapKeySet(parentMi, mi, "remove");
-                return DO_NOT_VISIT_SUBTREE;
+                return removeInvocationOfMapKeySet(mapKeySetMi, mi, "remove");
             }
             if (isMethod(mi, "java.util.Set", "contains", "java.lang.Object")) {
-                removeInvocationOfMapKeySet(parentMi, mi, "containsKey");
-                return DO_NOT_VISIT_SUBTREE;
+                return removeInvocationOfMapKeySet(mapKeySetMi, mi, "containsKey");
             }
         }
         return VISIT_SUBTREE;
     }
 
-    private boolean isKeySetMethod(Expression expr) {
-        if (expr instanceof MethodInvocation) {
-            return isMethod((MethodInvocation) expr, "java.util.Map", "keySet");
-        }
-        return false;
+    private boolean removeInvocationOfMapKeySet(
+            MethodInvocation mapKeySetMi, MethodInvocation actualMi, String methodName) {
+        final ASTBuilder b = ctx.getASTBuilder();
+        ctx.getRefactorings().replace(
+            actualMi,
+            b.invoke(
+                b.copyExpression(mapKeySetMi),
+                methodName,
+                b.copyRange(arguments(actualMi))));
+        return DO_NOT_VISIT_SUBTREE;
     }
 
     @Override
     public boolean visit(EnhancedForStatement enhancedFor) {
-        if (isKeySetMethod(enhancedFor.getExpression())) {
+        final Expression foreachExpr = enhancedFor.getExpression();
+        if (isKeySetMethod(foreachExpr)) {
             // From 'for (K key : map.keySet()) { }'
             // -> mapExpression become 'map', parameter become 'K key'
-            final Expression mapExpression = ((MethodInvocation) enhancedFor.getExpression()).getExpression();
+            final Expression mapExpression = ((MethodInvocation) foreachExpr).getExpression();
+            if (mapExpression == null) {
+                // not implemented
+                return VISIT_SUBTREE;
+            }
             final SingleVariableDeclaration parameter = enhancedFor.getParameter();
-
-            final ITypeBinding valueType = findAndRefactor(mapExpression, parameter, enhancedFor.getBody());
-            if (valueType != null) {
-
+            final List<MethodInvocation> getValueMis =
+                    collectMapGetValueCalls(mapExpression, parameter, enhancedFor.getBody());
+            if (!getValueMis.isEmpty() && haveSameTypeBindings(getValueMis)) {
                 final ASTBuilder b = ctx.getASTBuilder();
-                final AST ast = ctx.getAST();
-                final EnhancedForStatement newFor = ast.newEnhancedForStatement();
-                newFor.setExpression(b.invoke(b.copy(mapExpression), "entrySet"));
-                newFor.setParameter(b.declareSingleVariable(b.simpleName("entry"), "Map.Entry",
-                        getFriendlyTypeName(parameter.getType().resolveBinding()), getFriendlyTypeName(valueType)));
+                final Refactorings r = ctx.getRefactorings();
 
-                final Statement newBody = b.copy(enhancedFor.getBody());
+                final int insertionPoint = asList(enhancedFor.getBody()).get(0).getStartPosition() - 1;
+                final String entryVarName =
+                        new VariableNameDecider(enhancedFor.getBody(), insertionPoint).suggest("entry", "mapEntry");
 
-                // Declare 'KeyType' 'oldLoopVariable' = entry.getKey();
+                // for (K key : map.keySet()) => for (K key : map.entrySet())
+                r.set(enhancedFor, EXPRESSION_PROPERTY, b.invoke(b.move(mapExpression), "entrySet"));
+                // for (K key : map.entrySet()) => for (Map.Entry<K, V> mapEntry : map.entrySet())
+                final TypeNameDecider typeNameDecider = new TypeNameDecider(parameter);
+                final Type mapEntryType = createMapEntryType(parameter, getValueMis.get(0), typeNameDecider);
+                r.set(enhancedFor, PARAMETER_PROPERTY, b.declareSingleVariable(entryVarName, mapEntryType));
+                // for (Map.Entry<K, V> mapEntry : map.entrySet()) {
+                //     K key = mapEntry.getKey(); // <--- add this statement
+                final Type mapKeyType = b.copy(parameter.getType());
                 final VariableDeclarationStatement newKeyDeclaration = b.declareStmt(
-                        getFriendlyTypeName(parameter.getType().resolveBinding()),
-                        b.copy(parameter.getName()),
-                        b.invoke(b.name("entry"), "getKey"));
+                        mapKeyType,
+                        b.move(parameter.getName()),
+                        b.invoke(b.name(entryVarName), "getKey"));
+                r.insertFirst(enhancedFor.getBody(), Block.STATEMENTS_PROPERTY, newKeyDeclaration);
 
-                newFor.setBody(newBody);
-                ctx.getRefactorings().insertBefore(newKeyDeclaration,
-                        (ASTNode) ((Block) enhancedFor.getBody()).statements().get(0));
-                ctx.getRefactorings().replace(enhancedFor, newFor);
+                // Replace all occurrences of map.get(key) => mapEntry.getValue()
+                for (MethodInvocation getValueMi : getValueMis) {
+                    r.replace(getValueMi, b.invoke(b.name(entryVarName), "getValue"));
+                }
                 return DO_NOT_VISIT_SUBTREE;
             }
         }
@@ -134,69 +268,92 @@ public class MapEliminateKeySetCallsRefactoring extends AbstractRefactoringRule 
     }
 
     /**
-     * @param typeBinding
-     * @return a short name, for classes in the java. packages, otherwise a fully qualified name.
+     * If possible, use the type declaration, so we can return the type as it was declared.
+     * Otherwise, let's use the type binding and output verbose fully qualified types.
      */
-    private String getFriendlyTypeName(ITypeBinding typeBinding) {
-        final String name = typeBinding.getQualifiedName();
-        if (name.startsWith("java.")) {
-            return typeBinding.getName();
-        } else {
-            // TODO: fix to import the necessary type, if not found
-            return name;
+    private Type createMapEntryType(
+            SingleVariableDeclaration parameter, Expression getValueMi, TypeNameDecider typeNameDecider) {
+        final String mapEntryType = typeNameDecider.useSimplestPossibleName("java.util.Map.Entry");
+
+        final ASTBuilder b = ctx.getASTBuilder();
+        final Type mapKeyType = b.move(parameter.getType());
+        final Type mapValueType = b.copyType(getValueMi, typeNameDecider);
+        return b.genericType(mapEntryType, mapKeyType, mapValueType);
+    }
+
+    private boolean isKeySetMethod(Expression expr) {
+        return expr instanceof MethodInvocation
+            && isMethod((MethodInvocation) expr, "java.util.Map", "keySet");
+    }
+
+    private List<MethodInvocation> collectMapGetValueCalls(
+            Expression mapExpression, SingleVariableDeclaration parameter, Statement body) {
+        return new CollectMapGetCalls(mapExpression, parameter).collect(body);
+    }
+
+    /** Sanity check. */
+    private boolean haveSameTypeBindings(Collection<? extends Expression> exprs) {
+        Iterator<? extends Expression> it = exprs.iterator();
+        if (!it.hasNext()) {
+            // Not really expected
+            return false;
         }
+        final ITypeBinding type0 = it.next().resolveTypeBinding();
+        if (type0 == null) {
+            return false;
+        }
+        for (; it.hasNext();) {
+            final ITypeBinding typeN = it.next().resolveTypeBinding();
+            if (!type0.equals(typeN)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
-     * Class to find map.get(loopVariable) construct in the AST tree, and collect the type of the value,
-     * which is unknown till one is located.
-     *
+     * Class to find {@code map.get(loopVariable)} constructs in the AST tree,
+     * and collect the type of the value, which is unknown until one is located.
      */
-    class FindExpression extends ASTVisitor {
-
+    class CollectMapGetCalls extends CollectorVisitor<MethodInvocation> {
         private final Expression mapExpression;
-        private final SingleVariableDeclaration parameter;
-        private ITypeBinding valueType;
+        private final SingleVariableDeclaration forEachParameter;
 
-        public FindExpression(Expression mapExpression, SingleVariableDeclaration parameter) {
+        public CollectMapGetCalls(Expression mapExpression, SingleVariableDeclaration forEachParameter) {
             this.mapExpression = mapExpression;
-            this.parameter = parameter;
+            this.forEachParameter = forEachParameter;
         }
 
         @Override
         public boolean visit(MethodInvocation node) {
-            if (ASTHelper.isSameVariable(node.getExpression(), mapExpression)) {
-                if (isMethod(node, "java.util.Map", "get", "java.util.Object")) {
-                    final ASTNode getArgument = (ASTNode) node.arguments().get(0);
-                    if (ASTHelper.isSameVariable(getArgument, parameter.getName())) {
-
-                        // collect the value type
-                        valueType = node.resolveTypeBinding();
-                        final ASTBuilder b = ctx.getASTBuilder();
-                        ctx.getRefactorings().replace(node, b.invoke(b.name("entry"), "getValue"));
-                        return DO_NOT_VISIT_SUBTREE;
-                    }
-                }
+            if (isSameReference(node.getExpression(), mapExpression)
+                    && isMethod(node, "java.util.Map", "get", "java.util.Object")
+                    && isSameVariable(arg0(node), forEachParameter.getName())) {
+                addResult(node);
             }
             return VISIT_SUBTREE;
         }
 
-        public ITypeBinding getValueType() {
-            return valueType;
+        private boolean isSameReference(Expression expr1, Expression expr2) {
+            if (expr1 == null || expr2 == null) {
+                return false;
+            }
+            switch (expr1.getNodeType()) {
+            case METHOD_INVOCATION:
+                switch (expr2.getNodeType()) {
+                case METHOD_INVOCATION:
+                    final MethodInvocation mi1 = (MethodInvocation) expr1;
+                    final MethodInvocation mi2 = (MethodInvocation) expr2;
+                    return areBindingsEqual(mi1.resolveTypeBinding(), mi2.resolveTypeBinding())
+                            && isSameReference(mi1.getExpression(), mi2.getExpression());
+
+                default:
+                    return isSameVariable(expr1, expr2);
+                }
+
+            default:
+                return isSameVariable(expr1, expr2);
+            }
         }
-    }
-
-    private ITypeBinding findAndRefactor(Expression mapExpression, SingleVariableDeclaration parameter,
-            Statement body) {
-        final FindExpression finder = new FindExpression(mapExpression, parameter);
-        body.accept(finder);
-        return finder.getValueType();
-    }
-
-    private void removeInvocationOfMapKeySet(MethodInvocation mapKeySetMi, MethodInvocation actualMi,
-            String methodName) {
-        final ASTBuilder b = ctx.getASTBuilder();
-        ctx.getRefactorings().replace(actualMi, b.invoke(b.copyExpression(mapKeySetMi), methodName,
-                b.copyRange(arguments(actualMi))));
     }
 }

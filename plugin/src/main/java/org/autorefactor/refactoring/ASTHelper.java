@@ -40,7 +40,6 @@ import java.util.TreeSet;
 import org.autorefactor.util.IllegalArgumentException;
 import org.autorefactor.util.IllegalStateException;
 import org.autorefactor.util.NotImplementedException;
-import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTMatcher;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.AbstractTypeDeclaration;
@@ -108,7 +107,6 @@ import org.eclipse.jdt.core.dom.ParenthesizedExpression;
 import org.eclipse.jdt.core.dom.PostfixExpression;
 import org.eclipse.jdt.core.dom.PrefixExpression;
 import org.eclipse.jdt.core.dom.PrimitiveType;
-import org.eclipse.jdt.core.dom.PrimitiveType.Code;
 import org.eclipse.jdt.core.dom.QualifiedName;
 import org.eclipse.jdt.core.dom.QualifiedType;
 import org.eclipse.jdt.core.dom.ReturnStatement;
@@ -828,66 +826,6 @@ public final class ASTHelper {
             return false;
         }
         return null;
-    }
-
-    /**
-     * Converts the provided type binding to a new {@link Type} object.
-     *
-     * @param ast the {@link AST}
-     * @param typeBinding the type binding
-     * @return a new {@link Type} object
-     */
-    public static Type toType(final AST ast, final ITypeBinding typeBinding) {
-        if (typeBinding == null) {
-            return null;
-        } else if (typeBinding.isArray()) {
-            return ast.newArrayType(toType(ast, typeBinding.getComponentType()));
-        } else if (typeBinding.isPrimitive()) {
-            final Code primitiveTypeCode = PrimitiveType.toCode(typeBinding.getName());
-            if (primitiveTypeCode != null) {
-                return ast.newPrimitiveType(primitiveTypeCode);
-            }
-        } else if (typeBinding.isClass() || typeBinding.isInterface()) {
-            final Type result = toType(ast, typeBinding.getQualifiedName());
-            if (result == null) {
-                throw new IllegalStateException(null,
-                        "Cannot create a new type from an ITypeBinding without qualified name: " + typeBinding);
-            }
-            return result;
-        }
-        throw new NotImplementedException(null, "Unknown type for typeBinding " + typeBinding.getQualifiedName()
-                + ", isAnnotation()=" + typeBinding.isAnnotation()
-                + ", isAnonymous()=" + typeBinding.isAnonymous()
-                + ", isCapture()=" + typeBinding.isCapture()
-                + ", isEnum()=" + typeBinding.isEnum()
-                + ", isGenericType()=" + typeBinding.isGenericType()
-                + ", isParameterizedType()=" + typeBinding.isParameterizedType()
-                + ", isTypeVariable()=" + typeBinding.isTypeVariable()
-                + ", isRawType()=" + typeBinding.isRawType()
-                + ", isWildcardType()=" + typeBinding.isWildcardType());
-    }
-
-    /**
-     * Converts the provided qualified type name to a new {@link Type} object.
-     *
-     * @param ast the {@link AST}
-     * @param qualifiedName the qualified type name
-     * @return a new {@link Type} object
-     */
-    public static Type toType(final AST ast, String qualifiedName) {
-        final String[] names = qualifiedName.split("\\.");
-        if (names.length == 0) {
-            return null;
-        }
-        final SimpleType simpleType = ast.newSimpleType(ast.newSimpleName(names[0]));
-        if (names.length == 1) {
-            return simpleType;
-        }
-        Type result = simpleType;
-        for (int i = 1; i < names.length; i++) {
-            result = ast.newQualifiedType(result, ast.newSimpleName(names[i]));
-        }
-        return result;
     }
 
     // AST navigation
@@ -1990,8 +1928,17 @@ public final class ASTHelper {
     }
 
     private static boolean areVariableBindingsEqual(ASTNode node1, ASTNode node2) {
-        final IBinding b1 = varBinding(node1);
-        final IBinding b2 = varBinding(node2);
+        return areBindingsEqual(varBinding(node1), varBinding(node2));
+    }
+
+    /**
+     * Returns whether to bindings are equal.
+     *
+     * @param b1 the first binding
+     * @param b2 the second binding
+     * @return {@code true} when bindings are equal, {@code false} otherwise
+     */
+    public static boolean areBindingsEqual(final IBinding b1, final IBinding b2) {
         return b1 != null && b2 != null && b1.isEqualTo(b2);
     }
 
