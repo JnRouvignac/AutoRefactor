@@ -26,6 +26,7 @@
  */
 package org.autorefactor.refactoring.rules;
 
+
 import java.util.List;
 
 import org.autorefactor.refactoring.ASTBuilder;
@@ -33,7 +34,6 @@ import org.autorefactor.refactoring.ForLoopHelper.ForLoopContent;
 import org.autorefactor.refactoring.Refactorings;
 import org.eclipse.jdt.core.dom.ASTMatcher;
 import org.eclipse.jdt.core.dom.ASTNode;
-import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.ArrayAccess;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
@@ -41,7 +41,6 @@ import org.eclipse.jdt.core.dom.EnhancedForStatement;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ExpressionStatement;
 import org.eclipse.jdt.core.dom.ForStatement;
-import org.eclipse.jdt.core.dom.IBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.IfStatement;
@@ -53,7 +52,6 @@ import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
-
 import static org.autorefactor.refactoring.ASTBuilder.Copy.*;
 import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.autorefactor.refactoring.ForLoopHelper.*;
@@ -61,26 +59,6 @@ import static org.eclipse.jdt.core.dom.InfixExpression.Operator.*;
 import static org.eclipse.jdt.core.dom.PrefixExpression.Operator.*;
 /** See {@link #getDescription()} method. */
 public class CollectionRefactoring extends AbstractRefactoringRule {
-    private final class VariableUseCounterVisitor extends ASTVisitor {
-        private final IBinding variableBinding;
-        private int useCount;
-
-        public int getUseCount() {
-            return useCount;
-        }
-
-        private VariableUseCounterVisitor(IBinding variableBinding) {
-            this.variableBinding = variableBinding;
-        }
-
-        @Override
-        public boolean visit(SimpleName node) {
-            if (isSameLocalVariable(variableBinding, node)) {
-                useCount++;
-            }
-            return VISIT_SUBTREE;
-        }
-    }
 
     @Override
     public String getDescription() {
@@ -242,8 +220,8 @@ public class CollectionRefactoring extends AbstractRefactoringRule {
         if (loopContent != null
                 && loopContent.getLoopVariable() != null
                 && stmts.size() == 1) {
-            final Name loopVariable = loopContent.getLoopVariable();
-            final IBinding loopVariableName = ((SimpleName) loopVariable).resolveBinding();
+            final SimpleName loopVariable = (SimpleName) loopContent.getLoopVariable();
+            final IVariableBinding loopVariableName = (IVariableBinding) loopVariable.resolveBinding();
             // We should remove all the loop variable occurrences
             // As we replace only one, there should be no more than one occurrence
             if (getVariableUseCount(loopVariableName, node.getBody()) == 1) {
@@ -274,11 +252,11 @@ public class CollectionRefactoring extends AbstractRefactoringRule {
         return VISIT_SUBTREE;
     }
 
-    private int getVariableUseCount(final IBinding variableBinding, Statement toVisit) {
+    private int getVariableUseCount(final IVariableBinding variableBinding, Statement toVisit) {
         if (variableBinding != null) {
-            final VariableUseCounterVisitor variableUseVisitor = new VariableUseCounterVisitor(variableBinding);
-            toVisit.accept(variableUseVisitor);
-            return variableUseVisitor.getUseCount();
+            final VariableDefinitionsUsesVisitor variableUseVisitor =
+                new VariableDefinitionsUsesVisitor(variableBinding, toVisit).find();
+            return variableUseVisitor.getUses().size();
         }
         return 0;
     }

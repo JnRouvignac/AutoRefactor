@@ -203,7 +203,7 @@ public final class ForLoopHelper {
                     && isPrimitive(firstInit, "int")) {
                 final Pair<Name, Expression> initPair = decomposeInitializer(firstInit);
                 final Name init = initPair.getFirst();
-                final ForLoopContent forContent = getIndexOnIterable(condition);
+                final ForLoopContent forContent = getIndexOnIterable(condition, init);
                 final Name updater = getUpdaterOperand(updaters.get(0));
                 if (forContent != null
                         && isZero(initPair.getSecond())
@@ -279,15 +279,15 @@ public final class ForLoopHelper {
         return false;
     }
 
-    private static ForLoopContent getIndexOnIterable(final Expression condition) {
+    private static ForLoopContent getIndexOnIterable(final Expression condition, Name loopVariable) {
         final InfixExpression ie = as(condition, InfixExpression.class);
         if (ie != null && !ie.hasExtendedOperands()) {
             final Expression leftOp = ie.getLeftOperand();
             final Expression rightOp = ie.getRightOperand();
             if (hasOperator(ie, LESS)) {
-                return buildForLoopContent(leftOp, rightOp);
+                return buildForLoopContent(loopVariable, rightOp);
             } else if (hasOperator(ie, GREATER)) {
-                return buildForLoopContent(rightOp, leftOp);
+                return buildForLoopContent(loopVariable, leftOp);
             }
         }
         return null;

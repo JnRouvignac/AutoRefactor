@@ -33,21 +33,14 @@ import org.autorefactor.preferences.Preferences;
 import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.Refactorings;
 import org.eclipse.jdt.core.dom.ASTNode;
-import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.Assignment;
-import org.eclipse.jdt.core.dom.Block;
-import org.eclipse.jdt.core.dom.ChildPropertyDescriptor;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ExpressionStatement;
-import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.SimpleName;
-import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.TryStatement;
-import org.eclipse.jdt.core.dom.TypeDeclaration;
-import org.eclipse.jdt.core.dom.VariableDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
@@ -189,64 +182,6 @@ public class TryWithResourceRefactoring extends AbstractRefactoringRule {
             }
         }
         return true;
-    }
-
-    private static final class VariableDefinitionsUsesVisitor extends ASTVisitor {
-        private final VariableDeclaration variableDeclaration;
-        private final IVariableBinding variableBinding;
-        private final List<SimpleName> definitions = new ArrayList<SimpleName>();
-        private final List<SimpleName> uses = new ArrayList<SimpleName>();
-
-        private VariableDefinitionsUsesVisitor(VariableDeclaration variableDeclaration) {
-            this.variableDeclaration = variableDeclaration;
-            this.variableBinding = variableDeclaration.resolveBinding();
-        }
-
-        public VariableDefinitionsUsesVisitor find() {
-            if (variableBinding != null) {
-                final ASTNode scopeNode =
-                        getFirstAncestorOrNull(variableDeclaration, Block.class, TypeDeclaration.class);
-                if (scopeNode != null) {
-                    scopeNode.accept(this);
-                }
-            }
-            return this;
-        }
-
-        @Override
-        public boolean visit(SimpleName node) {
-            if (isSameLocalVariable(variableDeclaration, node)) {
-                switch (node.getParent().getNodeType()) {
-                case ASSIGNMENT:
-                    return addDefinitionOrUse(node, Assignment.LEFT_HAND_SIDE_PROPERTY);
-                case VARIABLE_DECLARATION_FRAGMENT:
-                    return addDefinitionOrUse(node, VariableDeclarationFragment.NAME_PROPERTY);
-                case SINGLE_VARIABLE_DECLARATION:
-                    return addDefinitionOrUse(node, SingleVariableDeclaration.NAME_PROPERTY);
-                default:
-                    uses.add(node);
-                    break;
-                }
-            }
-            return VISIT_SUBTREE;
-        }
-
-        private boolean addDefinitionOrUse(SimpleName node, ChildPropertyDescriptor definitionPropertyDescriptor) {
-            if (node.getLocationInParent() == definitionPropertyDescriptor) {
-                definitions.add(node);
-            } else {
-                uses.add(node);
-            }
-            return VISIT_SUBTREE;
-        }
-
-        public List<SimpleName> getDefinitions() {
-            return definitions;
-        }
-
-        public List<SimpleName> getUses() {
-            return uses;
-        }
     }
 
     private boolean collapseTryStatements(TryStatement outerTryStmt, TryStatement innerTryStmt) {
