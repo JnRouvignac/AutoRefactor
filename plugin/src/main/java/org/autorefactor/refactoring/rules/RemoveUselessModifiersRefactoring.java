@@ -46,7 +46,9 @@ import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.Modifier;
 import org.eclipse.jdt.core.dom.Modifier.ModifierKeyword;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
+import org.eclipse.jdt.core.dom.TryStatement;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
+import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
 
@@ -110,7 +112,7 @@ public class RemoveUselessModifiersRefactoring extends AbstractRefactoringRule {
         boolean result = VISIT_SUBTREE;
         for (Modifier m : getModifiersOnly(modifiers(node))) {
             if (m.isPublic() || m.isStatic() || m.isFinal()) {
-                this.ctx.getRefactorings().remove(m);
+                ctx.getRefactorings().remove(m);
                 result = DO_NOT_VISIT_SUBTREE;
             }
         }
@@ -135,7 +137,7 @@ public class RemoveUselessModifiersRefactoring extends AbstractRefactoringRule {
         boolean result = VISIT_SUBTREE;
         for (Modifier m : getModifiersOnly(modifiers(node))) {
             if (m.isPublic() || m.isAbstract()) {
-                this.ctx.getRefactorings().remove(m);
+                ctx.getRefactorings().remove(m);
                 result = DO_NOT_VISIT_SUBTREE;
             }
         }
@@ -155,6 +157,15 @@ public class RemoveUselessModifiersRefactoring extends AbstractRefactoringRule {
     @Override
     public boolean visit(EnumDeclaration node) {
         return removeStaticModifier(modifiers(node)) | ensureModifiersOrder(node);
+    }
+
+    @Override
+    public boolean visit(TryStatement node) {
+        boolean result = VISIT_SUBTREE;
+        for (VariableDeclarationExpression resource : resources(node)) {
+            result &= removeFinalModifier(modifiers(resource));
+        }
+        return result;
     }
 
     @Override
@@ -183,7 +194,7 @@ public class RemoveUselessModifiersRefactoring extends AbstractRefactoringRule {
         boolean result = VISIT_SUBTREE;
         for (Modifier m : getModifiersOnly(modifiers)) {
             if (m.isStatic()) {
-                this.ctx.getRefactorings().remove(m);
+                ctx.getRefactorings().remove(m);
                 result = DO_NOT_VISIT_SUBTREE;
             }
         }
@@ -204,16 +215,16 @@ public class RemoveUselessModifiersRefactoring extends AbstractRefactoringRule {
     @Override
     public boolean visit(SingleVariableDeclaration node) {
         if (isInterface(node.getParent().getParent())) {
-            return removeFinalModifier(node);
+            return removeFinalModifier(modifiers(node));
         }
         return VISIT_SUBTREE;
     }
 
-    private boolean removeFinalModifier(SingleVariableDeclaration node) {
+    private boolean removeFinalModifier(List<IExtendedModifier> modifiers) {
         boolean result = VISIT_SUBTREE;
-        for (Modifier m : getModifiersOnly(modifiers(node))) {
+        for (Modifier m : getModifiersOnly(modifiers)) {
             if (m.isFinal()) {
-                this.ctx.getRefactorings().remove(m);
+                ctx.getRefactorings().remove(m);
                 result = DO_NOT_VISIT_SUBTREE;
             }
         }

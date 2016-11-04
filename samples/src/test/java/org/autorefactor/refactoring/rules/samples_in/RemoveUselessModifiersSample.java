@@ -26,6 +26,9 @@
 package org.autorefactor.refactoring.rules.samples_in;
 
 import java.io.Closeable;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 public interface RemoveUselessModifiersSample {
 
@@ -43,6 +46,12 @@ public interface RemoveUselessModifiersSample {
         // FIXME JDT bug? (still failing with juno) uncomment next line
         // @Override
         synchronized public void close() {
+        }
+
+        void removeFinalModifierInTryWithResource() throws IOException {
+            try (final InputStream is = new FileInputStream("out.txt")) {
+                is.read();
+            }
         }
     }
 
