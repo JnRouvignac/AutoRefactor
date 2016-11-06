@@ -39,9 +39,7 @@ import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclaration;
-import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
-import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
 /** Visitor collecting all definitions and uses of a variable. */
 public final class VariableDefinitionsUsesVisitor extends ASTVisitor {
@@ -72,12 +70,23 @@ public final class VariableDefinitionsUsesVisitor extends ASTVisitor {
 
     private static ASTNode getDeclaringScope(VariableDeclaration variableDeclaration) {
         ASTNode node = variableDeclaration.getParent();
-        while (node instanceof VariableDeclaration
-                || node instanceof VariableDeclarationExpression
-                || node instanceof VariableDeclarationStatement) {
+        while (isVariableDeclaration(node)) {
             node = node.getParent();
         }
         return node;
+    }
+
+    private static boolean isVariableDeclaration(ASTNode node) {
+        switch (node.getNodeType()) {
+        case SINGLE_VARIABLE_DECLARATION:
+        case VARIABLE_DECLARATION_EXPRESSION:
+        case VARIABLE_DECLARATION_FRAGMENT:
+        case VARIABLE_DECLARATION_STATEMENT:
+            return true;
+
+        default:
+            return false;
+        }
     }
 
     /**
