@@ -899,6 +899,7 @@ public final class ASTHelper {
      * @param node the start node
      * @param ancestorClazz the required ancestor's type
      * @return the first ancestor of the provided node which has the required type
+     * @see #getFirstAncestorOrNull(ASTNode, Class...)
      */
     @SuppressWarnings("unchecked")
     public static <T extends ASTNode> T getAncestor(ASTNode node, Class<T> ancestorClazz) {
@@ -939,9 +940,14 @@ public final class ASTHelper {
      * @param node the start node
      * @param ancestorClasses the required ancestor's types
      * @return the first ancestor of the provided node which has any of the required type, or {@code null}
+     * @see #getAncestor(ASTNode, Class)
      */
     public static ASTNode getFirstAncestorOrNull(ASTNode node, Class<?>... ancestorClasses) {
-        if (node == null || node.getParent() == null) {
+        if (ancestorClasses.length == 1) {
+            throw new java.lang.IllegalArgumentException(
+                "Please use ASTHelper.getAncestor(ASTNode, Class<?>) instead");
+        }
+        if (node == null || node.getParent() == null || ancestorClasses.length == 0) {
             return null;
         }
         final ASTNode parent = node.getParent();
