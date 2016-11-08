@@ -36,6 +36,7 @@ import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.ASTHelper;
 import org.autorefactor.refactoring.FinderVisitor;
 import org.autorefactor.util.NotImplementedException;
+import org.eclipse.jdt.core.dom.ASTMatcher;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.BreakStatement;
@@ -45,6 +46,9 @@ import org.eclipse.jdt.core.dom.DoStatement;
 import org.eclipse.jdt.core.dom.EnhancedForStatement;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ForStatement;
+import org.eclipse.jdt.core.dom.IBinding;
+import org.eclipse.jdt.core.dom.IMethodBinding;
+import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.InfixExpression.Operator;
@@ -52,16 +56,44 @@ import org.eclipse.jdt.core.dom.NumberLiteral;
 import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.Statement;
+import org.eclipse.jdt.core.dom.SwitchCase;
 import org.eclipse.jdt.core.dom.SwitchStatement;
 import org.eclipse.jdt.core.dom.ThrowStatement;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.WhileStatement;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
+import static org.autorefactor.util.Utils.*;
 import static org.eclipse.jdt.core.dom.InfixExpression.Operator.*;
 
 /** See {@link #getDescription()} method. */
 public class SwitchRefactoring extends AbstractRefactoringRule {
+
+    /** ASTMatcher that matches two piece of code only if the variables in use are the same. */
+    private static final class ASTMatcherSameVariables extends ASTMatcher {
+        @Override
+        public boolean match(SimpleName node, Object other) {
+            return super.match(node, other)
+                    && sameVariable(node, (SimpleName) other);
+        }
+
+        private boolean sameVariable(SimpleName node1, SimpleName node2) {
+            return equalNotNull(getDeclaration(node1), getDeclaration(node2));
+        }
+
+        private IBinding getDeclaration(SimpleName node) {
+            final IBinding b = node.resolveBinding();
+            if (b != null) {
+                switch (b.getKind()) {
+                case IBinding.VARIABLE:
+                    return ((IVariableBinding) b).getVariableDeclaration();
+                case IBinding.METHOD:
+                    return ((IMethodBinding) b).getMethodDeclaration();
+                }
+            }
+            return null;
+        }
+    }
 
     static final class Variable {
         private final SimpleName name;
@@ -90,24 +122,35 @@ public class SwitchRefactoring extends AbstractRefactoringRule {
         }
     }
 
-    private static final class RewrittenCase {
+    private static final class SwitchCaseSection {
         /** Must resolve to constant values. */
         private List<Expression> expressions;
-        private Statement stmt;
+        private List<SwitchCase> existingCases;
+        private List<Statement> stmts;
 
-        public RewrittenCase(List<Expression> expressions, Statement stmt) {
-            this.expressions = expressions;
-            this.stmt = stmt;
+        public SwitchCaseSection() {
+            this(new ArrayList<Expression>(), new ArrayList<SwitchCase>(),
+                    new ArrayList<Statement>());
+        }
+
+        public SwitchCaseSection(List<Expression> expressionList, List<SwitchCase> caseList,
+                List<Statement> statementList) {
+            this.expressions = expressionList;
+            this.stmts = statementList;
+            this.existingCases = caseList;
         }
 
         @Override
         public String toString() {
             final StringBuilder sb = new StringBuilder();
-            for (Expression expr : expressions) {
-                sb.append("case ").append(expr).append(":\n");
+            for (Expression anExpression : expressions) {
+                sb.append("new case ").append(anExpression).append(":\n");
             }
-            for (Statement stmt : asList(stmt)) {
-                sb.append("    " + stmt);
+            for (SwitchCase existingCase : existingCases) {
+                sb.append("existing case ").append(existingCase.getExpression()).append(":\n");
+            }
+            for (Statement stmt : stmts) {
+                sb.append("    ").append(stmt);
             }
             sb.append("    break; // not needed if previous statement breaks control flow");
             return sb.toString();
@@ -203,7 +246,7 @@ public class SwitchRefactoring extends AbstractRefactoringRule {
         }
 
         final SimpleName switchExpr = variable.name;
-        final List<RewrittenCase> cases = new ArrayList<RewrittenCase>();
+        final List<SwitchCaseSection> cases = new ArrayList<SwitchCaseSection>();
         Statement remainingStmt = null;
 
         final Set<String> variableDeclarationIds = new HashSet<String>();
@@ -215,7 +258,8 @@ public class SwitchRefactoring extends AbstractRefactoringRule {
                 return VISIT_SUBTREE;
             }
 
-            cases.add(new RewrittenCase(variable.constantValues, currentNode.getThenStatement()));
+            cases.add(new SwitchCaseSection(variable.constantValues, new ArrayList<SwitchCase>(),
+                    asList(currentNode.getThenStatement())));
             remainingStmt = currentNode.getElseStatement();
 
             variable = extractVariableAndValues(remainingStmt);
@@ -225,7 +269,7 @@ public class SwitchRefactoring extends AbstractRefactoringRule {
             currentNode = (IfStatement) remainingStmt;
         }
 
-        final List<RewrittenCase> filteredCases = filterDuplicateCaseValues(cases);
+        final List<SwitchCaseSection> filteredCases = filterDuplicateCaseValues(cases);
         return maybeReplaceWithSwitchStmt(node, switchExpr, filteredCases, remainingStmt);
     }
 
@@ -257,7 +301,7 @@ public class SwitchRefactoring extends AbstractRefactoringRule {
     }
 
     private boolean maybeReplaceWithSwitchStmt(final IfStatement node, final Expression switchExpr,
-            final List<RewrittenCase> cases, final Statement remainingStmt) {
+            final List<SwitchCaseSection> cases, final Statement remainingStmt) {
         if (switchExpr != null && cases.size() > 1) {
             replaceWithSwitchStmt(node, switchExpr, cases, remainingStmt);
             return DO_NOT_VISIT_SUBTREE;
@@ -266,10 +310,10 @@ public class SwitchRefactoring extends AbstractRefactoringRule {
     }
 
     /** Side-effect: removes the dead branches in a chain of if-elseif. */
-    private List<RewrittenCase> filterDuplicateCaseValues(final List<RewrittenCase> sourceCases) {
-        final List<RewrittenCase> results = new ArrayList<RewrittenCase>();
+    private List<SwitchCaseSection> filterDuplicateCaseValues(final List<SwitchCaseSection> sourceCases) {
+        final List<SwitchCaseSection> results = new ArrayList<SwitchCaseSection>();
         final Set<Object> alreadyProccessedValues = new HashSet<Object>();
-        for (final RewrittenCase sourceCase : sourceCases) {
+        for (final SwitchCaseSection sourceCase : sourceCases) {
             final List<Expression> filteredExprs = new ArrayList<Expression>();
             for (final Expression expr : sourceCase.expressions) {
                 final Object constantValue = expr.resolveConstantExpressionValue();
@@ -283,31 +327,31 @@ public class SwitchRefactoring extends AbstractRefactoringRule {
             }
 
             if (!filteredExprs.isEmpty()) {
-                results.add(new RewrittenCase(filteredExprs, sourceCase.stmt));
+                results.add(new SwitchCaseSection(filteredExprs, new ArrayList<SwitchCase>(), sourceCase.stmts));
             }
         }
         return results;
     }
 
     private void replaceWithSwitchStmt(final IfStatement node, final Expression switchExpr,
-            final List<RewrittenCase> cases, final Statement remainingStmt) {
+            final List<SwitchCaseSection> cases, final Statement remainingStmt) {
         final ASTBuilder b = ctx.getASTBuilder();
         final SwitchStatement switchStmt = b.switch0(b.copy(switchExpr));
-        for (final RewrittenCase aCase : cases) {
-            addCaseWithStmts(switchStmt, aCase.expressions, aCase.stmt);
+        for (final SwitchCaseSection aCase : cases) {
+            addCaseWithStmts(switchStmt, aCase.expressions, aCase.stmts);
         }
         if (remainingStmt != null) {
-            addDefaultWithStmts(switchStmt, remainingStmt);
+            addDefaultWithStmts(switchStmt, asList(remainingStmt));
         }
         ctx.getRefactorings().replace(node, switchStmt);
     }
 
-    private void addDefaultWithStmts(final SwitchStatement switchStmt, final Statement remainingStmt) {
+    private void addDefaultWithStmts(final SwitchStatement switchStmt, final List<Statement> remainingStmt) {
         addCaseWithStmts(switchStmt, null, remainingStmt);
     }
 
     private void addCaseWithStmts(final SwitchStatement switchStmt,
-            final List<Expression> caseValues, final Statement innerStmt) {
+            final List<Expression> caseValues, final List<Statement> innerStmts) {
         final ASTBuilder b = ctx.getASTBuilder();
         final List<Statement> switchStmts = statements(switchStmt);
 
@@ -322,7 +366,6 @@ public class SwitchRefactoring extends AbstractRefactoringRule {
 
         // Add the statement(s) for this case(s)
         boolean isBreakNeeded = true;
-        List<Statement> innerStmts = asList(innerStmt);
         if (!innerStmts.isEmpty()) {
             for (final Statement stmt : innerStmts) {
                 switchStmts.add(b.copy(stmt));
@@ -384,5 +427,97 @@ public class SwitchRefactoring extends AbstractRefactoringRule {
             return new Variable((SimpleName) firstOp, Arrays.asList(secondOp));
         }
         return null;
+    }
+
+    @Override
+    public boolean visit(final SwitchStatement node) {
+        final List<SwitchCaseSection> switchStructure = getSwitchStructure(node);
+
+        for (int referenceIndex = 0; referenceIndex < switchStructure.size() - 1; referenceIndex++) {
+            for (int comparedIndex = referenceIndex + 1; comparedIndex < switchStructure.size(); comparedIndex++) {
+                final SwitchCaseSection referenceCase = switchStructure.get(referenceIndex);
+                final SwitchCaseSection comparedCase = switchStructure.get(comparedIndex);
+
+                if (!referenceCase.stmts.isEmpty()
+                        && breaksControlFlow(referenceCase.stmts.get(referenceCase.stmts.size() - 1))
+                        && isSameCode(referenceCase.stmts, comparedCase.stmts)) {
+                    List<Statement> precedingStatements = switchStructure.get(comparedIndex - 1).stmts;
+
+                    if (breaksControlFlow(precedingStatements.get(precedingStatements.size() - 1))) {
+                        mergeCases(false, referenceCase, comparedCase);
+                        return DO_NOT_VISIT_SUBTREE;
+                    } else if (referenceIndex == 0) {
+                        mergeCases(true, comparedCase, referenceCase);
+                        return DO_NOT_VISIT_SUBTREE;
+                    } else {
+                        precedingStatements = switchStructure.get(referenceIndex - 1).stmts;
+
+                        if (breaksControlFlow(precedingStatements.get(precedingStatements.size() - 1))) {
+                            mergeCases(true, comparedCase, referenceCase);
+                            return DO_NOT_VISIT_SUBTREE;
+                        }
+                    }
+                }
+            }
+        }
+        return VISIT_SUBTREE;
+    }
+
+    private List<SwitchCaseSection> getSwitchStructure(final SwitchStatement node) {
+        final List<SwitchCaseSection> switchStructure = new ArrayList<SwitchCaseSection>();
+
+        SwitchCaseSection currentCase = new SwitchCaseSection();
+        for (final Object oneStatement : node.statements()) {
+            if (oneStatement instanceof SwitchCase) {
+                final SwitchCase oneSwitchCase = (SwitchCase) oneStatement;
+                if (!currentCase.stmts.isEmpty()) {
+                    switchStructure.add(currentCase);
+                    currentCase = new SwitchCaseSection();
+                }
+                currentCase.existingCases.add(oneSwitchCase);
+            } else {
+                currentCase.stmts.add((Statement) oneStatement);
+            }
+        }
+
+        if (!currentCase.existingCases.isEmpty()) {
+            switchStructure.add(currentCase);
+        }
+
+        return switchStructure;
+    }
+
+    private boolean isSameCode(final List<Statement> referenceStatements, final List<Statement> comparedStatements) {
+        if (referenceStatements.size() == comparedStatements.size()) {
+            final ASTMatcher matcher = new ASTMatcherSameVariables();
+
+            for (int codeLine = 0; codeLine < referenceStatements.size(); codeLine++) {
+                if (!ASTHelper.match(matcher, referenceStatements.get(codeLine),
+                        comparedStatements.get(codeLine))) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        return false;
+    }
+
+    private void mergeCases(final boolean before, final SwitchCaseSection referenceSection,
+            final SwitchCaseSection sectionToMove) {
+        final ASTBuilder b = this.ctx.getASTBuilder();
+
+        final Statement referenceCase;
+        if (before) {
+            referenceCase = referenceSection.existingCases.get(0);
+        } else {
+            referenceCase = referenceSection.stmts.get(0);
+        }
+        for (final SwitchCase caseToMove : sectionToMove.existingCases) {
+            this.ctx.getRefactorings().insertBefore(b.move(caseToMove), referenceCase);
+        }
+
+        for (final Statement codeToMove : sectionToMove.stmts) {
+            this.ctx.getRefactorings().remove(codeToMove);
+        }
     }
 }
