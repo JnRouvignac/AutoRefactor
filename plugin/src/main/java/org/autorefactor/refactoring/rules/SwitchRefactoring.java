@@ -26,6 +26,20 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.asList;
+import static org.autorefactor.refactoring.ASTHelper.extendedOperands;
+import static org.autorefactor.refactoring.ASTHelper.haveSameType;
+import static org.autorefactor.refactoring.ASTHelper.isPrimitive;
+import static org.autorefactor.refactoring.ASTHelper.removeParentheses;
+import static org.autorefactor.refactoring.ASTHelper.statements;
+import static org.autorefactor.util.Utils.equalNotNull;
+import static org.eclipse.jdt.core.dom.InfixExpression.Operator.CONDITIONAL_OR;
+import static org.eclipse.jdt.core.dom.InfixExpression.Operator.EQUALS;
+import static org.eclipse.jdt.core.dom.InfixExpression.Operator.OR;
+import static org.eclipse.jdt.core.dom.InfixExpression.Operator.XOR;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -36,6 +50,8 @@ import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.ASTHelper;
 import org.autorefactor.refactoring.FinderVisitor;
 import org.autorefactor.util.NotImplementedException;
+import org.autorefactor.util.Pair;
+import org.eclipse.jdt.core.dom.ASTMatcher;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.BreakStatement;
@@ -45,6 +61,9 @@ import org.eclipse.jdt.core.dom.DoStatement;
 import org.eclipse.jdt.core.dom.EnhancedForStatement;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ForStatement;
+import org.eclipse.jdt.core.dom.IBinding;
+import org.eclipse.jdt.core.dom.IMethodBinding;
+import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.InfixExpression.Operator;
@@ -52,16 +71,40 @@ import org.eclipse.jdt.core.dom.NumberLiteral;
 import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.Statement;
+import org.eclipse.jdt.core.dom.SwitchCase;
 import org.eclipse.jdt.core.dom.SwitchStatement;
 import org.eclipse.jdt.core.dom.ThrowStatement;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.WhileStatement;
 
-import static org.autorefactor.refactoring.ASTHelper.*;
-import static org.eclipse.jdt.core.dom.InfixExpression.Operator.*;
-
 /** See {@link #getDescription()} method. */
 public class SwitchRefactoring extends AbstractRefactoringRule {
+
+    /** ASTMatcher that matches two piece of code only if the variables in use are the same. */
+    private static final class ASTMatcherSameVariables extends ASTMatcher {
+        @Override
+        public boolean match(SimpleName node, Object other) {
+            return super.match(node, other)
+                    && sameVariable(node, (SimpleName) other);
+        }
+
+        private boolean sameVariable(SimpleName node1, SimpleName node2) {
+            return equalNotNull(getDeclaration(node1), getDeclaration(node2));
+        }
+
+        private IBinding getDeclaration(SimpleName node) {
+            final IBinding b = node.resolveBinding();
+            if (b != null) {
+                switch (b.getKind()) {
+                case IBinding.VARIABLE:
+                    return ((IVariableBinding) b).getVariableDeclaration();
+                case IBinding.METHOD:
+                    return ((IMethodBinding) b).getMethodDeclaration();
+                }
+            }
+            return null;
+        }
+    }
 
     static final class Variable {
         private final SimpleName name;
@@ -384,5 +427,100 @@ public class SwitchRefactoring extends AbstractRefactoringRule {
             return new Variable((SimpleName) firstOp, Arrays.asList(secondOp));
         }
         return null;
+    }
+
+    @Override
+    public boolean visit(final SwitchStatement node) {
+        List<Pair<List<Statement>, List<Statement>>> switchStructure = getSwitchStructure(node);
+
+        for (int referenceIndex = 0; referenceIndex < switchStructure.size() - 1; referenceIndex++) {
+            for (int comparedIndex = referenceIndex + 1; comparedIndex < switchStructure.size(); comparedIndex++) {
+                Pair<List<Statement>, List<Statement>> referenceCase = switchStructure.get(referenceIndex);
+                Pair<List<Statement>, List<Statement>> comparedCase = switchStructure.get(comparedIndex);
+
+                if (!referenceCase.getSecond().isEmpty()
+                        && breaksControlFlow(referenceCase.getSecond().get(referenceCase.getSecond().size() - 1))
+                        && isTheSameCode(referenceCase.getSecond(), comparedCase.getSecond())) {
+                    List<Statement> precedingStatements = switchStructure.get(comparedIndex - 1).getSecond();
+
+                    if (breaksControlFlow(precedingStatements.get(precedingStatements.size() - 1))) {
+                        refactorByMergingCases(false, referenceCase, comparedCase);
+                        return DO_NOT_VISIT_SUBTREE;
+                    } else if (referenceIndex == 0) {
+                        refactorByMergingCases(true, comparedCase, referenceCase);
+                        return DO_NOT_VISIT_SUBTREE;
+                    } else {
+                        precedingStatements = switchStructure.get(referenceIndex - 1).getSecond();
+
+                        if (breaksControlFlow(precedingStatements.get(precedingStatements.size() - 1))) {
+                            refactorByMergingCases(true, comparedCase, referenceCase);
+                            return DO_NOT_VISIT_SUBTREE;
+                        }
+                    }
+                }
+            }
+        }
+        return VISIT_SUBTREE;
+    }
+
+    private List<Pair<List<Statement>, List<Statement>>> getSwitchStructure(final SwitchStatement node) {
+        final List<Pair<List<Statement>, List<Statement>>> switchStructure = new ArrayList<Pair<List<Statement>,
+                List<Statement>>>();
+
+        Pair<List<Statement>, List<Statement>> currentCase =
+                Pair.<List<Statement>, List<Statement>>of(new ArrayList<Statement>(), new ArrayList<Statement>());
+        for (final Object oneStatement : node.statements()) {
+            if (oneStatement instanceof SwitchCase) {
+                final SwitchCase oneSwitchCase = (SwitchCase) oneStatement;
+                if (!currentCase.getSecond().isEmpty()) {
+                    switchStructure.add(currentCase);
+                    currentCase = Pair.<List<Statement>, List<Statement>>of(
+                            new ArrayList<Statement>(), new ArrayList<Statement>());
+                }
+                currentCase.getFirst().add(oneSwitchCase);
+            } else {
+                currentCase.getSecond().add((Statement) oneStatement);
+            }
+        }
+
+        if (!currentCase.getFirst().isEmpty()) {
+            switchStructure.add(currentCase);
+        }
+
+        return switchStructure;
+    }
+
+    private boolean isTheSameCode(final List<Statement> referenceStatements, final List<Statement> comparedStatements) {
+        if (referenceStatements.size() == comparedStatements.size()) {
+            final ASTMatcher matcher = new ASTMatcherSameVariables();
+
+            for (int codeLine = 0; codeLine < referenceStatements.size(); codeLine++) {
+                if (!ASTHelper.match(matcher, referenceStatements.get(codeLine),
+                        comparedStatements.get(codeLine))) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        return false;
+    }
+
+    private void refactorByMergingCases(final boolean before, final Pair<List<Statement>, List<Statement>> targetCode,
+            final Pair<List<Statement>, List<Statement>> codeToMove) {
+        final ASTBuilder b = this.ctx.getASTBuilder();
+
+        final Statement referenceCase;
+        if (before) {
+            referenceCase = targetCode.getFirst().get(0);
+        } else {
+            referenceCase = targetCode.getSecond().get(0);
+        }
+        for (final Statement caseStatement : codeToMove.getFirst()) {
+            this.ctx.getRefactorings().insertBefore(b.move(caseStatement), referenceCase);
+        }
+
+        for (final Statement codeStatement : codeToMove.getSecond()) {
+            this.ctx.getRefactorings().remove(codeStatement);
+        }
     }
 }

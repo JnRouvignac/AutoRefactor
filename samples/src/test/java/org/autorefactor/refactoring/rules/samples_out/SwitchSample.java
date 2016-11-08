@@ -361,4 +361,169 @@ public class SwitchSample {
             i = 30;
         }
     }
+
+    public void mergeCases(int i1) {
+        int i = 0;
+        switch (i1) {
+        case 0:
+        case 1:
+            i = 0;
+            break;
+        default:
+            i = 1;
+            break;
+        }
+    }
+
+    public void mergeCasesWithUnbrokenCase(int i1) {
+        int i = 0;
+        switch (i1) {
+        case 1:
+            i = 1;
+        case 0:
+        default:
+            i = 0;
+            break;
+        }
+    }
+
+    public void mergeCasesWithPrecedingUnbrokenCase(int i1) {
+        int i = 0;
+        switch (i1) {
+        case 0:
+            i = 1;
+        case 1:
+        default:
+            i = 0;
+            break;
+        }
+    }
+
+    public void mergeMultipleCases(int i1) {
+        int i = 0;
+        switch (i1) {
+        case 0:
+        case 1:
+        case 2:
+        case 3:
+            i = 0;
+            break;
+        case 4:
+        default:
+            i = 1;
+            break;
+        }
+    }
+
+    public void mergeCasesWithReturn(int i1) {
+        int i = 0;
+        switch (i1) {
+        case 0:
+        case 1:
+            i = 0;
+            return;
+        default:
+            i = 1;
+            return;
+        }
+    }
+
+    public void mergeCasesWithException(int i1) {
+        RuntimeException e = new RuntimeException();
+        int i = 0;
+        switch (i1) {
+        case 0:
+        case 1:
+            i = 0;
+            throw e;
+        default:
+            i = 1;
+            throw e;
+        }
+    }
+
+    public void mergeCasesWithContinue(int i1) {
+        int i = 0;
+        for (int j = 0; j < 10; j++) {
+            switch (i1) {
+            case 0:
+            case 1:
+                i = 0;
+                continue;
+            default:
+                i = 1;
+                continue;
+            }
+        }
+    }
+
+    public void doNotMergeCasesWithoutBreaks(int i1) {
+        int i = 0;
+        switch (i1) {
+        case 0:
+            i = 0;
+        case 1:
+            i = 0;
+        default:
+            i = 1;
+        }
+    }
+
+    public void doNotMergeCasesWithPrecedingUnbrokenCases(int i1) {
+        int i = 0;
+        switch (i1) {
+        case 0:
+            i = 1;
+        case 1:
+            i = 0;
+            break;
+        case 2:
+            i = 2;
+        default:
+            i = 0;
+            break;
+        }
+    }
+
+    public void mergeCasesWithVariableDeclaration(int i1) {
+        switch (i1) {
+        case 0:
+            int i = 0;
+            i = 0;
+            break;
+        case 1:
+        default:
+            i = 0;
+            break;
+        }
+    }
+
+    public void mergeCasesWithUnusedVariable(int i1) {
+        int i = 0;
+        switch (i1) {
+        case 0:
+        case 2:
+            i = 0;
+            break;
+        case 1:
+            int i2 = 0;
+            i2 = 0;
+            break;
+        }
+    }
+
+    public void doNotMergeCasesWithVariableConflict(int i1) {
+        switch (i1) {
+        case 0:
+            i2 = 0;
+            break;
+        case 1:
+            int i2 = 0;
+            i2 = 0;
+            break;
+        default:
+            i2 = 0;
+            break;
+        }
+    }
 }
