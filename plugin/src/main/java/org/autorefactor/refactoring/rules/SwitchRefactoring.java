@@ -26,20 +26,6 @@
  */
 package org.autorefactor.refactoring.rules;
 
-import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
-import static org.autorefactor.refactoring.ASTHelper.asList;
-import static org.autorefactor.refactoring.ASTHelper.extendedOperands;
-import static org.autorefactor.refactoring.ASTHelper.haveSameType;
-import static org.autorefactor.refactoring.ASTHelper.isPrimitive;
-import static org.autorefactor.refactoring.ASTHelper.removeParentheses;
-import static org.autorefactor.refactoring.ASTHelper.statements;
-import static org.autorefactor.util.Utils.equalNotNull;
-import static org.eclipse.jdt.core.dom.InfixExpression.Operator.CONDITIONAL_OR;
-import static org.eclipse.jdt.core.dom.InfixExpression.Operator.EQUALS;
-import static org.eclipse.jdt.core.dom.InfixExpression.Operator.OR;
-import static org.eclipse.jdt.core.dom.InfixExpression.Operator.XOR;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -76,6 +62,10 @@ import org.eclipse.jdt.core.dom.SwitchStatement;
 import org.eclipse.jdt.core.dom.ThrowStatement;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.WhileStatement;
+
+import static org.autorefactor.refactoring.ASTHelper.*;
+import static org.autorefactor.util.Utils.*;
+import static org.eclipse.jdt.core.dom.InfixExpression.Operator.*;
 
 /** See {@link #getDescription()} method. */
 public class SwitchRefactoring extends AbstractRefactoringRule {
@@ -431,12 +421,12 @@ public class SwitchRefactoring extends AbstractRefactoringRule {
 
     @Override
     public boolean visit(final SwitchStatement node) {
-        List<Pair<List<Statement>, List<Statement>>> switchStructure = getSwitchStructure(node);
+        final List<Pair<List<Statement>, List<Statement>>> switchStructure = getSwitchStructure(node);
 
         for (int referenceIndex = 0; referenceIndex < switchStructure.size() - 1; referenceIndex++) {
             for (int comparedIndex = referenceIndex + 1; comparedIndex < switchStructure.size(); comparedIndex++) {
-                Pair<List<Statement>, List<Statement>> referenceCase = switchStructure.get(referenceIndex);
-                Pair<List<Statement>, List<Statement>> comparedCase = switchStructure.get(comparedIndex);
+                final Pair<List<Statement>, List<Statement>> referenceCase = switchStructure.get(referenceIndex);
+                final Pair<List<Statement>, List<Statement>> comparedCase = switchStructure.get(comparedIndex);
 
                 if (!referenceCase.getSecond().isEmpty()
                         && breaksControlFlow(referenceCase.getSecond().get(referenceCase.getSecond().size() - 1))
