@@ -257,15 +257,16 @@ public class ASTBuilder {
 
     private Type type(String typeName) {
         final String[] names = typeName.split("\\.");
-        if (names.length != 1) {
+        if (names.length == 1) {
+            final String name = names[0];
+            final Code primitiveTypeCode = PrimitiveType.toCode(name);
+            if (primitiveTypeCode != null) {
+                return ast.newPrimitiveType(primitiveTypeCode);
+            }
+            return ast.newSimpleType(ast.newSimpleName(name));
+        } else {
             throw new NotImplementedException(null);
         }
-        final String name = names[0];
-        final Code primitiveTypeCode = PrimitiveType.toCode(name);
-        if (primitiveTypeCode != null) {
-            return ast.newPrimitiveType(primitiveTypeCode);
-        }
-        return ast.newSimpleType(ast.newSimpleName(name));
     }
 
     /**
