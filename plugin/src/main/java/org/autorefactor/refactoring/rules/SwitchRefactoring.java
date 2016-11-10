@@ -128,6 +128,11 @@ public class SwitchRefactoring extends AbstractRefactoringRule {
         private List<SwitchCase> existingCases;
         private List<Statement> stmts;
 
+        public SwitchCaseSection() {
+            this(new ArrayList<Expression>(), new ArrayList<SwitchCase>(),
+                    new ArrayList<Statement>());
+        }
+
         public SwitchCaseSection(List<Expression> expressionList, List<SwitchCase> caseList,
                 List<Statement> statementList) {
             this.expressions = expressionList;
@@ -138,18 +143,14 @@ public class SwitchRefactoring extends AbstractRefactoringRule {
         @Override
         public String toString() {
             final StringBuilder sb = new StringBuilder();
-            if (expressions != null) {
-                for (Expression anExpression : expressions) {
-                    sb.append("new case ").append(anExpression).append(":\n");
-                }
+            for (Expression anExpression : expressions) {
+                sb.append("new case ").append(anExpression).append(":\n");
             }
-            if (existingCases != null) {
-                for (SwitchCase existingCase : existingCases) {
-                    sb.append("existing case ").append(existingCase.getExpression()).append(":\n");
-                }
+            for (SwitchCase existingCase : existingCases) {
+                sb.append("existing case ").append(existingCase.getExpression()).append(":\n");
             }
             for (Statement stmt : stmts) {
-                sb.append("    " + stmt);
+                sb.append("    ").append(stmt);
             }
             sb.append("    break; // not needed if previous statement breaks control flow");
             return sb.toString();
@@ -257,7 +258,8 @@ public class SwitchRefactoring extends AbstractRefactoringRule {
                 return VISIT_SUBTREE;
             }
 
-            cases.add(new SwitchCaseSection(variable.constantValues, null, asList(currentNode.getThenStatement())));
+            cases.add(new SwitchCaseSection(variable.constantValues, new ArrayList<SwitchCase>(),
+                    asList(currentNode.getThenStatement())));
             remainingStmt = currentNode.getElseStatement();
 
             variable = extractVariableAndValues(remainingStmt);
@@ -325,7 +327,7 @@ public class SwitchRefactoring extends AbstractRefactoringRule {
             }
 
             if (!filteredExprs.isEmpty()) {
-                results.add(new SwitchCaseSection(filteredExprs, null, sourceCase.stmts));
+                results.add(new SwitchCaseSection(filteredExprs, new ArrayList<SwitchCase>(), sourceCase.stmts));
             }
         }
         return results;
@@ -464,14 +466,13 @@ public class SwitchRefactoring extends AbstractRefactoringRule {
     private List<SwitchCaseSection> getSwitchStructure(final SwitchStatement node) {
         final List<SwitchCaseSection> switchStructure = new ArrayList<SwitchCaseSection>();
 
-        SwitchCaseSection currentCase = new SwitchCaseSection(null, new ArrayList<SwitchCase>(),
-                new ArrayList<Statement>());
+        SwitchCaseSection currentCase = new SwitchCaseSection();
         for (final Object oneStatement : node.statements()) {
             if (oneStatement instanceof SwitchCase) {
                 final SwitchCase oneSwitchCase = (SwitchCase) oneStatement;
                 if (!currentCase.stmts.isEmpty()) {
                     switchStructure.add(currentCase);
-                    currentCase = new SwitchCaseSection(null, new ArrayList<SwitchCase>(), new ArrayList<Statement>());
+                    currentCase = new SwitchCaseSection();
                 }
                 currentCase.existingCases.add(oneSwitchCase);
             } else {
