@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2014 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2014-2016 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,9 +25,9 @@
  */
 package org.autorefactor.util;
 
-/**
- * Utility class containing miscellaneous helper methods.
- */
+import java.util.List;
+
+/** Utility class containing miscellaneous helper methods. */
 public final class Utils {
 
     private Utils() {
@@ -147,4 +147,15 @@ public final class Utils {
         return d1 == d2;
     }
 
+    /**
+     * Returns the last element in the list.
+     *
+     * @param list the list
+     * @param <E> the type of elements in the list
+     * @return the last element
+     * @throws NullPointerException if the list is {@code null}
+     */
+    public static <E> E getLast(final List<E> list) {
+        return list.get(list.size() - 1);
+    }
 }

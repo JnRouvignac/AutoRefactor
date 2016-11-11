@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2013-2015 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2013-2016 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -213,7 +213,7 @@ public class ReduceVariableScopeRefactoring extends AbstractRefactoringRule {
                 this.allVariableAccesses.put(varName, list);
             }
             if (list.size() == 0
-                    || !list.get(list.size() - 1).getScope().equals(accessTypeAndScope.getSecond())) {
+                    || !getLast(list).getScope().equals(accessTypeAndScope.getSecond())) {
                 // only keep first write in scope
                 list.add(new VariableAccess(node, accessTypeAndScope.getFirst(), accessTypeAndScope.getSecond()));
             }

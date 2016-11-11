@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2015 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2015-2016 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -57,6 +57,7 @@ import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.autorefactor.refactoring.SourceLocation.*;
+import static org.autorefactor.util.Utils.*;
 
 /**
  * See {@link #getDescription()} method.
@@ -203,7 +204,7 @@ public class RemoveSemiColonRefactoring extends AbstractRefactoringRule {
         if (resources.isEmpty()) {
             return VISIT_SUBTREE;
         }
-        VariableDeclarationExpression lastResource = resources.get(resources.size() - 1);
+        VariableDeclarationExpression lastResource = getLast(resources);
         Block body = node.getBody();
         return removeSuperfluousSemiColons(node, getEndPosition(lastResource), body.getStartPosition());
     }
