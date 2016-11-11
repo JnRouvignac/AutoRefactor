@@ -37,6 +37,9 @@ import org.eclipse.jdt.core.dom.StringLiteral;
 import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.eclipse.jdt.core.dom.ASTNode.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /** See {@link #getDescription()} method. */
 public class StringRefactoring extends AbstractRefactoringRule {
 
@@ -193,7 +196,19 @@ public class StringRefactoring extends AbstractRefactoringRule {
             final Expression stringLiteral, final Expression variable) {
         if ((stringLiteral instanceof StringLiteral) && ((StringLiteral) stringLiteral).getLiteralValue().matches("")
                 && !hasType(variable, "java.lang.String", "char[]")) {
-            ctx.getRefactorings().replace(node, b.invoke("String", "valueOf", b.copy(variable)));
+            if (node.hasExtendedOperands()) {
+                final List<Expression> extendedOperands = new ArrayList<Expression>();
+                extendedOperands.add((Expression) b.invoke("String", "valueOf",
+                        b.copy(variable)));
+
+                for (final Object extendedOperand : node.extendedOperands()) {
+                    extendedOperands.add(b.copy((Expression) extendedOperand));
+                }
+                ctx.getRefactorings().replace(node, b.infixExpr(
+                        InfixExpression.Operator.PLUS, extendedOperands));
+            } else {
+                ctx.getRefactorings().replace(node, b.invoke("String", "valueOf", b.copy(variable)));
+            }
             return DO_NOT_VISIT_SUBTREE;
         }
         return VISIT_SUBTREE;
