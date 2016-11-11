@@ -91,7 +91,7 @@ public class VectorOldToNewAPIRefactoring extends AbstractRefactoringRule {
         final Refactorings r = this.ctx.getRefactorings();
         r.set(node, NAME_PROPERTY, b.simpleName(newMethodName));
         if (hasType(arg0, "int", "short", "byte")) {
-            r.replace(arg0, b.cast("Object", b.move(arg0)));
+            r.replace(arg0, b.cast(b.type("Object"), b.move(arg0)));
         }
         return DO_NOT_VISIT_SUBTREE;
     }

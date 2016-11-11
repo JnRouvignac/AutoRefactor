@@ -238,13 +238,13 @@ public class ASTBuilder {
     /**
      * Builds a new {@link CastExpression} instance.
      *
-     * @param typeName the name of the type being cast to
+     * @param type the type being cast to
      * @param expr the expression being cast
      * @return a new CastExpression
      */
-    public CastExpression cast(String typeName, Expression expr) {
+    public CastExpression cast(Type type, Expression expr) {
         final CastExpression ce = ast.newCastExpression();
-        ce.setType(type(typeName));
+        ce.setType(type);
         ce.setExpression(expr);
         return ce;
     }

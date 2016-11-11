@@ -204,7 +204,7 @@ public class PrimitiveWrapperCreationRefactoring extends AbstractRefactoringRule
             final ASTBuilder b = ctx.getASTBuilder();
             ctx.getRefactorings().replace(
                     node,
-                    b.invoke(typeBinding.getName(), "valueOf", b.cast("float", b.copy(arg0))));
+                    b.invoke(typeBinding.getName(), "valueOf", b.cast(b.type("float"), b.copy(arg0))));
             return DO_NOT_VISIT_SUBTREE;
         } else if (hasType(arg0, "java.lang.Double")) {
             final ASTBuilder b = ctx.getASTBuilder();
