@@ -117,19 +117,30 @@ public class MapEliminateKeySetCallsRefactoring extends AbstractRefactoringRule 
         public String suggest(String... candidateNames) {
             final Set<String> declaredLocalVarNames = new HashSet<String>(collectDeclaredLocalVariableNames());
             final Set<String> varNamesUsedAfter = new HashSet<String>(collectVariableNamesUsedAfter());
-            int i = 0;
+            // Can we use one of the candidate names?
+            for (String candidate : candidateNames) {
+                if (isSuitable(candidate, declaredLocalVarNames, varNamesUsedAfter)) {
+                    return candidate;
+                }
+            }
+
+            // Iterate on the first candidate name and suffix it with an integer
+            int i = 1;
             while (true) {
-                for (String candidateName : candidateNames) {
-                    final String candidate = i == 0 ? candidateName : candidateName + i;
-                    if (// no variable declaration conflict
-                        !declaredLocalVarNames.contains(candidate)
-                        // new variable does not shadow use of other variables/fields with the same name
-                            && !varNamesUsedAfter.contains(candidate)) {
-                        return candidate;
-                    }
+                final String candidate = candidateNames[0] + i;
+                if (isSuitable(candidate, declaredLocalVarNames, varNamesUsedAfter)) {
+                    return candidate;
                 }
                 i++;
             }
+        }
+
+        private boolean isSuitable(
+                String candidateName, Set<String> declaredLocalVarNames, Set<String> varNamesUsedAfter) {
+            return  // no variable declaration conflict
+                    !declaredLocalVarNames.contains(candidateName)
+                    // new variable does not shadow use of other variables/fields with the same name
+                    && !varNamesUsedAfter.contains(candidateName);
         }
 
         private Collection<String> collectDeclaredLocalVariableNames() {
@@ -240,21 +251,50 @@ public class MapEliminateKeySetCallsRefactoring extends AbstractRefactoringRule 
                 final int insertionPoint = asList(enhancedFor.getBody()).get(0).getStartPosition() - 1;
                 final String entryVarName =
                         new VariableNameDecider(enhancedFor.getBody(), insertionPoint).suggest("entry", "mapEntry");
-
-                // for (K key : map.keySet()) => for (K key : map.entrySet())
-                r.set(enhancedFor, EXPRESSION_PROPERTY, b.invoke(b.move(mapExpression), "entrySet"));
-                // for (K key : map.entrySet()) => for (Map.Entry<K, V> mapEntry : map.entrySet())
                 final TypeNameDecider typeNameDecider = new TypeNameDecider(parameter);
-                final Type mapEntryType = createMapEntryType(parameter, getValueMis.get(0), typeNameDecider);
-                r.set(enhancedFor, PARAMETER_PROPERTY, b.declareSingleVariable(entryVarName, mapEntryType));
-                // for (Map.Entry<K, V> mapEntry : map.entrySet()) {
-                //     K key = mapEntry.getKey(); // <--- add this statement
-                final Type mapKeyType = b.copy(parameter.getType());
-                final VariableDeclarationStatement newKeyDeclaration = b.declareStmt(
-                        mapKeyType,
-                        b.move(parameter.getName()),
-                        b.invoke(b.name(entryVarName), "getKey"));
-                r.insertFirst(enhancedFor.getBody(), Block.STATEMENTS_PROPERTY, newKeyDeclaration);
+
+                final MethodInvocation getValueMi0 = getValueMis.get(0);
+                final ITypeBinding typeBinding = getValueMi0.getExpression().resolveTypeBinding();
+                if (typeBinding != null && typeBinding.isRawType()) {
+                    // for (Object key : map.keySet()) => for (Object key : map.entrySet())
+                    r.set(enhancedFor, EXPRESSION_PROPERTY, b.invoke(b.move(mapExpression), "entrySet"));
+                    final Type objectType = b.type(typeNameDecider.useSimplestPossibleName("java.lang.Object"));
+                    final String objectVarName =
+                        new VariableNameDecider(enhancedFor.getBody(), insertionPoint).suggest("obj");
+                    r.set(enhancedFor, PARAMETER_PROPERTY, b.declareSingleVariable(objectVarName, objectType));
+
+                    // for (Map.Entry<K, V> mapEntry : map.entrySet()) {
+                    //     Map.Entry mapEntry = (Map.Entry) obj; // <--- add this statement
+                    //     Object key = mapEntry.getKey(); // <--- add this statement
+                    String mapEntryTypeName = typeNameDecider.useSimplestPossibleName("java.util.Map.Entry");
+                    final VariableDeclarationStatement newEntryDecl = b.declareStmt(
+                            b.type(mapEntryTypeName),
+                            b.simpleName(entryVarName),
+                            b.cast(b.type(mapEntryTypeName), b.simpleName(objectVarName)));
+
+                    final Type mapKeyType = b.copy(parameter.getType());
+                    final VariableDeclarationStatement newKeyDecl = b.declareStmt(
+                            mapKeyType,
+                            b.move(parameter.getName()),
+                            b.invoke(b.name(entryVarName), "getKey"));
+
+                    r.insertFirst(enhancedFor.getBody(), Block.STATEMENTS_PROPERTY, newKeyDecl);
+                    r.insertFirst(enhancedFor.getBody(), Block.STATEMENTS_PROPERTY, newEntryDecl);
+                } else {
+                    // for (K key : map.keySet()) => for (K key : map.entrySet())
+                    r.set(enhancedFor, EXPRESSION_PROPERTY, b.invoke(b.move(mapExpression), "entrySet"));
+                    // for (K key : map.entrySet()) => for (Map.Entry<K, V> mapEntry : map.entrySet())
+                    final Type mapEntryType = createMapEntryType(parameter, getValueMi0, typeNameDecider);
+                    r.set(enhancedFor, PARAMETER_PROPERTY, b.declareSingleVariable(entryVarName, mapEntryType));
+                    // for (Map.Entry<K, V> mapEntry : map.entrySet()) {
+                    //     K key = mapEntry.getKey(); // <--- add this statement
+                    final Type mapKeyType = b.copy(parameter.getType());
+                    final VariableDeclarationStatement newKeyDeclaration = b.declareStmt(
+                            mapKeyType,
+                            b.move(parameter.getName()),
+                            b.invoke(b.name(entryVarName), "getKey"));
+                    r.insertFirst(enhancedFor.getBody(), Block.STATEMENTS_PROPERTY, newKeyDeclaration);
+                }
 
                 // Replace all occurrences of map.get(key) => mapEntry.getValue()
                 for (MethodInvocation getValueMi : getValueMis) {
@@ -327,7 +367,7 @@ public class MapEliminateKeySetCallsRefactoring extends AbstractRefactoringRule 
         @Override
         public boolean visit(MethodInvocation node) {
             if (isSameReference(node.getExpression(), mapExpression)
-                    && isMethod(node, "java.util.Map", "get", "java.util.Object")
+                    && isMethod(node, "java.util.Map", "get", "java.lang.Object")
                     && isSameVariable(arg0(node), forEachParameter.getName())) {
                 addResult(node);
             }

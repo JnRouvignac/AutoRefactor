@@ -95,7 +95,7 @@ public class MapEliminateKeySetCallsSample {
         }
     }
 
-    public void refactorMEthodInvocation() {
+    public void refactorMethodInvocation() {
         ProcessBuilder pb = new ProcessBuilder();
         for (String key : pb.environment().keySet()) {
             System.out.println("hello " + pb.environment().get("name"));
@@ -105,7 +105,7 @@ public class MapEliminateKeySetCallsSample {
         }
     }
 
-    public void doNotRefactorRawMap(Map map) {
+    public void refactorRawMap(Map map) {
         for (Object key : map.keySet()) {
             System.out.println("hello " + map.get("name"));
             if (((Long) map.get(key)).longValue() > 0) {

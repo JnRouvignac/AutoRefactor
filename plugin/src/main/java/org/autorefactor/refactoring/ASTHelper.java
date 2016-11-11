@@ -1532,7 +1532,7 @@ public final class ASTHelper {
 
     private static boolean parameterTypesMatch(ITypeBinding implementedType,
             boolean isInstanceOf, IMethodBinding methodBinding, String[] parameterTypesQualifiedNames) {
-        if (implementedType != null) {
+        if (implementedType != null && !implementedType.isRawType()) {
             final ITypeBinding erasure = implementedType.getErasure();
             if (erasure.isGenericType() || erasure.isParameterizedType()) {
                 return parameterizedTypesMatch(implementedType, erasure, methodBinding);
