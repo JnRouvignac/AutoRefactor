@@ -307,7 +307,7 @@ public class SwitchSample {
         }
     }
 
-    public void mergeCases(int i1) {
+    public void mergeConsecutiveCases(int i1) {
         int i = 0;
         switch (i1) {
         case 0:
@@ -322,7 +322,7 @@ public class SwitchSample {
         }
     }
 
-    public void mergeCasesWithUnbrokenCase(int i1) {
+    public void mergeCasesWithFallthroughCase(int i1) {
         int i = 0;
         switch (i1) {
         case 0:
@@ -336,7 +336,7 @@ public class SwitchSample {
         }
     }
 
-    public void mergeCasesWithPrecedingUnbrokenCase(int i1) {
+    public void mergeCasesWithPrecedingFallthroughCase(int i1) {
         int i = 0;
         switch (i1) {
         case 0:
@@ -428,7 +428,7 @@ public class SwitchSample {
         }
     }
 
-    public void doNotMergeCasesWithPrecedingUnbrokenCases(int i1) {
+    public void doNotMergeCasesWithPrecedingFallthroughCases(int i1) {
         int i = 0;
         switch (i1) {
         case 0:
@@ -475,7 +475,7 @@ public class SwitchSample {
         }
     }
 
-    public void doNotMergeCasesWithVariableConflict(int i1) {
+    public void doNotMergeCasesWithVariableNameConflict(int i1) {
         switch (i1) {
         case 0:
             i2 = 0;

@@ -33,50 +33,19 @@ import java.util.List;
 
 import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.ASTHelper;
+import org.autorefactor.refactoring.ASTMatcherSameVariablesAndMethods;
 import org.autorefactor.util.IllegalStateException;
 import org.autorefactor.util.NotImplementedException;
 import org.eclipse.jdt.core.dom.ASTMatcher;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Block;
-import org.eclipse.jdt.core.dom.IBinding;
-import org.eclipse.jdt.core.dom.IMethodBinding;
-import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.IfStatement;
-import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.Statement;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
-import static org.autorefactor.util.Utils.*;
 
 /** See {@link #getDescription()} method. */
 public class CommonCodeInIfElseStatementRefactoring extends AbstractRefactoringRule {
-
-    /** ASTMatcher that matches two piece of code only if the variables in use are the same. */
-    private static final class ASTMatcherSameVariables extends ASTMatcher {
-        @Override
-        public boolean match(SimpleName node, Object other) {
-            return super.match(node, other)
-                    && sameVariable(node, (SimpleName) other);
-        }
-
-        private boolean sameVariable(SimpleName node1, SimpleName node2) {
-            return equalNotNull(getDeclaration(node1), getDeclaration(node2));
-        }
-
-        private IBinding getDeclaration(SimpleName node) {
-            final IBinding b = node.resolveBinding();
-            if (b != null) {
-                switch (b.getKind()) {
-                case IBinding.VARIABLE:
-                    return ((IVariableBinding) b).getVariableDeclaration();
-                case IBinding.METHOD:
-                    return ((IMethodBinding) b).getMethodDeclaration();
-                }
-            }
-            return null;
-        }
-    }
-
     @Override
     public String getDescription() {
         return ""
@@ -111,7 +80,7 @@ public class CommonCodeInIfElseStatementRefactoring extends AbstractRefactoringR
                 removedCaseStmts.add(new LinkedList<ASTNode>());
             }
             // if all cases exist
-            final ASTMatcher matcher = new ASTMatcherSameVariables();
+            final ASTMatcher matcher = new ASTMatcherSameVariablesAndMethods();
             final int minSize = minSize(allCasesStmts);
             final List<Statement> caseStmts = allCasesStmts.get(0);
 
