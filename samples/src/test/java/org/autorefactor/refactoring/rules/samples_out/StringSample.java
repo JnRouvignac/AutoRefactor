@@ -172,8 +172,8 @@ public class StringSample {
         return null;
     }
 
-    public void replaceForcedConcatenateByStringValueOf(Object o, boolean b, char c, byte by, short s, int i, long l,
-            float f, double d) {
+    public void replaceForcedConcatenationByStringValueOf(
+            Object o, boolean b, char c, byte by, short s, int i, long l, float f, double d) {
         String text = String.valueOf(o);
 
         text = String.valueOf(b);

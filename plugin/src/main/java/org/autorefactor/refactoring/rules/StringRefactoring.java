@@ -174,25 +174,24 @@ public class StringRefactoring extends AbstractRefactoringRule {
 
     @Override
     public boolean visit(InfixExpression node) {
-        if (InfixExpression.Operator.PLUS.equals(node.getOperator())) {
-            final ASTBuilder b = this.ctx.getASTBuilder();
-
+        if (InfixExpression.Operator.PLUS.equals(node.getOperator())
+                && extendedOperands(node).isEmpty()) {
             final Expression leftOperand = node.getLeftOperand();
             final Expression rightOperand = node.getRightOperand();
 
-            if (maybeReplaceStringConcatenate(node, b, leftOperand, rightOperand) == DO_NOT_VISIT_SUBTREE) {
-                return DO_NOT_VISIT_SUBTREE;
-            }
-
-            return maybeReplaceStringConcatenate(node, b, rightOperand, leftOperand);
+            return maybeReplaceStringConcatenation(node, leftOperand, rightOperand)
+                // if not replaced then try the other way round
+                && maybeReplaceStringConcatenation(node, rightOperand, leftOperand);
         }
         return VISIT_SUBTREE;
     }
 
-    private boolean maybeReplaceStringConcatenate(final InfixExpression node, final ASTBuilder b,
-            final Expression stringLiteral, final Expression variable) {
-        if ((stringLiteral instanceof StringLiteral) && ((StringLiteral) stringLiteral).getLiteralValue().matches("")
+    private boolean maybeReplaceStringConcatenation(
+            final InfixExpression node, final Expression expr, final Expression variable) {
+        if (expr instanceof StringLiteral
+                && ((StringLiteral) expr).getLiteralValue().matches("")
                 && !hasType(variable, "java.lang.String", "char[]")) {
+            final ASTBuilder b = this.ctx.getASTBuilder();
             ctx.getRefactorings().replace(node, b.invoke("String", "valueOf", b.copy(variable)));
             return DO_NOT_VISIT_SUBTREE;
         }
