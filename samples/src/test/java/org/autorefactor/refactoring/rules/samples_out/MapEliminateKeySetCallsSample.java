@@ -122,6 +122,16 @@ public class MapEliminateKeySetCallsSample {
         }
     }
 
+    public void refactorMapKeySetWithUnboxingOfKey(Map<Byte, Long> map) {
+        for (Map.Entry<Byte, Long> entry : map.entrySet()) {
+            byte key = entry.getKey();
+            System.out.println("hello " + map.get("name"));
+            if (entry.getValue().longValue() > 0) {
+                System.out.println("the value of "+ key + " is " + entry.getValue());
+            }
+        }
+    }
+
     public void doNotRefactor_noUseOfMapGet(Map<String, Long> map) {
         for (String key : map.keySet()) {
             System.out.println("key is "+key);

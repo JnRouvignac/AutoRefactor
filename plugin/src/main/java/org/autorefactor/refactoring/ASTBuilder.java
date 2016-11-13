@@ -358,45 +358,52 @@ public class ASTBuilder {
      * Creates a type by copying the type binding of the provided expression.
      *
      * @param expr the expression whose type must be copied
-     * @param typeNameDecider decides on how the type should be referenced
+     * @param typeNameDecider decides on how the type should be referenced (simple name or qualified name)
      * @return a new type
      */
     public Type copyType(Expression expr, TypeNameDecider typeNameDecider) {
         return toType(expr.resolveTypeBinding(), typeNameDecider);
     }
 
-    private Type toType(ITypeBinding binding, TypeNameDecider typeNameDecider) {
-        if (binding == null) {
+    /**
+     * Converts a type binding into a type.
+     *
+     * @param typeBinding the type binding to convert
+     * @param typeNameDecider decides on how the type should be referenced (simple name or qualified name)
+     * @return a new type
+     */
+    public Type toType(ITypeBinding typeBinding, TypeNameDecider typeNameDecider) {
+        if (typeBinding == null) {
             throw new IllegalArgumentException(null, "typeBinding cannot be null");
         }
 
-        if (binding.isParameterizedType()) {
-            final ParameterizedType type = ast.newParameterizedType(toType(binding.getErasure(), typeNameDecider));
+        if (typeBinding.isParameterizedType()) {
+            final ParameterizedType type = ast.newParameterizedType(toType(typeBinding.getErasure(), typeNameDecider));
             final List<Type> typeArgs = typeArguments(type);
-            for (ITypeBinding typeArg : binding.getTypeArguments()) {
+            for (ITypeBinding typeArg : typeBinding.getTypeArguments()) {
                 typeArgs.add(toType(typeArg, typeNameDecider));
             }
             return type;
-        } else if (binding.isClass()
-                || binding.isInterface()
-                || binding.isEnum()
-                || binding.isAnnotation()
-                || binding.isPrimitive()
-                || binding.isNullType()
-                || binding.isRawType()) {
-            return type(typeNameDecider.useSimplestPossibleName(binding));
-        } else  if (binding.isArray()) {
-            return ast.newArrayType(toType(binding.getElementType(), typeNameDecider));
-        } else if (binding.isWildcardType()) {
+        } else if (typeBinding.isClass()
+                || typeBinding.isInterface()
+                || typeBinding.isEnum()
+                || typeBinding.isAnnotation()
+                || typeBinding.isPrimitive()
+                || typeBinding.isNullType()
+                || typeBinding.isRawType()) {
+            return type(typeNameDecider.useSimplestPossibleName(typeBinding));
+        } else  if (typeBinding.isArray()) {
+            return ast.newArrayType(toType(typeBinding.getElementType(), typeNameDecider));
+        } else if (typeBinding.isWildcardType()) {
             final WildcardType type = ast.newWildcardType();
-            type.setBound(toType(binding.getBound(), typeNameDecider), binding.isUpperbound());
+            type.setBound(toType(typeBinding.getBound(), typeNameDecider), typeBinding.isUpperbound());
             return type;
-        } else if (binding.isTypeVariable()) {
-            throw new NotImplementedException(null, " for the type variable binding '" + binding + "'");
-        } else if (binding.isCapture()) {
-            throw new NotImplementedException(null, " for the capture type binding '" + binding + "'");
+        } else if (typeBinding.isTypeVariable()) {
+            throw new NotImplementedException(null, " for the type variable binding '" + typeBinding + "'");
+        } else if (typeBinding.isCapture()) {
+            throw new NotImplementedException(null, " for the capture type binding '" + typeBinding + "'");
         }
-        throw new NotImplementedException(null, " for the type binding '" + binding + "'");
+        throw new NotImplementedException(null, " for the type binding '" + typeBinding + "'");
     }
 
     private Type copyType(final Type type) {

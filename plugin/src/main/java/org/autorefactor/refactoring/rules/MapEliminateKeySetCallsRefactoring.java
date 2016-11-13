@@ -312,11 +312,21 @@ public class MapEliminateKeySetCallsRefactoring extends AbstractRefactoringRule 
      * Otherwise, let's use the type binding and output verbose fully qualified types.
      */
     private Type createMapEntryType(
-            SingleVariableDeclaration parameter, Expression getValueMi, TypeNameDecider typeNameDecider) {
+            SingleVariableDeclaration parameter, MethodInvocation getValueMi, TypeNameDecider typeNameDecider) {
         final String mapEntryType = typeNameDecider.useSimplestPossibleName("java.util.Map.Entry");
 
         final ASTBuilder b = ctx.getASTBuilder();
-        final Type mapKeyType = b.move(parameter.getType());
+        final Type paramType = parameter.getType();
+        final Type mapKeyType;
+        if (paramType.isPrimitiveType()) {
+            // Use the type binding (not as precise as what is in the code)
+            final ITypeBinding mapTypeBinding = getValueMi.getExpression().resolveTypeBinding();
+            final ITypeBinding keyTypeBinding = mapTypeBinding.getTypeArguments()[0];
+            mapKeyType = b.toType(keyTypeBinding, typeNameDecider);
+        } else {
+            // Use the type as defined in the code
+            mapKeyType = b.move(paramType);
+        }
         final Type mapValueType = b.copyType(getValueMi, typeNameDecider);
         return b.genericType(mapEntryType, mapKeyType, mapValueType);
     }
