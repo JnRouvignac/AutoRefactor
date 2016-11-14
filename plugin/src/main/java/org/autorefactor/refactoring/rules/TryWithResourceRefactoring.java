@@ -29,11 +29,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.autorefactor.preferences.Preferences;
 import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.Refactorings;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Assignment;
+import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ExpressionStatement;
 import org.eclipse.jdt.core.dom.IfStatement;
@@ -64,7 +64,7 @@ public class TryWithResourceRefactoring extends AbstractRefactoringRule {
     }
 
     @Override
-    public boolean isEnabled(Preferences preferences) {
+    public boolean visit(CompilationUnit node) {
         return ctx.getJavaProjectOptions().getJavaSERelease().getMinorVersion() >= 7;
     }
 

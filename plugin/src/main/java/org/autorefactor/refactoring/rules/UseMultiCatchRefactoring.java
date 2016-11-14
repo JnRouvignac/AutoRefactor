@@ -36,7 +36,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.autorefactor.preferences.Preferences;
 import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.ASTHelper;
 import org.autorefactor.refactoring.Refactorings;
@@ -45,6 +44,7 @@ import org.eclipse.jdt.core.dom.ASTMatcher;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.CatchClause;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
+import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.MethodInvocation;
@@ -75,7 +75,7 @@ public class UseMultiCatchRefactoring extends AbstractRefactoringRule {
     }
 
     @Override
-    public boolean isEnabled(Preferences preferences) {
+    public boolean visit(CompilationUnit node) {
         return ctx.getJavaProjectOptions().getJavaSERelease().getMinorVersion() >= 7;
     }
 

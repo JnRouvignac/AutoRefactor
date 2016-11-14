@@ -29,11 +29,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.autorefactor.preferences.Preferences;
 import org.autorefactor.refactoring.Release;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
+import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
@@ -61,7 +61,7 @@ public class UseDiamondOperatorRefactoring extends AbstractRefactoringRule {
     }
 
     @Override
-    public boolean isEnabled(Preferences preferences) {
+    public boolean visit(CompilationUnit node) {
         return ctx.getJavaProjectOptions().getJavaSERelease().isCompatibleWith(Release.javaSE("1.7.0"));
     }
 
