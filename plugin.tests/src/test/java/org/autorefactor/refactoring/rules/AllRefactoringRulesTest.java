@@ -53,6 +53,7 @@ import static org.junit.Assert.*;
 public class AllRefactoringRulesTest {
 
     private static final String SAMPLES_ALL_BASE_DIR = "../samples/src/test/java/org/autorefactor/refactoring/rules/all";
+    private static final String PACKAGE_NAME = "org.autorefactor.refactoring.rules.all.samples_in";
 
     /** If not empty, then only run the test samples present in this collection. */
     private static final Collection<Class<?>> WHITELIST = Arrays.<Class<?>> asList(
@@ -93,7 +94,7 @@ public class AllRefactoringRulesTest {
         final String sampleInSource = readAll(sampleIn);
         final String sampleOutSource = readAll(sampleOut);
 
-        final IPackageFragment packageFragment = JavaCoreHelper.getPackageFragment();
+        final IPackageFragment packageFragment = JavaCoreHelper.getPackageFragment(PACKAGE_NAME);
         final ICompilationUnit cu = packageFragment.createCompilationUnit(
                 sampleName, sampleInSource, true, null);
         cu.getBuffer().setContents(sampleInSource);

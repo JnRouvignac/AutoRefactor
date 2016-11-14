@@ -30,6 +30,7 @@ import java.lang.reflect.Method;
 import java.util.NavigableSet;
 import java.util.TreeSet;
 
+import org.autorefactor.util.IllegalArgumentException;
 import org.autorefactor.util.NotImplementedException;
 import org.autorefactor.util.UnhandledException;
 import org.eclipse.jdt.core.dom.ASTNode;
@@ -99,8 +100,9 @@ public class TypeNameDecider {
         }
     }
 
-    private final NavigableSet<String> importedTypes;
     private final ResolveTypeBindingStrategy resolveTypeBindingStrategy;
+    private final NavigableSet<String> importedTypes;
+    private final String packageName;
 
     /**
      * Builds an instance, and extracts out of the provided node: a type binding and the types
@@ -111,7 +113,13 @@ public class TypeNameDecider {
     public TypeNameDecider(final ASTNode parsedNode) {
         this.resolveTypeBindingStrategy =
                 new ReflectionResolveTypeBindingStrategy(parsedNode, getAnyTypeBinding(parsedNode));
-        this.importedTypes = getImportedTypes(parsedNode.getRoot());
+        final ASTNode root = parsedNode.getRoot();
+        if (!(root instanceof CompilationUnit)) {
+            throw new IllegalArgumentException(parsedNode, "Expected the root to be a CompilationUnit");
+        }
+        final CompilationUnit cu = (CompilationUnit) root;
+        this.packageName = cu.getPackage().getName().getFullyQualifiedName();
+        this.importedTypes = getImportedTypes(cu);
     }
 
     /**
@@ -122,6 +130,7 @@ public class TypeNameDecider {
      */
     public TypeNameDecider(ResolveTypeBindingStrategy resolveTypeBindingStrategy, NavigableSet<String> importedTypes) {
         this.resolveTypeBindingStrategy = resolveTypeBindingStrategy;
+        this.packageName = "";
         this.importedTypes = importedTypes;
     }
 
@@ -135,13 +144,11 @@ public class TypeNameDecider {
         }
     }
 
-    private static NavigableSet<String> getImportedTypes(ASTNode root) {
+    private static NavigableSet<String> getImportedTypes(CompilationUnit cu) {
         final TreeSet<String> results = new TreeSet<String>();
-        if (root instanceof CompilationUnit) {
-            for (ImportDeclaration importDecl : imports((CompilationUnit) root)) {
-                Name importName = importDecl.getName();
-                results.add(importName.getFullyQualifiedName());
-            }
+        for (ImportDeclaration importDecl : imports(cu)) {
+            Name importName = importDecl.getName();
+            results.add(importName.getFullyQualifiedName());
         }
         return results;
     }
@@ -174,7 +181,8 @@ public class TypeNameDecider {
      * @return the simplest possible name to use when referring to the type
      */
     public String useSimplestPossibleName(ITypeBinding typeBinding) {
-        if ("java.lang".equals(typeBinding.getPackage().getName())) {
+        final String pkgName = typeBinding.getPackage().getName();
+        if ("java.lang".equals(pkgName) || pkgName.equals(this.packageName)) {
             // TODO beware of name shadowing!
             return typeBinding.getName();
         }

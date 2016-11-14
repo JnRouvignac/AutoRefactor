@@ -31,6 +31,9 @@ import java.util.List;
 import java.util.Map;
 
 public class MapEliminateKeySetCallsSample {
+    private static class Dummy {
+    }
+
     private Map<String, Long> mapField;
     private long entry;
 
@@ -164,5 +167,11 @@ public class MapEliminateKeySetCallsSample {
             System.out.println(map.get(key));
         }
         System.out.println(entry);
+    }
+
+    public void refactorMapKeySetUseSimpleNameWhenInSamePackage(Map<String, Dummy> map) {
+        for (String key : map.keySet()) {
+            System.out.println("hello " + map.get(key));
+        }
     }
 }

@@ -57,11 +57,11 @@ public class JavaCoreHelper {
 
     private static final Path[] EMPTY_PATHS = new Path[0];
 
-    public static IPackageFragment getPackageFragment() throws Exception {
+    public static IPackageFragment getPackageFragment(String packageName) throws Exception {
         final IJavaProject javaProject = createJavaProject("projectName", "bin");
         final IPackageFragmentRoot root = addSourceContainer(javaProject, "/testRoot");
         addToClasspath(javaProject, getClasspathEntries(root));
-        return root.createPackageFragment("org.autorefactor", true, null);
+        return root.createPackageFragment(packageName, true, null);
     }
 
     private static List<IClasspathEntry> getClasspathEntries(final IPackageFragmentRoot root) throws Exception {

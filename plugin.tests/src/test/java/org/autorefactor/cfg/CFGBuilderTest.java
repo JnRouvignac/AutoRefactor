@@ -93,7 +93,7 @@ public class CFGBuilderTest {
         final String dotSource = readAll(dotFile).trim();
         final String javaSource = readAll(javaFile);
 
-        final IPackageFragment packageFragment = JavaCoreHelper.getPackageFragment();
+        final IPackageFragment packageFragment = JavaCoreHelper.getPackageFragment("org.autorefactor.cfg");
         final ICompilationUnit cu = packageFragment.createCompilationUnit(
                 sampleName, javaSource, true, null);
         cu.getBuffer().setContents(javaSource);

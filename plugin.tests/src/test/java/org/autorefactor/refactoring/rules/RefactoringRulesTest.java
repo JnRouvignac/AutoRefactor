@@ -54,6 +54,7 @@ import static org.junit.Assert.*;
 public class RefactoringRulesTest {
 
     private static final String SAMPLES_BASE_DIR = "../samples/src/test/java/org/autorefactor/refactoring/rules/";
+    private static final String PACKAGE_NAME = "org.autorefactor.refactoring.rules.samples_in";
 
     /** If not empty, then only run the refactorings present in this collection. */
     private static final Collection<Class<?>> WHITELIST = Arrays.<Class<?>> asList(
@@ -106,7 +107,7 @@ public class RefactoringRulesTest {
         final String sampleInSource = readAll(sampleIn);
         final String sampleOutSource = readAll(sampleOut);
 
-        final IPackageFragment packageFragment = JavaCoreHelper.getPackageFragment();
+        final IPackageFragment packageFragment = JavaCoreHelper.getPackageFragment(PACKAGE_NAME);
         final ICompilationUnit cu = packageFragment.createCompilationUnit(
                 sampleName, sampleInSource, true, null);
         cu.getBuffer().setContents(sampleInSource);
