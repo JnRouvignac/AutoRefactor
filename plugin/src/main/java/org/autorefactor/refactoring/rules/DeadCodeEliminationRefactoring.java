@@ -87,7 +87,6 @@ import static org.eclipse.jdt.core.search.SearchPattern.*;
  * @see #getDescription()
  */
 public class DeadCodeEliminationRefactoring extends AbstractRefactoringRule {
-
     @Override
     public String getDescription() {
         return "Removes dead code.";

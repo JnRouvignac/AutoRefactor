@@ -33,7 +33,6 @@ import org.autorefactor.util.NotImplementedException;
 import org.autorefactor.util.Pair;
 import org.eclipse.jdt.core.dom.ASTMatcher;
 import org.eclipse.jdt.core.dom.Assignment;
-import org.eclipse.jdt.core.dom.Assignment.Operator;
 import org.eclipse.jdt.core.dom.BooleanLiteral;
 import org.eclipse.jdt.core.dom.BreakStatement;
 import org.eclipse.jdt.core.dom.EnhancedForStatement;
@@ -58,7 +57,6 @@ import static org.eclipse.jdt.core.dom.Assignment.Operator.*;
 
 /** See {@link #getDescription()} method. */
 public class CollectionContainsRefactoring extends AbstractRefactoringRule {
-
     @Override
     public String getDescription() {
         return "Replace loop with Collection.contains(Object obj).";
@@ -179,7 +177,7 @@ public class CollectionContainsRefactoring extends AbstractRefactoringRule {
             return uniqueVariableDeclarationFragmentName(stmt);
         } else if (stmt instanceof ExpressionStatement) {
             Assignment as = asExpression(stmt, Assignment.class);
-            if (hasOperator(as, Operator.ASSIGN)
+            if (hasOperator(as, ASSIGN)
                     && as.getLeftHandSide() instanceof Name) {
                 return Pair.of((Name) as.getLeftHandSide(), as.getRightHandSide());
             }

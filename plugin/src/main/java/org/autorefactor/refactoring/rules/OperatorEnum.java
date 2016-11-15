@@ -47,7 +47,6 @@ import org.eclipse.jdt.core.dom.PrefixExpression;
  *      >Java tutorial - Operators</a>
  */
 public enum OperatorEnum {
-
     /** The dot operator '.'. For example <code>i.fieldName</code>. */
     DOT                        (null,                                             1, false, false),
     /** The parentheses operator '()'. For example <code>f()</code>. */
@@ -166,7 +165,6 @@ public enum OperatorEnum {
 
     /** The comma operator ','. For example <code>i++, j++</code>. */
     COMMA                      (null,                                            17, false, false);
-
 
     private static final Map<Object, OperatorEnum> OPERATORS;
     static {

@@ -32,7 +32,6 @@ import static org.autorefactor.util.Utils.*;
  * of the file, the line number and the column number.
  */
 class LineAndColumn {
-
     private final int startPosition;
     private final int lineNo;
     private final int colNo;
@@ -55,7 +54,6 @@ class LineAndColumn {
         return colNo;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
@@ -68,7 +66,6 @@ class LineAndColumn {
         return equal(startPosition, other.startPosition);
     }
 
-    /** {@inheritDoc} */
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -77,11 +74,9 @@ class LineAndColumn {
         return result;
     }
 
-    /** {@inheritDoc} */
     @Override
     public String toString() {
         return "LineAndColumn [startPosition=" + startPosition + ", lineNo="
                 + lineNo + ", colNo=" + colNo + "]";
     }
-
 }

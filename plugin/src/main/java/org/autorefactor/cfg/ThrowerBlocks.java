@@ -12,11 +12,8 @@ import java.util.Set;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 
-/**
- * Holds all the basic blocks that can potentially throw.
- */
+/** Holds all the basic blocks that can potentially throw. */
 class ThrowerBlocks {
-
     private final Map<CFGBasicBlock, Set<ITypeBinding>> potentialThrowingBlocks =
             new HashMap<CFGBasicBlock, Set<ITypeBinding>>();
     private final Map<CFGEdgeBuilder, Set<ITypeBinding>> potentialThrowingEdges =
@@ -93,5 +90,4 @@ class ThrowerBlocks {
         return "potentialThrowingBlocks=" + potentialThrowingBlocks
                 + " potentialThrowingEdges=" + potentialThrowingEdges;
     }
-
 }

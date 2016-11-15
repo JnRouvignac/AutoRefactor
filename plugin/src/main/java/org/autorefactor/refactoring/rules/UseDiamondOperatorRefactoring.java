@@ -49,7 +49,6 @@ import static org.eclipse.jdt.core.dom.ASTNode.*;
 
 /** See {@link #getDescription()} method. */
 public class UseDiamondOperatorRefactoring extends AbstractRefactoringRule {
-
     @Override
     public String getDescription() {
         return "Refactors class instance creations to use the diamond operator wherever possible.";

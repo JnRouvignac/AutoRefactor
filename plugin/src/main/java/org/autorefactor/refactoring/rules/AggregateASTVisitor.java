@@ -1293,7 +1293,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         }
     }
 
-
     @Override
     public void endVisit(SuperMethodInvocation node) {
         final List<ASTVisitor> visitorList = getVisitors(endVisitorsMap, SuperMethodInvocation.class);

@@ -47,7 +47,6 @@ import static org.autorefactor.util.Utils.*;
 /** See {@link #getDescription()} method. */
 @SuppressWarnings("javadoc")
 public class PrimitiveWrapperCreationRefactoring extends AbstractRefactoringRule {
-
     @Override
     public String getDescription() {
         return ""

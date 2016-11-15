@@ -137,7 +137,6 @@ public final class VariableDefinitionsUsesVisitor extends ASTVisitor {
         return definitions;
     }
 
-
     /**
      * Returns all the uses found.
      *

@@ -30,11 +30,8 @@ import org.eclipse.jdt.core.dom.ASTNode;
 
 import static org.autorefactor.util.Utils.*;
 
-/**
- * Represents a source location in a file, i.e. a position or a range in a source file.
- */
+/** Represents a source location in a file, i.e. a position or a range in a source file. */
 public class SourceLocation implements ISourceRange, Comparable<ISourceRange> {
-
     private final int offset;
     private final int length;
 

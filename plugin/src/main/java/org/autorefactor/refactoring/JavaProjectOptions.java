@@ -27,11 +27,8 @@ package org.autorefactor.refactoring;
 
 import java.util.Map;
 
-/**
- * The java project options.
- */
+/** The java project options. */
 public interface JavaProjectOptions {
-
     /**
      * Returns the compiler options used to compile a java project.
      *
@@ -59,5 +56,4 @@ public interface JavaProjectOptions {
      * @return the comment line length in use for the current project.
      */
     int getCommentLineLength();
-
 }

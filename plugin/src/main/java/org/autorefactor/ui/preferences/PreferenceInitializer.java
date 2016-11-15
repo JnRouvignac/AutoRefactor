@@ -33,12 +33,8 @@ import org.eclipse.jface.preference.IPreferenceStore;
 
 import static org.autorefactor.preferences.PreferenceConstants.*;
 
-/**
- * Initializes the Eclipse preferences for AutoRefactor.
- */
+/** Initializes the Eclipse preferences for AutoRefactor. */
 public class PreferenceInitializer extends AbstractPreferenceInitializer {
-
-    /** {@inheritDoc} */
     @Override
     public void initializeDefaultPreferences() {
         // TODO initialize preferences from the JDT preferences like:
@@ -65,5 +61,4 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
         }
         store.setDefault(ADD_CURLY_BRACKETS_TO_STATEMENT_BODIES.getName(), true);
     }
-
 }

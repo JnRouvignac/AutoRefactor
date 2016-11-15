@@ -25,11 +25,8 @@
  */
 package org.autorefactor.preferences;
 
-/**
- * Helper interface for preferences.
- */
+/** Helper interface for preferences. */
 public interface Preferences {
-
     /**
      * Returns whether debug mode is on.
      *
@@ -50,5 +47,4 @@ public interface Preferences {
      * @return true if debug mode is on, false otherwise.
      */
     boolean addCurlyBracketsToStatementBodies();
-
 }

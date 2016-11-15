@@ -46,13 +46,12 @@ import static org.eclipse.jdt.core.dom.InfixExpression.Operator.*;
 
 /** Helper class for dealing with loops. */
 public final class ForLoopHelper {
-
     private ForLoopHelper() {
         super();
     }
 
     /** The element container that the for loop iterates over. */
-    public static enum ContainerType {
+    public enum ContainerType {
         /** Means the for loop iterates over an array. */
         ARRAY,
         /** Means the for loop iterates over a collection. */
@@ -60,7 +59,7 @@ public final class ForLoopHelper {
     }
 
     /** The for loop iteration type. */
-    public static enum IterationType {
+    public enum IterationType {
         /** The for loop iterates using an integer index. */
         INDEX,
         /** The for loop iterates using an iterator. */

@@ -37,11 +37,8 @@ import org.eclipse.jdt.core.formatter.DefaultCodeFormatterConstants;
 import static org.eclipse.jdt.core.JavaCore.*;
 import static org.eclipse.jdt.core.formatter.DefaultCodeFormatterConstants.*;
 
-/**
- * Implementation of {@link JavaProjectOptions} for Eclipse JDT.
- */
+/** Implementation of {@link JavaProjectOptions} for Eclipse JDT. */
 public class JavaProjectOptionsImpl implements JavaProjectOptions {
-
     private final Map<String, String> options;
     private Release javaSERelease;
 
@@ -82,19 +79,16 @@ public class JavaProjectOptionsImpl implements JavaProjectOptions {
         return options;
     }
 
-    /** {@inheritDoc} */
     @Override
     public Release getJavaSERelease() {
         return javaSERelease;
     }
 
-    /** {@inheritDoc} */
     @Override
     public Integer getTabSize() {
         return asInteger(FORMATTER_INDENTATION_SIZE);
     }
 
-    /** {@inheritDoc} */
     @Override
     public int getCommentLineLength() {
         Integer result = asInteger(FORMATTER_COMMENT_LINE_LENGTH);
@@ -121,5 +115,4 @@ public class JavaProjectOptionsImpl implements JavaProjectOptions {
     public void setTabSize(int tabSize) {
         options.put(FORMATTER_INDENTATION_SIZE, String.valueOf(tabSize));
     }
-
 }

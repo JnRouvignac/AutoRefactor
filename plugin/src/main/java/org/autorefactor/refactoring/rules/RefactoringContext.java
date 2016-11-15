@@ -40,11 +40,8 @@ import org.eclipse.jdt.core.dom.CompilationUnit;
 import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.autorefactor.refactoring.SourceLocation.*;
 
-/**
- * Class holding necessary data for a refactoring.
- */
+/** Class holding necessary data for a refactoring. */
 public class RefactoringContext {
-
     private final ICompilationUnit compilationUnit;
     private final CompilationUnit astRoot;
     private final Refactorings refactorings;

@@ -132,7 +132,6 @@ public class ChooseRefactoringWizardPage extends WizardPage {
         return results;
     }
 
-    /** {@inheritDoc} */
     @Override
     public void createControl(Composite parent) {
         parent.setLayout(new GridLayout());
@@ -281,7 +280,6 @@ public class ChooseRefactoringWizardPage extends WizardPage {
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void dispose() {
         checkedState.clear();

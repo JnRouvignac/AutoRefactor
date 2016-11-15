@@ -76,7 +76,6 @@ import static org.autorefactor.util.Utils.*;
  */
 @SuppressWarnings("javadoc")
 public class ReduceVariableScopeRefactoring extends AbstractRefactoringRule {
-
     @Override
     public String getDescription() {
         return "Reduces the scope of local variables.";
@@ -92,7 +91,6 @@ public class ReduceVariableScopeRefactoring extends AbstractRefactoringRule {
     private static final int WRITE = 1 << 2;
 
     private static final class VariableName {
-
         private final Name name;
 
         public VariableName(Name name) {
@@ -137,7 +135,6 @@ public class ReduceVariableScopeRefactoring extends AbstractRefactoringRule {
     }
 
     private static final class VariableAccess {
-
         private final Name variableName;
         private final int accessType;
         private final ASTNode scope;

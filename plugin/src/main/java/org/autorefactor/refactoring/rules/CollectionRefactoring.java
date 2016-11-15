@@ -26,7 +26,6 @@
  */
 package org.autorefactor.refactoring.rules;
 
-
 import java.util.List;
 
 import org.autorefactor.refactoring.ASTBuilder;
@@ -59,7 +58,6 @@ import static org.eclipse.jdt.core.dom.InfixExpression.Operator.*;
 import static org.eclipse.jdt.core.dom.PrefixExpression.Operator.*;
 /** See {@link #getDescription()} method. */
 public class CollectionRefactoring extends AbstractRefactoringRule {
-
     @Override
     public String getDescription() {
         return ""

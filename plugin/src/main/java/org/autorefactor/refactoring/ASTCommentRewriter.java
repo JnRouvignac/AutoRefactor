@@ -505,5 +505,4 @@ public class ASTCommentRewriter {
         }
         return end;
     }
-
 }

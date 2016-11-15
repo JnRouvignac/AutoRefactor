@@ -43,7 +43,6 @@ import static org.eclipse.jdt.core.dom.InfixExpression.Operator.*;
 /** See {@link #getDescription()} method. */
 @SuppressWarnings("javadoc")
 public class WorkWithNullCheckedExpressionFirstRefactoring extends AbstractRefactoringRule {
-
     @Override
     public String getDescription() {
         return ""
@@ -112,7 +111,7 @@ public class WorkWithNullCheckedExpressionFirstRefactoring extends AbstractRefac
         }
     }
 
-    /** Revert condition + swap then and else statements.  */
+    /** Revert condition + swap then and else statements. */
     private boolean revertIfStatement(IfStatement node, Statement thenStmt, Statement elseStmt) {
         final ASTBuilder b = this.ctx.getASTBuilder();
         final Refactorings r = this.ctx.getRefactorings();

@@ -41,7 +41,6 @@ import static org.eclipse.jdt.core.dom.MethodInvocation.*;
 /** See {@link #getDescription()} method. */
 @SuppressWarnings("javadoc")
 public class VectorOldToNewAPIRefactoring extends AbstractRefactoringRule {
-
     @Override
     public String getDescription() {
         return "Replaces Vector pre-Collections APIs with equivalent Collections APIs.";

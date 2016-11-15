@@ -65,7 +65,6 @@ import static org.autorefactor.util.Utils.*;
  * TODO remove superfluous semi-colons in try-with-resources
  */
 public class RemoveSemiColonRefactoring extends AbstractRefactoringRule {
-
     @Override
     public String getDescription() {
         return "Removes superfluous semi-colon after body declarations in type declarations.";

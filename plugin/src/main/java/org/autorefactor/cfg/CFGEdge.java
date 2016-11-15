@@ -29,11 +29,8 @@ import org.eclipse.jdt.core.dom.Expression;
 
 import static org.autorefactor.util.Utils.*;
 
-/**
- * This class represents an edge of the control flow graph.
- */
+/** This class represents an edge of the control flow graph. */
 public class CFGEdge {
-
     private final Expression condition;
     /** TODO JNR rename. */
     private final boolean evaluationResult;
@@ -92,7 +89,6 @@ public class CFGEdge {
         return evaluationResult;
     }
 
-    /** {@inheritDoc} */
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("EDGE[");
@@ -102,7 +98,6 @@ public class CFGEdge {
         return sb.append("]").toString();
     }
 
-    /** {@inheritDoc} */
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -117,7 +112,6 @@ public class CFGEdge {
         return result;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
@@ -132,5 +126,4 @@ public class CFGEdge {
                 && equal(sourceBlock, other.sourceBlock)
                 && equal(targetBlock, other.targetBlock);
     }
-
 }

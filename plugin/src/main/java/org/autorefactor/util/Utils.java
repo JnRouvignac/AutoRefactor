@@ -29,7 +29,6 @@ import java.util.List;
 
 /** Utility class containing miscellaneous helper methods. */
 public final class Utils {
-
     private Utils() {
         // utility class ctor is private
     }

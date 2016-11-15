@@ -52,7 +52,6 @@ import static org.eclipse.jdt.core.dom.InfixExpression.Operator.*;
  */
 @SuppressWarnings("javadoc")
 public class RemoveUnnecessaryCastRefactoring extends AbstractRefactoringRule {
-
     @Override
     public String getDescription() {
         return "Removes unnecessary widening casts from return statements, assignments and infix expressions.";

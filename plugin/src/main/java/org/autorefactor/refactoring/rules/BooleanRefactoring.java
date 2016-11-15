@@ -73,7 +73,6 @@ import static org.eclipse.jdt.core.dom.InfixExpression.Operator.*;
 
 /** See {@link #getDescription()} method. */
 public class BooleanRefactoring extends AbstractRefactoringRule {
-
     @Override
     public String getDescription() {
         return ""
@@ -132,7 +131,7 @@ public class BooleanRefactoring extends AbstractRefactoringRule {
         }
     }
 
-    /** Compares mixed boolean literal and Boolean object values against each other.*/
+    /** Compares mixed boolean literal and Boolean object values against each other. */
     private static boolean areOppositeBooleanValues(Expression expr1, Expression expr2) {
         final Boolean b1 = getBooleanLiteral(expr1);
         final Boolean b2 = getBooleanLiteral(expr2);
@@ -140,7 +139,6 @@ public class BooleanRefactoring extends AbstractRefactoringRule {
     }
 
     private class BooleanReplaceVisitor extends ASTVisitor {
-
         private final Expression ifCondition;
         private final Collection<ASTNode> nodesToReplace;
         private final Name booleanName;

@@ -46,7 +46,6 @@ import static org.autorefactor.refactoring.SourceLocation.*;
 
 /** See {@link #getDescription()} method. */
 public class RemoveEmptyLinesRefactoring extends AbstractRefactoringRule {
-
     @Override
     public String getDescription() {
         return ""

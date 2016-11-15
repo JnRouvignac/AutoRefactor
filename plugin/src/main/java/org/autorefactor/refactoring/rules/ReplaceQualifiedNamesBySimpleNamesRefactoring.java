@@ -74,7 +74,6 @@ import static org.eclipse.jdt.core.search.SearchPattern.*;
 /** See {@link #getDescription()} method. */
 @SuppressWarnings("javadoc")
 public class ReplaceQualifiedNamesBySimpleNamesRefactoring extends AbstractRefactoringRule {
-
     private static final class QName {
         private QName qualifier;
         private String simpleName;
@@ -587,7 +586,7 @@ public class ReplaceQualifiedNamesBySimpleNamesRefactoring extends AbstractRefac
         final IMethodBinding methodBinding = node.resolveMethodBinding();
         if (methodBinding != null
                 && expr instanceof Name
-                && hasKind(((Name) expr), TYPE)
+                && hasKind((Name) expr, TYPE)
                 && node.typeArguments().isEmpty()) {
             final ITypeBinding declaringClass = methodBinding.getDeclaringClass();
             final QName qname = QName.valueOf(declaringClass.getErasure().getQualifiedName(), methodBinding.getName());

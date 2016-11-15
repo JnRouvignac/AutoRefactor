@@ -63,7 +63,6 @@ import static org.eclipse.jdt.core.dom.ASTNode.*;
 
 /** See {@link #getDescription()} method. */
 public class UseMultiCatchRefactoring extends AbstractRefactoringRule {
-
     @Override
     public String getDescription() {
         return "Refactors catch clauses with the same body to use Java 7's multi-catch.";
@@ -79,7 +78,7 @@ public class UseMultiCatchRefactoring extends AbstractRefactoringRule {
         return ctx.getJavaProjectOptions().getJavaSERelease().getMinorVersion() >= 7;
     }
 
-    private static enum MergeDirection {
+    private enum MergeDirection {
         NONE, UP, DOWN;
     }
 

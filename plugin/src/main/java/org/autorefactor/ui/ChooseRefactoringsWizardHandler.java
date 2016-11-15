@@ -41,8 +41,6 @@ import org.eclipse.ui.handlers.HandlerUtil;
  *      >Creating Eclipse Wizards - Tutorial </a>
  */
 public class ChooseRefactoringsWizardHandler extends AbstractHandler {
-
-    /** {@inheritDoc} */
     @Override
     public Object execute(final ExecutionEvent event) throws ExecutionException {
         final Shell shell = HandlerUtil.getActiveShell(event);
@@ -53,5 +51,4 @@ public class ChooseRefactoringsWizardHandler extends AbstractHandler {
         dialog.open();
         return null;
     }
-
 }

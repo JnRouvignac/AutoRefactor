@@ -23,7 +23,5 @@
  * which accompanies this distribution under LICENSE-ECLIPSE, and is
  * available at http://www.eclipse.org/legal/epl-v10.html
  */
-/**
- * Provides utility classes.
- */
+/** Provides utility classes. */
 package org.autorefactor.util;

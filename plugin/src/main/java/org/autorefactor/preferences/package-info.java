@@ -23,7 +23,5 @@
  * which accompanies this distribution under LICENSE-ECLIPSE, and is
  * available at http://www.eclipse.org/legal/epl-v10.html
  */
-/**
- * Provides interfaces and data for querying AutoRefactor preferences.
- */
+/** Provides interfaces and data for querying AutoRefactor preferences. */
 package org.autorefactor.preferences;

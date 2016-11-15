@@ -27,12 +27,8 @@ package org.autorefactor.util;
 
 import org.eclipse.jdt.core.dom.ASTNode;
 
-/**
- * Thrown to indicate that a method has been passed an illegal or inappropriate
- * argument.
- */
+/** Thrown to indicate that a method has been passed an illegal or inappropriate argument. */
 public class IllegalArgumentException extends AutoRefactorException {
-
     /**
      * Constructor.
      *
@@ -42,5 +38,4 @@ public class IllegalArgumentException extends AutoRefactorException {
     public IllegalArgumentException(ASTNode node, String message) {
         super(node, message);
     }
-
 }
