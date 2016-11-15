@@ -51,11 +51,12 @@ import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
-import static org.autorefactor.refactoring.ASTBuilder.Copy.*;
+
 import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.autorefactor.refactoring.ForLoopHelper.*;
 import static org.eclipse.jdt.core.dom.InfixExpression.Operator.*;
 import static org.eclipse.jdt.core.dom.PrefixExpression.Operator.*;
+
 /** See {@link #getDescription()} method. */
 public class CollectionRefactoring extends AbstractRefactoringRule {
     @Override
@@ -69,7 +70,10 @@ public class CollectionRefactoring extends AbstractRefactoringRule {
             + "- replaces creating a new Collection, then invoking Collection.addAll() on it,"
             + " by creating the new Collection with the other Collection as parameter,\n"
             + "- replaces some checks on Collection.size() with checks on Collection.isEmpty(),\n"
-            + "- replaces calls to Set.contains() immediately followed by Set.add() with straight calls to Set.add().";
+            + "- replaces calls to Set.contains() immediately followed by Set.add()"
+            + " with straight calls to Set.add(),\n"
+            + "- replaces calls to Set.contains() immediately followed by Set.remove()"
+            + " with straight calls to Set.remove().";
     }
 
     @Override
@@ -396,28 +400,46 @@ public class CollectionRefactoring extends AbstractRefactoringRule {
     public boolean visit(IfStatement node) {
         final PrefixExpression pe = as(node.getExpression(), PrefixExpression.class);
         if (hasOperator(pe, NOT)) {
-            final MethodInvocation miContains = as(pe.getOperand(), MethodInvocation.class);
-            return maybeReplaceSetContains(miContains, node.getThenStatement(), pe, false);
+            return maybeReplaceSetContains(node, pe.getOperand(), node.getThenStatement(), node.getElseStatement(),
+                    false);
         } else {
-            final MethodInvocation miContains = as(node.getExpression(), MethodInvocation.class);
-            return maybeReplaceSetContains(miContains, node.getElseStatement(), miContains, true);
+            return maybeReplaceSetContains(node, node.getExpression(), node.getElseStatement(), node.getThenStatement(),
+                    true);
         }
     }
 
-    private boolean maybeReplaceSetContains(
-            MethodInvocation miContains, Statement stmt, Expression toReplace, boolean negate) {
-        if (isMethod(miContains, "java.util.Set", "contains", "java.lang.Object")) {
-            Statement firstStmt = getAsList(stmt, 0);
-            MethodInvocation miAdd = asExpression(firstStmt, MethodInvocation.class);
+    private boolean maybeReplaceSetContains(final IfStatement nodeToReplace, final Expression ifExpression,
+            final Statement statement,
+            final Statement oppositeStatement, final boolean negate) {
+        return maybeReplaceSetContains(nodeToReplace, ifExpression, statement, oppositeStatement, negate, "add")
+                &&  maybeReplaceSetContains(nodeToReplace, ifExpression, oppositeStatement, statement, !negate,
+                    "remove");
+    }
+
+    private boolean maybeReplaceSetContains(final IfStatement nodeToReplace, final Expression ifExpression,
+            final Statement statement,
+            final Statement oppositeStatement, final boolean negate, final String methodName) {
+        final MethodInvocation miContains = as(ifExpression, MethodInvocation.class);
+        if (isMethod(miContains, "java.util.Set", "contains", "java.lang.Object") && !asList(statement).isEmpty()) {
+            final Statement firstStmt = getAsList(statement, 0);
+            final MethodInvocation miAddOrRemove = asExpression(firstStmt, MethodInvocation.class);
             final ASTMatcher astMatcher = new ASTMatcher();
-            if (isMethod(miAdd, "java.util.Set", "add", "java.lang.Object")
-                    && match(astMatcher, miContains.getExpression(), miAdd.getExpression())
-                    && match(astMatcher, arg0(miContains), arg0(miAdd))) {
-                ASTBuilder b = this.ctx.getASTBuilder();
-                Refactorings r = this.ctx.getRefactorings();
-                r.replace(toReplace, negate ? b.negate(miAdd, COPY.MOVE) : b.move(miAdd));
-                r.remove(firstStmt);
-                return DO_NOT_VISIT_SUBTREE;
+            if (isMethod(miAddOrRemove, "java.util.Set", methodName, "java.lang.Object")
+                    && match(astMatcher, miContains.getExpression(), miAddOrRemove.getExpression())
+                    && match(astMatcher, arg0(miContains), arg0(miAddOrRemove))) {
+                final ASTBuilder b = this.ctx.getASTBuilder();
+                final Refactorings r = this.ctx.getRefactorings();
+
+                if (asList(statement).size() == 1 && asList(oppositeStatement).isEmpty()) {
+                    // Only one statement: add() or remove()
+                    r.replace(nodeToReplace, b.copy(firstStmt));
+                    return DO_NOT_VISIT_SUBTREE;
+                } else {
+                    r.replace(nodeToReplace.getExpression(),
+                            negate ? b.negate(miAddOrRemove, ASTBuilder.Copy.MOVE) : b.move(miAddOrRemove));
+                    r.remove(firstStmt);
+                    return DO_NOT_VISIT_SUBTREE;
+                }
             }
         }
         return VISIT_SUBTREE;
