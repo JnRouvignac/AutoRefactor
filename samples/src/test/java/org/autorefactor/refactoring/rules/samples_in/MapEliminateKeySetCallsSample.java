@@ -42,6 +42,10 @@ public class MapEliminateKeySetCallsSample {
         if (map.keySet().contains("hello")) {
             map.keySet().remove("hello");
         }
+        if (map.keySet().remove("world")) {
+            // Cannot replace, because `map.removeKey("world") != null` is not strictly equivalent
+            System.out.println(map);
+        }
         map.keySet().clear();
         if (map.keySet().isEmpty()) {
             x++;
@@ -52,7 +56,7 @@ public class MapEliminateKeySetCallsSample {
     public void refactorMapKeySet(Map<String, Long> map) {
         for (String key : map.keySet()) {
             System.out.println("hello " + map.get("name"));
-            if (map.get(key).longValue() > 0) {
+            if (map.get(key) != null) {
                 System.out.println("the value of "+ key + " is " + map.get(key));
             }
         }
@@ -71,7 +75,7 @@ public class MapEliminateKeySetCallsSample {
         Map<String, Long> map2 = map;
         for (String key : map2.keySet()) {
             System.out.println("hello " + map2.get("name"));
-            if (map2.get(key).longValue() > 0) {
+            if (map2.get(key) != null) {
                 System.out.println("the value of "+ key + " is " + map2.get(key));
             }
         }
@@ -82,7 +86,7 @@ public class MapEliminateKeySetCallsSample {
         for (Map<String, Long> map2 = map; i <= 0; i++) {
             for (String key : map2.keySet()) {
                 System.out.println("hello " + map2.get("name"));
-                if (map2.get(key).longValue() > 0) {
+                if (map2.get(key) != null) {
                     System.out.println("the value of "+ key + " is " + map2.get(key));
                 }
             }
@@ -92,7 +96,7 @@ public class MapEliminateKeySetCallsSample {
     public void refactorField() {
         for (String key : mapField.keySet()) {
             System.out.println("hello " + mapField.get("name"));
-            if (mapField.get(key).longValue() > 0) {
+            if (mapField.get(key) != null) {
                 System.out.println("the value of "+ key + " is " + mapField.get(key));
             }
         }
@@ -111,7 +115,7 @@ public class MapEliminateKeySetCallsSample {
     public void refactorRawMap(Map map) {
         for (Object key : map.keySet()) {
             System.out.println("hello " + map.get("name"));
-            if (((Long) map.get(key)).longValue() > 0) {
+            if (((Long) map.get(key)) != null) {
                 System.out.println("the value of "+ key + " is " + map.get(key));
             }
         }
@@ -120,7 +124,7 @@ public class MapEliminateKeySetCallsSample {
     public void refactorMapKeySetWithUnboxingOfKey(Map<Byte, Long> map) {
         for (byte key : map.keySet()) {
             System.out.println("hello " + map.get("name"));
-            if (map.get(key).longValue() > 0) {
+            if (map.get(key) != null) {
                 System.out.println("the value of "+ key + " is " + map.get(key));
             }
         }
@@ -135,7 +139,7 @@ public class MapEliminateKeySetCallsSample {
     public void doNotRefactor_forWithIterator(Map<String, Long> map) {
         for (Iterator<String> iter = map.keySet().iterator(); iter.hasNext();) {
             String key = iter.next();
-            if (map.get(key).longValue() > 0) {
+            if (map.get(key) != null) {
                 System.out.println(map.get(key));
             }
         }

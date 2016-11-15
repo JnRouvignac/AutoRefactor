@@ -42,6 +42,10 @@ public class MapEliminateKeySetCallsSample {
         if (map.containsKey("hello")) {
             map.remove("hello");
         }
+        if (map.keySet().remove("world")) {
+            // Cannot replace, because `map.removeKey("world") != null` is not strictly equivalent
+            System.out.println(map);
+        }
         map.clear();
         if (map.isEmpty()) {
             x++;
@@ -53,7 +57,7 @@ public class MapEliminateKeySetCallsSample {
         for (Map.Entry<String, Long> entry : map.entrySet()) {
             String key = entry.getKey();
             System.out.println("hello " + map.get("name"));
-            if (entry.getValue().longValue() > 0) {
+            if (entry.getValue() != null) {
                 System.out.println("the value of "+ key + " is " + entry.getValue());
             }
         }
@@ -74,7 +78,7 @@ public class MapEliminateKeySetCallsSample {
         for (Map.Entry<String, Long> entry : map2.entrySet()) {
             String key = entry.getKey();
             System.out.println("hello " + map2.get("name"));
-            if (entry.getValue().longValue() > 0) {
+            if (entry.getValue() != null) {
                 System.out.println("the value of "+ key + " is " + entry.getValue());
             }
         }
@@ -86,7 +90,7 @@ public class MapEliminateKeySetCallsSample {
             for (Map.Entry<String, Long> entry : map2.entrySet()) {
                 String key = entry.getKey();
                 System.out.println("hello " + map2.get("name"));
-                if (entry.getValue().longValue() > 0) {
+                if (entry.getValue() != null) {
                     System.out.println("the value of "+ key + " is " + entry.getValue());
                 }
             }
@@ -97,7 +101,7 @@ public class MapEliminateKeySetCallsSample {
         for (Map.Entry<String, Long> entry : mapField.entrySet()) {
             String key = entry.getKey();
             System.out.println("hello " + mapField.get("name"));
-            if (entry.getValue().longValue() > 0) {
+            if (entry.getValue() != null) {
                 System.out.println("the value of "+ key + " is " + entry.getValue());
             }
         }
@@ -119,7 +123,7 @@ public class MapEliminateKeySetCallsSample {
             Map.Entry entry = (Map.Entry) obj;
             Object key = entry.getKey();
             System.out.println("hello " + map.get("name"));
-            if (((Long) entry.getValue()).longValue() > 0) {
+            if (((Long) entry.getValue()) != null) {
                 System.out.println("the value of "+ key + " is " + entry.getValue());
             }
         }
@@ -129,7 +133,7 @@ public class MapEliminateKeySetCallsSample {
         for (Map.Entry<Byte, Long> entry : map.entrySet()) {
             byte key = entry.getKey();
             System.out.println("hello " + map.get("name"));
-            if (entry.getValue().longValue() > 0) {
+            if (entry.getValue() != null) {
                 System.out.println("the value of "+ key + " is " + entry.getValue());
             }
         }
@@ -144,7 +148,7 @@ public class MapEliminateKeySetCallsSample {
     public void doNotRefactor_forWithIterator(Map<String, Long> map) {
         for (Iterator<String> iter = map.keySet().iterator(); iter.hasNext();) {
             String key = iter.next();
-            if (map.get(key).longValue() > 0) {
+            if (map.get(key) != null) {
                 System.out.println(map.get(key));
             }
         }

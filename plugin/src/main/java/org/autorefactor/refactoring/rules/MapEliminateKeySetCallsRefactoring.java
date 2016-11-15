@@ -198,7 +198,7 @@ public class MapEliminateKeySetCallsRefactoring extends AbstractRefactoringRule 
     public boolean visit(MethodInvocation mi) {
         Expression miExpr = mi.getExpression();
         if (isKeySetMethod(miExpr)) {
-            MethodInvocation mapKeySetMi = (MethodInvocation) miExpr;
+            final MethodInvocation mapKeySetMi = (MethodInvocation) miExpr;
             if (isMethod(mi, "java.util.Set", "clear")) {
                 return removeInvocationOfMapKeySet(mapKeySetMi, mi, "clear");
             }
@@ -208,7 +208,11 @@ public class MapEliminateKeySetCallsRefactoring extends AbstractRefactoringRule 
             if (isMethod(mi, "java.util.Set", "isEmpty")) {
                 return removeInvocationOfMapKeySet(mapKeySetMi, mi, "isEmpty");
             }
-            if (isMethod(mi, "java.util.Set", "remove", "java.lang.Object")) {
+            if (isMethod(mi, "java.util.Set", "remove", "java.lang.Object")
+                    // If parent is not an expression statement, the MethodInvocation must return a boolean.
+                    // In that case, we cannot replace because `Map.removeKey(key) != null`
+                    // is not strictly equivalent to `Map.keySet().remove(key)`
+                    && mi.getParent().getNodeType() == EXPRESSION_STATEMENT) {
                 return removeInvocationOfMapKeySet(mapKeySetMi, mi, "remove");
             }
             if (isMethod(mi, "java.util.Set", "contains", "java.lang.Object")) {
