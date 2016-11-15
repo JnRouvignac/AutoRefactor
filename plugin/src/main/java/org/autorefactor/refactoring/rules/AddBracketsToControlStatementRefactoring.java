@@ -25,7 +25,6 @@
  */
 package org.autorefactor.refactoring.rules;
 
-import org.autorefactor.preferences.Preferences;
 import org.autorefactor.refactoring.ASTBuilder;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.DoStatement;
@@ -53,11 +52,6 @@ public class AddBracketsToControlStatementRefactoring extends AbstractRefactorin
     @Override
     public String getName() {
         return "Add brackets to control statement";
-    }
-
-    @Override
-    public boolean isEnabled(final Preferences prefs) {
-        return prefs.addCurlyBracketsToStatementBodies();
     }
 
     @Override

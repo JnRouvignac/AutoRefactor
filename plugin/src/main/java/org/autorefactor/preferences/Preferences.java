@@ -25,6 +25,8 @@
  */
 package org.autorefactor.preferences;
 
+import org.autorefactor.refactoring.rules.AbstractRefactoringRule;
+
 /**
  * Helper interface for preferences.
  */
@@ -38,17 +40,11 @@ public interface Preferences {
     boolean debugModeOn();
 
     /**
-     * Returns whether to remove 'this' keyword for accesses to non static methods.
+     * Returns whether this refactoring rule is on.
      *
-     * @return true if must remove 'this' keyword for accesses to non static methods, false otherwise
+     * @param clazz The class.
+     * @return true if this refactoring rule is on, false otherwise.
      */
-    boolean removeThisForNonStaticMethodAccess();
-
-    /**
-     * Returns whether debug mode is on.
-     *
-     * @return true if debug mode is on, false otherwise.
-     */
-    boolean addCurlyBracketsToStatementBodies();
+    boolean isEnabled(Class<? extends AbstractRefactoringRule> clazz);
 
 }
