@@ -28,6 +28,9 @@ package org.autorefactor.refactoring.rules.samples_in;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.AbstractList;
+import java.util.Collection;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class DeadCodeEliminationSample {
 
@@ -288,6 +291,17 @@ public class DeadCodeEliminationSample {
         @Override
         protected void removeRange(int fromIndex, int toIndex) {
             super.removeRange(fromIndex, toIndex);
+        }
+    }
+
+    private void removeIfButKeepConditionsWithSideEffects(AtomicBoolean b, AtomicInteger i, Collection<Object> col) {
+        if (b.getAndSet(true)) {
+        }
+        if (col.add(1)) {
+        }
+        if (i.getAndIncrement() == 3) {
+        }
+        if (i.getAndIncrement() == 3 && b.getAndSet(false) && col.add(2)) {
         }
     }
 }
