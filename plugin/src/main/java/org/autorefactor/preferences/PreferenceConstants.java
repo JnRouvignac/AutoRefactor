@@ -33,20 +33,8 @@ public enum PreferenceConstants {
     /** Preference that turns debug mode on or off. */
     DEBUG_MODE_ON(
             "debug_mode_on",
-            "Enable debug mode (for developers only)",
-            Boolean.FALSE),
-
-    /** Preference that configures whether to add curly brackets to statement bodies. */
-    ADD_CURLY_BRACKETS_TO_STATEMENT_BODIES(
-            "add_curly_brackets_to_statement_bodies",
-            "Add curly brackets '{' and '}' to statement bodies",
-            Boolean.TRUE),
-
-    /** Preference that configures whether to remove <code>this</code> for non static method accesses. */
-    REMOVE_THIS_FOR_NON_STATIC_METHOD_ACCESS(
-            "remove_this_for_non_static_method_access",
-            "Remove 'this' qualifier for non static method accesses",
-            Boolean.TRUE);
+            "Enable debug mode (for developers)",
+            Boolean.FALSE);
 
     /** TODO use this for preferences initialization. */
     private static final String JDT_ALWAYS_USE_THIS_FOR_NON_STATIC_METHOD_ACCESS =

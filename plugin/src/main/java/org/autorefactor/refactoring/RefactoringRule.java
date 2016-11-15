@@ -60,6 +60,13 @@ public interface RefactoringRule {
     Refactorings getRefactorings(CompilationUnit astRoot);
 
     /**
+     * True if the refactoring is pre-configured.
+     *
+     * @return True if the refactoring is pre-configured.
+     */
+    boolean isByDefault();
+
+    /**
      * Returns whether the current refactoring is enabled by the preferences.
      *
      * @param preferences the preferences
