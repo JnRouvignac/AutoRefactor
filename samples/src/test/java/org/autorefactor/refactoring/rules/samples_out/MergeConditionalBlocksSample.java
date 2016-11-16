@@ -51,6 +51,15 @@ public class MergeConditionalBlocksSample {
         }
     }
 
+    /** Duplicate if and else if code, merge it */
+    public void duplicateIfAndElseIfWithoutElse(int i) {
+        // Keep this comment
+        if ((i == 0) || (i == 1)) {
+            // Keep this comment too
+            System.out.println("Duplicate");
+        }
+    }
+
     /** Duplicate else if codes, merge it */
     public void duplicateIfAndElseIfAmongOther(int i) {
         // Keep this comment

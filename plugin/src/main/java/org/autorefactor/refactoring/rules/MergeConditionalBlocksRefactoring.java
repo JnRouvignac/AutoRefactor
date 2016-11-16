@@ -86,7 +86,11 @@ public class MergeConditionalBlocksRefactoring extends AbstractRefactoringRule {
 
             r.replace(firstCondition, b.infixExpr(b.parenthesizeIfNeeded(b.copy(firstCondition)),
                     InfixExpression.Operator.CONDITIONAL_OR, b.parenthesizeIfNeeded(additionalCondition)));
-            r.replace(subNode, b.copy(remainingStatements));
+            if (remainingStatements != null) {
+                r.replace(subNode, b.copy(remainingStatements));
+            } else {
+                r.remove(subNode);
+            }
             return DO_NOT_VISIT_SUBTREE;
         }
         return VISIT_SUBTREE;
