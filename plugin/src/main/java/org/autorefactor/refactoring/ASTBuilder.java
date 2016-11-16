@@ -2,6 +2,7 @@
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
  * Copyright (C) 2014-2016 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2016 Zsombor Gegesy - various additions
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -57,7 +58,6 @@ import org.eclipse.jdt.core.dom.MarkerAnnotation;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Modifier;
-import org.eclipse.jdt.core.dom.Modifier.ModifierKeyword;
 import org.eclipse.jdt.core.dom.Name;
 import org.eclipse.jdt.core.dom.NumberLiteral;
 import org.eclipse.jdt.core.dom.ParameterizedType;
@@ -341,7 +341,7 @@ public class ASTBuilder {
      * @return a copy of the node
      */
     public <T extends ASTNode> T copy(T nodeToCopy) {
-        if (nodeToCopy.getNodeType() == ASTNode.ARRAY_TYPE) {
+        if (nodeToCopy.getNodeType() == ARRAY_TYPE) {
             return (T) copyType((Type) nodeToCopy);
         } else if (isValidInCurrentAST(nodeToCopy)) {
             return refactorings.createCopyTarget(nodeToCopy);
@@ -1066,7 +1066,7 @@ public class ASTBuilder {
      * @return a newline statement
      */
     public Statement newlinePlaceholder() {
-        return (Statement) refactorings.getRewrite().createStringPlaceholder("\n", ASTNode.EMPTY_STATEMENT);
+        return (Statement) refactorings.getRewrite().createStringPlaceholder("\n", EMPTY_STATEMENT);
     }
 
     /**
@@ -1075,7 +1075,7 @@ public class ASTBuilder {
      * @return a protected modifier
      */
     public Modifier protected0() {
-        return getAST().newModifier(ModifierKeyword.PROTECTED_KEYWORD);
+        return getAST().newModifier(PROTECTED_KEYWORD);
     }
 
     /**

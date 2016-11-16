@@ -62,7 +62,6 @@ import static org.eclipse.jdt.core.dom.IfStatement.*;
  */
 @SuppressWarnings("javadoc")
 public class IfElseIfRefactoring extends AbstractRefactoringRule {
-
     @Override
     public String getDescription() {
         return "Refactors \"else { if (...) {} }\" to \"else if (...) {}\" to.";

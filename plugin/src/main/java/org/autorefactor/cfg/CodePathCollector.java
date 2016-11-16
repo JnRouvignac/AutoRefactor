@@ -33,11 +33,8 @@ import java.util.List;
 
 import org.autorefactor.util.IllegalStateException;
 
-/**
- * Collects code paths into the CFG.
- */
+/** Collects code paths into the CFG. */
 public class CodePathCollector {
-
     private final List<List<CFGBasicBlock>> results = new ArrayList<List<CFGBasicBlock>>();
     private final Deque<CFGBasicBlock> stack = new LinkedList<CFGBasicBlock>();
 

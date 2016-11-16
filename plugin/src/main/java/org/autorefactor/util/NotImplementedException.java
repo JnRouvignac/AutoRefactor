@@ -27,11 +27,8 @@ package org.autorefactor.util;
 
 import org.eclipse.jdt.core.dom.ASTNode;
 
-/**
- * Exception thrown when some code is not implemented, or when some conditions are not handled.
- */
+/** Exception thrown when some code is not implemented, or when some conditions are not handled. */
 public class NotImplementedException extends AutoRefactorException {
-
     private static final String DEFAULT_MESSAGE = "Code is not implemented";
 
     /**
@@ -62,5 +59,4 @@ public class NotImplementedException extends AutoRefactorException {
     public NotImplementedException(ASTNode node, String reason) {
         super(node, DEFAULT_MESSAGE + " " + (reason != null ? reason : ""));
     }
-
 }

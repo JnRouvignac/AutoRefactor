@@ -49,11 +49,8 @@ import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaModelException;
 
-/**
- * Eclipse job that prepares and partitions work for {@link ApplyRefactoringsJob}.
- */
+/** Eclipse job that prepares and partitions work for {@link ApplyRefactoringsJob}. */
 public class PrepareApplyRefactoringsJob extends Job {
-
     private final List<IJavaElement> javaElements;
     private final List<RefactoringRule> refactoringRulesToApply;
     private final Map<IJavaElement, JavaProjectOptions> javaProjects = new HashMap<IJavaElement, JavaProjectOptions>();
@@ -71,7 +68,6 @@ public class PrepareApplyRefactoringsJob extends Job {
         this.refactoringRulesToApply = refactoringRulesToApply;
     }
 
-    /** {@inheritDoc} */
     @Override
     protected IStatus run(IProgressMonitor monitor) {
         AutoRefactorPlugin.register(this);

@@ -36,7 +36,6 @@ import org.eclipse.jdt.core.dom.CompilationUnit;
  * is called next.
  */
 public interface RefactoringRule {
-
     /**
      * Returns a description of the refactoring rule suitable for displaying to the user.
      *
@@ -74,5 +73,4 @@ public interface RefactoringRule {
      * @param ctx the refactoring context
      */
     void setRefactoringContext(RefactoringContext ctx);
-
 }

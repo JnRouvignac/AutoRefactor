@@ -30,11 +30,8 @@ import org.eclipse.jdt.core.dom.Expression;
 
 import static org.autorefactor.util.Utils.*;
 
-/**
- * Builder for a {@link CFGEdge}.
- */
+/** Builder for a {@link CFGEdge}. */
 public class CFGEdgeBuilder {
-
     private Expression condition;
     /** TODO JNR rename. */
     private boolean evaluationResult;
@@ -78,7 +75,6 @@ public class CFGEdgeBuilder {
         this.jumping = jumping;
     }
 
-    /** {@inheritDoc} */
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -93,7 +89,6 @@ public class CFGEdgeBuilder {
         return result;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
@@ -167,7 +162,6 @@ public class CFGEdgeBuilder {
         return buildEdge(condition, true, sourceBlock, targetBlock);
     }
 
-
     /**
      * Factory method building a CFGEdge with the provided arguments.
      *
@@ -185,7 +179,6 @@ public class CFGEdgeBuilder {
         return edge;
     }
 
-    /** {@inheritDoc} */
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("EDGE_BUILDER[");

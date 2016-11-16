@@ -41,7 +41,6 @@ import static org.eclipse.jdt.core.dom.PrefixExpression.Operator.*;
 
 /** See {@link #getDescription()} method. */
 public class PushNegationDownRefactoring extends AbstractRefactoringRule {
-
     @Override
     public String getDescription() {
         return "Pushes negations down, inside the negated expressions.";

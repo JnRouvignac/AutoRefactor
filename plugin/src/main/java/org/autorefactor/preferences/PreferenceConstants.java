@@ -25,11 +25,8 @@
  */
 package org.autorefactor.preferences;
 
-/**
- * Interface holding preference constants.
- */
+/** Interface holding preference constants. */
 public enum PreferenceConstants {
-
     /** Preference that turns debug mode on or off. */
     DEBUG_MODE_ON(
             "debug_mode_on",

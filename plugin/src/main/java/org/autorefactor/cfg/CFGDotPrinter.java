@@ -75,7 +75,6 @@ public class CFGDotPrinter {
     }
 
     private static final class CFGEdgeComparator implements Comparator<CFGEdge> {
-
         public int compare(CFGEdge e1, CFGEdge e2) {
             final int cmp = e1.getSourceBlock().compareTo(e2.getSourceBlock());
             if (cmp != 0) {
@@ -232,5 +231,4 @@ public class CFGDotPrinter {
     private String escape(String s) {
         return s != null ? s.replaceAll("\"", "\\\"") : null;
     }
-
 }

@@ -37,7 +37,6 @@ import static org.eclipse.jdt.core.dom.InfixExpression.Operator.*;
 /** See {@link #getDescription()} method. */
 @SuppressWarnings("javadoc")
 public class CollapseIfStatementRefactoring extends AbstractRefactoringRule {
-
     @Override
     public String getDescription() {
         return "Collapses two consecutive if statements into just one.";

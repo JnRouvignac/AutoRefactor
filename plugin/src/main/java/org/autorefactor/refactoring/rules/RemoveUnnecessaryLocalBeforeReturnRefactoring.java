@@ -43,7 +43,6 @@ import static org.eclipse.jdt.core.dom.Assignment.Operator.*;
 
 /** See {@link #getDescription()} method. */
 public class RemoveUnnecessaryLocalBeforeReturnRefactoring extends AbstractRefactoringRule {
-
     @Override
     public String getDescription() {
         return ""

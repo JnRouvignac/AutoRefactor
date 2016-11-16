@@ -37,7 +37,6 @@ import org.autorefactor.util.IllegalArgumentException;
  * </p>
  */
 public final class Release {
-
     private final int[] version;
     private final String releaseName;
 

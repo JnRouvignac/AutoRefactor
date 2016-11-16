@@ -28,11 +28,8 @@ package org.autorefactor.ui;
 import org.autorefactor.refactoring.JavaProjectOptions;
 import org.eclipse.jdt.core.ICompilationUnit;
 
-/**
- * Work item for the {@link ApplyRefactoringsJob}.
- */
+/** Work item for the {@link ApplyRefactoringsJob}. */
 class RefactoringUnit {
-
     private final ICompilationUnit compilationUnit;
     private final JavaProjectOptions options;
 

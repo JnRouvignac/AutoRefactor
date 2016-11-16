@@ -23,7 +23,5 @@
  * which accompanies this distribution under LICENSE-ECLIPSE, and is
  * available at http://www.eclipse.org/legal/epl-v10.html
  */
-/**
- * Provides useful classes to build and define refactorings.
- */
+/** Provides useful classes to build and define refactorings. */
 package org.autorefactor.refactoring;

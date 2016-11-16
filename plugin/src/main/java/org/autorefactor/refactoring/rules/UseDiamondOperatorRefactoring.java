@@ -33,7 +33,6 @@ import org.autorefactor.refactoring.Release;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
-import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
@@ -49,7 +48,6 @@ import static org.eclipse.jdt.core.dom.ASTNode.*;
 
 /** See {@link #getDescription()} method. */
 public class UseDiamondOperatorRefactoring extends AbstractRefactoringRule {
-
     @Override
     public String getDescription() {
         return "Refactors class instance creations to use the diamond operator wherever possible.";
@@ -60,15 +58,15 @@ public class UseDiamondOperatorRefactoring extends AbstractRefactoringRule {
         return "Diamond operator";
     }
 
-    @Override
-    public boolean visit(CompilationUnit node) {
+    private boolean isEnabled() {
         return ctx.getJavaProjectOptions().getJavaSERelease().isCompatibleWith(Release.javaSE("1.7.0"));
     }
 
     @Override
     public boolean visit(ClassInstanceCreation node) {
         final Type type = node.getType();
-        if (type.isParameterizedType()
+        if (isEnabled()
+                && type.isParameterizedType()
                 && node.getAnonymousClassDeclaration() == null
                 && parentAllowsDiamondOperator(node)
                 && canUseDiamondOperator(node, type)) {

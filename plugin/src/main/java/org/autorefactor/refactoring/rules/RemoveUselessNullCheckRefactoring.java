@@ -43,7 +43,6 @@ import static org.eclipse.jdt.core.dom.InfixExpression.Operator.*;
 /** See {@link #getDescription()} method. */
 @SuppressWarnings("javadoc")
 public class RemoveUselessNullCheckRefactoring extends AbstractRefactoringRule {
-
     @Override
     public String getDescription() {
         return ""
@@ -132,7 +131,7 @@ public class RemoveUselessNullCheckRefactoring extends AbstractRefactoringRule {
         this.ctx.getRefactorings().replace(node,
                 b.toStmt(b.assign(
                         b.copy(leftHandSide),
-                        Assignment.Operator.ASSIGN,
+                        ASSIGN,
                         b.copy(rightHandSide))));
         return DO_NOT_VISIT_SUBTREE;
     }

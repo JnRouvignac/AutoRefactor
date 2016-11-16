@@ -157,7 +157,7 @@ public class HotSpotIntrinsicedAPIsRefactoring extends AbstractRefactoringRule {
         }
         return b.infixExpr(
                 b.copy(expr1),
-                InfixExpression.Operator.MINUS,
+                MINUS,
                 b.copy(expr2));
     }
 
@@ -175,7 +175,7 @@ public class HotSpotIntrinsicedAPIsRefactoring extends AbstractRefactoringRule {
         }
         return b.infixExpr(
                 b.copy(expr1),
-                InfixExpression.Operator.PLUS,
+                PLUS,
                 b.copy(expr2));
     }
 

@@ -23,7 +23,5 @@
  * which accompanies this distribution under LICENSE-ECLIPSE, and is
  * available at http://www.eclipse.org/legal/epl-v10.html
  */
-/**
- * Package of the AutoRefactor plugin.
- */
+/** Package of the AutoRefactor plugin. */
 package org.autorefactor;

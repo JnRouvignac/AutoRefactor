@@ -27,11 +27,8 @@ package org.autorefactor.refactoring;
 
 import java.util.regex.Pattern;
 
-/**
- * Interface holding java constants.
- */
+/** Interface holding java constants. */
 public interface JavaConstants {
-
     /**
      * String pattern identifying number literal for an integer.
      *
@@ -94,5 +91,4 @@ public interface JavaConstants {
             + "1_*0" + ")|(?:"
             // hexadecimal literal
             + "(?:0x|0X)(?:0[0_]*)?(?:a|A)" + ")" + ")(?:l|L)?");
-
 }

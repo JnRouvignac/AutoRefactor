@@ -32,7 +32,6 @@ import org.eclipse.jdt.core.dom.ASTNode;
  * The cause is the unhandled exception.
  */
 public class UnhandledException extends AutoRefactorException {
-
     /**
      * Constructor.
      *
@@ -53,5 +52,4 @@ public class UnhandledException extends AutoRefactorException {
     public UnhandledException(ASTNode node, String message, Throwable unhandled) {
         super(node, message, unhandled);
     }
-
 }

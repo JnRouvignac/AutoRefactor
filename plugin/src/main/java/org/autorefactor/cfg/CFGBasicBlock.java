@@ -203,7 +203,6 @@ public class CFGBasicBlock implements Comparable<CFGBasicBlock> {
         this.outgoingEdgesAndVariableAccesses.add(varAccess);
     }
 
-    /** {@inheritDoc} */
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -215,7 +214,6 @@ public class CFGBasicBlock implements Comparable<CFGBasicBlock> {
         return result;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
@@ -230,7 +228,6 @@ public class CFGBasicBlock implements Comparable<CFGBasicBlock> {
                 && equal(isEntryBlock, other.isEntryBlock);
     }
 
-    /** {@inheritDoc} */
     @Override
     public int compareTo(CFGBasicBlock o) {
         final Integer startPosition = lineAndColumn.getStartPosition();
@@ -297,7 +294,6 @@ public class CFGBasicBlock implements Comparable<CFGBasicBlock> {
         return sb;
     }
 
-    /** {@inheritDoc} */
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("BLOCK[");

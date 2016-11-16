@@ -30,7 +30,6 @@ import java.util.List;
 import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.Refactorings;
 import org.autorefactor.util.NotImplementedException;
-import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ExpressionStatement;
@@ -59,7 +58,6 @@ import static org.eclipse.jdt.core.dom.PrefixExpression.Operator.*;
  * </p>
  */
 public class TestNGAssertRefactoring extends AbstractRefactoringRule {
-
     @Override
     public String getDescription() {
         return "Refactors to a proper use of TestNG assertions.";
@@ -190,7 +188,7 @@ public class TestNGAssertRefactoring extends AbstractRefactoringRule {
         if (replace) {
             r.replace(node, invokeFail(node));
             return DO_NOT_VISIT_SUBTREE;
-        } else if (node.getParent().getNodeType() == ASTNode.EXPRESSION_STATEMENT) {
+        } else if (node.getParent().getNodeType() == EXPRESSION_STATEMENT) {
             r.remove(node.getParent());
             return DO_NOT_VISIT_SUBTREE;
         }

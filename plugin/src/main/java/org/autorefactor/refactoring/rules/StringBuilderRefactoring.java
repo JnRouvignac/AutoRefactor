@@ -53,7 +53,6 @@ import static org.eclipse.jdt.core.dom.InfixExpression.Operator.*;
 
 /** See {@link #getDescription()} method. */
 public class StringBuilderRefactoring extends AbstractRefactoringRule {
-
     @Override
     public String getDescription() {
         return ""

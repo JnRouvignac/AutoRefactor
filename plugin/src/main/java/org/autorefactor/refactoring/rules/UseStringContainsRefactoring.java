@@ -38,7 +38,6 @@ import static org.autorefactor.refactoring.ASTHelper.*;
 /** See {@link #getDescription()} method. */
 @SuppressWarnings("javadoc")
 public class UseStringContainsRefactoring extends AbstractRefactoringRule {
-
     @Override
     public String getDescription() {
         return ""

@@ -39,7 +39,6 @@ import static org.eclipse.jdt.core.dom.Modifier.*;
 
 /** See {@link #getDescription()} method. */
 public class RemoveFieldsDefaultValuesRefactoring extends AbstractRefactoringRule {
-
     @Override
     public String getDescription() {
         return ""
