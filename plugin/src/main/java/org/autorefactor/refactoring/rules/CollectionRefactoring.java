@@ -412,12 +412,9 @@ public class CollectionRefactoring extends AbstractRefactoringRule {
     private boolean maybeReplaceSetContains(final IfStatement nodeToReplace, final Expression ifExpression,
             final Statement statement,
             final Statement oppositeStatement, final boolean negate) {
-        if (maybeReplaceSetContains(nodeToReplace, ifExpression, statement, oppositeStatement, negate, "add")
-                == VISIT_SUBTREE) {
-            return maybeReplaceSetContains(nodeToReplace, ifExpression, oppositeStatement, statement, !negate,
+        return maybeReplaceSetContains(nodeToReplace, ifExpression, statement, oppositeStatement, negate, "add")
+                &&  maybeReplaceSetContains(nodeToReplace, ifExpression, oppositeStatement, statement, !negate,
                     "remove");
-        }
-        return DO_NOT_VISIT_SUBTREE;
     }
 
     private boolean maybeReplaceSetContains(final IfStatement nodeToReplace, final Expression ifExpression,
