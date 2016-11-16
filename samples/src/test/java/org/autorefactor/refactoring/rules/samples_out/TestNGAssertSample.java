@@ -2,6 +2,7 @@
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
  * Copyright (C) 2015 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2016 Fabrice Tiercelin - include more cases
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,11 +26,15 @@
  */
 package org.autorefactor.refactoring.rules.samples_out;
 
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.fail;
 import static org.testng.Assert.*;
 
 import org.testng.Assert;
 
 public class TestNGAssertSample {
+
+    private static final int FOURTYTWO = 42;
 
     public void shouldRefactorWithPrimitives(int i1, int i2) throws Exception {
         Assert.assertEquals(i1, i2);
@@ -182,7 +187,7 @@ public class TestNGAssertSample {
         assertNotNull(o, "Failure message to keep");
     }
 
-    public void shouldMoveConstantAsExpectedArgInWithEquals(Object o) throws Exception {
+    public void shouldMoveLiteralAsExpectedArgInWithEquals(Object o) throws Exception {
         Assert.assertEquals(o, 42);
         Assert.assertEquals(o, 42, "Failure message to keep");
         Assert.assertNotEquals(o, 42);
@@ -192,6 +197,42 @@ public class TestNGAssertSample {
         assertEquals(o, 42, "Failure message to keep");
         assertNotEquals(o, 42);
         assertNotEquals(o, 42, "Failure message to keep");
+    }
+
+    public void doNotRefactorLiteralAsExpectedArgInWithEquals(Object o) throws Exception {
+        Assert.assertEquals(o, 42);
+        Assert.assertEquals(o, 42, "Failure message to keep");
+        Assert.assertNotEquals(o, 42);
+        Assert.assertNotEquals(o, 42, "Failure message to keep");
+
+        assertEquals(o, 42);
+        assertEquals(o, 42, "Failure message to keep");
+        assertNotEquals(o, 42);
+        assertNotEquals(o, 42, "Failure message to keep");
+    }
+
+    public void shouldMoveConstantAsExpectedArgInWithEquals(Object o) throws Exception {
+        Assert.assertEquals(o, FOURTYTWO);
+        Assert.assertEquals(o, FOURTYTWO, "Failure message to keep");
+        Assert.assertNotEquals(o, FOURTYTWO);
+        Assert.assertNotEquals(o, FOURTYTWO, "Failure message to keep");
+
+        assertEquals(o, FOURTYTWO);
+        assertEquals(o, FOURTYTWO, "Failure message to keep");
+        assertNotEquals(o, FOURTYTWO);
+        assertNotEquals(o, FOURTYTWO, "Failure message to keep");
+    }
+
+    public void doNotRefactorConstantAsExpectedArgInWithEquals(Object o) throws Exception {
+        Assert.assertEquals(o, FOURTYTWO);
+        Assert.assertEquals(o, FOURTYTWO, "Failure message to keep");
+        Assert.assertNotEquals(o, FOURTYTWO);
+        Assert.assertNotEquals(o, FOURTYTWO, "Failure message to keep");
+
+        assertEquals(o, FOURTYTWO);
+        assertEquals(o, FOURTYTWO, "Failure message to keep");
+        assertNotEquals(o, FOURTYTWO);
+        assertNotEquals(o, FOURTYTWO, "Failure message to keep");
     }
 
     public void shouldMoveExpectedVariableAsExpectedArgWithEquals(Object o, int expected) throws Exception {
@@ -264,6 +305,86 @@ public class TestNGAssertSample {
         assertNotEquals(o1, o2, "Failure message to keep");
         assertEquals(o1, o2);
         assertEquals(o1, o2, "Failure message to keep");
+    }
+
+    public void shouldRefactorIfLiteralThenFail(int i) throws Exception {
+        Assert.assertNotEquals(i, 42);
+        Assert.assertNotEquals(i, 42, "Failure message to keep");
+        Assert.assertEquals(i, 42);
+        Assert.assertEquals(i, 42, "Failure message to keep");
+        Assert.assertNotEquals(i, 42);
+        Assert.assertNotEquals(i, 42, "Failure message to keep");
+        Assert.assertEquals(i, 42);
+        Assert.assertEquals(i, 42, "Failure message to keep");
+
+        assertNotEquals(i, 42);
+        assertNotEquals(i, 42, "Failure message to keep");
+        assertEquals(i, 42);
+        assertEquals(i, 42, "Failure message to keep");
+        assertNotEquals(i, 42);
+        assertNotEquals(i, 42, "Failure message to keep");
+        assertEquals(i, 42);
+        assertEquals(i, 42, "Failure message to keep");
+    }
+
+    public void shouldRefactorIfConstantThenFail(int i) throws Exception {
+        Assert.assertNotEquals(i, FOURTYTWO);
+        Assert.assertNotEquals(i, FOURTYTWO, "Failure message to keep");
+        Assert.assertEquals(i, FOURTYTWO);
+        Assert.assertEquals(i, FOURTYTWO, "Failure message to keep");
+        Assert.assertNotEquals(i, FOURTYTWO);
+        Assert.assertNotEquals(i, FOURTYTWO, "Failure message to keep");
+        Assert.assertEquals(i, FOURTYTWO);
+        Assert.assertEquals(i, FOURTYTWO, "Failure message to keep");
+
+        assertNotEquals(i, FOURTYTWO);
+        assertNotEquals(i, FOURTYTWO, "Failure message to keep");
+        assertEquals(i, FOURTYTWO);
+        assertEquals(i, FOURTYTWO, "Failure message to keep");
+        assertNotEquals(i, FOURTYTWO);
+        assertNotEquals(i, FOURTYTWO, "Failure message to keep");
+        assertEquals(i, FOURTYTWO);
+        assertEquals(i, FOURTYTWO, "Failure message to keep");
+    }
+
+    public void shouldRefactorIfExpectedThenFail(int i, int expected) throws Exception {
+        Assert.assertNotEquals(i, expected);
+        Assert.assertNotEquals(i, expected, "Failure message to keep");
+        Assert.assertEquals(i, expected);
+        Assert.assertEquals(i, expected, "Failure message to keep");
+        Assert.assertNotEquals(i, expected);
+        Assert.assertNotEquals(i, expected, "Failure message to keep");
+        Assert.assertEquals(i, expected);
+        Assert.assertEquals(i, expected, "Failure message to keep");
+
+        assertNotEquals(i, expected);
+        assertNotEquals(i, expected, "Failure message to keep");
+        assertEquals(i, expected);
+        assertEquals(i, expected, "Failure message to keep");
+        assertNotEquals(i, expected);
+        assertNotEquals(i, expected, "Failure message to keep");
+        assertEquals(i, expected);
+        assertEquals(i, expected, "Failure message to keep");
+    }
+
+    public void shouldRefactorIfNearlyExpectedThenFail(int i, int expectedI) throws Exception {
+        Assert.assertNotEquals(i, expectedI);
+        Assert.assertNotEquals(i, expectedI, "Failure message to keep");
+        Assert.assertEquals(i, expectedI);
+        Assert.assertEquals(i, expectedI, "Failure message to keep");
+        Assert.assertNotEquals(i, expectedI);
+        Assert.assertNotEquals(i, expectedI, "Failure message to keep");
+        Assert.assertEquals(i, expectedI);
+        Assert.assertEquals(i, expectedI, "Failure message to keep");
+
+        assertNotEquals(i, expectedI);
+        assertNotEquals(i, expectedI, "Failure message to keep");
+        assertEquals(i, expectedI);
+        assertEquals(i, expectedI, "Failure message to keep");
+        assertNotEquals(i, expectedI);
+        assertNotEquals(i, expectedI, "Failure message to keep");
+        assertEquals(i, expectedI);
+        assertEquals(i, expectedI, "Failure message to keep");
     }
 
     public void doNotRefactorBecauseOfElseStatement(int i1, int i2, Object o1) throws Exception {

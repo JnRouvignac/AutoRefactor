@@ -1,8 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2015 Jean-Noël Rouvignac - initial API and implementation
- * Copyright (C) 2016 Fabrice Tiercelin - include more cases
+ * Copyright (C) 2016 Fabrice Tiercelin - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,247 +25,246 @@
  */
 package org.autorefactor.refactoring.rules.samples_in;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.fail;
-import static org.testng.Assert.*;
+import static org.junit.Assert.*;
 
-import org.testng.Assert;
+import org.junit.Assert;
 
-public class TestNGAssertSample {
+public class JUnitAssertSample {
 
     private static final int FOURTYTWO = 42;
 
     public void shouldRefactorWithPrimitives(int i1, int i2) throws Exception {
         Assert.assertTrue(i1 == i2);
-        Assert.assertTrue(i1 == i2, "Failure message to keep");
-        Assert.assertTrue(i1 != i2);
-        Assert.assertTrue(i1 != i2, "Failure message to keep");
+        Assert.assertTrue("Failure message to keep", i1 == i2);
         Assert.assertFalse(i1 != i2);
-        Assert.assertFalse(i1 != i2, "Failure message to keep");
-        Assert.assertFalse(i1 == i2);
-        Assert.assertFalse(i1 == i2, "Failure message to keep");
+        Assert.assertFalse("Failure message to keep", i1 != i2);
 
         assertTrue(i1 == i2);
-        assertTrue(i1 == i2, "Failure message to keep");
-        assertTrue(i1 != i2);
-        assertTrue(i1 != i2, "Failure message to keep");
+        assertTrue("Failure message to keep", i1 == i2);
         assertFalse(i1 != i2);
-        assertFalse(i1 != i2, "Failure message to keep");
-        assertFalse(i1 == i2);
-        assertFalse(i1 == i2, "Failure message to keep");
+        assertFalse("Failure message to keep", i1 != i2);
     }
 
     public void shouldRefactorFailures() throws Exception {
         Assert.assertTrue(false);
-        Assert.assertTrue(false, "Failure message to keep");
+        Assert.assertTrue("Failure message to keep", false);
         Assert.assertFalse(true);
-        Assert.assertFalse(true, "Failure message to keep");
+        Assert.assertFalse("Failure message to keep", true);
 
         assertTrue(false);
-        assertTrue(false, "Failure message to keep");
+        assertTrue("Failure message to keep", false);
         assertFalse(true);
-        assertFalse(true, "Failure message to keep");
+        assertFalse("Failure message to keep", true);
     }
 
     public void shouldRemoveDeadChecks() throws Exception {
         Assert.assertTrue(true);
-        Assert.assertTrue(true, "Failure message to keep");
+        Assert.assertTrue("Useless message", true);
         Assert.assertFalse(false);
-        Assert.assertFalse(false, "Failure message to keep");
+        Assert.assertFalse("Useless message", false);
 
         assertTrue(true);
-        assertTrue(true, "Failure message to keep");
+        assertTrue("Useless message", true);
         assertFalse(false);
-        assertFalse(false, "Failure message to keep");
+        assertFalse("Useless message", false);
     }
 
     public void shouldRefactorNegatedConditions(boolean b) throws Exception {
         Assert.assertTrue(!b);
-        Assert.assertTrue(!b, "Failure message to keep");
+        Assert.assertTrue("Failure message to keep", !b);
         Assert.assertFalse(!b);
-        Assert.assertFalse(!b, "Failure message to keep");
+        Assert.assertFalse("Failure message to keep", !b);
 
         assertTrue(!b);
-        assertTrue(!b, "Failure message to keep");
+        assertTrue("Failure message to keep", !b);
         assertFalse(!b);
-        assertFalse(!b, "Failure message to keep");
+        assertFalse("Failure message to keep", !b);
     }
 
     public void shouldRefactorWithObjectReferences(Object o1, Object o2) throws Exception {
         Assert.assertTrue(o1 == o2);
-        Assert.assertTrue(o1 == o2, "Failure message to keep");
+        Assert.assertTrue("Failure message to keep", o1 == o2);
         Assert.assertTrue(o1 != o2);
-        Assert.assertTrue(o1 != o2, "Failure message to keep");
+        Assert.assertTrue("Failure message to keep", o1 != o2);
         Assert.assertFalse(o1 != o2);
-        Assert.assertFalse(o1 != o2, "Failure message to keep");
+        Assert.assertFalse("Failure message to keep", o1 != o2);
         Assert.assertFalse(o1 == o2);
-        Assert.assertFalse(o1 == o2, "Failure message to keep");
+        Assert.assertFalse("Failure message to keep", o1 == o2);
 
         assertTrue(o1 == o2);
-        assertTrue(o1 == o2, "Failure message to keep");
+        assertTrue("Failure message to keep", o1 == o2);
         assertTrue(o1 != o2);
-        assertTrue(o1 != o2, "Failure message to keep");
+        assertTrue("Failure message to keep", o1 != o2);
         assertFalse(o1 != o2);
-        assertFalse(o1 != o2, "Failure message to keep");
+        assertFalse("Failure message to keep", o1 != o2);
         assertFalse(o1 == o2);
-        assertFalse(o1 == o2, "Failure message to keep");
+        assertFalse("Failure message to keep", o1 == o2);
     }
 
     public void shouldRefactorWithObjects(Object o1, Object o2) throws Exception {
         Assert.assertTrue(o1.equals(o2));
-        Assert.assertTrue(o1.equals(o2), "Failure message to keep");
-        Assert.assertTrue(!(o1.equals(o2)));
-        Assert.assertTrue(!(o1.equals(o2)), "Failure message to keep");
+        Assert.assertTrue("Failure message to keep", o1.equals(o2));
         Assert.assertFalse(!(o1.equals(o2)));
-        Assert.assertFalse(!(o1.equals(o2)), "Failure message to keep");
-        Assert.assertFalse(o1.equals(o2));
-        Assert.assertFalse(o1.equals(o2), "Failure message to keep");
+        Assert.assertFalse("Failure message to keep", !(o1.equals(o2)));
 
         assertTrue(o1.equals(o2));
-        assertTrue(o1.equals(o2), "Failure message to keep");
-        assertTrue(!(o1.equals(o2)));
-        assertTrue(!(o1.equals(o2)), "Failure message to keep");
+        assertTrue("Failure message to keep", o1.equals(o2));
         assertFalse(!(o1.equals(o2)));
-        assertFalse(!(o1.equals(o2)), "Failure message to keep");
-        assertFalse(o1.equals(o2));
-        assertFalse(o1.equals(o2), "Failure message to keep");
+        assertFalse("Failure message to keep", !(o1.equals(o2)));
     }
 
     public void shouldRefactorNullCheckFirstArg(Object o) throws Exception {
         Assert.assertTrue(null == o);
-        Assert.assertTrue(null == o, "Failure message to keep");
+        Assert.assertTrue("Failure message to keep", null == o);
         Assert.assertTrue(null != o);
-        Assert.assertTrue(null != o, "Failure message to keep");
+        Assert.assertTrue("Failure message to keep", null != o);
         Assert.assertFalse(null != o);
-        Assert.assertFalse(null != o, "Failure message to keep");
+        Assert.assertFalse("Failure message to keep", null != o);
         Assert.assertFalse(null == o);
-        Assert.assertFalse(null == o, "Failure message to keep");
+        Assert.assertFalse("Failure message to keep", null == o);
 
         assertTrue(null == o);
-        assertTrue(null == o, "Failure message to keep");
+        assertTrue("Failure message to keep", null == o);
         assertTrue(null != o);
-        assertTrue(null != o, "Failure message to keep");
+        assertTrue("Failure message to keep", null != o);
         assertFalse(null != o);
-        assertFalse(null != o, "Failure message to keep");
+        assertFalse("Failure message to keep", null != o);
         assertFalse(null == o);
-        assertFalse(null == o, "Failure message to keep");
+        assertFalse("Failure message to keep", null == o);
     }
 
     public void shouldRefactorNullCheckSecondArg(Object o) throws Exception {
         Assert.assertTrue(o == null);
-        Assert.assertTrue(o == null, "Failure message to keep");
+        Assert.assertTrue("Failure message to keep", o == null);
         Assert.assertTrue(o != null);
-        Assert.assertTrue(o != null, "Failure message to keep");
+        Assert.assertTrue("Failure message to keep", o != null);
         Assert.assertFalse(o != null);
-        Assert.assertFalse(o != null, "Failure message to keep");
+        Assert.assertFalse("Failure message to keep", o != null);
         Assert.assertFalse(o == null);
-        Assert.assertFalse(o == null, "Failure message to keep");
+        Assert.assertFalse("Failure message to keep", o == null);
 
         assertTrue(o == null);
-        assertTrue(o == null, "Failure message to keep");
+        assertTrue("Failure message to keep", o == null);
         assertTrue(o != null);
-        assertTrue(o != null, "Failure message to keep");
+        assertTrue("Failure message to keep", o != null);
         assertFalse(o != null);
-        assertFalse(o != null, "Failure message to keep");
+        assertFalse("Failure message to keep", o != null);
         assertFalse(o == null);
-        assertFalse(o == null, "Failure message to keep");
+        assertFalse("Failure message to keep", o == null);
     }
 
     public void shouldRefactorNullCheckFirstArgWithEquals(Object o) throws Exception {
         Assert.assertEquals(null, o);
-        Assert.assertEquals(null, o, "Failure message to keep");
-        Assert.assertNotEquals(null, o);
-        Assert.assertNotEquals(null, o, "Failure message to keep");
+        Assert.assertEquals("Failure message to keep", null, o);
 
         assertEquals(null, o);
-        assertEquals(null, o, "Failure message to keep");
-        assertNotEquals(null, o);
-        assertNotEquals(null, o, "Failure message to keep");
+        assertEquals("Failure message to keep", null, o);
     }
 
     public void shouldRefactorNullCheckSecondArgWithEquals(Object o) throws Exception {
         Assert.assertEquals(o, null);
-        Assert.assertEquals(o, null, "Failure message to keep");
-        Assert.assertNotEquals(o, null);
-        Assert.assertNotEquals(o, null, "Failure message to keep");
+        Assert.assertEquals("Failure message to keep", o, null);
 
         assertEquals(o, null);
-        assertEquals(o, null, "Failure message to keep");
-        assertNotEquals(o, null);
-        assertNotEquals(o, null, "Failure message to keep");
+        assertEquals("Failure message to keep", o, null);
     }
 
     public void shouldMoveLiteralAsExpectedArgInWithEquals(Object o) throws Exception {
-        Assert.assertEquals(42, o);
-        Assert.assertEquals(42, o, "Failure message to keep");
-        Assert.assertNotEquals(42, o);
-        Assert.assertNotEquals(42, o, "Failure message to keep");
+        Assert.assertEquals(o, 42);
+        Assert.assertEquals("Failure message to keep", o, 42);
 
-        assertEquals(42, o);
-        assertEquals(42, o, "Failure message to keep");
-        assertNotEquals(42, o);
-        assertNotEquals(42, o, "Failure message to keep");
+        assertEquals(o, 42);
+        assertEquals("Failure message to keep", o, 42);
     }
 
     public void doNotRefactorLiteralAsExpectedArgInWithEquals(Object o) throws Exception {
-        Assert.assertEquals(o, 42);
-        Assert.assertEquals(o, 42, "Failure message to keep");
-        Assert.assertNotEquals(o, 42);
-        Assert.assertNotEquals(o, 42, "Failure message to keep");
+        Assert.assertEquals(42, o);
+        Assert.assertEquals("Failure message to keep", 42, o);
 
-        assertEquals(o, 42);
-        assertEquals(o, 42, "Failure message to keep");
-        assertNotEquals(o, 42);
-        assertNotEquals(o, 42, "Failure message to keep");
+        assertEquals(42, o);
+        assertEquals("Failure message to keep", 42, o);
     }
 
     public void shouldMoveConstantAsExpectedArgInWithEquals(Object o) throws Exception {
-        Assert.assertEquals(FOURTYTWO, o);
-        Assert.assertEquals(FOURTYTWO, o, "Failure message to keep");
-        Assert.assertNotEquals(FOURTYTWO, o);
-        Assert.assertNotEquals(FOURTYTWO, o, "Failure message to keep");
+        Assert.assertEquals(o, FOURTYTWO);
+        Assert.assertEquals("Failure message to keep", o, FOURTYTWO);
 
-        assertEquals(FOURTYTWO, o);
-        assertEquals(FOURTYTWO, o, "Failure message to keep");
-        assertNotEquals(FOURTYTWO, o);
-        assertNotEquals(FOURTYTWO, o, "Failure message to keep");
+        assertEquals(o, FOURTYTWO);
+        assertEquals("Failure message to keep", o, FOURTYTWO);
     }
 
     public void doNotRefactorConstantAsExpectedArgInWithEquals(Object o) throws Exception {
-        Assert.assertEquals(o, FOURTYTWO);
-        Assert.assertEquals(o, FOURTYTWO, "Failure message to keep");
-        Assert.assertNotEquals(o, FOURTYTWO);
-        Assert.assertNotEquals(o, FOURTYTWO, "Failure message to keep");
+        Assert.assertEquals(FOURTYTWO, o);
+        Assert.assertEquals("Failure message to keep", FOURTYTWO, o);
 
-        assertEquals(o, FOURTYTWO);
-        assertEquals(o, FOURTYTWO, "Failure message to keep");
-        assertNotEquals(o, FOURTYTWO);
-        assertNotEquals(o, FOURTYTWO, "Failure message to keep");
+        assertEquals(FOURTYTWO, o);
+        assertEquals("Failure message to keep", FOURTYTWO, o);
     }
 
-    public void shouldMoveExpectedVariableAsExpectedArgWithEquals(Object o, int expected) throws Exception {
-        Assert.assertEquals(expected, o);
-        Assert.assertEquals(expected, o, "Failure message to keep");
-        Assert.assertNotEquals(expected, o);
-        Assert.assertNotEquals(expected, o, "Failure message to keep");
+    public void shouldMoveExpectedObjectAsExpectedArgWithEquals(Object o, int expected) throws Exception {
+        Assert.assertEquals(o, expected);
+        Assert.assertEquals("Failure message to keep", o, expected);
 
-        assertEquals(expected, o);
-        assertEquals(expected, o, "Failure message to keep");
-        assertNotEquals(expected, o);
-        assertNotEquals(expected, o, "Failure message to keep");
+        assertEquals(o, expected);
+        assertEquals("Failure message to keep", o, expected);
 
         // tests that this works according to levenshtein distance
+        int expceted = 0;
+        assertEquals(o, expceted);
+    }
+
+    public void doNotRefactorExpectedObjectAsExpectedArgWithEquals(Object o, int expected) throws Exception {
+        Assert.assertEquals(expected, o);
+        Assert.assertEquals("Failure message to keep", expected, o);
+
+        assertEquals(expected, o);
+        assertEquals("Failure message to keep", expected, o);
+
         int expceted = 0;
         assertEquals(expceted, o);
     }
 
-    public void shouldRefactorIfPrimitiveThenFail(int i1, int i2) throws Exception {
-        if (i1 == i2) {
+    public void shouldMoveExpectedLongAsExpectedArgWithEquals(long l, long expected) throws Exception {
+        Assert.assertEquals(l, expected);
+        Assert.assertEquals("Failure message to keep", l, expected);
+
+        assertEquals(l, expected);
+        assertEquals("Failure message to keep", l, expected);
+
+        // tests that this works according to levenshtein distance
+        int expceted = 0;
+        assertEquals(l, expceted);
+    }
+
+    public void shouldMoveExpectedDoubleAsExpectedArgWithEquals(double d, double expected) throws Exception {
+        Assert.assertEquals(d, expected);
+        Assert.assertEquals("Failure message to keep", d, expected);
+
+        assertEquals(d, expected);
+        assertEquals("Failure message to keep", d, expected);
+
+        // tests that this works according to levenshtein distance
+        int expceted = 0;
+        assertEquals(d, expceted);
+    }
+
+    public void shouldRefactorIfOnBoolean(boolean b) throws Exception {
+        if (b) {
             Assert.fail();
         }
-        if (i1 == i2) {
+        if (b) {
             Assert.fail("Failure message to keep");
         }
+
+        if (!b) {
+            fail();
+        }
+        if (!b) {
+            fail("Failure message to keep");
+        }
+    }
+
+    public void shouldRefactorIfPrimitiveThenFail(int i1, int i2) throws Exception {
         if (i1 != i2) {
             Assert.fail();
         }
@@ -274,12 +272,6 @@ public class TestNGAssertSample {
             Assert.fail("Failure message to keep");
         }
 
-        if (i1 == i2) {
-            fail();
-        }
-        if (i1 == i2) {
-            fail("Failure message to keep");
-        }
         if (i1 != i2) {
             fail();
         }
@@ -369,12 +361,6 @@ public class TestNGAssertSample {
     }
 
     public void shouldRefactorIfObjectThenFail(Object o1, Object o2) throws Exception {
-        if (o1.equals(o2)) {
-            Assert.fail();
-        }
-        if (o1.equals(o2)) {
-            Assert.fail("Failure message to keep");
-        }
         if (!o1.equals(o2)) {
             Assert.fail();
         }
@@ -382,12 +368,6 @@ public class TestNGAssertSample {
             Assert.fail("Failure message to keep");
         }
 
-        if (o1.equals(o2)) {
-            fail();
-        }
-        if (o1.equals(o2)) {
-            fail("Failure message to keep");
-        }
         if (!o1.equals(o2)) {
             fail();
         }
