@@ -23,7 +23,5 @@
  * which accompanies this distribution under LICENSE-ECLIPSE, and is
  * available at http://www.eclipse.org/legal/epl-v10.html
  */
-/**
- * Package dealing with Eclipse preferences like helpers and the AutoRefactor preferences UI.
- */
+/** Package dealing with Eclipse preferences like helpers and the AutoRefactor preferences UI. */
 package org.autorefactor.ui.preferences;

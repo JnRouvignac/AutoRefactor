@@ -54,7 +54,6 @@ import static org.autorefactor.refactoring.ASTHelper.*;
 
 /** See {@link #getDescription()} method. */
 public class RemoveUselessModifiersRefactoring extends AbstractRefactoringRule {
-
     @Override
     public String getDescription() {
         return ""

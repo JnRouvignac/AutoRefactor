@@ -39,7 +39,6 @@ import static org.eclipse.jdt.core.dom.ASTNode.*;
 
 /** See {@link #getDescription()} method. */
 public class StringRefactoring extends AbstractRefactoringRule {
-
     @Override
     public String getDescription() {
         return ""

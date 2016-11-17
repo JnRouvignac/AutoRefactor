@@ -268,7 +268,7 @@ public class CommentsRefactoring extends AbstractRefactoringRule {
 
     private boolean hasOverrideAnnotation(ASTNode node) {
         if (node instanceof BodyDeclaration) {
-            for (IExtendedModifier modifier : modifiers(((BodyDeclaration) node))) {
+            for (IExtendedModifier modifier : modifiers((BodyDeclaration) node)) {
                 return hasType(getTypeName(modifier), "java.lang.Override");
             }
         }

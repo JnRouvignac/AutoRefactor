@@ -36,7 +36,6 @@ import static org.autorefactor.refactoring.ASTHelper.*;
  * that caused a failure.
  */
 public class AutoRefactorException extends RuntimeException {
-
     /**
      * Constructor.
      *

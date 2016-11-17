@@ -32,7 +32,6 @@ import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.InfixExpression;
-import org.eclipse.jdt.core.dom.InfixExpression.Operator;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Name;
 import org.eclipse.jdt.core.dom.NumberLiteral;
@@ -197,6 +196,6 @@ public class BigDecimalRefactoring extends AbstractRefactoringRule {
         final MethodInvocation mi = b.invoke(
                 b.copy(node.getExpression()), "compareTo", b.copy(arg0(node)));
 
-        return b.infixExpr(mi, Operator.EQUALS, b.int0(0));
+        return b.infixExpr(mi, EQUALS, b.int0(0));
     }
 }

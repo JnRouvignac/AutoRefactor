@@ -63,8 +63,6 @@ import static org.eclipse.jface.dialogs.MessageDialog.*;
  * >Extending Eclipse - Plug-in Development Tutorial</a>
  */
 public class AutoRefactorHandler extends AbstractHandler {
-
-    /** {@inheritDoc} */
     @Override
     public Object execute(final ExecutionEvent event) throws ExecutionException {
         new PrepareApplyRefactoringsJob(

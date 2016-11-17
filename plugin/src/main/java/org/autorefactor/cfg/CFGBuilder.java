@@ -40,7 +40,6 @@ import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.autorefactor.refactoring.ASTHelper;
 import org.autorefactor.refactoring.JavaProjectOptions;
 import org.autorefactor.refactoring.TypeNameDecider;
 import org.autorefactor.util.IllegalStateException;
@@ -213,7 +212,6 @@ public class CFGBuilder {
             liveEdges.addAll(state.liveEdges);
         }
 
-        /** {@inheritDoc} */
         @Override
         public String toString() {
             return "LivenessState [liveBasicBlock=" + liveBasicBlock
@@ -1069,7 +1067,7 @@ public class CFGBuilder {
 
     private Statement findBreakableParentStmt(ASTNode node) {
         ASTNode n = node;
-        while (n != null && !ASTHelper.isBreakable(n)) {
+        while (n != null && !isBreakable(n)) {
             n = n.getParent();
         }
         if (n != null) {
@@ -1527,7 +1525,7 @@ public class CFGBuilder {
 
     private Statement findContinuableParentStmt(ASTNode node) {
         ASTNode n = node;
-        while (n != null && !ASTHelper.isLoop(n)) {
+        while (n != null && !isLoop(n)) {
             n = n.getParent();
         }
         if (n != null) {
@@ -1712,5 +1710,4 @@ public class CFGBuilder {
     private boolean isNotEmpty(final Map<?, ?> col) {
         return col != null && !col.isEmpty();
     }
-
 }

@@ -34,11 +34,8 @@ import org.autorefactor.AutoRefactorPlugin;
 import org.autorefactor.preferences.Preferences;
 import org.autorefactor.refactoring.RefactoringRule;
 
-/**
- * Lists all the available refactoring rules.
- */
+/** Lists all the available refactoring rules. */
 public final class AllRefactoringRules {
-
     private AllRefactoringRules() {
         super();
     }
@@ -128,5 +125,4 @@ public final class AllRefactoringRules {
         }
         return results;
     }
-
 }

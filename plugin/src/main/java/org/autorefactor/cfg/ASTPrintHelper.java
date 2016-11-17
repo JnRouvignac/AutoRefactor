@@ -31,11 +31,8 @@ import java.util.List;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Expression;
 
-/**
- * Helper class for printing AST information.
- */
+/** Helper class for printing AST information. */
 public final class ASTPrintHelper {
-
     private ASTPrintHelper() {
         // hide utility class ctor
     }
@@ -44,7 +41,7 @@ public final class ASTPrintHelper {
         final StringBuilder sb = new StringBuilder();
         for (final Iterator<Expression> iter = expressions.iterator(); iter.hasNext();) {
             final Expression expr = iter.next();
-            sb.append(expr.toString());
+            sb.append(expr);
             if (iter.hasNext()) {
                 sb.append(", ");
             }
@@ -63,5 +60,4 @@ public final class ASTPrintHelper {
         }
         return codeExcerpt.replaceAll("\\s+", " ");
     }
-
 }

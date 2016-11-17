@@ -42,7 +42,6 @@ import org.eclipse.jdt.core.dom.TypeDeclaration;
 
 /** See {@link #getDescription()} method. */
 public class AndroidWakeLockRefactoring extends AbstractRefactoringRule {
-
     @Override
     public String getDescription() {
         return "Android - Failing to release a wakelock properly can keep the Android device "
@@ -138,7 +137,6 @@ public class AndroidWakeLockRefactoring extends AbstractRefactoringRule {
         }
         return null;
     }
-
 
     private static class ReleasePresenceChecker extends FinderVisitor<Boolean> {
         @Override

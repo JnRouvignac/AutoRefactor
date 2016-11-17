@@ -64,7 +64,6 @@ import static org.autorefactor.refactoring.ASTHelper.*;
  */
 @SuppressWarnings("javadoc")
 public class CommonIfInIfElseRefactoring extends AbstractRefactoringRule {
-
     @Override
     public String getDescription() {
         return ""

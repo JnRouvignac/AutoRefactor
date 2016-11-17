@@ -23,7 +23,5 @@
  * which accompanies this distribution under LICENSE-ECLIPSE, and is
  * available at http://www.eclipse.org/legal/epl-v10.html
  */
-/**
- * Provides classes to build and work with a Control-Flow Graph.
- */
+/** Provides classes to build and work with a Control-Flow Graph. */
 package org.autorefactor.cfg;

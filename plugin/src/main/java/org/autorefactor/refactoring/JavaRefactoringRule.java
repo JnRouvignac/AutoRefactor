@@ -25,9 +25,6 @@
  */
 package org.autorefactor.refactoring;
 
-/**
- * Marker interface for all Java Standard Edition refactoring rules.
- */
+/** Marker interface for all Java Standard Edition refactoring rules. */
 public interface JavaRefactoringRule extends RefactoringRule {
-
 }

@@ -35,7 +35,6 @@ import org.eclipse.jface.wizard.Wizard;
  * Wizard which allows the user to choose which refactorings to apply to the selected java elements.
  */
 public class ChooseRefactoringsWizard extends Wizard {
-
     private final ChooseRefactoringWizardPage chooseRefactoringsPage = new ChooseRefactoringWizardPage();
     private final List<IJavaElement> javaElements;
 
@@ -49,19 +48,16 @@ public class ChooseRefactoringsWizard extends Wizard {
         this.javaElements = javaElements;
     }
 
-    /** {@inheritDoc} */
     @Override
     public String getWindowTitle() {
         return "Choose refactorings...";
     }
 
-    /** {@inheritDoc} */
     @Override
     public void addPages() {
         addPage(chooseRefactoringsPage);
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean performFinish() {
         final List<RefactoringRule> refactoringRules = chooseRefactoringsPage.getSelectedRefactorings();

@@ -33,7 +33,6 @@ import org.eclipse.jdt.core.dom.ASTNode;
  * requested operation.
  */
 public class IllegalStateException extends AutoRefactorException {
-
     /**
      * Constructor.
      *
@@ -43,5 +42,4 @@ public class IllegalStateException extends AutoRefactorException {
     public IllegalStateException(ASTNode node, String message) {
         super(node, message);
     }
-
 }

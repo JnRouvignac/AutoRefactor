@@ -33,7 +33,6 @@ import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.Refactorings;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Assignment;
-import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ExpressionStatement;
 import org.eclipse.jdt.core.dom.IfStatement;
@@ -50,7 +49,6 @@ import static org.eclipse.jdt.core.dom.ASTNode.*;
 
 /** See {@link #getDescription()} method. */
 public class TryWithResourceRefactoring extends AbstractRefactoringRule {
-
     @Override
     public String getDescription() {
         return ""
@@ -63,13 +61,15 @@ public class TryWithResourceRefactoring extends AbstractRefactoringRule {
         return "Use try-with-resource";
     }
 
-    @Override
-    public boolean visit(CompilationUnit node) {
+    private boolean isEnabled() {
         return ctx.getJavaProjectOptions().getJavaSERelease().getMinorVersion() >= 7;
     }
 
     @Override
     public boolean visit(TryStatement node) {
+        if (!isEnabled()) {
+            return VISIT_SUBTREE;
+        }
         final List<Statement> tryStmts = asList(node.getBody());
         if (tryStmts.size() >= 1 && tryStmts.get(0).getNodeType() == TRY_STATEMENT) {
             final TryStatement innerTryStmt = as(tryStmts.get(0), TryStatement.class);

@@ -38,7 +38,6 @@ import static org.autorefactor.refactoring.ASTHelper.*;
  */
 @SuppressWarnings("javadoc")
 public class GenerecizeRefactoring extends AbstractRefactoringRule {
-
     @Override
     public String getDescription() {
         return "Adds generic parameters to generic types.";

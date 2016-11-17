@@ -43,7 +43,6 @@ import static org.autorefactor.refactoring.ASTHelper.*;
 /** See {@link #getDescription()} method. */
 @SuppressWarnings("javadoc")
 public class RemoveUnneededThisExpressionRefactoring extends AbstractRefactoringRule {
-
     @Override
     public String getDescription() {
         return "Remove useless use of \"this\" from method calls.";

@@ -46,7 +46,6 @@ import static org.eclipse.jdt.core.dom.InfixExpression.Operator.*;
 
 /** See {@link #getDescription()} method. */
 public class MapRefactoring extends AbstractRefactoringRule {
-
     @Override
     public String getDescription() {
         return ""

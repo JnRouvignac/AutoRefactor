@@ -36,10 +36,9 @@ import static org.autorefactor.util.Utils.*;
  *            The type of the second element in the pair
  */
 public final class Pair<F, S> {
-
-    /** first object. */
+    /** First object. */
     private final F first;
-    /** second object. */
+    /** Second object. */
     private final S second;
 
     /**

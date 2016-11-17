@@ -29,11 +29,8 @@ import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Name;
 import org.eclipse.jdt.core.dom.Type;
 
-/**
- * Represents an access to a variable.
- */
+/** Represents an access to a variable. */
 public class VariableAccess {
-
     /** A declaration which value is already initialized. */
     public static final int DECL_INIT = 1 << 0;
     /** A declaration which value may or may not be initialized. */
@@ -73,7 +70,6 @@ public class VariableAccess {
         this(astNode, astNode instanceof Name ? (Name) astNode : null, null, accessType);
     }
 
-    /** {@inheritDoc} */
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("VAR_ACCESS[");
@@ -82,8 +78,8 @@ public class VariableAccess {
     }
 
     private void toString(final StringBuilder sb) {
-        sb.append(this.type.toString());
-        sb.append(" ").append(this.name.toString()).append(" <= ");
+        sb.append(this.type);
+        sb.append(" ").append(this.name).append(" <= ");
         if ((this.accessType & DECL_INIT) != 0) {
             sb.append("DECL_INIT");
         }

@@ -35,16 +35,10 @@ import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 
-/**
- * Represents a source file.
- */
+/** Represents a source file. */
 public class SourceCode {
-
-    /**
-     * Represents a line in a source file.
-     */
+    /** Represents a line in a source file. */
     public static class Line extends SourceLocation {
-
         private final String lineText;
         private final SourceCode sourceCode;
 
@@ -118,5 +112,4 @@ public class SourceCode {
             throw new UnhandledException(astRoot, e);
         }
     }
-
 }

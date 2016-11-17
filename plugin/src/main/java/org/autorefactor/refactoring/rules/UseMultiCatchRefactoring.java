@@ -44,7 +44,6 @@ import org.eclipse.jdt.core.dom.ASTMatcher;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.CatchClause;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
-import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.MethodInvocation;
@@ -63,7 +62,6 @@ import static org.eclipse.jdt.core.dom.ASTNode.*;
 
 /** See {@link #getDescription()} method. */
 public class UseMultiCatchRefactoring extends AbstractRefactoringRule {
-
     @Override
     public String getDescription() {
         return "Refactors catch clauses with the same body to use Java 7's multi-catch.";
@@ -74,12 +72,11 @@ public class UseMultiCatchRefactoring extends AbstractRefactoringRule {
         return "Multi-catch";
     }
 
-    @Override
-    public boolean visit(CompilationUnit node) {
+    private boolean isEnabled() {
         return ctx.getJavaProjectOptions().getJavaSERelease().getMinorVersion() >= 7;
     }
 
-    private static enum MergeDirection {
+    private enum MergeDirection {
         NONE, UP, DOWN;
     }
 
@@ -289,6 +286,10 @@ public class UseMultiCatchRefactoring extends AbstractRefactoringRule {
 
     @Override
     public boolean visit(TryStatement node) {
+        if (!isEnabled()) {
+            return VISIT_SUBTREE;
+        }
+
         List<CatchClause> catchClauses = catchClauses(node);
         Binding[] typeBindings = resolveTypeBindings(catchClauses);
         for (int i = 0; i < catchClauses.size(); i++) {
