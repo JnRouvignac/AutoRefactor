@@ -37,6 +37,8 @@ import org.eclipse.jdt.core.dom.StringLiteral;
 import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.eclipse.jdt.core.dom.ASTNode.*;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 /** See {@link #getDescription()} method. */
 public class StringRefactoring extends AbstractRefactoringRule {
     @Override
@@ -46,7 +48,8 @@ public class StringRefactoring extends AbstractRefactoringRule {
             + "- creating a String instance from a String constant or literal,\n"
             + "- calling String.toString() on a String instance,\n"
             + "- remove calls to String.toString() inside String concatenations,\n"
-            + "- replace forced string tranformation by String.valueOf().";
+            + "- replace forced string tranformation by String.valueOf(),\n"
+            + "- replace useless case shifts for equality by equalsIgnoreCase().";
     }
 
     @Override
@@ -70,14 +73,14 @@ public class StringRefactoring extends AbstractRefactoringRule {
 
     @Override
     public boolean visit(MethodInvocation node) {
-        final Expression expression = node.getExpression();
+        final Expression expr = node.getExpression();
         final ASTNode parent = node.getParent();
         final ASTBuilder b = this.ctx.getASTBuilder();
         final boolean isStringValueOf = isStringValueOf(node);
         if (isMethod(node, "java.lang.Object", "toString")) {
-            if (hasType(expression, "java.lang.String")) {
+            if (hasType(expr, "java.lang.String")) {
                 // if node is already a String, no need to call toString()
-                this.ctx.getRefactorings().replace(node, b.move(expression));
+                this.ctx.getRefactorings().replace(node, b.move(expr));
                 return DO_NOT_VISIT_SUBTREE;
             } else if (parent.getNodeType() == INFIX_EXPRESSION) {
                 // if node is in a String context, no need to call toString()
@@ -129,25 +132,64 @@ public class StringRefactoring extends AbstractRefactoringRule {
                 replaceStringValueOfByArg0(node, node);
                 return DO_NOT_VISIT_SUBTREE;
             }
+        } else if (isMethod(node, "java.lang.String", "equals", "java.lang.Object")) {
+            final MethodInvocation leftInvocation = as(node.getExpression(), MethodInvocation.class);
+            final MethodInvocation rightInvocation = as(arg0(node), MethodInvocation.class);
+
+            if (leftInvocation != null && rightInvocation != null
+                    && (
+                            (isMethod(leftInvocation, "java.lang.String", "toLowerCase")
+                                    && isMethod(rightInvocation, "java.lang.String", "toLowerCase"))
+                            || (isMethod(leftInvocation, "java.lang.String", "toUpperCase")
+                                    && isMethod(rightInvocation, "java.lang.String", "toUpperCase"))
+                            )) {
+                final Expression leftExpr = leftInvocation.getExpression();
+                final Expression rightExpr = rightInvocation.getExpression();
+                this.ctx.getRefactorings().replace(node, b.invoke(b.copy(leftExpr),
+                        "equalsIgnoreCase", b.copy(rightExpr)));
+                return DO_NOT_VISIT_SUBTREE;
+            }
+        } else if (isMethod(node, "java.lang.String", "equalsIgnoreCase", "java.lang.String")) {
+            final AtomicBoolean isRefacoringNeeded = new AtomicBoolean(false);
+
+            final Expression leftExpr = getReducedStringExpression(node.getExpression(), isRefacoringNeeded);
+            final Expression rightExpr = getReducedStringExpression(arg0(node), isRefacoringNeeded);
+
+            if (isRefacoringNeeded.get()) {
+                this.ctx.getRefactorings().replace(node, b.invoke(b.copy(leftExpr),
+                        "equalsIgnoreCase", b.copy(rightExpr)));
+                return DO_NOT_VISIT_SUBTREE;
+            }
         }
         return VISIT_SUBTREE;
     }
 
-    private void replaceStringValueOfByArg0(final Expression toReplace, MethodInvocation mi) {
+    private Expression getReducedStringExpression(final Expression stringExpr,
+            final AtomicBoolean isRefacoringNeeded) {
+        final MethodInvocation casingInvocation = as(stringExpr, MethodInvocation.class);
+        if (casingInvocation != null && (isMethod(casingInvocation, "java.lang.String", "toLowerCase")
+                || isMethod(casingInvocation, "java.lang.String", "toUpperCase"))) {
+            isRefacoringNeeded.set(true);
+            return casingInvocation.getExpression();
+        }
+        return stringExpr;
+    }
+
+    private void replaceStringValueOfByArg0(final Expression toReplace, final MethodInvocation mi) {
         final ASTBuilder b = this.ctx.getASTBuilder();
         ctx.getRefactorings().replace(toReplace, b.parenthesizeIfNeeded(b.move(arg0(mi))));
     }
 
-    private Expression replaceToString(Expression expression) {
+    private Expression replaceToString(final Expression expr) {
         final ASTBuilder b = ctx.getASTBuilder();
-        if (expression != null) {
-            return b.move(expression);
+        if (expr != null) {
+            return b.move(expr);
         } else {
             return b.this0();
         }
     }
 
-    private boolean isToStringForPrimitive(MethodInvocation node) {
+    private boolean isToStringForPrimitive(final MethodInvocation node) {
         return "toString".equals(node.getName().getIdentifier()) // fast-path
                 && (isMethod(node, "java.lang.Boolean", "toString", "boolean")
                       || isMethod(node, "java.lang.Character", "toString", "char")
@@ -159,7 +201,7 @@ public class StringRefactoring extends AbstractRefactoringRule {
                       || isMethod(node, "java.lang.Double", "toString", "double"));
     }
 
-    private boolean isStringValueOf(MethodInvocation node) {
+    private boolean isStringValueOf(final MethodInvocation node) {
         return hasType(node.getExpression(), "java.lang.String") // fast-path
                 && (isMethod(node, "java.lang.String", "valueOf", "boolean")
                       || isMethod(node, "java.lang.String", "valueOf", "char")
