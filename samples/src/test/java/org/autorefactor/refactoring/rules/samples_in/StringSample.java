@@ -200,4 +200,33 @@ public class StringSample {
     public void doNotReplaceConcatenateWithCharArray(char[] chars) {
         String text = "" + chars;
     }
+
+    public void replaceCaseShift(String s1, String s2) {
+        s1.toUpperCase().equals(s2.toUpperCase());
+        s1.toLowerCase().equals(s2.toLowerCase());
+        "lorem".toUpperCase().equals("ipsum".toUpperCase());
+        "lorem".toLowerCase().equals("ipsum".toLowerCase());
+    }
+
+    public void doNotReplaceUnilateralCaseShift(String s1, String s2) {
+        s1.toUpperCase().equals(s2);
+        s1.toLowerCase().equals(s2);
+        s1.equals(s2.toLowerCase());
+        s1.equals(s2.toUpperCase());
+    }
+
+    public void doNotReplaceCaseIncompatibility(String s1, String s2) {
+        s1.toLowerCase().equals(s2.toUpperCase());
+    }
+
+    public void simplifyInsensitiveCaseEquality(String s1, String s2) {
+        s1.toUpperCase().equalsIgnoreCase(s2.toUpperCase());
+        s1.toLowerCase().equalsIgnoreCase(s2.toLowerCase());
+        s1.toUpperCase().equalsIgnoreCase(s2.toLowerCase());
+        s1.toLowerCase().equalsIgnoreCase(s2.toUpperCase());
+        s1.toUpperCase().equalsIgnoreCase(s2);
+        s1.toLowerCase().equalsIgnoreCase(s2);
+        s1.equalsIgnoreCase(s2.toLowerCase());
+        s1.equalsIgnoreCase(s2.toUpperCase());
+    }
 }

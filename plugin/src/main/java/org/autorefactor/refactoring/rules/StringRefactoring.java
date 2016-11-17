@@ -46,7 +46,8 @@ public class StringRefactoring extends AbstractRefactoringRule {
             + "- creating a String instance from a String constant or literal,\n"
             + "- calling String.toString() on a String instance,\n"
             + "- remove calls to String.toString() inside String concatenations,\n"
-            + "- replace forced string tranformation by String.valueOf().";
+            + "- replace forced string tranformation by String.valueOf(),\n"
+            + "- replace useless case shifts for equality by equalsIgnoreCase().";
     }
 
     @Override
@@ -127,6 +128,47 @@ public class StringRefactoring extends AbstractRefactoringRule {
             } else {
                 // left or right operation is necessarily a string, so just replace
                 replaceStringValueOfByArg0(node, node);
+                return DO_NOT_VISIT_SUBTREE;
+            }
+        } else if (isMethod(node, "java.lang.String", "equals", "java.lang.Object")) {
+            final MethodInvocation leftInvocation = as(node.getExpression(), MethodInvocation.class);
+            final MethodInvocation rightInvocation = as(arg0(node), MethodInvocation.class);
+
+            if (leftInvocation != null && rightInvocation != null
+                    && (
+                            (isMethod(leftInvocation, "java.lang.String", "toLowerCase")
+                                    && isMethod(rightInvocation, "java.lang.String", "toLowerCase"))
+                            || (isMethod(leftInvocation, "java.lang.String", "toUpperCase")
+                                    && isMethod(rightInvocation, "java.lang.String", "toUpperCase"))
+                            )) {
+                final Expression leftExpression = leftInvocation.getExpression();
+                final Expression rightExpression = rightInvocation.getExpression();
+                this.ctx.getRefactorings().replace(node, b.invoke(b.copy(leftExpression),
+                        "equalsIgnoreCase", b.copy(rightExpression)));
+                return DO_NOT_VISIT_SUBTREE;
+            }
+        } else if (isMethod(node, "java.lang.String", "equalsIgnoreCase", "java.lang.String")) {
+            boolean isRefacoringNeeded = false;
+
+            Expression leftExpression = node.getExpression();
+            final MethodInvocation leftInvocation = as(leftExpression, MethodInvocation.class);
+            if (leftInvocation != null && (isMethod(leftInvocation, "java.lang.String", "toLowerCase")
+                    || isMethod(leftInvocation, "java.lang.String", "toUpperCase"))) {
+                isRefacoringNeeded = true;
+                leftExpression = leftInvocation.getExpression();
+            }
+
+            Expression rightExpression = arg0(node);
+            final MethodInvocation rightInvocation = as(rightExpression, MethodInvocation.class);
+            if (rightInvocation != null && (isMethod(rightInvocation, "java.lang.String", "toLowerCase")
+                    || isMethod(rightInvocation, "java.lang.String", "toUpperCase"))) {
+                isRefacoringNeeded = true;
+                rightExpression = rightInvocation.getExpression();
+            }
+
+            if (isRefacoringNeeded) {
+                this.ctx.getRefactorings().replace(node, b.invoke(b.copy(leftExpression),
+                        "equalsIgnoreCase", b.copy(rightExpression)));
                 return DO_NOT_VISIT_SUBTREE;
             }
         }
