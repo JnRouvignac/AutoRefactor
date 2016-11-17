@@ -45,7 +45,8 @@ public class StringRefactoring extends AbstractRefactoringRule {
             + "Removes:\n"
             + "- creating a String instance from a String constant or literal,\n"
             + "- calling String.toString() on a String instance,\n"
-            + "- remove calls to String.toString() inside String concatenations.";
+            + "- remove calls to String.toString() inside String concatenations,\n"
+            + "- replace forced string tranformation by String.valueOf().";
     }
 
     @Override
