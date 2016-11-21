@@ -37,6 +37,8 @@ import org.eclipse.jdt.core.dom.StringLiteral;
 import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.eclipse.jdt.core.dom.ASTNode.*;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 /** See {@link #getDescription()} method. */
 public class StringRefactoring extends AbstractRefactoringRule {
     @Override
@@ -148,31 +150,29 @@ public class StringRefactoring extends AbstractRefactoringRule {
                 return DO_NOT_VISIT_SUBTREE;
             }
         } else if (isMethod(node, "java.lang.String", "equalsIgnoreCase", "java.lang.String")) {
-            boolean isRefacoringNeeded = false;
+            final AtomicBoolean isRefacoringNeeded = new AtomicBoolean(false);
 
-            Expression leftExpression = node.getExpression();
-            final MethodInvocation leftInvocation = as(leftExpression, MethodInvocation.class);
-            if (leftInvocation != null && (isMethod(leftInvocation, "java.lang.String", "toLowerCase")
-                    || isMethod(leftInvocation, "java.lang.String", "toUpperCase"))) {
-                isRefacoringNeeded = true;
-                leftExpression = leftInvocation.getExpression();
-            }
+            final Expression leftExpression = getReducedStringExpression(node.getExpression(), isRefacoringNeeded);
+            final Expression rightExpression = getReducedStringExpression(arg0(node), isRefacoringNeeded);
 
-            Expression rightExpression = arg0(node);
-            final MethodInvocation rightInvocation = as(rightExpression, MethodInvocation.class);
-            if (rightInvocation != null && (isMethod(rightInvocation, "java.lang.String", "toLowerCase")
-                    || isMethod(rightInvocation, "java.lang.String", "toUpperCase"))) {
-                isRefacoringNeeded = true;
-                rightExpression = rightInvocation.getExpression();
-            }
-
-            if (isRefacoringNeeded) {
+            if (isRefacoringNeeded.get()) {
                 this.ctx.getRefactorings().replace(node, b.invoke(b.copy(leftExpression),
                         "equalsIgnoreCase", b.copy(rightExpression)));
                 return DO_NOT_VISIT_SUBTREE;
             }
         }
         return VISIT_SUBTREE;
+    }
+
+    private Expression getReducedStringExpression(final Expression stringExpression,
+            final AtomicBoolean isRefacoringNeeded) {
+        final MethodInvocation casingInvocation = as(stringExpression, MethodInvocation.class);
+        if (casingInvocation != null && (isMethod(casingInvocation, "java.lang.String", "toLowerCase")
+                || isMethod(casingInvocation, "java.lang.String", "toUpperCase"))) {
+            isRefacoringNeeded.set(true);
+            return casingInvocation.getExpression();
+        }
+        return stringExpression;
     }
 
     private void replaceStringValueOfByArg0(final Expression toReplace, MethodInvocation mi) {
