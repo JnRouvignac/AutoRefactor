@@ -84,6 +84,11 @@ public class StringBuilderSample {
         sb.append(Float.valueOf(f));
         sb.append(String.valueOf(d));
         sb.append(Double.valueOf(d));
+
+        sb.append(String.valueOf(o)).append(String.valueOf(b)).append(Boolean.valueOf(b)).append(String.valueOf(c))
+                .append(Character.valueOf(c)).append(String.valueOf(i)).append(Integer.valueOf(i))
+                .append(String.valueOf(l)).append(Long.valueOf(l)).append(String.valueOf(f)).append(Float.valueOf(f))
+                .append(String.valueOf(d)).append(Double.valueOf(d));
     }
 
     public void removeUselessCallsToValueOfWithStringBufferAppend(
@@ -102,6 +107,11 @@ public class StringBuilderSample {
         sb.append(Float.valueOf(f));
         sb.append(String.valueOf(d));
         sb.append(Double.valueOf(d));
+
+        sb.append(String.valueOf(o)).append(String.valueOf(b)).append(Boolean.valueOf(b)).append(String.valueOf(c))
+                .append(Character.valueOf(c)).append(String.valueOf(i)).append(Integer.valueOf(i))
+                .append(String.valueOf(l)).append(Long.valueOf(l)).append(String.valueOf(f)).append(Float.valueOf(f))
+                .append(String.valueOf(d)).append(Double.valueOf(d));
     }
 
     public void removeUselessCallsToToStringOfWithStringBuilderAppend(
@@ -117,6 +127,10 @@ public class StringBuilderSample {
         sb.append(Long.toString(l));
         sb.append(Float.toString(f));
         sb.append(Double.toString(d));
+
+        sb.append(toString()).append(o.toString()).append(Boolean.toString(bo)).append(Byte.toString(by))
+                .append(Character.toString(c)).append(Short.toString(s)).append(Integer.toString(i))
+                .append(Long.toString(l)).append(Float.toString(f)).append(Double.toString(d));
     }
 
     public void removeUselessCallsToToStringOfWithStringBufferAppend(
@@ -132,6 +146,17 @@ public class StringBuilderSample {
         sb.append(Long.toString(l));
         sb.append(Float.toString(f));
         sb.append(Double.toString(d));
+
+        sb.append(toString()).append(o.toString()).append(Boolean.toString(bo)).append(Byte.toString(by))
+                .append(Character.toString(c)).append(Short.toString(s)).append(Integer.toString(i))
+                .append(Long.toString(l)).append(Float.toString(f)).append(Double.toString(d));
+    }
+
+    public void removeValueOfCallsWithCast(
+        char c, byte b, int i) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(Integer.valueOf(b));
+        sb.append(Integer.valueOf(c));
     }
 
     public void removeSubstringDoubleArgsCallsWithAppend(String s) {
