@@ -1,8 +1,8 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2013-2016 Jean-Noël Rouvignac - initial API and implementation
- * Copyright (C) 2016 Fabrice Tiercelin - Make sure we do not visit again modified nodes
+ * Copyright (C) 2013-2017 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2016-2017 Fabrice Tiercelin - Make sure we do not visit again modified nodes
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,9 +30,11 @@ import org.autorefactor.refactoring.ASTBuilder;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.Expression;
+import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.StringLiteral;
+import org.eclipse.jdt.internal.corext.dom.Bindings;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.eclipse.jdt.core.dom.ASTNode.*;
@@ -177,7 +179,16 @@ public class StringRefactoring extends AbstractRefactoringRule {
 
     private void replaceStringValueOfByArg0(final Expression toReplace, final MethodInvocation mi) {
         final ASTBuilder b = this.ctx.getASTBuilder();
-        ctx.getRefactorings().replace(toReplace, b.parenthesizeIfNeeded(b.move(arg0(mi))));
+
+        final ITypeBinding expectedType = mi.resolveMethodBinding().getParameterTypes()[0];
+        final ITypeBinding actualType = arg0(mi).resolveTypeBinding();
+        if (!expectedType.equals(actualType)
+                && !Bindings.getBoxedTypeBinding(expectedType, mi.getAST()).equals(actualType)) {
+            ctx.getRefactorings().replace(toReplace, b.cast(b.type(expectedType.getQualifiedName()),
+                    b.move(arg0(mi))));
+        } else {
+            ctx.getRefactorings().replace(toReplace, b.parenthesizeIfNeeded(b.move(arg0(mi))));
+        }
     }
 
     private Expression replaceToString(final Expression expr) {
