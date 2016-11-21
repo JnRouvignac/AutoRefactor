@@ -324,13 +324,15 @@ public class StringBuilderRefactoring extends AbstractRefactoringRule {
     }
 
     private Pair<ITypeBinding, Expression> getTypeAndValue(final MethodInvocation mi) {
+        final ITypeBinding expectedType = mi.resolveMethodBinding().getParameterTypes()[0];
+        final ITypeBinding actualType = arg0(mi).resolveTypeBinding();
+
         ITypeBinding otherType = null;
-        ITypeBinding expectedType = mi.resolveMethodBinding().getParameterTypes()[0];
-        ITypeBinding actualType = arg0(mi).resolveTypeBinding();
         if (!expectedType.equals(actualType)
                 && !Bindings.getBoxedTypeBinding(expectedType, mi.getAST()).equals(actualType)) {
-            otherType = mi.resolveMethodBinding().getParameterTypes()[0];
+            otherType = expectedType;
         }
+
         return Pair.<ITypeBinding, Expression>of(otherType, arg0(mi));
     }
 
@@ -338,7 +340,7 @@ public class StringBuilderRefactoring extends AbstractRefactoringRule {
         Expression expression = null;
         if (typeAndValue.getFirst() != null) {
             expression = b.cast(b.type(typeAndValue.getFirst().getQualifiedName()),
-                    b.parenthesizeIfNeeded(b.copy(typeAndValue.getSecond())));
+                    b.copy(typeAndValue.getSecond()));
         } else if (typeAndValue.getFirst() == null)  {
             expression = b.copy(typeAndValue.getSecond());
         }

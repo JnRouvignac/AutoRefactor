@@ -88,7 +88,10 @@ public class StringSample {
         String s6 = 42l + " foo";
         String s7 = 42.42f + " foo";
         String s8 = 42.42 + " foo";
-        return s1 + s2 + s3 + s4 + s5 + s6 + s7 + s8;
+
+        String s9 = (int) 'c' + " foo";
+        String s10 = (int) b + " foo";
+        return s1 + s2 + s3 + s4 + s5 + s6 + s7 + s8 + s9 + s10;
     }
 
     public String removeUselessToStringRightOperand(byte b, short s) {
@@ -100,7 +103,10 @@ public class StringSample {
         String s6 = "foo " + 42l;
         String s7 = "foo " + 42.42f;
         String s8 = "foo " + 42.42;
-        return s1 + s2 + s3 + s4 + s5 + s6 + s7 + s8;
+
+        String s9 = "foo " + (int) 'c';
+        String s10 = "foo " + (int) b;
+        return s1 + s2 + s3 + s4 + s5 + s6 + s7 + s8 + s9 + s10;
     }
 
     public String removeUselessToStringExtendedOperand(byte b, short s) {
@@ -112,14 +118,17 @@ public class StringSample {
         String s6 = "foo " + 42l + " bar";
         String s7 = "foo " + 42.42f + " bar";
         String s8 = "foo " + 42.42 + " bar";
-        return s1 + s2 + s3 + s4 + s5 + s6 + s7 + s8;
+
+        String s9 = "foo " + (int) 'c' + " bar";
+        String s10 = "foo " + (int) b + " bar";
+        return s1 + s2 + s3 + s4 + s5 + s6 + s7 + s8 + s9 + s10;
     }
 
     public String removeUselessValueOfLeftOperand(byte b, short s) {
         String s1 = true + " foo";
         String s2 = 'c' + " foo";
-        String s3 = b + " foo";
-        String s4 = s + " foo";
+        String s3 = (int) b + " foo";
+        String s4 = (int) s + " foo";
         String s5 = 42 + " foo";
         String s6 = 42l + " foo";
         String s7 = 42.42f + " foo";
@@ -131,8 +140,8 @@ public class StringSample {
     public String removeUselessValueOfRightOperand(byte b, short s) {
         String s1 = "foo " + true;
         String s2 = "foo " + 'c';
-        String s3 = "foo " + b;
-        String s4 = "foo " + s;
+        String s3 = "foo " + (int) b;
+        String s4 = "foo " + (int) s;
         String s5 = "foo " + 42;
         String s6 = "foo " + 42l;
         String s7 = "foo " + 42.42f;
@@ -144,8 +153,8 @@ public class StringSample {
     public String removeUselessValueOfExtendedOperand(byte b, short s) {
         String s1 = "foo " + true + " bar";
         String s2 = "foo " + 'c' + " bar";
-        String s3 = "foo " + b + " bar";
-        String s4 = "foo " + s + " bar";
+        String s3 = "foo " + (int) b + " bar";
+        String s4 = "foo " + (int) s + " bar";
         String s5 = "foo " + 42 + " bar";
         String s6 = "foo " + 42l + " bar";
         String s7 = "foo " + 42.42f + " bar";

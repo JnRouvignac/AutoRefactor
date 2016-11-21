@@ -88,7 +88,10 @@ public class StringSample {
         String s6 = Long.toString(42l) + " foo";
         String s7 = Float.toString(42.42f) + " foo";
         String s8 = Double.toString(42.42) + " foo";
-        return s1 + s2 + s3 + s4 + s5 + s6 + s7 + s8;
+
+        String s9 = Integer.toString('c') + " foo";
+        String s10 = Integer.toString(b) + " foo";
+        return s1 + s2 + s3 + s4 + s5 + s6 + s7 + s8 + s9 + s10;
     }
 
     public String removeUselessToStringRightOperand(byte b, short s) {
@@ -100,7 +103,10 @@ public class StringSample {
         String s6 = "foo " + Long.toString(42l);
         String s7 = "foo " + Float.toString(42.42f);
         String s8 = "foo " + Double.toString(42.42);
-        return s1 + s2 + s3 + s4 + s5 + s6 + s7 + s8;
+
+        String s9 = "foo " + Integer.toString('c');
+        String s10 = "foo " + Integer.toString(b);
+        return s1 + s2 + s3 + s4 + s5 + s6 + s7 + s8 + s9 + s10;
     }
 
     public String removeUselessToStringExtendedOperand(byte b, short s) {
@@ -112,7 +118,10 @@ public class StringSample {
         String s6 = "foo " + Long.toString(42l) + " bar";
         String s7 = "foo " + Float.toString(42.42f) + " bar";
         String s8 = "foo " + Double.toString(42.42) + " bar";
-        return s1 + s2 + s3 + s4 + s5 + s6 + s7 + s8;
+
+        String s9 = "foo " + Integer.toString('c') + " bar";
+        String s10 = "foo " + Integer.toString(b) + " bar";
+        return s1 + s2 + s3 + s4 + s5 + s6 + s7 + s8 + s9 + s10;
     }
 
     public String removeUselessValueOfLeftOperand(byte b, short s) {

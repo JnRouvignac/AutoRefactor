@@ -245,7 +245,7 @@ public class ASTBuilder {
     public CastExpression cast(Type type, Expression expr) {
         final CastExpression ce = ast.newCastExpression();
         ce.setType(type);
-        ce.setExpression(expr);
+        ce.setExpression(parenthesizeIfNeeded(expr));
         return ce;
     }
 
