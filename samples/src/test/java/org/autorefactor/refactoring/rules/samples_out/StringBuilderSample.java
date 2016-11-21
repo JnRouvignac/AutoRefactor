@@ -148,11 +148,18 @@ public class StringBuilderSample {
                 .append(i).append(l).append(f).append(d);
     }
 
-    public void removeValueOfCallsWithCast(
-        char c, byte b, int i) {
+    public void removeValueOfCallsWithCast(char c, byte b, Character cObject, Byte bObject) {
         StringBuilder sb = new StringBuilder();
         sb.append((int) b);
         sb.append((int) c);
+        sb.append((int) bObject);
+        sb.append((int) cObject);
+    }
+
+    public void removeValueOfCallsWithoutCast(int i, Integer iObject) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(i);
+        sb.append(iObject);
     }
 
     public void removeSubstringDoubleArgsCallsWithAppend(String s) {

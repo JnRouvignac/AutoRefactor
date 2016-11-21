@@ -47,6 +47,7 @@ import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Name;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.StringLiteral;
+import org.eclipse.jdt.internal.corext.dom.Bindings;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.eclipse.jdt.core.dom.ASTNode.*;
@@ -324,7 +325,10 @@ public class StringBuilderRefactoring extends AbstractRefactoringRule {
 
     private Pair<ITypeBinding, Expression> getTypeAndValue(final MethodInvocation mi) {
         ITypeBinding otherType = null;
-        if (!mi.resolveMethodBinding().getParameterTypes()[0].equals(arg0(mi).resolveTypeBinding())) {
+        ITypeBinding expectedType = mi.resolveMethodBinding().getParameterTypes()[0];
+        ITypeBinding actualType = arg0(mi).resolveTypeBinding();
+        if (!expectedType.equals(actualType)
+                && !Bindings.getBoxedTypeBinding(expectedType, mi.getAST()).equals(actualType)) {
             otherType = mi.resolveMethodBinding().getParameterTypes()[0];
         }
         return Pair.<ITypeBinding, Expression>of(otherType, arg0(mi));
@@ -333,9 +337,6 @@ public class StringBuilderRefactoring extends AbstractRefactoringRule {
     private Expression getTypedExpression(final ASTBuilder b, final Pair<ITypeBinding, Expression> typeAndValue) {
         Expression expression = null;
         if (typeAndValue.getFirst() != null) {
-//            expression = b.cast(b.toType(typeAndValue.getFirst(),
-//                    new TypeNameDecider(b.copy(typeAndValue.getSecond()))),
-//                    b.copy(typeAndValue.getSecond()));
             expression = b.cast(b.type(typeAndValue.getFirst().getQualifiedName()),
                     b.parenthesizeIfNeeded(b.copy(typeAndValue.getSecond())));
         } else if (typeAndValue.getFirst() == null)  {

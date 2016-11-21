@@ -152,11 +152,18 @@ public class StringBuilderSample {
                 .append(Long.toString(l)).append(Float.toString(f)).append(Double.toString(d));
     }
 
-    public void removeValueOfCallsWithCast(
-        char c, byte b, int i) {
+    public void removeValueOfCallsWithCast(char c, byte b, Character cObject, Byte bObject) {
         StringBuilder sb = new StringBuilder();
         sb.append(Integer.valueOf(b));
         sb.append(Integer.valueOf(c));
+        sb.append(Integer.valueOf(bObject));
+        sb.append(Integer.valueOf(cObject));
+    }
+
+    public void removeValueOfCallsWithoutCast(int i, Integer iObject) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(Integer.valueOf(i));
+        sb.append(Integer.valueOf(iObject));
     }
 
     public void removeSubstringDoubleArgsCallsWithAppend(String s) {
