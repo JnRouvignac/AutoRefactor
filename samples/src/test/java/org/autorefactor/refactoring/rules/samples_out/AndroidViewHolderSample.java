@@ -48,6 +48,7 @@ public abstract class AndroidViewHolderSample extends BaseAdapter {
         return 0;
     }
 
+    /** Nothing to refactor: no perf impact. */
     public static class AdapterOk extends AndroidViewHolderSample {
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
@@ -55,11 +56,12 @@ public abstract class AndroidViewHolderSample extends BaseAdapter {
         }
     }
 
+    /** Refactor to use the view holder pattern. */
     public static class AdapterUsingRecycledView extends AndroidViewHolderSample {
         LayoutInflater mInflater;
 
-        static class ViewHolderItem {
-            TextView text;
+        private static class ViewHolderItem {
+            private TextView text;
         }
 
         @Override
@@ -68,7 +70,8 @@ public abstract class AndroidViewHolderSample extends BaseAdapter {
             if (convertView == null) {
                 convertView = mInflater.inflate(R.layout.your_layout, null);
                 viewHolderItem = new ViewHolderItem();
-                viewHolderItem.text = (TextView) convertView.findViewById(R.id.text);
+                viewHolderItem.text = (TextView) convertView
+                        .findViewById(R.id.text);
                 convertView.setTag(viewHolderItem);
             } else {
                 viewHolderItem = (ViewHolderItem) convertView.getTag();
@@ -80,11 +83,12 @@ public abstract class AndroidViewHolderSample extends BaseAdapter {
         }
     }
 
+    /** Refactor to use the view holder pattern. */
     public static class AdapterNotReturningRecycledView extends AndroidViewHolderSample {
         LayoutInflater mInflater;
 
-        static class ViewHolderItem {
-            TextView text;
+        private static class ViewHolderItem {
+            private TextView text;
         }
 
         @Override
@@ -93,7 +97,8 @@ public abstract class AndroidViewHolderSample extends BaseAdapter {
             if (convertView == null) {
                 convertView = mInflater.inflate(R.layout.your_layout, null);
                 viewHolderItem = new ViewHolderItem();
-                viewHolderItem.text = (TextView) convertView.findViewById(R.id.text);
+                viewHolderItem.text = (TextView) convertView
+                        .findViewById(R.id.text);
                 convertView.setTag(viewHolderItem);
             } else {
                 viewHolderItem = (ViewHolderItem) convertView.getTag();
@@ -105,11 +110,12 @@ public abstract class AndroidViewHolderSample extends BaseAdapter {
         }
     }
 
+    /** Refactor to use the view holder pattern. */
     public static class AdapterUsingDifferentView extends AndroidViewHolderSample {
         LayoutInflater mInflater;
 
-        static class ViewHolderItem {
-            TextView text;
+        private static class ViewHolderItem {
+            private TextView text;
         }
 
         @Override
@@ -118,7 +124,8 @@ public abstract class AndroidViewHolderSample extends BaseAdapter {
             if (convertView == null) {
                 convertView = mInflater.inflate(R.layout.your_layout, null);
                 viewHolderItem = new ViewHolderItem();
-                viewHolderItem.text = (TextView) convertView.findViewById(R.id.text);
+                viewHolderItem.text = (TextView) convertView
+                        .findViewById(R.id.text);
                 convertView.setTag(viewHolderItem);
             } else {
                 viewHolderItem = (ViewHolderItem) convertView.getTag();
@@ -131,6 +138,7 @@ public abstract class AndroidViewHolderSample extends BaseAdapter {
         }
     }
 
+    /** Do not refactor: it already uses the view holder pattern. */
     public static class AdapterUsingViewHolder extends AndroidViewHolderSample {
         LayoutInflater mInflater;
 
@@ -154,8 +162,9 @@ public abstract class AndroidViewHolderSample extends BaseAdapter {
             final int itemViewType = getItemViewType(position);
             switch (itemViewType) {
             case 0:
-                if (rootView != null)
+                if (rootView != null) {
                     return rootView;
+                }
                 rootView = inflater.inflate(android.R.layout.simple_list_item_1, parent, false);
                 break;
             }
@@ -163,7 +172,7 @@ public abstract class AndroidViewHolderSample extends BaseAdapter {
         }
     }
 
-    /* TODO low priority ViewHolder cornercase */
+    /** TODO low priority ViewHolder cornercase. */
     public static class CornerCase extends AndroidViewHolderSample {
         LayoutInflater inflater;
 
@@ -171,8 +180,9 @@ public abstract class AndroidViewHolderSample extends BaseAdapter {
         public View getView(final int position, View convertView, final ViewGroup parent) {
             View rootView = convertView;
             // this should not be refactored
-            if (rootView != null)
+            if (rootView != null) {
                 return rootView;
+            }
             if (convertView == null) {
                 convertView = inflater.inflate(android.R.layout.simple_list_item_1, parent, false);
             }
@@ -181,6 +191,13 @@ public abstract class AndroidViewHolderSample extends BaseAdapter {
         }
     }
 
+    /**
+     * GUI resources are defined using XML and can have the attribute {@code id}.
+     * <p>
+     * This {@code id} is later used to get that resource in the code.
+     * <p>
+     * {@code R.id.<id_of_resource>} is the way it's done.
+     */
     private static class R {
         public static class layout {
             public static final int your_layout = 2;

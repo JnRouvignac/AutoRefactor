@@ -831,22 +831,22 @@ public final class ASTHelper {
 
     /**
      * Returns the first ancestor of the provided node which has the required type.
-     * Throws exception if ancestor not found.
      *
      * @param <T> the required ancestor's type
      * @param node the start node
      * @param ancestorClazz the required ancestor's type
      * @return the first ancestor of the provided node which has the required type
+     * @see #getAncestorOrNull(ASTNode, Class)
      * @see #getFirstAncestorOrNull(ASTNode, Class...)
+     * @throws IllegalStateException if ancestor not found.
      */
-    @SuppressWarnings("unchecked")
     public static <T extends ASTNode> T getAncestor(ASTNode node, Class<T> ancestorClazz) {
-        T ancestor = getAncestorOrNull(node, ancestorClazz);
-        if (ancestor == null) {
-            throw new IllegalStateException(node,
-                    "Could not find any ancestor for " + ancestorClazz + "and node " + node);
+        final T ancestor = getAncestorOrNull(node, ancestorClazz);
+        if (ancestor != null) {
+            return ancestor;
         }
-        return ancestor;
+        throw new IllegalStateException(node,
+            "Could not find any ancestor for " + ancestorClazz + "and node " + node);
     }
 
     /**
@@ -855,8 +855,9 @@ public final class ASTHelper {
      * @param <T> the required ancestor's type
      * @param node the start node
      * @param ancestorClazz the required ancestor's type
-     * @return the first ancestor of the provided node which has the required type.
-     * Returns null if ancestor not found.
+     * @return the first ancestor of the provided node which has the required type,
+     *         {@code null} if no suitable ancestor can be found
+     * @see #getAncestor(ASTNode, Class)
      * @see #getFirstAncestorOrNull(ASTNode, Class...)
      */
     @SuppressWarnings("unchecked")
@@ -898,6 +899,7 @@ public final class ASTHelper {
      * @param ancestorClasses the required ancestor's types
      * @return the first ancestor of the provided node which has any of the required type, or {@code null}
      * @see #getAncestor(ASTNode, Class)
+     * @see #getAncestorOrNull(ASTNode, Class)
      */
     public static ASTNode getFirstAncestorOrNull(ASTNode node, Class<?>... ancestorClasses) {
         if (ancestorClasses.length == 1) {
@@ -2065,6 +2067,8 @@ public final class ASTHelper {
      * @return true if the two provided nodes represent the same variable, false otherwise
      */
     public static boolean isSameVariable(ASTNode node1, ASTNode node2) {
+        node1 = removeParentheses(node1);
+        node2 = removeParentheses(node2);
         if (node1 == null || node2 == null) {
             return false;
         }
