@@ -42,6 +42,7 @@ import org.autorefactor.util.IllegalStateException;
 import org.autorefactor.util.NotImplementedException;
 import org.eclipse.jdt.core.dom.ASTMatcher;
 import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.AbstractTypeDeclaration;
 import org.eclipse.jdt.core.dom.AnnotationTypeDeclaration;
 import org.eclipse.jdt.core.dom.AnnotationTypeMemberDeclaration;
@@ -192,6 +193,32 @@ public final class ASTHelper {
         @Override
         public int compare(ASTNode o1, ASTNode o2) {
             return o1.getStartPosition() - o2.getStartPosition();
+        }
+    }
+
+    private static final class VariableDeclarationIdentifierVisitor extends ASTVisitor {
+        private Set<String> variableNames = new HashSet<String>();
+        private ASTNode startNode;
+        private boolean includeInnerScopes;
+
+        private Set<String> getVariableNames() {
+            return variableNames;
+        }
+
+        private VariableDeclarationIdentifierVisitor(ASTNode node, boolean includeInnerScopes) {
+            startNode = node;
+            this.includeInnerScopes = includeInnerScopes;
+        }
+
+        @Override
+        public boolean visit(VariableDeclarationFragment node) {
+            variableNames.add(node.getName().getIdentifier());
+            return VISIT_SUBTREE;
+        }
+
+        @Override
+        public boolean visit(Block node) {
+            return startNode == node || includeInnerScopes ? VISIT_SUBTREE : DO_NOT_VISIT_SUBTREE;
         }
     }
 
@@ -2168,5 +2195,21 @@ public final class ASTHelper {
             return line + ":" + column;
         }
         return "";
+    }
+
+    /**
+     * Return the identifiers of variables declared inside the given statement.
+     *
+     * @param node The node to visit
+     * @param includeInnerScopes True if blocks are visited too.
+     *
+     * @return The ids of the declared variables.
+     */
+    public static Set<String> getLocalVariables(final ASTNode node, boolean includeInnerScopes) {
+        final VariableDeclarationIdentifierVisitor visitor = new VariableDeclarationIdentifierVisitor(node,
+                includeInnerScopes);
+        node.accept(visitor);
+
+        return visitor.getVariableNames();
     }
 }

@@ -40,6 +40,16 @@ import java.util.List;
 import java.util.Map;
 
 public class ReplaceQualifiedNamesBySimpleNamesSample {
+
+    private static long classField = 0l;
+
+    private java.lang.Long instanceField = java.lang.Long.MIN_VALUE;
+
+    static {
+        long classField = 0l;
+        ReplaceQualifiedNamesBySimpleNamesSample.classField = java.lang.Long.MAX_VALUE + classField;
+    }
+
     public java.util.List<String> removeQualifiedNameForImportNoWildcard(List<String> l) {
         return l;
     }
@@ -62,6 +72,10 @@ public class ReplaceQualifiedNamesBySimpleNamesSample {
 
     public void doNotRemoveQualifiedNameForGenericStaticMethodImport() {
         acceptListString(Collections.<String> emptyList());
+    }
+
+    public long removeQualifiedNameForParameterType(java.lang.Long i) {
+        return i;
     }
 
     private void acceptListString(List<String> l) {
@@ -166,5 +180,13 @@ public class ReplaceQualifiedNamesBySimpleNamesSample {
             return b().equals(other.b())
                 && i.equals(other.i);
         }
+    }
+
+    public void doNotConflictInstanceFieldAndLocalVariable(long instanceField) {
+        this.instanceField = instanceField;
+    }
+
+    public void doNotConflictClassFieldAndLocalVariable(long classField) {
+        ReplaceQualifiedNamesBySimpleNamesSample.classField = classField;
     }
 }
