@@ -90,12 +90,6 @@ public class TryWithResourceRefactoring extends AbstractRefactoringRule {
         final List<Statement> finallyStmts = asList(node.getFinally());
         if (previousDeclFragment != null && finallyStmts.size() >= 1) {
             final List<ASTNode> nodesToRemove = new ArrayList<ASTNode>();
-            final VariableDeclarationExpression newResource =
-                newResource(tryStmts, previousDeclStmt, previousDeclFragment, nodesToRemove);
-            if (newResource == null) {
-                return VISIT_SUBTREE;
-            }
-
             nodesToRemove.add(previousDeclStmt);
 
             final Statement finallyStmt = finallyStmts.get(0);
@@ -107,6 +101,8 @@ public class TryWithResourceRefactoring extends AbstractRefactoringRule {
                 final MethodInvocation mi = as(finallyEs.getExpression(), MethodInvocation.class);
                 if (isMethod(mi, "java.io.Closeable", "close")
                         && areSameVariables(previousDeclFragment, mi.getExpression())) {
+                    final VariableDeclarationExpression newResource =
+                        newResource(tryStmts, previousDeclStmt, previousDeclFragment, nodesToRemove);
                     return refactorToTryWithResources(node, newResource, nodesToRemove);
                 }
             } else if (finallyIs != null
@@ -118,6 +114,8 @@ public class TryWithResourceRefactoring extends AbstractRefactoringRule {
                 final MethodInvocation mi = asExpression(thenStmt, MethodInvocation.class);
                 if (isMethod(mi, "java.io.Closeable", "close")
                         && areSameVariables(previousDeclFragment, nullCheckedExpr, mi.getExpression())) {
+                    final VariableDeclarationExpression newResource =
+                        newResource(tryStmts, previousDeclStmt, previousDeclFragment, nodesToRemove);
                     return refactorToTryWithResources(node, newResource, nodesToRemove);
                 }
             }
@@ -127,6 +125,9 @@ public class TryWithResourceRefactoring extends AbstractRefactoringRule {
 
     private boolean refactorToTryWithResources(
             TryStatement node, VariableDeclarationExpression newResource, List<ASTNode> nodesToRemove) {
+        if (newResource == null) {
+            return VISIT_SUBTREE;
+        }
         final Refactorings r = ctx.getRefactorings();
         r.insertFirst(node, TryStatement.RESOURCES_PROPERTY, newResource);
         r.remove(nodesToRemove);
