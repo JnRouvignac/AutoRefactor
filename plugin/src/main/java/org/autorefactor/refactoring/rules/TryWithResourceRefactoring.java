@@ -99,7 +99,7 @@ public class TryWithResourceRefactoring extends AbstractRefactoringRule {
             final IfStatement finallyIs = as(finallyStmt, IfStatement.class);
             if (finallyEs != null) {
                 final MethodInvocation mi = as(finallyEs.getExpression(), MethodInvocation.class);
-                if (isMethod(mi, "java.io.Closeable", "close")
+                if (methodClosesCloseables(mi)
                         && areSameVariables(previousDeclFragment, mi.getExpression())) {
                     final VariableDeclarationExpression newResource =
                         newResource(tryStmts, previousDeclStmt, previousDeclFragment, nodesToRemove);
@@ -112,7 +112,7 @@ public class TryWithResourceRefactoring extends AbstractRefactoringRule {
 
                 final Statement thenStmt = asList(finallyIs.getThenStatement()).get(0);
                 final MethodInvocation mi = asExpression(thenStmt, MethodInvocation.class);
-                if (isMethod(mi, "java.io.Closeable", "close")
+                if (methodClosesCloseables(mi)
                         && areSameVariables(previousDeclFragment, nullCheckedExpr, mi.getExpression())) {
                     final VariableDeclarationExpression newResource =
                         newResource(tryStmts, previousDeclStmt, previousDeclFragment, nodesToRemove);
@@ -121,6 +121,26 @@ public class TryWithResourceRefactoring extends AbstractRefactoringRule {
             }
         }
         return VISIT_SUBTREE;
+    }
+
+    private boolean methodClosesCloseables(final MethodInvocation mi) {
+        if (isMethod(mi, "java.io.Closeable", "close")) {
+            return true;
+        }
+//        // Try to handle Guava's Closeables.closeQuietly(), Apache Commons IO'a IOUtils.closeQuietly()
+//        // and/or all various homegrown static utilities closing Closeables
+//        IMethodBinding methodBinding = mi.resolveMethodBinding();
+//        return methodBinding != null
+//                && methodBinding.getName().startsWith("close")
+//                // In theory we should also verify the code of the method that is being called.
+//                // In practice, the only thing you can do with an instance of Closeable is to close it,
+//                // so let's assume this is exactly what the method does
+//                && (isArrayOfCloseables(methodBinding.getParameterTypes())
+//                        || isVarargsOfCloseables(methodBinding.getParameterTypes())
+//                        // Beware of generic types (wildcards like ? extends Closeable)
+//                        || isCollectionOfCloseables(methodBinding.getParameterTypes())
+//                        || isCloseable(methodBinding.getParameterTypes()));
+        return false;
     }
 
     private boolean refactorToTryWithResources(
