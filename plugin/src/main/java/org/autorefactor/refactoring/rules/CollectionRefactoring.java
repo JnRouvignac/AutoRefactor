@@ -54,6 +54,7 @@ import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.autorefactor.refactoring.ForLoopHelper.*;
+import static org.autorefactor.util.Utils.*;
 import static org.eclipse.jdt.core.dom.InfixExpression.Operator.*;
 import static org.eclipse.jdt.core.dom.PrefixExpression.Operator.*;
 
@@ -398,30 +399,30 @@ public class CollectionRefactoring extends AbstractRefactoringRule {
 
     @Override
     public boolean visit(IfStatement node) {
+        final Statement elseStmt = node.getElseStatement();
+        final Statement thenStmt = node.getThenStatement();
         final PrefixExpression pe = as(node.getExpression(), PrefixExpression.class);
         if (hasOperator(pe, NOT)) {
-            return maybeReplaceSetContains(node, pe.getOperand(), node.getThenStatement(), node.getElseStatement(),
-                    false);
+            return maybeReplaceSetContains(node, pe.getOperand(), thenStmt, elseStmt, false);
         } else {
-            return maybeReplaceSetContains(node, node.getExpression(), node.getElseStatement(), node.getThenStatement(),
-                    true);
+            return maybeReplaceSetContains(node, node.getExpression(), elseStmt, thenStmt, true);
         }
     }
 
-    private boolean maybeReplaceSetContains(final IfStatement nodeToReplace, final Expression ifExpression,
-            final Statement statement,
-            final Statement oppositeStatement, final boolean negate) {
-        return maybeReplaceSetContains(nodeToReplace, ifExpression, statement, oppositeStatement, negate, "add")
-                &&  maybeReplaceSetContains(nodeToReplace, ifExpression, oppositeStatement, statement, !negate,
-                    "remove");
+    private boolean maybeReplaceSetContains(final IfStatement ifStmtToReplace,
+            final Expression ifExpr, final Statement stmt, final Statement oppositeStmt, final boolean negate) {
+        return maybeReplaceSetContains(ifStmtToReplace, ifExpr, stmt, oppositeStmt, negate, "add")
+                && maybeReplaceSetContains(ifStmtToReplace, ifExpr, oppositeStmt, stmt, !negate, "remove");
     }
 
-    private boolean maybeReplaceSetContains(final IfStatement nodeToReplace, final Expression ifExpression,
-            final Statement statement,
-            final Statement oppositeStatement, final boolean negate, final String methodName) {
-        final MethodInvocation miContains = as(ifExpression, MethodInvocation.class);
-        if (isMethod(miContains, "java.util.Set", "contains", "java.lang.Object") && !asList(statement).isEmpty()) {
-            final Statement firstStmt = getAsList(statement, 0);
+    private boolean maybeReplaceSetContains(final IfStatement ifStmtToReplace,
+            final Expression ifExpr, final Statement stmt, final Statement oppositeStmt,
+            final boolean negate, final String methodName) {
+        final List<Statement> stmts = asList(stmt);
+        final MethodInvocation miContains = as(ifExpr, MethodInvocation.class);
+        if (!stmts.isEmpty()
+                && isMethod(miContains, "java.util.Set", "contains", "java.lang.Object")) {
+            final Statement firstStmt = getFirst(stmts);
             final MethodInvocation miAddOrRemove = asExpression(firstStmt, MethodInvocation.class);
             final ASTMatcher astMatcher = new ASTMatcher();
             if (isMethod(miAddOrRemove, "java.util.Set", methodName, "java.lang.Object")
@@ -430,12 +431,13 @@ public class CollectionRefactoring extends AbstractRefactoringRule {
                 final ASTBuilder b = this.ctx.getASTBuilder();
                 final Refactorings r = this.ctx.getRefactorings();
 
-                if (asList(statement).size() == 1 && asList(oppositeStatement).isEmpty()) {
-                    // Only one statement: add() or remove()
-                    r.replace(nodeToReplace, b.copy(firstStmt));
+                if (stmts.size() == 1 && asList(oppositeStmt).isEmpty()) {
+                    // Only one statement: replace if statement with col.add() (or col.remove())
+                    r.replace(ifStmtToReplace, b.move(firstStmt));
                     return DO_NOT_VISIT_SUBTREE;
                 } else {
-                    r.replace(nodeToReplace.getExpression(),
+                    // There are other statements, replace the if condition with col.add() (or col.remove())
+                    r.replace(ifStmtToReplace.getExpression(),
                             negate ? b.negate(miAddOrRemove, ASTBuilder.Copy.MOVE) : b.move(miAddOrRemove));
                     r.remove(firstStmt);
                     return DO_NOT_VISIT_SUBTREE;
@@ -443,16 +445,5 @@ public class CollectionRefactoring extends AbstractRefactoringRule {
             }
         }
         return VISIT_SUBTREE;
-    }
-
-    private Statement getAsList(Statement stmt, int index) {
-        if (index < 0) {
-            throw new IllegalArgumentException("A list index cannot be negative. Given: " + index);
-        }
-        final List<Statement> stmts = asList(stmt);
-        if (stmts.size() > index) {
-            return stmts.get(index);
-        }
-        return null;
     }
 }
