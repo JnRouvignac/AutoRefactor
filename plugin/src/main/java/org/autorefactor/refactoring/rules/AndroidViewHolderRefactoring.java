@@ -78,8 +78,8 @@ public class AndroidViewHolderRefactoring extends AbstractRefactoringRule {
 
     @Override
     public String getDescription() {
-        return "Optimization for Android applications to optimize getView() routines. "
-                + "It allows reducing the calls to inflate and getViewById() Android API methods.";
+        return "Android - Optimize getView() routines for Android applications. "
+                + "It reduces the number calls to the costly inflate()) and getViewById() Android API methods.";
     }
 
     @Override
