@@ -115,4 +115,14 @@ public class RemoveUnnecessaryLocalBeforeReturnSample {
         char[] res = s.toCharArray();
         return res;
     }
+
+    public String doNotEliminateEverything(String param) {
+        param = (String) otherMethodCall(param);
+        return param;
+    }
+
+    public Object otherMethodCall(String param) {
+        param = param + " - too short string";
+        return param;
+    }
 }
