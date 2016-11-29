@@ -167,4 +167,16 @@ public class ReplaceQualifiedNamesBySimpleNamesSample {
                 && i.equals(other.i);
         }
     }
+
+    static String property = null;
+    static void setProperty(String property) {
+        ReplaceQualifiedNamesBySimpleNamesSample.property = property;
+    }
+
+}
+
+class Outer {
+    void foo() {
+        ReplaceQualifiedNamesBySimpleNamesSample.setProperty("hi");
+    }
 }
