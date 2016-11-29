@@ -37,7 +37,7 @@ public class NotImplementedException extends AutoRefactorException {
      * @param node the node from which to retrieve the source location
      */
     public NotImplementedException(ASTNode node) {
-        this(node, DEFAULT_MESSAGE);
+        this(node, node);
     }
 
     /**
