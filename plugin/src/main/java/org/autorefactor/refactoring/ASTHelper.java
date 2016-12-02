@@ -2209,7 +2209,6 @@ public final class ASTHelper {
         final VariableDeclarationIdentifierVisitor visitor = new VariableDeclarationIdentifierVisitor(node,
                 includeInnerScopes);
         node.accept(visitor);
-
         return visitor.getVariableNames();
     }
 }

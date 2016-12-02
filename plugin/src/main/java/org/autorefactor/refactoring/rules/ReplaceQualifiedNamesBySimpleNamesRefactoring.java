@@ -173,7 +173,7 @@ public class ReplaceQualifiedNamesBySimpleNamesRefactoring extends AbstractRefac
         @Override
         public String toString() {
             if (this.equals(CANNOT_REPLACE_SIMPLE_NAME)) {
-                return "CAN_NOT_REPLACE_SIMPLE_NAME";
+                return "CANNOT_REPLACE_SIMPLE_NAME";
             }
             return fullyQualifiedName + (fromImport ? " (imported)" : " (member)");
         }
@@ -635,7 +635,7 @@ public class ReplaceQualifiedNamesBySimpleNamesRefactoring extends AbstractRefac
         for (final SingleVariableDeclaration localParameter : ASTHelper.parameters(node)) {
             localIdentifiers.add(localParameter.getName().getIdentifier());
         }
-        localIdentifiers.addAll(ASTHelper.getLocalVariables(node.getBody(), true));
+        localIdentifiers.addAll(getLocalVariables(node.getBody(), true));
 
         return processNode(node.getBody(), localIdentifiers);
     }
