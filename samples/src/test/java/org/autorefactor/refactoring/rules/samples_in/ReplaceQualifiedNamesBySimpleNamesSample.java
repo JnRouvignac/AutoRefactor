@@ -2,6 +2,7 @@
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
  * Copyright (C) 2016 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2016 Fabrice Tiercelin - Handle local variable and outer classes
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -188,5 +189,34 @@ public class ReplaceQualifiedNamesBySimpleNamesSample {
 
     public void doNotConflictClassFieldAndLocalVariable(long classField) {
         ReplaceQualifiedNamesBySimpleNamesSample.classField = classField;
+    }
+
+    static String property = null;
+    static void setProperty(String property) {
+        ReplaceQualifiedNamesBySimpleNamesSample.property = property;
+    }
+
+    public void doNotConflictClassFieldAndOuterClassField(String text) {
+        Outer.outerProperty = text;
+        Outer.NestedOuter.nestedOuterProperty = text;
+    }
+
+}
+
+class Outer {
+
+    static java.lang.String outerProperty = null;
+
+    void foo() {
+        ReplaceQualifiedNamesBySimpleNamesSample.setProperty("hi");
+    }
+
+    static class NestedOuter {
+
+        static java.lang.String nestedOuterProperty = "bar";
+
+        void bar() {
+            ReplaceQualifiedNamesBySimpleNamesSample.setProperty("hi");
+        }
     }
 }

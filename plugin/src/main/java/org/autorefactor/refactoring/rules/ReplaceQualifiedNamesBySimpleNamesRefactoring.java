@@ -2,6 +2,7 @@
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
  * Copyright (C) 2016 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2016 Fabrice Tiercelin - Handle local variable and outer classes
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -377,8 +378,7 @@ public class ReplaceQualifiedNamesBySimpleNamesRefactoring extends AbstractRefac
         return "Replace qualified names by simple names";
     }
 
-    @Override
-    public boolean visit(final ImportDeclaration node) {
+    private void readImport(final ImportDeclaration node) {
         final QName qname = QName.valueOf(node.getName().getFullyQualifiedName());
         if (node.isStatic()) {
             if (node.isOnDemand()) {
@@ -394,7 +394,6 @@ public class ReplaceQualifiedNamesBySimpleNamesRefactoring extends AbstractRefac
                 types.addName(FQN.fromImport(qname, false));
             }
         }
-        return VISIT_SUBTREE;
     }
 
     private void importStaticTypesAndMembersFromType(ImportDeclaration node) {
@@ -486,17 +485,32 @@ public class ReplaceQualifiedNamesBySimpleNamesRefactoring extends AbstractRefac
     }
 
     @Override
-    public boolean visit(CompilationUnit node) {
-        node.accept(new NamesCollector());
-        importTypesFromPackage("java.lang", node);
+    public boolean visit(TypeDeclaration node) {
+        final ITypeBinding typeBinding = node.resolveBinding();
+        if (!typeBinding.isNested() && node.getParent() instanceof CompilationUnit) {
+            types.clear();
+            methods.clear();
+            fields.clear();
+
+            final CompilationUnit compilationUnit = (CompilationUnit) node.getParent();
+            for (final Object anImport : compilationUnit.imports()) {
+                readImport((ImportDeclaration) anImport);
+            }
+            importTypesFromPackage("java.lang", compilationUnit);
+
+            node.accept(new NamesCollector());
+        }
         return VISIT_SUBTREE;
     }
 
     @Override
-    public void endVisit(CompilationUnit node) {
-        types.clear();
-        methods.clear();
-        fields.clear();
+    public void endVisit(TypeDeclaration node) {
+        final ITypeBinding typeBinding = node.resolveBinding();
+        if (!typeBinding.isNested()) {
+            types.clear();
+            methods.clear();
+            fields.clear();
+        }
     }
 
     private final class NamesCollector extends ASTVisitor {
