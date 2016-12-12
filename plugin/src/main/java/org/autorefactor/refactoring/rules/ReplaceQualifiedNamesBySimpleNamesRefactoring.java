@@ -655,12 +655,14 @@ public class ReplaceQualifiedNamesBySimpleNamesRefactoring extends AbstractRefac
     }
 
     private boolean processNode(final ASTNode node, final Set<String> localIdentifiers) {
-        final QualifiedNamesVisitor visitor = new QualifiedNamesVisitor();
-        node.accept(visitor);
+        if (node != null) {
+            final QualifiedNamesVisitor visitor = new QualifiedNamesVisitor();
+            node.accept(visitor);
 
-        for (final QualifiedName qualifiedNameToProcess : visitor.getQualifiedNamesToProcess()) {
-            if (maybeReplaceFqnWithSimpleName(qualifiedNameToProcess, localIdentifiers) == DO_NOT_VISIT_SUBTREE) {
-                return DO_NOT_VISIT_SUBTREE;
+            for (final QualifiedName qualifiedNameToProcess : visitor.getQualifiedNamesToProcess()) {
+                if (maybeReplaceFqnWithSimpleName(qualifiedNameToProcess, localIdentifiers) == DO_NOT_VISIT_SUBTREE) {
+                    return DO_NOT_VISIT_SUBTREE;
+                }
             }
         }
 

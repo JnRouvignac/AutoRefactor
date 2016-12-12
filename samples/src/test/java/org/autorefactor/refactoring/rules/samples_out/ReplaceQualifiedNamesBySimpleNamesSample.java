@@ -51,6 +51,10 @@ public class ReplaceQualifiedNamesBySimpleNamesSample {
         ReplaceQualifiedNamesBySimpleNamesSample.classField = Long.MAX_VALUE + classField;
     }
 
+    public ReplaceQualifiedNamesBySimpleNamesSample(Long long1) {
+        Long long2 = Long.valueOf(long1 + 1);
+    }
+
     public List<String> removeQualifiedNameForImportNoWildcard(List<String> l) {
         return l;
     }
