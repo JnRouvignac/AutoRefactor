@@ -158,7 +158,8 @@ public class TestNGAssertRefactoring extends AbstractUnitTestRefactoring {
     }
 
     @Override
-    protected MethodInvocation invokeMethod(final ASTBuilder b, final Expression copyOfExpr, final String methodName,
+    protected MethodInvocation invokeQualifiedMethod(final ASTBuilder b, final Expression copyOfExpr,
+            final String methodName,
             final Expression copyOfActual, final Expression copyOfExpected, final Expression failureMessage) {
         if (failureMessage == null) {
             if (copyOfActual == null) {

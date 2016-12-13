@@ -77,7 +77,7 @@ public abstract class AbstractUnitTestRefactoring extends AbstractRefactoringRul
             final Expression rightValue);
 
     /**
-     * Invoke the method.
+     * Invoke the method with full qualified name if needed.
      *
      * @param b
      *            The builder.
@@ -93,7 +93,7 @@ public abstract class AbstractUnitTestRefactoring extends AbstractRefactoringRul
      *            The original failure message or null.
      * @return The method invocation object.
      */
-    protected abstract MethodInvocation invokeMethod(final ASTBuilder b, final Expression copyOfMethod,
+    protected abstract MethodInvocation invokeQualifiedMethod(final ASTBuilder b, final Expression copyOfMethod,
             final String methodName, final Expression copyOfActual, final Expression copyOfExpected,
             final Expression failureMessage);
 
@@ -176,11 +176,10 @@ public abstract class AbstractUnitTestRefactoring extends AbstractRefactoringRul
             final Expression failureMessage, final Expression condition, final boolean isAssertTrue) {
         final ASTBuilder b = this.ctx.getASTBuilder();
         final Refactorings r = this.ctx.getRefactorings();
-        final Expression copyOfMethod = b.copyExpression(originalMethod);
         final String methodName = isAssertTrue ? "assertTrue" : "assertFalse";
 
         r.replace(nodeToReplace, invokeMethodOrStatement(nodeToReplace, b,
-                invokeMethod(b, copyOfMethod, methodName, b.copy(condition), null, failureMessage)));
+                invokeMethod(b, originalMethod, methodName, b.copy(condition), null, failureMessage)));
         return DO_NOT_VISIT_SUBTREE;
     }
 
@@ -201,9 +200,8 @@ public abstract class AbstractUnitTestRefactoring extends AbstractRefactoringRul
             final Expression failureMessage) {
         final ASTBuilder b = this.ctx.getASTBuilder();
         final List<Expression> args = arguments(originalMethod);
-        final Expression copyOfMethod = b.copyExpression(originalMethod);
         if ((args.size() == 1) || (args.size() == 2)) {
-            return invokeMethod(b, copyOfMethod, "fail", null, null, failureMessage);
+            return invokeMethod(b, originalMethod, "fail", null, null, failureMessage);
         } else {
             throw new NotImplementedException(node);
         }
@@ -218,9 +216,8 @@ public abstract class AbstractUnitTestRefactoring extends AbstractRefactoringRul
         if (isComparingObjects(ie) && !isNullLiteral(ie.getLeftOperand()) && !isNullLiteral(ie.getRightOperand())) {
             final ASTBuilder b = this.ctx.getASTBuilder();
             final Refactorings r = this.ctx.getRefactorings();
-            final Expression copyOfMethod = b.copyExpression(originalMethod);
 
-            final MethodInvocation newAssert = invokeMethod(b, copyOfMethod, getAssertName(isAssertEquals, "Same"),
+            final MethodInvocation newAssert = invokeMethod(b, originalMethod, getAssertName(isAssertEquals, "Same"),
                     b.copy(actualAndExpected.getFirst()), b.copy(actualAndExpected.getSecond()), failureMessage);
             r.replace(nodeToReplace, invokeMethodOrStatement(nodeToReplace, b, newAssert));
             return DO_NOT_VISIT_SUBTREE;
@@ -265,14 +262,12 @@ public abstract class AbstractUnitTestRefactoring extends AbstractRefactoringRul
             return DO_NOT_VISIT_SUBTREE;
         } else if ((isConstant(actualValue) || isVariableNamedExpected(actualValue))
                 && !isConstant(expectedValue) && !isVariableNamedExpected(expectedValue)) {
-            final Expression copyOfMethod = b.copyExpression(originalMethod);
-            final MethodInvocation newAssert = invokeMethod(b, copyOfMethod, getAssertName(isAssertEquals, "Equals"),
+            final MethodInvocation newAssert = invokeMethod(b, originalMethod, getAssertName(isAssertEquals, "Equals"),
                     b.copy(expectedValue), b.copy(actualValue), failureMessage);
             r.replace(nodeToReplace, invokeMethodOrStatement(nodeToReplace, b, newAssert));
             return DO_NOT_VISIT_SUBTREE;
         } else if (isRewriteNeeded) {
-            final Expression copyOfMethod = b.copyExpression(originalMethod);
-            final MethodInvocation newAssert = invokeMethod(b, copyOfMethod, getAssertName(isAssertEquals, "Equals"),
+            final MethodInvocation newAssert = invokeMethod(b, originalMethod, getAssertName(isAssertEquals, "Equals"),
                     b.copy(actualValue), b.copy(expectedValue), failureMessage);
             r.replace(nodeToReplace, invokeMethodOrStatement(nodeToReplace, b, newAssert));
             return DO_NOT_VISIT_SUBTREE;
@@ -316,10 +311,41 @@ public abstract class AbstractUnitTestRefactoring extends AbstractRefactoringRul
     private MethodInvocation invokeAssertNull(final MethodInvocation originalMethod, final boolean isPositive,
             final Expression actual, final Expression failureMessage) {
         final ASTBuilder b = this.ctx.getASTBuilder();
-        final Expression copyOfMethod = b.copyExpression(originalMethod);
         final String methodName = getAssertName(isPositive, "Null");
         final Expression copyOfActual = b.copy(actual);
-        return invokeMethod(b, copyOfMethod, methodName, copyOfActual, null, failureMessage);
+        return invokeMethod(b, originalMethod, methodName, copyOfActual, null, failureMessage);
+    }
+
+    /**
+     * Invoke the method.
+     *
+     * @param b
+     *            The builder.
+     * @param originalMethod
+     *            The copy of the original method.
+     * @param methodName
+     *            methodName.
+     * @param copyOfActual
+     *            The copy of the actual value or null.
+     * @param copyOfExpected
+     *            The copy of the expected value or null.
+     * @param failureMessage
+     *            The original failure message or null.
+     * @return The method invocation object.
+     */
+    private MethodInvocation invokeMethod(final ASTBuilder b, final MethodInvocation originalMethod,
+            final String methodName, final Expression copyOfActual, final Expression copyOfExpected,
+            final Expression failureMessage) {
+        Expression qualifiedMethod;
+        if (originalMethod.getExpression() == null) {
+            qualifiedMethod = b.name(originalMethod.resolveMethodBinding().getDeclaringClass().getQualifiedName()
+                    .split("\\."));
+        } else {
+            qualifiedMethod = b.copyExpression(originalMethod);
+        }
+        return invokeQualifiedMethod(b, qualifiedMethod,
+                methodName, copyOfActual, copyOfExpected,
+                failureMessage);
     }
 
     /**
