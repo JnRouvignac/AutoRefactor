@@ -197,9 +197,9 @@ public final class ASTHelper {
     }
 
     private static final class VariableDeclarationIdentifierVisitor extends ASTVisitor {
-        private Set<String> variableNames = new HashSet<String>();
-        private ASTNode startNode;
-        private boolean includeInnerScopes;
+        private final Set<String> variableNames = new HashSet<String>();
+        private final ASTNode startNode;
+        private final boolean includeInnerScopes;
 
         private Set<String> getVariableNames() {
             return variableNames;
