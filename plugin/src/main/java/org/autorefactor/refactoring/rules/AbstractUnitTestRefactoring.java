@@ -26,7 +26,9 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.Refactorings;
@@ -35,6 +37,7 @@ import org.autorefactor.util.Pair;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.IfStatement;
+import org.eclipse.jdt.core.dom.ImportDeclaration;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.PrefixExpression;
@@ -56,6 +59,11 @@ public abstract class AbstractUnitTestRefactoring extends AbstractRefactoringRul
      * The OBJECT constant.
      */
     protected static final String OBJECT = "java.lang.Object";
+
+    /**
+     * The OBJECT constant.
+     */
+    private final Set<String> staticImports = new HashSet<String>();
 
     /**
      * Return true if assertNotEquals can be used.
@@ -102,6 +110,18 @@ public abstract class AbstractUnitTestRefactoring extends AbstractRefactoringRul
 
     @Override
     public abstract boolean visit(IfStatement node);
+
+    @Override
+    public boolean visit(final ImportDeclaration node) {
+        if (node.isStatic()) {
+            if (node.isOnDemand()) {
+                staticImports.add(node.getName().getFullyQualifiedName() + ".*");
+            } else {
+                staticImports.add(node.getName().getFullyQualifiedName());
+            }
+        }
+        return VISIT_SUBTREE;
+    }
 
     /**
      * Maybe refactor the statement.
@@ -336,10 +356,13 @@ public abstract class AbstractUnitTestRefactoring extends AbstractRefactoringRul
     private MethodInvocation invokeMethod(final ASTBuilder b, final MethodInvocation originalMethod,
             final String methodName, final Expression copyOfActual, final Expression copyOfExpected,
             final Expression failureMessage) {
+        final String qualifiedMethodName =
+                originalMethod.resolveMethodBinding().getDeclaringClass().getQualifiedName();
+
         Expression qualifiedMethod;
-        if (originalMethod.getExpression() == null) {
-            qualifiedMethod = b.name(originalMethod.resolveMethodBinding().getDeclaringClass().getQualifiedName()
-                    .split("\\."));
+        if (originalMethod.getExpression() == null && !staticImports.contains(qualifiedMethodName + "." + methodName)
+                && !staticImports.contains(qualifiedMethodName + ".*")) {
+            qualifiedMethod = b.name(qualifiedMethodName.split("\\."));
         } else {
             qualifiedMethod = b.copyExpression(originalMethod);
         }

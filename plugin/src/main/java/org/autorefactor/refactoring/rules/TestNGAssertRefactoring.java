@@ -82,7 +82,7 @@ public class TestNGAssertRefactoring extends AbstractUnitTestRefactoring {
             // we have not found testng yet for this file, go on looking for it
             canUseAssertNotEquals = canUseAssertNotEquals(node);
         }
-        return VISIT_SUBTREE;
+        return super.visit(node);
     }
 
     private boolean canUseAssertNotEquals(final ImportDeclaration node) {
