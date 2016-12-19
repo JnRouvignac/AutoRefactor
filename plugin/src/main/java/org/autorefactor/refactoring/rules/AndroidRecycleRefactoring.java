@@ -35,6 +35,8 @@ import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.Statement;
+import org.eclipse.jdt.core.dom.TryStatement;
+import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import static org.autorefactor.refactoring.ASTHelper.*;
 import org.autorefactor.refactoring.ASTBuilder;
@@ -182,6 +184,16 @@ public class AndroidRecycleRefactoring extends AbstractRefactoringRule {
             if (variableDeclarationFragment != null) {
                 cursorExpression = variableDeclarationFragment.getName();
                 variableAssignmentNode = variableDeclarationFragment;
+                // Skip cases in which variable is initialized in a try with
+                // resources statement
+                TryStatement tryStatement = getAncestorOrNull(variableDeclarationFragment, TryStatement.class);
+                if (tryStatement != null) {
+                    VariableDeclarationExpression declarationExpression = getAncestorOrNull(variableDeclarationFragment,
+                            VariableDeclarationExpression.class);
+                    if (declarationExpression != null && tryStatement.resources().contains(declarationExpression)) {
+                        return VISIT_SUBTREE;
+                    }
+                }
             } else {
                 Assignment variableAssignment = getAncestor(node, Assignment.class);
                 cursorExpression = (SimpleName) variableAssignment.getLeftHandSide();
