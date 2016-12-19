@@ -36,7 +36,7 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import org.autorefactor.refactoring.ASTBuilder;
-import org.autorefactor.refactoring.ASTHelper;
+import org.autorefactor.refactoring.CollectorVisitor;
 import org.autorefactor.util.NotImplementedException;
 import org.autorefactor.util.UnhandledException;
 import org.eclipse.core.runtime.SubMonitor;
@@ -78,7 +78,6 @@ import static org.eclipse.jdt.core.search.SearchEngine.*;
 import static org.eclipse.jdt.core.search.SearchPattern.*;
 
 /** See {@link #getDescription()} method. */
-@SuppressWarnings("javadoc")
 public class ReplaceQualifiedNamesBySimpleNamesRefactoring extends AbstractRefactoringRule {
     private static final class QName {
         private QName qualifier;
@@ -180,6 +179,7 @@ public class ReplaceQualifiedNamesBySimpleNamesRefactoring extends AbstractRefac
         }
     }
 
+    /** Maps simple names to their fully qualified names. */
     private static final class Names {
         /**
          * Simple names for java elements in use in this compilation unit.
@@ -366,6 +366,12 @@ public class ReplaceQualifiedNamesBySimpleNamesRefactoring extends AbstractRefac
     private final Names methods = new Names();
     private final Names fields = new Names();
 
+    private void resetAllNames() {
+        types.clear();
+        methods.clear();
+        fields.clear();
+    }
+
     @Override
     public String getDescription() {
         return "Refactors types, method invocations and field accesses"
@@ -487,14 +493,10 @@ public class ReplaceQualifiedNamesBySimpleNamesRefactoring extends AbstractRefac
     @Override
     public boolean visit(TypeDeclaration node) {
         final ITypeBinding typeBinding = node.resolveBinding();
-        if (!typeBinding.isNested() && node.getParent() instanceof CompilationUnit) {
-            types.clear();
-            methods.clear();
-            fields.clear();
-
+        if (typeBinding != null && !typeBinding.isNested() && node.getParent() instanceof CompilationUnit) {
             final CompilationUnit compilationUnit = (CompilationUnit) node.getParent();
-            for (final Object anImport : compilationUnit.imports()) {
-                readImport((ImportDeclaration) anImport);
+            for (final ImportDeclaration importDecl : imports(compilationUnit)) {
+                readImport(importDecl);
             }
             importTypesFromPackage("java.lang", compilationUnit);
 
@@ -506,10 +508,8 @@ public class ReplaceQualifiedNamesBySimpleNamesRefactoring extends AbstractRefac
     @Override
     public void endVisit(TypeDeclaration node) {
         final ITypeBinding typeBinding = node.resolveBinding();
-        if (!typeBinding.isNested()) {
-            types.clear();
-            methods.clear();
-            fields.clear();
+        if (typeBinding != null && !typeBinding.isNested()) {
+            resetAllNames();
         }
     }
 
@@ -606,67 +606,64 @@ public class ReplaceQualifiedNamesBySimpleNamesRefactoring extends AbstractRefac
         return binding != null && binding.getKind() == bindingKind;
     }
 
-    private static final class QualifiedNamesVisitor extends ASTVisitor {
-        private final List<QualifiedName> qualifiedNamesToProcess = new ArrayList<QualifiedName>();
-
-        private List<QualifiedName> getQualifiedNamesToProcess() {
-            return qualifiedNamesToProcess;
-        }
-
-        @Override
-        public boolean visit(QualifiedName node) {
-            qualifiedNamesToProcess.add(node);
-            return VISIT_SUBTREE;
-        }
-    }
-
     @Override
     public boolean visit(FieldDeclaration node) {
-        return processNode(node, Collections.<String>emptySet());
+        return maybeReplaceFqnsWithSimpleNames(node);
     }
 
     @Override
     public boolean visit(Initializer node) {
-        return processNode(node.getBody(), ASTHelper.getLocalVariables(node.getBody(), true));
+        final Set<String> localVars = getLocalVariableIdentifiers(node.getBody(), true);
+        return maybeReplaceFqnsWithSimpleNames(node.getBody(), localVars);
     }
 
     @Override
     public boolean visit(MethodDeclaration node) {
         // Method parameters
-        for (final SingleVariableDeclaration parameter : ASTHelper.parameters(node)) {
-            if (processNode(parameter, Collections.<String>emptySet()) == DO_NOT_VISIT_SUBTREE) {
+        for (final SingleVariableDeclaration parameter : parameters(node)) {
+            if (maybeReplaceFqnsWithSimpleNames(parameter) == DO_NOT_VISIT_SUBTREE) {
                 return DO_NOT_VISIT_SUBTREE;
             }
         }
 
         // Method return value
-        if (processNode(node.getReturnType2(), Collections.<String>emptySet()) == DO_NOT_VISIT_SUBTREE) {
+        if (maybeReplaceFqnsWithSimpleNames(node.getReturnType2()) == DO_NOT_VISIT_SUBTREE) {
             return DO_NOT_VISIT_SUBTREE;
         }
 
         // Method body
         final Set<String> localIdentifiers = new HashSet<String>();
-        for (final SingleVariableDeclaration localParameter : ASTHelper.parameters(node)) {
+        for (final SingleVariableDeclaration localParameter : parameters(node)) {
             localIdentifiers.add(localParameter.getName().getIdentifier());
         }
-        localIdentifiers.addAll(getLocalVariables(node.getBody(), true));
+        localIdentifiers.addAll(getLocalVariableIdentifiers(node.getBody(), true));
 
-        return processNode(node.getBody(), localIdentifiers);
+        return maybeReplaceFqnsWithSimpleNames(node.getBody(), localIdentifiers);
     }
 
-    private boolean processNode(final ASTNode node, final Set<String> localIdentifiers) {
-        if (node != null) {
-            final QualifiedNamesVisitor visitor = new QualifiedNamesVisitor();
-            node.accept(visitor);
+    private boolean maybeReplaceFqnsWithSimpleNames(final ASTNode node) {
+        return maybeReplaceFqnsWithSimpleNames(node, Collections.<String>emptySet());
+    }
 
-            for (final QualifiedName qualifiedNameToProcess : visitor.getQualifiedNamesToProcess()) {
-                if (maybeReplaceFqnWithSimpleName(qualifiedNameToProcess, localIdentifiers) == DO_NOT_VISIT_SUBTREE) {
+    private boolean maybeReplaceFqnsWithSimpleNames(final ASTNode node, final Set<String> localIdentifiers) {
+        if (node != null) {
+            final Iterable<QualifiedName> qualifiedNames = new QualifiedNamesCollector().collect(node);
+            for (final QualifiedName qualifiedName : qualifiedNames) {
+                if (maybeReplaceFqnWithSimpleName(qualifiedName, localIdentifiers) == DO_NOT_VISIT_SUBTREE) {
                     return DO_NOT_VISIT_SUBTREE;
                 }
             }
         }
 
         return VISIT_SUBTREE;
+    }
+
+    private static final class QualifiedNamesCollector extends CollectorVisitor<QualifiedName> {
+        @Override
+        public boolean visit(QualifiedName node) {
+            addResult(node);
+            return VISIT_SUBTREE;
+        }
     }
 
     private boolean maybeReplaceFqnWithSimpleName(final QualifiedName node, final Set<String> localIdentifiers) {

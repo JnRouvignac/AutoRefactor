@@ -258,7 +258,7 @@ public class SwitchRefactoring extends AbstractRefactoringRule {
     }
 
     private boolean detectDeclarationConflicts(final Statement stmt, final Set<String> variableDeclarationIds) {
-        final Set<String> varNames = ASTHelper.getLocalVariables(stmt, false);
+        final Set<String> varNames = getLocalVariableIdentifiers(stmt, false);
         final boolean hasConflict = containsAny(variableDeclarationIds, varNames);
         variableDeclarationIds.addAll(varNames);
         return hasConflict;

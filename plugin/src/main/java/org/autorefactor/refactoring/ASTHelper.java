@@ -197,17 +197,17 @@ public final class ASTHelper {
     }
 
     private static final class VariableDeclarationIdentifierVisitor extends ASTVisitor {
-        private Set<String> variableNames = new HashSet<String>();
-        private ASTNode startNode;
-        private boolean includeInnerScopes;
+        private final Set<String> variableNames = new HashSet<String>();
+        private final ASTNode startNode;
+        private final boolean includeInnerScopes;
+
+        private VariableDeclarationIdentifierVisitor(ASTNode startNode, boolean includeInnerScopes) {
+            this.startNode = startNode;
+            this.includeInnerScopes = includeInnerScopes;
+        }
 
         private Set<String> getVariableNames() {
             return variableNames;
-        }
-
-        private VariableDeclarationIdentifierVisitor(ASTNode node, boolean includeInnerScopes) {
-            startNode = node;
-            this.includeInnerScopes = includeInnerScopes;
         }
 
         @Override
@@ -218,7 +218,7 @@ public final class ASTHelper {
 
         @Override
         public boolean visit(Block node) {
-            return startNode == node || includeInnerScopes ? VISIT_SUBTREE : DO_NOT_VISIT_SUBTREE;
+            return startNode == node || includeInnerScopes;
         }
     }
 
@@ -2229,9 +2229,9 @@ public final class ASTHelper {
      *
      * @return The ids of the declared variables.
      */
-    public static Set<String> getLocalVariables(final ASTNode node, boolean includeInnerScopes) {
-        final VariableDeclarationIdentifierVisitor visitor = new VariableDeclarationIdentifierVisitor(node,
-                includeInnerScopes);
+    public static Set<String> getLocalVariableIdentifiers(final ASTNode node, boolean includeInnerScopes) {
+        final VariableDeclarationIdentifierVisitor visitor =
+            new VariableDeclarationIdentifierVisitor(node, includeInnerScopes);
         node.accept(visitor);
         return visitor.getVariableNames();
     }

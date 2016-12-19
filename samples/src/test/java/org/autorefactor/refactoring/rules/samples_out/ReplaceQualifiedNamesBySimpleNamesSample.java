@@ -40,11 +40,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+@SuppressWarnings("javadoc")
 public class ReplaceQualifiedNamesBySimpleNamesSample {
 
-    private static long classField = 0l;
+    static long classField;
 
-    private Long instanceField = Long.MIN_VALUE;
+    Long instanceField = Long.MIN_VALUE;
 
     static {
         long classField = 0l;
@@ -195,29 +196,26 @@ public class ReplaceQualifiedNamesBySimpleNamesSample {
         ReplaceQualifiedNamesBySimpleNamesSample.classField = classField;
     }
 
-    static String property = null;
+    static String property;
     static void setProperty(String property) {
         ReplaceQualifiedNamesBySimpleNamesSample.property = property;
     }
 
-    public void doNotConflictClassFieldAndOuterClassField(String text) {
-        Outer.outerProperty = text;
-        Outer.NestedOuter.nestedOuterProperty = text;
+    public void doNotConflictClassFieldAndOuterClassField(String property) {
+        Outer.property = property;
+        Outer.NestedOuter.property = property;
     }
-
 }
 
 class Outer {
-
-    static String outerProperty = null;
+    static String property;
 
     void foo() {
         ReplaceQualifiedNamesBySimpleNamesSample.setProperty("hi");
     }
 
     static class NestedOuter {
-
-        static String nestedOuterProperty = "bar";
+        static String property;
 
         void bar() {
             ReplaceQualifiedNamesBySimpleNamesSample.setProperty("hi");
