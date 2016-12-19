@@ -114,6 +114,14 @@ public class AndroidRecycleSample {
             Parcel myparcel = Parcel.obtain();
             myparcel.createBinderArray();
         }
+        
+        // No refactor to do here
+        public boolean testTryWithResources(SQLiteDatabase db) {
+            try (Cursor cursor = db.query("TABLE", new String[] { "KEY_TIMESTAMP" }, null, null, null, null, null,
+                    "1")) {
+                return cursor.moveToFirst();
+            }
+        }
     }
 
     public class ContentProviderClientTest {
