@@ -360,11 +360,64 @@ public class MapEliminateKeySetCallsRefactoring extends AbstractRefactoringRule 
         }
         for (; it.hasNext();) {
             final ITypeBinding typeN = it.next().resolveTypeBinding();
-            if (!type0.equals(typeN)) {
+            if (!areSameTypeBindings(type0, typeN)) {
                 return false;
             }
         }
         return true;
+    }
+
+    private boolean areSameTypeBindings(final ITypeBinding type1, final ITypeBinding type2) {
+        if (type1 == null || type2 == null) {
+            return true;
+        }
+        if (type1.isParameterizedType()) {
+            if (type2.isParameterizedType()) {
+                return areSameParameterizedTypeBindings(type1, type2);
+            } else {
+                return false;
+            }
+        } else {
+            if (type2.isParameterizedType()) {
+                return false;
+            } else {
+                return areSameTypeBindingsByAliasingTypeCaptures(type1, type2);
+            }
+        }
+    }
+
+    /** Special handling because of captures. */
+    private boolean areSameParameterizedTypeBindings(final ITypeBinding type1, final ITypeBinding type2) {
+        return type1.getErasure().equals(type2.getErasure())
+            && areSameTypeBindings(type1.getTypeArguments(), type2.getTypeArguments());
+    }
+
+    private boolean areSameTypeBindings(ITypeBinding[] types1, ITypeBinding[] types2) {
+        if (types1.length != types2.length) {
+            return false;
+        }
+        for (int i = 0; i < types1.length; i++) {
+            if (!areSameTypeBindings(types1[i], types2[i])) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean areSameTypeBindingsByAliasingTypeCaptures(final ITypeBinding type1, final ITypeBinding type2) {
+        if (type1.isCapture()) {
+            if (type2.isCapture()) {
+                return areSameTypeBindings(type1.getWildcard(), type2.getWildcard());
+            } else {
+                return false;
+            }
+        } else {
+            if (type2.isCapture()) {
+                return false;
+            } else {
+                return type1.equals(type2);
+            }
+        }
     }
 
     /**

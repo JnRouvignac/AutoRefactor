@@ -399,12 +399,20 @@ public class ASTBuilder {
             return ast.newArrayType(toType(typeBinding.getElementType(), typeNameDecider));
         } else if (typeBinding.isWildcardType()) {
             final WildcardType type = ast.newWildcardType();
-            type.setBound(toType(typeBinding.getBound(), typeNameDecider), typeBinding.isUpperbound());
+            if (typeBinding.getBound() != null) {
+                type.setBound(toType(typeBinding.getBound(), typeNameDecider), typeBinding.isUpperbound());
+            }
             return type;
         } else if (typeBinding.isTypeVariable()) {
             throw new NotImplementedException(null, " for the type variable binding '" + typeBinding + "'");
         } else if (typeBinding.isCapture()) {
-            throw new NotImplementedException(null, " for the capture type binding '" + typeBinding + "'");
+            if (typeBinding.getTypeBounds().length > 1) {
+                throw new NotImplementedException(null,
+                    "because it violates the javadoc of `ITypeBinding.getTypeBounds()`: "
+                    + "\"Note that per construction, it can only contain one class or array type, "
+                    + "at most, and then it is located in first position.\"");
+            }
+            return toType(typeBinding.getWildcard(), typeNameDecider);
         }
         throw new NotImplementedException(null, " for the type binding '" + typeBinding + "'");
     }
