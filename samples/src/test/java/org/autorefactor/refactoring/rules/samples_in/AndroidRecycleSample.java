@@ -55,6 +55,15 @@ public class AndroidRecycleSample {
                 null, null, null);
         return cursor;
     }
+    
+    public String testResourceUsedInReturn(SQLiteDatabase db) {
+        Cursor cursor = db.query("TABLE_TRIPS",
+                new String[]{ "KEY_TRIP_ID" },
+                "ROUTE_ID" + "=?",
+                new String[]{Long.toString(5)},
+                null, null, null);
+        return cursor.getString(0);
+    }
 
     public void testMultipleAssignment(Uri uri, ContentProvider provider) {
         Cursor query = provider.query(uri, null, null, null, null);

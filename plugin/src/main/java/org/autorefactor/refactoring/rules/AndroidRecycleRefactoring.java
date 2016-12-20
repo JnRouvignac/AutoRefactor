@@ -29,24 +29,26 @@ import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Block;
+import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.MethodInvocation;
+import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.TryStatement;
 import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
+
 import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.eclipse.jdt.core.dom.InfixExpression.Operator.NOT_EQUALS;
 
 import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.Refactorings;
+import org.autorefactor.refactoring.TypeNameDecider;
 
 /*
- * TODO when the last use of resource is as arg of a method invocation,
- * it should be assumed that the given method will take care of the release.
- * TODO Track local variables. E.g., when a TypedArray a is assigned to variable b,
+ * TODO (low prioriity) Track local variables. E.g., when a TypedArray a is assigned to variable b,
  * release() should be called only in one variable.
  * TODO (low priority) check whether resources are being used after release.
  * TODO add support for FragmentTransaction.beginTransaction(). It can use method
@@ -207,20 +209,43 @@ public class AndroidRecycleRefactoring extends AbstractRefactoringRule {
             Block block = getAncestor(node, Block.class);
             block.accept(visitor);
             if (!closePresenceChecker.isClosePresent()) {
+                final ASTBuilder b = this.ctx.getASTBuilder();
+                final Refactorings r = this.ctx.getRefactorings();
                 Statement lastCursorAccess = closePresenceChecker.getLastCursorStatementInBlock(block);
-                if (lastCursorAccess.getNodeType() != ASTNode.RETURN_STATEMENT) {
-                    final ASTBuilder b = this.ctx.getASTBuilder();
-                    final Refactorings r = this.ctx.getRefactorings();
-                    MethodInvocation closeInvocation = b.invoke(b.copy(cursorExpression), recycleMethodName);
-                    Statement stmt = b.if0(
-                            b.infixExpr(b.copy(cursorExpression), NOT_EQUALS, b.null0()),
-                            b.block(b.toStmt(closeInvocation)));
+                if (lastCursorAccess.getNodeType() == ASTNode.RETURN_STATEMENT) {
+                    //Do not refactor if the resource is being returned
+                    ReturnStatement returnStmt = ((ReturnStatement) lastCursorAccess);
+                    Expression returnExpr = returnStmt.getExpression();
+                    ITypeBinding returnType = returnExpr.resolveTypeBinding();
+                    if (returnType == cursorExpression.resolveTypeBinding()) {
+                        return VISIT_SUBTREE;
+                    } else {
+                        TypeNameDecider typeNameDecider = new TypeNameDecider(node);
+                        final String returnLocalVariableName = "returnValueAutoRefactor";
+                        Statement returnLocalVariable = b.toStmt(b.declareExpr(b.toType(returnType, typeNameDecider),
+                                b.simpleName(returnLocalVariableName), b.copy(returnExpr)));
+                        r.insertBefore(returnLocalVariable, returnStmt);
+                        r.replace(returnExpr, b.simpleName(returnLocalVariableName));
+                        lastCursorAccess = returnLocalVariable;
+                        Statement stmt = getCloseResourceStmt(recycleMethodName, cursorExpression, b);
+                        r.insertBefore(stmt, returnStmt);
+                        return DO_NOT_VISIT_SUBTREE;
+                    }
+                } else {
+                    Statement stmt = getCloseResourceStmt(recycleMethodName, cursorExpression, b);
                     r.insertAfter(stmt, lastCursorAccess);
                     return DO_NOT_VISIT_SUBTREE;
                 }
             }
         }
-        return VISIT_SUBTREE; 
+        return VISIT_SUBTREE;
+    }
+
+    private Statement getCloseResourceStmt(String recycleMethodName, SimpleName cursorExpression, final ASTBuilder b) {
+        MethodInvocation closeInvocation = b.invoke(b.copy(cursorExpression), recycleMethodName);
+        Statement stmt = b.if0(b.infixExpr(b.copy(cursorExpression), NOT_EQUALS, b.null0()),
+                b.block(b.toStmt(closeInvocation)));
+        return stmt;
     }
 
     private class ClosePresenceChecker extends ASTVisitor {
