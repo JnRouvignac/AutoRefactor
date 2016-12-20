@@ -32,6 +32,7 @@ import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
+import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.SimpleName;
@@ -206,7 +207,10 @@ public class AndroidRecycleRefactoring extends AbstractRefactoringRule {
             ClosePresenceChecker closePresenceChecker = new ClosePresenceChecker(cursorExpression, recycleMethodName);
             VisitorDecorator visitor = new VisitorDecorator(variableAssignmentNode, cursorExpression,
                     closePresenceChecker);
-            Block block = getAncestor(node, Block.class);
+            // When node is not declaring a new variable, the variable might
+            // have been declared in another block. Solution: use the block of
+            // the method declaration.
+            Block block = getAncestor(node, MethodDeclaration.class).getBody();
             block.accept(visitor);
             if (!closePresenceChecker.isClosePresent()) {
                 final ASTBuilder b = this.ctx.getASTBuilder();

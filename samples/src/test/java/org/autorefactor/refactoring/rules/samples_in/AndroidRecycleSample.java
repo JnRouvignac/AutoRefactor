@@ -1,5 +1,8 @@
 package org.autorefactor.refactoring.rules.samples_in;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.content.ContentProvider;
 import android.content.ContentProviderClient;
 import android.content.ContentResolver;
@@ -130,6 +133,52 @@ public class AndroidRecycleSample {
                     "1")) {
                 return cursor.moveToFirst();
             }
+        }
+    }
+    public static int getCalendars(Context context, boolean onlyWritable) {
+        List<Integer> ids = new ArrayList<>();
+        List<String> names = new ArrayList<>();
+        List<String> displayNames = new ArrayList<>();
+        List<String> accountNames = new ArrayList<>();
+        ContentResolver cr = context.getContentResolver();
+
+        Cursor c = null;
+        try {
+            c = cr.query(Uri.parse("com.example.android"),
+                    new String[]{"CALENDAR_PROJECTION"}, null, null, null);
+            if (c != null) {
+                while (c.moveToNext()) {
+                    int COLUMN_CAL_ACCESS_LEVEL = 0;
+                    if (!onlyWritable || (1 == (c.getInt(COLUMN_CAL_ACCESS_LEVEL)))) {
+                        int COLUMN_CAL_ID = 0;
+                        int id = c.getInt(COLUMN_CAL_ID);
+                        int COLUMN_CAL_NAME = 0;
+                        int COLUMN_CAL_DISPLAY_NAME = 0;
+                        int COLUMN_CAL_ACCOUNT_NAME = 0;
+                        String name = c.getString(COLUMN_CAL_NAME);
+                        String displayName = c.getString(COLUMN_CAL_DISPLAY_NAME);
+                        String accountName = c.getString(COLUMN_CAL_ACCOUNT_NAME);
+
+                        ids.add(id);
+                        names.add(name);
+                        displayNames.add(displayName);
+                        accountNames.add(accountName);
+                    }
+                }
+            }
+        } catch (Exception e) {
+//            Analytics.sendException(context, e, false);
+        } finally {
+            if (c != null) c.close();
+        }
+
+        return 0;
+    }
+
+    private static class R {
+        public static class styleable {
+            public static final int WeekView_scrollDuration = 1;
+            public static final int[] WeekView = {2};
         }
     }
 
