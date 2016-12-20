@@ -29,7 +29,6 @@ import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Block;
-import org.eclipse.jdt.core.dom.ExpressionStatement;
 import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.MethodInvocation;
@@ -39,6 +38,8 @@ import org.eclipse.jdt.core.dom.TryStatement;
 import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import static org.autorefactor.refactoring.ASTHelper.*;
+import static org.eclipse.jdt.core.dom.InfixExpression.Operator.NOT_EQUALS;
+
 import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.Refactorings;
 
@@ -211,13 +212,15 @@ public class AndroidRecycleRefactoring extends AbstractRefactoringRule {
                     final ASTBuilder b = this.ctx.getASTBuilder();
                     final Refactorings r = this.ctx.getRefactorings();
                     MethodInvocation closeInvocation = b.invoke(b.copy(cursorExpression), recycleMethodName);
-                    ExpressionStatement expressionStatement = b.toStmt(closeInvocation);
-                    r.insertAfter(expressionStatement, lastCursorAccess);
+                    Statement stmt = b.if0(
+                            b.infixExpr(b.copy(cursorExpression), NOT_EQUALS, b.null0()),
+                            b.block(b.toStmt(closeInvocation)));
+                    r.insertAfter(stmt, lastCursorAccess);
                     return DO_NOT_VISIT_SUBTREE;
                 }
             }
         }
-        return VISIT_SUBTREE;
+        return VISIT_SUBTREE; 
     }
 
     private class ClosePresenceChecker extends ASTVisitor {
