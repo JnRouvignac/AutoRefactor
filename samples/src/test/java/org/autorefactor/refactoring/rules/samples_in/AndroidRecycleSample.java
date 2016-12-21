@@ -135,6 +135,29 @@ public class AndroidRecycleSample {
             }
         }
     }
+
+    public static String testRecycleBeforeEarlyReturns(Context context, Uri uri) {
+        if ("content".equalsIgnoreCase(uri.getScheme())) {
+            String[] projection = { "_data" };
+            Cursor cursor = null;
+
+            try {
+                cursor = context.getContentResolver().query(uri, projection, null, null, null);
+                int column_index = cursor
+                .getColumnIndexOrThrow("_data");
+                if (cursor.moveToFirst()) {
+                    return cursor.getString(column_index);
+                }
+            } catch (Exception e) {
+                // Eat it
+            }
+        }
+        else if ("file".equalsIgnoreCase(uri.getScheme())) {
+            return uri.getPath();
+        }
+        return null;
+    }
+
     public static int getCalendars(Context context, boolean onlyWritable) {
         List<Integer> ids = new ArrayList<>();
         List<String> names = new ArrayList<>();

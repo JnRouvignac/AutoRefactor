@@ -183,6 +183,7 @@ public class AndroidRecycleRefactoring extends AbstractRefactoringRule {
         if (recycleMethodName != null) {
             SimpleName cursorExpression;
             ASTNode variableAssignmentNode;
+            Block cursorScopeBlock;
             VariableDeclarationFragment variableDeclarationFragment = getAncestorOrNull(node,
                     VariableDeclarationFragment.class);
             if (variableDeclarationFragment != null) {
@@ -198,24 +199,34 @@ public class AndroidRecycleRefactoring extends AbstractRefactoringRule {
                         return VISIT_SUBTREE;
                     }
                 }
+                cursorScopeBlock = getAncestor(node, Block.class);
             } else {
                 Assignment variableAssignment = getAncestor(node, Assignment.class);
                 cursorExpression = (SimpleName) variableAssignment.getLeftHandSide();
                 variableAssignmentNode = variableAssignment;
+
+                // When node is not declaring a new variable, the variable might
+                // have been declared in another block. Solution: find
+                // declaration in the method
+                Block methodDeclarationBody = getAncestor(node, MethodDeclaration.class).getBody();
+                FindVariableDeclarationVisitor findVariableDeclaration = new FindVariableDeclarationVisitor(
+                        cursorExpression);
+                methodDeclarationBody.accept(findVariableDeclaration);
+                cursorScopeBlock = findVariableDeclaration.getScopeBlock();
+                if (cursorScopeBlock == null) {
+                    // bullet proof for hypothetical corner case
+                    cursorScopeBlock = getAncestor(node, Block.class);
+                }
             }
             // Check whether it has been closed
             ClosePresenceChecker closePresenceChecker = new ClosePresenceChecker(cursorExpression, recycleMethodName);
             VisitorDecorator visitor = new VisitorDecorator(variableAssignmentNode, cursorExpression,
                     closePresenceChecker);
-            // When node is not declaring a new variable, the variable might
-            // have been declared in another block. Solution: use the block of
-            // the method declaration.
-            Block block = getAncestor(node, MethodDeclaration.class).getBody();
-            block.accept(visitor);
+            cursorScopeBlock.accept(visitor);
             if (!closePresenceChecker.isClosePresent()) {
                 final ASTBuilder b = this.ctx.getASTBuilder();
                 final Refactorings r = this.ctx.getRefactorings();
-                Statement lastCursorAccess = closePresenceChecker.getLastCursorStatementInBlock(block);
+                Statement lastCursorAccess = closePresenceChecker.getLastCursorStatementInBlock(cursorScopeBlock);
                 if (lastCursorAccess.getNodeType() == ASTNode.RETURN_STATEMENT) {
                     //Do not refactor if the resource is being returned
                     ReturnStatement returnStmt = ((ReturnStatement) lastCursorAccess);
@@ -250,6 +261,33 @@ public class AndroidRecycleRefactoring extends AbstractRefactoringRule {
         Statement stmt = b.if0(b.infixExpr(b.copy(cursorExpression), NOT_EQUALS, b.null0()),
                 b.block(b.toStmt(closeInvocation)));
         return stmt;
+    }
+
+    private class FindVariableDeclarationVisitor extends ASTVisitor {
+
+        private SimpleName variableName;
+        private VariableDeclarationFragment variableDeclaration;
+
+        public FindVariableDeclarationVisitor(SimpleName variableName) {
+            this.variableName = variableName;
+        }
+
+        private Block getScopeBlock() {
+            if (variableDeclaration != null) {
+                return getAncestorOrNull(variableDeclaration, Block.class);
+            }
+            return null;
+        }
+
+        @Override
+        public boolean visit(VariableDeclarationFragment node) {
+            if (node.getName().getIdentifier().equals(variableName.getIdentifier())) { // FIXME
+                                                                                       // getIdentifier
+                variableDeclaration = node;
+                return DO_NOT_VISIT_SUBTREE;
+            }
+            return VISIT_SUBTREE;
+        }
     }
 
     private class ClosePresenceChecker extends ASTVisitor {
