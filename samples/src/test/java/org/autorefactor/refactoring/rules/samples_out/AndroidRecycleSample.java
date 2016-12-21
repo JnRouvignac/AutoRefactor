@@ -198,10 +198,13 @@ public class AndroidRecycleSample {
                 int column_index = cursor
                 .getColumnIndexOrThrow("_data");
                 if (cursor.moveToFirst()) {
-                    return cursor.getString(column_index);
+                    final String returnValueAutoRefactor = cursor.getString(column_index);
+                    if (cursor != null) {
+                        cursor.close();
+                    }
+                    return returnValueAutoRefactor;
                 }
             } catch (Exception e) {
-                // Eat it
             }
             if (cursor != null) {
                 cursor.close();

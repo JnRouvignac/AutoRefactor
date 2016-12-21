@@ -44,6 +44,8 @@ import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.eclipse.jdt.core.dom.InfixExpression.Operator.NOT_EQUALS;
 
+import java.util.ArrayList;
+
 import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.Refactorings;
 import org.autorefactor.refactoring.TypeNameDecider;
@@ -227,26 +229,30 @@ public class AndroidRecycleRefactoring extends AbstractRefactoringRule {
                 final ASTBuilder b = this.ctx.getASTBuilder();
                 final Refactorings r = this.ctx.getRefactorings();
                 Statement lastCursorAccess = closePresenceChecker.getLastCursorStatementInBlock(cursorScopeBlock);
-                if (lastCursorAccess.getNodeType() == ASTNode.RETURN_STATEMENT) {
-                    //Do not refactor if the resource is being returned
-                    ReturnStatement returnStmt = ((ReturnStatement) lastCursorAccess);
+                if (closePresenceChecker.returns.size() > 0) {
+                    closePresenceChecker.returns.size();
+                }
+
+                for (ClosePresenceChecker.ReturnStatementExtra returnInfo : closePresenceChecker.returns) {
+                    ReturnStatement returnStmt = returnInfo.returnStmt;
                     Expression returnExpr = returnStmt.getExpression();
                     ITypeBinding returnType = returnExpr.resolveTypeBinding();
-                    if (returnType == cursorExpression.resolveTypeBinding()) {
-                        return VISIT_SUBTREE;
-                    } else {
-                        TypeNameDecider typeNameDecider = new TypeNameDecider(node);
-                        final String returnLocalVariableName = "returnValueAutoRefactor";
-                        Statement returnLocalVariable = b.toStmt(b.declareExpr(b.toType(returnType, typeNameDecider),
-                                b.simpleName(returnLocalVariableName), b.copy(returnExpr)));
-                        r.insertBefore(returnLocalVariable, returnStmt);
-                        r.replace(returnExpr, b.simpleName(returnLocalVariableName));
-                        lastCursorAccess = returnLocalVariable;
+                    if (returnType != cursorExpression.resolveTypeBinding()) {
+                        if (returnInfo.usesResource) {
+                            TypeNameDecider typeNameDecider = new TypeNameDecider(node);
+                            final String returnLocalVariableName = "returnValueAutoRefactor";
+                            Statement returnLocalVariable = b
+                                    .toStmt(b.declareExpr(b.toType(returnType, typeNameDecider),
+                                            b.simpleName(returnLocalVariableName), b.copy(returnExpr)));
+                            r.insertBefore(returnLocalVariable, returnStmt);
+                            r.replace(returnExpr, b.simpleName(returnLocalVariableName));
+                        }
                         Statement stmt = getCloseResourceStmt(recycleMethodName, cursorExpression, b);
                         r.insertBefore(stmt, returnStmt);
-                        return DO_NOT_VISIT_SUBTREE;
                     }
-                } else {
+                }
+
+                if (lastCursorAccess.getNodeType() != ASTNode.RETURN_STATEMENT) {
                     Statement stmt = getCloseResourceStmt(recycleMethodName, cursorExpression, b);
                     r.insertAfter(stmt, lastCursorAccess);
                     return DO_NOT_VISIT_SUBTREE;
@@ -295,6 +301,17 @@ public class AndroidRecycleRefactoring extends AbstractRefactoringRule {
         private SimpleName lastCursorUse;
         private SimpleName cursorSimpleName;
         private String recycleMethodName;
+        private ArrayList<ReturnStatementExtra> returns = new ArrayList<ReturnStatementExtra>();
+        private ArrayList<ReturnStatementExtra> returnsAfterCloseStatement = new ArrayList<ReturnStatementExtra>();
+
+        public class ReturnStatementExtra {
+            ReturnStatement returnStmt;
+            boolean usesResource;
+
+            ReturnStatementExtra(ReturnStatement returnStmt) {
+                this.returnStmt = returnStmt;
+            }
+        }
 
         /**
          * @param cursorSimpleName Variable name of cursor
@@ -338,6 +355,14 @@ public class AndroidRecycleRefactoring extends AbstractRefactoringRule {
         public boolean visit(SimpleName node) {
             if (isSameLocalVariable(node, cursorSimpleName)) {
                 this.lastCursorUse = node;
+                returns.addAll(returnsAfterCloseStatement);
+                returnsAfterCloseStatement.clear();
+                if (!returns.isEmpty()) {
+                    ReturnStatementExtra lastReturn = returns.get(returns.size() - 1);
+                    if (getAncestorOrNull(node, ReturnStatement.class) == lastReturn.returnStmt) {
+                        lastReturn.usesResource = true;
+                    }
+                }
             }
             return VISIT_SUBTREE;
         }
@@ -347,6 +372,12 @@ public class AndroidRecycleRefactoring extends AbstractRefactoringRule {
             if (isSameLocalVariable(node.getLeftHandSide(), cursorSimpleName)) {
                 return DO_NOT_VISIT_SUBTREE;
             }
+            return VISIT_SUBTREE;
+        }
+
+        @Override
+        public boolean visit(ReturnStatement node) {
+            returnsAfterCloseStatement.add(new ReturnStatementExtra(node));
             return VISIT_SUBTREE;
         }
     }
@@ -398,6 +429,11 @@ public class AndroidRecycleRefactoring extends AbstractRefactoringRule {
 
         @Override
         public boolean visit(MethodInvocation node) {
+            return visitor.visit(node);
+        }
+
+        @Override
+        public boolean visit(ReturnStatement node) {
             return visitor.visit(node);
         }
     }

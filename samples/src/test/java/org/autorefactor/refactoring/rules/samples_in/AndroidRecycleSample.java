@@ -149,7 +149,6 @@ public class AndroidRecycleSample {
                     return cursor.getString(column_index);
                 }
             } catch (Exception e) {
-                // Eat it
             }
         }
         else if ("file".equalsIgnoreCase(uri.getScheme())) {
