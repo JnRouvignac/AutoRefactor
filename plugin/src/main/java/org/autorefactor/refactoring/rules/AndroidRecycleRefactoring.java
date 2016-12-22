@@ -139,18 +139,6 @@ public class AndroidRecycleRefactoring extends AbstractRefactoringRule {
                 "obtain")
         ) {
             return "recycle";
-        } else if (isMethodIgnoringParameters(
-                node,
-                "android.os.Handler",
-                "obtainMessage")
-        ) {
-            return "recycle";
-        } else if (isMethodIgnoringParameters(
-                node,
-                "android.os.Message",
-                "obtain")
-        ) {
-            return "recycle";
         } else if (isMethod(
                 node,
                 "android.view.MotionEvent",

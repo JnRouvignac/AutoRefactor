@@ -95,7 +95,7 @@ public class AndroidRecycleSample {
             VelocityTracker tracker = VelocityTracker.obtain();
         }
 
-        // ---- Check recycling Message ----
+        // ---- Check recycling Message - Ignore ----
 
         public void message() {
             Message message1 = getHandler().obtainMessage();

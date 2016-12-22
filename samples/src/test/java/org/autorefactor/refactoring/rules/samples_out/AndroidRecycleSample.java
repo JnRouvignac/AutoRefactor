@@ -126,17 +126,11 @@ public class AndroidRecycleSample {
             }
         }
 
-        // ---- Check recycling Message ----
+        // ---- Check recycling Message - Ignore ----
 
         public void message() {
             Message message1 = getHandler().obtainMessage();
-            if (message1 != null) {
-                message1.recycle();
-            }
             Message message2 = Message.obtain();
-            if (message2 != null) {
-                message2.recycle();
-            }
         }
 
         // ---- Check recycling MotionEvent ----
