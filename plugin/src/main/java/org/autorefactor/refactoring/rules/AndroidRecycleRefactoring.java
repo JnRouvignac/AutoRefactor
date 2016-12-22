@@ -172,7 +172,8 @@ public class AndroidRecycleRefactoring extends AbstractRefactoringRule {
         String recycleMethodName = methodNameToCleanupResource(node);
         if (recycleMethodName != null) {
             MethodDeclaration methodDeclaration = getAncestor(node, MethodDeclaration.class);
-            if (methodDeclaration.getReturnType2().resolveBinding().equals(node.resolveTypeBinding())) {
+            ITypeBinding resourceType = node.resolveTypeBinding();
+            if (resourceType != null && resourceType.equals(methodDeclaration.getReturnType2().resolveBinding())) {
                 return VISIT_SUBTREE;
             }
             SimpleName cursorExpression;
