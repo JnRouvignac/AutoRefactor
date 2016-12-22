@@ -6,6 +6,7 @@ import java.util.List;
 import android.content.ContentProvider;
 import android.content.ContentProviderClient;
 import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.content.res.TypedArray;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -17,6 +18,7 @@ import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
 import android.content.Context;
+import android.content.UriMatcher;
 import android.os.Parcel;
 
 public class AndroidRecycleSample {
@@ -264,5 +266,44 @@ public class AndroidRecycleSample {
                 client.release();
             }
         }
+    }
+
+    public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder,
+            UriMatcher matcher, SQLiteDatabase db, Context context) {
+        Cursor c;
+        long alarmid;
+        final int ALARMS = 1;
+        final int ALARM_ID = 2;
+        final int SETTINGS_ID = 3;
+
+        switch (matcher.match(uri)) {
+        case ALARMS:
+            c = db.query(AlarmEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
+            c.setNotificationUri(context.getContentResolver(), uri);
+            return c;
+        case ALARM_ID:
+            alarmid = ContentUris.parseId(uri);
+            c = db.query(AlarmEntry.TABLE_NAME, projection, AlarmEntry._ID + " == " + alarmid, null, null, null, null);
+            c.setNotificationUri(context.getContentResolver(), uri);
+            return c;
+        case SETTINGS_ID:
+            alarmid = ContentUris.parseId(uri);
+            c = db.query(SettingsEntry.TABLE_NAME, projection, SettingsEntry.ALARM_ID + " == " + alarmid, null, null,
+                    null, null);
+            c.setNotificationUri(context.getContentResolver(), uri);
+            return c;
+        default:
+            throw new IllegalArgumentException("Unknown URI " + uri);
+        }
+    }
+
+    private static class AlarmEntry {
+        public static final String TABLE_NAME = "alarms";
+        public static final String _ID = "id";
+    }
+
+    private static class SettingsEntry {
+        public static final String TABLE_NAME = "settings";
+        public static final String ALARM_ID = "id";
     }
 }
