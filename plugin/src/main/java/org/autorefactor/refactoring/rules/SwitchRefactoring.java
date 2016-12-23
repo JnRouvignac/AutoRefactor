@@ -39,8 +39,6 @@ import org.autorefactor.refactoring.ASTMatcherSameVariablesAndMethods;
 import org.autorefactor.refactoring.FinderVisitor;
 import org.autorefactor.refactoring.Refactorings;
 import org.autorefactor.util.NotImplementedException;
-import org.eclipse.jdt.core.dom.ASTVisitor;
-import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.BreakStatement;
 import org.eclipse.jdt.core.dom.CharacterLiteral;
 import org.eclipse.jdt.core.dom.ContinueStatement;
@@ -58,7 +56,6 @@ import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.SwitchCase;
 import org.eclipse.jdt.core.dom.SwitchStatement;
 import org.eclipse.jdt.core.dom.ThrowStatement;
-import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.WhileStatement;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
@@ -158,30 +155,6 @@ public class SwitchRefactoring extends AbstractRefactoringRule {
             }
             sb.append("    break; // not needed if previous statement breaks control flow");
             return sb.toString();
-        }
-    }
-
-    private static final class VariableDeclarationIdentifierVisitor extends ASTVisitor {
-        private Set<String> variableNames = new HashSet<String>();
-        private Statement startNode;
-
-        public Set<String> getVariableNames() {
-            return variableNames;
-        }
-
-        public VariableDeclarationIdentifierVisitor(Statement node) {
-            startNode = node;
-        }
-
-        @Override
-        public boolean visit(VariableDeclarationFragment node) {
-            variableNames.add(node.getName().getIdentifier());
-            return VISIT_SUBTREE;
-        }
-
-        @Override
-        public boolean visit(Block node) {
-            return startNode == node ? VISIT_SUBTREE : DO_NOT_VISIT_SUBTREE;
         }
     }
 
@@ -285,10 +258,7 @@ public class SwitchRefactoring extends AbstractRefactoringRule {
     }
 
     private boolean detectDeclarationConflicts(final Statement stmt, final Set<String> variableDeclarationIds) {
-        final VariableDeclarationIdentifierVisitor visitor = new VariableDeclarationIdentifierVisitor(stmt);
-        stmt.accept(visitor);
-
-        final Set<String> varNames = visitor.getVariableNames();
+        final Set<String> varNames = ASTHelper.getLocalVariables(stmt, false);
         final boolean hasConflict = containsAny(variableDeclarationIds, varNames);
         variableDeclarationIds.addAll(varNames);
         return hasConflict;

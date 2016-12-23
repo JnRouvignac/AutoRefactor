@@ -2,6 +2,7 @@
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
  * Copyright (C) 2016 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2016 Fabrice Tiercelin - Handle local variable and outer classes
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,12 +28,15 @@ package org.autorefactor.refactoring.rules;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.TreeMap;
 
 import org.autorefactor.refactoring.ASTBuilder;
+import org.autorefactor.refactoring.ASTHelper;
 import org.autorefactor.util.NotImplementedException;
 import org.autorefactor.util.UnhandledException;
 import org.eclipse.core.runtime.SubMonitor;
@@ -50,11 +54,13 @@ import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.ImportDeclaration;
+import org.eclipse.jdt.core.dom.Initializer;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Name;
 import org.eclipse.jdt.core.dom.PackageDeclaration;
 import org.eclipse.jdt.core.dom.QualifiedName;
+import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.search.SearchEngine;
@@ -145,11 +151,11 @@ public class ReplaceQualifiedNamesBySimpleNamesRefactoring extends AbstractRefac
             return new FQN(fullyQualifiedName, true, onDemand);
         }
 
-        private static FQN fromLocal(QName fullyQualifiedName) {
+        private static FQN fromMember(QName fullyQualifiedName) {
             return new FQN(fullyQualifiedName, false, false /* meaningless */);
         }
 
-        public boolean isLocal() {
+        public boolean isMember() {
             return !fromImport;
         }
 
@@ -168,9 +174,9 @@ public class ReplaceQualifiedNamesBySimpleNamesRefactoring extends AbstractRefac
         @Override
         public String toString() {
             if (this.equals(CANNOT_REPLACE_SIMPLE_NAME)) {
-                return "CANNOT_NOT_REPLACE_SIMPLE_NAME";
+                return "CANNOT_REPLACE_SIMPLE_NAME";
             }
-            return fullyQualifiedName + (fromImport ? " (imported)" : " (local)");
+            return fullyQualifiedName + (fromImport ? " (imported)" : " (member)");
         }
     }
 
@@ -210,7 +216,7 @@ public class ReplaceQualifiedNamesBySimpleNamesRefactoring extends AbstractRefac
 
             default:
                 final ITypeBinding enclosingTypeBinding = resolveEnclosingTypeBinding(node);
-                if (enclosingTypeBinding != null && matches.get(0).isLocal()) {
+                if (enclosingTypeBinding != null && matches.get(0).isMember()) {
                     // all matches are local to this class
                     final ITypeBinding declaringType =
                             getDeclaringTypeInTypeHierarchy(enclosingTypeBinding, simpleName, fqnType, node);
@@ -299,7 +305,7 @@ public class ReplaceQualifiedNamesBySimpleNamesRefactoring extends AbstractRefac
                     // we now have a best match
                     bestMatches.add(fqn);
                 } else if (bestMatches.get(0).fromImport()) {
-                    if (fqn.isLocal()) {
+                    if (fqn.isMember()) {
                         // local FQNs take precedence over imported FQNs
                         bestMatches.clear();
                         bestMatches.add(fqn);
@@ -321,7 +327,7 @@ public class ReplaceQualifiedNamesBySimpleNamesRefactoring extends AbstractRefac
                             return Collections.emptyList();
                         }
                     }
-                } else if (fqn.isLocal()) {
+                } else if (fqn.isMember()) {
                     // group local FQNs together
                     bestMatches.add(fqn);
                 }
@@ -372,8 +378,7 @@ public class ReplaceQualifiedNamesBySimpleNamesRefactoring extends AbstractRefac
         return "Replace qualified names by simple names";
     }
 
-    @Override
-    public boolean visit(final ImportDeclaration node) {
+    private void readImport(final ImportDeclaration node) {
         final QName qname = QName.valueOf(node.getName().getFullyQualifiedName());
         if (node.isStatic()) {
             if (node.isOnDemand()) {
@@ -389,7 +394,6 @@ public class ReplaceQualifiedNamesBySimpleNamesRefactoring extends AbstractRefac
                 types.addName(FQN.fromImport(qname, false));
             }
         }
-        return VISIT_SUBTREE;
     }
 
     private void importStaticTypesAndMembersFromType(ImportDeclaration node) {
@@ -481,17 +485,32 @@ public class ReplaceQualifiedNamesBySimpleNamesRefactoring extends AbstractRefac
     }
 
     @Override
-    public boolean visit(CompilationUnit node) {
-        node.accept(new NamesCollector());
-        importTypesFromPackage("java.lang", node);
+    public boolean visit(TypeDeclaration node) {
+        final ITypeBinding typeBinding = node.resolveBinding();
+        if (!typeBinding.isNested() && node.getParent() instanceof CompilationUnit) {
+            types.clear();
+            methods.clear();
+            fields.clear();
+
+            final CompilationUnit compilationUnit = (CompilationUnit) node.getParent();
+            for (final Object anImport : compilationUnit.imports()) {
+                readImport((ImportDeclaration) anImport);
+            }
+            importTypesFromPackage("java.lang", compilationUnit);
+
+            node.accept(new NamesCollector());
+        }
         return VISIT_SUBTREE;
     }
 
     @Override
-    public void endVisit(CompilationUnit node) {
-        types.clear();
-        methods.clear();
-        fields.clear();
+    public void endVisit(TypeDeclaration node) {
+        final ITypeBinding typeBinding = node.resolveBinding();
+        if (!typeBinding.isNested()) {
+            types.clear();
+            methods.clear();
+            fields.clear();
+        }
     }
 
     private final class NamesCollector extends ASTVisitor {
@@ -508,7 +527,7 @@ public class ReplaceQualifiedNamesBySimpleNamesRefactoring extends AbstractRefac
         private boolean addTypeNames(AbstractTypeDeclaration node) {
             final ITypeBinding typeBinding = node.resolveBinding();
             if (typeBinding != null) {
-                types.addName(FQN.fromLocal(QName.valueOf(typeBinding.getQualifiedName())));
+                types.addName(FQN.fromMember(QName.valueOf(typeBinding.getQualifiedName())));
             } else {
                 // We cannot determine the FQN, so we cannot safely replace it
                 types.cannotReplaceSimpleName(node.getName().getIdentifier());
@@ -522,7 +541,7 @@ public class ReplaceQualifiedNamesBySimpleNamesRefactoring extends AbstractRefac
             final IMethodBinding methodBinding = node.resolveBinding();
             if (methodBinding != null) {
                 final QName qname = QName.valueOf(methodBinding.getDeclaringClass().getQualifiedName(), simpleName);
-                methods.addName(FQN.fromLocal(qname));
+                methods.addName(FQN.fromMember(qname));
             } else {
                 // We cannot determine the FQN, so we cannot safely replace it
                 methods.cannotReplaceSimpleName(simpleName);
@@ -536,7 +555,7 @@ public class ReplaceQualifiedNamesBySimpleNamesRefactoring extends AbstractRefac
                 final String simpleName = vdf.getName().getIdentifier();
                 final IVariableBinding variableBinding = vdf.resolveBinding();
                 if (variableBinding != null) {
-                    fields.addName(FQN.fromLocal(
+                    fields.addName(FQN.fromMember(
                             QName.valueOf(variableBinding.getDeclaringClass().getQualifiedName(), simpleName)));
                 } else {
                     // We cannot determine the FQN, so we cannot safely replace it
@@ -545,22 +564,6 @@ public class ReplaceQualifiedNamesBySimpleNamesRefactoring extends AbstractRefac
             }
             return VISIT_SUBTREE;
         }
-    }
-
-    @Override
-    public boolean visit(QualifiedName node) {
-        final ASTNode ancestor = getFirstAncestorOrNull(node, PackageDeclaration.class, ImportDeclaration.class);
-        final QName qname = getFullyQualifiedNameOrNull(node);
-        if (ancestor != null || qname == null) {
-            return VISIT_SUBTREE;
-        }
-        if (types.canReplaceFqnWithSimpleName(node, qname, FqnType.TYPE)
-                || fields.canReplaceFqnWithSimpleName(node, qname, FqnType.FIELD)) {
-            final ASTBuilder b = ctx.getASTBuilder();
-            ctx.getRefactorings().replace(node, b.copy(node.getName()));
-            return DO_NOT_VISIT_SUBTREE;
-        }
-        return VISIT_SUBTREE;
     }
 
     private QName getFullyQualifiedNameOrNull(QualifiedName node) {
@@ -601,5 +604,84 @@ public class ReplaceQualifiedNamesBySimpleNamesRefactoring extends AbstractRefac
     private boolean hasKind(Name name, int bindingKind) {
         final IBinding binding = name.resolveBinding();
         return binding != null && binding.getKind() == bindingKind;
+    }
+
+    private static final class QualifiedNamesVisitor extends ASTVisitor {
+        private final List<QualifiedName> qualifiedNamesToProcess = new ArrayList<QualifiedName>();
+
+        private List<QualifiedName> getQualifiedNamesToProcess() {
+            return qualifiedNamesToProcess;
+        }
+
+        @Override
+        public boolean visit(QualifiedName node) {
+            qualifiedNamesToProcess.add(node);
+            return VISIT_SUBTREE;
+        }
+    }
+
+    @Override
+    public boolean visit(FieldDeclaration node) {
+        return processNode(node, Collections.<String>emptySet());
+    }
+
+    @Override
+    public boolean visit(Initializer node) {
+        return processNode(node.getBody(), ASTHelper.getLocalVariables(node.getBody(), true));
+    }
+
+    @Override
+    public boolean visit(MethodDeclaration node) {
+        // Method parameters
+        for (final SingleVariableDeclaration parameter : ASTHelper.parameters(node)) {
+            if (processNode(parameter, Collections.<String>emptySet()) == DO_NOT_VISIT_SUBTREE) {
+                return DO_NOT_VISIT_SUBTREE;
+            }
+        }
+
+        // Method return value
+        if (processNode(node.getReturnType2(), Collections.<String>emptySet()) == DO_NOT_VISIT_SUBTREE) {
+            return DO_NOT_VISIT_SUBTREE;
+        }
+
+        // Method body
+        final Set<String> localIdentifiers = new HashSet<String>();
+        for (final SingleVariableDeclaration localParameter : ASTHelper.parameters(node)) {
+            localIdentifiers.add(localParameter.getName().getIdentifier());
+        }
+        localIdentifiers.addAll(getLocalVariables(node.getBody(), true));
+
+        return processNode(node.getBody(), localIdentifiers);
+    }
+
+    private boolean processNode(final ASTNode node, final Set<String> localIdentifiers) {
+        if (node != null) {
+            final QualifiedNamesVisitor visitor = new QualifiedNamesVisitor();
+            node.accept(visitor);
+
+            for (final QualifiedName qualifiedNameToProcess : visitor.getQualifiedNamesToProcess()) {
+                if (maybeReplaceFqnWithSimpleName(qualifiedNameToProcess, localIdentifiers) == DO_NOT_VISIT_SUBTREE) {
+                    return DO_NOT_VISIT_SUBTREE;
+                }
+            }
+        }
+
+        return VISIT_SUBTREE;
+    }
+
+    private boolean maybeReplaceFqnWithSimpleName(final QualifiedName node, final Set<String> localIdentifiers) {
+        final ASTNode ancestor = getFirstAncestorOrNull(node, PackageDeclaration.class, ImportDeclaration.class);
+        final QName qname = getFullyQualifiedNameOrNull(node);
+        if (ancestor != null || qname == null) {
+            return VISIT_SUBTREE;
+        }
+        if (types.canReplaceFqnWithSimpleName(node, qname, FqnType.TYPE)
+                || (fields.canReplaceFqnWithSimpleName(node, qname, FqnType.FIELD)
+                        && !localIdentifiers.contains(qname.simpleName))) {
+            final ASTBuilder b = ctx.getASTBuilder();
+            ctx.getRefactorings().replace(node, b.copy(node.getName()));
+            return DO_NOT_VISIT_SUBTREE;
+        }
+        return VISIT_SUBTREE;
     }
 }
