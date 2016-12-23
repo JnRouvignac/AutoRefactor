@@ -38,6 +38,7 @@ import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.TryStatement;
+import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
@@ -173,7 +174,9 @@ public class AndroidRecycleRefactoring extends AbstractRefactoringRule {
         if (recycleMethodName != null) {
             MethodDeclaration methodDeclaration = getAncestor(node, MethodDeclaration.class);
             ITypeBinding resourceType = node.resolveTypeBinding();
-            if (resourceType != null && resourceType.equals(methodDeclaration.getReturnType2().resolveBinding())) {
+            Type methodReturnType = methodDeclaration.getReturnType2();
+            if (resourceType != null && methodReturnType != null
+                    && resourceType.equals(methodReturnType.resolveBinding())) {
                 return VISIT_SUBTREE;
             }
             SimpleName cursorExpression;

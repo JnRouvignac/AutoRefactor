@@ -10,6 +10,8 @@ import android.content.ContentUris;
 import android.content.res.TypedArray;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Paint;
+import android.graphics.RectF;
 import android.net.Uri;
 import android.os.Message;
 import android.os.RemoteException;
@@ -268,7 +270,7 @@ public class AndroidRecycleSample {
         }
     }
 
-    public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder,
+    public Cursor testCornerCaseWithInfiniteLoop(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder,
             UriMatcher matcher, SQLiteDatabase db, Context context) {
         Cursor c;
         long alarmid;
@@ -305,5 +307,18 @@ public class AndroidRecycleSample {
     private static class SettingsEntry {
         public static final String TABLE_NAME = "settings";
         public static final String ALARM_ID = "id";
+    }
+
+    //test under constructors
+    public AndroidRecycleSample(Context context, AttributeSet attrs) {
+        int[] attrArray = new int[] {android.R.attr.layout_width, android.R.attr.layout_height};
+        TypedArray typedArray = context.obtainStyledAttributes(attrs, attrArray);
+        int width = typedArray.getDimensionPixelSize(0, 0);
+        int height = typedArray.getDimensionPixelSize(1, 0);
+        if (typedArray != null) {
+            typedArray.recycle();
+        }
+        RectF mRectF = new RectF(0, 0, width, height);
+        Paint mPaint = new Paint();
     }
 }
