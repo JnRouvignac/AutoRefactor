@@ -2,6 +2,7 @@
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
  * Copyright (C) 2016 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2016 Fabrice Tiercelin - Handle local variable and outer classes
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -39,7 +40,22 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+@SuppressWarnings("javadoc")
 public class ReplaceQualifiedNamesBySimpleNamesSample {
+
+    static long classField;
+
+    Long instanceField = Long.MIN_VALUE;
+
+    static {
+        long classField = 0l;
+        ReplaceQualifiedNamesBySimpleNamesSample.classField = Long.MAX_VALUE + classField;
+    }
+
+    public ReplaceQualifiedNamesBySimpleNamesSample(Long long1) {
+        Long long2 = Long.valueOf(long1 + 1);
+    }
+
     public List<String> removeQualifiedNameForImportNoWildcard(List<String> l) {
         return l;
     }
@@ -62,6 +78,10 @@ public class ReplaceQualifiedNamesBySimpleNamesSample {
 
     public void doNotRemoveQualifiedNameForGenericStaticMethodImport() {
         acceptListString(Collections.<String> emptyList());
+    }
+
+    public long removeQualifiedNameForParameterType(Long i) {
+        return i;
     }
 
     private void acceptListString(List<String> l) {
@@ -165,6 +185,40 @@ public class ReplaceQualifiedNamesBySimpleNamesSample {
             }
             return b().equals(other.b())
                 && i.equals(other.i);
+        }
+    }
+
+    public void doNotConflictInstanceFieldAndLocalVariable(long instanceField) {
+        this.instanceField = instanceField;
+    }
+
+    public void doNotConflictClassFieldAndLocalVariable(long classField) {
+        ReplaceQualifiedNamesBySimpleNamesSample.classField = classField;
+    }
+
+    static String property;
+    static void setProperty(String property) {
+        ReplaceQualifiedNamesBySimpleNamesSample.property = property;
+    }
+
+    public void doNotConflictClassFieldAndOuterClassField(String property) {
+        Outer.property = property;
+        Outer.NestedOuter.property = property;
+    }
+}
+
+class Outer {
+    static String property;
+
+    void foo() {
+        ReplaceQualifiedNamesBySimpleNamesSample.setProperty("hi");
+    }
+
+    static class NestedOuter {
+        static String property;
+
+        void bar() {
+            ReplaceQualifiedNamesBySimpleNamesSample.setProperty("hi");
         }
     }
 }

@@ -2,6 +2,7 @@
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
  * Copyright (C) 2016 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2016 Fabrice Tiercelin - Handle local variable and outer classes
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,12 +28,15 @@ package org.autorefactor.refactoring.rules;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.TreeMap;
 
 import org.autorefactor.refactoring.ASTBuilder;
+import org.autorefactor.refactoring.CollectorVisitor;
 import org.autorefactor.util.NotImplementedException;
 import org.autorefactor.util.UnhandledException;
 import org.eclipse.core.runtime.SubMonitor;
@@ -50,11 +54,13 @@ import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.ImportDeclaration;
+import org.eclipse.jdt.core.dom.Initializer;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Name;
 import org.eclipse.jdt.core.dom.PackageDeclaration;
 import org.eclipse.jdt.core.dom.QualifiedName;
+import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.search.SearchEngine;
@@ -72,7 +78,6 @@ import static org.eclipse.jdt.core.search.SearchEngine.*;
 import static org.eclipse.jdt.core.search.SearchPattern.*;
 
 /** See {@link #getDescription()} method. */
-@SuppressWarnings("javadoc")
 public class ReplaceQualifiedNamesBySimpleNamesRefactoring extends AbstractRefactoringRule {
     private static final class QName {
         private QName qualifier;
@@ -145,11 +150,11 @@ public class ReplaceQualifiedNamesBySimpleNamesRefactoring extends AbstractRefac
             return new FQN(fullyQualifiedName, true, onDemand);
         }
 
-        private static FQN fromLocal(QName fullyQualifiedName) {
+        private static FQN fromMember(QName fullyQualifiedName) {
             return new FQN(fullyQualifiedName, false, false /* meaningless */);
         }
 
-        public boolean isLocal() {
+        public boolean isMember() {
             return !fromImport;
         }
 
@@ -168,12 +173,13 @@ public class ReplaceQualifiedNamesBySimpleNamesRefactoring extends AbstractRefac
         @Override
         public String toString() {
             if (this.equals(CANNOT_REPLACE_SIMPLE_NAME)) {
-                return "CANNOT_NOT_REPLACE_SIMPLE_NAME";
+                return "CANNOT_REPLACE_SIMPLE_NAME";
             }
-            return fullyQualifiedName + (fromImport ? " (imported)" : " (local)");
+            return fullyQualifiedName + (fromImport ? " (imported)" : " (member)");
         }
     }
 
+    /** Maps simple names to their fully qualified names. */
     private static final class Names {
         /**
          * Simple names for java elements in use in this compilation unit.
@@ -210,7 +216,7 @@ public class ReplaceQualifiedNamesBySimpleNamesRefactoring extends AbstractRefac
 
             default:
                 final ITypeBinding enclosingTypeBinding = resolveEnclosingTypeBinding(node);
-                if (enclosingTypeBinding != null && matches.get(0).isLocal()) {
+                if (enclosingTypeBinding != null && matches.get(0).isMember()) {
                     // all matches are local to this class
                     final ITypeBinding declaringType =
                             getDeclaringTypeInTypeHierarchy(enclosingTypeBinding, simpleName, fqnType, node);
@@ -299,7 +305,7 @@ public class ReplaceQualifiedNamesBySimpleNamesRefactoring extends AbstractRefac
                     // we now have a best match
                     bestMatches.add(fqn);
                 } else if (bestMatches.get(0).fromImport()) {
-                    if (fqn.isLocal()) {
+                    if (fqn.isMember()) {
                         // local FQNs take precedence over imported FQNs
                         bestMatches.clear();
                         bestMatches.add(fqn);
@@ -321,7 +327,7 @@ public class ReplaceQualifiedNamesBySimpleNamesRefactoring extends AbstractRefac
                             return Collections.emptyList();
                         }
                     }
-                } else if (fqn.isLocal()) {
+                } else if (fqn.isMember()) {
                     // group local FQNs together
                     bestMatches.add(fqn);
                 }
@@ -360,6 +366,12 @@ public class ReplaceQualifiedNamesBySimpleNamesRefactoring extends AbstractRefac
     private final Names methods = new Names();
     private final Names fields = new Names();
 
+    private void resetAllNames() {
+        types.clear();
+        methods.clear();
+        fields.clear();
+    }
+
     @Override
     public String getDescription() {
         return "Refactors types, method invocations and field accesses"
@@ -372,8 +384,7 @@ public class ReplaceQualifiedNamesBySimpleNamesRefactoring extends AbstractRefac
         return "Replace qualified names by simple names";
     }
 
-    @Override
-    public boolean visit(final ImportDeclaration node) {
+    private void readImport(final ImportDeclaration node) {
         final QName qname = QName.valueOf(node.getName().getFullyQualifiedName());
         if (node.isStatic()) {
             if (node.isOnDemand()) {
@@ -389,7 +400,6 @@ public class ReplaceQualifiedNamesBySimpleNamesRefactoring extends AbstractRefac
                 types.addName(FQN.fromImport(qname, false));
             }
         }
-        return VISIT_SUBTREE;
     }
 
     private void importStaticTypesAndMembersFromType(ImportDeclaration node) {
@@ -481,17 +491,26 @@ public class ReplaceQualifiedNamesBySimpleNamesRefactoring extends AbstractRefac
     }
 
     @Override
-    public boolean visit(CompilationUnit node) {
-        node.accept(new NamesCollector());
-        importTypesFromPackage("java.lang", node);
+    public boolean visit(TypeDeclaration node) {
+        final ITypeBinding typeBinding = node.resolveBinding();
+        if (typeBinding != null && !typeBinding.isNested() && node.getParent() instanceof CompilationUnit) {
+            final CompilationUnit compilationUnit = (CompilationUnit) node.getParent();
+            for (final ImportDeclaration importDecl : imports(compilationUnit)) {
+                readImport(importDecl);
+            }
+            importTypesFromPackage("java.lang", compilationUnit);
+
+            node.accept(new NamesCollector());
+        }
         return VISIT_SUBTREE;
     }
 
     @Override
-    public void endVisit(CompilationUnit node) {
-        types.clear();
-        methods.clear();
-        fields.clear();
+    public void endVisit(TypeDeclaration node) {
+        final ITypeBinding typeBinding = node.resolveBinding();
+        if (typeBinding != null && !typeBinding.isNested()) {
+            resetAllNames();
+        }
     }
 
     private final class NamesCollector extends ASTVisitor {
@@ -508,7 +527,7 @@ public class ReplaceQualifiedNamesBySimpleNamesRefactoring extends AbstractRefac
         private boolean addTypeNames(AbstractTypeDeclaration node) {
             final ITypeBinding typeBinding = node.resolveBinding();
             if (typeBinding != null) {
-                types.addName(FQN.fromLocal(QName.valueOf(typeBinding.getQualifiedName())));
+                types.addName(FQN.fromMember(QName.valueOf(typeBinding.getQualifiedName())));
             } else {
                 // We cannot determine the FQN, so we cannot safely replace it
                 types.cannotReplaceSimpleName(node.getName().getIdentifier());
@@ -522,7 +541,7 @@ public class ReplaceQualifiedNamesBySimpleNamesRefactoring extends AbstractRefac
             final IMethodBinding methodBinding = node.resolveBinding();
             if (methodBinding != null) {
                 final QName qname = QName.valueOf(methodBinding.getDeclaringClass().getQualifiedName(), simpleName);
-                methods.addName(FQN.fromLocal(qname));
+                methods.addName(FQN.fromMember(qname));
             } else {
                 // We cannot determine the FQN, so we cannot safely replace it
                 methods.cannotReplaceSimpleName(simpleName);
@@ -536,7 +555,7 @@ public class ReplaceQualifiedNamesBySimpleNamesRefactoring extends AbstractRefac
                 final String simpleName = vdf.getName().getIdentifier();
                 final IVariableBinding variableBinding = vdf.resolveBinding();
                 if (variableBinding != null) {
-                    fields.addName(FQN.fromLocal(
+                    fields.addName(FQN.fromMember(
                             QName.valueOf(variableBinding.getDeclaringClass().getQualifiedName(), simpleName)));
                 } else {
                     // We cannot determine the FQN, so we cannot safely replace it
@@ -545,22 +564,6 @@ public class ReplaceQualifiedNamesBySimpleNamesRefactoring extends AbstractRefac
             }
             return VISIT_SUBTREE;
         }
-    }
-
-    @Override
-    public boolean visit(QualifiedName node) {
-        final ASTNode ancestor = getFirstAncestorOrNull(node, PackageDeclaration.class, ImportDeclaration.class);
-        final QName qname = getFullyQualifiedNameOrNull(node);
-        if (ancestor != null || qname == null) {
-            return VISIT_SUBTREE;
-        }
-        if (types.canReplaceFqnWithSimpleName(node, qname, FqnType.TYPE)
-                || fields.canReplaceFqnWithSimpleName(node, qname, FqnType.FIELD)) {
-            final ASTBuilder b = ctx.getASTBuilder();
-            ctx.getRefactorings().replace(node, b.copy(node.getName()));
-            return DO_NOT_VISIT_SUBTREE;
-        }
-        return VISIT_SUBTREE;
     }
 
     private QName getFullyQualifiedNameOrNull(QualifiedName node) {
@@ -601,5 +604,81 @@ public class ReplaceQualifiedNamesBySimpleNamesRefactoring extends AbstractRefac
     private boolean hasKind(Name name, int bindingKind) {
         final IBinding binding = name.resolveBinding();
         return binding != null && binding.getKind() == bindingKind;
+    }
+
+    @Override
+    public boolean visit(FieldDeclaration node) {
+        return maybeReplaceFqnsWithSimpleNames(node);
+    }
+
+    @Override
+    public boolean visit(Initializer node) {
+        final Set<String> localVars = getLocalVariableIdentifiers(node.getBody(), true);
+        return maybeReplaceFqnsWithSimpleNames(node.getBody(), localVars);
+    }
+
+    @Override
+    public boolean visit(MethodDeclaration node) {
+        // Method parameters
+        for (final SingleVariableDeclaration parameter : parameters(node)) {
+            if (maybeReplaceFqnsWithSimpleNames(parameter) == DO_NOT_VISIT_SUBTREE) {
+                return DO_NOT_VISIT_SUBTREE;
+            }
+        }
+
+        // Method return value
+        if (maybeReplaceFqnsWithSimpleNames(node.getReturnType2()) == DO_NOT_VISIT_SUBTREE) {
+            return DO_NOT_VISIT_SUBTREE;
+        }
+
+        // Method body
+        final Set<String> localIdentifiers = new HashSet<String>();
+        for (final SingleVariableDeclaration localParameter : parameters(node)) {
+            localIdentifiers.add(localParameter.getName().getIdentifier());
+        }
+        localIdentifiers.addAll(getLocalVariableIdentifiers(node.getBody(), true));
+
+        return maybeReplaceFqnsWithSimpleNames(node.getBody(), localIdentifiers);
+    }
+
+    private boolean maybeReplaceFqnsWithSimpleNames(final ASTNode node) {
+        return maybeReplaceFqnsWithSimpleNames(node, Collections.<String>emptySet());
+    }
+
+    private boolean maybeReplaceFqnsWithSimpleNames(final ASTNode node, final Set<String> localIdentifiers) {
+        if (node != null) {
+            final Iterable<QualifiedName> qualifiedNames = new QualifiedNamesCollector().collect(node);
+            for (final QualifiedName qualifiedName : qualifiedNames) {
+                if (maybeReplaceFqnWithSimpleName(qualifiedName, localIdentifiers) == DO_NOT_VISIT_SUBTREE) {
+                    return DO_NOT_VISIT_SUBTREE;
+                }
+            }
+        }
+
+        return VISIT_SUBTREE;
+    }
+
+    private static final class QualifiedNamesCollector extends CollectorVisitor<QualifiedName> {
+        @Override
+        public boolean visit(QualifiedName node) {
+            addResult(node);
+            return VISIT_SUBTREE;
+        }
+    }
+
+    private boolean maybeReplaceFqnWithSimpleName(final QualifiedName node, final Set<String> localIdentifiers) {
+        final ASTNode ancestor = getFirstAncestorOrNull(node, PackageDeclaration.class, ImportDeclaration.class);
+        final QName qname = getFullyQualifiedNameOrNull(node);
+        if (ancestor != null || qname == null) {
+            return VISIT_SUBTREE;
+        }
+        if (types.canReplaceFqnWithSimpleName(node, qname, FqnType.TYPE)
+                || (fields.canReplaceFqnWithSimpleName(node, qname, FqnType.FIELD)
+                        && !localIdentifiers.contains(qname.simpleName))) {
+            final ASTBuilder b = ctx.getASTBuilder();
+            ctx.getRefactorings().replace(node, b.copy(node.getName()));
+            return DO_NOT_VISIT_SUBTREE;
+        }
+        return VISIT_SUBTREE;
     }
 }

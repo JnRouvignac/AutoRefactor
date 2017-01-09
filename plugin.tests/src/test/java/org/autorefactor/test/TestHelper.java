@@ -38,7 +38,6 @@ import java.util.concurrent.Callable;
 import org.autorefactor.AutoRefactorPlugin;
 import org.autorefactor.refactoring.JavaProjectOptions;
 import org.autorefactor.refactoring.Release;
-import org.autorefactor.refactoring.rules.AllRefactoringRulesTest;
 import org.autorefactor.refactoring.rules.EndsWithFileFilter;
 import org.autorefactor.ui.JavaProjectOptionsImpl;
 

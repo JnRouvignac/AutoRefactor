@@ -57,6 +57,16 @@
       <version>4.1.1.4</version>
       <scope>provided</scope>
     </dependency>
+    <!--
+     ! Dependency of android jar.
+     ! Added here because the tests only read the pom.xml, not transitive dependency.
+     ! Maybe time to look into using m2e?
+    -->
+    <dependency>
+      <groupId>xpp3</groupId>
+      <artifactId>xpp3</artifactId>
+      <version>1.1.4c</version>
+    </dependency>
   </dependencies>
 
   <build>

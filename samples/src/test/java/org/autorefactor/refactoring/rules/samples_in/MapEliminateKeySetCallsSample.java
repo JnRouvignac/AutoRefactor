@@ -35,6 +35,7 @@ public class MapEliminateKeySetCallsSample {
     }
 
     private Map<String, Long> mapField;
+    private Map<String, Map<?, ?>> mapFieldWithWildcards;
     private long entry;
 
     public int replaceUnnecesaryCallsToMapKeySet(Map<String, String> map) {
@@ -67,6 +68,31 @@ public class MapEliminateKeySetCallsSample {
             System.out.println("hello " + map.get("name"));
             if (!map.get(key).isEmpty()) {
                 System.out.println("the value of "+ key + " is " + map.get(key));
+            }
+        }
+    }
+
+    public void refactorValueTypeUsesGenericsWithCapture(Map<String, Map<?, ? extends Integer>> map) {
+        for (String key : map.keySet()) {
+            System.out.println("hello " + map.get("name"));
+            System.out.println("the value of "+ key + " is " + map.get(key));
+        }
+    }
+
+    public void refactorValueTypeUsesGenericsWithCaptures(Map<String, Map<?, ? extends Integer>> map) {
+        for (String key : map.keySet()) {
+            System.out.println("hello " + map.get("name"));
+            if (!map.get(key).isEmpty()) {
+                System.out.println("the value of "+ key + " is " + map.get(key));
+            }
+        }
+    }
+
+    public void refactorValueTypeUsesGenericsWithWildcards() {
+        for (String key : mapFieldWithWildcards.keySet()) {
+            System.out.println("hello " + mapFieldWithWildcards.get("name"));
+            if (!mapFieldWithWildcards.get(key).isEmpty()) {
+                System.out.println("the value of "+ key + " is " + mapFieldWithWildcards.get(key));
             }
         }
     }

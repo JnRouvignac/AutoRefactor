@@ -50,6 +50,8 @@ import org.eclipse.jdt.core.dom.CatchClause;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ExpressionStatement;
+import org.eclipse.jdt.core.dom.FieldAccess;
+import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.IExtendedModifier;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IfStatement;
@@ -59,6 +61,7 @@ import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Modifier;
 import org.eclipse.jdt.core.dom.Name;
+import org.eclipse.jdt.core.dom.NullLiteral;
 import org.eclipse.jdt.core.dom.NumberLiteral;
 import org.eclipse.jdt.core.dom.ParameterizedType;
 import org.eclipse.jdt.core.dom.ParenthesizedExpression;
@@ -396,12 +399,20 @@ public class ASTBuilder {
             return ast.newArrayType(toType(typeBinding.getElementType(), typeNameDecider));
         } else if (typeBinding.isWildcardType()) {
             final WildcardType type = ast.newWildcardType();
-            type.setBound(toType(typeBinding.getBound(), typeNameDecider), typeBinding.isUpperbound());
+            if (typeBinding.getBound() != null) {
+                type.setBound(toType(typeBinding.getBound(), typeNameDecider), typeBinding.isUpperbound());
+            }
             return type;
         } else if (typeBinding.isTypeVariable()) {
             throw new NotImplementedException(null, " for the type variable binding '" + typeBinding + "'");
         } else if (typeBinding.isCapture()) {
-            throw new NotImplementedException(null, " for the capture type binding '" + typeBinding + "'");
+            if (typeBinding.getTypeBounds().length > 1) {
+                throw new NotImplementedException(null,
+                    "because it violates the javadoc of `ITypeBinding.getTypeBounds()`: "
+                    + "\"Note that per construction, it can only contain one class or array type, "
+                    + "at most, and then it is located in first position.\"");
+            }
+            return toType(typeBinding.getWildcard(), typeNameDecider);
         }
         throw new NotImplementedException(null, " for the type binding '" + typeBinding + "'");
     }
@@ -561,6 +572,34 @@ public class ASTBuilder {
     }
 
     /**
+     * Builds a new {@link FieldDeclaration} instance.
+     *
+     * @param type
+     *            the declared variable type
+     * @param fragment
+     *            the variable declaration fragment
+     * @return a new field declaration
+     */
+    public FieldDeclaration declareField(Type type, VariableDeclarationFragment fragment) {
+        final FieldDeclaration fd = ast.newFieldDeclaration(fragment);
+        fd.setType(type);
+        return fd;
+    }
+
+    /**
+     * Builds a new {@link VariableDeclarationFragment} instance.
+     *
+     * @param varName
+     *            the declared variable name
+     * @return a new variable declaration fragment
+     */
+    public VariableDeclarationFragment declareFragment(SimpleName varName) {
+        final VariableDeclarationFragment vdf = ast.newVariableDeclarationFragment();
+        vdf.setName(varName);
+        return vdf;
+    }
+
+    /**
      * Builds a new {@link VariableDeclarationFragment} instance.
      *
      * @param varName
@@ -586,7 +625,28 @@ public class ASTBuilder {
         return Arrays.asList(modifiers);
     }
 
-    private Modifier final0() {
+    /**
+     * Builds a new {@link FieldAccess} instance.
+     *
+     * @param expr
+     *            the expression on which the field is accessed
+     * @param fieldName
+     *            the field name being accessed
+     * @return a new single field access
+     */
+    public FieldAccess fieldAccess(Expression expr, SimpleName fieldName) {
+        final FieldAccess fa = getAST().newFieldAccess();
+        fa.setExpression(expr);
+        fa.setName(fieldName);
+        return fa;
+    }
+
+    /**
+     * Builds a new {@link Modifier} with keyword {@code final}.
+     *
+     * @return a {@code final} modifier
+     */
+    public Modifier final0() {
         return ast.newModifier(FINAL_KEYWORD);
     }
 
@@ -1070,12 +1130,39 @@ public class ASTBuilder {
     }
 
     /**
-     * Builds a new {@link Modifier} with keyword protected.
+     * Builds a new {@link Modifier} with keyword {@code public}.
      *
-     * @return a protected modifier
+     * @return a {@code public} modifier
+     */
+    public Modifier public0() {
+        return ast.newModifier(PUBLIC_KEYWORD);
+    }
+
+    /**
+     * Builds a new {@link Modifier} with keyword {@code private}.
+     *
+     * @return a {@code private} modifier
+     */
+    public Modifier private0() {
+        return ast.newModifier(PRIVATE_KEYWORD);
+    }
+
+    /**
+     * Builds a new {@link Modifier} with keyword {@code protected}.
+     *
+     * @return a {@code protected} modifier
      */
     public Modifier protected0() {
-        return getAST().newModifier(PROTECTED_KEYWORD);
+        return ast.newModifier(PROTECTED_KEYWORD);
+    }
+
+    /**
+     * Builds a new {@link Modifier} with keyword {@code static}.
+     *
+     * @return a {@code static} modifier
+     */
+    public Modifier static0() {
+        return ast.newModifier(STATIC_KEYWORD);
     }
 
     /**
@@ -1085,7 +1172,7 @@ public class ASTBuilder {
      * @return expression with a method invocation
      */
     public Expression superInvoke(String methodName) {
-        SuperMethodInvocation smi = getAST().newSuperMethodInvocation();
+        SuperMethodInvocation smi = ast.newSuperMethodInvocation();
         smi.setName(simpleName(methodName));
         return smi;
     }
@@ -1101,11 +1188,20 @@ public class ASTBuilder {
      */
     public MethodDeclaration method(List<IExtendedModifier> modifiers, String methodName,
             List<SingleVariableDeclaration> parameters, Block block) {
-        final MethodDeclaration md = getAST().newMethodDeclaration();
+        final MethodDeclaration md = ast.newMethodDeclaration();
         modifiers(md).addAll(modifiers);
         md.setName(simpleName(methodName));
         md.parameters().addAll(parameters);
         md.setBody(block);
         return md;
+    }
+
+    /**
+     * Builds a new {@link NullLiteral}.
+     *
+     * @return a {@code null} literal
+     */
+    public NullLiteral null0() {
+        return ast.newNullLiteral();
     }
 }

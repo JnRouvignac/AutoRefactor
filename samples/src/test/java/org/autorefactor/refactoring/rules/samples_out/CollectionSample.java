@@ -194,7 +194,7 @@ public class CollectionSample {
         System.out.println(false);
     }
 
-    public void replaceCheckOnSetContainsBeforeAdd(Set<String> col, String s) {
+    public void replaceCheckOnSetNotContainsBeforeAdd(Set<String> col, String s) {
         if (col.add(s)) {
             System.out.println("OK");
         } else {
@@ -202,7 +202,7 @@ public class CollectionSample {
         }
     }
 
-    public void replaceCheckOnSetContainsBeforeAdd2(Set<String> col, String s) {
+    public void replaceCheckOnSetContainsBeforeAdd(Set<String> col, String s) {
         if (!col.add(s)) {
             System.out.println("KO");
         } else {
@@ -210,9 +210,45 @@ public class CollectionSample {
         }
     }
 
+    public void replaceCheckOnSetContainsOneAddStatement(Set<String> col, String s) {
+        col.add(s);
+    }
+
+    public void replaceCheckOnSetNotContainsOneAddStatement(Set<String> col, String s) {
+        col.add(s);
+    }
+
+    public void replaceCheckOnSetContainsBeforeRemove(Set<String> col, String s) {
+        if (!col.remove(s)) {
+            System.out.println("KO");
+        } else {
+            System.out.println("OK");
+        }
+    }
+
+    public void replaceCheckOnSetNotContainsBeforeRemove(Set<String> col, String s) {
+        if (col.remove(s)) {
+            System.out.println("OK");
+        } else {
+            System.out.println("KO");
+        }
+    }
+
+    public void replaceCheckOnSetContainsOneRemoveStatement(Set<String> col, String s) {
+        col.remove(s);
+    }
+
+    public void replaceCheckOnSetNotContainsOneRemoveStatement(Set<String> col, String s) {
+        col.remove(s);
+    }
+
     public void doNotReplaceWhenCheckedValueIsDifferent(Set<String> col) {
         if (!col.contains("this")) {
             col.add("that");
+            System.out.println("OK");
+        }
+        if (col.contains("this")) {
+            col.remove("that");
             System.out.println("OK");
         }
     }
@@ -220,6 +256,10 @@ public class CollectionSample {
     public void doNotReplaceWhenCollectionsAreDifferent(Set<String> col1, Set<String> col2) {
         if (!col1.contains("that")) {
             col2.add("that");
+            System.out.println("OK");
+        }
+        if (col1.contains("that")) {
+            col2.remove("that");
             System.out.println("OK");
         }
     }
@@ -230,6 +270,12 @@ public class CollectionSample {
             System.out.println("OK");
         } else {
             System.out.println("KO");
+        }
+        if (!col.contains(s)) {
+            System.out.println("KO");
+        } else {
+            col.remove(s);
+            System.out.println("OK");
         }
     }
 

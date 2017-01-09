@@ -87,11 +87,11 @@ public class CommonIfInIfElseRefactoring extends AbstractRefactoringRule {
                 && match(new ASTMatcher(), thenInnerIfStmt.getExpression(), elseInnerIfStmt.getExpression())) {
             final ASTBuilder b = this.ctx.getASTBuilder();
             this.ctx.getRefactorings().replace(node,
-                    b.if0(b.copy(thenInnerIfStmt.getExpression()),
+                    b.if0(b.move(thenInnerIfStmt.getExpression()),
                             b.block(
-                                    b.if0(b.copy(node.getExpression()),
-                                            b.copy(thenInnerIfStmt.getThenStatement()),
-                                            b.copy(elseInnerIfStmt.getThenStatement())))));
+                                    b.if0(b.move(node.getExpression()),
+                                            b.move(thenInnerIfStmt.getThenStatement()),
+                                            b.move(elseInnerIfStmt.getThenStatement())))));
             return DO_NOT_VISIT_SUBTREE;
         }
         return VISIT_SUBTREE;

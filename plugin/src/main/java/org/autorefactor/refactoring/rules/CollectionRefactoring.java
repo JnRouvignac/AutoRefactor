@@ -51,11 +51,13 @@ import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
-import static org.autorefactor.refactoring.ASTBuilder.Copy.*;
+
 import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.autorefactor.refactoring.ForLoopHelper.*;
+import static org.autorefactor.util.Utils.*;
 import static org.eclipse.jdt.core.dom.InfixExpression.Operator.*;
 import static org.eclipse.jdt.core.dom.PrefixExpression.Operator.*;
+
 /** See {@link #getDescription()} method. */
 public class CollectionRefactoring extends AbstractRefactoringRule {
     @Override
@@ -69,7 +71,10 @@ public class CollectionRefactoring extends AbstractRefactoringRule {
             + "- replaces creating a new Collection, then invoking Collection.addAll() on it,"
             + " by creating the new Collection with the other Collection as parameter,\n"
             + "- replaces some checks on Collection.size() with checks on Collection.isEmpty(),\n"
-            + "- replaces calls to Set.contains() immediately followed by Set.add() with straight calls to Set.add().";
+            + "- replaces calls to Set.contains() immediately followed by Set.add()"
+            + " with straight calls to Set.add(),\n"
+            + "- replaces calls to Set.contains() immediately followed by Set.remove()"
+            + " with straight calls to Set.remove().";
     }
 
     @Override
@@ -394,43 +399,51 @@ public class CollectionRefactoring extends AbstractRefactoringRule {
 
     @Override
     public boolean visit(IfStatement node) {
+        final Statement elseStmt = node.getElseStatement();
+        final Statement thenStmt = node.getThenStatement();
         final PrefixExpression pe = as(node.getExpression(), PrefixExpression.class);
         if (hasOperator(pe, NOT)) {
-            final MethodInvocation miContains = as(pe.getOperand(), MethodInvocation.class);
-            return maybeReplaceSetContains(miContains, node.getThenStatement(), pe, false);
+            return maybeReplaceSetContains(node, pe.getOperand(), thenStmt, elseStmt, false);
         } else {
-            final MethodInvocation miContains = as(node.getExpression(), MethodInvocation.class);
-            return maybeReplaceSetContains(miContains, node.getElseStatement(), miContains, true);
+            return maybeReplaceSetContains(node, node.getExpression(), elseStmt, thenStmt, true);
         }
     }
 
-    private boolean maybeReplaceSetContains(
-            MethodInvocation miContains, Statement stmt, Expression toReplace, boolean negate) {
-        if (isMethod(miContains, "java.util.Set", "contains", "java.lang.Object")) {
-            Statement firstStmt = getAsList(stmt, 0);
-            MethodInvocation miAdd = asExpression(firstStmt, MethodInvocation.class);
+    private boolean maybeReplaceSetContains(final IfStatement ifStmtToReplace,
+            final Expression ifExpr, final Statement stmt, final Statement oppositeStmt, final boolean negate) {
+        return maybeReplaceSetContains(ifStmtToReplace, ifExpr, stmt, oppositeStmt, negate, "add")
+                && maybeReplaceSetContains(ifStmtToReplace, ifExpr, oppositeStmt, stmt, !negate, "remove");
+    }
+
+    private boolean maybeReplaceSetContains(final IfStatement ifStmtToReplace,
+            final Expression ifExpr, final Statement stmt, final Statement oppositeStmt,
+            final boolean negate, final String methodName) {
+        final List<Statement> stmts = asList(stmt);
+        final MethodInvocation miContains = as(ifExpr, MethodInvocation.class);
+        if (!stmts.isEmpty()
+                && isMethod(miContains, "java.util.Set", "contains", "java.lang.Object")) {
+            final Statement firstStmt = getFirst(stmts);
+            final MethodInvocation miAddOrRemove = asExpression(firstStmt, MethodInvocation.class);
             final ASTMatcher astMatcher = new ASTMatcher();
-            if (isMethod(miAdd, "java.util.Set", "add", "java.lang.Object")
-                    && match(astMatcher, miContains.getExpression(), miAdd.getExpression())
-                    && match(astMatcher, arg0(miContains), arg0(miAdd))) {
-                ASTBuilder b = this.ctx.getASTBuilder();
-                Refactorings r = this.ctx.getRefactorings();
-                r.replace(toReplace, negate ? b.negate(miAdd, COPY.MOVE) : b.move(miAdd));
-                r.remove(firstStmt);
-                return DO_NOT_VISIT_SUBTREE;
+            if (isMethod(miAddOrRemove, "java.util.Set", methodName, "java.lang.Object")
+                    && match(astMatcher, miContains.getExpression(), miAddOrRemove.getExpression())
+                    && match(astMatcher, arg0(miContains), arg0(miAddOrRemove))) {
+                final ASTBuilder b = this.ctx.getASTBuilder();
+                final Refactorings r = this.ctx.getRefactorings();
+
+                if (stmts.size() == 1 && asList(oppositeStmt).isEmpty()) {
+                    // Only one statement: replace if statement with col.add() (or col.remove())
+                    r.replace(ifStmtToReplace, b.move(firstStmt));
+                    return DO_NOT_VISIT_SUBTREE;
+                } else {
+                    // There are other statements, replace the if condition with col.add() (or col.remove())
+                    r.replace(ifStmtToReplace.getExpression(),
+                            negate ? b.negate(miAddOrRemove, ASTBuilder.Copy.MOVE) : b.move(miAddOrRemove));
+                    r.remove(firstStmt);
+                    return DO_NOT_VISIT_SUBTREE;
+                }
             }
         }
         return VISIT_SUBTREE;
-    }
-
-    private Statement getAsList(Statement stmt, int index) {
-        if (index < 0) {
-            throw new IllegalArgumentException("A list index cannot be negative. Given: " + index);
-        }
-        final List<Statement> stmts = asList(stmt);
-        if (stmts.size() > index) {
-            return stmts.get(index);
-        }
-        return null;
     }
 }

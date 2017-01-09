@@ -114,4 +114,14 @@ public class TryWithResourceSample {
             throw e;
         }
     }
+
+    public void doNotRefactorUnrelated() throws Exception {
+        FileInputStream inputStream = new FileInputStream("out.txt");
+        Object o = null;
+        try {
+            o = inputStream.read();
+        } finally {
+            inputStream.close();
+        }
+    }
 }

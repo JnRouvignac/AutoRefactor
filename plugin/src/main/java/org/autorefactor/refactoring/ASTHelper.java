@@ -42,6 +42,7 @@ import org.autorefactor.util.IllegalStateException;
 import org.autorefactor.util.NotImplementedException;
 import org.eclipse.jdt.core.dom.ASTMatcher;
 import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.AbstractTypeDeclaration;
 import org.eclipse.jdt.core.dom.AnnotationTypeDeclaration;
 import org.eclipse.jdt.core.dom.AnnotationTypeMemberDeclaration;
@@ -192,6 +193,32 @@ public final class ASTHelper {
         @Override
         public int compare(ASTNode o1, ASTNode o2) {
             return o1.getStartPosition() - o2.getStartPosition();
+        }
+    }
+
+    private static final class VariableDeclarationIdentifierVisitor extends ASTVisitor {
+        private final Set<String> variableNames = new HashSet<String>();
+        private final ASTNode startNode;
+        private final boolean includeInnerScopes;
+
+        private VariableDeclarationIdentifierVisitor(ASTNode startNode, boolean includeInnerScopes) {
+            this.startNode = startNode;
+            this.includeInnerScopes = includeInnerScopes;
+        }
+
+        private Set<String> getVariableNames() {
+            return variableNames;
+        }
+
+        @Override
+        public boolean visit(VariableDeclarationFragment node) {
+            variableNames.add(node.getName().getIdentifier());
+            return VISIT_SUBTREE;
+        }
+
+        @Override
+        public boolean visit(Block node) {
+            return startNode == node || includeInnerScopes;
         }
     }
 
@@ -836,19 +863,40 @@ public final class ASTHelper {
      * @param node the start node
      * @param ancestorClazz the required ancestor's type
      * @return the first ancestor of the provided node which has the required type
+     * @see #getAncestorOrNull(ASTNode, Class)
+     * @see #getFirstAncestorOrNull(ASTNode, Class...)
+     * @throws IllegalStateException if ancestor not found.
+     */
+    public static <T extends ASTNode> T getAncestor(ASTNode node, Class<T> ancestorClazz) {
+        final T ancestor = getAncestorOrNull(node, ancestorClazz);
+        if (ancestor != null) {
+            return ancestor;
+        }
+        throw new IllegalStateException(node,
+            "Could not find any ancestor for " + ancestorClazz + "and node " + node);
+    }
+
+    /**
+     * Returns the first ancestor of the provided node which has the required type.
+     *
+     * @param <T> the required ancestor's type
+     * @param node the start node
+     * @param ancestorClazz the required ancestor's type
+     * @return the first ancestor of the provided node which has the required type,
+     *         {@code null} if no suitable ancestor can be found
+     * @see #getAncestor(ASTNode, Class)
      * @see #getFirstAncestorOrNull(ASTNode, Class...)
      */
     @SuppressWarnings("unchecked")
-    public static <T extends ASTNode> T getAncestor(ASTNode node, Class<T> ancestorClazz) {
+    public static <T extends ASTNode> T getAncestorOrNull(ASTNode node, Class<T> ancestorClazz) {
         if (node == null || node.getParent() == null) {
-            throw new IllegalStateException(node,
-                    "Could not find any ancestor for " + ancestorClazz + "and node " + node);
+            return null;
         }
         final ASTNode parent = node.getParent();
         if (ancestorClazz.isAssignableFrom(parent.getClass())) {
             return (T) parent;
         }
-        return getAncestor(parent, ancestorClazz);
+        return getAncestorOrNull(parent, ancestorClazz);
     }
 
     /**
@@ -878,6 +926,7 @@ public final class ASTHelper {
      * @param ancestorClasses the required ancestor's types
      * @return the first ancestor of the provided node which has any of the required type, or {@code null}
      * @see #getAncestor(ASTNode, Class)
+     * @see #getAncestorOrNull(ASTNode, Class)
      */
     public static ASTNode getFirstAncestorOrNull(ASTNode node, Class<?>... ancestorClasses) {
         if (ancestorClasses.length == 1) {
@@ -2045,6 +2094,8 @@ public final class ASTHelper {
      * @return true if the two provided nodes represent the same variable, false otherwise
      */
     public static boolean isSameVariable(ASTNode node1, ASTNode node2) {
+        node1 = removeParentheses(node1);
+        node2 = removeParentheses(node2);
         if (node1 == null || node2 == null) {
             return false;
         }
@@ -2168,5 +2219,20 @@ public final class ASTHelper {
             return line + ":" + column;
         }
         return "";
+    }
+
+    /**
+     * Return the identifiers of variables declared inside the given statement.
+     *
+     * @param node The node to visit
+     * @param includeInnerScopes True if blocks are visited too.
+     *
+     * @return The ids of the declared variables.
+     */
+    public static Set<String> getLocalVariableIdentifiers(final ASTNode node, boolean includeInnerScopes) {
+        final VariableDeclarationIdentifierVisitor visitor =
+            new VariableDeclarationIdentifierVisitor(node, includeInnerScopes);
+        node.accept(visitor);
+        return visitor.getVariableNames();
     }
 }

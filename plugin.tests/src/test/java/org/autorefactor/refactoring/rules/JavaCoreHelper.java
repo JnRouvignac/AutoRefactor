@@ -84,6 +84,9 @@ public class JavaCoreHelper {
         final List<Node> dependencies = asList(getNodeByNodeName(projectNode.getChildNodes(), "dependencies").getChildNodes());
         final String m2Repo = getM2Repository();
         for (Node dependency : dependencies) {
+            if (dependency.getNodeType() == Node.COMMENT_NODE) {
+                continue;
+            }
             final NodeList children = dependency.getChildNodes();
             String groupId = getNodeByNodeName(children, "groupId").getTextContent();
             String artifactId = getNodeByNodeName(children, "artifactId").getTextContent();
