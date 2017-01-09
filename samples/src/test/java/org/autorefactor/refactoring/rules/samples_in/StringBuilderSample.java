@@ -30,6 +30,7 @@ import java.io.IOException;
 public class StringBuilderSample {
 
     public void replaceWithEfficientStringAppend(StringBuffer sbuf, StringBuilder sbui, String s) {
+        // Keep this comment
         sbuf.append("" + "foo ").append("bar " + 0).append("" + 1);
         sbui.append("" + "foo ").append("bar " + 0).append("" + 1);
         sbuf.append("foo" + 0 + "bar" + 1);
@@ -37,6 +38,7 @@ public class StringBuilderSample {
     }
 
     public void replaceWithStringAppend() {
+        // Keep this comment
         String s1 = new StringBuffer("foo ").append("bar ").append("baz").toString();
         String s2 = new StringBuilder("foo ").append("bar ").append("baz").toString();
         String s3 = new StringBuffer().append(0).append(1).append("bar").toString();
@@ -59,6 +61,7 @@ public class StringBuilderSample {
     }
 
     public void removeUselessStringConcatenation() {
+        // Keep this comment
         String s1 = Integer.toString(42) + "" + "";
         String s2 = "foo " + "" + 0 + "" + "bar " + 1 + "";
         String s3 = 1 + "" + "foo";
@@ -71,6 +74,7 @@ public class StringBuilderSample {
     public void removeUselessCallsToValueOfWithStringBuilderAppend(
         Object o, boolean b, char c, int i, long l, float f, double d) {
         StringBuilder sb = new StringBuilder();
+        // Keep this comment
         sb.append(String.valueOf(o));
         sb.append(String.valueOf(b));
         sb.append(Boolean.valueOf(b));
@@ -89,6 +93,7 @@ public class StringBuilderSample {
     public void removeUselessCallsToValueOfWithStringBufferAppend(
             Object o, boolean b, char c, int i, long l, float f, double d) {
         StringBuffer sb = new StringBuffer();
+        // Keep this comment
         sb.append(String.valueOf(o));
         sb.append(String.valueOf(b));
         sb.append(Boolean.valueOf(b));
@@ -107,6 +112,7 @@ public class StringBuilderSample {
     public void removeUselessCallsToToStringOfWithStringBuilderAppend(
             Object o, boolean bo, byte by, char c, short s, int i, long l, float f, double d) {
         StringBuilder sb = new StringBuilder();
+        // Keep this comment
         sb.append(toString());
         sb.append(o.toString());
         sb.append(Boolean.toString(bo));
@@ -122,6 +128,7 @@ public class StringBuilderSample {
     public void removeUselessCallsToToStringOfWithStringBufferAppend(
             Object o, boolean bo, byte by, char c, short s, int i, long l, float f, double d) {
         StringBuffer sb = new StringBuffer();
+        // Keep this comment
         sb.append(toString());
         sb.append(o.toString());
         sb.append(Boolean.toString(bo));
@@ -135,6 +142,7 @@ public class StringBuilderSample {
     }
 
     public void removeSubstringDoubleArgsCallsWithAppend(String s) {
+        // Keep this comment
         new StringBuilder().append(s.substring(0, 1));
         new StringBuffer().append(s.substring(0, 1));
         new StringBuilder().append(s.subSequence(0, 1));
@@ -147,6 +155,7 @@ public class StringBuilderSample {
     }
 
     public void removeAppendEmptyString(StringBuilder builder, StringBuffer buffer) {
+        // Keep this comment
         builder.append("");
         buffer.append("");
     }
@@ -156,6 +165,7 @@ public class StringBuilderSample {
     }
 
     public String formatTime(int hour, int min) {
+        // Keep this comment
         return new StringBuilder()
             .append(hour < 10 ? "0" + hour : hour)
             .append(":")

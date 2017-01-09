@@ -30,22 +30,26 @@ import java.math.BigDecimal;
 public class BigDecimalSample {
 
     private static String useConstructorWithStringArg() {
+        // Keep this comment
         BigDecimal bd1 = new BigDecimal(123.345);
         BigDecimal bd2 = BigDecimal.valueOf(123.345);
         return "" + bd1 + bd2;
     }
 
     private static boolean refactorToCompareToEqualsZero(BigDecimal bd1, BigDecimal bd2) {
+        // Keep this comment
         return bd1.equals(bd2);
     }
 
     private static String refactorToCompareToEqualsZeroSurroundWithParentheses(BigDecimal bd1, BigDecimal bd2) {
+        // Keep this comment
         String s = "" + bd1.equals(bd2);
         String s2 = "" + 1 + bd1.equals(bd2) + 2;
         String s3 = "" + 1 + bd1.equals(bd2);        return s + s2 + s3;
     }
 
     private static String useBigDecimalConstants() {
+        // Keep this comment
         BigDecimal bd1 = new BigDecimal(0);
         BigDecimal bd2 = new BigDecimal(1);
         BigDecimal bd3 = new BigDecimal(10);
@@ -62,6 +66,7 @@ public class BigDecimalSample {
     }
 
     private static String useValueOf() {
+        // Keep this comment
         BigDecimal bd1 = new BigDecimal(5);
         BigDecimal bd2 = new BigDecimal("5");
         return "" + bd1 + bd2;

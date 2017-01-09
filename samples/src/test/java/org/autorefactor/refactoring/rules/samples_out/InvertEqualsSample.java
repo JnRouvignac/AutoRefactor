@@ -42,6 +42,7 @@ public class InvertEqualsSample {
     private int primitiveField;
 
     public boolean invertEquals(Object obj) {
+        // Keep this comment 1
         return "".equals(obj)
                 && Itf.objConstant.equals(obj)
                 && ("" + Itf.objConstant).equals(obj)
@@ -62,6 +63,7 @@ public class InvertEqualsSample {
     }
 
     public boolean invertEqualsIgnoreCase(String s) {
+        // Keep this comment 1
         return "".equalsIgnoreCase(s)
                 && Itf.objConstant.equalsIgnoreCase(s)
                 && ("" + Itf.objConstant).equalsIgnoreCase(s);

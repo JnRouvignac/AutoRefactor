@@ -30,19 +30,23 @@ import java.util.List;
 
 public class CollectionContainsSample {
     public boolean replaceForeach(List<String> col, String toFind) {
+        // Keep this comment 1
         return col.contains(toFind);
     }
 
     public boolean replaceForeachInvertedEquals(List<String> col, String toFind) {
+        // Keep this comment 1
         return col.contains(toFind);
     }
 
     public boolean replaceForeachWithNotCollectionContains(List<String> col, String toFind) {
+        // Keep this comment 1
         return !col.contains(toFind);
     }
 
     public boolean replaceForeachNextStatementAfterTry(List<String> col, String toFind) {
         try {
+            // Keep this comment 1
             return col.contains(toFind);
         } catch (Exception e) {
             e.printStackTrace();
@@ -52,6 +56,7 @@ public class CollectionContainsSample {
 
     public boolean replaceForeachNextStatementAfterIf(List<String> col, String toFind, boolean b) {
         if (b) {
+            // Keep this comment 1
             return col.contains(toFind);
         }
         return false;
@@ -60,6 +65,7 @@ public class CollectionContainsSample {
     public boolean replaceForeachPreviousStatementBeforeTry(List<String> col, String toFind) {
         boolean result = false;
         try {
+            // Keep this comment 1
             result = col.contains(toFind);
         } catch (Exception e) {
             e.printStackTrace();
@@ -70,6 +76,7 @@ public class CollectionContainsSample {
     public boolean replaceForeachPreviousStatementBeforeIf(List<String> col, String toFind, boolean b) {
         boolean result = false;
         if (b) {
+            // Keep this comment 1
             result = col.contains(toFind);
         }
         return result;
@@ -86,6 +93,7 @@ public class CollectionContainsSample {
     }
 
     public boolean replaceForeachHoldResultInVariableCannotRemoveVariable(List<String> col, String toFind) {
+        // Keep this comment 1
         boolean result = false;
         ;
         result = col.contains(toFind);
@@ -114,35 +122,43 @@ public class CollectionContainsSample {
     }
 
     public boolean replaceForCounter(List<String> col, String toFind) {
+        // Keep this comment 1
         return col.contains(toFind);
     }
 
     public boolean replaceForCounterInvertedCondition(List<String> col, String toFind) {
+        // Keep this comment 1
         return col.contains(toFind);
     }
 
     public boolean replaceForCounterPrefixedUpdater(List<String> col, String toFind) {
+        // Keep this comment 1
         return col.contains(toFind);
     }
 
     public boolean replaceForCounterNoVariableDeclaration(List<String> col, String toFind) {
+        // Keep this comment 1
         int i;
         return col.contains(toFind);
     }
 
     public boolean replaceForCounterNoLoopVariable(List<String> col, String toFind) {
+        // Keep this comment 1
         return col.contains(toFind);
     }
 
     public boolean replaceForCounterNoLoopVariableInvertedEquals(List<String> col, String toFind) {
+        // Keep this comment 1
         return col.contains(toFind);
     }
 
     public boolean replaceForIterator(List<String> col, String toFind) {
+        // Keep this comment 1
         return col.contains(toFind);
     }
 
     public boolean replaceForIteratorNoLoopVariable(List<String> col, String toFind) {
+        // Keep this comment 1
         return col.contains(toFind);
     }
 

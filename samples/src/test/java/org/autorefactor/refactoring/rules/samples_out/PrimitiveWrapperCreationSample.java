@@ -78,6 +78,7 @@ public class PrimitiveWrapperCreationSample {
     }
 
     public static void convertValueOfCallsToParseCallsInPrimitiveContext() {
+        // Keep this comment 1
         byte by1 = Byte.parseByte("0");
         byte by2 = Byte.parseByte("0", 10);
         boolean bo = Boolean.parseBoolean("true");
@@ -92,6 +93,7 @@ public class PrimitiveWrapperCreationSample {
     }
 
     public static void removeUnnecessaryValueOfCallsInPrimitiveContext() {
+        // Keep this comment 1
         byte by = (byte) 0;
         boolean bo1 = true;
         boolean bo2 = true;
@@ -104,6 +106,7 @@ public class PrimitiveWrapperCreationSample {
     }
 
     public static void removeUnnecessaryConstructorInvocationsInPrimitiveContext() {
+        // Keep this comment 1
         byte by = (byte) 0;
         boolean bo = true;
         int i = 42;

@@ -31,6 +31,7 @@ public class BooleanSample {
     public Boolean g;
 
     public void useBooleanConstants() {
+        // Keep this comment
         Boolean b1 = Boolean.valueOf(true);
         Boolean b2 = Boolean.valueOf(false);
     }
@@ -38,6 +39,7 @@ public class BooleanSample {
     // TODO JNR handle mix and match of boolean primitives and boolean objects
 
     public boolean returnIfConditionBooleanPrimitive(boolean b) {
+        // Keep this comment
         if (b) {
             return true;
         } else {
@@ -46,6 +48,7 @@ public class BooleanSample {
     }
 
     public boolean returnIfConditionBooleanPrimitive2(boolean b) {
+        // Keep this comment
         if (b) {
             return false;
         } else {
@@ -54,6 +57,7 @@ public class BooleanSample {
     }
 
     public boolean returnIfConditionWithInfixExpressionBooleanPrimitive(int i) {
+        // Keep this comment
         if (0 < i && i < 12) {
             return false;
         } else {
@@ -62,6 +66,7 @@ public class BooleanSample {
     }
 
     public boolean returnIfConditionWithInstanceofExpressionBooleanPrimitive(Object o) {
+        // Keep this comment
         if (o instanceof String) {
             return false;
         } else {
@@ -70,6 +75,7 @@ public class BooleanSample {
     }
 
     public boolean returnIfConditionAddCurlyBraces(Object o) {
+        // Keep this comment
         if (o instanceof Integer) {
             return true;
         } else if (o instanceof String) {
@@ -80,6 +86,7 @@ public class BooleanSample {
     }
 
     public boolean returnIfConditionThatRevertsInstanceofExpressionBooleanPrimitive(Object o) {
+        // Keep this comment
         if (!(/* do not lose me */o instanceof String)) {
             return false;
         } else {
@@ -88,6 +95,7 @@ public class BooleanSample {
     }
 
     public Boolean returnIfConditionBooleanObject(boolean b) {
+        // Keep this comment
         if (b) {
             return Boolean.TRUE;
         } else {
@@ -96,6 +104,7 @@ public class BooleanSample {
     }
 
     public Boolean returnIfConditionBooleanObject2(boolean b) {
+        // Keep this comment
         if (b) {
             return Boolean.FALSE;
         } else {
@@ -104,6 +113,7 @@ public class BooleanSample {
     }
 
     public boolean returnIfConditionMixedBoolean1(boolean b) {
+        // Keep this comment
         if (b) {
             return Boolean.TRUE;
         } else {
@@ -112,6 +122,7 @@ public class BooleanSample {
     }
 
     public boolean returnIfConditionMixedBoolean2(boolean b) {
+        // Keep this comment
         if (b) {
             return true;
         } else {
@@ -120,6 +131,7 @@ public class BooleanSample {
     }
 
     public boolean returnIfConditionBooleanPrimitive3(boolean b) {
+        // Keep this comment
         if (b) {
             return true;
         }
@@ -127,6 +139,7 @@ public class BooleanSample {
     }
 
     public boolean returnIfConditionBooleanPrimitive4(boolean b) {
+        // Keep this comment
         if (b) {
             return false;
         }
@@ -134,6 +147,7 @@ public class BooleanSample {
     }
 
     public boolean returnIfConditionBooleanObject3(boolean b) {
+        // Keep this comment
         if (b) {
             return Boolean.TRUE;
         }
@@ -141,6 +155,7 @@ public class BooleanSample {
     }
 
     public boolean returnIfConditionBooleanObject4(boolean b) {
+        // Keep this comment
         if (b) {
             return Boolean.FALSE;
         }
@@ -148,89 +163,105 @@ public class BooleanSample {
     }
 
     public boolean removeUselessTernaryOperatorWithBooleanPrimitive1(boolean bo) {
+        // Keep this comment
         boolean b = bo ? true : false;
         return b;
     }
 
     public boolean removeUselessTernaryOperatorWithBooleanPrimitive2(boolean bo) {
+        // Keep this comment
         boolean b = bo ? false : true;
         return b;
     }
 
     public Boolean removeUselessTernaryOperatorWithBooleanObject1(boolean bo) {
+        // Keep this comment
         Boolean b = bo ? Boolean.TRUE : Boolean.FALSE;
         return b;
     }
 
     public Boolean removeUselessTernaryOperatorWithBooleanObject2(boolean bo) {
+        // Keep this comment
         Boolean b = bo ? Boolean.FALSE : Boolean.TRUE;
         return b;
     }
 
     public boolean replaceTernaryOperatorByAndOperator(boolean bo1, boolean bo2) {
+        // Keep this comment
         boolean b = bo1 ? bo2 : false;
         return b;
     }
 
     public boolean replaceTernaryOperatorByAndOperator2(boolean bo1, boolean bo2) {
+        // Keep this comment
         boolean b = bo1 ? false : bo2;
         return b;
     }
 
     public boolean replaceTernaryOperatorByOrOperator(boolean bo1, boolean bo2) {
+        // Keep this comment
         boolean b = bo1 ? true : bo2;
         return b;
     }
 
     public boolean replaceTernaryOperatorByOrOperator2(boolean bo1, boolean bo2) {
+        // Keep this comment
         boolean b = bo1 ? bo2 : true;
         return b;
     }
 
     public Boolean replaceTernaryOperatorByAndOperatorWithObjectConstant(
             boolean bo1, boolean bo2) {
+        // Keep this comment
         Boolean b = bo1 ? bo2 : Boolean.FALSE;
         return b;
     }
 
     public Boolean replaceTernaryOperatorByAndOperatorWithObjectConstant2(
             boolean bo1, boolean bo2) {
+        // Keep this comment
         Boolean b = bo1 ? Boolean.FALSE : bo2;
         return b;
     }
 
     public Boolean replaceTernaryOperatorByOrOperatorWithObjectConstant(
             boolean bo1, boolean bo2) {
+        // Keep this comment
         Boolean b = bo1 ? Boolean.TRUE : bo2;
         return b;
     }
 
     public Boolean replaceTernaryOperatorByOrOperatorWithObjectConstant2(
             boolean bo1, boolean bo2) {
+        // Keep this comment
         Boolean b = bo1 ? bo2 : Boolean.TRUE;
         return b;
     }
 
     public Boolean replaceTernaryOperatorByAndOperatorWithObject(
             Boolean bo1, Boolean bo2) {
+        // Keep this comment
         Boolean b = bo1 ? bo2 : false;
         return b;
     }
 
     public Boolean replaceTernaryOperatorByAndOperatorWithObject2(
             Boolean bo1, Boolean bo2) {
+        // Keep this comment
         Boolean b = bo1 ? false : bo2;
         return b;
     }
 
     public Boolean replaceTernaryOperatorByOrOperatorWithObject(
             Boolean bo1, Boolean bo2) {
+        // Keep this comment
         Boolean b = bo1 ? true : bo2;
         return b;
     }
 
     public Boolean replaceTernaryOperatorByOrOperatorWithObject2(
             Boolean bo1, Boolean bo2) {
+        // Keep this comment
         Boolean b = bo1 ? bo2 : true;
         return b;
     }
@@ -243,21 +274,25 @@ public class BooleanSample {
     }
 
     public Boolean replaceTernaryOperatorByAndOperatorWithExpression(int i1, int i2) {
+        // Keep this comment
         Boolean b = (i1 == 1) ? (i2 == 2) : Boolean.FALSE;
         return b;
     }
 
     public Boolean replaceTernaryOperatorByAndOperatorWithExpression2(int i1, int i2) {
+        // Keep this comment
         Boolean b = (i1 == 1) ? Boolean.FALSE : (i2 == 2);
         return b;
     }
 
     public Boolean replaceTernaryOperatorByOrOperatorWithExpression(int i1, int i2) {
+        // Keep this comment
         Boolean b = (i1 == 1) ? Boolean.TRUE : (i2 == 2);
         return b;
     }
 
     public Boolean replaceTernaryOperatorByOrOperatorWithExpression2(int i1, int i2) {
+        // Keep this comment
         Boolean b = (i1 == 1) ? (i2 == 2) : Boolean.TRUE;
         return b;
     }
@@ -272,6 +307,7 @@ public class BooleanSample {
     }
 
     public void removeUselessIfInBooleanPrimitiveAssignment1(boolean bo) {
+        // Keep this comment
         boolean b = true;
         if (bo) {
             b = false;
@@ -279,6 +315,7 @@ public class BooleanSample {
     }
 
     public void removeUselessIfInBooleanPrimitiveAssignment2(boolean bo) {
+        // Keep this comment
         boolean b = false;
         if (bo) {
             b = true;
@@ -286,6 +323,7 @@ public class BooleanSample {
     }
 
     public void removeUselessIfInBooleanObjectAssignment1(boolean bo) {
+        // Keep this comment
         Boolean b = Boolean.TRUE;
         if (bo) {
             b = Boolean.FALSE;
@@ -293,6 +331,7 @@ public class BooleanSample {
     }
 
     public void removeUselessIfInBooleanObjectAssignment2(boolean bo) {
+        // Keep this comment
         boolean b = Boolean.FALSE;
         if (bo) {
             b = Boolean.TRUE;
@@ -301,6 +340,7 @@ public class BooleanSample {
 
     public void removeUselessIfInBooleanPrimitiveAssignment3(boolean bo,
             boolean b) {
+        // Keep this comment
         b = true;
         if (bo) {
             b = false;
@@ -309,6 +349,7 @@ public class BooleanSample {
 
     public void removeUselessIfInBooleanPrimitiveAssignment4(boolean bo,
             boolean b) {
+        // Keep this comment
         b = false;
         if (bo) {
             b = true;
@@ -327,6 +368,7 @@ public class BooleanSample {
     }
 
     public void removeUselessIfInBooleanObjectAssignment3(boolean bo, Boolean b) {
+        // Keep this comment
         b = Boolean.TRUE;
         if (bo) {
             b = Boolean.FALSE;
@@ -334,6 +376,7 @@ public class BooleanSample {
     }
 
     public void removeUselessIfInBooleanObjectAssignment4(boolean bo, Boolean b) {
+        // Keep this comment
         b = Boolean.FALSE;
         if (bo) {
             b = Boolean.TRUE;
@@ -341,6 +384,7 @@ public class BooleanSample {
     }
 
     public void removeUselessIfInBooleanPrimitiveAssignment5(boolean bo) {
+        // Keep this comment
         this.f = Boolean.FALSE;
         if (bo) {
             this.f = Boolean.TRUE;
@@ -348,6 +392,7 @@ public class BooleanSample {
     }
 
     public void removeUselessIfInBooleanObjectAssignment5(boolean bo) {
+        // Keep this comment
         this.g = Boolean.FALSE;
         if (bo) {
             this.g = Boolean.TRUE;
@@ -355,6 +400,7 @@ public class BooleanSample {
     }
 
     public void removeUselessIfInBooleanPrimitiveAssignment6(boolean bo) {
+        // Keep this comment
         f = Boolean.FALSE;
         if (bo) {
             f = Boolean.TRUE;
@@ -362,6 +408,7 @@ public class BooleanSample {
     }
 
     public void removeUselessIfInBooleanObjectAssignment6(boolean bo) {
+        // Keep this comment
         g = Boolean.FALSE;
         if (bo) {
             g = Boolean.TRUE;
@@ -369,6 +416,7 @@ public class BooleanSample {
     }
 
     public void removeUselessIfInBooleanObjectAssignment7(boolean bo) {
+        // Keep this comment
         BooleanSample.this.g = Boolean.FALSE;
         if (bo) {
             BooleanSample.this.g = Boolean.TRUE;
@@ -378,6 +426,7 @@ public class BooleanSample {
     // TODO redo the next 4 with Boolean object
 
     public boolean removeUselessIfInBooleanPrimitiveAssignment7(boolean bo) {
+        // Keep this comment
         if (bo) {
             return aMethodThatReturnsBoolean();
         }
@@ -385,6 +434,7 @@ public class BooleanSample {
     }
 
     public boolean removeUselessIfInBooleanPrimitiveAssignment8(boolean bo) {
+        // Keep this comment
         if (bo) {
             return aMethodThatReturnsBoolean();
         }
@@ -392,6 +442,7 @@ public class BooleanSample {
     }
 
     public boolean removeUselessIfInBooleanPrimitiveAssignment9(boolean bo) {
+        // Keep this comment
         if (bo) {
             return false;
         }
@@ -399,18 +450,22 @@ public class BooleanSample {
     }
 
     public boolean removeUselessIfInBooleanPrimitiveAssignment10(boolean bo) {
+        // Keep this comment
         if (bo) {
             return true;
         }
         return aMethodThatReturnsBoolean();
     }
 
-    // TODO aMethodThatAcceptsABoolean(bo ? true : false);
-    // TODO aMethodThatAcceptsABoolean(bo ? false : true);
-    // TODO aMethodThatAcceptsABoolean(bo ? Boolean.TRUE : Boolean.FALSE);
-    // TODO aMethodThatAcceptsABoolean(bo ? Boolean.FALSE : Boolean.TRUE);
+    public void removeUselessTernaryOperatorWithBooleanPrimitive(boolean bo) {
+        aMethodThatAcceptsABoolean(bo ? true : false);
+        aMethodThatAcceptsABoolean(bo ? false : true);
+        aMethodThatAcceptsABoolean(bo ? Boolean.TRUE : Boolean.FALSE);
+        aMethodThatAcceptsABoolean(bo ? Boolean.FALSE : Boolean.TRUE);
+    }
 
     public void removeUselessIfInBooleanPrimitiveExpression10(boolean bo) {
+        // Keep this comment
         if (bo) {
             aMethodThatAcceptsABoolean(true);
         } else {
@@ -419,6 +474,7 @@ public class BooleanSample {
     }
 
     public void removeUselessIfInBooleanPrimitiveExpression11(boolean bo) {
+        // Keep this comment
         if (bo) {
             aMethodThatAcceptsABoolean(false);
         } else {
@@ -463,6 +519,7 @@ public class BooleanSample {
     }
 
     public boolean invertConditionalExpression(int i, boolean res1, boolean res2) {
+        // Keep this comment
         if (i == 0 ? res1 : res2) {
             return false;
         }
@@ -470,6 +527,7 @@ public class BooleanSample {
     }
 
     public boolean invertAssignment(boolean b1, boolean b2) {
+        // Keep this comment
         if (b1 = b2) {
             return false;
         }
@@ -477,6 +535,7 @@ public class BooleanSample {
     }
 
     public boolean invertCast(Object o) {
+        // Keep this comment
         if ((Boolean) o) {
             return false;
         }

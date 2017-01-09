@@ -49,6 +49,7 @@ import org.eclipse.jdt.core.dom.LineComment;
 import org.eclipse.jdt.core.dom.StructuralPropertyDescriptor;
 import org.eclipse.jdt.core.dom.rewrite.ASTRewrite;
 import org.eclipse.jdt.core.dom.rewrite.ListRewrite;
+import org.eclipse.jdt.core.dom.rewrite.TargetSourceRangeComputer;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.swt.widgets.Display;
@@ -60,6 +61,7 @@ import org.eclipse.text.edits.TextEdit;
  */
 public class Refactorings {
 
+    private static final String UNTOUCH_COMMENT = "untouchComment";
     private boolean hasRefactorings;
     private final ASTRewrite rewrite;
     private final Map<Pair<ASTNode, ChildListPropertyDescriptor>, ListRewrite> listRewriteCache =
@@ -76,6 +78,14 @@ public class Refactorings {
      */
     public Refactorings(CompilationUnit astRoot) {
         this.rewrite = ASTRewrite.create(astRoot.getAST());
+        this.rewrite.setTargetSourceRangeComputer(new TargetSourceRangeComputer() {
+            public SourceRange computeSourceRange(ASTNode node) {
+                if (Boolean.TRUE.equals(node.getProperty(UNTOUCH_COMMENT))) {
+                    return new SourceRange(node.getStartPosition(), node.getLength());
+                }
+                return super.computeSourceRange(node);
+            }
+        });
         this.commentRewriter = new ASTCommentRewriter(astRoot);
     }
 
@@ -242,6 +252,7 @@ public class Refactorings {
      * @see ASTRewrite#replace(ASTNode, ASTNode, org.eclipse.text.edits.TextEditGroup)
      */
     public void replace(ASTNode node, ASTNode replacement) {
+        node.setProperty(UNTOUCH_COMMENT, Boolean.TRUE);
         rewrite.replace(node, replacement, null);
         addRefactoredNodes(node);
     }

@@ -28,6 +28,7 @@ package org.autorefactor.refactoring.rules.samples_in;
 public class RemoveUnneededThisExpressionSample {
 
     public void removeThisExpression() {
+        // Keep this comment
         this.testRemoveThisExpression(42);
         RemoveUnneededThisExpressionSample.this.testRemoveThisExpression(42);
         this.hashCode();
@@ -36,6 +37,7 @@ public class RemoveUnneededThisExpressionSample {
     public void removeThisExpressionForAnonymousClass() {
         new Object() {
             public void testRemoveThisExpression(int i) {
+                // Keep this comment
                 this.testRemoveThisExpression(i);
             }
         }.testRemoveThisExpression(42);
@@ -76,6 +78,7 @@ public class RemoveUnneededThisExpressionSample {
     public class InnerClass {
 
         public void removeThisExpression() {
+            // Keep this comment
             this.testRemoveThisExpression(42);
             InnerClass.this.testRemoveThisExpression(42);
             RemoveUnneededThisExpressionSample.InnerClass.this.testRemoveThisExpression(42);
