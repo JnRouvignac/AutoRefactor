@@ -31,6 +31,7 @@ public class AddBracketsToControlStatementSample {
 
     public static void main(String[] args) {
         int i = 0;
+        // Keep this comment
         if (true)
             i++;
         else

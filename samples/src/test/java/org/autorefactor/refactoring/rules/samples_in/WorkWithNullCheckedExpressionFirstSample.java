@@ -36,6 +36,7 @@ public class WorkWithNullCheckedExpressionFirstSample {
     // TODO JNR add ConditionalExpressions
 
     private String refactor(String s) {
+        // Keep this comment
         if (s == null) {
             return null;
         } else {
@@ -45,6 +46,7 @@ public class WorkWithNullCheckedExpressionFirstSample {
 
     public List<String> refactorLocalVariable1(String s) throws Exception {
         List<String> l;
+        // Keep this comment
         if (s == null) {
             l = emptyList();
         } else {
@@ -55,6 +57,7 @@ public class WorkWithNullCheckedExpressionFirstSample {
 
     public List<String> refactorLocalVariable2(String s) throws Exception {
         List<String> l;
+        // Keep this comment
         if (null == s) {
             l = emptyList();
         } else {
@@ -84,6 +87,7 @@ public class WorkWithNullCheckedExpressionFirstSample {
     }
 
     public void refactorFieldAssign1(String s) throws Exception {
+        // Keep this comment
         if (s == null) {
             this.l = emptyList();
         } else {
@@ -92,6 +96,7 @@ public class WorkWithNullCheckedExpressionFirstSample {
     }
 
     public void refactorFieldAssign2(String s) throws Exception {
+        // Keep this comment
         if (null == s) {
             this.l = emptyList();
         } else {
@@ -116,6 +121,7 @@ public class WorkWithNullCheckedExpressionFirstSample {
     }
 
     public List<String> refactorReturn1(String s) throws Exception {
+        // Keep this comment
         if (s == null) {
             return emptyList();
         } else {
@@ -124,6 +130,7 @@ public class WorkWithNullCheckedExpressionFirstSample {
     }
 
     public List<String> refactorReturn2(String s) throws Exception {
+        // Keep this comment
         if (null == s) {
             return emptyList();
         } else {
@@ -148,6 +155,7 @@ public class WorkWithNullCheckedExpressionFirstSample {
     }
 
     public List<String> refactorReturnNoElse1(String s) throws Exception {
+        // Keep this comment
         if (s == null) {
             return emptyList();
         }
@@ -155,6 +163,7 @@ public class WorkWithNullCheckedExpressionFirstSample {
     }
 
     public List<String> refactorReturnNoElse2(String s) throws Exception {
+        // Keep this comment
         if (null == s) {
             return emptyList();
         }

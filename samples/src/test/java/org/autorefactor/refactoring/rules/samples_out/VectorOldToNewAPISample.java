@@ -33,6 +33,7 @@ public class VectorOldToNewAPISample {
         byte b = 43;
         short s = 44;
         Vector<Integer> v = new Vector<Integer>();
+        // Keep this comment
         v.add(42);
         v.add(1, 43);
         v.get(0);

@@ -30,6 +30,7 @@ import java.io.IOException;
 public class StringBuilderSample {
 
     public void replaceWithEfficientStringAppend(StringBuffer sbuf, StringBuilder sbui, String s) {
+        // Keep this comment
         sbuf.append("foo ").append("bar ").append(0).append(1);
         sbui.append("foo ").append("bar ").append(0).append(1);
         sbuf.append("foo").append(0).append("bar").append(1);
@@ -37,6 +38,7 @@ public class StringBuilderSample {
     }
 
     public void replaceWithStringAppend() {
+        // Keep this comment
         String s1 = "foo " + "bar " + "baz";
         String s2 = "foo " + "bar " + "baz";
         String s3 = "" + 0 + 1 + "bar";
@@ -59,6 +61,7 @@ public class StringBuilderSample {
     }
 
     public void removeUselessStringConcatenation() {
+        // Keep this comment
         String s1 = Integer.toString(42);
         String s2 = "foo " + 0 + "bar " + 1;
         String s3 = 1 + "foo";
@@ -71,6 +74,7 @@ public class StringBuilderSample {
     public void removeUselessCallsToValueOfWithStringBuilderAppend(
         Object o, boolean b, char c, int i, long l, float f, double d) {
         StringBuilder sb = new StringBuilder();
+        // Keep this comment
         sb.append(o);
         sb.append(b);
         sb.append(b);
@@ -89,6 +93,7 @@ public class StringBuilderSample {
     public void removeUselessCallsToValueOfWithStringBufferAppend(
             Object o, boolean b, char c, int i, long l, float f, double d) {
         StringBuffer sb = new StringBuffer();
+        // Keep this comment
         sb.append(o);
         sb.append(b);
         sb.append(b);
@@ -107,6 +112,7 @@ public class StringBuilderSample {
     public void removeUselessCallsToToStringOfWithStringBuilderAppend(
             Object o, boolean bo, byte by, char c, short s, int i, long l, float f, double d) {
         StringBuilder sb = new StringBuilder();
+        // Keep this comment
         sb.append(this);
         sb.append(o);
         sb.append(bo);
@@ -122,6 +128,7 @@ public class StringBuilderSample {
     public void removeUselessCallsToToStringOfWithStringBufferAppend(
             Object o, boolean bo, byte by, char c, short s, int i, long l, float f, double d) {
         StringBuffer sb = new StringBuffer();
+        // Keep this comment
         sb.append(this);
         sb.append(o);
         sb.append(bo);
@@ -135,6 +142,7 @@ public class StringBuilderSample {
     }
 
     public void removeSubstringDoubleArgsCallsWithAppend(String s) {
+        // Keep this comment
         new StringBuilder().append(s, 0, 1);
         new StringBuffer().append(s, 0, 1);
         new StringBuilder().append(s, 0, 1);
@@ -154,6 +162,7 @@ public class StringBuilderSample {
     }
 
     public String formatTime(int hour, int min) {
+        // Keep this comment
         return (hour < 10 ? "0" + hour : hour) + ":" + (min < 10 ? "0" + min : min);
     }
 }

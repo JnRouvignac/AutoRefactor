@@ -31,29 +31,34 @@ import java.util.Map;
 public class MapSample {
 
     public void replaceNewNoArgsAssignmentThenPutAll(Map<String, String> map, Map<String, String> output) {
+        // Keep this comment 1
         output = new HashMap<String, String>();
         output.putAll(map);
     }
 
     public Map<String, String> replaceNewNoArgsThenPutAll(Map<String, String> map) {
+        // Keep this comment 1
         final Map<String, String> output = new HashMap<String, String>();
         output.putAll(map);
         return output;
     }
 
     public Map<String, String> replaceNew0ArgThenPutAll(Map<String, String> map) {
+        // Keep this comment 1
         final Map<String, String> output = new HashMap<String, String>(0);
         output.putAll(map);
         return output;
     }
 
     public Map<String, String> replaceNew1ArgThenPutAll(Map<String, String> map) {
+        // Keep this comment 1
         final Map<String, String> output = new HashMap<String, String>(0);
         output.putAll(map);
         return output;
     }
 
     public Map<String, String> replaceNewMapSizeThenPutAll(Map<String, String> map) {
+        // Keep this comment 1
         final Map<String, String> output = new HashMap<String, String>(map.size());
         output.putAll(map);
         return output;
@@ -66,6 +71,7 @@ public class MapSample {
     }
 
     public void replaceChecksOnSize(Map<String, String> map) {
+        // Keep this comment 1
         System.out.println(map.size() > 0);
         System.out.println(map.size() >= 0);
         System.out.println(map.size() == 0);

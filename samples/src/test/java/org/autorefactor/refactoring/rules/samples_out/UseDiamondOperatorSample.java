@@ -37,30 +37,36 @@ import java.util.TreeSet;
 public class UseDiamondOperatorSample {
 
     public List<String> refactorVariableDeclarationStatement() {
+        // Keep this comment
         List<String> l = new ArrayList<>();
         return l;
     }
 
     public List<String> refactorVariableDeclarationStatementWithParentheses() {
+        // Keep this comment
         List<String> l = ((new ArrayList<>()));
         return l;
     }
 
     public List<String> refactorAssignment() {
         List<String> l;
+        // Keep this comment
         l = new ArrayList<>();
         return l;
     }
 
     public List<String> refactorReturnStatement() {
+        // Keep this comment
         return new ArrayList<>();
     }
 
     public List<String> refactorReturnStatementWithParameter(List<String> l) {
+        // Keep this comment
         return new ArrayList<>(l);
     }
 
     public Map<String, String> refactorReturnStatementWithParameter(Map<String, String> l) {
+        // Keep this comment
         return new HashMap<>(l);
     }
 
@@ -140,6 +146,7 @@ public class UseDiamondOperatorSample {
     }
 
     public Set<String> refactorRemoveGenericType() {
+        // Keep this comment
         Set<String> s = new TreeSet<>(new StringComparator());
         return s;
     }

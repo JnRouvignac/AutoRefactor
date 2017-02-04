@@ -32,6 +32,7 @@ public class SwitchSample {
 
     public void replaceIfWithSwitchOnParameter(int i1) {
         int i = 0;
+        // Keep this comment 1
         if (i1 == 0) {
             // Keep this comment 2
             i = 0;
@@ -65,6 +66,7 @@ public class SwitchSample {
     public void replaceIfWithSwitchOnLocalVariable() {
         int i1 = 0;
         int i = 0;
+        // Keep this comment 1
         if (i1 == 0) {
             // Keep this comment 2
             i = 0;
@@ -87,6 +89,7 @@ public class SwitchSample {
 
     public void replaceIfWithSwitchOnField() {
         int i = 0;
+        // Keep this comment 1
         if (i2 == 0) {
             // Keep this comment 2
             i = 0;
@@ -98,6 +101,7 @@ public class SwitchSample {
 
     public void replaceIfWithSwitchOnCharacter(char a1) {
         int i = 0;
+        // Keep this comment 1
         if (a1 == 'a') {
             // Keep this comment 2
             i = 0;

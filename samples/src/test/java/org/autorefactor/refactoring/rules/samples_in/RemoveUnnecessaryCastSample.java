@@ -33,10 +33,12 @@ public class RemoveUnnecessaryCastSample {
     private short s;
 
     public Object removeCastToSameType(Integer i) {
+        // Keep this comment
         return (Integer) i;
     }
 
     public Object removeCastToIntegerWrapper(int i) {
+        // Keep this comment
         return (Integer) i;
     }
 
@@ -49,6 +51,7 @@ public class RemoveUnnecessaryCastSample {
     }
 
     public long removeWideningPrimitiveCast(int i) {
+        // Keep this comment
         return (long) i;
     }
 
@@ -65,6 +68,7 @@ public class RemoveUnnecessaryCastSample {
         Object o1;
         long l;
         int i;
+        // Keep this comment
         o1 = (Integer) oi;
         o1 = (Integer) pi;
         l = (long) pi;
@@ -83,6 +87,7 @@ public class RemoveUnnecessaryCastSample {
     }
 
     public void removeVariableDeclarationFragmentCasts(Integer oi, int pi, Object o) {
+        // Keep this comment
         Object o1 = (Integer) oi;
         Object o2 = (Integer) pi;
         long l = (long) pi;
@@ -95,6 +100,7 @@ public class RemoveUnnecessaryCastSample {
     }
 
     public boolean removeCasts(Integer oi, int pi, long l) {
+        // Keep this comment
         return oi != (Integer) pi
             && (Integer) pi != oi
             && (int) oi != pi
@@ -126,6 +132,7 @@ public class RemoveUnnecessaryCastSample {
     }
 
     public long doNotRemoveWideningCastsWithExtendedOperands(int i, int j, int k) {
+        // Keep this comment
         return (long) i + j + (long) k;
     }
 
@@ -138,6 +145,7 @@ public class RemoveUnnecessaryCastSample {
     }
 
     public String removeCastsFromStringAppend(Integer oi, int pi, Object o) {
+        // Keep this comment
         return "" + (Object) oi + (Number) oi + (int) oi + (Integer) pi + (long) pi + (String) o;
     }
 
@@ -146,22 +154,27 @@ public class RemoveUnnecessaryCastSample {
     }
 
     public double removeSomeCastsFromDivisionWithDifferentTypes(int i, long l) {
+        // Keep this comment
         return (double) i / (double) l;
     }
 
     public double removeSomeCastsFromDivisionWithDifferentTypesWithExtendedOperands(int i, long l, short s) {
+        // Keep this comment
         return (double) i / (double) l / (double) s;
     }
 
     public double doNotRemoveCastsFromAdditionWhenResultIsWidened(Integer oi, int pi, long l) {
+        // Keep this comment
         return (long) oi + (Integer) pi + (double) l;
     }
 
     public double doNotRemoveCastsFromSoustractionWhenResultIsWidened(Integer oi, int pi, long l) {
+        // Keep this comment
         return (long) oi - (Integer) pi - (double) l;
     }
 
     public boolean removeCastsFromBooleanOperations(boolean b1, boolean b2) {
+        // Keep this comment
         return b1 && (Boolean) b2;
     }
 
@@ -170,14 +183,17 @@ public class RemoveUnnecessaryCastSample {
     }
 
     public double removeOneCastInFloatingPointDivision(int i, int j, int k) {
+        // Keep this comment
         return i / (double) j / (double) k;
     }
 
     public long removeCastsInIntegralDivision(int i, int j, int k) {
+        // Keep this comment
         return i / (long) j / (long) k;
     }
 
     public int removeCastsFromAssignmentsToByte() {
+        // Keep this comment
         byte b1 = (byte) -1;
         byte b2 = (byte) 127;
         byte b3 = (byte) -128;
@@ -191,6 +207,7 @@ public class RemoveUnnecessaryCastSample {
     }
 
     public int removeCastsFromAssignmentsToChar() {
+        // Keep this comment
         char c1 = (char) 0;
         char c2 = (char) 65535;
         char c3 = (char) ONE;
@@ -202,6 +219,7 @@ public class RemoveUnnecessaryCastSample {
     }
 
     public int removeCastsFromAssignmentsToShort() {
+        // Keep this comment
         short s1 = (short) -1;
         short s2 = (short) 32767;
         short s3 = (short) -32768;

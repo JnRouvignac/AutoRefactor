@@ -28,34 +28,42 @@ package org.autorefactor.refactoring.rules.samples_out;
 public class UseStringContainsSample {
 
     private boolean replaceStringIndexOfGreaterThanOrEqual(String s) {
+        // Keep this comment
         return s.contains("test");
     }
 
     private boolean replaceStringIndexOfLesserThan(String s) {
+        // Keep this comment
         return !s.contains("test");
     }
 
     private boolean replaceStringIndexOfNotEqualsMinusOne(String s) {
+        // Keep this comment
         return s.contains("test");
     }
 
     private boolean replaceStringIndexOfEqualsMinusOne(String s) {
+        // Keep this comment
         return !s.contains("test");
     }
 
     private boolean replaceStringLastIndexOfGreaterThanOrEqual(String s) {
+        // Keep this comment
         return s.contains("test");
     }
 
     private boolean replaceStringLastIndexOfLesserThan(String s) {
+        // Keep this comment
         return !s.contains("test");
     }
 
     private boolean replaceStringLastIndexOfNotEqualsMinusOne(String s) {
+        // Keep this comment
         return s.contains("test");
     }
 
     private boolean replaceStringLastIndexOfEqualsMinusOne(String s) {
+        // Keep this comment
         return !s.contains("test");
     }
 

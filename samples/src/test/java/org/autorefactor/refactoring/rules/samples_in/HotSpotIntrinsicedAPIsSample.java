@@ -28,6 +28,7 @@ package org.autorefactor.refactoring.rules.samples_in;
 public class HotSpotIntrinsicedAPIsSample {
 
     public static void replaceBySystemArrayCopyBasic(int[] src, int[] dest) {
+        // Keep this comment 1
         for (int i = 0; i < 3; i++) {
             dest[i] = src[i];
         }
@@ -46,48 +47,56 @@ public class HotSpotIntrinsicedAPIsSample {
     }
 
     public static void replaceBySystemArrayCopyComplexUpperBound(int[] src, int[] dest) {
+        // Keep this comment 1
         for (int i = 0; i < src.length; i++) {
             dest[i] = src[i];
         }
     }
 
     public static void replaceBySystemArrayCopyAssignIndexVariable(int[] src, int[] dest, int i) {
+        // Keep this comment 1
         for (i = 0; i < 3; i++) {
             dest[i] = src[i];
         }
     }
 
     public static void replaceBySystemArrayCopyWithConstantSrcPos(int[] src, int[] dest) {
+        // Keep this comment 1
         for (int i = 0; i < src.length - 1; i++) {
             dest[i] = src[i + 1];
         }
     }
 
     public static void replaceBySystemArrayCopyWithArgumentSrcPos(int[] src, int startPos, int[] dest) {
+        // Keep this comment 1
         for (int j = 0; j < dest.length; j++) {
             dest[j] = src[startPos + j];
         }
     }
 
     public static void replaceBySystemArrayCopyWithDestPos(int[] src, int[] dest) {
+        // Keep this comment 1
         for (int i = 0; i < src.length - 1; i++) {
             dest[i + 1] = src[i];
         }
     }
 
     public static void replaceBySystemArrayCopyWithLowerBound(int[] src, int[] dest) {
+        // Keep this comment 1
         for (int i = 1; i <= 3; i++) {
             dest[i + 2] = src[i + 1];
         }
     }
 
     public static void replaceBySystemArrayCopyRevertedCondition(int[] src, int[] dest) {
+        // Keep this comment 1
         for (int i = 0; 3 > i; i++) {
             dest[i] = src[i];
         }
     }
 
     public static void replaceBySystemArrayCopyRevertedCondition2(int[] src, int[] dest) {
+        // Keep this comment 1
         for (int i = 0; 3 >= i; i++) {
             dest[i] = src[i];
         }

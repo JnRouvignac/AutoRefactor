@@ -29,22 +29,27 @@ package org.autorefactor.refactoring.rules.samples_in;
 public class StringSample {
 
     public String replaceNewString() {
+        // Keep this comment
         return new String("");
     }
 
     public String replaceNewStringFromStringExpression(String s) {
+        // Keep this comment
         return new String(s);
     }
 
     public String replaceNewStringInMethodInvocation(String s, int i) {
+        // Keep this comment
         return new String(s + i).toLowerCase();
     }
 
     public String replaceStringValueOfOnAString(String s) {
+        // Keep this comment
         return String.valueOf(s);
     }
 
     public String replaceStringToString(String s) {
+        // Keep this comment
         String s1 = s.toString();
         String s2 = "".toString();
         String s3 = getS().toString();
@@ -52,12 +57,14 @@ public class StringSample {
     }
 
     public String replaceToStringCallInStringConcat() {
+        // Keep this comment
         String s1 = "" + Boolean.TRUE.toString() + Boolean.FALSE.toString();
         String s2 = Boolean.TRUE.toString() + "" + Boolean.FALSE.toString();
         return s1 + s2;
     }
 
     public String replaceToStringCallOnCurrentObjectInStringConcat() {
+        // Keep this comment
         String s1 = "" + toString() + toString();
         String s2 = toString() + "" + toString();
         return s1 + s2;
@@ -65,6 +72,7 @@ public class StringSample {
 
     public class TestWithQualifiedToString {
         public String replaceToStringCallOnCurrentObjectInStringConcat() {
+            // Keep this comment
             String s1 = "" + StringSample.this.toString() + StringSample.this.toString() + toString();
             String s2 = StringSample.this.toString() + "" + toString();
             return s1 + s2;
@@ -76,10 +84,12 @@ public class StringSample {
     }
 
     public String doNotReplaceTwoConsecutiveToStringCalls() {
+        // Keep this comment
         return Boolean.TRUE.toString() + Boolean.FALSE.toString();
     }
 
     public String removeUselessToStringLeftOperand(byte b, short s) {
+        // Keep this comment
         String s1 = Boolean.toString(true) + " foo";
         String s2 = Character.toString('c') + " foo";
         String s3 = Byte.toString(b) + " foo";
@@ -92,6 +102,7 @@ public class StringSample {
     }
 
     public String removeUselessToStringRightOperand(byte b, short s) {
+        // Keep this comment
         String s1 = "foo " + Boolean.toString(true);
         String s2 = "foo " + Character.toString('c');
         String s3 = "foo " + Byte.toString(b);
@@ -104,6 +115,7 @@ public class StringSample {
     }
 
     public String removeUselessToStringExtendedOperand(byte b, short s) {
+        // Keep this comment
         String s1 = "foo " + Boolean.toString(true) + " bar";
         String s2 = "foo " + Character.toString('c') + " bar";
         String s3 = "foo " + Byte.toString(b) + " bar";
@@ -116,6 +128,7 @@ public class StringSample {
     }
 
     public String removeUselessValueOfLeftOperand(byte b, short s) {
+        // Keep this comment
         String s1 = String.valueOf(true) + " foo";
         String s2 = String.valueOf('c') + " foo";
         String s3 = String.valueOf(b) + " foo";
@@ -129,6 +142,7 @@ public class StringSample {
     }
 
     public String removeUselessValueOfRightOperand(byte b, short s) {
+        // Keep this comment
         String s1 = "foo " + String.valueOf(true);
         String s2 = "foo " + String.valueOf('c');
         String s3 = "foo " + String.valueOf(b);
@@ -142,6 +156,7 @@ public class StringSample {
     }
 
     public String removeUselessValueOfExtendedOperand(byte b, short s) {
+        // Keep this comment
         String s1 = "foo " + String.valueOf(true) + " bar";
         String s2 = "foo " + String.valueOf('c') + " bar";
         String s3 = "foo " + String.valueOf(b) + " bar";
@@ -158,6 +173,7 @@ public class StringSample {
     // String s = "" + Integer.toString(42);
 
     public String onlyRefactorFirstStringValueOf(Object o1, Object o2) {
+        // Keep this comment
         return String.valueOf(o1) + String.valueOf(o2);
     }
 
@@ -166,6 +182,7 @@ public class StringSample {
     }
 
     public String doNotRefactorStringValueOf2(Object o) {
+        // Keep this comment
         return "is null: " + String.valueOf(o == null);
     }
 
@@ -175,8 +192,10 @@ public class StringSample {
 
     public void replaceForcedConcatenationByStringValueOf(
             Object o, boolean b, char c, byte by, short s, int i, long l, float f, double d) {
+        // Keep this comment 1
         String text = o + "";
 
+        // Keep this comment 2
         text = b + "";
         text = c + "";
         text = by + "";
@@ -186,6 +205,7 @@ public class StringSample {
         text = f + "";
         text = d + "";
 
+        // Keep this comment 3
         text = "" + o;
         text = "" + b;
         text = "" + c;

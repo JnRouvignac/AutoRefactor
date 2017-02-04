@@ -40,6 +40,7 @@ import java.util.Map.Entry;
 public class CollectionSample {
 
     public void replaceNewNoArgsAssignmentThenAddAll(List<String> col, List<String> output) {
+        // Keep this comment
         output = new ArrayList<String>(col);
     }
 
@@ -49,16 +50,19 @@ public class CollectionSample {
     }
 
     public List<String> replaceNewNoArgsThenAddAll(List<String> col) {
+        // Keep this comment
         final List<String> output = new ArrayList<String>(col);
         return output;
     }
 
     public List<String> replaceNewOneArgThenAddAll(List<String> col) {
+        // Keep this comment
         final List<String> output = new ArrayList<String>(col);
         return output;
     }
 
     public List<String> replaceNewCollectionSizeThenAddAll(List<String> col) {
+        // Keep this comment
         final List<String> output = new ArrayList<String>(col);
         return output;
     }
@@ -70,18 +74,21 @@ public class CollectionSample {
     }
 
     public Object replaceNewThenAddAllParameterizedType(Map<String, String> map) {
+        // Keep this comment
         List<Entry<String, String>> output = new ArrayList<Entry<String, String>>(map.entrySet());
         return output;
     }
 
     public void replaceAddWithForLoopByCollectionsAddAll(
             List<? super java.util.Date> output, java.util.Date[] elems1, java.sql.Date[] elems2) {
+        // Keep this comment
         java.util.Collections.addAll(output, elems1);
         java.util.Collections.addAll(output, elems2);
     }
 
     public void replaceAddWithForEachByCollectionsAddAll(
             List<? super java.util.Date> output, java.util.Date[] elems1, java.sql.Date[] elems2) {
+        // Keep this comment
         java.util.Collections.addAll(output, elems1);
         java.util.Collections.addAll(output, elems2);
     }
@@ -141,26 +148,32 @@ public class CollectionSample {
     }
 
     public void replaceAddWithForLoopByAddAll(List<String> col, List<String> output) {
+        // Keep this comment
         output.addAll(col);
     }
 
     public void replaceAddWithForEachByAddAll(Collection<String> col, List<String> output) {
+        // Keep this comment
         output.addAll(col);
     }
 
     public void replaceContainsWithForLoopByContainsAll(List<String> col, List<String> output) {
+        // Keep this comment
         output.containsAll(col);
     }
 
     public void replaceContainsWithForEachByContainsAll(Collection<String> col, List<String> output) {
+        // Keep this comment
         output.containsAll(col);
     }
 
     public void replaceRemoveWithForLoopByRemoveAll(List<String> col, List<String> output) {
+        // Keep this comment
         output.removeAll(col);
     }
 
     public void replaceRemoveWithForEachByRemoveAll(Collection<String> col, List<String> output) {
+        // Keep this comment
         output.removeAll(col);
     }
 
@@ -181,6 +194,7 @@ public class CollectionSample {
     }
 
     public void replaceChecksOnSize(Collection<String> col) {
+        // Keep this comment
         System.out.println(!col.isEmpty());
         System.out.println(true);
         System.out.println(col.isEmpty());
@@ -195,6 +209,7 @@ public class CollectionSample {
     }
 
     public void replaceCheckOnSetNotContainsBeforeAdd(Set<String> col, String s) {
+        // Keep this comment
         if (col.add(s)) {
             System.out.println("OK");
         } else {
@@ -203,6 +218,7 @@ public class CollectionSample {
     }
 
     public void replaceCheckOnSetContainsBeforeAdd(Set<String> col, String s) {
+        // Keep this comment
         if (!col.add(s)) {
             System.out.println("KO");
         } else {
@@ -211,14 +227,17 @@ public class CollectionSample {
     }
 
     public void replaceCheckOnSetContainsOneAddStatement(Set<String> col, String s) {
+        // Keep this comment
         col.add(s);
     }
 
     public void replaceCheckOnSetNotContainsOneAddStatement(Set<String> col, String s) {
+        // Keep this comment
         col.add(s);
     }
 
     public void replaceCheckOnSetContainsBeforeRemove(Set<String> col, String s) {
+        // Keep this comment
         if (!col.remove(s)) {
             System.out.println("KO");
         } else {
@@ -227,6 +246,7 @@ public class CollectionSample {
     }
 
     public void replaceCheckOnSetNotContainsBeforeRemove(Set<String> col, String s) {
+        // Keep this comment
         if (col.remove(s)) {
             System.out.println("OK");
         } else {
@@ -235,10 +255,12 @@ public class CollectionSample {
     }
 
     public void replaceCheckOnSetContainsOneRemoveStatement(Set<String> col, String s) {
+        // Keep this comment
         col.remove(s);
     }
 
     public void replaceCheckOnSetNotContainsOneRemoveStatement(Set<String> col, String s) {
+        // Keep this comment
         col.remove(s);
     }
 
@@ -281,6 +303,7 @@ public class CollectionSample {
 
     public class MySet extends AbstractSet<String> {
         public MySet(List<String> strings) {
+            // Keep this comment
             addAll(strings);
         }
 
@@ -301,6 +324,7 @@ public class CollectionSample {
         }
 
         final MyHashSet set = new MyHashSet();
+        // Keep this comment
         set.addAll(strings);
         return set;
     }

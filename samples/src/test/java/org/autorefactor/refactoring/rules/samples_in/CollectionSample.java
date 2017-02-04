@@ -40,6 +40,7 @@ import java.util.Map.Entry;
 public class CollectionSample {
 
     public void replaceNewNoArgsAssignmentThenAddAll(List<String> col, List<String> output) {
+        // Keep this comment
         output = new ArrayList<String>();
         output.addAll(col);
     }
@@ -50,18 +51,21 @@ public class CollectionSample {
     }
 
     public List<String> replaceNewNoArgsThenAddAll(List<String> col) {
+        // Keep this comment
         final List<String> output = new ArrayList<String>();
         output.addAll(col);
         return output;
     }
 
     public List<String> replaceNewOneArgThenAddAll(List<String> col) {
+        // Keep this comment
         final List<String> output = new ArrayList<String>(0);
         output.addAll(col);
         return output;
     }
 
     public List<String> replaceNewCollectionSizeThenAddAll(List<String> col) {
+        // Keep this comment
         final List<String> output = new ArrayList<String>(col.size());
         output.addAll(col);
         return output;
@@ -74,6 +78,7 @@ public class CollectionSample {
     }
 
     public Object replaceNewThenAddAllParameterizedType(Map<String, String> map) {
+        // Keep this comment
         List<Entry<String, String>> output = new ArrayList<Entry<String, String>>();
         output.addAll(map.entrySet());
         return output;
@@ -81,6 +86,7 @@ public class CollectionSample {
 
     public void replaceAddWithForLoopByCollectionsAddAll(
             List<? super java.util.Date> output, java.util.Date[] elems1, java.sql.Date[] elems2) {
+        // Keep this comment
         for (int i = 0; i < elems1.length; i++) {
             output.add(elems1[i]);
         }
@@ -91,6 +97,7 @@ public class CollectionSample {
 
     public void replaceAddWithForEachByCollectionsAddAll(
             List<? super java.util.Date> output, java.util.Date[] elems1, java.sql.Date[] elems2) {
+        // Keep this comment
         for (java.util.Date d : elems1) {
             output.add(d);
         }
@@ -154,36 +161,42 @@ public class CollectionSample {
     }
 
     public void replaceAddWithForLoopByAddAll(List<String> col, List<String> output) {
+        // Keep this comment
         for (int i = 0; i < col.size(); i++) {
             output.add(col.get(i));
         }
     }
 
     public void replaceAddWithForEachByAddAll(Collection<String> col, List<String> output) {
+        // Keep this comment
         for (String s : col) {
             output.add(s);
         }
     }
 
     public void replaceContainsWithForLoopByContainsAll(List<String> col, List<String> output) {
+        // Keep this comment
         for (int i = 0; i < col.size(); i++) {
             output.contains(col.get(i));
         }
     }
 
     public void replaceContainsWithForEachByContainsAll(Collection<String> col, List<String> output) {
+        // Keep this comment
         for (String s : col) {
             output.contains(s);
         }
     }
 
     public void replaceRemoveWithForLoopByRemoveAll(List<String> col, List<String> output) {
+        // Keep this comment
         for (int i = 0; i < col.size(); i++) {
             output.remove(col.get(i));
         }
     }
 
     public void replaceRemoveWithForEachByRemoveAll(Collection<String> col, List<String> output) {
+        // Keep this comment
         for (String s : col) {
             output.remove(s);
         }
@@ -206,6 +219,7 @@ public class CollectionSample {
     }
 
     public void replaceChecksOnSize(Collection<String> col) {
+        // Keep this comment
         System.out.println(col.size() > 0);
         System.out.println(col.size() >= 0);
         System.out.println(col.size() == 0);
@@ -220,6 +234,7 @@ public class CollectionSample {
     }
 
     public void replaceCheckOnSetNotContainsBeforeAdd(Set<String> col, String s) {
+        // Keep this comment
         if (!col.contains(s)) {
             col.add(s);
             System.out.println("OK");
@@ -229,6 +244,7 @@ public class CollectionSample {
     }
 
     public void replaceCheckOnSetContainsBeforeAdd(Set<String> col, String s) {
+        // Keep this comment
         if (col.contains(s)) {
             System.out.println("KO");
         } else {
@@ -238,6 +254,7 @@ public class CollectionSample {
     }
 
     public void replaceCheckOnSetContainsOneAddStatement(Set<String> col, String s) {
+        // Keep this comment
         if (col.contains(s)) {
         } else {
             col.add(s);
@@ -245,12 +262,14 @@ public class CollectionSample {
     }
 
     public void replaceCheckOnSetNotContainsOneAddStatement(Set<String> col, String s) {
+        // Keep this comment
         if (!col.contains(s)) {
             col.add(s);
         }
     }
 
     public void replaceCheckOnSetContainsBeforeRemove(Set<String> col, String s) {
+        // Keep this comment
         if (!col.contains(s)) {
             System.out.println("KO");
         } else {
@@ -260,6 +279,7 @@ public class CollectionSample {
     }
 
     public void replaceCheckOnSetNotContainsBeforeRemove(Set<String> col, String s) {
+        // Keep this comment
         if (col.contains(s)) {
             col.remove(s);
             System.out.println("OK");
@@ -269,12 +289,14 @@ public class CollectionSample {
     }
 
     public void replaceCheckOnSetContainsOneRemoveStatement(Set<String> col, String s) {
+        // Keep this comment
         if (col.contains(s)) {
             col.remove(s);
         }
     }
 
     public void replaceCheckOnSetNotContainsOneRemoveStatement(Set<String> col, String s) {
+        // Keep this comment
         if (!col.contains(s)) {
         } else {
             col.remove(s);
@@ -320,6 +342,7 @@ public class CollectionSample {
 
     public class MySet extends AbstractSet<String> {
         public MySet(List<String> strings) {
+            // Keep this comment
             for (String s : strings) {
                 add(s);
             }
@@ -342,6 +365,7 @@ public class CollectionSample {
         }
 
         final MyHashSet set = new MyHashSet();
+        // Keep this comment
         for (String s : strings) {
             set.add(s);
         }

@@ -65,14 +65,17 @@ public class ReplaceQualifiedNamesBySimpleNamesSample {
     }
 
     public int removeQualifiedNameForStaticImportWithWildcard() {
+        // Keep this comment
         return java.util.Calendar.DATE;
     }
 
     public boolean removeQualifiedNameForStaticMethodImport() {
+        // Keep this comment
         return java.util.Collections.emptyList().containsAll(Collections.emptyList());
     }
 
     public boolean removeQualifiedNameForStaticFieldImport() {
+        // Keep this comment
         return java.util.Collections.EMPTY_LIST.containsAll(Collections.EMPTY_LIST);
     }
 
@@ -97,6 +100,7 @@ public class ReplaceQualifiedNamesBySimpleNamesSample {
     }
 
     public BigDecimal removeQualifiedNameForOverridingFieldSimpleNameFromStaticImports() {
+        // Keep this comment
         return BigDecimal.ONE;
     }
 
@@ -105,6 +109,7 @@ public class ReplaceQualifiedNamesBySimpleNamesSample {
     }
 
     public int removeQualifiedNameForNonConflictingLocalMethodSimpleName() {
+        // Keep this comment
         return ReplaceQualifiedNamesBySimpleNamesSample.emptyMap();
     }
 
@@ -113,6 +118,7 @@ public class ReplaceQualifiedNamesBySimpleNamesSample {
     }
 
     public java.lang.Boolean removeQualifiedNameForJavaLangPackage() {
+        // Keep this comment
         return java.lang.Boolean.TRUE;
     }
 
@@ -121,6 +127,7 @@ public class ReplaceQualifiedNamesBySimpleNamesSample {
     }
 
     public Integer removeQualifiedNameForNonConflictingLocalType() {
+        // Keep this comment
         return new ReplaceQualifiedNamesBySimpleNamesSample.Integer();
     }
 
@@ -132,6 +139,7 @@ public class ReplaceQualifiedNamesBySimpleNamesSample {
     }
 
     public String removeQualifiedNameForNonConflictingLocalField() {
+        // Keep this comment
         return ReplaceQualifiedNamesBySimpleNamesSample.DAY_OF_WEEK_IN_MONTH;
     }
 
@@ -139,6 +147,7 @@ public class ReplaceQualifiedNamesBySimpleNamesSample {
 
     static class A {
         private int replaceFromEnclosingType() {
+            // Keep this comment
             return ReplaceQualifiedNamesBySimpleNamesSample.emptyMap();
         }
     }
@@ -155,6 +164,7 @@ public class ReplaceQualifiedNamesBySimpleNamesSample {
 
     static class C {
         private int replaceFromCurrentType() {
+            // Keep this comment
             return C.emptyMap();
         }
 
@@ -165,6 +175,7 @@ public class ReplaceQualifiedNamesBySimpleNamesSample {
 
     static class D extends C {
         private int replaceFromSuperType() {
+            // Keep this comment
             return C.emptyMap();
         }
     }

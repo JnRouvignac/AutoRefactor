@@ -33,6 +33,7 @@ public class NoAssignmentInIfConditionSample {
         Integer i;
         System.out.println("Before polling");
         i = q.poll();
+        // Keep this comment 1
         if (i != null) {
             System.out.println("Value=" + i);
         } else {
@@ -44,6 +45,7 @@ public class NoAssignmentInIfConditionSample {
         Integer i;
         System.out.println("Before polling");
         i = q.poll();
+        // Keep this comment 1
         if (null != i) {
             System.out.println("Value=" + i);
         } else {
@@ -55,6 +57,7 @@ public class NoAssignmentInIfConditionSample {
         Integer i;
         System.out.println("Before polling");
         i = q.poll();
+        // Keep this comment 1
         if (i != null) {
             System.out.println("Value=" + i);
         } else {
@@ -64,6 +67,7 @@ public class NoAssignmentInIfConditionSample {
 
     public void moveAssignmentBeforeIfAndMergeWithDeclaration(Queue<Integer> q) {
         Integer i = q.poll();
+        // Keep this comment 1
         if (i != null) {
             System.out.println("Value=" + i);
         } else {
@@ -74,6 +78,7 @@ public class NoAssignmentInIfConditionSample {
     public void doNotRefactor(Queue<Integer> q) {
         Integer i;
         System.out.println("Before polling");
+        // Keep this comment 1
         if (q == null) {
             System.out.println("Null queue");
         } else if ((i = q.poll()) != null) {
@@ -85,6 +90,7 @@ public class NoAssignmentInIfConditionSample {
 
     private void moveAssignmentBeforeIfAtStartOfInfixExpression(String s, int i) {
         final char c = s.charAt(i);
+        // Keep this comment 1
         if (c == 'A' || c == 'B' || c == 'C') {
             System.out.println("A, B or C");
         } else {
@@ -93,6 +99,7 @@ public class NoAssignmentInIfConditionSample {
     }
 
     private void doNotMoveAssignmentBeforeIfInsideInfixExpression(String s, int i, char c) {
+        // Keep this comment 1
         if (c == 'A' || (c = s.charAt(i)) == 'A' || c == 'B' || c == 'C') {
             System.out.println("A, B or C");
         } else {

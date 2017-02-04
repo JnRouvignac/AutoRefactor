@@ -32,6 +32,7 @@ public class NoAssignmentInIfConditionSample {
     public void moveLeftHandSideAssignmentBeforeIf(Queue<Integer> q) {
         Integer i;
         System.out.println("Before polling");
+        // Keep this comment 1
         if ((i = q.poll()) != null) {
             System.out.println("Value=" + i);
         } else {
@@ -42,6 +43,7 @@ public class NoAssignmentInIfConditionSample {
     public void moveRightHandSideAssignmentBeforeIf(Queue<Integer> q) {
         Integer i;
         System.out.println("Before polling");
+        // Keep this comment 1
         if (null != (i = q.poll())) {
             System.out.println("Value=" + i);
         } else {
@@ -52,6 +54,7 @@ public class NoAssignmentInIfConditionSample {
     public void moveAssignmentBeforeIfMultipleParenthesesToRemove(Queue<Integer> q) {
         Integer i;
         System.out.println("Before polling");
+        // Keep this comment 1
         if ((((i = q.poll()))) != null) {
             System.out.println("Value=" + i);
         } else {
@@ -61,6 +64,7 @@ public class NoAssignmentInIfConditionSample {
 
     public void moveAssignmentBeforeIfAndMergeWithDeclaration(Queue<Integer> q) {
         Integer i;
+        // Keep this comment 1
         if ((i = q.poll()) != null) {
             System.out.println("Value=" + i);
         } else {
@@ -71,6 +75,7 @@ public class NoAssignmentInIfConditionSample {
     public void doNotRefactor(Queue<Integer> q) {
         Integer i;
         System.out.println("Before polling");
+        // Keep this comment 1
         if (q == null) {
             System.out.println("Null queue");
         } else if ((i = q.poll()) != null) {
@@ -82,6 +87,7 @@ public class NoAssignmentInIfConditionSample {
 
     private void moveAssignmentBeforeIfAtStartOfInfixExpression(String s, int i) {
         final char c;
+        // Keep this comment 1
         if ((c = s.charAt(i)) == 'A' || c == 'B' || c == 'C') {
             System.out.println("A, B or C");
         } else {
@@ -90,6 +96,7 @@ public class NoAssignmentInIfConditionSample {
     }
 
     private void doNotMoveAssignmentBeforeIfInsideInfixExpression(String s, int i, char c) {
+        // Keep this comment 1
         if (c == 'A' || (c = s.charAt(i)) == 'A' || c == 'B' || c == 'C') {
             System.out.println("A, B or C");
         } else {
