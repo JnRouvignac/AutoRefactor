@@ -25,7 +25,6 @@
  */
 package org.autorefactor.refactoring.rules;
 
-import org.autorefactor.preferences.Preferences;
 import org.autorefactor.util.NotImplementedException;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.AbstractTypeDeclaration;
@@ -51,11 +50,6 @@ public class RemoveUnneededThisExpressionRefactoring extends AbstractRefactoring
     @Override
     public String getName() {
         return "Remove unneeded this expressions";
-    }
-
-    @Override
-    public boolean isEnabled(Preferences preferences) {
-        return preferences.removeThisForNonStaticMethodAccess();
     }
 
     @Override

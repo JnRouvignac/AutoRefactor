@@ -27,6 +27,7 @@ package org.autorefactor.ui.preferences;
 
 import org.autorefactor.preferences.PreferenceConstants;
 import org.autorefactor.preferences.Preferences;
+import org.autorefactor.refactoring.rules.AbstractRefactoringRule;
 import org.eclipse.jface.preference.IPreferenceStore;
 
 import static org.autorefactor.preferences.PreferenceConstants.*;
@@ -54,12 +55,7 @@ public class EclipsePreferences implements Preferences {
     }
 
     @Override
-    public boolean removeThisForNonStaticMethodAccess() {
-        return getBoolean(REMOVE_THIS_FOR_NON_STATIC_METHOD_ACCESS);
-    }
-
-    @Override
-    public boolean addCurlyBracketsToStatementBodies() {
-        return getBoolean(ADD_CURLY_BRACKETS_TO_STATEMENT_BODIES);
+    public boolean isEnabled(Class<? extends AbstractRefactoringRule> clazz) {
+        return preferenceStore.getBoolean(clazz.getCanonicalName());
     }
 }

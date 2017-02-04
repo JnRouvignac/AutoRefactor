@@ -3028,4 +3028,9 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         }
         return VISIT_SUBTREE;
     }
+
+    @Override
+    public boolean isByDefault() {
+        return false;
+    }
 }

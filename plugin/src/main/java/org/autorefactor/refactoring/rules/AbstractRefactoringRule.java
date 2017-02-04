@@ -41,8 +41,13 @@ public abstract class AbstractRefactoringRule extends ASTVisitor implements Java
     protected RefactoringContext ctx;
 
     @Override
-    public boolean isEnabled(Preferences preferences) {
+    public boolean isByDefault() {
         return true;
+    }
+
+    @Override
+    public boolean isEnabled(Preferences preferences) {
+        return preferences.isEnabled(this.getClass());
     }
 
     @Override

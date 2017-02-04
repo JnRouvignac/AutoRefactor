@@ -27,6 +27,8 @@ package org.autorefactor.ui.preferences;
 
 import org.autorefactor.AutoRefactorPlugin;
 import org.autorefactor.preferences.PreferenceConstants;
+import org.autorefactor.refactoring.RefactoringRule;
+import org.autorefactor.refactoring.rules.AllRefactoringRules;
 import org.autorefactor.util.NotImplementedException;
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -59,6 +61,9 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
                 throw new NotImplementedException(null, defaultValue);
             }
         }
-        store.setDefault(ADD_CURLY_BRACKETS_TO_STATEMENT_BODIES.getName(), true);
+
+        for (RefactoringRule refactoringRule : AllRefactoringRules.getAllRefactoringRules()) {
+            store.setDefault(refactoringRule.getClass().getCanonicalName(), refactoringRule.isByDefault());
+        }
     }
 }
