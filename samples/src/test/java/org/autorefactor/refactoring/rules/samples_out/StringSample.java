@@ -220,4 +220,33 @@ public class StringSample {
     public void doNotReplaceConcatenateWithCharArray(char[] chars) {
         String text = "" + chars;
     }
+
+    public void replaceCaseShift(String s1, String s2) {
+        s1.equalsIgnoreCase(s2);
+        s1.equalsIgnoreCase(s2);
+        "lorem".equalsIgnoreCase("ipsum");
+        "lorem".equalsIgnoreCase("ipsum");
+    }
+
+    public void doNotReplaceUnilateralCaseShift(String s1, String s2) {
+        s1.toUpperCase().equals(s2);
+        s1.toLowerCase().equals(s2);
+        s1.equals(s2.toLowerCase());
+        s1.equals(s2.toUpperCase());
+    }
+
+    public void doNotReplaceCaseIncompatibility(String s1, String s2) {
+        s1.toLowerCase().equals(s2.toUpperCase());
+    }
+
+    public void simplifyInsensitiveCaseEquality(String s1, String s2) {
+        s1.equalsIgnoreCase(s2);
+        s1.equalsIgnoreCase(s2);
+        s1.equalsIgnoreCase(s2);
+        s1.equalsIgnoreCase(s2);
+        s1.equalsIgnoreCase(s2);
+        s1.equalsIgnoreCase(s2);
+        s1.equalsIgnoreCase(s2);
+        s1.equalsIgnoreCase(s2);
+    }
 }
