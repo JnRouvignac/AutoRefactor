@@ -31,42 +31,23 @@ import java.util.List;
 public class CollectionContainsSample {
     public boolean replaceForeach(List<String> col, String toFind) {
         // Keep this comment 1
-        for (String s : col) {
-            if (s.equals(toFind)) {
-                return true;
-            }
-        }
-        return false;
+        return col.contains(toFind);
     }
 
     public boolean replaceForeachInvertedEquals(List<String> col, String toFind) {
         // Keep this comment 1
-        for (String s : col) {
-            if (toFind.equals(s)) {
-                return true;
-            }
-        }
-        return false;
+        return col.contains(toFind);
     }
 
     public boolean replaceForeachWithNotCollectionContains(List<String> col, String toFind) {
         // Keep this comment 1
-        for (String s : col) {
-            if (s.equals(toFind)) {
-                return false;
-            }
-        }
-        return true;
+        return !col.contains(toFind);
     }
 
     public boolean replaceForeachNextStatementAfterTry(List<String> col, String toFind) {
         try {
             // Keep this comment 1
-            for (String s : col) {
-                if (s.equals(toFind)) {
-                    return true;
-                }
-            }
+            return col.contains(toFind);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -76,11 +57,7 @@ public class CollectionContainsSample {
     public boolean replaceForeachNextStatementAfterIf(List<String> col, String toFind, boolean b) {
         if (b) {
             // Keep this comment 1
-            for (String s : col) {
-                if (s.equals(toFind)) {
-                    return true;
-                }
-            }
+            return col.contains(toFind);
         }
         return false;
     }
@@ -89,11 +66,7 @@ public class CollectionContainsSample {
         boolean result = false;
         try {
             // Keep this comment 1
-            for (String s : col) {
-                if (s.equals(toFind)) {
-                    result = true;
-                }
-            }
+            result = col.contains(toFind);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -104,35 +77,18 @@ public class CollectionContainsSample {
         boolean result = false;
         if (b) {
             // Keep this comment 1
-            for (String s : col) {
-                if (s.equals(toFind)) {
-                    result = true;
-                }
-            }
+            result = col.contains(toFind);
         }
         return result;
     }
 
     public boolean replaceForeachHoldResultInVariableThenBreak(List<String> col, String toFind) {
-        // Keep this comment 1
-        boolean result = false;
-        for (String s : col) {
-            if (s.equals(toFind)) {
-                result = true;
-                break;
-            }
-        }
+        boolean result = col.contains(toFind);
         return result;
     }
 
     public boolean replaceForeachHoldResultInVariableNoBreak(List<String> col, String toFind) {
-        // Keep this comment 1
-        boolean result = false;
-        for (String s : col) {
-            if (s.equals(toFind)) {
-                result = true;
-            }
-        }
+        boolean result = col.contains(toFind);
         return result;
     }
 
@@ -140,13 +96,7 @@ public class CollectionContainsSample {
         // Keep this comment 1
         boolean result = false;
         ;
-        result = false;
-        for (String s : col) {
-            if (s.equals(toFind)) {
-                result = true;
-                break;
-            }
-        }
+        result = col.contains(toFind);
         return result;
     }
 
@@ -173,88 +123,43 @@ public class CollectionContainsSample {
 
     public boolean replaceForCounter(List<String> col, String toFind) {
         // Keep this comment 1
-        for (int i = 0; i < col.size(); i++) {
-            String s = col.get(i);
-            if (s.equals(toFind)) {
-                return true;
-            }
-        }
-        return false;
+        return col.contains(toFind);
     }
 
     public boolean replaceForCounterInvertedCondition(List<String> col, String toFind) {
         // Keep this comment 1
-        for (int i = 0; col.size() > i; i++) {
-            String s = col.get(i);
-            if (s.equals(toFind)) {
-                return true;
-            }
-        }
-        return false;
+        return col.contains(toFind);
     }
 
     public boolean replaceForCounterPrefixedUpdater(List<String> col, String toFind) {
         // Keep this comment 1
-        for (int i = 0; i < col.size(); ++i) {
-            String s = col.get(i);
-            if (s.equals(toFind)) {
-                return true;
-            }
-        }
-        return false;
+        return col.contains(toFind);
     }
 
     public boolean replaceForCounterNoVariableDeclaration(List<String> col, String toFind) {
         // Keep this comment 1
         int i;
-        for (i = 0; i < col.size(); ++i) {
-            String s = col.get(i);
-            if (s.equals(toFind)) {
-                return true;
-            }
-        }
-        return false;
+        return col.contains(toFind);
     }
 
     public boolean replaceForCounterNoLoopVariable(List<String> col, String toFind) {
         // Keep this comment 1
-        for (int i = 0; i < col.size(); i++) {
-            if (col.get(i).equals(toFind)) {
-                return true;
-            }
-        }
-        return false;
+        return col.contains(toFind);
     }
 
     public boolean replaceForCounterNoLoopVariableInvertedEquals(List<String> col, String toFind) {
         // Keep this comment 1
-        for (int i = 0; i < col.size(); ++i) {
-            if (toFind.equals(col.get(i))) {
-                return true;
-            }
-        }
-        return false;
+        return col.contains(toFind);
     }
 
     public boolean replaceForIterator(List<String> col, String toFind) {
         // Keep this comment 1
-        for (Iterator<String> it = col.iterator(); it.hasNext();) {
-            String s = it.next();
-            if (s.equals(toFind)) {
-                return true;
-            }
-        }
-        return false;
+        return col.contains(toFind);
     }
 
     public boolean replaceForIteratorNoLoopVariable(List<String> col, String toFind) {
         // Keep this comment 1
-        for (Iterator<String> it = col.iterator(); it.hasNext();) {
-            if (it.next().equals(toFind)) {
-                return true;
-            }
-        }
-        return false;
+        return col.contains(toFind);
     }
 
     public String doNotRefactor1(List<String> col, String toFind) {

@@ -88,6 +88,7 @@ public final class AllRefactoringRules {
                 new UseMultiCatchRefactoring(),
                 new CollectionContainsRefactoring(),
                 new CollectionRefactoring(),
+                new IsEmptyRatherThanSizeRefactoring(),
                 new MapRefactoring(),
                 new MapEliminateKeySetCallsRefactoring(),
                 new NoAssignmentInIfConditionRefactoring(),

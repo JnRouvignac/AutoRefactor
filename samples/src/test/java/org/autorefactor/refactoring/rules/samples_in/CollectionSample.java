@@ -218,21 +218,6 @@ public class CollectionSample {
         return null;
     }
 
-    public void replaceChecksOnSize(Collection<String> col) {
-        // Keep this comment
-        System.out.println(col.size() > 0);
-        System.out.println(col.size() >= 0);
-        System.out.println(col.size() == 0);
-        System.out.println(col.size() <= 0);
-        System.out.println(col.size() < 0);
-
-        System.out.println(0 < col.size());
-        System.out.println(0 <= col.size());
-        System.out.println(0 == col.size());
-        System.out.println(0 >= col.size());
-        System.out.println(0 > col.size());
-    }
-
     public void replaceCheckOnSetNotContainsBeforeAdd(Set<String> col, String s) {
         // Keep this comment
         if (!col.contains(s)) {

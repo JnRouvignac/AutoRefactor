@@ -193,21 +193,6 @@ public class CollectionSample {
         return null;
     }
 
-    public void replaceChecksOnSize(Collection<String> col) {
-        // Keep this comment
-        System.out.println(!col.isEmpty());
-        System.out.println(true);
-        System.out.println(col.isEmpty());
-        System.out.println(col.isEmpty());
-        System.out.println(false);
-
-        System.out.println(!col.isEmpty());
-        System.out.println(true);
-        System.out.println(col.isEmpty());
-        System.out.println(col.isEmpty());
-        System.out.println(false);
-    }
-
     public void replaceCheckOnSetNotContainsBeforeAdd(Set<String> col, String s) {
         // Keep this comment
         if (col.add(s)) {

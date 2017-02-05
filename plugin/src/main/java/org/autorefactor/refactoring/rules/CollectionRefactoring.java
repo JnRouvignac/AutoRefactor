@@ -43,7 +43,6 @@ import org.eclipse.jdt.core.dom.ForStatement;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.IfStatement;
-import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Name;
 import org.eclipse.jdt.core.dom.PrefixExpression;
@@ -55,7 +54,6 @@ import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.autorefactor.refactoring.ForLoopHelper.*;
 import static org.autorefactor.util.Utils.*;
-import static org.eclipse.jdt.core.dom.InfixExpression.Operator.*;
 import static org.eclipse.jdt.core.dom.PrefixExpression.Operator.*;
 
 /** See {@link #getDescription()} method. */
@@ -70,7 +68,6 @@ public class CollectionRefactoring extends AbstractRefactoringRule {
             + "- replaces for/foreach loops to use Collections.addAll() where possible,\n"
             + "- replaces creating a new Collection, then invoking Collection.addAll() on it,"
             + " by creating the new Collection with the other Collection as parameter,\n"
-            + "- replaces some checks on Collection.size() with checks on Collection.isEmpty(),\n"
             + "- replaces calls to Set.contains() immediately followed by Set.add()"
             + " with straight calls to Set.add(),\n"
             + "- replaces calls to Set.contains() immediately followed by Set.remove()"
@@ -315,86 +312,6 @@ public class CollectionRefactoring extends AbstractRefactoringRule {
                             b.copy(colToAddAll))));
         }
         return DO_NOT_VISIT_SUBTREE;
-    }
-
-    @Override
-    public boolean visit(InfixExpression node) {
-        final MethodInvocation leftMi = as(node.getLeftOperand(), MethodInvocation.class);
-        final MethodInvocation rightMi = as(node.getRightOperand(), MethodInvocation.class);
-        if (isMethod(leftMi, "java.util.Collection", "size")
-                && isZero(node.getRightOperand())) {
-            return replaceCollectionSize(node, leftMi);
-        } else if (isMethod(rightMi, "java.util.Collection", "size")
-                && isZero(node.getLeftOperand())) {
-            return replaceInverseCollectionSize(node, rightMi);
-        }
-        return VISIT_SUBTREE;
-    }
-
-    private boolean replaceCollectionSize(InfixExpression node, MethodInvocation miToReplace) {
-        final Refactorings r = this.ctx.getRefactorings();
-        final ASTBuilder b = this.ctx.getASTBuilder();
-        final Expression copyOfExpr = b.copyExpression(miToReplace);
-        if (hasOperator(node, GREATER)) {
-            r.replace(node,
-                    b.not(b.invoke(copyOfExpr, "isEmpty")));
-            return DO_NOT_VISIT_SUBTREE;
-        } else if (hasOperator(node, GREATER_EQUALS)) {
-            r.replace(node,
-                    b.boolean0(true));
-            return DO_NOT_VISIT_SUBTREE;
-        } else if (hasOperator(node, EQUALS)) {
-            r.replace(node,
-                    b.invoke(copyOfExpr, "isEmpty"));
-            return DO_NOT_VISIT_SUBTREE;
-        } else if (hasOperator(node, LESS_EQUALS)) {
-            r.replace(node,
-                    b.invoke(copyOfExpr, "isEmpty"));
-            return DO_NOT_VISIT_SUBTREE;
-        } else if (hasOperator(node, LESS)) {
-            r.replace(node,
-                    b.boolean0(false));
-        }
-        return VISIT_SUBTREE;
-    }
-
-    private boolean replaceInverseCollectionSize(InfixExpression node, MethodInvocation miToReplace) {
-        final Refactorings r = this.ctx.getRefactorings();
-        final ASTBuilder b = this.ctx.getASTBuilder();
-        final Expression copyOfExpr = b.copyExpression(miToReplace);
-        if (hasOperator(node, LESS)) {
-            r.replace(node,
-                    b.not(b.invoke(copyOfExpr, "isEmpty")));
-            return DO_NOT_VISIT_SUBTREE;
-        } else if (hasOperator(node, LESS_EQUALS)) {
-            r.replace(node,
-                    b.boolean0(true));
-            return DO_NOT_VISIT_SUBTREE;
-        } else if (hasOperator(node, EQUALS)) {
-            r.replace(node,
-                    b.invoke(copyOfExpr, "isEmpty"));
-            return DO_NOT_VISIT_SUBTREE;
-        } else if (hasOperator(node, GREATER_EQUALS)) {
-            r.replace(node,
-                    b.invoke(copyOfExpr, "isEmpty"));
-            return DO_NOT_VISIT_SUBTREE;
-        } else if (hasOperator(node, GREATER)) {
-            r.replace(node,
-                    b.boolean0(false));
-        }
-        return VISIT_SUBTREE;
-    }
-
-    private boolean isZero(Expression expr) {
-        if (expr != null) {
-            final Object val = expr.resolveConstantExpressionValue();
-            if (val instanceof Integer) {
-                return ((Integer) val).intValue() == 0;
-            } else if (val instanceof Long) {
-                return ((Long) val).longValue() == 0;
-            }
-        }
-        return false;
     }
 
     @Override
