@@ -88,6 +88,10 @@ public class StringBuilderSample {
         sb.append(f);
         sb.append(d);
         sb.append(d);
+
+        sb.append(o).append(b).append(b).append(c).append(c).append(i)
+                .append(i).append(l).append(l).append(f).append(f).append(d)
+                .append(d);
     }
 
     public void removeUselessCallsToValueOfWithStringBufferAppend(
@@ -107,6 +111,10 @@ public class StringBuilderSample {
         sb.append(f);
         sb.append(d);
         sb.append(d);
+
+        sb.append(o).append(b).append(b).append(c).append(c).append(i)
+                .append(i).append(l).append(l).append(f).append(f).append(d)
+                .append(d);
     }
 
     public void removeUselessCallsToToStringOfWithStringBuilderAppend(
@@ -123,6 +131,9 @@ public class StringBuilderSample {
         sb.append(l);
         sb.append(f);
         sb.append(d);
+
+        sb.append(this).append(o).append(bo).append(by).append(c).append(s)
+                .append(i).append(l).append(f).append(d);
     }
 
     public void removeUselessCallsToToStringOfWithStringBufferAppend(
@@ -139,6 +150,23 @@ public class StringBuilderSample {
         sb.append(l);
         sb.append(f);
         sb.append(d);
+
+        sb.append(this).append(o).append(bo).append(by).append(c).append(s)
+                .append(i).append(l).append(f).append(d);
+    }
+
+    public void removeValueOfCallsWithCast(char c, byte b, Character cObject, Byte bObject) {
+        StringBuilder sb = new StringBuilder();
+        sb.append((int) b);
+        sb.append((int) c);
+        sb.append((int) bObject);
+        sb.append((int) cObject);
+    }
+
+    public void removeValueOfCallsWithoutCast(int i, Integer iObject) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(i);
+        sb.append(iObject);
     }
 
     public void removeSubstringDoubleArgsCallsWithAppend(String s) {
