@@ -151,6 +151,7 @@ public final class AllRefactoringRules {
                 new HashMapRatherThanTreeMapRefactoring(),
                 new HashSetRatherThanTreeSetRefactoring(),
                 new UseStringContainsRefactoring(),
+                new EnforceStaticFinalLoggerRefactoring(),
                 new CommentsRefactoring(),
                 new RemoveFieldsDefaultValuesRefactoring(),
                 new StaticConstantRatherThanInstanceConstantRefactoring(),

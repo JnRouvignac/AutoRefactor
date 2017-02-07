@@ -31,21 +31,17 @@ import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
 import static org.autorefactor.refactoring.ASTHelper.hasType;
 import static org.autorefactor.refactoring.ASTHelper.modifiers;
 import static org.autorefactor.refactoring.ASTHelper.resources;
+import static org.autorefactor.refactoring.ASTHelper.getModifiersOnly;
 import static org.eclipse.jdt.core.dom.Modifier.isFinal;
 import static org.eclipse.jdt.core.dom.Modifier.isPrivate;
 import static org.eclipse.jdt.core.dom.Modifier.isProtected;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import org.autorefactor.refactoring.ASTBuilder;
-import org.autorefactor.util.NotImplementedException;
-import org.eclipse.jdt.core.dom.ASTNode;
+import org.autorefactor.refactoring.ASTHelper;
 import org.eclipse.jdt.core.dom.Annotation;
+import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.AnnotationTypeDeclaration;
 import org.eclipse.jdt.core.dom.AnnotationTypeMemberDeclaration;
 import org.eclipse.jdt.core.dom.BodyDeclaration;
@@ -54,7 +50,6 @@ import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.IExtendedModifier;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.Modifier;
-import org.eclipse.jdt.core.dom.Modifier.ModifierKeyword;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.TryStatement;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
@@ -96,51 +91,6 @@ public class RemoveUselessModifiersRefactoring extends AbstractRefactoringRule {
     public String getReason() {
         return "It reduces code to focus attention on code that matters.";
     }
-
-    private static final class ModifierOrderComparator implements Comparator<IExtendedModifier> {
-        /**
-         * Compare objects.
-         *
-         * @param o1 First item
-         * @param o2 Second item
-         *
-         * @return -1, 0 or 1
-         */
-        public int compare(IExtendedModifier o1, IExtendedModifier o2) {
-            if (o1.isAnnotation()) {
-                if (o2.isAnnotation()) {
-                    return 0;
-                } else {
-                    return -1;
-                }
-            } else if (o2.isAnnotation()) {
-                return 1;
-            } else {
-                final int i1 = ORDERED_MODIFIERS.indexOf(((Modifier) o1).getKeyword());
-                final int i2 = ORDERED_MODIFIERS.indexOf(((Modifier) o2).getKeyword());
-                if (i1 == -1) {
-                    throw new NotImplementedException(((Modifier) o1), "cannot determine order for modifier " + o1);
-                }
-                if (i2 == -1) {
-                    throw new NotImplementedException(((Modifier) o2), "cannot compare modifier " + o2);
-                }
-                return i1 - i2;
-            }
-        }
-    }
-
-    private static final List<ModifierKeyword> ORDERED_MODIFIERS = Collections.unmodifiableList(Arrays.asList(
-            ModifierKeyword.PUBLIC_KEYWORD,
-            ModifierKeyword.PROTECTED_KEYWORD,
-            ModifierKeyword.PRIVATE_KEYWORD,
-            ModifierKeyword.ABSTRACT_KEYWORD,
-            ModifierKeyword.STATIC_KEYWORD,
-            ModifierKeyword.FINAL_KEYWORD,
-            ModifierKeyword.TRANSIENT_KEYWORD,
-            ModifierKeyword.VOLATILE_KEYWORD,
-            ModifierKeyword.SYNCHRONIZED_KEYWORD,
-            ModifierKeyword.NATIVE_KEYWORD,
-            ModifierKeyword.STRICTFP_KEYWORD));
 
     @Override
     public boolean visit(FieldDeclaration node) {
@@ -266,8 +216,7 @@ public class RemoveUselessModifiersRefactoring extends AbstractRefactoringRule {
 
     private boolean ensureModifiersOrder(BodyDeclaration node) {
         final List<IExtendedModifier> extendedModifiers = modifiers(node);
-        final List<IExtendedModifier> reorderedModifiers = new ArrayList<IExtendedModifier>(extendedModifiers);
-        Collections.sort(reorderedModifiers, new ModifierOrderComparator());
+        final List<IExtendedModifier> reorderedModifiers = ASTHelper.reorder(extendedModifiers);
 
         if (!extendedModifiers.equals(reorderedModifiers)) {
             reorderModifiers(reorderedModifiers);
@@ -320,13 +269,4 @@ public class RemoveUselessModifiersRefactoring extends AbstractRefactoringRule {
         return result;
     }
 
-    private List<Modifier> getModifiersOnly(Collection<IExtendedModifier> modifiers) {
-        final List<Modifier> results = new ArrayList<Modifier>();
-        for (IExtendedModifier em : modifiers) {
-            if (em.isModifier()) {
-                results.add((Modifier) em);
-            }
-        }
-        return results;
-    }
 }
