@@ -66,7 +66,7 @@ public class RemoveUnnecessaryCastRefactoring extends AbstractRefactoringRule {
     public boolean visit(CastExpression node) {
         if (canRemoveCast(node)) {
             final ASTBuilder b = ctx.getASTBuilder();
-            ctx.getRefactorings().replace(node, b.move(node.getExpression()));
+            ctx.getRefactorings().replace(node, b.copy(node.getExpression()));
             return DO_NOT_VISIT_SUBTREE;
         }
         return VISIT_SUBTREE;

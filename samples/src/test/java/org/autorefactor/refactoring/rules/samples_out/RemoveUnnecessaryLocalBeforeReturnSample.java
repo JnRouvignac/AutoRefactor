@@ -101,4 +101,12 @@ public class RemoveUnnecessaryLocalBeforeReturnSample {
     public char[] refactorMethodCall(String s) {
         return s.toCharArray();
     }
+
+    public String doNotEliminateEverything(String param) {
+        return (String) otherMethodCall(param);
+    }
+
+    public Object otherMethodCall(String param) {
+        return param + " - too short string";
+    }
 }
