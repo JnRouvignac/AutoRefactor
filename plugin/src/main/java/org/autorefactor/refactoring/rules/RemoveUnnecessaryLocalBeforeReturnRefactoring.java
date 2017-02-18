@@ -2,6 +2,7 @@
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
  * Copyright (C) 2013-2016 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2017 Fabrice TIERCELIN - Avoid side effect
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,11 +28,12 @@ package org.autorefactor.refactoring.rules;
 
 import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.Refactorings;
-import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.ArrayCreation;
 import org.eclipse.jdt.core.dom.ArrayInitializer;
 import org.eclipse.jdt.core.dom.ArrayType;
 import org.eclipse.jdt.core.dom.Assignment;
+import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.Statement;
@@ -56,57 +58,91 @@ public class RemoveUnnecessaryLocalBeforeReturnRefactoring extends AbstractRefac
     }
 
     @Override
-    public boolean visit(ReturnStatement node) {
-        final Statement previousSibling = getPreviousSibling(node);
-        if (!ctx.getRefactorings().hasBeenRefactored(previousSibling)
-                && previousSibling instanceof VariableDeclarationStatement) {
-            final VariableDeclarationStatement vds = (VariableDeclarationStatement) previousSibling;
-            final VariableDeclarationFragment vdf = getUniqueFragment(vds);
-            if (vdf != null && isSameLocalVariable(node.getExpression(), vdf.getName())) {
-                final Expression returnExpr = vdf.getInitializer();
-                if (returnExpr instanceof ArrayInitializer) {
-                    final ASTBuilder b = ctx.getASTBuilder();
-                    final ReturnStatement newReturnStmt =
-                            b.return0(b.newArray(
-                                    b.copy((ArrayType) vds.getType()),
-                                    b.move((ArrayInitializer) returnExpr)));
-                    replaceReturnStatementForArray(node, vds, newReturnStmt);
-                } else {
-                    replaceReturnStatement(node, vds, returnExpr);
-                }
-                return DO_NOT_VISIT_SUBTREE;
-            }
-        } else {
-            final Assignment as = asExpression(previousSibling, Assignment.class);
-            if (hasOperator(as, ASSIGN)
-                    && isSameLocalVariable(node.getExpression(), as.getLeftHandSide())) {
-                final Expression returnExpr = as.getRightHandSide();
-                if (isArray(returnExpr)) {
-                    final ASTBuilder b = ctx.getASTBuilder();
-                    final ReturnStatement newReturnStmt =
-                            b.return0(b.copy((ArrayCreation) returnExpr));
-                    replaceReturnStatementForArray(node, previousSibling, newReturnStmt);
-                } else {
-                    replaceReturnStatement(node, previousSibling, returnExpr);
-                }
-                return DO_NOT_VISIT_SUBTREE;
-            }
+    public boolean visit(Block node) {
+        final ReturnStatementVisitor returnStatementVisitor = new ReturnStatementVisitor(ctx, node);
+        node.accept(returnStatementVisitor);
+        return returnStatementVisitor.getResult();
+    }
+
+    private static final class ReturnStatementVisitor extends ASTVisitor {
+        private RefactoringContext ctx;
+        private Block startNode;
+
+        private boolean result = VISIT_SUBTREE;
+
+        public ReturnStatementVisitor(final RefactoringContext ctx, final Block startNode) {
+            this.ctx = ctx;
+            this.startNode = startNode;
         }
-        return VISIT_SUBTREE;
-    }
 
-    private void replaceReturnStatementForArray(ReturnStatement node, final ASTNode previousSibling,
-            ReturnStatement newReturnStmt) {
-        final Refactorings r = ctx.getRefactorings();
-        r.remove(previousSibling);
-        r.replace(node, newReturnStmt);
-    }
+        public boolean getResult() {
+            return result;
+        }
 
-    private void replaceReturnStatement(ReturnStatement node, final ASTNode previousSibling,
-            Expression returnExpr) {
-        final ASTBuilder b = ctx.getASTBuilder();
-        final Refactorings r = ctx.getRefactorings();
-        r.remove(previousSibling);
-        r.replace(node, b.return0(b.move(returnExpr)));
+        public void setResult(final boolean result) {
+            this.result = result;
+        }
+
+        @Override
+        public boolean visit(Block node) {
+            return (startNode == node) ? VISIT_SUBTREE : DO_NOT_VISIT_SUBTREE;
+        }
+
+        @Override
+        public boolean visit(ReturnStatement node) {
+            final Statement previousSibling = getPreviousSibling(node);
+            if (!ctx.getRefactorings().hasBeenRefactored(previousSibling)
+                    && previousSibling instanceof VariableDeclarationStatement) {
+                final VariableDeclarationStatement vds = (VariableDeclarationStatement) previousSibling;
+                final VariableDeclarationFragment vdf = getUniqueFragment(vds);
+                if (vdf != null && isSameLocalVariable(node.getExpression(), vdf.getName())) {
+                    final Expression returnExpr = vdf.getInitializer();
+                    if (returnExpr instanceof ArrayInitializer) {
+                        final ASTBuilder b = ctx.getASTBuilder();
+                        final ReturnStatement newReturnStmt =
+                                b.return0(b.newArray(
+                                        b.copy((ArrayType) vds.getType()),
+                                        b.move((ArrayInitializer) returnExpr)));
+                        replaceReturnStatementForArray(node, vds, newReturnStmt);
+                    } else {
+                        replaceReturnStatement(node, vds, returnExpr);
+                    }
+                    setResult(DO_NOT_VISIT_SUBTREE);
+                    return DO_NOT_VISIT_SUBTREE;
+                }
+            } else {
+                final Assignment as = asExpression(previousSibling, Assignment.class);
+                if (hasOperator(as, ASSIGN)
+                        && isSameLocalVariable(node.getExpression(), as.getLeftHandSide())) {
+                    final Expression returnExpr = as.getRightHandSide();
+                    if (isArray(returnExpr)) {
+                        final ASTBuilder b = ctx.getASTBuilder();
+                        final ReturnStatement newReturnStmt =
+                                b.return0(b.copy((ArrayCreation) returnExpr));
+                        replaceReturnStatementForArray(node, previousSibling, newReturnStmt);
+                    } else {
+                        replaceReturnStatement(node, previousSibling, returnExpr);
+                    }
+                    setResult(DO_NOT_VISIT_SUBTREE);
+                    return DO_NOT_VISIT_SUBTREE;
+                }
+            }
+            return VISIT_SUBTREE;
+        }
+
+        private void replaceReturnStatementForArray(final ReturnStatement node, final Statement previousSibling,
+                final ReturnStatement newReturnStmt) {
+            final Refactorings r = ctx.getRefactorings();
+            r.remove(previousSibling);
+            r.replace(node, newReturnStmt);
+        }
+
+        private void replaceReturnStatement(final ReturnStatement node, final Statement previousSibling,
+                final Expression returnExpr) {
+            final ASTBuilder b = ctx.getASTBuilder();
+            final Refactorings r = ctx.getRefactorings();
+            r.remove(previousSibling);
+            r.replace(node, b.return0(b.move(returnExpr)));
+        }
     }
 }

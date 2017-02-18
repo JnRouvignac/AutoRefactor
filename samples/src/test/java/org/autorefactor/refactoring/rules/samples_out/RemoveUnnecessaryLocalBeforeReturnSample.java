@@ -101,4 +101,12 @@ public class RemoveUnnecessaryLocalBeforeReturnSample {
     public char[] refactorMethodCall(String s) {
         return s.toCharArray();
     }
+
+    public int inlineSeveralReturns(int i1, int i2) {
+        if (i1 == 0) {
+            return 10;
+        } else {
+            return 11;
+        }
+    }
 }

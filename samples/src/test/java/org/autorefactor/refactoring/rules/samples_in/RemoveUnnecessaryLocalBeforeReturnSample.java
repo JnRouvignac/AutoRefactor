@@ -115,4 +115,14 @@ public class RemoveUnnecessaryLocalBeforeReturnSample {
         char[] res = s.toCharArray();
         return res;
     }
+
+    public int inlineSeveralReturns(int i1, int i2) {
+        if (i1 == 0) {
+            i1 = 10;
+            return i1;
+        } else {
+            i2 = 11;
+            return i2;
+        }
+    }
 }
