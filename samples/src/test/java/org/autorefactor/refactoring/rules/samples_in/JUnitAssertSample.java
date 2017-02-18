@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2016 Fabrice Tiercelin - initial API and implementation
+ * Copyright (C) 2016-2017 Fabrice Tiercelin - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,6 +34,7 @@ public class JUnitAssertSample {
     private static final int FOURTYTWO = 42;
 
     public void shouldRefactorWithPrimitives(int i1, int i2) throws Exception {
+        // Keep this comment
         Assert.assertTrue(i1 == i2);
         Assert.assertTrue("Failure message to keep", i1 == i2);
         Assert.assertFalse(i1 != i2);
@@ -46,6 +47,7 @@ public class JUnitAssertSample {
     }
 
     public void shouldRefactorFailures() throws Exception {
+        // Keep this comment
         Assert.assertTrue(false);
         Assert.assertTrue("Failure message to keep", false);
         Assert.assertFalse(true);
@@ -70,6 +72,7 @@ public class JUnitAssertSample {
     }
 
     public void shouldRefactorNegatedConditions(boolean b) throws Exception {
+        // Keep this comment
         Assert.assertTrue(!b);
         Assert.assertTrue("Failure message to keep", !b);
         Assert.assertFalse(!b);
@@ -82,6 +85,7 @@ public class JUnitAssertSample {
     }
 
     public void shouldRefactorWithObjectReferences(Object o1, Object o2) throws Exception {
+        // Keep this comment
         Assert.assertTrue(o1 == o2);
         Assert.assertTrue("Failure message to keep", o1 == o2);
         Assert.assertTrue(o1 != o2);
@@ -102,6 +106,7 @@ public class JUnitAssertSample {
     }
 
     public void shouldRefactorWithObjects(Object o1, Object o2) throws Exception {
+        // Keep this comment
         Assert.assertTrue(o1.equals(o2));
         Assert.assertTrue("Failure message to keep", o1.equals(o2));
         Assert.assertFalse(!(o1.equals(o2)));
@@ -114,6 +119,7 @@ public class JUnitAssertSample {
     }
 
     public void shouldRefactorNullCheckFirstArg(Object o) throws Exception {
+        // Keep this comment
         Assert.assertTrue(null == o);
         Assert.assertTrue("Failure message to keep", null == o);
         Assert.assertTrue(null != o);
@@ -134,6 +140,7 @@ public class JUnitAssertSample {
     }
 
     public void shouldRefactorNullCheckSecondArg(Object o) throws Exception {
+        // Keep this comment
         Assert.assertTrue(o == null);
         Assert.assertTrue("Failure message to keep", o == null);
         Assert.assertTrue(o != null);
@@ -154,6 +161,7 @@ public class JUnitAssertSample {
     }
 
     public void shouldRefactorNullCheckFirstArgWithEquals(Object o) throws Exception {
+        // Keep this comment
         Assert.assertEquals(null, o);
         Assert.assertEquals("Failure message to keep", null, o);
 
@@ -162,6 +170,7 @@ public class JUnitAssertSample {
     }
 
     public void shouldRefactorNullCheckSecondArgWithEquals(Object o) throws Exception {
+        // Keep this comment
         Assert.assertEquals(o, null);
         Assert.assertEquals("Failure message to keep", o, null);
 
@@ -170,6 +179,7 @@ public class JUnitAssertSample {
     }
 
     public void shouldMoveLiteralAsExpectedArgInWithEquals(Object o) throws Exception {
+        // Keep this comment
         Assert.assertEquals(o, 42);
         Assert.assertEquals("Failure message to keep", o, 42);
 
@@ -186,6 +196,7 @@ public class JUnitAssertSample {
     }
 
     public void shouldMoveConstantAsExpectedArgInWithEquals(Object o) throws Exception {
+        // Keep this comment
         Assert.assertEquals(o, FOURTYTWO);
         Assert.assertEquals("Failure message to keep", o, FOURTYTWO);
 
@@ -202,6 +213,7 @@ public class JUnitAssertSample {
     }
 
     public void shouldMoveExpectedObjectAsExpectedArgWithEquals(Object o, int expected) throws Exception {
+        // Keep this comment
         Assert.assertEquals(o, expected);
         Assert.assertEquals("Failure message to keep", o, expected);
 
@@ -225,6 +237,7 @@ public class JUnitAssertSample {
     }
 
     public void shouldMoveExpectedLongAsExpectedArgWithEquals(long l, long expected) throws Exception {
+        // Keep this comment
         Assert.assertEquals(l, expected);
         Assert.assertEquals("Failure message to keep", l, expected);
 
@@ -237,6 +250,7 @@ public class JUnitAssertSample {
     }
 
     public void shouldMoveExpectedDoubleAsExpectedArgWithEquals(double d, double expected) throws Exception {
+        // Keep this comment
         Assert.assertEquals(d, expected);
         Assert.assertEquals("Failure message to keep", d, expected);
 
@@ -249,6 +263,7 @@ public class JUnitAssertSample {
     }
 
     public void shouldRefactorIfOnBoolean(boolean b) throws Exception {
+        // Keep this comment
         if (b) {
             Assert.fail();
         }
@@ -265,6 +280,7 @@ public class JUnitAssertSample {
     }
 
     public void shouldRefactorIfPrimitiveThenFail(int i1, int i2) throws Exception {
+        // Keep this comment
         if (i1 != i2) {
             Assert.fail();
         }
@@ -281,6 +297,7 @@ public class JUnitAssertSample {
     }
 
     public void shouldRefactorIfSameObjectThenFail(Object o1, Object o2) throws Exception {
+        // Keep this comment
         if (o1 == o2) {
             Assert.fail();
         }
@@ -309,6 +326,7 @@ public class JUnitAssertSample {
     }
 
     public void shouldRefactorIfNullThenFail(Object o1) throws Exception {
+        // Keep this comment
         if (o1 == null) {
             Assert.fail();
         }
@@ -361,6 +379,7 @@ public class JUnitAssertSample {
     }
 
     public void shouldRefactorIfObjectThenFail(Object o1, Object o2) throws Exception {
+        // Keep this comment
         if (!o1.equals(o2)) {
             Assert.fail();
         }
@@ -377,6 +396,7 @@ public class JUnitAssertSample {
     }
 
     public void shouldRefactorIfLiteralThenFail(int i) throws Exception {
+        // Keep this comment
         if (i == 42) {
             Assert.fail();
         }
@@ -429,6 +449,7 @@ public class JUnitAssertSample {
     }
 
     public void shouldRefactorIfConstantThenFail(int i) throws Exception {
+        // Keep this comment
         if (i == FOURTYTWO) {
             Assert.fail();
         }
@@ -481,6 +502,7 @@ public class JUnitAssertSample {
     }
 
     public void shouldRefactorIfExpectedThenFail(int i, int expected) throws Exception {
+        // Keep this comment
         if (i == expected) {
             Assert.fail();
         }
@@ -533,6 +555,7 @@ public class JUnitAssertSample {
     }
 
     public void shouldRefactorIfNearlyExpectedThenFail(int i, int expectedI) throws Exception {
+        // Keep this comment
         if (i == expectedI) {
             Assert.fail();
         }
