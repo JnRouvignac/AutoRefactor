@@ -2,7 +2,7 @@
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
  * Copyright (C) 2014-2016 Jean-Noël Rouvignac - initial API and implementation
- * Copyright (C) 2016 Fabrice Tiercelin - Annoying remaining loop variable occurrence
+ * Copyright (C) 2016-2017 Fabrice Tiercelin - Annoying remaining loop variable occurrence
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,13 +35,19 @@ public class IsEmptyRatherThanSizeSample {
         System.out.println(col.size() > 0);
         System.out.println(col.size() >= 0);
         System.out.println(col.size() == 0);
+        System.out.println(col.size() != 0);
         System.out.println(col.size() <= 0);
         System.out.println(col.size() < 0);
+        System.out.println(col.size() < 1);
+        System.out.println(col.size() >= 1);
 
         System.out.println(0 < col.size());
         System.out.println(0 <= col.size());
         System.out.println(0 == col.size());
+        System.out.println(0 != col.size());
         System.out.println(0 >= col.size());
         System.out.println(0 > col.size());
+        System.out.println(1 > col.size());
+        System.out.println(1 <= col.size());
     }
 }
