@@ -82,6 +82,7 @@ public final class AllRefactoringRules {
                 new CollapseIfStatementRefactoring(),
                 new CommonCodeInIfElseStatementRefactoring(),
                 new MergeConditionalBlocksRefactoring(),
+                new MergeBlocksWithJumpRefactoring(),
                 // TODO JNR complete it
                 // new GenerecizeRefactoring(),
                 new UseDiamondOperatorRefactoring(),

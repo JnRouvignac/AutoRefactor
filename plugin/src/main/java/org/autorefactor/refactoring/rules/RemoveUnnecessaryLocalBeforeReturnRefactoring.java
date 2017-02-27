@@ -26,9 +26,19 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.asExpression;
+import static org.autorefactor.refactoring.ASTHelper.getPreviousSibling;
+import static org.autorefactor.refactoring.ASTHelper.getUniqueFragment;
+import static org.autorefactor.refactoring.ASTHelper.hasOperator;
+import static org.autorefactor.refactoring.ASTHelper.isArray;
+import static org.autorefactor.refactoring.ASTHelper.isSameLocalVariable;
+import static org.eclipse.jdt.core.dom.Assignment.Operator.ASSIGN;
+
 import org.autorefactor.refactoring.ASTBuilder;
+import org.autorefactor.refactoring.BlockSubVisitor;
 import org.autorefactor.refactoring.Refactorings;
-import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.ArrayCreation;
 import org.eclipse.jdt.core.dom.ArrayInitializer;
 import org.eclipse.jdt.core.dom.ArrayType;
@@ -39,9 +49,6 @@ import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
-
-import static org.autorefactor.refactoring.ASTHelper.*;
-import static org.eclipse.jdt.core.dom.Assignment.Operator.*;
 
 /** See {@link #getDescription()} method. */
 public class RemoveUnnecessaryLocalBeforeReturnRefactoring extends AbstractRefactoringRule {
@@ -64,41 +71,23 @@ public class RemoveUnnecessaryLocalBeforeReturnRefactoring extends AbstractRefac
         return returnStatementVisitor.getResult();
     }
 
-    private static final class ReturnStatementVisitor extends ASTVisitor {
-        private RefactoringContext ctx;
-        private Block startNode;
-
-        private boolean result = VISIT_SUBTREE;
+    private static final class ReturnStatementVisitor extends BlockSubVisitor {
 
         public ReturnStatementVisitor(final RefactoringContext ctx, final Block startNode) {
-            this.ctx = ctx;
-            this.startNode = startNode;
-        }
-
-        public boolean getResult() {
-            return result;
-        }
-
-        public void setResult(final boolean result) {
-            this.result = result;
-        }
-
-        @Override
-        public boolean visit(Block node) {
-            return (startNode == node) ? VISIT_SUBTREE : DO_NOT_VISIT_SUBTREE;
+            super(ctx, startNode);
         }
 
         @Override
         public boolean visit(ReturnStatement node) {
             final Statement previousSibling = getPreviousSibling(node);
-            if (!ctx.getRefactorings().hasBeenRefactored(previousSibling)
+            if (!getCtx().getRefactorings().hasBeenRefactored(previousSibling)
                     && previousSibling instanceof VariableDeclarationStatement) {
                 final VariableDeclarationStatement vds = (VariableDeclarationStatement) previousSibling;
                 final VariableDeclarationFragment vdf = getUniqueFragment(vds);
                 if (vdf != null && isSameLocalVariable(node.getExpression(), vdf.getName())) {
                     final Expression returnExpr = vdf.getInitializer();
                     if (returnExpr instanceof ArrayInitializer) {
-                        final ASTBuilder b = ctx.getASTBuilder();
+                        final ASTBuilder b = getCtx().getASTBuilder();
                         final ReturnStatement newReturnStmt =
                                 b.return0(b.newArray(
                                         b.copy((ArrayType) vds.getType()),
@@ -116,7 +105,7 @@ public class RemoveUnnecessaryLocalBeforeReturnRefactoring extends AbstractRefac
                         && isSameLocalVariable(node.getExpression(), as.getLeftHandSide())) {
                     final Expression returnExpr = as.getRightHandSide();
                     if (isArray(returnExpr)) {
-                        final ASTBuilder b = ctx.getASTBuilder();
+                        final ASTBuilder b = getCtx().getASTBuilder();
                         final ReturnStatement newReturnStmt =
                                 b.return0(b.copy((ArrayCreation) returnExpr));
                         replaceReturnStatementForArray(node, previousSibling, newReturnStmt);
@@ -132,15 +121,15 @@ public class RemoveUnnecessaryLocalBeforeReturnRefactoring extends AbstractRefac
 
         private void replaceReturnStatementForArray(final ReturnStatement node, final Statement previousSibling,
                 final ReturnStatement newReturnStmt) {
-            final Refactorings r = ctx.getRefactorings();
+            final Refactorings r = getCtx().getRefactorings();
             r.remove(previousSibling);
             r.replace(node, newReturnStmt);
         }
 
         private void replaceReturnStatement(final ReturnStatement node, final Statement previousSibling,
                 final Expression returnExpr) {
-            final ASTBuilder b = ctx.getASTBuilder();
-            final Refactorings r = ctx.getRefactorings();
+            final ASTBuilder b = getCtx().getASTBuilder();
+            final Refactorings r = getCtx().getRefactorings();
             r.remove(previousSibling);
             r.replace(node, b.return0(b.move(returnExpr)));
         }
