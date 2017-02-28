@@ -60,7 +60,6 @@ public class SimplifyExpressionRefactoring extends AbstractRefactoringRule {
         return ""
             + "Simplifies Java expressions:\n"
             + "- remove redundant null checks or useless right-hand side or left-hand sie operands,\n"
-            + "- fix Comparable.compareTo() usage,\n"
             + "- remove useless parentheses,\n"
             + "- directly check boolean values instead of comparing tham with true/false.";
     }
@@ -82,10 +81,6 @@ public class SimplifyExpressionRefactoring extends AbstractRefactoringRule {
             Pair.of(RIGHT_SHIFT_SIGNED, AND),
             Pair.of(RIGHT_SHIFT_UNSIGNED, OR),
             Pair.of(RIGHT_SHIFT_UNSIGNED, AND));
-
-    private int getJavaMinorVersion() {
-        return ctx.getJavaProjectOptions().getJavaSERelease().getMinorVersion();
-    }
 
     // TODO JNR remove avoidable boxing / unboxing
 
@@ -228,63 +223,6 @@ public class SimplifyExpressionRefactoring extends AbstractRefactoringRule {
             }
         }
         return false;
-    }
-
-    @Override
-    public boolean visit(MethodInvocation node) {
-        if (node.getExpression() == null) {
-            // TODO JNR handle same class calls and sub classes
-            return VISIT_SUBTREE;
-        }
-        if (isMethod(node, "java.lang.Comparable", "compareTo", "java.lang.Object")) {
-            return replaceInfixExpressionIfNeeded(node.getParent());
-        } else if (isMethod(node, "java.lang.Comparator", "compare", "java.lang.Object", "java.lang.Object")) {
-            return replaceInfixExpressionIfNeeded(node.getParent());
-        } else if (getJavaMinorVersion() >= 2
-                && isMethod(node, "java.lang.String", "compareToIgnoreCase", "java.lang.String")) {
-            return replaceInfixExpressionIfNeeded(node.getParent());
-        }
-        return VISIT_SUBTREE;
-    }
-
-    private boolean replaceInfixExpressionIfNeeded(ASTNode expr) {
-        if (expr instanceof ParenthesizedExpression) {
-            return replaceInfixExpressionIfNeeded(expr.getParent());
-        } else if (expr instanceof InfixExpression) {
-            final InfixExpression ie = (InfixExpression) expr;
-            checkNoExtendedOperands(ie);
-            final Object value = ie.getRightOperand().resolveConstantExpressionValue();
-            if (value instanceof Number) {
-                final Number nb = (Integer) value;
-                if (nb.doubleValue() == 0) {
-                    return VISIT_SUBTREE;
-                }
-                if (hasOperator(ie, EQUALS)) {
-                    if (nb.doubleValue() < 0) {
-                        return replaceWithCorrectCheckOnCompareTo(ie, LESS);
-                    } else if (nb.doubleValue() > 0) {
-                        return replaceWithCorrectCheckOnCompareTo(ie, GREATER);
-                    }
-                } else if (hasOperator(ie, NOT_EQUALS)) {
-                    if (nb.doubleValue() < 0) {
-                        return replaceWithCorrectCheckOnCompareTo(ie, GREATER_EQUALS);
-                    } else if (nb.doubleValue() > 0) {
-                        return replaceWithCorrectCheckOnCompareTo(ie, LESS_EQUALS);
-                    }
-                }
-            }
-        }
-        return VISIT_SUBTREE;
-    }
-
-    private boolean replaceWithCorrectCheckOnCompareTo(final InfixExpression ie, final Operator operator) {
-        final ASTBuilder b = this.ctx.getASTBuilder();
-        this.ctx.getRefactorings().replace(ie,
-            b.infixExpr(
-                b.copy(ie.getLeftOperand()),
-                operator,
-                b.number("0")));
-        return DO_NOT_VISIT_SUBTREE;
     }
 
     @Override

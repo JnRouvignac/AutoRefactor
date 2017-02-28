@@ -72,6 +72,7 @@ public final class AllRefactoringRules {
                 new WorkWithNullCheckedExpressionFirstRefactoring(),
                 new AddBracketsToControlStatementRefactoring(),
                 new InvertEqualsRefactoring(),
+                new ComparisonRefactoring(),
                 new SimplifyExpressionRefactoring(),
                 new RemoveUnneededThisExpressionRefactoring(),
                 new StringRefactoring(),

@@ -92,27 +92,6 @@ public class SimplifyExpressionSample {
         }
     }
 
-    public void fixCompareToUsage() {
-        boolean b;
-        final String s = "";
-
-        // valid, do no change these ones
-        b = s.compareTo("") < 0;
-        b = s.compareTo("") <= 0;
-        b = s.compareTo("") == 0;
-        b = s.compareTo("") != 0;
-        b = s.compareTo("") >= 0;
-        b = s.compareTo("") > 0;
-        b = s.compareToIgnoreCase("") == 0;
-
-        // invalid, refactor them
-        b = s.compareTo("") == -1;
-        b = s.compareTo("") != -1;
-        b = s.compareTo("") != 1;
-        b = s.compareTo("") == 1;
-        b = s.compareToIgnoreCase("") == 1;
-    }
-
     public void borderLineParenthezisedExpressions(Integer i) throws Exception {
         // do not replace any because they are in a String concatenation
         String s1 = ((Number) i).doubleValue() + " ";
