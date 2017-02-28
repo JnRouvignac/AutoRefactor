@@ -64,19 +64,4 @@ public class MapSample {
         output.putAll(map);
         return output;
     }
-
-    public void replaceChecksOnSize(Map<String, String> map) {
-        // Keep this comment 1
-        System.out.println(!map.isEmpty());
-        System.out.println(true);
-        System.out.println(map.isEmpty());
-        System.out.println(map.isEmpty());
-        System.out.println(false);
-
-        System.out.println(!map.isEmpty());
-        System.out.println(true);
-        System.out.println(map.isEmpty());
-        System.out.println(map.isEmpty());
-        System.out.println(false);
-    }
 }

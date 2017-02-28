@@ -26,23 +26,33 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.arg0;
+import static org.autorefactor.refactoring.ASTHelper.arguments;
+import static org.autorefactor.refactoring.ASTHelper.as;
+import static org.autorefactor.refactoring.ASTHelper.asExpression;
+import static org.autorefactor.refactoring.ASTHelper.getPreviousSibling;
+import static org.autorefactor.refactoring.ASTHelper.getUniqueFragment;
+import static org.autorefactor.refactoring.ASTHelper.hasOperator;
+import static org.autorefactor.refactoring.ASTHelper.hasType;
+import static org.autorefactor.refactoring.ASTHelper.isCastCompatible;
+import static org.autorefactor.refactoring.ASTHelper.isMethod;
+import static org.autorefactor.refactoring.ASTHelper.isPrimitive;
+import static org.autorefactor.refactoring.ASTHelper.isSameLocalVariable;
+
 import java.util.List;
 
 import org.autorefactor.refactoring.ASTBuilder;
-import org.autorefactor.refactoring.Refactorings;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ExpressionStatement;
-import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
-
-import static org.autorefactor.refactoring.ASTHelper.*;
-import static org.eclipse.jdt.core.dom.InfixExpression.Operator.*;
 
 /** See {@link #getDescription()} method. */
 public class MapRefactoring extends AbstractRefactoringRule {
@@ -126,88 +136,6 @@ public class MapRefactoring extends AbstractRefactoringRule {
                 "java.util.WeakHashMap")) {
             // TODO JNR verify capacity arguments is 0, 1 or map.length
             return true;
-        }
-        return false;
-    }
-
-    @Override
-    public boolean visit(InfixExpression node) {
-        final MethodInvocation leftMi = as(node.getLeftOperand(), MethodInvocation.class);
-        final MethodInvocation rightMi = as(node.getRightOperand(), MethodInvocation.class);
-        if (isMethod(leftMi, "java.util.Map", "size")
-                && isZero(node.getRightOperand())) {
-            return replaceCollectionSize(node, leftMi);
-        } else if (isMethod(rightMi, "java.util.Map", "size")
-                && isZero(node.getLeftOperand())) {
-            return replaceInverseCollectionSize(node, rightMi);
-        }
-        return VISIT_SUBTREE;
-    }
-
-    private boolean replaceCollectionSize(InfixExpression node, MethodInvocation miToReplace) {
-        final Refactorings r = this.ctx.getRefactorings();
-        final ASTBuilder b = this.ctx.getASTBuilder();
-        final Expression copyOfExpr = b.copyExpression(miToReplace);
-        if (hasOperator(node, GREATER)) {
-            r.replace(node,
-                    b.not(b.invoke(copyOfExpr, "isEmpty")));
-            return DO_NOT_VISIT_SUBTREE;
-        } else if (hasOperator(node, GREATER_EQUALS)) {
-            r.replace(node,
-                    b.boolean0(true));
-            return DO_NOT_VISIT_SUBTREE;
-        } else if (hasOperator(node, EQUALS)) {
-            r.replace(node,
-                    b.invoke(copyOfExpr, "isEmpty"));
-            return DO_NOT_VISIT_SUBTREE;
-        } else if (hasOperator(node, LESS_EQUALS)) {
-            r.replace(node,
-                    b.invoke(copyOfExpr, "isEmpty"));
-            return DO_NOT_VISIT_SUBTREE;
-        } else if (hasOperator(node, LESS)) {
-            r.replace(node,
-                    b.boolean0(false));
-            return DO_NOT_VISIT_SUBTREE;
-        }
-        return VISIT_SUBTREE;
-    }
-
-    private boolean replaceInverseCollectionSize(InfixExpression node, MethodInvocation miToReplace) {
-        final Refactorings r = this.ctx.getRefactorings();
-        final ASTBuilder b = this.ctx.getASTBuilder();
-        final Expression copyOfExpr = b.copyExpression(miToReplace);
-        if (hasOperator(node, LESS)) {
-            r.replace(node,
-                    b.not(b.invoke(copyOfExpr, "isEmpty")));
-            return DO_NOT_VISIT_SUBTREE;
-        } else if (hasOperator(node, LESS_EQUALS)) {
-            r.replace(node,
-                    b.boolean0(true));
-            return DO_NOT_VISIT_SUBTREE;
-        } else if (hasOperator(node, EQUALS)) {
-            r.replace(node,
-                    b.invoke(copyOfExpr, "isEmpty"));
-            return DO_NOT_VISIT_SUBTREE;
-        } else if (hasOperator(node, GREATER_EQUALS)) {
-            r.replace(node,
-                    b.invoke(copyOfExpr, "isEmpty"));
-            return DO_NOT_VISIT_SUBTREE;
-        } else if (hasOperator(node, GREATER)) {
-            r.replace(node,
-                    b.boolean0(false));
-            return DO_NOT_VISIT_SUBTREE;
-        }
-        return VISIT_SUBTREE;
-    }
-
-    private boolean isZero(Expression expr) {
-        if (expr != null) {
-            final Object val = expr.resolveConstantExpressionValue();
-            if (val instanceof Integer) {
-                return ((Integer) val).intValue() == 0;
-            } else if (val instanceof Long) {
-                return ((Long) val).longValue() == 0;
-            }
         }
         return false;
     }

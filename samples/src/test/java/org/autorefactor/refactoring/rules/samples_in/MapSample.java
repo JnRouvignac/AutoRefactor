@@ -69,19 +69,4 @@ public class MapSample {
         output.putAll(map);
         return output;
     }
-
-    public void replaceChecksOnSize(Map<String, String> map) {
-        // Keep this comment 1
-        System.out.println(map.size() > 0);
-        System.out.println(map.size() >= 0);
-        System.out.println(map.size() == 0);
-        System.out.println(map.size() <= 0);
-        System.out.println(map.size() < 0);
-
-        System.out.println(0 < map.size());
-        System.out.println(0 <= map.size());
-        System.out.println(0 == map.size());
-        System.out.println(0 >= map.size());
-        System.out.println(0 > map.size());
-    }
 }

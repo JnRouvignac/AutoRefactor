@@ -41,7 +41,7 @@ public class IsEmptyRatherThanSizeRefactoring extends AbstractRefactoringRule {
     @Override
     public String getDescription() {
         return ""
-            + "Replaces some checks on Collection.size() with checks on Collection.isEmpty().";
+            + "Replaces some checks on Collection.size() or Map.size() with checks on isEmpty().";
     }
 
     @Override
@@ -57,11 +57,13 @@ public class IsEmptyRatherThanSizeRefactoring extends AbstractRefactoringRule {
         final MethodInvocation rightMi = as(node.getRightOperand(), MethodInvocation.class);
         final Long leftLiteral = asNumber(node.getLeftOperand());
 
-        if (isMethod(leftMi, "java.util.Collection", "size")
+        if ((isMethod(leftMi, "java.util.Collection", "size")
+                || isMethod(leftMi, "java.util.Map", "size"))
                 && rightLiteral != null) {
             return replaceCollectionSize(node, leftMi, sign(node.getOperator(), true),
                     rightLiteral);
-        } else if (isMethod(rightMi, "java.util.Collection", "size")
+        } else if ((isMethod(rightMi, "java.util.Collection", "size")
+                || isMethod(rightMi, "java.util.Map", "size"))
                 && leftLiteral != null) {
             return replaceCollectionSize(node, rightMi, sign(node.getOperator(), false),
                     leftLiteral);

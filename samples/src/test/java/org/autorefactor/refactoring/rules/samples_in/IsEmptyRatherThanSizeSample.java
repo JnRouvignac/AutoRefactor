@@ -27,6 +27,7 @@
 package org.autorefactor.refactoring.rules.samples_in;
 
 import java.util.Collection;
+import java.util.Map;
 
 public class IsEmptyRatherThanSizeSample {
 
@@ -49,5 +50,26 @@ public class IsEmptyRatherThanSizeSample {
         System.out.println(0 > col.size());
         System.out.println(1 > col.size());
         System.out.println(1 <= col.size());
+    }
+
+    public void replaceChecksOnSize(Map<String, String> map) {
+        // Keep this comment
+        System.out.println(map.size() > 0);
+        System.out.println(map.size() >= 0);
+        System.out.println(map.size() == 0);
+        System.out.println(map.size() != 0);
+        System.out.println(map.size() <= 0);
+        System.out.println(map.size() < 0);
+        System.out.println(map.size() < 1);
+        System.out.println(map.size() >= 1);
+
+        System.out.println(0 < map.size());
+        System.out.println(0 <= map.size());
+        System.out.println(0 == map.size());
+        System.out.println(0 != map.size());
+        System.out.println(0 >= map.size());
+        System.out.println(0 > map.size());
+        System.out.println(1 > map.size());
+        System.out.println(1 <= map.size());
     }
 }
