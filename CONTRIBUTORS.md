@@ -5,7 +5,7 @@ AutoRefactor contributors (sorted alphabeticaly)
 
   * Added Android refactoring rules
 
-* **[sameer misger](https://github.com/misgersameer)
+* **[Sameer Misger](https://github.com/misgersameer)**
 
   * Made Sonarqube more happy
 
