@@ -28,21 +28,6 @@ package org.autorefactor.refactoring.rules.samples_in;
 
 public class StringSample {
 
-    public String replaceNewString() {
-        // Keep this comment
-        return new String("");
-    }
-
-    public String replaceNewStringFromStringExpression(String s) {
-        // Keep this comment
-        return new String(s);
-    }
-
-    public String replaceNewStringInMethodInvocation(String s, int i) {
-        // Keep this comment
-        return new String(s + i).toLowerCase();
-    }
-
     public String replaceStringValueOfOnAString(String s) {
         // Keep this comment
         return String.valueOf(s);
@@ -197,37 +182,6 @@ public class StringSample {
 
     private static String getS() {
         return null;
-    }
-
-    public void replaceForcedConcatenationByStringValueOf(
-            Object o, boolean b, char c, byte by, short s, int i, long l, float f, double d) {
-        // Keep this comment 1
-        String text = o + "";
-
-        // Keep this comment 2
-        text = b + "";
-        text = c + "";
-        text = by + "";
-        text = s + "";
-        text = i + "";
-        text = l + "";
-        text = f + "";
-        text = d + "";
-
-        // Keep this comment 3
-        text = "" + o;
-        text = "" + b;
-        text = "" + c;
-        text = "" + by;
-        text = "" + s;
-        text = "" + i;
-        text = "" + l;
-        text = "" + f;
-        text = "" + d;
-    }
-
-    public void doNotReplaceConcatenateWithCharArray(char[] chars) {
-        String text = "" + chars;
     }
 
     public void replaceCaseShift(String s1, String s2) {

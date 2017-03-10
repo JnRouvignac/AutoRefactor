@@ -28,21 +28,6 @@ package org.autorefactor.refactoring.rules.samples_out;
 
 public class StringSample {
 
-    public String replaceNewString() {
-        // Keep this comment
-        return "";
-    }
-
-    public String replaceNewStringFromStringExpression(String s) {
-        // Keep this comment
-        return s;
-    }
-
-    public String replaceNewStringInMethodInvocation(String s, int i) {
-        // Keep this comment
-        return (s + i).toLowerCase();
-    }
-
     public String replaceStringValueOfOnAString(String s) {
         // Keep this comment
         return s;
@@ -197,37 +182,6 @@ public class StringSample {
 
     private static String getS() {
         return null;
-    }
-
-    public void replaceForcedConcatenationByStringValueOf(
-            Object o, boolean b, char c, byte by, short s, int i, long l, float f, double d) {
-        // Keep this comment 1
-        String text = String.valueOf(o);
-
-        // Keep this comment 2
-        text = String.valueOf(b);
-        text = String.valueOf(c);
-        text = String.valueOf(by);
-        text = String.valueOf(s);
-        text = String.valueOf(i);
-        text = String.valueOf(l);
-        text = String.valueOf(f);
-        text = String.valueOf(d);
-
-        // Keep this comment 3
-        text = String.valueOf(o);
-        text = String.valueOf(b);
-        text = String.valueOf(c);
-        text = String.valueOf(by);
-        text = String.valueOf(s);
-        text = String.valueOf(i);
-        text = String.valueOf(l);
-        text = String.valueOf(f);
-        text = String.valueOf(d);
-    }
-
-    public void doNotReplaceConcatenateWithCharArray(char[] chars) {
-        String text = "" + chars;
     }
 
     public void replaceCaseShift(String s1, String s2) {

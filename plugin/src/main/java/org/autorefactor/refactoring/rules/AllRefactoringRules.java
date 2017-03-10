@@ -75,7 +75,9 @@ public final class AllRefactoringRules {
                 new ComparisonRefactoring(),
                 new SimplifyExpressionRefactoring(),
                 new RemoveUnneededThisExpressionRefactoring(),
+                new StringRatherThanNewStringRefactoring(),
                 new StringRefactoring(),
+                new StringValueOfRatherThanConcatRefactoring(),
                 new BigDecimalRefactoring(),
                 // TODO JNR implement
                 // new ForeachRefactoring(),

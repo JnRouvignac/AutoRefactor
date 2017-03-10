@@ -26,20 +26,23 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.arg0;
+import static org.autorefactor.refactoring.ASTHelper.as;
+import static org.autorefactor.refactoring.ASTHelper.hasType;
+import static org.autorefactor.refactoring.ASTHelper.isMethod;
+import static org.eclipse.jdt.core.dom.ASTNode.INFIX_EXPRESSION;
+
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import org.autorefactor.refactoring.ASTBuilder;
 import org.eclipse.jdt.core.dom.ASTNode;
-import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
-import org.eclipse.jdt.core.dom.StringLiteral;
 import org.eclipse.jdt.internal.corext.dom.Bindings;
-
-import static org.autorefactor.refactoring.ASTHelper.*;
-import static org.eclipse.jdt.core.dom.ASTNode.*;
-
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /** See {@link #getDescription()} method. */
 public class StringRefactoring extends AbstractRefactoringRule {
@@ -47,30 +50,14 @@ public class StringRefactoring extends AbstractRefactoringRule {
     public String getDescription() {
         return ""
             + "Removes:\n"
-            + "- creating a String instance from a String constant or literal,\n"
             + "- calling String.toString() on a String instance,\n"
             + "- remove calls to String.toString() inside String concatenations,\n"
-            + "- replace forced string tranformation by String.valueOf(),\n"
             + "- replace useless case shifts for equality by equalsIgnoreCase().";
     }
 
     @Override
     public String getName() {
         return "String";
-    }
-
-    @Override
-    public boolean visit(ClassInstanceCreation node) {
-        if (hasType(node, "java.lang.String")
-                && arguments(node).size() == 1) {
-            final Expression arg0 = arguments(node).get(0);
-            if (hasType(arg0, "java.lang.String")) {
-                final ASTBuilder b = ctx.getASTBuilder();
-                ctx.getRefactorings().replace(node, b.parenthesizeIfNeeded(b.copy(arg0)));
-                return DO_NOT_VISIT_SUBTREE;
-            }
-        }
-        return VISIT_SUBTREE;
     }
 
     @Override
@@ -223,31 +210,5 @@ public class StringRefactoring extends AbstractRefactoringRule {
                       || isMethod(node, "java.lang.String", "valueOf", "float")
                       || isMethod(node, "java.lang.String", "valueOf", "double")
                       || isMethod(node, "java.lang.String", "valueOf", "java.lang.Object"));
-    }
-
-    @Override
-    public boolean visit(InfixExpression node) {
-        if (InfixExpression.Operator.PLUS.equals(node.getOperator())
-                && extendedOperands(node).isEmpty()) {
-            final Expression leftOperand = node.getLeftOperand();
-            final Expression rightOperand = node.getRightOperand();
-
-            return maybeReplaceStringConcatenation(node, leftOperand, rightOperand)
-                // if not replaced then try the other way round
-                && maybeReplaceStringConcatenation(node, rightOperand, leftOperand);
-        }
-        return VISIT_SUBTREE;
-    }
-
-    private boolean maybeReplaceStringConcatenation(
-            final InfixExpression node, final Expression expr, final Expression variable) {
-        if (expr instanceof StringLiteral
-                && ((StringLiteral) expr).getLiteralValue().matches("")
-                && !hasType(variable, "java.lang.String", "char[]")) {
-            final ASTBuilder b = this.ctx.getASTBuilder();
-            ctx.getRefactorings().replace(node, b.invoke("String", "valueOf", b.copy(variable)));
-            return DO_NOT_VISIT_SUBTREE;
-        }
-        return VISIT_SUBTREE;
     }
 }
