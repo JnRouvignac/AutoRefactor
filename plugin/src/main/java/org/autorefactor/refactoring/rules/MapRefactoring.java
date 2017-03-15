@@ -44,7 +44,9 @@ import static org.autorefactor.refactoring.ASTHelper.isSameLocalVariable;
 import java.util.List;
 
 import org.autorefactor.refactoring.ASTBuilder;
+import org.autorefactor.refactoring.BlockSubVisitor;
 import org.eclipse.jdt.core.dom.Assignment;
+import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ExpressionStatement;
@@ -59,84 +61,98 @@ public class MapRefactoring extends AbstractRefactoringRule {
     @Override
     public String getDescription() {
         return ""
-            + "Map related refactorings:\n"
-            + "- replaces creating a new Map, then invoking Map.putAll() on it,"
-            + " by creating the new Map with the other Map as parameter,\n"
-            + "- replaces some checks on Map.size() with checks on Map.isEmpty().";
+                + "Replaces creating a new Map, then invoking Map.putAll() on it,"
+                + " by creating the new Map with the other Map as parameter.";
     }
 
     @Override
     public String getName() {
-        return "Map";
+        return "Inited map rather than new map and Map.putAll()";
     }
 
     @Override
-    public boolean visit(ExpressionStatement node) {
-        final MethodInvocation mi = asExpression(node, MethodInvocation.class);
-        if (isMethod(mi, "java.util.Map", "putAll", "java.util.Map")) {
-            final Expression arg0 = arg0(mi);
-            final Statement previousStmt = getPreviousSibling(node);
+    public boolean visit(Block node) {
+        final NewAndPutAllMethodVisitor returnStatementVisitor = new NewAndPutAllMethodVisitor(ctx, node);
+        node.accept(returnStatementVisitor);
+        return returnStatementVisitor.getResult();
+    }
 
-            final Assignment as = asExpression(previousStmt, Assignment.class);
-            if (hasOperator(as, Assignment.Operator.ASSIGN)) {
-                final Expression lhs = as.getLeftHandSide();
-                if (lhs instanceof SimpleName) {
-                    if (isSameLocalVariable(lhs, mi.getExpression())) {
-                        return replaceInitializer(as.getRightHandSide(), arg0, node);
+    private static final class NewAndPutAllMethodVisitor extends BlockSubVisitor {
+
+        public NewAndPutAllMethodVisitor(final RefactoringContext ctx, final Block startNode) {
+            super(ctx, startNode);
+        }
+
+        @Override
+        public boolean visit(ExpressionStatement node) {
+            final MethodInvocation mi = asExpression(node, MethodInvocation.class);
+            if (isMethod(mi, "java.util.Map", "putAll", "java.util.Map")) {
+                final Expression arg0 = arg0(mi);
+                final Statement previousStmt = getPreviousSibling(node);
+
+                final Assignment as = asExpression(previousStmt, Assignment.class);
+                if (hasOperator(as, Assignment.Operator.ASSIGN)) {
+                    final Expression lhs = as.getLeftHandSide();
+                    if (lhs instanceof SimpleName) {
+                        if (isSameLocalVariable(lhs, mi.getExpression())) {
+                            return replaceInitializer(as.getRightHandSide(), arg0, node);
+                        }
+                    }
+                } else if (previousStmt instanceof VariableDeclarationStatement) {
+                    final VariableDeclarationFragment vdf = getUniqueFragment((VariableDeclarationStatement)
+                            previousStmt);
+                    if (vdf != null && isSameLocalVariable(vdf, mi.getExpression())) {
+                        return replaceInitializer(vdf.getInitializer(), arg0, node);
                     }
                 }
-            } else if (previousStmt instanceof VariableDeclarationStatement) {
-                final VariableDeclarationFragment vdf = getUniqueFragment((VariableDeclarationStatement) previousStmt);
-                if (vdf != null && isSameLocalVariable(vdf, mi.getExpression())) {
-                    return replaceInitializer(vdf.getInitializer(), arg0, node);
-                }
             }
+            return VISIT_SUBTREE;
         }
-        return VISIT_SUBTREE;
-    }
 
-    private boolean replaceInitializer(Expression nodeToReplace,
-            final Expression arg0, ExpressionStatement nodeToRemove) {
-        final ClassInstanceCreation cic = as(nodeToReplace, ClassInstanceCreation.class);
-        if (canReplaceInitializer(cic)
-                && isCastCompatible(nodeToReplace, arg0)) {
-            final ASTBuilder b = this.ctx.getASTBuilder();
-            this.ctx.getRefactorings().replace(nodeToReplace,
-                    b.new0(b.copy(cic.getType()), b.copy(arg0)));
-            this.ctx.getRefactorings().remove(nodeToRemove);
-            return DO_NOT_VISIT_SUBTREE;
+        private boolean replaceInitializer(Expression nodeToReplace,
+                final Expression arg0, ExpressionStatement nodeToRemove) {
+            final ClassInstanceCreation cic = as(nodeToReplace, ClassInstanceCreation.class);
+            if (canReplaceInitializer(cic)
+                    && isCastCompatible(nodeToReplace, arg0)) {
+                final ASTBuilder b = getCtx().getASTBuilder();
+                getCtx().getRefactorings().replace(nodeToReplace,
+                        b.new0(b.copy(cic.getType()), b.copy(arg0)));
+                getCtx().getRefactorings().remove(nodeToRemove);
+                setResult(DO_NOT_VISIT_SUBTREE);
+                return DO_NOT_VISIT_SUBTREE;
+            }
+            return VISIT_SUBTREE;
         }
-        return VISIT_SUBTREE;
-    }
 
-    private boolean canReplaceInitializer(final ClassInstanceCreation cic) {
-        if (cic == null) {
+        private boolean canReplaceInitializer(final ClassInstanceCreation cic) {
+            if (cic == null) {
+                return false;
+            }
+            final List<Expression> args = arguments(cic);
+            final boolean noArgsCtor = args.size() == 0;
+            final boolean mapCapacityCtor = args.size() == 1 && isPrimitive(args.get(0), "int");
+            if (noArgsCtor && hasType(cic,
+                    "java.util.concurrent.ConcurrentHashMap",
+                    "java.util.concurrent.ConcurrentSkipListMap",
+                    "java.util.Hashtable",
+                    "java.util.HashMap",
+                    "java.util.IdentityHashMap",
+                    "java.util.LinkedHashMap",
+                    "java.util.TreeMap",
+                    "java.util.WeakHashMap")) {
+                return true;
+            }
+            if (mapCapacityCtor && hasType(cic,
+                    "java.util.concurrent.ConcurrentHashMap",
+                    "java.util.Hashtable",
+                    "java.util.HashMap",
+                    "java.util.IdentityHashMap",
+                    "java.util.LinkedHashMap",
+                    "java.util.WeakHashMap")) {
+                // TODO JNR verify capacity arguments is 0, 1 or map.length
+                return true;
+            }
             return false;
         }
-        final List<Expression> args = arguments(cic);
-        final boolean noArgsCtor = args.size() == 0;
-        final boolean mapCapacityCtor = args.size() == 1 && isPrimitive(args.get(0), "int");
-        if (noArgsCtor && hasType(cic,
-                "java.util.concurrent.ConcurrentHashMap",
-                "java.util.concurrent.ConcurrentSkipListMap",
-                "java.util.Hashtable",
-                "java.util.HashMap",
-                "java.util.IdentityHashMap",
-                "java.util.LinkedHashMap",
-                "java.util.TreeMap",
-                "java.util.WeakHashMap")) {
-            return true;
-        }
-        if (mapCapacityCtor && hasType(cic,
-                "java.util.concurrent.ConcurrentHashMap",
-                "java.util.Hashtable",
-                "java.util.HashMap",
-                "java.util.IdentityHashMap",
-                "java.util.LinkedHashMap",
-                "java.util.WeakHashMap")) {
-            // TODO JNR verify capacity arguments is 0, 1 or map.length
-            return true;
-        }
-        return false;
     }
 }

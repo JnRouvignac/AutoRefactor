@@ -113,6 +113,7 @@ public class CollectionContainsRefactoring extends AbstractRefactoringRule {
                                 if (forNextStmt.equals(getNextSibling(forNode))) {
                                     getCtx().getRefactorings().remove(forNextStmt);
                                 }
+                                setResult(DO_NOT_VISIT_SUBTREE);
                                 return DO_NOT_VISIT_SUBTREE;
                             }
                             return maybeReplaceWithCollectionContains0(forNode, iterable, thenStmt, toFind);
@@ -161,6 +162,7 @@ public class CollectionContainsRefactoring extends AbstractRefactoringRule {
                     if (previousStmtIsPreviousSibling) {
                         getCtx().getRefactorings().remove(previousStmt);
                     }
+                    setResult(DO_NOT_VISIT_SUBTREE);
                     return DO_NOT_VISIT_SUBTREE;
                 }
             }
