@@ -23,24 +23,24 @@
  * which accompanies this distribution under LICENSE-ECLIPSE, and is
  * available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.autorefactor.refactoring.rules.samples_out;
+package org.autorefactor.refactoring.rules.samples_in;
 
 import java.util.List;
 
-public class LazyLogicalRatherThanEagleSample {
+public class LazyLogicalRatherThanEagerSample {
 
     private static int staticField = 0;
 
     public void replaceOperatorWithPrimitiveTypes(boolean b1, boolean b2) {
         // Keep this comment
-        boolean newBoolean1 = b1 && b2;
-        boolean newBoolean2 = b1 || b2;
+        boolean newBoolean1 = b1 & b2;
+        boolean newBoolean2 = b1 | b2;
     }
 
     public void replaceOperatorWithWrappers(Boolean b1, Boolean b2) {
         // Keep this comment
-        boolean newBoolean1 = b1 && b2;
-        boolean newBoolean2 = b1 || b2;
+        boolean newBoolean1 = b1 & b2;
+        boolean newBoolean2 = b1 | b2;
     }
 
     public void doNotReplaceOperatorWithIntegers(int i1, int i2) {
@@ -50,8 +50,8 @@ public class LazyLogicalRatherThanEagleSample {
 
     public void replaceOperatorWithExpressions(int i1, int i2, int i3, int i4) {
         // Keep this comment
-        boolean newBoolean1 = (i1 == i2) && (i3 != i4);
-        boolean newBoolean2 = (i1 == i2) || (i3 != i4);
+        boolean newBoolean1 = (i1 == i2) & (i3 != i4);
+        boolean newBoolean2 = (i1 == i2) | (i3 != i4);
     }
 
     public void doNotReplaceOperatorWithMethods(List<String> myList) {

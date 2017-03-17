@@ -68,7 +68,7 @@ public final class AllRefactoringRules {
                 new VectorOldToNewAPIRefactoring(),
                 new PrimitiveWrapperCreationRefactoring(),
                 new BooleanRefactoring(),
-                new LazyLogicalRatherThanEagleRefactoring(),
+                new LazyLogicalRatherThanEagerRefactoring(),
                 new BooleanConstantRatherThanValueOfRefactoring(),
                 // Must come after BooleanRefactoring, which may remove some targets
                 new WorkWithNullCheckedExpressionFirstRefactoring(),

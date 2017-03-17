@@ -35,7 +35,7 @@ import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.InfixExpression.Operator;
 
 /** See {@link #getDescription()} method. */
-public class LazyLogicalRatherThanEagleRefactoring extends AbstractRefactoringRule {
+public class LazyLogicalRatherThanEagerRefactoring extends AbstractRefactoringRule {
     @Override
     public String getDescription() {
         return ""
@@ -44,7 +44,7 @@ public class LazyLogicalRatherThanEagleRefactoring extends AbstractRefactoringRu
 
     @Override
     public String getName() {
-        return "Lazy logical rather than eagle";
+        return "Lazy logical rather than eager";
     }
 
     @Override
