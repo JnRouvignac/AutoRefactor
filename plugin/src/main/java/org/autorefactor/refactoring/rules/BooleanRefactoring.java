@@ -2,7 +2,7 @@
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
  * Copyright (C) 2013-2015 Jean-Noël Rouvignac - initial API and implementation
- * Copyright (C) 2016 Fabrice Tiercelin - Make sure we do not visit again modified nodes
+ * Copyright (C) 2016-2017 Fabrice Tiercelin - Make sure we do not visit again modified nodes
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,6 +25,26 @@
  * available at http://www.eclipse.org/legal/epl-v10.html
  */
 package org.autorefactor.refactoring.rules;
+
+import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.as;
+import static org.autorefactor.refactoring.ASTHelper.asExpression;
+import static org.autorefactor.refactoring.ASTHelper.asList;
+import static org.autorefactor.refactoring.ASTHelper.fragments;
+import static org.autorefactor.refactoring.ASTHelper.getAncestor;
+import static org.autorefactor.refactoring.ASTHelper.getBooleanLiteral;
+import static org.autorefactor.refactoring.ASTHelper.getBooleanObject;
+import static org.autorefactor.refactoring.ASTHelper.getNextSibling;
+import static org.autorefactor.refactoring.ASTHelper.getPreviousSibling;
+import static org.autorefactor.refactoring.ASTHelper.hasOperator;
+import static org.autorefactor.refactoring.ASTHelper.imports;
+import static org.autorefactor.refactoring.ASTHelper.isPrimitive;
+import static org.autorefactor.refactoring.ASTHelper.isSameVariable;
+import static org.autorefactor.refactoring.ASTHelper.match;
+import static org.eclipse.jdt.core.dom.Assignment.Operator.ASSIGN;
+import static org.eclipse.jdt.core.dom.InfixExpression.Operator.CONDITIONAL_AND;
+import static org.eclipse.jdt.core.dom.InfixExpression.Operator.CONDITIONAL_OR;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -56,7 +76,6 @@ import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.ImportDeclaration;
 import org.eclipse.jdt.core.dom.InfixExpression.Operator;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
-import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Name;
 import org.eclipse.jdt.core.dom.PrimitiveType;
 import org.eclipse.jdt.core.dom.QualifiedName;
@@ -67,17 +86,12 @@ import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
-import static org.autorefactor.refactoring.ASTHelper.*;
-import static org.eclipse.jdt.core.dom.Assignment.Operator.*;
-import static org.eclipse.jdt.core.dom.InfixExpression.Operator.*;
-
 /** See {@link #getDescription()} method. */
 public class BooleanRefactoring extends AbstractRefactoringRule {
     @Override
     public String getDescription() {
         return ""
             + "Boolean related refactorings:\n"
-            + "- use boolean constants,\n"
             + "- remove if statements when then and else clauses do similar things with opposite boolean values,\n"
             + "- remove ternary operators when then and else clauses do similar things with opposite boolean values.";
     }
@@ -490,28 +504,5 @@ public class BooleanRefactoring extends AbstractRefactoringRule {
             }
         }
         return false;
-    }
-
-    @Override
-    public boolean visit(MethodInvocation node) {
-        if (isMethod(node, "java.lang.Boolean", "valueOf", "java.lang.String")
-                || isMethod(node, "java.lang.Boolean", "valueOf", "boolean")) {
-            final BooleanLiteral l = as(arguments(node), BooleanLiteral.class);
-            if (l != null) {
-                ctx.getRefactorings().replace(node,
-                        toFieldAccess(node, l.booleanValue()));
-                return DO_NOT_VISIT_SUBTREE;
-            }
-        }
-        return VISIT_SUBTREE;
-    }
-
-    private FieldAccess toFieldAccess(MethodInvocation node, boolean booleanLiteral) {
-        final FieldAccess fa = b.getAST().newFieldAccess();
-        if (node.getExpression() instanceof Name) {
-            fa.setExpression(b.copy(node.getExpression()));
-        }
-        fa.setName(b.simpleName(booleanLiteral ? "TRUE" : "FALSE"));
-        return fa;
     }
 }

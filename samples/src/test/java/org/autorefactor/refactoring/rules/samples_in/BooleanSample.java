@@ -30,12 +30,6 @@ public class BooleanSample {
     public boolean f;
     public Boolean g;
 
-    public void useBooleanConstants() {
-        // Keep this comment
-        Boolean b1 = Boolean.valueOf(true);
-        Boolean b2 = Boolean.valueOf(false);
-    }
-
     // TODO JNR handle mix and match of boolean primitives and boolean objects
 
     public boolean returnIfConditionBooleanPrimitive(boolean b) {

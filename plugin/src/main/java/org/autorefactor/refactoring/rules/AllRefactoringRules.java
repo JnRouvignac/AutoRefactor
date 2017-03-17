@@ -69,6 +69,7 @@ public final class AllRefactoringRules {
                 new PrimitiveWrapperCreationRefactoring(),
                 new BooleanRefactoring(),
                 new LazyLogicalRatherThanEagleRefactoring(),
+                new BooleanConstantRatherThanValueOfRefactoring(),
                 // Must come after BooleanRefactoring, which may remove some targets
                 new WorkWithNullCheckedExpressionFirstRefactoring(),
                 new AddBracketsToControlStatementRefactoring(),
