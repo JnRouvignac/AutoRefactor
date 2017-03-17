@@ -187,6 +187,15 @@ public final class ASTHelper {
             return name;
         }
     }
+    /** Enum representing the possible side effect of an expression. */
+    public enum ExprActivity {
+        /** Does nothing. */
+        PASSIVE,
+        /** May modify something. */
+        CAN_BE_ACTIVE,
+        /** Modify something. */
+        ACTIVE;
+    }
 
     /** Compares {@link ASTNode}s according to their start position. */
     public static final class NodeStartPositionComparator implements Comparator<ASTNode> {
@@ -219,6 +228,48 @@ public final class ASTHelper {
         @Override
         public boolean visit(Block node) {
             return startNode == node || includeInnerScopes;
+        }
+    }
+
+    private static final class ExprActivityVisitor extends ASTVisitor {
+        private ExprActivity activityLevel = ExprActivity.PASSIVE;
+
+        public ExprActivity getActivityLevel() {
+            return activityLevel;
+        }
+
+        @Override
+        public boolean visit(Assignment node) {
+            activityLevel = ExprActivity.ACTIVE;
+            return DO_NOT_VISIT_SUBTREE;
+        }
+
+        @Override
+        public boolean visit(PostfixExpression node) {
+            activityLevel = ExprActivity.ACTIVE;
+            return DO_NOT_VISIT_SUBTREE;
+        }
+
+        @Override
+        public boolean visit(PrefixExpression node) {
+            activityLevel = ExprActivity.ACTIVE;
+            return DO_NOT_VISIT_SUBTREE;
+        }
+
+        @Override
+        public boolean visit(MethodInvocation node) {
+            if (!ExprActivity.ACTIVE.equals(activityLevel)) {
+                activityLevel = ExprActivity.CAN_BE_ACTIVE;
+            }
+            return VISIT_SUBTREE;
+        }
+
+        @Override
+        public boolean visit(ClassInstanceCreation node) {
+            if (!ExprActivity.ACTIVE.equals(activityLevel)) {
+                activityLevel = ExprActivity.CAN_BE_ACTIVE;
+            }
+            return VISIT_SUBTREE;
         }
     }
 
@@ -2234,5 +2285,19 @@ public final class ASTHelper {
             new VariableDeclarationIdentifierVisitor(node, includeInnerScopes);
         node.accept(visitor);
         return visitor.getVariableNames();
+    }
+
+    /**
+     * Return true if the expression changes nothing.
+     *
+     * @param expr The expression to visit.
+     *
+     * @return True if the expression changes nothing.
+     */
+    public static boolean isPassive(final Expression expr) {
+        final ExprActivityVisitor visitor =
+            new ExprActivityVisitor();
+        expr.accept(visitor);
+        return ExprActivity.PASSIVE.equals(visitor.getActivityLevel());
     }
 }
