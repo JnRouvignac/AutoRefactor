@@ -42,7 +42,7 @@ public class BooleanConstantRatherThanValueOfRefactoring extends AbstractRefacto
     @Override
     public String getDescription() {
         return ""
-            + "Replace Boolean.valueOf(true) and Boolean.valueOf(true) by Boolean.TRUE and Boolean.FALSE.";
+            + "Replace Boolean.valueOf(true) and Boolean.valueOf(false) by Boolean.TRUE and Boolean.FALSE.";
     }
 
     @Override
