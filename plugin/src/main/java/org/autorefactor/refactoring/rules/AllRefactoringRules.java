@@ -95,6 +95,8 @@ public final class AllRefactoringRules {
                 new UseMultiCatchRefactoring(),
                 new CollectionContainsRefactoring(),
                 new CollectionRefactoring(),
+                new AllInCollectionRatherThanLoopRefactoring(),
+                new UpdateSetRatherThanTestingFirstRefactoring(),
                 new IsEmptyRatherThanSizeRefactoring(),
                 new MapRefactoring(),
                 new MapEliminateKeySetCallsRefactoring(),
