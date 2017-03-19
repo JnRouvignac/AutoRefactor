@@ -94,24 +94,29 @@ public class BooleanEqualsRatherThanNullCheckRefactoring extends AbstractRefacto
                 if (firstExpr != null && hasType(firstExpr, "java.lang.Boolean")
                         && isPassive(firstExpr)
                         && match(new ASTMatcher(), firstExpr, secondExpr)) {
-                    final ASTBuilder b = ctx.getASTBuilder();
-
-                    final Name booleanConstant = b.name("Boolean",
-                            isAndExpr == isPositiveExpr ? "TRUE" : "FALSE");
-                    final MethodInvocation equalsMethod = b.invoke(booleanConstant, "equals", b.copy(firstExpr));
-
-                    Expression newExpr = null;
-                    if (!isNullCheck || isAndExpr) {
-                        newExpr = equalsMethod;
-                    } else {
-                        newExpr = b.not(equalsMethod);
-                    }
-                    ctx.getRefactorings().replace(node,
-                            newExpr);
+                    replaceNullCheck(node, firstExpr, isNullCheck, isAndExpr, isPositiveExpr);
                     return DO_NOT_VISIT_SUBTREE;
                 }
             }
         }
         return VISIT_SUBTREE;
+    }
+
+    private void replaceNullCheck(final InfixExpression node, final Expression firstExpr, final boolean isNullCheck,
+            final boolean isAndExpr, final boolean isPositiveExpr) {
+        final ASTBuilder b = ctx.getASTBuilder();
+
+        final Name booleanConstant = b.name("Boolean",
+                isAndExpr == isPositiveExpr ? "TRUE" : "FALSE");
+        final MethodInvocation equalsMethod = b.invoke(booleanConstant, "equals", b.copy(firstExpr));
+
+        Expression newExpr = null;
+        if (!isNullCheck || isAndExpr) {
+            newExpr = equalsMethod;
+        } else {
+            newExpr = b.not(equalsMethod);
+        }
+        ctx.getRefactorings().replace(node,
+                newExpr);
     }
 }
