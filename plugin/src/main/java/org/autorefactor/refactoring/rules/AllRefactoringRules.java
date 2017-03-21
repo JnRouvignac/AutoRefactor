@@ -71,6 +71,7 @@ public final class AllRefactoringRules {
                 new LazyLogicalRatherThanEagerRefactoring(),
                 new BooleanConstantRatherThanValueOfRefactoring(),
                 new BooleanEqualsRatherThanNullCheckRefactoring(),
+                new XORRatherThanDuplicateConditionsRefactoring(),
                 // Must come after BooleanRefactoring, which may remove some targets
                 new WorkWithNullCheckedExpressionFirstRefactoring(),
                 new AddBracketsToControlStatementRefactoring(),
