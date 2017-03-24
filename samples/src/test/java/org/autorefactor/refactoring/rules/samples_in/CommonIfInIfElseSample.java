@@ -2,6 +2,7 @@
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
  * Copyright (C) 2015 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2017 Fabrice Tiercelin - Avoid to break the workflow
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,17 +26,19 @@
  */
 package org.autorefactor.refactoring.rules.samples_in;
 
+import java.util.List;
+
 public class CommonIfInIfElseSample {
 
     public void refactorCommonInnerIf(boolean b1, boolean b2) throws Exception {
         if (b1) {
             if (b2) {
-                // keep this comment
+                // Keep this comment
                 System.out.println(b1);
             }
         } else {
             if (b2) {
-                // keep this comment
+                // Keep this comment
                 System.out.println(!b1);
             }
         }
@@ -65,6 +68,54 @@ public class CommonIfInIfElseSample {
                 System.out.println(b2);
             } else {
                 System.out.println(!b1);
+            }
+        }
+    }
+
+    public void doNotRefactorActiveCondition(List<String> myList) throws Exception {
+        if (myList.remove("lorem")) {
+            if (myList.isEmpty()) {
+                System.out.println("Now empty");
+            }
+        } else {
+            if (myList.isEmpty()) {
+                System.out.println("Still empty");
+            }
+        }
+    }
+
+    public void doNotRefactorAssignment(boolean b1, boolean b2) throws Exception {
+        if (b2 = b1) {
+            if (b2) {
+                System.out.println(b1);
+            }
+        } else {
+            if (b2) {
+                System.out.println(!b1);
+            }
+        }
+    }
+
+    public void doNotRefactorPostincrement(int i1, int i2) throws Exception {
+        if (i1 == i2++) {
+            if (i2 == 0) {
+                System.out.println(i1);
+            }
+        } else {
+            if (i2 == 0) {
+                System.out.println(-i1);
+            }
+        }
+    }
+
+    public void doNotRefactorPreincrement(int i1, int i2) throws Exception {
+        if (i1 == ++i2) {
+            if (i2 == 0) {
+                System.out.println(i1);
+            }
+        } else {
+            if (i2 == 0) {
+                System.out.println(-i1);
             }
         }
     }

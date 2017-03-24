@@ -145,6 +145,8 @@ import static org.autorefactor.util.Utils.*;
 import static org.eclipse.jdt.core.dom.ASTNode.*;
 import static org.eclipse.jdt.core.dom.IBinding.*;
 import static org.eclipse.jdt.core.dom.InfixExpression.Operator.NOT_EQUALS;
+import static org.eclipse.jdt.core.dom.PrefixExpression.Operator.DECREMENT;
+import static org.eclipse.jdt.core.dom.PrefixExpression.Operator.INCREMENT;
 
 /** Helper class for manipulating, converting, navigating and checking {@link ASTNode}s. */
 public final class ASTHelper {
@@ -252,8 +254,12 @@ public final class ASTHelper {
 
         @Override
         public boolean visit(PrefixExpression node) {
-            activityLevel = ExprActivity.ACTIVE;
-            return DO_NOT_VISIT_SUBTREE;
+            if (INCREMENT.equals(node.getOperator())
+                    || DECREMENT.equals(node.getOperator())) {
+                activityLevel = ExprActivity.ACTIVE;
+                return DO_NOT_VISIT_SUBTREE;
+            }
+            return VISIT_SUBTREE;
         }
 
         @Override

@@ -2,6 +2,7 @@
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
  * Copyright (C) 2015 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2017 Fabrice Tiercelin - Avoid to break the workflow
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,11 +26,15 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.as;
+import static org.autorefactor.refactoring.ASTHelper.isPassive;
+import static org.autorefactor.refactoring.ASTHelper.match;
+
 import org.autorefactor.refactoring.ASTBuilder;
 import org.eclipse.jdt.core.dom.ASTMatcher;
 import org.eclipse.jdt.core.dom.IfStatement;
-
-import static org.autorefactor.refactoring.ASTHelper.*;
 
 /**
  * Refactors:
@@ -80,10 +85,12 @@ public class CommonIfInIfElseRefactoring extends AbstractRefactoringRule {
     public boolean visit(IfStatement node) {
         final IfStatement thenInnerIfStmt = as(node.getThenStatement(), IfStatement.class);
         final IfStatement elseInnerIfStmt = as(node.getElseStatement(), IfStatement.class);
-        if (thenInnerIfStmt != null
+        if (isPassive(node.getExpression())
+                && thenInnerIfStmt != null
                 && elseInnerIfStmt != null
                 && thenInnerIfStmt.getElseStatement() == null
                 && elseInnerIfStmt.getElseStatement() == null
+                && isPassive(thenInnerIfStmt.getExpression())
                 && match(new ASTMatcher(), thenInnerIfStmt.getExpression(), elseInnerIfStmt.getExpression())) {
             final ASTBuilder b = this.ctx.getASTBuilder();
             this.ctx.getRefactorings().replace(node,
