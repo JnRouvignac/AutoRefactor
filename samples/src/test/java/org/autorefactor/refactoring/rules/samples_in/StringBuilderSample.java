@@ -204,4 +204,10 @@ public class StringBuilderSample {
             .append(min < 10 ? "0" + min : min)
             .toString();
     }
+
+    public void concatStringLiterals(StringBuffer sbuf, StringBuilder sbui, String s) {
+        // Keep this comment
+        sbuf.append("").append("foo ").append("bar ").append(0).append("foo").append(1).append("bar ").append(s);
+        sbui.append("").append("foo ").append("bar ").append(0).append("foo").append(1).append("bar ").append(s);
+    }
 }

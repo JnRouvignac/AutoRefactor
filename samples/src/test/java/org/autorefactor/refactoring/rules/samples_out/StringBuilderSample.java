@@ -31,8 +31,8 @@ public class StringBuilderSample {
 
     public void replaceWithEfficientStringAppend(StringBuffer sbuf, StringBuilder sbui, String s) {
         // Keep this comment
-        sbuf.append("foo ").append("bar ").append(0).append(1);
-        sbui.append("foo ").append("bar ").append(0).append(1);
+        sbuf.append("foo " + "bar ").append(0).append(1);
+        sbui.append("foo " + "bar ").append(0).append(1);
         sbuf.append("foo").append(0).append("bar").append(1);
         sbui.append("foo").append(0).append("bar").append(1);
     }
@@ -192,5 +192,11 @@ public class StringBuilderSample {
     public String formatTime(int hour, int min) {
         // Keep this comment
         return (hour < 10 ? "0" + hour : hour) + ":" + (min < 10 ? "0" + min : min);
+    }
+
+    public void concatStringLiterals(StringBuffer sbuf, StringBuilder sbui, String s) {
+        // Keep this comment
+        sbuf.append("foo " + "bar ").append(0).append("foo").append(1).append("bar ").append(s);
+        sbui.append("foo " + "bar ").append(0).append("foo").append(1).append("bar ").append(s);
     }
 }

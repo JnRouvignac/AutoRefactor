@@ -26,6 +26,22 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.arg0;
+import static org.autorefactor.refactoring.ASTHelper.arguments;
+import static org.autorefactor.refactoring.ASTHelper.as;
+import static org.autorefactor.refactoring.ASTHelper.extendedOperands;
+import static org.autorefactor.refactoring.ASTHelper.hasOperator;
+import static org.autorefactor.refactoring.ASTHelper.hasType;
+import static org.autorefactor.refactoring.ASTHelper.instanceOf;
+import static org.autorefactor.refactoring.ASTHelper.isMethod;
+import static org.autorefactor.refactoring.ASTHelper.removeParentheses;
+import static org.eclipse.jdt.core.dom.ASTNode.FIELD_ACCESS;
+import static org.eclipse.jdt.core.dom.ASTNode.QUALIFIED_NAME;
+import static org.eclipse.jdt.core.dom.ASTNode.SIMPLE_NAME;
+import static org.eclipse.jdt.core.dom.InfixExpression.Operator.PLUS;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -49,17 +65,13 @@ import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.StringLiteral;
 import org.eclipse.jdt.internal.corext.dom.Bindings;
 
-import static org.autorefactor.refactoring.ASTHelper.*;
-import static org.eclipse.jdt.core.dom.ASTNode.*;
-import static org.eclipse.jdt.core.dom.InfixExpression.Operator.*;
-
 /** See {@link #getDescription()} method. */
+@SuppressWarnings("restriction")
 public class StringBuilderRefactoring extends AbstractRefactoringRule {
     @Override
     public String getDescription() {
         return ""
             + "Refactors to a proper use of StringBuilders:\n"
-            + "- convert StringBuffer to StringBuilder,\n"
             + "- replace String concatenations using operator '+' as parameters"
             + " of StringBuffer/StringBuilder.append(),\n"
             + "- replace chained call to StringBuffer/StringBuilder constructor followed by calls to append()"
@@ -88,14 +100,10 @@ public class StringBuilderRefactoring extends AbstractRefactoringRule {
 
     @Override
     public boolean visit(InfixExpression node) {
-        // TODO JNR also remove valueOf() methods in these cases, etc.:
-        // String s = "" + String.valueOf(1);
-        // String s = "" + Integer.toString(1);
-        // String s = "" + Long.toString(1);
         if (isStringConcat(node)) {
             final LinkedList<Pair<ITypeBinding, Expression>> allOperands =
                     new LinkedList<Pair<ITypeBinding, Expression>>();
-            addAllSubExpressions(node, allOperands, null);
+            addAllSubExpressions(node, allOperands, new AtomicBoolean(false));
             boolean replaceNeeded = filterOutEmptyStringsFromStringConcat(allOperands);
             if (replaceNeeded) {
                 this.ctx.getRefactorings().replace(node, createStringConcats(allOperands));
@@ -180,7 +188,8 @@ public class StringBuilderRefactoring extends AbstractRefactoringRule {
                 || isMethod(node, "java.lang.StringBuffer", "toString")) {
             final LinkedList<Pair<ITypeBinding, Expression>> allAppendedStrings =
                     new LinkedList<Pair<ITypeBinding, Expression>>();
-            final Expression lastExpr = collectAllAppendedStrings(node.getExpression(), allAppendedStrings, null);
+            final Expression lastExpr = collectAllAppendedStrings(node.getExpression(), allAppendedStrings,
+                    new AtomicBoolean(false));
             // TODO new StringBuffer().append(" bla").append("bla").toString();
             // outputs " blabla"
             if (lastExpr instanceof ClassInstanceCreation) {
@@ -204,14 +213,51 @@ public class StringBuilderRefactoring extends AbstractRefactoringRule {
             final LinkedList<Pair<ITypeBinding, Expression>> allAppendedStrings, final Expression lastExpr) {
         final ASTBuilder b = this.ctx.getASTBuilder();
         Expression result = b.copy(lastExpr);
-        for (Pair<ITypeBinding, Expression> typeAndValue : allAppendedStrings) {
-            if (result == null) {
-                result = b.copy(typeAndValue.getSecond());
+
+        int i = 0;
+        List<Expression> tempStringLiterals = new ArrayList<Expression>();
+        while (i < allAppendedStrings.size()) {
+            if (allAppendedStrings.get(i).getSecond() instanceof StringLiteral) {
+                tempStringLiterals.add(b.copy(allAppendedStrings.get(i).getSecond()));
             } else {
-                result = b.invoke(result, "append", getTypedExpression(b, typeAndValue));
+                if (!tempStringLiterals.isEmpty()) {
+                    result = addStringConcat(b, result, tempStringLiterals);
+
+                    tempStringLiterals.clear();
+                }
+
+                if (result == null) {
+                    result = b.copy(allAppendedStrings.get(i).getSecond());
+                } else {
+                    result = b.invoke(result, "append", getTypedExpression(b, allAppendedStrings.get(i)));
+                }
             }
+
+            i++;
+        }
+
+        if (!tempStringLiterals.isEmpty()) {
+            result = addStringConcat(b, result, tempStringLiterals);
         }
         ctx.getRefactorings().replace(node, result);
+    }
+
+    private Expression addStringConcat(final ASTBuilder b, Expression result,
+            final List<Expression> copyOfStringLiterals) {
+        if (copyOfStringLiterals.size() == 1) {
+            if (result == null) {
+                result = copyOfStringLiterals.get(0);
+            } else {
+                result = b.invoke(result, "append", copyOfStringLiterals.get(0));
+            }
+        } else {
+            if (result == null) {
+                result = b.infixExpr(Operator.PLUS, copyOfStringLiterals);
+            } else {
+                result = b.invoke(result, "append", b.infixExpr(Operator.PLUS, copyOfStringLiterals));
+            }
+        }
+        return result;
     }
 
     private void replaceWithAppendSubstring(final MethodInvocation node, final MethodInvocation embeddedMI) {
@@ -423,9 +469,7 @@ public class StringBuilderRefactoring extends AbstractRefactoringRule {
                 }
                 addAllSubExpressions(ie.getRightOperand(), results, hasStringConcat);
                 addAllSubExpressions(ie.getLeftOperand(), results, hasStringConcat);
-                if (hasStringConcat != null) {
-                    hasStringConcat.set(true);
-                }
+                hasStringConcat.set(true);
                 return;
             }
         }
@@ -433,7 +477,29 @@ public class StringBuilderRefactoring extends AbstractRefactoringRule {
     }
 
     private boolean isStringConcat(final InfixExpression node) {
-        return hasOperator(node, PLUS)
-                && hasType(node, "java.lang.String");
+        if (hasOperator(node, PLUS)
+                && hasType(node, "java.lang.String")) {
+            if (node.getLeftOperand() instanceof StringLiteral
+                    && !isEmptyString(node.getLeftOperand())
+                            && node.getRightOperand() instanceof StringLiteral
+                    && !isEmptyString(node.getRightOperand())) {
+                if (node.hasExtendedOperands()) {
+                    @SuppressWarnings("unchecked")
+                    Iterator<Expression> iterator = node.extendedOperands().iterator();
+                    while (iterator.hasNext()) {
+                        final Expression expr = iterator.next();
+                        if (!(expr instanceof StringLiteral) || isEmptyString(expr)) {
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+                return false;
+            } else {
+                return true;
+            }
+        } else {
+            return false;
+        }
     }
 }
