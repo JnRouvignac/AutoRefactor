@@ -2,6 +2,7 @@
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
  * Copyright (C) 2014-2015 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2017 Fabrice Tiercelin - Make sure we do not visit again modified nodes
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,9 +27,11 @@
 package org.autorefactor.refactoring.rules;
 
 import org.autorefactor.refactoring.ASTBuilder;
+import org.autorefactor.refactoring.BlockSubVisitor;
 import org.autorefactor.refactoring.Refactorings;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Assignment;
+import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.InfixExpression;
@@ -54,62 +57,78 @@ public class NoAssignmentInIfConditionRefactoring extends AbstractRefactoringRul
     }
 
     @Override
-    public boolean visit(IfStatement node) {
-        final InfixExpression ie = as(node.getExpression(), InfixExpression.class);
-        return moveAssignmentBeforeIfStatementIfPossible(node, ie);
+    public boolean visit(Block node) {
+        final NewAndPutAllMethodVisitor newAndPutAllMethodVisitor = new NewAndPutAllMethodVisitor(ctx, node);
+        node.accept(newAndPutAllMethodVisitor);
+        return newAndPutAllMethodVisitor.getResult();
     }
 
-    private boolean moveAssignmentBeforeIfStatementIfPossible(IfStatement node, InfixExpression ie) {
-        if (ie != null) {
-            final InfixExpression leftIe = as(ie.getLeftOperand(), InfixExpression.class);
-            final Assignment leftAs = as(ie.getLeftOperand(), Assignment.class);
-            final Assignment rightAs = as(ie.getRightOperand(), Assignment.class);
-            if (leftAs != null) {
-                return moveAssignmentBeforeIfStatement(node, leftAs);
-            } else if (rightAs != null) {
-                return moveAssignmentBeforeIfStatement(node, rightAs);
-            } else if (leftIe != null) {
-                return moveAssignmentBeforeIfStatementIfPossible(node, leftIe);
-            }
+    private static final class NewAndPutAllMethodVisitor extends BlockSubVisitor {
+
+        public NewAndPutAllMethodVisitor(final RefactoringContext ctx, final Block startNode) {
+            super(ctx, startNode);
         }
-        return VISIT_SUBTREE;
-    }
 
-    private boolean moveAssignmentBeforeIfStatement(final IfStatement node, final Assignment a) {
-        final Refactorings r = this.ctx.getRefactorings();
-        final ASTBuilder b = this.ctx.getASTBuilder();
-        final VariableDeclarationStatement vds = as(getPreviousSibling(node), VariableDeclarationStatement.class);
-        final Expression lhs = removeParentheses(a.getLeftHandSide());
-        final VariableDeclarationFragment vdf = findVariableDeclarationFragment(vds, lhs);
-        if (vdf != null) {
-            r.set(vdf, INITIALIZER_PROPERTY, a.getRightHandSide());
-            r.replace(getFirstParentOfType(a, ParenthesizedExpression.class),
-                b.copy(lhs));
-            return DO_NOT_VISIT_SUBTREE;
-        } else if (!isAnElseIf(node)) {
-            r.insertBefore(b.toStmt(b.move(a)), node);
-            r.replace(getFirstParentOfType(a, ParenthesizedExpression.class),
-                b.copy(lhs));
-            return DO_NOT_VISIT_SUBTREE;
+        @Override
+        public boolean visit(IfStatement node) {
+            final InfixExpression ie = as(node.getExpression(), InfixExpression.class);
+            return moveAssignmentBeforeIfStatementIfPossible(node, ie);
         }
-        return VISIT_SUBTREE;
-    }
 
-    private VariableDeclarationFragment findVariableDeclarationFragment(final VariableDeclarationStatement vds,
-            final Expression expr) {
-        if (vds != null && expr instanceof SimpleName) {
-            for (VariableDeclarationFragment vdf : fragments(vds)) {
-                if (isSameVariable(expr, vdf)) {
-                    return vdf;
+        private boolean moveAssignmentBeforeIfStatementIfPossible(IfStatement node, InfixExpression ie) {
+            if (ie != null) {
+                final InfixExpression leftIe = as(ie.getLeftOperand(), InfixExpression.class);
+                final Assignment leftAs = as(ie.getLeftOperand(), Assignment.class);
+                final Assignment rightAs = as(ie.getRightOperand(), Assignment.class);
+                if (leftAs != null) {
+                    return moveAssignmentBeforeIfStatement(node, leftAs);
+                } else if (rightAs != null) {
+                    return moveAssignmentBeforeIfStatement(node, rightAs);
+                } else if (leftIe != null) {
+                    return moveAssignmentBeforeIfStatementIfPossible(node, leftIe);
                 }
             }
+            return VISIT_SUBTREE;
         }
-        return null;
-    }
 
-    private boolean isAnElseIf(IfStatement node) {
-        final ASTNode parent = node.getParent();
-        return parent instanceof IfStatement
-                && ((IfStatement) parent).getElseStatement().equals(node);
+        private boolean moveAssignmentBeforeIfStatement(final IfStatement node, final Assignment a) {
+            final Refactorings r = this.getCtx().getRefactorings();
+            final ASTBuilder b = this.getCtx().getASTBuilder();
+            final VariableDeclarationStatement vds = as(getPreviousSibling(node), VariableDeclarationStatement.class);
+            final Expression lhs = removeParentheses(a.getLeftHandSide());
+            final VariableDeclarationFragment vdf = findVariableDeclarationFragment(vds, lhs);
+            if (vdf != null) {
+                r.set(vdf, INITIALIZER_PROPERTY, a.getRightHandSide());
+                r.replace(getFirstParentOfType(a, ParenthesizedExpression.class),
+                        b.copy(lhs));
+                setResult(DO_NOT_VISIT_SUBTREE);
+                return DO_NOT_VISIT_SUBTREE;
+            } else if (!isAnElseIf(node)) {
+                r.insertBefore(b.toStmt(b.move(a)), node);
+                r.replace(getFirstParentOfType(a, ParenthesizedExpression.class),
+                        b.copy(lhs));
+                setResult(DO_NOT_VISIT_SUBTREE);
+                return DO_NOT_VISIT_SUBTREE;
+            }
+            return VISIT_SUBTREE;
+        }
+
+        private VariableDeclarationFragment findVariableDeclarationFragment(final VariableDeclarationStatement vds,
+                final Expression expr) {
+            if (vds != null && expr instanceof SimpleName) {
+                for (VariableDeclarationFragment vdf : fragments(vds)) {
+                    if (isSameVariable(expr, vdf)) {
+                        return vdf;
+                    }
+                }
+            }
+            return null;
+        }
+
+        private boolean isAnElseIf(IfStatement node) {
+            final ASTNode parent = node.getParent();
+            return parent instanceof IfStatement
+                    && ((IfStatement) parent).getElseStatement().equals(node);
+        }
     }
 }

@@ -2,6 +2,7 @@
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
  * Copyright (C) 2014-2015 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2017 Fabrice Tiercelin - Make sure we do not visit again modified nodes
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,8 +29,10 @@ package org.autorefactor.refactoring.rules;
 import java.util.List;
 
 import org.autorefactor.refactoring.ASTBuilder;
+import org.autorefactor.refactoring.BlockSubVisitor;
 import org.autorefactor.refactoring.Refactorings;
 import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.InfixExpression;
@@ -46,9 +49,9 @@ public class WorkWithNullCheckedExpressionFirstRefactoring extends AbstractRefac
     @Override
     public String getDescription() {
         return ""
-            + "Refactors if statements with a null checked expression"
-            + " to work with the not null case in the then clause"
-            + " and then work with the null case in the else clause.";
+                + "Refactors if statements with a null checked expression"
+                + " to work with the not null case in the then clause"
+                + " and then work with the null case in the else clause.";
     }
 
     @Override
@@ -57,67 +60,82 @@ public class WorkWithNullCheckedExpressionFirstRefactoring extends AbstractRefac
     }
 
     @Override
-    public boolean visit(IfStatement node) {
-        final Statement thenStmt = getThenStatement(node);
-        final Statement elseStmt = getElseStatement(node, thenStmt);
-        if (isNullCheck(node.getExpression())
-                && thenStmt != null
-                && elseStmt != null
-                && thenStmt.getNodeType() == elseStmt.getNodeType()
-                && simpleStmt(thenStmt)) {
-            return revertIfStatement(node, thenStmt, elseStmt);
-        }
-        return VISIT_SUBTREE;
+    public boolean visit(Block node) {
+        final IfAndReturnVisitor ifAndReturnVisitor = new IfAndReturnVisitor(ctx, node);
+        node.accept(ifAndReturnVisitor);
+        return ifAndReturnVisitor.getResult();
     }
 
-    private Statement getThenStatement(IfStatement node) {
-        final List<Statement> thenStmts = asList(node.getThenStatement());
-        if (thenStmts.size() == 1) {
-            return thenStmts.get(0);
+    private static final class IfAndReturnVisitor extends BlockSubVisitor {
+
+        public IfAndReturnVisitor(final RefactoringContext ctx, final Block startNode) {
+            super(ctx, startNode);
         }
-        return null;
-    }
 
-    private Statement getElseStatement(IfStatement node, Statement thenStmt) {
-        final List<Statement> elseStmts = asList(node.getElseStatement());
-        if (elseStmts.size() == 1) {
-            return elseStmts.get(0);
+        @Override
+        public boolean visit(IfStatement node) {
+            final Statement thenStmt = getThenStatement(node);
+            final Statement elseStmt = getElseStatement(node, thenStmt);
+            if (isNullCheck(node.getExpression())
+                    && thenStmt != null
+                    && elseStmt != null
+                    && thenStmt.getNodeType() == elseStmt.getNodeType()
+                    && simpleStmt(thenStmt)) {
+                revertIfStatement(node, thenStmt, elseStmt);
+                setResult(DO_NOT_VISIT_SUBTREE);
+                return DO_NOT_VISIT_SUBTREE;
+            }
+            return VISIT_SUBTREE;
         }
-        if (is(thenStmt, ReturnStatement.class)) {
-            return getNextSibling(node);
+
+        private Statement getThenStatement(IfStatement node) {
+            final List<Statement> thenStmts = asList(node.getThenStatement());
+            if (thenStmts.size() == 1) {
+                return thenStmts.get(0);
+            }
+            return null;
         }
-        return null;
-    }
 
-    private boolean isNullCheck(Expression ifExpression) {
-        final InfixExpression condition = as(ifExpression, InfixExpression.class);
-        return hasOperator(condition, EQUALS)
-                && !condition.hasExtendedOperands()
-                && (isNullLiteral(condition.getLeftOperand()) || isNullLiteral(condition.getRightOperand()));
-    }
-
-    private boolean simpleStmt(Statement stmt) {
-        switch (stmt.getNodeType()) {
-        case ASTNode.IF_STATEMENT:
-        case ASTNode.DO_STATEMENT:
-        case ASTNode.WHILE_STATEMENT:
-        case ASTNode.FOR_STATEMENT:
-        case ASTNode.ENHANCED_FOR_STATEMENT:
-        case ASTNode.TRY_STATEMENT:
-            return false;
-
-        default:
-            return true;
+        private Statement getElseStatement(IfStatement node, Statement thenStmt) {
+            final List<Statement> elseStmts = asList(node.getElseStatement());
+            if (elseStmts.size() == 1) {
+                return elseStmts.get(0);
+            }
+            if (is(thenStmt, ReturnStatement.class)) {
+                return getNextSibling(node);
+            }
+            return null;
         }
-    }
 
-    /** Revert condition + swap then and else statements. */
-    private boolean revertIfStatement(IfStatement node, Statement thenStmt, Statement elseStmt) {
-        final ASTBuilder b = this.ctx.getASTBuilder();
-        final Refactorings r = this.ctx.getRefactorings();
-        r.set(node.getExpression(), OPERATOR_PROPERTY, NOT_EQUALS);
-        r.replace(thenStmt, b.move(elseStmt));
-        r.replace(elseStmt, b.move(thenStmt));
-        return DO_NOT_VISIT_SUBTREE;
+        private boolean isNullCheck(Expression ifExpression) {
+            final InfixExpression condition = as(ifExpression, InfixExpression.class);
+            return hasOperator(condition, EQUALS)
+                    && !condition.hasExtendedOperands()
+                    && (isNullLiteral(condition.getLeftOperand()) || isNullLiteral(condition.getRightOperand()));
+        }
+
+        private boolean simpleStmt(Statement stmt) {
+            switch (stmt.getNodeType()) {
+            case ASTNode.IF_STATEMENT:
+            case ASTNode.DO_STATEMENT:
+            case ASTNode.WHILE_STATEMENT:
+            case ASTNode.FOR_STATEMENT:
+            case ASTNode.ENHANCED_FOR_STATEMENT:
+            case ASTNode.TRY_STATEMENT:
+                return false;
+
+            default:
+                return true;
+            }
+        }
+
+        /** Revert condition + swap then and else statements. */
+        private void revertIfStatement(IfStatement node, Statement thenStmt, Statement elseStmt) {
+            final ASTBuilder b = this.getCtx().getASTBuilder();
+            final Refactorings r = this.getCtx().getRefactorings();
+            r.set(node.getExpression(), OPERATOR_PROPERTY, NOT_EQUALS);
+            r.replace(thenStmt, b.move(elseStmt));
+            r.replace(elseStmt, b.move(thenStmt));
+        }
     }
 }
