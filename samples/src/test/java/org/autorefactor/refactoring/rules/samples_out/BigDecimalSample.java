@@ -36,9 +36,10 @@ public class BigDecimalSample {
         return "" + bd1 + bd2;
     }
 
-    private static boolean refactorToCompareToEqualsZero(BigDecimal bd1, BigDecimal bd2) {
+    private static void refactorToCompareToEqualsZero(BigDecimal bd1, BigDecimal bd2) {
         // Keep this comment
-        return bd1.compareTo(bd2) == 0;
+        boolean result1 = bd1.compareTo(bd2) != 0;
+        boolean result2 = bd1.compareTo(bd2) == 0;
     }
 
     private static String refactorToCompareToEqualsZeroSurroundWithParentheses(BigDecimal bd1, BigDecimal bd2) {

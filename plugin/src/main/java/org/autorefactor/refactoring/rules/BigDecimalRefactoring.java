@@ -26,6 +26,22 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.arg0;
+import static org.autorefactor.refactoring.ASTHelper.arguments;
+import static org.autorefactor.refactoring.ASTHelper.as;
+import static org.autorefactor.refactoring.ASTHelper.hasOperator;
+import static org.autorefactor.refactoring.ASTHelper.hasType;
+import static org.autorefactor.refactoring.ASTHelper.isMethod;
+import static org.autorefactor.refactoring.JavaConstants.ONE_LONG_LITERAL_RE;
+import static org.autorefactor.refactoring.JavaConstants.TEN_LONG_LITERAL_RE;
+import static org.autorefactor.refactoring.JavaConstants.ZERO_LONG_LITERAL_RE;
+import static org.eclipse.jdt.core.dom.InfixExpression.Operator.EQUALS;
+import static org.eclipse.jdt.core.dom.InfixExpression.Operator.NOT_EQUALS;
+import static org.eclipse.jdt.core.dom.InfixExpression.Operator.PLUS;
+import static org.eclipse.jdt.core.dom.PrefixExpression.Operator.NOT;
+
 import org.autorefactor.refactoring.ASTBuilder;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
@@ -36,11 +52,8 @@ import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Name;
 import org.eclipse.jdt.core.dom.NumberLiteral;
 import org.eclipse.jdt.core.dom.ParenthesizedExpression;
+import org.eclipse.jdt.core.dom.PrefixExpression;
 import org.eclipse.jdt.core.dom.StringLiteral;
-
-import static org.autorefactor.refactoring.ASTHelper.*;
-import static org.autorefactor.refactoring.JavaConstants.*;
-import static org.eclipse.jdt.core.dom.InfixExpression.Operator.*;
 
 /** See {@link #getDescription()} method. */
 @SuppressWarnings("javadoc")
@@ -128,6 +141,15 @@ public class BigDecimalRefactoring extends AbstractRefactoringRule {
     }
 
     @Override
+    public boolean visit(PrefixExpression node) {
+        final MethodInvocation mi = as(node.getOperand(), MethodInvocation.class);
+        if (NOT.equals(node.getOperator()) && mi != null) {
+            return maybeReplaceEquals(false, node, mi);
+        }
+        return VISIT_SUBTREE;
+    }
+
+    @Override
     public boolean visit(MethodInvocation node) {
         if (node.getExpression() == null) {
             return VISIT_SUBTREE;
@@ -155,14 +177,22 @@ public class BigDecimalRefactoring extends AbstractRefactoringRule {
                 }
                 return DO_NOT_VISIT_SUBTREE;
             }
-        } else if (isMethod(node, "java.math.BigDecimal", "equals", "java.lang.Object")) {
-            final Expression arg0 = arg0(node);
+        } else if (!(node.getParent() instanceof PrefixExpression)
+                || !hasOperator((PrefixExpression) node.getParent(), NOT)) {
+            return maybeReplaceEquals(true, node, node);
+        }
+        return VISIT_SUBTREE;
+    }
+
+    private boolean maybeReplaceEquals(final boolean isPositive, final Expression node, final MethodInvocation mi) {
+        if (isMethod(mi, "java.math.BigDecimal", "equals", "java.lang.Object")) {
+            final Expression arg0 = arg0(mi);
             if (hasType(arg0, "java.math.BigDecimal")) {
-                if (isInStringAppend(node.getParent())) {
+                if (isInStringAppend(mi.getParent())) {
                     this.ctx.getRefactorings().replace(node,
-                            parenthesize(getCompareToNode(node)));
+                            parenthesize(getCompareToNode(isPositive, mi)));
                 } else {
-                    this.ctx.getRefactorings().replace(node, getCompareToNode(node));
+                    this.ctx.getRefactorings().replace(node, getCompareToNode(isPositive, mi));
                 }
                 return DO_NOT_VISIT_SUBTREE;
             }
@@ -170,11 +200,11 @@ public class BigDecimalRefactoring extends AbstractRefactoringRule {
         return VISIT_SUBTREE;
     }
 
-    private ParenthesizedExpression parenthesize(Expression compareToNode) {
+    private ParenthesizedExpression parenthesize(final Expression compareToNode) {
         return this.ctx.getASTBuilder().parenthesize(compareToNode);
     }
 
-    private boolean isInStringAppend(ASTNode node) {
+    private boolean isInStringAppend(final ASTNode node) {
         if (node instanceof InfixExpression) {
             final InfixExpression expr = (InfixExpression) node;
             if (hasOperator(expr, PLUS)
@@ -186,16 +216,16 @@ public class BigDecimalRefactoring extends AbstractRefactoringRule {
         return false;
     }
 
-    private ASTNode getClassInstanceCreatorNode(Name className, String numberLiteral) {
+    private ASTNode getClassInstanceCreatorNode(final Name className, final String numberLiteral) {
         final ASTBuilder b = this.ctx.getASTBuilder();
         return b.new0(className.getFullyQualifiedName(), b.string(numberLiteral));
     }
 
-    private InfixExpression getCompareToNode(MethodInvocation node) {
+    private InfixExpression getCompareToNode(final boolean isPositive, final MethodInvocation node) {
         final ASTBuilder b = this.ctx.getASTBuilder();
         final MethodInvocation mi = b.invoke(
                 b.copy(node.getExpression()), "compareTo", b.copy(arg0(node)));
 
-        return b.infixExpr(mi, EQUALS, b.int0(0));
+        return b.infixExpr(mi, isPositive ? EQUALS : NOT_EQUALS, b.int0(0));
     }
 }
