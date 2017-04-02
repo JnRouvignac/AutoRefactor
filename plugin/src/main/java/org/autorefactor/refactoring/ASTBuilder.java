@@ -48,6 +48,7 @@ import org.eclipse.jdt.core.dom.BreakStatement;
 import org.eclipse.jdt.core.dom.CastExpression;
 import org.eclipse.jdt.core.dom.CatchClause;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
+import org.eclipse.jdt.core.dom.ConditionalExpression;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ExpressionStatement;
 import org.eclipse.jdt.core.dom.FieldAccess;
@@ -717,6 +718,24 @@ public class ASTBuilder {
             extendedOperands(ie).add(it.next());
         }
         return ie;
+    }
+
+    /**
+     * Builds a new {@link ConditionalExpression} instance.
+     *
+     * @param mainExpression the main expression
+     * @param thenExpression the evaluated expression if the main expression is true
+     * @param elseExpression the evaluated expression if the main expression is false
+     * @return a new conditional expression
+     */
+    public ConditionalExpression conditionalExpr(Expression mainExpression,
+            Expression thenExpression,
+            Expression elseExpression) {
+        final ConditionalExpression ce = ast.newConditionalExpression();
+        ce.setExpression(mainExpression);
+        ce.setThenExpression(thenExpression);
+        ce.setElseExpression(elseExpression);
+        return ce;
     }
 
     /**
