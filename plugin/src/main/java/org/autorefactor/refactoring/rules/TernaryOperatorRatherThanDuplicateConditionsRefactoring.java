@@ -30,7 +30,7 @@ import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
 import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
 import static org.autorefactor.refactoring.ASTHelper.as;
 import static org.autorefactor.refactoring.ASTHelper.hasOperator;
-import static org.autorefactor.refactoring.ASTHelper.isPassive;
+import static org.autorefactor.refactoring.ASTHelper.isPrimitive;
 import static org.autorefactor.refactoring.ASTHelper.match;
 import static org.eclipse.jdt.core.dom.InfixExpression.Operator.AND;
 import static org.eclipse.jdt.core.dom.InfixExpression.Operator.CONDITIONAL_AND;
@@ -44,6 +44,7 @@ import org.autorefactor.refactoring.ASTBuilder;
 import org.eclipse.jdt.core.dom.ASTMatcher;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.InfixExpression;
+import org.eclipse.jdt.core.dom.Name;
 import org.eclipse.jdt.core.dom.PrefixExpression;
 
 /** See {@link #getDescription()} method. */
@@ -65,7 +66,7 @@ public class TernaryOperatorRatherThanDuplicateConditionsRefactoring extends Abs
             final InfixExpression firstCondition = as(node.getLeftOperand(), InfixExpression.class);
             final InfixExpression secondCondition = as(node.getRightOperand(), InfixExpression.class);
 
-            if (isPassive(node) && firstCondition != null
+            if (firstCondition != null
                     && !firstCondition.hasExtendedOperands()
                     && (hasOperator(firstCondition, CONDITIONAL_AND) || hasOperator(firstCondition, AND))
                     && secondCondition != null
@@ -83,30 +84,39 @@ public class TernaryOperatorRatherThanDuplicateConditionsRefactoring extends Abs
                 final Expression fourthExpr = getBasisExpression(secondCondition.getRightOperand(),
                         isFourthExprPositive);
 
-                if (match(new ASTMatcher(), firstExpr, thirdExpr)
-                        && isFirstExprPositive.get() != isThirdExprPositive.get()) {
-                    return maybeReplaceDuplicateExpr(node, firstExpr, firstCondition.getRightOperand(),
-                            secondCondition.getRightOperand(),
-                            isFirstExprPositive.get());
-                } else if (match(new ASTMatcher(), firstExpr, fourthExpr)
-                        && isFirstExprPositive.get() != isFourthExprPositive.get()) {
-                    return maybeReplaceDuplicateExpr(node, firstExpr, firstCondition.getRightOperand(),
-                            secondCondition.getLeftOperand(),
-                            isFirstExprPositive.get());
-                } else if (match(new ASTMatcher(), secondExpr, thirdExpr)
-                        && isSecondExprPositive.get() != isThirdExprPositive.get()) {
-                    return maybeReplaceDuplicateExpr(node, secondExpr, firstCondition.getLeftOperand(),
-                            secondCondition.getRightOperand(),
-                            isSecondExprPositive.get());
-                } else if (match(new ASTMatcher(), secondExpr, fourthExpr)
-                        && isSecondExprPositive.get() != isFourthExprPositive.get()) {
-                    return maybeReplaceDuplicateExpr(node, secondExpr, firstCondition.getLeftOperand(),
-                            secondCondition.getLeftOperand(),
-                            isSecondExprPositive.get());
+                if (isBooleanVariable(firstExpr)
+                        && isBooleanVariable(secondExpr)
+                        && isBooleanVariable(thirdExpr)
+                        && isBooleanVariable(fourthExpr)) {
+                    if (match(new ASTMatcher(), firstExpr, thirdExpr)
+                            && isFirstExprPositive.get() != isThirdExprPositive.get()) {
+                        return maybeReplaceDuplicateExpr(node, firstExpr, firstCondition.getRightOperand(),
+                                secondCondition.getRightOperand(),
+                                isFirstExprPositive.get());
+                    } else if (match(new ASTMatcher(), firstExpr, fourthExpr)
+                            && isFirstExprPositive.get() != isFourthExprPositive.get()) {
+                        return maybeReplaceDuplicateExpr(node, firstExpr, firstCondition.getRightOperand(),
+                                secondCondition.getLeftOperand(),
+                                isFirstExprPositive.get());
+                    } else if (match(new ASTMatcher(), secondExpr, thirdExpr)
+                            && isSecondExprPositive.get() != isThirdExprPositive.get()) {
+                        return maybeReplaceDuplicateExpr(node, secondExpr, firstCondition.getLeftOperand(),
+                                secondCondition.getRightOperand(),
+                                isSecondExprPositive.get());
+                    } else if (match(new ASTMatcher(), secondExpr, fourthExpr)
+                            && isSecondExprPositive.get() != isFourthExprPositive.get()) {
+                        return maybeReplaceDuplicateExpr(node, secondExpr, firstCondition.getLeftOperand(),
+                                secondCondition.getLeftOperand(),
+                                isSecondExprPositive.get());
+                    }
                 }
             }
         }
         return VISIT_SUBTREE;
+    }
+
+    private boolean isBooleanVariable(final Expression firstExpr) {
+        return isPrimitive(firstExpr, "boolean") && as(firstExpr, Name.class) != null;
     }
 
     private Expression getBasisExpression(final Expression originalExpr, final AtomicBoolean isExprPositive) {

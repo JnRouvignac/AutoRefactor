@@ -80,22 +80,21 @@ public class TernaryOperatorRatherThanDuplicateSample {
         boolean newBoolean1 = b1 && b2 || !b1 && b3 && b4;
     }
 
-    public void replaceDuplicateConditionsWithWrappers(Boolean b1, Boolean b2, Boolean b3) {
-        // Keep this comment
-        boolean newBoolean1 = b1 ? b2 : b3;
-        boolean newBoolean2 = b1 ? !b2 : b3;
-        boolean newBoolean3 = b1 ? b2 : !b3;
-        boolean newBoolean4 = b1 ? !b2 : !b3;
-        boolean newBoolean5 = b1 ? b3 : b2;
-        boolean newBoolean6 = b1 ? b3 : !b2;
-        boolean newBoolean7 = b1 ? !b3 : b2;
-        boolean newBoolean8 = b1 ? !b3 : !b2;
+    public void doNoReplaceDuplicateConditionsWithWrappers(Boolean b1, Boolean b2, Boolean b3) {
+        boolean newBoolean1 = b1 && b2 || !b1 && b3;
+        boolean newBoolean2 = b1 && !b2 || !b1 && b3;
+        boolean newBoolean3 = b1 && b2 || !b1 && !b3;
+        boolean newBoolean4 = b1 && !b2 || !b1 && !b3;
+        boolean newBoolean5 = !b1 && b2 || b1 && b3;
+        boolean newBoolean6 = !b1 && !b2 || b1 && b3;
+        boolean newBoolean7 = !b1 && b2 || b1 && !b3;
+        boolean newBoolean8 = !b1 && !b2 || b1 && !b3;
     }
 
-    public void replaceDuplicateConditionsWithExpressions(int i1, int i2, int i3, int i4, int i5, int i6) {
+    public void doNoReplaceDuplicateConditionsWithExpressions(int i1, int i2, int i3, int i4, int i5, int i6) {
         // Keep this comment
-        boolean newBoolean1 = (i1 == i2) ? !(i3 == i4) : (i5 == i6);
-        boolean newBoolean2 = (i1 == i2) ? (i3 == i4) : !(i5 == i6);
+        boolean newBoolean1 = (i1 == i2) && !(i3 == i4) || !(i1 == i2) && (i5 == i6);
+        boolean newBoolean2 = (i1 == i2) && (i3 == i4) || !(i1 == i2) && !(i5 == i6);
     }
 
     public void doNotReplaceDuplicateConditionsWithMethods(List<String> myList) {
