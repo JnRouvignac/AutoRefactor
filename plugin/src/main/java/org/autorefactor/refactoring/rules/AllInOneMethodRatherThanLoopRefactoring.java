@@ -55,20 +55,20 @@ import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.Statement;
 
 /** See {@link #getDescription()} method. */
-public class AllInCollectionRatherThanLoopRefactoring extends AbstractRefactoringRule {
+public class AllInOneMethodRatherThanLoopRefactoring extends AbstractRefactoringRule {
     @Override
     public String getDescription() {
         return ""
             + "Collection related refactorings:\n"
+            + "- replaces for/foreach loops to use Collections.addAll() where possible,\n"
             + "- replaces for/foreach loops to use Collection.addAll() where possible,\n"
             + "- replaces for/foreach loops to use Collection.containsAll() where possible,\n"
-            + "- replaces for/foreach loops to use Collection.removeAll() where possible,\n"
-            + "- replaces for/foreach loops to use Collections.addAll() where possible.";
+            + "- replaces for/foreach loops to use Collection.removeAll() where possible.";
     }
 
     @Override
     public String getName() {
-        return "All in collection rather than loop";
+        return "All in one method rather than loop";
     }
 
     @Override
