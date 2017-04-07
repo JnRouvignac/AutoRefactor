@@ -27,7 +27,7 @@ package org.autorefactor.refactoring.rules.samples_out;
 
 import java.util.List;
 
-public class TernaryOperatorRatherThanDuplicateSample {
+public class TernaryOperatorRatherThanDuplicateConditionsSample {
 
     private static int staticField = 0;
 
