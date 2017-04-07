@@ -162,7 +162,7 @@ public class ChooseRefactoringWizardPage extends WizardPage {
 
     private void createSelectAllCheckbox(Composite parent) {
         selectAllVisibleCheckbox = new Button(parent, SWT.CHECK);
-        selectAllVisibleCheckbox.setText("(de)select all visible refactorings");
+        selectAllVisibleCheckbox.setText("Toggle all the visible refactorings");
         selectAllVisibleCheckbox.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
