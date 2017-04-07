@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2016 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2016-2017 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
 
 import org.autorefactor.AutoRefactorPlugin;
@@ -40,6 +41,18 @@ import org.autorefactor.refactoring.JavaProjectOptions;
 import org.autorefactor.refactoring.Release;
 import org.autorefactor.refactoring.rules.EndsWithFileFilter;
 import org.autorefactor.ui.JavaProjectOptionsImpl;
+import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.jdt.core.formatter.CodeFormatter;
+import org.eclipse.jdt.core.formatter.DefaultCodeFormatterConstants;
+import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.jface.text.Document;
+import org.eclipse.jface.text.IDocument;
+import org.eclipse.text.edits.MalformedTreeException;
+import org.eclipse.text.edits.TextEdit;
+
+import static org.eclipse.jdt.core.JavaCore.*;
+import static org.eclipse.jdt.core.ToolFactory.*;
+import static org.eclipse.jdt.core.formatter.CodeFormatter.*;
 
 public final class TestHelper {
 
@@ -79,7 +92,7 @@ public final class TestHelper {
             }
         }
     }
-    
+
     public static JavaProjectOptions newJavaProjectOptions(Release javaSE, int tabSize) {
         final JavaProjectOptionsImpl options = new JavaProjectOptionsImpl();
         options.setTabSize(tabSize);
@@ -87,10 +100,31 @@ public final class TestHelper {
         return options;
     }
 
-    public static String normalizeJavaSourceCode(String s) {
-        return s.replaceAll("\t", "    ")
-                .replaceAll("(\r\n|\r|\n)", "\n")
-                .trim();
+    public static String normalizeJavaSourceCode(String source) {
+        final CodeFormatter codeFormatter = createCodeFormatter(getJava7Options());
+
+        final TextEdit edit = codeFormatter.format(K_COMPILATION_UNIT,
+            source, 0, source.length(), // source to format
+            0, System.getProperty("line.separator") // initial indentation and line separator
+        );
+
+        try {
+            final IDocument document = new Document(source);
+            edit.apply(document);
+            return document.get();
+        } catch (MalformedTreeException e) {
+            throw new RuntimeException(e);
+        } catch (BadLocationException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static Map<String, String> getJava7Options() {
+        Map<String, String> options = DefaultCodeFormatterConstants.getEclipseDefaultSettings();
+        options.put(COMPILER_COMPLIANCE, VERSION_1_7);
+        options.put(COMPILER_CODEGEN_TARGET_PLATFORM, JavaCore.VERSION_1_7);
+        options.put(COMPILER_SOURCE, VERSION_1_7);
+        return options;
     }
 
     public static Collection<Object[]> samples(String samplesBaseDir, Collection<Class<?>> whitelistRules,
