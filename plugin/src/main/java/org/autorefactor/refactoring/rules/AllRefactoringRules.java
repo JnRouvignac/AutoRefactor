@@ -111,6 +111,7 @@ public final class AllRefactoringRules {
                 // TODO JNR - to be completed
                 // new ReduceVariableScopeRefactoring(),
                 new StringBuilderRefactoring(),
+                new StringBuilderRatherThanStringBufferRefactoring(),
                 new UseStringContainsRefactoring(),
                 new PushNegationDownRefactoring(),
                 new CommentsRefactoring(),
