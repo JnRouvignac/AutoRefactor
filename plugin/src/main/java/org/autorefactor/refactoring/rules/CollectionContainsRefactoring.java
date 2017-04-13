@@ -71,9 +71,10 @@ public class CollectionContainsRefactoring extends AbstractRefactoringRule {
 
     @Override
     public boolean visit(Block node) {
-        final AssignmentForAndReturnVisitor returnStatementVisitor = new AssignmentForAndReturnVisitor(ctx, node);
-        node.accept(returnStatementVisitor);
-        return returnStatementVisitor.getResult();
+        final AssignmentForAndReturnVisitor assignmentForAndReturnVisitor =
+                new AssignmentForAndReturnVisitor(ctx, node);
+        node.accept(assignmentForAndReturnVisitor);
+        return assignmentForAndReturnVisitor.getResult();
     }
 
     private static final class AssignmentForAndReturnVisitor extends BlockSubVisitor {
@@ -102,25 +103,23 @@ public class CollectionContainsRefactoring extends AbstractRefactoringRule {
                     Expression toFind = getExpressionToFind(cond, loopElement);
                     if (toFind != null) {
                         if (thenStmts.size() == 1) {
-                            Statement forNextStmt = getNextStatement(forNode);
                             Statement thenStmt = thenStmts.get(0);
-                            Boolean negate = negateCollectionContains(thenStmt, forNextStmt);
-                            if (negate != null) {
-                                ASTBuilder b = getCtx().getASTBuilder();
-                                getCtx().getRefactorings().replace(forNode,
-                                        b.return0(
-                                                collectionContains(iterable, toFind, negate, b)));
-                                if (forNextStmt.equals(getNextSibling(forNode))) {
-                                    getCtx().getRefactorings().remove(forNextStmt);
-                                }
+                            BooleanLiteral innerBl = getReturnedBooleanLiteral(thenStmt);
+
+                            Statement forNextStmt = getNextStatement(forNode);
+                            BooleanLiteral outerBl = getReturnedBooleanLiteral(forNextStmt);
+
+                            Boolean isPositive = signCollectionContains(innerBl, outerBl);
+                            if (isPositive != null) {
+                                replaceLoopAndReturn(forNode, iterable, toFind, forNextStmt, isPositive);
                                 setResult(DO_NOT_VISIT_SUBTREE);
                                 return DO_NOT_VISIT_SUBTREE;
                             }
-                            return maybeReplaceWithCollectionContains0(forNode, iterable, thenStmt, toFind);
+                            return maybeReplaceLoopAndVariable(forNode, iterable, thenStmt, toFind);
                         } else if (thenStmts.size() == 2) {
                             BreakStatement bs = as(thenStmts.get(1), BreakStatement.class);
                             if (bs != null && bs.getLabel() == null) {
-                                return maybeReplaceWithCollectionContains0(forNode, iterable, thenStmts.get(0), toFind);
+                                return maybeReplaceLoopAndVariable(forNode, iterable, thenStmts.get(0), toFind);
                             }
                         }
                     }
@@ -129,63 +128,77 @@ public class CollectionContainsRefactoring extends AbstractRefactoringRule {
             return VISIT_SUBTREE;
         }
 
-        private boolean maybeReplaceWithCollectionContains0(
+        private void replaceLoopAndReturn(Statement forNode, Expression iterable, Expression toFind,
+                Statement forNextStmt, boolean negate) {
+            ASTBuilder b = getCtx().getASTBuilder();
+            getCtx().getRefactorings().replace(forNode,
+                    b.return0(
+                            collectionContains(iterable, toFind, negate, b)));
+            if (forNextStmt.equals(getNextSibling(forNode))) {
+                getCtx().getRefactorings().remove(forNextStmt);
+            }
+        }
+
+        private boolean maybeReplaceLoopAndVariable(
                 Statement forNode, Expression iterable, Statement uniqueThenStmt, Expression toFind) {
             Statement previousStmt = getPreviousStatement(forNode);
-            if (previousStmt == null) {
-                return VISIT_SUBTREE;
-            }
-            boolean previousStmtIsPreviousSibling = previousStmt.equals(getPreviousSibling(forNode));
-            Assignment as = asExpression(uniqueThenStmt, Assignment.class);
-            Pair<Name, Expression> innerInit = decomposeInitializer(as);
-            Name initName = innerInit.getFirst();
-            Expression init2 = innerInit.getSecond();
-            Pair<Name, Expression> outerInit = getInitializer(previousStmt);
-            if (isSameVariable(outerInit.getFirst(), initName)) {
-                Boolean negate2 = negateCollectionContains((BooleanLiteral) init2,
-                        (BooleanLiteral) outerInit.getSecond());
-                if (negate2 != null) {
-                    ASTBuilder b = getCtx().getASTBuilder();
-                    Statement replacement;
-                    if (previousStmtIsPreviousSibling
-                            && previousStmt instanceof VariableDeclarationStatement) {
-                        replacement = b.declareStmt(b.type("boolean"), b.move((SimpleName) initName),
-                                collectionContains(iterable, toFind, negate2, b));
-                    } else if (!previousStmtIsPreviousSibling
-                            || previousStmt instanceof ExpressionStatement) {
-                        replacement = b.toStmt(b.assign(b.copy(initName), ASSIGN,
-                                collectionContains(iterable, toFind, negate2, b)));
-                    } else {
-                        throw new NotImplementedException(forNode);
+            if (previousStmt != null) {
+                boolean previousStmtIsPreviousSibling = previousStmt.equals(getPreviousSibling(forNode));
+                Assignment as = asExpression(uniqueThenStmt, Assignment.class);
+                Pair<Name, Expression> innerInit = decomposeInitializer(as);
+                Name initName = innerInit.getFirst();
+                Expression init2 = innerInit.getSecond();
+                Pair<Name, Expression> outerInit = getInitializer(previousStmt);
+                if (isSameVariable(outerInit.getFirst(), initName)) {
+                    Boolean isPositive = signCollectionContains((BooleanLiteral) init2,
+                            (BooleanLiteral) outerInit.getSecond());
+                    if (isPositive != null) {
+                        replaceLoopAndVariable(forNode, iterable, toFind, previousStmt,
+                                previousStmtIsPreviousSibling, initName, isPositive);
+                        setResult(DO_NOT_VISIT_SUBTREE);
+                        return DO_NOT_VISIT_SUBTREE;
                     }
-                    getCtx().getRefactorings().replace(forNode, replacement);
-                    if (previousStmtIsPreviousSibling) {
-                        getCtx().getRefactorings().remove(previousStmt);
-                    }
-                    setResult(DO_NOT_VISIT_SUBTREE);
-                    return DO_NOT_VISIT_SUBTREE;
                 }
             }
             return VISIT_SUBTREE;
         }
 
-        private Expression collectionContains(Expression iterable, Expression toFind, Boolean negate, ASTBuilder b) {
-            return maybeNegate(
-                    b.invoke(b.move(iterable), "contains", b.move(toFind)),
-                    negate);
+        private void replaceLoopAndVariable(Statement forNode, Expression iterable, Expression toFind,
+                Statement previousStmt, boolean previousStmtIsPreviousSibling, Name initName, boolean isPositive) {
+            ASTBuilder b = getCtx().getASTBuilder();
+            Statement replacement;
+            if (previousStmtIsPreviousSibling
+                    && previousStmt instanceof VariableDeclarationStatement) {
+                replacement = b.declareStmt(b.type("boolean"), b.move((SimpleName) initName),
+                        collectionContains(iterable, toFind, isPositive, b));
+            } else if (!previousStmtIsPreviousSibling
+                    || previousStmt instanceof ExpressionStatement) {
+                replacement = b.toStmt(b.assign(b.copy(initName), ASSIGN,
+                        collectionContains(iterable, toFind, isPositive, b)));
+            } else {
+                throw new NotImplementedException(forNode);
+            }
+            getCtx().getRefactorings().replace(forNode, replacement);
+            if (previousStmtIsPreviousSibling) {
+                getCtx().getRefactorings().remove(previousStmt);
+            }
         }
 
-        private Boolean negateCollectionContains(Statement uniqueThenStmt, Statement forNextStmt) {
-            BooleanLiteral innerBl = getReturnedBooleanLiteral(uniqueThenStmt);
-            BooleanLiteral outerBl = getReturnedBooleanLiteral(forNextStmt);
-            return negateCollectionContains(innerBl, outerBl);
+        private Expression collectionContains(Expression iterable, Expression toFind, boolean isPositive,
+                ASTBuilder b) {
+            final MethodInvocation invoke = b.invoke(b.move(iterable), "contains", b.move(toFind));
+            if (isPositive) {
+                return invoke;
+            } else {
+                return b.not(invoke);
+            }
         }
 
-        private Boolean negateCollectionContains(BooleanLiteral innerBl, BooleanLiteral outerBl) {
+        private Boolean signCollectionContains(BooleanLiteral innerBl, BooleanLiteral outerBl) {
             if (innerBl != null
                     && outerBl != null
-                    && !innerBl.booleanValue() == outerBl.booleanValue()) {
-                return outerBl.booleanValue();
+                    && innerBl.booleanValue() != outerBl.booleanValue()) {
+                return innerBl.booleanValue();
             }
             return null;
         }
@@ -220,13 +233,6 @@ public class CollectionContainsRefactoring extends AbstractRefactoringRule {
                 return as(rs.getExpression(), BooleanLiteral.class);
             }
             return null;
-        }
-
-        private Expression maybeNegate(Expression invoke, boolean negate) {
-            if (negate) {
-                return getCtx().getASTBuilder().not(invoke);
-            }
-            return invoke;
         }
 
         private Expression getExpressionToFind(MethodInvocation cond, Expression forVar) {
