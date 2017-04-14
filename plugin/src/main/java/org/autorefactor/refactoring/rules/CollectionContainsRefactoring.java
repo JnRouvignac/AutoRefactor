@@ -116,16 +116,37 @@ public class CollectionContainsRefactoring extends AbstractRefactoringRule {
                                 return DO_NOT_VISIT_SUBTREE;
                             }
                             return maybeReplaceLoopAndVariable(forNode, iterable, thenStmt, toFind);
-                        } else if (thenStmts.size() == 2) {
-                            BreakStatement bs = as(thenStmts.get(1), BreakStatement.class);
+                        } else {
+                            BreakStatement bs = as(thenStmts.get(thenStmts.size() - 1), BreakStatement.class);
                             if (bs != null && bs.getLabel() == null) {
-                                return maybeReplaceLoopAndVariable(forNode, iterable, thenStmts.get(0), toFind);
+                                if (thenStmts.size() == 2) {
+                                    if (maybeReplaceLoopAndVariable(forNode, iterable, thenStmts.get(0), toFind)
+                                            == DO_NOT_VISIT_SUBTREE) {
+                                        return DO_NOT_VISIT_SUBTREE;
+                                    }
+                                }
+
+                                replaceLoopByIf(forNode, iterable, thenStmts, toFind, bs);
+                                setResult(DO_NOT_VISIT_SUBTREE);
+                                return DO_NOT_VISIT_SUBTREE;
                             }
                         }
                     }
                 }
             }
             return VISIT_SUBTREE;
+        }
+
+        private void replaceLoopByIf(Statement forNode, Expression iterable, List<Statement> thenStmts,
+                Expression toFind, BreakStatement bs) {
+            thenStmts.remove(thenStmts.size() - 1);
+
+            ASTBuilder b = getCtx().getASTBuilder();
+            Statement replacement = b.if0(collectionContains(iterable, toFind, true, b),
+                    b.block(b.copyRange(thenStmts)));
+            getCtx().getRefactorings().replace(forNode, replacement);
+
+            thenStmts.add(bs);
         }
 
         private void replaceLoopAndReturn(Statement forNode, Expression iterable, Expression toFind,
