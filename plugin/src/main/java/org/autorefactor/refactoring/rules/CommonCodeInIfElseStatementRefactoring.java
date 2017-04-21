@@ -50,7 +50,7 @@ public class CommonCodeInIfElseStatementRefactoring extends AbstractRefactoringR
     public String getDescription() {
         return ""
             + "Factorizes common code in all if / else if / else statements"
-            + " either at the start of each blocks or at the end.\n"
+            + " at the end of each blocks.\n"
             + "Ultimately it can completely remove the if statement condition.";
     }
 
@@ -86,19 +86,9 @@ public class CommonCodeInIfElseStatementRefactoring extends AbstractRefactoringR
 
             boolean result = VISIT_SUBTREE;
 
-            // identify matching statements starting from the beginning of each case
-            for (int stmtIndex = 0; stmtIndex < minSize; stmtIndex++) {
-                if (!match(matcher, allCasesStmts, true, stmtIndex, 0, allCasesStmts.size())) {
-                    break;
-                }
-                this.ctx.getRefactorings().insertBefore(b.copy(caseStmts.get(stmtIndex)), node);
-                removeStmts(allCasesStmts, true, stmtIndex, removedCaseStmts);
-                result = DO_NOT_VISIT_SUBTREE;
-            }
-
             // identify matching statements starting from the end of each case
             for (int stmtIndex = 1; 0 <= minSize - stmtIndex; stmtIndex++) {
-                if (!match(matcher, allCasesStmts, false, stmtIndex, 0, allCasesStmts.size())
+                if (!match(matcher, allCasesStmts, stmtIndex, 0, allCasesStmts.size())
                         || anyContains(removedCaseStmts, allCasesStmts, stmtIndex)) {
                     break;
                 }
@@ -221,16 +211,16 @@ public class CommonCodeInIfElseStatementRefactoring extends AbstractRefactoringR
         }
     }
 
-    private boolean match(ASTMatcher matcher, List<List<Statement>> allCasesStmts, boolean matchForward, int stmtIndex,
-            int startIndex, int endIndex) {
+    private boolean match(ASTMatcher matcher, List<List<Statement>> allCasesStmts, int stmtIndex, int startIndex,
+            int endIndex) {
         if (startIndex == endIndex || startIndex == endIndex - 1) {
             return true;
         }
         final int comparisonIndex;
         if (endIndex - startIndex > 1) {
             final int pivotIndex = (endIndex + startIndex + 1) / 2;
-            if (!match(matcher, allCasesStmts, matchForward, stmtIndex, startIndex, pivotIndex)
-                    || !match(matcher, allCasesStmts, matchForward, stmtIndex, pivotIndex, endIndex)) {
+            if (!match(matcher, allCasesStmts, stmtIndex, startIndex, pivotIndex)
+                    || !match(matcher, allCasesStmts, stmtIndex, pivotIndex, endIndex)) {
                 return false;
             }
             comparisonIndex = pivotIndex;
@@ -240,12 +230,8 @@ public class CommonCodeInIfElseStatementRefactoring extends AbstractRefactoringR
 
         final List<Statement> caseStmts1 = allCasesStmts.get(startIndex);
         final List<Statement> caseStmts2 = allCasesStmts.get(comparisonIndex);
-        if (matchForward) {
-            return ASTHelper.match(matcher, caseStmts1.get(stmtIndex), caseStmts2.get(stmtIndex));
-        } else {
-            return ASTHelper.match(matcher, caseStmts1.get(caseStmts1.size() - stmtIndex),
+        return ASTHelper.match(matcher, caseStmts1.get(caseStmts1.size() - stmtIndex),
                     caseStmts2.get(caseStmts2.size() - stmtIndex));
-        }
     }
 
     private int minSize(List<List<Statement>> allCasesStmts) {

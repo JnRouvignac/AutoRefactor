@@ -28,7 +28,7 @@ package org.autorefactor.refactoring.rules.samples_out;
 public class CommonCodeInIfElseStatementSample {
 
     /** no code at all, remove all */
-    public void emptyIfOrElseClauses(Boolean b, int i, int j) {
+    public void doNotRemoveIf(Boolean b, int i, int j) {
         if (b.booleanValue()) {
             System.out.println();
         } else {
@@ -36,7 +36,7 @@ public class CommonCodeInIfElseStatementSample {
     }
 
     /** no common code, Do not remove anything */
-    public void ifElseRemoveIf(Boolean b, int i, int j) {
+    public void doNotRemoveIfElse(Boolean b, int i, int j) {
         if (b.booleanValue()) {
             i++;
         } else {
@@ -58,32 +58,33 @@ public class CommonCodeInIfElseStatementSample {
 
     /** common code: i++, Remove then case */
     public void ifElseRemoveThen(Boolean b, int i, int j) {
-        // keep this comment
-        i++;
         if (!b.booleanValue()) {
-            j++;
+            i++;
         }
+        // keep this comment
+        j++;
     }
 
     /** common code: i++, Remove else case */
     public void ifElseRemoveElse(Boolean b, int i, int j) {
-        // keep this comment
-        i++;
         if (b.booleanValue()) {
-            j++;
+            i++;
         }
+        // keep this comment
+        j++;
     }
 
     /**
-     * common code: put i++ before if statement, put l++ after if statement. Do
-     * not remove if statement.
+     * common code: put l++ after if statement. Do not remove if statement.
      */
-    public void ifElseRemoveIf(Boolean b, int i, int j, int k, int l) {
-        // keep this comment
-        i++;
+    public void putAfterIfStatement(Boolean b, int i, int j, int k, int l) {
         if (b.booleanValue()) {
+            // keep this comment
+            i++;
             j++;
         } else {
+            // keep this comment
+            i++;
             k++;
         }
         // keep this comment
@@ -126,9 +127,9 @@ public class CommonCodeInIfElseStatementSample {
     }
 
     public void refactorMethodInvocatoin(boolean b, Object o) {
-        o.toString();
         if (b) {
             System.out.println(b);
         }
+        o.toString();
     }
 }
