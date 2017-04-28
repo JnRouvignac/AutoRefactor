@@ -27,7 +27,7 @@ package org.autorefactor.refactoring.rules.all.samples_in;
 
 public class NoMalformedTreeException2Sample {
     public void commentRefactoringsInteractsWithCodeRefactoring(Object o) {
-        StringBuffer sql = new StringBuffer();
+        StringBuilder sql = new StringBuilder();
         sql.append((o)  //
         );
     }
