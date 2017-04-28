@@ -33,7 +33,11 @@ cache:
   directories:
   - $HOME/.m2
 
-#notifications:
-#  email:
-#    - one@example.com
+# Skip the Installation Step: Build everything in 'script' phase
+install: true
+
+script:
+- mvn clean install
+# TODO Test Coverage
+# - mvn cobertura:cobertura coveralls:cobertura
 
