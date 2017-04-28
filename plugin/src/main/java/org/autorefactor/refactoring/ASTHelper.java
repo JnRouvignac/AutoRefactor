@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2013-2016 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2013-2017 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -2287,6 +2287,9 @@ public final class ASTHelper {
      * @return The ids of the declared variables.
      */
     public static Set<String> getLocalVariableIdentifiers(final ASTNode node, boolean includeInnerScopes) {
+        if (node == null) {
+            return Collections.emptySet();
+        }
         final VariableDeclarationIdentifierVisitor visitor =
             new VariableDeclarationIdentifierVisitor(node, includeInnerScopes);
         node.accept(visitor);
