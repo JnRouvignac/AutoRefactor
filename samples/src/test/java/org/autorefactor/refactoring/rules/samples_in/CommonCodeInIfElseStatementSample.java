@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2013-2016 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2013-2017 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,14 +26,6 @@
 package org.autorefactor.refactoring.rules.samples_in;
 
 public class CommonCodeInIfElseStatementSample {
-
-    /** no code at all, remove all */
-    public void emptyIfOrElseClauses(Boolean b, int i, int j) {
-        if (b.booleanValue()) {
-            System.out.println();
-        } else {
-        }
-    }
 
     /** no common code, Do not remove anything */
     public void ifElseRemoveIf(Boolean b, int i, int j) {
@@ -166,5 +158,55 @@ public class CommonCodeInIfElseStatementSample {
         } else {
             o.toString();
         }
+    }
+
+    public int doNotRefactorNoElse(boolean b) {
+        if (b) {
+            return 1;
+        }
+        return 1;
+    }
+
+    public int refactorIfElseInThenClause(boolean b1, boolean b2) {
+        if (b1) {
+            if (b2) {
+                return 1;
+            } else {
+                return 1;
+            }
+        } else {
+            return 1;
+        }
+    }
+
+    public int refactorIfElseInThenClauseNoBrackets(boolean b1, boolean b2) {
+        if (b1)
+            if (b2)
+                return 1;
+        else
+            return 1;
+        return 1;
+        // FIXME
+        // Should be refactored into this unique statement:
+        // return 1;
+    }
+
+    public int refactorIfElseInElseClause(boolean b1, boolean b2) {
+        if (b1) {
+            return 1;
+        } else if (b2) {
+            return 2;
+        } else {
+            return 2;
+        }
+    }
+
+    public int refactorIfElseInElseClauseNoBrackets(boolean b1, boolean b2) {
+        if (b1)      return 1;
+        else if (b2) return 2;
+        else         return 2;
+        // FIXME code above should be refactored to:
+        // if (b1)      return 1;
+        // else         return 2;
     }
 }
