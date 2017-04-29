@@ -48,7 +48,7 @@ public class HashMapRatherThanHashtableRefactoring extends AbstractClassSubstitu
 
     @Override
     public boolean isEnabled(Preferences preferences) {
-        return super.isEnabled(preferences) && getJavaMinorVersion() >= 5;
+        return super.isEnabled(preferences) && getJavaMinorVersion() >= 2;
     }
 
     private int getJavaMinorVersion() {
