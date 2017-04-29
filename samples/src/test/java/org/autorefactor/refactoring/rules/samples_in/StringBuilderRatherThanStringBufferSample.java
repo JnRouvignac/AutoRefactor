@@ -68,7 +68,7 @@ public class StringBuilderRatherThanStringBufferSample {
         buffer.append("foo");
     }
 
-    public void replaceStringBufferWithMParameter() {
+    public void replaceStringBufferWithParameter() {
         // Keep this comment
         StringBuffer buffer = new StringBuffer("foo");
         buffer.append('h');
@@ -85,9 +85,25 @@ public class StringBuilderRatherThanStringBufferSample {
         return buffer2.toString();
     }
 
+    public void doNotReplaceObject() {
+        Object buffer = new StringBuffer();
+    }
+
     public void doNotReplaceStringBufferParameter(StringBuffer aBuffer) {
         StringBuffer buffer = aBuffer;
         buffer.append("foo");
+    }
+
+    public void doNotReplaceCastedStringBuffer() {
+        StringBuffer buffer = (StringBuffer) new StringBuffer();
+        buffer.append("foo");
+    }
+
+    public void doNotReplaceStringBufferWithInstanceof() {
+        StringBuffer buffer = new StringBuffer();
+        if (buffer instanceof StringBuffer) {
+            buffer.append("foo");
+        }
     }
 
     public void doNotReplaceStringBufferPassedToAMethod() {

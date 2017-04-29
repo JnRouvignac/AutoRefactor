@@ -112,6 +112,7 @@ public final class AllRefactoringRules {
                 // new ReduceVariableScopeRefactoring(),
                 new StringBuilderRefactoring(),
                 new StringBuilderRatherThanStringBufferRefactoring(),
+                new HashMapRatherThanHashtableRefactoring(),
                 new UseStringContainsRefactoring(),
                 new PushNegationDownRefactoring(),
                 new CommentsRefactoring(),
