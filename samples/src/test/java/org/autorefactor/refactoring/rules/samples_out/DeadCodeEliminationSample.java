@@ -82,83 +82,79 @@ public class DeadCodeEliminationSample {
     private int removeImpossibleIfClauses() {
         int i = 0;
         int j = 0;
-        {
-            // keep this comment
-            i++;
-        }
-
-        // keep this comment
+        // Keep this comment
         i++;
 
-        {
-            // keep this comment
-            j++;
-        }
+        // Keep this comment
+        i++;
 
-        // keep this comment
+        // Keep this comment
+        j++;
+
+        // Keep this comment
         j++;
 
         return i + j;
     }
 
-    public int removeDeadCodeAfterIfTrueWithReturn(int i) {
-        {
-            System.out.println(i);
-            return 1;
+    public int doNotRefactorWithVariableConflict() {
+        if (true) {
+            int j = 0;
         }
+        int j = 1;
+        return j;
+    }
+
+    public int removeConditionWithCompatibleVariables(int i) {
+        if (i == 0) {
+            int j = 0;
+        }
+        // Keep this comment
+        // Keep this comment too
+        int j = 1;
+        return 1;
+    }
+
+    public int removeDeadCodeAfterIfTrueWithReturn(int i) {
+        System.out.println(i);
+        return 1;
     }
 
     public int removeDeadCodeAfterEmbeddedIfTrueWithThrow(int i) {
-        {
-            {
-                System.out.println(i);
-                throw new RuntimeException();
-            }
-        }
+        System.out.println(i);
+        throw new RuntimeException();
     }
 
     public int removeDeadCodeAfterIfFalseWithThrow(int i) {
-        {
+        System.out.println(i);
+        throw new RuntimeException();
+    }
+
+    public int doNotRemoveDeadCodeAfterEmbeddedIfTrueNoThrowOrReturn(int i) {
+        System.out.println(i);
+        return 2;
+    }
+
+    public int doNotRemoveAfterIfFalseNoThrowOrReturn(int i) {
+        System.out.println(i);
+        return 2;
+    }
+
+    public int removeDeadCodeAfterEmbeddedIfThrowOrReturn(boolean b, int i) {
+        if (b) {
+            toString();
+            return 1;
+        } else {
             System.out.println(i);
             throw new RuntimeException();
         }
     }
 
-    public int doNotRemoveDeadCodeAfterEmbeddedIfTrueNoThrowOrReturn(int i) {
-        {
-            {
-                System.out.println(i);
-            }
-        }
-        return 2;
-    }
-
-    public int doNotRemoveAfterIfFalseNoThrowOrReturn(int i) {
-        {
-            System.out.println(i);
-        }
-        return 2;
-    }
-
-    public int removeDeadCodeAfterEmbeddedIfThrowOrReturn(boolean b, int i) {
-        {
-            if (b) {
-                toString();
-                return 1;
-            } else {
-                System.out.println(i);
-                throw new RuntimeException();
-            }
-        }
-    }
-
     public int doNotRemoveDeadCodeAfterEmbeddedIfNoThrowNOrReturn(boolean b, int i) {
-        {
-            if (b) {
-                toString();
-            } else {
-                System.out.println(i);
-            }
+        if (b) {
+            toString();
+        } else {
+            System.out.println(i);
         }
         return 2;
     }
@@ -188,7 +184,7 @@ public class DeadCodeEliminationSample {
     private int removeEmptyTryNonEmptyFinally() {
         int i = 0;
         {
-            // keep this comment
+            // Keep this comment
             i++;
         }
         return i;

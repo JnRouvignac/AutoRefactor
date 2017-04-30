@@ -99,14 +99,14 @@ public class DeadCodeEliminationSample {
         int i = 0;
         int j = 0;
         if (true) {
-            // keep this comment
+            // Keep this comment
             i++;
         } else {
             j++;
         }
 
         if (true)
-            // keep this comment
+            // Keep this comment
             i++;
         else
             j++;
@@ -118,17 +118,37 @@ public class DeadCodeEliminationSample {
         if (false) {
             i++;
         } else {
-            // keep this comment
+            // Keep this comment
             j++;
         }
 
         if (false)
             i++;
         else
-            // keep this comment
+            // Keep this comment
             j++;
 
         return i + j;
+    }
+
+    public int doNotRefactorWithVariableConflict() {
+        if (true) {
+            int j = 0;
+        }
+        int j = 1;
+        return j;
+    }
+
+    public int removeConditionWithCompatibleVariables(int i) {
+        if (i == 0) {
+            int j = 0;
+        }
+        // Keep this comment
+        if (true) {
+            // Keep this comment too
+            int j = 1;
+        }
+        return 1;
     }
 
     public int removeDeadCodeAfterIfTrueWithReturn(int i) {
@@ -234,7 +254,7 @@ public class DeadCodeEliminationSample {
         } catch (Exception e) {
             i++;
         } finally {
-            // keep this comment
+            // Keep this comment
             i++;
         }
         return i;

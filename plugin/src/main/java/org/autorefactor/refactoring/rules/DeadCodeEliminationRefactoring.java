@@ -2,6 +2,7 @@
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
  * Copyright (C) 2013-2016 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2017 Fabrice Tiercelin - Inline the blocks
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,7 +28,9 @@ package org.autorefactor.refactoring.rules;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.autorefactor.refactoring.ASTBuilder;
@@ -133,23 +136,49 @@ public class DeadCodeEliminationRefactoring extends AbstractRefactoringRule {
 
         final Object constantCondition = condition.resolveConstantExpressionValue();
         if (Boolean.TRUE.equals(constantCondition)) {
-            r.replace(node, b.copy(thenStmt));
-            if (lastStmtIsThrowOrReturn(thenStmt)) {
-                r.remove(getNextSiblings(node));
-            }
-            return DO_NOT_VISIT_SUBTREE;
+            return maybeInlineBlock(node, thenStmt);
         } else if (Boolean.FALSE.equals(constantCondition)) {
             if (elseStmt != null) {
-                r.replace(node, b.copy(elseStmt));
-                if (lastStmtIsThrowOrReturn(elseStmt)) {
-                    r.remove(getNextSiblings(node));
-                }
+                return maybeInlineBlock(node, elseStmt);
             } else {
                 r.remove(node);
             }
             return DO_NOT_VISIT_SUBTREE;
         }
         return VISIT_SUBTREE;
+    }
+
+    private boolean maybeInlineBlock(final Statement node, final Statement unconditionnalStatement) {
+        if (lastStmtIsThrowOrReturn(unconditionnalStatement)) {
+            replaceBlockByPlainCode(node, unconditionnalStatement);
+            this.ctx.getRefactorings().remove(getNextSiblings(node));
+            return DO_NOT_VISIT_SUBTREE;
+        } else {
+            final Set<String> ifVariableNames =
+                    getLocalVariableIdentifiers(unconditionnalStatement, false);
+
+            final Set<String> followingVariableNames = new HashSet<String>();
+            for (final Statement statement : getNextSiblings(node)) {
+                followingVariableNames.addAll(getLocalVariableIdentifiers(statement, true));
+            }
+
+            if (!ifVariableNames.removeAll(followingVariableNames)) {
+                replaceBlockByPlainCode(node, unconditionnalStatement);
+                return DO_NOT_VISIT_SUBTREE;
+            }
+        }
+        return VISIT_SUBTREE;
+    }
+
+    private void replaceBlockByPlainCode(final Statement sourceNode, final Statement unconditionnalStatement) {
+        final ASTBuilder b = this.ctx.getASTBuilder();
+        final Refactorings r = this.ctx.getRefactorings();
+
+        if (unconditionnalStatement instanceof Block) {
+            r.replace(sourceNode, b.copyRange(((Block) unconditionnalStatement).statements()));
+        } else {
+            r.replace(sourceNode, b.copy(unconditionnalStatement));
+        }
     }
 
     private void collectSideEffects(Expression expr, List<Expression> sideEffectExprs) {
