@@ -26,6 +26,43 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.arguments;
+import static org.autorefactor.refactoring.ASTHelper.asExpression;
+import static org.autorefactor.refactoring.ASTHelper.asList;
+import static org.autorefactor.refactoring.ASTHelper.expressions;
+import static org.autorefactor.refactoring.ASTHelper.extendedOperands;
+import static org.autorefactor.refactoring.ASTHelper.fragments;
+import static org.autorefactor.refactoring.ASTHelper.getLocalVariableIdentifiers;
+import static org.autorefactor.refactoring.ASTHelper.hasType;
+import static org.autorefactor.refactoring.ASTHelper.isMethod;
+import static org.autorefactor.refactoring.ASTHelper.statements;
+import static org.eclipse.jdt.core.dom.ASTNode.ARRAY_ACCESS;
+import static org.eclipse.jdt.core.dom.ASTNode.ARRAY_CREATION;
+import static org.eclipse.jdt.core.dom.ASTNode.ARRAY_INITIALIZER;
+import static org.eclipse.jdt.core.dom.ASTNode.ASSIGNMENT;
+import static org.eclipse.jdt.core.dom.ASTNode.CAST_EXPRESSION;
+import static org.eclipse.jdt.core.dom.ASTNode.CLASS_INSTANCE_CREATION;
+import static org.eclipse.jdt.core.dom.ASTNode.CONDITIONAL_EXPRESSION;
+import static org.eclipse.jdt.core.dom.ASTNode.FIELD_ACCESS;
+import static org.eclipse.jdt.core.dom.ASTNode.IF_STATEMENT;
+import static org.eclipse.jdt.core.dom.ASTNode.INFIX_EXPRESSION;
+import static org.eclipse.jdt.core.dom.ASTNode.INSTANCEOF_EXPRESSION;
+import static org.eclipse.jdt.core.dom.ASTNode.METHOD_INVOCATION;
+import static org.eclipse.jdt.core.dom.ASTNode.PARENTHESIZED_EXPRESSION;
+import static org.eclipse.jdt.core.dom.ASTNode.POSTFIX_EXPRESSION;
+import static org.eclipse.jdt.core.dom.ASTNode.PREFIX_EXPRESSION;
+import static org.eclipse.jdt.core.dom.ASTNode.RETURN_STATEMENT;
+import static org.eclipse.jdt.core.dom.ASTNode.SUPER_FIELD_ACCESS;
+import static org.eclipse.jdt.core.dom.ASTNode.SUPER_METHOD_INVOCATION;
+import static org.eclipse.jdt.core.dom.ASTNode.THIS_EXPRESSION;
+import static org.eclipse.jdt.core.dom.ASTNode.THROW_STATEMENT;
+import static org.eclipse.jdt.core.dom.ASTNode.VARIABLE_DECLARATION_EXPRESSION;
+import static org.eclipse.jdt.core.search.IJavaSearchConstants.REFERENCES;
+import static org.eclipse.jdt.core.search.SearchPattern.R_EXACT_MATCH;
+import static org.eclipse.jdt.core.search.SearchPattern.createPattern;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -40,7 +77,6 @@ import org.autorefactor.util.UnhandledException;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jdt.core.IJavaElement;
-import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ArrayAccess;
 import org.eclipse.jdt.core.dom.ArrayCreation;
 import org.eclipse.jdt.core.dom.ArrayInitializer;
@@ -49,11 +85,8 @@ import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.CastExpression;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.ConditionalExpression;
-import org.eclipse.jdt.core.dom.EmptyStatement;
-import org.eclipse.jdt.core.dom.EnhancedForStatement;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.FieldAccess;
-import org.eclipse.jdt.core.dom.ForStatement;
 import org.eclipse.jdt.core.dom.IAnnotationBinding;
 import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.IPackageBinding;
@@ -73,16 +106,10 @@ import org.eclipse.jdt.core.dom.ThisExpression;
 import org.eclipse.jdt.core.dom.TryStatement;
 import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
-import org.eclipse.jdt.core.dom.WhileStatement;
 import org.eclipse.jdt.core.search.SearchEngine;
 import org.eclipse.jdt.core.search.SearchMatch;
 import org.eclipse.jdt.core.search.SearchParticipant;
 import org.eclipse.jdt.core.search.SearchRequestor;
-
-import static org.autorefactor.refactoring.ASTHelper.*;
-import static org.eclipse.jdt.core.dom.ASTNode.*;
-import static org.eclipse.jdt.core.search.IJavaSearchConstants.*;
-import static org.eclipse.jdt.core.search.SearchPattern.*;
 
 /**
  * TODO Use variable values analysis for determining where code is dead.
@@ -381,17 +408,6 @@ public class DeadCodeEliminationRefactoring extends AbstractRefactoringRule {
     }
 
     @Override
-    public boolean visit(WhileStatement node) {
-        final Object constantCondition =
-                node.getExpression().resolveConstantExpressionValue();
-        if (Boolean.FALSE.equals(constantCondition)) {
-            this.ctx.getRefactorings().remove(node);
-            return DO_NOT_VISIT_SUBTREE;
-        }
-        return VISIT_SUBTREE;
-    }
-
-    @Override
     public boolean visit(TryStatement node) {
         final List<Statement> tryStmts = asList(node.getBody());
         if (tryStmts.isEmpty()) {
@@ -423,55 +439,6 @@ public class DeadCodeEliminationRefactoring extends AbstractRefactoringRule {
     // // then we can remove the whole try statement and replace it with a simple block
     // return DO_NOT_VISIT_SUBTREE; // TODO JNR is this correct?
     // }
-        return VISIT_SUBTREE;
-    }
-
-    @Override
-    public boolean visit(EmptyStatement node) {
-        ASTNode parent = node.getParent();
-        if (parent instanceof Block) {
-            this.ctx.getRefactorings().remove(node);
-            return DO_NOT_VISIT_SUBTREE;
-        }
-        parent = getParentIgnoring(node, Block.class);
-        if (parent instanceof IfStatement) {
-            IfStatement is = (IfStatement) parent;
-            List<Statement> thenStmts = asList(is.getThenStatement());
-            List<Statement> elseStmts = asList(is.getElseStatement());
-            boolean thenIsEmptyStmt = thenStmts.size() == 1 && is(thenStmts.get(0), EmptyStatement.class);
-            boolean elseIsEmptyStmt = elseStmts.size() == 1 && is(elseStmts.get(0), EmptyStatement.class);
-            if (thenIsEmptyStmt && elseIsEmptyStmt) {
-                this.ctx.getRefactorings().remove(parent);
-                return DO_NOT_VISIT_SUBTREE;
-            } else if (thenIsEmptyStmt && is.getElseStatement() == null) {
-                this.ctx.getRefactorings().remove(is);
-                return DO_NOT_VISIT_SUBTREE;
-            } else if (elseIsEmptyStmt) {
-                this.ctx.getRefactorings().remove(is.getElseStatement());
-                return DO_NOT_VISIT_SUBTREE;
-            }
-        } else if (parent instanceof TryStatement) {
-            TryStatement ts = (TryStatement) parent;
-            return removeEmptyStmtBody(node, ts, ts.getBody());
-        } else if (parent instanceof EnhancedForStatement) {
-            EnhancedForStatement efs = (EnhancedForStatement) parent;
-            return removeEmptyStmtBody(node, efs, efs.getBody());
-        } else if (parent instanceof ForStatement) {
-            ForStatement fs = (ForStatement) parent;
-            return removeEmptyStmtBody(node, fs, fs.getBody());
-        } else if (parent instanceof WhileStatement) {
-            WhileStatement ws = (WhileStatement) parent;
-            return removeEmptyStmtBody(node, ws, ws.getBody());
-        }
-        return VISIT_SUBTREE;
-    }
-
-    private boolean removeEmptyStmtBody(EmptyStatement node, Statement stmt, Statement body) {
-        List<Statement> bodyStmts = asList(body);
-        if (bodyStmts.size() == 1 && bodyStmts.contains(node)) {
-            this.ctx.getRefactorings().remove(stmt);
-            return DO_NOT_VISIT_SUBTREE;
-        }
         return VISIT_SUBTREE;
     }
 

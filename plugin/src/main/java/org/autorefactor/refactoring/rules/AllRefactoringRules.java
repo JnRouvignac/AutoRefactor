@@ -88,6 +88,8 @@ public final class AllRefactoringRules {
                 // TODO JNR implement
                 // new ForeachRefactoring(),
                 new DeadCodeEliminationRefactoring(),
+                new CleanCodeRatherThanSemicolonRefactoring(),
+                new DoWhileRatherThanWhileRefactoring(),
                 new CollapseIfStatementRefactoring(),
                 new CommonCodeInIfElseStatementRefactoring(),
                 new MergeConditionalBlocksRefactoring(),

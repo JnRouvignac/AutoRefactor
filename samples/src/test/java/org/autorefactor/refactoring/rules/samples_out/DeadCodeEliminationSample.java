@@ -190,16 +190,6 @@ public class DeadCodeEliminationSample {
         return i;
     }
 
-    void removeEmptyStatement(boolean b, String[] args) {
-        if (b) System.out.println(b);
-        int i = 0;
-    }
-
-    void doNotRemoveEmptyStatement(boolean b) {
-        if (b);
-        else System.out.println(b);
-    }
-
     private void doNotRemoveTryWithResources() throws IOException {
         try (FileInputStream f = new FileInputStream("file.txt")) {
         }

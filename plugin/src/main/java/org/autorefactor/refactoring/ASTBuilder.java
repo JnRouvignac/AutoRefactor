@@ -49,6 +49,7 @@ import org.eclipse.jdt.core.dom.CastExpression;
 import org.eclipse.jdt.core.dom.CatchClause;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.ConditionalExpression;
+import org.eclipse.jdt.core.dom.DoStatement;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ExpressionStatement;
 import org.eclipse.jdt.core.dom.FieldAccess;
@@ -678,6 +679,20 @@ public class ASTBuilder {
      */
     public IfStatement if0(Expression condition, Statement thenStatement) {
         return if0(condition, thenStatement, null);
+    }
+
+    /**
+     * Builds a new {@link DoStatement} instance.
+     *
+     * @param condition the while condition
+     * @param statement the statement of the loop
+     * @return a new do statement
+     */
+    public DoStatement doWhile(Expression condition, Statement statement) {
+        final DoStatement ds = ast.newDoStatement();
+        ds.setExpression(condition);
+        ds.setBody(statement);
+        return ds;
     }
 
     /**
