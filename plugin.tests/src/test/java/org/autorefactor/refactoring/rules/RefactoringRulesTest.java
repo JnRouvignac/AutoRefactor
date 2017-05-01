@@ -58,10 +58,55 @@ public class RefactoringRulesTest {
 
     /** If not empty, then only run the refactorings present in this collection. */
     private static final Collection<Class<?>> WHITELIST = Arrays.<Class<?>> asList(
+            RemoveUselessNullCheckRefactoring.class,
+            VectorOldToNewAPIRefactoring.class,
+            PrimitiveWrapperCreationRefactoring.class,
+            BooleanRefactoring.class,
+            LazyLogicalRatherThanEagerRefactoring.class,
+            BooleanConstantRatherThanValueOfRefactoring.class,
+            BooleanEqualsRatherThanNullCheckRefactoring.class,
+            XORRatherThanDuplicateConditionsRefactoring.class,
+            ORConditionRatherThanRedundantClausesRefactoring.class,
+            TernaryOperatorRatherThanDuplicateConditionsRefactoring.class,
+            WorkWithNullCheckedExpressionFirstRefactoring.class,
+            AddBracketsToControlStatementRefactoring.class,
+            RemoveUnneededThisExpressionRefactoring.class,
+            StringRatherThanNewStringRefactoring.class,
+            StringRefactoring.class,
+            StringValueOfRatherThanConcatRefactoring.class,
+            BigDecimalRefactoring.class,
+            CleanCodeRatherThanSemicolonRefactoring.class,
+            DoWhileRatherThanWhileRefactoring.class,
+            CollapseIfStatementRefactoring.class,
+            CommonCodeInIfElseStatementRefactoring.class,
+            MergeConditionalBlocksRefactoring.class,
+            MergeBlocksWithJumpRefactoring.class,
+            CollectionContainsRefactoring.class,
+            UpdateSetRatherThanTestingFirstRefactoring.class,
+            NoAssignmentInIfConditionRefactoring.class,
+            IfElseIfRefactoring.class,
+            CommonIfInIfElseRefactoring.class,
+            UseStringContainsRefactoring.class,
+            PushNegationDownRefactoring.class,
+            CommentsRefactoring.class,
+            RemoveUnnecessaryLocalBeforeReturnRefactoring.class,
+            RemoveUnnecessaryCastRefactoring.class,
+            RemoveUselessModifiersRefactoring.class,
+            HotSpotIntrinsicedAPIsRefactoring.class,
+            AnnotationRefactoring.class,
+            TryWithResourceRefactoring.class,
+            RemoveSemiColonRefactoring.class,
+
+            JUnitAssertRefactoring.class,
+            RemoveEmptyLinesRefactoring.class,
+            AndroidWakeLockRefactoring.class,
+            SwitchRefactoring.class
     );
     /** When {@link #WHITELIST} is empty, the refactorings present in this collection will never be run. */
     private static final Collection<Class<?>> BLACKLIST = Arrays.<Class<?>> asList(
-            ReduceVariableScopeRefactoring.class
+            ReduceVariableScopeRefactoring.class,
+            DeadCodeEliminationRefactoring.class,
+            HashMapRatherThanHashtableRefactoring.class
     );
 
     private final String testName;
