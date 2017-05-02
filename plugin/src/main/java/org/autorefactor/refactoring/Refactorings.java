@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2013-2016 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2013-2017 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,11 +34,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.FutureTask;
 
+import org.autorefactor.environment.EventLoop;
 import org.autorefactor.util.Pair;
-import org.autorefactor.util.UnhandledException;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.BlockComment;
@@ -52,7 +50,6 @@ import org.eclipse.jdt.core.dom.rewrite.ListRewrite;
 import org.eclipse.jdt.core.dom.rewrite.TargetSourceRangeComputer;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.text.edits.TextEdit;
 
 /**
@@ -62,6 +59,8 @@ import org.eclipse.text.edits.TextEdit;
 public class Refactorings {
 
     private static final String UNTOUCH_COMMENT = "untouchComment";
+
+    private final EventLoop eventLoop;
     private boolean hasRefactorings;
     private final ASTRewrite rewrite;
     private final Map<Pair<ASTNode, ChildListPropertyDescriptor>, ListRewrite> listRewriteCache =
@@ -75,10 +74,13 @@ public class Refactorings {
      * Builds an instance of this class.
      *
      * @param astRoot the compilation unit, root of the AST
+     * @param eventLoop the event loop
      */
-    public Refactorings(CompilationUnit astRoot) {
+    public Refactorings(CompilationUnit astRoot, EventLoop eventLoop) {
+        this.eventLoop = eventLoop;
         this.rewrite = ASTRewrite.create(astRoot.getAST());
         this.rewrite.setTargetSourceRangeComputer(new TargetSourceRangeComputer() {
+            @Override
             public SourceRange computeSourceRange(ASTNode node) {
                 if (Boolean.TRUE.equals(node.getProperty(UNTOUCH_COMMENT))) {
                     return new SourceRange(node.getStartPosition(), node.getLength());
@@ -466,7 +468,7 @@ public class Refactorings {
         // Call this operation on the SWT Display Thread with syncExec(),
         // because it changes or adds something to the GUI.
         // Otherwise it would throw an Invalid thread access Exception.
-        final Callable<BadLocationException> call = new Callable<BadLocationException>() {
+        eventLoop.syncExec(new Callable<BadLocationException>() {
             @Override
             public BadLocationException call() throws Exception {
                 try {
@@ -476,20 +478,7 @@ public class Refactorings {
                     return e;
                 }
             }
-        };
-        final FutureTask<BadLocationException> future = new FutureTask<BadLocationException>(call);
-        Display.getDefault().syncExec(future);
-        final BadLocationException ex;
-        try {
-            ex = future.get();
-        } catch (ExecutionException e) {
-            throw new UnhandledException(null, e.getCause());
-        } catch (Exception e) {
-            throw new UnhandledException(null, e);
-        }
-        if (ex != null) {
-            throw ex;
-        }
+        });
     }
 
     /**

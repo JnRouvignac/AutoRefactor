@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2014-2016 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2014-2017 Jean-Noël Rouvignac - initial API and implementation
  * Copyright (C) 2016 Fabrice Tiercelin - Switch refactoring
  *
  * This program is free software: you can redistribute it and/or modify
@@ -30,7 +30,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.autorefactor.AutoRefactorPlugin;
 import org.autorefactor.preferences.Preferences;
 import org.autorefactor.refactoring.RefactoringRule;
 
@@ -43,14 +42,14 @@ public final class AllRefactoringRules {
     /**
      * Returns the refactoring rules which have been enabled from the Eclipse preferences.
      *
+     * @param preferences the preferences
      * @return the refactoring rules which have been enabled from the Eclipse preferences
      */
-    public static List<RefactoringRule> getConfiguredRefactoringRules() {
-        final Preferences prefs = AutoRefactorPlugin.getPreferenceHelper();
+    public static List<RefactoringRule> getConfiguredRefactoringRules(Preferences preferences) {
         final List<RefactoringRule> refactorings = getAllRefactoringRules();
         for (final Iterator<RefactoringRule> iter = refactorings.iterator(); iter.hasNext();) {
             final RefactoringRule refactoring = iter.next();
-            if (!refactoring.isEnabled(prefs)) {
+            if (!refactoring.isEnabled(preferences)) {
                 iter.remove();
             }
         }
