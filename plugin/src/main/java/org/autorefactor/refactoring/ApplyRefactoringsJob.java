@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2014-2015 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2014-2017 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@
  * which accompanies this distribution under LICENSE-ECLIPSE, and is
  * available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.autorefactor.ui;
+package org.autorefactor.refactoring;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -32,10 +32,7 @@ import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 
-import org.autorefactor.AutoRefactorPlugin;
-import org.autorefactor.refactoring.JavaProjectOptions;
-import org.autorefactor.refactoring.RefactoringRule;
-import org.autorefactor.refactoring.Refactorings;
+import org.autorefactor.environment.Environment;
 import org.autorefactor.refactoring.rules.AggregateASTVisitor;
 import org.autorefactor.refactoring.rules.RefactoringContext;
 import org.autorefactor.util.IllegalStateException;
@@ -59,6 +56,7 @@ import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jface.text.IDocument;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
+import static org.autorefactor.refactoring.PluginConstant.*;
 
 /**
  * Eclipse job that applies the provided refactoring rules in background.
@@ -69,24 +67,28 @@ import static org.autorefactor.refactoring.ASTHelper.*;
 public class ApplyRefactoringsJob extends Job {
     private final Queue<RefactoringUnit> refactoringUnits;
     private final List<RefactoringRule> refactoringRulesToApply;
+    private final Environment environment;
 
     /**
      * Builds an instance of this class.
      *
      * @param refactoringUnits the units to automatically refactor
      * @param refactoringRulesToApply the refactorings to apply
+     * @param environment the environment
      */
-    public ApplyRefactoringsJob(
-            Queue<RefactoringUnit> refactoringUnits, List<RefactoringRule> refactoringRulesToApply) {
+    public ApplyRefactoringsJob(Queue<RefactoringUnit> refactoringUnits,
+                                List<RefactoringRule> refactoringRulesToApply,
+                                Environment environment) {
         super("Auto Refactor");
         setPriority(Job.LONG);
         this.refactoringUnits = refactoringUnits;
         this.refactoringRulesToApply = refactoringRulesToApply;
+        this.environment = environment;
     }
 
     @Override
     protected IStatus run(IProgressMonitor monitor) {
-        AutoRefactorPlugin.register(this);
+        environment.getJobManager().register(this);
         try {
             return run0(monitor);
         } catch (Exception e) {
@@ -94,9 +96,9 @@ public class ApplyRefactoringsJob extends Job {
                     + "Please look at the Eclipse workspace logs and "
                     + "report the stacktrace to the AutoRefactor project.\n"
                     + "Please provide sample java code that triggers the error.\n\n";
-            return new Status(IStatus.ERROR, AutoRefactorPlugin.PLUGIN_ID, msg, e);
+            return new Status(IStatus.ERROR, PLUGIN_ID, msg, e);
         } finally {
-            AutoRefactorPlugin.unregister(this);
+            environment.getJobManager().unregister(this);
         }
     }
 
@@ -156,7 +158,7 @@ public class ApplyRefactoringsJob extends Job {
                  * - doing string manipulation with the source text
                  * - applying automated refactorings to such files
                  */
-                AutoRefactorPlugin.logError(
+                environment.getLogger().error(
                     "File \"" + compilationUnit.getPath() + "\" is not synchronized with the file system."
                         + " Automated refactorings will not be applied to it.");
                 return;
@@ -210,11 +212,12 @@ public class ApplyRefactoringsJob extends Job {
                         + " refactored one way then refactored back to what it was."
                         + " Fix the code before pursuing."
                         + getPossibleCulprits(nbLoopsWithSameVisitors, lastLoopVisitors);
-                AutoRefactorPlugin.logError(errorMsg, new IllegalStateException(astRoot, errorMsg));
+                environment.getLogger().error(errorMsg, new IllegalStateException(astRoot, errorMsg));
                 break;
             }
 
-            final RefactoringContext ctx = new RefactoringContext(compilationUnit, astRoot, options, monitor);
+            final RefactoringContext ctx = new RefactoringContext(
+                compilationUnit, astRoot, options, monitor, environment);
             refactoring.setRefactoringContext(ctx);
 
             final Refactorings refactorings = refactoring.getRefactorings(astRoot);

@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2013-2016 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2013-2017 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -40,6 +40,9 @@ import org.eclipse.jdt.core.dom.CompilationUnit;
 import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.autorefactor.refactoring.SourceLocation.*;
 
+import org.autorefactor.environment.Environment;
+import org.autorefactor.environment.Logger;
+
 /** Class holding necessary data for a refactoring. */
 public class RefactoringContext {
     private final ICompilationUnit compilationUnit;
@@ -48,6 +51,7 @@ public class RefactoringContext {
     private final ASTBuilder astBuilder;
     private final JavaProjectOptions options;
     private final IProgressMonitor monitor;
+    private final Environment environment;
 
     /**
      * Builds an instance of this class.
@@ -56,13 +60,15 @@ public class RefactoringContext {
      * @param astRoot the compilation unit, root of the AST
      * @param options the Java project options used to compile the project
      * @param monitor the progress monitor of the current job
+     * @param environment the environment
      */
     public RefactoringContext(ICompilationUnit compilationUnit, CompilationUnit astRoot,
-            JavaProjectOptions options, IProgressMonitor monitor) {
+            JavaProjectOptions options, IProgressMonitor monitor, Environment environment) {
         this.compilationUnit = compilationUnit;
         this.astRoot = astRoot;
         this.monitor = monitor;
-        this.refactorings = new Refactorings(astRoot);
+        this.environment = environment;
+        this.refactorings = new Refactorings(astRoot, environment.getEventLoop());
         this.astBuilder = new ASTBuilder(refactorings);
         this.options = options;
     }
@@ -140,5 +146,14 @@ public class RefactoringContext {
             }
         }
         return false;
+    }
+
+    /**
+     * Returns the logger.
+     *
+     * @return the logger
+     */
+    public Logger getLogger() {
+        return environment.getLogger();
     }
 }

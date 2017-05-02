@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2013-2015 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2013-2017 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,6 +30,8 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import org.autorefactor.environment.Environment;
+import org.autorefactor.refactoring.PrepareApplyRefactoringsJob;
 import org.autorefactor.refactoring.rules.AllRefactoringRules;
 import org.autorefactor.util.UnhandledException;
 import org.eclipse.core.commands.AbstractHandler;
@@ -65,9 +67,11 @@ import static org.eclipse.jface.dialogs.MessageDialog.*;
 public class AutoRefactorHandler extends AbstractHandler {
     @Override
     public Object execute(final ExecutionEvent event) throws ExecutionException {
+        Environment environment = getEnvironment();
         new PrepareApplyRefactoringsJob(
                 getSelectedJavaElements(event),
-                AllRefactoringRules.getConfiguredRefactoringRules()).schedule();
+                AllRefactoringRules.getConfiguredRefactoringRules(environment.getPreferences()),
+                environment).schedule();
 
         // TODO JNR provide a maven plugin
         // TODO JNR provide a gradle plugin
@@ -93,7 +97,7 @@ public class AutoRefactorHandler extends AbstractHandler {
                 || "org.eclipse.ui.navigator.ProjectExplorer".equals(activePartId)) {
             return getSelectedJavaElements(shell, (IStructuredSelection) HandlerUtil.getCurrentSelection(event));
         } else {
-            logWarning("Code is not implemented for activePartId '" + activePartId + "'.");
+            getEnvironment().getLogger().warn("Code is not implemented for activePartId '" + activePartId + "'.");
             return Collections.emptyList();
         }
     }

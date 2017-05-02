@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2014-2016 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2014-2017 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,11 +35,11 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import org.autorefactor.refactoring.ApplyRefactoringsJob;
 import org.autorefactor.refactoring.JavaProjectOptions;
+import org.autorefactor.refactoring.JavaProjectOptionsImpl;
 import org.autorefactor.refactoring.Release;
 import org.autorefactor.refactoring.rules.JavaCoreHelper;
-import org.autorefactor.ui.ApplyRefactoringsJob;
-import org.autorefactor.ui.JavaProjectOptionsImpl;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.dom.AST;

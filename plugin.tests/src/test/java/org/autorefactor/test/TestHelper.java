@@ -25,6 +25,10 @@
  */
 package org.autorefactor.test;
 
+import static org.eclipse.jdt.core.JavaCore.*;
+import static org.eclipse.jdt.core.ToolFactory.*;
+import static org.eclipse.jdt.core.formatter.CodeFormatter.*;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -36,11 +40,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
-import org.autorefactor.AutoRefactorPlugin;
+import org.autorefactor.environment.Environment;
 import org.autorefactor.refactoring.JavaProjectOptions;
+import org.autorefactor.refactoring.JavaProjectOptionsImpl;
 import org.autorefactor.refactoring.Release;
 import org.autorefactor.refactoring.rules.EndsWithFileFilter;
-import org.autorefactor.ui.JavaProjectOptionsImpl;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.formatter.CodeFormatter;
 import org.eclipse.jdt.core.formatter.DefaultCodeFormatterConstants;
@@ -50,17 +54,18 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.text.edits.MalformedTreeException;
 import org.eclipse.text.edits.TextEdit;
 
-import static org.eclipse.jdt.core.JavaCore.*;
-import static org.eclipse.jdt.core.ToolFactory.*;
-import static org.eclipse.jdt.core.formatter.CodeFormatter.*;
-
 public final class TestHelper {
+
+    /** Environment for unit tests. */
+    public static final Environment TEST_ENVIRONMENT = new Environment(new CurrentThreadEvenLoop(),
+                                                                       null,
+                                                                       new ThrowingLogger(),
+                                                                       null);
 
     private TestHelper() {
     }
 
     public static void runTest(Callable<Void> test) throws Exception {
-        AutoRefactorPlugin.turnDebugModeOn();
         try {
             test.call();
         } catch (RuntimeException e) {

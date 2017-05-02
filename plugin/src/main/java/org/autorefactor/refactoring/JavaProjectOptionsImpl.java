@@ -23,13 +23,11 @@
  * which accompanies this distribution under LICENSE-ECLIPSE, and is
  * available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.autorefactor.ui;
+package org.autorefactor.refactoring;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import org.autorefactor.refactoring.JavaProjectOptions;
-import org.autorefactor.refactoring.Release;
 import org.autorefactor.util.UnhandledException;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.formatter.DefaultCodeFormatterConstants;
@@ -69,7 +67,6 @@ public class JavaProjectOptionsImpl implements JavaProjectOptions {
         }
     }
 
-    /** {@inheritDoc} */
     @SuppressWarnings("unchecked")
     @Override
     public Map<String, String> getCompilerOptions() {

@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2015 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2015-2017 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@
  * which accompanies this distribution under LICENSE-ECLIPSE, and is
  * available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.autorefactor.ui;
+package org.autorefactor.refactoring;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,9 +33,7 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import org.autorefactor.AutoRefactorPlugin;
-import org.autorefactor.refactoring.JavaProjectOptions;
-import org.autorefactor.refactoring.RefactoringRule;
+import org.autorefactor.environment.Environment;
 import org.autorefactor.util.NotImplementedException;
 import org.autorefactor.util.UnhandledException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -49,28 +47,35 @@ import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaModelException;
 
+import static org.autorefactor.refactoring.PluginConstant.*;
+
 /** Eclipse job that prepares and partitions work for {@link ApplyRefactoringsJob}. */
 public class PrepareApplyRefactoringsJob extends Job {
     private final List<IJavaElement> javaElements;
     private final List<RefactoringRule> refactoringRulesToApply;
     private final Map<IJavaElement, JavaProjectOptions> javaProjects = new HashMap<IJavaElement, JavaProjectOptions>();
+    private final Environment environment;
 
     /**
      * Builds an instance of this class.
      *
      * @param javaElements the java elements selected for automatic refactoring
      * @param refactoringRulesToApply the refactorings to apply
+     * @param environment the environment
      */
-    public PrepareApplyRefactoringsJob(List<IJavaElement> javaElements, List<RefactoringRule> refactoringRulesToApply) {
+    public PrepareApplyRefactoringsJob(List<IJavaElement> javaElements,
+                                       List<RefactoringRule> refactoringRulesToApply,
+                                       Environment environment) {
         super("Prepare Auto Refactor");
         setPriority(Job.SHORT);
         this.javaElements = javaElements;
         this.refactoringRulesToApply = refactoringRulesToApply;
+        this.environment = environment;
     }
 
     @Override
     protected IStatus run(IProgressMonitor monitor) {
-        AutoRefactorPlugin.register(this);
+        environment.getJobManager().register(this);
         try {
             return run0(monitor);
         } catch (Exception e) {
@@ -78,9 +83,9 @@ public class PrepareApplyRefactoringsJob extends Job {
                     + "Please look at the Eclipse workspace logs and "
                     + "report the stacktrace to the AutoRefactor project.\n"
                     + "Please provide sample java code that triggers the error.\n\n";
-            return new Status(IStatus.ERROR, AutoRefactorPlugin.PLUGIN_ID, msg, e);
+            return new Status(IStatus.ERROR, PLUGIN_ID, msg, e);
         } finally {
-            AutoRefactorPlugin.unregister(this);
+            environment.getJobManager().unregister(this);
         }
     }
 
@@ -90,9 +95,7 @@ public class PrepareApplyRefactoringsJob extends Job {
             final int nbCores = Runtime.getRuntime().availableProcessors();
             final int nbWorkers = computeNbWorkers(toRefactor.size(), nbCores);
             for (int i = 0; i < nbWorkers; i++) {
-                new ApplyRefactoringsJob(
-                        toRefactor,
-                        clone(refactoringRulesToApply)).schedule();
+                new ApplyRefactoringsJob(toRefactor, clone(refactoringRulesToApply), environment).schedule();
             }
         }
         return Status.OK_STATUS;

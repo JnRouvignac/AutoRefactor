@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2013-2016 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2013-2017 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,8 +27,11 @@ package org.autorefactor;
 
 import java.util.Vector;
 
+import org.autorefactor.environment.Environment;
+import org.autorefactor.environment.JobManager;
+import org.autorefactor.environment.Logger;
 import org.autorefactor.preferences.PreferenceConstants;
-import org.autorefactor.preferences.Preferences;
+import org.autorefactor.ui.DisplayEventLoop;
 import org.autorefactor.ui.preferences.EclipsePreferences;
 import org.autorefactor.util.UnhandledException;
 import org.eclipse.core.runtime.ILog;
@@ -42,13 +45,15 @@ import org.osgi.framework.BundleContext;
 /** The activator class controls the plug-in life cycle. */
 public class AutoRefactorPlugin extends AbstractUIPlugin {
     /** The plug-in ID. */
-    public static final String PLUGIN_ID = "org.autorefactor.plugin";
+    public static final String PLUGIN_ID = "org.autorefactor.plugin.ui";
 
     /** The shared instance. */
     private static AutoRefactorPlugin plugin;
-
-    private static Preferences preferenceHelper;
-    private static Vector<Job> jobs = new Vector<Job>();
+    private static final Environment ENVIRONMENT = new Environment(
+        new DisplayEventLoop(),
+        new JobManagerImpl(),
+        new LoggerImpl(),
+        new EclipsePreferences(getDefault().getPreferenceStore()));
 
     @Override
     public void start(final BundleContext context) throws Exception {
@@ -59,51 +64,37 @@ public class AutoRefactorPlugin extends AbstractUIPlugin {
     @Override
     public void stop(final BundleContext context) throws Exception {
         plugin = null;
-        for (Job job : jobs) {
-            job.cancel();
-        }
-        jobs.clear();
+        ((JobManagerImpl) ENVIRONMENT.getJobManager()).cancelJobs();
         super.stop(context);
     }
 
-    private static void log(int severity, String message, Exception e) {
-        if (getPreferenceHelper().debugModeOn()) {
-            if (e instanceof RuntimeException) {
-                throw (RuntimeException) e;
+    private static class LoggerImpl implements Logger {
+        private static void log(int severity, String message, Exception e) {
+            if (getEnvironment().getPreferences().debugModeOn()) {
+                if (e instanceof RuntimeException) {
+                    throw (RuntimeException) e;
+                }
+                throw new UnhandledException(null, message, e);
             }
-            throw new UnhandledException(null, message, e);
+
+            final ILog log = getDefault().getLog();
+            log.log(new Status(severity, PLUGIN_ID, message, e));
         }
 
-        final ILog log = getDefault().getLog();
-        log.log(new Status(severity, PLUGIN_ID, message, e));
-    }
+        @Override
+        public void warn(String message) {
+            log(IStatus.WARNING, message, null);
+        }
 
-    /**
-     * Logs a warning into Eclipse workspace logs.
-     *
-     * @param message the message to log
-     */
-    public static void logWarning(String message) {
-        log(IStatus.WARNING, message, null);
-    }
+        @Override
+        public void error(String message) {
+            log(IStatus.ERROR, message, null);
+        }
 
-    /**
-     * Logs an error into Eclipse workspace logs.
-     *
-     * @param message the message to log
-     */
-    public static void logError(String message) {
-        log(IStatus.ERROR, message, null);
-    }
-
-    /**
-     * Logs an error with an exception into Eclipse workspace logs.
-     *
-     * @param message the message to log
-     * @param e the exception to log
-     */
-    public static void logError(String message, Exception e) {
-        log(IStatus.ERROR, message, e);
+        @Override
+        public void error(String message, Exception e) {
+            log(IStatus.ERROR, message, e);
+        }
     }
 
     /**
@@ -125,15 +116,12 @@ public class AutoRefactorPlugin extends AbstractUIPlugin {
     }
 
     /**
-     * Returns a helper object for the preferences.
+     * Returns the environment.
      *
-     * @return a helper object for the preferences
+     * @return the environment
      */
-    public static Preferences getPreferenceHelper() {
-        if (preferenceHelper == null) {
-            preferenceHelper = new EclipsePreferences(getDefault().getPreferenceStore());
-        }
-        return preferenceHelper;
+    public static Environment getEnvironment() {
+        return ENVIRONMENT;
     }
 
     /**
@@ -156,21 +144,24 @@ public class AutoRefactorPlugin extends AbstractUIPlugin {
         return imageDescriptorFromPlugin(PLUGIN_ID, path);
     }
 
-    /**
-     * Registers the provided job against this plugin.
-     *
-     * @param job the job to register
-     */
-    public static void register(Job job) {
-        jobs.add(job);
-    }
+    private static class JobManagerImpl implements JobManager {
+        private final Vector<Job> jobs = new Vector<Job>();
 
-    /**
-     * Unregisters the provided job from this plugin.
-     *
-     * @param job the job to unregister
-     */
-    public static void unregister(Job job) {
-        jobs.remove(job);
+        @Override
+        public void register(Job job) {
+            jobs.add(job);
+        }
+
+        @Override
+        public void unregister(Job job) {
+            jobs.remove(job);
+        }
+
+        private void cancelJobs() {
+            for (Job job : jobs) {
+                job.cancel();
+            }
+            jobs.clear();
+        }
     }
 }

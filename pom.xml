@@ -2,7 +2,7 @@
 <!--
  | AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  |
- | Copyright (C) 2014-2016 Jean-Noël Rouvignac - initial API and implementation
+ | Copyright (C) 2014-2017 Jean-Noël Rouvignac - initial API and implementation
  |
  | This program is free software: you can redistribute it and/or modify
  | it under the terms of the GNU General Public License as published by
@@ -36,9 +36,10 @@
   <modules>
     <module>feature</module>
     <module>plugin</module>
-    <module>samples</module>
     <module>plugin.tests</module>
+    <module>plugin.ui</module>
     <module>repository</module>
+    <module>samples</module>
   </modules>
 
   <properties>

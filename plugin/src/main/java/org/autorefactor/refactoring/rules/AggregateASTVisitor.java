@@ -133,7 +133,6 @@ import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 import org.eclipse.jdt.core.dom.WhileStatement;
 import org.eclipse.jdt.core.dom.WildcardType;
 
-import static org.autorefactor.AutoRefactorPlugin.*;
 import static org.autorefactor.refactoring.ASTHelper.*;
 
 /**
@@ -297,7 +296,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     private void logBadlyBehavedVisitor(ASTVisitor v, ASTNode node) {
         String message = "Visitor " + v.getClass().getName() + " is badly behaved:"
                 + " it reported doing a refactoring, but it did not actually contribute any refactoring.";
-        logError(message, new AutoRefactorException(node, message));
+        ctx.getLogger().error(message, new AutoRefactorException(node, message));
     }
 
     private void logFaultyVisitor(ASTVisitor v, ASTNode node, Exception e) {
@@ -307,7 +306,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         }
         String message = "Visitor " + v.getClass().getName() + " is faulty,"
                 + " it will be disabled for the rest of this run.";
-        logError(message, new UnhandledException(node, message, e));
+        ctx.getLogger().error(message, new UnhandledException(node, message, e));
     }
 
     /**

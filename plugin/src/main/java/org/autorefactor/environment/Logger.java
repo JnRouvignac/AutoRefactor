@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2015 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2017 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,31 +23,29 @@
  * which accompanies this distribution under LICENSE-ECLIPSE, and is
  * available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.autorefactor.ui;
+package org.autorefactor.environment;
 
-import org.autorefactor.refactoring.JavaProjectOptions;
-import org.eclipse.jdt.core.ICompilationUnit;
+/** Interface to use for logging. */
+public interface Logger {
+    /**
+     * Logs an error message into Eclipse workspace logs.
+     *
+     * @param message the message to log
+     */
+    void error(String message);
 
-/** Work item for the {@link ApplyRefactoringsJob}. */
-class RefactoringUnit {
-    private final ICompilationUnit compilationUnit;
-    private final JavaProjectOptions options;
+    /**
+     * Logs an error message with an exception into Eclipse workspace logs.
+     *
+     * @param message the message to log
+     * @param e the exception to log
+     */
+    void error(String message, Exception e);
 
-    RefactoringUnit(ICompilationUnit compilationUnit, JavaProjectOptions options) {
-        this.compilationUnit = compilationUnit;
-        this.options = options;
-    }
-
-    ICompilationUnit getCompilationUnit() {
-        return compilationUnit;
-    }
-
-    JavaProjectOptions getOptions() {
-        return options;
-    }
-
-    @Override
-    public String toString() {
-        return getCompilationUnit().toString();
-    }
+    /**
+     * Logs a warning message into Eclipse workspace logs.
+     *
+     * @param message the message to log
+     */
+    void warn(String message);
 }
