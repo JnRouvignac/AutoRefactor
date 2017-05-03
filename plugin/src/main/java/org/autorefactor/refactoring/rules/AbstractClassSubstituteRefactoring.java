@@ -2,6 +2,7 @@
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
  * Copyright (C) 2017 Fabrice Tiercelin - initial API and implementation
+ * Copyright (C) 2017 Jean-Noël Rouvignac - fix NPE with Eclipse 4.5.2
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,10 +26,6 @@
  */
 package org.autorefactor.refactoring.rules;
 
-import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
-import static org.autorefactor.refactoring.ASTHelper.hasType;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -51,6 +48,8 @@ import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.VariableDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
+
+import static org.autorefactor.refactoring.ASTHelper.*;
 
 /** See {@link #getDescription()} method. */
 public abstract class AbstractClassSubstituteRefactoring extends AbstractRefactoringRule {
@@ -310,7 +309,14 @@ public abstract class AbstractClassSubstituteRefactoring extends AbstractRefacto
 
         @Override
         public boolean visit(ClassInstanceCreation instanceCreation) {
-            final ITypeBinding typeBinding = instanceCreation.getType().resolveBinding();
+            final ITypeBinding typeBinding;
+            try {
+                typeBinding = instanceCreation.getType().resolveBinding();
+            } catch (NullPointerException ignored) {
+                // FIXME NPE occurs within Eclipse 4.5.2 (running on Java 8)
+                // This NPE does not occur with Eclipse Indigo (running on Java 7)
+                return VISIT_SUBTREE;
+            }
             if (hasType(typeBinding, getExistingClassCanonicalName())) {
                 objectInstantiations.add(instanceCreation);
             }
