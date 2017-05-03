@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2013-2016 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2013-2017 Jean-Noël Rouvignac - initial API and implementation
  * Copyright (C) 2017 Fabrice Tiercelin - Inline the blocks
  *
  * This program is free software: you can redistribute it and/or modify
@@ -25,35 +25,6 @@
  * available at http://www.eclipse.org/legal/epl-v10.html
  */
 package org.autorefactor.refactoring.rules;
-
-import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
-import static org.autorefactor.refactoring.ASTHelper.arguments;
-import static org.autorefactor.refactoring.ASTHelper.asList;
-import static org.autorefactor.refactoring.ASTHelper.expressions;
-import static org.autorefactor.refactoring.ASTHelper.extendedOperands;
-import static org.autorefactor.refactoring.ASTHelper.fragments;
-import static org.autorefactor.refactoring.ASTHelper.getLocalVariableIdentifiers;
-import static org.autorefactor.refactoring.ASTHelper.isEndingWithJump;
-import static org.autorefactor.refactoring.ASTHelper.isMethod;
-import static org.eclipse.jdt.core.dom.ASTNode.ARRAY_ACCESS;
-import static org.eclipse.jdt.core.dom.ASTNode.ARRAY_CREATION;
-import static org.eclipse.jdt.core.dom.ASTNode.ARRAY_INITIALIZER;
-import static org.eclipse.jdt.core.dom.ASTNode.ASSIGNMENT;
-import static org.eclipse.jdt.core.dom.ASTNode.CAST_EXPRESSION;
-import static org.eclipse.jdt.core.dom.ASTNode.CLASS_INSTANCE_CREATION;
-import static org.eclipse.jdt.core.dom.ASTNode.CONDITIONAL_EXPRESSION;
-import static org.eclipse.jdt.core.dom.ASTNode.FIELD_ACCESS;
-import static org.eclipse.jdt.core.dom.ASTNode.INFIX_EXPRESSION;
-import static org.eclipse.jdt.core.dom.ASTNode.INSTANCEOF_EXPRESSION;
-import static org.eclipse.jdt.core.dom.ASTNode.METHOD_INVOCATION;
-import static org.eclipse.jdt.core.dom.ASTNode.PARENTHESIZED_EXPRESSION;
-import static org.eclipse.jdt.core.dom.ASTNode.POSTFIX_EXPRESSION;
-import static org.eclipse.jdt.core.dom.ASTNode.PREFIX_EXPRESSION;
-import static org.eclipse.jdt.core.dom.ASTNode.SUPER_FIELD_ACCESS;
-import static org.eclipse.jdt.core.dom.ASTNode.SUPER_METHOD_INVOCATION;
-import static org.eclipse.jdt.core.dom.ASTNode.THIS_EXPRESSION;
-import static org.eclipse.jdt.core.dom.ASTNode.VARIABLE_DECLARATION_EXPRESSION;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -87,6 +58,9 @@ import org.eclipse.jdt.core.dom.ThisExpression;
 import org.eclipse.jdt.core.dom.TryStatement;
 import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
+
+import static org.autorefactor.refactoring.ASTHelper.*;
+import static org.eclipse.jdt.core.dom.ASTNode.*;
 
 /**
  * TODO Use variable values analysis for determining where code is dead.
@@ -304,7 +278,8 @@ public class DeadCodeEliminationRefactoring extends AbstractRefactoringRule {
 
     private void methodHasSideEffects(
             IMethodBinding methodBinding, Expression methodCall, List<Expression> sideEffectExprs) {
-        if (methodHasSideEffects(methodBinding)) {
+        if (methodBinding == null || methodHasSideEffects(methodBinding)) {
+            // do not remove method calls for which for which there is no type information (method bindings is null)
             sideEffectExprs.add(methodCall);
         }
     }
