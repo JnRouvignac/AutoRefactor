@@ -29,6 +29,7 @@ import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
 import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
 import static org.autorefactor.refactoring.ASTHelper.asList;
 import static org.autorefactor.refactoring.ASTHelper.getNextSibling;
+import static org.autorefactor.refactoring.ASTHelper.isEndingWithJump;
 import static org.autorefactor.refactoring.ASTHelper.match;
 
 import java.util.ArrayList;
@@ -40,14 +41,10 @@ import org.autorefactor.refactoring.BlockSubVisitor;
 import org.autorefactor.refactoring.Refactorings;
 import org.eclipse.jdt.core.dom.ASTMatcher;
 import org.eclipse.jdt.core.dom.Block;
-import org.eclipse.jdt.core.dom.BreakStatement;
-import org.eclipse.jdt.core.dom.ContinueStatement;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.InfixExpression;
-import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.Statement;
-import org.eclipse.jdt.core.dom.ThrowStatement;
 
 /** See {@link #getDescription()} method. */
 public class MergeBlocksWithJumpRefactoring extends AbstractRefactoringRule {
@@ -63,9 +60,9 @@ public class MergeBlocksWithJumpRefactoring extends AbstractRefactoringRule {
 
     @Override
     public boolean visit(Block node) {
-        final SuccessiveIfVisitor returnStatementVisitor = new SuccessiveIfVisitor(ctx, node);
-        node.accept(returnStatementVisitor);
-        return returnStatementVisitor.getResult();
+        final SuccessiveIfVisitor successiveIfVisitor = new SuccessiveIfVisitor(ctx, node);
+        node.accept(successiveIfVisitor);
+        return successiveIfVisitor.getResult();
     }
 
     private static final class SuccessiveIfVisitor extends BlockSubVisitor {
@@ -108,7 +105,7 @@ public class MergeBlocksWithJumpRefactoring extends AbstractRefactoringRule {
                             .getThenStatement());
                     final List<Statement> nextIfStmts = asList(nextIf.getThenStatement());
                     if (lastIfStmts != null && !lastIfStmts.isEmpty()
-                            && breaksControlFlow(lastIfStmts.get(lastIfStmts.size() - 1))
+                            && isEndingWithJump(lastIfStmts.get(lastIfStmts.size() - 1))
                             && isSameCode(lastIfStmts, nextIfStmts)) {
                         duplicateIfBlocks.add(nextIf);
                         return true;
@@ -141,13 +138,6 @@ public class MergeBlocksWithJumpRefactoring extends AbstractRefactoringRule {
             while (iterator.hasNext()) {
                 r.remove(iterator.next());
             }
-        }
-
-        private static boolean breaksControlFlow(final Statement stmt) {
-            return stmt instanceof ReturnStatement
-                    || stmt instanceof BreakStatement
-                    || stmt instanceof ContinueStatement
-                    || stmt instanceof ThrowStatement;
         }
 
         private boolean isSameCode(final List<Statement> referenceStmts, final List<Statement> comparedStmts) {

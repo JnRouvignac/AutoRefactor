@@ -69,6 +69,35 @@ public class MergeBlocksWithJumpSample {
         System.out.println("Another code");
     }
 
+    public void mergeConditionsWithReturnAndThrow(int i1, int i2) throws Exception {
+        // Keep this comment
+        if ((i1 == 0) || (i1 == 1)) {
+            System.out.println("The same code");
+            if (i2 == 0) {
+                return;
+            } else {
+                throw new Exception();
+            }
+        }
+        System.out.println("Next code");
+    }
+
+    public void doNotMergeConditionsWithConditionalReturn(int i1, int i2) {
+        if (i1 == 0) {
+            System.out.println("The same code");
+            if (i2 == 0) {
+                return;
+            }
+        }
+        if (i1 == 1) {
+            System.out.println("The same code");
+            if (i2 == 0) {
+                return;
+            }
+        }
+        System.out.println("Next code");
+    }
+
     public void mergeSeveralConditions(int i1) {
         // Keep this comment
         if ((i1 == 0) || (i1 == 1) || (i1 == 2) || (i1 == 3)) {
