@@ -1,17 +1,27 @@
 /*
- * The contents of this file are subject to the terms of the Common Development and
- * Distribution License (the License). You may not use this file except in compliance with the
- * License.
+ * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
- * specific language governing permission and limitations under the License.
+ * Copyright (C) 2016 Jean-Noël Rouvignac - initial API and implementation
  *
- * When distributing Covered Software, include this CDDL Header Notice in each file and include
- * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
- * Header, with the fields enclosed by brackets [] replaced by your own identifying
- * information: "Portions Copyright [year] [name of copyright owner]".
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * any later version.
  *
- * Copyright 2016 ForgeRock AS.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program under LICENSE-GNUGPL.  If not, see
+ * <http://www.gnu.org/licenses/>.
+ *
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution under LICENSE-ECLIPSE, and is
+ * available at http://www.eclipse.org/legal/epl-v10.html
  */
 package org.autorefactor.refactoring;
 
