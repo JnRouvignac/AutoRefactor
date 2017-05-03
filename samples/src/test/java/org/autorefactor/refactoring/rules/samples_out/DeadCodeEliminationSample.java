@@ -34,31 +34,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class DeadCodeEliminationSample {
 
-    private class Parent {
-        void removeUselessOverride() {
-        }
-        void removeOverrideWithInsignificantAnnotations() {
-        }
-        void doNotRemoveSignificantAnnotation() {
-        }
-        protected void doNotRemoveVisibilityChange() {
-        }
-    }
-
-    private class Child extends Parent {
-        @Deprecated
-        @Override
-        void doNotRemoveSignificantAnnotation() {
-            super.doNotRemoveSignificantAnnotation();
-        }
-
-        @Override
-        public void doNotRemoveVisibilityChange() {
-            super.doNotRemoveVisibilityChange();
-        }
-    }
-
-    private int removeEmptyElseClause(boolean b) {
+    public int removeEmptyElseClause(boolean b) {
         int i = 0;
         if (b) {
             i++;
@@ -66,7 +42,7 @@ public class DeadCodeEliminationSample {
         return i;
     }
 
-    private int removeEmptyThenClause(boolean b) {
+    public int removeEmptyThenClause(boolean b) {
         int i = 0;
         if (!b) {
             i++;
@@ -74,12 +50,12 @@ public class DeadCodeEliminationSample {
         return i;
     }
 
-    private int removeEmptyIfStatement(boolean b) {
+    public int removeEmptyIfStatement(boolean b) {
         int i = 0;
         return i;
     }
 
-    private int removeImpossibleIfClauses() {
+    public int removeImpossibleIfClauses() {
         int i = 0;
         int j = 0;
         // Keep this comment
@@ -176,26 +152,42 @@ public class DeadCodeEliminationSample {
 //        return i;
 //    }
 
-    private int removeEmptyTryEmptyFinally() {
+    public int removeEmptyTryEmptyFinally() {
         int i = 0;
         return i;
     }
 
-    private int removeEmptyTryNonEmptyFinally() {
+    public int removeEmptyTryNonEmptyFinally() {
         int i = 0;
-        {
-            // Keep this comment
+        // Keep this comment
+        i++;
+        return i;
+    }
+
+    public int doNotRemoveEmptyTryWithVariableConflict() {
+        try {
+        } finally {
+            int i = 0;
             i++;
         }
+        int i = 0;
         return i;
     }
 
-    private void doNotRemoveTryWithResources() throws IOException {
+    public void doNotRemoveTryWithResources() throws IOException {
         try (FileInputStream f = new FileInputStream("file.txt")) {
         }
     }
 
-    private interface MethodDeclarationWithoutBody {
+    public void doNotRemoveTryWithResourcesAndFinally() throws IOException {
+        int i = 0;
+        try (FileInputStream f = new FileInputStream("file.txt")) {
+        } finally {
+            i++;
+        }
+    }
+
+    public interface MethodDeclarationWithoutBody {
         void aMethod();
     }
 
@@ -204,7 +196,7 @@ public class DeadCodeEliminationSample {
         l.removeRange(0, l.size());
     }
 
-    private static class MyAbstractList<E> extends AbstractList<E> {
+    public static class MyAbstractList<E> extends AbstractList<E> {
         @Override
         public E get(int index) {
             return null;
@@ -221,7 +213,7 @@ public class DeadCodeEliminationSample {
         }
     }
 
-    private void removeIfButKeepConditionsWithSideEffects(AtomicBoolean b, AtomicInteger i, Collection<Object> col) {
+    public void removeIfButKeepConditionsWithSideEffects(AtomicBoolean b, AtomicInteger i, Collection<Object> col) {
         b.getAndSet(true);
         col.add(1);
         i.getAndIncrement();
