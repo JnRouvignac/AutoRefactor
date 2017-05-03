@@ -29,6 +29,7 @@ package org.autorefactor.refactoring.rules;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.autorefactor.preferences.Preferences;
 import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.Refactorings;
 import org.autorefactor.refactoring.TypeNameDecider;
@@ -85,6 +86,12 @@ public class AndroidViewHolderRefactoring extends AbstractRefactoringRule {
     @Override
     public String getName() {
         return "Android ViewHolder";
+    }
+
+    @Override
+    public boolean isEnabled(Preferences preferences) {
+        // FIXME enable only when android libraries are detected
+        return super.isEnabled(preferences);
     }
 
     @Override
