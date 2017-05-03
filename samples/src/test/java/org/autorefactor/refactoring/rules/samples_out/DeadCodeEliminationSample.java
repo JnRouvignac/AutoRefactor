@@ -117,6 +117,7 @@ public class DeadCodeEliminationSample {
     }
 
     public int removeDeadCodeAfterEmbeddedIfThrowOrReturn(boolean b, int i) {
+        // Keep this comment
         if (b) {
             toString();
             return 1;
@@ -126,11 +127,21 @@ public class DeadCodeEliminationSample {
         }
     }
 
-    public int doNotRemoveDeadCodeAfterEmbeddedIfNoThrowNOrReturn(boolean b, int i) {
+    public int removeOnlyConstantConditionWithEmbeddedIf(boolean b, int i) {
+        // Keep this comment
         if (b) {
             toString();
         } else {
             System.out.println(i);
+        }
+        return 2;
+    }
+
+    public int removeOnlyConstantConditionWithEmbeddedIfReturn(boolean b) {
+        // Keep this comment
+        if (b) {
+            toString();
+            return 1;
         }
         return 2;
     }

@@ -2309,4 +2309,36 @@ public final class ASTHelper {
         expr.accept(visitor);
         return ExprActivity.PASSIVE.equals(visitor.getActivityLevel());
     }
+
+    /**
+     * Return true if the statement falls through.
+     *
+     * @param stmt the statement
+     * @return true if the statement falls through.
+     */
+    public static boolean isEndingWithJump(Statement stmt) {
+        final List<Statement> stmts = asList(stmt);
+        if (stmts.isEmpty()) {
+            return false;
+        }
+
+        final Statement lastStmt = stmts.get(stmts.size() - 1);
+        switch (lastStmt.getNodeType()) {
+        case RETURN_STATEMENT:
+        case THROW_STATEMENT:
+        case BREAK_STATEMENT:
+        case CONTINUE_STATEMENT:
+            return true;
+
+        case IF_STATEMENT:
+            final IfStatement ifStmt = (IfStatement) lastStmt;
+            final Statement thenStmt = ifStmt.getThenStatement();
+            final Statement elseStmt = ifStmt.getElseStatement();
+            return isEndingWithJump(thenStmt)
+                    && isEndingWithJump(elseStmt);
+
+        default:
+            return false;
+        }
+    }
 }

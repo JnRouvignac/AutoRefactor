@@ -34,29 +34,25 @@ import static org.autorefactor.refactoring.ASTHelper.expressions;
 import static org.autorefactor.refactoring.ASTHelper.extendedOperands;
 import static org.autorefactor.refactoring.ASTHelper.fragments;
 import static org.autorefactor.refactoring.ASTHelper.getLocalVariableIdentifiers;
+import static org.autorefactor.refactoring.ASTHelper.isEndingWithJump;
 import static org.autorefactor.refactoring.ASTHelper.isMethod;
 import static org.eclipse.jdt.core.dom.ASTNode.ARRAY_ACCESS;
 import static org.eclipse.jdt.core.dom.ASTNode.ARRAY_CREATION;
 import static org.eclipse.jdt.core.dom.ASTNode.ARRAY_INITIALIZER;
 import static org.eclipse.jdt.core.dom.ASTNode.ASSIGNMENT;
-import static org.eclipse.jdt.core.dom.ASTNode.BREAK_STATEMENT;
 import static org.eclipse.jdt.core.dom.ASTNode.CAST_EXPRESSION;
 import static org.eclipse.jdt.core.dom.ASTNode.CLASS_INSTANCE_CREATION;
 import static org.eclipse.jdt.core.dom.ASTNode.CONDITIONAL_EXPRESSION;
-import static org.eclipse.jdt.core.dom.ASTNode.CONTINUE_STATEMENT;
 import static org.eclipse.jdt.core.dom.ASTNode.FIELD_ACCESS;
-import static org.eclipse.jdt.core.dom.ASTNode.IF_STATEMENT;
 import static org.eclipse.jdt.core.dom.ASTNode.INFIX_EXPRESSION;
 import static org.eclipse.jdt.core.dom.ASTNode.INSTANCEOF_EXPRESSION;
 import static org.eclipse.jdt.core.dom.ASTNode.METHOD_INVOCATION;
 import static org.eclipse.jdt.core.dom.ASTNode.PARENTHESIZED_EXPRESSION;
 import static org.eclipse.jdt.core.dom.ASTNode.POSTFIX_EXPRESSION;
 import static org.eclipse.jdt.core.dom.ASTNode.PREFIX_EXPRESSION;
-import static org.eclipse.jdt.core.dom.ASTNode.RETURN_STATEMENT;
 import static org.eclipse.jdt.core.dom.ASTNode.SUPER_FIELD_ACCESS;
 import static org.eclipse.jdt.core.dom.ASTNode.SUPER_METHOD_INVOCATION;
 import static org.eclipse.jdt.core.dom.ASTNode.THIS_EXPRESSION;
-import static org.eclipse.jdt.core.dom.ASTNode.THROW_STATEMENT;
 import static org.eclipse.jdt.core.dom.ASTNode.VARIABLE_DECLARATION_EXPRESSION;
 
 import java.util.ArrayList;
@@ -157,7 +153,7 @@ public class DeadCodeEliminationRefactoring extends AbstractRefactoringRule {
     }
 
     private boolean maybeInlineBlock(final Statement node, final Statement unconditionnalStatement) {
-        if (isLastStmtJump(unconditionnalStatement)) {
+        if (isEndingWithJump(unconditionnalStatement)) {
             replaceBlockByPlainCode(node, unconditionnalStatement);
             this.ctx.getRefactorings().remove(getNextSiblings(node));
             return DO_NOT_VISIT_SUBTREE;
@@ -350,32 +346,6 @@ public class DeadCodeEliminationRefactoring extends AbstractRefactoringRule {
             || isMethod(methodBinding, "java.util.concurrent.atomic.AtomicReference", "getAndSet", "java.lang.Object")
             || isMethod(methodBinding,
                     "java.util.concurrent.atomic.AtomicReferenceArray", "getAndSet", "int", "java.lang.Object"));
-    }
-
-    private boolean isLastStmtJump(Statement stmt) {
-        final List<Statement> stmts = asList(stmt);
-        if (stmts.isEmpty()) {
-            return false;
-        }
-
-        final Statement lastStmt = stmts.get(stmts.size() - 1);
-        switch (lastStmt.getNodeType()) {
-        case RETURN_STATEMENT:
-        case THROW_STATEMENT:
-        case BREAK_STATEMENT:
-        case CONTINUE_STATEMENT:
-            return true;
-
-        case IF_STATEMENT:
-            final IfStatement ifStmt = (IfStatement) lastStmt;
-            final Statement thenStmt = ifStmt.getThenStatement();
-            final Statement elseStmt = ifStmt.getElseStatement();
-            return isLastStmtJump(thenStmt)
-                    && (elseStmt == null || isLastStmtJump(elseStmt));
-
-        default:
-            return false;
-        }
     }
 
     private List<Statement> getNextSiblings(Statement node) {

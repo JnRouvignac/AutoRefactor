@@ -157,6 +157,13 @@ public class SwitchSample {
                 j = 50;
                 if (i == 5) {
                     throw new RuntimeException();
+                } else {
+                    return;
+                }
+            } else if (6 == i1) {
+                j = 60;
+                if (i == 5) {
+                    throw new RuntimeException();
                 }
             }
         }

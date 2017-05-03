@@ -26,6 +26,23 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.asList;
+import static org.autorefactor.refactoring.ASTHelper.extendedOperands;
+import static org.autorefactor.refactoring.ASTHelper.getLocalVariableIdentifiers;
+import static org.autorefactor.refactoring.ASTHelper.haveSameType;
+import static org.autorefactor.refactoring.ASTHelper.isEndingWithJump;
+import static org.autorefactor.refactoring.ASTHelper.isPrimitive;
+import static org.autorefactor.refactoring.ASTHelper.match;
+import static org.autorefactor.refactoring.ASTHelper.removeParentheses;
+import static org.autorefactor.refactoring.ASTHelper.statements;
+import static org.autorefactor.util.Utils.getLast;
+import static org.eclipse.jdt.core.dom.InfixExpression.Operator.CONDITIONAL_OR;
+import static org.eclipse.jdt.core.dom.InfixExpression.Operator.EQUALS;
+import static org.eclipse.jdt.core.dom.InfixExpression.Operator.OR;
+import static org.eclipse.jdt.core.dom.InfixExpression.Operator.XOR;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -41,7 +58,6 @@ import org.autorefactor.refactoring.Refactorings;
 import org.autorefactor.util.NotImplementedException;
 import org.eclipse.jdt.core.dom.BreakStatement;
 import org.eclipse.jdt.core.dom.CharacterLiteral;
-import org.eclipse.jdt.core.dom.ContinueStatement;
 import org.eclipse.jdt.core.dom.DoStatement;
 import org.eclipse.jdt.core.dom.EnhancedForStatement;
 import org.eclipse.jdt.core.dom.Expression;
@@ -50,17 +66,11 @@ import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.InfixExpression.Operator;
 import org.eclipse.jdt.core.dom.NumberLiteral;
-import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.SwitchCase;
 import org.eclipse.jdt.core.dom.SwitchStatement;
-import org.eclipse.jdt.core.dom.ThrowStatement;
 import org.eclipse.jdt.core.dom.WhileStatement;
-
-import static org.autorefactor.refactoring.ASTHelper.*;
-import static org.autorefactor.util.Utils.*;
-import static org.eclipse.jdt.core.dom.InfixExpression.Operator.*;
 
 /** See {@link #getDescription()} method. */
 public class SwitchRefactoring extends AbstractRefactoringRule {
@@ -125,7 +135,7 @@ public class SwitchRefactoring extends AbstractRefactoringRule {
         }
 
         private boolean fallsthrough() {
-            return stmts.isEmpty() || !breaksControlFlow(getLast(stmts));
+            return stmts.isEmpty() || !isEndingWithJump(getLast(stmts));
         }
 
         private boolean hasSameCode(SwitchCaseSection other) {
@@ -343,19 +353,12 @@ public class SwitchRefactoring extends AbstractRefactoringRule {
             for (final Statement stmt : innerStmts) {
                 switchStmts.add(b.move(stmt));
             }
-            isBreakNeeded = !breaksControlFlow(getLast(innerStmts));
+            isBreakNeeded = !isEndingWithJump(getLast(innerStmts));
         }
-        //  when required: end with a break;
+        // When required: end with a break;
         if (isBreakNeeded) {
             switchStmts.add(b.break0());
         }
-    }
-
-    private static boolean breaksControlFlow(final Statement stmt) {
-        return stmt instanceof ReturnStatement
-                || stmt instanceof BreakStatement
-                || stmt instanceof ContinueStatement
-                || stmt instanceof ThrowStatement;
     }
 
     private Variable extractVariableAndValues(final Statement stmt) {
