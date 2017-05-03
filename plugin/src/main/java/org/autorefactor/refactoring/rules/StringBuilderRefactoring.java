@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2013-2016 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2013-2017 Jean-Noël Rouvignac - initial API and implementation
  * Copyright (C) 2016 Fabrice Tiercelin - Make sure we do not visit again modified nodes
  *
  * This program is free software: you can redistribute it and/or modify
@@ -26,22 +26,6 @@
  */
 package org.autorefactor.refactoring.rules;
 
-import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
-import static org.autorefactor.refactoring.ASTHelper.arg0;
-import static org.autorefactor.refactoring.ASTHelper.arguments;
-import static org.autorefactor.refactoring.ASTHelper.as;
-import static org.autorefactor.refactoring.ASTHelper.extendedOperands;
-import static org.autorefactor.refactoring.ASTHelper.hasOperator;
-import static org.autorefactor.refactoring.ASTHelper.hasType;
-import static org.autorefactor.refactoring.ASTHelper.instanceOf;
-import static org.autorefactor.refactoring.ASTHelper.isMethod;
-import static org.autorefactor.refactoring.ASTHelper.removeParentheses;
-import static org.eclipse.jdt.core.dom.ASTNode.FIELD_ACCESS;
-import static org.eclipse.jdt.core.dom.ASTNode.QUALIFIED_NAME;
-import static org.eclipse.jdt.core.dom.ASTNode.SIMPLE_NAME;
-import static org.eclipse.jdt.core.dom.InfixExpression.Operator.PLUS;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -64,6 +48,10 @@ import org.eclipse.jdt.core.dom.Name;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.StringLiteral;
 import org.eclipse.jdt.internal.corext.dom.Bindings;
+
+import static org.autorefactor.refactoring.ASTHelper.*;
+import static org.eclipse.jdt.core.dom.ASTNode.*;
+import static org.eclipse.jdt.core.dom.InfixExpression.Operator.*;
 
 /** See {@link #getDescription()} method. */
 @SuppressWarnings("restriction")
@@ -477,29 +465,22 @@ public class StringBuilderRefactoring extends AbstractRefactoringRule {
     }
 
     private boolean isStringConcat(final InfixExpression node) {
-        if (hasOperator(node, PLUS)
-                && hasType(node, "java.lang.String")) {
-            if (node.getLeftOperand() instanceof StringLiteral
-                    && !isEmptyString(node.getLeftOperand())
-                            && node.getRightOperand() instanceof StringLiteral
-                    && !isEmptyString(node.getRightOperand())) {
-                if (node.hasExtendedOperands()) {
-                    @SuppressWarnings("unchecked")
-                    Iterator<Expression> iterator = node.extendedOperands().iterator();
-                    while (iterator.hasNext()) {
-                        final Expression expr = iterator.next();
-                        if (!(expr instanceof StringLiteral) || isEmptyString(expr)) {
-                            return true;
-                        }
-                    }
-                    return false;
-                }
-                return false;
-            } else {
-                return true;
-            }
-        } else {
+        if (!hasOperator(node, PLUS) || !hasType(node, "java.lang.String")) {
             return false;
         }
+        if (isEmptyStringLiteral(node.getLeftOperand())
+                || isEmptyStringLiteral(node.getRightOperand())) {
+            return true;
+        }
+        for (Expression expr : extendedOperands(node)) {
+            if (isEmptyStringLiteral(expr)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean isEmptyStringLiteral(Expression expr) {
+        return !(expr instanceof StringLiteral) || isEmptyString(expr);
     }
 }

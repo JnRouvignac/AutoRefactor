@@ -26,23 +26,19 @@
  */
 package org.autorefactor.refactoring.rules;
 
-import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
-import static org.autorefactor.refactoring.ASTHelper.arg0;
-import static org.autorefactor.refactoring.ASTHelper.as;
-import static org.autorefactor.refactoring.ASTHelper.hasType;
-import static org.autorefactor.refactoring.ASTHelper.isMethod;
-import static org.eclipse.jdt.core.dom.ASTNode.INFIX_EXPRESSION;
-
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.autorefactor.refactoring.ASTBuilder;
+import org.autorefactor.refactoring.Refactorings;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.internal.corext.dom.Bindings;
+
+import static org.autorefactor.refactoring.ASTHelper.*;
+import static org.eclipse.jdt.core.dom.ASTNode.*;
 
 /** See {@link #getDescription()} method. */
 public class StringRefactoring extends AbstractRefactoringRule {
@@ -65,11 +61,12 @@ public class StringRefactoring extends AbstractRefactoringRule {
         final Expression expr = node.getExpression();
         final ASTNode parent = node.getParent();
         final ASTBuilder b = this.ctx.getASTBuilder();
+        final Refactorings r = ctx.getRefactorings();
         final boolean isStringValueOf = isStringValueOf(node);
         if (isMethod(node, "java.lang.Object", "toString")) {
             if (hasType(expr, "java.lang.String")) {
                 // if node is already a String, no need to call toString()
-                this.ctx.getRefactorings().replace(node, b.move(expr));
+                r.replace(node, b.move(expr));
                 return DO_NOT_VISIT_SUBTREE;
             } else if (parent.getNodeType() == INFIX_EXPRESSION) {
                 // if node is in a String context, no need to call toString()
@@ -84,18 +81,18 @@ public class StringRefactoring extends AbstractRefactoringRule {
                         && !node.equals(rmi)
                         && (leftOpIsString || rightOpIsString)) {
                     // node is in the extended operands
-                    ctx.getRefactorings().replace(node, replaceToString(node.getExpression()));
+                    r.replace(node, replaceToString(node.getExpression()));
                     return DO_NOT_VISIT_SUBTREE;
                 } else if (leftOpIsString && isMethod(rmi, "java.lang.Object", "toString")) {
-                    ctx.getRefactorings().replace(rmi, replaceToString(rmi.getExpression()));
+                    r.replace(rmi, replaceToString(rmi.getExpression()));
                     return DO_NOT_VISIT_SUBTREE;
                 } else if (rightOpIsString && node.equals(lmi)) {
-                    ctx.getRefactorings().replace(lmi, replaceToString(lmi.getExpression()));
+                    r.replace(lmi, replaceToString(lmi.getExpression()));
                     return DO_NOT_VISIT_SUBTREE;
                 }
             }
         } else if (isStringValueOf && hasType(arg0(node), "java.lang.String")) {
-            this.ctx.getRefactorings().replace(node, b.move(arg0(node)));
+            r.replace(node, b.move(arg0(node)));
             return DO_NOT_VISIT_SUBTREE;
         } else if ((isToStringForPrimitive(node) || isStringValueOf)
                 && parent.getNodeType() == INFIX_EXPRESSION) {
@@ -112,7 +109,7 @@ public class StringRefactoring extends AbstractRefactoringRule {
                 if (hasType(lo, "java.lang.String")
                         // Do not refactor left and right operand at the same time
                         // to avoid compilation errors post refactoring
-                        && !ctx.getRefactorings().hasBeenRefactored(lo)) {
+                        && !r.hasBeenRefactored(lo)) {
                     replaceStringValueOfByArg0(ro, node);
                     return DO_NOT_VISIT_SUBTREE;
                 }
@@ -134,31 +131,30 @@ public class StringRefactoring extends AbstractRefactoringRule {
                             )) {
                 final Expression leftExpr = leftInvocation.getExpression();
                 final Expression rightExpr = rightInvocation.getExpression();
-                this.ctx.getRefactorings().replace(node, b.invoke(b.copy(leftExpr),
-                        "equalsIgnoreCase", b.copy(rightExpr)));
+                r.replace(node,
+                          b.invoke(b.copy(leftExpr), "equalsIgnoreCase", b.copy(rightExpr)));
                 return DO_NOT_VISIT_SUBTREE;
             }
         } else if (isMethod(node, "java.lang.String", "equalsIgnoreCase", "java.lang.String")) {
-            final AtomicBoolean isRefacoringNeeded = new AtomicBoolean(false);
+            final AtomicBoolean isRefactoringNeeded = new AtomicBoolean(false);
 
-            final Expression leftExpr = getReducedStringExpression(node.getExpression(), isRefacoringNeeded);
-            final Expression rightExpr = getReducedStringExpression(arg0(node), isRefacoringNeeded);
+            final Expression leftExpr = getReducedStringExpression(node.getExpression(), isRefactoringNeeded);
+            final Expression rightExpr = getReducedStringExpression(arg0(node), isRefactoringNeeded);
 
-            if (isRefacoringNeeded.get()) {
-                this.ctx.getRefactorings().replace(node, b.invoke(b.copy(leftExpr),
-                        "equalsIgnoreCase", b.copy(rightExpr)));
+            if (isRefactoringNeeded.get()) {
+                r.replace(node,
+                          b.invoke(b.copy(leftExpr), "equalsIgnoreCase", b.copy(rightExpr)));
                 return DO_NOT_VISIT_SUBTREE;
             }
         }
         return VISIT_SUBTREE;
     }
 
-    private Expression getReducedStringExpression(final Expression stringExpr,
-            final AtomicBoolean isRefacoringNeeded) {
+    private Expression getReducedStringExpression(Expression stringExpr, AtomicBoolean isRefactoringNeeded) {
         final MethodInvocation casingInvocation = as(stringExpr, MethodInvocation.class);
         if (casingInvocation != null && (isMethod(casingInvocation, "java.lang.String", "toLowerCase")
                 || isMethod(casingInvocation, "java.lang.String", "toUpperCase"))) {
-            isRefacoringNeeded.set(true);
+            isRefactoringNeeded.set(true);
             return casingInvocation.getExpression();
         }
         return stringExpr;
