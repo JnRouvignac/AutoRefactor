@@ -35,7 +35,6 @@ import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
-import org.eclipse.jdt.internal.corext.dom.Bindings;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.eclipse.jdt.core.dom.ASTNode.*;
@@ -166,7 +165,7 @@ public class StringRefactoring extends AbstractRefactoringRule {
         final ITypeBinding expectedType = mi.resolveMethodBinding().getParameterTypes()[0];
         final ITypeBinding actualType = arg0(mi).resolveTypeBinding();
         if (!expectedType.equals(actualType)
-                && !Bindings.getBoxedTypeBinding(expectedType, mi.getAST()).equals(actualType)) {
+                && !getBoxedTypeBinding(expectedType, mi.getAST()).equals(actualType)) {
             ctx.getRefactorings().replace(toReplace, b.cast(b.type(expectedType.getQualifiedName()),
                     b.move(arg0(mi))));
         } else {

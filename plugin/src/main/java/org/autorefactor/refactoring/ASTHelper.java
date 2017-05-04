@@ -2341,4 +2341,56 @@ public final class ASTHelper {
             return false;
         }
     }
+
+    /**
+     * Get the type of the associated primitive wrapper.
+     *
+     * @param type A primitive or wrapper type.
+     * @param ast The AST.
+     * @return The type of the associated primitive wrapper.
+     */
+    public static ITypeBinding getBoxedTypeBinding(ITypeBinding type,
+            org.eclipse.jdt.core.dom.AST ast) {
+        if (!type.isPrimitive()) {
+            return type;
+        }
+        String boxedTypeName = getBoxedTypeName(type.getName());
+        if (boxedTypeName == null) {
+            return type;
+        }
+        ITypeBinding boxed = ast.resolveWellKnownType(boxedTypeName);
+        if (boxed == null) {
+            return type;
+        }
+        return boxed;
+    }
+
+    private static String getBoxedTypeName(String primitiveName) {
+        if ("long".equals(primitiveName)) {
+            return "java.lang.Long";
+        }
+        if ("int".equals(primitiveName)) {
+            return "java.lang.Integer";
+        }
+        if ("short".equals(primitiveName)) {
+            return "java.lang.Short";
+        }
+        if ("char".equals(primitiveName)) {
+            return "java.lang.Character";
+        }
+        if ("byte".equals(primitiveName)) {
+            return "java.lang.Byte";
+        }
+        if ("boolean".equals(primitiveName)) {
+            return "java.lang.Boolean";
+        }
+        if ("float".equals(primitiveName)) {
+            return "java.lang.Float";
+        }
+        if ("double".equals(primitiveName)) {
+            return "java.lang.Double";
+        }
+
+        return null;
+    }
 }

@@ -47,14 +47,12 @@ import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Name;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.StringLiteral;
-import org.eclipse.jdt.internal.corext.dom.Bindings;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.eclipse.jdt.core.dom.ASTNode.*;
 import static org.eclipse.jdt.core.dom.InfixExpression.Operator.*;
 
 /** See {@link #getDescription()} method. */
-@SuppressWarnings("restriction")
 public class StringBuilderRefactoring extends AbstractRefactoringRule {
     @Override
     public String getDescription() {
@@ -363,7 +361,7 @@ public class StringBuilderRefactoring extends AbstractRefactoringRule {
 
         ITypeBinding otherType = null;
         if (!expectedType.equals(actualType)
-                && !Bindings.getBoxedTypeBinding(expectedType, mi.getAST()).equals(actualType)) {
+                && !getBoxedTypeBinding(expectedType, mi.getAST()).equals(actualType)) {
             otherType = expectedType;
         }
 
