@@ -26,7 +26,8 @@ language: java
 jdk:
   - openjdk7
   - oraclejdk7
-  - oraclejdk8
+# disable JDK 8 temporarily until release 1.1 is done
+#  - oraclejdk8
 
 sudo: false
 cache:
