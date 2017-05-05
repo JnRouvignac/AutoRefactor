@@ -49,22 +49,23 @@ public class AutoRefactorPlugin extends AbstractUIPlugin {
 
     /** The shared instance. */
     private static AutoRefactorPlugin plugin;
-    private static final Environment ENVIRONMENT = new Environment(
-        new DisplayEventLoop(),
-        new JobManagerImpl(),
-        new LoggerImpl(),
-        new EclipsePreferences(getDefault().getPreferenceStore()));
+    private static Environment environment;
 
     @Override
     public void start(final BundleContext context) throws Exception {
         super.start(context);
         plugin = this;
+        environment = new Environment(new DisplayEventLoop(),
+                                      new JobManagerImpl(),
+                                      new LoggerImpl(),
+                                      new EclipsePreferences(plugin.getPreferenceStore()));
     }
 
     @Override
     public void stop(final BundleContext context) throws Exception {
         plugin = null;
-        ((JobManagerImpl) ENVIRONMENT.getJobManager()).cancelJobs();
+        ((JobManagerImpl) environment.getJobManager()).cancelJobs();
+        environment = null;
         super.stop(context);
     }
 
@@ -121,7 +122,7 @@ public class AutoRefactorPlugin extends AbstractUIPlugin {
      * @return the environment
      */
     public static Environment getEnvironment() {
-        return ENVIRONMENT;
+        return environment;
     }
 
     /**
