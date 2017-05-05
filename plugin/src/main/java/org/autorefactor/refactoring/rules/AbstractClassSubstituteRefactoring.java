@@ -27,7 +27,6 @@
 package org.autorefactor.refactoring.rules;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.autorefactor.refactoring.ASTBuilder;
@@ -38,7 +37,6 @@ import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.CastExpression;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
-import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.InstanceofExpression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
@@ -50,7 +48,6 @@ import org.eclipse.jdt.core.dom.VariableDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
-
 /** See {@link #getDescription()} method. */
 public abstract class AbstractClassSubstituteRefactoring extends AbstractRefactoringRule {
 
@@ -97,31 +94,22 @@ public abstract class AbstractClassSubstituteRefactoring extends AbstractRefacto
     public boolean visit(Block node) {
         final ObjectInstantiationVisitor classCreationVisitor = new ObjectInstantiationVisitor();
         node.accept(classCreationVisitor);
-        final Iterator<ClassInstanceCreation> iterator =
-                classCreationVisitor.getObjectInstantiations().iterator();
 
-        boolean result = VISIT_SUBTREE;
-        while (result == VISIT_SUBTREE && iterator.hasNext()) {
-            final ClassInstanceCreation instanceCreation = iterator.next();
+        for (ClassInstanceCreation instanceCreation : classCreationVisitor.getObjectInstantiations()) {
+            final List<VariableDeclaration> varDecls = new ArrayList<VariableDeclaration>();
+            final List<MethodInvocation> methodCallsToRefactorAlone = new ArrayList<MethodInvocation>();
+            final List<MethodInvocation> methodCallsToRefactorWithVariable = new ArrayList<MethodInvocation>();
 
-            try {
-                final List<VariableDeclaration> varDecls = new ArrayList<VariableDeclaration>();
-                final List<MethodInvocation> methodCallsToRefactorAlone = new ArrayList<MethodInvocation>();
-                final List<MethodInvocation> methodCallsToRefactorWithVariable = new ArrayList<MethodInvocation>();
-
-                if (canBeRefactored(node, instanceCreation, varDecls,
-                        methodCallsToRefactorAlone,
-                        methodCallsToRefactorWithVariable)) {
-                    replaceClass(instanceCreation, varDecls, methodCallsToRefactorAlone,
-                            methodCallsToRefactorWithVariable);
-                    result = DO_NOT_VISIT_SUBTREE;
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
+            if (canBeRefactored(node, instanceCreation, varDecls,
+                    methodCallsToRefactorAlone,
+                    methodCallsToRefactorWithVariable)) {
+                replaceClass(instanceCreation, varDecls, methodCallsToRefactorAlone,
+                        methodCallsToRefactorWithVariable);
+                return DO_NOT_VISIT_SUBTREE;
             }
         }
 
-        return result;
+        return VISIT_SUBTREE;
     }
 
     private boolean canBeRefactored(Block node, final ASTNode instanceCreation,
@@ -136,33 +124,37 @@ public abstract class AbstractClassSubstituteRefactoring extends AbstractRefacto
     private boolean canVarOccurrenceBeRefactored(final Block node, final List<VariableDeclaration> varDecls,
             final List<MethodInvocation> methodCallsToRefactorAlone,
             final List<MethodInvocation> methodCallsToRefactorWithVariable) {
-        boolean canBeRefactored = true;
         final List<VariableDeclaration> otherVarDecls = new ArrayList<VariableDeclaration>();
-        final Iterator<VariableDeclaration> varIterator = varDecls.iterator();
-        while (canBeRefactored && varIterator.hasNext()) {
-            final VariableDeclaration varDecl = varIterator.next();
-            final VarOccurrenceVisitor varOccurrenceVisitor = new VarOccurrenceVisitor(varDecl);
-            node.accept(varOccurrenceVisitor);
-
-            if (!varOccurrenceVisitor.isUsedInAnnonymousClass()) {
-                Iterator<SimpleName> varOccurrenceIterator =
-                        varOccurrenceVisitor.getVarOccurrences().iterator();
-                while (canBeRefactored && varOccurrenceIterator.hasNext()) {
-                    final List<VariableDeclaration> subVarDecls = new ArrayList<VariableDeclaration>();
-
-                    if (canBeRefactored(node, varOccurrenceIterator.next(), subVarDecls,
-                            methodCallsToRefactorAlone, methodCallsToRefactorWithVariable)) {
-                        otherVarDecls.addAll(subVarDecls);
-                    } else {
-                        canBeRefactored = false;
-                    }
-                }
-            } else {
-                canBeRefactored = false;
-            }
-        }
+        final boolean canBeRefactored = canVarOccurrenceBeRefactored0(node,
+                                                                      varDecls,
+                                                                      methodCallsToRefactorAlone,
+                                                                      methodCallsToRefactorWithVariable,
+                                                                      otherVarDecls);
         varDecls.addAll(otherVarDecls);
         return canBeRefactored;
+    }
+
+    private boolean canVarOccurrenceBeRefactored0(final Block node, final List<VariableDeclaration> varDecls,
+                                                  final List<MethodInvocation> methodCallsToRefactorAlone,
+                                                  final List<MethodInvocation> methodCallsToRefactorWithVariable,
+                                                  final List<VariableDeclaration> otherVarDecls) {
+        for (VariableDeclaration varDecl : varDecls) {
+            final VarOccurrenceVisitor varOccurrenceVisitor = new VarOccurrenceVisitor(varDecl);
+            node.accept(varOccurrenceVisitor);
+            if (varOccurrenceVisitor.isUsedInAnnonymousClass()) {
+                return false;
+            }
+
+            for (SimpleName varOccurrence : varOccurrenceVisitor.getVarOccurrences()) {
+                final List<VariableDeclaration> subVarDecls = new ArrayList<VariableDeclaration>();
+                if (!canBeRefactored(node, varOccurrence, subVarDecls,
+                                     methodCallsToRefactorAlone, methodCallsToRefactorWithVariable)) {
+                    return false;
+                }
+                otherVarDecls.addAll(subVarDecls);
+            }
+        }
+        return true;
     }
 
     private void replaceClass(final ClassInstanceCreation originalInstanceCreation,
@@ -173,8 +165,7 @@ public abstract class AbstractClassSubstituteRefactoring extends AbstractRefacto
 
         if (variableDecls.isEmpty()) {
             final ClassInstanceCreation newInstanceCreation = createInstanceCreation(b, originalInstanceCreation);
-            ctx.getRefactorings().replace(originalInstanceCreation,
-                    newInstanceCreation);
+            ctx.getRefactorings().replace(originalInstanceCreation, newInstanceCreation);
         } else {
             replaceConstructorType(b, originalInstanceCreation);
 
@@ -183,12 +174,11 @@ public abstract class AbstractClassSubstituteRefactoring extends AbstractRefacto
             }
 
             for (final VariableDeclaration variableDecl : variableDecls) {
-                final VariableDeclarationStatement newDeclareStmt =
-                        (VariableDeclarationStatement) b.copySubtree(variableDecl.getParent());
+                final VariableDeclarationStatement parent = (VariableDeclarationStatement) variableDecl.getParent();
+                final VariableDeclarationStatement newDeclareStmt = b.copySubtree(parent);
 
-                replaceVariableType(b, newDeclareStmt, (VariableDeclarationStatement) variableDecl.getParent());
-
-                ctx.getRefactorings().replace(variableDecl.getParent(), newDeclareStmt);
+                replaceVariableType(b, newDeclareStmt, parent);
+                ctx.getRefactorings().replace(parent, newDeclareStmt);
             }
 
             for (final MethodInvocation methodCall : methodCallsToRefactorAlone) {
@@ -201,53 +191,34 @@ public abstract class AbstractClassSubstituteRefactoring extends AbstractRefacto
 
     private ClassInstanceCreation createInstanceCreation(final ASTBuilder b,
             final ClassInstanceCreation originalInstanceCreation) {
-        final Expression[] copyOfArguments = new Expression[originalInstanceCreation.arguments().size()];
-        for (int i = 0; i < originalInstanceCreation.arguments().size(); i++) {
-            copyOfArguments[i] = b.copy((Expression) originalInstanceCreation.arguments().get(i));
-        }
-
-        final Type newType;
-        if (originalInstanceCreation.getType().resolveBinding().isParameterizedType()) {
-            final ITypeBinding[] genericityTypes = originalInstanceCreation.getType().resolveBinding()
-                    .getTypeArguments();
-            final Type[] types = new Type[genericityTypes.length];
-            for (int i = 0; i < genericityTypes.length; i++) {
-                types[i] = b.type(genericityTypes[i].getName());
-            }
-            newType = b.genericType(getSubstitutingClassName(), types);
-        } else {
-            newType = b.type(getSubstitutingClassName());
-        }
-
-        return b.new0(newType, copyOfArguments);
+        return b.new0(substituteType(b, originalInstanceCreation.getType()),
+                      b.copyRange(arguments(originalInstanceCreation)));
     }
 
     private void replaceConstructorType(final ASTBuilder b, final ClassInstanceCreation instanceCreation) {
-        if (instanceCreation.getType().resolveBinding().isParameterizedType()) {
-            final ITypeBinding[] genericityTypes = instanceCreation.getType().resolveBinding().getTypeArguments();
-            final Type[] types = new Type[genericityTypes.length];
-            for (int i = 0; i < genericityTypes.length; i++) {
-                types[i] = b.type(genericityTypes[i].getName());
-            }
-            instanceCreation.setType(b.genericType(getSubstitutingClassName(), types));
-        } else {
-            instanceCreation.setType(b.type(getSubstitutingClassName()));
-        }
+        instanceCreation.setType(substituteType(b, instanceCreation.getType()));
     }
 
     private void replaceVariableType(final ASTBuilder b, final VariableDeclarationStatement newDeclareStmt,
             final VariableDeclarationStatement oldDeclareStmt) {
-        if (newDeclareStmt.getType().isParameterizedType()) {
-            final ITypeBinding[] genericityTypes = oldDeclareStmt.getType().resolveBinding()
-                    .getTypeArguments();
-            final Type[] types = new Type[genericityTypes.length];
-            for (int i = 0; i < genericityTypes.length; i++) {
-                types[i] = b.type(genericityTypes[i].getName());
-            }
-            newDeclareStmt.setType(b.genericType(getSubstitutingClassName(), types));
-        } else {
-            newDeclareStmt.setType(b.type(getSubstitutingClassName()));
+        newDeclareStmt.setType(substituteType(b, oldDeclareStmt.getType()));
+    }
+
+    private Type substituteType(final ASTBuilder b, Type origType) {
+        if (origType.isParameterizedType()) {
+            final Type[] types = typeArgumentsToTypes(b, origType);
+            return b.genericType(getSubstitutingClassName(), types);
         }
+        return b.type(getSubstitutingClassName());
+    }
+
+    private Type[] typeArgumentsToTypes(final ASTBuilder b, Type type) {
+        final ITypeBinding[] typeArgs = type.resolveBinding().getTypeArguments();
+        final Type[] types = new Type[typeArgs.length];
+        for (int i = 0; i < typeArgs.length; i++) {
+            types[i] = b.type(typeArgs[i].getName());
+        }
+        return types;
     }
 
     private boolean canInstantiationBeRefactored(final ASTNode node,
@@ -265,10 +236,11 @@ public abstract class AbstractClassSubstituteRefactoring extends AbstractRefacto
                     || parentNode instanceof Assignment) {
                 return false;
             } else if (parentNode instanceof VariableDeclaration) {
+                final VariableDeclaration varDecl = (VariableDeclaration) parentNode;
                 final VariableDeclarationStatement variableDeclaration =
-                        (VariableDeclarationStatement) ((VariableDeclaration) parentNode).getParent();
+                        (VariableDeclarationStatement) varDecl.getParent();
                 if (hasType(variableDeclaration.getType().resolveBinding(), getExistingClassCanonicalName())) {
-                    variablesToRefactor.add((VariableDeclaration) parentNode);
+                    variablesToRefactor.add(varDecl);
                     methodCallsToRefactorWithVariable.addAll(localMethodCallsToRefactor);
                     return true;
                 }
@@ -327,10 +299,8 @@ public abstract class AbstractClassSubstituteRefactoring extends AbstractRefacto
     private static final class VarOccurrenceVisitor extends ASTVisitor {
 
         private final VariableDeclaration varDecl;
-
         private final List<SimpleName> varOccurrences = new ArrayList<SimpleName>();
-
-        private boolean isUsedInAnnonymousClass = false;
+        private boolean isUsedInAnnonymousClass;
 
         public VarOccurrenceVisitor(VariableDeclaration variable) {
             varDecl = variable;
@@ -346,9 +316,9 @@ public abstract class AbstractClassSubstituteRefactoring extends AbstractRefacto
 
         @Override
         public boolean visit(SimpleName aVariable) {
-            if (varDecl.getName().getIdentifier()
-                    .equals(aVariable.getIdentifier())
-                    && !aVariable.equals(varDecl.getName())) {
+            final SimpleName varDeclName = varDecl.getName();
+            if (aVariable.getIdentifier().equals(varDeclName.getIdentifier())
+                    && !aVariable.equals(varDeclName)) {
                 varOccurrences.add(aVariable);
             }
             return VISIT_SUBTREE;
