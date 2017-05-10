@@ -48,40 +48,42 @@ public class VectorOldToNewAPIRefactoring extends AbstractRefactoringRule {
 
     @Override
     public String getName() {
-        return "Vector old-to-new APIs";
+        return "Collections APIs rather than Vector pre-Collections APIs";
     }
 
     @Override
     public boolean visit(MethodInvocation node) {
         if (ctx.getJavaProjectOptions().getJavaSERelease().isCompatibleWith(Release.javaSE("1.2.0"))) {
             if (isMethod(node, "java.util.Vector", "elementAt", "int")) {
-                return replaceWith(node, "get");
+                replaceWith(node, "get");
             } else if (isMethod(node, "java.util.Vector", "addElement", "java.lang.Object")) {
-                return replaceWith(node, "add");
+                replaceWith(node, "add");
             } else if (isMethod(node, "java.util.Vector", "insertElementAt", "java.lang.Object", "int")) {
-                return replaceWithAndSwapArguments(node, "add");
+                replaceWithAndSwapArguments(node, "add");
             } else if (isMethod(node, "java.util.Vector", "copyInto", "java.lang.Object[]")) {
                 replaceWith(node, "toArray");
             } else if (isMethod(node, "java.util.Vector", "removeAllElements")) {
-                return replaceWith(node, "clear");
+                replaceWith(node, "clear");
             } else if (isMethod(node, "java.util.Vector", "removeElement", "java.lang.Object")) {
-                return replaceWithSpecial(node, "remove");
+                replaceWithSpecial(node, "remove");
             } else if (isMethod(node, "java.util.Vector", "removeElementAt", "int")) {
-                return replaceWith(node, "remove");
+                replaceWith(node, "remove");
             } else if (isMethod(node, "java.util.Vector", "setElementAt", "java.lang.Object", "int")) {
-                return replaceWith(node, "set");
+                replaceWithAndSwapArguments(node, "set");
+            } else {
+                return VISIT_SUBTREE;
             }
+            return DO_NOT_VISIT_SUBTREE;
         }
         return VISIT_SUBTREE;
     }
 
-    private boolean replaceWith(MethodInvocation node, String newMethodName) {
+    private void replaceWith(final MethodInvocation node, final String newMethodName) {
         final ASTBuilder b = this.ctx.getASTBuilder();
         ctx.getRefactorings().set(node, NAME_PROPERTY, b.simpleName(newMethodName));
-        return DO_NOT_VISIT_SUBTREE;
     }
 
-    private boolean replaceWithSpecial(MethodInvocation node, String newMethodName) {
+    private void replaceWithSpecial(final MethodInvocation node, final String newMethodName) {
         final List<Expression> args = arguments(node);
         assertSize(args, 1);
         final Expression arg0 = args.get(0);
@@ -92,10 +94,9 @@ public class VectorOldToNewAPIRefactoring extends AbstractRefactoringRule {
         if (hasType(arg0, "int", "short", "byte")) {
             r.replace(arg0, b.cast(b.type("Object"), b.move(arg0)));
         }
-        return DO_NOT_VISIT_SUBTREE;
     }
 
-    private boolean replaceWithAndSwapArguments(MethodInvocation node, String newMethodName) {
+    private void replaceWithAndSwapArguments(final MethodInvocation node, final String newMethodName) {
         final List<Expression> args = arguments(node);
         assertSize(args, 2);
         final Expression arg1 = args.get(1);
@@ -104,10 +105,9 @@ public class VectorOldToNewAPIRefactoring extends AbstractRefactoringRule {
         final Refactorings r = ctx.getRefactorings();
         r.set(node, NAME_PROPERTY, b.simpleName(newMethodName));
         r.moveToIndex(arg1, 0, b.move(arg1));
-        return DO_NOT_VISIT_SUBTREE;
     }
 
-    private void assertSize(final List<Expression> args, int expectedSize) {
+    private void assertSize(final List<Expression> args, final int expectedSize) {
         if (args == null) {
             throw new IllegalArgumentException(null, "Expected " + args + "to not be null");
         }

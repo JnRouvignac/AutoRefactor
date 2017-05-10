@@ -43,7 +43,7 @@ public class VectorOldToNewAPISample {
         v.remove((Object) s);
         v.remove(1);
         v.clear();
-        v.set(999, 0);
+        v.set(0, 999);
     }
 
 }
