@@ -72,9 +72,9 @@ public class MapRefactoring extends AbstractRefactoringRule {
 
     @Override
     public boolean visit(Block node) {
-        final NewAndPutAllMethodVisitor returnStatementVisitor = new NewAndPutAllMethodVisitor(ctx, node);
-        node.accept(returnStatementVisitor);
-        return returnStatementVisitor.getResult();
+        final NewAndPutAllMethodVisitor newAndPutAllMethodVisitor = new NewAndPutAllMethodVisitor(ctx, node);
+        node.accept(newAndPutAllMethodVisitor);
+        return newAndPutAllMethodVisitor.getResult();
     }
 
     private static final class NewAndPutAllMethodVisitor extends BlockSubVisitor {
@@ -95,21 +95,21 @@ public class MapRefactoring extends AbstractRefactoringRule {
                     final Expression lhs = as.getLeftHandSide();
                     if (lhs instanceof SimpleName) {
                         if (isSameLocalVariable(lhs, mi.getExpression())) {
-                            return replaceInitializer(as.getRightHandSide(), arg0, node);
+                            return maybeReplaceInitializer(as.getRightHandSide(), arg0, node);
                         }
                     }
                 } else if (previousStmt instanceof VariableDeclarationStatement) {
                     final VariableDeclarationFragment vdf = getUniqueFragment((VariableDeclarationStatement)
                             previousStmt);
                     if (vdf != null && isSameLocalVariable(vdf, mi.getExpression())) {
-                        return replaceInitializer(vdf.getInitializer(), arg0, node);
+                        return maybeReplaceInitializer(vdf.getInitializer(), arg0, node);
                     }
                 }
             }
             return VISIT_SUBTREE;
         }
 
-        private boolean replaceInitializer(Expression nodeToReplace,
+        private boolean maybeReplaceInitializer(Expression nodeToReplace,
                 final Expression arg0, ExpressionStatement nodeToRemove) {
             final ClassInstanceCreation cic = as(nodeToReplace, ClassInstanceCreation.class);
             if (canReplaceInitializer(cic)
