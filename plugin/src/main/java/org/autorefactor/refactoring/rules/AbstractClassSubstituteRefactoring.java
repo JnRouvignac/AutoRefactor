@@ -26,6 +26,10 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.hasType;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,8 +50,6 @@ import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.VariableDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
-
-import static org.autorefactor.refactoring.ASTHelper.*;
 /** See {@link #getDescription()} method. */
 public abstract class AbstractClassSubstituteRefactoring extends AbstractRefactoringRule {
 
@@ -56,14 +58,24 @@ public abstract class AbstractClassSubstituteRefactoring extends AbstractRefacto
      *
      * @return the existing class canonical name.
      */
-    public abstract String getExistingClassCanonicalName();
+    protected abstract String getExistingClassCanonicalName();
 
     /**
      * Get the substituting class name.
      *
      * @return the substituting class name.
      */
-    public abstract String getSubstitutingClassName();
+    protected abstract String getSubstitutingClassName();
+
+    /**
+     * If the instantiation can be refactored.
+     *
+     * @param instanceCreation The instantiation
+     * @return True if the instantiation can be refactored.
+     */
+    protected boolean canInstantiationBeRefactored(final ClassInstanceCreation instanceCreation) {
+        return true;
+    }
 
     /**
      * Is the method returning existing class.
@@ -71,7 +83,21 @@ public abstract class AbstractClassSubstituteRefactoring extends AbstractRefacto
      * @param mi The method invocation
      * @return True if the method returns the existing class.
      */
-    public abstract boolean isMethodReturningExistingClass(final MethodInvocation mi);
+    protected boolean isMethodReturningExistingClass(final MethodInvocation mi) {
+        return false;
+    }
+
+    /**
+     * Refactor the constructor.
+     *
+     * @param b The builder.
+     * @param originalInstanceCreation The original instance creation.
+     * @param newInstanceCreation The new instance creation.
+     */
+    protected void refactorInstantiation(final ASTBuilder b, final ClassInstanceCreation originalInstanceCreation,
+            final ClassInstanceCreation newInstanceCreation) {
+        newInstanceCreation.setType(substituteType(b, originalInstanceCreation.getType()));
+    }
 
     /**
      * If the method can be refactored.
@@ -80,29 +106,36 @@ public abstract class AbstractClassSubstituteRefactoring extends AbstractRefacto
      * @param methodCallsToRefactor The method calls to refactor
      * @return True if the method can be refactored.
      */
-    public abstract boolean canMethodBeRefactored(final MethodInvocation mi,
-            final List<MethodInvocation> methodCallsToRefactor);
+    protected boolean canMethodBeRefactored(final MethodInvocation mi,
+            final List<MethodInvocation> methodCallsToRefactor) {
+        return true;
+    }
 
     /**
      * Refactor the method.
+     *
      * @param b The builder
-     * @param mi The method invocation
+     * @param originalMi The original method invocation
+     * @param refactoredMi The new method invocation
      */
-    public abstract void refactorMethod(final ASTBuilder b, final MethodInvocation mi);
+    protected void refactorMethod(final ASTBuilder b, final MethodInvocation originalMi,
+            final MethodInvocation refactoredMi) {
+    }
 
     @Override
     public boolean visit(Block node) {
         final ObjectInstantiationVisitor classCreationVisitor = new ObjectInstantiationVisitor();
         node.accept(classCreationVisitor);
 
-        for (ClassInstanceCreation instanceCreation : classCreationVisitor.getObjectInstantiations()) {
+        for (final ClassInstanceCreation instanceCreation : classCreationVisitor.getObjectInstantiations()) {
             final List<VariableDeclaration> varDecls = new ArrayList<VariableDeclaration>();
             final List<MethodInvocation> methodCallsToRefactorAlone = new ArrayList<MethodInvocation>();
             final List<MethodInvocation> methodCallsToRefactorWithVariable = new ArrayList<MethodInvocation>();
 
-            if (canBeRefactored(node, instanceCreation, varDecls,
-                    methodCallsToRefactorAlone,
-                    methodCallsToRefactorWithVariable)) {
+            if (canInstantiationBeRefactored(instanceCreation)
+                    && canBeRefactored(node, instanceCreation, varDecls,
+                            methodCallsToRefactorAlone,
+                            methodCallsToRefactorWithVariable)) {
                 replaceClass(instanceCreation, varDecls, methodCallsToRefactorAlone,
                         methodCallsToRefactorWithVariable);
                 return DO_NOT_VISIT_SUBTREE;
@@ -112,10 +145,10 @@ public abstract class AbstractClassSubstituteRefactoring extends AbstractRefacto
         return VISIT_SUBTREE;
     }
 
-    private boolean canBeRefactored(Block node, final ASTNode instanceCreation,
+    private boolean canBeRefactored(Block node, final ASTNode itemToRefactor,
             final List<VariableDeclaration> varDecls, final List<MethodInvocation> methodCallsToRefactorAlone,
             final List<MethodInvocation> methodCallsToRefactorWithVariable) {
-        return canInstantiationBeRefactored(instanceCreation, varDecls, methodCallsToRefactorAlone,
+        return canInstantiationBeRefactored(itemToRefactor, varDecls, methodCallsToRefactorAlone,
                 methodCallsToRefactorWithVariable)
                 && canVarOccurrenceBeRefactored(node, varDecls, methodCallsToRefactorAlone,
                         methodCallsToRefactorWithVariable);
@@ -138,14 +171,14 @@ public abstract class AbstractClassSubstituteRefactoring extends AbstractRefacto
                                                   final List<MethodInvocation> methodCallsToRefactorAlone,
                                                   final List<MethodInvocation> methodCallsToRefactorWithVariable,
                                                   final List<VariableDeclaration> otherVarDecls) {
-        for (VariableDeclaration varDecl : varDecls) {
+        for (final VariableDeclaration varDecl : varDecls) {
             final VarOccurrenceVisitor varOccurrenceVisitor = new VarOccurrenceVisitor(varDecl);
             node.accept(varOccurrenceVisitor);
             if (varOccurrenceVisitor.isUsedInAnnonymousClass()) {
                 return false;
             }
 
-            for (SimpleName varOccurrence : varOccurrenceVisitor.getVarOccurrences()) {
+            for (final SimpleName varOccurrence : varOccurrenceVisitor.getVarOccurrences()) {
                 final List<VariableDeclaration> subVarDecls = new ArrayList<VariableDeclaration>();
                 if (!canBeRefactored(node, varOccurrence, subVarDecls,
                                      methodCallsToRefactorAlone, methodCallsToRefactorWithVariable)) {
@@ -164,13 +197,20 @@ public abstract class AbstractClassSubstituteRefactoring extends AbstractRefacto
         final ASTBuilder b = ctx.getASTBuilder();
 
         if (variableDecls.isEmpty()) {
-            final ClassInstanceCreation newInstanceCreation = createInstanceCreation(b, originalInstanceCreation);
+            final ClassInstanceCreation newInstanceCreation = b.copySubtree(originalInstanceCreation);
+            refactorInstantiation(b, originalInstanceCreation, newInstanceCreation);
             ctx.getRefactorings().replace(originalInstanceCreation, newInstanceCreation);
         } else {
-            replaceConstructorType(b, originalInstanceCreation);
+            refactorInstantiation(b, originalInstanceCreation, originalInstanceCreation);
+
+            for (final MethodInvocation methodCall : methodCallsToRefactorAlone) {
+                final MethodInvocation copyOfMethodCall = b.copySubtree(methodCall);
+                refactorMethod(b, methodCall, copyOfMethodCall);
+                ctx.getRefactorings().replace(methodCall, copyOfMethodCall);
+            }
 
             for (final MethodInvocation methodCall : methodCallsToRefactorWithVariable) {
-                refactorMethod(b, methodCall);
+                refactorMethod(b, methodCall, methodCall);
             }
 
             for (final VariableDeclaration variableDecl : variableDecls) {
@@ -180,23 +220,7 @@ public abstract class AbstractClassSubstituteRefactoring extends AbstractRefacto
                 replaceVariableType(b, newDeclareStmt, parent);
                 ctx.getRefactorings().replace(parent, newDeclareStmt);
             }
-
-            for (final MethodInvocation methodCall : methodCallsToRefactorAlone) {
-                final MethodInvocation copyOfMethodCall = b.copySubtree(methodCall);
-                refactorMethod(b, copyOfMethodCall);
-                ctx.getRefactorings().replace(methodCall, copyOfMethodCall);
-            }
         }
-    }
-
-    private ClassInstanceCreation createInstanceCreation(final ASTBuilder b,
-            final ClassInstanceCreation originalInstanceCreation) {
-        return b.new0(substituteType(b, originalInstanceCreation.getType()),
-                      b.copyRange(arguments(originalInstanceCreation)));
-    }
-
-    private void replaceConstructorType(final ASTBuilder b, final ClassInstanceCreation instanceCreation) {
-        instanceCreation.setType(substituteType(b, instanceCreation.getType()));
     }
 
     private void replaceVariableType(final ASTBuilder b, final VariableDeclarationStatement newDeclareStmt,
@@ -204,7 +228,7 @@ public abstract class AbstractClassSubstituteRefactoring extends AbstractRefacto
         newDeclareStmt.setType(substituteType(b, oldDeclareStmt.getType()));
     }
 
-    private Type substituteType(final ASTBuilder b, Type origType) {
+    private Type substituteType(final ASTBuilder b, final Type origType) {
         if (origType.isParameterizedType()) {
             final Type[] types = typeArgumentsToTypes(b, origType);
             return b.genericType(getSubstitutingClassName(), types);
@@ -212,7 +236,7 @@ public abstract class AbstractClassSubstituteRefactoring extends AbstractRefacto
         return b.type(getSubstitutingClassName());
     }
 
-    private Type[] typeArgumentsToTypes(final ASTBuilder b, Type type) {
+    private Type[] typeArgumentsToTypes(final ASTBuilder b, final Type type) {
         final ITypeBinding[] typeArgs = type.resolveBinding().getTypeArguments();
         final Type[] types = new Type[typeArgs.length];
         for (int i = 0; i < typeArgs.length; i++) {

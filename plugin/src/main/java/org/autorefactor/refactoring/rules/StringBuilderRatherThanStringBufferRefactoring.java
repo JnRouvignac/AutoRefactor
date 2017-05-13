@@ -27,10 +27,7 @@ package org.autorefactor.refactoring.rules;
 
 import static org.autorefactor.refactoring.ASTHelper.isMethod;
 
-import java.util.List;
-
 import org.autorefactor.preferences.Preferences;
-import org.autorefactor.refactoring.ASTBuilder;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 
 /** See {@link #getDescription()} method. */
@@ -56,17 +53,17 @@ public class StringBuilderRatherThanStringBufferRefactoring extends AbstractClas
     }
 
     @Override
-    public String getExistingClassCanonicalName() {
+    protected String getExistingClassCanonicalName() {
         return "java.lang.StringBuffer";
     }
 
     @Override
-    public String getSubstitutingClassName() {
+    protected String getSubstitutingClassName() {
         return "StringBuilder";
     }
 
     @Override
-    public boolean isMethodReturningExistingClass(final MethodInvocation mi) {
+    protected boolean isMethodReturningExistingClass(final MethodInvocation mi) {
         return isMethod(mi, "java.lang.StringBuffer", "append", "boolean")
                 || isMethod(mi, "java.lang.StringBuffer", "append", "char")
                 || isMethod(mi, "java.lang.StringBuffer", "append", "char[]")
@@ -99,15 +96,5 @@ public class StringBuilderRatherThanStringBufferRefactoring extends AbstractClas
                 || isMethod(mi, "java.lang.StringBuffer", "reverse")
                 || isMethod(mi, "java.lang.StringBuffer", "ensureCapacity", "int")
                 || isMethod(mi, "java.lang.StringBuffer", "getChars", "int", "int", "char[]", "int");
-    }
-
-    @Override
-    public boolean canMethodBeRefactored(final MethodInvocation mi,
-            final List<MethodInvocation> methodCallsToRefactor) {
-        return true;
-    }
-
-    @Override
-    public void refactorMethod(final ASTBuilder b, final MethodInvocation mi) {
     }
 }
