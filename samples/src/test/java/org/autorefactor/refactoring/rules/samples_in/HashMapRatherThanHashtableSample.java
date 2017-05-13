@@ -97,8 +97,8 @@ public class HashMapRatherThanHashtableSample {
 
     public void replaceHashtableWithParameter() {
         // Keep this comment
-        Hashtable<String, String> buffer = new Hashtable<String, String>(10);
-        buffer.put("foo", "bar");
+        Hashtable<String, String> map = new Hashtable<String, String>(10);
+        map.put("foo", "bar");
     }
 
     public Set<Entry<String, String>> replaceReassignedHashtable() {

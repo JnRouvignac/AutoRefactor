@@ -56,22 +56,17 @@ public class HashMapRatherThanHashtableRefactoring extends AbstractClassSubstitu
     }
 
     @Override
-    public String getExistingClassCanonicalName() {
+    protected String getExistingClassCanonicalName() {
         return "java.util.Hashtable";
     }
 
     @Override
-    public String getSubstitutingClassName() {
+    protected String getSubstitutingClassName() {
         return "java.util.HashMap";
     }
 
     @Override
-    public boolean isMethodReturningExistingClass(final MethodInvocation mi) {
-        return false;
-    }
-
-    @Override
-    public boolean canMethodBeRefactored(final MethodInvocation mi,
+    protected boolean canMethodBeRefactored(final MethodInvocation mi,
             final List<MethodInvocation> methodCallsToRefactor) {
         if (isMethod(mi, "java.util.Hashtable", "contains", "java.lang.Object")) {
             methodCallsToRefactor.add(mi);
@@ -80,7 +75,8 @@ public class HashMapRatherThanHashtableRefactoring extends AbstractClassSubstitu
     }
 
     @Override
-    public void refactorMethod(final ASTBuilder b, final MethodInvocation mi) {
-        mi.setName(b.simpleName("containsValue"));
+    protected void refactorMethod(final ASTBuilder b, final MethodInvocation originalMi,
+            final MethodInvocation refactoredMi) {
+        refactoredMi.setName(b.simpleName("containsValue"));
     }
 }

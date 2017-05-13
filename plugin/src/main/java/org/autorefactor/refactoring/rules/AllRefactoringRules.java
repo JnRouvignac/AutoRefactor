@@ -115,6 +115,7 @@ public final class AllRefactoringRules {
                 new StringBuilderRefactoring(),
                 new StringBuilderRatherThanStringBufferRefactoring(),
                 new HashMapRatherThanHashtableRefactoring(),
+                new ArrayListRatherThanVectorRefactoring(),
                 new UseStringContainsRefactoring(),
                 new PushNegationDownRefactoring(),
                 new CommentsRefactoring(),
