@@ -306,13 +306,12 @@ public abstract class AbstractClassSubstituteRefactoring extends AbstractRefacto
         @Override
         public boolean visit(ClassInstanceCreation instanceCreation) {
             final ITypeBinding typeBinding;
-            try {
+            if (instanceCreation.getType() != null) {
                 typeBinding = instanceCreation.getType().resolveBinding();
-            } catch (NullPointerException ignored) {
-                // FIXME NPE occurs within Eclipse 4.5.2 (running on Java 8)
-                // This NPE does not occur with Eclipse Indigo (running on Java 7)
-                return VISIT_SUBTREE;
+            } else {
+                typeBinding = instanceCreation.resolveTypeBinding();
             }
+
             if (hasType(typeBinding, getExistingClassCanonicalName())) {
                 objectInstantiations.add(instanceCreation);
             }
