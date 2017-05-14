@@ -35,11 +35,11 @@ import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
@@ -117,7 +117,8 @@ public class WorkspacePreferencePage extends PreferencePage implements IWorkbenc
         });
 
         // Add a space
-        new Label(ruleGroup, SWT.NULL);
+        Composite spacer = new Composite(ruleGroup, SWT.NULL);
+        spacer.setLayoutData(new GridData(0, 5));
 
         rules = new ArrayList<BooleanFieldEditor>(allRefactoringRules.size());
         for (final RefactoringRule refactoringRule : allRefactoringRules) {
