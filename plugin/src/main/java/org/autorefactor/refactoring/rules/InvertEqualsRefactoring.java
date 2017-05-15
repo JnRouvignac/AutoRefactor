@@ -25,12 +25,16 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.arg0;
+import static org.autorefactor.refactoring.ASTHelper.isConstant;
+import static org.autorefactor.refactoring.ASTHelper.isMethod;
+import static org.autorefactor.refactoring.ASTHelper.isPrimitive;
+
 import org.autorefactor.refactoring.ASTBuilder;
-import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
-
-import static org.autorefactor.refactoring.ASTHelper.*;
 
 /**
  * See {@link #getDescription()} method.
@@ -38,7 +42,6 @@ import static org.autorefactor.refactoring.ASTHelper.*;
  * TODO JNR use CFG and expression analysis to find extra information about expression nullness.
  * </p>
  */
-@SuppressWarnings("javadoc")
 public class InvertEqualsRefactoring extends AbstractRefactoringRule {
     @Override
     public String getDescription() {
@@ -49,7 +52,7 @@ public class InvertEqualsRefactoring extends AbstractRefactoringRule {
 
     @Override
     public String getName() {
-        return "Invert equals";
+        return "Equals on constant rather than on variable";
     }
 
     @Override
@@ -64,17 +67,19 @@ public class InvertEqualsRefactoring extends AbstractRefactoringRule {
             final Expression expr = node.getExpression();
             final Expression arg0 = arg0(node);
             if (!isConstant(expr) && isConstant(arg0) && !isPrimitive(arg0)) {
-                this.ctx.getRefactorings().replace(node,
-                        invertEqualsInvocation(expr, arg0, isEquals));
+                invertEqualsInvocation(node, isEquals, expr, arg0);
                 return DO_NOT_VISIT_SUBTREE;
             }
         }
         return VISIT_SUBTREE;
     }
 
-    private ASTNode invertEqualsInvocation(Expression lhs, Expression rhs, boolean isEquals) {
-        final String methodName = isEquals ? "equals" : "equalsIgnoreCase";
+    private void invertEqualsInvocation(final MethodInvocation node, final boolean isEquals, final Expression expr,
+            final Expression arg0) {
         final ASTBuilder b = this.ctx.getASTBuilder();
-        return b.invoke(b.parenthesizeIfNeeded(b.copy(rhs)), methodName, b.copy(lhs));
+
+        final String methodName = isEquals ? "equals" : "equalsIgnoreCase";
+        this.ctx.getRefactorings().replace(node,
+                b.invoke(b.parenthesizeIfNeeded(b.copy(arg0)), methodName, b.copy(expr)));
     }
 }
