@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2016 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2016-2017 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,6 +31,7 @@ import java.util.List;
 
 import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.Refactorings;
+import org.autorefactor.refactoring.Release;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Expression;
@@ -61,15 +62,13 @@ public class TryWithResourceRefactoring extends AbstractRefactoringRule {
         return "Use try-with-resource";
     }
 
-    private boolean isEnabled() {
-        return ctx.getJavaProjectOptions().getJavaSERelease().getMinorVersion() >= 7;
+    @Override
+    public boolean isJavaVersionSupported(Release javaSeRelease) {
+        return javaSeRelease.getMinorVersion() >= 7;
     }
 
     @Override
     public boolean visit(TryStatement node) {
-        if (!isEnabled()) {
-            return VISIT_SUBTREE;
-        }
         final List<Statement> tryStmts = asList(node.getBody());
         if (tryStmts.size() >= 1 && tryStmts.get(0).getNodeType() == TRY_STATEMENT) {
             final TryStatement innerTryStmt = as(tryStmts.get(0), TryStatement.class);

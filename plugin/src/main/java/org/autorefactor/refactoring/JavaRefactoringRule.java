@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2013 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2013-2017 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,4 +27,12 @@ package org.autorefactor.refactoring;
 
 /** Marker interface for all Java Standard Edition refactoring rules. */
 public interface JavaRefactoringRule extends RefactoringRule {
+    /**
+     * Returns whether the provided java version is supported by this rule.
+     *
+     * @param javaSeRelease
+     *          java SE release
+     * @return whether the provided java version is version supported by this rule.
+     */
+    boolean isJavaVersionSupported(Release javaSeRelease);
 }

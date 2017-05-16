@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2015-2016 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2015-2017 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -39,6 +39,7 @@ import java.util.Set;
 import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.ASTHelper;
 import org.autorefactor.refactoring.Refactorings;
+import org.autorefactor.refactoring.Release;
 import org.autorefactor.util.NotImplementedException;
 import org.eclipse.jdt.core.dom.ASTMatcher;
 import org.eclipse.jdt.core.dom.ASTNode;
@@ -72,8 +73,9 @@ public class UseMultiCatchRefactoring extends AbstractRefactoringRule {
         return "Multi-catch";
     }
 
-    private boolean isEnabled() {
-        return ctx.getJavaProjectOptions().getJavaSERelease().getMinorVersion() >= 7;
+    @Override
+    public boolean isJavaVersionSupported(Release javaSeRelease) {
+        return javaSeRelease.getMinorVersion() >= 7;
     }
 
     private enum MergeDirection {
@@ -286,10 +288,6 @@ public class UseMultiCatchRefactoring extends AbstractRefactoringRule {
 
     @Override
     public boolean visit(TryStatement node) {
-        if (!isEnabled()) {
-            return VISIT_SUBTREE;
-        }
-
         List<CatchClause> catchClauses = catchClauses(node);
         Binding[] typeBindings = resolveTypeBindings(catchClauses);
         for (int i = 0; i < catchClauses.size(); i++) {

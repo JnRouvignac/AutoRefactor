@@ -2,6 +2,7 @@
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
  * Copyright (C) 2017 Fabrice Tiercelin - initial API and implementation
+ * Copyright (C) 2017 Jean-Noël Rouvignac - minor changes
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,10 +26,10 @@
  */
 package org.autorefactor.refactoring.rules;
 
-import static org.autorefactor.refactoring.ASTHelper.isMethod;
-
-import org.autorefactor.preferences.Preferences;
+import org.autorefactor.refactoring.Release;
 import org.eclipse.jdt.core.dom.MethodInvocation;
+
+import static org.autorefactor.refactoring.ASTHelper.*;
 
 /** See {@link #getDescription()} method. */
 public class StringBuilderRatherThanStringBufferRefactoring extends AbstractClassSubstituteRefactoring {
@@ -44,12 +45,8 @@ public class StringBuilderRatherThanStringBufferRefactoring extends AbstractClas
     }
 
     @Override
-    public boolean isEnabled(Preferences preferences) {
-        return super.isEnabled(preferences) && getJavaMinorVersion() >= 5;
-    }
-
-    private int getJavaMinorVersion() {
-        return ctx.getJavaProjectOptions().getJavaSERelease().getMinorVersion();
+    public boolean isJavaVersionSupported(Release javaSeRelease) {
+        return javaSeRelease.getMinorVersion() >= 5;
     }
 
     @Override
