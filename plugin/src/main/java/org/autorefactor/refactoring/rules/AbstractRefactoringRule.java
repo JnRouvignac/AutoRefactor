@@ -71,6 +71,6 @@ public abstract class AbstractRefactoringRule extends ASTVisitor implements Java
     @Override
     public Refactorings getRefactorings(CompilationUnit astRoot) {
         astRoot.accept(this);
-    return ctx.getRefactorings();
+        return ctx.getRefactorings();
     }
 }
