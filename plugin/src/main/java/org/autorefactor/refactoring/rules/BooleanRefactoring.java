@@ -53,8 +53,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.autorefactor.refactoring.ASTBuilder;
-import org.autorefactor.refactoring.BlockSubVisitor;
 import org.autorefactor.refactoring.ASTBuilder.Copy;
+import org.autorefactor.refactoring.BlockSubVisitor;
 import org.autorefactor.util.IllegalArgumentException;
 import org.autorefactor.util.IllegalStateException;
 import org.autorefactor.util.NotImplementedException;
@@ -297,8 +297,12 @@ public class BooleanRefactoring extends AbstractRefactoringRule {
                 final VariableDeclarationStatement vds = (VariableDeclarationStatement) previousSibling;
                 VariableDeclarationFragment vdf = getVariableDeclarationFragment(vds, thenA.getLeftHandSide());
                 if (vdf != null) {
-                    final ITypeBinding typeBinding = vds.getType().resolveBinding();
-                    return maybeReplace(node, thenA, typeBinding, vdf.getInitializer());
+                    final VariableDefinitionsUsesVisitor variableUseVisitor =
+                        new VariableDefinitionsUsesVisitor(vdf.resolveBinding(), node.getExpression()).find();
+                    if (variableUseVisitor.getUses().isEmpty()) {
+                        final ITypeBinding typeBinding = vds.getType().resolveBinding();
+                        return maybeReplace(node, thenA, typeBinding, vdf.getInitializer());
+                    }
                 }
             } else if (previousSibling instanceof ExpressionStatement) {
                 final Assignment elseA = asExpression(previousSibling, Assignment.class);

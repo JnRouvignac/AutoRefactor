@@ -350,6 +350,13 @@ public class BooleanSample {
         }
     }
 
+    public void doNotInlineAlreadyUsedVariable(boolean bo) {
+        boolean b = false;
+        if (bo || b) {
+            b = true;
+        }
+    }
+
     public void removeUselessIfInBooleanPrimitiveAssignmentSearchFurtherAwayForPreviousSibling(
             boolean bo, boolean b) {
         b = false;
