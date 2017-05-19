@@ -42,7 +42,6 @@ public class RemoveUnnecessaryLocalBeforeReturnSample {
      * <p>
      * Trying to use it reports compile error "Array constants can only be used in initializers"
      * <p>
-     * FIXME little bug: the return type should be String instead of java.lang.String
      */
     public String[] inlineStringArrayVariableDeclaration() {
         return new String[] { "test" };
@@ -107,6 +106,51 @@ public class RemoveUnnecessaryLocalBeforeReturnSample {
             return 10;
         } else {
             return 11;
+        }
+    }
+
+    public int doNotInlineVariableInFinally() {
+        int i = 0;
+        try {
+            i = 1;
+            return i;
+        } finally {
+            System.out.println(i);
+        }
+    }
+
+    public int doNotInlineCatchVariableInFinally() {
+        int i = 0;
+        try {
+            return 1;
+        } catch (Exception e) {
+            i = 1;
+            return 2;
+        } finally {
+            System.out.println(i);
+        }
+    }
+
+    public int inlineUnusedVariableInFinally() {
+        int i = 0;
+        try {
+            return 1;
+        } finally {
+            System.out.println("Finished");
+        }
+    }
+
+    public int doNotInlineVariableInFarAwayFinally() {
+        int i = 0;
+        try {
+            try {
+                i = 1;
+                return i;
+            } finally {
+                System.out.println("Finished");
+            }
+        } finally {
+            System.out.println(i);
         }
     }
 }
