@@ -63,11 +63,8 @@ import org.eclipse.jdt.core.dom.IfStatement;
  * }
  * </pre>
  *
- * TODO do this for else ifs too.
- *
  * @see #getDescription()
  */
-@SuppressWarnings("javadoc")
 public class CommonIfInIfElseRefactoring extends AbstractRefactoringRule {
     @Override
     public String getDescription() {
