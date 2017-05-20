@@ -27,6 +27,7 @@
 package org.autorefactor.refactoring.rules.samples_out;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -50,15 +51,29 @@ public class CollectionSample {
         return output;
     }
 
-    public List<String> replaceNewOneArgThenAddAll(List<String> col) {
+    public List<Date> replaceNewOneArgThenAddAll(List<Date> col) {
         // Keep this comment
-        final List<String> output = new ArrayList<String>(col);
+        final List<Date> output = new ArrayList<Date>(col);
         return output;
     }
 
-    public List<String> replaceNewCollectionSizeThenAddAll(List<String> col) {
+    public List<String> doNotReplaceAlreadyInitedCol(List<String> col1, List<String> col2) {
+        final List<String> output = new ArrayList<String>(col1);
+        output.addAll(col2);
+        return output;
+    }
+
+    public List<Integer> replaceNewCollectionSizeThenAddAll(List<Integer> col, List<List<Integer>> listOfCol) {
         // Keep this comment
-        final List<String> output = new ArrayList<String>(col);
+        final List<Integer> output = new ArrayList<Integer>(col);
+        // Keep this comment too
+        final List<Integer> output2 = new ArrayList<Integer>(listOfCol.get(0));
+        return output;
+    }
+
+    public List<String> doNotReplaceWithSpecificSize(List<String> col) {
+        final List<String> output = new ArrayList<String>(10);
+        output.addAll(col);
         return output;
     }
 
