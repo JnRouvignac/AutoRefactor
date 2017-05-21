@@ -52,137 +52,132 @@ import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
-public abstract class AbstractEnumCollectionReplacementRefactoring extends
-AbstractRefactoringRule {
+/**
+ * Abstract class for replacement other collections with enum as a type <br>
+ * with specific enum implementations, e.g. HashMap -> EnumMap
+ */
+public abstract class AbstractEnumCollectionReplacementRefactoring extends AbstractRefactoringRule {
 
-	@Override
-	public boolean visit(ClassInstanceCreation node) {
-		Type type = node.getType();
-		if (isEnabled() && type.isParameterizedType()
-				&& creates(node, getImplType())) {
+    @Override
+    public boolean visit(ClassInstanceCreation node) {
+        Type type = node.getType();
+        if (isEnabled() && type.isParameterizedType() && creates(node, getImplType())) {
+            ASTNode parent = getFirstAncestorOrNull(node, ReturnStatement.class, Assignment.class,
+                    VariableDeclarationStatement.class);
+            if (parent != null) {
+                switch (parent.getNodeType()) {
 
-			ASTNode parent = getFirstAncestorOrNull(node,
-					ReturnStatement.class, Assignment.class,
-					VariableDeclarationStatement.class);
+                case RETURN_STATEMENT: {
+                    return handleReturnStatement(node, (ReturnStatement) parent);
+                }
 
-			if (parent != null) {
-				switch (parent.getNodeType()) {
+                case ASSIGNMENT: {
+                    return handleAssignment(node, (Assignment) parent);
+                }
 
-				case RETURN_STATEMENT: {
-					return handleReturnStatement(node, (ReturnStatement) parent);
-				}
+                case VARIABLE_DECLARATION_STATEMENT: {
+                    return handleVarDeclarationStatement((VariableDeclarationStatement) parent);
+                }
 
-				case ASSIGNMENT: {
-					return handleAssignment(node, (Assignment) parent);
-				}
+                // TODO: probably, it can be applied to method invocation for
+                // some cases
+                // [A.Paikin]
+                // case ASTNode.METHOD_INVOCATION: {
+                // return handleMethodInvocation((MethodInvocation) parent);
+                // }
+                }
+            }
+        }
+        return VISIT_SUBTREE;
+    }
 
-				case VARIABLE_DECLARATION_STATEMENT: {
-					return handleVarDeclarationStatement((VariableDeclarationStatement) parent);
-				}
+    abstract String getImplType();
 
-				// TODO: probably, it can be applied to method invocation for
-				// some cases
-				// [A.Paikin]
-				// case ASTNode.METHOD_INVOCATION: {
-				// return handleMethodInvocation((MethodInvocation) parent);
-				// }
-				}
-			}
-		}
-		return VISIT_SUBTREE;
-	}
+    abstract String getInterfaceType();
 
-	abstract String getImplType();
+    boolean handleReturnStatement(ClassInstanceCreation node, ReturnStatement rs) {
+        MethodDeclaration md = getAncestorOrNull(node, MethodDeclaration.class);
+        if (md != null) {
+            Type returnType = md.getReturnType2();
+            if (isTargetType(returnType)) {
+                List<Type> typeArguments = typeArgs(returnType);
+                if (isEnum(typeArguments.get(0))) {
+                    return replace(node, typeArguments.toArray(new Type[] {}));
+                }
+            }
+        }
+        return VISIT_SUBTREE;
+    }
 
-	abstract String getInterfaceType();
+    abstract boolean replace(ClassInstanceCreation node, Type... types);
 
-	boolean handleReturnStatement(ClassInstanceCreation node, ReturnStatement rs) {
-		MethodDeclaration md = getAncestorOrNull(node, MethodDeclaration.class);
-		if (md != null) {
-			Type returnType = md.getReturnType2();
-			if (isTargetType(returnType)) {
-				List<Type> typeArguments = typeArgs(returnType);
-				if (isEnum(typeArguments.get(0))) {
-					return replace(node, typeArguments.toArray(new Type[] {}));
-				}
-			}
-		}
-		return VISIT_SUBTREE;
-	}
+    boolean handleAssignment(ClassInstanceCreation node, Assignment a) {
+        Expression lhs = a.getLeftHandSide();
+        if (isTargetType(lhs.resolveTypeBinding())) {
 
-	abstract boolean replace(ClassInstanceCreation node, Type... types);
+            ITypeBinding[] typeArguments = lhs.resolveTypeBinding().getTypeArguments();
+            ITypeBinding keyTypeBinding = typeArguments[0];
+            if (keyTypeBinding.isEnum()) {
+                ASTBuilder b = ctx.getASTBuilder();
+                Type[] types = new Type[typeArguments.length];
+                for (int i = 0; i < types.length; i++) {
+                    types[i] = b.type(typeArguments[i].getName());
+                }
+                return replace(node, types);
+            }
+        }
+        return VISIT_SUBTREE;
+    }
 
-	boolean handleAssignment(ClassInstanceCreation node, Assignment a) {
-		Expression lhs = a.getLeftHandSide();
-		if (isTargetType(lhs.resolveTypeBinding())) {
+    boolean handleVarDeclarationStatement(VariableDeclarationStatement node) {
+        Type type = node.getType();
+        if (type.isParameterizedType() && isTargetType(type)) {
 
-			ITypeBinding[] typeArguments = lhs.resolveTypeBinding()
-					.getTypeArguments();
-			ITypeBinding keyTypeBinding = typeArguments[0];
-			if (keyTypeBinding.isEnum()) {
-				ASTBuilder b = ctx.getASTBuilder();
-				Type[] types = new Type[typeArguments.length];
-				for (int i = 0; i < types.length; i++) {
-					types[i] = b.type(typeArguments[i].getName());
-				}
-				return replace(node, types);
-			}
-		}
-		return VISIT_SUBTREE;
-	}
+            ParameterizedType ptype = (ParameterizedType) type;
+            List<Type> typeArguments = typeArguments(ptype);
+            if (typeArguments.get(0).resolveBinding().isEnum()) {
+                List<VariableDeclarationFragment> fragments = fragments(node);
+                for (VariableDeclarationFragment vdf:fragments) {
+                    Expression initExpr = vdf.getInitializer();
+                    if (initExpr != null) {
+                        initExpr = removeParentheses(initExpr);
+                        if (creates(initExpr, getImplType())) {
+                            return replace((ClassInstanceCreation) initExpr, typeArguments.toArray(new Type[] {}));
+                        }
+                    }
+                }
+            }
 
-	boolean handleVarDeclarationStatement(VariableDeclarationStatement node) {
-		Type type = node.getType();
-		if (type.isParameterizedType() && isTargetType(type)) {
+        }
+        return VISIT_SUBTREE;
+    }
 
-			ParameterizedType ptype = (ParameterizedType) type;
-			List<Type> typeArguments = typeArguments(ptype);
-			if (typeArguments.get(0).resolveBinding().isEnum()) {
-				List<VariableDeclarationFragment> fragments = fragments(node);
-				for (VariableDeclarationFragment vdf : fragments) {
-					Expression initExpr = vdf.getInitializer();
-					if (initExpr != null) {
-						initExpr = removeParentheses(initExpr);
-						if (creates(initExpr, getImplType())) {
-							return replace((ClassInstanceCreation) initExpr,
-									typeArguments.toArray(new Type[] {}));
-						}
-					}
-				}
-			}
+    /**
+     * Just one more wrapper to extract type arguments, <br>
+     * to avoid boilerplate casting and shorten method name.
+     */
+    List<Type> typeArgs(Type parameterizedType) {
+        return typeArguments((ParameterizedType) parameterizedType);
+    }
 
-		}
-		return VISIT_SUBTREE;
-	}
+    boolean isTargetType(ITypeBinding it) {
+        return hasType(it, getInterfaceType());
+    }
 
-	/**
-	 * Just one more wrapper to extract type arguments, <br>
-	 * to avoid boilerplate casting and shorten method name.
-	 */
-	List<Type> typeArgs(Type parameterizedType) {
-		return typeArguments((ParameterizedType) parameterizedType);
-	}
+    private boolean isEnum(Type type) {
+        return type.resolveBinding().isEnum();
+    }
 
-	boolean isTargetType(ITypeBinding it) {
-		return hasType(it, getInterfaceType());
-	}
+    private boolean creates(Expression exp, String type) {
+        return exp.getNodeType() == Expression.CLASS_INSTANCE_CREATION && hasType(exp.resolveTypeBinding(), type);
+    }
 
-	private boolean isEnum(Type type) {
-		return type.resolveBinding().isEnum();
-	}
+    private boolean isTargetType(Type type) {
+        return type != null && type.isParameterizedType() && isTargetType(type.resolveBinding());
+    }
 
-	private boolean creates(Expression exp, String type) {
-		return exp.getNodeType() == Expression.CLASS_INSTANCE_CREATION
-				&& hasType(exp.resolveTypeBinding(), type);
-	}
-
-	private boolean isTargetType(Type type) {
-		return type != null && type.isParameterizedType()
-				&& isTargetType(type.resolveBinding());
-	}
-
-	private boolean isEnabled() {
-		return ctx.getJavaProjectOptions().getJavaSERelease().getMinorVersion() >= 5;
-	}
+    private boolean isEnabled() {
+        return ctx.getJavaProjectOptions().getJavaSERelease().getMinorVersion() >= 5;
+    }
 
 }
