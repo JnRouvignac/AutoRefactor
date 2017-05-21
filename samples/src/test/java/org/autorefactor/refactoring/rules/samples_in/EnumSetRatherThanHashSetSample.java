@@ -33,84 +33,84 @@ import java.util.Set;
 
 public class EnumSetRatherThanHashSetSample {
 
-	enum Example {
-		ONE, TWO, THREE
-	}
+    enum Example {
+        ONE, TWO, THREE
+    }
 
-	public Set<Example> refactorVariableDeclarationStatement() {
-		Set<Example> set = new HashSet<Example>();
-		return set;
-	}
+    public Set<Example> refactorVariableDeclarationStatement() {
+        Set<Example> set = new HashSet<Example>();
+        return set;
+    }
 
-	public Set<Example> refactorVariableDeclarationStatementWithDiamond() {
-		Set<Example> set = new HashSet<>();
-		return set;
-	}
+    public Set<Example> refactorVariableDeclarationStatementWithDiamond() {
+        Set<Example> set = new HashSet<>();
+        return set;
+    }
 
-	public Set<Example> refactorReturnStatement() {
-		return new HashSet<Example>();
-	}
+    public Set<Example> refactorReturnStatement() {
+        return new HashSet<Example>();
+    }
 
-	public Set<Example> refactorReturnStatement2() {
-		return new HashSet<>();
-	}
+    public Set<Example> refactorReturnStatement2() {
+        return new HashSet<>();
+    }
 
-	public Set<Example> refactorVariableDeclarationStatementWithParentheses() {
-		Set<Example> set = ((new HashSet<Example>()));
-		return set;
-	}
+    public Set<Example> refactorVariableDeclarationStatementWithParentheses() {
+        Set<Example> set = ((new HashSet<Example>()));
+        return set;
+    }
 
-	public Set<Example> refactorAssignment() {
-		Set<Example> set;
-		set = new HashSet<Example>();
-		return set;
-	}
+    public Set<Example> refactorAssignment() {
+        Set<Example> set;
+        set = new HashSet<Example>();
+        return set;
+    }
 
-	public Set<Example> refactorConditionalAssignment() {
-		Set<Example> set;
-		set = true ? new HashSet<Example>() : new HashSet<Example>();
-		return set;
-	}
+    public Set<Example> refactorConditionalAssignment() {
+        Set<Example> set;
+        set = true ? new HashSet<Example>() : new HashSet<Example>();
+        return set;
+    }
 
-	public Set<Example> refactorConstrutorWithInt() {
-		Set<Example> set = new HashSet<Example>(1);
-		return set;
-	}
+    public Set<Example> refactorConstrutorWithInt() {
+        Set<Example> set = new HashSet<Example>(1);
+        return set;
+    }
 
-	public Set<Example> refactorConstrutorWithIntAndFloat() {
-		Set<Example> set = new HashSet<Example>(1, 0.75F);
-		return set;
-	}
+    public Set<Example> refactorConstrutorWithIntAndFloat() {
+        Set<Example> set = new HashSet<Example>(1, 0.75F);
+        return set;
+    }
 
-	public Set<Example> doNotRefactorConstrutorWithCollection(
-			Collection<Example> col) {
-		Set<Example> set = new HashSet<Example>(col);
-		return set;
-	}
+    public Set<Example> doNotRefactorConstrutorWithCollection(
+            Collection<Example> col) {
+        Set<Example> set = new HashSet<Example>(col);
+        return set;
+    }
 
-	public Set<Example> refactorConstrutorWithEnumSet(EnumSet<Example> s) {
-		Set<Example> set = new HashSet<Example>(s);
-		return set;
-	}
+    public Set<Example> refactorConstrutorWithEnumSet(EnumSet<Example> s) {
+        Set<Example> set = new HashSet<Example>(s);
+        return set;
+    }
 
-	public void doNotRefactorMethodArgument() {
-		Set<Example> set = Collections
-				.synchronizedSet(new HashSet<Example>());
-		System.out.println(set);
-	}
+    public void doNotRefactorMethodArgument() {
+        Set<Example> set = Collections
+                .synchronizedSet(new HashSet<Example>());
+        System.out.println(set);
+    }
 
-	public Set<Example> doNotRefactor() {
-		Set<Example> set = EnumSet.noneOf(Example.class);
-		set.addAll(EnumSet.allOf(Example.class));
-		return set;
-	}
+    public Set<Example> doNotRefactor() {
+        Set<Example> set = EnumSet.noneOf(Example.class);
+        set.addAll(EnumSet.allOf(Example.class));
+        return set;
+    }
 
-	public Set<Example> doNotRefactorAnonymousClass() {
-		return new HashSet<Example>() {
-			@Override
-			public String toString() {
-				return super.toString();
-			}
-		};
-	}
+    public Set<Example> doNotRefactorAnonymousClass() {
+        return new HashSet<Example>() {
+            @Override
+            public String toString() {
+                return super.toString();
+            }
+        };
+    }
 }

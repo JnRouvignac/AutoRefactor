@@ -135,6 +135,8 @@ public final class AllRefactoringRules {
                 new RemoveEmptyLinesRefactoring(),
                 new AndroidWakeLockRefactoring(),
                 new AndroidViewHolderRefactoring(),
+                new EnumMapRatherThanHashMapRefactoring(),
+                new EnumSetRatherThanHashSetRefactoring(),
                 new SwitchRefactoring());
     }
 
