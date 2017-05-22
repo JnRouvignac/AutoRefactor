@@ -135,7 +135,8 @@ public final class AllRefactoringRules {
                 new RemoveEmptyLinesRefactoring(),
                 new AndroidWakeLockRefactoring(),
                 new AndroidViewHolderRefactoring(),
-                new SwitchRefactoring());
+                new SwitchRefactoring(),
+                new AddMissingOverrideAnnotationRefactoring());
     }
 
     private static List<RefactoringRule> newArrayList(RefactoringRule... refactorings) {
