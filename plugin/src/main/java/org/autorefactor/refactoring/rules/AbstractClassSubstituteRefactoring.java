@@ -349,8 +349,13 @@ public abstract class AbstractClassSubstituteRefactoring extends AbstractRefacto
 
         @Override
         public boolean visit(AnonymousClassDeclaration node) {
-            isUsedInAnnonymousClass = true;
-            return DO_NOT_VISIT_SUBTREE;
+            final VariableDefinitionsUsesVisitor variableUseVisitor =
+                    new VariableDefinitionsUsesVisitor(varDecl.resolveBinding(), node).find();
+            if (!variableUseVisitor.getUses().isEmpty()) {
+                isUsedInAnnonymousClass = true;
+                return DO_NOT_VISIT_SUBTREE;
+            }
+            return VISIT_SUBTREE;
         }
     }
 }
