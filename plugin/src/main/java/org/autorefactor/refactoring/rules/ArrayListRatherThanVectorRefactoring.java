@@ -103,6 +103,8 @@ public class ArrayListRatherThanVectorRefactoring extends AbstractClassSubstitut
             refactoredMi.setName(b.simpleName("get"));
         } else if (isMethod(originalMi, "java.util.Vector", "copyInto", "java.lang.Object[]")) {
             refactoredMi.setName(b.simpleName("toArray"));
+        } else if (isMethod(originalMi, "java.util.Vector", "removeElement", "java.lang.Object")) {
+            refactoredMi.setName(b.simpleName("remove"));
         } else if (isMethod(originalMi, "java.util.Vector", "removeElementAt", "int")) {
             refactoredMi.setName(b.simpleName("remove"));
         } else if (isMethod(originalMi, "java.util.Vector", "removeAllElements")) {

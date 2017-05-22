@@ -28,26 +28,27 @@ package org.autorefactor.refactoring.rules.samples_in;
 import java.util.Date;
 import java.util.Vector;
 import java.util.List;
+import java.util.Observable;
 
 public class ArrayListRatherThanVectorSample {
 
     public void replaceVectorInstanceCreation() {
         // Keep this comment
-        String[] entrySet = new Vector<String>().toArray(null);
+        String[] stringArray = new Vector<String>().toArray(null);
         // Keep this comment too
         int size = new Vector<String>(10).size();
     }
 
     public void replaceRawVector() {
         // Keep this comment
-        Object[] entrySet = new Vector().toArray(null);
+        Object[] objectArray = new Vector().toArray(null);
         // Keep this comment too
         int size = new Vector(10).size();
     }
 
     public void replaceFullyQualifiedVector() {
         // Keep this comment
-        Date[] entrySet = new java.util.Vector<Date>().toArray(null);
+        Date[] dateArray = new java.util.Vector<Date>().toArray(null);
         // Keep this comment too
         int size = new java.util.Vector(10).size();
     }
@@ -59,7 +60,7 @@ public class ArrayListRatherThanVectorSample {
 
     public void doNotReplaceInterface() {
         // Keep this comment
-        List<String> list = new Vector<String>();
+        List<String> vector = new Vector<String>();
     }
 
     public void replaceVectorVariableUse() {
@@ -69,9 +70,9 @@ public class ArrayListRatherThanVectorSample {
         list.add("bar");
     }
 
-    public void refactorMethod() {
+    public void refactorWithMethod() {
         // Keep this comment
-        Vector<String> list = new Vector<String>();
+        Vector<Observable> list = new Vector<Observable>();
         // Keep this comment too
         list.toArray();
     }
@@ -110,13 +111,13 @@ public class ArrayListRatherThanVectorSample {
         return list2.toArray(null);
     }
 
-    public void doNotReplaceVectorParameter(Vector<String> aList) {
-        Vector<String> list = aList;
-        list.add("bar");
+    public void doNotReplaceVectorParameter(Vector<String> aVector) {
+        Vector<String> vector = aVector;
+        vector.add("bar");
     }
 
     public void doNotReplaceVectorPassedToAMethod() {
-        String p3 = String.valueOf(new Vector<String>());
+        String text = String.valueOf(new Vector<String>());
     }
 
     public Vector<Date> doNotReplaceReturnedVector() {
@@ -124,16 +125,18 @@ public class ArrayListRatherThanVectorSample {
     }
 
     public void doNotReplaceReassignedVariable() {
-        Vector<String> list = new Vector<String>();
-        list = new Vector<String>();
+        Vector<String> vector = new Vector<String>();
+        vector = new Vector<String>();
     }
 
     public void replaceOldMethod() {
-        Vector<Integer> list = new Vector<Integer>();
         // Keep this comment
+        Vector<Integer> list = new Vector<Integer>();
+        // Keep this comment too
         list.addElement(42);
         list.elementAt(0);
         list.copyInto(new Object[10]);
+        list.removeElement(123);
         list.removeElementAt(1);
         list.removeAllElements();
     }
@@ -147,6 +150,19 @@ public class ArrayListRatherThanVectorSample {
         Vector<String> list = new Vector<String>();
         list.add("foo");
         return list.firstElement();
+    }
+
+    public void replaceStackWithRunnable() {
+        // Keep this comment
+        final Vector<String> list = new Vector<String>();
+        new Runnable() {
+
+            @Override
+            public void run() {
+                final Vector<String> localList = new Vector<String>();
+                localList.add("Local, it's safe.");
+            }
+        };
     }
 
     public void doNotReplaceThreadSharedVector() {
