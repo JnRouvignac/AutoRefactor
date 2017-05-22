@@ -1,8 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2017 Fabrice Tiercelin - initial API and implementation
- * Copyright (C) 2017 Jean-Noël Rouvignac - fix NPE with Eclipse 4.5.2
+ * Copyright (C) 2017 Andrei Paikin - Initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -53,7 +52,7 @@ public final class EnumMapRatherThanHashMapRefactoring extends
 
     @Override
     public String getName() {
-        return "HashMap to EnumMap for enum keys";
+        return "EnumMap rather than HashMap for enum keys";
     }
 
     @Override
@@ -95,7 +94,7 @@ public final class EnumMapRatherThanHashMapRefactoring extends
             return VISIT_SUBTREE;
         }
         Expression newParam = resolveParameter(keyType, arguments);
-        Type newType = b.genericType("EnumMap", b.copy(keyType),
+        Type newType = b.genericType("java.util.EnumMap", b.copy(keyType),
                 b.copy(valueType));
         // if there were no type args in original creation (diamond operator),
         // remove them from replacement

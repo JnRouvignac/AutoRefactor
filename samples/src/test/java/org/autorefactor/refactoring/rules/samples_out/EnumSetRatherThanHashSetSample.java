@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2015-2016 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2017 Andrei Paikin - Initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -38,48 +38,57 @@ public class EnumSetRatherThanHashSetSample {
     }
 
     public Set<Example> refactorVariableDeclarationStatement() {
-        Set<Example> set = EnumSet.noneOf(Example.class);
+        // Keep this comment
+        Set<Example> set = java.util.EnumSet.noneOf(Example.class);
         return set;
     }
 
     public Set<Example> refactorVariableDeclarationStatementWithDiamond() {
-        Set<Example> set = EnumSet.noneOf(Example.class);
+        // Keep this comment
+        Set<Example> set = java.util.EnumSet.noneOf(Example.class);
         return set;
     }
 
     public Set<Example> refactorReturnStatement() {
-        return EnumSet.noneOf(Example.class);
+        // Keep this comment
+        return java.util.EnumSet.noneOf(Example.class);
     }
 
     public Set<Example> refactorReturnStatement2() {
-        return EnumSet.noneOf(Example.class);
+        // Keep this comment
+        return java.util.EnumSet.noneOf(Example.class);
     }
 
     public Set<Example> refactorVariableDeclarationStatementWithParentheses() {
-        Set<Example> set = ((EnumSet.noneOf(Example.class)));
+        // Keep this comment
+        Set<Example> set = ((java.util.EnumSet.noneOf(Example.class)));
         return set;
     }
 
     public Set<Example> refactorAssignment() {
+        // Keep this comment
         Set<Example> set;
-        set = EnumSet.noneOf(Example.class);
+        set = java.util.EnumSet.noneOf(Example.class);
         return set;
     }
 
     public Set<Example> refactorConditionalAssignment() {
+        // Keep this comment
         Set<Example> set;
-        set = true ? EnumSet.noneOf(Example.class) : EnumSet
+        set = true ? java.util.EnumSet.noneOf(Example.class) : java.util.EnumSet
                                                             .noneOf(Example.class);
         return set;
     }
 
     public Set<Example> refactorConstrutorWithInt() {
-        Set<Example> set = EnumSet.noneOf(Example.class);
+        // Keep this comment
+        Set<Example> set = java.util.EnumSet.noneOf(Example.class);
         return set;
     }
 
     public Set<Example> refactorConstrutorWithIntAndFloat() {
-        Set<Example> set = EnumSet.noneOf(Example.class);
+        // Keep this comment
+        Set<Example> set = java.util.EnumSet.noneOf(Example.class);
         return set;
     }
 
@@ -90,7 +99,8 @@ public class EnumSetRatherThanHashSetSample {
     }
 
     public Set<Example> refactorConstrutorWithEnumSet(EnumSet<Example> s) {
-        Set<Example> set = EnumSet.copyOf(s);
+        // Keep this comment
+        Set<Example> set = java.util.EnumSet.copyOf(s);
         return set;
     }
 

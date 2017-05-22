@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2015-2016 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2017 Andrei Paikin - Initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -37,48 +37,57 @@ public class EnumMapRatherThanHashMapSample {
     }
 
     public Map<Example, String> refactorVariableDeclarationStatement() {
-        Map<Example, String> map = new EnumMap<Example, String>(Example.class);
+        // Keep this comment
+        Map<Example, String> map = new java.util.EnumMap<Example, String>(Example.class);
         return map;
     }
 
     public Map<Example, String> refactorVariableDeclarationStatementWithDiamond() {
-        Map<Example, String> map = new EnumMap<>(Example.class);
+        // Keep this comment
+        Map<Example, String> map = new java.util.EnumMap<>(Example.class);
         return map;
     }
 
     public Map<Example, String> refactorReturnStatement() {
-        return new EnumMap<Example, String>(Example.class);
+        // Keep this comment
+        return new java.util.EnumMap<Example, String>(Example.class);
     }
 
     public Map<Example, String> refactorReturnStatement2() {
-        return new EnumMap<>(Example.class);
+        // Keep this comment
+        return new java.util.EnumMap<>(Example.class);
     }
 
     public Map<Example, String> refactorVariableDeclarationStatementWithParentheses() {
-        Map<Example, String> map = ((new EnumMap<Example, String>(Example.class)));
+        // Keep this comment
+        Map<Example, String> map = ((new java.util.EnumMap<Example, String>(Example.class)));
         return map;
     }
 
     public Map<Example, String> refactorAssignment() {
+        // Keep this comment
         Map<Example, String> map;
-        map = new EnumMap<>(Example.class);
+        map = new java.util.EnumMap<>(Example.class);
         return map;
     }
 
     public Map<Example, String> refactorConditionalAssignment() {
+        // Keep this comment
         Map<Example, String> map;
-        map = true ? new EnumMap<Example, String>(Example.class)
-                : new EnumMap<Example, String>(Example.class);
+        map = true ? new java.util.EnumMap<Example, String>(Example.class)
+                : new java.util.EnumMap<Example, String>(Example.class);
         return map;
     }
 
     public Map<Example, String> refactorConstrutorWithInt() {
-        Map<Example, String> map = new EnumMap<Example, String>(Example.class);
+        // Keep this comment
+        Map<Example, String> map = new java.util.EnumMap<Example, String>(Example.class);
         return map;
     }
 
     public Map<Example, String> refactorConstrutorWithIntAndFloat() {
-        Map<Example, String> map = new EnumMap<Example, String>(Example.class);
+        // Keep this comment
+        Map<Example, String> map = new java.util.EnumMap<Example, String>(Example.class);
         return map;
     }
 
@@ -90,7 +99,8 @@ public class EnumMapRatherThanHashMapSample {
 
     public Map<Example, String> refactorConstrutorWithEnumMap(
             EnumMap<Example, String> m) {
-        Map<Example, String> map = new EnumMap<Example, String>(m);
+        // Keep this comment
+        Map<Example, String> map = new java.util.EnumMap<Example, String>(m);
         return map;
     }
 

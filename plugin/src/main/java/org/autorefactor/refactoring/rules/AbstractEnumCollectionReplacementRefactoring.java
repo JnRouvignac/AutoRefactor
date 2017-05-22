@@ -1,8 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2017 Fabrice Tiercelin - initial API and implementation
- * Copyright (C) 2017 Jean-Noël Rouvignac - fix NPE with Eclipse 4.5.2
+ * Copyright (C) 2017 Andrei Paikin - Initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -67,24 +66,20 @@ public abstract class AbstractEnumCollectionReplacementRefactoring extends Abstr
             if (parent != null) {
                 switch (parent.getNodeType()) {
 
-                case RETURN_STATEMENT: {
+                case RETURN_STATEMENT:
                     return handleReturnStatement(node, (ReturnStatement) parent);
-                }
 
-                case ASSIGNMENT: {
+                case ASSIGNMENT:
                     return handleAssignment(node, (Assignment) parent);
-                }
 
-                case VARIABLE_DECLARATION_STATEMENT: {
+                case VARIABLE_DECLARATION_STATEMENT:
                     return handleVarDeclarationStatement((VariableDeclarationStatement) parent);
-                }
 
                 // TODO: probably, it can be applied to method invocation for
                 // some cases
                 // [A.Paikin]
-                // case ASTNode.METHOD_INVOCATION: {
+                // case ASTNode.METHOD_INVOCATION:
                 // return handleMethodInvocation((MethodInvocation) parent);
-                // }
                 }
             }
         }
