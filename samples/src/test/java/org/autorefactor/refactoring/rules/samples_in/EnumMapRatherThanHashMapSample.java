@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2015-2016 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2017 Andrei Paikin - Initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -37,35 +37,42 @@ public class EnumMapRatherThanHashMapSample {
     }
 
     public Map<Example, String> refactorVariableDeclarationStatement() {
+        // Keep this comment
         Map<Example, String> map = new HashMap<Example, String>();
         return map;
     }
 
     public Map<Example, String> refactorVariableDeclarationStatementWithDiamond() {
+        // Keep this comment
         Map<Example, String> map = new HashMap<>();
         return map;
     }
 
     public Map<Example, String> refactorReturnStatement() {
+        // Keep this comment
         return new HashMap<Example, String>();
     }
 
     public Map<Example, String> refactorReturnStatement2() {
+        // Keep this comment
         return new HashMap<>();
     }
 
     public Map<Example, String> refactorVariableDeclarationStatementWithParentheses() {
+        // Keep this comment
         Map<Example, String> map = ((new HashMap<Example, String>()));
         return map;
     }
 
     public Map<Example, String> refactorAssignment() {
+        // Keep this comment
         Map<Example, String> map;
         map = new HashMap<>();
         return map;
     }
 
     public Map<Example, String> refactorConditionalAssignment() {
+        // Keep this comment
         Map<Example, String> map;
         map = true ? new HashMap<Example, String>()
                 : new HashMap<Example, String>();
@@ -73,11 +80,13 @@ public class EnumMapRatherThanHashMapSample {
     }
 
     public Map<Example, String> refactorConstrutorWithInt() {
+        // Keep this comment
         Map<Example, String> map = new HashMap<Example, String>(1);
         return map;
     }
 
     public Map<Example, String> refactorConstrutorWithIntAndFloat() {
+        // Keep this comment
         Map<Example, String> map = new HashMap<Example, String>(1, 0.75F);
         return map;
     }
@@ -90,6 +99,7 @@ public class EnumMapRatherThanHashMapSample {
 
     public Map<Example, String> refactorConstrutorWithEnumMap(
             EnumMap<Example, String> m) {
+        // Keep this comment
         Map<Example, String> map = new HashMap<Example, String>(m);
         return map;
     }

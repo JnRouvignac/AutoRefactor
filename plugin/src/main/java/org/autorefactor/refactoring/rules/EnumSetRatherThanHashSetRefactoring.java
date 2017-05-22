@@ -1,8 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2017 Fabrice Tiercelin - initial API and implementation
- * Copyright (C) 2017 Jean-Noël Rouvignac - fix NPE with Eclipse 4.5.2
+ * Copyright (C) 2017 Andrei Paikin - Initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -54,7 +53,7 @@ public final class EnumSetRatherThanHashSetRefactoring extends
 
     @Override
     public String getName() {
-        return "EnumSet instead of HashSet for enum types";
+        return "EnumSet rather than HashSet for enum types";
     }
 
     @Override
@@ -101,11 +100,11 @@ public final class EnumSetRatherThanHashSetRefactoring extends
             if (!instanceOf(typeArg, "java.util.EnumSet")) {
                 return VISIT_SUBTREE;
             }
-            invocation = b.invoke("EnumSet", "copyOf", b.copy(typeArg));
+            invocation = b.invoke(b.name("java", "util", "EnumSet"), "copyOf", b.copy(typeArg));
         } else {
             TypeLiteral newTypeLiteral = ctx.getAST().newTypeLiteral();
             newTypeLiteral.setType(b.copy(type));
-            invocation = b.invoke("EnumSet", "noneOf", newTypeLiteral);
+            invocation = b.invoke(b.name("java", "util", "EnumSet"), "noneOf", newTypeLiteral);
         }
         ctx.getRefactorings().replace(cic, invocation);
         return DO_NOT_VISIT_SUBTREE;

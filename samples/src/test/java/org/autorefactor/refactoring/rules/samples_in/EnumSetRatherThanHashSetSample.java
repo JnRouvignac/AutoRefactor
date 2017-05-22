@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2015-2016 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2017 Andrei Paikin - Initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -38,46 +38,55 @@ public class EnumSetRatherThanHashSetSample {
     }
 
     public Set<Example> refactorVariableDeclarationStatement() {
+        // Keep this comment
         Set<Example> set = new HashSet<Example>();
         return set;
     }
 
     public Set<Example> refactorVariableDeclarationStatementWithDiamond() {
+        // Keep this comment
         Set<Example> set = new HashSet<>();
         return set;
     }
 
     public Set<Example> refactorReturnStatement() {
+        // Keep this comment
         return new HashSet<Example>();
     }
 
     public Set<Example> refactorReturnStatement2() {
+        // Keep this comment
         return new HashSet<>();
     }
 
     public Set<Example> refactorVariableDeclarationStatementWithParentheses() {
+        // Keep this comment
         Set<Example> set = ((new HashSet<Example>()));
         return set;
     }
 
     public Set<Example> refactorAssignment() {
+        // Keep this comment
         Set<Example> set;
         set = new HashSet<Example>();
         return set;
     }
 
     public Set<Example> refactorConditionalAssignment() {
+        // Keep this comment
         Set<Example> set;
         set = true ? new HashSet<Example>() : new HashSet<Example>();
         return set;
     }
 
     public Set<Example> refactorConstrutorWithInt() {
+        // Keep this comment
         Set<Example> set = new HashSet<Example>(1);
         return set;
     }
 
     public Set<Example> refactorConstrutorWithIntAndFloat() {
+        // Keep this comment
         Set<Example> set = new HashSet<Example>(1, 0.75F);
         return set;
     }
@@ -89,6 +98,7 @@ public class EnumSetRatherThanHashSetSample {
     }
 
     public Set<Example> refactorConstrutorWithEnumSet(EnumSet<Example> s) {
+        // Keep this comment
         Set<Example> set = new HashSet<Example>(s);
         return set;
     }
