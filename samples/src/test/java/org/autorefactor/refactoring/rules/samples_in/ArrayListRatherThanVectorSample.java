@@ -139,6 +139,8 @@ public class ArrayListRatherThanVectorSample {
         list.removeElement(123);
         list.removeElementAt(1);
         list.removeAllElements();
+        list.insertElementAt(456, 2);
+        list.setElementAt(789, 3);
     }
 
     public void doNotReplaceSpecificInstantiation() {

@@ -82,18 +82,17 @@ public class ArrayListRatherThanVectorRefactoring extends AbstractClassSubstitut
                 || isMethod(mi, "java.util.Vector", "removeElement", "java.lang.Object")
                 || isMethod(mi, "java.util.Vector", "removeElementAt", "int")
                 || isMethod(mi, "java.util.Vector", "removeAllElements")
-                || isMethod(mi, "java.util.Vector", "setElementAt", "java.lang.Object", "int")) {
+                || isMethod(mi, "java.util.Vector", "setElementAt", "java.lang.Object", "int")
+                || isMethod(mi, "java.util.Vector", "insertElementAt", "java.lang.Object", "int")) {
             methodCallsToRefactor.add(mi);
             return true;
-        }
-        if (isMethod(mi, "java.util.Vector", "setSize", "int")
+        } else if (isMethod(mi, "java.util.Vector", "setSize", "int")
                 || isMethod(mi, "java.util.Vector", "capacity")
                 || isMethod(mi, "java.util.Vector", "elements")
                 || isMethod(mi, "java.util.Vector", "indexOf", "java.lang.Object", "int")
                 || isMethod(mi, "java.util.Vector", "lastIndexOf", "java.lang.Object", "int")
                 || isMethod(mi, "java.util.Vector", "firstElement")
-                || isMethod(mi, "java.util.Vector", "lastElement")
-                || isMethod(mi, "java.util.Vector", "insertElementAt", "java.lang.Object", "int")) {
+                || isMethod(mi, "java.util.Vector", "lastElement")) {
             return false;
         }
         return true;
@@ -114,6 +113,28 @@ public class ArrayListRatherThanVectorRefactoring extends AbstractClassSubstitut
             refactoredMi.setName(b.simpleName("remove"));
         } else if (isMethod(originalMi, "java.util.Vector", "removeAllElements")) {
             refactoredMi.setName(b.simpleName("clear"));
+        } else if (isMethod(originalMi, "java.util.Vector", "insertElementAt", "java.lang.Object", "int")) {
+            refactoredMi.setName(b.simpleName("add"));
+            reorderArguments(refactoredMi);
+        } else if (isMethod(originalMi, "java.util.Vector", "setElementAt", "java.lang.Object", "int")) {
+            refactoredMi.setName(b.simpleName("set"));
+            reorderArguments(refactoredMi);
+        }
+    }
+
+    private void reorderArguments(final MethodInvocation refactoredMi) {
+        Object item = refactoredMi.arguments().get(0);
+        Object index = refactoredMi.arguments().get(1);
+        refactoredMi.arguments().clear();
+        refactoredMi.arguments().add(index);
+        refactoredMi.arguments().add(item);
+
+        if (refactoredMi.typeArguments() != null && !refactoredMi.typeArguments().isEmpty()) {
+            Object itemType = refactoredMi.typeArguments().get(0);
+            Object indexType = refactoredMi.typeArguments().get(1);
+            refactoredMi.typeArguments().clear();
+            refactoredMi.typeArguments().add(indexType);
+            refactoredMi.typeArguments().add(itemType);
         }
     }
 }
