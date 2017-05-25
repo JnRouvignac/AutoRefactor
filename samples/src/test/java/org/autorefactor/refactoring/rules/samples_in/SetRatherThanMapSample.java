@@ -73,7 +73,12 @@ public class SetRatherThanMapSample {
         aggregate.put("foo", "bar");
     }
 
-    public void refactorMethod() {
+    public boolean refactorMethod() {
+        // Keep this comment
+        return new HashMap<String, String>().containsKey("foo");
+    }
+
+    public void refactorVariableAndMethod() {
         // Keep this comment
         HashMap<String, String> aggregate = new HashMap<String, String>();
         // Keep this comment too
