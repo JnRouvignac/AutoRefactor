@@ -40,11 +40,13 @@ import static org.autorefactor.refactoring.ASTHelper.isCastCompatible;
 import static org.autorefactor.refactoring.ASTHelper.isMethod;
 import static org.autorefactor.refactoring.ASTHelper.isPrimitive;
 import static org.autorefactor.refactoring.ASTHelper.isSameLocalVariable;
+import static org.autorefactor.refactoring.ASTHelper.match;
 
 import java.util.List;
 
 import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.BlockSubVisitor;
+import org.eclipse.jdt.core.dom.ASTMatcher;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
@@ -112,7 +114,7 @@ public class MapRefactoring extends AbstractRefactoringRule {
         private boolean maybeReplaceInitializer(Expression nodeToReplace,
                 final Expression arg0, ExpressionStatement nodeToRemove) {
             final ClassInstanceCreation cic = as(nodeToReplace, ClassInstanceCreation.class);
-            if (canReplaceInitializer(cic)
+            if (canReplaceInitializer(cic, arg0)
                     && isCastCompatible(nodeToReplace, arg0)) {
                 final ASTBuilder b = getCtx().getASTBuilder();
                 getCtx().getRefactorings().replace(nodeToReplace,
@@ -124,13 +126,13 @@ public class MapRefactoring extends AbstractRefactoringRule {
             return VISIT_SUBTREE;
         }
 
-        private boolean canReplaceInitializer(final ClassInstanceCreation cic) {
+        private boolean canReplaceInitializer(final ClassInstanceCreation cic, final Expression sourceMap) {
             if (cic == null) {
                 return false;
             }
             final List<Expression> args = arguments(cic);
             final boolean noArgsCtor = args.size() == 0;
-            final boolean mapCapacityCtor = args.size() == 1 && isPrimitive(args.get(0), "int");
+            final boolean mapCapacityCtor = isValidCapacityParameter(sourceMap, args);
             if (noArgsCtor && hasType(cic,
                     "java.util.concurrent.ConcurrentHashMap",
                     "java.util.concurrent.ConcurrentSkipListMap",
@@ -149,8 +151,21 @@ public class MapRefactoring extends AbstractRefactoringRule {
                     "java.util.IdentityHashMap",
                     "java.util.LinkedHashMap",
                     "java.util.WeakHashMap")) {
-                // TODO JNR verify capacity arguments is 0, 1 or map.length
                 return true;
+            }
+            return false;
+        }
+
+        private boolean isValidCapacityParameter(Expression sourceMap, final List<Expression> args) {
+            if (args.size() == 1 && isPrimitive(args.get(0), "int")) {
+                final Object constant = args.get(0).resolveConstantExpressionValue();
+                final MethodInvocation mi = as(args.get(0), MethodInvocation.class);
+                if (constant != null) {
+                    return constant.equals(0);
+                } else  {
+                    return isMethod(mi, "java.util.Map", "size") && match(new ASTMatcher(),
+                            mi.getExpression(), sourceMap);
+                }
             }
             return false;
         }
