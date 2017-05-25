@@ -26,40 +26,60 @@
 package org.autorefactor.refactoring.rules.samples_in;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class MapSample {
 
     public void replaceNewNoArgsAssignmentThenPutAll(Map<String, String> map, Map<String, String> output) {
-        // Keep this comment 1
+        // Keep this comment
         output = new HashMap<String, String>();
         output.putAll(map);
     }
 
     public Map<String, String> replaceNewNoArgsThenPutAll(Map<String, String> map) {
-        // Keep this comment 1
+        // Keep this comment
         final Map<String, String> output = new HashMap<String, String>();
         output.putAll(map);
         return output;
     }
 
     public Map<String, String> replaceNew0ArgThenPutAll(Map<String, String> map) {
-        // Keep this comment 1
+        // Keep this comment
         final Map<String, String> output = new HashMap<String, String>(0);
         output.putAll(map);
         return output;
     }
 
     public Map<String, String> replaceNew1ArgThenPutAll(Map<String, String> map) {
-        // Keep this comment 1
+        // Keep this comment
         final Map<String, String> output = new HashMap<String, String>(0);
         output.putAll(map);
         return output;
     }
 
     public Map<String, String> replaceNewMapSizeThenPutAll(Map<String, String> map) {
-        // Keep this comment 1
+        // Keep this comment
         final Map<String, String> output = new HashMap<String, String>(map.size());
+        output.putAll(map);
+        return output;
+    }
+
+    public Map<String, String> replaceWithSizeOfSubMap(List<Map<String, String>> listOfMap) {
+        // Keep this comment
+        final Map<String, String> output = new HashMap<String, String>(listOfMap.get(0).size());
+        output.putAll(listOfMap.get(0));
+        return output;
+    }
+
+    public Map<String, String> doNotReplaceAlreadyInitedMap(Map<String, String> map1, Map<String, String> map2) {
+        final Map<String, String> output = new HashMap<String, String>(map1);
+        output.putAll(map2);
+        return output;
+    }
+
+    public Map<String, String> doNotReplaceWithSpecificSize(Map<String, String> map) {
+        final Map<String, String> output = new HashMap<String, String>(10);
         output.putAll(map);
         return output;
     }
