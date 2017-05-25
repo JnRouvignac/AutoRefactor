@@ -73,7 +73,12 @@ public class SetRatherThanMapSample {
         aggregate.add("foo");
     }
 
-    public void refactorMethod() {
+    public boolean refactorMethod() {
+        // Keep this comment
+        return new java.util.HashSet<String>().contains("foo");
+    }
+
+    public void refactorVariableAndMethod() {
         // Keep this comment
         java.util.HashSet<String> aggregate = new java.util.HashSet<String>();
         // Keep this comment too

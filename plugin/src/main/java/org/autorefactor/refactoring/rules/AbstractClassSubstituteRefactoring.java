@@ -217,7 +217,7 @@ public abstract class AbstractClassSubstituteRefactoring extends AbstractRefacto
             final List<MethodInvocation> methodCallsToRefactorWithVariable) {
         final ASTBuilder b = ctx.getASTBuilder();
 
-        if (variableDecls.isEmpty()) {
+        if (variableDecls.isEmpty() && methodCallsToRefactorAlone.isEmpty()) {
             final ClassInstanceCreation newInstanceCreation = b.copySubtree(originalInstanceCreation);
             refactorInstantiation(b, originalInstanceCreation, newInstanceCreation);
             ctx.getRefactorings().replace(originalInstanceCreation, newInstanceCreation);
