@@ -50,6 +50,11 @@ public class StringBuilderRatherThanStringBufferRefactoring extends AbstractClas
     }
 
     @Override
+    protected boolean canBeSharedInOtherThread() {
+        return false;
+    }
+
+    @Override
     protected String getExistingClassCanonicalName() {
         return "java.lang.StringBuffer";
     }

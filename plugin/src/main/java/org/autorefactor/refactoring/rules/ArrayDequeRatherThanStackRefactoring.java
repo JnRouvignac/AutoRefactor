@@ -53,6 +53,11 @@ public class ArrayDequeRatherThanStackRefactoring extends AbstractClassSubstitut
     }
 
     @Override
+    protected boolean canBeSharedInOtherThread() {
+        return false;
+    }
+
+    @Override
     protected String getExistingClassCanonicalName() {
         return "java.util.Stack";
     }

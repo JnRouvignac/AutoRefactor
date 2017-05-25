@@ -53,6 +53,11 @@ public class HashMapRatherThanHashtableRefactoring extends AbstractClassSubstitu
     }
 
     @Override
+    protected boolean canBeSharedInOtherThread() {
+        return false;
+    }
+
+    @Override
     protected String getExistingClassCanonicalName() {
         return "java.util.Hashtable";
     }

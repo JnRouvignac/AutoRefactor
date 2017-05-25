@@ -54,6 +54,11 @@ public class ArrayListRatherThanVectorRefactoring extends AbstractClassSubstitut
     }
 
     @Override
+    protected boolean canBeSharedInOtherThread() {
+        return false;
+    }
+
+    @Override
     protected String getExistingClassCanonicalName() {
         return "java.util.Vector";
     }

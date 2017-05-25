@@ -68,6 +68,15 @@ public abstract class AbstractClassSubstituteRefactoring extends AbstractRefacto
     protected abstract String getSubstitutingClassName();
 
     /**
+     * If a local variable can be used in a runnable.
+     *
+     * @return True if a local variable can be used in a runnable.
+     */
+    protected boolean canBeSharedInOtherThread() {
+        return true;
+    }
+
+    /**
      * If the instantiation can be refactored.
      *
      * @param instanceCreation The instantiation
@@ -120,6 +129,18 @@ public abstract class AbstractClassSubstituteRefactoring extends AbstractRefacto
      */
     protected void refactorMethod(final ASTBuilder b, final MethodInvocation originalMi,
             final MethodInvocation refactoredMi) {
+    }
+
+    /**
+     * Refactor the variable.
+     *
+     * @param b The builder
+     * @param oldDeclareStmt The original variable declaration
+     * @param newDeclareStmt The new variable declaration
+     */
+    protected void replaceVariableType(final ASTBuilder b, final VariableDeclarationStatement oldDeclareStmt,
+            final VariableDeclarationStatement newDeclareStmt) {
+        newDeclareStmt.setType(substituteType(b, oldDeclareStmt.getType()));
     }
 
     @Override
@@ -217,15 +238,10 @@ public abstract class AbstractClassSubstituteRefactoring extends AbstractRefacto
                 final VariableDeclarationStatement parent = (VariableDeclarationStatement) variableDecl.getParent();
                 final VariableDeclarationStatement newDeclareStmt = b.copySubtree(parent);
 
-                replaceVariableType(b, newDeclareStmt, parent);
+                replaceVariableType(b, parent, newDeclareStmt);
                 ctx.getRefactorings().replace(parent, newDeclareStmt);
             }
         }
-    }
-
-    private void replaceVariableType(final ASTBuilder b, final VariableDeclarationStatement newDeclareStmt,
-            final VariableDeclarationStatement oldDeclareStmt) {
-        newDeclareStmt.setType(substituteType(b, oldDeclareStmt.getType()));
     }
 
     private Type substituteType(final ASTBuilder b, final Type origType) {
@@ -271,13 +287,12 @@ public abstract class AbstractClassSubstituteRefactoring extends AbstractRefacto
                 return false;
             } else if (parentNode instanceof MethodInvocation) {
                 final MethodInvocation mi = (MethodInvocation) parentNode;
-                if (isObjectPassedInParameter(childNode, mi)) {
+                if (isObjectPassedInParameter(childNode, mi)
+                        || !canMethodBeRefactored(mi, localMethodCallsToRefactor)) {
                     return false;
-                } else if (canMethodBeRefactored(mi, localMethodCallsToRefactor)) {
-                    if (!isMethodReturningExistingClass(mi)) {
-                        methodCallsToRefactorAlone.addAll(localMethodCallsToRefactor);
-                        return true;
-                    }
+                } else if (!isMethodReturningExistingClass(mi)) {
+                    methodCallsToRefactorAlone.addAll(localMethodCallsToRefactor);
+                    return true;
                 }
             } else if ((parentNode instanceof CastExpression)
                     || (parentNode instanceof InstanceofExpression)) {
@@ -319,7 +334,7 @@ public abstract class AbstractClassSubstituteRefactoring extends AbstractRefacto
         }
     }
 
-    private static final class VarOccurrenceVisitor extends ASTVisitor {
+    private class VarOccurrenceVisitor extends ASTVisitor {
 
         private final VariableDeclaration varDecl;
         private final List<SimpleName> varOccurrences = new ArrayList<SimpleName>();
@@ -349,11 +364,13 @@ public abstract class AbstractClassSubstituteRefactoring extends AbstractRefacto
 
         @Override
         public boolean visit(AnonymousClassDeclaration node) {
-            final VariableDefinitionsUsesVisitor variableUseVisitor =
-                    new VariableDefinitionsUsesVisitor(varDecl.resolveBinding(), node).find();
-            if (!variableUseVisitor.getUses().isEmpty()) {
-                isUsedInAnnonymousClass = true;
-                return DO_NOT_VISIT_SUBTREE;
+            if (!canBeSharedInOtherThread()) {
+                final VariableDefinitionsUsesVisitor variableUseVisitor =
+                        new VariableDefinitionsUsesVisitor(varDecl.resolveBinding(), node).find();
+                if (!variableUseVisitor.getUses().isEmpty()) {
+                    isUsedInAnnonymousClass = true;
+                    return DO_NOT_VISIT_SUBTREE;
+                }
             }
             return VISIT_SUBTREE;
         }
