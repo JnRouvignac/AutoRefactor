@@ -69,21 +69,6 @@ public class StringBuilderRefactoring extends AbstractRefactoringRule {
         return "StringBuilder";
     }
 
-    private int getJavaMinorVersion() {
-        return ctx.getJavaProjectOptions().getJavaSERelease().getMinorVersion();
-    }
-
-    @Override
-    public boolean visit(ClassInstanceCreation node) {
-        if (getJavaMinorVersion() >= 5
-                && hasType(node, "java.lang.StringBuffer")) {
-            // TODO JNR replace with StringBuilder
-            // check that the current method return type is not StringBuffer
-            // do we need the CFG + live variable analysis first?
-        }
-        return VISIT_SUBTREE;
-    }
-
     @Override
     public boolean visit(InfixExpression node) {
         if (isStringConcat(node)) {
