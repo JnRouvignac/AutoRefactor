@@ -134,6 +134,7 @@ public final class AllRefactoringRules {
                 new JUnitAssertRefactoring(),
                 new ReplaceQualifiedNamesBySimpleNamesRefactoring(),
                 new RemoveEmptyLinesRefactoring(),
+                new AndroidDrawAllocationRefactoring(),
                 new AndroidWakeLockRefactoring(),
                 new AndroidViewHolderRefactoring(),
                 new EnumMapRatherThanHashMapRefactoring(),
