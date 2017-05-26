@@ -28,7 +28,6 @@ package org.autorefactor.refactoring.rules;
 import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
 import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
 
-import org.eclipse.jdt.core.dom.EmptyStatement;
 import org.eclipse.jdt.core.dom.SuperConstructorInvocation;
 
 /** See {@link #getDescription()} method. */
@@ -49,12 +48,8 @@ public class RemoveEmptySuperConstrInvocationRefactoring extends
     @Override
     public boolean visit(SuperConstructorInvocation node) {
         if (node.arguments().isEmpty()) {
-            // For some reason, deletion of super() invocation deletes comment on the previous line.
-            // Therefore it replaces node with empty statement and removes it afterwards. This trick
-            // has no impact on comments.
-            EmptyStatement tempStatement = node.getAST().newEmptyStatement();
-            ctx.getRefactorings().replace(node, tempStatement);
-            ctx.getRefactorings().remove(tempStatement);
+            // A replacement keeps  comments, contrary to remove
+            ctx.getRefactorings().replace(node, null);
             return DO_NOT_VISIT_SUBTREE;
         }
         return VISIT_SUBTREE;
