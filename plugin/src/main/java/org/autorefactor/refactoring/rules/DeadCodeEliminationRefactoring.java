@@ -34,6 +34,7 @@ import java.util.Set;
 
 import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.Refactorings;
+import org.eclipse.jdt.core.dom.ASTMatcher;
 import org.eclipse.jdt.core.dom.ArrayAccess;
 import org.eclipse.jdt.core.dom.ArrayCreation;
 import org.eclipse.jdt.core.dom.ArrayInitializer;
@@ -59,6 +60,8 @@ import org.eclipse.jdt.core.dom.TryStatement;
 import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
+import static org.eclipse.jdt.core.dom.InfixExpression.Operator.EQUALS;
+import static org.eclipse.jdt.core.dom.InfixExpression.Operator.NOT_EQUALS;
 import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.eclipse.jdt.core.dom.ASTNode.*;
 
@@ -112,7 +115,7 @@ public class DeadCodeEliminationRefactoring extends AbstractRefactoringRule {
             return DO_NOT_VISIT_SUBTREE;
         }
 
-        final Object constantCondition = condition.resolveConstantExpressionValue();
+        final Object constantCondition = peremptoryValue(condition);
         if (Boolean.TRUE.equals(constantCondition)) {
             return maybeInlineBlock(node, thenStmt);
         } else if (Boolean.FALSE.equals(constantCondition)) {
@@ -124,6 +127,22 @@ public class DeadCodeEliminationRefactoring extends AbstractRefactoringRule {
             return DO_NOT_VISIT_SUBTREE;
         }
         return VISIT_SUBTREE;
+    }
+
+    private Object peremptoryValue(final Expression condition) {
+        final Object constantCondition = condition.resolveConstantExpressionValue();
+        if (constantCondition != null) {
+            return constantCondition;
+        } else if (condition instanceof InfixExpression) {
+            InfixExpression ie = (InfixExpression) condition;
+            if ((EQUALS.equals(ie.getOperator())
+                    || NOT_EQUALS.equals(ie.getOperator()))
+                    && isPassive(ie.getLeftOperand())
+                    && match(new ASTMatcher(), ie.getLeftOperand(), ie.getRightOperand())) {
+                return EQUALS.equals(ie.getOperator());
+            }
+        }
+        return null;
     }
 
     private boolean maybeInlineBlock(final Statement node, final Statement unconditionnalStatement) {

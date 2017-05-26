@@ -29,6 +29,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.AbstractList;
 import java.util.Collection;
+import java.util.Date;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -94,6 +96,35 @@ public class DeadCodeEliminationSample {
     public int removeDeadCodeAfterIfTrueWithReturn(int i) {
         System.out.println(i);
         return 1;
+    }
+
+    public int removePeremptoryTest(int increment, int j, byte b, Long longObject, List<Date> anotherObject) {
+
+        // Keep this comment
+        increment++;
+
+        // Keep this comment
+        increment--;
+
+        // Keep this comment
+        increment++;
+
+        // Keep this comment
+        increment--;
+
+        // Keep this comment
+        increment++;
+
+        // Keep this comment
+        increment--;
+
+        // Keep this comment
+        increment++;
+
+        // Keep this comment
+        increment--;
+
+        return increment;
     }
 
     public int removeDeadCodeAfterEmbeddedIfTrueWithThrow(int i) {
