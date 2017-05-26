@@ -29,6 +29,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.AbstractList;
 import java.util.Collection;
+import java.util.Date;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -122,6 +124,67 @@ public class DeadCodeEliminationSample {
             return 1;
         }
         return 2;
+    }
+
+    public int removePeremptoryTest(int increment, int j, byte b, Long longObject, List<Date> anotherObject) {
+
+        // Keep this comment
+        if (j == j) {
+            increment++;
+        } else {
+            increment--;
+        }
+
+        // Keep this comment
+        if (j != j) {
+            increment++;
+        } else {
+            increment--;
+        }
+
+        // Keep this comment
+        if (b == b) {
+            increment++;
+        } else {
+            increment--;
+        }
+
+        // Keep this comment
+        if (b != b) {
+            increment++;
+        } else {
+            increment--;
+        }
+
+        // Keep this comment
+        if (longObject == longObject) {
+            increment++;
+        } else {
+            increment--;
+        }
+
+        // Keep this comment
+        if (longObject != longObject) {
+            increment++;
+        } else {
+            increment--;
+        }
+
+        // Keep this comment
+        if (anotherObject == anotherObject) {
+            increment++;
+        } else {
+            increment--;
+        }
+
+        // Keep this comment
+        if (anotherObject != anotherObject) {
+            increment++;
+        } else {
+            increment--;
+        }
+
+        return increment;
     }
 
     public int removeDeadCodeAfterEmbeddedIfTrueWithThrow(int i) {
