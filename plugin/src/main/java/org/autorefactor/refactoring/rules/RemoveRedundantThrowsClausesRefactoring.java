@@ -32,11 +32,11 @@ import static org.autorefactor.refactoring.ASTHelper.instanceOf;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.autorefactor.preferences.Preferences;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.Name;
-import org.eclipse.jdt.core.dom.Type;
 
 /** See {@link #getDescription()} method. */
 public final class RemoveRedundantThrowsClausesRefactoring extends AbstractRefactoringRule {
@@ -52,14 +52,14 @@ public final class RemoveRedundantThrowsClausesRefactoring extends AbstractRefac
     }
 
     @Override
+    public boolean isEnabled(Preferences preferences) {
+        // TODO: AST.JLS4 is deprecated for Java 8+, remove check for java8 implementation
+        return super.isEnabled(preferences) && ctx.getAST().apiLevel() <= AST.JLS4;
+    }
+
+    @Override
     public boolean visit(MethodDeclaration node) {
-        boolean versionIs8orHigher = ctx.getAST().apiLevel() >= AST.JLS8;
-        final List<ASTNode> nodesToRemove;
-        if (versionIs8orHigher) {
-            nodesToRemove = getForVersion8orHigher(node);
-        } else {
-            nodesToRemove = getForVersion7orLower(node);
-        }
+        List<ASTNode> nodesToRemove = getUncheckedExceptions(node);
         if (!nodesToRemove.isEmpty()) {
             for (ASTNode n:nodesToRemove) {
                 ctx.getRefactorings().replace(n, null);
@@ -69,29 +69,28 @@ public final class RemoveRedundantThrowsClausesRefactoring extends AbstractRefac
         return VISIT_SUBTREE;
     }
 
-    private List<ASTNode> getForVersion8orHigher(MethodDeclaration node) {
-        List<Type> exceptions = node.thrownExceptionTypes();
+
+    /**
+     * Returns list of unchecked exception nodes in this method declaration (below JLS8 API only).
+     *
+     * @exception UnsupportedOperationException
+     *                if this operation is used in a JLS8 or later AST In the JLS8 API,<br>
+     *                this method is replaced by {@link MethodDeclaration#thrownExceptionTypes}.
+     */
+    private List<ASTNode> getUncheckedExceptions(MethodDeclaration node) {
         List<ASTNode> result = new ArrayList<ASTNode>();
-        for (Type t:exceptions) {
-            if (instanceOf(t.resolveBinding(), "java.lang.RuntimeException")
-                    || instanceOf(t.resolveBinding(), "java.lang.Error")) {
-                result.add(t);
+        // TODO: add a check for api level and invoke corresponding method
+        List<Name> exceptions = node.thrownExceptions();
+        for (Name n:exceptions) {
+            if (isUnchecked(n)) {
+                result.add(n);
             }
         }
         return result;
     }
 
-    private List<ASTNode> getForVersion7orLower(MethodDeclaration node) {
-        // will not be invoked for version >= 8
-        @SuppressWarnings({ "deprecation" })
-        List<Name> exceptions = node.thrownExceptions();
-        List<ASTNode> result = new ArrayList<ASTNode>();
-        for (Name n:exceptions) {
-            if (instanceOf(n, "java.lang.RuntimeException")
-                    || instanceOf(n, "java.lang.Error")) {
-                result.add(n);
-            }
-        }
-        return result;
+    private boolean isUnchecked(Name n) {
+        return instanceOf(n, "java.lang.RuntimeException")
+                || instanceOf(n, "java.lang.Error");
     }
 }
