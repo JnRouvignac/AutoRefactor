@@ -187,6 +187,18 @@ public class DeadCodeEliminationSample {
         return increment;
     }
 
+    public int doNotRemoveRealTest(int increment, int i, int j) {
+
+        // Keep this comment
+        if (i == j) {
+            increment++;
+        } else {
+            increment--;
+        }
+
+        return increment;
+    }
+
     public int removeDeadCodeAfterEmbeddedIfTrueWithThrow(int i) {
         if (true) {
             if (true) {
