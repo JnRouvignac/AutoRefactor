@@ -1,6 +1,10 @@
 AutoRefactor contributors (sorted alphabeticaly)
 ================================================
 
+* **[Andrei Paikin](https://github.com/strkkk)**
+
+  * Added some refactoring rules
+
 * **[Luís Cruz](https://github.com/luiscruz)**
 
   * Added Android refactoring rules
