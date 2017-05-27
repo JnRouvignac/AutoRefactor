@@ -34,7 +34,6 @@ import java.util.List;
 
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
-import org.eclipse.jdt.core.dom.EmptyStatement;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.Name;
 import org.eclipse.jdt.core.dom.Type;
@@ -52,19 +51,6 @@ public final class RemoveRedundantThrowsClausesRefactoring extends AbstractRefac
         return "Remove unchecked exceptions from throws clause";
     }
 
-    /**
-     * Checks method declaration and removes unchecked exception if there are some <br>
-     * <br>
-     * API to get exceptions thrown by method is deprecated <br>
-     * for api level below JLS8, so it is necessary to check version first. <br>
-     *
-     * @see {@link MethodDeclaration#thrownExceptions()}
-     * @see {@link MethodDeclaration#thrownExceptionTypes()}
-     *
-     * @param node
-     *            method declaration to visit
-     * @return continue visiting or not
-     */
     @Override
     public boolean visit(MethodDeclaration node) {
         boolean versionIs8orHigher = ctx.getAST().apiLevel() >= AST.JLS8;
@@ -76,11 +62,7 @@ public final class RemoveRedundantThrowsClausesRefactoring extends AbstractRefac
         }
         if (!nodesToRemove.isEmpty()) {
             for (ASTNode n:nodesToRemove) {
-                // small hack - if just remove node, it can delete line above method declaration.
-                EmptyStatement tempEmptyStatement = ctx.getAST().newEmptyStatement();
-                ctx.getRefactorings().replace(
-                        n, tempEmptyStatement);
-                ctx.getRefactorings().remove(tempEmptyStatement);
+                ctx.getRefactorings().replace(n, null);
             }
             return DO_NOT_VISIT_SUBTREE;
         }
