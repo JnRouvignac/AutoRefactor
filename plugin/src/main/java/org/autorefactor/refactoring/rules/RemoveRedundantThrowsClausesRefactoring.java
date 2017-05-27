@@ -53,22 +53,27 @@ public final class RemoveRedundantThrowsClausesRefactoring extends AbstractRefac
 
     @Override
     public boolean isEnabled(Preferences preferences) {
-        // TODO: AST.JLS4 is deprecated for Java 8+, remove check for java8 implementation
-        return super.isEnabled(preferences) && ctx.getAST().apiLevel() <= AST.JLS4;
+        // TODO: remove check for java8 implementation
+        return super.isEnabled(preferences) && apiLevel7orLower();
+    }
+
+    private boolean apiLevel7orLower() {
+        return ctx.getAST().apiLevel() <= AST.JLS4;
     }
 
     @Override
     public boolean visit(MethodDeclaration node) {
-        List<ASTNode> nodesToRemove = getUncheckedExceptions(node);
-        if (!nodesToRemove.isEmpty()) {
-            for (ASTNode n:nodesToRemove) {
-                ctx.getRefactorings().replace(n, null);
+        if (apiLevel7orLower()) {
+            List<ASTNode> nodesToRemove = getUncheckedExceptions(node);
+            if (!nodesToRemove.isEmpty()) {
+                for (ASTNode n:nodesToRemove) {
+                    ctx.getRefactorings().replace(n, null);
+                }
+                return DO_NOT_VISIT_SUBTREE;
             }
-            return DO_NOT_VISIT_SUBTREE;
         }
         return VISIT_SUBTREE;
     }
-
 
     /**
      * Returns list of unchecked exception nodes in this method declaration (below JLS8 API only).
