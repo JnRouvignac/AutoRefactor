@@ -39,7 +39,7 @@ import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.Name;
 
 /** See {@link #getDescription()} method. */
-public final class RemoveRedundantThrowsClausesRefactoring extends AbstractRefactoringRule {
+public final class RemoveUncheckedThrowsClausesRefactoring extends AbstractRefactoringRule {
 
     @Override
     public String getDescription() {
