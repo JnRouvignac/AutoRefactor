@@ -27,7 +27,7 @@ package org.autorefactor.refactoring.rules.samples_out;
 
 import java.sql.SQLException;
 
-public class RemoveRedundantThrowsClausesSample {
+public class RemoveUncheckedThrowsClausesSample {
 
     public void refactorMethod() throws Exception {
         // some code
@@ -42,12 +42,12 @@ public class RemoveRedundantThrowsClausesSample {
     }
 
     // remove unchecked descendants from constructor
-    public RemoveRedundantThrowsClausesSample() throws SQLException {
+    public RemoveUncheckedThrowsClausesSample() throws SQLException {
         // some code
     }
 
     // remove unchecked from constructor
-    public RemoveRedundantThrowsClausesSample(int i)
+    public RemoveUncheckedThrowsClausesSample(int i)
             throws Exception {
         // some code
     }

@@ -139,7 +139,7 @@ public final class AllRefactoringRules {
                 new AndroidViewHolderRefactoring(),
                 new EnumMapRatherThanHashMapRefactoring(),
                 new EnumSetRatherThanHashSetRefactoring(),
-                new RemoveRedundantThrowsClausesRefactoring(),
+                new RemoveUncheckedThrowsClausesRefactoring(),
                 new SwitchRefactoring());
     }
 
