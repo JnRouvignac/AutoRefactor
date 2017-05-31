@@ -118,6 +118,7 @@ public final class AllRefactoringRules {
                 new ArrayListRatherThanVectorRefactoring(),
                 new ArrayDequeRatherThanStackRefactoring(),
                 new SetRatherThanMapRefactoring(),
+                new ArrayListRatherThanLinkedListRefactoring(),
                 new UseStringContainsRefactoring(),
                 new PushNegationDownRefactoring(),
                 new CommentsRefactoring(),
