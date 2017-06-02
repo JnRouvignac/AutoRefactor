@@ -26,6 +26,16 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import static org.autorefactor.refactoring.ASTHelper.*;
+import static org.eclipse.jdt.core.dom.ASTNode.*;
+import static org.eclipse.jdt.core.dom.IBinding.METHOD;
+import static org.eclipse.jdt.core.dom.IBinding.TYPE;
+import static org.eclipse.jdt.core.dom.IBinding.VARIABLE;
+import static org.eclipse.jdt.core.dom.Modifier.*;
+import static org.eclipse.jdt.core.search.IJavaSearchConstants.*;
+import static org.eclipse.jdt.core.search.SearchEngine.*;
+import static org.eclipse.jdt.core.search.SearchPattern.*;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -66,16 +76,6 @@ import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.search.SearchEngine;
 import org.eclipse.jdt.core.search.TypeNameMatch;
 import org.eclipse.jdt.core.search.TypeNameMatchRequestor;
-
-import static org.autorefactor.refactoring.ASTHelper.*;
-import static org.eclipse.jdt.core.dom.ASTNode.*;
-import static org.eclipse.jdt.core.dom.IBinding.METHOD;
-import static org.eclipse.jdt.core.dom.IBinding.TYPE;
-import static org.eclipse.jdt.core.dom.IBinding.VARIABLE;
-import static org.eclipse.jdt.core.dom.Modifier.*;
-import static org.eclipse.jdt.core.search.IJavaSearchConstants.*;
-import static org.eclipse.jdt.core.search.SearchEngine.*;
-import static org.eclipse.jdt.core.search.SearchPattern.*;
 
 /** See {@link #getDescription()} method. */
 public class ReplaceQualifiedNamesBySimpleNamesRefactoring extends AbstractRefactoringRule {
@@ -212,7 +212,10 @@ public class ReplaceQualifiedNamesBySimpleNamesRefactoring extends AbstractRefac
                 return false;
 
             case 1:
-                return fullyQualifiedName.equals(matches.get(0).fullyQualifiedName);
+                if (!matches.get(0).isMember()) {
+                    return fullyQualifiedName.equals(matches.get(0).fullyQualifiedName);
+                }
+                //$FALL-THROUGH$
 
             default:
                 final ITypeBinding enclosingTypeBinding = resolveEnclosingTypeBinding(node);

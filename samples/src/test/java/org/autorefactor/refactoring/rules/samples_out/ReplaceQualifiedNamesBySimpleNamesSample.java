@@ -216,6 +216,28 @@ public class ReplaceQualifiedNamesBySimpleNamesSample {
         Outer.property = property;
         Outer.NestedOuter.property = property;
     }
+
+    static class Inner {
+        static class InnerInner {
+            // empty
+        }
+        private static final Inner INSTANCE = new Inner();
+        private static Inner getInstance() {
+            return INSTANCE;
+        }
+    }
+
+    public String doNotReplaceFieldUseOfInnerClass() {
+        return Inner.INSTANCE.toString();
+    }
+
+    public String doNotReplaceMethodUseOfInnerClass() {
+        return Inner.getInstance().toString();
+    }
+
+    public Class<Inner.InnerInner> doNotReplaceTypeUseOfInnerClass() {
+        return Inner.InnerInner.class;
+    }
 }
 
 class Outer {
