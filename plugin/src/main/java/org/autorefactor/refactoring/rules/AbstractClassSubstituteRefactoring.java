@@ -29,6 +29,16 @@ package org.autorefactor.refactoring.rules;
 import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
 import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
 import static org.autorefactor.refactoring.ASTHelper.hasType;
+import static org.eclipse.jdt.core.dom.ASTNode.ASSIGNMENT;
+import static org.eclipse.jdt.core.dom.ASTNode.CAST_EXPRESSION;
+import static org.eclipse.jdt.core.dom.ASTNode.INSTANCEOF_EXPRESSION;
+import static org.eclipse.jdt.core.dom.ASTNode.METHOD_INVOCATION;
+import static org.eclipse.jdt.core.dom.ASTNode.PARENTHESIZED_EXPRESSION;
+import static org.eclipse.jdt.core.dom.ASTNode.RETURN_STATEMENT;
+import static org.eclipse.jdt.core.dom.ASTNode.SINGLE_VARIABLE_DECLARATION;
+import static org.eclipse.jdt.core.dom.ASTNode.VARIABLE_DECLARATION_EXPRESSION;
+import static org.eclipse.jdt.core.dom.ASTNode.VARIABLE_DECLARATION_FRAGMENT;
+import static org.eclipse.jdt.core.dom.ASTNode.VARIABLE_DECLARATION_STATEMENT;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,15 +47,10 @@ import org.autorefactor.refactoring.ASTBuilder;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
-import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Block;
-import org.eclipse.jdt.core.dom.CastExpression;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.ITypeBinding;
-import org.eclipse.jdt.core.dom.InstanceofExpression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
-import org.eclipse.jdt.core.dom.ParenthesizedExpression;
-import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.VariableDeclaration;
@@ -143,6 +148,15 @@ public abstract class AbstractClassSubstituteRefactoring extends AbstractRefacto
         newDeclareStmt.setType(substituteType(b, oldDeclareStmt.getType()));
     }
 
+    /**
+     * If the refactoring can be done.
+     *
+     * @return True if refactoring can be done.
+     */
+    protected boolean canCodeBeRefactored() {
+        return true;
+    }
+
     @Override
     public boolean visit(Block node) {
         final ObjectInstantiationVisitor classCreationVisitor = new ObjectInstantiationVisitor();
@@ -156,7 +170,8 @@ public abstract class AbstractClassSubstituteRefactoring extends AbstractRefacto
             if (canInstantiationBeRefactored(instanceCreation)
                     && canBeRefactored(node, instanceCreation, varDecls,
                             methodCallsToRefactorAlone,
-                            methodCallsToRefactorWithVariable)) {
+                            methodCallsToRefactorWithVariable)
+                    && canCodeBeRefactored()) {
                 replaceClass(instanceCreation, varDecls, methodCallsToRefactorAlone,
                         methodCallsToRefactorWithVariable);
                 return DO_NOT_VISIT_SUBTREE;
@@ -272,10 +287,16 @@ public abstract class AbstractClassSubstituteRefactoring extends AbstractRefacto
         do {
             ASTNode parentNode = childNode.getParent();
 
-            if (parentNode instanceof ReturnStatement
-                    || parentNode instanceof Assignment) {
+            switch (parentNode.getNodeType()) {
+            case ASSIGNMENT:
+            case RETURN_STATEMENT:
+            case CAST_EXPRESSION:
+            case INSTANCEOF_EXPRESSION:
                 return false;
-            } else if (parentNode instanceof VariableDeclaration) {
+            case SINGLE_VARIABLE_DECLARATION:
+            case VARIABLE_DECLARATION_EXPRESSION:
+            case VARIABLE_DECLARATION_FRAGMENT:
+            case VARIABLE_DECLARATION_STATEMENT:
                 final VariableDeclaration varDecl = (VariableDeclaration) parentNode;
                 final VariableDeclarationStatement variableDeclaration =
                         (VariableDeclarationStatement) varDecl.getParent();
@@ -285,7 +306,7 @@ public abstract class AbstractClassSubstituteRefactoring extends AbstractRefacto
                     return true;
                 }
                 return false;
-            } else if (parentNode instanceof MethodInvocation) {
+            case METHOD_INVOCATION:
                 final MethodInvocation mi = (MethodInvocation) parentNode;
                 if (isObjectPassedInParameter(childNode, mi)
                         || !canMethodBeRefactored(mi, localMethodCallsToRefactor)) {
@@ -294,10 +315,10 @@ public abstract class AbstractClassSubstituteRefactoring extends AbstractRefacto
                     methodCallsToRefactorAlone.addAll(localMethodCallsToRefactor);
                     return true;
                 }
-            } else if ((parentNode instanceof CastExpression)
-                    || (parentNode instanceof InstanceofExpression)) {
-                return false;
-            } else if (!(parentNode instanceof ParenthesizedExpression)) {
+                break;
+            case PARENTHESIZED_EXPRESSION:
+                break;
+            default:
                 methodCallsToRefactorAlone.addAll(localMethodCallsToRefactor);
                 return true;
             }
