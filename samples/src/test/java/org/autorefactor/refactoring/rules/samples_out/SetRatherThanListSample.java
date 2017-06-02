@@ -25,55 +25,42 @@
  */
 package org.autorefactor.refactoring.rules.samples_out;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.Iterator;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Observable;
-import java.util.Spliterator;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
 
 public class SetRatherThanListSample {
 
     public void replaceArrayListInstanceCreation() {
-        // Keep this comment
-        boolean isFooContained = new java.util.HashSet<String>().contains("foo");
-        // Keep this comment too
-        boolean isBarContained = new java.util.HashSet<String>(new java.util.ArrayList<String>()).contains("bar");
+        new java.util.HashSet<String>().contains("foo");
+        new java.util.HashSet<String>(new java.util.ArrayList<String>()).contains("bar");
     }
 
     public void replaceOnlyWithContainsMethod() {
-        // Keep this comment
-        boolean isFooContained = new java.util.HashSet<String>().contains("foo");
-        boolean isBarContained = new ArrayList<String>().isEmpty();
+        new java.util.HashSet<String>().contains("foo");
+        new ArrayList<String>().isEmpty();
     }
 
     public void replaceRawArrayList() {
-        // Keep this comment
-        boolean isFooContained = new java.util.HashSet().contains("foo");
-        // Keep this comment too
-        boolean isBarContained = new java.util.HashSet(new java.util.ArrayList<String>()).contains("bar");
+        new java.util.HashSet().contains("foo");
+        new java.util.HashSet(new java.util.ArrayList<String>()).contains("bar");
     }
 
     public void replaceFullyQualifiedArrayList() {
-        // Keep this comment
-        boolean isFooContained = new java.util.HashSet<Date>().contains("foo");
-        // Keep this comment too
-        boolean isBarContained = new java.util.HashSet(10).contains("bar");
+        new java.util.HashSet<Date>().contains("foo");
+        new java.util.HashSet(10).contains("bar");
     }
 
     public void doNotReplaceArrayListVariableDeclaration() {
-        // Keep this comment
-        ArrayList<String> collection = new ArrayList<String>();
+        new ArrayList<String>();
     }
 
     public void doNotReplaceInterface() {
-        // Keep this comment
-        List<String> collection = new ArrayList<String>();
+        new ArrayList<String>();
     }
 
     public void replaceArrayListVariableUse() {
@@ -134,7 +121,7 @@ public class SetRatherThanListSample {
     }
 
     public void doNotReplaceArrayListPassedToAMethod() {
-        String text = String.valueOf(new ArrayList<String>());
+        String.valueOf(new ArrayList<String>());
     }
 
     public ArrayList<Date> doNotReplaceReturnedArrayList() {
@@ -142,8 +129,8 @@ public class SetRatherThanListSample {
     }
 
     public void doNotReplaceReassignedVariable() {
-        ArrayList<String> list = new ArrayList<String>();
-        list = new ArrayList<String>();
+        new ArrayList<String>();
+        new ArrayList<String>();
     }
 
     public void doNotReplaceEnsureCapacity(int index) {
@@ -206,17 +193,17 @@ public class SetRatherThanListSample {
         return list.removeAll(c);
     }
 
-    public boolean doNotReplaceRemoveIf(Predicate<String> filter) {
-        ArrayList<String> list = new ArrayList<String>();
-        list.contains("bar");
-        return list.removeIf(filter);
-    }
-
-    public void doNotReplaceReplaceAll(UnaryOperator<String> operator) {
-        ArrayList<String> list = new ArrayList<String>();
-        list.contains("bar");
-        list.replaceAll(operator);
-    }
+//    public boolean doNotReplaceRemoveIf(Predicate<String> filter) {
+//        ArrayList<String> list = new ArrayList<String>();
+//        list.contains("bar");
+//        return list.removeIf(filter);
+//    }
+//
+//    public void doNotReplaceReplaceAll(UnaryOperator<String> operator) {
+//        ArrayList<String> list = new ArrayList<String>();
+//        list.contains("bar");
+//        list.replaceAll(operator);
+//    }
 
     public boolean doNotReplaceRetainAll(Collection<?> c) {
         ArrayList<String> list = new ArrayList<String>();
@@ -236,17 +223,17 @@ public class SetRatherThanListSample {
         return list.size();
     }
 
-    public void doNotReplaceSort(Comparator<String> comparator) {
-        ArrayList<String> list = new ArrayList<String>();
-        list.contains("bar");
-        list.sort(comparator);
-    }
-
-    public Spliterator<String> doNotReplaceSpliterator() {
-        ArrayList<String> list = new ArrayList<String>();
-        list.contains("bar");
-        return list.spliterator();
-    }
+//    public void doNotReplaceSort(Comparator<String> comparator) {
+//        ArrayList<String> list = new ArrayList<String>();
+//        list.contains("bar");
+//        list.sort(comparator);
+//    }
+//
+//    public Spliterator<String> doNotReplaceSpliterator() {
+//        ArrayList<String> list = new ArrayList<String>();
+//        list.contains("bar");
+//        return list.spliterator();
+//    }
 
     public List<String> doNotReplaceSubList(int fromIndex, int toIndex) {
         ArrayList<String> list = new ArrayList<String>();
