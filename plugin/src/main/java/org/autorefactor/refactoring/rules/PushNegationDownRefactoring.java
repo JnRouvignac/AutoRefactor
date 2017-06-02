@@ -35,6 +35,7 @@ import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.InfixExpression.Operator;
 import org.eclipse.jdt.core.dom.PrefixExpression;
+import org.eclipse.jdt.core.dom.QualifiedName;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.eclipse.jdt.core.dom.PrefixExpression.Operator.*;
@@ -58,6 +59,7 @@ public class PushNegationDownRefactoring extends AbstractRefactoringRule {
         }
         final ASTBuilder b = ctx.getASTBuilder();
         final Refactorings r = ctx.getRefactorings();
+
         final Expression operand = removeParentheses(node.getOperand());
         if (operand instanceof PrefixExpression) {
             final PrefixExpression pe = (PrefixExpression) operand;
@@ -76,11 +78,20 @@ public class PushNegationDownRefactoring extends AbstractRefactoringRule {
                         it.set(b.negate(it.next()));
                     }
                     r.replace(node, b.parenthesize(b.infixExpr(reverseOp, allOperands)));
-                    return DO_NOT_VISIT_SUBTREE;
                 } else {
                     r.replace(node, b.parenthesize(b.infixExpr(reverseOp, b.move(allOperands))));
-                    return DO_NOT_VISIT_SUBTREE;
                 }
+                return DO_NOT_VISIT_SUBTREE;
+            }
+        } else {
+            final Object literal = operand.resolveConstantExpressionValue();
+            final QualifiedName constant = as(operand, QualifiedName.class);
+            if (Boolean.TRUE.equals(literal) || isField(constant, "java.lang.Boolean", "TRUE")) {
+                r.replace(node, b.boolean0(false));
+                return DO_NOT_VISIT_SUBTREE;
+            } else if (Boolean.FALSE.equals(literal) || isField(constant, "java.lang.Boolean", "FALSE")) {
+                r.replace(node, b.boolean0(true));
+                return DO_NOT_VISIT_SUBTREE;
             }
         }
         return VISIT_SUBTREE;

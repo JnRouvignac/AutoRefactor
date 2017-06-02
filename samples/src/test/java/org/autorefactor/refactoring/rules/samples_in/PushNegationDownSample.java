@@ -25,11 +25,20 @@
  */
 package org.autorefactor.refactoring.rules.samples_in;
 
-
 public class PushNegationDownSample {
 
     public boolean replaceDoubleNegation(boolean b) {
         return !!b;
+    }
+
+    public boolean reduceLiteralExpression() {
+        boolean b = !Boolean.TRUE;
+        return !Boolean.FALSE;
+    }
+
+    public boolean reduceConstantExpression() {
+        boolean b = !true;
+        return !false;
     }
 
     public boolean replaceDoubleNegationWithParentheses(boolean b) {
