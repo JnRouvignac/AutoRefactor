@@ -141,6 +141,7 @@ public final class AllRefactoringRules {
                 new EnumMapRatherThanHashMapRefactoring(),
                 new EnumSetRatherThanHashSetRefactoring(),
                 new RemoveUncheckedThrowsClausesRefactoring(),
+                new CapitalizeLongLiteralRefactoring(),
                 new SwitchRefactoring());
     }
 
