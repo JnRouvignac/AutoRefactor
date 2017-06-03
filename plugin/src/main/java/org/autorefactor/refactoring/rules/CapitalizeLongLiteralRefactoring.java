@@ -29,7 +29,11 @@ import static org.autorefactor.refactoring.ASTHelper.*;
 
 import org.eclipse.jdt.core.dom.NumberLiteral;
 
-/** See {@link #getDescription()} method. */
+/**
+ * See {@link #getDescription()} method.
+ *
+ * This rule refactors the Sonar squid:LowerCaseLongSuffixCheck.
+ */
 public class CapitalizeLongLiteralRefactoring extends AbstractRefactoringRule {
 
     @Override
