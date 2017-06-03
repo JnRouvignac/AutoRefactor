@@ -68,4 +68,28 @@ public class PushNegationDownSample {
     public boolean doNotNegateNonBooleanPrimitiveExprs(Boolean b) {
         return (b == null /* another refactoring removes the parentheses */);
     }
+
+    public boolean replaceNegationAndLessOperator(int i1, int i2) {
+        return (i1 >= i2 /* another refactoring removes the parentheses */);
+    }
+
+    public boolean replaceNegationAndLessEqualOperator(int i1, int i2) {
+        return (i1 > i2 /* another refactoring removes the parentheses */);
+    }
+
+    public boolean replaceNegationAndGreaterOperator(int i1, int i2) {
+        return (i1 <= i2 /* another refactoring removes the parentheses */);
+    }
+
+    public boolean replaceNegationAndGreaterEqualOperator(int i1, int i2) {
+        return (i1 < i2 /* another refactoring removes the parentheses */);
+    }
+
+    public boolean replaceNegationAndEqualOperator(int i1, int i2) {
+        return (i1 != i2 /* another refactoring removes the parentheses */);
+    }
+
+    public boolean replaceNegationAndNotEqualOperator(int i1, int i2) {
+        return (i1 == i2 /* another refactoring removes the parentheses */);
+    }
 }

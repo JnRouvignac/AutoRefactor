@@ -25,6 +25,15 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.allOperands;
+import static org.autorefactor.refactoring.ASTHelper.getBooleanLiteral;
+import static org.autorefactor.refactoring.ASTHelper.hasOperator;
+import static org.autorefactor.refactoring.ASTHelper.hasType;
+import static org.autorefactor.refactoring.ASTHelper.removeParentheses;
+import static org.eclipse.jdt.core.dom.PrefixExpression.Operator.NOT;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
@@ -35,10 +44,6 @@ import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.InfixExpression.Operator;
 import org.eclipse.jdt.core.dom.PrefixExpression;
-import org.eclipse.jdt.core.dom.QualifiedName;
-
-import static org.autorefactor.refactoring.ASTHelper.*;
-import static org.eclipse.jdt.core.dom.PrefixExpression.Operator.*;
 
 /** See {@link #getDescription()} method. */
 public class PushNegationDownRefactoring extends AbstractRefactoringRule {
@@ -84,13 +89,9 @@ public class PushNegationDownRefactoring extends AbstractRefactoringRule {
                 return DO_NOT_VISIT_SUBTREE;
             }
         } else {
-            final Object literal = operand.resolveConstantExpressionValue();
-            final QualifiedName constant = as(operand, QualifiedName.class);
-            if (Boolean.TRUE.equals(literal) || isField(constant, "java.lang.Boolean", "TRUE")) {
-                r.replace(node, b.boolean0(false));
-                return DO_NOT_VISIT_SUBTREE;
-            } else if (Boolean.FALSE.equals(literal) || isField(constant, "java.lang.Boolean", "FALSE")) {
-                r.replace(node, b.boolean0(true));
+            final Boolean constant = getBooleanLiteral(operand);
+            if (constant != null) {
+                r.replace(node, b.boolean0(!constant));
                 return DO_NOT_VISIT_SUBTREE;
             }
         }
