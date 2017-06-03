@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.ListIterator;
 
 import org.autorefactor.refactoring.ASTBuilder;
+import org.autorefactor.refactoring.Refactorings;
 import org.autorefactor.util.Pair;
 import org.eclipse.jdt.core.dom.ASTMatcher;
 import org.eclipse.jdt.core.dom.ASTNode;
@@ -44,6 +45,7 @@ import org.eclipse.jdt.core.dom.InfixExpression.Operator;
 import org.eclipse.jdt.core.dom.InstanceofExpression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.ParenthesizedExpression;
+import org.eclipse.jdt.core.dom.PrefixExpression;
 import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.WhileStatement;
@@ -51,6 +53,7 @@ import org.eclipse.jdt.core.dom.WhileStatement;
 import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.autorefactor.util.Utils.*;
 import static org.eclipse.jdt.core.dom.InfixExpression.Operator.*;
+import static org.eclipse.jdt.core.dom.PrefixExpression.Operator.*;
 
 /** See {@link #getDescription()} method. */
 public class SimplifyExpressionRefactoring extends AbstractRefactoringRule {
@@ -61,7 +64,8 @@ public class SimplifyExpressionRefactoring extends AbstractRefactoringRule {
             + "Simplifies Java expressions:\n"
             + "- remove redundant null checks or useless right-hand side or left-hand sie operands,\n"
             + "- remove useless parentheses,\n"
-            + "- directly check boolean values instead of comparing tham with true/false.";
+            + "- directly check boolean values instead of comparing them with true/false,\n"
+            + "- reduce double negation in boolean expression.";
     }
 
     @Override
@@ -92,8 +96,6 @@ public class SimplifyExpressionRefactoring extends AbstractRefactoringRule {
     // PostFixExpression?)
     // 3) Around CastExpression
     // Any others?
-
-    // TODO JNR !true => false and !false => true
 
     // TODO JNR String s = "some " + " string " + "" + ( "fhj" + "prout" );
 
@@ -253,28 +255,9 @@ public class SimplifyExpressionRefactoring extends AbstractRefactoringRule {
                     return replaceBy(node, lhs);
                 }
             }
-        } else if (hasOperator(node, EQUALS)) {
-            boolean result = VISIT_SUBTREE;
-            final Boolean blo = getBooleanLiteral(lhs);
-            final Boolean bro = getBooleanLiteral(rhs);
-            if (blo != null) {
-                result = replace(node, !blo.booleanValue(), rhs);
-            } else if (bro != null) {
-                result = replace(node, !bro.booleanValue(), lhs);
-            }
-            if (result == DO_NOT_VISIT_SUBTREE) {
-                return DO_NOT_VISIT_SUBTREE;
-            }
-        } else if (hasOperator(node, NOT_EQUALS)) {
-            boolean continueVisit = VISIT_SUBTREE;
-            final Boolean blo = getBooleanLiteral(lhs);
-            final Boolean bro = getBooleanLiteral(rhs);
-            if (blo != null) {
-                continueVisit = replace(node, blo.booleanValue(), rhs);
-            } else if (bro != null) {
-                continueVisit = replace(node, bro.booleanValue(), lhs);
-            }
-            if (!continueVisit) {
+        } else if ((hasOperator(node, EQUALS) || hasOperator(node, NOT_EQUALS) || hasOperator(node, XOR))
+                && !node.hasExtendedOperands()) {
+            if (maybeReduceBooleanExpression(node, lhs, rhs) == DO_NOT_VISIT_SUBTREE) {
                 return DO_NOT_VISIT_SUBTREE;
             }
         }
@@ -284,6 +267,86 @@ public class SimplifyExpressionRefactoring extends AbstractRefactoringRule {
             return DO_NOT_VISIT_SUBTREE;
         }
         return VISIT_SUBTREE;
+    }
+
+    private boolean maybeReduceBooleanExpression(final InfixExpression node, final Expression leftExpr,
+            final Expression rightExpr) {
+        final Boolean leftBoolean = getBooleanLiteral(leftExpr);
+        final Boolean rightBoolean = getBooleanLiteral(rightExpr);
+
+        if (leftBoolean != null) {
+            return replace(node, leftBoolean.booleanValue(), rightExpr);
+        } else if (rightBoolean != null) {
+            return replace(node, rightBoolean.booleanValue(), leftExpr);
+        }
+
+        Expression leftOppositeExpr = null;
+        final PrefixExpression leftPrefix = as(leftExpr, PrefixExpression.class);
+        if (leftPrefix != null && hasOperator(leftPrefix, NOT)) {
+            leftOppositeExpr = leftPrefix.getOperand();
+        }
+
+        Expression rightOppositeExpr = null;
+        final PrefixExpression rightPrefix = as(rightExpr, PrefixExpression.class);
+        if (rightPrefix != null && hasOperator(rightPrefix, NOT)) {
+            rightOppositeExpr = rightPrefix.getOperand();
+        }
+
+        final ASTBuilder b = this.ctx.getASTBuilder();
+        final Refactorings r = this.ctx.getRefactorings();
+        if (leftOppositeExpr != null && rightOppositeExpr != null) {
+            r.replace(node, b.infixExpr(b.copy(leftOppositeExpr), getAppropriateOperator(node),
+                    b.copy(rightOppositeExpr)));
+            return DO_NOT_VISIT_SUBTREE;
+        } else if (leftOppositeExpr != null) {
+            final Operator reverseOp = getReverseOperator(node);
+            r.replace(node, b.infixExpr(b.copy(leftOppositeExpr), reverseOp, b.copy(rightExpr)));
+            return DO_NOT_VISIT_SUBTREE;
+        } else if (rightOppositeExpr != null) {
+            final Operator reverseOp = getReverseOperator(node);
+            r.replace(node, b.infixExpr(b.copy(leftExpr), reverseOp, b.copy(rightOppositeExpr)));
+            return DO_NOT_VISIT_SUBTREE;
+        }
+
+        return VISIT_SUBTREE;
+    }
+
+    private Operator getAppropriateOperator(final InfixExpression node) {
+        if (NOT_EQUALS.equals(node.getOperator())) {
+            return XOR;
+        } else {
+            return (Operator) node.getOperator();
+        }
+    }
+
+    private Operator getReverseOperator(final InfixExpression node) {
+        if (EQUALS.equals(node.getOperator())) {
+            return XOR;
+        } else {
+            return EQUALS;
+        }
+    }
+
+    private boolean replace(final InfixExpression node, final boolean isTrue, final Expression exprToCopy) {
+        checkNoExtendedOperands(node);
+        if (!isPrimitive(node.getLeftOperand(), "boolean")
+                && !isPrimitive(node.getRightOperand(), "boolean")) {
+            return VISIT_SUBTREE;
+        }
+        // Either:
+        // - Two boolean primitives: no possible NPE
+        // - One boolean primitive and one Boolean object, this code already run
+        // the risk of an NPE, so we can replace the infix expression without
+        // fearing we would introduce a previously non existing NPE.
+        final ASTBuilder b = this.ctx.getASTBuilder();
+        final Expression operand;
+        if (isTrue == hasOperator(node, EQUALS)) {
+            operand = b.copy(exprToCopy);
+        } else {
+            operand = b.negate(exprToCopy);
+        }
+        this.ctx.getRefactorings().replace(node, operand);
+        return DO_NOT_VISIT_SUBTREE;
     }
 
     private boolean replaceWithNewInfixExpr(InfixExpression node,
@@ -344,28 +407,6 @@ public class SimplifyExpressionRefactoring extends AbstractRefactoringRule {
     private void addParentheses(Expression e) {
         final ASTBuilder b = this.ctx.getASTBuilder();
         this.ctx.getRefactorings().replace(e, b.parenthesize(b.copy(e)));
-    }
-
-    private boolean replace(InfixExpression node, boolean negate, Expression exprToCopy) {
-        checkNoExtendedOperands(node);
-        if (!isPrimitive(node.getLeftOperand(), "boolean")
-                && !isPrimitive(node.getRightOperand(), "boolean")) {
-            return VISIT_SUBTREE;
-        }
-        // Either:
-        // - Two boolean primitives: no possible NPE
-        // - One boolean primitive and one Boolean object, this code already run
-        // the risk of an NPE, so we can replace the infix expression without
-        // fearing we would introduce a previously non existing NPE.
-        final ASTBuilder b = this.ctx.getASTBuilder();
-        Expression operand;
-        if (negate) {
-            operand = b.negate(exprToCopy);
-        } else {
-            operand = b.copy(exprToCopy);
-        }
-        this.ctx.getRefactorings().replace(node, operand);
-        return DO_NOT_VISIT_SUBTREE;
     }
 
     private boolean replaceBy(ASTNode node, Expression expr) {
