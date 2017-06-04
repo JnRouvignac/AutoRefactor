@@ -120,6 +120,7 @@ public final class AllRefactoringRules {
                 new SetRatherThanMapRefactoring(),
                 new ArrayListRatherThanLinkedListRefactoring(),
                 new SetRatherThanListRefactoring(),
+                new HashMapRatherThanTreeMapRefactoring(),
                 new UseStringContainsRefactoring(),
                 new PushNegationDownRefactoring(),
                 new CommentsRefactoring(),
