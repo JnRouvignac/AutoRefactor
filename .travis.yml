@@ -41,4 +41,11 @@ script:
 - mvn clean install
 # TODO Test Coverage
 # - mvn cobertura:cobertura coveralls:cobertura
+notifications:
+  email:
+    recipients:
+      - jn.rouvignac@gmail.com
+      - fabrice.tiercelin@gmail.com
+    on_success: never # default: change
+    on_failure: always # default: always
 
