@@ -113,6 +113,7 @@ public final class AllRefactoringRules {
                 // TODO JNR - to be completed
                 // new ReduceVariableScopeRefactoring(),
                 new StringBuilderRefactoring(),
+                new StringBuilderMethodRatherThanReassignationRefactoring(),
                 new StringBuilderRatherThanStringBufferRefactoring(),
                 new HashMapRatherThanHashtableRefactoring(),
                 new ArrayListRatherThanVectorRefactoring(),
