@@ -29,18 +29,11 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.Iterator;
-import java.util.TreeSet;
 import java.util.List;
-import java.util.Map;
-import java.util.NavigableMap;
 import java.util.NavigableSet;
-import java.util.Observer;
-import java.util.Map.Entry;
-import java.util.function.BiConsumer;
 import java.util.Set;
-import java.util.SortedMap;
 import java.util.SortedSet;
-import java.util.Spliterator;
+import java.util.TreeSet;
 
 public class HashSetRatherThanTreeSetSample {
 
@@ -207,11 +200,6 @@ public class HashSetRatherThanTreeSetSample {
     public String doNotReplacePollLast() {
         TreeSet<String> set = new TreeSet<String>();
         return set.pollLast();
-    }
-
-    public Spliterator<String> doNotReplaceSpliterator() {
-        TreeSet<String> set = new TreeSet<String>();
-        return set.spliterator();
     }
 
     public NavigableSet<String> doNotReplaceSubSet(String fromElement, boolean fromInclusive, String toElement,

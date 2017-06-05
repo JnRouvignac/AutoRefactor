@@ -28,16 +28,14 @@ package org.autorefactor.refactoring.rules.samples_in;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.TreeMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NavigableMap;
 import java.util.NavigableSet;
 import java.util.Observer;
-import java.util.Map.Entry;
-import java.util.function.BiConsumer;
 import java.util.Set;
 import java.util.SortedMap;
+import java.util.TreeMap;
 
 public class HashMapRatherThanTreeMapSample {
 
@@ -86,7 +84,7 @@ public class HashMapRatherThanTreeMapSample {
             map.put(date.getTime(), date);
         }
 
-        return map.replace(789L, new Date());
+        return map.remove(789L);
     }
 
     public Observer replaceTreeMapWithModifier() {
@@ -196,11 +194,6 @@ public class HashMapRatherThanTreeMapSample {
         return map.floorKey(key);
     }
 
-    public void doNotReplaceForEach(BiConsumer<? super String,? super Long> action) {
-        TreeMap<String, Long> map = new TreeMap<String, Long>();
-        map.forEach(action);
-    }
-
     public SortedMap<String,Long> doNotReplaceHeadMap(String toKey) {
         TreeMap<String, Long> map = new TreeMap<String, Long>();
         return map.headMap(toKey);
@@ -283,15 +276,10 @@ public class HashMapRatherThanTreeMapSample {
         map.containsKey(123);
         map.containsValue("Lorem ipsum");
         map.get(123);
-        map.getOrDefault(123, "Lorem ipsum");
         map.isEmpty();
         map.put(123, "Lorem ipsum");
         map.putAll(anotherMap);
-        map.putIfAbsent(123, "Lorem ipsum");
         map.remove(123);
-        map.remove(123, "Lorem ipsum");
-        map.replace(123, "Lorem ipsum");
-        map.replace(123, "Lorem", "Ipsum");
         map.size();
         map.notify();
         map.notifyAll();
