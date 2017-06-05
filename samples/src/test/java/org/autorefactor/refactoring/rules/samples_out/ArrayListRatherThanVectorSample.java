@@ -84,7 +84,13 @@ public class ArrayListRatherThanVectorSample {
             list.add(date);
         }
 
-        return list.toString();
+        // Keep this comment too
+        java.util.ArrayList<Date> secondList = new java.util.ArrayList<Date>();
+        for (; list.isEmpty(); list.remove(0)) {
+            secondList.add(list.get(0));
+        }
+
+        return secondList.toString();
     }
 
     public void replaceVectorWithModifier() {
@@ -136,6 +142,7 @@ public class ArrayListRatherThanVectorSample {
         list.add(42);
         list.get(0);
         list.toArray(new Object[10]);
+        list.toArray(new Integer[10]);
         list.remove(123);
         list.remove(1);
         list.clear();
@@ -154,7 +161,7 @@ public class ArrayListRatherThanVectorSample {
         return list.firstElement();
     }
 
-    public void replaceStackWithRunnable() {
+    public void replaceVectorWithRunnable() {
         // Keep this comment
         final java.util.ArrayList<String> list = new java.util.ArrayList<String>();
         new Runnable() {
