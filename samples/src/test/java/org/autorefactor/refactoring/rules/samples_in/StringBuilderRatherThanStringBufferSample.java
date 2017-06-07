@@ -30,6 +30,8 @@ import java.util.List;
 
 public class StringBuilderRatherThanStringBufferSample {
 
+    private StringBuffer doNotReplaceField = new StringBuffer("foo");
+
     public void replaceStringBufferInstanceCreation() {
         // Keep this comment
         int capacity = new StringBuffer().capacity();

@@ -159,7 +159,7 @@ public abstract class AbstractClassSubstituteRefactoring extends AbstractRefacto
 
     @Override
     public boolean visit(Block node) {
-        final ObjectInstantiationVisitor classCreationVisitor = new ObjectInstantiationVisitor();
+        final ObjectInstantiationVisitor classCreationVisitor = new ObjectInstantiationVisitor(node);
         node.accept(classCreationVisitor);
 
         for (final ClassInstanceCreation instanceCreation : classCreationVisitor.getObjectInstantiations()) {
@@ -298,12 +298,14 @@ public abstract class AbstractClassSubstituteRefactoring extends AbstractRefacto
             case VARIABLE_DECLARATION_FRAGMENT:
             case VARIABLE_DECLARATION_STATEMENT:
                 final VariableDeclaration varDecl = (VariableDeclaration) parentNode;
-                final VariableDeclarationStatement variableDeclaration =
-                        (VariableDeclarationStatement) varDecl.getParent();
-                if (hasType(variableDeclaration.getType().resolveBinding(), getExistingClassCanonicalName())) {
-                    variablesToRefactor.add(varDecl);
-                    methodCallsToRefactorWithVariable.addAll(localMethodCallsToRefactor);
-                    return true;
+                if (varDecl.getParent() instanceof VariableDeclarationStatement) {
+                    final VariableDeclarationStatement variableDeclaration =
+                            (VariableDeclarationStatement) varDecl.getParent();
+                    if (hasType(variableDeclaration.getType().resolveBinding(), getExistingClassCanonicalName())) {
+                        variablesToRefactor.add(varDecl);
+                        methodCallsToRefactorWithVariable.addAll(localMethodCallsToRefactor);
+                        return true;
+                    }
                 }
                 return false;
             case METHOD_INVOCATION:
@@ -335,8 +337,29 @@ public abstract class AbstractClassSubstituteRefactoring extends AbstractRefacto
 
         private final List<ClassInstanceCreation> objectInstantiations = new ArrayList<ClassInstanceCreation>();
 
+        private final Block startNode;
+
+        /**
+         * Constructor.
+         *
+         * @param startNode The start node block
+         */
+        public ObjectInstantiationVisitor(final Block startNode) {
+            this.startNode = startNode;
+        }
+
         public List<ClassInstanceCreation> getObjectInstantiations() {
             return objectInstantiations;
+        }
+
+        @Override
+        public boolean visit(Block node) {
+            return (startNode == node) ? VISIT_SUBTREE : DO_NOT_VISIT_SUBTREE;
+        }
+
+        @Override
+        public boolean visit(AnonymousClassDeclaration node) {
+            return DO_NOT_VISIT_SUBTREE;
         }
 
         @Override

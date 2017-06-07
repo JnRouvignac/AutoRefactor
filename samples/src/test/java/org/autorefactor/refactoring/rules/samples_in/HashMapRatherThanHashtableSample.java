@@ -25,14 +25,20 @@
  */
 package org.autorefactor.refactoring.rules.samples_in;
 
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Observer;
 import java.util.Set;
 
 public class HashMapRatherThanHashtableSample {
+
+    private Set<Entry<String, Observer>> doNotRefactorTheExpression = new Hashtable<String, Observer>().entrySet();
+
+    private Hashtable<String, Integer> doNotReplaceField = new Hashtable<String, Integer>();
 
     public void replaceHashtableInstanceCreation() {
         // Keep this comment
@@ -119,7 +125,7 @@ public class HashMapRatherThanHashtableSample {
     }
 
     public void doNotReplaceHashtablePassedToAMethod() {
-        String p3 = String.valueOf(new Hashtable<String, String>());
+        String text = String.valueOf(new Hashtable<String, String>());
     }
 
     public Hashtable<Integer, Date> doNotReplaceReturnedHashtable() {
@@ -131,6 +137,19 @@ public class HashMapRatherThanHashtableSample {
         map = new Hashtable<String, String>();
     }
 
+    public void replaceThreadLocalHashtable() {
+        final Hashtable<String, String> map = new Hashtable<String, String>();
+        map.put("foo", "bar");
+        new Runnable() {
+
+            @Override
+            public void run() {
+                final Hashtable<String, String> localMap = new Hashtable<String, String>();
+                localMap.put("foo", "bar");
+            }
+        };
+    }
+
     public void doNotReplaceThreadSharedHashtable() {
         final Hashtable<String, String> map = new Hashtable<String, String>();
         new Runnable() {
@@ -139,6 +158,21 @@ public class HashMapRatherThanHashtableSample {
             public void run() {
                 map.put("No conflict", "please");
             }
+        };
+    }
+
+    public void doNotReplaceField() {
+        Comparator<String> c = new Comparator<String>() {
+
+            private Set<Entry<String, Observer>> doNotRefactorTheExpression = new Hashtable<String, Observer>().entrySet();
+
+            private Hashtable<String, Integer> doNotReplaceField = new Hashtable<String, Integer>();
+
+            @Override
+            public int compare(String arg0, String arg1) {
+                return doNotReplaceField.get(arg1) - doNotReplaceField.get(arg0);
+            }
+
         };
     }
 }
