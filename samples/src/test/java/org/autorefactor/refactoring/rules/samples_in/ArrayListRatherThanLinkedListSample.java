@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2017 Fabrice Tiercelin - initial API and implementation
+ * Copyright (C) 2017 Fabrice Tiercelin - Initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,6 +26,7 @@
 package org.autorefactor.refactoring.rules.samples_in;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -58,7 +59,7 @@ public class ArrayListRatherThanLinkedListSample {
 
     public void replaceLinkedListVariableDeclaration() {
         // Keep this comment
-        LinkedList<String> list = new LinkedList<String>();
+        LinkedList<LinkedList<String>> list = new LinkedList<LinkedList<String>>();
     }
 
     public void doNotReplaceInterface() {
@@ -272,7 +273,7 @@ public class ArrayListRatherThanLinkedListSample {
         return list.set(index, element);
     }
 
-    public void replaceStackWithRunnable() {
+    public void replaceListWithRunnable() {
         // Keep this comment
         final LinkedList<String> list = new LinkedList<String>();
         new Runnable() {
@@ -282,6 +283,21 @@ public class ArrayListRatherThanLinkedListSample {
                 final LinkedList<String> localList = new LinkedList<String>();
                 localList.add("foo");
             }
+        };
+    }
+
+    public void doNotReplaceField() {
+        Comparator<String> c = new Comparator<String>() {
+
+            private boolean doNotRefactorTheExpression = new LinkedList<String>().contains("foo");
+
+            private LinkedList<String> doNotReplaceField = new LinkedList<String>();
+
+            @Override
+            public int compare(String arg0, String arg1) {
+                return doNotReplaceField.contains(arg0) || !doNotReplaceField.contains(arg0) ? 1 : -1;
+            }
+
         };
     }
 }

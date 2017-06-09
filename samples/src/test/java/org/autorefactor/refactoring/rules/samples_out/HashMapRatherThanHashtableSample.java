@@ -80,7 +80,7 @@ public class HashMapRatherThanHashtableSample {
 
     public void refactorMethod() {
         // Keep this comment
-        java.util.HashMap<String, String> map = new java.util.HashMap<String, String>();
+        java.util.HashMap<String, List<String>[]> map = new java.util.HashMap<String, List<String>[]>();
         // Keep this comment too
         map.values();
     }
@@ -97,8 +97,8 @@ public class HashMapRatherThanHashtableSample {
 
     public void replaceHashtableWithModifier() {
         // Keep this comment
-        final java.util.HashMap<String, String> map = new java.util.HashMap<String, String>();
-        map.put("foo", "bar");
+        final java.util.HashMap<String, int[]> map = new java.util.HashMap<String, int[]>();
+        map.put("foo", new int[] {1, 2, 3});
     }
 
     public void replaceHashtableWithParameter() {

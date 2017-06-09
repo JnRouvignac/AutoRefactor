@@ -260,20 +260,22 @@ public abstract class AbstractClassSubstituteRefactoring extends AbstractRefacto
     }
 
     private Type substituteType(final ASTBuilder b, final Type origType) {
-        if (origType.isParameterizedType()) {
-            final Type[] types = typeArgumentsToTypes(b, origType);
-            return b.genericType(getSubstitutingClassName(), types);
-        }
-        return b.type(getSubstitutingClassName());
+        return substituteType(b, origType.resolveBinding(), getSubstitutingClassName());
     }
 
-    private Type[] typeArgumentsToTypes(final ASTBuilder b, final Type type) {
-        final ITypeBinding[] typeArgs = type.resolveBinding().getTypeArguments();
-        final Type[] types = new Type[typeArgs.length];
-        for (int i = 0; i < typeArgs.length; i++) {
-            types[i] = b.type(typeArgs[i].getName());
+    private Type substituteType(final ASTBuilder b, final ITypeBinding origTypeBinding, final String targetTypeName) {
+        if (origTypeBinding.isArray()) {
+            return b.getAST().newArrayType(substituteType(b, origTypeBinding.getElementType(), null));
+        } else if (origTypeBinding.isParameterizedType()) {
+            final ITypeBinding[] origTypeArgs = origTypeBinding.getTypeArguments();
+            final Type[] newTypes = new Type[origTypeArgs.length];
+            for (int i = 0; i < origTypeArgs.length; i++) {
+                newTypes[i] = substituteType(b, origTypeArgs[i], null);
+            }
+            return b.genericType((targetTypeName != null) ? targetTypeName : origTypeBinding.getErasure().getName(),
+                    newTypes);
         }
-        return types;
+        return b.type((targetTypeName != null) ? targetTypeName : origTypeBinding.getName());
     }
 
     private boolean canInstantiationBeRefactored(final ASTNode node,
