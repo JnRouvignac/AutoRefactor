@@ -111,11 +111,15 @@ public class RemoveUnnecessaryCastSample {
 
     public boolean doNotRemoveCasts(Integer oi, int pi, long l, Object o) {
         return (int) l != pi
-            && pi != (int) l
-            && (Integer) o != pi // TODO test cast to (int) after moving to Java 7 builds
-            && pi != (Integer) o // TODO test cast to (int) after moving to Java 7 builds
-            && (Integer) o != oi // TODO test cast to (int) after moving to Java 7 builds
-            && oi != (Integer) o; // TODO test cast to (int) after moving to Java 7 builds
+                && pi != (int) l
+                && (int) o != pi
+                && pi != (int) o
+                && (int) o != oi
+                && oi != (int) o
+                && (Integer) o != pi
+                && pi != (Integer) o
+                && (Integer) o != oi
+                && oi != (Integer) o;
     }
 
     public boolean doNotRemovePrimitiveNarrowingCastsWithComparison(int i) {
