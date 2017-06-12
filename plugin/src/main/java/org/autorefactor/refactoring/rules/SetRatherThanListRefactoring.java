@@ -60,6 +60,11 @@ public class SetRatherThanListRefactoring extends AbstractClassSubstituteRefacto
     }
 
     @Override
+    protected boolean canInvokeIterator() {
+        return false;
+    }
+
+    @Override
     protected boolean canCodeBeRefactored() {
         return isContainsMethodUsed;
     }

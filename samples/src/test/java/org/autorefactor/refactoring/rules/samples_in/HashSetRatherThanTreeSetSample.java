@@ -31,6 +31,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NavigableSet;
+import java.util.Properties;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -93,8 +94,8 @@ public class HashSetRatherThanTreeSetSample {
 
     public void replaceTreeSetWithParameter() {
         // Keep this comment
-        TreeSet<Long> set = new TreeSet<Long>(new java.util.HashSet<Long>());
-        set.add(123L);
+        TreeSet<char[]> set = new TreeSet<char[]>(new java.util.HashSet<char[]>());
+        set.add(new char[] {'a'});
     }
 
     public void doNotReplaceTreeSetWithComparator(Comparator<Long> comparator) {
@@ -112,6 +113,13 @@ public class HashSetRatherThanTreeSetSample {
         set2.add("bar");
 
         return set2.isEmpty();
+    }
+
+    public void doNotReplaceArrayListWithImplicitItertor() {
+        TreeSet<Properties> iterableList = new TreeSet<Properties>();
+        for (Properties properties : iterableList) {
+            System.out.println("The properties: " + properties);
+        }
     }
 
     public void doNotReplaceTreeSetParameter(TreeSet<String> aSet) {

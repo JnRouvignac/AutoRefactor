@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2017 Fabrice Tiercelin - initial API and implementation
+ * Copyright (C) 2017 Fabrice Tiercelin - Initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,6 +32,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Observable;
+import java.util.Properties;
 
 public class SetRatherThanListSample {
 
@@ -90,9 +91,9 @@ public class SetRatherThanListSample {
 
     public boolean replaceArrayListWithModifier() {
         // Keep this comment
-        final ArrayList<Integer> collection = new ArrayList<Integer>();
-        collection.add(1);
-        return collection.contains(2);
+        final ArrayList<byte[]> collection = new ArrayList<byte[]>();
+        collection.add(new byte[] {1});
+        return collection.contains(new byte[] {2});
     }
 
     public boolean replaceArrayListWithParameter() {
@@ -112,6 +113,13 @@ public class SetRatherThanListSample {
         collection2.add("BAR");
 
         return collection2.contains("foo");
+    }
+
+    public void doNotReplaceArrayListWithImplicitItertor() {
+        ArrayList<Properties> iterableList = new ArrayList<Properties>();
+        for (Properties properties : iterableList) {
+            System.out.println("The properties: " + properties);
+        }
     }
 
     public boolean doNotReplaceArrayListParameter(ArrayList<String> aArrayList) {

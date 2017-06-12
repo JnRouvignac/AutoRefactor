@@ -31,6 +31,7 @@ import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
 import static org.autorefactor.refactoring.ASTHelper.hasType;
 import static org.eclipse.jdt.core.dom.ASTNode.ASSIGNMENT;
 import static org.eclipse.jdt.core.dom.ASTNode.CAST_EXPRESSION;
+import static org.eclipse.jdt.core.dom.ASTNode.ENHANCED_FOR_STATEMENT;
 import static org.eclipse.jdt.core.dom.ASTNode.INSTANCEOF_EXPRESSION;
 import static org.eclipse.jdt.core.dom.ASTNode.METHOD_INVOCATION;
 import static org.eclipse.jdt.core.dom.ASTNode.PARENTHESIZED_EXPRESSION;
@@ -78,6 +79,15 @@ public abstract class AbstractClassSubstituteRefactoring extends AbstractRefacto
      * @return True if a local variable can be used in a runnable.
      */
     protected boolean canBeSharedInOtherThread() {
+        return true;
+    }
+
+    /**
+     * If an iterator can be implicitly or explicitly invoked on the object.
+     *
+     * @return True if an iterator can be implicitly or explicitly invoked on the object.
+     */
+    protected boolean canInvokeIterator() {
         return true;
     }
 
@@ -290,6 +300,8 @@ public abstract class AbstractClassSubstituteRefactoring extends AbstractRefacto
             ASTNode parentNode = childNode.getParent();
 
             switch (parentNode.getNodeType()) {
+            case ENHANCED_FOR_STATEMENT:
+                return canInvokeIterator();
             case ASSIGNMENT:
             case RETURN_STATEMENT:
             case CAST_EXPRESSION:
