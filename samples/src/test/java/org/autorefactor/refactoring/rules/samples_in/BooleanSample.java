@@ -424,8 +424,6 @@ public class BooleanSample {
         }
     }
 
-    // TODO redo the next 4 with Boolean object
-
     public boolean removeUselessIfInBooleanPrimitiveAssignment7(boolean bo) {
         // Keep this comment
         if (bo) {
@@ -451,6 +449,38 @@ public class BooleanSample {
     }
 
     public boolean removeUselessIfInBooleanPrimitiveAssignment10(boolean bo) {
+        // Keep this comment
+        if (bo) {
+            return true;
+        }
+        return aMethodThatReturnsBoolean();
+    }
+
+    public boolean removeUselessIfWithBooleanObjectParameter1(Boolean bo) {
+        // Keep this comment
+        if (bo) {
+            return aMethodThatReturnsBoolean();
+        }
+        return false;
+    }
+
+    public boolean removeUselessIfWithBooleanObjectParameter2(Boolean bo) {
+        // Keep this comment
+        if (bo) {
+            return aMethodThatReturnsBoolean();
+        }
+        return true;
+    }
+
+    public boolean removeUselessIfWithBooleanObjectParameter3(Boolean bo) {
+        // Keep this comment
+        if (bo) {
+            return false;
+        }
+        return aMethodThatReturnsBoolean();
+    }
+
+    public boolean removeUselessIfWithBooleanObjectParameter4(Boolean bo) {
         // Keep this comment
         if (bo) {
             return true;

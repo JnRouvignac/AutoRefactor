@@ -354,19 +354,19 @@ public class BooleanRefactoring extends AbstractRefactoringRule {
     private ReturnStatement getReturnStatement(IfStatement node,
             Boolean thenBool, Boolean elseBool, Expression thenExpr, Expression elseExpr) {
         if (thenBool == null && elseBool != null) {
-            final Expression leftOp = negateIfNeeded(
-                    b.parenthesize(b.copy(node.getExpression())), elseBool.booleanValue());
+            final Expression leftOp = signExpr(
+                    b.parenthesizeIfNeeded(b.copy(node.getExpression())), !elseBool.booleanValue());
             return b.return0(b.infixExpr(
                     leftOp,
                     getConditionalOperator(elseBool.booleanValue()),
-                    b.parenthesize(b.copy(thenExpr))));
+                    b.parenthesizeIfNeeded(b.copy(thenExpr))));
         } else if (thenBool != null && elseBool == null) {
-            final Expression leftOp = negateIfNeeded(
-                    b.parenthesize(b.copy(node.getExpression())), !thenBool.booleanValue());
+            final Expression leftOp = signExpr(
+                    b.parenthesizeIfNeeded(b.copy(node.getExpression())), thenBool.booleanValue());
             return b.return0(b.infixExpr(
                     leftOp,
                     getConditionalOperator(thenBool.booleanValue()),
-                    b.parenthesize(b.copy(elseExpr))));
+                    b.parenthesizeIfNeeded(b.copy(elseExpr))));
         }
         return null;
     }
@@ -375,11 +375,11 @@ public class BooleanRefactoring extends AbstractRefactoringRule {
         return isOrOperator ? CONDITIONAL_OR : CONDITIONAL_AND;
     }
 
-    private Expression negateIfNeeded(Expression ie, boolean negate) {
-        if (negate) {
-            return b.negate(ie, Copy.NONE);
+    private Expression signExpr(Expression ie, boolean isPositive) {
+        if (isPositive) {
+            return ie;
         }
-        return ie;
+        return b.negate(ie, Copy.NONE);
     }
 
     private VariableDeclarationFragment getVariableDeclarationFragment(

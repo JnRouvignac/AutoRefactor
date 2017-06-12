@@ -54,7 +54,7 @@ public class BooleanSample {
 
     public boolean returnIfConditionAddCurlyBraces(Object o) {
         // Keep this comment
-        return (o instanceof Integer) || (!(o instanceof String));
+        return (o instanceof Integer) || !(o instanceof String);
     }
 
     public boolean returnIfConditionThatRevertsInstanceofExpressionBooleanPrimitive(Object o) {
@@ -331,26 +331,44 @@ public class BooleanSample {
         BooleanSample.this.g = Boolean.valueOf(bo);
     }
 
-    // TODO redo the next 4 with Boolean object
-
     public boolean removeUselessIfInBooleanPrimitiveAssignment7(boolean bo) {
         // Keep this comment
-        return (bo) && (aMethodThatReturnsBoolean());
+        return bo && aMethodThatReturnsBoolean();
     }
 
     public boolean removeUselessIfInBooleanPrimitiveAssignment8(boolean bo) {
         // Keep this comment
-        return !(bo) || (aMethodThatReturnsBoolean());
+        return !bo || aMethodThatReturnsBoolean();
     }
 
     public boolean removeUselessIfInBooleanPrimitiveAssignment9(boolean bo) {
         // Keep this comment
-        return !(bo) && (aMethodThatReturnsBoolean());
+        return !bo && aMethodThatReturnsBoolean();
     }
 
     public boolean removeUselessIfInBooleanPrimitiveAssignment10(boolean bo) {
         // Keep this comment
-        return (bo) || (aMethodThatReturnsBoolean());
+        return bo || aMethodThatReturnsBoolean();
+    }
+
+    public boolean removeUselessIfWithBooleanObjectParameter1(Boolean bo) {
+        // Keep this comment
+        return bo && aMethodThatReturnsBoolean();
+    }
+
+    public boolean removeUselessIfWithBooleanObjectParameter2(Boolean bo) {
+        // Keep this comment
+        return !bo || aMethodThatReturnsBoolean();
+    }
+
+    public boolean removeUselessIfWithBooleanObjectParameter3(Boolean bo) {
+        // Keep this comment
+        return !bo && aMethodThatReturnsBoolean();
+    }
+
+    public boolean removeUselessIfWithBooleanObjectParameter4(Boolean bo) {
+        // Keep this comment
+        return bo || aMethodThatReturnsBoolean();
     }
 
     public void removeUselessTernaryOperatorWithBooleanPrimitive(boolean bo) {
