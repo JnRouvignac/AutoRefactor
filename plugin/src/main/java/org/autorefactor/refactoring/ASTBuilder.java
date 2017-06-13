@@ -389,11 +389,12 @@ public class ASTBuilder {
                 typeArgs.add(toType(typeArg, typeNameDecider));
             }
             return type;
+        } else if (typeBinding.isPrimitive()) {
+            return type(typeBinding.getName());
         } else if (typeBinding.isClass()
                 || typeBinding.isInterface()
                 || typeBinding.isEnum()
                 || typeBinding.isAnnotation()
-                || typeBinding.isPrimitive()
                 || typeBinding.isNullType()
                 || typeBinding.isRawType()) {
             return type(typeNameDecider.useSimplestPossibleName(typeBinding));

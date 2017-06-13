@@ -54,7 +54,7 @@ public class EnumSetRatherThanHashSetSample {
         return java.util.EnumSet.noneOf(Example.class);
     }
 
-    public Set<Example> refactorReturnStatement2() {
+    public Set<Example> refactorReturnStatementWithDiamondOperator() {
         // Keep this comment
         return java.util.EnumSet.noneOf(Example.class);
     }

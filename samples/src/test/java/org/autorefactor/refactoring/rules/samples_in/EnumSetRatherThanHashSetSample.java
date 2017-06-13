@@ -54,7 +54,7 @@ public class EnumSetRatherThanHashSetSample {
         return new HashSet<Example>();
     }
 
-    public Set<Example> refactorReturnStatement2() {
+    public Set<Example> refactorReturnStatementWithDiamondOperator() {
         // Keep this comment
         return new HashSet<>();
     }

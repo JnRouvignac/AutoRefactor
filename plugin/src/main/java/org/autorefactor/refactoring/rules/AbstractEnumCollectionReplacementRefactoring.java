@@ -39,6 +39,7 @@ import static org.eclipse.jdt.core.dom.ASTNode.VARIABLE_DECLARATION_STATEMENT;
 import java.util.List;
 
 import org.autorefactor.refactoring.ASTBuilder;
+import org.autorefactor.refactoring.TypeNameDecider;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
@@ -113,10 +114,11 @@ public abstract class AbstractEnumCollectionReplacementRefactoring extends Abstr
             ITypeBinding[] typeArguments = lhs.resolveTypeBinding().getTypeArguments();
             ITypeBinding keyTypeBinding = typeArguments[0];
             if (keyTypeBinding.isEnum()) {
+                final TypeNameDecider typeNameDecider = new TypeNameDecider(lhs);
                 ASTBuilder b = ctx.getASTBuilder();
                 Type[] types = new Type[typeArguments.length];
                 for (int i = 0; i < types.length; i++) {
-                    types[i] = b.type(typeArguments[i].getName());
+                    types[i] = b.toType(typeArguments[i], typeNameDecider);
                 }
                 return replace(node, types);
             }
@@ -137,7 +139,8 @@ public abstract class AbstractEnumCollectionReplacementRefactoring extends Abstr
                     if (initExpr != null) {
                         initExpr = removeParentheses(initExpr);
                         if (creates(initExpr, getImplType())) {
-                            return replace((ClassInstanceCreation) initExpr, typeArguments.toArray(new Type[] {}));
+                            return replace((ClassInstanceCreation) initExpr,
+                                    typeArguments.toArray(new Type[typeArguments.size()]));
                         }
                     }
                 }

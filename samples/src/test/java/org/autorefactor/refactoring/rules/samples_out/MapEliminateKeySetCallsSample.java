@@ -68,6 +68,17 @@ public class MapEliminateKeySetCallsSample {
         }
     }
 
+    public void refactorValueTypeUsesPrimitive(Map<String, byte[]> map) {
+        // Keep this comment 1
+        for (Map.Entry<String, byte[]> entry : map.entrySet()) {
+            String key = entry.getKey();
+            System.out.println("hello " + map.get("name"));
+            if (entry.getValue().length != 0) {
+                System.out.println("the value of "+ key + " is " + entry.getValue());
+            }
+        }
+    }
+
     public void refactorValueTypeUsesGenerics(Map<String, List<Map<Integer, List<Long>>>> map) {
         // Keep this comment 1
         for (Map.Entry<String, List<Map<Integer, List<Long>>>> entry : map.entrySet()) {

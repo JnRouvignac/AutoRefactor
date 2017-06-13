@@ -28,6 +28,7 @@ package org.autorefactor.refactoring.rules.samples_out;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class EnumMapRatherThanHashMapSample {
@@ -53,7 +54,12 @@ public class EnumMapRatherThanHashMapSample {
         return new java.util.EnumMap<Example, String>(Example.class);
     }
 
-    public Map<Example, String> refactorReturnStatement2() {
+    public Map<Example, List<String>> refactorReturnStatementWithParameterizedType() {
+        // Keep this comment
+        return new java.util.EnumMap<Example, List<String>>(Example.class);
+    }
+
+    public Map<Example, String> refactorReturnStatementWithDiamondOperator() {
         // Keep this comment
         return new java.util.EnumMap<>(Example.class);
     }
@@ -64,9 +70,9 @@ public class EnumMapRatherThanHashMapSample {
         return map;
     }
 
-    public Map<Example, String> refactorAssignment() {
+    public Map<Example, long[]> refactorAssignment() {
         // Keep this comment
-        Map<Example, String> map;
+        Map<Example, long[]> map;
         map = new java.util.EnumMap<>(Example.class);
         return map;
     }
