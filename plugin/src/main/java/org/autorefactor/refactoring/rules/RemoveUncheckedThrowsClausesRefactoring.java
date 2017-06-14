@@ -54,7 +54,7 @@ public final class RemoveUncheckedThrowsClausesRefactoring extends AbstractRefac
     @Override
     public boolean isEnabled(Preferences preferences) {
         // TODO: remove check for java8 implementation
-        return super.isEnabled(preferences) && apiLevel7orLower();
+        return super.isEnabled(preferences);
     }
 
     private boolean apiLevel7orLower() {

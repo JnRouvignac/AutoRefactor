@@ -25,6 +25,8 @@
  */
 package org.autorefactor.ui;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -67,11 +69,21 @@ import static org.eclipse.jface.dialogs.MessageDialog.*;
 public class AutoRefactorHandler extends AbstractHandler {
     @Override
     public Object execute(final ExecutionEvent event) throws ExecutionException {
-        Environment environment = getEnvironment();
-        new PrepareApplyRefactoringsJob(
-                getSelectedJavaElements(event),
-                AllRefactoringRules.getConfiguredRefactoringRules(environment.getPreferences()),
-                environment).schedule();
+        try {
+            Environment environment = getEnvironment();
+            new PrepareApplyRefactoringsJob(
+                    getSelectedJavaElements(event),
+                    AllRefactoringRules.getConfiguredRefactoringRules(environment.getPreferences()),
+                    environment).schedule();
+        } catch (Exception e) {
+            final Shell shell = HandlerUtil.getActiveShell(event);
+
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
+            e.printStackTrace(pw);
+
+            showMessage(shell, "An error has occurred:\n\n" + sw.toString());
+        }
 
         // TODO JNR provide a maven plugin
         // TODO JNR provide a gradle plugin
