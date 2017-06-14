@@ -245,8 +245,8 @@ public class BooleanSampleTest {
         final Boolean resIn = invoke(sampleIn, methodName, args);
         final Boolean resOut = invoke(sampleOut, methodName, args);
         assertEquals(resIn, resOut);
-        assertEquals(sampleIn.f, sampleOut.f);
-        assertEquals(sampleIn.g, sampleOut.g);
+        assertEquals(sampleIn.booleanPrimitive, sampleOut.booleanPrimitive);
+        assertEquals(sampleIn.booleanWrapper, sampleOut.booleanWrapper);
         assertEquals(sampleInResult, sampleOutResult);
     }
 

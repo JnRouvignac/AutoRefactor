@@ -27,10 +27,8 @@ package org.autorefactor.refactoring.rules.samples_out;
 
 public class BooleanSample {
 
-    public boolean f;
-    public Boolean g;
-
-    // TODO JNR handle mix and match of boolean primitives and boolean objects
+    public boolean booleanPrimitive;
+    public Boolean booleanWrapper;
 
     public boolean returnIfConditionBooleanPrimitive(boolean b) {
         // Keep this comment
@@ -308,27 +306,27 @@ public class BooleanSample {
 
     public void removeUselessIfInBooleanPrimitiveAssignment5(boolean bo) {
         // Keep this comment
-        this.f = bo;
+        this.booleanPrimitive = bo;
     }
 
     public void removeUselessIfInBooleanObjectAssignment5(boolean bo) {
         // Keep this comment
-        this.g = Boolean.valueOf(bo);
+        this.booleanWrapper = Boolean.valueOf(bo);
     }
 
     public void removeUselessIfInBooleanPrimitiveAssignment6(boolean bo) {
         // Keep this comment
-        f = bo;
+        booleanPrimitive = bo;
     }
 
     public void removeUselessIfInBooleanObjectAssignment6(boolean bo) {
         // Keep this comment
-        g = Boolean.valueOf(bo);
+        booleanWrapper = Boolean.valueOf(bo);
     }
 
     public void removeUselessIfInBooleanObjectAssignment7(boolean bo) {
         // Keep this comment
-        BooleanSample.this.g = Boolean.valueOf(bo);
+        BooleanSample.this.booleanWrapper = Boolean.valueOf(bo);
     }
 
     public boolean removeUselessIfInBooleanPrimitiveAssignment7(boolean bo) {

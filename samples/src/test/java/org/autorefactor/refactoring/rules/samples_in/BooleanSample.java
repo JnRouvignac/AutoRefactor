@@ -27,10 +27,8 @@ package org.autorefactor.refactoring.rules.samples_in;
 
 public class BooleanSample {
 
-    public boolean f;
-    public Boolean g;
-
-    // TODO JNR handle mix and match of boolean primitives and boolean objects
+    public boolean booleanPrimitive;
+    public Boolean booleanWrapper;
 
     public boolean returnIfConditionBooleanPrimitive(boolean b) {
         // Keep this comment
@@ -386,41 +384,41 @@ public class BooleanSample {
 
     public void removeUselessIfInBooleanPrimitiveAssignment5(boolean bo) {
         // Keep this comment
-        this.f = Boolean.FALSE;
+        this.booleanPrimitive = Boolean.FALSE;
         if (bo) {
-            this.f = Boolean.TRUE;
+            this.booleanPrimitive = Boolean.TRUE;
         }
     }
 
     public void removeUselessIfInBooleanObjectAssignment5(boolean bo) {
         // Keep this comment
-        this.g = Boolean.FALSE;
+        this.booleanWrapper = Boolean.FALSE;
         if (bo) {
-            this.g = Boolean.TRUE;
+            this.booleanWrapper = Boolean.TRUE;
         }
     }
 
     public void removeUselessIfInBooleanPrimitiveAssignment6(boolean bo) {
         // Keep this comment
-        f = Boolean.FALSE;
+        booleanPrimitive = Boolean.FALSE;
         if (bo) {
-            f = Boolean.TRUE;
+            booleanPrimitive = Boolean.TRUE;
         }
     }
 
     public void removeUselessIfInBooleanObjectAssignment6(boolean bo) {
         // Keep this comment
-        g = Boolean.FALSE;
+        booleanWrapper = Boolean.FALSE;
         if (bo) {
-            g = Boolean.TRUE;
+            booleanWrapper = Boolean.TRUE;
         }
     }
 
     public void removeUselessIfInBooleanObjectAssignment7(boolean bo) {
         // Keep this comment
-        BooleanSample.this.g = Boolean.FALSE;
+        BooleanSample.this.booleanWrapper = Boolean.FALSE;
         if (bo) {
-            BooleanSample.this.g = Boolean.TRUE;
+            BooleanSample.this.booleanWrapper = Boolean.TRUE;
         }
     }
 
