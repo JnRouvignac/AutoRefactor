@@ -25,11 +25,17 @@
  */
 package org.autorefactor.ui;
 
+import static org.eclipse.jface.dialogs.MessageDialog.openInformation;
+
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.handlers.HandlerUtil;
 
@@ -44,11 +50,24 @@ public class ChooseRefactoringsWizardHandler extends AbstractHandler {
     @Override
     public Object execute(final ExecutionEvent event) throws ExecutionException {
         final Shell shell = HandlerUtil.getActiveShell(event);
-        // retrieve the targeted java element before the menu item is disposed by the framework
-        final Wizard wizard = new ChooseRefactoringsWizard(
-                AutoRefactorHandler.getSelectedJavaElements(event));
-        final WizardDialog dialog = new WizardDialog(shell, wizard);
-        dialog.open();
+        try {
+            // Retrieve the targeted java element before the menu item is disposed by the framework
+            final Wizard wizard = new ChooseRefactoringsWizard(
+                    AutoRefactorHandler.getSelectedJavaElements(event));
+            final WizardDialog dialog = new WizardDialog(shell, wizard);
+            dialog.open();
+        } catch (final Exception e) {
+            Display.getDefault().asyncExec(new Runnable() {
+                @Override
+                public void run() {
+                    final StringWriter sw = new StringWriter();
+                    final PrintWriter pw = new PrintWriter(sw);
+                    e.printStackTrace(pw);
+
+                    openInformation(shell, "Info", "An error has occurred:\n\n" + sw.toString());
+                }
+            });
+        }
         return null;
     }
 }
