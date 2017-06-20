@@ -56,8 +56,8 @@ public class StringBuilderSample {
     }
 
     public void doNotReplaceWithStringAppend(StringBuffer sbuf, StringBuilder sbui) {
-        String s5 = sbuf.append("foo ").append("bar").toString();
-        String s6 = sbui.append("foo ").append("bar").toString();
+        String s5 = sbuf.append("foo " + "bar").toString();
+        String s6 = sbui.append("foo " + "bar").toString();
     }
 
     public void removeUselessStringConcatenation() {
@@ -177,9 +177,9 @@ public class StringBuilderSample {
         new StringBuffer().append(s, 0, 1);
     }
 
-    public void doNotRemoveSubstringSingleArgCallsWithAppend(String s) {
-        new StringBuilder().append(s.substring(1));
-        new StringBuffer().append(s.substring(1));
+    public void doNotRemoveSubstringSingleArgCallsWithAppend(String s, StringBuilder builder, StringBuffer buffer) {
+        builder.append(s.substring(1));
+        buffer.append(s.substring(1));
     }
 
     public void removeAppendEmptyString(StringBuilder builder, StringBuffer buffer) {
@@ -198,5 +198,88 @@ public class StringBuilderSample {
         // Keep this comment
         sbuf.append("foo " + "bar ").append(0).append("foo").append(1).append("bar ").append(s);
         sbui.append("foo " + "bar ").append(0).append("foo").append(1).append("bar ").append(s);
+    }
+
+    public void replaceConcatWithAppend() {
+        // Keep this comment
+        StringBuilder builder = new StringBuilder("foo ").append(1);
+        StringBuilder builder2 = new StringBuilder("foo ").append(1).append(" bar");
+        StringBuilder builder3 = new StringBuilder("foo ").append(1).append(" bar ").append(2);
+        StringBuilder builder4 = new StringBuilder("foo ").append(1).append(" bar ").append(2).append(" foo bar");
+        StringBuilder builder5 = new StringBuilder("foo " + "bar ").append(2).append(" foo bar");
+        StringBuilder builder6 = new StringBuilder("foo ").append(1).append(" bar ").append(2).append(" foo " + "bar");
+
+        // Keep this comment too
+        StringBuffer buffer = new StringBuffer("foo ").append(1);
+        StringBuffer buffer2 = new StringBuffer("foo ").append(1).append(" bar");
+        StringBuffer buffer3 = new StringBuffer("foo ").append(1).append(" bar ").append(2);
+        StringBuffer buffer4 = new StringBuffer("foo ").append(1).append(" bar ").append(2).append(" foo bar");
+        StringBuffer buffer5 = new StringBuffer("foo " + "bar ").append(2).append(" foo bar");
+        StringBuffer buffer6 = new StringBuffer("foo ").append(1).append(" bar ").append(2).append(" foo " + "bar");
+    }
+
+    public void removeEmptyString() {
+        // Keep this comment
+        StringBuilder builder2 = new StringBuilder("foo");
+        StringBuilder builder3 = new StringBuilder("foo");
+
+        // Keep this comment too
+        StringBuffer buffer2 = new StringBuffer("foo");
+        StringBuffer buffer3 = new StringBuffer("foo");
+    }
+
+    public void doNotReplaceLiteralConcat() {
+        StringBuilder builder = new StringBuilder("Do not " + "replace");
+
+        // Keep this comment too
+        StringBuffer buffer = new StringBuffer("Do not " + "replace");
+    }
+
+    public void replaceWithInteger() {
+        // Keep this comment
+        StringBuilder builder = new StringBuilder().append(1).append(" foo");
+
+        // Keep this comment too
+        StringBuffer buffer = new StringBuffer().append(1).append(" foo");
+    }
+
+    public void rewriteAppending() {
+        // Keep this comment
+        StringBuilder builder = new StringBuilder("one: ").append(1).append(" end");
+        StringBuilder builder2 = new StringBuilder("two: ").append(2).append(" bar" + " end");
+        StringBuilder builder3 = new StringBuilder("three: ").append(3).append(" bar ").append(2).append(" end");
+        StringBuilder builder4 = new StringBuilder("four: ").append(4).append(" bar ").append(2).append(" foo bar" + " end");
+        StringBuilder builder5 = new StringBuilder("five" + ": ").append(5).append(" foo bar" + " end");
+        StringBuilder builder6 = new StringBuilder("six: ").append(6).append(" bar ").append(2).append(" foo " + "bar" + " end");
+
+        // Keep this comment too
+        StringBuffer buffer = new StringBuffer("one: ").append(1).append(" end");
+        StringBuffer buffer2 = new StringBuffer("two: ").append(2).append(" bar" + " end");
+        StringBuffer buffer3 = new StringBuffer("three: ").append(3).append(" bar ").append(2).append(" end");
+        StringBuffer buffer4 = new StringBuffer("four: ").append(4).append(" bar ").append(2).append(" foo bar" + " end");
+        StringBuffer buffer5 = new StringBuffer("five" + ": ").append(5).append(" foo bar" + " end");
+        StringBuffer buffer6 = new StringBuffer("six: ").append(6).append(" bar ").append(2).append(" foo " + "bar" + " end");
+    }
+
+    public void avoidStringCreation() {
+        // Keep this comment
+        StringBuilder builder = new StringBuilder().append(1);
+        StringBuilder builder2 = new StringBuilder().append(2);
+        StringBuilder builder3 = new StringBuilder().append(3).append("...");
+        StringBuilder builder4 = new StringBuilder().append(4).append("...");
+
+        // Keep this comment too
+        StringBuffer buffer = new StringBuffer().append(1);
+        StringBuffer buffer2 = new StringBuffer().append(2);
+        StringBuffer buffer3 = new StringBuffer().append(3).append("...");
+        StringBuffer buffer4 = new StringBuffer().append(4).append("...");
+    }
+
+    public void shortenExpression() {
+        // Keep this comment
+        StringBuilder builder = new StringBuilder("Lorem ipsum");
+
+        // Keep this comment too
+        StringBuffer buffer = new StringBuffer("Lorem ipsum");
     }
 }
