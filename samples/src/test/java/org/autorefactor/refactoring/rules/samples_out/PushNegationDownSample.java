@@ -49,6 +49,18 @@ public class PushNegationDownSample {
         return (!b1 || !b2 || !b3); // another refactoring removes the parentheses
     }
 
+    public boolean replaceNegationWithInfixOrOperator(boolean b1, boolean b2, boolean b3) {
+        return (!b1 && !b2 && !b3); // another refactoring removes the parentheses
+    }
+
+    public boolean replaceNegationWithEqualOperator(boolean b1, boolean b2) {
+        return (b1 != b2); // another refactoring removes the parentheses
+    }
+
+    public boolean replaceNegationWithNotEqualOperator(boolean b1, boolean b2) {
+        return (b1 == b2); // another refactoring removes the parentheses
+    }
+
     public boolean replaceNegationRevertInnerExpressions(boolean b1, boolean b2) {
         return (b1 || b2 /* another refactoring removes the parentheses */);
     }

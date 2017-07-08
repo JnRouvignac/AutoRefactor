@@ -30,11 +30,15 @@ import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
 import static org.autorefactor.refactoring.ASTHelper.allOperands;
 import static org.autorefactor.refactoring.ASTHelper.getBooleanLiteral;
 import static org.autorefactor.refactoring.ASTHelper.hasOperator;
-import static org.autorefactor.refactoring.ASTHelper.hasType;
 import static org.autorefactor.refactoring.ASTHelper.removeParentheses;
+import static org.eclipse.jdt.core.dom.InfixExpression.Operator.AND;
+import static org.eclipse.jdt.core.dom.InfixExpression.Operator.CONDITIONAL_AND;
+import static org.eclipse.jdt.core.dom.InfixExpression.Operator.CONDITIONAL_OR;
+import static org.eclipse.jdt.core.dom.InfixExpression.Operator.OR;
 import static org.eclipse.jdt.core.dom.PrefixExpression.Operator.NOT;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -76,16 +80,15 @@ public class PushNegationDownRefactoring extends AbstractRefactoringRule {
             final InfixExpression ie = (InfixExpression) operand;
             final Operator reverseOp = (Operator) OperatorEnum.getOperator(ie).getReverseBooleanOperator();
             if (reverseOp != null) {
-                final List<Expression> allOperands = new ArrayList<Expression>(allOperands(ie));
-                if (hasType(ie.getLeftOperand(), "boolean", "java.lang.Boolean")
-                        && hasType(ie.getRightOperand(), "boolean", "java.lang.Boolean")) {
+                List<Expression> allOperands = new ArrayList<Expression>(allOperands(ie));
+                if (Arrays.<Operator>asList(CONDITIONAL_AND, CONDITIONAL_OR, AND, OR).contains(ie.getOperator())) {
                     for (ListIterator<Expression> it = allOperands.listIterator(); it.hasNext();) {
                         it.set(b.negate(it.next()));
                     }
-                    r.replace(node, b.parenthesize(b.infixExpr(reverseOp, allOperands)));
                 } else {
-                    r.replace(node, b.parenthesize(b.infixExpr(reverseOp, b.move(allOperands))));
+                    allOperands = b.move(allOperands);
                 }
+                r.replace(node, b.parenthesize(b.infixExpr(reverseOp, allOperands)));
                 return DO_NOT_VISIT_SUBTREE;
             }
         } else {
