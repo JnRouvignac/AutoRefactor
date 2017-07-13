@@ -186,7 +186,9 @@ public class DeadCodeEliminationRefactoring extends AbstractRefactoringRule {
         case METHOD_INVOCATION:
             MethodInvocation mi = (MethodInvocation) expr;
             methodHasSideEffects(mi.resolveMethodBinding(), mi, sideEffectExprs);
-            collectSideEffects(mi.getExpression(), sideEffectExprs);
+            if (mi.getExpression() != null) {
+                collectSideEffects(mi.getExpression(), sideEffectExprs);
+            }
             collectSideEffects(arguments(mi), sideEffectExprs);
             break;
 
