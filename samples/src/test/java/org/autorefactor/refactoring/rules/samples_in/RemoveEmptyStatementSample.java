@@ -23,17 +23,26 @@
  * which accompanies this distribution under LICENSE-ECLIPSE, and is
  * available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.autorefactor.refactoring.rules.samples_out;
+package org.autorefactor.refactoring.rules.samples_in;
 
-public class CleanCodeRatherThanSemicolonSample {
+public class RemoveEmptyStatementSample {
 
     void removeEmptyStatement(boolean b, String[] args) {
+        ;
+        if (b);
+        if (b);
+        else;
         if (b) System.out.println(b);
+        else;
         try {
+            ;
         } catch (Exception e) {
             e.printStackTrace();
         }
+        for (String arg : args);
+        for (int i = 0; i < 10; i++);
         int i = 0;
+        while (i < 10);
     }
 
     void doNotRemoveEmptyStatement(boolean b) {

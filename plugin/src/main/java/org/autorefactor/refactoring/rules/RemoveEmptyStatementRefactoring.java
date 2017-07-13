@@ -44,19 +44,19 @@ import org.eclipse.jdt.core.dom.TryStatement;
 import org.eclipse.jdt.core.dom.WhileStatement;
 
 /**
- * Clean code rather than semicolon.
+ * Removes empty statements.
  *
  * @see #getDescription()
  */
-public class CleanCodeRatherThanSemicolonRefactoring extends AbstractRefactoringRule {
+public class RemoveEmptyStatementRefactoring extends AbstractRefactoringRule {
     @Override
     public String getDescription() {
-        return "Removes empty statements.";
+        return "Removes lone semicolons.";
     }
 
     @Override
     public String getName() {
-        return "Clean code rather than semicolon";
+        return "Removes empty statements";
     }
 
     @Override
@@ -68,11 +68,11 @@ public class CleanCodeRatherThanSemicolonRefactoring extends AbstractRefactoring
         }
         parent = getParentIgnoring(node, Block.class);
         if (parent instanceof IfStatement) {
-            IfStatement is = (IfStatement) parent;
-            List<Statement> thenStmts = asList(is.getThenStatement());
-            List<Statement> elseStmts = asList(is.getElseStatement());
-            boolean thenIsEmptyStmt = thenStmts.size() == 1 && is(thenStmts.get(0), EmptyStatement.class);
-            boolean elseIsEmptyStmt = elseStmts.size() == 1 && is(elseStmts.get(0), EmptyStatement.class);
+            final IfStatement is = (IfStatement) parent;
+            final List<Statement> thenStmts = asList(is.getThenStatement());
+            final List<Statement> elseStmts = asList(is.getElseStatement());
+            final boolean thenIsEmptyStmt = thenStmts.size() == 1 && is(thenStmts.get(0), EmptyStatement.class);
+            final boolean elseIsEmptyStmt = elseStmts.size() == 1 && is(elseStmts.get(0), EmptyStatement.class);
             if (thenIsEmptyStmt && elseIsEmptyStmt) {
                 this.ctx.getRefactorings().remove(parent);
                 return DO_NOT_VISIT_SUBTREE;
@@ -99,8 +99,8 @@ public class CleanCodeRatherThanSemicolonRefactoring extends AbstractRefactoring
         return VISIT_SUBTREE;
     }
 
-    private boolean maybeRemoveEmptyStmtBody(EmptyStatement node, Statement stmt, Statement body) {
-        List<Statement> bodyStmts = asList(body);
+    private boolean maybeRemoveEmptyStmtBody(final EmptyStatement node, final Statement stmt, final Statement body) {
+        final List<Statement> bodyStmts = asList(body);
         if (bodyStmts.size() == 1 && bodyStmts.contains(node)) {
             this.ctx.getRefactorings().remove(stmt);
             return DO_NOT_VISIT_SUBTREE;
