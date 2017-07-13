@@ -25,9 +25,11 @@
  */
 package org.autorefactor.refactoring.rules.samples_out;
 
+import java.util.List;
+
 public class RemoveEmptyStatementSample {
 
-    void removeEmptyStatement(boolean b, String[] args) {
+    public void removeEmptyStatement(boolean b, String[] args) {
         if (b) System.out.println(b);
         try {
         } catch (Exception e) {
@@ -36,8 +38,37 @@ public class RemoveEmptyStatementSample {
         int i = 0;
     }
 
-    void doNotRemoveEmptyStatement(boolean b) {
+    public void doNotRemoveEmptyStatement(boolean b) {
         if (b);
         else System.out.println(b);
+    }
+
+    public void doNotRemoveWithMethodCall(List<String> filledList) {
+        if (filledList.remove("foo"));
+    }
+
+    public boolean doNotRemoveWithAssignment(boolean b) {
+        if (b = true);
+        return b;
+    }
+
+    public int doNotRemoveWithIncrement(int i) {
+        if (i++ == 0);
+        return i;
+    }
+
+    public int doNotRemoveWhileWithIncrement(int i) {
+        while (i++ == 100);
+        return i;
+    }
+
+    public int doNotRemoveDoWhileWithIncrement(int i) {
+        do; while (i++ == 100);
+        return i;
+    }
+
+    public int doNotRemoveForWithMethodCall(List<String> filledList, int end) {
+        for (String aString : filledList.subList(0, end--));
+        return end;
     }
 }

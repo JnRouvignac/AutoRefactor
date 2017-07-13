@@ -30,17 +30,18 @@ import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
 import static org.autorefactor.refactoring.ASTHelper.asList;
 import static org.autorefactor.refactoring.ASTHelper.getParentIgnoring;
 import static org.autorefactor.refactoring.ASTHelper.is;
+import static org.autorefactor.refactoring.ASTHelper.isPassive;
 
 import java.util.List;
 
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Block;
+import org.eclipse.jdt.core.dom.DoStatement;
 import org.eclipse.jdt.core.dom.EmptyStatement;
 import org.eclipse.jdt.core.dom.EnhancedForStatement;
 import org.eclipse.jdt.core.dom.ForStatement;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.Statement;
-import org.eclipse.jdt.core.dom.TryStatement;
 import org.eclipse.jdt.core.dom.WhileStatement;
 
 /**
@@ -69,32 +70,40 @@ public class RemoveEmptyStatementRefactoring extends AbstractRefactoringRule {
         parent = getParentIgnoring(node, Block.class);
         if (parent instanceof IfStatement) {
             final IfStatement is = (IfStatement) parent;
-            final List<Statement> thenStmts = asList(is.getThenStatement());
-            final List<Statement> elseStmts = asList(is.getElseStatement());
-            final boolean thenIsEmptyStmt = thenStmts.size() == 1 && is(thenStmts.get(0), EmptyStatement.class);
-            final boolean elseIsEmptyStmt = elseStmts.size() == 1 && is(elseStmts.get(0), EmptyStatement.class);
-            if (thenIsEmptyStmt && elseIsEmptyStmt) {
-                this.ctx.getRefactorings().remove(parent);
-                return DO_NOT_VISIT_SUBTREE;
-            } else if (thenIsEmptyStmt && is.getElseStatement() == null) {
-                this.ctx.getRefactorings().remove(is);
-                return DO_NOT_VISIT_SUBTREE;
-            } else if (elseIsEmptyStmt) {
-                this.ctx.getRefactorings().remove(is.getElseStatement());
-                return DO_NOT_VISIT_SUBTREE;
+            if (isPassive(is.getExpression())) {
+                final List<Statement> thenStmts = asList(is.getThenStatement());
+                final List<Statement> elseStmts = asList(is.getElseStatement());
+                final boolean thenIsEmptyStmt = thenStmts.size() == 1 && is(thenStmts.get(0), EmptyStatement.class);
+                final boolean elseIsEmptyStmt = elseStmts.size() == 1 && is(elseStmts.get(0), EmptyStatement.class);
+                if (thenIsEmptyStmt && elseIsEmptyStmt) {
+                    this.ctx.getRefactorings().remove(parent);
+                    return DO_NOT_VISIT_SUBTREE;
+                } else if (thenIsEmptyStmt && is.getElseStatement() == null) {
+                    this.ctx.getRefactorings().remove(is);
+                    return DO_NOT_VISIT_SUBTREE;
+                } else if (elseIsEmptyStmt) {
+                    this.ctx.getRefactorings().remove(is.getElseStatement());
+                    return DO_NOT_VISIT_SUBTREE;
+                }
             }
-        } else if (parent instanceof TryStatement) {
-            TryStatement ts = (TryStatement) parent;
-            return maybeRemoveEmptyStmtBody(node, ts, ts.getBody());
         } else if (parent instanceof EnhancedForStatement) {
             EnhancedForStatement efs = (EnhancedForStatement) parent;
-            return maybeRemoveEmptyStmtBody(node, efs, efs.getBody());
+            if (isPassive(efs.getExpression())) {
+                return maybeRemoveEmptyStmtBody(node, efs, efs.getBody());
+            }
         } else if (parent instanceof ForStatement) {
             ForStatement fs = (ForStatement) parent;
             return maybeRemoveEmptyStmtBody(node, fs, fs.getBody());
         } else if (parent instanceof WhileStatement) {
             WhileStatement ws = (WhileStatement) parent;
-            return maybeRemoveEmptyStmtBody(node, ws, ws.getBody());
+            if (isPassive(ws.getExpression())) {
+                return maybeRemoveEmptyStmtBody(node, ws, ws.getBody());
+            }
+        } else if (parent instanceof DoStatement) {
+            DoStatement ws = (DoStatement) parent;
+            if (isPassive(ws.getExpression())) {
+                return maybeRemoveEmptyStmtBody(node, ws, ws.getBody());
+            }
         }
         return VISIT_SUBTREE;
     }
