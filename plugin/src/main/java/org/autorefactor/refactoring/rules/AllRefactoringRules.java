@@ -130,6 +130,7 @@ public final class AllRefactoringRules {
                 new RemoveUnnecessaryLocalBeforeReturnRefactoring(),
                 new RemoveUnnecessaryCastRefactoring(),
                 new RemoveUselessModifiersRefactoring(),
+                new NoSettingRatherThanUselessSettingRefactoring(),
                 new HotSpotIntrinsicedAPIsRefactoring(),
                 new AnnotationRefactoring(),
                 new TryWithResourceRefactoring(),
