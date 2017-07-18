@@ -43,8 +43,12 @@ import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.CastExpression;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.ConditionalExpression;
+import org.eclipse.jdt.core.dom.DoStatement;
+import org.eclipse.jdt.core.dom.EnhancedForStatement;
 import org.eclipse.jdt.core.dom.Expression;
+import org.eclipse.jdt.core.dom.ExpressionStatement;
 import org.eclipse.jdt.core.dom.FieldAccess;
+import org.eclipse.jdt.core.dom.ForStatement;
 import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.InfixExpression;
@@ -59,6 +63,7 @@ import org.eclipse.jdt.core.dom.ThisExpression;
 import org.eclipse.jdt.core.dom.TryStatement;
 import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
+import org.eclipse.jdt.core.dom.WhileStatement;
 
 import static org.eclipse.jdt.core.dom.InfixExpression.Operator.EQUALS;
 import static org.eclipse.jdt.core.dom.InfixExpression.Operator.NOT_EQUALS;
@@ -105,12 +110,25 @@ public class DeadCodeEliminationRefactoring extends AbstractRefactoringRule {
             } else {
                 final List<Expression> sideEffectExprs = new ArrayList<Expression>();
                 collectSideEffects(condition, sideEffectExprs);
-                if (!sideEffectExprs.isEmpty()) {
+
+                if (node.getParent() instanceof IfStatement
+                        || node.getParent() instanceof EnhancedForStatement
+                        || node.getParent() instanceof ForStatement
+                        || node.getParent() instanceof WhileStatement
+                        || node.getParent() instanceof DoStatement) {
+                    final List<ExpressionStatement> sideEffectStmts =
+                            new ArrayList<ExpressionStatement>(sideEffectExprs.size());
+                    for (Expression sideEffectExpr : sideEffectExprs) {
+                        sideEffectStmts.add(b.toStmt(b.move(sideEffectExpr)));
+                    }
+                    r.replace(node,
+                            b.block(sideEffectStmts.toArray(new ExpressionStatement[sideEffectStmts.size()])));
+                } else {
                     for (Expression sideEffectExpr : sideEffectExprs) {
                         r.insertBefore(b.toStmt(b.move(sideEffectExpr)), node);
                     }
+                    r.remove(node);
                 }
-                r.remove(node);
             }
             return DO_NOT_VISIT_SUBTREE;
         }

@@ -275,4 +275,59 @@ public class DeadCodeEliminationSample {
         b.getAndSet(false);
         col.add(2);
     }
+
+    public int replaceDeadCodeByEmptyBlock(int i, byte[] bytes, boolean uselessCondition) {
+        for (;i * 13 < 100; i++) {
+        }
+
+        for (byte oneByte : bytes) {
+        }
+
+        while ((i++) * 13 < 100) {
+        }
+
+        do {
+        }
+        while ((i--) * 13 > -200);
+
+        return i;
+    }
+
+    public int replaceDeadCodeByAddingBlock(int i, byte[] bytes, boolean uselessCondition) {
+        for (;i * 13 < 100; i++) {
+        }
+
+        for (byte oneByte : bytes) {
+        }
+
+        while ((i++) * 13 < 100) {
+        }
+
+        do {
+        }
+        while ((i--) * 13 > -200);
+
+        return i;
+    }
+
+    public int replaceDeadCodeBySideEffects(int i, byte[] bytes, int j) {
+        for (;i * 13 < 100; i++) {
+            j++;
+        }
+
+        for (byte oneByte : bytes) {
+            j++;
+        }
+
+        while ((i++) * 13 < 100) {
+            j++;
+        }
+
+        do {
+            j++;
+        }
+        while ((i--) * 13 > -200);
+
+        return i + j;
+    }
 }
