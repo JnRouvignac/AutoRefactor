@@ -62,7 +62,7 @@ public class SimplifyExpressionRefactoring extends AbstractRefactoringRule {
     public String getDescription() {
         return ""
             + "Simplifies Java expressions:\n"
-            + "- remove redundant null checks or useless right-hand side or left-hand sie operands,\n"
+            + "- remove redundant null checks or useless right-hand side or left-hand side operands,\n"
             + "- remove useless parentheses,\n"
             + "- directly check boolean values instead of comparing them with true/false,\n"
             + "- reduce double negation in boolean expression.";
