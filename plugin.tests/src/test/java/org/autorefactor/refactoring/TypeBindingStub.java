@@ -370,6 +370,10 @@ class TypeBindingStub implements ITypeBinding {
         throw new UnsupportedOperationException();
     }
 
+    public boolean isIntersectionType() {
+        throw new UnsupportedOperationException();
+    }
+
     public String toString() {
         return fullyQualifiedName;
     }
