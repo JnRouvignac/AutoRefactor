@@ -135,6 +135,7 @@ public class SetRatherThanMapSample {
 
     public void doNotReplaceHashMapPassedToAMethod() {
         String text = String.valueOf(new HashMap<String, String>());
+        equals(new HashMap<String, String>());
     }
 
     public HashMap<Integer, Date> doNotReplaceReturnedHashMap() {
@@ -153,6 +154,21 @@ public class SetRatherThanMapSample {
             @Override
             public void run() {
                 aggregate.put("foo", "bar");
+            }
+        };
+    }
+
+    public void replaceHashMapInsideRunnable() {
+        // Keep this comment
+        final HashMap<String, long[]> set = new HashMap<String, long[]>();
+        set.put("foo", new long[] {0, 1, 2, 3});
+        new Runnable() {
+
+            @Override
+            public void run() {
+                // Keep this comment too
+                final HashMap<String, long[]> localSet = new HashMap<String, long[]>();
+                localSet.put("bar", new long[] {4, 5, 6, 7});
             }
         };
     }
@@ -200,5 +216,21 @@ public class SetRatherThanMapSample {
     public String doNotReplaceToStringMethod() {
         HashMap<String, String> map = new HashMap<String, String>();
         return map.toString();
+    }
+
+    public void refactorWithMethods(Collection<Integer> anotherCollection) throws InterruptedException {
+        // Keep this comment
+        HashMap<Integer, String> aggregate = new HashMap<Integer, String>();
+        aggregate.put(123, "123");
+        aggregate.clear();
+        aggregate.containsKey(anotherCollection);
+        aggregate.isEmpty();
+        aggregate.remove(123);
+        aggregate.size();
+        aggregate.notify();
+        aggregate.notifyAll();
+        aggregate.wait();
+        aggregate.wait(1000);
+        aggregate.wait(1000, 1000);
     }
 }

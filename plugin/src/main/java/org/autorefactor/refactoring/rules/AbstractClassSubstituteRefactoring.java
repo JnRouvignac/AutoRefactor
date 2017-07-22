@@ -344,7 +344,7 @@ public abstract class AbstractClassSubstituteRefactoring extends AbstractRefacto
     }
 
     private boolean isObjectPassedInParameter(final ASTNode subNode, final MethodInvocation mi) {
-        return !mi.getExpression().equals(subNode);
+        return !subNode.equals(mi.getExpression());
     }
 
     private final class ObjectInstantiationVisitor extends ASTVisitor {
