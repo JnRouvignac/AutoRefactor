@@ -28,6 +28,7 @@ package org.autorefactor.refactoring.rules.samples_in;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -149,5 +150,15 @@ public class UseDiamondOperatorSample {
         // Keep this comment
         Set<String> s = new TreeSet<String>(new StringComparator());
         return s;
+    }
+
+    public static final ParameterizedType EMPTY_NODE = null;
+
+    class ParameterizedType<T extends Comparable<T>> {
+        ParameterizedType(ParameterizedType<? extends Date> parameterizedArgument) {}
+    }
+
+    <T extends Comparable<T>> ParameterizedType<T> doNotUseDiamondOperatorForNotParameterizedArgument() {
+        return new ParameterizedType<T>(EMPTY_NODE);
     }
 }

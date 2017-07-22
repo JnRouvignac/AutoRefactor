@@ -70,7 +70,7 @@ public class UseDiamondOperatorRefactoring extends AbstractRefactoringRule {
                 && node.getAnonymousClassDeclaration() == null
                 && parentAllowsDiamondOperator(node)
                 && canUseDiamondOperator(node, type)) {
-            return removeAllTypeArguments((ParameterizedType) type);
+            return maybeRemoveAllTypeArguments((ParameterizedType) type);
         }
         return VISIT_SUBTREE;
     }
@@ -99,35 +99,40 @@ public class UseDiamondOperatorRefactoring extends AbstractRefactoringRule {
         IMethodBinding methodDecl = ctorBinding.getMethodDeclaration();
         ITypeBinding[] actualCtorParamTypes = ctorBinding.getParameterTypes();
         ITypeBinding[] declMethodParamTypes = methodDecl.getParameterTypes();
+
         for (int i = 0; i < declMethodParamTypes.length; i++) {
             ITypeBinding declParamType = declMethodParamTypes[i];
             ITypeBinding actualParamType = actualCtorParamTypes[i];
             String actualParamTypeQName = actualParamType.getErasure().getQualifiedName();
             Expression actualArg = args.get(i);
             ITypeBinding actualArgType = findImplementedType(actualArg.resolveTypeBinding(), actualParamTypeQName);
+
             if (actualArgType != null && declParamType.isParameterizedType()) {
                 ITypeBinding[] declParamTypeArgs = declParamType.getTypeArguments();
-                ITypeBinding[] actualParamTypeArgs = actualParamType.getTypeArguments();
                 ITypeBinding[] actualArgTypeArgs = actualArgType.getTypeArguments();
+
                 for (int j = 0; j < declParamTypeArgs.length; j++) {
                     ITypeBinding declParamTypeArg = declParamTypeArgs[j];
-                    ITypeBinding actualParamTypeArg = actualParamTypeArgs[j];
-                    ITypeBinding actualArgTypeArg = actualArgTypeArgs[j];
+
                     if (declParamTypeArg.isWildcardType()) {
                         ITypeBinding declParamTypeArgBound = declParamTypeArg.getBound();
-                        ITypeBinding actualParamTypeArgBound = actualParamTypeArg.getBound();
                         int typeParamIndex = typeParameters.indexOf(declParamTypeArgBound);
-                        int typeArgIndex = typeArguments.indexOf(actualArgTypeArg);
-                        if (typeParamIndex != -1 && typeArgIndex != -1) {
-                            // the type parameter is matching
-                            typeParameters.remove(typeParamIndex);
-                            typeArguments.remove(typeArgIndex);
+
+                        if (j < actualArgTypeArgs.length) {
+                            ITypeBinding actualArgTypeArg = actualArgTypeArgs[j];
+                            int typeArgIndex = typeArguments.indexOf(actualArgTypeArg);
+                            if (typeParamIndex != -1 && typeArgIndex != -1) {
+                                // The type parameter is matching
+                                typeParameters.remove(typeParamIndex);
+                                typeArguments.remove(typeArgIndex);
+                            }
                         }
                     }
                 }
             }
         }
-        // all the type parameters are matching
+
+        // All the type parameters are matching
         return typeParameters.isEmpty();
     }
 
@@ -138,18 +143,17 @@ public class UseDiamondOperatorRefactoring extends AbstractRefactoringRule {
         switch (parentInfo.getParent().getNodeType()) {
         case ASSIGNMENT:
             return Assignment.RIGHT_HAND_SIDE_PROPERTY.equals(locationInParent);
-        case METHOD_INVOCATION:
-            return false; // FIXME some of them can be refactored
         case RETURN_STATEMENT:
             return ReturnStatement.EXPRESSION_PROPERTY.equals(locationInParent);
         case VARIABLE_DECLARATION_FRAGMENT:
             return VariableDeclarationFragment.INITIALIZER_PROPERTY.equals(locationInParent);
+        case METHOD_INVOCATION: // TODO some of them can be refactored
         default:
             return false;
         }
     }
 
-    private boolean removeAllTypeArguments(ParameterizedType pt) {
+    private boolean maybeRemoveAllTypeArguments(ParameterizedType pt) {
         final List<Type> typeArguments = typeArguments(pt);
         if (!typeArguments.isEmpty()) {
             this.ctx.getRefactorings().remove(typeArguments);
