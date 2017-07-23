@@ -27,10 +27,12 @@ package org.autorefactor.refactoring.rules.samples_in;
 
 import java.util.Collection;
 import java.util.Date;
+import java.util.EventObject;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Observable;
 import java.util.Set;
 
 public class SetRatherThanMapSample {
@@ -58,7 +60,7 @@ public class SetRatherThanMapSample {
 
     public void replaceHashMapVariableDeclaration() {
         // Keep this comment
-        HashMap<String, String> aggregate = new HashMap<String, String>();
+        HashMap<String, Observable> aggregate = new HashMap<String, Observable>();
     }
 
     public void doNotReplaceInterface() {
@@ -136,6 +138,14 @@ public class SetRatherThanMapSample {
     public void doNotReplaceHashMapPassedToAMethod() {
         String text = String.valueOf(new HashMap<String, String>());
         equals(new HashMap<String, String>());
+    }
+
+    public Object doNotReplaceHashMapPassedToAConstructor() {
+        return new EventObject(new HashMap<String, String>());
+    }
+
+    public Object doNotReplaceHashMapInConditionalExpression(boolean b) {
+        return b ? new HashMap<String, String>() : null;
     }
 
     public HashMap<Integer, Date> doNotReplaceReturnedHashMap() {

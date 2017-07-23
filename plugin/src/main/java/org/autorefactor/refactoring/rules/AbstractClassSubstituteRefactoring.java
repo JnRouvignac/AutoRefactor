@@ -31,6 +31,8 @@ import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
 import static org.autorefactor.refactoring.ASTHelper.hasType;
 import static org.eclipse.jdt.core.dom.ASTNode.ASSIGNMENT;
 import static org.eclipse.jdt.core.dom.ASTNode.CAST_EXPRESSION;
+import static org.eclipse.jdt.core.dom.ASTNode.CLASS_INSTANCE_CREATION;
+import static org.eclipse.jdt.core.dom.ASTNode.CONDITIONAL_EXPRESSION;
 import static org.eclipse.jdt.core.dom.ASTNode.ENHANCED_FOR_STATEMENT;
 import static org.eclipse.jdt.core.dom.ASTNode.INSTANCEOF_EXPRESSION;
 import static org.eclipse.jdt.core.dom.ASTNode.METHOD_INVOCATION;
@@ -306,6 +308,8 @@ public abstract class AbstractClassSubstituteRefactoring extends AbstractRefacto
             case RETURN_STATEMENT:
             case CAST_EXPRESSION:
             case INSTANCEOF_EXPRESSION:
+            case CLASS_INSTANCE_CREATION:
+            case CONDITIONAL_EXPRESSION:
                 return false;
             case SINGLE_VARIABLE_DECLARATION:
             case VARIABLE_DECLARATION_EXPRESSION:
