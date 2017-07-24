@@ -89,6 +89,7 @@ public final class AllRefactoringRules {
                 new DeadCodeEliminationRefactoring(),
                 new RemoveEmptyStatementRefactoring(),
                 new DoWhileRatherThanWhileRefactoring(),
+                new DoWhileRatherThanDuplicateCodeRefactoring(),
                 new SuperCallRatherThanUselessOverridingRefactoring(),
                 new CollapseIfStatementRefactoring(),
                 new CommonCodeInIfElseStatementRefactoring(),
