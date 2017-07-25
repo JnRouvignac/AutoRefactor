@@ -27,22 +27,27 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.arg0;
+import static org.autorefactor.refactoring.ASTHelper.arguments;
+import static org.autorefactor.refactoring.ASTHelper.hasType;
+import static org.autorefactor.refactoring.ASTHelper.isMethod;
+import static org.autorefactor.refactoring.ASTHelper.isPrimitive;
+import static org.autorefactor.refactoring.ASTHelper.removeParentheses;
+import static org.autorefactor.refactoring.ASTHelper.resolveTypeBinding;
+import static org.autorefactor.util.Utils.equal;
+
 import java.util.List;
 
 import org.autorefactor.refactoring.ASTBuilder;
-import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.ASTNode;
-import org.eclipse.jdt.core.dom.BooleanLiteral;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.MethodInvocation;
-import org.eclipse.jdt.core.dom.QualifiedName;
 import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
-
-import static org.autorefactor.refactoring.ASTHelper.*;
-import static org.autorefactor.util.Utils.*;
 
 /** See {@link #getDescription()} method. */
 @SuppressWarnings("javadoc")
@@ -228,35 +233,5 @@ public class PrimitiveWrapperCreationRefactoring extends AbstractRefactoringRule
             String methodName, Expression arg) {
         final ASTBuilder b = this.ctx.getASTBuilder();
         return b.invoke(typeName, methodName, b.copy(arg));
-    }
-
-    @Override
-    public boolean visit(QualifiedName node) {
-        final ASTNode parent = removeParentheses(node.getParent());
-        if (parent instanceof VariableDeclarationFragment) {
-            final ITypeBinding typeBinding = resolveTypeBinding((VariableDeclarationFragment) parent);
-            return replaceBooleanObjectByPrimitive(node, typeBinding);
-        } else if (parent instanceof Assignment) {
-            final ITypeBinding typeBinding = ((Assignment) parent).resolveTypeBinding();
-            return replaceBooleanObjectByPrimitive(node, typeBinding);
-        }
-        return VISIT_SUBTREE;
-    }
-
-    private boolean replaceBooleanObjectByPrimitive(QualifiedName node, ITypeBinding typeBinding) {
-        if (typeBinding != null && typeBinding.isPrimitive()) {
-            if (isField(node, "java.lang.Boolean", "TRUE")) {
-                return replaceWithBooleanLiteral(node, true);
-            } else if (isField(node, "java.lang.Boolean", "FALSE")) {
-                return replaceWithBooleanLiteral(node, false);
-            }
-        }
-        return VISIT_SUBTREE;
-    }
-
-    private boolean replaceWithBooleanLiteral(QualifiedName node, boolean val) {
-        final BooleanLiteral booleanLiteral = this.ctx.getASTBuilder().boolean0(val);
-        this.ctx.getRefactorings().replace(node, booleanLiteral);
-        return DO_NOT_VISIT_SUBTREE;
     }
 }

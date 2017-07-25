@@ -66,6 +66,7 @@ public final class AllRefactoringRules {
                 new RemoveUselessNullCheckRefactoring(),
                 new VectorOldToNewAPIRefactoring(),
                 new PrimitiveWrapperCreationRefactoring(),
+                new LiteralRatherThanBooleanConstantRefactoring(),
                 new BooleanRefactoring(),
                 new LazyLogicalRatherThanEagerRefactoring(),
                 new BooleanConstantRatherThanValueOfRefactoring(),

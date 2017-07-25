@@ -41,7 +41,7 @@ public class PrimitiveWrapperCreationSample {
         short shPrimitive = 1;
         int iPrimitive = 1;
 
-        // primitive literals
+        // Primitive literals
         Byte by = new Byte((byte) 4);
         Boolean bo = new Boolean(true);
         Character c = new Character('c');
@@ -52,7 +52,7 @@ public class PrimitiveWrapperCreationSample {
         Short s = new Short((short) 1);
         Integer i = new Integer(1);
 
-        // primitive variables
+        // Primitive variables
         by = new Byte(byPrimitive);
         bo = new Boolean(boPrimitive);
         c = new Character(cPrimitive);
@@ -63,7 +63,7 @@ public class PrimitiveWrapperCreationSample {
         s = new Short(shPrimitive);
         i = new Integer(iPrimitive);
 
-        // implicit object narrowing
+        // Implicit object narrowing
         Float f3 = new Float(dObject);
     }
 
@@ -72,13 +72,13 @@ public class PrimitiveWrapperCreationSample {
         new Boolean("true").booleanValue();
         new Integer("42").intValue();
         new Long("42").longValue();
-        // nothing for Short?
+        // Nothing for Short?
         new Float("42.42").floatValue();
         new Double("42.42").doubleValue();
     }
 
     public static void convertValueOfCallsToParseCallsInPrimitiveContext() {
-        // Keep this comment 1
+        // Keep this comment
         byte by1 = Byte.valueOf("0");
         byte by2 = Byte.valueOf("0", 10);
         boolean bo = Boolean.valueOf("true");
@@ -93,11 +93,9 @@ public class PrimitiveWrapperCreationSample {
     }
 
     public static void removeUnnecessaryValueOfCallsInPrimitiveContext() {
-        // Keep this comment 1
+        // Keep this comment
         byte by = Byte.valueOf((byte) 0);
         boolean bo1 = Boolean.valueOf(true);
-        boolean bo2 = Boolean.TRUE;
-        bo2 = Boolean.FALSE;
         int i = Integer.valueOf(42);
         long l = Long.valueOf(42);
         short s = Short.valueOf((short) 42);
@@ -106,7 +104,7 @@ public class PrimitiveWrapperCreationSample {
     }
 
     public static void removeUnnecessaryConstructorInvocationsInPrimitiveContext() {
-        // Keep this comment 1
+        // Keep this comment
         byte by = new Byte((byte) 0);
         boolean bo = new Boolean(true);
         int i = new Integer(42);

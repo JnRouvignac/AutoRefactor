@@ -41,7 +41,7 @@ public class PrimitiveWrapperCreationSample {
         short shPrimitive = 1;
         int iPrimitive = 1;
 
-        // primitive literals
+        // Primitive literals
         Byte by = Byte.valueOf((byte) 4);
         Boolean bo = Boolean.valueOf(true);
         Character c = Character.valueOf('c');
@@ -52,7 +52,7 @@ public class PrimitiveWrapperCreationSample {
         Short s = Short.valueOf((short) 1);
         Integer i = Integer.valueOf(1);
 
-        // primitive variables
+        // Primitive variables
         by = Byte.valueOf(byPrimitive);
         bo = Boolean.valueOf(boPrimitive);
         c = Character.valueOf(cPrimitive);
@@ -63,7 +63,7 @@ public class PrimitiveWrapperCreationSample {
         s = Short.valueOf(shPrimitive);
         i = Integer.valueOf(iPrimitive);
 
-        // implicit object narrowing
+        // Implicit object narrowing
         Float f3 = dObject.floatValue();
     }
 
@@ -72,13 +72,13 @@ public class PrimitiveWrapperCreationSample {
         Boolean.valueOf("true");
         Integer.parseInt("42");
         Long.parseLong("42");
-        // nothing for Short?
+        // Nothing for Short?
         Float.parseFloat("42.42");
         Double.parseDouble("42.42");
     }
 
     public static void convertValueOfCallsToParseCallsInPrimitiveContext() {
-        // Keep this comment 1
+        // Keep this comment
         byte by1 = Byte.parseByte("0");
         byte by2 = Byte.parseByte("0", 10);
         boolean bo = Boolean.parseBoolean("true");
@@ -93,11 +93,9 @@ public class PrimitiveWrapperCreationSample {
     }
 
     public static void removeUnnecessaryValueOfCallsInPrimitiveContext() {
-        // Keep this comment 1
+        // Keep this comment
         byte by = (byte) 0;
         boolean bo1 = true;
-        boolean bo2 = true;
-        bo2 = false;
         int i = 42;
         long l = 42;
         short s = (short) 42;
@@ -106,7 +104,7 @@ public class PrimitiveWrapperCreationSample {
     }
 
     public static void removeUnnecessaryConstructorInvocationsInPrimitiveContext() {
-        // Keep this comment 1
+        // Keep this comment
         byte by = (byte) 0;
         boolean bo = true;
         int i = 42;
