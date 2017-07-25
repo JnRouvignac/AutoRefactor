@@ -25,6 +25,8 @@
  */
 package org.autorefactor.refactoring;
 
+import static org.autorefactor.refactoring.PluginConstant.PLUGIN_ID;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -46,8 +48,6 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaModelException;
-
-import static org.autorefactor.refactoring.PluginConstant.*;
 
 /** Eclipse job that prepares and partitions work for {@link ApplyRefactoringsJob}. */
 public class PrepareApplyRefactoringsJob extends Job {
@@ -141,11 +141,11 @@ public class PrepareApplyRefactoringsJob extends Job {
                 add(results, (ICompilationUnit) javaElement, options);
             } else if (javaElement instanceof IPackageFragment) {
                 final IPackageFragment pf = (IPackageFragment) javaElement;
+                addAll(results, getSubPackages(pf));
                 addAll(results, pf.getCompilationUnits(), options);
             } else if (javaElement instanceof IPackageFragmentRoot) {
                 final IPackageFragmentRoot pfr = (IPackageFragmentRoot) javaElement;
                 addAll(results, Arrays.asList(pfr.getChildren()));
-            } else if (javaElement instanceof IJavaProject) {
                 IJavaProject javaProject = (IJavaProject) javaElement;
                 for (IPackageFragment pf : javaProject.getPackageFragments()) {
                     addAll(results, pf.getCompilationUnits(), options);
@@ -191,5 +191,19 @@ public class PrepareApplyRefactoringsJob extends Job {
             return (IJavaProject) javaElement;
         }
         throw new NotImplementedException(null, javaElement);
+    }
+
+    private List<IJavaElement> getSubPackages(IPackageFragment motherPackage) throws JavaModelException {
+        List<IJavaElement> subPackages = new ArrayList<IJavaElement>();
+        String packageName = motherPackage.getElementName();
+        IJavaElement[] packages = ((IPackageFragmentRoot) motherPackage.getParent()).getChildren();
+
+        for (IJavaElement onePackage : packages) {
+            if (onePackage instanceof IPackageFragment && onePackage.getElementName().startsWith(packageName + ".")) {
+                subPackages.add(onePackage);
+            }
+        }
+
+        return subPackages;
     }
 }
