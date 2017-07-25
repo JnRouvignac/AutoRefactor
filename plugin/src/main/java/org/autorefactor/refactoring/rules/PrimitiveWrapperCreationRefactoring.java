@@ -75,7 +75,7 @@ public class PrimitiveWrapperCreationRefactoring extends AbstractRefactoringRule
         final ASTNode parent = removeParentheses(node.getParent());
         if (parent instanceof VariableDeclarationFragment) {
             final ITypeBinding typeBinding = resolveTypeBinding((VariableDeclarationFragment) parent);
-            if (typeBinding.isPrimitive()
+            if (typeBinding != null && typeBinding.isPrimitive()
                     && "valueOf".equals(node.getName().getIdentifier())) {
                 if (isMethod(node, "java.lang.Boolean", "valueOf", "boolean")
                         || isMethod(node, "java.lang.Byte", "valueOf", "byte")
@@ -245,9 +245,9 @@ public class PrimitiveWrapperCreationRefactoring extends AbstractRefactoringRule
 
     private boolean replaceBooleanObjectByPrimitive(QualifiedName node, ITypeBinding typeBinding) {
         if (typeBinding != null && typeBinding.isPrimitive()) {
-            if (isField(node, Boolean.class.getName(), "TRUE")) {
+            if (isField(node, "java.lang.Boolean", "TRUE")) {
                 return replaceWithBooleanLiteral(node, true);
-            } else if (isField(node, Boolean.class.getName(), "FALSE")) {
+            } else if (isField(node, "java.lang.Boolean", "FALSE")) {
                 return replaceWithBooleanLiteral(node, false);
             }
         }
