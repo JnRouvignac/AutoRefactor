@@ -57,6 +57,38 @@ public class AllInOneMethodRatherThanLoopSample {
         }
     }
 
+    public void replaceLoopOnCollectionAsExpressionWithArray(
+            Map<String, List<String>> mapToFill, String[] inputList) {
+        // Keep this comment
+        for (String input : inputList) {
+            mapToFill.get("foo").add(input);
+        }
+    }
+
+    public void replaceLoopOnRawCollectionWithArray(
+            List colToFill, String[] inputList) {
+        // Keep this comment
+        for (String input : inputList) {
+            colToFill.add(input);
+        }
+    }
+
+    public void replaceLoopOnCollectionAsExpressionWithList(
+            Map<String, List<String>> mapToFill, List<String> inputList) {
+        // Keep this comment
+        for (String input : inputList) {
+            mapToFill.get("foo").add(input);
+        }
+    }
+
+    public void replaceLoopOnRawCollectionWithList(
+            List colToFill, List<String> inputList) {
+        // Keep this comment
+        for (String input : inputList) {
+            colToFill.add(input);
+        }
+    }
+
     public void doNotRefactorForEachWithListUsingLoopVariable(
             Map<String, List<String>> mapToFill, List<String> inputList) {
         for (String input : inputList) {

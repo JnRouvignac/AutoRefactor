@@ -179,8 +179,11 @@ public class AllInOneMethodRatherThanLoopRefactoring extends AbstractRefactoring
         ITypeBinding arrayTypeBinding = arrayExpr.resolveTypeBinding();
         ITypeBinding colTypeBinding = colExpr.resolveTypeBinding();
         if (arrayTypeBinding != null && colTypeBinding != null) {
-            ITypeBinding componentType = arrayTypeBinding.getComponentType();
             ITypeBinding jucTypeBinding = findImplementedType(colTypeBinding, "java.util.Collection");
+            if (jucTypeBinding.isRawType()) {
+                return true;
+            }
+            ITypeBinding componentType = arrayTypeBinding.getComponentType();
             ITypeBinding colTypeArgument = jucTypeBinding.getTypeArguments()[0];
             return componentType.isSubTypeCompatible(colTypeArgument);
         }
