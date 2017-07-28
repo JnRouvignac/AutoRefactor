@@ -290,7 +290,7 @@ public class DeadCodeEliminationRefactoring extends AbstractRefactoringRule {
             PrefixExpression pe = (PrefixExpression) expr;
             PrefixExpression.Operator op = pe.getOperator();
             if (PrefixExpression.Operator.INCREMENT.equals(op)
-                  | PrefixExpression.Operator.DECREMENT.equals(op)) {
+                  || PrefixExpression.Operator.DECREMENT.equals(op)) {
                 sideEffectExprs.add(pe);
             } else {
                 collectSideEffects(pe.getOperand(), sideEffectExprs);
