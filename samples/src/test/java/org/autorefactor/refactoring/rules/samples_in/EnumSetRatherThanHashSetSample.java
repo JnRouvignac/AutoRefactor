@@ -49,6 +49,11 @@ public class EnumSetRatherThanHashSetSample {
         return set;
     }
 
+    public Set<Example> doNotRefactorRawVariableDeclarationStatement() {
+        Set set = new HashSet<Example>();
+        return set;
+    }
+
     public Set<Example> refactorReturnStatement() {
         // Keep this comment
         return new HashSet<Example>();
@@ -57,6 +62,10 @@ public class EnumSetRatherThanHashSetSample {
     public Set<Example> refactorReturnStatementWithDiamondOperator() {
         // Keep this comment
         return new HashSet<>();
+    }
+
+    public Set doNotRefactorRawReturnStatement() {
+        return new HashSet<Example>();
     }
 
     public Set<Example> refactorVariableDeclarationStatementWithParentheses() {
@@ -68,6 +77,12 @@ public class EnumSetRatherThanHashSetSample {
     public Set<Example> refactorAssignment() {
         // Keep this comment
         Set<Example> set;
+        set = new HashSet<Example>();
+        return set;
+    }
+
+    public Set<Example> doNotRefactorRawAssignment() {
+        Set set;
         set = new HashSet<Example>();
         return set;
     }

@@ -91,13 +91,15 @@ public abstract class AbstractEnumCollectionReplacementRefactoring extends Abstr
 
     abstract String getInterfaceType();
 
-    boolean handleReturnStatement(ClassInstanceCreation node, ReturnStatement rs) {
+    abstract boolean replace(ClassInstanceCreation node, Type... types);
+
+    private boolean handleReturnStatement(final ClassInstanceCreation node, final ReturnStatement rs) {
         MethodDeclaration md = getAncestorOrNull(node, MethodDeclaration.class);
         if (md != null) {
             Type returnType = md.getReturnType2();
             if (isTargetType(returnType)) {
                 List<Type> typeArguments = typeArgs(returnType);
-                if (isEnum(typeArguments.get(0))) {
+                if (!typeArguments.isEmpty() && isEnum(typeArguments.get(0))) {
                     return replace(node, typeArguments.toArray(new Type[] {}));
                 }
             }
@@ -105,15 +107,12 @@ public abstract class AbstractEnumCollectionReplacementRefactoring extends Abstr
         return VISIT_SUBTREE;
     }
 
-    abstract boolean replace(ClassInstanceCreation node, Type... types);
-
-    boolean handleAssignment(ClassInstanceCreation node, Assignment a) {
+    private boolean handleAssignment(final ClassInstanceCreation node, final Assignment a) {
         Expression lhs = a.getLeftHandSide();
         if (isTargetType(lhs.resolveTypeBinding())) {
 
             ITypeBinding[] typeArguments = lhs.resolveTypeBinding().getTypeArguments();
-            ITypeBinding keyTypeBinding = typeArguments[0];
-            if (keyTypeBinding.isEnum()) {
+            if (typeArguments.length > 0 && typeArguments[0].isEnum()) {
                 final TypeNameDecider typeNameDecider = new TypeNameDecider(lhs);
                 ASTBuilder b = ctx.getASTBuilder();
                 Type[] types = new Type[typeArguments.length];
@@ -126,13 +125,13 @@ public abstract class AbstractEnumCollectionReplacementRefactoring extends Abstr
         return VISIT_SUBTREE;
     }
 
-    boolean handleVarDeclarationStatement(VariableDeclarationStatement node) {
+    private boolean handleVarDeclarationStatement(final VariableDeclarationStatement node) {
         Type type = node.getType();
         if (type.isParameterizedType() && isTargetType(type)) {
 
             ParameterizedType ptype = (ParameterizedType) type;
             List<Type> typeArguments = typeArguments(ptype);
-            if (typeArguments.get(0).resolveBinding().isEnum()) {
+            if (!typeArguments.isEmpty() && typeArguments.get(0).resolveBinding().isEnum()) {
                 List<VariableDeclarationFragment> fragments = fragments(node);
                 for (VariableDeclarationFragment vdf:fragments) {
                     Expression initExpr = vdf.getInitializer();
@@ -154,23 +153,23 @@ public abstract class AbstractEnumCollectionReplacementRefactoring extends Abstr
      * Just one more wrapper to extract type arguments, <br>
      * to avoid boilerplate casting and shorten method name.
      */
-    List<Type> typeArgs(Type parameterizedType) {
+    List<Type> typeArgs(final Type parameterizedType) {
         return typeArguments((ParameterizedType) parameterizedType);
     }
 
-    boolean isTargetType(ITypeBinding it) {
+    boolean isTargetType(final ITypeBinding it) {
         return hasType(it, getInterfaceType());
     }
 
-    private boolean isEnum(Type type) {
+    private boolean isEnum(final Type type) {
         return type.resolveBinding().isEnum();
     }
 
-    private boolean creates(Expression exp, String type) {
+    private boolean creates(final Expression exp, final String type) {
         return exp.getNodeType() == Expression.CLASS_INSTANCE_CREATION && hasType(exp.resolveTypeBinding(), type);
     }
 
-    private boolean isTargetType(Type type) {
+    private boolean isTargetType(final Type type) {
         return type != null && type.isParameterizedType() && isTargetType(type.resolveBinding());
     }
 
