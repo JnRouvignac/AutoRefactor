@@ -79,7 +79,7 @@ public class ApplyRefactoringsJob extends Job {
     public ApplyRefactoringsJob(Queue<RefactoringUnit> refactoringUnits,
                                 List<RefactoringRule> refactoringRulesToApply,
                                 Environment environment) {
-        super("Auto Refactor");
+        super("AutoRefactor");
         setPriority(Job.LONG);
         this.refactoringUnits = refactoringUnits;
         this.refactoringRulesToApply = refactoringRulesToApply;

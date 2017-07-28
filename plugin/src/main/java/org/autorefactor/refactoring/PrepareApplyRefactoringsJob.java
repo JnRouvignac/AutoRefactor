@@ -66,7 +66,7 @@ public class PrepareApplyRefactoringsJob extends Job {
     public PrepareApplyRefactoringsJob(List<IJavaElement> javaElements,
                                        List<RefactoringRule> refactoringRulesToApply,
                                        Environment environment) {
-        super("Prepare Auto Refactor");
+        super("Prepare AutoRefactor");
         setPriority(Job.SHORT);
         this.javaElements = javaElements;
         this.refactoringRulesToApply = refactoringRulesToApply;
