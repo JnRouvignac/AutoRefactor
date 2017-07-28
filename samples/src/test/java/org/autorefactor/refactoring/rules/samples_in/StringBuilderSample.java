@@ -37,6 +37,14 @@ public class StringBuilderSample {
         sbui.append("foo" + 0 + "bar" + 1);
     }
 
+    public void refactorOnExpression(Object sbuf, Object sbui, String s) {
+        // Keep this comment
+        ((StringBuffer) sbuf).append("" + "foo ").append("bar " + 0).append("" + 1);
+        ((StringBuilder) sbui).append("" + "foo ").append("bar " + 0).append("" + 1);
+        ((StringBuffer) sbuf).append("foo" + 0 + "bar" + 1);
+        ((StringBuilder) sbui).append("foo" + 0 + "bar" + 1);
+    }
+
     public void replaceWithStringAppend() {
         // Keep this comment
         String s1 = new StringBuffer("foo ").append("bar ").append("baz").toString();

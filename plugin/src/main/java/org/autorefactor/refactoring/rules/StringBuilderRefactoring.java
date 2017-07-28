@@ -56,12 +56,10 @@ import org.autorefactor.util.Pair;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.Expression;
-import org.eclipse.jdt.core.dom.FieldAccess;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.InfixExpression.Operator;
 import org.eclipse.jdt.core.dom.MethodInvocation;
-import org.eclipse.jdt.core.dom.Name;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.StringLiteral;
 
@@ -150,18 +148,20 @@ public class StringBuilderRefactoring extends AbstractRefactoringRule {
         final Expression lastExpr = readAppendMethod(node, allAppendedStrings, isRefactoringNeeded,
                 isInstanceCreationToRewrite);
 
-        removeEmptyStrings(allAppendedStrings, isRefactoringNeeded);
-        removeCallsToToString(allAppendedStrings, isRefactoringNeeded, isInstanceCreationToRewrite.get());
+        if (lastExpr != null) {
+            removeEmptyStrings(allAppendedStrings, isRefactoringNeeded);
+            removeCallsToToString(allAppendedStrings, isRefactoringNeeded, isInstanceCreationToRewrite.get());
 
-        if (isRefactoringNeeded.get()) {
-            if (allAppendedStrings.isEmpty()
-                    && isVariable(lastExpr)
-                    && node.getParent() instanceof Statement) {
-                ctx.getRefactorings().remove(node.getParent());
-            } else {
-                replaceWithNewStringAppends(node, allAppendedStrings, lastExpr, isInstanceCreationToRewrite.get());
+            if (isRefactoringNeeded.get()) {
+                if (allAppendedStrings.isEmpty()
+                        && isVariable(lastExpr)
+                        && node.getParent() instanceof Statement) {
+                    ctx.getRefactorings().remove(node.getParent());
+                } else {
+                    replaceWithNewStringAppends(node, allAppendedStrings, lastExpr, isInstanceCreationToRewrite.get());
+                }
+                return DO_NOT_VISIT_SUBTREE;
             }
-            return DO_NOT_VISIT_SUBTREE;
         }
         return VISIT_SUBTREE;
     }
@@ -177,9 +177,11 @@ public class StringBuilderRefactoring extends AbstractRefactoringRule {
                         && arguments(mi).size() == 1) {
                     final Expression arg0 = arguments(mi).get(0);
                     readSubExpressions(arg0, allOperands, isRefactoringNeeded);
+                    System.out.println("############### readAppendMethod 0");
                     return readAppendMethod(mi.getExpression(), allOperands, isRefactoringNeeded,
                             isInstanceCreationToRewrite);
                 }
+                System.out.println("############### readAppendMethod 1");
             } else if (exp instanceof ClassInstanceCreation) {
                 final ClassInstanceCreation cic = (ClassInstanceCreation) exp;
                 if (arguments(cic).size() == 1) {
@@ -198,11 +200,15 @@ public class StringBuilderRefactoring extends AbstractRefactoringRule {
                     isInstanceCreationToRewrite.set(true);
                     isRefactoringNeeded.set(true);
                 }
+                System.out.println("############### readAppendMethod 2");
                 return cic;
-            } else if (exp instanceof Name || exp instanceof FieldAccess) {
-                return exp;
+            } else {
+                System.out.println("############### readAppendMethod 3");
+                return expr;
             }
+            System.out.println("############### readAppendMethod 4");
         }
+        System.out.println("############### readAppendMethod 5");
         return null;
     }
 
