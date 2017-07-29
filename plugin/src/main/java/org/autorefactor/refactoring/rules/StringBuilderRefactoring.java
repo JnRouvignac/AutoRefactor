@@ -177,11 +177,9 @@ public class StringBuilderRefactoring extends AbstractRefactoringRule {
                         && arguments(mi).size() == 1) {
                     final Expression arg0 = arguments(mi).get(0);
                     readSubExpressions(arg0, allOperands, isRefactoringNeeded);
-                    System.out.println("############### readAppendMethod 0");
                     return readAppendMethod(mi.getExpression(), allOperands, isRefactoringNeeded,
                             isInstanceCreationToRewrite);
                 }
-                System.out.println("############### readAppendMethod 1");
             } else if (exp instanceof ClassInstanceCreation) {
                 final ClassInstanceCreation cic = (ClassInstanceCreation) exp;
                 if (arguments(cic).size() == 1) {
@@ -200,15 +198,11 @@ public class StringBuilderRefactoring extends AbstractRefactoringRule {
                     isInstanceCreationToRewrite.set(true);
                     isRefactoringNeeded.set(true);
                 }
-                System.out.println("############### readAppendMethod 2");
                 return cic;
             } else {
-                System.out.println("############### readAppendMethod 3");
                 return expr;
             }
-            System.out.println("############### readAppendMethod 4");
         }
-        System.out.println("############### readAppendMethod 5");
         return null;
     }
 
