@@ -114,18 +114,18 @@ public class UseDiamondOperatorRefactoring extends AbstractRefactoringRule {
                 for (int j = 0; j < declParamTypeArgs.length; j++) {
                     ITypeBinding declParamTypeArg = declParamTypeArgs[j];
 
-                    if (declParamTypeArg.isWildcardType()) {
+                    if (declParamTypeArg.isWildcardType() && actualArgTypeArgs.length != 0) {
                         ITypeBinding declParamTypeArgBound = declParamTypeArg.getBound();
                         int typeParamIndex = typeParameters.indexOf(declParamTypeArgBound);
 
-                        if (j < actualArgTypeArgs.length) {
-                            ITypeBinding actualArgTypeArg = actualArgTypeArgs[j];
-                            int typeArgIndex = typeArguments.indexOf(actualArgTypeArg);
-                            if (typeParamIndex != -1 && typeArgIndex != -1) {
-                                // The type parameter is matching
-                                typeParameters.remove(typeParamIndex);
-                                typeArguments.remove(typeArgIndex);
-                            }
+                        ITypeBinding actualArgTypeArg = actualArgTypeArgs[j];
+                        int typeArgIndex = typeArguments.indexOf(actualArgTypeArg);
+                        if (typeParamIndex != -1 && typeArgIndex != -1) {
+                            // The type parameter is matching
+                            typeParameters.remove(typeParamIndex);
+                            typeArguments.remove(typeArgIndex);
+                        } else {
+                            return false;
                         }
                     }
                 }
