@@ -146,6 +146,7 @@ public class PrepareApplyRefactoringsJob extends Job {
             } else if (javaElement instanceof IPackageFragmentRoot) {
                 final IPackageFragmentRoot pfr = (IPackageFragmentRoot) javaElement;
                 addAll(results, Arrays.asList(pfr.getChildren()));
+            } else if (javaElement instanceof IJavaProject) {
                 IJavaProject javaProject = (IJavaProject) javaElement;
                 for (IPackageFragment pf : javaProject.getPackageFragments()) {
                     addAll(results, pf.getCompilationUnits(), options);
