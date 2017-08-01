@@ -29,6 +29,8 @@ public class RemoveUnnecessaryLocalBeforeReturnSample {
 
     private int i;
 
+    private double[] arrayField = new double[] { 42.42 };
+
     public int inlineLocalVariableDeclaration() {
         return 0;
     }
@@ -43,40 +45,53 @@ public class RemoveUnnecessaryLocalBeforeReturnSample {
      * Trying to use it reports compile error "Array constants can only be used in initializers"
      * <p>
      */
-    public String[] inlineStringArrayVariableDeclaration() {
+    public String[] inlineStringArrayConstants() {
         return new String[] { "test" };
     }
 
-    public boolean[] inlineBooleanArrayVariableDeclaration() {
+    public boolean[] inlineBooleanArrayConstants() {
         return new boolean[] { true };
     }
 
-    public char[] inlineCharArrayVariableDeclaration() {
+    public char[] inlineCharArrayConstants() {
         return new char[] { 'a' };
     }
 
-    public byte[] inlineByteArrayVariableDeclaration() {
+    public byte[] inlineByteArrayConstants() {
         return new byte[] { 42 };
     }
 
-    public short[] inlineShortArrayVariableDeclaration() {
+    public short[] inlineShortArrayConstants() {
         return new short[] { 42 };
     }
 
-    public int[] inlineIntArrayVariableDeclaration() {
+    public int[] inlineIntArrayConstants() {
         return new int[] { 42 };
     }
 
-    public long[] inlineLongArrayVariableDeclaration() {
+    public long[] inlineLongArrayConstants() {
         return new long[] { 42 };
     }
 
-    public float[] inlineFloatArrayVariableDeclaration() {
+    public float[] inlineFloatArrayConstants() {
         return new float[] { 42.42f };
     }
 
-    public double[] inlineDoubleArrayVariableDeclaration() {
+    public double[] inlineDoubleArrayConstants() {
         return new double[] { 42.42 };
+    }
+
+    public double[] inlineDoubleArrayCreation() {
+        return new double[] { 42.42 };
+    }
+
+    public double[] inlineDoubleArrayVariableDeclaration() {
+        return arrayField;
+    }
+
+    public double[] inlineDoubleArrayAssignment() {
+        double[] array = null;
+        return arrayField;
     }
 
     public int notInlineFieldAssignment1() {

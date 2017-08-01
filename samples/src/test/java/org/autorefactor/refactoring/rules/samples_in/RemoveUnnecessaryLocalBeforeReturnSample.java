@@ -29,6 +29,8 @@ public class RemoveUnnecessaryLocalBeforeReturnSample {
 
     private int i;
 
+    private double[] arrayField = new double[] { 42.42 };
+
     public int inlineLocalVariableDeclaration() {
         int i = 0;
         return i;
@@ -45,48 +47,64 @@ public class RemoveUnnecessaryLocalBeforeReturnSample {
      * Trying to use it reports compile error "Array constants can only be used in initializers"
      * <p>
      */
-    public String[] inlineStringArrayVariableDeclaration() {
+    public String[] inlineStringArrayConstants() {
         String[] array = { "test" };
         return array;
     }
 
-    public boolean[] inlineBooleanArrayVariableDeclaration() {
+    public boolean[] inlineBooleanArrayConstants() {
         boolean[] array = { true };
         return array;
     }
 
-    public char[] inlineCharArrayVariableDeclaration() {
+    public char[] inlineCharArrayConstants() {
         char[] array = { 'a' };
         return array;
     }
 
-    public byte[] inlineByteArrayVariableDeclaration() {
+    public byte[] inlineByteArrayConstants() {
         byte[] array = { 42 };
         return array;
     }
 
-    public short[] inlineShortArrayVariableDeclaration() {
+    public short[] inlineShortArrayConstants() {
         short[] array = { 42 };
         return array;
     }
 
-    public int[] inlineIntArrayVariableDeclaration() {
+    public int[] inlineIntArrayConstants() {
         int[] array = { 42 };
         return array;
     }
 
-    public long[] inlineLongArrayVariableDeclaration() {
+    public long[] inlineLongArrayConstants() {
         long[] array = { 42 };
         return array;
     }
 
-    public float[] inlineFloatArrayVariableDeclaration() {
+    public float[] inlineFloatArrayConstants() {
         float[] array = { 42.42f };
         return array;
     }
 
-    public double[] inlineDoubleArrayVariableDeclaration() {
+    public double[] inlineDoubleArrayConstants() {
         double[] array = { 42.42 };
+        return array;
+    }
+
+    public double[] inlineDoubleArrayCreation() {
+        double[] array = new double[] { 42.42 };
+        return array;
+    }
+
+    public double[] inlineDoubleArrayVariableDeclaration() {
+        double[] array = arrayField;
+        return array;
+    }
+
+    public double[] inlineDoubleArrayAssignment() {
+        double[] array = null;
+        array = arrayField;
         return array;
     }
 

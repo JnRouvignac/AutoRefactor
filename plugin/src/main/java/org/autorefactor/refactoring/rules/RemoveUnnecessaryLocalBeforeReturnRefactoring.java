@@ -33,7 +33,6 @@ import static org.autorefactor.refactoring.ASTHelper.getAncestorOrNull;
 import static org.autorefactor.refactoring.ASTHelper.getPreviousSibling;
 import static org.autorefactor.refactoring.ASTHelper.getUniqueFragment;
 import static org.autorefactor.refactoring.ASTHelper.hasOperator;
-import static org.autorefactor.refactoring.ASTHelper.isArray;
 import static org.autorefactor.refactoring.ASTHelper.isSameLocalVariable;
 import static org.eclipse.jdt.core.dom.Assignment.Operator.ASSIGN;
 
@@ -41,7 +40,6 @@ import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.BlockSubVisitor;
 import org.autorefactor.refactoring.Refactorings;
 import org.eclipse.jdt.core.dom.ASTNode;
-import org.eclipse.jdt.core.dom.ArrayCreation;
 import org.eclipse.jdt.core.dom.ArrayInitializer;
 import org.eclipse.jdt.core.dom.ArrayType;
 import org.eclipse.jdt.core.dom.Assignment;
@@ -101,7 +99,7 @@ public class RemoveUnnecessaryLocalBeforeReturnRefactoring extends AbstractRefac
                         && isSameLocalVariable(node.getExpression(), as.getLeftHandSide())
                         && !isUsedAfterReturn(((IVariableBinding) ((Name) as.getLeftHandSide()).resolveBinding()),
                                 node)) {
-                    removeAssignment(node, previousSibling, as);
+                    replaceReturnStatement(node, previousSibling, as.getRightHandSide());
                     setResult(DO_NOT_VISIT_SUBTREE);
                     return DO_NOT_VISIT_SUBTREE;
                 }
@@ -123,18 +121,6 @@ public class RemoveUnnecessaryLocalBeforeReturnRefactoring extends AbstractRefac
                     }
                 }
                 return isUsedAfterReturn(varToSearch, tryStmt);
-            }
-        }
-
-        private void removeAssignment(ReturnStatement node, final Statement previousSibling, final Assignment as) {
-            final Expression returnExpr = as.getRightHandSide();
-            if (isArray(returnExpr)) {
-                final ASTBuilder b = getCtx().getASTBuilder();
-                final ReturnStatement newReturnStmt =
-                        b.return0(b.copy((ArrayCreation) returnExpr));
-                replaceReturnStatementForArray(node, previousSibling, newReturnStmt);
-            } else {
-                replaceReturnStatement(node, previousSibling, returnExpr);
             }
         }
 
