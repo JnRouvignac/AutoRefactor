@@ -71,6 +71,10 @@ public class NoAssignmentInIfConditionRefactoring extends AbstractRefactoringRul
 
         @Override
         public boolean visit(IfStatement node) {
+            if (!(node.getParent() instanceof Block)) {
+                return VISIT_SUBTREE;
+            }
+
             final InfixExpression ie = as(node.getExpression(), InfixExpression.class);
             return moveAssignmentBeforeIfStatementIfPossible(node, ie);
         }
@@ -128,7 +132,7 @@ public class NoAssignmentInIfConditionRefactoring extends AbstractRefactoringRul
         private boolean isAnElseIf(IfStatement node) {
             final ASTNode parent = node.getParent();
             return parent instanceof IfStatement
-                    && ((IfStatement) parent).getElseStatement().equals(node);
+                    && node.equals(((IfStatement) parent).getElseStatement());
         }
     }
 }
