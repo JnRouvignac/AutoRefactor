@@ -118,9 +118,26 @@ public class CommentsRefactoring extends AbstractRefactoringRule {
     private static final Pattern TOOLS_CONTROL_INSTRUCTIONS = Pattern.compile("//\\s*@\\w+:\\w+");
     private static final Pattern JAVADOC_HAS_PUNCTUATION = Pattern.compile("\\.|\\?|!|:");
     private static final Pattern JAVADOC_WITHOUT_PUNCTUATION =
-            Pattern.compile("(.*?)((?:\\s*(?:\\r|\\n|\\r\\n)*\\s*)*(?:\\*/)?)", Pattern.DOTALL);
+            // @formatter:off
+            Pattern.compile(""
+                    + "(.*?)"
+                    + "("
+                    +  "\\s*"
+                    +  "(?:"
+                    +   "\\*" + "/"
+                    +  ")?"
+                    + ")", Pattern.DOTALL);
+            // @formatter:on
     private static final Pattern FIRST_JAVADOC_TAG =
-            Pattern.compile("(^|\\/\\*\\*)\\s*(?:\\*\\s*)?@\\w+", Pattern.MULTILINE);
+            // @formatter:off
+            Pattern.compile(""
+                + "("
+                +  "/\\*\\*"
+                + ")?"
+                + "\\s*"
+                + "(?:\\*\\s*)?"
+                + "@\\w+", Pattern.MULTILINE);
+            // @formatter:on
     private static final Pattern JAVADOC_FIRST_LETTER_LOWERCASE =
             Pattern.compile("(/\\*\\*\\s*(?:(?:\\r|\\n|\\r\\n|\\s)\\s*\\*)*\\s*)(\\w)(.*)", Pattern.DOTALL);
 
