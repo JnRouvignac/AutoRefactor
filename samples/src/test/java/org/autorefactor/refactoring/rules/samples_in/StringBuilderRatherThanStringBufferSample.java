@@ -87,6 +87,20 @@ public class StringBuilderRatherThanStringBufferSample {
         return buffer2.toString();
     }
 
+    public String replaceStringBufferWithSameName(boolean b) {
+        if (b) {
+            // Keep this comment
+            StringBuffer buffer = new StringBuffer();
+            buffer.append("foo");
+        }
+
+        // Keep this comment too
+        StringBuffer buffer = new StringBuffer();
+        buffer.append("foo");
+
+        return buffer.toString();
+    }
+
     public void doNotReplaceObject() {
         Object buffer = new StringBuffer();
     }

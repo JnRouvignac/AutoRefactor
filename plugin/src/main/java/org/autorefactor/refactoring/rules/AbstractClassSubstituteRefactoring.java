@@ -28,6 +28,8 @@ package org.autorefactor.refactoring.rules;
 
 import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
 import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.getAncestorOrNull;
+import static org.autorefactor.refactoring.ASTHelper.getNextSibling;
 import static org.autorefactor.refactoring.ASTHelper.hasType;
 import static org.eclipse.jdt.core.dom.ASTNode.ASSIGNMENT;
 import static org.eclipse.jdt.core.dom.ASTNode.CAST_EXPRESSION;
@@ -56,6 +58,7 @@ import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.SimpleName;
+import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.VariableDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
@@ -223,7 +226,14 @@ public abstract class AbstractClassSubstituteRefactoring extends AbstractRefacto
                                                   final List<VariableDeclaration> otherVarDecls) {
         for (final VariableDeclaration varDecl : varDecls) {
             final VarOccurrenceVisitor varOccurrenceVisitor = new VarOccurrenceVisitor(varDecl);
-            node.accept(varOccurrenceVisitor);
+
+            final Statement parent = (Statement) getAncestorOrNull(varDecl, Statement.class);
+            Statement nextSibling = getNextSibling(parent);
+            while (nextSibling != null) {
+                nextSibling.accept(varOccurrenceVisitor);
+                nextSibling = getNextSibling(nextSibling);
+            }
+
             if (varOccurrenceVisitor.isUsedInAnnonymousClass()) {
                 return false;
             }
