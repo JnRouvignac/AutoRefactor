@@ -318,7 +318,7 @@ public class DeadCodeEliminationRefactoring extends AbstractRefactoringRule {
     private void methodHasSideEffects(
             IMethodBinding methodBinding, Expression methodCall, List<Expression> sideEffectExprs) {
         if (methodBinding == null || methodHasSideEffects(methodBinding)) {
-            // do not remove method calls for which for which there is no type information (method bindings is null)
+            // Do not remove method calls for which there is no type information (method bindings is null)
             sideEffectExprs.add(methodCall);
         }
     }
