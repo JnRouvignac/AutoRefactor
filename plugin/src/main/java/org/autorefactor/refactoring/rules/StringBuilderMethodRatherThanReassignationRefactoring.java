@@ -30,6 +30,7 @@ import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
 import static org.autorefactor.refactoring.ASTHelper.as;
 import static org.autorefactor.refactoring.ASTHelper.hasType;
 import static org.autorefactor.refactoring.ASTHelper.isSameVariable;
+import static org.eclipse.jdt.core.dom.Assignment.Operator.ASSIGN;
 
 import java.util.Arrays;
 
@@ -37,6 +38,7 @@ import org.autorefactor.refactoring.ASTBuilder;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
+import org.eclipse.jdt.core.dom.Name;
 
 /** See {@link #getDescription()} method. */
 public class StringBuilderMethodRatherThanReassignationRefactoring extends AbstractRefactoringRule {
@@ -53,19 +55,26 @@ public class StringBuilderMethodRatherThanReassignationRefactoring extends Abstr
     @Override
     public boolean visit(Assignment node) {
         final Expression targetVar = node.getLeftHandSide();
-        Expression var = getVar(node.getRightHandSide());
+        Expression var = node.getRightHandSide();
+        if (ASSIGN.equals(node.getOperator())
+                && hasType(targetVar, "java.lang.StringBuffer", "java.lang.StringBuilder")
+                && var instanceof MethodInvocation) {
+            var = getVar(var);
 
-        if (isSameVariable(targetVar, var)) {
-            final ASTBuilder b = this.ctx.getASTBuilder();
-            ctx.getRefactorings().replace(node, b.copy(node.getRightHandSide()));
-            return DO_NOT_VISIT_SUBTREE;
+            if (isSameVariable(targetVar, var)) {
+                final ASTBuilder b = this.ctx.getASTBuilder();
+                ctx.getRefactorings().replace(node, b.copy(node.getRightHandSide()));
+                return DO_NOT_VISIT_SUBTREE;
+            }
         }
         return VISIT_SUBTREE;
     }
 
     private Expression getVar(final Expression var) {
         final MethodInvocation mi = as(var, MethodInvocation.class);
-        if (mi != null
+        if (var instanceof Name) {
+            return var;
+        } else if (mi != null
                 && hasType(mi.getExpression(), "java.lang.StringBuffer", "java.lang.StringBuilder")
                 && Arrays.asList(
                         "append",
@@ -77,6 +86,6 @@ public class StringBuilderMethodRatherThanReassignationRefactoring extends Abstr
                         "reverse").contains(mi.getName().getIdentifier())) {
             return getVar(mi.getExpression());
         }
-        return var;
+        return null;
     }
 }

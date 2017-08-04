@@ -76,6 +76,15 @@ public abstract class StringBuilderMethodRatherThanReassignationSample {
         StringBuilder localBuilder = builder.append("foo");
     }
 
+    public void doNotRefactorAutoAssignment(StringBuffer buffer, StringBuilder builder) {
+        buffer = buffer;
+        builder = builder;
+    }
+
+    public void doNotRefactorOtherClasses(String stringBuilder) {
+        stringBuilder = stringBuilder.replace('a', 'b');
+    }
+
     public void doNotRemoveOtherAssignation(StringBuffer buffer, StringBuilder builder) {
         int i = 0;
 
