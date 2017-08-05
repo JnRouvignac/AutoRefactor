@@ -35,6 +35,7 @@ import java.util.List;
 
 import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.util.NotImplementedException;
+import org.eclipse.jdt.core.dom.Annotation;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.AnnotationTypeDeclaration;
 import org.eclipse.jdt.core.dom.AnnotationTypeMemberDeclaration;
@@ -69,18 +70,28 @@ public class RemoveUselessModifiersRefactoring extends AbstractRefactoringRule {
         return "Remove useless modifiers";
     }
 
-    private static final class ModifierOrderComparator implements Comparator<Modifier> {
+    private static final class ModifierOrderComparator implements Comparator<IExtendedModifier> {
         @Override
-        public int compare(Modifier o1, Modifier o2) {
-            final int i1 = ORDERED_MODIFIERS.indexOf(o1.getKeyword());
-            final int i2 = ORDERED_MODIFIERS.indexOf(o2.getKeyword());
-            if (i1 == -1) {
-                throw new NotImplementedException(o1, "cannot determine order for modifier " + o1);
+        public int compare(IExtendedModifier o1, IExtendedModifier o2) {
+            if (o1.isAnnotation()) {
+                if (o2.isAnnotation()) {
+                    return 0;
+                } else {
+                    return -1;
+                }
+            } else if (o2.isAnnotation()) {
+                return 1;
+            } else {
+                final int i1 = ORDERED_MODIFIERS.indexOf(((Modifier) o1).getKeyword());
+                final int i2 = ORDERED_MODIFIERS.indexOf(((Modifier) o2).getKeyword());
+                if (i1 == -1) {
+                    throw new NotImplementedException(((Modifier) o1), "cannot determine order for modifier " + o1);
+                }
+                if (i2 == -1) {
+                    throw new NotImplementedException(((Modifier) o2), "cannot compare modifier " + o2);
+                }
+                return i1 - i2;
             }
-            if (i2 == -1) {
-                throw new NotImplementedException(o2, "cannot compare modifier " + o2);
-            }
-            return i1 - i2;
         }
     }
 
@@ -173,20 +184,30 @@ public class RemoveUselessModifiersRefactoring extends AbstractRefactoringRule {
             | ensureModifiersOrder(node);
     }
 
-    @SuppressWarnings("unchecked")
     private boolean ensureModifiersOrder(BodyDeclaration node) {
-        boolean result = VISIT_SUBTREE;
-        final List<Modifier> modifiers = getModifiersOnly(modifiers(node));
-        final List<Modifier> reorderedModifiers = new ArrayList<Modifier>(modifiers);
+        final List<IExtendedModifier> extendedModifiers = modifiers(node);
+        final List<IExtendedModifier> reorderedModifiers = new ArrayList<IExtendedModifier>(extendedModifiers);
         Collections.sort(reorderedModifiers, new ModifierOrderComparator());
-        if (!modifiers.equals(reorderedModifiers)) {
-            final int startSize = getStartSize(node.modifiers(), modifiers);
-            for (int i = startSize; i < reorderedModifiers.size(); i++) {
-                moveToIndex(reorderedModifiers.get(i), i);
-                result = DO_NOT_VISIT_SUBTREE;
+
+        if (!extendedModifiers.equals(reorderedModifiers)) {
+            reorderModifiers(reorderedModifiers);
+            return DO_NOT_VISIT_SUBTREE;
+        }
+
+        return VISIT_SUBTREE;
+    }
+
+    private void reorderModifiers(final List<IExtendedModifier> reorderedModifiers) {
+        final ASTBuilder b = ctx.getASTBuilder();
+
+        for (int i = 0; i < reorderedModifiers.size(); i++) {
+            IExtendedModifier m = reorderedModifiers.get(i);
+            if (m.isModifier()) {
+                ctx.getRefactorings().moveToIndex((Modifier) m, i, b.move((Modifier) m));
+            } else {
+                ctx.getRefactorings().moveToIndex((Annotation) m, i, b.move((Annotation) m));
             }
         }
-        return result;
     }
 
     private boolean removeStaticModifier(List<IExtendedModifier> modifiers) {
@@ -198,17 +219,6 @@ public class RemoveUselessModifiersRefactoring extends AbstractRefactoringRule {
             }
         }
         return result;
-    }
-
-    private <T> int getStartSize(List<T> initialList, final List<T> filteredList) {
-        final List<T> l = new ArrayList<T>(initialList);
-        l.removeAll(filteredList);
-        return l.size();
-    }
-
-    private void moveToIndex(Modifier m, int index) {
-        final ASTBuilder b = ctx.getASTBuilder();
-        ctx.getRefactorings().moveToIndex(m, index, b.move(m));
     }
 
     @Override

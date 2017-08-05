@@ -43,15 +43,22 @@ public interface RemoveUselessModifiersSample {
         final public static void myMethod(final String myArg) {
         }
 
-        // FIXME JDT bug? (still failing with juno) uncomment next line
-        // @Override
-        synchronized public void close() {
-        }
-
         void removeFinalModifierInTryWithResource() throws IOException {
             try (final InputStream is = new FileInputStream("out.txt")) {
                 is.read();
             }
+        }
+
+        @Deprecated
+        final protected void reorderModifiers() {
+        }
+
+        final @Deprecated protected void reorderModifiersAndAnnotations() {
+        }
+
+        @Deprecated
+        @Override
+        synchronized public void close() {
         }
     }
 
