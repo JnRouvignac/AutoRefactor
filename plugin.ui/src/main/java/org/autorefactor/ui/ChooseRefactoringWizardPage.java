@@ -249,7 +249,7 @@ public class ChooseRefactoringWizardPage extends WizardPage {
         });
 
         final Table table = tableViewer.getTable();
-        table.setLinesVisible(true);
+        table.setLinesVisible(false);
         tableViewer.getControl().setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, true));
         packColumns(table);
         table.setFocus();
