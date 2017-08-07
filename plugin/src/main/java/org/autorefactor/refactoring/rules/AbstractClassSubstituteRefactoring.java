@@ -118,18 +118,6 @@ public abstract class AbstractClassSubstituteRefactoring extends AbstractRefacto
     }
 
     /**
-     * Refactor the constructor.
-     *
-     * @param b The builder.
-     * @param originalInstanceCreation The original instance creation.
-     * @param newInstanceCreation The new instance creation.
-     */
-    protected void refactorInstantiation(final ASTBuilder b, final ClassInstanceCreation originalInstanceCreation,
-            final ClassInstanceCreation newInstanceCreation) {
-        newInstanceCreation.setType(substituteType(b, originalInstanceCreation.getType(), originalInstanceCreation));
-    }
-
-    /**
      * If the method can be refactored.
      *
      * @param mi The method invocation
@@ -150,19 +138,6 @@ public abstract class AbstractClassSubstituteRefactoring extends AbstractRefacto
      */
     protected void refactorMethod(final ASTBuilder b, final MethodInvocation originalMi,
             final MethodInvocation refactoredMi) {
-    }
-
-    /**
-     * Refactor the variable.
-     *
-     * @param b The builder
-     * @param oldDeclareStmt The original variable declaration
-     * @param newDeclareStmt The new variable declaration
-     */
-    protected void replaceVariableType(final ASTBuilder b, final VariableDeclarationStatement oldDeclareStmt,
-            final VariableDeclarationStatement newDeclareStmt) {
-        newDeclareStmt.setType(substituteType(b, oldDeclareStmt.getType(),
-                (ASTNode) oldDeclareStmt.fragments().get(0)));
     }
 
     /**
@@ -256,30 +231,30 @@ public abstract class AbstractClassSubstituteRefactoring extends AbstractRefacto
             final List<MethodInvocation> methodCallsToRefactorWithVariable) {
         final ASTBuilder b = ctx.getASTBuilder();
 
-        if (variableDecls.isEmpty() && methodCallsToRefactorAlone.isEmpty()) {
-            final ClassInstanceCreation newInstanceCreation = b.copySubtree(originalInstanceCreation);
-            refactorInstantiation(b, originalInstanceCreation, newInstanceCreation);
-            ctx.getRefactorings().replace(originalInstanceCreation, newInstanceCreation);
-        } else {
-            refactorInstantiation(b, originalInstanceCreation, originalInstanceCreation);
+        final Type substituteType = substituteType(b, originalInstanceCreation.getType(),
+                originalInstanceCreation);
+        ctx.getRefactorings().replace(originalInstanceCreation.getType(),
+                substituteType);
+        originalInstanceCreation.setType(substituteType);
 
-            for (final MethodInvocation methodCall : methodCallsToRefactorAlone) {
-                final MethodInvocation copyOfMethodCall = b.copySubtree(methodCall);
-                refactorMethod(b, methodCall, copyOfMethodCall);
-                ctx.getRefactorings().replace(methodCall, copyOfMethodCall);
-            }
+        for (final MethodInvocation methodCall : methodCallsToRefactorAlone) {
+            final MethodInvocation copyOfMethodCall = b.copySubtree(methodCall);
+            refactorMethod(b, methodCall, copyOfMethodCall);
+            ctx.getRefactorings().replace(methodCall, copyOfMethodCall);
+        }
 
-            for (final MethodInvocation methodCall : methodCallsToRefactorWithVariable) {
-                refactorMethod(b, methodCall, methodCall);
-            }
+        for (final MethodInvocation methodCall : methodCallsToRefactorWithVariable) {
+            final MethodInvocation copyOfMethodCall = b.copySubtree(methodCall);
+            refactorMethod(b, methodCall, copyOfMethodCall);
+            ctx.getRefactorings().replace(methodCall, copyOfMethodCall);
+        }
 
-            for (final VariableDeclaration variableDecl : variableDecls) {
-                final VariableDeclarationStatement parent = (VariableDeclarationStatement) variableDecl.getParent();
-                final VariableDeclarationStatement newDeclareStmt = b.copySubtree(parent);
-
-                replaceVariableType(b, parent, newDeclareStmt);
-                ctx.getRefactorings().replace(parent, newDeclareStmt);
-            }
+        for (final VariableDeclaration variableDecl : variableDecls) {
+            final VariableDeclarationStatement oldDeclareStmt =
+                    (VariableDeclarationStatement) variableDecl.getParent();
+            ctx.getRefactorings().replace(oldDeclareStmt.getType(),
+                    substituteType(b, oldDeclareStmt.getType(),
+                            (ASTNode) oldDeclareStmt.fragments().get(0)));
         }
     }
 
@@ -320,8 +295,6 @@ public abstract class AbstractClassSubstituteRefactoring extends AbstractRefacto
             ASTNode parentNode = childNode.getParent();
 
             switch (parentNode.getNodeType()) {
-            case ENHANCED_FOR_STATEMENT:
-                return canInvokeIterator();
             case ASSIGNMENT:
             case RETURN_STATEMENT:
             case CAST_EXPRESSION:
@@ -329,6 +302,10 @@ public abstract class AbstractClassSubstituteRefactoring extends AbstractRefacto
             case CLASS_INSTANCE_CREATION:
             case CONDITIONAL_EXPRESSION:
                 return false;
+            case PARENTHESIZED_EXPRESSION:
+                break;
+            case ENHANCED_FOR_STATEMENT:
+                return canInvokeIterator();
             case SINGLE_VARIABLE_DECLARATION:
             case VARIABLE_DECLARATION_EXPRESSION:
             case VARIABLE_DECLARATION_FRAGMENT:
@@ -353,8 +330,6 @@ public abstract class AbstractClassSubstituteRefactoring extends AbstractRefacto
                     methodCallsToRefactorAlone.addAll(localMethodCallsToRefactor);
                     return true;
                 }
-                break;
-            case PARENTHESIZED_EXPRESSION:
                 break;
             default:
                 methodCallsToRefactorAlone.addAll(localMethodCallsToRefactor);
