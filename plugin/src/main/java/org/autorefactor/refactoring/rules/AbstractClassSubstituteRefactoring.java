@@ -283,9 +283,17 @@ public abstract class AbstractClassSubstituteRefactoring extends AbstractRefacto
         }
     }
 
-    private Type substituteType(final ASTBuilder b, final Type origType, ASTNode originalExpression) {
+    /**
+     * Returns the substitute type.
+     *
+     * @param b The builder.
+     * @param origType The original type
+     * @param originalExpr The original expression
+     * @return the substitute type.
+     */
+    protected Type substituteType(final ASTBuilder b, final Type origType, ASTNode originalExpr) {
         final ITypeBinding origTypeBinding = origType.resolveBinding();
-        final TypeNameDecider typeNameDecider = new TypeNameDecider(originalExpression);
+        final TypeNameDecider typeNameDecider = new TypeNameDecider(originalExpr);
 
         if (origTypeBinding.isParameterizedType()) {
             final ITypeBinding[] origTypeArgs = origTypeBinding.getTypeArguments();

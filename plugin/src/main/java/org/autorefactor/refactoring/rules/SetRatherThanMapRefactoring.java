@@ -34,13 +34,13 @@ import java.util.List;
 
 import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.Release;
+import org.autorefactor.refactoring.TypeNameDecider;
+import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Type;
-import org.eclipse.jdt.core.dom.VariableDeclaration;
-import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
 /** See {@link #getDescription()} method. */
 public class SetRatherThanMapRefactoring extends AbstractClassSubstituteRefactoring {
@@ -76,80 +76,32 @@ public class SetRatherThanMapRefactoring extends AbstractClassSubstituteRefactor
                 || isPrimitive(((Expression) instanceCreation.arguments().get(0)));
     }
 
-    @Override
-    protected void refactorInstantiation(final ASTBuilder b, final ClassInstanceCreation originalInstanceCreation,
-            final ClassInstanceCreation newInstanceCreation) {
-        super.refactorInstantiation(b, originalInstanceCreation, newInstanceCreation);
+    /**
+     * Returns the substitute type.
+     *
+     * @param b The builder.
+     * @param origType The original type
+     * @param originalExpr The original expression
+     * @return the substitute type.
+     */
+    protected Type substituteType(final ASTBuilder b, final Type origType, ASTNode originalExpr) {
+        final ITypeBinding origTypeBinding = origType.resolveBinding();
+        final TypeNameDecider typeNameDecider = new TypeNameDecider(originalExpr);
 
-        if (originalInstanceCreation.getType().isParameterizedType()) {
-            ITypeBinding[] originalTypeArguments;
-            try {
-                originalTypeArguments = originalInstanceCreation.getType().resolveBinding().getTypeArguments();
-            } catch (Exception e) {
-                originalTypeArguments = null;
-            }
-
-            if (originalTypeArguments == null) {
-                try {
-                    originalTypeArguments = originalInstanceCreation.resolveTypeBinding().getTypeArguments();
-                } catch (Exception e) {
-                    originalTypeArguments = null;
-                }
-            }
-
-            if (originalTypeArguments == null) {
-                try {
-                    originalTypeArguments = originalInstanceCreation.resolveConstructorBinding().getTypeArguments();
-                } catch (Exception e) {
-                    originalTypeArguments = null;
-                }
-            }
-
-            final Type[] types;
-            if (originalTypeArguments.length > 0) {
-                types = new Type[1];
-                types[0] = b.type(originalTypeArguments[0].getName());
+        if (origTypeBinding.isParameterizedType()) {
+            final ITypeBinding[] origTypeArgs = origTypeBinding.getTypeArguments();
+            final Type[] newTypes;
+            if (origTypeArgs.length > 0) {
+                newTypes = new Type[1];
+                newTypes[0] = b.toType(origTypeArgs[0], typeNameDecider);
             } else {
-                types = new Type[0];
+                newTypes = new Type[0];
             }
-            final Type substituteType = b.genericType(getSubstitutingClassName(), types);
-            newInstanceCreation.setType(substituteType);
+            return b.genericType(getSubstitutingClassName(),
+                    newTypes);
         }
-    }
 
-    @Override
-    protected void replaceVariableType(final ASTBuilder b, final VariableDeclarationStatement oldDeclareStmt,
-            final VariableDeclarationStatement newDeclareStmt) {
-        super.replaceVariableType(b, oldDeclareStmt, newDeclareStmt);
-
-        if (oldDeclareStmt.getType().isParameterizedType()) {
-            ITypeBinding[] originalTypeArguments;
-            try {
-                originalTypeArguments = oldDeclareStmt.getType().resolveBinding().getTypeArguments();
-            } catch (Exception e) {
-                originalTypeArguments = null;
-            }
-
-            if (originalTypeArguments == null) {
-                try {
-                    originalTypeArguments =
-                            ((VariableDeclaration) oldDeclareStmt.fragments().get(0))
-                            .resolveBinding().getType().getTypeArguments();
-                } catch (Exception e) {
-                    originalTypeArguments = null;
-                }
-            }
-
-            final Type[] types;
-            if (originalTypeArguments.length > 0) {
-                types = new Type[1];
-                types[0] = b.type(originalTypeArguments[0].getName());
-            } else {
-                types = new Type[0];
-            }
-            final Type substituteType = b.genericType(getSubstitutingClassName(), types);
-            newDeclareStmt.setType(substituteType);
-        }
+        return b.type(getSubstitutingClassName());
     }
 
     @Override
