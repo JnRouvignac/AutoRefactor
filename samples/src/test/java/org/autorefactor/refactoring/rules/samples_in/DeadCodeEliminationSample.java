@@ -439,4 +439,69 @@ public class DeadCodeEliminationSample {
 
         return i + j;
     }
+
+    public void inlineAlwaysTrueCondition() {
+        if (true)
+            toString();
+    }
+
+    public void inlineBlockAlwaysTrueCondition() {
+        if (true) {
+            // Keep this comment
+            toString();
+        }
+    }
+
+    public void removeAlwaysFalseCondition() {
+        if (false) {
+            toString();
+        }
+    }
+
+    public void inlineAlwaysTrueConditionInStatement(List<String> aList) {
+        if (!aList.isEmpty())
+            if (true)
+                aList.remove("foo");
+    }
+
+    public void inlineBlockAlwaysTrueConditionInStatement(List<String> aList) {
+        if (!aList.isEmpty())
+            if (true) {
+                // Keep this comment
+                String forbiddenValue = "foo";
+                aList.remove(forbiddenValue);
+            }
+    }
+
+    public int inlineAlwaysTrueConditionAndRemoveCodeAfterReturn() {
+        if (true) {
+            // Keep this comment
+            toString();
+            return 0;
+        }
+        int i = 0;
+        i = i + 10;
+        return i;
+    }
+
+    public int inlineAlwaysTrueConditionAndRemoveCodeAfterThrow() {
+        if (true) {
+            // Keep this comment
+            toString();
+            throw new NullPointerException();
+        }
+        int i = 0;
+        i = i + 10;
+        return i;
+    }
+
+    public int removeAlwaysFalseConditionAndKeepCodeAfterThrow() {
+        if (false) {
+            toString();
+            throw new NullPointerException();
+        }
+        int i = 0;
+        i = i + 10;
+        return i;
+    }
 }

@@ -185,11 +185,13 @@ public class DeadCodeEliminationRefactoring extends AbstractRefactoringRule {
         return VISIT_SUBTREE;
     }
 
+    @SuppressWarnings("unchecked")
     private void replaceBlockByPlainCode(final Statement sourceNode, final Statement unconditionnalStatement) {
         final ASTBuilder b = this.ctx.getASTBuilder();
         final Refactorings r = this.ctx.getRefactorings();
 
-        if (unconditionnalStatement instanceof Block) {
+        if (unconditionnalStatement instanceof Block
+                && sourceNode.getParent() instanceof Block) {
             r.replace(sourceNode, b.copyRange(((Block) unconditionnalStatement).statements()));
         } else {
             r.replace(sourceNode, b.copy(unconditionnalStatement));
