@@ -26,20 +26,42 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.arguments;
+import static org.autorefactor.refactoring.ASTHelper.asList;
+import static org.autorefactor.refactoring.ASTHelper.expressions;
+import static org.autorefactor.refactoring.ASTHelper.extendedOperands;
+import static org.autorefactor.refactoring.ASTHelper.fragments;
+import static org.autorefactor.refactoring.ASTHelper.isMethod;
+import static org.eclipse.jdt.core.dom.ASTNode.ARRAY_ACCESS;
+import static org.eclipse.jdt.core.dom.ASTNode.ARRAY_CREATION;
+import static org.eclipse.jdt.core.dom.ASTNode.ARRAY_INITIALIZER;
+import static org.eclipse.jdt.core.dom.ASTNode.ASSIGNMENT;
+import static org.eclipse.jdt.core.dom.ASTNode.CAST_EXPRESSION;
+import static org.eclipse.jdt.core.dom.ASTNode.CLASS_INSTANCE_CREATION;
+import static org.eclipse.jdt.core.dom.ASTNode.CONDITIONAL_EXPRESSION;
+import static org.eclipse.jdt.core.dom.ASTNode.FIELD_ACCESS;
+import static org.eclipse.jdt.core.dom.ASTNode.INFIX_EXPRESSION;
+import static org.eclipse.jdt.core.dom.ASTNode.INSTANCEOF_EXPRESSION;
+import static org.eclipse.jdt.core.dom.ASTNode.METHOD_INVOCATION;
+import static org.eclipse.jdt.core.dom.ASTNode.PARENTHESIZED_EXPRESSION;
+import static org.eclipse.jdt.core.dom.ASTNode.POSTFIX_EXPRESSION;
+import static org.eclipse.jdt.core.dom.ASTNode.PREFIX_EXPRESSION;
+import static org.eclipse.jdt.core.dom.ASTNode.SUPER_FIELD_ACCESS;
+import static org.eclipse.jdt.core.dom.ASTNode.SUPER_METHOD_INVOCATION;
+import static org.eclipse.jdt.core.dom.ASTNode.THIS_EXPRESSION;
+import static org.eclipse.jdt.core.dom.ASTNode.VARIABLE_DECLARATION_EXPRESSION;
+
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.Refactorings;
-import org.eclipse.jdt.core.dom.ASTMatcher;
 import org.eclipse.jdt.core.dom.ArrayAccess;
 import org.eclipse.jdt.core.dom.ArrayCreation;
 import org.eclipse.jdt.core.dom.ArrayInitializer;
 import org.eclipse.jdt.core.dom.Assignment;
-import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.CastExpression;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.ConditionalExpression;
@@ -60,15 +82,9 @@ import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.SuperFieldAccess;
 import org.eclipse.jdt.core.dom.SuperMethodInvocation;
 import org.eclipse.jdt.core.dom.ThisExpression;
-import org.eclipse.jdt.core.dom.TryStatement;
 import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.WhileStatement;
-
-import static org.eclipse.jdt.core.dom.InfixExpression.Operator.EQUALS;
-import static org.eclipse.jdt.core.dom.InfixExpression.Operator.NOT_EQUALS;
-import static org.autorefactor.refactoring.ASTHelper.*;
-import static org.eclipse.jdt.core.dom.ASTNode.*;
 
 /**
  * TODO Use variable values analysis for determining where code is dead.
@@ -133,69 +149,7 @@ public class DeadCodeEliminationRefactoring extends AbstractRefactoringRule {
             return DO_NOT_VISIT_SUBTREE;
         }
 
-        final Object constantCondition = peremptoryValue(condition);
-        if (Boolean.TRUE.equals(constantCondition)) {
-            return maybeInlineBlock(node, thenStmt);
-        } else if (Boolean.FALSE.equals(constantCondition)) {
-            if (elseStmt != null) {
-                return maybeInlineBlock(node, elseStmt);
-            } else {
-                r.remove(node);
-            }
-            return DO_NOT_VISIT_SUBTREE;
-        }
         return VISIT_SUBTREE;
-    }
-
-    private Object peremptoryValue(final Expression condition) {
-        final Object constantCondition = condition.resolveConstantExpressionValue();
-        if (constantCondition != null) {
-            return constantCondition;
-        } else if (condition instanceof InfixExpression) {
-            InfixExpression ie = (InfixExpression) condition;
-            if ((EQUALS.equals(ie.getOperator())
-                    || NOT_EQUALS.equals(ie.getOperator()))
-                    && isPassive(ie.getLeftOperand())
-                    && match(new ASTMatcher(), ie.getLeftOperand(), ie.getRightOperand())) {
-                return EQUALS.equals(ie.getOperator());
-            }
-        }
-        return null;
-    }
-
-    private boolean maybeInlineBlock(final Statement node, final Statement unconditionnalStatement) {
-        if (isEndingWithJump(unconditionnalStatement)) {
-            replaceBlockByPlainCode(node, unconditionnalStatement);
-            this.ctx.getRefactorings().remove(getNextSiblings(node));
-            return DO_NOT_VISIT_SUBTREE;
-        } else {
-            final Set<String> ifVariableNames =
-                    getLocalVariableIdentifiers(unconditionnalStatement, false);
-
-            final Set<String> followingVariableNames = new HashSet<String>();
-            for (final Statement statement : getNextSiblings(node)) {
-                followingVariableNames.addAll(getLocalVariableIdentifiers(statement, true));
-            }
-
-            if (!ifVariableNames.removeAll(followingVariableNames)) {
-                replaceBlockByPlainCode(node, unconditionnalStatement);
-                return DO_NOT_VISIT_SUBTREE;
-            }
-        }
-        return VISIT_SUBTREE;
-    }
-
-    @SuppressWarnings("unchecked")
-    private void replaceBlockByPlainCode(final Statement sourceNode, final Statement unconditionnalStatement) {
-        final ASTBuilder b = this.ctx.getASTBuilder();
-        final Refactorings r = this.ctx.getRefactorings();
-
-        if (unconditionnalStatement instanceof Block
-                && sourceNode.getParent() instanceof Block) {
-            r.replace(sourceNode, b.copyRange(((Block) unconditionnalStatement).statements()));
-        } else {
-            r.replace(sourceNode, b.copy(unconditionnalStatement));
-        }
     }
 
     private void collectSideEffects(Expression expr, List<Expression> sideEffectExprs) {
@@ -362,35 +316,5 @@ public class DeadCodeEliminationRefactoring extends AbstractRefactoringRule {
             || isMethod(methodBinding, "java.util.concurrent.atomic.AtomicReference", "getAndSet", "java.lang.Object")
             || isMethod(methodBinding,
                     "java.util.concurrent.atomic.AtomicReferenceArray", "getAndSet", "int", "java.lang.Object"));
-    }
-
-    private List<Statement> getNextSiblings(Statement node) {
-        if (node.getParent() instanceof Block) {
-            final List<Statement> stmts = asList((Statement) node.getParent());
-            final int indexOfNode = stmts.indexOf(node);
-            final int siblingIndex = indexOfNode + 1;
-            if (0 <= siblingIndex && siblingIndex < stmts.size()) {
-                return stmts.subList(siblingIndex, stmts.size());
-            }
-        }
-        return Collections.emptyList();
-    }
-
-    @Override
-    public boolean visit(TryStatement node) {
-        if (node.resources().isEmpty()) {
-            final List<Statement> tryStmts = asList(node.getBody());
-            if (tryStmts.isEmpty()) {
-                final List<Statement> finallyStmts = asList(node.getFinally());
-                if (!finallyStmts.isEmpty()) {
-                    return maybeInlineBlock(node, node.getFinally());
-                } else {
-                    this.ctx.getRefactorings().remove(node);
-                    return DO_NOT_VISIT_SUBTREE;
-                }
-            }
-        }
-
-        return VISIT_SUBTREE;
     }
 }
