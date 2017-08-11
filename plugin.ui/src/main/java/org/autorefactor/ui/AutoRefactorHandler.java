@@ -103,7 +103,9 @@ public class AutoRefactorHandler extends AbstractHandler {
     static List<IJavaElement> getSelectedJavaElements(ExecutionEvent event) {
         final Shell shell = HandlerUtil.getActiveShell(event);
         final String activePartId = HandlerUtil.getActivePartId(event);
-        if ("org.eclipse.jdt.ui.CompilationUnitEditor".equals(activePartId)) {
+        if ("org.eclipse.jdt.ui.CompilationUnitEditor".equals(activePartId)
+                || "com.google.gwt.eclipse.core.editors.gwtJavaEditor".equals(activePartId)
+                || "com.google.gwt.eclipse.core.editors.java.GWTJavaEditor".equals(activePartId)) {
             return getSelectedJavaElements(shell, HandlerUtil.getActiveEditor(event));
         } else if ("org.eclipse.jdt.ui.PackageExplorer".equals(activePartId)
                 || "org.eclipse.ui.navigator.ProjectExplorer".equals(activePartId)) {
