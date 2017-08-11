@@ -163,8 +163,7 @@ public class InlineCodeRatherThanPeremptoryConditionRefactoring extends Abstract
         final ASTBuilder b = this.ctx.getASTBuilder();
         final Refactorings r = this.ctx.getRefactorings();
 
-        if (unconditionnalStatement instanceof Block
-                && sourceNode.getParent() instanceof Block) {
+        if (unconditionnalStatement instanceof Block && sourceNode.getParent() instanceof Block) {
             r.replace(sourceNode, b.copyRange(((Block) unconditionnalStatement).statements()));
         } else {
             r.replace(sourceNode, b.copy(unconditionnalStatement));
@@ -185,9 +184,10 @@ public class InlineCodeRatherThanPeremptoryConditionRefactoring extends Abstract
 
     private void removeForwardCode(final Statement astNode, final Statement unconditionnalStatement) {
         if (astNode.getParent() instanceof Block) {
-            this.ctx.getRefactorings()
-                    .remove(getNextSiblings((Statement) astNode));
+            this.ctx.getRefactorings().remove(getNextSiblings((Statement) astNode));
             removeForwardCode((Block) astNode.getParent(), unconditionnalStatement);
+        } else if (astNode.getParent() instanceof TryStatement) {
+            removeForwardCode((TryStatement) astNode.getParent(), unconditionnalStatement);
         }
     }
 }

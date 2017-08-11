@@ -25,12 +25,8 @@
  */
 package org.autorefactor.refactoring.rules.samples_in;
 
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.util.AbstractList;
 import java.util.Collection;
-import java.util.Date;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -61,23 +57,6 @@ public class DeadCodeEliminationSample {
         }
         return i;
     }
-
-// FIXME compilation error.
-// Following code:
-//    private int removeWhileWithoutIterations() {
-//        int i = 0;
-//        while (false) {
-//            i++;
-//        }
-//        while (false)
-//            i++;
-//        return i;
-//    }
-// Should become
-//    private int removeWhileWithoutIterations() {
-//        int i = 0;
-//        return i;
-//    }
 
     public interface MethodDeclarationWithoutBody {
         void aMethod();

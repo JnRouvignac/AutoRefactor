@@ -27,12 +27,8 @@ package org.autorefactor.refactoring.rules.samples_in;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.AbstractList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class InlineCodeRatherThanPeremptoryConditionSample {
 
@@ -248,23 +244,6 @@ public class InlineCodeRatherThanPeremptoryConditionSample {
         return 2;
     }
 
-// FIXME compilation error.
-// Following code:
-//    private int removeWhileWithoutIterations() {
-//        int i = 0;
-//        while (false) {
-//            i++;
-//        }
-//        while (false)
-//            i++;
-//        return i;
-//    }
-// Should become
-//    private int removeWhileWithoutIterations() {
-//        int i = 0;
-//        return i;
-//    }
-
     public int removeEmptyTryEmptyFinally() {
         int i = 0;
         try {
@@ -365,6 +344,64 @@ public class InlineCodeRatherThanPeremptoryConditionSample {
             i = i + 10;
         }
         return i;
+    }
+
+    public int inlineAlwaysTrueConditionAndRemoveCodeAfterReturnToTheFirstIf(int i) {
+        int j = 0;
+        if (i == 0) {
+            if (true) {
+                // Keep this comment
+                toString();
+                return 0;
+            }
+            j = j + 10;
+        }
+        return j;
+    }
+
+    public int inlineAlwaysTrueConditionAndRemoveCodeAfterReturnBeyondTryBlock(int i) {
+        int j = 0;
+        try {
+            if (true) {
+                // Keep this comment
+                toString();
+                return 0;
+            }
+            j = j + 10;
+        } finally {
+
+        }
+        return j;
+    }
+
+    public int inlineAlwaysTrueConditionAndRemoveCodeAfterReturnToTheFirstCatchBlock(int i) {
+        int j = 0;
+        try {
+            j = j + 10;
+        } catch (Exception e) {
+            if (true) {
+                // Keep this comment
+                toString();
+                return 0;
+            }
+            j = j + 20;
+        }
+        return j;
+    }
+
+    public int inlineAlwaysTrueConditionAndRemoveCodeAfterReturnBeyondFinallyBlock(int i) {
+        int j = 0;
+        try {
+            j = j + 10;
+        } finally {
+            if (true) {
+                // Keep this comment
+                toString();
+                return 0;
+            }
+            j = j + 20;
+        }
+        return j;
     }
 
     public int inlineAlwaysTrueConditionAndRemoveCodeAfterThrow() {
