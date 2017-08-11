@@ -27,8 +27,21 @@ package org.autorefactor.refactoring.rules.samples_out;
 
 public class CommonCodeInIfElseStatementSample {
 
+    /** common code: i++, Remove if statement */
+    public void ifElseRemoveIfNoBrackets(Boolean b, int i) {
+        // Keep this!
+        // Keep this comment
+        i++;
+    }
+
+    /** common code: i++, Remove if statement */
+    public void ifElseRemoveIf(Boolean b, int i) {
+        // Keep this comment
+        i++;
+    }
+
     /** no common code, Do not remove anything */
-    public void ifElseRemoveIf(Boolean b, int i, int j) {
+    public void doNotRemoveNotCommonCode(Boolean b, int i, int j) {
         if (b.booleanValue()) {
             i++;
         } else {
@@ -36,21 +49,9 @@ public class CommonCodeInIfElseStatementSample {
         }
     }
 
-    /** common code: i++, Remove if statement */
-    public void ifElseRemoveIfNoBrackets(Boolean b, int i) {
-        // keep this comment
-        i++;
-    }
-
-    /** common code: i++, Remove if statement */
-    public void ifElseRemoveIf(Boolean b, int i) {
-        // keep this comment
-        i++;
-    }
-
     /** common code: i++, Remove then case */
     public void ifElseRemoveThen(Boolean b, int i, int j) {
-        // keep this comment
+        // Keep this comment
         i++;
         if (!b.booleanValue()) {
             j++;
@@ -59,7 +60,7 @@ public class CommonCodeInIfElseStatementSample {
 
     /** common code: i++, Remove else case */
     public void ifElseRemoveElse(Boolean b, int i, int j) {
-        // keep this comment
+        // Keep this comment
         i++;
         if (b.booleanValue()) {
             j++;
@@ -71,20 +72,20 @@ public class CommonCodeInIfElseStatementSample {
      * not remove if statement.
      */
     public void ifElseRemoveIf(Boolean b, int i, int j, int k, int l) {
-        // keep this comment
+        // Keep this comment
         i++;
         if (b.booleanValue()) {
             j++;
         } else {
             k++;
         }
-        // keep this comment
+        // Keep this comment
         l++;
     }
 
     /** only common code, Remove if statement */
     public void ifElseRemoveIfSeveralStatements(Boolean b, int i, int j) {
-        // keep this comment
+        // Keep this comment
         i++;
         j++;
     }
@@ -102,7 +103,7 @@ public class CommonCodeInIfElseStatementSample {
 
     /** only common code: remove if statement */
     public void ifElseIfElseRemoveIf(Boolean b, int i, int j) {
-        // keep this comment
+        // Keep this comment
         i++;
         j++;
     }

@@ -79,20 +79,20 @@ public class CommonCodeInIfElseStatementRefactoring extends AbstractRefactoringR
         final List<List<Statement>> allCasesStmts = new ArrayList<List<Statement>>();
         final List<List<ASTNode>> removedCaseStmts = new LinkedList<List<ASTNode>>();
 
-        // collect all the if / else if / else if / ... / else cases
+        // Collect all the if / else if / else if / ... / else cases
         if (collectAllCases(allCasesStmts, node)) {
             // initialize removedCaseStmts list
             for (int i = 0; i < allCasesStmts.size(); i++) {
                 removedCaseStmts.add(new LinkedList<ASTNode>());
             }
-            // if all cases exist
+            // If all cases exist
             final ASTMatcher matcher = new ASTMatcherSameVariablesAndMethods();
             final int minSize = minSize(allCasesStmts);
             final List<Statement> caseStmts = allCasesStmts.get(0);
 
             boolean result = VISIT_SUBTREE;
 
-            // identify matching statements starting from the beginning of each case
+            // Identify matching statements starting from the beginning of each case
             for (int stmtIndex = 0; stmtIndex < minSize; stmtIndex++) {
                 if (!match(matcher, allCasesStmts, true, stmtIndex, 0, allCasesStmts.size())) {
                     break;
@@ -102,7 +102,7 @@ public class CommonCodeInIfElseStatementRefactoring extends AbstractRefactoringR
                 result = DO_NOT_VISIT_SUBTREE;
             }
 
-            // identify matching statements starting from the end of each case
+            // Identify matching statements starting from the end of each case
             for (int stmtIndex = 1; 0 <= minSize - stmtIndex; stmtIndex++) {
                 if (!match(matcher, allCasesStmts, false, stmtIndex, 0, allCasesStmts.size())
                         || anyContains(removedCaseStmts, allCasesStmts, stmtIndex)) {
@@ -113,24 +113,23 @@ public class CommonCodeInIfElseStatementRefactoring extends AbstractRefactoringR
                 result = DO_NOT_VISIT_SUBTREE;
             }
 
-            // remove the nodes common to all cases
-            final List<Boolean> areCasesEmpty = new ArrayList<Boolean>(allCasesStmts.size());
+            // Remove the nodes common to all cases
+            final boolean[] areCasesEmpty = new boolean[allCasesStmts.size()];
             for (int i = 0; i < allCasesStmts.size(); i++) {
-                areCasesEmpty.add(Boolean.FALSE);
+                areCasesEmpty[i] = false;
             }
             removeStmtsFromCases(allCasesStmts, removedCaseStmts, areCasesEmpty);
 
             if (allEmpty(areCasesEmpty)) {
-                // TODO JNR keep comments
-                r.remove(node);
+                r.removeButKeepComment(node);
                 return DO_NOT_VISIT_SUBTREE;
             }
 
-            // remove empty cases
-            if (areCasesEmpty.get(0)) {
-                if (areCasesEmpty.size() == 2
-                        && !areCasesEmpty.get(1)) {
-                    // then clause is empty and there is only one else clause
+            // Remove empty cases
+            if (areCasesEmpty[0]) {
+                if (areCasesEmpty.length == 2
+                        && !areCasesEmpty[1]) {
+                    // Then clause is empty and there is only one else clause
                     // => revert if statement
                     r.replace(node,
                               b.if0(b.not(b.parenthesizeIfNeeded(b.move(node.getExpression()))),
@@ -140,8 +139,8 @@ public class CommonCodeInIfElseStatementRefactoring extends AbstractRefactoringR
                 }
                 result = DO_NOT_VISIT_SUBTREE;
             }
-            for (int i = 1; i < areCasesEmpty.size(); i++) {
-                if (areCasesEmpty.get(i)) {
+            for (int i = 1; i < areCasesEmpty.length; i++) {
+                if (areCasesEmpty[i]) {
                     final Statement firstStmt = allCasesStmts.get(i).get(0);
                     r.remove(findNodeToRemove(firstStmt, firstStmt.getParent()));
                     result = DO_NOT_VISIT_SUBTREE;
@@ -163,9 +162,9 @@ public class CommonCodeInIfElseStatementRefactoring extends AbstractRefactoringR
         throw new NotImplementedException(parent, "for parent of type " + parent.getClass());
     }
 
-    private boolean allEmpty(List<Boolean> areCasesEmpty) {
-        for (int i = 0; i < areCasesEmpty.size(); i++) {
-            if (!areCasesEmpty.get(i)) {
+    private boolean allEmpty(boolean[] areCasesEmpty) {
+        for (boolean isCaseEmpty : areCasesEmpty) {
+            if (!isCaseEmpty) {
                 return false;
             }
         }
@@ -173,11 +172,11 @@ public class CommonCodeInIfElseStatementRefactoring extends AbstractRefactoringR
     }
 
     private void removeStmtsFromCases(List<List<Statement>> allCasesStmts, List<List<ASTNode>> removedCaseStmts,
-            List<Boolean> areCasesEmpty) {
+            boolean[] areCasesEmpty) {
         for (int i = 0; i < allCasesStmts.size(); i++) {
             final List<ASTNode> removedStmts = removedCaseStmts.get(i);
             if (removedStmts.containsAll(allCasesStmts.get(i))) {
-                areCasesEmpty.set(i, Boolean.TRUE);
+                areCasesEmpty[i] = true;
             } else {
                 this.ctx.getRefactorings().remove(removedStmts);
             }

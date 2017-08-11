@@ -297,6 +297,17 @@ public class Refactorings {
     }
 
     /**
+     * Removes the provided node from the AST leaving the leading comment.
+     *
+     * @param node the node to remove
+     * @see ASTRewrite#remove(ASTNode, org.eclipse.text.edits.TextEditGroup)
+     */
+    public void removeButKeepComment(ASTNode node) {
+        node.setProperty(UNTOUCH_COMMENT, Boolean.TRUE);
+        remove(node);
+    }
+
+    /**
      * Removes the provided source location from the source.
      *
      * @param toRemove the source location to remove
