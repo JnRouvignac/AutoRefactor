@@ -35,7 +35,7 @@ public class WorkWithNullCheckedExpressionFirstSample {
 
     // TODO JNR add ConditionalExpressions
 
-    private String refactor(String s) {
+    public String refactor(String s) {
         // Keep this comment
         if (s == null) {
             return null;
@@ -184,7 +184,7 @@ public class WorkWithNullCheckedExpressionFirstSample {
         return emptyList();
     }
 
-    private String doNotRefactorComplexStatement(Object o, boolean b) {
+    public String doNotRefactorComplexStatement(Object o, boolean b) {
         String s = null;
         if (o == null) {
             if (b) {

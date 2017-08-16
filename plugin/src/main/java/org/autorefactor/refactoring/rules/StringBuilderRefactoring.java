@@ -477,13 +477,6 @@ public class StringBuilderRefactoring extends AbstractRefactoringRule {
                 this.ctx.getRefactorings().replace(node, createStringConcats(allOperands));
                 return DO_NOT_VISIT_SUBTREE;
             }
-            // FIXME In theory commented code down below should work better than current code above
-            // (preserving comments, etc.), but in practice it does not work at all.
-            // for (Expression operand : allOperands) {
-            // if ("".equals(operand.resolveConstantExpressionValue())) {
-            // this.ctx.getRefactorings().remove(operand);
-            // }
-            // }
         }
         return VISIT_SUBTREE;
     }
@@ -527,22 +520,27 @@ public class StringBuilderRefactoring extends AbstractRefactoringRule {
             }
             return b.invoke("String", "valueOf", getTypedExpression(b, expr));
 
-        default: // >== 2
-            final Pair<ITypeBinding, Expression> arg0 = appendedStrings.get(0);
-            final Pair<ITypeBinding, Expression> arg1 = appendedStrings.get(1);
+        default: // >= 2
+            boolean isFirstAndNotAString = isFirstAndNotAString(appendedStrings);
 
             List<Expression> concatenateStrings = new ArrayList<Expression>(appendedStrings.size());
-            boolean prependEmptyString = !hasType(arg0.getSecond(), "java.lang.String")
-                    && !hasType(arg1.getSecond(), "java.lang.String");
-
-            if (prependEmptyString) {
-                concatenateStrings.add(b.string(""));
-            }
-
             for (final Pair<ITypeBinding, Expression> typeAndValue : appendedStrings) {
-                concatenateStrings.add(b.parenthesizeIfNeeded(getTypedExpression(b, typeAndValue)));
+                if (isFirstAndNotAString) {
+                    concatenateStrings.add(b.invoke("String", "valueOf", getTypedExpression(b, typeAndValue)));
+                    isFirstAndNotAString = false;
+                } else {
+                    concatenateStrings.add(b.parenthesizeIfNeeded(getTypedExpression(b, typeAndValue)));
+                }
             }
             return b.infixExpr(Operator.PLUS, concatenateStrings);
         }
+    }
+
+    private boolean isFirstAndNotAString(final List<Pair<ITypeBinding, Expression>> appendedStrings) {
+        final Pair<ITypeBinding, Expression> arg0 = appendedStrings.get(0);
+        final Pair<ITypeBinding, Expression> arg1 = appendedStrings.get(1);
+
+        return !hasType(arg0.getSecond(), "java.lang.String")
+                && !hasType(arg1.getSecond(), "java.lang.String");
     }
 }

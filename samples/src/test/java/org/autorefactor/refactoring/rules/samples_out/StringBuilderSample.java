@@ -49,8 +49,8 @@ public class StringBuilderSample {
         // Keep this comment
         String s1 = "foo " + "bar " + "baz";
         String s2 = "foo " + "bar " + "baz";
-        String s3 = "" + 0 + 1 + "bar";
-        String s4 = "" + 0 + 1 + "bar";
+        String s3 = String.valueOf(0) + 1 + "bar";
+        String s4 = String.valueOf(0) + 1 + "bar";
         String s5 = "foo";
         String s6 = "foo";
         String s7 = "";

@@ -163,9 +163,6 @@ public class StringSample {
         return s1 + s2 + s3 + s4 + s5 + s6 + s7 + s8 + s9;
     }
 
-    // TODO JNR which operand must be removed here?
-    // String s = "" + Integer.toString(42);
-
     public String onlyRefactorFirstStringValueOf(Object o1, Object o2) {
         // Keep this comment
         return o1 + String.valueOf(o2);
