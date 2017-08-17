@@ -137,16 +137,6 @@ public class AllInOneMethodRatherThanLoopSample {
         output.addAll(col);
     }
 
-    public void replaceContainsWithForLoopByContainsAll(List<String> col, List<String> output) {
-        // Keep this comment
-        output.containsAll(col);
-    }
-
-    public void replaceContainsWithForEachByContainsAll(Collection<String> col, List<String> output) {
-        // Keep this comment
-        output.containsAll(col);
-    }
-
     public void replaceRemoveWithForLoopByRemoveAll(List<String> col, List<String> output) {
         // Keep this comment
         output.removeAll(col);

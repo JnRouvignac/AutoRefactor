@@ -62,7 +62,6 @@ public class AllInOneMethodRatherThanLoopRefactoring extends AbstractRefactoring
             + "Collection related refactorings:\n"
             + "- replaces for/foreach loops to use Collections.addAll() where possible,\n"
             + "- replaces for/foreach loops to use Collection.addAll() where possible,\n"
-            + "- replaces for/foreach loops to use Collection.containsAll() where possible,\n"
             + "- replaces for/foreach loops to use Collection.removeAll() where possible.";
     }
 
@@ -86,23 +85,22 @@ public class AllInOneMethodRatherThanLoopRefactoring extends AbstractRefactoring
         if (getVariableUseCount(foreachVariable, node.getBody()) == 1) {
             if (instanceOf(iterable, "java.util.Collection")) {
                 if (isMethod(mi, "java.util.Collection", "add", "java.lang.Object")) {
-                    return replaceWithCollectionMethod(node, iterable, "addAll", mi);
-                } else if (isMethod(mi, "java.util.Collection", "contains", "java.lang.Object")) {
-                    return replaceWithCollectionMethod(node, iterable, "containsAll", mi);
+                    return maybeReplaceWithCollectionMethod(node, iterable, "addAll", mi);
                 } else if (isMethod(mi, "java.util.Collection", "remove", "java.lang.Object")) {
-                    return replaceWithCollectionMethod(node, iterable, "removeAll", mi);
+                    return maybeReplaceWithCollectionMethod(node, iterable, "removeAll", mi);
                 }
             } else if (isArray(iterable)
                     && isMethod(mi, "java.util.Collection", "add", "java.lang.Object")
                     && areTypeCompatible(mi.getExpression(), iterable)
                     && isSameLocalVariable(foreachVariable, arg0(mi))) {
-                return replaceWithCollectionsAddAll(node, iterable, mi);
+                replaceWithCollectionsAddAll(node, iterable, mi);
+                return DO_NOT_VISIT_SUBTREE;
             }
         }
         return VISIT_SUBTREE;
     }
 
-    private boolean replaceWithCollectionsAddAll(Statement node, Expression iterable, MethodInvocation mi) {
+    private void replaceWithCollectionsAddAll(Statement node, Expression iterable, MethodInvocation mi) {
         ASTBuilder b = ctx.getASTBuilder();
         ctx.getRefactorings().replace(node,
                 b.toStmt(b.invoke(
@@ -110,13 +108,13 @@ public class AllInOneMethodRatherThanLoopRefactoring extends AbstractRefactoring
                         "addAll",
                         b.copy(mi.getExpression()),
                         b.copy(iterable))));
-        return DO_NOT_VISIT_SUBTREE;
     }
 
-    private boolean replaceWithCollectionMethod(EnhancedForStatement node,
+    private boolean maybeReplaceWithCollectionMethod(EnhancedForStatement node,
             Expression collection, String methodName, MethodInvocation colMI) {
         if (isSameLocalVariable(node.getParameter(), arg0(colMI))) {
-            return replaceWithCollectionMethod(node, methodName, colMI.getExpression(), collection);
+            replaceWithCollectionMethod(node, methodName, colMI.getExpression(), collection);
+            return DO_NOT_VISIT_SUBTREE;
         }
         return VISIT_SUBTREE;
     }
@@ -137,11 +135,9 @@ public class AllInOneMethodRatherThanLoopRefactoring extends AbstractRefactoring
                 switch (loopContent.getContainerType()) {
                 case COLLECTION:
                     if (isMethod(mi, "java.util.Collection", "add", "java.lang.Object")) {
-                        return replaceWithCollectionMethod(node, loopContent, "addAll", mi);
-                    } else if (isMethod(mi, "java.util.Collection", "contains", "java.lang.Object")) {
-                        return replaceWithCollectionMethod(node, loopContent, "containsAll", mi);
+                        return maybeReplaceWithCollectionMethod(node, loopContent, "addAll", mi);
                     } else if (isMethod(mi, "java.util.Collection", "remove", "java.lang.Object")) {
-                        return replaceWithCollectionMethod(node, loopContent, "removeAll", mi);
+                        return maybeReplaceWithCollectionMethod(node, loopContent, "removeAll", mi);
                     }
                     break;
                 case ARRAY:
@@ -150,7 +146,8 @@ public class AllInOneMethodRatherThanLoopRefactoring extends AbstractRefactoring
                         final Expression addArg0 = arg0(mi);
                         final ArrayAccess aa = as(addArg0, ArrayAccess.class);
                         if (isSameVariable(loopContent, aa)) {
-                            return replaceWithCollectionsAddAll(node, loopContent.getContainerVariable(), mi);
+                            replaceWithCollectionsAddAll(node, loopContent.getContainerVariable(), mi);
+                            return DO_NOT_VISIT_SUBTREE;
                         }
                     }
                     break;
@@ -190,13 +187,14 @@ public class AllInOneMethodRatherThanLoopRefactoring extends AbstractRefactoring
         return false;
     }
 
-    private boolean replaceWithCollectionMethod(ForStatement node, ForLoopContent loopContent,
+    private boolean maybeReplaceWithCollectionMethod(ForStatement node, ForLoopContent loopContent,
             String methodName, MethodInvocation colMI) {
         final Expression addArg0 = arg0(colMI);
         final MethodInvocation getMI = as(addArg0, MethodInvocation.class);
         if (isSameVariable(loopContent, getMI)) {
-            return replaceWithCollectionMethod(node, methodName,
+            replaceWithCollectionMethod(node, methodName,
                     colMI.getExpression(), getMI.getExpression());
+            return DO_NOT_VISIT_SUBTREE;
         }
         return VISIT_SUBTREE;
     }
@@ -207,7 +205,7 @@ public class AllInOneMethodRatherThanLoopRefactoring extends AbstractRefactoring
                 && isSameLocalVariable(arg0(getMI), loopContent.getLoopVariable());
     }
 
-    private boolean replaceWithCollectionMethod(ASTNode toReplace, String methodName,
+    private void replaceWithCollectionMethod(ASTNode toReplace, String methodName,
             Expression colWhereToAddAll, Expression colToAddAll) {
         final ASTBuilder b = ctx.getASTBuilder();
         if (colWhereToAddAll != null) {
@@ -222,6 +220,5 @@ public class AllInOneMethodRatherThanLoopRefactoring extends AbstractRefactoring
                             methodName,
                             b.copy(colToAddAll))));
         }
-        return DO_NOT_VISIT_SUBTREE;
     }
 }
