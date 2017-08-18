@@ -41,7 +41,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -80,8 +79,8 @@ import org.eclipse.jdt.core.search.TypeNameMatchRequestor;
 /** See {@link #getDescription()} method. */
 public class ReplaceQualifiedNamesBySimpleNamesRefactoring extends AbstractRefactoringRule {
     private static final class QName {
-        private QName qualifier;
-        private String simpleName;
+        private final QName qualifier;
+        private final String simpleName;
 
         private static QName valueOf(String fullyQualifiedName) {
             QName qname = null;
@@ -109,13 +108,21 @@ public class ReplaceQualifiedNamesBySimpleNamesRefactoring extends AbstractRefac
                 return false;
             }
             QName other = (QName) obj;
-            return Objects.equals(simpleName, other.simpleName)
-                    && Objects.equals(qualifier, other.qualifier);
+            return equals(qualifier, other.qualifier)
+                    && equals(simpleName, other.simpleName);
+        }
+
+        private boolean equals(Object o1, Object o2) {
+            return o1 != null ? o1.equals(o2) : o2 == null;
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(simpleName, qualifier);
+            final int prime = 31;
+            int result = 1;
+            result = prime * result + ((qualifier == null) ? 0 : qualifier.hashCode());
+            result = prime * result + ((simpleName == null) ? 0 : simpleName.hashCode());
+            return result;
         }
 
         @Override
@@ -131,14 +138,14 @@ public class ReplaceQualifiedNamesBySimpleNamesRefactoring extends AbstractRefac
     /** Information about fully-qualified names. */
     private static final class FQN {
         private static final FQN CANNOT_REPLACE_SIMPLE_NAME = new FQN(null, false, false);
-        private QName fullyQualifiedName;
-        private boolean fromImport;
+        private final QName fullyQualifiedName;
+        private final boolean fromImport;
         /**
          * Whether an import was a star import (static or not).
          * <p>
          * Only applicable when <code>{@link #fromImport} == true</code>.
          */
-        private boolean onDemand;
+        private final boolean onDemand;
 
         public FQN(QName fullyQualifiedName, boolean fromImport, boolean onDemand) {
             this.fullyQualifiedName = fullyQualifiedName;
