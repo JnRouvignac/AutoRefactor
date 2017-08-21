@@ -101,7 +101,7 @@ public class WorkWithNullCheckedExpressionFirstRefactoring extends AbstractRefac
             if (elseStmts.size() == 1) {
                 return elseStmts.get(0);
             }
-            if (is(thenStmt, ReturnStatement.class)) {
+            if (elseStmts.isEmpty() && is(thenStmt, ReturnStatement.class)) {
                 return getNextSibling(node);
             }
             return null;

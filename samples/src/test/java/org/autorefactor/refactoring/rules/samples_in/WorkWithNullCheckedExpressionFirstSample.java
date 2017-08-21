@@ -44,7 +44,7 @@ public class WorkWithNullCheckedExpressionFirstSample {
         }
     }
 
-    public List<String> refactorLocalVariable1(String s) throws Exception {
+    public List<String> refactorLocalVariable1(String s) {
         List<String> l;
         // Keep this comment
         if (s == null) {
@@ -55,7 +55,7 @@ public class WorkWithNullCheckedExpressionFirstSample {
         return l;
     }
 
-    public List<String> refactorLocalVariable2(String s) throws Exception {
+    public List<String> refactorLocalVariable2(String s) {
         List<String> l;
         // Keep this comment
         if (null == s) {
@@ -66,7 +66,7 @@ public class WorkWithNullCheckedExpressionFirstSample {
         return l;
     }
 
-    public List<String> doNotRefactorLocalVariable3(String s) throws Exception {
+    public List<String> doNotRefactorLocalVariable3(String s) {
         List<String> l;
         if (s != null) {
             l = singletonList(s);
@@ -76,7 +76,7 @@ public class WorkWithNullCheckedExpressionFirstSample {
         return l;
     }
 
-    public List<String> doNotRefactorLocalVariable4(String s) throws Exception {
+    public List<String> doNotRefactorLocalVariable4(String s) {
         List<String> l;
         if (null != s) {
             l = singletonList(s);
@@ -86,7 +86,7 @@ public class WorkWithNullCheckedExpressionFirstSample {
         return l;
     }
 
-    public void refactorFieldAssign1(String s) throws Exception {
+    public void refactorFieldAssign1(String s) {
         // Keep this comment
         if (s == null) {
             this.l = emptyList();
@@ -95,7 +95,7 @@ public class WorkWithNullCheckedExpressionFirstSample {
         }
     }
 
-    public void refactorFieldAssign2(String s) throws Exception {
+    public void refactorFieldAssign2(String s) {
         // Keep this comment
         if (null == s) {
             this.l = emptyList();
@@ -104,7 +104,7 @@ public class WorkWithNullCheckedExpressionFirstSample {
         }
     }
 
-    public void doNotRefactorFieldAssign3(String s) throws Exception {
+    public void doNotRefactorFieldAssign3(String s) {
         if (s != null) {
             this.l = singletonList(s);
         } else {
@@ -112,7 +112,7 @@ public class WorkWithNullCheckedExpressionFirstSample {
         }
     }
 
-    public void doNotRefactorFieldAssign4(String s) throws Exception {
+    public void doNotRefactorFieldAssign4(String s) {
         if (null != s) {
             this.l = singletonList(s);
         } else {
@@ -120,7 +120,7 @@ public class WorkWithNullCheckedExpressionFirstSample {
         }
     }
 
-    public List<String> refactorReturn1(String s) throws Exception {
+    public List<String> refactorReturn1(String s) {
         // Keep this comment
         if (s == null) {
             return emptyList();
@@ -129,7 +129,7 @@ public class WorkWithNullCheckedExpressionFirstSample {
         }
     }
 
-    public List<String> refactorReturn2(String s) throws Exception {
+    public List<String> refactorReturn2(String s) {
         // Keep this comment
         if (null == s) {
             return emptyList();
@@ -138,7 +138,7 @@ public class WorkWithNullCheckedExpressionFirstSample {
         }
     }
 
-    public List<String> doNotRefactorReturn3(String s) throws Exception {
+    public List<String> doNotRefactorReturn3(String s) {
         if (s != null) {
             return singletonList(s);
         } else {
@@ -146,7 +146,7 @@ public class WorkWithNullCheckedExpressionFirstSample {
         }
     }
 
-    public List<String> doNotRefactorReturn4(String s) throws Exception {
+    public List<String> doNotRefactorReturn4(String s) {
         if (null != s) {
             return singletonList(s);
         } else {
@@ -154,7 +154,7 @@ public class WorkWithNullCheckedExpressionFirstSample {
         }
     }
 
-    public List<String> refactorReturnNoElse1(String s) throws Exception {
+    public List<String> refactorNullCheck1(String s) {
         // Keep this comment
         if (s == null) {
             return emptyList();
@@ -162,7 +162,7 @@ public class WorkWithNullCheckedExpressionFirstSample {
         return singletonList(s);
     }
 
-    public List<String> refactorReturnNoElse2(String s) throws Exception {
+    public List<String> refactorNullCheck2(String s) {
         // Keep this comment
         if (null == s) {
             return emptyList();
@@ -170,18 +170,28 @@ public class WorkWithNullCheckedExpressionFirstSample {
         return singletonList(s);
     }
 
-    public List<String> doNotRefactorReturnNoElse3(String s) throws Exception {
+    public List<String> doNotRefactorNotNullCheck1(String s) {
         if (s != null) {
             return singletonList(s);
         }
         return emptyList();
     }
 
-    public List<String> doNotRefactorReturnNoElse4(String s) throws Exception {
+    public List<String> doNotRefactorNotNullCheck2(String s) {
         if (null != s) {
           return singletonList(s);
         }
         return emptyList();
+    }
+
+    public List<String> doNotRefactorNullCheckWithLongElse(String s) {
+        if (s == null) {
+            return emptyList();
+        } else {
+            s = "Lots of";
+            s = "statements";
+        }
+        return singletonList(s);
     }
 
     public String doNotRefactorComplexStatement(Object o, boolean b) {
