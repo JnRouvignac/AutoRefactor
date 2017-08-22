@@ -37,6 +37,13 @@ import java.util.Set;
 
 public class SetRatherThanMapSample {
 
+    public SetRatherThanMapSample() {
+        this(new HashMap<String, String>());
+    }
+
+    public SetRatherThanMapSample(Map<String, String> parameter) {
+    }
+
     public void replaceHashMapInstanceCreation() {
         // Keep this comment
         boolean isInside = new HashMap<String, String>().isEmpty();

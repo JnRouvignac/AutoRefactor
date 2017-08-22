@@ -35,6 +35,7 @@ import static org.eclipse.jdt.core.dom.ASTNode.ASSIGNMENT;
 import static org.eclipse.jdt.core.dom.ASTNode.CAST_EXPRESSION;
 import static org.eclipse.jdt.core.dom.ASTNode.CLASS_INSTANCE_CREATION;
 import static org.eclipse.jdt.core.dom.ASTNode.CONDITIONAL_EXPRESSION;
+import static org.eclipse.jdt.core.dom.ASTNode.CONSTRUCTOR_INVOCATION;
 import static org.eclipse.jdt.core.dom.ASTNode.ENHANCED_FOR_STATEMENT;
 import static org.eclipse.jdt.core.dom.ASTNode.INSTANCEOF_EXPRESSION;
 import static org.eclipse.jdt.core.dom.ASTNode.METHOD_INVOCATION;
@@ -281,6 +282,7 @@ public abstract class AbstractClassSubstituteRefactoring extends AbstractRefacto
             case CAST_EXPRESSION:
             case INSTANCEOF_EXPRESSION:
             case CLASS_INSTANCE_CREATION:
+            case CONSTRUCTOR_INVOCATION:
             case CONDITIONAL_EXPRESSION:
                 return false;
             case PARENTHESIZED_EXPRESSION:
