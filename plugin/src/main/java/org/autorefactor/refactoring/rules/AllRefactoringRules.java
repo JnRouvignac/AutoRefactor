@@ -145,6 +145,7 @@ public final class AllRefactoringRules {
                 new ReplaceQualifiedNamesBySimpleNamesRefactoring(),
                 new RemoveEmptyLinesRefactoring(),
                 new RemoveEmptySuperConstrInvocationRefactoring(),
+                new ImplicitDefaultConstructorRatherThanWrittenOneRefactoring(),
                 new AndroidWakeLockRefactoring(),
                 new AndroidViewHolderRefactoring(),
                 new EnumMapRatherThanHashMapRefactoring(),
