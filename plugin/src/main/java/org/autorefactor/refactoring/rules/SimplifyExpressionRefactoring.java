@@ -45,6 +45,7 @@ import org.eclipse.jdt.core.dom.InfixExpression.Operator;
 import org.eclipse.jdt.core.dom.InstanceofExpression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.ParenthesizedExpression;
+import org.eclipse.jdt.core.dom.PostfixExpression;
 import org.eclipse.jdt.core.dom.PrefixExpression;
 import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
@@ -53,7 +54,11 @@ import org.eclipse.jdt.core.dom.WhileStatement;
 import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.autorefactor.util.Utils.*;
 import static org.eclipse.jdt.core.dom.InfixExpression.Operator.*;
-import static org.eclipse.jdt.core.dom.PrefixExpression.Operator.*;
+import static org.eclipse.jdt.core.dom.PrefixExpression.Operator.MINUS;
+import static org.eclipse.jdt.core.dom.PrefixExpression.Operator.PLUS;
+import static org.eclipse.jdt.core.dom.PrefixExpression.Operator.DECREMENT;
+import static org.eclipse.jdt.core.dom.PrefixExpression.Operator.INCREMENT;
+import static org.eclipse.jdt.core.dom.PrefixExpression.Operator.NOT;
 
 /** See {@link #getDescription()} method. */
 public class SimplifyExpressionRefactoring extends AbstractRefactoringRule {
@@ -112,7 +117,7 @@ public class SimplifyExpressionRefactoring extends AbstractRefactoringRule {
         final ASTNode parent = node.getParent();
         final Expression innerExpr = node.getExpression();
         if (innerExpr instanceof ParenthesizedExpression) {
-            return getExpressionWithoutParentheses((ParenthesizedExpression) innerExpr);
+            return innerExpr;
         }
         if (parent instanceof InfixExpression) {
             final InfixExpression parentInfixExpr = (InfixExpression) parent;
@@ -125,6 +130,27 @@ public class SimplifyExpressionRefactoring extends AbstractRefactoringRule {
                         && equalNotNull(innerExpr.resolveTypeBinding(), parentInfixExpr.resolveTypeBinding())) {
                     return innerExpr;
                 }
+            }
+        }
+        // Infix, prefix or postfix without parenthesis is not readable
+        if ((parent instanceof InfixExpression
+                && (InfixExpression.Operator.PLUS.equals(((InfixExpression) parent).getOperator())
+                        || InfixExpression.Operator.MINUS.equals(((InfixExpression) parent).getOperator())))
+                || (parent instanceof PrefixExpression
+                        && (PLUS.equals(((PrefixExpression) parent).getOperator())
+                                || MINUS.equals(((PrefixExpression) parent).getOperator())))) {
+            if (innerExpr instanceof PrefixExpression
+                    && (DECREMENT.equals(((PrefixExpression) innerExpr).getOperator())
+                            || INCREMENT.equals(((PrefixExpression) innerExpr).getOperator())
+                            || PLUS.equals(((PrefixExpression) innerExpr).getOperator())
+                            || MINUS.equals(((PrefixExpression) innerExpr).getOperator()))) {
+                return node;
+            }
+            if (innerExpr instanceof PostfixExpression
+                    && (PostfixExpression.Operator.DECREMENT.equals(((PostfixExpression) innerExpr).getOperator())
+                            || PostfixExpression.Operator.INCREMENT.equals(((PostfixExpression) innerExpr)
+                                    .getOperator()))) {
+                return node;
             }
         }
         if (isInnerExprHardToRead(innerExpr, parent)) {
@@ -148,7 +174,13 @@ public class SimplifyExpressionRefactoring extends AbstractRefactoringRule {
                 innerExpr instanceof InfixExpression
                 // TODO JNR add additional code to check if the cast is really required
                 // or if it can be removed.
-                || innerExpr instanceof CastExpression) {
+                || innerExpr instanceof CastExpression
+                // infix and prefix or postfix without parenthesis is not readable
+                || ((parent instanceof InfixExpression
+                        || parent instanceof PrefixExpression
+                                || parent instanceof PostfixExpression)
+                        && (innerExpr instanceof PrefixExpression
+                                || innerExpr instanceof PostfixExpression))) {
             return node;
         }
         return innerExpr;

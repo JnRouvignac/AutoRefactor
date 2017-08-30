@@ -294,4 +294,68 @@ public class SimplifyExpressionSample {
         boolean b11 = b1 == b2;
         return b3 && b4 && b5 && b6 && b7 && b8 && b9 && b10 && b11;
     }
+
+    public int doNotRefactorMinusOnDecrement(int increment) {
+        return -(increment--);
+    }
+
+    public int doNotRefactorPlusOnDecrement(int increment) {
+        return +(increment--);
+    }
+
+    public int doNotRefactorMinusOnIncrement(int increment) {
+        return -(increment++);
+    }
+
+    public int doNotRefactorPlusOnIncrement(int increment) {
+        return +(increment++);
+    }
+
+    public int doNotRefactorMinusOnPreDecrement(int increment) {
+        return -(--increment);
+    }
+
+    public int doNotRefactorPlusOnPreDecrement(int increment) {
+        return +(--increment);
+    }
+
+    public int doNotRefactorMinusOnPreIncrement(int increment) {
+        return -(++increment);
+    }
+
+    public int doNotRefactorPlusOnPreIncrement(int increment) {
+        return +(++increment);
+    }
+
+    public int doNotRefactorInfixOnDecrement(int increment) {
+        return 1 -(increment--);
+    }
+
+    public int doNotRefactorPositiveInfixOnDecrement(int increment) {
+        return 1 +(increment--);
+    }
+
+    public int doNotRefactorInfixOnIncrement(int increment) {
+        return 1 -(increment++);
+    }
+
+    public int doNotRefactorPositiveInfixOnIncrement(int increment) {
+        return 1 +(increment++);
+    }
+
+    public int doNotRefactorInfixOnPreDecrement(int increment) {
+        return 1 -(--increment);
+    }
+
+    public int doNotRefactorPositiveInfixOnPreDecrement(int increment) {
+        return 1 +(--increment);
+    }
+
+    public int doNotRefactorInfixOnPreIncrement(int increment) {
+        return 1 -(++increment);
+    }
+
+    public int doNotRefactorPositiveInfixOnPreIncrement(int increment) {
+        return 1 +(++increment);
+    }
 }
