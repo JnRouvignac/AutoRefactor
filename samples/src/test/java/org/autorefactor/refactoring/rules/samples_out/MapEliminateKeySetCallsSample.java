@@ -26,6 +26,7 @@
  */
 package org.autorefactor.refactoring.rules.samples_out;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -39,7 +40,7 @@ public class MapEliminateKeySetCallsSample {
     private long entry;
 
     public int replaceUnnecesaryCallsToMapKeySet(Map<String, String> map) {
-        // Keep this comment 1
+        // Keep this comment
         int x = map.size();
         if (map.containsKey("hello")) {
             map.remove("hello");
@@ -58,7 +59,7 @@ public class MapEliminateKeySetCallsSample {
     }
 
     public void refactorMapKeySet(Map<String, Long> map) {
-        // Keep this comment 1
+        // Keep this comment
         for (Map.Entry<String, Long> entry : map.entrySet()) {
             String key = entry.getKey();
             System.out.println("hello " + map.get("name"));
@@ -69,7 +70,7 @@ public class MapEliminateKeySetCallsSample {
     }
 
     public void refactorValueTypeUsesPrimitive(Map<String, byte[]> map) {
-        // Keep this comment 1
+        // Keep this comment
         for (Map.Entry<String, byte[]> entry : map.entrySet()) {
             String key = entry.getKey();
             System.out.println("hello " + map.get("name"));
@@ -80,7 +81,7 @@ public class MapEliminateKeySetCallsSample {
     }
 
     public void refactorValueTypeUsesGenerics(Map<String, List<Map<Integer, List<Long>>>> map) {
-        // Keep this comment 1
+        // Keep this comment
         for (Map.Entry<String, List<Map<Integer, List<Long>>>> entry : map.entrySet()) {
             String key = entry.getKey();
             System.out.println("hello " + map.get("name"));
@@ -120,7 +121,7 @@ public class MapEliminateKeySetCallsSample {
 
     public void refactorVariableDeclarationStatement(Map<String, Long> map) {
         Map<String, Long> map2 = map;
-        // Keep this comment 1
+        // Keep this comment
         for (Map.Entry<String, Long> entry : map2.entrySet()) {
             String key = entry.getKey();
             System.out.println("hello " + map2.get("name"));
@@ -133,7 +134,7 @@ public class MapEliminateKeySetCallsSample {
     public void refactorVariableDeclarationExpression(Map<String, Long> map) {
         int i = 0;
         for (Map<String, Long> map2 = map; i <= 0; i++) {
-            // Keep this comment 1
+            // Keep this comment
             for (Map.Entry<String, Long> entry : map2.entrySet()) {
                 String key = entry.getKey();
                 System.out.println("hello " + map2.get("name"));
@@ -145,7 +146,7 @@ public class MapEliminateKeySetCallsSample {
     }
 
     public void refactorField() {
-        // Keep this comment 1
+        // Keep this comment
         for (Map.Entry<String, Long> entry : mapField.entrySet()) {
             String key = entry.getKey();
             System.out.println("hello " + mapField.get("name"));
@@ -157,7 +158,7 @@ public class MapEliminateKeySetCallsSample {
 
     public void refactorMethodInvocation() {
         ProcessBuilder pb = new ProcessBuilder();
-        // Keep this comment 1
+        // Keep this comment
         for (Map.Entry<String, String> entry : pb.environment().entrySet()) {
             String key = entry.getKey();
             System.out.println("hello " + pb.environment().get("name"));
@@ -168,7 +169,7 @@ public class MapEliminateKeySetCallsSample {
     }
 
     public void refactorRawMap(Map map) {
-        // Keep this comment 1
+        // Keep this comment
         for (Object obj : map.entrySet()) {
             Map.Entry entry = (Map.Entry) obj;
             Object key = entry.getKey();
@@ -180,7 +181,7 @@ public class MapEliminateKeySetCallsSample {
     }
 
     public void refactorMapKeySetWithUnboxingOfKey(Map<Byte, Long> map) {
-        // Keep this comment 1
+        // Keep this comment
         for (Map.Entry<Byte, Long> entry : map.entrySet()) {
             byte key = entry.getKey();
             System.out.println("hello " + map.get("name"));
@@ -206,7 +207,7 @@ public class MapEliminateKeySetCallsSample {
     }
 
     public void refactorAndAvoidNameConflictsWithExistingVariableBefore(Map<String, Long> map, long entry) {
-        // Keep this comment 1
+        // Keep this comment
         for (Map.Entry<String, Long> mapEntry : map.entrySet()) {
             String key = mapEntry.getKey();
             System.out.println(mapEntry.getValue());
@@ -214,7 +215,7 @@ public class MapEliminateKeySetCallsSample {
     }
 
     public void refactorAndAvoidNameConflictsWithExistingVariableAfter(Map<String, Long> map) {
-        // Keep this comment 1
+        // Keep this comment
         for (Map.Entry<String, Long> mapEntry : map.entrySet()) {
             String key = mapEntry.getKey();
             System.out.println(mapEntry.getValue());
@@ -224,7 +225,7 @@ public class MapEliminateKeySetCallsSample {
     }
 
     public void refactorAndAvoidNameShadowingOfExistingVariableUse(Map<String, Long> map, long entry) {
-        // Keep this comment 1
+        // Keep this comment
         for (Map.Entry<String, Long> mapEntry : map.entrySet()) {
             String key = mapEntry.getKey();
             System.out.println(mapEntry.getValue());
@@ -233,7 +234,7 @@ public class MapEliminateKeySetCallsSample {
     }
 
     public void refactorAndAvoidNameShadowingOfExistingFieldUse(Map<String, Long> map, long entry) {
-        // Keep this comment 1
+        // Keep this comment
         for (Map.Entry<String, Long> mapEntry : map.entrySet()) {
             String key = mapEntry.getKey();
             System.out.println(mapEntry.getValue());
@@ -242,8 +243,32 @@ public class MapEliminateKeySetCallsSample {
     }
 
     public void refactorMapKeySetUseSimpleNameWhenInSamePackage(Map<String, Dummy> map) {
-        // Keep this comment 1
+        // Keep this comment
         for (Map.Entry<String, Dummy> entry : map.entrySet()) {
+            String key = entry.getKey();
+            System.out.println("hello " + entry.getValue());
+        }
+    }
+
+    public <V>void refactorMapWithTypeVariable(Map<String, V> map) {
+        // Keep this comment
+        for (Map.Entry<String, V> entry : map.entrySet()) {
+            String key = entry.getKey();
+            System.out.println("hello " + entry.getValue());
+        }
+    }
+
+    public <V extends Object>void refactorMapWithUpperBoundedTypeVariable(Map<String, V> map) {
+        // Keep this comment
+        for (Map.Entry<String, V> entry : map.entrySet()) {
+            String key = entry.getKey();
+            System.out.println("hello " + entry.getValue());
+        }
+    }
+
+    public <V extends ArrayList<Integer>>void refactorMapWithLowerBoundedTypeVariable(Map<String, V> map) {
+        // Keep this comment
+        for (Map.Entry<String, V> entry : map.entrySet()) {
             String key = entry.getKey();
             System.out.println("hello " + entry.getValue());
         }

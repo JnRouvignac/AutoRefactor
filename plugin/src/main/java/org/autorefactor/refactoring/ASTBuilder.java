@@ -407,7 +407,7 @@ public class ASTBuilder {
             }
             return type;
         } else if (typeBinding.isTypeVariable()) {
-            throw new NotImplementedException(null, " for the type variable binding '" + typeBinding + "'");
+            return type(typeBinding.getName());
         } else if (typeBinding.isCapture()) {
             if (typeBinding.getTypeBounds().length > 1) {
                 throw new NotImplementedException(null,

@@ -26,6 +26,7 @@
  */
 package org.autorefactor.refactoring.rules.samples_in;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -39,7 +40,7 @@ public class MapEliminateKeySetCallsSample {
     private long entry;
 
     public int replaceUnnecesaryCallsToMapKeySet(Map<String, String> map) {
-        // Keep this comment 1
+        // Keep this comment
         int x = map.keySet().size();
         if (map.keySet().contains("hello")) {
             map.keySet().remove("hello");
@@ -58,7 +59,7 @@ public class MapEliminateKeySetCallsSample {
     }
 
     public void refactorMapKeySet(Map<String, Long> map) {
-        // Keep this comment 1
+        // Keep this comment
         for (String key : map.keySet()) {
             System.out.println("hello " + map.get("name"));
             if (map.get(key) != null) {
@@ -68,7 +69,7 @@ public class MapEliminateKeySetCallsSample {
     }
 
     public void refactorValueTypeUsesPrimitive(Map<String, byte[]> map) {
-        // Keep this comment 1
+        // Keep this comment
         for (String key : map.keySet()) {
             System.out.println("hello " + map.get("name"));
             if (map.get(key).length != 0) {
@@ -78,7 +79,7 @@ public class MapEliminateKeySetCallsSample {
     }
 
     public void refactorValueTypeUsesGenerics(Map<String, List<Map<Integer, List<Long>>>> map) {
-        // Keep this comment 1
+        // Keep this comment
         for (String key : map.keySet()) {
             System.out.println("hello " + map.get("name"));
             if (!map.get(key).isEmpty()) {
@@ -114,7 +115,7 @@ public class MapEliminateKeySetCallsSample {
 
     public void refactorVariableDeclarationStatement(Map<String, Long> map) {
         Map<String, Long> map2 = map;
-        // Keep this comment 1
+        // Keep this comment
         for (String key : map2.keySet()) {
             System.out.println("hello " + map2.get("name"));
             if (map2.get(key) != null) {
@@ -126,7 +127,7 @@ public class MapEliminateKeySetCallsSample {
     public void refactorVariableDeclarationExpression(Map<String, Long> map) {
         int i = 0;
         for (Map<String, Long> map2 = map; i <= 0; i++) {
-            // Keep this comment 1
+            // Keep this comment
             for (String key : map2.keySet()) {
                 System.out.println("hello " + map2.get("name"));
                 if (map2.get(key) != null) {
@@ -137,7 +138,7 @@ public class MapEliminateKeySetCallsSample {
     }
 
     public void refactorField() {
-        // Keep this comment 1
+        // Keep this comment
         for (String key : mapField.keySet()) {
             System.out.println("hello " + mapField.get("name"));
             if (mapField.get(key) != null) {
@@ -148,7 +149,7 @@ public class MapEliminateKeySetCallsSample {
 
     public void refactorMethodInvocation() {
         ProcessBuilder pb = new ProcessBuilder();
-        // Keep this comment 1
+        // Keep this comment
         for (String key : pb.environment().keySet()) {
             System.out.println("hello " + pb.environment().get("name"));
             if (pb.environment().get(key) != null) {
@@ -158,7 +159,7 @@ public class MapEliminateKeySetCallsSample {
     }
 
     public void refactorRawMap(Map map) {
-        // Keep this comment 1
+        // Keep this comment
         for (Object key : map.keySet()) {
             System.out.println("hello " + map.get("name"));
             if (((Long) map.get(key)) != null) {
@@ -168,7 +169,7 @@ public class MapEliminateKeySetCallsSample {
     }
 
     public void refactorMapKeySetWithUnboxingOfKey(Map<Byte, Long> map) {
-        // Keep this comment 1
+        // Keep this comment
         for (byte key : map.keySet()) {
             System.out.println("hello " + map.get("name"));
             if (map.get(key) != null) {
@@ -193,14 +194,14 @@ public class MapEliminateKeySetCallsSample {
     }
 
     public void refactorAndAvoidNameConflictsWithExistingVariableBefore(Map<String, Long> map, long entry) {
-        // Keep this comment 1
+        // Keep this comment
         for (String key : map.keySet()) {
             System.out.println(map.get(key));
         }
     }
 
     public void refactorAndAvoidNameConflictsWithExistingVariableAfter(Map<String, Long> map) {
-        // Keep this comment 1
+        // Keep this comment
         for (String key : map.keySet()) {
             System.out.println(map.get(key));
         }
@@ -209,7 +210,7 @@ public class MapEliminateKeySetCallsSample {
     }
 
     public void refactorAndAvoidNameShadowingOfExistingVariableUse(Map<String, Long> map, long entry) {
-        // Keep this comment 1
+        // Keep this comment
         for (String key : map.keySet()) {
             System.out.println(map.get(key));
         }
@@ -217,7 +218,7 @@ public class MapEliminateKeySetCallsSample {
     }
 
     public void refactorAndAvoidNameShadowingOfExistingFieldUse(Map<String, Long> map, long entry) {
-        // Keep this comment 1
+        // Keep this comment
         for (String key : map.keySet()) {
             System.out.println(map.get(key));
         }
@@ -225,7 +226,28 @@ public class MapEliminateKeySetCallsSample {
     }
 
     public void refactorMapKeySetUseSimpleNameWhenInSamePackage(Map<String, Dummy> map) {
-        // Keep this comment 1
+        // Keep this comment
+        for (String key : map.keySet()) {
+            System.out.println("hello " + map.get(key));
+        }
+    }
+
+    public <V>void refactorMapWithTypeVariable(Map<String, V> map) {
+        // Keep this comment
+        for (String key : map.keySet()) {
+            System.out.println("hello " + map.get(key));
+        }
+    }
+
+    public <V extends Object>void refactorMapWithUpperBoundedTypeVariable(Map<String, V> map) {
+        // Keep this comment
+        for (String key : map.keySet()) {
+            System.out.println("hello " + map.get(key));
+        }
+    }
+
+    public <V extends ArrayList<Integer>>void refactorMapWithLowerBoundedTypeVariable(Map<String, V> map) {
+        // Keep this comment
         for (String key : map.keySet()) {
             System.out.println("hello " + map.get(key));
         }
