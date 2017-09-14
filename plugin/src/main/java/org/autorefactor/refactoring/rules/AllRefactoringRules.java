@@ -108,6 +108,7 @@ public final class AllRefactoringRules {
                 new IsEmptyRatherThanSizeRefactoring(),
                 new MapRefactoring(),
                 new MapEliminateKeySetCallsRefactoring(),
+                new MethodOnMapRatherThanMethodOnKeySetRefactoring(),
                 new NoAssignmentInIfConditionRefactoring(),
                 new IfElseIfRefactoring(),
                 new CommonIfInIfElseRefactoring(),

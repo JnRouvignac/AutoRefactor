@@ -65,8 +65,7 @@ public class MapEliminateKeySetCallsRefactoring extends AbstractRefactoringRule 
     @Override
     public String getDescription() {
         return ""
-                + "Directly invoke methods on Map rather than on Map.keySet() where possible,\n"
-                + "also convert for loops iterating on Map.keySet() to iterate on Map.entrySet() where possible.";
+                + "Convert for loops iterating on Map.keySet() to iterate on Map.entrySet() when possible.";
     }
 
     @Override
@@ -193,46 +192,6 @@ public class MapEliminateKeySetCallsRefactoring extends AbstractRefactoringRule 
                 return false;
             }
         }
-    }
-
-    @Override
-    public boolean visit(MethodInvocation mi) {
-        Expression miExpr = mi.getExpression();
-        if (isKeySetMethod(miExpr)) {
-            final MethodInvocation mapKeySetMi = (MethodInvocation) miExpr;
-            if (isMethod(mi, "java.util.Set", "clear")) {
-                return removeInvocationOfMapKeySet(mapKeySetMi, mi, "clear");
-            }
-            if (isMethod(mi, "java.util.Set", "size")) {
-                return removeInvocationOfMapKeySet(mapKeySetMi, mi, "size");
-            }
-            if (isMethod(mi, "java.util.Set", "isEmpty")) {
-                return removeInvocationOfMapKeySet(mapKeySetMi, mi, "isEmpty");
-            }
-            if (isMethod(mi, "java.util.Set", "remove", "java.lang.Object")
-                    // If parent is not an expression statement, the MethodInvocation must return a boolean.
-                    // In that case, we cannot replace because `Map.removeKey(key) != null`
-                    // is not strictly equivalent to `Map.keySet().remove(key)`
-                    && mi.getParent().getNodeType() == EXPRESSION_STATEMENT) {
-                return removeInvocationOfMapKeySet(mapKeySetMi, mi, "remove");
-            }
-            if (isMethod(mi, "java.util.Set", "contains", "java.lang.Object")) {
-                return removeInvocationOfMapKeySet(mapKeySetMi, mi, "containsKey");
-            }
-        }
-        return VISIT_SUBTREE;
-    }
-
-    private boolean removeInvocationOfMapKeySet(
-            MethodInvocation mapKeySetMi, MethodInvocation actualMi, String methodName) {
-        final ASTBuilder b = ctx.getASTBuilder();
-        ctx.getRefactorings().replace(
-            actualMi,
-            b.invoke(
-                b.copyExpression(mapKeySetMi),
-                methodName,
-                b.copyRange(arguments(actualMi))));
-        return DO_NOT_VISIT_SUBTREE;
     }
 
     @Override

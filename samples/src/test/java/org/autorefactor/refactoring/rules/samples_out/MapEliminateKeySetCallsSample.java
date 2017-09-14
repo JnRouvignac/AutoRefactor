@@ -37,26 +37,6 @@ public class MapEliminateKeySetCallsSample {
 
     private Map<String, Long> mapField;
     private Map<String, Map<?, ?>> mapFieldWithWildcards;
-    private long entry;
-
-    public int replaceUnnecesaryCallsToMapKeySet(Map<String, String> map) {
-        // Keep this comment
-        int x = map.size();
-        if (map.containsKey("hello")) {
-            map.remove("hello");
-        }
-        if (map.keySet().remove("world")) {
-            // Cannot replace, because `map.removeKey("world") != null` is not strictly equivalent
-            System.out.println(map);
-        }
-        // Keep this comment 2
-        map.clear();
-        // Keep this comment 3
-        if (map.isEmpty()) {
-            x++;
-        }
-        return x;
-    }
 
     public void refactorMapKeySet(Map<String, Long> map) {
         // Keep this comment
