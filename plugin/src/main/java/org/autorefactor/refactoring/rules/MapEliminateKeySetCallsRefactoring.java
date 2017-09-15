@@ -209,67 +209,84 @@ public class MapEliminateKeySetCallsRefactoring extends AbstractRefactoringRule 
             final List<MethodInvocation> getValueMis =
                     collectMapGetValueCalls(mapExpression, parameter, enhancedFor.getBody());
             if (!getValueMis.isEmpty() && haveSameTypeBindings(getValueMis)) {
-                final ASTBuilder b = ctx.getASTBuilder();
-                final Refactorings r = ctx.getRefactorings();
-
-                final int insertionPoint = asList(enhancedFor.getBody()).get(0).getStartPosition() - 1;
-                final Variable entryVar = new Variable(
-                    new VariableNameDecider(enhancedFor.getBody(), insertionPoint).suggest("entry", "mapEntry"), b);
-                final TypeNameDecider typeNameDecider = new TypeNameDecider(parameter);
-
-                final MethodInvocation getValueMi0 = getValueMis.get(0);
-                final ITypeBinding typeBinding = getValueMi0.getExpression().resolveTypeBinding();
-                if (typeBinding != null && typeBinding.isRawType()) {
-                    // for (Object key : map.keySet()) => for (Object key : map.entrySet())
-                    r.set(enhancedFor, EXPRESSION_PROPERTY, b.invoke(b.move(mapExpression), "entrySet"));
-                    final Type objectType = b.type(typeNameDecider.useSimplestPossibleName("java.lang.Object"));
-                    final Variable objectVar = new Variable(
-                        new VariableNameDecider(enhancedFor.getBody(), insertionPoint).suggest("obj"), b);
-                    r.set(enhancedFor, PARAMETER_PROPERTY, b.declareSingleVariable(objectVar.varNameRaw(), objectType));
-
-                    // for (Map.Entry<K, V> mapEntry : map.entrySet()) {
-                    //     Map.Entry mapEntry = (Map.Entry) obj; // <--- add this statement
-                    //     Object key = mapEntry.getKey(); // <--- add this statement
-                    String mapEntryTypeName = typeNameDecider.useSimplestPossibleName("java.util.Map.Entry");
-                    final VariableDeclarationStatement newEntryDecl = b.declareStmt(
-                            b.type(mapEntryTypeName),
-                            entryVar.varName(),
-                            b.cast(b.type(mapEntryTypeName), objectVar.varName()));
-
-                    final Type mapKeyType = b.copy(parameter.getType());
-                    final VariableDeclarationStatement newKeyDecl = b.declareStmt(
-                            mapKeyType,
-                            b.move(parameter.getName()),
-                            b.invoke(entryVar.varName(), "getKey"));
-
-                    r.insertFirst(enhancedFor.getBody(), Block.STATEMENTS_PROPERTY, newKeyDecl);
-                    r.insertFirst(enhancedFor.getBody(), Block.STATEMENTS_PROPERTY, newEntryDecl);
-                } else {
-                    // for (K key : map.keySet()) => for (K key : map.entrySet())
-                    r.set(enhancedFor, EXPRESSION_PROPERTY, b.invoke(b.move(mapExpression), "entrySet"));
-                    // for (K key : map.entrySet()) => for (Map.Entry<K, V> mapEntry : map.entrySet())
-                    final Type mapEntryType = createMapEntryType(parameter, getValueMi0, typeNameDecider);
-                    r.set(enhancedFor, PARAMETER_PROPERTY,
-                          b.declareSingleVariable(entryVar.varNameRaw(), mapEntryType));
-                    // for (Map.Entry<K, V> mapEntry : map.entrySet()) {
-                    //     K key = mapEntry.getKey(); // <--- add this statement
-                    final Type mapKeyType = b.copy(parameter.getType());
-                    final VariableDeclarationStatement newKeyDeclaration = b.declareStmt(
-                            mapKeyType,
-                            b.move(parameter.getName()),
-                            b.invoke(entryVar.varName(), "getKey"));
-                    r.insertFirst(enhancedFor.getBody(), Block.STATEMENTS_PROPERTY, newKeyDeclaration);
-                }
-
-                // Replace all occurrences of map.get(key) => mapEntry.getValue()
-                for (MethodInvocation getValueMi : getValueMis) {
-                    r.replace(getValueMi, b.invoke(entryVar.varName(), "getValue"));
-                }
+                replaceEntryIterationByKeyIteration(enhancedFor, mapExpression, parameter, getValueMis);
                 return DO_NOT_VISIT_SUBTREE;
             }
         }
 
         return VISIT_SUBTREE;
+    }
+
+    private void replaceEntryIterationByKeyIteration(EnhancedForStatement enhancedFor, final Expression mapExpression,
+            final SingleVariableDeclaration parameter, final List<MethodInvocation> getValueMis) {
+        final ASTBuilder b = ctx.getASTBuilder();
+        final Refactorings r = ctx.getRefactorings();
+
+        final VariableDefinitionsUsesVisitor keyUseVisitor = new VariableDefinitionsUsesVisitor(parameter);
+        enhancedFor.getBody().accept(keyUseVisitor);
+        int keyUses = keyUseVisitor.getUses().size();
+
+        final int insertionPoint = asList(enhancedFor.getBody()).get(0).getStartPosition() - 1;
+        final Variable entryVar = new Variable(
+            new VariableNameDecider(enhancedFor.getBody(), insertionPoint).suggest("entry", "mapEntry"), b);
+        final TypeNameDecider typeNameDecider = new TypeNameDecider(parameter);
+
+        final MethodInvocation getValueMi0 = getValueMis.get(0);
+        final ITypeBinding typeBinding = getValueMi0.getExpression().resolveTypeBinding();
+        if (typeBinding != null && typeBinding.isRawType()) {
+            // for (Object key : map.keySet()) => for (Object key : map.entrySet())
+            r.set(enhancedFor, EXPRESSION_PROPERTY, b.invoke(b.move(mapExpression), "entrySet"));
+            final Type objectType = b.type(typeNameDecider.useSimplestPossibleName("java.lang.Object"));
+            final Variable objectVar = new Variable(
+                new VariableNameDecider(enhancedFor.getBody(), insertionPoint).suggest("obj"), b);
+            r.set(enhancedFor, PARAMETER_PROPERTY, b.declareSingleVariable(objectVar.varNameRaw(), objectType));
+
+            // for (Map.Entry<K, V> mapEntry : map.entrySet()) {
+            //     Map.Entry mapEntry = (Map.Entry) obj; // <--- add this statement
+            //     Object key = mapEntry.getKey(); // <--- add this statement
+
+            final Type mapKeyType = b.copy(parameter.getType());
+            final VariableDeclarationStatement newKeyDecl = b.declareStmt(
+                    mapKeyType,
+                    b.move(parameter.getName()),
+                    b.invoke(entryVar.varName(), "getKey"));
+
+            r.insertFirst(enhancedFor.getBody(), Block.STATEMENTS_PROPERTY, newKeyDecl);
+
+            if (keyUses > getValueMis.size()) {
+                String mapEntryTypeName = typeNameDecider.useSimplestPossibleName("java.util.Map.Entry");
+
+                final VariableDeclarationStatement newEntryDecl = b.declareStmt(
+                        b.type(mapEntryTypeName),
+                        entryVar.varName(),
+                        b.cast(b.type(mapEntryTypeName), objectVar.varName()));
+                r.insertFirst(enhancedFor.getBody(), Block.STATEMENTS_PROPERTY, newEntryDecl);
+            }
+        } else {
+            // for (K key : map.keySet()) => for (K key : map.entrySet())
+            r.set(enhancedFor, EXPRESSION_PROPERTY, b.invoke(b.move(mapExpression), "entrySet"));
+            // for (K key : map.entrySet()) => for (Map.Entry<K, V> mapEntry : map.entrySet())
+            final Type mapEntryType = createMapEntryType(parameter, getValueMi0, typeNameDecider);
+            r.set(enhancedFor, PARAMETER_PROPERTY,
+                  b.declareSingleVariable(entryVar.varNameRaw(), mapEntryType));
+
+            if (keyUses > getValueMis.size()) {
+                // for (Map.Entry<K, V> mapEntry : map.entrySet()) {
+                //     K key = mapEntry.getKey(); // <--- add this statement
+                final Type mapKeyType = b.copy(parameter.getType());
+
+                final VariableDeclarationStatement newKeyDeclaration = b.declareStmt(
+                        mapKeyType,
+                        b.move(parameter.getName()),
+                        b.invoke(entryVar.varName(), "getKey"));
+                r.insertFirst(enhancedFor.getBody(), Block.STATEMENTS_PROPERTY, newKeyDeclaration);
+            }
+        }
+
+        // Replace all occurrences of map.get(key) => mapEntry.getValue()
+        for (MethodInvocation getValueMi : getValueMis) {
+            r.replace(getValueMi, b.invoke(entryVar.varName(), "getValue"));
+        }
     }
 
     /**
@@ -317,7 +334,7 @@ public class MapEliminateKeySetCallsRefactoring extends AbstractRefactoringRule 
         if (type0 == null) {
             return false;
         }
-        for (; it.hasNext();) {
+        while (it.hasNext()) {
             final ITypeBinding typeN = it.next().resolveTypeBinding();
             if (!areSameTypeBindings(type0, typeN)) {
                 return false;
@@ -364,18 +381,12 @@ public class MapEliminateKeySetCallsRefactoring extends AbstractRefactoringRule 
     }
 
     private boolean areSameTypeBindingsByAliasingTypeCaptures(final ITypeBinding type1, final ITypeBinding type2) {
-        if (type1.isCapture()) {
-            if (type2.isCapture()) {
-                return areSameTypeBindings(type1.getWildcard(), type2.getWildcard());
-            } else {
-                return false;
-            }
+        if (type1.isCapture() ^ type2.isCapture()) {
+            return false;
+        } else if (type1.isCapture()) {
+            return areSameTypeBindings(type1.getWildcard(), type2.getWildcard());
         } else {
-            if (type2.isCapture()) {
-                return false;
-            } else {
-                return type1.equals(type2);
-            }
+            return type1.equals(type2);
         }
     }
 
@@ -405,22 +416,13 @@ public class MapEliminateKeySetCallsRefactoring extends AbstractRefactoringRule 
         private boolean isSameReference(Expression expr1, Expression expr2) {
             if (expr1 == null || expr2 == null) {
                 return false;
-            }
-            switch (expr1.getNodeType()) {
-            case METHOD_INVOCATION:
-                switch (expr2.getNodeType()) {
-                case METHOD_INVOCATION:
-                    final MethodInvocation mi1 = (MethodInvocation) expr1;
-                    final MethodInvocation mi2 = (MethodInvocation) expr2;
-                    return areBindingsEqual(mi1.resolveTypeBinding(), mi2.resolveTypeBinding())
-                            && isSameReference(mi1.getExpression(), mi2.getExpression());
-
-                default:
-                    return isSameVariable(expr1, expr2);
-                }
-
-            default:
+            } else if (expr1.getNodeType() != METHOD_INVOCATION || expr2.getNodeType() != METHOD_INVOCATION) {
                 return isSameVariable(expr1, expr2);
+            } else {
+                final MethodInvocation mi1 = (MethodInvocation) expr1;
+                final MethodInvocation mi2 = (MethodInvocation) expr2;
+                return areBindingsEqual(mi1.resolveTypeBinding(), mi2.resolveTypeBinding())
+                        && isSameReference(mi1.getExpression(), mi2.getExpression());
             }
         }
     }

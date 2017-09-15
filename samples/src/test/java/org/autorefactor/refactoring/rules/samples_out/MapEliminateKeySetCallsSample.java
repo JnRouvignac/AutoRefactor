@@ -189,7 +189,6 @@ public class MapEliminateKeySetCallsSample {
     public void refactorAndAvoidNameConflictsWithExistingVariableBefore(Map<String, Long> map, long entry) {
         // Keep this comment
         for (Map.Entry<String, Long> mapEntry : map.entrySet()) {
-            String key = mapEntry.getKey();
             System.out.println(mapEntry.getValue());
         }
     }
@@ -197,7 +196,6 @@ public class MapEliminateKeySetCallsSample {
     public void refactorAndAvoidNameConflictsWithExistingVariableAfter(Map<String, Long> map) {
         // Keep this comment
         for (Map.Entry<String, Long> mapEntry : map.entrySet()) {
-            String key = mapEntry.getKey();
             System.out.println(mapEntry.getValue());
         }
         long entry = 0;
@@ -207,7 +205,6 @@ public class MapEliminateKeySetCallsSample {
     public void refactorAndAvoidNameShadowingOfExistingVariableUse(Map<String, Long> map, long entry) {
         // Keep this comment
         for (Map.Entry<String, Long> mapEntry : map.entrySet()) {
-            String key = mapEntry.getKey();
             System.out.println(mapEntry.getValue());
         }
         System.out.println(entry);
@@ -216,7 +213,6 @@ public class MapEliminateKeySetCallsSample {
     public void refactorAndAvoidNameShadowingOfExistingFieldUse(Map<String, Long> map, long entry) {
         // Keep this comment
         for (Map.Entry<String, Long> mapEntry : map.entrySet()) {
-            String key = mapEntry.getKey();
             System.out.println(mapEntry.getValue());
         }
         System.out.println(entry);
@@ -225,7 +221,6 @@ public class MapEliminateKeySetCallsSample {
     public void refactorMapKeySetUseSimpleNameWhenInSamePackage(Map<String, Dummy> map) {
         // Keep this comment
         for (Map.Entry<String, Dummy> entry : map.entrySet()) {
-            String key = entry.getKey();
             System.out.println("hello " + entry.getValue());
         }
     }
@@ -233,7 +228,6 @@ public class MapEliminateKeySetCallsSample {
     public <V>void refactorMapWithTypeVariable(Map<String, V> map) {
         // Keep this comment
         for (Map.Entry<String, V> entry : map.entrySet()) {
-            String key = entry.getKey();
             System.out.println("hello " + entry.getValue());
         }
     }
@@ -241,7 +235,6 @@ public class MapEliminateKeySetCallsSample {
     public <V extends Object>void refactorMapWithUpperBoundedTypeVariable(Map<String, V> map) {
         // Keep this comment
         for (Map.Entry<String, V> entry : map.entrySet()) {
-            String key = entry.getKey();
             System.out.println("hello " + entry.getValue());
         }
     }
@@ -249,7 +242,6 @@ public class MapEliminateKeySetCallsSample {
     public <V extends ArrayList<Integer>>void refactorMapWithLowerBoundedTypeVariable(Map<String, V> map) {
         // Keep this comment
         for (Map.Entry<String, V> entry : map.entrySet()) {
-            String key = entry.getKey();
             System.out.println("hello " + entry.getValue());
         }
     }
