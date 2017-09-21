@@ -58,8 +58,8 @@ public class ArrayDequeRatherThanStackRefactoring extends AbstractClassSubstitut
     }
 
     @Override
-    protected String getExistingClassCanonicalName() {
-        return "java.util.Stack";
+    protected String[] getExistingClassCanonicalName() {
+        return new String[] {"java.util.Stack"};
     }
 
     @Override

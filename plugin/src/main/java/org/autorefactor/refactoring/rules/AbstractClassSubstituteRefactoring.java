@@ -48,6 +48,7 @@ import static org.eclipse.jdt.core.dom.ASTNode.VARIABLE_DECLARATION_STATEMENT;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.TypeNameDecider;
@@ -71,7 +72,7 @@ public abstract class AbstractClassSubstituteRefactoring extends AbstractRefacto
      *
      * @return the existing class canonical name.
      */
-    protected abstract String getExistingClassCanonicalName();
+    protected abstract String[] getExistingClassCanonicalName();
 
     /**
      * Get the substituting class name.
@@ -160,7 +161,7 @@ public abstract class AbstractClassSubstituteRefactoring extends AbstractRefacto
             final List<MethodInvocation> methodCallsToRefactor = new ArrayList<MethodInvocation>();
 
             if (canInstantiationBeRefactored(instanceCreation)
-                    && canBeRefactored(node, instanceCreation, varDecls,
+                    && canBeRefactored(node, instanceCreation, instanceCreation.resolveTypeBinding(), varDecls,
                             methodCallsToRefactor)
                     && canCodeBeRefactored()) {
                 replaceClass(instanceCreation, varDecls, methodCallsToRefactor);
@@ -172,8 +173,9 @@ public abstract class AbstractClassSubstituteRefactoring extends AbstractRefacto
     }
 
     private boolean canBeRefactored(Block node, final ASTNode itemToRefactor,
-            final List<VariableDeclaration> varDecls, final List<MethodInvocation> methodCallsToRefactor) {
-        return canInstantiationBeRefactored(itemToRefactor, varDecls, methodCallsToRefactor)
+            final ITypeBinding itemTypeBinding, final List<VariableDeclaration> varDecls,
+            final List<MethodInvocation> methodCallsToRefactor) {
+        return canInstantiationBeRefactored(itemToRefactor, itemTypeBinding, varDecls, methodCallsToRefactor)
                 && canVarOccurrenceBeRefactored(node, varDecls, methodCallsToRefactor);
     }
 
@@ -207,7 +209,7 @@ public abstract class AbstractClassSubstituteRefactoring extends AbstractRefacto
 
             for (final SimpleName varOccurrence : varOccurrenceVisitor.getVarOccurrences()) {
                 final List<VariableDeclaration> subVarDecls = new ArrayList<VariableDeclaration>();
-                if (!canBeRefactored(node, varOccurrence, subVarDecls,
+                if (!canBeRefactored(node, varOccurrence, varOccurrence.resolveTypeBinding(), subVarDecls,
                                      methodCallsToRefactor)) {
                     return false;
                 }
@@ -251,7 +253,7 @@ public abstract class AbstractClassSubstituteRefactoring extends AbstractRefacto
      * @param originalExpr The original expression
      * @return the substitute type.
      */
-    protected Type substituteType(final ASTBuilder b, final Type origType, ASTNode originalExpr) {
+    protected Type substituteType(final ASTBuilder b, final Type origType, final ASTNode originalExpr) {
         final ITypeBinding origTypeBinding = origType.resolveBinding();
         final TypeNameDecider typeNameDecider = new TypeNameDecider(originalExpr);
 
@@ -269,55 +271,69 @@ public abstract class AbstractClassSubstituteRefactoring extends AbstractRefacto
     }
 
     private boolean canInstantiationBeRefactored(final ASTNode node,
-            final List<VariableDeclaration> variablesToRefactor,
-            final List<MethodInvocation> methodCallsToRefactor) {
-        ASTNode childNode = node;
+            final ITypeBinding nodeTypeBinding,
+            final List<VariableDeclaration> variablesToRefactor, final List<MethodInvocation> methodCallsToRefactor) {
+        ASTNode parentNode = node.getParent();
 
-        do {
-            ASTNode parentNode = childNode.getParent();
+        switch (parentNode.getNodeType()) {
+        case ASSIGNMENT:
+        case RETURN_STATEMENT:
+        case CAST_EXPRESSION:
+        case INSTANCEOF_EXPRESSION:
+        case CLASS_INSTANCE_CREATION:
+        case CONSTRUCTOR_INVOCATION:
+        case CONDITIONAL_EXPRESSION:
+            return false;
 
-            switch (parentNode.getNodeType()) {
-            case ASSIGNMENT:
-            case RETURN_STATEMENT:
-            case CAST_EXPRESSION:
-            case INSTANCEOF_EXPRESSION:
-            case CLASS_INSTANCE_CREATION:
-            case CONSTRUCTOR_INVOCATION:
-            case CONDITIONAL_EXPRESSION:
-                return false;
-            case PARENTHESIZED_EXPRESSION:
-                break;
-            case ENHANCED_FOR_STATEMENT:
-                return canInvokeIterator();
-            case SINGLE_VARIABLE_DECLARATION:
-            case VARIABLE_DECLARATION_EXPRESSION:
-            case VARIABLE_DECLARATION_FRAGMENT:
-            case VARIABLE_DECLARATION_STATEMENT:
-                final VariableDeclaration varDecl = (VariableDeclaration) parentNode;
-                if (varDecl.getParent() instanceof VariableDeclarationStatement) {
-                    final VariableDeclarationStatement variableDeclaration =
-                            (VariableDeclarationStatement) varDecl.getParent();
-                    if (hasType(variableDeclaration.getType().resolveBinding(), getExistingClassCanonicalName())) {
-                        variablesToRefactor.add(varDecl);
-                        return true;
-                    }
-                }
-                return false;
-            case METHOD_INVOCATION:
-                final MethodInvocation mi = (MethodInvocation) parentNode;
-                if (isObjectPassedInParameter(childNode, mi)
-                        || !canMethodBeRefactored(mi, methodCallsToRefactor)) {
-                    return false;
-                } else if (!isMethodReturningExistingClass(mi)) {
+        case PARENTHESIZED_EXPRESSION:
+            return canInstantiationBeRefactored(parentNode, nodeTypeBinding, variablesToRefactor,
+                    methodCallsToRefactor);
+
+        case ENHANCED_FOR_STATEMENT:
+            return canInvokeIterator();
+
+        case SINGLE_VARIABLE_DECLARATION:
+        case VARIABLE_DECLARATION_EXPRESSION:
+        case VARIABLE_DECLARATION_FRAGMENT:
+        case VARIABLE_DECLARATION_STATEMENT:
+            final VariableDeclaration varDecl = (VariableDeclaration) parentNode;
+            if (varDecl.getParent() instanceof VariableDeclarationStatement) {
+                final VariableDeclarationStatement variableDeclaration =
+                        (VariableDeclarationStatement) varDecl.getParent();
+                if (isTypeCompatible(variableDeclaration.getType().resolveBinding(), nodeTypeBinding)) {
+                    variablesToRefactor.add(varDecl);
                     return true;
                 }
-                break;
-            default:
+            }
+            return false;
+
+        case METHOD_INVOCATION:
+            final MethodInvocation mi = (MethodInvocation) parentNode;
+            if (isObjectPassedInParameter(node, mi)
+                    || !canMethodBeRefactored(mi, methodCallsToRefactor)) {
+                return false;
+            } else if (!isMethodReturningExistingClass(mi)) {
                 return true;
             }
+            return canInstantiationBeRefactored(parentNode, nodeTypeBinding, variablesToRefactor,
+                    methodCallsToRefactor);
 
-            childNode = parentNode;
-        } while (true);
+        default:
+            return true;
+        }
+    }
+
+    /**
+     * True if the type of the variable is compatible.
+     *
+     * @param variableType The type of the variable.
+     * @param nodeTypeBinding The type of the node.
+     *
+     * @return true if the type of the variable is compatible.
+     */
+    public boolean isTypeCompatible(final ITypeBinding variableType,
+            final ITypeBinding nodeTypeBinding) {
+        return Objects.equals(variableType, nodeTypeBinding);
     }
 
     private boolean isObjectPassedInParameter(final ASTNode subNode, final MethodInvocation mi) {

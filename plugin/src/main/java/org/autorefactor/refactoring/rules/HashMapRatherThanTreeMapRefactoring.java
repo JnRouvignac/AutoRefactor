@@ -49,8 +49,8 @@ public class HashMapRatherThanTreeMapRefactoring extends AbstractClassSubstitute
     }
 
     @Override
-    protected String getExistingClassCanonicalName() {
-        return "java.util.TreeMap";
+    protected String[] getExistingClassCanonicalName() {
+        return new String[] {"java.util.TreeMap"};
     }
 
     @Override

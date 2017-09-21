@@ -34,45 +34,65 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Observable;
 import java.util.Set;
+import java.util.TreeMap;
 
 public class SetRatherThanMapSample {
 
     public SetRatherThanMapSample() {
-        this(new HashMap<String, String>());
+        this(new TreeMap<String, String>());
+    }
+
+    public SetRatherThanMapSample(int i) {
+        this(new HashMap<String, String>(i));
     }
 
     public SetRatherThanMapSample(Map<String, String> parameter) {
     }
 
-    public void replaceHashMapInstanceCreation() {
+    public void replaceMapInstanceCreation() {
         // Keep this comment
         boolean isInside = new java.util.HashSet<String>().isEmpty();
+        boolean isInside2 = new java.util.TreeSet<String>().isEmpty();
+
         // Keep this comment too
         int size = new java.util.HashSet<String>(10).size();
+        int size2 = new java.util.TreeSet<String>().size();
+
+        // Keep this comment also
+        new java.util.HashSet<String>(10).clear();
+        new java.util.TreeSet<String>().clear();
     }
 
-    public void replaceRawHashMap() {
+    public void replaceRawMap() {
         // Keep this comment
         boolean isInside = new java.util.HashSet().isEmpty();
+        boolean isInside2 = new java.util.TreeSet().isEmpty();
+
         // Keep this comment too
         int size = new java.util.HashSet(10).size();
+        int size2 = new java.util.TreeSet().size();
     }
 
-    public void replaceFullyQualifiedHashMap() {
+    public void replaceFullyQualifiedMap() {
         // Keep this comment
         boolean isInside = new java.util.HashSet<Integer>().isEmpty();
+        boolean isInside2 = new java.util.TreeSet<Integer>().isEmpty();
+
         // Keep this comment too
         int size = new java.util.HashSet(10).size();
+        int size2 = new java.util.TreeSet().size();
     }
 
-    public void replaceHashMapVariableDeclaration() {
+    public void replaceMapVariableDeclaration() {
         // Keep this comment
         java.util.HashSet<String> aggregate = new java.util.HashSet<String>();
+        java.util.TreeSet<String> aggregate2 = new java.util.TreeSet<String>();
     }
 
     public void doNotReplaceInterface() {
         // Keep this comment
         Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map2 = new TreeMap<String, String>();
     }
 
     public void replaceHashMapVariableUse() {
@@ -80,6 +100,11 @@ public class SetRatherThanMapSample {
         java.util.HashSet<String> aggregate = new java.util.HashSet<String>();
         // Keep this comment too
         aggregate.add("foo");
+
+        // Keep this comment
+        java.util.TreeSet<String> aggregate2 = new java.util.TreeSet<String>();
+        // Keep this comment too
+        aggregate2.add("foo");
     }
 
     public boolean refactorMethod() {
@@ -87,21 +112,37 @@ public class SetRatherThanMapSample {
         return new java.util.HashSet<String>().contains("foo");
     }
 
+    public boolean refactorMethod2() {
+        // Keep this comment
+        return new java.util.TreeSet<String>().contains("foo");
+    }
+
     public void refactorVariableAndMethod() {
         // Keep this comment
         java.util.HashSet<String> aggregate = new java.util.HashSet<String>();
         // Keep this comment too
         aggregate.contains("foo");
+
+        // Keep this comment
+        java.util.TreeSet<String> aggregate2 = new java.util.TreeSet<String>();
+        // Keep this comment too
+        aggregate2.contains("foo");
     }
 
-    public int replaceHashMapWithLoop(List<Date> dates) {
+    public int replaceMapWithLoop(List<Date> dates) {
         // Keep this comment
         java.util.HashSet<Long> aggregate = new java.util.HashSet<Long>();
         for (Date date : dates) {
             aggregate.add(date.getTime());
         }
 
-        return aggregate.size();
+        // Keep this comment too
+        java.util.TreeSet<Long> aggregate2 = new java.util.TreeSet<Long>();
+        for (Date date : dates) {
+            aggregate2.add(date.getTime());
+        }
+
+        return aggregate.size() + aggregate2.size();
     }
 
     public int doNotRemoveActiveCode(List<Date> referenceDates, List<Date> dates) {
@@ -110,19 +151,32 @@ public class SetRatherThanMapSample {
             aggregate.put(date.getTime(), dates.remove(date));
         }
 
-        return aggregate.size();
+        TreeMap<Long, Boolean> aggregate2 = new TreeMap<Long, Boolean>();
+        for (Date date : referenceDates) {
+            aggregate2.put(date.getTime(), dates.remove(date));
+        }
+
+        return aggregate.size() + aggregate2.size();
     }
 
     public void replaceHashMapWithModifier() {
         // Keep this comment
         final java.util.HashSet<String> aggregate = new java.util.HashSet<String>();
         aggregate.add("foo");
+
+        // Keep this comment too
+        final java.util.TreeSet<String> aggregate2 = new java.util.TreeSet<String>();
+        aggregate2.add("foo");
     }
 
     public void replaceHashMapWithParameter() {
         // Keep this comment
         java.util.HashSet<String> aggregate = new java.util.HashSet<String>(10);
         aggregate.add("foo");
+
+        // Keep this comment too
+        java.util.TreeSet<String> aggregate2 = new java.util.TreeSet<String>();
+        aggregate2.add("foo");
     }
 
     public int replaceReassignedHashMap() {
@@ -134,17 +188,31 @@ public class SetRatherThanMapSample {
         java.util.HashSet<String> aggregate2 = aggregate1;
         aggregate2.add("bar");
 
+        // Keep this comment
+        java.util.TreeSet<String> aggregate3 = new java.util.TreeSet<String>();
+        aggregate3.add("foo");
+
+        // Keep this comment too
+        java.util.TreeSet<String> aggregate4 = aggregate3;
+        aggregate4.add("bar");
+
         return aggregate2.size();
     }
 
-    public void doNotReplaceHashMapParameter(HashMap<String, String> aMap) {
+    public void doNotReplaceHashMapParameter(HashMap<String, String> aMap, TreeMap<String, String> aMap2) {
         HashMap<String, String> map = aMap;
         map.put("foo", "bar");
+
+        TreeMap<String, String> map2 = aMap2;
+        map2.put("foo", "bar");
     }
 
     public void doNotReplaceHashMapPassedToAMethod() {
         String text = String.valueOf(new HashMap<String, String>());
         equals(new HashMap<String, String>());
+
+        String text2 = String.valueOf(new TreeMap<String, String>());
+        equals(new TreeMap<String, String>());
     }
 
     public Object doNotReplaceHashMapPassedToAConstructor() {
@@ -162,6 +230,9 @@ public class SetRatherThanMapSample {
     public void doNotReplaceReassignedVariable() {
         HashMap<String, String> map = new HashMap<String, String>();
         map = new HashMap<String, String>();
+
+        TreeMap<String, String> map2 = new TreeMap<String, String>();
+        map2 = new TreeMap<String, String>();
     }
 
     public void replaceHashMapInAnnomymousClass() {
@@ -173,25 +244,50 @@ public class SetRatherThanMapSample {
                 aggregate.add("foo");
             }
         };
+
+        final java.util.TreeSet<String> aggregate2 = new java.util.TreeSet<String>();
+        new Runnable() {
+
+            @Override
+            public void run() {
+                aggregate2.add("foo");
+            }
+        };
     }
 
-    public void replaceHashMapInsideRunnable() {
+    public void replaceMapInsideRunnable() {
         // Keep this comment
-        final java.util.HashSet<String> set = new java.util.HashSet<String>();
-        set.add("foo");
+        final java.util.HashSet<String> aggregate = new java.util.HashSet<String>();
+        aggregate.add("foo");
         new Runnable() {
 
             @Override
             public void run() {
                 // Keep this comment too
-                final java.util.HashSet<String> localSet = new java.util.HashSet<String>();
-                localSet.add("bar");
+                final java.util.HashSet<String> localAggregate = new java.util.HashSet<String>();
+                localAggregate.add("bar");
+            }
+        };
+
+        // Keep this comment
+        final java.util.TreeSet<String> aggregate2 = new java.util.TreeSet<String>();
+        aggregate2.add("foo");
+        new Runnable() {
+
+            @Override
+            public void run() {
+                // Keep this comment too
+                final java.util.TreeSet<String> localAggregate = new java.util.TreeSet<String>();
+                localAggregate.add("bar");
             }
         };
     }
 
     public void doNotReplaceSpecificInstantiation(HashMap<String, String> aMap) {
         HashMap<String, String> map = new HashMap<String, String>(aMap);
+        map.put("foo", "bar");
+
+        TreeMap<String, String> map2 = new TreeMap<String, String>(aMap);
         map.put("foo", "bar");
     }
 
@@ -230,6 +326,11 @@ public class SetRatherThanMapSample {
         return map.hashCode();
     }
 
+    public String doNotReplaceRemoveMethod() {
+        HashMap<String, String> map = new HashMap<String, String>();
+        return map.remove("foo");
+    }
+
     public String doNotReplaceToStringMethod() {
         HashMap<String, String> map = new HashMap<String, String>();
         return map.toString();
@@ -242,12 +343,24 @@ public class SetRatherThanMapSample {
         aggregate.clear();
         aggregate.contains(anotherCollection);
         aggregate.isEmpty();
-        aggregate.remove(123);
         aggregate.size();
         aggregate.notify();
         aggregate.notifyAll();
         aggregate.wait();
         aggregate.wait(1000);
         aggregate.wait(1000, 1000);
+
+        // Keep this comment too
+        java.util.TreeSet<Integer> aggregate2 = new java.util.TreeSet<Integer>();
+        aggregate2.add(123);
+        aggregate2.clear();
+        aggregate2.contains(anotherCollection);
+        aggregate2.isEmpty();
+        aggregate2.size();
+        aggregate2.notify();
+        aggregate2.notifyAll();
+        aggregate2.wait();
+        aggregate2.wait(1000);
+        aggregate2.wait(1000, 1000);
     }
 }

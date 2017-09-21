@@ -46,8 +46,8 @@ public class ArrayListRatherThanLinkedListRefactoring extends AbstractClassSubst
     }
 
     @Override
-    protected String getExistingClassCanonicalName() {
-        return "java.util.LinkedList";
+    protected String[] getExistingClassCanonicalName() {
+        return new String[] {"java.util.LinkedList"};
     }
 
     @Override

@@ -55,8 +55,8 @@ public class StringBuilderRatherThanStringBufferRefactoring extends AbstractClas
     }
 
     @Override
-    protected String getExistingClassCanonicalName() {
-        return "java.lang.StringBuffer";
+    protected String[] getExistingClassCanonicalName() {
+        return new String[] {"java.lang.StringBuffer"};
     }
 
     @Override

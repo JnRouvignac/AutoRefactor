@@ -50,8 +50,8 @@ public class SetRatherThanListRefactoring extends AbstractClassSubstituteRefacto
     }
 
     @Override
-    protected String getExistingClassCanonicalName() {
-        return "java.util.ArrayList";
+    protected String[] getExistingClassCanonicalName() {
+        return new String[] {"java.util.ArrayList"};
     }
 
     @Override

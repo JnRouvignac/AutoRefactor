@@ -58,8 +58,8 @@ public class HashMapRatherThanHashtableRefactoring extends AbstractClassSubstitu
     }
 
     @Override
-    protected String getExistingClassCanonicalName() {
-        return "java.util.Hashtable";
+    protected String[] getExistingClassCanonicalName() {
+        return new String[] {"java.util.Hashtable"};
     }
 
     @Override

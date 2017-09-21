@@ -47,12 +47,12 @@ public class SetRatherThanMapRefactoring extends AbstractClassSubstituteRefactor
     @Override
     public String getDescription() {
         return ""
-            + "Replace HashMap by HashSet when values are not read.";
+            + "Replace map by set when values are not read.";
     }
 
     @Override
     public String getName() {
-        return "HashSet rather than HashMap";
+        return "Set rather than map";
     }
 
     @Override
@@ -61,13 +61,13 @@ public class SetRatherThanMapRefactoring extends AbstractClassSubstituteRefactor
     }
 
     @Override
-    protected String getExistingClassCanonicalName() {
-        return "java.util.HashMap";
+    protected String[] getExistingClassCanonicalName() {
+        return new String[] {"java.util.HashMap", "java.util.TreeMap"};
     }
 
     @Override
     protected String getSubstitutingClassName() {
-        return "java.util.HashSet";
+        return null;
     }
 
     @Override
@@ -85,6 +85,13 @@ public class SetRatherThanMapRefactoring extends AbstractClassSubstituteRefactor
      * @return the substitute type.
      */
     protected Type substituteType(final ASTBuilder b, final Type origType, ASTNode originalExpr) {
+        String substitutingType;
+        if ("java.util.HashMap".equals(origType.resolveBinding().getErasure().getQualifiedName())) {
+            substitutingType = "java.util.HashSet";
+        } else {
+            substitutingType = "java.util.TreeSet";
+        }
+
         final ITypeBinding origTypeBinding = origType.resolveBinding();
         final TypeNameDecider typeNameDecider = new TypeNameDecider(originalExpr);
 
@@ -97,11 +104,11 @@ public class SetRatherThanMapRefactoring extends AbstractClassSubstituteRefactor
             } else {
                 newTypes = new Type[0];
             }
-            return b.genericType(getSubstitutingClassName(),
+            return b.genericType(substitutingType,
                     newTypes);
         }
 
-        return b.type(getSubstitutingClassName());
+        return b.type(substitutingType);
     }
 
     @Override
@@ -109,8 +116,10 @@ public class SetRatherThanMapRefactoring extends AbstractClassSubstituteRefactor
             final List<MethodInvocation> methodCallsToRefactor) {
         if (isMethod(mi, "java.util.HashMap", "clear")
                 || isMethod(mi, "java.util.HashMap", "isEmpty")
-                || isMethod(mi, "java.util.HashMap", "remove", "java.lang.Object")
                 || isMethod(mi, "java.util.HashMap", "size")
+                || isMethod(mi, "java.util.TreeMap", "clear")
+                || isMethod(mi, "java.util.AbstractMap", "isEmpty")
+                || isMethod(mi, "java.util.TreeMap", "size")
                 || isMethod(mi, "java.lang.Object", "finalize")
                 || isMethod(mi, "java.lang.Object", "notify")
                 || isMethod(mi, "java.lang.Object", "notifyAll")
@@ -118,10 +127,12 @@ public class SetRatherThanMapRefactoring extends AbstractClassSubstituteRefactor
                 || isMethod(mi, "java.lang.Object", "wait", "long")
                 || isMethod(mi, "java.lang.Object", "wait", "long", "int")) {
             return true;
-        } else if (isMethod(mi, "java.util.HashMap", "containsKey", "java.lang.Object")) {
+        } else if (isMethod(mi, "java.util.HashMap", "containsKey", "java.lang.Object")
+                || isMethod(mi, "java.util.TreeMap", "containsKey", "java.lang.Object")) {
             methodCallsToRefactor.add(mi);
             return true;
-        } else if (isMethod(mi, "java.util.HashMap", "put", "java.lang.Object", "java.lang.Object")) {
+        } else if (isMethod(mi, "java.util.HashMap", "put", "java.lang.Object", "java.lang.Object")
+                || isMethod(mi, "java.util.TreeMap", "put", "java.lang.Object", "java.lang.Object")) {
             if (isPassive((Expression) mi.arguments().get(1))) {
                 methodCallsToRefactor.add(mi);
                 return true;
@@ -141,6 +152,9 @@ public class SetRatherThanMapRefactoring extends AbstractClassSubstituteRefactor
             // AbstractMap.toString()
             // HashMap.keySet()
             // HashMap.putAll(Map)
+            //
+            // This method do not return the same object:
+            // java.util.TreeMap.remove(java.lang.Object)
             return false;
         }
     }
@@ -148,9 +162,11 @@ public class SetRatherThanMapRefactoring extends AbstractClassSubstituteRefactor
     @Override
     protected void refactorMethod(final ASTBuilder b, final MethodInvocation originalMi,
             final MethodInvocation refactoredMi) {
-        if (isMethod(originalMi, "java.util.HashMap", "containsKey", "java.lang.Object")) {
+        if (isMethod(originalMi, "java.util.HashMap", "containsKey", "java.lang.Object")
+                || isMethod(originalMi, "java.util.TreeMap", "containsKey", "java.lang.Object")) {
             refactoredMi.setName(b.simpleName("contains"));
-        } else if (isMethod(originalMi, "java.util.HashMap", "put", "java.lang.Object", "java.lang.Object")) {
+        } else if (isMethod(originalMi, "java.util.HashMap", "put", "java.lang.Object", "java.lang.Object")
+                || isMethod(originalMi, "java.util.TreeMap", "put", "java.lang.Object", "java.lang.Object")) {
             refactoredMi.setName(b.simpleName("add"));
             refactoredMi.arguments().remove(1);
         }

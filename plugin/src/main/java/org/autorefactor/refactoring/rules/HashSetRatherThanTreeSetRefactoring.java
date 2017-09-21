@@ -48,8 +48,8 @@ public class HashSetRatherThanTreeSetRefactoring extends AbstractClassSubstitute
     }
 
     @Override
-    protected String getExistingClassCanonicalName() {
-        return "java.util.TreeSet";
+    protected String[] getExistingClassCanonicalName() {
+        return new String[] {"java.util.TreeSet"};
     }
 
     @Override
