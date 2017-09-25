@@ -326,14 +326,19 @@ public class SetRatherThanMapSample {
         return map.hashCode();
     }
 
-    public String doNotReplaceRemoveMethod() {
+    public String doNotReplaceToStringMethod() {
+        HashMap<String, String> map = new HashMap<String, String>();
+        return map.toString();
+    }
+
+    public String doNotReplaceRemoveHashMapMethodInReturn() {
         HashMap<String, String> map = new HashMap<String, String>();
         return map.remove("foo");
     }
 
-    public String doNotReplaceToStringMethod() {
-        HashMap<String, String> map = new HashMap<String, String>();
-        return map.toString();
+    public String doNotReplaceRemoveTreeMapMethodInReturn() {
+        TreeMap<String, String> map = new TreeMap<String, String>();
+        return map.remove("foo");
     }
 
     public void refactorWithMethods(Collection<Integer> anotherCollection) throws InterruptedException {
@@ -343,6 +348,7 @@ public class SetRatherThanMapSample {
         aggregate.clear();
         aggregate.contains(anotherCollection);
         aggregate.isEmpty();
+        aggregate.remove(456);
         aggregate.size();
         aggregate.notify();
         aggregate.notifyAll();
@@ -356,6 +362,7 @@ public class SetRatherThanMapSample {
         aggregate2.clear();
         aggregate2.contains(anotherCollection);
         aggregate2.isEmpty();
+        aggregate.remove(456);
         aggregate2.size();
         aggregate2.notify();
         aggregate2.notifyAll();

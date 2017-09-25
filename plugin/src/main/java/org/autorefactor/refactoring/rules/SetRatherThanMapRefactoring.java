@@ -38,8 +38,10 @@ import org.autorefactor.refactoring.TypeNameDecider;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.Expression;
+import org.eclipse.jdt.core.dom.ExpressionStatement;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.MethodInvocation;
+import org.eclipse.jdt.core.dom.ParenthesizedExpression;
 import org.eclipse.jdt.core.dom.Type;
 
 /** See {@link #getDescription()} method. */
@@ -139,6 +141,9 @@ public class SetRatherThanMapRefactoring extends AbstractClassSubstituteRefactor
             } else {
                 return false;
             }
+        } else if (isMethod(mi, "java.util.HashMap", "remove", "java.lang.Object")
+                || isMethod(mi, "java.util.TreeMap", "remove", "java.lang.Object")) {
+            return isReturnValueLost(mi);
         } else {
             // Here are the following cases:
             //
@@ -152,9 +157,18 @@ public class SetRatherThanMapRefactoring extends AbstractClassSubstituteRefactor
             // AbstractMap.toString()
             // HashMap.keySet()
             // HashMap.putAll(Map)
-            //
-            // This method do not return the same object:
-            // java.util.TreeMap.remove(java.lang.Object)
+            return false;
+        }
+    }
+
+    private boolean isReturnValueLost(final ASTNode node) {
+        ASTNode parentNode = node.getParent();
+
+        if (parentNode instanceof ExpressionStatement) {
+            return true;
+        } else if (parentNode instanceof ParenthesizedExpression) {
+            return isReturnValueLost(parentNode);
+        } else {
             return false;
         }
     }
