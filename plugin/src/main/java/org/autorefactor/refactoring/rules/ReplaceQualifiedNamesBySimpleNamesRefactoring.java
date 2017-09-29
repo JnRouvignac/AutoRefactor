@@ -41,6 +41,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -108,21 +109,13 @@ public class ReplaceQualifiedNamesBySimpleNamesRefactoring extends AbstractRefac
                 return false;
             }
             QName other = (QName) obj;
-            return equals(qualifier, other.qualifier)
-                    && equals(simpleName, other.simpleName);
-        }
-
-        private boolean equals(Object o1, Object o2) {
-            return o1 != null ? o1.equals(o2) : o2 == null;
+            return Objects.equals(simpleName, other.simpleName)
+                    && Objects.equals(qualifier, other.qualifier);
         }
 
         @Override
         public int hashCode() {
-            final int prime = 31;
-            int result = 1;
-            result = prime * result + ((qualifier == null) ? 0 : qualifier.hashCode());
-            result = prime * result + ((simpleName == null) ? 0 : simpleName.hashCode());
-            return result;
+            return Objects.hash(simpleName, qualifier);
         }
 
         @Override
