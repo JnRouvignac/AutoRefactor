@@ -48,7 +48,6 @@ import static org.eclipse.jdt.core.dom.ASTNode.VARIABLE_DECLARATION_STATEMENT;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.TypeNameDecider;
@@ -196,7 +195,7 @@ public abstract class AbstractClassSubstituteRefactoring extends AbstractRefacto
         for (final VariableDeclaration varDecl : varDecls) {
             final VarOccurrenceVisitor varOccurrenceVisitor = new VarOccurrenceVisitor(varDecl);
 
-            final Statement parent = (Statement) getAncestorOrNull(varDecl, Statement.class);
+            final Statement parent = getAncestorOrNull(varDecl, Statement.class);
             Statement nextSibling = getNextSibling(parent);
             while (nextSibling != null) {
                 nextSibling.accept(varOccurrenceVisitor);
@@ -331,9 +330,9 @@ public abstract class AbstractClassSubstituteRefactoring extends AbstractRefacto
      *
      * @return true if the type of the variable is compatible.
      */
-    public boolean isTypeCompatible(final ITypeBinding variableType,
-            final ITypeBinding nodeTypeBinding) {
-        return Objects.equals(variableType, nodeTypeBinding);
+    public boolean isTypeCompatible(final ITypeBinding variableType, final ITypeBinding nodeTypeBinding) {
+        return variableType != null ? variableType.equals(nodeTypeBinding)
+                                    : nodeTypeBinding == null;
     }
 
     private boolean isObjectPassedInParameter(final ASTNode subNode, final MethodInvocation mi) {
