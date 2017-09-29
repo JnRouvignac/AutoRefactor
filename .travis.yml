@@ -24,14 +24,10 @@
 
 language: java
 jdk:
-  - openjdk7
-  - oraclejdk7
-# disable JDK 8 temporarily until release 1.1 is done
-#  - oraclejdk8
+  - openjdk8
+  - oraclejdk8
 
 sudo: false
-# deprecated but required until we support Java 8
-dist: precise
 cache:
   directories:
   - $HOME/.m2

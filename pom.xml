@@ -52,22 +52,9 @@
 
   <repositories>
     <repository>
-      <id>Indigo</id>
+      <id>eclipse-oxygen</id>
       <layout>p2</layout>
-      <url>http://download.eclipse.org/eclipse/updates/3.7</url>
-<!--
-      <id>Juno 3.8</id>
-      <url>http://download.eclipse.org/eclipse/updates/3.8</url>
-      <id>Juno 4.2</id>
-      <url>http://download.eclipse.org/eclipse/updates/4.2</url>
-      <id>Kepler</id>
-      <url>http://download.eclipse.org/eclipse/updates/4.3</url>
-      <id>Luna</id>
-      <url>http://download.eclipse.org/eclipse/updates/4.4</url>
-      <id>Mars</id>
-      <url>http://download.eclipse.org/eclipse/updates/4.5</url>
-      <url>http://download.eclipse.org/releases/mars</url>
--->
+      <url>http://download.eclipse.org/releases/oxygen</url>
     </repository>
   </repositories>
 
@@ -158,8 +145,8 @@ http://www.solutionsiq.com/developing-eclipse-plug-ins-program-to-publish/
         <artifactId>tycho-compiler-plugin</artifactId>
         <version>${tycho-version}</version>
         <configuration>
-          <source>1.6</source><!-- FIXME switch to 1.7 for RemoveUnnecessaryCastRefactoring -->
-          <target>1.6</target><!-- FIXME switch to 1.7 for RemoveUnnecessaryCastRefactoring -->
+          <source>1.8</source><!-- FIXME switch to 1.7 for RemoveUnnecessaryCastRefactoring -->
+          <target>1.8</target><!-- FIXME switch to 1.7 for RemoveUnnecessaryCastRefactoring -->
           <compilerId>jdt</compilerId>
           <!--
           <compilerArgument>-err:nullAnnot,null</compilerArgument> <!- insert your warn/err configuration here ->
