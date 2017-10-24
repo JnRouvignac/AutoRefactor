@@ -84,7 +84,7 @@ public final class AllRefactoringRules {
                 new StringRatherThanNewStringRefactoring(),
                 new StringRefactoring(),
                 new StringValueOfRatherThanConcatRefactoring(),
-                new BigDecimalRefactoring(),
+                new BigNumberRefactoring(),
                 // TODO JNR implement
                 // new ForeachRefactoring(),
                 new DeadCodeEliminationRefactoring(),

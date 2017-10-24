@@ -57,21 +57,21 @@ import org.eclipse.jdt.core.dom.StringLiteral;
 
 /** See {@link #getDescription()} method. */
 @SuppressWarnings("javadoc")
-public class BigDecimalRefactoring extends AbstractRefactoringRule {
+public class BigNumberRefactoring extends AbstractRefactoringRule {
 
     @Override
     public String getDescription() {
         return ""
-            + "Refactors to a proper use of BigDecimals:\n"
-            + "- create BigDecimals from Strings rather than floating point values,\n"
-            + "- create BigDecimals from integers rather than String representing integers,\n"
-            + "- use BigDecimal constants,\n"
-            + "- replace calls to BigDecimal.equals(Object) with calls to BigDecimal.compareTo(BigDecimal).";
+            + "Refactors to a proper use of BigDecimals and BigIntegers:\n"
+            + "- create BigDecimals and BigIntegers from Strings rather than floating point values,\n"
+            + "- create BigDecimals and BigIntegers from integers rather than String representing integers,\n"
+            + "- use BigDecimal and BigInteger constants,\n"
+            + "- replace calls to equals() with calls to compareTo().";
     }
 
     @Override
     public String getName() {
-        return "BigDecimal";
+        return "Big number";
     }
 
     private int getJavaMinorVersion() {
@@ -81,10 +81,10 @@ public class BigDecimalRefactoring extends AbstractRefactoringRule {
     @Override
     public boolean visit(ClassInstanceCreation node) {
         final ITypeBinding typeBinding = node.getType().resolveBinding();
-        if (hasType(typeBinding, "java.math.BigDecimal")
+        if (hasType(typeBinding, "java.math.BigDecimal", "java.math.BigInteger")
                 && arguments(node).size() == 1) {
             final Expression arg0 = arguments(node).get(0);
-            if (arg0 instanceof NumberLiteral) {
+            if (arg0 instanceof NumberLiteral && hasType(typeBinding, "java.math.BigDecimal")) {
                 final NumberLiteral nb = (NumberLiteral) arg0;
                 if (nb.getToken().contains(".")) {
                     // Only instantiation from double, not from integer
@@ -155,13 +155,14 @@ public class BigDecimalRefactoring extends AbstractRefactoringRule {
             return VISIT_SUBTREE;
         }
         if (getJavaMinorVersion() >= 5
-                && (isMethod(node, "java.math.BigDecimal", "valueOf", "long")
-                    || isMethod(node, "java.math.BigDecimal", "valueOf", "double"))) {
+                && (isMethod(node, "java.math.BigInteger", "valueOf", "long")
+                        || isMethod(node, "java.math.BigDecimal", "valueOf", "long")
+                        || isMethod(node, "java.math.BigDecimal", "valueOf", "double"))) {
             final ITypeBinding typeBinding = node.getExpression().resolveTypeBinding();
             final Expression arg0 = arg0(node);
             if (arg0 instanceof NumberLiteral) {
                 final NumberLiteral nb = (NumberLiteral) arg0;
-                if (nb.getToken().contains(".")) {
+                if (nb.getToken().contains(".") && hasType(typeBinding, "java.math.BigDecimal")) {
                     this.ctx.getRefactorings().replace(node,
                             getClassInstanceCreatorNode(
                                     (Name) node.getExpression(),
@@ -185,9 +186,10 @@ public class BigDecimalRefactoring extends AbstractRefactoringRule {
     }
 
     private boolean maybeReplaceEquals(final boolean isPositive, final Expression node, final MethodInvocation mi) {
-        if (isMethod(mi, "java.math.BigDecimal", "equals", "java.lang.Object")) {
+        if (isMethod(mi, "java.math.BigDecimal", "equals", "java.lang.Object")
+                || isMethod(mi, "java.math.BigInteger", "equals", "java.lang.Object")) {
             final Expression arg0 = arg0(mi);
-            if (hasType(arg0, "java.math.BigDecimal")) {
+            if (hasType(arg0, "java.math.BigDecimal", "java.math.BigInteger")) {
                 if (isInStringAppend(mi.getParent())) {
                     this.ctx.getRefactorings().replace(node,
                             parenthesize(getCompareToNode(isPositive, mi)));

@@ -26,23 +26,32 @@
 package org.autorefactor.refactoring.rules.samples_out;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 
-public class BigDecimalSample {
+public class BigNumberSample {
 
-    private static String useConstructorWithStringArg() {
+    public static String useConstructorWithStringArg() {
         // Keep this comment
         BigDecimal bd1 = new BigDecimal("123.345");
         BigDecimal bd2 = new BigDecimal("123.345");
         return "" + bd1 + bd2;
     }
 
-    private static void refactorToCompareToEqualsZero(BigDecimal bd1, BigDecimal bd2) {
+    public static boolean refactorToCompareToEqualsZero(BigDecimal bd1, BigDecimal bd2) {
         // Keep this comment
         boolean result1 = bd1.compareTo(bd2) != 0;
         boolean result2 = bd1.compareTo(bd2) == 0;
+        return result1 && result2;
     }
 
-    private static String refactorToCompareToEqualsZeroSurroundWithParentheses(BigDecimal bd1, BigDecimal bd2) {
+    public static boolean refactorToCompareToEqualsZero(BigInteger bd1, BigInteger bd2) {
+        // Keep this comment
+        boolean result1 = bd1.compareTo(bd2) != 0;
+        boolean result2 = bd1.compareTo(bd2) == 0;
+        return result1 && result2;
+    }
+
+    public static String refactorToCompareToEqualsZeroSurroundWithParentheses(BigDecimal bd1, BigDecimal bd2) {
         // Keep this comment
         String s = "" + (bd1.compareTo(bd2) == 0);
         String s2 = "" + 1 + (bd1.compareTo(bd2) == 0) + 2;
@@ -50,7 +59,15 @@ public class BigDecimalSample {
         return s + s2 + s3;
     }
 
-    private static String useBigDecimalConstants() {
+    public static String refactorToCompareToEqualsZeroSurroundWithParentheses(BigInteger bd1, BigInteger bd2) {
+        // Keep this comment
+        String s = "" + (bd1.compareTo(bd2) == 0);
+        String s2 = "" + 1 + (bd1.compareTo(bd2) == 0) + 2;
+        String s3 = "" + 1 + (bd1.compareTo(bd2) == 0);
+        return s + s2 + s3;
+    }
+
+    public static String useBigDecimalConstants() {
         // Keep this comment
         BigDecimal bd1 = BigDecimal.ZERO;
         BigDecimal bd2 = BigDecimal.ONE;
@@ -67,18 +84,36 @@ public class BigDecimalSample {
         return "" + bd1 + bd2 + bd3 + bd4 + bd5 + bd6 + bd7 + bd8 + bd9;
     }
 
-    private static String useValueOf() {
+    public static String useBigIntegerConstants() {
+        // Keep this comment
+        BigInteger bi1 = BigInteger.ZERO;
+        BigInteger bi2 = BigInteger.ONE;
+        BigInteger bi3 = BigInteger.TEN;
+
+        BigInteger bi4 = BigInteger.ZERO;
+        BigInteger bi5 = BigInteger.ONE;
+        BigInteger bi6 = BigInteger.TEN;
+
+        return "" + bi1 + bi2 + bi3 + bi4 + bi5 + bi6;
+    }
+
+    public static String useValueOf() {
         // Keep this comment
         BigDecimal bd1 = BigDecimal.valueOf(5);
         BigDecimal bd2 = BigDecimal.valueOf(5);
-        return "" + bd1 + bd2;
+        BigInteger bi1 = BigInteger.valueOf(5);
+        return "" + bd1 + bd2 + bi1;
     }
 
-    private static BigDecimal doNotRefactorCorrectUseOfValueOf() {
+    public static BigDecimal doNotRefactorCorrectUseOfBigDecimalValueOf() {
         return BigDecimal.valueOf(5);
     }
 
-    private static BigDecimal doNotRefactorCorrectUseOfCtorWithStringArg() {
+    public static BigInteger doNotRefactorCorrectUseOfBigIntegerValueOf() {
+        return BigInteger.valueOf(5);
+    }
+
+    public static BigDecimal doNotRefactorCorrectUseOfBigDecimalCtorWithStringArg() {
         return new BigDecimal("5.4");
     }
 }
