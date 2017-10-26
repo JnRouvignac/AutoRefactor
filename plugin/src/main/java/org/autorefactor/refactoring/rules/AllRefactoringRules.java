@@ -90,6 +90,7 @@ public final class AllRefactoringRules {
                 new DeadCodeEliminationRefactoring(),
                 new InlineCodeRatherThanPeremptoryConditionRefactoring(),
                 new RemoveEmptyStatementRefactoring(),
+                new EndOfMethodRatherThanReturnRefactoring(),
                 new DoWhileRatherThanWhileRefactoring(),
                 new DoWhileRatherThanDuplicateCodeRefactoring(),
                 new SuperCallRatherThanUselessOverridingRefactoring(),
