@@ -136,6 +136,7 @@ public final class AllRefactoringRules {
                 new RemoveUnnecessaryCastRefactoring(),
                 new RemoveUselessModifiersRefactoring(),
                 new RemoveAbstractFromInterfaceRefactoring(),
+                new StaticConstantRatherThanInstanceConstantRefactoring(),
                 new NoSettingRatherThanUselessSettingRefactoring(),
                 new HotSpotIntrinsicedAPIsRefactoring(),
                 new AnnotationRefactoring(),
