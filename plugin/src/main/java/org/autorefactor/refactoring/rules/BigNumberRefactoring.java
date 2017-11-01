@@ -63,9 +63,9 @@ public class BigNumberRefactoring extends AbstractRefactoringRule {
     public String getDescription() {
         return ""
             + "Refactors to a proper use of BigDecimals and BigIntegers:\n"
-            + "- create BigDecimals and BigIntegers from Strings rather than floating point values,\n"
-            + "- create BigDecimals and BigIntegers from integers rather than String representing integers,\n"
-            + "- use BigDecimal and BigInteger constants,\n"
+            + "- create BigDecimals or BigIntegers from Strings rather than floating point values,\n"
+            + "- create BigDecimals or BigIntegers from integers rather than String representing integers,\n"
+            + "- use BigDecimal or BigInteger constants,\n"
             + "- replace calls to equals() with calls to compareTo().";
     }
 
@@ -85,30 +85,30 @@ public class BigNumberRefactoring extends AbstractRefactoringRule {
                 && arguments(node).size() == 1) {
             final Expression arg0 = arguments(node).get(0);
             if (arg0 instanceof NumberLiteral && hasType(typeBinding, "java.math.BigDecimal")) {
-                final NumberLiteral nb = (NumberLiteral) arg0;
-                if (nb.getToken().contains(".")) {
+                final String token = ((NumberLiteral) arg0).getToken().replaceFirst("[lLfFdD]$", "");
+                if (token.contains(".")) {
                     // Only instantiation from double, not from integer
-                    ctx.getRefactorings().replace(nb,
-                            getStringLiteral(nb.getToken()));
+                    ctx.getRefactorings().replace(arg0,
+                            getStringLiteral(token));
                     return DO_NOT_VISIT_SUBTREE;
                 } else if (getJavaMinorVersion() < 5) {
                     return VISIT_SUBTREE;
-                } else if (ZERO_LONG_LITERAL_RE.matcher(nb.getToken()).matches()) {
+                } else if (ZERO_LONG_LITERAL_RE.matcher(token).matches()) {
                     return replaceWithQualifiedName(node, typeBinding, "ZERO");
-                } else if (ONE_LONG_LITERAL_RE.matcher(nb.getToken()).matches()) {
+                } else if (ONE_LONG_LITERAL_RE.matcher(token).matches()) {
                     return replaceWithQualifiedName(node, typeBinding, "ONE");
-                } else if (TEN_LONG_LITERAL_RE.matcher(nb.getToken()).matches()) {
+                } else if (TEN_LONG_LITERAL_RE.matcher(token).matches()) {
                     return replaceWithQualifiedName(node, typeBinding, "TEN");
                 } else {
                     ctx.getRefactorings().replace(node,
-                            getValueOf(typeBinding.getName(), nb.getToken()));
+                            getValueOf(typeBinding.getName(), token));
                     return DO_NOT_VISIT_SUBTREE;
                 }
             } else if (arg0 instanceof StringLiteral) {
                 if (getJavaMinorVersion() < 5) {
                     return VISIT_SUBTREE;
                 }
-                final String literalValue = ((StringLiteral) arg0).getLiteralValue();
+                final String literalValue = ((StringLiteral) arg0).getLiteralValue().replaceFirst("[lLfFdD]$", "");
                 if (literalValue.matches("0+")) {
                     return replaceWithQualifiedName(node, typeBinding, "ZERO");
                 } else if (literalValue.matches("0+1")) {
@@ -161,17 +161,17 @@ public class BigNumberRefactoring extends AbstractRefactoringRule {
             final ITypeBinding typeBinding = node.getExpression().resolveTypeBinding();
             final Expression arg0 = arg0(node);
             if (arg0 instanceof NumberLiteral) {
-                final NumberLiteral nb = (NumberLiteral) arg0;
-                if (nb.getToken().contains(".") && hasType(typeBinding, "java.math.BigDecimal")) {
+                final String token = ((NumberLiteral) arg0).getToken().replaceFirst("[lLfFdD]$", "");
+                if (token.contains(".") && hasType(typeBinding, "java.math.BigDecimal")) {
                     this.ctx.getRefactorings().replace(node,
                             getClassInstanceCreatorNode(
                                     (Name) node.getExpression(),
-                                    nb.getToken()));
-                } else if (ZERO_LONG_LITERAL_RE.matcher(nb.getToken()).matches()) {
+                                    token));
+                } else if (ZERO_LONG_LITERAL_RE.matcher(token).matches()) {
                     replaceWithQualifiedName(node, typeBinding, "ZERO");
-                } else if (ONE_LONG_LITERAL_RE.matcher(nb.getToken()).matches()) {
+                } else if (ONE_LONG_LITERAL_RE.matcher(token).matches()) {
                     replaceWithQualifiedName(node, typeBinding, "ONE");
-                } else if (TEN_LONG_LITERAL_RE.matcher(nb.getToken()).matches()) {
+                } else if (TEN_LONG_LITERAL_RE.matcher(token).matches()) {
                     replaceWithQualifiedName(node, typeBinding, "TEN");
                 } else {
                     return VISIT_SUBTREE;

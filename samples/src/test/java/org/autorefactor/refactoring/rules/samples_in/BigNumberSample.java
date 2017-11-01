@@ -33,8 +33,12 @@ public class BigNumberSample {
     public static String useConstructorWithStringArg() {
         // Keep this comment
         BigDecimal bd1 = new BigDecimal(123.345);
-        BigDecimal bd2 = BigDecimal.valueOf(123.345);
-        return "" + bd1 + bd2;
+        BigDecimal bd2 = new BigDecimal(123.345f);
+        BigDecimal bd3 = new BigDecimal(123.345d);
+        BigDecimal bd4 = BigDecimal.valueOf(123.345);
+        BigDecimal bd5 = BigDecimal.valueOf(123.345f);
+        BigDecimal bd6 = BigDecimal.valueOf(123.345d);
+        return "" + bd1 + bd2 + bd3 + bd4 + bd5 + bd6;
     }
 
     public static boolean refactorToCompareToEqualsZero(BigDecimal bd1, BigDecimal bd2) {
@@ -71,16 +75,29 @@ public class BigNumberSample {
         BigDecimal bd1 = new BigDecimal(0);
         BigDecimal bd2 = new BigDecimal(1);
         BigDecimal bd3 = new BigDecimal(10);
+        BigDecimal bd4 = new BigDecimal(0l);
+        BigDecimal bd5 = new BigDecimal(1l);
+        BigDecimal bd6 = new BigDecimal(10l);
+        BigDecimal bd7 = new BigDecimal(0L);
+        BigDecimal bd8 = new BigDecimal(1L);
+        BigDecimal bd9 = new BigDecimal(10L);
 
-        BigDecimal bd4 = new BigDecimal("0");
-        BigDecimal bd5 = new BigDecimal("1");
-        BigDecimal bd6 = new BigDecimal("10");
+        BigDecimal bd10 = new BigDecimal("0");
+        BigDecimal bd11 = new BigDecimal("1");
+        BigDecimal bd12 = new BigDecimal("10");
 
-        BigDecimal bd7 = BigDecimal.valueOf(0);
-        BigDecimal bd8 = BigDecimal.valueOf(1);
-        BigDecimal bd9 = BigDecimal.valueOf(10);
+        BigDecimal bd13 = BigDecimal.valueOf(0);
+        BigDecimal bd14 = BigDecimal.valueOf(1);
+        BigDecimal bd15 = BigDecimal.valueOf(10);
+        BigDecimal bd16 = BigDecimal.valueOf(0l);
+        BigDecimal bd17 = BigDecimal.valueOf(1l);
+        BigDecimal bd18 = BigDecimal.valueOf(10l);
+        BigDecimal bd19 = BigDecimal.valueOf(0L);
+        BigDecimal bd20 = BigDecimal.valueOf(1L);
+        BigDecimal bd21 = BigDecimal.valueOf(10L);
 
-        return "" + bd1 + bd2 + bd3 + bd4 + bd5 + bd6 + bd7 + bd8 + bd9;
+        return "" + bd1 + bd2 + bd3 + bd4 + bd5 + bd6 + bd7 + bd8 + bd9 + bd10 + bd11 + bd12 + bd13 + bd14 + bd15
+                + bd16 + bd17 + bd18 + bd19 + bd20 + bd21;
     }
 
     public static String useBigIntegerConstants() {
@@ -92,16 +109,25 @@ public class BigNumberSample {
         BigInteger bi4 = BigInteger.valueOf(0);
         BigInteger bi5 = BigInteger.valueOf(1);
         BigInteger bi6 = BigInteger.valueOf(10);
+        BigInteger bi7 = BigInteger.valueOf(0l);
+        BigInteger bi8 = BigInteger.valueOf(1l);
+        BigInteger bi9 = BigInteger.valueOf(10l);
+        BigInteger bi10 = BigInteger.valueOf(0L);
+        BigInteger bi11 = BigInteger.valueOf(1L);
+        BigInteger bi12 = BigInteger.valueOf(10L);
 
-        return "" + bi1 + bi2 + bi3 + bi4 + bi5 + bi6;
+        return "" + bi1 + bi2 + bi3 + bi4 + bi5 + bi6 + bi7 + bi8 + bi9 + bi10 + bi11 + bi12;
     }
 
     public static String useValueOf() {
         // Keep this comment
         BigDecimal bd1 = new BigDecimal(5);
-        BigDecimal bd2 = new BigDecimal("5");
+        BigDecimal bd2 = new BigDecimal(5l);
+        BigDecimal bd3 = new BigDecimal(5L);
+        BigDecimal bd4 = new BigDecimal("5");
         BigInteger bi1 = new BigInteger("5");
-        return "" + bd1 + bd2 + bi1;
+
+        return "" + bd1 + bd2 + bd3 + bd4 + bi1;
     }
 
     public static BigDecimal doNotRefactorCorrectUseOfBigDecimalValueOf() {
