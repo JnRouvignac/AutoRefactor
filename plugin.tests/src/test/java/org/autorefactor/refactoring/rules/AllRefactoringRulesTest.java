@@ -68,7 +68,7 @@ public class AllRefactoringRulesTest {
         this.sampleName = testName;
     }
 
-    @Parameters//(name = "{0}Refactoring") // requires junit 4.11
+    @Parameters(name = "{0}Refactoring")
     public static Collection<Object[]> data() {
         return samples(SAMPLES_ALL_BASE_DIR, WHITELIST, BLACKLIST);
     }

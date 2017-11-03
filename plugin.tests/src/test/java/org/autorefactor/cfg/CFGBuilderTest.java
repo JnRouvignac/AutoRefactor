@@ -52,7 +52,6 @@ import org.junit.runners.Parameterized.Parameters;
 
 import static org.autorefactor.test.TestHelper.*;
 import static org.junit.Assert.*;
-
 @RunWith(value = Parameterized.class)
 public class CFGBuilderTest {
 
@@ -70,7 +69,7 @@ public class CFGBuilderTest {
                 + "[" + testName + ", methodNb=" + methodDeclarationNb + "]";
     }
 
-    @Parameters//(name = "{index}: {0}") // requires junit 4.11
+    @Parameters(name = "{index}: {0}")
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][] {
                 { "ForWithIfToEndLoopSample", 0 },
