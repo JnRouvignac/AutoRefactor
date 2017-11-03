@@ -30,9 +30,7 @@ import static org.eclipse.jdt.core.ToolFactory.*;
 import static org.eclipse.jdt.core.formatter.CodeFormatter.*;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
