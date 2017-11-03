@@ -54,8 +54,8 @@ public class CFGBasicBlock implements Comparable<CFGBasicBlock> {
     /** true means entry block, false means exit block, null means neither entry nor exit block. */
     private final Boolean isEntryBlock;
     private final LineAndColumn lineAndColumn;
-    private final Collection<CFGEdge> incomingEdges = new LinkedList<CFGEdge>();
-    private final Collection<Object> outgoingEdgesAndVariableAccesses = new LinkedList<Object>();
+    private final Collection<CFGEdge> incomingEdges = new LinkedList<>();
+    private final Collection<Object> outgoingEdgesAndVariableAccesses = new LinkedList<>();
 
     private CFGBasicBlock(ASTNode node, String fileName, String codeExcerpt, boolean isDecision, Boolean isEntryBlock,
             LineAndColumn lineAndColumn) {

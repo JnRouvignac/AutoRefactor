@@ -83,7 +83,7 @@ public final class RemoveUncheckedThrowsClausesRefactoring extends AbstractRefac
      *                this method is replaced by {@link MethodDeclaration#thrownExceptionTypes}.
      */
     private List<ASTNode> getUncheckedExceptions(MethodDeclaration node) {
-        List<ASTNode> result = new ArrayList<ASTNode>();
+        List<ASTNode> result = new ArrayList<>();
         // TODO: add a check for api level and invoke corresponding method
         List<Name> exceptions = node.thrownExceptions();
         for (Name n:exceptions) {

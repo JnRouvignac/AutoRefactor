@@ -146,7 +146,7 @@ public class AutoRefactorPlugin extends AbstractUIPlugin {
     }
 
     private static class JobManagerImpl implements JobManager {
-        private final Vector<Job> jobs = new Vector<Job>();
+        private final Vector<Job> jobs = new Vector<>();
 
         @Override
         public void register(Job job) {

@@ -157,8 +157,8 @@ public abstract class AbstractClassSubstituteRefactoring extends AbstractRefacto
         node.accept(classCreationVisitor);
 
         for (final ClassInstanceCreation instanceCreation : classCreationVisitor.getObjectInstantiations()) {
-            final List<VariableDeclaration> varDecls = new ArrayList<VariableDeclaration>();
-            final List<MethodInvocation> methodCallsToRefactor = new ArrayList<MethodInvocation>();
+            final List<VariableDeclaration> varDecls = new ArrayList<>();
+            final List<MethodInvocation> methodCallsToRefactor = new ArrayList<>();
 
             if (canInstantiationBeRefactored(instanceCreation)
                     && canBeRefactored(node, instanceCreation, instanceCreation.resolveTypeBinding(), varDecls,
@@ -181,7 +181,7 @@ public abstract class AbstractClassSubstituteRefactoring extends AbstractRefacto
 
     private boolean canVarOccurrenceBeRefactored(final Block node, final List<VariableDeclaration> varDecls,
             final List<MethodInvocation> methodCallsToRefactor) {
-        final List<VariableDeclaration> otherVarDecls = new ArrayList<VariableDeclaration>();
+        final List<VariableDeclaration> otherVarDecls = new ArrayList<>();
         final boolean canBeRefactored = canVarOccurrenceBeRefactored0(node,
                                                                       varDecls,
                                                                       methodCallsToRefactor,
@@ -208,7 +208,7 @@ public abstract class AbstractClassSubstituteRefactoring extends AbstractRefacto
             }
 
             for (final SimpleName varOccurrence : varOccurrenceVisitor.getVarOccurrences()) {
-                final List<VariableDeclaration> subVarDecls = new ArrayList<VariableDeclaration>();
+                final List<VariableDeclaration> subVarDecls = new ArrayList<>();
                 if (!canBeRefactored(node, varOccurrence, varOccurrence.resolveTypeBinding(), subVarDecls,
                                      methodCallsToRefactor)) {
                     return false;
@@ -341,7 +341,7 @@ public abstract class AbstractClassSubstituteRefactoring extends AbstractRefacto
 
     private final class ObjectInstantiationVisitor extends ASTVisitor {
 
-        private final List<ClassInstanceCreation> objectInstantiations = new ArrayList<ClassInstanceCreation>();
+        private final List<ClassInstanceCreation> objectInstantiations = new ArrayList<>();
 
         private final Block startNode;
 
@@ -387,7 +387,7 @@ public abstract class AbstractClassSubstituteRefactoring extends AbstractRefacto
     private class VarOccurrenceVisitor extends ASTVisitor {
 
         private final VariableDeclaration varDecl;
-        private final List<SimpleName> varOccurrences = new ArrayList<SimpleName>();
+        private final List<SimpleName> varOccurrences = new ArrayList<>();
         private boolean isUsedInAnnonymousClass;
 
         public VarOccurrenceVisitor(VariableDeclaration variable) {

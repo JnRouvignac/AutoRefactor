@@ -63,12 +63,11 @@ public class Refactorings {
     private final EventLoop eventLoop;
     private boolean hasRefactorings;
     private final ASTRewrite rewrite;
-    private final Map<Pair<ASTNode, ChildListPropertyDescriptor>, ListRewrite> listRewriteCache =
-            new HashMap<Pair<ASTNode, ChildListPropertyDescriptor>, ListRewrite>();
+    private final Map<Pair<ASTNode, ChildListPropertyDescriptor>, ListRewrite> listRewriteCache = new HashMap<>();
     private final ASTCommentRewriter commentRewriter;
     private final SourceRewriter sourceRewriter = new SourceRewriter();
     /** Nodes that cannot be visited. */
-    private final Set<ASTNode> refactoredNodes = new HashSet<ASTNode>();
+    private final Set<ASTNode> refactoredNodes = new HashSet<>();
 
     /**
      * Builds an instance of this class.

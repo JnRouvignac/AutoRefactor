@@ -115,8 +115,8 @@ public class MapEliminateKeySetCallsRefactoring extends AbstractRefactoringRule 
          * @return the suggestion for a variable name
          */
         public String suggest(String... candidateNames) {
-            final Set<String> declaredLocalVarNames = new HashSet<String>(collectDeclaredLocalVariableNames());
-            final Set<String> varNamesUsedAfter = new HashSet<String>(collectVariableNamesUsedAfter());
+            final Set<String> declaredLocalVarNames = new HashSet<>(collectDeclaredLocalVariableNames());
+            final Set<String> varNamesUsedAfter = new HashSet<>(collectVariableNamesUsedAfter());
             // Can we use one of the candidate names?
             for (String candidate : candidateNames) {
                 if (isSuitable(candidate, declaredLocalVarNames, varNamesUsedAfter)) {

@@ -168,7 +168,7 @@ public enum OperatorEnum {
 
     private static final Map<Object, OperatorEnum> OPERATORS;
     static {
-        final Map<Object, OperatorEnum> m = new HashMap<Object, OperatorEnum>();
+        final Map<Object, OperatorEnum> m = new HashMap<>();
         for (OperatorEnum op : OperatorEnum.values()) {
             m.put(op.operator, op);
         }

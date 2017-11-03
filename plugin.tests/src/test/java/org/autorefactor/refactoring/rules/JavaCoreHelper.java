@@ -65,7 +65,7 @@ public class JavaCoreHelper {
     }
 
     private static List<IClasspathEntry> getClasspathEntries(final IPackageFragmentRoot root) throws Exception {
-        final List<IClasspathEntry> entries = new ArrayList<IClasspathEntry>();
+        final List<IClasspathEntry> entries = new ArrayList<>();
         final IClasspathEntry srcEntry = JavaCore.newSourceEntry(root.getPath(), EMPTY_PATHS, EMPTY_PATHS, null);
         final IClasspathEntry rtJarEntry = JavaCore.newLibraryEntry(getPathToRtJar(), null, null);
         entries.add(srcEntry);
@@ -144,7 +144,7 @@ public class JavaCoreHelper {
     }
 
     private static List<Node> asList(NodeList nodeList) {
-        final List<Node> results = new ArrayList<Node>();
+        final List<Node> results = new ArrayList<>();
         int length = nodeList.getLength();
         for (int i = 0; i < length; i++) {
             final Node item = nodeList.item(i);
@@ -233,7 +233,7 @@ public class JavaCoreHelper {
             IClasspathEntry[] newEntries;
             if (oldEntries.length != 0) {
                 // remove duplicate entries
-                Set<IClasspathEntry> set = new HashSet<IClasspathEntry>(Arrays.asList(oldEntries));
+                Set<IClasspathEntry> set = new HashSet<>(Arrays.asList(oldEntries));
                 set.addAll(classpathEntries);
                 newEntries = set.toArray(new IClasspathEntry[set.size()]);
             } else {

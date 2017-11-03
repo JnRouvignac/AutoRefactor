@@ -106,8 +106,7 @@ public class StringBuilderRefactoring extends AbstractRefactoringRule {
             return maybeRefactorAppending(node);
         } else if (isMethod(node, "java.lang.StringBuilder", "toString")
                 || isMethod(node, "java.lang.StringBuffer", "toString")) {
-            final LinkedList<Pair<ITypeBinding, Expression>> allAppendedStrings =
-                    new LinkedList<Pair<ITypeBinding, Expression>>();
+            final LinkedList<Pair<ITypeBinding, Expression>> allAppendedStrings = new LinkedList<>();
             final Expression lastExpr = readAppendMethod(node.getExpression(), allAppendedStrings,
                     new AtomicBoolean(false), new AtomicBoolean(false));
             // TODO new StringBuffer().append(" bla").append("bla").toString();
@@ -141,8 +140,7 @@ public class StringBuilderRefactoring extends AbstractRefactoringRule {
     }
 
     private boolean maybeRefactorAppending(Expression node) {
-        final LinkedList<Pair<ITypeBinding, Expression>> allAppendedStrings =
-                new LinkedList<Pair<ITypeBinding, Expression>>();
+        final LinkedList<Pair<ITypeBinding, Expression>> allAppendedStrings = new LinkedList<>();
         final AtomicBoolean isRefactoringNeeded = new AtomicBoolean(false);
         final AtomicBoolean isInstanceCreationToRewrite = new AtomicBoolean(false);
         final Expression lastExpr = readAppendMethod(node, allAppendedStrings, isRefactoringNeeded,
@@ -212,7 +210,7 @@ public class StringBuilderRefactoring extends AbstractRefactoringRule {
             final InfixExpression ie = (InfixExpression) arg;
             if (isStringConcat(ie)) {
                 if (ie.hasExtendedOperands()) {
-                    final List<Expression> reversed = new ArrayList<Expression>(extendedOperands(ie));
+                    final List<Expression> reversed = new ArrayList<>(extendedOperands(ie));
                     Collections.reverse(reversed);
 
                     if (isValuedStringLiteral(reversed.get(0)) && !results.isEmpty()
@@ -317,8 +315,8 @@ public class StringBuilderRefactoring extends AbstractRefactoringRule {
         final ASTBuilder b = this.ctx.getASTBuilder();
 
         Expression result = null;
-        final List<Expression> tempStringLiterals = new ArrayList<Expression>();
-        final List<Expression> finalStrings = new ArrayList<Expression>();
+        final List<Expression> tempStringLiterals = new ArrayList<>();
+        final List<Expression> finalStrings = new ArrayList<>();
         final AtomicBoolean isFirst = new AtomicBoolean(true);
         for (final Pair<ITypeBinding, Expression> appendedString : allAppendedStrings) {
             if (appendedString.getSecond() instanceof StringLiteral) {
@@ -469,8 +467,7 @@ public class StringBuilderRefactoring extends AbstractRefactoringRule {
     @Override
     public boolean visit(InfixExpression node) {
         if (isStringConcat(node)) {
-            final LinkedList<Pair<ITypeBinding, Expression>> allOperands =
-                    new LinkedList<Pair<ITypeBinding, Expression>>();
+            final LinkedList<Pair<ITypeBinding, Expression>> allOperands = new LinkedList<>();
             readSubExpressions(node, allOperands, new AtomicBoolean(false));
             boolean replaceNeeded = filterOutEmptyStringsFromStringConcat(allOperands);
             if (replaceNeeded) {

@@ -143,16 +143,16 @@ import static org.autorefactor.refactoring.ASTHelper.*;
  */
 public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRule {
 
-    private final Map<Class<?>, List<ASTVisitor>> visitorsMap = new HashMap<Class<?>, List<ASTVisitor>>();
-    private final Map<Class<?>, List<ASTVisitor>> endVisitorsMap = new HashMap<Class<?>, List<ASTVisitor>>();
-    private final Set<ASTVisitor> preVisitors = new LinkedHashSet<ASTVisitor>();
-    private final Set<ASTVisitor> preVisitors2 = new LinkedHashSet<ASTVisitor>();
-    private final Set<ASTVisitor> postVisitors = new LinkedHashSet<ASTVisitor>();
+    private final Map<Class<?>, List<ASTVisitor>> visitorsMap = new HashMap<>();
+    private final Map<Class<?>, List<ASTVisitor>> endVisitorsMap = new HashMap<>();
+    private final Set<ASTVisitor> preVisitors = new LinkedHashSet<>();
+    private final Set<ASTVisitor> preVisitors2 = new LinkedHashSet<>();
+    private final Set<ASTVisitor> postVisitors = new LinkedHashSet<>();
 
     private final List<ASTVisitor> visitors;
 
     private RefactoringContext ctx;
-    private final Set<ASTVisitor> visitorsContributingRefactoring = new HashSet<ASTVisitor>();
+    private final Set<ASTVisitor> visitorsContributingRefactoring = new HashSet<>();
 
     /**
      * Builds an instance of this class.

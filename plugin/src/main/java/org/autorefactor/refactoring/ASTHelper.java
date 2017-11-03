@@ -208,7 +208,7 @@ public final class ASTHelper {
     }
 
     private static final class VariableDeclarationIdentifierVisitor extends ASTVisitor {
-        private final Set<String> variableNames = new HashSet<String>();
+        private final Set<String> variableNames = new HashSet<>();
         private final ASTNode startNode;
         private final boolean includeInnerScopes;
 
@@ -1440,7 +1440,7 @@ public final class ASTHelper {
                 || qualifiedTypeName.equals(typeErasure.getQualifiedName())) {
             return typeBinding;
         }
-        final Set<String> visitedClasses = new HashSet<String>();
+        final Set<String> visitedClasses = new HashSet<>();
         visitedClasses.add(typeErasure.getQualifiedName());
         return findImplementedType(typeBinding, qualifiedTypeName, visitedClasses);
     }
@@ -1674,7 +1674,7 @@ public final class ASTHelper {
             final ITypeBinding clazz, final ITypeBinding clazzErasure) {
         final ITypeBinding[] typeParams = clazz.getTypeArguments();
         final ITypeBinding[] genericTypeParams = clazzErasure.getTypeParameters();
-        final Map<ITypeBinding, ITypeBinding> results = new HashMap<ITypeBinding, ITypeBinding>();
+        final Map<ITypeBinding, ITypeBinding> results = new HashMap<>();
         for (int i = 0; i < typeParams.length; i++) {
             results.put(genericTypeParams[i], typeParams[i]);
         }
@@ -1712,7 +1712,7 @@ public final class ASTHelper {
      * @return a set made of all the method bindings which are overridden by the provided method binding
      */
     public static Set<IMethodBinding> getOverridenMethods(IMethodBinding overridingMethod) {
-        final Set<IMethodBinding> results = new HashSet<IMethodBinding>();
+        final Set<IMethodBinding> results = new HashSet<>();
         findOverridenMethods(overridingMethod, results, overridingMethod.getDeclaringClass());
         return results;
     }

@@ -186,7 +186,7 @@ public class RemoveUselessModifiersRefactoring extends AbstractRefactoringRule {
 
     private boolean ensureModifiersOrder(BodyDeclaration node) {
         final List<IExtendedModifier> extendedModifiers = modifiers(node);
-        final List<IExtendedModifier> reorderedModifiers = new ArrayList<IExtendedModifier>(extendedModifiers);
+        final List<IExtendedModifier> reorderedModifiers = new ArrayList<>(extendedModifiers);
         Collections.sort(reorderedModifiers, new ModifierOrderComparator());
 
         if (!extendedModifiers.equals(reorderedModifiers)) {
@@ -241,7 +241,7 @@ public class RemoveUselessModifiersRefactoring extends AbstractRefactoringRule {
     }
 
     private List<Modifier> getModifiersOnly(Collection<IExtendedModifier> modifiers) {
-        final List<Modifier> results = new LinkedList<Modifier>();
+        final List<Modifier> results = new LinkedList<>();
         for (IExtendedModifier em : modifiers) {
             if (em.isModifier()) {
                 results.add((Modifier) em);

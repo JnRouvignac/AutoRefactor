@@ -53,7 +53,7 @@ import org.eclipse.jdt.core.JavaModelException;
 public class PrepareApplyRefactoringsJob extends Job {
     private final List<IJavaElement> javaElements;
     private final List<RefactoringRule> refactoringRulesToApply;
-    private final Map<IJavaElement, JavaProjectOptions> javaProjects = new HashMap<IJavaElement, JavaProjectOptions>();
+    private final Map<IJavaElement, JavaProjectOptions> javaProjects = new HashMap<>();
     private final Environment environment;
 
     /**
@@ -126,7 +126,7 @@ public class PrepareApplyRefactoringsJob extends Job {
 
     private Queue<RefactoringUnit> collectRefactoringUnits(List<IJavaElement> javaElements) {
         try {
-            final Queue<RefactoringUnit> results = new ConcurrentLinkedQueue<RefactoringUnit>();
+            final Queue<RefactoringUnit> results = new ConcurrentLinkedQueue<>();
             addAll(results, javaElements);
             return results;
         } catch (Exception e) {
@@ -195,7 +195,7 @@ public class PrepareApplyRefactoringsJob extends Job {
     }
 
     private List<IJavaElement> getSubPackages(IPackageFragment motherPackage) throws JavaModelException {
-        List<IJavaElement> subPackages = new ArrayList<IJavaElement>();
+        List<IJavaElement> subPackages = new ArrayList<>();
         String packageName = motherPackage.getElementName();
         IJavaElement[] packages = ((IPackageFragmentRoot) motherPackage.getParent()).getChildren();
 

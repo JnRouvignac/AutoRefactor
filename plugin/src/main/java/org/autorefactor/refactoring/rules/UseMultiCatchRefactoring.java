@@ -177,7 +177,7 @@ public class UseMultiCatchRefactoring extends AbstractRefactoringRule {
     }
 
     private static final class MultiCatchASTMatcher extends ASTMatcher {
-        private final Map<ASTNode, ASTNode> matchingVariables = new HashMap<ASTNode, ASTNode>();
+        private final Map<ASTNode, ASTNode> matchingVariables = new HashMap<>();
 
         public MultiCatchASTMatcher(CatchClause catchClause1, CatchClause catchClause2) {
             matchingVariables.put(catchClause1.getException(), catchClause2.getException());
@@ -382,7 +382,7 @@ public class UseMultiCatchRefactoring extends AbstractRefactoringRule {
     }
 
     private UnionType unionTypes(Type... types) {
-        final List<Type> allTypes = new ArrayList<Type>();
+        final List<Type> allTypes = new ArrayList<>();
         collectAllUnionedTypes(allTypes, Arrays.asList(types));
         removeSupersededAlternatives(allTypes);
 

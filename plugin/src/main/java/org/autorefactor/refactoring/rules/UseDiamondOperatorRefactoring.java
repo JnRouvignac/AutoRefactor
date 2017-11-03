@@ -90,10 +90,10 @@ public class UseDiamondOperatorRefactoring extends AbstractRefactoringRule {
         if (typeBinding == null || ctorBinding == null) {
             return false;
         }
-        List<ITypeBinding> typeArguments = new ArrayList<ITypeBinding>();
+        List<ITypeBinding> typeArguments = new ArrayList<>();
         Collections.addAll(typeArguments, typeBinding.getTypeArguments());
         ITypeBinding typeDecl = typeBinding.getTypeDeclaration();
-        List<ITypeBinding> typeParameters = new ArrayList<ITypeBinding>();
+        List<ITypeBinding> typeParameters = new ArrayList<>();
         Collections.addAll(typeParameters, typeDecl.getTypeParameters());
 
         IMethodBinding methodDecl = ctorBinding.getMethodDeclaration();

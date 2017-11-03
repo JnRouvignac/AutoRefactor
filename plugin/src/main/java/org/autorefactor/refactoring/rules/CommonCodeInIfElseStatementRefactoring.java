@@ -76,8 +76,8 @@ public class CommonCodeInIfElseStatementRefactoring extends AbstractRefactoringR
         final ASTBuilder b = this.ctx.getASTBuilder();
         final Refactorings r = this.ctx.getRefactorings();
 
-        final List<List<Statement>> allCasesStmts = new ArrayList<List<Statement>>();
-        final List<List<ASTNode>> removedCaseStmts = new LinkedList<List<ASTNode>>();
+        final List<List<Statement>> allCasesStmts = new ArrayList<>();
+        final List<List<ASTNode>> removedCaseStmts = new LinkedList<>();
 
         // Collect all the if / else if / else if / ... / else cases
         if (collectAllCases(allCasesStmts, node)) {

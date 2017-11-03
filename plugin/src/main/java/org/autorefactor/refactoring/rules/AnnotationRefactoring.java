@@ -104,7 +104,7 @@ public class AnnotationRefactoring extends AbstractRefactoringRule {
         }
         ITypeBinding annotationType = annotBinding.getAnnotationType();
         IMethodBinding[] elements = annotationType.getDeclaredMethods();
-        Map<String, IMethodBinding> results = new HashMap<String, IMethodBinding>();
+        Map<String, IMethodBinding> results = new HashMap<>();
         for (IMethodBinding element : elements) {
             results.put(element.getName(), element);
         }

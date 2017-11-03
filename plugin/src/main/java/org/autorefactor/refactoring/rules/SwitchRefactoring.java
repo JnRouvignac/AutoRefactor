@@ -88,7 +88,7 @@ public class SwitchRefactoring extends AbstractRefactoringRule {
         }
 
         private Variable mergeValues(final Variable other) {
-            final List<Expression> values = new ArrayList<Expression>(constantValues);
+            final List<Expression> values = new ArrayList<>(constantValues);
             values.addAll(other.constantValues);
             return new Variable(name, values);
         }
@@ -233,10 +233,10 @@ public class SwitchRefactoring extends AbstractRefactoringRule {
         }
 
         final SimpleName switchExpr = variable.name;
-        final List<SwitchCaseSection> cases = new ArrayList<SwitchCaseSection>();
+        final List<SwitchCaseSection> cases = new ArrayList<>();
         Statement remainingStmt = null;
 
-        final Set<String> variableDeclarationIds = new HashSet<String>();
+        final Set<String> variableDeclarationIds = new HashSet<>();
         IfStatement currentNode = node;
         while (haveSameIdentifier(switchExpr, variable.name)
                 && haveSameType(switchExpr, variable.name)) {
@@ -294,10 +294,10 @@ public class SwitchRefactoring extends AbstractRefactoringRule {
 
     /** Side-effect: removes the dead branches in a chain of if-elseif. */
     private List<SwitchCaseSection> filterDuplicateCaseValues(final List<SwitchCaseSection> sourceCases) {
-        final List<SwitchCaseSection> results = new ArrayList<SwitchCaseSection>();
-        final Set<Object> alreadyProccessedValues = new HashSet<Object>();
+        final List<SwitchCaseSection> results = new ArrayList<>();
+        final Set<Object> alreadyProccessedValues = new HashSet<>();
         for (final SwitchCaseSection sourceCase : sourceCases) {
-            final List<Expression> filteredExprs = new ArrayList<Expression>();
+            final List<Expression> filteredExprs = new ArrayList<>();
             for (final Expression expr : sourceCase.constantExprs) {
                 final Object constantValue = expr.resolveConstantExpressionValue();
                 if (constantValue == null) {
@@ -438,7 +438,7 @@ public class SwitchRefactoring extends AbstractRefactoringRule {
     }
 
     private List<SwitchCaseSection> getSwitchStructure(final SwitchStatement node) {
-        final List<SwitchCaseSection> switchStructure = new ArrayList<SwitchCaseSection>();
+        final List<SwitchCaseSection> switchStructure = new ArrayList<>();
 
         SwitchCaseSection currentCase = new SwitchCaseSection();
         for (final Statement stmt : statements(node)) {

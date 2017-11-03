@@ -80,7 +80,7 @@ public class PushNegationDownRefactoring extends AbstractRefactoringRule {
             final InfixExpression ie = (InfixExpression) operand;
             final Operator reverseOp = (Operator) OperatorEnum.getOperator(ie).getReverseBooleanOperator();
             if (reverseOp != null) {
-                List<Expression> allOperands = new ArrayList<Expression>(allOperands(ie));
+                List<Expression> allOperands = new ArrayList<>(allOperands(ie));
                 if (Arrays.<Operator>asList(CONDITIONAL_AND, CONDITIONAL_OR, AND, OR).contains(ie.getOperator())) {
                     for (ListIterator<Expression> it = allOperands.listIterator(); it.hasNext();) {
                         it.set(b.negate(it.next()));

@@ -185,7 +185,7 @@ public class ReplaceQualifiedNamesBySimpleNamesRefactoring extends AbstractRefac
          * Simple names for java elements in use in this compilation unit.
          * It merges imports and local declarations.
          */
-        private final Map<String, List<FQN>> simpleNames = new TreeMap<String, List<FQN>>();
+        private final Map<String, List<FQN>> simpleNames = new TreeMap<>();
 
         private void addName(FQN fqn) {
             addName(fqn.fullyQualifiedName.simpleName, fqn);
@@ -198,7 +198,7 @@ public class ReplaceQualifiedNamesBySimpleNamesRefactoring extends AbstractRefac
         private void addName(final String simpleName, FQN fqn) {
             List<FQN> existingFqns = simpleNames.get(simpleName);
             if (existingFqns == null) {
-                existingFqns = new ArrayList<FQN>();
+                existingFqns = new ArrayList<>();
                 simpleNames.put(simpleName, existingFqns);
             }
             existingFqns.add(fqn);
@@ -299,7 +299,7 @@ public class ReplaceQualifiedNamesBySimpleNamesRefactoring extends AbstractRefac
             if (fqns == null) {
                 return Collections.emptyList();
             }
-            List<FQN> bestMatches = new ArrayList<FQN>();
+            List<FQN> bestMatches = new ArrayList<>();
             for (FQN fqn : fqns) {
                 if (fqn.equals(FQN.CANNOT_REPLACE_SIMPLE_NAME)) {
                     // something got wrong while computing the FQNs => bail out
@@ -635,7 +635,7 @@ public class ReplaceQualifiedNamesBySimpleNamesRefactoring extends AbstractRefac
         }
 
         // Method body
-        final Set<String> localIdentifiers = new HashSet<String>();
+        final Set<String> localIdentifiers = new HashSet<>();
         for (final SingleVariableDeclaration localParameter : parameters(node)) {
             localIdentifiers.add(localParameter.getName().getIdentifier());
         }

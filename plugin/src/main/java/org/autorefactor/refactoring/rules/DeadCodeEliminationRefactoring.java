@@ -124,7 +124,7 @@ public class DeadCodeEliminationRefactoring extends AbstractRefactoringRule {
                           b.if0(b.negate(condition),
                                 b.move(elseStmt)));
             } else {
-                final List<Expression> sideEffectExprs = new ArrayList<Expression>();
+                final List<Expression> sideEffectExprs = new ArrayList<>();
                 collectSideEffects(condition, sideEffectExprs);
 
                 if (node.getParent() instanceof IfStatement

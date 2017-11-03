@@ -125,7 +125,7 @@ public class CommentsRefactoring extends AbstractRefactoringRule {
             Pattern.compile("(/\\*\\*\\s*(?:(?:\\r|\\n|\\r\\n|\\s)\\s*\\*)*\\s*)(\\w)(.*)", Pattern.DOTALL);
 
     private CompilationUnit astRoot;
-    private final List<Pair<SourceLocation, Comment>> comments = new ArrayList<Pair<SourceLocation, Comment>>();
+    private final List<Pair<SourceLocation, Comment>> comments = new ArrayList<>();
 
     /** Class constructor. */
     public CommentsRefactoring() {
@@ -460,7 +460,7 @@ public class CommentsRefactoring extends AbstractRefactoringRule {
         if (node != null && node.getParent() instanceof TypeDeclaration) {
             final TypeDeclaration typeDecl = (TypeDeclaration) node.getParent();
 
-            final TreeMap<Integer, ASTNode> nodes = new TreeMap<Integer, ASTNode>();
+            final TreeMap<Integer, ASTNode> nodes = new TreeMap<>();
             addAll(nodes, typeDecl.getFields());
             addAll(nodes, typeDecl.getMethods());
             addAll(nodes, typeDecl.getTypes());

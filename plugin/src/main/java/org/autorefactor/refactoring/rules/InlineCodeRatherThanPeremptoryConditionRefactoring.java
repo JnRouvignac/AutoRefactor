@@ -128,7 +128,7 @@ public class InlineCodeRatherThanPeremptoryConditionRefactoring extends Abstract
             } else {
                 final Set<String> ifVariableNames = getLocalVariableIdentifiers(unconditionnalStatement, false);
 
-                final Set<String> followingVariableNames = new HashSet<String>();
+                final Set<String> followingVariableNames = new HashSet<>();
                 for (final Statement statement : getNextSiblings(node)) {
                     followingVariableNames.addAll(getLocalVariableIdentifiers(statement, true));
                 }

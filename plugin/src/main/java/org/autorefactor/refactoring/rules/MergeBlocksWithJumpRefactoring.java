@@ -74,7 +74,7 @@ public class MergeBlocksWithJumpRefactoring extends AbstractRefactoringRule {
         @Override
         public boolean visit(IfStatement node) {
             if (getResult() == VISIT_SUBTREE) {
-                final List<IfStatement> duplicateIfBlocks = new ArrayList<IfStatement>();
+                final List<IfStatement> duplicateIfBlocks = new ArrayList<>();
                 duplicateIfBlocks.add(node);
                 while (addOneMoreIf(duplicateIfBlocks)) {
                     // OK continue

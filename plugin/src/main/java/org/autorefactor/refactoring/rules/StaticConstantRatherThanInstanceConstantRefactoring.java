@@ -118,7 +118,7 @@ public class StaticConstantRatherThanInstanceConstantRefactoring extends Abstrac
     }
 
     private List<Modifier> getModifiersOnly(final Collection<IExtendedModifier> modifiers) {
-        final List<Modifier> results = new LinkedList<Modifier>();
+        final List<Modifier> results = new LinkedList<>();
         for (final IExtendedModifier em : modifiers) {
             if (em.isModifier()) {
                 results.add((Modifier) em);
