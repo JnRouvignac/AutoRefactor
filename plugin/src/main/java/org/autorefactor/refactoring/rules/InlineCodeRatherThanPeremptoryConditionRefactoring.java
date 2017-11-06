@@ -30,13 +30,13 @@ import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
 import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
 import static org.autorefactor.refactoring.ASTHelper.asList;
 import static org.autorefactor.refactoring.ASTHelper.getLocalVariableIdentifiers;
+import static org.autorefactor.refactoring.ASTHelper.getNextSiblings;
 import static org.autorefactor.refactoring.ASTHelper.isEndingWithJump;
 import static org.autorefactor.refactoring.ASTHelper.isPassive;
 import static org.autorefactor.refactoring.ASTHelper.match;
 import static org.eclipse.jdt.core.dom.InfixExpression.Operator.EQUALS;
 import static org.eclipse.jdt.core.dom.InfixExpression.Operator.NOT_EQUALS;
 
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -168,18 +168,6 @@ public class InlineCodeRatherThanPeremptoryConditionRefactoring extends Abstract
         } else {
             r.replace(sourceNode, b.copy(unconditionnalStatement));
         }
-    }
-
-    private List<Statement> getNextSiblings(Statement node) {
-        if (node.getParent() instanceof Block) {
-            final List<Statement> stmts = asList((Statement) node.getParent());
-            final int indexOfNode = stmts.indexOf(node);
-            final int siblingIndex = indexOfNode + 1;
-            if (0 <= siblingIndex && siblingIndex < stmts.size()) {
-                return stmts.subList(siblingIndex, stmts.size());
-            }
-        }
-        return Collections.emptyList();
     }
 
     private void removeForwardCode(final Statement astNode, final Statement unconditionnalStatement) {

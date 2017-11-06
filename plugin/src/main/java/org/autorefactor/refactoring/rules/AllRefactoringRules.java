@@ -89,6 +89,7 @@ public final class AllRefactoringRules {
                 // new ForeachRefactoring(),
                 new DeadCodeEliminationRefactoring(),
                 new InlineCodeRatherThanPeremptoryConditionRefactoring(),
+                new RemoveUselessBlockRefactoring(),
                 new RemoveEmptyStatementRefactoring(),
                 new EndOfMethodRatherThanReturnRefactoring(),
                 new DoWhileRatherThanWhileRefactoring(),

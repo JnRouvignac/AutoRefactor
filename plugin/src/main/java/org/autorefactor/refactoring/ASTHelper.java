@@ -141,6 +141,7 @@ import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 import org.eclipse.jdt.core.dom.WhileStatement;
 import org.eclipse.jdt.core.dom.WildcardType;
 
+import static org.autorefactor.refactoring.ASTHelper.asList;
 import static org.autorefactor.util.Utils.*;
 import static org.eclipse.jdt.core.dom.ASTNode.*;
 import static org.eclipse.jdt.core.dom.IBinding.*;
@@ -1058,6 +1059,24 @@ public final class ASTHelper {
      */
     public static Statement getNextSibling(Statement startNode) {
         return getSibling(startNode, false);
+    }
+
+    /**
+     * Returns the next statements in the same block if it exists.
+     *
+     * @param startNode the start node
+     * @return the next statements in the same block if it exists, empty list otherwise
+     */
+    public static List<Statement> getNextSiblings(Statement startNode) {
+        if (startNode.getParent() instanceof Block) {
+            final List<Statement> stmts = asList((Statement) startNode.getParent());
+            final int indexOfNode = stmts.indexOf(startNode);
+            final int siblingIndex = indexOfNode + 1;
+            if (0 <= siblingIndex && siblingIndex < stmts.size()) {
+                return stmts.subList(siblingIndex, stmts.size());
+            }
+        }
+        return Collections.emptyList();
     }
 
     /**
