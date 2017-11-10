@@ -25,12 +25,10 @@
  */
 package org.autorefactor.refactoring.rules;
 
-import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
-import static org.autorefactor.refactoring.ASTHelper.getLocalVariableIdentifiers;
-import static org.autorefactor.refactoring.ASTHelper.getNextSiblings;
+import static org.autorefactor.refactoring.ASTHelper.*;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.autorefactor.refactoring.ASTBuilder;
@@ -38,9 +36,7 @@ import org.autorefactor.refactoring.Refactorings;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.Statement;
 
-/**
- * See {@link #getDescription()} method.
- */
+/** See {@link #getDescription()} method. */
 public class RemoveUselessBlockRefactoring extends AbstractRefactoringRule {
     @Override
     public String getDescription() {
@@ -54,9 +50,10 @@ public class RemoveUselessBlockRefactoring extends AbstractRefactoringRule {
 
     @Override
     public boolean visit(Block node) {
-        if (node.statements() != null && node.statements().size() == 1
-                && node.statements().get(0) instanceof Block) {
-            replaceBlock((Block) node.statements().get(0));
+        final List<Statement> stmts = statements(node);
+        if (stmts.size() == 1
+                && stmts.get(0) instanceof Block) {
+            replaceBlock((Block) stmts.get(0));
             return DO_NOT_VISIT_SUBTREE;
         } else if (node.getParent() instanceof Block) {
             final Set<String> ifVariableNames = getLocalVariableIdentifiers(node, false);
