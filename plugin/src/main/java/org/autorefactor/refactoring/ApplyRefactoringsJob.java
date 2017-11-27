@@ -47,6 +47,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.core.runtime.jobs.IJobChangeListener;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.dom.AST;
@@ -68,7 +69,12 @@ public class ApplyRefactoringsJob extends Job {
     private final Queue<RefactoringUnit> refactoringUnits;
     private final List<RefactoringRule> refactoringRulesToApply;
     private final Environment environment;
-
+    
+    public IJobChangeListener applyRefactoringListener;
+    
+    
+    public static String refactoredContent = "Apply Refactoring to preview refcatorings";
+    public static String codeToRefactor = "Here is a code to refactor";
     /**
      * Builds an instance of this class.
      *
@@ -84,6 +90,17 @@ public class ApplyRefactoringsJob extends Job {
         this.refactoringUnits = refactoringUnits;
         this.refactoringRulesToApply = refactoringRulesToApply;
         this.environment = environment;
+    }
+    
+    public ApplyRefactoringsJob(Queue<RefactoringUnit> refactoringUnits,
+            List<RefactoringRule> refactoringRulesToApply,
+            Environment environment, IJobChangeListener applyRefactoringListener) {
+    	super("AutoRefactor");
+    	setPriority(Job.LONG);
+    	this.refactoringUnits = refactoringUnits;
+    	this.refactoringRulesToApply = refactoringRulesToApply;
+    	this.environment = environment;
+    	this.applyRefactoringListener = applyRefactoringListener;
     }
 
     @Override
@@ -164,6 +181,7 @@ public class ApplyRefactoringsJob extends Job {
                 return;
             }
             final IDocument document = textFileBuffer.getDocument();
+            codeToRefactor = document.get();
             applyRefactoring(document, compilationUnit, refactoringToApply, options, monitor);
         } finally {
             bufferManager.disconnect(path, locationKind, null);
@@ -231,6 +249,8 @@ public class ApplyRefactoringsJob extends Job {
             refactorings.applyTo(document);
             final boolean hadUnsavedChanges = compilationUnit.hasUnsavedChanges();
             compilationUnit.getBuffer().setContents(document.get());
+            
+            refactoredContent = document.get();
             // http://wiki.eclipse.org/FAQ_What_is_a_working_copy%3F
             // compilationUnit.reconcile(AST.JLS4,
             // ICompilationUnit.ENABLE_BINDINGS_RECOVERY |
@@ -260,6 +280,8 @@ public class ApplyRefactoringsJob extends Job {
             }
         }
     }
+    
+   
 
     private static void resetParser(ICompilationUnit cu, ASTParser parser, JavaProjectOptions options) {
         parser.setSource(cu);

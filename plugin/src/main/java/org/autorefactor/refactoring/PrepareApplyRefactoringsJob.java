@@ -41,6 +41,7 @@ import org.autorefactor.util.UnhandledException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.IJobChangeListener;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
@@ -48,6 +49,7 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaModelException;
+import org.autorefactor.*;
 
 /** Eclipse job that prepares and partitions work for {@link ApplyRefactoringsJob}. */
 public class PrepareApplyRefactoringsJob extends Job {
@@ -55,6 +57,7 @@ public class PrepareApplyRefactoringsJob extends Job {
     private final List<RefactoringRule> refactoringRulesToApply;
     private final Map<IJavaElement, JavaProjectOptions> javaProjects = new HashMap<>();
     private final Environment environment;
+    IJobChangeListener listener;
 
     /**
      * Builds an instance of this class.
@@ -72,6 +75,18 @@ public class PrepareApplyRefactoringsJob extends Job {
         this.refactoringRulesToApply = refactoringRulesToApply;
         this.environment = environment;
     }
+    
+    public PrepareApplyRefactoringsJob(List<IJavaElement> javaElements,
+            List<RefactoringRule> refactoringRulesToApply,
+            Environment environment, IJobChangeListener applyRefactoringListener) {
+    	super("Prepare AutoRefactor");
+    	setPriority(Job.SHORT);
+    	this.javaElements = javaElements;
+    	this.refactoringRulesToApply = refactoringRulesToApply;
+    	this.environment = environment;
+    	this.listener = applyRefactoringListener;
+    }
+
 
     @Override
     protected IStatus run(IProgressMonitor monitor) {
@@ -95,7 +110,9 @@ public class PrepareApplyRefactoringsJob extends Job {
             final int nbCores = Runtime.getRuntime().availableProcessors();
             final int nbWorkers = computeNbWorkers(toRefactor.size(), nbCores);
             for (int i = 0; i < nbWorkers; i++) {
-                new ApplyRefactoringsJob(toRefactor, clone(refactoringRulesToApply), environment).schedule();
+            	ApplyRefactoringsJob applyRefactoringsJob = new ApplyRefactoringsJob(toRefactor, clone(refactoringRulesToApply), environment);
+            	applyRefactoringsJob.addJobChangeListener(listener);
+            			applyRefactoringsJob.schedule();
             }
         }
         return Status.OK_STATUS;

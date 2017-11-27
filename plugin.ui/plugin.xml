@@ -84,6 +84,8 @@
                          commandId="org.autorefactor.automatic.refactoring" />
                 <command style="push"
                          commandId="org.autorefactor.choose.refactorings" />
+                         <command
+                          commandId="org.autorefactor.preview.refactorings" style="push"/>
             </menu>
         </menuContribution>
     </extension>
@@ -115,7 +117,11 @@
         </command>
     </extension>
 
+	<extension point="org.eclipse.ui.commands">
 
+	<command name="Preview refactorings..." defaultHandler="org.autorefactor.ui.PreviewWizardHandler" id="org.autorefactor.preview.refactorings"> </command>
+
+	</extension>
 
   <!-- Workspace wide preferences -->
   <extension point="org.eclipse.ui.preferencePages">
