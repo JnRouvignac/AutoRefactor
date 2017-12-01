@@ -57,7 +57,6 @@ import org.eclipse.jface.text.IDocument;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.autorefactor.refactoring.PluginConstant.*;
-
 /**
  * Eclipse job that applies the provided refactoring rules in background.
  * Several such jobs might be started and run in parallel to form a worker pool,
@@ -190,7 +189,7 @@ public class ApplyRefactoringsJob extends Job {
     public void applyRefactoring(IDocument document, ICompilationUnit compilationUnit, AggregateASTVisitor refactoring,
             JavaProjectOptions options, SubMonitor monitor) throws Exception {
         // creation of DOM/AST from a ICompilationUnit
-        final ASTParser parser = ASTParser.newParser(AST.JLS4);
+        final ASTParser parser = ASTParser.newParser(AST.JLS8);
         resetParser(compilationUnit, parser, options);
 
         CompilationUnit astRoot = (CompilationUnit) parser.createAST(null);
@@ -230,7 +229,7 @@ public class ApplyRefactoringsJob extends Job {
             final boolean hadUnsavedChanges = compilationUnit.hasUnsavedChanges();
             compilationUnit.getBuffer().setContents(document.get());
             // http://wiki.eclipse.org/FAQ_What_is_a_working_copy%3F
-            // compilationUnit.reconcile(AST.JLS4,
+            // compilationUnit.reconcile(AST.JLS8,
             // ICompilationUnit.ENABLE_BINDINGS_RECOVERY |
             // ICompilationUnit.ENABLE_STATEMENTS_RECOVERY |
             // ICompilationUnit.FORCE_PROBLEM_DETECTION

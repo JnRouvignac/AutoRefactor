@@ -425,7 +425,7 @@ public class ASTBuilder {
         case ARRAY_TYPE:
             final ArrayType arrayType = (ArrayType) type;
             return ast.newArrayType(
-                    copyType(arrayType.getComponentType()),
+                    copyType(arrayType.getElementType()),
                     arrayType.getDimensions());
 
         case PRIMITIVE_TYPE:
@@ -935,6 +935,7 @@ public class ASTBuilder {
         return cic;
     }
 
+    @SuppressWarnings("unchecked")
     private <T extends ASTNode> void addAll(List<T> whereToAdd, T... toAdd) {
         if (!isEmptyRangeCopy(toAdd)) {
             Collections.addAll(whereToAdd, toAdd);

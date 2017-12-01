@@ -27,7 +27,7 @@ package org.autorefactor.cfg;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.lang.reflect.Method;
@@ -50,8 +50,10 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
-import static org.autorefactor.test.TestHelper.*;
+import static java.nio.file.Files.newOutputStream;
+import static org.autorefactor.test.TestHelper.readAll;
 import static org.junit.Assert.*;
+
 @RunWith(value = Parameterized.class)
 public class CFGBuilderTest {
 
@@ -99,7 +101,7 @@ public class CFGBuilderTest {
         cu.save(null, true);
 
         final JavaProjectOptions options = newJavaProjectOptions(Release.javaSE("1.7"), 4);
-        final ASTParser parser = ASTParser.newParser(AST.JLS4);
+        final ASTParser parser = ASTParser.newParser(AST.JLS8);
         autoRefactorHandlerResetParser(cu, parser, options);
 
         final CompilationUnit astRoot = (CompilationUnit) parser.createAST(null);
@@ -114,19 +116,9 @@ public class CFGBuilderTest {
     }
 
     private void writeAll(File file, String fileContent) throws Exception {
-        FileOutputStream fos = null;
-        Writer writer = null;
-        try {
-            fos = new FileOutputStream(file);
-            writer = new BufferedWriter(new OutputStreamWriter(fos));
+        try (OutputStream os = newOutputStream(file.toPath());
+                Writer writer = new BufferedWriter(new OutputStreamWriter(os))) {
             writer.append(fileContent);
-        } finally {
-            if (writer != null) {
-                writer.close();
-            }
-            if (fos != null) {
-                fos.close();
-            }
         }
     }
 

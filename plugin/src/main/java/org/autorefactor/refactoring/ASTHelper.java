@@ -141,7 +141,6 @@ import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 import org.eclipse.jdt.core.dom.WhileStatement;
 import org.eclipse.jdt.core.dom.WildcardType;
 
-import static org.autorefactor.refactoring.ASTHelper.asList;
 import static org.autorefactor.util.Utils.*;
 import static org.eclipse.jdt.core.dom.ASTNode.*;
 import static org.eclipse.jdt.core.dom.IBinding.*;
@@ -814,6 +813,18 @@ public final class ASTHelper {
     @SuppressWarnings("unchecked")
     public static List<TagElement> tags(Javadoc node) {
         return node.tags();
+    }
+
+    /**
+     * Generecized version of the equivalent JDT method.
+     *
+     * @param node the node on which to call the equivalent JDT method
+     * @return a List of types
+     * @see MethodDeclaration#thrownExceptionTypes()
+     */
+    @SuppressWarnings("unchecked")
+    public static List<Type> thrownExceptionTypes(MethodDeclaration node) {
+        return node.thrownExceptionTypes();
     }
 
     /**

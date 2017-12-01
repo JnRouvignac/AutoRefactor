@@ -25,18 +25,16 @@
  */
 package org.autorefactor.refactoring.rules;
 
-import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
-import static org.autorefactor.refactoring.ASTHelper.instanceOf;
+import static org.autorefactor.refactoring.ASTHelper.*;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
-import org.autorefactor.preferences.Preferences;
-import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
-import org.eclipse.jdt.core.dom.Name;
+import org.eclipse.jdt.core.dom.Type;
 
 /** See {@link #getDescription()} method. */
 public final class RemoveUncheckedThrowsClausesRefactoring extends AbstractRefactoringRule {
@@ -52,25 +50,13 @@ public final class RemoveUncheckedThrowsClausesRefactoring extends AbstractRefac
     }
 
     @Override
-    public boolean isEnabled(Preferences preferences) {
-        // TODO: remove check for java8 implementation
-        return super.isEnabled(preferences);
-    }
-
-    private boolean apiLevel7orLower() {
-        return ctx.getAST().apiLevel() <= AST.JLS4;
-    }
-
-    @Override
     public boolean visit(MethodDeclaration node) {
-        if (apiLevel7orLower()) {
-            List<ASTNode> nodesToRemove = getUncheckedExceptions(node);
-            if (!nodesToRemove.isEmpty()) {
-                for (ASTNode n:nodesToRemove) {
-                    ctx.getRefactorings().replace(n, null);
-                }
-                return DO_NOT_VISIT_SUBTREE;
+        final Collection<ASTNode> nodesToRemove = getUncheckedExceptions(node);
+        if (!nodesToRemove.isEmpty()) {
+            for (ASTNode n : nodesToRemove) {
+                ctx.getRefactorings().replace(n, null);
             }
+            return DO_NOT_VISIT_SUBTREE;
         }
         return VISIT_SUBTREE;
     }
@@ -82,11 +68,9 @@ public final class RemoveUncheckedThrowsClausesRefactoring extends AbstractRefac
      *                if this operation is used in a JLS8 or later AST In the JLS8 API,<br>
      *                this method is replaced by {@link MethodDeclaration#thrownExceptionTypes}.
      */
-    private List<ASTNode> getUncheckedExceptions(MethodDeclaration node) {
+    private Collection<ASTNode> getUncheckedExceptions(MethodDeclaration node) {
         List<ASTNode> result = new ArrayList<>();
-        // TODO: add a check for api level and invoke corresponding method
-        List<Name> exceptions = node.thrownExceptions();
-        for (Name n:exceptions) {
+        for (Type n : thrownExceptionTypes(node)) {
             if (isUnchecked(n)) {
                 result.add(n);
             }
@@ -94,8 +78,9 @@ public final class RemoveUncheckedThrowsClausesRefactoring extends AbstractRefac
         return result;
     }
 
-    private boolean isUnchecked(Name n) {
-        return instanceOf(n, "java.lang.RuntimeException")
-                || instanceOf(n, "java.lang.Error");
+    private boolean isUnchecked(Type type) {
+        final ITypeBinding binding = type.resolveBinding();
+        return instanceOf(binding, "java.lang.RuntimeException")
+                || instanceOf(binding, "java.lang.Error");
     }
 }

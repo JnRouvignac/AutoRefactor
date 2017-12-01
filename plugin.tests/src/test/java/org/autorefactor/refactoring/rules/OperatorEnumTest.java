@@ -95,7 +95,7 @@ public class OperatorEnumTest {
 
     @Test
     public void simpleTestCompareExpressions() {
-        final AST ast = AST.newAST(AST.JLS4);
+        final AST ast = AST.newAST(AST.JLS8);
         final Assignment op1 = ast.newAssignment();
         op1.setOperator(Assignment.Operator.ASSIGN);
         final InfixExpression op2 = ast.newInfixExpression();
