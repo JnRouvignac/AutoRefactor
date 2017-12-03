@@ -28,9 +28,18 @@ package org.autorefactor.refactoring.rules.samples_out;
 
 public class StringSample {
 
-    public String replaceStringValueOfOnAString(String s) {
+    public String replaceValueOfOnStringLiteral() {
         // Keep this comment
-        return s;
+        return "foo";
+    }
+
+    public String doNotReplaceNullableString(String s) {
+        return String.valueOf(s);
+    }
+
+    public String replaceNewStringInMethodInvocation(String s, int i) {
+        // Keep this comment
+        return (s + i).toLowerCase();
     }
 
     public String replaceStringToString(String s) {

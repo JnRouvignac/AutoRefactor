@@ -34,13 +34,15 @@ import static org.autorefactor.refactoring.ASTHelper.hasType;
 import org.autorefactor.refactoring.ASTBuilder;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.Expression;
+import org.eclipse.jdt.core.dom.InfixExpression;
+import org.eclipse.jdt.core.dom.StringLiteral;
 
 /** See {@link #getDescription()} method. */
 public class StringRatherThanNewStringRefactoring extends AbstractRefactoringRule {
     @Override
     public String getDescription() {
         return ""
-            + "Removes a String instance from a String constant or literal.";
+            + "Removes a String instance from a String literal.";
     }
 
     @Override
@@ -53,7 +55,8 @@ public class StringRatherThanNewStringRefactoring extends AbstractRefactoringRul
         if (hasType(node, "java.lang.String")
                 && arguments(node).size() == 1) {
             final Expression arg0 = arguments(node).get(0);
-            if (hasType(arg0, "java.lang.String")) {
+            if (hasType(arg0, "java.lang.String")
+                    && ((arg0 instanceof StringLiteral) || (arg0 instanceof InfixExpression))) {
                 final ASTBuilder b = ctx.getASTBuilder();
                 ctx.getRefactorings().replace(node, b.parenthesizeIfNeeded(b.copy(arg0)));
                 return DO_NOT_VISIT_SUBTREE;

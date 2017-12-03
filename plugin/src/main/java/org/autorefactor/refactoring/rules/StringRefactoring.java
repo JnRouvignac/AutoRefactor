@@ -35,6 +35,7 @@ import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
+import org.eclipse.jdt.core.dom.StringLiteral;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.eclipse.jdt.core.dom.ASTNode.*;
@@ -91,8 +92,10 @@ public class StringRefactoring extends AbstractRefactoringRule {
                 }
             }
         } else if (isStringValueOf && hasType(arg0(node), "java.lang.String")) {
-            r.replace(node, b.move(arg0(node)));
-            return DO_NOT_VISIT_SUBTREE;
+            if ((arg0(node) instanceof StringLiteral) || (arg0(node) instanceof InfixExpression)) {
+                r.replace(node, b.parenthesizeIfNeeded(b.move(arg0(node))));
+                return DO_NOT_VISIT_SUBTREE;
+            }
         } else if ((isToStringForPrimitive(node) || isStringValueOf)
                 && parent.getNodeType() == INFIX_EXPRESSION) {
             // if node is in a String context, no need to call toString()

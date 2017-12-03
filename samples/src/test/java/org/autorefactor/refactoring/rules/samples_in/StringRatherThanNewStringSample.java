@@ -33,8 +33,7 @@ public class StringRatherThanNewStringSample {
         return new String("");
     }
 
-    public String replaceNewStringFromStringExpression(String s) {
-        // Keep this comment
+    public String doNotReplaceNullableString(String s) {
         return new String(s);
     }
 
