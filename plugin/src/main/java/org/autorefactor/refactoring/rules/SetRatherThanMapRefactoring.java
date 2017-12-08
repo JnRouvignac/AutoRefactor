@@ -68,8 +68,12 @@ public class SetRatherThanMapRefactoring extends AbstractClassSubstituteRefactor
     }
 
     @Override
-    protected String getSubstitutingClassName() {
-        return null;
+    protected String getSubstitutingClassName(String origRawType) {
+        if ("java.util.HashMap".equals(origRawType)) {
+            return "java.util.HashSet";
+        } else {
+            return "java.util.TreeSet";
+        }
     }
 
     @Override
@@ -87,12 +91,7 @@ public class SetRatherThanMapRefactoring extends AbstractClassSubstituteRefactor
      * @return the substitute type.
      */
     protected Type substituteType(final ASTBuilder b, final Type origType, ASTNode originalExpr) {
-        String substitutingType;
-        if ("java.util.HashMap".equals(origType.resolveBinding().getErasure().getQualifiedName())) {
-            substitutingType = "java.util.HashSet";
-        } else {
-            substitutingType = "java.util.TreeSet";
-        }
+        String substitutingType = getSubstitutingClassName(origType.resolveBinding().getErasure().getQualifiedName());
 
         final ITypeBinding origTypeBinding = origType.resolveBinding();
         final TypeNameDecider typeNameDecider = new TypeNameDecider(originalExpr);

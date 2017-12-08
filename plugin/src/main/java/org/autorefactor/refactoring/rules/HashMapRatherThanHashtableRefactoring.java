@@ -63,7 +63,7 @@ public class HashMapRatherThanHashtableRefactoring extends AbstractClassSubstitu
     }
 
     @Override
-    protected String getSubstitutingClassName() {
+    protected String getSubstitutingClassName(String origRawType) {
         return "java.util.HashMap";
     }
 

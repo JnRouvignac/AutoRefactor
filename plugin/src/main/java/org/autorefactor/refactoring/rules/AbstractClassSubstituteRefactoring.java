@@ -77,9 +77,11 @@ public abstract class AbstractClassSubstituteRefactoring extends AbstractRefacto
     /**
      * Get the substituting class name.
      *
+     * @param origRawType The original raw type.
+     *
      * @return the substituting class name.
      */
-    protected abstract String getSubstitutingClassName();
+    protected abstract String getSubstitutingClassName(String origRawType);
 
     /**
      * If a local variable can be used in a runnable.
@@ -149,6 +151,45 @@ public abstract class AbstractClassSubstituteRefactoring extends AbstractRefacto
      */
     protected boolean canCodeBeRefactored() {
         return true;
+    }
+
+    /**
+     * Returns the substitute type.
+     *
+     * @param b The builder.
+     * @param origType The original type
+     * @param originalExpr The original expression
+     * @return the substitute type.
+     */
+    protected Type substituteType(final ASTBuilder b, final Type origType, final ASTNode originalExpr) {
+        final ITypeBinding origTypeBinding = origType.resolveBinding();
+        final String origRawType = origTypeBinding.getErasure().getQualifiedName();
+        final TypeNameDecider typeNameDecider = new TypeNameDecider(originalExpr);
+
+        if (origTypeBinding.isParameterizedType()) {
+            final ITypeBinding[] origTypeArgs = origTypeBinding.getTypeArguments();
+            final Type[] newTypes = new Type[origTypeArgs.length];
+            for (int i = 0; i < origTypeArgs.length; i++) {
+                newTypes[i] = b.toType(origTypeArgs[i], typeNameDecider);
+            }
+            return b.genericType(getSubstitutingClassName(origRawType),
+                    newTypes);
+        }
+
+        return b.type(getSubstitutingClassName(origRawType));
+    }
+
+    /**
+     * True if the type of the variable is compatible.
+     *
+     * @param variableType The type of the variable.
+     * @param nodeTypeBinding The type of the node.
+     *
+     * @return true if the type of the variable is compatible.
+     */
+    protected boolean isTypeCompatible(final ITypeBinding variableType,
+            final ITypeBinding nodeTypeBinding) {
+        return Objects.equals(variableType, nodeTypeBinding);
     }
 
     @Override
@@ -245,31 +286,6 @@ public abstract class AbstractClassSubstituteRefactoring extends AbstractRefacto
         }
     }
 
-    /**
-     * Returns the substitute type.
-     *
-     * @param b The builder.
-     * @param origType The original type
-     * @param originalExpr The original expression
-     * @return the substitute type.
-     */
-    protected Type substituteType(final ASTBuilder b, final Type origType, final ASTNode originalExpr) {
-        final ITypeBinding origTypeBinding = origType.resolveBinding();
-        final TypeNameDecider typeNameDecider = new TypeNameDecider(originalExpr);
-
-        if (origTypeBinding.isParameterizedType()) {
-            final ITypeBinding[] origTypeArgs = origTypeBinding.getTypeArguments();
-            final Type[] newTypes = new Type[origTypeArgs.length];
-            for (int i = 0; i < origTypeArgs.length; i++) {
-                newTypes[i] = b.toType(origTypeArgs[i], typeNameDecider);
-            }
-            return b.genericType(getSubstitutingClassName(),
-                    newTypes);
-        }
-
-        return b.type(getSubstitutingClassName());
-    }
-
     private boolean canInstantiationBeRefactored(final ASTNode node,
             final ITypeBinding nodeTypeBinding,
             final List<VariableDeclaration> variablesToRefactor, final List<MethodInvocation> methodCallsToRefactor) {
@@ -321,18 +337,6 @@ public abstract class AbstractClassSubstituteRefactoring extends AbstractRefacto
         default:
             return true;
         }
-    }
-
-    /**
-     * True if the type of the variable is compatible.
-     *
-     * @param variableType The type of the variable.
-     * @param nodeTypeBinding The type of the node.
-     *
-     * @return true if the type of the variable is compatible.
-     */
-    public boolean isTypeCompatible(final ITypeBinding variableType, final ITypeBinding nodeTypeBinding) {
-        return Objects.equals(variableType, nodeTypeBinding);
     }
 
     private boolean isObjectPassedInParameter(final ASTNode subNode, final MethodInvocation mi) {

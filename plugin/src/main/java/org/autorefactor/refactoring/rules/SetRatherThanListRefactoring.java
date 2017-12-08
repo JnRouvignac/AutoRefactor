@@ -55,7 +55,7 @@ public class SetRatherThanListRefactoring extends AbstractClassSubstituteRefacto
     }
 
     @Override
-    protected String getSubstitutingClassName() {
+    protected String getSubstitutingClassName(String origRawType) {
         return "java.util.HashSet";
     }
 

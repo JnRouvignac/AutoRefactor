@@ -53,7 +53,7 @@ public class HashSetRatherThanTreeSetRefactoring extends AbstractClassSubstitute
     }
 
     @Override
-    protected String getSubstitutingClassName() {
+    protected String getSubstitutingClassName(String origRawType) {
         return "java.util.HashSet";
     }
 

@@ -60,7 +60,7 @@ public class StringBuilderRatherThanStringBufferRefactoring extends AbstractClas
     }
 
     @Override
-    protected String getSubstitutingClassName() {
+    protected String getSubstitutingClassName(String origRawType) {
         return "StringBuilder";
     }
 

@@ -63,7 +63,7 @@ public class ArrayDequeRatherThanStackRefactoring extends AbstractClassSubstitut
     }
 
     @Override
-    protected String getSubstitutingClassName() {
+    protected String getSubstitutingClassName(String origRawType) {
         return "java.util.ArrayDeque";
     }
 
