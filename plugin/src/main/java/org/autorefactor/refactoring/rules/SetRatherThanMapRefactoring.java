@@ -26,11 +26,14 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import static org.autorefactor.refactoring.ASTHelper.hasType;
 import static org.autorefactor.refactoring.ASTHelper.isMethod;
 import static org.autorefactor.refactoring.ASTHelper.isPassive;
 import static org.autorefactor.refactoring.ASTHelper.isPrimitive;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.Release;
@@ -46,6 +49,24 @@ import org.eclipse.jdt.core.dom.Type;
 
 /** See {@link #getDescription()} method. */
 public class SetRatherThanMapRefactoring extends AbstractClassSubstituteRefactoring {
+    private static Map<String, String[]> canBeCastedTo = new HashMap<>();
+
+    static {
+        canBeCastedTo.put("java.lang.Object", new String[]{"java.lang.Object"});
+        canBeCastedTo.put("java.lang.Cloneable", new String[]{"java.lang.Cloneable", "java.lang.Object"});
+        canBeCastedTo.put("java.io.Serializable",
+                new String[]{"java.io.Serializable", "java.lang.Object"});
+        canBeCastedTo.put("java.util.Map", new String[]{"java.util.Map", "java.lang.Object"});
+        canBeCastedTo.put("java.util.AbstractMap",
+                new String[]{"java.util.AbstractMap", "java.lang.Cloneable", "java.lang.Object"});
+        canBeCastedTo.put("java.util.TreeMap",
+                new String[]{"java.util.TreeMap", "java.io.Serializable", "java.util.Map",
+                    "java.util.AbstractMap", "java.lang.Cloneable", "java.lang.Object"});
+        canBeCastedTo.put("java.util.HashMap",
+                new String[]{"java.util.HashMap", "java.io.Serializable", "java.util.Map",
+                    "java.util.AbstractMap", "java.lang.Cloneable", "java.lang.Object"});
+    }
+
     @Override
     public String getDescription() {
         return ""
@@ -71,8 +92,14 @@ public class SetRatherThanMapRefactoring extends AbstractClassSubstituteRefactor
     protected String getSubstitutingClassName(String origRawType) {
         if ("java.util.HashMap".equals(origRawType)) {
             return "java.util.HashSet";
-        } else {
+        } else if ("java.util.TreeMap".equals(origRawType)) {
             return "java.util.TreeSet";
+        } else if ("java.util.AbstractMap".equals(origRawType)) {
+            return "java.util.AbstractSet";
+        } else if ("java.util.Map".equals(origRawType)) {
+            return "java.util.Set";
+        } else {
+            return null;
         }
     }
 
@@ -115,12 +142,9 @@ public class SetRatherThanMapRefactoring extends AbstractClassSubstituteRefactor
     @Override
     protected boolean canMethodBeRefactored(final MethodInvocation mi,
             final List<MethodInvocation> methodCallsToRefactor) {
-        if (isMethod(mi, "java.util.HashMap", "clear")
-                || isMethod(mi, "java.util.HashMap", "isEmpty")
-                || isMethod(mi, "java.util.HashMap", "size")
-                || isMethod(mi, "java.util.TreeMap", "clear")
-                || isMethod(mi, "java.util.AbstractMap", "isEmpty")
-                || isMethod(mi, "java.util.TreeMap", "size")
+        if (isMethod(mi, "java.util.Map", "clear")
+                || isMethod(mi, "java.util.Map", "isEmpty")
+                || isMethod(mi, "java.util.Map", "size")
                 || isMethod(mi, "java.lang.Object", "finalize")
                 || isMethod(mi, "java.lang.Object", "notify")
                 || isMethod(mi, "java.lang.Object", "notifyAll")
@@ -128,20 +152,17 @@ public class SetRatherThanMapRefactoring extends AbstractClassSubstituteRefactor
                 || isMethod(mi, "java.lang.Object", "wait", "long")
                 || isMethod(mi, "java.lang.Object", "wait", "long", "int")) {
             return true;
-        } else if (isMethod(mi, "java.util.HashMap", "containsKey", "java.lang.Object")
-                || isMethod(mi, "java.util.TreeMap", "containsKey", "java.lang.Object")) {
+        } else if (isMethod(mi, "java.util.Map", "containsKey", "java.lang.Object")) {
             methodCallsToRefactor.add(mi);
             return true;
-        } else if (isMethod(mi, "java.util.HashMap", "put", "java.lang.Object", "java.lang.Object")
-                || isMethod(mi, "java.util.TreeMap", "put", "java.lang.Object", "java.lang.Object")) {
+        } else if (isMethod(mi, "java.util.Map", "put", "java.lang.Object", "java.lang.Object")) {
             if (isPassive((Expression) mi.arguments().get(1))) {
                 methodCallsToRefactor.add(mi);
                 return true;
             } else {
                 return false;
             }
-        } else if (isMethod(mi, "java.util.HashMap", "remove", "java.lang.Object")
-                || isMethod(mi, "java.util.TreeMap", "remove", "java.lang.Object")) {
+        } else if (isMethod(mi, "java.util.Map", "remove", "java.lang.Object")) {
             return isReturnValueLost(mi);
         } else {
             // Here are the following cases:
@@ -175,13 +196,19 @@ public class SetRatherThanMapRefactoring extends AbstractClassSubstituteRefactor
     @Override
     protected void refactorMethod(final ASTBuilder b, final MethodInvocation originalMi,
             final MethodInvocation refactoredMi) {
-        if (isMethod(originalMi, "java.util.HashMap", "containsKey", "java.lang.Object")
-                || isMethod(originalMi, "java.util.TreeMap", "containsKey", "java.lang.Object")) {
+        if (isMethod(originalMi, "java.util.Map", "containsKey", "java.lang.Object")) {
             refactoredMi.setName(b.simpleName("contains"));
-        } else if (isMethod(originalMi, "java.util.HashMap", "put", "java.lang.Object", "java.lang.Object")
-                || isMethod(originalMi, "java.util.TreeMap", "put", "java.lang.Object", "java.lang.Object")) {
+        } else if (isMethod(originalMi, "java.util.Map", "put", "java.lang.Object", "java.lang.Object")) {
             refactoredMi.setName(b.simpleName("add"));
             refactoredMi.arguments().remove(1);
         }
+    }
+
+    @Override
+    protected boolean isTypeCompatible(final ITypeBinding variableType,
+            final ITypeBinding refType) {
+        return super.isTypeCompatible(variableType, refType)
+                || hasType(variableType, canBeCastedTo.getOrDefault(refType.getErasure().getQualifiedName(),
+                        new String[0]));
     }
 }

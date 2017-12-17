@@ -29,14 +29,32 @@ package org.autorefactor.refactoring.rules;
 import static org.autorefactor.refactoring.ASTHelper.hasType;
 import static org.autorefactor.refactoring.ASTHelper.isMethod;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.Expression;
+import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 
 /** See {@link #getDescription()} method. */
 public class HashMapRatherThanTreeMapRefactoring extends AbstractClassSubstituteRefactoring {
+    private static Map<String, String[]> canBeCastedTo = new HashMap<>();
+
+    static {
+        canBeCastedTo.put("java.lang.Object", new String[]{"java.lang.Object"});
+        canBeCastedTo.put("java.lang.Cloneable", new String[]{"java.lang.Cloneable", "java.lang.Object"});
+        canBeCastedTo.put("java.io.Serializable",
+                new String[]{"java.io.Serializable", "java.lang.Object"});
+        canBeCastedTo.put("java.util.Map", new String[]{"java.util.Map", "java.lang.Object"});
+        canBeCastedTo.put("java.util.AbstractMap",
+                new String[]{"java.util.AbstractMap", "java.lang.Cloneable", "java.lang.Object"});
+        canBeCastedTo.put("java.util.TreeMap",
+                new String[]{"java.util.TreeMap", "java.io.Serializable", "java.util.Map",
+                    "java.util.AbstractMap", "java.lang.Cloneable", "java.lang.Object"});
+    }
+
     @Override
     public String getDescription() {
         return ""
@@ -55,7 +73,11 @@ public class HashMapRatherThanTreeMapRefactoring extends AbstractClassSubstitute
 
     @Override
     protected String getSubstitutingClassName(String origRawType) {
-        return "java.util.HashMap";
+        if ("java.util.TreeMap".equals(origRawType)) {
+            return "java.util.HashMap";
+        } else {
+            return null;
+        }
     }
 
     @Override
@@ -87,5 +109,13 @@ public class HashMapRatherThanTreeMapRefactoring extends AbstractClassSubstitute
                 || isMethod(mi, "java.lang.Object", "wait")
                 || isMethod(mi, "java.lang.Object", "wait", "long")
                 || isMethod(mi, "java.lang.Object", "wait", "long", "int");
+    }
+
+    @Override
+    protected boolean isTypeCompatible(final ITypeBinding variableType,
+            final ITypeBinding refType) {
+        return super.isTypeCompatible(variableType, refType)
+                || hasType(variableType, canBeCastedTo.getOrDefault(refType.getErasure().getQualifiedName(),
+                        new String[0]));
     }
 }

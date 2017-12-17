@@ -65,14 +65,21 @@ public class HashMapRatherThanTreeMapSample {
         java.util.HashMap<String, String> map = new java.util.HashMap<String, String>();
     }
 
-    public void doNotReplaceInterface() {
+    public void replaceMapVariableDeclaration() {
         // Keep this comment
-        Map<String, String> map = new TreeMap<String, String>();
+        Map<String, String> map = new java.util.HashMap<String, String>();
     }
 
     public void replaceTreeMapVariableUse() {
         // Keep this comment
         java.util.HashMap<String, String> map = new java.util.HashMap<String, String>();
+        // Keep this comment too
+        map.put("foo", "bar");
+    }
+
+    public void replaceMapVariableUse() {
+        // Keep this comment
+        Map<String, String> map = new java.util.HashMap<String, String>();
         // Keep this comment too
         map.put("foo", "bar");
     }
@@ -87,9 +94,25 @@ public class HashMapRatherThanTreeMapSample {
         return map.remove(789L);
     }
 
+    public Date replaceMapWithLoop(List<Date> dates) {
+        // Keep this comment
+        Map<Long, Date> map = new java.util.HashMap<Long, Date>();
+        for (Date date : dates) {
+            map.put(date.getTime(), date);
+        }
+
+        return map.remove(789L);
+    }
+
     public Observer replaceTreeMapWithModifier() {
         // Keep this comment
         final java.util.HashMap<String, Observer> map = new java.util.HashMap<String, Observer>();
+        return map.get("foo");
+    }
+
+    public Observer replaceMapWithModifier() {
+        // Keep this comment
+        final Map<String, Observer> map = new java.util.HashMap<String, Observer>();
         return map.get("foo");
     }
 
@@ -99,8 +122,19 @@ public class HashMapRatherThanTreeMapSample {
         map.put(123L, 456L);
     }
 
+    public void replaceMapWithParameter() {
+        // Keep this comment
+        Map<Long, Long> map = new java.util.HashMap<Long, Long>(new java.util.HashMap<Long, Long>());
+        map.put(123L, 456L);
+    }
+
     public void doNotReplaceTreeMapWithComparator(Comparator<Long> comparator) {
         TreeMap<Long, Long> map = new TreeMap<Long, Long>(comparator);
+        map.put(123L, 456L);
+    }
+
+    public void doNotReplaceMapWithComparator(Comparator<Long> comparator) {
+        Map<Long, Long> map = new TreeMap<Long, Long>(comparator);
         map.put(123L, 456L);
     }
 
@@ -111,6 +145,18 @@ public class HashMapRatherThanTreeMapSample {
 
         // Keep this comment too
         java.util.HashMap<String, String> map2 = map1;
+        map2.put("bar", "BAR");
+
+        return map2.isEmpty();
+    }
+
+    public boolean replaceReassignedMap() {
+        // Keep this comment
+        Map<String, String> map1 = new java.util.HashMap<String, String>();
+        map1.put("foo", "FOO");
+
+        // Keep this comment too
+        Map<String, String> map2 = map1;
         map2.put("bar", "BAR");
 
         return map2.isEmpty();
@@ -270,7 +316,7 @@ public class HashMapRatherThanTreeMapSample {
         return map.values();
     }
 
-    public void refactorWithMethods(Map<Integer, String> anotherMap) throws InterruptedException {
+    public void refactorWithTreeMapMethods(Map<Integer, String> anotherMap) throws InterruptedException {
         // Keep this comment
         java.util.HashMap<Integer, String> map = new java.util.HashMap<Integer, String>();
         map.containsKey(123);
@@ -288,7 +334,25 @@ public class HashMapRatherThanTreeMapSample {
         map.wait(1000, 1000);
     }
 
-    public void replaceMapThroughRunnable() {
+    public void refactorWithMapMethods(Map<Integer, String> anotherMap) throws InterruptedException {
+        // Keep this comment
+        Map<Integer, String> map = new java.util.HashMap<Integer, String>();
+        map.containsKey(123);
+        map.containsValue("Lorem ipsum");
+        map.get(123);
+        map.isEmpty();
+        map.put(123, "Lorem ipsum");
+        map.putAll(anotherMap);
+        map.remove(123);
+        map.size();
+        map.notify();
+        map.notifyAll();
+        map.wait();
+        map.wait(1000);
+        map.wait(1000, 1000);
+    }
+
+    public void replaceTreeMapThroughRunnable() {
         // Keep this comment
         final java.util.HashMap<String, String> map = new java.util.HashMap<String, String>();
         new Runnable() {
@@ -300,7 +364,19 @@ public class HashMapRatherThanTreeMapSample {
         };
     }
 
-    public void replaceMapInsideRunnable() {
+    public void replaceMapThroughRunnable() {
+        // Keep this comment
+        final Map<String, String> map = new java.util.HashMap<String, String>();
+        new Runnable() {
+
+            @Override
+            public void run() {
+                map.put("foo", "bar");
+            }
+        };
+    }
+
+    public void replaceTreeMapInsideRunnable() {
         // Keep this comment
         final java.util.HashMap<String, String> map = new java.util.HashMap<String, String>();
         map.put("foo", "bar");
@@ -310,6 +386,21 @@ public class HashMapRatherThanTreeMapSample {
             public void run() {
                 // Keep this comment too
                 final java.util.HashMap<String, String> localMap = new java.util.HashMap<String, String>();
+                localMap.put("foo", "bar");
+            }
+        };
+    }
+
+    public void replaceMapInsideRunnable() {
+        // Keep this comment
+        final Map<String, String> map = new java.util.HashMap<String, String>();
+        map.put("foo", "bar");
+        new Runnable() {
+
+            @Override
+            public void run() {
+                // Keep this comment too
+                final Map<String, String> localMap = new java.util.HashMap<String, String>();
                 localMap.put("foo", "bar");
             }
         };

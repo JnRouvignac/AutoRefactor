@@ -62,9 +62,9 @@ public class ArrayListRatherThanLinkedListSample {
         java.util.ArrayList<LinkedList<String>> list = new java.util.ArrayList<LinkedList<String>>();
     }
 
-    public void doNotReplaceInterface() {
+    public void replaceInterface() {
         // Keep this comment
-        List<String> list = new LinkedList<String>();
+        List<String> list = new java.util.ArrayList<String>();
     }
 
     public void replaceLinkedListVariableUse() {
@@ -74,9 +74,23 @@ public class ArrayListRatherThanLinkedListSample {
         list.add("bar");
     }
 
+    public void refactorListVariableUse() {
+        // Keep this comment
+        List<String> list = new java.util.ArrayList<String>();
+        // Keep this comment too
+        list.add("bar");
+    }
+
     public void refactorWithMethod() {
         // Keep this comment
         java.util.ArrayList<Observable> list = new java.util.ArrayList<Observable>();
+        // Keep this comment too
+        list.toArray();
+    }
+
+    public void refactorListWithMethod() {
+        // Keep this comment
+        List<Observable> list = new java.util.ArrayList<Observable>();
         // Keep this comment too
         list.toArray();
     }
@@ -91,15 +105,37 @@ public class ArrayListRatherThanLinkedListSample {
         return list.toString();
     }
 
+    public String refactorListWithLoop(List<Date> dates) {
+        // Keep this comment
+        List<Date> list = new java.util.ArrayList<Date>();
+        for (Date date : dates) {
+            list.add(date);
+        }
+
+        return list.toString();
+    }
+
     public void replaceLinkedListWithModifier() {
         // Keep this comment
         final java.util.ArrayList<String> list = new java.util.ArrayList<String>();
         list.add("bar");
     }
 
+    public void refactorListWithModifier() {
+        // Keep this comment
+        final List<String> list = new java.util.ArrayList<String>();
+        list.add("bar");
+    }
+
     public void replaceLinkedListWithParameter() {
         // Keep this comment
         java.util.ArrayList<String> list = new java.util.ArrayList<String>(new java.util.ArrayList<String>());
+        list.add("bar");
+    }
+
+    public void refactorListWithParameter() {
+        // Keep this comment
+        List<String> list = new java.util.ArrayList<String>(new java.util.ArrayList<String>());
         list.add("bar");
     }
 
@@ -110,6 +146,18 @@ public class ArrayListRatherThanLinkedListSample {
 
         // Keep this comment too
         java.util.ArrayList<String> list2 = list1;
+        list2.add("BAR");
+
+        return list2.isEmpty();
+    }
+
+    public boolean replaceReassignedList() {
+        // Keep this comment
+        java.util.ArrayList<String> list1 = new java.util.ArrayList<String>();
+        list1.add("FOO");
+
+        // Keep this comment too
+        List<String> list2 = list1;
         list2.add("BAR");
 
         return list2.isEmpty();
@@ -273,7 +321,12 @@ public class ArrayListRatherThanLinkedListSample {
         return list.set(index, element);
     }
 
-    public void replaceListWithRunnable() {
+    public String doNotReplaceSetOnList(int index, String element) {
+        List<String> list = new LinkedList<String>();
+        return list.set(index, element);
+    }
+
+    public void replaceLinkedListWithRunnable() {
         // Keep this comment
         final java.util.ArrayList<String> list = new java.util.ArrayList<String>();
         new Runnable() {
@@ -281,6 +334,19 @@ public class ArrayListRatherThanLinkedListSample {
             @Override
             public void run() {
                 final java.util.ArrayList<String> localList = new java.util.ArrayList<String>();
+                localList.add("foo");
+            }
+        };
+    }
+
+    public void replaceListWithRunnable() {
+        // Keep this comment
+        final List<String> list = new java.util.ArrayList<String>();
+        new Runnable() {
+
+            @Override
+            public void run() {
+                final List<String> localList = new java.util.ArrayList<String>();
                 localList.add("foo");
             }
         };

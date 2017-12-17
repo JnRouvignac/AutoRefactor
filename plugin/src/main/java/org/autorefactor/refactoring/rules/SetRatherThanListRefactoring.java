@@ -25,16 +25,42 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import static org.autorefactor.refactoring.ASTHelper.hasType;
 import static org.autorefactor.refactoring.ASTHelper.isMethod;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.autorefactor.refactoring.ASTBuilder;
 import org.eclipse.jdt.core.dom.Block;
+import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 
 /** See {@link #getDescription()} method. */
 public class SetRatherThanListRefactoring extends AbstractClassSubstituteRefactoring {
+    private static Map<String, String[]> canBeCastedTo = new HashMap<>();
+
+    static {
+        canBeCastedTo.put("java.lang.Object", new String[]{"java.lang.Object"});
+        canBeCastedTo.put("java.lang.Cloneable", new String[]{"java.lang.Cloneable", "java.lang.Object"});
+        canBeCastedTo.put("java.io.Serializable",
+                new String[]{"java.io.Serializable", "java.lang.Object"});
+        canBeCastedTo.put("java.util.Collection", new String[]{"java.util.Collection", "java.lang.Object"});
+        canBeCastedTo.put("java.util.List", new String[]{"java.util.List", "java.lang.Object"});
+        canBeCastedTo.put("java.util.AbstractList",
+                new String[]{"java.util.AbstractList", "java.util.List", "java.lang.Object"});
+        canBeCastedTo.put("java.util.AbstractCollection",
+                new String[]{"java.util.AbstractCollection", "java.util.Collection", "java.lang.Object"});
+        canBeCastedTo.put("java.util.LinkedList",
+                new String[]{"java.util.LinkedList", "java.util.AbstractList", "java.util.List",
+                    "java.util.AbstractCollection", "java.util.Collection",
+                    "java.io.Serializable", "java.lang.Cloneable", "java.lang.Object"});
+        canBeCastedTo.put("java.util.ArrayList",
+                new String[]{"java.util.ArrayList", "java.util.AbstractList", "java.util.List",
+                    "java.util.AbstractCollection", "java.util.Collection",
+                    "java.io.Serializable", "java.lang.Cloneable", "java.lang.Object"});
+    }
 
     private boolean isContainsMethodUsed = false;
 
@@ -50,13 +76,26 @@ public class SetRatherThanListRefactoring extends AbstractClassSubstituteRefacto
     }
 
     @Override
+    public boolean visit(Block node) {
+        isContainsMethodUsed = false;
+        return super.visit(node);
+
+    }
+
+    @Override
     protected String[] getExistingClassCanonicalName() {
-        return new String[] {"java.util.ArrayList"};
+        return new String[] {"java.util.ArrayList", "java.util.LinkedList"};
     }
 
     @Override
     protected String getSubstitutingClassName(String origRawType) {
-        return "java.util.HashSet";
+        if ("java.util.ArrayList".equals(origRawType) || "java.util.LinkedList".equals(origRawType)) {
+            return "java.util.HashSet";
+        } else if ("java.util.AbstractList".equals(origRawType) || "java.util.List".equals(origRawType)) {
+            return "java.util.Set";
+        } else {
+            return null;
+        }
     }
 
     @Override
@@ -72,7 +111,7 @@ public class SetRatherThanListRefactoring extends AbstractClassSubstituteRefacto
     @Override
     protected boolean canMethodBeRefactored(final MethodInvocation mi,
             final List<MethodInvocation> methodCallsToRefactor) {
-        if (isMethod(mi, "java.util.List", "contains", "java.lang.Object")) {
+        if (isMethod(mi, "java.util.Collection", "contains", "java.lang.Object")) {
             isContainsMethodUsed = true;
         }
 
@@ -82,11 +121,11 @@ public class SetRatherThanListRefactoring extends AbstractClassSubstituteRefacto
             return true;
         }
 
-        return isMethod(mi, "java.util.List", "add", "java.lang.Object")
-                || isMethod(mi, "java.util.List", "addAll", "java.util.Collection")
-                || isMethod(mi, "java.util.List", "clear")
-                || isMethod(mi, "java.util.List", "contains", "java.lang.Object")
-                || isMethod(mi, "java.util.List", "isEmpty")
+        return isMethod(mi, "java.util.Collection", "add", "java.lang.Object")
+                || isMethod(mi, "java.util.Collection", "addAll", "java.util.Collection")
+                || isMethod(mi, "java.util.Collection", "clear")
+                || isMethod(mi, "java.util.Collection", "contains", "java.lang.Object")
+                || isMethod(mi, "java.util.Collection", "isEmpty")
                 || isMethod(mi, "java.lang.Object", "finalize")
                 || isMethod(mi, "java.lang.Object", "notify")
                 || isMethod(mi, "java.lang.Object", "notifyAll")
@@ -95,6 +134,7 @@ public class SetRatherThanListRefactoring extends AbstractClassSubstituteRefacto
                 || isMethod(mi, "java.lang.Object", "wait", "long", "int");
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     protected void refactorMethod(final ASTBuilder b, final MethodInvocation originalMi,
             final MethodInvocation refactoredMi) {
@@ -103,19 +143,14 @@ public class SetRatherThanListRefactoring extends AbstractClassSubstituteRefacto
             Object item = refactoredMi.arguments().get(1);
             refactoredMi.arguments().clear();
             refactoredMi.arguments().add(item);
-
-            if (refactoredMi.typeArguments() != null && !refactoredMi.typeArguments().isEmpty()) {
-                Object itemType = refactoredMi.typeArguments().get(1);
-                refactoredMi.typeArguments().clear();
-                refactoredMi.typeArguments().add(itemType);
-            }
         }
     }
 
     @Override
-    public boolean visit(Block node) {
-        isContainsMethodUsed = false;
-        return super.visit(node);
-
+    protected boolean isTypeCompatible(final ITypeBinding variableType,
+            final ITypeBinding refType) {
+        return super.isTypeCompatible(variableType, refType)
+                || hasType(variableType, canBeCastedTo.getOrDefault(refType.getErasure().getQualifiedName(),
+                        new String[0]));
     }
 }

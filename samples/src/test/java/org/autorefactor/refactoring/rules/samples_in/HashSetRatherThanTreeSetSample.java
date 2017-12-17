@@ -64,14 +64,33 @@ public class HashSetRatherThanTreeSetSample {
         TreeSet<String> set = new TreeSet<String>();
     }
 
-    public void doNotReplaceInterface() {
+    public void replaceSetVariableDeclaration() {
         // Keep this comment
         Set<String> set = new TreeSet<String>();
+    }
+
+    public void replaceCollectionVariableDeclaration() {
+        // Keep this comment
+        Collection<String> set = new TreeSet<String>();
     }
 
     public void replaceTreeSetVariableUse() {
         // Keep this comment
         TreeSet<String> set = new TreeSet<String>();
+        // Keep this comment too
+        set.add("foo");
+    }
+
+    public void replaceSetVariableUse() {
+        // Keep this comment
+        Set<String> set = new TreeSet<String>();
+        // Keep this comment too
+        set.add("foo");
+    }
+
+    public void replaceCollectionVariableUse() {
+        // Keep this comment
+        Collection<String> set = new TreeSet<String>();
         // Keep this comment too
         set.add("foo");
     }
@@ -86,15 +105,59 @@ public class HashSetRatherThanTreeSetSample {
         return set.remove(789L);
     }
 
+    public boolean replaceSetWithLoop(List<Date> dates) {
+        // Keep this comment
+        Set<Long> set = new TreeSet<Long>();
+        for (Date date : dates) {
+            set.add(date.getTime());
+        }
+
+        return set.remove(789L);
+    }
+
+    public boolean replaceCollectionWithLoop(List<Date> dates) {
+        // Keep this comment
+        Collection<Long> set = new TreeSet<Long>();
+        for (Date date : dates) {
+            set.add(date.getTime());
+        }
+
+        return set.remove(789L);
+    }
+
     public boolean replaceTreeSetWithModifier() {
         // Keep this comment
         final TreeSet<String> set = new TreeSet<String>();
         return set.add("foo");
     }
 
+    public boolean replaceSetWithModifier() {
+        // Keep this comment
+        final Set<String> set = new TreeSet<String>();
+        return set.add("foo");
+    }
+
+    public boolean replaceCollectionWithModifier() {
+        // Keep this comment
+        final Collection<String> set = new TreeSet<String>();
+        return set.add("foo");
+    }
+
     public void replaceTreeSetWithParameter() {
         // Keep this comment
         TreeSet<char[]> set = new TreeSet<char[]>(new java.util.HashSet<char[]>());
+        set.add(new char[] {'a'});
+    }
+
+    public void replaceSetWithParameter() {
+        // Keep this comment
+        Set<char[]> set = new TreeSet<char[]>(new java.util.HashSet<char[]>());
+        set.add(new char[] {'a'});
+    }
+
+    public void replaceCollectionWithParameter() {
+        // Keep this comment
+        Collection<char[]> set = new TreeSet<char[]>(new java.util.HashSet<char[]>());
         set.add(new char[] {'a'});
     }
 
@@ -110,6 +173,30 @@ public class HashSetRatherThanTreeSetSample {
 
         // Keep this comment too
         TreeSet<String> set2 = set1;
+        set2.add("bar");
+
+        return set2.isEmpty();
+    }
+
+    public boolean replaceReassignedSet() {
+        // Keep this comment
+        Set<String> set1 = new TreeSet<String>();
+        set1.add("foo");
+
+        // Keep this comment too
+        Set<String> set2 = set1;
+        set2.add("bar");
+
+        return set2.isEmpty();
+    }
+
+    public boolean replaceReassignedCollection() {
+        // Keep this comment
+        Collection<String> set1 = new TreeSet<String>();
+        set1.add("foo");
+
+        // Keep this comment too
+        Collection<String> set2 = set1;
         set2.add("bar");
 
         return set2.isEmpty();
@@ -241,7 +328,7 @@ public class HashSetRatherThanTreeSetSample {
         return set.toArray(a);
     }
 
-    public void refactorWithMethods(Collection<Integer> anotherCollection) throws InterruptedException {
+    public void refactorWithTreeSetMethods(Collection<Integer> anotherCollection) throws InterruptedException {
         // Keep this comment
         TreeSet<Integer> set = new TreeSet<Integer>();
         set.add(123);
@@ -261,7 +348,47 @@ public class HashSetRatherThanTreeSetSample {
         set.wait(1000, 1000);
     }
 
-    public void replaceMapThroughRunnable() {
+    public void refactorWithSetMethods(Collection<Integer> anotherCollection) throws InterruptedException {
+        // Keep this comment
+        Set<Integer> set = new TreeSet<Integer>();
+        set.add(123);
+        set.clear();
+        set.contains(anotherCollection);
+        set.isEmpty();
+        set.remove(123);
+        set.size();
+        set.removeAll(anotherCollection);
+        set.addAll(anotherCollection);
+        set.containsAll(anotherCollection);
+        set.retainAll(anotherCollection);
+        set.notify();
+        set.notifyAll();
+        set.wait();
+        set.wait(1000);
+        set.wait(1000, 1000);
+    }
+
+    public void refactorWithCollectionMethods(Collection<Integer> anotherCollection) throws InterruptedException {
+        // Keep this comment
+        Collection<Integer> collection = new TreeSet<Integer>();
+        collection.add(123);
+        collection.clear();
+        collection.contains(anotherCollection);
+        collection.isEmpty();
+        collection.remove(123);
+        collection.size();
+        collection.removeAll(anotherCollection);
+        collection.addAll(anotherCollection);
+        collection.containsAll(anotherCollection);
+        collection.retainAll(anotherCollection);
+        collection.notify();
+        collection.notifyAll();
+        collection.wait();
+        collection.wait(1000);
+        collection.wait(1000, 1000);
+    }
+
+    public void replaceTreeSetThroughRunnable() {
         // Keep this comment
         final TreeSet<String> set = new TreeSet<String>();
         new Runnable() {
@@ -273,7 +400,31 @@ public class HashSetRatherThanTreeSetSample {
         };
     }
 
-    public void replaceMapInsideRunnable() {
+    public void replaceSetThroughRunnable() {
+        // Keep this comment
+        final Set<String> set = new TreeSet<String>();
+        new Runnable() {
+
+            @Override
+            public void run() {
+                set.add("foo");
+            }
+        };
+    }
+
+    public void replaceCollectionThroughRunnable() {
+        // Keep this comment
+        final Collection<String> set = new TreeSet<String>();
+        new Runnable() {
+
+            @Override
+            public void run() {
+                set.add("foo");
+            }
+        };
+    }
+
+    public void replaceTreeSetInsideRunnable() {
         // Keep this comment
         final TreeSet<String> set = new TreeSet<String>();
         set.add("foo");
@@ -283,6 +434,36 @@ public class HashSetRatherThanTreeSetSample {
             public void run() {
                 // Keep this comment too
                 final TreeSet<String> localSet = new TreeSet<String>();
+                localSet.add("foo");
+            }
+        };
+    }
+
+    public void replaceSetInsideRunnable() {
+        // Keep this comment
+        final Set<String> set = new TreeSet<String>();
+        set.add("foo");
+        new Runnable() {
+
+            @Override
+            public void run() {
+                // Keep this comment too
+                final Set<String> localSet = new TreeSet<String>();
+                localSet.add("foo");
+            }
+        };
+    }
+
+    public void replaceCollectionInsideRunnable() {
+        // Keep this comment
+        final Collection<String> set = new TreeSet<String>();
+        set.add("foo");
+        new Runnable() {
+
+            @Override
+            public void run() {
+                // Keep this comment too
+                final Collection<String> localSet = new TreeSet<String>();
                 localSet.add("foo");
             }
         };

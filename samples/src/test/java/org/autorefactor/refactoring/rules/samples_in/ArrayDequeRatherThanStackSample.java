@@ -25,29 +25,31 @@
  */
 package org.autorefactor.refactoring.rules.samples_in;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.Stack;
+import java.util.Vector;
 import java.util.List;
 
 public class ArrayDequeRatherThanStackSample {
 
     public void replaceStackInstanceCreation() {
         // Keep this comment
-        String[] stringArray = new Stack<String>().toArray(null);
+        Object[] stringArray = new Stack<String>().toArray();
         // Keep this comment too
         int size = new Stack<String>().size();
     }
 
     public void replaceRawStack() {
         // Keep this comment
-        Object[] objectArray = new Stack().toArray(null);
+        Object[] objectArray = new Stack().toArray();
         // Keep this comment too
         int size = new Stack().size();
     }
 
     public void replaceFullyQualifiedStack() {
         // Keep this comment
-        Date[] dateArray = new java.util.Stack<Date>().toArray(null);
+        Object[] dateArray = new java.util.Stack<Date>().toArray();
         // Keep this comment too
         int size = new java.util.Stack().size();
     }
@@ -55,6 +57,16 @@ public class ArrayDequeRatherThanStackSample {
     public void replaceStackVariableDeclaration() {
         // Keep this comment
         Stack<String> queue = new Stack<String>();
+    }
+
+    public void replaceVectorVariableDeclaration() {
+        // Keep this comment
+        Vector<String> queue = new Stack<String>();
+    }
+
+    public void replaceCollectionVariableDeclaration() {
+        // Keep this comment
+        Collection<String> queue = new Stack<String>();
     }
 
     public void doNotReplaceInterface() {
@@ -69,9 +81,37 @@ public class ArrayDequeRatherThanStackSample {
         queue.add("bar");
     }
 
+    public void replaceVectorVariableUse() {
+        // Keep this comment
+        Vector<String> queue = new Stack<String>();
+        // Keep this comment too
+        queue.add("bar");
+    }
+
+    public void replaceCollectionVariableUse() {
+        // Keep this comment
+        Collection<String> queue = new Stack<String>();
+        // Keep this comment too
+        queue.add("bar");
+    }
+
     public void refactorMethod() {
         // Keep this comment
         Stack<String> queue = new Stack<String>();
+        // Keep this comment too
+        queue.toArray();
+    }
+
+    public void refactorVectorMethod() {
+        // Keep this comment
+        Vector<String> queue = new Stack<String>();
+        // Keep this comment too
+        queue.toArray();
+    }
+
+    public void refactorCollectionMethod() {
+        // Keep this comment
+        Collection<String> queue = new Stack<String>();
         // Keep this comment too
         queue.toArray();
     }
@@ -86,9 +126,41 @@ public class ArrayDequeRatherThanStackSample {
         return queue.toString();
     }
 
+    public String replaceVectorWithLoop(List<Date> dates) {
+        // Keep this comment
+        Vector<Date> queue = new Stack<Date>();
+        for (Date date : dates) {
+            queue.add(date);
+        }
+
+        return queue.toString();
+    }
+
+    public String replaceCollectionWithLoop(List<Date> dates) {
+        // Keep this comment
+        Collection<Date> queue = new Stack<Date>();
+        for (Date date : dates) {
+            queue.add(date);
+        }
+
+        return queue.toString();
+    }
+
     public void replaceStackWithModifier() {
         // Keep this comment
         final Stack<String> queue = new Stack<String>();
+        queue.add("bar");
+    }
+
+    public void replaceVectorWithModifier() {
+        // Keep this comment
+        final Vector<String> queue = new Stack<String>();
+        queue.add("bar");
+    }
+
+    public void replaceCollectionWithModifier() {
+        // Keep this comment
+        final Collection<String> queue = new Stack<String>();
         queue.add("bar");
     }
 
@@ -98,7 +170,19 @@ public class ArrayDequeRatherThanStackSample {
         queue.add("bar");
     }
 
-    public String[] replaceReassignedStack() {
+    public void replaceVectorWithParameter() {
+        // Keep this comment
+        Vector<String> queue = new Stack<String>();
+        queue.add("bar");
+    }
+
+    public void replaceCollectionWithParameter() {
+        // Keep this comment
+        Collection<String> queue = new Stack<String>();
+        queue.add("bar");
+    }
+
+    public Object[] replaceReassignedStack() {
         // Keep this comment
         Stack<String> queue1 = new Stack<String>();
         queue1.add("FOO");
@@ -107,7 +191,31 @@ public class ArrayDequeRatherThanStackSample {
         Stack<String> queue2 = queue1;
         queue2.add("BAR");
 
-        return queue2.toArray(null);
+        return queue2.toArray();
+    }
+
+    public Object[] replaceReassignedVector() {
+        // Keep this comment
+        Stack<String> queue1 = new Stack<String>();
+        queue1.add("FOO");
+
+        // Keep this comment too
+        Vector<String> queue2 = queue1;
+        queue2.add("BAR");
+
+        return queue2.toArray();
+    }
+
+    public Object[] replaceReassignedCollection() {
+        // Keep this comment
+        Stack<String> queue1 = new Stack<String>();
+        queue1.add("FOO");
+
+        // Keep this comment too
+        Collection<String> queue2 = queue1;
+        queue2.add("BAR");
+
+        return queue2.toArray();
     }
 
     public void doNotReplaceStackParameter(Stack<String> aStack) {
@@ -154,6 +262,32 @@ public class ArrayDequeRatherThanStackSample {
             @Override
             public void run() {
                 final Stack<String> localQueue = new Stack<String>();
+                localQueue.add("Local, it's safe.");
+            }
+        };
+    }
+
+    public void replaceVectorWithRunnable() {
+        // Keep this comment
+        final Vector<String> queue = new Stack<String>();
+        new Runnable() {
+
+            @Override
+            public void run() {
+                final Vector<String> localQueue = new Stack<String>();
+                localQueue.add("Local, it's safe.");
+            }
+        };
+    }
+
+    public void replaceCollectionWithRunnable() {
+        // Keep this comment
+        final Collection<String> queue = new Stack<String>();
+        new Runnable() {
+
+            @Override
+            public void run() {
+                final Collection<String> localQueue = new Stack<String>();
                 localQueue.add("Local, it's safe.");
             }
         };

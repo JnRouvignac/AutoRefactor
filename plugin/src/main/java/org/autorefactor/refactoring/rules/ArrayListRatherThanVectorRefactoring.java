@@ -26,17 +26,37 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import static org.autorefactor.refactoring.ASTHelper.hasType;
+import static org.autorefactor.refactoring.ASTHelper.isMethod;
+
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.Release;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
+import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.MethodInvocation;
-
-import static org.autorefactor.refactoring.ASTHelper.*;
 
 /** See {@link #getDescription()} method. */
 public class ArrayListRatherThanVectorRefactoring extends AbstractClassSubstituteRefactoring {
+    private static Map<String, String[]> canBeCastedTo = new HashMap<>();
+
+    static {
+        canBeCastedTo.put("java.lang.Object", new String[]{"java.lang.Object"});
+        canBeCastedTo.put("java.lang.Cloneable", new String[]{"java.lang.Cloneable", "java.lang.Object"});
+        canBeCastedTo.put("java.io.Serializable",
+                new String[]{"java.io.Serializable", "java.lang.Object"});
+        canBeCastedTo.put("java.util.Collection", new String[]{"java.util.Collection", "java.lang.Object"});
+        canBeCastedTo.put("java.util.AbstractCollection",
+                new String[]{"java.util.AbstractCollection", "java.util.Collection", "java.lang.Object"});
+        canBeCastedTo.put("java.util.Vector",
+                new String[]{"java.util.Vector",
+                    "java.util.AbstractCollection", "java.util.Collection",
+                    "java.io.Serializable", "java.lang.Cloneable", "java.lang.Object"});
+    }
+
     @Override
     public String getDescription() {
         return ""
@@ -65,7 +85,11 @@ public class ArrayListRatherThanVectorRefactoring extends AbstractClassSubstitut
 
     @Override
     protected String getSubstitutingClassName(String origRawType) {
-        return "java.util.ArrayList";
+        if ("java.util.Vector".equals(origRawType)) {
+            return "java.util.ArrayList";
+        } else {
+            return null;
+        }
     }
 
     @Override
@@ -76,6 +100,14 @@ public class ArrayListRatherThanVectorRefactoring extends AbstractClassSubstitut
     @Override
     protected boolean canMethodBeRefactored(final MethodInvocation mi,
             final List<MethodInvocation> methodCallsToRefactor) {
+        final String argumentType;
+        if (mi.getExpression().resolveTypeBinding().getTypeArguments() != null
+                        && mi.getExpression().resolveTypeBinding().getTypeArguments().length == 1) {
+            argumentType = mi.getExpression().resolveTypeBinding().getTypeArguments()[0].getQualifiedName();
+        } else {
+            argumentType = "java.lang.Object";
+        }
+
         if (isMethod(mi, "java.util.Vector", "addElement", "java.lang.Object")
                 || isMethod(mi, "java.util.Vector", "elementAt", "int")
                 || isMethod(mi, "java.util.Vector", "copyInto", "java.lang.Object[]")
@@ -86,16 +118,29 @@ public class ArrayListRatherThanVectorRefactoring extends AbstractClassSubstitut
                 || isMethod(mi, "java.util.Vector", "insertElementAt", "java.lang.Object", "int")) {
             methodCallsToRefactor.add(mi);
             return true;
-        } else if (isMethod(mi, "java.util.Vector", "setSize", "int")
-                || isMethod(mi, "java.util.Vector", "capacity")
-                || isMethod(mi, "java.util.Vector", "elements")
-                || isMethod(mi, "java.util.Vector", "indexOf", "java.lang.Object", "int")
-                || isMethod(mi, "java.util.Vector", "lastIndexOf", "java.lang.Object", "int")
-                || isMethod(mi, "java.util.Vector", "firstElement")
-                || isMethod(mi, "java.util.Vector", "lastElement")) {
-            return false;
         }
-        return true;
+
+        if (isMethod(mi, "java.util.Collection", "add", "java.lang.Object")
+                || isMethod(mi, "java.util.List", "addAll", "int", "java.util.Collection")
+                || isMethod(mi, "java.util.Collection", "clear")
+                || isMethod(mi, "java.util.Collection", "contains", "java.lang.Object")
+                || isMethod(mi, "java.util.Collection", "containsAll", "java.util.Collection")
+                || isMethod(mi, "java.lang.Object", "equals", "java.lang.Object")
+                || isMethod(mi, "java.lang.Object", "hashCode")
+                || isMethod(mi, "java.util.Collection", "isEmpty")
+                || isMethod(mi, "java.util.Collection", "iterator")
+                || isMethod(mi, "java.util.Collection", "remove", "java.lang.Object")
+                || isMethod(mi, "java.util.Collection", "removeAll", "java.util.Collection")
+                || isMethod(mi, "java.util.Collection", "retainAll", "java.util.Collection")
+                || isMethod(mi, "java.util.Collection", "size")
+                || isMethod(mi, "java.util.Collection", "toArray")
+                || isMethod(mi, "java.util.Collection", "toArray", argumentType + "[]")
+                || isMethod(mi, "java.lang.Object", "clone")
+                || isMethod(mi, "java.lang.Object", "toString")) {
+            return true;
+        }
+
+        return false;
     }
 
     @Override
@@ -122,6 +167,7 @@ public class ArrayListRatherThanVectorRefactoring extends AbstractClassSubstitut
         }
     }
 
+    @SuppressWarnings("unchecked")
     private void reorderArguments(final MethodInvocation refactoredMi) {
         Object item = refactoredMi.arguments().get(0);
         Object index = refactoredMi.arguments().get(1);
@@ -136,5 +182,13 @@ public class ArrayListRatherThanVectorRefactoring extends AbstractClassSubstitut
             refactoredMi.typeArguments().add(indexType);
             refactoredMi.typeArguments().add(itemType);
         }
+    }
+
+    @Override
+    protected boolean isTypeCompatible(final ITypeBinding variableType,
+            final ITypeBinding refType) {
+        return super.isTypeCompatible(variableType, refType)
+                || hasType(variableType, canBeCastedTo.getOrDefault(refType.getErasure().getQualifiedName(),
+                        new String[0]));
     }
 }

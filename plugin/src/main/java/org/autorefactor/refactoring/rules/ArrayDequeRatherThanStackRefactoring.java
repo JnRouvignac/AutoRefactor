@@ -26,16 +26,40 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import static org.autorefactor.refactoring.ASTHelper.hasType;
 import static org.autorefactor.refactoring.ASTHelper.isMethod;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.Release;
+import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 
 /** See {@link #getDescription()} method. */
 public class ArrayDequeRatherThanStackRefactoring extends AbstractClassSubstituteRefactoring {
+    private static Map<String, String[]> canBeCastedTo = new HashMap<>();
+
+    static {
+        canBeCastedTo.put("java.lang.Object", new String[]{"java.lang.Object"});
+        canBeCastedTo.put("java.lang.Cloneable", new String[]{"java.lang.Cloneable", "java.lang.Object"});
+        canBeCastedTo.put("java.io.Serializable",
+                new String[]{"java.io.Serializable", "java.lang.Object"});
+        canBeCastedTo.put("java.util.Collection", new String[]{"java.util.Collection", "java.lang.Object"});
+        canBeCastedTo.put("java.util.AbstractCollection",
+                new String[]{"java.util.AbstractCollection", "java.util.Collection", "java.lang.Object"});
+        canBeCastedTo.put("java.util.Vector",
+                new String[]{"java.util.Vector",
+                    "java.util.AbstractCollection", "java.util.Collection",
+                    "java.io.Serializable", "java.lang.Cloneable", "java.lang.Object"});
+        canBeCastedTo.put("java.util.Stack",
+                new String[]{"java.util.Stack", "java.util.Vector",
+                    "java.util.AbstractCollection", "java.util.Collection",
+                    "java.io.Serializable", "java.lang.Cloneable", "java.lang.Object"});
+    }
+
     @Override
     public String getDescription() {
         return ""
@@ -64,7 +88,13 @@ public class ArrayDequeRatherThanStackRefactoring extends AbstractClassSubstitut
 
     @Override
     protected String getSubstitutingClassName(String origRawType) {
-        return "java.util.ArrayDeque";
+        if ("java.util.Stack".equals(origRawType)) {
+            return "java.util.ArrayDeque";
+        } else if ("java.util.Vector".equals(origRawType)) {
+            return "java.util.Collection";
+        } else {
+            return null;
+        }
     }
 
     @Override
@@ -80,29 +110,32 @@ public class ArrayDequeRatherThanStackRefactoring extends AbstractClassSubstitut
             methodCallsToRefactor.add(mi);
             return true;
         }
-        if (isMethod(mi, "java.util.Vector", "add", "int", "java.lang.Object")
-                || isMethod(mi, "java.util.Vector", "addAll", "int", "java.util.Collection")
-                || isMethod(mi, "java.util.Vector", "setSize", "int")
-                || isMethod(mi, "java.util.Vector", "capacity")
-                || isMethod(mi, "java.util.Vector", "elementAt", "int")
-                || isMethod(mi, "java.util.Vector", "elements")
-                || isMethod(mi, "java.util.Vector", "get", "int")
-                || isMethod(mi, "java.util.Vector", "indexOf", "java.lang.Object")
-                || isMethod(mi, "java.util.Vector", "indexOf", "java.lang.Object", "int")
-                || isMethod(mi, "java.util.Vector", "lastIndexOf", "java.lang.Object")
-                || isMethod(mi, "java.util.Vector", "lastIndexOf", "java.lang.Object", "int")
-                || isMethod(mi, "java.util.Vector", "listIterator")
-                || isMethod(mi, "java.util.Vector", "listIterator", "int")
-                || isMethod(mi, "java.util.Vector", "insertElementAt", "java.lang.Object", "int")
-                || isMethod(mi, "java.util.Vector", "remove", "int")
-                || isMethod(mi, "java.util.Vector", "removeElementAt", "int")
-                || isMethod(mi, "java.util.Stack", "search", "java.lang.Object")
-                || isMethod(mi, "java.util.Vector", "set", "java.lang.Object", "int")
-                || isMethod(mi, "java.util.Vector", "setElementAt", "java.lang.Object", "int")
-                || isMethod(mi, "java.util.Vector", "subList", "int", "int")) {
-            return false;
+
+        if (isMethod(mi, "java.util.Collection", "add", "java.lang.Object")
+                || isMethod(mi, "java.util.List", "addAll", "int", "java.util.Collection")
+                || isMethod(mi, "java.util.Collection", "clear")
+                || isMethod(mi, "java.util.Collection", "contains", "java.lang.Object")
+                || isMethod(mi, "java.util.Collection", "containsAll", "java.util.Collection")
+                || isMethod(mi, "java.lang.Object", "equals", "java.lang.Object")
+                || isMethod(mi, "java.lang.Object", "hashCode")
+                || isMethod(mi, "java.util.Collection", "isEmpty")
+                || isMethod(mi, "java.util.Collection", "iterator")
+                || isMethod(mi, "java.util.Collection", "remove", "java.lang.Object")
+                || isMethod(mi, "java.util.Collection", "removeAll", "java.util.Collection")
+                || isMethod(mi, "java.util.Collection", "retainAll", "java.util.Collection")
+                || isMethod(mi, "java.util.Collection", "size")
+                || isMethod(mi, "java.util.Collection", "toArray")
+                || isMethod(mi, "java.util.Collection", "toArray", "java.lang.Object[]")
+                || isMethod(mi, "java.util.Stack", "clone")
+                || isMethod(mi, "java.util.Stack", "retainAll", "java.util.Collection")
+                || isMethod(mi, "java.lang.Object", "toString")
+                || isMethod(mi, "java.util.Stack", "peek")
+                || isMethod(mi, "java.util.Stack", "pop")
+                || isMethod(mi, "java.util.Stack", "push", "java.lang.Object")) {
+            return true;
         }
-        return true;
+
+        return false;
     }
 
     @Override
@@ -123,5 +156,13 @@ public class ArrayDequeRatherThanStackRefactoring extends AbstractClassSubstitut
         } else if (isMethod(originalMi, "java.util.Stack", "empty")) {
             refactoredMi.setName(b.simpleName("isEmpty"));
         }
+    }
+
+    @Override
+    protected boolean isTypeCompatible(final ITypeBinding variableType,
+            final ITypeBinding refType) {
+        return super.isTypeCompatible(variableType, refType)
+                || hasType(variableType, canBeCastedTo.getOrDefault(refType.getErasure().getQualifiedName(),
+                        new String[0]));
     }
 }

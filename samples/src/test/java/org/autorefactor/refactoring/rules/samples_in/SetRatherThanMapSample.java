@@ -87,12 +87,7 @@ public class SetRatherThanMapSample {
         // Keep this comment
         HashMap<String, Observable> aggregate = new HashMap<String, Observable>();
         TreeMap<String, Observable> aggregate2 = new TreeMap<String, Observable>();
-    }
-
-    public void doNotReplaceInterface() {
-        // Keep this comment
-        Map<String, String> map = new HashMap<String, String>();
-        Map<String, String> map2 = new TreeMap<String, String>();
+        Map<String, Observable> aggregate3 = new TreeMap<String, Observable>();
     }
 
     public void replaceHashMapVariableUse() {
@@ -105,14 +100,19 @@ public class SetRatherThanMapSample {
         TreeMap<String, String> aggregate2 = new TreeMap<String, String>();
         // Keep this comment too
         aggregate2.put("foo", "bar");
+
+        // Keep this comment
+        Map<String, String> aggregate3 = new TreeMap<String, String>();
+        // Keep this comment too
+        aggregate3.put("foo", "bar");
     }
 
-    public boolean refactorMethod() {
+    public boolean refactorHashMapMethod() {
         // Keep this comment
         return new HashMap<String, String>().containsKey("foo");
     }
 
-    public boolean refactorMethod2() {
+    public boolean refactorTreeMapMethod() {
         // Keep this comment
         return new TreeMap<String, String>().containsKey("foo");
     }
@@ -127,6 +127,11 @@ public class SetRatherThanMapSample {
         TreeMap<String, String> aggregate2 = new TreeMap<String, String>();
         // Keep this comment too
         aggregate2.containsKey("foo");
+
+        // Keep this comment
+        Map<String, String> aggregate3 = new TreeMap<String, String>();
+        // Keep this comment too
+        aggregate3.containsKey("foo");
     }
 
     public int replaceMapWithLoop(List<Date> dates) {
@@ -142,7 +147,13 @@ public class SetRatherThanMapSample {
             aggregate2.put(date.getTime(), date);
         }
 
-        return aggregate.size() + aggregate2.size();
+        // Keep this comment also
+        Map<Long, Date> aggregate3 = new TreeMap<Long, Date>();
+        for (Date date : dates) {
+            aggregate3.put(date.getTime(), date);
+        }
+
+        return aggregate.size() + aggregate2.size() + aggregate3.size();
     }
 
     public int doNotRemoveActiveCode(List<Date> referenceDates, List<Date> dates) {
@@ -156,7 +167,12 @@ public class SetRatherThanMapSample {
             aggregate2.put(date.getTime(), dates.remove(date));
         }
 
-        return aggregate.size() + aggregate2.size();
+        Map<Long, Boolean> aggregate3 = new TreeMap<Long, Boolean>();
+        for (Date date : referenceDates) {
+            aggregate3.put(date.getTime(), dates.remove(date));
+        }
+
+        return aggregate.size() + aggregate2.size() + aggregate3.size();
     }
 
     public void replaceHashMapWithModifier() {
@@ -167,6 +183,10 @@ public class SetRatherThanMapSample {
         // Keep this comment too
         final TreeMap<String, String> aggregate2 = new TreeMap<String, String>();
         aggregate2.put("foo", "bar");
+
+        // Keep this comment also
+        final Map<String, String> aggregate3 = new TreeMap<String, String>();
+        aggregate3.put("foo", "bar");
     }
 
     public void replaceHashMapWithParameter() {
@@ -177,6 +197,10 @@ public class SetRatherThanMapSample {
         // Keep this comment too
         TreeMap<String, String> aggregate2 = new TreeMap<String, String>();
         aggregate2.put("foo", "bar");
+
+        // Keep this comment also
+        Map<String, String> aggregate3 = new TreeMap<String, String>();
+        aggregate3.put("foo", "bar");
     }
 
     public int replaceReassignedHashMap() {
@@ -196,14 +220,27 @@ public class SetRatherThanMapSample {
         TreeMap<String, String> aggregate4 = aggregate3;
         aggregate4.put("bar", "BAR");
 
-        return aggregate2.size();
+        // Keep this comment
+        Map<String, String> aggregate5 = new TreeMap<String, String>();
+        aggregate3.put("foo", "FOO");
+
+        // Keep this comment too
+        Map<String, String> aggregate6 = aggregate5;
+        aggregate4.put("bar", "BAR");
+
+        return aggregate1.size() + aggregate2.size() + aggregate3.size() + aggregate4.size() + aggregate5.size();
     }
 
-    public void doNotReplaceHashMapParameter(HashMap<String, String> aMap, TreeMap<String, String> aMap2) {
+    public void doNotReplaceHashMapParameter(HashMap<String, String> aMap,
+            TreeMap<String, String> aMap2,
+            TreeMap<String, String> aMap3) {
         HashMap<String, String> map = aMap;
         map.put("foo", "bar");
 
         TreeMap<String, String> map2 = aMap2;
+        map2.put("foo", "bar");
+
+        Map<String, String> map3 = aMap3;
         map2.put("foo", "bar");
     }
 
@@ -233,6 +270,9 @@ public class SetRatherThanMapSample {
 
         TreeMap<String, String> map2 = new TreeMap<String, String>();
         map2 = new TreeMap<String, String>();
+
+        Map<String, String> map3 = new TreeMap<String, String>();
+        map3 = new TreeMap<String, String>();
     }
 
     public void replaceHashMapInAnnomymousClass() {
@@ -251,6 +291,15 @@ public class SetRatherThanMapSample {
             @Override
             public void run() {
                 aggregate2.put("foo", "bar");
+            }
+        };
+
+        final Map<String, String> aggregate3 = new TreeMap<String, String>();
+        new Runnable() {
+
+            @Override
+            public void run() {
+                aggregate3.put("foo", "bar");
             }
         };
     }
@@ -281,6 +330,19 @@ public class SetRatherThanMapSample {
                 localAggregate.put("bar", new long[] {4, 5, 6, 7});
             }
         };
+
+        // Keep this comment
+        final Map<String, long[]> aggregate3 = new TreeMap<String, long[]>();
+        aggregate3.put("foo", new long[] {0, 1, 2, 3});
+        new Runnable() {
+
+            @Override
+            public void run() {
+                // Keep this comment too
+                final Map<String, long[]> localAggregate = new TreeMap<String, long[]>();
+                localAggregate.put("bar", new long[] {4, 5, 6, 7});
+            }
+        };
     }
 
     public void doNotReplaceSpecificInstantiation(HashMap<String, String> aMap) {
@@ -288,6 +350,9 @@ public class SetRatherThanMapSample {
         map.put("foo", "bar");
 
         TreeMap<String, String> map2 = new TreeMap<String, String>(aMap);
+        map.put("foo", "bar");
+
+        Map<String, String> map3 = new TreeMap<String, String>(aMap);
         map.put("foo", "bar");
     }
 
@@ -362,12 +427,26 @@ public class SetRatherThanMapSample {
         aggregate2.clear();
         aggregate2.containsKey(anotherCollection);
         aggregate2.isEmpty();
-        aggregate.remove(456);
+        aggregate2.remove(456);
         aggregate2.size();
         aggregate2.notify();
         aggregate2.notifyAll();
         aggregate2.wait();
         aggregate2.wait(1000);
         aggregate2.wait(1000, 1000);
+
+        // Keep this comment also
+        Map<Integer, String> aggregate3 = new TreeMap<Integer, String>();
+        aggregate3.put(123, "123");
+        aggregate3.clear();
+        aggregate3.containsKey(anotherCollection);
+        aggregate3.isEmpty();
+        aggregate3.remove(456);
+        aggregate3.size();
+        aggregate3.notify();
+        aggregate3.notifyAll();
+        aggregate3.wait();
+        aggregate3.wait(1000);
+        aggregate3.wait(1000, 1000);
     }
 }

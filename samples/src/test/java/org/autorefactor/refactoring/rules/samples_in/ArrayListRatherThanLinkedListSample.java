@@ -62,7 +62,7 @@ public class ArrayListRatherThanLinkedListSample {
         LinkedList<LinkedList<String>> list = new LinkedList<LinkedList<String>>();
     }
 
-    public void doNotReplaceInterface() {
+    public void replaceInterface() {
         // Keep this comment
         List<String> list = new LinkedList<String>();
     }
@@ -74,9 +74,23 @@ public class ArrayListRatherThanLinkedListSample {
         list.add("bar");
     }
 
+    public void refactorListVariableUse() {
+        // Keep this comment
+        List<String> list = new LinkedList<String>();
+        // Keep this comment too
+        list.add("bar");
+    }
+
     public void refactorWithMethod() {
         // Keep this comment
         LinkedList<Observable> list = new LinkedList<Observable>();
+        // Keep this comment too
+        list.toArray();
+    }
+
+    public void refactorListWithMethod() {
+        // Keep this comment
+        List<Observable> list = new LinkedList<Observable>();
         // Keep this comment too
         list.toArray();
     }
@@ -91,15 +105,37 @@ public class ArrayListRatherThanLinkedListSample {
         return list.toString();
     }
 
+    public String refactorListWithLoop(List<Date> dates) {
+        // Keep this comment
+        List<Date> list = new LinkedList<Date>();
+        for (Date date : dates) {
+            list.add(date);
+        }
+
+        return list.toString();
+    }
+
     public void replaceLinkedListWithModifier() {
         // Keep this comment
         final LinkedList<String> list = new LinkedList<String>();
         list.add("bar");
     }
 
+    public void refactorListWithModifier() {
+        // Keep this comment
+        final List<String> list = new LinkedList<String>();
+        list.add("bar");
+    }
+
     public void replaceLinkedListWithParameter() {
         // Keep this comment
         LinkedList<String> list = new LinkedList<String>(new java.util.ArrayList<String>());
+        list.add("bar");
+    }
+
+    public void refactorListWithParameter() {
+        // Keep this comment
+        List<String> list = new LinkedList<String>(new java.util.ArrayList<String>());
         list.add("bar");
     }
 
@@ -110,6 +146,18 @@ public class ArrayListRatherThanLinkedListSample {
 
         // Keep this comment too
         LinkedList<String> list2 = list1;
+        list2.add("BAR");
+
+        return list2.isEmpty();
+    }
+
+    public boolean replaceReassignedList() {
+        // Keep this comment
+        LinkedList<String> list1 = new LinkedList<String>();
+        list1.add("FOO");
+
+        // Keep this comment too
+        List<String> list2 = list1;
         list2.add("BAR");
 
         return list2.isEmpty();
@@ -273,7 +321,12 @@ public class ArrayListRatherThanLinkedListSample {
         return list.set(index, element);
     }
 
-    public void replaceListWithRunnable() {
+    public String doNotReplaceSetOnList(int index, String element) {
+        List<String> list = new LinkedList<String>();
+        return list.set(index, element);
+    }
+
+    public void replaceLinkedListWithRunnable() {
         // Keep this comment
         final LinkedList<String> list = new LinkedList<String>();
         new Runnable() {
@@ -281,6 +334,19 @@ public class ArrayListRatherThanLinkedListSample {
             @Override
             public void run() {
                 final LinkedList<String> localList = new LinkedList<String>();
+                localList.add("foo");
+            }
+        };
+    }
+
+    public void replaceListWithRunnable() {
+        // Keep this comment
+        final List<String> list = new LinkedList<String>();
+        new Runnable() {
+
+            @Override
+            public void run() {
+                final List<String> localList = new LinkedList<String>();
                 localList.add("foo");
             }
         };

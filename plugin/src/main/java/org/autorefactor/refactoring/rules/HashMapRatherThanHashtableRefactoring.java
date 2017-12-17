@@ -26,16 +26,32 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.Release;
+import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
 
 /** See {@link #getDescription()} method. */
 public class HashMapRatherThanHashtableRefactoring extends AbstractClassSubstituteRefactoring {
+    private static Map<String, String[]> canBeCastedTo = new HashMap<>();
+
+    static {
+        canBeCastedTo.put("java.lang.Object", new String[]{"java.lang.Object"});
+        canBeCastedTo.put("java.lang.Cloneable", new String[]{"java.lang.Cloneable", "java.lang.Object"});
+        canBeCastedTo.put("java.io.Serializable",
+                new String[]{"java.io.Serializable", "java.lang.Object"});
+        canBeCastedTo.put("java.util.Map", new String[]{"java.util.Map", "java.lang.Object"});
+        canBeCastedTo.put("java.util.Hashtable",
+                new String[]{"java.util.Hashtable", "java.io.Serializable", "java.util.Map",
+                    "java.lang.Cloneable", "java.lang.Object"});
+    }
+
     @Override
     public String getDescription() {
         return ""
@@ -64,7 +80,11 @@ public class HashMapRatherThanHashtableRefactoring extends AbstractClassSubstitu
 
     @Override
     protected String getSubstitutingClassName(String origRawType) {
-        return "java.util.HashMap";
+        if ("java.util.Hashtable".equals(origRawType)) {
+            return "java.util.HashMap";
+        } else {
+            return null;
+        }
     }
 
     @Override
@@ -80,5 +100,13 @@ public class HashMapRatherThanHashtableRefactoring extends AbstractClassSubstitu
     protected void refactorMethod(final ASTBuilder b, final MethodInvocation originalMi,
             final MethodInvocation refactoredMi) {
         refactoredMi.setName(b.simpleName("containsValue"));
+    }
+
+    @Override
+    protected boolean isTypeCompatible(final ITypeBinding variableType,
+            final ITypeBinding refType) {
+        return super.isTypeCompatible(variableType, refType)
+                || hasType(variableType, canBeCastedTo.getOrDefault(refType.getErasure().getQualifiedName(),
+                        new String[0]));
     }
 }

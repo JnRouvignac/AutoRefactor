@@ -79,7 +79,7 @@ public abstract class AbstractClassSubstituteRefactoring extends AbstractRefacto
      *
      * @param origRawType The original raw type.
      *
-     * @return the substituting class name.
+     * @return the substituting class name or null if the class should be the same.
      */
     protected abstract String getSubstitutingClassName(String origRawType);
 
@@ -154,42 +154,47 @@ public abstract class AbstractClassSubstituteRefactoring extends AbstractRefacto
     }
 
     /**
-     * Returns the substitute type.
+     * Returns the substitute type or null if the class should be the same.
      *
      * @param b The builder.
      * @param origType The original type
      * @param originalExpr The original expression
-     * @return the substitute type.
+     * @return the substitute type or null if the class should be the same.
      */
     protected Type substituteType(final ASTBuilder b, final Type origType, final ASTNode originalExpr) {
         final ITypeBinding origTypeBinding = origType.resolveBinding();
         final String origRawType = origTypeBinding.getErasure().getQualifiedName();
-        final TypeNameDecider typeNameDecider = new TypeNameDecider(originalExpr);
+        final String substitutingClassName = getSubstitutingClassName(origRawType);
+        if (substitutingClassName != null) {
+            final TypeNameDecider typeNameDecider = new TypeNameDecider(originalExpr);
 
-        if (origTypeBinding.isParameterizedType()) {
-            final ITypeBinding[] origTypeArgs = origTypeBinding.getTypeArguments();
-            final Type[] newTypes = new Type[origTypeArgs.length];
-            for (int i = 0; i < origTypeArgs.length; i++) {
-                newTypes[i] = b.toType(origTypeArgs[i], typeNameDecider);
+            if (origTypeBinding.isParameterizedType()) {
+                final ITypeBinding[] origTypeArgs = origTypeBinding.getTypeArguments();
+                final Type[] newTypes = new Type[origTypeArgs.length];
+                for (int i = 0; i < origTypeArgs.length; i++) {
+                    newTypes[i] = b.toType(origTypeArgs[i], typeNameDecider);
+                }
+                return b.genericType(substitutingClassName,
+                        newTypes);
             }
-            return b.genericType(getSubstitutingClassName(origRawType),
-                    newTypes);
+
+            return b.type(substitutingClassName);
         }
 
-        return b.type(getSubstitutingClassName(origRawType));
+        return null;
     }
 
     /**
      * True if the type of the variable is compatible.
      *
      * @param variableType The type of the variable.
-     * @param nodeTypeBinding The type of the node.
+     * @param refType The type of the node.
      *
      * @return true if the type of the variable is compatible.
      */
     protected boolean isTypeCompatible(final ITypeBinding variableType,
-            final ITypeBinding nodeTypeBinding) {
-        return Objects.equals(variableType, nodeTypeBinding);
+            final ITypeBinding refType) {
+        return Objects.equals(variableType, refType);
     }
 
     @Override
@@ -267,9 +272,11 @@ public abstract class AbstractClassSubstituteRefactoring extends AbstractRefacto
 
         final Type substituteType = substituteType(b, originalInstanceCreation.getType(),
                 originalInstanceCreation);
-        ctx.getRefactorings().replace(originalInstanceCreation.getType(),
-                substituteType);
-        originalInstanceCreation.setType(substituteType);
+        if (substituteType != null) {
+            ctx.getRefactorings().replace(originalInstanceCreation.getType(),
+                    substituteType);
+            originalInstanceCreation.setType(substituteType);
+        }
 
         for (final MethodInvocation methodCall : methodCallsToRefactor) {
             final MethodInvocation copyOfMethodCall = b.copySubtree(methodCall);
@@ -280,9 +287,12 @@ public abstract class AbstractClassSubstituteRefactoring extends AbstractRefacto
         for (final VariableDeclaration variableDecl : variableDecls) {
             final VariableDeclarationStatement oldDeclareStmt =
                     (VariableDeclarationStatement) variableDecl.getParent();
-            ctx.getRefactorings().replace(oldDeclareStmt.getType(),
-                    substituteType(b, oldDeclareStmt.getType(),
-                            (ASTNode) oldDeclareStmt.fragments().get(0)));
+            final Type substituteVarType = substituteType(b, oldDeclareStmt.getType(),
+                    (ASTNode) oldDeclareStmt.fragments().get(0));
+            if (substituteVarType != null) {
+                ctx.getRefactorings().replace(oldDeclareStmt.getType(),
+                        substituteVarType);
+            }
         }
     }
 
