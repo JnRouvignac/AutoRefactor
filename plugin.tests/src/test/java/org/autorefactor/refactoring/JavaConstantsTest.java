@@ -297,7 +297,7 @@ public class JavaConstantsTest {
             validIntegerZeroLongLiteralRegexp((String) args[0]);
         }
     }
-    
+
     public void validIntegerZeroLongLiteralRegexp(String literal) {
         assertTrue(ZERO_LONG_LITERAL_RE.matcher(literal).matches());
     }

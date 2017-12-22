@@ -27,25 +27,21 @@ package org.autorefactor.cfg;
 
 public class WhileLoopsSample extends ParentWhileLoopsSample {
 
-    public WhileLoopsSample()
-    {
+    public WhileLoopsSample() {
         this(0);
     }
 
-    public WhileLoopsSample(int i)
-    {
+    public WhileLoopsSample(int i) {
         super();
     }
 
     @Override
-    public int sample(boolean b1, boolean b2)
-    {
+    public int sample(boolean b1, boolean b2) {
         hashCode();
         while (b1) {
             assert b1;
             do {
-                synchronized (this)
-                {
+                synchronized (this) {
                     super.superField++;
                 }
                 this.superField++;

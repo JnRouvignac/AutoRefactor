@@ -76,7 +76,7 @@ public class OperatorEnumTest {
         }
     }
 
-    public void compareSamePrecedenceOperators(OperatorEnum op1,OperatorEnum op2) {
+    public void compareSamePrecedenceOperators(OperatorEnum op1, OperatorEnum op2) {
         assertTrue("Expected but did not get: " + op1 + " == " + op2, OperatorEnum.compareTo(op1, op2) == 0);
     }
 

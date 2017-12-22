@@ -100,7 +100,7 @@ public class CFGBuilderTest {
 
         final JavaProjectOptions options = newJavaProjectOptions(Release.javaSE("1.7"), 4);
         final ASTParser parser = ASTParser.newParser(AST.JLS4);
-        autoRefactorHandler_resetParser(cu, parser, options);
+        autoRefactorHandlerResetParser(cu, parser, options);
 
         final CompilationUnit astRoot = (CompilationUnit) parser.createAST(null);
         final CFGBuilder builder = new CFGBuilder(javaSource, options);
@@ -137,7 +137,7 @@ public class CFGBuilderTest {
         return options;
     }
 
-    private void autoRefactorHandler_resetParser(ICompilationUnit cu, ASTParser parser,
+    private void autoRefactorHandlerResetParser(ICompilationUnit cu, ASTParser parser,
             JavaProjectOptions options) throws Exception {
         final Method m = ApplyRefactoringsJob.class.getDeclaredMethod(
                 "resetParser", ICompilationUnit.class, ASTParser.class, JavaProjectOptions.class);

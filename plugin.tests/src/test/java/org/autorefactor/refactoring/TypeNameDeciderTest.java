@@ -57,15 +57,15 @@ public class TypeNameDeciderTest {
     @Parameters// (name = "{0} + imports{1} => {2}")
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][] {
-                new Object[] { "java.util.Map", imports(), "java.util.Map" },
-                new Object[] { "java.util.Map", imports("java.util.Map"), "Map" },
-                new Object[] { "java.util.Map", imports("java.util.*"), "Map" },
-                new Object[] { "java.util.Map.Entry", imports(), "java.util.Map.Entry" },
-                new Object[] { "java.util.Map.Entry", imports("java.util.Map"), "Map.Entry" },
-                new Object[] { "java.util.Map.Entry", imports("java.util.*"), "Map.Entry" },
-                new Object[] { "java.util.Map.Entry", imports("java.util.Map.Entry"), "Entry" },
-                new Object[] { "java.util.Map.Entry", imports("java.util.Map.*"), "Entry" },
-                new Object[] { "java.util.concurrent.Callable", imports("java.util.*"), "java.util.concurrent.Callable" },
+            { "java.util.Map", imports(), "java.util.Map" },
+            { "java.util.Map", imports("java.util.Map"), "Map" },
+            { "java.util.Map", imports("java.util.*"), "Map" },
+            { "java.util.Map.Entry", imports(), "java.util.Map.Entry" },
+            { "java.util.Map.Entry", imports("java.util.Map"), "Map.Entry" },
+            { "java.util.Map.Entry", imports("java.util.*"), "Map.Entry" },
+            { "java.util.Map.Entry", imports("java.util.Map.Entry"), "Entry" },
+            { "java.util.Map.Entry", imports("java.util.Map.*"), "Entry" },
+            { "java.util.concurrent.Callable", imports("java.util.*"), "java.util.concurrent.Callable" },
         });
     }
 

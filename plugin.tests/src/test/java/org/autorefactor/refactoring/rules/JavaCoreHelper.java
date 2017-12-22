@@ -53,7 +53,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-public class JavaCoreHelper {
+public final class JavaCoreHelper {
 
     private static final Path[] EMPTY_PATHS = new Path[0];
 
@@ -81,7 +81,8 @@ public class JavaCoreHelper {
         final Document document = builder.parse(new File(classpathFile));
 
         final Node projectNode = getNodeByNodeName(document.getChildNodes(), "project");
-        final List<Node> dependencies = asList(getNodeByNodeName(projectNode.getChildNodes(), "dependencies").getChildNodes());
+        final List<Node> dependencies =
+                asList(getNodeByNodeName(projectNode.getChildNodes(), "dependencies").getChildNodes());
         final String m2Repo = getM2Repository();
         for (Node dependency : dependencies) {
             if (dependency.getNodeType() == Node.COMMENT_NODE) {
@@ -227,7 +228,8 @@ public class JavaCoreHelper {
         return new Path(classPath.substring(start, end));
     }
 
-    private static void addToClasspath(IJavaProject javaProject, List<IClasspathEntry> classpathEntries) throws Exception {
+    private static void addToClasspath(IJavaProject javaProject, List<IClasspathEntry> classpathEntries)
+            throws Exception {
         if (!classpathEntries.isEmpty()) {
             IClasspathEntry[] oldEntries = javaProject.getRawClasspath();
             IClasspathEntry[] newEntries;
@@ -241,5 +243,9 @@ public class JavaCoreHelper {
             }
             javaProject.setRawClasspath(newEntries, null);
         }
+    }
+
+    private JavaCoreHelper() {
+        // private for utility classes
     }
 }
