@@ -40,6 +40,7 @@ import org.autorefactor.util.NotImplementedException;
 import org.autorefactor.util.UnhandledException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
@@ -79,6 +80,8 @@ public class PrepareApplyRefactoringsJob extends Job {
         environment.getJobManager().register(this);
         try {
             return run0(monitor);
+        } catch (OperationCanceledException e) {
+            throw e;
         } catch (Exception e) {
             final String msg = "Error while preparing automatic refactorings.\n\n"
                     + "Please look at the Eclipse workspace logs and "

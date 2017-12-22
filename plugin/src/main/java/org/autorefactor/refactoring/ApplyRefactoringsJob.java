@@ -119,6 +119,8 @@ public class ApplyRefactoringsJob extends Job {
                     loopMonitor.subTask("Applying refactorings to " + getClassName(compilationUnit));
                     final AggregateASTVisitor refactoring = new AggregateASTVisitor(refactoringRulesToApply);
                     applyRefactoring(compilationUnit, refactoring, options, loopMonitor.split(1));
+                } catch (OperationCanceledException e) {
+                    throw e;
                 } catch (Exception e) {
                     final String msg = "Exception when applying refactorings to file \""
                             + compilationUnit.getPath() + "\": " + e.getMessage();
