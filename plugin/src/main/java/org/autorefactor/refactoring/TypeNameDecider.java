@@ -42,7 +42,6 @@ import org.eclipse.jdt.core.dom.Name;
 import org.eclipse.jdt.core.dom.VariableDeclaration;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
-
 /** Helps decide on which type name to use. */
 public class TypeNameDecider {
     /** Strategy that resolves type bindings. */
@@ -75,28 +74,33 @@ public class TypeNameDecider {
         @Override
         public ITypeBinding resolveTypeBinding(String fullyQualifiedName) {
             try {
-                final Field f1 = anyTypeBinding.getClass().getDeclaredField("resolver");
-                f1.setAccessible(true);
-                Object bindingResolver = f1.get(anyTypeBinding);
+                final Object bindingResolver = getField(anyTypeBinding, "resolver");
+                final Object compilationUnitScope = getField(bindingResolver, "scope");
 
-                final Field f2 = bindingResolver.getClass().getDeclaredField("scope");
-                f2.setAccessible(true);
-                Object compilationUnitScope = f2.get(bindingResolver);
-
-                final Method m2 = compilationUnitScope.getClass()
-                        .getMethod("getType", char[][].class, int.class);
-                m2.setAccessible(true);
                 final char[][] simpleNamesArray = toSimpleNamesArray(fullyQualifiedName);
+                final Method getType = compilationUnitScope.getClass().getMethod("getType", char[][].class, int.class);
                 final Object internalTypeBinding =
-                        m2.invoke(compilationUnitScope, simpleNamesArray, simpleNamesArray.length);
+                        invokeMethod(compilationUnitScope, getType, simpleNamesArray, simpleNamesArray.length);
 
-                final Method m1 = bindingResolver.getClass().getDeclaredMethod("getTypeBinding",
+                final Method getTypeBinding = bindingResolver.getClass().getDeclaredMethod("getTypeBinding",
                         internalTypeBinding.getClass().getSuperclass().getSuperclass());
-                m1.setAccessible(true);
-                return (ITypeBinding) m1.invoke(bindingResolver, internalTypeBinding);
+                return invokeMethod(bindingResolver, getTypeBinding, internalTypeBinding);
             } catch (Exception e) {
                 throw new UnhandledException(parsedNode, e);
             }
+        }
+
+        @SuppressWarnings("unchecked")
+        private <T> T invokeMethod(Object object, Method method, Object... args) throws ReflectiveOperationException {
+            method.setAccessible(true);
+            return (T) method.invoke(object, args);
+        }
+
+        @SuppressWarnings("unchecked")
+        private <T> T getField(Object object, String fieldName) throws ReflectiveOperationException {
+            final Field f = object.getClass().getDeclaredField(fieldName);
+            f.setAccessible(true);
+            return (T) f.get(object);
         }
     }
 
