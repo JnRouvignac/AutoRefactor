@@ -29,7 +29,7 @@ import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.JavaProjectOptions;
 import org.autorefactor.refactoring.Refactorings;
 import org.autorefactor.util.UnhandledException;
-import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.AST;
@@ -50,7 +50,7 @@ public class RefactoringContext {
     private final Refactorings refactorings;
     private final ASTBuilder astBuilder;
     private final JavaProjectOptions options;
-    private final IProgressMonitor monitor;
+    private final SubMonitor monitor;
     private final Environment environment;
 
     /**
@@ -63,7 +63,7 @@ public class RefactoringContext {
      * @param environment the environment
      */
     public RefactoringContext(ICompilationUnit compilationUnit, CompilationUnit astRoot,
-            JavaProjectOptions options, IProgressMonitor monitor, Environment environment) {
+            JavaProjectOptions options, SubMonitor monitor, Environment environment) {
         this.compilationUnit = compilationUnit;
         this.astRoot = astRoot;
         this.monitor = monitor;
@@ -114,7 +114,7 @@ public class RefactoringContext {
      *
      * @return the progress monitor of the current job
      */
-    public IProgressMonitor getProgressMonitor() {
+    public SubMonitor getProgressMonitor() {
         return monitor;
     }
 

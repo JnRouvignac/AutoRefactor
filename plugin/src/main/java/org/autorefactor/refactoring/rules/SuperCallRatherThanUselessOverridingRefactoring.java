@@ -25,11 +25,7 @@
  */
 package org.autorefactor.refactoring.rules;
 
-import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
-import static org.autorefactor.refactoring.ASTHelper.asExpression;
-import static org.autorefactor.refactoring.ASTHelper.hasType;
-import static org.autorefactor.refactoring.ASTHelper.statements;
+import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.eclipse.jdt.core.search.IJavaSearchConstants.REFERENCES;
 import static org.eclipse.jdt.core.search.SearchPattern.R_EXACT_MATCH;
 import static org.eclipse.jdt.core.search.SearchPattern.createPattern;
@@ -37,10 +33,8 @@ import static org.eclipse.jdt.core.search.SearchPattern.createPattern;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.autorefactor.util.OnEclipseVersionUpgrade;
 import org.autorefactor.util.UnhandledException;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.dom.IAnnotationBinding;
 import org.eclipse.jdt.core.dom.IMethodBinding;
@@ -105,7 +99,6 @@ public class SuperCallRatherThanUselessOverridingRefactoring extends AbstractRef
     }
 
     /** This method is extremely expensive. */
-    @OnEclipseVersionUpgrade("Replace monitor.newChild(1) by monitor.split(1)")
     private boolean isMethodUsedInItsPackage(IMethodBinding methodBinding, MethodDeclaration node) {
         final IPackageBinding methodPackage = methodBinding.getDeclaringClass().getPackage();
 
@@ -117,8 +110,6 @@ public class SuperCallRatherThanUselessOverridingRefactoring extends AbstractRef
             }
         };
 
-        final SubMonitor subMonitor = SubMonitor.convert(ctx.getProgressMonitor(), 1);
-        final SubMonitor childMonitor = subMonitor.newChild(1);
         try {
             final SearchEngine searchEngine = new SearchEngine();
             searchEngine.search(
@@ -126,12 +117,10 @@ public class SuperCallRatherThanUselessOverridingRefactoring extends AbstractRef
                     new SearchParticipant[] { SearchEngine.getDefaultSearchParticipant() },
                     SearchEngine.createJavaSearchScope(new IJavaElement[] { methodPackage.getJavaElement() }),
                     requestor,
-                    childMonitor);
+                    ctx.getProgressMonitor());
             return methodIsUsedInPackage.get();
         } catch (CoreException e) {
             throw new UnhandledException(node, e);
-        } finally {
-            childMonitor.done();
         }
     }
 

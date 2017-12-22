@@ -49,7 +49,6 @@ import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.CollectorVisitor;
 import org.autorefactor.util.NotImplementedException;
 import org.autorefactor.util.UnhandledException;
-import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
@@ -474,8 +473,6 @@ public class ReplaceQualifiedNamesBySimpleNamesRefactoring extends AbstractRefac
             }
         };
 
-        SubMonitor monitor = SubMonitor.convert(ctx.getProgressMonitor(), 1);
-        final SubMonitor childMonitor = monitor.newChild(1);
         try {
             final SearchEngine searchEngine = new SearchEngine();
             searchEngine.searchAllTypeNames(
@@ -485,11 +482,9 @@ public class ReplaceQualifiedNamesBySimpleNamesRefactoring extends AbstractRefac
                     createWorkspaceScope(),               // search everywhere
                     importTypeCollector,
                     WAIT_UNTIL_READY_TO_SEARCH,           // wait in case the indexer is indexing
-                    childMonitor);
+                    ctx.getProgressMonitor());
         } catch (JavaModelException e) {
             throw new UnhandledException(node, e);
-        } finally {
-            childMonitor.done();
         }
     }
 

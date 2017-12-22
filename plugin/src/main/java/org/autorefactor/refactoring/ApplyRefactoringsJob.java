@@ -36,7 +36,6 @@ import org.autorefactor.environment.Environment;
 import org.autorefactor.refactoring.rules.AggregateASTVisitor;
 import org.autorefactor.refactoring.rules.RefactoringContext;
 import org.autorefactor.util.IllegalStateException;
-import org.autorefactor.util.OnEclipseVersionUpgrade;
 import org.autorefactor.util.UnhandledException;
 import org.eclipse.core.filebuffers.FileBuffers;
 import org.eclipse.core.filebuffers.ITextFileBuffer;
@@ -45,6 +44,7 @@ import org.eclipse.core.filebuffers.LocationKind;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
@@ -91,6 +91,8 @@ public class ApplyRefactoringsJob extends Job {
         environment.getJobManager().register(this);
         try {
             return run0(monitor);
+        } catch (OperationCanceledException e) {
+            throw e;
         } catch (Exception e) {
             final String msg = "Error while applying refactorings.\n\n"
                     + "Please look at the Eclipse workspace logs and "
@@ -102,9 +104,6 @@ public class ApplyRefactoringsJob extends Job {
         }
     }
 
-    @OnEclipseVersionUpgrade({
-            "Remove the check to monitor.isCanceled()",
-            "Replace monitor.newChild(1) by monitor.split(1)" })
     private IStatus run0(IProgressMonitor monitor) throws Exception {
         if (refactoringUnits.isEmpty()) {
             // No java project exists.
@@ -115,16 +114,12 @@ public class ApplyRefactoringsJob extends Job {
         try {
             RefactoringUnit toRefactor;
             while ((toRefactor = refactoringUnits.poll()) != null) {
-                if (loopMonitor.isCanceled()) {
-                    return Status.CANCEL_STATUS;
-                }
-
                 final ICompilationUnit compilationUnit = toRefactor.getCompilationUnit();
                 final JavaProjectOptions options = toRefactor.getOptions();
                 try {
                     loopMonitor.subTask("Applying refactorings to " + getClassName(compilationUnit));
                     final AggregateASTVisitor refactoring = new AggregateASTVisitor(refactoringRulesToApply);
-                    applyRefactoring(compilationUnit, refactoring, options, loopMonitor.newChild(1));
+                    applyRefactoring(compilationUnit, refactoring, options, loopMonitor.split(1));
                 } catch (Exception e) {
                     final String msg = "Exception when applying refactorings to file \""
                             + compilationUnit.getPath() + "\": " + e.getMessage();
@@ -144,7 +139,7 @@ public class ApplyRefactoringsJob extends Job {
     }
 
     private void applyRefactoring(ICompilationUnit compilationUnit, AggregateASTVisitor refactoringToApply,
-            JavaProjectOptions options, IProgressMonitor monitor) throws Exception {
+            JavaProjectOptions options, SubMonitor monitor) throws Exception {
         final ITextFileBufferManager bufferManager = FileBuffers.getTextFileBufferManager();
         final IPath path = compilationUnit.getPath();
         final LocationKind locationKind = LocationKind.NORMALIZE;
@@ -193,18 +188,21 @@ public class ApplyRefactoringsJob extends Job {
      * >Abstract Syntax Tree > Write it down</a>
      */
     public void applyRefactoring(IDocument document, ICompilationUnit compilationUnit, AggregateASTVisitor refactoring,
-            JavaProjectOptions options, IProgressMonitor monitor) throws Exception {
+            JavaProjectOptions options, SubMonitor monitor) throws Exception {
         // creation of DOM/AST from a ICompilationUnit
         final ASTParser parser = ASTParser.newParser(AST.JLS4);
         resetParser(compilationUnit, parser, options);
 
         CompilationUnit astRoot = (CompilationUnit) parser.createAST(null);
 
-        int totalNbLoops = 0;
+        final int maxIterations = 100;
+        int iterationCount = 0;
         Set<ASTVisitor> lastLoopVisitors = Collections.emptySet();
         int nbLoopsWithSameVisitors = 0;
+
+        monitor.setWorkRemaining(maxIterations);
         while (true) {
-            if (totalNbLoops > 100) {
+            if (iterationCount > maxIterations) {
                 // Oops! Something went wrong.
                 final String errorMsg = "An infinite loop has been detected for file "
                         + getFileName(astRoot) + "."
@@ -217,7 +215,7 @@ public class ApplyRefactoringsJob extends Job {
             }
 
             final RefactoringContext ctx = new RefactoringContext(
-                compilationUnit, astRoot, options, monitor, environment);
+                compilationUnit, astRoot, options, monitor.split(1), environment);
             refactoring.setRefactoringContext(ctx);
 
             final Refactorings refactorings = refactoring.getRefactorings(astRoot);
@@ -249,7 +247,7 @@ public class ApplyRefactoringsJob extends Job {
             // the AST level and refresh the bindings
             resetParser(compilationUnit, parser, options);
             astRoot = (CompilationUnit) parser.createAST(null);
-            ++totalNbLoops;
+            ++iterationCount;
 
             final Set<ASTVisitor> thisLoopVisitors = refactoring.getVisitorsContributingRefactoring();
             if (!thisLoopVisitors.equals(lastLoopVisitors)) {

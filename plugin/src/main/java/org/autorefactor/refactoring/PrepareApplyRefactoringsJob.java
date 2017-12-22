@@ -41,6 +41,7 @@ import org.autorefactor.util.UnhandledException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
@@ -91,7 +92,7 @@ public class PrepareApplyRefactoringsJob extends Job {
 
     private IStatus run0(IProgressMonitor monitor) throws Exception {
         if (!javaElements.isEmpty()) {
-            final Queue<RefactoringUnit> toRefactor = collectRefactoringUnits(javaElements);
+            final Queue<RefactoringUnit> toRefactor = collectRefactoringUnits(javaElements, monitor);
             final int nbCores = Runtime.getRuntime().availableProcessors();
             final int nbWorkers = computeNbWorkers(toRefactor.size(), nbCores);
             for (int i = 0; i < nbWorkers; i++) {
@@ -124,28 +125,31 @@ public class PrepareApplyRefactoringsJob extends Job {
         }
     }
 
-    private Queue<RefactoringUnit> collectRefactoringUnits(List<IJavaElement> javaElements) {
+    private Queue<RefactoringUnit> collectRefactoringUnits(List<IJavaElement> javaElements, IProgressMonitor monitor) {
         try {
             final Queue<RefactoringUnit> results = new ConcurrentLinkedQueue<>();
-            addAll(results, javaElements);
+            addAll(results, javaElements, monitor);
             return results;
         } catch (Exception e) {
             throw new UnhandledException(null, e);
         }
     }
 
-    private void addAll(Queue<RefactoringUnit> results, List<IJavaElement> javaElements) throws JavaModelException {
+    private void addAll(Queue<RefactoringUnit> results, List<IJavaElement> javaElements, IProgressMonitor monitor)
+            throws JavaModelException {
+        final SubMonitor subMonitor = SubMonitor.convert(monitor, javaElements.size());
         for (IJavaElement javaElement : javaElements) {
+            final SubMonitor child = subMonitor.split(1);
             final JavaProjectOptions options = getJavaProjectOptions(javaElement);
             if (javaElement instanceof ICompilationUnit) {
                 add(results, (ICompilationUnit) javaElement, options);
             } else if (javaElement instanceof IPackageFragment) {
                 final IPackageFragment pf = (IPackageFragment) javaElement;
-                addAll(results, getSubPackages(pf));
+                addAll(results, getSubPackages(pf), child);
                 addAll(results, pf.getCompilationUnits(), options);
             } else if (javaElement instanceof IPackageFragmentRoot) {
                 final IPackageFragmentRoot pfr = (IPackageFragmentRoot) javaElement;
-                addAll(results, Arrays.asList(pfr.getChildren()));
+                addAll(results, Arrays.asList(pfr.getChildren()), child);
             } else if (javaElement instanceof IJavaProject) {
                 IJavaProject javaProject = (IJavaProject) javaElement;
                 for (IPackageFragment pf : javaProject.getPackageFragments()) {
@@ -172,7 +176,6 @@ public class PrepareApplyRefactoringsJob extends Job {
         }
     }
 
-    @SuppressWarnings("unchecked")
     private JavaProjectOptions getJavaProjectOptions(IJavaElement javaElement) {
         final IJavaProject javaProject = getIJavaProject(javaElement);
         JavaProjectOptions options = javaProjects.get(javaProject);
