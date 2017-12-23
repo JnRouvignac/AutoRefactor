@@ -110,6 +110,9 @@ public class PrepareApplyRefactoringsJob extends Job {
             final int nbCores = Runtime.getRuntime().availableProcessors();
             final int nbWorkers = computeNbWorkers(toRefactor.size(), nbCores);
             for (int i = 0; i < nbWorkers; i++) {
+            	
+            	System.out.println("To Refactor Queue: "+ toRefactor.toString());
+           
             	ApplyRefactoringsJob applyRefactoringsJob = new ApplyRefactoringsJob(toRefactor, clone(refactoringRulesToApply), environment);
             	applyRefactoringsJob.addJobChangeListener(listener);
             			applyRefactoringsJob.schedule();

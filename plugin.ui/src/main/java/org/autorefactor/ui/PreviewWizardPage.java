@@ -11,6 +11,10 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
 
+
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.compare.CompareUI;
+
 public class PreviewWizardPage extends WizardPage{
 
 	public Text refactoredText;
@@ -39,12 +43,14 @@ public class PreviewWizardPage extends WizardPage{
 		// TODO Auto-generated method stub
 		
 		
-		refactoredText = new Text(parent,SWT.MULTI | SWT.BORDER );
+	/*	refactoredText = new Text(parent,SWT.MULTI | SWT.BORDER );
 		refactoredText.setEnabled(false);
 		refactoredText.setText(ApplyRefactoringsJob.refactoredContent);
 		
 		refactoredText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.FILL_VERTICAL));
+		*/
 		
+		CompareUI.openCompareDialog(new CompareInput());
 	}
 
 }

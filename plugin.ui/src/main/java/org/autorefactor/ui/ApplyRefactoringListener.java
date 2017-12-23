@@ -35,6 +35,8 @@ public class ApplyRefactoringListener implements IJobChangeListener {
 		Display.getDefault().syncExec(new Runnable() {
 			
 			public void run() {
+				CompareInput compareInput = new CompareInput();
+				compareInput.setDirty(true);
 				CompareUI.openCompareDialog(new CompareInput());
 			}
 		});

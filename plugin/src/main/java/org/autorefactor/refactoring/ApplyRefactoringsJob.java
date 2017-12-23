@@ -25,6 +25,9 @@
  */
 package org.autorefactor.refactoring;
 
+import static org.autorefactor.refactoring.ASTHelper.getFileName;
+import static org.autorefactor.refactoring.PluginConstant.PLUGIN_ID;
+
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -34,6 +37,7 @@ import java.util.Set;
 
 import org.autorefactor.environment.Environment;
 import org.autorefactor.refactoring.rules.AggregateASTVisitor;
+
 import org.autorefactor.refactoring.rules.RefactoringContext;
 import org.autorefactor.util.IllegalStateException;
 import org.autorefactor.util.OnEclipseVersionUpgrade;
@@ -42,6 +46,9 @@ import org.eclipse.core.filebuffers.FileBuffers;
 import org.eclipse.core.filebuffers.ITextFileBuffer;
 import org.eclipse.core.filebuffers.ITextFileBufferManager;
 import org.eclipse.core.filebuffers.LocationKind;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -50,14 +57,27 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.IJobChangeListener;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.ICompilationUnit;
+import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jdt.core.WorkingCopyOwner;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
-import static org.autorefactor.refactoring.ASTHelper.*;
-import static org.autorefactor.refactoring.PluginConstant.*;
+import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.core.resources.IFile;
+
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+
+
+//import target.classes.org.autorefactor.refactoring.rules.JavaCoreHelper;//plugin.tests.org.autorefactor.refactoring.rules.JavaCoreHelper;
 
 /**
  * Eclipse job that applies the provided refactoring rules in background.
@@ -75,6 +95,10 @@ public class ApplyRefactoringsJob extends Job {
     
     public static String refactoredContent = "Apply Refactoring to preview refcatorings";
     public static String codeToRefactor = "Here is a code to refactor";
+    public static ICompilationUnit iCompile ;
+    private static final String PACKAGE_NAME = "org.autorefactor.refactoring";
+    public static ICompilationUnit cu;
+    public static IFile newFile;
     /**
      * Builds an instance of this class.
      *
@@ -137,6 +161,8 @@ public class ApplyRefactoringsJob extends Job {
                 }
 
                 final ICompilationUnit compilationUnit = toRefactor.getCompilationUnit();
+               
+                
                 final JavaProjectOptions options = toRefactor.getOptions();
                 try {
                     loopMonitor.subTask("Applying refactorings to " + getClassName(compilationUnit));
@@ -163,7 +189,11 @@ public class ApplyRefactoringsJob extends Job {
     private void applyRefactoring(ICompilationUnit compilationUnit, AggregateASTVisitor refactoringToApply,
             JavaProjectOptions options, IProgressMonitor monitor) throws Exception {
         final ITextFileBufferManager bufferManager = FileBuffers.getTextFileBufferManager();
+        final ITextFileBufferManager newbufferManager = FileBuffers.getTextFileBufferManager();
+        System.out.println("BufferManager: "+bufferManager + " newbufferManager: " +newbufferManager);
+        
         final IPath path = compilationUnit.getPath();
+        IPath newPath = null;
         final LocationKind locationKind = LocationKind.NORMALIZE;
         try {
             bufferManager.connect(path, locationKind, null);
@@ -181,10 +211,60 @@ public class ApplyRefactoringsJob extends Job {
                 return;
             }
             final IDocument document = textFileBuffer.getDocument();
+           
+            /*final ITextFileBuffer textFileBuffer1 = bufferManager.getTextFileBuffer(newPath, locationKind);
+            
+            final IDocument document1 = textFileBuffer1.getDocument();*/
+            
             codeToRefactor = document.get();
-            applyRefactoring(document, compilationUnit, refactoringToApply, options, monitor);
-        } finally {
+            System.out.println("File Path"+ path.toString());
+            System.out.println("File Path_------------------------------");
+            System.out.println("Code To Refactor:"+ codeToRefactor);
+            
+            IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+           // IPath newPath = compilationUnit.getFullPath().removeLastSegment(1);
+            
+            iCompile = compilationUnit;
+            IProject project = root.getProject(compilationUnit.getPath().segment(0));
+            System.out.println("Project Name:"+ project.getName());
+            newFile = project.getFile("../"+compilationUnit.getPath().removeLastSegments(1)+"/newFile.java");
+            System.out.println("File Name:"+ newFile.getName() +" hello");
+            InputStream sourceInput = new ByteArrayInputStream(codeToRefactor.getBytes());
+            
+            newFile.create(sourceInput, false, monitor);
+            System.out.println("File is created: Source Input: " + getStringFromInputStream(sourceInput));
+            
+             newPath = newFile.getFullPath();
+            
+            System.out.println("IPATH has "+newFile.getFullPath());
+            
+             newbufferManager.connect(newPath, locationKind, null);
+           
+            System.out.println("Establish Connection");
+            final ITextFileBuffer newTextFileBuffer = newbufferManager.getTextFileBuffer(newPath, locationKind);
+            System.out.println("ITextFileBuffer is executed"+ newTextFileBuffer);
+            final IDocument newDocument = newTextFileBuffer.getDocument();
+            
+            System.out.println("New File Content::-------------------- " );
+            System.out.println(readContentOfJavaFile("C:\\Users\\User\\runtime-AutoRefactoring\\JavaProject\\src\\newFile.java"));
+            
+            System.out.println("Content of new Doc: ------------------------------");
+            System.out.println(newDocument.get());
+       
+             cu = JavaCore.createCompilationUnitFrom(newFile);
+            
+            applyRefactoring(newDocument, cu, refactoringToApply, options, monitor);
+            System.out.println("Refactoring is called");
+        } 
+        catch(Exception e){
+        	System.out.println("Exception occured");
+        	e.printStackTrace();
+        	
+        }
+        finally {
             bufferManager.disconnect(path, locationKind, null);
+           newbufferManager.disconnect(newPath, locationKind, null);
+            
         }
     }
 
@@ -213,7 +293,8 @@ public class ApplyRefactoringsJob extends Job {
     public void applyRefactoring(IDocument document, ICompilationUnit compilationUnit, AggregateASTVisitor refactoring,
             JavaProjectOptions options, IProgressMonitor monitor) throws Exception {
         // creation of DOM/AST from a ICompilationUnit
-        final ASTParser parser = ASTParser.newParser(AST.JLS4);
+     	
+    	final ASTParser parser = ASTParser.newParser(AST.JLS4);
         resetParser(compilationUnit, parser, options);
 
         CompilationUnit astRoot = (CompilationUnit) parser.createAST(null);
@@ -240,17 +321,25 @@ public class ApplyRefactoringsJob extends Job {
 
             final Refactorings refactorings = refactoring.getRefactorings(astRoot);
             if (!refactorings.hasRefactorings()) {
+            	System.out.println("No Refcatorings");
                 // no new refactorings have been applied,
                 // we are done with applying the refactorings.
+            	
+            	 compilationUnit.getBuffer().setContents(document.get());
+                 
+                 refactoredContent = document.get();
                 return;
             }
 
             // apply the refactorings and save the compilation unit
             refactorings.applyTo(document);
+           
             final boolean hadUnsavedChanges = compilationUnit.hasUnsavedChanges();
             compilationUnit.getBuffer().setContents(document.get());
-            
+           
             refactoredContent = document.get();
+            System.out.println("refactoredContent "+refactoredContent);
+           
             // http://wiki.eclipse.org/FAQ_What_is_a_working_copy%3F
             // compilationUnit.reconcile(AST.JLS4,
             // ICompilationUnit.ENABLE_BINDINGS_RECOVERY |
@@ -258,9 +347,12 @@ public class ApplyRefactoringsJob extends Job {
             // ICompilationUnit.FORCE_PROBLEM_DETECTION
             // /** can be useful to back out a change that does not compile */
             // , null, null);
+            
+         /* */ 
             if (!hadUnsavedChanges) {
-                compilationUnit.save(null, true);
+             	compilationUnit.save(null, true);
             }
+            
             // I did not find any other way to directly modify the AST
             // while still keeping the resolved type bindings working.
             // Using astRoot.recordModifications() did not work:
@@ -279,6 +371,9 @@ public class ApplyRefactoringsJob extends Job {
                 ++nbLoopsWithSameVisitors;
             }
         }
+        
+        System.out.println("Refactored:"+ refactoredContent);
+       
     }
     
    
@@ -301,4 +396,124 @@ public class ApplyRefactoringsJob extends Job {
         }
         return sb.toString();
     }
+    
+    public void createNewFile(ICompilationUnit icompile) {
+    	
+    	IPath newPath = icompile.getPath().removeLastSegments(1);
+    	//newPath.create(newPath);
+    }
+    
+    /*public void createSampleFile(ICompilationUnit icompile) {
+    	String sampleName = "";
+    	String sampleInSource = "";
+    	try {
+    	/*IPackageFragment packageFragment = JavaCoreHelper.getPackageFragment(PACKAGE_NAME);
+    	final ICompilationUnit cu = packageFragment.createCompilationUnit(
+                sampleName, codeToRefactor, true, null);
+        cu.getBuffer().setContents(sampleInSource);
+        cu.save(null, true);
+    	}
+    	catch(Exception e) {
+    		System.out.println("Here is the exception");
+    	}
+    	/*System.out.print(icompile.getFullPath().removeLastSegments(1));
+    	String SAMPLES_ALL_BASE_DIR = "C:\\Users\\User\\runtime-AutoRefactoring\\JavaProject\\src";
+        final File sampleIn = new File(SAMPLES_ALL_BASE_DIR+"\\current_code.txt");
+       
+        System.out.println("File created");
+        BufferedWriter bufferedWriter = null;
+        FileWriter fileWriter = null;
+        try {
+        	 sampleIn.createNewFile();
+        	fileWriter = new FileWriter(sampleIn);
+        	bufferedWriter = new BufferedWriter(fileWriter);
+       
+        	bufferedWriter.write(codeToRefactor);
+        	
+        	bufferedWriter.close();
+        	fileWriter.close();
+        	System.out.println("SampleFile is created");
+        }
+       catch(IOException e) {
+    	   e.printStackTrace();
+       }
+        
+        finally {
+        	
+        	
+        }
+        
+        
+    }*/
+    
+	private static String getStringFromInputStream(InputStream is) {
+
+		System.out.println("Converting InputStream to String");
+		BufferedReader br = null;
+		StringBuilder sb = new StringBuilder();
+
+		String line;
+		try {
+
+			br = new BufferedReader(new InputStreamReader(is));
+			while ((line = br.readLine()) != null) {
+				//System.out.println("Lines: "+ line);
+				sb.append(line);
+				sb.append("\n");
+			}
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			if (br != null) {
+				try {
+					br.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+
+		return sb.toString();
+
+	}
+	
+	public String readContentOfJavaFile(String fileFullName) {
+		
+		System.out.println("FileFullName: "+fileFullName);
+		BufferedReader br = null;
+		StringBuilder sb = new StringBuilder();
+
+		String line;
+		try {
+
+			FileInputStream file = new FileInputStream(fileFullName);
+			
+			br = new BufferedReader(new InputStreamReader(file));
+			while ((line = br.readLine()) != null) {
+				
+				sb.append(line);
+				sb.append("\n");
+			}
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			if (br != null) {
+				try {
+					br.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+
+		return sb.toString();
+
+		
+		
+		
+	}
+	
+	
 }
