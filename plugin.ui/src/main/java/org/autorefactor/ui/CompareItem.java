@@ -7,6 +7,7 @@ import org.eclipse.compare.IEditableContent;
 import org.eclipse.compare.IModificationDate;
 import org.eclipse.compare.IStreamContentAccessor;
 import org.eclipse.compare.ITypedElement;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.compare.ResourceNode;
@@ -16,7 +17,7 @@ public class CompareItem implements IStreamContentAccessor, ITypedElement, IModi
 	private String content;
 	
 	public static String newContents;
-
+	IFile file; 
 	public CompareItem(String left ) {
 		//super();
 		content = left;
