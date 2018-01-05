@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2017 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2017-2018 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,17 +29,25 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 
 import org.autorefactor.environment.EventLoop;
-import org.autorefactor.util.UnhandledException;
 
 class CurrentThreadEvenLoop implements EventLoop {
     @Override
     public <E extends Exception> void syncExec(Callable<E> callable) throws E {
         try {
-            callable.call();
+            final E ex = callable.call();
+            if (ex != null) {
+                sneakyThrow(ex);
+            }
         } catch (ExecutionException e) {
-            throw new UnhandledException(null, e.getCause());
+            sneakyThrow(e.getCause());
         } catch (Exception e) {
-            throw new UnhandledException(null, e);
+            sneakyThrow(e);
         }
+    }
+
+    /** Allows to throw checked exceptions, throwables, etc. Beware: this method fools the compiler. */
+    @SuppressWarnings("unchecked")
+    private static <T extends Throwable> void sneakyThrow(Throwable t) throws T {
+        throw (T) t;
     }
 }
