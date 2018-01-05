@@ -44,6 +44,7 @@ import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.jobs.JobGroup;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
@@ -98,8 +99,12 @@ public class PrepareApplyRefactoringsJob extends Job {
             final Queue<RefactoringUnit> toRefactor = collectRefactoringUnits(javaElements, monitor);
             final int nbCores = Runtime.getRuntime().availableProcessors();
             final int nbWorkers = computeNbWorkers(toRefactor.size(), nbCores);
+            final JobGroup jobGroup = new JobGroup("Job name", nbWorkers, nbWorkers);
             for (int i = 0; i < nbWorkers; i++) {
-                new ApplyRefactoringsJob(toRefactor, clone(refactoringRulesToApply), environment).schedule();
+                final Job job = new ApplyRefactoringsJob(toRefactor, clone(refactoringRulesToApply), environment);
+                job.setJobGroup(jobGroup);
+                job.setUser(true);
+                job.schedule();
             }
         }
         return Status.OK_STATUS;
