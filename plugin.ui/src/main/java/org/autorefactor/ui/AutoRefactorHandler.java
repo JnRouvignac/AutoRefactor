@@ -57,7 +57,6 @@ import org.eclipse.ui.handlers.HandlerUtil;
 
 import static org.autorefactor.AutoRefactorPlugin.*;
 import static org.eclipse.jface.dialogs.MessageDialog.*;
-
 /**
  * This is the Eclipse handler for launching the automated refactorings. This is
  * invoked from the Eclipse UI.
@@ -109,7 +108,7 @@ public class AutoRefactorHandler extends AbstractHandler {
             return getSelectedJavaElements(shell, HandlerUtil.getActiveEditor(event));
         } else if ("org.eclipse.jdt.ui.PackageExplorer".equals(activePartId)
                 || "org.eclipse.ui.navigator.ProjectExplorer".equals(activePartId)) {
-            return getSelectedJavaElements(shell, (IStructuredSelection) HandlerUtil.getCurrentSelection(event));
+            return getSelectedJavaElements(shell, HandlerUtil.getCurrentStructuredSelection(event));
         } else {
             getEnvironment().getLogger().warn("Code is not implemented for activePartId '" + activePartId + "'.");
             return Collections.emptyList();
