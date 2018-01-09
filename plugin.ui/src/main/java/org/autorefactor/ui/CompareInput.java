@@ -25,6 +25,8 @@ public class CompareInput extends CompareEditorInput  {
 	static CompareConfiguration compareConfiguration = new CompareConfiguration();
 	static DiffNode node;
 	static IProgressMonitor monitor;
+	File file1 = new File("C:\\Users\\User\\Desktop\\JavaClass1.java");
+	File file2 = new File("C:\\Users\\User\\Desktop\\JavaClass2.java");
 	CompareItem left;
 	CompareItem right;
 	public CompareInput() {
@@ -59,11 +61,7 @@ public class CompareInput extends CompareEditorInput  {
 		
 		return node;
 	}
-	
-	
 
-	
-	 
 	@Override
 	public boolean okPressed() {
 	
@@ -78,13 +76,11 @@ public class CompareInput extends CompareEditorInput  {
 			
 		}
 		catch(Exception e) {
-			System.out.println("I am inside the save thing");
+			e.printStackTrace();
 		}
 		createAndCommit();
 		return true;
 	}
-	
-	
 	
 	@Override
 	public void cancelPressed() {

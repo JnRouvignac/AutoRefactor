@@ -64,8 +64,9 @@ public class ChooseRefactoringsWizard extends Wizard {
 
         final List<RefactoringRule> refactoringRules = chooseRefactoringsPage.getSelectedRefactorings();
         ApplyRefactoringListener applyRefactoringListener = new ApplyRefactoringListener();
-        PrepareApplyRefactoringsJob prepareApplyRefactoringJob =  new PrepareApplyRefactoringsJob(javaElements, refactoringRules, getEnvironment(), applyRefactoringListener);
-      //  prepareApplyRefactoringJob.addJobChangeListener(applyRefactoringListener);
+        PrepareApplyRefactoringsJob prepareApplyRefactoringJob =  new PrepareApplyRefactoringsJob(javaElements, 
+        		refactoringRules, getEnvironment(), applyRefactoringListener);
+      
         prepareApplyRefactoringJob.schedule();
       
         return !refactoringRules.isEmpty();

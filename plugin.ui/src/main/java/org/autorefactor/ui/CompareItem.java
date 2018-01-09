@@ -45,7 +45,7 @@ public class CompareItem implements IStreamContentAccessor, ITypedElement, IModi
 	@Override
 	public String getType() {
 		// TODO Auto-generated method stub
-		return null;
+		return "JAVA";
 	}
 
 	@Override

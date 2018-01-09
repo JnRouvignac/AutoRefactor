@@ -71,10 +71,11 @@ public class AutoRefactorHandler extends AbstractHandler {
     public Object execute(final ExecutionEvent event) throws ExecutionException {
         try {
             Environment environment = getEnvironment();
+            ApplyRefactoringListener applyRefactoringListener = new ApplyRefactoringListener();
             new PrepareApplyRefactoringsJob(
                     getSelectedJavaElements(event),
                     AllRefactoringRules.getConfiguredRefactoringRules(environment.getPreferences()),
-                    environment).schedule();
+                    environment, applyRefactoringListener).schedule();
         } catch (Exception e) {
             final Shell shell = HandlerUtil.getActiveShell(event);
 

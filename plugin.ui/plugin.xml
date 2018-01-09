@@ -48,6 +48,8 @@
                          commandId="org.autorefactor.automatic.refactoring" />
                 <command style="push"
                          commandId="org.autorefactor.choose.refactorings" />
+                          <command
+                          commandId="org.autorefactor.preview.refactorings" style="push"/>
             </menu>
         </menuContribution>
         <menuContribution locationURI="popup:org.eclipse.ui.navigator.ProjectExplorer#PopupMenu?after=org.eclipse.jdt.ui.refactoring.menu">
@@ -65,6 +67,8 @@
                          commandId="org.autorefactor.automatic.refactoring" />
                 <command style="push"
                          commandId="org.autorefactor.choose.refactorings" />
+                          <command
+                          commandId="org.autorefactor.preview.refactorings" style="push"/>
             </menu>
         </menuContribution>
         <!-- Cannot add to Refactor sub menu: @see https://issues.jboss.org/browse/JBIDE-1077 from Alexey Kazakov:
@@ -119,7 +123,11 @@
 
 	<extension point="org.eclipse.ui.commands">
 
-	<command name="Preview refactorings..." defaultHandler="org.autorefactor.ui.PreviewWizardHandler" id="org.autorefactor.preview.refactorings"> </command>
+	<command
+
+	name="Preview refactorings..."
+	 defaultHandler="org.autorefactor.ui.PreviewWizardHandler" 
+	 id="org.autorefactor.preview.refactorings"> </command>
 
 	</extension>
 
