@@ -1639,13 +1639,13 @@ public final class ASTHelper {
      */
     public static boolean isMethod(IMethodBinding methodBinding, String typeQualifiedName,
             String methodName, String... parameterTypesQualifiedNames) {
-        // let's do the fast checks first
+        // Let's do the fast checks first
         if (methodBinding == null
                 || !methodName.equals(methodBinding.getName())
                 || methodBinding.getParameterTypes().length != parameterTypesQualifiedNames.length) {
             return false;
         }
-        // ok more heavy checks now
+        // OK more heavy checks now
         final ITypeBinding declaringClazz = methodBinding.getDeclaringClass();
         final ITypeBinding implementedType =
                 findImplementedType(declaringClazz, typeQualifiedName);
@@ -1653,7 +1653,7 @@ public final class ASTHelper {
         if (parameterTypesMatch(implementedType, isInstanceOf, methodBinding, parameterTypesQualifiedNames)) {
             return true;
         }
-        // a lot more heavy checks
+        // A lot more heavy checks
         // FIXME find a more efficient way to do this. It would be awesome
         // if an API to directly find the overriddenMethod IMethodBinding existed
         IMethodBinding overriddenMethod = findOverridenMethod(declaringClazz, typeQualifiedName,
@@ -1688,12 +1688,18 @@ public final class ASTHelper {
     private static boolean parameterizedTypesMatch(final ITypeBinding clazz,
             final ITypeBinding clazzErasure, IMethodBinding methodBinding) {
         if (clazz.isParameterizedType() && !clazz.equals(clazzErasure)) {
-            final Map<ITypeBinding, ITypeBinding> genericToConcreteTypeParams =
+            final Map<ITypeBinding, ITypeBinding> genericToConcreteTypeParamsFromClass =
                     getGenericToConcreteTypeParamsMap(clazz, clazzErasure);
+
             for (IMethodBinding declaredMethod : clazzErasure.getDeclaredMethods()) {
-                if (declaredMethod.getName().equals(methodBinding.getName())
-                        && parameterizedTypesMatch2(genericToConcreteTypeParams, methodBinding, declaredMethod)) {
-                    return true;
+                if (declaredMethod.getName().equals(methodBinding.getName())) {
+                    final Map<ITypeBinding, ITypeBinding> genericToConcreteTypeParams =
+                            getGenericToConcreteTypeParamsMap(methodBinding, declaredMethod);
+                    genericToConcreteTypeParams.putAll(genericToConcreteTypeParamsFromClass);
+
+                    if (parameterizedTypesMatch2(genericToConcreteTypeParams, methodBinding, declaredMethod)) {
+                        return true;
+                    }
                 }
             }
         }
@@ -1701,11 +1707,19 @@ public final class ASTHelper {
     }
 
     private static Map<ITypeBinding, ITypeBinding> getGenericToConcreteTypeParamsMap(
+            final IMethodBinding method, final IMethodBinding methodErasure) {
+        return getGenericToConcreteTypeParamsMap(method.getTypeArguments(), methodErasure.getTypeParameters());
+    }
+
+    private static Map<ITypeBinding, ITypeBinding> getGenericToConcreteTypeParamsMap(
             final ITypeBinding clazz, final ITypeBinding clazzErasure) {
-        final ITypeBinding[] typeParams = clazz.getTypeArguments();
-        final ITypeBinding[] genericTypeParams = clazzErasure.getTypeParameters();
+        return getGenericToConcreteTypeParamsMap(clazz.getTypeArguments(), clazzErasure.getTypeParameters());
+    }
+
+    private static Map<ITypeBinding, ITypeBinding> getGenericToConcreteTypeParamsMap(final ITypeBinding[] typeParams,
+            final ITypeBinding[] genericTypeParams) {
         final Map<ITypeBinding, ITypeBinding> results = new HashMap<>();
-        for (int i = 0; i < typeParams.length; i++) {
+        for (int i = 0; (i < genericTypeParams.length) && (i < typeParams.length); i++) {
             results.put(genericTypeParams[i], typeParams[i]);
         }
         return results;
@@ -1722,10 +1736,21 @@ public final class ASTHelper {
         for (int i = 0; i < genericParamTypes.length; i++) {
             ITypeBinding genericParamType = genericParamTypes[i];
 
-            ITypeBinding concreteParamType = genericToConcreteTypeParams.get(genericParamType);
+            ITypeBinding concreteParamType = null;
+
+            if (genericParamType.isArray()) {
+                ITypeBinding concreteElementType = genericToConcreteTypeParams.get(genericParamType.getElementType());
+                if (concreteElementType != null) {
+                    concreteParamType = concreteElementType.createArrayType(genericParamType.getDimensions());
+                }
+            } else {
+                concreteParamType = genericToConcreteTypeParams.get(genericParamType);
+            }
+
             if (concreteParamType == null) {
                 concreteParamType = genericParamType;
             }
+
             final ITypeBinding erasure1 = paramTypes[i].getErasure();
             final ITypeBinding erasure2 = concreteParamType.getErasure();
             if (!erasure1.equals(erasure2)) {

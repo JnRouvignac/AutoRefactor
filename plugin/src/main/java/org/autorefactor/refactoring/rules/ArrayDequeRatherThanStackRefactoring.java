@@ -100,6 +100,14 @@ public class ArrayDequeRatherThanStackRefactoring extends AbstractClassSubstitut
     @Override
     protected boolean canMethodBeRefactored(final MethodInvocation mi,
             final List<MethodInvocation> methodCallsToRefactor) {
+        final String argumentType;
+        if (mi.getExpression().resolveTypeBinding().getTypeArguments() != null
+                        && mi.getExpression().resolveTypeBinding().getTypeArguments().length == 1) {
+            argumentType = mi.getExpression().resolveTypeBinding().getTypeArguments()[0].getQualifiedName();
+        } else {
+            argumentType = "java.lang.Object";
+        }
+
         if (isMethod(mi, "java.util.Vector", "addElement", "java.lang.Object")
                 || isMethod(mi, "java.util.Vector", "copyInto", "java.lang.Object[]")
                 || isMethod(mi, "java.util.Vector", "firstElement")
@@ -125,7 +133,7 @@ public class ArrayDequeRatherThanStackRefactoring extends AbstractClassSubstitut
                 || isMethod(mi, "java.util.Collection", "retainAll", "java.util.Collection")
                 || isMethod(mi, "java.util.Collection", "size")
                 || isMethod(mi, "java.util.Collection", "toArray")
-                || isMethod(mi, "java.util.Collection", "toArray", "java.lang.Object[]")
+                || isMethod(mi, "java.util.Collection", "toArray", argumentType + "[]")
                 || isMethod(mi, "java.util.Stack", "clone")
                 || isMethod(mi, "java.util.Stack", "retainAll", "java.util.Collection")
                 || isMethod(mi, "java.lang.Object", "toString")

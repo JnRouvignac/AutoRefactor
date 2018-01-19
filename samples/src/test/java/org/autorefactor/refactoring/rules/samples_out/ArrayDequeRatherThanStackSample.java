@@ -35,7 +35,7 @@ public class ArrayDequeRatherThanStackSample {
 
     public void replaceStackInstanceCreation() {
         // Keep this comment
-        Object[] stringArray = new java.util.ArrayDeque<String>().toArray();
+        Object[] stringArray = new java.util.ArrayDeque<String>().toArray(new Integer[10]);
         // Keep this comment too
         int size = new java.util.ArrayDeque<String>().size();
     }

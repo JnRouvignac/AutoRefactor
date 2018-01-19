@@ -83,11 +83,11 @@ public class ArrayListRatherThanVectorSample {
         list.add("bar");
     }
 
-    public void refactorWithMethod() {
+    public void refactorWithListMethod() {
         // Keep this comment
         java.util.ArrayList<Observable> list = new java.util.ArrayList<Observable>();
         // Keep this comment too
-        list.toArray();
+        list.toArray(new Observable[0]);
     }
 
     public void refactorWithCollectionMethod() {
@@ -113,7 +113,7 @@ public class ArrayListRatherThanVectorSample {
         return secondList.toString();
     }
 
-    public String replaceCollectionWithLoop(List<Date> dates) {
+    public Observable[] replaceCollectionWithLoop(List<Date> dates) {
         // Keep this comment
         Collection<Date> list = new java.util.ArrayList<Date>();
         for (Date date : dates) {
@@ -126,7 +126,7 @@ public class ArrayListRatherThanVectorSample {
             secondList.add(list.toString());
         }
 
-        return secondList.toString();
+        return secondList.toArray(new Observable[0]);
     }
 
     public void replaceVectorWithModifier() {

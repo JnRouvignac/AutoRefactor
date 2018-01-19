@@ -85,6 +85,14 @@ public class ArrayListRatherThanLinkedListRefactoring extends AbstractClassSubst
     @Override
     protected boolean canMethodBeRefactored(final MethodInvocation mi,
             final List<MethodInvocation> methodCallsToRefactor) {
+        final String argumentType;
+        if (mi.getExpression().resolveTypeBinding().getTypeArguments() != null
+                        && mi.getExpression().resolveTypeBinding().getTypeArguments().length == 1) {
+            argumentType = mi.getExpression().resolveTypeBinding().getTypeArguments()[0].getQualifiedName();
+        } else {
+            argumentType = "java.lang.Object";
+        }
+
         return isMethod(mi, "java.util.Collection", "add", "java.lang.Object")
                 || isMethod(mi, "java.util.Collection", "addAll", "java.util.Collection")
                 || isMethod(mi, "java.util.Collection", "clear")
@@ -98,7 +106,7 @@ public class ArrayListRatherThanLinkedListRefactoring extends AbstractClassSubst
                 || isMethod(mi, "java.util.Collection", "size")
                 || isMethod(mi, "java.util.List", "subList", "int", "int")
                 || isMethod(mi, "java.util.Collection", "toArray")
-                || isMethod(mi, "java.util.Collection", "toArray", "java.lang.Object[]")
+                || isMethod(mi, "java.util.Collection", "toArray", argumentType + "[]")
                 || isMethod(mi, "java.util.Collection", "isEmpty")
                 || isMethod(mi, "java.lang.Object", "toString")
                 || isMethod(mi, "java.lang.Object", "finalize")

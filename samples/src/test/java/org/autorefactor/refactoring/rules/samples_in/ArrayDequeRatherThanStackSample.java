@@ -35,7 +35,7 @@ public class ArrayDequeRatherThanStackSample {
 
     public void replaceStackInstanceCreation() {
         // Keep this comment
-        Object[] stringArray = new Stack<String>().toArray();
+        Object[] stringArray = new Stack<String>().toArray(new Integer[10]);
         // Keep this comment too
         int size = new Stack<String>().size();
     }

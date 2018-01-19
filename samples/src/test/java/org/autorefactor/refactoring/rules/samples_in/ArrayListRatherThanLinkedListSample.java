@@ -45,7 +45,7 @@ public class ArrayListRatherThanLinkedListSample {
 
     public void replaceRawLinkedList() {
         // Keep this comment
-        Object[] objectArray = new LinkedList().toArray();
+        String[] objectArray = new LinkedList<Integer>().toArray(new String[0]);
         // Keep this comment too
         int size = new LinkedList(new java.util.ArrayList<String>()).size();
     }
