@@ -68,6 +68,7 @@ public final class AllRefactoringRules {
                 new PrimitiveWrapperCreationRefactoring(),
                 new LiteralRatherThanBooleanConstantRefactoring(),
                 new BooleanRefactoring(),
+                new PrimitiveRatherThanBooleanWrapperRefactoring(),
                 new LazyLogicalRatherThanEagerRefactoring(),
                 new BooleanConstantRatherThanValueOfRefactoring(),
                 new BooleanEqualsRatherThanNullCheckRefactoring(),
