@@ -3,25 +3,29 @@ package org.autorefactor.ui;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
+import org.eclipse.compare.ICompareNavigator;
 import org.eclipse.compare.IEditableContent;
 import org.eclipse.compare.IModificationDate;
+import org.eclipse.compare.INavigatable;
 import org.eclipse.compare.IStreamContentAccessor;
 import org.eclipse.compare.ITypedElement;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.compare.ResourceNode;
 
-public class CompareItem implements IStreamContentAccessor, ITypedElement, IModificationDate, IEditableContent{
+public class CompareItem implements  IStreamContentAccessor, ITypedElement, IModificationDate, IEditableContent{
 
 	private String content;
-	
+	static String TEXT_TYPE = "JAVA";
 	public static String newContents;
-	IFile file; 
+	
 	public CompareItem(String left ) {
-		//super();
+		
 		content = left;
-		// TODO Auto-generated constructor stub
+		
 	}
 
 	@Override
@@ -45,7 +49,7 @@ public class CompareItem implements IStreamContentAccessor, ITypedElement, IModi
 	@Override
 	public String getType() {
 		// TODO Auto-generated method stub
-		return "JAVA";
+		return TEXT_TYPE;
 	}
 
 	@Override
@@ -63,9 +67,9 @@ public class CompareItem implements IStreamContentAccessor, ITypedElement, IModi
 
 	@Override
 	public void setContent(byte[] newContent) {
+		getType();
 		// TODO Auto-generated method stub
 		try{
-			System.out.println("SetContent is called ---------------------------"+  new String(newContent, "UTF-8"));	
 			newContents = new String(newContent, "UTF-8");
 		}
 		catch(Exception e) {
@@ -81,10 +85,12 @@ public class CompareItem implements IStreamContentAccessor, ITypedElement, IModi
 	
 	@Override
 	public ITypedElement replace(ITypedElement dest, ITypedElement src) {
-		System.out.println("somethings just changed");
+		
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+
 	
 	
 

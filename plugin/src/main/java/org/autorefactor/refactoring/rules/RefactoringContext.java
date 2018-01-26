@@ -124,7 +124,7 @@ public class RefactoringContext {
      * @return the {@link Refactorings} object containing the changes that must be applied to the AST
      */
     public Refactorings getRefactorings() {
-        return refactorings;
+    	        return refactorings;
     }
 
     String getSource(ASTNode node) {

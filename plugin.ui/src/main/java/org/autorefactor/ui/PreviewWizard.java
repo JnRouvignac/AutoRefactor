@@ -1,5 +1,6 @@
 package org.autorefactor.ui;
 
+import org.eclipse.compare.CompareUI;
 import org.eclipse.jface.wizard.Wizard;
 
 public class PreviewWizard extends Wizard {
@@ -8,7 +9,7 @@ public class PreviewWizard extends Wizard {
 
     @Override
     public String getWindowTitle() {
-        return "Preview refactorings...";
+        return "View Refactorings Applied...";
     }
 
     @Override
@@ -19,7 +20,12 @@ public class PreviewWizard extends Wizard {
 	@Override
 	public boolean performFinish() {
 		// TODO Auto-generated method stub
-		return false;
+//		final Wizard wizard = new PreviewWizard();
+//		final WizardDialog wizardDialog = new WizardDialog(shell, wizard);
+//		wizardDialog.open();
+	
+		CompareUI.openCompareDialog(new CompareInput());
+		return true;
 	}
 
 }

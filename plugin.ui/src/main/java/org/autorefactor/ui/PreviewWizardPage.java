@@ -2,6 +2,8 @@ package org.autorefactor.ui;
 
 
 
+import java.util.Iterator;
+
 import org.autorefactor.refactoring.ApplyRefactoringsJob;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
@@ -19,9 +21,9 @@ public class PreviewWizardPage extends WizardPage{
 
 	public Text refactoredText;
 	protected PreviewWizardPage() {
-		super("Preview Here");
+		super("Preview");
 		
-		setTitle("Preview WIzard");
+		setTitle("View Refactorings Applied...");
 		setDescription("This wizard is to allow user to preview the refactoring that are to be applied or that have been applied");
 		// TODO Auto-generated constructor stub
 	}
@@ -43,14 +45,25 @@ public class PreviewWizardPage extends WizardPage{
 		// TODO Auto-generated method stub
 		
 		
-	/*	refactoredText = new Text(parent,SWT.MULTI | SWT.BORDER );
+		refactoredText = new Text(parent,SWT.MULTI | SWT.BORDER );
 		refactoredText.setEnabled(false);
-		refactoredText.setText(ApplyRefactoringsJob.refactoredContent);
+		Iterator iterate = ApplyRefactoringsJob.refactoringsApplied.iterator();
+		String data= "";
+		while(iterate.hasNext()) {
+			System.out.println("No of iteration--");
+			data = data+iterate.next()+ " ";
+		}
+			
+		if(data.equals(""))
+		refactoredText.setText("No refactoring applied");
+		else {
+			System.out.println("Data-----"+ data);
+			refactoredText.setText(data.replaceAll(" ",System.getProperty("line.separator")));
 		
+		}
 		refactoredText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.FILL_VERTICAL));
-		*/
 		
-		CompareUI.openCompareDialog(new CompareInput());
+				//CompareUI.openCompareDialog(new CompareInput());
 	}
 
 }

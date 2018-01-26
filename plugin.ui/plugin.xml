@@ -50,6 +50,7 @@
                          commandId="org.autorefactor.choose.refactorings" />
                           <command
                           commandId="org.autorefactor.preview.refactorings" style="push"/>
+                        
             </menu>
         </menuContribution>
         <menuContribution locationURI="popup:org.eclipse.ui.navigator.ProjectExplorer#PopupMenu?after=org.eclipse.jdt.ui.refactoring.menu">
@@ -88,7 +89,7 @@
                          commandId="org.autorefactor.automatic.refactoring" />
                 <command style="push"
                          commandId="org.autorefactor.choose.refactorings" />
-                         <command
+                 <command
                           commandId="org.autorefactor.preview.refactorings" style="push"/>
             </menu>
         </menuContribution>
@@ -110,7 +111,7 @@
         <command
                 id="org.autorefactor.automatic.refactoring"
                 defaultHandler="org.autorefactor.ui.AutoRefactorHandler"
-                name="Automatic refactoring">
+                name="Automatic refactoring...">
         </command>
     </extension>
     <extension point="org.eclipse.ui.commands">
@@ -124,10 +125,10 @@
 	<extension point="org.eclipse.ui.commands">
 
 	<command
-
-	name="Preview refactorings..."
-	 defaultHandler="org.autorefactor.ui.PreviewWizardHandler" 
-	 id="org.autorefactor.preview.refactorings"> </command>
+    	 name="View Refactorings Applied..."
+		 defaultHandler="org.autorefactor.ui.PreviewWizardHandler" 
+	 	 id="org.autorefactor.preview.refactorings">
+	  </command>
 
 	</extension>
 

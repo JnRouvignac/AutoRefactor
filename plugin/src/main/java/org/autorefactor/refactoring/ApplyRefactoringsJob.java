@@ -87,18 +87,19 @@ import java.io.ByteArrayInputStream;
  */
 public class ApplyRefactoringsJob extends Job {
     private final Queue<RefactoringUnit> refactoringUnits;
-    private final List<RefactoringRule> refactoringRulesToApply;
+    public static  List<RefactoringRule> refactoringRulesToApply = null;
     private final Environment environment;
     
     public IJobChangeListener applyRefactoringListener;
     
     
-    public static String refactoredContent = "Apply Refactoring to preview refcatorings";
+    public static String refactoredContent = "Apply Refactoring to preview refactorings";
     public static String codeToRefactor = "Here is a code to refactor";
     public static ICompilationUnit iCompile ;
     private static final String PACKAGE_NAME = "org.autorefactor.refactoring";
     public static ICompilationUnit cu;
     public static IFile newFile;
+    public static Set<String> refactoringsApplied = new HashSet<String>();
     /**
      * Builds an instance of this class.
      *
@@ -190,8 +191,7 @@ public class ApplyRefactoringsJob extends Job {
             JavaProjectOptions options, IProgressMonitor monitor) throws Exception {
         final ITextFileBufferManager bufferManager = FileBuffers.getTextFileBufferManager();
         final ITextFileBufferManager newbufferManager = FileBuffers.getTextFileBufferManager();
-        System.out.println("BufferManager: "+bufferManager + " newbufferManager: " +newbufferManager);
-        
+    
         final IPath path = compilationUnit.getPath();
         IPath newPath = null;
         final LocationKind locationKind = LocationKind.NORMALIZE;
@@ -212,49 +212,35 @@ public class ApplyRefactoringsJob extends Job {
             }
             final IDocument document = textFileBuffer.getDocument();
            
-            /*final ITextFileBuffer textFileBuffer1 = bufferManager.getTextFileBuffer(newPath, locationKind);
-            
-            final IDocument document1 = textFileBuffer1.getDocument();*/
-            
+          
             codeToRefactor = document.get();
-            System.out.println("File Path"+ path.toString());
-            System.out.println("File Path_------------------------------");
-            System.out.println("Code To Refactor:"+ codeToRefactor);
             
             IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-           // IPath newPath = compilationUnit.getFullPath().removeLastSegment(1);
+         
             
             iCompile = compilationUnit;
             IProject project = root.getProject(compilationUnit.getPath().segment(0));
-            System.out.println("Project Name:"+ project.getName());
+         
             newFile = project.getFile("../"+compilationUnit.getPath().removeLastSegments(1)+"/newFile.java");
-            System.out.println("File Name:"+ newFile.getName() +" hello");
+        
             InputStream sourceInput = new ByteArrayInputStream(codeToRefactor.getBytes());
             
             newFile.create(sourceInput, false, monitor);
-            System.out.println("File is created: Source Input: " + getStringFromInputStream(sourceInput));
-            
+          
              newPath = newFile.getFullPath();
             
-            System.out.println("IPATH has "+newFile.getFullPath());
-            
+           
              newbufferManager.connect(newPath, locationKind, null);
            
-            System.out.println("Establish Connection");
             final ITextFileBuffer newTextFileBuffer = newbufferManager.getTextFileBuffer(newPath, locationKind);
-            System.out.println("ITextFileBuffer is executed"+ newTextFileBuffer);
+          
             final IDocument newDocument = newTextFileBuffer.getDocument();
             
-            System.out.println("New File Content::-------------------- " );
-            System.out.println(readContentOfJavaFile("C:\\Users\\User\\runtime-AutoRefactoring\\JavaProject\\src\\newFile.java"));
-            
-            System.out.println("Content of new Doc: ------------------------------");
-            System.out.println(newDocument.get());
-       
+        
              cu = JavaCore.createCompilationUnitFrom(newFile);
             
             applyRefactoring(newDocument, cu, refactoringToApply, options, monitor);
-            System.out.println("Refactoring is called");
+           
         } 
         catch(Exception e){
         	System.out.println("Exception occured");
@@ -302,6 +288,7 @@ public class ApplyRefactoringsJob extends Job {
         int totalNbLoops = 0;
         Set<ASTVisitor> lastLoopVisitors = Collections.emptySet();
         int nbLoopsWithSameVisitors = 0;
+        refactoringsApplied.clear();
         while (true) {
             if (totalNbLoops > 100) {
                 // Oops! Something went wrong.
@@ -330,7 +317,11 @@ public class ApplyRefactoringsJob extends Job {
                  refactoredContent = document.get();
                 return;
             }
-
+//            if(refactorings.hasRefactorings()) {
+//            	System.out.println("Refactorings applied:"+refactoring.getRefactorings(astRoot));
+//            	//System.out.println("Refactor....."+ refactoring.getDescription());
+//            }
+            	
             // apply the refactorings and save the compilation unit
             refactorings.applyTo(document);
            
@@ -338,7 +329,7 @@ public class ApplyRefactoringsJob extends Job {
             compilationUnit.getBuffer().setContents(document.get());
            
             refactoredContent = document.get();
-            System.out.println("refactoredContent "+refactoredContent);
+            //System.out.println("refactoredContent "+refactoredContent);
            
             // http://wiki.eclipse.org/FAQ_What_is_a_working_copy%3F
             // compilationUnit.reconcile(AST.JLS4,
@@ -362,8 +353,14 @@ public class ApplyRefactoringsJob extends Job {
             resetParser(compilationUnit, parser, options);
             astRoot = (CompilationUnit) parser.createAST(null);
             ++totalNbLoops;
-
+            
             final Set<ASTVisitor> thisLoopVisitors = refactoring.getVisitorsContributingRefactoring();
+            Iterator iterate = thisLoopVisitors.iterator();
+            while(iterate.hasNext()) {
+            	String refactoringapp =iterate.next().getClass().getName();
+            	System.out.println("Refcatorings applied" + refactoringapp);
+            	refactoringsApplied.add(refactoringapp);
+            }
             if (!thisLoopVisitors.equals(lastLoopVisitors)) {
                 lastLoopVisitors = new HashSet<>(thisLoopVisitors);
                 nbLoopsWithSameVisitors = 0;
@@ -372,14 +369,15 @@ public class ApplyRefactoringsJob extends Job {
             }
         }
         
-        System.out.println("Refactored:"+ refactoredContent);
+     
        
     }
     
    
 
     private static void resetParser(ICompilationUnit cu, ASTParser parser, JavaProjectOptions options) {
-        parser.setSource(cu);
+    	
+    	parser.setSource(cu);
         parser.setResolveBindings(true);
         parser.setCompilerOptions(options.getCompilerOptions());
     }
@@ -400,51 +398,9 @@ public class ApplyRefactoringsJob extends Job {
     public void createNewFile(ICompilationUnit icompile) {
     	
     	IPath newPath = icompile.getPath().removeLastSegments(1);
-    	//newPath.create(newPath);
-    }
     
-    /*public void createSampleFile(ICompilationUnit icompile) {
-    	String sampleName = "";
-    	String sampleInSource = "";
-    	try {
-    	/*IPackageFragment packageFragment = JavaCoreHelper.getPackageFragment(PACKAGE_NAME);
-    	final ICompilationUnit cu = packageFragment.createCompilationUnit(
-                sampleName, codeToRefactor, true, null);
-        cu.getBuffer().setContents(sampleInSource);
-        cu.save(null, true);
-    	}
-    	catch(Exception e) {
-    		System.out.println("Here is the exception");
-    	}
-    	/*System.out.print(icompile.getFullPath().removeLastSegments(1));
-    	String SAMPLES_ALL_BASE_DIR = "C:\\Users\\User\\runtime-AutoRefactoring\\JavaProject\\src";
-        final File sampleIn = new File(SAMPLES_ALL_BASE_DIR+"\\current_code.txt");
-       
-        System.out.println("File created");
-        BufferedWriter bufferedWriter = null;
-        FileWriter fileWriter = null;
-        try {
-        	 sampleIn.createNewFile();
-        	fileWriter = new FileWriter(sampleIn);
-        	bufferedWriter = new BufferedWriter(fileWriter);
-       
-        	bufferedWriter.write(codeToRefactor);
-        	
-        	bufferedWriter.close();
-        	fileWriter.close();
-        	System.out.println("SampleFile is created");
-        }
-       catch(IOException e) {
-    	   e.printStackTrace();
-       }
-        
-        finally {
-        	
-        	
-        }
-        
-        
-    }*/
+    }
+
     
 	private static String getStringFromInputStream(InputStream is) {
 
@@ -515,5 +471,7 @@ public class ApplyRefactoringsJob extends Job {
 		
 	}
 	
-	
+	public List allRefactoringApplied() {
+		return refactoringRulesToApply;
+	}
 }

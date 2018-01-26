@@ -4,17 +4,16 @@ import java.lang.reflect.InvocationTargetException;
 import java.io.*;
 import org.eclipse.compare.structuremergeviewer.ICompareInput;
 import org.eclipse.compare.structuremergeviewer.ICompareInputChangeListener;
-
 import org.autorefactor.refactoring.ApplyRefactoringsJob;
 import org.eclipse.compare.*;
 import org.eclipse.compare.structuremergeviewer.DiffNode;
 import org.eclipse.compare.structuremergeviewer.Differencer;
 import org.eclipse.core.runtime.IProgressMonitor;
-
 import org.autorefactor.refactoring.RefactoringUnit;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.internal.corext.util.Resources;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.core.runtime.CoreException;
 public class CompareInput extends CompareEditorInput  {
@@ -25,24 +24,24 @@ public class CompareInput extends CompareEditorInput  {
 	static CompareConfiguration compareConfiguration = new CompareConfiguration();
 	static DiffNode node;
 	static IProgressMonitor monitor;
-	File file1 = new File("C:\\Users\\User\\Desktop\\JavaClass1.java");
-	File file2 = new File("C:\\Users\\User\\Desktop\\JavaClass2.java");
+	
 	CompareItem left;
 	CompareItem right;
+	private Composite parent;
+	//CompareViewerPane compareView = createStructureInputPane(parent);
+	
 	public CompareInput() {
 		super(compareConfiguration);
 		compareConfiguration.setLeftLabel("Original Java File");
-		
 		compareConfiguration.setRightLabel("Refactored Java File");
 		compareConfiguration.setRightEditable(true);
 		compareConfiguration.setLeftEditable(true);
+		
 		compareConfiguration.setProperty(IGNORE_WHITESPACE, IGNORE_WHITESPACE);
-		
+		compareConfiguration.setProperty(CompareItem.TEXT_TYPE , "JAVA");
 		setDirty(true);
+		setTitle("Compare the two java File");
 		
-		
-		
-		// TODO Auto-generated constructor stub
 	}
 
 	
@@ -54,9 +53,7 @@ public class CompareInput extends CompareEditorInput  {
 		
 		CompareItem ancestor = new CompareItem(ApplyRefactoringsJob.codeToRefactor);
 		left = new CompareItem(ApplyRefactoringsJob.codeToRefactor);
-		
 		right = new CompareItem(ApplyRefactoringsJob.refactoredContent);
-		
 		node = new DiffNode(null, Differencer.CONFLICTING, ancestor, left, right);
 		
 		return node;
@@ -109,6 +106,8 @@ public class CompareInput extends CompareEditorInput  {
 		}
 		
 	}
+	
+	
 	private static String getStringFromInputStream(InputStream is) {
 
 		BufferedReader br = null;
@@ -168,8 +167,6 @@ public class CompareInput extends CompareEditorInput  {
 
 		
 	}
-
-
 
 
 

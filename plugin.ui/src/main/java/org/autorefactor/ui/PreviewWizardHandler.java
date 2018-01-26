@@ -20,20 +20,21 @@ public class PreviewWizardHandler extends AbstractHandler{
 		// TODO Auto-generated method stub
 		final Shell shell = HandlerUtil.getActiveShell(event);
 		try {
-			CompareUI.openCompareDialog(new CompareInput());
-		}
-		 /* Display.getDefault().asyncExec(new Runnable() {
+			//CompareUI.openCompareDialog(new CompareInput());
+		
+		  Display.getDefault().asyncExec(new Runnable() {
 	                @Override
 	                public void run() {
-			/*final Wizard wizard = new PreviewWizard();
+			final Wizard wizard = new PreviewWizard();
 			final WizardDialog wizardDialog = new WizardDialog(shell, wizard);
 			wizardDialog.open();
-			System.out.println("Wizard Open");*/
+			System.out.println("Wizard Open");
 	                	
-	       /*         	
+	               	
 	               }
 			 });
-		}*/
+		}
+		
 		catch(Exception e) {
 			 Display.getDefault().asyncExec(new Runnable() {
 	                @Override

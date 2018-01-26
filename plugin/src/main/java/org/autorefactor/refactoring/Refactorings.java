@@ -88,6 +88,7 @@ public class Refactorings {
             }
         });
         this.commentRewriter = new ASTCommentRewriter(astRoot);
+      
     }
 
     /**
@@ -471,7 +472,7 @@ public class Refactorings {
         final TextEdit edits = rewrite.rewriteAST(document, null);
         commentRewriter.addEdits(document, edits);
         sourceRewriter.addEdits(document, edits);
-       
+     
         applyEditsToDocument(edits, document);
     }
 
@@ -479,7 +480,7 @@ public class Refactorings {
         // Call this operation on the SWT Display Thread with syncExec(),
         // because it changes or adds something to the GUI.
         // Otherwise it would throw an Invalid thread access Exception.
-    	 System.out.println("-----------------Apply Edits To document called---------------");
+    	 //System.out.println("-----------------Apply Edits To document called---------------");
         eventLoop.syncExec(new Callable<BadLocationException>() {
             @Override
             public BadLocationException call() throws Exception {

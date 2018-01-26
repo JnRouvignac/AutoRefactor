@@ -30,11 +30,10 @@ public class ApplyRefactoringListener implements IJobChangeListener {
 	public void done(IJobChangeEvent event) {
 		// TODO Auto-generated method stub
 		
-		System.out.println("Number Of Jobs"+ numberOfJobs);
-		System.out.println("Job is done");
 		Display.getDefault().syncExec(new Runnable() {
 			
 			public void run() {
+				
 				CompareInput compareInput = new CompareInput();
 				compareInput.setDirty(true);
 				CompareUI.openCompareDialog(new CompareInput());
