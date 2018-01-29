@@ -30,6 +30,26 @@ public class BooleanSample {
     public boolean booleanPrimitive;
     public Boolean booleanWrapper;
 
+    public void replaceIfByAssignment(boolean b) {
+        boolean varToAssign;
+        // Keep this comment
+        if (b) {
+            varToAssign = true;
+        } else {
+            varToAssign = false;
+        }
+    }
+
+    public void replaceIfByOppositeAssignment(boolean b) {
+        boolean varToAssign;
+        // Keep this comment
+        if (b) {
+            varToAssign = false;
+        } else {
+            varToAssign = true;
+        }
+    }
+
     public boolean returnIfConditionBooleanPrimitive(boolean b) {
         // Keep this comment
         if (b) {

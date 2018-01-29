@@ -45,6 +45,9 @@ import static org.eclipse.jdt.core.dom.InfixExpression.Operator.CONDITIONAL_OR;
 import static org.eclipse.jdt.core.dom.InfixExpression.Operator.OR;
 import static org.eclipse.jdt.core.dom.InfixExpression.Operator.XOR;
 import static org.eclipse.jdt.core.dom.PrefixExpression.Operator.NOT;
+import static org.eclipse.jdt.core.dom.Assignment.Operator.BIT_AND_ASSIGN;
+import static org.eclipse.jdt.core.dom.Assignment.Operator.BIT_OR_ASSIGN;
+import static org.eclipse.jdt.core.dom.Assignment.Operator.BIT_XOR_ASSIGN;
 
 import org.autorefactor.refactoring.ASTBuilder;
 import org.eclipse.jdt.core.dom.ASTNode;
@@ -55,6 +58,8 @@ import org.eclipse.jdt.core.dom.CastExpression;
 import org.eclipse.jdt.core.dom.ConditionalExpression;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.InfixExpression;
+import org.eclipse.jdt.core.dom.MethodDeclaration;
+import org.eclipse.jdt.core.dom.Name;
 import org.eclipse.jdt.core.dom.ParenthesizedExpression;
 import org.eclipse.jdt.core.dom.PrefixExpression;
 import org.eclipse.jdt.core.dom.QualifiedName;
@@ -80,7 +85,7 @@ public class PrimitiveRatherThanBooleanWrapperRefactoring extends AbstractRefact
     @Override
     public boolean visit(VariableDeclarationStatement node) {
         if (node.fragments().size() == 1) {
-            VariableDeclarationFragment fragment = (VariableDeclarationFragment) node.fragments().get(0);
+            final VariableDeclarationFragment fragment = (VariableDeclarationFragment) node.fragments().get(0);
             if (hasType(fragment.resolveBinding().getType(), "java.lang.Boolean")
                     && fragment.getInitializer() != null) {
                 if (isNotNull(fragment.getInitializer())) {
@@ -91,7 +96,7 @@ public class PrimitiveRatherThanBooleanWrapperRefactoring extends AbstractRefact
 
                         if (varOccurrenceVisitor.canBeRefactored() && varOccurrenceVisitor.getAutoBoxingCount() < 2) {
                             final ASTBuilder b = this.ctx.getASTBuilder();
-                            Type booleanPrimitiveType = b.type("boolean");
+                            final Type booleanPrimitiveType = b.type("boolean");
                             ctx.getRefactorings().replace(node.getType(),
                                     booleanPrimitiveType);
                             return DO_NOT_VISIT_SUBTREE;
@@ -113,17 +118,17 @@ public class PrimitiveRatherThanBooleanWrapperRefactoring extends AbstractRefact
         } else if (expr instanceof InfixExpression) {
             return true;
         } else if (expr instanceof PrefixExpression) {
-            PrefixExpression prefixExpr = (PrefixExpression) expr;
+            final PrefixExpression prefixExpr = (PrefixExpression) expr;
             return NOT.equals(prefixExpr.getOperator());
         } else if (expr instanceof CastExpression) {
-            CastExpression castExpr = (CastExpression) expr;
+            final CastExpression castExpr = (CastExpression) expr;
             return hasType(castExpr.getType().resolveBinding(), "boolean");
         } else if (expr instanceof QualifiedName) {
-            QualifiedName qualifiedName = (QualifiedName) expr;
+            final QualifiedName qualifiedName = (QualifiedName) expr;
             return isField(qualifiedName, "java.lang.Boolean", "TRUE")
                     || isField(qualifiedName, "java.lang.Boolean", "FALSE");
         } else if (expr instanceof ParenthesizedExpression) {
-            ParenthesizedExpression parenthesizedExpr = (ParenthesizedExpression) expr;
+            final ParenthesizedExpression parenthesizedExpr = (ParenthesizedExpression) expr;
             return isNotNull(parenthesizedExpr.getExpression());
         }
         return false;
@@ -172,39 +177,56 @@ public class PrimitiveRatherThanBooleanWrapperRefactoring extends AbstractRefact
                 return true;
 
             case ASSIGNMENT:
-                Assignment assignment = (Assignment) parentNode;
-                if (assignment.getLeftHandSide().equals(node)) {
+                final Assignment assignment = (Assignment) parentNode;
+                if (BIT_AND_ASSIGN.equals(assignment.getOperator())
+                        || BIT_OR_ASSIGN.equals(assignment.getOperator())
+                        || BIT_XOR_ASSIGN.equals(assignment.getOperator())) {
+                    return true;
+                } else if (assignment.getLeftHandSide().equals(node)) {
                     return isNotNull(assignment.getRightHandSide());
                 } else if (assignment.getRightHandSide().equals(node)) {
-                    autoBoxingCount++;
-                    return true;
+                    if (assignment.getLeftHandSide() instanceof Name) {
+                        return isBoolean((Name) assignment.getLeftHandSide());
+                    } else {
+                        return false;
+                    }
                 } else {
                     return false;
                 }
 
             case VARIABLE_DECLARATION_FRAGMENT:
-                VariableDeclarationFragment fragment = (VariableDeclarationFragment) parentNode;
+                final VariableDeclarationFragment fragment = (VariableDeclarationFragment) parentNode;
                 if (fragment.getInitializer().equals(node)) {
-                    autoBoxingCount++;
-                    return true;
+                    return isBoolean(fragment.getName());
                 } else {
                     return false;
                 }
 
             case RETURN_STATEMENT:
-                ReturnStatement returnStmt = (ReturnStatement) parentNode;
+                final ReturnStatement returnStmt = (ReturnStatement) parentNode;
                 if (returnStmt.getExpression().equals(node)) {
-                    if (!isVarReturned) {
-                        isVarReturned = true;
-                        autoBoxingCount++;
+                    final MethodDeclaration method = getAncestorOrNull(returnStmt, MethodDeclaration.class);
+                    if (method != null && method.getReturnType2() != null) {
+                        if (hasType(method.getReturnType2().resolveBinding(), "boolean")) {
+                            return true;
+                        } else if (hasType(method.getReturnType2().resolveBinding(), "java.lang.Boolean")) {
+                            if (!isVarReturned) {
+                                isVarReturned = true;
+                                autoBoxingCount++;
+                            }
+                            return true;
+                        } else {
+                            return false;
+                        }
+                    } else {
+                        return false;
                     }
-                    return true;
                 } else {
                     return false;
                 }
 
             case CONDITIONAL_EXPRESSION:
-                ConditionalExpression conditionalExpr = (ConditionalExpression) parentNode;
+                final ConditionalExpression conditionalExpr = (ConditionalExpression) parentNode;
                 return conditionalExpr.getExpression().equals(node);
 
             case PREFIX_EXPRESSION:
@@ -218,6 +240,17 @@ public class PrimitiveRatherThanBooleanWrapperRefactoring extends AbstractRefact
                         || XOR.equals(((InfixExpression) parentNode).getOperator());
 
             default:
+                return false;
+            }
+        }
+
+        private boolean isBoolean(final Name name) {
+            if (hasType(name.resolveTypeBinding(), "boolean")) {
+                return true;
+            } else if (hasType(name.resolveTypeBinding(), "java.lang.Boolean")) {
+                autoBoxingCount++;
+                return true;
+            } else {
                 return false;
             }
         }

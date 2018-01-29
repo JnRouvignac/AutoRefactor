@@ -25,9 +25,18 @@
  */
 package org.autorefactor.refactoring.rules.samples_out;
 
+import java.util.Map;
+import java.util.Observable;
+
 public class PrimitiveRatherThanBooleanWrapperSample {
 
     public Boolean doNotRefactorFields = Boolean.TRUE;
+
+    public boolean booleanField;
+
+    public Boolean wrapperField;
+
+    public Object objectField;
 
     public void replaceWrapper(boolean b) {
         // Keep this comment
@@ -145,14 +154,31 @@ public class PrimitiveRatherThanBooleanWrapperSample {
         return returnedBoolean;
     }
 
-    public boolean replaceMultiReturnedWrapper(boolean b) {
+    public Object doNotBreakAutoboxing() {
+        Boolean returnedObject = Boolean.TRUE;
+        return returnedObject;
+    }
+
+    public boolean replaceMultiReturnedWrapper(int i) {
         // Keep this comment
         boolean returnedBoolean = Boolean.TRUE;
-        if (b) {
-            System.out.println("True!");
+        if (i > 0) {
+            System.out.println("Positive");
             return returnedBoolean;
         } else {
-            System.out.println("False!");
+            System.out.println("Negative");
+            return returnedBoolean;
+        }
+    }
+
+    public Boolean replaceReturnedAutoBoxedWrapper(int i) {
+        // Keep this comment
+        boolean returnedBoolean = Boolean.TRUE;
+        if (i > 0) {
+            System.out.println("Positive");
+            return returnedBoolean;
+        } else {
+            System.out.println("Negative");
             return returnedBoolean;
         }
     }
@@ -175,9 +201,57 @@ public class PrimitiveRatherThanBooleanWrapperSample {
         reassignedBoolean = null;
     }
 
+    public void doNotReplaceWrapperPassedAsObject(Map<Boolean, Observable> obsByBoolean) {
+        Boolean reassignedBoolean = Boolean.TRUE;
+        obsByBoolean.get(reassignedBoolean).notifyObservers();
+    }
+
+    public void replaceAssignedWrapper() {
+        // Keep this comment
+        boolean assignedBoolean = Boolean.TRUE;
+        Boolean anotherBoolean = assignedBoolean;
+    }
+
+    public void replaceWrapperAssignedOnBooleanField() {
+        // Keep this comment
+        boolean assignedBoolean = Boolean.TRUE;
+        booleanField = assignedBoolean;
+    }
+
+    public void replaceWrapperAssignedOnWrapperField() {
+        // Keep this comment
+        boolean assignedBoolean = Boolean.TRUE;
+        wrapperField = assignedBoolean;
+    }
+
+    public void doNotReplaceWrapperAssignedOnObjectField() {
+        Boolean assignedBoolean = Boolean.TRUE;
+        objectField = assignedBoolean;
+    }
+
     public void doNotReplaceMultiAssignedWrapper() {
         Boolean assignedBoolean = Boolean.TRUE;
         Boolean anotherBoolean = assignedBoolean;
         Boolean yetAnotherBoolean = assignedBoolean;
+    }
+
+    public void replaceBitAssignedWrapper(Boolean aBoolean, Boolean anotherBoolean,
+            Boolean yetAnotherBoolean) {
+        // Keep this comment
+        boolean assignedBoolean = Boolean.TRUE;
+        aBoolean &= assignedBoolean;
+        anotherBoolean |= assignedBoolean;
+        yetAnotherBoolean ^= assignedBoolean;
+    }
+
+    public Boolean doNotReplaceMultiAutoBoxedWrapper() {
+        Boolean assignedBoolean = Boolean.TRUE;
+        Boolean anotherBoolean = assignedBoolean;
+        return assignedBoolean;
+    }
+
+    public void doNotBreakAutoboxingOnAssignment() {
+        Boolean returnedObject = Boolean.TRUE;
+        Object anotherObject = returnedObject;
     }
 }
