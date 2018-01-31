@@ -102,6 +102,14 @@ public class PrimitiveRatherThanBooleanWrapperSample {
         }
     }
 
+    public void replaceComplexExprWrapper(boolean b1, boolean b2, boolean b3, boolean b4) {
+        // Keep this comment
+        boolean complexVar = b1 ? !b2 : (b3 || b4);
+        if (complexVar) {
+            System.out.println("True!");
+        }
+    }
+
     public void replaceCastWrapper(Boolean b) {
         // Keep this comment
         boolean castVar = (boolean) b;

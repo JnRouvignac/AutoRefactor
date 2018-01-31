@@ -95,10 +95,7 @@ public class PrimitiveRatherThanBooleanWrapperRefactoring extends AbstractRefact
                         parentBlock.accept(varOccurrenceVisitor);
 
                         if (varOccurrenceVisitor.canBeRefactored() && varOccurrenceVisitor.getAutoBoxingCount() < 2) {
-                            final ASTBuilder b = this.ctx.getASTBuilder();
-                            final Type booleanPrimitiveType = b.type("boolean");
-                            ctx.getRefactorings().replace(node.getType(),
-                                    booleanPrimitiveType);
+                            refactorBoolean(node);
                             return DO_NOT_VISIT_SUBTREE;
                         }
                     }
@@ -109,12 +106,25 @@ public class PrimitiveRatherThanBooleanWrapperRefactoring extends AbstractRefact
         return VISIT_SUBTREE;
     }
 
+    private void refactorBoolean(final VariableDeclarationStatement node) {
+        final ASTBuilder b = this.ctx.getASTBuilder();
+        final Type booleanPrimitiveType = b.type("boolean");
+        ctx.getRefactorings().replace(node.getType(),
+                booleanPrimitiveType);
+    }
+
     private boolean isNotNull(final Expression expr) {
         final Object constantCondition =
                 expr.resolveConstantExpressionValue();
         if (constantCondition != null) {
             return Boolean.TRUE.equals(constantCondition)
                     || Boolean.FALSE.equals(constantCondition);
+        } else if (expr instanceof ParenthesizedExpression) {
+            final ParenthesizedExpression parenthesizedExpr = (ParenthesizedExpression) expr;
+            return isNotNull(parenthesizedExpr.getExpression());
+        } else if (expr instanceof ConditionalExpression) {
+            final ConditionalExpression prefixExpr = (ConditionalExpression) expr;
+            return isNotNull(prefixExpr.getThenExpression()) && isNotNull(prefixExpr.getElseExpression());
         } else if (expr instanceof InfixExpression) {
             return true;
         } else if (expr instanceof PrefixExpression) {
@@ -127,9 +137,6 @@ public class PrimitiveRatherThanBooleanWrapperRefactoring extends AbstractRefact
             final QualifiedName qualifiedName = (QualifiedName) expr;
             return isField(qualifiedName, "java.lang.Boolean", "TRUE")
                     || isField(qualifiedName, "java.lang.Boolean", "FALSE");
-        } else if (expr instanceof ParenthesizedExpression) {
-            final ParenthesizedExpression parenthesizedExpr = (ParenthesizedExpression) expr;
-            return isNotNull(parenthesizedExpr.getExpression());
         }
         return false;
     }
