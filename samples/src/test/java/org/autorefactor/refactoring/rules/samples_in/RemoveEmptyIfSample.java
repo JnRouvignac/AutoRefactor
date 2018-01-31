@@ -26,11 +26,9 @@
 package org.autorefactor.refactoring.rules.samples_in;
 
 import java.util.AbstractList;
-import java.util.Collection;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.List;
 
-public class DeadCodeEliminationSample {
+public class RemoveEmptyIfSample {
 
     public int removeEmptyElseClause(boolean b) {
         int i = 0;
@@ -84,14 +82,21 @@ public class DeadCodeEliminationSample {
         }
     }
 
-    public void removeIfButKeepConditionsWithSideEffects(AtomicBoolean b, AtomicInteger i, Collection<Object> col) {
-        if (b.getAndSet(true)) {
+    public void doNotRemoveIncrement(int i) {
+        if (i++ > 0) {
+
         }
-        if (col.add(1)) {
+    }
+
+    public void doNotRemoveAssgnment(int i) {
+        if ((i = 10) > 0) {
+
         }
-        if (i.getAndIncrement() == 3) {
-        }
-        if (i.getAndIncrement() == 3 && b.getAndSet(false) && col.add(2)) {
+    }
+
+    public void doNotRemoveMethod(List<String> list) {
+        if (list.remove("foo")) {
+
         }
     }
 
@@ -139,26 +144,5 @@ public class DeadCodeEliminationSample {
         while ((i--) * 13 > -200);
 
         return i;
-    }
-
-    public int replaceDeadCodeBySideEffects(int i, byte[] bytes, int j) {
-        for (;i * 13 < 100; i++)
-            if (j++ == 10) {
-            }
-
-        for (byte oneByte : bytes)
-            if (j++ == 10) {
-            }
-
-        while ((i++) * 13 < 100)
-            if (j++ == 10) {
-            }
-
-        do
-            if (j++ == 10) {
-            }
-        while ((i--) * 13 > -200);
-
-        return i + j;
     }
 }

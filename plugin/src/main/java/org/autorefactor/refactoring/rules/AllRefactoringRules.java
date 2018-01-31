@@ -88,7 +88,7 @@ public final class AllRefactoringRules {
                 new BigNumberRefactoring(),
                 // TODO JNR implement
                 // new ForeachRefactoring(),
-                new DeadCodeEliminationRefactoring(),
+                new RemoveEmptyIfRefactoring(),
                 new InlineCodeRatherThanPeremptoryConditionRefactoring(),
                 new RemoveUselessBlockRefactoring(),
                 new RemoveEmptyStatementRefactoring(),

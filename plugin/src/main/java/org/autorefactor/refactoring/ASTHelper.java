@@ -263,6 +263,14 @@ public final class ASTHelper {
         }
 
         @Override
+        public boolean visit(SuperMethodInvocation node) {
+            if (!ExprActivity.ACTIVE.equals(activityLevel)) {
+                activityLevel = ExprActivity.CAN_BE_ACTIVE;
+            }
+            return VISIT_SUBTREE;
+        }
+
+        @Override
         public boolean visit(MethodInvocation node) {
             if (!ExprActivity.ACTIVE.equals(activityLevel)) {
                 activityLevel = ExprActivity.CAN_BE_ACTIVE;
@@ -272,6 +280,14 @@ public final class ASTHelper {
 
         @Override
         public boolean visit(ClassInstanceCreation node) {
+            if (!ExprActivity.ACTIVE.equals(activityLevel)) {
+                activityLevel = ExprActivity.CAN_BE_ACTIVE;
+            }
+            return VISIT_SUBTREE;
+        }
+
+        @Override
+        public boolean visit(ThrowStatement node) {
             if (!ExprActivity.ACTIVE.equals(activityLevel)) {
                 activityLevel = ExprActivity.CAN_BE_ACTIVE;
             }
@@ -2352,16 +2368,16 @@ public final class ASTHelper {
     }
 
     /**
-     * Return true if the expression changes nothing.
+     * Return true if the node changes nothing.
      *
-     * @param expr The expression to visit.
+     * @param node The node to visit.
      *
-     * @return True if the expression changes nothing.
+     * @return True if the node changes nothing.
      */
-    public static boolean isPassive(final Expression expr) {
+    public static boolean isPassive(final ASTNode node) {
         final ExprActivityVisitor visitor =
             new ExprActivityVisitor();
-        expr.accept(visitor);
+        node.accept(visitor);
         return ExprActivity.PASSIVE.equals(visitor.getActivityLevel());
     }
 
