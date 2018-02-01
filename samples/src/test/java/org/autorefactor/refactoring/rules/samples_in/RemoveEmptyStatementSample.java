@@ -25,6 +25,8 @@
  */
 package org.autorefactor.refactoring.rules.samples_in;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class RemoveEmptyStatementSample {
@@ -72,13 +74,46 @@ public class RemoveEmptyStatementSample {
         return i;
     }
 
+    public void doNotRemoveInfiniteWhile() {
+        while (true);
+    }
+
     public int doNotRemoveDoWhileWithIncrement(int i) {
         do; while (i++ == 100);
         return i;
     }
 
-    public int doNotRemoveForWithMethodCall(List<String> filledList, int end) {
-        for (String aString : filledList.subList(0, end--));
-        return end;
+    public void doNotRemoveInfiniteDoWhile() {
+        do; while (true);
+    }
+
+    public int doNotRemoveForWithExternalVar(int myValue) {
+        for (myValue = 0; myValue < 1000; myValue = myValue * myValue);
+        return myValue;
+    }
+
+    public int doNotRemoveForWithDecrement(List<String> filledList, int init) {
+        for (String aString : filledList.toArray(new String[init--]));
+        return init;
+    }
+
+    public class ActiveIteratorList<E> extends ArrayList<E> {
+
+        private int readCount = 0;
+
+        public Iterator<E> iterator() {
+            readCount++;
+            return super.iterator();
+        }
+
+        public int getReadCount() {
+            return readCount;
+        }
+    }
+
+    public int doNotRemoveForWithActiveIterator(ActiveIteratorList<String> activeList) {
+        for (String aString : activeList);
+
+        return activeList.getReadCount();
     }
 }

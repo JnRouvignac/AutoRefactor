@@ -39,6 +39,7 @@ import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.DoStatement;
 import org.eclipse.jdt.core.dom.EmptyStatement;
 import org.eclipse.jdt.core.dom.EnhancedForStatement;
+import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ForStatement;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.Statement;
@@ -87,25 +88,38 @@ public class RemoveEmptyStatementRefactoring extends AbstractRefactoringRule {
                 }
             }
         } else if (parent instanceof EnhancedForStatement) {
-            EnhancedForStatement efs = (EnhancedForStatement) parent;
-            if (isPassive(efs.getExpression())) {
+            final EnhancedForStatement efs = (EnhancedForStatement) parent;
+            if (isPassive(efs.getExpression()) && efs.getExpression().resolveTypeBinding().isArray()) {
                 return maybeRemoveEmptyStmtBody(node, efs, efs.getBody());
             }
         } else if (parent instanceof ForStatement) {
-            ForStatement fs = (ForStatement) parent;
-            return maybeRemoveEmptyStmtBody(node, fs, fs.getBody());
+            final ForStatement fs = (ForStatement) parent;
+            if (arePassive(fs.initializers()) && isPassive(fs.getExpression())) {
+                return maybeRemoveEmptyStmtBody(node, fs, fs.getBody());
+            }
         } else if (parent instanceof WhileStatement) {
-            WhileStatement ws = (WhileStatement) parent;
-            if (isPassive(ws.getExpression())) {
+            final WhileStatement ws = (WhileStatement) parent;
+            if (isPassive(ws.getExpression())
+                    && !Boolean.TRUE.equals(ws.getExpression().resolveConstantExpressionValue())) {
                 return maybeRemoveEmptyStmtBody(node, ws, ws.getBody());
             }
         } else if (parent instanceof DoStatement) {
-            DoStatement ws = (DoStatement) parent;
-            if (isPassive(ws.getExpression())) {
-                return maybeRemoveEmptyStmtBody(node, ws, ws.getBody());
+            final DoStatement ds = (DoStatement) parent;
+            if (isPassive(ds.getExpression())
+                    && !Boolean.TRUE.equals(ds.getExpression().resolveConstantExpressionValue())) {
+                return maybeRemoveEmptyStmtBody(node, ds, ds.getBody());
             }
         }
         return VISIT_SUBTREE;
+    }
+
+    private boolean arePassive(final List<?> initializers) {
+        for (final Object initializer : initializers) {
+            if (!isPassive((Expression) initializer)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private boolean maybeRemoveEmptyStmtBody(final EmptyStatement node, final Statement stmt, final Statement body) {
