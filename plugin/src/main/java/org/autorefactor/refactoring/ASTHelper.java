@@ -1603,12 +1603,12 @@ public final class ASTHelper {
      *
      * @param node the qualified name to compare
      * @param qualifiedTypeName the qualified name of the type declaring the field
-     * @param fieldName the field name
+     * @param fieldNames the field names
      * @return true if the provided qualified name matches the provided field signature, false otherwise
      */
-    public static boolean isField(QualifiedName node, String qualifiedTypeName, String fieldName) {
+    public static boolean isField(QualifiedName node, String qualifiedTypeName, String... fieldNames) {
         return instanceOf(node, qualifiedTypeName)
-                && node.getName().getIdentifier().equals(fieldName);
+                && Arrays.asList(fieldNames).contains(node.getName().getIdentifier());
     }
 
     /**

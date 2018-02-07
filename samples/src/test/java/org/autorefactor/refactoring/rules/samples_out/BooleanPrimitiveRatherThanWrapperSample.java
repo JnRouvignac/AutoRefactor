@@ -110,6 +110,14 @@ public class BooleanPrimitiveRatherThanWrapperSample {
         }
     }
 
+    public void replaceWrapperFromValueOf(boolean b1) {
+        // Keep this comment
+        boolean varFromValueOf = Boolean.valueOf(b1);
+        if (varFromValueOf) {
+            System.out.println("True!");
+        }
+    }
+
     public void replaceParentherizedWrapper(boolean b1, boolean b2) {
         // Keep this comment
         boolean parentherizedVar = (b1 || b2);
