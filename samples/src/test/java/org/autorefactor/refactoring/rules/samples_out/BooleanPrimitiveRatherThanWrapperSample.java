@@ -28,7 +28,7 @@ package org.autorefactor.refactoring.rules.samples_out;
 import java.util.Map;
 import java.util.Observable;
 
-public class PrimitiveRatherThanBooleanWrapperSample {
+public class BooleanPrimitiveRatherThanWrapperSample {
 
     public Boolean doNotRefactorFields = Boolean.TRUE;
 
@@ -48,8 +48,24 @@ public class PrimitiveRatherThanBooleanWrapperSample {
 
     public void replaceFullyQualifiedWrapper(boolean b) {
         // Keep this comment
-        boolean alwaysInitializedVar = Boolean.TRUE;
+        boolean alwaysInitializedVar = Boolean.FALSE;
         if (alwaysInitializedVar && b) {
+            System.out.println("True!");
+        }
+    }
+
+    public void replaceWrapperInCast() {
+        // Keep this comment
+        boolean alwaysInitializedVar = Boolean.FALSE;
+        if ((boolean) alwaysInitializedVar) {
+            System.out.println("True!");
+        }
+    }
+
+    public void replaceWrapperInParenthesis() {
+        // Keep this comment
+        boolean alwaysInitializedVar = Boolean.FALSE;
+        if ((alwaysInitializedVar)) {
             System.out.println("True!");
         }
     }
@@ -136,7 +152,7 @@ public class PrimitiveRatherThanBooleanWrapperSample {
 
     public void replaceWrapperInWhile() {
         // Keep this comment
-        boolean alwaysInitializedVar = Boolean.TRUE;
+        boolean alwaysInitializedVar = true;
         while (alwaysInitializedVar) {
             System.out.println("True!");
         }
@@ -144,7 +160,7 @@ public class PrimitiveRatherThanBooleanWrapperSample {
 
     public void replaceWrapperInDoWhile() {
         // Keep this comment
-        boolean alwaysInitializedVar = Boolean.TRUE;
+        boolean alwaysInitializedVar = false;
         do {
             System.out.println("True!");
         } while (alwaysInitializedVar);
@@ -181,7 +197,7 @@ public class PrimitiveRatherThanBooleanWrapperSample {
 
     public Boolean replaceReturnedAutoBoxedWrapper(int i) {
         // Keep this comment
-        boolean returnedBoolean = Boolean.TRUE;
+        boolean returnedBoolean = Boolean.FALSE;
         if (i > 0) {
             System.out.println("Positive");
             return returnedBoolean;
@@ -261,5 +277,20 @@ public class PrimitiveRatherThanBooleanWrapperSample {
     public void doNotBreakAutoboxingOnAssignment() {
         Boolean returnedObject = Boolean.TRUE;
         Object anotherObject = returnedObject;
+    }
+
+    public void doNotReplaceRessignedWrapper(Boolean b) {
+        Boolean returnedObject = Boolean.TRUE;
+        try {
+            returnedObject = b;
+        } catch (Exception e) {
+            System.out.println("Error!");
+        }
+    }
+
+    public Boolean doNotReplaceAssignedAndReturnedWrapper(Boolean b) {
+        Boolean returnedObject = Boolean.FALSE;
+        returnedObject = b;
+        return returnedObject;
     }
 }

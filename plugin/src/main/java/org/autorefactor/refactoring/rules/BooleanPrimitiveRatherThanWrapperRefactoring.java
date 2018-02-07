@@ -34,6 +34,8 @@ import static org.eclipse.jdt.core.dom.ASTNode.ASSIGNMENT;
 import static org.eclipse.jdt.core.dom.ASTNode.CONDITIONAL_EXPRESSION;
 import static org.eclipse.jdt.core.dom.ASTNode.DO_STATEMENT;
 import static org.eclipse.jdt.core.dom.ASTNode.IF_STATEMENT;
+import static org.eclipse.jdt.core.dom.ASTNode.PARENTHESIZED_EXPRESSION;
+import static org.eclipse.jdt.core.dom.ASTNode.CAST_EXPRESSION;
 import static org.eclipse.jdt.core.dom.ASTNode.INFIX_EXPRESSION;
 import static org.eclipse.jdt.core.dom.ASTNode.PREFIX_EXPRESSION;
 import static org.eclipse.jdt.core.dom.ASTNode.RETURN_STATEMENT;
@@ -45,6 +47,9 @@ import static org.eclipse.jdt.core.dom.InfixExpression.Operator.CONDITIONAL_OR;
 import static org.eclipse.jdt.core.dom.InfixExpression.Operator.OR;
 import static org.eclipse.jdt.core.dom.InfixExpression.Operator.XOR;
 import static org.eclipse.jdt.core.dom.PrefixExpression.Operator.NOT;
+
+import java.util.Arrays;
+
 import static org.eclipse.jdt.core.dom.Assignment.Operator.BIT_AND_ASSIGN;
 import static org.eclipse.jdt.core.dom.Assignment.Operator.BIT_OR_ASSIGN;
 import static org.eclipse.jdt.core.dom.Assignment.Operator.BIT_XOR_ASSIGN;
@@ -54,6 +59,7 @@ import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Block;
+import org.eclipse.jdt.core.dom.BooleanLiteral;
 import org.eclipse.jdt.core.dom.CastExpression;
 import org.eclipse.jdt.core.dom.ConditionalExpression;
 import org.eclipse.jdt.core.dom.Expression;
@@ -70,7 +76,7 @@ import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
 /** See {@link #getDescription()} method. */
-public class PrimitiveRatherThanBooleanWrapperRefactoring extends AbstractRefactoringRule {
+public class BooleanPrimitiveRatherThanWrapperRefactoring extends AbstractRefactoringRule {
     @Override
     public String getDescription() {
         return ""
@@ -79,7 +85,7 @@ public class PrimitiveRatherThanBooleanWrapperRefactoring extends AbstractRefact
 
     @Override
     public String getName() {
-        return "Primitive rather than Boolean wrapper";
+        return "Boolean primitive rather than wrapper";
     }
 
     @Override
@@ -114,17 +120,19 @@ public class PrimitiveRatherThanBooleanWrapperRefactoring extends AbstractRefact
     }
 
     private boolean isNotNull(final Expression expr) {
-        final Object constantCondition =
-                expr.resolveConstantExpressionValue();
-        if (constantCondition != null) {
-            return Boolean.TRUE.equals(constantCondition)
-                    || Boolean.FALSE.equals(constantCondition);
-        } else if (expr instanceof ParenthesizedExpression) {
+        if (expr instanceof ParenthesizedExpression) {
             final ParenthesizedExpression parenthesizedExpr = (ParenthesizedExpression) expr;
             return isNotNull(parenthesizedExpr.getExpression());
         } else if (expr instanceof ConditionalExpression) {
             final ConditionalExpression prefixExpr = (ConditionalExpression) expr;
             return isNotNull(prefixExpr.getThenExpression()) && isNotNull(prefixExpr.getElseExpression());
+        } else if (expr instanceof BooleanLiteral) {
+            return true;
+        } else if (expr instanceof QualifiedName) {
+            final QualifiedName qualifiedName = (QualifiedName) expr;
+            return hasType(qualifiedName.getQualifier(), "java.lang.Boolean")
+                    && (isField(qualifiedName, "java.lang.Boolean", "TRUE")
+                    || isField(qualifiedName, "java.lang.Boolean", "FALSE"));
         } else if (expr instanceof InfixExpression) {
             return true;
         } else if (expr instanceof PrefixExpression) {
@@ -133,10 +141,6 @@ public class PrimitiveRatherThanBooleanWrapperRefactoring extends AbstractRefact
         } else if (expr instanceof CastExpression) {
             final CastExpression castExpr = (CastExpression) expr;
             return hasType(castExpr.getType().resolveBinding(), "boolean");
-        } else if (expr instanceof QualifiedName) {
-            final QualifiedName qualifiedName = (QualifiedName) expr;
-            return isField(qualifiedName, "java.lang.Boolean", "TRUE")
-                    || isField(qualifiedName, "java.lang.Boolean", "FALSE");
         }
         return false;
     }
@@ -164,7 +168,7 @@ public class PrimitiveRatherThanBooleanWrapperRefactoring extends AbstractRefact
 
         @Override
         public boolean visit(final SimpleName aVar) {
-            if (aVar.getIdentifier().equals(varDecl.getName().getIdentifier())
+            if (canBeRefactored && aVar.getIdentifier().equals(varDecl.getName().getIdentifier())
                     && !aVar.getParent().equals(varDecl)) {
                 canBeRefactored = canInstantiationBeRefactored(aVar);
                 if (!canBeRefactored) {
@@ -182,6 +186,13 @@ public class PrimitiveRatherThanBooleanWrapperRefactoring extends AbstractRefact
             case WHILE_STATEMENT:
             case DO_STATEMENT:
                 return true;
+
+            case PARENTHESIZED_EXPRESSION:
+                return canInstantiationBeRefactored(parentNode);
+
+            case CAST_EXPRESSION:
+                final CastExpression castExpression = (CastExpression) parentNode;
+                return hasType(castExpression.getType().resolveBinding(), "boolean");
 
             case ASSIGNMENT:
                 final Assignment assignment = (Assignment) parentNode;
@@ -240,11 +251,8 @@ public class PrimitiveRatherThanBooleanWrapperRefactoring extends AbstractRefact
                 return NOT.equals(((PrefixExpression) parentNode).getOperator());
 
             case INFIX_EXPRESSION:
-                return AND.equals(((InfixExpression) parentNode).getOperator())
-                        || OR.equals(((InfixExpression) parentNode).getOperator())
-                        || CONDITIONAL_AND.equals(((InfixExpression) parentNode).getOperator())
-                        || CONDITIONAL_OR.equals(((InfixExpression) parentNode).getOperator())
-                        || XOR.equals(((InfixExpression) parentNode).getOperator());
+                return Arrays.asList(AND, OR, CONDITIONAL_AND, CONDITIONAL_OR, XOR)
+                        .contains(((InfixExpression) parentNode).getOperator());
 
             default:
                 return false;
