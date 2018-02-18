@@ -64,6 +64,10 @@ public final class AllRefactoringRules {
     public static List<RefactoringRule> getAllRefactoringRules() {
         return newArrayList(
                 new IntPrimitiveRatherThanWrapperRefactoring(),
+                new ShortPrimitiveRatherThanWrapperRefactoring(),
+                new LongPrimitiveRatherThanWrapperRefactoring(),
+                new DoublePrimitiveRatherThanWrapperRefactoring(),
+                new FloatPrimitiveRatherThanWrapperRefactoring(),
                 new RemoveUselessNullCheckRefactoring(),
                 new VectorOldToNewAPIRefactoring(),
                 new PrimitiveWrapperCreationRefactoring(),
