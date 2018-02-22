@@ -26,7 +26,6 @@
 package org.autorefactor.test;
 
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
 
 import org.autorefactor.environment.EventLoop;
 
@@ -36,18 +35,9 @@ class CurrentThreadEvenLoop implements EventLoop {
         try {
             final E ex = callable.call();
             if (ex != null) {
-                sneakyThrow(ex);
+                throw ex;
             }
-        } catch (ExecutionException e) {
-            sneakyThrow(e.getCause());
         } catch (Exception e) {
-            sneakyThrow(e);
         }
-    }
-
-    /** Allows to throw checked exceptions, throwables, etc. Beware: this method fools the compiler. */
-    @SuppressWarnings("unchecked")
-    private static <T extends Throwable> void sneakyThrow(Throwable t) throws T {
-        throw (T) t;
     }
 }

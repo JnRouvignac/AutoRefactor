@@ -147,7 +147,7 @@ public class PrepareApplyRefactoringsJob extends Job {
             throws JavaModelException {
         final SubMonitor subMonitor = SubMonitor.convert(monitor, javaElements.size());
         for (IJavaElement javaElement : javaElements) {
-            final SubMonitor child = subMonitor.split(1);
+            final SubMonitor child = subMonitor.newChild(1);
             final JavaProjectOptions options = getJavaProjectOptions(javaElement);
             if (javaElement instanceof ICompilationUnit) {
                 add(results, (ICompilationUnit) javaElement, options);

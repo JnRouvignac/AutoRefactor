@@ -109,7 +109,7 @@ public class AutoRefactorHandler extends AbstractHandler {
             return getSelectedJavaElements(shell, HandlerUtil.getActiveEditor(event));
         } else if ("org.eclipse.jdt.ui.PackageExplorer".equals(activePartId)
                 || "org.eclipse.ui.navigator.ProjectExplorer".equals(activePartId)) {
-            return getSelectedJavaElements(shell, HandlerUtil.getCurrentStructuredSelection(event));
+            return getSelectedJavaElements(shell, (IStructuredSelection) HandlerUtil.getCurrentSelection(event));
         } else {
             getEnvironment().getLogger().warn("Code is not implemented for activePartId '" + activePartId + "'.");
             return Collections.emptyList();

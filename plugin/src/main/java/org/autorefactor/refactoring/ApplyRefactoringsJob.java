@@ -118,7 +118,7 @@ public class ApplyRefactoringsJob extends Job {
                 try {
                     loopMonitor.subTask("Applying refactorings to " + getClassName(compilationUnit));
                     final AggregateASTVisitor refactoring = new AggregateASTVisitor(refactoringRulesToApply);
-                    applyRefactoring(compilationUnit, refactoring, options, loopMonitor.split(1));
+                    applyRefactoring(compilationUnit, refactoring, options, loopMonitor.newChild(1));
                 } catch (OperationCanceledException e) {
                     throw e;
                 } catch (Exception e) {
@@ -216,7 +216,7 @@ public class ApplyRefactoringsJob extends Job {
             }
 
             final RefactoringContext ctx = new RefactoringContext(
-                compilationUnit, astRoot, options, monitor.split(1), environment);
+                compilationUnit, astRoot, options, monitor, environment);
             refactoring.setRefactoringContext(ctx);
 
             final Refactorings refactorings = refactoring.getRefactorings(astRoot);
