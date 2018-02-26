@@ -5,14 +5,15 @@ Bundle-SymbolicName: org.autorefactor.plugin;singleton:=true
 Bundle-Version: 2.0.0.qualifier
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources,
- org.eclipse.jdt.core;bundle-version="3.13.50",
- org.eclipse.text;bundle-version="3.6.100",
- org.eclipse.core.filebuffers;bundle-version="3.6.100"
+ org.eclipse.jdt.core;bundle-version="3.7.1",
+ org.eclipse.text;bundle-version="3.5.101",
+ org.eclipse.core.filebuffers;bundle-version="3.5.200"
 Bundle-ActivationPolicy: lazy
 Comment1: Need to follow Eclipse's supported JRE unless dictated by
 Comment2: functionalities required from Eclipse or JRE.
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 CommentForImportPackage: FIXME JNR can we avoid accessing this internal package?
+Import-Package: org.eclipse.jdt.internal.corext.dom
 Export-Package: org.autorefactor.cfg;x-friends:="org.autorefactor.plugin.tests",
  org.autorefactor.environment;x-friends:="org.autorefactor.plugin.tests",
  org.autorefactor.preferences;x-friends:="org.autorefactor.plugin.ui",

@@ -52,9 +52,22 @@
 
   <repositories>
     <repository>
-      <id>eclipse-oxygen</id>
+      <id>Indigo</id>
       <layout>p2</layout>
-      <url>http://download.eclipse.org/releases/oxygen</url>
+<!--
+      <url>http://download.eclipse.org/eclipse/updates/3.7</url>
+      <id>Juno 3.8</id>
+      <url>http://download.eclipse.org/eclipse/updates/3.8</url>
+      <id>Juno 4.2</id>
+      <url>http://download.eclipse.org/eclipse/updates/4.2</url>
+      <id>Kepler</id>
+      <url>http://download.eclipse.org/eclipse/updates/4.3</url>
+      <id>Luna</id>
+      <url>http://download.eclipse.org/eclipse/updates/4.4</url>
+      <id>Mars</id>
+      <url>http://download.eclipse.org/eclipse/updates/4.5</url>
+-->
+      <url>http://download.eclipse.org/releases/mars</url>
     </repository>
   </repositories>
 

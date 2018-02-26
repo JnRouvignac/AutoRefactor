@@ -4,12 +4,12 @@ Bundle-Name: AutoRefactor Tests
 Bundle-SymbolicName: org.autorefactor.plugin.tests;singleton:=true
 Bundle-Version: 2.0.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
-Require-Bundle: org.junit;bundle-version="4.12.0",
+Require-Bundle: org.junit;bundle-version="4.8.2",
  org.autorefactor.plugin,
  org.eclipse.core.jobs,
  org.eclipse.core.resources,
- org.eclipse.text;bundle-version="3.6.100",
- org.eclipse.jdt.core;bundle-version="3.13.50"
+ org.eclipse.text;bundle-version="3.5.101",
+ org.eclipse.jdt.core;bundle-version="3.7.1"
 Import-Package: org.autorefactor,
  org.eclipse.core.resources,
  org.eclipse.core.runtime,
