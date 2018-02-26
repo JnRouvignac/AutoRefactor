@@ -25,6 +25,10 @@
  */
 package org.autorefactor.refactoring.rules.samples_in;
 
+import java.util.Arrays;
+import java.util.function.Function;
+import java.util.function.Predicate;
+
 public class CommonCodeInIfElseStatementSample {
 
     /** common code: i++, Remove if statement */
@@ -208,5 +212,14 @@ public class CommonCodeInIfElseStatementSample {
         // FIXME code above should be refactored to:
         // if (b1)      return 1;
         // else         return 2;
+    }
+
+    public static Predicate<String> doNotMergeDifferentLambdaExpr(final boolean caseSensitive, final String... allowedSet) {
+        if (caseSensitive) {
+            return x -> Arrays.stream(allowedSet).anyMatch(y -> (x == null && y == null) || (x != null && x.equals(y)));
+        } else {
+            Function<String,String> toLower = x -> x == null ? null : x.toLowerCase();
+            return x -> Arrays.stream(allowedSet).map(toLower).anyMatch(y -> (x == null && y == null) || (x != null && toLower.apply(x).equals(y)));
+        }
     }
 }
