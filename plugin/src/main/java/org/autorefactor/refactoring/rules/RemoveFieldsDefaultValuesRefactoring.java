@@ -67,10 +67,7 @@ public class RemoveFieldsDefaultValuesRefactoring extends AbstractRefactoringRul
             final Expression initializer = vdf.getInitializer();
             if (initializer != null) {
                 if (!fieldType.isPrimitive()
-                        && isNullLiteral(initializer)
-                        // TODO This refactoring fails in Java 8
-                        // Enable it when JDT will correctly evaluate lambda expressions
-                        && ctx.getJavaProjectOptions().getJavaSERelease().getMinorVersion() < 8) {
+                        && isNullLiteral(initializer)) {
                     this.ctx.getRefactorings().remove(initializer);
                     visitSubtree = DO_NOT_VISIT_SUBTREE;
                 } else if (fieldType.isPrimitive()

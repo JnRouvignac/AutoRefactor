@@ -27,6 +27,7 @@ package org.autorefactor.refactoring.rules.samples_in;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.function.Predicate;
 
 public class RemoveFieldsDefaultValuesSample {
 
@@ -51,6 +52,7 @@ public class RemoveFieldsDefaultValuesSample {
     private long l1 = 0, l2 = 0l, l3 = 0L;
     private float f1 = 0, f2 = 0f, f3 = 0F, f4 = 0.0f;
     private double d1 = 0, d2 = 0.0;
+    private Predicate<String> doNotRemoveLambdaExpr = x -> "foo".equals(x);
 
     public Iterable<String> getIterable() {
         return new Iterable<String>() {
