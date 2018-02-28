@@ -68,6 +68,8 @@ public final class AllRefactoringRules {
                 new LongPrimitiveRatherThanWrapperRefactoring(),
                 new DoublePrimitiveRatherThanWrapperRefactoring(),
                 new FloatPrimitiveRatherThanWrapperRefactoring(),
+                new CharPrimitiveRatherThanWrapperRefactoring(),
+                new BytePrimitiveRatherThanWrapperRefactoring(),
                 new RemoveUselessNullCheckRefactoring(),
                 new VectorOldToNewAPIRefactoring(),
                 new PrimitiveWrapperCreationRefactoring(),

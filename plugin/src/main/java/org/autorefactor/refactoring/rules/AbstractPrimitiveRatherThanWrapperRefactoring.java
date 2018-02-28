@@ -232,7 +232,9 @@ public abstract class AbstractPrimitiveRatherThanWrapperRefactoring extends Abst
                     .contains(postfixExpr.getOperator());
         } else if (expr instanceof CastExpression) {
             final CastExpression castExpr = (CastExpression) expr;
-            return hasType(castExpr.getType().resolveBinding(), getPrimitiveTypeName());
+            return hasType(castExpr.getType().resolveBinding(), getPrimitiveTypeName())
+                    || (hasType(castExpr.getType().resolveBinding(), getWrapperFullyQualifiedName())
+                            && isNotNull(castExpr.getExpression()));
         } else if (expr instanceof MethodInvocation) {
             final MethodInvocation mi = (MethodInvocation) expr;
             return isMethod(mi, getWrapperFullyQualifiedName(), "valueOf", getPrimitiveTypeName());
