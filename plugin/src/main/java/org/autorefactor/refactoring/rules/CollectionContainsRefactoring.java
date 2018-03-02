@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2015-2016 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2015-2018 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,6 +29,7 @@ import java.util.List;
 
 import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.BlockSubVisitor;
+import org.autorefactor.refactoring.FinderVisitor;
 import org.autorefactor.refactoring.ForLoopHelper.ForLoopContent;
 import org.autorefactor.util.NotImplementedException;
 import org.autorefactor.util.Pair;
@@ -78,17 +79,15 @@ public class CollectionContainsRefactoring extends AbstractRefactoringRule {
     }
 
     private static final class AssignmentForAndReturnVisitor extends BlockSubVisitor {
-
         public AssignmentForAndReturnVisitor(final RefactoringContext ctx, final Block startNode) {
             super(ctx, startNode);
         }
 
         @Override
         public boolean visit(EnhancedForStatement node) {
-            final Expression iterable = node.getExpression();
             final SingleVariableDeclaration loopVariable = node.getParameter();
             final IfStatement is = uniqueStmtAs(node.getBody(), IfStatement.class);
-            return maybeReplaceWithCollectionContains(node, iterable, loopVariable.getName(), is);
+            return maybeReplaceWithCollectionContains(node, node.getExpression(), loopVariable.getName(), is);
         }
 
         private boolean maybeReplaceWithCollectionContains(
@@ -119,11 +118,15 @@ public class CollectionContainsRefactoring extends AbstractRefactoringRule {
                         } else {
                             BreakStatement bs = as(thenStmts.get(thenStmts.size() - 1), BreakStatement.class);
                             if (bs != null && bs.getLabel() == null) {
-                                if (thenStmts.size() == 2) {
-                                    if (maybeReplaceLoopAndVariable(forNode, iterable, thenStmts.get(0), toFind)
+                                if (thenStmts.size() == 2
+                                        && maybeReplaceLoopAndVariable(forNode, iterable, thenStmts.get(0), toFind)
                                             == DO_NOT_VISIT_SUBTREE) {
-                                        return DO_NOT_VISIT_SUBTREE;
-                                    }
+                                    return DO_NOT_VISIT_SUBTREE;
+                                }
+
+                                if (loopElementIsUsed(loopElement, thenStmts)) {
+                                    // Cannot remove the loop and its loop element
+                                    return VISIT_SUBTREE;
                                 }
 
                                 replaceLoopByIf(forNode, iterable, thenStmts, toFind, bs);
@@ -135,6 +138,35 @@ public class CollectionContainsRefactoring extends AbstractRefactoringRule {
                 }
             }
             return VISIT_SUBTREE;
+        }
+
+        private boolean loopElementIsUsed(Expression loopElement, List<Statement> thenStmts) {
+            if (loopElement instanceof SimpleName) {
+                VarUseFinderVisitor visitor = new VarUseFinderVisitor((SimpleName) loopElement);
+                for (Statement aThenStmt : thenStmts) {
+                    if (visitor.findOrDefault(aThenStmt, false)) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        private static class VarUseFinderVisitor extends FinderVisitor<Boolean> {
+            private final SimpleName varName;
+
+            public VarUseFinderVisitor(SimpleName varName) {
+                this.varName = varName;
+            }
+
+            @Override
+            public boolean visit(SimpleName variable) {
+                if (isSameLocalVariable(varName, variable)) {
+                    setResult(true);
+                    return DO_NOT_VISIT_SUBTREE;
+                }
+                return VISIT_SUBTREE;
+            }
         }
 
         private void replaceLoopByIf(Statement forNode, Expression iterable, List<Statement> thenStmts,
@@ -242,10 +274,7 @@ public class CollectionContainsRefactoring extends AbstractRefactoringRule {
         }
 
         private Statement uniqueStmt(List<Statement> stmts) {
-            if (stmts.size() == 1) {
-                return stmts.get(0);
-            }
-            return null;
+            return stmts.size() == 1 ? stmts.get(0) : null;
         }
 
         private BooleanLiteral getReturnedBooleanLiteral(Statement stmt) {
