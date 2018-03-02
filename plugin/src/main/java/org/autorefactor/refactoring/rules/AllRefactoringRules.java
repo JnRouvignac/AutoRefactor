@@ -102,6 +102,7 @@ public final class AllRefactoringRules {
                 new EndOfMethodRatherThanReturnRefactoring(),
                 new DoWhileRatherThanWhileRefactoring(),
                 new DoWhileRatherThanDuplicateCodeRefactoring(),
+                new IfRatherThanWhileAndFallsThroughRefactoring(),
                 new SuperCallRatherThanUselessOverridingRefactoring(),
                 new CollapseIfStatementRefactoring(),
                 new CommonCodeInIfElseStatementRefactoring(),
