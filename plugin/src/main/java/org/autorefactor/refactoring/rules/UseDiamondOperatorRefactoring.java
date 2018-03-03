@@ -100,7 +100,8 @@ public class UseDiamondOperatorRefactoring extends AbstractRefactoringRule {
         ITypeBinding[] actualCtorParamTypes = ctorBinding.getParameterTypes();
         ITypeBinding[] declMethodParamTypes = methodDecl.getParameterTypes();
 
-        for (int i = 0; i < declMethodParamTypes.length; i++) {
+        int limit = Math.min(declMethodParamTypes.length, args.size());
+        for (int i = 0; i < limit; i++) {
             ITypeBinding declParamType = declMethodParamTypes[i];
             ITypeBinding actualParamType = actualCtorParamTypes[i];
             String actualParamTypeQName = actualParamType.getErasure().getQualifiedName();
