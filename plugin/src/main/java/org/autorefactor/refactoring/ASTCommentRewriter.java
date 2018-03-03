@@ -471,7 +471,7 @@ public class ASTCommentRewriter {
     }
 
     private int findPreviousLineStart(TreeSet<Integer> lineStarts, final int commentStart) {
-        return lineStarts.headSet(commentStart).last();
+        return lineStarts.headSet(commentStart, true).last();
     }
 
     private int chompWhitespacesBefore(final String text, int start) {
