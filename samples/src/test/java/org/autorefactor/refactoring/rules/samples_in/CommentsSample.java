@@ -185,4 +185,11 @@ public class CommentsSample implements Runnable, Callable<Void>, Closeable {
     //// second line starts with 4 slashes and may trigger compilation errors
     public void bewareOfSlashesAfterSlashes2() {
     }
+    
+    class Sample
+    {
+    Object SEED=1;
+    Sample f;//Should refactor correctly with no indentation
+    public void doSomething(){}
+    }
 }

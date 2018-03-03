@@ -136,4 +136,12 @@ public class CommentsSample implements Runnable, Callable<Void>, Closeable {
      */
     public void bewareOfSlashesAfterSlashes2() {
     }
+    
+    class Sample
+    {
+    Object SEED=1;
+    /** Should refactor correctly with no indentation. */
+    Sample f;
+    public void doSomething(){}
+    }
 }
