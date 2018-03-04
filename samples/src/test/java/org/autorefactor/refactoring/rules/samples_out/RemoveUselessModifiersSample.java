@@ -65,6 +65,14 @@ public interface RemoveUselessModifiersSample {
 
     public static abstract class AbstractSampleClass {
     }
+    
+    class Sample {
+       private static void refactorIt(){};
+       private void refactorIt2(){};
+       
+       final void doNotRefactor(){};
+       private void doNotRefactor2(){};
+   }
 
     public enum RemoveStaticSampleEnum {
         VALUE1, VALUE2
