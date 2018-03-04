@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2013-2015 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2013-2018 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -52,17 +52,20 @@ import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
+import static org.eclipse.jdt.core.dom.Modifier.isFinal;
+import static org.eclipse.jdt.core.dom.Modifier.isPrivate;
 
 /** See {@link #getDescription()} method. */
 public class RemoveUselessModifiersRefactoring extends AbstractRefactoringRule {
     @Override
     public String getDescription() {
         return ""
-            + "Fixes modifier order.\n"
-            + "Also removes modifiers implied by the context:\n"
-            + "- \"public\", \"static\" and \"final\" for interface fields,\n"
-            + "- \"public\" and \"abstract\" for interface methods,\n"
-            + "- \"final\" for parameters in interface method declarations.";
+                + "Fixes modifier order.\n"
+                + "Also removes modifiers implied by the context:\n"
+                + "- \"public\", \"static\" and \"final\" for interface fields,\n"
+                + "- \"public\" and \"abstract\" for interface methods,\n"
+                + "- \"final\" for private methods,\n"
+                + "- \"final\" for parameters in interface method declarations.";
     }
 
     @Override
@@ -95,19 +98,18 @@ public class RemoveUselessModifiersRefactoring extends AbstractRefactoringRule {
         }
     }
 
-    private static final List<ModifierKeyword> ORDERED_MODIFIERS =
-            Collections.unmodifiableList(Arrays.asList(
-                    ModifierKeyword.PUBLIC_KEYWORD,
-                    ModifierKeyword.PROTECTED_KEYWORD,
-                    ModifierKeyword.PRIVATE_KEYWORD,
-                    ModifierKeyword.STATIC_KEYWORD,
-                    ModifierKeyword.ABSTRACT_KEYWORD,
-                    ModifierKeyword.FINAL_KEYWORD,
-                    ModifierKeyword.TRANSIENT_KEYWORD,
-                    ModifierKeyword.VOLATILE_KEYWORD,
-                    ModifierKeyword.SYNCHRONIZED_KEYWORD,
-                    ModifierKeyword.NATIVE_KEYWORD,
-                    ModifierKeyword.STRICTFP_KEYWORD));
+    private static final List<ModifierKeyword> ORDERED_MODIFIERS = Collections.unmodifiableList(Arrays.asList(
+            ModifierKeyword.PUBLIC_KEYWORD,
+            ModifierKeyword.PROTECTED_KEYWORD,
+            ModifierKeyword.PRIVATE_KEYWORD,
+            ModifierKeyword.STATIC_KEYWORD,
+            ModifierKeyword.ABSTRACT_KEYWORD,
+            ModifierKeyword.FINAL_KEYWORD,
+            ModifierKeyword.TRANSIENT_KEYWORD,
+            ModifierKeyword.VOLATILE_KEYWORD,
+            ModifierKeyword.SYNCHRONIZED_KEYWORD,
+            ModifierKeyword.NATIVE_KEYWORD,
+            ModifierKeyword.STRICTFP_KEYWORD));
 
     @Override
     public boolean visit(FieldDeclaration node) {
@@ -139,6 +141,10 @@ public class RemoveUselessModifiersRefactoring extends AbstractRefactoringRule {
         if (isInterface(node.getParent())) {
             // remove modifiers implied by the context
             return removePublicAbstractModifiers(node);
+        }
+        int modifiers = node.getModifiers();
+        if (isPrivate(modifiers) && isFinal(modifiers)) {
+            return removeFinalModifier(modifiers(node));
         }
         return ensureModifiersOrder(node);
     }
@@ -181,7 +187,7 @@ public class RemoveUselessModifiersRefactoring extends AbstractRefactoringRule {
     @Override
     public boolean visit(TypeDeclaration node) {
         return (isInterface(node) && removeStaticModifier(modifiers(node)))
-            | ensureModifiersOrder(node);
+                | ensureModifiersOrder(node);
     }
 
     private boolean ensureModifiersOrder(BodyDeclaration node) {
