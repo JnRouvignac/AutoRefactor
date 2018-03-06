@@ -20,3 +20,4 @@ Export-Package: org.autorefactor.cfg;x-friends:="org.autorefactor.plugin.tests",
  org.autorefactor.refactoring;x-friends:="org.autorefactor.plugin.tests",
  org.autorefactor.refactoring.rules;x-friends:="org.autorefactor.plugin.tests",
  org.autorefactor.util;x-friends:="org.autorefactor.plugin.ui"
+Import-Package: org.autorefactor.refactoring.rules

@@ -28,7 +28,7 @@ package org.autorefactor.refactoring;
 import org.eclipse.jdt.core.ICompilationUnit;
 
 /** Work item for the {@link ApplyRefactoringsJob}. */
-class RefactoringUnit {
+public class RefactoringUnit {
     private final ICompilationUnit compilationUnit;
     private final JavaProjectOptions options;
 
@@ -37,7 +37,7 @@ class RefactoringUnit {
         this.options = options;
     }
 
-    ICompilationUnit getCompilationUnit() {
+   public ICompilationUnit getCompilationUnit() {
         return compilationUnit;
     }
 

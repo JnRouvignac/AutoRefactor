@@ -173,6 +173,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     @Override
     public String getName() {
         throw new UnsupportedOperationException();
+    	
     }
 
     @Override
@@ -268,6 +269,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     @Override
     public Refactorings getRefactorings(CompilationUnit astRoot) {
         astRoot.accept(this);
+       // System.out.println("Lets see..");
         return this.ctx.getRefactorings();
     }
 

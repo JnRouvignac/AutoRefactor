@@ -43,6 +43,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.core.runtime.jobs.IJobChangeListener;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobGroup;
 import org.eclipse.jdt.core.ICompilationUnit;
@@ -58,6 +59,7 @@ public class PrepareApplyRefactoringsJob extends Job {
     private final List<RefactoringRule> refactoringRulesToApply;
     private final Map<IJavaElement, JavaProjectOptions> javaProjects = new HashMap<IJavaElement, JavaProjectOptions>();
     private final Environment environment;
+    IJobChangeListener listener;
 
     /**
      * Builds an instance of this class.
@@ -75,6 +77,18 @@ public class PrepareApplyRefactoringsJob extends Job {
         this.refactoringRulesToApply = refactoringRulesToApply;
         this.environment = environment;
     }
+
+    public PrepareApplyRefactoringsJob(List<IJavaElement> javaElements,
+            List<RefactoringRule> refactoringRulesToApply,
+            Environment environment, IJobChangeListener applyRefactoringListener) {
+    	super("Prepare AutoRefactor");
+    	setPriority(Job.SHORT);
+    	this.javaElements = javaElements;
+    	this.refactoringRulesToApply = refactoringRulesToApply;
+    	this.environment = environment;
+    	this.listener = applyRefactoringListener;
+    }
+
 
     @Override
     protected IStatus run(IProgressMonitor monitor) {
@@ -101,9 +115,13 @@ public class PrepareApplyRefactoringsJob extends Job {
             final int nbWorkers = computeNbWorkers(toRefactor.size(), nbCores);
             final JobGroup jobGroup = new JobGroup("Job name", nbWorkers, nbWorkers);
             for (int i = 0; i < nbWorkers; i++) {
+
+            	System.out.println("To Refactor Queue: "+ toRefactor.toString());
+
                 final Job job = new ApplyRefactoringsJob(toRefactor, clone(refactoringRulesToApply), environment);
                 job.setJobGroup(jobGroup);
                 job.setUser(true);
+                job.addJobChangeListener(listener);
                 job.schedule();
             }
         }

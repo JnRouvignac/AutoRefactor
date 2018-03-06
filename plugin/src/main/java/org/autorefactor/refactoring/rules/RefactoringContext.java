@@ -25,6 +25,11 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import static org.autorefactor.refactoring.ASTHelper.getCommentList;
+import static org.autorefactor.refactoring.SourceLocation.getEndPosition;
+
+import org.autorefactor.environment.Environment;
+import org.autorefactor.environment.Logger;
 import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.JavaProjectOptions;
 import org.autorefactor.refactoring.Refactorings;
@@ -36,12 +41,6 @@ import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Comment;
 import org.eclipse.jdt.core.dom.CompilationUnit;
-
-import static org.autorefactor.refactoring.ASTHelper.*;
-import static org.autorefactor.refactoring.SourceLocation.*;
-
-import org.autorefactor.environment.Environment;
-import org.autorefactor.environment.Logger;
 
 /** Class holding necessary data for a refactoring. */
 public class RefactoringContext {
@@ -124,7 +123,7 @@ public class RefactoringContext {
      * @return the {@link Refactorings} object containing the changes that must be applied to the AST
      */
     public Refactorings getRefactorings() {
-        return refactorings;
+    	        return refactorings;
     }
 
     String getSource(ASTNode node) {

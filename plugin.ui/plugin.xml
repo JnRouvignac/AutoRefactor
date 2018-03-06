@@ -48,6 +48,9 @@
                          commandId="org.autorefactor.automatic.refactoring" />
                 <command style="push"
                          commandId="org.autorefactor.choose.refactorings" />
+                          <command
+                          commandId="org.autorefactor.preview.refactorings" style="push"/>
+                        
             </menu>
         </menuContribution>
         <menuContribution locationURI="popup:org.eclipse.ui.navigator.ProjectExplorer#PopupMenu?after=org.eclipse.jdt.ui.refactoring.menu">
@@ -65,6 +68,8 @@
                          commandId="org.autorefactor.automatic.refactoring" />
                 <command style="push"
                          commandId="org.autorefactor.choose.refactorings" />
+                          <command
+                          commandId="org.autorefactor.preview.refactorings" style="push"/>
             </menu>
         </menuContribution>
         <!-- Cannot add to Refactor sub menu: @see https://issues.jboss.org/browse/JBIDE-1077 from Alexey Kazakov:
@@ -84,6 +89,8 @@
                          commandId="org.autorefactor.automatic.refactoring" />
                 <command style="push"
                          commandId="org.autorefactor.choose.refactorings" />
+                 <command
+                          commandId="org.autorefactor.preview.refactorings" style="push"/>
             </menu>
         </menuContribution>
     </extension>
@@ -104,7 +111,7 @@
         <command
                 id="org.autorefactor.automatic.refactoring"
                 defaultHandler="org.autorefactor.ui.AutoRefactorHandler"
-                name="Automatic refactoring">
+                name="Automatic refactoring...">
         </command>
     </extension>
     <extension point="org.eclipse.ui.commands">
@@ -115,7 +122,15 @@
         </command>
     </extension>
 
+	<extension point="org.eclipse.ui.commands">
 
+	<command
+    	 name="View Refactorings Applied..."
+		 defaultHandler="org.autorefactor.ui.PreviewWizardHandler" 
+	 	 id="org.autorefactor.preview.refactorings">
+	  </command>
+
+	</extension>
 
   <!-- Workspace wide preferences -->
   <extension point="org.eclipse.ui.preferencePages">
