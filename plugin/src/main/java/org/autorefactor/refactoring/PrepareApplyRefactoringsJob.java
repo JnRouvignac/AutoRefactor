@@ -83,6 +83,18 @@ public class PrepareApplyRefactoringsJob extends Job {
         this.environment = environment;
     }
 
+    /**
+     * Builds an instance of this class.
+     *
+     * @param javaElements
+     *            the java elements selected for automatic refactoring
+     * @param refactoringRulesToApply
+     *            the refactorings to apply
+     * @param environment
+     *            the environment
+     * @param applyRefactoringListener
+     *            the apply refactoring listener
+     */
     public PrepareApplyRefactoringsJob(List<IJavaElement> javaElements, List<RefactoringRule> refactoringRulesToApply,
             Environment environment, IJobChangeListener applyRefactoringListener) {
         super("Prepare AutoRefactor");
@@ -118,8 +130,6 @@ public class PrepareApplyRefactoringsJob extends Job {
             final int nbWorkers = computeNbWorkers(toRefactor.size(), nbCores);
             final JobGroup jobGroup = new JobGroup("Job name", nbWorkers, nbWorkers);
             for (int i = 0; i < nbWorkers; i++) {
-                System.out.println("To Refactor Queue: " + toRefactor);
-
                 final Job job = new ApplyRefactoringsJob(toRefactor, clone(refactoringRulesToApply), environment);
                 job.setJobGroup(jobGroup);
                 job.setUser(true);

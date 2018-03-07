@@ -74,17 +74,14 @@ import org.eclipse.jface.text.IDocument;
  */
 public class ApplyRefactoringsJob extends Job {
     private final Queue<RefactoringUnit> refactoringUnits;
-    public static List<RefactoringRule> refactoringRulesToApply;
+    private static List<RefactoringRule> refactoringRulesToApply;
     private final Environment environment;
 
-    public IJobChangeListener applyRefactoringListener;
-
-    public static String refactoredContent = "Apply Refactoring to preview refactorings";
-    public static String codeToRefactor = "Here is a code to refactor";
-    public static ICompilationUnit iCompile;
-    public static ICompilationUnit cu;
-    public static IFile newFile;
-    public static Set<String> refactoringsApplied = new HashSet<>();
+    private static String refactoredContent = "Apply Refactoring to preview refactorings";
+    private static String codeToRefactor = "Here is a code to refactor";
+    private static ICompilationUnit iCompile;
+    private static IFile newFile;
+    private static Set<String> refactoringsApplied = new HashSet<String>();
 
     /**
      * Builds an instance of this class.
@@ -105,6 +102,18 @@ public class ApplyRefactoringsJob extends Job {
         this.environment = environment;
     }
 
+    /**
+     * Builds an instance of this class.
+     *
+     * @param refactoringUnits
+     *            the units to automatically refactor
+     * @param refactoringRulesToApply
+     *            the refactorings to apply
+     * @param environment
+     *            the environment
+     * @param applyRefactoringListener
+     *            the apply refactoring listener
+     */
     public ApplyRefactoringsJob(Queue<RefactoringUnit> refactoringUnits, List<RefactoringRule> refactoringRulesToApply,
             Environment environment, IJobChangeListener applyRefactoringListener) {
         super("AutoRefactor");
@@ -112,7 +121,6 @@ public class ApplyRefactoringsJob extends Job {
         this.refactoringUnits = refactoringUnits;
         ApplyRefactoringsJob.refactoringRulesToApply = refactoringRulesToApply;
         this.environment = environment;
-        this.applyRefactoringListener = applyRefactoringListener;
     }
 
     @Override
@@ -195,24 +203,25 @@ public class ApplyRefactoringsJob extends Job {
             }
             final IDocument document = textFileBuffer.getDocument();
 
-            codeToRefactor = document.get();
+            ApplyRefactoringsJob.codeToRefactor = document.get();
 
             IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 
-            iCompile = compilationUnit;
+            ApplyRefactoringsJob.iCompile = compilationUnit;
             IProject project = root.getProject(compilationUnit.getPath().segment(0));
 
-            newFile = project.getFile("../" + compilationUnit.getPath().removeLastSegments(1) + "/newFile.java");
+            ApplyRefactoringsJob.newFile =
+                    project.getFile("../" + compilationUnit.getPath().removeLastSegments(1) + "/newFile.java");
 
-            InputStream sourceInput = new ByteArrayInputStream(codeToRefactor.getBytes());
+            InputStream sourceInput = new ByteArrayInputStream(getCodeToRefactor().getBytes());
 
-            if (newFile.exists()) {
-                newFile.delete(false, monitor);
+            if (getNewFile().exists()) {
+                getNewFile().delete(false, monitor);
             }
 
-            newFile.create(sourceInput, false, monitor);
+            getNewFile().create(sourceInput, false, monitor);
 
-            newPath = newFile.getFullPath();
+            newPath = getNewFile().getFullPath();
 
             newbufferManager.connect(newPath, locationKind, null);
 
@@ -220,11 +229,10 @@ public class ApplyRefactoringsJob extends Job {
 
             final IDocument newDocument = newTextFileBuffer.getDocument();
 
-            cu = JavaCore.createCompilationUnitFrom(newFile);
+            final ICompilationUnit cu = JavaCore.createCompilationUnitFrom(getNewFile());
 
             applyRefactoring(newDocument, cu, refactoringToApply, options, monitor);
         } catch (Exception e) {
-            System.out.println("Exception occured");
             e.printStackTrace();
         } finally {
             bufferManager.disconnect(path, locationKind, null);
@@ -264,7 +272,7 @@ public class ApplyRefactoringsJob extends Job {
      */
     public void applyRefactoring(IDocument document, ICompilationUnit compilationUnit, AggregateASTVisitor refactoring,
             JavaProjectOptions options, SubMonitor monitor) throws Exception {
-        // creation of DOM/AST from a ICompilationUnit
+        // Creation of DOM/AST from a ICompilationUnit
 
         final ASTParser parser = ASTParser.newParser(AST.JLS8);
         resetParser(compilationUnit, parser, options);
@@ -274,7 +282,7 @@ public class ApplyRefactoringsJob extends Job {
         int totalNbLoops = 0;
         Set<ASTVisitor> lastLoopVisitors = Collections.emptySet();
         int nbLoopsWithSameVisitors = 0;
-        refactoringsApplied.clear();
+        getRefactoringsApplied().clear();
         do {
             if (totalNbLoops > 100) {
                 // Oops! Something went wrong.
@@ -292,13 +300,12 @@ public class ApplyRefactoringsJob extends Job {
 
             final Refactorings refactorings = refactoring.getRefactorings(astRoot);
             if (!refactorings.hasRefactorings()) {
-                System.out.println("No Refcatorings");
-                // no new refactorings have been applied,
+                // No new refactorings have been applied,
                 // we are done with applying the refactorings.
 
                 compilationUnit.getBuffer().setContents(document.get());
 
-                refactoredContent = document.get();
+                ApplyRefactoringsJob.refactoredContent = document.get();
                 return;
             }
 
@@ -306,10 +313,10 @@ public class ApplyRefactoringsJob extends Job {
 
             final boolean hadUnsavedChanges = compilationUnit.hasUnsavedChanges();
             compilationUnit.getBuffer().setContents(document.get());
-            refactoredContent = document.get();
+            ApplyRefactoringsJob.refactoredContent = document.get();
 
             // http://wiki.eclipse.org/FAQ_What_is_a_working_copy%3F
-            // compilationUnit.reconcile(AST.JLS4,
+            // compilationUnit.reconcile(AST.JLS8,
             // ICompilationUnit.ENABLE_BINDINGS_RECOVERY |
             // ICompilationUnit.ENABLE_STATEMENTS_RECOVERY |
             // ICompilationUnit.FORCE_PROBLEM_DETECTION
@@ -328,20 +335,21 @@ public class ApplyRefactoringsJob extends Job {
             // the AST level and refresh the bindings
             resetParser(compilationUnit, parser, options);
             astRoot = (CompilationUnit) parser.createAST(null);
-            ++totalNbLoops;
+            totalNbLoops++;
 
             final Set<ASTVisitor> thisLoopVisitors = refactoring.getVisitorsContributingRefactoring();
-            Iterator iterate = thisLoopVisitors.iterator();
+            Iterator<ASTVisitor> iterate = thisLoopVisitors.iterator();
             while (iterate.hasNext()) {
                 String refactoringapp = iterate.next().getClass().getName();
 
-                refactoringsApplied.add(refactoringapp);
+                getRefactoringsApplied().add(refactoringapp);
             }
+
             if (!thisLoopVisitors.equals(lastLoopVisitors)) {
-                lastLoopVisitors = new HashSet<>(thisLoopVisitors);
+                lastLoopVisitors = new HashSet<ASTVisitor>(thisLoopVisitors);
                 nbLoopsWithSameVisitors = 0;
             } else {
-                ++nbLoopsWithSameVisitors;
+                nbLoopsWithSameVisitors++;
             }
         } while (true);
     }
@@ -365,7 +373,57 @@ public class ApplyRefactoringsJob extends Job {
         return sb.toString();
     }
 
-    public List allRefactoringApplied() {
+    /**
+     * Returns all the refactoring applied.
+     *
+     * @return all the refactoring applied
+     */
+    public List<RefactoringRule> allRefactoringApplied() {
         return refactoringRulesToApply;
+    }
+
+    /**
+     * Returns the refactored content.
+     *
+     * @return the refactored content.
+     */
+    public static String getRefactoredContent() {
+        return refactoredContent;
+    }
+
+    /**
+     * Returns the code to refactor.
+     *
+     * @return the code to refactor.
+     */
+    public static String getCodeToRefactor() {
+        return codeToRefactor;
+    }
+
+    /**
+     * Returns the iCompile.
+     *
+     * @return the iCompile.
+     */
+    public static ICompilationUnit getiCompile() {
+        return iCompile;
+    }
+
+    /**
+     * Returns the new file.
+     *
+     * @return the new file.
+     */
+    public static IFile getNewFile() {
+        return newFile;
+    }
+
+    /**
+     * Returns the refactorings applied.
+     *
+     * @return the refactorings applied.
+     */
+    public static Set<String> getRefactoringsApplied() {
+        return refactoringsApplied;
     }
 }

@@ -548,8 +548,6 @@ public class Refactorings {
         // Call this operation on the SWT Display Thread with syncExec(),
         // because it changes or adds something to the GUI.
         // Otherwise it would throw an Invalid thread access Exception.
-        // System.out.println("-----------------Apply Edits To document
-        // called---------------");
         eventLoop.syncExec(new Callable<BadLocationException>() {
             @Override
             public BadLocationException call() throws Exception {

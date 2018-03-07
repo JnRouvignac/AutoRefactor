@@ -3,6 +3,9 @@ package org.autorefactor.ui;
 import org.eclipse.compare.CompareUI;
 import org.eclipse.jface.wizard.Wizard;
 
+/**
+ * Preview wizard.
+ */
 public class PreviewWizard extends Wizard {
     private PreviewWizardPage previewWizardPage = new PreviewWizardPage();
 

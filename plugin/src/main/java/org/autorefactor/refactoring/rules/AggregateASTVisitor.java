@@ -267,7 +267,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     @Override
     public Refactorings getRefactorings(CompilationUnit astRoot) {
         astRoot.accept(this);
-        // System.out.println("Lets see..");
         return this.ctx.getRefactorings();
     }
 
@@ -300,7 +299,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
             } else {
                 visitorsContributingRefactoring.add(v);
             }
-            // changes will be made to this node.
+            // Changes will be made to this node.
             // no other visitors can make any more changes to it
             // => do not let other visitors visit this node
             return false;
@@ -316,7 +315,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
 
     private void logFaultyVisitor(ASTVisitor v, ASTNode node, Exception e) {
         if (e instanceof OperationCanceledException) {
-            // let the user cancel the current operation
+            // Let the user cancel the current operation
             throw (OperationCanceledException) e;
         }
         String message =

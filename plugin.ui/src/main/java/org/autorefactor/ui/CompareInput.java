@@ -5,13 +5,18 @@ import java.lang.reflect.InvocationTargetException;
 import org.autorefactor.refactoring.ApplyRefactoringsJob;
 import org.eclipse.compare.CompareConfiguration;
 import org.eclipse.compare.CompareEditorInput;
-import org.eclipse.compare.ITypedElement;
 import org.eclipse.compare.structuremergeviewer.DiffNode;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.ICompilationUnit;
 
+/**
+ * Compare input.
+ */
 public class CompareInput extends CompareEditorInput {
+    /**
+     * Ignore whitespace.
+     */
     public static final String IGNORE_WHITESPACE = "IGNORE_WHITESPACE";
 
     static CompareConfiguration compareConfiguration = new CompareConfiguration();
@@ -21,6 +26,9 @@ public class CompareInput extends CompareEditorInput {
     CompareItem left;
     CompareItem right;
 
+    /**
+     * Constructor.
+     */
     public CompareInput() {
         super(compareConfiguration);
         compareConfiguration.setLeftLabel("Original Java File");
@@ -36,9 +44,9 @@ public class CompareInput extends CompareEditorInput {
     @SuppressWarnings("restriction")
     @Override
     protected Object prepareInput(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-        CompareItem ancestor = new CompareItem(ApplyRefactoringsJob.codeToRefactor);
-        left = new CompareItem(ApplyRefactoringsJob.codeToRefactor);
-        right = new CompareItem(ApplyRefactoringsJob.refactoredContent);
+        CompareItem ancestor = new CompareItem(ApplyRefactoringsJob.getCodeToRefactor());
+        left = new CompareItem(ApplyRefactoringsJob.getCodeToRefactor());
+        right = new CompareItem(ApplyRefactoringsJob.getRefactoredContent());
         node = new DiffNode(1, ancestor, left, right);
 
         return node;
@@ -46,10 +54,8 @@ public class CompareInput extends CompareEditorInput {
 
     @Override
     public boolean okPressed() {
-        ITypedElement itypeElement = node.getRight();
-
         try {
-            CompareItem.newContents = ApplyRefactoringsJob.refactoredContent;
+            CompareItem.setNewContents(ApplyRefactoringsJob.getRefactoredContent());
             saveChanges(monitor);
         } catch (Exception e) {
             e.printStackTrace();
@@ -61,22 +67,21 @@ public class CompareInput extends CompareEditorInput {
     @Override
     public void cancelPressed() {
         try {
-            ApplyRefactoringsJob.newFile.delete(true, monitor);
+            ApplyRefactoringsJob.getNewFile().delete(true, monitor);
         } catch (CoreException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
 
+    /**
+     * Create and commit.
+     */
     public void createAndCommit() {
-        ICompilationUnit iCompilation = ApplyRefactoringsJob.iCompile;
+        ICompilationUnit iCompilation = ApplyRefactoringsJob.getiCompile();
         try {
-            iCompilation.getBuffer().setContents(CompareItem.newContents);
-            ApplyRefactoringsJob.newFile.delete(true, monitor);
-        }
-
-        catch (Exception e) {
-            System.out.println("Exception in create and commit");
+            iCompilation.getBuffer().setContents(CompareItem.getNewContents());
+            ApplyRefactoringsJob.getNewFile().delete(true, monitor);
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

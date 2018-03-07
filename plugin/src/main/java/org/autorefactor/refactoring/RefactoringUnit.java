@@ -37,11 +37,21 @@ public class RefactoringUnit {
         this.options = options;
     }
 
+    /**
+     * Get the compilation unit.
+     *
+     * @return the compilation unit.
+     */
     public ICompilationUnit getCompilationUnit() {
         return compilationUnit;
     }
 
-    JavaProjectOptions getOptions() {
+    /**
+     * Get the options.
+     *
+     * @return the options.
+     */
+    public JavaProjectOptions getOptions() {
         return options;
     }
 
