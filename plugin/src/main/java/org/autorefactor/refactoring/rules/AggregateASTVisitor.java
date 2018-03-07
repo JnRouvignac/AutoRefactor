@@ -25,6 +25,9 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
+
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -134,15 +137,13 @@ import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 import org.eclipse.jdt.core.dom.WhileStatement;
 import org.eclipse.jdt.core.dom.WildcardType;
 
-import static org.autorefactor.refactoring.ASTHelper.*;
-
 /**
- * Aggregates running several visitors into only one visitor to increase performances.
- * When one visitor refactors a subtree of the AST, visitors coming after will not be able to visit it.
- * Visitors throwing exceptions are isolated and ignored for the rest of a run for stability.
+ * Aggregates running several visitors into only one visitor to increase
+ * performances. When one visitor refactors a subtree of the AST, visitors
+ * coming after will not be able to visit it. Visitors throwing exceptions are
+ * isolated and ignored for the rest of a run for stability.
  */
 public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRule {
-
     private final Map<Class<?>, List<ASTVisitor>> visitorsMap = new HashMap<Class<?>, List<ASTVisitor>>();
     private final Map<Class<?>, List<ASTVisitor>> endVisitorsMap = new HashMap<Class<?>, List<ASTVisitor>>();
     private final Set<ASTVisitor> preVisitors = new LinkedHashSet<ASTVisitor>();
@@ -157,7 +158,9 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     /**
      * Builds an instance of this class.
      *
-     * @param visitors the visitors that will be executed by this {@link AggregateASTVisitor}
+     * @param visitors
+     *            the visitors that will be executed by this
+     *            {@link AggregateASTVisitor}
      */
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public AggregateASTVisitor(List<RefactoringRule> visitors) {
@@ -173,7 +176,6 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     @Override
     public String getName() {
         throw new UnsupportedOperationException();
-    	
     }
 
     @Override
@@ -208,23 +210,20 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     private static boolean is(String methodName, Method m) {
-        return methodName.equals(m.getName())
-            && m.getParameterTypes().length == 1
-            && ASTNode.class.equals(m.getParameterTypes()[0]);
+        return methodName.equals(m.getName()) && m.getParameterTypes().length == 1
+                && ASTNode.class.equals(m.getParameterTypes()[0]);
     }
 
     private static boolean isVisit(Method m) {
-        return "visit".equals(m.getName())
-            && m.getParameterTypes().length == 1
-            && ASTNode.class.isAssignableFrom(m.getParameterTypes()[0])
-            && !Modifier.isAbstract(m.getParameterTypes()[0].getModifiers());
+        return "visit".equals(m.getName()) && m.getParameterTypes().length == 1
+                && ASTNode.class.isAssignableFrom(m.getParameterTypes()[0])
+                && !Modifier.isAbstract(m.getParameterTypes()[0].getModifiers());
     }
 
     private static boolean isEndVisit(Method m) {
-        return "endVisit".equals(m.getName())
-            && m.getParameterTypes().length == 1
-            && ASTNode.class.isAssignableFrom(m.getParameterTypes()[0])
-            && !Modifier.isAbstract(m.getParameterTypes()[0].getModifiers());
+        return "endVisit".equals(m.getName()) && m.getParameterTypes().length == 1
+                && ASTNode.class.isAssignableFrom(m.getParameterTypes()[0])
+                && !Modifier.isAbstract(m.getParameterTypes()[0].getModifiers());
     }
 
     private void put(Map<Class<?>, List<ASTVisitor>> map, Class<?> key, ASTVisitor value) {
@@ -236,8 +235,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         visitors.add(value);
     }
 
-    private List<ASTVisitor> getVisitors(Map<Class<?>, List<ASTVisitor>> map,
-            Class<? extends ASTNode> clazzKey) {
+    private List<ASTVisitor> getVisitors(Map<Class<?>, List<ASTVisitor>> map, Class<? extends ASTNode> clazzKey) {
         final List<ASTVisitor> result = map.get(clazzKey);
         if (result != null) {
             return result;
@@ -269,7 +267,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     @Override
     public Refactorings getRefactorings(CompilationUnit astRoot) {
         astRoot.accept(this);
-       // System.out.println("Lets see..");
+        // System.out.println("Lets see..");
         return this.ctx.getRefactorings();
     }
 
@@ -285,12 +283,15 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     /**
      * Verify whether the following visitors can visit the current node.
      *
-     * @param continueVisiting whether the current visitor reported it wants
-     *        to visit the subtree of the current node
-     * @param v the current visitor
-     * @param node the node being currently visited
-     * @return true if the following visitors can visit the current node,
-     *         false otherwise
+     * @param continueVisiting
+     *            whether the current visitor reported it wants to visit the
+     *            subtree of the current node
+     * @param v
+     *            the current visitor
+     * @param node
+     *            the node being currently visited
+     * @return true if the following visitors can visit the current node, false
+     *         otherwise
      */
     private boolean continueVisiting(boolean continueVisiting, ASTVisitor v, ASTNode node) {
         if (!continueVisiting) {
@@ -318,15 +319,17 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
             // let the user cancel the current operation
             throw (OperationCanceledException) e;
         }
-        String message = "Visitor " + v.getClass().getName() + " is faulty,"
-                + " it will be disabled for the rest of this run.";
+        String message =
+                "Visitor " + v.getClass().getName() + " is faulty," + " it will be disabled for the rest of this run.";
         ctx.getLogger().error(message, new UnhandledException(node, message, e));
     }
 
     /**
-     * Generates the code for all the ASTVisitor methods that delegate to the underlying visitors.
+     * Generates the code for all the ASTVisitor methods that delegate to the
+     * underlying visitors.
      *
-     * @param args the arguments of the Java program
+     * @param args
+     *            the arguments of the Java program
      */
     public static void main(String[] args) {
         final Method[] mm = ASTVisitor.class.getDeclaredMethods();
@@ -1621,8 +1624,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
-                if (isJavaVersionSupported(v)
-                        && !continueVisiting(v.visit(node), v, node)) {
+                if (isJavaVersionSupported(v) && !continueVisiting(v.visit(node), v, node)) {
                     return DO_NOT_VISIT_SUBTREE;
                 }
             } catch (Exception e) {
@@ -1639,8 +1641,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
-                if (isJavaVersionSupported(v)
-                        && !continueVisiting(v.visit(node), v, node)) {
+                if (isJavaVersionSupported(v) && !continueVisiting(v.visit(node), v, node)) {
                     return DO_NOT_VISIT_SUBTREE;
                 }
             } catch (Exception e) {
@@ -1657,8 +1658,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
-                if (isJavaVersionSupported(v)
-                        && !continueVisiting(v.visit(node), v, node)) {
+                if (isJavaVersionSupported(v) && !continueVisiting(v.visit(node), v, node)) {
                     return DO_NOT_VISIT_SUBTREE;
                 }
             } catch (Exception e) {
@@ -1675,8 +1675,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
-                if (isJavaVersionSupported(v)
-                        && !continueVisiting(v.visit(node), v, node)) {
+                if (isJavaVersionSupported(v) && !continueVisiting(v.visit(node), v, node)) {
                     return DO_NOT_VISIT_SUBTREE;
                 }
             } catch (Exception e) {
@@ -1693,8 +1692,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
-                if (isJavaVersionSupported(v)
-                        && !continueVisiting(v.visit(node), v, node)) {
+                if (isJavaVersionSupported(v) && !continueVisiting(v.visit(node), v, node)) {
                     return DO_NOT_VISIT_SUBTREE;
                 }
             } catch (Exception e) {
@@ -1711,8 +1709,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
-                if (isJavaVersionSupported(v)
-                        && !continueVisiting(v.visit(node), v, node)) {
+                if (isJavaVersionSupported(v) && !continueVisiting(v.visit(node), v, node)) {
                     return DO_NOT_VISIT_SUBTREE;
                 }
             } catch (Exception e) {
@@ -1729,8 +1726,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
-                if (isJavaVersionSupported(v)
-                        && !continueVisiting(v.visit(node), v, node)) {
+                if (isJavaVersionSupported(v) && !continueVisiting(v.visit(node), v, node)) {
                     return DO_NOT_VISIT_SUBTREE;
                 }
             } catch (Exception e) {
@@ -1747,8 +1743,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
-                if (isJavaVersionSupported(v)
-                        && !continueVisiting(v.visit(node), v, node)) {
+                if (isJavaVersionSupported(v) && !continueVisiting(v.visit(node), v, node)) {
                     return DO_NOT_VISIT_SUBTREE;
                 }
             } catch (Exception e) {
@@ -1765,8 +1760,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
-                if (isJavaVersionSupported(v)
-                        && !continueVisiting(v.visit(node), v, node)) {
+                if (isJavaVersionSupported(v) && !continueVisiting(v.visit(node), v, node)) {
                     return DO_NOT_VISIT_SUBTREE;
                 }
             } catch (Exception e) {
@@ -1783,8 +1777,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
-                if (isJavaVersionSupported(v)
-                        && !continueVisiting(v.visit(node), v, node)) {
+                if (isJavaVersionSupported(v) && !continueVisiting(v.visit(node), v, node)) {
                     return DO_NOT_VISIT_SUBTREE;
                 }
             } catch (Exception e) {
@@ -1801,8 +1794,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
-                if (isJavaVersionSupported(v)
-                        && !continueVisiting(v.visit(node), v, node)) {
+                if (isJavaVersionSupported(v) && !continueVisiting(v.visit(node), v, node)) {
                     return DO_NOT_VISIT_SUBTREE;
                 }
             } catch (Exception e) {
@@ -1819,8 +1811,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
-                if (isJavaVersionSupported(v)
-                        && !continueVisiting(v.visit(node), v, node)) {
+                if (isJavaVersionSupported(v) && !continueVisiting(v.visit(node), v, node)) {
                     return DO_NOT_VISIT_SUBTREE;
                 }
             } catch (Exception e) {
@@ -1837,8 +1828,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
-                if (isJavaVersionSupported(v)
-                        && !continueVisiting(v.visit(node), v, node)) {
+                if (isJavaVersionSupported(v) && !continueVisiting(v.visit(node), v, node)) {
                     return DO_NOT_VISIT_SUBTREE;
                 }
             } catch (Exception e) {
@@ -1855,8 +1845,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
-                if (isJavaVersionSupported(v)
-                        && !continueVisiting(v.visit(node), v, node)) {
+                if (isJavaVersionSupported(v) && !continueVisiting(v.visit(node), v, node)) {
                     return DO_NOT_VISIT_SUBTREE;
                 }
             } catch (Exception e) {
@@ -1873,8 +1862,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
-                if (isJavaVersionSupported(v)
-                        && !continueVisiting(v.visit(node), v, node)) {
+                if (isJavaVersionSupported(v) && !continueVisiting(v.visit(node), v, node)) {
                     return DO_NOT_VISIT_SUBTREE;
                 }
             } catch (Exception e) {
@@ -1891,8 +1879,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
-                if (isJavaVersionSupported(v)
-                        && !continueVisiting(v.visit(node), v, node)) {
+                if (isJavaVersionSupported(v) && !continueVisiting(v.visit(node), v, node)) {
                     return DO_NOT_VISIT_SUBTREE;
                 }
             } catch (Exception e) {
@@ -1909,8 +1896,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
-                if (isJavaVersionSupported(v)
-                        && !continueVisiting(v.visit(node), v, node)) {
+                if (isJavaVersionSupported(v) && !continueVisiting(v.visit(node), v, node)) {
                     return DO_NOT_VISIT_SUBTREE;
                 }
             } catch (Exception e) {
@@ -1927,8 +1913,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
-                if (isJavaVersionSupported(v)
-                        && !continueVisiting(v.visit(node), v, node)) {
+                if (isJavaVersionSupported(v) && !continueVisiting(v.visit(node), v, node)) {
                     return DO_NOT_VISIT_SUBTREE;
                 }
             } catch (Exception e) {
@@ -1945,8 +1930,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
-                if (isJavaVersionSupported(v)
-                        && !continueVisiting(v.visit(node), v, node)) {
+                if (isJavaVersionSupported(v) && !continueVisiting(v.visit(node), v, node)) {
                     return DO_NOT_VISIT_SUBTREE;
                 }
             } catch (Exception e) {
@@ -1963,8 +1947,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
-                if (isJavaVersionSupported(v)
-                        && !continueVisiting(v.visit(node), v, node)) {
+                if (isJavaVersionSupported(v) && !continueVisiting(v.visit(node), v, node)) {
                     return DO_NOT_VISIT_SUBTREE;
                 }
             } catch (Exception e) {
@@ -1981,8 +1964,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
-                if (isJavaVersionSupported(v)
-                        && !continueVisiting(v.visit(node), v, node)) {
+                if (isJavaVersionSupported(v) && !continueVisiting(v.visit(node), v, node)) {
                     return DO_NOT_VISIT_SUBTREE;
                 }
             } catch (Exception e) {
@@ -1999,8 +1981,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
-                if (isJavaVersionSupported(v)
-                        && !continueVisiting(v.visit(node), v, node)) {
+                if (isJavaVersionSupported(v) && !continueVisiting(v.visit(node), v, node)) {
                     return DO_NOT_VISIT_SUBTREE;
                 }
             } catch (Exception e) {
@@ -2017,8 +1998,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
-                if (isJavaVersionSupported(v)
-                        && !continueVisiting(v.visit(node), v, node)) {
+                if (isJavaVersionSupported(v) && !continueVisiting(v.visit(node), v, node)) {
                     return DO_NOT_VISIT_SUBTREE;
                 }
             } catch (Exception e) {
@@ -2035,8 +2015,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
-                if (isJavaVersionSupported(v)
-                        && !continueVisiting(v.visit(node), v, node)) {
+                if (isJavaVersionSupported(v) && !continueVisiting(v.visit(node), v, node)) {
                     return DO_NOT_VISIT_SUBTREE;
                 }
             } catch (Exception e) {
@@ -2053,8 +2032,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
-                if (isJavaVersionSupported(v)
-                        && !continueVisiting(v.visit(node), v, node)) {
+                if (isJavaVersionSupported(v) && !continueVisiting(v.visit(node), v, node)) {
                     return DO_NOT_VISIT_SUBTREE;
                 }
             } catch (Exception e) {
@@ -2071,8 +2049,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
-                if (isJavaVersionSupported(v)
-                        && !continueVisiting(v.visit(node), v, node)) {
+                if (isJavaVersionSupported(v) && !continueVisiting(v.visit(node), v, node)) {
                     return DO_NOT_VISIT_SUBTREE;
                 }
             } catch (Exception e) {
@@ -2089,8 +2066,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
-                if (isJavaVersionSupported(v)
-                        && !continueVisiting(v.visit(node), v, node)) {
+                if (isJavaVersionSupported(v) && !continueVisiting(v.visit(node), v, node)) {
                     return DO_NOT_VISIT_SUBTREE;
                 }
             } catch (Exception e) {
@@ -2107,8 +2083,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
-                if (isJavaVersionSupported(v)
-                        && !continueVisiting(v.visit(node), v, node)) {
+                if (isJavaVersionSupported(v) && !continueVisiting(v.visit(node), v, node)) {
                     return DO_NOT_VISIT_SUBTREE;
                 }
             } catch (Exception e) {
@@ -2125,8 +2100,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
-                if (isJavaVersionSupported(v)
-                        && !continueVisiting(v.visit(node), v, node)) {
+                if (isJavaVersionSupported(v) && !continueVisiting(v.visit(node), v, node)) {
                     return DO_NOT_VISIT_SUBTREE;
                 }
             } catch (Exception e) {
@@ -2143,8 +2117,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
-                if (isJavaVersionSupported(v)
-                        && !continueVisiting(v.visit(node), v, node)) {
+                if (isJavaVersionSupported(v) && !continueVisiting(v.visit(node), v, node)) {
                     return DO_NOT_VISIT_SUBTREE;
                 }
             } catch (Exception e) {
@@ -2161,8 +2134,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
-                if (isJavaVersionSupported(v)
-                        && !continueVisiting(v.visit(node), v, node)) {
+                if (isJavaVersionSupported(v) && !continueVisiting(v.visit(node), v, node)) {
                     return DO_NOT_VISIT_SUBTREE;
                 }
             } catch (Exception e) {
@@ -2179,8 +2151,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
-                if (isJavaVersionSupported(v)
-                        && !continueVisiting(v.visit(node), v, node)) {
+                if (isJavaVersionSupported(v) && !continueVisiting(v.visit(node), v, node)) {
                     return DO_NOT_VISIT_SUBTREE;
                 }
             } catch (Exception e) {
@@ -2197,8 +2168,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
-                if (isJavaVersionSupported(v)
-                        && !continueVisiting(v.visit(node), v, node)) {
+                if (isJavaVersionSupported(v) && !continueVisiting(v.visit(node), v, node)) {
                     return DO_NOT_VISIT_SUBTREE;
                 }
             } catch (Exception e) {
@@ -2215,8 +2185,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
-                if (isJavaVersionSupported(v)
-                        && !continueVisiting(v.visit(node), v, node)) {
+                if (isJavaVersionSupported(v) && !continueVisiting(v.visit(node), v, node)) {
                     return DO_NOT_VISIT_SUBTREE;
                 }
             } catch (Exception e) {
@@ -2233,8 +2202,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
-                if (isJavaVersionSupported(v)
-                        && !continueVisiting(v.visit(node), v, node)) {
+                if (isJavaVersionSupported(v) && !continueVisiting(v.visit(node), v, node)) {
                     return DO_NOT_VISIT_SUBTREE;
                 }
             } catch (Exception e) {
@@ -2251,8 +2219,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
-                if (isJavaVersionSupported(v)
-                        && !continueVisiting(v.visit(node), v, node)) {
+                if (isJavaVersionSupported(v) && !continueVisiting(v.visit(node), v, node)) {
                     return DO_NOT_VISIT_SUBTREE;
                 }
             } catch (Exception e) {
@@ -2269,8 +2236,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
-                if (isJavaVersionSupported(v)
-                        && !continueVisiting(v.visit(node), v, node)) {
+                if (isJavaVersionSupported(v) && !continueVisiting(v.visit(node), v, node)) {
                     return DO_NOT_VISIT_SUBTREE;
                 }
             } catch (Exception e) {
@@ -2287,8 +2253,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
-                if (isJavaVersionSupported(v)
-                        && !continueVisiting(v.visit(node), v, node)) {
+                if (isJavaVersionSupported(v) && !continueVisiting(v.visit(node), v, node)) {
                     return DO_NOT_VISIT_SUBTREE;
                 }
             } catch (Exception e) {
@@ -2305,8 +2270,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
-                if (isJavaVersionSupported(v)
-                        && !continueVisiting(v.visit(node), v, node)) {
+                if (isJavaVersionSupported(v) && !continueVisiting(v.visit(node), v, node)) {
                     return DO_NOT_VISIT_SUBTREE;
                 }
             } catch (Exception e) {
@@ -2323,8 +2287,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
-                if (isJavaVersionSupported(v)
-                        && !continueVisiting(v.visit(node), v, node)) {
+                if (isJavaVersionSupported(v) && !continueVisiting(v.visit(node), v, node)) {
                     return DO_NOT_VISIT_SUBTREE;
                 }
             } catch (Exception e) {
@@ -2341,8 +2304,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
-                if (isJavaVersionSupported(v)
-                        && !continueVisiting(v.visit(node), v, node)) {
+                if (isJavaVersionSupported(v) && !continueVisiting(v.visit(node), v, node)) {
                     return DO_NOT_VISIT_SUBTREE;
                 }
             } catch (Exception e) {
@@ -2359,8 +2321,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
-                if (isJavaVersionSupported(v)
-                        && !continueVisiting(v.visit(node), v, node)) {
+                if (isJavaVersionSupported(v) && !continueVisiting(v.visit(node), v, node)) {
                     return DO_NOT_VISIT_SUBTREE;
                 }
             } catch (Exception e) {
@@ -2377,8 +2338,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
-                if (isJavaVersionSupported(v)
-                        && !continueVisiting(v.visit(node), v, node)) {
+                if (isJavaVersionSupported(v) && !continueVisiting(v.visit(node), v, node)) {
                     return DO_NOT_VISIT_SUBTREE;
                 }
             } catch (Exception e) {
@@ -2395,8 +2355,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
-                if (isJavaVersionSupported(v)
-                        && !continueVisiting(v.visit(node), v, node)) {
+                if (isJavaVersionSupported(v) && !continueVisiting(v.visit(node), v, node)) {
                     return DO_NOT_VISIT_SUBTREE;
                 }
             } catch (Exception e) {
@@ -2413,8 +2372,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
-                if (isJavaVersionSupported(v)
-                        && !continueVisiting(v.visit(node), v, node)) {
+                if (isJavaVersionSupported(v) && !continueVisiting(v.visit(node), v, node)) {
                     return DO_NOT_VISIT_SUBTREE;
                 }
             } catch (Exception e) {
@@ -2431,8 +2389,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
-                if (isJavaVersionSupported(v)
-                        && !continueVisiting(v.visit(node), v, node)) {
+                if (isJavaVersionSupported(v) && !continueVisiting(v.visit(node), v, node)) {
                     return DO_NOT_VISIT_SUBTREE;
                 }
             } catch (Exception e) {
@@ -2449,8 +2406,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
-                if (isJavaVersionSupported(v)
-                        && !continueVisiting(v.visit(node), v, node)) {
+                if (isJavaVersionSupported(v) && !continueVisiting(v.visit(node), v, node)) {
                     return DO_NOT_VISIT_SUBTREE;
                 }
             } catch (Exception e) {
@@ -2467,8 +2423,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
-                if (isJavaVersionSupported(v)
-                        && !continueVisiting(v.visit(node), v, node)) {
+                if (isJavaVersionSupported(v) && !continueVisiting(v.visit(node), v, node)) {
                     return DO_NOT_VISIT_SUBTREE;
                 }
             } catch (Exception e) {
@@ -2485,8 +2440,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
-                if (isJavaVersionSupported(v)
-                        && !continueVisiting(v.visit(node), v, node)) {
+                if (isJavaVersionSupported(v) && !continueVisiting(v.visit(node), v, node)) {
                     return DO_NOT_VISIT_SUBTREE;
                 }
             } catch (Exception e) {
@@ -2503,8 +2457,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
-                if (isJavaVersionSupported(v)
-                        && !continueVisiting(v.visit(node), v, node)) {
+                if (isJavaVersionSupported(v) && !continueVisiting(v.visit(node), v, node)) {
                     return DO_NOT_VISIT_SUBTREE;
                 }
             } catch (Exception e) {
@@ -2521,8 +2474,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
-                if (isJavaVersionSupported(v)
-                        && !continueVisiting(v.visit(node), v, node)) {
+                if (isJavaVersionSupported(v) && !continueVisiting(v.visit(node), v, node)) {
                     return DO_NOT_VISIT_SUBTREE;
                 }
             } catch (Exception e) {
@@ -2539,8 +2491,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
-                if (isJavaVersionSupported(v)
-                        && !continueVisiting(v.visit(node), v, node)) {
+                if (isJavaVersionSupported(v) && !continueVisiting(v.visit(node), v, node)) {
                     return DO_NOT_VISIT_SUBTREE;
                 }
             } catch (Exception e) {
@@ -2557,8 +2508,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
-                if (isJavaVersionSupported(v)
-                        && !continueVisiting(v.visit(node), v, node)) {
+                if (isJavaVersionSupported(v) && !continueVisiting(v.visit(node), v, node)) {
                     return DO_NOT_VISIT_SUBTREE;
                 }
             } catch (Exception e) {
@@ -2575,8 +2525,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
-                if (isJavaVersionSupported(v)
-                        && !continueVisiting(v.visit(node), v, node)) {
+                if (isJavaVersionSupported(v) && !continueVisiting(v.visit(node), v, node)) {
                     return DO_NOT_VISIT_SUBTREE;
                 }
             } catch (Exception e) {
@@ -2593,8 +2542,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
-                if (isJavaVersionSupported(v)
-                        && !continueVisiting(v.visit(node), v, node)) {
+                if (isJavaVersionSupported(v) && !continueVisiting(v.visit(node), v, node)) {
                     return DO_NOT_VISIT_SUBTREE;
                 }
             } catch (Exception e) {
@@ -2611,8 +2559,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
-                if (isJavaVersionSupported(v)
-                        && !continueVisiting(v.visit(node), v, node)) {
+                if (isJavaVersionSupported(v) && !continueVisiting(v.visit(node), v, node)) {
                     return DO_NOT_VISIT_SUBTREE;
                 }
             } catch (Exception e) {
@@ -2629,8 +2576,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
-                if (isJavaVersionSupported(v)
-                        && !continueVisiting(v.visit(node), v, node)) {
+                if (isJavaVersionSupported(v) && !continueVisiting(v.visit(node), v, node)) {
                     return DO_NOT_VISIT_SUBTREE;
                 }
             } catch (Exception e) {
@@ -2647,8 +2593,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
-                if (isJavaVersionSupported(v)
-                        && !continueVisiting(v.visit(node), v, node)) {
+                if (isJavaVersionSupported(v) && !continueVisiting(v.visit(node), v, node)) {
                     return DO_NOT_VISIT_SUBTREE;
                 }
             } catch (Exception e) {
@@ -2665,8 +2610,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
-                if (isJavaVersionSupported(v)
-                        && !continueVisiting(v.visit(node), v, node)) {
+                if (isJavaVersionSupported(v) && !continueVisiting(v.visit(node), v, node)) {
                     return DO_NOT_VISIT_SUBTREE;
                 }
             } catch (Exception e) {
@@ -2683,8 +2627,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
-                if (isJavaVersionSupported(v)
-                        && !continueVisiting(v.visit(node), v, node)) {
+                if (isJavaVersionSupported(v) && !continueVisiting(v.visit(node), v, node)) {
                     return DO_NOT_VISIT_SUBTREE;
                 }
             } catch (Exception e) {
@@ -2701,8 +2644,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
-                if (isJavaVersionSupported(v)
-                        && !continueVisiting(v.visit(node), v, node)) {
+                if (isJavaVersionSupported(v) && !continueVisiting(v.visit(node), v, node)) {
                     return DO_NOT_VISIT_SUBTREE;
                 }
             } catch (Exception e) {
@@ -2719,8 +2661,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
-                if (isJavaVersionSupported(v)
-                        && !continueVisiting(v.visit(node), v, node)) {
+                if (isJavaVersionSupported(v) && !continueVisiting(v.visit(node), v, node)) {
                     return DO_NOT_VISIT_SUBTREE;
                 }
             } catch (Exception e) {
@@ -2737,8 +2678,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
-                if (isJavaVersionSupported(v)
-                        && !continueVisiting(v.visit(node), v, node)) {
+                if (isJavaVersionSupported(v) && !continueVisiting(v.visit(node), v, node)) {
                     return DO_NOT_VISIT_SUBTREE;
                 }
             } catch (Exception e) {
@@ -2755,8 +2695,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
-                if (isJavaVersionSupported(v)
-                        && !continueVisiting(v.visit(node), v, node)) {
+                if (isJavaVersionSupported(v) && !continueVisiting(v.visit(node), v, node)) {
                     return DO_NOT_VISIT_SUBTREE;
                 }
             } catch (Exception e) {
@@ -2773,8 +2712,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
-                if (isJavaVersionSupported(v)
-                        && !continueVisiting(v.visit(node), v, node)) {
+                if (isJavaVersionSupported(v) && !continueVisiting(v.visit(node), v, node)) {
                     return DO_NOT_VISIT_SUBTREE;
                 }
             } catch (Exception e) {
@@ -2791,8 +2729,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
-                if (isJavaVersionSupported(v)
-                        && !continueVisiting(v.visit(node), v, node)) {
+                if (isJavaVersionSupported(v) && !continueVisiting(v.visit(node), v, node)) {
                     return DO_NOT_VISIT_SUBTREE;
                 }
             } catch (Exception e) {
@@ -2809,8 +2746,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
-                if (isJavaVersionSupported(v)
-                        && !continueVisiting(v.visit(node), v, node)) {
+                if (isJavaVersionSupported(v) && !continueVisiting(v.visit(node), v, node)) {
                     return DO_NOT_VISIT_SUBTREE;
                 }
             } catch (Exception e) {
@@ -2827,8 +2763,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
-                if (isJavaVersionSupported(v)
-                        && !continueVisiting(v.visit(node), v, node)) {
+                if (isJavaVersionSupported(v) && !continueVisiting(v.visit(node), v, node)) {
                     return DO_NOT_VISIT_SUBTREE;
                 }
             } catch (Exception e) {
@@ -2845,8 +2780,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
-                if (isJavaVersionSupported(v)
-                        && !continueVisiting(v.visit(node), v, node)) {
+                if (isJavaVersionSupported(v) && !continueVisiting(v.visit(node), v, node)) {
                     return DO_NOT_VISIT_SUBTREE;
                 }
             } catch (Exception e) {
@@ -2863,8 +2797,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
-                if (isJavaVersionSupported(v)
-                        && !continueVisiting(v.visit(node), v, node)) {
+                if (isJavaVersionSupported(v) && !continueVisiting(v.visit(node), v, node)) {
                     return DO_NOT_VISIT_SUBTREE;
                 }
             } catch (Exception e) {
@@ -2881,8 +2814,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
-                if (isJavaVersionSupported(v)
-                        && !continueVisiting(v.visit(node), v, node)) {
+                if (isJavaVersionSupported(v) && !continueVisiting(v.visit(node), v, node)) {
                     return DO_NOT_VISIT_SUBTREE;
                 }
             } catch (Exception e) {
@@ -2899,8 +2831,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
-                if (isJavaVersionSupported(v)
-                        && !continueVisiting(v.visit(node), v, node)) {
+                if (isJavaVersionSupported(v) && !continueVisiting(v.visit(node), v, node)) {
                     return DO_NOT_VISIT_SUBTREE;
                 }
             } catch (Exception e) {
@@ -2917,8 +2848,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
-                if (isJavaVersionSupported(v)
-                        && !continueVisiting(v.visit(node), v, node)) {
+                if (isJavaVersionSupported(v) && !continueVisiting(v.visit(node), v, node)) {
                     return DO_NOT_VISIT_SUBTREE;
                 }
             } catch (Exception e) {
@@ -2935,8 +2865,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
-                if (isJavaVersionSupported(v)
-                        && !continueVisiting(v.visit(node), v, node)) {
+                if (isJavaVersionSupported(v) && !continueVisiting(v.visit(node), v, node)) {
                     return DO_NOT_VISIT_SUBTREE;
                 }
             } catch (Exception e) {
@@ -2953,8 +2882,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
-                if (isJavaVersionSupported(v)
-                        && !continueVisiting(v.visit(node), v, node)) {
+                if (isJavaVersionSupported(v) && !continueVisiting(v.visit(node), v, node)) {
                     return DO_NOT_VISIT_SUBTREE;
                 }
             } catch (Exception e) {
@@ -2971,8 +2899,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
-                if (isJavaVersionSupported(v)
-                        && !continueVisiting(v.visit(node), v, node)) {
+                if (isJavaVersionSupported(v) && !continueVisiting(v.visit(node), v, node)) {
                     return DO_NOT_VISIT_SUBTREE;
                 }
             } catch (Exception e) {
@@ -2989,8 +2916,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
-                if (isJavaVersionSupported(v)
-                        && !continueVisiting(v.visit(node), v, node)) {
+                if (isJavaVersionSupported(v) && !continueVisiting(v.visit(node), v, node)) {
                     return DO_NOT_VISIT_SUBTREE;
                 }
             } catch (Exception e) {
@@ -3007,8 +2933,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
-                if (isJavaVersionSupported(v)
-                        && !continueVisiting(v.visit(node), v, node)) {
+                if (isJavaVersionSupported(v) && !continueVisiting(v.visit(node), v, node)) {
                     return DO_NOT_VISIT_SUBTREE;
                 }
             } catch (Exception e) {
@@ -3025,8 +2950,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
-                if (isJavaVersionSupported(v)
-                        && !continueVisiting(v.visit(node), v, node)) {
+                if (isJavaVersionSupported(v) && !continueVisiting(v.visit(node), v, node)) {
                     return DO_NOT_VISIT_SUBTREE;
                 }
             } catch (Exception e) {
@@ -3043,8 +2967,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
-                if (isJavaVersionSupported(v)
-                        && !continueVisiting(v.visit(node), v, node)) {
+                if (isJavaVersionSupported(v) && !continueVisiting(v.visit(node), v, node)) {
                     return DO_NOT_VISIT_SUBTREE;
                 }
             } catch (Exception e) {
@@ -3061,8 +2984,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
-                if (isJavaVersionSupported(v)
-                        && !continueVisiting(v.visit(node), v, node)) {
+                if (isJavaVersionSupported(v) && !continueVisiting(v.visit(node), v, node)) {
                     return DO_NOT_VISIT_SUBTREE;
                 }
             } catch (Exception e) {
@@ -3079,8 +3001,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
-                if (isJavaVersionSupported(v)
-                        && !continueVisiting(v.visit(node), v, node)) {
+                if (isJavaVersionSupported(v) && !continueVisiting(v.visit(node), v, node)) {
                     return DO_NOT_VISIT_SUBTREE;
                 }
             } catch (Exception e) {
@@ -3097,8 +3018,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
-                if (isJavaVersionSupported(v)
-                        && !continueVisiting(v.visit(node), v, node)) {
+                if (isJavaVersionSupported(v) && !continueVisiting(v.visit(node), v, node)) {
                     return DO_NOT_VISIT_SUBTREE;
                 }
             } catch (Exception e) {
@@ -3115,8 +3035,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         for (Iterator<ASTVisitor> iter = visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v = iter.next();
             try {
-                if (isJavaVersionSupported(v)
-                        && !continueVisiting(v.visit(node), v, node)) {
+                if (isJavaVersionSupported(v) && !continueVisiting(v.visit(node), v, node)) {
                     return DO_NOT_VISIT_SUBTREE;
                 }
             } catch (Exception e) {

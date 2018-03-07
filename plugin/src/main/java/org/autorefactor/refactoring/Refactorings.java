@@ -57,7 +57,6 @@ import org.eclipse.text.edits.TextEdit;
  * the rule finished traversing the whole AST tree.
  */
 public class Refactorings {
-
     private static final String UNTOUCH_COMMENT = "untouchComment";
 
     private final EventLoop eventLoop;
@@ -73,8 +72,10 @@ public class Refactorings {
     /**
      * Builds an instance of this class.
      *
-     * @param astRoot the compilation unit, root of the AST
-     * @param eventLoop the event loop
+     * @param astRoot
+     *            the compilation unit, root of the AST
+     * @param eventLoop
+     *            the event loop
      */
     public Refactorings(CompilationUnit astRoot, EventLoop eventLoop) {
         this.eventLoop = eventLoop;
@@ -89,7 +90,6 @@ public class Refactorings {
             }
         });
         this.commentRewriter = new ASTCommentRewriter(astRoot);
-      
     }
 
     /**
@@ -104,7 +104,8 @@ public class Refactorings {
     /**
      * Returns whether the provided node has been the target of a refactoring.
      *
-     * @param node the node for which to make the determination
+     * @param node
+     *            the node for which to make the determination
      * @return true if the provided node has been refactored, false otherwise
      */
     public boolean hasBeenRefactored(ASTNode node) {
@@ -120,13 +121,18 @@ public class Refactorings {
     }
 
     /**
-     * Creates and returns a placeholder node for a copy of the source code of the provided node.<br>
-     * The placeholder node can be used like any new node created via the AST class.<br>
-     * When the document is rewritten, a copy of the source code for the provided node is inserted
-     * into the output document at the position corresponding to the placeholder (indentation is adjusted).
+     * Creates and returns a placeholder node for a copy of the source code of
+     * the provided node.<br>
+     * The placeholder node can be used like any new node created via the AST
+     * class.<br>
+     * When the document is rewritten, a copy of the source code for the
+     * provided node is inserted into the output document at the position
+     * corresponding to the placeholder (indentation is adjusted).
      *
-     * @param <T> the type of the provided node
-     * @param node the node for which to create a copy placeholder
+     * @param <T>
+     *            the type of the provided node
+     * @param node
+     *            the node for which to create a copy placeholder
      * @return the new placeholder node
      * @see ASTRewrite#createCopyTarget(ASTNode)
      */
@@ -136,14 +142,20 @@ public class Refactorings {
     }
 
     /**
-     * Creates and returns a placeholder node for a copy of the source code of the provided range of nodes.<br>
-     * The placeholder node can be used like any new node created via the AST class.<br>
-     * When the document is rewritten, a copy of the source code for the provided range of nodes is inserted
-     * into the output document at the position corresponding to the placeholder (indentation is adjusted).
+     * Creates and returns a placeholder node for a copy of the source code of
+     * the provided range of nodes.<br>
+     * The placeholder node can be used like any new node created via the AST
+     * class.<br>
+     * When the document is rewritten, a copy of the source code for the
+     * provided range of nodes is inserted into the output document at the
+     * position corresponding to the placeholder (indentation is adjusted).
      *
-     * @param <T> the type of the provided nodes
-     * @param first the first node of the range
-     * @param last the first node of the range
+     * @param <T>
+     *            the type of the provided nodes
+     * @param first
+     *            the first node of the range
+     * @param last
+     *            the first node of the range
      * @return the new placeholder node
      * @see ListRewrite#createCopyTarget(ASTNode, ASTNode)
      */
@@ -171,14 +183,19 @@ public class Refactorings {
     }
 
     /**
-     * Creates and returns a placeholder node where to move the source code of the provided node.<br>
-     * The placeholder node can be used like any new node created via the AST class.<br>
-     * When the document is rewritten, the source code for the provided node is inserted
-     * into the output document at the position corresponding to the placeholder (indentation is adjusted)
-     * and it is removed from the old location.
+     * Creates and returns a placeholder node where to move the source code of
+     * the provided node.<br>
+     * The placeholder node can be used like any new node created via the AST
+     * class.<br>
+     * When the document is rewritten, the source code for the provided node is
+     * inserted into the output document at the position corresponding to the
+     * placeholder (indentation is adjusted) and it is removed from the old
+     * location.
      *
-     * @param <T> the type of the provided node
-     * @param node the node for which to create a move placeholder
+     * @param <T>
+     *            the type of the provided node
+     * @param node
+     *            the node for which to create a move placeholder
      * @return the new placeholder node
      * @see ASTRewrite#createMoveTarget(ASTNode)
      */
@@ -188,24 +205,27 @@ public class Refactorings {
     }
 
     /**
-     * Creates and returns a placeholder node for a move of a range of nodes of the current list.<br>
-     * The placeholder node can either be inserted as new or used to replace an existing node.<br>
-     * When the document is rewritten, a copy of the source code for the given node range is inserted
-     * into the output document at the position corresponding to the placeholder (indentation is
-     * adjusted).
+     * Creates and returns a placeholder node for a move of a range of nodes of
+     * the current list.<br>
+     * The placeholder node can either be inserted as new or used to replace an
+     * existing node.<br>
+     * When the document is rewritten, a copy of the source code for the given
+     * node range is inserted into the output document at the position
+     * corresponding to the placeholder (indentation is adjusted).
      *
      * @param <T>
-     *          the type of the provided node
+     *            the type of the provided node
      * @param first
-     *          the node that starts the range
+     *            the node that starts the range
      * @param last
-     *          the node that ends the range
+     *            the node that ends the range
      * @return the new placeholder node
      * @throws IllegalArgumentException
-     *           An exception is thrown if the first or last node are null, if a node is not a child
-     *           of the current list or if the first node is not before the last node. An
-     *           IllegalArgumentException is also thrown if the moved range is overlapping with an
-     *           other moved or copied range.
+     *             An exception is thrown if the first or last node are null, if
+     *             a node is not a child of the current list or if the first
+     *             node is not before the last node. An IllegalArgumentException
+     *             is also thrown if the moved range is overlapping with an
+     *             other moved or copied range.
      * @see ListRewrite#createMoveTarget(ASTNode, ASTNode)
      */
     @SuppressWarnings("unchecked")
@@ -216,8 +236,10 @@ public class Refactorings {
     /**
      * Returns whether the provided nodes are a valid existing range.
      *
-     * @param nodes the node range to validate
-     * @return true if the provided nodes are a valid existing range, false otherwise
+     * @param nodes
+     *            the node range to validate
+     * @return true if the provided nodes are a valid existing range, false
+     *         otherwise
      */
     public boolean isValidRange(List<? extends ASTNode> nodes) {
         if (nodes.isEmpty()) {
@@ -248,11 +270,15 @@ public class Refactorings {
     }
 
     /**
-     * Replaces the provided node from the AST with the provided replacement node.
+     * Replaces the provided node from the AST with the provided replacement
+     * node.
      *
-     * @param node the node to remove
-     * @param replacement the replacement node
-     * @see ASTRewrite#replace(ASTNode, ASTNode, org.eclipse.text.edits.TextEditGroup)
+     * @param node
+     *            the node to remove
+     * @param replacement
+     *            the replacement node
+     * @see ASTRewrite#replace(ASTNode, ASTNode,
+     *      org.eclipse.text.edits.TextEditGroup)
      */
     public void replace(ASTNode node, ASTNode replacement) {
         node.setProperty(UNTOUCH_COMMENT, Boolean.TRUE);
@@ -263,8 +289,10 @@ public class Refactorings {
     /**
      * Replaces the provided comment with the provided text.
      *
-     * @param comment the comment to replace
-     * @param replacement the replacement text
+     * @param comment
+     *            the comment to replace
+     * @param replacement
+     *            the replacement text
      */
     public void replace(Comment comment, String replacement) {
         hasRefactorings = true;
@@ -272,10 +300,13 @@ public class Refactorings {
     }
 
     /**
-     * Replaces the provided source location with the replacement string in the source.
+     * Replaces the provided source location with the replacement string in the
+     * source.
      *
-     * @param toReplace the source location to replace
-     * @param replacement the replacement string
+     * @param toReplace
+     *            the source location to replace
+     * @param replacement
+     *            the replacement string
      */
     public void replace(SourceLocation toReplace, String replacement) {
         hasRefactorings = true;
@@ -285,7 +316,8 @@ public class Refactorings {
     /**
      * Removes the provided node from the AST.
      *
-     * @param node the node to remove
+     * @param node
+     *            the node to remove
      * @see ASTRewrite#remove(ASTNode, org.eclipse.text.edits.TextEditGroup)
      */
     public void remove(ASTNode node) {
@@ -300,7 +332,8 @@ public class Refactorings {
     /**
      * Removes the provided node from the AST leaving the leading comment.
      *
-     * @param node the node to remove
+     * @param node
+     *            the node to remove
      * @see ASTRewrite#remove(ASTNode, org.eclipse.text.edits.TextEditGroup)
      */
     public void removeButKeepComment(ASTNode node) {
@@ -311,7 +344,8 @@ public class Refactorings {
     /**
      * Removes the provided source location from the source.
      *
-     * @param toRemove the source location to remove
+     * @param toRemove
+     *            the source location to remove
      */
     public void remove(SourceLocation toRemove) {
         if (toRemove.getLength() == 0) {
@@ -324,7 +358,8 @@ public class Refactorings {
     /**
      * Removes the provided nodes from the AST.
      *
-     * @param nodes the nodes to remove
+     * @param nodes
+     *            the nodes to remove
      * @see #remove(ASTNode)
      */
     public void remove(ASTNode... nodes) {
@@ -334,7 +369,8 @@ public class Refactorings {
     /**
      * Removes the provided nodes from the AST.
      *
-     * @param nodes the nodes to remove
+     * @param nodes
+     *            the nodes to remove
      * @see #remove(ASTNode)
      */
     public void remove(Collection<? extends ASTNode> nodes) {
@@ -355,14 +391,19 @@ public class Refactorings {
     /**
      * Inserts the provided node at the specified index of the list in a node.
      *
-     * @param listHolder the node holding the list where to insert
-     * @param locationInParent the insert location description
-     * @param nodeToInsert the node to insert
-     * @param index the index where to insert the node in the list
-     * @see ListRewrite#insertAt(ASTNode, int, org.eclipse.text.edits.TextEditGroup)
+     * @param listHolder
+     *            the node holding the list where to insert
+     * @param locationInParent
+     *            the insert location description
+     * @param nodeToInsert
+     *            the node to insert
+     * @param index
+     *            the index where to insert the node in the list
+     * @see ListRewrite#insertAt(ASTNode, int,
+     *      org.eclipse.text.edits.TextEditGroup)
      */
-    public void insertAt(
-            ASTNode listHolder, StructuralPropertyDescriptor locationInParent, ASTNode nodeToInsert, int index) {
+    public void insertAt(ASTNode listHolder, StructuralPropertyDescriptor locationInParent, ASTNode nodeToInsert,
+            int index) {
         getListRewrite(listHolder, locationInParent).insertAt(nodeToInsert, index, null);
         addRefactoredNodes(listHolder);
     }
@@ -370,9 +411,12 @@ public class Refactorings {
     /**
      * Inserts the provided node before the provided element.
      *
-     * @param nodeToInsert the node to insert
-     * @param element the node serving as a reference location
-     * @see ListRewrite#insertBefore(ASTNode, ASTNode, org.eclipse.text.edits.TextEditGroup)
+     * @param nodeToInsert
+     *            the node to insert
+     * @param element
+     *            the node serving as a reference location
+     * @see ListRewrite#insertBefore(ASTNode, ASTNode,
+     *      org.eclipse.text.edits.TextEditGroup)
      */
     public void insertBefore(ASTNode nodeToInsert, ASTNode element) {
         getListRewrite(element).insertBefore(nodeToInsert, element, null);
@@ -382,9 +426,12 @@ public class Refactorings {
     /**
      * Inserts the provided node after the provided element.
      *
-     * @param nodeToInsert the node to insert
-     * @param element the node serving as a reference location
-     * @see ListRewrite#insertAfter(ASTNode, ASTNode, org.eclipse.text.edits.TextEditGroup)
+     * @param nodeToInsert
+     *            the node to insert
+     * @param element
+     *            the node serving as a reference location
+     * @see ListRewrite#insertAfter(ASTNode, ASTNode,
+     *      org.eclipse.text.edits.TextEditGroup)
      */
     public void insertAfter(ASTNode nodeToInsert, ASTNode element) {
         getListRewrite(element).insertAfter(nodeToInsert, element, null);
@@ -394,10 +441,14 @@ public class Refactorings {
     /**
      * Inserts the provided node as the first element of the list in a node.
      *
-     * @param listHolder the node holding the list where to insert
-     * @param locationInParent the insert location description
-     * @param nodeToInsert the node to insert
-     * @see ListRewrite#insertFirst(ASTNode, org.eclipse.text.edits.TextEditGroup)
+     * @param listHolder
+     *            the node holding the list where to insert
+     * @param locationInParent
+     *            the insert location description
+     * @param nodeToInsert
+     *            the node to insert
+     * @see ListRewrite#insertFirst(ASTNode,
+     *      org.eclipse.text.edits.TextEditGroup)
      */
     public void insertFirst(ASTNode listHolder, StructuralPropertyDescriptor locationInParent, ASTNode nodeToInsert) {
         getListRewrite(listHolder, locationInParent).insertFirst(nodeToInsert, null);
@@ -407,10 +458,14 @@ public class Refactorings {
     /**
      * Inserts the provided node as the last element of the list in a node.
      *
-     * @param listHolder the node holding the list where to insert
-     * @param locationInParent the insert location description
-     * @param nodeToInsert the node to insert
-     * @see ListRewrite#insertLast(ASTNode, org.eclipse.text.edits.TextEditGroup)
+     * @param listHolder
+     *            the node holding the list where to insert
+     * @param locationInParent
+     *            the insert location description
+     * @param nodeToInsert
+     *            the node to insert
+     * @see ListRewrite#insertLast(ASTNode,
+     *      org.eclipse.text.edits.TextEditGroup)
      */
     public void insertLast(ASTNode listHolder, StructuralPropertyDescriptor locationInParent, ASTNode nodeToInsert) {
         getListRewrite(listHolder, locationInParent).insertLast(nodeToInsert, null);
@@ -420,9 +475,12 @@ public class Refactorings {
     /**
      * Moves the old node to the new index in the parents' list.
      *
-     * @param oldNode the old node containing the old location
-     * @param newIndex the new index for the node in the parent's list
-     * @param movedNode the old node which has been moved using
+     * @param oldNode
+     *            the old node containing the old location
+     * @param newIndex
+     *            the new index for the node in the parent's list
+     * @param movedNode
+     *            the old node which has been moved using
      *            {@link org.autorefactor.refactoring.ASTBuilder#move(ASTNode)}
      */
     public void moveToIndex(ASTNode oldNode, int newIndex, ASTNode movedNode) {
@@ -432,8 +490,10 @@ public class Refactorings {
     /**
      * Adds the provided line comment to convert to javadoc.
      *
-     * @param lineComment the line comment to convert to javadoc
-     * @param nextNode the AST node immediately following the line comment
+     * @param lineComment
+     *            the line comment to convert to javadoc
+     * @param nextNode
+     *            the AST node immediately following the line comment
      */
     public void toJavadoc(LineComment lineComment, ASTNode nextNode) {
         hasRefactorings = true;
@@ -443,7 +503,8 @@ public class Refactorings {
     /**
      * Adds the provided block comment to convert to javadoc.
      *
-     * @param blockComment the block comment to convert to javadoc
+     * @param blockComment
+     *            the block comment to convert to javadoc
      */
     public void toJavadoc(BlockComment blockComment) {
         hasRefactorings = true;
@@ -453,10 +514,14 @@ public class Refactorings {
     /**
      * Sets the node's property to the provided value.
      *
-     * @param node the node where to set the property
-     * @param property the property to be set
-     * @param value the value to set
-     * @see ASTRewrite#set(ASTNode, StructuralPropertyDescriptor, Object, org.eclipse.text.edits.TextEditGroup)
+     * @param node
+     *            the node where to set the property
+     * @param property
+     *            the property to be set
+     * @param value
+     *            the value to set
+     * @see ASTRewrite#set(ASTNode, StructuralPropertyDescriptor, Object,
+     *      org.eclipse.text.edits.TextEditGroup)
      */
     public void set(ASTNode node, StructuralPropertyDescriptor property, Object value) {
         rewrite.set(node, property, value, null);
@@ -466,14 +531,16 @@ public class Refactorings {
     /**
      * Applies the accumulated refactorings to the provided document.
      *
-     * @param document the document to refactor
-     * @throws BadLocationException if trying to access a non existing position
+     * @param document
+     *            the document to refactor
+     * @throws BadLocationException
+     *             if trying to access a non existing position
      */
     public void applyTo(final IDocument document) throws BadLocationException {
         final TextEdit edits = rewrite.rewriteAST(document, null);
         commentRewriter.addEdits(document, edits);
         sourceRewriter.addEdits(document, edits);
-     
+
         applyEditsToDocument(edits, document);
     }
 
@@ -481,7 +548,8 @@ public class Refactorings {
         // Call this operation on the SWT Display Thread with syncExec(),
         // because it changes or adds something to the GUI.
         // Otherwise it would throw an Invalid thread access Exception.
-    	 //System.out.println("-----------------Apply Edits To document called---------------");
+        // System.out.println("-----------------Apply Edits To document
+        // called---------------");
         eventLoop.syncExec(new Callable<BadLocationException>() {
             @Override
             public BadLocationException call() throws Exception {

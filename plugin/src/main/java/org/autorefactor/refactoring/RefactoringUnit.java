@@ -37,7 +37,7 @@ public class RefactoringUnit {
         this.options = options;
     }
 
-   public ICompilationUnit getCompilationUnit() {
+    public ICompilationUnit getCompilationUnit() {
         return compilationUnit;
     }
 

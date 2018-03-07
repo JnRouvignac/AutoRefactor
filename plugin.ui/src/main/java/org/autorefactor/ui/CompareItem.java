@@ -11,83 +11,72 @@ import org.eclipse.compare.ITypedElement;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.swt.graphics.Image;
 
-public class CompareItem implements  IStreamContentAccessor, ITypedElement, IModificationDate, IEditableContent{
+public class CompareItem implements IStreamContentAccessor, ITypedElement, IModificationDate, IEditableContent {
+    private String content;
+    private File fileContent;
+    static String UNKNOWN_TYPE = "JAVA";
+    public static String newContents;
+    public static String newFileCnt;
 
-	private String content;
-	private File fileContent;
-	static String UNKNOWN_TYPE = "JAVA";
-	public static String newContents;
-	public static String newFileCnt;
+    public CompareItem(String left) {
+        content = left;
+    }
 
-	public CompareItem(String left ) {
+    @Override
+    public long getModificationDate() {
+        // TODO Auto-generated method stub
+        return 0;
+    }
 
-		content = left;
-	}
+    @Override
+    public String getName() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
+    @Override
+    public Image getImage() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	@Override
-	public long getModificationDate() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
+    @Override
+    public String getType() {
+        // TODO Auto-generated method stub
+        return UNKNOWN_TYPE;
+    }
 
-	@Override
-	public String getName() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public InputStream getContents() throws CoreException {
+        // TODO Auto-generated method stub
 
-	@Override
-	public Image getImage() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+        return new ByteArrayInputStream(content.getBytes());
+    }
 
-	@Override
-	public String getType() {
-		// TODO Auto-generated method stub
-		return UNKNOWN_TYPE;
-	}
+    @Override
+    public boolean isEditable() {
+        // TODO Auto-generated method stub
+        return true;
+    }
 
-	@Override
-	public InputStream getContents() throws CoreException {
-		// TODO Auto-generated method stub
+    @Override
+    public void setContent(byte[] newContent) {
+        // TODO Auto-generated method stub
+        try {
+            newContents = new String(newContent, "UTF-8");
+        } catch (Exception e) {
+            System.out.println("Set Content failed");
+            e.printStackTrace();
+        }
+    }
 
-		return new ByteArrayInputStream(content.getBytes());
+    public static String getNewContent() {
+        return newContents;
+    }
 
-	}
-
-	@Override
-	public boolean isEditable() {
-		// TODO Auto-generated method stub
-		return true;
-	}
-
-	@Override
-	public void setContent(byte[] newContent) {
-
-		// TODO Auto-generated method stub
-		try{
-			newContents = new String(newContent, "UTF-8");
-
-
-		}
-		catch(Exception e) {
-			System.out.println("Set Content failed");
-			e.printStackTrace();
-		}
-
-	}
-
-	public static String getNewContent() {
-		return newContents;
-	}
-
-	@Override
-	public ITypedElement replace(ITypedElement dest, ITypedElement src) {
-
-		// TODO Auto-generated method stub
-		return null;
-	}
-
+    @Override
+    public ITypedElement replace(ITypedElement dest, ITypedElement src) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 }

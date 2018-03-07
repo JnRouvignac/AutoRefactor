@@ -25,6 +25,9 @@
  */
 package org.autorefactor.ui;
 
+import static org.autorefactor.AutoRefactorPlugin.getEnvironment;
+import static org.eclipse.jface.dialogs.MessageDialog.openInformation;
+
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -55,16 +58,13 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.handlers.HandlerUtil;
 
-import static org.autorefactor.AutoRefactorPlugin.*;
-import static org.eclipse.jface.dialogs.MessageDialog.*;
-
 /**
  * This is the Eclipse handler for launching the automated refactorings. This is
  * invoked from the Eclipse UI.
  *
- * @see <a
- * href="http://www.vogella.com/articles/EclipsePlugIn/article.html#contribute"
- * >Extending Eclipse - Plug-in Development Tutorial</a>
+ * @see <a href=
+ *      "http://www.vogella.com/articles/EclipsePlugIn/article.html#contribute"
+ *      >Extending Eclipse - Plug-in Development Tutorial</a>
  */
 public class AutoRefactorHandler extends AbstractHandler {
     @Override
@@ -72,10 +72,9 @@ public class AutoRefactorHandler extends AbstractHandler {
         try {
             Environment environment = getEnvironment();
             ApplyRefactoringListener applyRefactoringListener = new ApplyRefactoringListener();
-            new PrepareApplyRefactoringsJob(
-                    getSelectedJavaElements(event),
-                    AllRefactoringRules.getConfiguredRefactoringRules(environment.getPreferences()),
-                    environment, applyRefactoringListener).schedule();
+            new PrepareApplyRefactoringsJob(getSelectedJavaElements(event),
+                    AllRefactoringRules.getConfiguredRefactoringRules(environment.getPreferences()), environment,
+                    applyRefactoringListener).schedule();
         } catch (Exception e) {
             final Shell shell = HandlerUtil.getActiveShell(event);
 
@@ -83,7 +82,7 @@ public class AutoRefactorHandler extends AbstractHandler {
             PrintWriter pw = new PrintWriter(sw);
             e.printStackTrace(pw);
 
-            showMessage(shell, "An error has occurred:\n\n" + sw.toString());
+            showMessage(shell, "An error has occurred:\n\n" + sw);
         }
 
         // TODO JNR provide a maven plugin
@@ -94,10 +93,12 @@ public class AutoRefactorHandler extends AbstractHandler {
         // TODO JNR provide from the UI the ability to execute groovy (other
         // scripts? rhino?) scripts for refactoring.
 
-        // <p> Extract method: Live variable analysis - READ WRITE variable analysis (including method params).
+        // <p> Extract method: Live variable analysis - READ WRITE variable
+        // analysis (including method params).
         // If variable used in extracted method and WRITE first in selected text
         // => do not pass it down as parameter
-        // Use ASTMatcher and do not compare content of expressions, compare just resolvedTypeBinding().
+        // Use ASTMatcher and do not compare content of expressions, compare
+        // just resolvedTypeBinding().
         return null;
     }
 
@@ -117,15 +118,13 @@ public class AutoRefactorHandler extends AbstractHandler {
         }
     }
 
-    private static List<IJavaElement> getSelectedJavaElements(Shell shell,  IStructuredSelection selection) {
+    private static List<IJavaElement> getSelectedJavaElements(Shell shell, IStructuredSelection selection) {
         boolean wrongSelection = false;
         final List<IJavaElement> results = new ArrayList<IJavaElement>();
         final Iterator<?> it = selection.iterator();
         while (it.hasNext()) {
             final Object el = it.next();
-            if (el instanceof ICompilationUnit
-                    || el instanceof IPackageFragment
-                    || el instanceof IPackageFragmentRoot
+            if (el instanceof ICompilationUnit || el instanceof IPackageFragment || el instanceof IPackageFragmentRoot
                     || el instanceof IJavaProject) {
                 results.add((IJavaElement) el);
             } else if (el instanceof IProject) {

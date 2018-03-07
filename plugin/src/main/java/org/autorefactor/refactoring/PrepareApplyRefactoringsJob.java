@@ -53,7 +53,10 @@ import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaModelException;
 
-/** Eclipse job that prepares and partitions work for {@link ApplyRefactoringsJob}. */
+/**
+ * Eclipse job that prepares and partitions work for
+ * {@link ApplyRefactoringsJob}.
+ */
 public class PrepareApplyRefactoringsJob extends Job {
     private final List<IJavaElement> javaElements;
     private final List<RefactoringRule> refactoringRulesToApply;
@@ -64,13 +67,15 @@ public class PrepareApplyRefactoringsJob extends Job {
     /**
      * Builds an instance of this class.
      *
-     * @param javaElements the java elements selected for automatic refactoring
-     * @param refactoringRulesToApply the refactorings to apply
-     * @param environment the environment
+     * @param javaElements
+     *            the java elements selected for automatic refactoring
+     * @param refactoringRulesToApply
+     *            the refactorings to apply
+     * @param environment
+     *            the environment
      */
-    public PrepareApplyRefactoringsJob(List<IJavaElement> javaElements,
-                                       List<RefactoringRule> refactoringRulesToApply,
-                                       Environment environment) {
+    public PrepareApplyRefactoringsJob(List<IJavaElement> javaElements, List<RefactoringRule> refactoringRulesToApply,
+            Environment environment) {
         super("Prepare AutoRefactor");
         setPriority(Job.SHORT);
         this.javaElements = javaElements;
@@ -78,17 +83,15 @@ public class PrepareApplyRefactoringsJob extends Job {
         this.environment = environment;
     }
 
-    public PrepareApplyRefactoringsJob(List<IJavaElement> javaElements,
-            List<RefactoringRule> refactoringRulesToApply,
+    public PrepareApplyRefactoringsJob(List<IJavaElement> javaElements, List<RefactoringRule> refactoringRulesToApply,
             Environment environment, IJobChangeListener applyRefactoringListener) {
-    	super("Prepare AutoRefactor");
-    	setPriority(Job.SHORT);
-    	this.javaElements = javaElements;
-    	this.refactoringRulesToApply = refactoringRulesToApply;
-    	this.environment = environment;
-    	this.listener = applyRefactoringListener;
+        super("Prepare AutoRefactor");
+        setPriority(Job.SHORT);
+        this.javaElements = javaElements;
+        this.refactoringRulesToApply = refactoringRulesToApply;
+        this.environment = environment;
+        this.listener = applyRefactoringListener;
     }
-
 
     @Override
     protected IStatus run(IProgressMonitor monitor) {
@@ -115,8 +118,7 @@ public class PrepareApplyRefactoringsJob extends Job {
             final int nbWorkers = computeNbWorkers(toRefactor.size(), nbCores);
             final JobGroup jobGroup = new JobGroup("Job name", nbWorkers, nbWorkers);
             for (int i = 0; i < nbWorkers; i++) {
-
-            	System.out.println("To Refactor Queue: "+ toRefactor.toString());
+                System.out.println("To Refactor Queue: " + toRefactor);
 
                 final Job job = new ApplyRefactoringsJob(toRefactor, clone(refactoringRulesToApply), environment);
                 job.setJobGroup(jobGroup);
@@ -129,8 +131,8 @@ public class PrepareApplyRefactoringsJob extends Job {
     }
 
     /**
-     * Clones all the refactorings to apply.
-     * In fairness, this method is only useful for stateful refactorings.
+     * Clones all the refactorings to apply. In fairness, this method is only
+     * useful for stateful refactorings.
      */
     private List<RefactoringRule> clone(List<RefactoringRule> refactorings) throws Exception {
         final List<RefactoringRule> res = new ArrayList<RefactoringRule>(refactorings.size());
@@ -213,8 +215,7 @@ public class PrepareApplyRefactoringsJob extends Job {
     }
 
     private IJavaProject getIJavaProject(IJavaElement javaElement) {
-        if (javaElement instanceof ICompilationUnit
-                || javaElement instanceof IPackageFragment
+        if (javaElement instanceof ICompilationUnit || javaElement instanceof IPackageFragment
                 || javaElement instanceof IPackageFragmentRoot) {
             return getIJavaProject(javaElement.getParent());
         } else if (javaElement instanceof IJavaProject) {

@@ -25,6 +25,8 @@
  */
 package org.autorefactor.ui;
 
+import static org.autorefactor.AutoRefactorPlugin.getEnvironment;
+
 import java.util.List;
 
 import org.autorefactor.refactoring.PrepareApplyRefactoringsJob;
@@ -32,9 +34,10 @@ import org.autorefactor.refactoring.RefactoringRule;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jface.wizard.Wizard;
 
-import static org.autorefactor.AutoRefactorPlugin.*;
-
-/** Wizard which allows the user to choose which refactorings to apply to the selected java elements. */
+/**
+ * Wizard which allows the user to choose which refactorings to apply to the
+ * selected java elements.
+ */
 public class ChooseRefactoringsWizard extends Wizard {
     private final ChooseRefactoringWizardPage chooseRefactoringsPage = new ChooseRefactoringWizardPage();
     private final List<IJavaElement> javaElements;
@@ -42,7 +45,8 @@ public class ChooseRefactoringsWizard extends Wizard {
     /**
      * Builds an instance of this class, with the provided java element.
      *
-     * @param javaElements the java elements from where to extract the project options
+     * @param javaElements
+     *            the java elements from where to extract the project options
      */
     public ChooseRefactoringsWizard(List<IJavaElement> javaElements) {
         setNeedsProgressMonitor(true);
@@ -61,15 +65,13 @@ public class ChooseRefactoringsWizard extends Wizard {
 
     @Override
     public boolean performFinish() {
-
         final List<RefactoringRule> refactoringRules = chooseRefactoringsPage.getSelectedRefactorings();
         ApplyRefactoringListener applyRefactoringListener = new ApplyRefactoringListener();
-        PrepareApplyRefactoringsJob prepareApplyRefactoringJob =  new PrepareApplyRefactoringsJob(javaElements, 
-        		refactoringRules, getEnvironment(), applyRefactoringListener);
-      
-        prepareApplyRefactoringJob.schedule();
-      
-        return !refactoringRules.isEmpty();
+        PrepareApplyRefactoringsJob prepareApplyRefactoringJob = new PrepareApplyRefactoringsJob(javaElements,
+                refactoringRules, getEnvironment(), applyRefactoringListener);
 
+        prepareApplyRefactoringJob.schedule();
+
+        return !refactoringRules.isEmpty();
     }
 }
