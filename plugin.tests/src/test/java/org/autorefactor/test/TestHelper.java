@@ -136,7 +136,7 @@ public final class TestHelper {
     }
 
     private static Collection<String> toSampleNames(Collection<Class<?>> clazzes) {
-        final Collection<String> results = new ArrayList<>();
+        final Collection<String> results = new ArrayList<String>();
         for (Class<?> clazz : clazzes) {
             final String name = clazz.getSimpleName();
             results.add(name.substring(0, name.lastIndexOf("Refactoring")) + "Sample.java");

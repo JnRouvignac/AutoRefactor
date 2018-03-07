@@ -61,7 +61,7 @@ public class RemoveEmptyLinesRefactoring extends AbstractRefactoringRule {
     }
 
     private static final Pattern NEWLINE_PATTERN = Pattern.compile("\\r\\n|\\n|\\r");
-    private final NavigableSet<Integer> lineEnds = new TreeSet<>();
+    private final NavigableSet<Integer> lineEnds = new TreeSet<Integer>();
 
     @Override
     public boolean visit(CompilationUnit node) {

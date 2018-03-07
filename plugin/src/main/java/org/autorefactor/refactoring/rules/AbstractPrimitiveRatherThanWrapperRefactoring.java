@@ -95,7 +95,7 @@ public abstract class AbstractPrimitiveRatherThanWrapperRefactoring extends Abst
      * @return the prefix in safe operators.
      */
     public List<PrefixExpression.Operator> getPrefixInSafeOperators() {
-        return new ArrayList<>(0);
+        return new ArrayList<PrefixExpression.Operator>(0);
     }
 
     /**
@@ -104,7 +104,7 @@ public abstract class AbstractPrimitiveRatherThanWrapperRefactoring extends Abst
      * @return the Infix In Safe Operators.
      */
     public List<InfixExpression.Operator> getInfixInSafeOperators() {
-        return new ArrayList<>(0);
+        return new ArrayList<InfixExpression.Operator>(0);
     }
 
     /**
@@ -113,7 +113,7 @@ public abstract class AbstractPrimitiveRatherThanWrapperRefactoring extends Abst
      * @return the postfix in safe operators.
      */
     public List<PostfixExpression.Operator> getPostfixInSafeOperators() {
-        return new ArrayList<>(0);
+        return new ArrayList<PostfixExpression.Operator>(0);
     }
 
     /**
@@ -122,7 +122,7 @@ public abstract class AbstractPrimitiveRatherThanWrapperRefactoring extends Abst
      * @return the prefix out safe operators.
      */
     public List<PrefixExpression.Operator> getPrefixOutSafeOperators() {
-        return new ArrayList<>(0);
+        return new ArrayList<PrefixExpression.Operator>(0);
     }
 
     /**
@@ -131,7 +131,7 @@ public abstract class AbstractPrimitiveRatherThanWrapperRefactoring extends Abst
      * @return the infix out safe operators.
      */
     public List<InfixExpression.Operator> getInfixOutSafeOperators() {
-        return new ArrayList<>(0);
+        return new ArrayList<InfixExpression.Operator>(0);
     }
 
     /**
@@ -140,7 +140,7 @@ public abstract class AbstractPrimitiveRatherThanWrapperRefactoring extends Abst
      * @return the postfix out safe operators.
      */
     public List<PostfixExpression.Operator> getPostfixOutSafeOperators() {
-        return new ArrayList<>(0);
+        return new ArrayList<PostfixExpression.Operator>(0);
     }
 
     /**
@@ -149,7 +149,7 @@ public abstract class AbstractPrimitiveRatherThanWrapperRefactoring extends Abst
      * @return the assignment out safe operators.
      */
     public List<Assignment.Operator> getAssignmentOutSafeOperators() {
-        return new ArrayList<>(0);
+        return new ArrayList<Assignment.Operator>(0);
     }
 
     /**

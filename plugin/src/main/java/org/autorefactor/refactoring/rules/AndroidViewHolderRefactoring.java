@@ -333,7 +333,7 @@ public class AndroidViewHolderRefactoring extends AbstractRefactoringRule {
             }
         }
 
-        private List<FindViewByIdItem> items = new ArrayList<>();
+        private List<FindViewByIdItem> items = new ArrayList<FindViewByIdItem>();
         private SimpleName viewVariableName;
 
         private FindViewByIdVisitor(SimpleName viewVariableName) {

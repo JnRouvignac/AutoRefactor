@@ -63,7 +63,7 @@ public abstract class AbstractUnitTestRefactoring extends AbstractRefactoringRul
     /**
      * The OBJECT constant.
      */
-    private final Set<String> staticImports = new HashSet<>();
+    private final Set<String> staticImports = new HashSet<String>();
 
     /**
      * Return true if assertNotEquals can be used.

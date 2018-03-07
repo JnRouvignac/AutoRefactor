@@ -39,8 +39,8 @@ import org.eclipse.text.edits.TextEdit;
 /** Directly rewrites source code. */
 public class SourceRewriter {
 
-    private final Set<SourceLocation> removals = new LinkedHashSet<>();
-    private final Map<SourceLocation, String> replacements = new LinkedHashMap<>();
+    private final Set<SourceLocation> removals = new LinkedHashSet<SourceLocation>();
+    private final Map<SourceLocation, String> replacements = new LinkedHashMap<SourceLocation, String>();
 
     /**
      * Removes the provided source location from the source.

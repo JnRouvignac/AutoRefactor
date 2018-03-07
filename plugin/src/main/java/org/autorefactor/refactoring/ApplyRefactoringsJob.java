@@ -252,7 +252,7 @@ public class ApplyRefactoringsJob extends Job {
 
             final Set<ASTVisitor> thisLoopVisitors = refactoring.getVisitorsContributingRefactoring();
             if (!thisLoopVisitors.equals(lastLoopVisitors)) {
-                lastLoopVisitors = new HashSet<>(thisLoopVisitors);
+                lastLoopVisitors = new HashSet<ASTVisitor>(thisLoopVisitors);
                 nbLoopsWithSameVisitors = 0;
             } else {
                 ++nbLoopsWithSameVisitors;

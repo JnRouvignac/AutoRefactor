@@ -108,7 +108,7 @@ public class BooleanRefactoring extends AbstractRefactoringRule {
     private class BooleanASTMatcher extends ASTMatcher {
 
         /** else node to then node. */
-        final Map<ASTNode, ASTNode> matches = new HashMap<>();
+        final Map<ASTNode, ASTNode> matches = new HashMap<ASTNode, ASTNode>();
         final Map<ASTNode, ASTNode> previousMatches;
 
         public BooleanASTMatcher() {

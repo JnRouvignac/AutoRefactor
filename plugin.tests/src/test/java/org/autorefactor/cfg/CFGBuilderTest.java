@@ -116,9 +116,19 @@ public class CFGBuilderTest {
     }
 
     private void writeAll(File file, String fileContent) throws Exception {
-        try (OutputStream os = newOutputStream(file.toPath());
-                Writer writer = new BufferedWriter(new OutputStreamWriter(os))) {
+        OutputStream os = null;
+        Writer writer = null;
+        try {
+            os = newOutputStream(file.toPath());
+            writer = new BufferedWriter(new OutputStreamWriter(os));
             writer.append(fileContent);
+        } finally {
+            if (writer != null) {
+                writer.close();
+            }
+            if (os != null) {
+                os.close();
+            }
         }
     }
 

@@ -40,7 +40,7 @@ public class OperatorEnumTest {
 
     // @DataProvider
     public Iterator<Object[]> getPairsOfOperatorsWithSamePrecedence() {
-        final List<Object[]> results = new ArrayList<>();
+        final List<Object[]> results = new ArrayList<Object[]>();
         for (int i = 0; i < OperatorEnum.values().length; i++) {
             OperatorEnum op1 = OperatorEnum.values()[i];
             for (int j = i; j < OperatorEnum.values().length; j++) {
@@ -55,7 +55,7 @@ public class OperatorEnumTest {
 
     // @DataProvider
     public Iterator<Object[]> getPairsOfOperatorsWithDifferentPrecedence() {
-        final List<Object[]> results = new ArrayList<>();
+        final List<Object[]> results = new ArrayList<Object[]>();
         for (int i = 0; i < OperatorEnum.values().length; i++) {
             OperatorEnum op1 = OperatorEnum.values()[i];
             for (int j = i + 1; j < OperatorEnum.values().length; j++) {

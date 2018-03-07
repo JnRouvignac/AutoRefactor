@@ -45,8 +45,8 @@ import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 public final class VariableDefinitionsUsesVisitor extends ASTVisitor {
     private final IVariableBinding variableBinding;
     private final ASTNode scopeNode;
-    private final List<SimpleName> definitions = new ArrayList<>();
-    private final List<SimpleName> uses = new ArrayList<>();
+    private final List<SimpleName> definitions = new ArrayList<SimpleName>();
+    private final List<SimpleName> uses = new ArrayList<SimpleName>();
 
     /**
      * Builds from a {@link VariableDeclaration} and infers the variable binding and the scope from it.

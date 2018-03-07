@@ -153,7 +153,7 @@ public class CFGBuilder {
          * The edges that are live on entering or after finishing analyzing a
          * statement.
          */
-        private final List<CFGEdgeBuilder> liveEdges = new LinkedList<>();
+        private final List<CFGEdgeBuilder> liveEdges = new LinkedList<CFGEdgeBuilder>();
 
         private LivenessState() {
             this.liveBasicBlock = null;
@@ -234,7 +234,8 @@ public class CFGBuilder {
      * statements which can send control flow back to any parent statement.
      * </p>
      */
-    private final Map<Statement, Map<CFGEdgeBuilder, Boolean>> edgesToBuild = new HashMap<>();
+    private final Map<Statement, Map<CFGEdgeBuilder, Boolean>> edgesToBuild =
+            new HashMap<Statement, Map<CFGEdgeBuilder, Boolean>>();
     /** The exit block for the CFG being built. */
     private CFGBasicBlock exitBlock;
 
@@ -245,7 +246,7 @@ public class CFGBuilder {
      * work, all type bindings must have been loaded from the same
      * CompilationUnit.
      */
-    private final Map<String, ITypeBinding> typeBindingsCache = new HashMap<>();
+    private final Map<String, ITypeBinding> typeBindingsCache = new HashMap<String, ITypeBinding>();
 
     /**
      * Builds an instance of this class.
@@ -738,7 +739,7 @@ public class CFGBuilder {
      */
     public List<CFGBasicBlock> buildCFG(TypeDeclaration node) {
         if (!node.isInterface()) {
-            List<CFGBasicBlock> results = new LinkedList<>();
+            List<CFGBasicBlock> results = new LinkedList<CFGBasicBlock>();
             for (FieldDeclaration fieldDecl : node.getFields()) {
                 buildCFG(fieldDecl);
             }
@@ -771,7 +772,7 @@ public class CFGBuilder {
         final LivenessState liveAfterTry = buildCFG(node.getBody(), state, localThrowers);
         final LivenessState liveAfterCatchClauses = new LivenessState();
 
-        final Set<ITypeBinding> caughtExceptions = new HashSet<>();
+        final Set<ITypeBinding> caughtExceptions = new HashSet<ITypeBinding>();
         for (CatchClause catchClause : catchClauses(node)) {
             final LivenessState catchState = new LivenessState();
             CFGBasicBlock catchBasicBlock = getCFGBasicBlock(catchClause, catchState);
@@ -785,7 +786,7 @@ public class CFGBuilder {
             if (throwingBlocksInTry.isEmpty()) {
                 // TODO JNR dead code found!!
             }
-            final List<CFGEdgeBuilder> liveBeforeCatchClause = new LinkedList<>();
+            final List<CFGEdgeBuilder> liveBeforeCatchClause = new LinkedList<CFGEdgeBuilder>();
             for (CFGBasicBlock throwingBlockInTry : throwingBlocksInTry) {
                 // TODO JNR if a Statement throws an exception, it must break the current basicBlock
                 // TODO JNR how to specify this edge is due to an exception?
@@ -1114,7 +1115,7 @@ public class CFGBuilder {
      * @return the list of basic blocks representing CFGs for each method in this compilation unit
      */
     public List<CFGBasicBlock> buildCFG(CompilationUnit node) {
-        List<CFGBasicBlock> results = new LinkedList<>();
+        List<CFGBasicBlock> results = new LinkedList<CFGBasicBlock>();
         for (AbstractTypeDeclaration decl : (List<AbstractTypeDeclaration>) node.types()) {
             if (decl.getNodeType() == TYPE_DECLARATION) {
                 results.addAll(buildCFG((TypeDeclaration) decl));
@@ -1372,7 +1373,7 @@ public class CFGBuilder {
         if (builder != null) {
             Map<CFGEdgeBuilder, Boolean> builders = this.edgesToBuild.get(node);
             if (builders == null) {
-                builders = new HashMap<>();
+                builders = new HashMap<CFGEdgeBuilder, Boolean>();
                 this.edgesToBuild.put(node, builders);
             }
             builders.put(builder, isBreakStmt);

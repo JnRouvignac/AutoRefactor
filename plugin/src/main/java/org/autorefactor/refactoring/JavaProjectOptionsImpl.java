@@ -42,7 +42,7 @@ public class JavaProjectOptionsImpl implements JavaProjectOptions {
 
     /** Builds a new instance of this class. */
     public JavaProjectOptionsImpl() {
-        this.options = new HashMap<>();
+        this.options = new HashMap<String, String>();
     }
 
     /**

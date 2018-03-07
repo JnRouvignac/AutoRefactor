@@ -40,7 +40,7 @@ import org.eclipse.jdt.core.dom.ASTVisitor;
  */
 public class CollectorVisitor<R> extends ASTVisitor {
     /** The actual boolean result. */
-    private final List<R> results = new ArrayList<>();
+    private final List<R> results = new ArrayList<R>();
 
     /**
      * Adds the provided result to the list of results.

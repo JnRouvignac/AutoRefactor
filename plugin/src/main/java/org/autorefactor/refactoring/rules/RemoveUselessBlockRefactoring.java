@@ -58,7 +58,7 @@ public class RemoveUselessBlockRefactoring extends AbstractRefactoringRule {
         } else if (node.getParent() instanceof Block) {
             final Set<String> ifVariableNames = getLocalVariableIdentifiers(node, false);
 
-            final Set<String> followingVariableNames = new HashSet<>();
+            final Set<String> followingVariableNames = new HashSet<String>();
             for (final Statement statement : getNextSiblings(node)) {
                 followingVariableNames.addAll(getLocalVariableIdentifiers(statement, true));
             }

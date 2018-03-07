@@ -118,7 +118,7 @@ public class AutoRefactorHandler extends AbstractHandler {
 
     private static List<IJavaElement> getSelectedJavaElements(Shell shell,  IStructuredSelection selection) {
         boolean wrongSelection = false;
-        final List<IJavaElement> results = new ArrayList<>();
+        final List<IJavaElement> results = new ArrayList<IJavaElement>();
         final Iterator<?> it = selection.iterator();
         while (it.hasNext()) {
             final Object el = it.next();

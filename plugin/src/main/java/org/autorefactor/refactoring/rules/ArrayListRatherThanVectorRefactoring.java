@@ -41,7 +41,7 @@ import org.eclipse.jdt.core.dom.MethodInvocation;
 
 /** See {@link #getDescription()} method. */
 public class ArrayListRatherThanVectorRefactoring extends AbstractClassSubstituteRefactoring {
-    private static Map<String, String[]> canBeCastedTo = new HashMap<>();
+    private static Map<String, String[]> canBeCastedTo = new HashMap<String, String[]>();
 
     static {
         canBeCastedTo.put("java.lang.Object", new String[]{"java.lang.Object"});

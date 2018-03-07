@@ -84,7 +84,7 @@ public class TypeNameDeciderTest {
     }
 
     private static NavigableSet<String> imports(String... imports) {
-        final TreeSet<String> results = new TreeSet<>();
+        final TreeSet<String> results = new TreeSet<String>();
         Collections.addAll(results, imports);
         return results;
     }

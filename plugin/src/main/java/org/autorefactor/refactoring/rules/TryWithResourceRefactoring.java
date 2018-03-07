@@ -88,7 +88,7 @@ public class TryWithResourceRefactoring extends AbstractRefactoringRule {
         final VariableDeclarationFragment previousDeclFragment = getUniqueFragment(previousDeclStmt);
         final List<Statement> finallyStmts = asList(node.getFinally());
         if (previousDeclFragment != null && finallyStmts.size() >= 1) {
-            final List<ASTNode> nodesToRemove = new ArrayList<>();
+            final List<ASTNode> nodesToRemove = new ArrayList<ASTNode>();
             nodesToRemove.add(previousDeclStmt);
 
             final Statement finallyStmt = finallyStmts.get(0);

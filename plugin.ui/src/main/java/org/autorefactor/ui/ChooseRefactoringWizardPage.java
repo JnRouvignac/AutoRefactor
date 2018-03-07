@@ -93,7 +93,7 @@ public class ChooseRefactoringWizardPage extends WizardPage {
         }
     }
 
-    private final HashMap<Object, Boolean> checkedState = new HashMap<>();
+    private final HashMap<Object, Boolean> checkedState = new HashMap<Object, Boolean>();
     private Text filterText;
     private CheckboxTableViewer tableViewer;
     private Button selectAllVisibleCheckbox;
@@ -125,7 +125,7 @@ public class ChooseRefactoringWizardPage extends WizardPage {
      * @return the refactorings (selected by the user) to apply to the selected elements
      */
     public List<RefactoringRule> getSelectedRefactorings() {
-        final ArrayList<RefactoringRule> results = new ArrayList<>();
+        final ArrayList<RefactoringRule> results = new ArrayList<RefactoringRule>();
         for (Object o : tableViewer.getCheckedElements()) {
             results.add((RefactoringRule) o);
         }

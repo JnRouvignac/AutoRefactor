@@ -149,7 +149,7 @@ public class TypeNameDecider {
     }
 
     private static NavigableSet<String> getImportedTypes(CompilationUnit cu) {
-        final TreeSet<String> results = new TreeSet<>();
+        final TreeSet<String> results = new TreeSet<String>();
         for (ImportDeclaration importDecl : imports(cu)) {
             Name importName = importDecl.getName();
             results.add(importName.getFullyQualifiedName());

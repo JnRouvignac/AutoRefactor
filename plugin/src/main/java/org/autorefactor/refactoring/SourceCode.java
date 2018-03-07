@@ -79,7 +79,7 @@ public class SourceCode {
     private final CompilationUnit astRoot;
     private final String text;
     private final ICompilationUnit compilationUnit;
-    private final List<Line> lines = new ArrayList<>();
+    private final List<Line> lines = new ArrayList<Line>();
 
     /**
      * Builds an instance of this class.

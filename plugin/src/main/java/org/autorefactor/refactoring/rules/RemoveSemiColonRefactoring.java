@@ -149,7 +149,7 @@ public class RemoveSemiColonRefactoring extends AbstractRefactoringRule {
         final List<Comment> comments = filterCommentsInRange(start, end, node.getRoot());
 
         final String source = ctx.getSource(node);
-        final LinkedHashMap<String, SourceLocation> results = new LinkedHashMap<>();
+        final LinkedHashMap<String, SourceLocation> results = new LinkedHashMap<String, SourceLocation>();
         if (comments.isEmpty()) {
             putResult(source, start, end, results);
         } else {
@@ -183,7 +183,7 @@ public class RemoveSemiColonRefactoring extends AbstractRefactoringRule {
         if (commentList.isEmpty()) {
             return Collections.emptyList();
         }
-        final List<Comment> comments = new ArrayList<>(commentList);
+        final List<Comment> comments = new ArrayList<Comment>(commentList);
         Collections.sort(comments, new NodeStartPositionComparator());
 
         final Iterator<Comment> it = comments.iterator();
