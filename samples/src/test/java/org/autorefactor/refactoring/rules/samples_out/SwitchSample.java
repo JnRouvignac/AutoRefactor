@@ -173,9 +173,9 @@ public class SwitchSample {
         }
     }
 
-    public void replaceIfKeepExistingControlFlowBreaks(int i1) {
-        int j = 0;
-        loop: for (int i = 0; i < 10; i++) {
+    public void replaceIfKeepExistingControlFlowBreaks(byte i1) {
+        byte j = 0;
+        loop: for (byte i = 0; i < 10; i++) {
             switch (i1) {
             case 0:
                 j = 0;
@@ -231,15 +231,15 @@ public class SwitchSample {
         }
     }
 
-    public void replaceWithInnerLoopBreak(int i1) {
-        int j = 0;
+    public void replaceWithInnerLoopBreak(short i1) {
+        short j = 0;
         switch (i1) {
         case 0:
             j = 0;
             break;
         case 1:
             j = 10;
-            int k = 0;
+            short k = 0;
             do {
                 if (j == i1) {
                     break;
@@ -249,7 +249,7 @@ public class SwitchSample {
             break;
         case 2:
             j = 20;
-            for (int l = 0; l < j; l++) {
+            for (short l = 0; l < j; l++) {
                 if (j == i1) {
                     break;
                 }
@@ -258,7 +258,7 @@ public class SwitchSample {
         case 3:
             j = 25;
             j = 30;
-            int m = 0;
+            short m = 0;
             while (m < j) {
                 if (j == i1) {
                     break;
@@ -268,7 +268,7 @@ public class SwitchSample {
             break;
         case 4:
             j = 40;
-            for (int o : new int[] { 1, 2, 3 }) {
+            for (short o : new short[] { 1, 2, 3 }) {
                 if (o == i1) {
                     break;
                 }
@@ -369,6 +369,19 @@ public class SwitchSample {
         } else if (i1 == 20) {
             i = 20;
         } else {
+            i = 30;
+        }
+    }
+
+    public void doNotRefactorLongVar(long l1) {
+        int i = 0;
+        if (l1 == 0) {
+            i = 0;
+        } else if (l1 == 1) {
+            i = 10;
+        } else if (l1 == 2) {
+            i = 20;
+        } else if (l1 == 3) {
             i = 30;
         }
     }

@@ -31,9 +31,9 @@ import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
 import static org.autorefactor.refactoring.ASTHelper.asList;
 import static org.autorefactor.refactoring.ASTHelper.extendedOperands;
 import static org.autorefactor.refactoring.ASTHelper.getLocalVariableIdentifiers;
+import static org.autorefactor.refactoring.ASTHelper.hasType;
 import static org.autorefactor.refactoring.ASTHelper.haveSameType;
 import static org.autorefactor.refactoring.ASTHelper.isEndingWithJump;
-import static org.autorefactor.refactoring.ASTHelper.isPrimitive;
 import static org.autorefactor.refactoring.ASTHelper.match;
 import static org.autorefactor.refactoring.ASTHelper.removeParentheses;
 import static org.autorefactor.refactoring.ASTHelper.statements;
@@ -397,7 +397,7 @@ public class SwitchRefactoring extends AbstractRefactoringRule {
     private Variable extractVariableWithConstantValue(Expression firstOp, Expression secondOp) {
         // TODO JNR handle enums
         // TODO JNR handle strings
-        if (firstOp instanceof SimpleName && isPrimitive(firstOp)
+        if (firstOp instanceof SimpleName && hasType(firstOp, "char", "byte", "short", "int")
                 && (secondOp instanceof NumberLiteral || secondOp instanceof CharacterLiteral)) {
             return new Variable((SimpleName) firstOp, Arrays.asList(secondOp));
         }
