@@ -47,23 +47,30 @@ public class PreviewWizardPage extends WizardPage{
 		
 		refactoredText = new Text(parent,SWT.MULTI | SWT.BORDER );
 		refactoredText.setEnabled(false);
-		Iterator iterate = ApplyRefactoringsJob.refactoringsApplied.iterator();
-		String data= "";
-		while(iterate.hasNext()) {
-			System.out.println("No of iteration--");
-			data = data+iterate.next()+ " ";
-		}
-			
-		if(data.equals(""))
-		refactoredText.setText("No refactoring applied");
-		else {
-			System.out.println("Data-----"+ data);
-			refactoredText.setText(data.replaceAll(" ",System.getProperty("line.separator")));
 		
-		}
+			if(( ApplyRefactoringsJob.iCompile != null)&& (PreviewWizardHandler.getSelectedJavaElement+" ").contains(ApplyRefactoringsJob.iCompile.getElementName()))
+			{
+				Iterator iterate = ApplyRefactoringsJob.refactoringsApplied.iterator();
+				String data= "";
+				while(iterate.hasNext()) {
+					
+					data = data+iterate.next()+ " ";
+				}
+
+				if(data.equals(""))
+					refactoredText.setText("No refactoring applied");
+				else {
+					System.out.println("Data-----"+ data);
+					refactoredText.setText(data.replaceAll(" ",System.getProperty("line.separator")));
+
+				}
+			}
+		
+			else {
+				refactoredText.setText("No refactoring applied");
+			}
 		refactoredText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.FILL_VERTICAL));
 		
-				//CompareUI.openCompareDialog(new CompareInput());
 	}
 
 }

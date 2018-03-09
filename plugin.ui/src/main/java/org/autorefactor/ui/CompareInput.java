@@ -22,7 +22,6 @@ public class CompareInput extends CompareEditorInput  {
 	static CompareConfiguration compareConfiguration = new CompareConfiguration();
 	static DiffNode node;
 	static IProgressMonitor monitor;
-
 	CompareItem left;
 	CompareItem right;
 
@@ -45,7 +44,6 @@ public class CompareInput extends CompareEditorInput  {
 	@Override
 	protected Object prepareInput(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException
 	{
-
 
 		CompareItem ancestor = new CompareItem(ApplyRefactoringsJob.codeToRefactor);
 		left = new CompareItem(ApplyRefactoringsJob.codeToRefactor);
@@ -91,7 +89,6 @@ public class CompareInput extends CompareEditorInput  {
 
 			iCompilation.getBuffer().setContents(CompareItem.newContents);
 			ApplyRefactoringsJob.newFile.delete(true, monitor);
-
 
 		}
 

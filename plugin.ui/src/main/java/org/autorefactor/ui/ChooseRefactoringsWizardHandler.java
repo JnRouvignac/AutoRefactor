@@ -51,9 +51,10 @@ public class ChooseRefactoringsWizardHandler extends AbstractHandler {
     public Object execute(final ExecutionEvent event) throws ExecutionException {
         final Shell shell = HandlerUtil.getActiveShell(event);
         try {
-            // Retrieve the targeted java element before the menu item is disposed by the framework
+            
             final Wizard wizard = new ChooseRefactoringsWizard(
                     AutoRefactorHandler.getSelectedJavaElements(event));
+            System.out.println("Selected Java Element--------"+ AutoRefactorHandler.getSelectedJavaElements(event));
             final WizardDialog dialog = new WizardDialog(shell, wizard);
             dialog.open();
         } catch (final Exception e) {
