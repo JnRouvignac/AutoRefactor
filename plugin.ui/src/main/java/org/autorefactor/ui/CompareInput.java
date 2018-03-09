@@ -49,6 +49,12 @@ public class CompareInput extends CompareEditorInput  {
 		left = new CompareItem(ApplyRefactoringsJob.codeToRefactor);
 		right = new CompareItem(ApplyRefactoringsJob.refactoredContent);
 		node = new DiffNode(1, ancestor, left, right);
+		try {
+			ApplyRefactoringsJob.newFile.delete(true, monitor);
+		} catch (CoreException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 		return node;
 	}
@@ -75,12 +81,6 @@ public class CompareInput extends CompareEditorInput  {
 
 	@Override
 	public void cancelPressed() {
-		try {
-			ApplyRefactoringsJob.newFile.delete(true, monitor);
-		} catch (CoreException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 
 	}
 	public void createAndCommit() {
@@ -88,7 +88,7 @@ public class CompareInput extends CompareEditorInput  {
 		try {
 
 			iCompilation.getBuffer().setContents(CompareItem.newContents);
-			ApplyRefactoringsJob.newFile.delete(true, monitor);
+			//ApplyRefactoringsJob.newFile.delete(true, monitor);
 
 		}
 
@@ -98,7 +98,8 @@ public class CompareInput extends CompareEditorInput  {
 		}
 
 	}
-
+	
+	
 }
 
 
