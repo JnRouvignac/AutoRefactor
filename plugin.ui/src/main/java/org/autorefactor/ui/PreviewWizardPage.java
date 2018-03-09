@@ -60,7 +60,7 @@ public class PreviewWizardPage extends WizardPage{
 				if(data.equals(""))
 					refactoredText.setText("No refactoring applied");
 				else {
-					System.out.println("Data-----"+ data);
+					
 					refactoredText.setText(data.replaceAll(" ",System.getProperty("line.separator")));
 
 				}

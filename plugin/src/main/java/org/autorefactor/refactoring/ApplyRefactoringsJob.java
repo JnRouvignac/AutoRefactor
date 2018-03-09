@@ -218,7 +218,6 @@ public class ApplyRefactoringsJob extends Job {
 
 
 			iCompile = compilationUnit;
-			System.out.println("Icompile file--"+ iCompile.getElementName());
 			IProject project = root.getProject(compilationUnit.getPath().segment(0));
 
 			newFile = project.getFile("../"+compilationUnit.getPath().removeLastSegments(1)+"/newFile.java");

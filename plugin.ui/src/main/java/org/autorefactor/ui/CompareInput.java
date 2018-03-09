@@ -49,6 +49,8 @@ public class CompareInput extends CompareEditorInput  {
 		left = new CompareItem(ApplyRefactoringsJob.codeToRefactor);
 		right = new CompareItem(ApplyRefactoringsJob.refactoredContent);
 		node = new DiffNode(1, ancestor, left, right);
+		
+		//Delete NewFile as long as the refcatoring is done
 		try {
 			ApplyRefactoringsJob.newFile.delete(true, monitor);
 		} catch (CoreException e) {
@@ -79,17 +81,12 @@ public class CompareInput extends CompareEditorInput  {
 		return true;
 	}
 
-	@Override
-	public void cancelPressed() {
-
-	}
 	public void createAndCommit() {
 		ICompilationUnit iCompilation = ApplyRefactoringsJob.iCompile;
 		try {
 
 			iCompilation.getBuffer().setContents(CompareItem.newContents);
-			//ApplyRefactoringsJob.newFile.delete(true, monitor);
-
+			
 		}
 
 		catch(Exception e) {
