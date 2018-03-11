@@ -65,9 +65,6 @@ public class PrimitiveWrapperCreationRefactoring extends AbstractRefactoringRule
         return ctx.getJavaProjectOptions().getJavaSERelease().getMinorVersion();
     }
 
-    // TODO Can we reduce bad effects of autoboxing / unboxing
-    // fix autoboxing and unboxing (returning boxed value in primitive context)
-
     @Override
     public boolean visit(MethodInvocation node) {
         if (node.getExpression() == null) {

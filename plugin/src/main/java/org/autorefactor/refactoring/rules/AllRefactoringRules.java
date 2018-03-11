@@ -73,6 +73,7 @@ public final class AllRefactoringRules {
                 new RemoveUselessNullCheckRefactoring(),
                 new VectorOldToNewAPIRefactoring(),
                 new PrimitiveWrapperCreationRefactoring(),
+                new AutoBoxingRatherThanExplicitMethodRefactoring(),
                 new LiteralRatherThanBooleanConstantRefactoring(),
                 new BooleanRefactoring(),
                 new BooleanPrimitiveRatherThanWrapperRefactoring(),
