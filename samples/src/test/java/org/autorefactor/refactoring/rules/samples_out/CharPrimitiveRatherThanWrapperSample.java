@@ -120,10 +120,10 @@ public class CharPrimitiveRatherThanWrapperSample {
         return alwaysInitializedVar++;
     }
 
-    public void replaceWrapperInIf() {
+    public void replaceWrapperInSwitch() {
         // Keep this comment
-        char alwaysInitializedVar = Character.MIN_VALUE;
-        switch (alwaysInitializedVar) {
+        char charInSwitch = Character.MIN_VALUE;
+        switch (charInSwitch) {
         case 1:
             System.out.println("One");
             break;
@@ -135,6 +135,12 @@ public class CharPrimitiveRatherThanWrapperSample {
         default:
             break;
         }
+    }
+
+    public String replaceWrapperInArrayAccess(String[] strings) {
+        // Keep this comment
+        char charInArrayAccess = Character.MIN_VALUE;
+        return strings[charInArrayAccess];
     }
 
     public char replaceReturnedWrapper() {

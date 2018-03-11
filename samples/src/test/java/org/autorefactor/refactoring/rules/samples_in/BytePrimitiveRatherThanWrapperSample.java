@@ -126,10 +126,10 @@ public class BytePrimitiveRatherThanWrapperSample {
         return alwaysInitializedVar++;
     }
 
-    public void replaceWrapperInIf() {
+    public void replaceWrapperInSwitch() {
         // Keep this comment
-        Byte alwaysInitializedVar = Byte.MIN_VALUE;
-        switch (alwaysInitializedVar) {
+        Byte byteInSwitch = Byte.MIN_VALUE;
+        switch (byteInSwitch) {
         case 1:
             System.out.println("One");
             break;
@@ -141,6 +141,12 @@ public class BytePrimitiveRatherThanWrapperSample {
         default:
             break;
         }
+    }
+
+    public String replaceWrapperInArrayAccess(String[] strings) {
+        // Keep this comment
+        Byte byteInArrayAccess = Byte.MIN_VALUE;
+        return strings[byteInArrayAccess];
     }
 
     public byte replaceReturnedWrapper() {

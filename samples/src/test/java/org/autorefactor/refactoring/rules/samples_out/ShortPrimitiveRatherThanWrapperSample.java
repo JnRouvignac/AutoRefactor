@@ -123,10 +123,10 @@ public class ShortPrimitiveRatherThanWrapperSample {
         return shortInPostIncrement++;
     }
 
-    public void replaceWrapperInIf() {
+    public void replaceWrapperInSwitch() {
         // Keep this comment
-        short shortInIf = Short.MIN_VALUE;
-        switch (shortInIf) {
+        short shortInSwitch = Short.MIN_VALUE;
+        switch (shortInSwitch) {
         case 1:
             System.out.println("One");
             break;
@@ -138,6 +138,12 @@ public class ShortPrimitiveRatherThanWrapperSample {
         default:
             break;
         }
+    }
+
+    public String replaceWrapperInArrayAccess(String[] strings) {
+        // Keep this comment
+        short shortInArrayAccess = Short.MIN_VALUE;
+        return strings[shortInArrayAccess];
     }
 
     public short replaceReturnedWrapper() {

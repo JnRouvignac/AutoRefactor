@@ -25,6 +25,7 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import static org.eclipse.jdt.core.dom.ASTNode.ARRAY_ACCESS;
 import static org.eclipse.jdt.core.dom.ASTNode.SWITCH_STATEMENT;
 import static org.eclipse.jdt.core.dom.Assignment.Operator.BIT_AND_ASSIGN;
 import static org.eclipse.jdt.core.dom.Assignment.Operator.BIT_OR_ASSIGN;
@@ -151,6 +152,7 @@ public class ShortPrimitiveRatherThanWrapperRefactoring extends AbstractPrimitiv
         final ASTNode parentNode = node.getParent();
 
         switch (parentNode.getNodeType()) {
+        case ARRAY_ACCESS:
         case SWITCH_STATEMENT:
             return true;
 
