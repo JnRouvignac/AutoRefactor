@@ -71,8 +71,8 @@ public class PrimitiveWrapperCreationSample {
         Byte.parseByte("0");
         Boolean.valueOf("true");
         Integer.parseInt("42");
+        Short.parseShort("42");
         Long.parseLong("42");
-        // Nothing for Short?
         Float.parseFloat("42.42");
         Double.parseDouble("42.42");
     }
@@ -92,15 +92,76 @@ public class PrimitiveWrapperCreationSample {
         double d = Double.parseDouble("42.42");
     }
 
-    public static void removeUnnecessaryValueOfCallsInPrimitiveContext() {
+    public static void removeUnnecessaryValueOfCallsInPrimitiveDeclaration() {
         // Keep this comment
+        char c = '&';
         byte by = (byte) 0;
-        boolean bo1 = true;
+        boolean bo = true;
         int i = 42;
         long l = 42;
         short s = (short) 42;
         float f = 42.42F;
         double d = 42.42;
+    }
+
+    public static void removeUnnecessaryValueOfCallsInPrimitiveAssignment() {
+        // Keep this comment
+        char c;
+        c = '&';
+        byte by;
+        by = (byte) 0;
+        boolean bo1;
+        bo1 = true;
+        int i;
+        i = 42;
+        long l;
+        l = 42;
+        short s;
+        s = (short) 42;
+        float f;
+        f = 42.42F;
+        double d;
+        d = 42.42;
+    }
+
+    public static char removeUnnecessaryValueOfCallsInCharacterPrimitive() {
+        // Keep this comment
+        return '&';
+    }
+
+    public static byte removeUnnecessaryValueOfCallsInBytePrimitive() {
+        // Keep this comment
+        return (byte) 0;
+    }
+
+    public static boolean removeUnnecessaryValueOfCallsInBooleanPrimitive() {
+        // Keep this comment
+        return true;
+    }
+
+    public static int removeUnnecessaryValueOfCallsInIntegerPrimitive() {
+        // Keep this comment
+        return 42;
+    }
+
+    public static long removeUnnecessaryValueOfCallsInLongPrimitive() {
+        // Keep this comment
+        return 42;
+    }
+
+    public static short removeUnnecessaryValueOfCallsInShortPrimitive() {
+        // Keep this comment
+        return (short) 42;
+    }
+
+    public static float removeUnnecessaryValueOfCallsInFloatPrimitive() {
+        // Keep this comment
+        return 42.42F;
+    }
+
+    public static double removeUnnecessaryValueOfCallsInDoublePrimitive() {
+        // Keep this comment
+        return 42.42;
     }
 
     public static void removeUnnecessaryConstructorInvocationsInPrimitiveContext() {
@@ -112,5 +173,31 @@ public class PrimitiveWrapperCreationSample {
         short s = (short) 42;
         float f = 42.42F;
         double d = 42.42;
+    }
+
+    public static void removeUnnecessaryConstructorInvocationsInSwitch() {
+        byte by = (byte) 4;
+        char c = 'c';
+        short s = (short) 1;
+        int i = 1;
+
+        // Keep this comment
+        switch (by) {
+        // Keep this comment too
+        default:
+        }
+        switch (c) {
+        default:
+        }
+        switch (s) {
+        default:
+        }
+        switch (i) {
+        default:
+        }
+    }
+
+    public static String removeUnnecessaryConstructorInvocationsInArrayAccess(String[] strings, int i) {
+        return strings[i];
     }
 }

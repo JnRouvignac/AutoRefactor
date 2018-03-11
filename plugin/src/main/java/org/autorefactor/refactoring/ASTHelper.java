@@ -1031,6 +1031,76 @@ public final class ASTHelper {
     }
 
     /**
+     * TODO Also take into account infix expression.
+     *
+     * Returns the type of either a method return or an assigned variable that is the destination of
+     * the given node. Returns null otherwise.
+     *
+     * @param node the start node
+     *
+     * @return the type of either a method return or an assigned variable
+     */
+    public static ITypeBinding getDestinationType(final ASTNode node) {
+        if (node != null) {
+            final ASTNode parent = node.getParent();
+            if (parent instanceof ParenthesizedExpression) {
+                return getDestinationType(parent);
+            } else if (parent instanceof ReturnStatement) {
+                final ReturnStatement returnStmt = (ReturnStatement) parent;
+                if (returnStmt.getExpression().equals(node)) {
+                    final MethodDeclaration method = getAncestorOrNull(returnStmt, MethodDeclaration.class);
+                    if (method != null && method.getReturnType2() != null) {
+                        return method.getReturnType2().resolveBinding();
+                    }
+                }
+            } else if (parent instanceof VariableDeclarationFragment) {
+                return resolveTypeBinding((VariableDeclarationFragment) parent);
+            } else if (parent instanceof Assignment) {
+                return ((Assignment) parent).getLeftHandSide().resolveTypeBinding();
+            } else if (parent instanceof ArrayAccess) {
+                final ArrayAccess arrayAccess = (ArrayAccess) parent;
+                if (arrayAccess.getIndex().equals(node)) {
+                    return node.getAST().resolveWellKnownType("int");
+                }
+            } else if (parent instanceof ConditionalExpression) {
+                final ConditionalExpression conditionalExpr = (ConditionalExpression) parent;
+                if (conditionalExpr.getExpression().equals(node)) {
+                    return node.getAST().resolveWellKnownType("boolean");
+                }
+            } else if (parent instanceof IfStatement) {
+                final IfStatement ifStmt = (IfStatement) parent;
+                if (ifStmt.getExpression().equals(node)) {
+                    return node.getAST().resolveWellKnownType("boolean");
+                }
+            } else if (parent instanceof WhileStatement) {
+                final WhileStatement whileStmt = (WhileStatement) parent;
+                if (whileStmt.getExpression().equals(node)) {
+                    return node.getAST().resolveWellKnownType("boolean");
+                }
+            } else if (parent instanceof DoStatement) {
+                final DoStatement doStmt = (DoStatement) parent;
+                if (doStmt.getExpression().equals(node)) {
+                    return node.getAST().resolveWellKnownType("boolean");
+                }
+            } else if (parent instanceof SwitchStatement) {
+                final SwitchStatement switchStmt = (SwitchStatement) parent;
+                if (switchStmt.getExpression().equals(node)) {
+                    final ITypeBinding discriminentType = switchStmt.getExpression().resolveTypeBinding();
+                    if (discriminentType.isPrimitive() || discriminentType.isEnum()
+                            || hasType(discriminentType, "java.lang.String")) {
+                        return discriminentType;
+                    } else {
+                        return node.getAST().resolveWellKnownType(
+                                getUnboxedTypeName(discriminentType.getQualifiedName()));
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Returns the previous body declaration in the same block if it exists.
      *
      * @param startNode the start node
@@ -2460,6 +2530,35 @@ public final class ASTHelper {
         }
         if ("double".equals(primitiveName)) {
             return "java.lang.Double";
+        }
+
+        return null;
+    }
+
+    private static String getUnboxedTypeName(String wrapperName) {
+        if ("java.lang.Long".equals(wrapperName)) {
+            return "long";
+        }
+        if ("java.lang.Integer".equals(wrapperName)) {
+            return "int";
+        }
+        if ("java.lang.Short".equals(wrapperName)) {
+            return "short";
+        }
+        if ("java.lang.Character".equals(wrapperName)) {
+            return "char";
+        }
+        if ("java.lang.Byte".equals(wrapperName)) {
+            return "byte";
+        }
+        if ("java.lang.Boolean".equals(wrapperName)) {
+            return "boolean";
+        }
+        if ("java.lang.Float".equals(wrapperName)) {
+            return "float";
+        }
+        if ("java.lang.Double".equals(wrapperName)) {
+            return "double";
         }
 
         return null;

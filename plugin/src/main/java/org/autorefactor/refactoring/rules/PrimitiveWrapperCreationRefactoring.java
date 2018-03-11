@@ -31,23 +31,20 @@ import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
 import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
 import static org.autorefactor.refactoring.ASTHelper.arg0;
 import static org.autorefactor.refactoring.ASTHelper.arguments;
+import static org.autorefactor.refactoring.ASTHelper.getDestinationType;
 import static org.autorefactor.refactoring.ASTHelper.hasType;
 import static org.autorefactor.refactoring.ASTHelper.isMethod;
 import static org.autorefactor.refactoring.ASTHelper.isPrimitive;
-import static org.autorefactor.refactoring.ASTHelper.removeParentheses;
-import static org.autorefactor.refactoring.ASTHelper.resolveTypeBinding;
 import static org.autorefactor.util.Utils.equal;
 
 import java.util.List;
 
 import org.autorefactor.refactoring.ASTBuilder;
-import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.SimpleName;
-import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
 /** See {@link #getDescription()} method. */
 @SuppressWarnings("javadoc")
@@ -77,42 +74,40 @@ public class PrimitiveWrapperCreationRefactoring extends AbstractRefactoringRule
             return VISIT_SUBTREE;
         }
 
-        final ASTNode parent = removeParentheses(node.getParent());
-        if (parent instanceof VariableDeclarationFragment) {
-            final ITypeBinding typeBinding = resolveTypeBinding((VariableDeclarationFragment) parent);
-            if (typeBinding != null && typeBinding.isPrimitive()
-                    && "valueOf".equals(node.getName().getIdentifier())) {
-                if (isMethod(node, "java.lang.Boolean", "valueOf", "boolean")
-                        || isMethod(node, "java.lang.Byte", "valueOf", "byte")
-                        || isMethod(node, "java.lang.Character", "valueOf", "char")
-                        || isMethod(node, "java.lang.Short", "valueOf", "short")
-                        || isMethod(node, "java.lang.Integer", "valueOf", "int")
-                        || isMethod(node, "java.lang.Long", "valueOf", "long")
-                        || isMethod(node, "java.lang.Float", "valueOf", "float")
-                        || isMethod(node, "java.lang.Double", "valueOf", "double")) {
-                    return replaceWithTheSingleArgument(node);
-                }
-                if (is(node, "java.lang.Byte")) {
-                    return replaceMethodName(node, "parseByte");
-                }
-                if (is(node, "java.lang.Short")) {
-                    return replaceMethodName(node, "parseShort");
-                }
-                if (is(node, "java.lang.Integer")) {
-                    return replaceMethodName(node, "parseInt");
-                }
-                if (is(node, "java.lang.Long")) {
-                    return replaceMethodName(node, "parseLong");
-                }
-                if (isMethod(node, "java.lang.Boolean", "valueOf", "java.lang.String")) {
-                    return replaceMethodName(node, "parseBoolean");
-                }
-                if (is(node, "java.lang.Float")) {
-                    return replaceMethodName(node, "parseFloat");
-                }
-                if (is(node, "java.lang.Double")) {
-                    return replaceMethodName(node, "parseDouble");
-                }
+        ITypeBinding destinationTypeBinding = getDestinationType(node);
+
+        if (destinationTypeBinding != null && destinationTypeBinding.isPrimitive()
+                && "valueOf".equals(node.getName().getIdentifier())) {
+            if (isMethod(node, "java.lang.Boolean", "valueOf", "boolean")
+                    || isMethod(node, "java.lang.Byte", "valueOf", "byte")
+                    || isMethod(node, "java.lang.Character", "valueOf", "char")
+                    || isMethod(node, "java.lang.Short", "valueOf", "short")
+                    || isMethod(node, "java.lang.Integer", "valueOf", "int")
+                    || isMethod(node, "java.lang.Long", "valueOf", "long")
+                    || isMethod(node, "java.lang.Float", "valueOf", "float")
+                    || isMethod(node, "java.lang.Double", "valueOf", "double")) {
+                return replaceWithTheSingleArgument(node);
+            }
+            if (is(node, "java.lang.Byte")) {
+                return replaceMethodName(node, "parseByte");
+            }
+            if (is(node, "java.lang.Short")) {
+                return replaceMethodName(node, "parseShort");
+            }
+            if (is(node, "java.lang.Integer")) {
+                return replaceMethodName(node, "parseInt");
+            }
+            if (is(node, "java.lang.Long")) {
+                return replaceMethodName(node, "parseLong");
+            }
+            if (isMethod(node, "java.lang.Boolean", "valueOf", "java.lang.String")) {
+                return replaceMethodName(node, "parseBoolean");
+            }
+            if (is(node, "java.lang.Float")) {
+                return replaceMethodName(node, "parseFloat");
+            }
+            if (is(node, "java.lang.Double")) {
+                return replaceMethodName(node, "parseDouble");
             }
         }
 
@@ -172,6 +167,9 @@ public class PrimitiveWrapperCreationRefactoring extends AbstractRefactoringRule
         } else if ("java.lang.Long".equals(typeName)
                 && "longValue".equals(invokedMethodName)) {
             return "parseLong";
+        } else if ("java.lang.Short".equals(typeName)
+                && "shortValue".equals(invokedMethodName)) {
+            return "parseShort";
         } else if ("java.lang.Integer".equals(typeName)
                 && "intValue".equals(invokedMethodName)) {
             return "parseInt";
