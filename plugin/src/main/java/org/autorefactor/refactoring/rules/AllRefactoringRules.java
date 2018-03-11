@@ -74,6 +74,7 @@ public final class AllRefactoringRules {
                 new VectorOldToNewAPIRefactoring(),
                 new PrimitiveWrapperCreationRefactoring(),
                 new AutoBoxingRatherThanExplicitMethodRefactoring(),
+                new UnboxingRatherThanExplicitMethodRefactoring(),
                 new LiteralRatherThanBooleanConstantRefactoring(),
                 new BooleanRefactoring(),
                 new BooleanPrimitiveRatherThanWrapperRefactoring(),
