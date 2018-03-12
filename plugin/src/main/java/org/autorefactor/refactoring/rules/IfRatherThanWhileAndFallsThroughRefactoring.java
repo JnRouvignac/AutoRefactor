@@ -39,7 +39,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.autorefactor.refactoring.ASTBuilder;
-import org.eclipse.jdt.core.dom.ASTVisitor;
+import org.autorefactor.refactoring.InterruptableVisitor;
 import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
 import org.eclipse.jdt.core.dom.BreakStatement;
 import org.eclipse.jdt.core.dom.DoStatement;
@@ -67,7 +67,7 @@ public class IfRatherThanWhileAndFallsThroughRefactoring extends AbstractRefacto
     public boolean visit(WhileStatement node) {
         if (isEndingWithExit(node.getBody())) {
             final BreakVisitor breakVisitor = new BreakVisitor(node);
-            node.accept(breakVisitor);
+            breakVisitor.visitNode(node);
 
             if (breakVisitor.canBeRefactored()) {
                 final ASTBuilder b = ctx.getASTBuilder();
@@ -115,7 +115,7 @@ public class IfRatherThanWhileAndFallsThroughRefactoring extends AbstractRefacto
         }
     }
 
-    private class BreakVisitor extends ASTVisitor {
+    private class BreakVisitor extends InterruptableVisitor {
 
         private final WhileStatement root;
         private final List<BreakStatement> breaks = new ArrayList<BreakStatement>();
@@ -142,7 +142,7 @@ public class IfRatherThanWhileAndFallsThroughRefactoring extends AbstractRefacto
 
             if (parent != root) {
                 canBeRefactored = false;
-                return DO_NOT_VISIT_SUBTREE;
+                return interruptVisit();
             }
 
             breaks.add(aBreak);

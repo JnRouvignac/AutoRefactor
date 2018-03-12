@@ -51,6 +51,7 @@ import java.util.List;
 import java.util.Objects;
 
 import org.autorefactor.refactoring.ASTBuilder;
+import org.autorefactor.refactoring.InterruptableVisitor;
 import org.autorefactor.refactoring.TypeNameDecider;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
@@ -245,7 +246,7 @@ public abstract class AbstractClassSubstituteRefactoring extends AbstractRefacto
             final Statement parent = getAncestorOrNull(varDecl, Statement.class);
             Statement nextSibling = getNextSibling(parent);
             while (nextSibling != null) {
-                nextSibling.accept(varOccurrenceVisitor);
+                varOccurrenceVisitor.visitNode(nextSibling);
                 nextSibling = getNextSibling(nextSibling);
             }
 
@@ -398,7 +399,7 @@ public abstract class AbstractClassSubstituteRefactoring extends AbstractRefacto
         }
     }
 
-    private class VarOccurrenceVisitor extends ASTVisitor {
+    private class VarOccurrenceVisitor extends InterruptableVisitor {
 
         private final VariableDeclaration varDecl;
         private final List<SimpleName> varOccurrences = new ArrayList<SimpleName>();
@@ -433,7 +434,7 @@ public abstract class AbstractClassSubstituteRefactoring extends AbstractRefacto
                         new VariableDefinitionsUsesVisitor(varDecl.resolveBinding(), node).find();
                 if (!variableUseVisitor.getUses().isEmpty()) {
                     isUsedInAnnonymousClass = true;
-                    return DO_NOT_VISIT_SUBTREE;
+                    return interruptVisit();
                 }
             }
             return VISIT_SUBTREE;

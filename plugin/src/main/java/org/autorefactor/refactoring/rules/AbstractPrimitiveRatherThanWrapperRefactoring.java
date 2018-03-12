@@ -45,8 +45,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.autorefactor.refactoring.ASTBuilder;
+import org.autorefactor.refactoring.InterruptableVisitor;
 import org.eclipse.jdt.core.dom.ASTNode;
-import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.CastExpression;
@@ -182,7 +182,7 @@ public abstract class AbstractPrimitiveRatherThanWrapperRefactoring extends Abst
                     final VarOccurrenceVisitor varOccurrenceVisitor = new VarOccurrenceVisitor(fragment);
                     final Block parentBlock = getAncestorOrNull(fragment, Block.class);
                     if (parentBlock != null) {
-                        parentBlock.accept(varOccurrenceVisitor);
+                        varOccurrenceVisitor.visitNode(parentBlock);
 
                         if (varOccurrenceVisitor.isPrimitiveAllowed()
                                 && varOccurrenceVisitor.getAutoBoxingCount() < 2) {
@@ -242,7 +242,7 @@ public abstract class AbstractPrimitiveRatherThanWrapperRefactoring extends Abst
         return false;
     }
 
-    private class VarOccurrenceVisitor extends ASTVisitor {
+    private class VarOccurrenceVisitor extends InterruptableVisitor {
         private final VariableDeclarationFragment varDecl;
 
         private boolean isPrimitiveAllowed = true;
@@ -269,7 +269,7 @@ public abstract class AbstractPrimitiveRatherThanWrapperRefactoring extends Abst
                     && !aVar.getParent().equals(varDecl)) {
                 isPrimitiveAllowed = isPrimitiveAllowed(aVar);
                 if (!isPrimitiveAllowed) {
-                    return DO_NOT_VISIT_SUBTREE;
+                    return interruptVisit();
                 }
             }
             return VISIT_SUBTREE;

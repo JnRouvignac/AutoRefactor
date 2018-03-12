@@ -233,7 +233,7 @@ public final class ASTHelper {
         }
     }
 
-    private static final class ExprActivityVisitor extends ASTVisitor {
+    private static final class ExprActivityVisitor extends InterruptableVisitor {
         private ExprActivity activityLevel = ExprActivity.PASSIVE;
 
         public ExprActivity getActivityLevel() {
@@ -243,13 +243,13 @@ public final class ASTHelper {
         @Override
         public boolean visit(Assignment node) {
             activityLevel = ExprActivity.ACTIVE;
-            return DO_NOT_VISIT_SUBTREE;
+            return interruptVisit();
         }
 
         @Override
         public boolean visit(PostfixExpression node) {
             activityLevel = ExprActivity.ACTIVE;
-            return DO_NOT_VISIT_SUBTREE;
+            return interruptVisit();
         }
 
         @Override
@@ -257,7 +257,7 @@ public final class ASTHelper {
             if (INCREMENT.equals(node.getOperator())
                     || DECREMENT.equals(node.getOperator())) {
                 activityLevel = ExprActivity.ACTIVE;
-                return DO_NOT_VISIT_SUBTREE;
+                return interruptVisit();
             }
             return VISIT_SUBTREE;
         }
@@ -2447,7 +2447,7 @@ public final class ASTHelper {
     public static boolean isPassive(final ASTNode node) {
         final ExprActivityVisitor visitor =
             new ExprActivityVisitor();
-        node.accept(visitor);
+        visitor.visitNode(node);
         return ExprActivity.PASSIVE.equals(visitor.getActivityLevel());
     }
 
