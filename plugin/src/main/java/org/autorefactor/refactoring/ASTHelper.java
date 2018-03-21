@@ -1764,7 +1764,9 @@ public final class ASTHelper {
             return false;
         }
         for (int i = 0; i < typesQualifiedNames.length; i++) {
-            if (!typesQualifiedNames[i].equals(typeBindings[i].getQualifiedName())) {
+            if (!typesQualifiedNames[i].equals(typeBindings[i].getQualifiedName())
+                    && !typesQualifiedNames[i].equals(getBoxedTypeName(typeBindings[i].getQualifiedName()))
+                    && !typesQualifiedNames[i].equals(getUnboxedTypeName(typeBindings[i].getQualifiedName()))) {
                 return false;
             }
         }
@@ -1838,8 +1840,22 @@ public final class ASTHelper {
             }
 
             final ITypeBinding erasure1 = paramTypes[i].getErasure();
+            final String erasureName1;
+            if (erasure1.isPrimitive()) {
+                erasureName1 = getBoxedTypeName(erasure1.getQualifiedName());
+            } else {
+                erasureName1 = erasure1.getQualifiedName();
+            }
+
             final ITypeBinding erasure2 = concreteParamType.getErasure();
-            if (!erasure1.equals(erasure2)) {
+            final String erasureName2;
+            if (erasure2.isPrimitive()) {
+                erasureName2 = getBoxedTypeName(erasure2.getQualifiedName());
+            } else {
+                erasureName2 = erasure2.getQualifiedName();
+            }
+
+            if (!erasureName1.equals(erasureName2)) {
                 return false;
             }
         }
