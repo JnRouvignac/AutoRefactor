@@ -26,6 +26,32 @@
  */
 package org.autorefactor.refactoring;
 
+import static org.autorefactor.refactoring.ASTHelper.arguments;
+import static org.autorefactor.refactoring.ASTHelper.catchClauses;
+import static org.autorefactor.refactoring.ASTHelper.extendedOperands;
+import static org.autorefactor.refactoring.ASTHelper.hasOperator;
+import static org.autorefactor.refactoring.ASTHelper.modifiers;
+import static org.autorefactor.refactoring.ASTHelper.removeParentheses;
+import static org.autorefactor.refactoring.ASTHelper.statements;
+import static org.autorefactor.refactoring.ASTHelper.typeArguments;
+import static org.autorefactor.util.Utils.equal;
+import static org.eclipse.jdt.core.dom.ASTNode.ARRAY_TYPE;
+import static org.eclipse.jdt.core.dom.ASTNode.ASSIGNMENT;
+import static org.eclipse.jdt.core.dom.ASTNode.CONDITIONAL_EXPRESSION;
+import static org.eclipse.jdt.core.dom.ASTNode.EMPTY_STATEMENT;
+import static org.eclipse.jdt.core.dom.ASTNode.INFIX_EXPRESSION;
+import static org.eclipse.jdt.core.dom.ASTNode.INSTANCEOF_EXPRESSION;
+import static org.eclipse.jdt.core.dom.ASTNode.PREFIX_EXPRESSION;
+import static org.eclipse.jdt.core.dom.ASTNode.PRIMITIVE_TYPE;
+import static org.eclipse.jdt.core.dom.ASTNode.QUALIFIED_TYPE;
+import static org.eclipse.jdt.core.dom.ASTNode.SIMPLE_TYPE;
+import static org.eclipse.jdt.core.dom.Modifier.ModifierKeyword.FINAL_KEYWORD;
+import static org.eclipse.jdt.core.dom.Modifier.ModifierKeyword.PRIVATE_KEYWORD;
+import static org.eclipse.jdt.core.dom.Modifier.ModifierKeyword.PROTECTED_KEYWORD;
+import static org.eclipse.jdt.core.dom.Modifier.ModifierKeyword.PUBLIC_KEYWORD;
+import static org.eclipse.jdt.core.dom.Modifier.ModifierKeyword.STATIC_KEYWORD;
+import static org.eclipse.jdt.core.dom.PrefixExpression.Operator.NOT;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -49,8 +75,10 @@ import org.eclipse.jdt.core.dom.CastExpression;
 import org.eclipse.jdt.core.dom.CatchClause;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.ConditionalExpression;
+import org.eclipse.jdt.core.dom.CreationReference;
 import org.eclipse.jdt.core.dom.DoStatement;
 import org.eclipse.jdt.core.dom.Expression;
+import org.eclipse.jdt.core.dom.ExpressionMethodReference;
 import org.eclipse.jdt.core.dom.ExpressionStatement;
 import org.eclipse.jdt.core.dom.FieldAccess;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
@@ -58,6 +86,7 @@ import org.eclipse.jdt.core.dom.IExtendedModifier;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.InfixExpression;
+import org.eclipse.jdt.core.dom.LambdaExpression;
 import org.eclipse.jdt.core.dom.MarkerAnnotation;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
@@ -80,22 +109,18 @@ import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.StringLiteral;
 import org.eclipse.jdt.core.dom.StructuralPropertyDescriptor;
 import org.eclipse.jdt.core.dom.SuperMethodInvocation;
+import org.eclipse.jdt.core.dom.SuperMethodReference;
 import org.eclipse.jdt.core.dom.SwitchCase;
 import org.eclipse.jdt.core.dom.SwitchStatement;
 import org.eclipse.jdt.core.dom.ThisExpression;
 import org.eclipse.jdt.core.dom.ThrowStatement;
 import org.eclipse.jdt.core.dom.TryStatement;
 import org.eclipse.jdt.core.dom.Type;
+import org.eclipse.jdt.core.dom.TypeMethodReference;
 import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 import org.eclipse.jdt.core.dom.WildcardType;
-
-import static org.autorefactor.refactoring.ASTHelper.*;
-import static org.autorefactor.util.Utils.*;
-import static org.eclipse.jdt.core.dom.ASTNode.*;
-import static org.eclipse.jdt.core.dom.Modifier.ModifierKeyword.*;
-import static org.eclipse.jdt.core.dom.PrefixExpression.Operator.*;
 
 /**
  * Helper class for building AST note in a somewhat fluent API.
@@ -852,6 +877,51 @@ public class ASTBuilder {
 
     private <E extends ASTNode> boolean isEmptyRangeCopy(List<E> nodes) {
         return nodes.size() == 1 && nodes.get(0) == null;
+    }
+
+    /**
+     * Builds a new {@link LambdaExpression} instance.
+     *
+     * @return a new lambda expression
+     */
+    public LambdaExpression lambda() {
+        return ast.newLambdaExpression();
+    }
+
+    /**
+     * Builds a new {@link ExpressionMethodReference} instance.
+     *
+     * @return a new expression method reference
+     */
+    public ExpressionMethodReference exprMethodRef() {
+        return ast.newExpressionMethodReference();
+    }
+
+    /**
+     * Builds a new {@link TypeMethodReference} instance.
+     *
+     * @return a new type method reference
+     */
+    public TypeMethodReference typeMethodRef() {
+        return ast.newTypeMethodReference();
+    }
+
+    /**
+     * Builds a new {@link CreationReference} instance.
+     *
+     * @return a new creation reference
+     */
+    public CreationReference creationRef() {
+        return ast.newCreationReference();
+    }
+
+    /**
+     * Builds a new {@link SuperMethodReference} instance.
+     *
+     * @return a new super method reference
+     */
+    public SuperMethodReference superMethodRef() {
+        return ast.newSuperMethodReference();
     }
 
     /**

@@ -100,7 +100,7 @@ public class CFGBuilderTest {
         cu.getBuffer().setContents(javaSource);
         cu.save(null, true);
 
-        final JavaProjectOptions options = newJavaProjectOptions(Release.javaSE("1.7"), 4);
+        final JavaProjectOptions options = newJavaProjectOptions(Release.javaSE("1.8"), 4);
         final ASTParser parser = ASTParser.newParser(AST.JLS8);
         autoRefactorHandlerResetParser(cu, parser, options);
 

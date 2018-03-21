@@ -118,7 +118,7 @@ public class RefactoringRulesTest {
         new ApplyRefactoringsJob(null, null, TEST_ENVIRONMENT).applyRefactoring(
                 doc, cu,
                 new AggregateASTVisitor(Arrays.asList(refactoring)),
-                newJavaProjectOptions(Release.javaSE("1.7.0"), 4),
+                newJavaProjectOptions(Release.javaSE("1.8.0"), 4),
                 SubMonitor.convert(new NullProgressMonitor()));
 
         final String actual = normalizeJavaSourceCode(
