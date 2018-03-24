@@ -27,6 +27,7 @@ package org.autorefactor.refactoring.rules;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
 
+import org.autorefactor.refactoring.ASTBuilder;
 import org.eclipse.jdt.core.dom.NumberLiteral;
 
 /**
@@ -37,26 +38,32 @@ import org.eclipse.jdt.core.dom.NumberLiteral;
 public class CapitalizeLongLiteralRefactoring extends AbstractRefactoringRule {
 
     @Override
-    public String getDescription() {
-        return "Capitalize lower case 'l' -> 'L' for long number literals";
-    }
-
-    @Override
     public String getName() {
         return "Capitalize lower case 'l' -> 'L' for long number literals";
     }
 
     @Override
+    public String getDescription() {
+        return "Capitalize lower case 'l' -> 'L' for long number literals";
+    }
+
+    @Override
     public boolean visit(NumberLiteral node) {
-        String token = node.getToken();
+        final String token = node.getToken();
         if (token.endsWith("l")) {
-            NumberLiteral replacement = ctx.getAST().newNumberLiteral();
-            String newToken = token.substring(0, token.length() - 1) + "L";
-            replacement.setToken(newToken);
-            ctx.getRefactorings().replace(node, replacement);
+            replaceLong(node, token);
             return DO_NOT_VISIT_SUBTREE;
         }
         return VISIT_SUBTREE;
+    }
+
+    private void replaceLong(final NumberLiteral node, final String token) {
+        final ASTBuilder b = this.ctx.getASTBuilder();
+
+        final NumberLiteral replacement = b.numberLiteral();
+        final String newToken = token.substring(0, token.length() - 1) + "L";
+        replacement.setToken(newToken);
+        ctx.getRefactorings().replace(node, replacement);
     }
 
 }

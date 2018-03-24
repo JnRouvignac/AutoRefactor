@@ -880,6 +880,15 @@ public class ASTBuilder {
     }
 
     /**
+     * Builds a new {@link NumberLiteral} instance.
+     *
+     * @return a new number literal
+     */
+    public NumberLiteral numberLiteral() {
+        return ast.newNumberLiteral();
+    }
+
+    /**
      * Builds a new {@link LambdaExpression} instance.
      *
      * @return a new lambda expression
