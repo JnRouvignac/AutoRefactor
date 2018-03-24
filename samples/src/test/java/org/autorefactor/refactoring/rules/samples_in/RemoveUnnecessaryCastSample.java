@@ -2,6 +2,7 @@
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
  * Copyright (C) 2014-2015 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2018 Fabrice Tiercelin - Adds 'L', 'f' or 'd' to type literals.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,6 +32,34 @@ public class RemoveUnnecessaryCastSample {
     private byte b;
     private char c;
     private short s;
+
+    private Long usual = (long) 101;
+    private Long octal = (long) 0121;
+    private Long hex = (long) 0xdafdaf;
+    private Long binary = (long) 0b1110010111;
+    private Float usualFloat = (float) 101;
+    private Double usualDouble = (double) 101;
+    private Double floatingDouble = (double) 101.01;
+
+    private Long doNotChangeLong = 101L;
+    private Float doNotChangeFloat = 101f;
+    private Double doNotChangeDouble = 101d;
+
+    public void refactorIt() {
+        Long localUsual = (long) 101;
+        Long localOctal = (long) 0121;
+        Long localHex = (long) 0xdafdaf;
+        Long localBinary = (long) 0b1110010111;
+        Float localUsualFloat = (float) 101;
+        Double localUsualDouble = (double) 101;
+        Double localFloatingDouble = (double) 101.01;
+    }
+
+    public void doNotRefactor() {
+        Long doNotChangeLocalLong = 101L;
+        Float doNotChangeLocalFloat = 101f;
+        Double doNotChangeLocalDouble = 101d;
+    }
 
     public Object removeCastToSameType(Integer i) {
         // Keep this comment

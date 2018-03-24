@@ -3,6 +3,7 @@
  *
  * Copyright (C) 2014-2016 Jean-Noël Rouvignac - initial API and implementation
  * Copyright (C) 2016 Fabrice Tiercelin - Make sure we do not visit again modified nodes
+ * Copyright (C) 2018 Fabrice Tiercelin - Adds 'L', 'f' or 'd' to type literals.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -38,6 +39,7 @@ import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
+import org.eclipse.jdt.core.dom.NumberLiteral;
 import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
@@ -54,7 +56,9 @@ import static org.eclipse.jdt.core.dom.InfixExpression.Operator.*;
 public class RemoveUnnecessaryCastRefactoring extends AbstractRefactoringRule {
     @Override
     public String getDescription() {
-        return "Removes unnecessary widening casts from return statements, assignments and infix expressions.";
+        return ""
+                + "Removes unnecessary widening casts from return statements, assignments and infix expressions. "
+                + "Correctly types literals. ";
     }
 
     @Override
@@ -64,12 +68,40 @@ public class RemoveUnnecessaryCastRefactoring extends AbstractRefactoringRule {
 
     @Override
     public boolean visit(CastExpression node) {
+        final NumberLiteral literal = as(node.getExpression(), NumberLiteral.class);
+        if (literal != null
+                && (literal.getToken().matches(".*[^lLdDfF]") || literal.getToken().matches("0x.*[^lL]"))) {
+            if (hasType(node.getType().resolveBinding(), "long")) {
+                createPrimitive(node, literal, 'L');
+                return DO_NOT_VISIT_SUBTREE;
+            }
+
+            if (hasType(node.getType().resolveBinding(), "float")) {
+                createPrimitive(node, literal, 'f');
+                return DO_NOT_VISIT_SUBTREE;
+            }
+
+            if (hasType(node.getType().resolveBinding(), "double")) {
+                createPrimitive(node, literal, 'd');
+                return DO_NOT_VISIT_SUBTREE;
+            }
+        }
+
         if (canRemoveCast(node)) {
             final ASTBuilder b = ctx.getASTBuilder();
             ctx.getRefactorings().replace(node, b.move(node.getExpression()));
             return DO_NOT_VISIT_SUBTREE;
         }
         return VISIT_SUBTREE;
+    }
+
+    private void createPrimitive(final CastExpression node, final NumberLiteral literal, final char postfix) {
+        final ASTBuilder b = this.ctx.getASTBuilder();
+
+        final NumberLiteral numberLiteral = b.numberLiteral();
+        numberLiteral.setToken(literal.getToken() + postfix);
+
+        ctx.getRefactorings().replace(node, numberLiteral);
     }
 
     private boolean canRemoveCast(CastExpression node) {
@@ -209,9 +241,9 @@ public class RemoveUnnecessaryCastRefactoring extends AbstractRefactoringRule {
         final Object value = node.getExpression().resolveConstantExpressionValue();
         if (value instanceof Integer) {
             final int val = (Integer) value;
-            return     (hasType(node, "byte")  &&   -128 <= val && val <= 127)
-                    || (hasType(node, "short") && -32768 <= val && val <= 32767)
-                    || (hasType(node, "char")  &&      0 <= val && val <= 65535);
+            return     (hasType(node, "byte")  && Byte.MIN_VALUE  <= val && val <= Byte.MAX_VALUE)
+                    || (hasType(node, "short") && Short.MIN_VALUE <= val && val <= Short.MAX_VALUE)
+                    || (hasType(node, "char")  && 0               <= val && val <= 65535);
         }
         return false;
     }
