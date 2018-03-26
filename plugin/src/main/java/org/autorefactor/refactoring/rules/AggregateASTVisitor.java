@@ -25,6 +25,9 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
+
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -134,8 +137,6 @@ import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 import org.eclipse.jdt.core.dom.WhileStatement;
 import org.eclipse.jdt.core.dom.WildcardType;
 
-import static org.autorefactor.refactoring.ASTHelper.*;
-
 /**
  * Aggregates running several visitors into only one visitor to increase performances.
  * When one visitor refactors a subtree of the AST, visitors coming after will not be able to visit it.
@@ -165,17 +166,31 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         analyzeVisitors();
     }
 
-    @Override
+    /**
+     * Get the description.
+     *
+     * @return the description.
+     */
     public String getDescription() {
         throw new UnsupportedOperationException();
     }
 
-    @Override
+    /**
+     * Get the name.
+     *
+     * @return the name.
+     */
     public String getName() {
         throw new UnsupportedOperationException();
     }
 
-    @Override
+    /**
+     * True if the visitor is enabled.
+     *
+     * @param preferences The preferences
+     *
+     * @return true if the visitor is enabled.
+     */
     public boolean isEnabled(Preferences preferences) {
         return true;
     }
@@ -244,7 +259,13 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         return Collections.emptyList();
     }
 
-    @Override
+    /**
+     * True if this Java version is supported.
+     *
+     * @param javaSeRelease The javaSe release
+     *
+     * @return true if this Java version is supported.
+     */
     public boolean isJavaVersionSupported(Release javaSeRelease) {
         return true;
     }
@@ -255,7 +276,11 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
                 && ((JavaRefactoringRule) visitor).isJavaVersionSupported(javaSERelease);
     }
 
-    @Override
+    /**
+     * Set the refactoring context.
+     *
+     * @param ctx the refactoring context.
+     */
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public void setRefactoringContext(RefactoringContext ctx) {
         this.ctx = ctx;
@@ -265,7 +290,13 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         this.visitorsContributingRefactoring.clear();
     }
 
-    @Override
+    /**
+     * Get the refactorings.
+     *
+     * @param astRoot The AST toot
+     *
+     * @return the refactorings.
+     */
     public Refactorings getRefactorings(CompilationUnit astRoot) {
         astRoot.accept(this);
         return this.ctx.getRefactorings();
@@ -329,7 +360,14 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     public static void main(String[] args) {
         final Method[] mm = ASTVisitor.class.getDeclaredMethods();
         Arrays.sort(mm, new Comparator<Method>() {
-            @Override
+            /**
+             * Compare objects.
+             *
+             * @param o1 First item
+             * @param o2 Second item
+             *
+             * @return -1, 0 or 1
+             */
             public int compare(Method o1, Method o2) {
                 return o1.getName().compareTo(o2.getName());
             }
@@ -3125,7 +3163,11 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
         return VISIT_SUBTREE;
     }
 
-    @Override
+    /**
+     * True if it is the visitor by default.
+     *
+     * @return true if it is the visitor by default.
+     */
     public boolean isByDefault() {
         return false;
     }

@@ -67,15 +67,23 @@ public class SetRatherThanMapRefactoring extends AbstractClassSubstituteRefactor
                     "java.util.AbstractMap", "java.lang.Cloneable", "java.lang.Object"});
     }
 
-    @Override
+    /**
+     * Get the name.
+     *
+     * @return the name.
+     */
+    public String getName() {
+        return "Set rather than map";
+    }
+
+    /**
+     * Get the description.
+     *
+     * @return the description.
+     */
     public String getDescription() {
         return ""
             + "Replace map by set when values are not read.";
-    }
-
-    @Override
-    public String getName() {
-        return "Set rather than map";
     }
 
     @Override
@@ -117,6 +125,7 @@ public class SetRatherThanMapRefactoring extends AbstractClassSubstituteRefactor
      * @param originalExpr The original expression
      * @return the substitute type.
      */
+    @Override
     protected Type substituteType(final ASTBuilder b, final Type origType, ASTNode originalExpr) {
         String substitutingType = getSubstitutingClassName(origType.resolveBinding().getErasure().getQualifiedName());
 

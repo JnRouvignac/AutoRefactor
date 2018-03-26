@@ -67,8 +67,11 @@ public class JavaProjectOptionsImpl implements JavaProjectOptions {
         }
     }
 
-    @SuppressWarnings("unchecked")
-    @Override
+    /**
+     * Get the compiler options.
+     *
+     * @return the compiler options.
+     */
     public Map<String, String> getCompilerOptions() {
         final Map<String, String> options = JavaCore.getOptions();
         final String v = javaSERelease.getMajorVersion() + "." + javaSERelease.getMinorVersion();
@@ -76,17 +79,29 @@ public class JavaProjectOptionsImpl implements JavaProjectOptions {
         return options;
     }
 
-    @Override
+    /**
+     * Get the JavaSE Release.
+     *
+     * @return the JavaSE Release.
+     */
     public Release getJavaSERelease() {
         return javaSERelease;
     }
 
-    @Override
+    /**
+     * Get the tab size.
+     *
+     * @return the tab size.
+     */
     public Integer getTabSize() {
         return asInteger(FORMATTER_INDENTATION_SIZE);
     }
 
-    @Override
+    /**
+     * Get the comment line length.
+     *
+     * @return the comment line length.
+     */
     public int getCommentLineLength() {
         Integer result = asInteger(FORMATTER_COMMENT_LINE_LENGTH);
         if (result == null) {

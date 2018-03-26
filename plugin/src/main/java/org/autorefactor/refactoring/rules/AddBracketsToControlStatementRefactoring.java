@@ -25,6 +25,9 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
+
 import org.autorefactor.refactoring.ASTBuilder;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.DoStatement;
@@ -34,12 +37,23 @@ import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.WhileStatement;
 
-import static org.autorefactor.refactoring.ASTHelper.*;
-
 /** See {@link #getDescription()} method. */
 @SuppressWarnings("javadoc")
 public class AddBracketsToControlStatementRefactoring extends AbstractRefactoringRule {
-    @Override
+    /**
+     * Get the name.
+     *
+     * @return the name.
+     */
+    public String getName() {
+        return "Add brackets to control statement";
+    }
+
+    /**
+     * Get the description.
+     *
+     * @return the description.
+     */
     public String getDescription() {
         return ""
             + "Adds brackets to:\n"
@@ -47,11 +61,6 @@ public class AddBracketsToControlStatementRefactoring extends AbstractRefactorin
             + "- for loop body,\n"
             + "- do ... while loop body,\n"
             + "- while loop body.";
-    }
-
-    @Override
-    public String getName() {
-        return "Add brackets to control statement";
     }
 
     @Override

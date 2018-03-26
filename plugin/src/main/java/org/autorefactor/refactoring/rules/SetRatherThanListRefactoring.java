@@ -64,15 +64,23 @@ public class SetRatherThanListRefactoring extends AbstractClassSubstituteRefacto
 
     private boolean isContainsMethodUsed = false;
 
-    @Override
+    /**
+     * Get the name.
+     *
+     * @return the name.
+     */
+    public String getName() {
+        return "Set rather than List";
+    }
+
+    /**
+     * Get the description.
+     *
+     * @return the description.
+     */
     public String getDescription() {
         return ""
             + "Replace List by HashSet when only presence of items is used.";
-    }
-
-    @Override
-    public String getName() {
-        return "Set rather than List";
     }
 
     @Override

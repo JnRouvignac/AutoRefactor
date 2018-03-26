@@ -66,16 +66,24 @@ import org.eclipse.jdt.core.dom.IfStatement;
  * @see #getDescription()
  */
 public class CommonIfInIfElseRefactoring extends AbstractRefactoringRule {
-    @Override
+    /**
+     * Get the name.
+     *
+     * @return the name.
+     */
+    public String getName() {
+        return "Move common inner if statement from then/else clauses around outer if statement";
+    }
+
+    /**
+     * Get the description.
+     *
+     * @return the description.
+     */
     public String getDescription() {
         return ""
             + "Moves an inner if statement around the outer if condition,"
             + " when the inner if condition is common to both if/else clauses of the outer if statement.";
-    }
-
-    @Override
-    public String getName() {
-        return "Move common inner if statement from then/else clauses around outer if statement";
     }
 
     @Override

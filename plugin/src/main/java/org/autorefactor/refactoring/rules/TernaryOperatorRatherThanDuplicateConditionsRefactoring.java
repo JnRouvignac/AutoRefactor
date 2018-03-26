@@ -49,15 +49,23 @@ import org.eclipse.jdt.core.dom.PrefixExpression;
 
 /** See {@link #getDescription()} method. */
 public class TernaryOperatorRatherThanDuplicateConditionsRefactoring extends AbstractRefactoringRule {
-    @Override
+    /**
+     * Get the name.
+     *
+     * @return the name.
+     */
+    public String getName() {
+        return "Ternary operator rather than duplicate conditions";
+    }
+
+    /**
+     * Get the description.
+     *
+     * @return the description.
+     */
     public String getDescription() {
         return ""
             + "Replace (X && Y) || (!X && Z) by X ? Y : Z.";
-    }
-
-    @Override
-    public String getName() {
-        return "Ternary operator rather than duplicate conditions";
     }
 
     @Override

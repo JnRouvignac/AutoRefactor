@@ -25,10 +25,10 @@
  */
 package org.autorefactor.refactoring;
 
+import static org.autorefactor.util.Utils.equal;
+
 import org.eclipse.jdt.core.ISourceRange;
 import org.eclipse.jdt.core.dom.ASTNode;
-
-import static org.autorefactor.util.Utils.*;
 
 /** Represents a source location in a file, i.e. a position or a range in a source file. */
 public class SourceLocation implements ISourceRange, Comparable<ISourceRange> {
@@ -94,12 +94,20 @@ public class SourceLocation implements ISourceRange, Comparable<ISourceRange> {
         return range.getOffset() + range.getLength();
     }
 
-    @Override
+    /**
+     * Get the length.
+     *
+     * @return the length.
+     */
     public int getLength() {
         return this.length;
     }
 
-    @Override
+    /**
+     * Get the offset.
+     *
+     * @return the offset.
+     */
     public int getOffset() {
         return this.offset;
     }
@@ -173,7 +181,13 @@ public class SourceLocation implements ISourceRange, Comparable<ISourceRange> {
                 && getStartPosition() <= getEndPosition(range);
     }
 
-    @Override
+    /**
+     * Compare objects.
+     *
+     * @param sourceRange Second item
+     *
+     * @return -1, 0 or 1
+     */
     public int compareTo(ISourceRange sourceRange) {
         final int offsetDiff = this.offset - sourceRange.getOffset();
         if (offsetDiff != 0) {

@@ -25,6 +25,15 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.getCommentList;
+import static org.autorefactor.refactoring.ASTHelper.getNextSibling;
+import static org.autorefactor.refactoring.ASTHelper.resources;
+import static org.autorefactor.refactoring.SourceLocation.fromPositions;
+import static org.autorefactor.refactoring.SourceLocation.getEndPosition;
+import static org.autorefactor.util.Utils.getLast;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -55,24 +64,28 @@ import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.TypeDeclarationStatement;
 import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
 
-import static org.autorefactor.refactoring.ASTHelper.*;
-import static org.autorefactor.refactoring.SourceLocation.*;
-import static org.autorefactor.util.Utils.*;
-
 /**
  * See {@link #getDescription()} method.
  * <p>
  * TODO remove superfluous semi-colons in try-with-resources
  */
 public class RemoveSemiColonRefactoring extends AbstractRefactoringRule {
-    @Override
-    public String getDescription() {
-        return "Removes superfluous semi-colon after body declarations in type declarations.";
-    }
-
-    @Override
+    /**
+     * Get the name.
+     *
+     * @return the name.
+     */
     public String getName() {
         return "Remove semi-colons";
+    }
+
+    /**
+     * Get the description.
+     *
+     * @return the description.
+     */
+    public String getDescription() {
+        return "Removes superfluous semi-colon after body declarations in type declarations.";
     }
 
     @Override

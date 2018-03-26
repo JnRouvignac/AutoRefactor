@@ -25,6 +25,9 @@
  */
 package org.autorefactor.ui;
 
+import static org.autorefactor.AutoRefactorPlugin.getEnvironment;
+import static org.eclipse.jface.dialogs.MessageDialog.openInformation;
+
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -55,9 +58,6 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.handlers.HandlerUtil;
 
-import static org.autorefactor.AutoRefactorPlugin.*;
-import static org.eclipse.jface.dialogs.MessageDialog.*;
-
 /**
  * This is the Eclipse handler for launching the automated refactorings. This is
  * invoked from the Eclipse UI.
@@ -67,7 +67,15 @@ import static org.eclipse.jface.dialogs.MessageDialog.*;
  * >Extending Eclipse - Plug-in Development Tutorial</a>
  */
 public class AutoRefactorHandler extends AbstractHandler {
-    @Override
+    /**
+     * Execute.
+     *
+     * @param event The event
+     *
+     * @return An object
+     *
+     * @throws ExecutionException ExecutionException
+     */
     public Object execute(final ExecutionEvent event) throws ExecutionException {
         try {
             Environment environment = getEnvironment();
@@ -162,7 +170,9 @@ public class AutoRefactorHandler extends AbstractHandler {
 
     private static void showMessage(final Shell shell, final String message) {
         Display.getDefault().asyncExec(new Runnable() {
-            @Override
+            /**
+             * Run.
+             */
             public void run() {
                 openInformation(shell, "Info", message);
             }

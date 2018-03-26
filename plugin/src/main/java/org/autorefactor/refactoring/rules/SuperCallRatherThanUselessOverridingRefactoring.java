@@ -25,7 +25,11 @@
  */
 package org.autorefactor.refactoring.rules;
 
-import static org.autorefactor.refactoring.ASTHelper.*;
+import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.asExpression;
+import static org.autorefactor.refactoring.ASTHelper.hasType;
+import static org.autorefactor.refactoring.ASTHelper.statements;
 import static org.eclipse.jdt.core.search.IJavaSearchConstants.REFERENCES;
 import static org.eclipse.jdt.core.search.SearchPattern.R_EXACT_MATCH;
 import static org.eclipse.jdt.core.search.SearchPattern.createPattern;
@@ -55,14 +59,22 @@ import org.eclipse.jdt.core.search.SearchRequestor;
  * @see #getDescription()
  */
 public class SuperCallRatherThanUselessOverridingRefactoring extends AbstractRefactoringRule {
-    @Override
-    public String getDescription() {
-        return "Removes overriding of method if the overriding only call the super class.";
-    }
-
-    @Override
+    /**
+     * Get the name.
+     *
+     * @return the name.
+     */
     public String getName() {
         return "Super call rather than useless overriding";
+    }
+
+    /**
+     * Get the description.
+     *
+     * @return the description.
+     */
+    public String getDescription() {
+        return "Removes overriding of method if the overriding only call the super class.";
     }
 
     @Override

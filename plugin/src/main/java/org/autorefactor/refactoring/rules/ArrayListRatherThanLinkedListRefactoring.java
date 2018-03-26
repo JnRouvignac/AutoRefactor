@@ -57,15 +57,23 @@ public class ArrayListRatherThanLinkedListRefactoring extends AbstractClassSubst
                     "java.io.Serializable", "java.lang.Cloneable", "java.lang.Object"});
     }
 
-    @Override
+    /**
+     * Get the name.
+     *
+     * @return the name.
+     */
+    public String getName() {
+        return "ArrayList rather than LinkedList";
+    }
+
+    /**
+     * Get the description.
+     *
+     * @return the description.
+     */
     public String getDescription() {
         return ""
             + "Replace LinkedList by ArrayList when no item is inserted or removed in the middle of the list.";
-    }
-
-    @Override
-    public String getName() {
-        return "ArrayList rather than LinkedList";
     }
 
     @Override

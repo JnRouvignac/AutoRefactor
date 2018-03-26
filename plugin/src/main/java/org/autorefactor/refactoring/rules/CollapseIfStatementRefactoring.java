@@ -26,25 +26,37 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.as;
+import static org.autorefactor.refactoring.ASTHelper.hasOperator;
+import static org.eclipse.jdt.core.dom.InfixExpression.Operator.CONDITIONAL_AND;
+import static org.eclipse.jdt.core.dom.InfixExpression.Operator.CONDITIONAL_OR;
+
 import org.autorefactor.refactoring.ASTBuilder;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.InfixExpression;
 
-import static org.autorefactor.refactoring.ASTHelper.*;
-import static org.eclipse.jdt.core.dom.InfixExpression.Operator.*;
-
 /** See {@link #getDescription()} method. */
 @SuppressWarnings("javadoc")
 public class CollapseIfStatementRefactoring extends AbstractRefactoringRule {
-    @Override
-    public String getDescription() {
-        return "Collapses two consecutive if statements into just one.";
-    }
-
-    @Override
+    /**
+     * Get the name.
+     *
+     * @return the name.
+     */
     public String getName() {
         return "Collapse if statements";
+    }
+
+    /**
+     * Get the description.
+     *
+     * @return the description.
+     */
+    public String getDescription() {
+        return "Collapses two consecutive if statements into just one.";
     }
 
     @Override

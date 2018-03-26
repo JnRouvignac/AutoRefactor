@@ -51,14 +51,22 @@ import org.eclipse.jdt.core.dom.PrefixExpression;
 
 /** See {@link #getDescription()} method. */
 public class PushNegationDownRefactoring extends AbstractRefactoringRule {
-    @Override
-    public String getDescription() {
-        return "Pushes negations down, inside the negated expressions.";
-    }
-
-    @Override
+    /**
+     * Get the name.
+     *
+     * @return the name.
+     */
     public String getName() {
         return "Push negation down";
+    }
+
+    /**
+     * Get the description.
+     *
+     * @return the description.
+     */
+    public String getDescription() {
+        return "Pushes negations down, inside the negated expressions.";
     }
 
     @Override

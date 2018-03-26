@@ -65,7 +65,20 @@ import org.eclipse.jdt.core.dom.StringLiteral;
 
 /** See {@link #getDescription()} method. */
 public class StringBuilderRefactoring extends AbstractRefactoringRule {
-    @Override
+    /**
+     * Get the name.
+     *
+     * @return the name.
+     */
+    public String getName() {
+        return "StringBuilder";
+    }
+
+    /**
+     * Get the description.
+     *
+     * @return the description.
+     */
     public String getDescription() {
         return ""
             + "Refactors to a proper use of StringBuilders:\n"
@@ -73,11 +86,6 @@ public class StringBuilderRefactoring extends AbstractRefactoringRule {
             + " of StringBuffer/StringBuilder.append(),\n"
             + "- replace chained call to StringBuffer/StringBuilder constructor followed by calls to append()"
             + " and call toString() with straight String concatenation using operator '+'.";
-    }
-
-    @Override
-    public String getName() {
-        return "StringBuilder";
     }
 
     private boolean isEmptyString(final Expression expr) {

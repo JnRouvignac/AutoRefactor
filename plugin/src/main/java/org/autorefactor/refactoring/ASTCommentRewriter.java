@@ -25,6 +25,9 @@
  */
 package org.autorefactor.refactoring;
 
+import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
+import static org.autorefactor.refactoring.SourceLocation.getEndPosition;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -57,9 +60,6 @@ import org.eclipse.text.edits.MultiTextEdit;
 import org.eclipse.text.edits.ReplaceEdit;
 import org.eclipse.text.edits.TextEdit;
 import org.eclipse.text.edits.TextEditVisitor;
-
-import static org.autorefactor.refactoring.ASTHelper.*;
-import static org.autorefactor.refactoring.SourceLocation.*;
 
 /** This class rewrites AST comments. */
 public class ASTCommentRewriter {
@@ -167,7 +167,14 @@ public class ASTCommentRewriter {
             return;
         }
         Collections.sort(commentEdits, new Comparator<TextEdit>() {
-            @Override
+            /**
+             * Compare objects.
+             *
+             * @param te1 First item
+             * @param te2 Second item
+             *
+             * @return -1, 0 or 1
+             */
             public int compare(TextEdit te1, TextEdit te2) {
                 final SourceLocation sourceLoc1 = toSourceLoc(te1);
                 final SourceLocation sourceLoc2 = toSourceLoc(te2);

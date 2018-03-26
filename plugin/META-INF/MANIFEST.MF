@@ -11,7 +11,7 @@ Require-Bundle: org.eclipse.core.runtime,
 Bundle-ActivationPolicy: lazy
 Comment1: Need to follow Eclipse's supported JRE unless dictated by
 Comment2: functionalities required from Eclipse or JRE.
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
 CommentForImportPackage: FIXME JNR can we avoid accessing this internal package?
 Import-Package: org.eclipse.jdt.internal.corext.dom
 Export-Package: org.autorefactor.cfg;x-friends:="org.autorefactor.plugin.tests",

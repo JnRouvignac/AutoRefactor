@@ -36,15 +36,23 @@ import org.eclipse.jdt.core.dom.InfixExpression.Operator;
 
 /** See {@link #getDescription()} method. */
 public class LazyLogicalRatherThanEagerRefactoring extends AbstractRefactoringRule {
-    @Override
+    /**
+     * Get the name.
+     *
+     * @return the name.
+     */
+    public String getName() {
+        return "Lazy logical rather than eager";
+    }
+
+    /**
+     * Get the description.
+     *
+     * @return the description.
+     */
     public String getDescription() {
         return ""
             + "Replace & by && and | by || when the right operand is passive.";
-    }
-
-    @Override
-    public String getName() {
-        return "Lazy logical rather than eager";
     }
 
     @Override

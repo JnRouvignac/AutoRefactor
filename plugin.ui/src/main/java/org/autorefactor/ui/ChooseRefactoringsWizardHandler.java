@@ -47,7 +47,15 @@ import org.eclipse.ui.handlers.HandlerUtil;
  *      >Creating Eclipse Wizards - Tutorial </a>
  */
 public class ChooseRefactoringsWizardHandler extends AbstractHandler {
-    @Override
+    /**
+     * Execute.
+     *
+     * @param event The event
+     *
+     * @return An object
+     *
+     * @throws ExecutionException ExecutionException
+     */
     public Object execute(final ExecutionEvent event) throws ExecutionException {
         final Shell shell = HandlerUtil.getActiveShell(event);
         try {
@@ -58,7 +66,9 @@ public class ChooseRefactoringsWizardHandler extends AbstractHandler {
             dialog.open();
         } catch (final Exception e) {
             Display.getDefault().asyncExec(new Runnable() {
-                @Override
+                /**
+                 * Run.
+                 */
                 public void run() {
                     final StringWriter sw = new StringWriter();
                     final PrintWriter pw = new PrintWriter(sw);

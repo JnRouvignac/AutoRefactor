@@ -25,6 +25,13 @@
  */
 package org.autorefactor.ui;
 
+import static org.eclipse.jface.viewers.CheckboxTableViewer.newCheckList;
+import static org.eclipse.swt.SWT.BORDER;
+import static org.eclipse.swt.SWT.CHECK;
+import static org.eclipse.swt.SWT.HIDE_SELECTION;
+import static org.eclipse.swt.SWT.H_SCROLL;
+import static org.eclipse.swt.SWT.NO_FOCUS;
+
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -66,9 +73,6 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Text;
 
-import static org.eclipse.jface.viewers.CheckboxTableViewer.*;
-import static org.eclipse.swt.SWT.*;
-
 /**
  * Wizard page which allows the user to choose which refactorings to apply to the selected java elements.
  */
@@ -82,12 +86,24 @@ public class ChooseRefactoringWizardPage extends WizardPage {
             }
         }
 
-        @Override
+        /**
+         * True if it is checked.
+         *
+         * @param element The element
+         *
+         * @return True if it is checked.
+         */
         public boolean isChecked(Object element) {
             return Boolean.TRUE.equals(checkedState.get(element));
         }
 
-        @Override
+        /**
+         * True if it is grayed.
+         *
+         * @param element The element
+         *
+         * @return True if it is grayed.
+         */
         public boolean isGrayed(Object element) {
             return false;
         }
@@ -132,7 +148,11 @@ public class ChooseRefactoringWizardPage extends WizardPage {
         return results;
     }
 
-    @Override
+    /**
+     * create the control.
+     *
+     * @param parent The parent
+     */
     public void createControl(Composite parent) {
         parent.setLayout(new GridLayout());
 

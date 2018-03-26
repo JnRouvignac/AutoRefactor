@@ -26,6 +26,13 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.arguments;
+import static org.autorefactor.refactoring.ASTHelper.hasType;
+import static org.autorefactor.refactoring.ASTHelper.isMethod;
+import static org.eclipse.jdt.core.dom.MethodInvocation.NAME_PROPERTY;
+
 import java.util.List;
 
 import org.autorefactor.refactoring.ASTBuilder;
@@ -35,20 +42,25 @@ import org.autorefactor.util.IllegalArgumentException;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 
-import static org.autorefactor.refactoring.ASTHelper.*;
-import static org.eclipse.jdt.core.dom.MethodInvocation.*;
-
 /** See {@link #getDescription()} method. */
 @SuppressWarnings("javadoc")
 public class VectorOldToNewAPIRefactoring extends AbstractRefactoringRule {
-    @Override
-    public String getDescription() {
-        return "Replaces Vector pre-Collections APIs with equivalent Collections APIs.";
-    }
-
-    @Override
+    /**
+     * Get the name.
+     *
+     * @return the name.
+     */
     public String getName() {
         return "Collections APIs rather than Vector pre-Collections APIs";
+    }
+
+    /**
+     * Get the description.
+     *
+     * @return the description.
+     */
+    public String getDescription() {
+        return "Replaces Vector pre-Collections APIs with equivalent Collections APIs.";
     }
 
     @Override

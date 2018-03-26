@@ -26,6 +26,22 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.areBindingsEqual;
+import static org.autorefactor.refactoring.ASTHelper.arg0;
+import static org.autorefactor.refactoring.ASTHelper.asList;
+import static org.autorefactor.refactoring.ASTHelper.getFirstAncestorOrNull;
+import static org.autorefactor.refactoring.ASTHelper.isMethod;
+import static org.autorefactor.refactoring.ASTHelper.isSameVariable;
+import static org.eclipse.jdt.core.dom.ASTNode.ANNOTATION_TYPE_DECLARATION;
+import static org.eclipse.jdt.core.dom.ASTNode.ANONYMOUS_CLASS_DECLARATION;
+import static org.eclipse.jdt.core.dom.ASTNode.ENUM_DECLARATION;
+import static org.eclipse.jdt.core.dom.ASTNode.METHOD_INVOCATION;
+import static org.eclipse.jdt.core.dom.ASTNode.TYPE_DECLARATION;
+import static org.eclipse.jdt.core.dom.EnhancedForStatement.EXPRESSION_PROPERTY;
+import static org.eclipse.jdt.core.dom.EnhancedForStatement.PARAMETER_PROPERTY;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
@@ -55,22 +71,25 @@ import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
-import static org.autorefactor.refactoring.ASTHelper.*;
-import static org.eclipse.jdt.core.dom.ASTNode.*;
-import static org.eclipse.jdt.core.dom.EnhancedForStatement.*;
-
 /** See {@link #getDescription()} method. */
 public class MapEliminateKeySetCallsRefactoring extends AbstractRefactoringRule {
+    /**
+     * Get the name.
+     *
+     * @return the name.
+     */
+    public String getName() {
+        return "Replace useless calls to Map.keySet() when direct calls to the Map are possible";
+    }
 
-    @Override
+    /**
+     * Get the description.
+     *
+     * @return the description.
+     */
     public String getDescription() {
         return ""
                 + "Convert for loops iterating on Map.keySet() to iterate on Map.entrySet() when possible.";
-    }
-
-    @Override
-    public String getName() {
-        return "Replace useless calls to Map.keySet() when direct calls to the Map are possible";
     }
 
     /**

@@ -26,6 +26,21 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import static java.util.Arrays.asList;
+import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.bodyDeclarations;
+import static org.autorefactor.refactoring.ASTHelper.getAncestorOrNull;
+import static org.autorefactor.refactoring.ASTHelper.getFirstAncestorOrNull;
+import static org.autorefactor.refactoring.ASTHelper.isMethod;
+import static org.autorefactor.refactoring.ASTHelper.isSameVariable;
+import static org.autorefactor.refactoring.ASTHelper.modifiers;
+import static org.autorefactor.refactoring.ASTHelper.parameters;
+import static org.autorefactor.refactoring.ASTHelper.statements;
+import static org.eclipse.jdt.core.dom.ASTNode.SIMPLE_NAME;
+import static org.eclipse.jdt.core.dom.Assignment.Operator.ASSIGN;
+import static org.eclipse.jdt.core.dom.InfixExpression.Operator.EQUALS;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,13 +71,6 @@ import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
-import static java.util.Arrays.*;
-
-import static org.autorefactor.refactoring.ASTHelper.*;
-import static org.eclipse.jdt.core.dom.ASTNode.*;
-import static org.eclipse.jdt.core.dom.Assignment.Operator.*;
-import static org.eclipse.jdt.core.dom.InfixExpression.Operator.*;
-
 /**
  * TODO when findViewById is reusing a local variable, the viewHolderItem will create a new field
  * with duplicate name.
@@ -76,16 +84,23 @@ import static org.eclipse.jdt.core.dom.InfixExpression.Operator.*;
  * @see {@link #getDescription()} method.
  */
 public class AndroidViewHolderRefactoring extends AbstractRefactoringRule {
+    /**
+     * Get the name.
+     *
+     * @return the name.
+     */
+    public String getName() {
+        return "Android ViewHolder";
+    }
 
-    @Override
+    /**
+     * Get the description.
+     *
+     * @return the description.
+     */
     public String getDescription() {
         return "Android - Optimize getView() routines for Android applications. "
                 + "It reduces the number calls to the costly inflate()) and getViewById() Android API methods.";
-    }
-
-    @Override
-    public String getName() {
-        return "Android ViewHolder";
     }
 
     @Override

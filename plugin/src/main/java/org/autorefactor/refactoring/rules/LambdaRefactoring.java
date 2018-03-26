@@ -59,12 +59,20 @@ import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
 /** See {@link #getDescription()} method. */
 public class LambdaRefactoring extends AbstractRefactoringRule {
-    @Override
+    /**
+     * Get the name.
+     *
+     * @return the name.
+     */
     public String getName() {
         return "Improve lambda expressions";
     }
 
-    @Override
+    /**
+     * Get the description.
+     *
+     * @return the description.
+     */
     public String getDescription() {
         return ""
                 + "Improve lambda expressions.";
@@ -173,7 +181,7 @@ public class LambdaRefactoring extends AbstractRefactoringRule {
                     if (((VariableDeclarationFragment) node.parameters().get(0)).getName().getIdentifier()
                             .equals(calledObject.getIdentifier())) {
                         for (int i = 0; i < arguments.size(); i++) {
-                            final ASTNode expr = removeParentheses((ASTNode) arguments.get(i));
+                            final ASTNode expr = removeParentheses(arguments.get(i));
                             if (!(expr instanceof SimpleName)) {
                                 return VISIT_SUBTREE;
                             }
@@ -212,7 +220,7 @@ public class LambdaRefactoring extends AbstractRefactoringRule {
         }
 
         private boolean isSameIdentifier(final LambdaExpression node, final List<ASTNode> arguments, final int i) {
-            final ASTNode expr = removeParentheses((ASTNode) arguments.get(i));
+            final ASTNode expr = removeParentheses(arguments.get(i));
             if (expr instanceof SimpleName) {
                 final SimpleName argument = (SimpleName) expr;
 

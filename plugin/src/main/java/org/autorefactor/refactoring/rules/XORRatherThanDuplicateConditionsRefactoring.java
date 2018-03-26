@@ -50,15 +50,23 @@ import org.eclipse.jdt.core.dom.PrefixExpression;
 
 /** See {@link #getDescription()} method. */
 public class XORRatherThanDuplicateConditionsRefactoring extends AbstractRefactoringRule {
-    @Override
+    /**
+     * Get the name.
+     *
+     * @return the name.
+     */
+    public String getName() {
+        return "XOR rather than duplicate conditions";
+    }
+
+    /**
+     * Get the description.
+     *
+     * @return the description.
+     */
     public String getDescription() {
         return ""
             + "Replace (X && !Y) || (!X && Y) by X ^ Y.";
-    }
-
-    @Override
-    public String getName() {
-        return "XOR rather than duplicate conditions";
     }
 
     @Override

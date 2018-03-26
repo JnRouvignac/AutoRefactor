@@ -82,17 +82,30 @@ public class AutoRefactorPlugin extends AbstractUIPlugin {
             log.log(new Status(severity, PLUGIN_ID, message, e));
         }
 
-        @Override
+        /**
+         * Log a warning message.
+         *
+         * @param message the message
+         */
         public void warn(String message) {
             log(IStatus.WARNING, message, null);
         }
 
-        @Override
+        /**
+         * Log a error message.
+         *
+         * @param message the message
+         */
         public void error(String message) {
             log(IStatus.ERROR, message, null);
         }
 
-        @Override
+        /**
+         * Log a error message with exception.
+         *
+         * @param message the message
+         * @param e the exception
+         */
         public void error(String message, Exception e) {
             log(IStatus.ERROR, message, e);
         }
@@ -148,12 +161,20 @@ public class AutoRefactorPlugin extends AbstractUIPlugin {
     private static class JobManagerImpl implements JobManager {
         private final Vector<Job> jobs = new Vector<Job>();
 
-        @Override
+        /**
+         * Register a job.
+         *
+         * @param job the job
+         */
         public void register(Job job) {
             jobs.add(job);
         }
 
-        @Override
+        /**
+         * Unregister a job.
+         *
+         * @param job the job
+         */
         public void unregister(Job job) {
             jobs.remove(job);
         }

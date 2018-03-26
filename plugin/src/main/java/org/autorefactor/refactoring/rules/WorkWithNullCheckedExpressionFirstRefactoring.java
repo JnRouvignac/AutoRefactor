@@ -26,6 +26,18 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.as;
+import static org.autorefactor.refactoring.ASTHelper.asList;
+import static org.autorefactor.refactoring.ASTHelper.getNextSibling;
+import static org.autorefactor.refactoring.ASTHelper.hasOperator;
+import static org.autorefactor.refactoring.ASTHelper.is;
+import static org.autorefactor.refactoring.ASTHelper.isNullLiteral;
+import static org.eclipse.jdt.core.dom.InfixExpression.OPERATOR_PROPERTY;
+import static org.eclipse.jdt.core.dom.InfixExpression.Operator.EQUALS;
+import static org.eclipse.jdt.core.dom.InfixExpression.Operator.NOT_EQUALS;
+
 import java.util.List;
 
 import org.autorefactor.refactoring.ASTBuilder;
@@ -39,24 +51,28 @@ import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.Statement;
 
-import static org.autorefactor.refactoring.ASTHelper.*;
-import static org.eclipse.jdt.core.dom.InfixExpression.*;
-import static org.eclipse.jdt.core.dom.InfixExpression.Operator.*;
-
 /** See {@link #getDescription()} method. */
 @SuppressWarnings("javadoc")
 public class WorkWithNullCheckedExpressionFirstRefactoring extends AbstractRefactoringRule {
-    @Override
+    /**
+     * Get the name.
+     *
+     * @return the name.
+     */
+    public String getName() {
+        return "Work with null checked expressions first";
+    }
+
+    /**
+     * Get the description.
+     *
+     * @return the description.
+     */
     public String getDescription() {
         return ""
                 + "Refactors if statements with a null checked expression"
                 + " to work with the not null case in the then clause"
                 + " and then work with the null case in the else clause.";
-    }
-
-    @Override
-    public String getName() {
-        return "Work with null checked expressions first";
     }
 
     @Override

@@ -25,6 +25,13 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.modifiers;
+import static org.autorefactor.refactoring.ASTHelper.resources;
+import static org.eclipse.jdt.core.dom.Modifier.isFinal;
+import static org.eclipse.jdt.core.dom.Modifier.isPrivate;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -35,8 +42,8 @@ import java.util.List;
 
 import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.util.NotImplementedException;
-import org.eclipse.jdt.core.dom.Annotation;
 import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.Annotation;
 import org.eclipse.jdt.core.dom.AnnotationTypeDeclaration;
 import org.eclipse.jdt.core.dom.AnnotationTypeMemberDeclaration;
 import org.eclipse.jdt.core.dom.BodyDeclaration;
@@ -51,13 +58,22 @@ import org.eclipse.jdt.core.dom.TryStatement;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
 
-import static org.autorefactor.refactoring.ASTHelper.*;
-import static org.eclipse.jdt.core.dom.Modifier.isFinal;
-import static org.eclipse.jdt.core.dom.Modifier.isPrivate;
-
 /** See {@link #getDescription()} method. */
 public class RemoveUselessModifiersRefactoring extends AbstractRefactoringRule {
-    @Override
+    /**
+     * Get the name.
+     *
+     * @return the name.
+     */
+    public String getName() {
+        return "Remove useless modifiers";
+    }
+
+    /**
+     * Get the description.
+     *
+     * @return the description.
+     */
     public String getDescription() {
         return ""
                 + "Fixes modifier order.\n"
@@ -68,13 +84,15 @@ public class RemoveUselessModifiersRefactoring extends AbstractRefactoringRule {
                 + "- \"final\" for parameters in interface method declarations.";
     }
 
-    @Override
-    public String getName() {
-        return "Remove useless modifiers";
-    }
-
     private static final class ModifierOrderComparator implements Comparator<IExtendedModifier> {
-        @Override
+        /**
+         * Compare objects.
+         *
+         * @param o1 First item
+         * @param o2 Second item
+         *
+         * @return -1, 0 or 1
+         */
         public int compare(IExtendedModifier o1, IExtendedModifier o2) {
             if (o1.isAnnotation()) {
                 if (o2.isAnnotation()) {

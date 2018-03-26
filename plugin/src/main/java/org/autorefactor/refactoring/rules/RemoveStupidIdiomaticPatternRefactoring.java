@@ -56,14 +56,22 @@ import java.util.List;
  */
 /** See {@link #getDescription()} method. */
 public class RemoveStupidIdiomaticPatternRefactoring extends AbstractRefactoringRule {
-    @Override
-    public String getDescription() {
-        return "Refactors to a proper use of try statements and return statements.";
-    }
-
-    @Override
+    /**
+     * Get the name.
+     *
+     * @return the name.
+     */
     public String getName() {
         return "Try statement then return";
+    }
+
+    /**
+     * Get the description.
+     *
+     * @return the description.
+     */
+    public String getDescription() {
+        return "Refactors to a proper use of try statements and return statements.";
     }
 
     // TODO JNR

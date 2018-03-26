@@ -38,16 +38,23 @@ import org.eclipse.jdt.core.dom.MethodInvocation;
 
 /** See {@link #getDescription()} method. */
 public class MethodOnMapRatherThanMethodOnKeySetRefactoring extends AbstractRefactoringRule {
+    /**
+     * Get the name.
+     *
+     * @return the name.
+     */
+    public String getName() {
+        return "Method on map rather than method on keyset";
+    }
 
-    @Override
+    /**
+     * Get the description.
+     *
+     * @return the description.
+     */
     public String getDescription() {
         return ""
                 + "Directly invoke methods on Map rather than on Map.keySet() when possible.";
-    }
-
-    @Override
-    public String getName() {
-        return "Method on map rather than method on keyset";
     }
 
     @Override

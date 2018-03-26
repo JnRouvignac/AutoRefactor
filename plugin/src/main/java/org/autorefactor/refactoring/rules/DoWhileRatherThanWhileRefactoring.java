@@ -37,14 +37,22 @@ import org.eclipse.jdt.core.dom.WhileStatement;
  * @see #getDescription()
  */
 public class DoWhileRatherThanWhileRefactoring extends AbstractRefactoringRule {
-    @Override
-    public String getDescription() {
-        return "Replace while by do/while when the first evaluation is always true.";
-    }
-
-    @Override
+    /**
+     * Get the name.
+     *
+     * @return the name.
+     */
     public String getName() {
         return "Do/while rather than while";
+    }
+
+    /**
+     * Get the description.
+     *
+     * @return the description.
+     */
+    public String getDescription() {
+        return "Replace while by do/while when the first evaluation is always true.";
     }
 
     @Override

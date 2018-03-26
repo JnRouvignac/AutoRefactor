@@ -25,6 +25,25 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.asExpression;
+import static org.autorefactor.refactoring.ASTHelper.asList;
+import static org.autorefactor.refactoring.ASTHelper.fragments;
+import static org.autorefactor.refactoring.ASTHelper.hasOperator;
+import static org.autorefactor.refactoring.ASTHelper.haveSameType;
+import static org.autorefactor.refactoring.ASTHelper.initializers;
+import static org.autorefactor.refactoring.ASTHelper.isPrimitive;
+import static org.autorefactor.refactoring.ASTHelper.updaters;
+import static org.autorefactor.util.Utils.equalNotNull;
+import static org.eclipse.jdt.core.dom.Assignment.Operator.ASSIGN;
+import static org.eclipse.jdt.core.dom.InfixExpression.Operator.GREATER;
+import static org.eclipse.jdt.core.dom.InfixExpression.Operator.GREATER_EQUALS;
+import static org.eclipse.jdt.core.dom.InfixExpression.Operator.LESS;
+import static org.eclipse.jdt.core.dom.InfixExpression.Operator.LESS_EQUALS;
+import static org.eclipse.jdt.core.dom.InfixExpression.Operator.MINUS;
+import static org.eclipse.jdt.core.dom.InfixExpression.Operator.PLUS;
+
 import java.util.List;
 
 import org.autorefactor.refactoring.ASTBuilder;
@@ -45,25 +64,27 @@ import org.eclipse.jdt.core.dom.TryStatement;
 import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
-import static org.autorefactor.refactoring.ASTHelper.*;
-import static org.autorefactor.util.Utils.*;
-import static org.eclipse.jdt.core.dom.Assignment.Operator.*;
-import static org.eclipse.jdt.core.dom.InfixExpression.Operator.*;
-
 /** See {@link #getDescription()} method. */
 public class HotSpotIntrinsicedAPIsRefactoring extends AbstractRefactoringRule {
+    /**
+     * Get the name.
+     *
+     * @return the name.
+     */
+    public String getName() {
+        return "HotSpot intrinsiced APIs";
+    }
 
-    @Override
+    /**
+     * Get the description.
+     *
+     * @return the description.
+     */
     public String getDescription() {
         return ""
             + "Refactors code patterns to use intrinsiced APIs in Hotspot JVM.\n"
             + "Intrinsics are APIs that receive special treatment when JITed:"
             + " they can be compiled down to use very efficient CPU instructions.";
-    }
-
-    @Override
-    public String getName() {
-        return "HotSpot intrinsiced APIs";
     }
 
     private static class SystemArrayCopyParams {

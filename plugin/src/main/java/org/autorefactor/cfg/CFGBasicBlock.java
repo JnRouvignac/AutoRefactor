@@ -25,13 +25,13 @@
  */
 package org.autorefactor.cfg;
 
+import static org.autorefactor.util.Utils.equal;
+
 import java.util.Collection;
 import java.util.LinkedList;
 
 import org.autorefactor.util.IllegalArgumentException;
 import org.eclipse.jdt.core.dom.ASTNode;
-
-import static org.autorefactor.util.Utils.*;
 
 /**
  * Control Flow Graph Basic Block. Basic blocks here are a little different from
@@ -228,7 +228,13 @@ public class CFGBasicBlock implements Comparable<CFGBasicBlock> {
                 && equal(isEntryBlock, other.isEntryBlock);
     }
 
-    @Override
+    /**
+     * Compare objects.
+     *
+     * @param o Second item
+     *
+     * @return -1, 0 or 1
+     */
     public int compareTo(CFGBasicBlock o) {
         final Integer startPosition = lineAndColumn.getStartPosition();
         return startPosition.compareTo(o.lineAndColumn.getStartPosition());

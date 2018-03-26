@@ -38,15 +38,23 @@ import org.eclipse.jdt.core.dom.StringLiteral;
 
 /** See {@link #getDescription()} method. */
 public class StringValueOfRatherThanConcatRefactoring extends AbstractRefactoringRule {
-    @Override
+    /**
+     * Get the name.
+     *
+     * @return the name.
+     */
+    public String getName() {
+        return "String.valueOf() rather than concatenation";
+    }
+
+    /**
+     * Get the description.
+     *
+     * @return the description.
+     */
     public String getDescription() {
         return ""
             + "Replace forced string tranformation by String.valueOf().";
-    }
-
-    @Override
-    public String getName() {
-        return "String.valueOf() rather than concatenation";
     }
 
     @Override

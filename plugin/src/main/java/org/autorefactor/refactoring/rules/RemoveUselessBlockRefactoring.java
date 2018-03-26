@@ -25,7 +25,11 @@
  */
 package org.autorefactor.refactoring.rules;
 
-import static org.autorefactor.refactoring.ASTHelper.*;
+import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.getLocalVariableIdentifiers;
+import static org.autorefactor.refactoring.ASTHelper.getNextSiblings;
+import static org.autorefactor.refactoring.ASTHelper.statements;
 
 import java.util.HashSet;
 import java.util.List;
@@ -38,14 +42,22 @@ import org.eclipse.jdt.core.dom.Statement;
 
 /** See {@link #getDescription()} method. */
 public class RemoveUselessBlockRefactoring extends AbstractRefactoringRule {
-    @Override
-    public String getDescription() {
-        return "Removes lone and embedded block.";
-    }
-
-    @Override
+    /**
+     * Get the name.
+     *
+     * @return the name.
+     */
     public String getName() {
         return "Remove useless block";
+    }
+
+    /**
+     * Get the description.
+     *
+     * @return the description.
+     */
+    public String getDescription() {
+        return "Removes lone and embedded block.";
     }
 
     @Override

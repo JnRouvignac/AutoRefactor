@@ -50,15 +50,23 @@ import org.eclipse.jdt.core.dom.PrefixExpression;
 
 /** See {@link #getDescription()} method. */
 public class BooleanEqualsRatherThanNullCheckRefactoring extends AbstractRefactoringRule {
-    @Override
+    /**
+     * Get the name.
+     *
+     * @return the name.
+     */
+    public String getName() {
+        return "Boolean equals() rather than null check";
+    }
+
+    /**
+     * Get the description.
+     *
+     * @return the description.
+     */
     public String getDescription() {
         return ""
             + "Replace a null check of a Boolean followed by its value by an equality with a boolean constant.";
-    }
-
-    @Override
-    public String getName() {
-        return "Boolean equals() rather than null check";
     }
 
     @Override

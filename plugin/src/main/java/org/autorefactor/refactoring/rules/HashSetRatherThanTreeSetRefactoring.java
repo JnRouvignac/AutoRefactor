@@ -58,15 +58,23 @@ public class HashSetRatherThanTreeSetRefactoring extends AbstractClassSubstitute
                     "java.io.Serializable", "java.lang.Cloneable", "java.lang.Object"});
     }
 
-    @Override
+    /**
+     * Get the name.
+     *
+     * @return the name.
+     */
+    public String getName() {
+        return "HashSet rather than TreeSet";
+    }
+
+    /**
+     * Get the description.
+     *
+     * @return the description.
+     */
     public String getDescription() {
         return ""
             + "Replace TreeSet by HashSet when the entry order is not used.";
-    }
-
-    @Override
-    public String getName() {
-        return "HashSet rather than TreeSet";
     }
 
     @Override

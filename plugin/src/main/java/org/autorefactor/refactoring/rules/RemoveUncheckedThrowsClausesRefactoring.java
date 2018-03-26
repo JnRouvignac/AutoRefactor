@@ -25,7 +25,10 @@
  */
 package org.autorefactor.refactoring.rules;
 
-import static org.autorefactor.refactoring.ASTHelper.*;
+import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.instanceOf;
+import static org.autorefactor.refactoring.ASTHelper.thrownExceptionTypes;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -38,14 +41,21 @@ import org.eclipse.jdt.core.dom.Type;
 
 /** See {@link #getDescription()} method. */
 public final class RemoveUncheckedThrowsClausesRefactoring extends AbstractRefactoringRule {
-
-    @Override
-    public String getDescription() {
+    /**
+     * Get the name.
+     *
+     * @return the name.
+     */
+    public String getName() {
         return "Remove unchecked exceptions from throws clause";
     }
 
-    @Override
-    public String getName() {
+    /**
+     * Get the description.
+     *
+     * @return the description.
+     */
+    public String getDescription() {
         return "Remove unchecked exceptions from throws clause";
     }
 

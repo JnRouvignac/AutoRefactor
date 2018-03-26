@@ -25,6 +25,15 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.asExpression;
+import static org.autorefactor.refactoring.ASTHelper.getAncestor;
+import static org.autorefactor.refactoring.ASTHelper.initializers;
+import static org.autorefactor.refactoring.ASTHelper.isEqual;
+import static org.autorefactor.refactoring.ASTHelper.statements;
+import static org.autorefactor.util.Utils.equalNotNull;
+import static org.autorefactor.util.Utils.getLast;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -66,9 +75,6 @@ import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 import org.eclipse.jdt.core.dom.WhileStatement;
 
-import static org.autorefactor.refactoring.ASTHelper.*;
-import static org.autorefactor.util.Utils.*;
-
 /**
  * TODO JNR can we also transform singular fields into local variables?
  *
@@ -76,14 +82,22 @@ import static org.autorefactor.util.Utils.*;
  */
 @SuppressWarnings("javadoc")
 public class ReduceVariableScopeRefactoring extends AbstractRefactoringRule {
-    @Override
-    public String getDescription() {
-        return "Reduces the scope of local variables.";
-    }
-
-    @Override
+    /**
+     * Get the name.
+     *
+     * @return the name.
+     */
     public String getName() {
         return "Reduce scope of variable";
+    }
+
+    /**
+     * Get the description.
+     *
+     * @return the description.
+     */
+    public String getDescription() {
+        return "Reduces the scope of local variables.";
     }
 
     private static final int DECL  = 1 << 0;

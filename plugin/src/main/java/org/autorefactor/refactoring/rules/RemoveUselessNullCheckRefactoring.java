@@ -26,6 +26,20 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.as;
+import static org.autorefactor.refactoring.ASTHelper.asExpression;
+import static org.autorefactor.refactoring.ASTHelper.asList;
+import static org.autorefactor.refactoring.ASTHelper.getNextSibling;
+import static org.autorefactor.refactoring.ASTHelper.hasOperator;
+import static org.autorefactor.refactoring.ASTHelper.is;
+import static org.autorefactor.refactoring.ASTHelper.isNullLiteral;
+import static org.autorefactor.refactoring.ASTHelper.match;
+import static org.eclipse.jdt.core.dom.Assignment.Operator.ASSIGN;
+import static org.eclipse.jdt.core.dom.InfixExpression.Operator.EQUALS;
+import static org.eclipse.jdt.core.dom.InfixExpression.Operator.NOT_EQUALS;
+
 import java.util.List;
 
 import org.autorefactor.refactoring.ASTBuilder;
@@ -39,25 +53,29 @@ import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.Statement;
 
-import static org.autorefactor.refactoring.ASTHelper.*;
-import static org.eclipse.jdt.core.dom.Assignment.Operator.*;
-import static org.eclipse.jdt.core.dom.InfixExpression.Operator.*;
-
 /** See {@link #getDescription()} method. */
 @SuppressWarnings("javadoc")
 public class RemoveUselessNullCheckRefactoring extends AbstractRefactoringRule {
-    @Override
+    /**
+     * Get the name.
+     *
+     * @return the name.
+     */
+    public String getName() {
+        return "Remove useless null checks";
+    }
+
+    /**
+     * Get the description.
+     *
+     * @return the description.
+     */
     public String getDescription() {
         return ""
                 + "Removes useless null checks before assignments or return statements.\n"
                 + "Such useless null checks are comparing an expression against null,\n"
                 + "then either assigning null or the expression depending on the result of the null check.\n"
                 + "It is simpler to directly assign the expression.";
-    }
-
-    @Override
-    public String getName() {
-        return "Remove useless null checks";
     }
 
     @Override

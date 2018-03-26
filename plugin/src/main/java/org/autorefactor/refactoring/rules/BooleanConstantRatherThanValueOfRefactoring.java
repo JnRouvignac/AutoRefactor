@@ -39,15 +39,23 @@ import org.eclipse.jdt.core.dom.Name;
 
 /** See {@link #getDescription()} method. */
 public class BooleanConstantRatherThanValueOfRefactoring extends AbstractRefactoringRule {
-    @Override
+    /**
+     * Get the name.
+     *
+     * @return the name.
+     */
+    public String getName() {
+        return "Boolean constant rather than valueOf()";
+    }
+
+    /**
+     * Get the description.
+     *
+     * @return the description.
+     */
     public String getDescription() {
         return ""
             + "Replace Boolean.valueOf(true) and Boolean.valueOf(false) by Boolean.TRUE and Boolean.FALSE.";
-    }
-
-    @Override
-    public String getName() {
-        return "Boolean constant rather than valueOf()";
     }
 
     @Override

@@ -26,6 +26,13 @@
  */
 package org.autorefactor.ui.preferences;
 
+import static org.autorefactor.preferences.PreferenceConstants.DEBUG_MODE_ON;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
 import org.autorefactor.AutoRefactorPlugin;
 import org.autorefactor.refactoring.RefactoringRule;
 import org.autorefactor.refactoring.rules.AllRefactoringRules;
@@ -42,13 +49,6 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
-
-import static org.autorefactor.preferences.PreferenceConstants.*;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
 
 /** The Eclipse preference page for AutoRefactor. */
 public class WorkspacePreferencePage extends PreferencePage implements IWorkbenchPreferencePage {
@@ -68,7 +68,11 @@ public class WorkspacePreferencePage extends PreferencePage implements IWorkbenc
         setPreferenceStore(AutoRefactorPlugin.getDefault().getPreferenceStore());
     }
 
-    @Override
+    /**
+     * Initialization.
+     *
+     * @param workbench The workbench
+     */
     public void init(IWorkbench workbench) {
     }
 
@@ -76,7 +80,14 @@ public class WorkspacePreferencePage extends PreferencePage implements IWorkbenc
     protected Control createContents(Composite parent) {
         final List<RefactoringRule> allRefactoringRules = AllRefactoringRules.getAllRefactoringRules();
         Collections.sort(allRefactoringRules, new Comparator<RefactoringRule>() {
-            @Override
+            /**
+             * Compare objects.
+             *
+             * @param o1 First item
+             * @param o2 Second item
+             *
+             * @return -1, 0 or 1
+             */
             public int compare(final RefactoringRule o1, final RefactoringRule o2) {
                 return o1.getName().compareTo(o2.getName());
             }
@@ -108,6 +119,7 @@ public class WorkspacePreferencePage extends PreferencePage implements IWorkbenc
         toggleAllRules.setFont(ruleGroup.getFont());
         toggleAllRules.setText("Toggle all the rules");
         toggleAllRules.addSelectionListener(new SelectionAdapter() {
+            @Override
             public void widgetSelected(SelectionEvent e) {
                 boolean isSelected = WorkspacePreferencePage.this.toggleAllRules.getSelection();
                 for (BooleanFieldEditor rule : WorkspacePreferencePage.this.rules) {
@@ -127,6 +139,7 @@ public class WorkspacePreferencePage extends PreferencePage implements IWorkbenc
                     refactoringRule.getName(), SWT.WRAP, ruleGroup);
             booleanFieldEditor.getDescriptionControl(ruleGroup).setToolTipText(refactoringRule.getDescription());
             ((Button) booleanFieldEditor.getDescriptionControl(ruleGroup)).addSelectionListener(new SelectionAdapter() {
+                @Override
                 public void widgetSelected(final SelectionEvent e) {
                     invalidateToggleRules(ruleGroup);
                 }

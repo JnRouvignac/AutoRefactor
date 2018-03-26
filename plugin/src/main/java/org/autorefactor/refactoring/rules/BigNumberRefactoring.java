@@ -58,8 +58,20 @@ import org.eclipse.jdt.core.dom.StringLiteral;
 /** See {@link #getDescription()} method. */
 @SuppressWarnings("javadoc")
 public class BigNumberRefactoring extends AbstractRefactoringRule {
+    /**
+     * Get the name.
+     *
+     * @return the name.
+     */
+    public String getName() {
+        return "Big number";
+    }
 
-    @Override
+    /**
+     * Get the description.
+     *
+     * @return the description.
+     */
     public String getDescription() {
         return ""
             + "Refactors to a proper use of BigDecimals and BigIntegers:\n"
@@ -67,11 +79,6 @@ public class BigNumberRefactoring extends AbstractRefactoringRule {
             + "- create BigDecimals or BigIntegers from integers rather than String representing integers,\n"
             + "- use BigDecimal or BigInteger constants,\n"
             + "- replace calls to equals() with calls to compareTo().";
-    }
-
-    @Override
-    public String getName() {
-        return "Big number";
     }
 
     private int getJavaMinorVersion() {

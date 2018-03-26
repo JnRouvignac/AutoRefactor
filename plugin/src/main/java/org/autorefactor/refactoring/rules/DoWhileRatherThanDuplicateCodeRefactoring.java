@@ -36,20 +36,28 @@ import java.util.List;
 
 import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.Refactorings;
-import org.eclipse.jdt.core.dom.WhileStatement;
 import org.eclipse.jdt.core.dom.ASTMatcher;
 import org.eclipse.jdt.core.dom.Statement;
+import org.eclipse.jdt.core.dom.WhileStatement;
 
 /** See {@link #getDescription()} method. */
 public class DoWhileRatherThanDuplicateCodeRefactoring extends AbstractRefactoringRule {
-    @Override
-    public String getDescription() {
-        return "Replace while by do/while when the loop statements are duplicated before the loop.";
-    }
-
-    @Override
+    /**
+     * Get the name.
+     *
+     * @return the name.
+     */
     public String getName() {
         return "Do/while rather than duplicate code";
+    }
+
+    /**
+     * Get the description.
+     *
+     * @return the description.
+     */
+    public String getDescription() {
+        return "Replace while by do/while when the loop statements are duplicated before the loop.";
     }
 
     @Override

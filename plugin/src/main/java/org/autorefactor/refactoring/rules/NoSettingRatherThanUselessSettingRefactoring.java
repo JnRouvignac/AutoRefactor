@@ -42,15 +42,23 @@ import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
 /** See {@link #getDescription()} method. */
 public class NoSettingRatherThanUselessSettingRefactoring extends AbstractRefactoringRule {
-    @Override
+    /**
+     * Get the name.
+     *
+     * @return the name.
+     */
+    public String getName() {
+        return "No setting rather than useless setting";
+    }
+
+    /**
+     * Get the description.
+     *
+     * @return the description.
+     */
     public String getDescription() {
         return ""
                 + "Remove passive assignment when the variable is reassigned before being read.";
-    }
-
-    @Override
-    public String getName() {
-        return "No setting rather than useless setting";
     }
 
     @Override

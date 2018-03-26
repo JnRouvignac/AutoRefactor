@@ -41,15 +41,22 @@ import org.eclipse.jdt.core.dom.TypeDeclaration;
 /** See {@link #getDescription()} method. */
 public class ImplicitDefaultConstructorRatherThanWrittenOneRefactoring extends
         AbstractRefactoringRule {
-
-    @Override
-    public String getDescription() {
-        return "Remove single public constructor with no arguments, no annotation and no code.";
-    }
-
-    @Override
+    /**
+     * Get the name.
+     *
+     * @return the name.
+     */
     public String getName() {
         return "Implicit default constructor rather than written one";
+    }
+
+    /**
+     * Get the description.
+     *
+     * @return the description.
+     */
+    public String getDescription() {
+        return "Remove single public constructor with no arguments, no annotation and no code.";
     }
 
     @Override

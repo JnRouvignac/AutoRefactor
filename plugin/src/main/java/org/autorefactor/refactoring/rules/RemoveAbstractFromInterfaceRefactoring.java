@@ -35,15 +35,23 @@ import org.eclipse.jdt.core.dom.TypeDeclaration;
 
 /** See {@link #getDescription()} method. */
 public class RemoveAbstractFromInterfaceRefactoring extends AbstractRefactoringRule {
-    @Override
+    /**
+     * Get the name.
+     *
+     * @return the name.
+     */
+    public String getName() {
+        return "Remove abstract from interface";
+    }
+
+    /**
+     * Get the description.
+     *
+     * @return the description.
+     */
     public String getDescription() {
         return ""
             + "Remove the useless abstract modifier from interface.";
-    }
-
-    @Override
-    public String getName() {
-        return "Remove abstract from interface";
     }
 
     @Override

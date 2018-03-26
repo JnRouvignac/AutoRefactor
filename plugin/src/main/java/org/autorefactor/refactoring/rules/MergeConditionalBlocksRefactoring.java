@@ -25,29 +25,40 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.asList;
+import static org.autorefactor.refactoring.ASTHelper.match;
+
 import java.util.List;
 
 import org.autorefactor.refactoring.ASTBuilder;
-import org.autorefactor.refactoring.Refactorings;
 import org.autorefactor.refactoring.ASTBuilder.Copy;
+import org.autorefactor.refactoring.Refactorings;
 import org.eclipse.jdt.core.dom.ASTMatcher;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.Statement;
 
-import static org.autorefactor.refactoring.ASTHelper.*;
-
 /** See {@link #getDescription()} method. */
 public class MergeConditionalBlocksRefactoring extends AbstractRefactoringRule {
-    @Override
-    public String getDescription() {
-        return "Merge adjacent if / else if / else statements with same code block.";
-    }
-
-    @Override
+    /**
+     * Get the name.
+     *
+     * @return the name.
+     */
     public String getName() {
         return "Merge conditional statements";
+    }
+
+    /**
+     * Get the description.
+     *
+     * @return the description.
+     */
+    public String getDescription() {
+        return "Merge adjacent if / else if / else statements with same code block.";
     }
 
     @Override

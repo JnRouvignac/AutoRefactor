@@ -48,14 +48,22 @@ import org.eclipse.jdt.core.dom.Statement;
 
 /** See {@link #getDescription()} method. */
 public class MergeBlocksWithJumpRefactoring extends AbstractRefactoringRule {
-    @Override
-    public String getDescription() {
-        return "Merge following if statements with same code block that end with a jump statement.";
-    }
-
-    @Override
+    /**
+     * Get the name.
+     *
+     * @return the name.
+     */
     public String getName() {
         return "One block with jump rather than duplicate blocks";
+    }
+
+    /**
+     * Get the description.
+     *
+     * @return the description.
+     */
+    public String getDescription() {
+        return "Merge following if statements with same code block that end with a jump statement.";
     }
 
     @Override

@@ -26,6 +26,13 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.arguments;
+import static org.autorefactor.refactoring.ASTHelper.asExpression;
+import static org.autorefactor.refactoring.ASTHelper.asList;
+import static org.autorefactor.refactoring.ASTHelper.hasType;
+import static org.autorefactor.refactoring.ASTHelper.isMethod;
+
 import java.util.List;
 
 import org.autorefactor.refactoring.ASTBuilder;
@@ -40,8 +47,6 @@ import org.eclipse.jdt.core.dom.ImportDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Statement;
 
-import static org.autorefactor.refactoring.ASTHelper.*;
-
 /**
  * See {@link #getDescription()} method.
  * <p>
@@ -53,14 +58,22 @@ public class TestNGAssertRefactoring extends AbstractUnitTestRefactoring {
 
     private boolean canUseAssertNotEquals;
 
-    @Override
-    public String getDescription() {
-        return "Refactors to a proper use of TestNG assertions.";
-    }
-
-    @Override
+    /**
+     * Get the name.
+     *
+     * @return the name.
+     */
     public String getName() {
         return "TestNG asserts";
+    }
+
+    /**
+     * Get the description.
+     *
+     * @return the description.
+     */
+    public String getDescription() {
+        return "Refactors to a proper use of TestNG assertions.";
     }
 
     @Override

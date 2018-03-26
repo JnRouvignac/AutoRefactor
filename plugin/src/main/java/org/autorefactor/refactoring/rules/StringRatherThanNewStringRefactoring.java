@@ -39,15 +39,23 @@ import org.eclipse.jdt.core.dom.StringLiteral;
 
 /** See {@link #getDescription()} method. */
 public class StringRatherThanNewStringRefactoring extends AbstractRefactoringRule {
-    @Override
+    /**
+     * Get the name.
+     *
+     * @return the name.
+     */
+    public String getName() {
+        return "String rather than new string";
+    }
+
+    /**
+     * Get the description.
+     *
+     * @return the description.
+     */
     public String getDescription() {
         return ""
             + "Removes a String instance from a String literal.";
-    }
-
-    @Override
-    public String getName() {
-        return "String rather than new string";
     }
 
     @Override

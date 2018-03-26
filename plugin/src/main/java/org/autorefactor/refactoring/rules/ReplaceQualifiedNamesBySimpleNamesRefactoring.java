@@ -26,15 +26,25 @@
  */
 package org.autorefactor.refactoring.rules;
 
-import static org.autorefactor.refactoring.ASTHelper.*;
-import static org.eclipse.jdt.core.dom.ASTNode.*;
+import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.fragments;
+import static org.autorefactor.refactoring.ASTHelper.getEnclosingType;
+import static org.autorefactor.refactoring.ASTHelper.getFirstAncestorOrNull;
+import static org.autorefactor.refactoring.ASTHelper.getLocalVariableIdentifiers;
+import static org.autorefactor.refactoring.ASTHelper.imports;
+import static org.autorefactor.refactoring.ASTHelper.parameters;
+import static org.eclipse.jdt.core.dom.ASTNode.ANONYMOUS_CLASS_DECLARATION;
+import static org.eclipse.jdt.core.dom.ASTNode.ENUM_DECLARATION;
+import static org.eclipse.jdt.core.dom.ASTNode.TYPE_DECLARATION;
 import static org.eclipse.jdt.core.dom.IBinding.METHOD;
 import static org.eclipse.jdt.core.dom.IBinding.TYPE;
 import static org.eclipse.jdt.core.dom.IBinding.VARIABLE;
-import static org.eclipse.jdt.core.dom.Modifier.*;
-import static org.eclipse.jdt.core.search.IJavaSearchConstants.*;
-import static org.eclipse.jdt.core.search.SearchEngine.*;
-import static org.eclipse.jdt.core.search.SearchPattern.*;
+import static org.eclipse.jdt.core.dom.Modifier.isPrivate;
+import static org.eclipse.jdt.core.dom.Modifier.isStatic;
+import static org.eclipse.jdt.core.search.IJavaSearchConstants.WAIT_UNTIL_READY_TO_SEARCH;
+import static org.eclipse.jdt.core.search.SearchEngine.createWorkspaceScope;
+import static org.eclipse.jdt.core.search.SearchPattern.R_EXACT_MATCH;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -374,16 +384,24 @@ public class ReplaceQualifiedNamesBySimpleNamesRefactoring extends AbstractRefac
         fields.clear();
     }
 
-    @Override
+    /**
+     * Get the name.
+     *
+     * @return the name.
+     */
+    public String getName() {
+        return "Replace qualified names by simple names";
+    }
+
+    /**
+     * Get the description.
+     *
+     * @return the description.
+     */
     public String getDescription() {
         return "Refactors types, method invocations and field accesses"
                 + " to replace qualified names by simple names when appropriate."
                 + " For example when relevant imports exist.";
-    }
-
-    @Override
-    public String getName() {
-        return "Replace qualified names by simple names";
     }
 
     private void readImport(final ImportDeclaration node) {

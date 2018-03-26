@@ -26,6 +26,9 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import static org.autorefactor.refactoring.ASTHelper.hasType;
+import static org.autorefactor.refactoring.ASTHelper.isMethod;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,8 +37,6 @@ import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.Release;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.MethodInvocation;
-
-import static org.autorefactor.refactoring.ASTHelper.*;
 
 /** See {@link #getDescription()} method. */
 public class HashMapRatherThanHashtableRefactoring extends AbstractClassSubstituteRefactoring {
@@ -52,15 +53,23 @@ public class HashMapRatherThanHashtableRefactoring extends AbstractClassSubstitu
                     "java.lang.Cloneable", "java.lang.Object"});
     }
 
-    @Override
+    /**
+     * Get the name.
+     *
+     * @return the name.
+     */
+    public String getName() {
+        return "HashMap rather than Hashtable";
+    }
+
+    /**
+     * Get the description.
+     *
+     * @return the description.
+     */
     public String getDescription() {
         return ""
             + "Replace Hashtable by HashMap when possible.";
-    }
-
-    @Override
-    public String getName() {
-        return "HashMap rather than Hashtable";
     }
 
     @Override

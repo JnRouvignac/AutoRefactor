@@ -25,11 +25,12 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.isMethod;
+
 import org.eclipse.jdt.core.dom.CastExpression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Type;
-
-import static org.autorefactor.refactoring.ASTHelper.*;
 
 /**
  * TODO be more assertive about generics than what Eclipse does.
@@ -38,14 +39,22 @@ import static org.autorefactor.refactoring.ASTHelper.*;
  */
 @SuppressWarnings("javadoc")
 public class GenerecizeRefactoring extends AbstractRefactoringRule {
-    @Override
-    public String getDescription() {
-        return "Adds generic parameters to generic types.";
-    }
-
-    @Override
+    /**
+     * Get the name.
+     *
+     * @return the name.
+     */
     public String getName() {
         return "Generics";
+    }
+
+    /**
+     * Get the description.
+     *
+     * @return the description.
+     */
+    public String getDescription() {
+        return "Adds generic parameters to generic types.";
     }
 
     // TODO JNR where are we doing casts?

@@ -26,6 +26,27 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.getCommentList;
+import static org.autorefactor.refactoring.ASTHelper.getFileName;
+import static org.autorefactor.refactoring.ASTHelper.hasType;
+import static org.autorefactor.refactoring.ASTHelper.modifiers;
+import static org.autorefactor.refactoring.ASTHelper.tags;
+import static org.eclipse.jdt.core.dom.TagElement.TAG_AUTHOR;
+import static org.eclipse.jdt.core.dom.TagElement.TAG_DEPRECATED;
+import static org.eclipse.jdt.core.dom.TagElement.TAG_EXCEPTION;
+import static org.eclipse.jdt.core.dom.TagElement.TAG_INHERITDOC;
+import static org.eclipse.jdt.core.dom.TagElement.TAG_PARAM;
+import static org.eclipse.jdt.core.dom.TagElement.TAG_RETURN;
+import static org.eclipse.jdt.core.dom.TagElement.TAG_SEE;
+import static org.eclipse.jdt.core.dom.TagElement.TAG_SERIAL;
+import static org.eclipse.jdt.core.dom.TagElement.TAG_SERIALDATA;
+import static org.eclipse.jdt.core.dom.TagElement.TAG_SERIALFIELD;
+import static org.eclipse.jdt.core.dom.TagElement.TAG_SINCE;
+import static org.eclipse.jdt.core.dom.TagElement.TAG_THROWS;
+import static org.eclipse.jdt.core.dom.TagElement.TAG_VERSION;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -55,9 +76,6 @@ import org.eclipse.jdt.core.dom.TagElement;
 import org.eclipse.jdt.core.dom.TextElement;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 
-import static org.autorefactor.refactoring.ASTHelper.*;
-import static org.eclipse.jdt.core.dom.TagElement.*;
-
 /**
  * See {@link #getDescription()} method.
  *
@@ -68,8 +86,20 @@ import static org.eclipse.jdt.core.dom.TagElement.*;
  * </ul>
  */
 public class CommentsRefactoring extends AbstractRefactoringRule {
+    /**
+     * Get the name.
+     *
+     * @return the name.
+     */
+    public String getName() {
+        return "Comments";
+    }
 
-    @Override
+    /**
+     * Get the description.
+     *
+     * @return the description.
+     */
     public String getDescription() {
         return ""
             + "Refactors comments:\n"
@@ -82,11 +112,6 @@ public class CommentsRefactoring extends AbstractRefactoringRule {
             + "- collapse javadocs on a single line when allowed by Eclipse settings for formatting,\n"
             + "- add final '.' to javadocs that do not have any,\n"
             + "- remove Eclipse generated (non-Javadoc) block comments.";
-    }
-
-    @Override
-    public String getName() {
-        return "Comments";
     }
 
     private static final Pattern EMPTY_LINE_COMMENT = Pattern.compile("//\\s*");

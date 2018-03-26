@@ -44,15 +44,22 @@ import org.eclipse.jdt.core.dom.TypeLiteral;
  */
 public final class EnumMapRatherThanHashMapRefactoring extends
         AbstractEnumCollectionReplacementRefactoring {
-
-    @Override
-    public String getDescription() {
-        return "Refactor implementation class HashMap -> EnumMap when key is a enum type";
-    }
-
-    @Override
+    /**
+     * Get the name.
+     *
+     * @return the name.
+     */
     public String getName() {
         return "EnumMap rather than HashMap for enum keys";
+    }
+
+    /**
+     * Get the description.
+     *
+     * @return the description.
+     */
+    public String getDescription() {
+        return "Refactor implementation class HashMap -> EnumMap when key is a enum type";
     }
 
     @Override

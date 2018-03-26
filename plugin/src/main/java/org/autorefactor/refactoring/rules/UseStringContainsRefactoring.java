@@ -25,6 +25,12 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.hasOperator;
+import static org.autorefactor.refactoring.ASTHelper.isMethod;
+import static org.autorefactor.refactoring.ASTHelper.removeParentheses;
+
 import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.Refactorings;
 import org.eclipse.jdt.core.dom.ASTNode;
@@ -33,21 +39,27 @@ import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.InfixExpression.Operator;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 
-import static org.autorefactor.refactoring.ASTHelper.*;
-
 /** See {@link #getDescription()} method. */
 @SuppressWarnings("javadoc")
 public class UseStringContainsRefactoring extends AbstractRefactoringRule {
-    @Override
+    /**
+     * Get the name.
+     *
+     * @return the name.
+     */
+    public String getName() {
+        return "Use String.contains()";
+    }
+
+    /**
+     * Get the description.
+     *
+     * @return the description.
+     */
     public String getDescription() {
         return ""
             + "Replaces uses of String.indexOf(String) String.lastIndexOf(String)"
             + " with String.contains(CharSequence) where appropriate.";
-    }
-
-    @Override
-    public String getName() {
-        return "Use String.contains()";
     }
 
     @Override

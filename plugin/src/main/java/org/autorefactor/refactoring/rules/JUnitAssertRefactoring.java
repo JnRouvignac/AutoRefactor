@@ -25,6 +25,12 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.arguments;
+import static org.autorefactor.refactoring.ASTHelper.asExpression;
+import static org.autorefactor.refactoring.ASTHelper.asList;
+import static org.autorefactor.refactoring.ASTHelper.isMethod;
+
 import java.util.List;
 
 import org.autorefactor.refactoring.ASTBuilder;
@@ -34,23 +40,28 @@ import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Statement;
 
-import static org.autorefactor.refactoring.ASTHelper.*;
-
 /**
  * See {@link #getDescription()} method.
  */
 public class JUnitAssertRefactoring extends AbstractUnitTestRefactoring {
-
     private static final String[] PACKAGE_PATHES = new String[] { "junit.framework.", "org.junit." };
 
-    @Override
-    public String getDescription() {
-        return "Refactors to a proper use of JUnit assertions.";
-    }
-
-    @Override
+    /**
+     * Get the name.
+     *
+     * @return the name.
+     */
     public String getName() {
         return "JUnit asserts";
+    }
+
+    /**
+     * Get the description.
+     *
+     * @return the description.
+     */
+    public String getDescription() {
+        return "Refactors to a proper use of JUnit assertions.";
     }
 
     @Override

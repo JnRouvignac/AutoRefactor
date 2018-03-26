@@ -52,15 +52,23 @@ import org.eclipse.jdt.core.dom.PrefixExpression;
 
 /** See {@link #getDescription()} method. */
 public class LongPrimitiveRatherThanWrapperRefactoring extends AbstractPrimitiveRatherThanWrapperRefactoring {
-    @Override
+    /**
+     * Get the name.
+     *
+     * @return the name.
+     */
+    public String getName() {
+        return "Long primitive rather than wrapper";
+    }
+
+    /**
+     * Get the description.
+     *
+     * @return the description.
+     */
     public String getDescription() {
         return ""
             + "Replace Long wrapper object by long primitive type when an object is not necessary.";
-    }
-
-    @Override
-    public String getName() {
-        return "Long primitive rather than wrapper";
     }
 
     @Override

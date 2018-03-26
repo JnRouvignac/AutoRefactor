@@ -41,22 +41,42 @@ public abstract class AbstractRefactoringRule extends ASTVisitor implements Java
     /** The refactoring context of the current visitor. */
     protected RefactoringContext ctx;
 
-    @Override
+    /**
+     * True if it is the visitor by default.
+     *
+     * @return true if it is the visitor by default.
+     */
     public boolean isByDefault() {
         return true;
     }
 
-    @Override
+    /**
+     * True if the visitor is enabled.
+     *
+     * @param preferences The preferences
+     *
+     * @return true if the visitor is enabled.
+     */
     public boolean isEnabled(Preferences preferences) {
         return preferences.isEnabled(getClass());
     }
 
-    @Override
+    /**
+     * True if this Java version is supported.
+     *
+     * @param javaSeRelease The javaSe release
+     *
+     * @return true if this Java version is supported.
+     */
     public boolean isJavaVersionSupported(Release javaSeRelease) {
         return true;
     }
 
-    @Override
+    /**
+     * Set the refactoring context.
+     *
+     * @param ctx the refactoring context.
+     */
     public void setRefactoringContext(RefactoringContext ctx) {
         this.ctx = ctx;
     }
@@ -68,7 +88,13 @@ public abstract class AbstractRefactoringRule extends ASTVisitor implements Java
         return !ctx.getRefactorings().hasBeenRefactored(node);
     }
 
-    @Override
+    /**
+     * Get the refactorings.
+     *
+     * @param astRoot The AST toot
+     *
+     * @return the refactorings.
+     */
     public Refactorings getRefactorings(CompilationUnit astRoot) {
         astRoot.accept(this);
         return ctx.getRefactorings();

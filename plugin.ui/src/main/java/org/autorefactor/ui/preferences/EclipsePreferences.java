@@ -25,12 +25,12 @@
  */
 package org.autorefactor.ui.preferences;
 
+import static org.autorefactor.preferences.PreferenceConstants.DEBUG_MODE_ON;
+
 import org.autorefactor.preferences.PreferenceConstants;
 import org.autorefactor.preferences.Preferences;
 import org.autorefactor.refactoring.rules.AbstractRefactoringRule;
 import org.eclipse.jface.preference.IPreferenceStore;
-
-import static org.autorefactor.preferences.PreferenceConstants.*;
 
 /** Helper implementation for Eclipse preferences. */
 public class EclipsePreferences implements Preferences {
@@ -49,12 +49,22 @@ public class EclipsePreferences implements Preferences {
         return preferenceStore.getBoolean(pref.getName());
     }
 
-    @Override
+    /**
+     * True if debug mode is on.
+     *
+     * @return True if debug mode is on.
+     */
     public boolean debugModeOn() {
         return getBoolean(DEBUG_MODE_ON);
     }
 
-    @Override
+    /**
+     * True if it is enabled.
+     *
+     * @param clazz the class
+     *
+     * @return True if it is enabled.
+     */
     public boolean isEnabled(Class<? extends AbstractRefactoringRule> clazz) {
         return preferenceStore.getBoolean(clazz.getCanonicalName());
     }

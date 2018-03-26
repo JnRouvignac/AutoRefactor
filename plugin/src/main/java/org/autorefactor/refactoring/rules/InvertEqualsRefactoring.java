@@ -43,16 +43,24 @@ import org.eclipse.jdt.core.dom.MethodInvocation;
  * </p>
  */
 public class InvertEqualsRefactoring extends AbstractRefactoringRule {
-    @Override
+    /**
+     * Get the name.
+     *
+     * @return the name.
+     */
+    public String getName() {
+        return "Equals on constant rather than on variable";
+    }
+
+    /**
+     * Get the description.
+     *
+     * @return the description.
+     */
     public String getDescription() {
         return ""
             + "Inverts calls to Object.equals(Object) and String.equalsIgnoreCase(String)"
             + " when it is known that the second operand is not null and the first can be null.";
-    }
-
-    @Override
-    public String getName() {
-        return "Equals on constant rather than on variable";
     }
 
     @Override

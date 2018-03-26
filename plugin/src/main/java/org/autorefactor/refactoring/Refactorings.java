@@ -480,7 +480,11 @@ public class Refactorings {
         // because it changes or adds something to the GUI.
         // Otherwise it would throw an Invalid thread access Exception.
         eventLoop.syncExec(new Callable<BadLocationException>() {
-            @Override
+            /**
+             * Call.
+             *
+             * @return the bad location exception.
+             */
             public BadLocationException call() throws Exception {
                 try {
                     edits.apply(document);

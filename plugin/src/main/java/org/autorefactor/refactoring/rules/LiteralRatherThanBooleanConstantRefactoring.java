@@ -41,15 +41,23 @@ import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 /** See {@link #getDescription()} method. */
 @SuppressWarnings("javadoc")
 public class LiteralRatherThanBooleanConstantRefactoring extends AbstractRefactoringRule {
-    @Override
+    /**
+     * Get the name.
+     *
+     * @return the name.
+     */
+    public String getName() {
+        return "Literal rather than boolean constant";
+    }
+
+    /**
+     * Get the description.
+     *
+     * @return the description.
+     */
     public String getDescription() {
         return ""
             + "Replace Boolean.TRUE/Boolean.FALSE by true/false on primitive assignment.";
-    }
-
-    @Override
-    public String getName() {
-        return "Literal rather than boolean constant";
     }
 
     @Override

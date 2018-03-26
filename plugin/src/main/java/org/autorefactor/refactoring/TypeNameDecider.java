@@ -25,6 +25,8 @@
  */
 package org.autorefactor.refactoring;
 
+import static org.autorefactor.refactoring.ASTHelper.imports;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.NavigableSet;
@@ -40,8 +42,6 @@ import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.ImportDeclaration;
 import org.eclipse.jdt.core.dom.Name;
 import org.eclipse.jdt.core.dom.VariableDeclaration;
-
-import static org.autorefactor.refactoring.ASTHelper.*;
 /** Helps decide on which type name to use. */
 public class TypeNameDecider {
     /** Strategy that resolves type bindings. */
@@ -71,7 +71,13 @@ public class TypeNameDecider {
             this.anyTypeBinding = anyTypeBinding;
         }
 
-        @Override
+        /**
+         * Resolve the type binding.
+         *
+         * @param fullyQualifiedName The fully qualified name
+         *
+         * @return the type binding.
+         */
         public ITypeBinding resolveTypeBinding(String fullyQualifiedName) {
             try {
                 final Object bindingResolver = getField(anyTypeBinding, "resolver");

@@ -43,15 +43,23 @@ import org.eclipse.jdt.core.dom.PrefixExpression;
 
 /** See {@link #getDescription()} method. */
 public class BytePrimitiveRatherThanWrapperRefactoring extends AbstractPrimitiveRatherThanWrapperRefactoring {
-    @Override
+    /**
+     * Get the name.
+     *
+     * @return the name.
+     */
+    public String getName() {
+        return "Byte primitive rather than wrapper";
+    }
+
+    /**
+     * Get the description.
+     *
+     * @return the description.
+     */
     public String getDescription() {
         return ""
             + "Replace Byte wrapper object by byte primitive type when an object is not necessary.";
-    }
-
-    @Override
-    public String getName() {
-        return "Byte primitive rather than wrapper";
     }
 
     @Override

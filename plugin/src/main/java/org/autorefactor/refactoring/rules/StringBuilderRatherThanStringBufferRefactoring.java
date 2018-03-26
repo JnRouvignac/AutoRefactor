@@ -26,22 +26,30 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import static org.autorefactor.refactoring.ASTHelper.isMethod;
+
 import org.autorefactor.refactoring.Release;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 
-import static org.autorefactor.refactoring.ASTHelper.*;
-
 /** See {@link #getDescription()} method. */
 public class StringBuilderRatherThanStringBufferRefactoring extends AbstractClassSubstituteRefactoring {
-    @Override
+    /**
+     * Get the name.
+     *
+     * @return the name.
+     */
+    public String getName() {
+        return "StringBuilder rather than StringBuffer";
+    }
+
+    /**
+     * Get the description.
+     *
+     * @return the description.
+     */
     public String getDescription() {
         return ""
             + "Replace StringBuffer by StringBuilder when possible.";
-    }
-
-    @Override
-    public String getName() {
-        return "StringBuilder rather than StringBuffer";
     }
 
     @Override

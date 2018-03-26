@@ -54,14 +54,22 @@ import org.eclipse.jdt.core.dom.TryStatement;
 
 /** See {@link #getDescription()} method. */
 public class InlineCodeRatherThanPeremptoryConditionRefactoring extends AbstractRefactoringRule {
-    @Override
-    public String getDescription() {
-        return "" + "Replace always true or always false condition by inline code.";
-    }
-
-    @Override
+    /**
+     * Get the name.
+     *
+     * @return the name.
+     */
     public String getName() {
         return "Inline code rather than peremptory condition";
+    }
+
+    /**
+     * Get the description.
+     *
+     * @return the description.
+     */
+    public String getDescription() {
+        return "" + "Replace always true or always false condition by inline code.";
     }
 
     @Override
@@ -172,7 +180,7 @@ public class InlineCodeRatherThanPeremptoryConditionRefactoring extends Abstract
 
     private void removeForwardCode(final Statement astNode, final Statement unconditionnalStatement) {
         if (astNode.getParent() instanceof Block) {
-            this.ctx.getRefactorings().remove(getNextSiblings((Statement) astNode));
+            this.ctx.getRefactorings().remove(getNextSiblings(astNode));
             removeForwardCode((Block) astNode.getParent(), unconditionnalStatement);
         } else if (astNode.getParent() instanceof TryStatement) {
             removeForwardCode((TryStatement) astNode.getParent(), unconditionnalStatement);

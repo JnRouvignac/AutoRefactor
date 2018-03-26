@@ -26,7 +26,10 @@
  */
 package org.autorefactor.refactoring.rules;
 
-import static org.autorefactor.refactoring.ASTHelper.*;
+import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.getAncestor;
+import static org.autorefactor.refactoring.ASTHelper.isMethod;
 
 import org.autorefactor.preferences.Preferences;
 import org.autorefactor.refactoring.ASTBuilder;
@@ -42,7 +45,20 @@ import org.eclipse.jdt.core.dom.TypeDeclaration;
 
 /** See {@link #getDescription()} method. */
 public class AndroidWakeLockRefactoring extends AbstractRefactoringRule {
-    @Override
+    /**
+     * Get the name.
+     *
+     * @return the name.
+     */
+    public String getName() {
+        return "Android WakeLock";
+    }
+
+    /**
+     * Get the description.
+     *
+     * @return the description.
+     */
     public String getDescription() {
         return "Android - Failing to release a wakelock properly can keep the Android device "
             + "in a high power mode, which reduces battery life. "
@@ -50,11 +66,6 @@ public class AndroidWakeLockRefactoring extends AbstractRefactoringRule {
             + "releasing the wake lock in onDestroy() instead of in onPause(), "
             + "failing to call release() in all possible code paths after an acquire(), "
             + "and so on.";
-    }
-
-    @Override
-    public String getName() {
-        return "Android WakeLock";
     }
 
     @Override

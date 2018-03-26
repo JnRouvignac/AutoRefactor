@@ -57,15 +57,23 @@ public class ArrayListRatherThanVectorRefactoring extends AbstractClassSubstitut
                     "java.io.Serializable", "java.lang.Cloneable", "java.lang.Object"});
     }
 
-    @Override
+    /**
+     * Get the name.
+     *
+     * @return the name.
+     */
+    public String getName() {
+        return "ArrayList rather than Vector";
+    }
+
+    /**
+     * Get the description.
+     *
+     * @return the description.
+     */
     public String getDescription() {
         return ""
             + "Replace Vector by ArrayList when possible.";
-    }
-
-    @Override
-    public String getName() {
-        return "ArrayList rather than Vector";
     }
 
     @Override

@@ -25,6 +25,13 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.as;
+import static org.autorefactor.refactoring.ASTHelper.getEnclosingType;
+import static org.autorefactor.refactoring.ASTHelper.isEqual;
+import static org.autorefactor.refactoring.ASTHelper.typeArguments;
+
 import org.autorefactor.util.NotImplementedException;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.AbstractTypeDeclaration;
@@ -37,19 +44,25 @@ import org.eclipse.jdt.core.dom.QualifiedName;
 import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.ThisExpression;
 
-import static org.autorefactor.refactoring.ASTHelper.*;
-
 /** See {@link #getDescription()} method. */
 @SuppressWarnings("javadoc")
 public class RemoveUnneededThisExpressionRefactoring extends AbstractRefactoringRule {
-    @Override
-    public String getDescription() {
-        return "Remove useless use of \"this\" from method calls.";
-    }
-
-    @Override
+    /**
+     * Get the name.
+     *
+     * @return the name.
+     */
     public String getName() {
         return "Remove unneeded this expressions";
+    }
+
+    /**
+     * Get the description.
+     *
+     * @return the description.
+     */
+    public String getDescription() {
+        return "Remove useless use of \"this\" from method calls.";
     }
 
     @Override

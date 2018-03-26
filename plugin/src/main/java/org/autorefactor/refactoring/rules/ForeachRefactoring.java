@@ -25,6 +25,11 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.initializers;
+import static org.autorefactor.refactoring.ASTHelper.updaters;
+
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.FieldAccess;
@@ -33,22 +38,28 @@ import org.eclipse.jdt.core.dom.QualifiedName;
 import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.WhileStatement;
 
-import static org.autorefactor.refactoring.ASTHelper.*;
-
 /** See {@link #getDescription()} method. */
 @SuppressWarnings("javadoc")
 public class ForeachRefactoring extends AbstractRefactoringRule {
-    @Override
+    /**
+     * Get the name.
+     *
+     * @return the name.
+     */
+    public String getName() {
+        return "Foreach";
+    }
+
+    /**
+     * Get the description.
+     *
+     * @return the description.
+     */
     public String getDescription() {
         return ""
             + "Replaces \"while\"/\"for with iterator\"/\"for with index loops\" into foreach loops"
             + " (applicable to arrays or Iterable)."
             + "Replaces Map.keySet() iteration with calls to Map.get()} into iterations over Map.entrySet().";
-    }
-
-    @Override
-    public String getName() {
-        return "Foreach";
     }
 
     private static class VariableUseVisitor extends ASTVisitor {

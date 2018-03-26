@@ -55,16 +55,24 @@ import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
 /** See {@link #getDescription()} method. */
 public class RemoveUnnecessaryLocalBeforeReturnRefactoring extends AbstractRefactoringRule {
-    @Override
+    /**
+     * Get the name.
+     *
+     * @return the name.
+     */
+    public String getName() {
+        return "Remove unnecessary local before return";
+    }
+
+    /**
+     * Get the description.
+     *
+     * @return the description.
+     */
     public String getDescription() {
         return ""
             + "Removes unnecessary local variable declaration"
             + " or unnecessary variable assignment before a return statement.";
-    }
-
-    @Override
-    public String getName() {
-        return "Remove unnecessary local before return";
     }
 
     @Override

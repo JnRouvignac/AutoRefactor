@@ -209,16 +209,24 @@ public class SwitchRefactoring extends AbstractRefactoringRule {
         }
     }
 
-    @Override
+    /**
+     * Get the name.
+     *
+     * @return the name.
+     */
+    public String getName() {
+        return "Switch";
+    }
+
+    /**
+     * Get the description.
+     *
+     * @return the description.
+     */
     public String getDescription() {
         return ""
             + "Switch related refactorings:\n"
             + "- replaces if/else if/else blocks to use switch where possible.";
-    }
-
-    @Override
-    public String getName() {
-        return "Switch";
     }
 
     @Override

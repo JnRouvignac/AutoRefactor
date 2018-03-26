@@ -60,16 +60,24 @@ import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
 /** See {@link #getDescription()} method. */
 public class MapRefactoring extends AbstractRefactoringRule {
-    @Override
+    /**
+     * Get the name.
+     *
+     * @return the name.
+     */
+    public String getName() {
+        return "Inited map rather than new map and Map.putAll()";
+    }
+
+    /**
+     * Get the description.
+     *
+     * @return the description.
+     */
     public String getDescription() {
         return ""
                 + "Replaces creating a new Map, then invoking Map.putAll() on it,"
                 + " by creating the new Map with the other Map as parameter.";
-    }
-
-    @Override
-    public String getName() {
-        return "Inited map rather than new map and Map.putAll()";
     }
 
     @Override

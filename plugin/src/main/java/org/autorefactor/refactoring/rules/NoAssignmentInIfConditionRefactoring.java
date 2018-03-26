@@ -26,6 +26,16 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.as;
+import static org.autorefactor.refactoring.ASTHelper.fragments;
+import static org.autorefactor.refactoring.ASTHelper.getFirstParentOfType;
+import static org.autorefactor.refactoring.ASTHelper.getPreviousSibling;
+import static org.autorefactor.refactoring.ASTHelper.isSameVariable;
+import static org.autorefactor.refactoring.ASTHelper.removeParentheses;
+import static org.eclipse.jdt.core.dom.VariableDeclarationFragment.INITIALIZER_PROPERTY;
+
 import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.BlockSubVisitor;
 import org.autorefactor.refactoring.Refactorings;
@@ -40,20 +50,25 @@ import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
-import static org.autorefactor.refactoring.ASTHelper.*;
-import static org.eclipse.jdt.core.dom.VariableDeclarationFragment.*;
-
 /** See {@link #getDescription()} method. */
 @SuppressWarnings("javadoc")
 public class NoAssignmentInIfConditionRefactoring extends AbstractRefactoringRule {
-    @Override
-    public String getDescription() {
-        return "Moves assignments inside an if condition before the if node.";
-    }
-
-    @Override
+    /**
+     * Get the name.
+     *
+     * @return the name.
+     */
     public String getName() {
         return "No assignment in if condition";
+    }
+
+    /**
+     * Get the description.
+     *
+     * @return the description.
+     */
+    public String getDescription() {
+        return "Moves assignments inside an if condition before the if node.";
     }
 
     @Override

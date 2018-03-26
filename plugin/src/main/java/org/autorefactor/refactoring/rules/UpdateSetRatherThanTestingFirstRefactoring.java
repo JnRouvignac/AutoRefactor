@@ -50,7 +50,20 @@ import org.eclipse.jdt.core.dom.Statement;
 
 /** See {@link #getDescription()} method. */
 public class UpdateSetRatherThanTestingFirstRefactoring extends AbstractRefactoringRule {
-    @Override
+    /**
+     * Get the name.
+     *
+     * @return the name.
+     */
+    public String getName() {
+        return "Update set rather than testing first";
+    }
+
+    /**
+     * Get the description.
+     *
+     * @return the description.
+     */
     public String getDescription() {
         return ""
             + "Set related refactorings:\n"
@@ -58,11 +71,6 @@ public class UpdateSetRatherThanTestingFirstRefactoring extends AbstractRefactor
             + " with straight calls to Set.add(),\n"
             + "- replaces calls to Set.contains() immediately followed by Set.remove()"
             + " with straight calls to Set.remove().";
-    }
-
-    @Override
-    public String getName() {
-        return "Update set rather than testing first";
     }
 
     @Override

@@ -44,16 +44,23 @@ import org.eclipse.jdt.core.dom.TypeLiteral;
  */
 public final class EnumSetRatherThanHashSetRefactoring extends
         AbstractEnumCollectionReplacementRefactoring {
+    /**
+     * Get the name.
+     *
+     * @return the name.
+     */
+    public String getName() {
+        return "EnumSet rather than HashSet for enum types";
+    }
 
-    @Override
+    /**
+     * Get the description.
+     *
+     * @return the description.
+     */
     public String getDescription() {
         return "Converts creation of HashSet with enum as a type "
                 + "to invocation of static methods of EnumSet where possible";
-    }
-
-    @Override
-    public String getName() {
-        return "EnumSet rather than HashSet for enum types";
     }
 
     @Override
@@ -76,9 +83,9 @@ public final class EnumSetRatherThanHashSetRefactoring extends
      * Other constructors can be replaced with <code>EnumSet.noneOf(Class)</code> method. <br>
      * <br>
      *
-     * @see {@link java.util.EnumSet#copyOf(Collection)}
-     * @see {@link java.util.EnumSet#copyOf(EnumSet)}
-     * @see {@link java.util.EnumSet#noneOf(Class)} <br>
+     * @see java.util.EnumSet#copyOf(Collection)
+     * @see java.util.EnumSet#copyOf(EnumSet)
+     * @see java.util.EnumSet#noneOf(Class) <br>
      * @param cic
      *            - class instance creation node to be replaced
      * @param type

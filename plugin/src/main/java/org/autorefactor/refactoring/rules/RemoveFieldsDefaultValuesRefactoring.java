@@ -25,6 +25,12 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.fragments;
+import static org.autorefactor.refactoring.ASTHelper.isNullLiteral;
+import static org.eclipse.jdt.core.dom.Modifier.isFinal;
+
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
 import org.eclipse.jdt.core.dom.EnumDeclaration;
@@ -34,22 +40,27 @@ import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
-import static org.autorefactor.refactoring.ASTHelper.*;
-import static org.eclipse.jdt.core.dom.Modifier.*;
-
 /** See {@link #getDescription()} method. */
 public class RemoveFieldsDefaultValuesRefactoring extends AbstractRefactoringRule {
-    @Override
+    /**
+     * Get the name.
+     *
+     * @return the name.
+     */
+    public String getName() {
+        return "Remove fields default values";
+    }
+
+    /**
+     * Get the description.
+     *
+     * @return the description.
+     */
     public String getDescription() {
         return ""
             + "Removes field initializers when they are the default value of the field's types.\n"
             + "For example, the initializer will be removed for integer fields initialized to \"0\".\n"
             + "Likewise, the initializer will be removed for non primitive fields initialized to \"null\".";
-    }
-
-    @Override
-    public String getName() {
-        return "Remove fields default values";
     }
 
     @Override

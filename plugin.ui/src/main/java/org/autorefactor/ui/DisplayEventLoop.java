@@ -35,7 +35,14 @@ import org.eclipse.swt.widgets.Display;
 
 /** The event loop run by the {@link Display} class. */
 public class DisplayEventLoop implements EventLoop {
-    @Override
+    /**
+     * Calls the {@link Callable#call()} method of the callable to be invoked by the event loop at the
+     * next reasonable opportunity.
+     *
+     * @param call the callable to invoke
+     * @param <E> the declared exception type returned by the callable
+     * @throws E the exception possibly returned by executing the callable that is then thrown
+     */
     public <E extends Exception> void syncExec(final Callable<E> call) throws E {
         final FutureTask<E> future = new FutureTask<E>(call);
         Display.getDefault().syncExec(future);

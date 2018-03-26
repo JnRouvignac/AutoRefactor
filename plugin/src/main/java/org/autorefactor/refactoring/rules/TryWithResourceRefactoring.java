@@ -25,6 +25,20 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.areSameVariables;
+import static org.autorefactor.refactoring.ASTHelper.as;
+import static org.autorefactor.refactoring.ASTHelper.asExpression;
+import static org.autorefactor.refactoring.ASTHelper.asList;
+import static org.autorefactor.refactoring.ASTHelper.getNullCheckedExpression;
+import static org.autorefactor.refactoring.ASTHelper.getPreviousStatement;
+import static org.autorefactor.refactoring.ASTHelper.getUniqueFragment;
+import static org.autorefactor.refactoring.ASTHelper.isMethod;
+import static org.autorefactor.refactoring.ASTHelper.isSameVariable;
+import static org.autorefactor.refactoring.ASTHelper.resources;
+import static org.eclipse.jdt.core.dom.ASTNode.TRY_STATEMENT;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -45,21 +59,26 @@ import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
-import static org.autorefactor.refactoring.ASTHelper.*;
-import static org.eclipse.jdt.core.dom.ASTNode.*;
-
 /** See {@link #getDescription()} method. */
 public class TryWithResourceRefactoring extends AbstractRefactoringRule {
-    @Override
+    /**
+     * Get the name.
+     *
+     * @return the name.
+     */
+    public String getName() {
+        return "Use try-with-resource";
+    }
+
+    /**
+     * Get the description.
+     *
+     * @return the description.
+     */
     public String getDescription() {
         return ""
             + "Changes code to make use of Java 7 try-with-resources feature. "
             + "In particular, it removes now useless finally clauses.";
-    }
-
-    @Override
-    public String getName() {
-        return "Use try-with-resource";
     }
 
     @Override

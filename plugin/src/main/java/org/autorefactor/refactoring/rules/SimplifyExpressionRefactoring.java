@@ -25,6 +25,35 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.allOperands;
+import static org.autorefactor.refactoring.ASTHelper.arguments;
+import static org.autorefactor.refactoring.ASTHelper.as;
+import static org.autorefactor.refactoring.ASTHelper.checkNoExtendedOperands;
+import static org.autorefactor.refactoring.ASTHelper.getBooleanLiteral;
+import static org.autorefactor.refactoring.ASTHelper.getNullCheckedExpression;
+import static org.autorefactor.refactoring.ASTHelper.hasOperator;
+import static org.autorefactor.refactoring.ASTHelper.is;
+import static org.autorefactor.refactoring.ASTHelper.isMethod;
+import static org.autorefactor.refactoring.ASTHelper.isPrimitive;
+import static org.autorefactor.util.Utils.equalNotNull;
+import static org.eclipse.jdt.core.dom.InfixExpression.Operator.AND;
+import static org.eclipse.jdt.core.dom.InfixExpression.Operator.CONDITIONAL_AND;
+import static org.eclipse.jdt.core.dom.InfixExpression.Operator.CONDITIONAL_OR;
+import static org.eclipse.jdt.core.dom.InfixExpression.Operator.EQUALS;
+import static org.eclipse.jdt.core.dom.InfixExpression.Operator.LEFT_SHIFT;
+import static org.eclipse.jdt.core.dom.InfixExpression.Operator.NOT_EQUALS;
+import static org.eclipse.jdt.core.dom.InfixExpression.Operator.OR;
+import static org.eclipse.jdt.core.dom.InfixExpression.Operator.RIGHT_SHIFT_SIGNED;
+import static org.eclipse.jdt.core.dom.InfixExpression.Operator.RIGHT_SHIFT_UNSIGNED;
+import static org.eclipse.jdt.core.dom.InfixExpression.Operator.XOR;
+import static org.eclipse.jdt.core.dom.PrefixExpression.Operator.DECREMENT;
+import static org.eclipse.jdt.core.dom.PrefixExpression.Operator.INCREMENT;
+import static org.eclipse.jdt.core.dom.PrefixExpression.Operator.MINUS;
+import static org.eclipse.jdt.core.dom.PrefixExpression.Operator.NOT;
+import static org.eclipse.jdt.core.dom.PrefixExpression.Operator.PLUS;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.ListIterator;
@@ -51,19 +80,22 @@ import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.WhileStatement;
 
-import static org.autorefactor.refactoring.ASTHelper.*;
-import static org.autorefactor.util.Utils.*;
-import static org.eclipse.jdt.core.dom.InfixExpression.Operator.*;
-import static org.eclipse.jdt.core.dom.PrefixExpression.Operator.MINUS;
-import static org.eclipse.jdt.core.dom.PrefixExpression.Operator.PLUS;
-import static org.eclipse.jdt.core.dom.PrefixExpression.Operator.DECREMENT;
-import static org.eclipse.jdt.core.dom.PrefixExpression.Operator.INCREMENT;
-import static org.eclipse.jdt.core.dom.PrefixExpression.Operator.NOT;
-
 /** See {@link #getDescription()} method. */
 public class SimplifyExpressionRefactoring extends AbstractRefactoringRule {
+    /**
+     * Get the name.
+     *
+     * @return the name.
+     */
+    public String getName() {
+        return "Simplify expressions";
+    }
 
-    @Override
+    /**
+     * Get the description.
+     *
+     * @return the description.
+     */
     public String getDescription() {
         return ""
             + "Simplifies Java expressions:\n"
@@ -73,13 +105,9 @@ public class SimplifyExpressionRefactoring extends AbstractRefactoringRule {
             + "- reduce double negation in boolean expression.";
     }
 
-    @Override
-    public String getName() {
-        return "Simplify expressions";
-    }
-
     /** A mapping of child operation to parent operation that mandates using parentheses. */
-    private static final List<Pair<Operator, Operator>> SHOULD_HAVE_PARENTHESES = Arrays.asList(
+    private static final List<Pair<Operator, Operator>> SHOULD_HAVE_PARENTHESES =
+            Arrays.<Pair<Operator, Operator>>asList(
             Pair.of(CONDITIONAL_AND, CONDITIONAL_OR),
             Pair.of(AND, XOR),
             Pair.of(AND, OR),
@@ -347,7 +375,7 @@ public class SimplifyExpressionRefactoring extends AbstractRefactoringRule {
         if (NOT_EQUALS.equals(node.getOperator())) {
             return XOR;
         } else {
-            return (Operator) node.getOperator();
+            return node.getOperator();
         }
     }
 

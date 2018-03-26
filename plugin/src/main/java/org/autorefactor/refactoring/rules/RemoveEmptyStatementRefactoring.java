@@ -51,14 +51,22 @@ import org.eclipse.jdt.core.dom.WhileStatement;
  * @see #getDescription()
  */
 public class RemoveEmptyStatementRefactoring extends AbstractRefactoringRule {
-    @Override
-    public String getDescription() {
-        return "Removes lone semicolons.";
-    }
-
-    @Override
+    /**
+     * Get the name.
+     *
+     * @return the name.
+     */
     public String getName() {
         return "Removes empty statements";
+    }
+
+    /**
+     * Get the description.
+     *
+     * @return the description.
+     */
+    public String getDescription() {
+        return "Removes lone semicolons.";
     }
 
     @Override

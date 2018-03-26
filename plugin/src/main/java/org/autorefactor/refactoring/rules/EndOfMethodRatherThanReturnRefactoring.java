@@ -39,14 +39,22 @@ import org.eclipse.jdt.core.dom.WhileStatement;
 
 /** See {@link #getDescription()} method. */
 public class EndOfMethodRatherThanReturnRefactoring extends AbstractRefactoringRule {
-    @Override
-    public String getDescription() {
-        return "Removes useless lone return at the end of a method.";
-    }
-
-    @Override
+    /**
+     * Get the name.
+     *
+     * @return the name.
+     */
     public String getName() {
         return "End of method rather than return";
+    }
+
+    /**
+     * Get the description.
+     *
+     * @return the description.
+     */
+    public String getDescription() {
+        return "Removes useless lone return at the end of a method.";
     }
 
     @Override

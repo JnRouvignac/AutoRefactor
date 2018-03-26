@@ -25,6 +25,31 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.arg0;
+import static org.autorefactor.refactoring.ASTHelper.as;
+import static org.autorefactor.refactoring.ASTHelper.asExpression;
+import static org.autorefactor.refactoring.ASTHelper.asList;
+import static org.autorefactor.refactoring.ASTHelper.getNextSibling;
+import static org.autorefactor.refactoring.ASTHelper.getNextStatement;
+import static org.autorefactor.refactoring.ASTHelper.getPreviousSibling;
+import static org.autorefactor.refactoring.ASTHelper.getPreviousStatement;
+import static org.autorefactor.refactoring.ASTHelper.getUniqueFragment;
+import static org.autorefactor.refactoring.ASTHelper.hasOperator;
+import static org.autorefactor.refactoring.ASTHelper.instanceOf;
+import static org.autorefactor.refactoring.ASTHelper.isMethod;
+import static org.autorefactor.refactoring.ASTHelper.isSameLocalVariable;
+import static org.autorefactor.refactoring.ASTHelper.isSameVariable;
+import static org.autorefactor.refactoring.ASTHelper.match;
+import static org.autorefactor.refactoring.ASTHelper.removeParentheses;
+import static org.autorefactor.refactoring.ForLoopHelper.decomposeInitializer;
+import static org.autorefactor.refactoring.ForLoopHelper.iterateOverContainer;
+import static org.autorefactor.refactoring.ForLoopHelper.ContainerType.COLLECTION;
+import static org.autorefactor.refactoring.ForLoopHelper.IterationType.INDEX;
+import static org.autorefactor.refactoring.ForLoopHelper.IterationType.ITERATOR;
+import static org.eclipse.jdt.core.dom.Assignment.Operator.ASSIGN;
+
 import java.util.List;
 
 import org.autorefactor.refactoring.ASTBuilder;
@@ -52,22 +77,24 @@ import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
-import static org.autorefactor.refactoring.ASTHelper.*;
-import static org.autorefactor.refactoring.ForLoopHelper.*;
-import static org.autorefactor.refactoring.ForLoopHelper.ContainerType.*;
-import static org.autorefactor.refactoring.ForLoopHelper.IterationType.*;
-import static org.eclipse.jdt.core.dom.Assignment.Operator.*;
-
 /** See {@link #getDescription()} method. */
 public class CollectionContainsRefactoring extends AbstractRefactoringRule {
-    @Override
-    public String getDescription() {
-        return "Replace loop with Collection.contains(Object obj).";
-    }
-
-    @Override
+    /**
+     * Get the name.
+     *
+     * @return the name.
+     */
     public String getName() {
         return "Collection.contains() rather than loop";
+    }
+
+    /**
+     * Get the description.
+     *
+     * @return the description.
+     */
+    public String getDescription() {
+        return "Replace loop with Collection.contains(Object obj).";
     }
 
     @Override

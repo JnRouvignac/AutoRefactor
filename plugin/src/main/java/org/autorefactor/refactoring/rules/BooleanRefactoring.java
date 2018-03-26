@@ -89,8 +89,20 @@ import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
 /** See {@link #getDescription()} method. */
 public class BooleanRefactoring extends AbstractRefactoringRule {
+    /**
+     * Get the name.
+     *
+     * @return the name.
+     */
+    public String getName() {
+        return "Boolean";
+    }
 
-    @Override
+    /**
+     * Get the description.
+     *
+     * @return the description.
+     */
     public String getDescription() {
         return ""
                 + "Boolean related refactorings:\n"
@@ -98,11 +110,6 @@ public class BooleanRefactoring extends AbstractRefactoringRule {
                 + "- remove ternary operators when then and else clauses do similar things with opposite boolean values"
                 + ",\n"
                 + "- simplify boolean expressions.";
-    }
-
-    @Override
-    public String getName() {
-        return "Boolean";
     }
 
     private class BooleanASTMatcher extends ASTMatcher {

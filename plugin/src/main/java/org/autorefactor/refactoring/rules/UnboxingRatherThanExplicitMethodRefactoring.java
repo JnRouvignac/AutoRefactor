@@ -37,15 +37,23 @@ import org.eclipse.jdt.core.dom.MethodInvocation;
 /** See {@link #getDescription()} method. */
 @SuppressWarnings("javadoc")
 public class UnboxingRatherThanExplicitMethodRefactoring extends AbstractRefactoringRule {
-    @Override
+    /**
+     * Get the name.
+     *
+     * @return the name.
+     */
+    public String getName() {
+        return "Unboxing rather than explicit method";
+    }
+
+    /**
+     * Get the description.
+     *
+     * @return the description.
+     */
     public String getDescription() {
         return ""
             + "Remove useless primitiveValue() call to use unboxing.";
-    }
-
-    @Override
-    public String getName() {
-        return "Unboxing rather than explicit method";
     }
 
     private int getJavaMinorVersion() {

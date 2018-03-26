@@ -25,15 +25,17 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.statements;
+import static org.eclipse.jdt.core.dom.IfStatement.ELSE_STATEMENT_PROPERTY;
+
 import java.util.List;
 
 import org.autorefactor.refactoring.ASTBuilder;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.Statement;
-
-import static org.autorefactor.refactoring.ASTHelper.*;
-import static org.eclipse.jdt.core.dom.IfStatement.*;
 
 /**
  * Refactors:
@@ -62,14 +64,22 @@ import static org.eclipse.jdt.core.dom.IfStatement.*;
  */
 @SuppressWarnings("javadoc")
 public class IfElseIfRefactoring extends AbstractRefactoringRule {
-    @Override
-    public String getDescription() {
-        return "Refactors \"else { if (...) {} }\" to \"else if (...) {}\".";
-    }
-
-    @Override
+    /**
+     * Get the name.
+     *
+     * @return the name.
+     */
     public String getName() {
         return "if-elseif";
+    }
+
+    /**
+     * Get the description.
+     *
+     * @return the description.
+     */
+    public String getDescription() {
+        return "Refactors \"else { if (...) {} }\" to \"else if (...) {}\".";
     }
 
     // TODO JNR

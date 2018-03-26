@@ -25,7 +25,8 @@
  */
 package org.autorefactor.refactoring.rules;
 
-import static org.autorefactor.refactoring.ASTHelper.*;
+import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
 
 import org.autorefactor.refactoring.ASTBuilder;
 import org.eclipse.jdt.core.dom.NumberLiteral;
@@ -36,13 +37,20 @@ import org.eclipse.jdt.core.dom.NumberLiteral;
  * This rule refactors the Sonar squid:LowerCaseLongSuffixCheck.
  */
 public class CapitalizeLongLiteralRefactoring extends AbstractRefactoringRule {
-
-    @Override
+    /**
+     * Get the name.
+     *
+     * @return the name.
+     */
     public String getName() {
         return "Capitalize lower case 'l' -> 'L' for long number literals";
     }
 
-    @Override
+    /**
+     * Get the description.
+     *
+     * @return the description.
+     */
     public String getDescription() {
         return "Capitalize lower case 'l' -> 'L' for long number literals";
     }

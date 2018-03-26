@@ -33,16 +33,23 @@ import org.eclipse.jdt.core.dom.SuperConstructorInvocation;
 /** See {@link #getDescription()} method. */
 public class RemoveEmptySuperConstrInvocationRefactoring extends
         AbstractRefactoringRule {
+    /**
+     * Get the name.
+     *
+     * @return the name.
+     */
+    public String getName() {
+        return "Remove super() call in constructor";
+    }
 
-    @Override
+    /**
+     * Get the description.
+     *
+     * @return the description.
+     */
     public String getDescription() {
         return "Remove call to super constructor with empty arguments "
                 + "since it is redundant. See JLS section 12.5 for more info.";
-    }
-
-    @Override
-    public String getName() {
-        return "Remove super() call in constructor";
     }
 
     @Override

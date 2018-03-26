@@ -25,6 +25,17 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.arguments;
+import static org.autorefactor.refactoring.ASTHelper.findImplementedType;
+import static org.autorefactor.refactoring.ASTHelper.getFirstParentOfType;
+import static org.autorefactor.refactoring.ASTHelper.typeArguments;
+import static org.eclipse.jdt.core.dom.ASTNode.ASSIGNMENT;
+import static org.eclipse.jdt.core.dom.ASTNode.METHOD_INVOCATION;
+import static org.eclipse.jdt.core.dom.ASTNode.RETURN_STATEMENT;
+import static org.eclipse.jdt.core.dom.ASTNode.VARIABLE_DECLARATION_FRAGMENT;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -43,19 +54,24 @@ import org.eclipse.jdt.core.dom.StructuralPropertyDescriptor;
 import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
-import static org.autorefactor.refactoring.ASTHelper.*;
-import static org.eclipse.jdt.core.dom.ASTNode.*;
-
 /** See {@link #getDescription()} method. */
 public class UseDiamondOperatorRefactoring extends AbstractRefactoringRule {
-    @Override
-    public String getDescription() {
-        return "Refactors class instance creations to use the diamond operator wherever possible.";
-    }
-
-    @Override
+    /**
+     * Get the name.
+     *
+     * @return the name.
+     */
     public String getName() {
         return "Diamond operator";
+    }
+
+    /**
+     * Get the description.
+     *
+     * @return the description.
+     */
+    public String getDescription() {
+        return "Refactors class instance creations to use the diamond operator wherever possible.";
     }
 
     private boolean isEnabled() {

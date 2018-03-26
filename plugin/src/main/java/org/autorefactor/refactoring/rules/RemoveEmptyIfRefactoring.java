@@ -43,14 +43,22 @@ import org.eclipse.jdt.core.dom.WhileStatement;
 
 /** See {@link #getDescription()} method. */
 public class RemoveEmptyIfRefactoring extends AbstractRefactoringRule {
-    @Override
-    public String getDescription() {
-        return "Removes empty if or else block.";
-    }
-
-    @Override
+    /**
+     * Get the name.
+     *
+     * @return the name.
+     */
     public String getName() {
         return "Remove empty if";
+    }
+
+    /**
+     * Get the description.
+     *
+     * @return the description.
+     */
+    public String getDescription() {
+        return "Removes empty if or else block.";
     }
 
     @Override

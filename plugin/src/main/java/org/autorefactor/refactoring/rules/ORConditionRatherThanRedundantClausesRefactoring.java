@@ -50,15 +50,23 @@ import org.eclipse.jdt.core.dom.PrefixExpression;
 
 /** See {@link #getDescription()} method. */
 public class ORConditionRatherThanRedundantClausesRefactoring extends AbstractRefactoringRule {
-    @Override
+    /**
+     * Get the name.
+     *
+     * @return the name.
+     */
+    public String getName() {
+        return "OR condition rather than redundant clauses";
+    }
+
+    /**
+     * Get the description.
+     *
+     * @return the description.
+     */
     public String getDescription() {
         return ""
             + "Replace (X && Y) || !X by Y || !X.";
-    }
-
-    @Override
-    public String getName() {
-        return "OR condition rather than redundant clauses";
     }
 
     @Override

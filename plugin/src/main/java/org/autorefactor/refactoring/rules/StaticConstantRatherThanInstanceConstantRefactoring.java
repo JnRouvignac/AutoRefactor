@@ -45,15 +45,23 @@ import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
 /** See {@link #getDescription()} method. */
 public class StaticConstantRatherThanInstanceConstantRefactoring extends AbstractRefactoringRule {
-    @Override
+    /**
+     * Get the name.
+     *
+     * @return the name.
+     */
+    public String getName() {
+        return "Static constant rather than instance constant";
+    }
+
+    /**
+     * Get the description.
+     *
+     * @return the description.
+     */
     public String getDescription() {
         return ""
             + "Add the static modifier to the initialized final primitive or wrapper fields.";
-    }
-
-    @Override
-    public String getName() {
-        return "Static constant rather than instance constant";
     }
 
     @Override

@@ -60,16 +60,24 @@ import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
 /** See {@link #getDescription()} method. */
 public class CollectionRefactoring extends AbstractRefactoringRule {
-    @Override
+    /**
+     * Get the name.
+     *
+     * @return the name.
+     */
+    public String getName() {
+        return "Inited collection rather than new collection and Collection.addAll()";
+    }
+
+    /**
+     * Get the description.
+     *
+     * @return the description.
+     */
     public String getDescription() {
         return ""
                 + "Replaces creating a new Collection, then invoking Collection.addAll() on it,"
                 + " by creating the new Collection with the other Collection as parameter.";
-    }
-
-    @Override
-    public String getName() {
-        return "Inited collection rather than new collection and Collection.addAll()";
     }
 
     @Override

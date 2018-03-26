@@ -55,15 +55,23 @@ import org.eclipse.jdt.core.dom.PrefixExpression;
 
 /** See {@link #getDescription()} method. */
 public class CharPrimitiveRatherThanWrapperRefactoring extends AbstractPrimitiveRatherThanWrapperRefactoring {
-    @Override
+    /**
+     * Get the name.
+     *
+     * @return the name.
+     */
+    public String getName() {
+        return "Char primitive rather than wrapper";
+    }
+
+    /**
+     * Get the description.
+     *
+     * @return the description.
+     */
     public String getDescription() {
         return ""
             + "Replace Character wrapper object by char primitive type when an object is not necessary.";
-    }
-
-    @Override
-    public String getName() {
-        return "Char primitive rather than wrapper";
     }
 
     @Override

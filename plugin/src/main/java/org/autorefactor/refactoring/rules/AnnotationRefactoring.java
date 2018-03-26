@@ -25,6 +25,17 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.expressions;
+import static org.autorefactor.refactoring.ASTHelper.getPrimitiveEnum;
+import static org.autorefactor.refactoring.ASTHelper.values;
+import static org.eclipse.jdt.core.dom.ASTNode.ARRAY_INITIALIZER;
+import static org.eclipse.jdt.core.dom.ASTNode.BOOLEAN_LITERAL;
+import static org.eclipse.jdt.core.dom.ASTNode.CHARACTER_LITERAL;
+import static org.eclipse.jdt.core.dom.ASTNode.NUMBER_LITERAL;
+import static org.eclipse.jdt.core.dom.ASTNode.STRING_LITERAL;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -43,23 +54,27 @@ import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.MemberValuePair;
 import org.eclipse.jdt.core.dom.NormalAnnotation;
 
-import static org.autorefactor.refactoring.ASTHelper.*;
-import static org.eclipse.jdt.core.dom.ASTNode.*;
-
 /** See {@link #getDescription()} method. */
 public class AnnotationRefactoring extends AbstractRefactoringRule {
+    /**
+     * Get the name.
+     *
+     * @return the name.
+     */
+    public String getName() {
+        return "Annotation";
+    }
 
-    @Override
+    /**
+     * Get the description.
+     *
+     * @return the description.
+     */
     public String getDescription() {
         return ""
             + "Simplifies annotation uses:\n"
             + "- empty parentheses will be removed from annotations,\n"
             + "- single members named \"value\" will be removed from annotations and only the value will be left.";
-    }
-
-    @Override
-    public String getName() {
-        return "Annotation";
     }
 
     @Override

@@ -25,6 +25,10 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
+import static org.autorefactor.refactoring.SourceLocation.getEndPosition;
+
 import java.util.NavigableSet;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
@@ -41,23 +45,28 @@ import org.eclipse.jdt.core.dom.EnumDeclaration;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 
-import static org.autorefactor.refactoring.ASTHelper.*;
-import static org.autorefactor.refactoring.SourceLocation.*;
-
 /** See {@link #getDescription()} method. */
 public class RemoveEmptyLinesRefactoring extends AbstractRefactoringRule {
-    @Override
+    /**
+     * Get the name.
+     *
+     * @return the name.
+     */
+    public String getName() {
+        return "Remove empty lines";
+    }
+
+    /**
+     * Get the description.
+     *
+     * @return the description.
+     */
     public String getDescription() {
         return ""
             + "Removes unnecessary empty lines from source code:\n"
             + "- empty lines after opening braces,\n"
             + "- empty lines before closing braces,\n"
             + "- two consecutive empty lines are converted to a single empty line.";
-    }
-
-    @Override
-    public String getName() {
-        return "Remove empty lines";
     }
 
     private static final Pattern NEWLINE_PATTERN = Pattern.compile("\\r\\n|\\n|\\r");

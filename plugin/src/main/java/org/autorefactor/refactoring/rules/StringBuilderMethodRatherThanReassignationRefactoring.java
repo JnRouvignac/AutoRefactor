@@ -42,14 +42,22 @@ import org.eclipse.jdt.core.dom.Name;
 
 /** See {@link #getDescription()} method. */
 public class StringBuilderMethodRatherThanReassignationRefactoring extends AbstractRefactoringRule {
-    @Override
-    public String getDescription() {
-        return "Removes the assignation to the same variable on a StringBuilder.append() call.";
-    }
-
-    @Override
+    /**
+     * Get the name.
+     *
+     * @return the name.
+     */
     public String getName() {
         return "StringBuilder method call rather than reassignation";
+    }
+
+    /**
+     * Get the description.
+     *
+     * @return the description.
+     */
+    public String getDescription() {
+        return "Removes the assignation to the same variable on a StringBuilder.append() call.";
     }
 
     @Override

@@ -27,6 +27,23 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.allOperands;
+import static org.autorefactor.refactoring.ASTHelper.as;
+import static org.autorefactor.refactoring.ASTHelper.getAncestor;
+import static org.autorefactor.refactoring.ASTHelper.hasOperator;
+import static org.autorefactor.refactoring.ASTHelper.hasType;
+import static org.autorefactor.refactoring.ASTHelper.isPrimitive;
+import static org.autorefactor.refactoring.ASTHelper.resolveTypeBinding;
+import static org.eclipse.jdt.core.dom.ASTNode.ASSIGNMENT;
+import static org.eclipse.jdt.core.dom.ASTNode.INFIX_EXPRESSION;
+import static org.eclipse.jdt.core.dom.ASTNode.RETURN_STATEMENT;
+import static org.eclipse.jdt.core.dom.ASTNode.VARIABLE_DECLARATION_FRAGMENT;
+import static org.eclipse.jdt.core.dom.InfixExpression.Operator.DIVIDE;
+import static org.eclipse.jdt.core.dom.InfixExpression.Operator.MINUS;
+import static org.eclipse.jdt.core.dom.InfixExpression.Operator.PLUS;
+
 import java.util.Iterator;
 import java.util.List;
 
@@ -43,10 +60,6 @@ import org.eclipse.jdt.core.dom.NumberLiteral;
 import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
-import static org.autorefactor.refactoring.ASTHelper.*;
-import static org.eclipse.jdt.core.dom.ASTNode.*;
-import static org.eclipse.jdt.core.dom.InfixExpression.Operator.*;
-
 /**
  * See {@link #getDescription()} method.
  * <p>
@@ -54,16 +67,24 @@ import static org.eclipse.jdt.core.dom.InfixExpression.Operator.*;
  */
 @SuppressWarnings("javadoc")
 public class RemoveUnnecessaryCastRefactoring extends AbstractRefactoringRule {
-    @Override
+    /**
+     * Get the name.
+     *
+     * @return the name.
+     */
+    public String getName() {
+        return "Remove unnecessary casts";
+    }
+
+    /**
+     * Get the description.
+     *
+     * @return the description.
+     */
     public String getDescription() {
         return ""
                 + "Removes unnecessary widening casts from return statements, assignments and infix expressions. "
                 + "Correctly types literals. ";
-    }
-
-    @Override
-    public String getName() {
-        return "Remove unnecessary casts";
     }
 
     @Override

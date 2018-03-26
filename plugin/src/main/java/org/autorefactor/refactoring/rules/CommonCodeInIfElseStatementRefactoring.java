@@ -27,6 +27,11 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.as;
+import static org.autorefactor.refactoring.ASTHelper.asList;
+
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -42,21 +47,27 @@ import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.Statement;
-
-import static org.autorefactor.refactoring.ASTHelper.*;
 /** See {@link #getDescription()} method. */
 public class CommonCodeInIfElseStatementRefactoring extends AbstractRefactoringRule {
-    @Override
+    /**
+     * Get the name.
+     *
+     * @return the name.
+     */
+    public String getName() {
+        return "Extract common code in if else statement";
+    }
+
+    /**
+     * Get the description.
+     *
+     * @return the description.
+     */
     public String getDescription() {
         return ""
             + "Factorizes common code in all if / else if / else statements"
             + " either at the start of each blocks or at the end.\n"
             + "Ultimately it can completely remove the if statement condition.";
-    }
-
-    @Override
-    public String getName() {
-        return "Extract common code in if else statement";
     }
 
     // TODO handle switch statements

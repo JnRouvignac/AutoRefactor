@@ -60,15 +60,23 @@ public class ArrayDequeRatherThanStackRefactoring extends AbstractClassSubstitut
                     "java.io.Serializable", "java.lang.Cloneable", "java.lang.Object"});
     }
 
-    @Override
+    /**
+     * Get the name.
+     *
+     * @return the name.
+     */
+    public String getName() {
+        return "ArrayDeque rather than Stack";
+    }
+
+    /**
+     * Get the description.
+     *
+     * @return the description.
+     */
     public String getDescription() {
         return ""
             + "Replace Stack by ArrayDeque when possible.";
-    }
-
-    @Override
-    public String getName() {
-        return "ArrayDeque rather than Stack";
     }
 
     @Override

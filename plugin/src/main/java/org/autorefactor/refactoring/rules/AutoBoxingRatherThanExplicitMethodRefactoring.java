@@ -38,15 +38,23 @@ import org.eclipse.jdt.core.dom.MethodInvocation;
 /** See {@link #getDescription()} method. */
 @SuppressWarnings("javadoc")
 public class AutoBoxingRatherThanExplicitMethodRefactoring extends AbstractRefactoringRule {
-    @Override
+    /**
+     * Get the name.
+     *
+     * @return the name.
+     */
+    public String getName() {
+        return "AutoBoxing rather than explicit method";
+    }
+
+    /**
+     * Get the description.
+     *
+     * @return the description.
+     */
     public String getDescription() {
         return ""
             + "Remove useless valueOf() call to use AutoBoxing.";
-    }
-
-    @Override
-    public String getName() {
-        return "AutoBoxing rather than explicit method";
     }
 
     private int getJavaMinorVersion() {

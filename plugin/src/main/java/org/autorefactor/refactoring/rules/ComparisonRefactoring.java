@@ -46,16 +46,23 @@ import org.eclipse.jdt.core.dom.ParenthesizedExpression;
 
 /** See {@link #getDescription()} method. */
 public class ComparisonRefactoring extends AbstractRefactoringRule {
+    /**
+     * Get the name.
+     *
+     * @return the name.
+     */
+    public String getName() {
+        return "Comparison to 0 rather than 1 or -1";
+    }
 
-    @Override
+    /**
+     * Get the description.
+     *
+     * @return the description.
+     */
     public String getDescription() {
         return ""
             + "Fix Comparable.compareTo() usage.";
-    }
-
-    @Override
-    public String getName() {
-        return "Comparison to 0 rather than 1 or -1";
     }
 
     private int getJavaMinorVersion() {

@@ -52,15 +52,23 @@ import org.eclipse.jdt.core.dom.WhileStatement;
 
 /** See {@link #getDescription()} method. */
 public class IfRatherThanWhileAndFallsThroughRefactoring extends AbstractRefactoringRule {
-    @Override
+    /**
+     * Get the name.
+     *
+     * @return the name.
+     */
+    public String getName() {
+        return "If rather than while and falls through";
+    }
+
+    /**
+     * Get the description.
+     *
+     * @return the description.
+     */
     public String getDescription() {
         return ""
             + "Replace a while loop that always terminates during the first iteration by an if.";
-    }
-
-    @Override
-    public String getName() {
-        return "If rather than while and falls through";
     }
 
     @Override

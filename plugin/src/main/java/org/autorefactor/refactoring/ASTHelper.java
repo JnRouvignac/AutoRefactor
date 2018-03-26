@@ -201,7 +201,14 @@ public final class ASTHelper {
 
     /** Compares {@link ASTNode}s according to their start position. */
     public static final class NodeStartPositionComparator implements Comparator<ASTNode> {
-        @Override
+        /**
+         * Compare objects.
+         *
+         * @param o1 First item
+         * @param o2 Second item
+         *
+         * @return -1, 0 or 1
+         */
         public int compare(ASTNode o1, ASTNode o2) {
             return o1.getStartPosition() - o2.getStartPosition();
         }

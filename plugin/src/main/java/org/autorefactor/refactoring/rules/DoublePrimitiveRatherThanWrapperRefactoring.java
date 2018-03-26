@@ -46,15 +46,23 @@ import org.eclipse.jdt.core.dom.PrefixExpression;
 
 /** See {@link #getDescription()} method. */
 public class DoublePrimitiveRatherThanWrapperRefactoring extends AbstractPrimitiveRatherThanWrapperRefactoring {
-    @Override
+    /**
+     * Get the name.
+     *
+     * @return the name.
+     */
+    public String getName() {
+        return "Double primitive rather than wrapper";
+    }
+
+    /**
+     * Get the description.
+     *
+     * @return the description.
+     */
     public String getDescription() {
         return ""
             + "Replace Double wrapper object by double primitive type when an object is not necessary.";
-    }
-
-    @Override
-    public String getName() {
-        return "Double primitive rather than wrapper";
     }
 
     @Override

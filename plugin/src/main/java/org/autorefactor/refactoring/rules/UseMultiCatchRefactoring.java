@@ -25,6 +25,19 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.catchClauses;
+import static org.autorefactor.refactoring.ASTHelper.fragments;
+import static org.autorefactor.refactoring.ASTHelper.getOverridenMethods;
+import static org.autorefactor.refactoring.ASTHelper.isSameVariable;
+import static org.autorefactor.refactoring.ASTHelper.match;
+import static org.autorefactor.refactoring.ASTHelper.resolveTypeBinding;
+import static org.autorefactor.refactoring.ASTHelper.types;
+import static org.autorefactor.util.Utils.equalNotNull;
+import static org.eclipse.jdt.core.dom.ASTNode.SIMPLE_TYPE;
+import static org.eclipse.jdt.core.dom.ASTNode.UNION_TYPE;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -57,20 +70,24 @@ import org.eclipse.jdt.core.dom.UnionType;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
-import static org.autorefactor.refactoring.ASTHelper.*;
-import static org.autorefactor.util.Utils.*;
-import static org.eclipse.jdt.core.dom.ASTNode.*;
-
 /** See {@link #getDescription()} method. */
 public class UseMultiCatchRefactoring extends AbstractRefactoringRule {
-    @Override
-    public String getDescription() {
-        return "Refactors catch clauses with the same body to use Java 7's multi-catch.";
-    }
-
-    @Override
+    /**
+     * Get the name.
+     *
+     * @return the name.
+     */
     public String getName() {
         return "Multi-catch";
+    }
+
+    /**
+     * Get the description.
+     *
+     * @return the description.
+     */
+    public String getDescription() {
+        return "Refactors catch clauses with the same body to use Java 7's multi-catch.";
     }
 
     @Override
