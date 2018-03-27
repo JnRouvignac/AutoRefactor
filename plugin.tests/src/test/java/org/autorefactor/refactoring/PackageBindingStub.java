@@ -37,62 +37,110 @@ class PackageBindingStub implements IPackageBinding {
         this.packageName = packageName;
     }
 
-    @Override
+    /**
+     * Get the annotations.
+     *
+     * @return the annotations.
+     */
     public IAnnotationBinding[] getAnnotations() {
         throw new UnsupportedOperationException();
     }
 
-    @Override
+    /**
+     * Get the Java element.
+     *
+     * @return the Java element.
+     */
     public IJavaElement getJavaElement() {
         throw new UnsupportedOperationException();
     }
 
-    @Override
+    /**
+     * Get the key.
+     *
+     * @return the key.
+     */
     public String getKey() {
         throw new UnsupportedOperationException();
     }
 
-    @Override
+    /**
+     * Get the kind.
+     *
+     * @return the kind.
+     */
     public int getKind() {
         throw new UnsupportedOperationException();
     }
 
-    @Override
+    /**
+     * Get the modifiers.
+     *
+     * @return the modifiers.
+     */
     public int getModifiers() {
         throw new UnsupportedOperationException();
     }
 
-    @Override
+    /**
+     * True if it is deprecated.
+     *
+     * @return True if it is deprecated.
+     */
     public boolean isDeprecated() {
         throw new UnsupportedOperationException();
     }
 
-    @Override
+    /**
+     * True if it is equal.
+     *
+     * @return True if it is equal.
+     */
     public boolean isEqualTo(IBinding arg0) {
         throw new UnsupportedOperationException();
     }
 
-    @Override
+    /**
+     * True if it is recovered.
+     *
+     * @return True if it is recovered.
+     */
     public boolean isRecovered() {
         throw new UnsupportedOperationException();
     }
 
-    @Override
+    /**
+     * True if it is synthetic.
+     *
+     * @return True if it is synthetic.
+     */
     public boolean isSynthetic() {
         throw new UnsupportedOperationException();
     }
 
-    @Override
+    /**
+     * Get the name.
+     *
+     * @return the name.
+     */
     public String getName() {
         return packageName;
     }
 
-    @Override
+    /**
+     * Get the name components.
+     *
+     * @return the name components.
+     */
     public String[] getNameComponents() {
         throw new UnsupportedOperationException();
     }
 
-    @Override
+    /**
+     * True if it is unnamed.
+     *
+     * @return True if it is unnamed.
+     */
     public boolean isUnnamed() {
         throw new UnsupportedOperationException();
     }

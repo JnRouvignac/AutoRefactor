@@ -25,6 +25,15 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import static org.autorefactor.test.TestHelper.TEST_ENVIRONMENT;
+import static org.autorefactor.test.TestHelper.newJavaProjectOptions;
+import static org.autorefactor.test.TestHelper.normalizeJavaSourceCode;
+import static org.autorefactor.test.TestHelper.readAll;
+import static org.autorefactor.test.TestHelper.runTest;
+import static org.autorefactor.test.TestHelper.samples;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.util.Arrays;
 import java.util.Collection;
@@ -42,9 +51,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
-
-import static org.autorefactor.test.TestHelper.*;
-import static org.junit.Assert.*;
 
 /**
  * Tests all refactoring rules at the same time. This test verifies that all the
@@ -78,7 +84,11 @@ public class AllRefactoringRulesTest {
     @Test
     public void testRefactoring() throws Exception {
         runTest(new Callable<Void>() {
-            @Override
+            /**
+             * Call.
+             *
+             * @return the void.
+             */
             public Void call() throws Exception {
                 testRefactoring0();
                 return null;

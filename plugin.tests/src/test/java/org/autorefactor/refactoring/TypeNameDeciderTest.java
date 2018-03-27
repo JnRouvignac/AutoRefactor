@@ -25,6 +25,8 @@
  */
 package org.autorefactor.refactoring;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -36,8 +38,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
-
-import static org.junit.Assert.*;
 
 @SuppressWarnings("javadoc")
 @RunWith(value = Parameterized.class)
@@ -76,7 +76,13 @@ public class TypeNameDeciderTest {
 
     private String useSimplestPossibleName(String qualifiedName) {
         return new TypeNameDecider(new TypeNameDecider.ResolveTypeBindingStrategy() {
-            @Override
+            /**
+             * Get the type binding.
+             *
+             * @param fullyQualifiedName fullyQualifiedName.
+             *
+             * @return  the type binding.
+             */
             public ITypeBinding resolveTypeBinding(String fullyQualifiedName) {
                 return new TypeBindingStub(fullyQualifiedName);
             }

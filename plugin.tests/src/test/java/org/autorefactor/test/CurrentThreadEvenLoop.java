@@ -30,7 +30,14 @@ import java.util.concurrent.Callable;
 import org.autorefactor.environment.EventLoop;
 
 class CurrentThreadEvenLoop implements EventLoop {
-    @Override
+    /**
+     * Calls the {@link Callable#call()} method of the callable to be invoked by the event loop at the
+     * next reasonable opportunity.
+     *
+     * @param call the callable to invoke
+     * @param <E> the declared exception type returned by the callable
+     * @throws E the exception possibly returned by executing the callable that is then thrown
+     */
     public <E extends Exception> void syncExec(Callable<E> callable) throws E {
         try {
             final E ex = callable.call();
