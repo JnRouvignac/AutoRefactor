@@ -73,6 +73,7 @@ import org.eclipse.jdt.core.dom.BooleanLiteral;
 import org.eclipse.jdt.core.dom.BreakStatement;
 import org.eclipse.jdt.core.dom.CastExpression;
 import org.eclipse.jdt.core.dom.CatchClause;
+import org.eclipse.jdt.core.dom.CharacterLiteral;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.ConditionalExpression;
 import org.eclipse.jdt.core.dom.CreationReference;
@@ -886,6 +887,15 @@ public class ASTBuilder {
      */
     public NumberLiteral numberLiteral() {
         return ast.newNumberLiteral();
+    }
+
+    /**
+     * Builds a new {@link CharacterLiteral} instance.
+     *
+     * @return a new character literal
+     */
+    public CharacterLiteral charLiteral() {
+        return ast.newCharacterLiteral();
     }
 
     /**

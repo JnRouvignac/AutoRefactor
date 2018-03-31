@@ -40,6 +40,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.Refactorings;
 import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.CharacterLiteral;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.InfixExpression;
@@ -67,7 +68,9 @@ public class StringRefactoring extends AbstractRefactoringRule {
             + "Removes:\n"
             + "- calling String.toString() on a String instance,\n"
             + "- remove calls to String.toString() inside String concatenations,\n"
-            + "- replace useless case shifts for equality by equalsIgnoreCase().";
+            + "- replace useless case shifts for equality by equalsIgnoreCase()\n"
+            + "Refactors:\n"
+            + "- usages of 'indexOf' and 'lastIndexOf' with single letter in string";
     }
 
     @Override
@@ -161,6 +164,20 @@ public class StringRefactoring extends AbstractRefactoringRule {
                 r.replace(node,
                           b.invoke(b.copy(leftExpr), "equalsIgnoreCase", b.copy(rightExpr)));
                 return DO_NOT_VISIT_SUBTREE;
+            }
+        } else if (isMethod(node, "java.lang.String", "indexOf", "java.lang.String")
+                || isMethod(node, "java.lang.String", "lastIndexOf", "java.lang.String")
+                || isMethod(node, "java.lang.String", "indexOf", "java.lang.String", "java.lang.Integer")
+                || isMethod(node, "java.lang.String", "lastIndexOf", "java.lang.String", "java.lang.Integer")) {
+            Expression expression = arg0(node);
+            if (expression instanceof StringLiteral) {
+                String value = ((StringLiteral) expression).getLiteralValue();
+                if (value.length() == 1) {
+                    CharacterLiteral replacement = b.charLiteral();
+                    replacement.setCharValue(value.charAt(0));
+                    r.replace(expression, replacement);
+                    return DO_NOT_VISIT_SUBTREE;
+                }
             }
         }
         return VISIT_SUBTREE;
