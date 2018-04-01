@@ -31,6 +31,7 @@ import static org.autorefactor.refactoring.ASTHelper.modifiers;
 import static org.autorefactor.refactoring.ASTHelper.resources;
 import static org.eclipse.jdt.core.dom.Modifier.isFinal;
 import static org.eclipse.jdt.core.dom.Modifier.isPrivate;
+import static org.eclipse.jdt.core.dom.Modifier.isProtected;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,6 +40,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Predicate;
 
 import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.util.NotImplementedException;
@@ -81,7 +83,8 @@ public class RemoveUselessModifiersRefactoring extends AbstractRefactoringRule {
                 + "- \"public\", \"static\" and \"final\" for interface fields,\n"
                 + "- \"public\" and \"abstract\" for interface methods,\n"
                 + "- \"final\" for private methods,\n"
-                + "- \"final\" for parameters in interface method declarations.";
+                + "- \"final\" for parameters in interface method declarations,"
+                + "- \"protected\" modifier for final class members.";
     }
 
     private static final class ModifierOrderComparator implements Comparator<IExtendedModifier> {
@@ -134,24 +137,30 @@ public class RemoveUselessModifiersRefactoring extends AbstractRefactoringRule {
         if (isInterface(node.getParent())) {
             return removePublicStaticFinalModifiers(node);
         }
+        if (isProtected(node.getModifiers())
+                && isFinalClass(node.getParent())) {
+            return removeProtectedModifier(node);
+        }
         return ensureModifiersOrder(node);
+    }
+
+    private boolean removeProtectedModifier(BodyDeclaration node) {
+        return removeModifiers(modifiers(node), Modifier::isProtected);
     }
 
     private boolean removePublicStaticFinalModifiers(FieldDeclaration node) {
         // remove modifiers implied by the context
-        boolean result = VISIT_SUBTREE;
-        for (Modifier m : getModifiersOnly(modifiers(node))) {
-            if (m.isPublic() || m.isStatic() || m.isFinal()) {
-                ctx.getRefactorings().remove(m);
-                result = DO_NOT_VISIT_SUBTREE;
-            }
-        }
-        return result;
+        return removeModifiers(modifiers(node), m -> m.isPublic() || m.isStatic() || m.isFinal());
     }
 
     private boolean isInterface(ASTNode node) {
         return node instanceof TypeDeclaration
                 && ((TypeDeclaration) node).isInterface();
+    }
+
+    private boolean isFinalClass(ASTNode node) {
+        return node instanceof TypeDeclaration
+                && isFinal(((TypeDeclaration) node).getModifiers());
     }
 
     @Override
@@ -164,18 +173,15 @@ public class RemoveUselessModifiersRefactoring extends AbstractRefactoringRule {
         if (isPrivate(modifiers) && isFinal(modifiers)) {
             return removeFinalModifier(modifiers(node));
         }
+        if (isProtected(node.getModifiers())
+                && isFinalClass(node.getParent())) {
+            return removeProtectedModifier(node);
+        }
         return ensureModifiersOrder(node);
     }
 
     private boolean removePublicAbstractModifiers(BodyDeclaration node) {
-        boolean result = VISIT_SUBTREE;
-        for (Modifier m : getModifiersOnly(modifiers(node))) {
-            if (m.isPublic() || m.isAbstract()) {
-                ctx.getRefactorings().remove(m);
-                result = DO_NOT_VISIT_SUBTREE;
-            }
-        }
-        return result;
+        return removeModifiers(modifiers(node), m -> m.isPublic() || m.isAbstract());
     }
 
     @Override
@@ -190,7 +196,7 @@ public class RemoveUselessModifiersRefactoring extends AbstractRefactoringRule {
 
     @Override
     public boolean visit(EnumDeclaration node) {
-        return removeStaticModifier(modifiers(node)) | ensureModifiersOrder(node);
+        return removeStaticModifier(node) | ensureModifiersOrder(node);
     }
 
     @Override
@@ -204,7 +210,7 @@ public class RemoveUselessModifiersRefactoring extends AbstractRefactoringRule {
 
     @Override
     public boolean visit(TypeDeclaration node) {
-        return (isInterface(node) && removeStaticModifier(modifiers(node)))
+        return (isInterface(node) && removeStaticModifier(node))
                 | ensureModifiersOrder(node);
     }
 
@@ -234,10 +240,14 @@ public class RemoveUselessModifiersRefactoring extends AbstractRefactoringRule {
         }
     }
 
-    private boolean removeStaticModifier(List<IExtendedModifier> modifiers) {
+    private boolean removeStaticModifier(BodyDeclaration node) {
+        return removeModifiers(modifiers(node), Modifier::isStatic);
+    }
+
+    private boolean removeModifiers(List<IExtendedModifier> modifiers, Predicate<Modifier> checker) {
         boolean result = VISIT_SUBTREE;
         for (Modifier m : getModifiersOnly(modifiers)) {
-            if (m.isStatic()) {
+            if (checker.test(m)) {
                 ctx.getRefactorings().remove(m);
                 result = DO_NOT_VISIT_SUBTREE;
             }
@@ -254,14 +264,7 @@ public class RemoveUselessModifiersRefactoring extends AbstractRefactoringRule {
     }
 
     private boolean removeFinalModifier(List<IExtendedModifier> modifiers) {
-        boolean result = VISIT_SUBTREE;
-        for (Modifier m : getModifiersOnly(modifiers)) {
-            if (m.isFinal()) {
-                ctx.getRefactorings().remove(m);
-                result = DO_NOT_VISIT_SUBTREE;
-            }
-        }
-        return result;
+        return removeModifiers(modifiers, Modifier::isFinal);
     }
 
     private List<Modifier> getModifiersOnly(Collection<IExtendedModifier> modifiers) {

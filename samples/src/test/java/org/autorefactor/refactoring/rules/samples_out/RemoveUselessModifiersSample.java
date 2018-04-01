@@ -85,4 +85,12 @@ public interface RemoveUselessModifiersSample {
         int fixModifierOrder();
     }
 
+    final class Class {
+        String field = "someStr";
+        
+        Class(){}
+        
+        void doIt(){}
+    }
+
 }
