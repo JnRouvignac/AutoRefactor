@@ -67,8 +67,10 @@ public final class JavaCoreHelper {
     private static List<IClasspathEntry> getClasspathEntries(final IPackageFragmentRoot root) throws Exception {
         final List<IClasspathEntry> entries = new ArrayList<IClasspathEntry>();
         final IClasspathEntry srcEntry = JavaCore.newSourceEntry(root.getPath(), EMPTY_PATHS, EMPTY_PATHS, null);
-        final IClasspathEntry rtJarEntry = JavaCore.newLibraryEntry(getPathToRtJar(), null, null);
         entries.add(srcEntry);
+
+        // Should not execute this code for Java 9
+        final IClasspathEntry rtJarEntry = JavaCore.newLibraryEntry(getPathToRtJar(), null, null);
         entries.add(rtJarEntry);
 
         extractClasspathEntries(entries, "../samples/pom.xml");
