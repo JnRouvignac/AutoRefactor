@@ -40,7 +40,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.function.Predicate;
 
 import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.util.NotImplementedException;
@@ -144,13 +143,16 @@ public class RemoveUselessModifiersRefactoring extends AbstractRefactoringRule {
         return ensureModifiersOrder(node);
     }
 
-    private boolean removeProtectedModifier(BodyDeclaration node) {
-        return removeModifiers(modifiers(node), Modifier::isProtected);
-    }
-
     private boolean removePublicStaticFinalModifiers(FieldDeclaration node) {
         // remove modifiers implied by the context
-        return removeModifiers(modifiers(node), m -> m.isPublic() || m.isStatic() || m.isFinal());
+        boolean result = VISIT_SUBTREE;
+        for (Modifier m : getModifiersOnly(modifiers(node))) {
+            if (m.isPublic() || m.isStatic() || m.isFinal()) {
+                ctx.getRefactorings().remove(m);
+                result = DO_NOT_VISIT_SUBTREE;
+            }
+        }
+        return result;
     }
 
     private boolean isInterface(ASTNode node) {
@@ -180,8 +182,25 @@ public class RemoveUselessModifiersRefactoring extends AbstractRefactoringRule {
         return ensureModifiersOrder(node);
     }
 
+    private boolean removeProtectedModifier(BodyDeclaration node) {
+        for (Modifier m : getModifiersOnly(modifiers(node))) {
+            if (m.isProtected()) {
+                ctx.getRefactorings().remove(m);
+                return DO_NOT_VISIT_SUBTREE;
+            }
+        }
+        return VISIT_SUBTREE;
+    }
+
     private boolean removePublicAbstractModifiers(BodyDeclaration node) {
-        return removeModifiers(modifiers(node), m -> m.isPublic() || m.isAbstract());
+        boolean result = VISIT_SUBTREE;
+        for (Modifier m : getModifiersOnly(modifiers(node))) {
+            if (m.isPublic() || m.isAbstract()) {
+                ctx.getRefactorings().remove(m);
+                result = DO_NOT_VISIT_SUBTREE;
+            }
+        }
+        return result;
     }
 
     @Override
@@ -196,7 +215,7 @@ public class RemoveUselessModifiersRefactoring extends AbstractRefactoringRule {
 
     @Override
     public boolean visit(EnumDeclaration node) {
-        return removeStaticModifier(node) | ensureModifiersOrder(node);
+        return removeStaticModifier(modifiers(node)) | ensureModifiersOrder(node);
     }
 
     @Override
@@ -210,7 +229,7 @@ public class RemoveUselessModifiersRefactoring extends AbstractRefactoringRule {
 
     @Override
     public boolean visit(TypeDeclaration node) {
-        return (isInterface(node) && removeStaticModifier(node))
+        return (isInterface(node) && removeStaticModifier(modifiers(node)))
                 | ensureModifiersOrder(node);
     }
 
@@ -240,14 +259,10 @@ public class RemoveUselessModifiersRefactoring extends AbstractRefactoringRule {
         }
     }
 
-    private boolean removeStaticModifier(BodyDeclaration node) {
-        return removeModifiers(modifiers(node), Modifier::isStatic);
-    }
-
-    private boolean removeModifiers(List<IExtendedModifier> modifiers, Predicate<Modifier> checker) {
+    private boolean removeStaticModifier(List<IExtendedModifier> modifiers) {
         boolean result = VISIT_SUBTREE;
         for (Modifier m : getModifiersOnly(modifiers)) {
-            if (checker.test(m)) {
+            if (m.isStatic()) {
                 ctx.getRefactorings().remove(m);
                 result = DO_NOT_VISIT_SUBTREE;
             }
@@ -264,7 +279,14 @@ public class RemoveUselessModifiersRefactoring extends AbstractRefactoringRule {
     }
 
     private boolean removeFinalModifier(List<IExtendedModifier> modifiers) {
-        return removeModifiers(modifiers, Modifier::isFinal);
+        boolean result = VISIT_SUBTREE;
+        for (Modifier m : getModifiersOnly(modifiers)) {
+            if (m.isFinal()) {
+                ctx.getRefactorings().remove(m);
+                result = DO_NOT_VISIT_SUBTREE;
+            }
+        }
+        return result;
     }
 
     private List<Modifier> getModifiersOnly(Collection<IExtendedModifier> modifiers) {
