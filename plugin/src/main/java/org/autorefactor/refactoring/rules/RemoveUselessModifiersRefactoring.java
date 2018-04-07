@@ -2,6 +2,7 @@
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
  * Copyright (C) 2013-2018 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2018 Andrei Paikin - Remove protected modifier for final class not inherited members.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,6 +28,7 @@ package org.autorefactor.refactoring.rules;
 
 import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
 import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.hasType;
 import static org.autorefactor.refactoring.ASTHelper.modifiers;
 import static org.autorefactor.refactoring.ASTHelper.resources;
 import static org.eclipse.jdt.core.dom.Modifier.isFinal;
@@ -83,7 +85,7 @@ public class RemoveUselessModifiersRefactoring extends AbstractRefactoringRule {
                 + "- \"public\" and \"abstract\" for interface methods,\n"
                 + "- \"final\" for private methods,\n"
                 + "- \"final\" for parameters in interface method declarations,"
-                + "- \"protected\" modifier for final class members.";
+                + "- \"protected\" modifier for final class not inherited members.";
     }
 
     private static final class ModifierOrderComparator implements Comparator<IExtendedModifier> {
@@ -144,7 +146,7 @@ public class RemoveUselessModifiersRefactoring extends AbstractRefactoringRule {
     }
 
     private boolean removePublicStaticFinalModifiers(FieldDeclaration node) {
-        // remove modifiers implied by the context
+        // Remove modifiers implied by the context
         boolean result = VISIT_SUBTREE;
         for (Modifier m : getModifiersOnly(modifiers(node))) {
             if (m.isPublic() || m.isStatic() || m.isFinal()) {
@@ -168,7 +170,7 @@ public class RemoveUselessModifiersRefactoring extends AbstractRefactoringRule {
     @Override
     public boolean visit(MethodDeclaration node) {
         if (isInterface(node.getParent())) {
-            // remove modifiers implied by the context
+            // Remove modifiers implied by the context
             return removePublicAbstractModifiers(node);
         }
         int modifiers = node.getModifiers();
@@ -176,16 +178,28 @@ public class RemoveUselessModifiersRefactoring extends AbstractRefactoringRule {
             return removeFinalModifier(modifiers(node));
         }
         if (isProtected(node.getModifiers())
-                && isFinalClass(node.getParent())) {
+                && (node.isConstructor() || isFinalClassWithoutInheritance(node.getParent()))) {
             return removeProtectedModifier(node);
         }
         return ensureModifiersOrder(node);
     }
 
+    private boolean isFinalClassWithoutInheritance(ASTNode node) {
+        if (node instanceof TypeDeclaration) {
+            TypeDeclaration clazz = (TypeDeclaration) node;
+            return isFinalClass(clazz)
+                    && clazz.superInterfaceTypes().isEmpty()
+                    && (clazz.getSuperclassType() == null
+                            || hasType(clazz.getSuperclassType().resolveBinding(), "java.lan.Object"));
+        }
+
+        return false;
+    }
+
     private boolean removeProtectedModifier(BodyDeclaration node) {
-        for (Modifier m : getModifiersOnly(modifiers(node))) {
-            if (m.isProtected()) {
-                ctx.getRefactorings().remove(m);
+        for (Modifier modifier : getModifiersOnly(modifiers(node))) {
+            if (modifier.isProtected()) {
+                ctx.getRefactorings().remove(modifier);
                 return DO_NOT_VISIT_SUBTREE;
             }
         }

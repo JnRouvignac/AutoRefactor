@@ -2,6 +2,7 @@
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
  * Copyright (C) 2013-2014 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2018 Andrei Paikin - Remove protected modifier for final class not inherited members.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -65,11 +66,11 @@ public interface RemoveUselessModifiersSample {
 
     public static abstract class AbstractSampleClass {
     }
-    
+
     class Sample {
        private static void refactorIt(){};
        private void refactorIt2(){};
-       
+
        final void doNotRefactor(){};
        private void doNotRefactor2(){};
    }
@@ -86,11 +87,19 @@ public interface RemoveUselessModifiersSample {
     }
 
     final class Class {
-        String field = "someStr";
-        
+        String refactorThisField = "someStr";
+
         Class(){}
-        
+
         void doIt(){}
     }
 
+    final class InheritedClass<E> extends javax.swing.JComboBox<E> {
+        String refactorThisField = "someStr";
+
+        InheritedClass(boolean isActive) {}
+
+        @Override
+        protected void fireActionEvent() {}
+    }
 }
