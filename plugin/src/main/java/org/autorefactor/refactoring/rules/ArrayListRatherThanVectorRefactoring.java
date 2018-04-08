@@ -76,6 +76,15 @@ public class ArrayListRatherThanVectorRefactoring extends AbstractClassSubstitut
             + "Replace Vector by ArrayList when possible.";
     }
 
+    /**
+     * Get the reason.
+     *
+     * @return the reason.
+     */
+    public String getReason() {
+        return "It improves the time performance.";
+    }
+
     @Override
     public boolean isJavaVersionSupported(Release javaSeRelease) {
         return javaSeRelease.getMinorVersion() >= 2;

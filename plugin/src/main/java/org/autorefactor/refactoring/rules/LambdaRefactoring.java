@@ -74,8 +74,16 @@ public class LambdaRefactoring extends AbstractRefactoringRule {
      * @return the description.
      */
     public String getDescription() {
-        return ""
-                + "Improve lambda expressions.";
+        return "Improve lambda expressions.";
+    }
+
+    /**
+     * Get the reason.
+     *
+     * @return the reason.
+     */
+    public String getReason() {
+        return "It reduces code to focus attention on code that matters.";
     }
 
     private int getJavaMinorVersion() {

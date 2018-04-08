@@ -74,6 +74,16 @@ public class CharPrimitiveRatherThanWrapperRefactoring extends AbstractPrimitive
             + "Replace Character wrapper object by char primitive type when an object is not necessary.";
     }
 
+    /**
+     * Get the reason.
+     *
+     * @return the reason.
+     */
+    public String getReason() {
+        return "It improves the readibility and reduces null pointer check."
+                + " It also improves the space performance.";
+    }
+
     @Override
     public String getWrapperFullyQualifiedName() {
         return "java.lang.Character";

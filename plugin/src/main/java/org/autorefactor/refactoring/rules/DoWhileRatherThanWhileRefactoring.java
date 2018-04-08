@@ -55,6 +55,15 @@ public class DoWhileRatherThanWhileRefactoring extends AbstractRefactoringRule {
         return "Replace while by do/while when the first evaluation is always true.";
     }
 
+    /**
+     * Get the reason.
+     *
+     * @return the reason.
+     */
+    public String getReason() {
+        return "It improves the time performance.";
+    }
+
     @Override
     public boolean visit(WhileStatement node) {
         final Object constantCondition =

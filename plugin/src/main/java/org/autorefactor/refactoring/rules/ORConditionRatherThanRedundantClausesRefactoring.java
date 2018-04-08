@@ -69,6 +69,15 @@ public class ORConditionRatherThanRedundantClausesRefactoring extends AbstractRe
             + "Replace (X && Y) || !X by Y || !X.";
     }
 
+    /**
+     * Get the reason.
+     *
+     * @return the reason.
+     */
+    public String getReason() {
+        return "It improves the readibility.";
+    }
+
     @Override
     public boolean visit(InfixExpression node) {
         if (isPassive(node) && (hasOperator(node, CONDITIONAL_OR) || hasOperator(node, OR))

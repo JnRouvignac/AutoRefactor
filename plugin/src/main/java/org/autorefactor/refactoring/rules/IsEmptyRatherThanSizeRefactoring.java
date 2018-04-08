@@ -65,6 +65,15 @@ public class IsEmptyRatherThanSizeRefactoring extends AbstractRefactoringRule {
             + "Replaces some checks on Collection.size() or Map.size() with checks on isEmpty().";
     }
 
+    /**
+     * Get the reason.
+     *
+     * @return the reason.
+     */
+    public String getReason() {
+        return "It improves the readibility of such simple code to spotlight the complexity of other code.";
+    }
+
     @Override
     public boolean visit(InfixExpression node) {
         final MethodInvocation leftMi = as(node.getLeftOperand(), MethodInvocation.class);

@@ -61,8 +61,16 @@ public class ComparisonRefactoring extends AbstractRefactoringRule {
      * @return the description.
      */
     public String getDescription() {
-        return ""
-            + "Fix Comparable.compareTo() usage.";
+        return "Fix Comparable.compareTo() usage.";
+    }
+
+    /**
+     * Get the reason.
+     *
+     * @return the reason.
+     */
+    public String getReason() {
+        return "It standardizes the code.";
     }
 
     private int getJavaMinorVersion() {

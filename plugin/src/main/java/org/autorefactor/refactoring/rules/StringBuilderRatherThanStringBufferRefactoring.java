@@ -52,6 +52,15 @@ public class StringBuilderRatherThanStringBufferRefactoring extends AbstractClas
             + "Replace StringBuffer by StringBuilder when possible.";
     }
 
+    /**
+     * Get the reason.
+     *
+     * @return the reason.
+     */
+    public String getReason() {
+        return "It improves the time performance.";
+    }
+
     @Override
     public boolean isJavaVersionSupported(Release javaSeRelease) {
         return javaSeRelease.getMinorVersion() >= 5;

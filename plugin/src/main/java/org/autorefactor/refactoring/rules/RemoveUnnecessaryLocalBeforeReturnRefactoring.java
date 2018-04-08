@@ -75,6 +75,15 @@ public class RemoveUnnecessaryLocalBeforeReturnRefactoring extends AbstractRefac
             + " or unnecessary variable assignment before a return statement.";
     }
 
+    /**
+     * Get the reason.
+     *
+     * @return the reason.
+     */
+    public String getReason() {
+        return "It reduces code to focus attention on code that matters. It also improves time performance.";
+    }
+
     @Override
     public boolean visit(Block node) {
         final ReturnStatementVisitor returnStatementVisitor = new ReturnStatementVisitor(ctx, node);

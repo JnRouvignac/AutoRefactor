@@ -61,6 +61,15 @@ public class MergeConditionalBlocksRefactoring extends AbstractRefactoringRule {
         return "Merge adjacent if / else if / else statements with same code block.";
     }
 
+    /**
+     * Get the reason.
+     *
+     * @return the reason.
+     */
+    public String getReason() {
+        return "It reduces the coding, reading, debugging and tesing cost.";
+    }
+
     @Override
     public boolean visit(IfStatement node) {
         final Expression firstCondition = node.getExpression();

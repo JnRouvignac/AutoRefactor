@@ -68,6 +68,15 @@ public class AndroidWakeLockRefactoring extends AbstractRefactoringRule {
             + "and so on.";
     }
 
+    /**
+     * Get the reason.
+     *
+     * @return the reason.
+     */
+    public String getReason() {
+        return "It improves the performance.";
+    }
+
     @Override
     public boolean isEnabled(Preferences preferences) {
         // FIXME enable only when android libraries are detected

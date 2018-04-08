@@ -74,6 +74,15 @@ public class UseDiamondOperatorRefactoring extends AbstractRefactoringRule {
         return "Refactors class instance creations to use the diamond operator wherever possible.";
     }
 
+    /**
+     * Get the reason.
+     *
+     * @return the reason.
+     */
+    public String getReason() {
+        return "It reduces the code to focus the attention on code that matters. It also upgrades legacy code.";
+    }
+
     private boolean isEnabled() {
         return ctx.getJavaProjectOptions().getJavaSERelease().isCompatibleWith(Release.javaSE("1.7.0"));
     }

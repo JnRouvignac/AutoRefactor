@@ -69,6 +69,15 @@ public class PushNegationDownRefactoring extends AbstractRefactoringRule {
         return "Pushes negations down, inside the negated expressions.";
     }
 
+    /**
+     * Get the reason.
+     *
+     * @return the reason.
+     */
+    public String getReason() {
+        return "It disambiguates the code to reduce bug hazard.";
+    }
+
     @Override
     public boolean visit(PrefixExpression node) {
         if (!hasOperator(node, NOT)) {

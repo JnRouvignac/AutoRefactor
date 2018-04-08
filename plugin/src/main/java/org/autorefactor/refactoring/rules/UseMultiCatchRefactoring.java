@@ -90,6 +90,15 @@ public class UseMultiCatchRefactoring extends AbstractRefactoringRule {
         return "Refactors catch clauses with the same body to use Java 7's multi-catch.";
     }
 
+    /**
+     * Get the reason.
+     *
+     * @return the reason.
+     */
+    public String getReason() {
+        return "It reduces the coding, reading, debugging and testing cost. It also upgrades legacy code.";
+    }
+
     @Override
     public boolean isJavaVersionSupported(Release javaSeRelease) {
         return javaSeRelease.getMinorVersion() >= 7;

@@ -55,6 +55,15 @@ public class CapitalizeLongLiteralRefactoring extends AbstractRefactoringRule {
         return "Capitalize lower case 'l' -> 'L' for long number literals";
     }
 
+    /**
+     * Get the reason.
+     *
+     * @return the reason.
+     */
+    public String getReason() {
+        return "It disambiguates the code to reduce bug hazard.";
+    }
+
     @Override
     public boolean visit(NumberLiteral node) {
         final String token = node.getToken();

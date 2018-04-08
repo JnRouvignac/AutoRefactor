@@ -59,6 +59,15 @@ public class ImplicitDefaultConstructorRatherThanWrittenOneRefactoring extends
         return "Remove single public constructor with no arguments, no annotation and no code.";
     }
 
+    /**
+     * Get the reason.
+     *
+     * @return the reason.
+     */
+    public String getReason() {
+        return "It improves the readibility of a such case to spotlight the complexity of other code.";
+    }
+
     @Override
     public boolean visit(TypeDeclaration node) {
         if (!node.isInterface()) {

@@ -404,6 +404,15 @@ public class ReplaceQualifiedNamesBySimpleNamesRefactoring extends AbstractRefac
                 + " For example when relevant imports exist.";
     }
 
+    /**
+     * Get the reason.
+     *
+     * @return the reason.
+     */
+    public String getReason() {
+        return "It reduces code to focus attention on code that matters.";
+    }
+
     private void readImport(final ImportDeclaration node) {
         final QName qname = QName.valueOf(node.getName().getFullyQualifiedName());
         if (node.isStatic()) {

@@ -66,6 +66,15 @@ public class MergeBlocksWithJumpRefactoring extends AbstractRefactoringRule {
         return "Merge following if statements with same code block that end with a jump statement.";
     }
 
+    /**
+     * Get the reason.
+     *
+     * @return the reason.
+     */
+    public String getReason() {
+        return "It reduces the coding, reading, debugging and tesing cost.";
+    }
+
     @Override
     public boolean visit(Block node) {
         final SuccessiveIfVisitor successiveIfVisitor = new SuccessiveIfVisitor(ctx, node);

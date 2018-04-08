@@ -60,6 +60,15 @@ public class DoWhileRatherThanDuplicateCodeRefactoring extends AbstractRefactori
         return "Replace while by do/while when the loop statements are duplicated before the loop.";
     }
 
+    /**
+     * Get the reason.
+     *
+     * @return the reason.
+     */
+    public String getReason() {
+        return "It reduces the coding, reading, debugging and testing cost.";
+    }
+
     @Override
     public boolean visit(WhileStatement node) {
         final List<Statement> whileStmts = asList(node.getBody());

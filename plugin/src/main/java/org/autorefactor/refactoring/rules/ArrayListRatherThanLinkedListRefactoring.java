@@ -76,6 +76,15 @@ public class ArrayListRatherThanLinkedListRefactoring extends AbstractClassSubst
             + "Replace LinkedList by ArrayList when no item is inserted or removed in the middle of the list.";
     }
 
+    /**
+     * Get the reason.
+     *
+     * @return the reason.
+     */
+    public String getReason() {
+        return "It improves the time and space performance.";
+    }
+
     @Override
     protected String[] getExistingClassCanonicalName() {
         return new String[] {"java.util.LinkedList"};

@@ -97,6 +97,15 @@ public class CollectionContainsRefactoring extends AbstractRefactoringRule {
         return "Replace loop with Collection.contains(Object obj).";
     }
 
+    /**
+     * Get the reason.
+     *
+     * @return the reason.
+     */
+    public String getReason() {
+        return "It reduces code to focus attention on code that matters.";
+    }
+
     @Override
     public boolean visit(Block node) {
         final AssignmentForAndReturnVisitor assignmentForAndReturnVisitor =

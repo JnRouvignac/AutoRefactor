@@ -103,6 +103,15 @@ public class AndroidViewHolderRefactoring extends AbstractRefactoringRule {
                 + "It reduces the number calls to the costly inflate()) and getViewById() Android API methods.";
     }
 
+    /**
+     * Get the reason.
+     *
+     * @return the reason.
+     */
+    public String getReason() {
+        return "It improves the performance.";
+    }
+
     @Override
     public boolean isEnabled(Preferences preferences) {
         // FIXME enable only when android libraries are detected

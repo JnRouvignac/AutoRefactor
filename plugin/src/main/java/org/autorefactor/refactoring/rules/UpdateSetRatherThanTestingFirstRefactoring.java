@@ -73,6 +73,15 @@ public class UpdateSetRatherThanTestingFirstRefactoring extends AbstractRefactor
             + " with straight calls to Set.remove().";
     }
 
+    /**
+     * Get the reason.
+     *
+     * @return the reason.
+     */
+    public String getReason() {
+        return "It reduces the coding, reading and debugging time.";
+    }
+
     @Override
     public boolean visit(IfStatement node) {
         final Statement elseStmt = node.getElseStatement();

@@ -59,6 +59,15 @@ public final class RemoveUncheckedThrowsClausesRefactoring extends AbstractRefac
         return "Remove unchecked exceptions from throws clause";
     }
 
+    /**
+     * Get the reason.
+     *
+     * @return the reason.
+     */
+    public String getReason() {
+        return "It reduces code to focus attention on code that matters.";
+    }
+
     @Override
     public boolean visit(MethodDeclaration node) {
         final Collection<ASTNode> nodesToRemove = getUncheckedExceptions(node);

@@ -78,6 +78,15 @@ public class AllInOneMethodRatherThanLoopRefactoring extends AbstractRefactoring
             + "- replaces for/foreach loops to use Collection.removeAll() where possible.";
     }
 
+    /**
+     * Get the reason.
+     *
+     * @return the reason.
+     */
+    public String getReason() {
+        return "It reduces code to focus attention on code that matters.";
+    }
+
     @Override
     public boolean visit(EnhancedForStatement node) {
         final Expression iterable = node.getExpression();

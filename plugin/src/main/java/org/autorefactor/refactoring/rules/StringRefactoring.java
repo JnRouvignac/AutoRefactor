@@ -73,6 +73,15 @@ public class StringRefactoring extends AbstractRefactoringRule {
             + "- usages of 'indexOf' and 'lastIndexOf' with single letter in string";
     }
 
+    /**
+     * Get the reason.
+     *
+     * @return the reason.
+     */
+    public String getReason() {
+        return "It improves the time and space performance. It also improves the readibility.";
+    }
+
     @Override
     public boolean visit(MethodInvocation node) {
         final Expression expr = node.getExpression();

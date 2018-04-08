@@ -80,6 +80,15 @@ public class MapRefactoring extends AbstractRefactoringRule {
                 + " by creating the new Map with the other Map as parameter.";
     }
 
+    /**
+     * Get the reason.
+     *
+     * @return the reason.
+     */
+    public String getReason() {
+        return "It reduces the reading and debugging cost.";
+    }
+
     @Override
     public boolean visit(Block node) {
         final NewAndPutAllMethodVisitor newAndPutAllMethodVisitor = new NewAndPutAllMethodVisitor(ctx, node);

@@ -45,7 +45,6 @@ import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.ThisExpression;
 
 /** See {@link #getDescription()} method. */
-@SuppressWarnings("javadoc")
 public class RemoveUnneededThisExpressionRefactoring extends AbstractRefactoringRule {
     /**
      * Get the name.
@@ -63,6 +62,15 @@ public class RemoveUnneededThisExpressionRefactoring extends AbstractRefactoring
      */
     public String getDescription() {
         return "Remove useless use of \"this\" from method calls.";
+    }
+
+    /**
+     * Get the reason.
+     *
+     * @return the reason.
+     */
+    public String getReason() {
+        return "It reduces code to focus attention on code that matters.";
     }
 
     @Override

@@ -69,7 +69,16 @@ public class InlineCodeRatherThanPeremptoryConditionRefactoring extends Abstract
      * @return the description.
      */
     public String getDescription() {
-        return "" + "Replace always true or always false condition by inline code.";
+        return "Replace always true or always false condition by inline code.";
+    }
+
+    /**
+     * Get the reason.
+     *
+     * @return the reason.
+     */
+    public String getReason() {
+        return "It disambiguates the code to improve the readibility.";
     }
 
     @Override

@@ -35,7 +35,6 @@ import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 
 /** See {@link #getDescription()} method. */
-@SuppressWarnings("javadoc")
 public class UnboxingRatherThanExplicitMethodRefactoring extends AbstractRefactoringRule {
     /**
      * Get the name.
@@ -54,6 +53,15 @@ public class UnboxingRatherThanExplicitMethodRefactoring extends AbstractRefacto
     public String getDescription() {
         return ""
             + "Remove useless primitiveValue() call to use unboxing.";
+    }
+
+    /**
+     * Get the reason.
+     *
+     * @return the reason.
+     */
+    public String getReason() {
+        return "It improves the readibility. It also upgrades legacy code.";
     }
 
     private int getJavaMinorVersion() {

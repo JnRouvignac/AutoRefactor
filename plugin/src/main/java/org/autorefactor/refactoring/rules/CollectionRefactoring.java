@@ -80,6 +80,15 @@ public class CollectionRefactoring extends AbstractRefactoringRule {
                 + " by creating the new Collection with the other Collection as parameter.";
     }
 
+    /**
+     * Get the reason.
+     *
+     * @return the reason.
+     */
+    public String getReason() {
+        return "It reduces the reading and debugging cost.";
+    }
+
     @Override
     public boolean visit(Block node) {
         final NewAndAddAllMethodVisitor newAndAddAllMethodVisitor = new NewAndAddAllMethodVisitor(ctx, node);

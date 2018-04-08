@@ -83,6 +83,15 @@ public class SetRatherThanListRefactoring extends AbstractClassSubstituteRefacto
             + "Replace List by HashSet when only presence of items is used.";
     }
 
+    /**
+     * Get the reason.
+     *
+     * @return the reason.
+     */
+    public String getReason() {
+        return "It improves the space performance.";
+    }
+
     @Override
     public boolean visit(Block node) {
         isContainsMethodUsed = false;

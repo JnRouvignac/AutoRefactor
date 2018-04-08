@@ -81,6 +81,15 @@ public class TryWithResourceRefactoring extends AbstractRefactoringRule {
             + "In particular, it removes now useless finally clauses.";
     }
 
+    /**
+     * Get the reason.
+     *
+     * @return the reason.
+     */
+    public String getReason() {
+        return "It improves the readibility. It also upgrades legacy code.";
+    }
+
     @Override
     public boolean isJavaVersionSupported(Release javaSeRelease) {
         return javaSeRelease.getMinorVersion() >= 7;

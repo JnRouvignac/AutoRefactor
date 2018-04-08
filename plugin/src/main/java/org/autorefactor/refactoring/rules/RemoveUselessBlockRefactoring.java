@@ -60,6 +60,15 @@ public class RemoveUselessBlockRefactoring extends AbstractRefactoringRule {
         return "Removes lone and embedded block.";
     }
 
+    /**
+     * Get the reason.
+     *
+     * @return the reason.
+     */
+    public String getReason() {
+        return "It reduces code to focus attention on code that matters.";
+    }
+
     @Override
     public boolean visit(Block node) {
         final List<Statement> stmts = statements(node);

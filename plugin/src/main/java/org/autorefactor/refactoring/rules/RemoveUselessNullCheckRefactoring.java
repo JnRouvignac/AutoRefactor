@@ -54,7 +54,6 @@ import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.Statement;
 
 /** See {@link #getDescription()} method. */
-@SuppressWarnings("javadoc")
 public class RemoveUselessNullCheckRefactoring extends AbstractRefactoringRule {
     /**
      * Get the name.
@@ -76,6 +75,15 @@ public class RemoveUselessNullCheckRefactoring extends AbstractRefactoringRule {
                 + "Such useless null checks are comparing an expression against null,\n"
                 + "then either assigning null or the expression depending on the result of the null check.\n"
                 + "It is simpler to directly assign the expression.";
+    }
+
+    /**
+     * Get the reason.
+     *
+     * @return the reason.
+     */
+    public String getReason() {
+        return "It reduces code to focus attention on code that matters.";
     }
 
     @Override

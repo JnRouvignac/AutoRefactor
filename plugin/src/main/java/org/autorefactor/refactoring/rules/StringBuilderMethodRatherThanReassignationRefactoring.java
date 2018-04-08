@@ -60,6 +60,15 @@ public class StringBuilderMethodRatherThanReassignationRefactoring extends Abstr
         return "Removes the assignation to the same variable on a StringBuilder.append() call.";
     }
 
+    /**
+     * Get the reason.
+     *
+     * @return the reason.
+     */
+    public String getReason() {
+        return "It reduces the code to focus the attention on code that matters.";
+    }
+
     @Override
     public boolean visit(Assignment node) {
         final Expression targetVar = node.getLeftHandSide();

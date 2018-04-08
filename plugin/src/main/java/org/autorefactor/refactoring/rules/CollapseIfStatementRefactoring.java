@@ -39,7 +39,6 @@ import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.InfixExpression;
 
 /** See {@link #getDescription()} method. */
-@SuppressWarnings("javadoc")
 public class CollapseIfStatementRefactoring extends AbstractRefactoringRule {
     /**
      * Get the name.
@@ -56,7 +55,16 @@ public class CollapseIfStatementRefactoring extends AbstractRefactoringRule {
      * @return the description.
      */
     public String getDescription() {
-        return "Collapses two consecutive if statements into just one.";
+        return "Merge inside if statement into the parent if statement.";
+    }
+
+    /**
+     * Get the reason.
+     *
+     * @return the reason.
+     */
+    public String getReason() {
+        return "It reduces the coding, reading, debugging and testing cost.";
     }
 
     @Override

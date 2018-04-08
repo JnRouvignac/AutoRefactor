@@ -62,6 +62,16 @@ public class BytePrimitiveRatherThanWrapperRefactoring extends AbstractPrimitive
             + "Replace Byte wrapper object by byte primitive type when an object is not necessary.";
     }
 
+    /**
+     * Get the reason.
+     *
+     * @return the reason.
+     */
+    public String getReason() {
+        return "It improves the readibility and reduces null pointer check."
+                + " It also improves the space performance.";
+    }
+
     @Override
     public String getWrapperFullyQualifiedName() {
         return "java.lang.Byte";

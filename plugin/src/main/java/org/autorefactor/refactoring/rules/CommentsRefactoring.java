@@ -114,6 +114,15 @@ public class CommentsRefactoring extends AbstractRefactoringRule {
             + "- remove Eclipse generated (non-Javadoc) block comments.";
     }
 
+    /**
+     * Get the reason.
+     *
+     * @return the reason.
+     */
+    public String getReason() {
+        return "It improves the readibility.";
+    }
+
     private static final Pattern EMPTY_LINE_COMMENT = Pattern.compile("//\\s*");
     private static final Pattern EMPTY_BLOCK_COMMENT = Pattern.compile("/\\*\\s*(\\*\\s*)*\\*/");
     private static final Pattern EMPTY_JAVADOC = Pattern.compile("/\\*\\*\\s*(\\*\\s*)*\\*/");

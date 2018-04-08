@@ -65,7 +65,6 @@ import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
  * <p>
  * TODO JNR remove casts from method parameters
  */
-@SuppressWarnings("javadoc")
 public class RemoveUnnecessaryCastRefactoring extends AbstractRefactoringRule {
     /**
      * Get the name.
@@ -85,6 +84,16 @@ public class RemoveUnnecessaryCastRefactoring extends AbstractRefactoringRule {
         return ""
                 + "Removes unnecessary widening casts from return statements, assignments and infix expressions. "
                 + "Correctly types literals. ";
+    }
+
+    /**
+     * Get the reason.
+     *
+     * @return the reason.
+     */
+    public String getReason() {
+        return "It reduces code to focus attention on code that matters."
+                + " It also improves the time and the space performance.";
     }
 
     @Override

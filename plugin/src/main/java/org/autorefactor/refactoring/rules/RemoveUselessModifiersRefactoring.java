@@ -88,6 +88,15 @@ public class RemoveUselessModifiersRefactoring extends AbstractRefactoringRule {
                 + "- \"protected\" modifier for final class not inherited members.";
     }
 
+    /**
+     * Get the reason.
+     *
+     * @return the reason.
+     */
+    public String getReason() {
+        return "It reduces code to focus attention on code that matters.";
+    }
+
     private static final class ModifierOrderComparator implements Comparator<IExtendedModifier> {
         /**
          * Compare objects.

@@ -61,6 +61,15 @@ public class NoSettingRatherThanUselessSettingRefactoring extends AbstractRefact
                 + "Remove passive assignment when the variable is reassigned before being read.";
     }
 
+    /**
+     * Get the reason.
+     *
+     * @return the reason.
+     */
+    public String getReason() {
+        return "It improves the readibility. It also improves the time and the space performance.";
+    }
+
     @Override
     public boolean visit(VariableDeclarationStatement node) {
         if (node.fragments() != null && node.fragments().size() == 1) {

@@ -88,6 +88,15 @@ public class StringBuilderRefactoring extends AbstractRefactoringRule {
             + " and call toString() with straight String concatenation using operator '+'.";
     }
 
+    /**
+     * Get the reason.
+     *
+     * @return the reason.
+     */
+    public String getReason() {
+        return "It improves the time and space performance. It also improves the readibility.";
+    }
+
     private boolean isEmptyString(final Expression expr) {
         return "".equals(expr.resolveConstantExpressionValue())
                 // Due to a bug with ASTNode.resolveConstantExpressionValue()

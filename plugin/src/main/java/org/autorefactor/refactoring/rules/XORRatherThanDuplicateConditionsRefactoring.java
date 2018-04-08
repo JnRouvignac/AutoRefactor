@@ -69,6 +69,15 @@ public class XORRatherThanDuplicateConditionsRefactoring extends AbstractRefacto
             + "Replace (X && !Y) || (!X && Y) by X ^ Y.";
     }
 
+    /**
+     * Get the reason.
+     *
+     * @return the reason.
+     */
+    public String getReason() {
+        return "It improves the readibility.";
+    }
+
     @Override
     public boolean visit(InfixExpression node) {
         if ((hasOperator(node, CONDITIONAL_OR) || hasOperator(node, OR)) && !node.hasExtendedOperands()) {

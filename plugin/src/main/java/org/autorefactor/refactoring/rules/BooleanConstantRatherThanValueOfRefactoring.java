@@ -58,6 +58,15 @@ public class BooleanConstantRatherThanValueOfRefactoring extends AbstractRefacto
             + "Replace Boolean.valueOf(true) and Boolean.valueOf(false) by Boolean.TRUE and Boolean.FALSE.";
     }
 
+    /**
+     * Get the reason.
+     *
+     * @return the reason.
+     */
+    public String getReason() {
+        return "It improves the readibility. It also improves the time performance.";
+    }
+
     @Override
     public boolean visit(MethodInvocation node) {
         if (isMethod(node, "java.lang.Boolean", "valueOf", "java.lang.String")

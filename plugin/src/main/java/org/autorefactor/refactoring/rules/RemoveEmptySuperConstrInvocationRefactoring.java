@@ -52,6 +52,15 @@ public class RemoveEmptySuperConstrInvocationRefactoring extends
                 + "since it is redundant. See JLS section 12.5 for more info.";
     }
 
+    /**
+     * Get the reason.
+     *
+     * @return the reason.
+     */
+    public String getReason() {
+        return "It reduces code to focus attention on code that matters.";
+    }
+
     @Override
     public boolean visit(SuperConstructorInvocation node) {
         if (node.arguments().isEmpty()) {

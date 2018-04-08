@@ -37,7 +37,6 @@ import org.eclipse.jdt.core.dom.Type;
  *
  * @see {@link #getDescription()}
  */
-@SuppressWarnings("javadoc")
 public class GenerecizeRefactoring extends AbstractRefactoringRule {
     /**
      * Get the name.
@@ -55,6 +54,15 @@ public class GenerecizeRefactoring extends AbstractRefactoringRule {
      */
     public String getDescription() {
         return "Adds generic parameters to generic types.";
+    }
+
+    /**
+     * Get the reason.
+     *
+     * @return the reason.
+     */
+    public String getReason() {
+        return "It reduces the bug hazard.";
     }
 
     // TODO JNR where are we doing casts?

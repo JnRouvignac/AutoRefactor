@@ -47,7 +47,6 @@ import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.SimpleName;
 
 /** See {@link #getDescription()} method. */
-@SuppressWarnings("javadoc")
 public class PrimitiveWrapperCreationRefactoring extends AbstractRefactoringRule {
     /**
      * Get the name.
@@ -67,6 +66,15 @@ public class PrimitiveWrapperCreationRefactoring extends AbstractRefactoringRule
         return ""
             + "Replaces unnecessary primitive wrappers instance creations"
             + " by using static factory methods (\"valueOf()\") or existing constants.";
+    }
+
+    /**
+     * Get the reason.
+     *
+     * @return the reason.
+     */
+    public String getReason() {
+        return "It dramatically improves the space performance.";
     }
 
     private int getJavaMinorVersion() {

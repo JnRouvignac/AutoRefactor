@@ -63,6 +63,15 @@ public final class EnumSetRatherThanHashSetRefactoring extends
                 + "to invocation of static methods of EnumSet where possible";
     }
 
+    /**
+     * Get the reason.
+     *
+     * @return the reason.
+     */
+    public String getReason() {
+        return "It improves the space performance.";
+    }
+
     @Override
     String getImplType() {
         return "java.util.HashSet";
@@ -83,8 +92,6 @@ public final class EnumSetRatherThanHashSetRefactoring extends
      * Other constructors can be replaced with <code>EnumSet.noneOf(Class)</code> method. <br>
      * <br>
      *
-     * @see java.util.EnumSet#copyOf(Collection)
-     * @see java.util.EnumSet#copyOf(EnumSet)
      * @see java.util.EnumSet#noneOf(Class) <br>
      * @param cic
      *            - class instance creation node to be replaced

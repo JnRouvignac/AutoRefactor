@@ -112,6 +112,15 @@ public class BooleanRefactoring extends AbstractRefactoringRule {
                 + "- simplify boolean expressions.";
     }
 
+    /**
+     * Get the reason.
+     *
+     * @return the reason.
+     */
+    public String getReason() {
+        return "It reduces code to focus attention on code that matters.";
+    }
+
     private class BooleanASTMatcher extends ASTMatcher {
 
         /** else node to then node. */

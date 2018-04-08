@@ -57,6 +57,16 @@ public class MethodOnMapRatherThanMethodOnKeySetRefactoring extends AbstractRefa
                 + "Directly invoke methods on Map rather than on Map.keySet() when possible.";
     }
 
+    /**
+     * Get the reason.
+     *
+     * @return the reason.
+     */
+    public String getReason() {
+        return "It reduces the coding, reading and debugging cost."
+                + " It also improves the time and the space performance.";
+    }
+
     @Override
     public boolean visit(MethodInvocation mi) {
         Expression miExpr = mi.getExpression();

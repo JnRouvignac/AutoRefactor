@@ -57,6 +57,15 @@ public class EndOfMethodRatherThanReturnRefactoring extends AbstractRefactoringR
         return "Removes useless lone return at the end of a method.";
     }
 
+    /**
+     * Get the reason.
+     *
+     * @return the reason.
+     */
+    public String getReason() {
+        return "It reduces code to focus attention on code that matters.";
+    }
+
     @Override
     public boolean visit(ReturnStatement node) {
         if (node.getExpression() == null && isLastStmt(node)) {

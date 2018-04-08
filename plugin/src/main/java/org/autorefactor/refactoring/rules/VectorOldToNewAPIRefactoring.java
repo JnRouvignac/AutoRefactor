@@ -43,7 +43,6 @@ import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 
 /** See {@link #getDescription()} method. */
-@SuppressWarnings("javadoc")
 public class VectorOldToNewAPIRefactoring extends AbstractRefactoringRule {
     /**
      * Get the name.
@@ -61,6 +60,15 @@ public class VectorOldToNewAPIRefactoring extends AbstractRefactoringRule {
      */
     public String getDescription() {
         return "Replaces Vector pre-Collections APIs with equivalent Collections APIs.";
+    }
+
+    /**
+     * Get the reason.
+     *
+     * @return the reason.
+     */
+    public String getReason() {
+        return "It makes the code more standard.";
     }
 
     @Override

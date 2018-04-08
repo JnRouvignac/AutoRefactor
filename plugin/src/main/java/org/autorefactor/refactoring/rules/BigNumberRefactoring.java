@@ -81,6 +81,15 @@ public class BigNumberRefactoring extends AbstractRefactoringRule {
             + "- replace calls to equals() with calls to compareTo().";
     }
 
+    /**
+     * Get the reason.
+     *
+     * @return the reason.
+     */
+    public String getReason() {
+        return "It improves the readibility.";
+    }
+
     private int getJavaMinorVersion() {
         return ctx.getJavaProjectOptions().getJavaSERelease().getMinorVersion();
     }

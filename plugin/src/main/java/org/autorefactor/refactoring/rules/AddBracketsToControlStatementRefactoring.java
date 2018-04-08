@@ -38,7 +38,6 @@ import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.WhileStatement;
 
 /** See {@link #getDescription()} method. */
-@SuppressWarnings("javadoc")
 public class AddBracketsToControlStatementRefactoring extends AbstractRefactoringRule {
     /**
      * Get the name.
@@ -61,6 +60,15 @@ public class AddBracketsToControlStatementRefactoring extends AbstractRefactorin
             + "- for loop body,\n"
             + "- do ... while loop body,\n"
             + "- while loop body.";
+    }
+
+    /**
+     * Get the reason.
+     *
+     * @return the reason.
+     */
+    public String getReason() {
+        return "It improves the readibility and reduce the bug hazard.";
     }
 
     @Override

@@ -37,18 +37,25 @@ import org.eclipse.jdt.core.dom.CompilationUnit;
  */
 public interface RefactoringRule {
     /**
+     * Returns the name of the refactoring rule suitable for displaying to the user.
+     *
+     * @return the name
+     */
+    String getName();
+
+    /**
      * Returns a description of the refactoring rule suitable for displaying to the user.
      *
-     * @return a description of the refactoring rule suitable for displaying to the user
+     * @return the description
      */
     String getDescription();
 
     /**
-     * Returns the name of the refactoring rule suitable for displaying to the user.
+     * Returns the motivation of the refactoring rule suitable for displaying to the user.
      *
-     * @return the name of the refactoring rule suitable for displaying to the user
+     * @return the motivation
      */
-    String getName();
+    String getReason();
 
     /**
      * Returns all the refactorings determined for the provided compilation unit after analysis.

@@ -64,6 +64,15 @@ public class StaticConstantRatherThanInstanceConstantRefactoring extends Abstrac
             + "Add the static modifier to the initialized final primitive or wrapper fields.";
     }
 
+    /**
+     * Get the reason.
+     *
+     * @return the reason.
+     */
+    public String getReason() {
+        return "It improves the space performance.";
+    }
+
     @Override
     public boolean visit(FieldDeclaration node) {
         if (node.getType().isPrimitiveType()

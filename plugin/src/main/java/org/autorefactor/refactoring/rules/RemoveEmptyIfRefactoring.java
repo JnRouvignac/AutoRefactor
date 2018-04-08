@@ -61,6 +61,16 @@ public class RemoveEmptyIfRefactoring extends AbstractRefactoringRule {
         return "Removes empty if or else block.";
     }
 
+    /**
+     * Get the reason.
+     *
+     * @return the reason.
+     */
+    public String getReason() {
+        return "It reduces code to focus attention on code that matters."
+                + " It also improves the time performance.";
+    }
+
     @Override
     public boolean visit(IfStatement node) {
         final Refactorings r = this.ctx.getRefactorings();

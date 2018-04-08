@@ -39,7 +39,6 @@ import org.eclipse.jdt.core.dom.QualifiedName;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
 /** See {@link #getDescription()} method. */
-@SuppressWarnings("javadoc")
 public class LiteralRatherThanBooleanConstantRefactoring extends AbstractRefactoringRule {
     /**
      * Get the name.
@@ -58,6 +57,15 @@ public class LiteralRatherThanBooleanConstantRefactoring extends AbstractRefacto
     public String getDescription() {
         return ""
             + "Replace Boolean.TRUE/Boolean.FALSE by true/false on primitive assignment.";
+    }
+
+    /**
+     * Get the reason.
+     *
+     * @return the reason.
+     */
+    public String getReason() {
+        return "It improves the readibility.";
     }
 
     @Override

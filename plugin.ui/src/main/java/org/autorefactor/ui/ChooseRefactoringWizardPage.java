@@ -259,7 +259,8 @@ public class ChooseRefactoringWizardPage extends WizardPage {
 
             @Override
             public String getToolTipText(Object refactoring) {
-                return ((RefactoringRule) refactoring).getDescription();
+                RefactoringRule refactoringRule = (RefactoringRule) refactoring;
+                return refactoringRule.getDescription() + "\n\nWhy to do so:\n" + refactoringRule.getReason();
             }
 
             @Override

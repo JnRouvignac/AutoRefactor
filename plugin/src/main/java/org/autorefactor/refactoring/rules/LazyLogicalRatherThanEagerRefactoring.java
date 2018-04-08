@@ -55,6 +55,15 @@ public class LazyLogicalRatherThanEagerRefactoring extends AbstractRefactoringRu
             + "Replace & by && and | by || when the right operand is passive.";
     }
 
+    /**
+     * Get the reason.
+     *
+     * @return the reason.
+     */
+    public String getReason() {
+        return "It improves the time performance.";
+    }
+
     @Override
     public boolean visit(InfixExpression node) {
         if (!node.hasExtendedOperands()

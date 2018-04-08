@@ -86,6 +86,15 @@ public class CommonIfInIfElseRefactoring extends AbstractRefactoringRule {
             + " when the inner if condition is common to both if/else clauses of the outer if statement.";
     }
 
+    /**
+     * Get the reason.
+     *
+     * @return the reason.
+     */
+    public String getReason() {
+        return "It reduces the coding, reading, debugging and testing cost.";
+    }
+
     @Override
     public boolean visit(IfStatement node) {
         final IfStatement thenInnerIfStmt = as(node.getThenStatement(), IfStatement.class);

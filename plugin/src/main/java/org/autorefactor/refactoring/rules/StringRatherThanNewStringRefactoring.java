@@ -58,6 +58,15 @@ public class StringRatherThanNewStringRefactoring extends AbstractRefactoringRul
             + "Removes a String instance from a String literal.";
     }
 
+    /**
+     * Get the reason.
+     *
+     * @return the reason.
+     */
+    public String getReason() {
+        return "It improves the time and space performance. It also improves the readibility.";
+    }
+
     @Override
     public boolean visit(ClassInstanceCreation node) {
         if (hasType(node, "java.lang.String")

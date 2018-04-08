@@ -69,6 +69,15 @@ public class RemoveEmptyStatementRefactoring extends AbstractRefactoringRule {
         return "Removes lone semicolons.";
     }
 
+    /**
+     * Get the reason.
+     *
+     * @return the reason.
+     */
+    public String getReason() {
+        return "It reduces code to focus attention on code that matters.";
+    }
+
     @Override
     public boolean visit(EmptyStatement node) {
         ASTNode parent = node.getParent();

@@ -52,7 +52,6 @@ import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.Statement;
 
 /** See {@link #getDescription()} method. */
-@SuppressWarnings("javadoc")
 public class WorkWithNullCheckedExpressionFirstRefactoring extends AbstractRefactoringRule {
     /**
      * Get the name.
@@ -73,6 +72,15 @@ public class WorkWithNullCheckedExpressionFirstRefactoring extends AbstractRefac
                 + "Refactors if statements with a null checked expression"
                 + " to work with the not null case in the then clause"
                 + " and then work with the null case in the else clause.";
+    }
+
+    /**
+     * Get the reason.
+     *
+     * @return the reason.
+     */
+    public String getReason() {
+        return "The readibility is improved.";
     }
 
     @Override

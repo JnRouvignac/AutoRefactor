@@ -51,7 +51,6 @@ import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
 /** See {@link #getDescription()} method. */
-@SuppressWarnings("javadoc")
 public class NoAssignmentInIfConditionRefactoring extends AbstractRefactoringRule {
     /**
      * Get the name.
@@ -69,6 +68,15 @@ public class NoAssignmentInIfConditionRefactoring extends AbstractRefactoringRul
      */
     public String getDescription() {
         return "Moves assignments inside an if condition before the if node.";
+    }
+
+    /**
+     * Get the reason.
+     *
+     * @return the reason.
+     */
+    public String getReason() {
+        return "It improves the readibility and reduces the bug hazard.";
     }
 
     @Override

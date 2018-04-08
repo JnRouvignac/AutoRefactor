@@ -61,6 +61,15 @@ public class ArrayDequeRatherThanStackRefactoring extends AbstractClassSubstitut
     }
 
     /**
+     * Get the reason.
+     *
+     * @return the reason.
+     */
+    public String getReason() {
+        return "It improves the time performance.";
+    }
+
+    /**
      * Get the name.
      *
      * @return the name.

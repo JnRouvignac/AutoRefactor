@@ -54,6 +54,15 @@ public class RemoveAbstractFromInterfaceRefactoring extends AbstractRefactoringR
             + "Remove the useless abstract modifier from interface.";
     }
 
+    /**
+     * Get the reason.
+     *
+     * @return the reason.
+     */
+    public String getReason() {
+        return "It reduces code to focus attention on code that matters.";
+    }
+
     @Override
     public boolean visit(TypeDeclaration node) {
         if (node.isInterface()) {

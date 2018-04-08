@@ -63,6 +63,15 @@ public class RemoveFieldsDefaultValuesRefactoring extends AbstractRefactoringRul
             + "Likewise, the initializer will be removed for non primitive fields initialized to \"null\".";
     }
 
+    /**
+     * Get the reason.
+     *
+     * @return the reason.
+     */
+    public String getReason() {
+        return "It reduces the code to focus the attention on the other non-default initializations.";
+    }
+
     @Override
     public boolean visit(FieldDeclaration node) {
         if (!canRemoveFieldDefaultValue(node)) {

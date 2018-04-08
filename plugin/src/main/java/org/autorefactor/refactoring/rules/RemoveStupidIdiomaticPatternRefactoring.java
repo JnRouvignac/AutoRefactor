@@ -74,6 +74,16 @@ public class RemoveStupidIdiomaticPatternRefactoring extends AbstractRefactoring
         return "Refactors to a proper use of try statements and return statements.";
     }
 
+    /**
+     * Get the reason.
+     *
+     * @return the reason.
+     */
+    public String getReason() {
+        return "It reduces code to focus attention on code that matters."
+                + " It also improves the time and space performance.";
+    }
+
     // TODO JNR
 
     // public Object myMethod() {

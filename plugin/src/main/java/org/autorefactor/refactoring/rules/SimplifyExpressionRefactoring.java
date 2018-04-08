@@ -105,6 +105,15 @@ public class SimplifyExpressionRefactoring extends AbstractRefactoringRule {
             + "- reduce double negation in boolean expression.";
     }
 
+    /**
+     * Get the reason.
+     *
+     * @return the reason.
+     */
+    public String getReason() {
+        return "It improves the readibility and the performance.";
+    }
+
     /** A mapping of child operation to parent operation that mandates using parentheses. */
     private static final List<Pair<Operator, Operator>> SHOULD_HAVE_PARENTHESES =
             Arrays.<Pair<Operator, Operator>>asList(

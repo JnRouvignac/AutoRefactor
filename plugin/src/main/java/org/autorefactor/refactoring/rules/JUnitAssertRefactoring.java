@@ -64,6 +64,15 @@ public class JUnitAssertRefactoring extends AbstractUnitTestRefactoring {
         return "Refactors to a proper use of JUnit assertions.";
     }
 
+    /**
+     * Get the reason.
+     *
+     * @return the reason.
+     */
+    public String getReason() {
+        return "It improves the readibility of the code and the report.";
+    }
+
     @Override
     protected boolean canUseAssertNotEquals() {
         return false;

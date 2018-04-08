@@ -63,6 +63,15 @@ public class InvertEqualsRefactoring extends AbstractRefactoringRule {
             + " when it is known that the second operand is not null and the first can be null.";
     }
 
+    /**
+     * Get the reason.
+     *
+     * @return the reason.
+     */
+    public String getReason() {
+        return "It avoids null pointer.";
+    }
+
     @Override
     public boolean visit(MethodInvocation node) {
         if (node.getExpression() == null) {

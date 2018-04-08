@@ -77,6 +77,15 @@ public class SuperCallRatherThanUselessOverridingRefactoring extends AbstractRef
         return "Removes overriding of method if the overriding only call the super class.";
     }
 
+    /**
+     * Get the reason.
+     *
+     * @return the reason.
+     */
+    public String getReason() {
+        return "It improves the readibility of such simple code to spotlight the complexity of other code.";
+    }
+
     @Override
     public boolean visit(MethodDeclaration node) {
         if (node.getBody() == null) {

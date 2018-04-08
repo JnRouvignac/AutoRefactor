@@ -77,6 +77,15 @@ public class HashSetRatherThanTreeSetRefactoring extends AbstractClassSubstitute
             + "Replace TreeSet by HashSet when the entry order is not used.";
     }
 
+    /**
+     * Get the reason.
+     *
+     * @return the reason.
+     */
+    public String getReason() {
+        return "It improves the time and the space performance.";
+    }
+
     @Override
     protected String[] getExistingClassCanonicalName() {
         return new String[] {"java.util.TreeSet"};

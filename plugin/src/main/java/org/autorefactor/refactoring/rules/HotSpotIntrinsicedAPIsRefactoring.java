@@ -87,6 +87,15 @@ public class HotSpotIntrinsicedAPIsRefactoring extends AbstractRefactoringRule {
             + " they can be compiled down to use very efficient CPU instructions.";
     }
 
+    /**
+     * Get the reason.
+     *
+     * @return the reason.
+     */
+    public String getReason() {
+        return "It reduces code to focus attention on code that matters.";
+    }
+
     private static class SystemArrayCopyParams {
         private IVariableBinding indexVarBinding;
         private Expression indexStartPos;

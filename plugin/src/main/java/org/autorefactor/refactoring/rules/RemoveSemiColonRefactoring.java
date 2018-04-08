@@ -88,6 +88,15 @@ public class RemoveSemiColonRefactoring extends AbstractRefactoringRule {
         return "Removes superfluous semi-colon after body declarations in type declarations.";
     }
 
+    /**
+     * Get the reason.
+     *
+     * @return the reason.
+     */
+    public String getReason() {
+        return "It reduces code to focus attention on code that matters.";
+    }
+
     @Override
     public boolean visit(AnnotationTypeDeclaration node) {
         return visit((BodyDeclaration) node);

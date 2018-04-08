@@ -69,6 +69,15 @@ public class RemoveEmptyLinesRefactoring extends AbstractRefactoringRule {
             + "- two consecutive empty lines are converted to a single empty line.";
     }
 
+    /**
+     * Get the reason.
+     *
+     * @return the reason.
+     */
+    public String getReason() {
+        return "It reduces code to focus attention on code that matters.";
+    }
+
     private static final Pattern NEWLINE_PATTERN = Pattern.compile("\\r\\n|\\n|\\r");
     private final NavigableSet<Integer> lineEnds = new TreeSet<Integer>();
 

@@ -39,7 +39,6 @@ import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.WhileStatement;
 
 /** See {@link #getDescription()} method. */
-@SuppressWarnings("javadoc")
 public class ForeachRefactoring extends AbstractRefactoringRule {
     /**
      * Get the name.
@@ -60,6 +59,15 @@ public class ForeachRefactoring extends AbstractRefactoringRule {
             + "Replaces \"while\"/\"for with iterator\"/\"for with index loops\" into foreach loops"
             + " (applicable to arrays or Iterable)."
             + "Replaces Map.keySet() iteration with calls to Map.get()} into iterations over Map.entrySet().";
+    }
+
+    /**
+     * Get the reason.
+     *
+     * @return the reason.
+     */
+    public String getReason() {
+        return "It reduces code to focus attention on code that matters.";
     }
 
     private static class VariableUseVisitor extends ASTVisitor {

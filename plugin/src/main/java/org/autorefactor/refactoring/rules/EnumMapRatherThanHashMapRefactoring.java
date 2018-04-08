@@ -62,6 +62,15 @@ public final class EnumMapRatherThanHashMapRefactoring extends
         return "Refactor implementation class HashMap -> EnumMap when key is a enum type";
     }
 
+    /**
+     * Get the reason.
+     *
+     * @return the reason.
+     */
+    public String getReason() {
+        return "It improves the space performance.";
+    }
+
     @Override
     String getImplType() {
         return "java.util.HashMap";

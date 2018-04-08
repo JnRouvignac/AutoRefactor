@@ -167,6 +167,15 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     /**
+     * Get the name.
+     *
+     * @return the name.
+     */
+    public String getName() {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
      * Get the description.
      *
      * @return the description.
@@ -176,11 +185,11 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     /**
-     * Get the name.
+     * Get the reason.
      *
-     * @return the name.
+     * @return the reason.
      */
-    public String getName() {
+    public String getReason() {
         throw new UnsupportedOperationException();
     }
 

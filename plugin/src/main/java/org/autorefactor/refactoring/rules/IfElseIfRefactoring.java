@@ -62,7 +62,6 @@ import org.eclipse.jdt.core.dom.Statement;
  *
  * @see #getDescription()
  */
-@SuppressWarnings("javadoc")
 public class IfElseIfRefactoring extends AbstractRefactoringRule {
     /**
      * Get the name.
@@ -80,6 +79,15 @@ public class IfElseIfRefactoring extends AbstractRefactoringRule {
      */
     public String getDescription() {
         return "Refactors \"else { if (...) {} }\" to \"else if (...) {}\".";
+    }
+
+    /**
+     * Get the reason.
+     *
+     * @return the reason.
+     */
+    public String getReason() {
+        return "It reduces code to focus attention on code that matters.";
     }
 
     // TODO JNR

@@ -77,6 +77,15 @@ public class AnnotationRefactoring extends AbstractRefactoringRule {
             + "- single members named \"value\" will be removed from annotations and only the value will be left.";
     }
 
+    /**
+     * Get the reason.
+     *
+     * @return the reason.
+     */
+    public String getReason() {
+        return "It improves the readibility.";
+    }
+
     @Override
     public boolean visit(NormalAnnotation node) {
         final Refactorings r = this.ctx.getRefactorings();

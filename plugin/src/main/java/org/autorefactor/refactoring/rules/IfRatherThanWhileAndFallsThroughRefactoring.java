@@ -71,6 +71,15 @@ public class IfRatherThanWhileAndFallsThroughRefactoring extends AbstractRefacto
             + "Replace a while loop that always terminates during the first iteration by an if.";
     }
 
+    /**
+     * Get the reason.
+     *
+     * @return the reason.
+     */
+    public String getReason() {
+        return "It disambiguates the code to improve the readibility.";
+    }
+
     @Override
     public boolean visit(WhileStatement node) {
         if (isEndingWithExit(node.getBody())) {

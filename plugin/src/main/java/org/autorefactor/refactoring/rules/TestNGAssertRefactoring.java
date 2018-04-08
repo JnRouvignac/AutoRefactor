@@ -76,6 +76,15 @@ public class TestNGAssertRefactoring extends AbstractUnitTestRefactoring {
         return "Refactors to a proper use of TestNG assertions.";
     }
 
+    /**
+     * Get the reason.
+     *
+     * @return the reason.
+     */
+    public String getReason() {
+        return "It improves the readibility of the code and the report.";
+    }
+
     @Override
     protected Pair<Expression, Expression> getActualAndExpected(final Expression leftValue,
             final Expression rightValue) {

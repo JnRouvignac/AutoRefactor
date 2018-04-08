@@ -86,6 +86,15 @@ public class SetRatherThanMapRefactoring extends AbstractClassSubstituteRefactor
             + "Replace map by set when values are not read.";
     }
 
+    /**
+     * Get the reason.
+     *
+     * @return the reason.
+     */
+    public String getReason() {
+        return "It simplify the code showing that the values are not used.";
+    }
+
     @Override
     public boolean isJavaVersionSupported(Release javaSeRelease) {
         return javaSeRelease.getMinorVersion() >= 2;

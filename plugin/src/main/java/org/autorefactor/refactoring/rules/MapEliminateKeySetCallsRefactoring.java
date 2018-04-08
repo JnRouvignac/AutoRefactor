@@ -93,6 +93,16 @@ public class MapEliminateKeySetCallsRefactoring extends AbstractRefactoringRule 
     }
 
     /**
+     * Get the reason.
+     *
+     * @return the reason.
+     */
+    public String getReason() {
+        return "It reduces the coding, reading, debugging and tesing cost."
+                + " It also improves the time and the space performance.";
+    }
+
+    /**
      * This class helps decide which name to give to a new variable.
      * <p>
      * When creating a new variable, its name may shadow another variable or field used in the local

@@ -229,6 +229,15 @@ public class SwitchRefactoring extends AbstractRefactoringRule {
             + "- replaces if/else if/else blocks to use switch where possible.";
     }
 
+    /**
+     * Get the reason.
+     *
+     * @return the reason.
+     */
+    public String getReason() {
+        return "It reduces the coding, reading and debugging cost.";
+    }
+
     @Override
     public boolean visit(final IfStatement node) {
         if (hasUnlabeledBreak(node)) {

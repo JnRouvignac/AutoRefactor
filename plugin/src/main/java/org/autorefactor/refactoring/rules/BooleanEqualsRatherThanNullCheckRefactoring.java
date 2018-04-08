@@ -69,6 +69,15 @@ public class BooleanEqualsRatherThanNullCheckRefactoring extends AbstractRefacto
             + "Replace a null check of a Boolean followed by its value by an equality with a boolean constant.";
     }
 
+    /**
+     * Get the reason.
+     *
+     * @return the reason.
+     */
+    public String getReason() {
+        return "It reduces the coding, reading, debugging and testing cost.";
+    }
+
     @Override
     public boolean visit(InfixExpression node) {
         if (hasOperator(node, CONDITIONAL_AND) || hasOperator(node, CONDITIONAL_OR)) {

@@ -57,6 +57,15 @@ public class StringValueOfRatherThanConcatRefactoring extends AbstractRefactorin
             + "Replace forced string tranformation by String.valueOf().";
     }
 
+    /**
+     * Get the reason.
+     *
+     * @return the reason.
+     */
+    public String getReason() {
+        return "It improves the time and space performance.";
+    }
+
     @Override
     public boolean visit(InfixExpression node) {
         if (InfixExpression.Operator.PLUS.equals(node.getOperator())

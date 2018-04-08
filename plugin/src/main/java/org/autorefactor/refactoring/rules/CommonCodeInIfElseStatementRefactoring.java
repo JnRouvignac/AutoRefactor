@@ -70,6 +70,15 @@ public class CommonCodeInIfElseStatementRefactoring extends AbstractRefactoringR
             + "Ultimately it can completely remove the if statement condition.";
     }
 
+    /**
+     * Get the reason.
+     *
+     * @return the reason.
+     */
+    public String getReason() {
+        return "It reduces the coding, reading, debugging and testing cost.";
+    }
+
     // TODO handle switch statements
     // TODO also handle ternary operator, ConditionalExpression
 

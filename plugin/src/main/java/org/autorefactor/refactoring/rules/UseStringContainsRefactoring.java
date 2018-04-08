@@ -40,7 +40,6 @@ import org.eclipse.jdt.core.dom.InfixExpression.Operator;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 
 /** See {@link #getDescription()} method. */
-@SuppressWarnings("javadoc")
 public class UseStringContainsRefactoring extends AbstractRefactoringRule {
     /**
      * Get the name.
@@ -59,7 +58,16 @@ public class UseStringContainsRefactoring extends AbstractRefactoringRule {
     public String getDescription() {
         return ""
             + "Replaces uses of String.indexOf(String) String.lastIndexOf(String)"
-            + " with String.contains(CharSequence) where appropriate.";
+            + " by String.contains(CharSequence) where appropriate.";
+    }
+
+    /**
+     * Get the reason.
+     *
+     * @return the reason.
+     */
+    public String getReason() {
+        return "It improves the readibility of such simple code to spotlight the complexity of other code.";
     }
 
     @Override
