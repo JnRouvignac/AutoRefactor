@@ -190,7 +190,7 @@ public class RemoveUselessModifiersRefactoring extends AbstractRefactoringRule {
             return isFinalClass(clazz)
                     && clazz.superInterfaceTypes().isEmpty()
                     && (clazz.getSuperclassType() == null
-                            || hasType(clazz.getSuperclassType().resolveBinding(), "java.lan.Object"));
+                            || hasType(clazz.getSuperclassType().resolveBinding(), "java.lang.Object"));
         }
 
         return false;
