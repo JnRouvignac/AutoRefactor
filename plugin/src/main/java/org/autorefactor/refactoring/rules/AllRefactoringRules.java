@@ -150,7 +150,7 @@ public final class AllRefactoringRules {
                 new RemoveUselessModifiersRefactoring(),
                 new RemoveAbstractFromInterfaceRefactoring(),
                 new StaticConstantRatherThanInstanceConstantRefactoring(),
-                new NoSettingRatherThanUselessSettingRefactoring(),
+                new RemoveOverridenAssignmentRefactoring(),
                 new HotSpotIntrinsicedAPIsRefactoring(),
                 new AnnotationRefactoring(),
                 new TryWithResourceRefactoring(),

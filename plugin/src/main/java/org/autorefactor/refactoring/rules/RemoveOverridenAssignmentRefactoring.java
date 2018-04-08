@@ -30,6 +30,7 @@ import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
 import static org.autorefactor.refactoring.ASTHelper.asExpression;
 import static org.autorefactor.refactoring.ASTHelper.getNextSibling;
 import static org.autorefactor.refactoring.ASTHelper.hasOperator;
+import static org.autorefactor.refactoring.ASTHelper.isPassive;
 import static org.autorefactor.refactoring.ASTHelper.isSameVariable;
 import static org.eclipse.jdt.core.dom.Assignment.Operator.ASSIGN;
 
@@ -41,14 +42,14 @@ import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
 /** See {@link #getDescription()} method. */
-public class NoSettingRatherThanUselessSettingRefactoring extends AbstractRefactoringRule {
+public class RemoveOverridenAssignmentRefactoring extends AbstractRefactoringRule {
     /**
      * Get the name.
      *
      * @return the name.
      */
     public String getName() {
-        return "No setting rather than useless setting";
+        return "Remove overriden assignment";
     }
 
     /**
@@ -57,8 +58,7 @@ public class NoSettingRatherThanUselessSettingRefactoring extends AbstractRefact
      * @return the description.
      */
     public String getDescription() {
-        return ""
-                + "Remove passive assignment when the variable is reassigned before being read.";
+        return "Remove passive assignment when the variable is reassigned before being read.";
     }
 
     /**
@@ -75,7 +75,7 @@ public class NoSettingRatherThanUselessSettingRefactoring extends AbstractRefact
         if (node.fragments() != null && node.fragments().size() == 1) {
             final VariableDeclarationFragment fragment = (VariableDeclarationFragment) node.fragments().get(0);
             if (fragment.getInitializer() != null
-                    && fragment.getInitializer().resolveConstantExpressionValue() != null) {
+                    && isPassive(fragment.getInitializer())) {
                 final IVariableBinding variable = fragment.resolveBinding();
                 Statement stmtToInspect = getNextSibling(node);
                 boolean isOverridden = false;

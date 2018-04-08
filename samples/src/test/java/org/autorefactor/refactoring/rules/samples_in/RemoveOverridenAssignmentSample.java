@@ -28,7 +28,7 @@ package org.autorefactor.refactoring.rules.samples_in;
 import java.util.Arrays;
 import java.util.List;
 
-public class NoSettingRatherThanUselessSettingSample {
+public class RemoveOverridenAssignmentSample {
 
     public boolean removeUselessInitialization() {
         // Keep this comment
@@ -106,5 +106,30 @@ public class NoSettingRatherThanUselessSettingSample {
             usedVar = System.lineSeparator();
         }
         return usedVar;
+    }
+
+    public boolean doNotRemoveActiveInitialization(List<String> aList) {
+        boolean reassignedActiveVar = aList.remove("foo");
+        reassignedActiveVar = "\n".equals(System.lineSeparator());
+        return reassignedActiveVar;
+    }
+
+    public int doNotRemoveInitializationWithIncrement(int i) {
+        int reassignedActiveVar = i++;
+        reassignedActiveVar = 123;
+        return reassignedActiveVar + i;
+    }
+
+    public long doNotRemoveInitializationWithAssignment(long i, long j) {
+        long reassignedActiveVar = i = j;
+        reassignedActiveVar = 123;
+        return reassignedActiveVar + i + j;
+    }
+
+    public boolean removePassiveInitialization(int i) {
+        // Keep this comment
+        boolean reassignedPassiveVar = i > 0;
+        reassignedPassiveVar = "\n".equals(System.lineSeparator());
+        return reassignedPassiveVar;
     }
 }
