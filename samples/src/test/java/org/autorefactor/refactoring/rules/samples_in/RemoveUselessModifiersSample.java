@@ -101,4 +101,12 @@ public interface RemoveUselessModifiersSample {
         @Override
         protected void fireActionEvent() {}
     }
+
+    class DoNotRefactorNonFinalClass {
+        protected String doNotRefactorThisField = "someStr";
+
+        protected DoNotRefactorNonFinalClass(){}
+
+        protected void doIt(){}
+    }
 }

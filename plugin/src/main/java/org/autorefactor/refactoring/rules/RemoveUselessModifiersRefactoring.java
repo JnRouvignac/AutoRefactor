@@ -187,7 +187,8 @@ public class RemoveUselessModifiersRefactoring extends AbstractRefactoringRule {
             return removeFinalModifier(modifiers(node));
         }
         if (isProtected(node.getModifiers())
-                && (node.isConstructor() || isFinalClassWithoutInheritance(node.getParent()))) {
+                && (node.isConstructor()
+                        ? isFinalClass(node.getParent()) : isFinalClassWithoutInheritance(node.getParent()))) {
             return removeProtectedModifier(node);
         }
         return ensureModifiersOrder(node);
