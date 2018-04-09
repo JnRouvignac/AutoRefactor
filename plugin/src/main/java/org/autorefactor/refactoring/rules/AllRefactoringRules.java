@@ -110,7 +110,7 @@ public final class AllRefactoringRules {
                 new CollapseIfStatementRefactoring(),
                 new CommonCodeInIfElseStatementRefactoring(),
                 new MergeConditionalBlocksRefactoring(),
-                new MergeBlocksWithJumpRefactoring(),
+                new OneIfRatherThanDuplicateBlocksThatFallThroughRefactoring(),
                 // TODO JNR complete it
                 // new GenerecizeRefactoring(),
                 new UseDiamondOperatorRefactoring(),

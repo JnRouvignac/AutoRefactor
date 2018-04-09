@@ -25,7 +25,7 @@
  */
 package org.autorefactor.refactoring.rules.samples_in;
 
-public class MergeBlocksWithJumpSample {
+public class OneIfRatherThanDuplicateBlocksThatFallThroughSample {
 
     public void mergeConditionsWithReturn(int i1) {
         // Keep this comment

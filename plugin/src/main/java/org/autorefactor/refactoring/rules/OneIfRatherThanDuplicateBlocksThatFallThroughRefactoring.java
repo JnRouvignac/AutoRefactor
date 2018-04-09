@@ -47,14 +47,14 @@ import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.Statement;
 
 /** See {@link #getDescription()} method. */
-public class MergeBlocksWithJumpRefactoring extends AbstractRefactoringRule {
+public class OneIfRatherThanDuplicateBlocksThatFallThroughRefactoring extends AbstractRefactoringRule {
     /**
      * Get the name.
      *
      * @return the name.
      */
     public String getName() {
-        return "One block with jump rather than duplicate blocks";
+        return "One if rather than duplicate blocks that fall through";
     }
 
     /**
@@ -63,7 +63,7 @@ public class MergeBlocksWithJumpRefactoring extends AbstractRefactoringRule {
      * @return the description.
      */
     public String getDescription() {
-        return "Merge following if statements with same code block that end with a jump statement.";
+        return "Merge consecutive if statements with same code block that end with a jump statement.";
     }
 
     /**
@@ -72,7 +72,7 @@ public class MergeBlocksWithJumpRefactoring extends AbstractRefactoringRule {
      * @return the reason.
      */
     public String getReason() {
-        return "It reduces the coding, reading, debugging and tesing cost.";
+        return "It reduces the coding, reading, debugging and testing cost.";
     }
 
     @Override
