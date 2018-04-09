@@ -72,14 +72,14 @@ import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
 /** See {@link #getDescription()} method. */
-public class MapEliminateKeySetCallsRefactoring extends AbstractRefactoringRule {
+public class EntrySetRatherThanKeySetAndValueSearchRefactoring extends AbstractRefactoringRule {
     /**
      * Get the name.
      *
      * @return the name.
      */
     public String getName() {
-        return "Replace useless calls to Map.keySet() when direct calls to the Map are possible";
+        return "Map.entrySet() rather than Map.keySet() and value search";
     }
 
     /**

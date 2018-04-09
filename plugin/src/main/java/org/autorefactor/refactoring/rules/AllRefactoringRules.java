@@ -121,7 +121,7 @@ public final class AllRefactoringRules {
                 new UpdateSetRatherThanTestingFirstRefactoring(),
                 new IsEmptyRatherThanSizeRefactoring(),
                 new MapRefactoring(),
-                new MapEliminateKeySetCallsRefactoring(),
+                new EntrySetRatherThanKeySetAndValueSearchRefactoring(),
                 new MethodOnMapRatherThanMethodOnKeySetRefactoring(),
                 new NoAssignmentInIfConditionRefactoring(),
                 new IfElseIfRefactoring(),
