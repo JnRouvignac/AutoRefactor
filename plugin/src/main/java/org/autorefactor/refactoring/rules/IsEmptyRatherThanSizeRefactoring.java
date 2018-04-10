@@ -83,12 +83,14 @@ public class IsEmptyRatherThanSizeRefactoring extends AbstractRefactoringRule {
         final Long leftLiteral = asNumber(node.getLeftOperand());
 
         if ((isMethod(leftMi, "java.util.Collection", "size")
-                || isMethod(leftMi, "java.util.Map", "size"))
+                || isMethod(leftMi, "java.util.Map", "size")
+                || isMethod(leftMi, "java.lang.String", "length"))
                 && rightLiteral != null) {
             return replaceCollectionSize(node, leftMi, sign(node.getOperator(), true),
                     rightLiteral);
         } else if ((isMethod(rightMi, "java.util.Collection", "size")
-                || isMethod(rightMi, "java.util.Map", "size"))
+                || isMethod(rightMi, "java.util.Map", "size")
+                || isMethod(rightMi, "java.lang.String", "length"))
                 && leftLiteral != null) {
             return replaceCollectionSize(node, rightMi, sign(node.getOperator(), false),
                     leftLiteral);

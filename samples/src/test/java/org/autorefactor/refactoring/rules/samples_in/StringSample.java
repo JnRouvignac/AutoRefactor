@@ -251,18 +251,4 @@ public class StringSample {
         "a".lastIndexOf("as");
         "a".lastIndexOf("\\b");
     }
-
-    public void doRefactorLengthComparison() {
-        boolean b = new Object().toString().length() == 0;
-        boolean b1 = "".trim().length() <= 0;
-        boolean b2 = "".length() < 1;
-    }
-    
-    public void doNotRefactorLengthComparison() {
-        boolean b2 = "asda".length() > 0;
-        boolean b3 = "".length() != 0;
-        boolean b4 = "".length() < 0;
-        boolean b5 = "".length() != 1;
-        boolean b6 = "".length() <= 1;
-    }
 }

@@ -35,7 +35,6 @@ import static org.autorefactor.refactoring.ASTHelper.hasType;
 import static org.autorefactor.refactoring.ASTHelper.isMethod;
 import static org.eclipse.jdt.core.dom.ASTNode.INFIX_EXPRESSION;
 
-import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.autorefactor.refactoring.ASTBuilder;
@@ -45,9 +44,7 @@ import org.eclipse.jdt.core.dom.CharacterLiteral;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.InfixExpression;
-import org.eclipse.jdt.core.dom.InfixExpression.Operator;
 import org.eclipse.jdt.core.dom.MethodInvocation;
-import org.eclipse.jdt.core.dom.NumberLiteral;
 import org.eclipse.jdt.core.dom.StringLiteral;
 
 /** See {@link #getDescription()} method. */
@@ -73,8 +70,7 @@ public class StringRefactoring extends AbstractRefactoringRule {
             + "- remove calls to String.toString() inside String concatenations,\n"
             + "- replace useless case shifts for equality by equalsIgnoreCase()\n"
             + "Refactors:\n"
-            + "- usages of 'indexOf' and 'lastIndexOf' with single letter in string,\n"
-            + "- checking string length to 'isEmpty' method\n";
+            + "- usages of 'indexOf' and 'lastIndexOf' with single letter in string";
     }
 
     /**
@@ -192,25 +188,8 @@ public class StringRefactoring extends AbstractRefactoringRule {
                     return DO_NOT_VISIT_SUBTREE;
                 }
             }
-        } else if (isMethod(node, "java.lang.String", "length")) {
-            InfixExpression ie = (InfixExpression) node.getParent();
-            Operator operator = ie.getOperator();
-            Expression rightOp = ie.getRightOperand();
-            if (rightOp.getNodeType() == ASTNode.NUMBER_LITERAL) {
-                NumberLiteral number = (NumberLiteral) rightOp;
-                if (isCheckingForEmptiness(operator.toString(), number.getToken())) {
-                    MethodInvocation replacement = b.invoke(b.copy(node.getExpression()), "isEmpty");
-                    r.replace(node.getParent(), replacement);
-                    return DO_NOT_VISIT_SUBTREE;
-                }
-            }
         }
         return VISIT_SUBTREE;
-    }
-
-    private boolean isCheckingForEmptiness(String operator, String number) {
-        return ("0".equals(number) && Arrays.asList("==", "<=").contains(operator))
-                || ("1".equals(number) && "<".equals(operator));
     }
 
     private Expression getReducedStringExpression(Expression stringExpr, AtomicBoolean isRefactoringNeeded) {

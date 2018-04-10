@@ -28,10 +28,12 @@ package org.autorefactor.refactoring.rules.samples_out;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Observable;
+import java.util.Observer;
 
 public class IsEmptyRatherThanSizeSample {
 
-    public void replaceChecksOnSize(Collection<String> col) {
+    public void replaceChecksOnSize(Collection<Integer> col) {
         // Keep this comment
         System.out.println(!col.isEmpty());
         System.out.println(true);
@@ -52,7 +54,21 @@ public class IsEmptyRatherThanSizeSample {
         System.out.println(!col.isEmpty());
     }
 
-    public void replaceChecksOnSize(Map<String, String> map) {
+    public void doNotRefactorChecksOtherThanEmptiness(Collection<Long> col) {
+        System.out.println(col.size() == 1);
+        System.out.println(col.size() != 1);
+        System.out.println(col.size() > 1);
+        System.out.println(col.size() <= 1);
+        System.out.println(col.size() >= 2);
+
+        System.out.println(1 == col.size());
+        System.out.println(1 != col.size());
+        System.out.println(1 < col.size());
+        System.out.println(1 >= col.size());
+        System.out.println(2 <= col.size());
+    }
+
+    public void replaceChecksOnSize(Map<Short, Observable> map) {
         // Keep this comment
         System.out.println(!map.isEmpty());
         System.out.println(true);
@@ -71,5 +87,54 @@ public class IsEmptyRatherThanSizeSample {
         System.out.println(false);
         System.out.println(map.isEmpty());
         System.out.println(!map.isEmpty());
+    }
+
+    public void doNotRefactorChecksOtherThanEmptiness(Map<Byte, Observer> map) {
+        System.out.println(map.size() == 1);
+        System.out.println(map.size() != 1);
+        System.out.println(map.size() > 1);
+        System.out.println(map.size() <= 1);
+        System.out.println(map.size() >= 2);
+
+        System.out.println(1 == map.size());
+        System.out.println(1 != map.size());
+        System.out.println(1 < map.size());
+        System.out.println(1 >= map.size());
+        System.out.println(2 <= map.size());
+    }
+
+    public void replaceChecksOnSize(String text) {
+        // Keep this comment
+        System.out.println(!text.isEmpty());
+        System.out.println(true);
+        System.out.println(text.isEmpty());
+        System.out.println(!text.isEmpty());
+        System.out.println(text.isEmpty());
+        System.out.println(false);
+        System.out.println(text.isEmpty());
+        System.out.println(!text.isEmpty());
+
+        System.out.println(!text.isEmpty());
+        System.out.println(true);
+        System.out.println(text.isEmpty());
+        System.out.println(!text.isEmpty());
+        System.out.println(text.isEmpty());
+        System.out.println(false);
+        System.out.println(text.isEmpty());
+        System.out.println(!text.isEmpty());
+    }
+
+    public void doNotRefactorChecksOtherThanEmptiness(String text) {
+        System.out.println(text.length() == 1);
+        System.out.println(text.length() != 1);
+        System.out.println(text.length() > 1);
+        System.out.println(text.length() <= 1);
+        System.out.println(text.length() >= 2);
+
+        System.out.println(1 == text.length());
+        System.out.println(1 != text.length());
+        System.out.println(1 < text.length());
+        System.out.println(1 >= text.length());
+        System.out.println(2 <= text.length());
     }
 }
