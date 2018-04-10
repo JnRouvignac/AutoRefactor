@@ -33,7 +33,7 @@ import static org.autorefactor.refactoring.ASTHelper.extendedOperands;
 import static org.autorefactor.refactoring.ASTHelper.getLocalVariableIdentifiers;
 import static org.autorefactor.refactoring.ASTHelper.hasType;
 import static org.autorefactor.refactoring.ASTHelper.haveSameType;
-import static org.autorefactor.refactoring.ASTHelper.isEndingWithJump;
+import static org.autorefactor.refactoring.ASTHelper.fallsThrough;
 import static org.autorefactor.refactoring.ASTHelper.match;
 import static org.autorefactor.refactoring.ASTHelper.removeParentheses;
 import static org.autorefactor.refactoring.ASTHelper.statements;
@@ -135,7 +135,7 @@ public class SwitchRefactoring extends AbstractRefactoringRule {
         }
 
         private boolean fallsthrough() {
-            return stmts.isEmpty() || !isEndingWithJump(getLast(stmts));
+            return stmts.isEmpty() || !fallsThrough(getLast(stmts));
         }
 
         private boolean hasSameCode(SwitchCaseSection other) {
@@ -370,7 +370,7 @@ public class SwitchRefactoring extends AbstractRefactoringRule {
             for (final Statement stmt : innerStmts) {
                 switchStmts.add(b.move(stmt));
             }
-            isBreakNeeded = !isEndingWithJump(getLast(innerStmts));
+            isBreakNeeded = !fallsThrough(getLast(innerStmts));
         }
         // When required: end with a break;
         if (isBreakNeeded) {

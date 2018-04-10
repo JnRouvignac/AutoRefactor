@@ -31,7 +31,7 @@ import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
 import static org.autorefactor.refactoring.ASTHelper.asList;
 import static org.autorefactor.refactoring.ASTHelper.getLocalVariableIdentifiers;
 import static org.autorefactor.refactoring.ASTHelper.getNextSiblings;
-import static org.autorefactor.refactoring.ASTHelper.isEndingWithJump;
+import static org.autorefactor.refactoring.ASTHelper.fallsThrough;
 import static org.autorefactor.refactoring.ASTHelper.isPassive;
 import static org.autorefactor.refactoring.ASTHelper.match;
 import static org.eclipse.jdt.core.dom.InfixExpression.Operator.EQUALS;
@@ -137,7 +137,7 @@ public class InlineCodeRatherThanPeremptoryConditionRefactoring extends Abstract
         }
 
         private boolean maybeInlineBlock(final Statement node, final Statement unconditionnalStatement) {
-            if (isEndingWithJump(unconditionnalStatement)) {
+            if (fallsThrough(unconditionnalStatement)) {
                 replaceBlockByPlainCode(node, unconditionnalStatement);
                 removeForwardCode(node, unconditionnalStatement);
                 setResult(DO_NOT_VISIT_SUBTREE);

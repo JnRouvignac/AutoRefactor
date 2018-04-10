@@ -28,8 +28,8 @@ package org.autorefactor.refactoring.rules;
 import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
 import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
 import static org.autorefactor.refactoring.ASTHelper.asList;
+import static org.autorefactor.refactoring.ASTHelper.fallsThrough;
 import static org.autorefactor.refactoring.ASTHelper.getNextSibling;
-import static org.autorefactor.refactoring.ASTHelper.isEndingWithJump;
 import static org.autorefactor.refactoring.ASTHelper.match;
 
 import java.util.ArrayList;
@@ -39,7 +39,6 @@ import java.util.List;
 import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.BlockSubVisitor;
 import org.autorefactor.refactoring.Refactorings;
-import org.eclipse.jdt.core.dom.ASTMatcher;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.IfStatement;
@@ -122,8 +121,8 @@ public class OneIfRatherThanDuplicateBlocksThatFallThroughRefactoring extends Ab
                             .getThenStatement());
                     final List<Statement> nextIfStmts = asList(nextIf.getThenStatement());
                     if (lastIfStmts != null && !lastIfStmts.isEmpty()
-                            && isEndingWithJump(lastIfStmts.get(lastIfStmts.size() - 1))
-                            && isSameCode(lastIfStmts, nextIfStmts)) {
+                            && fallsThrough(lastIfStmts.get(lastIfStmts.size() - 1))
+                            && match(lastIfStmts, nextIfStmts)) {
                         duplicateIfBlocks.add(nextIf);
                         return true;
                     }
@@ -155,22 +154,6 @@ public class OneIfRatherThanDuplicateBlocksThatFallThroughRefactoring extends Ab
             while (iterator.hasNext()) {
                 r.remove(iterator.next());
             }
-        }
-
-        private boolean isSameCode(final List<Statement> referenceStmts, final List<Statement> comparedStmts) {
-            if (referenceStmts.size() != comparedStmts.size()) {
-                return false;
-            }
-
-            final ASTMatcher matcher = new ASTMatcher();
-
-            for (int codeLine = 0; codeLine < referenceStmts.size(); codeLine++) {
-                if (!match(matcher, referenceStmts.get(codeLine),
-                        comparedStmts.get(codeLine))) {
-                    return false;
-                }
-            }
-            return true;
         }
     }
 }

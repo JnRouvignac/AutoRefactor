@@ -25,6 +25,95 @@
  */
 package org.autorefactor.refactoring;
 
+import static org.autorefactor.util.Utils.equalNotNull;
+import static org.eclipse.jdt.core.dom.ASTNode.ANNOTATION_TYPE_DECLARATION;
+import static org.eclipse.jdt.core.dom.ASTNode.ANNOTATION_TYPE_MEMBER_DECLARATION;
+import static org.eclipse.jdt.core.dom.ASTNode.ANONYMOUS_CLASS_DECLARATION;
+import static org.eclipse.jdt.core.dom.ASTNode.ARRAY_ACCESS;
+import static org.eclipse.jdt.core.dom.ASTNode.ARRAY_CREATION;
+import static org.eclipse.jdt.core.dom.ASTNode.ARRAY_INITIALIZER;
+import static org.eclipse.jdt.core.dom.ASTNode.ARRAY_TYPE;
+import static org.eclipse.jdt.core.dom.ASTNode.ASSERT_STATEMENT;
+import static org.eclipse.jdt.core.dom.ASTNode.ASSIGNMENT;
+import static org.eclipse.jdt.core.dom.ASTNode.BLOCK;
+import static org.eclipse.jdt.core.dom.ASTNode.BLOCK_COMMENT;
+import static org.eclipse.jdt.core.dom.ASTNode.BOOLEAN_LITERAL;
+import static org.eclipse.jdt.core.dom.ASTNode.BREAK_STATEMENT;
+import static org.eclipse.jdt.core.dom.ASTNode.CAST_EXPRESSION;
+import static org.eclipse.jdt.core.dom.ASTNode.CATCH_CLAUSE;
+import static org.eclipse.jdt.core.dom.ASTNode.CHARACTER_LITERAL;
+import static org.eclipse.jdt.core.dom.ASTNode.CLASS_INSTANCE_CREATION;
+import static org.eclipse.jdt.core.dom.ASTNode.COMPILATION_UNIT;
+import static org.eclipse.jdt.core.dom.ASTNode.CONDITIONAL_EXPRESSION;
+import static org.eclipse.jdt.core.dom.ASTNode.CONSTRUCTOR_INVOCATION;
+import static org.eclipse.jdt.core.dom.ASTNode.CONTINUE_STATEMENT;
+import static org.eclipse.jdt.core.dom.ASTNode.DO_STATEMENT;
+import static org.eclipse.jdt.core.dom.ASTNode.EMPTY_STATEMENT;
+import static org.eclipse.jdt.core.dom.ASTNode.ENHANCED_FOR_STATEMENT;
+import static org.eclipse.jdt.core.dom.ASTNode.ENUM_CONSTANT_DECLARATION;
+import static org.eclipse.jdt.core.dom.ASTNode.ENUM_DECLARATION;
+import static org.eclipse.jdt.core.dom.ASTNode.EXPRESSION_STATEMENT;
+import static org.eclipse.jdt.core.dom.ASTNode.FIELD_ACCESS;
+import static org.eclipse.jdt.core.dom.ASTNode.FIELD_DECLARATION;
+import static org.eclipse.jdt.core.dom.ASTNode.FOR_STATEMENT;
+import static org.eclipse.jdt.core.dom.ASTNode.IF_STATEMENT;
+import static org.eclipse.jdt.core.dom.ASTNode.IMPORT_DECLARATION;
+import static org.eclipse.jdt.core.dom.ASTNode.INFIX_EXPRESSION;
+import static org.eclipse.jdt.core.dom.ASTNode.INITIALIZER;
+import static org.eclipse.jdt.core.dom.ASTNode.INSTANCEOF_EXPRESSION;
+import static org.eclipse.jdt.core.dom.ASTNode.JAVADOC;
+import static org.eclipse.jdt.core.dom.ASTNode.LABELED_STATEMENT;
+import static org.eclipse.jdt.core.dom.ASTNode.LINE_COMMENT;
+import static org.eclipse.jdt.core.dom.ASTNode.MARKER_ANNOTATION;
+import static org.eclipse.jdt.core.dom.ASTNode.MEMBER_REF;
+import static org.eclipse.jdt.core.dom.ASTNode.METHOD_DECLARATION;
+import static org.eclipse.jdt.core.dom.ASTNode.METHOD_INVOCATION;
+import static org.eclipse.jdt.core.dom.ASTNode.METHOD_REF;
+import static org.eclipse.jdt.core.dom.ASTNode.METHOD_REF_PARAMETER;
+import static org.eclipse.jdt.core.dom.ASTNode.MODIFIER;
+import static org.eclipse.jdt.core.dom.ASTNode.NORMAL_ANNOTATION;
+import static org.eclipse.jdt.core.dom.ASTNode.NULL_LITERAL;
+import static org.eclipse.jdt.core.dom.ASTNode.NUMBER_LITERAL;
+import static org.eclipse.jdt.core.dom.ASTNode.PACKAGE_DECLARATION;
+import static org.eclipse.jdt.core.dom.ASTNode.PARAMETERIZED_TYPE;
+import static org.eclipse.jdt.core.dom.ASTNode.PARENTHESIZED_EXPRESSION;
+import static org.eclipse.jdt.core.dom.ASTNode.POSTFIX_EXPRESSION;
+import static org.eclipse.jdt.core.dom.ASTNode.PREFIX_EXPRESSION;
+import static org.eclipse.jdt.core.dom.ASTNode.PRIMITIVE_TYPE;
+import static org.eclipse.jdt.core.dom.ASTNode.QUALIFIED_NAME;
+import static org.eclipse.jdt.core.dom.ASTNode.QUALIFIED_TYPE;
+import static org.eclipse.jdt.core.dom.ASTNode.RETURN_STATEMENT;
+import static org.eclipse.jdt.core.dom.ASTNode.SIMPLE_NAME;
+import static org.eclipse.jdt.core.dom.ASTNode.SIMPLE_TYPE;
+import static org.eclipse.jdt.core.dom.ASTNode.SINGLE_MEMBER_ANNOTATION;
+import static org.eclipse.jdt.core.dom.ASTNode.SINGLE_VARIABLE_DECLARATION;
+import static org.eclipse.jdt.core.dom.ASTNode.STRING_LITERAL;
+import static org.eclipse.jdt.core.dom.ASTNode.SUPER_CONSTRUCTOR_INVOCATION;
+import static org.eclipse.jdt.core.dom.ASTNode.SUPER_FIELD_ACCESS;
+import static org.eclipse.jdt.core.dom.ASTNode.SUPER_METHOD_INVOCATION;
+import static org.eclipse.jdt.core.dom.ASTNode.SWITCH_CASE;
+import static org.eclipse.jdt.core.dom.ASTNode.SWITCH_STATEMENT;
+import static org.eclipse.jdt.core.dom.ASTNode.SYNCHRONIZED_STATEMENT;
+import static org.eclipse.jdt.core.dom.ASTNode.TAG_ELEMENT;
+import static org.eclipse.jdt.core.dom.ASTNode.TEXT_ELEMENT;
+import static org.eclipse.jdt.core.dom.ASTNode.THIS_EXPRESSION;
+import static org.eclipse.jdt.core.dom.ASTNode.THROW_STATEMENT;
+import static org.eclipse.jdt.core.dom.ASTNode.TRY_STATEMENT;
+import static org.eclipse.jdt.core.dom.ASTNode.TYPE_DECLARATION;
+import static org.eclipse.jdt.core.dom.ASTNode.TYPE_DECLARATION_STATEMENT;
+import static org.eclipse.jdt.core.dom.ASTNode.TYPE_LITERAL;
+import static org.eclipse.jdt.core.dom.ASTNode.TYPE_PARAMETER;
+import static org.eclipse.jdt.core.dom.ASTNode.UNION_TYPE;
+import static org.eclipse.jdt.core.dom.ASTNode.VARIABLE_DECLARATION_EXPRESSION;
+import static org.eclipse.jdt.core.dom.ASTNode.VARIABLE_DECLARATION_FRAGMENT;
+import static org.eclipse.jdt.core.dom.ASTNode.VARIABLE_DECLARATION_STATEMENT;
+import static org.eclipse.jdt.core.dom.ASTNode.WHILE_STATEMENT;
+import static org.eclipse.jdt.core.dom.ASTNode.WILDCARD_TYPE;
+import static org.eclipse.jdt.core.dom.IBinding.VARIABLE;
+import static org.eclipse.jdt.core.dom.InfixExpression.Operator.NOT_EQUALS;
+import static org.eclipse.jdt.core.dom.PrefixExpression.Operator.DECREMENT;
+import static org.eclipse.jdt.core.dom.PrefixExpression.Operator.INCREMENT;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -140,13 +229,6 @@ import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 import org.eclipse.jdt.core.dom.WhileStatement;
 import org.eclipse.jdt.core.dom.WildcardType;
-
-import static org.autorefactor.util.Utils.*;
-import static org.eclipse.jdt.core.dom.ASTNode.*;
-import static org.eclipse.jdt.core.dom.IBinding.*;
-import static org.eclipse.jdt.core.dom.InfixExpression.Operator.NOT_EQUALS;
-import static org.eclipse.jdt.core.dom.PrefixExpression.Operator.DECREMENT;
-import static org.eclipse.jdt.core.dom.PrefixExpression.Operator.INCREMENT;
 
 /** Helper class for manipulating, converting, navigating and checking {@link ASTNode}s. */
 public final class ASTHelper {
@@ -2002,6 +2084,29 @@ public final class ASTHelper {
     }
 
     /**
+     * Returns whether the two provided codes structurally match.
+     *
+     * @param referenceStmts the first code to compare
+     * @param comparedStmts the second code to compare
+     * @return true if the two provided codes structurally match, false otherwise
+     */
+    public static boolean match(final List<Statement> referenceStmts, final List<Statement> comparedStmts) {
+        if (referenceStmts.size() != comparedStmts.size()) {
+            return false;
+        }
+
+        final ASTMatcher matcher = new ASTMatcher();
+
+        for (int codeLine = 0; codeLine < referenceStmts.size(); codeLine++) {
+            if (!match(matcher, referenceStmts.get(codeLine),
+                    comparedStmts.get(codeLine))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
      * Returns whether the two provided nodes structurally match.
      *
      * @param matcher the AST matcher
@@ -2480,7 +2585,7 @@ public final class ASTHelper {
      * @param stmt the statement
      * @return true if the statement falls through.
      */
-    public static boolean isEndingWithJump(Statement stmt) {
+    public static boolean fallsThrough(Statement stmt) {
         final List<Statement> stmts = asList(stmt);
         if (stmts.isEmpty()) {
             return false;
@@ -2498,8 +2603,8 @@ public final class ASTHelper {
             final IfStatement ifStmt = (IfStatement) lastStmt;
             final Statement thenStmt = ifStmt.getThenStatement();
             final Statement elseStmt = ifStmt.getElseStatement();
-            return isEndingWithJump(thenStmt)
-                    && isEndingWithJump(elseStmt);
+            return fallsThrough(thenStmt)
+                    && fallsThrough(elseStmt);
 
         default:
             return false;
