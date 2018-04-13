@@ -27,7 +27,7 @@ package org.autorefactor.refactoring.rules.samples_in;
 
 import java.util.List;
 
-public class OneBlockThatFallsThroughRatherThanRedundantCatchesSample {
+public class OneCodeThatFallsThroughRatherThanRedundantBlocksSample {
 
     public void mergeCatchIntoFollowingCode(String number) {
         // Keep this comment
@@ -200,6 +200,164 @@ public class OneBlockThatFallsThroughRatherThanRedundantCatchesSample {
                 throw new Exception("Stop!");
             }
         } catch (NullPointerException npe) {
+            System.out.println("Doing something");
+            if (interruptCode) {
+                throw new Exception("Stop!");
+            }
+        }
+        System.out.println("Doing something");
+        if (interruptCode) {
+            throw new Exception("Stop!");
+        }
+    }
+
+    public void mergeIfBlocksIntoFollowingCode(int i) {
+        // Keep this comment
+        if (i <= 0) {
+            System.out.println("Doing something");
+            return;
+        } else if (i == 10) {
+            System.out.println("Doing another thing");
+            return;
+        } else if (i == 20) {
+            System.out.println("Doing something");
+            return;
+        }
+        System.out.println("Doing something");
+        return;
+    }
+
+    public char mergeIfStatementIntoFollowingCode(int i) {
+        // Keep this comment
+        if (i <= 0) return 'a';
+        else if (i == 10) return 'b';
+        else if (i == 20) return 'a';
+        return 'a';
+    }
+
+    public void mergeEndOfIfIntoFollowingCode(int i) {
+        // Keep this comment
+        if (i <= 0) {
+            System.out.println("Doing another thing");
+            System.out.println("Doing something");
+            return;
+        } else if (i == 10) {
+            System.out.println("Doing another thing");
+            return;
+        } else if (i == 20) {
+            System.out.println("Doing another thing");
+            System.out.println("Doing something");
+            return;
+        }
+        System.out.println("Doing something");
+        return;
+    }
+
+    public void doNotRefactorCodeThatDoesntFallThrough(int i) {
+        if (i <= 0) {
+            System.out.println("Doing something");
+        } else if (i == 20) {
+            System.out.println("Doing something");
+        }
+        System.out.println("Doing something");
+    }
+
+    public void mergeIfThrowingException(int i) throws Exception {
+        // Keep this comment
+        if (i <= 0) {
+            System.out.println("Doing something");
+            throw new Exception();
+        } else if (i == 10) {
+            System.out.println("Doing another thing");
+            throw new Exception();
+        } else if (i == 20) {
+            System.out.println("Doing something");
+            throw new Exception();
+        }
+        System.out.println("Doing something");
+        throw new Exception();
+    }
+
+    public void mergeIfWithContinue(int[] numbers) {
+        for (int i : numbers) {
+            // Keep this comment
+            if (i <= 0) {
+                System.out.println("Doing something");
+                continue;
+            } else if (i == 10) {
+                System.out.println("Doing another thing");
+                continue;
+            } else if (i == 20) {
+                System.out.println("Doing something");
+                continue;
+            }
+            System.out.println("Doing something");
+            continue;
+        }
+    }
+
+    public void mergeIfWithBreak(int[] numbers) {
+        for (int i : numbers) {
+            // Keep this comment
+            if (i <= 0) {
+                System.out.println("Doing something");
+                break;
+            } else if (i == 10) {
+                System.out.println("Doing another thing");
+                break;
+            } else if (i == 20) {
+                System.out.println("Doing something");
+                break;
+            }
+            System.out.println("Doing something");
+            break;
+        }
+    }
+
+    public void mergeIfThatAlwaysFallThrough(int i, boolean interruptCode) throws Exception {
+        // Keep this comment
+        if (i <= 0) {
+            System.out.println("Doing something");
+            if (interruptCode) {
+                throw new Exception("Stop!");
+            } else {
+                return;
+            }
+        } else if (i == 10) {
+            System.out.println("Doing another thing");
+            if (interruptCode) {
+                throw new Exception("Stop!");
+            } else {
+                return;
+            }
+        } else if (i == 20) {
+            System.out.println("Doing something");
+            if (interruptCode) {
+                throw new Exception("Stop!");
+            } else {
+                return;
+            }
+        }
+        System.out.println("Doing something");
+        if (interruptCode) {
+            throw new Exception("Stop!");
+        } else {
+            return;
+        }
+    }
+
+    public void doNotMergeIfThatNotAlwaysFallThrough(int i, boolean interruptCode) throws Exception {
+        if (i <= 0) {
+            System.out.println("Doing something");
+            if (interruptCode) {
+                throw new Exception("Stop!");
+            }
+        } else if (i == 10) {
+            System.out.println("Doing another thing");
+            if (interruptCode) {
+                throw new Exception("Stop!");
+            }
+        } else if (i == 20) {
             System.out.println("Doing something");
             if (interruptCode) {
                 throw new Exception("Stop!");

@@ -36,7 +36,10 @@ import org.eclipse.jdt.core.dom.Block;
  * A visitor to refactor several sibling nodes and flag the parent block to visited.
  */
 public class BlockSubVisitor extends ASTVisitor {
-    private RefactoringContext ctx;
+    /**
+     * The refactoring context.
+     */
+    protected RefactoringContext ctx;
 
     private Block startNode;
 
@@ -57,7 +60,9 @@ public class BlockSubVisitor extends ASTVisitor {
      * Get the refactoring context.
      *
      * @return The refactoring context
+     * @deprecated Call ctx field instead
      */
+    @Deprecated
     public RefactoringContext getCtx() {
         return ctx;
     }
