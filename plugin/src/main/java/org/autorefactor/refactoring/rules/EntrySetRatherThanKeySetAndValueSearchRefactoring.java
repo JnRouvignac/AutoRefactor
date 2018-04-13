@@ -98,7 +98,7 @@ public class EntrySetRatherThanKeySetAndValueSearchRefactoring extends AbstractR
      * @return the reason.
      */
     public String getReason() {
-        return "It reduces the coding, reading, debugging and tesing cost."
+        return "It reduces the coding, reading, debugging and testing cost."
                 + " It also improves the time and the space performance.";
     }
 

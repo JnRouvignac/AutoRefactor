@@ -67,7 +67,7 @@ public class MergeConditionalBlocksRefactoring extends AbstractRefactoringRule {
      * @return the reason.
      */
     public String getReason() {
-        return "It reduces the coding, reading, debugging and tesing cost.";
+        return "It reduces the coding, reading, debugging and testing cost.";
     }
 
     @Override
