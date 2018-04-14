@@ -54,6 +54,7 @@ import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.text.edits.MalformedTreeException;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.autorefactor.refactoring.PluginConstant.*;
@@ -175,6 +176,7 @@ public class ApplyRefactoringsJob extends Job {
      * @param refactoring the {@link AggregateASTVisitor} to apply to the compilation unit
      * @param options the Java project options used to compile the project
      * @param monitor the progress monitor of the current job
+     * @return true, if changes were applied
      * @throws Exception if any problem occurs
      *
      * @see <a
@@ -188,8 +190,9 @@ public class ApplyRefactoringsJob extends Job {
      * href="http://www.eclipse.org/articles/article.php?file=Article-JavaCodeManipulation_AST/index.html"
      * >Abstract Syntax Tree > Write it down</a>
      */
-    public void applyRefactoring(IDocument document, ICompilationUnit compilationUnit, AggregateASTVisitor refactoring,
-            JavaProjectOptions options, SubMonitor monitor) throws Exception {
+    public boolean applyRefactoring(IDocument document, ICompilationUnit compilationUnit,
+            AggregateASTVisitor refactoring, JavaProjectOptions options, SubMonitor monitor) throws Exception {
+        boolean changed = false;
         // creation of DOM/AST from a ICompilationUnit
         final ASTParser parser = ASTParser.newParser(AST.JLS8);
         resetParser(compilationUnit, parser, options);
@@ -223,11 +226,24 @@ public class ApplyRefactoringsJob extends Job {
             if (!refactorings.hasRefactorings()) {
                 // no new refactorings have been applied,
                 // we are done with applying the refactorings.
-                return;
+                return changed;
             }
+            changed = true;
 
-            // apply the refactorings and save the compilation unit
-            refactorings.applyTo(document);
+            try {
+                // apply the refactorings and save the compilation unit
+                refactorings.applyTo(document);
+            } catch (MalformedTreeException e) {
+                final String errorMsg = "Illegal changes have been created by "
+                        + visitorClasses("", refactoring.getVisitorsContributingRefactoring())
+                        + " for file " + getFileName(astRoot) + ". (" + e.getMessage() + ")"
+                        + " Parent text edit: " + e.getParent()
+                        + ", child text edit: " + e.getChild();
+                Exception ise = new IllegalStateException(astRoot, errorMsg);
+                ise.initCause(e);
+                environment.getLogger().error(errorMsg, ise);
+                break;
+            }
             final boolean hadUnsavedChanges = compilationUnit.hasUnsavedChanges();
             compilationUnit.getBuffer().setContents(document.get());
             // http://wiki.eclipse.org/FAQ_What_is_a_working_copy%3F
@@ -258,6 +274,7 @@ public class ApplyRefactoringsJob extends Job {
                 ++nbLoopsWithSameVisitors;
             }
         }
+        return changed;
     }
 
     private static void resetParser(ICompilationUnit cu, ASTParser parser, JavaProjectOptions options) {
@@ -270,8 +287,12 @@ public class ApplyRefactoringsJob extends Job {
         if (nbLoopsWithSameVisitors < 100 || lastLoopVisitors.isEmpty()) {
             return "";
         }
-        final StringBuilder sb = new StringBuilder(" Possible culprit ASTVisitor classes are: ");
-        final Iterator<ASTVisitor> iter = lastLoopVisitors.iterator();
+        return visitorClasses(" Possible culprit ASTVisitor classes are: ", lastLoopVisitors);
+    }
+
+    private String visitorClasses(String message, Set<ASTVisitor> visitors) {
+        final StringBuilder sb = new StringBuilder(message);
+        final Iterator<ASTVisitor> iter = visitors.iterator();
         sb.append(iter.next().getClass().getName());
         while (iter.hasNext()) {
             sb.append(", ").append(iter.next().getClass().getName());
