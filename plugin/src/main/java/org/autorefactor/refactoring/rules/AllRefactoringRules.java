@@ -114,6 +114,7 @@ public final class AllRefactoringRules {
                 new OneCodeThatFallsThroughRatherThanRedundantBlocksRefactoring(),
                 // TODO JNR complete it
                 // new GenerecizeRefactoring(),
+                new GenericListRatherThanRawListRefactoring(),
                 new UseDiamondOperatorRefactoring(),
                 new UseMultiCatchRefactoring(),
                 new CollectionContainsRefactoring(),

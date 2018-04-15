@@ -196,6 +196,7 @@ import org.eclipse.jdt.core.dom.ParameterizedType;
 import org.eclipse.jdt.core.dom.ParenthesizedExpression;
 import org.eclipse.jdt.core.dom.PostfixExpression;
 import org.eclipse.jdt.core.dom.PrefixExpression;
+import org.eclipse.jdt.core.dom.PrefixExpression.Operator;
 import org.eclipse.jdt.core.dom.PrimitiveType;
 import org.eclipse.jdt.core.dom.QualifiedName;
 import org.eclipse.jdt.core.dom.QualifiedType;
@@ -1120,8 +1121,6 @@ public final class ASTHelper {
     }
 
     /**
-     * TODO Also take into account infix expression.
-     *
      * Returns the type of either a method return or an assigned variable that is the destination of
      * the given node. Returns null otherwise.
      *
@@ -1142,6 +1141,8 @@ public final class ASTHelper {
                         return method.getReturnType2().resolveBinding();
                     }
                 }
+            } else if (parent instanceof CastExpression) {
+                return ((CastExpression) parent).resolveTypeBinding();
             } else if (parent instanceof VariableDeclarationFragment) {
                 return resolveTypeBinding((VariableDeclarationFragment) parent);
             } else if (parent instanceof Assignment) {
@@ -1154,6 +1155,17 @@ public final class ASTHelper {
             } else if (parent instanceof ConditionalExpression) {
                 final ConditionalExpression conditionalExpr = (ConditionalExpression) parent;
                 if (conditionalExpr.getExpression().equals(node)) {
+                    return node.getAST().resolveWellKnownType("boolean");
+                }
+            } else if (parent instanceof PrefixExpression) {
+                final PrefixExpression prefixExpr = (PrefixExpression) parent;
+                if (Operator.NOT.equals(prefixExpr.getOperator())) {
+                    return node.getAST().resolveWellKnownType("boolean");
+                }
+            } else if (parent instanceof InfixExpression) {
+                final InfixExpression prefixExpr = (InfixExpression) parent;
+                if (Arrays.asList(InfixExpression.Operator.CONDITIONAL_AND,
+                        InfixExpression.Operator.CONDITIONAL_OR).contains(prefixExpr.getOperator())) {
                     return node.getAST().resolveWellKnownType("boolean");
                 }
             } else if (parent instanceof IfStatement) {
