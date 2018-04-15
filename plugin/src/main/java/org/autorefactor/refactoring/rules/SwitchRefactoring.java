@@ -30,10 +30,10 @@ import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
 import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
 import static org.autorefactor.refactoring.ASTHelper.asList;
 import static org.autorefactor.refactoring.ASTHelper.extendedOperands;
+import static org.autorefactor.refactoring.ASTHelper.fallsThrough;
 import static org.autorefactor.refactoring.ASTHelper.getLocalVariableIdentifiers;
 import static org.autorefactor.refactoring.ASTHelper.hasType;
 import static org.autorefactor.refactoring.ASTHelper.haveSameType;
-import static org.autorefactor.refactoring.ASTHelper.fallsThrough;
 import static org.autorefactor.refactoring.ASTHelper.match;
 import static org.autorefactor.refactoring.ASTHelper.removeParentheses;
 import static org.autorefactor.refactoring.ASTHelper.statements;
@@ -134,8 +134,8 @@ public class SwitchRefactoring extends AbstractRefactoringRule {
             this.stmts = stmts;
         }
 
-        private boolean fallsthrough() {
-            return stmts.isEmpty() || !fallsThrough(getLast(stmts));
+        private boolean fallsThrough() {
+            return stmts.isEmpty() || !ASTHelper.fallsThrough(getLast(stmts));
         }
 
         private boolean hasSameCode(SwitchCaseSection other) {
@@ -427,7 +427,7 @@ public class SwitchRefactoring extends AbstractRefactoringRule {
 
         for (int referenceIndex = 0; referenceIndex < switchStructure.size() - 1; referenceIndex++) {
             final SwitchCaseSection referenceCase = switchStructure.get(referenceIndex);
-            if (referenceCase.fallsthrough()) {
+            if (referenceCase.fallsThrough()) {
                 continue;
             }
 
@@ -451,7 +451,7 @@ public class SwitchRefactoring extends AbstractRefactoringRule {
     }
 
     private boolean previousSectionFallsthrough(final List<SwitchCaseSection> switchStructure, int idx) {
-        return switchStructure.get(idx - 1).fallsthrough();
+        return switchStructure.get(idx - 1).fallsThrough();
     }
 
     private List<SwitchCaseSection> getSwitchStructure(final SwitchStatement node) {
@@ -460,11 +460,12 @@ public class SwitchRefactoring extends AbstractRefactoringRule {
         SwitchCaseSection currentCase = new SwitchCaseSection();
         for (final Statement stmt : statements(node)) {
             if (stmt instanceof SwitchCase) {
-                final SwitchCase swithCase = (SwitchCase) stmt;
                 if (!currentCase.stmts.isEmpty()) {
                     switchStructure.add(currentCase);
                     currentCase = new SwitchCaseSection();
                 }
+
+                final SwitchCase swithCase = (SwitchCase) stmt;
                 currentCase.existingCases.add(swithCase);
             } else {
                 currentCase.stmts.add(stmt);

@@ -399,7 +399,22 @@ public class SwitchSample {
         }
     }
 
-    public void mergeCasesWithFallthroughCase(int i1) {
+    public void mergeLongCases(int i1, boolean interrumpt) {
+        int i = 0;
+        switch (i1) {
+        case 0:
+        case 1:
+            System.out.println("Let's do lots of things!");
+            System.out.println("And again!");
+            i = 0;
+            break;
+        default:
+            i = 1;
+            break;
+        }
+    }
+
+    public void mergeCasesThatFallsThrough(int i1) {
         int i = 0;
         switch (i1) {
         case 1:
@@ -411,7 +426,7 @@ public class SwitchSample {
         }
     }
 
-    public void mergeCasesWithPrecedingFallthroughCase(int i1) {
+    public void mergeCasesWithPreviousCaseThatFallsThrough(int i1) {
         int i = 0;
         switch (i1) {
         case 0:
