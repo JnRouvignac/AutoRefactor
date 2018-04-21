@@ -29,7 +29,6 @@ package org.autorefactor.refactoring.rules;
 import static org.autorefactor.refactoring.ASTHelper.hasType;
 import static org.autorefactor.refactoring.ASTHelper.isMethod;
 import static org.autorefactor.refactoring.ASTHelper.isPassive;
-import static org.autorefactor.refactoring.ASTHelper.isPrimitive;
 
 import java.util.HashMap;
 import java.util.List;
@@ -122,8 +121,9 @@ public class SetRatherThanMapRefactoring extends AbstractClassSubstituteRefactor
 
     @Override
     protected boolean canInstantiationBeRefactored(final ClassInstanceCreation instanceCreation) {
-        return instanceCreation.arguments().size() == 0
-                || isPrimitive(((Expression) instanceCreation.arguments().get(0)));
+        ITypeBinding[] parameterTypes = instanceCreation.resolveConstructorBinding().getParameterTypes();
+
+        return parameterTypes.length == 0 || hasType(parameterTypes[0], "int");
     }
 
     /**
