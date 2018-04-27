@@ -62,7 +62,8 @@ public class AutoBoxingRatherThanExplicitMethodRefactoring extends AbstractRefac
      * @return the reason.
      */
     public String getReason() {
-        return "It improves the readibility. It also upgrades legacy code.";
+        return "AutoBoxing methods are automatically added by the compiler so it is useless. "
+                + "It improves the readibility. It also upgrades legacy code.";
     }
 
     private int getJavaMinorVersion() {

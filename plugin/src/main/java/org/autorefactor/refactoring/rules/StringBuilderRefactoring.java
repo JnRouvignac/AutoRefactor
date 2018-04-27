@@ -94,7 +94,9 @@ public class StringBuilderRefactoring extends AbstractRefactoringRule {
      * @return the reason.
      */
     public String getReason() {
-        return "It improves the time and space performance. It also improves the readibility.";
+        return "It improves the time and space performance. "
+                + "It also improves the readibility. "
+                + "String concatenation is automatically converted as StringBuilder by the compiler so it is useless.";
     }
 
     private boolean isEmptyString(final Expression expr) {

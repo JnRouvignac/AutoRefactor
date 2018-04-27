@@ -61,7 +61,8 @@ public class UnboxingRatherThanExplicitMethodRefactoring extends AbstractRefacto
      * @return the reason.
      */
     public String getReason() {
-        return "It improves the readibility. It also upgrades legacy code.";
+        return "UnBoxing methods are automatically added by the compiler so it is useless. "
+                + "It improves the readibility. It also upgrades legacy code.";
     }
 
     private int getJavaMinorVersion() {
