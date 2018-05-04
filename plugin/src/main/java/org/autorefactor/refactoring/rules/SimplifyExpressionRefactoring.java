@@ -128,8 +128,6 @@ public class SimplifyExpressionRefactoring extends AbstractRefactoringRule {
             Pair.of(RIGHT_SHIFT_UNSIGNED, OR),
             Pair.of(RIGHT_SHIFT_UNSIGNED, AND));
 
-    // TODO JNR remove avoidable boxing / unboxing
-
     // TODO Very few parenthesized expressions are actually needed. They are:
     // 1) inside InfixExpressions with logical operators (&&, ||, etc.)
     // Sometimes needed to explicit code, some like it like that too
