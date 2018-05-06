@@ -42,7 +42,7 @@ import static org.eclipse.jdt.core.dom.PrefixExpression.Operator.NOT;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.autorefactor.refactoring.ASTBuilder;
-import org.eclipse.jdt.core.dom.ASTMatcher;
+import org.autorefactor.refactoring.ASTSemanticMatcher;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.InfixExpression.Operator;
@@ -108,12 +108,12 @@ public class ORConditionRatherThanRedundantClausesRefactoring extends AbstractRe
                     isThirdExprPositive);
 
             if (isPrimitive(firstExpr) && isPrimitive(secondExpr) && isPrimitive(thirdExpr)) {
-                if (match(new ASTMatcher(), secondExpr, thirdExpr)) {
+                if (match(new ASTSemanticMatcher(), secondExpr, thirdExpr)) {
                     replaceDuplicateExpr(node, operator, firstExpr, thirdExpr,
                             isFirstExprPositive.get(),
                             isThirdExprPositive.get(), forward);
                     return DO_NOT_VISIT_SUBTREE;
-                } else if (match(new ASTMatcher(), firstExpr, thirdExpr)) {
+                } else if (match(new ASTSemanticMatcher(), firstExpr, thirdExpr)) {
                     replaceDuplicateExpr(node, operator, secondExpr, thirdExpr,
                             isSecondExprPositive.get(),
                             isThirdExprPositive.get(), forward);

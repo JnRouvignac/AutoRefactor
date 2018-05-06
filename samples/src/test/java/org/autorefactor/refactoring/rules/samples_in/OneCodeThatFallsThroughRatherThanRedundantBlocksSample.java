@@ -265,15 +265,19 @@ public class OneCodeThatFallsThroughRatherThanRedundantBlocksSample {
     public void mergeIfThrowingException(int i) throws Exception {
         // Keep this comment
         if (i <= 0) {
+            i += 42;
             System.out.println("Doing something");
             throw new Exception();
         } else if (i == 10) {
+            i += 42;
             System.out.println("Doing another thing");
             throw new Exception();
         } else if (i == 20) {
+            i += 42;
             System.out.println("Doing something");
             throw new Exception();
         }
+        i = i + 42;
         System.out.println("Doing something");
         throw new Exception();
     }
@@ -317,6 +321,7 @@ public class OneCodeThatFallsThroughRatherThanRedundantBlocksSample {
     public void mergeIfThatAlwaysFallThrough(int i, boolean interruptCode) throws Exception {
         // Keep this comment
         if (i <= 0) {
+            i++;
             System.out.println("Doing something");
             if (interruptCode) {
                 throw new Exception("Stop!");
@@ -324,6 +329,7 @@ public class OneCodeThatFallsThroughRatherThanRedundantBlocksSample {
                 return;
             }
         } else if (i == 10) {
+            i += 1;
             System.out.println("Doing another thing");
             if (interruptCode) {
                 throw new Exception("Stop!");
@@ -331,6 +337,7 @@ public class OneCodeThatFallsThroughRatherThanRedundantBlocksSample {
                 return;
             }
         } else if (i == 20) {
+            i = 1 + i;
             System.out.println("Doing something");
             if (interruptCode) {
                 throw new Exception("Stop!");
@@ -338,6 +345,7 @@ public class OneCodeThatFallsThroughRatherThanRedundantBlocksSample {
                 return;
             }
         }
+        i = i + 1;
         System.out.println("Doing something");
         if (interruptCode) {
             throw new Exception("Stop!");

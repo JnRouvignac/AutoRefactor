@@ -41,7 +41,7 @@ public class CommonCodeInIfElseStatementSample {
     /** common code: i++, Remove if statement */
     public void ifElseRemoveIf(Boolean b, int i) {
         // Keep this comment
-        i++;
+        i = i + 1;
     }
 
     /** no common code, Do not remove anything */
@@ -56,7 +56,7 @@ public class CommonCodeInIfElseStatementSample {
     /** common code: i++, Remove then case */
     public void ifElseRemoveThen(Boolean b, int i, int j) {
         // Keep this comment
-        i++;
+        ++i;
         if (!b.booleanValue()) {
             j++;
         }
@@ -77,7 +77,7 @@ public class CommonCodeInIfElseStatementSample {
      */
     public void ifElseRemoveIf(Boolean b, int i, int j, int k, int l) {
         // Keep this comment
-        i++;
+        i--;
         if (b.booleanValue()) {
             j++;
         } else {

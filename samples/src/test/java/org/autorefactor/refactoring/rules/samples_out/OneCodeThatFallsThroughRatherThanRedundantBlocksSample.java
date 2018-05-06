@@ -226,10 +226,12 @@ public class OneCodeThatFallsThroughRatherThanRedundantBlocksSample {
         // Keep this comment
         if (i <= 0) {
         } else if (i == 10) {
+            i += 42;
             System.out.println("Doing another thing");
             throw new Exception();
         } else if (i == 20) {
         }
+        i = i + 42;
         System.out.println("Doing something");
         throw new Exception();
     }
@@ -266,6 +268,7 @@ public class OneCodeThatFallsThroughRatherThanRedundantBlocksSample {
         // Keep this comment
         if (i <= 0) {
         } else if (i == 10) {
+            i += 1;
             System.out.println("Doing another thing");
             if (interruptCode) {
                 throw new Exception("Stop!");
@@ -274,6 +277,7 @@ public class OneCodeThatFallsThroughRatherThanRedundantBlocksSample {
             }
         } else if (i == 20) {
         }
+        i = i + 1;
         System.out.println("Doing something");
         if (interruptCode) {
             throw new Exception("Stop!");

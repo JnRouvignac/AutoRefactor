@@ -27,14 +27,13 @@ package org.autorefactor.refactoring;
 
 import static org.autorefactor.util.Utils.equalNotNull;
 
-import org.eclipse.jdt.core.dom.ASTMatcher;
 import org.eclipse.jdt.core.dom.IBinding;
 import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.SimpleName;
 
 /** Matches two piece of code only if the variables/methods in use are the same. */
-public final class ASTMatcherSameVariablesAndMethods extends ASTMatcher {
+public final class ASTMatcherSameVariablesAndMethods extends ASTSemanticMatcher {
     @Override
     public boolean match(SimpleName node, Object other) {
         return super.match(node, other)

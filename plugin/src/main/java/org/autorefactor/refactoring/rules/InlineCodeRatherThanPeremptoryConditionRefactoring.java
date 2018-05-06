@@ -42,9 +42,9 @@ import java.util.List;
 import java.util.Set;
 
 import org.autorefactor.refactoring.ASTBuilder;
+import org.autorefactor.refactoring.ASTSemanticMatcher;
 import org.autorefactor.refactoring.BlockSubVisitor;
 import org.autorefactor.refactoring.Refactorings;
-import org.eclipse.jdt.core.dom.ASTMatcher;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.IfStatement;
@@ -168,7 +168,7 @@ public class InlineCodeRatherThanPeremptoryConditionRefactoring extends Abstract
             InfixExpression ie = (InfixExpression) condition;
             if ((EQUALS.equals(ie.getOperator()) || NOT_EQUALS.equals(ie.getOperator()))
                     && isPassive(ie.getLeftOperand())
-                    && match(new ASTMatcher(), ie.getLeftOperand(), ie.getRightOperand())) {
+                    && match(new ASTSemanticMatcher(), ie.getLeftOperand(), ie.getRightOperand())) {
                 return EQUALS.equals(ie.getOperator());
             }
         }

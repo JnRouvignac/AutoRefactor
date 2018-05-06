@@ -40,8 +40,8 @@ import static org.eclipse.jdt.core.dom.PrefixExpression.Operator.NOT;
 import java.util.List;
 
 import org.autorefactor.refactoring.ASTBuilder;
+import org.autorefactor.refactoring.ASTSemanticMatcher;
 import org.autorefactor.refactoring.Refactorings;
-import org.eclipse.jdt.core.dom.ASTMatcher;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.MethodInvocation;
@@ -109,7 +109,7 @@ public class UpdateSetRatherThanTestingFirstRefactoring extends AbstractRefactor
                 && isMethod(miContains, "java.util.Set", "contains", "java.lang.Object")) {
             final Statement firstStmt = getFirst(stmts);
             final MethodInvocation miAddOrRemove = asExpression(firstStmt, MethodInvocation.class);
-            final ASTMatcher astMatcher = new ASTMatcher();
+            final ASTSemanticMatcher astMatcher = new ASTSemanticMatcher();
             if (isMethod(miAddOrRemove, "java.util.Set", methodName, "java.lang.Object")
                     && match(astMatcher, miContains.getExpression(), miAddOrRemove.getExpression())
                     && match(astMatcher, arg0(miContains), arg0(miAddOrRemove))) {

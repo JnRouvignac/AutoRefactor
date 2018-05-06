@@ -43,7 +43,7 @@ import static org.eclipse.jdt.core.dom.PrefixExpression.Operator.NOT;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.autorefactor.refactoring.ASTBuilder;
-import org.eclipse.jdt.core.dom.ASTMatcher;
+import org.autorefactor.refactoring.ASTSemanticMatcher;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.PrefixExpression;
@@ -103,12 +103,12 @@ public class XORRatherThanDuplicateConditionsRefactoring extends AbstractRefacto
                         isFourthExprPositive);
 
                 if (isPassive(firstExpr) && isPassive(secondExpr)
-                        && ((match(new ASTMatcher(), firstExpr, thirdExpr)
-                                && match(new ASTMatcher(), secondExpr, fourthExpr)
+                        && ((match(new ASTSemanticMatcher(), firstExpr, thirdExpr)
+                                && match(new ASTSemanticMatcher(), secondExpr, fourthExpr)
                         && isFirstExprPositive.get() ^ isThirdExprPositive.get()
                         && isSecondExprPositive.get() ^ isFourthExprPositive.get())
-                        || (match(new ASTMatcher(), firstExpr, fourthExpr)
-                                && match(new ASTMatcher(), secondExpr, thirdExpr)
+                        || (match(new ASTSemanticMatcher(), firstExpr, fourthExpr)
+                                && match(new ASTSemanticMatcher(), secondExpr, thirdExpr)
                         && isFirstExprPositive.get() ^ isFourthExprPositive.get()
                         && isSecondExprPositive.get() ^ isThirdExprPositive.get()))) {
                     replaceDuplicateExpr(node, firstExpr, secondExpr, isFirstExprPositive, isSecondExprPositive);

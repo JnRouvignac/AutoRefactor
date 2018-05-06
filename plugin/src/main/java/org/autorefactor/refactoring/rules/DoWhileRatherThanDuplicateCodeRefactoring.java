@@ -35,8 +35,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.autorefactor.refactoring.ASTBuilder;
+import org.autorefactor.refactoring.ASTSemanticMatcher;
 import org.autorefactor.refactoring.Refactorings;
-import org.eclipse.jdt.core.dom.ASTMatcher;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.WhileStatement;
 
@@ -78,7 +78,7 @@ public class DoWhileRatherThanDuplicateCodeRefactoring extends AbstractRefactori
         }
 
         final List<Statement> previousStmts = new ArrayList<Statement>(whileStmts.size());
-        final ASTMatcher matcher = new ASTMatcher();
+        final ASTSemanticMatcher matcher = new ASTSemanticMatcher();
 
         Statement previousStmt = getPreviousSibling(node);
         int i = whileStmts.size() - 1;

@@ -41,7 +41,7 @@ import static org.eclipse.jdt.core.dom.PrefixExpression.Operator.NOT;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.autorefactor.refactoring.ASTBuilder;
-import org.eclipse.jdt.core.dom.ASTMatcher;
+import org.autorefactor.refactoring.ASTSemanticMatcher;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.Name;
@@ -105,22 +105,22 @@ public class TernaryOperatorRatherThanDuplicateConditionsRefactoring extends Abs
                         && isBooleanVariable(secondExpr)
                         && isBooleanVariable(thirdExpr)
                         && isBooleanVariable(fourthExpr)) {
-                    if (match(new ASTMatcher(), firstExpr, thirdExpr)
+                    if (match(new ASTSemanticMatcher(), firstExpr, thirdExpr)
                             && isFirstExprPositive.get() != isThirdExprPositive.get()) {
                         return maybeReplaceDuplicateExpr(node, firstExpr, firstCondition.getRightOperand(),
                                 secondCondition.getRightOperand(),
                                 isFirstExprPositive.get());
-                    } else if (match(new ASTMatcher(), firstExpr, fourthExpr)
+                    } else if (match(new ASTSemanticMatcher(), firstExpr, fourthExpr)
                             && isFirstExprPositive.get() != isFourthExprPositive.get()) {
                         return maybeReplaceDuplicateExpr(node, firstExpr, firstCondition.getRightOperand(),
                                 secondCondition.getLeftOperand(),
                                 isFirstExprPositive.get());
-                    } else if (match(new ASTMatcher(), secondExpr, thirdExpr)
+                    } else if (match(new ASTSemanticMatcher(), secondExpr, thirdExpr)
                             && isSecondExprPositive.get() != isThirdExprPositive.get()) {
                         return maybeReplaceDuplicateExpr(node, secondExpr, firstCondition.getLeftOperand(),
                                 secondCondition.getRightOperand(),
                                 isSecondExprPositive.get());
-                    } else if (match(new ASTMatcher(), secondExpr, fourthExpr)
+                    } else if (match(new ASTSemanticMatcher(), secondExpr, fourthExpr)
                             && isSecondExprPositive.get() != isFourthExprPositive.get()) {
                         return maybeReplaceDuplicateExpr(node, secondExpr, firstCondition.getLeftOperand(),
                                 secondCondition.getLeftOperand(),
@@ -153,7 +153,7 @@ public class TernaryOperatorRatherThanDuplicateConditionsRefactoring extends Abs
             final Expression secondExpr,
             final Expression thirdExpr,
             final boolean isFirstExprPositive) {
-        if (!match(new ASTMatcher(), secondExpr, thirdExpr)) {
+        if (!match(new ASTSemanticMatcher(), secondExpr, thirdExpr)) {
             final ASTBuilder b = ctx.getASTBuilder();
 
             final Expression thenExpr;

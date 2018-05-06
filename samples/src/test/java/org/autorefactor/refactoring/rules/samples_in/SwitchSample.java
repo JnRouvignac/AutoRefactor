@@ -415,10 +415,10 @@ public class SwitchSample {
         int i = 0;
         switch (i1) {
         case 0:
-            i = 0;
+            i = i + 1;
             return;
         case 1:
-            i = 0;
+            ++i;
             return;
         default:
             i = 1;
@@ -431,10 +431,10 @@ public class SwitchSample {
         int i = 0;
         switch (i1) {
         case 0:
-            i = 0;
+            --i;
             throw e;
         case 1:
-            i = 0;
+            i = i - 1;
             throw e;
         default:
             i = 1;
@@ -447,10 +447,10 @@ public class SwitchSample {
         for (int j = 0; j < 10; j++) {
             switch (i1) {
             case 0:
-                i = 0;
+                i = i - 1;
                 continue;
             case 1:
-                i = 0;
+                i--;
                 continue;
             default:
                 i = 1;
@@ -506,14 +506,14 @@ public class SwitchSample {
         int i = 0;
         switch (i1) {
         case 0:
-            i = 0;
+            i++;
             break;
         case 1:
             int i2 = 0;
             i2 = 0;
             break;
         case 2:
-            i = 0;
+            i = i + 1;
             break;
         }
     }

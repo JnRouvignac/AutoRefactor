@@ -129,7 +129,6 @@ import java.util.TreeSet;
 import org.autorefactor.util.IllegalArgumentException;
 import org.autorefactor.util.IllegalStateException;
 import org.autorefactor.util.NotImplementedException;
-import org.eclipse.jdt.core.dom.ASTMatcher;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.AbstractTypeDeclaration;
@@ -2107,7 +2106,7 @@ public final class ASTHelper {
             return false;
         }
 
-        final ASTMatcher matcher = new ASTMatcher();
+        final ASTSemanticMatcher matcher = new ASTSemanticMatcher();
 
         for (int codeLine = 0; codeLine < referenceStmts.size(); codeLine++) {
             if (!match(matcher, referenceStmts.get(codeLine),
@@ -2126,7 +2125,7 @@ public final class ASTHelper {
      * @param node2 the second node to compare
      * @return true if the two provided nodes structurally match, false otherwise
      */
-    public static boolean match(ASTMatcher matcher, ASTNode node1, ASTNode node2) {
+    public static boolean match(ASTSemanticMatcher matcher, ASTNode node1, ASTNode node2) {
         if (sameClass(node1, node2)) {
             // FIXME JNR implement all expressions
             // TODO JNR

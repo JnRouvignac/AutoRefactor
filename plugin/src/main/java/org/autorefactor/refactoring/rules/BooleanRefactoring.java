@@ -54,11 +54,11 @@ import java.util.Map;
 
 import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.ASTBuilder.Copy;
+import org.autorefactor.refactoring.ASTSemanticMatcher;
 import org.autorefactor.refactoring.BlockSubVisitor;
 import org.autorefactor.util.IllegalArgumentException;
 import org.autorefactor.util.IllegalStateException;
 import org.autorefactor.util.NotImplementedException;
-import org.eclipse.jdt.core.dom.ASTMatcher;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.Assignment;
@@ -121,7 +121,7 @@ public class BooleanRefactoring extends AbstractRefactoringRule {
         return "It reduces code to focus attention on code that matters.";
     }
 
-    private class BooleanASTMatcher extends ASTMatcher {
+    private class BooleanASTMatcher extends ASTSemanticMatcher {
 
         /** else node to then node. */
         final Map<ASTNode, ASTNode> matches = new HashMap<ASTNode, ASTNode>();

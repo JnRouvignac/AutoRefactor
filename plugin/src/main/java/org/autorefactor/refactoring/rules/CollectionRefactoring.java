@@ -45,8 +45,8 @@ import static org.autorefactor.refactoring.ASTHelper.match;
 import java.util.List;
 
 import org.autorefactor.refactoring.ASTBuilder;
+import org.autorefactor.refactoring.ASTSemanticMatcher;
 import org.autorefactor.refactoring.BlockSubVisitor;
-import org.eclipse.jdt.core.dom.ASTMatcher;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
@@ -193,7 +193,7 @@ public class CollectionRefactoring extends AbstractRefactoringRule {
                 if (constant != null) {
                     return constant.equals(0);
                 } else  {
-                    return isMethod(mi, "java.util.Collection", "size") && match(new ASTMatcher(),
+                    return isMethod(mi, "java.util.Collection", "size") && match(new ASTSemanticMatcher(),
                             mi.getExpression(), sourceCollection);
                 }
             }

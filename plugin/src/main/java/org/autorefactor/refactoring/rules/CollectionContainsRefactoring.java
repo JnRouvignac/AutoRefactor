@@ -53,12 +53,12 @@ import static org.eclipse.jdt.core.dom.Assignment.Operator.ASSIGN;
 import java.util.List;
 
 import org.autorefactor.refactoring.ASTBuilder;
+import org.autorefactor.refactoring.ASTSemanticMatcher;
 import org.autorefactor.refactoring.BlockSubVisitor;
 import org.autorefactor.refactoring.FinderVisitor;
 import org.autorefactor.refactoring.ForLoopHelper.ForLoopContent;
 import org.autorefactor.util.NotImplementedException;
 import org.autorefactor.util.Pair;
-import org.eclipse.jdt.core.dom.ASTMatcher;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.BooleanLiteral;
@@ -338,7 +338,7 @@ public class CollectionContainsRefactoring extends AbstractRefactoringRule {
         }
 
         private boolean matches(Expression e1, Expression e2) {
-            return match(new ASTMatcher(), e1, e2);
+            return match(new ASTSemanticMatcher(), e1, e2);
         }
 
         @Override

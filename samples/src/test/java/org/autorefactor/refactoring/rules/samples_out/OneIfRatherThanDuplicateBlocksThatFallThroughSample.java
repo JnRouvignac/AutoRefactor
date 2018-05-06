@@ -40,6 +40,7 @@ public class OneIfRatherThanDuplicateBlocksThatFallThroughSample {
         // Keep this comment
         if ((i1 == 0) || (i1 == 1)) {
             System.out.println("The same code");
+            i1--;
             throw new Exception();
         }
         System.out.println("Next code");
@@ -50,6 +51,7 @@ public class OneIfRatherThanDuplicateBlocksThatFallThroughSample {
             // Keep this comment
             if ((i1 == 0) || (i1 == 1)) {
                 System.out.println("The same code");
+                i1++;
                 continue;
             }
             System.out.println("Next code");
@@ -62,6 +64,7 @@ public class OneIfRatherThanDuplicateBlocksThatFallThroughSample {
             // Keep this comment
             if ((i1 == 0) || (i1 == 1)) {
                 System.out.println("The same code");
+                i1++;
                 break;
             }
             System.out.println("Next code");
@@ -76,7 +79,7 @@ public class OneIfRatherThanDuplicateBlocksThatFallThroughSample {
             if (i2 == 0) {
                 return;
             } else {
-                throw new Exception();
+                throw new Exception("Error #" + i1++);
             }
         }
         System.out.println("Next code");
@@ -107,50 +110,50 @@ public class OneIfRatherThanDuplicateBlocksThatFallThroughSample {
         System.out.println("Next code");
     }
 
-    public void doNotMergeConditionsWithoutJump(int i1) {
-        if (i1 == 0) {
+    public void doNotMergeConditionsWithoutJump(int i) {
+        if (i == 0) {
             System.out.println("The same code");
         }
-        if (i1 == 1) {
+        if (i == 1) {
             System.out.println("The same code");
         }
         System.out.println("Next code");
     }
 
-    public void doNotMergeDifferentBlocks(int i1) {
-        if (i1 == 0) {
+    public void doNotMergeDifferentBlocks(int i) {
+        if (i == 0) {
             System.out.println("A code");
             return;
         }
-        if (i1 == 1) {
+        if (i == 1) {
             System.out.println("Another code");
             return;
         }
         System.out.println("Next code");
     }
 
-    public void doNotMergeConditionsWithElse(int i1) {
+    public void doNotMergeConditionsWithElse(int i1, int counter) {
         // Keep this comment
         if (i1 == 0) {
-            System.out.println("The same code");
+            System.out.println("The count is: " + counter++);
             return;
         } else {
-            System.out.println("Another code");
+            System.out.println("The count is: " + ++counter);
         }
         if (i1 == 1) {
-            System.out.println("The same code");
+            System.out.println("The count is: " + counter++);
             return;
         }
         System.out.println("Next code");
     }
 
-    public void doNotMergeConditionsWithAnotherElse(int i1) {
+    public void doNotMergeConditionsWithAnotherElse(int i) {
         // Keep this comment
-        if (i1 == 0) {
+        if (i == 0) {
             System.out.println("The same code");
             return;
         }
-        if (i1 == 1) {
+        if (i == 1) {
             System.out.println("The same code");
             return;
         } else {

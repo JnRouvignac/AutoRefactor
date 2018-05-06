@@ -459,7 +459,7 @@ public class SwitchSample {
         switch (i1) {
         case 0:
         case 1:
-            i = 0;
+            i = i + 1;
             return;
         default:
             i = 1;
@@ -473,7 +473,7 @@ public class SwitchSample {
         switch (i1) {
         case 0:
         case 1:
-            i = 0;
+            --i;
             throw e;
         default:
             i = 1;
@@ -487,7 +487,7 @@ public class SwitchSample {
             switch (i1) {
             case 0:
             case 1:
-                i = 0;
+                i = i - 1;
                 continue;
             default:
                 i = 1;
@@ -542,7 +542,7 @@ public class SwitchSample {
         switch (i1) {
         case 0:
         case 2:
-            i = 0;
+            i++;
             break;
         case 1:
             int i2 = 0;

@@ -51,10 +51,10 @@ import java.util.Set;
 
 import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.ASTHelper;
+import org.autorefactor.refactoring.ASTSemanticMatcher;
 import org.autorefactor.refactoring.Refactorings;
 import org.autorefactor.refactoring.Release;
 import org.autorefactor.util.NotImplementedException;
-import org.eclipse.jdt.core.dom.ASTMatcher;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.CatchClause;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
@@ -202,7 +202,7 @@ public class UseMultiCatchRefactoring extends AbstractRefactoringRule {
         }
     }
 
-    private static final class MultiCatchASTMatcher extends ASTMatcher {
+    private static final class MultiCatchASTMatcher extends ASTSemanticMatcher {
         private final Map<ASTNode, ASTNode> matchingVariables = new HashMap<ASTNode, ASTNode>();
 
         public MultiCatchASTMatcher(CatchClause catchClause1, CatchClause catchClause2) {

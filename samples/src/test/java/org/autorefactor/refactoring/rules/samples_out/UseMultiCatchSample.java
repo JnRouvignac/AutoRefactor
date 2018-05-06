@@ -154,14 +154,17 @@ public class UseMultiCatchSample {
         }
     }
 
-    public void refactorDown(ThrowingObject<NamingException, RuntimeException> obj) {
+    public void refactorDown(ThrowingObject<NamingException, RuntimeException> obj, int errorCount) {
         try {
             obj.throwingMethod();
         } catch (RuntimeException ioe) {
+            errorCount++;
             ioe.toString();
         } catch (Exception e) {
+            errorCount = errorCount + 1;
             e.printStackTrace();
         }
+        System.out.println("Error count: " + errorCount);
     }
 
     public void refactorMultiCatchWithLocalVariables(ThrowingObject<IllegalArgumentException, IOException> obj) {

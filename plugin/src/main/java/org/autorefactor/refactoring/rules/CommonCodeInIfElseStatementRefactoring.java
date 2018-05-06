@@ -39,10 +39,10 @@ import java.util.List;
 import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.ASTHelper;
 import org.autorefactor.refactoring.ASTMatcherSameVariablesAndMethods;
+import org.autorefactor.refactoring.ASTSemanticMatcher;
 import org.autorefactor.refactoring.Refactorings;
 import org.autorefactor.util.IllegalStateException;
 import org.autorefactor.util.NotImplementedException;
-import org.eclipse.jdt.core.dom.ASTMatcher;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.IfStatement;
@@ -88,7 +88,7 @@ public class CommonCodeInIfElseStatementRefactoring extends AbstractRefactoringR
             return VISIT_SUBTREE;
         }
         if (!(node.getParent() instanceof Block)) {
-            // FIXME current code does not handle common code in if / else if statements
+            // TODO current code does not handle common code in if / else if statements
             // when not inside curly braces
             return VISIT_SUBTREE;
         }
@@ -106,7 +106,7 @@ public class CommonCodeInIfElseStatementRefactoring extends AbstractRefactoringR
                 removedCaseStmts.add(new LinkedList<ASTNode>());
             }
             // If all cases exist
-            final ASTMatcher matcher = new ASTMatcherSameVariablesAndMethods();
+            final ASTSemanticMatcher matcher = new ASTMatcherSameVariablesAndMethods();
             final int minSize = minSize(allCasesStmts);
             final List<Statement> caseStmts = allCasesStmts.get(0);
 
@@ -228,8 +228,8 @@ public class CommonCodeInIfElseStatementRefactoring extends AbstractRefactoringR
         }
     }
 
-    private boolean match(ASTMatcher matcher, List<List<Statement>> allCasesStmts, boolean matchForward, int stmtIndex,
-            int startIndex, int endIndex) {
+    private boolean match(ASTSemanticMatcher matcher, List<List<Statement>> allCasesStmts, boolean matchForward,
+            int stmtIndex, int startIndex, int endIndex) {
         if (startIndex == endIndex || startIndex == endIndex - 1) {
             return true;
         }

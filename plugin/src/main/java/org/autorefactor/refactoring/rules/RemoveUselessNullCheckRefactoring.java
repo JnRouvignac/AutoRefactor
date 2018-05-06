@@ -43,8 +43,8 @@ import static org.eclipse.jdt.core.dom.InfixExpression.Operator.NOT_EQUALS;
 import java.util.List;
 
 import org.autorefactor.refactoring.ASTBuilder;
+import org.autorefactor.refactoring.ASTSemanticMatcher;
 import org.autorefactor.refactoring.BlockSubVisitor;
-import org.eclipse.jdt.core.dom.ASTMatcher;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.Expression;
@@ -99,7 +99,7 @@ public class RemoveUselessNullCheckRefactoring extends AbstractRefactoringRule {
             super(ctx, startNode);
         }
 
-        private final ASTMatcher matcher = new ASTMatcher();
+        private final ASTSemanticMatcher matcher = new ASTSemanticMatcher();
 
         @Override
         public boolean visit(IfStatement node) {

@@ -33,7 +33,7 @@ import static org.autorefactor.refactoring.ASTHelper.isPassive;
 import static org.autorefactor.refactoring.ASTHelper.match;
 
 import org.autorefactor.refactoring.ASTBuilder;
-import org.eclipse.jdt.core.dom.ASTMatcher;
+import org.autorefactor.refactoring.ASTSemanticMatcher;
 import org.eclipse.jdt.core.dom.IfStatement;
 
 /**
@@ -105,7 +105,7 @@ public class CommonIfInIfElseRefactoring extends AbstractRefactoringRule {
                 && thenInnerIfStmt.getElseStatement() == null
                 && elseInnerIfStmt.getElseStatement() == null
                 && isPassive(thenInnerIfStmt.getExpression())
-                && match(new ASTMatcher(), thenInnerIfStmt.getExpression(), elseInnerIfStmt.getExpression())) {
+                && match(new ASTSemanticMatcher(), thenInnerIfStmt.getExpression(), elseInnerIfStmt.getExpression())) {
             final ASTBuilder b = this.ctx.getASTBuilder();
             this.ctx.getRefactorings().replace(node,
                     b.if0(b.move(thenInnerIfStmt.getExpression()),

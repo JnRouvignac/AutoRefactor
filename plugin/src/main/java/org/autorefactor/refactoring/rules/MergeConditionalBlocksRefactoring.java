@@ -33,9 +33,9 @@ import static org.autorefactor.refactoring.ASTHelper.match;
 import java.util.List;
 
 import org.autorefactor.refactoring.ASTBuilder;
+import org.autorefactor.refactoring.ASTSemanticMatcher;
 import org.autorefactor.refactoring.ASTBuilder.Copy;
 import org.autorefactor.refactoring.Refactorings;
-import org.eclipse.jdt.core.dom.ASTMatcher;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.InfixExpression;
@@ -119,7 +119,7 @@ public class MergeConditionalBlocksRefactoring extends AbstractRefactoringRule {
             return false;
         }
 
-        final ASTMatcher matcher = new ASTMatcher();
+        final ASTSemanticMatcher matcher = new ASTSemanticMatcher();
 
         for (int codeLine = 0; codeLine < referenceStmts.size(); codeLine++) {
             if (!match(matcher, referenceStmts.get(codeLine),
