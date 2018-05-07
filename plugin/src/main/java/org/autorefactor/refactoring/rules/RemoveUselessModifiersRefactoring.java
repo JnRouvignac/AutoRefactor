@@ -183,7 +183,7 @@ public class RemoveUselessModifiersRefactoring extends AbstractRefactoringRule {
             return removePublicAbstractModifiers(node);
         }
         int modifiers = node.getModifiers();
-        if (isPrivate(modifiers) && isFinal(modifiers)) {
+        if (isFinal(modifiers) && (isFinalClass(node.getParent()) || isPrivate(modifiers))) {
             return removeFinalModifier(modifiers(node));
         }
         if (isProtected(node.getModifiers())

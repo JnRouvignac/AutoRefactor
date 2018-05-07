@@ -92,6 +92,8 @@ public interface RemoveUselessModifiersSample {
         Class(){}
 
         void doIt(){}
+
+        void doItThisWay(){}
     }
 
     final class InheritedClass<E> extends javax.swing.JComboBox<E> {
@@ -108,6 +110,6 @@ public interface RemoveUselessModifiersSample {
 
         protected DoNotRefactorNonFinalClass(){}
 
-        protected void doIt(){}
+        protected final void doIt(){}
     }
 }
