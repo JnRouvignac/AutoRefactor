@@ -33,21 +33,21 @@ import java.util.function.Predicate;
 public class CommonCodeInIfElseStatementSample {
 
     /** common code: i++, Remove if statement */
-    public void ifElseRemoveIfNoBrackets(Boolean b, int i) {
+    public void ifElseRemoveIfNoBrackets(boolean b, int i) {
         // Keep this!
         // Keep this comment
         i++;
     }
 
     /** common code: i++, Remove if statement */
-    public void ifElseRemoveIf(Boolean b, int i) {
+    public void ifElseRemoveIf(boolean b, int i) {
         // Keep this comment
         i = i + 1;
     }
 
     /** no common code, Do not remove anything */
-    public void doNotRemoveNotCommonCode(Boolean b, int i, int j) {
-        if (b.booleanValue()) {
+    public void doNotRemoveNotCommonCode(boolean b, int i, int j) {
+        if (b) {
             i++;
         } else {
             j++;
@@ -55,8 +55,8 @@ public class CommonCodeInIfElseStatementSample {
     }
 
     /** common code: i++, Remove then case */
-    public void ifElseRemoveThen(Boolean b, int i, int j) {
-        if (!b.booleanValue()) {
+    public void ifElseRemoveThen(boolean b, int i, int j) {
+        if (!b) {
             j++;
         }
         // Keep this comment
@@ -64,8 +64,8 @@ public class CommonCodeInIfElseStatementSample {
     }
 
     /** common code: i++, Remove else case */
-    public void ifElseRemoveElse(Boolean b, int i, int j) {
-        if (b.booleanValue()) {
+    public void ifElseRemoveElse(boolean b, int i, int j) {
+        if (b) {
             j++;
         }
         // Keep this comment
@@ -73,25 +73,25 @@ public class CommonCodeInIfElseStatementSample {
     }
 
     /** only common code, Remove if statement */
-    public void ifElseRemoveIfSeveralStatements(Boolean b, int i, int j) {
+    public void ifElseRemoveIfSeveralStatements(boolean b, int i, int j) {
         // Keep this comment
         i++;
         j++;
     }
 
     /** not all cases covered, Do not remove anything */
-    public void ifElseIfNoElseDoNotTouch(Boolean b, int i, int j) {
-        if (b.booleanValue()) {
+    public void ifElseIfNoElseDoNotTouch(boolean b, int i, int j) {
+        if (b) {
             i++;
             j++;
-        } else if (!b.booleanValue()) {
+        } else if (!b) {
             i++;
             j++;
         }
     }
 
     /** only common code: remove if statement */
-    public void ifElseIfElseRemoveIf(Boolean b, int i, int j) {
+    public void ifElseIfElseRemoveIf(boolean b, int i, int j) {
         // Keep this comment
         i++;
         j++;
@@ -102,6 +102,7 @@ public class CommonCodeInIfElseStatementSample {
         if (b1) {
         } else if (b2) {
             i++;
+        } else if (modifiableList.remove("foo")) {
         }
         // Keep this comment
         i++;

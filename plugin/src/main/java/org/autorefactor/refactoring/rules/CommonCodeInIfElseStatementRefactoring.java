@@ -31,6 +31,7 @@ import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
 import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
 import static org.autorefactor.refactoring.ASTHelper.as;
 import static org.autorefactor.refactoring.ASTHelper.asList;
+import static org.autorefactor.refactoring.ASTHelper.isPassive;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -67,7 +68,7 @@ public class CommonCodeInIfElseStatementRefactoring extends AbstractRefactoringR
         return ""
             + "Factorizes common code in all if / else if / else statements"
             + " at the end of each blocks.\n"
-            + "Ultimately it can completely remove the if statement condition.";
+            + "Ultimately it removes the empty and passive if conditions.";
     }
 
     /**
@@ -93,72 +94,78 @@ public class CommonCodeInIfElseStatementRefactoring extends AbstractRefactoringR
             return VISIT_SUBTREE;
         }
 
-        final ASTBuilder b = this.ctx.getASTBuilder();
-        final Refactorings r = this.ctx.getRefactorings();
-
         final List<List<Statement>> allCasesStmts = new ArrayList<List<Statement>>();
-        final List<List<ASTNode>> removedCaseStmts = new LinkedList<List<ASTNode>>();
 
         // Collect all the if / else if / else if / ... / else cases
         if (collectAllCases(allCasesStmts, node)) {
+            final ASTBuilder b = this.ctx.getASTBuilder();
+            final Refactorings r = this.ctx.getRefactorings();
+
+            final List<List<ASTNode>> caseStmtsToRemove = new LinkedList<List<ASTNode>>();
+
             // initialize removedCaseStmts list
             for (int i = 0; i < allCasesStmts.size(); i++) {
-                removedCaseStmts.add(new LinkedList<ASTNode>());
+                caseStmtsToRemove.add(new LinkedList<ASTNode>());
             }
+
             // If all cases exist
             final ASTSemanticMatcher matcher = new ASTMatcherSameVariablesAndMethods();
             final int minSize = minSize(allCasesStmts);
             final List<Statement> caseStmts = allCasesStmts.get(0);
 
-            boolean result = VISIT_SUBTREE;
-
             // Identify matching statements starting from the end of each case
-            for (int stmtIndex = 1; 0 <= minSize - stmtIndex; stmtIndex++) {
+            boolean hasInsertedCode = false;
+            for (int stmtIndex = 1; stmtIndex <= minSize; stmtIndex++) {
                 if (!match(matcher, allCasesStmts, stmtIndex, 0, allCasesStmts.size())
-                        || anyContains(removedCaseStmts, allCasesStmts, stmtIndex)) {
+                        || anyContains(caseStmtsToRemove, allCasesStmts, stmtIndex)) {
                     break;
                 }
                 r.insertAfter(b.copy(caseStmts.get(caseStmts.size() - stmtIndex)), node);
-                removeStmts(allCasesStmts, stmtIndex, removedCaseStmts);
-                result = DO_NOT_VISIT_SUBTREE;
+                flagStmtsToRemove(allCasesStmts, stmtIndex, caseStmtsToRemove);
+                hasInsertedCode = true;
             }
 
-            // Remove the nodes common to all cases
-            final boolean[] areCasesEmpty = new boolean[allCasesStmts.size()];
-            for (int i = 0; i < allCasesStmts.size(); i++) {
-                areCasesEmpty[i] = false;
-            }
-            removeStmtsFromCases(allCasesStmts, removedCaseStmts, areCasesEmpty);
-
-            if (allEmpty(areCasesEmpty)) {
-                r.removeButKeepComment(node);
+            if (hasInsertedCode) {
+                removeIdenticalTrailingCode(node, b, r, allCasesStmts, caseStmtsToRemove);
                 return DO_NOT_VISIT_SUBTREE;
             }
-
-            // Remove empty cases
-            if (areCasesEmpty[0]) {
-                if (areCasesEmpty.length == 2
-                        && !areCasesEmpty[1]) {
-                    // Then clause is empty and there is only one else clause
-                    // => revert if statement
-                    r.replace(node,
-                              b.if0(b.not(b.parenthesizeIfNeeded(b.move(node.getExpression()))),
-                                    b.move(node.getElseStatement())));
-                } else {
-                    r.replace(node.getThenStatement(), b.block());
-                }
-                result = DO_NOT_VISIT_SUBTREE;
-            }
-            for (int i = 1; i < areCasesEmpty.length; i++) {
-                if (areCasesEmpty[i]) {
-                    final Statement firstStmt = allCasesStmts.get(i).get(0);
-                    r.remove(findNodeToRemove(firstStmt));
-                    result = DO_NOT_VISIT_SUBTREE;
-                }
-            }
-            return result;
         }
         return VISIT_SUBTREE;
+    }
+
+    private void removeIdenticalTrailingCode(IfStatement node, final ASTBuilder b, final Refactorings r,
+            final List<List<Statement>> allCasesStmts, final List<List<ASTNode>> caseStmtsToRemove) {
+        // Remove the nodes common to all cases
+        final boolean[] areCasesRemovable = new boolean[allCasesStmts.size()];
+        for (int i = 0; i < allCasesStmts.size(); i++) {
+            areCasesRemovable[i] = false;
+        }
+        removeStmtsFromCases(allCasesStmts, caseStmtsToRemove, areCasesRemovable);
+
+        if (allRemovable(areCasesRemovable)) {
+            r.removeButKeepComment(node);
+            return;
+        }
+
+        // Remove empty cases
+        if (areCasesRemovable[0]) {
+            if (areCasesRemovable.length == 2
+                    && !areCasesRemovable[1]) {
+                // Then clause is empty and there is only one else clause
+                // => revert if statement
+                r.replace(node,
+                          b.if0(b.not(b.parenthesizeIfNeeded(b.move(node.getExpression()))),
+                                b.move(node.getElseStatement())));
+            } else {
+                r.replace(node.getThenStatement(), b.block());
+            }
+        }
+        for (int i = 1; i < areCasesRemovable.length; i++) {
+            if (areCasesRemovable[i]) {
+                final Statement firstStmt = allCasesStmts.get(i).get(0);
+                r.remove(findNodeToRemove(firstStmt));
+            }
+        }
     }
 
     private ASTNode findNodeToRemove(ASTNode node) {
@@ -177,9 +184,9 @@ public class CommonCodeInIfElseStatementRefactoring extends AbstractRefactoringR
         throw new NotImplementedException(parent, "for parent of type " + parent.getClass());
     }
 
-    private boolean allEmpty(boolean[] areCasesEmpty) {
-        for (boolean isCaseEmpty : areCasesEmpty) {
-            if (!isCaseEmpty) {
+    private boolean allRemovable(boolean[] areCasesRemovable) {
+        for (boolean isCaseRemovable : areCasesRemovable) {
+            if (!isCaseRemovable) {
                 return false;
             }
         }
@@ -187,11 +194,15 @@ public class CommonCodeInIfElseStatementRefactoring extends AbstractRefactoringR
     }
 
     private void removeStmtsFromCases(List<List<Statement>> allCasesStmts, List<List<ASTNode>> removedCaseStmts,
-            boolean[] areCasesEmpty) {
+            boolean[] areCasesRemovable) {
         for (int i = 0; i < allCasesStmts.size(); i++) {
             final List<ASTNode> removedStmts = removedCaseStmts.get(i);
-            if (removedStmts.containsAll(allCasesStmts.get(i))) {
-                areCasesEmpty[i] = true;
+            final ASTNode parent = findNodeToRemove(allCasesStmts.get(i).get(0));
+
+            if (removedStmts.containsAll(allCasesStmts.get(i))
+                    && (!(parent instanceof IfStatement)
+                            || isPassive(((IfStatement) parent).getExpression()))) {
+                areCasesRemovable[i] = true;
             } else {
                 this.ctx.getRefactorings().remove(removedStmts);
             }
@@ -209,7 +220,8 @@ public class CommonCodeInIfElseStatementRefactoring extends AbstractRefactoringR
         return false;
     }
 
-    private void removeStmts(List<List<Statement>> allCasesStmts, int stmtIndex, List<List<ASTNode>> removedCaseStmts) {
+    private void flagStmtsToRemove(List<List<Statement>> allCasesStmts, int stmtIndex,
+            List<List<ASTNode>> removedCaseStmts) {
         for (int i = 0; i < allCasesStmts.size(); i++) {
             final List<Statement> caseStmts = allCasesStmts.get(i);
             final Statement stmtToRemove = caseStmts.get(caseStmts.size() - stmtIndex);
