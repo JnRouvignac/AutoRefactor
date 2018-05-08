@@ -26,6 +26,7 @@
 package org.autorefactor.refactoring.rules.samples_in;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -115,6 +116,28 @@ public class CommonCodeInIfElseStatementSample {
             i++;
             j++;
         } else if (!b.booleanValue()) {
+            // Keep this comment
+            i++;
+            j++;
+        } else {
+            // Keep this comment
+            i++;
+            j++;
+        }
+    }
+
+    /** specific code: keep some if statement */
+    public void ifElseIfElseRemoveSomeIf(boolean b1, boolean b2, List<String> modifiableList, int i, int j) {
+        if (b1) {
+            // Keep this comment
+            i++;
+            j++;
+        } else if (b2) {
+            i++;
+            // Keep this comment
+            i++;
+            j++;
+        } else if (modifiableList != null) {
             // Keep this comment
             i++;
             j++;

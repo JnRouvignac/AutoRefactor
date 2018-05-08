@@ -152,7 +152,7 @@ public class CommonCodeInIfElseStatementRefactoring extends AbstractRefactoringR
             for (int i = 1; i < areCasesEmpty.length; i++) {
                 if (areCasesEmpty[i]) {
                     final Statement firstStmt = allCasesStmts.get(i).get(0);
-                    r.remove(findNodeToRemove(firstStmt, firstStmt.getParent()));
+                    r.remove(findNodeToRemove(firstStmt));
                     result = DO_NOT_VISIT_SUBTREE;
                 }
             }
@@ -161,13 +161,18 @@ public class CommonCodeInIfElseStatementRefactoring extends AbstractRefactoringR
         return VISIT_SUBTREE;
     }
 
-    private ASTNode findNodeToRemove(ASTNode node, ASTNode parent) {
+    private ASTNode findNodeToRemove(ASTNode node) {
+        ASTNode parent = node.getParent();
         if (parent instanceof IfStatement) {
-            return node;
+            if (node.equals(((IfStatement) parent).getThenStatement())) {
+                return parent;
+            } else {
+                return node;
+            }
         }
         if (parent instanceof Block) {
-            final Block b = (Block) parent;
-            return findNodeToRemove(b, b.getParent());
+            final Block block = (Block) parent;
+            return findNodeToRemove(block);
         }
         throw new NotImplementedException(parent, "for parent of type " + parent.getClass());
     }
