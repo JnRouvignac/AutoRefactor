@@ -55,36 +55,20 @@ public class CommonCodeInIfElseStatementSample {
 
     /** common code: i++, Remove then case */
     public void ifElseRemoveThen(Boolean b, int i, int j) {
-        // Keep this comment
-        ++i;
         if (!b.booleanValue()) {
             j++;
         }
+        // Keep this comment
+        ++i;
     }
 
     /** common code: i++, Remove else case */
     public void ifElseRemoveElse(Boolean b, int i, int j) {
+        if (b.booleanValue()) {
+            j++;
+        }
         // Keep this comment
         i++;
-        if (b.booleanValue()) {
-            j++;
-        }
-    }
-
-    /**
-     * common code: put i++ before if statement, put l++ after if statement. Do
-     * not remove if statement.
-     */
-    public void ifElseRemoveIf(Boolean b, int i, int j, int k, int l) {
-        // Keep this comment
-        i--;
-        if (b.booleanValue()) {
-            j++;
-        } else {
-            k++;
-        }
-        // Keep this comment
-        l++;
     }
 
     /** only common code, Remove if statement */
@@ -123,10 +107,10 @@ public class CommonCodeInIfElseStatementSample {
     }
 
     public void refactorMethodInvocatoin(boolean b, Object o) {
-        o.toString();
         if (b) {
             System.out.println(b);
         }
+        o.toString();
     }
 
     public int doNotRefactorNoElse(boolean b) {
@@ -138,18 +122,6 @@ public class CommonCodeInIfElseStatementSample {
 
     public int refactorIfElseInThenClause(boolean b1, boolean b2) {
         return 1;
-    }
-
-    public int refactorIfElseInThenClauseNoBrackets(boolean b1, boolean b2) {
-        if (b1)
-            if (b2)
-                return 1;
-        else
-            return 1;
-        return 1;
-        // FIXME
-        // Should be refactored into this unique statement:
-        // return 1;
     }
 
     public int refactorIfElseInElseClause(boolean b1, boolean b2) {

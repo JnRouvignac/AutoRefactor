@@ -66,41 +66,21 @@ public class CommonCodeInIfElseStatementSample {
             // Keep this comment
             ++i;
         } else {
+            j++;
             // Keep this comment
             i = i + 1;
-            j++;
         }
     }
 
     /** common code: i++, Remove else case */
     public void ifElseRemoveElse(Boolean b, int i, int j) {
         if (b.booleanValue()) {
+            j++;
             // Keep this comment
             i++;
-            j++;
         } else {
             // Keep this comment
             i++;
-        }
-    }
-
-    /**
-     * common code: put i++ before if statement, put l++ after if statement. Do
-     * not remove if statement.
-     */
-    public void ifElseRemoveIf(Boolean b, int i, int j, int k, int l) {
-        if (b.booleanValue()) {
-            // Keep this comment
-            i--;
-            j++;
-            // Keep this comment
-            l++;
-        } else {
-            // Keep this comment
-            i = i - 1;
-            k++;
-            // Keep this comment
-            l++;
         }
     }
 
@@ -157,8 +137,8 @@ public class CommonCodeInIfElseStatementSample {
 
     public void refactorMethodInvocatoin(boolean b, Object o) {
         if (b) {
-            o.toString();
             System.out.println(b);
+            o.toString();
         } else {
             o.toString();
         }
@@ -181,18 +161,6 @@ public class CommonCodeInIfElseStatementSample {
         } else {
             return 1;
         }
-    }
-
-    public int refactorIfElseInThenClauseNoBrackets(boolean b1, boolean b2) {
-        if (b1)
-            if (b2)
-                return 1;
-        else
-            return 1;
-        return 1;
-        // FIXME
-        // Should be refactored into this unique statement:
-        // return 1;
     }
 
     public int refactorIfElseInElseClause(boolean b1, boolean b2) {
