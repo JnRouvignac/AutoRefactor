@@ -98,43 +98,43 @@ public class CommonCodeInIfElseStatementRefactoring extends AbstractRefactoringR
 
         // Collect all the if / else if / else if / ... / else cases
         if (collectAllCases(allCasesStmts, node)) {
-            final ASTBuilder b = this.ctx.getASTBuilder();
-            final Refactorings r = this.ctx.getRefactorings();
-
-            final List<List<ASTNode>> caseStmtsToRemove = new LinkedList<List<ASTNode>>();
+            final List<List<Statement>> caseStmtsToRemove = new LinkedList<List<Statement>>();
 
             // initialize removedCaseStmts list
             for (int i = 0; i < allCasesStmts.size(); i++) {
-                caseStmtsToRemove.add(new LinkedList<ASTNode>());
+                caseStmtsToRemove.add(new LinkedList<Statement>());
             }
 
             // If all cases exist
             final ASTSemanticMatcher matcher = new ASTMatcherSameVariablesAndMethods();
             final int minSize = minSize(allCasesStmts);
-            final List<Statement> caseStmts = allCasesStmts.get(0);
 
             // Identify matching statements starting from the end of each case
-            boolean hasInsertedCode = false;
+            boolean hasCodeToMove = false;
             for (int stmtIndex = 1; stmtIndex <= minSize; stmtIndex++) {
                 if (!match(matcher, allCasesStmts, stmtIndex, 0, allCasesStmts.size())
                         || anyContains(caseStmtsToRemove, allCasesStmts, stmtIndex)) {
                     break;
                 }
-                r.insertAfter(b.copy(caseStmts.get(caseStmts.size() - stmtIndex)), node);
                 flagStmtsToRemove(allCasesStmts, stmtIndex, caseStmtsToRemove);
-                hasInsertedCode = true;
+                hasCodeToMove = true;
             }
 
-            if (hasInsertedCode) {
-                removeIdenticalTrailingCode(node, b, r, allCasesStmts, caseStmtsToRemove);
+            if (hasCodeToMove) {
+                removeIdenticalTrailingCode(node, allCasesStmts, caseStmtsToRemove);
                 return DO_NOT_VISIT_SUBTREE;
             }
         }
         return VISIT_SUBTREE;
     }
 
-    private void removeIdenticalTrailingCode(IfStatement node, final ASTBuilder b, final Refactorings r,
-            final List<List<Statement>> allCasesStmts, final List<List<ASTNode>> caseStmtsToRemove) {
+    private void removeIdenticalTrailingCode(IfStatement node, final List<List<Statement>> allCasesStmts,
+            final List<List<Statement>> caseStmtsToRemove) {
+        final ASTBuilder b = this.ctx.getASTBuilder();
+        final Refactorings r = this.ctx.getRefactorings();
+
+        insertIdenticalCode(node, b, r, caseStmtsToRemove.get(0));
+
         // Remove the nodes common to all cases
         final boolean[] areCasesRemovable = new boolean[allCasesStmts.size()];
         for (int i = 0; i < allCasesStmts.size(); i++) {
@@ -154,17 +154,25 @@ public class CommonCodeInIfElseStatementRefactoring extends AbstractRefactoringR
                 // Then clause is empty and there is only one else clause
                 // => revert if statement
                 r.replace(node,
-                          b.if0(b.not(b.parenthesizeIfNeeded(b.move(node.getExpression()))),
+                          b.if0(b.negate(node.getExpression()),
                                 b.move(node.getElseStatement())));
             } else {
                 r.replace(node.getThenStatement(), b.block());
             }
         }
+
         for (int i = 1; i < areCasesRemovable.length; i++) {
             if (areCasesRemovable[i]) {
                 final Statement firstStmt = allCasesStmts.get(i).get(0);
                 r.remove(findNodeToRemove(firstStmt));
             }
+        }
+    }
+
+    private void insertIdenticalCode(final IfStatement node, final ASTBuilder b, final Refactorings r,
+            final List<Statement> stmtsToRemove) {
+        for (final Statement stmtToRemove : stmtsToRemove) {
+            r.insertAfter(b.copy(stmtToRemove), node);
         }
     }
 
@@ -193,10 +201,10 @@ public class CommonCodeInIfElseStatementRefactoring extends AbstractRefactoringR
         return true;
     }
 
-    private void removeStmtsFromCases(List<List<Statement>> allCasesStmts, List<List<ASTNode>> removedCaseStmts,
+    private void removeStmtsFromCases(List<List<Statement>> allCasesStmts, List<List<Statement>> removedCaseStmts,
             boolean[] areCasesRemovable) {
         for (int i = 0; i < allCasesStmts.size(); i++) {
-            final List<ASTNode> removedStmts = removedCaseStmts.get(i);
+            final List<Statement> removedStmts = removedCaseStmts.get(i);
             final ASTNode parent = findNodeToRemove(allCasesStmts.get(i).get(0));
 
             if (removedStmts.containsAll(allCasesStmts.get(i))
@@ -209,7 +217,7 @@ public class CommonCodeInIfElseStatementRefactoring extends AbstractRefactoringR
         }
     }
 
-    private boolean anyContains(List<List<ASTNode>> removedCaseStmts, List<List<Statement>> allCasesStmts,
+    private boolean anyContains(List<List<Statement>> removedCaseStmts, List<List<Statement>> allCasesStmts,
             int stmtIndex) {
         for (int i = 0; i < allCasesStmts.size(); i++) {
             final List<Statement> caseStmts = allCasesStmts.get(i);
@@ -221,7 +229,7 @@ public class CommonCodeInIfElseStatementRefactoring extends AbstractRefactoringR
     }
 
     private void flagStmtsToRemove(List<List<Statement>> allCasesStmts, int stmtIndex,
-            List<List<ASTNode>> removedCaseStmts) {
+            List<List<Statement>> removedCaseStmts) {
         for (int i = 0; i < allCasesStmts.size(); i++) {
             final List<Statement> caseStmts = allCasesStmts.get(i);
             final Statement stmtToRemove = caseStmts.get(caseStmts.size() - stmtIndex);
