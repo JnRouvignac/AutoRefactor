@@ -549,6 +549,22 @@ public class BooleanSample {
         }
     }
 
+    public int directlyPassBooleanAmongOtherBoolean(boolean bo, int i) {
+        // Keep this comment
+        if (bo) {
+            aMethodThatAcceptsABoolean(true);
+            aMethodThatAcceptsABoolean(true);
+            aMethodThatAcceptsABoolean(true);
+            i++;
+        } else {
+            aMethodThatAcceptsABoolean(true);
+            aMethodThatAcceptsABoolean(false);
+            aMethodThatAcceptsABoolean(true);
+            ++i;
+        }
+        return i;
+    }
+
     public int directlyPassOppositeBoolean(boolean bo) {
         // Keep this comment
         if (bo) {

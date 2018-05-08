@@ -148,7 +148,7 @@ public class BooleanRefactoring extends AbstractRefactoringRule {
                     return true;
                 }
             }
-            return false;
+            return super.match(node, other);
         }
 
         @Override
@@ -161,7 +161,7 @@ public class BooleanRefactoring extends AbstractRefactoringRule {
                     return true;
                 }
             }
-            return false;
+            return super.match(node, other);
         }
     }
 
