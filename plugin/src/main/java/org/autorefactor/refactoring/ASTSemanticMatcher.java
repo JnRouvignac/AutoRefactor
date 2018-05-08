@@ -33,13 +33,34 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.jdt.core.dom.ASTMatcher;
+import org.eclipse.jdt.core.dom.AssertStatement;
 import org.eclipse.jdt.core.dom.Assignment;
+import org.eclipse.jdt.core.dom.Block;
+import org.eclipse.jdt.core.dom.BreakStatement;
+import org.eclipse.jdt.core.dom.ConstructorInvocation;
+import org.eclipse.jdt.core.dom.ContinueStatement;
+import org.eclipse.jdt.core.dom.DoStatement;
+import org.eclipse.jdt.core.dom.EmptyStatement;
+import org.eclipse.jdt.core.dom.EnhancedForStatement;
 import org.eclipse.jdt.core.dom.Expression;
+import org.eclipse.jdt.core.dom.ExpressionStatement;
+import org.eclipse.jdt.core.dom.ForStatement;
+import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.InfixExpression.Operator;
+import org.eclipse.jdt.core.dom.LabeledStatement;
 import org.eclipse.jdt.core.dom.PostfixExpression;
 import org.eclipse.jdt.core.dom.PrefixExpression;
+import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.Statement;
+import org.eclipse.jdt.core.dom.SuperConstructorInvocation;
+import org.eclipse.jdt.core.dom.SwitchStatement;
+import org.eclipse.jdt.core.dom.SynchronizedStatement;
+import org.eclipse.jdt.core.dom.ThrowStatement;
+import org.eclipse.jdt.core.dom.TryStatement;
+import org.eclipse.jdt.core.dom.TypeDeclarationStatement;
+import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
+import org.eclipse.jdt.core.dom.WhileStatement;
 
 /** Matches two pieces of code on semantic (not on syntax). */
 public class ASTSemanticMatcher extends ASTMatcher {
@@ -250,5 +271,227 @@ public class ASTSemanticMatcher extends ASTMatcher {
 
         return rightExpr != null && rightExpr instanceof Number
                 && ((Number) rightExpr).longValue() == 1;
+    }
+
+    @Override
+    public boolean match(final Block node, final Object other) {
+        if (other instanceof AssertStatement
+            || other instanceof BreakStatement
+            || other instanceof ConstructorInvocation
+            || other instanceof ContinueStatement
+            || other instanceof DoStatement
+            || other instanceof EmptyStatement
+            || other instanceof EnhancedForStatement
+            || other instanceof ExpressionStatement
+            || other instanceof ForStatement
+            || other instanceof IfStatement
+            || other instanceof LabeledStatement
+            || other instanceof ReturnStatement
+            || other instanceof SuperConstructorInvocation
+            || other instanceof SwitchStatement
+            || other instanceof SynchronizedStatement
+            || other instanceof ThrowStatement
+            || other instanceof TryStatement
+            || other instanceof TypeDeclarationStatement
+            || other instanceof VariableDeclarationStatement
+            || other instanceof WhileStatement) {
+            return match0(node, (Statement) other);
+        }
+
+        return super.match(node, other);
+    }
+
+    @Override
+    public boolean match(final AssertStatement node, final Object other) {
+        if (other instanceof Block) {
+            return match0((Block) other, (Statement) node);
+        }
+
+        return super.match(node, other);
+    }
+
+    @Override
+    public boolean match(final BreakStatement node, final Object other) {
+        if (other instanceof Block) {
+            return match0((Block) other, (Statement) node);
+        }
+
+        return super.match(node, other);
+    }
+
+    @Override
+    public boolean match(final ConstructorInvocation node, final Object other) {
+        if (other instanceof Block) {
+            return match0((Block) other, (Statement) node);
+        }
+
+        return super.match(node, other);
+    }
+
+    @Override
+    public boolean match(final ContinueStatement node, final Object other) {
+        if (other instanceof Block) {
+            return match0((Block) other, (Statement) node);
+        }
+
+        return super.match(node, other);
+    }
+
+    @Override
+    public boolean match(final DoStatement node, final Object other) {
+        if (other instanceof Block) {
+            return match0((Block) other, (Statement) node);
+        }
+
+        return super.match(node, other);
+    }
+
+    @Override
+    public boolean match(final EmptyStatement node, final Object other) {
+        if (other instanceof Block) {
+            return match0((Block) other, (Statement) node);
+        }
+
+        return super.match(node, other);
+    }
+
+    @Override
+    public boolean match(final EnhancedForStatement node, final Object other) {
+        if (other instanceof Block) {
+            return match0((Block) other, (Statement) node);
+        }
+
+        return super.match(node, other);
+    }
+
+    @Override
+    public boolean match(final ExpressionStatement node, final Object other) {
+        if (other instanceof Block) {
+            return match0((Block) other, (Statement) node);
+        }
+
+        return super.match(node, other);
+    }
+
+    @Override
+    public boolean match(final ForStatement node, final Object other) {
+        if (other instanceof Block) {
+            return match0((Block) other, (Statement) node);
+        }
+
+        return super.match(node, other);
+    }
+
+    @Override
+    public boolean match(final IfStatement node, final Object other) {
+        if (other instanceof Block) {
+            return match0((Block) other, (Statement) node);
+        }
+
+        return super.match(node, other);
+    }
+
+    @Override
+    public boolean match(final LabeledStatement node, final Object other) {
+        if (other instanceof Block) {
+            return match0((Block) other, (Statement) node);
+        }
+
+        return super.match(node, other);
+    }
+
+    @Override
+    public boolean match(final ReturnStatement node, final Object other) {
+        if (other instanceof Block) {
+            return match0((Block) other, (Statement) node);
+        }
+
+        return super.match(node, other);
+    }
+
+    @Override
+    public boolean match(final SuperConstructorInvocation node, final Object other) {
+        if (other instanceof Block) {
+            return match0((Block) other, (Statement) node);
+        }
+
+        return super.match(node, other);
+    }
+
+    @Override
+    public boolean match(final SwitchStatement node, final Object other) {
+        if (other instanceof Block) {
+            return match0((Block) other, (Statement) node);
+        }
+
+        return super.match(node, other);
+    }
+
+    @Override
+    public boolean match(final SynchronizedStatement node, final Object other) {
+        if (other instanceof Block) {
+            return match0((Block) other, (Statement) node);
+        }
+
+        return super.match(node, other);
+    }
+
+    @Override
+    public boolean match(final ThrowStatement node, final Object other) {
+        if (other instanceof Block) {
+            return match0((Block) other, (Statement) node);
+        }
+
+        return super.match(node, other);
+    }
+
+    @Override
+    public boolean match(final TryStatement node, final Object other) {
+        if (other instanceof Block) {
+            return match0((Block) other, (Statement) node);
+        }
+
+        return super.match(node, other);
+    }
+
+    @Override
+    public boolean match(final TypeDeclarationStatement node, final Object other) {
+        if (other instanceof Block) {
+            return match0((Block) other, (Statement) node);
+        }
+
+        return super.match(node, other);
+    }
+
+    @Override
+    public boolean match(final VariableDeclarationStatement node, final Object other) {
+        if (other instanceof Block) {
+            return match0((Block) other, (Statement) node);
+        }
+
+        return super.match(node, other);
+    }
+
+    @Override
+    public boolean match(final WhileStatement node, final Object other) {
+        if (other instanceof Block) {
+            return match0((Block) other, (Statement) node);
+        }
+
+        return super.match(node, other);
+    }
+
+    private boolean match0(final Block node, final Statement other) {
+        if ((node.getParent() instanceof IfStatement
+                || node.getParent() instanceof ForStatement
+                || node.getParent() instanceof EnhancedForStatement
+                || node.getParent() instanceof WhileStatement
+                || node.getParent() instanceof DoStatement)
+                && node.statements().size() == 1) {
+            return safeSubtreeMatch(node.statements().get(0), other)
+                    || super.match(node, (Object) other);
+        }
+
+        return super.match(node, (Object) other);
     }
 }

@@ -513,7 +513,7 @@ public class BooleanSample {
         aMethodThatAcceptsABoolean(bo ? Boolean.FALSE : Boolean.TRUE);
     }
 
-    public void removeUselessIfInBooleanPrimitiveExpression10(boolean bo) {
+    public void directlyPassBooleanPrimitiveAsParameter(boolean bo) {
         // Keep this comment
         if (bo) {
             aMethodThatAcceptsABoolean(true);
@@ -522,12 +522,50 @@ public class BooleanSample {
         }
     }
 
-    public void removeUselessIfInBooleanPrimitiveExpression11(boolean bo) {
+    public void directlyPassInvertedBooleanPrimitiveAsParameter(boolean bo) {
         // Keep this comment
         if (bo) {
             aMethodThatAcceptsABoolean(false);
         } else {
             aMethodThatAcceptsABoolean(true);
+        }
+    }
+
+    public int directlyPassBooleanAmongOtherCode(boolean bo) {
+        // Keep this comment
+        if (bo) {
+            aMethodThatAcceptsABoolean(true);
+            if (aMethodThatReturnsBoolean()) {
+                return 0;
+            } else {
+                return 10;
+            }
+        } else {
+            aMethodThatAcceptsABoolean(false);
+            if (aMethodThatReturnsBoolean())
+                return 0;
+            else
+                return 10;
+        }
+    }
+
+    public int directlyPassOppositeBoolean(boolean bo) {
+        // Keep this comment
+        if (bo) {
+            aMethodThatAcceptsABoolean(true);
+            aMethodThatAcceptsABoolean(false);
+            if (aMethodThatReturnsBoolean()) {
+                return 0;
+            } else
+                return 10;
+        } else {
+            aMethodThatAcceptsABoolean(false);
+            aMethodThatAcceptsABoolean(true);
+            if (aMethodThatReturnsBoolean())
+                return 0;
+            else {
+                return 10;
+            }
         }
     }
 
