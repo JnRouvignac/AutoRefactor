@@ -140,8 +140,6 @@ public class CommonCodeInIfElseStatementSample {
     public int refactorIfElseInElseClause(boolean b1, boolean b2) {
         if (b1) {
             return 1;
-        } else if (b2) {
-            return 2;
         } else {
             return 2;
         }
@@ -149,11 +147,17 @@ public class CommonCodeInIfElseStatementSample {
 
     public int refactorIfElseInElseClauseNoBrackets(boolean b1, boolean b2) {
         if (b1)      return 1;
-        else if (b2) return 2;
-        else         return 2;
-        // FIXME code above should be refactored to:
-        // if (b1)      return 1;
-        // else         return 2;
+        else {
+            return 2;
+        }
+    }
+
+    /** common code: i++, Remove if statement */
+    public void ifElseRemoveIfInsideWhile(boolean b, int i) {
+        while (i < 100) {
+            // Keep this comment
+            i = 1 + i;
+        }
     }
 
     public static Predicate<String> doNotMergeDifferentLambdaExpr(final boolean caseSensitive, final String... allowedSet) {

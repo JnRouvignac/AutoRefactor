@@ -88,11 +88,6 @@ public class CommonCodeInIfElseStatementRefactoring extends AbstractRefactoringR
         if (node.getElseStatement() == null) {
             return VISIT_SUBTREE;
         }
-        if (!(node.getParent() instanceof Block)) {
-            // TODO current code does not handle common code in if / else if statements
-            // when not inside curly braces
-            return VISIT_SUBTREE;
-        }
 
         final List<List<Statement>> allCasesStmts = new ArrayList<List<Statement>>();
 
@@ -133,8 +128,6 @@ public class CommonCodeInIfElseStatementRefactoring extends AbstractRefactoringR
         final ASTBuilder b = this.ctx.getASTBuilder();
         final Refactorings r = this.ctx.getRefactorings();
 
-        insertIdenticalCode(node, b, r, caseStmtsToRemove.get(0));
-
         // Remove the nodes common to all cases
         final boolean[] areCasesRemovable = new boolean[allCasesStmts.size()];
         for (int i = 0; i < allCasesStmts.size(); i++) {
@@ -143,30 +136,52 @@ public class CommonCodeInIfElseStatementRefactoring extends AbstractRefactoringR
         removeStmtsFromCases(allCasesStmts, caseStmtsToRemove, areCasesRemovable);
 
         if (allRemovable(areCasesRemovable)) {
-            r.removeButKeepComment(node);
-            return;
-        }
 
-        // Remove empty cases
-        if (areCasesRemovable[0]) {
-            if (areCasesRemovable.length == 2
-                    && !areCasesRemovable[1]) {
-                // Then clause is empty and there is only one else clause
-                // => revert if statement
-                r.replace(node,
-                          b.if0(b.negate(node.getExpression()),
-                                b.move(node.getElseStatement())));
+            if (node.getParent() instanceof Block) {
+                insertIdenticalCode(node, b, r, caseStmtsToRemove.get(0));
+
+                r.removeButKeepComment(node);
             } else {
-                r.replace(node.getThenStatement(), b.block());
+                List<Statement> orderedStmts = new ArrayList<Statement>(caseStmtsToRemove.get(0).size());
+                for (final Statement stmtToRemove : caseStmtsToRemove.get(0)) {
+                    orderedStmts.add(0, b.copy(stmtToRemove));
+                }
+                r.replace(node, b.block(orderedStmts.toArray(new Statement[caseStmtsToRemove.get(0).size()])));
+            }
+        } else {
+            // Remove empty cases
+            if (areCasesRemovable[0]) {
+                if (areCasesRemovable.length == 2
+                        && !areCasesRemovable[1]) {
+                    // Then clause is empty and there is only one else clause
+                    // => revert if statement
+                    r.replace(node,
+                              b.if0(b.negate(node.getExpression()),
+                                    b.move(node.getElseStatement())));
+                } else {
+                    r.replace(node.getThenStatement(), b.block());
+                }
+            }
+
+            for (int i = 1; i < areCasesRemovable.length; i++) {
+                if (areCasesRemovable[i]) {
+                    final Statement firstStmt = allCasesStmts.get(i).get(0);
+                    r.remove(findNodeToRemove(firstStmt));
+                }
+            }
+
+            if (node.getParent() instanceof Block) {
+                insertIdenticalCode(node, b, r, caseStmtsToRemove.get(0));
+            } else {
+                List<Statement> orderedStmts = new ArrayList<Statement>(caseStmtsToRemove.get(0).size() + 1);
+                for (final Statement stmtToRemove : caseStmtsToRemove.get(0)) {
+                    orderedStmts.add(0, b.copy(stmtToRemove));
+                }
+                orderedStmts.add(0, b.move(node));
+                r.replace(node, b.block(orderedStmts.toArray(new Statement[caseStmtsToRemove.get(0).size() + 1])));
             }
         }
 
-        for (int i = 1; i < areCasesRemovable.length; i++) {
-            if (areCasesRemovable[i]) {
-                final Statement firstStmt = allCasesStmts.get(i).get(0);
-                r.remove(findNodeToRemove(firstStmt));
-            }
-        }
     }
 
     private void insertIdenticalCode(final IfStatement node, final ASTBuilder b, final Refactorings r,
