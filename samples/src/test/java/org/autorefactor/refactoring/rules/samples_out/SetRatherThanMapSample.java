@@ -156,23 +156,40 @@ public class SetRatherThanMapSample {
         return aggregate.size() + aggregate2.size() + aggregate3.size();
     }
 
-    public int doNotRemoveActiveCode(List<Date> referenceDates, List<Date> dates) {
-        HashMap<Long, Boolean> aggregate = new HashMap<Long, Boolean>();
-        for (Date date : referenceDates) {
-            aggregate.put(date.getTime(), dates.remove(date));
+    public int doNotRemoveActiveCode(List<PrintCounter> referenceCounters,
+            List<PrintCounter> counters) {
+        long key = 0;
+
+        HashMap<Long, String> aggregate = new HashMap<Long, String>();
+        for (PrintCounter counter : referenceCounters) {
+            aggregate.put(key++, "The counter is " + counter);
         }
 
-        TreeMap<Long, Boolean> aggregate2 = new TreeMap<Long, Boolean>();
-        for (Date date : referenceDates) {
-            aggregate2.put(date.getTime(), dates.remove(date));
+        TreeMap<Long, String> aggregate2 = new TreeMap<Long, String>();
+        for (PrintCounter counter : referenceCounters) {
+            aggregate2.put(key++, "The counter is " + counter);
         }
 
-        Map<Long, Boolean> aggregate3 = new TreeMap<Long, Boolean>();
-        for (Date date : referenceDates) {
-            aggregate3.put(date.getTime(), dates.remove(date));
+        Map<Long, String> aggregate3 = new TreeMap<Long, String>();
+        for (PrintCounter counter : referenceCounters) {
+            aggregate3.put(key++, "The counter is " + counter);
         }
 
         return aggregate.size() + aggregate2.size() + aggregate3.size();
+    }
+
+    public class PrintCounter {
+        private int count;
+
+        public int getCount() {
+            return count;
+        }
+
+        @Override
+        public String toString() {
+            count++;
+            return "counting";
+        }
     }
 
     public void replaceHashMapWithModifier() {

@@ -63,7 +63,7 @@ public class XORRatherThanDuplicateConditionsSample {
     public void replaceDuplicateConditionsWithExpressions(int i1, int i2, int i3, int i4) {
         // Keep this comment
         boolean newBoolean1 = (i1 == i2) ^ (i3 == i4);
-        boolean newBoolean2 = (i1 == i2) == (i3 == i4);
+        boolean newBoolean2 = (i1 == i2) == (i3 <= i4);
     }
 
     public void doNotReplaceDuplicateConditionsWithMethods(List<String> myList) {

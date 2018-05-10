@@ -336,12 +336,6 @@ public final class ASTHelper {
         }
 
         @Override
-        public boolean visit(PostfixExpression node) {
-            activityLevel = ExprActivity.ACTIVE;
-            return interruptVisit();
-        }
-
-        @Override
         public boolean visit(PrefixExpression node) {
             if (INCREMENT.equals(node.getOperator())
                     || DECREMENT.equals(node.getOperator())) {
@@ -352,34 +346,65 @@ public final class ASTHelper {
         }
 
         @Override
-        public boolean visit(SuperMethodInvocation node) {
-            if (!ExprActivity.ACTIVE.equals(activityLevel)) {
+        public boolean visit(PostfixExpression node) {
+            activityLevel = ExprActivity.ACTIVE;
+            return interruptVisit();
+        }
+
+        @SuppressWarnings("unchecked")
+        @Override
+        public boolean visit(InfixExpression node) {
+            if (InfixExpression.Operator.PLUS.equals(node.getOperator())
+                    && hasType(node, "java.lang.String")
+                    && (mayCallImplicitToString(node.getLeftOperand())
+                            || mayCallImplicitToString(node.getRightOperand())
+                            || mayCallImplicitToString(node.extendedOperands()))) {
                 activityLevel = ExprActivity.CAN_BE_ACTIVE;
             }
+            return VISIT_SUBTREE;
+        }
+
+        private boolean mayCallImplicitToString(List<Expression> extendedOperands) {
+            if (extendedOperands != null) {
+                for (Expression expr : extendedOperands) {
+                    if (mayCallImplicitToString(expr)) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        private boolean mayCallImplicitToString(Expression expr) {
+            return !hasType(expr, "java.lang.String", "boolean", "short", "int", "long", "float",
+                    "double", "java.lang.Short", "java.lang.Boolean", "java.lang.Integer", "java.lang.Long",
+                    "java.lang.Float", "java.lang.Double")
+                    && !(expr instanceof PrefixExpression)
+                    && !(expr instanceof InfixExpression)
+                    && !(expr instanceof PostfixExpression);
+        }
+
+        @Override
+        public boolean visit(SuperMethodInvocation node) {
+            activityLevel = ExprActivity.CAN_BE_ACTIVE;
             return VISIT_SUBTREE;
         }
 
         @Override
         public boolean visit(MethodInvocation node) {
-            if (!ExprActivity.ACTIVE.equals(activityLevel)) {
-                activityLevel = ExprActivity.CAN_BE_ACTIVE;
-            }
+            activityLevel = ExprActivity.CAN_BE_ACTIVE;
             return VISIT_SUBTREE;
         }
 
         @Override
         public boolean visit(ClassInstanceCreation node) {
-            if (!ExprActivity.ACTIVE.equals(activityLevel)) {
-                activityLevel = ExprActivity.CAN_BE_ACTIVE;
-            }
+            activityLevel = ExprActivity.CAN_BE_ACTIVE;
             return VISIT_SUBTREE;
         }
 
         @Override
         public boolean visit(ThrowStatement node) {
-            if (!ExprActivity.ACTIVE.equals(activityLevel)) {
-                activityLevel = ExprActivity.CAN_BE_ACTIVE;
-            }
+            activityLevel = ExprActivity.CAN_BE_ACTIVE;
             return VISIT_SUBTREE;
         }
     }

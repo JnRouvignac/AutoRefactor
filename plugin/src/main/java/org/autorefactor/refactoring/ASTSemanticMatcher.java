@@ -27,6 +27,7 @@ package org.autorefactor.refactoring;
 
 import static org.autorefactor.refactoring.ASTHelper.hasType;
 import static org.autorefactor.refactoring.ASTHelper.haveSameType;
+import static org.autorefactor.refactoring.ASTHelper.isPassive;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -134,18 +135,47 @@ public class ASTSemanticMatcher extends ASTMatcher {
             }
         };
 
+    private static final Map<InfixExpression.Operator, InfixExpression.Operator> INFIX_TO_MIRROR_OPERATOR =
+            new HashMap<InfixExpression.Operator, InfixExpression.Operator>() {
+            private static final long serialVersionUID = -8949107654517355857L;
+
+            {
+                this.put(InfixExpression.Operator.EQUALS, InfixExpression.Operator.EQUALS);
+                this.put(InfixExpression.Operator.NOT_EQUALS, InfixExpression.Operator.NOT_EQUALS);
+                this.put(InfixExpression.Operator.CONDITIONAL_AND, InfixExpression.Operator.CONDITIONAL_AND);
+                this.put(InfixExpression.Operator.CONDITIONAL_OR, InfixExpression.Operator.CONDITIONAL_OR);
+                this.put(InfixExpression.Operator.AND, InfixExpression.Operator.AND);
+                this.put(InfixExpression.Operator.OR, InfixExpression.Operator.OR);
+                this.put(InfixExpression.Operator.XOR, InfixExpression.Operator.XOR);
+                this.put(InfixExpression.Operator.GREATER, InfixExpression.Operator.LESS);
+                this.put(InfixExpression.Operator.LESS, InfixExpression.Operator.GREATER);
+                this.put(InfixExpression.Operator.LESS_EQUALS, InfixExpression.Operator.GREATER_EQUALS);
+                this.put(InfixExpression.Operator.GREATER_EQUALS, InfixExpression.Operator.LESS_EQUALS);
+            }
+        };
+
     @Override
     public boolean match(final InfixExpression node, final Object other) {
-        if ((node.extendedOperands() == null || node.extendedOperands().isEmpty())
-                && other instanceof InfixExpression
-                && InfixExpression.Operator.PLUS.equals(node.getOperator())
-                && InfixExpression.Operator.PLUS.equals(((InfixExpression) other).getOperator())
-                && hasType(node.getLeftOperand(), "short", "int", "long", "float", "double", "java.lang.Short",
-                        "java.lang.Integer", "java.lang.Long", "java.lang.Float", "java.lang.Double")
-                && haveSameType(node.getLeftOperand(), node.getRightOperand())
-                && safeSubtreeMatch(node.getLeftOperand(), ((InfixExpression) other).getRightOperand())
-                && safeSubtreeMatch(node.getRightOperand(), ((InfixExpression) other).getLeftOperand())) {
-            return true;
+        if (!node.hasExtendedOperands()
+                && other instanceof InfixExpression) {
+            InfixExpression ie = (InfixExpression) other;
+
+            if (!ie.hasExtendedOperands()
+                    && isPassive(node.getLeftOperand())
+                    && isPassive(node.getRightOperand())
+                    && safeSubtreeMatch(node.getLeftOperand(), ie.getRightOperand())
+                    && safeSubtreeMatch(node.getRightOperand(), ie.getLeftOperand())) {
+                if (node.getOperator().equals(INFIX_TO_MIRROR_OPERATOR.get(ie.getOperator()))) {
+                    return true;
+                } else if (InfixExpression.Operator.PLUS.equals(ie.getOperator())
+                        && node.getOperator().equals(ie.getOperator())
+                        && hasType(node.getLeftOperand(), "short", "int", "long", "float", "double",
+                                "java.lang.Short", "java.lang.Integer", "java.lang.Long", "java.lang.Float",
+                                "java.lang.Double")
+                        && haveSameType(node.getLeftOperand(), node.getRightOperand())) {
+                    return true;
+                }
+            }
         }
 
         return super.match(node, other);
@@ -198,7 +228,7 @@ public class ASTSemanticMatcher extends ASTMatcher {
                 && node.getRightHandSide() instanceof InfixExpression) {
             InfixExpression infixExpr = (InfixExpression) node.getRightHandSide();
 
-            if ((infixExpr.extendedOperands() == null || infixExpr.extendedOperands().isEmpty())
+            if (!infixExpr.hasExtendedOperands()
                     && Arrays.asList(Assignment.Operator.PLUS_ASSIGN,
                             Assignment.Operator.MINUS_ASSIGN,
                             Assignment.Operator.TIMES_ASSIGN,
@@ -241,7 +271,7 @@ public class ASTSemanticMatcher extends ASTMatcher {
         if (Assignment.Operator.ASSIGN.equals(assignment.getOperator())
                 && assignment.getRightHandSide() instanceof InfixExpression) {
             InfixExpression infixExpr = (InfixExpression) assignment.getRightHandSide();
-            if ((infixExpr.extendedOperands() == null || infixExpr.extendedOperands().isEmpty())
+            if (!infixExpr.hasExtendedOperands()
                     && infixAssociatedOperator.equals(infixExpr.getOperator())) {
                 if (isOneLiteral(infixExpr.getRightOperand())) {
                     return safeSubtreeMatch(prefixOrPostfixOperand, assignment.getLeftHandSide())
