@@ -27,9 +27,9 @@ package org.autorefactor.refactoring.rules;
 
 import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
 import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
-import static org.autorefactor.refactoring.ASTHelper.checkNoExtendedOperands;
 import static org.autorefactor.refactoring.ASTHelper.hasOperator;
 import static org.autorefactor.refactoring.ASTHelper.isMethod;
+import static org.autorefactor.refactoring.ASTHelper.removeParentheses;
 import static org.eclipse.jdt.core.dom.InfixExpression.Operator.EQUALS;
 import static org.eclipse.jdt.core.dom.InfixExpression.Operator.GREATER;
 import static org.eclipse.jdt.core.dom.InfixExpression.Operator.GREATER_EQUALS;
@@ -38,11 +38,10 @@ import static org.eclipse.jdt.core.dom.InfixExpression.Operator.LESS_EQUALS;
 import static org.eclipse.jdt.core.dom.InfixExpression.Operator.NOT_EQUALS;
 
 import org.autorefactor.refactoring.ASTBuilder;
-import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.InfixExpression.Operator;
 import org.eclipse.jdt.core.dom.MethodInvocation;
-import org.eclipse.jdt.core.dom.ParenthesizedExpression;
 
 /** See {@link #getDescription()} method. */
 public class ComparisonRefactoring extends AbstractRefactoringRule {
@@ -78,59 +77,72 @@ public class ComparisonRefactoring extends AbstractRefactoringRule {
     }
 
     @Override
-    public boolean visit(MethodInvocation node) {
-        if (node.getExpression() == null) {
-            // TODO JNR handle same class calls and sub classes
-            return VISIT_SUBTREE;
+    public boolean visit(InfixExpression node) {
+        if (!node.hasExtendedOperands()) {
+            if (maybeStandardizeComparison(node, node.getLeftOperand(), node.getRightOperand())
+                    == DO_NOT_VISIT_SUBTREE) {
+                return DO_NOT_VISIT_SUBTREE;
+            }
+            return maybeStandardizeComparison(node, node.getRightOperand(), node.getLeftOperand());
         }
-        if (isMethod(node, "java.lang.Comparable", "compareTo", "java.lang.Object")) {
-            return replaceInfixExpressionIfNeeded(node.getParent());
-        } else if (isMethod(node, "java.lang.Comparator", "compare", "java.lang.Object", "java.lang.Object")) {
-            return replaceInfixExpressionIfNeeded(node.getParent());
-        } else if (getJavaMinorVersion() >= 2
-                && isMethod(node, "java.lang.String", "compareToIgnoreCase", "java.lang.String")) {
-            return replaceInfixExpressionIfNeeded(node.getParent());
-        }
+
         return VISIT_SUBTREE;
     }
 
-    private boolean replaceInfixExpressionIfNeeded(ASTNode expr) {
-        if (expr instanceof ParenthesizedExpression) {
-            return replaceInfixExpressionIfNeeded(expr.getParent());
-        } else if (expr instanceof InfixExpression) {
-            final InfixExpression ie = (InfixExpression) expr;
-            checkNoExtendedOperands(ie);
-            final Object value = ie.getRightOperand().resolveConstantExpressionValue();
-            if (value instanceof Number) {
-                final Number nb = (Integer) value;
-                if (nb.doubleValue() == 0) {
-                    return VISIT_SUBTREE;
-                }
-                if (hasOperator(ie, EQUALS)) {
-                    if (nb.doubleValue() < 0) {
-                        return replaceWithCorrectCheckOnCompareTo(ie, LESS);
-                    } else if (nb.doubleValue() > 0) {
-                        return replaceWithCorrectCheckOnCompareTo(ie, GREATER);
+    private boolean maybeStandardizeComparison(InfixExpression node, final Expression comparator,
+            final Expression literal) {
+        if (removeParentheses(comparator) instanceof MethodInvocation) {
+            final MethodInvocation comparisonMI = (MethodInvocation) removeParentheses(comparator);
+            if (comparisonMI.getExpression() == null) {
+                // TODO JNR handle same class calls and sub classes
+                return VISIT_SUBTREE;
+            }
+
+            if (isMethod(comparisonMI, "java.lang.Comparable", "compareTo", "java.lang.Object")
+                || isMethod(comparisonMI, "java.lang.Comparator", "compare", "java.lang.Object", "java.lang.Object")
+                || (getJavaMinorVersion() >= 2
+                    && isMethod(comparisonMI, "java.lang.String", "compareToIgnoreCase", "java.lang.String"))) {
+                final Object literalValue = literal.resolveConstantExpressionValue();
+
+                if (literalValue != null && literalValue instanceof Number) {
+                    final Number numberValue = (Number) literalValue;
+                    final double doubleValue = numberValue.doubleValue();
+
+                    if (doubleValue == 0) {
+                        return VISIT_SUBTREE;
                     }
-                } else if (hasOperator(ie, NOT_EQUALS)) {
-                    if (nb.doubleValue() < 0) {
-                        return replaceWithCorrectCheckOnCompareTo(ie, GREATER_EQUALS);
-                    } else if (nb.doubleValue() > 0) {
-                        return replaceWithCorrectCheckOnCompareTo(ie, LESS_EQUALS);
+
+                    if (hasOperator(node, EQUALS)) {
+                        if (doubleValue < 0) {
+                            refactorComparingToZero(node, comparisonMI, LESS);
+                        } else {
+                            refactorComparingToZero(node, comparisonMI, GREATER);
+                        }
+                    } else if (hasOperator(node, NOT_EQUALS)) {
+                        if (doubleValue < 0) {
+                            refactorComparingToZero(node, comparisonMI, GREATER_EQUALS);
+                        } else {
+                            refactorComparingToZero(node, comparisonMI, LESS_EQUALS);
+                        }
+                    } else {
+                        return VISIT_SUBTREE;
                     }
+
+                    return DO_NOT_VISIT_SUBTREE;
                 }
+                return VISIT_SUBTREE;
             }
         }
         return VISIT_SUBTREE;
     }
 
-    private boolean replaceWithCorrectCheckOnCompareTo(final InfixExpression ie, final Operator operator) {
+    private void refactorComparingToZero(final InfixExpression node, final MethodInvocation comparisonMI,
+            final Operator operator) {
         final ASTBuilder b = this.ctx.getASTBuilder();
-        this.ctx.getRefactorings().replace(ie,
+        this.ctx.getRefactorings().replace(node,
             b.infixExpr(
-                b.copy(ie.getLeftOperand()),
+                b.copy(comparisonMI),
                 operator,
                 b.number("0")));
-        return DO_NOT_VISIT_SUBTREE;
     }
 }

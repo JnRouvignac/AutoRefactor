@@ -27,24 +27,31 @@ package org.autorefactor.refactoring.rules.samples_in;
 
 public class ComparisonSample {
 
-    public void fixCompareToUsage() {
+    public boolean fixCompareToUsage() {
         boolean b;
         final String s = "";
 
-        // valid, do no change these ones
-        b = s.compareTo("") < 0;
-        b = s.compareTo("") <= 0;
-        b = s.compareTo("") == 0;
-        b = s.compareTo("") != 0;
-        b = s.compareTo("") >= 0;
-        b = s.compareTo("") > 0;
-        b = s.compareToIgnoreCase("") == 0;
+        // Valid, do no change these ones
+        b = s.compareTo("smaller") < 0;
+        b = s.compareTo("smaller") <= 0;
+        b = s.compareTo("equal") == 0;
+        b = s.compareTo("different") != 0;
+        b = s.compareTo("greater") >= 0;
+        b = s.compareTo("greater") > 0;
+        b = s.compareToIgnoreCase("equal") == 0;
 
-        // invalid, refactor them
-        b = s.compareTo("") == -1;
-        b = s.compareTo("") != -1;
-        b = s.compareTo("") != 1;
-        b = s.compareTo("") == 1;
-        b = s.compareToIgnoreCase("") == 1;
+        // Invalid, refactor them
+        b = s.compareTo("smaller") == -1;
+        b = s.compareTo("greater") != -1;
+        b = s.compareTo("smaller") != 1;
+        b = (s.compareTo("greater")) == 1;
+        b = (s.compareToIgnoreCase("greater")) == 1;
+        b = -1 == (s.compareTo("smaller"));
+        b = -1 != s.compareTo("greater");
+        b = 1 != s.compareTo("smaller");
+        b = 1 == s.compareTo("greater");
+        b = 1 == s.compareToIgnoreCase("greater");
+
+        return b;
     }
 }
