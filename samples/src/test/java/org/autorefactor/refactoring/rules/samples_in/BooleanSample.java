@@ -25,6 +25,8 @@
  */
 package org.autorefactor.refactoring.rules.samples_in;
 
+import java.util.List;
+
 public class BooleanSample {
 
     public boolean booleanPrimitive;
@@ -522,6 +524,25 @@ public class BooleanSample {
         }
     }
 
+    public void directlyPassBooleanExpressionAsParameter(int i) {
+        // Keep this comment
+        if (i > 0) {
+            aMethodThatAcceptsABoolean(true);
+        } else {
+            aMethodThatAcceptsABoolean(false);
+        }
+    }
+
+    public void doNotDuplicateExpression(int i) {
+        if (i > 0) {
+            aMethodThatAcceptsABoolean(true);
+            aMethodThatAcceptsABoolean(true);
+        } else {
+            aMethodThatAcceptsABoolean(false);
+            aMethodThatAcceptsABoolean(false);
+        }
+    }
+
     public void directlyPassInvertedBooleanPrimitiveAsParameter(boolean bo) {
         // Keep this comment
         if (bo) {
@@ -582,6 +603,16 @@ public class BooleanSample {
             else {
                 return 10;
             }
+        }
+    }
+
+    public void doNotMoveActiveExpression(List<Integer> modifiableList) {
+        if (modifiableList.add(1)) {
+            aMethodThatAcceptsABoolean(modifiableList.contains(1));
+            aMethodThatAcceptsABoolean(true);
+        } else {
+            aMethodThatAcceptsABoolean(modifiableList.contains(1));
+            aMethodThatAcceptsABoolean(false);
         }
     }
 
