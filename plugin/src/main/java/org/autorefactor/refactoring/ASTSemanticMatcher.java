@@ -167,7 +167,8 @@ public class ASTSemanticMatcher extends ASTMatcher {
                     && safeSubtreeMatch(node.getRightOperand(), ie.getLeftOperand())) {
                 if (node.getOperator().equals(INFIX_TO_MIRROR_OPERATOR.get(ie.getOperator()))) {
                     return true;
-                } else if (InfixExpression.Operator.PLUS.equals(ie.getOperator())
+                } else if (Arrays.asList(InfixExpression.Operator.PLUS,
+                        InfixExpression.Operator.TIMES).contains(ie.getOperator())
                         && node.getOperator().equals(ie.getOperator())
                         && hasType(node.getLeftOperand(), "short", "int", "long", "float", "double",
                                 "java.lang.Short", "java.lang.Integer", "java.lang.Long", "java.lang.Float",

@@ -91,10 +91,10 @@ public class TernaryOperatorRatherThanDuplicateConditionsSample {
         boolean newBoolean8 = !b1 && !b2 || b1 && !b3;
     }
 
-    public void doNoReplaceDuplicateConditionsWithExpressions(int i1, int i2, int i3, int i4, int i5, int i6) {
+    public void replaceDuplicateConditionsWithExpressions(int i1, int i2, int i3, int i4, int i5, int i6) {
         // Keep this comment
-        boolean newBoolean1 = (i1 == i2) && !(i3 == i4) || !(i1 == i2) && (i5 == i6);
-        boolean newBoolean2 = (i1 == i2) && (i3 == i4) || !(i1 == i2) && !(i5 == i6);
+        boolean newBoolean1 = (i1 == i2 * 2) && !(i3 == i4) || !(i1 == 2 * i2) && (i5 == i6);
+        boolean newBoolean2 = (i1 + 1 == i2) && (i3 == i4) || !(1 + i1 == i2) && !(i5 == i6);
     }
 
     public void doNotReplaceDuplicateConditionsWithMethods(List<String> myList) {
