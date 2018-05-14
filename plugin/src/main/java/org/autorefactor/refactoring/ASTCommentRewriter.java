@@ -29,8 +29,6 @@ import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
 import static org.autorefactor.refactoring.SourceLocation.getEndPosition;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -43,7 +41,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.autorefactor.util.IllegalStateException;
 import org.autorefactor.util.NotImplementedException;
 import org.autorefactor.util.Pair;
 import org.autorefactor.util.UnhandledException;
@@ -153,43 +150,11 @@ public class ASTCommentRewriter {
         addReplacementEdits(commentEdits);
         addBlockCommentToJavadocEdits(commentEdits);
         addLineCommentsToJavadocEdits(commentEdits, source);
-        // detectPotentiallyMalformedTree(commentEdits, source);
         if (!commentEdits.isEmpty() && !anyOverlaps(edits, commentEdits)) {
             edits.addChildren(commentEdits.toArray(new TextEdit[commentEdits.size()]));
         }
         // else, code edits take priority. Give up applying current text edits.
         // They will be retried in the next refactoring loop.
-    }
-
-    private void detectPotentiallyMalformedTree(List<TextEdit> commentEdits, final String source) {
-        if (commentEdits.isEmpty()) {
-            return;
-        }
-        Collections.sort(commentEdits, new Comparator<TextEdit>() {
-            /**
-             * Compare objects.
-             *
-             * @param te1 First item
-             * @param te2 Second item
-             *
-             * @return -1, 0 or 1
-             */
-            public int compare(TextEdit te1, TextEdit te2) {
-                final SourceLocation sourceLoc1 = toSourceLoc(te1);
-                final SourceLocation sourceLoc2 = toSourceLoc(te2);
-                if (sourceLoc1.overlapsWith(sourceLoc2)) {
-                    throw new IllegalStateException(null,
-                            "Potentially malformed tree detected:\n"
-                            + " overlapping edit 1: " + toString(te1, sourceLoc1, source)
-                            + " overlapping edit 2: " + toString(te2, sourceLoc2, source));
-                }
-                return sourceLoc1.compareTo(sourceLoc2);
-            }
-
-            private String toString(TextEdit te, SourceLocation sourceLocation, String source) {
-                return te + "\"" + sourceLocation.substring(source) + "\"";
-            }
-        });
     }
 
     private int nbEdits() {

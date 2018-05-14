@@ -25,6 +25,7 @@
  */
 package org.autorefactor.refactoring;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -54,6 +55,7 @@ import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.text.edits.TextEdit;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.autorefactor.refactoring.PluginConstant.*;
@@ -118,7 +120,7 @@ public class ApplyRefactoringsJob extends Job {
                 try {
                     loopMonitor.subTask("Applying refactorings to " + getClassName(compilationUnit));
                     final AggregateASTVisitor refactoring = new AggregateASTVisitor(refactoringRulesToApply);
-                    applyRefactoring(compilationUnit, refactoring, options, loopMonitor.newChild(1));
+                    applyRefactoring(compilationUnit, refactoring, options, loopMonitor.newChild(1), true);
                 } catch (OperationCanceledException e) {
                     throw e;
                 } catch (Exception e) {
@@ -139,11 +141,25 @@ public class ApplyRefactoringsJob extends Job {
         return compilationUnit.getParent().getElementName() + "." + simpleName;
     }
 
-    private void applyRefactoring(ICompilationUnit compilationUnit, AggregateASTVisitor refactoringToApply,
-            JavaProjectOptions options, SubMonitor monitor) throws Exception {
+    /**
+     * Applies the refactorings provided inside the {@link AggregateASTVisitor} to the provided
+     * {@link ICompilationUnit}.
+     *
+     * @param compilationUnit the compilation unit to refactor
+     * @param refactoringToApply the {@link AggregateASTVisitor} to apply to the compilation unit
+     * @param options the Java project options used to compile the project
+     * @param monitor the progress monitor of the current job
+     * @param hasToSave hasToSave
+     * @return
+     * @return TextEdit
+     * @throws Exception if any problem occurs
+     */
+    public List<TextEdit> applyRefactoring(ICompilationUnit compilationUnit, AggregateASTVisitor refactoringToApply,
+            JavaProjectOptions options, SubMonitor monitor, boolean hasToSave) throws Exception {
         final ITextFileBufferManager bufferManager = FileBuffers.getTextFileBufferManager();
         final IPath path = compilationUnit.getPath();
         final LocationKind locationKind = LocationKind.NORMALIZE;
+        List<TextEdit> textEdits = null;
         try {
             bufferManager.connect(path, locationKind, null);
             final ITextFileBuffer textFileBuffer = bufferManager.getTextFileBuffer(path, locationKind);
@@ -157,13 +173,14 @@ public class ApplyRefactoringsJob extends Job {
                 environment.getLogger().error(
                     "File \"" + compilationUnit.getPath() + "\" is not synchronized with the file system."
                         + " Automated refactorings will not be applied to it.");
-                return;
+                return null;
             }
             final IDocument document = textFileBuffer.getDocument();
-            applyRefactoring(document, compilationUnit, refactoringToApply, options, monitor);
+            textEdits = applyRefactoring(document, compilationUnit, refactoringToApply, options, monitor, hasToSave);
         } finally {
             bufferManager.disconnect(path, locationKind, null);
         }
+        return textEdits;
     }
 
     /**
@@ -175,6 +192,8 @@ public class ApplyRefactoringsJob extends Job {
      * @param refactoring the {@link AggregateASTVisitor} to apply to the compilation unit
      * @param options the Java project options used to compile the project
      * @param monitor the progress monitor of the current job
+     * @param hasToSave hasToSave
+     * @return TextEdit
      * @throws Exception if any problem occurs
      *
      * @see <a
@@ -188,21 +207,32 @@ public class ApplyRefactoringsJob extends Job {
      * href="http://www.eclipse.org/articles/article.php?file=Article-JavaCodeManipulation_AST/index.html"
      * >Abstract Syntax Tree > Write it down</a>
      */
-    public void applyRefactoring(IDocument document, ICompilationUnit compilationUnit, AggregateASTVisitor refactoring,
-            JavaProjectOptions options, SubMonitor monitor) throws Exception {
-        // creation of DOM/AST from a ICompilationUnit
+    public List<TextEdit> applyRefactoring(IDocument document, ICompilationUnit compilationUnit,
+            AggregateASTVisitor refactoring,
+            JavaProjectOptions options, SubMonitor monitor, boolean hasToSave) throws Exception {
+        // Creation of DOM/AST from a ICompilationUnit
         final ASTParser parser = ASTParser.newParser(AST.JLS8);
-        resetParser(compilationUnit, parser, options);
-
-        CompilationUnit astRoot = (CompilationUnit) parser.createAST(null);
 
         final int maxIterations = 100;
         int iterationCount = 0;
         Set<ASTVisitor> lastLoopVisitors = Collections.emptySet();
         int nbLoopsWithSameVisitors = 0;
 
+        List<TextEdit> textEdits = new ArrayList<TextEdit>();
+
         monitor.setWorkRemaining(maxIterations);
+
+        CompilationUnit astRoot;
         do {
+            // I did not find any other way to directly modify the AST
+            // while still keeping the resolved type bindings working.
+            // Using astRoot.recordModifications() did not work:
+            // type bindings were lost. Is there a way to recover them?
+            // FIXME we should find a way to apply all the changes at
+            // the AST level and refresh the bindings
+            resetParser(compilationUnit, parser, options);
+            astRoot = (CompilationUnit) parser.createAST(null);
+
             if (iterationCount > maxIterations) {
                 // Oops! Something went wrong.
                 final String errorMsg = "An infinite loop has been detected for file "
@@ -221,13 +251,17 @@ public class ApplyRefactoringsJob extends Job {
 
             final Refactorings refactorings = refactoring.getRefactorings(astRoot);
             if (!refactorings.hasRefactorings()) {
-                // no new refactorings have been applied,
-                // we are done with applying the refactorings.
-                return;
+                // No new refactorings have been applied,
+                // We are done with applying the refactorings.
+                break;
             }
 
-            // apply the refactorings and save the compilation unit
-            refactorings.applyTo(document);
+            // Apply the refactorings and save the compilation unit
+            refactorings.applyTo(document, hasToSave);
+            textEdits.add(refactorings.getEdits());
+            if (!hasToSave) {
+                return textEdits;
+            }
             final boolean hadUnsavedChanges = compilationUnit.hasUnsavedChanges();
             compilationUnit.getBuffer().setContents(document.get());
             // http://wiki.eclipse.org/FAQ_What_is_a_working_copy%3F
@@ -237,27 +271,21 @@ public class ApplyRefactoringsJob extends Job {
             // ICompilationUnit.FORCE_PROBLEM_DETECTION
             // /** can be useful to back out a change that does not compile */
             // , null, null);
-            if (!hadUnsavedChanges) {
+            if (!hadUnsavedChanges && hasToSave) {
                 compilationUnit.save(null, true);
             }
-            // I did not find any other way to directly modify the AST
-            // while still keeping the resolved type bindings working.
-            // Using astRoot.recordModifications() did not work:
-            // type bindings were lost. Is there a way to recover them?
-            // FIXME we should find a way to apply all the changes at
-            // the AST level and refresh the bindings
-            resetParser(compilationUnit, parser, options);
-            astRoot = (CompilationUnit) parser.createAST(null);
-            ++iterationCount;
+            iterationCount++;
 
             final Set<ASTVisitor> thisLoopVisitors = refactoring.getVisitorsContributingRefactoring();
-            if (!thisLoopVisitors.equals(lastLoopVisitors)) {
+            if (thisLoopVisitors.equals(lastLoopVisitors)) {
+                nbLoopsWithSameVisitors++;
+            } else {
                 lastLoopVisitors = new HashSet<ASTVisitor>(thisLoopVisitors);
                 nbLoopsWithSameVisitors = 0;
-            } else {
-                ++nbLoopsWithSameVisitors;
             }
         } while (true);
+
+        return textEdits;
     }
 
     private static void resetParser(ICompilationUnit cu, ASTParser parser, JavaProjectOptions options) {

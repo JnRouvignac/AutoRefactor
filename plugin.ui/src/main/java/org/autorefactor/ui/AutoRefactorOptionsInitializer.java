@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2015 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2018 Fabrice Tiercelin - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,36 +23,19 @@
  * which accompanies this distribution under LICENSE-ECLIPSE, and is
  * available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.autorefactor.refactoring;
+package org.autorefactor.ui;
 
-import org.eclipse.jdt.core.ICompilationUnit;
+import org.eclipse.jdt.ui.cleanup.CleanUpOptions;
+import org.eclipse.jdt.ui.cleanup.ICleanUpOptionsInitializer;
 
-/** Work item for the {@link ApplyRefactoringsJob}. */
-public class RefactoringUnit {
-    private final ICompilationUnit compilationUnit;
-    private final JavaProjectOptions options;
-
+/** AutoRefactorOptionsInitializer. */
+public class AutoRefactorOptionsInitializer implements ICleanUpOptionsInitializer {
     /**
-     * RefactoringUnit.
+     * Set the Default Options.
      *
-     * @param compilationUnit compilationUnit
      * @param options options
      */
-    public RefactoringUnit(ICompilationUnit compilationUnit, JavaProjectOptions options) {
-        this.compilationUnit = compilationUnit;
-        this.options = options;
-    }
-
-    ICompilationUnit getCompilationUnit() {
-        return compilationUnit;
-    }
-
-    JavaProjectOptions getOptions() {
-        return options;
-    }
-
-    @Override
-    public String toString() {
-        return getCompilationUnit().toString();
+    public void setDefaultOptions(CleanUpOptions options) {
+        options.setOption("org.autorefactor.ui.autorefactor_clean_up", CleanUpOptions.TRUE);
     }
 }

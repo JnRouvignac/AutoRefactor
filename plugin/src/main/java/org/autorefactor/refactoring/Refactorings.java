@@ -67,6 +67,7 @@ public class Refactorings {
     private boolean hasRefactorings;
     private final ASTRewrite rewrite;
     private final ImportRewrite importRewrite;
+    private TextEdit edits;
     private final Map<Pair<ASTNode, ChildListPropertyDescriptor>, ListRewrite> listRewriteCache =
             new HashMap<Pair<ASTNode, ChildListPropertyDescriptor>, ListRewrite>();
     private final ASTCommentRewriter commentRewriter;
@@ -475,17 +476,19 @@ public class Refactorings {
      * Applies the accumulated refactorings to the provided document.
      *
      * @param document the document to refactor
+     * @param hasToSave true if the saving should be handled here
      * @throws BadLocationException if trying to access a non existing position
      * @throws CoreException CoreException
      */
-    public void applyTo(final IDocument document) throws BadLocationException, CoreException {
-        final TextEdit edits = rewrite.rewriteAST(document, null);
+    public void applyTo(final IDocument document, boolean hasToSave) throws BadLocationException, CoreException {
+        edits = rewrite.rewriteAST(document, null);
         final TextEdit importEdits = importRewrite.rewriteImports(monitor);
-
         commentRewriter.addEdits(document, edits);
         sourceRewriter.addEdits(document, edits);
 
-        applyEditsToDocument(edits, importEdits, document);
+        if (hasToSave) {
+            applyEditsToDocument(edits, importEdits, document);
+        }
     }
 
     private void applyEditsToDocument(final TextEdit edits, final TextEdit importEdits, final IDocument document)
@@ -501,7 +504,7 @@ public class Refactorings {
              */
             public BadLocationException call() throws Exception {
                 try {
-                    edits.apply(document);
+                    edits.apply(document, TextEdit.UPDATE_REGIONS);
                     importEdits.apply(document);
                     return null;
                 } catch (BadLocationException e) {
@@ -518,6 +521,15 @@ public class Refactorings {
      */
     public ImportRewrite getImportRewrite() {
         return importRewrite;
+    }
+
+    /**
+     * Gets the edits.
+     *
+     * @return the edits
+     */
+    public TextEdit getEdits() {
+        return edits;
     }
 
     /**

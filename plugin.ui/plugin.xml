@@ -3,7 +3,7 @@
 <!--
  | AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  |
- | Copyright (C) 2013-2017 Jean-Noël Rouvignac - initial API and implementation
+ | Copyright (C) 2013-2018 Jean-Noël Rouvignac - initial API and implementation
  |
  | This program is free software: you can redistribute it and/or modify
  | it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@
 -->
 <plugin>
     <extension point="org.eclipse.ui.menus">
-        <menuContribution locationURI="popup:org.eclipse.jdt.ui.PackageExplorer?after=org.eclipse.jdt.ui.refactoring.menu">
+        <menuContribution locationURI="popup:org.eclipse.jdt.ui.PackageExplorer?after=org.eclipse.jdt.ui.source.menu">
             <!-- See http://blog.richclientgui.com/?p=50
                  "Eclipse RCP Commands Part 3: visibleWhen and Core Expressions"
                  http://wiki.eclipse.org/Platform_Expression_Framework
@@ -43,14 +43,14 @@
                     </or>
                 </iterate>
             </visibleWhen>
-            <menu label="AutoRefactor">
+            <menu label="Source (AutoRefactor)">
                 <command style="push"
                          commandId="org.autorefactor.automatic.refactoring" />
                 <command style="push"
                          commandId="org.autorefactor.choose.refactorings" />
             </menu>
         </menuContribution>
-        <menuContribution locationURI="popup:org.eclipse.ui.navigator.ProjectExplorer#PopupMenu?after=org.eclipse.jdt.ui.refactoring.menu">
+        <menuContribution locationURI="popup:org.eclipse.ui.navigator.ProjectExplorer#PopupMenu?after=org.eclipse.jdt.ui.source.menu">
             <visibleWhen checkEnabled="false">
                 <iterate ifEmpty="false">
                     <or>
@@ -60,7 +60,7 @@
                     </or>
                 </iterate>
             </visibleWhen>
-            <menu label="AutoRefactor">
+            <menu label="Source (AutoRefactor)">
                 <command style="push"
                          commandId="org.autorefactor.automatic.refactoring" />
                 <command style="push"
@@ -78,8 +78,8 @@
 
 			@see org.eclipse.jdt.ui.actions.RefactorActionGroup
         -->
-        <menuContribution locationURI="popup:#CompilationUnitEditorContext?after=org.eclipse.jdt.ui.refactoring.menu">
-            <menu label="AutoRefactor">
+        <menuContribution locationURI="popup:#CompilationUnitEditorContext?after=org.eclipse.jdt.ui.source.menu">
+            <menu label="Source (AutoRefactor)">
                 <command style="push"
                          commandId="org.autorefactor.automatic.refactoring" />
                 <command style="push"
@@ -104,7 +104,7 @@
         <command
                 id="org.autorefactor.automatic.refactoring"
                 defaultHandler="org.autorefactor.ui.AutoRefactorHandler"
-                name="Automatic refactoring">
+                name="AutoRefactor Clean Up">
         </command>
     </extension>
     <extension point="org.eclipse.ui.commands">
@@ -114,6 +114,28 @@
                 name="Choose refactorings...">
         </command>
     </extension>
+    
+	<extension point="org.eclipse.jdt.ui.cleanUps">
+		<cleanUp
+			id="autorefactor_clean_up"
+			class="org.autorefactor.ui.AutoRefactorCleanUp">
+		</cleanUp>
+		
+		<cleanUpOptionsInitializer
+			class="org.autorefactor.ui.AutoRefactorOptionsInitializer"
+			cleanUpKind="cleanUp">
+		</cleanUpOptionsInitializer>
+		
+		<cleanUpOptionsInitializer
+			class="org.autorefactor.ui.AutoRefactorSaveActionOptionsInitializer"
+			cleanUpKind="saveAction">
+		</cleanUpOptionsInitializer>
+		  
+		<cleanUpConfigurationUI
+			class="org.autorefactor.ui.AutoRefactorTabPage"
+			name="AutoRefactor" cleanUpKind="cleanUp">
+		</cleanUpConfigurationUI>
+	</extension>
 
 
 

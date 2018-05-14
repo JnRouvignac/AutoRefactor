@@ -1,8 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2013-2017 Jean-Noël Rouvignac - initial API and implementation
- * Copyright (C) 2016-2017 Fabrice Tiercelin - Add a configuration for each rule
+ * Copyright (C) 2018 Fabrice Tiercelin - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,34 +23,34 @@
  * which accompanies this distribution under LICENSE-ECLIPSE, and is
  * available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.autorefactor.ui.preferences;
-
-import static org.autorefactor.preferences.PreferenceConstants.DEBUG_MODE_ON;
+package org.autorefactor.ui;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 
 import org.autorefactor.AutoRefactorPlugin;
 import org.autorefactor.refactoring.RefactoringRule;
 import org.autorefactor.refactoring.rules.AllRefactoringRules;
+import org.eclipse.jdt.internal.ui.fix.MapCleanUpOptions;
+import org.eclipse.jdt.internal.ui.preferences.cleanup.CleanUpTabPage;
+import org.eclipse.jdt.ui.cleanup.CleanUpOptions;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditor;
-import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
-import org.eclipse.ui.IWorkbench;
-import org.eclipse.ui.IWorkbenchPreferencePage;
 
-/** The Eclipse preference page for AutoRefactor. */
-public class WorkspacePreferencePage extends PreferencePage implements IWorkbenchPreferencePage {
+/** AutoRefactorTabPage. */
+public class AutoRefactorTabPage extends CleanUpTabPage {
     /**
      * The fields.
      */
@@ -61,36 +60,22 @@ public class WorkspacePreferencePage extends PreferencePage implements IWorkbenc
 
     private List<BooleanFieldEditor> rules;
 
-    private FieldEditor invalidFieldEditor;
-
     private Composite fieldEditorParent;
 
-    /** Default constructor. */
-    public WorkspacePreferencePage() {
-        super("AutoRefactor workbench preferences");
-        setPreferenceStore(AutoRefactorPlugin.getDefault().getPreferenceStore());
-    }
-
-    /**
-     * Get the property name.
-     *
-     * @param refactoringRule a refactoring rule
-     * @return the property name
-     */
-    public String getPropertyName(final RefactoringRule refactoringRule) {
-        return refactoringRule.getClass().getCanonicalName();
-    }
-
-    /**
-     * Initialization.
-     *
-     * @param workbench The workbench
-     */
-    public void init(IWorkbench workbench) {
-    }
-
     @Override
-    protected Control createContents(Composite parent) {
+    public void setWorkingValues(Map<String, String> workingValues) {
+        super.setWorkingValues(workingValues);
+        setOptions(new MapCleanUpOptions(workingValues));
+    }
+
+    /**
+     * Create the contents.
+     *
+     * @param parent parent
+     * @return Composite
+     */
+    @Override
+    public Composite createContents(Composite parent) {
         final List<RefactoringRule> allRefactoringRules = AllRefactoringRules.getAllRefactoringRules();
         Collections.sort(allRefactoringRules, new Comparator<RefactoringRule>() {
             /**
@@ -112,16 +97,20 @@ public class WorkspacePreferencePage extends PreferencePage implements IWorkbenc
         initialize();
         invalidateToggleRules(ruleGroup);
 
-        checkState();
         return fieldEditorParent;
     }
 
     private Group createControls(final Composite parent, final List<RefactoringRule> allRefactoringRules) {
         fieldEditorParent = new Composite(parent, SWT.FILL);
+        fieldEditorParent.setLayout(new FillLayout());
+
+        ScrolledComposite scrolledComposite = new ScrolledComposite(fieldEditorParent,
+                SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
 
         initFields(allRefactoringRules);
 
-        final Group ruleGroup = new Group(fieldEditorParent, SWT.FILL);
+        Composite composite = new Composite(scrolledComposite, SWT.FILL);
+        final Group ruleGroup = new Group(composite, SWT.FILL);
         ruleGroup.setText("Rules by default");
 
         // All rule checkbox
@@ -131,10 +120,15 @@ public class WorkspacePreferencePage extends PreferencePage implements IWorkbenc
         toggleAllRules.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                boolean isSelected = WorkspacePreferencePage.this.toggleAllRules.getSelection();
-                for (BooleanFieldEditor rule : WorkspacePreferencePage.this.rules) {
+                boolean isSelected = AutoRefactorTabPage.this.toggleAllRules.getSelection();
+
+                for (BooleanFieldEditor rule : AutoRefactorTabPage.this.rules) {
                     ((Button) rule.getDescriptionControl(ruleGroup)).setSelection(isSelected);
+                    rule.getPreferenceStore().setValue(rule.getPreferenceName(),
+                            isSelected);
                 }
+
+                AutoRefactorPlugin.getDefault().getPreferenceStore().needsSaving();
             }
         });
 
@@ -143,38 +137,47 @@ public class WorkspacePreferencePage extends PreferencePage implements IWorkbenc
         spacer.setLayoutData(new GridData(0, 5));
 
         rules = new ArrayList<BooleanFieldEditor>(allRefactoringRules.size());
+
         for (final RefactoringRule refactoringRule : allRefactoringRules) {
             final BooleanFieldEditor booleanFieldEditor = new BooleanFieldEditor(
                     getPropertyName(refactoringRule),
                     refactoringRule.getName(), SWT.WRAP, ruleGroup);
+
             booleanFieldEditor.getDescriptionControl(ruleGroup).setToolTipText(refactoringRule.getDescription());
             ((Button) booleanFieldEditor.getDescriptionControl(ruleGroup)).addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(final SelectionEvent e) {
+                    final String isPreferenceEnabled = booleanFieldEditor.getBooleanValue()
+                            ? CleanUpOptions.TRUE : CleanUpOptions.FALSE;
+
+                    booleanFieldEditor.getPreferenceStore().setValue(booleanFieldEditor.getPreferenceName(),
+                            isPreferenceEnabled);
+                    booleanFieldEditor.getPreferenceStore().needsSaving();
                     invalidateToggleRules(ruleGroup);
                 }
             });
+
             rules.add(booleanFieldEditor);
         }
         fields.addAll(rules);
+        scrolledComposite.setContent(composite);
+        ruleGroup.pack();
+        composite.pack();
         return ruleGroup;
     }
 
     /**
      * Initialize the fields.
      *
-     * @param allRefactoringRules allRefactoringRules
+     * @param allRefactoringRules all the refactoring rules
      */
     protected void initFields(final List<RefactoringRule> allRefactoringRules) {
-        fields = new ArrayList<FieldEditor>(1 + allRefactoringRules.size());
-
-        fields.add(new BooleanFieldEditor(DEBUG_MODE_ON.getName(), DEBUG_MODE_ON.getDescription(),
-                fieldEditorParent));
+        fields = new ArrayList<FieldEditor>(allRefactoringRules.size());
     }
 
     private void invalidateToggleRules(final Composite ruleGroup) {
         boolean isAllRulesChecked = true;
-        for (final BooleanFieldEditor rule : WorkspacePreferencePage.this.rules) {
+        for (final BooleanFieldEditor rule : this.rules) {
             isAllRulesChecked = ((Button) rule.getDescriptionControl(ruleGroup)).getSelection();
             if (!isAllRulesChecked) {
                 break;
@@ -187,57 +190,93 @@ public class WorkspacePreferencePage extends PreferencePage implements IWorkbenc
     protected void initialize() {
         if (fields != null) {
             for (final FieldEditor field : fields) {
-                field.setPage(this);
-                field.setPreferenceStore(getPreferenceStore());
+                field.setPreferenceStore(AutoRefactorPlugin.getDefault().getPreferenceStore());
                 field.load();
             }
         }
     }
 
-    /** Check the state. */
-    protected void checkState() {
-        boolean valid = true;
-        invalidFieldEditor = null;
+    /**
+     * Get the clean up count.
+     *
+     * @return int
+     */
+    @Override
+    public int getCleanUpCount() {
+        if (fields != null) {
+            return fields.size();
+        }
+        return 0;
+    }
+
+    /**
+     * Get the preview.
+     *
+     * @return String
+     */
+    public String getPreview() {
+        return "// no preview";
+    }
+
+    /**
+     * Get the selected clean up count.
+     *
+     * @return int
+     */
+    @Override
+    public int getSelectedCleanUpCount() {
+        int selectedCleanups = 0;
 
         if (fields != null) {
             for (final FieldEditor field : fields) {
-                valid = field.isValid();
-                if (!valid) {
-                    invalidFieldEditor = field;
-                    break;
+                if (((BooleanFieldEditor) field).getBooleanValue()) {
+                    selectedCleanups++;
                 }
             }
         }
-        setValid(valid);
+
+        return selectedCleanups;
     }
 
-    @Override
-    public void setVisible(boolean visible) {
-        super.setVisible(visible);
-        if (visible && invalidFieldEditor != null) {
-            invalidFieldEditor.setFocus();
-        }
-    }
-
-    @Override
-    protected void performDefaults() {
+    /**
+     * Set the options.
+     *
+     * @param options options
+     */
+    public void setOptions(CleanUpOptions options) {
         if (fields != null) {
             for (final FieldEditor field : fields) {
-                field.loadDefault();
+                final String isPreferenceEnabled = ((BooleanFieldEditor) field).getBooleanValue()
+                        ? CleanUpOptions.TRUE : CleanUpOptions.FALSE;
+
+                options.setOption(field.getPreferenceName(),
+                        isPreferenceEnabled);
+                field.getPreferenceStore().setValue(field.getPreferenceName(), isPreferenceEnabled);
             }
         }
+    }
 
-        checkState();
-        super.performDefaults();
+    /**
+     * Get the property name.
+     *
+     * @param refactoringRule refactoring rule
+     * @return refactoringRule
+     */
+    public String getPropertyName(final RefactoringRule refactoringRule) {
+        return getCleanupPropertyName(refactoringRule);
+    }
+
+    /**
+     * Get the cleanup property name.
+     *
+     * @param refactoringRule a refactoring rule
+     * @return the cleanup property name
+     */
+    public static String getCleanupPropertyName(final RefactoringRule refactoringRule) {
+        return refactoringRule.getClass().getCanonicalName() + ":cleanup";
     }
 
     @Override
-    public boolean performOk() {
-        if (fields != null) {
-            for (final FieldEditor field : fields) {
-                field.store();
-            }
-        }
-        return super.performOk();
+    protected void doCreatePreferences(Composite paramComposite, int paramInt) {
     }
 }

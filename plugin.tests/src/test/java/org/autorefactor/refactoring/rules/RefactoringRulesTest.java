@@ -146,7 +146,7 @@ public class RefactoringRulesTest {
                 doc, cu,
                 new AggregateASTVisitor(Arrays.asList(refactoring)),
                 newJavaProjectOptions(Release.javaSE("1.8.0"), 4),
-                SubMonitor.convert(new NullProgressMonitor()));
+                SubMonitor.convert(new NullProgressMonitor()), true);
         return doc;
     }
 

@@ -311,6 +311,15 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     /**
+     * Get the refactorings.
+     *
+     * @return the refactorings.
+     */
+    public Refactorings getRefactorings() {
+        return this.ctx.getRefactorings();
+    }
+
+    /**
      * Returns the visitors that contributed refactorings in the last run.
      *
      * @return the visitors that contributed refactorings in the last run

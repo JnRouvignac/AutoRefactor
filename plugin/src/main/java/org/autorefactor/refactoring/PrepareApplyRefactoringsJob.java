@@ -194,7 +194,13 @@ public class PrepareApplyRefactoringsJob extends Job {
         return options;
     }
 
-    private IJavaProject getIJavaProject(IJavaElement javaElement) {
+    /**
+     * getIJavaProject.
+     *
+     * @param javaElement javaElement
+     * @return IJavaProject
+     */
+    public static IJavaProject getIJavaProject(IJavaElement javaElement) {
         if (javaElement instanceof ICompilationUnit
                 || javaElement instanceof IPackageFragment
                 || javaElement instanceof IPackageFragmentRoot) {
