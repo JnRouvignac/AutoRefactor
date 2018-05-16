@@ -27,6 +27,7 @@ package org.autorefactor.refactoring.rules;
 
 import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
 import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.modifiers;
 import static org.autorefactor.refactoring.ASTHelper.statements;
 
 import java.util.List;
@@ -69,10 +70,35 @@ public class ImplicitDefaultConstructorRatherThanWrittenOneRefactoring extends
     }
 
     @Override
-    public boolean visit(TypeDeclaration node) {
+    public boolean visit(final TypeDeclaration node) {
         if (!node.isInterface()) {
             MethodDeclaration uniqueConstructor = null;
-            for (MethodDeclaration methodDeclaration : node.getMethods()) {
+            boolean isPublicClass = false;
+            boolean isProtectedClass = false;
+            boolean isPackageClass = true;
+            boolean isPrivateClass = false;
+
+            for (final IExtendedModifier extendedModifier : modifiers(node)) {
+                if (extendedModifier.isModifier()) {
+                    final Modifier modifier = (Modifier) extendedModifier;
+                    if (modifier.isPublic()) {
+                        isPublicClass = true;
+                        isPackageClass = false;
+                        break;
+                    } else if (modifier.isProtected()) {
+                        isProtectedClass = true;
+                        isPackageClass = false;
+                        break;
+                    } else if (modifier.isPrivate()) {
+                        isPrivateClass = true;
+                        isPackageClass = false;
+                        break;
+                    }
+                }
+            }
+
+
+            for (final MethodDeclaration methodDeclaration : node.getMethods()) {
                 if (methodDeclaration.isConstructor()) {
                     if (uniqueConstructor == null) {
                         uniqueConstructor = methodDeclaration;
@@ -85,16 +111,22 @@ public class ImplicitDefaultConstructorRatherThanWrittenOneRefactoring extends
 
             if (uniqueConstructor != null
                     && (uniqueConstructor.parameters() == null || uniqueConstructor.parameters().isEmpty())
-                    && uniqueConstructor.modifiers() != null
-                    && uniqueConstructor.modifiers().size() == 1) {
-                IExtendedModifier extendedModifier = (IExtendedModifier) uniqueConstructor.modifiers().get(0);
-                if (extendedModifier.isModifier()
-                        && isDefaultStmts(uniqueConstructor)) {
-                    Modifier modifier = (Modifier) extendedModifier;
-                    if (modifier.isPublic()) {
-                        ctx.getRefactorings().remove(uniqueConstructor);
-                        return DO_NOT_VISIT_SUBTREE;
+                    && uniqueConstructor.modifiers() != null) {
+                if (uniqueConstructor.modifiers().size() == 1) {
+                    final IExtendedModifier extendedModifier = (IExtendedModifier) uniqueConstructor.modifiers().get(0);
+                    if (extendedModifier.isModifier()
+                            && isDefaultStmts(uniqueConstructor)) {
+                        Modifier modifier = (Modifier) extendedModifier;
+                        if ((modifier.isPublic() && isPublicClass)
+                            || (modifier.isProtected() && isProtectedClass)
+                            || (modifier.isPrivate() && isPrivateClass)) {
+                            ctx.getRefactorings().remove(uniqueConstructor);
+                            return DO_NOT_VISIT_SUBTREE;
+                        }
                     }
+                } else if (uniqueConstructor.modifiers().isEmpty() && isPackageClass) {
+                    ctx.getRefactorings().remove(uniqueConstructor);
+                    return DO_NOT_VISIT_SUBTREE;
                 }
             }
         }
@@ -102,14 +134,14 @@ public class ImplicitDefaultConstructorRatherThanWrittenOneRefactoring extends
         return VISIT_SUBTREE;
     }
 
-    private boolean isDefaultStmts(MethodDeclaration uniqueConstructor) {
-        List<Statement> stmts = statements(uniqueConstructor.getBody());
+    private boolean isDefaultStmts(final MethodDeclaration uniqueConstructor) {
+        final List<Statement> stmts = statements(uniqueConstructor.getBody());
         if (stmts == null || stmts.isEmpty()) {
             return true;
         } else if (stmts.size() == 1) {
-            Statement stmt = stmts.get(0);
+            final Statement stmt = stmts.get(0);
             if (stmt instanceof SuperConstructorInvocation) {
-                SuperConstructorInvocation superStmt = (SuperConstructorInvocation) stmt;
+                final SuperConstructorInvocation superStmt = (SuperConstructorInvocation) stmt;
                 if (superStmt.arguments() == null || superStmt.arguments().isEmpty()) {
                     return true;
                 }

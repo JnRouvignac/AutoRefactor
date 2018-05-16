@@ -30,42 +30,63 @@ import java.util.Date;
 import java.util.Observable;
 
 public class ImplicitDefaultConstructorRatherThanWrittenOneSample {
-    class RemoveDefaultConstructor {
+    public class RemoveDefaultConstructor {
     }
 
-    class RemoveDefaultConstructorWithSuperCall {
+    public class RemoveDefaultConstructorWithSuperCall {
     }
 
-    class RemoveDefaultConstructorWithInheritance extends Observable {
+    public class RemoveDefaultConstructorWithInheritance extends Observable {
     }
 
-    class RemoveDefaultConstructorWithSuperInheritedCall extends Observable {
+    public class RemoveDefaultConstructorWithSuperInheritedCall extends Observable {
     }
 
-    class DoNotRemoveProtectedConstructor {
+    protected class RemoveProtectedConstructor {
+    }
+
+    class RemovePackageConstructor {
+    }
+
+    private class RemovePrivateConstructor {
+    }
+
+    public class DoNotRemoveProtectedConstructor {
         protected DoNotRemoveProtectedConstructor() {}
     }
 
-    class DoNotRemoveProtectedConstructorWithSuperCall {
+    public class DoNotRemovePackageConstructor {
+        DoNotRemovePackageConstructor() {}
+    }
+
+    public class DoNotRemovePrivateConstructor {
+        private DoNotRemovePrivateConstructor() {}
+    }
+
+    protected class DoNotRemovePublicConstructor {
+        public DoNotRemovePublicConstructor() {}
+    }
+
+    public class DoNotRemoveProtectedConstructorWithSuperCall {
         protected DoNotRemoveProtectedConstructorWithSuperCall() {
             super();
         }
     }
 
-    class DoNotRemoveAnnotatedConstructor {
+    public class DoNotRemoveAnnotatedConstructor {
         @ConstructorProperties(value = { "We need an annotation" })
         public DoNotRemoveAnnotatedConstructor() {}
     }
 
-    class DoNotRemoveConstructorWithParameter {
+    public class DoNotRemoveConstructorWithParameter {
         public DoNotRemoveConstructorWithParameter(int i) {}
     }
 
-    class DoNotRemoveConstructorWithVararg {
+    public class DoNotRemoveConstructorWithVararg {
         public DoNotRemoveConstructorWithVararg(int... i) {}
     }
 
-    class DoNotRemoveConstructorWithParameterizedSuperCall extends Date {
+    public class DoNotRemoveConstructorWithParameterizedSuperCall extends Date {
         private static final long serialVersionUID = -2817725354012950325L;
 
         public DoNotRemoveConstructorWithParameterizedSuperCall() {
@@ -73,12 +94,12 @@ public class ImplicitDefaultConstructorRatherThanWrittenOneSample {
         }
     }
 
-    class DoNotRemoveDefaultConstructorWithOtherConstructors {
+    public class DoNotRemoveDefaultConstructorWithOtherConstructors {
         public DoNotRemoveDefaultConstructorWithOtherConstructors() {}
         public DoNotRemoveDefaultConstructorWithOtherConstructors(int i) {}
     }
 
-    class RemoveDefaultConstructorWithMethod {
+    public class RemoveDefaultConstructorWithMethod {
         public void process() {}
     }
 }
