@@ -29,7 +29,6 @@ import java.util.Arrays;
 import java.util.List;
 
 public class RemoveOverridenAssignmentSample {
-
     public boolean removeUselessInitialization() {
         // Keep this comment
         boolean reassignedVar = true;
@@ -49,6 +48,20 @@ public class RemoveOverridenAssignmentSample {
         String reassignedVar = "";
         reassignedVar = System.lineSeparator();
         return reassignedVar;
+    }
+
+    public long doNotRemoveWithPlusAssignment() {
+        long incrementedVar = 123;
+        incrementedVar += 456;
+        incrementedVar = 789;
+        return incrementedVar;
+    }
+
+    public long doNotRemoveWithMinusAssignment() {
+        long decrementedVar = 123;
+        decrementedVar -= 456;
+        decrementedVar = 789;
+        return decrementedVar;
     }
 
     public List<String> doNotRemoveActiveInit() {

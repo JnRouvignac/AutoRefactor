@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2017 Fabrice Tiercelin - initial API and implementation
+ * Copyright (C) 2017-2018 Fabrice Tiercelin - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,8 +35,8 @@ import static org.autorefactor.refactoring.ASTHelper.isSameVariable;
 import static org.eclipse.jdt.core.dom.Assignment.Operator.ASSIGN;
 
 import org.eclipse.jdt.core.dom.Assignment;
-import org.eclipse.jdt.core.dom.ExpressionStatement;
 import org.eclipse.jdt.core.dom.IVariableBinding;
+import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
@@ -71,25 +71,29 @@ public class RemoveOverridenAssignmentRefactoring extends AbstractRefactoringRul
     }
 
     @Override
-    public boolean visit(VariableDeclarationStatement node) {
+    public boolean visit(final VariableDeclarationStatement node) {
         if (node.fragments() != null && node.fragments().size() == 1) {
             final VariableDeclarationFragment fragment = (VariableDeclarationFragment) node.fragments().get(0);
+
             if (fragment.getInitializer() != null
                     && isPassive(fragment.getInitializer())) {
+                final SimpleName varName = fragment.getName();
                 final IVariableBinding variable = fragment.resolveBinding();
                 Statement stmtToInspect = getNextSibling(node);
                 boolean isOverridden = false;
                 boolean isRead = false;
+
                 while (stmtToInspect != null && !isOverridden && !isRead) {
-                    if (stmtToInspect instanceof ExpressionStatement) {
-                        final Assignment assignment = asExpression(stmtToInspect, Assignment.class);
-                        isOverridden = hasOperator(assignment, ASSIGN)
-                                && isSameVariable(
-                                        fragment.getName(),
-                                        assignment.getLeftHandSide());
+                    final Assignment assignment = asExpression(stmtToInspect, Assignment.class);
+                    if (assignment != null && isSameVariable(varName, assignment.getLeftHandSide())) {
+                        if (hasOperator(assignment, ASSIGN)) {
+                            isOverridden = true;
+                        } else {
+                            isRead = true;
+                        }
                     }
 
-                    isRead = !new VariableDefinitionsUsesVisitor(variable, stmtToInspect).find().getUses()
+                    isRead |= !new VariableDefinitionsUsesVisitor(variable, stmtToInspect).find().getUses()
                             .isEmpty();
 
                     stmtToInspect = getNextSibling(stmtToInspect);

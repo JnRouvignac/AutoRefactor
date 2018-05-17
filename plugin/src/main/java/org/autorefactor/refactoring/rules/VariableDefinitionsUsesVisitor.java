@@ -25,8 +25,13 @@
  */
 package org.autorefactor.refactoring.rules;
 
-import static org.autorefactor.refactoring.ASTHelper.*;
-import static org.eclipse.jdt.core.dom.ASTNode.*;
+import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.isSameLocalVariable;
+import static org.eclipse.jdt.core.dom.ASTNode.ASSIGNMENT;
+import static org.eclipse.jdt.core.dom.ASTNode.SINGLE_VARIABLE_DECLARATION;
+import static org.eclipse.jdt.core.dom.ASTNode.VARIABLE_DECLARATION_EXPRESSION;
+import static org.eclipse.jdt.core.dom.ASTNode.VARIABLE_DECLARATION_FRAGMENT;
+import static org.eclipse.jdt.core.dom.ASTNode.VARIABLE_DECLARATION_STATEMENT;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -106,11 +111,17 @@ public final class VariableDefinitionsUsesVisitor extends ASTVisitor {
         if (isSameLocalVariable(variableBinding, node)) {
             switch (node.getParent().getNodeType()) {
             case ASSIGNMENT:
-                return addDefinitionOrUse(node, Assignment.LEFT_HAND_SIDE_PROPERTY);
+                addDefinitionOrUse(node, Assignment.LEFT_HAND_SIDE_PROPERTY);
+                break;
+
             case VARIABLE_DECLARATION_FRAGMENT:
-                return addDefinitionOrUse(node, VariableDeclarationFragment.NAME_PROPERTY);
+                addDefinitionOrUse(node, VariableDeclarationFragment.NAME_PROPERTY);
+                break;
+
             case SINGLE_VARIABLE_DECLARATION:
-                return addDefinitionOrUse(node, SingleVariableDeclaration.NAME_PROPERTY);
+                addDefinitionOrUse(node, SingleVariableDeclaration.NAME_PROPERTY);
+                break;
+
             default:
                 uses.add(node);
                 break;
@@ -119,13 +130,12 @@ public final class VariableDefinitionsUsesVisitor extends ASTVisitor {
         return VISIT_SUBTREE;
     }
 
-    private boolean addDefinitionOrUse(SimpleName node, ChildPropertyDescriptor definitionPropertyDescriptor) {
+    private void addDefinitionOrUse(SimpleName node, ChildPropertyDescriptor definitionPropertyDescriptor) {
         if (node.getLocationInParent() == definitionPropertyDescriptor) {
             definitions.add(node);
         } else {
             uses.add(node);
         }
-        return VISIT_SUBTREE;
     }
 
     /**
