@@ -211,11 +211,16 @@ public class BooleanSample {
         return b;
     }
 
-    public Boolean replaceTernaryOperatorByOrOperatorWithObject2(
+    public Object replaceTernaryOperatorByOrOperatorWithObject2(
             Boolean bo1, Boolean bo2) {
         // Keep this comment
-        Boolean b = !bo1 || bo2;
+        Object b = !bo1 || bo2;
         return b;
+    }
+
+    public Object doNotReplaceNonBooleanExpression(boolean bo) {
+        Object anything = bo ? true : "false";
+        return anything;
     }
 
     public void doNotReplacePossibleNullObject(Boolean bo1, Boolean bo2) {
