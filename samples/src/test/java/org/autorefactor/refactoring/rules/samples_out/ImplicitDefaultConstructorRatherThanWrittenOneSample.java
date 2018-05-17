@@ -36,6 +36,25 @@ public class ImplicitDefaultConstructorRatherThanWrittenOneSample {
     public class RemoveDefaultConstructorWithSuperCall {
     }
 
+    public class DoNotRemoveConstructorWithCode {
+        public DoNotRemoveConstructorWithCode() {
+            System.out.println("Don't lose me!");
+        }
+    }
+
+    class DoNotRemovePackageConstructorWithCode {
+        DoNotRemovePackageConstructorWithCode() {
+            System.out.println("Don't lose me!");
+        }
+    }
+
+    public class DoNotRemoveConstructorWithSuperAndCode {
+        public DoNotRemoveConstructorWithSuperAndCode() {
+            super();
+            System.out.println("Don't lose me!");
+        }
+    }
+
     public class RemoveDefaultConstructorWithInheritance extends Observable {
     }
 

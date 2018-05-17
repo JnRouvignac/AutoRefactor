@@ -111,11 +111,11 @@ public class ImplicitDefaultConstructorRatherThanWrittenOneRefactoring extends
 
             if (uniqueConstructor != null
                     && (uniqueConstructor.parameters() == null || uniqueConstructor.parameters().isEmpty())
-                    && uniqueConstructor.modifiers() != null) {
-                if (uniqueConstructor.modifiers().size() == 1) {
+                    && isDefaultStmts(uniqueConstructor)) {
+                if (uniqueConstructor.modifiers() != null
+                        && uniqueConstructor.modifiers().size() == 1) {
                     final IExtendedModifier extendedModifier = (IExtendedModifier) uniqueConstructor.modifiers().get(0);
-                    if (extendedModifier.isModifier()
-                            && isDefaultStmts(uniqueConstructor)) {
+                    if (extendedModifier.isModifier()) {
                         Modifier modifier = (Modifier) extendedModifier;
                         if ((modifier.isPublic() && isPublicClass)
                             || (modifier.isProtected() && isProtectedClass)
@@ -124,7 +124,8 @@ public class ImplicitDefaultConstructorRatherThanWrittenOneRefactoring extends
                             return DO_NOT_VISIT_SUBTREE;
                         }
                     }
-                } else if (uniqueConstructor.modifiers().isEmpty() && isPackageClass) {
+                } else if ((uniqueConstructor.modifiers() == null || uniqueConstructor.modifiers().isEmpty())
+                        && isPackageClass) {
                     ctx.getRefactorings().remove(uniqueConstructor);
                     return DO_NOT_VISIT_SUBTREE;
                 }
