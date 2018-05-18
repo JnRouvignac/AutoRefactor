@@ -39,13 +39,13 @@ public class UnboxingRatherThanExplicitMethodSample {
         double d = dObject;
     }
 
-    public static void useUnboxingOnNarrowingType(Character cObject, Byte byObject,
+    public static void doNotUseUnboxingOnNarrowingType(Character cObject, Byte byObject,
             Integer iObject, Short sObject, Float fObject) {
-        int c = cObject;
-        int by = byObject;
-        long i = iObject;
-        int s = sObject;
-        double f = fObject;
+        int c = cObject.charValue();
+        int by = byObject.byteValue();
+        long i = iObject.intValue();
+        int s = sObject.shortValue();
+        double f = fObject.floatValue();
     }
 
     public static void doNotUseUnboxingWhenTypesDontMatch(Byte byObject,

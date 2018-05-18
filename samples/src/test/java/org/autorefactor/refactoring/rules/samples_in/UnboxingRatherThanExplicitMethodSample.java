@@ -39,7 +39,7 @@ public class UnboxingRatherThanExplicitMethodSample {
         double d = dObject.doubleValue();
     }
 
-    public static void useUnboxingOnNarrowingType(Character cObject, Byte byObject,
+    public static void doNotUseUnboxingOnNarrowingType(Character cObject, Byte byObject,
             Integer iObject, Short sObject, Float fObject) {
         int c = cObject.charValue();
         int by = byObject.byteValue();
