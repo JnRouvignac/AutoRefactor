@@ -35,6 +35,7 @@ import org.autorefactor.refactoring.Refactorings;
 import org.autorefactor.util.NotImplementedException;
 import org.autorefactor.util.Pair;
 import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.ImportDeclaration;
@@ -110,6 +111,12 @@ public abstract class AbstractUnitTestRefactoring extends AbstractRefactoringRul
 
     @Override
     public abstract boolean visit(IfStatement node);
+
+    @Override
+    public boolean visit(CompilationUnit node) {
+        staticImports.clear();
+        return VISIT_SUBTREE;
+    }
 
     @Override
     public boolean visit(final ImportDeclaration node) {
