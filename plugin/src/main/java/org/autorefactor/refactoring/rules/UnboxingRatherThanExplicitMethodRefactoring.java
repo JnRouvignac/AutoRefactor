@@ -87,12 +87,6 @@ public class UnboxingRatherThanExplicitMethodRefactoring extends AbstractRefacto
                 useUnboxing(node);
                 return DO_NOT_VISIT_SUBTREE;
             }
-            System.out.println("###########################################################");
-            System.out.println(node.getName());
-            System.out.println(actualResultType);
-            System.out.println(node.resolveTypeBinding());
-            System.out.println(actualResultType != null
-                    && actualResultType.isAssignmentCompatible(node.resolveTypeBinding()));
         }
         return VISIT_SUBTREE;
     }
