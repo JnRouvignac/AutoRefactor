@@ -27,16 +27,20 @@ package org.autorefactor.refactoring.rules;
 
 import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
 import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.hasType;
+import static org.autorefactor.refactoring.ASTHelper.instanceOf;
 import static org.autorefactor.refactoring.ASTHelper.modifiers;
 import static org.autorefactor.refactoring.ASTHelper.statements;
 
 import java.util.List;
 
 import org.eclipse.jdt.core.dom.IExtendedModifier;
+import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.Modifier;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.SuperConstructorInvocation;
+import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 
 /** See {@link #getDescription()} method. */
@@ -97,7 +101,6 @@ public class ImplicitDefaultConstructorRatherThanWrittenOneRefactoring extends
                 }
             }
 
-
             for (final MethodDeclaration methodDeclaration : node.getMethods()) {
                 if (methodDeclaration.isConstructor()) {
                     if (uniqueConstructor == null) {
@@ -110,6 +113,9 @@ public class ImplicitDefaultConstructorRatherThanWrittenOneRefactoring extends
             }
 
             if (uniqueConstructor != null
+                    && (!isCheckedExceptionThrown(uniqueConstructor)
+                    || node.getSuperclassType() == null
+                    || hasType(node.getSuperclassType().resolveBinding(), "java.lang.Object"))
                     && (uniqueConstructor.parameters() == null || uniqueConstructor.parameters().isEmpty())
                     && isDefaultStmts(uniqueConstructor)) {
                 if (uniqueConstructor.modifiers() != null
@@ -149,5 +155,22 @@ public class ImplicitDefaultConstructorRatherThanWrittenOneRefactoring extends
             }
         }
         return false;
+    }
+
+    private boolean isCheckedExceptionThrown(final MethodDeclaration uniqueConstructor) {
+        if (uniqueConstructor.thrownExceptionTypes() != null) {
+            for (final Object type : uniqueConstructor.thrownExceptionTypes()) {
+                if (isChecked((Type) type)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean isChecked(Type type) {
+        final ITypeBinding binding = type.resolveBinding();
+        return !instanceOf(binding, "java.lang.RuntimeException")
+                && !instanceOf(binding, "java.lang.Error");
     }
 }

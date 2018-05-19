@@ -26,6 +26,10 @@
 package org.autorefactor.refactoring.rules.samples_in;
 
 import java.beans.ConstructorProperties;
+import java.io.Serializable;
+import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
+import java.text.ParseException;
 import java.util.Date;
 import java.util.Observable;
 
@@ -135,5 +139,21 @@ public class ImplicitDefaultConstructorRatherThanWrittenOneSample {
     public class RemoveDefaultConstructorWithMethod {
         public RemoveDefaultConstructorWithMethod() {}
         public void process() {}
+    }
+
+    public class RemoveDefaultConstructorWithCheckedException {
+        public RemoveDefaultConstructorWithCheckedException() throws ParseException {}
+    }
+
+    public class RemoveSerializableConstructorWithCheckedException implements Serializable {
+        public RemoveSerializableConstructorWithCheckedException() throws ParseException {}
+    }
+
+    public class DoNotRemoveInheritedCheckedException extends UnicastRemoteObject {
+        public DoNotRemoveInheritedCheckedException() throws RemoteException {}
+    }
+
+    public class RemoveDefaultConstructorWithRuntimeException extends Date {
+        public RemoveDefaultConstructorWithRuntimeException() throws NullPointerException {}
     }
 }
