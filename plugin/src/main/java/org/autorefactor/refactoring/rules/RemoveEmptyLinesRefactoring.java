@@ -83,6 +83,8 @@ public class RemoveEmptyLinesRefactoring extends AbstractRefactoringRule {
 
     @Override
     public boolean visit(CompilationUnit node) {
+        lineEnds.clear();
+
         final String source = this.ctx.getSource(node);
         if (source.length() == 0) {
             // empty file, bail out
@@ -159,11 +161,6 @@ public class RemoveEmptyLinesRefactoring extends AbstractRefactoringRule {
         while (matcher.find()) {
             lineEnds.add(matcher.end());
         }
-    }
-
-    @Override
-    public void endVisit(CompilationUnit node) {
-        lineEnds.clear();
     }
 
     private int getIndexOfFirstNonWhitespaceChar(String s, int offset) {

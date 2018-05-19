@@ -115,7 +115,7 @@ public abstract class AbstractUnitTestRefactoring extends AbstractRefactoringRul
     @Override
     public boolean visit(CompilationUnit node) {
         staticImports.clear();
-        return VISIT_SUBTREE;
+        return super.visit(node);
     }
 
     @Override

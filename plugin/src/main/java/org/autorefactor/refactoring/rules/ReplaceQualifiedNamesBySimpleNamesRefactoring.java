@@ -413,6 +413,12 @@ public class ReplaceQualifiedNamesBySimpleNamesRefactoring extends AbstractRefac
         return "It reduces code to focus attention on code that matters.";
     }
 
+    @Override
+    public boolean visit(CompilationUnit node) {
+        resetAllNames();
+        return super.visit(node);
+    }
+
     private void readImport(final ImportDeclaration node) {
         final QName qname = QName.valueOf(node.getName().getFullyQualifiedName());
         if (node.isStatic()) {

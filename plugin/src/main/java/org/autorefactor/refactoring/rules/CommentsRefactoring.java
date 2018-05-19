@@ -592,6 +592,8 @@ public class CommentsRefactoring extends AbstractRefactoringRule {
 
     @Override
     public boolean visit(CompilationUnit node) {
+        comments.clear();
+
         this.astRoot = node;
         for (Comment comment : getCommentList(astRoot)) {
             comments.add(Pair.of(new SourceLocation(comment), comment));
@@ -618,10 +620,5 @@ public class CommentsRefactoring extends AbstractRefactoringRule {
         final String source = this.ctx.getSource(node);
         final int start = node.getStartPosition();
         return source.substring(start, start + node.getLength());
-    }
-
-    @Override
-    public void endVisit(CompilationUnit node) {
-        comments.clear();
     }
 }

@@ -95,7 +95,7 @@ public class TestNGAssertRefactoring extends AbstractUnitTestRefactoring {
     public boolean visit(CompilationUnit node) {
         // new file: reset the value
         canUseAssertNotEquals = false;
-        return VISIT_SUBTREE;
+        return super.visit(node);
     }
 
     @Override
