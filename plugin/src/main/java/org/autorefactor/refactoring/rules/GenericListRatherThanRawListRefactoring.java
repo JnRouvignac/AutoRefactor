@@ -48,24 +48,24 @@ import org.eclipse.jdt.core.dom.Type;
 
 /** See {@link #getDescription()} method. */
 public class GenericListRatherThanRawListRefactoring extends AbstractClassSubstituteRefactoring {
-    private static Map<String, String[]> canBeCastedTo = new HashMap<String, String[]>();
+    private static final Map<String, String[]> CAN_BE_CASTED_TO = new HashMap<String, String[]>();
 
     static {
-        canBeCastedTo.put("java.lang.Object", new String[]{"java.lang.Object"});
-        canBeCastedTo.put("java.lang.Cloneable", new String[]{"java.lang.Cloneable", "java.lang.Object"});
-        canBeCastedTo.put("java.io.Serializable",
+        CAN_BE_CASTED_TO.put("java.lang.Object", new String[]{"java.lang.Object"});
+        CAN_BE_CASTED_TO.put("java.lang.Cloneable", new String[]{"java.lang.Cloneable", "java.lang.Object"});
+        CAN_BE_CASTED_TO.put("java.io.Serializable",
                 new String[]{"java.io.Serializable", "java.lang.Object"});
-        canBeCastedTo.put("java.util.Collection", new String[]{"java.util.Collection", "java.lang.Object"});
-        canBeCastedTo.put("java.util.List", new String[]{"java.util.List", "java.lang.Object"});
-        canBeCastedTo.put("java.util.AbstractList",
+        CAN_BE_CASTED_TO.put("java.util.Collection", new String[]{"java.util.Collection", "java.lang.Object"});
+        CAN_BE_CASTED_TO.put("java.util.List", new String[]{"java.util.List", "java.lang.Object"});
+        CAN_BE_CASTED_TO.put("java.util.AbstractList",
                 new String[]{"java.util.AbstractList", "java.util.List", "java.lang.Object"});
-        canBeCastedTo.put("java.util.AbstractCollection",
+        CAN_BE_CASTED_TO.put("java.util.AbstractCollection",
                 new String[]{"java.util.AbstractCollection", "java.util.Collection", "java.lang.Object"});
-        canBeCastedTo.put("java.util.LinkedList",
+        CAN_BE_CASTED_TO.put("java.util.LinkedList",
                 new String[]{"java.util.LinkedList", "java.util.AbstractList", "java.util.List",
                     "java.util.AbstractCollection", "java.util.Collection",
                     "java.io.Serializable", "java.lang.Cloneable", "java.lang.Object"});
-        canBeCastedTo.put("java.util.ArrayList",
+        CAN_BE_CASTED_TO.put("java.util.ArrayList",
                 new String[]{"java.util.ArrayList", "java.util.AbstractList", "java.util.List",
                     "java.util.AbstractCollection", "java.util.Collection",
                     "java.io.Serializable", "java.lang.Cloneable", "java.lang.Object"});
@@ -316,7 +316,7 @@ public class GenericListRatherThanRawListRefactoring extends AbstractClassSubsti
     protected boolean isTypeCompatible(final ITypeBinding variableType,
             final ITypeBinding refType) {
         return super.isTypeCompatible(variableType, refType)
-                || hasType(variableType, canBeCastedTo.getOrDefault(refType.getErasure().getQualifiedName(),
+                || hasType(variableType, CAN_BE_CASTED_TO.getOrDefault(refType.getErasure().getQualifiedName(),
                         new String[0]));
     }
 }

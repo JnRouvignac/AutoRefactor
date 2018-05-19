@@ -48,20 +48,20 @@ import org.eclipse.jdt.core.dom.Type;
 
 /** See {@link #getDescription()} method. */
 public class SetRatherThanMapRefactoring extends AbstractClassSubstituteRefactoring {
-    private static Map<String, String[]> canBeCastedTo = new HashMap<String, String[]>();
+    private static final Map<String, String[]> CAN_BE_CASTED_TO = new HashMap<String, String[]>();
 
     static {
-        canBeCastedTo.put("java.lang.Object", new String[]{"java.lang.Object"});
-        canBeCastedTo.put("java.lang.Cloneable", new String[]{"java.lang.Cloneable", "java.lang.Object"});
-        canBeCastedTo.put("java.io.Serializable",
+        CAN_BE_CASTED_TO.put("java.lang.Object", new String[]{"java.lang.Object"});
+        CAN_BE_CASTED_TO.put("java.lang.Cloneable", new String[]{"java.lang.Cloneable", "java.lang.Object"});
+        CAN_BE_CASTED_TO.put("java.io.Serializable",
                 new String[]{"java.io.Serializable", "java.lang.Object"});
-        canBeCastedTo.put("java.util.Map", new String[]{"java.util.Map", "java.lang.Object"});
-        canBeCastedTo.put("java.util.AbstractMap",
+        CAN_BE_CASTED_TO.put("java.util.Map", new String[]{"java.util.Map", "java.lang.Object"});
+        CAN_BE_CASTED_TO.put("java.util.AbstractMap",
                 new String[]{"java.util.AbstractMap", "java.lang.Cloneable", "java.lang.Object"});
-        canBeCastedTo.put("java.util.TreeMap",
+        CAN_BE_CASTED_TO.put("java.util.TreeMap",
                 new String[]{"java.util.TreeMap", "java.io.Serializable", "java.util.Map",
                     "java.util.AbstractMap", "java.lang.Cloneable", "java.lang.Object"});
-        canBeCastedTo.put("java.util.HashMap",
+        CAN_BE_CASTED_TO.put("java.util.HashMap",
                 new String[]{"java.util.HashMap", "java.io.Serializable", "java.util.Map",
                     "java.util.AbstractMap", "java.lang.Cloneable", "java.lang.Object"});
     }
@@ -226,7 +226,7 @@ public class SetRatherThanMapRefactoring extends AbstractClassSubstituteRefactor
     protected boolean isTypeCompatible(final ITypeBinding variableType,
             final ITypeBinding refType) {
         return super.isTypeCompatible(variableType, refType)
-                || hasType(variableType, canBeCastedTo.getOrDefault(refType.getErasure().getQualifiedName(),
+                || hasType(variableType, CAN_BE_CASTED_TO.getOrDefault(refType.getErasure().getQualifiedName(),
                         new String[0]));
     }
 }

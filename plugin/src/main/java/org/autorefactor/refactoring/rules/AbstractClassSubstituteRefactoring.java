@@ -48,7 +48,6 @@ import static org.eclipse.jdt.core.dom.ASTNode.VARIABLE_DECLARATION_STATEMENT;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.InterruptableVisitor;
@@ -188,14 +187,14 @@ public abstract class AbstractClassSubstituteRefactoring extends AbstractRefacto
     /**
      * True if the type of the variable is compatible.
      *
-     * @param variableType The type of the variable.
-     * @param refType The type of the node.
+     * @param targetType The type of the destination.
+     * @param sourceType The type of the node.
      *
      * @return true if the type of the variable is compatible.
      */
-    protected boolean isTypeCompatible(final ITypeBinding variableType,
-            final ITypeBinding refType) {
-        return Objects.equals(variableType, refType);
+    protected boolean isTypeCompatible(final ITypeBinding targetType,
+            final ITypeBinding sourceType) {
+        return (targetType != null) && targetType.isAssignmentCompatible(sourceType);
     }
 
     @Override

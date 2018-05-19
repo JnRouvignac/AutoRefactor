@@ -283,11 +283,11 @@ public class RemoveUnnecessaryCastRefactoring extends AbstractRefactoringRule {
     }
 
     private boolean isPrimitiveTypeNarrowing(CastExpression node) {
-        final ITypeBinding typeBinding1 = node.getType().resolveBinding();
-        final ITypeBinding typeBinding2 = node.getExpression().resolveTypeBinding();
-        return isPrimitive(typeBinding1)
-                && isPrimitive(typeBinding2)
-                && isAssignmentCompatible(typeBinding1, typeBinding2);
+        final ITypeBinding castTypeBinding = node.getType().resolveBinding();
+        final ITypeBinding exprTypeBinding = node.getExpression().resolveTypeBinding();
+        return isPrimitive(castTypeBinding)
+                && isPrimitive(exprTypeBinding)
+                && isAssignmentCompatible(castTypeBinding, exprTypeBinding);
     }
 
     private boolean isAssignmentCompatible(Expression expr, Type type) {
@@ -311,9 +311,9 @@ public class RemoveUnnecessaryCastRefactoring extends AbstractRefactoringRule {
         return false;
     }
 
-    private boolean isAssignmentCompatible(final ITypeBinding binding1, final ITypeBinding binding2) {
-        if (binding1 != null && binding2 != null) {
-            return binding1.isAssignmentCompatible(binding2);
+    private boolean isAssignmentCompatible(final ITypeBinding targetBinding, final ITypeBinding sourceBinding) {
+        if (targetBinding != null && sourceBinding != null) {
+            return targetBinding.isAssignmentCompatible(sourceBinding);
         }
         return false;
     }
