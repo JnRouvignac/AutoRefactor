@@ -55,7 +55,6 @@ import org.eclipse.jdt.core.dom.ForStatement;
 import org.eclipse.jdt.core.dom.IBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.InfixExpression;
-import org.eclipse.jdt.core.dom.NumberLiteral;
 import org.eclipse.jdt.core.dom.PostfixExpression;
 import org.eclipse.jdt.core.dom.PrefixExpression;
 import org.eclipse.jdt.core.dom.SimpleName;
@@ -120,19 +119,23 @@ public class HotSpotIntrinsicedAPIsRefactoring extends AbstractRefactoringRule {
         collectUniqueIndex(node, params);
         final IVariableBinding incrementedIdx = getUniqueIncrementedVariable(node);
         final List<Statement> stmts = asList(node.getBody());
+
         if (equalNotNull(params.indexVarBinding, incrementedIdx)
                 && stmts.size() == 1) {
             collectLength(node.getExpression(), incrementedIdx, params);
 
             final Assignment as = asExpression(stmts.get(0), Assignment.class);
+
             if (hasOperator(as, ASSIGN)) {
                 final Expression lhs = as.getLeftHandSide();
                 final Expression rhs = as.getRightHandSide();
+
                 if (lhs instanceof ArrayAccess && rhs instanceof ArrayAccess) {
                     final ArrayAccess aaLHS = (ArrayAccess) lhs;
                     final ArrayAccess aaRHS = (ArrayAccess) rhs;
                     params.destArrayExpr = aaLHS.getArray();
                     params.srcArrayExpr = aaRHS.getArray();
+
                     if (haveSameType(params.srcArrayExpr, params.destArrayExpr)) {
                         params.destPos = calcIndex(aaLHS.getIndex(), params);
                         params.srcPos = calcIndex(aaRHS.getIndex(), params);
@@ -145,25 +148,33 @@ public class HotSpotIntrinsicedAPIsRefactoring extends AbstractRefactoringRule {
     }
 
     private Expression calcIndex(Expression index, SystemArrayCopyParams params) {
+        final ASTBuilder b = this.ctx.getASTBuilder();
+
         if (index instanceof SimpleName) {
             final IVariableBinding idxVar = getVariableBinding(index);
+
             if (equalNotNull(params.indexVarBinding, idxVar)) {
-                return params.indexStartPos;
+                return b.copy(params.indexStartPos);
             }
         } else if (index instanceof InfixExpression) {
             final InfixExpression ie = (InfixExpression) index;
+
             if (!ie.hasExtendedOperands()
                     && hasOperator(ie, PLUS)) {
                 final Expression leftOp = ie.getLeftOperand();
                 final Expression rightOp = ie.getRightOperand();
+
                 if (leftOp instanceof SimpleName) {
                     final IVariableBinding idxVar = getVariableBinding(leftOp);
+
                     if (equalNotNull(params.indexVarBinding, idxVar)) {
                         return plus(rightOp, params.indexStartPos);
                     }
                 }
+
                 if (rightOp instanceof SimpleName) {
                     final IVariableBinding idxVar = getVariableBinding(rightOp);
+
                     if (equalNotNull(params.indexVarBinding, idxVar)) {
                         return plus(leftOp, params.indexStartPos);
                     }
@@ -173,35 +184,17 @@ public class HotSpotIntrinsicedAPIsRefactoring extends AbstractRefactoringRule {
         return null;
     }
 
-    private Expression minus(Expression expr1, Expression expr2) {
-        final ASTBuilder b = this.ctx.getASTBuilder();
-
-        final Integer expr1Value = intValue(expr1);
-        final Integer expr2Value = intValue(expr2);
-        if (expr1Value != null && expr2Value != null) {
-            return b.int0(expr1Value - expr2Value);
-        } else if (equalNotNull(expr1Value, 0)) {
-            throw new NotImplementedException(expr2, "Code is not implemented for negating expr2: " + expr2);
-        } else if (equalNotNull(expr2Value, 0)) {
-            return expr1;
-        }
-        return b.infixExpr(
-                b.copy(expr1),
-                MINUS,
-                b.copy(expr2));
-    }
-
     private Expression plus(Expression expr1, Expression expr2) {
         final ASTBuilder b = this.ctx.getASTBuilder();
-
         final Integer expr1Value = intValue(expr1);
         final Integer expr2Value = intValue(expr2);
+
         if (expr1Value != null && expr2Value != null) {
             return b.int0(expr1Value + expr2Value);
         } else if (equalNotNull(expr1Value, 0)) {
-            return expr2;
+            return b.copy(expr2);
         } else if (equalNotNull(expr2Value, 0)) {
-            return expr1;
+            return b.copy(expr1);
         }
         return b.infixExpr(
                 b.copy(expr1),
@@ -209,14 +202,58 @@ public class HotSpotIntrinsicedAPIsRefactoring extends AbstractRefactoringRule {
                 b.copy(expr2));
     }
 
-    private Integer intValue(Expression expr) {
-        if (expr instanceof NumberLiteral) {
-            try {
-                return Integer.parseInt(((NumberLiteral) expr).getToken());
-            } catch (NumberFormatException ignored) {
-                // this is not an int, nothing to do
-            }
+    private Expression minus(Expression expr1, Expression expr2) {
+        final ASTBuilder b = this.ctx.getASTBuilder();
+        final Integer expr1Value = intValue(expr1);
+        final Integer expr2Value = intValue(expr2);
+
+        if (expr1Value != null && expr2Value != null) {
+            return b.int0(expr1Value - expr2Value);
+        } else if (equalNotNull(expr1Value, 0)) {
+            throw new NotImplementedException(expr2, "Code is not implemented for negating expr2: "
+                    + expr2);
+        } else if (equalNotNull(expr2Value, 0)) {
+            return b.copy(expr1);
         }
+        return b.infixExpr(
+                b.copy(expr1),
+                MINUS,
+                b.copy(expr2));
+    }
+
+    private Expression minusPlusOne(Expression expr1, Expression expr2) {
+        final ASTBuilder b = this.ctx.getASTBuilder();
+        final Integer expr1Value = intValue(expr1);
+        final Integer expr2Value = intValue(expr2);
+
+        if (expr1Value != null && expr2Value != null) {
+            return b.int0(expr1Value - expr2Value + 1);
+        } else if (equalNotNull(expr1Value, 0)) {
+            throw new NotImplementedException(expr2, "Code is not implemented for negating expr2: "
+                    + expr2);
+        } else if (equalNotNull(expr2Value, 0)) {
+            return b.infixExpr(
+                    b.copy(expr1),
+                    PLUS,
+                    ctx.getAST().newNumberLiteral("1"));
+        }
+
+        return b.infixExpr(
+                b.infixExpr(
+                        b.copy(expr1),
+                        MINUS,
+                        b.copy(expr2)),
+                PLUS,
+                ctx.getAST().newNumberLiteral("1"));
+    }
+
+    private Integer intValue(Expression expr) {
+        Object literal = expr.resolveConstantExpressionValue();
+
+        if (literal != null && literal instanceof Number) {
+            return ((Number) literal).intValue();
+        }
+
         return null;
     }
 
@@ -224,30 +261,24 @@ public class HotSpotIntrinsicedAPIsRefactoring extends AbstractRefactoringRule {
             final IVariableBinding incrementedIdx, final SystemArrayCopyParams params) {
         if (condition instanceof InfixExpression) {
             final InfixExpression ie = (InfixExpression) condition;
-            if (hasOperator(ie, LESS)) {
-                IVariableBinding conditionIdx = getVariableBinding(ie.getLeftOperand());
-                if (equalNotNull(incrementedIdx, conditionIdx)) {
-                    params.length = ie.getRightOperand();
-                }
-            } else if (hasOperator(ie, LESS_EQUALS)) {
-                IVariableBinding conditionIdx = getVariableBinding(ie.getLeftOperand());
-                if (equalNotNull(incrementedIdx, conditionIdx)) {
-                    params.length = minus(
-                            plus(ie.getRightOperand(), ctx.getAST().newNumberLiteral("1")),
-                            params.indexStartPos);
-                }
-            } else if (hasOperator(ie, GREATER)) {
-                IVariableBinding conditionIdx = getVariableBinding(ie.getRightOperand());
-                if (equalNotNull(incrementedIdx, conditionIdx)) {
-                    params.length = ie.getLeftOperand();
-                }
-            } else if (hasOperator(ie, GREATER_EQUALS)) {
-                IVariableBinding conditionIdx = getVariableBinding(ie.getRightOperand());
-                if (equalNotNull(incrementedIdx, conditionIdx)) {
-                    params.length = minus(
-                            plus(ie.getLeftOperand(), ctx.getAST().newNumberLiteral("1")),
-                            params.indexStartPos);
-                }
+            if (hasOperator(ie, LESS, LESS_EQUALS)) {
+                collectLength(incrementedIdx, params, ie, ie.getLeftOperand(), ie.getRightOperand());
+            } else if (hasOperator(ie, GREATER, GREATER_EQUALS)) {
+                collectLength(incrementedIdx, params, ie, ie.getRightOperand(), ie.getLeftOperand());
+            }
+        }
+    }
+
+    private void collectLength(final IVariableBinding incrementedIdx, final SystemArrayCopyParams params,
+            final InfixExpression ie, final Expression variable, final Expression boundary) {
+        IVariableBinding conditionIdx = getVariableBinding(variable);
+        if (equalNotNull(incrementedIdx, conditionIdx)) {
+            final ASTBuilder b = ctx.getASTBuilder();
+
+            if (hasOperator(ie, LESS_EQUALS, GREATER_EQUALS)) {
+                params.length = minusPlusOne(boundary, params.indexStartPos);
+            } else {
+                params.length = minus(boundary, params.indexStartPos);
             }
         }
     }
@@ -263,10 +294,10 @@ public class HotSpotIntrinsicedAPIsRefactoring extends AbstractRefactoringRule {
         final ASTBuilder b = this.ctx.getASTBuilder();
         return replaceWithSystemArrayCopy(node,
                 b.copy(params.srcArrayExpr),
-                b.copy(params.srcPos),
+                params.srcPos,
                 b.copy(params.destArrayExpr),
-                b.copy(params.destPos),
-                b.copy(params.length));
+                params.destPos,
+                params.length);
     }
 
     private boolean replaceWithSystemArrayCopy(ForStatement node,
@@ -292,12 +323,14 @@ public class HotSpotIntrinsicedAPIsRefactoring extends AbstractRefactoringRule {
         if (initializers(node).size() != 1) {
             return;
         }
+
         final Expression initializer0 = initializers(node).get(0);
+
         if (initializer0 instanceof VariableDeclarationExpression) {
             final VariableDeclarationExpression vde =
                     (VariableDeclarationExpression) initializer0;
             if (isPrimitive(vde, "int") && fragments(vde).size() == 1) {
-                // this must be the array index
+                // This must be the array index
                 VariableDeclarationFragment vdf = fragments(vde).get(0);
                 if (vdf.getExtraDimensions() == 0) {
                     params.indexStartPos = vdf.getInitializer();
@@ -309,7 +342,7 @@ public class HotSpotIntrinsicedAPIsRefactoring extends AbstractRefactoringRule {
             final Assignment as = (Assignment) initializer0;
             if (hasOperator(as, ASSIGN)
                     && isPrimitive(as.resolveTypeBinding(), "int")) {
-                // this must be the array index
+                // This must be the array index
                 params.indexStartPos = as.getRightHandSide();
                 final Expression lhs = as.getLeftHandSide();
                 if (lhs instanceof SimpleName) {

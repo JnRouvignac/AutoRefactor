@@ -28,7 +28,7 @@ package org.autorefactor.refactoring.rules.samples_out;
 public class HotSpotIntrinsicedAPIsSample {
 
     public static void replaceBySystemArrayCopyBasic(int[] src, int[] dest) {
-        // Keep this comment 1
+        // Keep this comment
         try {
             System.arraycopy(src, 0, dest, 0, 3);
         } catch (IndexOutOfBoundsException e) {
@@ -49,7 +49,7 @@ public class HotSpotIntrinsicedAPIsSample {
     }
 
     public static void replaceBySystemArrayCopyComplexUpperBound(int[] src, int[] dest) {
-        // Keep this comment 1
+        // Keep this comment
         try {
             System.arraycopy(src, 0, dest, 0, src.length);
         } catch (IndexOutOfBoundsException e) {
@@ -58,7 +58,7 @@ public class HotSpotIntrinsicedAPIsSample {
     }
 
     public static void replaceBySystemArrayCopyAssignIndexVariable(int[] src, int[] dest, int i) {
-        // Keep this comment 1
+        // Keep this comment
         try {
             System.arraycopy(src, 0, dest, 0, 3);
         } catch (IndexOutOfBoundsException e) {
@@ -67,7 +67,7 @@ public class HotSpotIntrinsicedAPIsSample {
     }
 
     public static void replaceBySystemArrayCopyWithConstantSrcPos(int[] src, int[] dest) {
-        // Keep this comment 1
+        // Keep this comment
         try {
             System.arraycopy(src, 1, dest, 0, src.length - 1);
         } catch (IndexOutOfBoundsException e) {
@@ -76,7 +76,7 @@ public class HotSpotIntrinsicedAPIsSample {
     }
 
     public static void replaceBySystemArrayCopyWithArgumentSrcPos(int[] src, int startPos, int[] dest) {
-        // Keep this comment 1
+        // Keep this comment
         try {
             System.arraycopy(src, startPos, dest, 0, dest.length);
         } catch (IndexOutOfBoundsException e) {
@@ -85,7 +85,7 @@ public class HotSpotIntrinsicedAPIsSample {
     }
 
     public static void replaceBySystemArrayCopyWithDestPos(int[] src, int[] dest) {
-        // Keep this comment 1
+        // Keep this comment
         try {
             System.arraycopy(src, 0, dest, 1, src.length - 1);
         } catch (IndexOutOfBoundsException e) {
@@ -94,7 +94,7 @@ public class HotSpotIntrinsicedAPIsSample {
     }
 
     public static void replaceBySystemArrayCopyWithLowerBound(int[] src, int[] dest) {
-        // Keep this comment 1
+        // Keep this comment
         try {
             System.arraycopy(src, 2, dest, 3, 3);
         } catch (IndexOutOfBoundsException e) {
@@ -102,8 +102,39 @@ public class HotSpotIntrinsicedAPIsSample {
         }
     }
 
+    public static int[] replaceBySystemArrayCopyWithOffset(int[] src, int[] dest) {
+        // Keep this comment
+        try {
+            System.arraycopy(src, 2, dest, 2, 5);
+        } catch (IndexOutOfBoundsException e) {
+            throw new ArrayIndexOutOfBoundsException(e.getMessage());
+        }
+        return dest;
+    }
+
+    public static int[] replaceBySystemArrayCopyWithBoundaryVariable(int[] src, int[] dest, int boundary) {
+        // Keep this comment
+        try {
+            System.arraycopy(src, 2, dest, 2, boundary - 2);
+        } catch (IndexOutOfBoundsException e) {
+            throw new ArrayIndexOutOfBoundsException(e.getMessage());
+        }
+        return dest;
+    }
+
+    public static int[] replaceBySystemArrayCopyWithOffsetAndBoundaryVariable(int[] src, int[] dest, int offset,
+            int boundary) {
+        // Keep this comment
+        try {
+            System.arraycopy(src, offset, dest, offset, boundary - offset);
+        } catch (IndexOutOfBoundsException e) {
+            throw new ArrayIndexOutOfBoundsException(e.getMessage());
+        }
+        return dest;
+    }
+
     public static void replaceBySystemArrayCopyRevertedCondition(int[] src, int[] dest) {
-        // Keep this comment 1
+        // Keep this comment
         try {
             System.arraycopy(src, 0, dest, 0, 3);
         } catch (IndexOutOfBoundsException e) {
@@ -112,7 +143,7 @@ public class HotSpotIntrinsicedAPIsSample {
     }
 
     public static void replaceBySystemArrayCopyRevertedCondition2(int[] src, int[] dest) {
-        // Keep this comment 1
+        // Keep this comment
         try {
             System.arraycopy(src, 0, dest, 0, 4);
         } catch (IndexOutOfBoundsException e) {

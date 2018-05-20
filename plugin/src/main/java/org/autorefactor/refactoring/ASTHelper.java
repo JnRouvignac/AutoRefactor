@@ -1407,8 +1407,8 @@ public final class ASTHelper {
      * @param operator the operator to test
      * @return true if the provided node has the provided operator, false otherwise.
      */
-    public static boolean hasOperator(Assignment node, Assignment.Operator operator) {
-        return node != null && operator.equals(node.getOperator());
+    public static boolean hasOperator(Assignment node, Assignment.Operator... operator) {
+        return node != null && Arrays.asList(operator).contains(node.getOperator());
     }
 
     /**
@@ -1418,8 +1418,8 @@ public final class ASTHelper {
      * @param operator the operator to test
      * @return true if the provided node has the provided operator, false otherwise.
      */
-    public static boolean hasOperator(InfixExpression node, InfixExpression.Operator operator) {
-        return node != null && operator.equals(node.getOperator());
+    public static boolean hasOperator(InfixExpression node, InfixExpression.Operator... operator) {
+        return node != null && Arrays.asList(operator).contains(node.getOperator());
     }
 
     /**
@@ -1429,8 +1429,8 @@ public final class ASTHelper {
      * @param operator the operator to test
      * @return true if the provided node has the provided operator, false otherwise.
      */
-    public static boolean hasOperator(PostfixExpression node, PostfixExpression.Operator operator) {
-        return node != null && operator.equals(node.getOperator());
+    public static boolean hasOperator(PostfixExpression node, PostfixExpression.Operator... operator) {
+        return node != null && Arrays.asList(operator).contains(node.getOperator());
     }
 
     /**
@@ -1440,8 +1440,8 @@ public final class ASTHelper {
      * @param operator the operator to test
      * @return true if the provided node has the provided operator, false otherwise.
      */
-    public static boolean hasOperator(PrefixExpression node, PrefixExpression.Operator operator) {
-        return node != null && operator.equals(node.getOperator());
+    public static boolean hasOperator(PrefixExpression node, PrefixExpression.Operator... operator) {
+        return node != null && Arrays.asList(operator).contains(node.getOperator());
     }
 
     /**

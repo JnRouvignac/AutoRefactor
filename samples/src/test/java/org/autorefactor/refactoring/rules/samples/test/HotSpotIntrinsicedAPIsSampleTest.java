@@ -121,6 +121,27 @@ public class HotSpotIntrinsicedAPIsSampleTest {
         assertArrayEquals(dest1, dest2);
     }
 
+    @Test
+    public void replaceBySystemArrayCopyWithOffset() {
+        sampleIn.replaceBySystemArrayCopyWithOffset(src, dest1);
+        sampleOut.replaceBySystemArrayCopyWithOffset(src, dest2);
+        assertArrayEquals(dest1, dest2);
+    }
+
+    @Test
+    public void replaceBySystemArrayCopyWithBoundaryVariable() {
+        sampleIn.replaceBySystemArrayCopyWithBoundaryVariable(src, dest1, 5);
+        sampleOut.replaceBySystemArrayCopyWithBoundaryVariable(src, dest2, 5);
+        assertArrayEquals(dest1, dest2);
+    }
+
+    @Test
+    public void replaceBySystemArrayCopyWithOffsetAndBoundaryVariable() {
+        sampleIn.replaceBySystemArrayCopyWithOffsetAndBoundaryVariable(src, dest1, 2, 5);
+        sampleOut.replaceBySystemArrayCopyWithOffsetAndBoundaryVariable(src, dest2, 2, 5);
+        assertArrayEquals(dest1, dest2);
+    }
+
     private void assertArrayEquals(int[] a1, int[] a2) {
         assertEquals(toList(a1), toList(a2));
     }
