@@ -87,10 +87,8 @@ public final class AllRefactoringRules {
                 new TernaryOperatorRatherThanDuplicateConditionsRefactoring(),
                 // Must come after BooleanRefactoring, which may remove some targets
                 new WorkWithNullCheckedExpressionFirstRefactoring(),
-                new AddBracketsToControlStatementRefactoring(),
                 new InvertEqualsRefactoring(),
                 new ComparisonRefactoring(),
-                new SimplifyExpressionRefactoring(),
                 new RemoveUnneededThisExpressionRefactoring(),
                 new StringRatherThanNewStringRefactoring(),
                 new StringRefactoring(),
@@ -145,23 +143,17 @@ public final class AllRefactoringRules {
                 new HashMapRatherThanTreeMapRefactoring(),
                 new HashSetRatherThanTreeSetRefactoring(),
                 new UseStringContainsRefactoring(),
-                new PushNegationDownRefactoring(),
                 new CommentsRefactoring(),
                 new RemoveFieldsDefaultValuesRefactoring(),
-                new RemoveUnnecessaryLocalBeforeReturnRefactoring(),
-                new RemoveUnnecessaryCastRefactoring(),
-                new RemoveUselessModifiersRefactoring(),
                 new RemoveAbstractFromInterfaceRefactoring(),
                 new StaticConstantRatherThanInstanceConstantRefactoring(),
                 new RemoveOverridenAssignmentRefactoring(),
                 new HotSpotIntrinsicedAPIsRefactoring(),
                 new AnnotationRefactoring(),
                 new TryWithResourceRefactoring(),
-                new RemoveSemiColonRefactoring(),
                 // FIXME it would be nice if it was only enabled when testng jar is detected for the project
                 new TestNGAssertRefactoring(),
                 new JUnitAssertRefactoring(),
-                new ReplaceQualifiedNamesBySimpleNamesRefactoring(),
                 new RemoveEmptyLinesRefactoring(),
                 new RemoveEmptySuperConstrInvocationRefactoring(),
                 new ImplicitDefaultConstructorRatherThanWrittenOneRefactoring(),
@@ -171,7 +163,17 @@ public final class AllRefactoringRules {
                 new EnumSetRatherThanHashSetRefactoring(),
                 new RemoveUncheckedThrowsClausesRefactoring(),
                 new CapitalizeLongLiteralRefactoring(),
-                new SwitchRefactoring());
+                new SwitchRefactoring(),
+
+                // Those refactorings should end the list because they clean the previous changes
+                new RemoveSemiColonRefactoring(),
+                new AddBracketsToControlStatementRefactoring(),
+                new RemoveUnnecessaryLocalBeforeReturnRefactoring(),
+                new RemoveUselessModifiersRefactoring(),
+                new RemoveUnnecessaryCastRefactoring(),
+                new PushNegationDownRefactoring(),
+                new ReplaceQualifiedNamesBySimpleNamesRefactoring(),
+                new SimplifyExpressionRefactoring());
     }
 
     private static List<RefactoringRule> newArrayList(RefactoringRule... refactorings) {
