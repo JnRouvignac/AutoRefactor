@@ -31,36 +31,49 @@ import java.util.List;
 
 public class RemoveEmptyStatementSample {
 
-    public void removeEmptyStatement(boolean b, String[] args) {
+    public void removeEmptyStatement(boolean b, int i, String[] args) {
         if (b) System.out.println(b);
         try {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        int i = 0;
+    }
+
+    public void removeEmptyBlock(boolean b, int i, String[] args) {
+        if (b) System.out.println(b);
+        try {
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void doNotRemoveEmptyStatement(boolean b) {
         if (b);
         else System.out.println(b);
+        if (b) {}
+        else System.out.println(b);
     }
 
     public void doNotRemoveWithMethodCall(List<String> filledList) {
         if (filledList.remove("foo"));
+        if (filledList.remove("foo")) {}
     }
 
-    public boolean doNotRemoveWithAssignment(boolean b) {
-        if (b = true);
-        return b;
+    public boolean doNotRemoveWithAssignment(boolean b1, boolean b2) {
+        if (b1 = true);
+        if (b2 = true) {}
+        return b1;
     }
 
     public int doNotRemoveWithIncrement(int i) {
         if (i++ == 0);
+        if (i++ == 0) {}
         return i;
     }
 
     public int doNotRemoveWhileWithIncrement(int i) {
         while (i++ == 100);
+        while (i++ == 100) {}
         return i;
     }
 
@@ -70,6 +83,7 @@ public class RemoveEmptyStatementSample {
 
     public int doNotRemoveDoWhileWithIncrement(int i) {
         do; while (i++ == 100);
+        do {} while (i++ == 100);
         return i;
     }
 
@@ -79,11 +93,13 @@ public class RemoveEmptyStatementSample {
 
     public int doNotRemoveForWithExternalVar(int myValue) {
         for (myValue = 0; myValue < 1000; myValue = myValue * myValue);
+        for (myValue = 0; myValue < 1000; myValue = myValue * myValue) {}
         return myValue;
     }
 
     public int doNotRemoveForWithDecrement(List<String> filledList, int init) {
         for (String aString : filledList.toArray(new String[init--]));
+        for (String aString : filledList.toArray(new String[init--])) {}
         return init;
     }
 
@@ -91,6 +107,7 @@ public class RemoveEmptyStatementSample {
 
         private int readCount = 0;
 
+        @Override
         public Iterator<E> iterator() {
             readCount++;
             return super.iterator();
@@ -103,6 +120,7 @@ public class RemoveEmptyStatementSample {
 
     public int doNotRemoveForWithActiveIterator(ActiveIteratorList<String> activeList) {
         for (String aString : activeList);
+        for (String aString : activeList) {}
 
         return activeList.getReadCount();
     }

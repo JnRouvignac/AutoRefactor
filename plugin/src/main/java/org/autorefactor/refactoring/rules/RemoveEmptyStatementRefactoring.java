@@ -66,7 +66,7 @@ public class RemoveEmptyStatementRefactoring extends AbstractRefactoringRule {
      * @return the description.
      */
     public String getDescription() {
-        return "Removes lone semicolons.";
+        return "Removes structural statements with no substatement.";
     }
 
     /**
@@ -80,19 +80,38 @@ public class RemoveEmptyStatementRefactoring extends AbstractRefactoringRule {
 
     @Override
     public boolean visit(EmptyStatement node) {
+        return maybeRemoveEmptyStmt(node);
+    }
+
+    @Override
+    public boolean visit(Block node) {
+        if (node.statements() == null || node.statements().isEmpty()) {
+            return maybeRemoveEmptyStmt(node);
+        }
+
+        return VISIT_SUBTREE;
+    }
+
+    private boolean maybeRemoveEmptyStmt(Statement node) {
         ASTNode parent = node.getParent();
+
         if (parent instanceof Block) {
             this.ctx.getRefactorings().remove(node);
             return DO_NOT_VISIT_SUBTREE;
         }
+
         parent = getParentIgnoring(node, Block.class);
         if (parent instanceof IfStatement) {
             final IfStatement is = (IfStatement) parent;
+
             if (isPassive(is.getExpression())) {
                 final List<Statement> thenStmts = asList(is.getThenStatement());
                 final List<Statement> elseStmts = asList(is.getElseStatement());
-                final boolean thenIsEmptyStmt = thenStmts.size() == 1 && is(thenStmts.get(0), EmptyStatement.class);
-                final boolean elseIsEmptyStmt = elseStmts.size() == 1 && is(elseStmts.get(0), EmptyStatement.class);
+                final boolean thenIsEmptyStmt = thenStmts.isEmpty()
+                        || (thenStmts.size() == 1 && is(thenStmts.get(0), EmptyStatement.class));
+                final boolean elseIsEmptyStmt = elseStmts.isEmpty()
+                        || (elseStmts.size() == 1 && is(elseStmts.get(0), EmptyStatement.class));
+
                 if (thenIsEmptyStmt && elseIsEmptyStmt) {
                     this.ctx.getRefactorings().remove(parent);
                     return DO_NOT_VISIT_SUBTREE;
@@ -139,12 +158,12 @@ public class RemoveEmptyStatementRefactoring extends AbstractRefactoringRule {
         return true;
     }
 
-    private boolean maybeRemoveEmptyStmtBody(final EmptyStatement node, final Statement stmt, final Statement body) {
-        final List<Statement> bodyStmts = asList(body);
-        if (bodyStmts.size() == 1 && bodyStmts.contains(node)) {
+    private boolean maybeRemoveEmptyStmtBody(final Statement node, final Statement stmt, final Statement body) {
+        if (body == node) {
             this.ctx.getRefactorings().remove(stmt);
             return DO_NOT_VISIT_SUBTREE;
         }
+
         return VISIT_SUBTREE;
     }
 }
