@@ -60,6 +60,7 @@ import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.InfixExpression.Operator;
 import org.eclipse.jdt.core.dom.MethodInvocation;
+import org.eclipse.jdt.core.dom.Name;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.StringLiteral;
 
@@ -129,8 +130,6 @@ public class StringBuilderRefactoring extends AbstractRefactoringRule {
                     new LinkedList<Pair<ITypeBinding, Expression>>();
             final Expression lastExpr = readAppendMethod(node.getExpression(), allAppendedStrings,
                     new AtomicBoolean(false), new AtomicBoolean(false));
-            // TODO new StringBuffer().append(" bla").append("bla").toString();
-            // outputs " blabla"
             if (lastExpr instanceof ClassInstanceCreation) {
                 // Replace with String concatenation
                 this.ctx.getRefactorings().replace(node,
@@ -234,18 +233,19 @@ public class StringBuilderRefactoring extends AbstractRefactoringRule {
                     final List<Expression> reversed = new ArrayList<Expression>(extendedOperands(ie));
                     Collections.reverse(reversed);
 
-                    if (isValuedStringLiteral(reversed.get(0)) && !results.isEmpty()
-                            && isValuedStringLiteral(results.get(0).getSecond())) {
+                    if (isValuedStringLiteralOrConstant(reversed.get(0)) && !results.isEmpty()
+                            && isValuedStringLiteralOrConstant(results.get(0).getSecond())) {
                         isRefactoringNeeded.set(true);
                     }
                     for (final Expression op : reversed) {
-                        if (!isValuedStringLiteral(reversed.get(0))) {
+                        if (!isValuedStringLiteralOrConstant(reversed.get(0))) {
                             isRefactoringNeeded.set(true);
                         }
                         readSubExpressions(op, results, new AtomicBoolean(false));
                     }
                 }
-                if (!isValuedStringLiteral(ie.getRightOperand()) || !isValuedStringLiteral(ie.getLeftOperand())) {
+                if (!isValuedStringLiteralOrConstant(ie.getRightOperand())
+                        || !isValuedStringLiteralOrConstant(ie.getLeftOperand())) {
                     isRefactoringNeeded.set(true);
                 }
                 readSubExpressions(ie.getRightOperand(), results, new AtomicBoolean(false));
@@ -253,8 +253,8 @@ public class StringBuilderRefactoring extends AbstractRefactoringRule {
                 return;
             }
         }
-        if (isValuedStringLiteral(arg) && !results.isEmpty()
-                && isValuedStringLiteral(results.get(0).getSecond())) {
+        if (isValuedStringLiteralOrConstant(arg) && !results.isEmpty()
+                && isValuedStringLiteralOrConstant(results.get(0).getSecond())) {
             isRefactoringNeeded.set(true);
         }
         results.addFirst(Pair.<ITypeBinding, Expression>of(null, arg));
@@ -264,20 +264,27 @@ public class StringBuilderRefactoring extends AbstractRefactoringRule {
         if (!hasOperator(node, PLUS) || !hasType(node, "java.lang.String")) {
             return false;
         }
-        if (!isValuedStringLiteral(node.getLeftOperand())
-                || !isValuedStringLiteral(node.getRightOperand())) {
+        if (!isValuedStringLiteralOrConstant(node.getLeftOperand())
+                || !isValuedStringLiteralOrConstant(node.getRightOperand())) {
             return true;
         }
         for (Expression expr : extendedOperands(node)) {
-            if (!isValuedStringLiteral(expr)) {
+            if (!isValuedStringLiteralOrConstant(expr)) {
                 return true;
             }
         }
         return false;
     }
 
-    private boolean isValuedStringLiteral(Expression expr) {
-        return (expr instanceof StringLiteral) && !isEmptyString(expr);
+    private boolean isValuedStringLiteralOrConstant(Expression expr) {
+        if (expr instanceof StringLiteral) {
+            return !isEmptyString(expr);
+        } else if (expr instanceof Name && hasType(expr, "java.lang.String")) {
+            Name name = (Name) expr;
+            return name.resolveConstantExpressionValue() != null;
+        }
+
+        return false;
     }
 
     private void removeEmptyStrings(final List<Pair<ITypeBinding, Expression>> allExprs,
@@ -339,8 +346,9 @@ public class StringBuilderRefactoring extends AbstractRefactoringRule {
         final List<Expression> tempStringLiterals = new ArrayList<Expression>();
         final List<Expression> finalStrings = new ArrayList<Expression>();
         final AtomicBoolean isFirst = new AtomicBoolean(true);
+
         for (final Pair<ITypeBinding, Expression> appendedString : allAppendedStrings) {
-            if (appendedString.getSecond() instanceof StringLiteral) {
+            if (isValuedStringLiteralOrConstant(appendedString.getSecond())) {
                 tempStringLiterals.add(b.copy(appendedString.getSecond()));
             } else {
                 result = handleTempStringLiterals(b, lastExpr, isInstanceCreationToRewrite, result, tempStringLiterals,
@@ -348,6 +356,7 @@ public class StringBuilderRefactoring extends AbstractRefactoringRule {
 
                 if (isFirst.get()) {
                     isFirst.set(false);
+
                     if (!isInstanceCreationToRewrite) {
                         result = b.copy(lastExpr);
                         finalStrings.add(getTypedExpression(b, appendedString));

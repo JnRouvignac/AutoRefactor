@@ -27,6 +27,8 @@ package org.autorefactor.refactoring.rules.samples_in;
 
 import java.io.IOException;
 
+import javax.management.JMX;
+
 public class StringBuilderSample {
 
     public void replaceWithEfficientStringAppend(StringBuffer sbuf, StringBuilder sbui, String s) {
@@ -45,7 +47,7 @@ public class StringBuilderSample {
         ((StringBuilder) sbui).append("foo" + 0 + "bar" + 1);
     }
 
-    public void replaceWithStringAppend() {
+    public void useConcatenation() {
         // Keep this comment
         String s1 = new StringBuffer("foo ").append("bar ").append("baz").toString();
         String s2 = new StringBuilder("foo ").append("bar ").append("baz").toString();
@@ -63,9 +65,21 @@ public class StringBuilderSample {
         String s14 = (((new StringBuilder("foo ")).append("bar ")).append("baz")).toString();
     }
 
-    public void doNotReplaceWithStringAppend(StringBuffer sbuf, StringBuilder sbui) {
+    public void useConcatenationInsideAppend(StringBuffer sbuf, StringBuilder sbui) {
+        // Keep this comment
         String s5 = sbuf.append("foo ").append("bar").toString();
         String s6 = sbui.append("foo ").append("bar").toString();
+    }
+
+    public void useConcatenationWithStringConstant(StringBuffer sbuf, StringBuilder sbui, String text) {
+        // Keep this comment
+        sbuf.append("<").append(JMX.DEFAULT_VALUE_FIELD).append(">").append(text);
+        sbui.append("<").append(JMX.DEFAULT_VALUE_FIELD).append(">").append(text);
+    }
+
+    public void doNotUseConcatenationWithAnyConstant(StringBuffer sbuf, StringBuilder sbui, String text) {
+        sbuf.append("<").append(Integer.MAX_VALUE).append(">").append(text);
+        sbui.append("<").append(Integer.MAX_VALUE).append(">").append(text);
     }
 
     public void removeUselessStringConcatenation() {
