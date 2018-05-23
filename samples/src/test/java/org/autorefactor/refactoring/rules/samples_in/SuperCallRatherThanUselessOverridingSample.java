@@ -27,7 +27,7 @@ package org.autorefactor.refactoring.rules.samples_in;
 
 public class SuperCallRatherThanUselessOverridingSample {
 
-    private class Parent {
+    public class Parent {
         void removeUselessOverride() {
         }
         void removeOverrideWithInsignificantAnnotations() {
@@ -36,9 +36,13 @@ public class SuperCallRatherThanUselessOverridingSample {
         }
         protected void doNotRemoveVisibilityChange() {
         }
+        public void doNotRemoveOverrideWithOtherParam(String classname) {
+        }
+        public void doNotRemoveOverrideWithUnorderedParam(String firstname, String lastname) {
+        }
     }
 
-    private class Child extends Parent {
+    public class Child extends Parent {
         @Override
         void removeUselessOverride() {
             super.removeUselessOverride();
@@ -59,6 +63,16 @@ public class SuperCallRatherThanUselessOverridingSample {
         @Override
         public void doNotRemoveVisibilityChange() {
             super.doNotRemoveVisibilityChange();
+        }
+
+        @Override
+        public void doNotRemoveOverrideWithOtherParam(String classname) {
+            super.doNotRemoveOverrideWithOtherParam("java.util." + classname);
+        }
+
+        @Override
+        public void doNotRemoveOverrideWithUnorderedParam(String firstname, String lastname) {
+            super.doNotRemoveOverrideWithUnorderedParam(lastname, firstname);
         }
     }
 }

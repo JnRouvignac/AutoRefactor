@@ -40,12 +40,15 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.autorefactor.util.UnhandledException;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IJavaElement;
+import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.IAnnotationBinding;
 import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.IPackageBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.Modifier;
+import org.eclipse.jdt.core.dom.SimpleName;
+import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.SuperMethodInvocation;
 import org.eclipse.jdt.core.search.SearchEngine;
@@ -87,21 +90,26 @@ public class SuperCallRatherThanUselessOverridingRefactoring extends AbstractRef
     }
 
     @Override
-    public boolean visit(MethodDeclaration node) {
+    public boolean visit(final MethodDeclaration node) {
         if (node.getBody() == null) {
             return VISIT_SUBTREE;
         }
-        List<Statement> bodyStmts = statements(node.getBody());
+
+        final List<Statement> bodyStmts = statements(node.getBody());
+
         if (bodyStmts.size() == 1) {
-            SuperMethodInvocation bodyMi = asExpression(bodyStmts.get(0), SuperMethodInvocation.class);
+            final SuperMethodInvocation bodyMi = asExpression(bodyStmts.get(0), SuperMethodInvocation.class);
+
             if (bodyMi != null) {
-                IMethodBinding bodyMethodBinding = bodyMi.resolveMethodBinding();
-                IMethodBinding declMethodBinding = node.resolveBinding();
+                final IMethodBinding bodyMethodBinding = bodyMi.resolveMethodBinding();
+                final IMethodBinding declMethodBinding = node.resolveBinding();
+
                 if (declMethodBinding != null
                         && bodyMethodBinding != null
                         && declMethodBinding.overrides(bodyMethodBinding)
                         && !hasSignificantAnnotations(declMethodBinding)
-                        && haveSameModifiers(bodyMethodBinding, declMethodBinding)) {
+                        && haveSameModifiers(bodyMethodBinding, declMethodBinding)
+                        && haveSameParameters(node, bodyMi)) {
                     if (Modifier.isProtected(declMethodBinding.getModifiers())
                             && !declaredInSamePackage(bodyMethodBinding, declMethodBinding)) {
                         // protected also means package visibility, so check if it is required
@@ -116,11 +124,28 @@ public class SuperCallRatherThanUselessOverridingRefactoring extends AbstractRef
                 }
             }
         }
+
         return VISIT_SUBTREE;
     }
 
+    private boolean haveSameParameters(final MethodDeclaration node, final SuperMethodInvocation bodyMi) {
+        final List<?> parameters = node.parameters();
+
+        for (int i = 0; i < node.parameters().size(); i++) {
+            final SingleVariableDeclaration paramName = (SingleVariableDeclaration) parameters.get(i);
+            final Expression paramExpr = (Expression) bodyMi.arguments().get(i);
+
+            if (!(paramExpr instanceof SimpleName)
+                    || !paramName.getName().getIdentifier().equals(((SimpleName) paramExpr).getIdentifier())) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     /** This method is extremely expensive. */
-    private boolean isMethodUsedInItsPackage(IMethodBinding methodBinding, MethodDeclaration node) {
+    private boolean isMethodUsedInItsPackage(final IMethodBinding methodBinding, MethodDeclaration node) {
         final IPackageBinding methodPackage = methodBinding.getDeclaringClass().getPackage();
 
         final AtomicBoolean methodIsUsedInPackage = new AtomicBoolean(false);
@@ -145,20 +170,21 @@ public class SuperCallRatherThanUselessOverridingRefactoring extends AbstractRef
         }
     }
 
-    private boolean declaredInSamePackage(IMethodBinding methodBinding1, IMethodBinding methodBinding2) {
+    private boolean declaredInSamePackage(final IMethodBinding methodBinding1, final IMethodBinding methodBinding2) {
         final ITypeBinding declaringClass1 = methodBinding1.getDeclaringClass();
         final ITypeBinding declaringClass2 = methodBinding2.getDeclaringClass();
         return declaringClass1.getPackage().equals(declaringClass2.getPackage());
     }
 
-    private boolean haveSameModifiers(IMethodBinding overriding, IMethodBinding overridden) {
+    private boolean haveSameModifiers(final IMethodBinding overriding, final IMethodBinding overridden) {
         // UCDetector can suggest to reduce visibility where possible
         return overriding.getModifiers() == overridden.getModifiers();
     }
 
-    private boolean hasSignificantAnnotations(IMethodBinding methodBinding) {
-        for (IAnnotationBinding annotation : methodBinding.getAnnotations()) {
-            ITypeBinding annotationType = annotation.getAnnotationType();
+    private boolean hasSignificantAnnotations(final IMethodBinding methodBinding) {
+        for (final IAnnotationBinding annotation : methodBinding.getAnnotations()) {
+            final ITypeBinding annotationType = annotation.getAnnotationType();
+
             if (!hasType(annotationType, "java.lang.Override", "java.lang.SuppressWarnings")) {
                 return true;
             }
