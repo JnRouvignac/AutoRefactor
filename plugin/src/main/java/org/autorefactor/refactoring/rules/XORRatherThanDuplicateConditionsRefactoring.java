@@ -80,16 +80,16 @@ public class XORRatherThanDuplicateConditionsRefactoring extends AbstractRefacto
 
     @Override
     public boolean visit(InfixExpression node) {
-        if ((hasOperator(node, CONDITIONAL_OR) || hasOperator(node, OR)) && !node.hasExtendedOperands()) {
+        if (hasOperator(node, CONDITIONAL_OR, OR) && !node.hasExtendedOperands()) {
             final InfixExpression firstCondition = as(node.getLeftOperand(), InfixExpression.class);
             final InfixExpression secondCondition = as(node.getRightOperand(), InfixExpression.class);
 
             if (firstCondition != null
                     && !firstCondition.hasExtendedOperands()
-                    && (hasOperator(firstCondition, CONDITIONAL_AND) || hasOperator(firstCondition, AND))
+                    && hasOperator(firstCondition, CONDITIONAL_AND, AND)
                     && secondCondition != null
                     && !secondCondition.hasExtendedOperands()
-                    && (hasOperator(secondCondition, CONDITIONAL_AND) || hasOperator(secondCondition, AND))) {
+                    && hasOperator(secondCondition, CONDITIONAL_AND, AND)) {
                 final AtomicBoolean isFirstExprPositive = new AtomicBoolean();
                 final AtomicBoolean isSecondExprPositive = new AtomicBoolean();
                 final AtomicBoolean isThirdExprPositive = new AtomicBoolean();

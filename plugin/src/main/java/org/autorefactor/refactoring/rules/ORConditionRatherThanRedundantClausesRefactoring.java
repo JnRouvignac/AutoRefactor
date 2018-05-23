@@ -80,7 +80,7 @@ public class ORConditionRatherThanRedundantClausesRefactoring extends AbstractRe
 
     @Override
     public boolean visit(InfixExpression node) {
-        if (isPassive(node) && (hasOperator(node, CONDITIONAL_OR) || hasOperator(node, OR))
+        if (isPassive(node) && hasOperator(node, CONDITIONAL_OR, OR)
                 && !node.hasExtendedOperands()) {
             final Expression leftOperand = node.getLeftOperand();
             final Expression rightOperand = node.getRightOperand();
@@ -96,7 +96,7 @@ public class ORConditionRatherThanRedundantClausesRefactoring extends AbstractRe
 
         if (complexCondition != null
                 && !complexCondition.hasExtendedOperands()
-                && (hasOperator(complexCondition, CONDITIONAL_AND) || hasOperator(complexCondition, AND))) {
+                && hasOperator(complexCondition, CONDITIONAL_AND, AND)) {
             final AtomicBoolean isFirstExprPositive = new AtomicBoolean();
             final AtomicBoolean isSecondExprPositive = new AtomicBoolean();
             final AtomicBoolean isThirdExprPositive = new AtomicBoolean();

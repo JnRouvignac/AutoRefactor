@@ -322,7 +322,7 @@ public class SimplifyExpressionRefactoring extends AbstractRefactoringRule {
                     return replaceBy(node, lhs);
                 }
             }
-        } else if ((hasOperator(node, EQUALS) || hasOperator(node, NOT_EQUALS) || hasOperator(node, XOR))
+        } else if (hasOperator(node, EQUALS, NOT_EQUALS, XOR)
                 && !node.hasExtendedOperands()) {
             if (maybeReduceBooleanExpression(node, lhs, rhs) == DO_NOT_VISIT_SUBTREE) {
                 return DO_NOT_VISIT_SUBTREE;

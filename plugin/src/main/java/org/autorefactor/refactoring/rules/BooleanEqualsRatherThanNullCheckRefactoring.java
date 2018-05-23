@@ -80,7 +80,7 @@ public class BooleanEqualsRatherThanNullCheckRefactoring extends AbstractRefacto
 
     @Override
     public boolean visit(InfixExpression node) {
-        if (hasOperator(node, CONDITIONAL_AND) || hasOperator(node, CONDITIONAL_OR)) {
+        if (hasOperator(node, CONDITIONAL_AND, CONDITIONAL_OR)) {
             final Expression leftOperand = node.getLeftOperand();
             final Expression rightOperand = node.getRightOperand();
 
@@ -88,8 +88,7 @@ public class BooleanEqualsRatherThanNullCheckRefactoring extends AbstractRefacto
             final boolean isNullCheck = hasOperator(condition, EQUALS);
             final boolean isAndExpr = hasOperator(node, CONDITIONAL_AND);
             if (!node.hasExtendedOperands()
-                    && (isNullCheck ^ isAndExpr) && condition != null && (hasOperator(condition, EQUALS)
-                    || hasOperator(condition, NOT_EQUALS))) {
+                    && (isNullCheck ^ isAndExpr) && condition != null && hasOperator(condition, EQUALS, NOT_EQUALS)) {
                 Expression firstExpr = null;
                 if (isNullLiteral(condition.getLeftOperand())) {
                     firstExpr = condition.getRightOperand();
