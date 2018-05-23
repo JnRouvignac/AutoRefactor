@@ -31,6 +31,9 @@ import java.util.List;
 
 public class RemoveEmptyStatementSample {
 
+    {
+    }
+
     public void removeEmptyStatement(boolean b, int i, String[] args) {
         if (b) System.out.println(b);
         try {
@@ -45,6 +48,44 @@ public class RemoveEmptyStatementSample {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public void doNotRemoveFilledBlock(boolean b, int i, String[] args) {
+        {
+            System.out.println("foo");
+        }
+        if (b) {
+            System.out.println("foo");
+        }
+        if (b) {
+            System.out.println("foo");
+        }
+        else {
+            System.out.println("foo");
+        }
+        if (b) System.out.println(b);
+        else {
+            System.out.println("foo");
+        }
+        try {
+            {
+                System.out.println("foo");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        for (String arg : args) {
+            System.out.println("foo");
+        }
+        for (int j = 0; j < 10; j++) {
+            System.out.println("foo");
+        }
+        while (i < 10) {
+            System.out.println("foo");
+        }
+        do {
+            System.out.println("foo");
+        } while (i < 10);
     }
 
     public void doNotRemoveEmptyStatement(boolean b) {

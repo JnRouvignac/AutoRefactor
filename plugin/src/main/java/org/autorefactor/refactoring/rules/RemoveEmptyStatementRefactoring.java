@@ -27,9 +27,6 @@ package org.autorefactor.refactoring.rules;
 
 import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
 import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
-import static org.autorefactor.refactoring.ASTHelper.asList;
-import static org.autorefactor.refactoring.ASTHelper.getParentIgnoring;
-import static org.autorefactor.refactoring.ASTHelper.is;
 import static org.autorefactor.refactoring.ASTHelper.isPassive;
 
 import java.util.List;
@@ -79,73 +76,74 @@ public class RemoveEmptyStatementRefactoring extends AbstractRefactoringRule {
     }
 
     @Override
-    public boolean visit(EmptyStatement node) {
-        return maybeRemoveEmptyStmt(node);
-    }
+    public boolean visit(final IfStatement node) {
+        if (isPassive(node.getExpression())) {
+            final boolean isThenEmpty = isEmptyCode(node.getThenStatement());
+            final boolean isElseEmpty = isEmptyCode(node.getElseStatement());
 
-    @Override
-    public boolean visit(Block node) {
-        if (node.statements() == null || node.statements().isEmpty()) {
-            return maybeRemoveEmptyStmt(node);
+            if (isThenEmpty && (isElseEmpty || node.getElseStatement() == null)) {
+                this.ctx.getRefactorings().remove(node);
+                return DO_NOT_VISIT_SUBTREE;
+            } else if (isElseEmpty) {
+                this.ctx.getRefactorings().remove(node.getElseStatement());
+                return DO_NOT_VISIT_SUBTREE;
+            }
         }
-
         return VISIT_SUBTREE;
     }
 
-    private boolean maybeRemoveEmptyStmt(Statement node) {
-        ASTNode parent = node.getParent();
+    @Override
+    public boolean visit(final EnhancedForStatement node) {
+        if (isPassive(node.getExpression()) && node.getExpression().resolveTypeBinding().isArray()) {
+            return maybeRemoveStmtWithEmptyBody(node, node.getBody());
+        }
+        return VISIT_SUBTREE;
+    }
 
-        if (parent instanceof Block) {
+    @Override
+    public boolean visit(final ForStatement node) {
+        if (arePassive(node.initializers()) && isPassive(node.getExpression())) {
+            return maybeRemoveStmtWithEmptyBody(node, node.getBody());
+        }
+        return VISIT_SUBTREE;
+    }
+
+    @Override
+    public boolean visit(final WhileStatement node) {
+        if (isPassive(node.getExpression())
+                && !Boolean.TRUE.equals(node.getExpression().resolveConstantExpressionValue())) {
+            return maybeRemoveStmtWithEmptyBody(node, node.getBody());
+        }
+        return VISIT_SUBTREE;
+    }
+
+    @Override
+    public boolean visit(final DoStatement node) {
+        if (isPassive(node.getExpression())
+                && !Boolean.TRUE.equals(node.getExpression().resolveConstantExpressionValue())) {
+            return maybeRemoveStmtWithEmptyBody(node, node.getBody());
+        }
+        return VISIT_SUBTREE;
+    }
+
+    @Override
+    public boolean visit(final Block node) {
+        return maybeRemoveCode(node);
+    }
+
+    @Override
+    public boolean visit(final EmptyStatement node) {
+        return maybeRemoveCode(node);
+    }
+
+    private boolean maybeRemoveCode(final Statement node) {
+        final ASTNode parent = node.getParent();
+
+        if (parent instanceof Block && isEmptyCode(node)) {
             this.ctx.getRefactorings().remove(node);
             return DO_NOT_VISIT_SUBTREE;
         }
 
-        parent = getParentIgnoring(node, Block.class);
-        if (parent instanceof IfStatement) {
-            final IfStatement is = (IfStatement) parent;
-
-            if (isPassive(is.getExpression())) {
-                final List<Statement> thenStmts = asList(is.getThenStatement());
-                final List<Statement> elseStmts = asList(is.getElseStatement());
-                final boolean thenIsEmptyStmt = thenStmts.isEmpty()
-                        || (thenStmts.size() == 1 && is(thenStmts.get(0), EmptyStatement.class));
-                final boolean elseIsEmptyStmt = elseStmts.isEmpty()
-                        || (elseStmts.size() == 1 && is(elseStmts.get(0), EmptyStatement.class));
-
-                if (thenIsEmptyStmt && elseIsEmptyStmt) {
-                    this.ctx.getRefactorings().remove(parent);
-                    return DO_NOT_VISIT_SUBTREE;
-                } else if (thenIsEmptyStmt && is.getElseStatement() == null) {
-                    this.ctx.getRefactorings().remove(is);
-                    return DO_NOT_VISIT_SUBTREE;
-                } else if (elseIsEmptyStmt) {
-                    this.ctx.getRefactorings().remove(is.getElseStatement());
-                    return DO_NOT_VISIT_SUBTREE;
-                }
-            }
-        } else if (parent instanceof EnhancedForStatement) {
-            final EnhancedForStatement efs = (EnhancedForStatement) parent;
-            if (isPassive(efs.getExpression()) && efs.getExpression().resolveTypeBinding().isArray()) {
-                return maybeRemoveEmptyStmtBody(node, efs, efs.getBody());
-            }
-        } else if (parent instanceof ForStatement) {
-            final ForStatement fs = (ForStatement) parent;
-            if (arePassive(fs.initializers()) && isPassive(fs.getExpression())) {
-                return maybeRemoveEmptyStmtBody(node, fs, fs.getBody());
-            }
-        } else if (parent instanceof WhileStatement) {
-            final WhileStatement ws = (WhileStatement) parent;
-            if (isPassive(ws.getExpression())
-                    && !Boolean.TRUE.equals(ws.getExpression().resolveConstantExpressionValue())) {
-                return maybeRemoveEmptyStmtBody(node, ws, ws.getBody());
-            }
-        } else if (parent instanceof DoStatement) {
-            final DoStatement ds = (DoStatement) parent;
-            if (isPassive(ds.getExpression())
-                    && !Boolean.TRUE.equals(ds.getExpression().resolveConstantExpressionValue())) {
-                return maybeRemoveEmptyStmtBody(node, ds, ds.getBody());
-            }
-        }
         return VISIT_SUBTREE;
     }
 
@@ -158,12 +156,21 @@ public class RemoveEmptyStatementRefactoring extends AbstractRefactoringRule {
         return true;
     }
 
-    private boolean maybeRemoveEmptyStmtBody(final Statement node, final Statement stmt, final Statement body) {
-        if (body == node) {
-            this.ctx.getRefactorings().remove(stmt);
+    private boolean maybeRemoveStmtWithEmptyBody(final Statement node, final Statement emptyCode) {
+        if (isEmptyCode(emptyCode)) {
+            this.ctx.getRefactorings().remove(node);
             return DO_NOT_VISIT_SUBTREE;
         }
-
         return VISIT_SUBTREE;
+    }
+
+    private boolean isEmptyCode(final Statement emptyCode) {
+        if (emptyCode instanceof EmptyStatement) {
+            return true;
+        } else if (emptyCode instanceof Block) {
+            final Block block = (Block) emptyCode;
+            return block.statements() == null || block.statements().isEmpty();
+        }
+        return false;
     }
 }
