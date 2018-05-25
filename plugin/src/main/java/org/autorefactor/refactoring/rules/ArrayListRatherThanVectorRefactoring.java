@@ -2,7 +2,7 @@
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
  * Copyright (C) 2017 Fabrice Tiercelin - initial API and implementation
- * Copyright (C) 2017 Jean-Noël Rouvignac - minor changes
+ * Copyright (C) 2017-2018 Jean-Noël Rouvignac - minor changes
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,9 +26,6 @@
  */
 package org.autorefactor.refactoring.rules;
 
-import static org.autorefactor.refactoring.ASTHelper.hasType;
-import static org.autorefactor.refactoring.ASTHelper.isMethod;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,6 +35,9 @@ import org.autorefactor.refactoring.Release;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.MethodInvocation;
+
+import static org.autorefactor.refactoring.ASTHelper.*;
+import static org.autorefactor.util.Utils.*;
 
 /** See {@link #getDescription()} method. */
 public class ArrayListRatherThanVectorRefactoring extends AbstractClassSubstituteRefactoring {
@@ -205,7 +205,7 @@ public class ArrayListRatherThanVectorRefactoring extends AbstractClassSubstitut
     protected boolean isTypeCompatible(final ITypeBinding variableType,
             final ITypeBinding refType) {
         return super.isTypeCompatible(variableType, refType)
-                || hasType(variableType, CAN_BE_CASTED_TO.getOrDefault(refType.getErasure().getQualifiedName(),
-                        new String[0]));
+                || hasType(variableType,
+                           getOrDefault(CAN_BE_CASTED_TO, refType.getErasure().getQualifiedName(), new String[0]));
     }
 }

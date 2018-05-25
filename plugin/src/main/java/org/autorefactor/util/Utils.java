@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2014-2016 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2014-2018 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,6 +26,7 @@
 package org.autorefactor.util;
 
 import java.util.List;
+import java.util.Map;
 
 /** Utility class containing miscellaneous helper methods. */
 public final class Utils {
@@ -174,5 +175,20 @@ public final class Utils {
      */
     public static <E> E getLast(final List<E> list) {
         return list.get(list.size() - 1);
+    }
+
+    /**
+     * Returns the value to which the specified key is mapped, or defaultValue if this map contains no mapping for the
+     * key.
+     *
+     * @param map the map
+     * @param key the key
+     * @param defaultValue default value to use if there is no such key in this map
+     * @param <K> type for the key
+     * @param <V> type for the value
+     * @return the value associated to this key in this map, the default value otherwise
+     */
+    public static <K, V> V getOrDefault(Map<K, V> map, K key, V defaultValue) {
+        return map.containsKey(key) ? map.get(key) : defaultValue;
     }
 }

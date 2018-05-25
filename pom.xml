@@ -2,7 +2,7 @@
 <!--
  | AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  |
- | Copyright (C) 2014-2017 Jean-Noël Rouvignac - initial API and implementation
+ | Copyright (C) 2014-2018 Jean-Noël Rouvignac - initial API and implementation
  |
  | This program is free software: you can redistribute it and/or modify
  | it under the terms of the GNU General Public License as published by
@@ -47,7 +47,7 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <tycho.scmUrl>scm:git:https://github.com/JnRouvignac/AutoRefactor.git</tycho.scmUrl>
     <tycho-repo.url>https://oss.sonatype.org/content/groups/public/</tycho-repo.url>
-    <tycho-version>1.0.0</tycho-version>
+    <tycho-version>0.23.1</tycho-version>
   </properties>
 
   <repositories>
