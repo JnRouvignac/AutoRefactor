@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2017 Fabrice Tiercelin - Split the code
+ * Copyright (C) 2018 Fabrice Tiercelin - Split the code
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -102,7 +102,8 @@ public class RemoveEmptyStatementRefactoring extends AbstractRefactoringRule {
 
     @Override
     public boolean visit(final ForStatement node) {
-        if (arePassive(node.initializers()) && isPassive(node.getExpression())) {
+        List<?> initializers = node.initializers();
+        if (!initializers.isEmpty() && arePassive(initializers) && isPassive(node.getExpression())) {
             return maybeRemoveStmtWithEmptyBody(node, node.getBody());
         }
         return VISIT_SUBTREE;

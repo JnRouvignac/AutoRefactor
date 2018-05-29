@@ -165,4 +165,8 @@ public class RemoveEmptyStatementSample {
 
         return activeList.getReadCount();
     }
+
+    public void doNotRemoveInfiniteFor() {
+        for(;;){}
+    }
 }
