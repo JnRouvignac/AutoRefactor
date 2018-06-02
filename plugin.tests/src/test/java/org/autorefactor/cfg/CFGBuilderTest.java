@@ -25,9 +25,13 @@
  */
 package org.autorefactor.cfg;
 
+import static org.autorefactor.test.TestHelper.readAll;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.OutputStream;
+import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.lang.reflect.Method;
@@ -49,10 +53,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
-
-import static java.nio.file.Files.newOutputStream;
-import static org.autorefactor.test.TestHelper.readAll;
-import static org.junit.Assert.*;
 
 @RunWith(value = Parameterized.class)
 public class CFGBuilderTest {
@@ -116,10 +116,10 @@ public class CFGBuilderTest {
     }
 
     private void writeAll(File file, String fileContent) throws Exception {
-        OutputStream os = null;
+        FileOutputStream os = null;
         Writer writer = null;
         try {
-            os = newOutputStream(file.toPath());
+            os = new FileOutputStream(file);
             writer = new BufferedWriter(new OutputStreamWriter(os));
             writer.append(fileContent);
         } finally {

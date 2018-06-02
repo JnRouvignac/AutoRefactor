@@ -25,13 +25,18 @@
  */
 package org.autorefactor.test;
 
-import static org.eclipse.jdt.core.JavaCore.*;
-import static org.eclipse.jdt.core.ToolFactory.*;
-import static org.eclipse.jdt.core.formatter.CodeFormatter.*;
+import static org.eclipse.jdt.core.JavaCore.COMPILER_CODEGEN_TARGET_PLATFORM;
+import static org.eclipse.jdt.core.JavaCore.COMPILER_COMPLIANCE;
+import static org.eclipse.jdt.core.JavaCore.COMPILER_SOURCE;
+import static org.eclipse.jdt.core.JavaCore.VERSION_1_7;
+import static org.eclipse.jdt.core.ToolFactory.createCodeFormatter;
+import static org.eclipse.jdt.core.formatter.CodeFormatter.K_COMPILATION_UNIT;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.file.Files;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -77,7 +82,25 @@ public final class TestHelper {
     }
 
     public static String readAll(File file) throws IOException {
-        return new String(Files.readAllBytes(file.toPath()), "UTF8");
+        final StringBuilder sb = new StringBuilder();
+        FileInputStream input = null;
+        Reader reader = null;
+        try {
+            input = new FileInputStream(file);
+            reader = new InputStreamReader(input, "UTF-8");
+            int c = 0;
+            while ((c = reader.read()) != -1) {
+                sb.append((char) c);
+            }
+        } finally {
+            if (input != null) {
+                input.close();
+            }
+            if (reader != null) {
+                reader.close();
+            }
+        }
+        return sb.toString();
     }
 
     public static JavaProjectOptions newJavaProjectOptions(Release javaSE, int tabSize) {
@@ -126,6 +149,7 @@ public final class TestHelper {
         final List<Object[]> output = new ArrayList<Object[]>(sampleFiles.length);
         for (File file : sampleFiles) {
             final String fileName = file.getName();
+
             if (!whitelist.isEmpty()
                     ? whitelist.contains(fileName)
                     : !blacklist.contains(fileName)) {

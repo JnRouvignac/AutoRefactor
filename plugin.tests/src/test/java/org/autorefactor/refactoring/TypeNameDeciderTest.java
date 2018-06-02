@@ -30,7 +30,6 @@ import static org.junit.Assert.assertEquals;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.NavigableSet;
 import java.util.TreeSet;
 
 import org.eclipse.jdt.core.dom.ITypeBinding;
@@ -44,11 +43,11 @@ import org.junit.runners.Parameterized.Parameters;
 public class TypeNameDeciderTest {
 
     private String qualifiedName;
-    private NavigableSet<String> imports;
+    private TreeSet<String> imports;
     private String expectedResult;
 
     public TypeNameDeciderTest(
-            String qualifiedName, NavigableSet<String> imports, String expectedResult) {
+            String qualifiedName, TreeSet<String> imports, String expectedResult) {
         this.qualifiedName = qualifiedName;
         this.imports = imports;
         this.expectedResult = expectedResult;
@@ -89,7 +88,7 @@ public class TypeNameDeciderTest {
         }, imports).useSimplestPossibleName(qualifiedName);
     }
 
-    private static NavigableSet<String> imports(String... imports) {
+    private static TreeSet<String> imports(String... imports) {
         final TreeSet<String> results = new TreeSet<String>();
         Collections.addAll(results, imports);
         return results;

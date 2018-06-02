@@ -28,8 +28,9 @@ package org.autorefactor.refactoring;
 import static org.autorefactor.refactoring.ASTHelper.imports;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.NavigableSet;
+import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.autorefactor.util.IllegalArgumentException;
@@ -97,13 +98,16 @@ public class TypeNameDecider {
         }
 
         @SuppressWarnings("unchecked")
-        private <T> T invokeMethod(Object object, Method method, Object... args) throws ReflectiveOperationException {
+        private <T> T invokeMethod(Object object, Method method, Object... args)
+                throws IllegalAccessException, InvocationTargetException {
             method.setAccessible(true);
             return (T) method.invoke(object, args);
         }
 
         @SuppressWarnings("unchecked")
-        private <T> T getField(Object object, String fieldName) throws ReflectiveOperationException {
+        private <T> T getField(Object object, String fieldName)
+                throws IllegalAccessException, InvocationTargetException,
+                NoSuchFieldException {
             final Field f = object.getClass().getDeclaredField(fieldName);
             f.setAccessible(true);
             return (T) f.get(object);
@@ -111,7 +115,7 @@ public class TypeNameDecider {
     }
 
     private final ResolveTypeBindingStrategy resolveTypeBindingStrategy;
-    private final NavigableSet<String> importedTypes;
+    private final TreeSet<String> importedTypes;
     private final String packageName;
 
     /**
@@ -138,7 +142,7 @@ public class TypeNameDecider {
      * @param resolveTypeBindingStrategy the strategy that resolves type bindings
      * @param importedTypes the imported types
      */
-    public TypeNameDecider(ResolveTypeBindingStrategy resolveTypeBindingStrategy, NavigableSet<String> importedTypes) {
+    public TypeNameDecider(ResolveTypeBindingStrategy resolveTypeBindingStrategy, TreeSet<String> importedTypes) {
         this.resolveTypeBindingStrategy = resolveTypeBindingStrategy;
         this.packageName = "";
         this.importedTypes = importedTypes;
@@ -154,7 +158,7 @@ public class TypeNameDecider {
         }
     }
 
-    private static NavigableSet<String> getImportedTypes(CompilationUnit cu) {
+    private static TreeSet<String> getImportedTypes(CompilationUnit cu) {
         final TreeSet<String> results = new TreeSet<String>();
         for (ImportDeclaration importDecl : imports(cu)) {
             Name importName = importDecl.getName();
@@ -198,10 +202,18 @@ public class TypeNameDecider {
         }
 
         final String fqn = typeBinding.getQualifiedName();
-        final String elementBefore = importedTypes.floor(fqn);
-        if (elementBefore == null) {
-            return fqn;
-        } else if (elementBefore.equals(fqn)) {
+        final String elementBefore;
+        if (importedTypes.contains(fqn)) {
+            elementBefore = fqn;
+        } else {
+            final SortedSet<String> elementsBefore = importedTypes.headSet(fqn);
+            if (elementsBefore.isEmpty()) {
+                return fqn;
+            }
+            elementBefore = elementsBefore.last();
+        }
+
+        if (elementBefore.equals(fqn)) {
             int lastIdx = fqn.lastIndexOf('.');
             if (lastIdx != -1) {
                 return fqn.substring(lastIdx + 1);

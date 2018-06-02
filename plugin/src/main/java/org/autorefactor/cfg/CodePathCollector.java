@@ -27,7 +27,6 @@ package org.autorefactor.cfg;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -36,7 +35,7 @@ import org.autorefactor.util.IllegalStateException;
 /** Collects code paths into the CFG. */
 public class CodePathCollector {
     private final List<List<CFGBasicBlock>> results = new ArrayList<List<CFGBasicBlock>>();
-    private final Deque<CFGBasicBlock> stack = new LinkedList<CFGBasicBlock>();
+    private final LinkedList<CFGBasicBlock> stack = new LinkedList<CFGBasicBlock>();
 
     /**
      * Returns the collected code paths.
@@ -61,7 +60,7 @@ public class CodePathCollector {
             return;
         }
 
-        stack.push(block);
+        stack.addFirst(block);
         try {
             boolean foundAtLeastOneEdge = false;
             for (Object obj : block.getOutgoingEdgesAndVariableAccesses()) {
@@ -76,7 +75,7 @@ public class CodePathCollector {
                         "Path should have ended with an exit block: " + stack);
             }
         } finally {
-            stack.pop();
+            stack.removeLast();
         }
     }
 }

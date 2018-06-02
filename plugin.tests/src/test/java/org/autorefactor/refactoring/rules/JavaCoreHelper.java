@@ -190,7 +190,8 @@ public final class JavaCoreHelper {
 
         IProjectDescription description = project.getDescription();
         String[] prevNatures = description.getNatureIds();
-        String[] newNatures = Arrays.copyOf(prevNatures, prevNatures.length + 1);
+        String[] newNatures = new String[prevNatures.length + 1];
+        System.arraycopy(prevNatures, 0, newNatures, 0, prevNatures.length);
         newNatures[prevNatures.length] = natureId;
         description.setNatureIds(newNatures);
         project.setDescription(description, null);

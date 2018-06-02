@@ -50,7 +50,7 @@ import static org.eclipse.jdt.core.dom.TagElement.TAG_VERSION;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map.Entry;
+import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -516,14 +516,16 @@ public class CommentsRefactoring extends AbstractRefactoringRule {
             addAll(nodes, typeDecl.getMethods());
             addAll(nodes, typeDecl.getTypes());
 
-            Entry<Integer, ASTNode> entry;
             if (isPrevious) {
-                entry = nodes.floorEntry(node.getStartPosition() - 1);
+                SortedMap<Integer, ASTNode> entries = nodes.headMap(node.getStartPosition());
+                if (!entries.isEmpty()) {
+                    return entries.get(entries.lastKey());
+                }
             } else {
-                entry = nodes.ceilingEntry(node.getStartPosition() + 1);
-            }
-            if (entry != null) {
-                return entry.getValue();
+                SortedMap<Integer, ASTNode> entries = nodes.tailMap(node.getStartPosition());
+                if (!entries.isEmpty()) {
+                    return entries.get(entries.firstKey());
+                }
             }
         }
         return null;
