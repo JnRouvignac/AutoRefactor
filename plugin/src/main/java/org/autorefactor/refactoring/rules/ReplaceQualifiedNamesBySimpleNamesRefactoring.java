@@ -390,7 +390,6 @@ public class ReplaceQualifiedNamesBySimpleNamesRefactoring extends AbstractRefac
      *
      * @return the name.
      */
-    @Override
     public String getName() {
         return "Replace qualified names by simple names";
     }
@@ -400,7 +399,6 @@ public class ReplaceQualifiedNamesBySimpleNamesRefactoring extends AbstractRefac
      *
      * @return the description.
      */
-    @Override
     public String getDescription() {
         return "Refactors types, method invocations and field accesses"
                 + " to replace qualified names by simple names when appropriate."
@@ -412,7 +410,6 @@ public class ReplaceQualifiedNamesBySimpleNamesRefactoring extends AbstractRefac
      *
      * @return the reason.
      */
-    @Override
     public String getReason() {
         return "It reduces code to focus attention on code that matters.";
     }

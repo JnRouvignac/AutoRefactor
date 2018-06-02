@@ -52,7 +52,6 @@ public class RemoveEmptyLinesRefactoring extends AbstractRefactoringRule {
      *
      * @return the name.
      */
-    @Override
     public String getName() {
         return "Remove empty lines";
     }
@@ -62,7 +61,6 @@ public class RemoveEmptyLinesRefactoring extends AbstractRefactoringRule {
      *
      * @return the description.
      */
-    @Override
     public String getDescription() {
         return ""
             + "Removes unnecessary empty lines from source code:\n"
@@ -76,7 +74,6 @@ public class RemoveEmptyLinesRefactoring extends AbstractRefactoringRule {
      *
      * @return the reason.
      */
-    @Override
     public String getReason() {
         return "It reduces code to focus attention on code that matters.";
     }
