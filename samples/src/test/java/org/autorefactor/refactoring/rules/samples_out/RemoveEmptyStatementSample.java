@@ -107,14 +107,14 @@ public class RemoveEmptyStatementSample {
     }
 
     public int doNotRemoveWithIncrement(int i) {
-        if (i++ == 0);
-        if (i++ == 0) {}
+        if (i-- == 0);
+        if (--i == 0) {}
         return i;
     }
 
     public int doNotRemoveWhileWithIncrement(int i) {
         while (i++ == 100);
-        while (i++ == 100) {}
+        while (++i == 100) {}
         return i;
     }
 
@@ -124,12 +124,20 @@ public class RemoveEmptyStatementSample {
 
     public int doNotRemoveDoWhileWithIncrement(int i) {
         do; while (i++ == 100);
-        do {} while (i++ == 100);
+        do {} while (++i == 100);
         return i;
     }
 
     public void doNotRemoveInfiniteDoWhile() {
         do; while (true);
+    }
+
+    public void doNotRemoveInfiniteForLoop() {
+        for (;;);
+    }
+
+    public void doNotRemoveAnotherInfiniteForLoop() {
+        for (int i = 0;;i++) {}
     }
 
     public int doNotRemoveForWithExternalVar(int myValue) {

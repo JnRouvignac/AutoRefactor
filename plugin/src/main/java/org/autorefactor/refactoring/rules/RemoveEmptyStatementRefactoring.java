@@ -102,7 +102,7 @@ public class RemoveEmptyStatementRefactoring extends AbstractRefactoringRule {
 
     @Override
     public boolean visit(final ForStatement node) {
-        if (arePassive(node.initializers()) && isPassive(node.getExpression())) {
+        if (node.getExpression() != null && arePassive(node.initializers()) && isPassive(node.getExpression())) {
             return maybeRemoveStmtWithEmptyBody(node, node.getBody());
         }
         return VISIT_SUBTREE;
