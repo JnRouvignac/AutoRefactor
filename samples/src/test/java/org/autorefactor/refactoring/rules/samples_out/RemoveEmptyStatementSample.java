@@ -140,6 +140,10 @@ public class RemoveEmptyStatementSample {
         for (int i = 0;;i++) {}
     }
 
+    public void doNotRemoveForLoopWithEternalCondition() {
+        for (;true;);
+    }
+
     public int doNotRemoveForWithExternalVar(int myValue) {
         for (myValue = 0; myValue < 1000; myValue = myValue * myValue);
         for (myValue = 0; myValue < 1000; myValue = myValue * myValue) {}
