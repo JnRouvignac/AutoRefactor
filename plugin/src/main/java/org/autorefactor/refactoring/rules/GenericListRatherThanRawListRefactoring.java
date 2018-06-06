@@ -37,9 +37,11 @@ import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.Expression;
+import org.eclipse.jdt.core.dom.ExpressionStatement;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.ParameterizedType;
+import org.eclipse.jdt.core.dom.ParenthesizedExpression;
 import org.eclipse.jdt.core.dom.Type;
 
 import static org.autorefactor.refactoring.ASTHelper.*;
@@ -147,6 +149,8 @@ public class GenericListRatherThanRawListRefactoring extends AbstractClassSubsti
 
     @Override
     protected boolean canInstantiationBeRefactored(final ClassInstanceCreation instanceCreation) {
+        elementType = null;
+
         if (instanceCreation.resolveTypeBinding().isParameterizedType()) {
             return false;
         }
@@ -265,29 +269,50 @@ public class GenericListRatherThanRawListRefactoring extends AbstractClassSubsti
                 || isMethod(mi, "java.util.Vector", "lastElement")
                 || isMethod(mi, "java.util.Stack", "pop")
                 || isMethod(mi, "java.util.Stack", "peek")) {
-            ITypeBinding newElementType = getDestinationType(mi);
-            return resolveTypeCompatible(newElementType);
+            if (isExprReceived(mi)) {
+                ITypeBinding newElementType = getDestinationType(mi);
+                return resolveTypeCompatible(newElementType);
+            } else {
+                return true;
+            }
         } else if (isMethod(mi, "java.util.LinkedList", "descendingIterator")
                 || isMethod(mi, "java.util.List", "iterator")
                 || isMethod(mi, "java.util.List", "listIterator")
                 || isMethod(mi, "java.util.List", "listIterator", "int")
                 || isMethod(mi, "java.util.List", "spliterator")
                 || isMethod(mi, "java.util.Vector", "elements")) {
-            ITypeBinding newElementType = getDestinationType(mi);
-            if (newElementType != null && newElementType.isParameterizedType()
-                    && newElementType.getTypeArguments().length == 1) {
-                return resolveTypeCompatible(newElementType.getTypeArguments()[0]);
+            if (isExprReceived(mi)) {
+                ITypeBinding newElementType = getDestinationType(mi);
+                if (newElementType != null && newElementType.isParameterizedType()
+                        && newElementType.getTypeArguments().length == 1) {
+                    return resolveTypeCompatible(newElementType.getTypeArguments()[0]);
+                }
+            } else {
+                return true;
             }
         } else if (isMethod(mi, "java.util.List", "subList", "int", "int")
                 || isMethod(mi, "java.util.Collection", "toArray")) {
-            ITypeBinding newCollectionType = getDestinationType(mi);
-            if (newCollectionType != null) {
-                ITypeBinding newElementType = newCollectionType.getElementType();
-                return resolveTypeCompatible(newElementType);
+            if (isExprReceived(mi)) {
+                ITypeBinding newCollectionType = getDestinationType(mi);
+                if (newCollectionType != null) {
+                    ITypeBinding newElementType = newCollectionType.getElementType();
+                    return resolveTypeCompatible(newElementType);
+                }
+            } else {
+                return true;
             }
         }
 
         return false;
+    }
+
+    private boolean isExprReceived(final ASTNode node) {
+        final ASTNode parent = node.getParent();
+        if (parent instanceof ParenthesizedExpression) {
+            return isExprReceived(parent);
+        } else {
+            return !(parent instanceof ExpressionStatement);
+        }
     }
 
     private boolean resolveTypeCompatible(ITypeBinding newElementType) {
@@ -296,7 +321,6 @@ public class GenericListRatherThanRawListRefactoring extends AbstractClassSubsti
         }
         if (newElementType.isPrimitive()) {
             newElementType = getBoxedTypeBinding(newElementType, ctx.getAST());
-            return true;
         }
         if (!hasType(newElementType, "java.lang.Object")
                 && (elementType == null || newElementType.equals(elementType))) {

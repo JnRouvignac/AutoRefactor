@@ -124,24 +124,35 @@ public class GenericListRatherThanRawListSample {
         list.toArray(new Observable[0]);
     }
 
-    public String replaceLinkedListWithLoop(Date[] dates) {
+    public void doNotGenericizeListWithoutClearTypes() {
+        List list = new java.util.LinkedList();
+        list.remove(0);
+    }
+
+    public void doNotGenericizeListWithConflictingTypes() {
+        List list = new java.util.LinkedList();
+        list.add("1");
+        list.add(1);
+    }
+
+    public void replaceLinkedListWithLoop(Date[] dates) {
         // Keep this comment
         java.util.LinkedList list = new java.util.LinkedList();
         for (Date date : dates) {
             list.add(date);
         }
 
-        return list.toString();
+        list.removeFirst();
     }
 
-    public String replaceArrayListWithLoop(Date[] dates) {
+    public void replaceArrayListWithLoop(Date[] dates) {
         // Keep this comment
         java.util.ArrayList list = new java.util.ArrayList();
         for (Date date : dates) {
             list.add(date);
         }
 
-        return list.toString();
+        list.remove(0);
     }
 
     public String refactorListWithLoop(Date[] dates) {
