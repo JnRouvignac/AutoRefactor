@@ -43,6 +43,8 @@ import java.util.Map;
 @SuppressWarnings("javadoc")
 public class ReplaceQualifiedNamesBySimpleNamesSample {
 
+    private static final String TOP_LEVEL_PRIVATE_CONSTANT = "visible from sublevel";
+
     static long classField;
 
     java.lang.Long instanceField = java.lang.Long.MIN_VALUE;
@@ -163,6 +165,8 @@ public class ReplaceQualifiedNamesBySimpleNamesSample {
     }
 
     static class C {
+        private static final String PRIVATE_CONSTANT = "not visible";
+
         private int replaceFromCurrentType() {
             // Keep this comment
             return C.emptyMap();
@@ -177,6 +181,14 @@ public class ReplaceQualifiedNamesBySimpleNamesSample {
         private int replaceFromSuperType() {
             // Keep this comment
             return C.emptyMap();
+        }
+
+        public void replaceThisTopLevelPrivateConstant() {
+            System.out.println("value is " + ReplaceQualifiedNamesBySimpleNamesSample.TOP_LEVEL_PRIVATE_CONSTANT);
+        }
+
+        public void doNotRefactorThisPrivateConstant() {
+            System.out.println("value is " + C.PRIVATE_CONSTANT);
         }
     }
 
@@ -243,15 +255,23 @@ public class ReplaceQualifiedNamesBySimpleNamesSample {
 class Outer {
     static java.lang.String property;
 
-    void foo() {
+    void doNotRefactorTopLevelClassCall() {
         ReplaceQualifiedNamesBySimpleNamesSample.setProperty("hi");
     }
 
     static class NestedOuter {
+        private static final String PRIVATE_CONSTANT = "not visible";
+
         static java.lang.String property;
 
-        void bar() {
+        void doNotRefactorTopLevelClassCall() {
             ReplaceQualifiedNamesBySimpleNamesSample.setProperty("hi");
+        }
+    }
+
+    public static class OuterInheritedClass extends NestedOuter {
+        public void doNotRefactorThisPrivateConstant() {
+            System.out.println("value is " + NestedOuter.PRIVATE_CONSTANT);
         }
     }
 }

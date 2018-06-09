@@ -76,6 +76,7 @@ import org.eclipse.jdt.core.dom.ImportDeclaration;
 import org.eclipse.jdt.core.dom.Initializer;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
+import org.eclipse.jdt.core.dom.Modifier;
 import org.eclipse.jdt.core.dom.Name;
 import org.eclipse.jdt.core.dom.PackageDeclaration;
 import org.eclipse.jdt.core.dom.QualifiedName;
@@ -228,15 +229,24 @@ public class ReplaceQualifiedNamesBySimpleNamesRefactoring extends AbstractRefac
                 //$FALL-THROUGH$
 
             default:
-                final ITypeBinding enclosingTypeBinding = resolveEnclosingTypeBinding(node);
+                final ITypeBinding enclosingTypeBinding = resolveEnclosingTypeBinding(getEnclosingType(node));
                 if (enclosingTypeBinding != null && matches.get(0).isMember()) {
-                    // all matches are local to this class
-                    final ITypeBinding declaringType =
+
+                    // All matches are local to this class
+                    ITypeBinding declaringType =
                             getDeclaringTypeInTypeHierarchy(enclosingTypeBinding, simpleName, fqnType, node);
                     if (declaringType != null) {
                         return fullyQualifiedName.equals(QName.valueOf(declaringType.getQualifiedName(), simpleName));
                     }
-                    // whether we can replace a simple name highly depends on the current context
+
+                    // All matches are local to this class
+                    declaringType =
+                            getDeclaringTypeInTopLevelHierarchy(simpleName, fqnType, node);
+                    if (declaringType != null) {
+                        return fullyQualifiedName.equals(QName.valueOf(declaringType.getQualifiedName(), simpleName));
+                    }
+
+                    // Whether we can replace a simple name highly depends on the current context
                     // are we in an inner class, is this from the enclosing class, etc.
                     QName enclosingTypeQName = QName.valueOf(enclosingTypeBinding.getQualifiedName());
                     return existsInAnyEnclosingType(matches, fullyQualifiedName, enclosingTypeQName);
@@ -258,50 +268,68 @@ public class ReplaceQualifiedNamesBySimpleNamesRefactoring extends AbstractRefac
 
         private boolean existsInEnclosingType(List<FQN> matches, QName fullyQualifiedName, QName enclosingTypeQName) {
             QName enclosingQName = new QName(enclosingTypeQName, fullyQualifiedName.simpleName);
-            for (FQN fqn : matches) {
-                if (fqn.fullyQualifiedName.equals(fullyQualifiedName)
-                        && fqn.fullyQualifiedName.equals(enclosingQName)) {
-                    return true;
+
+            if (fullyQualifiedName.equals(enclosingQName)) {
+                for (FQN fqn : matches) {
+                    if (fqn.fullyQualifiedName.equals(fullyQualifiedName)) {
+                        return true;
+                    }
                 }
             }
+
             return false;
         }
 
         private ITypeBinding getDeclaringTypeInTypeHierarchy(
-                ITypeBinding typeBinding, String simpleName, FqnType fqnType, ASTNode node) {
-            while (typeBinding != null) {
-                if (isDeclaredInType(typeBinding, simpleName, fqnType, node)) {
-                    return typeBinding;
+                final ITypeBinding typeBinding, final String simpleName, final FqnType fqnType, final ASTNode node) {
+            ITypeBinding superTypeBinding = typeBinding;
+            do {
+                for (final IBinding binding : getDeclaredBinding(superTypeBinding, fqnType, node)) {
+                    if (binding.getName().equals(simpleName)
+                            && (Modifier.isPublic(binding.getModifiers())
+                                    || Modifier.isProtected(binding.getModifiers())
+                                    || (!Modifier.isPrivate(binding.getModifiers())
+                                            && superTypeBinding.getPackage().equals(typeBinding.getPackage())))) {
+                        return superTypeBinding;
+                    }
                 }
-                typeBinding = typeBinding.getSuperclass();
-            }
+                superTypeBinding = superTypeBinding.getSuperclass();
+            } while (superTypeBinding != null);
             return null;
         }
 
-        private boolean isDeclaredInType(ITypeBinding typeBinding, String simpleName, FqnType fqnType, ASTNode node) {
-            return hasSimpleName(getDeclaredBinding(typeBinding, fqnType, node), simpleName);
+        private ITypeBinding getDeclaringTypeInTopLevelHierarchy(
+                final String simpleName, final FqnType fqnType, final ASTNode node) {
+            final Class<?>[] ancestorClasses = { AbstractTypeDeclaration.class, AnonymousClassDeclaration.class };
+            ASTNode enclosingType = getFirstAncestorOrNull(node, ancestorClasses);
+
+            while (enclosingType != null) {
+                final ITypeBinding enclosingTypeBinding = resolveEnclosingTypeBinding(enclosingType);
+
+                for (final IBinding binding : getDeclaredBinding(enclosingTypeBinding, fqnType, node)) {
+                    if (binding.getName().equals(simpleName)) {
+                        return enclosingTypeBinding;
+                    }
+                }
+                enclosingType = getFirstAncestorOrNull(enclosingType, ancestorClasses);
+            }
+            return null;
         }
 
         private IBinding[] getDeclaredBinding(ITypeBinding typeBinding, FqnType fqnType, ASTNode node) {
             switch (fqnType) {
             case METHOD:
                 return typeBinding.getDeclaredMethods();
+
             case FIELD:
                 return typeBinding.getDeclaredFields();
+
             case TYPE:
                 return typeBinding.getDeclaredTypes();
+
             default:
                 throw new NotImplementedException(node, fqnType);
             }
-        }
-
-        private boolean hasSimpleName(IBinding[] bindings, String simpleName) {
-            for (IBinding binding : bindings) {
-                if (binding.getName().equals(simpleName)) {
-                    return true;
-                }
-            }
-            return false;
         }
 
         private List<FQN> getBestMatches(String simpleName) {
@@ -349,17 +377,16 @@ public class ReplaceQualifiedNamesBySimpleNamesRefactoring extends AbstractRefac
         }
 
         private ITypeBinding resolveEnclosingTypeBinding(ASTNode node) {
-            ASTNode enclosingType = getEnclosingType(node);
-            if (enclosingType != null) {
-                switch (enclosingType.getNodeType()) {
+            if (node != null) {
+                switch (node.getNodeType()) {
                 case ANONYMOUS_CLASS_DECLARATION:
-                    return ((AnonymousClassDeclaration) enclosingType).resolveBinding();
+                    return ((AnonymousClassDeclaration) node).resolveBinding();
                 case ENUM_DECLARATION:
-                    return ((EnumDeclaration) enclosingType).resolveBinding();
+                    return ((EnumDeclaration) node).resolveBinding();
                 case TYPE_DECLARATION:
-                    return ((TypeDeclaration) enclosingType).resolveBinding();
+                    return ((TypeDeclaration) node).resolveBinding();
                 default:
-                    throw new NotImplementedException(node, enclosingType);
+                    throw new NotImplementedException(node, node);
                 }
             }
             return null;
@@ -605,6 +632,7 @@ public class ReplaceQualifiedNamesBySimpleNamesRefactoring extends AbstractRefac
             case TYPE:
                 final ITypeBinding typeBinding = (ITypeBinding) binding;
                 return QName.valueOf(typeBinding.getErasure().getQualifiedName());
+
             case VARIABLE:
                 final IVariableBinding fieldBinding = (IVariableBinding) binding;
                 if (hasKind(node.getQualifier(), TYPE)) {
