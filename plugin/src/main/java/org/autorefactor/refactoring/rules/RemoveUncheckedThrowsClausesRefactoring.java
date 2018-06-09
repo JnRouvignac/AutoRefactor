@@ -56,7 +56,7 @@ public final class RemoveUncheckedThrowsClausesRefactoring extends AbstractRefac
      * @return the description.
      */
     public String getDescription() {
-        return "Remove unchecked exceptions from throws clause";
+        return "Remove unchecked exceptions from throws clause. Beware, the JavaDoc is not updated!";
     }
 
     /**
