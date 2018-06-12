@@ -110,10 +110,10 @@ public class MergeConditionalBlocksSample {
         } else if (i == 1) {
             // Keep this comment too
             System.out.println("Duplicate");
-        } else if (i == 2) {
+        } else if (i == 2)
             // Keep this comment too
             System.out.println("Duplicate");
-        } else if (i == 3) {
+        else if (i == 3) {
             // Keep this comment too
             System.out.println("Duplicate");
         } else {
