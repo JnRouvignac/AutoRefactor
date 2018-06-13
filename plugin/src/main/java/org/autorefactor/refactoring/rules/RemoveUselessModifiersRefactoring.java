@@ -40,7 +40,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.LinkedList;
 import java.util.List;
 
 import org.autorefactor.refactoring.ASTBuilder;
@@ -79,8 +78,9 @@ public class RemoveUselessModifiersRefactoring extends AbstractRefactoringRule {
      */
     public String getDescription() {
         return ""
-                + "Fixes modifier order.\n"
+                + "Sorts modifier.\n"
                 + "Also removes modifiers implied by the context:\n"
+                + "- \"static\" and \"abstract\" for interface,\n"
                 + "- \"public\", \"static\" and \"final\" for interface fields,\n"
                 + "- \"public\" and \"abstract\" for interface methods,\n"
                 + "- \"final\" for private methods,\n"
@@ -239,7 +239,11 @@ public class RemoveUselessModifiersRefactoring extends AbstractRefactoringRule {
 
     @Override
     public boolean visit(EnumDeclaration node) {
-        return removeStaticModifier(modifiers(node)) | ensureModifiersOrder(node);
+        if (removeStaticAbstractModifier(modifiers(node)) == DO_NOT_VISIT_SUBTREE) {
+            return DO_NOT_VISIT_SUBTREE;
+        }
+
+        return ensureModifiersOrder(node);
     }
 
     @Override
@@ -253,8 +257,11 @@ public class RemoveUselessModifiersRefactoring extends AbstractRefactoringRule {
 
     @Override
     public boolean visit(TypeDeclaration node) {
-        return (isInterface(node) && removeStaticModifier(modifiers(node)))
-                | ensureModifiersOrder(node);
+        if (isInterface(node) && removeStaticAbstractModifier(modifiers(node)) == DO_NOT_VISIT_SUBTREE) {
+            return DO_NOT_VISIT_SUBTREE;
+        }
+
+        return ensureModifiersOrder(node);
     }
 
     private boolean ensureModifiersOrder(BodyDeclaration node) {
@@ -283,10 +290,10 @@ public class RemoveUselessModifiersRefactoring extends AbstractRefactoringRule {
         }
     }
 
-    private boolean removeStaticModifier(List<IExtendedModifier> modifiers) {
+    private boolean removeStaticAbstractModifier(List<IExtendedModifier> modifiers) {
         boolean result = VISIT_SUBTREE;
         for (Modifier m : getModifiersOnly(modifiers)) {
-            if (m.isStatic()) {
+            if (m.isStatic() || m.isAbstract()) {
                 ctx.getRefactorings().remove(m);
                 result = DO_NOT_VISIT_SUBTREE;
             }
@@ -314,7 +321,7 @@ public class RemoveUselessModifiersRefactoring extends AbstractRefactoringRule {
     }
 
     private List<Modifier> getModifiersOnly(Collection<IExtendedModifier> modifiers) {
-        final List<Modifier> results = new LinkedList<Modifier>();
+        final List<Modifier> results = new ArrayList<Modifier>();
         for (IExtendedModifier em : modifiers) {
             if (em.isModifier()) {
                 results.add((Modifier) em);

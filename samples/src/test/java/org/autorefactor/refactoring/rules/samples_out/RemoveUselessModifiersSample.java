@@ -31,7 +31,37 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+/**
+ * Keep the JavaDoc.
+ */
+@Deprecated
 public interface RemoveUselessModifiersSample {
+
+    /**
+     * Keep the JavaDoc.
+     */
+    @Deprecated
+    interface RemoveAbstractModifier {
+    }
+
+    @Deprecated
+    interface RemoveStaticModifier {
+    }
+
+    public interface RefactorUnorderedSubInterface {
+    }
+
+    @Deprecated
+    public abstract class DoNotRefactorSubClass {
+    }
+
+    @Deprecated
+    interface DoNotRefactorSubRightInterface {
+    }
+
+    @Deprecated
+    abstract @interface DoNotRefactorAnnotation {
+    }
 
     String MY_FIELD = "";
 
@@ -77,9 +107,6 @@ public interface RemoveUselessModifiersSample {
 
     public enum RemoveStaticSampleEnum {
         VALUE1, VALUE2
-    }
-
-    public interface RemoveStaticSampleInterface {
     }
 
     public static @interface FixModifierOrderSampleAnnotation {

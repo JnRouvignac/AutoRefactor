@@ -31,11 +31,41 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-public interface RemoveUselessModifiersSample {
+/**
+ * Keep the JavaDoc.
+ */
+@Deprecated
+abstract public interface RemoveUselessModifiersSample {
+
+    /**
+     * Keep the JavaDoc.
+     */
+    @Deprecated
+    abstract interface RemoveAbstractModifier {
+    }
+
+    @Deprecated
+    static interface RemoveStaticModifier {
+    }
+
+    abstract public interface RefactorUnorderedSubInterface {
+    }
+
+    @Deprecated
+    public abstract class DoNotRefactorSubClass {
+    }
+
+    @Deprecated
+    interface DoNotRefactorSubRightInterface {
+    }
+
+    @Deprecated
+    abstract @interface DoNotRefactorAnnotation {
+    }
 
     public static final String MY_FIELD = "";
 
-    public abstract void myMethod(final String myArg);
+    abstract public void myMethod(final String myArg);
 
     abstract static public class FixModifierOrderSampleClass implements Closeable {
 
@@ -76,9 +106,6 @@ public interface RemoveUselessModifiersSample {
 
     static public enum RemoveStaticSampleEnum {
         VALUE1, VALUE2
-    }
-
-    static public interface RemoveStaticSampleInterface {
     }
 
     static public @interface FixModifierOrderSampleAnnotation {

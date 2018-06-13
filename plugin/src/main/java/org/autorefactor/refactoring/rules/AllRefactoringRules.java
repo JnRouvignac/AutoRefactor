@@ -144,7 +144,6 @@ public final class AllRefactoringRules {
                 new UseStringContainsRefactoring(),
                 new CommentsRefactoring(),
                 new RemoveFieldsDefaultValuesRefactoring(),
-                new RemoveAbstractFromInterfaceRefactoring(),
                 new StaticConstantRatherThanInstanceConstantRefactoring(),
                 new RemoveOverridenAssignmentRefactoring(),
                 new HotSpotIntrinsicedAPIsRefactoring(),
