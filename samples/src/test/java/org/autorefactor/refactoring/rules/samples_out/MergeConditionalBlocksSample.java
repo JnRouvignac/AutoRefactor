@@ -86,6 +86,15 @@ public class MergeConditionalBlocksSample {
             System.out.println("Different");
     }
 
+    /** Hardly identified elements */
+    public void doNotCreateMalFormedTree(boolean b1, boolean b2) {
+        if (b1) {
+        } else if (b2) {
+            ;
+        }
+//
+    }
+
     /** Duplicate if and else if code, merge it */
     public void numerousDuplicateIfAndElseIf(int i) {
         // Keep this comment
