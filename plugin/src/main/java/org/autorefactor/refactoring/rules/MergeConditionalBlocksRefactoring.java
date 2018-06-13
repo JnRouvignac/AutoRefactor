@@ -76,39 +76,33 @@ public class MergeConditionalBlocksRefactoring extends AbstractRefactoringRule {
 
         if (elseCode != null && elseCode.size() == 1 && elseCode.get(0) instanceof IfStatement) {
             final IfStatement subNode = (IfStatement) elseCode.get(0);
-            final Expression secondCondition = subNode.getExpression();
 
-            final Expression firstCondition = node.getExpression();
-            final List<Statement> ifCode = asList(node.getThenStatement());
-
-            return maybeMergeBlocks(firstCondition, ifCode, subNode, secondCondition, subNode.getThenStatement(),
-                    subNode.getElseStatement(), true)
-                    && maybeMergeBlocks(firstCondition, ifCode, subNode, secondCondition,
-                            subNode.getElseStatement(), subNode.getThenStatement(), false);
+            return maybeMergeBlocks(node, subNode, subNode.getThenStatement(), subNode.getElseStatement(), true)
+                    && maybeMergeBlocks(node, subNode, subNode.getElseStatement(), subNode.getThenStatement(),
+                            false);
         }
         return VISIT_SUBTREE;
     }
 
-    private boolean maybeMergeBlocks(final Expression firstCondition, final List<Statement> ifCode,
-            final IfStatement subNode, final Expression secondCondition, final Statement doubleStmts,
-            final Statement remainingStmts, final boolean isPositive) {
-        if (doubleStmts != null && isSameCode(ifCode, asList(doubleStmts))) {
-            refactorBlocks(firstCondition, subNode, secondCondition, remainingStmts, isPositive);
+    private boolean maybeMergeBlocks(final IfStatement node, final IfStatement subNode,
+            final Statement doubleStmts, final Statement remainingStmts, final boolean isPositive) {
+        if (doubleStmts != null && match(new ASTSemanticMatcher(), node.getThenStatement(), doubleStmts)) {
+            refactorBlocks(node.getExpression(), subNode, remainingStmts, isPositive);
             return DO_NOT_VISIT_SUBTREE;
         }
         return VISIT_SUBTREE;
     }
 
     private void refactorBlocks(final Expression firstCondition, final IfStatement subNode,
-            final Expression secondCondition, final Statement remainingStmts, final boolean isPositive) {
+            final Statement remainingStmts, final boolean isPositive) {
         final ASTBuilder b = this.ctx.getASTBuilder();
         final Refactorings r = this.ctx.getRefactorings();
 
         final Expression additionalCondition;
         if (isPositive) {
-            additionalCondition = b.copy(secondCondition);
+            additionalCondition = b.copy(subNode.getExpression());
         } else {
-            additionalCondition = b.negate(secondCondition, Copy.COPY);
+            additionalCondition = b.negate(subNode.getExpression(), Copy.COPY);
         }
 
         r.replace(firstCondition, b.infixExpr(b.parenthesizeIfNeeded(b.copy(firstCondition)),
@@ -118,21 +112,5 @@ public class MergeConditionalBlocksRefactoring extends AbstractRefactoringRule {
         } else {
             r.remove(subNode);
         }
-    }
-
-    private boolean isSameCode(final List<Statement> referenceStmts, final List<Statement> comparedStmts) {
-        if (referenceStmts.size() != comparedStmts.size()) {
-            return false;
-        }
-
-        final ASTSemanticMatcher matcher = new ASTSemanticMatcher();
-
-        for (int codeLine = 0; codeLine < referenceStmts.size(); codeLine++) {
-            if (!match(matcher, referenceStmts.get(codeLine),
-                    comparedStmts.get(codeLine))) {
-                return false;
-            }
-        }
-        return true;
     }
 }
