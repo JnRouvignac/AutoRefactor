@@ -171,7 +171,7 @@ public final class AllRefactoringRules {
                 new RemoveUselessModifiersRefactoring(),
                 new RemoveUnnecessaryCastRefactoring(),
                 new PushNegationDownRefactoring(),
-                new ReplaceQualifiedNamesBySimpleNamesRefactoring(),
+                new SimpleNameRatherThanQualifiedNameRefactoring(),
                 new SimplifyExpressionRefactoring());
     }
 

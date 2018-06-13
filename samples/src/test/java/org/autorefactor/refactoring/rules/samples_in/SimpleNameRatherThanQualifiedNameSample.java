@@ -24,7 +24,7 @@
  * which accompanies this distribution under LICENSE-ECLIPSE, and is
  * available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.autorefactor.refactoring.rules.samples_out;
+package org.autorefactor.refactoring.rules.samples_in;
 
 import static java.math.BigDecimal.ONE;
 import static java.math.BigInteger.*;
@@ -41,51 +41,51 @@ import java.util.List;
 import java.util.Map;
 
 @SuppressWarnings("javadoc")
-public class ReplaceQualifiedNamesBySimpleNamesSample {
+public class SimpleNameRatherThanQualifiedNameSample {
 
     private static final String TOP_LEVEL_PRIVATE_CONSTANT = "visible from sublevel";
 
     static long classField;
 
-    Long instanceField = Long.MIN_VALUE;
+    java.lang.Long instanceField = java.lang.Long.MIN_VALUE;
 
     static {
         long classField = 0l;
-        ReplaceQualifiedNamesBySimpleNamesSample.classField = Long.MAX_VALUE + classField;
+        SimpleNameRatherThanQualifiedNameSample.classField = java.lang.Long.MAX_VALUE + classField;
     }
 
-    public ReplaceQualifiedNamesBySimpleNamesSample(Long long1) {
-        Long long2 = Long.valueOf(long1 + 1);
+    public SimpleNameRatherThanQualifiedNameSample(java.lang.Long long1) {
+        java.lang.Long long2 = java.lang.Long.valueOf(long1 + 1);
     }
 
-    public List<String> removeQualifiedNameForImportNoWildcard(List<String> l) {
+    public java.util.List<String> removeQualifiedNameForImportNoWildcard(List<String> l) {
         return l;
     }
 
-    public Calendar removeQualifiedNameForImportWithWildcard(Calendar cal) {
+    public java.util.Calendar removeQualifiedNameForImportWithWildcard(Calendar cal) {
         return cal;
     }
 
     public int removeQualifiedNameForStaticImportWithWildcard() {
         // Keep this comment
-        return DATE;
+        return java.util.Calendar.DATE;
     }
 
     public boolean removeQualifiedNameForStaticMethodImport() {
         // Keep this comment
-        return emptyList().containsAll(emptyList());
+        return java.util.Collections.emptyList().containsAll(Collections.emptyList());
     }
 
     public boolean removeQualifiedNameForStaticFieldImport() {
         // Keep this comment
-        return EMPTY_LIST.containsAll(EMPTY_LIST);
+        return java.util.Collections.EMPTY_LIST.containsAll(Collections.EMPTY_LIST);
     }
 
     public void doNotRemoveQualifiedNameForGenericStaticMethodImport() {
         acceptListString(Collections.<String> emptyList());
     }
 
-    public long removeQualifiedNameForParameterType(Long i) {
+    public long removeQualifiedNameForParameterType(java.lang.Long i) {
         return i;
     }
 
@@ -93,7 +93,7 @@ public class ReplaceQualifiedNamesBySimpleNamesSample {
         // nothing to do
     }
 
-    public boolean removeQualifiedNameForStaticTypeImport(Entry<?, ?> e) {
+    public boolean removeQualifiedNameForStaticTypeImport(Map.Entry<?, ?> e) {
         return e.getKey() != null;
     }
 
@@ -103,7 +103,7 @@ public class ReplaceQualifiedNamesBySimpleNamesSample {
 
     public BigDecimal removeQualifiedNameForOverridingFieldSimpleNameFromStaticImports() {
         // Keep this comment
-        return ONE;
+        return BigDecimal.ONE;
     }
 
     public Map<Object, Object> doNotRemoveQualifiedNameForConflictingMethodSimpleName() {
@@ -112,16 +112,16 @@ public class ReplaceQualifiedNamesBySimpleNamesSample {
 
     public int removeQualifiedNameForNonConflictingLocalMethodSimpleName() {
         // Keep this comment
-        return emptyMap();
+        return SimpleNameRatherThanQualifiedNameSample.emptyMap();
     }
 
     private static int emptyMap() {
         return 0;
     }
 
-    public Boolean removeQualifiedNameForJavaLangPackage() {
+    public java.lang.Boolean removeQualifiedNameForJavaLangPackage() {
         // Keep this comment
-        return Boolean.TRUE;
+        return java.lang.Boolean.TRUE;
     }
 
     public java.lang.Integer doNotRemoveQualifiedNameForConflictingTypeFromJavaLangPackage() {
@@ -130,7 +130,7 @@ public class ReplaceQualifiedNamesBySimpleNamesSample {
 
     public Integer removeQualifiedNameForNonConflictingLocalType() {
         // Keep this comment
-        return new Integer();
+        return new SimpleNameRatherThanQualifiedNameSample.Integer();
     }
 
     private static final class Integer {
@@ -142,7 +142,7 @@ public class ReplaceQualifiedNamesBySimpleNamesSample {
 
     public String removeQualifiedNameForNonConflictingLocalField() {
         // Keep this comment
-        return DAY_OF_WEEK_IN_MONTH;
+        return SimpleNameRatherThanQualifiedNameSample.DAY_OF_WEEK_IN_MONTH;
     }
 
     private static final String DAY_OF_WEEK_IN_MONTH = "DAY_OF_WEEK_IN_MONTH";
@@ -150,13 +150,13 @@ public class ReplaceQualifiedNamesBySimpleNamesSample {
     static class A {
         private int replaceFromEnclosingType() {
             // Keep this comment
-            return emptyMap();
+            return SimpleNameRatherThanQualifiedNameSample.emptyMap();
         }
     }
 
     static class B {
         private int doNotReplaceCurrentTypeDiffers() {
-            return ReplaceQualifiedNamesBySimpleNamesSample.emptyMap();
+            return SimpleNameRatherThanQualifiedNameSample.emptyMap();
         }
 
         static int emptyMap() {
@@ -169,7 +169,7 @@ public class ReplaceQualifiedNamesBySimpleNamesSample {
 
         private int replaceFromCurrentType() {
             // Keep this comment
-            return emptyMap();
+            return C.emptyMap();
         }
 
         static int emptyMap() {
@@ -180,11 +180,11 @@ public class ReplaceQualifiedNamesBySimpleNamesSample {
     static class D extends C {
         private int replaceFromSuperType() {
             // Keep this comment
-            return emptyMap();
+            return C.emptyMap();
         }
 
         public void replaceThisTopLevelPrivateConstant() {
-            System.out.println("value is " + TOP_LEVEL_PRIVATE_CONSTANT);
+            System.out.println("value is " + SimpleNameRatherThanQualifiedNameSample.TOP_LEVEL_PRIVATE_CONSTANT);
         }
 
         public void doNotRefactorThisPrivateConstant() {
@@ -216,12 +216,12 @@ public class ReplaceQualifiedNamesBySimpleNamesSample {
     }
 
     public void doNotConflictClassFieldAndLocalVariable(long classField) {
-        ReplaceQualifiedNamesBySimpleNamesSample.classField = classField;
+        SimpleNameRatherThanQualifiedNameSample.classField = classField;
     }
 
     static String property;
     static void setProperty(String property) {
-        ReplaceQualifiedNamesBySimpleNamesSample.property = property;
+        SimpleNameRatherThanQualifiedNameSample.property = property;
     }
 
     public void doNotConflictClassFieldAndOuterClassField(String property) {
@@ -253,19 +253,19 @@ public class ReplaceQualifiedNamesBySimpleNamesSample {
 }
 
 class Outer {
-    static String property;
+    static java.lang.String property;
 
     void doNotRefactorTopLevelClassCall() {
-        ReplaceQualifiedNamesBySimpleNamesSample.setProperty("hi");
+        SimpleNameRatherThanQualifiedNameSample.setProperty("hi");
     }
 
     static class NestedOuter {
-        private static final String PRIVATE_CONSTANT = "not visible" ;
+        private static final String PRIVATE_CONSTANT = "not visible";
 
-        static String property;
+        static java.lang.String property;
 
         void doNotRefactorTopLevelClassCall() {
-            ReplaceQualifiedNamesBySimpleNamesSample.setProperty("hi");
+            SimpleNameRatherThanQualifiedNameSample.setProperty("hi");
         }
     }
 

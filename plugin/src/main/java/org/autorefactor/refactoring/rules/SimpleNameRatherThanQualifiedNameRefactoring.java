@@ -88,7 +88,7 @@ import org.eclipse.jdt.core.search.TypeNameMatch;
 import org.eclipse.jdt.core.search.TypeNameMatchRequestor;
 
 /** See {@link #getDescription()} method. */
-public class ReplaceQualifiedNamesBySimpleNamesRefactoring extends AbstractRefactoringRule {
+public class SimpleNameRatherThanQualifiedNameRefactoring extends AbstractRefactoringRule {
     private static final class QName {
         private final QName qualifier;
         private final String simpleName;
@@ -418,7 +418,7 @@ public class ReplaceQualifiedNamesBySimpleNamesRefactoring extends AbstractRefac
      * @return the name.
      */
     public String getName() {
-        return "Replace qualified names by simple names";
+        return "Simple name rather than qualified name";
     }
 
     /**
