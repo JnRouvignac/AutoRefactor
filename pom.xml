@@ -25,35 +25,40 @@
  | available at http://www.eclipse.org/legal/epl-v10.html
  -->
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <modelVersion>4.0.0</modelVersion>
+	<modelVersion>4.0.0</modelVersion>
 
   <groupId>org.autorefactor.plugin</groupId>
-  <artifactId>parent</artifactId>
-  <version>1.2.0-SNAPSHOT</version>
-  <packaging>pom</packaging>
-  <modules>
-    <module>feature</module>
-    <module>plugin</module>
-    <module>plugin.tests</module>
-    <module>plugin.ui</module>
-    <module>repository</module>
-    <module>samples</module>
-  </modules>
+	<artifactId>parent</artifactId>
+	<version>1.2.0-SNAPSHOT</version>
+	<packaging>pom</packaging>
 
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <tycho.scmUrl>scm:git:https://github.com/JnRouvignac/AutoRefactor.git</tycho.scmUrl>
-    <tycho-repo.url>https://oss.sonatype.org/content/groups/public/</tycho-repo.url>
-    <tycho-version>0.23.1</tycho-version>
-  </properties>
+	<modules>
+		<module>feature</module>
+		<module>plugin</module>
+		<module>plugin.tests</module>
+		<module>plugin.ui</module>
+		<module>repository</module>
+		<module>samples</module>
+	</modules>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<tycho-version>1.2.0</tycho-version>
+	</properties>
+
+	<scm>
+		<connection>scm:git:https://github.com/JnRouvignac/AutoRefactor.git</connection>
+		<developerConnection>scm:git:https://github.com/JnRouvignac/AutoRefactor.git</developerConnection>
+		<tag>HEAD</tag>
+	</scm>
 
   <repositories>
-    <repository>
-      <id>Indigo</id>
-      <layout>p2</layout>
+		<repository>
+			<id>Indigo</id>
+			<layout>p2</layout>
 <!--
       <url>http://download.eclipse.org/eclipse/updates/3.7</url>
       <id>Juno 3.8</id>
@@ -67,25 +72,12 @@
       <id>Mars</id>
       <url>http://download.eclipse.org/eclipse/updates/4.5</url>
 -->
-      <url>http://download.eclipse.org/releases/mars</url>
-    </repository>
+			<url>http://download.eclipse.org/releases/mars</url>
+		</repository>
   </repositories>
 
-  <pluginRepositories>
-    <pluginRepository>
-      <id>tycho</id>
-      <url>${tycho-repo.url}</url>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </pluginRepository>
-  </pluginRepositories>
-
-  <build>
-    <plugins>
+	<build>
+		<plugins>
       <!-- More information for Tycho based builds:
             http://wiki.eclipse.org/Tycho/Reference_Card
             http://wiki.eclipse.org/Tycho/FAQ
@@ -98,46 +90,46 @@
             https://github.com/jeffmaury/eclipsecon2013-tycho
             http://git.eclipse.org/c/tycho/org.eclipse.tycho-demo.git/tree/
       -->
-      <plugin>
-        <groupId>org.eclipse.tycho</groupId>
-        <artifactId>tycho-maven-plugin</artifactId>
-        <version>${tycho-version}</version>
-        <extensions>true</extensions>
-      </plugin>
-      <plugin>
-        <groupId>org.eclipse.tycho</groupId>
-        <artifactId>target-platform-configuration</artifactId>
-        <version>${tycho-version}</version>
-        <configuration>
-          <environments>
-            <environment>
-              <os>linux</os>
-              <ws>gtk</ws>
-              <arch>x86</arch>
-            </environment>
-            <environment>
-              <os>linux</os>
-              <ws>gtk</ws>
-              <arch>x86_64</arch>
-            </environment>
-            <environment>
-              <os>win32</os>
-              <ws>win32</ws>
-              <arch>x86</arch>
-            </environment>
-            <environment>
-              <os>win32</os>
-              <ws>win32</ws>
-              <arch>x86_64</arch>
-            </environment>
-            <environment>
-              <os>macosx</os>
-              <ws>cocoa</ws>
-              <arch>x86_64</arch>
-            </environment>
-          </environments>
-        </configuration>
-      </plugin>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-maven-plugin</artifactId>
+				<version>${tycho-version}</version>
+				<extensions>true</extensions>
+			</plugin>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>target-platform-configuration</artifactId>
+				<version>${tycho-version}</version>
+				<configuration>
+					<environments>
+						<environment>
+							<os>linux</os>
+							<ws>gtk</ws>
+							<arch>x86</arch>
+						</environment>
+						<environment>
+							<os>linux</os>
+							<ws>gtk</ws>
+							<arch>x86_64</arch>
+						</environment>
+						<environment>
+							<os>win32</os>
+							<ws>win32</ws>
+							<arch>x86</arch>
+						</environment>
+						<environment>
+							<os>win32</os>
+							<ws>win32</ws>
+							<arch>x86_64</arch>
+						</environment>
+						<environment>
+							<os>macosx</os>
+							<ws>cocoa</ws>
+							<arch>x86_64</arch>
+						</environment>
+					</environments>
+				</configuration>
+			</plugin>
 <!-- TODO JNR
 Read and apply:
 http://www.sebastianbauer.info/index.php?page=tutorials&which=justify
@@ -153,75 +145,98 @@ http://www.solutionsiq.com/developing-eclipse-plug-ins-program-to-publish/
         </configuration>
       </plugin>
 -->
-      <plugin>
-        <groupId>org.eclipse.tycho</groupId>
-        <artifactId>tycho-compiler-plugin</artifactId>
-        <version>${tycho-version}</version>
-        <configuration>
-          <source>1.5</source>
-          <target>1.5</target>
-          <compilerId>jdt</compilerId>
-          <!--
-          <compilerArgument>-err:nullAnnot,null</compilerArgument> <!- insert your warn/err configuration here ->
-          <compilerArguments>
-            <properties>${project.basedir}/.settings/org.eclipse.jdt.core.prefs</properties>
-          </compilerArguments>
-          -->
-        </configuration>
-        <dependencies>
-          <!-- This dependency provides the implementation of compiler "jdt": -->
-          <dependency>
-            <groupId>org.eclipse.tycho</groupId>
-            <artifactId>tycho-compiler-jdt</artifactId>
-            <version>${tycho-version}</version>
-          </dependency>
-        </dependencies>
-      </plugin>
-      <!-- Set the new version with:
-           mvn org.eclipse.tycho:tycho-versions-plugin:set-version -DnewVersion=1.0
-           And tag with:
-           git tag -a v1.0 -m "My message"
-      -->
-      <plugin>
-        <groupId>org.eclipse.tycho</groupId>
-        <artifactId>tycho-versions-plugin</artifactId>
-        <version>${tycho-version}</version>
-      </plugin>
-    </plugins>
-  </build>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-compiler-plugin</artifactId>
+				<version>${tycho-version}</version>
+				<configuration>
+					<source>1.5</source>
+					<target>1.5</target>
+					<compilerId>jdt</compilerId>
+					<!--
+					<compilerArgument>-err:nullAnnot,null</compilerArgument> <!- insert your warn/err configuration here ->
+					<compilerArguments>
+					<properties>${project.basedir}/.settings/org.eclipse.jdt.core.prefs</properties>
+					</compilerArguments>
+					-->
+				</configuration>
+				<dependencies>
+				<!-- This dependency provides the implementation of compiler "jdt": -->
+					<dependency>
+						<groupId>org.eclipse.tycho</groupId>
+						<artifactId>tycho-compiler-jdt</artifactId>
+						<version>${tycho-version}</version>
+					</dependency>
+				</dependencies>
+			</plugin>
+			<!-- Set the new version with:
+			mvn org.eclipse.tycho:tycho-versions-plugin:set-version -DnewVersion=1.0
+			And tag with:
+			git tag -a v1.0 -m "My message"
+			-->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-release-plugin</artifactId>
+				<version>2.5.3</version>
+				<configuration>
+					<preparationGoals>org.eclipse.tycho:tycho-versions-plugin:${tycho-version}:update-eclipse-metadata org.apache.maven.plugins:maven-scm-plugin:1.9.5:add org.apache.maven.plugins:maven-scm-plugin:1.9.5:checkin</preparationGoals>
+					<completionGoals>org.eclipse.tycho:tycho-versions-plugin:${tycho-version}:update-eclipse-metadata org.apache.maven.plugins:maven-scm-plugin:1.9.5:add org.apache.maven.plugins:maven-scm-plugin:1.9.5:checkin</completionGoals>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-scm-plugin</artifactId>
+				<version>1.10.0</version>
+				<executions>
+					<execution>
+						<id>default-cli</id>
+						<goals>
+							<goal>add</goal>
+							<goal>checkin</goal>
+						</goals>
+						<configuration>
+							<includes>**/META-INF/MANIFEST.MF,**/feature.xml,**/*.product,**/category.xml</includes>
+							<excludes>**/target/**</excludes>
+							<message>Changing the Eclipse files versions</message>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 
-  <profiles>
-    <profile>
-      <id>checkstyle</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-checkstyle-plugin</artifactId>
-            <version>2.12.1</version>
-            <executions>
-              <execution>
-                <id>validate</id>
-                <phase>validate</phase>
-                <configuration>
-                  <configLocation>checkstyle.xml</configLocation>
-                  <encoding>UTF-8</encoding>
-                  <consoleOutput>true</consoleOutput>
-                  <failsOnError>true</failsOnError>
-                  <linkXRef>false</linkXRef>
-                </configuration>
-                <goals>
-                  <goal>check</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
-
+	<profiles>
+		<profile>
+			<id>checkstyle</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-checkstyle-plugin</artifactId>
+						<version>2.12.1</version>
+						<executions>
+							<execution>
+								<id>validate</id>
+								<phase>validate</phase>
+								<configuration>
+									<configLocation>checkstyle.xml</configLocation>
+									<encoding>UTF-8</encoding>
+									<consoleOutput>true</consoleOutput>
+									<failsOnError>true</failsOnError>
+									<linkXRef>false</linkXRef>
+								</configuration>
+								<goals>
+									<goal>check</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+	
 </project>
