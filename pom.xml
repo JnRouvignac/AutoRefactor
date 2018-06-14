@@ -182,6 +182,13 @@ http://www.solutionsiq.com/developing-eclipse-plug-ins-program-to-publish/
 					<preparationGoals>org.eclipse.tycho:tycho-versions-plugin:${tycho-version}:update-eclipse-metadata org.apache.maven.plugins:maven-scm-plugin:1.9.5:add org.apache.maven.plugins:maven-scm-plugin:1.9.5:checkin</preparationGoals>
 					<completionGoals>org.eclipse.tycho:tycho-versions-plugin:${tycho-version}:update-eclipse-metadata org.apache.maven.plugins:maven-scm-plugin:1.9.5:add org.apache.maven.plugins:maven-scm-plugin:1.9.5:checkin</completionGoals>
 				</configuration>
+			    <dependencies>
+			        <dependency>
+			            <groupId>org.apache.maven.plugins</groupId>
+			            <artifactId>maven-scm-plugin</artifactId>
+			            <version>1.10.0</version>
+			        </dependency>
+			    </dependencies>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
