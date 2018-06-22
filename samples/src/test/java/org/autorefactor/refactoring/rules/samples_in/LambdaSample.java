@@ -103,6 +103,10 @@ public class LambdaSample extends Date {
         return anotherDate -> this.compareTo(anotherDate);
     }
 
+    public Function<Date, Integer> useThisMethodReferenceAddThis() {
+        return anotherDate -> compareTo(anotherDate);
+    }
+
     public Function<Integer, String> doNotUseConflictingMethodReference() {
         return numberToPrint -> numberToPrint.toString();
     }
