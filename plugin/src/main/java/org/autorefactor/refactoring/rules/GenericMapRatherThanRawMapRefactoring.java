@@ -2,6 +2,7 @@
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
  * Copyright (C) 2018 Fabrice Tiercelin - initial API and implementation
+ * Copyright (C) 2018 Jean-Noël Rouvignac - minor changes
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,10 +26,7 @@
  */
 package org.autorefactor.refactoring.rules;
 
-import static org.autorefactor.refactoring.ASTHelper.getBoxedTypeBinding;
-import static org.autorefactor.refactoring.ASTHelper.getDestinationType;
-import static org.autorefactor.refactoring.ASTHelper.hasType;
-import static org.autorefactor.refactoring.ASTHelper.isMethod;
+import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.autorefactor.util.Utils.getOrDefault;
 
 import java.util.ArrayList;
@@ -156,7 +154,6 @@ public class GenericMapRatherThanRawMapRefactoring extends AbstractClassSubstitu
      * @param originalExpr The original expression
      * @return the substitute type.
      */
-    @SuppressWarnings("unchecked")
     @Override
     protected Type substituteType(final ASTBuilder b, final Type origType, ASTNode originalExpr) {
         if (origType.isParameterizedType()) {
@@ -166,9 +163,10 @@ public class GenericMapRatherThanRawMapRefactoring extends AbstractClassSubstitu
         final TypeNameDecider typeNameDecider = new TypeNameDecider(originalExpr);
 
         final ParameterizedType parameterizedType = b.getAST().newParameterizedType(b.copy(origType));
-        parameterizedType.typeArguments().clear();
-        parameterizedType.typeArguments().add(b.toType(keyType, typeNameDecider));
-        parameterizedType.typeArguments().add(b.toType(valueType, typeNameDecider));
+        final List<Type> typeArgs = typeArguments(parameterizedType);
+        typeArgs.clear();
+        typeArgs.add(b.toType(keyType, typeNameDecider));
+        typeArgs.add(b.toType(valueType, typeNameDecider));
 
         return parameterizedType;
     }

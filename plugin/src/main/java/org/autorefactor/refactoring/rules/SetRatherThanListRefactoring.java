@@ -26,17 +26,18 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import static org.autorefactor.refactoring.ASTHelper.*;
+import static org.autorefactor.util.Utils.getOrDefault;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.autorefactor.refactoring.ASTBuilder;
 import org.eclipse.jdt.core.dom.Block;
+import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.MethodInvocation;
-
-import static org.autorefactor.refactoring.ASTHelper.*;
-import static org.autorefactor.util.Utils.*;
 
 /** See {@link #getDescription()} method. */
 public class SetRatherThanListRefactoring extends AbstractClassSubstituteRefactoring {
@@ -152,15 +153,15 @@ public class SetRatherThanListRefactoring extends AbstractClassSubstituteRefacto
                 || isMethod(mi, "java.lang.Object", "wait", "long", "int");
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     protected void refactorMethod(final ASTBuilder b, final MethodInvocation originalMi,
             final MethodInvocation refactoredMi) {
         if (isMethod(originalMi, "java.util.List", "add", "int", "java.lang.Object")
                 || isMethod(originalMi, "java.util.List", "addAll", "int", "java.util.Collection")) {
-            Object item = refactoredMi.arguments().get(1);
-            refactoredMi.arguments().clear();
-            refactoredMi.arguments().add(item);
+            List<Expression> args = arguments(refactoredMi);
+            Expression item = args.get(1);
+            args.clear();
+            args.add(item);
         }
     }
 
