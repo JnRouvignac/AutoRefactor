@@ -293,7 +293,11 @@ public class LambdaRefactoring extends AbstractRefactoringRule {
             final ASTBuilder b = LambdaRefactoring.this.ctx.getASTBuilder();
 
             final ExpressionMethodReference typeMethodRef = b.exprMethodRef();
-            typeMethodRef.setExpression(b.copy(mi.getExpression()));
+            if (mi.getExpression() != null) {
+                typeMethodRef.setExpression(b.copy(mi.getExpression()));
+            } else {
+                typeMethodRef.setExpression(b.this0());
+            }
             typeMethodRef.setName(b.copy(mi.getName()));
             LambdaRefactoring.this.ctx.getRefactorings().replace(node, typeMethodRef);
         }
