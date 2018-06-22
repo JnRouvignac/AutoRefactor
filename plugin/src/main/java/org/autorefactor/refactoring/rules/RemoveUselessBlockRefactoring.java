@@ -2,6 +2,7 @@
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
  * Copyright (C) 2017 Fabrice Tiercelin - initial API and implementation
+ * Copyright (C) 2018 Jean-Noël Rouvignac - minor changes
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,11 +26,7 @@
  */
 package org.autorefactor.refactoring.rules;
 
-import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
-import static org.autorefactor.refactoring.ASTHelper.getLocalVariableIdentifiers;
-import static org.autorefactor.refactoring.ASTHelper.getNextSiblings;
-import static org.autorefactor.refactoring.ASTHelper.statements;
+import static org.autorefactor.refactoring.ASTHelper.*;
 
 import java.util.HashSet;
 import java.util.List;
@@ -92,10 +89,9 @@ public class RemoveUselessBlockRefactoring extends AbstractRefactoringRule {
         return VISIT_SUBTREE;
     }
 
-    @SuppressWarnings("unchecked")
     private void replaceBlock(final Block node) {
         final ASTBuilder b = this.ctx.getASTBuilder();
         final Refactorings r = this.ctx.getRefactorings();
-        r.replace(node, b.copyRange(node.statements()));
+        r.replace(node, b.copyRange(statements(node)));
     }
 }

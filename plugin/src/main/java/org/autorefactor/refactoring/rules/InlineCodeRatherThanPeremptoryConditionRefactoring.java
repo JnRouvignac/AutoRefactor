@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2015-2016 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2015-2018 Jean-Noël Rouvignac - initial API and implementation
  * Copyright (C) 2016 Fabrice Tiercelin - Make sure we do not visit again modified nodes
  *
  * This program is free software: you can redistribute it and/or modify
@@ -26,14 +26,7 @@
  */
 package org.autorefactor.refactoring.rules;
 
-import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
-import static org.autorefactor.refactoring.ASTHelper.asList;
-import static org.autorefactor.refactoring.ASTHelper.getLocalVariableIdentifiers;
-import static org.autorefactor.refactoring.ASTHelper.getNextSiblings;
-import static org.autorefactor.refactoring.ASTHelper.fallsThrough;
-import static org.autorefactor.refactoring.ASTHelper.isPassive;
-import static org.autorefactor.refactoring.ASTHelper.match;
+import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.eclipse.jdt.core.dom.InfixExpression.Operator.EQUALS;
 import static org.eclipse.jdt.core.dom.InfixExpression.Operator.NOT_EQUALS;
 
@@ -114,7 +107,6 @@ public class InlineCodeRatherThanPeremptoryConditionRefactoring extends Abstract
 
         @Override
         public boolean visit(IfStatement node) {
-            final ASTBuilder b = InlineCodeRatherThanPeremptoryConditionRefactoring.this.ctx.getASTBuilder();
             final Refactorings r = InlineCodeRatherThanPeremptoryConditionRefactoring.this.ctx.getRefactorings();
 
             final Statement thenStmt = node.getThenStatement();
@@ -175,13 +167,12 @@ public class InlineCodeRatherThanPeremptoryConditionRefactoring extends Abstract
         return null;
     }
 
-    @SuppressWarnings("unchecked")
     private void replaceBlockByPlainCode(final Statement sourceNode, final Statement unconditionnalStatement) {
         final ASTBuilder b = this.ctx.getASTBuilder();
         final Refactorings r = this.ctx.getRefactorings();
 
         if (unconditionnalStatement instanceof Block && sourceNode.getParent() instanceof Block) {
-            r.replace(sourceNode, b.copyRange(((Block) unconditionnalStatement).statements()));
+            r.replace(sourceNode, b.copyRange(statements((Block) unconditionnalStatement)));
         } else {
             r.replace(sourceNode, b.copy(unconditionnalStatement));
         }

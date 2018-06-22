@@ -26,6 +26,9 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import static org.autorefactor.refactoring.ASTHelper.*;
+import static org.autorefactor.util.Utils.getOrDefault;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,11 +36,10 @@ import java.util.Map;
 import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.Release;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
+import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.MethodInvocation;
-
-import static org.autorefactor.refactoring.ASTHelper.*;
-import static org.autorefactor.util.Utils.*;
+import org.eclipse.jdt.core.dom.Type;
 
 /** See {@link #getDescription()} method. */
 public class ArrayListRatherThanVectorRefactoring extends AbstractClassSubstituteRefactoring {
@@ -184,20 +186,21 @@ public class ArrayListRatherThanVectorRefactoring extends AbstractClassSubstitut
         }
     }
 
-    @SuppressWarnings("unchecked")
     private void reorderArguments(final MethodInvocation refactoredMi) {
-        Object item = refactoredMi.arguments().get(0);
-        Object index = refactoredMi.arguments().get(1);
-        refactoredMi.arguments().clear();
-        refactoredMi.arguments().add(index);
-        refactoredMi.arguments().add(item);
+        List<Expression> args = arguments(refactoredMi);
+        Expression item = args.get(0);
+        Expression index = args.get(1);
+        args.clear();
+        args.add(index);
+        args.add(item);
 
-        if (refactoredMi.typeArguments() != null && !refactoredMi.typeArguments().isEmpty()) {
-            Object itemType = refactoredMi.typeArguments().get(0);
-            Object indexType = refactoredMi.typeArguments().get(1);
-            refactoredMi.typeArguments().clear();
-            refactoredMi.typeArguments().add(indexType);
-            refactoredMi.typeArguments().add(itemType);
+        final List<Type> typeArgs = typeArguments(refactoredMi);
+        if (typeArgs != null && !typeArgs.isEmpty()) {
+            Type itemType = typeArgs.get(0);
+            Type indexType = typeArgs.get(1);
+            typeArgs.clear();
+            typeArgs.add(indexType);
+            typeArgs.add(itemType);
         }
     }
 

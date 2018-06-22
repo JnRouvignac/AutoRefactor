@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2013-2016 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2013-2018 Jean-Noël Rouvignac - initial API and implementation
  * Copyright (C) 2016 Fabrice Tiercelin - Make sure we do not visit again modified nodes
  *
  * This program is free software: you can redistribute it and/or modify
@@ -56,7 +56,6 @@ import org.eclipse.jdt.core.dom.PrefixExpression;
 import org.eclipse.jdt.core.dom.StringLiteral;
 
 /** See {@link #getDescription()} method. */
-@SuppressWarnings("javadoc")
 public class BigNumberRefactoring extends AbstractRefactoringRule {
     /**
      * Get the name.
