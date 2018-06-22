@@ -2,6 +2,7 @@
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
  * Copyright (C) 2018 Fabrice Tiercelin - Initial API and implementation
+ * Copyright (C) 2018 Jean-Noël Rouvignac - fix NPE
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,12 +26,7 @@
  */
 package org.autorefactor.refactoring.rules;
 
-import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
-import static org.autorefactor.refactoring.ASTHelper.asList;
-import static org.autorefactor.refactoring.ASTHelper.haveSameType;
-import static org.autorefactor.refactoring.ASTHelper.isMethod;
-import static org.autorefactor.refactoring.ASTHelper.removeParentheses;
+import static org.autorefactor.refactoring.ASTHelper.*;
 
 import java.util.List;
 
@@ -114,67 +110,54 @@ public class LambdaRefactoring extends AbstractRefactoringRule {
             } else if (node.getBody() instanceof Block) {
                 final List<Statement> stmts = asList((Block) node.getBody());
 
-                if (stmts != null && stmts.size() == 1 && stmts.get(0) instanceof ReturnStatement) {
+                if (stmts.size() == 1 && stmts.get(0) instanceof ReturnStatement) {
                     removeReturnAndBrackets(node, stmts);
                     return DO_NOT_VISIT_SUBTREE;
                 }
             } else if (node.getBody() instanceof ClassInstanceCreation) {
                 final ClassInstanceCreation ci = (ClassInstanceCreation) node.getBody();
 
-                @SuppressWarnings("unchecked")
-                final List<ASTNode> arguments = ci.arguments();
-                if (node.parameters().size() == arguments.size()) {
-                    for (int i = 0; i < node.parameters().size(); i++) {
-                        if (!isSameIdentifier(node, arguments, i)) {
-                            return VISIT_SUBTREE;
-                        }
-                    }
-
+                final List<Expression> arguments = arguments(ci);
+                if (node.parameters().size() == arguments.size()
+                        && isSameIdentifier(node, arguments)) {
                     replaceByCreationReference(node, ci);
                     return DO_NOT_VISIT_SUBTREE;
                 }
             } else if (node.getBody() instanceof SuperMethodInvocation) {
                 final SuperMethodInvocation smi = (SuperMethodInvocation) node.getBody();
 
-                @SuppressWarnings("unchecked")
-                final List<ASTNode> arguments = smi.arguments();
-                if (node.parameters().size() == arguments.size()) {
-                    for (int i = 0; i < node.parameters().size(); i++) {
-                        if (!isSameIdentifier(node, arguments, i)) {
-                            return VISIT_SUBTREE;
-                        }
-                    }
-
+                final List<Expression> arguments = arguments(smi);
+                if (node.parameters().size() == arguments.size()
+                        && isSameIdentifier(node, arguments)) {
                     replaceBySuperMethodReference(node, smi);
                     return DO_NOT_VISIT_SUBTREE;
                 }
             } else if (node.getBody() instanceof MethodInvocation) {
                 final MethodInvocation mi = (MethodInvocation) node.getBody();
-                @SuppressWarnings("unchecked")
-                final List<ASTNode> arguments = mi.arguments();
+                final Expression miExpr = mi.getExpression();
+
+                final List<Expression> arguments = arguments(mi);
                 if (node.parameters().size() == arguments.size()) {
-                    for (int i = 0; i < node.parameters().size(); i++) {
-                        if (!isSameIdentifier(node, arguments, i)) {
-                            return VISIT_SUBTREE;
-                        }
+                    if (!isSameIdentifier(node, arguments)) {
+                        return VISIT_SUBTREE;
                     }
 
-                    if (mi.getExpression() instanceof SimpleName
-                            && ((SimpleName) mi.getExpression()).resolveBinding().getKind() == IBinding.TYPE
+                    if (miExpr instanceof SimpleName
+                            && ((SimpleName) miExpr).resolveBinding().getKind() == IBinding.TYPE
                                     && !arguments.isEmpty()
-                                    && haveSameType((Expression) arguments.get(0), mi.getExpression())) {
+                                    && haveSameType(arguments.get(0), miExpr)) {
 
                         final String[] remainingParams = new String[arguments.size() - 1];
                         for (int i = 0; i < arguments.size() - 1; i++) {
                             remainingParams[i] =
-                                    ((Expression) arguments.get(i + 1)).resolveTypeBinding().getQualifiedName();
+                                    arguments.get(i + 1).resolveTypeBinding().getQualifiedName();
                         }
 
-                        final ITypeBinding clazz = ((SimpleName) mi.getExpression()).resolveTypeBinding();
+                        final ITypeBinding clazz = miExpr.resolveTypeBinding();
                         for (final IMethodBinding methodBinding : clazz.getDeclaredMethods()) {
                             if ((methodBinding.getModifiers() & Modifier.STATIC) == 0
                                     && isMethod(methodBinding,
-                                            mi.getExpression().resolveTypeBinding().getQualifiedName(),
+                                            clazz.getQualifiedName(),
                                             mi.getName().getIdentifier(), remainingParams)) {
                                 return VISIT_SUBTREE;
                             }
@@ -183,37 +166,30 @@ public class LambdaRefactoring extends AbstractRefactoringRule {
 
                     replaceByMethodReference(node, mi);
                     return DO_NOT_VISIT_SUBTREE;
-                } else if (mi.getExpression() instanceof SimpleName
+                } else if (miExpr instanceof SimpleName
                         && node.parameters().size() == arguments.size() + 1) {
-                    final SimpleName calledObject = (SimpleName) mi.getExpression();
-                    if (((VariableDeclarationFragment) node.parameters().get(0)).getName().getIdentifier()
-                            .equals(calledObject.getIdentifier())) {
+                    final SimpleName calledObject = (SimpleName) miExpr;
+                    if (isSameIdentifier(node, 0, calledObject)) {
                         for (int i = 0; i < arguments.size(); i++) {
                             final ASTNode expr = removeParentheses(arguments.get(i));
-                            if (!(expr instanceof SimpleName)) {
-                                return VISIT_SUBTREE;
-                            }
-                            final SimpleName argument = (SimpleName) expr;
-
-                            if (!((VariableDeclarationFragment) node.parameters().get(i + 1))
-                                    .getName().getIdentifier()
-                                    .equals(argument.getIdentifier())) {
+                            if (!(expr instanceof SimpleName)
+                                    || !isSameIdentifier(node, i + 1, (SimpleName) expr)) {
                                 return VISIT_SUBTREE;
                             }
                         }
 
+                        final ITypeBinding clazz = miExpr.resolveTypeBinding();
                         final String[] remainingParams = new String[arguments.size() + 1];
-                        remainingParams[0] = calledObject.resolveTypeBinding().getQualifiedName();
+                        remainingParams[0] = clazz.getQualifiedName();
                         for (int i = 0; i < arguments.size(); i++) {
                             remainingParams[i + 1] =
-                                    ((Expression) arguments.get(i)).resolveTypeBinding().getQualifiedName();
+                                    arguments.get(i).resolveTypeBinding().getQualifiedName();
                         }
 
-                        final ITypeBinding clazz = ((SimpleName) mi.getExpression()).resolveTypeBinding();
                         for (IMethodBinding methodBinding : clazz.getDeclaredMethods()) {
                             if ((methodBinding.getModifiers() & Modifier.STATIC) > 0
                                     && isMethod(methodBinding,
-                                            mi.getExpression().resolveTypeBinding().getQualifiedName(),
+                                            clazz.getQualifiedName(),
                                             mi.getName().getIdentifier(), remainingParams)) {
                                 return VISIT_SUBTREE;
                             }
@@ -227,17 +203,23 @@ public class LambdaRefactoring extends AbstractRefactoringRule {
             return VISIT_SUBTREE;
         }
 
-        private boolean isSameIdentifier(final LambdaExpression node, final List<ASTNode> arguments, final int i) {
-            final ASTNode expr = removeParentheses(arguments.get(i));
-            if (expr instanceof SimpleName) {
-                final SimpleName argument = (SimpleName) expr;
-
-                if (((VariableDeclarationFragment) node.parameters().get(i)).getName().getIdentifier()
-                        .equals(argument.getIdentifier())) {
-                    return true;
+        private boolean isSameIdentifier(LambdaExpression node, List<Expression> arguments) {
+            for (int i = 0; i < node.parameters().size(); i++) {
+                if (!isSameIdentifier(node, arguments, i)) {
+                    return false;
                 }
             }
-            return false;
+            return true;
+        }
+
+        private boolean isSameIdentifier(final LambdaExpression node, final List<Expression> arguments, final int i) {
+            final Expression expr = removeParentheses(arguments.get(i));
+            return expr instanceof SimpleName && isSameIdentifier(node, i, (SimpleName) expr);
+        }
+
+        private boolean isSameIdentifier(final LambdaExpression node, final int i, final SimpleName argument) {
+            final VariableDeclarationFragment vdf = (VariableDeclarationFragment) node.parameters().get(i);
+            return vdf.getName().getIdentifier().equals(argument.getIdentifier());
         }
 
         @SuppressWarnings("unchecked")

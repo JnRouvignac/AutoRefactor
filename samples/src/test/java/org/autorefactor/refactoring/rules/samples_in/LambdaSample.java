@@ -2,6 +2,7 @@
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
  * Copyright (C) 2018 Fabrice TIERCELIN - Initial API and implementation
+ * Copyright (C) 2018 Jean-Noël Rouvignac - fix NPE
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
