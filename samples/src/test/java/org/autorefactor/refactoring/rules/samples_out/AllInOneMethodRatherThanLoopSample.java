@@ -26,6 +26,7 @@
 package org.autorefactor.refactoring.rules.samples_out;
 
 import java.util.AbstractSet;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -33,7 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class AllInOneMethodRatherThanLoopSample {
+public class AllInOneMethodRatherThanLoopSample extends ArrayList<java.util.Date> {
 
     public void replaceAddWithForLoopByCollectionsAddAll(
             List<? super java.util.Date> output, java.util.Date[] elems1, java.sql.Date[] elems2) {
@@ -42,11 +43,23 @@ public class AllInOneMethodRatherThanLoopSample {
         java.util.Collections.addAll(output, elems2);
     }
 
+    public void replaceAddWithForLoopByCollectionsAddAll(
+            java.util.Date[] dates) {
+        // Keep this comment
+        java.util.Collections.addAll(this, dates);
+    }
+
     public void replaceAddWithForEachByCollectionsAddAll(
             List<? super java.util.Date> output, java.util.Date[] elems1, java.sql.Date[] elems2) {
         // Keep this comment
         java.util.Collections.addAll(output, elems1);
         java.util.Collections.addAll(output, elems2);
+    }
+
+    public void replaceAddWithForEachByCollectionsAddAll(
+            java.util.Date[] dates) {
+        // Keep this comment
+        java.util.Collections.addAll(this, dates);
     }
 
     public void replaceLoopOnCollectionAsExpressionWithArray(
