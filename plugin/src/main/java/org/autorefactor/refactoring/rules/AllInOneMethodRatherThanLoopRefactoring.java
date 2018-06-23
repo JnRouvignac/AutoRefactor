@@ -36,7 +36,7 @@ import static org.autorefactor.refactoring.ASTHelper.instanceOf;
 import static org.autorefactor.refactoring.ASTHelper.isArray;
 import static org.autorefactor.refactoring.ASTHelper.isMethod;
 import static org.autorefactor.refactoring.ASTHelper.isSameLocalVariable;
-import static org.autorefactor.refactoring.ASTHelper.getFirstAncestorOrNull;
+import static org.autorefactor.refactoring.ASTHelper.getCalledType;
 import static org.autorefactor.refactoring.ForLoopHelper.iterateOverContainer;
 
 import java.util.List;
@@ -44,7 +44,6 @@ import java.util.List;
 import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.ForLoopHelper.ForLoopContent;
 import org.eclipse.jdt.core.dom.ASTNode;
-import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
 import org.eclipse.jdt.core.dom.ArrayAccess;
 import org.eclipse.jdt.core.dom.EnhancedForStatement;
 import org.eclipse.jdt.core.dom.Expression;
@@ -55,7 +54,6 @@ import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Name;
 import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.Statement;
-import org.eclipse.jdt.core.dom.TypeDeclaration;
 
 /** See {@link #getDescription()} method. */
 public class AllInOneMethodRatherThanLoopRefactoring extends AbstractRefactoringRule {
@@ -120,21 +118,6 @@ public class AllInOneMethodRatherThanLoopRefactoring extends AbstractRefactoring
         return VISIT_SUBTREE;
     }
 
-    private ITypeBinding getCalledType(final MethodInvocation mi) {
-        if (mi.getExpression() != null) {
-            return mi.getExpression().resolveTypeBinding();
-        } else {
-            ASTNode declarationClass = getFirstAncestorOrNull(mi, AnonymousClassDeclaration.class,
-                    TypeDeclaration.class);
-            if (declarationClass instanceof AnonymousClassDeclaration) {
-                return ((AnonymousClassDeclaration) declarationClass).resolveBinding();
-            } else if (declarationClass instanceof TypeDeclaration) {
-                return ((TypeDeclaration) declarationClass).resolveBinding();
-            }
-        }
-        return null;
-    }
-
     private void replaceWithCollectionsAddAll(Statement node, Expression iterable, MethodInvocation mi) {
         ASTBuilder b = ctx.getASTBuilder();
         ctx.getRefactorings().replace(node,
@@ -175,6 +158,7 @@ public class AllInOneMethodRatherThanLoopRefactoring extends AbstractRefactoring
                         return maybeReplaceWithCollectionMethod(node, loopContent, "removeAll", mi);
                     }
                     break;
+
                 case ARRAY:
                     if (isMethod(mi, "java.util.Collection", "add", "java.lang.Object")
                             && areTypeCompatible(getCalledType(mi),

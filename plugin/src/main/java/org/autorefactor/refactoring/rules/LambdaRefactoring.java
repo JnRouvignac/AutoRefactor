@@ -26,7 +26,13 @@
  */
 package org.autorefactor.refactoring.rules;
 
-import static org.autorefactor.refactoring.ASTHelper.*;
+import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.arguments;
+import static org.autorefactor.refactoring.ASTHelper.asList;
+import static org.autorefactor.refactoring.ASTHelper.getCalledType;
+import static org.autorefactor.refactoring.ASTHelper.isMethod;
+import static org.autorefactor.refactoring.ASTHelper.removeParentheses;
 
 import java.util.List;
 
@@ -99,7 +105,7 @@ public class LambdaRefactoring extends AbstractRefactoringRule {
     private final class LambdaExprVisitor extends BlockSubVisitor {
 
         public LambdaExprVisitor(final Block startNode) {
-            super(null, startNode);
+            super(LambdaRefactoring.this.ctx, startNode);
         }
 
         @Override
@@ -134,7 +140,8 @@ public class LambdaRefactoring extends AbstractRefactoringRule {
                 }
             } else if (node.getBody() instanceof MethodInvocation) {
                 final MethodInvocation mi = (MethodInvocation) node.getBody();
-                final Expression miExpr = mi.getExpression();
+                final Expression calledExpr = mi.getExpression();
+                final ITypeBinding calledType = getCalledType(mi);
 
                 final List<Expression> arguments = arguments(mi);
                 if (node.parameters().size() == arguments.size()) {
@@ -142,33 +149,33 @@ public class LambdaRefactoring extends AbstractRefactoringRule {
                         return VISIT_SUBTREE;
                     }
 
-                    if (miExpr instanceof SimpleName
-                            && ((SimpleName) miExpr).resolveBinding().getKind() == IBinding.TYPE
-                                    && !arguments.isEmpty()
-                                    && haveSameType(arguments.get(0), miExpr)) {
-
+                    if (isStaticMethod(mi)) {
                         final String[] remainingParams = new String[arguments.size() - 1];
                         for (int i = 0; i < arguments.size() - 1; i++) {
                             remainingParams[i] =
                                     arguments.get(i + 1).resolveTypeBinding().getQualifiedName();
                         }
 
-                        final ITypeBinding clazz = miExpr.resolveTypeBinding();
-                        for (final IMethodBinding methodBinding : clazz.getDeclaredMethods()) {
+                        for (final IMethodBinding methodBinding : calledType.getDeclaredMethods()) {
                             if ((methodBinding.getModifiers() & Modifier.STATIC) == 0
                                     && isMethod(methodBinding,
-                                            clazz.getQualifiedName(),
+                                            calledType.getQualifiedName(),
                                             mi.getName().getIdentifier(), remainingParams)) {
                                 return VISIT_SUBTREE;
                             }
+                        }
+
+                        if (calledExpr == null) {
+                            replaceByTypeReference(node, mi);
+                            return DO_NOT_VISIT_SUBTREE;
                         }
                     }
 
                     replaceByMethodReference(node, mi);
                     return DO_NOT_VISIT_SUBTREE;
-                } else if (miExpr instanceof SimpleName
+                } else if (calledExpr instanceof SimpleName
                         && node.parameters().size() == arguments.size() + 1) {
-                    final SimpleName calledObject = (SimpleName) miExpr;
+                    final SimpleName calledObject = (SimpleName) calledExpr;
                     if (isSameIdentifier(node, 0, calledObject)) {
                         for (int i = 0; i < arguments.size(); i++) {
                             final ASTNode expr = removeParentheses(arguments.get(i));
@@ -178,7 +185,7 @@ public class LambdaRefactoring extends AbstractRefactoringRule {
                             }
                         }
 
-                        final ITypeBinding clazz = miExpr.resolveTypeBinding();
+                        final ITypeBinding clazz = calledExpr.resolveTypeBinding();
                         final String[] remainingParams = new String[arguments.size() + 1];
                         remainingParams[0] = clazz.getQualifiedName();
                         for (int i = 0; i < arguments.size(); i++) {
@@ -203,6 +210,18 @@ public class LambdaRefactoring extends AbstractRefactoringRule {
             return VISIT_SUBTREE;
         }
 
+        private boolean isStaticMethod(final MethodInvocation mi) {
+            final Expression calledExpr = mi.getExpression();
+
+            if (calledExpr == null) {
+                return (mi.resolveMethodBinding().getModifiers() & Modifier.STATIC) != 0;
+            } else if (calledExpr instanceof SimpleName) {
+                return ((SimpleName) calledExpr).resolveBinding().getKind() == IBinding.TYPE;
+            }
+
+            return false;
+        }
+
         private boolean isSameIdentifier(LambdaExpression node, List<Expression> arguments) {
             for (int i = 0; i < node.parameters().size(); i++) {
                 if (!isSameIdentifier(node, arguments, i)) {
@@ -224,55 +243,55 @@ public class LambdaRefactoring extends AbstractRefactoringRule {
 
         @SuppressWarnings("unchecked")
         private void removeParamParentheses(final LambdaExpression node) {
-            final ASTBuilder b = LambdaRefactoring.this.ctx.getASTBuilder();
+            final ASTBuilder b = ctx.getASTBuilder();
 
             final LambdaExpression copyOfLambdaExpr = b.lambda();
             final ASTNode copyOfParameter = b.copy((ASTNode) node.parameters().get(0));
             copyOfLambdaExpr.parameters().add(copyOfParameter);
             copyOfLambdaExpr.setBody(b.copy(node.getBody()));
             copyOfLambdaExpr.setParentheses(false);
-            LambdaRefactoring.this.ctx.getRefactorings().replace(node, copyOfLambdaExpr);
+            ctx.getRefactorings().replace(node, copyOfLambdaExpr);
         }
 
         private void removeReturnAndBrackets(final LambdaExpression node, final List<Statement> stmts) {
-            final ASTBuilder b = LambdaRefactoring.this.ctx.getASTBuilder();
+            final ASTBuilder b = ctx.getASTBuilder();
 
             final ReturnStatement returnStmt = (ReturnStatement) stmts.get(0);
-            LambdaRefactoring.this.ctx.getRefactorings().replace(node.getBody(),
+            ctx.getRefactorings().replace(node.getBody(),
                     b.parenthesizeIfNeeded(b.copy(returnStmt.getExpression())));
         }
 
         private void replaceByCreationReference(final LambdaExpression node, final ClassInstanceCreation ci) {
-            final ASTBuilder b = LambdaRefactoring.this.ctx.getASTBuilder();
+            final ASTBuilder b = ctx.getASTBuilder();
 
             final TypeNameDecider typeNameDecider = new TypeNameDecider(ci);
 
             final CreationReference creationRef = b.creationRef();
             creationRef.setType(b.toType(ci.resolveTypeBinding().getErasure(), typeNameDecider));
-            LambdaRefactoring.this.ctx.getRefactorings().replace(node, creationRef);
+            ctx.getRefactorings().replace(node, creationRef);
         }
 
         private void replaceBySuperMethodReference(final LambdaExpression node, final SuperMethodInvocation ci) {
-            final ASTBuilder b = LambdaRefactoring.this.ctx.getASTBuilder();
+            final ASTBuilder b = ctx.getASTBuilder();
 
             final SuperMethodReference creationRef = b.superMethodRef();
             creationRef.setName(b.copy(ci.getName()));
-            LambdaRefactoring.this.ctx.getRefactorings().replace(node, creationRef);
+            ctx.getRefactorings().replace(node, creationRef);
         }
 
         private void replaceByTypeReference(final LambdaExpression node, final MethodInvocation mi) {
-            final ASTBuilder b = LambdaRefactoring.this.ctx.getASTBuilder();
+            final ASTBuilder b = ctx.getASTBuilder();
 
             final TypeNameDecider typeNameDecider = new TypeNameDecider(mi);
 
             final TypeMethodReference typeMethodRef = b.typeMethodRef();
-            typeMethodRef.setType(b.toType(mi.getExpression().resolveTypeBinding().getErasure(), typeNameDecider));
+            typeMethodRef.setType(b.toType(getCalledType(mi).getErasure(), typeNameDecider));
             typeMethodRef.setName(b.copy(mi.getName()));
-            LambdaRefactoring.this.ctx.getRefactorings().replace(node, typeMethodRef);
+            ctx.getRefactorings().replace(node, typeMethodRef);
         }
 
         private void replaceByMethodReference(final LambdaExpression node, final MethodInvocation mi) {
-            final ASTBuilder b = LambdaRefactoring.this.ctx.getASTBuilder();
+            final ASTBuilder b = ctx.getASTBuilder();
 
             final ExpressionMethodReference typeMethodRef = b.exprMethodRef();
             if (mi.getExpression() != null) {
@@ -281,7 +300,7 @@ public class LambdaRefactoring extends AbstractRefactoringRule {
                 typeMethodRef.setExpression(b.this0());
             }
             typeMethodRef.setName(b.copy(mi.getName()));
-            LambdaRefactoring.this.ctx.getRefactorings().replace(node, typeMethodRef);
+            ctx.getRefactorings().replace(node, typeMethodRef);
         }
     }
 }

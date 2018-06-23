@@ -911,6 +911,27 @@ public final class ASTHelper {
     }
 
     /**
+     * Returns the type of the object on which the method is called.
+     *
+     * @param mi the node on which to call the equivalent JDT method
+     * @return the type of the object on which the method is called.
+     */
+    public static ITypeBinding getCalledType(final MethodInvocation mi) {
+        if (mi.getExpression() != null) {
+            return mi.getExpression().resolveTypeBinding();
+        } else {
+            ASTNode declarationClass = getFirstAncestorOrNull(mi, AnonymousClassDeclaration.class,
+                    TypeDeclaration.class);
+            if (declarationClass instanceof AnonymousClassDeclaration) {
+                return ((AnonymousClassDeclaration) declarationClass).resolveBinding();
+            } else if (declarationClass instanceof TypeDeclaration) {
+                return ((TypeDeclaration) declarationClass).resolveBinding();
+            }
+        }
+        return null;
+    }
+
+    /**
      * Returns the {@link Boolean} object value represented by the provided expression.
      *
      * @param expr the expression to analyze

@@ -26,6 +26,7 @@
  */
 package org.autorefactor.refactoring.rules.samples_out;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Vector;
@@ -90,6 +91,10 @@ public class LambdaSample extends Date {
 
     public Function<String, Long> useTypeReference() {
         return Long::getLong;
+    }
+
+    public static Function<Instant, Date> useDeclaringTypeReference() {
+        return LambdaSample::from;
     }
 
     public Function<String, Integer> useExpressionMethodReference() {
