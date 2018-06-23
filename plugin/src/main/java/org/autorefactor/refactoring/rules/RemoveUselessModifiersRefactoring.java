@@ -78,7 +78,7 @@ public class RemoveUselessModifiersRefactoring extends AbstractRefactoringRule {
      */
     public String getDescription() {
         return ""
-                + "Sorts modifier.\n"
+                + "Sorts modifiers.\n"
                 + "Also removes modifiers implied by the context:\n"
                 + "- \"static\" and \"abstract\" for interface,\n"
                 + "- \"public\", \"static\" and \"final\" for interface fields,\n"
