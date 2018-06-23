@@ -103,7 +103,8 @@ public class ArrayListRatherThanLinkedListRefactoring extends AbstractClassSubst
     protected boolean canMethodBeRefactored(final MethodInvocation mi,
             final List<MethodInvocation> methodCallsToRefactor) {
         final String argumentType;
-        if (mi.getExpression().resolveTypeBinding().getTypeArguments() != null
+        if (mi.getExpression() != null
+                && mi.getExpression().resolveTypeBinding().getTypeArguments() != null
                         && mi.getExpression().resolveTypeBinding().getTypeArguments().length == 1) {
             argumentType = mi.getExpression().resolveTypeBinding().getTypeArguments()[0].getQualifiedName();
         } else {

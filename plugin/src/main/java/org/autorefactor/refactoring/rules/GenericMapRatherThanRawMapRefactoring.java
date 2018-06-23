@@ -197,7 +197,8 @@ public class GenericMapRatherThanRawMapRefactoring extends AbstractClassSubstitu
     @Override
     protected boolean canMethodBeRefactored(final MethodInvocation mi,
             final List<MethodInvocation> methodCallsToRefactor) {
-        if (mi.getExpression().resolveTypeBinding().isParameterizedType()) {
+        if (mi.getExpression() == null
+                || mi.getExpression().resolveTypeBinding().isParameterizedType()) {
             return false;
         }
 
