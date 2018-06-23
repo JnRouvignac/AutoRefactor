@@ -374,15 +374,15 @@ public final class ASTHelper {
      *
      * @param <T> the required statement type
      * @param stmt the statement to cast
-     * @param stmtClazz the class representing the required statement type
+     * @param stmtClass the class representing the required statement type
      * @return the provided statement as an object of the provided type if type matches, null otherwise
      */
     @SuppressWarnings("unchecked")
-    public static <T extends Statement> T as(Statement stmt, Class<T> stmtClazz) {
+    public static <T extends Statement> T as(Statement stmt, Class<T> stmtClass) {
         if (stmt != null) {
             final List<Statement> stmts = asList(stmt);
             if (stmts.size() == 1
-                    && stmtClazz.isAssignableFrom(stmts.get(0).getClass())) {
+                    && stmtClass.isAssignableFrom(stmts.get(0).getClass())) {
                 return (T) stmts.get(0);
             }
         }
@@ -393,11 +393,11 @@ public final class ASTHelper {
      * Returns whether the provided statement has the provided type.
      *
      * @param stmt the statement to test
-     * @param stmtClazz the type to test the statement against
+     * @param stmtClass the type to test the statement against
      * @return {@code true} if the provided statement has the provided type, {@code false} otherwise
      */
-    public static boolean is(Statement stmt, Class<? extends Statement> stmtClazz) {
-        return as(stmt, stmtClazz) != null;
+    public static boolean is(Statement stmt, Class<? extends Statement> stmtClass) {
+        return as(stmt, stmtClass) != null;
     }
 
     /**
@@ -405,16 +405,16 @@ public final class ASTHelper {
      *
      * @param <T> the required expression type
      * @param expr the expression to cast
-     * @param exprClazz the class representing the required expression type
+     * @param exprClass the class representing the required expression type
      * @return the provided expression as an object of the provided type if type matches, null otherwise
      */
     @SuppressWarnings("unchecked")
-    public static <T extends Expression> T as(Expression expr, Class<T> exprClazz) {
+    public static <T extends Expression> T as(Expression expr, Class<T> exprClass) {
         if (expr != null) {
-            if (exprClazz.isAssignableFrom(expr.getClass())) {
+            if (exprClass.isAssignableFrom(expr.getClass())) {
                 return (T) expr;
             } else if (expr instanceof ParenthesizedExpression) {
-                return as(((ParenthesizedExpression) expr).getExpression(), exprClazz);
+                return as(((ParenthesizedExpression) expr).getExpression(), exprClass);
             }
         }
         return null;
@@ -424,11 +424,11 @@ public final class ASTHelper {
      * Returns whether the provided expression has the provided type.
      *
      * @param expr the expression to test
-     * @param exprClazz the type to test the expression against
+     * @param exprClass the type to test the expression against
      * @return {@code true} if the provided expression has the provided type, {@code false} otherwise
      */
-    public static boolean is(Expression expr, Class<? extends Expression> exprClazz) {
-        return as(expr, exprClazz) != null;
+    public static boolean is(Expression expr, Class<? extends Expression> exprClass) {
+        return as(expr, exprClass) != null;
     }
 
     /**
@@ -447,13 +447,13 @@ public final class ASTHelper {
      *
      * @param <T> the required expression type
      * @param exprs the singleton expression to cast
-     * @param exprClazz the class representing the required expression type
+     * @param exprClass the class representing the required expression type
      * @return the provided singleton expression as an object of the provided type if type matches, null otherwise
      */
     public static <T extends Expression> T as(Collection<? extends Expression> exprs,
-            Class<T> exprClazz) {
+            Class<T> exprClass) {
         if (exprs != null && exprs.size() == 1) {
-            return as(exprs.iterator().next(), exprClazz);
+            return as(exprs.iterator().next(), exprClass);
         }
         return null;
     }
@@ -464,13 +464,13 @@ public final class ASTHelper {
      *
      * @param <T> the required expression type
      * @param stmt the statement
-     * @param exprClazz the class representing the required expression type
+     * @param exprClass the class representing the required expression type
      * @return the {@link Expression} of a specified type out of an {@link ExpressionStatement}
      */
-    public static <T extends Expression> T asExpression(Statement stmt, Class<T> exprClazz) {
+    public static <T extends Expression> T asExpression(Statement stmt, Class<T> exprClass) {
         final ExpressionStatement es = as(stmt, ExpressionStatement.class);
         if (es != null) {
-            return as(es.getExpression(), exprClazz);
+            return as(es.getExpression(), exprClass);
         }
         return null;
     }
@@ -953,19 +953,19 @@ public final class ASTHelper {
      *
      * @param <T> the required ancestor's type
      * @param node the start node
-     * @param ancestorClazz the required ancestor's type
+     * @param ancestorClass the required ancestor's type
      * @return the first ancestor of the provided node which has the required type
      * @see #getAncestorOrNull(ASTNode, Class)
      * @see #getFirstAncestorOrNull(ASTNode, Class...)
      * @throws IllegalStateException if ancestor not found.
      */
-    public static <T extends ASTNode> T getAncestor(ASTNode node, Class<T> ancestorClazz) {
-        final T ancestor = getAncestorOrNull(node, ancestorClazz);
+    public static <T extends ASTNode> T getAncestor(ASTNode node, Class<T> ancestorClass) {
+        final T ancestor = getAncestorOrNull(node, ancestorClass);
         if (ancestor != null) {
             return ancestor;
         }
         throw new IllegalStateException(node,
-            "Could not find any ancestor for " + ancestorClazz + "and node " + node);
+            "Could not find any ancestor for " + ancestorClass + "and node " + node);
     }
 
     /**
@@ -973,22 +973,22 @@ public final class ASTHelper {
      *
      * @param <T> the required ancestor's type
      * @param node the start node
-     * @param ancestorClazz the required ancestor's type
+     * @param ancestorClass the required ancestor's type
      * @return the first ancestor of the provided node which has the required type,
      *         {@code null} if no suitable ancestor can be found
      * @see #getAncestor(ASTNode, Class)
      * @see #getFirstAncestorOrNull(ASTNode, Class...)
      */
     @SuppressWarnings("unchecked")
-    public static <T extends ASTNode> T getAncestorOrNull(ASTNode node, Class<T> ancestorClazz) {
+    public static <T extends ASTNode> T getAncestorOrNull(ASTNode node, Class<T> ancestorClass) {
         if (node == null || node.getParent() == null) {
             return null;
         }
         final ASTNode parent = node.getParent();
-        if (ancestorClazz.isAssignableFrom(parent.getClass())) {
+        if (ancestorClass.isAssignableFrom(parent.getClass())) {
             return (T) parent;
         }
-        return getAncestorOrNull(parent, ancestorClazz);
+        return getAncestorOrNull(parent, ancestorClass);
     }
 
     /**
@@ -1029,8 +1029,8 @@ public final class ASTHelper {
             return null;
         }
         final ASTNode parent = node.getParent();
-        for (Class<?> ancestorClazz : ancestorClasses) {
-            if (ancestorClazz.isAssignableFrom(parent.getClass())) {
+        for (Class<?> ancestorClass : ancestorClasses) {
+            if (ancestorClass.isAssignableFrom(parent.getClass())) {
                 return parent;
             }
         }
@@ -1750,17 +1750,17 @@ public final class ASTHelper {
             return false;
         }
         // OK more heavy checks now
-        final ITypeBinding declaringClazz = methodBinding.getDeclaringClass();
+        final ITypeBinding declaringClass = methodBinding.getDeclaringClass();
         final ITypeBinding implementedType =
-                findImplementedType(declaringClazz, typeQualifiedName);
-        final boolean isInstanceOf = instanceOf(declaringClazz, typeQualifiedName);
+                findImplementedType(declaringClass, typeQualifiedName);
+        final boolean isInstanceOf = instanceOf(declaringClass, typeQualifiedName);
         if (parameterTypesMatch(implementedType, isInstanceOf, methodBinding, parameterTypesQualifiedNames)) {
             return true;
         }
         // A lot more heavy checks
         // FIXME find a more efficient way to do this. It would be awesome
         // if an API to directly find the overriddenMethod IMethodBinding existed
-        IMethodBinding overriddenMethod = findOverridenMethod(declaringClazz, typeQualifiedName,
+        IMethodBinding overriddenMethod = findOverridenMethod(declaringClass, typeQualifiedName,
                 methodName, parameterTypesQualifiedNames);
         return overriddenMethod != null && methodBinding.overrides(overriddenMethod);
     }
