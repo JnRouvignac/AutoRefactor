@@ -105,11 +105,11 @@ public class ArrayListRatherThanLinkedListSample {
         return list.toString();
     }
 
-    public String refactorListWithLoop(List<Date> dates) {
+    public String refactorListWithLoop(List<boolean[][]> flags) {
         // Keep this comment
-        List<Date> list = new LinkedList<Date>();
-        for (Date date : dates) {
-            list.add(date);
+        List<boolean[][]> list = new LinkedList<boolean[][]>();
+        for (boolean[][] flag : flags) {
+            list.add(flag);
         }
 
         return list.toString();
@@ -266,8 +266,8 @@ public class ArrayListRatherThanLinkedListSample {
         return list.pollFirst();
     }
 
-    public String doNotReplacePollLast() {
-        LinkedList<String> list = new LinkedList<String>();
+    public long[][] doNotReplacePollLast() {
+        LinkedList<long[][]> list = new LinkedList<long[][]>();
         return list.pollLast();
     }
 

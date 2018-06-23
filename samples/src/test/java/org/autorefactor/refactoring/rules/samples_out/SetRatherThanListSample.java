@@ -129,10 +129,10 @@ public class SetRatherThanListSample {
 
     public boolean refactorWithMethod() {
         // Keep this comment
-        java.util.HashSet<Observable> collection = new java.util.HashSet<Observable>();
+        java.util.HashSet<Observable[][]> collection = new java.util.HashSet<Observable[][]>();
         // Keep this comment too
-        collection.add(new Observable());
-        return collection.contains(new Observable());
+        collection.add(new Observable[0][]);
+        return collection.contains(new Observable[0][]);
     }
 
     public boolean refactorWithLinkedListMethod() {

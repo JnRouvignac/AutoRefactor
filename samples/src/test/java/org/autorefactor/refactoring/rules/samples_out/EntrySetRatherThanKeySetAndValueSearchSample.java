@@ -99,10 +99,10 @@ public class EntrySetRatherThanKeySetAndValueSearchSample {
         }
     }
 
-    public void refactorVariableDeclarationStatement(Map<String, Long> map) {
-        Map<String, Long> map2 = map;
+    public void refactorVariableDeclarationStatement(Map<String, double[][]> map) {
+        Map<String, double[][]> map2 = map;
         // Keep this comment
-        for (Map.Entry<String, Long> entry : map2.entrySet()) {
+        for (Map.Entry<String, double[][]> entry : map2.entrySet()) {
             String key = entry.getKey();
             System.out.println("hello " + map2.get("name"));
             if (entry.getValue() != null) {

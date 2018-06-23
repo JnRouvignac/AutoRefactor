@@ -129,10 +129,10 @@ public class SetRatherThanListSample {
 
     public boolean refactorWithMethod() {
         // Keep this comment
-        ArrayList<Observable> collection = new ArrayList<Observable>();
+        ArrayList<Observable[][]> collection = new ArrayList<Observable[][]>();
         // Keep this comment too
-        collection.add(0, new Observable());
-        return collection.contains(new Observable());
+        collection.add(0, new Observable[0][]);
+        return collection.contains(new Observable[0][]);
     }
 
     public boolean refactorWithLinkedListMethod() {

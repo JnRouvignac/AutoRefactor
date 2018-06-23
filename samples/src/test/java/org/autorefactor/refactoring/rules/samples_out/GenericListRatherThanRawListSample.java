@@ -390,8 +390,8 @@ public class GenericListRatherThanRawListSample {
         return list.set(index, element);
     }
 
-    public Object genericizeSetOnList(int index, String[] element) {
-        List<String[]> list = new LinkedList<String[]>();
+    public Object genericizeSetOnList(int index, int[][] element) {
+        List<int[][]> list = new LinkedList<int[][]>();
         return list.set(index, element);
     }
 

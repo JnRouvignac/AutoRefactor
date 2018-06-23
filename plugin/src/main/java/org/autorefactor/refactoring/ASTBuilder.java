@@ -424,8 +424,8 @@ public class ASTBuilder {
                 || typeBinding.isNullType()
                 || typeBinding.isRawType()) {
             return type(typeNameDecider.useSimplestPossibleName(typeBinding));
-        } else  if (typeBinding.isArray()) {
-            return ast.newArrayType(toType(typeBinding.getElementType(), typeNameDecider));
+        } else if (typeBinding.isArray()) {
+            return ast.newArrayType(toType(typeBinding.getElementType(), typeNameDecider), typeBinding.getDimensions());
         } else if (typeBinding.isWildcardType()) {
             final WildcardType type = ast.newWildcardType();
             if (typeBinding.getBound() != null) {
