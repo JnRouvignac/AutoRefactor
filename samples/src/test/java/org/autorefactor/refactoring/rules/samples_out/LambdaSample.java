@@ -35,6 +35,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class LambdaSample extends Date {
+    public String changeableText = "foo";
 
     public Function<String, String> removeParentheses() {
         return someString -> someString.trim().toLowerCase();
@@ -97,12 +98,12 @@ public class LambdaSample extends Date {
         return LambdaSample::from;
     }
 
-    public Function<String, Integer> useExpressionMethodReference() {
+    public Function<String, Integer> useExpressionMethodReferenceOnLiteral() {
         return "AutoRefactor"::indexOf;
     }
 
-    public Function<Date, Integer> useSuperMethodReference() {
-        return super::compareTo;
+    public Function<String, Integer> doNotUseExpressionMethodReferenceOnVariable() {
+        return textToSearch -> this.changeableText.indexOf(textToSearch);
     }
 
     public Function<Date, Integer> useThisMethodReference() {
@@ -111,6 +112,10 @@ public class LambdaSample extends Date {
 
     public Function<Date, Integer> useThisMethodReferenceAddThis() {
         return this::compareTo;
+    }
+
+    public Function<Date, Integer> useSuperMethodReference() {
+        return super::compareTo;
     }
 
     public Function<Integer, String> doNotUseConflictingMethodReference() {

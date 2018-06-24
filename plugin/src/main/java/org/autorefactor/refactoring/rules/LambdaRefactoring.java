@@ -45,17 +45,22 @@ import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.CreationReference;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ExpressionMethodReference;
+import org.eclipse.jdt.core.dom.FieldAccess;
 import org.eclipse.jdt.core.dom.IBinding;
 import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.LambdaExpression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Modifier;
+import org.eclipse.jdt.core.dom.NumberLiteral;
 import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.Statement;
+import org.eclipse.jdt.core.dom.StringLiteral;
+import org.eclipse.jdt.core.dom.SuperFieldAccess;
 import org.eclipse.jdt.core.dom.SuperMethodInvocation;
 import org.eclipse.jdt.core.dom.SuperMethodReference;
+import org.eclipse.jdt.core.dom.ThisExpression;
 import org.eclipse.jdt.core.dom.TypeMethodReference;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
@@ -165,14 +170,35 @@ public class LambdaRefactoring extends AbstractRefactoringRule {
                             }
                         }
 
-                        if (calledExpr == null) {
-                            replaceByTypeReference(node, mi);
+                        replaceByTypeReference(node, mi);
+                        return DO_NOT_VISIT_SUBTREE;
+                    }
+
+                    if (calledExpr == null
+                            || calledExpr instanceof StringLiteral
+                            || calledExpr instanceof NumberLiteral
+                            || calledExpr instanceof ThisExpression) {
+                        replaceByMethodReference(node, mi);
+                        return DO_NOT_VISIT_SUBTREE;
+                    } else if (calledExpr instanceof FieldAccess) {
+                        final FieldAccess fieldAccess = (FieldAccess) calledExpr;
+                        if (fieldAccess.resolveFieldBinding().isEffectivelyFinal()) {
+                            replaceByMethodReference(node, mi);
+                            return DO_NOT_VISIT_SUBTREE;
+                        }
+                    } else if (calledExpr instanceof FieldAccess) {
+                        final FieldAccess fieldAccess = (FieldAccess) calledExpr;
+                        if (fieldAccess.resolveFieldBinding().isEffectivelyFinal()) {
+                            replaceByMethodReference(node, mi);
+                            return DO_NOT_VISIT_SUBTREE;
+                        }
+                    } else if (calledExpr instanceof SuperFieldAccess) {
+                        final SuperFieldAccess fieldAccess = (SuperFieldAccess) calledExpr;
+                        if (fieldAccess.resolveFieldBinding().isEffectivelyFinal()) {
+                            replaceByMethodReference(node, mi);
                             return DO_NOT_VISIT_SUBTREE;
                         }
                     }
-
-                    replaceByMethodReference(node, mi);
-                    return DO_NOT_VISIT_SUBTREE;
                 } else if (calledExpr instanceof SimpleName
                         && node.parameters().size() == arguments.size() + 1) {
                     final SimpleName calledObject = (SimpleName) calledExpr;
