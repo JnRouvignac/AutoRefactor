@@ -26,9 +26,13 @@
  */
 package org.autorefactor.refactoring.rules.samples_out;
 
+import static java.util.Calendar.getInstance;
+
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 import java.util.Vector;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -94,8 +98,12 @@ public class LambdaSample extends Date {
         return Long::getLong;
     }
 
-    public static Function<Instant, Date> useDeclaringTypeReference() {
-        return LambdaSample::from;
+    public static Function<Instant, Date> useypeReferenceOnClassMethod() {
+        return Date::from;
+    }
+
+    public static Function<Locale, Calendar> useTypeReferenceOnImportedMethod() {
+        return Calendar::getInstance;
     }
 
     public Function<String, Integer> useExpressionMethodReferenceOnLiteral() {

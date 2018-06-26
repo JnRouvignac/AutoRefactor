@@ -917,18 +917,12 @@ public final class ASTHelper {
      * @return the type of the object on which the method is called.
      */
     public static ITypeBinding getCalledType(final MethodInvocation mi) {
-        if (mi.getExpression() != null) {
-            return mi.getExpression().resolveTypeBinding();
+        IMethodBinding methodBinding = mi.resolveMethodBinding();
+        if (methodBinding != null) {
+            return methodBinding.getDeclaringClass();
         } else {
-            ASTNode declarationClass = getFirstAncestorOrNull(mi, AnonymousClassDeclaration.class,
-                    TypeDeclaration.class);
-            if (declarationClass instanceof AnonymousClassDeclaration) {
-                return ((AnonymousClassDeclaration) declarationClass).resolveBinding();
-            } else if (declarationClass instanceof TypeDeclaration) {
-                return ((TypeDeclaration) declarationClass).resolveBinding();
-            }
+            return null;
         }
-        return null;
     }
 
     /**
