@@ -261,8 +261,15 @@ public class LambdaRefactoring extends AbstractRefactoringRule {
         }
 
         private boolean isSameIdentifier(final LambdaExpression node, final int i, final SimpleName argument) {
-            final VariableDeclarationFragment vdf = (VariableDeclarationFragment) node.parameters().get(i);
-            return vdf.getName().getIdentifier().equals(argument.getIdentifier());
+            final Object param0 = node.parameters().get(i);
+            if (param0 instanceof VariableDeclarationFragment) {
+                final VariableDeclarationFragment vdf = (VariableDeclarationFragment) param0;
+                return vdf.getName().getIdentifier().equals(argument.getIdentifier());
+            // } else if (param0 instanceof SingleVariableDeclaration) {
+                // FIXME: it should also be possible to deal with a SingleVariableDeclaration
+                // when the type matches the expected inferred type
+            }
+            return false;
         }
 
         @SuppressWarnings("unchecked")

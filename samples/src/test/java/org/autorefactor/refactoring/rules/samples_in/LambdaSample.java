@@ -78,6 +78,11 @@ public class LambdaSample extends Date {
         return capacity -> new ArrayList<>(capacity);
     }
 
+    public Function<Integer, ArrayList<String>> useCreationReferenceWithParameterAndType() {
+        // TODO this can be refactored like useCreationReferenceWithParameter
+        return (Integer capacity) -> new ArrayList<>(capacity);
+    }
+
     public Function<Integer, ArrayList<String>> doNotRefactorWithExpressions() {
         return capacity -> new ArrayList<>(capacity + 1);
     }
