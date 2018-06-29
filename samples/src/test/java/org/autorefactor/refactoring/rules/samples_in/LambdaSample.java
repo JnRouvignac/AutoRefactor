@@ -45,6 +45,10 @@ public class LambdaSample extends Date {
         return (someString) -> someString.trim().toLowerCase();
     }
 
+    public Function<String, String> doNotRemoveParenthesesWithSingleVariableDeclaration() {
+        return (String someString) -> someString.trim().toLowerCase();
+    }
+
     public BiFunction<String, String, Integer> doNotRemoveParenthesesWithTwoParameters() {
         return (someString, anotherString) -> someString.trim().compareTo(anotherString.trim());
     }

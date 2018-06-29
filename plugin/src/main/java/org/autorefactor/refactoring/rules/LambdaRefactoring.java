@@ -115,7 +115,11 @@ public class LambdaRefactoring extends AbstractRefactoringRule {
 
         @Override
         public boolean visit(LambdaExpression node) {
-            if (node.hasParentheses() && node.parameters().size() == 1) {
+            if (node.hasParentheses()
+                    && node.parameters().size() == 1
+                    && node.parameters().get(0) instanceof VariableDeclarationFragment) {
+                // FIXME: it should also be possible to deal with a SingleVariableDeclaration
+                // when the type matches the expected inferred type
                 removeParamParentheses(node);
                 return DO_NOT_VISIT_SUBTREE;
             } else if (node.getBody() instanceof Block) {
