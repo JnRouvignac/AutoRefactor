@@ -27,6 +27,7 @@
 package org.autorefactor.refactoring.rules.samples_out;
 
 import static java.util.Calendar.getInstance;
+import static java.util.Calendar.getAvailableLocales;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -113,6 +114,10 @@ public class LambdaSample extends Date {
 
     public static Function<Locale, Calendar> useTypeReferenceOnImportedMethod() {
         return Calendar::getInstance;
+    }
+
+    public static Supplier<Locale[]> useTypeReferenceAsSupplier() {
+        return Calendar::getAvailableLocales;
     }
 
     public Function<String, Integer> useExpressionMethodReferenceOnLiteral() {

@@ -159,18 +159,20 @@ public class LambdaRefactoring extends AbstractRefactoringRule {
                     }
 
                     if (isStaticMethod(mi)) {
-                        final String[] remainingParams = new String[arguments.size() - 1];
-                        for (int i = 0; i < arguments.size() - 1; i++) {
-                            remainingParams[i] =
-                                    arguments.get(i + 1).resolveTypeBinding().getQualifiedName();
-                        }
+                        if (!arguments.isEmpty()) {
+                            final String[] remainingParams = new String[arguments.size() - 1];
+                            for (int i = 0; i < arguments.size() - 1; i++) {
+                                remainingParams[i] =
+                                        arguments.get(i + 1).resolveTypeBinding().getQualifiedName();
+                            }
 
-                        for (final IMethodBinding methodBinding : calledType.getDeclaredMethods()) {
-                            if ((methodBinding.getModifiers() & Modifier.STATIC) == 0
-                                    && isMethod(methodBinding,
-                                            calledType.getQualifiedName(),
-                                            mi.getName().getIdentifier(), remainingParams)) {
-                                return VISIT_SUBTREE;
+                            for (final IMethodBinding methodBinding : calledType.getDeclaredMethods()) {
+                                if ((methodBinding.getModifiers() & Modifier.STATIC) == 0
+                                        && isMethod(methodBinding,
+                                                calledType.getQualifiedName(),
+                                                mi.getName().getIdentifier(), remainingParams)) {
+                                    return VISIT_SUBTREE;
+                                }
                             }
                         }
 
