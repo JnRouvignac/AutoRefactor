@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: AutoRefactor
 Bundle-SymbolicName: org.autorefactor.plugin;singleton:=true
-Bundle-Version: 1.2.0.qualifier
+Bundle-Version: 1.2.0
 Comment1: Upgrade to JDT Core 4.4.1 to support Java 9
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources,
