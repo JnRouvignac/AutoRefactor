@@ -98,7 +98,7 @@ public class LambdaSample extends Date {
         return Long::getLong;
     }
 
-    public static Function<Instant, Date> useypeReferenceOnClassMethod() {
+    public static Function<Instant, Date> useTypeReferenceOnClassMethod() {
         return Date::from;
     }
 

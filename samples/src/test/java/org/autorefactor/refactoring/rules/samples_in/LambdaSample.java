@@ -98,7 +98,7 @@ public class LambdaSample extends Date {
         return numberInText -> Long.getLong(numberInText);
     }
 
-    public static Function<Instant, Date> useypeReferenceOnClassMethod() {
+    public static Function<Instant, Date> useTypeReferenceOnClassMethod() {
         return instant -> from(instant);
     }
 
