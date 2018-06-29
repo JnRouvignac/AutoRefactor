@@ -186,12 +186,6 @@ public class LambdaRefactoring extends AbstractRefactoringRule {
                             replaceByMethodReference(node, mi);
                             return DO_NOT_VISIT_SUBTREE;
                         }
-                    } else if (calledExpr instanceof FieldAccess) {
-                        final FieldAccess fieldAccess = (FieldAccess) calledExpr;
-                        if (fieldAccess.resolveFieldBinding().isEffectivelyFinal()) {
-                            replaceByMethodReference(node, mi);
-                            return DO_NOT_VISIT_SUBTREE;
-                        }
                     } else if (calledExpr instanceof SuperFieldAccess) {
                         final SuperFieldAccess fieldAccess = (SuperFieldAccess) calledExpr;
                         if (fieldAccess.resolveFieldBinding().isEffectivelyFinal()) {
