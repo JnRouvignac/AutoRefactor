@@ -26,15 +26,16 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import static org.autorefactor.refactoring.ASTHelper.hasType;
+import static org.autorefactor.refactoring.ASTHelper.isMethod;
+import static org.autorefactor.util.Utils.getOrDefault;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.MethodInvocation;
-
-import static org.autorefactor.refactoring.ASTHelper.*;
-import static org.autorefactor.util.Utils.*;
 
 /** See {@link #getDescription()} method. */
 public class ArrayListRatherThanLinkedListRefactoring extends AbstractClassSubstituteRefactoring {
@@ -100,17 +101,8 @@ public class ArrayListRatherThanLinkedListRefactoring extends AbstractClassSubst
     }
 
     @Override
-    protected boolean canMethodBeRefactored(final MethodInvocation mi,
-            final List<MethodInvocation> methodCallsToRefactor) {
-        final String argumentType;
-        if (mi.getExpression() != null
-                && mi.getExpression().resolveTypeBinding().getTypeArguments() != null
-                        && mi.getExpression().resolveTypeBinding().getTypeArguments().length == 1) {
-            argumentType = mi.getExpression().resolveTypeBinding().getTypeArguments()[0].getQualifiedName();
-        } else {
-            argumentType = "java.lang.Object";
-        }
-
+    protected boolean canMethodBeRefactored(MethodInvocation mi, List<MethodInvocation> methodCallsToRefactor) {
+        final String argumentType = getArgumentType(mi);
         return isMethod(mi, "java.util.Collection", "add", "java.lang.Object")
                 || isMethod(mi, "java.util.Collection", "addAll", "java.util.Collection")
                 || isMethod(mi, "java.util.Collection", "clear")

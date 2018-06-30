@@ -2,7 +2,7 @@
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
  * Copyright (C) 2017 Fabrice Tiercelin - initial API and implementation
- * Copyright (C) 2017 Jean-Noël Rouvignac - fix NPE with Eclipse 4.5.2
+ * Copyright (C) 2017-2018 Jean-Noël Rouvignac - fix NPE with Eclipse 4.5.2
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -57,6 +57,7 @@ import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
+import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.SimpleName;
@@ -351,6 +352,20 @@ public abstract class AbstractClassSubstituteRefactoring extends AbstractRefacto
 
     private boolean isObjectPassedInParameter(final ASTNode subNode, final MethodInvocation mi) {
         return !subNode.equals(mi.getExpression());
+    }
+
+    static String getArgumentType(final MethodInvocation mi) {
+        final Expression expr = mi.getExpression();
+        if (expr != null) {
+            final ITypeBinding typeBinding = expr.resolveTypeBinding();
+            if (typeBinding != null) {
+                final ITypeBinding[] typeArguments = typeBinding.getTypeArguments();
+                if (typeArguments.length == 1) {
+                    return typeArguments[0].getQualifiedName();
+                }
+            }
+        }
+        return "java.lang.Object";
     }
 
     private final class ObjectInstantiationVisitor extends ASTVisitor {

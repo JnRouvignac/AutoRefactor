@@ -119,15 +119,6 @@ public class ArrayListRatherThanVectorRefactoring extends AbstractClassSubstitut
     @Override
     protected boolean canMethodBeRefactored(final MethodInvocation mi,
             final List<MethodInvocation> methodCallsToRefactor) {
-        final String argumentType;
-        if (mi.getExpression() != null
-                && mi.getExpression().resolveTypeBinding().getTypeArguments() != null
-                        && mi.getExpression().resolveTypeBinding().getTypeArguments().length == 1) {
-            argumentType = mi.getExpression().resolveTypeBinding().getTypeArguments()[0].getQualifiedName();
-        } else {
-            argumentType = "java.lang.Object";
-        }
-
         if (isMethod(mi, "java.util.Vector", "addElement", "java.lang.Object")
                 || isMethod(mi, "java.util.Vector", "elementAt", "int")
                 || isMethod(mi, "java.util.Vector", "copyInto", "java.lang.Object[]")
@@ -140,6 +131,7 @@ public class ArrayListRatherThanVectorRefactoring extends AbstractClassSubstitut
             return true;
         }
 
+        final String argumentType = getArgumentType(mi);
         if (isMethod(mi, "java.util.Collection", "add", "java.lang.Object")
                 || isMethod(mi, "java.util.List", "addAll", "int", "java.util.Collection")
                 || isMethod(mi, "java.util.Collection", "clear")
@@ -164,8 +156,7 @@ public class ArrayListRatherThanVectorRefactoring extends AbstractClassSubstitut
     }
 
     @Override
-    protected void refactorMethod(final ASTBuilder b, final MethodInvocation originalMi,
-            final MethodInvocation refactoredMi) {
+    protected void refactorMethod(ASTBuilder b, MethodInvocation originalMi, MethodInvocation refactoredMi) {
         if (isMethod(originalMi, "java.util.Vector", "addElement", "java.lang.Object")) {
             refactoredMi.setName(b.simpleName("add"));
         } else if (isMethod(originalMi, "java.util.Vector", "elementAt", "int")) {
