@@ -115,7 +115,6 @@ public class GenericMapRatherThanRawMapRefactoring extends AbstractClassSubstitu
         keyType = null;
         valueType = null;
         return super.visit(node);
-
     }
 
     @Override
@@ -183,9 +182,9 @@ public class GenericMapRatherThanRawMapRefactoring extends AbstractClassSubstitu
         ITypeBinding[] parameterTypes = instanceCreation.resolveConstructorBinding().getParameterTypes();
 
         if (parameterTypes.length > 0 && hasType(parameterTypes[0], "java.util.Map")) {
-            ITypeBinding actualParameter = ((Expression) instanceCreation.arguments().get(0)).resolveTypeBinding();
+            ITypeBinding actualParameter = arguments(instanceCreation).get(0).resolveTypeBinding();
 
-            if (actualParameter.isParameterizedType() && actualParameter.getTypeArguments().length == 2) {
+            if (isParameterizedTypeWithNbArguments(actualParameter, 2)) {
                 ITypeBinding newKeyType = actualParameter.getTypeArguments()[0];
                 ITypeBinding newValueType = actualParameter.getTypeArguments()[1];
                 return resolveKeyTypeCompatible(newKeyType) && resolveValueTypeCompatible(newValueType);
@@ -202,6 +201,7 @@ public class GenericMapRatherThanRawMapRefactoring extends AbstractClassSubstitu
             return false;
         }
 
+        final List<Expression> arguments = arguments(mi);
         if (isMethod(mi, "java.lang.Object", "equals", "java.lang.Object")
                 || isMethod(mi, "java.lang.Object", "toString")
                 || isMethod(mi, "java.lang.Object", "finalize")
@@ -222,18 +222,18 @@ public class GenericMapRatherThanRawMapRefactoring extends AbstractClassSubstitu
                 || isMethod(mi, "java.util.Map", "remove", "java.lang.Object", "java.lang.Object")) {
             return true;
         } else if (isMethod(mi, "java.util.Map", "ofEntries", "java.util.Map.Entry[]")) {
-            final ITypeBinding paramType = ((Expression) mi.arguments().get(0)).resolveTypeBinding().getElementType();
+            final ITypeBinding paramType = arguments.get(0).resolveTypeBinding().getElementType();
 
-            if (paramType.isParameterizedType() && paramType.getTypeArguments().length == 2) {
+            if (isParameterizedTypeWithNbArguments(paramType, 2)) {
                 final ITypeBinding newKeyType = paramType.getTypeArguments()[0];
                 final ITypeBinding newValueType = paramType.getTypeArguments()[1];
                 return resolveKeyTypeCompatible(newKeyType) && resolveValueTypeCompatible(newValueType);
             }
         } else if (isMethod(mi, "java.util.Map", "putAll", "java.util.Map")
                 || isMethod(mi, "java.util.LinkedHashMap", "removeEldestEntry", "java.util.Map.Entry")) {
-            final ITypeBinding paramType = ((Expression) mi.arguments().get(0)).resolveTypeBinding();
+            final ITypeBinding paramType = arguments.get(0).resolveTypeBinding();
 
-            if (paramType.isParameterizedType() && paramType.getTypeArguments().length == 2) {
+            if (isParameterizedTypeWithNbArguments(paramType, 2)) {
                 final ITypeBinding newKeyType = paramType.getTypeArguments()[0];
                 final ITypeBinding newValueType = paramType.getTypeArguments()[1];
                 return resolveKeyTypeCompatible(newKeyType) && resolveValueTypeCompatible(newValueType);
@@ -266,26 +266,25 @@ public class GenericMapRatherThanRawMapRefactoring extends AbstractClassSubstitu
                 || isMethod(mi, "java.util.TreeMap", "lowerEntry", "java.lang.Object")
                 || isMethod(mi, "java.util.TreeMap", "tailMap", "java.lang.Object")
                 || isMethod(mi, "java.util.TreeMap", "tailMap", "java.lang.Object", "boolean")) {
-            final ITypeBinding newKeyType = ((Expression) mi.arguments().get(0)).resolveTypeBinding();
+            final ITypeBinding newKeyType = arguments.get(0).resolveTypeBinding();
             return resolveKeyTypeCompatible(newKeyType)
                     && resolveDestinationParamTypeCompatibleWithKeyValue(mi);
         } else if (isMethod(mi, "java.util.Map", "entry", "java.lang.Object", "java.lang.Object")
                 || isMethod(mi, "java.util.Map", "of", "java.lang.Object", "java.lang.Object")
                 || isMethod(mi, "java.util.TreeMap", "subMap", "java.lang.Object", "java.lang.Object")) {
-            final ITypeBinding newKeyType = ((Expression) mi.arguments().get(0)).resolveTypeBinding();
-            final ITypeBinding newValueType = ((Expression) mi.arguments().get(1)).resolveTypeBinding();
-            return resolveKeyTypeCompatible(newKeyType) && resolveValueTypeCompatible(newValueType)
+            final ITypeBinding newKeyType = arguments.get(0).resolveTypeBinding();
+            final ITypeBinding newValueType = arguments.get(1).resolveTypeBinding();
+            return resolveKeyTypeCompatible(newKeyType)
+                    && resolveValueTypeCompatible(newValueType)
                     && resolveDestinationParamTypeCompatibleWithKeyValue(mi);
         } else if (isMethod(mi, "java.util.Map", "entrySet")) {
             if (isExprReceived(mi)) {
                 final ITypeBinding newTargetType = getDestinationType(mi);
 
-                if (newTargetType != null && newTargetType.isParameterizedType()
-                        && newTargetType.getTypeArguments().length == 1) {
+                if (isParameterizedTypeWithNbArguments(newTargetType, 1)) {
                     final ITypeBinding newElementType = newTargetType.getTypeArguments()[0];
 
-                    if (newElementType != null && newElementType.isParameterizedType()
-                            && newElementType.getTypeArguments().length == 2) {
+                    if (isParameterizedTypeWithNbArguments(newElementType, 2)) {
                         return resolveKeyTypeCompatible(newElementType.getTypeArguments()[0])
                                 && resolveValueTypeCompatible(newElementType.getTypeArguments()[1]);
                     }
@@ -297,27 +296,28 @@ public class GenericMapRatherThanRawMapRefactoring extends AbstractClassSubstitu
                 || isMethod(mi, "java.util.TreeMap", "floorKey", "java.lang.Object")
                 || isMethod(mi, "java.util.TreeMap", "higherKey", "java.lang.Object")
                 || isMethod(mi, "java.util.TreeMap", "lowerKey", "java.lang.Object")) {
-            return resolveKeyTypeCompatible(((Expression) mi.arguments().get(0)).resolveTypeBinding())
+            return resolveKeyTypeCompatible(arguments.get(0).resolveTypeBinding())
                     && resolveDestinationTypeCompatibleWithKey(mi);
         } else if (isMethod(mi, "java.util.Map", "getOrDefault", "java.lang.Object", "java.lang.Object")) {
-            return resolveValueTypeCompatible(((Expression) mi.arguments().get(1)).resolveTypeBinding())
+            return resolveValueTypeCompatible(arguments.get(1).resolveTypeBinding())
                     && resolveDestinationTypeCompatibleWithValue(mi);
         } else if (isMethod(mi, "java.util.Map", "put", "java.lang.Object", "java.lang.Object")
                 || isMethod(mi, "java.util.Map", "putIfAbsent", "java.lang.Object", "java.lang.Object")
                 || isMethod(mi, "java.util.Map", "replace", "java.lang.Object", "java.lang.Object")) {
-            return resolveKeyTypeCompatible(((Expression) mi.arguments().get(0)).resolveTypeBinding())
-                    && resolveValueTypeCompatible(((Expression) mi.arguments().get(1)).resolveTypeBinding())
+            return resolveKeyTypeCompatible(arguments.get(0).resolveTypeBinding())
+                    && resolveValueTypeCompatible(arguments.get(1).resolveTypeBinding())
                     && resolveDestinationTypeCompatibleWithValue(mi);
         } else if (isMethod(mi, "java.util.Map", "replace", "java.lang.Object", "java.lang.Object",
                 "java.lang.Object")) {
-            return resolveKeyTypeCompatible(((Expression) mi.arguments().get(0)).resolveTypeBinding())
-                    && resolveValueTypeCompatible(((Expression) mi.arguments().get(1)).resolveTypeBinding())
-                    && resolveValueTypeCompatible(((Expression) mi.arguments().get(2)).resolveTypeBinding());
+            return resolveKeyTypeCompatible(arguments.get(0).resolveTypeBinding())
+                    && resolveValueTypeCompatible(arguments.get(1).resolveTypeBinding())
+                    && resolveValueTypeCompatible(arguments.get(2).resolveTypeBinding());
         } else if (isMethod(mi, "java.util.TreeMap", "subMap", "java.lang.Object", "boolean", "java.lang.Object",
                 "boolean")) {
-            final ITypeBinding newKeyType = ((Expression) mi.arguments().get(0)).resolveTypeBinding();
-            final ITypeBinding newValueType = ((Expression) mi.arguments().get(2)).resolveTypeBinding();
-            return resolveKeyTypeCompatible(newKeyType) && resolveValueTypeCompatible(newValueType)
+            final ITypeBinding newKeyType = arguments.get(0).resolveTypeBinding();
+            final ITypeBinding newValueType = arguments.get(2).resolveTypeBinding();
+            return resolveKeyTypeCompatible(newKeyType)
+                    && resolveValueTypeCompatible(newValueType)
                     && resolveDestinationParamTypeCompatibleWithKeyValue(mi);
         } else if (isMethod(mi, "java.util.Map", "of", "java.lang.Object", "java.lang.Object", "java.lang.Object",
                 "java.lang.Object")
@@ -353,14 +353,14 @@ public class GenericMapRatherThanRawMapRefactoring extends AbstractClassSubstitu
                         "java.lang.Object", "java.lang.Object", "java.lang.Object", "java.lang.Object",
                         "java.lang.Object", "java.lang.Object", "java.lang.Object", "java.lang.Object",
                         "java.lang.Object")) {
-            final Iterator<?> argumentIterator = mi.arguments().iterator();
+            final Iterator<Expression> argumentIterator = arguments.iterator();
 
             final List<ITypeBinding> keyTypes = new ArrayList<ITypeBinding>();
             final List<ITypeBinding> valueTypes = new ArrayList<ITypeBinding>();
 
             while (argumentIterator.hasNext()) {
-                keyTypes.add(((Expression) argumentIterator.next()).resolveTypeBinding());
-                valueTypes.add(((Expression) argumentIterator.next()).resolveTypeBinding());
+                keyTypes.add(argumentIterator.next().resolveTypeBinding());
+                valueTypes.add(argumentIterator.next().resolveTypeBinding());
             }
 
             for (final ITypeBinding keyType : keyTypes) {
@@ -379,42 +379,42 @@ public class GenericMapRatherThanRawMapRefactoring extends AbstractClassSubstitu
         } else if (isMethod(mi, "java.util.Map", "compute", "java.lang.Object", "java.util.function.BiFunction")
                 || isMethod(mi, "java.util.Map", "computeIfPresent", "java.lang.Object",
                         "java.util.function.BiFunction")) {
-            final ITypeBinding paramType = ((Expression) mi.arguments().get(1)).resolveTypeBinding();
+            final ITypeBinding paramType = arguments.get(1).resolveTypeBinding();
 
-            if (paramType.isParameterizedType() && paramType.getTypeArguments().length == 3) {
+            if (isParameterizedTypeWithNbArguments(paramType, 3)) {
                 final ITypeBinding newValueType = paramType.getTypeArguments()[2];
 
-                return resolveKeyTypeCompatible(((Expression) mi.arguments().get(0)).resolveTypeBinding())
+                return resolveKeyTypeCompatible(arguments.get(0).resolveTypeBinding())
                         && resolveValueTypeCompatible(newValueType)
                         && resolveDestinationTypeCompatibleWithValue(mi);
             }
         } else if (isMethod(mi, "java.util.Map", "computeIfAbsent", "java.lang.Object",
                 "java.util.function.Function")) {
-            final ITypeBinding paramType = ((Expression) mi.arguments().get(1)).resolveTypeBinding();
+            final ITypeBinding paramType = arguments.get(1).resolveTypeBinding();
 
-            if (paramType.isParameterizedType() && paramType.getTypeArguments().length == 2) {
+            if (isParameterizedTypeWithNbArguments(paramType, 2)) {
                 final ITypeBinding newValueType = paramType.getTypeArguments()[1];
 
-                return resolveKeyTypeCompatible(((Expression) mi.arguments().get(0)).resolveTypeBinding())
+                return resolveKeyTypeCompatible(arguments.get(0).resolveTypeBinding())
                         && resolveValueTypeCompatible(newValueType)
                         && resolveDestinationTypeCompatibleWithValue(mi);
             }
         } else if (isMethod(mi, "java.util.Map", "merge", "java.lang.Object", "java.lang.Object",
                 "java.util.function.BiFunction")) {
-            final ITypeBinding paramType = ((Expression) mi.arguments().get(2)).resolveTypeBinding();
+            final ITypeBinding paramType = arguments.get(2).resolveTypeBinding();
 
-            if (paramType.isParameterizedType() && paramType.getTypeArguments().length == 3) {
+            if (isParameterizedTypeWithNbArguments(paramType, 3)) {
                 final ITypeBinding newValueType = paramType.getTypeArguments()[2];
 
-                return resolveKeyTypeCompatible(((Expression) mi.arguments().get(0)).resolveTypeBinding())
-                        && resolveValueTypeCompatible(((Expression) mi.arguments().get(1)).resolveTypeBinding())
+                return resolveKeyTypeCompatible(arguments.get(0).resolveTypeBinding())
+                        && resolveValueTypeCompatible(arguments.get(1).resolveTypeBinding())
                         && resolveValueTypeCompatible(newValueType)
                         && resolveDestinationTypeCompatibleWithValue(mi);
             }
         } else if (isMethod(mi, "java.util.Map", "replaceAll", "java.util.function.BiFunction")) {
-            final ITypeBinding paramType = ((Expression) mi.arguments().get(0)).resolveTypeBinding();
+            final ITypeBinding paramType = arguments.get(0).resolveTypeBinding();
 
-            if (paramType.isParameterizedType() && paramType.getTypeArguments().length == 3) {
+            if (isParameterizedTypeWithNbArguments(paramType, 3)) {
                 final ITypeBinding newValueType = paramType.getTypeArguments()[2];
 
                 return resolveValueTypeCompatible(newValueType);
@@ -434,62 +434,45 @@ public class GenericMapRatherThanRawMapRefactoring extends AbstractClassSubstitu
     }
 
     private boolean resolveDestinationTypeCompatibleWithKey(final MethodInvocation mi) {
-        if (isExprReceived(mi)) {
-            return resolveKeyTypeCompatible(getDestinationType(mi));
-        } else {
-            return true;
-        }
+        return !isExprReceived(mi) || resolveKeyTypeCompatible(getDestinationType(mi));
     }
 
     private boolean resolveDestinationTypeCompatibleWithValue(final MethodInvocation mi) {
-        if (isExprReceived(mi)) {
-            return resolveValueTypeCompatible(getDestinationType(mi));
-        } else {
-            return true;
-        }
+        return !isExprReceived(mi) || resolveValueTypeCompatible(getDestinationType(mi));
     }
 
     private boolean resolveDestinationParamTypeCompatibleWithKey(final MethodInvocation mi) {
         if (isExprReceived(mi)) {
             final ITypeBinding newElementType = getDestinationType(mi);
-
-            if (newElementType != null && newElementType.isParameterizedType()
-                    && newElementType.getTypeArguments().length == 1) {
-                return resolveKeyTypeCompatible(newElementType.getTypeArguments()[0]);
-            }
-            return false;
-        } else {
-            return true;
+            return isParameterizedTypeWithNbArguments(newElementType, 1)
+                    && resolveKeyTypeCompatible(newElementType.getTypeArguments()[0]);
         }
+        return true;
     }
 
     private boolean resolveDestinationParamTypeCompatibleWithValue(final MethodInvocation mi) {
         if (isExprReceived(mi)) {
             final ITypeBinding newElementType = getDestinationType(mi);
-
-            if (newElementType != null && newElementType.isParameterizedType()
-                    && newElementType.getTypeArguments().length == 1) {
-                return resolveValueTypeCompatible(newElementType.getTypeArguments()[0]);
-            }
-            return false;
-        } else {
-            return true;
+            return isParameterizedTypeWithNbArguments(newElementType, 1)
+                    && resolveValueTypeCompatible(newElementType.getTypeArguments()[0]);
         }
+        return true;
     }
 
     private boolean resolveDestinationParamTypeCompatibleWithKeyValue(final MethodInvocation mi) {
         if (isExprReceived(mi)) {
             final ITypeBinding newElementType = getDestinationType(mi);
-
-            if (newElementType != null && newElementType.isParameterizedType()
-                    && newElementType.getTypeArguments().length == 2) {
-                return resolveKeyTypeCompatible(newElementType.getTypeArguments()[0])
-                        && resolveValueTypeCompatible(newElementType.getTypeArguments()[1]);
-            }
-            return false;
-        } else {
-            return true;
+            return isParameterizedTypeWithNbArguments(newElementType, 2)
+                    && resolveKeyTypeCompatible(newElementType.getTypeArguments()[0])
+                    && resolveValueTypeCompatible(newElementType.getTypeArguments()[1]);
         }
+        return true;
+    }
+
+    private boolean isParameterizedTypeWithNbArguments(final ITypeBinding typeBinding, int nbArgs) {
+        return typeBinding != null
+                && typeBinding.isParameterizedType()
+                && typeBinding.getTypeArguments().length == nbArgs;
     }
 
     private boolean resolveKeyTypeCompatible(ITypeBinding newElementType) {

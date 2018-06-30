@@ -26,6 +26,9 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import static org.autorefactor.refactoring.ASTHelper.*;
+import static org.autorefactor.util.Utils.getOrDefault;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,16 +39,12 @@ import org.autorefactor.refactoring.TypeNameDecider;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
-import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ExpressionStatement;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.ParameterizedType;
 import org.eclipse.jdt.core.dom.ParenthesizedExpression;
 import org.eclipse.jdt.core.dom.Type;
-
-import static org.autorefactor.refactoring.ASTHelper.*;
-import static org.autorefactor.util.Utils.*;
 
 /** See {@link #getDescription()} method. */
 public class GenericListRatherThanRawListRefactoring extends AbstractClassSubstituteRefactoring {
@@ -141,9 +140,8 @@ public class GenericListRatherThanRawListRefactoring extends AbstractClassSubsti
         final TypeNameDecider typeNameDecider = new TypeNameDecider(originalExpr);
 
         final ParameterizedType parameterizedType = b.getAST().newParameterizedType(b.copy(origType));
-        parameterizedType.typeArguments().clear();
-        parameterizedType.typeArguments().add(b.toType(elementType, typeNameDecider));
-
+        typeArguments(parameterizedType).clear();
+        typeArguments(parameterizedType).add(b.toType(elementType, typeNameDecider));
         return parameterizedType;
     }
 
@@ -159,12 +157,10 @@ public class GenericListRatherThanRawListRefactoring extends AbstractClassSubsti
 
         if (parameterTypes.length > 0
                 && hasType(parameterTypes[0], "java.util.Collection")) {
-            ITypeBinding actualParameter = ((Expression) instanceCreation.arguments().get(0)).resolveTypeBinding();
+            ITypeBinding actualParameter = arguments(instanceCreation).get(0).resolveTypeBinding();
 
-            if (actualParameter.isParameterizedType() && actualParameter.getTypeArguments().length == 1) {
-                ITypeBinding newElementType = actualParameter.getTypeArguments()[0];
-                return resolveTypeCompatible(
-                        newElementType);
+            if (isParameterizedTypeWithOneArgument(actualParameter)) {
+                return resolveTypeCompatible(actualParameter.getTypeArguments()[0]);
             }
         }
         return true;
@@ -224,32 +220,20 @@ public class GenericListRatherThanRawListRefactoring extends AbstractClassSubsti
                 || isMethod(mi, "java.util.Vector", "removeElement", "java.lang.Object")
                 || isMethod(mi, "java.util.Stack", "push", "java.lang.Object")
                 || isMethod(mi, "java.util.Stack", "search", "java.lang.Object")) {
-            ITypeBinding newElementType = ((Expression) mi.arguments().get(0)).resolveTypeBinding();
+            ITypeBinding newElementType = arguments(mi).get(0).resolveTypeBinding();
             return resolveTypeCompatible(newElementType);
         } else if (isMethod(mi, "java.util.List", "add", "int", "java.lang.Object")
                 || isMethod(mi, "java.util.List", "set", "int", "java.lang.Object")) {
-            return resolveTypeCompatible(((Expression) mi.arguments().get(1)).resolveTypeBinding());
+            return resolveTypeCompatible(arguments(mi).get(1).resolveTypeBinding());
         } else if (isMethod(mi, "java.util.Collection", "toArray", "java.lang.Object[]")
                 || isMethod(mi, "java.util.Vector", "copyInto", "java.lang.Object[]")) {
-            ITypeBinding newElementType = ((Expression) mi.arguments().get(0)).resolveTypeBinding().getElementType();
+            ITypeBinding newElementType = arguments(mi).get(0).resolveTypeBinding().getElementType();
             return resolveTypeCompatible(newElementType);
         } else if (isMethod(mi, "java.util.Collection", "addAll", "java.util.Collection")
                 || isMethod(mi, "java.util.Collection", "containsAll", "java.util.Collection")) {
-            ITypeBinding paramType = ((Expression) mi.arguments().get(0)).resolveTypeBinding();
-
-            if (paramType.isParameterizedType() && paramType.getTypeArguments().length == 1) {
-                ITypeBinding newElementType = paramType.getTypeArguments()[0];
-                return resolveTypeCompatible(
-                        newElementType);
-            }
+            return resolveTypeCompatibleIfPossible(arguments(mi).get(0).resolveTypeBinding());
         } else if (isMethod(mi, "java.util.List", "addAll", "int", "java.util.Collection")) {
-            ITypeBinding paramType = ((Expression) mi.arguments().get(1)).resolveTypeBinding();
-
-            if (paramType.isParameterizedType() && paramType.getTypeArguments().length == 1) {
-                ITypeBinding newElementType = paramType.getTypeArguments()[0];
-                return resolveTypeCompatible(
-                        newElementType);
-            }
+            return resolveTypeCompatibleIfPossible(arguments(mi).get(1).resolveTypeBinding());
         } else if (isMethod(mi, "java.util.List", "get", "int")
                 || isMethod(mi, "java.util.List", "remove")
                 || isMethod(mi, "java.util.List", "remove", "int")
@@ -284,10 +268,7 @@ public class GenericListRatherThanRawListRefactoring extends AbstractClassSubsti
                 || isMethod(mi, "java.util.Vector", "elements")) {
             if (isExprReceived(mi)) {
                 ITypeBinding newElementType = getDestinationType(mi);
-                if (newElementType != null && newElementType.isParameterizedType()
-                        && newElementType.getTypeArguments().length == 1) {
-                    return resolveTypeCompatible(newElementType.getTypeArguments()[0]);
-                }
+                return resolveTypeCompatibleIfPossible(newElementType);
             } else {
                 return true;
             }
@@ -305,6 +286,17 @@ public class GenericListRatherThanRawListRefactoring extends AbstractClassSubsti
         }
 
         return false;
+    }
+
+    private boolean resolveTypeCompatibleIfPossible(ITypeBinding paramType) {
+        return isParameterizedTypeWithOneArgument(paramType)
+                && resolveTypeCompatible(paramType.getTypeArguments()[0]);
+    }
+
+    private boolean isParameterizedTypeWithOneArgument(ITypeBinding typeBinding) {
+        return typeBinding != null
+                && typeBinding.isParameterizedType()
+                && typeBinding.getTypeArguments().length == 1;
     }
 
     private boolean isExprReceived(final ASTNode node) {
