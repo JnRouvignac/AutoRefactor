@@ -231,7 +231,7 @@ public class TypeNameDecider {
             final String name = names[i];
             final String elementBeforeName = elementBeforeNames[i];
             if (!name.equals(elementBeforeName)) {
-                if (elementBeforeName.equals("*")
+                if ("*".equals(elementBeforeName)
                         && i + 1 == elementBeforeNames.length) {
                     if (i + 1 == names.length) {
                         return name;

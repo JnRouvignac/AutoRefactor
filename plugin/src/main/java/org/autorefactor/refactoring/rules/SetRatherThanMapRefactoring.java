@@ -201,13 +201,8 @@ public class SetRatherThanMapRefactoring extends AbstractClassSubstituteRefactor
     private boolean isReturnValueLost(final ASTNode node) {
         ASTNode parentNode = node.getParent();
 
-        if (parentNode instanceof ExpressionStatement) {
-            return true;
-        } else if (parentNode instanceof ParenthesizedExpression) {
-            return isReturnValueLost(parentNode);
-        } else {
-            return false;
-        }
+        return parentNode instanceof ExpressionStatement
+                || (parentNode instanceof ParenthesizedExpression && isReturnValueLost(parentNode));
     }
 
     @Override

@@ -119,14 +119,13 @@ public class UpdateSetRatherThanTestingFirstRefactoring extends AbstractRefactor
                 if (stmts.size() == 1 && asList(oppositeStmt).isEmpty()) {
                     // Only one statement: replace if statement with col.add() (or col.remove())
                     r.replace(ifStmtToReplace, b.move(firstStmt));
-                    return DO_NOT_VISIT_SUBTREE;
                 } else {
                     // There are other statements, replace the if condition with col.add() (or col.remove())
                     r.replace(ifStmtToReplace.getExpression(),
                             negate ? b.negate(miAddOrRemove, ASTBuilder.Copy.MOVE) : b.move(miAddOrRemove));
                     r.remove(firstStmt);
-                    return DO_NOT_VISIT_SUBTREE;
                 }
+                return DO_NOT_VISIT_SUBTREE;
             }
         }
         return VISIT_SUBTREE;

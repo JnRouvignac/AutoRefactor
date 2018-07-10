@@ -71,7 +71,7 @@ public class UnboxingRatherThanExplicitMethodRefactoring extends AbstractRefacto
 
     @Override
     public boolean visit(MethodInvocation node) {
-        if ((node.getExpression() != null)
+        if (node.getExpression() != null
                 && getJavaMinorVersion() >= 5
                 && (isMethod(node, "java.lang.Boolean", "booleanValue")
                 || isMethod(node, "java.lang.Byte", "byteValue")

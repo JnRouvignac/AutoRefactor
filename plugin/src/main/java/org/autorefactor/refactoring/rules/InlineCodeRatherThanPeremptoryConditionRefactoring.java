@@ -82,7 +82,6 @@ public class InlineCodeRatherThanPeremptoryConditionRefactoring extends Abstract
     }
 
     private final class IfAndFollowingCodeVisitor extends BlockSubVisitor {
-
         public IfAndFollowingCodeVisitor(final Block startNode) {
             super(null, startNode);
         }

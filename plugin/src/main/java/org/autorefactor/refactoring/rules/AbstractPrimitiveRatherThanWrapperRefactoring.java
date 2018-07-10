@@ -177,18 +177,16 @@ public abstract class AbstractPrimitiveRatherThanWrapperRefactoring extends Abst
         if (node.fragments().size() == 1) {
             final VariableDeclarationFragment fragment = (VariableDeclarationFragment) node.fragments().get(0);
             if (hasType(fragment.resolveBinding().getType(), getWrapperFullyQualifiedName())
-                    && fragment.getInitializer() != null) {
-                if (isNotNull(fragment.getInitializer())) {
-                    final VarOccurrenceVisitor varOccurrenceVisitor = new VarOccurrenceVisitor(fragment);
-                    final Block parentBlock = getAncestorOrNull(fragment, Block.class);
-                    if (parentBlock != null) {
-                        varOccurrenceVisitor.visitNode(parentBlock);
+                    && fragment.getInitializer() != null && isNotNull(fragment.getInitializer())) {
+                final VarOccurrenceVisitor varOccurrenceVisitor = new VarOccurrenceVisitor(fragment);
+                final Block parentBlock = getAncestorOrNull(fragment, Block.class);
+                if (parentBlock != null) {
+                    varOccurrenceVisitor.visitNode(parentBlock);
 
-                        if (varOccurrenceVisitor.isPrimitiveAllowed()
-                                && varOccurrenceVisitor.getAutoBoxingCount() < 2) {
-                            refactorWrapper(node);
-                            return DO_NOT_VISIT_SUBTREE;
-                        }
+                    if (varOccurrenceVisitor.isPrimitiveAllowed()
+                            && varOccurrenceVisitor.getAutoBoxingCount() < 2) {
+                        refactorWrapper(node);
+                        return DO_NOT_VISIT_SUBTREE;
                     }
                 }
             }
@@ -249,7 +247,7 @@ public abstract class AbstractPrimitiveRatherThanWrapperRefactoring extends Abst
 
         private boolean isVarReturned;
 
-        private int autoBoxingCount = 0;
+        private int autoBoxingCount;
 
         public VarOccurrenceVisitor(final VariableDeclarationFragment var) {
             varDecl = var;
@@ -292,23 +290,15 @@ public abstract class AbstractPrimitiveRatherThanWrapperRefactoring extends Abst
                     return true;
                 } else if (assignment.getLeftHandSide().equals(node)) {
                     return isNotNull(assignment.getRightHandSide());
-                } else if (assignment.getRightHandSide().equals(node)) {
-                    if (assignment.getLeftHandSide() instanceof Name) {
-                        return isOfType((Name) assignment.getLeftHandSide());
-                    } else {
-                        return false;
-                    }
                 } else {
-                    return false;
+                    return assignment.getRightHandSide().equals(node)
+                            && assignment.getLeftHandSide() instanceof Name
+                            && isOfType((Name) assignment.getLeftHandSide());
                 }
 
             case VARIABLE_DECLARATION_FRAGMENT:
                 final VariableDeclarationFragment fragment = (VariableDeclarationFragment) parentNode;
-                if (fragment.getInitializer().equals(node)) {
-                    return isOfType(fragment.getName());
-                } else {
-                    return false;
-                }
+                return fragment.getInitializer().equals(node) && isOfType(fragment.getName());
 
             case RETURN_STATEMENT:
                 final ReturnStatement returnStmt = (ReturnStatement) parentNode;

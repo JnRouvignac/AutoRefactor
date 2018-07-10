@@ -67,7 +67,6 @@ import org.eclipse.jdt.core.dom.VariableDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 /** See {@link #getDescription()} method. */
 public abstract class AbstractClassSubstituteRefactoring extends AbstractRefactoringRule {
-
     /**
      * Get the existing class canonical name.
      *
@@ -195,7 +194,7 @@ public abstract class AbstractClassSubstituteRefactoring extends AbstractRefacto
      */
     protected boolean isTypeCompatible(final ITypeBinding targetType,
             final ITypeBinding sourceType) {
-        return (targetType != null) && targetType.isAssignmentCompatible(sourceType);
+        return targetType != null && targetType.isAssignmentCompatible(sourceType);
     }
 
     @Override
@@ -369,7 +368,6 @@ public abstract class AbstractClassSubstituteRefactoring extends AbstractRefacto
     }
 
     private final class ObjectInstantiationVisitor extends ASTVisitor {
-
         private final List<ClassInstanceCreation> objectInstantiations = new ArrayList<ClassInstanceCreation>();
 
         private final Block startNode;
@@ -414,7 +412,6 @@ public abstract class AbstractClassSubstituteRefactoring extends AbstractRefacto
     }
 
     private class VarOccurrenceVisitor extends InterruptableVisitor {
-
         private final VariableDeclaration varDecl;
         private final List<SimpleName> varOccurrences = new ArrayList<SimpleName>();
         private boolean isUsedInAnnonymousClass;

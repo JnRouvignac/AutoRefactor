@@ -36,7 +36,6 @@ import org.autorefactor.refactoring.RefactoringRule;
 /** Lists all the available refactoring rules. */
 public final class AllRefactoringRules {
     private AllRefactoringRules() {
-        super();
     }
 
     /**

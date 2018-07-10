@@ -110,7 +110,6 @@ public class GenericListRatherThanRawListRefactoring extends AbstractClassSubsti
     public boolean visit(Block node) {
         elementType = null;
         return super.visit(node);
-
     }
 
     @Override

@@ -80,7 +80,6 @@ public final class Pair<F, S> {
      *            the second element, can be null
      */
     private Pair(F first, S second) {
-        super();
         this.first = first;
         this.second = second;
     }
@@ -108,8 +107,7 @@ public final class Pair<F, S> {
         final int prime = 31;
         int result = 1;
         result = prime * result + ((first == null) ? 0 : first.hashCode());
-        result = prime * result + ((second == null) ? 0 : second.hashCode());
-        return result;
+        return prime * result + ((second == null) ? 0 : second.hashCode());
     }
 
     @Override

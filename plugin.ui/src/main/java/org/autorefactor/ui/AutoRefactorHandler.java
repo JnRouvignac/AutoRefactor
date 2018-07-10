@@ -90,7 +90,7 @@ public class AutoRefactorHandler extends AbstractHandler {
             PrintWriter pw = new PrintWriter(sw);
             e.printStackTrace(pw);
 
-            showMessage(shell, "An error has occurred:\n\n" + sw.toString());
+            showMessage(shell, "An error has occurred:\n\n" + sw);
         }
 
         // TODO JNR provide a maven plugin

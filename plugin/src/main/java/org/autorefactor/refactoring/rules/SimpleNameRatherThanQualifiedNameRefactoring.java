@@ -183,7 +183,7 @@ public class SimpleNameRatherThanQualifiedNameRefactoring extends AbstractRefact
 
         @Override
         public String toString() {
-            if (this.equals(CANNOT_REPLACE_SIMPLE_NAME)) {
+            if (equals(CANNOT_REPLACE_SIMPLE_NAME)) {
                 return "CANNOT_REPLACE_SIMPLE_NAME";
             }
             return fullyQualifiedName + (fromImport ? " (imported)" : " (member)");
@@ -231,7 +231,6 @@ public class SimpleNameRatherThanQualifiedNameRefactoring extends AbstractRefact
             default:
                 final ITypeBinding enclosingTypeBinding = resolveEnclosingTypeBinding(getEnclosingType(node));
                 if (enclosingTypeBinding != null && matches.get(0).isMember()) {
-
                     // All matches are local to this class
                     ITypeBinding declaringType =
                             getDeclaringTypeInTypeHierarchy(enclosingTypeBinding, simpleName, fqnType, node);
@@ -288,7 +287,7 @@ public class SimpleNameRatherThanQualifiedNameRefactoring extends AbstractRefact
                     if (binding.getName().equals(simpleName)
                             && (Modifier.isPublic(binding.getModifiers())
                                     || Modifier.isProtected(binding.getModifiers())
-                                    || (!Modifier.isPrivate(binding.getModifiers())
+                                    || (!isPrivate(binding.getModifiers())
                                             && superTypeBinding.getPackage().equals(typeBinding.getPackage())))) {
                         return superTypeBinding;
                     }
@@ -350,24 +349,19 @@ public class SimpleNameRatherThanQualifiedNameRefactoring extends AbstractRefact
                         // local FQNs take precedence over imported FQNs
                         bestMatches.clear();
                         bestMatches.add(fqn);
-                    } else {
-                        // fqn is imported
+                    } else // fqn is imported
                         if (bestMatches.get(0).fromStarImport()) {
                             if (fqn.fromSpecificImport()) {
                                 // specific imports take precedence over on-demand imports
                                 bestMatches.clear();
-                                bestMatches.add(fqn);
-                            } else {
-                                // group imported FQNs together
-                                bestMatches.add(fqn);
                             }
+                            bestMatches.add(fqn);
                         } else if (fqn.fromSpecificImport()) {
                             // import conflicts:
                             // there is more than one specific import.
                             // this is a compile-error: do not try to replace
                             return Collections.emptyList();
                         }
-                    }
                 } else if (fqn.isMember()) {
                     // group local FQNs together
                     bestMatches.add(fqn);
@@ -455,13 +449,11 @@ public class SimpleNameRatherThanQualifiedNameRefactoring extends AbstractRefact
             } else {
                 importStaticTypeOrMember(node, qname);
             }
+        } else if (node.isOnDemand()) {
+            final String pkgName = node.getName().getFullyQualifiedName();
+            importTypesFromPackage(pkgName, node);
         } else {
-            if (node.isOnDemand()) {
-                final String pkgName = node.getName().getFullyQualifiedName();
-                importTypesFromPackage(pkgName, node);
-            } else {
-                types.addName(FQN.fromImport(qname, false));
-            }
+            types.addName(FQN.fromImport(qname, false));
         }
     }
 
@@ -525,8 +517,9 @@ public class SimpleNameRatherThanQualifiedNameRefactoring extends AbstractRefact
                 if (isTopLevelType) {
                     if (!pkgName.equals(typeNameMatch.getPackageName())) {
                         // sanity check failed
-                        throw new IllegalStateException("Expected package '" + typeNameMatch.getPackageName()
-                                                        + "' to be equal to '" + pkgName + "'");
+                        throw new IllegalStateException("Expected package '"
+                                + typeNameMatch.getPackageName()
+                                + "' to be equal to '" + pkgName + "'");
                     }
                     QName qname = QName.valueOf(typeNameMatch.getFullyQualifiedName());
                     types.addName(FQN.fromImport(qname, true));

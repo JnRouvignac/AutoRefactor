@@ -98,7 +98,7 @@ public class TryWithResourceRefactoring extends AbstractRefactoringRule {
     @Override
     public boolean visit(TryStatement node) {
         final List<Statement> tryStmts = asList(node.getBody());
-        if (tryStmts.size() >= 1 && tryStmts.get(0).getNodeType() == TRY_STATEMENT) {
+        if (!tryStmts.isEmpty() && tryStmts.get(0).getNodeType() == TRY_STATEMENT) {
             final TryStatement innerTryStmt = as(tryStmts.get(0), TryStatement.class);
             if (innerTryStmt != null
                     && !innerTryStmt.resources().isEmpty()
@@ -115,7 +115,7 @@ public class TryWithResourceRefactoring extends AbstractRefactoringRule {
 
         final VariableDeclarationFragment previousDeclFragment = getUniqueFragment(previousDeclStmt);
         final List<Statement> finallyStmts = asList(node.getFinally());
-        if (previousDeclFragment != null && finallyStmts.size() >= 1) {
+        if (previousDeclFragment != null && !finallyStmts.isEmpty()) {
             final List<ASTNode> nodesToRemove = new ArrayList<ASTNode>();
             nodesToRemove.add(previousDeclStmt);
 

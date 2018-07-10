@@ -56,7 +56,6 @@ import org.junit.runners.Parameterized.Parameters;
 
 @RunWith(value = Parameterized.class)
 public class CFGBuilderTest {
-
     private String testName;
     private int methodDeclarationNb;
 
@@ -146,5 +145,4 @@ public class CFGBuilderTest {
         m.setAccessible(true);
         m.invoke(null, cu, parser, options);
     }
-
 }

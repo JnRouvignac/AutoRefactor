@@ -109,7 +109,7 @@ public class HashSetRatherThanTreeSetRefactoring extends AbstractClassSubstitute
     @Override
     protected boolean canInstantiationBeRefactored(final ClassInstanceCreation instanceCreation) {
         return instanceCreation.arguments().size() != 1
-                || !hasType(((Expression) instanceCreation.arguments().get(0)), "java.util.Comparator");
+                || !hasType((Expression) instanceCreation.arguments().get(0), "java.util.Comparator");
     }
 
     @Override

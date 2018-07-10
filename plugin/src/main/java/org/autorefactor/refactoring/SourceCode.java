@@ -73,7 +73,6 @@ public class SourceCode {
                     + " => (" + astRoot.getLineNumber(getEndPosition())
                     + "," + astRoot.getColumnNumber(getEndPosition()) + ")]";
         }
-
     }
 
     private final CompilationUnit astRoot;

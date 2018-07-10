@@ -97,7 +97,6 @@ public class CollectionRefactoring extends AbstractRefactoringRule {
     }
 
     private static final class NewAndAddAllMethodVisitor extends BlockSubVisitor {
-
         public NewAndAddAllMethodVisitor(final RefactoringContext ctx, final Block startNode) {
             super(ctx, startNode);
         }
@@ -112,10 +111,8 @@ public class CollectionRefactoring extends AbstractRefactoringRule {
                 final Assignment as = asExpression(previousStmt, Assignment.class);
                 if (hasOperator(as, Assignment.Operator.ASSIGN)) {
                     final Expression lhs = as.getLeftHandSide();
-                    if (lhs instanceof SimpleName) {
-                        if (isSameLocalVariable(lhs, mi.getExpression())) {
-                            return replaceInitializer(as.getRightHandSide(), arg0, node);
-                        }
+                    if (lhs instanceof SimpleName && isSameLocalVariable(lhs, mi.getExpression())) {
+                        return replaceInitializer(as.getRightHandSide(), arg0, node);
                     }
                 } else if (previousStmt instanceof VariableDeclarationStatement) {
                     final VariableDeclarationFragment vdf =
@@ -133,10 +130,10 @@ public class CollectionRefactoring extends AbstractRefactoringRule {
             final ClassInstanceCreation cic = as(nodeToReplace, ClassInstanceCreation.class);
             if (canReplaceInitializer(cic, arg0)
                     && isCastCompatible(nodeToReplace, arg0)) {
-                final ASTBuilder b = getCtx().getASTBuilder();
-                getCtx().getRefactorings().replace(nodeToReplace,
+                final ASTBuilder b = ctx.getASTBuilder();
+                ctx.getRefactorings().replace(nodeToReplace,
                         b.new0(b.copy(cic.getType()), b.copy(arg0)));
-                getCtx().getRefactorings().remove(nodeToRemove);
+                ctx.getRefactorings().remove(nodeToRemove);
                 setResult(DO_NOT_VISIT_SUBTREE);
                 return DO_NOT_VISIT_SUBTREE;
             }
@@ -150,7 +147,7 @@ public class CollectionRefactoring extends AbstractRefactoringRule {
             final List<Expression> args = arguments(cic);
             final boolean noArgsCtor = args.isEmpty();
             final boolean colCapacityCtor = isValidCapacityParameter(sourceCollection, args);
-            if (noArgsCtor && hasType(cic,
+            return (noArgsCtor && hasType(cic,
                     "java.util.concurrent.ConcurrentLinkedDeque",
                     "java.util.concurrent.ConcurrentLinkedQueue",
                     "java.util.concurrent.ConcurrentSkipListSet",
@@ -168,22 +165,16 @@ public class CollectionRefactoring extends AbstractRefactoringRule {
                     "java.util.LinkedList",
                     "java.util.PriorityQueue",
                     "java.util.TreeSet",
-                    "java.util.Vector")) {
-                return true;
-            }
-            if (colCapacityCtor && hasType(cic,
-                    "java.util.concurrent.LinkedBlockingDeque",
-                    "java.util.concurrent.LinkedBlockingQueue",
-                    "java.util.concurrent.PriorityBlockingQueue",
-                    "java.util.ArrayDeque",
-                    "java.util.ArrayList",
-                    "java.util.HashSet",
-                    "java.util.LinkedHashSet",
-                    "java.util.PriorityQueue",
-                    "java.util.Vector")) {
-                return true;
-            }
-            return false;
+                    "java.util.Vector")) || (colCapacityCtor && hasType(cic,
+                            "java.util.concurrent.LinkedBlockingDeque",
+                            "java.util.concurrent.LinkedBlockingQueue",
+                            "java.util.concurrent.PriorityBlockingQueue",
+                            "java.util.ArrayDeque",
+                            "java.util.ArrayList",
+                            "java.util.HashSet",
+                            "java.util.LinkedHashSet",
+                            "java.util.PriorityQueue",
+                            "java.util.Vector"));
         }
 
         private boolean isValidCapacityParameter(Expression sourceCollection, final List<Expression> args) {

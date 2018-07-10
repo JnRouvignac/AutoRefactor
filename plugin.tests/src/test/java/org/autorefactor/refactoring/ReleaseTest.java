@@ -5,29 +5,28 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class ReleaseTest {
-
     @Test
     public void javaSEFromString() {
         Release release1 = Release.javaSE("1.2.3");
-        assertEquals(release1.getMajorVersion(), 1);
-        assertEquals(release1.getMinorVersion(), 2);
-        assertEquals(release1.getPatchVersion(), 3);
+        assertEquals(1, release1.getMajorVersion());
+        assertEquals(2, release1.getMinorVersion());
+        assertEquals(3, release1.getPatchVersion());
         Release release2 = Release.javaSE("1.2.0");
-        assertEquals(release2.getMajorVersion(), 1);
-        assertEquals(release2.getMinorVersion(), 2);
-        assertEquals(release2.getPatchVersion(), 0);
+        assertEquals(1, release2.getMajorVersion());
+        assertEquals(2, release2.getMinorVersion());
+        assertEquals(0, release2.getPatchVersion());
     }
 
     @Test
     public void javaSEFromIntegers() {
         Release release1 = Release.javaSE(1, 2, 3);
-        assertEquals(release1.getMajorVersion(), 1);
-        assertEquals(release1.getMinorVersion(), 2);
-        assertEquals(release1.getPatchVersion(), 3);
+        assertEquals(1, release1.getMajorVersion());
+        assertEquals(2, release1.getMinorVersion());
+        assertEquals(3, release1.getPatchVersion());
         Release release2 = Release.javaSE(1, 2, 0);
-        assertEquals(release2.getMajorVersion(), 1);
-        assertEquals(release2.getMinorVersion(), 2);
-        assertEquals(release2.getPatchVersion(), 0);
+        assertEquals(1, release2.getMajorVersion());
+        assertEquals(2, release2.getMinorVersion());
+        assertEquals(0, release2.getPatchVersion());
     }
 
     // @DataProvider
@@ -57,6 +56,6 @@ public class ReleaseTest {
     public void isCompatibleWith(String version1, String version2, boolean expected) {
         Release r1 = Release.javaSE(version1);
         Release r2 = Release.javaSE(version2);
-        assertEquals(r1.isCompatibleWith(r2), expected);
+        assertEquals(expected, r1.isCompatibleWith(r2));
     }
 }

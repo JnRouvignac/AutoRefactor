@@ -77,9 +77,7 @@ import org.eclipse.swt.widgets.Text;
  * Wizard page which allows the user to choose which refactorings to apply to the selected java elements.
  */
 public class ChooseRefactoringWizardPage extends WizardPage {
-
     private final class CheckStateProvider implements ICheckStateProvider {
-
         public CheckStateProvider(List<? extends Object> refactorings) {
             for (Object refactoring : refactorings) {
                 checkedState.put(refactoring, Boolean.FALSE);
@@ -128,7 +126,6 @@ public class ChooseRefactoringWizardPage extends WizardPage {
         }
     };
 
-
     ChooseRefactoringWizardPage() {
         super("Choose refactorings...");
         setTitle("Choose refactorings...");
@@ -167,7 +164,7 @@ public class ChooseRefactoringWizardPage extends WizardPage {
     }
 
     private void createFilterText(Composite parent) {
-        filterText = new Text(parent, SWT.BORDER | SWT.SINGLE);
+        filterText = new Text(parent, BORDER | SWT.SINGLE);
         filterText.setMessage("Type in to filter refactorings");
         filterText.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
 
@@ -181,7 +178,7 @@ public class ChooseRefactoringWizardPage extends WizardPage {
     }
 
     private void createSelectAllCheckbox(Composite parent) {
-        selectAllVisibleCheckbox = new Button(parent, SWT.CHECK);
+        selectAllVisibleCheckbox = new Button(parent, CHECK);
         selectAllVisibleCheckbox.setText("Toggle all the visible refactorings");
         selectAllVisibleCheckbox.addSelectionListener(new SelectionAdapter() {
             @Override

@@ -28,5 +28,5 @@ package org.autorefactor.refactoring;
 /** Constants to be used in the current plugin. */
 public interface PluginConstant {
     /** The plug-in ID. */
-    public static final String PLUGIN_ID = "org.autorefactor.plugin";
+    String PLUGIN_ID = "org.autorefactor.plugin";
 }

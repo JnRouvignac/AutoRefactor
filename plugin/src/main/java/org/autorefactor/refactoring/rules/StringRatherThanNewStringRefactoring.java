@@ -73,7 +73,7 @@ public class StringRatherThanNewStringRefactoring extends AbstractRefactoringRul
                 && arguments(node).size() == 1) {
             final Expression arg0 = arguments(node).get(0);
             if (hasType(arg0, "java.lang.String")
-                    && ((arg0 instanceof StringLiteral) || (arg0 instanceof InfixExpression))) {
+                    && (arg0 instanceof StringLiteral || arg0 instanceof InfixExpression)) {
                 final ASTBuilder b = ctx.getASTBuilder();
                 ctx.getRefactorings().replace(node, b.parenthesizeIfNeeded(b.copy(arg0)));
                 return DO_NOT_VISIT_SUBTREE;

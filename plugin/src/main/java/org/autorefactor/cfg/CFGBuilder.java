@@ -26,6 +26,7 @@
 package org.autorefactor.cfg;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -141,9 +142,7 @@ import static org.eclipse.jdt.core.dom.ASTNode.*;
  * + looking at if / while / etc. conditions and see if they resolve to a constant
  */
 public class CFGBuilder {
-
     private static final class LivenessState {
-
         /**
          * The currently live CFGBasicBlock. It can be null which means that further
          * analysis will first have to create a live CFGBasicBlock.
@@ -185,7 +184,7 @@ public class CFGBuilder {
         }
 
         private LivenessState copyLiveEdges() {
-            return LivenessState.of(liveEdges);
+            return of(liveEdges);
         }
 
         private LivenessState nextStmtWillCreateNewBlock() {
@@ -786,7 +785,8 @@ public class CFGBuilder {
             if (throwingBlocksInTry.isEmpty()) {
                 // TODO JNR dead code found!!
             }
-            final List<CFGEdgeBuilder> liveBeforeCatchClause = new LinkedList<CFGEdgeBuilder>();
+            final List<CFGEdgeBuilder> liveBeforeCatchClause =
+                    new ArrayList<CFGEdgeBuilder>(throwingBlocksInTry.size());
             for (CFGBasicBlock throwingBlockInTry : throwingBlocksInTry) {
                 // TODO JNR if a Statement throws an exception, it must break the current basicBlock
                 // TODO JNR how to specify this edge is due to an exception?
@@ -810,8 +810,7 @@ public class CFGBuilder {
             final LivenessState liveBeforeFinally = new LivenessState();
             liveBeforeFinally.addAll(liveAfterTry);
             liveBeforeFinally.addAll(liveAfterCatchClauses);
-            final LivenessState liveAfterFinally = buildCFG(node.getFinally(), liveBeforeFinally, throwers);
-            return liveAfterFinally;
+            return buildCFG(node.getFinally(), liveBeforeFinally, throwers);
         } else {
             return liveAfterCatchClauses.copyLiveBasicBlock();
         }
@@ -1203,6 +1202,7 @@ public class CFGBuilder {
                 liveState = buildCFG((BreakStatement) stmt, liveState, throwers);
                 break;
             case CONSTRUCTOR_INVOCATION:
+            case SUPER_CONSTRUCTOR_INVOCATION:
                 liveState = buildCFG(stmt, liveState, throwers);
                 break;
             case CONTINUE_STATEMENT:
@@ -1231,9 +1231,6 @@ public class CFGBuilder {
                 break;
             case RETURN_STATEMENT:
                 liveState = buildCFG((ReturnStatement) stmt, liveState, throwers);
-                break;
-            case SUPER_CONSTRUCTOR_INVOCATION:
-                liveState = buildCFG(stmt, liveState, throwers);
                 break;
             case SWITCH_CASE:
                 // Here, use startState.liveBasicBlock to build an edge
@@ -1627,11 +1624,10 @@ public class CFGBuilder {
                 + "\" before a CFGBasicBlock is created for it. Found the following edges to build " + toBuild);
         }
         if (!state.requireNewBlock()) {
-            final CFGBasicBlock basicBlock = state.liveBasicBlock;
-            // TODO JNR add nodes to the basicBlock they belong to
+                        // TODO JNR add nodes to the basicBlock they belong to
             // and adapt the CFGDotPrinter to display "..." after the first node
             // basicBlock.addNode(node);
-            return basicBlock;
+            return state.liveBasicBlock;
         }
         final LineAndColumn lineCol = getLineAndColumn(node);
         final CFGBasicBlock basicBlock = new CFGBasicBlock(node,
@@ -1695,7 +1691,7 @@ public class CFGBuilder {
         int result = 0;
         for (int i = 0; i < s.length(); i++) {
             if (s.charAt(i) == '\t') {
-                result += tabSize - (i % tabSize);
+                result += tabSize - i % tabSize;
             } else {
                 result++;
             }

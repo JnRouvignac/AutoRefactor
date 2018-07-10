@@ -231,7 +231,7 @@ public class ReduceVariableScopeRefactoring extends AbstractRefactoringRule {
                 list = new ArrayList<VariableAccess>();
                 this.allVariableAccesses.put(varName, list);
             }
-            if (list.size() == 0
+            if (list.isEmpty()
                     || !getLast(list).getScope().equals(accessTypeAndScope.getSecond())) {
                 // only keep first write in scope
                 list.add(new VariableAccess(node, accessTypeAndScope.getFirst(), accessTypeAndScope.getSecond()));
@@ -450,14 +450,11 @@ public class ReduceVariableScopeRefactoring extends AbstractRefactoringRule {
             if (varAccess.getAccessType() == WRITE) {
                 // is only write
                 lastWrite = varAccess;
-            } else if ((varAccess.getAccessType() & READ) != 0) {
-                // is read
-                if (lastWrite != null
-                        && !isReadDominatedByWriteInScopeMoreReducedThanVariableScope(
-                                varAccess.getScope(), lastWrite.getScope(), varDecl.getScope())) {
-                    // TODO JNR return sublist of reduceable scope
-                    return false;
-                }
+            } else if ((varAccess.getAccessType() & READ) != 0 && lastWrite != null
+                    && !isReadDominatedByWriteInScopeMoreReducedThanVariableScope(
+                            varAccess.getScope(), lastWrite.getScope(), varDecl.getScope())) {
+                // TODO JNR return sublist of reduceable scope
+                return false;
             }
         }
         return true;
@@ -465,13 +462,9 @@ public class ReduceVariableScopeRefactoring extends AbstractRefactoringRule {
 
     private boolean isReadDominatedByWriteInScopeMoreReducedThanVariableScope(
             ASTNode readScope, ASTNode writeScope, ASTNode varScope) {
-        if (varScope.equals(readScope) || varScope.equals(writeScope)) {
-            return false;
-        }
-        if (readScope.equals(writeScope)) {
-            return true;
-        }
-        return isReadDominatedByWriteInScopeMoreReducedThanVariableScope(
-                readScope.getParent(), writeScope, varScope);
+        return !varScope.equals(readScope) && !varScope.equals(writeScope)
+                && (readScope.equals(writeScope)
+                        || isReadDominatedByWriteInScopeMoreReducedThanVariableScope(readScope.getParent(), writeScope,
+                                varScope));
     }
 }

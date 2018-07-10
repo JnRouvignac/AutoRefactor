@@ -218,13 +218,13 @@ public class RemoveEmptyLinesRefactoring extends AbstractRefactoringRule {
 
     private int findOpeningCurlyForTypeBody(AbstractTypeDeclaration node, String source) {
         int pos = node.getStartPosition();
-        while (true) {
-            int firstCurly = source.indexOf("{", pos);
+        do {
+            int firstCurly = source.indexOf('{', pos);
             if (!this.ctx.isInComment(firstCurly)) {
                 return firstCurly;
             }
             pos = firstCurly + 1;
-        }
+        } while (true);
     }
 
     @Override

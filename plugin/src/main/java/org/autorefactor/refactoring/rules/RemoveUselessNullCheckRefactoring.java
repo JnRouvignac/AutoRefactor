@@ -94,7 +94,6 @@ public class RemoveUselessNullCheckRefactoring extends AbstractRefactoringRule {
     }
 
     private static final class IfAndReturnVisitor extends BlockSubVisitor {
-
         public IfAndReturnVisitor(final RefactoringContext ctx, final Block startNode) {
             super(ctx, startNode);
         }
@@ -173,8 +172,8 @@ public class RemoveUselessNullCheckRefactoring extends AbstractRefactoringRule {
 
         private void replaceWithStraightAssign(IfStatement node,
                 Expression leftHandSide, Expression rightHandSide) {
-            final ASTBuilder b = this.getCtx().getASTBuilder();
-            this.getCtx().getRefactorings().replace(node,
+            final ASTBuilder b = ctx.getASTBuilder();
+            ctx.getRefactorings().replace(node,
                     b.toStmt(b.assign(
                             b.copy(leftHandSide),
                             ASSIGN,
@@ -186,13 +185,13 @@ public class RemoveUselessNullCheckRefactoring extends AbstractRefactoringRule {
             if (isNullLiteral(otherRs.getExpression())) {
                 if (isNullLiteral(condition.getRightOperand())
                         && match(matcher, condition.getLeftOperand(), rs.getExpression())) {
-                    this.getCtx().getRefactorings().remove(toRemove);
+                    ctx.getRefactorings().remove(toRemove);
                     replaceWithStraightReturn(node, condition.getLeftOperand());
                     setResult(DO_NOT_VISIT_SUBTREE);
                     return DO_NOT_VISIT_SUBTREE;
                 } else if (isNullLiteral(condition.getLeftOperand())
                         && match(matcher, condition.getRightOperand(), rs.getExpression())) {
-                    this.getCtx().getRefactorings().remove(toRemove);
+                    ctx.getRefactorings().remove(toRemove);
                     replaceWithStraightReturn(node, condition.getRightOperand());
                     setResult(DO_NOT_VISIT_SUBTREE);
                     return DO_NOT_VISIT_SUBTREE;
@@ -202,8 +201,8 @@ public class RemoveUselessNullCheckRefactoring extends AbstractRefactoringRule {
         }
 
         private void replaceWithStraightReturn(IfStatement node, Expression returnedExpr) {
-            final ASTBuilder b = this.getCtx().getASTBuilder();
-            this.getCtx().getRefactorings().replace(node,
+            final ASTBuilder b = ctx.getASTBuilder();
+            ctx.getRefactorings().replace(node,
                     b.return0(b.copy(returnedExpr)));
         }
     }

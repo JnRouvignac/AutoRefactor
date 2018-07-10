@@ -140,12 +140,12 @@ public class AnnotationRefactoring extends AbstractRefactoringRule {
         switch (expr.getNodeType()) {
         case ARRAY_INITIALIZER:
             return arraysEqual(typeBinding, (ArrayInitializer) expr, javaObj2);
+
         case BOOLEAN_LITERAL:
-            return Utils.equalNotNull(javaObj1, javaObj2);
         case CHARACTER_LITERAL:
-            return Utils.equalNotNull(javaObj1, javaObj2);
         case STRING_LITERAL:
             return Utils.equalNotNull(javaObj1, javaObj2);
+
         case NUMBER_LITERAL:
             PrimitiveEnum primEnum = getPrimitiveEnum(typeBinding);
             switch (primEnum) {
@@ -164,6 +164,7 @@ public class AnnotationRefactoring extends AbstractRefactoringRule {
             default:
                 throw new NotImplementedException(expr, "for primitive type \"" + primEnum + "\".");
             }
+
         default:
             return false;
         }

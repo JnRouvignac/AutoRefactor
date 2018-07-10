@@ -29,7 +29,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.autorefactor.util.UnhandledException;
-import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.formatter.DefaultCodeFormatterConstants;
 
 import static org.eclipse.jdt.core.JavaCore.*;
@@ -73,9 +72,9 @@ public class JavaProjectOptionsImpl implements JavaProjectOptions {
      * @return the compiler options.
      */
     public Map<String, String> getCompilerOptions() {
-        final Map<String, String> options = JavaCore.getOptions();
+        final Map<String, String> options = getOptions();
         final String v = javaSERelease.getMajorVersion() + "." + javaSERelease.getMinorVersion();
-        JavaCore.setComplianceOptions(v, options);
+        setComplianceOptions(v, options);
         return options;
     }
 

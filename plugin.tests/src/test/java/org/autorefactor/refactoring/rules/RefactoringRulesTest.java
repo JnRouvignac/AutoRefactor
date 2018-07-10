@@ -60,7 +60,6 @@ import org.junit.runners.Parameterized.Parameters;
  */
 @RunWith(value = Parameterized.class)
 public class RefactoringRulesTest {
-
     private static final String SAMPLES_BASE_DIR = "../samples/src/test/java/org/autorefactor/refactoring/rules/";
     private static final String PACKAGE_NAME = "org.autorefactor.refactoring.rules.samples_in";
 

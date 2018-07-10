@@ -108,7 +108,6 @@ public class LambdaRefactoring extends AbstractRefactoringRule {
     }
 
     private final class LambdaExprVisitor extends BlockSubVisitor {
-
         public LambdaExprVisitor(final Block startNode) {
             super(LambdaRefactoring.this.ctx, startNode);
         }

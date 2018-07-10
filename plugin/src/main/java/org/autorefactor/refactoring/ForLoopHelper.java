@@ -47,7 +47,6 @@ import static org.eclipse.jdt.core.dom.InfixExpression.Operator.*;
 /** Helper class for dealing with loops. */
 public final class ForLoopHelper {
     private ForLoopHelper() {
-        super();
     }
 
     /** The element container that the for loop iterates over. */
@@ -315,6 +314,6 @@ public final class ForLoopHelper {
 
     private static boolean isArrayLength(final QualifiedName containerVarName) {
         return isArray(containerVarName.getQualifier())
-                && containerVarName.getName().getIdentifier().equals("length");
+                && "length".equals(containerVarName.getName().getIdentifier());
     }
 }

@@ -57,7 +57,6 @@ import org.eclipse.text.edits.TextEdit;
  * the rule finished traversing the whole AST tree.
  */
 public class Refactorings {
-
     private static final String UNTOUCH_COMMENT = "untouchComment";
 
     private final EventLoop eventLoop;

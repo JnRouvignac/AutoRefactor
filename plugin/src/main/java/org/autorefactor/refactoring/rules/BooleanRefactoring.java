@@ -123,7 +123,6 @@ public class BooleanRefactoring extends AbstractRefactoringRule {
     }
 
     private class BooleanASTMatcher extends ASTSemanticMatcher {
-
         /** else node to then node. */
         final Map<ASTNode, ASTNode> matches = new HashMap<ASTNode, ASTNode>();
         final Map<ASTNode, ASTNode> previousMatches;
@@ -167,7 +166,6 @@ public class BooleanRefactoring extends AbstractRefactoringRule {
     }
 
     private final class AssignmentIfAndReturnVisitor extends BlockSubVisitor {
-
         public AssignmentIfAndReturnVisitor(final RefactoringContext ctx, final Block startNode) {
             super(ctx, startNode);
         }
@@ -325,7 +323,7 @@ public class BooleanRefactoring extends AbstractRefactoringRule {
                 VariableDeclarationFragment vdf = getVariableDeclarationFragment(vds, thenA.getLeftHandSide());
                 if (vdf != null) {
                     final VariableDefinitionsUsesVisitor variableUseVisitor =
-                        new VariableDefinitionsUsesVisitor(vdf.resolveBinding(), node.getExpression()).find();
+                            new VariableDefinitionsUsesVisitor(vdf.resolveBinding(), node.getExpression()).find();
                     if (variableUseVisitor.getUses().isEmpty()) {
                         final ITypeBinding typeBinding = vds.getType().resolveBinding();
                         return maybeReplace(node, thenA, typeBinding, vdf.getInitializer());
@@ -382,7 +380,7 @@ public class BooleanRefactoring extends AbstractRefactoringRule {
             Boolean thenBool, Boolean elseBool, Expression thenExpr, Expression elseExpr) {
         if (thenBool == null && elseBool != null) {
             final Expression leftOp = signExpr(
-                    b.parenthesizeIfNeeded(b.copy(node.getExpression())), !elseBool.booleanValue());
+                    b.parenthesizeIfNeeded(b.copy(node.getExpression())), !elseBool);
             return b.return0(b.infixExpr(
                     leftOp,
                     getConditionalOperator(elseBool.booleanValue()),
@@ -531,24 +529,22 @@ public class BooleanRefactoring extends AbstractRefactoringRule {
         if (isPassive(node.getExpression())) {
             final BooleanASTMatcher matcher = new BooleanASTMatcher();
 
-            if (match(matcher, node.getThenStatement(), node.getElseStatement())) {
-                if (matcher.matches.size() <= 1
-                        || node.getExpression() instanceof Name) {
-                    // Then and else statement are matching, bar the boolean values
-                    // which are opposite
-                    final Statement copyStmt = b.copySubtree(node.getThenStatement());
-                    // identify the node that need to be replaced after the copy
-                    final BooleanASTMatcher matcher2 = new BooleanASTMatcher(matcher.matches);
+            if (match(matcher, node.getThenStatement(), node.getElseStatement()) && (matcher.matches.size() <= 1
+                    || node.getExpression() instanceof Name)) {
+                // Then and else statement are matching, bar the boolean values
+                // which are opposite
+                final Statement copyStmt = b.copySubtree(node.getThenStatement());
+                // identify the node that need to be replaced after the copy
+                final BooleanASTMatcher matcher2 = new BooleanASTMatcher(matcher.matches);
 
-                    if (match(matcher2, copyStmt, node.getElseStatement())) {
-                        final Expression ifCondition = node.getExpression();
-                        copyStmt.accept(new BooleanReplaceVisitor(ifCondition,
-                                matcher2.matches.values(), getBooleanName(node)));
-                        // make sure to keep curly braces if the node is an else statement
-                        ctx.getRefactorings().replace(node,
-                                isElseStatementOfParent(node) ? copyStmt : toSingleStmt(copyStmt));
-                        return DO_NOT_VISIT_SUBTREE;
-                    }
+                if (match(matcher2, copyStmt, node.getElseStatement())) {
+                    final Expression ifCondition = node.getExpression();
+                    copyStmt.accept(new BooleanReplaceVisitor(ifCondition,
+                            matcher2.matches.values(), getBooleanName(node)));
+                    // make sure to keep curly braces if the node is an else statement
+                    ctx.getRefactorings().replace(node,
+                            isElseStatementOfParent(node) ? copyStmt : toSingleStmt(copyStmt));
+                    return DO_NOT_VISIT_SUBTREE;
                 }
             }
         }

@@ -100,7 +100,6 @@ public final class EnumSetRatherThanHashSetRefactoring extends
      */
     @Override
     boolean replace(ClassInstanceCreation cic, Type... types) {
-
         if (types == null || types.length < 1) {
             return VISIT_SUBTREE;
         }
@@ -123,5 +122,4 @@ public final class EnumSetRatherThanHashSetRefactoring extends
         ctx.getRefactorings().replace(cic, invocation);
         return DO_NOT_VISIT_SUBTREE;
     }
-
 }

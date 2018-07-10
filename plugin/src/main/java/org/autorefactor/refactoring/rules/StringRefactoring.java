@@ -118,7 +118,7 @@ public class StringRefactoring extends AbstractRefactoringRule {
                 }
             }
         } else if (isStringValueOf && hasType(arg0(node), "java.lang.String")) {
-            if ((arg0(node) instanceof StringLiteral) || (arg0(node) instanceof InfixExpression)) {
+            if (arg0(node) instanceof StringLiteral || arg0(node) instanceof InfixExpression) {
                 r.replace(node, b.parenthesizeIfNeeded(b.move(arg0(node))));
                 return DO_NOT_VISIT_SUBTREE;
             }

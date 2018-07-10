@@ -29,7 +29,6 @@ import java.io.File;
 import java.io.FileFilter;
 
 public class EndsWithFileFilter implements FileFilter {
-
     private String nameEnd;
 
     public EndsWithFileFilter(String nameEnd) {

@@ -178,11 +178,6 @@ public class CommentsRefactoring extends AbstractRefactoringRule {
     private CompilationUnit astRoot;
     private final List<Pair<SourceLocation, Comment>> comments = new ArrayList<Pair<SourceLocation, Comment>>();
 
-    /** Class constructor. */
-    public CommentsRefactoring() {
-        super();
-    }
-
     @Override
     public boolean visit(BlockComment node) {
         final String comment = getComment(node);
@@ -431,9 +426,7 @@ public class CommentsRefactoring extends AbstractRefactoringRule {
                 || TAG_THROWS.equals(tagName)) {
             // TODO JNR a @throws tag repeating the checked exceptions of the method is useless
             return !isTagEmptyOrWithSimpleNameOnly(tag);
-        } else if (TAG_INHERITDOC.equals(tagName)) {
-            return true;
-        } else if (throwIfUnknown) {
+        } else if (!TAG_INHERITDOC.equals(tagName) && throwIfUnknown) {
             throw new NotImplementedException(tag, "for tagName " + tagName);
         }
         return true;
@@ -476,16 +469,11 @@ public class CommentsRefactoring extends AbstractRefactoringRule {
     @Override
     public boolean visit(LineComment node) {
         final String comment = getComment(node);
-        if (EMPTY_LINE_COMMENT.matcher(comment).matches()) {
+        if (EMPTY_LINE_COMMENT.matcher(comment).matches() || ECLIPSE_GENERATED_TODOS.matcher(comment).matches()) {
             this.ctx.getRefactorings().remove(node);
             return DO_NOT_VISIT_SUBTREE;
-        } else if (ECLIPSE_GENERATED_TODOS.matcher(comment).matches()) {
-            this.ctx.getRefactorings().remove(node);
-            return DO_NOT_VISIT_SUBTREE;
-        } else if (TOOLS_CONTROL_INSTRUCTIONS.matcher(comment).matches()
-                || ECLIPSE_IGNORE_NON_EXTERNALIZED_STRINGS.matcher(comment).matches()) {
-            return VISIT_SUBTREE;
-        } else {
+        } else if (!TOOLS_CONTROL_INSTRUCTIONS.matcher(comment).matches()
+                && !ECLIPSE_IGNORE_NON_EXTERNALIZED_STRINGS.matcher(comment).matches()) {
             final ASTNode nextNode = getNextNode(node);
             final ASTNode previousNode = getPreviousSibling(nextNode);
             if (previousNode != null && isSameLineNumber(node, previousNode)) {
@@ -558,18 +546,12 @@ public class CommentsRefactoring extends AbstractRefactoringRule {
             if (nodeLoc.compareTo(newLoc) < 0) {
                 break;
             }
-            if (bestLoc.compareTo(newLoc) < 0) {
-                if (!(newComment instanceof LineComment)) {
-                    // new comment is a BlockComment or a Javadoc
-                    bestLoc = newLoc;
-                    bestComment = newComment;
-                    continue;
-                } else if (!(bestComment instanceof LineComment)) {
-                    // new comment is a line comment and best comment is not
-                    bestLoc = newLoc;
-                    bestComment = newComment;
-                    continue;
-                }
+            if (bestLoc.compareTo(newLoc) < 0
+                    && (!(newComment instanceof LineComment) || !(bestComment instanceof LineComment))) {
+                // new comment is a BlockComment or a Javadoc
+                bestLoc = newLoc;
+                bestComment = newComment;
+                continue;
             }
         }
         return bestComment != null && bestComment != comment;

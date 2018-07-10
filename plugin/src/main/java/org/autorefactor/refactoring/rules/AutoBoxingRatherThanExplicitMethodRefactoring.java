@@ -73,7 +73,7 @@ public class AutoBoxingRatherThanExplicitMethodRefactoring extends AbstractRefac
     @Override
     public boolean visit(MethodInvocation node) {
         if ("valueOf".equals(node.getName().getIdentifier())
-                && (node.getExpression() != null)
+                && node.getExpression() != null
                 && getJavaMinorVersion() >= 5
                 && (isMethod(node, "java.lang.Boolean", "valueOf", "boolean")
                 || isMethod(node, "java.lang.Byte", "valueOf", "byte")

@@ -92,7 +92,6 @@ public class RemoveUnnecessaryLocalBeforeReturnRefactoring extends AbstractRefac
     }
 
     private static final class ReturnStatementVisitor extends BlockSubVisitor {
-
         public ReturnStatementVisitor(final RefactoringContext ctx, final Block startNode) {
             super(ctx, startNode);
         }
@@ -100,7 +99,7 @@ public class RemoveUnnecessaryLocalBeforeReturnRefactoring extends AbstractRefac
         @Override
         public boolean visit(ReturnStatement node) {
             final Statement previousSibling = getPreviousSibling(node);
-            if (!getCtx().getRefactorings().hasBeenRefactored(previousSibling)
+            if (!ctx.getRefactorings().hasBeenRefactored(previousSibling)
                     && previousSibling instanceof VariableDeclarationStatement) {
                 final VariableDeclarationStatement vds = (VariableDeclarationStatement) previousSibling;
                 final VariableDeclarationFragment vdf = getUniqueFragment(vds);
@@ -114,7 +113,7 @@ public class RemoveUnnecessaryLocalBeforeReturnRefactoring extends AbstractRefac
                 final Assignment as = asExpression(previousSibling, Assignment.class);
                 if (hasOperator(as, ASSIGN)
                         && isSameLocalVariable(node.getExpression(), as.getLeftHandSide())
-                        && !isUsedAfterReturn(((IVariableBinding) ((Name) as.getLeftHandSide()).resolveBinding()),
+                        && !isUsedAfterReturn((IVariableBinding) ((Name) as.getLeftHandSide()).resolveBinding(),
                                 node)) {
                     replaceReturnStatement(node, previousSibling, as.getRightHandSide());
                     setResult(DO_NOT_VISIT_SUBTREE);
@@ -145,7 +144,7 @@ public class RemoveUnnecessaryLocalBeforeReturnRefactoring extends AbstractRefac
                 final VariableDeclarationFragment vdf) {
             final Expression returnExpr = vdf.getInitializer();
             if (returnExpr instanceof ArrayInitializer) {
-                final ASTBuilder b = getCtx().getASTBuilder();
+                final ASTBuilder b = ctx.getASTBuilder();
                 final ReturnStatement newReturnStmt =
                         b.return0(b.newArray(
                                 b.copy((ArrayType) vds.getType()),
@@ -158,15 +157,15 @@ public class RemoveUnnecessaryLocalBeforeReturnRefactoring extends AbstractRefac
 
         private void replaceReturnStatementForArray(final ReturnStatement node, final Statement previousSibling,
                 final ReturnStatement newReturnStmt) {
-            final Refactorings r = getCtx().getRefactorings();
+            final Refactorings r = ctx.getRefactorings();
             r.remove(previousSibling);
             r.replace(node, newReturnStmt);
         }
 
         private void replaceReturnStatement(final ReturnStatement node, final Statement previousSibling,
                 final Expression returnExpr) {
-            final ASTBuilder b = getCtx().getASTBuilder();
-            final Refactorings r = getCtx().getRefactorings();
+            final ASTBuilder b = ctx.getASTBuilder();
+            final Refactorings r = ctx.getRefactorings();
             r.remove(previousSibling);
             r.replace(node, b.return0(b.move(returnExpr)));
         }

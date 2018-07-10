@@ -54,7 +54,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 public final class JavaCoreHelper {
-
     private static final Path[] EMPTY_PATHS = new Path[0];
 
     public static IPackageFragment getPackageFragment(String packageName) throws Exception {
@@ -226,7 +225,7 @@ public final class JavaCoreHelper {
             throw new RuntimeException("Could not find Java runtime library rt.jar");
         }
         final int end = idx + "rt.jar".length();
-        final int lastIdx = classPath.lastIndexOf(":", idx);
+        final int lastIdx = classPath.lastIndexOf(':', idx);
         final int start = lastIdx != -1 ? lastIdx + 1 : 0;
         return new Path(classPath.substring(start, end));
     }

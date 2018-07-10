@@ -55,7 +55,6 @@ import static org.eclipse.jdt.core.dom.PrefixExpression.Operator.*;
  * See {@link #getDescription()} method.
  */
 public abstract class AbstractUnitTestRefactoring extends AbstractRefactoringRule {
-
     /**
      * The OBJECT constant.
      */
@@ -216,7 +215,7 @@ public abstract class AbstractUnitTestRefactoring extends AbstractRefactoringRul
         if (replace) {
             r.replace(nodeToReplace, invokeFail(nodeToReplace, originalMethod, failureMessage));
             return DO_NOT_VISIT_SUBTREE;
-        } else if (nodeToReplace.getParent().getNodeType() == ASTNode.EXPRESSION_STATEMENT) {
+        } else if (nodeToReplace.getParent().getNodeType() == EXPRESSION_STATEMENT) {
             r.remove(nodeToReplace.getParent());
             return DO_NOT_VISIT_SUBTREE;
         }
@@ -227,7 +226,7 @@ public abstract class AbstractUnitTestRefactoring extends AbstractRefactoringRul
             final Expression failureMessage) {
         final ASTBuilder b = this.ctx.getASTBuilder();
         final List<Expression> args = arguments(originalMethod);
-        if ((args.size() == 1) || (args.size() == 2)) {
+        if (args.size() == 1 || args.size() == 2) {
             return invokeMethod(b, originalMethod, "fail", null, null, failureMessage);
         } else {
             throw new NotImplementedException(node);

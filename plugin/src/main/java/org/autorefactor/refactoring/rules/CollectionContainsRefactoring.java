@@ -209,22 +209,22 @@ public class CollectionContainsRefactoring extends AbstractRefactoringRule {
                 Expression toFind, BreakStatement bs) {
             thenStmts.remove(thenStmts.size() - 1);
 
-            ASTBuilder b = getCtx().getASTBuilder();
+            ASTBuilder b = ctx.getASTBuilder();
             Statement replacement = b.if0(collectionContains(iterable, toFind, true, b),
                     b.block(b.copyRange(thenStmts)));
-            getCtx().getRefactorings().replace(forNode, replacement);
+            ctx.getRefactorings().replace(forNode, replacement);
 
             thenStmts.add(bs);
         }
 
         private void replaceLoopAndReturn(Statement forNode, Expression iterable, Expression toFind,
                 Statement forNextStmt, boolean negate) {
-            ASTBuilder b = getCtx().getASTBuilder();
-            getCtx().getRefactorings().replace(forNode,
+            ASTBuilder b = ctx.getASTBuilder();
+            ctx.getRefactorings().replace(forNode,
                     b.return0(
                             collectionContains(iterable, toFind, negate, b)));
             if (forNextStmt.equals(getNextSibling(forNode))) {
-                getCtx().getRefactorings().remove(forNextStmt);
+                ctx.getRefactorings().remove(forNextStmt);
             }
         }
 
@@ -254,7 +254,7 @@ public class CollectionContainsRefactoring extends AbstractRefactoringRule {
 
         private void replaceLoopAndVariable(Statement forNode, Expression iterable, Expression toFind,
                 Statement previousStmt, boolean previousStmtIsPreviousSibling, Name initName, boolean isPositive) {
-            ASTBuilder b = getCtx().getASTBuilder();
+            ASTBuilder b = ctx.getASTBuilder();
             Statement replacement;
             if (previousStmtIsPreviousSibling
                     && previousStmt instanceof VariableDeclarationStatement) {
@@ -267,9 +267,9 @@ public class CollectionContainsRefactoring extends AbstractRefactoringRule {
             } else {
                 throw new NotImplementedException(forNode);
             }
-            getCtx().getRefactorings().replace(forNode, replacement);
+            ctx.getRefactorings().replace(forNode, replacement);
             if (previousStmtIsPreviousSibling) {
-                getCtx().getRefactorings().remove(previousStmt);
+                ctx.getRefactorings().remove(previousStmt);
             }
         }
 
@@ -397,14 +397,14 @@ public class CollectionContainsRefactoring extends AbstractRefactoringRule {
         }
 
         private MethodInvocation iteratorNext(final ForLoopContent loopContent) {
-            ASTBuilder b = getCtx().getASTBuilder();
+            ASTBuilder b = ctx.getASTBuilder();
             return b.invoke(
                     b.copySubtree(loopContent.getIteratorVariable()),
                     "next");
         }
 
         private MethodInvocation collectionGet(final ForLoopContent loopContent) {
-            ASTBuilder b = getCtx().getASTBuilder();
+            ASTBuilder b = ctx.getASTBuilder();
             return b.invoke(
                     b.copySubtree(loopContent.getContainerVariable()),
                     "get",

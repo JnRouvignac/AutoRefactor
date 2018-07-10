@@ -202,7 +202,7 @@ public class ApplyRefactoringsJob extends Job {
         int nbLoopsWithSameVisitors = 0;
 
         monitor.setWorkRemaining(maxIterations);
-        while (true) {
+        do {
             if (iterationCount > maxIterations) {
                 // Oops! Something went wrong.
                 final String errorMsg = "An infinite loop has been detected for file "
@@ -257,7 +257,7 @@ public class ApplyRefactoringsJob extends Job {
             } else {
                 ++nbLoopsWithSameVisitors;
             }
-        }
+        } while (true);
     }
 
     private static void resetParser(ICompilationUnit cu, ASTParser parser, JavaProjectOptions options) {

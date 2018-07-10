@@ -136,7 +136,6 @@ public class CommonCodeInIfElseStatementRefactoring extends AbstractRefactoringR
         removeStmtsFromCases(allCasesStmts, caseStmtsToRemove, areCasesRemovable);
 
         if (allRemovable(areCasesRemovable)) {
-
             if (node.getParent() instanceof Block) {
                 insertIdenticalCode(node, b, r, caseStmtsToRemove.get(0));
 
@@ -181,7 +180,6 @@ public class CommonCodeInIfElseStatementRefactoring extends AbstractRefactoringR
                 r.replace(node, b.block(orderedStmts.toArray(new Statement[caseStmtsToRemove.get(0).size() + 1])));
             }
         }
-
     }
 
     private void insertIdenticalCode(final IfStatement node, final ASTBuilder b, final Refactorings r,

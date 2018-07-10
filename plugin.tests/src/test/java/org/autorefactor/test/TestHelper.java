@@ -49,7 +49,6 @@ import org.autorefactor.refactoring.JavaProjectOptions;
 import org.autorefactor.refactoring.JavaProjectOptionsImpl;
 import org.autorefactor.refactoring.Release;
 import org.autorefactor.refactoring.rules.EndsWithFileFilter;
-import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.formatter.CodeFormatter;
 import org.eclipse.jdt.core.formatter.DefaultCodeFormatterConstants;
 import org.eclipse.jface.text.BadLocationException;
@@ -59,7 +58,6 @@ import org.eclipse.text.edits.MalformedTreeException;
 import org.eclipse.text.edits.TextEdit;
 
 public final class TestHelper {
-
     /** Environment for unit tests. */
     public static final Environment TEST_ENVIRONMENT = new Environment(new CurrentThreadEvenLoop(),
                                                                        null,
@@ -73,7 +71,7 @@ public final class TestHelper {
         try {
             test.call();
         } catch (RuntimeException e) {
-            if (e.getClass().getName().equals("org.autorefactor.util.UnhandledException")
+            if ("org.autorefactor.util.UnhandledException".equals(e.getClass().getName())
                     || "Unexpected exception".equals(e.getMessage())) {
                 throw (Exception) e.getCause();
             }
@@ -132,7 +130,7 @@ public final class TestHelper {
     private static Map<String, String> getJava7Options() {
         Map<String, String> options = DefaultCodeFormatterConstants.getEclipseDefaultSettings();
         options.put(COMPILER_COMPLIANCE, VERSION_1_7);
-        options.put(COMPILER_CODEGEN_TARGET_PLATFORM, JavaCore.VERSION_1_7);
+        options.put(COMPILER_CODEGEN_TARGET_PLATFORM, VERSION_1_7);
         options.put(COMPILER_SOURCE, VERSION_1_7);
         return options;
     }

@@ -314,7 +314,6 @@ public final class ASTHelper {
     public static final boolean VISIT_SUBTREE = true;
 
     private ASTHelper() {
-        super();
     }
 
     // AST nodes manipulation
@@ -1348,7 +1347,7 @@ public final class ASTHelper {
      * @param operator the operator to test
      * @return true if the provided node has the provided operator, false otherwise.
      */
-    public static boolean hasOperator(PrefixExpression node, PrefixExpression.Operator... operator) {
+    public static boolean hasOperator(PrefixExpression node, Operator... operator) {
         return node != null && Arrays.asList(operator).contains(node.getOperator());
     }
 
@@ -1840,7 +1839,7 @@ public final class ASTHelper {
     private static Map<ITypeBinding, ITypeBinding> getGenericToConcreteTypeParamsMap(final ITypeBinding[] typeParams,
             final ITypeBinding[] genericTypeParams) {
         final Map<ITypeBinding, ITypeBinding> results = new HashMap<ITypeBinding, ITypeBinding>();
-        for (int i = 0; (i < genericTypeParams.length) && (i < typeParams.length); i++) {
+        for (int i = 0; i < genericTypeParams.length && i < typeParams.length; i++) {
             results.put(genericTypeParams[i], typeParams[i]);
         }
         return results;
@@ -1910,10 +1909,8 @@ public final class ASTHelper {
     private static void findOverridenMethods(IMethodBinding overridingMethod, Set<IMethodBinding> results,
             ITypeBinding declaringClass) {
         final ITypeBinding superclass = declaringClass.getSuperclass();
-        if (superclass != null) {
-            if (!addOverridenMethods(overridingMethod, superclass, results)) {
-                findOverridenMethods(overridingMethod, results, superclass);
-            }
+        if (superclass != null && !addOverridenMethods(overridingMethod, superclass, results)) {
+            findOverridenMethods(overridingMethod, results, superclass);
         }
 
         for (ITypeBinding itf : declaringClass.getInterfaces()) {

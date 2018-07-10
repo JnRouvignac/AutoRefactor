@@ -58,7 +58,6 @@ import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.InfixExpression;
-import org.eclipse.jdt.core.dom.InfixExpression.Operator;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Name;
 import org.eclipse.jdt.core.dom.Statement;
@@ -417,7 +416,7 @@ public class StringBuilderRefactoring extends AbstractRefactoringRule {
         if (tempStringLiterals.size() == 1) {
             newExpr = tempStringLiterals.get(0);
         } else {
-            newExpr = b.infixExpr(Operator.PLUS, tempStringLiterals);
+            newExpr = b.infixExpr(PLUS, tempStringLiterals);
         }
         return newExpr;
     }
@@ -560,7 +559,7 @@ public class StringBuilderRefactoring extends AbstractRefactoringRule {
                     concatenateStrings.add(b.parenthesizeIfNeeded(getTypedExpression(b, typeAndValue)));
                 }
             }
-            return b.infixExpr(Operator.PLUS, concatenateStrings);
+            return b.infixExpr(PLUS, concatenateStrings);
         }
     }
 

@@ -55,7 +55,6 @@ import org.eclipse.jdt.core.dom.Statement;
  * </p>
  */
 public class TestNGAssertRefactoring extends AbstractUnitTestRefactoring {
-
     private boolean canUseAssertNotEquals;
 
     /**

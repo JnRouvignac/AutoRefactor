@@ -82,5 +82,4 @@ public class CapitalizeLongLiteralRefactoring extends AbstractRefactoringRule {
         replacement.setToken(newToken);
         ctx.getRefactorings().replace(node, replacement);
     }
-
 }

@@ -250,7 +250,7 @@ public class HotSpotIntrinsicedAPIsRefactoring extends AbstractRefactoringRule {
     private Integer intValue(Expression expr) {
         Object literal = expr.resolveConstantExpressionValue();
 
-        if (literal != null && literal instanceof Number) {
+        if (literal instanceof Number) {
             return ((Number) literal).intValue();
         }
 
@@ -335,7 +335,6 @@ public class HotSpotIntrinsicedAPIsRefactoring extends AbstractRefactoringRule {
                 if (vdf.getExtraDimensions() == 0) {
                     params.indexStartPos = vdf.getInitializer();
                     params.indexVarBinding = vdf.resolveBinding();
-                    return;
                 }
             }
         } else if (initializer0 instanceof Assignment) {
@@ -349,7 +348,6 @@ public class HotSpotIntrinsicedAPIsRefactoring extends AbstractRefactoringRule {
                     final IBinding binding = ((SimpleName) lhs).resolveBinding();
                     if (binding instanceof IVariableBinding) {
                         params.indexVarBinding = (IVariableBinding) binding;
-                        return;
                     }
                 }
             }

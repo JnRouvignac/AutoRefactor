@@ -82,7 +82,6 @@ public class OneCodeThatFallsThroughRatherThanRedundantBlocksRefactoring extends
     }
 
     private static final class CatchesAndFollowingCodeVisitor extends BlockSubVisitor {
-
         public CatchesAndFollowingCodeVisitor(final RefactoringContext ctx, final Block startNode) {
             super(ctx, startNode);
         }
@@ -150,7 +149,6 @@ public class OneCodeThatFallsThroughRatherThanRedundantBlocksRefactoring extends
                         } else {
                             ASTBuilder b = ctx.getASTBuilder();
                             r.replace(redundantStmt, b.block());
-
                         }
                         setResult(DO_NOT_VISIT_SUBTREE);
                     }

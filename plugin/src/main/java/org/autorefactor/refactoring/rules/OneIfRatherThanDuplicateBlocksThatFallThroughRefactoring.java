@@ -82,7 +82,6 @@ public class OneIfRatherThanDuplicateBlocksThatFallThroughRefactoring extends Ab
     }
 
     private static final class SuccessiveIfVisitor extends BlockSubVisitor {
-
         public SuccessiveIfVisitor(final RefactoringContext ctx, final Block startNode) {
             super(ctx, startNode);
         }
@@ -111,10 +110,9 @@ public class OneIfRatherThanDuplicateBlocksThatFallThroughRefactoring extends Ab
             if (duplicateIfBlocks.get(duplicateIfBlocks.size() - 1).getElseStatement() == null) {
                 final Statement nextSibling = getNextSibling(duplicateIfBlocks.get(duplicateIfBlocks.size() - 1));
 
-                if (nextSibling != null
-                        && nextSibling instanceof IfStatement
+                if (nextSibling instanceof IfStatement
                         && ((IfStatement) nextSibling).getElseStatement() == null
-                        && !getCtx().getRefactorings().hasBeenRefactored(nextSibling)) {
+                        && !ctx.getRefactorings().hasBeenRefactored(nextSibling)) {
                     final IfStatement nextIf = (IfStatement) nextSibling;
 
                     final List<Statement> lastIfStmts = asList(duplicateIfBlocks.get(duplicateIfBlocks.size() - 1)
@@ -133,8 +131,8 @@ public class OneIfRatherThanDuplicateBlocksThatFallThroughRefactoring extends Ab
         }
 
         private void mergeCode(final List<IfStatement> duplicateIfBlocks) {
-            final ASTBuilder b = getCtx().getASTBuilder();
-            final Refactorings r = getCtx().getRefactorings();
+            final ASTBuilder b = ctx.getASTBuilder();
+            final Refactorings r = ctx.getRefactorings();
 
             Iterator<IfStatement> iterator = duplicateIfBlocks.iterator();
             Expression newCondition = b.parenthesizeIfNeeded(b.copy(iterator.next()

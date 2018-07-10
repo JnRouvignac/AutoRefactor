@@ -37,5 +37,5 @@ public interface EventLoop {
      * @param <E> the declared exception type returned by the callable
      * @throws E the exception possibly returned by executing the callable that is then thrown
      */
-    <E extends Exception> void syncExec(final Callable<E> callable) throws E;
+    <E extends Exception> void syncExec(Callable<E> callable) throws E;
 }

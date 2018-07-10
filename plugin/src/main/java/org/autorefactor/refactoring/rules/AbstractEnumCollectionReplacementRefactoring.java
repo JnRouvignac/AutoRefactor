@@ -57,7 +57,6 @@ import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
  * with specific enum implementations, e.g. HashMap -> EnumMap
  */
 public abstract class AbstractEnumCollectionReplacementRefactoring extends AbstractRefactoringRule {
-
     @Override
     public boolean visit(ClassInstanceCreation node) {
         Type type = node.getType();
@@ -110,7 +109,6 @@ public abstract class AbstractEnumCollectionReplacementRefactoring extends Abstr
     private boolean handleAssignment(final ClassInstanceCreation node, final Assignment a) {
         Expression lhs = a.getLeftHandSide();
         if (isTargetType(lhs.resolveTypeBinding())) {
-
             ITypeBinding[] typeArguments = lhs.resolveTypeBinding().getTypeArguments();
             if (typeArguments.length > 0 && typeArguments[0].isEnum()) {
                 final TypeNameDecider typeNameDecider = new TypeNameDecider(lhs);
@@ -128,7 +126,6 @@ public abstract class AbstractEnumCollectionReplacementRefactoring extends Abstr
     private boolean handleVarDeclarationStatement(final VariableDeclarationStatement node) {
         Type type = node.getType();
         if (type.isParameterizedType() && isTargetType(type)) {
-
             ParameterizedType ptype = (ParameterizedType) type;
             List<Type> typeArguments = typeArguments(ptype);
             if (!typeArguments.isEmpty() && typeArguments.get(0).resolveBinding().isEnum()) {
@@ -144,7 +141,6 @@ public abstract class AbstractEnumCollectionReplacementRefactoring extends Abstr
                     }
                 }
             }
-
         }
         return VISIT_SUBTREE;
     }
@@ -166,7 +162,7 @@ public abstract class AbstractEnumCollectionReplacementRefactoring extends Abstr
     }
 
     private boolean creates(final Expression exp, final String type) {
-        return exp.getNodeType() == Expression.CLASS_INSTANCE_CREATION && hasType(exp.resolveTypeBinding(), type);
+        return exp.getNodeType() == ASTNode.CLASS_INSTANCE_CREATION && hasType(exp.resolveTypeBinding(), type);
     }
 
     private boolean isTargetType(final Type type) {
@@ -176,5 +172,4 @@ public abstract class AbstractEnumCollectionReplacementRefactoring extends Abstr
     private boolean isEnabled() {
         return ctx.getJavaProjectOptions().getJavaSERelease().getMinorVersion() >= 5;
     }
-
 }

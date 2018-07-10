@@ -143,7 +143,6 @@ import org.eclipse.jdt.core.dom.WildcardType;
  * Visitors throwing exceptions are isolated and ignored for the rest of a run for stability.
  */
 public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRule {
-
     private final Map<Class<?>, List<ASTVisitor>> visitorsMap = new HashMap<Class<?>, List<ASTVisitor>>();
     private final Map<Class<?>, List<ASTVisitor>> endVisitorsMap = new HashMap<Class<?>, List<ASTVisitor>>();
     private final Set<ASTVisitor> preVisitors = new LinkedHashSet<ASTVisitor>();

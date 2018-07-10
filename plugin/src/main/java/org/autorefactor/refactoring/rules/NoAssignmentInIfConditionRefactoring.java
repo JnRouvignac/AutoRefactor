@@ -87,7 +87,6 @@ public class NoAssignmentInIfConditionRefactoring extends AbstractRefactoringRul
     }
 
     private static final class NewAndPutAllMethodVisitor extends BlockSubVisitor {
-
         public NewAndPutAllMethodVisitor(final RefactoringContext ctx, final Block startNode) {
             super(ctx, startNode);
         }
@@ -119,8 +118,8 @@ public class NoAssignmentInIfConditionRefactoring extends AbstractRefactoringRul
         }
 
         private boolean moveAssignmentBeforeIfStatement(final IfStatement node, final Assignment a) {
-            final Refactorings r = this.getCtx().getRefactorings();
-            final ASTBuilder b = this.getCtx().getASTBuilder();
+            final Refactorings r = ctx.getRefactorings();
+            final ASTBuilder b = ctx.getASTBuilder();
             final VariableDeclarationStatement vds = as(getPreviousSibling(node), VariableDeclarationStatement.class);
             final Expression lhs = removeParentheses(a.getLeftHandSide());
             final VariableDeclarationFragment vdf = findVariableDeclarationFragment(vds, lhs);

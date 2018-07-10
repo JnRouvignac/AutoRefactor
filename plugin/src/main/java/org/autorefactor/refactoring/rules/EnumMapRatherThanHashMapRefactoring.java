@@ -95,7 +95,6 @@ public final class EnumMapRatherThanHashMapRefactoring extends
      */
     @Override
     boolean replace(ClassInstanceCreation cic, Type... types) {
-
         if (types == null || types.length < 2) {
             return VISIT_SUBTREE;
         }

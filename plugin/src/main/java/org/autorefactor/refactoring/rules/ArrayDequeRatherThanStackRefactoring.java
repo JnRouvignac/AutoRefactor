@@ -130,7 +130,7 @@ public class ArrayDequeRatherThanStackRefactoring extends AbstractClassSubstitut
         }
 
         final String argumentType = getArgumentType(mi);
-        if (isMethod(mi, "java.util.Collection", "add", "java.lang.Object")
+        return isMethod(mi, "java.util.Collection", "add", "java.lang.Object")
                 || isMethod(mi, "java.util.List", "addAll", "int", "java.util.Collection")
                 || isMethod(mi, "java.util.Collection", "clear")
                 || isMethod(mi, "java.util.Collection", "contains", "java.lang.Object")
@@ -150,11 +150,7 @@ public class ArrayDequeRatherThanStackRefactoring extends AbstractClassSubstitut
                 || isMethod(mi, "java.lang.Object", "toString")
                 || isMethod(mi, "java.util.Stack", "peek")
                 || isMethod(mi, "java.util.Stack", "pop")
-                || isMethod(mi, "java.util.Stack", "push", "java.lang.Object")) {
-            return true;
-        }
-
-        return false;
+                || isMethod(mi, "java.util.Stack", "push", "java.lang.Object");
     }
 
     @Override

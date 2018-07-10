@@ -65,8 +65,7 @@ public class BooleanEqualsRatherThanNullCheckRefactoring extends AbstractRefacto
      * @return the description.
      */
     public String getDescription() {
-        return ""
-            + "Replace a null check of a Boolean followed by its value by an equality with a boolean constant.";
+        return "Replace a null check of a Boolean followed by its value by an equality with a boolean constant.";
     }
 
     /**
@@ -88,7 +87,7 @@ public class BooleanEqualsRatherThanNullCheckRefactoring extends AbstractRefacto
             final boolean isNullCheck = hasOperator(condition, EQUALS);
             final boolean isAndExpr = hasOperator(node, CONDITIONAL_AND);
             if (!node.hasExtendedOperands()
-                    && (isNullCheck ^ isAndExpr) && condition != null && hasOperator(condition, EQUALS, NOT_EQUALS)) {
+                    && isNullCheck ^ isAndExpr && condition != null && hasOperator(condition, EQUALS, NOT_EQUALS)) {
                 Expression firstExpr = null;
                 if (isNullLiteral(condition.getLeftOperand())) {
                     firstExpr = condition.getRightOperand();

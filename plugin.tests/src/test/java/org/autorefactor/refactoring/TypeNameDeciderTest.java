@@ -41,7 +41,6 @@ import org.junit.runners.Parameterized.Parameters;
 @SuppressWarnings("javadoc")
 @RunWith(value = Parameterized.class)
 public class TypeNameDeciderTest {
-
     private String qualifiedName;
     private TreeSet<String> imports;
     private String expectedResult;

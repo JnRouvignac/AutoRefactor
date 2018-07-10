@@ -132,7 +132,7 @@ public class ArrayListRatherThanVectorRefactoring extends AbstractClassSubstitut
         }
 
         final String argumentType = getArgumentType(mi);
-        if (isMethod(mi, "java.util.Collection", "add", "java.lang.Object")
+        return isMethod(mi, "java.util.Collection", "add", "java.lang.Object")
                 || isMethod(mi, "java.util.List", "addAll", "int", "java.util.Collection")
                 || isMethod(mi, "java.util.Collection", "clear")
                 || isMethod(mi, "java.util.Collection", "contains", "java.lang.Object")
@@ -148,11 +148,7 @@ public class ArrayListRatherThanVectorRefactoring extends AbstractClassSubstitut
                 || isMethod(mi, "java.util.Collection", "toArray")
                 || isMethod(mi, "java.util.Collection", "toArray", argumentType + "[]")
                 || isMethod(mi, "java.lang.Object", "clone")
-                || isMethod(mi, "java.lang.Object", "toString")) {
-            return true;
-        }
-
-        return false;
+                || isMethod(mi, "java.lang.Object", "toString");
     }
 
     @Override
@@ -163,9 +159,8 @@ public class ArrayListRatherThanVectorRefactoring extends AbstractClassSubstitut
             refactoredMi.setName(b.simpleName("get"));
         } else if (isMethod(originalMi, "java.util.Vector", "copyInto", "java.lang.Object[]")) {
             refactoredMi.setName(b.simpleName("toArray"));
-        } else if (isMethod(originalMi, "java.util.Vector", "removeElement", "java.lang.Object")) {
-            refactoredMi.setName(b.simpleName("remove"));
-        } else if (isMethod(originalMi, "java.util.Vector", "removeElementAt", "int")) {
+        } else if (isMethod(originalMi, "java.util.Vector", "removeElement", "java.lang.Object")
+                || isMethod(originalMi, "java.util.Vector", "removeElementAt", "int")) {
             refactoredMi.setName(b.simpleName("remove"));
         } else if (isMethod(originalMi, "java.util.Vector", "removeAllElements")) {
             refactoredMi.setName(b.simpleName("clear"));

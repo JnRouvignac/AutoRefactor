@@ -104,7 +104,7 @@ public class ComparisonRefactoring extends AbstractRefactoringRule {
                     && isMethod(comparisonMI, "java.lang.String", "compareToIgnoreCase", "java.lang.String"))) {
                 final Object literalValue = literal.resolveConstantExpressionValue();
 
-                if (literalValue != null && literalValue instanceof Number) {
+                if (literalValue instanceof Number) {
                     final Number numberValue = (Number) literalValue;
                     final double doubleValue = numberValue.doubleValue();
 

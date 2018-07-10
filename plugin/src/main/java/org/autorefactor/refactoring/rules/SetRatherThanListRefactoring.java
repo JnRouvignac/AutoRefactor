@@ -64,7 +64,7 @@ public class SetRatherThanListRefactoring extends AbstractClassSubstituteRefacto
                     "java.io.Serializable", "java.lang.Cloneable", "java.lang.Object"});
     }
 
-    private boolean isContainsMethodUsed = false;
+    private boolean isContainsMethodUsed;
 
     /**
      * Get the name.
@@ -98,7 +98,6 @@ public class SetRatherThanListRefactoring extends AbstractClassSubstituteRefacto
     public boolean visit(Block node) {
         isContainsMethodUsed = false;
         return super.visit(node);
-
     }
 
     @Override

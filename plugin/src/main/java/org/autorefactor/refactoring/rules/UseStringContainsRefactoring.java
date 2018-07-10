@@ -105,16 +105,9 @@ public class UseStringContainsRefactoring extends AbstractRefactoringRule {
     private boolean is(final InfixExpression ie, MethodInvocation node, Operator operator, Integer constant) {
         final Expression leftOp = removeParentheses(ie.getLeftOperand());
         final Expression rightOp = removeParentheses(ie.getRightOperand());
-        if (hasOperator(ie, operator)) {
-            if (leftOp.equals(node)
-                    && constant.equals(rightOp.resolveConstantExpressionValue())) {
-                return true;
-            } else if (rightOp.equals(node)
-                    && constant.equals(leftOp.resolveConstantExpressionValue())) {
-                return true;
-            }
-        }
-        return false;
+        return hasOperator(ie, operator) && ((leftOp.equals(node)
+                && constant.equals(rightOp.resolveConstantExpressionValue())) || (rightOp.equals(node)
+                && constant.equals(leftOp.resolveConstantExpressionValue())));
     }
 
     private ASTNode getFirstAncestorWithoutParentheses(ASTNode node) {

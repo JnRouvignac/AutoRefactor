@@ -65,13 +65,13 @@ import org.eclipse.jdt.core.dom.WhileStatement;
 
 /** Matches two pieces of code on semantic (not on syntax). */
 public class ASTSemanticMatcher extends ASTMatcher {
-    private static final Map<PrefixExpression.Operator, InfixExpression.Operator> PREFIX_TO_INFIX_OPERATOR =
-            new HashMap<PrefixExpression.Operator, InfixExpression.Operator>() {
+    private static final Map<PrefixExpression.Operator, Operator> PREFIX_TO_INFIX_OPERATOR =
+            new HashMap<PrefixExpression.Operator, Operator>() {
             private static final long serialVersionUID = -8949107654517355855L;
 
             {
-                this.put(PrefixExpression.Operator.INCREMENT, InfixExpression.Operator.PLUS);
-                this.put(PrefixExpression.Operator.DECREMENT, InfixExpression.Operator.MINUS);
+                put(PrefixExpression.Operator.INCREMENT, Operator.PLUS);
+                put(PrefixExpression.Operator.DECREMENT, Operator.MINUS);
             }
         };
 
@@ -80,18 +80,18 @@ public class ASTSemanticMatcher extends ASTMatcher {
             private static final long serialVersionUID = -8949107654517355856L;
 
             {
-                this.put(PrefixExpression.Operator.INCREMENT, Assignment.Operator.PLUS_ASSIGN);
-                this.put(PrefixExpression.Operator.DECREMENT, Assignment.Operator.MINUS_ASSIGN);
+                put(PrefixExpression.Operator.INCREMENT, Assignment.Operator.PLUS_ASSIGN);
+                put(PrefixExpression.Operator.DECREMENT, Assignment.Operator.MINUS_ASSIGN);
             }
         };
 
-    private static final Map<PostfixExpression.Operator, InfixExpression.Operator> POSTFIX_TO_INFIX_OPERATOR =
-            new HashMap<PostfixExpression.Operator, InfixExpression.Operator>() {
+    private static final Map<PostfixExpression.Operator, Operator> POSTFIX_TO_INFIX_OPERATOR =
+            new HashMap<PostfixExpression.Operator, Operator>() {
             private static final long serialVersionUID = -8949107654517355857L;
 
             {
-                this.put(PostfixExpression.Operator.INCREMENT, InfixExpression.Operator.PLUS);
-                this.put(PostfixExpression.Operator.DECREMENT, InfixExpression.Operator.MINUS);
+                put(PostfixExpression.Operator.INCREMENT, Operator.PLUS);
+                put(PostfixExpression.Operator.DECREMENT, Operator.MINUS);
             }
         };
 
@@ -100,8 +100,8 @@ public class ASTSemanticMatcher extends ASTMatcher {
             private static final long serialVersionUID = -8949107654517355858L;
 
             {
-                this.put(PostfixExpression.Operator.INCREMENT, Assignment.Operator.PLUS_ASSIGN);
-                this.put(PostfixExpression.Operator.DECREMENT, Assignment.Operator.MINUS_ASSIGN);
+                put(PostfixExpression.Operator.INCREMENT, Assignment.Operator.PLUS_ASSIGN);
+                put(PostfixExpression.Operator.DECREMENT, Assignment.Operator.MINUS_ASSIGN);
             }
         };
 
@@ -110,47 +110,47 @@ public class ASTSemanticMatcher extends ASTMatcher {
             private static final long serialVersionUID = -8949107654517355859L;
 
             {
-                this.put(PrefixExpression.Operator.INCREMENT, PostfixExpression.Operator.INCREMENT);
-                this.put(PrefixExpression.Operator.DECREMENT, PostfixExpression.Operator.DECREMENT);
+                put(PrefixExpression.Operator.INCREMENT, PostfixExpression.Operator.INCREMENT);
+                put(PrefixExpression.Operator.DECREMENT, PostfixExpression.Operator.DECREMENT);
             }
         };
 
-    private static final Map<Assignment.Operator, InfixExpression.Operator> ASSIGN_TO_INFIX_OPERATOR =
-            new HashMap<Assignment.Operator, InfixExpression.Operator>() {
+    private static final Map<Assignment.Operator, Operator> ASSIGN_TO_INFIX_OPERATOR =
+            new HashMap<Assignment.Operator, Operator>() {
             private static final long serialVersionUID = -8949107654517355859L;
 
             {
-                this.put(Assignment.Operator.PLUS_ASSIGN, InfixExpression.Operator.PLUS);
-                this.put(Assignment.Operator.MINUS_ASSIGN, InfixExpression.Operator.MINUS);
-                this.put(Assignment.Operator.TIMES_ASSIGN, InfixExpression.Operator.TIMES);
-                this.put(Assignment.Operator.DIVIDE_ASSIGN, InfixExpression.Operator.DIVIDE);
-                this.put(Assignment.Operator.BIT_AND_ASSIGN, InfixExpression.Operator.AND);
-                this.put(Assignment.Operator.BIT_OR_ASSIGN, InfixExpression.Operator.OR);
-                this.put(Assignment.Operator.BIT_XOR_ASSIGN, InfixExpression.Operator.XOR);
-                this.put(Assignment.Operator.REMAINDER_ASSIGN, InfixExpression.Operator.REMAINDER);
-                this.put(Assignment.Operator.LEFT_SHIFT_ASSIGN, InfixExpression.Operator.LEFT_SHIFT);
-                this.put(Assignment.Operator.RIGHT_SHIFT_SIGNED_ASSIGN, InfixExpression.Operator.RIGHT_SHIFT_SIGNED);
-                this.put(Assignment.Operator.RIGHT_SHIFT_UNSIGNED_ASSIGN,
-                        InfixExpression.Operator.RIGHT_SHIFT_UNSIGNED);
+                put(Assignment.Operator.PLUS_ASSIGN, Operator.PLUS);
+                put(Assignment.Operator.MINUS_ASSIGN, Operator.MINUS);
+                put(Assignment.Operator.TIMES_ASSIGN, Operator.TIMES);
+                put(Assignment.Operator.DIVIDE_ASSIGN, Operator.DIVIDE);
+                put(Assignment.Operator.BIT_AND_ASSIGN, Operator.AND);
+                put(Assignment.Operator.BIT_OR_ASSIGN, Operator.OR);
+                put(Assignment.Operator.BIT_XOR_ASSIGN, Operator.XOR);
+                put(Assignment.Operator.REMAINDER_ASSIGN, Operator.REMAINDER);
+                put(Assignment.Operator.LEFT_SHIFT_ASSIGN, Operator.LEFT_SHIFT);
+                put(Assignment.Operator.RIGHT_SHIFT_SIGNED_ASSIGN, Operator.RIGHT_SHIFT_SIGNED);
+                put(Assignment.Operator.RIGHT_SHIFT_UNSIGNED_ASSIGN,
+                        Operator.RIGHT_SHIFT_UNSIGNED);
             }
         };
 
-    private static final Map<InfixExpression.Operator, InfixExpression.Operator> INFIX_TO_MIRROR_OPERATOR =
-            new HashMap<InfixExpression.Operator, InfixExpression.Operator>() {
+    private static final Map<Operator, Operator> INFIX_TO_MIRROR_OPERATOR =
+            new HashMap<Operator, Operator>() {
             private static final long serialVersionUID = -8949107654517355857L;
 
             {
-                this.put(InfixExpression.Operator.EQUALS, InfixExpression.Operator.EQUALS);
-                this.put(InfixExpression.Operator.NOT_EQUALS, InfixExpression.Operator.NOT_EQUALS);
-                this.put(InfixExpression.Operator.CONDITIONAL_AND, InfixExpression.Operator.CONDITIONAL_AND);
-                this.put(InfixExpression.Operator.CONDITIONAL_OR, InfixExpression.Operator.CONDITIONAL_OR);
-                this.put(InfixExpression.Operator.AND, InfixExpression.Operator.AND);
-                this.put(InfixExpression.Operator.OR, InfixExpression.Operator.OR);
-                this.put(InfixExpression.Operator.XOR, InfixExpression.Operator.XOR);
-                this.put(InfixExpression.Operator.GREATER, InfixExpression.Operator.LESS);
-                this.put(InfixExpression.Operator.LESS, InfixExpression.Operator.GREATER);
-                this.put(InfixExpression.Operator.LESS_EQUALS, InfixExpression.Operator.GREATER_EQUALS);
-                this.put(InfixExpression.Operator.GREATER_EQUALS, InfixExpression.Operator.LESS_EQUALS);
+                put(Operator.EQUALS, Operator.EQUALS);
+                put(Operator.NOT_EQUALS, Operator.NOT_EQUALS);
+                put(Operator.CONDITIONAL_AND, Operator.CONDITIONAL_AND);
+                put(Operator.CONDITIONAL_OR, Operator.CONDITIONAL_OR);
+                put(Operator.AND, Operator.AND);
+                put(Operator.OR, Operator.OR);
+                put(Operator.XOR, Operator.XOR);
+                put(Operator.GREATER, Operator.LESS);
+                put(Operator.LESS, Operator.GREATER);
+                put(Operator.LESS_EQUALS, Operator.GREATER_EQUALS);
+                put(Operator.GREATER_EQUALS, Operator.LESS_EQUALS);
             }
         };
 
@@ -210,10 +210,10 @@ public class ASTSemanticMatcher extends ASTMatcher {
 
     @Override
     public boolean match(final Assignment node, final Object other) {
-        if (other instanceof PrefixExpression && (((PrefixExpression) other).getParent() instanceof Statement)) {
+        if (other instanceof PrefixExpression && ((PrefixExpression) other).getParent() instanceof Statement) {
             return match0((PrefixExpression) other, node);
         } else if (other instanceof PostfixExpression
-                && (((PostfixExpression) other).getParent() instanceof Statement)) {
+                && ((PostfixExpression) other).getParent() instanceof Statement) {
             return match0((PostfixExpression) other, node);
         } else if (other instanceof Assignment) {
             return matchAssignmentWithAndWithoutEqual(node, (Assignment) other)
@@ -277,7 +277,7 @@ public class ASTSemanticMatcher extends ASTMatcher {
                 if (isOneLiteral(infixExpr.getRightOperand())) {
                     return safeSubtreeMatch(prefixOrPostfixOperand, assignment.getLeftHandSide())
                             && safeSubtreeMatch(prefixOrPostfixOperand, infixExpr.getLeftOperand());
-                } else if (InfixExpression.Operator.PLUS.equals(infixExpr.getOperator())
+                } else if (Operator.PLUS.equals(infixExpr.getOperator())
                         && isOneLiteral(infixExpr.getLeftOperand())) {
                     return safeSubtreeMatch(prefixOrPostfixOperand, assignment.getLeftHandSide())
                             && safeSubtreeMatch(prefixOrPostfixOperand, infixExpr.getRightOperand());
@@ -288,7 +288,7 @@ public class ASTSemanticMatcher extends ASTMatcher {
                 && assignmentAssociatedOperator.equals(assignment.getOperator())) {
             Object assignmentExpr = assignment.resolveConstantExpressionValue();
 
-            if (assignmentExpr != null && assignmentExpr instanceof Number
+            if (assignmentExpr instanceof Number
                     && ((Number) assignmentExpr).longValue() == 1) {
                 return safeSubtreeMatch(prefixOrPostfixOperand, assignment.getLeftHandSide());
             }
@@ -300,7 +300,7 @@ public class ASTSemanticMatcher extends ASTMatcher {
     private boolean isOneLiteral(Expression operand) {
         Object rightExpr = operand.resolveConstantExpressionValue();
 
-        return rightExpr != null && rightExpr instanceof Number
+        return rightExpr instanceof Number
                 && ((Number) rightExpr).longValue() == 1;
     }
 
@@ -520,9 +520,9 @@ public class ASTSemanticMatcher extends ASTMatcher {
                 || node.getParent() instanceof DoStatement)
                 && node.statements().size() == 1) {
             return safeSubtreeMatch(node.statements().get(0), other)
-                    || super.match(node, (Object) other);
+                    || super.match(node, other);
         }
 
-        return super.match(node, (Object) other);
+        return super.match(node, other);
     }
 }

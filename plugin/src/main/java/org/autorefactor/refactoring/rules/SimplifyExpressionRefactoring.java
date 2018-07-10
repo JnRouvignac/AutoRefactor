@@ -98,11 +98,11 @@ public class SimplifyExpressionRefactoring extends AbstractRefactoringRule {
      */
     public String getDescription() {
         return ""
-            + "Simplifies Java expressions:\n"
-            + "- remove redundant null checks or useless right-hand side or left-hand side operands,\n"
-            + "- remove useless parentheses,\n"
-            + "- directly check boolean values instead of comparing them with true/false,\n"
-            + "- reduce double negation in boolean expression.";
+                + "Simplifies Java expressions:\n"
+                + "- remove redundant null checks or useless right-hand side or left-hand side operands,\n"
+                + "- remove useless parentheses,\n"
+                + "- directly check boolean values instead of comparing them with true/false,\n"
+                + "- reduce double negation in boolean expression.";
     }
 
     /**
@@ -117,16 +117,16 @@ public class SimplifyExpressionRefactoring extends AbstractRefactoringRule {
     /** A mapping of child operation to parent operation that mandates using parentheses. */
     private static final List<Pair<Operator, Operator>> SHOULD_HAVE_PARENTHESES =
             Arrays.<Pair<Operator, Operator>>asList(
-            Pair.of(CONDITIONAL_AND, CONDITIONAL_OR),
-            Pair.of(AND, XOR),
-            Pair.of(AND, OR),
-            Pair.of(XOR, OR),
-            Pair.of(LEFT_SHIFT, OR),
-            Pair.of(LEFT_SHIFT, AND),
-            Pair.of(RIGHT_SHIFT_SIGNED, OR),
-            Pair.of(RIGHT_SHIFT_SIGNED, AND),
-            Pair.of(RIGHT_SHIFT_UNSIGNED, OR),
-            Pair.of(RIGHT_SHIFT_UNSIGNED, AND));
+                    Pair.of(CONDITIONAL_AND, CONDITIONAL_OR),
+                    Pair.of(AND, XOR),
+                    Pair.of(AND, OR),
+                    Pair.of(XOR, OR),
+                    Pair.of(LEFT_SHIFT, OR),
+                    Pair.of(LEFT_SHIFT, AND),
+                    Pair.of(RIGHT_SHIFT_SIGNED, OR),
+                    Pair.of(RIGHT_SHIFT_SIGNED, AND),
+                    Pair.of(RIGHT_SHIFT_UNSIGNED, OR),
+                    Pair.of(RIGHT_SHIFT_UNSIGNED, AND));
 
     // TODO Very few parenthesized expressions are actually needed. They are:
     // 1) inside InfixExpressions with logical operators (&&, ||, etc.)
@@ -213,7 +213,7 @@ public class SimplifyExpressionRefactoring extends AbstractRefactoringRule {
                 // infix and prefix or postfix without parenthesis is not readable
                 || ((parent instanceof InfixExpression
                         || parent instanceof PrefixExpression
-                                || parent instanceof PostfixExpression)
+                        || parent instanceof PostfixExpression)
                         && (innerExpr instanceof PrefixExpression
                                 || innerExpr instanceof PostfixExpression))) {
             return node;
@@ -236,17 +236,15 @@ public class SimplifyExpressionRefactoring extends AbstractRefactoringRule {
                 final InfixExpression innerIe = (InfixExpression) innerExpr;
                 final Operator innerOp = innerIe.getOperator();
                 final Operator parentOp = ((InfixExpression) parent).getOperator();
-                if (Operator.EQUALS.equals(parentOp) || shouldHaveParentheses(innerOp, parentOp)) {
-                    return true;
-                }
-                return is(innerIe.getLeftOperand(), Assignment.class)
+                return EQUALS.equals(parentOp) || shouldHaveParentheses(innerOp, parentOp)
+                        || is(innerIe.getLeftOperand(), Assignment.class)
                         || is(innerIe.getRightOperand(), Assignment.class);
             }
         } else if (parent instanceof ConditionalExpression) {
             return innerExpr instanceof ConditionalExpression
-                || innerExpr instanceof Assignment
-                || innerExpr instanceof InstanceofExpression
-                || innerExpr instanceof InfixExpression;
+                    || innerExpr instanceof Assignment
+                    || innerExpr instanceof InstanceofExpression
+                    || innerExpr instanceof InfixExpression;
         }
         return false;
     }
@@ -323,10 +321,9 @@ public class SimplifyExpressionRefactoring extends AbstractRefactoringRule {
                 }
             }
         } else if (hasOperator(node, EQUALS, NOT_EQUALS, XOR)
-                && !node.hasExtendedOperands()) {
-            if (maybeReduceBooleanExpression(node, lhs, rhs) == DO_NOT_VISIT_SUBTREE) {
-                return DO_NOT_VISIT_SUBTREE;
-            }
+                && !node.hasExtendedOperands()
+                && maybeReduceBooleanExpression(node, lhs, rhs) == DO_NOT_VISIT_SUBTREE) {
+            return DO_NOT_VISIT_SUBTREE;
         }
 
         if (shouldHaveParentheses(node)) {
@@ -361,17 +358,20 @@ public class SimplifyExpressionRefactoring extends AbstractRefactoringRule {
 
         final ASTBuilder b = this.ctx.getASTBuilder();
         final Refactorings r = this.ctx.getRefactorings();
-        if (leftOppositeExpr != null && rightOppositeExpr != null) {
-            r.replace(node, b.infixExpr(b.copy(leftOppositeExpr), getAppropriateOperator(node),
-                    b.copy(rightOppositeExpr)));
-            return DO_NOT_VISIT_SUBTREE;
-        } else if (leftOppositeExpr != null) {
-            final Operator reverseOp = getReverseOperator(node);
-            r.replace(node, b.infixExpr(b.copy(leftOppositeExpr), reverseOp, b.copy(rightExpr)));
-            return DO_NOT_VISIT_SUBTREE;
-        } else if (rightOppositeExpr != null) {
-            final Operator reverseOp = getReverseOperator(node);
-            r.replace(node, b.infixExpr(b.copy(leftExpr), reverseOp, b.copy(rightOppositeExpr)));
+        if (leftOppositeExpr == null) {
+            if (rightOppositeExpr != null) {
+                final Operator reverseOp = getReverseOperator(node);
+                r.replace(node, b.infixExpr(b.copy(leftExpr), reverseOp, b.copy(rightOppositeExpr)));
+                return DO_NOT_VISIT_SUBTREE;
+            }
+        } else {
+            if (rightOppositeExpr != null) {
+                r.replace(node, b.infixExpr(b.copy(leftOppositeExpr), getAppropriateOperator(node),
+                        b.copy(rightOppositeExpr)));
+            } else {
+                final Operator reverseOp = getReverseOperator(node);
+                r.replace(node, b.infixExpr(b.copy(leftOppositeExpr), reverseOp, b.copy(rightExpr)));
+            }
             return DO_NOT_VISIT_SUBTREE;
         }
 
@@ -492,21 +492,21 @@ public class SimplifyExpressionRefactoring extends AbstractRefactoringRule {
      * </ul>
      */
     private boolean isNullCheckRedundant(Expression e, Expression nullCheckedExpression) {
-        if (nullCheckedExpression == null) {
-            return false;
-        } else if (e instanceof InstanceofExpression) {
-            final Expression expr = ((InstanceofExpression) e).getLeftOperand();
-            return expr.subtreeMatch(new ASTSemanticMatcher(), nullCheckedExpression);
-        } else if (e instanceof MethodInvocation) {
-            final MethodInvocation expr = (MethodInvocation) e;
-            if (expr.getExpression() != null
-                    && expr.getExpression().resolveConstantExpressionValue() != null
-                    && arguments(expr).size() == 1
-                    && arguments(expr).get(0).subtreeMatch(
-                            new ASTSemanticMatcher(), nullCheckedExpression)) {
-                // Did we invoke java.lang.Object.equals() or java.lang.String.equalsIgnoreCase()?
-                return isMethod(expr, "java.lang.Object", "equals", "java.lang.Object")
-                        || isMethod(expr, "java.lang.String", "equalsIgnoreCase", "java.lang.String");
+        if (nullCheckedExpression != null) {
+            if (e instanceof InstanceofExpression) {
+                final Expression expr = ((InstanceofExpression) e).getLeftOperand();
+                return expr.subtreeMatch(new ASTSemanticMatcher(), nullCheckedExpression);
+            } else if (e instanceof MethodInvocation) {
+                final MethodInvocation expr = (MethodInvocation) e;
+                if (expr.getExpression() != null
+                        && expr.getExpression().resolveConstantExpressionValue() != null
+                        && arguments(expr).size() == 1
+                        && arguments(expr).get(0).subtreeMatch(
+                                new ASTSemanticMatcher(), nullCheckedExpression)) {
+                    // Did we invoke java.lang.Object.equals() or java.lang.String.equalsIgnoreCase()?
+                    return isMethod(expr, "java.lang.Object", "equals", "java.lang.Object")
+                            || isMethod(expr, "java.lang.String", "equalsIgnoreCase", "java.lang.String");
+                }
             }
         }
         return false;

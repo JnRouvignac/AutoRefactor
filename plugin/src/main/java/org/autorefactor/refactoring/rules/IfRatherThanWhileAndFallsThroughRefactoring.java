@@ -133,7 +133,6 @@ public class IfRatherThanWhileAndFallsThroughRefactoring extends AbstractRefacto
     }
 
     private class BreakVisitor extends InterruptableVisitor {
-
         private final WhileStatement root;
         private final List<BreakStatement> breaks = new ArrayList<BreakStatement>();
         private boolean canBeRefactored = true;

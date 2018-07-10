@@ -63,7 +63,6 @@ import org.eclipse.text.edits.TextEditVisitor;
 
 /** This class rewrites AST comments. */
 public class ASTCommentRewriter {
-
     private static final Pattern INDENT = Pattern.compile("\\s+");
     /**
      * Using a Set to avoid duplicates because Javadocs are visited twice via
@@ -315,9 +314,7 @@ public class ASTCommentRewriter {
             replaceEndsOfBlockCommentFromCommentText(commentEdits, lineComment, source);
         } else {
             // assume comment is situated exactly after target node for javadoc
-            final StringBuilder newJavadoc = new StringBuilder()
-                .append("/**")
-                .append(getSpaceAtStart(source, lineComment));
+            final StringBuilder newJavadoc = new StringBuilder("/**").append(getSpaceAtStart(source, lineComment));
 
             appendCommentTextReplaceEndsOfBlockComment(newJavadoc, lineComment, source);
 
@@ -442,10 +439,7 @@ public class ASTCommentRewriter {
         final LineComment previousLineComment = lineComments.get(i - 1);
         final int position = getEndPosition(previousLineComment);
         final String indent = getIndentForJavadoc(previousLineComment, source, lineStarts).substring(source);
-        final StringBuilder newJavadoc = new StringBuilder()
-            .append(lineSeparator)
-            .append(indent)
-            .append(" *");
+        final StringBuilder newJavadoc = new StringBuilder(lineSeparator).append(indent).append(" *");
 
         appendCommentTextReplaceEndsOfBlockComment(newJavadoc, lineComment, source);
 

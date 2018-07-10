@@ -37,7 +37,6 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class OperatorEnumTest {
-
     // @DataProvider
     public Iterator<Object[]> getPairsOfOperatorsWithSamePrecedence() {
         final List<Object[]> results = new ArrayList<Object[]>();
@@ -77,7 +76,7 @@ public class OperatorEnumTest {
     }
 
     public void compareSamePrecedenceOperators(OperatorEnum op1, OperatorEnum op2) {
-        assertTrue("Expected but did not get: " + op1 + " == " + op2, OperatorEnum.compareTo(op1, op2) == 0);
+        assertEquals("Expected but did not get: " + op1 + " == " + op2, 0, OperatorEnum.compareTo(op1, op2));
     }
 
     @Test

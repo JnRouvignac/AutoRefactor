@@ -91,7 +91,6 @@ public class WorkWithNullCheckedExpressionFirstRefactoring extends AbstractRefac
     }
 
     private static final class IfAndReturnVisitor extends BlockSubVisitor {
-
         public IfAndReturnVisitor(final RefactoringContext ctx, final Block startNode) {
             super(ctx, startNode);
         }
@@ -155,8 +154,8 @@ public class WorkWithNullCheckedExpressionFirstRefactoring extends AbstractRefac
 
         /** Revert condition + swap then and else statements. */
         private void revertIfStatement(IfStatement node, Statement thenStmt, Statement elseStmt) {
-            final ASTBuilder b = this.getCtx().getASTBuilder();
-            final Refactorings r = this.getCtx().getRefactorings();
+            final ASTBuilder b = ctx.getASTBuilder();
+            final Refactorings r = ctx.getRefactorings();
             r.set(node.getExpression(), OPERATOR_PROPERTY, NOT_EQUALS);
             r.replace(thenStmt, b.move(elseStmt));
             r.replace(elseStmt, b.move(thenStmt));

@@ -31,7 +31,6 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 
 public class JavaConstantsTest {
-
     // @DataProvider
     public Object[][] getValidLongZeroLiteral() {
         return new Object[][] {
@@ -101,8 +100,6 @@ public class JavaConstantsTest {
         };
     }
 
-
-
     // @DataProvider
     public Object[][] getValidLongOneLiteral() {
         return new Object[][] {
@@ -171,8 +168,6 @@ public class JavaConstantsTest {
             // @formatter:on
         };
     }
-
-
 
     // @DataProvider
     public Object[][] getValidLongTenLiteral() {
@@ -252,8 +247,6 @@ public class JavaConstantsTest {
         };
     }
 
-
-
     // @DataProvider
     public Object[][] getValidIntegerLiteral() {
         Object[][] zeros = getValidIntegerZeroLiteral();
@@ -289,8 +282,6 @@ public class JavaConstantsTest {
         return results;
     }
 
-
-
     @Test
     public void validIntegerZeroLongLiteralRegexp() {
         for (Object[] args : getValidIntegerZeroLiteral()) {
@@ -323,8 +314,6 @@ public class JavaConstantsTest {
     public void validLongZeroLongLiteralRegexp(String literal) {
         assertTrue(ZERO_LONG_LITERAL_RE.matcher(literal).matches());
     }
-
-
 
     @Test
     public void validIntegerOneLongLiteralRegexp() {
@@ -359,8 +348,6 @@ public class JavaConstantsTest {
         assertTrue(ONE_LONG_LITERAL_RE.matcher(literal).matches());
     }
 
-
-
     @Test
     public void validIntegerTenLongLiteralRegexp() {
         for (Object[] args : getValidIntegerTenLiteral()) {
@@ -393,8 +380,6 @@ public class JavaConstantsTest {
     public void validLongTenLongLiteralRegexp(String literal) {
         assertTrue(TEN_LONG_LITERAL_RE.matcher(literal).matches());
     }
-
-
 
     @Test
     public void validIntegerLiteralRegexp() {

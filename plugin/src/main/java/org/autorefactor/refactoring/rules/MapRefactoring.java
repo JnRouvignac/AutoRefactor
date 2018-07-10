@@ -97,7 +97,6 @@ public class MapRefactoring extends AbstractRefactoringRule {
     }
 
     private static final class NewAndPutAllMethodVisitor extends BlockSubVisitor {
-
         public NewAndPutAllMethodVisitor(final RefactoringContext ctx, final Block startNode) {
             super(ctx, startNode);
         }
@@ -112,10 +111,8 @@ public class MapRefactoring extends AbstractRefactoringRule {
                 final Assignment as = asExpression(previousStmt, Assignment.class);
                 if (hasOperator(as, Assignment.Operator.ASSIGN)) {
                     final Expression lhs = as.getLeftHandSide();
-                    if (lhs instanceof SimpleName) {
-                        if (isSameLocalVariable(lhs, mi.getExpression())) {
-                            return maybeReplaceInitializer(as.getRightHandSide(), arg0, node);
-                        }
+                    if (lhs instanceof SimpleName && isSameLocalVariable(lhs, mi.getExpression())) {
+                        return maybeReplaceInitializer(as.getRightHandSide(), arg0, node);
                     }
                 } else if (previousStmt instanceof VariableDeclarationStatement) {
                     final VariableDeclarationFragment vdf = getUniqueFragment((VariableDeclarationStatement)
@@ -133,10 +130,10 @@ public class MapRefactoring extends AbstractRefactoringRule {
             final ClassInstanceCreation cic = as(nodeToReplace, ClassInstanceCreation.class);
             if (canReplaceInitializer(cic, arg0)
                     && isCastCompatible(nodeToReplace, arg0)) {
-                final ASTBuilder b = getCtx().getASTBuilder();
-                getCtx().getRefactorings().replace(nodeToReplace,
+                final ASTBuilder b = ctx.getASTBuilder();
+                ctx.getRefactorings().replace(nodeToReplace,
                         b.new0(b.copy(cic.getType()), b.copy(arg0)));
-                getCtx().getRefactorings().remove(nodeToRemove);
+                ctx.getRefactorings().remove(nodeToRemove);
                 setResult(DO_NOT_VISIT_SUBTREE);
                 return DO_NOT_VISIT_SUBTREE;
             }
@@ -148,9 +145,9 @@ public class MapRefactoring extends AbstractRefactoringRule {
                 return false;
             }
             final List<Expression> args = arguments(cic);
-            final boolean noArgsCtor = args.size() == 0;
+            final boolean noArgsCtor = args.isEmpty();
             final boolean mapCapacityCtor = isValidCapacityParameter(sourceMap, args);
-            if (noArgsCtor && hasType(cic,
+            return (noArgsCtor && hasType(cic,
                     "java.util.concurrent.ConcurrentHashMap",
                     "java.util.concurrent.ConcurrentSkipListMap",
                     "java.util.Hashtable",
@@ -158,19 +155,13 @@ public class MapRefactoring extends AbstractRefactoringRule {
                     "java.util.IdentityHashMap",
                     "java.util.LinkedHashMap",
                     "java.util.TreeMap",
-                    "java.util.WeakHashMap")) {
-                return true;
-            }
-            if (mapCapacityCtor && hasType(cic,
-                    "java.util.concurrent.ConcurrentHashMap",
-                    "java.util.Hashtable",
-                    "java.util.HashMap",
-                    "java.util.IdentityHashMap",
-                    "java.util.LinkedHashMap",
-                    "java.util.WeakHashMap")) {
-                return true;
-            }
-            return false;
+                    "java.util.WeakHashMap")) || (mapCapacityCtor && hasType(cic,
+                            "java.util.concurrent.ConcurrentHashMap",
+                            "java.util.Hashtable",
+                            "java.util.HashMap",
+                            "java.util.IdentityHashMap",
+                            "java.util.LinkedHashMap",
+                            "java.util.WeakHashMap"));
         }
 
         private boolean isValidCapacityParameter(Expression sourceMap, final List<Expression> args) {

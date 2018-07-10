@@ -437,10 +437,7 @@ public class SwitchRefactoring extends AbstractRefactoringRule {
                     if (!previousSectionFallsthrough(switchStructure, comparedIndex)) {
                         mergeCases(Merge.AFTER_SWITCH_CASES, referenceCase, comparedCase);
                         return DO_NOT_VISIT_SUBTREE;
-                    } else if (referenceIndex == 0) {
-                        mergeCases(Merge.BEFORE_SWITCH_CASES, comparedCase, referenceCase);
-                        return DO_NOT_VISIT_SUBTREE;
-                    } else if (!previousSectionFallsthrough(switchStructure, referenceIndex)) {
+                    } else if (referenceIndex == 0 || !previousSectionFallsthrough(switchStructure, referenceIndex)) {
                         mergeCases(Merge.BEFORE_SWITCH_CASES, comparedCase, referenceCase);
                         return DO_NOT_VISIT_SUBTREE;
                     }

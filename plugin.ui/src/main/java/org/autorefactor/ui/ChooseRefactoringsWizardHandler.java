@@ -74,7 +74,7 @@ public class ChooseRefactoringsWizardHandler extends AbstractHandler {
                     final PrintWriter pw = new PrintWriter(sw);
                     e.printStackTrace(pw);
 
-                    openInformation(shell, "Info", "An error has occurred:\n\n" + sw.toString());
+                    openInformation(shell, "Info", "An error has occurred:\n\n" + sw);
                 }
             });
         }

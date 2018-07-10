@@ -58,7 +58,6 @@ import org.junit.runners.Parameterized.Parameters;
  */
 @RunWith(value = Parameterized.class)
 public class AllRefactoringRulesTest {
-
     private static final String SAMPLES_ALL_BASE_DIR =
             "../samples/src/test/java/org/autorefactor/refactoring/rules/all";
     private static final String PACKAGE_NAME = "org.autorefactor.refactoring.rules.all.samples_in";

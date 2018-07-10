@@ -155,13 +155,13 @@ public class EntrySetRatherThanKeySetAndValueSearchRefactoring extends AbstractR
 
             // Iterate on the first candidate name and suffix it with an integer
             int i = 1;
-            while (true) {
+            do {
                 final String candidate = candidateNames[0] + i;
                 if (isSuitable(candidate, declaredLocalVarNames, varNamesUsedAfter)) {
                     return candidate;
                 }
                 i++;
-            }
+            } while (true);
         }
 
         private boolean isSuitable(
@@ -376,19 +376,8 @@ public class EntrySetRatherThanKeySetAndValueSearchRefactoring extends AbstractR
         if (type1 == null || type2 == null) {
             return true;
         }
-        if (type1.isParameterizedType()) {
-            if (type2.isParameterizedType()) {
-                return areSameParameterizedTypeBindings(type1, type2);
-            } else {
-                return false;
-            }
-        } else {
-            if (type2.isParameterizedType()) {
-                return false;
-            } else {
-                return areSameTypeBindingsByAliasingTypeCaptures(type1, type2);
-            }
-        }
+        return type1.isParameterizedType() == type2.isParameterizedType()
+                && areSameParameterizedTypeBindings(type1, type2);
     }
 
     /** Special handling because of captures. */

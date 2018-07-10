@@ -84,9 +84,8 @@ public class CFGEdgeBuilder {
         result = prime * result + (evaluationResult ? 1231 : 1237);
         result = prime * result
                 + ((sourceBlock == null) ? 0 : sourceBlock.hashCode());
-        result = prime * result
+        return prime * result
                 + ((targetBlock == null) ? 0 : targetBlock.hashCode());
-        return result;
     }
 
     @Override

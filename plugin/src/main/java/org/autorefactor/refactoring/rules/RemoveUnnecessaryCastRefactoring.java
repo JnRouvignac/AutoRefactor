@@ -164,8 +164,8 @@ public class RemoveUnnecessaryCastRefactoring extends AbstractRefactoringRule {
             } else {
                 final boolean integralDivision = isIntegralDivision(ie);
                 return ((isNotRefactored(lo) && isStringConcat(ie))
-                            || (!integralDivision && isAssignmentCompatibleInInfixExpression(node, ie))
-                            || (integralDivision && canRemoveCastInIntegralDivision(node, ie)))
+                        || (!integralDivision && isAssignmentCompatibleInInfixExpression(node, ie))
+                        || (integralDivision && canRemoveCastInIntegralDivision(node, ie)))
                         && !isPrimitiveTypeNarrowing(node)
                         && !isIntegralDividedByFloatingPoint(node, ie);
             }
@@ -218,19 +218,19 @@ public class RemoveUnnecessaryCastRefactoring extends AbstractRefactoringRule {
     }
 
     private int toPseudoEnum(String name) {
-        if (name.equals("byte") || name.equals("java.lang.Byte")) {
+        if ("byte".equals(name) || "java.lang.Byte".equals(name)) {
             return 1;
-        } else if (name.equals("short") || name.equals("java.lang.Short")) {
+        } else if ("short".equals(name) || "java.lang.Short".equals(name)) {
             return 2;
-        } else if (name.equals("char") || name.equals("java.lang.Character")) {
+        } else if ("char".equals(name) || "java.lang.Character".equals(name)) {
             return 3;
-        } else if (name.equals("int") || name.equals("java.lang.Integer")) {
+        } else if ("int".equals(name) || "java.lang.Integer".equals(name)) {
             return 4;
-        } else if (name.equals("long") || name.equals("java.lang.Long")) {
+        } else if ("long".equals(name) || "java.lang.Long".equals(name)) {
             return 5;
-        } else if (name.equals("float") || name.equals("java.lang.Float")) {
+        } else if ("float".equals(name) || "java.lang.Float".equals(name)) {
             return 6;
-        } else if (name.equals("double") || name.equals("java.lang.Double")) {
+        } else if ("double".equals(name) || "java.lang.Double".equals(name)) {
             return 7;
         }
         throw new NotImplementedException(null, "for type '" + name + "'");
@@ -291,31 +291,19 @@ public class RemoveUnnecessaryCastRefactoring extends AbstractRefactoringRule {
     }
 
     private boolean isAssignmentCompatible(Expression expr, Type type) {
-        if (expr != null && type != null) {
-            return isAssignmentCompatible(expr.resolveTypeBinding(), type.resolveBinding());
-        }
-        return false;
+        return expr != null && type != null && isAssignmentCompatible(expr.resolveTypeBinding(), type.resolveBinding());
     }
 
     private boolean isAssignmentCompatible(Expression expr, ITypeBinding typeBinding) {
-        if (expr != null && typeBinding != null) {
-            return isAssignmentCompatible(expr.resolveTypeBinding(), typeBinding);
-        }
-        return false;
+        return expr != null && typeBinding != null && isAssignmentCompatible(expr.resolveTypeBinding(), typeBinding);
     }
 
     private boolean isAssignmentCompatible(Expression expr1, Expression expr2) {
-        if (expr1 != null && expr2 != null) {
-            return isAssignmentCompatible(expr1.resolveTypeBinding(), expr2.resolveTypeBinding());
-        }
-        return false;
+        return expr1 != null && expr2 != null
+                && isAssignmentCompatible(expr1.resolveTypeBinding(), expr2.resolveTypeBinding());
     }
 
     private boolean isAssignmentCompatible(final ITypeBinding targetBinding, final ITypeBinding sourceBinding) {
-        if (targetBinding != null && sourceBinding != null) {
-            return targetBinding.isAssignmentCompatible(sourceBinding);
-        }
-        return false;
+        return targetBinding != null && sourceBinding != null && targetBinding.isAssignmentCompatible(sourceBinding);
     }
-
 }

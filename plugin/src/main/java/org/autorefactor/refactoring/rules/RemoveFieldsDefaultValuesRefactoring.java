@@ -58,9 +58,9 @@ public class RemoveFieldsDefaultValuesRefactoring extends AbstractRefactoringRul
      */
     public String getDescription() {
         return ""
-            + "Removes field initializers when they are the default value of the field's types.\n"
-            + "For example, the initializer will be removed for integer fields initialized to \"0\".\n"
-            + "Likewise, the initializer will be removed for non primitive fields initialized to \"null\".";
+                + "Removes field initializers when they are the default value of the field's types.\n"
+                + "For example, the initializer will be removed for integer fields initialized to \"0\".\n"
+                + "Likewise, the initializer will be removed for non primitive fields initialized to \"null\".";
     }
 
     /**
@@ -85,17 +85,12 @@ public class RemoveFieldsDefaultValuesRefactoring extends AbstractRefactoringRul
         boolean visitSubtree = VISIT_SUBTREE;
         for (VariableDeclarationFragment vdf : fragments(node)) {
             final Expression initializer = vdf.getInitializer();
-            if (initializer != null) {
-                if (!fieldType.isPrimitive()
-                        && isNullLiteral(initializer)) {
-                    this.ctx.getRefactorings().remove(initializer);
-                    visitSubtree = DO_NOT_VISIT_SUBTREE;
-                } else if (fieldType.isPrimitive()
-                        && isPrimitiveLiteral(initializer)
-                        && isPrimitiveDefaultValue(initializer.resolveConstantExpressionValue())) {
-                    this.ctx.getRefactorings().remove(initializer);
-                    visitSubtree = DO_NOT_VISIT_SUBTREE;
-                }
+            if (initializer != null && ((!fieldType.isPrimitive()
+                    && isNullLiteral(initializer)) || (fieldType.isPrimitive()
+                            && isPrimitiveLiteral(initializer)
+                            && isPrimitiveDefaultValue(initializer.resolveConstantExpressionValue())))) {
+                this.ctx.getRefactorings().remove(initializer);
+                visitSubtree = DO_NOT_VISIT_SUBTREE;
             }
         }
         return visitSubtree;
@@ -109,7 +104,7 @@ public class RemoveFieldsDefaultValuesRefactoring extends AbstractRefactoringRul
             return !((TypeDeclaration) parent).isInterface();
         }
         return parent instanceof AnonymousClassDeclaration
-            || parent instanceof EnumDeclaration;
+                || parent instanceof EnumDeclaration;
     }
 
     private boolean isPrimitiveDefaultValue(Object val) {

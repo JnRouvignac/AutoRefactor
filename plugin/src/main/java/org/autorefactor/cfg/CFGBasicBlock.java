@@ -46,7 +46,6 @@ import org.eclipse.jdt.core.dom.ASTNode;
  *      wikipedia</a>
  */
 public class CFGBasicBlock implements Comparable<CFGBasicBlock> {
-
     private final ASTNode node;
     private final String fileName;
     private final String codeExcerpt;
@@ -209,9 +208,8 @@ public class CFGBasicBlock implements Comparable<CFGBasicBlock> {
         int result = 1;
         result = prime * result + ((fileName == null) ? 0 : fileName.hashCode());
         result = prime * result + ((lineAndColumn == null) ? 0 : lineAndColumn.hashCode());
-        result = prime * result
+        return prime * result
                 + ((isEntryBlock == null) ? 0 : isEntryBlock.hashCode());
-        return result;
     }
 
     @Override
@@ -313,5 +311,4 @@ public class CFGBasicBlock implements Comparable<CFGBasicBlock> {
         }
         appendDotNodeLabel(sb);
     }
-
 }

@@ -53,7 +53,6 @@ import org.eclipse.jdt.core.dom.TryStatement;
  * </p>
  */
 public class CFGDotPrinter {
-
     // TODO JNR
     // - Add variable access nodes
     // - link them with "--" and/or inside a box
@@ -62,11 +61,10 @@ public class CFGDotPrinter {
     // - use separate colors?
 
     private static final class CFGSubGraph {
-
         private final String codeExcerpt;
         private final int startPosition;
         final Set<CFGBasicBlock> blocks = new TreeSet<CFGBasicBlock>();
-        final List<CFGSubGraph> subGraphs = new ArrayList<CFGDotPrinter.CFGSubGraph>();
+        final List<CFGSubGraph> subGraphs = new ArrayList<CFGSubGraph>();
 
         public CFGSubGraph(String codeExcerpt, int startPosition) {
             this.codeExcerpt = codeExcerpt;
