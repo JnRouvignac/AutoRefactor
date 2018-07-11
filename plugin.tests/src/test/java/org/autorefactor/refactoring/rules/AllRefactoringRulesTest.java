@@ -32,6 +32,7 @@ import static org.autorefactor.test.TestHelper.readAll;
 import static org.autorefactor.test.TestHelper.runTest;
 import static org.autorefactor.test.TestHelper.samples;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
@@ -45,6 +46,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IPackageFragment;
+import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 import org.junit.Test;
@@ -105,6 +107,20 @@ public class AllRefactoringRulesTest {
         final String sampleInSource = readAll(sampleIn);
         final String sampleOutSource = readAll(sampleOut);
 
+        given(sampleInSource, sampleOutSource);
+
+        final IDocument doc = when(sampleInSource);
+
+        then(sampleOutSource, doc);
+    }
+
+    private void given(final String sampleInSource, final String sampleOutSource) {
+        final String actual = normalizeJavaSourceCode(sampleInSource.replaceAll("samples_in", "samples_out"));
+        final String expected = normalizeJavaSourceCode(sampleOutSource);
+        assertNotEquals(sampleName + ": verify nothing;", expected, actual);
+    }
+
+    private IDocument when(final String sampleInSource) throws Exception, JavaModelException {
         final IPackageFragment packageFragment = JavaCoreHelper.getPackageFragment(PACKAGE_NAME);
         final ICompilationUnit cu = packageFragment.createCompilationUnit(
                 sampleName, sampleInSource, true, null);
@@ -117,7 +133,10 @@ public class AllRefactoringRulesTest {
                 new AggregateASTVisitor(AllRefactoringRules.getAllRefactoringRules()),
                 newJavaProjectOptions(Release.javaSE("1.8.0"), 4),
                 SubMonitor.convert(new NullProgressMonitor()));
+        return doc;
+    }
 
+    private void then(final String sampleOutSource, final IDocument doc) {
         final String actual = normalizeJavaSourceCode(
                 doc.get().replaceAll("samples_in", "samples_out"));
         final String expected = normalizeJavaSourceCode(sampleOutSource);
