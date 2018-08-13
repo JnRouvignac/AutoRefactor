@@ -67,7 +67,7 @@ public interface RemoveUselessModifiersSample {
 
     void myMethod(String myArg);
 
-    public static abstract class FixModifierOrderSampleClass implements Closeable {
+    public abstract static class FixModifierOrderSampleClass implements Closeable {
 
         public static final String MY_FIELD = "";
 
@@ -94,7 +94,7 @@ public interface RemoveUselessModifiersSample {
         }
     }
 
-    public static abstract class AbstractSampleClass {
+    public abstract static class AbstractSampleClass {
     }
 
     class Sample {
