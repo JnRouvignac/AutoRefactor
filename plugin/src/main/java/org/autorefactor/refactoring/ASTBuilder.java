@@ -281,6 +281,15 @@ public class ASTBuilder {
     }
 
     /**
+     * Builds a new {@link ArrayInitializer} instance.
+     *
+     * @return a new array initializer
+     */
+    public ArrayInitializer arrayInitializer() {
+        return ast.newArrayInitializer();
+    }
+
+    /**
      * Builds a new {@link SwitchCase} instance which represents a {@code default} statement.
      *
      * @return a new switch case statement representing a {@code default} statement
