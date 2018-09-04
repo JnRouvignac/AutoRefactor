@@ -100,6 +100,7 @@ public final class AllRefactoringRules {
                 new InlineCodeRatherThanPeremptoryConditionRefactoring(),
                 new RemoveUselessBlockRefactoring(),
                 new RemoveEmptyStatementRefactoring(),
+                new SingleDeclarationsRatherThanMultiDeclarationRefactoring(),
                 new EndOfMethodRatherThanReturnRefactoring(),
                 new DoWhileRatherThanWhileRefactoring(),
                 new DoWhileRatherThanDuplicateCodeRefactoring(),

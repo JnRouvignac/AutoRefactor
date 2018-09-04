@@ -570,6 +570,19 @@ public class ASTBuilder {
      */
     public VariableDeclarationStatement declareStmt(Type type, SimpleName varName, Expression initializer) {
         final VariableDeclarationFragment fragment = declareFragment(varName, initializer);
+        return declareStmt(type, fragment);
+    }
+
+    /**
+     * Builds a new {@link VariableDeclarationStatement} instance.
+     *
+     * @param type
+     *            the type of the variable being declared
+     * @param fragment
+     *            the fragment being declared
+     * @return a new variable declaration statement
+     */
+    public VariableDeclarationStatement declareStmt(Type type, VariableDeclarationFragment fragment) {
         final VariableDeclarationStatement vds = ast.newVariableDeclarationStatement(fragment);
         vds.setType(type);
         return vds;
