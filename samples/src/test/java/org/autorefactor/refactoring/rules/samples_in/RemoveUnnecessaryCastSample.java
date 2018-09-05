@@ -225,7 +225,7 @@ public class RemoveUnnecessaryCastSample {
         return i / (long) j / (long) k;
     }
 
-    public int removeCastsFromAssignmentsToByte() {
+    public int removeCastsFromDeclarationsToByte() {
         // Keep this comment
         byte b1 = (byte) -1;
         byte b2 = (byte) 127;
@@ -239,7 +239,35 @@ public class RemoveUnnecessaryCastSample {
         return b1 + b2 + b3 + b4 + b5 + b6 + b7 + b8 + b;
     }
 
-    public int removeCastsFromAssignmentsToChar() {
+    public int removeCastsFromAssignmentsToByte() {
+        byte b1;
+        byte b2;
+        byte b3;
+        byte b4;
+        Byte b5;
+        Byte b6;
+        Byte b7;
+        Byte b8;
+
+        // Keep this comment
+        b1 = (byte) -1;
+        b2 = (byte) 127;
+        b3 = (byte) -128;
+        b4 = (byte) ONE;
+        b5 = (byte) -1;
+        b6 = (byte) 127;
+        b7 = (byte) -128;
+        b8 = (byte) ONE;
+        b = (byte) 1;
+        return b1 + b2 + b3 + b4 + b5 + b6 + b7 + b8 + b;
+    }
+
+    public byte removeCastFromReturnToByte() {
+        // Keep this comment
+        return (byte) -1;
+    }
+
+    public int removeCastsFromDeclarationsToChar() {
         // Keep this comment
         char c1 = (char) 0;
         char c2 = (char) 65535;
@@ -251,7 +279,7 @@ public class RemoveUnnecessaryCastSample {
         return c1 + c2 + c3 + c4 + c5 + c6 + c;
     }
 
-    public int removeCastsFromAssignmentsToShort() {
+    public int removeCastsFromDeclarationsToShort() {
         // Keep this comment
         short s1 = (short) -1;
         short s2 = (short) 32767;
@@ -265,7 +293,7 @@ public class RemoveUnnecessaryCastSample {
         return s1 + s2 + s3 + s4 + s5 + s6 + s7 + s8 + s;
     }
 
-    public int doNotRemoveCastsFromPrimitiveAssignments() {
+    public int doNotRemoveCastsFromPrimitiveDeclarations() {
         byte b1 = (byte) 128;
         byte b2 = (byte) -129;
         char c1 = (char) -1;

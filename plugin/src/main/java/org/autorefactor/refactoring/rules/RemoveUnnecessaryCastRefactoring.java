@@ -139,7 +139,8 @@ public class RemoveUnnecessaryCastRefactoring extends AbstractRefactoringRule {
         switch (parent.getNodeType()) {
         case RETURN_STATEMENT:
             final MethodDeclaration md = getAncestor(parent, MethodDeclaration.class);
-            return isAssignmentCompatible(node.getExpression(), md.getReturnType2());
+            return isAssignmentCompatible(node.getExpression(), md.getReturnType2())
+                    || isConstantExpressionAssignmentConversion(node);
 
         case ASSIGNMENT:
             final Assignment as = (Assignment) parent;
@@ -152,22 +153,22 @@ public class RemoveUnnecessaryCastRefactoring extends AbstractRefactoringRule {
                     || isConstantExpressionAssignmentConversion(node);
 
         case INFIX_EXPRESSION:
-            final InfixExpression ie = (InfixExpression) parent;
-            final Expression lo = ie.getLeftOperand();
-            final Expression ro = ie.getRightOperand();
-            if (node.equals(lo)) {
-                return (isStringConcat(ie) || isAssignmentCompatible(node.getExpression(), ro))
-                        && !isPrimitiveTypeNarrowing(node)
-                        && !hasOperator(ie, DIVIDE)
-                        && !hasOperator(ie, PLUS)
-                        && !hasOperator(ie, MINUS);
-            } else {
-                final boolean integralDivision = isIntegralDivision(ie);
-                return ((isNotRefactored(lo) && isStringConcat(ie))
-                        || (!integralDivision && isAssignmentCompatibleInInfixExpression(node, ie))
-                        || (integralDivision && canRemoveCastInIntegralDivision(node, ie)))
-                        && !isPrimitiveTypeNarrowing(node)
-                        && !isIntegralDividedByFloatingPoint(node, ie);
+            if (!isPrimitiveTypeNarrowing(node)) {
+                final InfixExpression ie = (InfixExpression) parent;
+                final Expression lo = ie.getLeftOperand();
+                final Expression ro = ie.getRightOperand();
+
+                if (node.equals(lo)) {
+                    return (isStringConcat(ie) || isAssignmentCompatible(node.getExpression(), ro))
+                            && !hasOperator(ie, DIVIDE, PLUS, MINUS);
+                } else {
+                    final boolean integralDivision = isIntegralDivision(ie);
+                    return ((isNotRefactored(lo) && isStringConcat(ie))
+                            || (integralDivision
+                                    ? canRemoveCastInIntegralDivision(node, ie)
+                                            : isAssignmentCompatibleInInfixExpression(node, ie)))
+                            && !isIntegralDividedByFloatingPoint(node, ie);
+                }
             }
         }
         return false;

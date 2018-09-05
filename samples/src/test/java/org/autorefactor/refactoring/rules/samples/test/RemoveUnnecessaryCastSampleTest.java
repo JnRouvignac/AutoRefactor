@@ -186,4 +186,35 @@ public class RemoveUnnecessaryCastSampleTest {
         assertEquals(sampleIn.doNotRemoveCastsFromSoustractionWhenResultIsWidened(oi, pi, l),
                 sampleOut.doNotRemoveCastsFromSoustractionWhenResultIsWidened(oi, pi, l), 0.0);
     }
+
+    @Test
+    public void removeCastsFromDeclarationsToByte() throws Exception {
+        assertEquals(sampleIn.removeCastsFromDeclarationsToByte(), sampleOut.removeCastsFromDeclarationsToByte());
+    }
+
+    @Test
+    public void removeCastsFromAssignmentsToByte() throws Exception {
+        assertEquals(sampleIn.removeCastsFromAssignmentsToByte(), sampleOut.removeCastsFromAssignmentsToByte());
+    }
+
+    @Test
+    public void removeCastFromReturnToByte() throws Exception {
+        assertEquals(sampleIn.removeCastFromReturnToByte(), sampleOut.removeCastFromReturnToByte());
+    }
+
+    @Test
+    public void removeCastsFromDeclarationsToChar() throws Exception {
+        assertEquals(sampleIn.removeCastsFromDeclarationsToChar(), sampleOut.removeCastsFromDeclarationsToChar());
+    }
+
+    @Test
+    public void removeCastsFromDeclarationsToShort() throws Exception {
+        assertEquals(sampleIn.removeCastsFromDeclarationsToShort(), sampleOut.removeCastsFromDeclarationsToShort());
+    }
+
+    @Test
+    public void doNotRemoveCastsFromPrimitiveDeclarations() throws Exception {
+        assertEquals(sampleIn.doNotRemoveCastsFromPrimitiveDeclarations(),
+                sampleOut.doNotRemoveCastsFromPrimitiveDeclarations());
+    }
 }
