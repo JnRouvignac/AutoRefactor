@@ -66,7 +66,7 @@ public class SingleDeclarationsRatherThanMultiDeclarationRefactoring extends Abs
      * @return the reason.
      */
     public String getReason() {
-        return "It makes the code more standard. It fixes a Sonar alert.";
+        return "It makes the code more standard. It fixes the Sonar RSPEC-1659.";
     }
 
     @Override
