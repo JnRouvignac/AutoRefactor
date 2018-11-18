@@ -1456,6 +1456,62 @@ public final class ASTHelper {
     }
 
     /**
+     * Returns whether the provided expression is hard-coded as a literal in the byte code ignoring parentheses.
+     *
+     * @param expr the expression to check
+     * @return true if the provided expression is hard-coded as a literal in the byte code ignoring parentheses,
+     * false otherwise
+     */
+    public static boolean isHardCoded(final Expression expr) {
+        if (expr != null) {
+            switch (expr.getNodeType()) {
+            case ASTNode.BOOLEAN_LITERAL:
+            case ASTNode.CHARACTER_LITERAL:
+            case ASTNode.NUMBER_LITERAL:
+            case ASTNode.STRING_LITERAL:
+            case ASTNode.NULL_LITERAL:
+                return true;
+
+            case ASTNode.INFIX_EXPRESSION:
+                InfixExpression infixExpression = (InfixExpression) expr;
+
+                if (!isHardCoded(infixExpression.getLeftOperand())) {
+                    return false;
+                } else if (!isHardCoded(infixExpression.getRightOperand())) {
+                    return false;
+                } else if (infixExpression.hasExtendedOperands()) {
+                    for (Object operand : infixExpression.extendedOperands()) {
+                        if (!isHardCoded((Expression) operand)) {
+                            return false;
+                        }
+                    }
+                }
+
+                return true;
+
+            case ASTNode.PREFIX_EXPRESSION:
+                PrefixExpression prefixExpression = (PrefixExpression) expr;
+                return isHardCoded(prefixExpression.getOperand());
+
+            case ASTNode.POSTFIX_EXPRESSION:
+                PostfixExpression postfixExpression = (PostfixExpression) expr;
+                return isHardCoded(postfixExpression.getOperand());
+
+            case ASTNode.CAST_EXPRESSION:
+                return isHardCoded(((CastExpression) expr).getExpression());
+
+            case ASTNode.PARENTHESIZED_EXPRESSION:
+                return isHardCoded(((ParenthesizedExpression) expr).getExpression());
+
+            default:
+                return expr.resolveConstantExpressionValue() != null || isEnumConstant(expr);
+            }
+        } else {
+            return false;
+        }
+    }
+
+    /**
      * Returns whether the provided binding represents a local variable.
      *
      * @param binding the binding to analyze
@@ -2017,11 +2073,6 @@ public final class ASTHelper {
     public static boolean isEqual(QualifiedName name1, QualifiedName name2) {
         return isEqual(name1.getName(), name2.getName())
                 && isEqual(name1.getQualifier(), name2.getQualifier());
-    }
-
-    private static boolean sameClass(ASTNode node1, ASTNode node2) {
-        return node1 != null && node2 != null
-                && node1.getClass().equals(node2.getClass());
     }
 
     /**

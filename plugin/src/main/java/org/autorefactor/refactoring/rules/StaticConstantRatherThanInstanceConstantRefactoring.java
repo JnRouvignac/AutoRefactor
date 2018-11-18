@@ -29,6 +29,7 @@ import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
 import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
 import static org.autorefactor.refactoring.ASTHelper.hasType;
 import static org.autorefactor.refactoring.ASTHelper.modifiers;
+import static org.autorefactor.refactoring.ASTHelper.isHardCoded;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -36,7 +37,6 @@ import java.util.List;
 
 import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.Refactorings;
-import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.IExtendedModifier;
@@ -99,7 +99,7 @@ public class StaticConstantRatherThanInstanceConstantRefactoring extends Abstrac
                 final Expression initializer =
                         ((VariableDeclarationFragment) node.fragments().get(0)).getInitializer();
 
-                if (isLiteral(initializer)) {
+                if (isHardCoded(initializer)) {
                     addStaticModifier(finalModifier);
                     return DO_NOT_VISIT_SUBTREE;
                 }
@@ -114,24 +114,6 @@ public class StaticConstantRatherThanInstanceConstantRefactoring extends Abstrac
         final Refactorings r = ctx.getRefactorings();
 
         r.insertBefore(b.static0(), finalModifier);
-    }
-
-    private boolean isLiteral(final Expression initializer) {
-        if (initializer != null) {
-            switch (initializer.getNodeType()) {
-            case ASTNode.BOOLEAN_LITERAL:
-            case ASTNode.CHARACTER_LITERAL:
-            case ASTNode.NUMBER_LITERAL:
-            case ASTNode.STRING_LITERAL:
-            case ASTNode.NULL_LITERAL:
-                return true;
-
-            default:
-                return false;
-            }
-        } else {
-            return false;
-        }
     }
 
     private List<Modifier> getModifiersOnly(final Collection<IExtendedModifier> modifiers) {

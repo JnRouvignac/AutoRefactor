@@ -119,6 +119,7 @@ public final class AllRefactoringRules {
                 new CollectionContainsRefactoring(),
                 new CollectionRefactoring(),
                 new AllInOneMethodRatherThanLoopRefactoring(),
+                new BreakRatherThanPassiveIterationsRefactoring(),
                 new UpdateSetRatherThanTestingFirstRefactoring(),
                 new IsEmptyRatherThanSizeRefactoring(),
                 new MapRefactoring(),
