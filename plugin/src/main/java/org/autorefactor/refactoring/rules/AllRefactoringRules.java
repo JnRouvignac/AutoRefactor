@@ -159,6 +159,7 @@ public final class AllRefactoringRules {
                 new ImplicitDefaultConstructorRatherThanWrittenOneRefactoring(),
                 new AndroidWakeLockRefactoring(),
                 new AndroidViewHolderRefactoring(),
+                new LogParametersRatherThanLogMessageRefactoring(),
                 new EnumMapRatherThanHashMapRefactoring(),
                 new EnumSetRatherThanHashSetRefactoring(),
                 new RemoveUncheckedThrowsClausesRefactoring(),
