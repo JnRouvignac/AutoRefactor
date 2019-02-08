@@ -160,6 +160,7 @@ public final class AllRefactoringRules {
                 new AndroidWakeLockRefactoring(),
                 new AndroidViewHolderRefactoring(),
                 new LogParametersRatherThanLogMessageRefactoring(),
+                new NamedMethodRatherThanLogLevelParameterRefactoring(),
                 new EnumMapRatherThanHashMapRefactoring(),
                 new EnumSetRatherThanHashSetRefactoring(),
                 new RemoveUncheckedThrowsClausesRefactoring(),
