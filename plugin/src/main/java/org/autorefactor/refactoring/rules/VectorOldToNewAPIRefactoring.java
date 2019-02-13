@@ -72,30 +72,32 @@ public class VectorOldToNewAPIRefactoring extends AbstractRefactoringRule {
     }
 
     @Override
+    public boolean isJavaVersionSupported(Release javaSeRelease) {
+        return javaSeRelease.getMinorVersion() >= 2;
+    }
+
+    @Override
     public boolean visit(MethodInvocation node) {
-        if (ctx.getJavaProjectOptions().getJavaSERelease().isCompatibleWith(Release.javaSE("1.2.0"))) {
-            if (isMethod(node, "java.util.Vector", "elementAt", "int")) {
-                replaceWith(node, "get");
-            } else if (isMethod(node, "java.util.Vector", "addElement", "java.lang.Object")) {
-                replaceWith(node, "add");
-            } else if (isMethod(node, "java.util.Vector", "insertElementAt", "java.lang.Object", "int")) {
-                replaceWithAndSwapArguments(node, "add");
-            } else if (isMethod(node, "java.util.Vector", "copyInto", "java.lang.Object[]")) {
-                replaceWith(node, "toArray");
-            } else if (isMethod(node, "java.util.Vector", "removeAllElements")) {
-                replaceWith(node, "clear");
-            } else if (isMethod(node, "java.util.Vector", "removeElement", "java.lang.Object")) {
-                replaceWithSpecial(node, "remove");
-            } else if (isMethod(node, "java.util.Vector", "removeElementAt", "int")) {
-                replaceWith(node, "remove");
-            } else if (isMethod(node, "java.util.Vector", "setElementAt", "java.lang.Object", "int")) {
-                replaceWithAndSwapArguments(node, "set");
-            } else {
-                return VISIT_SUBTREE;
-            }
-            return DO_NOT_VISIT_SUBTREE;
+        if (isMethod(node, "java.util.Vector", "elementAt", "int")) {
+            replaceWith(node, "get");
+        } else if (isMethod(node, "java.util.Vector", "addElement", "java.lang.Object")) {
+            replaceWith(node, "add");
+        } else if (isMethod(node, "java.util.Vector", "insertElementAt", "java.lang.Object", "int")) {
+            replaceWithAndSwapArguments(node, "add");
+        } else if (isMethod(node, "java.util.Vector", "copyInto", "java.lang.Object[]")) {
+            replaceWith(node, "toArray");
+        } else if (isMethod(node, "java.util.Vector", "removeAllElements")) {
+            replaceWith(node, "clear");
+        } else if (isMethod(node, "java.util.Vector", "removeElement", "java.lang.Object")) {
+            replaceWithSpecial(node, "remove");
+        } else if (isMethod(node, "java.util.Vector", "removeElementAt", "int")) {
+            replaceWith(node, "remove");
+        } else if (isMethod(node, "java.util.Vector", "setElementAt", "java.lang.Object", "int")) {
+            replaceWithAndSwapArguments(node, "set");
+        } else {
+            return VISIT_SUBTREE;
         }
-        return VISIT_SUBTREE;
+        return DO_NOT_VISIT_SUBTREE;
     }
 
     private void replaceWith(final MethodInvocation node, final String newMethodName) {

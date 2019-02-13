@@ -83,15 +83,15 @@ public class UseDiamondOperatorRefactoring extends AbstractRefactoringRule {
         return "It reduces the code to focus the attention on code that matters. It also upgrades legacy code.";
     }
 
-    private boolean isEnabled() {
-        return ctx.getJavaProjectOptions().getJavaSERelease().isCompatibleWith(Release.javaSE("1.7.0"));
+    @Override
+    public boolean isJavaVersionSupported(Release javaSeRelease) {
+        return javaSeRelease.getMinorVersion() >= 7;
     }
 
     @Override
     public boolean visit(ClassInstanceCreation node) {
         final Type type = node.getType();
-        if (isEnabled()
-                && type.isParameterizedType()
+        if (type.isParameterizedType()
                 && node.getAnonymousClassDeclaration() == null
                 && parentAllowsDiamondOperator(node)
                 && canUseDiamondOperator(node, type)) {
