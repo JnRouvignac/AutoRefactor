@@ -149,6 +149,7 @@ public final class AllRefactoringRules {
                 new StaticConstantRatherThanInstanceConstantRefactoring(),
                 new RemoveOverridenAssignmentRefactoring(),
                 new HotSpotIntrinsicedAPIsRefactoring(),
+                new Java7HashRatherThanEclipseJava6HashRefactoring(),
                 new AnnotationRefactoring(),
                 new TryWithResourceRefactoring(),
                 // FIXME it would be nice if it was only enabled when testng jar is detected for the project
