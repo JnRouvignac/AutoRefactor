@@ -37,6 +37,8 @@ import java.util.concurrent.Callable;
 
 import org.autorefactor.environment.EventLoop;
 import org.autorefactor.util.Pair;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.BlockComment;
@@ -46,6 +48,7 @@ import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.LineComment;
 import org.eclipse.jdt.core.dom.StructuralPropertyDescriptor;
 import org.eclipse.jdt.core.dom.rewrite.ASTRewrite;
+import org.eclipse.jdt.core.dom.rewrite.ImportRewrite;
 import org.eclipse.jdt.core.dom.rewrite.ListRewrite;
 import org.eclipse.jdt.core.dom.rewrite.TargetSourceRangeComputer;
 import org.eclipse.jface.text.BadLocationException;
@@ -60,8 +63,10 @@ public class Refactorings {
     private static final String UNTOUCH_COMMENT = "untouchComment";
 
     private final EventLoop eventLoop;
+    private final SubMonitor monitor;
     private boolean hasRefactorings;
     private final ASTRewrite rewrite;
+    private final ImportRewrite importRewrite;
     private final Map<Pair<ASTNode, ChildListPropertyDescriptor>, ListRewrite> listRewriteCache =
             new HashMap<Pair<ASTNode, ChildListPropertyDescriptor>, ListRewrite>();
     private final ASTCommentRewriter commentRewriter;
@@ -74,9 +79,11 @@ public class Refactorings {
      *
      * @param astRoot the compilation unit, root of the AST
      * @param eventLoop the event loop
+     * @param monitor TODO
      */
-    public Refactorings(CompilationUnit astRoot, EventLoop eventLoop) {
+    public Refactorings(CompilationUnit astRoot, EventLoop eventLoop, SubMonitor monitor) {
         this.eventLoop = eventLoop;
+        this.monitor = monitor;
         this.rewrite = ASTRewrite.create(astRoot.getAST());
         this.rewrite.setTargetSourceRangeComputer(new TargetSourceRangeComputer() {
             @Override
@@ -87,6 +94,9 @@ public class Refactorings {
                 return super.computeSourceRange(node);
             }
         });
+
+        this.importRewrite = ImportRewrite.create(astRoot, true);
+
         this.commentRewriter = new ASTCommentRewriter(astRoot);
     }
 
@@ -466,15 +476,20 @@ public class Refactorings {
      *
      * @param document the document to refactor
      * @throws BadLocationException if trying to access a non existing position
+     * @throws CoreException CoreException
      */
-    public void applyTo(final IDocument document) throws BadLocationException {
+    public void applyTo(final IDocument document) throws BadLocationException, CoreException {
         final TextEdit edits = rewrite.rewriteAST(document, null);
+        final TextEdit importEdits = importRewrite.rewriteImports(monitor);
+
         commentRewriter.addEdits(document, edits);
         sourceRewriter.addEdits(document, edits);
-        applyEditsToDocument(edits, document);
+
+        applyEditsToDocument(edits, importEdits, document);
     }
 
-    private void applyEditsToDocument(final TextEdit edits, final IDocument document) throws BadLocationException {
+    private void applyEditsToDocument(final TextEdit edits, final TextEdit importEdits, final IDocument document)
+            throws BadLocationException {
         // Call this operation on the SWT Display Thread with syncExec(),
         // because it changes or adds something to the GUI.
         // Otherwise it would throw an Invalid thread access Exception.
@@ -487,12 +502,22 @@ public class Refactorings {
             public BadLocationException call() throws Exception {
                 try {
                     edits.apply(document);
+                    importEdits.apply(document);
                     return null;
                 } catch (BadLocationException e) {
                     return e;
                 }
             }
         });
+    }
+
+    /**
+     * Gets the ImportRewrite rewrite object.
+     *
+     * @return the ImportRewrite rewrite
+     */
+    public ImportRewrite getImportRewrite() {
+        return importRewrite;
     }
 
     /**

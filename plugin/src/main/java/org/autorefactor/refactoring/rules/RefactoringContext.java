@@ -68,7 +68,7 @@ public class RefactoringContext {
         this.astRoot = astRoot;
         this.monitor = monitor;
         this.environment = environment;
-        this.refactorings = new Refactorings(astRoot, environment.getEventLoop());
+        this.refactorings = new Refactorings(astRoot, environment.getEventLoop(), monitor);
         this.astBuilder = new ASTBuilder(refactorings);
         this.options = options;
     }

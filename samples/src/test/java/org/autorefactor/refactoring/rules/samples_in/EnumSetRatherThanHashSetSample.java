@@ -27,7 +27,6 @@ package org.autorefactor.refactoring.rules.samples_in;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -112,7 +111,7 @@ public class EnumSetRatherThanHashSetSample {
         return set;
     }
 
-    public Set<Example> refactorConstrutorWithEnumSet(EnumSet<Example> s) {
+    public Set<Example> refactorConstrutorWithEnumSet(java.util.EnumSet<Example> s) {
         // Keep this comment
         Set<Example> set = new HashSet<Example>(s);
         return set;
@@ -125,8 +124,8 @@ public class EnumSetRatherThanHashSetSample {
     }
 
     public Set<Example> doNotRefactor() {
-        Set<Example> set = EnumSet.noneOf(Example.class);
-        set.addAll(EnumSet.allOf(Example.class));
+        Set<Example> set = java.util.EnumSet.noneOf(Example.class);
+        set.addAll(java.util.EnumSet.allOf(Example.class));
         return set;
     }
 

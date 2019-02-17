@@ -29,9 +29,9 @@ import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 
 /**
- * An interruptable visitor.
+ * An interruptible visitor.
  */
-public class InterruptableVisitor extends ASTVisitor {
+public class InterruptibleVisitor extends ASTVisitor {
     /**
      * Visit the node.
      *

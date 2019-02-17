@@ -50,7 +50,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.autorefactor.refactoring.ASTBuilder;
-import org.autorefactor.refactoring.InterruptableVisitor;
+import org.autorefactor.refactoring.InterruptibleVisitor;
 import org.autorefactor.refactoring.TypeNameDecider;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
@@ -411,7 +411,7 @@ public abstract class AbstractClassSubstituteRefactoring extends AbstractRefacto
         }
     }
 
-    private class VarOccurrenceVisitor extends InterruptableVisitor {
+    private class VarOccurrenceVisitor extends InterruptibleVisitor {
         private final VariableDeclaration varDecl;
         private final List<SimpleName> varOccurrences = new ArrayList<SimpleName>();
         private boolean isUsedInAnnonymousClass;

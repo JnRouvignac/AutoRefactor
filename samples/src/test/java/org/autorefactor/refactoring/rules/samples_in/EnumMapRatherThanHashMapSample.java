@@ -26,7 +26,6 @@
 package org.autorefactor.refactoring.rules.samples_in;
 
 import java.util.Collections;
-import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -77,10 +76,10 @@ public class EnumMapRatherThanHashMapSample {
         return map;
     }
 
-    public Map<Example, String> refactorConditionalAssignment() {
+    public Map<Example, String> refactorConditionalAssignment(boolean isFeatureEbabled) {
         // Keep this comment
         Map<Example, String> map;
-        map = true ? new HashMap<Example, String>()
+        map = isFeatureEbabled ? new HashMap<Example, String>()
                 : new HashMap<Example, String>();
         return map;
     }
@@ -104,7 +103,7 @@ public class EnumMapRatherThanHashMapSample {
     }
 
     public Map<Example, String> refactorConstrutorWithEnumMap(
-            EnumMap<Example, String> m) {
+            java.util.EnumMap<Example, String> m) {
         // Keep this comment
         Map<Example, String> map = new HashMap<Example, String>(m);
         return map;
@@ -117,8 +116,8 @@ public class EnumMapRatherThanHashMapSample {
     }
 
     public Map<Example, String> doNotRefactor() {
-        Map<Example, String> map = new EnumMap<>(Example.class);
-        map.putAll(new EnumMap<Example, String>(Example.class));
+        Map<Example, String> map = new java.util.EnumMap<>(Example.class);
+        map.putAll(new java.util.EnumMap<Example, String>(Example.class));
         return map;
     }
 

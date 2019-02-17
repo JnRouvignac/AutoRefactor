@@ -86,6 +86,7 @@ import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.IExtendedModifier;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IfStatement;
+import org.eclipse.jdt.core.dom.ImportDeclaration;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.LambdaExpression;
 import org.eclipse.jdt.core.dom.MarkerAnnotation;
@@ -759,6 +760,20 @@ public class ASTBuilder {
         is.setThenStatement(thenStatement);
         is.setElseStatement(elseStatement);
         return is;
+    }
+
+    /**
+     * Builds a new {@link ImportDeclaration} instance.
+     *
+     * @param name the if name
+     * @return a new if statement
+     */
+    public ImportDeclaration import0(Name name) {
+        final ImportDeclaration id = ast.newImportDeclaration();
+        id.setName(name);
+        id.setStatic(false);
+        id.setOnDemand(false);
+        return id;
     }
 
     /**

@@ -39,7 +39,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.autorefactor.refactoring.ASTBuilder;
-import org.autorefactor.refactoring.InterruptableVisitor;
+import org.autorefactor.refactoring.InterruptibleVisitor;
 import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
 import org.eclipse.jdt.core.dom.BreakStatement;
 import org.eclipse.jdt.core.dom.DoStatement;
@@ -132,7 +132,7 @@ public class IfRatherThanWhileAndFallsThroughRefactoring extends AbstractRefacto
         }
     }
 
-    private class BreakVisitor extends InterruptableVisitor {
+    private class BreakVisitor extends InterruptibleVisitor {
         private final WhileStatement root;
         private final List<BreakStatement> breaks = new ArrayList<BreakStatement>();
         private boolean canBeRefactored = true;

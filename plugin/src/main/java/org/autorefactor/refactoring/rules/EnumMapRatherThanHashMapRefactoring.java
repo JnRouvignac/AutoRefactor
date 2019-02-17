@@ -32,6 +32,7 @@ import static org.autorefactor.refactoring.ASTHelper.hasType;
 import static org.autorefactor.refactoring.ASTHelper.instanceOf;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.autorefactor.refactoring.ASTBuilder;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
@@ -72,13 +73,18 @@ public final class EnumMapRatherThanHashMapRefactoring extends
     }
 
     @Override
-    String getImplType() {
+    public String getImplType() {
         return "java.util.HashMap";
     }
 
     @Override
-    String getInterfaceType() {
+    public String getInterfaceType() {
         return "java.util.Map";
+    }
+
+    @Override
+    public String getClassNameToImport() {
+        return "EnumMap";
     }
 
     /**
@@ -94,13 +100,12 @@ public final class EnumMapRatherThanHashMapRefactoring extends
      * @see {@link java.util.HashMap#HashMap(java.util.Map)}
      */
     @Override
-    boolean replace(ClassInstanceCreation cic, Type... types) {
+    boolean maybeReplace(ClassInstanceCreation cic, boolean useImport, AtomicBoolean isImportToBeAdd, Type... types) {
         if (types == null || types.length < 2) {
             return VISIT_SUBTREE;
         }
         Type keyType = types[0];
         Type valueType = types[1];
-        ASTBuilder b = ctx.getASTBuilder();
         List<Expression> arguments = arguments(cic);
         if (!arguments.isEmpty()
                 && isTargetType(arguments.get(0).resolveTypeBinding())
@@ -108,8 +113,16 @@ public final class EnumMapRatherThanHashMapRefactoring extends
                         "java.util.EnumMap")) {
             return VISIT_SUBTREE;
         }
+
+        replace(cic, useImport, isImportToBeAdd, keyType, valueType, arguments);
+        return DO_NOT_VISIT_SUBTREE;
+    }
+
+    private void replace(ClassInstanceCreation cic, boolean useImport, AtomicBoolean isImportToBeAdd, Type keyType,
+            Type valueType, List<Expression> arguments) {
+        ASTBuilder b = ctx.getASTBuilder();
         Expression newParam = resolveParameter(keyType, arguments);
-        Type newType = b.genericType("java.util.EnumMap", b.copy(keyType),
+        Type newType = b.genericType(useImport ? "EnumMap" : "java.util.EnumMap", b.copy(keyType),
                 b.copy(valueType));
         // if there were no type args in original creation (diamond operator),
         // remove them from replacement
@@ -118,7 +131,7 @@ public final class EnumMapRatherThanHashMapRefactoring extends
         }
 
         ctx.getRefactorings().replace(cic, b.new0(newType, newParam));
-        return DO_NOT_VISIT_SUBTREE;
+        isImportToBeAdd.set(useImport);
     }
 
     /**

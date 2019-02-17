@@ -37,6 +37,7 @@ import static org.eclipse.jdt.core.dom.ASTNode.RETURN_STATEMENT;
 import static org.eclipse.jdt.core.dom.ASTNode.VARIABLE_DECLARATION_STATEMENT;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.TypeNameDecider;
@@ -56,10 +57,48 @@ import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
  * Abstract class for replacement other collections with enum as a type <br>
  * with specific enum implementations, e.g. HashMap -> EnumMap
  */
-public abstract class AbstractEnumCollectionReplacementRefactoring extends AbstractRefactoringRule {
+public abstract class AbstractEnumCollectionReplacementRefactoring extends NewClassImportRefactoring {
+    private final class RefactoringWithObjectsClass extends RefactoringWithNewClassImport {
+        public RefactoringWithObjectsClass(RefactoringContext context) {
+            ctx = context;
+        }
+
+        @Override
+        public boolean visit(ClassInstanceCreation node) {
+            final AtomicBoolean isImportToBeAdd = new AtomicBoolean(false);
+            final boolean isSubTreeToVisit =
+                    AbstractEnumCollectionReplacementRefactoring.this.maybeRefactorClassInstanceCreation(node,
+                            true, isImportToBeAdd);
+
+            if (isImportToBeAdd.get()) {
+                setImportToBeAdd(true);
+            }
+
+            return isSubTreeToVisit;
+        }
+    }
+
+    @Override
+    public RefactoringWithObjectsClass getRefactoringClassInstance() {
+        final RefactoringWithObjectsClass refactoringWithNewClassImport = new RefactoringWithObjectsClass(ctx);
+
+        return refactoringWithNewClassImport;
+    }
+
+    @Override
+    public String getPackageNameToImport() {
+        return "java.util";
+    }
+
     @Override
     public boolean visit(ClassInstanceCreation node) {
+        return maybeRefactorClassInstanceCreation(node, isAlreadyImported(node), new AtomicBoolean(false));
+    }
+
+    private boolean maybeRefactorClassInstanceCreation(ClassInstanceCreation node, boolean useImport,
+            AtomicBoolean isImportToBeAdd) {
         Type type = node.getType();
+
         if (isEnabled() && type.isParameterizedType() && creates(node, getImplType())) {
             ASTNode parent = getFirstAncestorOrNull(node, ReturnStatement.class, Assignment.class,
                     VariableDeclarationStatement.class);
@@ -67,13 +106,14 @@ public abstract class AbstractEnumCollectionReplacementRefactoring extends Abstr
                 switch (parent.getNodeType()) {
 
                 case RETURN_STATEMENT:
-                    return handleReturnStatement(node, (ReturnStatement) parent);
+                    return handleReturnStatement(node, (ReturnStatement) parent, useImport, isImportToBeAdd);
 
                 case ASSIGNMENT:
-                    return handleAssignment(node, (Assignment) parent);
+                    return handleAssignment(node, (Assignment) parent, useImport, isImportToBeAdd);
 
                 case VARIABLE_DECLARATION_STATEMENT:
-                    return handleVarDeclarationStatement((VariableDeclarationStatement) parent);
+                    return handleVarDeclarationStatement((VariableDeclarationStatement) parent, useImport,
+                            isImportToBeAdd);
 
                 // TODO: probably, it can be applied to method invocation for
                 // some cases
@@ -83,6 +123,7 @@ public abstract class AbstractEnumCollectionReplacementRefactoring extends Abstr
                 }
             }
         }
+
         return VISIT_SUBTREE;
     }
 
@@ -90,58 +131,77 @@ public abstract class AbstractEnumCollectionReplacementRefactoring extends Abstr
 
     abstract String getInterfaceType();
 
-    abstract boolean replace(ClassInstanceCreation node, Type... types);
+    abstract boolean maybeReplace(ClassInstanceCreation node, boolean useImport, AtomicBoolean isImportToBeAdd,
+            Type... types);
 
-    private boolean handleReturnStatement(final ClassInstanceCreation node, final ReturnStatement rs) {
+    private boolean handleReturnStatement(final ClassInstanceCreation node, final ReturnStatement rs, boolean useImport,
+            AtomicBoolean isImportToBeAdd) {
         MethodDeclaration md = getAncestorOrNull(node, MethodDeclaration.class);
+
         if (md != null) {
             Type returnType = md.getReturnType2();
+
             if (isTargetType(returnType)) {
                 List<Type> typeArguments = typeArgs(returnType);
+
                 if (!typeArguments.isEmpty() && isEnum(typeArguments.get(0))) {
-                    return replace(node, typeArguments.toArray(new Type[] {}));
+                    return maybeReplace(node, useImport, isImportToBeAdd, typeArguments.toArray(new Type[] {}));
                 }
             }
         }
+
         return VISIT_SUBTREE;
     }
 
-    private boolean handleAssignment(final ClassInstanceCreation node, final Assignment a) {
+    private boolean handleAssignment(final ClassInstanceCreation node, final Assignment a, boolean useImport,
+            AtomicBoolean isImportToBeAdd) {
         Expression lhs = a.getLeftHandSide();
+
         if (isTargetType(lhs.resolveTypeBinding())) {
             ITypeBinding[] typeArguments = lhs.resolveTypeBinding().getTypeArguments();
+
             if (typeArguments.length > 0 && typeArguments[0].isEnum()) {
                 final TypeNameDecider typeNameDecider = new TypeNameDecider(lhs);
                 ASTBuilder b = ctx.getASTBuilder();
                 Type[] types = new Type[typeArguments.length];
+
                 for (int i = 0; i < types.length; i++) {
                     types[i] = b.toType(typeArguments[i], typeNameDecider);
                 }
-                return replace(node, types);
+
+                return maybeReplace(node, useImport, isImportToBeAdd, types);
             }
         }
+
         return VISIT_SUBTREE;
     }
 
-    private boolean handleVarDeclarationStatement(final VariableDeclarationStatement node) {
+    private boolean handleVarDeclarationStatement(final VariableDeclarationStatement node, boolean useImport,
+            AtomicBoolean isImportToBeAdd) {
         Type type = node.getType();
+
         if (type.isParameterizedType() && isTargetType(type)) {
             ParameterizedType ptype = (ParameterizedType) type;
             List<Type> typeArguments = typeArguments(ptype);
+
             if (!typeArguments.isEmpty() && typeArguments.get(0).resolveBinding().isEnum()) {
                 List<VariableDeclarationFragment> fragments = fragments(node);
+
                 for (VariableDeclarationFragment vdf:fragments) {
                     Expression initExpr = vdf.getInitializer();
+
                     if (initExpr != null) {
                         initExpr = removeParentheses(initExpr);
+
                         if (creates(initExpr, getImplType())) {
-                            return replace((ClassInstanceCreation) initExpr,
-                                    typeArguments.toArray(new Type[typeArguments.size()]));
+                            return maybeReplace((ClassInstanceCreation) initExpr,
+                                    useImport, isImportToBeAdd, typeArguments.toArray(new Type[typeArguments.size()]));
                         }
                     }
                 }
             }
         }
+
         return VISIT_SUBTREE;
     }
 

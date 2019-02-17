@@ -42,7 +42,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.autorefactor.refactoring.ASTBuilder;
-import org.autorefactor.refactoring.InterruptableVisitor;
+import org.autorefactor.refactoring.InterruptibleVisitor;
 import org.autorefactor.refactoring.Refactorings;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Assignment;
@@ -66,7 +66,7 @@ import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
 /** See {@link #getDescription()} method. */
 public class BreakRatherThanPassiveIterationsRefactoring extends AbstractRefactoringRule {
-    private static final class SideEffectVisitor extends InterruptableVisitor {
+    private static final class SideEffectVisitor extends InterruptibleVisitor {
         private final Set<String> localVariableNames;
         private boolean hasSideEffect = false;
 

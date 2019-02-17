@@ -28,50 +28,51 @@ package org.autorefactor.refactoring.rules.samples_out;
 import java.util.AbstractSet;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils.*;
 
 public class AllInOneMethodRatherThanLoopSample extends ArrayList<java.util.Date> {
-
     public void replaceAddWithForLoopByCollectionsAddAll(
             List<? super java.util.Date> output, java.util.Date[] elems1, java.sql.Date[] elems2) {
         // Keep this comment
-        java.util.Collections.addAll(output, elems1);
-        java.util.Collections.addAll(output, elems2);
+        Collections.addAll(output, elems1);
+        Collections.addAll(output, elems2);
     }
 
     public void replaceAddWithForLoopByCollectionsAddAll(
             java.util.Date[] dates) {
         // Keep this comment
-        java.util.Collections.addAll(this, dates);
+        Collections.addAll(this, dates);
     }
 
     public void replaceAddWithForEachByCollectionsAddAll(
             List<? super java.util.Date> output, java.util.Date[] elems1, java.sql.Date[] elems2) {
         // Keep this comment
-        java.util.Collections.addAll(output, elems1);
-        java.util.Collections.addAll(output, elems2);
+        Collections.addAll(output, elems1);
+        Collections.addAll(output, elems2);
     }
 
     public void replaceAddWithForEachByCollectionsAddAll(
             java.util.Date[] dates) {
         // Keep this comment
-        java.util.Collections.addAll(this, dates);
+        Collections.addAll(this, dates);
     }
 
     public void replaceLoopOnCollectionAsExpressionWithArray(
             Map<String, List<String>> mapToFill, String[] inputList) {
         // Keep this comment
-        java.util.Collections.addAll(mapToFill.get("foo"), inputList);
+        Collections.addAll(mapToFill.get("foo"), inputList);
     }
 
     public void replaceLoopOnRawCollectionWithArray(
             List colToFill, String[] inputList) {
         // Keep this comment
-        java.util.Collections.addAll(colToFill, inputList);
+        Collections.addAll(colToFill, inputList);
     }
 
     public void replaceLoopOnCollectionAsExpressionWithList(

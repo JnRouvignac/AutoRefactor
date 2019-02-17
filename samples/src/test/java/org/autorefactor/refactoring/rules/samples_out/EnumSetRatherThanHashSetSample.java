@@ -39,13 +39,13 @@ public class EnumSetRatherThanHashSetSample {
 
     public Set<Example> refactorVariableDeclarationStatement() {
         // Keep this comment
-        Set<Example> set = java.util.EnumSet.noneOf(Example.class);
+        Set<Example> set = EnumSet.noneOf(Example.class);
         return set;
     }
 
     public Set<Example> refactorVariableDeclarationStatementWithDiamond() {
         // Keep this comment
-        Set<Example> set = java.util.EnumSet.noneOf(Example.class);
+        Set<Example> set = EnumSet.noneOf(Example.class);
         return set;
     }
 
@@ -56,12 +56,12 @@ public class EnumSetRatherThanHashSetSample {
 
     public Set<Example> refactorReturnStatement() {
         // Keep this comment
-        return java.util.EnumSet.noneOf(Example.class);
+        return EnumSet.noneOf(Example.class);
     }
 
     public Set<Example> refactorReturnStatementWithDiamondOperator() {
         // Keep this comment
-        return java.util.EnumSet.noneOf(Example.class);
+        return EnumSet.noneOf(Example.class);
     }
 
     public Set doNotRefactorRawReturnStatement() {
@@ -70,14 +70,14 @@ public class EnumSetRatherThanHashSetSample {
 
     public Set<Example> refactorVariableDeclarationStatementWithParentheses() {
         // Keep this comment
-        Set<Example> set = ((java.util.EnumSet.noneOf(Example.class)));
+        Set<Example> set = ((EnumSet.noneOf(Example.class)));
         return set;
     }
 
     public Set<Example> refactorAssignment() {
         // Keep this comment
         Set<Example> set;
-        set = java.util.EnumSet.noneOf(Example.class);
+        set = EnumSet.noneOf(Example.class);
         return set;
     }
 
@@ -90,20 +90,20 @@ public class EnumSetRatherThanHashSetSample {
     public Set<Example> refactorConditionalAssignment() {
         // Keep this comment
         Set<Example> set;
-        set = true ? java.util.EnumSet.noneOf(Example.class) : java.util.EnumSet
+        set = true ? EnumSet.noneOf(Example.class) : EnumSet
                                                             .noneOf(Example.class);
         return set;
     }
 
     public Set<Example> refactorConstrutorWithInt() {
         // Keep this comment
-        Set<Example> set = java.util.EnumSet.noneOf(Example.class);
+        Set<Example> set = EnumSet.noneOf(Example.class);
         return set;
     }
 
     public Set<Example> refactorConstrutorWithIntAndFloat() {
         // Keep this comment
-        Set<Example> set = java.util.EnumSet.noneOf(Example.class);
+        Set<Example> set = EnumSet.noneOf(Example.class);
         return set;
     }
 
@@ -113,9 +113,9 @@ public class EnumSetRatherThanHashSetSample {
         return set;
     }
 
-    public Set<Example> refactorConstrutorWithEnumSet(EnumSet<Example> s) {
+    public Set<Example> refactorConstrutorWithEnumSet(java.util.EnumSet<Example> s) {
         // Keep this comment
-        Set<Example> set = java.util.EnumSet.copyOf(s);
+        Set<Example> set = EnumSet.copyOf(s);
         return set;
     }
 
@@ -126,8 +126,8 @@ public class EnumSetRatherThanHashSetSample {
     }
 
     public Set<Example> doNotRefactor() {
-        Set<Example> set = EnumSet.noneOf(Example.class);
-        set.addAll(EnumSet.allOf(Example.class));
+        Set<Example> set = java.util.EnumSet.noneOf(Example.class);
+        set.addAll(java.util.EnumSet.allOf(Example.class));
         return set;
     }
 

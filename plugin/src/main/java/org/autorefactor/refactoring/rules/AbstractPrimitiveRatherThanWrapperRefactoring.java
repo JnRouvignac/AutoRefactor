@@ -45,7 +45,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.autorefactor.refactoring.ASTBuilder;
-import org.autorefactor.refactoring.InterruptableVisitor;
+import org.autorefactor.refactoring.InterruptibleVisitor;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Block;
@@ -240,7 +240,7 @@ public abstract class AbstractPrimitiveRatherThanWrapperRefactoring extends Abst
         return false;
     }
 
-    private class VarOccurrenceVisitor extends InterruptableVisitor {
+    private class VarOccurrenceVisitor extends InterruptibleVisitor {
         private final VariableDeclarationFragment varDecl;
 
         private boolean isPrimitiveAllowed = true;

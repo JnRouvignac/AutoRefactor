@@ -40,6 +40,7 @@ import static org.autorefactor.refactoring.ASTHelper.getCalledType;
 import static org.autorefactor.refactoring.ForLoopHelper.iterateOverContainer;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.ForLoopHelper.ForLoopContent;
@@ -56,7 +57,41 @@ import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.Statement;
 
 /** See {@link #getDescription()} method. */
-public class AllInOneMethodRatherThanLoopRefactoring extends AbstractRefactoringRule {
+public class AllInOneMethodRatherThanLoopRefactoring extends NewClassImportRefactoring {
+    private final class RefactoringWithObjectsClass extends RefactoringWithNewClassImport {
+        public RefactoringWithObjectsClass(RefactoringContext context) {
+            ctx = context;
+        }
+
+        @Override
+        public boolean visit(EnhancedForStatement node) {
+            final AtomicBoolean isImportToBeAdd = new AtomicBoolean(false);
+            final boolean isSubTreeToVisit =
+                    AllInOneMethodRatherThanLoopRefactoring.this.maybeRefactorEnhancedForStatement(node,
+                            true, isImportToBeAdd);
+
+            if (isImportToBeAdd.get()) {
+                setImportToBeAdd(true);
+            }
+
+            return isSubTreeToVisit;
+        }
+
+        @Override
+        public boolean visit(ForStatement node) {
+            final AtomicBoolean isImportToBeAdd = new AtomicBoolean(false);
+            final boolean isSubTreeToVisit =
+                    AllInOneMethodRatherThanLoopRefactoring.this.maybeRefactorForStatement(node,
+                            true, isImportToBeAdd);
+
+            if (isImportToBeAdd.get()) {
+                setImportToBeAdd(true);
+            }
+
+            return isSubTreeToVisit;
+        }
+    }
+
     /**
      * Get the name.
      *
@@ -89,9 +124,32 @@ public class AllInOneMethodRatherThanLoopRefactoring extends AbstractRefactoring
     }
 
     @Override
+    public RefactoringWithObjectsClass getRefactoringClassInstance() {
+        final RefactoringWithObjectsClass refactoringWithNewClassImport = new RefactoringWithObjectsClass(ctx);
+
+        return refactoringWithNewClassImport;
+    }
+
+    @Override
+    public String getPackageNameToImport() {
+        return "java.util";
+    }
+
+    @Override
+    public String getClassNameToImport() {
+        return "Collections";
+    }
+
+    @Override
     public boolean visit(EnhancedForStatement node) {
+        return maybeRefactorEnhancedForStatement(node, isAlreadyImported(node), new AtomicBoolean(false));
+    }
+
+    private boolean maybeRefactorEnhancedForStatement(EnhancedForStatement node, boolean useImport,
+            AtomicBoolean isImportToBeAdd) {
         final Expression iterable = node.getExpression();
         final List<Statement> stmts = asList(node.getBody());
+
         if (stmts.size() != 1) {
             return VISIT_SUBTREE;
         }
@@ -111,18 +169,21 @@ public class AllInOneMethodRatherThanLoopRefactoring extends AbstractRefactoring
                     && isMethod(mi, "java.util.Collection", "add", "java.lang.Object")
                     && areTypeCompatible(getCalledType(mi), iterable.resolveTypeBinding())
                     && isSameLocalVariable(foreachVariable, arg0(mi))) {
-                replaceWithCollectionsAddAll(node, iterable, mi);
+                replaceWithCollectionsAddAll(node, iterable, mi, useImport);
+                isImportToBeAdd.set(useImport);
                 return DO_NOT_VISIT_SUBTREE;
             }
         }
+
         return VISIT_SUBTREE;
     }
 
-    private void replaceWithCollectionsAddAll(Statement node, Expression iterable, MethodInvocation mi) {
+    private void replaceWithCollectionsAddAll(Statement node, Expression iterable, MethodInvocation mi,
+            boolean useImport) {
         ASTBuilder b = ctx.getASTBuilder();
         ctx.getRefactorings().replace(node,
                 b.toStmt(b.invoke(
-                        b.name("java", "util", "Collections"),
+                        useImport ? b.name("Collections") : b.name("java", "util", "Collections"),
                         "addAll",
                         mi.getExpression() != null ? b.copy(mi.getExpression()) : b.this0(),
                         b.copy(iterable))));
@@ -139,8 +200,13 @@ public class AllInOneMethodRatherThanLoopRefactoring extends AbstractRefactoring
 
     @Override
     public boolean visit(ForStatement node) {
+        return maybeRefactorForStatement(node, isAlreadyImported(node), new AtomicBoolean(false));
+    }
+
+    private boolean maybeRefactorForStatement(ForStatement node, boolean useImport, AtomicBoolean isImportToBeAdd) {
         final ForLoopContent loopContent = iterateOverContainer(node);
         final List<Statement> stmts = asList(node.getBody());
+
         if (loopContent != null
                 && loopContent.getLoopVariable() != null
                 && stmts.size() == 1) {
@@ -150,6 +216,7 @@ public class AllInOneMethodRatherThanLoopRefactoring extends AbstractRefactoring
             // As we replace only one, there should be no more than one occurrence
             if (getVariableUseCount(loopVariableName, node.getBody()) == 1) {
                 final MethodInvocation mi = asExpression(stmts.get(0), MethodInvocation.class);
+
                 switch (loopContent.getContainerType()) {
                 case COLLECTION:
                     if (isMethod(mi, "java.util.Collection", "add", "java.lang.Object")) {
@@ -166,7 +233,8 @@ public class AllInOneMethodRatherThanLoopRefactoring extends AbstractRefactoring
                         final Expression addArg0 = arg0(mi);
                         final ArrayAccess aa = as(addArg0, ArrayAccess.class);
                         if (isSameVariable(loopContent, aa)) {
-                            replaceWithCollectionsAddAll(node, loopContent.getContainerVariable(), mi);
+                            replaceWithCollectionsAddAll(node, loopContent.getContainerVariable(), mi, useImport);
+                            isImportToBeAdd.set(useImport);
                             return DO_NOT_VISIT_SUBTREE;
                         }
                     }

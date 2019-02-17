@@ -215,7 +215,7 @@ public final class ASTHelper {
         }
     }
 
-    private static final class ExprActivityVisitor extends InterruptableVisitor {
+    private static final class ExprActivityVisitor extends InterruptibleVisitor {
         private ExprActivity activityLevel = ExprActivity.PASSIVE;
 
         public ExprActivity getActivityLevel() {
