@@ -128,6 +128,7 @@ public final class AllRefactoringRules {
                 new EntrySetRatherThanKeySetAndValueSearchRefactoring(),
                 new MethodOnMapRatherThanMethodOnKeySetRefactoring(),
                 new NoAssignmentInIfConditionRefactoring(),
+                new DeclarationOutsideLoopRatherThanInsideRefactoring(),
                 new IfElseIfRefactoring(),
                 new CommonIfInIfElseRefactoring(),
                 // TODO JNR implement

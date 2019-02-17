@@ -204,6 +204,12 @@ public final class ASTHelper {
         }
 
         @Override
+        public boolean visit(SingleVariableDeclaration node) {
+            variableNames.add(node.getName().getIdentifier());
+            return VISIT_SUBTREE;
+        }
+
+        @Override
         public boolean visit(VariableDeclarationFragment node) {
             variableNames.add(node.getName().getIdentifier());
             return VISIT_SUBTREE;
