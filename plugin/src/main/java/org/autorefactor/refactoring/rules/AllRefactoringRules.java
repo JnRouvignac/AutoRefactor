@@ -119,6 +119,7 @@ public final class AllRefactoringRules {
                 new CollectionContainsRefactoring(),
                 new CollectionRefactoring(),
                 new AllInOneMethodRatherThanLoopRefactoring(),
+                new ObjectsEqualsRatherThanEqualsAndNullCheckRefactoring(),
                 new BreakRatherThanPassiveIterationsRefactoring(),
                 new UpdateSetRatherThanTestingFirstRefactoring(),
                 new IsEmptyRatherThanSizeRefactoring(),
@@ -148,8 +149,8 @@ public final class AllRefactoringRules {
                 new RemoveFieldsDefaultValuesRefactoring(),
                 new StaticConstantRatherThanInstanceConstantRefactoring(),
                 new RemoveOverridenAssignmentRefactoring(),
-                new HotSpotIntrinsicedAPIsRefactoring(),
                 new Java7HashRatherThanEclipseJava6HashRefactoring(),
+                new HotSpotIntrinsicedAPIsRefactoring(),
                 new AnnotationRefactoring(),
                 new TryWithResourceRefactoring(),
                 // FIXME it would be nice if it was only enabled when testng jar is detected for the project
