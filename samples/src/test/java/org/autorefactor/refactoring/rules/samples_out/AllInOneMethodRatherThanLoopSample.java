@@ -34,7 +34,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils.*;
 
 public class AllInOneMethodRatherThanLoopSample extends ArrayList<java.util.Date> {
     public void replaceAddWithForLoopByCollectionsAddAll(
