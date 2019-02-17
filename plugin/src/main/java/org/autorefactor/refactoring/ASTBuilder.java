@@ -380,6 +380,7 @@ public class ASTBuilder {
      * @param nodeToCopy the node to copy
      * @return a copy of the node
      */
+    @SuppressWarnings("unchecked")
     public <T extends ASTNode> T copy(T nodeToCopy) {
         if (nodeToCopy.getNodeType() == ARRAY_TYPE) {
             return (T) copyType((Type) nodeToCopy);
@@ -1046,7 +1047,6 @@ public class ASTBuilder {
         return cic;
     }
 
-    @SuppressWarnings("unchecked")
     private <T extends ASTNode> void addAll(List<T> whereToAdd, T... toAdd) {
         if (!isEmptyRangeCopy(toAdd)) {
             Collections.addAll(whereToAdd, toAdd);
