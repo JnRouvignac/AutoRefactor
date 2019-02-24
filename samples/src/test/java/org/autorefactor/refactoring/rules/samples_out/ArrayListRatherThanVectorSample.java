@@ -25,6 +25,7 @@
  */
 package org.autorefactor.refactoring.rules.samples_out;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Vector;
@@ -35,33 +36,33 @@ public class ArrayListRatherThanVectorSample {
 
     public void replaceVectorInstanceCreation() {
         // Keep this comment
-        Object[] stringArray = new java.util.ArrayList<String>().toArray();
+        Object[] stringArray = new ArrayList<String>().toArray();
         // Keep this comment too
-        int size = new java.util.ArrayList<String>(10).size();
+        int size = new ArrayList<String>(10).size();
     }
 
     public void replaceRawVector() {
         // Keep this comment
-        Object[] objectArray = new java.util.ArrayList().toArray();
+        Object[] objectArray = new ArrayList().toArray();
         // Keep this comment too
-        int size = new java.util.ArrayList(10).size();
+        int size = new ArrayList(10).size();
     }
 
     public void replaceFullyQualifiedVector() {
         // Keep this comment
-        Object[] dateArray = new java.util.ArrayList<Date>().toArray();
+        Object[] dateArray = new ArrayList<Date>().toArray();
         // Keep this comment too
-        int size = new java.util.ArrayList(10).size();
+        int size = new ArrayList(10).size();
     }
 
     public void replaceVectorVariableDeclaration() {
         // Keep this comment
-        java.util.ArrayList<String> list = new java.util.ArrayList<String>();
+        ArrayList<String> list = new ArrayList<String>();
     }
 
     public void replaceCollectionVariableDeclaration() {
         // Keep this comment
-        Collection<String> list = new java.util.ArrayList<String>();
+        Collection<String> list = new ArrayList<String>();
     }
 
     public void doNotReplaceInterface() {
@@ -71,41 +72,41 @@ public class ArrayListRatherThanVectorSample {
 
     public void replaceVectorVariableUse() {
         // Keep this comment
-        java.util.ArrayList<String> list = new java.util.ArrayList<String>();
+        ArrayList<String> list = new ArrayList<String>();
         // Keep this comment too
         list.add("bar");
     }
 
     public void replaceCollectionVariableUse() {
         // Keep this comment
-        Collection<String> list = new java.util.ArrayList<String>();
+        Collection<String> list = new ArrayList<String>();
         // Keep this comment too
         list.add("bar");
     }
 
     public void refactorWithListMethod() {
         // Keep this comment
-        java.util.ArrayList<Observable> list = new java.util.ArrayList<Observable>();
+        ArrayList<Observable> list = new ArrayList<Observable>();
         // Keep this comment too
         list.toArray(new Observable[0]);
     }
 
     public void refactorWithCollectionMethod() {
         // Keep this comment
-        Collection<Observable> list = new java.util.ArrayList<Observable>();
+        Collection<Observable> list = new ArrayList<Observable>();
         // Keep this comment too
         list.toArray();
     }
 
     public String replaceVectorWithLoop(List<Date> dates) {
         // Keep this comment
-        java.util.ArrayList<Date> list = new java.util.ArrayList<Date>();
+        ArrayList<Date> list = new ArrayList<Date>();
         for (Date date : dates) {
             list.add(date);
         }
 
         // Keep this comment too
-        java.util.ArrayList<Date> secondList = new java.util.ArrayList<Date>();
+        ArrayList<Date> secondList = new ArrayList<Date>();
         for (; list.isEmpty(); list.remove(0)) {
             secondList.add(list.get(0));
         }
@@ -115,13 +116,13 @@ public class ArrayListRatherThanVectorSample {
 
     public Observable[] replaceCollectionWithLoop(List<Date> dates) {
         // Keep this comment
-        Collection<Date> list = new java.util.ArrayList<Date>();
+        Collection<Date> list = new ArrayList<Date>();
         for (Date date : dates) {
             list.add(date);
         }
 
         // Keep this comment too
-        Collection<String> secondList = new java.util.ArrayList<String>();
+        Collection<String> secondList = new ArrayList<String>();
         for (; list.isEmpty(); list.remove(0)) {
             secondList.add(list.toString());
         }
@@ -131,35 +132,35 @@ public class ArrayListRatherThanVectorSample {
 
     public void replaceVectorWithModifier() {
         // Keep this comment
-        final java.util.ArrayList<String> list = new java.util.ArrayList<String>();
+        final ArrayList<String> list = new ArrayList<String>();
         list.add("bar");
     }
 
     public void replaceCollectionWithModifier() {
         // Keep this comment
-        final Collection<String> list = new java.util.ArrayList<String>();
+        final Collection<String> list = new ArrayList<String>();
         list.add("bar");
     }
 
     public void replaceVectorWithParameter() {
         // Keep this comment
-        java.util.ArrayList<String> list = new java.util.ArrayList<String>(10);
+        ArrayList<String> list = new ArrayList<String>(10);
         list.add("bar");
     }
 
     public void replaceCollectionWithParameter() {
         // Keep this comment
-        Collection<String> list = new java.util.ArrayList<String>(10);
+        Collection<String> list = new ArrayList<String>(10);
         list.add("bar");
     }
 
     public Object[] replaceReassignedVector() {
         // Keep this comment
-        java.util.ArrayList<String> list1 = new java.util.ArrayList<String>();
+        ArrayList<String> list1 = new ArrayList<String>();
         list1.add("FOO");
 
         // Keep this comment too
-        java.util.ArrayList<String> list2 = list1;
+        ArrayList<String> list2 = list1;
         list2.add("BAR");
 
         return list2.toArray();
@@ -167,7 +168,7 @@ public class ArrayListRatherThanVectorSample {
 
     public Object[] replaceReassignedCollection() {
         // Keep this comment
-        Collection<String> list1 = new java.util.ArrayList<String>();
+        Collection<String> list1 = new ArrayList<String>();
         list1.add("FOO");
 
         // Keep this comment too
@@ -197,7 +198,7 @@ public class ArrayListRatherThanVectorSample {
 
     public void replaceOldMethod() {
         // Keep this comment
-        java.util.ArrayList<Integer> list = new java.util.ArrayList<Integer>();
+        ArrayList<Integer> list = new ArrayList<Integer>();
         // Keep this comment too
         list.add(42);
         list.get(0);
@@ -223,12 +224,12 @@ public class ArrayListRatherThanVectorSample {
 
     public void replaceVectorWithRunnable() {
         // Keep this comment
-        final java.util.ArrayList<String> list = new java.util.ArrayList<String>();
+        final ArrayList<String> list = new ArrayList<String>();
         new Runnable() {
 
             @Override
             public void run() {
-                final java.util.ArrayList<String> localList = new java.util.ArrayList<String>();
+                final ArrayList<String> localList = new ArrayList<String>();
                 localList.add("Local, it's safe.");
             }
         };
@@ -236,12 +237,12 @@ public class ArrayListRatherThanVectorSample {
 
     public void replaceCollectionWithRunnable() {
         // Keep this comment
-        final Collection<String> list = new java.util.ArrayList<String>();
+        final Collection<String> list = new ArrayList<String>();
         new Runnable() {
 
             @Override
             public void run() {
-                final Collection<String> localList = new java.util.ArrayList<String>();
+                final Collection<String> localList = new ArrayList<String>();
                 localList.add("Local, it's safe.");
             }
         };

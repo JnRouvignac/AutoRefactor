@@ -25,16 +25,14 @@
  */
 package org.autorefactor.refactoring.rules.all.samples_out;
 
-import java.util.Date;
-import java.util.List;
+import org.testng.collections.Objects;
 
-public class UseCollectionsWhileNestedClassConflictsSample {
-    public class Collections {
-    }
+public class UseObjectsWhileOtherImportConflictsSample {
+    private Objects testNGObject;
 
-    public void replaceAddWithForLoopByCollectionsAddAll(
-            List<? super Date> output, Date[] elems1) {
+    @Override
+    public int hashCode() {
         // Keep this comment
-        java.util.Collections.addAll(output, elems1);
+        return java.util.Objects.hash(testNGObject);
     }
 }

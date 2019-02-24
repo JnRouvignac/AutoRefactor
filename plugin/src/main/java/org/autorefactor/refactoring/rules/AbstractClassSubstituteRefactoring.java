@@ -47,7 +47,9 @@ import static org.eclipse.jdt.core.dom.ASTNode.VARIABLE_DECLARATION_FRAGMENT;
 import static org.eclipse.jdt.core.dom.ASTNode.VARIABLE_DECLARATION_STATEMENT;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.InterruptibleVisitor;
@@ -65,8 +67,34 @@ import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.VariableDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
+
 /** See {@link #getDescription()} method. */
-public abstract class AbstractClassSubstituteRefactoring extends AbstractRefactoringRule {
+public abstract class AbstractClassSubstituteRefactoring extends NewClassImportRefactoring {
+    private final class RefactoringWithObjectsClass extends RefactoringWithNewClassImport {
+        public RefactoringWithObjectsClass(RefactoringContext context) {
+            ctx = context;
+        }
+
+        @Override
+        public boolean visit(Block node) {
+            final boolean isSubTreeToVisit =
+                    AbstractClassSubstituteRefactoring.this.maybeRefactorBlock(node,
+                            getClassesToUseWithImport(), getImportsToAdd());
+
+            return isSubTreeToVisit;
+        }
+    }
+
+    @Override
+    public RefactoringWithNewClassImport getRefactoringClassInstance() {
+        return new RefactoringWithObjectsClass(ctx);
+    }
+
+    @Override
+    public Set<String> getClassesToImport() {
+        return new HashSet<String>(0);
+    }
+
     /**
      * Get the existing class canonical name.
      *
@@ -159,13 +187,22 @@ public abstract class AbstractClassSubstituteRefactoring extends AbstractRefacto
      * @param b The builder.
      * @param origType The original type
      * @param originalExpr The original expression
+     * @param classesToUseWithImport The classes that should be used with simple name.
+     * @param importsToAdd The imports that need to be added during this refactoring.
      * @return the substitute type or null if the class should be the same.
      */
-    protected Type substituteType(final ASTBuilder b, final Type origType, final ASTNode originalExpr) {
+    protected Type substituteType(final ASTBuilder b, final Type origType, final ASTNode originalExpr,
+            final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
         final ITypeBinding origTypeBinding = origType.resolveBinding();
         final String origRawType = origTypeBinding.getErasure().getQualifiedName();
-        final String substitutingClassName = getSubstitutingClassName(origRawType);
+        String substitutingClassName = getSubstitutingClassName(origRawType);
+
         if (substitutingClassName != null) {
+            if (classesToUseWithImport.contains(substitutingClassName)) {
+                importsToAdd.add(substitutingClassName);
+                substitutingClassName = getSimpleName(substitutingClassName);
+            }
+
             final TypeNameDecider typeNameDecider = new TypeNameDecider(originalExpr);
 
             if (origTypeBinding.isParameterizedType()) {
@@ -199,6 +236,20 @@ public abstract class AbstractClassSubstituteRefactoring extends AbstractRefacto
 
     @Override
     public boolean visit(Block node) {
+        return maybeRefactorBlock(node, getAlreadyImportedClasses(node), new HashSet<String>());
+    }
+
+    /**
+     * Maybe refactor the block.
+     *
+     * @param node The node
+     * @param classesToUseWithImport The classes to use with import
+     * @param importsToAdd The imports to add
+     * @return True to visit subtree
+     */
+    protected boolean maybeRefactorBlock(final Block node,
+            final Set<String> classesToUseWithImport,
+            final Set<String> importsToAdd) {
         final ObjectInstantiationVisitor classCreationVisitor = new ObjectInstantiationVisitor(node);
         node.accept(classCreationVisitor);
 
@@ -210,7 +261,7 @@ public abstract class AbstractClassSubstituteRefactoring extends AbstractRefacto
                     && canBeRefactored(node, instanceCreation, instanceCreation.resolveTypeBinding(), varDecls,
                             methodCallsToRefactor)
                     && canCodeBeRefactored()) {
-                replaceClass(instanceCreation, varDecls, methodCallsToRefactor);
+                replaceClass(instanceCreation, varDecls, methodCallsToRefactor, classesToUseWithImport, importsToAdd);
                 return DO_NOT_VISIT_SUBTREE;
             }
         }
@@ -267,11 +318,13 @@ public abstract class AbstractClassSubstituteRefactoring extends AbstractRefacto
 
     private void replaceClass(final ClassInstanceCreation originalInstanceCreation,
             final List<VariableDeclaration> variableDecls,
-            final List<MethodInvocation> methodCallsToRefactor) {
+            final List<MethodInvocation> methodCallsToRefactor, final Set<String> classesToUseWithImport,
+            final Set<String> importsToAdd) {
         final ASTBuilder b = ctx.getASTBuilder();
+        final Type substituteType = substituteType(b, originalInstanceCreation.getType(), originalInstanceCreation,
+                classesToUseWithImport,
+                importsToAdd);
 
-        final Type substituteType = substituteType(b, originalInstanceCreation.getType(),
-                originalInstanceCreation);
         if (substituteType != null) {
             ctx.getRefactorings().replace(originalInstanceCreation.getType(),
                     substituteType);
@@ -288,7 +341,10 @@ public abstract class AbstractClassSubstituteRefactoring extends AbstractRefacto
             final VariableDeclarationStatement oldDeclareStmt =
                     (VariableDeclarationStatement) variableDecl.getParent();
             final Type substituteVarType = substituteType(b, oldDeclareStmt.getType(),
-                    (ASTNode) oldDeclareStmt.fragments().get(0));
+                    (ASTNode) oldDeclareStmt.fragments().get(0),
+                    classesToUseWithImport,
+                    importsToAdd);
+
             if (substituteVarType != null) {
                 ctx.getRefactorings().replace(oldDeclareStmt.getType(),
                         substituteVarType);

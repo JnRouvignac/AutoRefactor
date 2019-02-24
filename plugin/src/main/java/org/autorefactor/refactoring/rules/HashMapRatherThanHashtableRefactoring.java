@@ -26,9 +26,12 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.Release;
@@ -94,6 +97,11 @@ public class HashMapRatherThanHashtableRefactoring extends AbstractClassSubstitu
     @Override
     protected String[] getExistingClassCanonicalName() {
         return new String[] {"java.util.Hashtable"};
+    }
+
+    @Override
+    public Set<String> getClassesToImport() {
+        return new HashSet<String>(Arrays.asList("java.util.HashMap"));
     }
 
     @Override

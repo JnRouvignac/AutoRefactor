@@ -30,8 +30,10 @@ import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
 import static org.autorefactor.refactoring.ASTHelper.arguments;
 import static org.autorefactor.refactoring.ASTHelper.instanceOf;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.Set;
 
 import org.autorefactor.refactoring.ASTBuilder;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
@@ -84,8 +86,8 @@ public final class EnumSetRatherThanHashSetRefactoring extends
     }
 
     @Override
-    public String getClassNameToImport() {
-        return "EnumSet";
+    public Set<String> getClassesToImport() {
+        return new HashSet<String>(Arrays.asList("java.util.EnumSet"));
     }
 
     /**
@@ -104,30 +106,36 @@ public final class EnumSetRatherThanHashSetRefactoring extends
      * @see java.util.EnumSet#noneOf(Class) <br>
      */
     @Override
-    boolean maybeReplace(ClassInstanceCreation cic, boolean useImport, AtomicBoolean isImportToBeAdd, Type... types) {
+    boolean maybeReplace(ClassInstanceCreation cic, Set<String> alreadyImportedClasses,
+            Set<String> importsToAdd, Type... types) {
         if (types == null || types.length < 1) {
             return VISIT_SUBTREE;
         }
+
         Type type = types[0];
         ASTBuilder b = ctx.getASTBuilder();
         List<Expression> arguments = arguments(cic);
         final MethodInvocation invocation;
+
         if (!arguments.isEmpty()
                 && instanceOf(arguments.get(0), "java.util.Collection")) {
             Expression typeArg = arguments.get(0);
             if (!instanceOf(typeArg, "java.util.EnumSet")) {
                 return VISIT_SUBTREE;
             }
-            invocation = b.invoke(useImport ? b.name("EnumSet") : b.name("java", "util", "EnumSet"),
+            invocation = b.invoke(alreadyImportedClasses.contains("java.util.EnumSet") ? b.name("EnumSet")
+                    : b.name("java", "util", "EnumSet"),
                     "copyOf", b.copy(typeArg));
         } else {
             TypeLiteral newTypeLiteral = ctx.getAST().newTypeLiteral();
             newTypeLiteral.setType(b.copy(type));
-            invocation = b.invoke(useImport ? b.name("EnumSet") : b.name("java", "util", "EnumSet"),
+            invocation = b.invoke(alreadyImportedClasses.contains("java.util.EnumSet") ? b.name("EnumSet")
+                    : b.name("java", "util", "EnumSet"),
                     "noneOf", newTypeLiteral);
         }
+
         ctx.getRefactorings().replace(cic, invocation);
-        isImportToBeAdd.set(useImport);
+        importsToAdd.add("java.util.EnumSet");
         return DO_NOT_VISIT_SUBTREE;
     }
 }

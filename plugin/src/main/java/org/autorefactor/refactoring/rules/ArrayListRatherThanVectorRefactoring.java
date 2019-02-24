@@ -29,9 +29,12 @@ package org.autorefactor.refactoring.rules;
 import static org.autorefactor.refactoring.ASTHelper.*;
 import static org.autorefactor.util.Utils.getOrDefault;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.Release;
@@ -100,6 +103,11 @@ public class ArrayListRatherThanVectorRefactoring extends AbstractClassSubstitut
     @Override
     protected String[] getExistingClassCanonicalName() {
         return new String[] {"java.util.Vector"};
+    }
+
+    @Override
+    public Set<String> getClassesToImport() {
+        return new HashSet<String>(Arrays.asList("java.util.ArrayList"));
     }
 
     @Override

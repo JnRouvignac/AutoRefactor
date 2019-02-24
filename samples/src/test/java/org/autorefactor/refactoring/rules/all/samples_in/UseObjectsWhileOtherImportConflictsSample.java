@@ -23,18 +23,19 @@
  * which accompanies this distribution under LICENSE-ECLIPSE, and is
  * available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.autorefactor.refactoring.rules.all.samples_out;
+package org.autorefactor.refactoring.rules.all.samples_in;
 
-import java.util.Date;
-import java.util.List;
+import org.testng.collections.Objects;
 
-public class UseCollectionsWhileNestedClassConflictsSample {
-    public class Collections {
-    }
+public class UseObjectsWhileOtherImportConflictsSample {
+    private Objects testNGObject;
 
-    public void replaceAddWithForLoopByCollectionsAddAll(
-            List<? super Date> output, Date[] elems1) {
+    @Override
+    public int hashCode() {
         // Keep this comment
-        java.util.Collections.addAll(output, elems1);
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((testNGObject == null) ? 0 : testNGObject.hashCode());
+        return result;
     }
 }

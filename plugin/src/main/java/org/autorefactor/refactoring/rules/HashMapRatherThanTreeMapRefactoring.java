@@ -26,9 +26,12 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.Expression;
@@ -86,6 +89,11 @@ public class HashMapRatherThanTreeMapRefactoring extends AbstractClassSubstitute
     @Override
     protected String[] getExistingClassCanonicalName() {
         return new String[] {"java.util.TreeMap"};
+    }
+
+    @Override
+    public Set<String> getClassesToImport() {
+        return new HashSet<String>(Arrays.asList("java.util.HashMap"));
     }
 
     @Override

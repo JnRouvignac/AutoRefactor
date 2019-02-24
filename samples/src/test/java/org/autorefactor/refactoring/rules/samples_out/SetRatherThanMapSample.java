@@ -29,12 +29,14 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.EventObject;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Observable;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 public class SetRatherThanMapSample {
 
@@ -51,104 +53,104 @@ public class SetRatherThanMapSample {
 
     public void replaceMapInstanceCreation() {
         // Keep this comment
-        boolean isInside = new java.util.HashSet<String>().isEmpty();
-        boolean isInside2 = new java.util.TreeSet<String>().isEmpty();
+        boolean isInside = new HashSet<String>().isEmpty();
+        boolean isInside2 = new TreeSet<String>().isEmpty();
 
         // Keep this comment too
-        int size = new java.util.HashSet<String>(10).size();
-        int size2 = new java.util.TreeSet<String>().size();
+        int size = new HashSet<String>(10).size();
+        int size2 = new TreeSet<String>().size();
 
         // Keep this comment also
-        new java.util.HashSet<String>(10).clear();
-        new java.util.TreeSet<String>().clear();
+        new HashSet<String>(10).clear();
+        new TreeSet<String>().clear();
     }
 
     public void replaceRawMap() {
         // Keep this comment
-        boolean isInside = new java.util.HashSet().isEmpty();
-        boolean isInside2 = new java.util.TreeSet().isEmpty();
+        boolean isInside = new HashSet().isEmpty();
+        boolean isInside2 = new TreeSet().isEmpty();
 
         // Keep this comment too
-        int size = new java.util.HashSet(10).size();
-        int size2 = new java.util.TreeSet().size();
+        int size = new HashSet(10).size();
+        int size2 = new TreeSet().size();
     }
 
     public void replaceFullyQualifiedMap() {
         // Keep this comment
-        boolean isInside = new java.util.HashSet<Integer>().isEmpty();
-        boolean isInside2 = new java.util.TreeSet<Integer>().isEmpty();
+        boolean isInside = new HashSet<Integer>().isEmpty();
+        boolean isInside2 = new TreeSet<Integer>().isEmpty();
 
         // Keep this comment too
-        int size = new java.util.HashSet(10).size();
-        int size2 = new java.util.TreeSet().size();
+        int size = new HashSet(10).size();
+        int size2 = new TreeSet().size();
     }
 
     public void replaceMapVariableDeclaration() {
         // Keep this comment
-        java.util.HashSet<String> aggregate = new java.util.HashSet<String>();
-        java.util.TreeSet<String> aggregate2 = new java.util.TreeSet<String>();
-        java.util.Set<String> aggregate3 = new java.util.TreeSet<String>();
+        HashSet<String> aggregate = new HashSet<String>();
+        TreeSet<String> aggregate2 = new TreeSet<String>();
+        Set<String> aggregate3 = new TreeSet<String>();
     }
 
     public void replaceHashMapVariableUse() {
         // Keep this comment
-        java.util.HashSet<String> aggregate = new java.util.HashSet<String>();
+        HashSet<String> aggregate = new HashSet<String>();
         // Keep this comment too
         aggregate.add("foo");
 
         // Keep this comment
-        java.util.TreeSet<String> aggregate2 = new java.util.TreeSet<String>();
+        TreeSet<String> aggregate2 = new TreeSet<String>();
         // Keep this comment too
         aggregate2.add("foo");
 
         // Keep this comment
-        java.util.Set<String> aggregate3 = new java.util.TreeSet<String>();
+        Set<String> aggregate3 = new TreeSet<String>();
         // Keep this comment too
         aggregate3.add("foo");
     }
 
     public boolean refactorHashMapMethod() {
         // Keep this comment
-        return new java.util.HashSet<String>().contains("foo");
+        return new HashSet<String>().contains("foo");
     }
 
     public boolean refactorTreeMapMethod() {
         // Keep this comment
-        return new java.util.TreeSet<String>().contains("foo");
+        return new TreeSet<String>().contains("foo");
     }
 
     public void refactorVariableAndMethod() {
         // Keep this comment
-        java.util.HashSet<String> aggregate = new java.util.HashSet<String>();
+        HashSet<String> aggregate = new HashSet<String>();
         // Keep this comment too
         aggregate.contains("foo");
 
         // Keep this comment
-        java.util.TreeSet<String> aggregate2 = new java.util.TreeSet<String>();
+        TreeSet<String> aggregate2 = new TreeSet<String>();
         // Keep this comment too
         aggregate2.contains("foo");
 
         // Keep this comment
-        java.util.Set<String> aggregate3 = new java.util.TreeSet<String>();
+        Set<String> aggregate3 = new TreeSet<String>();
         // Keep this comment too
         aggregate3.contains("foo");
     }
 
     public int replaceMapWithLoop(List<Date> dates) {
         // Keep this comment
-        java.util.HashSet<Long> aggregate = new java.util.HashSet<Long>();
+        HashSet<Long> aggregate = new HashSet<Long>();
         for (Date date : dates) {
             aggregate.add(date.getTime());
         }
 
         // Keep this comment too
-        java.util.TreeSet<Long> aggregate2 = new java.util.TreeSet<Long>();
+        TreeSet<Long> aggregate2 = new TreeSet<Long>();
         for (Date date : dates) {
             aggregate2.add(date.getTime());
         }
 
         // Keep this comment also
-        java.util.Set<Long> aggregate3 = new java.util.TreeSet<Long>();
+        Set<Long> aggregate3 = new TreeSet<Long>();
         for (Date date : dates) {
             aggregate3.add(date.getTime());
         }
@@ -194,55 +196,55 @@ public class SetRatherThanMapSample {
 
     public void replaceHashMapWithModifier() {
         // Keep this comment
-        final java.util.HashSet<String> aggregate = new java.util.HashSet<String>();
+        final HashSet<String> aggregate = new HashSet<String>();
         aggregate.add("foo");
 
         // Keep this comment too
-        final java.util.TreeSet<String> aggregate2 = new java.util.TreeSet<String>();
+        final TreeSet<String> aggregate2 = new TreeSet<String>();
         aggregate2.add("foo");
 
         // Keep this comment also
-        final java.util.Set<String> aggregate3 = new java.util.TreeSet<String>();
+        final Set<String> aggregate3 = new TreeSet<String>();
         aggregate3.add("foo");
     }
 
     public void replaceHashMapWithParameter() {
         // Keep this comment
-        java.util.HashSet<String> aggregate = new java.util.HashSet<String>(10);
+        HashSet<String> aggregate = new HashSet<String>(10);
         aggregate.add("foo");
 
         // Keep this comment too
-        java.util.TreeSet<String> aggregate2 = new java.util.TreeSet<String>();
+        TreeSet<String> aggregate2 = new TreeSet<String>();
         aggregate2.add("foo");
 
         // Keep this comment also
-        java.util.Set<String> aggregate3 = new java.util.TreeSet<String>();
+        Set<String> aggregate3 = new TreeSet<String>();
         aggregate3.add("foo");
     }
 
     public int replaceReassignedHashMap() {
         // Keep this comment
-        java.util.HashSet<String> aggregate1 = new java.util.HashSet<String>();
+        HashSet<String> aggregate1 = new HashSet<String>();
         aggregate1.add("foo");
 
         // Keep this comment too
-        java.util.HashSet<String> aggregate2 = aggregate1;
+        HashSet<String> aggregate2 = aggregate1;
         aggregate2.add("bar");
 
         // Keep this comment
-        java.util.TreeSet<String> aggregate3 = new java.util.TreeSet<String>();
+        TreeSet<String> aggregate3 = new TreeSet<String>();
         aggregate3.add("foo");
 
         // Keep this comment too
-        java.util.TreeSet<String> aggregate4 = aggregate3;
+        TreeSet<String> aggregate4 = aggregate3;
         aggregate4.add("bar");
 
         // Keep this comment
-        java.util.Set<String> aggregate5 = new java.util.TreeSet<String>();
+        Set<String> aggregate5 = new TreeSet<String>();
         aggregate3.add("foo");
 
         // Keep this comment too
-        java.util.Set<String> aggregate6 = aggregate5;
+        Set<String> aggregate6 = aggregate5;
         aggregate4.add("bar");
 
         return aggregate1.size() + aggregate2.size() + aggregate3.size() + aggregate4.size() + aggregate5.size();
@@ -293,7 +295,7 @@ public class SetRatherThanMapSample {
     }
 
     public void replaceHashMapInAnnomymousClass() {
-        final java.util.HashSet<String> aggregate = new java.util.HashSet<String>();
+        final HashSet<String> aggregate = new HashSet<String>();
         new Runnable() {
 
             @Override
@@ -302,7 +304,7 @@ public class SetRatherThanMapSample {
             }
         };
 
-        final java.util.TreeSet<String> aggregate2 = new java.util.TreeSet<String>();
+        final TreeSet<String> aggregate2 = new TreeSet<String>();
         new Runnable() {
 
             @Override
@@ -311,7 +313,7 @@ public class SetRatherThanMapSample {
             }
         };
 
-        final java.util.Set<String> aggregate3 = new java.util.TreeSet<String>();
+        final Set<String> aggregate3 = new TreeSet<String>();
         new Runnable() {
 
             @Override
@@ -323,40 +325,40 @@ public class SetRatherThanMapSample {
 
     public void replaceMapInsideRunnable() {
         // Keep this comment
-        final java.util.HashSet<String> aggregate = new java.util.HashSet<String>();
+        final HashSet<String> aggregate = new HashSet<String>();
         aggregate.add("foo");
         new Runnable() {
 
             @Override
             public void run() {
                 // Keep this comment too
-                final java.util.HashSet<String> localAggregate = new java.util.HashSet<String>();
+                final HashSet<String> localAggregate = new HashSet<String>();
                 localAggregate.add("bar");
             }
         };
 
         // Keep this comment
-        final java.util.TreeSet<String> aggregate2 = new java.util.TreeSet<String>();
+        final TreeSet<String> aggregate2 = new TreeSet<String>();
         aggregate2.add("foo");
         new Runnable() {
 
             @Override
             public void run() {
                 // Keep this comment too
-                final java.util.TreeSet<String> localAggregate = new java.util.TreeSet<String>();
+                final TreeSet<String> localAggregate = new TreeSet<String>();
                 localAggregate.add("bar");
             }
         };
 
         // Keep this comment
-        final java.util.Set<String> aggregate3 = new java.util.TreeSet<String>();
+        final Set<String> aggregate3 = new TreeSet<String>();
         aggregate3.add("foo");
         new Runnable() {
 
             @Override
             public void run() {
                 // Keep this comment too
-                final java.util.Set<String> localAggregate = new java.util.TreeSet<String>();
+                final Set<String> localAggregate = new TreeSet<String>();
                 localAggregate.add("bar");
             }
         };
@@ -425,7 +427,7 @@ public class SetRatherThanMapSample {
 
     public void refactorWithMethods(Collection<Integer> anotherCollection) throws InterruptedException {
         // Keep this comment
-        java.util.HashSet<Integer> aggregate = new java.util.HashSet<Integer>();
+        HashSet<Integer> aggregate = new HashSet<Integer>();
         aggregate.add(123);
         aggregate.clear();
         aggregate.contains(anotherCollection);
@@ -439,7 +441,7 @@ public class SetRatherThanMapSample {
         aggregate.wait(1000, 1000);
 
         // Keep this comment too
-        java.util.TreeSet<Integer> aggregate2 = new java.util.TreeSet<Integer>();
+        TreeSet<Integer> aggregate2 = new TreeSet<Integer>();
         aggregate2.add(123);
         aggregate2.clear();
         aggregate2.contains(anotherCollection);
@@ -453,7 +455,7 @@ public class SetRatherThanMapSample {
         aggregate2.wait(1000, 1000);
 
         // Keep this comment also
-        java.util.Set<Integer> aggregate3 = new java.util.TreeSet<Integer>();
+        Set<Integer> aggregate3 = new TreeSet<Integer>();
         aggregate3.add(123);
         aggregate3.clear();
         aggregate3.contains(anotherCollection);

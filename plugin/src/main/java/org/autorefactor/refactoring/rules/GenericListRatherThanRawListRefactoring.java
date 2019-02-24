@@ -32,6 +32,7 @@ import static org.autorefactor.util.Utils.getOrDefault;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.Release;
@@ -128,10 +129,13 @@ public class GenericListRatherThanRawListRefactoring extends AbstractClassSubsti
      * @param b The builder.
      * @param origType The original type
      * @param originalExpr The original expression
+     * @param classesToUseWithImport The classes that should be used with simple name.
+     * @param importsToAdd The imports that need to be added during this refactoring.
      * @return the substitute type.
      */
     @Override
-    protected Type substituteType(final ASTBuilder b, final Type origType, ASTNode originalExpr) {
+    protected Type substituteType(final ASTBuilder b, final Type origType, final ASTNode originalExpr,
+            final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
         if (origType.isParameterizedType()) {
             return null;
         }

@@ -34,9 +34,10 @@ import static org.autorefactor.refactoring.ASTHelper.isMethod;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.Set;
 
 import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.Refactorings;
@@ -178,14 +179,9 @@ public class Java7HashRatherThanEclipseJava6HashRefactoring extends NewClassImpo
 
         @Override
         public boolean visit(final MethodDeclaration node) {
-            final AtomicBoolean isImportToBeAdd = new AtomicBoolean(false);
             final boolean isSubTreeToVisit =
                     Java7HashRatherThanEclipseJava6HashRefactoring.this.maybeRefactorMethodDeclaration(node,
-                            true, isImportToBeAdd);
-
-            if (isImportToBeAdd.get()) {
-                setImportToBeAdd(true);
-            }
+                            getClassesToUseWithImport(), getImportsToAdd());
 
             return isSubTreeToVisit;
         }
@@ -220,13 +216,8 @@ public class Java7HashRatherThanEclipseJava6HashRefactoring extends NewClassImpo
     }
 
     @Override
-    public String getPackageNameToImport() {
-        return "java.util";
-    }
-
-    @Override
-    public String getClassNameToImport() {
-        return "Objects";
+    public Set<String> getClassesToImport() {
+        return new HashSet<String>(Arrays.asList("java.util.Objects"));
     }
 
     @Override
@@ -241,11 +232,12 @@ public class Java7HashRatherThanEclipseJava6HashRefactoring extends NewClassImpo
 
     @Override
     public boolean visit(final MethodDeclaration node) {
-        return maybeRefactorMethodDeclaration(node, isAlreadyImported(node), new AtomicBoolean(false));
+        return maybeRefactorMethodDeclaration(node, getAlreadyImportedClasses(node), new HashSet<String>());
     }
 
-    private boolean maybeRefactorMethodDeclaration(final MethodDeclaration node, final boolean useImport,
-            final AtomicBoolean isImportToBeAdd) {
+    private boolean maybeRefactorMethodDeclaration(final MethodDeclaration node,
+            final Set<String> classesToUseWithImport,
+            final Set<String> importsToAdd) {
         final Block body = node.getBody();
 
         if (isMethod(node,
@@ -269,8 +261,8 @@ public class Java7HashRatherThanEclipseJava6HashRefactoring extends NewClassImpo
                     }
 
                     if (data.isHasReturnStmt() && !data.getStmtIterator().hasNext()) {
-                        refactorHash(node, data.getFields(), useImport);
-                        isImportToBeAdd.set(useImport);
+                        refactorHash(node, data.getFields(), classesToUseWithImport);
+                        importsToAdd.add("java.util.Objects");
                         return DO_NOT_VISIT_SUBTREE;
                     }
                 }
@@ -654,7 +646,8 @@ public class Java7HashRatherThanEclipseJava6HashRefactoring extends NewClassImpo
         return expr != null && varId.equals(expr.getIdentifier());
     }
 
-    private void refactorHash(final MethodDeclaration node, final List<SimpleName> fields, final boolean useImport) {
+    private void refactorHash(final MethodDeclaration node, final List<SimpleName> fields,
+            final Set<String> classesToUseWithImport) {
         final ASTBuilder b = this.ctx.getASTBuilder();
         final Refactorings r = this.ctx.getRefactorings();
 
@@ -667,7 +660,8 @@ public class Java7HashRatherThanEclipseJava6HashRefactoring extends NewClassImpo
             copyOfFields.add(b.copy(simpleName));
         }
 
-        r.replace(stmts.get(0), b.return0(b.invoke(useImport ? b.name("Objects") : b.name("java", "util", "Objects"),
+        r.replace(stmts.get(0), b.return0(b.invoke(classesToUseWithImport
+                .contains("java.util.Objects") ? b.name("Objects") : b.name("java", "util", "Objects"),
                 "hash",
                 copyOfFields)));
 

@@ -26,12 +26,17 @@
  */
 package org.autorefactor.refactoring.rules;
 
-import static org.autorefactor.refactoring.ASTHelper.*;
+import static org.autorefactor.refactoring.ASTHelper.arguments;
+import static org.autorefactor.refactoring.ASTHelper.hasType;
+import static org.autorefactor.refactoring.ASTHelper.isMethod;
 import static org.autorefactor.util.Utils.getOrDefault;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.autorefactor.refactoring.ASTBuilder;
 import org.eclipse.jdt.core.dom.Block;
@@ -41,6 +46,27 @@ import org.eclipse.jdt.core.dom.MethodInvocation;
 
 /** See {@link #getDescription()} method. */
 public class SetRatherThanListRefactoring extends AbstractClassSubstituteRefactoring {
+    private final class RefactoringWithObjectsClass extends RefactoringWithNewClassImport {
+        public RefactoringWithObjectsClass(RefactoringContext context) {
+            ctx = context;
+        }
+
+        @Override
+        public boolean visit(Block node) {
+            isContainsMethodUsed = false;
+            final boolean isSubTreeToVisit =
+                    SetRatherThanListRefactoring.this.maybeRefactorBlock(node,
+                            getClassesToUseWithImport(), getImportsToAdd());
+
+            return isSubTreeToVisit;
+        }
+    }
+
+    @Override
+    public RefactoringWithObjectsClass getRefactoringClassInstance() {
+        return new RefactoringWithObjectsClass(ctx);
+    }
+
     private static final Map<String, String[]> CAN_BE_CASTED_TO = new HashMap<String, String[]>();
 
     static {
@@ -103,6 +129,11 @@ public class SetRatherThanListRefactoring extends AbstractClassSubstituteRefacto
     @Override
     protected String[] getExistingClassCanonicalName() {
         return new String[] {"java.util.ArrayList", "java.util.LinkedList"};
+    }
+
+    @Override
+    public Set<String> getClassesToImport() {
+        return new HashSet<String>(Arrays.asList("java.util.HashSet", "java.util.Set"));
     }
 
     @Override

@@ -25,6 +25,7 @@
  */
 package org.autorefactor.refactoring.rules.samples_out;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Date;
@@ -38,66 +39,66 @@ public class ArrayListRatherThanLinkedListSample {
 
     public void replaceLinkedListInstanceCreation() {
         // Keep this comment
-        boolean isFooContained = new java.util.ArrayList<String>().contains("foo");
+        boolean isFooContained = new ArrayList<String>().contains("foo");
         // Keep this comment too
-        int size = new java.util.ArrayList<String>(new java.util.ArrayList<String>()).size();
+        int size = new ArrayList<String>(new java.util.ArrayList<String>()).size();
     }
 
     public void replaceRawLinkedList() {
         // Keep this comment
-        String[] objectArray = new java.util.ArrayList<Integer>().toArray(new String[0]);
+        String[] objectArray = new ArrayList<Integer>().toArray(new String[0]);
         // Keep this comment too
-        int size = new java.util.ArrayList(new java.util.ArrayList<String>()).size();
+        int size = new ArrayList(new java.util.ArrayList<String>()).size();
     }
 
     public void replaceFullyQualifiedLinkedList() {
         // Keep this comment
-        boolean isFooContained = new java.util.ArrayList<Date>().contains("foo");
+        boolean isFooContained = new ArrayList<Date>().contains("foo");
         // Keep this comment too
-        int size = new java.util.ArrayList(new java.util.ArrayList<String>()).size();
+        int size = new ArrayList(new java.util.ArrayList<String>()).size();
     }
 
     public void replaceLinkedListVariableDeclaration() {
         // Keep this comment
-        java.util.ArrayList<LinkedList<String>> list = new java.util.ArrayList<LinkedList<String>>();
+        ArrayList<LinkedList<String>> list = new ArrayList<LinkedList<String>>();
     }
 
     public void replaceInterface() {
         // Keep this comment
-        List<String> list = new java.util.ArrayList<String>();
+        List<String> list = new ArrayList<String>();
     }
 
     public void replaceLinkedListVariableUse() {
         // Keep this comment
-        java.util.ArrayList<String> list = new java.util.ArrayList<String>();
+        ArrayList<String> list = new ArrayList<String>();
         // Keep this comment too
         list.add("bar");
     }
 
     public void refactorListVariableUse() {
         // Keep this comment
-        List<String> list = new java.util.ArrayList<String>();
+        List<String> list = new ArrayList<String>();
         // Keep this comment too
         list.add("bar");
     }
 
     public void refactorWithMethod() {
         // Keep this comment
-        java.util.ArrayList<Observable> list = new java.util.ArrayList<Observable>();
+        ArrayList<Observable> list = new ArrayList<Observable>();
         // Keep this comment too
         list.toArray();
     }
 
     public void refactorListWithMethod() {
         // Keep this comment
-        List<Observable> list = new java.util.ArrayList<Observable>();
+        List<Observable> list = new ArrayList<Observable>();
         // Keep this comment too
         list.toArray();
     }
 
     public String replaceLinkedListWithLoop(List<Date> dates) {
         // Keep this comment
-        java.util.ArrayList<Date> list = new java.util.ArrayList<Date>();
+        ArrayList<Date> list = new ArrayList<Date>();
         for (Date date : dates) {
             list.add(date);
         }
@@ -107,7 +108,7 @@ public class ArrayListRatherThanLinkedListSample {
 
     public String refactorListWithLoop(List<boolean[][]> flags) {
         // Keep this comment
-        List<boolean[][]> list = new java.util.ArrayList<boolean[][]>();
+        List<boolean[][]> list = new ArrayList<boolean[][]>();
         for (boolean[][] flag : flags) {
             list.add(flag);
         }
@@ -117,35 +118,35 @@ public class ArrayListRatherThanLinkedListSample {
 
     public void replaceLinkedListWithModifier() {
         // Keep this comment
-        final java.util.ArrayList<String> list = new java.util.ArrayList<String>();
+        final ArrayList<String> list = new ArrayList<String>();
         list.add("bar");
     }
 
     public void refactorListWithModifier() {
         // Keep this comment
-        final List<String> list = new java.util.ArrayList<String>();
+        final List<String> list = new ArrayList<String>();
         list.add("bar");
     }
 
     public void replaceLinkedListWithParameter() {
         // Keep this comment
-        java.util.ArrayList<String> list = new java.util.ArrayList<String>(new java.util.ArrayList<String>());
+        ArrayList<String> list = new ArrayList<String>(new java.util.ArrayList<String>());
         list.add("bar");
     }
 
     public void refactorListWithParameter() {
         // Keep this comment
-        List<String> list = new java.util.ArrayList<String>(new java.util.ArrayList<String>());
+        List<String> list = new ArrayList<String>(new java.util.ArrayList<String>());
         list.add("bar");
     }
 
     public boolean replaceReassignedLinkedList() {
         // Keep this comment
-        java.util.ArrayList<String> list1 = new java.util.ArrayList<String>();
+        ArrayList<String> list1 = new ArrayList<String>();
         list1.add("FOO");
 
         // Keep this comment too
-        java.util.ArrayList<String> list2 = list1;
+        ArrayList<String> list2 = list1;
         list2.add("BAR");
 
         return list2.isEmpty();
@@ -153,7 +154,7 @@ public class ArrayListRatherThanLinkedListSample {
 
     public boolean replaceReassignedList() {
         // Keep this comment
-        java.util.ArrayList<String> list1 = new java.util.ArrayList<String>();
+        ArrayList<String> list1 = new ArrayList<String>();
         list1.add("FOO");
 
         // Keep this comment too
@@ -328,12 +329,12 @@ public class ArrayListRatherThanLinkedListSample {
 
     public void replaceLinkedListWithRunnable() {
         // Keep this comment
-        final java.util.ArrayList<String> list = new java.util.ArrayList<String>();
+        final ArrayList<String> list = new ArrayList<String>();
         new Runnable() {
 
             @Override
             public void run() {
-                final java.util.ArrayList<String> localList = new java.util.ArrayList<String>();
+                final ArrayList<String> localList = new ArrayList<String>();
                 localList.add("foo");
             }
         };
@@ -341,12 +342,12 @@ public class ArrayListRatherThanLinkedListSample {
 
     public void replaceListWithRunnable() {
         // Keep this comment
-        final List<String> list = new java.util.ArrayList<String>();
+        final List<String> list = new ArrayList<String>();
         new Runnable() {
 
             @Override
             public void run() {
-                final List<String> localList = new java.util.ArrayList<String>();
+                final List<String> localList = new ArrayList<String>();
                 localList.add("foo");
             }
         };

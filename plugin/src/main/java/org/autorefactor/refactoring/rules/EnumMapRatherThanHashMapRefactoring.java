@@ -31,8 +31,10 @@ import static org.autorefactor.refactoring.ASTHelper.arguments;
 import static org.autorefactor.refactoring.ASTHelper.hasType;
 import static org.autorefactor.refactoring.ASTHelper.instanceOf;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.Set;
 
 import org.autorefactor.refactoring.ASTBuilder;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
@@ -83,8 +85,8 @@ public final class EnumMapRatherThanHashMapRefactoring extends
     }
 
     @Override
-    public String getClassNameToImport() {
-        return "EnumMap";
+    public Set<String> getClassesToImport() {
+        return new HashSet<String>(Arrays.asList("java.util.EnumMap"));
     }
 
     /**
@@ -100,13 +102,16 @@ public final class EnumMapRatherThanHashMapRefactoring extends
      * @see {@link java.util.HashMap#HashMap(java.util.Map)}
      */
     @Override
-    boolean maybeReplace(ClassInstanceCreation cic, boolean useImport, AtomicBoolean isImportToBeAdd, Type... types) {
+    boolean maybeReplace(ClassInstanceCreation cic, Set<String> alreadyImportedClasses,
+            Set<String> importsToAdd, Type... types) {
         if (types == null || types.length < 2) {
             return VISIT_SUBTREE;
         }
+
         Type keyType = types[0];
         Type valueType = types[1];
         List<Expression> arguments = arguments(cic);
+
         if (!arguments.isEmpty()
                 && isTargetType(arguments.get(0).resolveTypeBinding())
                 && !hasType(arguments.get(0).resolveTypeBinding(),
@@ -114,24 +119,27 @@ public final class EnumMapRatherThanHashMapRefactoring extends
             return VISIT_SUBTREE;
         }
 
-        replace(cic, useImport, isImportToBeAdd, keyType, valueType, arguments);
+        replace(cic, alreadyImportedClasses, importsToAdd, keyType, valueType, arguments);
+        importsToAdd.add("java.util.EnumMap");
         return DO_NOT_VISIT_SUBTREE;
     }
 
-    private void replace(ClassInstanceCreation cic, boolean useImport, AtomicBoolean isImportToBeAdd, Type keyType,
+    private void replace(ClassInstanceCreation cic, Set<String> alreadyImportedClasses,
+            Set<String> importsToAdd, Type keyType,
             Type valueType, List<Expression> arguments) {
         ASTBuilder b = ctx.getASTBuilder();
         Expression newParam = resolveParameter(keyType, arguments);
-        Type newType = b.genericType(useImport ? "EnumMap" : "java.util.EnumMap", b.copy(keyType),
+        Type newType = b.genericType(alreadyImportedClasses.contains("java.util.EnumMap") ? "EnumMap"
+                : "java.util.EnumMap", b.copy(keyType),
                 b.copy(valueType));
-        // if there were no type args in original creation (diamond operator),
+
+        // If there were no type args in original creation (diamond operator),
         // remove them from replacement
         if (typeArgs(cic.getType()).isEmpty()) {
             typeArgs(newType).clear();
         }
 
         ctx.getRefactorings().replace(cic, b.new0(newType, newParam));
-        isImportToBeAdd.set(useImport);
     }
 
     /**

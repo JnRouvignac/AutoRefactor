@@ -32,15 +32,17 @@ import static org.autorefactor.refactoring.ASTHelper.as;
 import static org.autorefactor.refactoring.ASTHelper.asExpression;
 import static org.autorefactor.refactoring.ASTHelper.asList;
 import static org.autorefactor.refactoring.ASTHelper.findImplementedType;
+import static org.autorefactor.refactoring.ASTHelper.getCalledType;
 import static org.autorefactor.refactoring.ASTHelper.instanceOf;
 import static org.autorefactor.refactoring.ASTHelper.isArray;
 import static org.autorefactor.refactoring.ASTHelper.isMethod;
 import static org.autorefactor.refactoring.ASTHelper.isSameLocalVariable;
-import static org.autorefactor.refactoring.ASTHelper.getCalledType;
 import static org.autorefactor.refactoring.ForLoopHelper.iterateOverContainer;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.Set;
 
 import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.ForLoopHelper.ForLoopContent;
@@ -65,28 +67,18 @@ public class AllInOneMethodRatherThanLoopRefactoring extends NewClassImportRefac
 
         @Override
         public boolean visit(EnhancedForStatement node) {
-            final AtomicBoolean isImportToBeAdd = new AtomicBoolean(false);
             final boolean isSubTreeToVisit =
                     AllInOneMethodRatherThanLoopRefactoring.this.maybeRefactorEnhancedForStatement(node,
-                            true, isImportToBeAdd);
-
-            if (isImportToBeAdd.get()) {
-                setImportToBeAdd(true);
-            }
+                            getClassesToUseWithImport(), getImportsToAdd());
 
             return isSubTreeToVisit;
         }
 
         @Override
         public boolean visit(ForStatement node) {
-            final AtomicBoolean isImportToBeAdd = new AtomicBoolean(false);
             final boolean isSubTreeToVisit =
                     AllInOneMethodRatherThanLoopRefactoring.this.maybeRefactorForStatement(node,
-                            true, isImportToBeAdd);
-
-            if (isImportToBeAdd.get()) {
-                setImportToBeAdd(true);
-            }
+                            getClassesToUseWithImport(), getImportsToAdd());
 
             return isSubTreeToVisit;
         }
@@ -131,22 +123,18 @@ public class AllInOneMethodRatherThanLoopRefactoring extends NewClassImportRefac
     }
 
     @Override
-    public String getPackageNameToImport() {
-        return "java.util";
+    public Set<String> getClassesToImport() {
+        return new HashSet<String>(Arrays.asList("java.util.Collections"));
     }
 
     @Override
-    public String getClassNameToImport() {
-        return "Collections";
+    public boolean visit(final EnhancedForStatement node) {
+        return maybeRefactorEnhancedForStatement(node, getAlreadyImportedClasses(node), new HashSet<String>());
     }
 
-    @Override
-    public boolean visit(EnhancedForStatement node) {
-        return maybeRefactorEnhancedForStatement(node, isAlreadyImported(node), new AtomicBoolean(false));
-    }
-
-    private boolean maybeRefactorEnhancedForStatement(EnhancedForStatement node, boolean useImport,
-            AtomicBoolean isImportToBeAdd) {
+    private boolean maybeRefactorEnhancedForStatement(final EnhancedForStatement node,
+            final Set<String> classesToUseWithImport,
+            final Set<String> importsToAdd) {
         final Expression iterable = node.getExpression();
         final List<Statement> stmts = asList(node.getBody());
 
@@ -169,8 +157,8 @@ public class AllInOneMethodRatherThanLoopRefactoring extends NewClassImportRefac
                     && isMethod(mi, "java.util.Collection", "add", "java.lang.Object")
                     && areTypeCompatible(getCalledType(mi), iterable.resolveTypeBinding())
                     && isSameLocalVariable(foreachVariable, arg0(mi))) {
-                replaceWithCollectionsAddAll(node, iterable, mi, useImport);
-                isImportToBeAdd.set(useImport);
+                replaceWithCollectionsAddAll(node, iterable, mi, classesToUseWithImport);
+                importsToAdd.add("java.util.Collections");
                 return DO_NOT_VISIT_SUBTREE;
             }
         }
@@ -178,12 +166,14 @@ public class AllInOneMethodRatherThanLoopRefactoring extends NewClassImportRefac
         return VISIT_SUBTREE;
     }
 
-    private void replaceWithCollectionsAddAll(Statement node, Expression iterable, MethodInvocation mi,
-            boolean useImport) {
+    private void replaceWithCollectionsAddAll(final Statement node, final Expression iterable,
+            final MethodInvocation mi,
+            final Set<String> classesToUseWithImport) {
         ASTBuilder b = ctx.getASTBuilder();
         ctx.getRefactorings().replace(node,
                 b.toStmt(b.invoke(
-                        useImport ? b.name("Collections") : b.name("java", "util", "Collections"),
+                        classesToUseWithImport.contains("java.util.Collections") ? b.name("Collections")
+                                : b.name("java", "util", "Collections"),
                         "addAll",
                         mi.getExpression() != null ? b.copy(mi.getExpression()) : b.this0(),
                         b.copy(iterable))));
@@ -200,10 +190,11 @@ public class AllInOneMethodRatherThanLoopRefactoring extends NewClassImportRefac
 
     @Override
     public boolean visit(ForStatement node) {
-        return maybeRefactorForStatement(node, isAlreadyImported(node), new AtomicBoolean(false));
+        return maybeRefactorForStatement(node, getAlreadyImportedClasses(node), new HashSet<String>());
     }
 
-    private boolean maybeRefactorForStatement(ForStatement node, boolean useImport, AtomicBoolean isImportToBeAdd) {
+    private boolean maybeRefactorForStatement(final ForStatement node, final Set<String> classesToUseWithImport,
+            final Set<String> importsToAdd) {
         final ForLoopContent loopContent = iterateOverContainer(node);
         final List<Statement> stmts = asList(node.getBody());
 
@@ -212,6 +203,7 @@ public class AllInOneMethodRatherThanLoopRefactoring extends NewClassImportRefac
                 && stmts.size() == 1) {
             final SimpleName loopVariable = (SimpleName) loopContent.getLoopVariable();
             final IVariableBinding loopVariableName = (IVariableBinding) loopVariable.resolveBinding();
+
             // We should remove all the loop variable occurrences
             // As we replace only one, there should be no more than one occurrence
             if (getVariableUseCount(loopVariableName, node.getBody()) == 1) {
@@ -232,9 +224,11 @@ public class AllInOneMethodRatherThanLoopRefactoring extends NewClassImportRefac
                                     loopContent.getContainerVariable().resolveTypeBinding())) {
                         final Expression addArg0 = arg0(mi);
                         final ArrayAccess aa = as(addArg0, ArrayAccess.class);
+
                         if (isSameVariable(loopContent, aa)) {
-                            replaceWithCollectionsAddAll(node, loopContent.getContainerVariable(), mi, useImport);
-                            isImportToBeAdd.set(useImport);
+                            replaceWithCollectionsAddAll(node, loopContent.getContainerVariable(), mi,
+                                    classesToUseWithImport);
+                            importsToAdd.add("java.util.Collections");
                             return DO_NOT_VISIT_SUBTREE;
                         }
                     }

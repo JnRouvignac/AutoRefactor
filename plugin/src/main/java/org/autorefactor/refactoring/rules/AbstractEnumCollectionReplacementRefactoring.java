@@ -36,8 +36,9 @@ import static org.eclipse.jdt.core.dom.ASTNode.ASSIGNMENT;
 import static org.eclipse.jdt.core.dom.ASTNode.RETURN_STATEMENT;
 import static org.eclipse.jdt.core.dom.ASTNode.VARIABLE_DECLARATION_STATEMENT;
 
+import java.util.HashSet;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.Set;
 
 import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.TypeNameDecider;
@@ -65,14 +66,9 @@ public abstract class AbstractEnumCollectionReplacementRefactoring extends NewCl
 
         @Override
         public boolean visit(ClassInstanceCreation node) {
-            final AtomicBoolean isImportToBeAdd = new AtomicBoolean(false);
             final boolean isSubTreeToVisit =
                     AbstractEnumCollectionReplacementRefactoring.this.maybeRefactorClassInstanceCreation(node,
-                            true, isImportToBeAdd);
-
-            if (isImportToBeAdd.get()) {
-                setImportToBeAdd(true);
-            }
+                            getClassesToUseWithImport(), getImportsToAdd());
 
             return isSubTreeToVisit;
         }
@@ -86,17 +82,13 @@ public abstract class AbstractEnumCollectionReplacementRefactoring extends NewCl
     }
 
     @Override
-    public String getPackageNameToImport() {
-        return "java.util";
+    public boolean visit(final ClassInstanceCreation node) {
+        return maybeRefactorClassInstanceCreation(node, getAlreadyImportedClasses(node), new HashSet<String>());
     }
 
-    @Override
-    public boolean visit(ClassInstanceCreation node) {
-        return maybeRefactorClassInstanceCreation(node, isAlreadyImported(node), new AtomicBoolean(false));
-    }
-
-    private boolean maybeRefactorClassInstanceCreation(ClassInstanceCreation node, boolean useImport,
-            AtomicBoolean isImportToBeAdd) {
+    private boolean maybeRefactorClassInstanceCreation(final ClassInstanceCreation node,
+            final Set<String> classesToUseWithImport,
+            final Set<String> importsToAdd) {
         Type type = node.getType();
 
         if (isEnabled() && type.isParameterizedType() && creates(node, getImplType())) {
@@ -106,14 +98,14 @@ public abstract class AbstractEnumCollectionReplacementRefactoring extends NewCl
                 switch (parent.getNodeType()) {
 
                 case RETURN_STATEMENT:
-                    return handleReturnStatement(node, (ReturnStatement) parent, useImport, isImportToBeAdd);
+                    return handleReturnStatement(node, (ReturnStatement) parent, classesToUseWithImport, importsToAdd);
 
                 case ASSIGNMENT:
-                    return handleAssignment(node, (Assignment) parent, useImport, isImportToBeAdd);
+                    return handleAssignment(node, (Assignment) parent, classesToUseWithImport, importsToAdd);
 
                 case VARIABLE_DECLARATION_STATEMENT:
-                    return handleVarDeclarationStatement((VariableDeclarationStatement) parent, useImport,
-                            isImportToBeAdd);
+                    return handleVarDeclarationStatement((VariableDeclarationStatement) parent, classesToUseWithImport,
+                            importsToAdd);
 
                 // TODO: probably, it can be applied to method invocation for
                 // some cases
@@ -131,11 +123,13 @@ public abstract class AbstractEnumCollectionReplacementRefactoring extends NewCl
 
     abstract String getInterfaceType();
 
-    abstract boolean maybeReplace(ClassInstanceCreation node, boolean useImport, AtomicBoolean isImportToBeAdd,
+    abstract boolean maybeReplace(ClassInstanceCreation node, Set<String> classesToUseWithImport,
+            Set<String> importsToAdd,
             Type... types);
 
-    private boolean handleReturnStatement(final ClassInstanceCreation node, final ReturnStatement rs, boolean useImport,
-            AtomicBoolean isImportToBeAdd) {
+    private boolean handleReturnStatement(final ClassInstanceCreation node, final ReturnStatement rs,
+            final Set<String> classesToUseWithImport,
+            final Set<String> importsToAdd) {
         MethodDeclaration md = getAncestorOrNull(node, MethodDeclaration.class);
 
         if (md != null) {
@@ -145,7 +139,8 @@ public abstract class AbstractEnumCollectionReplacementRefactoring extends NewCl
                 List<Type> typeArguments = typeArgs(returnType);
 
                 if (!typeArguments.isEmpty() && isEnum(typeArguments.get(0))) {
-                    return maybeReplace(node, useImport, isImportToBeAdd, typeArguments.toArray(new Type[] {}));
+                    return maybeReplace(node, classesToUseWithImport, importsToAdd,
+                            typeArguments.toArray(new Type[] {}));
                 }
             }
         }
@@ -153,8 +148,9 @@ public abstract class AbstractEnumCollectionReplacementRefactoring extends NewCl
         return VISIT_SUBTREE;
     }
 
-    private boolean handleAssignment(final ClassInstanceCreation node, final Assignment a, boolean useImport,
-            AtomicBoolean isImportToBeAdd) {
+    private boolean handleAssignment(final ClassInstanceCreation node, final Assignment a,
+            final Set<String> classesToUseWithImport,
+            final Set<String> importsToAdd) {
         Expression lhs = a.getLeftHandSide();
 
         if (isTargetType(lhs.resolveTypeBinding())) {
@@ -169,15 +165,16 @@ public abstract class AbstractEnumCollectionReplacementRefactoring extends NewCl
                     types[i] = b.toType(typeArguments[i], typeNameDecider);
                 }
 
-                return maybeReplace(node, useImport, isImportToBeAdd, types);
+                return maybeReplace(node, classesToUseWithImport, importsToAdd, types);
             }
         }
 
         return VISIT_SUBTREE;
     }
 
-    private boolean handleVarDeclarationStatement(final VariableDeclarationStatement node, boolean useImport,
-            AtomicBoolean isImportToBeAdd) {
+    private boolean handleVarDeclarationStatement(final VariableDeclarationStatement node,
+            final Set<String> classesToUseWithImport,
+            final Set<String> importsToAdd) {
         Type type = node.getType();
 
         if (type.isParameterizedType() && isTargetType(type)) {
@@ -195,7 +192,8 @@ public abstract class AbstractEnumCollectionReplacementRefactoring extends NewCl
 
                         if (creates(initExpr, getImplType())) {
                             return maybeReplace((ClassInstanceCreation) initExpr,
-                                    useImport, isImportToBeAdd, typeArguments.toArray(new Type[typeArguments.size()]));
+                                    classesToUseWithImport, importsToAdd,
+                                    typeArguments.toArray(new Type[typeArguments.size()]));
                         }
                     }
                 }

@@ -27,6 +27,7 @@ package org.autorefactor.refactoring.rules.samples_out;
 
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
@@ -42,66 +43,66 @@ public class HashMapRatherThanHashtableSample {
 
     public void replaceHashtableInstanceCreation() {
         // Keep this comment
-        Set<Entry<String, String>> entrySet = new java.util.HashMap<String, String>().entrySet();
+        Set<Entry<String, String>> entrySet = new HashMap<String, String>().entrySet();
         // Keep this comment too
-        int size = new java.util.HashMap<String, String>(10).size();
+        int size = new HashMap<String, String>(10).size();
     }
 
     public void replaceRawHashtable() {
         // Keep this comment
-        Set<Entry> entrySet = new java.util.HashMap().entrySet();
+        Set<Entry> entrySet = new HashMap().entrySet();
         // Keep this comment too
-        int size = new java.util.HashMap(10).size();
+        int size = new HashMap(10).size();
     }
 
     public void replaceFullyQualifiedHashtable() {
         // Keep this comment
-        Set<Entry<Integer, Date>> entrySet = new java.util.HashMap<Integer, Date>().entrySet();
+        Set<Entry<Integer, Date>> entrySet = new HashMap<Integer, Date>().entrySet();
         // Keep this comment too
-        int size = new java.util.HashMap(10).size();
+        int size = new HashMap(10).size();
     }
 
     public void replaceHashtableVariableDeclaration() {
         // Keep this comment
-        java.util.HashMap<String, String> map = new java.util.HashMap<String, String>();
+        HashMap<String, String> map = new HashMap<String, String>();
     }
 
     public void replaceMapVariableDeclaration() {
         // Keep this comment
-        Map<String, String> map = new java.util.HashMap<String, String>();
+        Map<String, String> map = new HashMap<String, String>();
     }
 
     public void replaceHashtableVariableUse() {
         // Keep this comment
-        java.util.HashMap<String, String> map = new java.util.HashMap<String, String>();
+        HashMap<String, String> map = new HashMap<String, String>();
         // Keep this comment too
         map.put("foo", "bar");
     }
 
     public void replaceMapVariableUse() {
         // Keep this comment
-        Map<String, String> map = new java.util.HashMap<String, String>();
+        Map<String, String> map = new HashMap<String, String>();
         // Keep this comment too
         map.put("foo", "bar");
     }
 
     public void refactorHashtableMethod() {
         // Keep this comment
-        java.util.HashMap<String, List<String>[]> map = new java.util.HashMap<String, List<String>[]>();
+        HashMap<String, List<String>[]> map = new HashMap<String, List<String>[]>();
         // Keep this comment too
         map.values();
     }
 
     public void refactorMapMethod() {
         // Keep this comment
-        Map<String, List<String>[]> map = new java.util.HashMap<String, List<String>[]>();
+        Map<String, List<String>[]> map = new HashMap<String, List<String>[]>();
         // Keep this comment too
         map.values();
     }
 
     public String replaceHashtableWithLoop(List<Date> dates) {
         // Keep this comment
-        java.util.HashMap<Long, Date> map = new java.util.HashMap<Long, Date>();
+        HashMap<Long, Date> map = new HashMap<Long, Date>();
         for (Date date : dates) {
             map.put(date.getTime(), date);
         }
@@ -111,7 +112,7 @@ public class HashMapRatherThanHashtableSample {
 
     public String replaceMapWithLoop(List<Date> dates) {
         // Keep this comment
-        Map<Long, Date> map = new java.util.HashMap<Long, Date>();
+        Map<Long, Date> map = new HashMap<Long, Date>();
         for (Date date : dates) {
             map.put(date.getTime(), date);
         }
@@ -121,35 +122,35 @@ public class HashMapRatherThanHashtableSample {
 
     public void replaceHashtableWithModifier() {
         // Keep this comment
-        final java.util.HashMap<String, int[]> map = new java.util.HashMap<String, int[]>();
+        final HashMap<String, int[]> map = new HashMap<String, int[]>();
         map.put("foo", new int[] {1, 2, 3});
     }
 
     public void replaceMapWithModifier() {
         // Keep this comment
-        final Map<String, int[]> map = new java.util.HashMap<String, int[]>();
+        final Map<String, int[]> map = new HashMap<String, int[]>();
         map.put("foo", new int[] {1, 2, 3});
     }
 
     public void replaceHashtableWithParameter() {
         // Keep this comment
-        java.util.HashMap<String, String> map = new java.util.HashMap<String, String>(10);
+        HashMap<String, String> map = new HashMap<String, String>(10);
         map.put("foo", "bar");
     }
 
     public void replaceMapWithParameter() {
         // Keep this comment
-        Map<String, String> map = new java.util.HashMap<String, String>(10);
+        Map<String, String> map = new HashMap<String, String>(10);
         map.put("foo", "bar");
     }
 
     public Set<Entry<String, String>> replaceReassignedHashtable() {
         // Keep this comment
-        java.util.HashMap<String, String> map1 = new java.util.HashMap<String, String>();
+        HashMap<String, String> map1 = new HashMap<String, String>();
         map1.put("foo", "FOO");
 
         // Keep this comment too
-        java.util.HashMap<String, String> map2 = map1;
+        HashMap<String, String> map2 = map1;
         map2.put("bar", "BAR");
 
         return map2.entrySet();
@@ -157,7 +158,7 @@ public class HashMapRatherThanHashtableSample {
 
     public Set<Entry<String, String>> replaceReassignedMap() {
         // Keep this comment
-        Map<String, String> map1 = new java.util.HashMap<String, String>();
+        Map<String, String> map1 = new HashMap<String, String>();
         map1.put("foo", "FOO");
 
         // Keep this comment too
@@ -186,26 +187,26 @@ public class HashMapRatherThanHashtableSample {
     }
 
     public void replaceThreadLocalHashtable() {
-        final java.util.HashMap<String, String> map = new java.util.HashMap<String, String>();
+        final HashMap<String, String> map = new HashMap<String, String>();
         map.put("foo", "bar");
         new Runnable() {
 
             @Override
             public void run() {
-                final java.util.HashMap<String, String> localMap = new java.util.HashMap<String, String>();
+                final HashMap<String, String> localMap = new HashMap<String, String>();
                 localMap.put("foo", "bar");
             }
         };
     }
 
     public void replaceThreadLocalMap() {
-        final Map<String, String> map = new java.util.HashMap<String, String>();
+        final Map<String, String> map = new HashMap<String, String>();
         map.put("foo", "bar");
         new Runnable() {
 
             @Override
             public void run() {
-                final Map<String, String> localMap = new java.util.HashMap<String, String>();
+                final Map<String, String> localMap = new HashMap<String, String>();
                 localMap.put("foo", "bar");
             }
         };

@@ -28,13 +28,19 @@ package org.autorefactor.refactoring.rules;
 import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
 import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+
 import org.autorefactor.refactoring.InterruptibleVisitor;
 import org.autorefactor.refactoring.Refactorings;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.ImportDeclaration;
-import org.eclipse.jdt.core.dom.Name;
+import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.SimpleType;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 
@@ -47,42 +53,45 @@ public abstract class NewClassImportRefactoring extends AbstractRefactoringRule 
      * The class that does the refactoring when an import needs to be added.
      */
     public abstract class RefactoringWithNewClassImport extends ASTVisitor {
-        /**
-         * True if an import needs to be added.
-         */
-        private boolean isImportToBeAdd = false;
+        private Set<String> classesToUseWithImport = new HashSet<String>();
+        private Set<String> importsToAdd = new HashSet<String>();
 
         /**
-         * True if an import needs to be added.
+         * The imports that need to be added.
          *
-         * @return True if an import needs to be added
+         * @return the importsToBeAdd
          */
-        public boolean isImportToBeAdd() {
-            return isImportToBeAdd;
+        public Set<String> getImportsToAdd() {
+            return importsToAdd;
         }
 
         /**
-         * Set true if an import needs to be added.
+         * The imports already existing.
          *
-         * @param isImportToBeUsed True if an import needs to be added
+         * @return the already imported classes
          */
-        public void setImportToBeAdd(boolean isImportToBeUsed) {
-            this.isImportToBeAdd = isImportToBeUsed;
+        public Set<String> getClassesToUseWithImport() {
+            return classesToUseWithImport;
         }
     }
 
     private class LocalClassVisitor extends InterruptibleVisitor {
-        private boolean isClassnameLocallyUsed;
+        private Set<String> classnamesNeverUsedLocally = new HashSet<String>();
 
-        public boolean isClassnameLocallyUsed() {
-            return isClassnameLocallyUsed;
+        /**
+         * LocalClassVisitor.
+         *
+         * @param classnamesNeverUsedLocally Classnames never used locally
+         */
+        public LocalClassVisitor(Set<String> classnamesNeverUsedLocally) {
+            this.classnamesNeverUsedLocally = classnamesNeverUsedLocally;
         }
 
         @Override
         public boolean visit(TypeDeclaration nestedClass) {
+            classnamesNeverUsedLocally.remove(nestedClass.getName().getIdentifier());
 
-            if (nestedClass.getName().getIdentifier().equals(getClassNameToImport())) {
-                isClassnameLocallyUsed = true;
+            if (classnamesNeverUsedLocally.isEmpty()) {
                 return interruptVisit();
             }
 
@@ -91,20 +100,23 @@ public abstract class NewClassImportRefactoring extends AbstractRefactoringRule 
 
         @Override
         public boolean visit(SimpleType simpleName) {
-            if (simpleName.getName().isSimpleName()
-                    && hasSimpleName(simpleName.getName(), getClassNameToImport())) {
-                isClassnameLocallyUsed = true;
-                return interruptVisit();
+            if (simpleName.getName().isSimpleName()) {
+                classnamesNeverUsedLocally.remove(((SimpleName) simpleName.getName()).getIdentifier());
+
+                if (classnamesNeverUsedLocally.isEmpty()) {
+                    return interruptVisit();
+                }
             }
 
             return VISIT_SUBTREE;
         }
-    }
 
-    private boolean hasSimpleName(final Name aName, final String simpleNameToSearch) {
-        final boolean matches = aName.getFullyQualifiedName()
-                .matches("^(.*\\.)?" + simpleNameToSearch + "$");
-        return matches;
+        /**
+         * @return the classnamesNeverUsedLocally
+         */
+        public Set<String> getClassnamesNeverUsedLocally() {
+            return classnamesNeverUsedLocally;
+        }
     }
 
     /**
@@ -113,69 +125,133 @@ public abstract class NewClassImportRefactoring extends AbstractRefactoringRule 
      * @param node One node in the class file
      * @return True if an import already exists for a class.
      */
-    public boolean isAlreadyImported(final ASTNode node) {
+    public Set<String> getAlreadyImportedClasses(final ASTNode node) {
+        final Set<String> alreadyImportedClasses = new HashSet<String>();
         final CompilationUnit cu = (CompilationUnit) node.getRoot();
-        final String fullyQualifiedName = getPackageNameToImport() + "." + getClassNameToImport();
+        final Set<String> classesToUse = getClassesToImport();
+        final Map<String, String> importsByPackage = new HashMap<String, String>();
 
-        for (Object anObject : cu.imports()) {
-            ImportDeclaration anImport = (ImportDeclaration) anObject;
+        for (String clazz : classesToUse) {
+            importsByPackage.put(getPackageName(clazz), clazz);
+        }
+
+        for (final Object anObject : cu.imports()) {
+            final ImportDeclaration anImport = (ImportDeclaration) anObject;
 
             if (anImport.isOnDemand()) {
-                if (getPackageNameToImport().equals(anImport.getName().getFullyQualifiedName())) {
-                    return true;
+                String fullName = importsByPackage.get(anImport.getName().getFullyQualifiedName());
+
+                if (fullName != null) {
+                    alreadyImportedClasses.add(fullName);
                 }
-            } else if (fullyQualifiedName.equals(anImport.getName().getFullyQualifiedName())) {
-                return true;
+            } else if (classesToUse.contains(anImport.getName().getFullyQualifiedName())) {
+                alreadyImportedClasses.add(anImport.getName().getFullyQualifiedName());
             }
         }
 
-        return false;
+        return alreadyImportedClasses;
     }
 
     @Override
     public boolean visit(final CompilationUnit node) {
-        boolean isAlreadyImported = false;
-        boolean canClassBeImported = true;
-        final String fullyQualifiedName = getPackageNameToImport() + "." + getClassNameToImport();
+        if (super.visit(node) == DO_NOT_VISIT_SUBTREE) {
+            return DO_NOT_VISIT_SUBTREE;
+        }
+
+        final Set<String> classesToUse = getClassesToImport();
+
+        if (classesToUse.isEmpty()) {
+            return VISIT_SUBTREE;
+        }
+
+        final Map<String, String> importsByClassname = new HashMap<String, String>();
+        final Map<String, String> importsByPackage = new HashMap<String, String>();
+
+        for (String clazz : classesToUse) {
+            importsByClassname.put(getSimpleName(clazz), clazz);
+            importsByPackage.put(getPackageName(clazz), clazz);
+        }
+
+        Set<String> alreadyImportedClasses = new HashSet<String>();
+        Set<String> classesToImport = new HashSet<String>(classesToUse);
 
         for (Object anObject : node.imports()) {
             ImportDeclaration anImport = (ImportDeclaration) anObject;
 
             if (!anImport.isStatic()) {
                 if (anImport.isOnDemand()) {
-                    if (getPackageNameToImport().equals(anImport.getName().getFullyQualifiedName())) {
-                        isAlreadyImported = true;
+                    String fullName = importsByPackage.get(anImport.getName().getFullyQualifiedName());
+
+                    if (fullName != null) {
+                        alreadyImportedClasses.add(fullName);
                     }
-                } else if (fullyQualifiedName.equals(anImport.getName().getFullyQualifiedName())) {
-                    isAlreadyImported = true;
-                    canClassBeImported = false;
-                } else if (hasSimpleName(anImport.getName(), getClassNameToImport())) {
-                    canClassBeImported = false;
+                } else if (classesToUse.contains(anImport.getName().getFullyQualifiedName())) {
+                    alreadyImportedClasses.add(anImport.getName().getFullyQualifiedName());
+                    classesToImport.remove(anImport.getName().getFullyQualifiedName());
+                } else if (importsByClassname.containsKey(getSimpleName(anImport.getName()
+                        .getFullyQualifiedName()))) {
+                    classesToImport.remove(anImport.getName().getFullyQualifiedName());
                 }
             }
         }
 
-        if (canClassBeImported) {
-            LocalClassVisitor nestedClassVisitor = new LocalClassVisitor();
-            nestedClassVisitor.visitNode(node);
+        filterLocallyUsedNames(node, importsByClassname, classesToImport);
 
-            canClassBeImported = !nestedClassVisitor.isClassnameLocallyUsed();
-        }
-
-        if (!isAlreadyImported && canClassBeImported) {
+        if (alreadyImportedClasses.size() < classesToUse.size() && !classesToImport.isEmpty()) {
             final RefactoringWithNewClassImport refactoringClass = getRefactoringClassInstance();
+            refactoringClass.getClassesToUseWithImport().addAll(alreadyImportedClasses);
+            refactoringClass.getClassesToUseWithImport().addAll(classesToImport);
             node.accept(refactoringClass);
 
-            if (refactoringClass.isImportToBeAdd()) {
+            if (!refactoringClass.getImportsToAdd().isEmpty()) {
                 final Refactorings r = ctx.getRefactorings();
 
-                r.getImportRewrite().addImport(fullyQualifiedName);
+                for (String importToAdd : refactoringClass.getImportsToAdd()) {
+                    r.getImportRewrite().addImport(importToAdd);
+                }
 
                 return DO_NOT_VISIT_SUBTREE;
             }
         }
 
         return VISIT_SUBTREE;
+    }
+
+    /**
+     * The simple name of the class.
+     *
+     * @param fullyQualifiedName The name of the class with packages.
+     * @return The simple name of the class.
+     */
+    public String getSimpleName(final String fullyQualifiedName) {
+        return fullyQualifiedName.replaceFirst("^(?:.*\\.)?([^.]*)$", "$1");
+    }
+
+    /**
+     * The package of the class.
+     *
+     * @param fullyQualifiedName The name of the class with packages.
+     * @return The package of the class.
+     */
+    public String getPackageName(final String fullyQualifiedName) {
+        return fullyQualifiedName.replaceFirst("^(.*)\\.[^.]$", "$1");
+    }
+
+    private void filterLocallyUsedNames(final CompilationUnit node, final Map<String, String> importsByClassname,
+            final Set<String> classesToImport) {
+        final LocalClassVisitor nestedClassVisitor = new LocalClassVisitor(
+                importsByClassname.keySet());
+        nestedClassVisitor.visitNode(node);
+        final Set<String> classnamesNeverUsedLocally = nestedClassVisitor.getClassnamesNeverUsedLocally();
+        final Iterator<String> iterator = classesToImport.iterator();
+
+        while (iterator.hasNext()) {
+            final String classToImport = iterator.next();
+
+            if (!classnamesNeverUsedLocally.contains(getSimpleName(classToImport))) {
+                classesToImport.remove(classToImport);
+            }
+        }
     }
 
     /**
@@ -186,16 +262,9 @@ public abstract class NewClassImportRefactoring extends AbstractRefactoringRule 
     public abstract RefactoringWithNewClassImport getRefactoringClassInstance();
 
     /**
-     * The package name to import.
+     * The class names to import.
      *
-     * @return The package name to import
+     * @return The class names to import
      */
-    public abstract String getPackageNameToImport();
-
-    /**
-     * The class name to import.
-     *
-     * @return The class name to import
-     */
-    public abstract String getClassNameToImport();
+    public abstract Set<String> getClassesToImport();
 }

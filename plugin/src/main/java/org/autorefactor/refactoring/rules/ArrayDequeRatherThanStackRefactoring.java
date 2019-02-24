@@ -30,9 +30,12 @@ import static org.autorefactor.refactoring.ASTHelper.hasType;
 import static org.autorefactor.refactoring.ASTHelper.isMethod;
 import static org.autorefactor.util.Utils.getOrDefault;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.Release;
@@ -102,6 +105,11 @@ public class ArrayDequeRatherThanStackRefactoring extends AbstractClassSubstitut
     @Override
     protected String[] getExistingClassCanonicalName() {
         return new String[] {"java.util.Stack"};
+    }
+
+    @Override
+    public Set<String> getClassesToImport() {
+        return new HashSet<String>(Arrays.asList("java.util.ArrayDeque", "java.util.Collection"));
     }
 
     @Override

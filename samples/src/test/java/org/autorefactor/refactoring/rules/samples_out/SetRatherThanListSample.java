@@ -28,53 +28,55 @@ package org.autorefactor.refactoring.rules.samples_out;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Observable;
 import java.util.Properties;
+import java.util.Set;
 
 public class SetRatherThanListSample {
 
     public void replaceArrayListInstanceCreation() {
-        new java.util.HashSet<String>().contains("foo");
-        new java.util.HashSet<String>(new java.util.ArrayList<String>()).contains("bar");
+        new HashSet<String>().contains("foo");
+        new HashSet<String>(new java.util.ArrayList<String>()).contains("bar");
     }
 
     public void replaceLinkedListInstanceCreation() {
-        new java.util.HashSet<String>().contains("foo");
-        new java.util.HashSet<String>(new java.util.LinkedList<String>()).contains("bar");
+        new HashSet<String>().contains("foo");
+        new HashSet<String>(new java.util.LinkedList<String>()).contains("bar");
     }
 
     public void replaceOnlyWithContainsMethod() {
-        new java.util.HashSet<String>().contains("foo");
+        new HashSet<String>().contains("foo");
         new ArrayList<String>().isEmpty();
     }
 
     public void replaceOnlyWithContainsLinkedListMethod() {
-        new java.util.HashSet<String>().contains("foo");
+        new HashSet<String>().contains("foo");
         new LinkedList<String>().isEmpty();
     }
 
     public void replaceRawArrayList() {
-        new java.util.HashSet().contains("foo");
-        new java.util.HashSet(new java.util.ArrayList<String>()).contains("bar");
+        new HashSet().contains("foo");
+        new HashSet(new java.util.ArrayList<String>()).contains("bar");
     }
 
     public void replaceRawLinkedList() {
-        new java.util.HashSet().contains("foo");
-        new java.util.HashSet(new java.util.LinkedList<String>()).contains("bar");
+        new HashSet().contains("foo");
+        new HashSet(new java.util.LinkedList<String>()).contains("bar");
     }
 
     public void replaceFullyQualifiedArrayList() {
-        new java.util.HashSet<Date>().contains("foo");
-        new java.util.HashSet(10).contains("bar");
+        new HashSet<Date>().contains("foo");
+        new HashSet(10).contains("bar");
     }
 
     public void replaceFullyQualifiedLinkedList() {
-        new java.util.HashSet<Date>().contains("foo");
-        new java.util.HashSet().contains("bar");
+        new HashSet<Date>().contains("foo");
+        new HashSet().contains("bar");
     }
 
     public void doNotReplaceArrayListVariableDeclaration() {
@@ -87,49 +89,49 @@ public class SetRatherThanListSample {
 
     public void replaceArrayListVariableUse() {
         // Keep this comment
-        java.util.HashSet<String> collection = new java.util.HashSet<String>();
+        HashSet<String> collection = new HashSet<String>();
         // Keep this comment too
         collection.contains("foo");
     }
 
     public void replaceLinkedListVariableUse() {
         // Keep this comment
-        java.util.HashSet<String> collection = new java.util.HashSet<String>();
+        HashSet<String> collection = new HashSet<String>();
         // Keep this comment too
         collection.contains("foo");
     }
 
     public void replaceArrayListAndListInterface() {
         // Keep this comment
-        java.util.Set<String> collection = new java.util.HashSet<String>();
+        Set<String> collection = new HashSet<String>();
         // Keep this comment too
         collection.contains("foo");
     }
 
     public void replaceLinkedListAndListInterface() {
         // Keep this comment
-        java.util.Set<String> collection = new java.util.HashSet<String>();
+        Set<String> collection = new HashSet<String>();
         // Keep this comment too
         collection.contains("foo");
     }
 
     public void replaceArrayListAndCollectionInterface() {
         // Keep this comment
-        Collection<String> collection = new java.util.HashSet<String>();
+        Collection<String> collection = new HashSet<String>();
         // Keep this comment too
         collection.contains("foo");
     }
 
     public void replaceLinkedListAndCollectionInterface() {
         // Keep this comment
-        Collection<String> collection = new java.util.HashSet<String>();
+        Collection<String> collection = new HashSet<String>();
         // Keep this comment too
         collection.contains("foo");
     }
 
     public boolean refactorWithMethod() {
         // Keep this comment
-        java.util.HashSet<Observable[][]> collection = new java.util.HashSet<Observable[][]>();
+        HashSet<Observable[][]> collection = new HashSet<Observable[][]>();
         // Keep this comment too
         collection.add(new Observable[0][]);
         return collection.contains(new Observable[0][]);
@@ -137,7 +139,7 @@ public class SetRatherThanListSample {
 
     public boolean refactorWithLinkedListMethod() {
         // Keep this comment
-        java.util.HashSet<Observable> collection = new java.util.HashSet<Observable>();
+        HashSet<Observable> collection = new HashSet<Observable>();
         // Keep this comment too
         collection.add(new Observable());
         return collection.contains(new Observable());
@@ -145,7 +147,7 @@ public class SetRatherThanListSample {
 
     public boolean replaceArrayListWithLoop(List<Date> dates) {
         // Keep this comment
-        Collection<Date> collection = new java.util.HashSet<Date>();
+        Collection<Date> collection = new HashSet<Date>();
         for (Date date : dates) {
             collection.add(date);
         }
@@ -155,7 +157,7 @@ public class SetRatherThanListSample {
 
     public boolean replaceLinkedListWithLoop(List<Date> dates) {
         // Keep this comment
-        Collection<Date> collection = new java.util.HashSet<Date>();
+        Collection<Date> collection = new HashSet<Date>();
         for (Date date : dates) {
             collection.add(date);
         }
@@ -165,35 +167,35 @@ public class SetRatherThanListSample {
 
     public boolean replaceArrayListWithModifier() {
         // Keep this comment
-        final java.util.HashSet<byte[]> collection = new java.util.HashSet<byte[]>();
+        final HashSet<byte[]> collection = new HashSet<byte[]>();
         collection.add(new byte[] {1});
         return collection.contains(new byte[] {2});
     }
 
     public boolean replaceLinkedListWithModifier() {
         // Keep this comment
-        final java.util.HashSet<byte[]> collection = new java.util.HashSet<byte[]>();
+        final HashSet<byte[]> collection = new HashSet<byte[]>();
         collection.add(new byte[] {1});
         return collection.contains(new byte[] {2});
     }
 
     public boolean replaceArrayListWithParameter() {
         // Keep this comment
-        java.util.HashSet<Integer> collection = new java.util.HashSet<Integer>(new java.util.ArrayList<Integer>());
+        HashSet<Integer> collection = new HashSet<Integer>(new java.util.ArrayList<Integer>());
         collection.add(1);
         return collection.contains(2);
     }
 
     public boolean replaceLinkedListWithParameter() {
         // Keep this comment
-        java.util.HashSet<Integer> collection = new java.util.HashSet<Integer>(new java.util.ArrayList<Integer>());
+        HashSet<Integer> collection = new HashSet<Integer>(new java.util.ArrayList<Integer>());
         collection.add(1);
         return collection.contains(2);
     }
 
     public boolean replaceReassignedArrayList() {
         // Keep this comment
-        java.util.HashSet<String> collection1 = new java.util.HashSet<String>();
+        HashSet<String> collection1 = new HashSet<String>();
         collection1.add("FOO");
 
         // Keep this comment too
@@ -205,7 +207,7 @@ public class SetRatherThanListSample {
 
     public boolean replaceReassignedLinkedList() {
         // Keep this comment
-        java.util.HashSet<String> collection1 = new java.util.HashSet<String>();
+        HashSet<String> collection1 = new HashSet<String>();
         collection1.add("FOO");
 
         // Keep this comment too
@@ -369,7 +371,7 @@ public class SetRatherThanListSample {
 
     public boolean refactorMethods(Collection collection) {
         // Keep this comment
-        java.util.HashSet<String> list = new java.util.HashSet<String>();
+        HashSet<String> list = new HashSet<String>();
         list.add("bar");
         list.addAll(collection);
         return list.contains("foo");
@@ -377,7 +379,7 @@ public class SetRatherThanListSample {
 
     public boolean refactorLinkedListMethods(Collection collection) {
         // Keep this comment
-        java.util.HashSet<String> list = new java.util.HashSet<String>();
+        HashSet<String> list = new HashSet<String>();
         list.add("bar");
         list.addAll(collection);
         return list.contains("foo");
@@ -385,7 +387,7 @@ public class SetRatherThanListSample {
 
     public void replaceListInRunnable() {
         // Keep this comment
-        final java.util.HashSet<String> list = new java.util.HashSet<String>();
+        final HashSet<String> list = new HashSet<String>();
         new Runnable() {
 
             @Override
@@ -398,7 +400,7 @@ public class SetRatherThanListSample {
 
     public void replaceLinkedListInRunnable() {
         // Keep this comment
-        final java.util.HashSet<String> list = new java.util.HashSet<String>();
+        final HashSet<String> list = new HashSet<String>();
         new Runnable() {
 
             @Override
@@ -411,14 +413,14 @@ public class SetRatherThanListSample {
 
     public void replaceListInsideRunnable() {
         // Keep this comment
-        final java.util.Set<String> list = new java.util.HashSet<String>();
+        final Set<String> list = new HashSet<String>();
         list.contains("bar");
         new Runnable() {
 
             @Override
             public void run() {
                 // Keep this comment too
-                final java.util.HashSet<String> localList = new java.util.HashSet<String>();
+                final HashSet<String> localList = new HashSet<String>();
                 localList.add("foo");
                 localList.contains("bar");
             }
@@ -427,14 +429,14 @@ public class SetRatherThanListSample {
 
     public void replaceLinkedListInsideRunnable() {
         // Keep this comment
-        final java.util.Set<String> list = new java.util.HashSet<String>();
+        final Set<String> list = new HashSet<String>();
         list.contains("bar");
         new Runnable() {
 
             @Override
             public void run() {
                 // Keep this comment too
-                final java.util.HashSet<String> localList = new java.util.HashSet<String>();
+                final HashSet<String> localList = new HashSet<String>();
                 localList.add("foo");
                 localList.contains("bar");
             }

@@ -30,9 +30,12 @@ import static org.autorefactor.refactoring.ASTHelper.hasType;
 import static org.autorefactor.refactoring.ASTHelper.isMethod;
 import static org.autorefactor.util.Utils.getOrDefault;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.MethodInvocation;
@@ -89,6 +92,11 @@ public class ArrayListRatherThanLinkedListRefactoring extends AbstractClassSubst
     @Override
     protected String[] getExistingClassCanonicalName() {
         return new String[] {"java.util.LinkedList"};
+    }
+
+    @Override
+    public Set<String> getClassesToImport() {
+        return new HashSet<String>(Arrays.asList("java.util.ArrayList"));
     }
 
     @Override
