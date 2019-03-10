@@ -90,6 +90,7 @@ public final class AllRefactoringRules {
                 new InvertEqualsRefactoring(),
                 new ComparisonRefactoring(),
                 new RemoveUnneededThisExpressionRefactoring(),
+                new AggregateConstructorRatherThanGWTMethodRefactoring(),
                 new StringRatherThanNewStringRefactoring(),
                 new StringRefactoring(),
                 new StringValueOfRatherThanConcatRefactoring(),

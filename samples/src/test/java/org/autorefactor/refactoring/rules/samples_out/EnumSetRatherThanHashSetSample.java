@@ -25,6 +25,7 @@
  */
 package org.autorefactor.refactoring.rules.samples_out;
 
+import java.time.DayOfWeek;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
@@ -37,26 +38,26 @@ public class EnumSetRatherThanHashSetSample {
         ONE, TWO, THREE
     }
 
-    public Set<Example> refactorVariableDeclarationStatement() {
+    public Set<DayOfWeek> refactorVariableDeclarationStatement() {
         // Keep this comment
-        Set<Example> set = EnumSet.noneOf(Example.class);
+        Set<DayOfWeek> set = EnumSet.noneOf(DayOfWeek.class);
         return set;
     }
 
-    public Set<Example> refactorVariableDeclarationStatementWithDiamond() {
+    public Set<DayOfWeek> refactorVariableDeclarationStatementWithDiamond() {
         // Keep this comment
-        Set<Example> set = EnumSet.noneOf(Example.class);
+        Set<DayOfWeek> set = EnumSet.noneOf(DayOfWeek.class);
         return set;
     }
 
-    public Set<Example> doNotRefactorRawVariableDeclarationStatement() {
-        Set set = new HashSet<Example>();
+    public Set<DayOfWeek> doNotRefactorRawVariableDeclarationStatement() {
+        Set set = new HashSet<DayOfWeek>();
         return set;
     }
 
-    public Set<Example> refactorReturnStatement() {
+    public Set<DayOfWeek> refactorReturnStatement() {
         // Keep this comment
-        return EnumSet.noneOf(Example.class);
+        return EnumSet.noneOf(DayOfWeek.class);
     }
 
     public Set<Example> refactorReturnStatementWithDiamondOperator() {

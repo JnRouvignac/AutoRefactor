@@ -25,6 +25,7 @@
  */
 package org.autorefactor.refactoring.rules.samples_in;
 
+import java.time.DayOfWeek;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -36,21 +37,21 @@ public class EnumMapRatherThanHashMapSample {
         ONE, TWO, THREE
     }
 
-    public Map<Example, String> refactorVariableDeclarationStatement() {
+    public Map<DayOfWeek, String> refactorVariableDeclarationStatement() {
         // Keep this comment
-        Map<Example, String> map = new HashMap<Example, String>();
+        Map<DayOfWeek, String> map = new HashMap<DayOfWeek, String>();
         return map;
     }
 
-    public Map<Example, String> refactorVariableDeclarationStatementWithDiamond() {
+    public Map<DayOfWeek, String> refactorVariableDeclarationStatementWithDiamond() {
         // Keep this comment
-        Map<Example, String> map = new HashMap<>();
+        Map<DayOfWeek, String> map = new HashMap<>();
         return map;
     }
 
-    public Map<Example, String> refactorReturnStatement() {
+    public Map<DayOfWeek, String> refactorReturnStatement() {
         // Keep this comment
-        return new HashMap<Example, String>();
+        return new HashMap<DayOfWeek, String>();
     }
 
     public Map<Example, List<String>> refactorReturnStatementWithParameterizedType() {
