@@ -190,7 +190,8 @@ public abstract class NewClassImportRefactoring extends AbstractRefactoringRule 
                     classesToImport.remove(anImport.getName().getFullyQualifiedName());
                 } else if (importsByClassname.containsKey(getSimpleName(anImport.getName()
                         .getFullyQualifiedName()))) {
-                    classesToImport.remove(anImport.getName().getFullyQualifiedName());
+                    classesToImport.remove(importsByClassname.get(getSimpleName(anImport.getName()
+                            .getFullyQualifiedName())));
                 }
             }
         }
@@ -234,7 +235,7 @@ public abstract class NewClassImportRefactoring extends AbstractRefactoringRule 
      * @return The package of the class.
      */
     public String getPackageName(final String fullyQualifiedName) {
-        return fullyQualifiedName.replaceFirst("^(.*)\\.[^.]$", "$1");
+        return fullyQualifiedName.replaceFirst("^(.*)\\.[^.]+$", "$1");
     }
 
     private void filterLocallyUsedNames(final CompilationUnit node, final Map<String, String> importsByClassname,
