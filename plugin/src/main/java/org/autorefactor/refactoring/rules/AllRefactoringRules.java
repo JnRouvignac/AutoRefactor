@@ -44,7 +44,7 @@ public final class AllRefactoringRules {
      * @param preferences the preferences
      * @return the refactoring rules which have been enabled from the Eclipse preferences
      */
-    public static List<RefactoringRule> getConfiguredRefactoringRules(Preferences preferences) {
+    public static List<RefactoringRule> getConfiguredRefactoringRules(final Preferences preferences) {
         final List<RefactoringRule> refactorings = getAllRefactoringRules();
         for (final Iterator<RefactoringRule> iter = refactorings.iterator(); iter.hasNext();) {
             final RefactoringRule refactoring = iter.next();
@@ -91,6 +91,7 @@ public final class AllRefactoringRules {
                 new ComparisonRefactoring(),
                 new RemoveUnneededThisExpressionRefactoring(),
                 new AggregateConstructorRatherThanGWTMethodRefactoring(),
+                new StandardMethodRatherThanLibraryMethodRefactoring(),
                 new StringRatherThanNewStringRefactoring(),
                 new StringRefactoring(),
                 new StringValueOfRatherThanConcatRefactoring(),
@@ -182,7 +183,7 @@ public final class AllRefactoringRules {
                 new SimplifyExpressionRefactoring());
     }
 
-    private static List<RefactoringRule> newArrayList(RefactoringRule... refactorings) {
+    private static List<RefactoringRule> newArrayList(final RefactoringRule... refactorings) {
         final List<RefactoringRule> results = new ArrayList<RefactoringRule>(refactorings.length);
         for (RefactoringRule r : refactorings) {
             if (r != null) {
