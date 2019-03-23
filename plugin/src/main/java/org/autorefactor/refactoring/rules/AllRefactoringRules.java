@@ -89,6 +89,7 @@ public final class AllRefactoringRules {
                 new WorkWithNullCheckedExpressionFirstRefactoring(),
                 new InvertEqualsRefactoring(),
                 new ComparisonRefactoring(),
+                new DoubleCompareRatherThanEqualityRefactoring(),
                 new RemoveUnneededThisExpressionRefactoring(),
                 new AggregateConstructorRatherThanGWTMethodRefactoring(),
                 new StandardMethodRatherThanLibraryMethodRefactoring(),
