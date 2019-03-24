@@ -49,6 +49,7 @@ import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.internal.corext.fix.CleanUpRefactoring.CleanUpChange;
+import org.eclipse.jdt.internal.corext.refactoring.util.TextEditUtil;
 import org.eclipse.jdt.ui.cleanup.CleanUpOptions;
 import org.eclipse.jdt.ui.cleanup.ICleanUpFix;
 import org.eclipse.text.edits.TextEdit;
@@ -71,6 +72,7 @@ public class AutoRefactorFix implements ICleanUpFix {
         boolean hasChanges = false;
         final ICompilationUnit iCompilationUnit = (ICompilationUnit) compilationUnit.getJavaElement();
         final CleanUpChange cleanUpChange = new CleanUpChange("AutoRefactor", iCompilationUnit);
+        TextEdit allEdits = null;
 
         if (enabled) {
             final IJavaProject javaProject = PrepareApplyRefactoringsJob.getIJavaProject(iCompilationUnit);
@@ -93,10 +95,10 @@ public class AutoRefactorFix implements ICleanUpFix {
 
                 for (TextEdit textEdit : textEdits) {
                     if (hasChanges) {
-                        cleanUpChange.addEdit(textEdit);
+                        allEdits = TextEditUtil.merge(allEdits, textEdit);
                     } else {
                         hasChanges = true;
-                        cleanUpChange.setEdit(textEdit);
+                        allEdits = textEdit;
                     }
                 }
             } catch (Exception e) {
@@ -110,6 +112,7 @@ public class AutoRefactorFix implements ICleanUpFix {
             return null;
         }
 
+        cleanUpChange.setEdit(allEdits);
         AutoRefactorFix autoRefactorFix = new AutoRefactorFix();
         autoRefactorFix.cleanUpChange = cleanUpChange;
         return autoRefactorFix;
