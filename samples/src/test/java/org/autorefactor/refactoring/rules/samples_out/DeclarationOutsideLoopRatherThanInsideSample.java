@@ -103,6 +103,19 @@ public class DeclarationOutsideLoopRatherThanInsideSample {
         return result;
     }
 
+    public int moveComplexType(int max) {
+        int result = 1;
+
+        Class<?>[] complexObject;
+        do {
+            // Keep this comment
+            complexObject = new Class<?>[0];
+            result += complexObject.length + 1;
+        } while (result < max);
+
+        return result;
+    }
+
     public int moveDeclWithoutInit(List<String> myList) {
         int total = 0;
 

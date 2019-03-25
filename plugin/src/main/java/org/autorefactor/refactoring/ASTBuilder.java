@@ -45,6 +45,7 @@ import static org.eclipse.jdt.core.dom.ASTNode.PREFIX_EXPRESSION;
 import static org.eclipse.jdt.core.dom.ASTNode.PRIMITIVE_TYPE;
 import static org.eclipse.jdt.core.dom.ASTNode.QUALIFIED_TYPE;
 import static org.eclipse.jdt.core.dom.ASTNode.SIMPLE_TYPE;
+import static org.eclipse.jdt.core.dom.ASTNode.PARAMETERIZED_TYPE;
 import static org.eclipse.jdt.core.dom.Modifier.ModifierKeyword.FINAL_KEYWORD;
 import static org.eclipse.jdt.core.dom.Modifier.ModifierKeyword.PRIVATE_KEYWORD;
 import static org.eclipse.jdt.core.dom.Modifier.ModifierKeyword.PROTECTED_KEYWORD;
@@ -475,6 +476,19 @@ public class ASTBuilder {
         case SIMPLE_TYPE:
             final SimpleType sType = (SimpleType) type;
             return ast.newSimpleType(copy(sType.getName()));
+
+        case PARAMETERIZED_TYPE:
+            final ParameterizedType pType = (ParameterizedType) type;
+            final ParameterizedType copyOfType = ast.newParameterizedType(copy(pType.getType()));
+            final List<Type> newTypeArgs = typeArguments(copyOfType);
+            for (Object typeArg : pType.typeArguments()) {
+                if (((Type) typeArg).isWildcardType()) {
+                    newTypeArgs.add(ast.newWildcardType());
+                } else {
+                    newTypeArgs.add(copy((Type) typeArg));
+                }
+            }
+            return copyOfType;
         }
 
         throw new NotImplementedException(null, "Unknown type for type " + type);

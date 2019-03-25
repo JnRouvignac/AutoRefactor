@@ -45,7 +45,9 @@ import org.eclipse.jdt.core.dom.DoStatement;
 import org.eclipse.jdt.core.dom.EnhancedForStatement;
 import org.eclipse.jdt.core.dom.ForStatement;
 import org.eclipse.jdt.core.dom.IExtendedModifier;
+import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.Statement;
+import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 import org.eclipse.jdt.core.dom.WhileStatement;
@@ -84,13 +86,14 @@ public class DeclarationOutsideLoopRatherThanInsideRefactoring extends AbstractR
         final List<Statement> blockStmt = asList(node);
         boolean result = VISIT_SUBTREE;
 
+        List<Statement> forStmts;
         for (int i = 0; i < blockStmt.size(); i++) {
             final Statement stmt = blockStmt.get(i);
             final ForStatement forStatement = as(stmt, ForStatement.class);
             final EnhancedForStatement enhancedForStatement = as(stmt, EnhancedForStatement.class);
             final WhileStatement whileStatement = as(stmt, WhileStatement.class);
             final DoStatement doStatement = as(stmt, DoStatement.class);
-            List<Statement> forStmts = null;
+            forStmts = null;
 
             if (forStatement != null) {
                 forStmts = asList(forStatement.getBody());
@@ -124,7 +127,6 @@ public class DeclarationOutsideLoopRatherThanInsideRefactoring extends AbstractR
                             && !hasAnnotation(decl.modifiers())
                             && decl.fragments() != null
                             && decl.fragments().size() == 1) {
-
                         final VariableDeclarationFragment fragment = (VariableDeclarationFragment) decl
                                 .fragments().get(0);
                         final String id = fragment.getName().getIdentifier();
@@ -150,8 +152,8 @@ public class DeclarationOutsideLoopRatherThanInsideRefactoring extends AbstractR
     }
 
     @SuppressWarnings("unchecked")
-    private boolean hasAnnotation(List<?> modifiers) {
-        for (IExtendedModifier em : (List<IExtendedModifier>) modifiers) {
+    private boolean hasAnnotation(final List<?> modifiers) {
+        for (final IExtendedModifier em : (List<IExtendedModifier>) modifiers) {
             if (!em.isModifier()) {
                 return true;
             }
@@ -161,18 +163,20 @@ public class DeclarationOutsideLoopRatherThanInsideRefactoring extends AbstractR
     }
 
     private void moveDeclaration(final ASTBuilder b, final Refactorings r, final Statement stmt,
-            final VariableDeclarationStatement candidate) {
-        final VariableDeclarationFragment fragment = (VariableDeclarationFragment) candidate.fragments()
+            final VariableDeclarationStatement varToMove) {
+        final VariableDeclarationFragment fragment = (VariableDeclarationFragment) varToMove.fragments()
                 .get(0);
 
         if (fragment.getInitializer() != null) {
-            r.insertBefore(b.declareStmt(b.copy(candidate.getType()),
-                    b.declareFragment(b.copy(fragment.getName()))), stmt);
-            r.replace(candidate, b.toStmt(b.assign(b.copy(fragment.getName()), Assignment.Operator.ASSIGN,
+            final Type copyOfType = b.copy(varToMove.getType());
+            final SimpleName name = fragment.getName();
+            r.insertBefore(b.declareStmt(copyOfType,
+                    b.declareFragment(b.copy(name))), stmt);
+            r.replace(varToMove, b.toStmt(b.assign(b.copy(name), Assignment.Operator.ASSIGN,
                     b.copy(fragment.getInitializer()))));
         } else {
-            r.insertBefore(b.copy(candidate), stmt);
-            r.remove(candidate);
+            r.insertBefore(b.copy(varToMove), stmt);
+            r.remove(varToMove);
         }
     }
 }
