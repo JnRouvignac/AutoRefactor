@@ -39,7 +39,6 @@ import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.InfixExpression.Operator;
-import org.eclipse.jdt.core.dom.PrefixExpression;
 import org.eclipse.jdt.core.dom.Statement;
 
 /**
@@ -112,13 +111,10 @@ public class OppositeConditionRatherThanDuplicateConditionRefactoring extends Ab
                 final IfStatement secondIf = (IfStatement) node.getElseStatement();
 
                 if (secondIf.getElseStatement() != null) {
-                    if (maybeRefactorCondition(node, secondIf, firstCondition.getLeftOperand(),
-                            firstCondition.getRightOperand()) == DO_NOT_VISIT_SUBTREE) {
-                        return DO_NOT_VISIT_SUBTREE;
-                    }
-
-                    return maybeRefactorCondition(node, secondIf, firstCondition.getRightOperand(),
-                            firstCondition.getLeftOperand());
+                    return maybeRefactorCondition(node, secondIf, firstCondition.getLeftOperand(),
+                            firstCondition.getRightOperand())
+                            && maybeRefactorCondition(node, secondIf, firstCondition.getRightOperand(),
+                                    firstCondition.getLeftOperand());
                 }
             }
         }
@@ -128,30 +124,18 @@ public class OppositeConditionRatherThanDuplicateConditionRefactoring extends Ab
     private boolean maybeRefactorCondition(final IfStatement node, final IfStatement secondIf,
             final Expression duplicateExpr,
             final Expression notDuplicateExpr) {
-        if (match(new ASTSemanticMatcher(), removeParentheses(duplicateExpr),
-                removeParentheses(secondIf.getExpression()))) {
+        final ASTSemanticMatcher matcher = new ASTSemanticMatcher();
+
+        if (match(matcher, duplicateExpr, secondIf.getExpression())) {
             refactorCondition(node, duplicateExpr, notDuplicateExpr, secondIf.getThenStatement(),
                     secondIf.getElseStatement());
             return DO_NOT_VISIT_SUBTREE;
-        } else if (secondIf.getExpression() instanceof PrefixExpression) {
-            final PrefixExpression secondNegateIf = (PrefixExpression) secondIf.getExpression();
-            if (PrefixExpression.Operator.NOT.equals(secondNegateIf.getOperator())
-                    && match(new ASTSemanticMatcher(), removeParentheses(duplicateExpr),
-                            removeParentheses(secondNegateIf.getOperand()))) {
-                refactorCondition(node, duplicateExpr, notDuplicateExpr, secondIf.getElseStatement(),
-                        secondIf.getThenStatement());
-                return DO_NOT_VISIT_SUBTREE;
-            }
-        } else if (duplicateExpr instanceof PrefixExpression) {
-            final PrefixExpression negateDuplicateExpr = (PrefixExpression) duplicateExpr;
-            if (PrefixExpression.Operator.NOT.equals(negateDuplicateExpr.getOperator())
-                    && match(new ASTSemanticMatcher(), removeParentheses(negateDuplicateExpr.getOperand()),
-                            removeParentheses(secondIf.getExpression()))) {
-                refactorCondition(node, duplicateExpr, notDuplicateExpr, secondIf.getElseStatement(),
-                        secondIf.getThenStatement());
-                return DO_NOT_VISIT_SUBTREE;
-            }
+        } else if (matcher.matchOpposite(duplicateExpr, secondIf.getExpression())) {
+            refactorCondition(node, duplicateExpr, notDuplicateExpr, secondIf.getElseStatement(),
+                    secondIf.getThenStatement());
+            return DO_NOT_VISIT_SUBTREE;
         }
+
         return VISIT_SUBTREE;
     }
 

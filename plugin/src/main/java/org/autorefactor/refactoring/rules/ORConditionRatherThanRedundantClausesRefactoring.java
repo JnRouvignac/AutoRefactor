@@ -32,21 +32,16 @@ import static org.autorefactor.refactoring.ASTHelper.as;
 import static org.autorefactor.refactoring.ASTHelper.hasOperator;
 import static org.autorefactor.refactoring.ASTHelper.isPassive;
 import static org.autorefactor.refactoring.ASTHelper.isPrimitive;
-import static org.autorefactor.refactoring.ASTHelper.match;
 import static org.eclipse.jdt.core.dom.InfixExpression.Operator.AND;
 import static org.eclipse.jdt.core.dom.InfixExpression.Operator.CONDITIONAL_AND;
 import static org.eclipse.jdt.core.dom.InfixExpression.Operator.CONDITIONAL_OR;
 import static org.eclipse.jdt.core.dom.InfixExpression.Operator.OR;
-import static org.eclipse.jdt.core.dom.PrefixExpression.Operator.NOT;
-
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.ASTSemanticMatcher;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.InfixExpression.Operator;
-import org.eclipse.jdt.core.dom.PrefixExpression;
 
 /** See {@link #getDescription()} method. */
 public class ORConditionRatherThanRedundantClausesRefactoring extends AbstractRefactoringRule {
@@ -87,36 +82,31 @@ public class ORConditionRatherThanRedundantClausesRefactoring extends AbstractRe
             return maybeRefactorCondition(node, node.getOperator(), leftOperand, rightOperand, true)
                     && maybeRefactorCondition(node, node.getOperator(), rightOperand, leftOperand, false);
         }
+
         return VISIT_SUBTREE;
     }
 
     private boolean maybeRefactorCondition(final InfixExpression node, final Operator operator,
-            final Expression leftOperand, final Expression rightOperand, final boolean forward) {
-        final InfixExpression complexCondition = as(leftOperand, InfixExpression.class);
+            final Expression operand1, final Expression operand2, final boolean forward) {
+        final InfixExpression complexCondition = as(operand1, InfixExpression.class);
 
         if (complexCondition != null
                 && !complexCondition.hasExtendedOperands()
                 && hasOperator(complexCondition, CONDITIONAL_AND, AND)) {
-            final AtomicBoolean isFirstExprPositive = new AtomicBoolean();
-            final AtomicBoolean isSecondExprPositive = new AtomicBoolean();
-            final AtomicBoolean isThirdExprPositive = new AtomicBoolean();
+            final ASTSemanticMatcher matcher = new ASTSemanticMatcher();
 
-            final Expression firstExpr = getBasisExpression(complexCondition.getLeftOperand(), isFirstExprPositive);
-            final Expression secondExpr = getBasisExpression(complexCondition.getRightOperand(),
-                    isSecondExprPositive);
-            final Expression thirdExpr = getBasisExpression(rightOperand,
-                    isThirdExprPositive);
-
-            if (isPrimitive(firstExpr) && isPrimitive(secondExpr) && isPrimitive(thirdExpr)) {
-                if (match(new ASTSemanticMatcher(), secondExpr, thirdExpr)) {
-                    replaceDuplicateExpr(node, operator, firstExpr, thirdExpr,
-                            isFirstExprPositive.get(),
-                            isThirdExprPositive.get(), forward);
+            if (isPrimitive(complexCondition.getLeftOperand())
+                    && isPrimitive(complexCondition.getRightOperand())
+                    && isPrimitive(operand2)) {
+                if (matcher.matchOpposite(complexCondition.getLeftOperand(), operand2)) {
+                    replaceDuplicateExpr(node, operator, complexCondition.getRightOperand(), operand2,
+                            forward);
                     return DO_NOT_VISIT_SUBTREE;
-                } else if (match(new ASTSemanticMatcher(), firstExpr, thirdExpr)) {
-                    replaceDuplicateExpr(node, operator, secondExpr, thirdExpr,
-                            isSecondExprPositive.get(),
-                            isThirdExprPositive.get(), forward);
+                }
+
+                if (matcher.matchOpposite(complexCondition.getRightOperand(), operand2)) {
+                    replaceDuplicateExpr(node, operator, complexCondition.getLeftOperand(), operand2,
+                            forward);
                     return DO_NOT_VISIT_SUBTREE;
                 }
             }
@@ -124,40 +114,18 @@ public class ORConditionRatherThanRedundantClausesRefactoring extends AbstractRe
         return VISIT_SUBTREE;
     }
 
-    private Expression getBasisExpression(final Expression originalExpr, final AtomicBoolean isExprPositive) {
-        final Expression basisExpr;
-        final PrefixExpression negateExpr = as(originalExpr, PrefixExpression.class);
-        if (hasOperator(negateExpr, NOT)) {
-            basisExpr = negateExpr.getOperand();
-            isExprPositive.set(false);
-        } else {
-            basisExpr = originalExpr;
-            isExprPositive.set(true);
-        }
-        return basisExpr;
-    }
-
     private void replaceDuplicateExpr(final InfixExpression node, final Operator operator,
             final Expression leftExpr,
             final Expression rightExpr,
-            final boolean isLeftExprPositive, final boolean isRightExprPositive, final boolean forward) {
+            final boolean forward) {
         final ASTBuilder b = ctx.getASTBuilder();
-        Expression copyOfLeftExpr = b.copy(leftExpr);
-        if (!isLeftExprPositive) {
-            copyOfLeftExpr = b.not(copyOfLeftExpr);
-        }
-
-        Expression copyOfRightExpr = b.copy(rightExpr);
-        if (!isRightExprPositive) {
-            copyOfRightExpr = b.not(copyOfRightExpr);
-        }
 
         if (forward) {
             ctx.getRefactorings().replace(node,
-                    b.infixExpr(copyOfLeftExpr, operator, copyOfRightExpr));
+                    b.infixExpr(b.copy(leftExpr), operator, b.copy(rightExpr)));
         } else {
             ctx.getRefactorings().replace(node,
-                    b.infixExpr(copyOfRightExpr, operator, copyOfLeftExpr));
+                    b.infixExpr(b.copy(rightExpr), operator, b.copy(leftExpr)));
         }
     }
 }

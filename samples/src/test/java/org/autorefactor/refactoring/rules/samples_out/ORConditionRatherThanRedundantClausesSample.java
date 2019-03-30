@@ -34,7 +34,7 @@ public class ORConditionRatherThanRedundantClausesSample {
     public void removeDuplicateConditionsWithEagerOperator(boolean b1, boolean b2) {
         // Keep this comment
         boolean newBoolean1 = b1 | b2;
-        boolean newBoolean2 = b1 | !b2;
+        boolean newBoolean2 = !b1 | !b2;
         boolean newBoolean3 = b2 | !b1;
         boolean newBoolean4 = !b2 | b1;
     }
@@ -69,6 +69,8 @@ public class ORConditionRatherThanRedundantClausesSample {
         // Keep this comment
         boolean newBoolean1 = (i1 == i2) || (i3 == i4);
         boolean newBoolean2 = (i1 < i2) || !(i3 == i4);
+        boolean newBoolean3 = (i1 == i2) || (i3 == i4);
+        boolean newBoolean4 = (i1 < i2) || (i3 != i4);
     }
 
     public void doNotReplaceDuplicateConditionsWithMethods(List<String> myList) {

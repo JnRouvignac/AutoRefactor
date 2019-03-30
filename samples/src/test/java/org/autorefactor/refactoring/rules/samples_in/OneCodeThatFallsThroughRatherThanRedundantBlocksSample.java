@@ -172,10 +172,10 @@ public class OneCodeThatFallsThroughRatherThanRedundantBlocksSample {
             }
         } catch (NullPointerException npe) {
             System.out.println("Doing something");
-            if (interruptCode) {
-                throw new Exception("Stop!");
-            } else {
+            if (!interruptCode) {
                 return;
+            } else {
+                throw new Exception("Stop!");
             }
         }
         System.out.println("Doing something");

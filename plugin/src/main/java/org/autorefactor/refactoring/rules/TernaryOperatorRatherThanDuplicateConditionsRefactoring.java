@@ -78,7 +78,7 @@ public class TernaryOperatorRatherThanDuplicateConditionsRefactoring extends Abs
     }
 
     @Override
-    public boolean visit(InfixExpression node) {
+    public boolean visit(final InfixExpression node) {
         if (hasOperator(node, CONDITIONAL_OR, OR) && !node.hasExtendedOperands()) {
             final InfixExpression firstCondition = as(node.getLeftOperand(), InfixExpression.class);
             final InfixExpression secondCondition = as(node.getRightOperand(), InfixExpression.class);
@@ -88,47 +88,36 @@ public class TernaryOperatorRatherThanDuplicateConditionsRefactoring extends Abs
                     && hasOperator(firstCondition, CONDITIONAL_AND, AND)
                     && secondCondition != null
                     && !secondCondition.hasExtendedOperands()
-                    && hasOperator(secondCondition, CONDITIONAL_AND, AND)) {
-                final AtomicBoolean isFirstExprPositive = new AtomicBoolean();
-                final AtomicBoolean isSecondExprPositive = new AtomicBoolean();
-                final AtomicBoolean isThirdExprPositive = new AtomicBoolean();
-                final AtomicBoolean isFourthExprPositive = new AtomicBoolean();
+                    && hasOperator(secondCondition, CONDITIONAL_AND, AND)
+                    && isBooleanAndPassive(firstCondition.getLeftOperand())
+                    && isBooleanAndPassive(firstCondition.getRightOperand())
+                    && isBooleanAndPassive(secondCondition.getLeftOperand())
+                    && isBooleanAndPassive(secondCondition.getRightOperand())) {
+                ASTSemanticMatcher matcher = new ASTSemanticMatcher();
 
-                final Expression firstExpr = getBasisExpression(firstCondition.getLeftOperand(), isFirstExprPositive);
-                final Expression secondExpr = getBasisExpression(firstCondition.getRightOperand(),
-                        isSecondExprPositive);
-                final Expression thirdExpr = getBasisExpression(secondCondition.getLeftOperand(), isThirdExprPositive);
-                final Expression fourthExpr = getBasisExpression(secondCondition.getRightOperand(),
-                        isFourthExprPositive);
-
-                if (isBooleanAndPassive(firstExpr)
-                        && isBooleanAndPassive(secondExpr)
-                        && isBooleanAndPassive(thirdExpr)
-                        && isBooleanAndPassive(fourthExpr)) {
-                    if (match(new ASTSemanticMatcher(), firstExpr, thirdExpr)
-                            && isFirstExprPositive.get() != isThirdExprPositive.get()) {
-                        return maybeReplaceDuplicateExpr(node, firstExpr, firstCondition.getRightOperand(),
+                return maybeReplaceDuplicateExpr(matcher, node,
+                        firstCondition.getLeftOperand(),
+                        secondCondition.getLeftOperand(),
+                        firstCondition.getRightOperand(),
+                        secondCondition.getRightOperand())
+                        && maybeReplaceDuplicateExpr(matcher, node,
+                                firstCondition.getLeftOperand(),
                                 secondCondition.getRightOperand(),
-                                isFirstExprPositive.get());
-                    } else if (match(new ASTSemanticMatcher(), firstExpr, fourthExpr)
-                            && isFirstExprPositive.get() != isFourthExprPositive.get()) {
-                        return maybeReplaceDuplicateExpr(node, firstExpr, firstCondition.getRightOperand(),
+                                firstCondition.getRightOperand(),
+                                secondCondition.getLeftOperand())
+                        && maybeReplaceDuplicateExpr(matcher, node,
+                                firstCondition.getRightOperand(),
                                 secondCondition.getLeftOperand(),
-                                isFirstExprPositive.get());
-                    } else if (match(new ASTSemanticMatcher(), secondExpr, thirdExpr)
-                            && isSecondExprPositive.get() != isThirdExprPositive.get()) {
-                        return maybeReplaceDuplicateExpr(node, secondExpr, firstCondition.getLeftOperand(),
+                                firstCondition.getLeftOperand(),
+                                secondCondition.getRightOperand())
+                        && maybeReplaceDuplicateExpr(matcher, node,
+                                firstCondition.getRightOperand(),
                                 secondCondition.getRightOperand(),
-                                isSecondExprPositive.get());
-                    } else if (match(new ASTSemanticMatcher(), secondExpr, fourthExpr)
-                            && isSecondExprPositive.get() != isFourthExprPositive.get()) {
-                        return maybeReplaceDuplicateExpr(node, secondExpr, firstCondition.getLeftOperand(),
-                                secondCondition.getLeftOperand(),
-                                isSecondExprPositive.get());
-                    }
-                }
+                                firstCondition.getLeftOperand(),
+                                secondCondition.getLeftOperand());
             }
         }
+
         return VISIT_SUBTREE;
     }
 
@@ -136,9 +125,22 @@ public class TernaryOperatorRatherThanDuplicateConditionsRefactoring extends Abs
         return isPrimitive(expr, "boolean") && isPassive(expr);
     }
 
+    private boolean maybeReplaceDuplicateExpr(final ASTSemanticMatcher matcher, final InfixExpression node,
+            final Expression oneCondition,
+            final Expression oppositeCondition, final Expression oneExpr, final Expression oppositeExpr) {
+        if (matcher.matchOpposite(oneCondition, oppositeCondition)
+                && !match(matcher, oneExpr, oppositeExpr)) {
+            replaceDuplicateExpr(node, oneCondition, oneExpr, oppositeExpr);
+            return DO_NOT_VISIT_SUBTREE;
+        }
+
+        return VISIT_SUBTREE;
+    }
+
     private Expression getBasisExpression(final Expression originalExpr, final AtomicBoolean isExprPositive) {
         Expression basisExpr = null;
         final PrefixExpression negateExpr = as(originalExpr, PrefixExpression.class);
+
         if (hasOperator(negateExpr, NOT)) {
             basisExpr = negateExpr.getOperand();
             isExprPositive.set(false);
@@ -146,30 +148,30 @@ public class TernaryOperatorRatherThanDuplicateConditionsRefactoring extends Abs
             basisExpr = originalExpr;
             isExprPositive.set(true);
         }
+
         return basisExpr;
     }
 
-    private boolean maybeReplaceDuplicateExpr(final InfixExpression node, final Expression conditionExpr,
-            final Expression trueExpr,
-            final Expression falseExpr,
-            final boolean isFirstExprPositive) {
-        if (!match(new ASTSemanticMatcher(), trueExpr, falseExpr)) {
-            final ASTBuilder b = ctx.getASTBuilder();
+    private void replaceDuplicateExpr(final InfixExpression node, final Expression oneCondition,
+            final Expression oneExpr, final Expression oppositeExpr) {
+        final AtomicBoolean isFirstExprPositive = new AtomicBoolean();
 
-            final Expression thenExpr;
-            final Expression elseExpr;
-            if (isFirstExprPositive) {
-                thenExpr = trueExpr;
-                elseExpr = falseExpr;
-            } else {
-                thenExpr = falseExpr;
-                elseExpr = trueExpr;
-            }
+        final Expression basicExpr = getBasisExpression(oneCondition,
+                isFirstExprPositive);
 
-            ctx.getRefactorings().replace(node,
-                    b.conditionalExpr(b.copy(conditionExpr), b.copy(thenExpr), b.copy(elseExpr)));
-            return DO_NOT_VISIT_SUBTREE;
+        final ASTBuilder b = ctx.getASTBuilder();
+        final Expression thenExpr;
+        final Expression elseExpr;
+
+        if (isFirstExprPositive.get()) {
+            thenExpr = oneExpr;
+            elseExpr = oppositeExpr;
+        } else {
+            thenExpr = oppositeExpr;
+            elseExpr = oneExpr;
         }
-        return VISIT_SUBTREE;
+
+        ctx.getRefactorings().replace(node,
+                b.conditionalExpr(b.copy(basicExpr), b.copy(thenExpr), b.copy(elseExpr)));
     }
 }

@@ -95,6 +95,7 @@ public class TernaryOperatorRatherThanDuplicateConditionsSample {
         // Keep this comment
         boolean newBoolean1 = (i1 == i2 * 2) ? !(i3 == i4) : (i5 == i6);
         boolean newBoolean2 = (i1 + 1 == i2) ? (i3 == i4) : !(i5 == i6);
+        boolean newBoolean3 = (i1 < i2) ? (i3 == i4) : !(i5 == i6);
     }
 
     public void doNotReplaceDuplicateConditionsWithMethods(List<String> myList) {

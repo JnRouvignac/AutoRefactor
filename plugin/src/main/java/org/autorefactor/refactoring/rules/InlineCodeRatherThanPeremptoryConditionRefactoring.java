@@ -90,8 +90,10 @@ public class InlineCodeRatherThanPeremptoryConditionRefactoring extends Abstract
         public boolean visit(TryStatement node) {
             if (node.resources().isEmpty()) {
                 final List<Statement> tryStmts = asList(node.getBody());
+
                 if (tryStmts.isEmpty()) {
                     final List<Statement> finallyStmts = asList(node.getFinally());
+
                     if (!finallyStmts.isEmpty()) {
                         return maybeInlineBlock(node, node.getFinally());
                     } else {
@@ -113,6 +115,7 @@ public class InlineCodeRatherThanPeremptoryConditionRefactoring extends Abstract
             final Expression condition = node.getExpression();
 
             final Object constantCondition = peremptoryValue(condition);
+
             if (Boolean.TRUE.equals(constantCondition)) {
                 return maybeInlineBlock(node, thenStmt);
             } else if (Boolean.FALSE.equals(constantCondition)) {
@@ -153,16 +156,25 @@ public class InlineCodeRatherThanPeremptoryConditionRefactoring extends Abstract
 
     private Object peremptoryValue(final Expression condition) {
         final Object constantCondition = condition.resolveConstantExpressionValue();
+
         if (constantCondition != null) {
             return constantCondition;
         } else if (condition instanceof InfixExpression) {
             InfixExpression ie = (InfixExpression) condition;
-            if ((EQUALS.equals(ie.getOperator()) || NOT_EQUALS.equals(ie.getOperator()))
-                    && isPassive(ie.getLeftOperand())
-                    && match(new ASTSemanticMatcher(), ie.getLeftOperand(), ie.getRightOperand())) {
-                return EQUALS.equals(ie.getOperator());
+            final ASTSemanticMatcher matcher = new ASTSemanticMatcher();
+
+            if (hasOperator(ie, EQUALS, NOT_EQUALS)
+                    && isPassive(ie.getLeftOperand())) {
+                if (match(matcher, ie.getLeftOperand(), ie.getRightOperand())) {
+                    return EQUALS.equals(ie.getOperator());
+                }
+
+                if (matcher.matchOpposite(ie.getLeftOperand(), ie.getRightOperand())) {
+                    return NOT_EQUALS.equals(ie.getOperator());
+                }
             }
         }
+
         return null;
     }
 

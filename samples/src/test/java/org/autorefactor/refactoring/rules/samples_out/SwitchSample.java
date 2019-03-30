@@ -405,7 +405,7 @@ public class SwitchSample {
         case 0:
         case 1:
             System.out.println("Let's do lots of things!");
-            System.out.println("And again!");
+            System.out.println(interrumpt ? "And again!" : "And stop.");
             i = 0;
             break;
         default:

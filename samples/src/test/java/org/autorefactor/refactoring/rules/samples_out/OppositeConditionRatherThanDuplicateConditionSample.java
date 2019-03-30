@@ -178,6 +178,18 @@ public class OppositeConditionRatherThanDuplicateConditionSample {
         }
     }
 
+    public double mergeOppositeCondition(int i, boolean anotherCondition) {
+        // Keep this comment
+        if (!(i < 10 || 20 < i)) {
+            return 10.0;
+        } else if (anotherCondition) {
+            // Keep this comment also
+            return 0.0;
+        } else {
+            return 20.0;
+        }
+    }
+
     public int doNotMergeAssignment(int i, boolean assignedCondition) {
         if (i == 0 && (assignedCondition = i == 0)) {
             return 0;

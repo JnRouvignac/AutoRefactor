@@ -96,58 +96,66 @@ public class InlineCodeRatherThanPeremptoryConditionSample {
         return 2;
     }
 
-    public int removePeremptoryTest(int increment, int j, byte b, Long longObject, List<Date> anotherObject) {
+    public int removePeremptoryTest(int increment, int j, byte by, boolean b, Long longObject,
+            List<Date> anotherObject) {
 
-        // Keep this comment
+        // Keep this comment 1
         if (j == j) {
             increment++;
         } else {
             increment--;
         }
 
-        // Keep this comment
+        // Keep this comment 2
         if (j != j) {
             increment++;
         } else {
             increment--;
         }
 
-        // Keep this comment
-        if (b == b) {
+        // Keep this comment 3
+        if (by == by) {
             increment++;
         } else {
             increment--;
         }
 
-        // Keep this comment
-        if (b != b) {
+        // Keep this comment 4
+        if (by != by) {
             increment++;
         } else {
             increment--;
         }
 
-        // Keep this comment
+        // Keep this comment 5
+        if (b == !b) {
+            increment++;
+        } else {
+            increment--;
+        }
+
+        // Keep this comment 6
         if (longObject == longObject) {
             increment++;
         } else {
             increment--;
         }
 
-        // Keep this comment
+        // Keep this comment 7
         if (longObject != longObject) {
             increment++;
         } else {
             increment--;
         }
 
-        // Keep this comment
+        // Keep this comment 8
         if (anotherObject == anotherObject) {
             increment++;
         } else {
             increment--;
         }
 
-        // Keep this comment
+        // Keep this comment 9
         if (anotherObject != anotherObject) {
             increment++;
         } else {

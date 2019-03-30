@@ -31,7 +31,6 @@ import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
 import static org.autorefactor.refactoring.ASTHelper.as;
 import static org.autorefactor.refactoring.ASTHelper.hasOperator;
 import static org.autorefactor.refactoring.ASTHelper.isPassive;
-import static org.autorefactor.refactoring.ASTHelper.match;
 import static org.eclipse.jdt.core.dom.InfixExpression.Operator.AND;
 import static org.eclipse.jdt.core.dom.InfixExpression.Operator.CONDITIONAL_AND;
 import static org.eclipse.jdt.core.dom.InfixExpression.Operator.CONDITIONAL_OR;
@@ -79,7 +78,7 @@ public class XORRatherThanDuplicateConditionsRefactoring extends AbstractRefacto
     }
 
     @Override
-    public boolean visit(InfixExpression node) {
+    public boolean visit(final InfixExpression node) {
         if (hasOperator(node, CONDITIONAL_OR, OR) && !node.hasExtendedOperands()) {
             final InfixExpression firstCondition = as(node.getLeftOperand(), InfixExpression.class);
             final InfixExpression secondCondition = as(node.getRightOperand(), InfixExpression.class);
@@ -89,39 +88,51 @@ public class XORRatherThanDuplicateConditionsRefactoring extends AbstractRefacto
                     && hasOperator(firstCondition, CONDITIONAL_AND, AND)
                     && secondCondition != null
                     && !secondCondition.hasExtendedOperands()
-                    && hasOperator(secondCondition, CONDITIONAL_AND, AND)) {
-                final AtomicBoolean isFirstExprPositive = new AtomicBoolean();
-                final AtomicBoolean isSecondExprPositive = new AtomicBoolean();
-                final AtomicBoolean isThirdExprPositive = new AtomicBoolean();
-                final AtomicBoolean isFourthExprPositive = new AtomicBoolean();
+                    && hasOperator(secondCondition, CONDITIONAL_AND, AND)
+                    && isPassive(firstCondition.getLeftOperand())
+                    && isPassive(firstCondition.getRightOperand())
+                    && isPassive(secondCondition.getLeftOperand())
+                    && isPassive(secondCondition.getRightOperand())) {
+                final ASTSemanticMatcher matcher = new ASTSemanticMatcher();
 
-                final Expression firstExpr = getBasisExpression(firstCondition.getLeftOperand(), isFirstExprPositive);
-                final Expression secondExpr = getBasisExpression(firstCondition.getRightOperand(),
-                        isSecondExprPositive);
-                final Expression thirdExpr = getBasisExpression(secondCondition.getLeftOperand(), isThirdExprPositive);
-                final Expression fourthExpr = getBasisExpression(secondCondition.getRightOperand(),
-                        isFourthExprPositive);
-
-                if (isPassive(firstExpr) && isPassive(secondExpr)
-                        && ((match(new ASTSemanticMatcher(), firstExpr, thirdExpr)
-                                && match(new ASTSemanticMatcher(), secondExpr, fourthExpr)
-                        && isFirstExprPositive.get() ^ isThirdExprPositive.get()
-                        && isSecondExprPositive.get() ^ isFourthExprPositive.get())
-                        || (match(new ASTSemanticMatcher(), firstExpr, fourthExpr)
-                                && match(new ASTSemanticMatcher(), secondExpr, thirdExpr)
-                        && isFirstExprPositive.get() ^ isFourthExprPositive.get()
-                        && isSecondExprPositive.get() ^ isThirdExprPositive.get()))) {
-                    replaceDuplicateExpr(node, firstExpr, secondExpr, isFirstExprPositive, isSecondExprPositive);
-                    return DO_NOT_VISIT_SUBTREE;
-                }
+                return maybeReplaceDuplicateExpr(matcher, node,
+                        firstCondition.getLeftOperand(),
+                        secondCondition.getLeftOperand(),
+                        firstCondition.getRightOperand(),
+                        secondCondition.getRightOperand())
+                        && maybeReplaceDuplicateExpr(matcher, node,
+                                firstCondition.getLeftOperand(),
+                                secondCondition.getRightOperand(),
+                                firstCondition.getRightOperand(),
+                                secondCondition.getLeftOperand());
             }
         }
+
+        return VISIT_SUBTREE;
+    }
+
+    private boolean maybeReplaceDuplicateExpr(final ASTSemanticMatcher matcher, final InfixExpression node,
+            final Expression firstExpr, final Expression firstOppositeExpr, final Expression secondExpr,
+            final Expression secondOppositeExpr) {
+        if (matcher.matchOpposite(firstExpr, firstOppositeExpr)
+                && matcher.matchOpposite(secondExpr, secondOppositeExpr)) {
+            final AtomicBoolean isFirstExprPositive = new AtomicBoolean();
+            final AtomicBoolean isSecondExprPositive = new AtomicBoolean();
+
+            final Expression firstBasicExpr = getBasisExpression(firstExpr, isFirstExprPositive);
+            final Expression secondBasicExpr = getBasisExpression(secondExpr, isSecondExprPositive);
+
+            replaceDuplicateExpr(node, firstBasicExpr, secondBasicExpr, isFirstExprPositive, isSecondExprPositive);
+            return DO_NOT_VISIT_SUBTREE;
+        }
+
         return VISIT_SUBTREE;
     }
 
     private Expression getBasisExpression(final Expression originalExpr, final AtomicBoolean isExprPositive) {
         Expression basisExpr = null;
         final PrefixExpression negateExpr = as(originalExpr, PrefixExpression.class);
+
         if (hasOperator(negateExpr, NOT)) {
             basisExpr = negateExpr.getOperand();
             isExprPositive.set(false);
@@ -129,6 +140,7 @@ public class XORRatherThanDuplicateConditionsRefactoring extends AbstractRefacto
             basisExpr = originalExpr;
             isExprPositive.set(true);
         }
+
         return basisExpr;
     }
 
@@ -137,6 +149,7 @@ public class XORRatherThanDuplicateConditionsRefactoring extends AbstractRefacto
             final AtomicBoolean isFirstExprPositive,
             final AtomicBoolean isSecondExprPositive) {
         final ASTBuilder b = ctx.getASTBuilder();
+
         if (isFirstExprPositive.get() == isSecondExprPositive.get()) {
             ctx.getRefactorings().replace(node,
                     b.infixExpr(b.copy(firstExpr), EQUALS, b.copy(secondExpr)));

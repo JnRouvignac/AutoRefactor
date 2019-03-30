@@ -64,6 +64,8 @@ public class XORRatherThanDuplicateConditionsSample {
         // Keep this comment
         boolean newBoolean1 = (i1 == i2) && !(i3 == i4) || !(i2 == i1) && (i3 == i4);
         boolean newBoolean2 = (i1 == i2) && (i3 <= i4) || !(i1 == i2) && !(i4 >= i3);
+        boolean newBoolean3 = (i1 == i2) && (i3 != i4) || (i2 != i1) && (i3 == i4);
+        boolean newBoolean4 = (i1 == i2) && (i3 < i4) || (i1 != i2) && (i4 <= i3);
     }
 
     public void doNotReplaceDuplicateConditionsWithMethods(List<String> myList) {

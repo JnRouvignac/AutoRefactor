@@ -73,10 +73,14 @@ public class CommonCodeInIfElseStatementSample {
     }
 
     /** only common code, Remove if statement */
-    public void ifElseRemoveIfSeveralStatements(boolean b, int i, int j) {
+    public void ifElseRemoveIfSeveralStatements(boolean b1, boolean b2, int i, int j) {
         // Keep this comment
         i++;
-        j++;
+        if (b2 && true) {
+            i++;
+        } else {
+            j++;
+        }
     }
 
     /** not all cases covered, Do not remove anything */

@@ -351,12 +351,12 @@ public class SwitchSample {
         switch (i1) {
         case 0:
             System.out.println("Let's do lots of things!");
-            System.out.println("And again!");
+            System.out.println(interrumpt ? "And again!" : "And stop.");
             i = 0;
             break;
         case 1:
             System.out.println("Let's do lots of things!");
-            System.out.println("And again!");
+            System.out.println(!interrumpt ? "And stop." : "And again!");
             i = 0;
             break;
         default:
