@@ -108,11 +108,9 @@ public class StandardMethodRatherThanLibraryMethodRefactoring extends NewClassIm
     private boolean maybeRefactorMethodInvocation(final MethodInvocation node,
             final Set<String> classesToUseWithImport,
             final Set<String> importsToAdd) {
-        if (isMethod(node, "org.apache.commons.lang3.ObjectUtils", "equals", "java.lang.Object", "java.lang.Object")
-                || isMethod(node, "org.apache.commons.lang3.ObjectUtils", "hashCode", "java.lang.Object")
-                || isMethod(node, "com.google.common.base.Objects", "hashCode", "java.lang.Object[]")
-                || isMethod(node, "com.google.gwt.thirdparty.guava.common.base.Objects", "hashCode",
-                        "java.lang.Object[]")
+        if (isMethod(node, "org.apache.commons.lang3.ObjectUtils", "hashCode", "java.lang.Object")
+                || isMethod(node, "org.apache.commons.lang3.ObjectUtils", "equals", "java.lang.Object",
+                        "java.lang.Object")
                 || isMethod(node, "org.apache.commons.lang3.ObjectUtils", "toString", "java.lang.Object",
                         "java.lang.String")) {
             replaceUtilClass(node, classesToUseWithImport, importsToAdd);
@@ -143,6 +141,26 @@ public class StandardMethodRatherThanLibraryMethodRefactoring extends NewClassIm
                             "toString",
                             b.copy((Expression) node.arguments().get(0)),
                             b.string("")));
+            importsToAdd.add("java.util.Objects");
+            return DO_NOT_VISIT_SUBTREE;
+        }
+
+        if (isMethod(node, "com.google.common.base.Objects", "hashCode", "java.lang.Object[]")
+                || isMethod(node, "com.google.gwt.thirdparty.guava.common.base.Objects", "hashCode",
+                        "java.lang.Object[]")) {
+            final ASTBuilder b = this.ctx.getASTBuilder();
+            final Refactorings r = this.ctx.getRefactorings();
+
+            final List<Expression> copyOfArgs = new ArrayList<Expression>(node.arguments().size());
+
+            for (Object expression : node.arguments()) {
+                copyOfArgs.add(b.copy((Expression) expression));
+            }
+
+            r.replace(node, b.invoke(classesToUseWithImport
+                    .contains("java.util.Objects") ? b.simpleName("Objects") : b.name("java", "util", "Objects"),
+                            "hash",
+                            copyOfArgs.toArray(new Expression[copyOfArgs.size()])));
             importsToAdd.add("java.util.Objects");
             return DO_NOT_VISIT_SUBTREE;
         }

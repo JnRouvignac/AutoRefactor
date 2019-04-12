@@ -35,7 +35,7 @@ public class ReplaceGoogleMethodsByJavaMethods {
         boolean b1 = Objects.equal(object1, object2);
 
         // Keep this comment too
-        int i2 = Objects.hashCode(object1);
+        int i2 = Objects.hashCode(object1, object2);
 
         return String.valueOf(b1) + i2;
     }
