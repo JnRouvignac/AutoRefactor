@@ -25,19 +25,44 @@
  */
 package org.autorefactor.refactoring.rules;
 
+import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
+
 import org.autorefactor.preferences.Preferences;
+import org.autorefactor.refactoring.InterruptibleVisitor;
 import org.autorefactor.refactoring.JavaRefactoringRule;
 import org.autorefactor.refactoring.Refactorings;
 import org.autorefactor.refactoring.Release;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.CompilationUnit;
+import org.eclipse.jdt.core.dom.QualifiedName;
 
 /**
  * Abstract class to extend when writing refactoring rules as {@link ASTVisitor}s.
  * It centralizes useful features for refactoring rules.
  */
 public abstract class AbstractRefactoringRule extends ASTVisitor implements JavaRefactoringRule {
+
+    private static final class LombokVisitor extends InterruptibleVisitor {
+        private boolean useLombok;
+
+        @Override
+        public boolean visit(QualifiedName node) {
+            if (node.getFullyQualifiedName().contains("lombok")) {
+                useLombok = true;
+                return interruptVisit();
+            }
+            return VISIT_SUBTREE;
+        }
+
+        /**
+         * @return the useLombok
+         */
+        public boolean isUseLombok() {
+            return useLombok;
+        }
+    }
+
     /** The refactoring context of the current visitor. */
     protected RefactoringContext ctx;
 
@@ -83,6 +108,14 @@ public abstract class AbstractRefactoringRule extends ASTVisitor implements Java
 
     @Override
     public boolean preVisit2(ASTNode node) {
+        if (node instanceof CompilationUnit) {
+            LombokVisitor lombokVisitor = new LombokVisitor();
+            lombokVisitor.visitNode(node);
+
+            if (lombokVisitor.isUseLombok()) {
+                return false;
+            }
+        }
         // only visit nodes that have not been refactored
         // to avoid trying to refactor twice the same node (or sub nodes)
         return !ctx.getRefactorings().hasBeenRefactored(node);
