@@ -40,6 +40,28 @@ public class OppositeConditionRatherThanDuplicateConditionSample {
         }
     }
 
+    public int doNotMoveExtendedExpr(boolean duplicateCondition, boolean anotherCondition, boolean oneMoreCondition) {
+        if (duplicateCondition && anotherCondition && oneMoreCondition) {
+            return 0;
+        } else if (duplicateCondition) {
+            return 10;
+        } else {
+            return 20;
+        }
+    }
+
+    public int mergeNegativeCondition(boolean duplicateCondition, boolean anotherCondition) {
+        // Keep this comment
+        if (duplicateCondition && !anotherCondition) {
+            // Keep this comment also
+            return 0;
+        } else if (duplicateCondition) {
+            return 10;
+        } else {
+            return 20;
+        }
+    }
+
     public int mergeDuplicateCondition2(boolean duplicateCondition, boolean anotherCondition) {
         // Keep this comment
         if (duplicateCondition && anotherCondition) {

@@ -27,6 +27,7 @@ package org.autorefactor.refactoring.rules;
 
 import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
 import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
+import static org.autorefactor.refactoring.ASTHelper.as;
 import static org.autorefactor.refactoring.ASTHelper.isPassive;
 import static org.autorefactor.refactoring.ASTHelper.match;
 import static org.autorefactor.refactoring.ASTHelper.removeParentheses;
@@ -39,6 +40,7 @@ import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.InfixExpression.Operator;
+import org.eclipse.jdt.core.dom.PrefixExpression;
 import org.eclipse.jdt.core.dom.Statement;
 
 /**
@@ -104,8 +106,9 @@ public class OppositeConditionRatherThanDuplicateConditionRefactoring extends Ab
                 && node.getElseStatement() instanceof IfStatement) {
             final InfixExpression firstCondition = (InfixExpression) node.getExpression();
 
-            if (Arrays.<Operator>asList(Operator.AND,
-                    Operator.CONDITIONAL_AND).contains(firstCondition.getOperator())
+            if (!firstCondition.hasExtendedOperands()
+                    && Arrays.<Operator>asList(Operator.AND, Operator.CONDITIONAL_AND)
+                            .contains(firstCondition.getOperator())
                     && isPassive(firstCondition.getLeftOperand())
                     && isPassive(firstCondition.getRightOperand())) {
                 final IfStatement secondIf = (IfStatement) node.getElseStatement();
@@ -150,10 +153,24 @@ public class OppositeConditionRatherThanDuplicateConditionRefactoring extends Ab
             negativeStmtCopy = b.move(negativeStmt);
         }
 
+        final Expression secondCond;
+        final Statement secondStmtCopy;
+        final Statement thirdStmtCopy;
+        final PrefixExpression negativeCond = as(notDuplicateExpr, PrefixExpression.class);
+
+        if (negativeCond != null && PrefixExpression.Operator.NOT.equals(negativeCond.getOperator())) {
+            secondCond = negativeCond.getOperand();
+            secondStmtCopy = b.move(positiveStmt);
+            thirdStmtCopy = b.move(node.getThenStatement());
+        } else {
+            secondCond = notDuplicateExpr;
+            secondStmtCopy = b.move(node.getThenStatement());
+            thirdStmtCopy = b.move(positiveStmt);
+        }
+
         this.ctx.getRefactorings().replace(node,
                 b.if0(b.parenthesizeIfNeeded(b.negate(removeParentheses(duplicateExpr))),
                         negativeStmtCopy,
-                        b.if0(b.copy(removeParentheses(notDuplicateExpr)), b.move(node.getThenStatement()),
-                                b.move(positiveStmt))));
+                        b.if0(b.copy(removeParentheses(secondCond)), secondStmtCopy, thirdStmtCopy)));
     }
 }
