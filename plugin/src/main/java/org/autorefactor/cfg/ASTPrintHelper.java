@@ -32,8 +32,8 @@ import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Expression;
 
 /** Helper class for printing AST information. */
-public final class CFGBasicBlock2 {
-    private CFGBasicBlock2() {
+public final class ASTPrintHelper {
+    private ASTPrintHelper() {
         // hide utility class ctor
     }
 
