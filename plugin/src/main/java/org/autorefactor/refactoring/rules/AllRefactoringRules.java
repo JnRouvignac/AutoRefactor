@@ -112,6 +112,7 @@ public final class AllRefactoringRules {
                 new CollapseIfStatementRefactoring(),
                 new CommonCodeInIfElseStatementRefactoring(),
                 new OppositeConditionRatherThanDuplicateConditionRefactoring(),
+                new OneConditionRatherThanUnreachableBlockRefactoring(),
                 new MergeConditionalBlocksRefactoring(),
                 new OneIfRatherThanDuplicateBlocksThatFallThroughRefactoring(),
                 new OneCodeThatFallsThroughRatherThanRedundantBlocksRefactoring(),
