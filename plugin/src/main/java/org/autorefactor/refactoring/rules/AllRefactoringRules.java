@@ -116,6 +116,7 @@ public final class AllRefactoringRules {
                 new MergeConditionalBlocksRefactoring(),
                 new OneIfRatherThanDuplicateBlocksThatFallThroughRefactoring(),
                 new OneCodeThatFallsThroughRatherThanRedundantBlocksRefactoring(),
+                new ElseRatherThanOppositeConditionRefactoring(),
                 new GenericMapRatherThanRawMapRefactoring(),
                 new GenericListRatherThanRawListRefactoring(),
                 new UseDiamondOperatorRefactoring(),
