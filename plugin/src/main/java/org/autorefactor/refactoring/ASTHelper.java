@@ -1763,12 +1763,42 @@ public final class ASTHelper {
     }
 
     /**
-     * Returns whether the provided qualified name accesses a field with the provided signature.
+     * Returns whether a checked exception is supposed to be caught.
      *
-     * @param node the qualified name to compare
+     * @param node the node
+     * @return true if a checked exception is supposed to be caught.
+     */
+    public static boolean isExceptionExpected(final ASTNode node) {
+        ASTNode parentNode = getFirstAncestorOrNull(node, TryStatement.class, BodyDeclaration.class);
+
+        while (parentNode instanceof TryStatement) {
+            TryStatement tryStmt = (TryStatement) parentNode;
+
+            for (Object object : tryStmt.catchClauses()) {
+                CatchClause catchClause = (CatchClause) object;
+
+                if (catchClause.getException().getType() != null
+                        && !instanceOf(catchClause.getException().getType().resolveBinding(),
+                                "java.lang.RuntimeException")) {
+                    return true;
+                }
+            }
+
+            parentNode = getFirstAncestorOrNull(parentNode, TryStatement.class, BodyDeclaration.class);
+        }
+
+        return false;
+    }
+
+    /**
+     * Returns whether the provided qualified name accesses a field with the
+     * provided signature.
+     *
+     * @param node              the qualified name to compare
      * @param qualifiedTypeName the qualified name of the type declaring the field
-     * @param fieldNames the field names
-     * @return true if the provided qualified name matches the provided field signature, false otherwise
+     * @param fieldNames        the field names
+     * @return true if the provided qualified name matches the provided field
+     *         signature, false otherwise
      */
     public static boolean isField(QualifiedName node, String qualifiedTypeName, String... fieldNames) {
         return instanceOf(node, qualifiedTypeName)

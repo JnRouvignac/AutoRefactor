@@ -122,6 +122,22 @@ public class ElseRatherThanOppositeConditionSample {
         return i;
     }
 
+    public int removeUncaughtCode(boolean b1, boolean b2) {
+        int i = -1;
+        try {
+            // Keep this comment
+            if (b1 && b2) {
+                i = 0;
+            } else {
+                i = 1;
+            }
+        } finally {
+            System.out.println("I should be reachable");
+        }
+
+        return i;
+    }
+
     public int doNotRefactorFallThroughBlocks(boolean b1, boolean b2) {
         if (b1 && b2) {
             return 0;

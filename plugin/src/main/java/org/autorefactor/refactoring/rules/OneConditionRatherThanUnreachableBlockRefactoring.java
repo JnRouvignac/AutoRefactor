@@ -29,17 +29,14 @@ import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
 import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
 import static org.autorefactor.refactoring.ASTHelper.as;
 import static org.autorefactor.refactoring.ASTHelper.fallsThrough;
-import static org.autorefactor.refactoring.ASTHelper.getFirstAncestorOrNull;
+import static org.autorefactor.refactoring.ASTHelper.isExceptionExpected;
 import static org.autorefactor.refactoring.ASTHelper.isPassive;
 import static org.autorefactor.refactoring.ASTHelper.match;
 
 import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.ASTSemanticMatcher;
 import org.autorefactor.refactoring.Refactorings;
-import org.eclipse.jdt.core.dom.ASTNode;
-import org.eclipse.jdt.core.dom.BodyDeclaration;
 import org.eclipse.jdt.core.dom.IfStatement;
-import org.eclipse.jdt.core.dom.TryStatement;
 
 /** See {@link #getDescription()} method. */
 public class OneConditionRatherThanUnreachableBlockRefactoring extends AbstractRefactoringRule {
@@ -75,9 +72,8 @@ public class OneConditionRatherThanUnreachableBlockRefactoring extends AbstractR
     public boolean visit(IfStatement node) {
         final IfStatement secondIf = as(node.getElseStatement(), IfStatement.class);
         final ASTSemanticMatcher matcher = new ASTSemanticMatcher();
-        final ASTNode tryStmt = getFirstAncestorOrNull(node, TryStatement.class, BodyDeclaration.class);
 
-        if (!(tryStmt instanceof TryStatement) && secondIf != null && isPassive(node.getExpression())
+        if (!isExceptionExpected(node) && secondIf != null && isPassive(node.getExpression())
                 && isPassive(secondIf.getExpression())
                 && match(matcher, node.getExpression(), secondIf.getExpression())
                 && ((secondIf.getElseStatement() == null) || !fallsThrough(node.getThenStatement())

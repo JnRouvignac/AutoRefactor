@@ -28,17 +28,14 @@ package org.autorefactor.refactoring.rules;
 import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
 import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
 import static org.autorefactor.refactoring.ASTHelper.as;
-import static org.autorefactor.refactoring.ASTHelper.getFirstAncestorOrNull;
+import static org.autorefactor.refactoring.ASTHelper.isExceptionExpected;
 import static org.autorefactor.refactoring.ASTHelper.isPassive;
 import static org.autorefactor.refactoring.ASTHelper.fallsThrough;
 
 import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.ASTSemanticMatcher;
 import org.autorefactor.refactoring.Refactorings;
-import org.eclipse.jdt.core.dom.ASTNode;
-import org.eclipse.jdt.core.dom.BodyDeclaration;
 import org.eclipse.jdt.core.dom.IfStatement;
-import org.eclipse.jdt.core.dom.TryStatement;
 
 /** See {@link #getDescription()} method. */
 public class ElseRatherThanOppositeConditionRefactoring extends AbstractRefactoringRule {
@@ -75,12 +72,11 @@ public class ElseRatherThanOppositeConditionRefactoring extends AbstractRefactor
     public boolean visit(final IfStatement node) {
         final IfStatement secondIf = as(node.getElseStatement(), IfStatement.class);
         final ASTSemanticMatcher matcher = new ASTSemanticMatcher();
-        final ASTNode tryStmt = getFirstAncestorOrNull(node, TryStatement.class, BodyDeclaration.class);
 
         if (secondIf != null && isPassive(node.getExpression())
                 && isPassive(secondIf.getExpression())
                 && matcher.matchOpposite(node.getExpression(), secondIf.getExpression())
-                && (!(tryStmt instanceof TryStatement) || secondIf.getElseStatement() == null)
+                && (secondIf.getElseStatement() == null || !isExceptionExpected(node))
                 && (!fallsThrough(node.getThenStatement()) || !fallsThrough(secondIf.getThenStatement()))) {
             removeCondition(secondIf);
 

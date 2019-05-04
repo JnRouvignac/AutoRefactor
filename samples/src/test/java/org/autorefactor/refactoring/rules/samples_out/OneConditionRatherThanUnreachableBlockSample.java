@@ -103,4 +103,17 @@ public class OneConditionRatherThanUnreachableBlockSample {
 
         return 2;
     }
+
+    public int removeUncaughtCode(boolean b1, boolean b2) throws IOException {
+        try {
+            // Keep this comment
+            if (b1 && b2) {
+                return 0;
+            }
+        } catch (NullPointerException e) {
+            System.out.println("I should be reachable");
+        }
+
+        return 2;
+    }
 }
