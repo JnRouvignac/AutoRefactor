@@ -56,6 +56,7 @@ import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.jface.window.ToolTip;
+import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyleRange;
@@ -69,8 +70,11 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 
 /**
@@ -268,6 +272,44 @@ public class ChooseRefactoringWizardPage extends WizardPage {
 
         final Table table = tableViewer.getTable();
         table.setLinesVisible(false);
+        table.addListener(SWT.EraseItem, new Listener() {
+            public void handleEvent(Event event) {
+                if ((event.detail & SWT.SELECTED) != 0) {
+                    event.detail &= ~SWT.SELECTED;
+                }
+            }
+        });
+        table.addListener(SWT.MouseDown, new Listener() {
+            public void handleEvent(Event event) {
+                Point pt = new Point(event.x, event.y);
+                TableItem item = table.getItem(pt);
+
+                if (item == null) {
+                    return;
+                }
+
+                int index = table.indexOf(item);
+                Object element = tableViewer.getElementAt(index);
+                tableViewer.setChecked(element, !tableViewer.getChecked(element));
+            }
+        });
+        table.addListener(SWT.MouseDoubleClick, new Listener() {
+            public void handleEvent(Event event) {
+                Point pt = new Point(event.x, event.y);
+                TableItem item = table.getItem(pt);
+
+                if (item == null) {
+                    return;
+                }
+
+                int index = table.indexOf(item);
+                Object element = tableViewer.getElementAt(index);
+                tableViewer.setCheckedElements(new Object[] { element });
+
+                ChooseRefactoringWizardPage.this.getWizard().performFinish();
+                ((WizardDialog) ChooseRefactoringWizardPage.this.getWizard().getContainer()).close();
+            }
+        });
         tableViewer.getControl().setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, true));
         packColumns(table);
         table.setFocus();
