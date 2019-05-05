@@ -174,6 +174,7 @@ public final class AllRefactoringRules {
                 new RemoveUncheckedThrowsClausesRefactoring(),
                 new CapitalizeLongLiteralRefactoring(),
                 new SwitchRefactoring(),
+                new IfRatherThanTwoSwitchCasesRefactoring(),
 
                 // Those refactorings should end the list because they clean the previous changes
                 new RemoveSemiColonRefactoring(),
