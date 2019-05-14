@@ -1868,7 +1868,12 @@ public final class ASTHelper {
         // if an API to directly find the overriddenMethod IMethodBinding existed
         IMethodBinding overriddenMethod = findOverridenMethod(declaringClass, typeQualifiedName,
                 methodName, parameterTypesQualifiedNames);
-        return overriddenMethod != null && methodBinding.overrides(overriddenMethod);
+        if (overriddenMethod != null && methodBinding.overrides(overriddenMethod)) {
+            return true;
+        }
+        IMethodBinding methodDeclaration = methodBinding.getMethodDeclaration();
+        return methodDeclaration != null && methodDeclaration != methodBinding
+                && isMethod(methodDeclaration, typeQualifiedName, methodName, parameterTypesQualifiedNames);
     }
 
     private static boolean parameterTypesMatch(ITypeBinding implementedType,

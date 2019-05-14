@@ -28,11 +28,18 @@ package org.autorefactor.refactoring.rules.samples_out;
 import java.util.Date;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 
 public class StandardMethodRatherThanLibraryMethodSample {
     public String replaceGoogleMethods(Date object1, Date object2) {
+        // Keep comment
+        Date notNullObject1 = java.util.Objects.requireNonNull(object1);
+
+        // Comment 2
+        Date notNullObject2 = java.util.Objects.requireNonNull(object2, "object2");
+
         // Keep this comment
-        boolean b1 = java.util.Objects.equals(object1, object2);
+        boolean b1 = java.util.Objects.equals(notNullObject1, notNullObject2);
 
         // Keep this comment too
         int i2 = java.util.Objects.hash(object1, object2);
