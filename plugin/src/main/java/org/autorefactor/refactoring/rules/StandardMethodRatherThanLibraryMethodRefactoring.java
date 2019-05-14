@@ -174,23 +174,44 @@ public class StandardMethodRatherThanLibraryMethodRefactoring extends NewClassIm
                         .contains("java.util.Objects") ? b.simpleName("Objects") : b.name("java", "util", "Objects"));
                 r.replace(node.getName(), b.simpleName("hash"));
             } else {
-                final List<Expression> copyOfArgs = new ArrayList<Expression>(node.arguments().size());
-
-                for (Object expression : node.arguments()) {
-                    copyOfArgs.add(b.copy((Expression) expression));
-                }
+                final Expression[] copyOfArgs = copyArguments(b, node);
 
                 r.replace(node, b.invoke(classesToUseWithImport
                         .contains("java.util.Objects") ? b.simpleName("Objects") : b.name("java", "util", "Objects"),
                                 "hash",
-                                copyOfArgs.toArray(new Expression[copyOfArgs.size()])));
+                                copyOfArgs));
             }
 
             importsToAdd.add("java.util.Objects");
             return DO_NOT_VISIT_SUBTREE;
         }
 
+        if (isMethod(node, "com.google.common.base.Preconditions", "checkNotNull", "T")
+                || isMethod(node, "com.google.common.base.Preconditions", "checkNotNull", "T",
+                        "java.lang.Object")) {
+            final ASTBuilder b = this.ctx.getASTBuilder();
+            final Refactorings r = this.ctx.getRefactorings();
+
+            final Expression[] copyOfArgs = copyArguments(b, node);
+
+            r.replace(node, b.invoke(classesToUseWithImport
+                    .contains("java.util.Objects") ? b.simpleName("Objects") : b.name("java", "util", "Objects"),
+                            "requireNonNull",
+                            copyOfArgs));
+            importsToAdd.add("java.util.Objects");
+            return DO_NOT_VISIT_SUBTREE;
+        }
+
         return VISIT_SUBTREE;
+    }
+
+    private Expression[] copyArguments(final ASTBuilder b, final MethodInvocation node) {
+        final List<Expression> copyOfArgs = new ArrayList<Expression>(node.arguments().size());
+
+        for (Object expression : node.arguments()) {
+            copyOfArgs.add(b.copy((Expression) expression));
+        }
+        return copyOfArgs.toArray(new Expression[copyOfArgs.size()]);
     }
 
     private void replaceUtilClass(final MethodInvocation node, final Set<String> classesToUseWithImport,
