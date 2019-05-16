@@ -27,6 +27,8 @@ package org.autorefactor.refactoring.rules.samples_out;
 
 import java.util.Date;
 
+import org.apache.commons.lang3.Validate;
+
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 
@@ -38,8 +40,18 @@ public class StandardMethodRatherThanLibraryMethodSample {
         // Comment 2
         Date notNullObject2 = java.util.Objects.requireNonNull(object2, "object2");
 
+        // Double check
+        Date justToBeSure1 = java.util.Objects.requireNonNull(notNullObject1);
+        Date justToBeSure2 = java.util.Objects.requireNonNull(notNullObject2, "you never know");
+
+        // Keep questioning...
+        Date justToBeSure3 = java.util.Objects.requireNonNull(justToBeSure1,
+                        () -> String.format("message:%s", justToBeSure2));
+        Date justToBeSure4 = java.util.Objects.requireNonNull(notNullObject2,
+                        () -> String.format("you never know:%s - %s", justToBeSure3, notNullObject1));
+
         // Keep this comment
-        boolean b1 = java.util.Objects.equals(notNullObject1, notNullObject2);
+        boolean b1 = java.util.Objects.equals(justToBeSure1, justToBeSure4);
 
         // Keep this comment too
         int i2 = java.util.Objects.hash(object1, object2);

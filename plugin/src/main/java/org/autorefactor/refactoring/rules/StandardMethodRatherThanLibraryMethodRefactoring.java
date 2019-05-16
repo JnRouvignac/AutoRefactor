@@ -39,7 +39,9 @@ import org.autorefactor.refactoring.ASTBuilder;
 import org.autorefactor.refactoring.Refactorings;
 import org.autorefactor.refactoring.Release;
 import org.eclipse.jdt.core.dom.Expression;
+import org.eclipse.jdt.core.dom.LambdaExpression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
+import org.eclipse.jdt.core.dom.Name;
 
 /** See {@link #getDescription()} method. */
 public class StandardMethodRatherThanLibraryMethodRefactoring extends NewClassImportRefactoring {
@@ -116,15 +118,17 @@ public class StandardMethodRatherThanLibraryMethodRefactoring extends NewClassIm
             replaceUtilClass(node, classesToUseWithImport, importsToAdd);
             return DO_NOT_VISIT_SUBTREE;
         }
+        final ASTBuilder b = this.ctx.getASTBuilder();
+
+        final Name javaUtilObjects = classesToUseWithImport
+                .contains("java.util.Objects") ? b.simpleName("Objects") : b.name("java", "util", "Objects");
 
         if (isMethod(node, "com.google.common.base.Objects", "equal", "java.lang.Object", "java.lang.Object")
                 || isMethod(node, "com.google.gwt.thirdparty.guava.common.base.Objects", "equal", "java.lang.Object",
                         "java.lang.Object")) {
-            final ASTBuilder b = this.ctx.getASTBuilder();
             final Refactorings r = this.ctx.getRefactorings();
 
-            r.replace(node, b.invoke(classesToUseWithImport
-                    .contains("java.util.Objects") ? b.simpleName("Objects") : b.name("java", "util", "Objects"),
+            r.replace(node, b.invoke(javaUtilObjects,
                             "equals",
                             b.copy((Expression) node.arguments().get(0)),
                             b.copy((Expression) node.arguments().get(1))));
@@ -133,11 +137,9 @@ public class StandardMethodRatherThanLibraryMethodRefactoring extends NewClassIm
         }
 
         if (isMethod(node, "org.apache.commons.lang3.ObjectUtils", "toString", "java.lang.Object")) {
-            final ASTBuilder b = this.ctx.getASTBuilder();
             final Refactorings r = this.ctx.getRefactorings();
 
-            r.replace(node, b.invoke(classesToUseWithImport
-                    .contains("java.util.Objects") ? b.simpleName("Objects") : b.name("java", "util", "Objects"),
+            r.replace(node, b.invoke(javaUtilObjects,
                             "toString",
                             b.copy((Expression) node.arguments().get(0)),
                             b.string("")));
@@ -148,7 +150,6 @@ public class StandardMethodRatherThanLibraryMethodRefactoring extends NewClassIm
         if (isMethod(node, "com.google.common.base.Objects", "hashCode", "java.lang.Object[]")
                 || isMethod(node, "com.google.gwt.thirdparty.guava.common.base.Objects", "hashCode",
                         "java.lang.Object[]")) {
-            final ASTBuilder b = this.ctx.getASTBuilder();
             final Refactorings r = this.ctx.getRefactorings();
 
             final List<Expression> copyOfArgs = new ArrayList<Expression>(node.arguments().size());
@@ -157,8 +158,7 @@ public class StandardMethodRatherThanLibraryMethodRefactoring extends NewClassIm
                 copyOfArgs.add(b.copy((Expression) expression));
             }
 
-            r.replace(node, b.invoke(classesToUseWithImport
-                    .contains("java.util.Objects") ? b.simpleName("Objects") : b.name("java", "util", "Objects"),
+            r.replace(node, b.invoke(javaUtilObjects,
                             "hash",
                             copyOfArgs.toArray(new Expression[copyOfArgs.size()])));
             importsToAdd.add("java.util.Objects");
@@ -166,20 +166,15 @@ public class StandardMethodRatherThanLibraryMethodRefactoring extends NewClassIm
         }
 
         if (isMethod(node, "org.apache.commons.lang3.ObjectUtils", "hashCodeMulti", "java.lang.Object[]")) {
-            final ASTBuilder b = this.ctx.getASTBuilder();
             final Refactorings r = this.ctx.getRefactorings();
 
             if (node.getExpression() != null) {
-                r.replace(node.getExpression(), classesToUseWithImport
-                        .contains("java.util.Objects") ? b.simpleName("Objects") : b.name("java", "util", "Objects"));
+                r.replace(node.getExpression(), javaUtilObjects);
                 r.replace(node.getName(), b.simpleName("hash"));
             } else {
-                final Expression[] copyOfArgs = copyArguments(b, node);
-
-                r.replace(node, b.invoke(classesToUseWithImport
-                        .contains("java.util.Objects") ? b.simpleName("Objects") : b.name("java", "util", "Objects"),
+                r.replace(node, b.invoke(javaUtilObjects,
                                 "hash",
-                                copyOfArgs));
+                                copyArguments(b, node)));
             }
 
             importsToAdd.add("java.util.Objects");
@@ -188,16 +183,32 @@ public class StandardMethodRatherThanLibraryMethodRefactoring extends NewClassIm
 
         if (isMethod(node, "com.google.common.base.Preconditions", "checkNotNull", "T")
                 || isMethod(node, "com.google.common.base.Preconditions", "checkNotNull", "T",
-                        "java.lang.Object")) {
-            final ASTBuilder b = this.ctx.getASTBuilder();
+                        "java.lang.Object")
+                || isMethod(node, "com.google.gwt.thirdparty.guava.common.base.Preconditions", "checkNotNull", "T")
+                || isMethod(node, "com.google.gwt.thirdparty.guava.common.base.Preconditions", "checkNotNull", "T",
+                        "java.lang.Object")
+                || isMethod(node, "org.apache.commons.lang3.Validate", "notNull", "T")
+                || isMethod(node, "org.apache.commons.lang3.Validate", "notNull", "T", "java.lang.String", "java.lang.Object[]")
+                ) {
             final Refactorings r = this.ctx.getRefactorings();
 
-            final Expression[] copyOfArgs = copyArguments(b, node);
+            final List<Expression> copyOfArgs = copyArguments(b, node);
 
-            r.replace(node, b.invoke(classesToUseWithImport
-                    .contains("java.util.Objects") ? b.simpleName("Objects") : b.name("java", "util", "Objects"),
-                            "requireNonNull",
-                            copyOfArgs));
+            if (copyOfArgs.size() > 2) {
+                LambdaExpression messageSupplier = b.lambda();
+                messageSupplier.setBody(
+                        b.invoke(
+                                b.simpleName("String"),
+                                "format",
+                                copyOfArgs.subList(1, copyOfArgs.size())));
+                r.replace(node, b.invoke(javaUtilObjects,
+                        "requireNonNull",
+                        copyOfArgs.get(0), messageSupplier));
+            } else {
+                r.replace(node, b.invoke(javaUtilObjects,
+                                "requireNonNull",
+                                copyOfArgs));
+            }
             importsToAdd.add("java.util.Objects");
             return DO_NOT_VISIT_SUBTREE;
         }
@@ -205,13 +216,13 @@ public class StandardMethodRatherThanLibraryMethodRefactoring extends NewClassIm
         return VISIT_SUBTREE;
     }
 
-    private Expression[] copyArguments(final ASTBuilder b, final MethodInvocation node) {
+    private List<Expression> copyArguments(final ASTBuilder b, final MethodInvocation node) {
         final List<Expression> copyOfArgs = new ArrayList<Expression>(node.arguments().size());
 
         for (Object expression : node.arguments()) {
             copyOfArgs.add(b.copy((Expression) expression));
         }
-        return copyOfArgs.toArray(new Expression[copyOfArgs.size()]);
+        return copyOfArgs;
     }
 
     private void replaceUtilClass(final MethodInvocation node, final Set<String> classesToUseWithImport,
