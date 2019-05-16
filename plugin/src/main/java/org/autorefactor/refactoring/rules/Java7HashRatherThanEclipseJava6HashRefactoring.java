@@ -68,7 +68,7 @@ import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 /** See {@link #getDescription()} method. */
 public class Java7HashRatherThanEclipseJava6HashRefactoring extends NewClassImportRefactoring {
     private final class CollectedData {
-        private List<SimpleName> fields = new ArrayList<SimpleName>();
+        private List<Expression> fields = new ArrayList<Expression>();
         private String primeId;
         private String resultId;
         private Iterator<Statement> stmtIterator;
@@ -167,7 +167,7 @@ public class Java7HashRatherThanEclipseJava6HashRefactoring extends NewClassImpo
         /**
          * @return the fields
          */
-        public List<SimpleName> getFields() {
+        public List<Expression> getFields() {
             return fields;
         }
     }
@@ -261,7 +261,7 @@ public class Java7HashRatherThanEclipseJava6HashRefactoring extends NewClassImpo
                     }
 
                     if (data.isHasReturnStmt() && !data.getStmtIterator().hasNext()) {
-                        refactorHash(node, data.getFields(), classesToUseWithImport);
+                        refactorHash(node, classesToUseWithImport, data);
                         importsToAdd.add("java.util.Objects");
                         return DO_NOT_VISIT_SUBTREE;
                     }
@@ -429,8 +429,15 @@ public class Java7HashRatherThanEclipseJava6HashRefactoring extends NewClassImpo
             final MethodInvocation specificMethod = (MethodInvocation) newHash;
 
             if (isMethod(specificMethod,
-                    "java.lang.Float", "floatToIntBits", "float")
-                    || isMethod(specificMethod, "java.util.Arrays", "hashCode", "boolean[]")
+                    "java.lang.Float", "floatToIntBits", "float")) {
+                final SimpleName fieldName = getField((Expression) specificMethod.arguments().get(0));
+
+                if (fieldName != null && !fieldName.getIdentifier().equals(data.getPrimeId())
+                        && !fieldName.getIdentifier().equals(data.getResultId())) {
+                    data.getFields().add(fieldName);
+                    return true;
+                }
+            } else if (isMethod(specificMethod, "java.util.Arrays", "hashCode", "boolean[]")
                     || isMethod(specificMethod, "java.util.Arrays", "hashCode", "byte[]")
                     || isMethod(specificMethod, "java.util.Arrays", "hashCode", "char[]")
                     || isMethod(specificMethod, "java.util.Arrays", "hashCode", "double[]")
@@ -444,7 +451,7 @@ public class Java7HashRatherThanEclipseJava6HashRefactoring extends NewClassImpo
                 if (fieldName != null
                         && !fieldName.getIdentifier().equals(data.getPrimeId())
                         && !fieldName.getIdentifier().equals(data.getResultId())) {
-                    data.getFields().add(fieldName);
+                    data.getFields().add(specificMethod);
                     return true;
                 }
             }
@@ -646,17 +653,17 @@ public class Java7HashRatherThanEclipseJava6HashRefactoring extends NewClassImpo
         return expr != null && varId.equals(expr.getIdentifier());
     }
 
-    private void refactorHash(final MethodDeclaration node, final List<SimpleName> fields,
-            final Set<String> classesToUseWithImport) {
+    private void refactorHash(final MethodDeclaration node, final Set<String> classesToUseWithImport,
+            final CollectedData data) {
         final ASTBuilder b = this.ctx.getASTBuilder();
         final Refactorings r = this.ctx.getRefactorings();
 
         @SuppressWarnings("unchecked")
         final List<Statement> stmts = node.getBody().statements();
 
-        final List<SimpleName> copyOfFields = new ArrayList<SimpleName>(fields.size());
+        final List<Expression> copyOfFields = new ArrayList<Expression>(data.getFields().size());
 
-        for (final SimpleName simpleName : fields) {
+        for (final Expression simpleName : data.getFields()) {
             copyOfFields.add(b.copy(simpleName));
         }
 
