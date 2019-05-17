@@ -188,27 +188,36 @@ public class StandardMethodRatherThanLibraryMethodRefactoring extends NewClassIm
                 || isMethod(node, "com.google.gwt.thirdparty.guava.common.base.Preconditions", "checkNotNull", "T",
                         "java.lang.Object")
                 || isMethod(node, "org.apache.commons.lang3.Validate", "notNull", "T")
-                || isMethod(node, "org.apache.commons.lang3.Validate", "notNull", "T", "java.lang.String", "java.lang.Object[]")
-                ) {
+                || isMethod(node, "org.apache.commons.lang3.Validate", "notNull", "T", "java.lang.String",
+                        "java.lang.Object[]")) {
             final Refactorings r = this.ctx.getRefactorings();
 
             final List<Expression> copyOfArgs = copyArguments(b, node);
 
-            if (copyOfArgs.size() > 2) {
+            if (copyOfArgs.size() <= 2) {
+                r.replace(node, b.invoke(javaUtilObjects, "requireNonNull", copyOfArgs));
+            } else if (ctx.getJavaProjectOptions().getJavaSERelease().getMinorVersion() >= 8) {
                 LambdaExpression messageSupplier = b.lambda();
-                messageSupplier.setBody(
-                        b.invoke(
-                                b.simpleName("String"),
-                                "format",
-                                copyOfArgs.subList(1, copyOfArgs.size())));
-                r.replace(node, b.invoke(javaUtilObjects,
-                        "requireNonNull",
-                        copyOfArgs.get(0), messageSupplier));
+                messageSupplier
+                        .setBody(b.invoke(b.simpleName("String"), "format", copyOfArgs.subList(1, copyOfArgs.size())));
+                r.replace(node, b.invoke(javaUtilObjects, "requireNonNull", copyOfArgs.get(0), messageSupplier));
             } else {
-                r.replace(node, b.invoke(javaUtilObjects,
-                                "requireNonNull",
-                                copyOfArgs));
+                return VISIT_SUBTREE;
             }
+            importsToAdd.add("java.util.Objects");
+            return DO_NOT_VISIT_SUBTREE;
+        }
+
+        if (isMethod(node, "org.apache.commons.lang3.Validate", "notNull", "T", "java.lang.String",
+                "java.lang.Object[]") && ctx.getJavaProjectOptions().getJavaSERelease().getMinorVersion() >= 8) {
+            final Refactorings r = this.ctx.getRefactorings();
+
+            final List<Expression> copyOfArgs = copyArguments(b, node);
+
+            LambdaExpression messageSupplier = b.lambda();
+            messageSupplier
+                    .setBody(b.invoke(b.simpleName("String"), "format", copyOfArgs.subList(1, copyOfArgs.size())));
+            r.replace(node, b.invoke(javaUtilObjects, "requireNonNull", copyOfArgs.get(0), messageSupplier));
             importsToAdd.add("java.util.Objects");
             return DO_NOT_VISIT_SUBTREE;
         }

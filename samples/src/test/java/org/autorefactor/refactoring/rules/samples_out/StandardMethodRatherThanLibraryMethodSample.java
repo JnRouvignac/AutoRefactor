@@ -46,12 +46,12 @@ public class StandardMethodRatherThanLibraryMethodSample {
 
         // Keep questioning...
         Date justToBeSure3 = java.util.Objects.requireNonNull(justToBeSure1,
-                        () -> String.format("message:%s", justToBeSure2));
+                () -> String.format("message:%s", justToBeSure2));
         Date justToBeSure4 = java.util.Objects.requireNonNull(notNullObject2,
-                        () -> String.format("you never know:%s - %s", justToBeSure3, notNullObject1));
+                () -> String.format("you never know:%s - %s", justToBeSure3, notNullObject1));
 
         // Keep this comment
-        boolean b1 = java.util.Objects.equals(justToBeSure1, justToBeSure4);
+        boolean b1 = java.util.Objects.equals(justToBeSure2, justToBeSure4);
 
         // Keep this comment too
         int i2 = java.util.Objects.hash(object1, object2);
