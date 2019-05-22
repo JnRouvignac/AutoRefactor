@@ -56,9 +56,6 @@ import org.eclipse.jdt.core.dom.Statement;
 /** See {@link #getDescription()} method. */
 public class ObjectsEqualsRatherThanEqualsAndNullCheckRefactoring extends NewClassImportRefactoring {
     private final class RefactoringWithObjectsClass extends RefactoringWithNewClassImport {
-        public RefactoringWithObjectsClass(final RefactoringContext context) {
-            ctx = context;
-        }
 
         @Override
         public boolean visit(final IfStatement node) {
@@ -109,7 +106,7 @@ public class ObjectsEqualsRatherThanEqualsAndNullCheckRefactoring extends NewCla
 
     @Override
     public RefactoringWithNewClassImport getRefactoringClassInstance() {
-        return new RefactoringWithObjectsClass(ctx);
+        return new RefactoringWithObjectsClass();
     }
 
     @Override

@@ -60,9 +60,6 @@ import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
  */
 public abstract class AbstractEnumCollectionReplacementRefactoring extends NewClassImportRefactoring {
     private final class RefactoringWithObjectsClass extends RefactoringWithNewClassImport {
-        public RefactoringWithObjectsClass(RefactoringContext context) {
-            ctx = context;
-        }
 
         @Override
         public boolean visit(ClassInstanceCreation node) {
@@ -76,7 +73,7 @@ public abstract class AbstractEnumCollectionReplacementRefactoring extends NewCl
 
     @Override
     public RefactoringWithObjectsClass getRefactoringClassInstance() {
-        final RefactoringWithObjectsClass refactoringWithNewClassImport = new RefactoringWithObjectsClass(ctx);
+        final RefactoringWithObjectsClass refactoringWithNewClassImport = new RefactoringWithObjectsClass();
 
         return refactoringWithNewClassImport;
     }
