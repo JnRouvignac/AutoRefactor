@@ -45,9 +45,6 @@ import org.eclipse.jdt.core.dom.Type;
 /** See {@link #getDescription()} method. */
 public class AggregateConstructorRatherThanGWTMethodRefactoring extends NewClassImportRefactoring {
     private final class RefactoringWithArrayListOrHashMapClass extends RefactoringWithNewClassImport {
-        public RefactoringWithArrayListOrHashMapClass(final RefactoringContext context) {
-            ctx = context;
-        }
 
         @Override
         public boolean visit(final MethodInvocation node) {
@@ -107,7 +104,7 @@ public class AggregateConstructorRatherThanGWTMethodRefactoring extends NewClass
 
     @Override
     public RefactoringWithNewClassImport getRefactoringClassInstance() {
-        return new RefactoringWithArrayListOrHashMapClass(ctx);
+        return new RefactoringWithArrayListOrHashMapClass();
     }
 
     @Override

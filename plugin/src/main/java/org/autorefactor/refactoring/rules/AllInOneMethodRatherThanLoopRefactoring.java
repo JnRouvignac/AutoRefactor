@@ -61,9 +61,6 @@ import org.eclipse.jdt.core.dom.Statement;
 /** See {@link #getDescription()} method. */
 public class AllInOneMethodRatherThanLoopRefactoring extends NewClassImportRefactoring {
     private final class RefactoringWithObjectsClass extends RefactoringWithNewClassImport {
-        public RefactoringWithObjectsClass(RefactoringContext context) {
-            ctx = context;
-        }
 
         @Override
         public boolean visit(EnhancedForStatement node) {
@@ -117,7 +114,7 @@ public class AllInOneMethodRatherThanLoopRefactoring extends NewClassImportRefac
 
     @Override
     public RefactoringWithObjectsClass getRefactoringClassInstance() {
-        final RefactoringWithObjectsClass refactoringWithNewClassImport = new RefactoringWithObjectsClass(ctx);
+        final RefactoringWithObjectsClass refactoringWithNewClassImport = new RefactoringWithObjectsClass();
 
         return refactoringWithNewClassImport;
     }

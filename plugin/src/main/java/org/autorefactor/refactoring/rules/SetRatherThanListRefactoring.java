@@ -47,9 +47,6 @@ import org.eclipse.jdt.core.dom.MethodInvocation;
 /** See {@link #getDescription()} method. */
 public class SetRatherThanListRefactoring extends AbstractClassSubstituteRefactoring {
     private final class RefactoringWithObjectsClass extends RefactoringWithNewClassImport {
-        public RefactoringWithObjectsClass(RefactoringContext context) {
-            ctx = context;
-        }
 
         @Override
         public boolean visit(Block node) {
@@ -64,7 +61,7 @@ public class SetRatherThanListRefactoring extends AbstractClassSubstituteRefacto
 
     @Override
     public RefactoringWithObjectsClass getRefactoringClassInstance() {
-        return new RefactoringWithObjectsClass(ctx);
+        return new RefactoringWithObjectsClass();
     }
 
     private static final Map<String, String[]> CAN_BE_CASTED_TO = new HashMap<String, String[]>();

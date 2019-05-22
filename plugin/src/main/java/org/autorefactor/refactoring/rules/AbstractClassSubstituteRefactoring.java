@@ -71,9 +71,6 @@ import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 /** See {@link #getDescription()} method. */
 public abstract class AbstractClassSubstituteRefactoring extends NewClassImportRefactoring {
     private final class RefactoringWithObjectsClass extends RefactoringWithNewClassImport {
-        public RefactoringWithObjectsClass(RefactoringContext context) {
-            ctx = context;
-        }
 
         @Override
         public boolean visit(Block node) {
@@ -87,7 +84,7 @@ public abstract class AbstractClassSubstituteRefactoring extends NewClassImportR
 
     @Override
     public RefactoringWithNewClassImport getRefactoringClassInstance() {
-        return new RefactoringWithObjectsClass(ctx);
+        return new RefactoringWithObjectsClass();
     }
 
     @Override

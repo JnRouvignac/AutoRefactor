@@ -173,9 +173,6 @@ public class Java7HashRatherThanEclipseJava6HashRefactoring extends NewClassImpo
     }
 
     private final class RefactoringWithObjectsClass extends RefactoringWithNewClassImport {
-        public RefactoringWithObjectsClass(final RefactoringContext context) {
-            ctx = context;
-        }
 
         @Override
         public boolean visit(final MethodDeclaration node) {
@@ -222,7 +219,7 @@ public class Java7HashRatherThanEclipseJava6HashRefactoring extends NewClassImpo
 
     @Override
     public RefactoringWithNewClassImport getRefactoringClassInstance() {
-        return new RefactoringWithObjectsClass(ctx);
+        return new RefactoringWithObjectsClass();
     }
 
     @Override

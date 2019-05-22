@@ -46,9 +46,6 @@ import org.eclipse.jdt.core.dom.Name;
 /** See {@link #getDescription()} method. */
 public class StandardMethodRatherThanLibraryMethodRefactoring extends NewClassImportRefactoring {
     private final class RefactoringWithObjectsClass extends RefactoringWithNewClassImport {
-        public RefactoringWithObjectsClass(final RefactoringContext context) {
-            ctx = context;
-        }
 
         @Override
         public boolean visit(final MethodInvocation node) {
@@ -99,7 +96,7 @@ public class StandardMethodRatherThanLibraryMethodRefactoring extends NewClassIm
 
     @Override
     public RefactoringWithNewClassImport getRefactoringClassInstance() {
-        return new RefactoringWithObjectsClass(ctx);
+        return new RefactoringWithObjectsClass();
     }
 
     @Override
