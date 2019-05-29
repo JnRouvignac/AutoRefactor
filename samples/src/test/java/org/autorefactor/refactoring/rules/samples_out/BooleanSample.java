@@ -513,7 +513,7 @@ public class BooleanSample {
 
     public boolean invertCast(Object o) {
         // Keep this comment
-        return !(Boolean) o;
+        return !((Boolean) o);
     }
 
     public boolean doNotRefactor(Object o) {

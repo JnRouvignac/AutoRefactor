@@ -97,6 +97,7 @@ public final class AllRefactoringRules {
                 new StringRefactoring(),
                 new StringValueOfRatherThanConcatRefactoring(),
                 new BigNumberRefactoring(),
+                new OppositeComparisonRatherThanNegativeExpressionRefactoring(),
                 // TODO JNR implement
                 // new ForeachRefactoring(),
                 new RemoveEmptyIfRefactoring(),

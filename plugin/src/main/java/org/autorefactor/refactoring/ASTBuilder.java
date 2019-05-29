@@ -40,6 +40,7 @@ import static org.eclipse.jdt.core.dom.ASTNode.ASSIGNMENT;
 import static org.eclipse.jdt.core.dom.ASTNode.CONDITIONAL_EXPRESSION;
 import static org.eclipse.jdt.core.dom.ASTNode.EMPTY_STATEMENT;
 import static org.eclipse.jdt.core.dom.ASTNode.INFIX_EXPRESSION;
+import static org.eclipse.jdt.core.dom.ASTNode.CAST_EXPRESSION;
 import static org.eclipse.jdt.core.dom.ASTNode.INSTANCEOF_EXPRESSION;
 import static org.eclipse.jdt.core.dom.ASTNode.PREFIX_EXPRESSION;
 import static org.eclipse.jdt.core.dom.ASTNode.PRIMITIVE_TYPE;
@@ -1287,10 +1288,12 @@ public class ASTBuilder {
     public Expression parenthesizeIfNeeded(Expression expr) {
         switch (expr.getNodeType()) {
         case ASSIGNMENT:
+        case CAST_EXPRESSION:
         case CONDITIONAL_EXPRESSION:
         case INFIX_EXPRESSION:
         case INSTANCEOF_EXPRESSION:
             return parenthesize(expr);
+
         default:
             return expr;
         }
