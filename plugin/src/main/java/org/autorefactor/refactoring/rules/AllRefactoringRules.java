@@ -75,6 +75,7 @@ public final class AllRefactoringRules {
                 new AutoBoxingRatherThanExplicitMethodRefactoring(),
                 new UnboxingRatherThanExplicitMethodRefactoring(),
                 new BracketsRatherThanArrayInstantiationRefactoring(),
+                new LambdaExpressionRatherThanComparatorRefactoring(),
                 new LambdaRefactoring(),
                 new LiteralRatherThanBooleanConstantRefactoring(),
                 new BooleanRefactoring(),
