@@ -33,6 +33,7 @@ import java.util.List;
 
 public class LambdaExpressionRatherThanComparatorSample {
     public List<Date> useMethodRef(List<Date> listToSort) {
+        // Keep this comment
         Comparator<Date> comparator = Comparator.comparing(Date::toString);
         Collections.sort(listToSort, comparator);
 
@@ -40,6 +41,7 @@ public class LambdaExpressionRatherThanComparatorSample {
     }
 
     public List<Date> useReversedMethodRef(List<Date> listToSort) {
+        // Keep this comment
         Comparator<Date> comparator = Comparator.comparing(Date::toString).reversed();
         Collections.sort(listToSort, comparator);
 
@@ -47,6 +49,7 @@ public class LambdaExpressionRatherThanComparatorSample {
     }
 
     public List<File> useTypedLambdaExpression(List<File> listToSort) {
+        // Keep this comment
         Comparator<File> comparator = Comparator.comparing(f1 -> f1.separator);
         Collections.sort(listToSort, comparator);
 
@@ -54,6 +57,7 @@ public class LambdaExpressionRatherThanComparatorSample {
     }
 
     public List<File> useUntypedLambdaExpression(List<File> listToSort) {
+        // Keep this comment
         Comparator comparator = Comparator.comparing((File f1) -> f1.separator);
         Collections.sort(listToSort, comparator);
 
@@ -61,9 +65,39 @@ public class LambdaExpressionRatherThanComparatorSample {
     }
 
     public List<File> useReversedLambdaExpression(List<File> listToSort) {
+        // Keep this comment
         Comparator<File> comparator = Comparator.comparing((File f1) -> f1.separator).reversed();
         Collections.sort(listToSort, comparator);
 
         return listToSort;
+    }
+
+    public Comparator<Date> doNotRefactorComparisonWithoutCompareToMethod(List<Date> listToSort) {
+        Comparator<Date> comparator = new Comparator<Date>() {
+
+            @Override
+            public int compare(Date o1, Date o2) {
+                return (int) (o1.getTime() - o2.getTime());
+            }
+        };
+
+        return comparator;
+    }
+
+    public Comparator<Date> doNotRemoveSecondaryMethod(List<Date> listToSort) {
+        Comparator<Date> comparator = new Comparator<Date>() {
+
+            @Override
+            public int compare(Date o1, Date o2) {
+                return o1.toString().compareTo(o2.toString());
+            }
+
+            @Override
+            public String toString() {
+                return "Compare formatted dates";
+            }
+        };
+
+        return comparator;
     }
 }
