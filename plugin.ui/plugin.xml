@@ -35,7 +35,7 @@
                  http://unicase.blogspot.fr/2011/02/curious-case-of-visiblewhen.html
             -->
             <visibleWhen checkEnabled="false">
-                <iterate ifEmpty="false">
+                <iterate ifEmpty="false" operator="or">
                     <or>
                         <instanceof value="org.eclipse.jdt.core.IJavaProject" />
                         <instanceof value="org.eclipse.jdt.core.IPackageFragment" />
@@ -52,7 +52,7 @@
         </menuContribution>
         <menuContribution locationURI="popup:org.eclipse.ui.navigator.ProjectExplorer#PopupMenu?after=org.eclipse.jdt.ui.source.menu">
             <visibleWhen checkEnabled="false">
-                <iterate ifEmpty="false">
+                <iterate ifEmpty="false" operator="or">
                     <or>
                         <instanceof value="org.eclipse.jdt.core.IJavaProject" />
                         <instanceof value="org.eclipse.jdt.core.IPackageFragment" />
