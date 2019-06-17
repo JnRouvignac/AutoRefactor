@@ -55,7 +55,7 @@
 
   <repositories>
 		<repository>
-			<id>Indigo</id>
+			<id>Mars</id>
 			<layout>p2</layout>
 <!--
       <url>http://download.eclipse.org/eclipse/updates/3.7</url>
