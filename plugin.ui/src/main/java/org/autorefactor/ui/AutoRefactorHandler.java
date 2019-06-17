@@ -32,7 +32,6 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 import org.autorefactor.environment.Environment;
@@ -125,11 +124,10 @@ public class AutoRefactorHandler extends AbstractHandler {
     }
 
     private static List<IJavaElement> getSelectedJavaElements(Shell shell,  IStructuredSelection selection) {
-        boolean wrongSelection = false;
+        boolean goodSelection = true;
         final List<IJavaElement> results = new ArrayList<IJavaElement>();
-        final Iterator<?> it = selection.iterator();
-        while (it.hasNext()) {
-            final Object el = it.next();
+
+        for (Object el : selection.toArray()) {
             if (el instanceof ICompilationUnit
                     || el instanceof IPackageFragment
                     || el instanceof IPackageFragmentRoot
@@ -137,16 +135,18 @@ public class AutoRefactorHandler extends AbstractHandler {
                 results.add((IJavaElement) el);
             } else if (el instanceof IProject) {
                 final IProject project = (IProject) el;
-                if (hasNature(project, JavaCore.NATURE_ID)) {
+                if (project.isOpen() && hasNature(project, JavaCore.NATURE_ID)) {
                     results.add(JavaCore.create(project));
                 }
             } else {
-                wrongSelection = true;
+                goodSelection = false;
             }
         }
-        if (wrongSelection) {
+
+        if (!goodSelection) {
             showMessage(shell, "Please select a Java source file, Java package or Java project");
         }
+
         return results;
     }
 
