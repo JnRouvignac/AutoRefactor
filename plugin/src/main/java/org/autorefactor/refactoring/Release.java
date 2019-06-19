@@ -90,7 +90,7 @@ public final class Release {
         return "JavaSE".equals(this.releaseName)
                 && this.version.length >= 2
                 && this.version[0] == 1
-                && 0 <= this.version[1] && this.version[1] <= 8;
+                && 0 <= this.version[1] && this.version[1] <= 12;
     }
 
     private static int[] toIntegerArray(String version) {
