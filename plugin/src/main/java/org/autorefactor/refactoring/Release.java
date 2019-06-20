@@ -87,10 +87,15 @@ public final class Release {
     }
 
     private boolean isVersionValid() {
-        return "JavaSE".equals(this.releaseName)
-                && this.version.length >= 2
-                && this.version[0] == 1
-                && 0 <= this.version[1] && this.version[1] <= 12;
+        if ("JavaSE".equals(this.releaseName)) {
+            if (this.version.length >= 2) {
+                return this.version[0] == 1 && 0 <= this.version[1] && this.version[1] <= 12;
+            } else {
+                return 9 <= this.version[0] && this.version[0] <= 12;
+            }
+        }
+
+        return false;
     }
 
     private static int[] toIntegerArray(String version) {
