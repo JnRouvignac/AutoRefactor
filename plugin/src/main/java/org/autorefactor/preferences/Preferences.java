@@ -25,7 +25,7 @@
  */
 package org.autorefactor.preferences;
 
-import org.autorefactor.refactoring.rules.AbstractRefactoringRule;
+import org.autorefactor.refactoring.rules.AbstractCleanUpRule;
 
 /** Helper interface for preferences. */
 public interface Preferences {
@@ -42,5 +42,5 @@ public interface Preferences {
      * @param clazz The class.
      * @return true if this refactoring rule is on, false otherwise.
      */
-    boolean isEnabled(Class<? extends AbstractRefactoringRule> clazz);
+    boolean isEnabled(Class<? extends AbstractCleanUpRule> clazz);
 }

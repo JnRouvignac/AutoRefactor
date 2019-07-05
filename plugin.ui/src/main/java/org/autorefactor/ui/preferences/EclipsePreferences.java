@@ -29,7 +29,7 @@ import static org.autorefactor.preferences.PreferenceConstants.DEBUG_MODE_ON;
 
 import org.autorefactor.preferences.PreferenceConstants;
 import org.autorefactor.preferences.Preferences;
-import org.autorefactor.refactoring.rules.AbstractRefactoringRule;
+import org.autorefactor.refactoring.rules.AbstractCleanUpRule;
 import org.eclipse.jface.preference.IPreferenceStore;
 
 /** Helper implementation for Eclipse preferences. */
@@ -65,7 +65,7 @@ public class EclipsePreferences implements Preferences {
      *
      * @return True if it is enabled.
      */
-    public boolean isEnabled(Class<? extends AbstractRefactoringRule> clazz) {
+    public boolean isEnabled(Class<? extends AbstractCleanUpRule> clazz) {
         return preferenceStore.getBoolean(clazz.getCanonicalName());
     }
 }

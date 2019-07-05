@@ -38,7 +38,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.autorefactor.refactoring.RefactoringRule;
-import org.autorefactor.refactoring.rules.AllRefactoringRules;
+import org.autorefactor.refactoring.rules.AllCleanUpRules;
 import org.autorefactor.util.UnhandledException;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
@@ -216,7 +216,7 @@ public class ChooseRefactoringWizardPage extends WizardPage {
                 BORDER | H_SCROLL | CHECK | NO_FOCUS | HIDE_SELECTION);
         createColumns(tableViewer);
         tableViewer.setContentProvider(new ArrayContentProvider());
-        final List<RefactoringRule> refactorings = AllRefactoringRules.getAllRefactoringRules();
+        final List<RefactoringRule> refactorings = AllCleanUpRules.getAllCleanUpRules();
         tableViewer.setInput(refactorings);
         tableViewer.setCheckStateProvider(new CheckStateProvider(refactorings));
         tableViewer.setComparator(new ViewerComparator() {

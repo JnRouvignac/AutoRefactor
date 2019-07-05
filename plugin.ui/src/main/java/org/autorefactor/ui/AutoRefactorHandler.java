@@ -36,7 +36,7 @@ import java.util.List;
 
 import org.autorefactor.environment.Environment;
 import org.autorefactor.refactoring.PrepareApplyRefactoringsJob;
-import org.autorefactor.refactoring.rules.AllRefactoringRules;
+import org.autorefactor.refactoring.rules.AllCleanUpRules;
 import org.autorefactor.util.UnhandledException;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
@@ -80,7 +80,7 @@ public class AutoRefactorHandler extends AbstractHandler {
             Environment environment = getEnvironment();
             new PrepareApplyRefactoringsJob(
                     getSelectedJavaElements(event),
-                    AllRefactoringRules.getConfiguredRefactoringRules(environment.getPreferences()),
+                    AllCleanUpRules.getConfiguredRefactoringRules(environment.getPreferences()),
                     environment).schedule();
         } catch (Exception e) {
             final Shell shell = HandlerUtil.getActiveShell(event);

@@ -70,7 +70,7 @@ public class RefactoringRulesTest {
     );
     /** When {@link #WHITELIST} is empty, the refactorings present in this collection will never be run. */
     private static final Collection<Class<?>> BLACKLIST = Arrays.<Class<?>> asList(
-            ReduceVariableScopeRefactoring.class
+            ReduceVariableScopeCleanUp.class
     );
 
     private final String testName;
@@ -110,11 +110,11 @@ public class RefactoringRulesTest {
         final File sampleOut = new File(SAMPLES_BASE_DIR, "samples_out/" + sampleName);
         assertTrue(testName + ": sample out file " + sampleOut + " should exist", sampleOut.exists());
 
-        final String refactoringClassname = testName + "Refactoring";
+        final String refactoringClassname = testName + "CleanUp";
         final RefactoringRule refactoring = getRefactoringClass(refactoringClassname);
         assertNotNull(testName + ": refactoring class " + refactoringClassname + " should exist.\n"
-                + "Make sure you added it to the method getAllRefactoringRules() "
-                + "of the " + AllRefactoringRules.class + ".",
+                + "Make sure you added it to the method getAllCleanUpRules() "
+                + "of the " + AllCleanUpRules.class + ".",
                 refactoring);
 
         final String sampleInSource = readAll(sampleIn);
@@ -158,7 +158,7 @@ public class RefactoringRulesTest {
     }
 
     private RefactoringRule getRefactoringClass(final String refactoringClassName) throws Exception {
-        Collection<RefactoringRule> refactorings = AllRefactoringRules.getAllRefactoringRules();
+        Collection<RefactoringRule> refactorings = AllCleanUpRules.getAllCleanUpRules();
         for (RefactoringRule refactoring : refactorings) {
             if (refactoring.getClass().getSimpleName().equals(refactoringClassName)) {
                 return refactoring;

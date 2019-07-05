@@ -28,7 +28,7 @@ package org.autorefactor.ui.preferences;
 import org.autorefactor.AutoRefactorPlugin;
 import org.autorefactor.preferences.PreferenceConstants;
 import org.autorefactor.refactoring.RefactoringRule;
-import org.autorefactor.refactoring.rules.AllRefactoringRules;
+import org.autorefactor.refactoring.rules.AllCleanUpRules;
 import org.autorefactor.util.NotImplementedException;
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -60,7 +60,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
             }
         }
 
-        for (RefactoringRule refactoringRule : AllRefactoringRules.getAllRefactoringRules()) {
+        for (RefactoringRule refactoringRule : AllCleanUpRules.getAllCleanUpRules()) {
             store.setDefault(refactoringRule.getClass().getCanonicalName(), refactoringRule.isByDefault());
         }
     }

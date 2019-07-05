@@ -33,7 +33,7 @@ import java.util.Map;
 
 import org.autorefactor.AutoRefactorPlugin;
 import org.autorefactor.refactoring.RefactoringRule;
-import org.autorefactor.refactoring.rules.AllRefactoringRules;
+import org.autorefactor.refactoring.rules.AllCleanUpRules;
 import org.eclipse.jdt.internal.ui.fix.MapCleanUpOptions;
 import org.eclipse.jdt.internal.ui.preferences.cleanup.CleanUpTabPage;
 import org.eclipse.jdt.ui.cleanup.CleanUpOptions;
@@ -76,7 +76,7 @@ public class AutoRefactorTabPage extends CleanUpTabPage {
      */
     @Override
     public Composite createContents(Composite parent) {
-        final List<RefactoringRule> allRefactoringRules = AllRefactoringRules.getAllRefactoringRules();
+        final List<RefactoringRule> allRefactoringRules = AllCleanUpRules.getAllCleanUpRules();
         Collections.sort(allRefactoringRules, new Comparator<RefactoringRule>() {
             /**
              * Compare objects.

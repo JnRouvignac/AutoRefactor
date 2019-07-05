@@ -161,7 +161,7 @@ public final class TestHelper {
         final Collection<String> results = new ArrayList<String>();
         for (Class<?> clazz : clazzes) {
             final String name = clazz.getSimpleName();
-            results.add(name.substring(0, name.lastIndexOf("Refactoring")) + "Sample.java");
+            results.add(name.substring(0, name.lastIndexOf("CleanUp")) + "Sample.java");
         }
         return results;
     }

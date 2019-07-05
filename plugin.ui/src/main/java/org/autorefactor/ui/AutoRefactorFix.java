@@ -41,7 +41,7 @@ import org.autorefactor.refactoring.PrepareApplyRefactoringsJob;
 import org.autorefactor.refactoring.RefactoringRule;
 import org.autorefactor.refactoring.RefactoringUnit;
 import org.autorefactor.refactoring.rules.AggregateASTVisitor;
-import org.autorefactor.refactoring.rules.AllRefactoringRules;
+import org.autorefactor.refactoring.rules.AllCleanUpRules;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
@@ -125,7 +125,7 @@ public class AutoRefactorFix implements ICleanUpFix {
      * @return the refactoring rules which have been enabled from the Eclipse preferences
      */
     public static List<RefactoringRule> getConfiguredRefactoringRules(final CleanUpOptions options) {
-        final List<RefactoringRule> refactorings = AllRefactoringRules.getAllRefactoringRules();
+        final List<RefactoringRule> refactorings = AllCleanUpRules.getAllCleanUpRules();
         for (final Iterator<RefactoringRule> iter = refactorings.iterator(); iter.hasNext();) {
             final RefactoringRule refactoring = iter.next();
             final String cleanupPropertyName = AutoRefactorTabPage.getCleanupPropertyName(refactoring);

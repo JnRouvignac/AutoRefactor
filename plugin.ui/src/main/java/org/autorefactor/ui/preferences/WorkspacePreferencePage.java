@@ -35,7 +35,7 @@ import java.util.List;
 
 import org.autorefactor.AutoRefactorPlugin;
 import org.autorefactor.refactoring.RefactoringRule;
-import org.autorefactor.refactoring.rules.AllRefactoringRules;
+import org.autorefactor.refactoring.rules.AllCleanUpRules;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.preference.PreferencePage;
@@ -91,7 +91,7 @@ public class WorkspacePreferencePage extends PreferencePage implements IWorkbenc
 
     @Override
     protected Control createContents(Composite parent) {
-        final List<RefactoringRule> allRefactoringRules = AllRefactoringRules.getAllRefactoringRules();
+        final List<RefactoringRule> allRefactoringRules = AllCleanUpRules.getAllCleanUpRules();
         Collections.sort(allRefactoringRules, new Comparator<RefactoringRule>() {
             /**
              * Compare objects.
