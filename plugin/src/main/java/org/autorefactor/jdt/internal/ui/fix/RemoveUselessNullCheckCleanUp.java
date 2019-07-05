@@ -26,25 +26,25 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
-import static org.autorefactor.refactoring.ASTHelper.as;
-import static org.autorefactor.refactoring.ASTHelper.asExpression;
-import static org.autorefactor.refactoring.ASTHelper.asList;
-import static org.autorefactor.refactoring.ASTHelper.getNextSibling;
-import static org.autorefactor.refactoring.ASTHelper.hasOperator;
-import static org.autorefactor.refactoring.ASTHelper.is;
-import static org.autorefactor.refactoring.ASTHelper.isNullLiteral;
-import static org.autorefactor.refactoring.ASTHelper.match;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.as;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.asExpression;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.asList;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getNextSibling;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasOperator;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.is;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isNullLiteral;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.match;
 import static org.eclipse.jdt.core.dom.Assignment.Operator.ASSIGN;
 import static org.eclipse.jdt.core.dom.InfixExpression.Operator.EQUALS;
 import static org.eclipse.jdt.core.dom.InfixExpression.Operator.NOT_EQUALS;
 
 import java.util.List;
 
-import org.autorefactor.refactoring.ASTBuilder;
-import org.autorefactor.refactoring.ASTSemanticMatcher;
-import org.autorefactor.refactoring.BlockSubVisitor;
+import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
+import org.autorefactor.jdt.internal.corext.dom.ASTSemanticMatcher;
+import org.autorefactor.jdt.internal.corext.dom.BlockSubVisitor;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.Expression;

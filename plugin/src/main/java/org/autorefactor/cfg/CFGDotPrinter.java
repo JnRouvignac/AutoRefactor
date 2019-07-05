@@ -34,7 +34,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.autorefactor.refactoring.ASTHelper;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.CatchClause;
 import org.eclipse.jdt.core.dom.IfStatement;
@@ -154,7 +154,7 @@ public class CFGDotPrinter {
         }
         CFGSubGraph subGraph = subGraphs.get(node);
         if (subGraph == null) {
-            if (ASTHelper.isLoop(node) || node instanceof IfStatement || node instanceof SwitchStatement
+            if (ASTNodes.isLoop(node) || node instanceof IfStatement || node instanceof SwitchStatement
                     || node instanceof MethodDeclaration || node instanceof TryStatement
                     || node instanceof CatchClause) {
                 // such statements need their own subgraph to ease reading the CFG

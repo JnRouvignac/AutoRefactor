@@ -26,14 +26,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
-import static org.autorefactor.refactoring.ASTHelper.fragments;
-import static org.autorefactor.refactoring.ASTHelper.getEnclosingType;
-import static org.autorefactor.refactoring.ASTHelper.getFirstAncestorOrNull;
-import static org.autorefactor.refactoring.ASTHelper.getLocalVariableIdentifiers;
-import static org.autorefactor.refactoring.ASTHelper.imports;
-import static org.autorefactor.refactoring.ASTHelper.parameters;
 import static org.eclipse.jdt.core.dom.ASTNode.ANONYMOUS_CLASS_DECLARATION;
 import static org.eclipse.jdt.core.dom.ASTNode.ENUM_DECLARATION;
 import static org.eclipse.jdt.core.dom.ASTNode.TYPE_DECLARATION;
@@ -45,6 +37,14 @@ import static org.eclipse.jdt.core.dom.Modifier.isStatic;
 import static org.eclipse.jdt.core.search.IJavaSearchConstants.WAIT_UNTIL_READY_TO_SEARCH;
 import static org.eclipse.jdt.core.search.SearchEngine.createWorkspaceScope;
 import static org.eclipse.jdt.core.search.SearchPattern.R_EXACT_MATCH;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.fragments;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getEnclosingType;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getFirstAncestorOrNull;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getLocalVariableIdentifiers;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.imports;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.parameters;
 import static org.autorefactor.util.Utils.equal;
 
 import java.util.ArrayList;
@@ -55,8 +55,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-import org.autorefactor.refactoring.ASTBuilder;
-import org.autorefactor.refactoring.CollectorVisitor;
+import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
+import org.autorefactor.jdt.internal.corext.dom.CollectorVisitor;
 import org.autorefactor.util.NotImplementedException;
 import org.autorefactor.util.UnhandledException;
 import org.eclipse.jdt.core.JavaModelException;

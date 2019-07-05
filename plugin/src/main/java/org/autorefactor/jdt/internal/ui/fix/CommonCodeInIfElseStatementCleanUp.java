@@ -27,21 +27,21 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
-import static org.autorefactor.refactoring.ASTHelper.as;
-import static org.autorefactor.refactoring.ASTHelper.asList;
-import static org.autorefactor.refactoring.ASTHelper.isPassive;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.as;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.asList;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isPassive;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.autorefactor.refactoring.ASTBuilder;
-import org.autorefactor.refactoring.ASTHelper;
-import org.autorefactor.refactoring.ASTMatcherSameVariablesAndMethods;
-import org.autorefactor.refactoring.ASTSemanticMatcher;
-import org.autorefactor.refactoring.Refactorings;
+import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
+import org.autorefactor.jdt.internal.corext.dom.ASTMatcherSameVariablesAndMethods;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
+import org.autorefactor.jdt.internal.corext.dom.ASTSemanticMatcher;
+import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.autorefactor.util.IllegalStateException;
 import org.autorefactor.util.NotImplementedException;
 import org.eclipse.jdt.core.dom.ASTNode;
@@ -269,7 +269,7 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
 
         final List<Statement> caseStmts1 = allCasesStmts.get(startIndex);
         final List<Statement> caseStmts2 = allCasesStmts.get(comparisonIndex);
-        return ASTHelper.match(matcher, caseStmts1.get(caseStmts1.size() - stmtIndex),
+        return ASTNodes.match(matcher, caseStmts1.get(caseStmts1.size() - stmtIndex),
                 caseStmts2.get(caseStmts2.size() - stmtIndex));
     }
 

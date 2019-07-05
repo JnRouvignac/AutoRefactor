@@ -25,18 +25,18 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
-import static org.autorefactor.refactoring.ASTHelper.asList;
-import static org.autorefactor.refactoring.ASTHelper.getPreviousSibling;
-import static org.autorefactor.refactoring.ASTHelper.match;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.asList;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getPreviousSibling;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.match;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.autorefactor.refactoring.ASTBuilder;
-import org.autorefactor.refactoring.ASTSemanticMatcher;
-import org.autorefactor.refactoring.Refactorings;
+import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
+import org.autorefactor.jdt.internal.corext.dom.ASTSemanticMatcher;
+import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.WhileStatement;
 

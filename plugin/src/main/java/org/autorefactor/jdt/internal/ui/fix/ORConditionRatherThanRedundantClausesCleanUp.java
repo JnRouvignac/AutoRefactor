@@ -26,19 +26,19 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
-import static org.autorefactor.refactoring.ASTHelper.as;
-import static org.autorefactor.refactoring.ASTHelper.hasOperator;
-import static org.autorefactor.refactoring.ASTHelper.isPassive;
-import static org.autorefactor.refactoring.ASTHelper.isPrimitive;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.as;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasOperator;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isPassive;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isPrimitive;
 import static org.eclipse.jdt.core.dom.InfixExpression.Operator.AND;
 import static org.eclipse.jdt.core.dom.InfixExpression.Operator.CONDITIONAL_AND;
 import static org.eclipse.jdt.core.dom.InfixExpression.Operator.CONDITIONAL_OR;
 import static org.eclipse.jdt.core.dom.InfixExpression.Operator.OR;
 
-import org.autorefactor.refactoring.ASTBuilder;
-import org.autorefactor.refactoring.ASTSemanticMatcher;
+import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
+import org.autorefactor.jdt.internal.corext.dom.ASTSemanticMatcher;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.InfixExpression.Operator;

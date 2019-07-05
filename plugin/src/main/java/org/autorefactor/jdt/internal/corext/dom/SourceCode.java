@@ -23,7 +23,7 @@
  * which accompanies this distribution under LICENSE-ECLIPSE, and is
  * available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.autorefactor.refactoring;
+package org.autorefactor.jdt.internal.corext.dom;
 
 import java.util.ArrayList;
 import java.util.List;

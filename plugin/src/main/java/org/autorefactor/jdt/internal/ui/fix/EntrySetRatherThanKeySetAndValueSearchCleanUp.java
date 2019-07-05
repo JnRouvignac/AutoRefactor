@@ -26,14 +26,14 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
-import static org.autorefactor.refactoring.ASTHelper.areBindingsEqual;
-import static org.autorefactor.refactoring.ASTHelper.arg0;
-import static org.autorefactor.refactoring.ASTHelper.asList;
-import static org.autorefactor.refactoring.ASTHelper.getFirstAncestorOrNull;
-import static org.autorefactor.refactoring.ASTHelper.isMethod;
-import static org.autorefactor.refactoring.ASTHelper.isSameVariable;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.areBindingsEqual;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.arg0;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.asList;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getFirstAncestorOrNull;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isMethod;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isSameVariable;
 import static org.eclipse.jdt.core.dom.ASTNode.ANNOTATION_TYPE_DECLARATION;
 import static org.eclipse.jdt.core.dom.ASTNode.ANONYMOUS_CLASS_DECLARATION;
 import static org.eclipse.jdt.core.dom.ASTNode.ENUM_DECLARATION;
@@ -49,11 +49,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import org.autorefactor.refactoring.ASTBuilder;
-import org.autorefactor.refactoring.CollectorVisitor;
-import org.autorefactor.refactoring.Refactorings;
-import org.autorefactor.refactoring.TypeNameDecider;
-import org.autorefactor.refactoring.Variable;
+import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
+import org.autorefactor.jdt.internal.corext.dom.CollectorVisitor;
+import org.autorefactor.jdt.internal.corext.dom.Refactorings;
+import org.autorefactor.jdt.internal.corext.dom.TypeNameDecider;
+import org.autorefactor.jdt.internal.corext.dom.Variable;
 import org.autorefactor.util.IllegalStateException;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Block;

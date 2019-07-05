@@ -32,6 +32,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.TreeSet;
 
+import org.autorefactor.jdt.internal.corext.dom.TypeNameDecider;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.junit.Test;
 import org.junit.runner.RunWith;

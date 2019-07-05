@@ -24,16 +24,16 @@
  * which accompanies this distribution under LICENSE-ECLIPSE, and is
  * available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.autorefactor.refactoring;
+package org.autorefactor.jdt.internal.corext.dom;
 
-import static org.autorefactor.refactoring.ASTHelper.arguments;
-import static org.autorefactor.refactoring.ASTHelper.catchClauses;
-import static org.autorefactor.refactoring.ASTHelper.extendedOperands;
-import static org.autorefactor.refactoring.ASTHelper.hasOperator;
-import static org.autorefactor.refactoring.ASTHelper.modifiers;
-import static org.autorefactor.refactoring.ASTHelper.removeParentheses;
-import static org.autorefactor.refactoring.ASTHelper.statements;
-import static org.autorefactor.refactoring.ASTHelper.typeArguments;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.arguments;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.catchClauses;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.extendedOperands;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasOperator;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.modifiers;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.removeParentheses;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.statements;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.typeArguments;
 import static org.autorefactor.util.Utils.equal;
 import static org.eclipse.jdt.core.dom.ASTNode.ARRAY_TYPE;
 import static org.eclipse.jdt.core.dom.ASTNode.ASSIGNMENT;

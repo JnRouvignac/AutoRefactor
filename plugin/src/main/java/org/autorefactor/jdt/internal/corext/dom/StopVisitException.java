@@ -23,34 +23,11 @@
  * which accompanies this distribution under LICENSE-ECLIPSE, and is
  * available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.autorefactor.refactoring;
-
-import org.eclipse.jdt.core.dom.ASTNode;
-import org.eclipse.jdt.core.dom.ASTVisitor;
+package org.autorefactor.jdt.internal.corext.dom;
 
 /**
- * An interruptible visitor.
+ * Interrupt the visit of a tree.
  */
-public class InterruptibleVisitor extends ASTVisitor {
-    /**
-     * Visit the node.
-     *
-     * @param node The visited node.
-     */
-    public void visitNode(ASTNode node) {
-        try {
-            node.accept(this);
-        } catch (StopVisitException e) {
-            return;
-        }
-    }
-
-    /**
-     * Interrupt the visit of a tree.
-     *
-     * @return nothing
-     */
-    public boolean interruptVisit() {
-        throw new StopVisitException();
-    }
+public class StopVisitException extends RuntimeException {
+    private static final long serialVersionUID = 8809979732051907351L;
 }

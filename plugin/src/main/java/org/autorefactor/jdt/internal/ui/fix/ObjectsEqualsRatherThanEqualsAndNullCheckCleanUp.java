@@ -25,21 +25,21 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
-import static org.autorefactor.refactoring.ASTHelper.as;
-import static org.autorefactor.refactoring.ASTHelper.asList;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.as;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.asList;
 
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.autorefactor.refactoring.ASTBuilder;
-import org.autorefactor.refactoring.ASTHelper;
-import org.autorefactor.refactoring.ASTSemanticMatcher;
-import org.autorefactor.refactoring.Refactorings;
-import org.autorefactor.refactoring.Release;
+import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
+import org.autorefactor.jdt.internal.corext.dom.ASTSemanticMatcher;
+import org.autorefactor.jdt.internal.corext.dom.Refactorings;
+import org.autorefactor.jdt.internal.corext.dom.Release;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.BooleanLiteral;
 import org.eclipse.jdt.core.dom.Expression;
@@ -258,8 +258,8 @@ public class ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp extends NewClassIm
     private boolean match(final Name firstField, final Name secondField, final Expression thisObject,
             final ASTNode otherObject) {
         final ASTSemanticMatcher matcher = new ASTSemanticMatcher();
-        return ASTHelper.match(matcher, thisObject, firstField)
-                                && ASTHelper.match(matcher, otherObject, secondField);
+        return ASTNodes.match(matcher, thisObject, firstField)
+                                && ASTNodes.match(matcher, otherObject, secondField);
     }
 
     private void replaceEquals(final IfStatement node, final Name firstField, final Name secondField,

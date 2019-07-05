@@ -23,12 +23,12 @@
  * which accompanies this distribution under LICENSE-ECLIPSE, and is
  * available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.autorefactor.refactoring;
+package org.autorefactor.jdt.internal.corext.dom;
+
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.*;
 
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
-
-import static org.autorefactor.refactoring.ASTHelper.*;
 
 /**
  * A visitor that stops visiting as fast as possible once a result has been found.

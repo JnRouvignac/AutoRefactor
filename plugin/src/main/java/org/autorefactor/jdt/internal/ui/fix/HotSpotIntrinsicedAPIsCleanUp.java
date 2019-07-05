@@ -25,16 +25,16 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
-import static org.autorefactor.refactoring.ASTHelper.asExpression;
-import static org.autorefactor.refactoring.ASTHelper.asList;
-import static org.autorefactor.refactoring.ASTHelper.fragments;
-import static org.autorefactor.refactoring.ASTHelper.hasOperator;
-import static org.autorefactor.refactoring.ASTHelper.haveSameType;
-import static org.autorefactor.refactoring.ASTHelper.initializers;
-import static org.autorefactor.refactoring.ASTHelper.isPrimitive;
-import static org.autorefactor.refactoring.ASTHelper.updaters;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.asExpression;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.asList;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.fragments;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasOperator;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.haveSameType;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.initializers;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isPrimitive;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.updaters;
 import static org.autorefactor.util.Utils.equalNotNull;
 import static org.eclipse.jdt.core.dom.Assignment.Operator.ASSIGN;
 import static org.eclipse.jdt.core.dom.InfixExpression.Operator.GREATER;
@@ -46,7 +46,7 @@ import static org.eclipse.jdt.core.dom.InfixExpression.Operator.PLUS;
 
 import java.util.List;
 
-import org.autorefactor.refactoring.ASTBuilder;
+import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
 import org.autorefactor.util.NotImplementedException;
 import org.eclipse.jdt.core.dom.ArrayAccess;
 import org.eclipse.jdt.core.dom.Assignment;

@@ -34,8 +34,8 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.autorefactor.AutoRefactorPlugin;
+import org.autorefactor.jdt.internal.corext.dom.RefactoringRule;
 import org.autorefactor.jdt.internal.ui.fix.AllCleanUpRules;
-import org.autorefactor.refactoring.RefactoringRule;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.preference.PreferencePage;

@@ -25,9 +25,9 @@
  */
 package org.autorefactor.util;
 
-import org.eclipse.jdt.core.dom.ASTNode;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.*;
 
-import static org.autorefactor.refactoring.ASTHelper.*;
+import org.eclipse.jdt.core.dom.ASTNode;
 
 /**
  * This is the base class for exceptions used in AutoRefactor.

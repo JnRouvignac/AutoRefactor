@@ -26,7 +26,7 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.refactoring.ASTHelper.*;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.*;
 import static org.eclipse.jdt.core.dom.InfixExpression.Operator.EQUALS;
 import static org.eclipse.jdt.core.dom.InfixExpression.Operator.NOT_EQUALS;
 
@@ -34,10 +34,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.autorefactor.refactoring.ASTBuilder;
-import org.autorefactor.refactoring.ASTSemanticMatcher;
-import org.autorefactor.refactoring.BlockSubVisitor;
-import org.autorefactor.refactoring.Refactorings;
+import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
+import org.autorefactor.jdt.internal.corext.dom.ASTSemanticMatcher;
+import org.autorefactor.jdt.internal.corext.dom.BlockSubVisitor;
+import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.IfStatement;

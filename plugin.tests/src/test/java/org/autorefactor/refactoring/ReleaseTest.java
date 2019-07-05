@@ -4,6 +4,8 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
+import org.autorefactor.jdt.internal.corext.dom.Release;
+
 public class ReleaseTest {
     @Test
     public void javaSEFromString() {

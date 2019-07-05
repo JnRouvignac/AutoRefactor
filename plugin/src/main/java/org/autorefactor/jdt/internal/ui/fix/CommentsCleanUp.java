@@ -26,13 +26,13 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
-import static org.autorefactor.refactoring.ASTHelper.getCommentList;
-import static org.autorefactor.refactoring.ASTHelper.getFileName;
-import static org.autorefactor.refactoring.ASTHelper.hasType;
-import static org.autorefactor.refactoring.ASTHelper.modifiers;
-import static org.autorefactor.refactoring.ASTHelper.tags;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getCommentList;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getFileName;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasType;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.modifiers;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.tags;
 import static org.eclipse.jdt.core.dom.TagElement.TAG_AUTHOR;
 import static org.eclipse.jdt.core.dom.TagElement.TAG_DEPRECATED;
 import static org.eclipse.jdt.core.dom.TagElement.TAG_EXCEPTION;
@@ -55,7 +55,7 @@ import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.autorefactor.refactoring.SourceLocation;
+import org.autorefactor.jdt.internal.corext.dom.SourceLocation;
 import org.autorefactor.util.NotImplementedException;
 import org.autorefactor.util.Pair;
 import org.eclipse.jdt.core.dom.ASTNode;

@@ -25,13 +25,13 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
-import static org.autorefactor.refactoring.ASTHelper.getCommentList;
-import static org.autorefactor.refactoring.ASTHelper.getNextSibling;
-import static org.autorefactor.refactoring.ASTHelper.resources;
-import static org.autorefactor.refactoring.SourceLocation.fromPositions;
-import static org.autorefactor.refactoring.SourceLocation.getEndPosition;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getCommentList;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getNextSibling;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.resources;
+import static org.autorefactor.jdt.internal.corext.dom.SourceLocation.fromPositions;
+import static org.autorefactor.jdt.internal.corext.dom.SourceLocation.getEndPosition;
 import static org.autorefactor.util.Utils.getLast;
 
 import java.util.ArrayList;
@@ -44,8 +44,8 @@ import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.autorefactor.refactoring.ASTHelper.NodeStartPositionComparator;
-import org.autorefactor.refactoring.SourceLocation;
+import org.autorefactor.jdt.internal.corext.dom.SourceLocation;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodes.NodeStartPositionComparator;
 import org.autorefactor.util.NotImplementedException;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.AbstractTypeDeclaration;

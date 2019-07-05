@@ -25,7 +25,7 @@
  */
 package org.autorefactor.refactoring;
 
-import static org.autorefactor.refactoring.JavaConstants.*;
+import static org.autorefactor.jdt.internal.corext.dom.JavaConstants.*;
 import static org.junit.Assert.*;
 
 import org.junit.Test;

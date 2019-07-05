@@ -45,9 +45,9 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 
 import org.autorefactor.environment.Environment;
-import org.autorefactor.refactoring.JavaProjectOptions;
-import org.autorefactor.refactoring.JavaProjectOptionsImpl;
-import org.autorefactor.refactoring.Release;
+import org.autorefactor.jdt.internal.corext.dom.JavaProjectOptions;
+import org.autorefactor.jdt.internal.corext.dom.JavaProjectOptionsImpl;
+import org.autorefactor.jdt.internal.corext.dom.Release;
 import org.autorefactor.refactoring.rules.EndsWithFileFilter;
 import org.eclipse.jdt.core.formatter.CodeFormatter;
 import org.eclipse.jdt.core.formatter.DefaultCodeFormatterConstants;

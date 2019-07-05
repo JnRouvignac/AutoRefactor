@@ -23,7 +23,7 @@
  * which accompanies this distribution under LICENSE-ECLIPSE, and is
  * available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.autorefactor.refactoring;
+package org.autorefactor.jdt.internal.corext.dom;
 
 import static org.autorefactor.util.Utils.equalNotNull;
 import static org.eclipse.jdt.core.dom.ASTNode.BREAK_STATEMENT;
@@ -124,7 +124,7 @@ import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 import org.eclipse.jdt.core.dom.WhileStatement;
 
 /** Helper class for manipulating, converting, navigating and checking {@link ASTNode}s. */
-public final class ASTHelper {
+public final class ASTNodes {
     /** Enum representing a primitive type. */
     public enum PrimitiveEnum {
         /** The {@code boolean} type. */
@@ -319,7 +319,7 @@ public final class ASTHelper {
      */
     public static final boolean VISIT_SUBTREE = true;
 
-    private ASTHelper() {
+    private ASTNodes() {
     }
 
     // AST nodes manipulation
@@ -2324,10 +2324,10 @@ public final class ASTHelper {
      * @param includedClasses the classes to include when looking for the parent node
      * @return the last parent node of the provided classes, or the current node otherwise
      */
-    public static ASTNode getFirstParentOfType(ASTNode node, Class<?>... includedClasses) {
+    public static ASTNode getParent(ASTNode node, Class<?>... includedClasses) {
         final ASTNode parent = node.getParent();
         if (instanceOf(parent, includedClasses)) {
-            return getFirstParentOfType(parent, includedClasses);
+            return getParent(parent, includedClasses);
         }
         return node;
     }

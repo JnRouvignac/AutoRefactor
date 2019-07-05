@@ -26,9 +26,9 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.refactoring.ASTHelper.isMethod;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isMethod;
 
-import org.autorefactor.refactoring.Release;
+import org.autorefactor.jdt.internal.corext.dom.Release;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 
 /** See {@link #getDescription()} method. */

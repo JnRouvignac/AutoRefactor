@@ -25,10 +25,10 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
-import static org.autorefactor.refactoring.ASTHelper.fragments;
-import static org.autorefactor.refactoring.ASTHelper.isNullLiteral;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.fragments;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isNullLiteral;
 import static org.eclipse.jdt.core.dom.Modifier.isFinal;
 
 import org.eclipse.jdt.core.dom.ASTNode;

@@ -25,12 +25,12 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
-import static org.autorefactor.refactoring.ASTHelper.getAncestorOrNull;
-import static org.autorefactor.refactoring.ASTHelper.hasType;
-import static org.autorefactor.refactoring.ASTHelper.isField;
-import static org.autorefactor.refactoring.ASTHelper.isMethod;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getAncestorOrNull;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasType;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isField;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isMethod;
 import static org.eclipse.jdt.core.dom.ASTNode.ASSIGNMENT;
 import static org.eclipse.jdt.core.dom.ASTNode.CAST_EXPRESSION;
 import static org.eclipse.jdt.core.dom.ASTNode.CONDITIONAL_EXPRESSION;
@@ -44,8 +44,8 @@ import static org.eclipse.jdt.core.dom.ASTNode.VARIABLE_DECLARATION_FRAGMENT;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.autorefactor.refactoring.ASTBuilder;
-import org.autorefactor.refactoring.InterruptibleVisitor;
+import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
+import org.autorefactor.jdt.internal.corext.dom.InterruptibleVisitor;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Block;

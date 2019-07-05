@@ -26,18 +26,18 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
-import static org.autorefactor.refactoring.ASTHelper.arguments;
-import static org.autorefactor.refactoring.ASTHelper.hasType;
-import static org.autorefactor.refactoring.ASTHelper.isMethod;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.arguments;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasType;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isMethod;
 import static org.eclipse.jdt.core.dom.MethodInvocation.NAME_PROPERTY;
 
 import java.util.List;
 
-import org.autorefactor.refactoring.ASTBuilder;
-import org.autorefactor.refactoring.Refactorings;
-import org.autorefactor.refactoring.Release;
+import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
+import org.autorefactor.jdt.internal.corext.dom.Refactorings;
+import org.autorefactor.jdt.internal.corext.dom.Release;
 import org.autorefactor.util.IllegalArgumentException;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.MethodInvocation;

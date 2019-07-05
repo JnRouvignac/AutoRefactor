@@ -26,19 +26,19 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
-import static org.autorefactor.refactoring.ASTHelper.as;
-import static org.autorefactor.refactoring.ASTHelper.fragments;
-import static org.autorefactor.refactoring.ASTHelper.getFirstParentOfType;
-import static org.autorefactor.refactoring.ASTHelper.getPreviousSibling;
-import static org.autorefactor.refactoring.ASTHelper.isSameVariable;
-import static org.autorefactor.refactoring.ASTHelper.removeParentheses;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.as;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.fragments;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getParent;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getPreviousSibling;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isSameVariable;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.removeParentheses;
 import static org.eclipse.jdt.core.dom.VariableDeclarationFragment.INITIALIZER_PROPERTY;
 
-import org.autorefactor.refactoring.ASTBuilder;
-import org.autorefactor.refactoring.BlockSubVisitor;
-import org.autorefactor.refactoring.Refactorings;
+import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
+import org.autorefactor.jdt.internal.corext.dom.BlockSubVisitor;
+import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Block;
@@ -125,13 +125,13 @@ public class NoAssignmentInIfConditionCleanUp extends AbstractCleanUpRule {
             final VariableDeclarationFragment vdf = findVariableDeclarationFragment(vds, lhs);
             if (vdf != null) {
                 r.set(vdf, INITIALIZER_PROPERTY, a.getRightHandSide());
-                r.replace(getFirstParentOfType(a, ParenthesizedExpression.class),
+                r.replace(getParent(a, ParenthesizedExpression.class),
                         b.copy(lhs));
                 setResult(DO_NOT_VISIT_SUBTREE);
                 return DO_NOT_VISIT_SUBTREE;
             } else if (!isAnElseIf(node)) {
                 r.insertBefore(b.toStmt(b.move(a)), node);
-                r.replace(getFirstParentOfType(a, ParenthesizedExpression.class),
+                r.replace(getParent(a, ParenthesizedExpression.class),
                         b.copy(lhs));
                 setResult(DO_NOT_VISIT_SUBTREE);
                 return DO_NOT_VISIT_SUBTREE;

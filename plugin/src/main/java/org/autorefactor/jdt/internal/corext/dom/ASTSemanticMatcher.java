@@ -23,11 +23,11 @@
  * which accompanies this distribution under LICENSE-ECLIPSE, and is
  * available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.autorefactor.refactoring;
+package org.autorefactor.jdt.internal.corext.dom;
 
-import static org.autorefactor.refactoring.ASTHelper.hasType;
-import static org.autorefactor.refactoring.ASTHelper.haveSameType;
-import static org.autorefactor.refactoring.ASTHelper.isPassive;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasType;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.haveSameType;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isPassive;
 
 import java.util.ArrayList;
 import java.util.Arrays;

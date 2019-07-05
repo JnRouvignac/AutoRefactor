@@ -26,11 +26,11 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
-import static org.autorefactor.refactoring.ASTHelper.hasType;
-import static org.autorefactor.refactoring.ASTHelper.modifiers;
-import static org.autorefactor.refactoring.ASTHelper.resources;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasType;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.modifiers;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.resources;
 import static org.eclipse.jdt.core.dom.Modifier.isFinal;
 import static org.eclipse.jdt.core.dom.Modifier.isPrivate;
 import static org.eclipse.jdt.core.dom.Modifier.isProtected;
@@ -42,7 +42,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import org.autorefactor.refactoring.ASTBuilder;
+import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
 import org.autorefactor.util.NotImplementedException;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Annotation;

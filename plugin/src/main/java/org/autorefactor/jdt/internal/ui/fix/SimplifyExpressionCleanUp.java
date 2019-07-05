@@ -25,18 +25,18 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
-import static org.autorefactor.refactoring.ASTHelper.allOperands;
-import static org.autorefactor.refactoring.ASTHelper.arguments;
-import static org.autorefactor.refactoring.ASTHelper.as;
-import static org.autorefactor.refactoring.ASTHelper.checkNoExtendedOperands;
-import static org.autorefactor.refactoring.ASTHelper.getBooleanLiteral;
-import static org.autorefactor.refactoring.ASTHelper.getNullCheckedExpression;
-import static org.autorefactor.refactoring.ASTHelper.hasOperator;
-import static org.autorefactor.refactoring.ASTHelper.is;
-import static org.autorefactor.refactoring.ASTHelper.isMethod;
-import static org.autorefactor.refactoring.ASTHelper.isPrimitive;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.allOperands;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.arguments;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.as;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.checkNoExtendedOperands;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getBooleanLiteral;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getNullCheckedExpression;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasOperator;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.is;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isMethod;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isPrimitive;
 import static org.autorefactor.util.Utils.equalNotNull;
 import static org.eclipse.jdt.core.dom.InfixExpression.Operator.AND;
 import static org.eclipse.jdt.core.dom.InfixExpression.Operator.CONDITIONAL_AND;
@@ -58,9 +58,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.ListIterator;
 
-import org.autorefactor.refactoring.ASTBuilder;
-import org.autorefactor.refactoring.ASTSemanticMatcher;
-import org.autorefactor.refactoring.Refactorings;
+import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
+import org.autorefactor.jdt.internal.corext.dom.ASTSemanticMatcher;
+import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.autorefactor.util.Pair;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Assignment;

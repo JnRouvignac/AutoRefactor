@@ -25,15 +25,15 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
-import static org.autorefactor.refactoring.ASTHelper.catchClauses;
-import static org.autorefactor.refactoring.ASTHelper.fragments;
-import static org.autorefactor.refactoring.ASTHelper.getOverridenMethods;
-import static org.autorefactor.refactoring.ASTHelper.isSameVariable;
-import static org.autorefactor.refactoring.ASTHelper.match;
-import static org.autorefactor.refactoring.ASTHelper.resolveTypeBinding;
-import static org.autorefactor.refactoring.ASTHelper.types;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.catchClauses;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.fragments;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getOverridenMethods;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isSameVariable;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.match;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.resolveTypeBinding;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.types;
 import static org.autorefactor.util.Utils.equalNotNull;
 import static org.eclipse.jdt.core.dom.ASTNode.SIMPLE_TYPE;
 import static org.eclipse.jdt.core.dom.ASTNode.UNION_TYPE;
@@ -49,11 +49,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.autorefactor.refactoring.ASTBuilder;
-import org.autorefactor.refactoring.ASTHelper;
-import org.autorefactor.refactoring.ASTSemanticMatcher;
-import org.autorefactor.refactoring.Refactorings;
-import org.autorefactor.refactoring.Release;
+import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
+import org.autorefactor.jdt.internal.corext.dom.ASTSemanticMatcher;
+import org.autorefactor.jdt.internal.corext.dom.Refactorings;
+import org.autorefactor.jdt.internal.corext.dom.Release;
 import org.autorefactor.util.NotImplementedException;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.CatchClause;
@@ -236,7 +236,7 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
                             // It cannot reconcile 1 with 1L, true with Boolean.TRUE, etc.
                             // Let's rely on other refactoring rules which will simplify such expressions
                             // and convert 1L => 1 (in long context), Boolean.TRUE to true (in boolean context), etc.
-                            && ASTHelper.match(this, f1.getInitializer(), f2.getInitializer())) {
+                            && ASTNodes.match(this, f1.getInitializer(), f2.getInitializer())) {
                         this.matchingVariables.put(f1, f2);
                         return true;
                     }

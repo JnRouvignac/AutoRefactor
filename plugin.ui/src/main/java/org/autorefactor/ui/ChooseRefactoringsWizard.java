@@ -27,8 +27,8 @@ package org.autorefactor.ui;
 
 import java.util.List;
 
-import org.autorefactor.refactoring.PrepareApplyRefactoringsJob;
-import org.autorefactor.refactoring.RefactoringRule;
+import org.autorefactor.jdt.internal.corext.dom.PrepareApplyRefactoringsJob;
+import org.autorefactor.jdt.internal.corext.dom.RefactoringRule;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jface.wizard.Wizard;
 

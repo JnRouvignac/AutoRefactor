@@ -35,8 +35,8 @@ import java.util.Collections;
 import java.util.List;
 
 import org.autorefactor.environment.Environment;
+import org.autorefactor.jdt.internal.corext.dom.PrepareApplyRefactoringsJob;
 import org.autorefactor.jdt.internal.ui.fix.AllCleanUpRules;
-import org.autorefactor.refactoring.PrepareApplyRefactoringsJob;
 import org.autorefactor.util.UnhandledException;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;

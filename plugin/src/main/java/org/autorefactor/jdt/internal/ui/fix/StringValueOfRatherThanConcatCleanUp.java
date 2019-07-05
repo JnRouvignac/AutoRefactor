@@ -26,12 +26,12 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
-import static org.autorefactor.refactoring.ASTHelper.extendedOperands;
-import static org.autorefactor.refactoring.ASTHelper.hasType;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.extendedOperands;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasType;
 
-import org.autorefactor.refactoring.ASTBuilder;
+import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.StringLiteral;

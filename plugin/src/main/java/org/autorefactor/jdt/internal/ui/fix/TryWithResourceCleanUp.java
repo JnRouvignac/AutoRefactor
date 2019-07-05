@@ -25,27 +25,27 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
-import static org.autorefactor.refactoring.ASTHelper.areSameVariables;
-import static org.autorefactor.refactoring.ASTHelper.as;
-import static org.autorefactor.refactoring.ASTHelper.asExpression;
-import static org.autorefactor.refactoring.ASTHelper.asList;
-import static org.autorefactor.refactoring.ASTHelper.getNullCheckedExpression;
-import static org.autorefactor.refactoring.ASTHelper.getPreviousStatement;
-import static org.autorefactor.refactoring.ASTHelper.getUniqueFragment;
-import static org.autorefactor.refactoring.ASTHelper.isMethod;
-import static org.autorefactor.refactoring.ASTHelper.isSameVariable;
-import static org.autorefactor.refactoring.ASTHelper.resources;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.areSameVariables;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.as;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.asExpression;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.asList;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getNullCheckedExpression;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getPreviousStatement;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getUniqueFragment;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isMethod;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isSameVariable;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.resources;
 import static org.eclipse.jdt.core.dom.ASTNode.TRY_STATEMENT;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.autorefactor.refactoring.ASTBuilder;
-import org.autorefactor.refactoring.Refactorings;
-import org.autorefactor.refactoring.Release;
+import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
+import org.autorefactor.jdt.internal.corext.dom.Refactorings;
+import org.autorefactor.jdt.internal.corext.dom.Release;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Expression;

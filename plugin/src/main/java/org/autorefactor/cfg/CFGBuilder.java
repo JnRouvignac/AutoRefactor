@@ -41,8 +41,8 @@ import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.autorefactor.refactoring.JavaProjectOptions;
-import org.autorefactor.refactoring.TypeNameDecider;
+import org.autorefactor.jdt.internal.corext.dom.JavaProjectOptions;
+import org.autorefactor.jdt.internal.corext.dom.TypeNameDecider;
 import org.autorefactor.util.IllegalStateException;
 import org.autorefactor.util.NotImplementedException;
 import org.autorefactor.util.UnhandledException;
@@ -129,7 +129,7 @@ import org.eclipse.jdt.core.dom.WildcardType;
 import static org.autorefactor.cfg.ASTPrintHelper.*;
 import static org.autorefactor.cfg.CFGEdgeBuilder.*;
 import static org.autorefactor.cfg.VariableAccess.*;
-import static org.autorefactor.refactoring.ASTHelper.*;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.*;
 import static org.eclipse.jdt.core.dom.ASTNode.*;
 
 /**

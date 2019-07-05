@@ -25,27 +25,27 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
-import static org.autorefactor.refactoring.ASTHelper.arg0;
-import static org.autorefactor.refactoring.ASTHelper.as;
-import static org.autorefactor.refactoring.ASTHelper.asExpression;
-import static org.autorefactor.refactoring.ASTHelper.asList;
-import static org.autorefactor.refactoring.ASTHelper.findImplementedType;
-import static org.autorefactor.refactoring.ASTHelper.getCalledType;
-import static org.autorefactor.refactoring.ASTHelper.instanceOf;
-import static org.autorefactor.refactoring.ASTHelper.isArray;
-import static org.autorefactor.refactoring.ASTHelper.isMethod;
-import static org.autorefactor.refactoring.ASTHelper.isSameLocalVariable;
-import static org.autorefactor.refactoring.ForLoopHelper.iterateOverContainer;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.arg0;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.as;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.asExpression;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.asList;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.findImplementedType;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getCalledType;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.instanceOf;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isArray;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isMethod;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isSameLocalVariable;
+import static org.autorefactor.jdt.internal.corext.dom.ForLoopHelper.iterateOverContainer;
 
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.autorefactor.refactoring.ASTBuilder;
-import org.autorefactor.refactoring.ForLoopHelper.ForLoopContent;
+import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
+import org.autorefactor.jdt.internal.corext.dom.ForLoopHelper.ForLoopContent;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ArrayAccess;
 import org.eclipse.jdt.core.dom.EnhancedForStatement;

@@ -25,12 +25,12 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
-import static org.autorefactor.refactoring.ASTHelper.asExpression;
-import static org.autorefactor.refactoring.ASTHelper.getAncestor;
-import static org.autorefactor.refactoring.ASTHelper.initializers;
-import static org.autorefactor.refactoring.ASTHelper.isEqual;
-import static org.autorefactor.refactoring.ASTHelper.statements;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.asExpression;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getAncestor;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.initializers;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isEqual;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.statements;
 import static org.autorefactor.util.Utils.equalNotNull;
 import static org.autorefactor.util.Utils.getLast;
 
@@ -40,8 +40,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.autorefactor.refactoring.ASTBuilder;
-import org.autorefactor.refactoring.Refactorings;
+import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
+import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.autorefactor.util.IllegalArgumentException;
 import org.autorefactor.util.IllegalStateException;
 import org.autorefactor.util.NotImplementedException;

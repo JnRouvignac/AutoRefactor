@@ -23,9 +23,9 @@
  * which accompanies this distribution under LICENSE-ECLIPSE, and is
  * available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.autorefactor.refactoring;
+package org.autorefactor.jdt.internal.corext.dom;
 
-import static org.autorefactor.refactoring.ASTHelper.imports;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.imports;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;

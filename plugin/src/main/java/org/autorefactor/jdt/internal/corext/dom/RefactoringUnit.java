@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2018 Fabrice TIERCELIN - Initial API and implementation
+ * Copyright (C) 2015 Jean-Noël Rouvignac - initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,11 +23,36 @@
  * which accompanies this distribution under LICENSE-ECLIPSE, and is
  * available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.autorefactor.refactoring;
+package org.autorefactor.jdt.internal.corext.dom;
 
-/**
- * Interrupt the visit of a tree.
- */
-public class StopVisitException extends RuntimeException {
-    private static final long serialVersionUID = 8809979732051907351L;
+import org.eclipse.jdt.core.ICompilationUnit;
+
+/** Work item for the {@link ApplyRefactoringsJob}. */
+public class RefactoringUnit {
+    private final ICompilationUnit compilationUnit;
+    private final JavaProjectOptions options;
+
+    /**
+     * RefactoringUnit.
+     *
+     * @param compilationUnit compilationUnit
+     * @param options options
+     */
+    public RefactoringUnit(ICompilationUnit compilationUnit, JavaProjectOptions options) {
+        this.compilationUnit = compilationUnit;
+        this.options = options;
+    }
+
+    ICompilationUnit getCompilationUnit() {
+        return compilationUnit;
+    }
+
+    JavaProjectOptions getOptions() {
+        return options;
+    }
+
+    @Override
+    public String toString() {
+        return getCompilationUnit().toString();
+    }
 }

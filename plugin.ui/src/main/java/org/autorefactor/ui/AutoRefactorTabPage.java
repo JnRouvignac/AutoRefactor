@@ -32,8 +32,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.autorefactor.AutoRefactorPlugin;
+import org.autorefactor.jdt.internal.corext.dom.RefactoringRule;
 import org.autorefactor.jdt.internal.ui.fix.AllCleanUpRules;
-import org.autorefactor.refactoring.RefactoringRule;
 import org.eclipse.jdt.internal.ui.fix.MapCleanUpOptions;
 import org.eclipse.jdt.internal.ui.preferences.cleanup.CleanUpTabPage;
 import org.eclipse.jdt.ui.cleanup.CleanUpOptions;

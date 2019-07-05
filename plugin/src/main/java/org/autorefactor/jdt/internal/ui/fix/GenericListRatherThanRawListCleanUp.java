@@ -26,7 +26,7 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.refactoring.ASTHelper.*;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.*;
 import static org.autorefactor.util.Utils.getOrDefault;
 
 import java.util.HashMap;
@@ -34,9 +34,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.autorefactor.refactoring.ASTBuilder;
-import org.autorefactor.refactoring.Release;
-import org.autorefactor.refactoring.TypeNameDecider;
+import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
+import org.autorefactor.jdt.internal.corext.dom.Release;
+import org.autorefactor.jdt.internal.corext.dom.TypeNameDecider;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;

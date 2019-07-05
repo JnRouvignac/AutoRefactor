@@ -23,9 +23,9 @@
  * which accompanies this distribution under LICENSE-ECLIPSE, and is
  * available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.autorefactor.refactoring;
+package org.autorefactor.jdt.internal.corext.dom;
 
-import static org.autorefactor.refactoring.PluginConstant.PLUGIN_ID;
+import static org.autorefactor.jdt.internal.corext.dom.PluginConstant.PLUGIN_ID;
 
 import java.util.ArrayList;
 import java.util.Arrays;

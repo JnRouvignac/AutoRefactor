@@ -30,8 +30,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.autorefactor.jdt.internal.corext.dom.RefactoringRule;
 import org.autorefactor.preferences.Preferences;
-import org.autorefactor.refactoring.RefactoringRule;
 
 /** Lists all the available refactoring rules. */
 public final class AllCleanUpRules {

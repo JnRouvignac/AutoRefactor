@@ -25,8 +25,8 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -41,11 +41,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.autorefactor.jdt.internal.corext.dom.JavaRefactoringRule;
+import org.autorefactor.jdt.internal.corext.dom.RefactoringRule;
+import org.autorefactor.jdt.internal.corext.dom.Refactorings;
+import org.autorefactor.jdt.internal.corext.dom.Release;
 import org.autorefactor.preferences.Preferences;
-import org.autorefactor.refactoring.JavaRefactoringRule;
-import org.autorefactor.refactoring.RefactoringRule;
-import org.autorefactor.refactoring.Refactorings;
-import org.autorefactor.refactoring.Release;
 import org.autorefactor.util.AutoRefactorException;
 import org.autorefactor.util.NotImplementedException;
 import org.autorefactor.util.UnhandledException;

@@ -33,9 +33,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.autorefactor.refactoring.ASTBuilder;
-import org.autorefactor.refactoring.Release;
-import org.autorefactor.refactoring.TypeNameDecider;
+import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
+import org.autorefactor.jdt.internal.corext.dom.Release;
+import org.autorefactor.jdt.internal.corext.dom.TypeNameDecider;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.Expression;
@@ -45,7 +45,7 @@ import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.ParenthesizedExpression;
 import org.eclipse.jdt.core.dom.Type;
 
-import static org.autorefactor.refactoring.ASTHelper.*;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.*;
 import static org.autorefactor.util.Utils.*;
 
 /** See {@link #getDescription()} method. */

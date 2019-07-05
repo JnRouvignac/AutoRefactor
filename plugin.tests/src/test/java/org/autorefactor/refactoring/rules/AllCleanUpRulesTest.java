@@ -40,10 +40,10 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.concurrent.Callable;
 
+import org.autorefactor.jdt.internal.corext.dom.ApplyRefactoringsJob;
+import org.autorefactor.jdt.internal.corext.dom.Release;
 import org.autorefactor.jdt.internal.ui.fix.AggregateASTVisitor;
 import org.autorefactor.jdt.internal.ui.fix.AllCleanUpRules;
-import org.autorefactor.refactoring.ApplyRefactoringsJob;
-import org.autorefactor.refactoring.Release;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jdt.core.ICompilationUnit;

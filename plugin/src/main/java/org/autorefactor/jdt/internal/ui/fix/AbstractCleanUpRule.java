@@ -25,13 +25,13 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
 
+import org.autorefactor.jdt.internal.corext.dom.InterruptibleVisitor;
+import org.autorefactor.jdt.internal.corext.dom.JavaRefactoringRule;
+import org.autorefactor.jdt.internal.corext.dom.Refactorings;
+import org.autorefactor.jdt.internal.corext.dom.Release;
 import org.autorefactor.preferences.Preferences;
-import org.autorefactor.refactoring.InterruptibleVisitor;
-import org.autorefactor.refactoring.JavaRefactoringRule;
-import org.autorefactor.refactoring.Refactorings;
-import org.autorefactor.refactoring.Release;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.CompilationUnit;

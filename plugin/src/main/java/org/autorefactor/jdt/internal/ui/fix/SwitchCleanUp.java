@@ -26,17 +26,17 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
-import static org.autorefactor.refactoring.ASTHelper.asList;
-import static org.autorefactor.refactoring.ASTHelper.extendedOperands;
-import static org.autorefactor.refactoring.ASTHelper.fallsThrough;
-import static org.autorefactor.refactoring.ASTHelper.getLocalVariableIdentifiers;
-import static org.autorefactor.refactoring.ASTHelper.hasType;
-import static org.autorefactor.refactoring.ASTHelper.haveSameType;
-import static org.autorefactor.refactoring.ASTHelper.match;
-import static org.autorefactor.refactoring.ASTHelper.removeParentheses;
-import static org.autorefactor.refactoring.ASTHelper.statements;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.asList;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.extendedOperands;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.fallsThrough;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getLocalVariableIdentifiers;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasType;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.haveSameType;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.match;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.removeParentheses;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.statements;
 import static org.autorefactor.util.Utils.getLast;
 import static org.eclipse.jdt.core.dom.InfixExpression.Operator.CONDITIONAL_OR;
 import static org.eclipse.jdt.core.dom.InfixExpression.Operator.EQUALS;
@@ -50,11 +50,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.autorefactor.refactoring.ASTBuilder;
-import org.autorefactor.refactoring.ASTHelper;
-import org.autorefactor.refactoring.ASTMatcherSameVariablesAndMethods;
-import org.autorefactor.refactoring.FinderVisitor;
-import org.autorefactor.refactoring.Refactorings;
+import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
+import org.autorefactor.jdt.internal.corext.dom.ASTMatcherSameVariablesAndMethods;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
+import org.autorefactor.jdt.internal.corext.dom.FinderVisitor;
+import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.autorefactor.util.NotImplementedException;
 import org.eclipse.jdt.core.dom.BreakStatement;
 import org.eclipse.jdt.core.dom.CharacterLiteral;
@@ -84,7 +84,7 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
         }
 
         private boolean isSameVariable(Variable other) {
-            return other != null && ASTHelper.isSameVariable(name, other.name);
+            return other != null && ASTNodes.isSameVariable(name, other.name);
         }
 
         private Variable mergeValues(final Variable other) {
@@ -135,7 +135,7 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
         }
 
         private boolean fallsThrough() {
-            return stmts.isEmpty() || !ASTHelper.fallsThrough(getLast(stmts));
+            return stmts.isEmpty() || !ASTNodes.fallsThrough(getLast(stmts));
         }
 
         private boolean hasSameCode(SwitchCaseSection other) {

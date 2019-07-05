@@ -25,12 +25,12 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
-import static org.autorefactor.refactoring.ASTHelper.arguments;
-import static org.autorefactor.refactoring.ASTHelper.findImplementedType;
-import static org.autorefactor.refactoring.ASTHelper.getFirstParentOfType;
-import static org.autorefactor.refactoring.ASTHelper.typeArguments;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.arguments;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.findImplementedType;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getParent;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.typeArguments;
 import static org.eclipse.jdt.core.dom.ASTNode.ASSIGNMENT;
 import static org.eclipse.jdt.core.dom.ASTNode.METHOD_INVOCATION;
 import static org.eclipse.jdt.core.dom.ASTNode.RETURN_STATEMENT;
@@ -40,7 +40,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.autorefactor.refactoring.Release;
+import org.autorefactor.jdt.internal.corext.dom.Release;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
@@ -163,7 +163,7 @@ public class UseDiamondOperatorCleanUp extends AbstractCleanUpRule {
     }
 
     private boolean parentAllowsDiamondOperator(ClassInstanceCreation node) {
-        final ASTNode parentInfo = getFirstParentOfType(node, ParenthesizedExpression.class);
+        final ASTNode parentInfo = getParent(node, ParenthesizedExpression.class);
         final StructuralPropertyDescriptor locationInParent = parentInfo.getLocationInParent();
 
         switch (parentInfo.getParent().getNodeType()) {

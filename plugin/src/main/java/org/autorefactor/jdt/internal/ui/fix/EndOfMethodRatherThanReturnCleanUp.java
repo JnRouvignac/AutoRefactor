@@ -25,10 +25,10 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
 
-import org.autorefactor.refactoring.ASTHelper;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jdt.core.dom.DoStatement;
 import org.eclipse.jdt.core.dom.EnhancedForStatement;
 import org.eclipse.jdt.core.dom.ForStatement;
@@ -76,7 +76,7 @@ public class EndOfMethodRatherThanReturnCleanUp extends AbstractCleanUpRule {
     }
 
     private boolean isLastStmt(final Statement node) {
-        final Statement nextStmt = ASTHelper.getNextStatement(node);
+        final Statement nextStmt = ASTNodes.getNextStatement(node);
 
         if (nextStmt == null) {
             if (node.getParent() instanceof MethodDeclaration) {

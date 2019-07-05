@@ -17,7 +17,7 @@ CommentForImportPackage: FIXME JNR can we avoid accessing this internal package?
 Import-Package: org.eclipse.jdt.internal.corext.dom
 Export-Package: org.autorefactor.cfg;x-friends:="org.autorefactor.plugin.tests",
  org.autorefactor.environment;x-friends:="org.autorefactor.plugin.tests",
+ org.autorefactor.jdt.internal.corext.dom;x-friends:="org.autorefactor.plugin.tests",
  org.autorefactor.jdt.internal.ui.fix;x-friends:="org.autorefactor.plugin.tests",
  org.autorefactor.preferences;x-friends:="org.autorefactor.plugin.ui",
- org.autorefactor.refactoring;x-friends:="org.autorefactor.plugin.tests",
  org.autorefactor.util;x-friends:="org.autorefactor.plugin.ui"

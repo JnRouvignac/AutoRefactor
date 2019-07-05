@@ -23,7 +23,10 @@
  * which accompanies this distribution under LICENSE-ECLIPSE, and is
  * available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.autorefactor.refactoring;
+package org.autorefactor.jdt.internal.corext.dom;
+
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.*;
+import static org.autorefactor.jdt.internal.corext.dom.PluginConstant.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -56,9 +59,6 @@ import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.text.edits.TextEdit;
-
-import static org.autorefactor.refactoring.ASTHelper.*;
-import static org.autorefactor.refactoring.PluginConstant.*;
 /**
  * Eclipse job that applies the provided refactoring rules in background.
  * Several such jobs might be started and run in parallel to form a worker pool,

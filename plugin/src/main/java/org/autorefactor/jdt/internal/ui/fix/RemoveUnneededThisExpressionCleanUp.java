@@ -25,12 +25,12 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
-import static org.autorefactor.refactoring.ASTHelper.as;
-import static org.autorefactor.refactoring.ASTHelper.getEnclosingType;
-import static org.autorefactor.refactoring.ASTHelper.isEqual;
-import static org.autorefactor.refactoring.ASTHelper.typeArguments;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.as;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getEnclosingType;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isEqual;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.typeArguments;
 
 import org.autorefactor.util.NotImplementedException;
 import org.eclipse.jdt.core.dom.ASTNode;
