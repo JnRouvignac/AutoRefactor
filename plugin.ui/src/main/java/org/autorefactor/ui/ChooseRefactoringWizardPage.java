@@ -37,8 +37,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import org.autorefactor.jdt.internal.ui.fix.AllCleanUpRules;
 import org.autorefactor.refactoring.RefactoringRule;
-import org.autorefactor.refactoring.rules.AllCleanUpRules;
 import org.autorefactor.util.UnhandledException;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CheckboxTableViewer;

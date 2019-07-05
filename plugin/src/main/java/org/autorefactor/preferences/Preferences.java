@@ -25,7 +25,7 @@
  */
 package org.autorefactor.preferences;
 
-import org.autorefactor.refactoring.rules.AbstractCleanUpRule;
+import org.autorefactor.jdt.internal.ui.fix.AbstractCleanUpRule;
 
 /** Helper interface for preferences. */
 public interface Preferences {

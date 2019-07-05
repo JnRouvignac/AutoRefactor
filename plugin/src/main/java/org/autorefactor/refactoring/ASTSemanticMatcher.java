@@ -36,7 +36,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.autorefactor.refactoring.rules.OperatorEnum;
+import org.autorefactor.jdt.internal.ui.fix.OperatorEnum;
 import org.eclipse.jdt.core.dom.ASTMatcher;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.AssertStatement;

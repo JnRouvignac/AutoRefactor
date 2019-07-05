@@ -28,7 +28,7 @@ package org.autorefactor.refactoring;
 import static org.autorefactor.refactoring.ASTHelper.DO_NOT_VISIT_SUBTREE;
 import static org.autorefactor.refactoring.ASTHelper.VISIT_SUBTREE;
 
-import org.autorefactor.refactoring.rules.RefactoringContext;
+import org.autorefactor.jdt.internal.ui.fix.RefactoringContext;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.Block;
 

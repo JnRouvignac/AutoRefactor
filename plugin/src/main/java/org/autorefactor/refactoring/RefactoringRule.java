@@ -25,8 +25,8 @@
  */
 package org.autorefactor.refactoring;
 
+import org.autorefactor.jdt.internal.ui.fix.RefactoringContext;
 import org.autorefactor.preferences.Preferences;
-import org.autorefactor.refactoring.rules.RefactoringContext;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 
 /**

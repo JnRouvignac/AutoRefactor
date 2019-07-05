@@ -26,9 +26,9 @@
 package org.autorefactor.ui.preferences;
 
 import org.autorefactor.AutoRefactorPlugin;
+import org.autorefactor.jdt.internal.ui.fix.AllCleanUpRules;
 import org.autorefactor.preferences.PreferenceConstants;
 import org.autorefactor.refactoring.RefactoringRule;
-import org.autorefactor.refactoring.rules.AllCleanUpRules;
 import org.autorefactor.util.NotImplementedException;
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.jface.preference.IPreferenceStore;

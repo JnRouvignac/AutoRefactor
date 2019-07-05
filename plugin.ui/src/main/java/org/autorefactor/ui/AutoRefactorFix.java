@@ -34,14 +34,14 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.autorefactor.AutoRefactorPlugin;
 import org.autorefactor.environment.Environment;
+import org.autorefactor.jdt.internal.ui.fix.AggregateASTVisitor;
+import org.autorefactor.jdt.internal.ui.fix.AllCleanUpRules;
 import org.autorefactor.refactoring.ApplyRefactoringsJob;
 import org.autorefactor.refactoring.JavaProjectOptions;
 import org.autorefactor.refactoring.JavaProjectOptionsImpl;
 import org.autorefactor.refactoring.PrepareApplyRefactoringsJob;
 import org.autorefactor.refactoring.RefactoringRule;
 import org.autorefactor.refactoring.RefactoringUnit;
-import org.autorefactor.refactoring.rules.AggregateASTVisitor;
-import org.autorefactor.refactoring.rules.AllCleanUpRules;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;

@@ -34,8 +34,8 @@ import java.util.Queue;
 import java.util.Set;
 
 import org.autorefactor.environment.Environment;
-import org.autorefactor.refactoring.rules.AggregateASTVisitor;
-import org.autorefactor.refactoring.rules.RefactoringContext;
+import org.autorefactor.jdt.internal.ui.fix.AggregateASTVisitor;
+import org.autorefactor.jdt.internal.ui.fix.RefactoringContext;
 import org.autorefactor.util.IllegalStateException;
 import org.autorefactor.util.UnhandledException;
 import org.eclipse.core.filebuffers.FileBuffers;
