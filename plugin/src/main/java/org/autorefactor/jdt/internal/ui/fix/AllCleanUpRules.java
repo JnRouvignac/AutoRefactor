@@ -182,7 +182,7 @@ public final class AllCleanUpRules {
                 new RemoveSemiColonCleanUp(),
                 new AddBracketsToControlStatementCleanUp(),
                 new RemoveUnnecessaryLocalBeforeReturnCleanUp(),
-                new RemoveUselessModifiersCleanUp(),
+                new RedundantModifiersCleanUp(),
                 new RemoveUnnecessaryCastCleanUp(),
                 new PushNegationDownCleanUp(),
                 new SimpleNameRatherThanQualifiedNameCleanUp(),

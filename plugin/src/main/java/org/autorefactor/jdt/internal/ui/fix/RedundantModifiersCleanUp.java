@@ -61,7 +61,7 @@ import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
 
 /** See {@link #getDescription()} method. */
-public class RemoveUselessModifiersCleanUp extends AbstractCleanUpRule {
+public class RedundantModifiersCleanUp extends AbstractCleanUpRule {
     /**
      * Get the name.
      *

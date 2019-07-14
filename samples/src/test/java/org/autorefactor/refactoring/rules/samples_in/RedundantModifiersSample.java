@@ -35,7 +35,7 @@ import java.io.InputStream;
  * Keep the JavaDoc.
  */
 @Deprecated
-abstract public interface RemoveUselessModifiersSample {
+abstract public interface RedundantModifiersSample {
 
     /**
      * Keep the JavaDoc.
