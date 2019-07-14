@@ -47,7 +47,7 @@ public class DoubleCompareRatherThanEqualityCleanUp extends AbstractCleanUpRule 
      * @return the name.
      */
     public String getName() {
-        return "Double compare rather than equality";
+        return MultiFixMessages.CleanUpRefactoringWizard_DoubleCompareRatherThanEqualityCleanUp_name;
     }
 
     /**
@@ -56,8 +56,7 @@ public class DoubleCompareRatherThanEqualityCleanUp extends AbstractCleanUpRule 
      * @return the description.
      */
     public String getDescription() {
-        return "Replace arithmetic comparison by Double.compare()."
-                + " Beware! The behavior may change if your code run with a bug!";
+        return MultiFixMessages.CleanUpRefactoringWizard_DoubleCompareRatherThanEqualityCleanUp_description;
     }
 
     /**
@@ -66,7 +65,7 @@ public class DoubleCompareRatherThanEqualityCleanUp extends AbstractCleanUpRule 
      * @return the reason.
      */
     public String getReason() {
-        return "It avoids computation errors.";
+        return MultiFixMessages.CleanUpRefactoringWizard_DoubleCompareRatherThanEqualityCleanUp_reason;
     }
 
     @Override

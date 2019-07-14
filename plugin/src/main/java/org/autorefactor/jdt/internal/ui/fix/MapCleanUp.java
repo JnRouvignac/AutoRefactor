@@ -66,7 +66,7 @@ public class MapCleanUp extends AbstractCleanUpRule {
      * @return the name.
      */
     public String getName() {
-        return "Inited map rather than new map and Map.putAll()";
+        return MultiFixMessages.CleanUpRefactoringWizard_MapCleanUp_name;
     }
 
     /**
@@ -75,9 +75,7 @@ public class MapCleanUp extends AbstractCleanUpRule {
      * @return the description.
      */
     public String getDescription() {
-        return ""
-                + "Replaces creating a new Map, then invoking Map.putAll() on it,"
-                + " by creating the new Map with the other Map as parameter.";
+        return MultiFixMessages.CleanUpRefactoringWizard_MapCleanUp_description;
     }
 
     /**
@@ -86,7 +84,7 @@ public class MapCleanUp extends AbstractCleanUpRule {
      * @return the reason.
      */
     public String getReason() {
-        return "It reduces the reading and debugging cost.";
+        return MultiFixMessages.CleanUpRefactoringWizard_MapCleanUp_reason;
     }
 
     @Override

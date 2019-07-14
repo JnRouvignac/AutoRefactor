@@ -50,7 +50,7 @@ public class VectorOldToNewAPICleanUp extends AbstractCleanUpRule {
      * @return the name.
      */
     public String getName() {
-        return "Collections APIs rather than Vector pre-Collections APIs";
+        return MultiFixMessages.CleanUpRefactoringWizard_VectorOldToNewAPICleanUp_name;
     }
 
     /**
@@ -59,7 +59,7 @@ public class VectorOldToNewAPICleanUp extends AbstractCleanUpRule {
      * @return the description.
      */
     public String getDescription() {
-        return "Replaces Vector pre-Collections APIs with equivalent Collections APIs.";
+        return MultiFixMessages.CleanUpRefactoringWizard_VectorOldToNewAPICleanUp_description;
     }
 
     /**
@@ -68,7 +68,7 @@ public class VectorOldToNewAPICleanUp extends AbstractCleanUpRule {
      * @return the reason.
      */
     public String getReason() {
-        return "It makes the code more standard.";
+        return MultiFixMessages.CleanUpRefactoringWizard_VectorOldToNewAPICleanUp_reason;
     }
 
     @Override

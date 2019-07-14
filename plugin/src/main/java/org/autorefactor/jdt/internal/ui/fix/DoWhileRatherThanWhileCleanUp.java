@@ -43,7 +43,7 @@ public class DoWhileRatherThanWhileCleanUp extends AbstractCleanUpRule {
      * @return the name.
      */
     public String getName() {
-        return "Do/while rather than while";
+        return MultiFixMessages.CleanUpRefactoringWizard_DoWhileRatherThanWhileCleanUp_name;
     }
 
     /**
@@ -52,7 +52,7 @@ public class DoWhileRatherThanWhileCleanUp extends AbstractCleanUpRule {
      * @return the description.
      */
     public String getDescription() {
-        return "Replace while by do/while when the first evaluation is always true.";
+        return MultiFixMessages.CleanUpRefactoringWizard_DoWhileRatherThanWhileCleanUp_description;
     }
 
     /**
@@ -61,7 +61,7 @@ public class DoWhileRatherThanWhileCleanUp extends AbstractCleanUpRule {
      * @return the reason.
      */
     public String getReason() {
-        return "It improves the time performance.";
+        return MultiFixMessages.CleanUpRefactoringWizard_DoWhileRatherThanWhileCleanUp_reason;
     }
 
     @Override

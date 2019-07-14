@@ -59,7 +59,7 @@ public class IfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRule {
      * @return the name.
      */
     public String getName() {
-        return "If rather than two switch cases";
+        return MultiFixMessages.CleanUpRefactoringWizard_IfRatherThanTwoSwitchCasesCleanUp_name;
     }
 
     /**
@@ -68,9 +68,7 @@ public class IfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRule {
      * @return the description.
      */
     public String getDescription() {
-        return ""
-                + "Replace a switch structure by an if block when there are less than three distinct cases."
-                + " Beware! It may fix some null pointers, so it may change the behavior.";
+        return MultiFixMessages.CleanUpRefactoringWizard_IfRatherThanTwoSwitchCasesCleanUp_description;
     }
 
     /**
@@ -79,7 +77,7 @@ public class IfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRule {
      * @return the reason.
      */
     public String getReason() {
-        return "It improves readibility. It also fixes SONAR alerts.";
+        return MultiFixMessages.CleanUpRefactoringWizard_IfRatherThanTwoSwitchCasesCleanUp_reason;
     }
 
     private class VarOccurrenceVisitor extends InterruptibleVisitor {

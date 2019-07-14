@@ -45,7 +45,7 @@ public class ElseRatherThanOppositeConditionCleanUp extends AbstractCleanUpRule 
      * @return the name.
      */
     public String getName() {
-        return "Else rather than opposite condition";
+        return MultiFixMessages.CleanUpRefactoringWizard_ElseRatherThanOppositeConditionCleanUp_name;
     }
 
     /**
@@ -54,9 +54,7 @@ public class ElseRatherThanOppositeConditionCleanUp extends AbstractCleanUpRule 
      * @return the description.
      */
     public String getDescription() {
-        return ""
-                + "Remove a condition on an else that is opposite to the condition of the previous if."
-                + " Beware! It may change the behavior if the code is transpiled in JavaScript for NaN values.";
+        return MultiFixMessages.CleanUpRefactoringWizard_ElseRatherThanOppositeConditionCleanUp_description;
     }
 
     /**
@@ -65,7 +63,7 @@ public class ElseRatherThanOppositeConditionCleanUp extends AbstractCleanUpRule 
      * @return the reason.
      */
     public String getReason() {
-        return "It improves readibility.";
+        return MultiFixMessages.CleanUpRefactoringWizard_ElseRatherThanOppositeConditionCleanUp_reason;
     }
 
     @Override

@@ -51,7 +51,7 @@ public class AndroidWakeLockCleanUp extends AbstractCleanUpRule {
      * @return the name.
      */
     public String getName() {
-        return "Android WakeLock";
+        return MultiFixMessages.CleanUpRefactoringWizard_AndroidWakeLockCleanUp_name;
     }
 
     /**
@@ -60,12 +60,7 @@ public class AndroidWakeLockCleanUp extends AbstractCleanUpRule {
      * @return the description.
      */
     public String getDescription() {
-        return "Android - Failing to release a wakelock properly can keep the Android device "
-            + "in a high power mode, which reduces battery life. "
-            + "There are several causes for this, such as "
-            + "releasing the wake lock in onDestroy() instead of in onPause(), "
-            + "failing to call release() in all possible code paths after an acquire(), "
-            + "and so on.";
+        return MultiFixMessages.CleanUpRefactoringWizard_AndroidWakeLockCleanUp_description;
     }
 
     /**
@@ -74,7 +69,7 @@ public class AndroidWakeLockCleanUp extends AbstractCleanUpRule {
      * @return the reason.
      */
     public String getReason() {
-        return "It improves the performance.";
+        return MultiFixMessages.CleanUpRefactoringWizard_AndroidWakeLockCleanUp_reason;
     }
 
     @Override

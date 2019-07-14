@@ -59,7 +59,7 @@ public class WorkWithNullCheckedExpressionFirstCleanUp extends AbstractCleanUpRu
      * @return the name.
      */
     public String getName() {
-        return "Work with null checked expressions first";
+        return MultiFixMessages.CleanUpRefactoringWizard_WorkWithNullCheckedExpressionFirstCleanUp_name;
     }
 
     /**
@@ -68,10 +68,7 @@ public class WorkWithNullCheckedExpressionFirstCleanUp extends AbstractCleanUpRu
      * @return the description.
      */
     public String getDescription() {
-        return ""
-                + "Refactors if statements with a null checked expression"
-                + " to work with the not null case in the then clause"
-                + " and then work with the null case in the else clause.";
+        return MultiFixMessages.CleanUpRefactoringWizard_WorkWithNullCheckedExpressionFirstCleanUp_description;
     }
 
     /**
@@ -80,7 +77,7 @@ public class WorkWithNullCheckedExpressionFirstCleanUp extends AbstractCleanUpRu
      * @return the reason.
      */
     public String getReason() {
-        return "The readibility is improved.";
+        return MultiFixMessages.CleanUpRefactoringWizard_WorkWithNullCheckedExpressionFirstCleanUp_reason;
     }
 
     @Override

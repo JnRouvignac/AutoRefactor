@@ -72,7 +72,7 @@ public class LambdaCleanUp extends AbstractCleanUpRule {
      * @return the name.
      */
     public String getName() {
-        return "Improve lambda expressions";
+        return MultiFixMessages.CleanUpRefactoringWizard_LambdaCleanUp_name;
     }
 
     /**
@@ -81,7 +81,7 @@ public class LambdaCleanUp extends AbstractCleanUpRule {
      * @return the description.
      */
     public String getDescription() {
-        return "Improve lambda expressions.";
+        return MultiFixMessages.CleanUpRefactoringWizard_LambdaCleanUp_description;
     }
 
     /**
@@ -90,7 +90,7 @@ public class LambdaCleanUp extends AbstractCleanUpRule {
      * @return the reason.
      */
     public String getReason() {
-        return "It reduces code to focus attention on code that matters.";
+        return MultiFixMessages.CleanUpRefactoringWizard_LambdaCleanUp_reason;
     }
 
     private int getJavaMinorVersion() {

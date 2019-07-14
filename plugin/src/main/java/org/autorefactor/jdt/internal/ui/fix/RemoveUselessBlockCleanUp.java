@@ -45,7 +45,7 @@ public class RemoveUselessBlockCleanUp extends AbstractCleanUpRule {
      * @return the name.
      */
     public String getName() {
-        return "Remove useless block";
+        return MultiFixMessages.CleanUpRefactoringWizard_RemoveUselessBlockCleanUp_name;
     }
 
     /**
@@ -54,7 +54,7 @@ public class RemoveUselessBlockCleanUp extends AbstractCleanUpRule {
      * @return the description.
      */
     public String getDescription() {
-        return "Removes lone and embedded block.";
+        return MultiFixMessages.CleanUpRefactoringWizard_RemoveUselessBlockCleanUp_description;
     }
 
     /**
@@ -63,7 +63,7 @@ public class RemoveUselessBlockCleanUp extends AbstractCleanUpRule {
      * @return the reason.
      */
     public String getReason() {
-        return "It reduces code to focus attention on code that matters.";
+        return MultiFixMessages.CleanUpRefactoringWizard_RemoveUselessBlockCleanUp_reason;
     }
 
     @Override

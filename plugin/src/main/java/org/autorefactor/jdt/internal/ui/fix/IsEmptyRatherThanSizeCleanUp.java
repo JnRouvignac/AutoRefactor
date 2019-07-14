@@ -52,7 +52,7 @@ public class IsEmptyRatherThanSizeCleanUp extends AbstractCleanUpRule {
      * @return the name.
      */
     public String getName() {
-        return "Empty test rather than size";
+        return MultiFixMessages.CleanUpRefactoringWizard_IsEmptyRatherThanSizeCleanUp_name;
     }
 
     /**
@@ -61,8 +61,7 @@ public class IsEmptyRatherThanSizeCleanUp extends AbstractCleanUpRule {
      * @return the description.
      */
     public String getDescription() {
-        return ""
-            + "Replaces some checks on Collection.size() or Map.size() with checks on isEmpty().";
+        return MultiFixMessages.CleanUpRefactoringWizard_IsEmptyRatherThanSizeCleanUp_description;
     }
 
     /**
@@ -71,7 +70,7 @@ public class IsEmptyRatherThanSizeCleanUp extends AbstractCleanUpRule {
      * @return the reason.
      */
     public String getReason() {
-        return "It improves the readibility of such simple code to spotlight the complexity of other code.";
+        return MultiFixMessages.CleanUpRefactoringWizard_IsEmptyRatherThanSizeCleanUp_reason;
     }
 
     private int getJavaMinorVersion() {

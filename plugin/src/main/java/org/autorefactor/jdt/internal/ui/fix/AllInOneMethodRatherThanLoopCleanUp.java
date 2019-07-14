@@ -87,7 +87,7 @@ public class AllInOneMethodRatherThanLoopCleanUp extends NewClassImportCleanUp {
      * @return the name.
      */
     public String getName() {
-        return "All in one method rather than loop";
+        return MultiFixMessages.CleanUpRefactoringWizard_AllInOneMethodRatherThanLoopCleanUp_name;
     }
 
     /**
@@ -96,11 +96,7 @@ public class AllInOneMethodRatherThanLoopCleanUp extends NewClassImportCleanUp {
      * @return the description.
      */
     public String getDescription() {
-        return ""
-            + "Collection related refactorings:\n"
-            + "- replaces for/foreach loops to use Collections.addAll() where possible,\n"
-            + "- replaces for/foreach loops to use Collection.addAll() where possible,\n"
-            + "- replaces for/foreach loops to use Collection.removeAll() where possible.";
+        return MultiFixMessages.CleanUpRefactoringWizard_AllInOneMethodRatherThanLoopCleanUp_description;
     }
 
     /**
@@ -109,7 +105,7 @@ public class AllInOneMethodRatherThanLoopCleanUp extends NewClassImportCleanUp {
      * @return the reason.
      */
     public String getReason() {
-        return "It reduces code to focus attention on code that matters.";
+        return MultiFixMessages.CleanUpRefactoringWizard_AllInOneMethodRatherThanLoopCleanUp_reason;
     }
 
     @Override

@@ -51,7 +51,7 @@ public class StaticConstantRatherThanInstanceConstantCleanUp extends AbstractCle
      * @return the name.
      */
     public String getName() {
-        return "Static constant rather than instance constant";
+        return MultiFixMessages.CleanUpRefactoringWizard_StaticConstantRatherThanInstanceConstantCleanUp_name;
     }
 
     /**
@@ -60,8 +60,7 @@ public class StaticConstantRatherThanInstanceConstantCleanUp extends AbstractCle
      * @return the description.
      */
     public String getDescription() {
-        return ""
-            + "Add the static modifier to the initialized final primitive or wrapper fields.";
+        return MultiFixMessages.CleanUpRefactoringWizard_StaticConstantRatherThanInstanceConstantCleanUp_description;
     }
 
     /**
@@ -70,7 +69,7 @@ public class StaticConstantRatherThanInstanceConstantCleanUp extends AbstractCle
      * @return the reason.
      */
     public String getReason() {
-        return "It improves the space performance.";
+        return MultiFixMessages.CleanUpRefactoringWizard_StaticConstantRatherThanInstanceConstantCleanUp_reason;
     }
 
     @Override

@@ -71,7 +71,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
      * @return the name.
      */
     public String getName() {
-        return "StringBuilder";
+        return MultiFixMessages.CleanUpRefactoringWizard_StringBuilderCleanUp_name;
     }
 
     /**
@@ -80,12 +80,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
      * @return the description.
      */
     public String getDescription() {
-        return ""
-            + "Refactors to a proper use of StringBuilders:\n"
-            + "- replace String concatenations using operator '+' as parameters"
-            + " of StringBuffer/StringBuilder.append(),\n"
-            + "- replace chained call to StringBuffer/StringBuilder constructor followed by calls to append()"
-            + " and call toString() with straight String concatenation using operator '+'.";
+        return MultiFixMessages.CleanUpRefactoringWizard_StringBuilderCleanUp_description;
     }
 
     /**
@@ -94,9 +89,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
      * @return the reason.
      */
     public String getReason() {
-        return "It improves the time and space performance. "
-                + "It also improves the readibility. "
-                + "String concatenation is automatically converted as StringBuilder by the compiler so it is useless.";
+        return MultiFixMessages.CleanUpRefactoringWizard_StringBuilderCleanUp_reason;
     }
 
     private boolean isEmptyString(final Expression expr) {

@@ -45,7 +45,7 @@ public class BooleanConstantRatherThanValueOfCleanUp extends AbstractCleanUpRule
      * @return the name.
      */
     public String getName() {
-        return "Boolean constant rather than valueOf()";
+        return MultiFixMessages.CleanUpRefactoringWizard_BooleanConstantRatherThanValueOfCleanUp_name;
     }
 
     /**
@@ -54,8 +54,7 @@ public class BooleanConstantRatherThanValueOfCleanUp extends AbstractCleanUpRule
      * @return the description.
      */
     public String getDescription() {
-        return ""
-            + "Replace Boolean.valueOf(true) and Boolean.valueOf(false) by Boolean.TRUE and Boolean.FALSE.";
+        return MultiFixMessages.CleanUpRefactoringWizard_BooleanConstantRatherThanValueOfCleanUp_description;
     }
 
     /**
@@ -64,7 +63,7 @@ public class BooleanConstantRatherThanValueOfCleanUp extends AbstractCleanUpRule
      * @return the reason.
      */
     public String getReason() {
-        return "It improves the readibility. It also improves the time performance.";
+        return MultiFixMessages.CleanUpRefactoringWizard_BooleanConstantRatherThanValueOfCleanUp_reason;
     }
 
     @Override

@@ -72,7 +72,7 @@ public class CommonIfInIfElseCleanUp extends AbstractCleanUpRule {
      * @return the name.
      */
     public String getName() {
-        return "Move common inner if statement from then/else clauses around outer if statement";
+        return MultiFixMessages.CleanUpRefactoringWizard_CommonIfInIfElseCleanUp_name;
     }
 
     /**
@@ -81,9 +81,7 @@ public class CommonIfInIfElseCleanUp extends AbstractCleanUpRule {
      * @return the description.
      */
     public String getDescription() {
-        return ""
-            + "Moves an inner if statement around the outer if condition,"
-            + " when the inner if condition is common to both if/else clauses of the outer if statement.";
+        return MultiFixMessages.CleanUpRefactoringWizard_CommonIfInIfElseCleanUp_description;
     }
 
     /**
@@ -92,7 +90,7 @@ public class CommonIfInIfElseCleanUp extends AbstractCleanUpRule {
      * @return the reason.
      */
     public String getReason() {
-        return "It reduces the coding, reading, debugging and testing cost.";
+        return MultiFixMessages.CleanUpRefactoringWizard_CommonIfInIfElseCleanUp_reason;
     }
 
     @Override

@@ -52,7 +52,7 @@ public class OneCodeThatFallsThroughRatherThanRedundantBlocksCleanUp extends Abs
      * @return the name.
      */
     public String getName() {
-        return "One code that falls through rather than redundant blocks";
+        return MultiFixMessages.CleanUpRefactoringWizard_OneCodeThatFallsThroughRatherThanRedundantBlocksCleanUp_name;
     }
 
     /**
@@ -61,7 +61,7 @@ public class OneCodeThatFallsThroughRatherThanRedundantBlocksCleanUp extends Abs
      * @return the description.
      */
     public String getDescription() {
-        return "Merge blocks that end with a jump statement into the following same code.";
+        return MultiFixMessages.CleanUpRefactoringWizard_OneCodeThatFallsThroughRatherThanRedundantBlocksCleanUp_description;
     }
 
     /**
@@ -70,7 +70,7 @@ public class OneCodeThatFallsThroughRatherThanRedundantBlocksCleanUp extends Abs
      * @return the reason.
      */
     public String getReason() {
-        return "It reduces the coding, reading, debugging and testing cost.";
+        return MultiFixMessages.CleanUpRefactoringWizard_OneCodeThatFallsThroughRatherThanRedundantBlocksCleanUp_reason;
     }
 
     @Override

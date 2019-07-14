@@ -43,7 +43,7 @@ public class AutoBoxingRatherThanExplicitMethodCleanUp extends AbstractCleanUpRu
      * @return the name.
      */
     public String getName() {
-        return "AutoBoxing rather than explicit method";
+        return MultiFixMessages.CleanUpRefactoringWizard_AutoBoxingRatherThanExplicitMethodCleanUp_name;
     }
 
     /**
@@ -52,8 +52,7 @@ public class AutoBoxingRatherThanExplicitMethodCleanUp extends AbstractCleanUpRu
      * @return the description.
      */
     public String getDescription() {
-        return ""
-            + "Remove useless valueOf() call to use AutoBoxing.";
+        return MultiFixMessages.CleanUpRefactoringWizard_AutoBoxingRatherThanExplicitMethodCleanUp_description;
     }
 
     /**
@@ -62,8 +61,7 @@ public class AutoBoxingRatherThanExplicitMethodCleanUp extends AbstractCleanUpRu
      * @return the reason.
      */
     public String getReason() {
-        return "AutoBoxing methods are automatically added by the compiler so it is useless. "
-                + "It improves the readibility. It also upgrades legacy code.";
+        return MultiFixMessages.CleanUpRefactoringWizard_AutoBoxingRatherThanExplicitMethodCleanUp_reason;
     }
 
     private int getJavaMinorVersion() {

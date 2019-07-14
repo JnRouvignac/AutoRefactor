@@ -47,7 +47,7 @@ public class UseStringContainsCleanUp extends AbstractCleanUpRule {
      * @return the name.
      */
     public String getName() {
-        return "Use String.contains()";
+        return MultiFixMessages.CleanUpRefactoringWizard_UseStringContainsCleanUp_name;
     }
 
     /**
@@ -56,9 +56,7 @@ public class UseStringContainsCleanUp extends AbstractCleanUpRule {
      * @return the description.
      */
     public String getDescription() {
-        return ""
-            + "Replaces uses of String.indexOf(String) String.lastIndexOf(String)"
-            + " by String.contains(CharSequence) where appropriate.";
+        return MultiFixMessages.CleanUpRefactoringWizard_UseStringContainsCleanUp_description;
     }
 
     /**
@@ -67,7 +65,7 @@ public class UseStringContainsCleanUp extends AbstractCleanUpRule {
      * @return the reason.
      */
     public String getReason() {
-        return "It improves the readibility of such simple code to spotlight the complexity of other code.";
+        return MultiFixMessages.CleanUpRefactoringWizard_UseStringContainsCleanUp_reason;
     }
 
     @Override

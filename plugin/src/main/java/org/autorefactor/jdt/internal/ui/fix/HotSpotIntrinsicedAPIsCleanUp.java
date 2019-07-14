@@ -71,7 +71,7 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
      * @return the name.
      */
     public String getName() {
-        return "HotSpot intrinsiced APIs";
+        return MultiFixMessages.CleanUpRefactoringWizard_HotSpotIntrinsicedAPIsCleanUp_name;
     }
 
     /**
@@ -80,10 +80,7 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
      * @return the description.
      */
     public String getDescription() {
-        return ""
-            + "Refactors code patterns to use intrinsiced APIs in Hotspot JVM.\n"
-            + "Intrinsics are APIs that receive special treatment when JITed:"
-            + " they can be compiled down to use very efficient CPU instructions.";
+        return MultiFixMessages.CleanUpRefactoringWizard_HotSpotIntrinsicedAPIsCleanUp_description;
     }
 
     /**
@@ -92,7 +89,7 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
      * @return the reason.
      */
     public String getReason() {
-        return "It reduces code to focus attention on code that matters.";
+        return MultiFixMessages.CleanUpRefactoringWizard_HotSpotIntrinsicedAPIsCleanUp_reason;
     }
 
     private static class SystemArrayCopyParams {

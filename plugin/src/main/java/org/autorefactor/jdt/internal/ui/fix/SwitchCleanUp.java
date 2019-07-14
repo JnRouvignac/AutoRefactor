@@ -215,7 +215,7 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
      * @return the name.
      */
     public String getName() {
-        return "Switch";
+        return MultiFixMessages.CleanUpRefactoringWizard_SwitchCleanUp_name;
     }
 
     /**
@@ -224,9 +224,7 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
      * @return the description.
      */
     public String getDescription() {
-        return ""
-            + "Switch related refactorings:\n"
-            + "- replaces if/else if/else blocks to use switch where possible.";
+        return MultiFixMessages.CleanUpRefactoringWizard_SwitchCleanUp_description;
     }
 
     /**
@@ -235,7 +233,7 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
      * @return the reason.
      */
     public String getReason() {
-        return "It reduces the coding, reading and debugging cost.";
+        return MultiFixMessages.CleanUpRefactoringWizard_SwitchCleanUp_reason;
     }
 
     @Override

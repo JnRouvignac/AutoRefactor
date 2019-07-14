@@ -62,7 +62,7 @@ public class UseDiamondOperatorCleanUp extends AbstractCleanUpRule {
      * @return the name.
      */
     public String getName() {
-        return "Diamond operator";
+        return MultiFixMessages.CleanUpRefactoringWizard_UseDiamondOperatorCleanUp_name;
     }
 
     /**
@@ -71,7 +71,7 @@ public class UseDiamondOperatorCleanUp extends AbstractCleanUpRule {
      * @return the description.
      */
     public String getDescription() {
-        return "Refactors class instance creations to use the diamond operator wherever possible.";
+        return MultiFixMessages.CleanUpRefactoringWizard_UseDiamondOperatorCleanUp_description;
     }
 
     /**
@@ -80,7 +80,7 @@ public class UseDiamondOperatorCleanUp extends AbstractCleanUpRule {
      * @return the reason.
      */
     public String getReason() {
-        return "It reduces the code to focus the attention on code that matters. It also upgrades legacy code.";
+        return MultiFixMessages.CleanUpRefactoringWizard_UseDiamondOperatorCleanUp_reason;
     }
 
     @Override

@@ -60,7 +60,7 @@ public class DeclarationOutsideLoopRatherThanInsideCleanUp extends AbstractClean
      * @return the name.
      */
     public String getName() {
-        return "Declaration outside loop rather than inside";
+        return MultiFixMessages.CleanUpRefactoringWizard_DeclarationOutsideLoopRatherThanInsideCleanUp_name;
     }
 
     /**
@@ -69,7 +69,7 @@ public class DeclarationOutsideLoopRatherThanInsideCleanUp extends AbstractClean
      * @return the description.
      */
     public String getDescription() {
-        return "Move declarations of variable inside a loop outside of the loop.";
+        return MultiFixMessages.CleanUpRefactoringWizard_DeclarationOutsideLoopRatherThanInsideCleanUp_description;
     }
 
     /**
@@ -78,7 +78,7 @@ public class DeclarationOutsideLoopRatherThanInsideCleanUp extends AbstractClean
      * @return the reason.
      */
     public String getReason() {
-        return "It avoids to recreate the same variable. So it improves the time and memory performance.";
+        return MultiFixMessages.CleanUpRefactoringWizard_DeclarationOutsideLoopRatherThanInsideCleanUp_reason;
     }
 
     @Override

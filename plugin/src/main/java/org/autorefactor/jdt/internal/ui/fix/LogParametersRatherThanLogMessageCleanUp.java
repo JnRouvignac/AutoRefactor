@@ -50,7 +50,7 @@ public class LogParametersRatherThanLogMessageCleanUp extends AbstractCleanUpRul
      * @return the name.
      */
     public String getName() {
-        return "Log parameters rather than log message";
+        return MultiFixMessages.CleanUpRefactoringWizard_LogParametersRatherThanLogMessageCleanUp_name;
     }
 
     /**
@@ -59,8 +59,7 @@ public class LogParametersRatherThanLogMessageCleanUp extends AbstractCleanUpRul
      * @return the description.
      */
     public String getDescription() {
-        return "Replaces a string concatenation as parameter of a logger method"
-                + " by a string template followed by objects.";
+        return MultiFixMessages.CleanUpRefactoringWizard_LogParametersRatherThanLogMessageCleanUp_description;
     }
 
     /**
@@ -69,8 +68,7 @@ public class LogParametersRatherThanLogMessageCleanUp extends AbstractCleanUpRul
      * @return the reason.
      */
     public String getReason() {
-        return "It improves the time performance. "
-                + "It also avoids some null pointers.";
+        return MultiFixMessages.CleanUpRefactoringWizard_LogParametersRatherThanLogMessageCleanUp_reason;
     }
 
     @Override

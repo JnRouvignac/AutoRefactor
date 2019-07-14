@@ -90,7 +90,7 @@ public class AndroidViewHolderCleanUp extends AbstractCleanUpRule {
      * @return the name.
      */
     public String getName() {
-        return "Android ViewHolder";
+        return MultiFixMessages.CleanUpRefactoringWizard_AndroidViewHolderCleanUp_name;
     }
 
     /**
@@ -99,8 +99,7 @@ public class AndroidViewHolderCleanUp extends AbstractCleanUpRule {
      * @return the description.
      */
     public String getDescription() {
-        return "Android - Optimize getView() routines for Android applications. "
-                + "It reduces the number calls to the costly inflate()) and getViewById() Android API methods.";
+        return MultiFixMessages.CleanUpRefactoringWizard_AndroidViewHolderCleanUp_description;
     }
 
     /**
@@ -109,7 +108,7 @@ public class AndroidViewHolderCleanUp extends AbstractCleanUpRule {
      * @return the reason.
      */
     public String getReason() {
-        return "It improves the performance.";
+        return MultiFixMessages.CleanUpRefactoringWizard_AndroidViewHolderCleanUp_reason;
     }
 
     @Override

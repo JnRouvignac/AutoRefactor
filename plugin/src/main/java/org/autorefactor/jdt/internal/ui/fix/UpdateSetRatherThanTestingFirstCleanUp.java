@@ -56,7 +56,7 @@ public class UpdateSetRatherThanTestingFirstCleanUp extends AbstractCleanUpRule 
      * @return the name.
      */
     public String getName() {
-        return "Update set rather than testing first";
+        return MultiFixMessages.CleanUpRefactoringWizard_UpdateSetRatherThanTestingFirstCleanUp_name;
     }
 
     /**
@@ -65,12 +65,7 @@ public class UpdateSetRatherThanTestingFirstCleanUp extends AbstractCleanUpRule 
      * @return the description.
      */
     public String getDescription() {
-        return ""
-            + "Set related refactorings:\n"
-            + "- replaces calls to Set.contains() immediately followed by Set.add()"
-            + " with straight calls to Set.add(),\n"
-            + "- replaces calls to Set.contains() immediately followed by Set.remove()"
-            + " with straight calls to Set.remove().";
+        return MultiFixMessages.CleanUpRefactoringWizard_UpdateSetRatherThanTestingFirstCleanUp_description;
     }
 
     /**
@@ -79,7 +74,7 @@ public class UpdateSetRatherThanTestingFirstCleanUp extends AbstractCleanUpRule 
      * @return the reason.
      */
     public String getReason() {
-        return "It reduces the coding, reading and debugging time.";
+        return MultiFixMessages.CleanUpRefactoringWizard_UpdateSetRatherThanTestingFirstCleanUp_reason;
     }
 
     @Override

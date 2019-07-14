@@ -78,7 +78,7 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
      * @return the name.
      */
     public String getName() {
-        return "Lambda expression rather than comparator";
+        return MultiFixMessages.CleanUpRefactoringWizard_LambdaExpressionRatherThanComparatorCleanUp_name;
     }
 
     /**
@@ -87,7 +87,7 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
      * @return the description.
      */
     public String getDescription() {
-        return "Replace a plain comparator instance by a lambda expression passed to a Comparator.comparing() method.";
+        return MultiFixMessages.CleanUpRefactoringWizard_LambdaExpressionRatherThanComparatorCleanUp_description;
     }
 
     /**
@@ -96,7 +96,7 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
      * @return the reason.
      */
     public String getReason() {
-        return "It improves the readibility.";
+        return MultiFixMessages.CleanUpRefactoringWizard_LambdaExpressionRatherThanComparatorCleanUp_reason;
     }
 
     @Override

@@ -92,7 +92,7 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
      * @return the name.
      */
     public String getName() {
-        return "Comments";
+        return MultiFixMessages.CleanUpRefactoringWizard_CommentsCleanUp_name;
     }
 
     /**
@@ -101,17 +101,7 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
      * @return the description.
      */
     public String getDescription() {
-        return ""
-            + "Refactors comments:\n"
-            + "- remove empty comments and javadocs,\n"
-            + "- transform comments applicable to java elements into javadocs,\n"
-            + "- transform javadocs that are not attached to any java elements into block comments,\n"
-            + "- remove IDE generated TODOs,\n"
-            + "- remove empty lines at start and end of javadocs and block comments,\n"
-            + "- uppercase first letter of javadocs,\n"
-            + "- collapse javadocs on a single line when allowed by Eclipse settings for formatting,\n"
-            + "- add final '.' to javadocs that do not have any,\n"
-            + "- remove Eclipse generated (non-Javadoc) block comments.";
+        return MultiFixMessages.CleanUpRefactoringWizard_CommentsCleanUp_description;
     }
 
     /**
@@ -120,7 +110,7 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
      * @return the reason.
      */
     public String getReason() {
-        return "It improves the readibility.";
+        return MultiFixMessages.CleanUpRefactoringWizard_CommentsCleanUp_reason;
     }
 
     private static final Pattern EMPTY_LINE_COMMENT = Pattern.compile("//\\s*");

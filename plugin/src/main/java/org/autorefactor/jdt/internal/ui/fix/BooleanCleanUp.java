@@ -96,7 +96,7 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
      * @return the name.
      */
     public String getName() {
-        return "Boolean";
+        return MultiFixMessages.CleanUpRefactoringWizard_BooleanCleanUp_name;
     }
 
     /**
@@ -105,12 +105,7 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
      * @return the description.
      */
     public String getDescription() {
-        return ""
-                + "Boolean related refactorings:\n"
-                + "- remove if statements when then and else clauses do similar things with opposite boolean values,\n"
-                + "- remove ternary operators when then and else clauses do similar things with opposite boolean values"
-                + ",\n"
-                + "- simplify boolean expressions.";
+        return MultiFixMessages.CleanUpRefactoringWizard_BooleanCleanUp_description;
     }
 
     /**
@@ -119,7 +114,7 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
      * @return the reason.
      */
     public String getReason() {
-        return "It reduces code to focus attention on code that matters.";
+        return MultiFixMessages.CleanUpRefactoringWizard_BooleanCleanUp_reason;
     }
 
     private class BooleanASTMatcher extends ASTSemanticMatcher {

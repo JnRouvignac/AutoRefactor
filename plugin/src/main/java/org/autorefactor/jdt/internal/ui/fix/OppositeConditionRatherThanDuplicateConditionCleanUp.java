@@ -77,7 +77,7 @@ public class OppositeConditionRatherThanDuplicateConditionCleanUp extends Abstra
      * @return the name.
      */
     public String getName() {
-        return "Opposite condition rather than duplicate condition";
+        return MultiFixMessages.CleanUpRefactoringWizard_OppositeConditionRatherThanDuplicateConditionCleanUp_name;
     }
 
     /**
@@ -86,8 +86,7 @@ public class OppositeConditionRatherThanDuplicateConditionCleanUp extends Abstra
      * @return the description.
      */
     public String getDescription() {
-        return ""
-            + "Do not repeat the same condition in several if.";
+        return MultiFixMessages.CleanUpRefactoringWizard_OppositeConditionRatherThanDuplicateConditionCleanUp_description;
     }
 
     /**
@@ -96,7 +95,7 @@ public class OppositeConditionRatherThanDuplicateConditionCleanUp extends Abstra
      * @return the reason.
      */
     public String getReason() {
-        return "It reduces the reading, debugging and testing cost.";
+        return MultiFixMessages.CleanUpRefactoringWizard_OppositeConditionRatherThanDuplicateConditionCleanUp_reason;
     }
 
     @Override

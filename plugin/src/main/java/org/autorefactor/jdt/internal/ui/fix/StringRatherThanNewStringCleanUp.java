@@ -45,7 +45,7 @@ public class StringRatherThanNewStringCleanUp extends AbstractCleanUpRule {
      * @return the name.
      */
     public String getName() {
-        return "String rather than new string";
+        return MultiFixMessages.CleanUpRefactoringWizard_StringRatherThanNewStringCleanUp_name;
     }
 
     /**
@@ -54,8 +54,7 @@ public class StringRatherThanNewStringCleanUp extends AbstractCleanUpRule {
      * @return the description.
      */
     public String getDescription() {
-        return ""
-            + "Removes a String instance from a String literal.";
+        return MultiFixMessages.CleanUpRefactoringWizard_StringRatherThanNewStringCleanUp_description;
     }
 
     /**
@@ -64,7 +63,7 @@ public class StringRatherThanNewStringCleanUp extends AbstractCleanUpRule {
      * @return the reason.
      */
     public String getReason() {
-        return "It improves the time and space performance. It also improves the readibility.";
+        return MultiFixMessages.CleanUpRefactoringWizard_StringRatherThanNewStringCleanUp_reason;
     }
 
     @Override

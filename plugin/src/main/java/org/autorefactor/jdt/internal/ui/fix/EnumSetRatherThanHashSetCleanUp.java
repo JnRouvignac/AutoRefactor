@@ -53,7 +53,7 @@ public final class EnumSetRatherThanHashSetCleanUp extends
      * @return the name.
      */
     public String getName() {
-        return "EnumSet rather than HashSet for enum types";
+        return MultiFixMessages.CleanUpRefactoringWizard_EnumSetRatherThanHashSetCleanUp_name;
     }
 
     /**
@@ -62,8 +62,7 @@ public final class EnumSetRatherThanHashSetCleanUp extends
      * @return the description.
      */
     public String getDescription() {
-        return "Converts creation of HashSet with enum as a type "
-                + "to invocation of static methods of EnumSet where possible";
+        return MultiFixMessages.CleanUpRefactoringWizard_EnumSetRatherThanHashSetCleanUp_description;
     }
 
     /**
@@ -72,7 +71,7 @@ public final class EnumSetRatherThanHashSetCleanUp extends
      * @return the reason.
      */
     public String getReason() {
-        return "It improves the space performance.";
+        return MultiFixMessages.CleanUpRefactoringWizard_EnumSetRatherThanHashSetCleanUp_reason;
     }
 
     @Override

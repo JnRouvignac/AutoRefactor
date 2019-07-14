@@ -43,7 +43,7 @@ public class CapitalizeLongLiteralCleanUp extends AbstractCleanUpRule {
      * @return the name.
      */
     public String getName() {
-        return "Capitalize lower case 'l' -> 'L' for long number literals";
+        return MultiFixMessages.CleanUpRefactoringWizard_CapitalizeLongLiteralCleanUp_name;
     }
 
     /**
@@ -52,7 +52,7 @@ public class CapitalizeLongLiteralCleanUp extends AbstractCleanUpRule {
      * @return the description.
      */
     public String getDescription() {
-        return "Capitalize lower case 'l' -> 'L' for long number literals";
+        return MultiFixMessages.CleanUpRefactoringWizard_CapitalizeLongLiteralCleanUp_description;
     }
 
     /**
@@ -61,7 +61,7 @@ public class CapitalizeLongLiteralCleanUp extends AbstractCleanUpRule {
      * @return the reason.
      */
     public String getReason() {
-        return "It disambiguates the code to reduce bug hazard.";
+        return MultiFixMessages.CleanUpRefactoringWizard_CapitalizeLongLiteralCleanUp_reason;
     }
 
     @Override

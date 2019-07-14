@@ -42,7 +42,7 @@ public class UnboxingRatherThanExplicitMethodCleanUp extends AbstractCleanUpRule
      * @return the name.
      */
     public String getName() {
-        return "Unboxing rather than explicit method";
+        return MultiFixMessages.CleanUpRefactoringWizard_UnboxingRatherThanExplicitMethodCleanUp_name;
     }
 
     /**
@@ -51,8 +51,7 @@ public class UnboxingRatherThanExplicitMethodCleanUp extends AbstractCleanUpRule
      * @return the description.
      */
     public String getDescription() {
-        return ""
-            + "Remove useless primitiveValue() call to use unboxing.";
+        return MultiFixMessages.CleanUpRefactoringWizard_UnboxingRatherThanExplicitMethodCleanUp_description;
     }
 
     /**
@@ -61,8 +60,7 @@ public class UnboxingRatherThanExplicitMethodCleanUp extends AbstractCleanUpRule
      * @return the reason.
      */
     public String getReason() {
-        return "UnBoxing methods are automatically added by the compiler so it is useless. "
-                + "It improves the readibility. It also upgrades legacy code.";
+        return MultiFixMessages.CleanUpRefactoringWizard_UnboxingRatherThanExplicitMethodCleanUp_reason;
     }
 
     private int getJavaMinorVersion() {

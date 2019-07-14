@@ -46,7 +46,7 @@ public class OneConditionRatherThanUnreachableBlockCleanUp extends AbstractClean
      * @return the name.
      */
     public String getName() {
-        return "One condition rather than unreachable block";
+        return MultiFixMessages.CleanUpRefactoringWizard_OneConditionRatherThanUnreachableBlockCleanUp_name;
     }
 
     /**
@@ -55,8 +55,7 @@ public class OneConditionRatherThanUnreachableBlockCleanUp extends AbstractClean
      * @return the description.
      */
     public String getDescription() {
-        return ""
-                + "Detect two successive if conditions that are identical and remove the second one.";
+        return MultiFixMessages.CleanUpRefactoringWizard_OneConditionRatherThanUnreachableBlockCleanUp_description;
     }
 
     /**
@@ -65,7 +64,7 @@ public class OneConditionRatherThanUnreachableBlockCleanUp extends AbstractClean
      * @return the reason.
      */
     public String getReason() {
-        return "It removes dead code.";
+        return MultiFixMessages.CleanUpRefactoringWizard_OneConditionRatherThanUnreachableBlockCleanUp_reason;
     }
 
     @Override

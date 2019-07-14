@@ -44,7 +44,7 @@ public class MethodOnMapRatherThanMethodOnKeySetCleanUp extends AbstractCleanUpR
      * @return the name.
      */
     public String getName() {
-        return "Method on map rather than method on keyset";
+        return MultiFixMessages.CleanUpRefactoringWizard_MethodOnMapRatherThanMethodOnKeySetCleanUp_name;
     }
 
     /**
@@ -53,8 +53,7 @@ public class MethodOnMapRatherThanMethodOnKeySetCleanUp extends AbstractCleanUpR
      * @return the description.
      */
     public String getDescription() {
-        return ""
-                + "Directly invoke methods on Map rather than on Map.keySet() when possible.";
+        return MultiFixMessages.CleanUpRefactoringWizard_MethodOnMapRatherThanMethodOnKeySetCleanUp_description;
     }
 
     /**
@@ -63,8 +62,7 @@ public class MethodOnMapRatherThanMethodOnKeySetCleanUp extends AbstractCleanUpR
      * @return the reason.
      */
     public String getReason() {
-        return "It reduces the coding, reading and debugging cost."
-                + " It also improves the time and the space performance.";
+        return MultiFixMessages.CleanUpRefactoringWizard_MethodOnMapRatherThanMethodOnKeySetCleanUp_reason;
     }
 
     @Override

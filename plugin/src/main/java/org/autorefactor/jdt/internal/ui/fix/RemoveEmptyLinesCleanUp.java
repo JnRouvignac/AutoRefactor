@@ -53,7 +53,7 @@ public class RemoveEmptyLinesCleanUp extends AbstractCleanUpRule {
      * @return the name.
      */
     public String getName() {
-        return "Remove empty lines";
+        return MultiFixMessages.CleanUpRefactoringWizard_RemoveEmptyLinesCleanUp_name;
     }
 
     /**
@@ -62,11 +62,7 @@ public class RemoveEmptyLinesCleanUp extends AbstractCleanUpRule {
      * @return the description.
      */
     public String getDescription() {
-        return ""
-            + "Removes unnecessary empty lines from source code:\n"
-            + "- empty lines after opening braces,\n"
-            + "- empty lines before closing braces,\n"
-            + "- two consecutive empty lines are converted to a single empty line.";
+        return MultiFixMessages.CleanUpRefactoringWizard_RemoveEmptyLinesCleanUp_description;
     }
 
     /**
@@ -75,7 +71,7 @@ public class RemoveEmptyLinesCleanUp extends AbstractCleanUpRule {
      * @return the reason.
      */
     public String getReason() {
-        return "It reduces code to focus attention on code that matters.";
+        return MultiFixMessages.CleanUpRefactoringWizard_RemoveEmptyLinesCleanUp_reason;
     }
 
     private static final Pattern NEWLINE_PATTERN = Pattern.compile("\\r\\n|\\n|\\r");

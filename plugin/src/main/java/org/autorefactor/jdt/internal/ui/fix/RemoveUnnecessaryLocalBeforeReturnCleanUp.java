@@ -61,7 +61,7 @@ public class RemoveUnnecessaryLocalBeforeReturnCleanUp extends AbstractCleanUpRu
      * @return the name.
      */
     public String getName() {
-        return "Remove unnecessary local before return";
+        return MultiFixMessages.CleanUpRefactoringWizard_RemoveUnnecessaryLocalBeforeReturnCleanUp_name;
     }
 
     /**
@@ -70,9 +70,7 @@ public class RemoveUnnecessaryLocalBeforeReturnCleanUp extends AbstractCleanUpRu
      * @return the description.
      */
     public String getDescription() {
-        return ""
-            + "Removes unnecessary local variable declaration"
-            + " or unnecessary variable assignment before a return statement.";
+        return MultiFixMessages.CleanUpRefactoringWizard_RemoveUnnecessaryLocalBeforeReturnCleanUp_description;
     }
 
     /**
@@ -81,7 +79,7 @@ public class RemoveUnnecessaryLocalBeforeReturnCleanUp extends AbstractCleanUpRu
      * @return the reason.
      */
     public String getReason() {
-        return "It reduces code to focus attention on code that matters. It also improves time performance.";
+        return MultiFixMessages.CleanUpRefactoringWizard_RemoveUnnecessaryLocalBeforeReturnCleanUp_reason;
     }
 
     @Override

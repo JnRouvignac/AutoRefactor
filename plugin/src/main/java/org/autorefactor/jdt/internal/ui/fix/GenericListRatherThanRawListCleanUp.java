@@ -80,7 +80,7 @@ public class GenericListRatherThanRawListCleanUp extends AbstractClassSubstitute
      * @return the name.
      */
     public String getName() {
-        return "Generic list rather than raw list";
+        return MultiFixMessages.CleanUpRefactoringWizard_GenericListRatherThanRawListCleanUp_name;
     }
 
     /**
@@ -89,8 +89,7 @@ public class GenericListRatherThanRawListCleanUp extends AbstractClassSubstitute
      * @return the description.
      */
     public String getDescription() {
-        return ""
-            + "Genericize a list if possible.";
+        return MultiFixMessages.CleanUpRefactoringWizard_GenericListRatherThanRawListCleanUp_description;
     }
 
     /**
@@ -99,7 +98,7 @@ public class GenericListRatherThanRawListCleanUp extends AbstractClassSubstitute
      * @return the reason.
      */
     public String getReason() {
-        return "It reduces the bug hazard.";
+        return MultiFixMessages.CleanUpRefactoringWizard_GenericListRatherThanRawListCleanUp_reason;
     }
 
     @Override

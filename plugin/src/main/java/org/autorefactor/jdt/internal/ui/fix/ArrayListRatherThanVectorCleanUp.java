@@ -68,7 +68,7 @@ public class ArrayListRatherThanVectorCleanUp extends AbstractClassSubstituteCle
      * @return the name.
      */
     public String getName() {
-        return "ArrayList rather than Vector";
+        return MultiFixMessages.CleanUpRefactoringWizard_ArrayListRatherThanVectorCleanUp_name;
     }
 
     /**
@@ -77,8 +77,7 @@ public class ArrayListRatherThanVectorCleanUp extends AbstractClassSubstituteCle
      * @return the description.
      */
     public String getDescription() {
-        return ""
-            + "Replace Vector by ArrayList when possible.";
+        return MultiFixMessages.CleanUpRefactoringWizard_ArrayListRatherThanVectorCleanUp_description;
     }
 
     /**
@@ -87,7 +86,7 @@ public class ArrayListRatherThanVectorCleanUp extends AbstractClassSubstituteCle
      * @return the reason.
      */
     public String getReason() {
-        return "It improves the time performance.";
+        return MultiFixMessages.CleanUpRefactoringWizard_ArrayListRatherThanVectorCleanUp_reason;
     }
 
     @Override

@@ -52,7 +52,7 @@ public class ImplicitDefaultConstructorRatherThanWrittenOneCleanUp extends
      * @return the name.
      */
     public String getName() {
-        return "Implicit default constructor rather than written one";
+        return MultiFixMessages.CleanUpRefactoringWizard_ImplicitDefaultConstructorRatherThanWrittenOneCleanUp_name;
     }
 
     /**
@@ -61,7 +61,7 @@ public class ImplicitDefaultConstructorRatherThanWrittenOneCleanUp extends
      * @return the description.
      */
     public String getDescription() {
-        return "Remove single public constructor with no arguments, no annotation and no code.";
+        return MultiFixMessages.CleanUpRefactoringWizard_ImplicitDefaultConstructorRatherThanWrittenOneCleanUp_description;
     }
 
     /**
@@ -70,7 +70,7 @@ public class ImplicitDefaultConstructorRatherThanWrittenOneCleanUp extends
      * @return the reason.
      */
     public String getReason() {
-        return "It improves the readibility of a such case to spotlight the complexity of other code.";
+        return MultiFixMessages.CleanUpRefactoringWizard_ImplicitDefaultConstructorRatherThanWrittenOneCleanUp_reason;
     }
 
     @Override

@@ -62,7 +62,7 @@ public class AggregateConstructorRatherThanGWTMethodCleanUp extends NewClassImpo
      * @return the name.
      */
     public String getName() {
-        return "Aggregate constructor rather than GWT method";
+        return MultiFixMessages.CleanUpRefactoringWizard_AggregateConstructorRatherThanGWTMethodCleanUp_name;
     }
 
     /**
@@ -71,8 +71,7 @@ public class AggregateConstructorRatherThanGWTMethodCleanUp extends NewClassImpo
      * @return the description.
      */
     public String getDescription() {
-        return "Use new ArrayList<>() and new HashMap<>() instead of"
-                + " using specific GWT Lists.newArrayList() and Maps.newHashMap().";
+        return MultiFixMessages.CleanUpRefactoringWizard_AggregateConstructorRatherThanGWTMethodCleanUp_description;
     }
 
     /**
@@ -81,8 +80,7 @@ public class AggregateConstructorRatherThanGWTMethodCleanUp extends NewClassImpo
      * @return the reason.
      */
     public String getReason() {
-        return "With diamond operator in Java 7, those specific GWT methods are useless."
-                + " It also reduces the dependency to libraries.";
+        return MultiFixMessages.CleanUpRefactoringWizard_AggregateConstructorRatherThanGWTMethodCleanUp_reason;
     }
 
     @Override

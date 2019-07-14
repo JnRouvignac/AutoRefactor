@@ -56,7 +56,7 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
      * @return the name.
      */
     public String getName() {
-        return "Extract common code in if else statement";
+        return MultiFixMessages.CleanUpRefactoringWizard_CommonCodeInIfElseStatementCleanUp_name;
     }
 
     /**
@@ -65,10 +65,7 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
      * @return the description.
      */
     public String getDescription() {
-        return ""
-            + "Factorizes common code in all if / else if / else statements"
-            + " at the end of each blocks.\n"
-            + "Ultimately it removes the empty and passive if conditions.";
+        return MultiFixMessages.CleanUpRefactoringWizard_CommonCodeInIfElseStatementCleanUp_description;
     }
 
     /**
@@ -77,7 +74,7 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
      * @return the reason.
      */
     public String getReason() {
-        return "It reduces the coding, reading, debugging and testing cost.";
+        return MultiFixMessages.CleanUpRefactoringWizard_CommonCodeInIfElseStatementCleanUp_reason;
     }
 
     // TODO handle switch statements

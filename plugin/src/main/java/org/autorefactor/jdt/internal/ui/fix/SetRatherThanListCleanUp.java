@@ -95,7 +95,7 @@ public class SetRatherThanListCleanUp extends AbstractClassSubstituteCleanUp {
      * @return the name.
      */
     public String getName() {
-        return "Set rather than List";
+        return MultiFixMessages.CleanUpRefactoringWizard_SetRatherThanListCleanUp_name;
     }
 
     /**
@@ -104,8 +104,7 @@ public class SetRatherThanListCleanUp extends AbstractClassSubstituteCleanUp {
      * @return the description.
      */
     public String getDescription() {
-        return ""
-            + "Replace List by HashSet when only presence of items is used.";
+        return MultiFixMessages.CleanUpRefactoringWizard_SetRatherThanListCleanUp_description;
     }
 
     /**
@@ -114,7 +113,7 @@ public class SetRatherThanListCleanUp extends AbstractClassSubstituteCleanUp {
      * @return the reason.
      */
     public String getReason() {
-        return "It improves the space performance.";
+        return MultiFixMessages.CleanUpRefactoringWizard_SetRatherThanListCleanUp_reason;
     }
 
     @Override

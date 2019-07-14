@@ -47,7 +47,7 @@ public class NamedMethodRatherThanLogLevelParameterCleanUp extends AbstractClean
      * @return the name.
      */
     public String getName() {
-        return "Named method rather than log level parameter";
+        return MultiFixMessages.CleanUpRefactoringWizard_NamedMethodRatherThanLogLevelParameterCleanUp_name;
     }
 
     /**
@@ -56,7 +56,7 @@ public class NamedMethodRatherThanLogLevelParameterCleanUp extends AbstractClean
      * @return the description.
      */
     public String getDescription() {
-        return "Replaces level parameter by the appropriate method for standard logging.";
+        return MultiFixMessages.CleanUpRefactoringWizard_NamedMethodRatherThanLogLevelParameterCleanUp_description;
     }
 
     /**
@@ -65,7 +65,7 @@ public class NamedMethodRatherThanLogLevelParameterCleanUp extends AbstractClean
      * @return the reason.
      */
     public String getReason() {
-        return "It improves readibility. Level parameter should be used only for dynamic level.";
+        return MultiFixMessages.CleanUpRefactoringWizard_NamedMethodRatherThanLogLevelParameterCleanUp_reason;
     }
 
     @Override

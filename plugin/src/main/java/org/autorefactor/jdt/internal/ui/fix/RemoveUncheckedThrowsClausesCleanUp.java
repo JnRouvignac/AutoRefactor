@@ -47,7 +47,7 @@ public final class RemoveUncheckedThrowsClausesCleanUp extends AbstractCleanUpRu
      * @return the name.
      */
     public String getName() {
-        return "Remove unchecked exceptions from throws clause";
+        return MultiFixMessages.CleanUpRefactoringWizard_RemoveUncheckedThrowsClausesCleanUp_name;
     }
 
     /**
@@ -56,7 +56,7 @@ public final class RemoveUncheckedThrowsClausesCleanUp extends AbstractCleanUpRu
      * @return the description.
      */
     public String getDescription() {
-        return "Remove unchecked exceptions from throws clause. Beware, the JavaDoc is not updated!";
+        return MultiFixMessages.CleanUpRefactoringWizard_RemoveUncheckedThrowsClausesCleanUp_description;
     }
 
     /**
@@ -65,7 +65,7 @@ public final class RemoveUncheckedThrowsClausesCleanUp extends AbstractCleanUpRu
      * @return the reason.
      */
     public String getReason() {
-        return "It reduces code to focus attention on code that matters.";
+        return MultiFixMessages.CleanUpRefactoringWizard_RemoveUncheckedThrowsClausesCleanUp_reason;
     }
 
     @Override

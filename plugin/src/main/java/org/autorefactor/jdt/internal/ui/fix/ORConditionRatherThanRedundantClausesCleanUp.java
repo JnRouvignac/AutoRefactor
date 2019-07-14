@@ -51,7 +51,7 @@ public class ORConditionRatherThanRedundantClausesCleanUp extends AbstractCleanU
      * @return the name.
      */
     public String getName() {
-        return "OR condition rather than redundant clauses";
+        return MultiFixMessages.CleanUpRefactoringWizard_ORConditionRatherThanRedundantClausesCleanUp_name;
     }
 
     /**
@@ -60,8 +60,7 @@ public class ORConditionRatherThanRedundantClausesCleanUp extends AbstractCleanU
      * @return the description.
      */
     public String getDescription() {
-        return ""
-            + "Replace (X && Y) || !X by Y || !X.";
+        return MultiFixMessages.CleanUpRefactoringWizard_ORConditionRatherThanRedundantClausesCleanUp_description;
     }
 
     /**
@@ -70,7 +69,7 @@ public class ORConditionRatherThanRedundantClausesCleanUp extends AbstractCleanU
      * @return the reason.
      */
     public String getReason() {
-        return "It improves the readibility.";
+        return MultiFixMessages.CleanUpRefactoringWizard_ORConditionRatherThanRedundantClausesCleanUp_reason;
     }
 
     @Override

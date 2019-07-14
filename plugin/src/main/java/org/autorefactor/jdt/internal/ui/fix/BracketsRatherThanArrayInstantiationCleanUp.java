@@ -46,7 +46,7 @@ public class BracketsRatherThanArrayInstantiationCleanUp extends AbstractCleanUp
      * @return the name.
      */
     public String getName() {
-        return "Brackets rather than array instantiation";
+        return MultiFixMessages.CleanUpRefactoringWizard_BracketsRatherThanArrayInstantiationCleanUp_name;
     }
 
     /**
@@ -55,8 +55,7 @@ public class BracketsRatherThanArrayInstantiationCleanUp extends AbstractCleanUp
      * @return the description.
      */
     public String getDescription() {
-        return ""
-            + "Replace the new instance syntax by curly brackets to create an array when possible.";
+        return MultiFixMessages.CleanUpRefactoringWizard_BracketsRatherThanArrayInstantiationCleanUp_description;
     }
 
     /**
@@ -65,7 +64,7 @@ public class BracketsRatherThanArrayInstantiationCleanUp extends AbstractCleanUp
      * @return the reason.
      */
     public String getReason() {
-        return "It reduces code to focus attention on code that matters.";
+        return MultiFixMessages.CleanUpRefactoringWizard_BracketsRatherThanArrayInstantiationCleanUp_reason;
     }
 
     @Override

@@ -61,7 +61,7 @@ public class CharPrimitiveRatherThanWrapperCleanUp extends AbstractPrimitiveRath
      * @return the name.
      */
     public String getName() {
-        return "Char primitive rather than wrapper";
+        return MultiFixMessages.CleanUpRefactoringWizard_CharPrimitiveRatherThanWrapperCleanUp_name;
     }
 
     /**
@@ -70,8 +70,7 @@ public class CharPrimitiveRatherThanWrapperCleanUp extends AbstractPrimitiveRath
      * @return the description.
      */
     public String getDescription() {
-        return ""
-            + "Replace Character wrapper object by char primitive type when an object is not necessary.";
+        return MultiFixMessages.CleanUpRefactoringWizard_CharPrimitiveRatherThanWrapperCleanUp_description;
     }
 
     /**
@@ -80,8 +79,7 @@ public class CharPrimitiveRatherThanWrapperCleanUp extends AbstractPrimitiveRath
      * @return the reason.
      */
     public String getReason() {
-        return "It improves the readibility and reduces null pointer check."
-                + " It also improves the space performance.";
+        return MultiFixMessages.CleanUpRefactoringWizard_CharPrimitiveRatherThanWrapperCleanUp_reason;
     }
 
     @Override

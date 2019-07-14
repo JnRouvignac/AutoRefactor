@@ -52,7 +52,7 @@ public class RemoveUnneededThisExpressionCleanUp extends AbstractCleanUpRule {
      * @return the name.
      */
     public String getName() {
-        return "Remove unneeded this expressions";
+        return MultiFixMessages.CleanUpRefactoringWizard_RemoveUnneededThisExpressionCleanUp_name;
     }
 
     /**
@@ -61,7 +61,7 @@ public class RemoveUnneededThisExpressionCleanUp extends AbstractCleanUpRule {
      * @return the description.
      */
     public String getDescription() {
-        return "Remove useless use of \"this\" from method calls.";
+        return MultiFixMessages.CleanUpRefactoringWizard_RemoveUnneededThisExpressionCleanUp_description;
     }
 
     /**
@@ -70,7 +70,7 @@ public class RemoveUnneededThisExpressionCleanUp extends AbstractCleanUpRule {
      * @return the reason.
      */
     public String getReason() {
-        return "It reduces code to focus attention on code that matters.";
+        return MultiFixMessages.CleanUpRefactoringWizard_RemoveUnneededThisExpressionCleanUp_reason;
     }
 
     @Override

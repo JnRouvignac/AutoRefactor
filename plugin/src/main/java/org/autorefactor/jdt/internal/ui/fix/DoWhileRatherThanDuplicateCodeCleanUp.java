@@ -48,7 +48,7 @@ public class DoWhileRatherThanDuplicateCodeCleanUp extends AbstractCleanUpRule {
      * @return the name.
      */
     public String getName() {
-        return "Do/while rather than duplicate code";
+        return MultiFixMessages.CleanUpRefactoringWizard_DoWhileRatherThanWhileCleanUp_name;
     }
 
     /**
@@ -57,7 +57,7 @@ public class DoWhileRatherThanDuplicateCodeCleanUp extends AbstractCleanUpRule {
      * @return the description.
      */
     public String getDescription() {
-        return "Replace while by do/while when the loop statements are duplicated before the loop.";
+        return MultiFixMessages.CleanUpRefactoringWizard_DoWhileRatherThanWhileCleanUp_description;
     }
 
     /**
@@ -66,7 +66,7 @@ public class DoWhileRatherThanDuplicateCodeCleanUp extends AbstractCleanUpRule {
      * @return the reason.
      */
     public String getReason() {
-        return "It reduces the coding, reading, debugging and testing cost.";
+        return MultiFixMessages.CleanUpRefactoringWizard_DoWhileRatherThanWhileCleanUp_reason;
     }
 
     @Override

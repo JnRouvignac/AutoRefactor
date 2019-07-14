@@ -49,7 +49,7 @@ public class InvertEqualsCleanUp extends AbstractCleanUpRule {
      * @return the name.
      */
     public String getName() {
-        return "Equals on constant rather than on variable";
+        return MultiFixMessages.CleanUpRefactoringWizard_InvertEqualsCleanUp_name;
     }
 
     /**
@@ -58,9 +58,7 @@ public class InvertEqualsCleanUp extends AbstractCleanUpRule {
      * @return the description.
      */
     public String getDescription() {
-        return ""
-            + "Inverts calls to Object.equals(Object) and String.equalsIgnoreCase(String)"
-            + " when it is known that the second operand is not null and the first can be null.";
+        return MultiFixMessages.CleanUpRefactoringWizard_InvertEqualsCleanUp_description;
     }
 
     /**
@@ -69,7 +67,7 @@ public class InvertEqualsCleanUp extends AbstractCleanUpRule {
      * @return the reason.
      */
     public String getReason() {
-        return "It avoids null pointer.";
+        return MultiFixMessages.CleanUpRefactoringWizard_InvertEqualsCleanUp_reason;
     }
 
     @Override

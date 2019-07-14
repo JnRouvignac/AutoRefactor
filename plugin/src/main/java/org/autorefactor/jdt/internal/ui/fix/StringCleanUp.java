@@ -55,7 +55,7 @@ public class StringCleanUp extends AbstractCleanUpRule {
      * @return the name.
      */
     public String getName() {
-        return "String";
+        return MultiFixMessages.CleanUpRefactoringWizard_StringCleanUp_name;
     }
 
     /**
@@ -64,13 +64,7 @@ public class StringCleanUp extends AbstractCleanUpRule {
      * @return the description.
      */
     public String getDescription() {
-        return ""
-            + "Removes:\n"
-            + "- calling String.toString() on a String instance,\n"
-            + "- remove calls to String.toString() inside String concatenations,\n"
-            + "- replace useless case shifts for equality by equalsIgnoreCase()\n"
-            + "Refactors:\n"
-            + "- usages of 'indexOf' and 'lastIndexOf' with single letter in string";
+        return MultiFixMessages.CleanUpRefactoringWizard_StringCleanUp_description;
     }
 
     /**
@@ -79,7 +73,7 @@ public class StringCleanUp extends AbstractCleanUpRule {
      * @return the reason.
      */
     public String getReason() {
-        return "It improves the time and space performance. It also improves the readibility.";
+        return MultiFixMessages.CleanUpRefactoringWizard_StringCleanUp_reason;
     }
 
     @Override

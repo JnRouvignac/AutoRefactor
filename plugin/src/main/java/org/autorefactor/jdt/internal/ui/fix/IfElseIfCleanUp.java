@@ -69,7 +69,7 @@ public class IfElseIfCleanUp extends AbstractCleanUpRule {
      * @return the name.
      */
     public String getName() {
-        return "if-elseif";
+        return MultiFixMessages.CleanUpRefactoringWizard_IfElseIfCleanUp_name;
     }
 
     /**
@@ -78,7 +78,7 @@ public class IfElseIfCleanUp extends AbstractCleanUpRule {
      * @return the description.
      */
     public String getDescription() {
-        return "Refactors \"else { if (...) {} }\" to \"else if (...) {}\".";
+        return MultiFixMessages.CleanUpRefactoringWizard_IfElseIfCleanUp_description;
     }
 
     /**
@@ -87,7 +87,7 @@ public class IfElseIfCleanUp extends AbstractCleanUpRule {
      * @return the reason.
      */
     public String getReason() {
-        return "It reduces code to focus attention on code that matters.";
+        return MultiFixMessages.CleanUpRefactoringWizard_IfElseIfCleanUp_reason;
     }
 
     // TODO JNR

@@ -53,7 +53,7 @@ public final class EnumMapRatherThanHashMapCleanUp extends
      * @return the name.
      */
     public String getName() {
-        return "EnumMap rather than HashMap for enum keys";
+        return MultiFixMessages.CleanUpRefactoringWizard_EnumMapRatherThanHashMapCleanUp_name;
     }
 
     /**
@@ -62,7 +62,7 @@ public final class EnumMapRatherThanHashMapCleanUp extends
      * @return the description.
      */
     public String getDescription() {
-        return "Refactor implementation class HashMap -> EnumMap when key is a enum type";
+        return MultiFixMessages.CleanUpRefactoringWizard_EnumMapRatherThanHashMapCleanUp_description;
     }
 
     /**
@@ -71,7 +71,7 @@ public final class EnumMapRatherThanHashMapCleanUp extends
      * @return the reason.
      */
     public String getReason() {
-        return "It improves the space performance.";
+        return MultiFixMessages.CleanUpRefactoringWizard_EnumMapRatherThanHashMapCleanUp_reason;
     }
 
     @Override

@@ -67,7 +67,7 @@ public class ArrayListRatherThanLinkedListCleanUp extends AbstractClassSubstitut
      * @return the name.
      */
     public String getName() {
-        return "ArrayList rather than LinkedList";
+        return MultiFixMessages.CleanUpRefactoringWizard_ArrayListRatherThanLinkedListCleanUp_name;
     }
 
     /**
@@ -76,8 +76,7 @@ public class ArrayListRatherThanLinkedListCleanUp extends AbstractClassSubstitut
      * @return the description.
      */
     public String getDescription() {
-        return ""
-            + "Replace LinkedList by ArrayList when no item is inserted or removed in the middle of the list.";
+        return MultiFixMessages.CleanUpRefactoringWizard_ArrayListRatherThanLinkedListCleanUp_description;
     }
 
     /**
@@ -86,7 +85,7 @@ public class ArrayListRatherThanLinkedListCleanUp extends AbstractClassSubstitut
      * @return the reason.
      */
     public String getReason() {
-        return "It improves the time and space performance.";
+        return MultiFixMessages.CleanUpRefactoringWizard_ArrayListRatherThanLinkedListCleanUp_reason;
     }
 
     @Override

@@ -61,7 +61,7 @@ public class IntPrimitiveRatherThanWrapperCleanUp extends AbstractPrimitiveRathe
      * @return the name.
      */
     public String getName() {
-        return "Int primitive rather than wrapper";
+        return MultiFixMessages.CleanUpRefactoringWizard_IntPrimitiveRatherThanWrapperCleanUp_name;
     }
 
     /**
@@ -70,8 +70,7 @@ public class IntPrimitiveRatherThanWrapperCleanUp extends AbstractPrimitiveRathe
      * @return the description.
      */
     public String getDescription() {
-        return ""
-            + "Replace Integer wrapper object by int primitive type when an object is not necessary.";
+        return MultiFixMessages.CleanUpRefactoringWizard_IntPrimitiveRatherThanWrapperCleanUp_description;
     }
 
     /**
@@ -80,8 +79,7 @@ public class IntPrimitiveRatherThanWrapperCleanUp extends AbstractPrimitiveRathe
      * @return the reason.
      */
     public String getReason() {
-        return "It improves the readibility and reduces null pointer check."
-                + " It also improves the space performance.";
+        return MultiFixMessages.CleanUpRefactoringWizard_IntPrimitiveRatherThanWrapperCleanUp_reason;
     }
 
     @Override

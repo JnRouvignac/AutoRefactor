@@ -85,7 +85,7 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
      * @return the name.
      */
     public String getName() {
-        return "Generic map rather than raw map";
+        return MultiFixMessages.CleanUpRefactoringWizard_GenericMapRatherThanRawMapCleanUp_name;
     }
 
     /**
@@ -94,7 +94,7 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
      * @return the description.
      */
     public String getDescription() {
-        return "" + "Genericize a map if possible.";
+        return MultiFixMessages.CleanUpRefactoringWizard_GenericMapRatherThanRawMapCleanUp_description;
     }
 
     /**
@@ -103,7 +103,7 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
      * @return the reason.
      */
     public String getReason() {
-        return "It reduces the bug hazard.";
+        return MultiFixMessages.CleanUpRefactoringWizard_GenericMapRatherThanRawMapCleanUp_reason;
     }
 
     @Override

@@ -39,7 +39,7 @@ public class StringBuilderRatherThanStringBufferCleanUp extends AbstractClassSub
      * @return the name.
      */
     public String getName() {
-        return "StringBuilder rather than StringBuffer";
+        return MultiFixMessages.CleanUpRefactoringWizard_StringBuilderRatherThanStringBufferCleanUp_name;
     }
 
     /**
@@ -48,8 +48,7 @@ public class StringBuilderRatherThanStringBufferCleanUp extends AbstractClassSub
      * @return the description.
      */
     public String getDescription() {
-        return ""
-            + "Replace StringBuffer by StringBuilder when possible.";
+        return MultiFixMessages.CleanUpRefactoringWizard_StringBuilderRatherThanStringBufferCleanUp_description;
     }
 
     /**
@@ -58,7 +57,7 @@ public class StringBuilderRatherThanStringBufferCleanUp extends AbstractClassSub
      * @return the reason.
      */
     public String getReason() {
-        return "It improves the time performance.";
+        return MultiFixMessages.CleanUpRefactoringWizard_StringBuilderRatherThanStringBufferCleanUp_reason;
     }
 
     @Override

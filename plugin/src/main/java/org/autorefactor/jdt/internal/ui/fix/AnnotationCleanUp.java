@@ -62,7 +62,7 @@ public class AnnotationCleanUp extends AbstractCleanUpRule {
      * @return the name.
      */
     public String getName() {
-        return "Annotation";
+        return MultiFixMessages.CleanUpRefactoringWizard_AnnotationCleanUp_name;
     }
 
     /**
@@ -71,10 +71,7 @@ public class AnnotationCleanUp extends AbstractCleanUpRule {
      * @return the description.
      */
     public String getDescription() {
-        return ""
-            + "Simplifies annotation uses:\n"
-            + "- empty parentheses will be removed from annotations,\n"
-            + "- single members named \"value\" will be removed from annotations and only the value will be left.";
+        return MultiFixMessages.CleanUpRefactoringWizard_AnnotationCleanUp_description;
     }
 
     /**
@@ -83,7 +80,7 @@ public class AnnotationCleanUp extends AbstractCleanUpRule {
      * @return the reason.
      */
     public String getReason() {
-        return "It improves the readibility.";
+        return MultiFixMessages.CleanUpRefactoringWizard_AnnotationCleanUp_reason;
     }
 
     @Override

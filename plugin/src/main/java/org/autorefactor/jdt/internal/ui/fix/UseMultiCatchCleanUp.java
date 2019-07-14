@@ -78,7 +78,7 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
      * @return the name.
      */
     public String getName() {
-        return "Multi-catch";
+        return MultiFixMessages.CleanUpRefactoringWizard_UseMultiCatchCleanUp_name;
     }
 
     /**
@@ -87,7 +87,7 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
      * @return the description.
      */
     public String getDescription() {
-        return "Refactors catch clauses with the same body to use Java 7's multi-catch.";
+        return MultiFixMessages.CleanUpRefactoringWizard_UseMultiCatchCleanUp_description;
     }
 
     /**
@@ -96,7 +96,7 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
      * @return the reason.
      */
     public String getReason() {
-        return "It reduces the coding, reading, debugging and testing cost. It also upgrades legacy code.";
+        return MultiFixMessages.CleanUpRefactoringWizard_UseMultiCatchCleanUp_reason;
     }
 
     @Override

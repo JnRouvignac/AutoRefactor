@@ -49,7 +49,7 @@ public class BytePrimitiveRatherThanWrapperCleanUp extends AbstractPrimitiveRath
      * @return the name.
      */
     public String getName() {
-        return "Byte primitive rather than wrapper";
+        return MultiFixMessages.CleanUpRefactoringWizard_BytePrimitiveRatherThanWrapperCleanUp_name;
     }
 
     /**
@@ -58,8 +58,7 @@ public class BytePrimitiveRatherThanWrapperCleanUp extends AbstractPrimitiveRath
      * @return the description.
      */
     public String getDescription() {
-        return ""
-            + "Replace Byte wrapper object by byte primitive type when an object is not necessary.";
+        return MultiFixMessages.CleanUpRefactoringWizard_BytePrimitiveRatherThanWrapperCleanUp_description;
     }
 
     /**
@@ -68,8 +67,7 @@ public class BytePrimitiveRatherThanWrapperCleanUp extends AbstractPrimitiveRath
      * @return the reason.
      */
     public String getReason() {
-        return "It improves the readibility and reduces null pointer check."
-                + " It also improves the space performance.";
+        return MultiFixMessages.CleanUpRefactoringWizard_BytePrimitiveRatherThanWrapperCleanUp_reason;
     }
 
     @Override

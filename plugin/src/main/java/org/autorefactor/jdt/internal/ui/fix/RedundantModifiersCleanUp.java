@@ -68,7 +68,7 @@ public class RedundantModifiersCleanUp extends AbstractCleanUpRule {
      * @return the name.
      */
     public String getName() {
-        return "Remove useless modifiers";
+        return MultiFixMessages.CleanUpRefactoringWizard_RedundantModifiersCleanUp_name;
     }
 
     /**
@@ -77,15 +77,7 @@ public class RedundantModifiersCleanUp extends AbstractCleanUpRule {
      * @return the description.
      */
     public String getDescription() {
-        return ""
-                + "Sorts modifiers.\n"
-                + "Also removes modifiers implied by the context:\n"
-                + "- \"static\" and \"abstract\" for interface,\n"
-                + "- \"public\", \"static\" and \"final\" for interface fields,\n"
-                + "- \"public\" and \"abstract\" for interface methods,\n"
-                + "- \"final\" for private methods,\n"
-                + "- \"final\" for parameters in interface method declarations,"
-                + "- \"protected\" modifier for final class not inherited members.";
+        return MultiFixMessages.CleanUpRefactoringWizard_RedundantModifiersCleanUp_description;
     }
 
     /**
@@ -94,7 +86,7 @@ public class RedundantModifiersCleanUp extends AbstractCleanUpRule {
      * @return the reason.
      */
     public String getReason() {
-        return "It reduces code to focus attention on code that matters.";
+        return MultiFixMessages.CleanUpRefactoringWizard_RedundantModifiersCleanUp_reason;
     }
 
     private static final class ModifierOrderComparator implements Comparator<IExtendedModifier> {

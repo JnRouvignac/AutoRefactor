@@ -42,7 +42,7 @@ public class LazyLogicalRatherThanEagerCleanUp extends AbstractCleanUpRule {
      * @return the name.
      */
     public String getName() {
-        return "Lazy logical rather than eager";
+        return MultiFixMessages.CleanUpRefactoringWizard_LazyLogicalRatherThanEagerCleanUp_name;
     }
 
     /**
@@ -51,8 +51,7 @@ public class LazyLogicalRatherThanEagerCleanUp extends AbstractCleanUpRule {
      * @return the description.
      */
     public String getDescription() {
-        return ""
-            + "Replace & by && and | by || when the right operand is passive.";
+        return MultiFixMessages.CleanUpRefactoringWizard_LazyLogicalRatherThanEagerCleanUp_description;
     }
 
     /**
@@ -61,7 +60,7 @@ public class LazyLogicalRatherThanEagerCleanUp extends AbstractCleanUpRule {
      * @return the reason.
      */
     public String getReason() {
-        return "It improves the time performance.";
+        return MultiFixMessages.CleanUpRefactoringWizard_LazyLogicalRatherThanEagerCleanUp_reason;
     }
 
     @Override

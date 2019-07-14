@@ -63,7 +63,7 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
      * @return the name.
      */
     public String getName() {
-        return "Big number";
+        return MultiFixMessages.CleanUpRefactoringWizard_BigNumberCleanUp_name;
     }
 
     /**
@@ -72,12 +72,7 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
      * @return the description.
      */
     public String getDescription() {
-        return ""
-            + "Refactors to a proper use of BigDecimals and BigIntegers:\n"
-            + "- create BigDecimals or BigIntegers from Strings rather than floating point values,\n"
-            + "- create BigDecimals or BigIntegers from integers rather than String representing integers,\n"
-            + "- use BigDecimal or BigInteger constants,\n"
-            + "- replace calls to equals() with calls to compareTo().";
+        return MultiFixMessages.CleanUpRefactoringWizard_BigNumberCleanUp_description;
     }
 
     /**
@@ -86,7 +81,7 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
      * @return the reason.
      */
     public String getReason() {
-        return "It improves the readibility.";
+        return MultiFixMessages.CleanUpRefactoringWizard_BigNumberCleanUp_reason;
     }
 
     private int getJavaMinorVersion() {

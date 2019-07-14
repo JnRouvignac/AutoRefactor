@@ -48,7 +48,7 @@ public class SingleDeclarationsRatherThanMultiDeclarationCleanUp extends Abstrac
      * @return the name.
      */
     public String getName() {
-        return "Single declarations rather than multi declaration";
+        return MultiFixMessages.CleanUpRefactoringWizard_SingleDeclarationsRatherThanMultiDeclarationCleanUp_name;
     }
 
     /**
@@ -57,7 +57,7 @@ public class SingleDeclarationsRatherThanMultiDeclarationCleanUp extends Abstrac
      * @return the description.
      */
     public String getDescription() {
-        return "Write only one variable declaration per line.";
+        return MultiFixMessages.CleanUpRefactoringWizard_SingleDeclarationsRatherThanMultiDeclarationCleanUp_description;
     }
 
     /**
@@ -66,7 +66,7 @@ public class SingleDeclarationsRatherThanMultiDeclarationCleanUp extends Abstrac
      * @return the reason.
      */
     public String getReason() {
-        return "It makes the code more standard. It fixes the Sonar RSPEC-1659.";
+        return MultiFixMessages.CleanUpRefactoringWizard_SingleDeclarationsRatherThanMultiDeclarationCleanUp_reason;
     }
 
     @Override

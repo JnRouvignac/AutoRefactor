@@ -85,7 +85,7 @@ public class CollectionContainsCleanUp extends AbstractCleanUpRule {
      * @return the name.
      */
     public String getName() {
-        return "Collection.contains() rather than loop";
+        return MultiFixMessages.CleanUpRefactoringWizard_CollectionContainsCleanUp_name;
     }
 
     /**
@@ -94,7 +94,7 @@ public class CollectionContainsCleanUp extends AbstractCleanUpRule {
      * @return the description.
      */
     public String getDescription() {
-        return "Replace loop with Collection.contains(Object obj).";
+        return MultiFixMessages.CleanUpRefactoringWizard_CollectionContainsCleanUp_description;
     }
 
     /**
@@ -103,7 +103,7 @@ public class CollectionContainsCleanUp extends AbstractCleanUpRule {
      * @return the reason.
      */
     public String getReason() {
-        return "It reduces code to focus attention on code that matters.";
+        return MultiFixMessages.CleanUpRefactoringWizard_CollectionContainsCleanUp_reason;
     }
 
     @Override

@@ -54,7 +54,7 @@ public class RemoveEmptyStatementCleanUp extends AbstractCleanUpRule {
      * @return the name.
      */
     public String getName() {
-        return "Removes empty statements";
+        return MultiFixMessages.CleanUpRefactoringWizard_RemoveEmptyStatementCleanUp_name;
     }
 
     /**
@@ -63,7 +63,7 @@ public class RemoveEmptyStatementCleanUp extends AbstractCleanUpRule {
      * @return the description.
      */
     public String getDescription() {
-        return "Removes structural statements with no substatement.";
+        return MultiFixMessages.CleanUpRefactoringWizard_RemoveEmptyStatementCleanUp_description;
     }
 
     /**
@@ -72,7 +72,7 @@ public class RemoveEmptyStatementCleanUp extends AbstractCleanUpRule {
      * @return the reason.
      */
     public String getReason() {
-        return "It reduces code to focus attention on code that matters.";
+        return MultiFixMessages.CleanUpRefactoringWizard_RemoveEmptyStatementCleanUp_reason;
     }
 
     @Override

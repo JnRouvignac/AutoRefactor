@@ -58,7 +58,7 @@ public class IfRatherThanWhileAndFallsThroughCleanUp extends AbstractCleanUpRule
      * @return the name.
      */
     public String getName() {
-        return "If rather than while and falls through";
+        return MultiFixMessages.CleanUpRefactoringWizard_IfRatherThanWhileAndFallsThroughCleanUp_name;
     }
 
     /**
@@ -67,8 +67,7 @@ public class IfRatherThanWhileAndFallsThroughCleanUp extends AbstractCleanUpRule
      * @return the description.
      */
     public String getDescription() {
-        return ""
-            + "Replace a while loop that always terminates during the first iteration by an if.";
+        return MultiFixMessages.CleanUpRefactoringWizard_IfRatherThanWhileAndFallsThroughCleanUp_description;
     }
 
     /**
@@ -77,7 +76,7 @@ public class IfRatherThanWhileAndFallsThroughCleanUp extends AbstractCleanUpRule
      * @return the reason.
      */
     public String getReason() {
-        return "It disambiguates the code to improve the readibility.";
+        return MultiFixMessages.CleanUpRefactoringWizard_IfRatherThanWhileAndFallsThroughCleanUp_reason;
     }
 
     @Override

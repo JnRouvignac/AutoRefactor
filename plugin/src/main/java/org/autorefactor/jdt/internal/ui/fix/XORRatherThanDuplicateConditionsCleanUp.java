@@ -55,7 +55,7 @@ public class XORRatherThanDuplicateConditionsCleanUp extends AbstractCleanUpRule
      * @return the name.
      */
     public String getName() {
-        return "XOR rather than duplicate conditions";
+        return MultiFixMessages.CleanUpRefactoringWizard_XORRatherThanDuplicateConditionsCleanUp_name;
     }
 
     /**
@@ -64,8 +64,7 @@ public class XORRatherThanDuplicateConditionsCleanUp extends AbstractCleanUpRule
      * @return the description.
      */
     public String getDescription() {
-        return ""
-            + "Replace (X && !Y) || (!X && Y) by X ^ Y.";
+        return MultiFixMessages.CleanUpRefactoringWizard_XORRatherThanDuplicateConditionsCleanUp_description;
     }
 
     /**
@@ -74,7 +73,7 @@ public class XORRatherThanDuplicateConditionsCleanUp extends AbstractCleanUpRule
      * @return the reason.
      */
     public String getReason() {
-        return "It improves the readibility.";
+        return MultiFixMessages.CleanUpRefactoringWizard_XORRatherThanDuplicateConditionsCleanUp_reason;
     }
 
     @Override

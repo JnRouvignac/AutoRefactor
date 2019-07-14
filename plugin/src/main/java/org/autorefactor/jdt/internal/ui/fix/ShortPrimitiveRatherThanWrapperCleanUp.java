@@ -61,7 +61,7 @@ public class ShortPrimitiveRatherThanWrapperCleanUp extends AbstractPrimitiveRat
      * @return the name.
      */
     public String getName() {
-        return "Short primitive rather than wrapper";
+        return MultiFixMessages.CleanUpRefactoringWizard_ShortPrimitiveRatherThanWrapperCleanUp_name;
     }
 
     /**
@@ -70,8 +70,7 @@ public class ShortPrimitiveRatherThanWrapperCleanUp extends AbstractPrimitiveRat
      * @return the description.
      */
     public String getDescription() {
-        return ""
-            + "Replace Short wrapper object by short primitive type when an object is not necessary.";
+        return MultiFixMessages.CleanUpRefactoringWizard_ShortPrimitiveRatherThanWrapperCleanUp_description;
     }
 
     /**
@@ -80,8 +79,7 @@ public class ShortPrimitiveRatherThanWrapperCleanUp extends AbstractPrimitiveRat
      * @return the reason.
      */
     public String getReason() {
-        return "It improves the readibility and reduces null pointer check."
-                + " It also improves the space performance.";
+        return MultiFixMessages.CleanUpRefactoringWizard_ShortPrimitiveRatherThanWrapperCleanUp_reason;
     }
 
     @Override

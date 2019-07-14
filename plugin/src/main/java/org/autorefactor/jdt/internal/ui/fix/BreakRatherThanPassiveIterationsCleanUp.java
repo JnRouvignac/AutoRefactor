@@ -172,7 +172,7 @@ public class BreakRatherThanPassiveIterationsCleanUp extends AbstractCleanUpRule
      * @return the name.
      */
     public String getName() {
-        return "Break rather than passive loops";
+        return MultiFixMessages.CleanUpRefactoringWizard_BreakRatherThanPassiveIterationsCleanUp_name;
     }
 
     /**
@@ -181,8 +181,7 @@ public class BreakRatherThanPassiveIterationsCleanUp extends AbstractCleanUpRule
      * @return the description.
      */
     public String getDescription() {
-        return ""
-            + "Add a break to avoid passive for loop iterations.";
+        return MultiFixMessages.CleanUpRefactoringWizard_BreakRatherThanPassiveIterationsCleanUp_description;
     }
 
     /**
@@ -191,7 +190,7 @@ public class BreakRatherThanPassiveIterationsCleanUp extends AbstractCleanUpRule
      * @return the reason.
      */
     public String getReason() {
-        return "It improves the time performance.";
+        return MultiFixMessages.CleanUpRefactoringWizard_BreakRatherThanPassiveIterationsCleanUp_reason;
     }
 
     @Override

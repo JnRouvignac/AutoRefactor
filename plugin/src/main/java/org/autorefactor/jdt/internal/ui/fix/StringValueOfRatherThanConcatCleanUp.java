@@ -44,7 +44,7 @@ public class StringValueOfRatherThanConcatCleanUp extends AbstractCleanUpRule {
      * @return the name.
      */
     public String getName() {
-        return "String.valueOf() rather than concatenation";
+        return MultiFixMessages.CleanUpRefactoringWizard_StringValueOfRatherThanConcatCleanUp_name;
     }
 
     /**
@@ -53,8 +53,7 @@ public class StringValueOfRatherThanConcatCleanUp extends AbstractCleanUpRule {
      * @return the description.
      */
     public String getDescription() {
-        return ""
-            + "Replace forced string tranformation by String.valueOf().";
+        return MultiFixMessages.CleanUpRefactoringWizard_StringValueOfRatherThanConcatCleanUp_description;
     }
 
     /**
@@ -63,7 +62,7 @@ public class StringValueOfRatherThanConcatCleanUp extends AbstractCleanUpRule {
      * @return the reason.
      */
     public String getReason() {
-        return "It improves the time and space performance.";
+        return MultiFixMessages.CleanUpRefactoringWizard_StringValueOfRatherThanConcatCleanUp_reason;
     }
 
     @Override

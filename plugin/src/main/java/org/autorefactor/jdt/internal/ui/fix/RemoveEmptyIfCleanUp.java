@@ -49,7 +49,7 @@ public class RemoveEmptyIfCleanUp extends AbstractCleanUpRule {
      * @return the name.
      */
     public String getName() {
-        return "Remove empty if";
+        return MultiFixMessages.CleanUpRefactoringWizard_RemoveEmptyIfCleanUp_name;
     }
 
     /**
@@ -58,7 +58,7 @@ public class RemoveEmptyIfCleanUp extends AbstractCleanUpRule {
      * @return the description.
      */
     public String getDescription() {
-        return "Removes empty if or else block.";
+        return MultiFixMessages.CleanUpRefactoringWizard_RemoveEmptyIfCleanUp_description;
     }
 
     /**
@@ -67,8 +67,7 @@ public class RemoveEmptyIfCleanUp extends AbstractCleanUpRule {
      * @return the reason.
      */
     public String getReason() {
-        return "It reduces code to focus attention on code that matters."
-                + " It also improves the time performance.";
+        return MultiFixMessages.CleanUpRefactoringWizard_RemoveEmptyIfCleanUp_reason;
     }
 
     @Override

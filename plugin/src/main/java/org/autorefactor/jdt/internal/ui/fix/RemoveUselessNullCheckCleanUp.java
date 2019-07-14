@@ -61,7 +61,7 @@ public class RemoveUselessNullCheckCleanUp extends AbstractCleanUpRule {
      * @return the name.
      */
     public String getName() {
-        return "Remove useless null checks";
+        return MultiFixMessages.CleanUpRefactoringWizard_RemoveUselessNullCheckCleanUp_name;
     }
 
     /**
@@ -70,11 +70,7 @@ public class RemoveUselessNullCheckCleanUp extends AbstractCleanUpRule {
      * @return the description.
      */
     public String getDescription() {
-        return ""
-                + "Removes useless null checks before assignments or return statements.\n"
-                + "Such useless null checks are comparing an expression against null,\n"
-                + "then either assigning null or the expression depending on the result of the null check.\n"
-                + "It is simpler to directly assign the expression.";
+        return MultiFixMessages.CleanUpRefactoringWizard_RemoveUselessNullCheckCleanUp_description;
     }
 
     /**
@@ -83,7 +79,7 @@ public class RemoveUselessNullCheckCleanUp extends AbstractCleanUpRule {
      * @return the reason.
      */
     public String getReason() {
-        return "It reduces code to focus attention on code that matters.";
+        return MultiFixMessages.CleanUpRefactoringWizard_RemoveUselessNullCheckCleanUp_reason;
     }
 
     @Override

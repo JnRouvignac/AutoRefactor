@@ -57,7 +57,7 @@ public class PushNegationDownCleanUp extends AbstractCleanUpRule {
      * @return the name.
      */
     public String getName() {
-        return "Push negation down";
+        return MultiFixMessages.CleanUpRefactoringWizard_PushNegationDownCleanUp_name;
     }
 
     /**
@@ -66,7 +66,7 @@ public class PushNegationDownCleanUp extends AbstractCleanUpRule {
      * @return the description.
      */
     public String getDescription() {
-        return "Pushes negations down, inside the negated expressions.";
+        return MultiFixMessages.CleanUpRefactoringWizard_PushNegationDownCleanUp_description;
     }
 
     /**
@@ -75,7 +75,7 @@ public class PushNegationDownCleanUp extends AbstractCleanUpRule {
      * @return the reason.
      */
     public String getReason() {
-        return "It disambiguates the code to reduce bug hazard.";
+        return MultiFixMessages.CleanUpRefactoringWizard_PushNegationDownCleanUp_reason;
     }
 
     @Override

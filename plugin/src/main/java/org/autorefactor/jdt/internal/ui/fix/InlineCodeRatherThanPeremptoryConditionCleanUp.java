@@ -53,7 +53,7 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
      * @return the name.
      */
     public String getName() {
-        return "Inline code rather than peremptory condition";
+        return MultiFixMessages.CleanUpRefactoringWizard_InlineCodeRatherThanPeremptoryConditionCleanUp_name;
     }
 
     /**
@@ -62,7 +62,7 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
      * @return the description.
      */
     public String getDescription() {
-        return "Replace always true or always false condition by inline code.";
+        return MultiFixMessages.CleanUpRefactoringWizard_InlineCodeRatherThanPeremptoryConditionCleanUp_description;
     }
 
     /**
@@ -71,7 +71,7 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
      * @return the reason.
      */
     public String getReason() {
-        return "It disambiguates the code to improve the readibility.";
+        return MultiFixMessages.CleanUpRefactoringWizard_InlineCodeRatherThanPeremptoryConditionCleanUp_reason;
     }
 
     @Override

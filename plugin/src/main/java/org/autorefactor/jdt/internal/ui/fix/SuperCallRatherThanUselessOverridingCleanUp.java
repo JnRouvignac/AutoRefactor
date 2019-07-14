@@ -68,7 +68,7 @@ public class SuperCallRatherThanUselessOverridingCleanUp extends AbstractCleanUp
      * @return the name.
      */
     public String getName() {
-        return "Super call rather than useless overriding";
+        return MultiFixMessages.CleanUpRefactoringWizard_SuperCallRatherThanUselessOverridingCleanUp_name;
     }
 
     /**
@@ -77,7 +77,7 @@ public class SuperCallRatherThanUselessOverridingCleanUp extends AbstractCleanUp
      * @return the description.
      */
     public String getDescription() {
-        return "Removes overriding of method if the overriding only call the super class.";
+        return MultiFixMessages.CleanUpRefactoringWizard_SuperCallRatherThanUselessOverridingCleanUp_description;
     }
 
     /**
@@ -86,7 +86,7 @@ public class SuperCallRatherThanUselessOverridingCleanUp extends AbstractCleanUp
      * @return the reason.
      */
     public String getReason() {
-        return "It improves the readibility of such simple code to spotlight the complexity of other code.";
+        return MultiFixMessages.CleanUpRefactoringWizard_SuperCallRatherThanUselessOverridingCleanUp_reason;
     }
 
     @Override

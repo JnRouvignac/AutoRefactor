@@ -46,7 +46,7 @@ public class LiteralRatherThanBooleanConstantCleanUp extends AbstractCleanUpRule
      * @return the name.
      */
     public String getName() {
-        return "Literal rather than boolean constant";
+        return MultiFixMessages.CleanUpRefactoringWizard_LiteralRatherThanBooleanConstantCleanUp_name;
     }
 
     /**
@@ -55,8 +55,7 @@ public class LiteralRatherThanBooleanConstantCleanUp extends AbstractCleanUpRule
      * @return the description.
      */
     public String getDescription() {
-        return ""
-            + "Replace Boolean.TRUE/Boolean.FALSE by true/false on primitive assignment.";
+        return MultiFixMessages.CleanUpRefactoringWizard_LiteralRatherThanBooleanConstantCleanUp_description;
     }
 
     /**
@@ -65,7 +64,7 @@ public class LiteralRatherThanBooleanConstantCleanUp extends AbstractCleanUpRule
      * @return the reason.
      */
     public String getReason() {
-        return "It improves the readibility.";
+        return MultiFixMessages.CleanUpRefactoringWizard_LiteralRatherThanBooleanConstantCleanUp_reason;
     }
 
     @Override

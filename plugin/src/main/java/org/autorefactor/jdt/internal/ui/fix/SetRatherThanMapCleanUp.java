@@ -74,7 +74,7 @@ public class SetRatherThanMapCleanUp extends AbstractClassSubstituteCleanUp {
      * @return the name.
      */
     public String getName() {
-        return "Set rather than map";
+        return MultiFixMessages.CleanUpRefactoringWizard_SetRatherThanMapCleanUp_name;
     }
 
     /**
@@ -83,8 +83,7 @@ public class SetRatherThanMapCleanUp extends AbstractClassSubstituteCleanUp {
      * @return the description.
      */
     public String getDescription() {
-        return ""
-            + "Replace map by set when values are not read.";
+        return MultiFixMessages.CleanUpRefactoringWizard_SetRatherThanMapCleanUp_description;
     }
 
     /**
@@ -93,7 +92,7 @@ public class SetRatherThanMapCleanUp extends AbstractClassSubstituteCleanUp {
      * @return the reason.
      */
     public String getReason() {
-        return "It simplify the code showing that the values are not used.";
+        return MultiFixMessages.CleanUpRefactoringWizard_SetRatherThanMapCleanUp_reason;
     }
 
     @Override

@@ -79,7 +79,7 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
      * @return the name.
      */
     public String getName() {
-        return "Map.entrySet() rather than Map.keySet() and value search";
+        return MultiFixMessages.CleanUpRefactoringWizard_EntrySetRatherThanKeySetAndValueSearchCleanUp_name;
     }
 
     /**
@@ -88,8 +88,7 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
      * @return the description.
      */
     public String getDescription() {
-        return ""
-                + "Convert for loops iterating on Map.keySet() to iterate on Map.entrySet() when possible.";
+        return MultiFixMessages.CleanUpRefactoringWizard_EntrySetRatherThanKeySetAndValueSearchCleanUp_description;
     }
 
     /**
@@ -98,8 +97,7 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
      * @return the reason.
      */
     public String getReason() {
-        return "It reduces the coding, reading, debugging and testing cost."
-                + " It also improves the time and the space performance.";
+        return MultiFixMessages.CleanUpRefactoringWizard_EntrySetRatherThanKeySetAndValueSearchCleanUp_reason;
     }
 
     /**

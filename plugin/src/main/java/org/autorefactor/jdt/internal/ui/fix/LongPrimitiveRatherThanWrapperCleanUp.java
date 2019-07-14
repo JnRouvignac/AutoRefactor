@@ -58,7 +58,7 @@ public class LongPrimitiveRatherThanWrapperCleanUp extends AbstractPrimitiveRath
      * @return the name.
      */
     public String getName() {
-        return "Long primitive rather than wrapper";
+        return MultiFixMessages.CleanUpRefactoringWizard_LongPrimitiveRatherThanWrapperCleanUp_name;
     }
 
     /**
@@ -67,8 +67,7 @@ public class LongPrimitiveRatherThanWrapperCleanUp extends AbstractPrimitiveRath
      * @return the description.
      */
     public String getDescription() {
-        return ""
-            + "Replace Long wrapper object by long primitive type when an object is not necessary.";
+        return MultiFixMessages.CleanUpRefactoringWizard_LongPrimitiveRatherThanWrapperCleanUp_description;
     }
 
     /**
@@ -77,8 +76,7 @@ public class LongPrimitiveRatherThanWrapperCleanUp extends AbstractPrimitiveRath
      * @return the reason.
      */
     public String getReason() {
-        return "It improves the readibility and reduces null pointer check."
-                + " It also improves the space performance.";
+        return MultiFixMessages.CleanUpRefactoringWizard_LongPrimitiveRatherThanWrapperCleanUp_reason;
     }
 
     @Override

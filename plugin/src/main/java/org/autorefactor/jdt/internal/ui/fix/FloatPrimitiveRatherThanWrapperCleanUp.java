@@ -52,7 +52,7 @@ public class FloatPrimitiveRatherThanWrapperCleanUp extends AbstractPrimitiveRat
      * @return the name.
      */
     public String getName() {
-        return "Float primitive rather than wrapper";
+        return MultiFixMessages.CleanUpRefactoringWizard_FloatPrimitiveRatherThanWrapperCleanUp_name;
     }
 
     /**
@@ -61,8 +61,7 @@ public class FloatPrimitiveRatherThanWrapperCleanUp extends AbstractPrimitiveRat
      * @return the description.
      */
     public String getDescription() {
-        return ""
-            + "Replace Float wrapper object by float primitive type when an object is not necessary.";
+        return MultiFixMessages.CleanUpRefactoringWizard_FloatPrimitiveRatherThanWrapperCleanUp_description;
     }
 
     /**
@@ -71,8 +70,7 @@ public class FloatPrimitiveRatherThanWrapperCleanUp extends AbstractPrimitiveRat
      * @return the reason.
      */
     public String getReason() {
-        return "It improves the readibility and reduces null pointer check."
-                + " It also improves the space performance.";
+        return MultiFixMessages.CleanUpRefactoringWizard_FloatPrimitiveRatherThanWrapperCleanUp_reason;
     }
 
     @Override

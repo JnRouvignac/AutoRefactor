@@ -49,7 +49,7 @@ public class RemoveOverridenAssignmentCleanUp extends AbstractCleanUpRule {
      * @return the name.
      */
     public String getName() {
-        return "Remove overriden assignment";
+        return MultiFixMessages.CleanUpRefactoringWizard_RemoveOverridenAssignmentCleanUp_name;
     }
 
     /**
@@ -58,7 +58,7 @@ public class RemoveOverridenAssignmentCleanUp extends AbstractCleanUpRule {
      * @return the description.
      */
     public String getDescription() {
-        return "Remove passive assignment when the variable is reassigned before being read.";
+        return MultiFixMessages.CleanUpRefactoringWizard_RemoveOverridenAssignmentCleanUp_description;
     }
 
     /**
@@ -67,7 +67,7 @@ public class RemoveOverridenAssignmentCleanUp extends AbstractCleanUpRule {
      * @return the reason.
      */
     public String getReason() {
-        return "It improves the readibility. It also improves the time and the space performance.";
+        return MultiFixMessages.CleanUpRefactoringWizard_RemoveOverridenAssignmentCleanUp_reason;
     }
 
     @Override

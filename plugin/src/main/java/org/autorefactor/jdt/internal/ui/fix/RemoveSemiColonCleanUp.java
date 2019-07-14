@@ -76,7 +76,7 @@ public class RemoveSemiColonCleanUp extends AbstractCleanUpRule {
      * @return the name.
      */
     public String getName() {
-        return "Remove semi-colons";
+        return MultiFixMessages.CleanUpRefactoringWizard_RemoveSemiColonCleanUp_name;
     }
 
     /**
@@ -85,7 +85,7 @@ public class RemoveSemiColonCleanUp extends AbstractCleanUpRule {
      * @return the description.
      */
     public String getDescription() {
-        return "Removes superfluous semi-colon after body declarations in type declarations.";
+        return MultiFixMessages.CleanUpRefactoringWizard_RemoveSemiColonCleanUp_description;
     }
 
     /**
@@ -94,7 +94,7 @@ public class RemoveSemiColonCleanUp extends AbstractCleanUpRule {
      * @return the reason.
      */
     public String getReason() {
-        return "It reduces code to focus attention on code that matters.";
+        return MultiFixMessages.CleanUpRefactoringWizard_RemoveSemiColonCleanUp_reason;
     }
 
     @Override

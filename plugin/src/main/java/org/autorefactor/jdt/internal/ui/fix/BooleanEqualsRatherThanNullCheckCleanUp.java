@@ -56,7 +56,7 @@ public class BooleanEqualsRatherThanNullCheckCleanUp extends AbstractCleanUpRule
      * @return the name.
      */
     public String getName() {
-        return "Boolean equals() rather than null check";
+        return MultiFixMessages.CleanUpRefactoringWizard_BooleanEqualsRatherThanNullCheckCleanUp_name;
     }
 
     /**
@@ -65,7 +65,7 @@ public class BooleanEqualsRatherThanNullCheckCleanUp extends AbstractCleanUpRule
      * @return the description.
      */
     public String getDescription() {
-        return "Replace a null check of a Boolean followed by its value by an equality with a boolean constant.";
+        return MultiFixMessages.CleanUpRefactoringWizard_BooleanEqualsRatherThanNullCheckCleanUp_description;
     }
 
     /**
@@ -74,7 +74,7 @@ public class BooleanEqualsRatherThanNullCheckCleanUp extends AbstractCleanUpRule
      * @return the reason.
      */
     public String getReason() {
-        return "It reduces the coding, reading, debugging and testing cost.";
+        return MultiFixMessages.CleanUpRefactoringWizard_BooleanEqualsRatherThanNullCheckCleanUp_reason;
     }
 
     @Override

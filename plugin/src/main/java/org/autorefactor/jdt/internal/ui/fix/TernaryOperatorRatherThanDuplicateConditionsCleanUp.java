@@ -55,7 +55,7 @@ public class TernaryOperatorRatherThanDuplicateConditionsCleanUp extends Abstrac
      * @return the name.
      */
     public String getName() {
-        return "Ternary operator rather than duplicate conditions";
+        return MultiFixMessages.CleanUpRefactoringWizard_TernaryOperatorRatherThanDuplicateConditionsCleanUp_name;
     }
 
     /**
@@ -64,8 +64,7 @@ public class TernaryOperatorRatherThanDuplicateConditionsCleanUp extends Abstrac
      * @return the description.
      */
     public String getDescription() {
-        return ""
-            + "Replace (X && Y) || (!X && Z) by X ? Y : Z.";
+        return MultiFixMessages.CleanUpRefactoringWizard_TernaryOperatorRatherThanDuplicateConditionsCleanUp_description;
     }
 
     /**
@@ -74,7 +73,7 @@ public class TernaryOperatorRatherThanDuplicateConditionsCleanUp extends Abstrac
      * @return the reason.
      */
     public String getReason() {
-        return "It improves the readibility.";
+        return MultiFixMessages.CleanUpRefactoringWizard_TernaryOperatorRatherThanDuplicateConditionsCleanUp_reason;
     }
 
     @Override

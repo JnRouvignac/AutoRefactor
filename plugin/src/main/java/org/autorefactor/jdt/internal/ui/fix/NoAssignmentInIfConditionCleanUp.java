@@ -58,7 +58,7 @@ public class NoAssignmentInIfConditionCleanUp extends AbstractCleanUpRule {
      * @return the name.
      */
     public String getName() {
-        return "No assignment in if condition";
+        return MultiFixMessages.CleanUpRefactoringWizard_NoAssignmentInIfConditionCleanUp_name;
     }
 
     /**
@@ -67,7 +67,7 @@ public class NoAssignmentInIfConditionCleanUp extends AbstractCleanUpRule {
      * @return the description.
      */
     public String getDescription() {
-        return "Moves assignments inside an if condition before the if node.";
+        return MultiFixMessages.CleanUpRefactoringWizard_NoAssignmentInIfConditionCleanUp_description;
     }
 
     /**
@@ -76,7 +76,7 @@ public class NoAssignmentInIfConditionCleanUp extends AbstractCleanUpRule {
      * @return the reason.
      */
     public String getReason() {
-        return "It improves the readibility and reduces the bug hazard.";
+        return MultiFixMessages.CleanUpRefactoringWizard_NoAssignmentInIfConditionCleanUp_reason;
     }
 
     @Override

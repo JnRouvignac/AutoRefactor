@@ -64,7 +64,7 @@ public class HashMapRatherThanTreeMapCleanUp extends AbstractClassSubstituteClea
      * @return the name.
      */
     public String getName() {
-        return "HashMap rather than TreeMap";
+        return MultiFixMessages.CleanUpRefactoringWizard_HashMapRatherThanTreeMapCleanUp_name;
     }
 
     /**
@@ -73,8 +73,7 @@ public class HashMapRatherThanTreeMapCleanUp extends AbstractClassSubstituteClea
      * @return the description.
      */
     public String getDescription() {
-        return ""
-            + "Replace TreeMap by HashMap when the entry order is not used.";
+        return MultiFixMessages.CleanUpRefactoringWizard_HashMapRatherThanTreeMapCleanUp_description;
     }
 
     /**
@@ -83,7 +82,7 @@ public class HashMapRatherThanTreeMapCleanUp extends AbstractClassSubstituteClea
      * @return the reason.
      */
     public String getReason() {
-        return "It improves the time and the space performance.";
+        return MultiFixMessages.CleanUpRefactoringWizard_HashMapRatherThanTreeMapCleanUp_reason;
     }
 
     @Override

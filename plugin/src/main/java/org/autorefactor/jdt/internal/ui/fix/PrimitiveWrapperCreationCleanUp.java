@@ -54,7 +54,7 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
      * @return the name.
      */
     public String getName() {
-        return "Primitive wrapper creation";
+        return MultiFixMessages.CleanUpRefactoringWizard_PrimitiveWrapperCreationCleanUp_name;
     }
 
     /**
@@ -63,9 +63,7 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
      * @return the description.
      */
     public String getDescription() {
-        return ""
-            + "Replaces unnecessary primitive wrappers instance creations"
-            + " by using static factory methods (\"valueOf()\") or existing constants.";
+        return MultiFixMessages.CleanUpRefactoringWizard_PrimitiveWrapperCreationCleanUp_description;
     }
 
     /**
@@ -74,7 +72,7 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
      * @return the reason.
      */
     public String getReason() {
-        return "It dramatically improves the space performance.";
+        return MultiFixMessages.CleanUpRefactoringWizard_PrimitiveWrapperCreationCleanUp_reason;
     }
 
     private int getJavaMinorVersion() {

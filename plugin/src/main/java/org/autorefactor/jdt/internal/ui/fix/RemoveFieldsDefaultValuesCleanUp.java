@@ -48,7 +48,7 @@ public class RemoveFieldsDefaultValuesCleanUp extends AbstractCleanUpRule {
      * @return the name.
      */
     public String getName() {
-        return "Remove fields default values";
+        return MultiFixMessages.CleanUpRefactoringWizard_RemoveFieldsDefaultValuesCleanUp_name;
     }
 
     /**
@@ -57,10 +57,7 @@ public class RemoveFieldsDefaultValuesCleanUp extends AbstractCleanUpRule {
      * @return the description.
      */
     public String getDescription() {
-        return ""
-                + "Removes field initializers when they are the default value of the field's types.\n"
-                + "For example, the initializer will be removed for integer fields initialized to \"0\".\n"
-                + "Likewise, the initializer will be removed for non primitive fields initialized to \"null\".";
+        return MultiFixMessages.CleanUpRefactoringWizard_RemoveFieldsDefaultValuesCleanUp_description;
     }
 
     /**
@@ -69,7 +66,7 @@ public class RemoveFieldsDefaultValuesCleanUp extends AbstractCleanUpRule {
      * @return the reason.
      */
     public String getReason() {
-        return "It reduces the code to focus the attention on the other non-default initializations.";
+        return MultiFixMessages.CleanUpRefactoringWizard_RemoveFieldsDefaultValuesCleanUp_reason;
     }
 
     @Override

@@ -45,7 +45,7 @@ public class EndOfMethodRatherThanReturnCleanUp extends AbstractCleanUpRule {
      * @return the name.
      */
     public String getName() {
-        return "End of method rather than return";
+        return MultiFixMessages.CleanUpRefactoringWizard_EndOfMethodRatherThanReturnCleanUp_name;
     }
 
     /**
@@ -54,7 +54,7 @@ public class EndOfMethodRatherThanReturnCleanUp extends AbstractCleanUpRule {
      * @return the description.
      */
     public String getDescription() {
-        return "Removes useless lone return at the end of a method.";
+        return MultiFixMessages.CleanUpRefactoringWizard_EndOfMethodRatherThanReturnCleanUp_description;
     }
 
     /**
@@ -63,7 +63,7 @@ public class EndOfMethodRatherThanReturnCleanUp extends AbstractCleanUpRule {
      * @return the reason.
      */
     public String getReason() {
-        return "It reduces code to focus attention on code that matters.";
+        return MultiFixMessages.CleanUpRefactoringWizard_EndOfMethodRatherThanReturnCleanUp_reason;
     }
 
     @Override

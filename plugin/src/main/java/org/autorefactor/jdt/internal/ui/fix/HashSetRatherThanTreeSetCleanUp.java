@@ -68,7 +68,7 @@ public class HashSetRatherThanTreeSetCleanUp extends AbstractClassSubstituteClea
      * @return the name.
      */
     public String getName() {
-        return "HashSet rather than TreeSet";
+        return MultiFixMessages.CleanUpRefactoringWizard_HashSetRatherThanTreeSetCleanUp_name;
     }
 
     /**
@@ -77,8 +77,7 @@ public class HashSetRatherThanTreeSetCleanUp extends AbstractClassSubstituteClea
      * @return the description.
      */
     public String getDescription() {
-        return ""
-            + "Replace TreeSet by HashSet when the entry order is not used.";
+        return MultiFixMessages.CleanUpRefactoringWizard_HashSetRatherThanTreeSetCleanUp_description;
     }
 
     /**
@@ -87,7 +86,7 @@ public class HashSetRatherThanTreeSetCleanUp extends AbstractClassSubstituteClea
      * @return the reason.
      */
     public String getReason() {
-        return "It improves the time and the space performance.";
+        return MultiFixMessages.CleanUpRefactoringWizard_HashSetRatherThanTreeSetCleanUp_reason;
     }
 
     @Override

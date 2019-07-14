@@ -48,7 +48,7 @@ public class StringBuilderMethodRatherThanReassignationCleanUp extends AbstractC
      * @return the name.
      */
     public String getName() {
-        return "StringBuilder method call rather than reassignation";
+        return MultiFixMessages.CleanUpRefactoringWizard_StringBuilderMethodRatherThanReassignationCleanUp_name;
     }
 
     /**
@@ -57,7 +57,7 @@ public class StringBuilderMethodRatherThanReassignationCleanUp extends AbstractC
      * @return the description.
      */
     public String getDescription() {
-        return "Removes the assignation to the same variable on a StringBuilder.append() call.";
+        return MultiFixMessages.CleanUpRefactoringWizard_StringBuilderMethodRatherThanReassignationCleanUp_description;
     }
 
     /**
@@ -66,7 +66,7 @@ public class StringBuilderMethodRatherThanReassignationCleanUp extends AbstractC
      * @return the reason.
      */
     public String getReason() {
-        return "It reduces the code to focus the attention on code that matters.";
+        return MultiFixMessages.CleanUpRefactoringWizard_StringBuilderMethodRatherThanReassignationCleanUp_reason;
     }
 
     @Override

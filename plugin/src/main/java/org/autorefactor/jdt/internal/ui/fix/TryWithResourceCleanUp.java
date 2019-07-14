@@ -67,7 +67,7 @@ public class TryWithResourceCleanUp extends AbstractCleanUpRule {
      * @return the name.
      */
     public String getName() {
-        return "Use try-with-resource";
+        return MultiFixMessages.CleanUpRefactoringWizard_TryWithResourceCleanUp_name;
     }
 
     /**
@@ -76,9 +76,7 @@ public class TryWithResourceCleanUp extends AbstractCleanUpRule {
      * @return the description.
      */
     public String getDescription() {
-        return ""
-            + "Changes code to make use of Java 7 try-with-resources feature. "
-            + "In particular, it removes now useless finally clauses.";
+        return MultiFixMessages.CleanUpRefactoringWizard_TryWithResourceCleanUp_description;
     }
 
     /**
@@ -87,7 +85,7 @@ public class TryWithResourceCleanUp extends AbstractCleanUpRule {
      * @return the reason.
      */
     public String getReason() {
-        return "It improves the readibility. It also upgrades legacy code.";
+        return MultiFixMessages.CleanUpRefactoringWizard_TryWithResourceCleanUp_reason;
     }
 
     @Override

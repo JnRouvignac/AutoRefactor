@@ -46,7 +46,7 @@ public class OppositeComparisonRatherThanNegativeExpressionCleanUp extends Abstr
      * @return the name.
      */
     public String getName() {
-        return "Opposite comparison rather than negative expression";
+        return MultiFixMessages.CleanUpRefactoringWizard_OppositeComparisonRatherThanNegativeExpressionCleanUp_name;
     }
 
     /**
@@ -55,7 +55,7 @@ public class OppositeComparisonRatherThanNegativeExpressionCleanUp extends Abstr
      * @return the description.
      */
     public String getDescription() {
-        return "Reverse a comparison expression to avoid a minus prefix.";
+        return MultiFixMessages.CleanUpRefactoringWizard_OppositeComparisonRatherThanNegativeExpressionCleanUp_description;
     }
 
     /**
@@ -64,7 +64,7 @@ public class OppositeComparisonRatherThanNegativeExpressionCleanUp extends Abstr
      * @return the reason.
      */
     public String getReason() {
-        return "It improves the readibility and the performance. It also fixes a SONAR alert (squid:S2676).";
+        return MultiFixMessages.CleanUpRefactoringWizard_OppositeComparisonRatherThanNegativeExpressionCleanUp_reason;
     }
 
     @Override

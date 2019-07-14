@@ -53,7 +53,7 @@ public class OneIfRatherThanDuplicateBlocksThatFallThroughCleanUp extends Abstra
      * @return the name.
      */
     public String getName() {
-        return "One if rather than duplicate blocks that fall through";
+        return MultiFixMessages.CleanUpRefactoringWizard_OneIfRatherThanDuplicateBlocksThatFallThroughCleanUp_name;
     }
 
     /**
@@ -62,7 +62,7 @@ public class OneIfRatherThanDuplicateBlocksThatFallThroughCleanUp extends Abstra
      * @return the description.
      */
     public String getDescription() {
-        return "Merge consecutive if statements with same code block that end with a jump statement.";
+        return MultiFixMessages.CleanUpRefactoringWizard_OneIfRatherThanDuplicateBlocksThatFallThroughCleanUp_description;
     }
 
     /**
@@ -71,7 +71,7 @@ public class OneIfRatherThanDuplicateBlocksThatFallThroughCleanUp extends Abstra
      * @return the reason.
      */
     public String getReason() {
-        return "It reduces the coding, reading, debugging and testing cost.";
+        return MultiFixMessages.CleanUpRefactoringWizard_OneIfRatherThanDuplicateBlocksThatFallThroughCleanUp_reason;
     }
 
     @Override

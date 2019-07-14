@@ -60,7 +60,7 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
      * @return the name.
      */
     public String getName() {
-        return "Standard method rather than Library method";
+        return MultiFixMessages.CleanUpRefactoringWizard_StandardMethodRatherThanLibraryMethodCleanUp_name;
     }
 
     /**
@@ -69,8 +69,7 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
      * @return the description.
      */
     public String getDescription() {
-        return "Stop using ObjectUtils.equals(), ObjectUtils.hashCode(), ObjectUtils.hashCodeMulti()"
-                + " and ObjectUtils.toString() to use java.util.Objects methods instead.";
+        return MultiFixMessages.CleanUpRefactoringWizard_StandardMethodRatherThanLibraryMethodCleanUp_description;
     }
 
     /**
@@ -79,8 +78,7 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
      * @return the reason.
      */
     public String getReason() {
-        return "Those specific Apache and Google methods are deprecated."
-                + " It also reduces the dependency to libraries.";
+        return MultiFixMessages.CleanUpRefactoringWizard_StandardMethodRatherThanLibraryMethodCleanUp_reason;
     }
 
     @Override

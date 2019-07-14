@@ -51,7 +51,7 @@ public class ComparisonCleanUp extends AbstractCleanUpRule {
      * @return the name.
      */
     public String getName() {
-        return "Comparison to 0 rather than 1 or -1";
+        return MultiFixMessages.CleanUpRefactoringWizard_ComparisonCleanUp_name;
     }
 
     /**
@@ -60,7 +60,7 @@ public class ComparisonCleanUp extends AbstractCleanUpRule {
      * @return the description.
      */
     public String getDescription() {
-        return "Fix Comparable.compareTo() usage.";
+        return MultiFixMessages.CleanUpRefactoringWizard_ComparisonCleanUp_description;
     }
 
     /**
@@ -69,7 +69,7 @@ public class ComparisonCleanUp extends AbstractCleanUpRule {
      * @return the reason.
      */
     public String getReason() {
-        return "It standardizes the code.";
+        return MultiFixMessages.CleanUpRefactoringWizard_ComparisonCleanUp_reason;
     }
 
     private int getJavaMinorVersion() {

@@ -46,7 +46,7 @@ public class CollapseIfStatementCleanUp extends AbstractCleanUpRule {
      * @return the name.
      */
     public String getName() {
-        return "Collapse if statements";
+        return MultiFixMessages.CleanUpRefactoringWizard_CollapseIfStatementCleanUp_name;
     }
 
     /**
@@ -55,7 +55,7 @@ public class CollapseIfStatementCleanUp extends AbstractCleanUpRule {
      * @return the description.
      */
     public String getDescription() {
-        return "Merge inside if statement into the parent if statement.";
+        return MultiFixMessages.CleanUpRefactoringWizard_CollapseIfStatementCleanUp_description;
     }
 
     /**
@@ -64,7 +64,7 @@ public class CollapseIfStatementCleanUp extends AbstractCleanUpRule {
      * @return the reason.
      */
     public String getReason() {
-        return "It reduces the coding, reading, debugging and testing cost.";
+        return MultiFixMessages.CleanUpRefactoringWizard_CollapseIfStatementCleanUp_reason;
     }
 
     @Override

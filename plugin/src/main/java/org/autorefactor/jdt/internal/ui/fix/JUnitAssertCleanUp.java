@@ -52,7 +52,7 @@ public class JUnitAssertCleanUp extends AbstractUnitTestCleanUp {
      * @return the name.
      */
     public String getName() {
-        return "JUnit asserts";
+        return MultiFixMessages.CleanUpRefactoringWizard_JUnitAssertCleanUp_name;
     }
 
     /**
@@ -61,7 +61,7 @@ public class JUnitAssertCleanUp extends AbstractUnitTestCleanUp {
      * @return the description.
      */
     public String getDescription() {
-        return "Refactors to a proper use of JUnit assertions.";
+        return MultiFixMessages.CleanUpRefactoringWizard_JUnitAssertCleanUp_description;
     }
 
     /**
@@ -70,7 +70,7 @@ public class JUnitAssertCleanUp extends AbstractUnitTestCleanUp {
      * @return the reason.
      */
     public String getReason() {
-        return "It improves the readibility of the code and the report.";
+        return MultiFixMessages.CleanUpRefactoringWizard_JUnitAssertCleanUp_reason;
     }
 
     @Override

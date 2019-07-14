@@ -412,7 +412,7 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
      * @return the name.
      */
     public String getName() {
-        return "Simple name rather than qualified name";
+        return MultiFixMessages.CleanUpRefactoringWizard_SimpleNameRatherThanQualifiedNameCleanUp_name;
     }
 
     /**
@@ -421,9 +421,7 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
      * @return the description.
      */
     public String getDescription() {
-        return "Refactors types, method invocations and field accesses"
-                + " to replace qualified names by simple names when appropriate."
-                + " For example when relevant imports exist.";
+        return MultiFixMessages.CleanUpRefactoringWizard_SimpleNameRatherThanQualifiedNameCleanUp_description;
     }
 
     /**
@@ -432,7 +430,7 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
      * @return the reason.
      */
     public String getReason() {
-        return "It reduces code to focus attention on code that matters.";
+        return MultiFixMessages.CleanUpRefactoringWizard_SimpleNameRatherThanQualifiedNameCleanUp_reason;
     }
 
     @Override

@@ -62,7 +62,7 @@ public class BooleanPrimitiveRatherThanWrapperCleanUp extends AbstractPrimitiveR
      * @return the name.
      */
     public String getName() {
-        return "Boolean primitive rather than wrapper";
+        return MultiFixMessages.CleanUpRefactoringWizard_BooleanPrimitiveRatherThanWrapperCleanUp_name;
     }
 
     /**
@@ -71,8 +71,7 @@ public class BooleanPrimitiveRatherThanWrapperCleanUp extends AbstractPrimitiveR
      * @return the description.
      */
     public String getDescription() {
-        return ""
-            + "Replace Boolean wrapper object by boolean primitive type when an object is not necessary.";
+        return MultiFixMessages.CleanUpRefactoringWizard_BooleanPrimitiveRatherThanWrapperCleanUp_description;
     }
 
     /**
@@ -81,8 +80,7 @@ public class BooleanPrimitiveRatherThanWrapperCleanUp extends AbstractPrimitiveR
      * @return the reason.
      */
     public String getReason() {
-        return "It improves the readibility and reduces null pointer check."
-                + " It also improves the space performance.";
+        return MultiFixMessages.CleanUpRefactoringWizard_BooleanPrimitiveRatherThanWrapperCleanUp_reason;
     }
 
     @Override

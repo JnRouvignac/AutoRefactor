@@ -66,7 +66,7 @@ public class CollectionCleanUp extends AbstractCleanUpRule {
      * @return the name.
      */
     public String getName() {
-        return "Inited collection rather than new collection and Collection.addAll()";
+        return MultiFixMessages.CleanUpRefactoringWizard_CollectionCleanUp_name;
     }
 
     /**
@@ -75,9 +75,7 @@ public class CollectionCleanUp extends AbstractCleanUpRule {
      * @return the description.
      */
     public String getDescription() {
-        return ""
-                + "Replaces creating a new Collection, then invoking Collection.addAll() on it,"
-                + " by creating the new Collection with the other Collection as parameter.";
+        return MultiFixMessages.CleanUpRefactoringWizard_CollectionCleanUp_description;
     }
 
     /**
@@ -86,7 +84,7 @@ public class CollectionCleanUp extends AbstractCleanUpRule {
      * @return the reason.
      */
     public String getReason() {
-        return "It reduces the reading and debugging cost.";
+        return MultiFixMessages.CleanUpRefactoringWizard_CollectionCleanUp_reason;
     }
 
     @Override

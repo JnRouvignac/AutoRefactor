@@ -65,21 +65,12 @@ public class ArrayDequeRatherThanStackCleanUp extends AbstractClassSubstituteCle
     }
 
     /**
-     * Get the reason.
-     *
-     * @return the reason.
-     */
-    public String getReason() {
-        return "It improves the time performance.";
-    }
-
-    /**
      * Get the name.
      *
      * @return the name.
      */
     public String getName() {
-        return "ArrayDeque rather than Stack";
+        return MultiFixMessages.CleanUpRefactoringWizard_ArrayDequeRatherThanStackCleanUp_name;
     }
 
     /**
@@ -88,8 +79,16 @@ public class ArrayDequeRatherThanStackCleanUp extends AbstractClassSubstituteCle
      * @return the description.
      */
     public String getDescription() {
-        return ""
-            + "Replace Stack by ArrayDeque when possible.";
+        return MultiFixMessages.CleanUpRefactoringWizard_ArrayDequeRatherThanStackCleanUp_description;
+    }
+
+    /**
+     * Get the reason.
+     *
+     * @return the reason.
+     */
+    public String getReason() {
+        return MultiFixMessages.CleanUpRefactoringWizard_ArrayDequeRatherThanStackCleanUp_reason;
     }
 
     @Override

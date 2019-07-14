@@ -73,7 +73,7 @@ public class ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp extends NewClassIm
      * @return the name.
      */
     public String getName() {
-        return "Objects equals rather than equals and null check";
+        return MultiFixMessages.CleanUpRefactoringWizard_ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp_name;
     }
 
     /**
@@ -82,7 +82,7 @@ public class ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp extends NewClassIm
      * @return the description.
      */
     public String getDescription() {
-        return "Simplify the equality between two objects.";
+        return MultiFixMessages.CleanUpRefactoringWizard_ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp_description;
     }
 
     /**
@@ -91,7 +91,7 @@ public class ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp extends NewClassIm
      * @return the reason.
      */
     public String getReason() {
-        return "It improves readibility. It is particularly useful for Eclipse-generated equals() method.";
+        return MultiFixMessages.CleanUpRefactoringWizard_ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp_reason;
     }
 
     @Override

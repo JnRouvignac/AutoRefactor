@@ -155,7 +155,6 @@
     </module>
     <module name="PackageName" />
     <module name="ParameterName" />
-    <module name="StaticVariableName" />
     <module name="TypeName" />
 
     <!-- As per Sun convention except also allowing "logger" or "xxxLogger"
@@ -188,13 +187,6 @@
         SIZE VIOLATIONS
     
     -->
-    
-    <!-- Unlike Sun conventions, allow lines bigger than 80 and imports to
-         exceed line length since they are a pain to wrap -->
-    <module name="LineLength">
-      <property name="max" value="120" />
-      <property name="ignorePattern" value="^import " />
-    </module>
     
     <!--  Restrict classes to one per file -->
     <module name="OuterTypeNumber" />
@@ -293,10 +285,6 @@
     <!--  As per Sun conventions -->
     <module name="FinalClass" />
     <module name="HideUtilityClassConstructor" />
-    <module name="VisibilityModifier">
-      <property name="packageAllowed" value="true"/>
-      <property name="protectedAllowed" value="true"/>
-    </module>
     
     <!--
     

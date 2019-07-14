@@ -52,7 +52,7 @@ public class DoublePrimitiveRatherThanWrapperCleanUp extends AbstractPrimitiveRa
      * @return the name.
      */
     public String getName() {
-        return "Double primitive rather than wrapper";
+        return MultiFixMessages.CleanUpRefactoringWizard_DoublePrimitiveRatherThanWrapperCleanUp_name;
     }
 
     /**
@@ -61,8 +61,7 @@ public class DoublePrimitiveRatherThanWrapperCleanUp extends AbstractPrimitiveRa
      * @return the description.
      */
     public String getDescription() {
-        return ""
-            + "Replace Double wrapper object by double primitive type when an object is not necessary.";
+        return MultiFixMessages.CleanUpRefactoringWizard_DoublePrimitiveRatherThanWrapperCleanUp_description;
     }
 
     /**
@@ -71,8 +70,7 @@ public class DoublePrimitiveRatherThanWrapperCleanUp extends AbstractPrimitiveRa
      * @return the reason.
      */
     public String getReason() {
-        return "It improves the readibility and reduces null pointer check."
-                + " It also improves the space performance.";
+        return MultiFixMessages.CleanUpRefactoringWizard_DoublePrimitiveRatherThanWrapperCleanUp_reason;
     }
 
     @Override

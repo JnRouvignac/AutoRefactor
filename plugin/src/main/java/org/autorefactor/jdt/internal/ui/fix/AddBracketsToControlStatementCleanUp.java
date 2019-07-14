@@ -45,7 +45,7 @@ public class AddBracketsToControlStatementCleanUp extends AbstractCleanUpRule {
      * @return the name.
      */
     public String getName() {
-        return "Add brackets to control statement";
+        return MultiFixMessages.CleanUpRefactoringWizard_AddBracketsToControlStatementCleanUp_name;
     }
 
     /**
@@ -54,12 +54,7 @@ public class AddBracketsToControlStatementCleanUp extends AbstractCleanUpRule {
      * @return the description.
      */
     public String getDescription() {
-        return ""
-            + "Adds brackets to:\n"
-            + "- if then/else clauses,\n"
-            + "- for loop body,\n"
-            + "- do ... while loop body,\n"
-            + "- while loop body.";
+        return MultiFixMessages.CleanUpRefactoringWizard_AddBracketsToControlStatementCleanUp_description;
     }
 
     /**
@@ -68,7 +63,7 @@ public class AddBracketsToControlStatementCleanUp extends AbstractCleanUpRule {
      * @return the reason.
      */
     public String getReason() {
-        return "It improves the readibility and reduce the bug hazard.";
+        return MultiFixMessages.CleanUpRefactoringWizard_AddBracketsToControlStatementCleanUp_reason;
     }
 
     @Override

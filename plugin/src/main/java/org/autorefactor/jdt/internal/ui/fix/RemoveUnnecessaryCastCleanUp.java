@@ -72,7 +72,7 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
      * @return the name.
      */
     public String getName() {
-        return "Remove unnecessary casts";
+        return MultiFixMessages.CleanUpRefactoringWizard_RemoveUnnecessaryCastCleanUp_name;
     }
 
     /**
@@ -81,9 +81,7 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
      * @return the description.
      */
     public String getDescription() {
-        return ""
-                + "Removes unnecessary widening casts from return statements, assignments and infix expressions. "
-                + "Correctly types literals. ";
+        return MultiFixMessages.CleanUpRefactoringWizard_RemoveUnnecessaryCastCleanUp_description;
     }
 
     /**
@@ -92,8 +90,7 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
      * @return the reason.
      */
     public String getReason() {
-        return "It reduces code to focus attention on code that matters."
-                + " It also improves the time and the space performance.";
+        return MultiFixMessages.CleanUpRefactoringWizard_RemoveUnnecessaryCastCleanUp_reason;
     }
 
     @Override

@@ -88,7 +88,7 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
      * @return the name.
      */
     public String getName() {
-        return "Simplify expressions";
+        return MultiFixMessages.CleanUpRefactoringWizard_SimplifyExpressionCleanUp_name;
     }
 
     /**
@@ -97,12 +97,7 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
      * @return the description.
      */
     public String getDescription() {
-        return ""
-                + "Simplifies Java expressions:\n"
-                + "- remove redundant null checks or useless right-hand side or left-hand side operands,\n"
-                + "- remove useless parentheses,\n"
-                + "- directly check boolean values instead of comparing them with true/false,\n"
-                + "- reduce double negation in boolean expression.";
+        return MultiFixMessages.CleanUpRefactoringWizard_SimplifyExpressionCleanUp_description;
     }
 
     /**
@@ -111,7 +106,7 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
      * @return the reason.
      */
     public String getReason() {
-        return "It improves the readibility and the performance.";
+        return MultiFixMessages.CleanUpRefactoringWizard_SimplifyExpressionCleanUp_reason;
     }
 
     /** A mapping of child operation to parent operation that mandates using parentheses. */

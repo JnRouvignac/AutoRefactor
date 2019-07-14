@@ -49,7 +49,7 @@ public class MergeConditionalBlocksCleanUp extends AbstractCleanUpRule {
      * @return the name.
      */
     public String getName() {
-        return "Merge conditional statements";
+        return MultiFixMessages.CleanUpRefactoringWizard_MergeConditionalBlocksCleanUp_name;
     }
 
     /**
@@ -58,7 +58,7 @@ public class MergeConditionalBlocksCleanUp extends AbstractCleanUpRule {
      * @return the description.
      */
     public String getDescription() {
-        return "Merge adjacent if / else if / else statements with same code block.";
+        return MultiFixMessages.CleanUpRefactoringWizard_MergeConditionalBlocksCleanUp_description;
     }
 
     /**
@@ -67,7 +67,7 @@ public class MergeConditionalBlocksCleanUp extends AbstractCleanUpRule {
      * @return the reason.
      */
     public String getReason() {
-        return "It reduces the coding, reading, debugging and testing cost.";
+        return MultiFixMessages.CleanUpRefactoringWizard_MergeConditionalBlocksCleanUp_reason;
     }
 
     @Override
