@@ -109,19 +109,15 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
         return MultiFixMessages.CleanUpRefactoringWizard_SimplifyExpressionCleanUp_reason;
     }
 
-    /** A mapping of child operation to parent operation that mandates using parentheses. */
-    private static final List<Pair<Operator, Operator>> SHOULD_HAVE_PARENTHESES =
-            Arrays.<Pair<Operator, Operator>>asList(
-                    Pair.of(CONDITIONAL_AND, CONDITIONAL_OR),
-                    Pair.of(AND, XOR),
-                    Pair.of(AND, OR),
-                    Pair.of(XOR, OR),
-                    Pair.of(LEFT_SHIFT, OR),
-                    Pair.of(LEFT_SHIFT, AND),
-                    Pair.of(RIGHT_SHIFT_SIGNED, OR),
-                    Pair.of(RIGHT_SHIFT_SIGNED, AND),
-                    Pair.of(RIGHT_SHIFT_UNSIGNED, OR),
-                    Pair.of(RIGHT_SHIFT_UNSIGNED, AND));
+    /**
+     * A mapping of child operation to parent operation that mandates using
+     * parentheses.
+     */
+    private static final List<Pair<Operator, Operator>> SHOULD_HAVE_PARENTHESES= Arrays
+            .<Pair<Operator, Operator>>asList(Pair.of(CONDITIONAL_AND, CONDITIONAL_OR), Pair.of(AND, XOR),
+                    Pair.of(AND, OR), Pair.of(XOR, OR), Pair.of(LEFT_SHIFT, OR), Pair.of(LEFT_SHIFT, AND),
+                    Pair.of(RIGHT_SHIFT_SIGNED, OR), Pair.of(RIGHT_SHIFT_SIGNED, AND),
+                    Pair.of(RIGHT_SHIFT_UNSIGNED, OR), Pair.of(RIGHT_SHIFT_UNSIGNED, AND));
 
     // TODO Very few parenthesized expressions are actually needed. They are:
     // 1) inside InfixExpressions with logical operators (&&, ||, etc.)
@@ -136,7 +132,7 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
 
     @Override
     public boolean visit(ParenthesizedExpression node) {
-        final Expression innerExpr = getExpressionWithoutParentheses(node);
+        final Expression innerExpr= getExpressionWithoutParentheses(node);
         if (innerExpr != node) {
             return replaceBy(node, innerExpr);
         }
@@ -144,8 +140,8 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
     }
 
     private Expression getExpressionWithoutParentheses(ParenthesizedExpression node) {
-        final ASTNode parent = node.getParent();
-        final Expression innerExpr = node.getExpression();
+        final ASTNode parent= node.getParent();
+        final Expression innerExpr= node.getExpression();
         if (innerExpr instanceof ParenthesizedExpression) {
             return innerExpr;
         }
@@ -191,7 +187,7 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
         if (isUselessParenthesesInStatement(parent, node)) {
             return innerExpr;
         }
-        final int compareTo = OperatorEnum.compareTo(innerExpr, parent);
+        final int compareTo= OperatorEnum.compareTo(innerExpr, parent);
         if (compareTo < 0) {
             return node;
         } else if (compareTo > 0) {
@@ -219,27 +215,23 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
     /**
      * Returns whether the supplied expression is complex enough to read.
      *
-     * @param innerExpr
-     *          the inner expression to test for ease of read
-     * @param parent
-     *          the parent node to test for ease of read
+     * @param innerExpr the inner expression to test for ease of read
+     * @param parent    the parent node to test for ease of read
      * @return true if the expressions is hard to read, false otherwise
      */
     private boolean isInnerExprHardToRead(final Expression innerExpr, final ASTNode parent) {
         if (parent instanceof InfixExpression) {
             if (innerExpr instanceof InfixExpression) {
-                final InfixExpression innerIe = (InfixExpression) innerExpr;
-                final Operator innerOp = innerIe.getOperator();
-                final Operator parentOp = ((InfixExpression) parent).getOperator();
+                final InfixExpression innerIe= (InfixExpression) innerExpr;
+                final Operator innerOp= innerIe.getOperator();
+                final Operator parentOp= ((InfixExpression) parent).getOperator();
                 return EQUALS.equals(parentOp) || shouldHaveParentheses(innerOp, parentOp)
                         || is(innerIe.getLeftOperand(), Assignment.class)
                         || is(innerIe.getRightOperand(), Assignment.class);
             }
         } else if (parent instanceof ConditionalExpression) {
-            return innerExpr instanceof ConditionalExpression
-                    || innerExpr instanceof Assignment
-                    || innerExpr instanceof InstanceofExpression
-                    || innerExpr instanceof InfixExpression;
+            return innerExpr instanceof ConditionalExpression || innerExpr instanceof Assignment
+                    || innerExpr instanceof InstanceofExpression || innerExpr instanceof InfixExpression;
         }
         return false;
     }
@@ -247,25 +239,25 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
     private boolean isUselessParenthesesInStatement(ASTNode parent, ParenthesizedExpression node) {
         switch (parent.getNodeType()) {
         case ASTNode.ASSIGNMENT:
-            final Assignment a = (Assignment) parent;
+            final Assignment a= (Assignment) parent;
             return node.equals(a.getRightHandSide());
         case ASTNode.METHOD_INVOCATION:
-            final MethodInvocation mi = (MethodInvocation) parent;
+            final MethodInvocation mi= (MethodInvocation) parent;
             return arguments(mi).contains(node) || canRemoveParenthesesAroundExpression(mi, node);
         case ASTNode.IF_STATEMENT:
-            final IfStatement is = (IfStatement) parent;
+            final IfStatement is= (IfStatement) parent;
             return node.equals(is.getExpression());
         case ASTNode.WHILE_STATEMENT:
-            final WhileStatement ws = (WhileStatement) parent;
+            final WhileStatement ws= (WhileStatement) parent;
             return node.equals(ws.getExpression());
         case ASTNode.DO_STATEMENT:
-            final DoStatement ds = (DoStatement) parent;
+            final DoStatement ds= (DoStatement) parent;
             return node.equals(ds.getExpression());
         case ASTNode.RETURN_STATEMENT:
-            final ReturnStatement rs = (ReturnStatement) parent;
+            final ReturnStatement rs= (ReturnStatement) parent;
             return node.equals(rs.getExpression());
         case ASTNode.VARIABLE_DECLARATION_FRAGMENT:
-            final VariableDeclarationFragment vdf = (VariableDeclarationFragment) parent;
+            final VariableDeclarationFragment vdf= (VariableDeclarationFragment) parent;
             return node.equals(vdf.getInitializer());
         default:
             return false;
@@ -289,23 +281,23 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
 
     @Override
     public boolean visit(InfixExpression node) {
-        final Expression lhs = node.getLeftOperand();
-        final Expression rhs = node.getRightOperand();
+        final Expression lhs= node.getLeftOperand();
+        final Expression rhs= node.getRightOperand();
         if (hasOperator(node, CONDITIONAL_OR)) {
-            final List<Expression> remainingOperands = removeUselessOperands(node, true, false);
+            final List<Expression> remainingOperands= removeUselessOperands(node, true, false);
             if (!remainingOperands.equals(allOperands(node))) {
                 return replaceWithNewInfixExpr(node, remainingOperands);
             }
         } else if (hasOperator(node, CONDITIONAL_AND)) {
-            final List<Expression> remainingOperands = removeUselessOperands(node, false, true);
+            final List<Expression> remainingOperands= removeUselessOperands(node, false, true);
             if (!remainingOperands.equals(allOperands(node))) {
                 return replaceWithNewInfixExpr(node, remainingOperands);
             } else {
                 // FIXME this should actually check anywhere in the infix expression,
                 // not only for left and right operands,
                 // said otherwise: handle extended operands
-                final Expression nullCheckedExpressionLHS = getNullCheckedExpression(lhs);
-                final Expression nullCheckedExpressionRHS = getNullCheckedExpression(rhs);
+                final Expression nullCheckedExpressionLHS= getNullCheckedExpression(lhs);
+                final Expression nullCheckedExpressionRHS= getNullCheckedExpression(rhs);
                 if (nullCheckedExpressionLHS != null) {
                     if (isNullCheckRedundant(rhs, nullCheckedExpressionLHS)) {
                         checkNoExtendedOperands(node);
@@ -315,8 +307,7 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
                     return replaceBy(node, lhs);
                 }
             }
-        } else if (hasOperator(node, EQUALS, NOT_EQUALS, XOR)
-                && !node.hasExtendedOperands()
+        } else if (hasOperator(node, EQUALS, NOT_EQUALS, XOR) && !node.hasExtendedOperands()
                 && maybeReduceBooleanExpression(node, lhs, rhs) == DO_NOT_VISIT_SUBTREE) {
             return DO_NOT_VISIT_SUBTREE;
         }
@@ -330,8 +321,8 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
 
     private boolean maybeReduceBooleanExpression(final InfixExpression node, final Expression leftExpr,
             final Expression rightExpr) {
-        final Boolean leftBoolean = getBooleanLiteral(leftExpr);
-        final Boolean rightBoolean = getBooleanLiteral(rightExpr);
+        final Boolean leftBoolean= getBooleanLiteral(leftExpr);
+        final Boolean rightBoolean= getBooleanLiteral(rightExpr);
 
         if (leftBoolean != null) {
             return replace(node, leftBoolean.booleanValue(), rightExpr);
@@ -339,32 +330,32 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
             return replace(node, rightBoolean.booleanValue(), leftExpr);
         }
 
-        Expression leftOppositeExpr = null;
-        final PrefixExpression leftPrefix = as(leftExpr, PrefixExpression.class);
+        Expression leftOppositeExpr= null;
+        final PrefixExpression leftPrefix= as(leftExpr, PrefixExpression.class);
         if (leftPrefix != null && hasOperator(leftPrefix, NOT)) {
-            leftOppositeExpr = leftPrefix.getOperand();
+            leftOppositeExpr= leftPrefix.getOperand();
         }
 
-        Expression rightOppositeExpr = null;
-        final PrefixExpression rightPrefix = as(rightExpr, PrefixExpression.class);
+        Expression rightOppositeExpr= null;
+        final PrefixExpression rightPrefix= as(rightExpr, PrefixExpression.class);
         if (rightPrefix != null && hasOperator(rightPrefix, NOT)) {
-            rightOppositeExpr = rightPrefix.getOperand();
+            rightOppositeExpr= rightPrefix.getOperand();
         }
 
-        final ASTBuilder b = this.ctx.getASTBuilder();
-        final Refactorings r = this.ctx.getRefactorings();
+        final ASTBuilder b= this.ctx.getASTBuilder();
+        final Refactorings r= this.ctx.getRefactorings();
         if (leftOppositeExpr == null) {
             if (rightOppositeExpr != null) {
-                final Operator reverseOp = getReverseOperator(node);
+                final Operator reverseOp= getReverseOperator(node);
                 r.replace(node, b.infixExpr(b.copy(leftExpr), reverseOp, b.copy(rightOppositeExpr)));
                 return DO_NOT_VISIT_SUBTREE;
             }
         } else {
             if (rightOppositeExpr != null) {
-                r.replace(node, b.infixExpr(b.copy(leftOppositeExpr), getAppropriateOperator(node),
-                        b.copy(rightOppositeExpr)));
+                r.replace(node,
+                        b.infixExpr(b.copy(leftOppositeExpr), getAppropriateOperator(node), b.copy(rightOppositeExpr)));
             } else {
-                final Operator reverseOp = getReverseOperator(node);
+                final Operator reverseOp= getReverseOperator(node);
                 r.replace(node, b.infixExpr(b.copy(leftOppositeExpr), reverseOp, b.copy(rightExpr)));
             }
             return DO_NOT_VISIT_SUBTREE;
@@ -391,8 +382,7 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
 
     private boolean replace(final InfixExpression node, final boolean isTrue, final Expression exprToCopy) {
         checkNoExtendedOperands(node);
-        if (!isPrimitive(node.getLeftOperand(), "boolean")
-                && !isPrimitive(node.getRightOperand(), "boolean")) {
+        if (!isPrimitive(node.getLeftOperand(), "boolean") && !isPrimitive(node.getRightOperand(), "boolean")) {
             return VISIT_SUBTREE;
         }
         // Either:
@@ -400,35 +390,32 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
         // - One boolean primitive and one Boolean object, this code already run
         // the risk of an NPE, so we can replace the infix expression without
         // fearing we would introduce a previously non existing NPE.
-        final ASTBuilder b = this.ctx.getASTBuilder();
+        final ASTBuilder b= this.ctx.getASTBuilder();
         final Expression operand;
         if (isTrue == hasOperator(node, EQUALS)) {
-            operand = b.copy(exprToCopy);
+            operand= b.copy(exprToCopy);
         } else {
-            operand = b.negate(exprToCopy);
+            operand= b.negate(exprToCopy);
         }
         this.ctx.getRefactorings().replace(node, operand);
         return DO_NOT_VISIT_SUBTREE;
     }
 
-    private boolean replaceWithNewInfixExpr(InfixExpression node,
-            final List<Expression> remainingOperands) {
+    private boolean replaceWithNewInfixExpr(InfixExpression node, final List<Expression> remainingOperands) {
         if (remainingOperands.size() == 1) {
             replaceBy(node, remainingOperands.get(0));
         } else {
-            final ASTBuilder b = ctx.getASTBuilder();
-            ctx.getRefactorings().replace(node,
-                    b.infixExpr(node.getOperator(), b.move(remainingOperands)));
+            final ASTBuilder b= ctx.getASTBuilder();
+            ctx.getRefactorings().replace(node, b.infixExpr(node.getOperator(), b.move(remainingOperands)));
         }
         return DO_NOT_VISIT_SUBTREE;
     }
 
-    private List<Expression> removeUselessOperands(InfixExpression node,
-            Boolean shortCircuitValue, Boolean noOpValue) {
-        final List<Expression> allOperands = allOperands(node);
-        for (ListIterator<Expression> it = allOperands.listIterator(); it.hasNext();) {
-            final Expression operand = it.next();
-            final Object value = operand.resolveConstantExpressionValue();
+    private List<Expression> removeUselessOperands(InfixExpression node, Boolean shortCircuitValue, Boolean noOpValue) {
+        final List<Expression> allOperands= allOperands(node);
+        for (ListIterator<Expression> it= allOperands.listIterator(); it.hasNext();) {
+            final Expression operand= it.next();
+            final Object value= operand.resolveConstantExpressionValue();
             if (shortCircuitValue.equals(value)) {
                 removeRemaining(it);
                 break;
@@ -447,9 +434,9 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
     }
 
     private boolean shouldHaveParentheses(InfixExpression node) {
-        final Operator childOp = node.getOperator();
+        final Operator childOp= node.getOperator();
         if (node.getParent() instanceof InfixExpression) {
-            final InfixExpression ie = (InfixExpression) node.getParent();
+            final InfixExpression ie= (InfixExpression) node.getParent();
             return shouldHaveParentheses(childOp, ie.getOperator());
         }
         return false;
@@ -457,8 +444,8 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
 
     private boolean shouldHaveParentheses(Operator actualChildOp, Operator actualParentOp) {
         for (Pair<Operator, Operator> pair : SHOULD_HAVE_PARENTHESES) {
-            final Operator childOp = pair.getFirst();
-            final Operator parentOp = pair.getSecond();
+            final Operator childOp= pair.getFirst();
+            final Operator parentOp= pair.getSecond();
             if (childOp.equals(actualChildOp) && parentOp.equals(actualParentOp)) {
                 return true;
             }
@@ -467,12 +454,12 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
     }
 
     private void addParentheses(Expression e) {
-        final ASTBuilder b = this.ctx.getASTBuilder();
+        final ASTBuilder b= this.ctx.getASTBuilder();
         this.ctx.getRefactorings().replace(e, b.parenthesize(b.copy(e)));
     }
 
     private boolean replaceBy(ASTNode node, Expression expr) {
-        final ASTBuilder b = ctx.getASTBuilder();
+        final ASTBuilder b= ctx.getASTBuilder();
         ctx.getRefactorings().replace(node, b.move(expr));
         return DO_NOT_VISIT_SUBTREE;
     }
@@ -489,16 +476,15 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
     private boolean isNullCheckRedundant(Expression e, Expression nullCheckedExpression) {
         if (nullCheckedExpression != null) {
             if (e instanceof InstanceofExpression) {
-                final Expression expr = ((InstanceofExpression) e).getLeftOperand();
+                final Expression expr= ((InstanceofExpression) e).getLeftOperand();
                 return expr.subtreeMatch(new ASTSemanticMatcher(), nullCheckedExpression);
             } else if (e instanceof MethodInvocation) {
-                final MethodInvocation expr = (MethodInvocation) e;
-                if (expr.getExpression() != null
-                        && expr.getExpression().resolveConstantExpressionValue() != null
+                final MethodInvocation expr= (MethodInvocation) e;
+                if (expr.getExpression() != null && expr.getExpression().resolveConstantExpressionValue() != null
                         && arguments(expr).size() == 1
-                        && arguments(expr).get(0).subtreeMatch(
-                                new ASTSemanticMatcher(), nullCheckedExpression)) {
-                    // Did we invoke java.lang.Object.equals() or java.lang.String.equalsIgnoreCase()?
+                        && arguments(expr).get(0).subtreeMatch(new ASTSemanticMatcher(), nullCheckedExpression)) {
+                    // Did we invoke java.lang.Object.equals() or
+                    // java.lang.String.equalsIgnoreCase()?
                     return isMethod(expr, "java.lang.Object", "equals", "java.lang.Object")
                             || isMethod(expr, "java.lang.String", "equalsIgnoreCase", "java.lang.String");
                 }

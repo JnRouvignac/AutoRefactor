@@ -57,20 +57,20 @@ public class RefactoringContext {
      * Builds an instance of this class.
      *
      * @param compilationUnit the compilation unit to refactor
-     * @param astRoot the compilation unit, root of the AST
-     * @param options the Java project options used to compile the project
-     * @param monitor the progress monitor of the current job
-     * @param environment the environment
+     * @param astRoot         the compilation unit, root of the AST
+     * @param options         the Java project options used to compile the project
+     * @param monitor         the progress monitor of the current job
+     * @param environment     the environment
      */
-    public RefactoringContext(ICompilationUnit compilationUnit, CompilationUnit astRoot,
-            JavaProjectOptions options, SubMonitor monitor, Environment environment) {
-        this.compilationUnit = compilationUnit;
-        this.astRoot = astRoot;
-        this.monitor = monitor;
-        this.environment = environment;
-        this.refactorings = new Refactorings(astRoot, environment.getEventLoop(), monitor);
-        this.astBuilder = new ASTBuilder(refactorings);
-        this.options = options;
+    public RefactoringContext(ICompilationUnit compilationUnit, CompilationUnit astRoot, JavaProjectOptions options,
+            SubMonitor monitor, Environment environment) {
+        this.compilationUnit= compilationUnit;
+        this.astRoot= astRoot;
+        this.monitor= monitor;
+        this.environment= environment;
+        this.refactorings= new Refactorings(astRoot, environment.getEventLoop(), monitor);
+        this.astBuilder= new ASTBuilder(refactorings);
+        this.options= options;
     }
 
     /**
@@ -119,9 +119,11 @@ public class RefactoringContext {
     }
 
     /**
-     * Returns the {@link Refactorings} object containing the changes that must be applied to the AST.
+     * Returns the {@link Refactorings} object containing the changes that must be
+     * applied to the AST.
      *
-     * @return the {@link Refactorings} object containing the changes that must be applied to the AST
+     * @return the {@link Refactorings} object containing the changes that must be
+     *         applied to the AST
      */
     public Refactorings getRefactorings() {
         return refactorings;

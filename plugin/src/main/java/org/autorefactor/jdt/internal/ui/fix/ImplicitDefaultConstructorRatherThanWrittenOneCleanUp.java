@@ -44,8 +44,7 @@ import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 
 /** See {@link #getDescription()} method. */
-public class ImplicitDefaultConstructorRatherThanWrittenOneCleanUp extends
-        AbstractCleanUpRule {
+public class ImplicitDefaultConstructorRatherThanWrittenOneCleanUp extends AbstractCleanUpRule {
     /**
      * Get the name.
      *
@@ -76,26 +75,26 @@ public class ImplicitDefaultConstructorRatherThanWrittenOneCleanUp extends
     @Override
     public boolean visit(final TypeDeclaration node) {
         if (!node.isInterface()) {
-            MethodDeclaration uniqueConstructor = null;
-            boolean isPublicClass = false;
-            boolean isProtectedClass = false;
-            boolean isPackageClass = true;
-            boolean isPrivateClass = false;
+            MethodDeclaration uniqueConstructor= null;
+            boolean isPublicClass= false;
+            boolean isProtectedClass= false;
+            boolean isPackageClass= true;
+            boolean isPrivateClass= false;
 
             for (final IExtendedModifier extendedModifier : modifiers(node)) {
                 if (extendedModifier.isModifier()) {
-                    final Modifier modifier = (Modifier) extendedModifier;
+                    final Modifier modifier= (Modifier) extendedModifier;
                     if (modifier.isPublic()) {
-                        isPublicClass = true;
-                        isPackageClass = false;
+                        isPublicClass= true;
+                        isPackageClass= false;
                         break;
                     } else if (modifier.isProtected()) {
-                        isProtectedClass = true;
-                        isPackageClass = false;
+                        isProtectedClass= true;
+                        isPackageClass= false;
                         break;
                     } else if (modifier.isPrivate()) {
-                        isPrivateClass = true;
-                        isPackageClass = false;
+                        isPrivateClass= true;
+                        isPackageClass= false;
                         break;
                     }
                 }
@@ -104,7 +103,7 @@ public class ImplicitDefaultConstructorRatherThanWrittenOneCleanUp extends
             for (final MethodDeclaration methodDeclaration : node.getMethods()) {
                 if (methodDeclaration.isConstructor()) {
                     if (uniqueConstructor == null) {
-                        uniqueConstructor = methodDeclaration;
+                        uniqueConstructor= methodDeclaration;
                     } else {
                         // Too much constructors
                         return VISIT_SUBTREE;
@@ -113,19 +112,16 @@ public class ImplicitDefaultConstructorRatherThanWrittenOneCleanUp extends
             }
 
             if (uniqueConstructor != null
-                    && (!isCheckedExceptionThrown(uniqueConstructor)
-                    || node.getSuperclassType() == null
-                    || hasType(node.getSuperclassType().resolveBinding(), "java.lang.Object"))
+                    && (!isCheckedExceptionThrown(uniqueConstructor) || node.getSuperclassType() == null
+                            || hasType(node.getSuperclassType().resolveBinding(), "java.lang.Object"))
                     && (uniqueConstructor.parameters() == null || uniqueConstructor.parameters().isEmpty())
                     && isDefaultStmts(uniqueConstructor)) {
-                if (uniqueConstructor.modifiers() != null
-                        && uniqueConstructor.modifiers().size() == 1) {
-                    final IExtendedModifier extendedModifier = (IExtendedModifier) uniqueConstructor.modifiers().get(0);
+                if (uniqueConstructor.modifiers() != null && uniqueConstructor.modifiers().size() == 1) {
+                    final IExtendedModifier extendedModifier= (IExtendedModifier) uniqueConstructor.modifiers().get(0);
                     if (extendedModifier.isModifier()) {
-                        Modifier modifier = (Modifier) extendedModifier;
-                        if ((modifier.isPublic() && isPublicClass)
-                            || (modifier.isProtected() && isProtectedClass)
-                            || (modifier.isPrivate() && isPrivateClass)) {
+                        Modifier modifier= (Modifier) extendedModifier;
+                        if ((modifier.isPublic() && isPublicClass) || (modifier.isProtected() && isProtectedClass)
+                                || (modifier.isPrivate() && isPrivateClass)) {
                             ctx.getRefactorings().remove(uniqueConstructor);
                             return DO_NOT_VISIT_SUBTREE;
                         }
@@ -142,13 +138,13 @@ public class ImplicitDefaultConstructorRatherThanWrittenOneCleanUp extends
     }
 
     private boolean isDefaultStmts(final MethodDeclaration uniqueConstructor) {
-        final List<Statement> stmts = statements(uniqueConstructor.getBody());
+        final List<Statement> stmts= statements(uniqueConstructor.getBody());
         if (stmts == null || stmts.isEmpty()) {
             return true;
         } else if (stmts.size() == 1) {
-            final Statement stmt = stmts.get(0);
+            final Statement stmt= stmts.get(0);
             if (stmt instanceof SuperConstructorInvocation) {
-                final SuperConstructorInvocation superStmt = (SuperConstructorInvocation) stmt;
+                final SuperConstructorInvocation superStmt= (SuperConstructorInvocation) stmt;
                 if (superStmt.arguments() == null || superStmt.arguments().isEmpty()) {
                     return true;
                 }
@@ -169,8 +165,7 @@ public class ImplicitDefaultConstructorRatherThanWrittenOneCleanUp extends
     }
 
     private boolean isChecked(Type type) {
-        final ITypeBinding binding = type.resolveBinding();
-        return !instanceOf(binding, "java.lang.RuntimeException")
-                && !instanceOf(binding, "java.lang.Error");
+        final ITypeBinding binding= type.resolveBinding();
+        return !instanceOf(binding, "java.lang.RuntimeException") && !instanceOf(binding, "java.lang.Error");
     }
 }

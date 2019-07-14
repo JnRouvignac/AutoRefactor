@@ -50,10 +50,9 @@ public class SetRatherThanListCleanUp extends AbstractClassSubstituteCleanUp {
 
         @Override
         public boolean visit(Block node) {
-            isContainsMethodUsed = false;
-            final boolean isSubTreeToVisit =
-                    SetRatherThanListCleanUp.this.maybeRefactorBlock(node,
-                            getClassesToUseWithImport(), getImportsToAdd());
+            isContainsMethodUsed= false;
+            final boolean isSubTreeToVisit= SetRatherThanListCleanUp.this.maybeRefactorBlock(node,
+                    getClassesToUseWithImport(), getImportsToAdd());
 
             return isSubTreeToVisit;
         }
@@ -64,27 +63,18 @@ public class SetRatherThanListCleanUp extends AbstractClassSubstituteCleanUp {
         return new RefactoringWithObjectsClass();
     }
 
-    private static final Map<String, String[]> CAN_BE_CASTED_TO = new HashMap<String, String[]>();
+    private static final Map<String, String[]> CAN_BE_CASTED_TO= new HashMap<String, String[]>();
 
     static {
-        CAN_BE_CASTED_TO.put("java.lang.Object", new String[]{"java.lang.Object"});
-        CAN_BE_CASTED_TO.put("java.lang.Cloneable", new String[]{"java.lang.Cloneable", "java.lang.Object"});
-        CAN_BE_CASTED_TO.put("java.io.Serializable",
-                new String[]{"java.io.Serializable", "java.lang.Object"});
-        CAN_BE_CASTED_TO.put("java.util.Collection", new String[]{"java.util.Collection", "java.lang.Object"});
-        CAN_BE_CASTED_TO.put("java.util.List", new String[]{"java.util.List", "java.lang.Object"});
-        CAN_BE_CASTED_TO.put("java.util.AbstractList",
-                new String[]{"java.util.AbstractList", "java.util.List", "java.lang.Object"});
-        CAN_BE_CASTED_TO.put("java.util.AbstractCollection",
-                new String[]{"java.util.AbstractCollection", "java.util.Collection", "java.lang.Object"});
-        CAN_BE_CASTED_TO.put("java.util.LinkedList",
-                new String[]{"java.util.LinkedList", "java.util.AbstractList", "java.util.List",
-                    "java.util.AbstractCollection", "java.util.Collection",
-                    "java.io.Serializable", "java.lang.Cloneable", "java.lang.Object"});
-        CAN_BE_CASTED_TO.put("java.util.ArrayList",
-                new String[]{"java.util.ArrayList", "java.util.AbstractList", "java.util.List",
-                    "java.util.AbstractCollection", "java.util.Collection",
-                    "java.io.Serializable", "java.lang.Cloneable", "java.lang.Object"});
+        CAN_BE_CASTED_TO.put("java.lang.Object", new String[] { "java.lang.Object" });
+        CAN_BE_CASTED_TO.put("java.lang.Cloneable", new String[] { "java.lang.Cloneable", "java.lang.Object" });
+        CAN_BE_CASTED_TO.put("java.io.Serializable", new String[] { "java.io.Serializable", "java.lang.Object" });
+        CAN_BE_CASTED_TO.put("java.util.Collection", new String[] { "java.util.Collection", "java.lang.Object" });
+        CAN_BE_CASTED_TO.put("java.util.List", new String[] { "java.util.List", "java.lang.Object" });
+        CAN_BE_CASTED_TO.put("java.util.AbstractList", new String[] { "java.util.AbstractList", "java.util.List", "java.lang.Object" });
+        CAN_BE_CASTED_TO.put("java.util.AbstractCollection", new String[] { "java.util.AbstractCollection", "java.util.Collection", "java.lang.Object" });
+        CAN_BE_CASTED_TO.put("java.util.LinkedList", new String[] { "java.util.LinkedList", "java.util.AbstractList", "java.util.List", "java.util.AbstractCollection", "java.util.Collection", "java.io.Serializable", "java.lang.Cloneable", "java.lang.Object" });
+        CAN_BE_CASTED_TO.put("java.util.ArrayList", new String[] { "java.util.ArrayList", "java.util.AbstractList", "java.util.List", "java.util.AbstractCollection", "java.util.Collection", "java.io.Serializable", "java.lang.Cloneable", "java.lang.Object" });
     }
 
     private boolean isContainsMethodUsed;
@@ -118,13 +108,13 @@ public class SetRatherThanListCleanUp extends AbstractClassSubstituteCleanUp {
 
     @Override
     public boolean visit(Block node) {
-        isContainsMethodUsed = false;
+        isContainsMethodUsed= false;
         return super.visit(node);
     }
 
     @Override
     protected String[] getExistingClassCanonicalName() {
-        return new String[] {"java.util.ArrayList", "java.util.LinkedList"};
+        return new String[] { "java.util.ArrayList", "java.util.LinkedList" };
     }
 
     @Override
@@ -157,7 +147,7 @@ public class SetRatherThanListCleanUp extends AbstractClassSubstituteCleanUp {
     protected boolean canMethodBeRefactored(final MethodInvocation mi,
             final List<MethodInvocation> methodCallsToRefactor) {
         if (isMethod(mi, "java.util.Collection", "contains", "java.lang.Object")) {
-            isContainsMethodUsed = true;
+            isContainsMethodUsed= true;
         }
 
         if (isMethod(mi, "java.util.List", "add", "int", "java.lang.Object")
@@ -170,12 +160,9 @@ public class SetRatherThanListCleanUp extends AbstractClassSubstituteCleanUp {
                 || isMethod(mi, "java.util.Collection", "addAll", "java.util.Collection")
                 || isMethod(mi, "java.util.Collection", "clear")
                 || isMethod(mi, "java.util.Collection", "contains", "java.lang.Object")
-                || isMethod(mi, "java.util.Collection", "isEmpty")
-                || isMethod(mi, "java.lang.Object", "finalize")
-                || isMethod(mi, "java.lang.Object", "notify")
-                || isMethod(mi, "java.lang.Object", "notifyAll")
-                || isMethod(mi, "java.lang.Object", "wait")
-                || isMethod(mi, "java.lang.Object", "wait", "long")
+                || isMethod(mi, "java.util.Collection", "isEmpty") || isMethod(mi, "java.lang.Object", "finalize")
+                || isMethod(mi, "java.lang.Object", "notify") || isMethod(mi, "java.lang.Object", "notifyAll")
+                || isMethod(mi, "java.lang.Object", "wait") || isMethod(mi, "java.lang.Object", "wait", "long")
                 || isMethod(mi, "java.lang.Object", "wait", "long", "int");
     }
 
@@ -184,18 +171,16 @@ public class SetRatherThanListCleanUp extends AbstractClassSubstituteCleanUp {
             final MethodInvocation refactoredMi) {
         if (isMethod(originalMi, "java.util.List", "add", "int", "java.lang.Object")
                 || isMethod(originalMi, "java.util.List", "addAll", "int", "java.util.Collection")) {
-            List<Expression> args = arguments(refactoredMi);
-            Expression item = args.get(1);
+            List<Expression> args= arguments(refactoredMi);
+            Expression item= args.get(1);
             args.clear();
             args.add(item);
         }
     }
 
     @Override
-    protected boolean isTypeCompatible(final ITypeBinding variableType,
-            final ITypeBinding refType) {
-        return super.isTypeCompatible(variableType, refType)
-                || hasType(variableType,
-                           getOrDefault(CAN_BE_CASTED_TO, refType.getErasure().getQualifiedName(), new String[0]));
+    protected boolean isTypeCompatible(final ITypeBinding variableType, final ITypeBinding refType) {
+        return super.isTypeCompatible(variableType, refType) || hasType(variableType,
+                getOrDefault(CAN_BE_CASTED_TO, refType.getErasure().getQualifiedName(), new String[0]));
     }
 }

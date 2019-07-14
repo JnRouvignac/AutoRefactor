@@ -63,7 +63,10 @@ public final class ForLoopHelper {
         INDEX,
         /** The for loop iterates using an iterator. */
         ITERATOR,
-        /** The for loop iterates via a foreach. Technically this could be desugared by using an iterator. */
+        /**
+         * The for loop iterates via a foreach. Technically this could be desugared by
+         * using an iterator.
+         */
         FOREACH
     }
 
@@ -77,33 +80,33 @@ public final class ForLoopHelper {
         private Name elementVariable;
 
         private ForLoopContent() {
-           // use method factories
+            // use method factories
         }
 
         private static ForLoopContent indexedArray(Name containerVariable, Name loopVariable) {
-            final ForLoopContent content = new ForLoopContent();
-            content.iterationType = IterationType.INDEX;
-            content.containerType = ContainerType.ARRAY;
-            content.containerVariable = containerVariable;
-            content.loopVariable = loopVariable;
+            final ForLoopContent content= new ForLoopContent();
+            content.iterationType= IterationType.INDEX;
+            content.containerType= ContainerType.ARRAY;
+            content.containerVariable= containerVariable;
+            content.loopVariable= loopVariable;
             return content;
         }
 
         private static ForLoopContent indexedCollection(Name containerVariable, Name loopVariable) {
-            final ForLoopContent content = new ForLoopContent();
-            content.iterationType = IterationType.INDEX;
-            content.containerType = ContainerType.COLLECTION;
-            content.containerVariable = containerVariable;
-            content.loopVariable = loopVariable;
+            final ForLoopContent content= new ForLoopContent();
+            content.iterationType= IterationType.INDEX;
+            content.containerType= ContainerType.COLLECTION;
+            content.containerVariable= containerVariable;
+            content.loopVariable= loopVariable;
             return content;
         }
 
         private static ForLoopContent iteratedCollection(Expression iteratorVariable, Name containerVariable) {
-            final ForLoopContent content = new ForLoopContent();
-            content.iterationType = IterationType.ITERATOR;
-            content.containerType = ContainerType.COLLECTION;
-            content.containerVariable = containerVariable;
-            content.iteratorVariable = iteratorVariable;
+            final ForLoopContent content= new ForLoopContent();
+            content.iterationType= IterationType.ITERATOR;
+            content.containerType= ContainerType.COLLECTION;
+            content.containerVariable= containerVariable;
+            content.iteratorVariable= iteratorVariable;
             return content;
         }
 
@@ -163,49 +166,43 @@ public final class ForLoopHelper {
 
         @Override
         public String toString() {
-            return getClass().getSimpleName() + "("
-                    + "iterationType=" + iterationType
-                    + ", containerType=" + containerType
-                    + ", containerVariable=" + containerVariable
-                    + ", iteratorVariable=" + iteratorVariable
-                    + ", loopVariable=" + loopVariable
-                    + ", elementVariable=" + elementVariable
+            return getClass().getSimpleName() + "(" + "iterationType=" + iterationType + ", containerType="
+                    + containerType + ", containerVariable=" + containerVariable + ", iteratorVariable="
+                    + iteratorVariable + ", loopVariable=" + loopVariable + ", elementVariable=" + elementVariable
                     + ")";
         }
     }
 
     /**
-     * Returns the {@link ForLoopContent} if this for loop iterates over a container.
+     * Returns the {@link ForLoopContent} if this for loop iterates over a
+     * container.
      *
      * @param node the for statement
-     * @return the {@link ForLoopContent} if this for loop iterates over a container, null otherwise
+     * @return the {@link ForLoopContent} if this for loop iterates over a
+     *         container, null otherwise
      */
     public static ForLoopContent iterateOverContainer(ForStatement node) {
-        final List<Expression> initializers = initializers(node);
-        final Expression condition = node.getExpression();
-        final List<Expression> updaters = updaters(node);
+        final List<Expression> initializers= initializers(node);
+        final Expression condition= node.getExpression();
+        final List<Expression> updaters= updaters(node);
         if (initializers.size() == 1) {
-            Expression firstInit = initializers.get(0);
+            Expression firstInit= initializers.get(0);
             if (updaters.isEmpty()) {
-                final Pair<Name, Expression> initPair = decomposeInitializer(firstInit);
-                final Name init = initPair.getFirst();
-                final MethodInvocation condMi = as(node.getExpression(), MethodInvocation.class);
-                final MethodInvocation initMi = as(initPair.getSecond(), MethodInvocation.class);
-                if (condMi != null
-                        && isSameVariable(init, condMi.getExpression())
+                final Pair<Name, Expression> initPair= decomposeInitializer(firstInit);
+                final Name init= initPair.getFirst();
+                final MethodInvocation condMi= as(node.getExpression(), MethodInvocation.class);
+                final MethodInvocation initMi= as(initPair.getSecond(), MethodInvocation.class);
+                if (condMi != null && isSameVariable(init, condMi.getExpression())
                         && isMethod(initMi, "java.util.Collection", "iterator")
                         && isMethod(condMi, "java.util.Iterator", "hasNext")) {
                     return getIteratorOnCollection(initMi.getExpression(), condMi.getExpression());
                 }
-            } else if (updaters.size() == 1
-                    && isPrimitive(firstInit, "int")) {
-                final Pair<Name, Expression> initPair = decomposeInitializer(firstInit);
-                final Name init = initPair.getFirst();
-                final ForLoopContent forContent = getIndexOnIterable(condition, init);
-                final Name updater = getUpdaterOperand(updaters.get(0));
-                if (forContent != null
-                        && isZero(initPair.getSecond())
-                        && isSameVariable(init, forContent.loopVariable)
+            } else if (updaters.size() == 1 && isPrimitive(firstInit, "int")) {
+                final Pair<Name, Expression> initPair= decomposeInitializer(firstInit);
+                final Name init= initPair.getFirst();
+                final ForLoopContent forContent= getIndexOnIterable(condition, init);
+                final Name updater= getUpdaterOperand(updaters.get(0));
+                if (forContent != null && isZero(initPair.getSecond()) && isSameVariable(init, forContent.loopVariable)
                         && isSameVariable(init, updater)) {
                     return forContent;
                 }
@@ -222,16 +219,16 @@ public final class ForLoopHelper {
     }
 
     private static Name getUpdaterOperand(Expression updater) {
-        Expression updaterOperand = null;
+        Expression updaterOperand= null;
         if (updater instanceof PostfixExpression) {
-            final PostfixExpression pe = (PostfixExpression) updater;
+            final PostfixExpression pe= (PostfixExpression) updater;
             if (hasOperator(pe, PostfixExpression.Operator.INCREMENT)) {
-                updaterOperand = pe.getOperand();
+                updaterOperand= pe.getOperand();
             }
         } else if (updater instanceof PrefixExpression) {
-            final PrefixExpression pe = (PrefixExpression) updater;
+            final PrefixExpression pe= (PrefixExpression) updater;
             if (hasOperator(pe, PrefixExpression.Operator.INCREMENT)) {
-                updaterOperand = pe.getOperand();
+                updaterOperand= pe.getOperand();
             }
         }
         if (updaterOperand instanceof Name) {
@@ -241,26 +238,25 @@ public final class ForLoopHelper {
     }
 
     /**
-     * Decomposes an initializer into a {@link Pair} with the name of the initialized variable
-     * and the initializing expression.
+     * Decomposes an initializer into a {@link Pair} with the name of the
+     * initialized variable and the initializing expression.
      *
-     * @param init
-     *          the initializer to decompose
-     * @return a {@link Pair} with the name of the initialized variable and the initializing
-     *         expression, or {@code null} if the initializer could not be decomposed
+     * @param init the initializer to decompose
+     * @return a {@link Pair} with the name of the initialized variable and the
+     *         initializing expression, or {@code null} if the initializer could not
+     *         be decomposed
      */
     public static Pair<Name, Expression> decomposeInitializer(Expression init) {
         if (init instanceof VariableDeclarationExpression) {
-            final VariableDeclarationExpression vde = (VariableDeclarationExpression) init;
-            final List<VariableDeclarationFragment> fragments = fragments(vde);
+            final VariableDeclarationExpression vde= (VariableDeclarationExpression) init;
+            final List<VariableDeclarationFragment> fragments= fragments(vde);
             if (fragments.size() == 1) {
-                final VariableDeclarationFragment fragment = fragments.get(0);
+                final VariableDeclarationFragment fragment= fragments.get(0);
                 return Pair.of((Name) fragment.getName(), fragment.getInitializer());
             }
         } else if (init instanceof Assignment) {
-            final Assignment as = (Assignment) init;
-            if (hasOperator(as, ASSIGN)
-                    && as.getLeftHandSide() instanceof Name) {
+            final Assignment as= (Assignment) init;
+            if (hasOperator(as, ASSIGN) && as.getLeftHandSide() instanceof Name) {
                 return Pair.of((Name) as.getLeftHandSide(), as.getRightHandSide());
             }
         }
@@ -269,7 +265,7 @@ public final class ForLoopHelper {
 
     private static boolean isZero(final Expression expr) {
         if (expr != null) {
-            final Object val = expr.resolveConstantExpressionValue();
+            final Object val= expr.resolveConstantExpressionValue();
             if (val instanceof Integer) {
                 return ((Integer) val).intValue() == 0;
             }
@@ -278,10 +274,10 @@ public final class ForLoopHelper {
     }
 
     private static ForLoopContent getIndexOnIterable(final Expression condition, Name loopVariable) {
-        final InfixExpression ie = as(condition, InfixExpression.class);
+        final InfixExpression ie= as(condition, InfixExpression.class);
         if (ie != null && !ie.hasExtendedOperands()) {
-            final Expression leftOp = ie.getLeftOperand();
-            final Expression rightOp = ie.getRightOperand();
+            final Expression leftOp= ie.getLeftOperand();
+            final Expression rightOp= ie.getRightOperand();
             if (hasOperator(ie, LESS)) {
                 return buildForLoopContent(loopVariable, rightOp);
             } else if (hasOperator(ie, GREATER)) {
@@ -296,16 +292,15 @@ public final class ForLoopHelper {
             return null;
         }
         if (containerVar instanceof MethodInvocation) {
-            final MethodInvocation mi = (MethodInvocation) containerVar;
-            final Name containerVarName = as(mi.getExpression(), Name.class);
-            if (containerVarName != null
-                    && isMethod(mi, "java.util.Collection", "size")) {
+            final MethodInvocation mi= (MethodInvocation) containerVar;
+            final Name containerVarName= as(mi.getExpression(), Name.class);
+            if (containerVarName != null && isMethod(mi, "java.util.Collection", "size")) {
                 return ForLoopContent.indexedCollection(containerVarName, (Name) loopVar);
             }
         } else if (containerVar instanceof QualifiedName) {
-            final QualifiedName containerVarName = (QualifiedName) containerVar;
+            final QualifiedName containerVarName= (QualifiedName) containerVar;
             if (isArrayLength(containerVarName)) {
-                Name containerVariable = ((QualifiedName) containerVar).getQualifier();
+                Name containerVariable= ((QualifiedName) containerVar).getQualifier();
                 return ForLoopContent.indexedArray(containerVariable, (Name) loopVar);
             }
         }
@@ -313,7 +308,6 @@ public final class ForLoopHelper {
     }
 
     private static boolean isArrayLength(final QualifiedName containerVarName) {
-        return isArray(containerVarName.getQualifier())
-                && "length".equals(containerVarName.getName().getIdentifier());
+        return isArray(containerVarName.getQualifier()) && "length".equals(containerVarName.getName().getIdentifier());
     }
 }

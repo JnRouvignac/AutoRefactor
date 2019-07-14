@@ -95,22 +95,16 @@ public class CommonIfInIfElseCleanUp extends AbstractCleanUpRule {
 
     @Override
     public boolean visit(IfStatement node) {
-        final IfStatement thenInnerIfStmt = as(node.getThenStatement(), IfStatement.class);
-        final IfStatement elseInnerIfStmt = as(node.getElseStatement(), IfStatement.class);
-        if (isPassive(node.getExpression())
-                && thenInnerIfStmt != null
-                && elseInnerIfStmt != null
-                && thenInnerIfStmt.getElseStatement() == null
-                && elseInnerIfStmt.getElseStatement() == null
+        final IfStatement thenInnerIfStmt= as(node.getThenStatement(), IfStatement.class);
+        final IfStatement elseInnerIfStmt= as(node.getElseStatement(), IfStatement.class);
+        if (isPassive(node.getExpression()) && thenInnerIfStmt != null && elseInnerIfStmt != null
+                && thenInnerIfStmt.getElseStatement() == null && elseInnerIfStmt.getElseStatement() == null
                 && isPassive(thenInnerIfStmt.getExpression())
                 && match(new ASTSemanticMatcher(), thenInnerIfStmt.getExpression(), elseInnerIfStmt.getExpression())) {
-            final ASTBuilder b = this.ctx.getASTBuilder();
+            final ASTBuilder b= this.ctx.getASTBuilder();
             this.ctx.getRefactorings().replace(node,
-                    b.if0(b.move(thenInnerIfStmt.getExpression()),
-                            b.block(
-                                    b.if0(b.move(node.getExpression()),
-                                            b.move(thenInnerIfStmt.getThenStatement()),
-                                            b.move(elseInnerIfStmt.getThenStatement())))));
+                    b.if0(b.move(thenInnerIfStmt.getExpression()), b.block(b.if0(b.move(node.getExpression()),
+                            b.move(thenInnerIfStmt.getThenStatement()), b.move(elseInnerIfStmt.getThenStatement())))));
             return DO_NOT_VISIT_SUBTREE;
         }
         return VISIT_SUBTREE;

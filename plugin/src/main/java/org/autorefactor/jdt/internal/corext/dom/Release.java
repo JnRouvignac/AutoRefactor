@@ -41,13 +41,13 @@ public final class Release {
     private final String releaseName;
 
     private Release(String releaseName, int... versionNumbers) {
-        this.releaseName = releaseName;
-        this.version = normalize(versionNumbers);
+        this.releaseName= releaseName;
+        this.version= normalize(versionNumbers);
     }
 
     private int[] normalize(int[] versionNumbers) {
         int i;
-        for (i = versionNumbers.length - 1; i >= 0; i--) {
+        for (i= versionNumbers.length - 1; i >= 0; i--) {
             if (versionNumbers[i] != 0) {
                 break;
             }
@@ -55,13 +55,14 @@ public final class Release {
         if (i == versionNumbers.length - 1) {
             return versionNumbers;
         }
-        int[] newVersionNumbers = new int[i + 1];
+        int[] newVersionNumbers= new int[i + 1];
         System.arraycopy(versionNumbers, 0, newVersionNumbers, 0, i + 1);
         return newVersionNumbers;
     }
 
     /**
-     * Factory method that builds a release instance for Java SE with the version provided as a string.
+     * Factory method that builds a release instance for Java SE with the version
+     * provided as a string.
      *
      * @param version the string representation of the version
      * @return a release instance for Java SE
@@ -72,14 +73,15 @@ public final class Release {
     }
 
     /**
-     * Factory method that builds a release instance for Java SE with the version provided as integer varargs.
+     * Factory method that builds a release instance for Java SE with the version
+     * provided as integer varargs.
      *
      * @param version the integer varargs representation of the version
      * @return a release instance for Java SE
      * @throws RuntimeException if the provided version is not valid
      */
     public static Release javaSE(int... version) {
-        final Release release = new Release("JavaSE", version);
+        final Release release= new Release("JavaSE", version);
         if (!release.isVersionValid()) {
             throw new IllegalArgumentException(null, "Invalid version for " + release);
         }
@@ -99,11 +101,11 @@ public final class Release {
     }
 
     private static int[] toIntegerArray(String version) {
-        final String[] versionNumbers = version.split("\\.");
-        final int[] result = new int[versionNumbers.length];
-        for (int i = 0; i < versionNumbers.length; i++) {
-            final String nb = versionNumbers[i];
-            result[i] = Integer.parseInt(nb);
+        final String[] versionNumbers= version.split("\\.");
+        final int[] result= new int[versionNumbers.length];
+        for (int i= 0; i < versionNumbers.length; i++) {
+            final String nb= versionNumbers[i];
+            result[i]= Integer.parseInt(nb);
         }
         return result;
     }
@@ -113,19 +115,20 @@ public final class Release {
      * Newer releases are considered compatible with older releases.
      *
      * @param requiredRelease the required release
-     * @return true if the current release is compatible with the required release, false otherwise
+     * @return true if the current release is compatible with the required release,
+     *         false otherwise
      */
     public boolean isCompatibleWith(Release requiredRelease) {
         if (!this.releaseName.equals(requiredRelease.releaseName)) {
             return false;
         }
-        final int min = Math.min(this.version.length, requiredRelease.version.length);
-        for (int i = 0; i < min; i++) {
-            final int nb = this.version[i];
-            final int requiredNb = requiredRelease.version[i];
+        final int min= Math.min(this.version.length, requiredRelease.version.length);
+        for (int i= 0; i < min; i++) {
+            final int nb= this.version[i];
+            final int requiredNb= requiredRelease.version[i];
             if (nb < requiredNb) {
                 return false;
-            } else  if (nb > requiredNb) {
+            } else if (nb > requiredNb) {
                 return true;
             }
         }
@@ -133,8 +136,8 @@ public final class Release {
     }
 
     /**
-     * Returns the major version of a release.
-     * For example, if the release version is "1.3.5", then this method will return "1".
+     * Returns the major version of a release. For example, if the release version
+     * is "1.3.5", then this method will return "1".
      *
      * @return the major version of a release
      */
@@ -143,8 +146,8 @@ public final class Release {
     }
 
     /**
-     * Returns the minor version of a release.
-     * For example, if the release version is "1.3.5", then this method will return "3".
+     * Returns the minor version of a release. For example, if the release version
+     * is "1.3.5", then this method will return "3".
      *
      * @return the minor version of a release
      */
@@ -153,8 +156,8 @@ public final class Release {
     }
 
     /**
-     * Returns the patch version of a release.
-     * For example, if the release version is "1.3.5", then this method will return "5".
+     * Returns the patch version of a release. For example, if the release version
+     * is "1.3.5", then this method will return "5".
      *
      * @return the patch version of a release
      */

@@ -73,20 +73,18 @@ public class LogParametersRatherThanLogMessageCleanUp extends AbstractCleanUpRul
 
     @Override
     public boolean visit(final MethodInvocation node) {
-        return maybeRefactorMethod(node, "debug")
-                && maybeRefactorMethod(node, "error")
-                && maybeRefactorMethod(node, "info")
-                && maybeRefactorMethod(node, "trace")
+        return maybeRefactorMethod(node, "debug") && maybeRefactorMethod(node, "error")
+                && maybeRefactorMethod(node, "info") && maybeRefactorMethod(node, "trace")
                 && maybeRefactorMethod(node, "warn");
     }
 
     private boolean maybeRefactorMethod(final MethodInvocation node, final String methodName) {
         if (isMethod(node, "org.slf4j.Logger", methodName, "java.lang.String")
                 || isMethod(node, "ch.qos.logback.classic.Logger", methodName, "java.lang.String")) {
-            final List<Expression> args = arguments(node);
+            final List<Expression> args= arguments(node);
 
             if (args != null && args.size() == 1) {
-                final Expression message = args.get(0);
+                final Expression message= args.get(0);
 
                 if (message instanceof InfixExpression) {
                     return maybeReplaceConcatenation(node, methodName, message);
@@ -100,10 +98,10 @@ public class LogParametersRatherThanLogMessageCleanUp extends AbstractCleanUpRul
     @SuppressWarnings("unchecked")
     private boolean maybeReplaceConcatenation(final MethodInvocation node, final String methodName,
             final Expression message) {
-        final ASTBuilder b = this.ctx.getASTBuilder();
+        final ASTBuilder b= this.ctx.getASTBuilder();
 
-        final InfixExpression concatenation = (InfixExpression) message;
-        final List<Expression> strings = new ArrayList<Expression>();
+        final InfixExpression concatenation= (InfixExpression) message;
+        final List<Expression> strings= new ArrayList<Expression>();
         strings.add(concatenation.getLeftOperand());
         strings.add(concatenation.getRightOperand());
 
@@ -111,15 +109,15 @@ public class LogParametersRatherThanLogMessageCleanUp extends AbstractCleanUpRul
             strings.addAll(concatenation.extendedOperands());
         }
 
-        final StringBuilder messageBuilder = new StringBuilder();
-        final List<Expression> params = new LinkedList<Expression>();
-        boolean hasLiteral = false;
-        boolean hasObjects = false;
+        final StringBuilder messageBuilder= new StringBuilder();
+        final List<Expression> params= new LinkedList<Expression>();
+        boolean hasLiteral= false;
+        boolean hasObjects= false;
 
         for (final Expression string : strings) {
             if (string instanceof StringLiteral) {
-                hasLiteral = true;
-                final String literal = (String) string.resolveConstantExpressionValue();
+                hasLiteral= true;
+                final String literal= (String) string.resolveConstantExpressionValue();
 
                 if ((literal != null) && (literal.contains("{") || literal.contains("}"))) {
                     return VISIT_SUBTREE;
@@ -127,7 +125,7 @@ public class LogParametersRatherThanLogMessageCleanUp extends AbstractCleanUpRul
 
                 messageBuilder.append(literal);
             } else {
-                hasObjects = true;
+                hasObjects= true;
                 messageBuilder.append("{}");
 
                 if (hasType(string, "java.lang.Throwable")) {
@@ -150,8 +148,7 @@ public class LogParametersRatherThanLogMessageCleanUp extends AbstractCleanUpRul
             final StringBuilder messageBuilder, final List<Expression> params) {
         params.add(0, b.string(messageBuilder.toString()));
 
-        final Refactorings r = this.ctx.getRefactorings();
-        r.replace(node, b.invoke(b.copy(node.getExpression()), methodName,
-                params));
+        final Refactorings r= this.ctx.getRefactorings();
+        r.replace(node, b.invoke(b.copy(node.getExpression()), methodName, params));
     }
 }

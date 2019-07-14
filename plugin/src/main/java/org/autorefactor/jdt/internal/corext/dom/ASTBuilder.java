@@ -127,8 +127,8 @@ import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 import org.eclipse.jdt.core.dom.WildcardType;
 
 /**
- * Helper class for building AST note in a somewhat fluent API.
- * Method names which are also java keywords are postfixed with a "0".
+ * Helper class for building AST note in a somewhat fluent API. Method names
+ * which are also java keywords are postfixed with a "0".
  */
 public class ASTBuilder {
     /** Copy operations to be performed deeply into {@link ASTBuilder} methods. */
@@ -156,11 +156,12 @@ public class ASTBuilder {
         };
 
         /**
-         * Performs the copy operation on the provided node  with the provided {@link ASTBuilder}.
+         * Performs the copy operation on the provided node with the provided
+         * {@link ASTBuilder}.
          *
-         * @param b the {@link ASTBuilder} allowing to copy the provided node
+         * @param b    the {@link ASTBuilder} allowing to copy the provided node
          * @param node the node on which to perform the copy operation
-         * @param <T> the node type
+         * @param <T>  the node type
          * @return the copied node
          */
         protected abstract <T extends ASTNode> T perform(ASTBuilder b, T node);
@@ -175,8 +176,8 @@ public class ASTBuilder {
      * @param refactorings the refactorings
      */
     public ASTBuilder(final Refactorings refactorings) {
-        this.refactorings = refactorings;
-        this.ast = refactorings.getAST();
+        this.refactorings= refactorings;
+        this.ast= refactorings.getAST();
     }
 
     /**
@@ -212,13 +213,13 @@ public class ASTBuilder {
     /**
      * Builds a new {@link Assignment} instance.
      *
-     * @param lhs the left hand side expression
+     * @param lhs      the left hand side expression
      * @param operator the assignment operator
-     * @param rhs the right hand side expression
+     * @param rhs      the right hand side expression
      * @return a new Block
      */
     public Assignment assign(final Expression lhs, final Assignment.Operator operator, final Expression rhs) {
-        final Assignment assign = ast.newAssignment();
+        final Assignment assign= ast.newAssignment();
         assign.setLeftHandSide(lhs);
         assign.setOperator(operator);
         assign.setRightHandSide(rhs);
@@ -232,7 +233,7 @@ public class ASTBuilder {
      * @return a new Block
      */
     public Block block(final Statement... stmts) {
-        final Block block = ast.newBlock();
+        final Block block= ast.newBlock();
         addAll(statements(block), stmts);
         return block;
     }
@@ -259,12 +260,11 @@ public class ASTBuilder {
     /**
      * Builds a new {@link SwitchCase} instance.
      *
-     * @param expr
-     *            the case expression
+     * @param expr the case expression
      * @return a new switch case statement
      */
     public SwitchCase case0(Expression expr) {
-        final SwitchCase sc = ast.newSwitchCase();
+        final SwitchCase sc= ast.newSwitchCase();
         sc.setExpression(expr);
         return sc;
     }
@@ -277,7 +277,7 @@ public class ASTBuilder {
      * @return a new CastExpression
      */
     public CastExpression cast(Type type, Expression expr) {
-        final CastExpression ce = ast.newCastExpression();
+        final CastExpression ce= ast.newCastExpression();
         ce.setType(type);
         ce.setExpression(parenthesizeIfNeeded(expr));
         return ce;
@@ -293,7 +293,8 @@ public class ASTBuilder {
     }
 
     /**
-     * Builds a new {@link SwitchCase} instance which represents a {@code default} statement.
+     * Builds a new {@link SwitchCase} instance which represents a {@code default}
+     * statement.
      *
      * @return a new switch case statement representing a {@code default} statement
      */
@@ -315,7 +316,7 @@ public class ASTBuilder {
     }
 
     private Type simpleType(final String name) {
-        final Code primitiveTypeCode = PrimitiveType.toCode(name);
+        final Code primitiveTypeCode= PrimitiveType.toCode(name);
         if (primitiveTypeCode != null) {
             return ast.newPrimitiveType(primitiveTypeCode);
         }
@@ -329,9 +330,9 @@ public class ASTBuilder {
         case 1:
             return simpleType(names[0]);
         default:
-            Type type = ast.newSimpleType(ast.newSimpleName(names[0]));
-            for (int i = 1; i < names.length; i++) {
-                type = ast.newQualifiedType(type, ast.newSimpleName(names[i]));
+            Type type= ast.newSimpleType(ast.newSimpleName(names[0]));
+            for (int i= 1; i < names.length; i++) {
+                type= ast.newQualifiedType(type, ast.newSimpleName(names[i]));
             }
             return type;
         }
@@ -340,17 +341,17 @@ public class ASTBuilder {
     /**
      * Returns a parameterized type with the provided type name and type arguments.
      *
-     * @param typeName the type name (simple or qualified name)
+     * @param typeName      the type name (simple or qualified name)
      * @param typeArguments the type arguments
      * @return a new parameterized type
      */
     public Type genericType(String typeName, Type... typeArguments) {
-        final Type type = type(typeName);
+        final Type type= type(typeName);
         if (typeArguments.length == 0) {
             return type;
         }
 
-        final ParameterizedType parameterizedType = ast.newParameterizedType(type);
+        final ParameterizedType parameterizedType= ast.newParameterizedType(type);
         Collections.addAll(typeArguments(parameterizedType), typeArguments);
         return parameterizedType;
     }
@@ -358,19 +359,19 @@ public class ASTBuilder {
     /**
      * Builds a new {@link CatchClause} instance.
      *
-     * @param exceptionTypeName the exception type name
+     * @param exceptionTypeName   the exception type name
      * @param caughtExceptionName the local name for the caught exception
-     * @param stmts the statements to add to the catch clause
+     * @param stmts               the statements to add to the catch clause
      * @return a new catch clause
      */
     public CatchClause catch0(String exceptionTypeName, String caughtExceptionName, Statement... stmts) {
-        final CatchClause cc = ast.newCatchClause();
-        final SingleVariableDeclaration svd = ast.newSingleVariableDeclaration();
+        final CatchClause cc= ast.newCatchClause();
+        final SingleVariableDeclaration svd= ast.newSingleVariableDeclaration();
         svd.setType(simpleType(exceptionTypeName));
         svd.setName(ast.newSimpleName(caughtExceptionName));
         cc.setException(svd);
 
-        final Block block = ast.newBlock();
+        final Block block= ast.newBlock();
         addAll(statements(block), stmts);
         cc.setBody(block);
         return cc;
@@ -379,7 +380,7 @@ public class ASTBuilder {
     /**
      * Returns a copy of the provided {@link ASTNode}.
      *
-     * @param <T> the actual node type
+     * @param <T>        the actual node type
      * @param nodeToCopy the node to copy
      * @return a copy of the node
      */
@@ -394,15 +395,15 @@ public class ASTBuilder {
     }
 
     private boolean isValidInCurrentAST(ASTNode node) {
-        return node.getAST() == ast
-                && node.getStartPosition() != -1;
+        return node.getAST() == ast && node.getStartPosition() != -1;
     }
 
     /**
      * Creates a type by copying the type binding of the provided expression.
      *
-     * @param expr the expression whose type must be copied
-     * @param typeNameDecider decides on how the type should be referenced (simple name or qualified name)
+     * @param expr            the expression whose type must be copied
+     * @param typeNameDecider decides on how the type should be referenced (simple
+     *                        name or qualified name)
      * @return a new type
      */
     public Type copyType(Expression expr, TypeNameDecider typeNameDecider) {
@@ -412,8 +413,9 @@ public class ASTBuilder {
     /**
      * Converts a type binding into a type.
      *
-     * @param typeBinding the type binding to convert
-     * @param typeNameDecider decides on how the type should be referenced (simple name or qualified name)
+     * @param typeBinding     the type binding to convert
+     * @param typeNameDecider decides on how the type should be referenced (simple
+     *                        name or qualified name)
      * @return a new type
      */
     public Type toType(ITypeBinding typeBinding, TypeNameDecider typeNameDecider) {
@@ -422,25 +424,21 @@ public class ASTBuilder {
         }
 
         if (typeBinding.isParameterizedType()) {
-            final ParameterizedType type = ast.newParameterizedType(toType(typeBinding.getErasure(), typeNameDecider));
-            final List<Type> typeArgs = typeArguments(type);
+            final ParameterizedType type= ast.newParameterizedType(toType(typeBinding.getErasure(), typeNameDecider));
+            final List<Type> typeArgs= typeArguments(type);
             for (ITypeBinding typeArg : typeBinding.getTypeArguments()) {
                 typeArgs.add(toType(typeArg, typeNameDecider));
             }
             return type;
         } else if (typeBinding.isPrimitive()) {
             return type(typeBinding.getName());
-        } else if (typeBinding.isClass()
-                || typeBinding.isInterface()
-                || typeBinding.isEnum()
-                || typeBinding.isAnnotation()
-                || typeBinding.isNullType()
-                || typeBinding.isRawType()) {
+        } else if (typeBinding.isClass() || typeBinding.isInterface() || typeBinding.isEnum()
+                || typeBinding.isAnnotation() || typeBinding.isNullType() || typeBinding.isRawType()) {
             return type(typeNameDecider.useSimplestPossibleName(typeBinding));
         } else if (typeBinding.isArray()) {
             return ast.newArrayType(toType(typeBinding.getElementType(), typeNameDecider), typeBinding.getDimensions());
         } else if (typeBinding.isWildcardType()) {
-            final WildcardType type = ast.newWildcardType();
+            final WildcardType type= ast.newWildcardType();
             if (typeBinding.getBound() != null) {
                 type.setBound(toType(typeBinding.getBound(), typeNameDecider), typeBinding.isUpperbound());
             }
@@ -450,9 +448,9 @@ public class ASTBuilder {
         } else if (typeBinding.isCapture()) {
             if (typeBinding.getTypeBounds().length > 1) {
                 throw new NotImplementedException(null,
-                    "because it violates the javadoc of `ITypeBinding.getTypeBounds()`: "
-                    + "\"Note that per construction, it can only contain one class or array type, "
-                    + "at most, and then it is located in first position.\"");
+                        "because it violates the javadoc of `ITypeBinding.getTypeBounds()`: "
+                                + "\"Note that per construction, it can only contain one class or array type, "
+                                + "at most, and then it is located in first position.\"");
             }
             return toType(typeBinding.getWildcard(), typeNameDecider);
         }
@@ -462,26 +460,24 @@ public class ASTBuilder {
     private Type copyType(final Type type) {
         switch (type.getNodeType()) {
         case ARRAY_TYPE:
-            final ArrayType arrayType = (ArrayType) type;
-            return ast.newArrayType(
-                    copyType(arrayType.getElementType()),
-                    arrayType.getDimensions());
+            final ArrayType arrayType= (ArrayType) type;
+            return ast.newArrayType(copyType(arrayType.getElementType()), arrayType.getDimensions());
 
         case PRIMITIVE_TYPE:
-            final Code code = ((PrimitiveType) type).getPrimitiveTypeCode();
+            final Code code= ((PrimitiveType) type).getPrimitiveTypeCode();
             return ast.newPrimitiveType(code);
 
         case QUALIFIED_TYPE:
             return type(type.resolveBinding().getQualifiedName());
 
         case SIMPLE_TYPE:
-            final SimpleType sType = (SimpleType) type;
+            final SimpleType sType= (SimpleType) type;
             return ast.newSimpleType(copy(sType.getName()));
 
         case PARAMETERIZED_TYPE:
-            final ParameterizedType pType = (ParameterizedType) type;
-            final ParameterizedType copyOfType = ast.newParameterizedType(copy(pType.getType()));
-            final List<Type> newTypeArgs = typeArguments(copyOfType);
+            final ParameterizedType pType= (ParameterizedType) type;
+            final ParameterizedType copyOfType= ast.newParameterizedType(copy(pType.getType()));
+            final List<Type> newTypeArgs= typeArguments(copyOfType);
             for (Object typeArg : pType.typeArguments()) {
                 if (((Type) typeArg).isWildcardType()) {
                     newTypeArgs.add(ast.newWildcardType());
@@ -496,7 +492,8 @@ public class ASTBuilder {
     }
 
     /**
-     * Returns a copy of the expression of the provided {@link MethodInvocation} or null if no such expression exists.
+     * Returns a copy of the expression of the provided {@link MethodInvocation} or
+     * null if no such expression exists.
      *
      * @param node the {@link MethodInvocation} for which to copy the expression
      * @return a copy of the expression, or false if no such expression exists
@@ -508,7 +505,7 @@ public class ASTBuilder {
     /**
      * Returns a copy of the provided nodes list.
      *
-     * @param <T> the actual nodes's type
+     * @param <T>   the actual nodes's type
      * @param nodes the nodes list to copy
      * @return a single node, representing a copy of the nodes list
      */
@@ -526,7 +523,7 @@ public class ASTBuilder {
     /**
      * Returns a move for the provided nodes list.
      *
-     * @param <T> the actual nodes's type
+     * @param <T>   the actual nodes's type
      * @param nodes the nodes list to move
      * @return a single node, representing a move of the nodes list
      */
@@ -549,12 +546,11 @@ public class ASTBuilder {
         if (nodes.isEmpty()) {
             return true;
         }
-        final ASTNode firstNode = nodes.get(0);
-        final ASTNode parent = firstNode.getParent();
-        final StructuralPropertyDescriptor locInParent = firstNode.getLocationInParent();
+        final ASTNode firstNode= nodes.get(0);
+        final ASTNode parent= firstNode.getParent();
+        final StructuralPropertyDescriptor locInParent= firstNode.getLocationInParent();
         for (ASTNode node : nodes) {
-            if (!equal(node.getParent(), parent)
-                    || !equal(node.getLocationInParent(), locInParent)) {
+            if (!equal(node.getParent(), parent) || !equal(node.getLocationInParent(), locInParent)) {
                 return false;
             }
         }
@@ -562,10 +558,10 @@ public class ASTBuilder {
     }
 
     /**
-     * Returns a copy of the provided {@link ASTNode}.
-     * This method loses code comments. Prefer using {@link #copy(ASTNode)}.
+     * Returns a copy of the provided {@link ASTNode}. This method loses code
+     * comments. Prefer using {@link #copy(ASTNode)}.
      *
-     * @param <T> the actual node type
+     * @param <T>  the actual node type
      * @param node the node to copy
      * @return a copy of the node
      */
@@ -577,30 +573,25 @@ public class ASTBuilder {
     /**
      * Builds a new {@link VariableDeclarationStatement} instance.
      *
-     * @param type
-     *            the type of the variable being declared
-     * @param varName
-     *            the name of the variable being declared
-     * @param initializer
-     *            the variable initializer, can be null
+     * @param type        the type of the variable being declared
+     * @param varName     the name of the variable being declared
+     * @param initializer the variable initializer, can be null
      * @return a new variable declaration statement
      */
     public VariableDeclarationStatement declareStmt(Type type, SimpleName varName, Expression initializer) {
-        final VariableDeclarationFragment fragment = declareFragment(varName, initializer);
+        final VariableDeclarationFragment fragment= declareFragment(varName, initializer);
         return declareStmt(type, fragment);
     }
 
     /**
      * Builds a new {@link VariableDeclarationStatement} instance.
      *
-     * @param type
-     *            the type of the variable being declared
-     * @param fragment
-     *            the fragment being declared
+     * @param type     the type of the variable being declared
+     * @param fragment the fragment being declared
      * @return a new variable declaration statement
      */
     public VariableDeclarationStatement declareStmt(Type type, VariableDeclarationFragment fragment) {
-        final VariableDeclarationStatement vds = ast.newVariableDeclarationStatement(fragment);
+        final VariableDeclarationStatement vds= ast.newVariableDeclarationStatement(fragment);
         vds.setType(type);
         return vds;
     }
@@ -608,17 +599,14 @@ public class ASTBuilder {
     /**
      * Builds a new {@link VariableDeclarationExpression} instance.
      *
-     * @param type
-     *            the type of the variable being declared
-     * @param varName
-     *            the name of the variable being declared
-     * @param initializer
-     *            the variable initializer, can be null
+     * @param type        the type of the variable being declared
+     * @param varName     the name of the variable being declared
+     * @param initializer the variable initializer, can be null
      * @return a new variable declaration expression
      */
     public VariableDeclarationExpression declareExpr(Type type, SimpleName varName, Expression initializer) {
-        final VariableDeclarationFragment fragment = declareFragment(varName, initializer);
-        final VariableDeclarationExpression vde = ast.newVariableDeclarationExpression(fragment);
+        final VariableDeclarationFragment fragment= declareFragment(varName, initializer);
+        final VariableDeclarationExpression vde= ast.newVariableDeclarationExpression(fragment);
         modifiers(vde).add(final0());
         vde.setType(type);
         return vde;
@@ -627,14 +615,12 @@ public class ASTBuilder {
     /**
      * Builds a new {@link VariableDeclarationExpression} instance.
      *
-     * @param type
-     *            the declared variable type
-     * @param fragment
-     *            the variable declaration fragment
+     * @param type     the declared variable type
+     * @param fragment the variable declaration fragment
      * @return a new variable declaration expression
      */
     public VariableDeclarationExpression declareExpr(Type type, VariableDeclarationFragment fragment) {
-        final VariableDeclarationExpression vde = ast.newVariableDeclarationExpression(fragment);
+        final VariableDeclarationExpression vde= ast.newVariableDeclarationExpression(fragment);
         vde.setType(type);
         return vde;
     }
@@ -642,14 +628,12 @@ public class ASTBuilder {
     /**
      * Builds a new {@link FieldDeclaration} instance.
      *
-     * @param type
-     *            the declared variable type
-     * @param fragment
-     *            the variable declaration fragment
+     * @param type     the declared variable type
+     * @param fragment the variable declaration fragment
      * @return a new field declaration
      */
     public FieldDeclaration declareField(Type type, VariableDeclarationFragment fragment) {
-        final FieldDeclaration fd = ast.newFieldDeclaration(fragment);
+        final FieldDeclaration fd= ast.newFieldDeclaration(fragment);
         fd.setType(type);
         return fd;
     }
@@ -657,12 +641,11 @@ public class ASTBuilder {
     /**
      * Builds a new {@link VariableDeclarationFragment} instance.
      *
-     * @param varName
-     *            the declared variable name
+     * @param varName the declared variable name
      * @return a new variable declaration fragment
      */
     public VariableDeclarationFragment declareFragment(SimpleName varName) {
-        final VariableDeclarationFragment vdf = ast.newVariableDeclarationFragment();
+        final VariableDeclarationFragment vdf= ast.newVariableDeclarationFragment();
         vdf.setName(varName);
         return vdf;
     }
@@ -670,14 +653,12 @@ public class ASTBuilder {
     /**
      * Builds a new {@link VariableDeclarationFragment} instance.
      *
-     * @param varName
-     *            the declared variable name
-     * @param initializer
-     *            the variable initializer
+     * @param varName     the declared variable name
+     * @param initializer the variable initializer
      * @return a new variable declaration fragment
      */
     public VariableDeclarationFragment declareFragment(SimpleName varName, Expression initializer) {
-        final VariableDeclarationFragment vdf = ast.newVariableDeclarationFragment();
+        final VariableDeclarationFragment vdf= ast.newVariableDeclarationFragment();
         vdf.setName(varName);
         vdf.setInitializer(initializer);
         return vdf;
@@ -696,14 +677,12 @@ public class ASTBuilder {
     /**
      * Builds a new {@link FieldAccess} instance.
      *
-     * @param expr
-     *            the expression on which the field is accessed
-     * @param fieldName
-     *            the field name being accessed
+     * @param expr      the expression on which the field is accessed
+     * @param fieldName the field name being accessed
      * @return a new single field access
      */
     public FieldAccess fieldAccess(Expression expr, SimpleName fieldName) {
-        final FieldAccess fa = getAST().newFieldAccess();
+        final FieldAccess fa= getAST().newFieldAccess();
         fa.setExpression(expr);
         fa.setName(fieldName);
         return fa;
@@ -721,14 +700,12 @@ public class ASTBuilder {
     /**
      * Builds a new {@link SingleVariableDeclaration} instance.
      *
-     * @param varName
-     *            the name of the variable being declared
-     * @param type
-     *            the type of the variable being declared
+     * @param varName the name of the variable being declared
+     * @param type    the type of the variable being declared
      * @return a new single variable declaration
      */
     public SingleVariableDeclaration declareSingleVariable(String varName, Type type) {
-        final SingleVariableDeclaration svd = ast.newSingleVariableDeclaration();
+        final SingleVariableDeclaration svd= ast.newSingleVariableDeclaration();
         svd.setName(simpleName(varName));
         svd.setType(type);
         return svd;
@@ -737,10 +714,8 @@ public class ASTBuilder {
     /**
      * Builds a new {@link IfStatement} instance.
      *
-     * @param condition
-     *            the if condition
-     * @param thenStatement
-     *            the then statement
+     * @param condition     the if condition
+     * @param thenStatement the then statement
      * @return a new if statement
      */
     public IfStatement if0(Expression condition, Statement thenStatement) {
@@ -755,7 +730,7 @@ public class ASTBuilder {
      * @return a new do statement
      */
     public DoStatement doWhile(Expression condition, Statement statement) {
-        final DoStatement ds = ast.newDoStatement();
+        final DoStatement ds= ast.newDoStatement();
         ds.setExpression(condition);
         ds.setBody(statement);
         return ds;
@@ -764,13 +739,13 @@ public class ASTBuilder {
     /**
      * Builds a new {@link IfStatement} instance.
      *
-     * @param condition the if condition
+     * @param condition     the if condition
      * @param thenStatement the statement of the then clause
      * @param elseStatement the statement of the else clause
      * @return a new if statement
      */
     public IfStatement if0(Expression condition, Statement thenStatement, Statement elseStatement) {
-        final IfStatement is = ast.newIfStatement();
+        final IfStatement is= ast.newIfStatement();
         is.setExpression(condition);
         is.setThenStatement(thenStatement);
         is.setElseStatement(elseStatement);
@@ -784,7 +759,7 @@ public class ASTBuilder {
      * @return a new if statement
      */
     public ImportDeclaration import0(Name name) {
-        final ImportDeclaration id = ast.newImportDeclaration();
+        final ImportDeclaration id= ast.newImportDeclaration();
         id.setName(name);
         id.setStatic(false);
         id.setOnDemand(false);
@@ -794,18 +769,17 @@ public class ASTBuilder {
     /**
      * Builds a new {@link InfixExpression} instance.
      *
-     * @param operator the infix operator
+     * @param operator    the infix operator
      * @param allOperands the operands
      * @return a new infix expression
      */
-    public InfixExpression infixExpr(InfixExpression.Operator operator,
-            Collection<? extends Expression> allOperands) {
+    public InfixExpression infixExpr(InfixExpression.Operator operator, Collection<? extends Expression> allOperands) {
         if (allOperands.size() < 2) {
             throw new IllegalArgumentException(null, "Not enough operands for an infix expression: "
                     + "needed at least 2, but got " + allOperands.size());
         }
-        final Iterator<? extends Expression> it = allOperands.iterator();
-        final InfixExpression ie = ast.newInfixExpression();
+        final Iterator<? extends Expression> it= allOperands.iterator();
+        final InfixExpression ie= ast.newInfixExpression();
         ie.setLeftOperand(it.next());
         ie.setOperator(operator);
         ie.setRightOperand(it.next());
@@ -820,13 +794,13 @@ public class ASTBuilder {
      *
      * @param mainExpression the main expression
      * @param thenExpression the evaluated expression if the main expression is true
-     * @param elseExpression the evaluated expression if the main expression is false
+     * @param elseExpression the evaluated expression if the main expression is
+     *                       false
      * @return a new conditional expression
      */
-    public ConditionalExpression conditionalExpr(Expression mainExpression,
-            Expression thenExpression,
+    public ConditionalExpression conditionalExpr(Expression mainExpression, Expression thenExpression,
             Expression elseExpression) {
-        final ConditionalExpression ce = ast.newConditionalExpression();
+        final ConditionalExpression ce= ast.newConditionalExpression();
         ce.setExpression(mainExpression);
         ce.setThenExpression(thenExpression);
         ce.setElseExpression(elseExpression);
@@ -836,15 +810,15 @@ public class ASTBuilder {
     /**
      * Builds a new {@link InfixExpression} instance.
      *
-     * @param leftOperand the left operand
-     * @param operator the infix operator
-     * @param rightOperand the right operand
+     * @param leftOperand      the left operand
+     * @param operator         the infix operator
+     * @param rightOperand     the right operand
      * @param extendedOperands the extended operands
      * @return a new infix expression
      */
-    public InfixExpression infixExpr(Expression leftOperand, InfixExpression.Operator operator,
-            Expression rightOperand, Expression... extendedOperands) {
-        final InfixExpression ie = ast.newInfixExpression();
+    public InfixExpression infixExpr(Expression leftOperand, InfixExpression.Operator operator, Expression rightOperand,
+            Expression... extendedOperands) {
+        final InfixExpression ie= ast.newInfixExpression();
         ie.setLeftOperand(leftOperand);
         ie.setOperator(operator);
         ie.setRightOperand(rightOperand);
@@ -867,11 +841,11 @@ public class ASTBuilder {
      *
      * @param expression the method invocation expression
      * @param methodName the name of the invoked method
-     * @param arguments the arguments for the method invocation
+     * @param arguments  the arguments for the method invocation
      * @return a new method invocation
      */
     public MethodInvocation invoke(String expression, String methodName, Expression... arguments) {
-        final MethodInvocation mi = ast.newMethodInvocation();
+        final MethodInvocation mi= ast.newMethodInvocation();
         mi.setExpression(ast.newSimpleName(expression));
         mi.setName(ast.newSimpleName(methodName));
         addAll(arguments(mi), arguments);
@@ -882,11 +856,11 @@ public class ASTBuilder {
      * Builds a new {@link MethodInvocation} instance.
      *
      * @param methodName the name of the invoked method
-     * @param arguments the arguments for the method invocation
+     * @param arguments  the arguments for the method invocation
      * @return a new method invocation
      */
     public MethodInvocation invoke(String methodName, Expression... arguments) {
-        final MethodInvocation mi = ast.newMethodInvocation();
+        final MethodInvocation mi= ast.newMethodInvocation();
         mi.setName(ast.newSimpleName(methodName));
         addAll(arguments(mi), arguments);
         return mi;
@@ -897,11 +871,11 @@ public class ASTBuilder {
      *
      * @param expression the method invocation expression
      * @param methodName the name of the invoked method
-     * @param arguments the arguments for the method invocation
+     * @param arguments  the arguments for the method invocation
      * @return a new method invocation
      */
     public MethodInvocation invoke(Expression expression, String methodName, Expression... arguments) {
-        final MethodInvocation mi = ast.newMethodInvocation();
+        final MethodInvocation mi= ast.newMethodInvocation();
         mi.setExpression(expression);
         mi.setName(ast.newSimpleName(methodName));
         addAll(arguments(mi), arguments);
@@ -911,14 +885,14 @@ public class ASTBuilder {
     /**
      * Builds a new {@link MethodInvocation} instance.
      *
-     * @param <E> the arguments type
+     * @param <E>        the arguments type
      * @param expression the method invocation expression
      * @param methodName the name of the invoked method
-     * @param arguments the arguments for the method invocation
+     * @param arguments  the arguments for the method invocation
      * @return a new method invocation
      */
     public <E extends Expression> MethodInvocation invoke(Expression expression, String methodName, List<E> arguments) {
-        final MethodInvocation mi = ast.newMethodInvocation();
+        final MethodInvocation mi= ast.newMethodInvocation();
         mi.setExpression(expression);
         mi.setName(ast.newSimpleName(methodName));
         addAll(mi, arguments);
@@ -999,7 +973,7 @@ public class ASTBuilder {
     /**
      * Returns a placeholder where to move the provided {@link ASTNode}.
      *
-     * @param <T> the actual node type
+     * @param <T>        the actual node type
      * @param nodeToMove the node to move
      * @return a placeholder for the moved node
      */
@@ -1010,20 +984,21 @@ public class ASTBuilder {
     /**
      * Moves all the provided {@link ASTNode}s in place.
      *
-     * @param <T> the actual nodes type
+     * @param <T>   the actual nodes type
      * @param nodes the nodes to move
      * @return the provided list with all nodes moved
      */
     public <T extends ASTNode> List<T> move(final List<T> nodes) {
-        for (ListIterator<T> it = nodes.listIterator(); it.hasNext();) {
+        for (ListIterator<T> it= nodes.listIterator(); it.hasNext();) {
             it.set(move(it.next()));
         }
         return nodes;
     }
 
     /**
-     * Builds a new {@link Name} instance. If only a single name is provided then a {@link SimpleName} is returned,
-     * if several names are provided then a {@link QualifiedName} is built.
+     * Builds a new {@link Name} instance. If only a single name is provided then a
+     * {@link SimpleName} is returned, if several names are provided then a
+     * {@link QualifiedName} is built.
      *
      * @param names the qualified or simple name
      * @return a new name
@@ -1052,12 +1027,12 @@ public class ASTBuilder {
     /**
      * Builds a new {@link ClassInstanceCreation} instance.
      *
-     * @param typeName the instantiated type name
+     * @param typeName  the instantiated type name
      * @param arguments the constructor invocation arguments
      * @return a new class instance creation
      */
     public ClassInstanceCreation new0(String typeName, Expression... arguments) {
-        final ClassInstanceCreation cic = ast.newClassInstanceCreation();
+        final ClassInstanceCreation cic= ast.newClassInstanceCreation();
         cic.setType(simpleType(typeName));
         addAll(arguments(cic), arguments);
         return cic;
@@ -1066,12 +1041,12 @@ public class ASTBuilder {
     /**
      * Builds a new {@link ClassInstanceCreation} instance.
      *
-     * @param type the instantiated type
+     * @param type      the instantiated type
      * @param arguments the constructor invocation arguments
      * @return a new class instance creation
      */
     public ClassInstanceCreation new0(Type type, Expression... arguments) {
-        final ClassInstanceCreation cic = ast.newClassInstanceCreation();
+        final ClassInstanceCreation cic= ast.newClassInstanceCreation();
         cic.setType(type);
         addAll(arguments(cic), arguments);
         return cic;
@@ -1092,12 +1067,12 @@ public class ASTBuilder {
     /**
      * Builds a new {@link ArrayCreation} instance.
      *
-     * @param arrayType the array type
+     * @param arrayType        the array type
      * @param arrayInitializer the array initializer
      * @return a new array creation instance
      */
     public ArrayCreation newArray(ArrayType arrayType, ArrayInitializer arrayInitializer) {
-        final ArrayCreation ac = ast.newArrayCreation();
+        final ArrayCreation ac= ast.newArrayCreation();
         ac.setType(arrayType);
         ac.setInitializer(arrayInitializer);
         return ac;
@@ -1124,16 +1099,17 @@ public class ASTBuilder {
     }
 
     /**
-     * Negates the provided expression and applies the provided copy operation on the returned expression.
+     * Negates the provided expression and applies the provided copy operation on
+     * the returned expression.
      *
      * @param expr the expression to negate
      * @param copy the copy operation to perform
      * @return the negated expression, copied according to the copy operation
      */
     public Expression negate(Expression expr, Copy copy) {
-        final Expression exprNoParen = removeParentheses(expr);
+        final Expression exprNoParen= removeParentheses(expr);
         if (exprNoParen.getNodeType() == PREFIX_EXPRESSION) {
-            final PrefixExpression pe = (PrefixExpression) exprNoParen;
+            final PrefixExpression pe= (PrefixExpression) exprNoParen;
             if (hasOperator(pe, NOT)) {
                 return copy.perform(this, removeParentheses(pe.getOperand()));
             }
@@ -1159,13 +1135,13 @@ public class ASTBuilder {
      * @return a new parenthesized expression
      */
     public ParenthesizedExpression parenthesize(Expression expression) {
-        final ParenthesizedExpression pe = ast.newParenthesizedExpression();
+        final ParenthesizedExpression pe= ast.newParenthesizedExpression();
         pe.setExpression(expression);
         return pe;
     }
 
     private Expression prefixExpr(PrefixExpression.Operator operator, Expression operand) {
-        final PrefixExpression pe = ast.newPrefixExpression();
+        final PrefixExpression pe= ast.newPrefixExpression();
         pe.setOperator(operator);
         pe.setOperand(operand);
         return pe;
@@ -1178,7 +1154,7 @@ public class ASTBuilder {
      * @return a new return statement
      */
     public ReturnStatement return0(Expression expression) {
-        final ReturnStatement rs = ast.newReturnStatement();
+        final ReturnStatement rs= ast.newReturnStatement();
         rs.setExpression(expression);
         return rs;
     }
@@ -1190,7 +1166,7 @@ public class ASTBuilder {
      * @return a new marker annotation
      */
     public MarkerAnnotation markerAnnotation(Name typeName) {
-        final MarkerAnnotation ma = ast.newMarkerAnnotation();
+        final MarkerAnnotation ma= ast.newMarkerAnnotation();
         ma.setTypeName(typeName);
         return ma;
     }
@@ -1199,11 +1175,11 @@ public class ASTBuilder {
      * Builds a new {@link SingleMemberAnnotation} instance.
      *
      * @param typeName the annotation type name
-     * @param value the annotation single value
+     * @param value    the annotation single value
      * @return a new single member annotation
      */
     public SingleMemberAnnotation singleValueAnnotation(Name typeName, Expression value) {
-        final SingleMemberAnnotation sma = ast.newSingleMemberAnnotation();
+        final SingleMemberAnnotation sma= ast.newSingleMemberAnnotation();
         sma.setTypeName(typeName);
         sma.setValue(value);
         return sma;
@@ -1216,7 +1192,7 @@ public class ASTBuilder {
      * @return a new string literal
      */
     public StringLiteral string(String s) {
-        final StringLiteral sl = ast.newStringLiteral();
+        final StringLiteral sl= ast.newStringLiteral();
         sl.setLiteralValue(s);
         return sl;
     }
@@ -1224,12 +1200,11 @@ public class ASTBuilder {
     /**
      * Builds a new {@link SwitchStatement} instance.
      *
-     * @param expr
-     *            the switch expression
+     * @param expr the switch expression
      * @return a new switch statement
      */
     public SwitchStatement switch0(Expression expr) {
-        final SwitchStatement ss = ast.newSwitchStatement();
+        final SwitchStatement ss= ast.newSwitchStatement();
         ss.setExpression(expr);
         return ss;
     }
@@ -1250,7 +1225,7 @@ public class ASTBuilder {
      * @return a new throw statement
      */
     public ThrowStatement throw0(final Expression expression) {
-        final ThrowStatement throwS = ast.newThrowStatement();
+        final ThrowStatement throwS= ast.newThrowStatement();
         throwS.setExpression(expression);
         return throwS;
     }
@@ -1268,12 +1243,12 @@ public class ASTBuilder {
     /**
      * Builds a new {@link TryStatement} instance.
      *
-     * @param body the try body
+     * @param body         the try body
      * @param catchClauses the catch clauses for the try
      * @return a new try statement
      */
     public TryStatement try0(final Block body, CatchClause... catchClauses) {
-        final TryStatement tryS = ast.newTryStatement();
+        final TryStatement tryS= ast.newTryStatement();
         tryS.setBody(body);
         addAll(catchClauses(tryS), catchClauses);
         return tryS;
@@ -1283,7 +1258,8 @@ public class ASTBuilder {
      * Parenthesizes the provided expression if its type requires it.
      *
      * @param expr the expression to conditionally return parenthesized
-     * @return the parenthesized expression of the provided expression to return or this expression itself
+     * @return the parenthesized expression of the provided expression to return or
+     *         this expression itself
      */
     public Expression parenthesizeIfNeeded(Expression expr) {
         switch (expr.getNodeType()) {
@@ -1351,7 +1327,7 @@ public class ASTBuilder {
      * @return expression with a method invocation
      */
     public Expression superInvoke(String methodName) {
-        SuperMethodInvocation smi = ast.newSuperMethodInvocation();
+        SuperMethodInvocation smi= ast.newSuperMethodInvocation();
         smi.setName(simpleName(methodName));
         return smi;
     }
@@ -1359,15 +1335,15 @@ public class ASTBuilder {
     /**
      * Builds a new {@link MethodDeclaration} node.
      *
-     * @param modifiers list of modifiers of the method
+     * @param modifiers  list of modifiers of the method
      * @param methodName the method name
      * @param parameters list of parameters
-     * @param block the block of the method
+     * @param block      the block of the method
      * @return a new method declaration
      */
     public MethodDeclaration method(List<IExtendedModifier> modifiers, String methodName,
             List<SingleVariableDeclaration> parameters, Block block) {
-        final MethodDeclaration md = ast.newMethodDeclaration();
+        final MethodDeclaration md= ast.newMethodDeclaration();
         modifiers(md).addAll(modifiers);
         md.setName(simpleName(methodName));
         md.parameters().addAll(parameters);

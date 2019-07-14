@@ -70,7 +70,7 @@ public final class RemoveUncheckedThrowsClausesCleanUp extends AbstractCleanUpRu
 
     @Override
     public boolean visit(MethodDeclaration node) {
-        final Collection<ASTNode> nodesToRemove = getUncheckedExceptions(node);
+        final Collection<ASTNode> nodesToRemove= getUncheckedExceptions(node);
         if (!nodesToRemove.isEmpty()) {
             for (ASTNode n : nodesToRemove) {
                 ctx.getRefactorings().replace(n, null);
@@ -81,14 +81,16 @@ public final class RemoveUncheckedThrowsClausesCleanUp extends AbstractCleanUpRu
     }
 
     /**
-     * Returns list of unchecked exception nodes in this method declaration (below JLS8 API only).
+     * Returns list of unchecked exception nodes in this method declaration (below
+     * JLS8 API only).
      *
-     * @exception UnsupportedOperationException
-     *                if this operation is used in a JLS8 or later AST In the JLS8 API,<br>
-     *                this method is replaced by {@link MethodDeclaration#thrownExceptionTypes}.
+     * @exception UnsupportedOperationException if this operation is used in a JLS8
+     *                                          or later AST In the JLS8 API,<br>
+     *                                          this method is replaced by
+     *                                          {@link MethodDeclaration#thrownExceptionTypes}.
      */
     private Collection<ASTNode> getUncheckedExceptions(MethodDeclaration node) {
-        List<ASTNode> result = new ArrayList<ASTNode>();
+        List<ASTNode> result= new ArrayList<ASTNode>();
         for (Type n : thrownExceptionTypes(node)) {
             if (isUnchecked(n)) {
                 result.add(n);
@@ -98,8 +100,7 @@ public final class RemoveUncheckedThrowsClausesCleanUp extends AbstractCleanUpRu
     }
 
     private boolean isUnchecked(Type type) {
-        final ITypeBinding binding = type.resolveBinding();
-        return instanceOf(binding, "java.lang.RuntimeException")
-                || instanceOf(binding, "java.lang.Error");
+        final ITypeBinding binding= type.resolveBinding();
+        return instanceOf(binding, "java.lang.RuntimeException") || instanceOf(binding, "java.lang.Error");
     }
 }

@@ -54,22 +54,22 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 public final class JavaCoreHelper {
-    private static final Path[] EMPTY_PATHS = new Path[0];
+    private static final Path[] EMPTY_PATHS= new Path[0];
 
     public static IPackageFragment getPackageFragment(String packageName) throws Exception {
-        final IJavaProject javaProject = createJavaProject("projectName", "bin");
-        final IPackageFragmentRoot root = addSourceContainer(javaProject, "/testRoot");
+        final IJavaProject javaProject= createJavaProject("projectName", "bin");
+        final IPackageFragmentRoot root= addSourceContainer(javaProject, "/testRoot");
         addToClasspath(javaProject, getClasspathEntries(root));
         return root.createPackageFragment(packageName, true, null);
     }
 
     private static List<IClasspathEntry> getClasspathEntries(final IPackageFragmentRoot root) throws Exception {
-        final List<IClasspathEntry> entries = new ArrayList<IClasspathEntry>();
-        final IClasspathEntry srcEntry = JavaCore.newSourceEntry(root.getPath(), EMPTY_PATHS, EMPTY_PATHS, null);
+        final List<IClasspathEntry> entries= new ArrayList<IClasspathEntry>();
+        final IClasspathEntry srcEntry= JavaCore.newSourceEntry(root.getPath(), EMPTY_PATHS, EMPTY_PATHS, null);
         entries.add(srcEntry);
 
         // Should not execute this code for Java 9
-        final IClasspathEntry rtJarEntry = JavaCore.newLibraryEntry(getPathToRtJar(), null, null);
+        final IClasspathEntry rtJarEntry= JavaCore.newLibraryEntry(getPathToRtJar(), null, null);
         entries.add(rtJarEntry);
 
         extractClasspathEntries(entries, "../samples/pom.xml");
@@ -77,52 +77,49 @@ public final class JavaCoreHelper {
     }
 
     private static void extractClasspathEntries(List<IClasspathEntry> entries, String classpathFile) throws Exception {
-        final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        final DocumentBuilder builder = factory.newDocumentBuilder();
-        final Document document = builder.parse(new File(classpathFile));
+        final DocumentBuilderFactory factory= DocumentBuilderFactory.newInstance();
+        final DocumentBuilder builder= factory.newDocumentBuilder();
+        final Document document= builder.parse(new File(classpathFile));
 
-        final Node projectNode = getNodeByNodeName(document.getChildNodes(), "project");
-        final List<Node> dependencies =
-                asList(getNodeByNodeName(projectNode.getChildNodes(), "dependencies").getChildNodes());
-        final String m2Repo = getM2Repository();
+        final Node projectNode= getNodeByNodeName(document.getChildNodes(), "project");
+        final List<Node> dependencies= asList(
+                getNodeByNodeName(projectNode.getChildNodes(), "dependencies").getChildNodes());
+        final String m2Repo= getM2Repository();
         for (Node dependency : dependencies) {
             if (dependency.getNodeType() == Node.COMMENT_NODE) {
                 continue;
             }
-            final NodeList children = dependency.getChildNodes();
-            String groupId = getNodeByNodeName(children, "groupId").getTextContent();
-            String artifactId = getNodeByNodeName(children, "artifactId").getTextContent();
-            String version = getNodeByNodeName(children, "version").getTextContent();
-            String sep = File.separator;
-            final String jarPath = m2Repo + sep + toPath(groupId) + sep + artifactId + sep + version + sep
-                    + artifactId + "-" + version + ".jar";
+            final NodeList children= dependency.getChildNodes();
+            String groupId= getNodeByNodeName(children, "groupId").getTextContent();
+            String artifactId= getNodeByNodeName(children, "artifactId").getTextContent();
+            String version= getNodeByNodeName(children, "version").getTextContent();
+            String sep= File.separator;
+            final String jarPath= m2Repo + sep + toPath(groupId) + sep + artifactId + sep + version + sep + artifactId
+                    + "-" + version + ".jar";
             entries.add(JavaCore.newLibraryEntry(new Path(jarPath), null, null));
         }
     }
 
     private static String getM2Repository() throws Exception {
-        final String userHome = System.getProperty("user.home");
-        final File m2Settings = new File(userHome + "/.m2/settings.xml");
+        final String userHome= System.getProperty("user.home");
+        final File m2Settings= new File(userHome + "/.m2/settings.xml");
         if (m2Settings.exists() && m2Settings.isFile()) {
-            final Document document = DocumentBuilderFactory.newInstance()
-                                                            .newDocumentBuilder()
-                                                            .parse(m2Settings);
+            final Document document= DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(m2Settings);
 
-            final Node settingsNode = getNodeByNodeName(document.getChildNodes(), "settings");
+            final Node settingsNode= getNodeByNodeName(document.getChildNodes(), "settings");
             if (settingsNode != null) {
-                final Node localRepoNode = getNodeByNodeName(settingsNode.getChildNodes(), "localRepository");
+                final Node localRepoNode= getNodeByNodeName(settingsNode.getChildNodes(), "localRepository");
                 if (localRepoNode != null) {
                     return localRepoNode.getTextContent();
                 }
             }
         }
-        final File m2Repo = new File(userHome + "/.m2/repository");
+        final File m2Repo= new File(userHome + "/.m2/repository");
         if (m2Repo.exists() && m2Repo.isDirectory()) {
             return m2Repo.getPath();
         }
-        throw new RuntimeException("Cannot determine maven repository."
-                        + " Tried \"" + m2Settings + "\" file"
-                        + " and \"" + m2Repo + "\" directory.");
+        throw new RuntimeException("Cannot determine maven repository." + " Tried \"" + m2Settings + "\" file"
+                + " and \"" + m2Repo + "\" directory.");
     }
 
     private static Node getNodeByNodeName(NodeList nodes, String nodeName) {
@@ -135,9 +132,9 @@ public final class JavaCoreHelper {
     }
 
     private static String toPath(String groupId) {
-        final StringBuilder sb = new StringBuilder(groupId);
-        int length = sb.length();
-        for (int i = 0; i < length; i++) {
+        final StringBuilder sb= new StringBuilder(groupId);
+        int length= sb.length();
+        for (int i= 0; i < length; i++) {
             if (sb.charAt(i) == '.') {
                 sb.setCharAt(i, '/');
             }
@@ -146,10 +143,10 @@ public final class JavaCoreHelper {
     }
 
     private static List<Node> asList(NodeList nodeList) {
-        final List<Node> results = new ArrayList<Node>();
-        int length = nodeList.getLength();
-        for (int i = 0; i < length; i++) {
-            final Node item = nodeList.item(i);
+        final List<Node> results= new ArrayList<Node>();
+        int length= nodeList.getLength();
+        for (int i= 0; i < length; i++) {
+            final Node item= nodeList.item(i);
             if (item.getNodeType() != Node.TEXT_NODE) {
                 results.add(item);
             }
@@ -157,10 +154,9 @@ public final class JavaCoreHelper {
         return results;
     }
 
-    public static IJavaProject createJavaProject(String projectName,
-            String binFolderName) throws Exception {
-        IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-        IProject project = root.getProject(projectName);
+    public static IJavaProject createJavaProject(String projectName, String binFolderName) throws Exception {
+        IWorkspaceRoot root= ResourcesPlugin.getWorkspace().getRoot();
+        IProject project= root.getProject(projectName);
         if (!project.exists()) {
             project.create(null);
         } else {
@@ -171,12 +167,12 @@ public final class JavaCoreHelper {
             project.open(null);
         }
 
-        final IFolder binFolder = project.getFolder(binFolderName);
+        final IFolder binFolder= project.getFolder(binFolderName);
         createFolder(binFolder);
 
         addNatureToProject(project, JavaCore.NATURE_ID);
 
-        final IJavaProject javaProject = JavaCore.create(project);
+        final IJavaProject javaProject= JavaCore.create(project);
         javaProject.setOutputLocation(binFolder.getFullPath(), null);
         javaProject.setRawClasspath(new IClasspathEntry[0], null);
         return javaProject;
@@ -187,30 +183,30 @@ public final class JavaCoreHelper {
             return;
         }
 
-        IProjectDescription description = project.getDescription();
-        String[] prevNatures = description.getNatureIds();
-        String[] newNatures = new String[prevNatures.length + 1];
+        IProjectDescription description= project.getDescription();
+        String[] prevNatures= description.getNatureIds();
+        String[] newNatures= new String[prevNatures.length + 1];
         System.arraycopy(prevNatures, 0, newNatures, 0, prevNatures.length);
-        newNatures[prevNatures.length] = natureId;
+        newNatures[prevNatures.length]= natureId;
         description.setNatureIds(newNatures);
         project.setDescription(description, null);
     }
 
-    private static IPackageFragmentRoot addSourceContainer(
-            IJavaProject javaProject, String containerName) throws Exception {
-        final IProject project = javaProject.getProject();
-        final IFolder folder = project.getFolder(containerName);
+    private static IPackageFragmentRoot addSourceContainer(IJavaProject javaProject, String containerName)
+            throws Exception {
+        final IProject project= javaProject.getProject();
+        final IFolder folder= project.getFolder(containerName);
         createFolder(folder);
 
-        IPackageFragmentRoot root = javaProject.getPackageFragmentRoot(folder);
-        IClasspathEntry cpe = JavaCore.newSourceEntry(root.getPath(), EMPTY_PATHS, EMPTY_PATHS, null);
+        IPackageFragmentRoot root= javaProject.getPackageFragmentRoot(folder);
+        IClasspathEntry cpe= JavaCore.newSourceEntry(root.getPath(), EMPTY_PATHS, EMPTY_PATHS, null);
         addToClasspath(javaProject, Arrays.asList(cpe));
         return root;
     }
 
     private static void createFolder(IFolder folder) throws Exception {
         if (!folder.exists()) {
-            final IContainer parent = folder.getParent();
+            final IContainer parent= folder.getParent();
             if (parent instanceof IFolder) {
                 createFolder((IFolder) parent);
             }
@@ -219,29 +215,29 @@ public final class JavaCoreHelper {
     }
 
     private static IPath getPathToRtJar() {
-        final String classPath = System.getProperty("sun.boot.class.path");
-        final int idx = classPath.indexOf("rt.jar");
+        final String classPath= System.getProperty("sun.boot.class.path");
+        final int idx= classPath.indexOf("rt.jar");
         if (idx == -1) {
             throw new RuntimeException("Could not find Java runtime library rt.jar");
         }
-        final int end = idx + "rt.jar".length();
-        final int lastIdx = classPath.lastIndexOf(':', idx);
-        final int start = lastIdx != -1 ? lastIdx + 1 : 0;
+        final int end= idx + "rt.jar".length();
+        final int lastIdx= classPath.lastIndexOf(':', idx);
+        final int start= lastIdx != -1 ? lastIdx + 1 : 0;
         return new Path(classPath.substring(start, end));
     }
 
     private static void addToClasspath(IJavaProject javaProject, List<IClasspathEntry> classpathEntries)
             throws Exception {
         if (!classpathEntries.isEmpty()) {
-            IClasspathEntry[] oldEntries = javaProject.getRawClasspath();
+            IClasspathEntry[] oldEntries= javaProject.getRawClasspath();
             IClasspathEntry[] newEntries;
             if (oldEntries.length != 0) {
                 // remove duplicate entries
-                Set<IClasspathEntry> set = new HashSet<IClasspathEntry>(Arrays.asList(oldEntries));
+                Set<IClasspathEntry> set= new HashSet<IClasspathEntry>(Arrays.asList(oldEntries));
                 set.addAll(classpathEntries);
-                newEntries = set.toArray(new IClasspathEntry[set.size()]);
+                newEntries= set.toArray(new IClasspathEntry[set.size()]);
             } else {
-                newEntries = classpathEntries.toArray(new IClasspathEntry[classpathEntries.size()]);
+                newEntries= classpathEntries.toArray(new IClasspathEntry[classpathEntries.size()]);
             }
             javaProject.setRawClasspath(newEntries, null);
         }

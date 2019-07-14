@@ -105,17 +105,8 @@ public class BooleanPrimitiveRatherThanWrapperCleanUp extends AbstractPrimitiveR
 
     @Override
     public List<InfixExpression.Operator> getInfixInSafeOperators() {
-        return Arrays.<InfixExpression.Operator>asList(AND,
-                CONDITIONAL_AND,
-                CONDITIONAL_OR,
-                EQUALS,
-                GREATER,
-                GREATER_EQUALS,
-                LESS,
-                LESS_EQUALS,
-                NOT_EQUALS,
-                OR,
-                XOR);
+        return Arrays.<InfixExpression.Operator>asList(AND, CONDITIONAL_AND, CONDITIONAL_OR, EQUALS, GREATER,
+                GREATER_EQUALS, LESS, LESS_EQUALS, NOT_EQUALS, OR, XOR);
     }
 
     @Override
@@ -135,12 +126,12 @@ public class BooleanPrimitiveRatherThanWrapperCleanUp extends AbstractPrimitiveR
 
     @Override
     public String[] getSafeInConstants() {
-        return new String[]{"TRUE", "FALSE"};
+        return new String[] { "TRUE", "FALSE" };
     }
 
     @Override
     public boolean isSpecificPrimitiveAllowed(final ASTNode node) {
-        final ASTNode parentNode = node.getParent();
+        final ASTNode parentNode= node.getParent();
 
         switch (parentNode.getNodeType()) {
         case IF_STATEMENT:

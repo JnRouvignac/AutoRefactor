@@ -27,9 +27,12 @@ package org.autorefactor.util;
 
 import org.eclipse.jdt.core.dom.ASTNode;
 
-/** Exception thrown when some code is not implemented, or when some conditions are not handled. */
+/**
+ * Exception thrown when some code is not implemented, or when some conditions
+ * are not handled.
+ */
 public class NotImplementedException extends AutoRefactorException {
-    private static final String DEFAULT_MESSAGE = "Code is not implemented";
+    private static final String DEFAULT_MESSAGE= "Code is not implemented";
 
     /**
      * Class constructor to use when some code is not implemented.
@@ -43,7 +46,7 @@ public class NotImplementedException extends AutoRefactorException {
     /**
      * Constructor to use when the provided object was not expected.
      *
-     * @param node the node from which to retrieve the source location
+     * @param node  the node from which to retrieve the source location
      * @param cause the unexpected object
      */
     public NotImplementedException(ASTNode node, Object cause) {
@@ -53,7 +56,7 @@ public class NotImplementedException extends AutoRefactorException {
     /**
      * Constructor to use with a provided reason.
      *
-     * @param node the node from which to retrieve the source location
+     * @param node   the node from which to retrieve the source location
      * @param reason an additional message
      */
     public NotImplementedException(ASTNode node, String reason) {

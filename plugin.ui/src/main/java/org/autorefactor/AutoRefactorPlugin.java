@@ -45,7 +45,7 @@ import org.osgi.framework.BundleContext;
 /** The activator class controls the plug-in life cycle. */
 public class AutoRefactorPlugin extends AbstractUIPlugin {
     /** The plug-in ID. */
-    public static final String PLUGIN_ID = "org.autorefactor.plugin.ui";
+    public static final String PLUGIN_ID= "org.autorefactor.plugin.ui";
 
     /** The shared instance. */
     private static AutoRefactorPlugin plugin;
@@ -54,18 +54,16 @@ public class AutoRefactorPlugin extends AbstractUIPlugin {
     @Override
     public void start(final BundleContext context) throws Exception {
         super.start(context);
-        plugin = this;
-        environment = new Environment(new DisplayEventLoop(),
-                                      new JobManagerImpl(),
-                                      new LoggerImpl(),
-                                      new EclipsePreferences(plugin.getPreferenceStore()));
+        plugin= this;
+        environment= new Environment(new DisplayEventLoop(), new JobManagerImpl(), new LoggerImpl(),
+                new EclipsePreferences(plugin.getPreferenceStore()));
     }
 
     @Override
     public void stop(final BundleContext context) throws Exception {
-        plugin = null;
+        plugin= null;
         ((JobManagerImpl) environment.getJobManager()).cancelJobs();
-        environment = null;
+        environment= null;
         super.stop(context);
     }
 
@@ -78,7 +76,7 @@ public class AutoRefactorPlugin extends AbstractUIPlugin {
                 throw new UnhandledException(null, message, e);
             }
 
-            final ILog log = getDefault().getLog();
+            final ILog log= getDefault().getLog();
             log.log(new Status(severity, PLUGIN_ID, message, e));
         }
 
@@ -104,7 +102,7 @@ public class AutoRefactorPlugin extends AbstractUIPlugin {
          * Log a error message with exception.
          *
          * @param message the message
-         * @param e the exception
+         * @param e       the exception
          */
         public void error(String message, Exception e) {
             log(IStatus.ERROR, message, e);
@@ -119,12 +117,17 @@ public class AutoRefactorPlugin extends AbstractUIPlugin {
     public static AutoRefactorPlugin getDefault() {
         // Deprecated. Replaced by IEclipsePreferences.
         // Preferences are now stored according to scopes in the IPreferencesService.
-        // The return value of this method corresponds to a combination of the InstanceScope and the DefaultScope.
-        // To set preferences for your plug-in, use new InstanceScope().getNode(<&yourPluginId>).
-        // To set default preferences for your plug-in, use new DefaultScope().getNode(<yourPluginId>).
+        // The return value of this method corresponds to a combination of the
+        // InstanceScope and the DefaultScope.
+        // To set preferences for your plug-in, use new
+        // InstanceScope().getNode(<&yourPluginId>).
+        // To set default preferences for your plug-in, use new
+        // DefaultScope().getNode(<yourPluginId>).
         // To lookup an integer preference value for your plug-in, use
-        // Platform.getPreferencesService().getInt(<yourPluginId>, <preferenceKey>, <defaultValue>, null).
-        // Similar methods exist on IPreferencesService for obtaining other kinds of preference values
+        // Platform.getPreferencesService().getInt(<yourPluginId>, <preferenceKey>,
+        // <defaultValue>, null).
+        // Similar methods exist on IPreferencesService for obtaining other kinds of
+        // preference values
         // (strings, booleans, etc).
         return plugin;
     }
@@ -148,10 +151,10 @@ public class AutoRefactorPlugin extends AbstractUIPlugin {
     }
 
     /**
-     * Returns an image descriptor for the image file at the given plug-in relative path.
+     * Returns an image descriptor for the image file at the given plug-in relative
+     * path.
      *
-     * @param path
-     *            the path
+     * @param path the path
      * @return the image descriptor
      */
     public static ImageDescriptor getImageDescriptor(final String path) {
@@ -159,7 +162,7 @@ public class AutoRefactorPlugin extends AbstractUIPlugin {
     }
 
     private static class JobManagerImpl implements JobManager {
-        private final Vector<Job> jobs = new Vector<Job>();
+        private final Vector<Job> jobs= new Vector<Job>();
 
         /**
          * Register a job.

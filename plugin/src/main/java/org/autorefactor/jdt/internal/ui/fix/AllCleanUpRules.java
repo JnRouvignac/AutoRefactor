@@ -39,15 +39,17 @@ public final class AllCleanUpRules {
     }
 
     /**
-     * Returns the refactoring rules which have been enabled from the Eclipse preferences.
+     * Returns the refactoring rules which have been enabled from the Eclipse
+     * preferences.
      *
      * @param preferences the preferences
-     * @return the refactoring rules which have been enabled from the Eclipse preferences
+     * @return the refactoring rules which have been enabled from the Eclipse
+     *         preferences
      */
     public static List<RefactoringRule> getConfiguredRefactoringRules(final Preferences preferences) {
-        final List<RefactoringRule> refactorings = getAllCleanUpRules();
-        for (final Iterator<RefactoringRule> iter = refactorings.iterator(); iter.hasNext();) {
-            final RefactoringRule refactoring = iter.next();
+        final List<RefactoringRule> refactorings= getAllCleanUpRules();
+        for (final Iterator<RefactoringRule> iter= refactorings.iterator(); iter.hasNext();) {
+            final RefactoringRule refactoring= iter.next();
             if (!refactoring.isEnabled(preferences)) {
                 iter.remove();
             }
@@ -61,136 +63,78 @@ public final class AllCleanUpRules {
      * @return all the available refactoring rules
      */
     public static List<RefactoringRule> getAllCleanUpRules() {
-        return newArrayList(
-                new IntPrimitiveRatherThanWrapperCleanUp(),
-                new ShortPrimitiveRatherThanWrapperCleanUp(),
-                new LongPrimitiveRatherThanWrapperCleanUp(),
-                new DoublePrimitiveRatherThanWrapperCleanUp(),
-                new FloatPrimitiveRatherThanWrapperCleanUp(),
-                new CharPrimitiveRatherThanWrapperCleanUp(),
-                new BytePrimitiveRatherThanWrapperCleanUp(),
-                new RemoveUselessNullCheckCleanUp(),
-                new VectorOldToNewAPICleanUp(),
-                new PrimitiveWrapperCreationCleanUp(),
-                new AutoBoxingRatherThanExplicitMethodCleanUp(),
-                new UnboxingRatherThanExplicitMethodCleanUp(),
-                new BracketsRatherThanArrayInstantiationCleanUp(),
-                new LambdaExpressionRatherThanComparatorCleanUp(),
-                new LambdaCleanUp(),
-                new LiteralRatherThanBooleanConstantCleanUp(),
-                new BooleanCleanUp(),
-                new BooleanPrimitiveRatherThanWrapperCleanUp(),
-                new LazyLogicalRatherThanEagerCleanUp(),
-                new BooleanConstantRatherThanValueOfCleanUp(),
-                new BooleanEqualsRatherThanNullCheckCleanUp(),
-                new XORRatherThanDuplicateConditionsCleanUp(),
-                new ORConditionRatherThanRedundantClausesCleanUp(),
+        return newArrayList(new IntPrimitiveRatherThanWrapperCleanUp(), new ShortPrimitiveRatherThanWrapperCleanUp(),
+                new LongPrimitiveRatherThanWrapperCleanUp(), new DoublePrimitiveRatherThanWrapperCleanUp(),
+                new FloatPrimitiveRatherThanWrapperCleanUp(), new CharPrimitiveRatherThanWrapperCleanUp(),
+                new BytePrimitiveRatherThanWrapperCleanUp(), new RemoveUselessNullCheckCleanUp(),
+                new VectorOldToNewAPICleanUp(), new PrimitiveWrapperCreationCleanUp(),
+                new AutoBoxingRatherThanExplicitMethodCleanUp(), new UnboxingRatherThanExplicitMethodCleanUp(),
+                new BracketsRatherThanArrayInstantiationCleanUp(), new LambdaExpressionRatherThanComparatorCleanUp(),
+                new LambdaCleanUp(), new LiteralRatherThanBooleanConstantCleanUp(), new BooleanCleanUp(),
+                new BooleanPrimitiveRatherThanWrapperCleanUp(), new LazyLogicalRatherThanEagerCleanUp(),
+                new BooleanConstantRatherThanValueOfCleanUp(), new BooleanEqualsRatherThanNullCheckCleanUp(),
+                new XORRatherThanDuplicateConditionsCleanUp(), new ORConditionRatherThanRedundantClausesCleanUp(),
                 new TernaryOperatorRatherThanDuplicateConditionsCleanUp(),
                 // Must come after BooleanRefactoring, which may remove some targets
-                new WorkWithNullCheckedExpressionFirstCleanUp(),
-                new InvertEqualsCleanUp(),
-                new ComparisonCleanUp(),
-                new DoubleCompareRatherThanEqualityCleanUp(),
-                new RemoveUnneededThisExpressionCleanUp(),
+                new WorkWithNullCheckedExpressionFirstCleanUp(), new InvertEqualsCleanUp(), new ComparisonCleanUp(),
+                new DoubleCompareRatherThanEqualityCleanUp(), new RemoveUnneededThisExpressionCleanUp(),
                 new AggregateConstructorRatherThanGWTMethodCleanUp(),
-                new StandardMethodRatherThanLibraryMethodCleanUp(),
-                new StringRatherThanNewStringCleanUp(),
-                new StringCleanUp(),
-                new StringValueOfRatherThanConcatCleanUp(),
-                new BigNumberCleanUp(),
+                new StandardMethodRatherThanLibraryMethodCleanUp(), new StringRatherThanNewStringCleanUp(),
+                new StringCleanUp(), new StringValueOfRatherThanConcatCleanUp(), new BigNumberCleanUp(),
                 new OppositeComparisonRatherThanNegativeExpressionCleanUp(),
                 // TODO JNR implement
                 // new ForeachCleanUp(),
-                new RemoveEmptyIfCleanUp(),
-                new InlineCodeRatherThanPeremptoryConditionCleanUp(),
-                new RemoveUselessBlockCleanUp(),
-                new RemoveEmptyStatementCleanUp(),
-                new SingleDeclarationsRatherThanMultiDeclarationCleanUp(),
-                new EndOfMethodRatherThanReturnCleanUp(),
-                new DoWhileRatherThanWhileCleanUp(),
-                new DoWhileRatherThanDuplicateCodeCleanUp(),
-                new IfRatherThanWhileAndFallsThroughCleanUp(),
-                new SuperCallRatherThanUselessOverridingCleanUp(),
-                new CollapseIfStatementCleanUp(),
-                new CommonCodeInIfElseStatementCleanUp(),
+                new RemoveEmptyIfCleanUp(), new InlineCodeRatherThanPeremptoryConditionCleanUp(),
+                new RemoveUselessBlockCleanUp(), new RemoveEmptyStatementCleanUp(),
+                new SingleDeclarationsRatherThanMultiDeclarationCleanUp(), new EndOfMethodRatherThanReturnCleanUp(),
+                new DoWhileRatherThanWhileCleanUp(), new DoWhileRatherThanDuplicateCodeCleanUp(),
+                new IfRatherThanWhileAndFallsThroughCleanUp(), new SuperCallRatherThanUselessOverridingCleanUp(),
+                new CollapseIfStatementCleanUp(), new CommonCodeInIfElseStatementCleanUp(),
                 new OppositeConditionRatherThanDuplicateConditionCleanUp(),
-                new OneConditionRatherThanUnreachableBlockCleanUp(),
-                new MergeConditionalBlocksCleanUp(),
+                new OneConditionRatherThanUnreachableBlockCleanUp(), new MergeConditionalBlocksCleanUp(),
                 new OneIfRatherThanDuplicateBlocksThatFallThroughCleanUp(),
                 new OneCodeThatFallsThroughRatherThanRedundantBlocksCleanUp(),
-                new ElseRatherThanOppositeConditionCleanUp(),
-                new GenericMapRatherThanRawMapCleanUp(),
-                new GenericListRatherThanRawListCleanUp(),
-                new UseDiamondOperatorCleanUp(),
-                new UseMultiCatchCleanUp(),
-                new CollectionContainsCleanUp(),
-                new CollectionCleanUp(),
-                new AllInOneMethodRatherThanLoopCleanUp(),
-                new ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp(),
-                new BreakRatherThanPassiveIterationsCleanUp(),
-                new UpdateSetRatherThanTestingFirstCleanUp(),
-                new IsEmptyRatherThanSizeCleanUp(),
-                new MapCleanUp(),
-                new EntrySetRatherThanKeySetAndValueSearchCleanUp(),
-                new MethodOnMapRatherThanMethodOnKeySetCleanUp(),
-                new NoAssignmentInIfConditionCleanUp(),
-                new DeclarationOutsideLoopRatherThanInsideCleanUp(),
-                new IfElseIfCleanUp(),
-                new CommonIfInIfElseCleanUp(),
+                new ElseRatherThanOppositeConditionCleanUp(), new GenericMapRatherThanRawMapCleanUp(),
+                new GenericListRatherThanRawListCleanUp(), new UseDiamondOperatorCleanUp(), new UseMultiCatchCleanUp(),
+                new CollectionContainsCleanUp(), new CollectionCleanUp(), new AllInOneMethodRatherThanLoopCleanUp(),
+                new ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp(), new BreakRatherThanPassiveIterationsCleanUp(),
+                new UpdateSetRatherThanTestingFirstCleanUp(), new IsEmptyRatherThanSizeCleanUp(), new MapCleanUp(),
+                new EntrySetRatherThanKeySetAndValueSearchCleanUp(), new MethodOnMapRatherThanMethodOnKeySetCleanUp(),
+                new NoAssignmentInIfConditionCleanUp(), new DeclarationOutsideLoopRatherThanInsideCleanUp(),
+                new IfElseIfCleanUp(), new CommonIfInIfElseCleanUp(),
                 // TODO JNR implement
                 // new RemoveStupidIdiomaticPatternCleanUp(),
                 // TODO JNR - to be completed
                 // new ReduceVariableScopeCleanUp(),
-                new StringBuilderCleanUp(),
-                new StringBuilderMethodRatherThanReassignationCleanUp(),
-                new StringBuilderRatherThanStringBufferCleanUp(),
-                new HashMapRatherThanHashtableCleanUp(),
-                new ArrayListRatherThanVectorCleanUp(),
-                new ArrayDequeRatherThanStackCleanUp(),
-                new SetRatherThanMapCleanUp(),
-                new ArrayListRatherThanLinkedListCleanUp(),
-                new SetRatherThanListCleanUp(),
-                new HashMapRatherThanTreeMapCleanUp(),
-                new HashSetRatherThanTreeSetCleanUp(),
-                new UseStringContainsCleanUp(),
-                new CommentsCleanUp(),
-                new RemoveFieldsDefaultValuesCleanUp(),
-                new StaticConstantRatherThanInstanceConstantCleanUp(),
-                new RemoveOverridenAssignmentCleanUp(),
-                new Java7HashRatherThanEclipseJava6HashCleanUp(),
-                new HotSpotIntrinsicedAPIsCleanUp(),
-                new AnnotationCleanUp(),
-                new TryWithResourceCleanUp(),
-                // FIXME it would be nice if it was only enabled when testng jar is detected for the project
-                new TestNGAssertCleanUp(),
-                new JUnitAssertCleanUp(),
-                new RemoveEmptyLinesCleanUp(),
+                new StringBuilderCleanUp(), new StringBuilderMethodRatherThanReassignationCleanUp(),
+                new StringBuilderRatherThanStringBufferCleanUp(), new HashMapRatherThanHashtableCleanUp(),
+                new ArrayListRatherThanVectorCleanUp(), new ArrayDequeRatherThanStackCleanUp(),
+                new SetRatherThanMapCleanUp(), new ArrayListRatherThanLinkedListCleanUp(),
+                new SetRatherThanListCleanUp(), new HashMapRatherThanTreeMapCleanUp(),
+                new HashSetRatherThanTreeSetCleanUp(), new UseStringContainsCleanUp(), new CommentsCleanUp(),
+                new RemoveFieldsDefaultValuesCleanUp(), new StaticConstantRatherThanInstanceConstantCleanUp(),
+                new RemoveOverridenAssignmentCleanUp(), new Java7HashRatherThanEclipseJava6HashCleanUp(),
+                new HotSpotIntrinsicedAPIsCleanUp(), new AnnotationCleanUp(), new TryWithResourceCleanUp(),
+                // FIXME it would be nice if it was only enabled when testng jar is detected for
+                // the project
+                new TestNGAssertCleanUp(), new JUnitAssertCleanUp(), new RemoveEmptyLinesCleanUp(),
                 new RemoveEmptySuperConstrInvocationCleanUp(),
-                new ImplicitDefaultConstructorRatherThanWrittenOneCleanUp(),
-                new AndroidWakeLockCleanUp(),
-                new AndroidViewHolderCleanUp(),
-                new LogParametersRatherThanLogMessageCleanUp(),
-                new NamedMethodRatherThanLogLevelParameterCleanUp(),
-                new EnumMapRatherThanHashMapCleanUp(),
-                new EnumSetRatherThanHashSetCleanUp(),
-                new RemoveUncheckedThrowsClausesCleanUp(),
-                new CapitalizeLongLiteralCleanUp(),
-                new SwitchCleanUp(),
-                new IfRatherThanTwoSwitchCasesCleanUp(),
+                new ImplicitDefaultConstructorRatherThanWrittenOneCleanUp(), new AndroidWakeLockCleanUp(),
+                new AndroidViewHolderCleanUp(), new LogParametersRatherThanLogMessageCleanUp(),
+                new NamedMethodRatherThanLogLevelParameterCleanUp(), new EnumMapRatherThanHashMapCleanUp(),
+                new EnumSetRatherThanHashSetCleanUp(), new RemoveUncheckedThrowsClausesCleanUp(),
+                new CapitalizeLongLiteralCleanUp(), new SwitchCleanUp(), new IfRatherThanTwoSwitchCasesCleanUp(),
 
-                // Those refactorings should end the list because they clean the previous changes
-                new RemoveSemiColonCleanUp(),
-                new AddBracketsToControlStatementCleanUp(),
-                new RemoveUnnecessaryLocalBeforeReturnCleanUp(),
-                new RedundantModifiersCleanUp(),
-                new RemoveUnnecessaryCastCleanUp(),
-                new PushNegationDownCleanUp(),
-                new SimpleNameRatherThanQualifiedNameCleanUp(),
-                new SimplifyExpressionCleanUp());
+                // Those refactorings should end the list because they clean the previous
+                // changes
+                new RemoveSemiColonCleanUp(), new AddBracketsToControlStatementCleanUp(),
+                new RemoveUnnecessaryLocalBeforeReturnCleanUp(), new RedundantModifiersCleanUp(),
+                new RemoveUnnecessaryCastCleanUp(), new PushNegationDownCleanUp(),
+                new SimpleNameRatherThanQualifiedNameCleanUp(), new SimplifyExpressionCleanUp());
     }
 
     private static List<RefactoringRule> newArrayList(final RefactoringRule... refactorings) {
-        final List<RefactoringRule> results = new ArrayList<RefactoringRule>(refactorings.length);
+        final List<RefactoringRule> results= new ArrayList<RefactoringRule>(refactorings.length);
         for (RefactoringRule r : refactorings) {
             if (r != null) {
                 results.add(r);

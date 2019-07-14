@@ -45,8 +45,7 @@ import org.eclipse.jdt.core.dom.TypeLiteral;
 /**
  * Replaces HashMap for enum type creation to EnumMap.
  */
-public final class EnumMapRatherThanHashMapCleanUp extends
-        AbstractEnumCollectionReplacementCleanUp {
+public final class EnumMapRatherThanHashMapCleanUp extends AbstractEnumCollectionReplacementCleanUp {
     /**
      * Get the name.
      *
@@ -93,29 +92,27 @@ public final class EnumMapRatherThanHashMapCleanUp extends
      * Replace given class instance creation with suitable EnumMap constructor. <br>
      * <br>
      * Replacement is not correct if HashMap constructor accepts map <br>
-     * other than EnumMap, because it throws <code>IllegalArgumentException</code> if map is empty,
-     * <br>
-     * and HashMap(Map) does not. Therefore, for correctness reasons, it should not be refactored.
-     * <br>
+     * other than EnumMap, because it throws <code>IllegalArgumentException</code>
+     * if map is empty, <br>
+     * and HashMap(Map) does not. Therefore, for correctness reasons, it should not
+     * be refactored. <br>
      *
      * @see {@link java.util.EnumMap#EnumMap(java.util.Map)}
      * @see {@link java.util.HashMap#HashMap(java.util.Map)}
      */
     @Override
-    boolean maybeReplace(ClassInstanceCreation cic, Set<String> alreadyImportedClasses,
-            Set<String> importsToAdd, Type... types) {
+    boolean maybeReplace(ClassInstanceCreation cic, Set<String> alreadyImportedClasses, Set<String> importsToAdd,
+            Type... types) {
         if (types == null || types.length < 2) {
             return VISIT_SUBTREE;
         }
 
-        Type keyType = types[0];
-        Type valueType = types[1];
-        List<Expression> arguments = arguments(cic);
+        Type keyType= types[0];
+        Type valueType= types[1];
+        List<Expression> arguments= arguments(cic);
 
-        if (!arguments.isEmpty()
-                && isTargetType(arguments.get(0).resolveTypeBinding())
-                && !hasType(arguments.get(0).resolveTypeBinding(),
-                        "java.util.EnumMap")) {
+        if (!arguments.isEmpty() && isTargetType(arguments.get(0).resolveTypeBinding())
+                && !hasType(arguments.get(0).resolveTypeBinding(), "java.util.EnumMap")) {
             return VISIT_SUBTREE;
         }
 
@@ -124,13 +121,12 @@ public final class EnumMapRatherThanHashMapCleanUp extends
         return DO_NOT_VISIT_SUBTREE;
     }
 
-    private void replace(ClassInstanceCreation cic, Set<String> alreadyImportedClasses,
-            Set<String> importsToAdd, Type keyType,
-            Type valueType, List<Expression> arguments) {
-        ASTBuilder b = ctx.getASTBuilder();
-        Expression newParam = resolveParameter(keyType, arguments);
-        Type newType = b.genericType(alreadyImportedClasses.contains("java.util.EnumMap") ? "EnumMap"
-                : "java.util.EnumMap", b.copy(keyType),
+    private void replace(ClassInstanceCreation cic, Set<String> alreadyImportedClasses, Set<String> importsToAdd,
+            Type keyType, Type valueType, List<Expression> arguments) {
+        ASTBuilder b= ctx.getASTBuilder();
+        Expression newParam= resolveParameter(keyType, arguments);
+        Type newType= b.genericType(
+                alreadyImportedClasses.contains("java.util.EnumMap") ? "EnumMap" : "java.util.EnumMap", b.copy(keyType),
                 b.copy(valueType));
 
         // If there were no type args in original creation (diamond operator),
@@ -149,13 +145,11 @@ public final class EnumMapRatherThanHashMapCleanUp extends
      *
      * @return correct parameter for EnumMap constructor
      */
-    private Expression resolveParameter(Type keyType,
-            List<Expression> originalArgs) {
-        if (!originalArgs.isEmpty()
-                && instanceOf(originalArgs.get(0), "java.util.EnumMap")) {
+    private Expression resolveParameter(Type keyType, List<Expression> originalArgs) {
+        if (!originalArgs.isEmpty() && instanceOf(originalArgs.get(0), "java.util.EnumMap")) {
             return ctx.getASTBuilder().copy(originalArgs.get(0));
         }
-        TypeLiteral keyTypeLiteral = keyType.getAST().newTypeLiteral();
+        TypeLiteral keyTypeLiteral= keyType.getAST().newTypeLiteral();
         keyTypeLiteral.setType(ctx.getASTBuilder().copy(keyType));
         return keyTypeLiteral;
     }

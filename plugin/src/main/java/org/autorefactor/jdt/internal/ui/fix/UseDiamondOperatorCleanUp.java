@@ -90,11 +90,9 @@ public class UseDiamondOperatorCleanUp extends AbstractCleanUpRule {
 
     @Override
     public boolean visit(ClassInstanceCreation node) {
-        final Type type = node.getType();
-        if (type.isParameterizedType()
-                && node.getAnonymousClassDeclaration() == null
-                && parentAllowsDiamondOperator(node)
-                && canUseDiamondOperator(node, type)) {
+        final Type type= node.getType();
+        if (type.isParameterizedType() && node.getAnonymousClassDeclaration() == null
+                && parentAllowsDiamondOperator(node) && canUseDiamondOperator(node, type)) {
             return maybeRemoveAllTypeArguments((ParameterizedType) type);
         }
         return VISIT_SUBTREE;
@@ -105,47 +103,47 @@ public class UseDiamondOperatorCleanUp extends AbstractCleanUpRule {
      * {@link ClassInstanceCreation#isResolvedTypeInferredFromExpectedType()}.
      */
     private boolean canUseDiamondOperator(ClassInstanceCreation node, final Type type) {
-        List<Expression> args = arguments(node);
+        List<Expression> args= arguments(node);
         if (args.isEmpty()) {
             return true;
         }
 
-        ITypeBinding typeBinding = type.resolveBinding();
-        IMethodBinding ctorBinding = node.resolveConstructorBinding();
+        ITypeBinding typeBinding= type.resolveBinding();
+        IMethodBinding ctorBinding= node.resolveConstructorBinding();
         if (typeBinding == null || ctorBinding == null) {
             return false;
         }
-        List<ITypeBinding> typeArguments = new ArrayList<ITypeBinding>();
+        List<ITypeBinding> typeArguments= new ArrayList<ITypeBinding>();
         Collections.addAll(typeArguments, typeBinding.getTypeArguments());
-        ITypeBinding typeDecl = typeBinding.getTypeDeclaration();
-        List<ITypeBinding> typeParameters = new ArrayList<ITypeBinding>();
+        ITypeBinding typeDecl= typeBinding.getTypeDeclaration();
+        List<ITypeBinding> typeParameters= new ArrayList<ITypeBinding>();
         Collections.addAll(typeParameters, typeDecl.getTypeParameters());
 
-        IMethodBinding methodDecl = ctorBinding.getMethodDeclaration();
-        ITypeBinding[] actualCtorParamTypes = ctorBinding.getParameterTypes();
-        ITypeBinding[] declMethodParamTypes = methodDecl.getParameterTypes();
+        IMethodBinding methodDecl= ctorBinding.getMethodDeclaration();
+        ITypeBinding[] actualCtorParamTypes= ctorBinding.getParameterTypes();
+        ITypeBinding[] declMethodParamTypes= methodDecl.getParameterTypes();
 
-        int limit = Math.min(declMethodParamTypes.length, args.size());
-        for (int i = 0; i < limit; i++) {
-            ITypeBinding declParamType = declMethodParamTypes[i];
-            ITypeBinding actualParamType = actualCtorParamTypes[i];
-            String actualParamTypeQName = actualParamType.getErasure().getQualifiedName();
-            Expression actualArg = args.get(i);
-            ITypeBinding actualArgType = findImplementedType(actualArg.resolveTypeBinding(), actualParamTypeQName);
+        int limit= Math.min(declMethodParamTypes.length, args.size());
+        for (int i= 0; i < limit; i++) {
+            ITypeBinding declParamType= declMethodParamTypes[i];
+            ITypeBinding actualParamType= actualCtorParamTypes[i];
+            String actualParamTypeQName= actualParamType.getErasure().getQualifiedName();
+            Expression actualArg= args.get(i);
+            ITypeBinding actualArgType= findImplementedType(actualArg.resolveTypeBinding(), actualParamTypeQName);
 
             if (actualArgType != null && declParamType.isParameterizedType()) {
-                ITypeBinding[] declParamTypeArgs = declParamType.getTypeArguments();
-                ITypeBinding[] actualArgTypeArgs = actualArgType.getTypeArguments();
+                ITypeBinding[] declParamTypeArgs= declParamType.getTypeArguments();
+                ITypeBinding[] actualArgTypeArgs= actualArgType.getTypeArguments();
 
-                for (int j = 0; j < declParamTypeArgs.length; j++) {
-                    ITypeBinding declParamTypeArg = declParamTypeArgs[j];
+                for (int j= 0; j < declParamTypeArgs.length; j++) {
+                    ITypeBinding declParamTypeArg= declParamTypeArgs[j];
 
                     if (declParamTypeArg.isWildcardType() && actualArgTypeArgs.length != 0) {
-                        ITypeBinding declParamTypeArgBound = declParamTypeArg.getBound();
-                        int typeParamIndex = typeParameters.indexOf(declParamTypeArgBound);
+                        ITypeBinding declParamTypeArgBound= declParamTypeArg.getBound();
+                        int typeParamIndex= typeParameters.indexOf(declParamTypeArgBound);
 
-                        ITypeBinding actualArgTypeArg = actualArgTypeArgs[j];
-                        int typeArgIndex = typeArguments.indexOf(actualArgTypeArg);
+                        ITypeBinding actualArgTypeArg= actualArgTypeArgs[j];
+                        int typeArgIndex= typeArguments.indexOf(actualArgTypeArg);
                         if (typeParamIndex != -1 && typeArgIndex != -1) {
                             // The type parameter is matching
                             typeParameters.remove(typeParamIndex);
@@ -163,8 +161,8 @@ public class UseDiamondOperatorCleanUp extends AbstractCleanUpRule {
     }
 
     private boolean parentAllowsDiamondOperator(ClassInstanceCreation node) {
-        final ASTNode parentInfo = getParent(node, ParenthesizedExpression.class);
-        final StructuralPropertyDescriptor locationInParent = parentInfo.getLocationInParent();
+        final ASTNode parentInfo= getParent(node, ParenthesizedExpression.class);
+        final StructuralPropertyDescriptor locationInParent= parentInfo.getLocationInParent();
 
         switch (parentInfo.getParent().getNodeType()) {
         case ASSIGNMENT:
@@ -180,7 +178,7 @@ public class UseDiamondOperatorCleanUp extends AbstractCleanUpRule {
     }
 
     private boolean maybeRemoveAllTypeArguments(ParameterizedType pt) {
-        final List<Type> typeArguments = typeArguments(pt);
+        final List<Type> typeArguments= typeArguments(pt);
         if (!typeArguments.isEmpty()) {
             this.ctx.getRefactorings().remove(typeArguments);
             return DO_NOT_VISIT_SUBTREE;

@@ -44,24 +44,16 @@ import org.eclipse.jdt.core.dom.MethodInvocation;
 
 /** See {@link #getDescription()} method. */
 public class ArrayDequeRatherThanStackCleanUp extends AbstractClassSubstituteCleanUp {
-    private static final Map<String, String[]> CAN_BE_CASTED_TO = new HashMap<String, String[]>();
+    private static final Map<String, String[]> CAN_BE_CASTED_TO= new HashMap<String, String[]>();
 
     static {
-        CAN_BE_CASTED_TO.put("java.lang.Object", new String[]{"java.lang.Object"});
-        CAN_BE_CASTED_TO.put("java.lang.Cloneable", new String[]{"java.lang.Cloneable", "java.lang.Object"});
-        CAN_BE_CASTED_TO.put("java.io.Serializable",
-                new String[]{"java.io.Serializable", "java.lang.Object"});
-        CAN_BE_CASTED_TO.put("java.util.Collection", new String[]{"java.util.Collection", "java.lang.Object"});
-        CAN_BE_CASTED_TO.put("java.util.AbstractCollection",
-                new String[]{"java.util.AbstractCollection", "java.util.Collection", "java.lang.Object"});
-        CAN_BE_CASTED_TO.put("java.util.Vector",
-                new String[]{"java.util.Vector",
-                    "java.util.AbstractCollection", "java.util.Collection",
-                    "java.io.Serializable", "java.lang.Cloneable", "java.lang.Object"});
-        CAN_BE_CASTED_TO.put("java.util.Stack",
-                new String[]{"java.util.Stack", "java.util.Vector",
-                    "java.util.AbstractCollection", "java.util.Collection",
-                    "java.io.Serializable", "java.lang.Cloneable", "java.lang.Object"});
+        CAN_BE_CASTED_TO.put("java.lang.Object", new String[] { "java.lang.Object" });
+        CAN_BE_CASTED_TO.put("java.lang.Cloneable", new String[] { "java.lang.Cloneable", "java.lang.Object" });
+        CAN_BE_CASTED_TO.put("java.io.Serializable", new String[] { "java.io.Serializable", "java.lang.Object" });
+        CAN_BE_CASTED_TO.put("java.util.Collection", new String[] { "java.util.Collection", "java.lang.Object" });
+        CAN_BE_CASTED_TO.put("java.util.AbstractCollection", new String[] { "java.util.AbstractCollection", "java.util.Collection", "java.lang.Object" });
+        CAN_BE_CASTED_TO.put("java.util.Vector", new String[] { "java.util.Vector", "java.util.AbstractCollection", "java.util.Collection", "java.io.Serializable", "java.lang.Cloneable", "java.lang.Object" });
+        CAN_BE_CASTED_TO.put("java.util.Stack", new String[] { "java.util.Stack", "java.util.Vector", "java.util.AbstractCollection", "java.util.Collection", "java.io.Serializable", "java.lang.Cloneable", "java.lang.Object" });
     }
 
     /**
@@ -103,7 +95,7 @@ public class ArrayDequeRatherThanStackCleanUp extends AbstractClassSubstituteCle
 
     @Override
     protected String[] getExistingClassCanonicalName() {
-        return new String[] {"java.util.Stack"};
+        return new String[] { "java.util.Stack" };
     }
 
     @Override
@@ -127,35 +119,30 @@ public class ArrayDequeRatherThanStackCleanUp extends AbstractClassSubstituteCle
             final List<MethodInvocation> methodCallsToRefactor) {
         if (isMethod(mi, "java.util.Vector", "addElement", "java.lang.Object")
                 || isMethod(mi, "java.util.Vector", "copyInto", "java.lang.Object[]")
-                || isMethod(mi, "java.util.Vector", "firstElement")
-                || isMethod(mi, "java.util.Vector", "lastElement")
+                || isMethod(mi, "java.util.Vector", "firstElement") || isMethod(mi, "java.util.Vector", "lastElement")
                 || isMethod(mi, "java.util.Vector", "removeElement", "java.lang.Object")
-                || isMethod(mi, "java.util.Vector", "removeAllElements")
-                || isMethod(mi, "java.util.Stack", "empty")) {
+                || isMethod(mi, "java.util.Vector", "removeAllElements") || isMethod(mi, "java.util.Stack", "empty")) {
             methodCallsToRefactor.add(mi);
             return true;
         }
 
-        final String argumentType = getArgumentType(mi);
+        final String argumentType= getArgumentType(mi);
         return isMethod(mi, "java.util.Collection", "add", "java.lang.Object")
                 || isMethod(mi, "java.util.List", "addAll", "int", "java.util.Collection")
                 || isMethod(mi, "java.util.Collection", "clear")
                 || isMethod(mi, "java.util.Collection", "contains", "java.lang.Object")
                 || isMethod(mi, "java.util.Collection", "containsAll", "java.util.Collection")
                 || isMethod(mi, "java.lang.Object", "equals", "java.lang.Object")
-                || isMethod(mi, "java.lang.Object", "hashCode")
-                || isMethod(mi, "java.util.Collection", "isEmpty")
+                || isMethod(mi, "java.lang.Object", "hashCode") || isMethod(mi, "java.util.Collection", "isEmpty")
                 || isMethod(mi, "java.util.Collection", "iterator")
                 || isMethod(mi, "java.util.Collection", "remove", "java.lang.Object")
                 || isMethod(mi, "java.util.Collection", "removeAll", "java.util.Collection")
                 || isMethod(mi, "java.util.Collection", "retainAll", "java.util.Collection")
-                || isMethod(mi, "java.util.Collection", "size")
-                || isMethod(mi, "java.util.Collection", "toArray")
+                || isMethod(mi, "java.util.Collection", "size") || isMethod(mi, "java.util.Collection", "toArray")
                 || isMethod(mi, "java.util.Collection", "toArray", argumentType + "[]")
                 || isMethod(mi, "java.util.Stack", "clone")
                 || isMethod(mi, "java.util.Stack", "retainAll", "java.util.Collection")
-                || isMethod(mi, "java.lang.Object", "toString")
-                || isMethod(mi, "java.util.Stack", "peek")
+                || isMethod(mi, "java.lang.Object", "toString") || isMethod(mi, "java.util.Stack", "peek")
                 || isMethod(mi, "java.util.Stack", "pop")
                 || isMethod(mi, "java.util.Stack", "push", "java.lang.Object");
     }
@@ -181,10 +168,8 @@ public class ArrayDequeRatherThanStackCleanUp extends AbstractClassSubstituteCle
     }
 
     @Override
-    protected boolean isTypeCompatible(final ITypeBinding variableType,
-            final ITypeBinding refType) {
-        return super.isTypeCompatible(variableType, refType)
-                || hasType(variableType,
-                           getOrDefault(CAN_BE_CASTED_TO, refType.getErasure().getQualifiedName(), new String[0]));
+    protected boolean isTypeCompatible(final ITypeBinding variableType, final ITypeBinding refType) {
+        return super.isTypeCompatible(variableType, refType) || hasType(variableType,
+                getOrDefault(CAN_BE_CASTED_TO, refType.getErasure().getQualifiedName(), new String[0]));
     }
 }

@@ -33,7 +33,8 @@ import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.Block;
 
 /**
- * A visitor to refactor several sibling nodes and flag the parent block to visited.
+ * A visitor to refactor several sibling nodes and flag the parent block to
+ * visited.
  */
 public class BlockSubVisitor extends ASTVisitor {
     /**
@@ -43,17 +44,17 @@ public class BlockSubVisitor extends ASTVisitor {
 
     private Block startNode;
 
-    private boolean result = VISIT_SUBTREE;
+    private boolean result= VISIT_SUBTREE;
 
     /**
      * Constructor.
      *
-     * @param ctx The refactoring context
+     * @param ctx       The refactoring context
      * @param startNode The start node block
      */
     public BlockSubVisitor(final RefactoringContext ctx, final Block startNode) {
-        this.ctx = ctx;
-        this.startNode = startNode;
+        this.ctx= ctx;
+        this.startNode= startNode;
     }
 
     /**
@@ -71,7 +72,7 @@ public class BlockSubVisitor extends ASTVisitor {
      * @param result The result
      */
     public void setResult(final boolean result) {
-        this.result = result;
+        this.result= result;
     }
 
     @Override

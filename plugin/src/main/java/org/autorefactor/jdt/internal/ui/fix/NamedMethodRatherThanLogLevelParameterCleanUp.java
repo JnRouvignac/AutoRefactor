@@ -71,28 +71,28 @@ public class NamedMethodRatherThanLogLevelParameterCleanUp extends AbstractClean
     @Override
     public boolean visit(final MethodInvocation node) {
         if (isMethod(node, "java.util.logging.Logger", "log", "java.util.logging.Level", "java.lang.String")) {
-            final List<Expression> args = arguments(node);
+            final List<Expression> args= arguments(node);
 
             if (args != null && args.size() == 2) {
-                final Expression level = args.get(0);
-                final Expression message = args.get(1);
+                final Expression level= args.get(0);
+                final Expression message= args.get(1);
 
                 if (level instanceof QualifiedName) {
-                    final QualifiedName levelType = (QualifiedName) level;
+                    final QualifiedName levelType= (QualifiedName) level;
                     final String methodName;
 
                     if (isField(levelType, "java.util.logging.Level", "SEVERE")) {
-                        methodName = "severe";
+                        methodName= "severe";
                     } else if (isField(levelType, "java.util.logging.Level", "WARNING")) {
-                        methodName = "warning";
+                        methodName= "warning";
                     } else if (isField(levelType, "java.util.logging.Level", "INFO")) {
-                        methodName = "info";
+                        methodName= "info";
                     } else if (isField(levelType, "java.util.logging.Level", "FINE")) {
-                        methodName = "fine";
+                        methodName= "fine";
                     } else if (isField(levelType, "java.util.logging.Level", "FINER")) {
-                        methodName = "finer";
+                        methodName= "finer";
                     } else if (isField(levelType, "java.util.logging.Level", "FINEST")) {
-                        methodName = "finest";
+                        methodName= "finest";
                     } else {
                         return VISIT_SUBTREE;
                     }
@@ -108,8 +108,8 @@ public class NamedMethodRatherThanLogLevelParameterCleanUp extends AbstractClean
 
     private void replaceLevelByMethodName(final MethodInvocation node, final String methodName,
             final Expression message) {
-        final ASTBuilder b = this.ctx.getASTBuilder();
-        final Refactorings r = this.ctx.getRefactorings();
+        final ASTBuilder b= this.ctx.getASTBuilder();
+        final Refactorings r= this.ctx.getRefactorings();
 
         r.replace(node, b.invoke(b.copy(node.getExpression()), methodName, b.copy(message)));
     }

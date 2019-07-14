@@ -61,9 +61,9 @@ import org.eclipse.ui.handlers.HandlerUtil;
  * This is the Eclipse handler for launching the automated refactorings. This is
  * invoked from the Eclipse UI.
  *
- * @see <a
- * href="http://www.vogella.com/articles/EclipsePlugIn/article.html#contribute"
- * >Extending Eclipse - Plug-in Development Tutorial</a>
+ * @see <a href=
+ *      "http://www.vogella.com/articles/EclipsePlugIn/article.html#contribute"
+ *      >Extending Eclipse - Plug-in Development Tutorial</a>
  */
 public class AutoRefactorHandler extends AbstractHandler {
     /**
@@ -77,16 +77,15 @@ public class AutoRefactorHandler extends AbstractHandler {
      */
     public Object execute(final ExecutionEvent event) throws ExecutionException {
         try {
-            Environment environment = getEnvironment();
-            new PrepareApplyRefactoringsJob(
-                    getSelectedJavaElements(event),
-                    AllCleanUpRules.getConfiguredRefactoringRules(environment.getPreferences()),
-                    environment).schedule();
+            Environment environment= getEnvironment();
+            new PrepareApplyRefactoringsJob(getSelectedJavaElements(event),
+                    AllCleanUpRules.getConfiguredRefactoringRules(environment.getPreferences()), environment)
+                            .schedule();
         } catch (Exception e) {
-            final Shell shell = HandlerUtil.getActiveShell(event);
+            final Shell shell= HandlerUtil.getActiveShell(event);
 
-            StringWriter sw = new StringWriter();
-            PrintWriter pw = new PrintWriter(sw);
+            StringWriter sw= new StringWriter();
+            PrintWriter pw= new PrintWriter(sw);
             e.printStackTrace(pw);
 
             showMessage(shell, "An error has occurred:\n\n" + sw);
@@ -100,16 +99,18 @@ public class AutoRefactorHandler extends AbstractHandler {
         // TODO JNR provide from the UI the ability to execute groovy (other
         // scripts? rhino?) scripts for refactoring.
 
-        // <p> Extract method: Live variable analysis - READ WRITE variable analysis (including method params).
+        // <p> Extract method: Live variable analysis - READ WRITE variable analysis
+        // (including method params).
         // If variable used in extracted method and WRITE first in selected text
         // => do not pass it down as parameter
-        // Use ASTMatcher and do not compare content of expressions, compare just resolvedTypeBinding().
+        // Use ASTMatcher and do not compare content of expressions, compare just
+        // resolvedTypeBinding().
         return null;
     }
 
     static List<IJavaElement> getSelectedJavaElements(ExecutionEvent event) {
-        final Shell shell = HandlerUtil.getActiveShell(event);
-        final String activePartId = HandlerUtil.getActivePartId(event);
+        final Shell shell= HandlerUtil.getActiveShell(event);
+        final String activePartId= HandlerUtil.getActivePartId(event);
         if ("org.eclipse.jdt.ui.CompilationUnitEditor".equals(activePartId)
                 || "com.google.gwt.eclipse.core.editors.gwtJavaEditor".equals(activePartId)
                 || "com.google.gwt.eclipse.core.editors.java.GWTJavaEditor".equals(activePartId)) {
@@ -123,23 +124,21 @@ public class AutoRefactorHandler extends AbstractHandler {
         }
     }
 
-    private static List<IJavaElement> getSelectedJavaElements(Shell shell,  IStructuredSelection selection) {
-        boolean goodSelection = true;
-        final List<IJavaElement> results = new ArrayList<IJavaElement>();
+    private static List<IJavaElement> getSelectedJavaElements(Shell shell, IStructuredSelection selection) {
+        boolean goodSelection= true;
+        final List<IJavaElement> results= new ArrayList<IJavaElement>();
 
         for (Object el : selection.toArray()) {
-            if (el instanceof ICompilationUnit
-                    || el instanceof IPackageFragment
-                    || el instanceof IPackageFragmentRoot
+            if (el instanceof ICompilationUnit || el instanceof IPackageFragment || el instanceof IPackageFragmentRoot
                     || el instanceof IJavaProject) {
                 results.add((IJavaElement) el);
             } else if (el instanceof IProject) {
-                final IProject project = (IProject) el;
+                final IProject project= (IProject) el;
                 if (project.isOpen() && hasNature(project, JavaCore.NATURE_ID)) {
                     results.add(JavaCore.create(project));
                 }
             } else {
-                goodSelection = false;
+                goodSelection= false;
             }
         }
 
@@ -159,8 +158,8 @@ public class AutoRefactorHandler extends AbstractHandler {
     }
 
     private static List<IJavaElement> getSelectedJavaElements(Shell shell, IEditorPart activeEditor) {
-        final IEditorInput editorInput = activeEditor.getEditorInput();
-        final IJavaElement javaElement = JavaUI.getEditorInputJavaElement(editorInput);
+        final IEditorInput editorInput= activeEditor.getEditorInput();
+        final IJavaElement javaElement= JavaUI.getEditorInputJavaElement(editorInput);
         if (javaElement instanceof ICompilationUnit) {
             return Collections.singletonList(javaElement);
         }

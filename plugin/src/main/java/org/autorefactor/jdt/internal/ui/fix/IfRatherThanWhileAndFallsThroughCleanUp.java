@@ -82,11 +82,11 @@ public class IfRatherThanWhileAndFallsThroughCleanUp extends AbstractCleanUpRule
     @Override
     public boolean visit(WhileStatement node) {
         if (isEndingWithExit(node.getBody())) {
-            final BreakVisitor breakVisitor = new BreakVisitor(node);
+            final BreakVisitor breakVisitor= new BreakVisitor(node);
             breakVisitor.visitNode(node);
 
             if (breakVisitor.canBeRefactored()) {
-                final ASTBuilder b = ctx.getASTBuilder();
+                final ASTBuilder b= ctx.getASTBuilder();
                 for (final BreakStatement breakStmt : breakVisitor.getBreaks()) {
                     ctx.getRefactorings().remove(breakStmt);
                 }
@@ -104,27 +104,26 @@ public class IfRatherThanWhileAndFallsThroughCleanUp extends AbstractCleanUpRule
      * @return true if the statement falls through.
      */
     private boolean isEndingWithExit(final Statement stmt) {
-        final List<Statement> stmts = asList(stmt);
+        final List<Statement> stmts= asList(stmt);
         if (stmts.isEmpty()) {
             return false;
         }
 
-        final Statement lastStmt = stmts.get(stmts.size() - 1);
+        final Statement lastStmt= stmts.get(stmts.size() - 1);
         switch (lastStmt.getNodeType()) {
         case RETURN_STATEMENT:
         case THROW_STATEMENT:
             return true;
 
         case BREAK_STATEMENT:
-            final BreakStatement breakStmt = (BreakStatement) lastStmt;
+            final BreakStatement breakStmt= (BreakStatement) lastStmt;
             return breakStmt.getLabel() == null;
 
         case IF_STATEMENT:
-            final IfStatement ifStmt = (IfStatement) lastStmt;
-            final Statement thenStmt = ifStmt.getThenStatement();
-            final Statement elseStmt = ifStmt.getElseStatement();
-            return isEndingWithExit(thenStmt)
-                    && isEndingWithExit(elseStmt);
+            final IfStatement ifStmt= (IfStatement) lastStmt;
+            final Statement thenStmt= ifStmt.getThenStatement();
+            final Statement elseStmt= ifStmt.getElseStatement();
+            return isEndingWithExit(thenStmt) && isEndingWithExit(elseStmt);
 
         default:
             return false;
@@ -133,11 +132,11 @@ public class IfRatherThanWhileAndFallsThroughCleanUp extends AbstractCleanUpRule
 
     private class BreakVisitor extends InterruptibleVisitor {
         private final WhileStatement root;
-        private final List<BreakStatement> breaks = new ArrayList<BreakStatement>();
-        private boolean canBeRefactored = true;
+        private final List<BreakStatement> breaks= new ArrayList<BreakStatement>();
+        private boolean canBeRefactored= true;
 
         public BreakVisitor(final WhileStatement root) {
-            this.root = root;
+            this.root= root;
         }
 
         public List<BreakStatement> getBreaks() {
@@ -150,13 +149,13 @@ public class IfRatherThanWhileAndFallsThroughCleanUp extends AbstractCleanUpRule
 
         @Override
         public boolean visit(BreakStatement aBreak) {
-            Statement parent = getAncestorOrNull(aBreak, Statement.class);
+            Statement parent= getAncestorOrNull(aBreak, Statement.class);
             while (parent != root && (getNextSiblings(parent) == null || getNextSiblings(parent).isEmpty())) {
-                parent = getAncestorOrNull(parent, Statement.class);
+                parent= getAncestorOrNull(parent, Statement.class);
             }
 
             if (parent != root) {
-                canBeRefactored = false;
+                canBeRefactored= false;
                 return interruptVisit();
             }
 

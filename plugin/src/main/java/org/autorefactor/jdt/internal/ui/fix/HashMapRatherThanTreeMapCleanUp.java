@@ -43,19 +43,15 @@ import static org.autorefactor.util.Utils.*;
 
 /** See {@link #getDescription()} method. */
 public class HashMapRatherThanTreeMapCleanUp extends AbstractClassSubstituteCleanUp {
-    private static final Map<String, String[]> CAN_BE_CASTED_TO = new HashMap<String, String[]>();
+    private static final Map<String, String[]> CAN_BE_CASTED_TO= new HashMap<String, String[]>();
 
     static {
-        CAN_BE_CASTED_TO.put("java.lang.Object", new String[]{"java.lang.Object"});
-        CAN_BE_CASTED_TO.put("java.lang.Cloneable", new String[]{"java.lang.Cloneable", "java.lang.Object"});
-        CAN_BE_CASTED_TO.put("java.io.Serializable",
-                new String[]{"java.io.Serializable", "java.lang.Object"});
-        CAN_BE_CASTED_TO.put("java.util.Map", new String[]{"java.util.Map", "java.lang.Object"});
-        CAN_BE_CASTED_TO.put("java.util.AbstractMap",
-                new String[]{"java.util.AbstractMap", "java.lang.Cloneable", "java.lang.Object"});
-        CAN_BE_CASTED_TO.put("java.util.TreeMap",
-                new String[]{"java.util.TreeMap", "java.io.Serializable", "java.util.Map",
-                    "java.util.AbstractMap", "java.lang.Cloneable", "java.lang.Object"});
+        CAN_BE_CASTED_TO.put("java.lang.Object", new String[] { "java.lang.Object" });
+        CAN_BE_CASTED_TO.put("java.lang.Cloneable", new String[] { "java.lang.Cloneable", "java.lang.Object" });
+        CAN_BE_CASTED_TO.put("java.io.Serializable", new String[] { "java.io.Serializable", "java.lang.Object" });
+        CAN_BE_CASTED_TO.put("java.util.Map", new String[] { "java.util.Map", "java.lang.Object" });
+        CAN_BE_CASTED_TO.put("java.util.AbstractMap", new String[] { "java.util.AbstractMap", "java.lang.Cloneable", "java.lang.Object" });
+        CAN_BE_CASTED_TO.put("java.util.TreeMap", new String[] { "java.util.TreeMap", "java.io.Serializable", "java.util.Map", "java.util.AbstractMap", "java.lang.Cloneable", "java.lang.Object" });
     }
 
     /**
@@ -87,7 +83,7 @@ public class HashMapRatherThanTreeMapCleanUp extends AbstractClassSubstituteClea
 
     @Override
     protected String[] getExistingClassCanonicalName() {
-        return new String[] {"java.util.TreeMap"};
+        return new String[] { "java.util.TreeMap" };
     }
 
     @Override
@@ -126,20 +122,15 @@ public class HashMapRatherThanTreeMapCleanUp extends AbstractClassSubstituteClea
                 || isMethod(mi, "java.util.Map", "remove", "java.lang.Object", "java.lang.Object")
                 || isMethod(mi, "java.util.Map", "replace", "java.lang.Object", "java.lang.Object")
                 || isMethod(mi, "java.util.Map", "replace", "java.lang.Object", "java.lang.Object", "java.lang.Object")
-                || isMethod(mi, "java.util.Map", "size")
-                || isMethod(mi, "java.lang.Object", "finalize")
-                || isMethod(mi, "java.lang.Object", "notify")
-                || isMethod(mi, "java.lang.Object", "notifyAll")
-                || isMethod(mi, "java.lang.Object", "wait")
-                || isMethod(mi, "java.lang.Object", "wait", "long")
+                || isMethod(mi, "java.util.Map", "size") || isMethod(mi, "java.lang.Object", "finalize")
+                || isMethod(mi, "java.lang.Object", "notify") || isMethod(mi, "java.lang.Object", "notifyAll")
+                || isMethod(mi, "java.lang.Object", "wait") || isMethod(mi, "java.lang.Object", "wait", "long")
                 || isMethod(mi, "java.lang.Object", "wait", "long", "int");
     }
 
     @Override
-    protected boolean isTypeCompatible(final ITypeBinding variableType,
-            final ITypeBinding refType) {
-        return super.isTypeCompatible(variableType, refType)
-                || hasType(variableType,
-                           getOrDefault(CAN_BE_CASTED_TO, refType.getErasure().getQualifiedName(), new String[0]));
+    protected boolean isTypeCompatible(final ITypeBinding variableType, final ITypeBinding refType) {
+        return super.isTypeCompatible(variableType, refType) || hasType(variableType,
+                getOrDefault(CAN_BE_CASTED_TO, refType.getErasure().getQualifiedName(), new String[0]));
     }
 }

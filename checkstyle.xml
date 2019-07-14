@@ -204,12 +204,13 @@
     <module name="NoWhitespaceAfter">
       <property name="tokens" value="BNOT,DEC,DOT,INC,LNOT,UNARY_MINUS,UNARY_PLUS" />
     </module>
-    <module name="NoWhitespaceBefore" />
+    <module name="NoWhitespaceBefore">
+      <property name="tokens" value="EQUAL" />
+    </module>
     <module name="OperatorWrap" />
     <module name="ParenPad" />
     <module name="TypecastParenPad" />
     <module name="WhitespaceAfter" />
-    <module name="WhitespaceAround" />
 
     <!--
     

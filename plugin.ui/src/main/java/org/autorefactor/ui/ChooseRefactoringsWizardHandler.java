@@ -57,12 +57,12 @@ public class ChooseRefactoringsWizardHandler extends AbstractHandler {
      * @throws ExecutionException ExecutionException
      */
     public Object execute(final ExecutionEvent event) throws ExecutionException {
-        final Shell shell = HandlerUtil.getActiveShell(event);
+        final Shell shell= HandlerUtil.getActiveShell(event);
         try {
-            // Retrieve the targeted java element before the menu item is disposed by the framework
-            final Wizard wizard = new ChooseRefactoringsWizard(
-                    AutoRefactorHandler.getSelectedJavaElements(event));
-            final WizardDialog dialog = new WizardDialog(shell, wizard);
+            // Retrieve the targeted java element before the menu item is disposed by the
+            // framework
+            final Wizard wizard= new ChooseRefactoringsWizard(AutoRefactorHandler.getSelectedJavaElements(event));
+            final WizardDialog dialog= new WizardDialog(shell, wizard);
             dialog.open();
         } catch (final Exception e) {
             Display.getDefault().asyncExec(new Runnable() {
@@ -70,8 +70,8 @@ public class ChooseRefactoringsWizardHandler extends AbstractHandler {
                  * Run.
                  */
                 public void run() {
-                    final StringWriter sw = new StringWriter();
-                    final PrintWriter pw = new PrintWriter(sw);
+                    final StringWriter sw= new StringWriter();
+                    final PrintWriter pw= new PrintWriter(sw);
                     e.printStackTrace(pw);
 
                     openInformation(shell, "Info", "An error has occurred:\n\n" + sw);

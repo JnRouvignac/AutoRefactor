@@ -101,17 +101,17 @@ public class VectorOldToNewAPICleanUp extends AbstractCleanUpRule {
     }
 
     private void replaceWith(final MethodInvocation node, final String newMethodName) {
-        final ASTBuilder b = this.ctx.getASTBuilder();
+        final ASTBuilder b= this.ctx.getASTBuilder();
         ctx.getRefactorings().set(node, NAME_PROPERTY, b.simpleName(newMethodName));
     }
 
     private void replaceWithSpecial(final MethodInvocation node, final String newMethodName) {
-        final List<Expression> args = arguments(node);
+        final List<Expression> args= arguments(node);
         assertSize(args, 1);
-        final Expression arg0 = args.get(0);
+        final Expression arg0= args.get(0);
 
-        final ASTBuilder b = this.ctx.getASTBuilder();
-        final Refactorings r = this.ctx.getRefactorings();
+        final ASTBuilder b= this.ctx.getASTBuilder();
+        final Refactorings r= this.ctx.getRefactorings();
         r.set(node, NAME_PROPERTY, b.simpleName(newMethodName));
         if (hasType(arg0, "int", "short", "byte")) {
             r.replace(arg0, b.cast(b.type("Object"), b.move(arg0)));
@@ -119,12 +119,12 @@ public class VectorOldToNewAPICleanUp extends AbstractCleanUpRule {
     }
 
     private void replaceWithAndSwapArguments(final MethodInvocation node, final String newMethodName) {
-        final List<Expression> args = arguments(node);
+        final List<Expression> args= arguments(node);
         assertSize(args, 2);
-        final Expression arg1 = args.get(1);
+        final Expression arg1= args.get(1);
 
-        final ASTBuilder b = ctx.getASTBuilder();
-        final Refactorings r = ctx.getRefactorings();
+        final ASTBuilder b= ctx.getASTBuilder();
+        final Refactorings r= ctx.getRefactorings();
         r.set(node, NAME_PROPERTY, b.simpleName(newMethodName));
         r.moveToIndex(arg1, 0, b.move(arg1));
     }
@@ -134,11 +134,9 @@ public class VectorOldToNewAPICleanUp extends AbstractCleanUpRule {
             throw new IllegalArgumentException(null, "Expected " + args + "to not be null");
         }
         if (args.size() != expectedSize) {
-            final Expression node = !args.isEmpty() ? args.get(0) : null;
+            final Expression node= !args.isEmpty() ? args.get(0) : null;
             throw new IllegalArgumentException(node,
-                    "Expected " + args
-                    + " to have size <" + expectedSize + ">, but found <"
-                    + args.size() + ">");
+                    "Expected " + args + " to have size <" + expectedSize + ">, but found <" + args.size() + ">");
         }
     }
 }

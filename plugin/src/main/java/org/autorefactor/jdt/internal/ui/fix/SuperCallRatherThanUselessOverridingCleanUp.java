@@ -95,17 +95,16 @@ public class SuperCallRatherThanUselessOverridingCleanUp extends AbstractCleanUp
             return VISIT_SUBTREE;
         }
 
-        final List<Statement> bodyStmts = statements(node.getBody());
+        final List<Statement> bodyStmts= statements(node.getBody());
 
         if (bodyStmts.size() == 1) {
-            final SuperMethodInvocation bodyMi = asExpression(bodyStmts.get(0), SuperMethodInvocation.class);
+            final SuperMethodInvocation bodyMi= asExpression(bodyStmts.get(0), SuperMethodInvocation.class);
 
             if (bodyMi != null) {
-                final IMethodBinding bodyMethodBinding = bodyMi.resolveMethodBinding();
-                final IMethodBinding declMethodBinding = node.resolveBinding();
+                final IMethodBinding bodyMethodBinding= bodyMi.resolveMethodBinding();
+                final IMethodBinding declMethodBinding= node.resolveBinding();
 
-                if (declMethodBinding != null
-                        && bodyMethodBinding != null
+                if (declMethodBinding != null && bodyMethodBinding != null
                         && declMethodBinding.overrides(bodyMethodBinding)
                         && !hasSignificantAnnotations(declMethodBinding)
                         && haveSameModifiers(bodyMethodBinding, declMethodBinding)
@@ -129,11 +128,11 @@ public class SuperCallRatherThanUselessOverridingCleanUp extends AbstractCleanUp
     }
 
     private boolean haveSameParameters(final MethodDeclaration node, final SuperMethodInvocation bodyMi) {
-        final List<?> parameters = node.parameters();
+        final List<?> parameters= node.parameters();
 
-        for (int i = 0; i < node.parameters().size(); i++) {
-            final SingleVariableDeclaration paramName = (SingleVariableDeclaration) parameters.get(i);
-            final Expression paramExpr = (Expression) bodyMi.arguments().get(i);
+        for (int i= 0; i < node.parameters().size(); i++) {
+            final SingleVariableDeclaration paramName= (SingleVariableDeclaration) parameters.get(i);
+            final Expression paramExpr= (Expression) bodyMi.arguments().get(i);
 
             if (!(paramExpr instanceof SimpleName)
                     || !paramName.getName().getIdentifier().equals(((SimpleName) paramExpr).getIdentifier())) {
@@ -146,10 +145,10 @@ public class SuperCallRatherThanUselessOverridingCleanUp extends AbstractCleanUp
 
     /** This method is extremely expensive. */
     private boolean isMethodUsedInItsPackage(final IMethodBinding methodBinding, MethodDeclaration node) {
-        final IPackageBinding methodPackage = methodBinding.getDeclaringClass().getPackage();
+        final IPackageBinding methodPackage= methodBinding.getDeclaringClass().getPackage();
 
-        final AtomicBoolean methodIsUsedInPackage = new AtomicBoolean(false);
-        final SearchRequestor requestor = new SearchRequestor() {
+        final AtomicBoolean methodIsUsedInPackage= new AtomicBoolean(false);
+        final SearchRequestor requestor= new SearchRequestor() {
             @Override
             public void acceptSearchMatch(SearchMatch match) {
                 methodIsUsedInPackage.set(true);
@@ -157,13 +156,11 @@ public class SuperCallRatherThanUselessOverridingCleanUp extends AbstractCleanUp
         };
 
         try {
-            final SearchEngine searchEngine = new SearchEngine();
-            searchEngine.search(
-                    createPattern(methodBinding.getJavaElement(), REFERENCES, R_EXACT_MATCH),
+            final SearchEngine searchEngine= new SearchEngine();
+            searchEngine.search(createPattern(methodBinding.getJavaElement(), REFERENCES, R_EXACT_MATCH),
                     new SearchParticipant[] { SearchEngine.getDefaultSearchParticipant() },
                     SearchEngine.createJavaSearchScope(new IJavaElement[] { methodPackage.getJavaElement() }),
-                    requestor,
-                    ctx.getProgressMonitor());
+                    requestor, ctx.getProgressMonitor());
             return methodIsUsedInPackage.get();
         } catch (CoreException e) {
             throw new UnhandledException(node, e);
@@ -171,8 +168,8 @@ public class SuperCallRatherThanUselessOverridingCleanUp extends AbstractCleanUp
     }
 
     private boolean declaredInSamePackage(final IMethodBinding methodBinding1, final IMethodBinding methodBinding2) {
-        final ITypeBinding declaringClass1 = methodBinding1.getDeclaringClass();
-        final ITypeBinding declaringClass2 = methodBinding2.getDeclaringClass();
+        final ITypeBinding declaringClass1= methodBinding1.getDeclaringClass();
+        final ITypeBinding declaringClass2= methodBinding2.getDeclaringClass();
         return declaringClass1.getPackage().equals(declaringClass2.getPackage());
     }
 
@@ -183,7 +180,7 @@ public class SuperCallRatherThanUselessOverridingCleanUp extends AbstractCleanUp
 
     private boolean hasSignificantAnnotations(final IMethodBinding methodBinding) {
         for (final IAnnotationBinding annotation : methodBinding.getAnnotations()) {
-            final ITypeBinding annotationType = annotation.getAnnotationType();
+            final ITypeBinding annotationType= annotation.getAnnotationType();
 
             if (!hasType(annotationType, "java.lang.Override", "java.lang.SuppressWarnings")) {
                 return true;

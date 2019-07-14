@@ -34,19 +34,23 @@ import org.eclipse.jface.wizard.Wizard;
 
 import static org.autorefactor.AutoRefactorPlugin.*;
 
-/** Wizard which allows the user to choose which refactorings to apply to the selected java elements. */
+/**
+ * Wizard which allows the user to choose which refactorings to apply to the
+ * selected java elements.
+ */
 public class ChooseRefactoringsWizard extends Wizard {
-    private final ChooseRefactoringWizardPage chooseRefactoringsPage = new ChooseRefactoringWizardPage();
+    private final ChooseRefactoringWizardPage chooseRefactoringsPage= new ChooseRefactoringWizardPage();
     private final List<IJavaElement> javaElements;
 
     /**
      * Builds an instance of this class, with the provided java element.
      *
-     * @param javaElements the java elements from where to extract the project options
+     * @param javaElements the java elements from where to extract the project
+     *                     options
      */
     public ChooseRefactoringsWizard(List<IJavaElement> javaElements) {
         setNeedsProgressMonitor(true);
-        this.javaElements = javaElements;
+        this.javaElements= javaElements;
     }
 
     @Override
@@ -61,7 +65,7 @@ public class ChooseRefactoringsWizard extends Wizard {
 
     @Override
     public boolean performFinish() {
-        final List<RefactoringRule> refactoringRules = chooseRefactoringsPage.getSelectedRefactorings();
+        final List<RefactoringRule> refactoringRules= chooseRefactoringsPage.getSelectedRefactorings();
         new PrepareApplyRefactoringsJob(javaElements, refactoringRules, getEnvironment()).schedule();
         return !refactoringRules.isEmpty();
     }

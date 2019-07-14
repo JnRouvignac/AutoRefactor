@@ -79,8 +79,8 @@ public class ComparisonCleanUp extends AbstractCleanUpRule {
     @Override
     public boolean visit(InfixExpression node) {
         if (!node.hasExtendedOperands()) {
-            if (maybeStandardizeComparison(node, node.getLeftOperand(), node.getRightOperand())
-                    == DO_NOT_VISIT_SUBTREE) {
+            if (maybeStandardizeComparison(node, node.getLeftOperand(),
+                    node.getRightOperand()) == DO_NOT_VISIT_SUBTREE) {
                 return DO_NOT_VISIT_SUBTREE;
             }
             return maybeStandardizeComparison(node, node.getRightOperand(), node.getLeftOperand());
@@ -92,21 +92,21 @@ public class ComparisonCleanUp extends AbstractCleanUpRule {
     private boolean maybeStandardizeComparison(InfixExpression node, final Expression comparator,
             final Expression literal) {
         if (removeParentheses(comparator) instanceof MethodInvocation) {
-            final MethodInvocation comparisonMI = (MethodInvocation) removeParentheses(comparator);
+            final MethodInvocation comparisonMI= (MethodInvocation) removeParentheses(comparator);
             if (comparisonMI.getExpression() == null) {
                 // TODO JNR handle same class calls and sub classes
                 return VISIT_SUBTREE;
             }
 
             if (isMethod(comparisonMI, "java.lang.Comparable", "compareTo", "java.lang.Object")
-                || isMethod(comparisonMI, "java.lang.Comparator", "compare", "java.lang.Object", "java.lang.Object")
-                || (getJavaMinorVersion() >= 2
-                    && isMethod(comparisonMI, "java.lang.String", "compareToIgnoreCase", "java.lang.String"))) {
-                final Object literalValue = literal.resolveConstantExpressionValue();
+                    || isMethod(comparisonMI, "java.lang.Comparator", "compare", "java.lang.Object", "java.lang.Object")
+                    || (getJavaMinorVersion() >= 2
+                            && isMethod(comparisonMI, "java.lang.String", "compareToIgnoreCase", "java.lang.String"))) {
+                final Object literalValue= literal.resolveConstantExpressionValue();
 
                 if (literalValue instanceof Number) {
-                    final Number numberValue = (Number) literalValue;
-                    final double doubleValue = numberValue.doubleValue();
+                    final Number numberValue= (Number) literalValue;
+                    final double doubleValue= numberValue.doubleValue();
 
                     if (doubleValue == 0) {
                         return VISIT_SUBTREE;
@@ -138,11 +138,7 @@ public class ComparisonCleanUp extends AbstractCleanUpRule {
 
     private void refactorComparingToZero(final InfixExpression node, final MethodInvocation comparisonMI,
             final Operator operator) {
-        final ASTBuilder b = this.ctx.getASTBuilder();
-        this.ctx.getRefactorings().replace(node,
-            b.infixExpr(
-                b.copy(comparisonMI),
-                operator,
-                b.number("0")));
+        final ASTBuilder b= this.ctx.getASTBuilder();
+        this.ctx.getRefactorings().replace(node, b.infixExpr(b.copy(comparisonMI), operator, b.number("0")));
     }
 }

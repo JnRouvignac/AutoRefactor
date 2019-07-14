@@ -43,17 +43,14 @@ import static org.autorefactor.util.Utils.*;
 
 /** See {@link #getDescription()} method. */
 public class HashMapRatherThanHashtableCleanUp extends AbstractClassSubstituteCleanUp {
-    private static final Map<String, String[]> CAN_BE_CASTED_TO = new HashMap<String, String[]>();
+    private static final Map<String, String[]> CAN_BE_CASTED_TO= new HashMap<String, String[]>();
 
     static {
-        CAN_BE_CASTED_TO.put("java.lang.Object", new String[]{"java.lang.Object"});
-        CAN_BE_CASTED_TO.put("java.lang.Cloneable", new String[]{"java.lang.Cloneable", "java.lang.Object"});
-        CAN_BE_CASTED_TO.put("java.io.Serializable",
-                new String[]{"java.io.Serializable", "java.lang.Object"});
-        CAN_BE_CASTED_TO.put("java.util.Map", new String[]{"java.util.Map", "java.lang.Object"});
-        CAN_BE_CASTED_TO.put("java.util.Hashtable",
-                new String[]{"java.util.Hashtable", "java.io.Serializable", "java.util.Map",
-                    "java.lang.Cloneable", "java.lang.Object"});
+        CAN_BE_CASTED_TO.put("java.lang.Object", new String[] { "java.lang.Object" });
+        CAN_BE_CASTED_TO.put("java.lang.Cloneable", new String[] { "java.lang.Cloneable", "java.lang.Object" });
+        CAN_BE_CASTED_TO.put("java.io.Serializable", new String[] { "java.io.Serializable", "java.lang.Object" });
+        CAN_BE_CASTED_TO.put("java.util.Map", new String[] { "java.util.Map", "java.lang.Object" });
+        CAN_BE_CASTED_TO.put("java.util.Hashtable", new String[] { "java.util.Hashtable", "java.io.Serializable", "java.util.Map", "java.lang.Cloneable", "java.lang.Object" });
     }
 
     /**
@@ -95,7 +92,7 @@ public class HashMapRatherThanHashtableCleanUp extends AbstractClassSubstituteCl
 
     @Override
     protected String[] getExistingClassCanonicalName() {
-        return new String[] {"java.util.Hashtable"};
+        return new String[] { "java.util.Hashtable" };
     }
 
     @Override
@@ -128,10 +125,8 @@ public class HashMapRatherThanHashtableCleanUp extends AbstractClassSubstituteCl
     }
 
     @Override
-    protected boolean isTypeCompatible(final ITypeBinding variableType,
-            final ITypeBinding refType) {
-        return super.isTypeCompatible(variableType, refType)
-                || hasType(variableType,
-                        getOrDefault(CAN_BE_CASTED_TO, refType.getErasure().getQualifiedName(), new String[0]));
+    protected boolean isTypeCompatible(final ITypeBinding variableType, final ITypeBinding refType) {
+        return super.isTypeCompatible(variableType, refType) || hasType(variableType,
+                getOrDefault(CAN_BE_CASTED_TO, refType.getErasure().getQualifiedName(), new String[0]));
     }
 }

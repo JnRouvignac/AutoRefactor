@@ -25,6 +25,6 @@
  */
 /**
  * Output java code samples used to test refactoring rules.
- * Refactoring rules are run on the samples in org.autorefactor.samples_in and the refactored output is compared against these samples. 
+ * Refactoring rules are run on the samples in org.autorefactor.samples_in and the refactored output is compared against these samples.
  */
 package org.autorefactor.refactoring.rules.samples_out;

@@ -66,7 +66,7 @@ public class CapitalizeLongLiteralCleanUp extends AbstractCleanUpRule {
 
     @Override
     public boolean visit(NumberLiteral node) {
-        final String token = node.getToken();
+        final String token= node.getToken();
         if (token.endsWith("l")) {
             replaceLong(node, token);
             return DO_NOT_VISIT_SUBTREE;
@@ -75,10 +75,10 @@ public class CapitalizeLongLiteralCleanUp extends AbstractCleanUpRule {
     }
 
     private void replaceLong(final NumberLiteral node, final String token) {
-        final ASTBuilder b = this.ctx.getASTBuilder();
+        final ASTBuilder b= this.ctx.getASTBuilder();
 
-        final NumberLiteral replacement = b.numberLiteral();
-        final String newToken = token.substring(0, token.length() - 1) + "L";
+        final NumberLiteral replacement= b.numberLiteral();
+        final String newToken= token.substring(0, token.length() - 1) + "L";
         replacement.setToken(newToken);
         ctx.getRefactorings().replace(node, replacement);
     }

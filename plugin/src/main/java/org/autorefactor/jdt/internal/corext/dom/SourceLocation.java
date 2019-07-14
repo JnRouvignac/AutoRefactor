@@ -30,20 +30,24 @@ import static org.autorefactor.util.Utils.equal;
 import org.eclipse.jdt.core.ISourceRange;
 import org.eclipse.jdt.core.dom.ASTNode;
 
-/** Represents a source location in a file, i.e. a position or a range in a source file. */
+/**
+ * Represents a source location in a file, i.e. a position or a range in a
+ * source file.
+ */
 public class SourceLocation implements ISourceRange, Comparable<ISourceRange> {
     private final int offset;
     private final int length;
 
     /**
-     * Builds a source location instance from an offset and a length in a source file.
+     * Builds a source location instance from an offset and a length in a source
+     * file.
      *
      * @param offset the position offset in the file
      * @param length the length starting from the offset
      */
     public SourceLocation(int offset, int length) {
-        this.offset = offset;
-        this.length = length;
+        this.offset= offset;
+        this.length= length;
     }
 
     /**
@@ -59,13 +63,13 @@ public class SourceLocation implements ISourceRange, Comparable<ISourceRange> {
      * Factory method for a source range in a file.
      *
      * @param startPos the start position in the file
-     * @param endPos the end position in the file
+     * @param endPos   the end position in the file
      * @return a source location instance representing a range in a source file.
      */
     public static SourceLocation fromPositions(int startPos, int endPos) {
         if (startPos > endPos) {
-            throw new IllegalArgumentException("start position (" + startPos
-                    + ") should be situated before end position (" + startPos + ")");
+            throw new IllegalArgumentException(
+                    "start position (" + startPos + ") should be situated before end position (" + startPos + ")");
         }
         return new SourceLocation(startPos, endPos - startPos);
     }
@@ -81,7 +85,8 @@ public class SourceLocation implements ISourceRange, Comparable<ISourceRange> {
     }
 
     /**
-     * Returns the end position of the provided {@link ASTNode} (start position + length).
+     * Returns the end position of the provided {@link ASTNode} (start position +
+     * length).
      *
      * @param node the node for which to compute the end position
      * @return the end position of the provided {@link ASTNode}
@@ -134,7 +139,8 @@ public class SourceLocation implements ISourceRange, Comparable<ISourceRange> {
      * Whether the provided position is inside the current source location.
      *
      * @param position the provided position
-     * @return true if the provided position is inside the current source location, false otherwise
+     * @return true if the provided position is inside the current source location,
+     *         false otherwise
      */
     public boolean contains(int position) {
         return getStartPosition() <= position && position <= getEndPosition();
@@ -144,7 +150,8 @@ public class SourceLocation implements ISourceRange, Comparable<ISourceRange> {
      * Whether the provided source range is inside the current source location.
      *
      * @param sourceRange the provided source range
-     * @return true if the provided source range is inside the current source location, false otherwise
+     * @return true if the provided source range is inside the current source
+     *         location, false otherwise
      */
     public boolean contains(ISourceRange sourceRange) {
         return getStartPosition() <= sourceRange.getOffset()
@@ -152,7 +159,8 @@ public class SourceLocation implements ISourceRange, Comparable<ISourceRange> {
     }
 
     /**
-     * Returns the substring of the provided String by using the current source location.
+     * Returns the substring of the provided String by using the current source
+     * location.
      *
      * @param s the string for which to provide the substring
      * @return the substring of the provided string
@@ -165,20 +173,19 @@ public class SourceLocation implements ISourceRange, Comparable<ISourceRange> {
      * Whether the provided source range overlaps with the current source location.
      *
      * @param sourceRange the provided source range
-     * @return true if the provided source range overlaps with the current source location, false otherwise
+     * @return true if the provided source range overlaps with the current source
+     *         location, false otherwise
      */
     public boolean overlapsWith(ISourceRange sourceRange) {
         return overlapsLeft(sourceRange) || overlapsRight(sourceRange);
     }
 
     private boolean overlapsLeft(ISourceRange range) {
-        return getStartPosition() <= range.getOffset()
-                && range.getOffset() <= getEndPosition();
+        return getStartPosition() <= range.getOffset() && range.getOffset() <= getEndPosition();
     }
 
     private boolean overlapsRight(ISourceRange range) {
-        return range.getOffset() <= getStartPosition()
-                && getStartPosition() <= getEndPosition(range);
+        return range.getOffset() <= getStartPosition() && getStartPosition() <= getEndPosition(range);
     }
 
     /**
@@ -189,7 +196,7 @@ public class SourceLocation implements ISourceRange, Comparable<ISourceRange> {
      * @return -1, 0 or 1
      */
     public int compareTo(ISourceRange sourceRange) {
-        final int offsetDiff = this.offset - sourceRange.getOffset();
+        final int offsetDiff= this.offset - sourceRange.getOffset();
         if (offsetDiff != 0) {
             return offsetDiff;
         }
@@ -198,9 +205,9 @@ public class SourceLocation implements ISourceRange, Comparable<ISourceRange> {
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + length;
+        final int prime= 31;
+        int result= 1;
+        result= prime * result + length;
         return prime * result + offset;
     }
 
@@ -212,9 +219,8 @@ public class SourceLocation implements ISourceRange, Comparable<ISourceRange> {
         if (obj == null || getClass() != obj.getClass()) {
             return false;
         }
-        final SourceLocation other = (SourceLocation) obj;
-        return equal(length, other.length)
-                && equal(offset, other.offset);
+        final SourceLocation other= (SourceLocation) obj;
+        return equal(length, other.length) && equal(offset, other.offset);
     }
 
     @Override

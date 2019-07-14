@@ -49,27 +49,18 @@ import org.eclipse.jdt.core.dom.Type;
 
 /** See {@link #getDescription()} method. */
 public class GenericListRatherThanRawListCleanUp extends AbstractClassSubstituteCleanUp {
-    private static final Map<String, String[]> CAN_BE_CASTED_TO = new HashMap<String, String[]>();
+    private static final Map<String, String[]> CAN_BE_CASTED_TO= new HashMap<String, String[]>();
 
     static {
-        CAN_BE_CASTED_TO.put("java.lang.Object", new String[]{"java.lang.Object"});
-        CAN_BE_CASTED_TO.put("java.lang.Cloneable", new String[]{"java.lang.Cloneable", "java.lang.Object"});
-        CAN_BE_CASTED_TO.put("java.io.Serializable",
-                new String[]{"java.io.Serializable", "java.lang.Object"});
-        CAN_BE_CASTED_TO.put("java.util.Collection", new String[]{"java.util.Collection", "java.lang.Object"});
-        CAN_BE_CASTED_TO.put("java.util.List", new String[]{"java.util.List", "java.lang.Object"});
-        CAN_BE_CASTED_TO.put("java.util.AbstractList",
-                new String[]{"java.util.AbstractList", "java.util.List", "java.lang.Object"});
-        CAN_BE_CASTED_TO.put("java.util.AbstractCollection",
-                new String[]{"java.util.AbstractCollection", "java.util.Collection", "java.lang.Object"});
-        CAN_BE_CASTED_TO.put("java.util.LinkedList",
-                new String[]{"java.util.LinkedList", "java.util.AbstractList", "java.util.List",
-                    "java.util.AbstractCollection", "java.util.Collection",
-                    "java.io.Serializable", "java.lang.Cloneable", "java.lang.Object"});
-        CAN_BE_CASTED_TO.put("java.util.ArrayList",
-                new String[]{"java.util.ArrayList", "java.util.AbstractList", "java.util.List",
-                    "java.util.AbstractCollection", "java.util.Collection",
-                    "java.io.Serializable", "java.lang.Cloneable", "java.lang.Object"});
+        CAN_BE_CASTED_TO.put("java.lang.Object", new String[] { "java.lang.Object" });
+        CAN_BE_CASTED_TO.put("java.lang.Cloneable", new String[] { "java.lang.Cloneable", "java.lang.Object" });
+        CAN_BE_CASTED_TO.put("java.io.Serializable", new String[] { "java.io.Serializable", "java.lang.Object" });
+        CAN_BE_CASTED_TO.put("java.util.Collection", new String[] { "java.util.Collection", "java.lang.Object" });
+        CAN_BE_CASTED_TO.put("java.util.List", new String[] { "java.util.List", "java.lang.Object" });
+        CAN_BE_CASTED_TO.put("java.util.AbstractList", new String[] { "java.util.AbstractList", "java.util.List", "java.lang.Object" });
+        CAN_BE_CASTED_TO.put("java.util.AbstractCollection", new String[] { "java.util.AbstractCollection", "java.util.Collection", "java.lang.Object" });
+        CAN_BE_CASTED_TO.put("java.util.LinkedList", new String[] { "java.util.LinkedList", "java.util.AbstractList", "java.util.List", "java.util.AbstractCollection", "java.util.Collection", "java.io.Serializable", "java.lang.Cloneable", "java.lang.Object" });
+        CAN_BE_CASTED_TO.put("java.util.ArrayList", new String[] { "java.util.ArrayList", "java.util.AbstractList", "java.util.List", "java.util.AbstractCollection", "java.util.Collection", "java.io.Serializable", "java.lang.Cloneable", "java.lang.Object" });
     }
 
     private ITypeBinding elementType;
@@ -108,13 +99,13 @@ public class GenericListRatherThanRawListCleanUp extends AbstractClassSubstitute
 
     @Override
     public boolean visit(Block node) {
-        elementType = null;
+        elementType= null;
         return super.visit(node);
     }
 
     @Override
     protected String[] getExistingClassCanonicalName() {
-        return new String[] {"java.util.LinkedList", "java.util.ArrayList", "java.util.Vector", "java.util.Stack"};
+        return new String[] { "java.util.LinkedList", "java.util.ArrayList", "java.util.Vector", "java.util.Stack" };
     }
 
     @Override
@@ -125,11 +116,13 @@ public class GenericListRatherThanRawListCleanUp extends AbstractClassSubstitute
     /**
      * Returns the substitute type.
      *
-     * @param b The builder.
-     * @param origType The original type
-     * @param originalExpr The original expression
-     * @param classesToUseWithImport The classes that should be used with simple name.
-     * @param importsToAdd The imports that need to be added during this refactoring.
+     * @param b                      The builder.
+     * @param origType               The original type
+     * @param originalExpr           The original expression
+     * @param classesToUseWithImport The classes that should be used with simple
+     *                               name.
+     * @param importsToAdd           The imports that need to be added during this
+     *                               refactoring.
      * @return the substitute type.
      */
     @Override
@@ -139,9 +132,9 @@ public class GenericListRatherThanRawListCleanUp extends AbstractClassSubstitute
             return null;
         }
 
-        final TypeNameDecider typeNameDecider = new TypeNameDecider(originalExpr);
+        final TypeNameDecider typeNameDecider= new TypeNameDecider(originalExpr);
 
-        final ParameterizedType parameterizedType = b.getAST().newParameterizedType(b.copy(origType));
+        final ParameterizedType parameterizedType= b.getAST().newParameterizedType(b.copy(origType));
         typeArguments(parameterizedType).clear();
         typeArguments(parameterizedType).add(b.toType(elementType, typeNameDecider));
         return parameterizedType;
@@ -149,17 +142,16 @@ public class GenericListRatherThanRawListCleanUp extends AbstractClassSubstitute
 
     @Override
     protected boolean canInstantiationBeRefactored(final ClassInstanceCreation instanceCreation) {
-        elementType = null;
+        elementType= null;
 
         if (instanceCreation.resolveTypeBinding().isParameterizedType()) {
             return false;
         }
 
-        ITypeBinding[] parameterTypes = instanceCreation.resolveConstructorBinding().getParameterTypes();
+        ITypeBinding[] parameterTypes= instanceCreation.resolveConstructorBinding().getParameterTypes();
 
-        if (parameterTypes.length > 0
-                && hasType(parameterTypes[0], "java.util.Collection")) {
-            ITypeBinding actualParameter = arguments(instanceCreation).get(0).resolveTypeBinding();
+        if (parameterTypes.length > 0 && hasType(parameterTypes[0], "java.util.Collection")) {
+            ITypeBinding actualParameter= arguments(instanceCreation).get(0).resolveTypeBinding();
 
             if (isParameterizedTypeWithOneArgument(actualParameter)) {
                 return resolveTypeCompatible(actualParameter.getTypeArguments()[0]);
@@ -171,21 +163,16 @@ public class GenericListRatherThanRawListCleanUp extends AbstractClassSubstitute
     @Override
     protected boolean canMethodBeRefactored(final MethodInvocation mi,
             final List<MethodInvocation> methodCallsToRefactor) {
-        if (mi.getExpression() == null
-                || mi.getExpression().resolveTypeBinding().isParameterizedType()) {
+        if (mi.getExpression() == null || mi.getExpression().resolveTypeBinding().isParameterizedType()) {
             return false;
         }
 
         if (isMethod(mi, "java.util.Collection", "clear")
                 || isMethod(mi, "java.lang.Object", "equals", "java.lang.Object")
-                || isMethod(mi, "java.lang.Object", "hashCode")
-                || isMethod(mi, "java.util.Collection", "size")
-                || isMethod(mi, "java.util.Collection", "isEmpty")
-                || isMethod(mi, "java.lang.Object", "toString")
-                || isMethod(mi, "java.lang.Object", "finalize")
-                || isMethod(mi, "java.lang.Object", "notify")
-                || isMethod(mi, "java.lang.Object", "notifyAll")
-                || isMethod(mi, "java.lang.Object", "wait")
+                || isMethod(mi, "java.lang.Object", "hashCode") || isMethod(mi, "java.util.Collection", "size")
+                || isMethod(mi, "java.util.Collection", "isEmpty") || isMethod(mi, "java.lang.Object", "toString")
+                || isMethod(mi, "java.lang.Object", "finalize") || isMethod(mi, "java.lang.Object", "notify")
+                || isMethod(mi, "java.lang.Object", "notifyAll") || isMethod(mi, "java.lang.Object", "wait")
                 || isMethod(mi, "java.lang.Object", "wait", "long")
                 || isMethod(mi, "java.lang.Object", "wait", "long", "int")
                 || isMethod(mi, "java.util.ArrayList", "ensureCapacity", "int")
@@ -195,11 +182,9 @@ public class GenericListRatherThanRawListCleanUp extends AbstractClassSubstitute
                 || isMethod(mi, "java.util.ArrayList", "sort", "java.util.Comparator")
                 || isMethod(mi, "java.util.Vector", "trimToSize")
                 || isMethod(mi, "java.util.Vector", "ensureCapacity", "int")
-                || isMethod(mi, "java.util.Vector", "setSize", "int")
-                || isMethod(mi, "java.util.Vector", "capacity")
+                || isMethod(mi, "java.util.Vector", "setSize", "int") || isMethod(mi, "java.util.Vector", "capacity")
                 || isMethod(mi, "java.util.Vector", "removeElementAt", "int")
-                || isMethod(mi, "java.util.Vector", "removeAllElements")
-                || isMethod(mi, "java.util.Stack", "empty")) {
+                || isMethod(mi, "java.util.Vector", "removeAllElements") || isMethod(mi, "java.util.Stack", "empty")) {
             return true;
         } else if (isMethod(mi, "java.util.Collection", "add", "java.lang.Object")
                 || isMethod(mi, "java.util.Collection", "contains", "java.lang.Object")
@@ -222,54 +207,43 @@ public class GenericListRatherThanRawListCleanUp extends AbstractClassSubstitute
                 || isMethod(mi, "java.util.Vector", "removeElement", "java.lang.Object")
                 || isMethod(mi, "java.util.Stack", "push", "java.lang.Object")
                 || isMethod(mi, "java.util.Stack", "search", "java.lang.Object")) {
-            ITypeBinding newElementType = arguments(mi).get(0).resolveTypeBinding();
+            ITypeBinding newElementType= arguments(mi).get(0).resolveTypeBinding();
             return resolveTypeCompatible(newElementType);
         } else if (isMethod(mi, "java.util.List", "add", "int", "java.lang.Object")
                 || isMethod(mi, "java.util.List", "set", "int", "java.lang.Object")) {
             return resolveTypeCompatible(arguments(mi).get(1).resolveTypeBinding());
         } else if (isMethod(mi, "java.util.Collection", "toArray", "java.lang.Object[]")
                 || isMethod(mi, "java.util.Vector", "copyInto", "java.lang.Object[]")) {
-            ITypeBinding newElementType = arguments(mi).get(0).resolveTypeBinding().getElementType();
+            ITypeBinding newElementType= arguments(mi).get(0).resolveTypeBinding().getElementType();
             return resolveTypeCompatible(newElementType);
         } else if (isMethod(mi, "java.util.Collection", "addAll", "java.util.Collection")
                 || isMethod(mi, "java.util.Collection", "containsAll", "java.util.Collection")) {
             return resolveTypeCompatibleIfPossible(arguments(mi).get(0).resolveTypeBinding());
         } else if (isMethod(mi, "java.util.List", "addAll", "int", "java.util.Collection")) {
             return resolveTypeCompatibleIfPossible(arguments(mi).get(1).resolveTypeBinding());
-        } else if (isMethod(mi, "java.util.List", "get", "int")
-                || isMethod(mi, "java.util.List", "remove")
-                || isMethod(mi, "java.util.List", "remove", "int")
-                || isMethod(mi, "java.util.LinkedList", "element")
-                || isMethod(mi, "java.util.LinkedList", "getFirst")
-                || isMethod(mi, "java.util.LinkedList", "getLast")
-                || isMethod(mi, "java.util.LinkedList", "peek")
-                || isMethod(mi, "java.util.LinkedList", "peekFirst")
-                || isMethod(mi, "java.util.LinkedList", "peekLast")
-                || isMethod(mi, "java.util.LinkedList", "poll")
-                || isMethod(mi, "java.util.LinkedList", "pollFirst")
-                || isMethod(mi, "java.util.LinkedList", "pollLast")
-                || isMethod(mi, "java.util.LinkedList", "pop")
-                || isMethod(mi, "java.util.LinkedList", "removeFirst")
+        } else if (isMethod(mi, "java.util.List", "get", "int") || isMethod(mi, "java.util.List", "remove")
+                || isMethod(mi, "java.util.List", "remove", "int") || isMethod(mi, "java.util.LinkedList", "element")
+                || isMethod(mi, "java.util.LinkedList", "getFirst") || isMethod(mi, "java.util.LinkedList", "getLast")
+                || isMethod(mi, "java.util.LinkedList", "peek") || isMethod(mi, "java.util.LinkedList", "peekFirst")
+                || isMethod(mi, "java.util.LinkedList", "peekLast") || isMethod(mi, "java.util.LinkedList", "poll")
+                || isMethod(mi, "java.util.LinkedList", "pollFirst") || isMethod(mi, "java.util.LinkedList", "pollLast")
+                || isMethod(mi, "java.util.LinkedList", "pop") || isMethod(mi, "java.util.LinkedList", "removeFirst")
                 || isMethod(mi, "java.util.LinkedList", "removeLast")
                 || isMethod(mi, "java.util.Vector", "elementAt", "int")
-                || isMethod(mi, "java.util.Vector", "firstElement")
-                || isMethod(mi, "java.util.Vector", "lastElement")
-                || isMethod(mi, "java.util.Stack", "pop")
-                || isMethod(mi, "java.util.Stack", "peek")) {
+                || isMethod(mi, "java.util.Vector", "firstElement") || isMethod(mi, "java.util.Vector", "lastElement")
+                || isMethod(mi, "java.util.Stack", "pop") || isMethod(mi, "java.util.Stack", "peek")) {
             if (isExprReceived(mi)) {
-                ITypeBinding newElementType = getDestinationType(mi);
+                ITypeBinding newElementType= getDestinationType(mi);
                 return resolveTypeCompatible(newElementType);
             } else {
                 return true;
             }
         } else if (isMethod(mi, "java.util.LinkedList", "descendingIterator")
-                || isMethod(mi, "java.util.List", "iterator")
-                || isMethod(mi, "java.util.List", "listIterator")
+                || isMethod(mi, "java.util.List", "iterator") || isMethod(mi, "java.util.List", "listIterator")
                 || isMethod(mi, "java.util.List", "listIterator", "int")
-                || isMethod(mi, "java.util.List", "spliterator")
-                || isMethod(mi, "java.util.Vector", "elements")) {
+                || isMethod(mi, "java.util.List", "spliterator") || isMethod(mi, "java.util.Vector", "elements")) {
             if (isExprReceived(mi)) {
-                ITypeBinding newElementType = getDestinationType(mi);
+                ITypeBinding newElementType= getDestinationType(mi);
                 return resolveTypeCompatibleIfPossible(newElementType);
             } else {
                 return true;
@@ -277,9 +251,9 @@ public class GenericListRatherThanRawListCleanUp extends AbstractClassSubstitute
         } else if (isMethod(mi, "java.util.List", "subList", "int", "int")
                 || isMethod(mi, "java.util.Collection", "toArray")) {
             if (isExprReceived(mi)) {
-                ITypeBinding newCollectionType = getDestinationType(mi);
+                ITypeBinding newCollectionType= getDestinationType(mi);
                 if (newCollectionType != null) {
-                    ITypeBinding newElementType = newCollectionType.getElementType();
+                    ITypeBinding newElementType= newCollectionType.getElementType();
                     return resolveTypeCompatible(newElementType);
                 }
             } else {
@@ -291,18 +265,15 @@ public class GenericListRatherThanRawListCleanUp extends AbstractClassSubstitute
     }
 
     private boolean resolveTypeCompatibleIfPossible(ITypeBinding paramType) {
-        return isParameterizedTypeWithOneArgument(paramType)
-                && resolveTypeCompatible(paramType.getTypeArguments()[0]);
+        return isParameterizedTypeWithOneArgument(paramType) && resolveTypeCompatible(paramType.getTypeArguments()[0]);
     }
 
     private boolean isParameterizedTypeWithOneArgument(ITypeBinding typeBinding) {
-        return typeBinding != null
-                && typeBinding.isParameterizedType()
-                && typeBinding.getTypeArguments().length == 1;
+        return typeBinding != null && typeBinding.isParameterizedType() && typeBinding.getTypeArguments().length == 1;
     }
 
     private boolean isExprReceived(final ASTNode node) {
-        final ASTNode parent = node.getParent();
+        final ASTNode parent= node.getParent();
         if (parent instanceof ParenthesizedExpression) {
             return isExprReceived(parent);
         } else {
@@ -315,11 +286,11 @@ public class GenericListRatherThanRawListCleanUp extends AbstractClassSubstitute
             return false;
         }
         if (newElementType.isPrimitive()) {
-            newElementType = getBoxedTypeBinding(newElementType, ctx.getAST());
+            newElementType= getBoxedTypeBinding(newElementType, ctx.getAST());
         }
         if (!hasType(newElementType, "java.lang.Object")
                 && (elementType == null || newElementType.equals(elementType))) {
-            elementType = newElementType;
+            elementType= newElementType;
             return true;
         }
         return false;
@@ -331,10 +302,8 @@ public class GenericListRatherThanRawListCleanUp extends AbstractClassSubstitute
     }
 
     @Override
-    protected boolean isTypeCompatible(final ITypeBinding variableType,
-            final ITypeBinding refType) {
-        return super.isTypeCompatible(variableType, refType)
-                || hasType(variableType,
-                           getOrDefault(CAN_BE_CASTED_TO, refType.getErasure().getQualifiedName(), new String[0]));
+    protected boolean isTypeCompatible(final ITypeBinding variableType, final ITypeBinding refType) {
+        return super.isTypeCompatible(variableType, refType) || hasType(variableType,
+                getOrDefault(CAN_BE_CASTED_TO, refType.getErasure().getQualifiedName(), new String[0]));
     }
 }

@@ -59,9 +59,8 @@ public class ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp extends NewClassIm
 
         @Override
         public boolean visit(final IfStatement node) {
-            final boolean isSubTreeToVisit =
-                    ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp.this.maybeRefactorIfStatement(node,
-                            getClassesToUseWithImport(), getImportsToAdd());
+            final boolean isSubTreeToVisit= ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp.this
+                    .maybeRefactorIfStatement(node, getClassesToUseWithImport(), getImportsToAdd());
 
             return isSubTreeToVisit;
         }
@@ -114,37 +113,32 @@ public class ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp extends NewClassIm
         return maybeRefactorIfStatement(node, getAlreadyImportedClasses(node), new HashSet<String>());
     }
 
-    private boolean maybeRefactorIfStatement(final IfStatement node,
-            final Set<String> classesToUseWithImport,
+    private boolean maybeRefactorIfStatement(final IfStatement node, final Set<String> classesToUseWithImport,
             final Set<String> importsToAdd) {
         if (node.getElseStatement() != null) {
-            final InfixExpression condition = as(node.getExpression(), InfixExpression.class);
-            final List<Statement> thenStmts = asList(node.getThenStatement());
-            final List<Statement> elseStmts = asList(node.getElseStatement());
+            final InfixExpression condition= as(node.getExpression(), InfixExpression.class);
+            final List<Statement> thenStmts= asList(node.getThenStatement());
+            final List<Statement> elseStmts= asList(node.getElseStatement());
 
-            if (condition != null
-                    && !condition.hasExtendedOperands()
+            if (condition != null && !condition.hasExtendedOperands()
                     && Arrays.asList(Operator.EQUALS, Operator.NOT_EQUALS).contains(condition.getOperator())
-                    && thenStmts != null
-                    && thenStmts.size() == 1
-                    && elseStmts != null
-                    && elseStmts.size() == 1) {
-                final Expression operand1 = condition.getLeftOperand();
-                final Expression operand2 = condition.getRightOperand();
+                    && thenStmts != null && thenStmts.size() == 1 && elseStmts != null && elseStmts.size() == 1) {
+                final Expression operand1= condition.getLeftOperand();
+                final Expression operand2= condition.getRightOperand();
 
-                final Name field1 = as(operand1, Name.class);
-                final NullLiteral nullLiteral1 = as(operand2, NullLiteral.class);
-                final NullLiteral nullLiteral2 = as(operand1, NullLiteral.class);
-                final Name field2 = as(operand2, Name.class);
+                final Name field1= as(operand1, Name.class);
+                final NullLiteral nullLiteral1= as(operand2, NullLiteral.class);
+                final NullLiteral nullLiteral2= as(operand1, NullLiteral.class);
+                final Name field2= as(operand2, Name.class);
 
                 final Name firstField;
 
                 if (field1 != null && nullLiteral1 != null) {
-                    firstField = field1;
+                    firstField= field1;
                 } else if (field2 != null && nullLiteral2 != null) {
-                    firstField = field2;
+                    firstField= field2;
                 } else {
-                    firstField = null;
+                    firstField= null;
                 }
 
                 if (firstField != null) {
@@ -158,43 +152,34 @@ public class ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp extends NewClassIm
     }
 
     private boolean maybeReplaceCode(final IfStatement node, final InfixExpression condition,
-            final List<Statement> thenStmts,
-            final List<Statement> elseStmts, final Name firstField,
-            final Set<String> classesToUseWithImport,
-            final Set<String> importsToAdd) {
+            final List<Statement> thenStmts, final List<Statement> elseStmts, final Name firstField,
+            final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
         final IfStatement checkNullityStmt;
         final IfStatement checkEqualsStmt;
 
         if (Operator.EQUALS.equals(condition.getOperator())) {
-            checkNullityStmt = as(thenStmts.get(0), IfStatement.class);
-            checkEqualsStmt = as(elseStmts.get(0), IfStatement.class);
+            checkNullityStmt= as(thenStmts.get(0), IfStatement.class);
+            checkEqualsStmt= as(elseStmts.get(0), IfStatement.class);
         } else {
-            checkEqualsStmt = as(thenStmts.get(0), IfStatement.class);
-            checkNullityStmt = as(elseStmts.get(0), IfStatement.class);
+            checkEqualsStmt= as(thenStmts.get(0), IfStatement.class);
+            checkNullityStmt= as(elseStmts.get(0), IfStatement.class);
         }
 
-        if (checkNullityStmt != null && checkNullityStmt.getElseStatement() == null
-                && checkEqualsStmt != null && checkEqualsStmt.getElseStatement() == null) {
-            final InfixExpression nullityCondition = as(checkNullityStmt.getExpression(),
-                    InfixExpression.class);
-            final List<Statement> nullityStmts = asList(checkNullityStmt.getThenStatement());
+        if (checkNullityStmt != null && checkNullityStmt.getElseStatement() == null && checkEqualsStmt != null
+                && checkEqualsStmt.getElseStatement() == null) {
+            final InfixExpression nullityCondition= as(checkNullityStmt.getExpression(), InfixExpression.class);
+            final List<Statement> nullityStmts= asList(checkNullityStmt.getThenStatement());
 
-            final PrefixExpression equalsCondition = as(checkEqualsStmt.getExpression(),
-                    PrefixExpression.class);
-            final List<Statement> equalsStmts = asList(checkEqualsStmt.getThenStatement());
+            final PrefixExpression equalsCondition= as(checkEqualsStmt.getExpression(), PrefixExpression.class);
+            final List<Statement> equalsStmts= asList(checkEqualsStmt.getThenStatement());
 
-            if (nullityCondition != null
-                    && !nullityCondition.hasExtendedOperands()
-                    && Operator.NOT_EQUALS.equals(nullityCondition.getOperator())
-                    && nullityStmts != null
-                    && nullityStmts.size() == 1
-                    && equalsCondition != null
-                    && PrefixExpression.Operator.NOT.equals(equalsCondition.getOperator())
-                    && equalsStmts != null
+            if (nullityCondition != null && !nullityCondition.hasExtendedOperands()
+                    && Operator.NOT_EQUALS.equals(nullityCondition.getOperator()) && nullityStmts != null
+                    && nullityStmts.size() == 1 && equalsCondition != null
+                    && PrefixExpression.Operator.NOT.equals(equalsCondition.getOperator()) && equalsStmts != null
                     && equalsStmts.size() == 1) {
                 return maybeReplaceEquals(node, firstField, nullityCondition, nullityStmts, equalsCondition,
-                        equalsStmts, classesToUseWithImport,
-                        importsToAdd);
+                        equalsStmts, classesToUseWithImport, importsToAdd);
             }
         }
 
@@ -204,47 +189,40 @@ public class ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp extends NewClassIm
     private boolean maybeReplaceEquals(final IfStatement node, final Name firstField,
             final InfixExpression nullityCondition, final List<Statement> nullityStmts,
             final PrefixExpression equalsCondition, final List<Statement> equalsStmts,
-            final Set<String> classesToUseWithImport,
-            final Set<String> importsToAdd) {
-        final Expression nullityOperand1 = nullityCondition.getLeftOperand();
-        final Expression nullityOperand2 = nullityCondition.getRightOperand();
+            final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
+        final Expression nullityOperand1= nullityCondition.getLeftOperand();
+        final Expression nullityOperand2= nullityCondition.getRightOperand();
 
-        final Name nullityField1 = as(nullityOperand1, Name.class);
-        final NullLiteral nullityLiteral1 = as(nullityOperand2, NullLiteral.class);
-        final NullLiteral nullityLiteral2 = as(nullityOperand1, NullLiteral.class);
-        final Name nullityField2 = as(nullityOperand2, Name.class);
+        final Name nullityField1= as(nullityOperand1, Name.class);
+        final NullLiteral nullityLiteral1= as(nullityOperand2, NullLiteral.class);
+        final NullLiteral nullityLiteral2= as(nullityOperand1, NullLiteral.class);
+        final Name nullityField2= as(nullityOperand2, Name.class);
 
         final Name secondField;
 
         if (nullityField1 != null && nullityLiteral1 != null) {
-            secondField = nullityField1;
+            secondField= nullityField1;
         } else if (nullityField2 != null && nullityLiteral2 != null) {
-            secondField = nullityField2;
+            secondField= nullityField2;
         } else {
-            secondField = null;
+            secondField= null;
         }
 
-        final ReturnStatement returnStmt1 = as(nullityStmts.get(0), ReturnStatement.class);
-        final ReturnStatement returnStmt2 = as(equalsStmts.get(0), ReturnStatement.class);
-        final MethodInvocation equalsMethod = as(equalsCondition.getOperand(), MethodInvocation.class);
+        final ReturnStatement returnStmt1= as(nullityStmts.get(0), ReturnStatement.class);
+        final ReturnStatement returnStmt2= as(equalsStmts.get(0), ReturnStatement.class);
+        final MethodInvocation equalsMethod= as(equalsCondition.getOperand(), MethodInvocation.class);
 
-        if (secondField != null
-                && returnStmt1 != null
-                && returnStmt2 != null
-                && equalsMethod != null
-                && equalsMethod.getExpression() != null
-                && "equals".equals(equalsMethod.getName().getIdentifier())
+        if (secondField != null && returnStmt1 != null && returnStmt2 != null && equalsMethod != null
+                && equalsMethod.getExpression() != null && "equals".equals(equalsMethod.getName().getIdentifier())
                 && (equalsMethod.arguments() == null || equalsMethod.arguments().size() == 1)
                 && (match(firstField, secondField, equalsMethod.getExpression(),
                         (ASTNode) equalsMethod.arguments().get(0))
                         || match(secondField, firstField, equalsMethod.getExpression(),
                                 (ASTNode) equalsMethod.arguments().get(0)))) {
-            final BooleanLiteral returnFalse1 = as(returnStmt1.getExpression(), BooleanLiteral.class);
-            final BooleanLiteral returnFalse2 = as(returnStmt2.getExpression(), BooleanLiteral.class);
+            final BooleanLiteral returnFalse1= as(returnStmt1.getExpression(), BooleanLiteral.class);
+            final BooleanLiteral returnFalse2= as(returnStmt2.getExpression(), BooleanLiteral.class);
 
-            if (returnFalse1 != null
-                    && !returnFalse1.booleanValue()
-                    && returnFalse2 != null
+            if (returnFalse1 != null && !returnFalse1.booleanValue() && returnFalse2 != null
                     && !returnFalse2.booleanValue()) {
                 replaceEquals(node, firstField, secondField, returnStmt1, classesToUseWithImport);
                 importsToAdd.add("java.util.Objects");
@@ -257,19 +235,19 @@ public class ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp extends NewClassIm
 
     private boolean match(final Name firstField, final Name secondField, final Expression thisObject,
             final ASTNode otherObject) {
-        final ASTSemanticMatcher matcher = new ASTSemanticMatcher();
-        return ASTNodes.match(matcher, thisObject, firstField)
-                                && ASTNodes.match(matcher, otherObject, secondField);
+        final ASTSemanticMatcher matcher= new ASTSemanticMatcher();
+        return ASTNodes.match(matcher, thisObject, firstField) && ASTNodes.match(matcher, otherObject, secondField);
     }
 
     private void replaceEquals(final IfStatement node, final Name firstField, final Name secondField,
             final ReturnStatement returnStmt1, final Set<String> classesToUseWithImport) {
-        final ASTBuilder b = this.ctx.getASTBuilder();
-        final Refactorings r = this.ctx.getRefactorings();
+        final ASTBuilder b= this.ctx.getASTBuilder();
+        final Refactorings r= this.ctx.getRefactorings();
 
-        r.replace(node, b.if0(b.not(b.invoke(classesToUseWithImport
-                .contains("java.util.Objects") ? b.name("Objects") : b.name("java", "util", "Objects"),
-                "equals",
-                b.copy(firstField), b.copy(secondField))), b.block(b.copy(returnStmt1))));
+        r.replace(node,
+                b.if0(b.not(b.invoke(
+                        classesToUseWithImport.contains("java.util.Objects") ? b.name("Objects")
+                                : b.name("java", "util", "Objects"),
+                        "equals", b.copy(firstField), b.copy(secondField))), b.block(b.copy(returnStmt1))));
     }
 }

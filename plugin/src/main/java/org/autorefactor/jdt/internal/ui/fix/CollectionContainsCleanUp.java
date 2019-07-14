@@ -108,8 +108,7 @@ public class CollectionContainsCleanUp extends AbstractCleanUpRule {
 
     @Override
     public boolean visit(Block node) {
-        final AssignmentForAndReturnVisitor assignmentForAndReturnVisitor =
-                new AssignmentForAndReturnVisitor(ctx, node);
+        final AssignmentForAndReturnVisitor assignmentForAndReturnVisitor= new AssignmentForAndReturnVisitor(ctx, node);
         node.accept(assignmentForAndReturnVisitor);
         return assignmentForAndReturnVisitor.getResult();
     }
@@ -121,30 +120,27 @@ public class CollectionContainsCleanUp extends AbstractCleanUpRule {
 
         @Override
         public boolean visit(EnhancedForStatement node) {
-            final SingleVariableDeclaration loopVariable = node.getParameter();
-            final IfStatement is = uniqueStmtAs(node.getBody(), IfStatement.class);
+            final SingleVariableDeclaration loopVariable= node.getParameter();
+            final IfStatement is= uniqueStmtAs(node.getBody(), IfStatement.class);
             return maybeReplaceWithCollectionContains(node, node.getExpression(), loopVariable.getName(), is);
         }
 
-        private boolean maybeReplaceWithCollectionContains(
-                Statement forNode, Expression iterable, Expression loopElement, IfStatement is) {
-            if (is != null
-                    && is.getElseStatement() == null
-                    && instanceOf(iterable, "java.util.Collection")) {
-                MethodInvocation cond = as(is.getExpression(), MethodInvocation.class);
-                List<Statement> thenStmts = asList(is.getThenStatement());
-                if (!thenStmts.isEmpty()
-                        && isMethod(cond, "java.lang.Object", "equals", "java.lang.Object")) {
-                    Expression toFind = getExpressionToFind(cond, loopElement);
+        private boolean maybeReplaceWithCollectionContains(Statement forNode, Expression iterable,
+                Expression loopElement, IfStatement is) {
+            if (is != null && is.getElseStatement() == null && instanceOf(iterable, "java.util.Collection")) {
+                MethodInvocation cond= as(is.getExpression(), MethodInvocation.class);
+                List<Statement> thenStmts= asList(is.getThenStatement());
+                if (!thenStmts.isEmpty() && isMethod(cond, "java.lang.Object", "equals", "java.lang.Object")) {
+                    Expression toFind= getExpressionToFind(cond, loopElement);
                     if (toFind != null) {
                         if (thenStmts.size() == 1) {
-                            Statement thenStmt = thenStmts.get(0);
-                            BooleanLiteral innerBl = getReturnedBooleanLiteral(thenStmt);
+                            Statement thenStmt= thenStmts.get(0);
+                            BooleanLiteral innerBl= getReturnedBooleanLiteral(thenStmt);
 
-                            Statement forNextStmt = getNextStatement(forNode);
-                            BooleanLiteral outerBl = getReturnedBooleanLiteral(forNextStmt);
+                            Statement forNextStmt= getNextStatement(forNode);
+                            BooleanLiteral outerBl= getReturnedBooleanLiteral(forNextStmt);
 
-                            Boolean isPositive = signCollectionContains(innerBl, outerBl);
+                            Boolean isPositive= signCollectionContains(innerBl, outerBl);
                             if (isPositive != null) {
                                 replaceLoopAndReturn(forNode, iterable, toFind, forNextStmt, isPositive);
                                 setResult(DO_NOT_VISIT_SUBTREE);
@@ -152,11 +148,10 @@ public class CollectionContainsCleanUp extends AbstractCleanUpRule {
                             }
                             return maybeReplaceLoopAndVariable(forNode, iterable, thenStmt, toFind);
                         } else {
-                            BreakStatement bs = as(thenStmts.get(thenStmts.size() - 1), BreakStatement.class);
+                            BreakStatement bs= as(thenStmts.get(thenStmts.size() - 1), BreakStatement.class);
                             if (bs != null && bs.getLabel() == null) {
-                                if (thenStmts.size() == 2
-                                        && maybeReplaceLoopAndVariable(forNode, iterable, thenStmts.get(0), toFind)
-                                            == DO_NOT_VISIT_SUBTREE) {
+                                if (thenStmts.size() == 2 && maybeReplaceLoopAndVariable(forNode, iterable,
+                                        thenStmts.get(0), toFind) == DO_NOT_VISIT_SUBTREE) {
                                     return DO_NOT_VISIT_SUBTREE;
                                 }
 
@@ -178,7 +173,7 @@ public class CollectionContainsCleanUp extends AbstractCleanUpRule {
 
         private boolean loopElementIsUsed(Expression loopElement, List<Statement> thenStmts) {
             if (loopElement instanceof SimpleName) {
-                VarUseFinderVisitor visitor = new VarUseFinderVisitor((SimpleName) loopElement);
+                VarUseFinderVisitor visitor= new VarUseFinderVisitor((SimpleName) loopElement);
                 for (Statement aThenStmt : thenStmts) {
                     if (visitor.findOrDefault(aThenStmt, false)) {
                         return true;
@@ -192,7 +187,7 @@ public class CollectionContainsCleanUp extends AbstractCleanUpRule {
             private final SimpleName varName;
 
             public VarUseFinderVisitor(SimpleName varName) {
-                this.varName = varName;
+                this.varName= varName;
             }
 
             @Override
@@ -209,8 +204,8 @@ public class CollectionContainsCleanUp extends AbstractCleanUpRule {
                 Expression toFind, BreakStatement bs) {
             thenStmts.remove(thenStmts.size() - 1);
 
-            ASTBuilder b = ctx.getASTBuilder();
-            Statement replacement = b.if0(collectionContains(iterable, toFind, true, b),
+            ASTBuilder b= ctx.getASTBuilder();
+            Statement replacement= b.if0(collectionContains(iterable, toFind, true, b),
                     b.block(b.copyRange(thenStmts)));
             ctx.getRefactorings().replace(forNode, replacement);
 
@@ -219,31 +214,29 @@ public class CollectionContainsCleanUp extends AbstractCleanUpRule {
 
         private void replaceLoopAndReturn(Statement forNode, Expression iterable, Expression toFind,
                 Statement forNextStmt, boolean negate) {
-            ASTBuilder b = ctx.getASTBuilder();
-            ctx.getRefactorings().replace(forNode,
-                    b.return0(
-                            collectionContains(iterable, toFind, negate, b)));
+            ASTBuilder b= ctx.getASTBuilder();
+            ctx.getRefactorings().replace(forNode, b.return0(collectionContains(iterable, toFind, negate, b)));
             if (forNextStmt.equals(getNextSibling(forNode))) {
                 ctx.getRefactorings().remove(forNextStmt);
             }
         }
 
-        private boolean maybeReplaceLoopAndVariable(
-                Statement forNode, Expression iterable, Statement uniqueThenStmt, Expression toFind) {
-            Statement previousStmt = getPreviousStatement(forNode);
+        private boolean maybeReplaceLoopAndVariable(Statement forNode, Expression iterable, Statement uniqueThenStmt,
+                Expression toFind) {
+            Statement previousStmt= getPreviousStatement(forNode);
             if (previousStmt != null) {
-                boolean previousStmtIsPreviousSibling = previousStmt.equals(getPreviousSibling(forNode));
-                Assignment as = asExpression(uniqueThenStmt, Assignment.class);
-                Pair<Name, Expression> innerInit = decomposeInitializer(as);
-                Name initName = innerInit.getFirst();
-                Expression init2 = innerInit.getSecond();
-                Pair<Name, Expression> outerInit = getInitializer(previousStmt);
+                boolean previousStmtIsPreviousSibling= previousStmt.equals(getPreviousSibling(forNode));
+                Assignment as= asExpression(uniqueThenStmt, Assignment.class);
+                Pair<Name, Expression> innerInit= decomposeInitializer(as);
+                Name initName= innerInit.getFirst();
+                Expression init2= innerInit.getSecond();
+                Pair<Name, Expression> outerInit= getInitializer(previousStmt);
                 if (isSameVariable(outerInit.getFirst(), initName)) {
-                    Boolean isPositive = signCollectionContains((BooleanLiteral) init2,
+                    Boolean isPositive= signCollectionContains((BooleanLiteral) init2,
                             (BooleanLiteral) outerInit.getSecond());
                     if (isPositive != null) {
-                        replaceLoopAndVariable(forNode, iterable, toFind, previousStmt,
-                                previousStmtIsPreviousSibling, initName, isPositive);
+                        replaceLoopAndVariable(forNode, iterable, toFind, previousStmt, previousStmtIsPreviousSibling,
+                                initName, isPositive);
                         setResult(DO_NOT_VISIT_SUBTREE);
                         return DO_NOT_VISIT_SUBTREE;
                     }
@@ -254,16 +247,14 @@ public class CollectionContainsCleanUp extends AbstractCleanUpRule {
 
         private void replaceLoopAndVariable(Statement forNode, Expression iterable, Expression toFind,
                 Statement previousStmt, boolean previousStmtIsPreviousSibling, Name initName, boolean isPositive) {
-            ASTBuilder b = ctx.getASTBuilder();
+            ASTBuilder b= ctx.getASTBuilder();
             Statement replacement;
-            if (previousStmtIsPreviousSibling
-                    && previousStmt instanceof VariableDeclarationStatement) {
-                replacement = b.declareStmt(b.type("boolean"), b.move((SimpleName) initName),
+            if (previousStmtIsPreviousSibling && previousStmt instanceof VariableDeclarationStatement) {
+                replacement= b.declareStmt(b.type("boolean"), b.move((SimpleName) initName),
                         collectionContains(iterable, toFind, isPositive, b));
-            } else if (!previousStmtIsPreviousSibling
-                    || previousStmt instanceof ExpressionStatement) {
-                replacement = b.toStmt(b.assign(b.copy(initName), ASSIGN,
-                        collectionContains(iterable, toFind, isPositive, b)));
+            } else if (!previousStmtIsPreviousSibling || previousStmt instanceof ExpressionStatement) {
+                replacement= b.toStmt(
+                        b.assign(b.copy(initName), ASSIGN, collectionContains(iterable, toFind, isPositive, b)));
             } else {
                 throw new NotImplementedException(forNode);
             }
@@ -275,7 +266,7 @@ public class CollectionContainsCleanUp extends AbstractCleanUpRule {
 
         private Expression collectionContains(Expression iterable, Expression toFind, boolean isPositive,
                 ASTBuilder b) {
-            final MethodInvocation invoke = b.invoke(b.move(iterable), "contains", b.move(toFind));
+            final MethodInvocation invoke= b.invoke(b.move(iterable), "contains", b.move(toFind));
             if (isPositive) {
                 return invoke;
             } else {
@@ -284,9 +275,7 @@ public class CollectionContainsCleanUp extends AbstractCleanUpRule {
         }
 
         private Boolean signCollectionContains(BooleanLiteral innerBl, BooleanLiteral outerBl) {
-            if (innerBl != null
-                    && outerBl != null
-                    && innerBl.booleanValue() != outerBl.booleanValue()) {
+            if (innerBl != null && outerBl != null && innerBl.booleanValue() != outerBl.booleanValue()) {
                 return innerBl.booleanValue();
             }
             return null;
@@ -296,9 +285,8 @@ public class CollectionContainsCleanUp extends AbstractCleanUpRule {
             if (stmt instanceof VariableDeclarationStatement) {
                 return uniqueVariableDeclarationFragmentName(stmt);
             } else if (stmt instanceof ExpressionStatement) {
-                Assignment as = asExpression(stmt, Assignment.class);
-                if (hasOperator(as, ASSIGN)
-                        && as.getLeftHandSide() instanceof Name) {
+                Assignment as= asExpression(stmt, Assignment.class);
+                if (hasOperator(as, ASSIGN) && as.getLeftHandSide() instanceof Name) {
                     return Pair.of((Name) as.getLeftHandSide(), as.getRightHandSide());
                 }
             }
@@ -314,7 +302,7 @@ public class CollectionContainsCleanUp extends AbstractCleanUpRule {
         }
 
         private BooleanLiteral getReturnedBooleanLiteral(Statement stmt) {
-            ReturnStatement rs = as(stmt, ReturnStatement.class);
+            ReturnStatement rs= as(stmt, ReturnStatement.class);
             if (rs != null) {
                 return as(rs.getExpression(), BooleanLiteral.class);
             }
@@ -322,8 +310,8 @@ public class CollectionContainsCleanUp extends AbstractCleanUpRule {
         }
 
         private Expression getExpressionToFind(MethodInvocation cond, Expression forVar) {
-            Expression expr = removeParentheses(cond.getExpression());
-            Expression arg0 = removeParentheses(arg0(cond));
+            Expression expr= removeParentheses(cond.getExpression());
+            Expression arg0= removeParentheses(arg0(cond));
             if (isSameVariable(forVar, expr)) {
                 return arg0;
             } else if (isSameVariable(forVar, arg0)) {
@@ -343,26 +331,25 @@ public class CollectionContainsCleanUp extends AbstractCleanUpRule {
 
         @Override
         public boolean visit(ForStatement node) {
-            final ForLoopContent loopContent = iterateOverContainer(node);
-            final List<Statement> stmts = asList(node.getBody());
-            if (loopContent != null
-                    && COLLECTION.equals(loopContent.getContainerType())) {
+            final ForLoopContent loopContent= iterateOverContainer(node);
+            final List<Statement> stmts= asList(node.getBody());
+            if (loopContent != null && COLLECTION.equals(loopContent.getContainerType())) {
                 if (INDEX.equals(loopContent.getIterationType())) {
-                    Expression loopElement = null;
+                    Expression loopElement= null;
                     IfStatement is;
                     if (stmts.size() == 2) {
-                        Pair<Name, Expression> loopVarPair = uniqueVariableDeclarationFragmentName(stmts.get(0));
-                        loopElement = loopVarPair.getFirst();
-                        MethodInvocation mi = as(loopVarPair.getSecond(), MethodInvocation.class);
+                        Pair<Name, Expression> loopVarPair= uniqueVariableDeclarationFragmentName(stmts.get(0));
+                        loopElement= loopVarPair.getFirst();
+                        MethodInvocation mi= as(loopVarPair.getSecond(), MethodInvocation.class);
                         if (!matches(mi, collectionGet(loopContent))
                                 || !isSameVariable(mi.getExpression(), loopContent.getContainerVariable())) {
                             return VISIT_SUBTREE;
                         }
 
-                        is = as(stmts.get(1), IfStatement.class);
+                        is= as(stmts.get(1), IfStatement.class);
                     } else if (stmts.size() == 1) {
-                        is = as(stmts.get(0), IfStatement.class);
-                        loopElement = collectionGet(loopContent);
+                        is= as(stmts.get(0), IfStatement.class);
+                        loopElement= collectionGet(loopContent);
                     } else {
                         return VISIT_SUBTREE;
                     }
@@ -370,21 +357,21 @@ public class CollectionContainsCleanUp extends AbstractCleanUpRule {
                     return maybeReplaceWithCollectionContains(node, loopContent.getContainerVariable(), loopElement,
                             is);
                 } else if (ITERATOR.equals(loopContent.getIterationType())) {
-                    Expression loopElement = null;
+                    Expression loopElement= null;
                     IfStatement is;
                     if (stmts.size() == 2) {
-                        Pair<Name, Expression> loopVarPair = uniqueVariableDeclarationFragmentName(stmts.get(0));
-                        loopElement = loopVarPair.getFirst();
-                        MethodInvocation mi = as(loopVarPair.getSecond(), MethodInvocation.class);
+                        Pair<Name, Expression> loopVarPair= uniqueVariableDeclarationFragmentName(stmts.get(0));
+                        loopElement= loopVarPair.getFirst();
+                        MethodInvocation mi= as(loopVarPair.getSecond(), MethodInvocation.class);
                         if (!matches(mi, iteratorNext(loopContent))
                                 || !isSameVariable(mi.getExpression(), loopContent.getIteratorVariable())) {
                             return VISIT_SUBTREE;
                         }
 
-                        is = as(stmts.get(1), IfStatement.class);
+                        is= as(stmts.get(1), IfStatement.class);
                     } else if (stmts.size() == 1) {
-                        is = as(stmts.get(0), IfStatement.class);
-                        loopElement = iteratorNext(loopContent);
+                        is= as(stmts.get(0), IfStatement.class);
+                        loopElement= iteratorNext(loopContent);
                     } else {
                         return VISIT_SUBTREE;
                     }
@@ -397,22 +384,18 @@ public class CollectionContainsCleanUp extends AbstractCleanUpRule {
         }
 
         private MethodInvocation iteratorNext(final ForLoopContent loopContent) {
-            ASTBuilder b = ctx.getASTBuilder();
-            return b.invoke(
-                    b.copySubtree(loopContent.getIteratorVariable()),
-                    "next");
+            ASTBuilder b= ctx.getASTBuilder();
+            return b.invoke(b.copySubtree(loopContent.getIteratorVariable()), "next");
         }
 
         private MethodInvocation collectionGet(final ForLoopContent loopContent) {
-            ASTBuilder b = ctx.getASTBuilder();
-            return b.invoke(
-                    b.copySubtree(loopContent.getContainerVariable()),
-                    "get",
+            ASTBuilder b= ctx.getASTBuilder();
+            return b.invoke(b.copySubtree(loopContent.getContainerVariable()), "get",
                     b.copySubtree(loopContent.getLoopVariable()));
         }
 
         private Pair<Name, Expression> uniqueVariableDeclarationFragmentName(Statement stmt) {
-            VariableDeclarationFragment vdf = getUniqueFragment(as(stmt, VariableDeclarationStatement.class));
+            VariableDeclarationFragment vdf= getUniqueFragment(as(stmt, VariableDeclarationStatement.class));
             if (vdf != null) {
                 return Pair.of((Name) vdf.getName(), vdf.getInitializer());
             }

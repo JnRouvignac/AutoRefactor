@@ -44,7 +44,7 @@ import org.eclipse.jdt.core.dom.Statement;
  * See {@link #getDescription()} method.
  */
 public class JUnitAssertCleanUp extends AbstractUnitTestCleanUp {
-    private static final String[] PACKAGE_PATHES = new String[] { "junit.framework.", "org.junit." };
+    private static final String[] PACKAGE_PATHES= new String[] { "junit.framework.", "org.junit." };
 
     /**
      * Get the name.
@@ -86,11 +86,11 @@ public class JUnitAssertCleanUp extends AbstractUnitTestCleanUp {
 
     @Override
     public boolean visit(MethodInvocation node) {
-        final List<Expression> args = arguments(node);
-        int i = 0;
-        boolean shouldVisit = VISIT_SUBTREE;
+        final List<Expression> args= arguments(node);
+        int i= 0;
+        boolean shouldVisit= VISIT_SUBTREE;
         while (shouldVisit == VISIT_SUBTREE && i < PACKAGE_PATHES.length) {
-            shouldVisit = maybeRefactorMethod(node, PACKAGE_PATHES[i], args);
+            shouldVisit= maybeRefactorMethod(node, PACKAGE_PATHES[i], args);
             i++;
         }
         return shouldVisit;
@@ -121,13 +121,13 @@ public class JUnitAssertCleanUp extends AbstractUnitTestCleanUp {
 
     @Override
     public boolean visit(IfStatement node) {
-        final List<Statement> stmts = asList(node.getThenStatement());
+        final List<Statement> stmts= asList(node.getThenStatement());
         if (node.getElseStatement() == null && stmts.size() == 1) {
-            final MethodInvocation mi = asExpression(stmts.get(0), MethodInvocation.class);
-            int i = 0;
-            boolean shouldVisit = VISIT_SUBTREE;
+            final MethodInvocation mi= asExpression(stmts.get(0), MethodInvocation.class);
+            int i= 0;
+            boolean shouldVisit= VISIT_SUBTREE;
             while (shouldVisit == VISIT_SUBTREE && i < PACKAGE_PATHES.length) {
-                shouldVisit = maybeRefactorIf(node, mi, PACKAGE_PATHES[i]);
+                shouldVisit= maybeRefactorIf(node, mi, PACKAGE_PATHES[i]);
                 i++;
             }
             return shouldVisit;
@@ -147,8 +147,8 @@ public class JUnitAssertCleanUp extends AbstractUnitTestCleanUp {
 
     @Override
     protected MethodInvocation invokeQualifiedMethod(final ASTBuilder b, final Expression copyOfExpr,
-            final String methodName,
-            final Expression copyOfActual, final Expression copyOfExpected, final Expression failureMessage) {
+            final String methodName, final Expression copyOfActual, final Expression copyOfExpected,
+            final Expression failureMessage) {
         if (failureMessage == null) {
             if (copyOfActual == null) {
                 return b.invoke(copyOfExpr, methodName);

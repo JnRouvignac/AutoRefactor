@@ -76,7 +76,7 @@ public class OneIfRatherThanDuplicateBlocksThatFallThroughCleanUp extends Abstra
 
     @Override
     public boolean visit(Block node) {
-        final SuccessiveIfVisitor successiveIfVisitor = new SuccessiveIfVisitor(ctx, node);
+        final SuccessiveIfVisitor successiveIfVisitor= new SuccessiveIfVisitor(ctx, node);
         node.accept(successiveIfVisitor);
         return successiveIfVisitor.getResult();
     }
@@ -89,7 +89,7 @@ public class OneIfRatherThanDuplicateBlocksThatFallThroughCleanUp extends Abstra
         @Override
         public boolean visit(IfStatement node) {
             if (getResult() == VISIT_SUBTREE) {
-                final List<IfStatement> duplicateIfBlocks = new ArrayList<IfStatement>();
+                final List<IfStatement> duplicateIfBlocks= new ArrayList<IfStatement>();
                 duplicateIfBlocks.add(node);
                 while (addOneMoreIf(duplicateIfBlocks)) {
                     // OK continue
@@ -108,16 +108,15 @@ public class OneIfRatherThanDuplicateBlocksThatFallThroughCleanUp extends Abstra
 
         private boolean addOneMoreIf(final List<IfStatement> duplicateIfBlocks) {
             if (duplicateIfBlocks.get(duplicateIfBlocks.size() - 1).getElseStatement() == null) {
-                final Statement nextSibling = getNextSibling(duplicateIfBlocks.get(duplicateIfBlocks.size() - 1));
+                final Statement nextSibling= getNextSibling(duplicateIfBlocks.get(duplicateIfBlocks.size() - 1));
 
-                if (nextSibling instanceof IfStatement
-                        && ((IfStatement) nextSibling).getElseStatement() == null
+                if (nextSibling instanceof IfStatement && ((IfStatement) nextSibling).getElseStatement() == null
                         && !ctx.getRefactorings().hasBeenRefactored(nextSibling)) {
-                    final IfStatement nextIf = (IfStatement) nextSibling;
+                    final IfStatement nextIf= (IfStatement) nextSibling;
 
-                    final List<Statement> lastIfStmts = asList(duplicateIfBlocks.get(duplicateIfBlocks.size() - 1)
-                            .getThenStatement());
-                    final List<Statement> nextIfStmts = asList(nextIf.getThenStatement());
+                    final List<Statement> lastIfStmts= asList(
+                            duplicateIfBlocks.get(duplicateIfBlocks.size() - 1).getThenStatement());
+                    final List<Statement> nextIfStmts= asList(nextIf.getThenStatement());
                     if (lastIfStmts != null && !lastIfStmts.isEmpty()
                             && fallsThrough(lastIfStmts.get(lastIfStmts.size() - 1))
                             && match(lastIfStmts, nextIfStmts)) {
@@ -131,23 +130,20 @@ public class OneIfRatherThanDuplicateBlocksThatFallThroughCleanUp extends Abstra
         }
 
         private void mergeCode(final List<IfStatement> duplicateIfBlocks) {
-            final ASTBuilder b = ctx.getASTBuilder();
-            final Refactorings r = ctx.getRefactorings();
+            final ASTBuilder b= ctx.getASTBuilder();
+            final Refactorings r= ctx.getRefactorings();
 
-            Iterator<IfStatement> iterator = duplicateIfBlocks.iterator();
-            Expression newCondition = b.parenthesizeIfNeeded(b.copy(iterator.next()
-                    .getExpression()));
+            Iterator<IfStatement> iterator= duplicateIfBlocks.iterator();
+            Expression newCondition= b.parenthesizeIfNeeded(b.copy(iterator.next().getExpression()));
 
             while (iterator.hasNext()) {
-                newCondition = b.infixExpr(newCondition,
-                        InfixExpression.Operator.CONDITIONAL_OR, b.parenthesizeIfNeeded(b.copy(iterator.next()
-                                .getExpression())));
+                newCondition= b.infixExpr(newCondition, InfixExpression.Operator.CONDITIONAL_OR,
+                        b.parenthesizeIfNeeded(b.copy(iterator.next().getExpression())));
             }
 
-            final IfStatement newIf = b.if0(newCondition,
-                    b.copy(duplicateIfBlocks.get(0).getThenStatement()));
+            final IfStatement newIf= b.if0(newCondition, b.copy(duplicateIfBlocks.get(0).getThenStatement()));
 
-            iterator = duplicateIfBlocks.iterator();
+            iterator= duplicateIfBlocks.iterator();
             r.replace(iterator.next(), newIf);
             while (iterator.hasNext()) {
                 r.remove(iterator.next());

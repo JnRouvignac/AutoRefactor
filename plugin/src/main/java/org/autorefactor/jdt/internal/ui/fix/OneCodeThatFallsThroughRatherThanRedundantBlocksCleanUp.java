@@ -75,8 +75,8 @@ public class OneCodeThatFallsThroughRatherThanRedundantBlocksCleanUp extends Abs
 
     @Override
     public boolean visit(Block node) {
-        final CatchesAndFollowingCodeVisitor catchesAndFollowingCodeVisitor =
-                new CatchesAndFollowingCodeVisitor(ctx, node);
+        final CatchesAndFollowingCodeVisitor catchesAndFollowingCodeVisitor= new CatchesAndFollowingCodeVisitor(ctx,
+                node);
         node.accept(catchesAndFollowingCodeVisitor);
         return catchesAndFollowingCodeVisitor.getResult();
     }
@@ -89,7 +89,7 @@ public class OneCodeThatFallsThroughRatherThanRedundantBlocksCleanUp extends Abs
         @Override
         public boolean visit(TryStatement node) {
             if (getResult() == VISIT_SUBTREE && node.getFinally() == null) {
-                final List<Statement> redundantStmts = new ArrayList<Statement>();
+                final List<Statement> redundantStmts= new ArrayList<Statement>();
                 for (final CatchClause catchClause : (List<CatchClause>) node.catchClauses()) {
                     redundantStmts.add(catchClause.getBody());
                 }
@@ -102,7 +102,7 @@ public class OneCodeThatFallsThroughRatherThanRedundantBlocksCleanUp extends Abs
         @Override
         public boolean visit(IfStatement node) {
             if (getResult() == VISIT_SUBTREE) {
-                final List<Statement> redundantStmts = new ArrayList<Statement>();
+                final List<Statement> redundantStmts= new ArrayList<Statement>();
                 redundantStmts.add(node.getThenStatement());
                 extractStmt(node, redundantStmts);
 
@@ -112,7 +112,7 @@ public class OneCodeThatFallsThroughRatherThanRedundantBlocksCleanUp extends Abs
         }
 
         private void extractStmt(final IfStatement node, final List<Statement> redundantStmts) {
-            Statement subIfStmt = node.getElseStatement();
+            Statement subIfStmt= node.getElseStatement();
             if (subIfStmt != null) {
                 if (subIfStmt instanceof IfStatement) {
                     redundantStmts.add(((IfStatement) subIfStmt).getThenStatement());
@@ -124,30 +124,30 @@ public class OneCodeThatFallsThroughRatherThanRedundantBlocksCleanUp extends Abs
         }
 
         private boolean maybeRemoveRedundantCode(final Statement node, final List<Statement> redundantStmts) {
-            final List<Statement> referenceStmts = new ArrayList<Statement>();
+            final List<Statement> referenceStmts= new ArrayList<Statement>();
 
-            Statement nextSibling = getNextSibling(node);
+            Statement nextSibling= getNextSibling(node);
             while (nextSibling != null && !fallsThrough(nextSibling)) {
                 referenceStmts.add(nextSibling);
-                nextSibling = getNextSibling(nextSibling);
+                nextSibling= getNextSibling(nextSibling);
             }
 
             if (nextSibling != null) {
                 referenceStmts.add(nextSibling);
 
                 for (final Statement redundantStmt : redundantStmts) {
-                    List<Statement> stmtsToCompare = asList(redundantStmt);
+                    List<Statement> stmtsToCompare= asList(redundantStmt);
                     if (stmtsToCompare.size() > referenceStmts.size()) {
-                        stmtsToCompare = stmtsToCompare.subList(stmtsToCompare.size() - referenceStmts.size(),
+                        stmtsToCompare= stmtsToCompare.subList(stmtsToCompare.size() - referenceStmts.size(),
                                 stmtsToCompare.size());
                     }
 
                     if (match(referenceStmts, stmtsToCompare)) {
-                        Refactorings r = ctx.getRefactorings();
+                        Refactorings r= ctx.getRefactorings();
                         if (redundantStmt instanceof Block) {
                             r.remove(stmtsToCompare);
                         } else {
-                            ASTBuilder b = ctx.getASTBuilder();
+                            ASTBuilder b= ctx.getASTBuilder();
                             r.replace(redundantStmt, b.block());
                         }
                         setResult(DO_NOT_VISIT_SUBTREE);

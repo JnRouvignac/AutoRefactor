@@ -32,12 +32,13 @@ import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.SimpleName;
 
-/** Matches two piece of code only if the variables/methods in use are the same. */
+/**
+ * Matches two piece of code only if the variables/methods in use are the same.
+ */
 public final class ASTMatcherSameVariablesAndMethods extends ASTSemanticMatcher {
     @Override
     public boolean match(SimpleName node, Object other) {
-        return super.match(node, other)
-                && sameReference(node, (SimpleName) other);
+        return super.match(node, other) && sameReference(node, (SimpleName) other);
     }
 
     private boolean sameReference(SimpleName node1, SimpleName node2) {
@@ -45,7 +46,7 @@ public final class ASTMatcherSameVariablesAndMethods extends ASTSemanticMatcher 
     }
 
     private IBinding getDeclaration(SimpleName node) {
-        final IBinding b = node.resolveBinding();
+        final IBinding b= node.resolveBinding();
         if (b != null) {
             switch (b.getKind()) {
             case IBinding.VARIABLE:

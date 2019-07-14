@@ -175,16 +175,15 @@ public abstract class AbstractPrimitiveRatherThanWrapperCleanUp extends Abstract
     @Override
     public boolean visit(VariableDeclarationStatement node) {
         if (node.fragments().size() == 1) {
-            final VariableDeclarationFragment fragment = (VariableDeclarationFragment) node.fragments().get(0);
+            final VariableDeclarationFragment fragment= (VariableDeclarationFragment) node.fragments().get(0);
             if (hasType(fragment.resolveBinding().getType(), getWrapperFullyQualifiedName())
                     && fragment.getInitializer() != null && isNotNull(fragment.getInitializer())) {
-                final VarOccurrenceVisitor varOccurrenceVisitor = new VarOccurrenceVisitor(fragment);
-                final Block parentBlock = getAncestorOrNull(fragment, Block.class);
+                final VarOccurrenceVisitor varOccurrenceVisitor= new VarOccurrenceVisitor(fragment);
+                final Block parentBlock= getAncestorOrNull(fragment, Block.class);
                 if (parentBlock != null) {
                     varOccurrenceVisitor.visitNode(parentBlock);
 
-                    if (varOccurrenceVisitor.isPrimitiveAllowed()
-                            && varOccurrenceVisitor.getAutoBoxingCount() < 2) {
+                    if (varOccurrenceVisitor.isPrimitiveAllowed() && varOccurrenceVisitor.getAutoBoxingCount() < 2) {
                         refactorWrapper(node);
                         return DO_NOT_VISIT_SUBTREE;
                     }
@@ -196,45 +195,41 @@ public abstract class AbstractPrimitiveRatherThanWrapperCleanUp extends Abstract
     }
 
     private void refactorWrapper(final VariableDeclarationStatement node) {
-        final ASTBuilder b = this.ctx.getASTBuilder();
-        final Type primitiveType = b.type(getPrimitiveTypeName());
-        ctx.getRefactorings().replace(node.getType(),
-                primitiveType);
+        final ASTBuilder b= this.ctx.getASTBuilder();
+        final Type primitiveType= b.type(getPrimitiveTypeName());
+        ctx.getRefactorings().replace(node.getType(), primitiveType);
     }
 
     private boolean isNotNull(final Expression expr) {
         if (expr instanceof ParenthesizedExpression) {
-            final ParenthesizedExpression parenthesizedExpr = (ParenthesizedExpression) expr;
+            final ParenthesizedExpression parenthesizedExpr= (ParenthesizedExpression) expr;
             return isNotNull(parenthesizedExpr.getExpression());
         } else if (expr instanceof ConditionalExpression) {
-            final ConditionalExpression prefixExpr = (ConditionalExpression) expr;
+            final ConditionalExpression prefixExpr= (ConditionalExpression) expr;
             return isNotNull(prefixExpr.getThenExpression()) && isNotNull(prefixExpr.getElseExpression());
         } else if (getLiteralClass().equals(expr.getClass())) {
             return true;
         } else if (expr instanceof QualifiedName) {
-            final QualifiedName qualifiedName = (QualifiedName) expr;
+            final QualifiedName qualifiedName= (QualifiedName) expr;
             return hasType(qualifiedName.getQualifier(), getWrapperFullyQualifiedName())
                     && (isField(qualifiedName, getWrapperFullyQualifiedName(), getSafeInConstants())
                             || isField(qualifiedName, getPrimitiveTypeName(), getSafeInConstants()));
         } else if (expr instanceof InfixExpression) {
-            final InfixExpression infixExpr = (InfixExpression) expr;
-            return getInfixInSafeOperators()
-                    .contains(infixExpr.getOperator());
+            final InfixExpression infixExpr= (InfixExpression) expr;
+            return getInfixInSafeOperators().contains(infixExpr.getOperator());
         } else if (expr instanceof PrefixExpression) {
-            final PrefixExpression prefixExpr = (PrefixExpression) expr;
-            return getPrefixInSafeOperators()
-                    .contains(prefixExpr.getOperator());
+            final PrefixExpression prefixExpr= (PrefixExpression) expr;
+            return getPrefixInSafeOperators().contains(prefixExpr.getOperator());
         } else if (expr instanceof PostfixExpression) {
-            final PostfixExpression postfixExpr = (PostfixExpression) expr;
-            return getPostfixInSafeOperators()
-                    .contains(postfixExpr.getOperator());
+            final PostfixExpression postfixExpr= (PostfixExpression) expr;
+            return getPostfixInSafeOperators().contains(postfixExpr.getOperator());
         } else if (expr instanceof CastExpression) {
-            final CastExpression castExpr = (CastExpression) expr;
+            final CastExpression castExpr= (CastExpression) expr;
             return hasType(castExpr.getType().resolveBinding(), getPrimitiveTypeName())
                     || (hasType(castExpr.getType().resolveBinding(), getWrapperFullyQualifiedName())
                             && isNotNull(castExpr.getExpression()));
         } else if (expr instanceof MethodInvocation) {
-            final MethodInvocation mi = (MethodInvocation) expr;
+            final MethodInvocation mi= (MethodInvocation) expr;
             return isMethod(mi, getWrapperFullyQualifiedName(), "valueOf", getPrimitiveTypeName());
         }
         return false;
@@ -243,14 +238,14 @@ public abstract class AbstractPrimitiveRatherThanWrapperCleanUp extends Abstract
     private class VarOccurrenceVisitor extends InterruptibleVisitor {
         private final VariableDeclarationFragment varDecl;
 
-        private boolean isPrimitiveAllowed = true;
+        private boolean isPrimitiveAllowed= true;
 
         private boolean isVarReturned;
 
         private int autoBoxingCount;
 
         public VarOccurrenceVisitor(final VariableDeclarationFragment var) {
-            varDecl = var;
+            varDecl= var;
         }
 
         public boolean isPrimitiveAllowed() {
@@ -265,7 +260,7 @@ public abstract class AbstractPrimitiveRatherThanWrapperCleanUp extends Abstract
         public boolean visit(final SimpleName aVar) {
             if (isPrimitiveAllowed && aVar.getIdentifier().equals(varDecl.getName().getIdentifier())
                     && !aVar.getParent().equals(varDecl)) {
-                isPrimitiveAllowed = isPrimitiveAllowed(aVar);
+                isPrimitiveAllowed= isPrimitiveAllowed(aVar);
                 if (!isPrimitiveAllowed) {
                     return interruptVisit();
                 }
@@ -274,42 +269,41 @@ public abstract class AbstractPrimitiveRatherThanWrapperCleanUp extends Abstract
         }
 
         private boolean isPrimitiveAllowed(final ASTNode node) {
-            final ASTNode parentNode = node.getParent();
+            final ASTNode parentNode= node.getParent();
 
             switch (parentNode.getNodeType()) {
             case PARENTHESIZED_EXPRESSION:
                 return isPrimitiveAllowed(parentNode);
 
             case CAST_EXPRESSION:
-                final CastExpression castExpr = (CastExpression) parentNode;
+                final CastExpression castExpr= (CastExpression) parentNode;
                 return hasType(castExpr.getType().resolveBinding(), getPrimitiveTypeName());
 
             case ASSIGNMENT:
-                final Assignment assignment = (Assignment) parentNode;
+                final Assignment assignment= (Assignment) parentNode;
                 if (getAssignmentOutSafeOperators().contains(assignment.getOperator())) {
                     return true;
                 } else if (assignment.getLeftHandSide().equals(node)) {
                     return isNotNull(assignment.getRightHandSide());
                 } else {
-                    return assignment.getRightHandSide().equals(node)
-                            && assignment.getLeftHandSide() instanceof Name
+                    return assignment.getRightHandSide().equals(node) && assignment.getLeftHandSide() instanceof Name
                             && isOfType((Name) assignment.getLeftHandSide());
                 }
 
             case VARIABLE_DECLARATION_FRAGMENT:
-                final VariableDeclarationFragment fragment = (VariableDeclarationFragment) parentNode;
+                final VariableDeclarationFragment fragment= (VariableDeclarationFragment) parentNode;
                 return fragment.getInitializer().equals(node) && isOfType(fragment.getName());
 
             case RETURN_STATEMENT:
-                final ReturnStatement returnStmt = (ReturnStatement) parentNode;
+                final ReturnStatement returnStmt= (ReturnStatement) parentNode;
                 if (returnStmt.getExpression().equals(node)) {
-                    final MethodDeclaration method = getAncestorOrNull(returnStmt, MethodDeclaration.class);
+                    final MethodDeclaration method= getAncestorOrNull(returnStmt, MethodDeclaration.class);
                     if (method != null && method.getReturnType2() != null) {
                         if (hasType(method.getReturnType2().resolveBinding(), getPrimitiveTypeName())) {
                             return true;
                         } else if (hasType(method.getReturnType2().resolveBinding(), getWrapperFullyQualifiedName())) {
                             if (!isVarReturned) {
-                                isVarReturned = true;
+                                isVarReturned= true;
                                 autoBoxingCount++;
                             }
                             return true;
@@ -324,20 +318,17 @@ public abstract class AbstractPrimitiveRatherThanWrapperCleanUp extends Abstract
                 }
 
             case CONDITIONAL_EXPRESSION:
-                final ConditionalExpression conditionalExpr = (ConditionalExpression) parentNode;
+                final ConditionalExpression conditionalExpr= (ConditionalExpression) parentNode;
                 return conditionalExpr.getExpression().equals(node);
 
             case PREFIX_EXPRESSION:
-                return getPrefixOutSafeOperators()
-                        .contains(((PrefixExpression) parentNode).getOperator());
+                return getPrefixOutSafeOperators().contains(((PrefixExpression) parentNode).getOperator());
 
             case INFIX_EXPRESSION:
-                return getInfixOutSafeOperators()
-                        .contains(((InfixExpression) parentNode).getOperator());
+                return getInfixOutSafeOperators().contains(((InfixExpression) parentNode).getOperator());
 
             case POSTFIX_EXPRESSION:
-                return getPostfixOutSafeOperators()
-                        .contains(((PostfixExpression) parentNode).getOperator());
+                return getPostfixOutSafeOperators().contains(((PostfixExpression) parentNode).getOperator());
 
             default:
                 return isSpecificPrimitiveAllowed(node);

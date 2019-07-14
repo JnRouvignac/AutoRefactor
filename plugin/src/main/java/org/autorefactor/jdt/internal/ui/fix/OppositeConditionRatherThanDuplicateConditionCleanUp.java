@@ -100,17 +100,15 @@ public class OppositeConditionRatherThanDuplicateConditionCleanUp extends Abstra
 
     @Override
     public boolean visit(IfStatement node) {
-        if (node.getExpression() instanceof InfixExpression
-                && node.getElseStatement() != null
+        if (node.getExpression() instanceof InfixExpression && node.getElseStatement() != null
                 && node.getElseStatement() instanceof IfStatement) {
-            final InfixExpression firstCondition = (InfixExpression) node.getExpression();
+            final InfixExpression firstCondition= (InfixExpression) node.getExpression();
 
             if (!firstCondition.hasExtendedOperands()
                     && Arrays.<Operator>asList(Operator.AND, Operator.CONDITIONAL_AND)
                             .contains(firstCondition.getOperator())
-                    && isPassive(firstCondition.getLeftOperand())
-                    && isPassive(firstCondition.getRightOperand())) {
-                final IfStatement secondIf = (IfStatement) node.getElseStatement();
+                    && isPassive(firstCondition.getLeftOperand()) && isPassive(firstCondition.getRightOperand())) {
+                final IfStatement secondIf= (IfStatement) node.getElseStatement();
 
                 if (secondIf.getElseStatement() != null) {
                     return maybeRefactorCondition(node, secondIf, firstCondition.getLeftOperand(),
@@ -124,9 +122,8 @@ public class OppositeConditionRatherThanDuplicateConditionCleanUp extends Abstra
     }
 
     private boolean maybeRefactorCondition(final IfStatement node, final IfStatement secondIf,
-            final Expression duplicateExpr,
-            final Expression notDuplicateExpr) {
-        final ASTSemanticMatcher matcher = new ASTSemanticMatcher();
+            final Expression duplicateExpr, final Expression notDuplicateExpr) {
+        final ASTSemanticMatcher matcher= new ASTSemanticMatcher();
 
         if (match(matcher, duplicateExpr, secondIf.getExpression())) {
             refactorCondition(node, duplicateExpr, notDuplicateExpr, secondIf.getThenStatement(),
@@ -143,33 +140,32 @@ public class OppositeConditionRatherThanDuplicateConditionCleanUp extends Abstra
 
     private void refactorCondition(final IfStatement node, final Expression duplicateExpr,
             final Expression notDuplicateExpr, final Statement positiveStmt, final Statement negativeStmt) {
-        final ASTBuilder b = this.ctx.getASTBuilder();
+        final ASTBuilder b= this.ctx.getASTBuilder();
 
         Statement negativeStmtCopy;
         if (negativeStmt instanceof IfStatement) {
-            negativeStmtCopy = b.block(b.move(negativeStmt));
+            negativeStmtCopy= b.block(b.move(negativeStmt));
         } else {
-            negativeStmtCopy = b.move(negativeStmt);
+            negativeStmtCopy= b.move(negativeStmt);
         }
 
         final Expression secondCond;
         final Statement secondStmtCopy;
         final Statement thirdStmtCopy;
-        final PrefixExpression negativeCond = as(notDuplicateExpr, PrefixExpression.class);
+        final PrefixExpression negativeCond= as(notDuplicateExpr, PrefixExpression.class);
 
         if (negativeCond != null && PrefixExpression.Operator.NOT.equals(negativeCond.getOperator())) {
-            secondCond = negativeCond.getOperand();
-            secondStmtCopy = b.move(positiveStmt);
-            thirdStmtCopy = b.move(node.getThenStatement());
+            secondCond= negativeCond.getOperand();
+            secondStmtCopy= b.move(positiveStmt);
+            thirdStmtCopy= b.move(node.getThenStatement());
         } else {
-            secondCond = notDuplicateExpr;
-            secondStmtCopy = b.move(node.getThenStatement());
-            thirdStmtCopy = b.move(positiveStmt);
+            secondCond= notDuplicateExpr;
+            secondStmtCopy= b.move(node.getThenStatement());
+            thirdStmtCopy= b.move(positiveStmt);
         }
 
         this.ctx.getRefactorings().replace(node,
-                b.if0(b.parenthesizeIfNeeded(b.negate(removeParentheses(duplicateExpr))),
-                        negativeStmtCopy,
+                b.if0(b.parenthesizeIfNeeded(b.negate(removeParentheses(duplicateExpr))), negativeStmtCopy,
                         b.if0(b.copy(removeParentheses(secondCond)), secondStmtCopy, thirdStmtCopy)));
     }
 }

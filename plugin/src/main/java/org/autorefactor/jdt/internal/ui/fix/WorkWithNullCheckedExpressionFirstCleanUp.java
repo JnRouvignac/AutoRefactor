@@ -82,7 +82,7 @@ public class WorkWithNullCheckedExpressionFirstCleanUp extends AbstractCleanUpRu
 
     @Override
     public boolean visit(Block node) {
-        final IfAndReturnVisitor ifAndReturnVisitor = new IfAndReturnVisitor(ctx, node);
+        final IfAndReturnVisitor ifAndReturnVisitor= new IfAndReturnVisitor(ctx, node);
         node.accept(ifAndReturnVisitor);
         return ifAndReturnVisitor.getResult();
     }
@@ -94,13 +94,10 @@ public class WorkWithNullCheckedExpressionFirstCleanUp extends AbstractCleanUpRu
 
         @Override
         public boolean visit(IfStatement node) {
-            final Statement thenStmt = getThenStatement(node);
-            final Statement elseStmt = getElseStatement(node, thenStmt);
-            if (isNullCheck(node.getExpression())
-                    && thenStmt != null
-                    && elseStmt != null
-                    && thenStmt.getNodeType() == elseStmt.getNodeType()
-                    && simpleStmt(thenStmt)) {
+            final Statement thenStmt= getThenStatement(node);
+            final Statement elseStmt= getElseStatement(node, thenStmt);
+            if (isNullCheck(node.getExpression()) && thenStmt != null && elseStmt != null
+                    && thenStmt.getNodeType() == elseStmt.getNodeType() && simpleStmt(thenStmt)) {
                 revertIfStatement(node, thenStmt, elseStmt);
                 setResult(DO_NOT_VISIT_SUBTREE);
                 return DO_NOT_VISIT_SUBTREE;
@@ -109,7 +106,7 @@ public class WorkWithNullCheckedExpressionFirstCleanUp extends AbstractCleanUpRu
         }
 
         private Statement getThenStatement(IfStatement node) {
-            final List<Statement> thenStmts = asList(node.getThenStatement());
+            final List<Statement> thenStmts= asList(node.getThenStatement());
             if (thenStmts.size() == 1) {
                 return thenStmts.get(0);
             }
@@ -117,7 +114,7 @@ public class WorkWithNullCheckedExpressionFirstCleanUp extends AbstractCleanUpRu
         }
 
         private Statement getElseStatement(IfStatement node, Statement thenStmt) {
-            final List<Statement> elseStmts = asList(node.getElseStatement());
+            final List<Statement> elseStmts= asList(node.getElseStatement());
             if (elseStmts.size() == 1) {
                 return elseStmts.get(0);
             }
@@ -128,9 +125,8 @@ public class WorkWithNullCheckedExpressionFirstCleanUp extends AbstractCleanUpRu
         }
 
         private boolean isNullCheck(Expression ifExpression) {
-            final InfixExpression condition = as(ifExpression, InfixExpression.class);
-            return hasOperator(condition, EQUALS)
-                    && !condition.hasExtendedOperands()
+            final InfixExpression condition= as(ifExpression, InfixExpression.class);
+            return hasOperator(condition, EQUALS) && !condition.hasExtendedOperands()
                     && (isNullLiteral(condition.getLeftOperand()) || isNullLiteral(condition.getRightOperand()));
         }
 
@@ -151,8 +147,8 @@ public class WorkWithNullCheckedExpressionFirstCleanUp extends AbstractCleanUpRu
 
         /** Revert condition + swap then and else statements. */
         private void revertIfStatement(IfStatement node, Statement thenStmt, Statement elseStmt) {
-            final ASTBuilder b = ctx.getASTBuilder();
-            final Refactorings r = ctx.getRefactorings();
+            final ASTBuilder b= ctx.getASTBuilder();
+            final Refactorings r= ctx.getRefactorings();
             r.set(node.getExpression(), OPERATOR_PROPERTY, NOT_EQUALS);
             r.replace(thenStmt, b.move(elseStmt));
             r.replace(elseStmt, b.move(thenStmt));

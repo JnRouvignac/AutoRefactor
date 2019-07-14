@@ -99,73 +99,53 @@ public class ShortPrimitiveRatherThanWrapperCleanUp extends AbstractPrimitiveRat
 
     @Override
     public List<PrefixExpression.Operator> getPrefixInSafeOperators() {
-        return Arrays.<PrefixExpression.Operator>asList(INCREMENT, DECREMENT,
-                COMPLEMENT);
+        return Arrays.<PrefixExpression.Operator>asList(INCREMENT, DECREMENT, COMPLEMENT);
     }
 
     @Override
     public List<PostfixExpression.Operator> getPostfixInSafeOperators() {
-        return Arrays.<PostfixExpression.Operator>asList(
-                PostfixExpression.Operator.INCREMENT,
+        return Arrays.<PostfixExpression.Operator>asList(PostfixExpression.Operator.INCREMENT,
                 PostfixExpression.Operator.DECREMENT);
     }
 
     @Override
     public List<PrefixExpression.Operator> getPrefixOutSafeOperators() {
         return Arrays.<PrefixExpression.Operator>asList(INCREMENT, PrefixExpression.Operator.MINUS, DECREMENT,
-                PrefixExpression.Operator.PLUS,
-                COMPLEMENT);
+                PrefixExpression.Operator.PLUS, COMPLEMENT);
     }
 
     @Override
     public List<InfixExpression.Operator> getInfixOutSafeOperators() {
-        return Arrays.<InfixExpression.Operator>asList(InfixExpression.Operator.AND,
-                InfixExpression.Operator.DIVIDE,
-                InfixExpression.Operator.GREATER,
-                InfixExpression.Operator.GREATER_EQUALS,
-                InfixExpression.Operator.LEFT_SHIFT,
-                InfixExpression.Operator.LESS,
-                InfixExpression.Operator.LESS_EQUALS,
-                InfixExpression.Operator.MINUS,
-                InfixExpression.Operator.OR,
-                InfixExpression.Operator.PLUS,
-                InfixExpression.Operator.REMAINDER,
-                InfixExpression.Operator.RIGHT_SHIFT_SIGNED,
-                InfixExpression.Operator.RIGHT_SHIFT_UNSIGNED,
-                InfixExpression.Operator.TIMES,
-                InfixExpression.Operator.XOR);
+        return Arrays.<InfixExpression.Operator>asList(InfixExpression.Operator.AND, InfixExpression.Operator.DIVIDE,
+                InfixExpression.Operator.GREATER, InfixExpression.Operator.GREATER_EQUALS,
+                InfixExpression.Operator.LEFT_SHIFT, InfixExpression.Operator.LESS,
+                InfixExpression.Operator.LESS_EQUALS, InfixExpression.Operator.MINUS, InfixExpression.Operator.OR,
+                InfixExpression.Operator.PLUS, InfixExpression.Operator.REMAINDER,
+                InfixExpression.Operator.RIGHT_SHIFT_SIGNED, InfixExpression.Operator.RIGHT_SHIFT_UNSIGNED,
+                InfixExpression.Operator.TIMES, InfixExpression.Operator.XOR);
     }
 
     @Override
     public List<PostfixExpression.Operator> getPostfixOutSafeOperators() {
-        return Arrays.<PostfixExpression.Operator>asList(
-                PostfixExpression.Operator.INCREMENT,
+        return Arrays.<PostfixExpression.Operator>asList(PostfixExpression.Operator.INCREMENT,
                 PostfixExpression.Operator.DECREMENT);
     }
 
     @Override
     public List<Assignment.Operator> getAssignmentOutSafeOperators() {
-        return Arrays.<Assignment.Operator>asList(PLUS_ASSIGN,
-                MINUS_ASSIGN,
-                TIMES_ASSIGN,
-                DIVIDE_ASSIGN,
-                BIT_AND_ASSIGN,
-                BIT_OR_ASSIGN,
-                BIT_XOR_ASSIGN,
-                REMAINDER_ASSIGN,
-                LEFT_SHIFT_ASSIGN,
-                RIGHT_SHIFT_SIGNED_ASSIGN,
-                RIGHT_SHIFT_UNSIGNED_ASSIGN);
+        return Arrays.<Assignment.Operator>asList(PLUS_ASSIGN, MINUS_ASSIGN, TIMES_ASSIGN, DIVIDE_ASSIGN,
+                BIT_AND_ASSIGN, BIT_OR_ASSIGN, BIT_XOR_ASSIGN, REMAINDER_ASSIGN, LEFT_SHIFT_ASSIGN,
+                RIGHT_SHIFT_SIGNED_ASSIGN, RIGHT_SHIFT_UNSIGNED_ASSIGN);
     }
 
     @Override
     public String[] getSafeInConstants() {
-        return new String[]{"MIN_VALUE", "MAX_VALUE"};
+        return new String[] { "MIN_VALUE", "MAX_VALUE" };
     }
 
     @Override
     public boolean isSpecificPrimitiveAllowed(final ASTNode node) {
-        final ASTNode parentNode = node.getParent();
+        final ASTNode parentNode= node.getParent();
 
         switch (parentNode.getNodeType()) {
         case ARRAY_ACCESS:

@@ -41,7 +41,7 @@ public class JavaProjectOptionsImpl implements JavaProjectOptions {
 
     /** Builds a new instance of this class. */
     public JavaProjectOptionsImpl() {
-        this.options = new HashMap<String, String>();
+        this.options= new HashMap<String, String>();
     }
 
     /**
@@ -50,13 +50,13 @@ public class JavaProjectOptionsImpl implements JavaProjectOptions {
      * @param options the java project options
      */
     public JavaProjectOptionsImpl(Map<String, String> options) {
-        this.options = options;
-        this.javaSERelease = Release.javaSE(options.get(COMPILER_SOURCE));
+        this.options= options;
+        this.javaSERelease= Release.javaSE(options.get(COMPILER_SOURCE));
     }
 
     private Integer asInteger(String preference) {
         try {
-            String value = options.get(preference);
+            String value= options.get(preference);
             if (value != null) {
                 return Integer.parseInt(value);
             }
@@ -72,8 +72,8 @@ public class JavaProjectOptionsImpl implements JavaProjectOptions {
      * @return the compiler options.
      */
     public Map<String, String> getCompilerOptions() {
-        final Map<String, String> options = getOptions();
-        final String v = javaSERelease.getMajorVersion() + "." + javaSERelease.getMinorVersion();
+        final Map<String, String> options= getOptions();
+        final String v= javaSERelease.getMajorVersion() + "." + javaSERelease.getMinorVersion();
         setComplianceOptions(v, options);
         return options;
     }
@@ -102,9 +102,9 @@ public class JavaProjectOptionsImpl implements JavaProjectOptions {
      * @return the comment line length.
      */
     public int getCommentLineLength() {
-        Integer result = asInteger(FORMATTER_COMMENT_LINE_LENGTH);
+        Integer result= asInteger(FORMATTER_COMMENT_LINE_LENGTH);
         if (result == null) {
-            result = asInteger(DefaultCodeFormatterConstants.FORMATTER_LINE_SPLIT);
+            result= asInteger(DefaultCodeFormatterConstants.FORMATTER_LINE_SPLIT);
         }
         return result != null ? result : 80;
     }
@@ -115,7 +115,7 @@ public class JavaProjectOptionsImpl implements JavaProjectOptions {
      * @param javaSERelease the Java SE release
      */
     public void setJavaSERelease(Release javaSERelease) {
-        this.javaSERelease = javaSERelease;
+        this.javaSERelease= javaSERelease;
     }
 
     /**

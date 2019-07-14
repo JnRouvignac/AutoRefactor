@@ -55,10 +55,9 @@ public class ForeachCleanUp extends AbstractCleanUpRule {
      * @return the description.
      */
     public String getDescription() {
-        return ""
-            + "Replaces \"while\"/\"for with iterator\"/\"for with index loops\" into foreach loops"
-            + " (applicable to arrays or Iterable)."
-            + "Replaces Map.keySet() iteration with calls to Map.get()} into iterations over Map.entrySet().";
+        return "" + "Replaces \"while\"/\"for with iterator\"/\"for with index loops\" into foreach loops"
+                + " (applicable to arrays or Iterable)."
+                + "Replaces Map.keySet() iteration with calls to Map.get()} into iterations over Map.entrySet().";
     }
 
     /**
@@ -73,9 +72,8 @@ public class ForeachCleanUp extends AbstractCleanUpRule {
     private static class VariableUseVisitor extends ASTVisitor {
         @Override
         public boolean visit(SimpleName node) {
-            ASTNode parent = node.getParent();
-            if (parent instanceof QualifiedName
-                    || parent instanceof FieldAccess) {
+            ASTNode parent= node.getParent();
+            if (parent instanceof QualifiedName || parent instanceof FieldAccess) {
                 return DO_NOT_VISIT_SUBTREE;
             }
             return DO_NOT_VISIT_SUBTREE;
@@ -84,7 +82,7 @@ public class ForeachCleanUp extends AbstractCleanUpRule {
 
     @Override
     public boolean visit(ForStatement node) {
-        final VariableUseVisitor variableUseVisitor = new VariableUseVisitor();
+        final VariableUseVisitor variableUseVisitor= new VariableUseVisitor();
         node.accept(variableUseVisitor);
 
         if (initializers(node).size() == 1) {

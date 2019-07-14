@@ -37,8 +37,8 @@ import org.eclipse.jdt.core.dom.ASTNode;
  * Control Flow Graph Basic Block. Basic blocks here are a little different from
  * the normal definition of "all adjacent statements not separated by a jump".
  * Here, things like for statement initializers, if conditions, while conditions
- * all receive their own basic block in order to be able to link variable uses to
- * one basic block. It also mixes in lexical scoping.
+ * all receive their own basic block in order to be able to link variable uses
+ * to one basic block. It also mixes in lexical scoping.
  *
  * @see <a href="http://en.wikipedia.org/wiki/Control_flow_graph">Control flow
  *      graph on wikipedia</a>
@@ -50,29 +50,32 @@ public class CFGBasicBlock implements Comparable<CFGBasicBlock> {
     private final String fileName;
     private final String codeExcerpt;
     private final boolean isDecision;
-    /** true means entry block, false means exit block, null means neither entry nor exit block. */
+    /**
+     * true means entry block, false means exit block, null means neither entry nor
+     * exit block.
+     */
     private final Boolean isEntryBlock;
     private final LineAndColumn lineAndColumn;
-    private final Collection<CFGEdge> incomingEdges = new LinkedList<CFGEdge>();
-    private final Collection<Object> outgoingEdgesAndVariableAccesses = new LinkedList<Object>();
+    private final Collection<CFGEdge> incomingEdges= new LinkedList<CFGEdge>();
+    private final Collection<Object> outgoingEdgesAndVariableAccesses= new LinkedList<Object>();
 
     private CFGBasicBlock(ASTNode node, String fileName, String codeExcerpt, boolean isDecision, Boolean isEntryBlock,
             LineAndColumn lineAndColumn) {
-        this.node = node;
-        this.fileName = fileName;
-        this.codeExcerpt = codeExcerpt;
-        this.isDecision = isDecision;
-        this.isEntryBlock = isEntryBlock;
-        this.lineAndColumn = lineAndColumn;
+        this.node= node;
+        this.fileName= fileName;
+        this.codeExcerpt= codeExcerpt;
+        this.isDecision= isDecision;
+        this.isEntryBlock= isEntryBlock;
+        this.lineAndColumn= lineAndColumn;
     }
 
     /**
      * Constructor for a new block.
      *
-     * @param node the AST node that led to the creation of this block
-     * @param fileName the file name where this block is coming from
-     * @param codeExcerpt a code excerpt to display for this block
-     * @param isDecision whether this block is a decision block
+     * @param node          the AST node that led to the creation of this block
+     * @param fileName      the file name where this block is coming from
+     * @param codeExcerpt   a code excerpt to display for this block
+     * @param isDecision    whether this block is a decision block
      * @param lineAndColumn the line and column information for this block
      */
     public CFGBasicBlock(ASTNode node, String fileName, String codeExcerpt, boolean isDecision,
@@ -83,8 +86,8 @@ public class CFGBasicBlock implements Comparable<CFGBasicBlock> {
     /**
      * Builds and returns a new entry block.
      *
-     * @param node the AST node that led to the creation of this entry block
-     * @param fileName the file name where this entry block is coming from
+     * @param node        the AST node that led to the creation of this entry block
+     * @param fileName    the file name where this entry block is coming from
      * @param codeExcerpt a code excerpt to display for this block
      * @return a new entry block
      */
@@ -95,9 +98,9 @@ public class CFGBasicBlock implements Comparable<CFGBasicBlock> {
     /**
      * Builds and returns a new exit block.
      *
-     * @param node the AST node that led to the creation of this exit block
-     * @param fileName the file name where this exit block is coming from
-     * @param codeExcerpt a code excerpt to display for this block
+     * @param node          the AST node that led to the creation of this exit block
+     * @param fileName      the file name where this exit block is coming from
+     * @param codeExcerpt   a code excerpt to display for this block
      * @param lineAndColumn the line and column information for this exit block
      * @return a new exit block
      */
@@ -152,9 +155,11 @@ public class CFGBasicBlock implements Comparable<CFGBasicBlock> {
     }
 
     /**
-     * Returns a collection of the outgoing edges and variable accesses of this basic block.
+     * Returns a collection of the outgoing edges and variable accesses of this
+     * basic block.
      *
-     * @return a collection of the outgoing edges and variable accesses of this basic block.
+     * @return a collection of the outgoing edges and variable accesses of this
+     *         basic block.
      */
     public Collection<Object> getOutgoingEdgesAndVariableAccesses() {
         return outgoingEdgesAndVariableAccesses;
@@ -168,12 +173,10 @@ public class CFGBasicBlock implements Comparable<CFGBasicBlock> {
     public void addIncomingEdge(CFGEdge edge) {
         if (edge.getTargetBlock() != this) {
             throw new IllegalArgumentException(null,
-                    "Error: the target block of this incoming edge is not the current block: "
-                            + edge);
+                    "Error: the target block of this incoming edge is not the current block: " + edge);
         }
         if (!this.incomingEdges.add(edge)) {
-            throw new IllegalArgumentException(null,
-                    "Error: duplicate incoming edge:" + edge);
+            throw new IllegalArgumentException(null, "Error: duplicate incoming edge:" + edge);
         }
     }
 
@@ -188,8 +191,7 @@ public class CFGBasicBlock implements Comparable<CFGBasicBlock> {
                     "Error: the source block of this outgoing edge is not the current block");
         }
         if (!this.outgoingEdgesAndVariableAccesses.add(edge)) {
-            throw new IllegalArgumentException(null,
-                    "Error: duplicate outgoing edge:" + edge);
+            throw new IllegalArgumentException(null, "Error: duplicate outgoing edge:" + edge);
         }
     }
 
@@ -204,12 +206,11 @@ public class CFGBasicBlock implements Comparable<CFGBasicBlock> {
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((fileName == null) ? 0 : fileName.hashCode());
-        result = prime * result + ((lineAndColumn == null) ? 0 : lineAndColumn.hashCode());
-        return prime * result
-                + ((isEntryBlock == null) ? 0 : isEntryBlock.hashCode());
+        final int prime= 31;
+        int result= 1;
+        result= prime * result + ((fileName == null) ? 0 : fileName.hashCode());
+        result= prime * result + ((lineAndColumn == null) ? 0 : lineAndColumn.hashCode());
+        return prime * result + ((isEntryBlock == null) ? 0 : isEntryBlock.hashCode());
     }
 
     @Override
@@ -220,9 +221,8 @@ public class CFGBasicBlock implements Comparable<CFGBasicBlock> {
         if (obj == null || getClass() != obj.getClass()) {
             return false;
         }
-        final CFGBasicBlock other = (CFGBasicBlock) obj;
-        return equal(fileName, other.fileName)
-                && equal(lineAndColumn, other.lineAndColumn)
+        final CFGBasicBlock other= (CFGBasicBlock) obj;
+        return equal(fileName, other.fileName) && equal(lineAndColumn, other.lineAndColumn)
                 && equal(isEntryBlock, other.isEntryBlock);
     }
 
@@ -234,7 +234,7 @@ public class CFGBasicBlock implements Comparable<CFGBasicBlock> {
      * @return -1, 0 or 1
      */
     public int compareTo(CFGBasicBlock o) {
-        final Integer startPosition = lineAndColumn.getStartPosition();
+        final Integer startPosition= lineAndColumn.getStartPosition();
         return startPosition.compareTo(o.lineAndColumn.getStartPosition());
     }
 
@@ -262,13 +262,14 @@ public class CFGBasicBlock implements Comparable<CFGBasicBlock> {
      * @return the node label in the DOT format
      */
     String getDotNodeLabel() {
-        final StringBuilder sb = new StringBuilder();
+        final StringBuilder sb= new StringBuilder();
         appendDotNodeLabel(sb);
         return sb.toString();
     }
 
     /**
-     * Appends the node id in the DOT format and returns the provided string builder.
+     * Appends the node id in the DOT format and returns the provided string
+     * builder.
      *
      * @param sb the string builder where to append the node id
      * @return the provided string builder
@@ -279,28 +280,29 @@ public class CFGBasicBlock implements Comparable<CFGBasicBlock> {
         } else if (isExitBlock()) {
             sb.append("Exit");
         } else {
-            LineAndColumn lal = this.lineAndColumn;
+            LineAndColumn lal= this.lineAndColumn;
             sb.append("_").append(lal.getLine()).append("_").append(lal.getColumn());
         }
         return sb;
     }
 
     /**
-     * Appends the node label in the DOT format and returns the provided string builder.
+     * Appends the node label in the DOT format and returns the provided string
+     * builder.
      *
      * @param sb the string builder where to append the node label
      * @return the provided string builder
      */
     StringBuilder appendDotNodeLabel(StringBuilder sb) {
         sb.append(this.codeExcerpt).append("\\n(");
-        LineAndColumn lal = this.lineAndColumn;
+        LineAndColumn lal= this.lineAndColumn;
         sb.append(lal.getLine()).append(",").append(lal.getColumn()).append(")");
         return sb;
     }
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("BLOCK[");
+        final StringBuilder sb= new StringBuilder("BLOCK[");
         toString(sb);
         return sb.append("]").toString();
     }

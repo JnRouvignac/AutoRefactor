@@ -70,11 +70,10 @@ public class UseStringContainsCleanUp extends AbstractCleanUpRule {
 
     @Override
     public boolean visit(MethodInvocation node) {
-        final ASTNode parent = getFirstAncestorWithoutParentheses(node);
-        if (parent instanceof InfixExpression
-                && (isMethod(node, "java.lang.String", "indexOf", "java.lang.String")
-                        || isMethod(node, "java.lang.String", "lastIndexOf", "java.lang.String"))) {
-            final InfixExpression ie = (InfixExpression) parent;
+        final ASTNode parent= getFirstAncestorWithoutParentheses(node);
+        if (parent instanceof InfixExpression && (isMethod(node, "java.lang.String", "indexOf", "java.lang.String")
+                || isMethod(node, "java.lang.String", "lastIndexOf", "java.lang.String"))) {
+            final InfixExpression ie= (InfixExpression) parent;
             if (is(ie, node, Operator.GREATER_EQUALS, 0)) {
                 return replaceWithStringContains(ie, node, false);
             } else if (is(ie, node, Operator.LESS, 0)) {
@@ -89,8 +88,8 @@ public class UseStringContainsCleanUp extends AbstractCleanUpRule {
     }
 
     private boolean replaceWithStringContains(InfixExpression ie, MethodInvocation node, boolean negate) {
-        final Refactorings r = this.ctx.getRefactorings();
-        final ASTBuilder b = this.ctx.getASTBuilder();
+        final Refactorings r= this.ctx.getRefactorings();
+        final ASTBuilder b= this.ctx.getASTBuilder();
         r.set(node, MethodInvocation.NAME_PROPERTY, b.simpleName("contains"));
         if (negate) {
             r.replace(ie, b.not(b.move(node)));
@@ -101,15 +100,15 @@ public class UseStringContainsCleanUp extends AbstractCleanUpRule {
     }
 
     private boolean is(final InfixExpression ie, MethodInvocation node, Operator operator, Integer constant) {
-        final Expression leftOp = removeParentheses(ie.getLeftOperand());
-        final Expression rightOp = removeParentheses(ie.getRightOperand());
-        return hasOperator(ie, operator) && ((leftOp.equals(node)
-                && constant.equals(rightOp.resolveConstantExpressionValue())) || (rightOp.equals(node)
-                && constant.equals(leftOp.resolveConstantExpressionValue())));
+        final Expression leftOp= removeParentheses(ie.getLeftOperand());
+        final Expression rightOp= removeParentheses(ie.getRightOperand());
+        return hasOperator(ie, operator)
+                && ((leftOp.equals(node) && constant.equals(rightOp.resolveConstantExpressionValue()))
+                        || (rightOp.equals(node) && constant.equals(leftOp.resolveConstantExpressionValue())));
     }
 
     private ASTNode getFirstAncestorWithoutParentheses(ASTNode node) {
-        final ASTNode parent = node.getParent();
+        final ASTNode parent= node.getParent();
         if (node.getNodeType() == ASTNode.PARENTHESIZED_EXPRESSION) {
             return getFirstAncestorWithoutParentheses(parent);
         }

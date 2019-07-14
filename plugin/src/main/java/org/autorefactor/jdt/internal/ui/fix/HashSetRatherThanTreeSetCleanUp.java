@@ -43,23 +43,16 @@ import static org.autorefactor.util.Utils.*;
 
 /** See {@link #getDescription()} method. */
 public class HashSetRatherThanTreeSetCleanUp extends AbstractClassSubstituteCleanUp {
-    private static final Map<String, String[]> CAN_BE_CASTED_TO = new HashMap<String, String[]>();
+    private static final Map<String, String[]> CAN_BE_CASTED_TO= new HashMap<String, String[]>();
 
     static {
-        CAN_BE_CASTED_TO.put("java.lang.Object", new String[]{"java.lang.Object"});
-        CAN_BE_CASTED_TO.put("java.lang.Cloneable", new String[]{"java.lang.Cloneable", "java.lang.Object"});
-        CAN_BE_CASTED_TO.put("java.io.Serializable",
-                new String[]{"java.io.Serializable", "java.lang.Object"});
-        CAN_BE_CASTED_TO.put("java.util.Collection", new String[]{"java.util.Collection", "java.lang.Object"});
-        CAN_BE_CASTED_TO.put("java.util.AbstractCollection",
-                new String[]{"java.util.AbstractCollection", "java.util.Collection", "java.lang.Object"});
-        CAN_BE_CASTED_TO.put("java.util.AbstractSet",
-                new String[]{"java.util.AbstractSet", "java.util.Set",
-                    "java.util.AbstractCollection", "java.util.Collection", "java.lang.Object"});
-        CAN_BE_CASTED_TO.put("java.util.TreeSet",
-                new String[]{"java.util.TreeSet", "java.util.AbstractSet", "java.util.Set",
-                    "java.util.AbstractCollection", "java.util.Collection",
-                    "java.io.Serializable", "java.lang.Cloneable", "java.lang.Object"});
+        CAN_BE_CASTED_TO.put("java.lang.Object", new String[] { "java.lang.Object" });
+        CAN_BE_CASTED_TO.put("java.lang.Cloneable", new String[] { "java.lang.Cloneable", "java.lang.Object" });
+        CAN_BE_CASTED_TO.put("java.io.Serializable", new String[] { "java.io.Serializable", "java.lang.Object" });
+        CAN_BE_CASTED_TO.put("java.util.Collection", new String[] { "java.util.Collection", "java.lang.Object" });
+        CAN_BE_CASTED_TO.put("java.util.AbstractCollection", new String[] { "java.util.AbstractCollection", "java.util.Collection", "java.lang.Object" });
+        CAN_BE_CASTED_TO.put("java.util.AbstractSet", new String[] { "java.util.AbstractSet", "java.util.Set", "java.util.AbstractCollection", "java.util.Collection", "java.lang.Object" });
+        CAN_BE_CASTED_TO.put("java.util.TreeSet", new String[] { "java.util.TreeSet", "java.util.AbstractSet", "java.util.Set", "java.util.AbstractCollection", "java.util.Collection", "java.io.Serializable", "java.lang.Cloneable", "java.lang.Object" });
     }
 
     /**
@@ -91,7 +84,7 @@ public class HashSetRatherThanTreeSetCleanUp extends AbstractClassSubstituteClea
 
     @Override
     protected String[] getExistingClassCanonicalName() {
-        return new String[] {"java.util.TreeSet"};
+        return new String[] { "java.util.TreeSet" };
     }
 
     @Override
@@ -132,19 +125,15 @@ public class HashSetRatherThanTreeSetCleanUp extends AbstractClassSubstituteClea
                 || isMethod(mi, "java.util.Collection", "addAll", "java.util.Collection")
                 || isMethod(mi, "java.util.Collection", "containsAll", "java.util.Collection")
                 || isMethod(mi, "java.util.Collection", "retainAll", "java.util.Collection")
-                || isMethod(mi, "java.lang.Object", "finalize")
-                || isMethod(mi, "java.lang.Object", "notify")
-                || isMethod(mi, "java.lang.Object", "notifyAll")
-                || isMethod(mi, "java.lang.Object", "wait")
+                || isMethod(mi, "java.lang.Object", "finalize") || isMethod(mi, "java.lang.Object", "notify")
+                || isMethod(mi, "java.lang.Object", "notifyAll") || isMethod(mi, "java.lang.Object", "wait")
                 || isMethod(mi, "java.lang.Object", "wait", "long")
                 || isMethod(mi, "java.lang.Object", "wait", "long", "int");
     }
 
     @Override
-    protected boolean isTypeCompatible(final ITypeBinding variableType,
-            final ITypeBinding refType) {
-        return super.isTypeCompatible(variableType, refType)
-                || hasType(variableType,
-                           getOrDefault(CAN_BE_CASTED_TO, refType.getErasure().getQualifiedName(), new String[0]));
+    protected boolean isTypeCompatible(final ITypeBinding variableType, final ITypeBinding refType) {
+        return super.isTypeCompatible(variableType, refType) || hasType(variableType,
+                getOrDefault(CAN_BE_CASTED_TO, refType.getErasure().getQualifiedName(), new String[0]));
     }
 }

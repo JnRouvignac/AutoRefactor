@@ -35,12 +35,11 @@ import org.eclipse.jdt.core.dom.ASTVisitor;
 /**
  * A visitor that collects a list of results.
  *
- * @param <R>
- *          type of the results returned by this finder visitor
+ * @param <R> type of the results returned by this finder visitor
  */
 public class CollectorVisitor<R> extends ASTVisitor {
     /** The actual boolean result. */
-    private final List<R> results = new ArrayList<R>();
+    private final List<R> results= new ArrayList<R>();
 
     /**
      * Adds the provided result to the list of results.
@@ -61,8 +60,8 @@ public class CollectorVisitor<R> extends ASTVisitor {
     }
 
     /**
-     * Calls {@link ASTNode#accept(ASTVisitor)} on the provided node
-     * and returns the found result if one exists, or the default value.
+     * Calls {@link ASTNode#accept(ASTVisitor)} on the provided node and returns the
+     * found result if one exists, or the default value.
      *
      * @param nodeToVisit the node to visit
      * @return the results found, may be empty

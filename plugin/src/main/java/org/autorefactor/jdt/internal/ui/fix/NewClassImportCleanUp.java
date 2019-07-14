@@ -53,8 +53,8 @@ public abstract class NewClassImportCleanUp extends AbstractCleanUpRule {
      * The class that does the refactoring when an import needs to be added.
      */
     public abstract class CleanUpWithNewClassImport extends ASTVisitor {
-        private Set<String> classesToUseWithImport = new HashSet<String>();
-        private Set<String> importsToAdd = new HashSet<String>();
+        private Set<String> classesToUseWithImport= new HashSet<String>();
+        private Set<String> importsToAdd= new HashSet<String>();
 
         /**
          * The imports that need to be added.
@@ -76,7 +76,7 @@ public abstract class NewClassImportCleanUp extends AbstractCleanUpRule {
     }
 
     private class LocalClassVisitor extends InterruptibleVisitor {
-        private Set<String> classnamesNeverUsedLocally = new HashSet<String>();
+        private Set<String> classnamesNeverUsedLocally= new HashSet<String>();
 
         /**
          * LocalClassVisitor.
@@ -84,7 +84,7 @@ public abstract class NewClassImportCleanUp extends AbstractCleanUpRule {
          * @param classnamesNeverUsedLocally Classnames never used locally
          */
         public LocalClassVisitor(Set<String> classnamesNeverUsedLocally) {
-            this.classnamesNeverUsedLocally = classnamesNeverUsedLocally;
+            this.classnamesNeverUsedLocally= classnamesNeverUsedLocally;
         }
 
         @Override
@@ -126,20 +126,20 @@ public abstract class NewClassImportCleanUp extends AbstractCleanUpRule {
      * @return True if an import already exists for a class.
      */
     public Set<String> getAlreadyImportedClasses(final ASTNode node) {
-        final Set<String> alreadyImportedClasses = new HashSet<String>();
-        final CompilationUnit cu = (CompilationUnit) node.getRoot();
-        final Set<String> classesToUse = getClassesToImport();
-        final Map<String, String> importsByPackage = new HashMap<String, String>();
+        final Set<String> alreadyImportedClasses= new HashSet<String>();
+        final CompilationUnit cu= (CompilationUnit) node.getRoot();
+        final Set<String> classesToUse= getClassesToImport();
+        final Map<String, String> importsByPackage= new HashMap<String, String>();
 
         for (String clazz : classesToUse) {
             importsByPackage.put(getPackageName(clazz), clazz);
         }
 
         for (final Object anObject : cu.imports()) {
-            final ImportDeclaration anImport = (ImportDeclaration) anObject;
+            final ImportDeclaration anImport= (ImportDeclaration) anObject;
 
             if (anImport.isOnDemand()) {
-                String fullName = importsByPackage.get(anImport.getName().getFullyQualifiedName());
+                String fullName= importsByPackage.get(anImport.getName().getFullyQualifiedName());
 
                 if (fullName != null) {
                     alreadyImportedClasses.add(fullName);
@@ -158,29 +158,29 @@ public abstract class NewClassImportCleanUp extends AbstractCleanUpRule {
             return DO_NOT_VISIT_SUBTREE;
         }
 
-        final Set<String> classesToUse = getClassesToImport();
+        final Set<String> classesToUse= getClassesToImport();
 
         if (classesToUse.isEmpty()) {
             return VISIT_SUBTREE;
         }
 
-        final Map<String, String> importsByClassname = new HashMap<String, String>();
-        final Map<String, String> importsByPackage = new HashMap<String, String>();
+        final Map<String, String> importsByClassname= new HashMap<String, String>();
+        final Map<String, String> importsByPackage= new HashMap<String, String>();
 
         for (String clazz : classesToUse) {
             importsByClassname.put(getSimpleName(clazz), clazz);
             importsByPackage.put(getPackageName(clazz), clazz);
         }
 
-        Set<String> alreadyImportedClasses = new HashSet<String>();
-        Set<String> classesToImport = new HashSet<String>(classesToUse);
+        Set<String> alreadyImportedClasses= new HashSet<String>();
+        Set<String> classesToImport= new HashSet<String>(classesToUse);
 
         for (Object anObject : node.imports()) {
-            ImportDeclaration anImport = (ImportDeclaration) anObject;
+            ImportDeclaration anImport= (ImportDeclaration) anObject;
 
             if (!anImport.isStatic()) {
                 if (anImport.isOnDemand()) {
-                    String fullName = importsByPackage.get(anImport.getName().getFullyQualifiedName());
+                    String fullName= importsByPackage.get(anImport.getName().getFullyQualifiedName());
 
                     if (fullName != null) {
                         alreadyImportedClasses.add(fullName);
@@ -188,10 +188,9 @@ public abstract class NewClassImportCleanUp extends AbstractCleanUpRule {
                 } else if (classesToUse.contains(anImport.getName().getFullyQualifiedName())) {
                     alreadyImportedClasses.add(anImport.getName().getFullyQualifiedName());
                     classesToImport.remove(anImport.getName().getFullyQualifiedName());
-                } else if (importsByClassname.containsKey(getSimpleName(anImport.getName()
-                        .getFullyQualifiedName()))) {
-                    classesToImport.remove(importsByClassname.get(getSimpleName(anImport.getName()
-                            .getFullyQualifiedName())));
+                } else if (importsByClassname.containsKey(getSimpleName(anImport.getName().getFullyQualifiedName()))) {
+                    classesToImport
+                            .remove(importsByClassname.get(getSimpleName(anImport.getName().getFullyQualifiedName())));
                 }
             }
         }
@@ -199,13 +198,13 @@ public abstract class NewClassImportCleanUp extends AbstractCleanUpRule {
         filterLocallyUsedNames(node, importsByClassname, classesToImport);
 
         if (alreadyImportedClasses.size() < classesToUse.size() && !classesToImport.isEmpty()) {
-            final CleanUpWithNewClassImport refactoringClass = getRefactoringClassInstance();
+            final CleanUpWithNewClassImport refactoringClass= getRefactoringClassInstance();
             refactoringClass.getClassesToUseWithImport().addAll(alreadyImportedClasses);
             refactoringClass.getClassesToUseWithImport().addAll(classesToImport);
             node.accept(refactoringClass);
 
             if (!refactoringClass.getImportsToAdd().isEmpty()) {
-                final Refactorings r = ctx.getRefactorings();
+                final Refactorings r= ctx.getRefactorings();
 
                 for (String importToAdd : refactoringClass.getImportsToAdd()) {
                     r.getImportRewrite().addImport(importToAdd);
@@ -240,14 +239,13 @@ public abstract class NewClassImportCleanUp extends AbstractCleanUpRule {
 
     private void filterLocallyUsedNames(final CompilationUnit node, final Map<String, String> importsByClassname,
             final Set<String> classesToImport) {
-        final LocalClassVisitor nestedClassVisitor = new LocalClassVisitor(
-                importsByClassname.keySet());
+        final LocalClassVisitor nestedClassVisitor= new LocalClassVisitor(importsByClassname.keySet());
         nestedClassVisitor.visitNode(node);
-        final Set<String> classnamesNeverUsedLocally = nestedClassVisitor.getClassnamesNeverUsedLocally();
-        final Iterator<String> iterator = classesToImport.iterator();
+        final Set<String> classnamesNeverUsedLocally= nestedClassVisitor.getClassnamesNeverUsedLocally();
+        final Iterator<String> iterator= classesToImport.iterator();
 
         while (iterator.hasNext()) {
-            final String classToImport = iterator.next();
+            final String classToImport= iterator.next();
 
             if (!classnamesNeverUsedLocally.contains(getSimpleName(classToImport))) {
                 classesToImport.remove(classToImport);

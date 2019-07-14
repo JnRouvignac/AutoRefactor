@@ -52,27 +52,18 @@ import org.eclipse.jdt.core.dom.Type;
 
 /** See {@link #getDescription()} method. */
 public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCleanUp {
-    private static final Map<String, String[]> CAN_BE_CASTED_TO = new HashMap<String, String[]>();
+    private static final Map<String, String[]> CAN_BE_CASTED_TO= new HashMap<String, String[]>();
 
     static {
         CAN_BE_CASTED_TO.put("java.lang.Object", new String[] { "java.lang.Object" });
         CAN_BE_CASTED_TO.put("java.lang.Cloneable", new String[] { "java.lang.Cloneable", "java.lang.Object" });
         CAN_BE_CASTED_TO.put("java.io.Serializable", new String[] { "java.io.Serializable", "java.lang.Object" });
         CAN_BE_CASTED_TO.put("java.util.Map", new String[] { "java.util.Map", "java.lang.Object" });
-        CAN_BE_CASTED_TO.put("java.util.AbstractMap",
-                new String[] { "java.util.AbstractMap", "java.util.Map", "java.lang.Object" });
-        CAN_BE_CASTED_TO.put("java.util.TreeMap",
-                new String[] { "java.util.TreeMap", "java.util.AbstractMap",
-                    "java.util.Map", "java.io.Serializable", "java.lang.Cloneable", "java.lang.Object" });
-        CAN_BE_CASTED_TO.put("java.util.HashMap",
-                new String[] { "java.util.HashMap", "java.util.AbstractMap",
-                    "java.util.Map", "java.io.Serializable", "java.lang.Cloneable", "java.lang.Object" });
-        CAN_BE_CASTED_TO.put("java.util.EnumMap",
-                new String[] { "java.util.EnumMap", "java.util.AbstractMap",
-                    "java.util.Map", "java.io.Serializable", "java.lang.Cloneable", "java.lang.Object" });
-        CAN_BE_CASTED_TO.put("java.util.Hashtable",
-                new String[] { "java.util.Hashtable", "java.util.AbstractMap",
-                    "java.util.Map", "java.io.Serializable", "java.lang.Cloneable", "java.lang.Object" });
+        CAN_BE_CASTED_TO.put("java.util.AbstractMap", new String[] { "java.util.AbstractMap", "java.util.Map", "java.lang.Object" });
+        CAN_BE_CASTED_TO.put("java.util.TreeMap", new String[] { "java.util.TreeMap", "java.util.AbstractMap", "java.util.Map", "java.io.Serializable", "java.lang.Cloneable", "java.lang.Object" });
+        CAN_BE_CASTED_TO.put("java.util.HashMap", new String[] { "java.util.HashMap", "java.util.AbstractMap", "java.util.Map", "java.io.Serializable", "java.lang.Cloneable", "java.lang.Object" });
+        CAN_BE_CASTED_TO.put("java.util.EnumMap", new String[] { "java.util.EnumMap", "java.util.AbstractMap", "java.util.Map", "java.io.Serializable", "java.lang.Cloneable", "java.lang.Object" });
+        CAN_BE_CASTED_TO.put("java.util.Hashtable", new String[] { "java.util.Hashtable", "java.util.AbstractMap", "java.util.Map", "java.io.Serializable", "java.lang.Cloneable", "java.lang.Object" });
     }
 
     private ITypeBinding keyType;
@@ -113,32 +104,14 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
 
     @Override
     public boolean visit(Block node) {
-        keyType = null;
-        valueType = null;
+        keyType= null;
+        valueType= null;
         return super.visit(node);
     }
 
     @Override
     protected String[] getExistingClassCanonicalName() {
-        return new String[] {
-            "java.util.jar.Attributes",
-            "java.security.AuthProvider",
-            "java.util.concurrent.ConcurrentHashMap",
-            "java.util.concurrent.ConcurrentSkipListMap",
-            "java.util.EnumMap",
-            "java.util.HashMap",
-            "java.util.Hashtable",
-            "java.util.IdentityHashMap",
-            "java.util.LinkedHashMap",
-            "javax.print.attribute.standard.PrinterStateReasons",
-            "java.util.Properties",
-            "java.security.Provider",
-            "java.awt.RenderingHints",
-            "javax.script.SimpleBindings",
-            "javax.management.openmbean.TabularDataSupport",
-            "java.util.TreeMap",
-            "javax.swing.UIDefaults",
-            "java.util.WeakHashMap"};
+        return new String[] { "java.util.jar.Attributes", "java.security.AuthProvider", "java.util.concurrent.ConcurrentHashMap", "java.util.concurrent.ConcurrentSkipListMap", "java.util.EnumMap", "java.util.HashMap", "java.util.Hashtable", "java.util.IdentityHashMap", "java.util.LinkedHashMap", "javax.print.attribute.standard.PrinterStateReasons", "java.util.Properties", "java.security.Provider", "java.awt.RenderingHints", "javax.script.SimpleBindings", "javax.management.openmbean.TabularDataSupport", "java.util.TreeMap", "javax.swing.UIDefaults", "java.util.WeakHashMap" };
     }
 
     @Override
@@ -152,8 +125,10 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
      * @param b                      The builder.
      * @param origType               The original type
      * @param originalExpr           The original expression
-     * @param classesToUseWithImport The classes that should be used with simple name.
-     * @param importsToAdd           The imports that need to be added during this refactoring.
+     * @param classesToUseWithImport The classes that should be used with simple
+     *                               name.
+     * @param importsToAdd           The imports that need to be added during this
+     *                               refactoring.
      * @return the substitute type.
      */
     @Override
@@ -163,10 +138,10 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
             return null;
         }
 
-        final TypeNameDecider typeNameDecider = new TypeNameDecider(originalExpr);
+        final TypeNameDecider typeNameDecider= new TypeNameDecider(originalExpr);
 
-        final ParameterizedType parameterizedType = b.getAST().newParameterizedType(b.copy(origType));
-        final List<Type> typeArgs = typeArguments(parameterizedType);
+        final ParameterizedType parameterizedType= b.getAST().newParameterizedType(b.copy(origType));
+        final List<Type> typeArgs= typeArguments(parameterizedType);
         typeArgs.clear();
         typeArgs.add(b.toType(keyType, typeNameDecider));
         typeArgs.add(b.toType(valueType, typeNameDecider));
@@ -176,21 +151,21 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
 
     @Override
     protected boolean canInstantiationBeRefactored(final ClassInstanceCreation instanceCreation) {
-        keyType = null;
-        valueType = null;
+        keyType= null;
+        valueType= null;
 
         if (instanceCreation.resolveTypeBinding().isParameterizedType()) {
             return false;
         }
 
-        ITypeBinding[] parameterTypes = instanceCreation.resolveConstructorBinding().getParameterTypes();
+        ITypeBinding[] parameterTypes= instanceCreation.resolveConstructorBinding().getParameterTypes();
 
         if (parameterTypes.length > 0 && hasType(parameterTypes[0], "java.util.Map")) {
-            ITypeBinding actualParameter = arguments(instanceCreation).get(0).resolveTypeBinding();
+            ITypeBinding actualParameter= arguments(instanceCreation).get(0).resolveTypeBinding();
 
             if (isParameterizedTypeWithNbArguments(actualParameter, 2)) {
-                ITypeBinding newKeyType = actualParameter.getTypeArguments()[0];
-                ITypeBinding newValueType = actualParameter.getTypeArguments()[1];
+                ITypeBinding newKeyType= actualParameter.getTypeArguments()[0];
+                ITypeBinding newValueType= actualParameter.getTypeArguments()[1];
                 return resolveKeyTypeCompatible(newKeyType) && resolveValueTypeCompatible(newValueType);
             }
         }
@@ -200,67 +175,56 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
     @Override
     protected boolean canMethodBeRefactored(final MethodInvocation mi,
             final List<MethodInvocation> methodCallsToRefactor) {
-        if (mi.getExpression() == null
-                || mi.getExpression().resolveTypeBinding().isParameterizedType()) {
+        if (mi.getExpression() == null || mi.getExpression().resolveTypeBinding().isParameterizedType()) {
             return false;
         }
 
-        final List<Expression> arguments = arguments(mi);
+        final List<Expression> arguments= arguments(mi);
         if (isMethod(mi, "java.lang.Object", "equals", "java.lang.Object")
-                || isMethod(mi, "java.lang.Object", "toString")
-                || isMethod(mi, "java.lang.Object", "finalize")
-                || isMethod(mi, "java.lang.Object", "notify")
-                || isMethod(mi, "java.lang.Object", "notifyAll")
-                || isMethod(mi, "java.lang.Object", "size")
-                || isMethod(mi, "java.lang.Object", "wait")
+                || isMethod(mi, "java.lang.Object", "toString") || isMethod(mi, "java.lang.Object", "finalize")
+                || isMethod(mi, "java.lang.Object", "notify") || isMethod(mi, "java.lang.Object", "notifyAll")
+                || isMethod(mi, "java.lang.Object", "size") || isMethod(mi, "java.lang.Object", "wait")
                 || isMethod(mi, "java.lang.Object", "wait", "long")
-                || isMethod(mi, "java.lang.Object", "wait", "long", "int")
-                || isMethod(mi, "java.util.Map", "clear")
+                || isMethod(mi, "java.lang.Object", "wait", "long", "int") || isMethod(mi, "java.util.Map", "clear")
                 || isMethod(mi, "java.util.Map", "containsKey", "java.lang.Object")
                 || isMethod(mi, "java.util.Map", "containsValue", "java.lang.Object")
                 || isMethod(mi, "java.util.Map", "equals", "java.lang.Object")
                 || isMethod(mi, "java.util.Map", "forEach", "java.util.function.BiConsumer")
-                || isMethod(mi, "java.util.Map", "hashCode")
-                || isMethod(mi, "java.util.Map", "isEmpty")
+                || isMethod(mi, "java.util.Map", "hashCode") || isMethod(mi, "java.util.Map", "isEmpty")
                 || isMethod(mi, "java.util.Map", "size")
                 || isMethod(mi, "java.util.Map", "remove", "java.lang.Object", "java.lang.Object")) {
             return true;
         } else if (isMethod(mi, "java.util.Map", "ofEntries", "java.util.Map.Entry[]")) {
-            final ITypeBinding paramType = arguments.get(0).resolveTypeBinding().getElementType();
+            final ITypeBinding paramType= arguments.get(0).resolveTypeBinding().getElementType();
 
             if (isParameterizedTypeWithNbArguments(paramType, 2)) {
-                final ITypeBinding newKeyType = paramType.getTypeArguments()[0];
-                final ITypeBinding newValueType = paramType.getTypeArguments()[1];
+                final ITypeBinding newKeyType= paramType.getTypeArguments()[0];
+                final ITypeBinding newValueType= paramType.getTypeArguments()[1];
                 return resolveKeyTypeCompatible(newKeyType) && resolveValueTypeCompatible(newValueType);
             }
         } else if (isMethod(mi, "java.util.Map", "putAll", "java.util.Map")
                 || isMethod(mi, "java.util.LinkedHashMap", "removeEldestEntry", "java.util.Map.Entry")) {
-            final ITypeBinding paramType = arguments.get(0).resolveTypeBinding();
+            final ITypeBinding paramType= arguments.get(0).resolveTypeBinding();
 
             if (isParameterizedTypeWithNbArguments(paramType, 2)) {
-                final ITypeBinding newKeyType = paramType.getTypeArguments()[0];
-                final ITypeBinding newValueType = paramType.getTypeArguments()[1];
+                final ITypeBinding newKeyType= paramType.getTypeArguments()[0];
+                final ITypeBinding newValueType= paramType.getTypeArguments()[1];
                 return resolveKeyTypeCompatible(newKeyType) && resolveValueTypeCompatible(newValueType);
             }
-        } else if (isMethod(mi, "java.util.TreeMap", "lastKey")
-                || isMethod(mi, "java.util.TreeMap", "firstKey")) {
+        } else if (isMethod(mi, "java.util.TreeMap", "lastKey") || isMethod(mi, "java.util.TreeMap", "firstKey")) {
             return resolveDestinationTypeCompatibleWithKey(mi);
         } else if (isMethod(mi, "java.util.Map", "get", "java.lang.Object")
                 || isMethod(mi, "java.util.Map", "remove", "java.lang.Object")) {
             return resolveDestinationTypeCompatibleWithValue(mi);
-        } else if (isMethod(mi, "java.util.Map", "keySet")
-                || isMethod(mi, "java.util.TreeMap", "comparator")
+        } else if (isMethod(mi, "java.util.Map", "keySet") || isMethod(mi, "java.util.TreeMap", "comparator")
                 || isMethod(mi, "java.util.TreeMap", "descendingKeySet")
                 || isMethod(mi, "java.util.TreeMap", "navigableKeySet")) {
             return resolveDestinationParamTypeCompatibleWithKey(mi);
         } else if (isMethod(mi, "java.util.Map", "values")) {
             return resolveDestinationParamTypeCompatibleWithValue(mi);
-        } else if (isMethod(mi, "java.util.TreeMap", "descendingMap")
-                || isMethod(mi, "java.util.TreeMap", "firstEntry")
-                || isMethod(mi, "java.util.TreeMap", "lastEntry")
-                || isMethod(mi, "java.util.TreeMap", "pollFirstEntry")
-                || isMethod(mi, "java.util.TreeMap", "pollLastEntry")
-                || isMethod(mi, "java.util.Map", "of")) {
+        } else if (isMethod(mi, "java.util.TreeMap", "descendingMap") || isMethod(mi, "java.util.TreeMap", "firstEntry")
+                || isMethod(mi, "java.util.TreeMap", "lastEntry") || isMethod(mi, "java.util.TreeMap", "pollFirstEntry")
+                || isMethod(mi, "java.util.TreeMap", "pollLastEntry") || isMethod(mi, "java.util.Map", "of")) {
             return resolveDestinationParamTypeCompatibleWithKeyValue(mi);
         } else if (isMethod(mi, "java.util.TreeMap", "ceilingEntry", "java.lang.Object")
                 || isMethod(mi, "java.util.TreeMap", "floorEntry", "java.lang.Object")
@@ -270,23 +234,21 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
                 || isMethod(mi, "java.util.TreeMap", "lowerEntry", "java.lang.Object")
                 || isMethod(mi, "java.util.TreeMap", "tailMap", "java.lang.Object")
                 || isMethod(mi, "java.util.TreeMap", "tailMap", "java.lang.Object", "boolean")) {
-            final ITypeBinding newKeyType = arguments.get(0).resolveTypeBinding();
-            return resolveKeyTypeCompatible(newKeyType)
-                    && resolveDestinationParamTypeCompatibleWithKeyValue(mi);
+            final ITypeBinding newKeyType= arguments.get(0).resolveTypeBinding();
+            return resolveKeyTypeCompatible(newKeyType) && resolveDestinationParamTypeCompatibleWithKeyValue(mi);
         } else if (isMethod(mi, "java.util.Map", "entry", "java.lang.Object", "java.lang.Object")
                 || isMethod(mi, "java.util.Map", "of", "java.lang.Object", "java.lang.Object")
                 || isMethod(mi, "java.util.TreeMap", "subMap", "java.lang.Object", "java.lang.Object")) {
-            final ITypeBinding newKeyType = arguments.get(0).resolveTypeBinding();
-            final ITypeBinding newValueType = arguments.get(1).resolveTypeBinding();
-            return resolveKeyTypeCompatible(newKeyType)
-                    && resolveValueTypeCompatible(newValueType)
+            final ITypeBinding newKeyType= arguments.get(0).resolveTypeBinding();
+            final ITypeBinding newValueType= arguments.get(1).resolveTypeBinding();
+            return resolveKeyTypeCompatible(newKeyType) && resolveValueTypeCompatible(newValueType)
                     && resolveDestinationParamTypeCompatibleWithKeyValue(mi);
         } else if (isMethod(mi, "java.util.Map", "entrySet")) {
             if (isExprReceived(mi)) {
-                final ITypeBinding newTargetType = getDestinationType(mi);
+                final ITypeBinding newTargetType= getDestinationType(mi);
 
                 if (isParameterizedTypeWithNbArguments(newTargetType, 1)) {
-                    final ITypeBinding newElementType = newTargetType.getTypeArguments()[0];
+                    final ITypeBinding newElementType= newTargetType.getTypeArguments()[0];
 
                     if (isParameterizedTypeWithNbArguments(newElementType, 2)) {
                         return resolveKeyTypeCompatible(newElementType.getTypeArguments()[0])
@@ -318,10 +280,9 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
                     && resolveValueTypeCompatible(arguments.get(2).resolveTypeBinding());
         } else if (isMethod(mi, "java.util.TreeMap", "subMap", "java.lang.Object", "boolean", "java.lang.Object",
                 "boolean")) {
-            final ITypeBinding newKeyType = arguments.get(0).resolveTypeBinding();
-            final ITypeBinding newValueType = arguments.get(2).resolveTypeBinding();
-            return resolveKeyTypeCompatible(newKeyType)
-                    && resolveValueTypeCompatible(newValueType)
+            final ITypeBinding newKeyType= arguments.get(0).resolveTypeBinding();
+            final ITypeBinding newValueType= arguments.get(2).resolveTypeBinding();
+            return resolveKeyTypeCompatible(newKeyType) && resolveValueTypeCompatible(newValueType)
                     && resolveDestinationParamTypeCompatibleWithKeyValue(mi);
         } else if (isMethod(mi, "java.util.Map", "of", "java.lang.Object", "java.lang.Object", "java.lang.Object",
                 "java.lang.Object")
@@ -357,10 +318,10 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
                         "java.lang.Object", "java.lang.Object", "java.lang.Object", "java.lang.Object",
                         "java.lang.Object", "java.lang.Object", "java.lang.Object", "java.lang.Object",
                         "java.lang.Object")) {
-            final Iterator<Expression> argumentIterator = arguments.iterator();
+            final Iterator<Expression> argumentIterator= arguments.iterator();
 
-            final List<ITypeBinding> keyTypes = new ArrayList<ITypeBinding>();
-            final List<ITypeBinding> valueTypes = new ArrayList<ITypeBinding>();
+            final List<ITypeBinding> keyTypes= new ArrayList<ITypeBinding>();
+            final List<ITypeBinding> valueTypes= new ArrayList<ITypeBinding>();
 
             while (argumentIterator.hasNext()) {
                 keyTypes.add(argumentIterator.next().resolveTypeBinding());
@@ -383,43 +344,40 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
         } else if (isMethod(mi, "java.util.Map", "compute", "java.lang.Object", "java.util.function.BiFunction")
                 || isMethod(mi, "java.util.Map", "computeIfPresent", "java.lang.Object",
                         "java.util.function.BiFunction")) {
-            final ITypeBinding paramType = arguments.get(1).resolveTypeBinding();
+            final ITypeBinding paramType= arguments.get(1).resolveTypeBinding();
 
             if (isParameterizedTypeWithNbArguments(paramType, 3)) {
-                final ITypeBinding newValueType = paramType.getTypeArguments()[2];
+                final ITypeBinding newValueType= paramType.getTypeArguments()[2];
 
                 return resolveKeyTypeCompatible(arguments.get(0).resolveTypeBinding())
-                        && resolveValueTypeCompatible(newValueType)
-                        && resolveDestinationTypeCompatibleWithValue(mi);
+                        && resolveValueTypeCompatible(newValueType) && resolveDestinationTypeCompatibleWithValue(mi);
             }
         } else if (isMethod(mi, "java.util.Map", "computeIfAbsent", "java.lang.Object",
                 "java.util.function.Function")) {
-            final ITypeBinding paramType = arguments.get(1).resolveTypeBinding();
+            final ITypeBinding paramType= arguments.get(1).resolveTypeBinding();
 
             if (isParameterizedTypeWithNbArguments(paramType, 2)) {
-                final ITypeBinding newValueType = paramType.getTypeArguments()[1];
+                final ITypeBinding newValueType= paramType.getTypeArguments()[1];
 
                 return resolveKeyTypeCompatible(arguments.get(0).resolveTypeBinding())
-                        && resolveValueTypeCompatible(newValueType)
-                        && resolveDestinationTypeCompatibleWithValue(mi);
+                        && resolveValueTypeCompatible(newValueType) && resolveDestinationTypeCompatibleWithValue(mi);
             }
         } else if (isMethod(mi, "java.util.Map", "merge", "java.lang.Object", "java.lang.Object",
                 "java.util.function.BiFunction")) {
-            final ITypeBinding paramType = arguments.get(2).resolveTypeBinding();
+            final ITypeBinding paramType= arguments.get(2).resolveTypeBinding();
 
             if (isParameterizedTypeWithNbArguments(paramType, 3)) {
-                final ITypeBinding newValueType = paramType.getTypeArguments()[2];
+                final ITypeBinding newValueType= paramType.getTypeArguments()[2];
 
                 return resolveKeyTypeCompatible(arguments.get(0).resolveTypeBinding())
                         && resolveValueTypeCompatible(arguments.get(1).resolveTypeBinding())
-                        && resolveValueTypeCompatible(newValueType)
-                        && resolveDestinationTypeCompatibleWithValue(mi);
+                        && resolveValueTypeCompatible(newValueType) && resolveDestinationTypeCompatibleWithValue(mi);
             }
         } else if (isMethod(mi, "java.util.Map", "replaceAll", "java.util.function.BiFunction")) {
-            final ITypeBinding paramType = arguments.get(0).resolveTypeBinding();
+            final ITypeBinding paramType= arguments.get(0).resolveTypeBinding();
 
             if (isParameterizedTypeWithNbArguments(paramType, 3)) {
-                final ITypeBinding newValueType = paramType.getTypeArguments()[2];
+                final ITypeBinding newValueType= paramType.getTypeArguments()[2];
 
                 return resolveValueTypeCompatible(newValueType);
             }
@@ -429,7 +387,7 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
     }
 
     private boolean isExprReceived(final ASTNode node) {
-        final ASTNode parent = node.getParent();
+        final ASTNode parent= node.getParent();
         if (parent instanceof ParenthesizedExpression) {
             return isExprReceived(parent);
         } else {
@@ -447,7 +405,7 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
 
     private boolean resolveDestinationParamTypeCompatibleWithKey(final MethodInvocation mi) {
         if (isExprReceived(mi)) {
-            final ITypeBinding newElementType = getDestinationType(mi);
+            final ITypeBinding newElementType= getDestinationType(mi);
             return isParameterizedTypeWithNbArguments(newElementType, 1)
                     && resolveKeyTypeCompatible(newElementType.getTypeArguments()[0]);
         }
@@ -456,7 +414,7 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
 
     private boolean resolveDestinationParamTypeCompatibleWithValue(final MethodInvocation mi) {
         if (isExprReceived(mi)) {
-            final ITypeBinding newElementType = getDestinationType(mi);
+            final ITypeBinding newElementType= getDestinationType(mi);
             return isParameterizedTypeWithNbArguments(newElementType, 1)
                     && resolveValueTypeCompatible(newElementType.getTypeArguments()[0]);
         }
@@ -465,7 +423,7 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
 
     private boolean resolveDestinationParamTypeCompatibleWithKeyValue(final MethodInvocation mi) {
         if (isExprReceived(mi)) {
-            final ITypeBinding newElementType = getDestinationType(mi);
+            final ITypeBinding newElementType= getDestinationType(mi);
             return isParameterizedTypeWithNbArguments(newElementType, 2)
                     && resolveKeyTypeCompatible(newElementType.getTypeArguments()[0])
                     && resolveValueTypeCompatible(newElementType.getTypeArguments()[1]);
@@ -474,8 +432,7 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
     }
 
     private boolean isParameterizedTypeWithNbArguments(final ITypeBinding typeBinding, int nbArgs) {
-        return typeBinding != null
-                && typeBinding.isParameterizedType()
+        return typeBinding != null && typeBinding.isParameterizedType()
                 && typeBinding.getTypeArguments().length == nbArgs;
     }
 
@@ -484,10 +441,10 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
             return false;
         }
         if (newElementType.isPrimitive()) {
-            newElementType = getBoxedTypeBinding(newElementType, ctx.getAST());
+            newElementType= getBoxedTypeBinding(newElementType, ctx.getAST());
         }
         if (!hasType(newElementType, "java.lang.Object") && (keyType == null || newElementType.equals(keyType))) {
-            keyType = newElementType;
+            keyType= newElementType;
             return true;
         }
         return false;
@@ -498,10 +455,10 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
             return false;
         }
         if (newElementType.isPrimitive()) {
-            newElementType = getBoxedTypeBinding(newElementType, ctx.getAST());
+            newElementType= getBoxedTypeBinding(newElementType, ctx.getAST());
         }
         if (!hasType(newElementType, "java.lang.Object") && (valueType == null || newElementType.equals(valueType))) {
-            valueType = newElementType;
+            valueType= newElementType;
             return true;
         }
         return false;

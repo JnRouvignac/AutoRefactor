@@ -70,12 +70,9 @@ public class LazyLogicalRatherThanEagerCleanUp extends AbstractCleanUpRule {
                 && (hasType(node.getRightOperand(), "boolean") || hasType(node.getRightOperand(), "java.lang.Boolean"))
                 && isPassive(node.getRightOperand())
                 && (Operator.AND.equals(node.getOperator()) || Operator.OR.equals(node.getOperator()))) {
-            final ASTBuilder b = ctx.getASTBuilder();
-            ctx.getRefactorings().replace(node,
-                    b.infixExpr(
-                            b.copy(node.getLeftOperand()),
-                            getLazyOperator(node.getOperator()),
-                            b.copy(node.getRightOperand())));
+            final ASTBuilder b= ctx.getASTBuilder();
+            ctx.getRefactorings().replace(node, b.infixExpr(b.copy(node.getLeftOperand()),
+                    getLazyOperator(node.getOperator()), b.copy(node.getRightOperand())));
             return DO_NOT_VISIT_SUBTREE;
         }
         return VISIT_SUBTREE;

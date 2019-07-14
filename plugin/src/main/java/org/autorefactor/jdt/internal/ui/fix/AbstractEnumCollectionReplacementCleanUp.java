@@ -63,9 +63,8 @@ public abstract class AbstractEnumCollectionReplacementCleanUp extends NewClassI
 
         @Override
         public boolean visit(ClassInstanceCreation node) {
-            final boolean isSubTreeToVisit =
-                    AbstractEnumCollectionReplacementCleanUp.this.maybeRefactorClassInstanceCreation(node,
-                            getClassesToUseWithImport(), getImportsToAdd());
+            final boolean isSubTreeToVisit= AbstractEnumCollectionReplacementCleanUp.this
+                    .maybeRefactorClassInstanceCreation(node, getClassesToUseWithImport(), getImportsToAdd());
 
             return isSubTreeToVisit;
         }
@@ -73,7 +72,7 @@ public abstract class AbstractEnumCollectionReplacementCleanUp extends NewClassI
 
     @Override
     public RefactoringWithObjectsClass getRefactoringClassInstance() {
-        final RefactoringWithObjectsClass refactoringWithNewClassImport = new RefactoringWithObjectsClass();
+        final RefactoringWithObjectsClass refactoringWithNewClassImport= new RefactoringWithObjectsClass();
 
         return refactoringWithNewClassImport;
     }
@@ -84,12 +83,11 @@ public abstract class AbstractEnumCollectionReplacementCleanUp extends NewClassI
     }
 
     private boolean maybeRefactorClassInstanceCreation(final ClassInstanceCreation node,
-            final Set<String> classesToUseWithImport,
-            final Set<String> importsToAdd) {
-        Type type = node.getType();
+            final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
+        Type type= node.getType();
 
         if (isEnabled() && type.isParameterizedType() && creates(node, getImplType())) {
-            ASTNode parent = getFirstAncestorOrNull(node, ReturnStatement.class, Assignment.class,
+            ASTNode parent= getFirstAncestorOrNull(node, ReturnStatement.class, Assignment.class,
                     VariableDeclarationStatement.class);
             if (parent != null) {
                 switch (parent.getNodeType()) {
@@ -121,19 +119,17 @@ public abstract class AbstractEnumCollectionReplacementCleanUp extends NewClassI
     abstract String getInterfaceType();
 
     abstract boolean maybeReplace(ClassInstanceCreation node, Set<String> classesToUseWithImport,
-            Set<String> importsToAdd,
-            Type... types);
+            Set<String> importsToAdd, Type... types);
 
     private boolean handleReturnStatement(final ClassInstanceCreation node, final ReturnStatement rs,
-            final Set<String> classesToUseWithImport,
-            final Set<String> importsToAdd) {
-        MethodDeclaration md = getAncestorOrNull(node, MethodDeclaration.class);
+            final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
+        MethodDeclaration md= getAncestorOrNull(node, MethodDeclaration.class);
 
         if (md != null) {
-            Type returnType = md.getReturnType2();
+            Type returnType= md.getReturnType2();
 
             if (isTargetType(returnType)) {
-                List<Type> typeArguments = typeArgs(returnType);
+                List<Type> typeArguments= typeArgs(returnType);
 
                 if (!typeArguments.isEmpty() && isEnum(typeArguments.get(0))) {
                     return maybeReplace(node, classesToUseWithImport, importsToAdd,
@@ -146,20 +142,19 @@ public abstract class AbstractEnumCollectionReplacementCleanUp extends NewClassI
     }
 
     private boolean handleAssignment(final ClassInstanceCreation node, final Assignment a,
-            final Set<String> classesToUseWithImport,
-            final Set<String> importsToAdd) {
-        Expression lhs = a.getLeftHandSide();
+            final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
+        Expression lhs= a.getLeftHandSide();
 
         if (isTargetType(lhs.resolveTypeBinding())) {
-            ITypeBinding[] typeArguments = lhs.resolveTypeBinding().getTypeArguments();
+            ITypeBinding[] typeArguments= lhs.resolveTypeBinding().getTypeArguments();
 
             if (typeArguments.length > 0 && typeArguments[0].isEnum()) {
-                final TypeNameDecider typeNameDecider = new TypeNameDecider(lhs);
-                ASTBuilder b = ctx.getASTBuilder();
-                Type[] types = new Type[typeArguments.length];
+                final TypeNameDecider typeNameDecider= new TypeNameDecider(lhs);
+                ASTBuilder b= ctx.getASTBuilder();
+                Type[] types= new Type[typeArguments.length];
 
-                for (int i = 0; i < types.length; i++) {
-                    types[i] = b.toType(typeArguments[i], typeNameDecider);
+                for (int i= 0; i < types.length; i++) {
+                    types[i]= b.toType(typeArguments[i], typeNameDecider);
                 }
 
                 return maybeReplace(node, classesToUseWithImport, importsToAdd, types);
@@ -170,26 +165,24 @@ public abstract class AbstractEnumCollectionReplacementCleanUp extends NewClassI
     }
 
     private boolean handleVarDeclarationStatement(final VariableDeclarationStatement node,
-            final Set<String> classesToUseWithImport,
-            final Set<String> importsToAdd) {
-        Type type = node.getType();
+            final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
+        Type type= node.getType();
 
         if (type.isParameterizedType() && isTargetType(type)) {
-            ParameterizedType ptype = (ParameterizedType) type;
-            List<Type> typeArguments = typeArguments(ptype);
+            ParameterizedType ptype= (ParameterizedType) type;
+            List<Type> typeArguments= typeArguments(ptype);
 
             if (!typeArguments.isEmpty() && typeArguments.get(0).resolveBinding().isEnum()) {
-                List<VariableDeclarationFragment> fragments = fragments(node);
+                List<VariableDeclarationFragment> fragments= fragments(node);
 
-                for (VariableDeclarationFragment vdf:fragments) {
-                    Expression initExpr = vdf.getInitializer();
+                for (VariableDeclarationFragment vdf : fragments) {
+                    Expression initExpr= vdf.getInitializer();
 
                     if (initExpr != null) {
-                        initExpr = removeParentheses(initExpr);
+                        initExpr= removeParentheses(initExpr);
 
                         if (creates(initExpr, getImplType())) {
-                            return maybeReplace((ClassInstanceCreation) initExpr,
-                                    classesToUseWithImport, importsToAdd,
+                            return maybeReplace((ClassInstanceCreation) initExpr, classesToUseWithImport, importsToAdd,
                                     typeArguments.toArray(new Type[typeArguments.size()]));
                         }
                     }

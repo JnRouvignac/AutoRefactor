@@ -73,30 +73,28 @@ public class RemoveOverridenAssignmentCleanUp extends AbstractCleanUpRule {
     @Override
     public boolean visit(final VariableDeclarationStatement node) {
         if (node.fragments() != null && node.fragments().size() == 1) {
-            final VariableDeclarationFragment fragment = (VariableDeclarationFragment) node.fragments().get(0);
+            final VariableDeclarationFragment fragment= (VariableDeclarationFragment) node.fragments().get(0);
 
-            if (fragment.getInitializer() != null
-                    && isPassive(fragment.getInitializer())) {
-                final SimpleName varName = fragment.getName();
-                final IVariableBinding variable = fragment.resolveBinding();
-                Statement stmtToInspect = getNextSibling(node);
-                boolean isOverridden = false;
-                boolean isRead = false;
+            if (fragment.getInitializer() != null && isPassive(fragment.getInitializer())) {
+                final SimpleName varName= fragment.getName();
+                final IVariableBinding variable= fragment.resolveBinding();
+                Statement stmtToInspect= getNextSibling(node);
+                boolean isOverridden= false;
+                boolean isRead= false;
 
                 while (stmtToInspect != null && !isOverridden && !isRead) {
-                    final Assignment assignment = asExpression(stmtToInspect, Assignment.class);
+                    final Assignment assignment= asExpression(stmtToInspect, Assignment.class);
                     if (assignment != null && isSameVariable(varName, assignment.getLeftHandSide())) {
                         if (hasOperator(assignment, ASSIGN)) {
-                            isOverridden = true;
+                            isOverridden= true;
                         } else {
-                            isRead = true;
+                            isRead= true;
                         }
                     }
 
-                    isRead |= !new VariableDefinitionsUsesVisitor(variable, stmtToInspect).find().getUses()
-                            .isEmpty();
+                    isRead|= !new VariableDefinitionsUsesVisitor(variable, stmtToInspect).find().getUses().isEmpty();
 
-                    stmtToInspect = getNextSibling(stmtToInspect);
+                    stmtToInspect= getNextSibling(stmtToInspect);
                 }
 
                 if (isOverridden && !isRead) {

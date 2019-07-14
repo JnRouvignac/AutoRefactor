@@ -34,7 +34,7 @@ class PackageBindingStub implements IPackageBinding {
     private String packageName;
 
     PackageBindingStub(String packageName) {
-        this.packageName = packageName;
+        this.packageName= packageName;
     }
 
     /**

@@ -79,30 +79,21 @@ public class XORRatherThanDuplicateConditionsCleanUp extends AbstractCleanUpRule
     @Override
     public boolean visit(final InfixExpression node) {
         if (hasOperator(node, CONDITIONAL_OR, OR) && !node.hasExtendedOperands()) {
-            final InfixExpression firstCondition = as(node.getLeftOperand(), InfixExpression.class);
-            final InfixExpression secondCondition = as(node.getRightOperand(), InfixExpression.class);
+            final InfixExpression firstCondition= as(node.getLeftOperand(), InfixExpression.class);
+            final InfixExpression secondCondition= as(node.getRightOperand(), InfixExpression.class);
 
-            if (firstCondition != null
-                    && !firstCondition.hasExtendedOperands()
-                    && hasOperator(firstCondition, CONDITIONAL_AND, AND)
-                    && secondCondition != null
-                    && !secondCondition.hasExtendedOperands()
-                    && hasOperator(secondCondition, CONDITIONAL_AND, AND)
-                    && isPassive(firstCondition.getLeftOperand())
-                    && isPassive(firstCondition.getRightOperand())
-                    && isPassive(secondCondition.getLeftOperand())
-                    && isPassive(secondCondition.getRightOperand())) {
-                final ASTSemanticMatcher matcher = new ASTSemanticMatcher();
+            if (firstCondition != null && !firstCondition.hasExtendedOperands()
+                    && hasOperator(firstCondition, CONDITIONAL_AND, AND) && secondCondition != null
+                    && !secondCondition.hasExtendedOperands() && hasOperator(secondCondition, CONDITIONAL_AND, AND)
+                    && isPassive(firstCondition.getLeftOperand()) && isPassive(firstCondition.getRightOperand())
+                    && isPassive(secondCondition.getLeftOperand()) && isPassive(secondCondition.getRightOperand())) {
+                final ASTSemanticMatcher matcher= new ASTSemanticMatcher();
 
-                return maybeReplaceDuplicateExpr(matcher, node,
-                        firstCondition.getLeftOperand(),
-                        secondCondition.getLeftOperand(),
-                        firstCondition.getRightOperand(),
+                return maybeReplaceDuplicateExpr(matcher, node, firstCondition.getLeftOperand(),
+                        secondCondition.getLeftOperand(), firstCondition.getRightOperand(),
                         secondCondition.getRightOperand())
-                        && maybeReplaceDuplicateExpr(matcher, node,
-                                firstCondition.getLeftOperand(),
-                                secondCondition.getRightOperand(),
-                                firstCondition.getRightOperand(),
+                        && maybeReplaceDuplicateExpr(matcher, node, firstCondition.getLeftOperand(),
+                                secondCondition.getRightOperand(), firstCondition.getRightOperand(),
                                 secondCondition.getLeftOperand());
             }
         }
@@ -115,11 +106,11 @@ public class XORRatherThanDuplicateConditionsCleanUp extends AbstractCleanUpRule
             final Expression secondOppositeExpr) {
         if (matcher.matchOpposite(firstExpr, firstOppositeExpr)
                 && matcher.matchOpposite(secondExpr, secondOppositeExpr)) {
-            final AtomicBoolean isFirstExprPositive = new AtomicBoolean();
-            final AtomicBoolean isSecondExprPositive = new AtomicBoolean();
+            final AtomicBoolean isFirstExprPositive= new AtomicBoolean();
+            final AtomicBoolean isSecondExprPositive= new AtomicBoolean();
 
-            final Expression firstBasicExpr = getBasisExpression(firstExpr, isFirstExprPositive);
-            final Expression secondBasicExpr = getBasisExpression(secondExpr, isSecondExprPositive);
+            final Expression firstBasicExpr= getBasisExpression(firstExpr, isFirstExprPositive);
+            final Expression secondBasicExpr= getBasisExpression(secondExpr, isSecondExprPositive);
 
             replaceDuplicateExpr(node, firstBasicExpr, secondBasicExpr, isFirstExprPositive, isSecondExprPositive);
             return DO_NOT_VISIT_SUBTREE;
@@ -129,14 +120,14 @@ public class XORRatherThanDuplicateConditionsCleanUp extends AbstractCleanUpRule
     }
 
     private Expression getBasisExpression(final Expression originalExpr, final AtomicBoolean isExprPositive) {
-        Expression basisExpr = null;
-        final PrefixExpression negateExpr = as(originalExpr, PrefixExpression.class);
+        Expression basisExpr= null;
+        final PrefixExpression negateExpr= as(originalExpr, PrefixExpression.class);
 
         if (hasOperator(negateExpr, NOT)) {
-            basisExpr = negateExpr.getOperand();
+            basisExpr= negateExpr.getOperand();
             isExprPositive.set(false);
         } else {
-            basisExpr = originalExpr;
+            basisExpr= originalExpr;
             isExprPositive.set(true);
         }
 
@@ -144,17 +135,14 @@ public class XORRatherThanDuplicateConditionsCleanUp extends AbstractCleanUpRule
     }
 
     private void replaceDuplicateExpr(final InfixExpression node, final Expression firstExpr,
-            final Expression secondExpr,
-            final AtomicBoolean isFirstExprPositive,
+            final Expression secondExpr, final AtomicBoolean isFirstExprPositive,
             final AtomicBoolean isSecondExprPositive) {
-        final ASTBuilder b = ctx.getASTBuilder();
+        final ASTBuilder b= ctx.getASTBuilder();
 
         if (isFirstExprPositive.get() == isSecondExprPositive.get()) {
-            ctx.getRefactorings().replace(node,
-                    b.infixExpr(b.copy(firstExpr), EQUALS, b.copy(secondExpr)));
+            ctx.getRefactorings().replace(node, b.infixExpr(b.copy(firstExpr), EQUALS, b.copy(secondExpr)));
         } else {
-            ctx.getRefactorings().replace(node,
-                    b.infixExpr(b.copy(firstExpr), XOR, b.copy(secondExpr)));
+            ctx.getRefactorings().replace(node, b.infixExpr(b.copy(firstExpr), XOR, b.copy(secondExpr)));
         }
     }
 }

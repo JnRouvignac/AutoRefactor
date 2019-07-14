@@ -59,11 +59,12 @@ import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.text.edits.TextEdit;
+
 /**
  * Eclipse job that applies the provided refactoring rules in background.
  * Several such jobs might be started and run in parallel to form a worker pool,
- * with all workers accepting work items ({@link RefactoringUnit}) from a queue provided by the partitioner
- * ({@link PrepareApplyRefactoringsJob}).
+ * with all workers accepting work items ({@link RefactoringUnit}) from a queue
+ * provided by the partitioner ({@link PrepareApplyRefactoringsJob}).
  */
 public class ApplyRefactoringsJob extends Job {
     private final Queue<RefactoringUnit> refactoringUnits;
@@ -73,18 +74,17 @@ public class ApplyRefactoringsJob extends Job {
     /**
      * Builds an instance of this class.
      *
-     * @param refactoringUnits the units to automatically refactor
+     * @param refactoringUnits        the units to automatically refactor
      * @param refactoringRulesToApply the refactorings to apply
-     * @param environment the environment
+     * @param environment             the environment
      */
-    public ApplyRefactoringsJob(Queue<RefactoringUnit> refactoringUnits,
-                                List<RefactoringRule> refactoringRulesToApply,
-                                Environment environment) {
+    public ApplyRefactoringsJob(Queue<RefactoringUnit> refactoringUnits, List<RefactoringRule> refactoringRulesToApply,
+            Environment environment) {
         super("AutoRefactor");
         setPriority(Job.LONG);
-        this.refactoringUnits = refactoringUnits;
-        this.refactoringRulesToApply = refactoringRulesToApply;
-        this.environment = environment;
+        this.refactoringUnits= refactoringUnits;
+        this.refactoringRulesToApply= refactoringRulesToApply;
+        this.environment= environment;
     }
 
     @Override
@@ -95,7 +95,7 @@ public class ApplyRefactoringsJob extends Job {
         } catch (OperationCanceledException e) {
             throw e;
         } catch (Exception e) {
-            final String msg = "Error while applying refactorings.\n\n"
+            final String msg= "Error while applying refactorings.\n\n"
                     + "Please look at the Eclipse workspace logs and "
                     + "report the stacktrace to the AutoRefactor project.\n"
                     + "Please provide sample java code that triggers the error.\n\n";
@@ -111,21 +111,21 @@ public class ApplyRefactoringsJob extends Job {
             return Status.OK_STATUS;
         }
 
-        final SubMonitor loopMonitor = SubMonitor.convert(monitor, refactoringUnits.size());
+        final SubMonitor loopMonitor= SubMonitor.convert(monitor, refactoringUnits.size());
         try {
             RefactoringUnit toRefactor;
-            while ((toRefactor = refactoringUnits.poll()) != null) {
-                final ICompilationUnit compilationUnit = toRefactor.getCompilationUnit();
-                final JavaProjectOptions options = toRefactor.getOptions();
+            while ((toRefactor= refactoringUnits.poll()) != null) {
+                final ICompilationUnit compilationUnit= toRefactor.getCompilationUnit();
+                final JavaProjectOptions options= toRefactor.getOptions();
                 try {
                     loopMonitor.subTask("Applying refactorings to " + getClassName(compilationUnit));
-                    final AggregateASTVisitor refactoring = new AggregateASTVisitor(refactoringRulesToApply);
+                    final AggregateASTVisitor refactoring= new AggregateASTVisitor(refactoringRulesToApply);
                     applyRefactoring(compilationUnit, refactoring, options, loopMonitor.newChild(1), true);
                 } catch (OperationCanceledException e) {
                     throw e;
                 } catch (Exception e) {
-                    final String msg = "Exception when applying refactorings to file \""
-                            + compilationUnit.getPath() + "\": " + e.getMessage();
+                    final String msg= "Exception when applying refactorings to file \"" + compilationUnit.getPath()
+                            + "\": " + e.getMessage();
                     throw new UnhandledException(null, msg, e);
                 }
             }
@@ -136,47 +136,48 @@ public class ApplyRefactoringsJob extends Job {
     }
 
     private String getClassName(final ICompilationUnit compilationUnit) {
-        final String elName = compilationUnit.getElementName();
-        final String simpleName = elName.substring(0, elName.lastIndexOf('.'));
+        final String elName= compilationUnit.getElementName();
+        final String simpleName= elName.substring(0, elName.lastIndexOf('.'));
         return compilationUnit.getParent().getElementName() + "." + simpleName;
     }
 
     /**
-     * Applies the refactorings provided inside the {@link AggregateASTVisitor} to the provided
-     * {@link ICompilationUnit}.
+     * Applies the refactorings provided inside the {@link AggregateASTVisitor} to
+     * the provided {@link ICompilationUnit}.
      *
-     * @param compilationUnit the compilation unit to refactor
-     * @param refactoringToApply the {@link AggregateASTVisitor} to apply to the compilation unit
-     * @param options the Java project options used to compile the project
-     * @param monitor the progress monitor of the current job
-     * @param hasToSave hasToSave
+     * @param compilationUnit    the compilation unit to refactor
+     * @param refactoringToApply the {@link AggregateASTVisitor} to apply to the
+     *                           compilation unit
+     * @param options            the Java project options used to compile the
+     *                           project
+     * @param monitor            the progress monitor of the current job
+     * @param hasToSave          hasToSave
      * @return
      * @return TextEdit
      * @throws Exception if any problem occurs
      */
     public List<TextEdit> applyRefactoring(ICompilationUnit compilationUnit, AggregateASTVisitor refactoringToApply,
             JavaProjectOptions options, SubMonitor monitor, boolean hasToSave) throws Exception {
-        final ITextFileBufferManager bufferManager = FileBuffers.getTextFileBufferManager();
-        final IPath path = compilationUnit.getPath();
-        final LocationKind locationKind = LocationKind.NORMALIZE;
-        List<TextEdit> textEdits = null;
+        final ITextFileBufferManager bufferManager= FileBuffers.getTextFileBufferManager();
+        final IPath path= compilationUnit.getPath();
+        final LocationKind locationKind= LocationKind.NORMALIZE;
+        List<TextEdit> textEdits= null;
         try {
             bufferManager.connect(path, locationKind, null);
-            final ITextFileBuffer textFileBuffer = bufferManager.getTextFileBuffer(path, locationKind);
+            final ITextFileBuffer textFileBuffer= bufferManager.getTextFileBuffer(path, locationKind);
             if (!textFileBuffer.isSynchronized()) {
                 /*
-                 * Cannot read the source when a file is not synchronized,
-                 * Let's ignore this file to avoid problems when:
-                 * - doing string manipulation with the source text
+                 * Cannot read the source when a file is not synchronized, Let's ignore this
+                 * file to avoid problems when: - doing string manipulation with the source text
                  * - applying automated refactorings to such files
                  */
-                environment.getLogger().error(
-                    "File \"" + compilationUnit.getPath() + "\" is not synchronized with the file system."
-                        + " Automated refactorings will not be applied to it.");
+                environment.getLogger()
+                        .error("File \"" + compilationUnit.getPath() + "\" is not synchronized with the file system."
+                                + " Automated refactorings will not be applied to it.");
                 return null;
             }
-            final IDocument document = textFileBuffer.getDocument();
-            textEdits = applyRefactoring(document, compilationUnit, refactoringToApply, options, monitor, hasToSave);
+            final IDocument document= textFileBuffer.getDocument();
+            textEdits= applyRefactoring(document, compilationUnit, refactoringToApply, options, monitor, hasToSave);
         } finally {
             bufferManager.disconnect(path, locationKind, null);
         }
@@ -184,41 +185,43 @@ public class ApplyRefactoringsJob extends Job {
     }
 
     /**
-     * Applies the refactorings provided inside the {@link AggregateASTVisitor} to the provided
-     * {@link ICompilationUnit}.
+     * Applies the refactorings provided inside the {@link AggregateASTVisitor} to
+     * the provided {@link ICompilationUnit}.
      *
-     * @param document the document where the compilation unit comes from
+     * @param document        the document where the compilation unit comes from
      * @param compilationUnit the compilation unit to refactor
-     * @param refactoring the {@link AggregateASTVisitor} to apply to the compilation unit
-     * @param options the Java project options used to compile the project
-     * @param monitor the progress monitor of the current job
-     * @param hasToSave hasToSave
+     * @param refactoring     the {@link AggregateASTVisitor} to apply to the
+     *                        compilation unit
+     * @param options         the Java project options used to compile the project
+     * @param monitor         the progress monitor of the current job
+     * @param hasToSave       hasToSave
      * @return TextEdit
      * @throws Exception if any problem occurs
      *
-     * @see <a
-     * href="http://help.eclipse.org/indigo/index.jsp?topic=%2Forg.eclipse.jdt.doc.isv%2Fguide%2Fjdt_api_manip.htm"
-     * >Eclipse JDT core - Manipulating Java code</a>
+     * @see <a href=
+     *      "http://help.eclipse.org/indigo/index.jsp?topic=%2Forg.eclipse.jdt.doc.isv%2Fguide%2Fjdt_api_manip.htm"
+     *      >Eclipse JDT core - Manipulating Java code</a>
      * @see <a href="
-     * http://help.eclipse.org/indigo/index.jsp?topic=/org.eclipse.platform.doc.isv/guide/workbench_cmd_menus.htm"
-     * > Eclipse Platform Plug-in Developer Guide > Plugging into the workbench
-     * > Basic workbench extension points using commands > org.eclipse.ui.menus</a>
-     * @see <a
-     * href="http://www.eclipse.org/articles/article.php?file=Article-JavaCodeManipulation_AST/index.html"
-     * >Abstract Syntax Tree > Write it down</a>
+     *      http://help.eclipse.org/indigo/index.jsp?topic=/org.eclipse.platform.doc.isv/guide/workbench_cmd_menus.htm"
+     *      > Eclipse Platform Plug-in Developer Guide > Plugging into the workbench
+     *      > Basic workbench extension points using commands >
+     *      org.eclipse.ui.menus</a>
+     * @see <a href=
+     *      "http://www.eclipse.org/articles/article.php?file=Article-JavaCodeManipulation_AST/index.html"
+     *      >Abstract Syntax Tree > Write it down</a>
      */
     public List<TextEdit> applyRefactoring(IDocument document, ICompilationUnit compilationUnit,
-            AggregateASTVisitor refactoring,
-            JavaProjectOptions options, SubMonitor monitor, boolean hasToSave) throws Exception {
+            AggregateASTVisitor refactoring, JavaProjectOptions options, SubMonitor monitor, boolean hasToSave)
+            throws Exception {
         // Creation of DOM/AST from a ICompilationUnit
-        final ASTParser parser = ASTParser.newParser(AST.JLS8);
+        final ASTParser parser= ASTParser.newParser(AST.JLS8);
 
-        final int maxIterations = 100;
-        int iterationCount = 0;
-        Set<ASTVisitor> lastLoopVisitors = Collections.emptySet();
-        int nbLoopsWithSameVisitors = 0;
+        final int maxIterations= 100;
+        int iterationCount= 0;
+        Set<ASTVisitor> lastLoopVisitors= Collections.emptySet();
+        int nbLoopsWithSameVisitors= 0;
 
-        List<TextEdit> textEdits = new ArrayList<TextEdit>();
+        List<TextEdit> textEdits= new ArrayList<TextEdit>();
 
         monitor.setWorkRemaining(maxIterations);
 
@@ -231,25 +234,23 @@ public class ApplyRefactoringsJob extends Job {
             // FIXME we should find a way to apply all the changes at
             // the AST level and refresh the bindings
             resetParser(compilationUnit, parser, options);
-            astRoot = (CompilationUnit) parser.createAST(null);
+            astRoot= (CompilationUnit) parser.createAST(null);
 
             if (iterationCount > maxIterations) {
                 // Oops! Something went wrong.
-                final String errorMsg = "An infinite loop has been detected for file "
-                        + getFileName(astRoot) + "."
+                final String errorMsg= "An infinite loop has been detected for file " + getFileName(astRoot) + "."
                         + " A possible cause is that code is being incorrectly"
-                        + " refactored one way then refactored back to what it was."
-                        + " Fix the code before pursuing."
+                        + " refactored one way then refactored back to what it was." + " Fix the code before pursuing."
                         + getPossibleCulprits(nbLoopsWithSameVisitors, lastLoopVisitors);
                 environment.getLogger().error(errorMsg, new IllegalStateException(astRoot, errorMsg));
                 break;
             }
 
-            final RefactoringContext ctx = new RefactoringContext(
-                compilationUnit, astRoot, options, monitor, environment);
+            final RefactoringContext ctx= new RefactoringContext(compilationUnit, astRoot, options, monitor,
+                    environment);
             refactoring.setRefactoringContext(ctx);
 
-            final Refactorings refactorings = refactoring.getRefactorings(astRoot);
+            final Refactorings refactorings= refactoring.getRefactorings(astRoot);
             if (!refactorings.hasRefactorings()) {
                 // No new refactorings have been applied,
                 // We are done with applying the refactorings.
@@ -262,7 +263,7 @@ public class ApplyRefactoringsJob extends Job {
             if (!hasToSave) {
                 return textEdits;
             }
-            final boolean hadUnsavedChanges = compilationUnit.hasUnsavedChanges();
+            final boolean hadUnsavedChanges= compilationUnit.hasUnsavedChanges();
             compilationUnit.getBuffer().setContents(document.get());
             // http://wiki.eclipse.org/FAQ_What_is_a_working_copy%3F
             // compilationUnit.reconcile(AST.JLS8,
@@ -276,12 +277,12 @@ public class ApplyRefactoringsJob extends Job {
             }
             iterationCount++;
 
-            final Set<ASTVisitor> thisLoopVisitors = refactoring.getVisitorsContributingRefactoring();
+            final Set<ASTVisitor> thisLoopVisitors= refactoring.getVisitorsContributingRefactoring();
             if (thisLoopVisitors.equals(lastLoopVisitors)) {
                 nbLoopsWithSameVisitors++;
             } else {
-                lastLoopVisitors = new HashSet<ASTVisitor>(thisLoopVisitors);
-                nbLoopsWithSameVisitors = 0;
+                lastLoopVisitors= new HashSet<ASTVisitor>(thisLoopVisitors);
+                nbLoopsWithSameVisitors= 0;
             }
         } while (true);
 
@@ -298,8 +299,8 @@ public class ApplyRefactoringsJob extends Job {
         if (nbLoopsWithSameVisitors < 100 || lastLoopVisitors.isEmpty()) {
             return "";
         }
-        final StringBuilder sb = new StringBuilder(" Possible culprit ASTVisitor classes are: ");
-        final Iterator<ASTVisitor> iter = lastLoopVisitors.iterator();
+        final StringBuilder sb= new StringBuilder(" Possible culprit ASTVisitor classes are: ");
+        final Iterator<ASTVisitor> iter= lastLoopVisitors.iterator();
         sb.append(iter.next().getClass().getName());
         while (iter.hasNext()) {
             sb.append(", ").append(iter.next().getClass().getName());

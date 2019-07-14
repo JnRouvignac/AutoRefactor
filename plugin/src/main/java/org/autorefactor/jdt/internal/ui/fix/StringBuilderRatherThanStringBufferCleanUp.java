@@ -72,7 +72,7 @@ public class StringBuilderRatherThanStringBufferCleanUp extends AbstractClassSub
 
     @Override
     protected String[] getExistingClassCanonicalName() {
-        return new String[] {"java.lang.StringBuffer"};
+        return new String[] { "java.lang.StringBuffer" };
     }
 
     @Override

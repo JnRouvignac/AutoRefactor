@@ -39,10 +39,10 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
     public void initializeDefaultPreferences() {
         // TODO initialize preferences from the JDT preferences like:
         // code style/cleanup/formatting
-        final IPreferenceStore store = AutoRefactorPlugin.getDefault().getPreferenceStore();
+        final IPreferenceStore store= AutoRefactorPlugin.getDefault().getPreferenceStore();
         for (PreferenceConstants preference : PreferenceConstants.values()) {
-            final String name = preference.getName();
-            final Object defaultValue = preference.getDefaultValue();
+            final String name= preference.getName();
+            final Object defaultValue= preference.getDefaultValue();
             if (defaultValue instanceof Boolean) {
                 store.setDefault(name, (Boolean) defaultValue);
             } else if (defaultValue instanceof Integer) {

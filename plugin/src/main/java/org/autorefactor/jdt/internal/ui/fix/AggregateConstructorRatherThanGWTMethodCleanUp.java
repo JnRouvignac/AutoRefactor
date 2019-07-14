@@ -48,9 +48,8 @@ public class AggregateConstructorRatherThanGWTMethodCleanUp extends NewClassImpo
 
         @Override
         public boolean visit(final MethodInvocation node) {
-            final boolean isSubTreeToVisit =
-                    AggregateConstructorRatherThanGWTMethodCleanUp.this.maybeRefactorMethodInvocation(node,
-                            getClassesToUseWithImport(), getImportsToAdd());
+            final boolean isSubTreeToVisit= AggregateConstructorRatherThanGWTMethodCleanUp.this
+                    .maybeRefactorMethodInvocation(node, getClassesToUseWithImport(), getImportsToAdd());
 
             return isSubTreeToVisit;
         }
@@ -90,14 +89,8 @@ public class AggregateConstructorRatherThanGWTMethodCleanUp extends NewClassImpo
 
     @Override
     public Set<String> getClassesToImport() {
-        return new HashSet<String>(Arrays.asList(
-                "java.util.ArrayList",
-                "java.util.LinkedList",
-                "java.util.HashMap",
-                "java.util.TreeMap",
-                "java.util.LinkedHashMap",
-                "java.util.IdentityHashMap",
-                "java.util.EnumMap"));
+        return new HashSet<String>(Arrays.asList("java.util.ArrayList", "java.util.LinkedList", "java.util.HashMap",
+                "java.util.TreeMap", "java.util.LinkedHashMap", "java.util.IdentityHashMap", "java.util.EnumMap"));
     }
 
     @Override
@@ -110,8 +103,7 @@ public class AggregateConstructorRatherThanGWTMethodCleanUp extends NewClassImpo
         return maybeRefactorMethodInvocation(node, getAlreadyImportedClasses(node), new HashSet<String>());
     }
 
-    private boolean maybeRefactorMethodInvocation(final MethodInvocation node,
-            final Set<String> classesToUseWithImport,
+    private boolean maybeRefactorMethodInvocation(final MethodInvocation node, final Set<String> classesToUseWithImport,
             final Set<String> importsToAdd) {
         if (node.arguments().isEmpty()) {
             return maybeRefactor(node, classesToUseWithImport, importsToAdd, "Lists", "ArrayList")
@@ -123,40 +115,40 @@ public class AggregateConstructorRatherThanGWTMethodCleanUp extends NewClassImpo
         }
 
         if (node.arguments().size() == 1) {
-            final Expression arg = (Expression) node.arguments().get(0);
+            final Expression arg= (Expression) node.arguments().get(0);
 
             if (!hasType(arg, "java.lang.Class")) {
                 return VISIT_SUBTREE;
             }
 
-            final ITypeBinding argType = arg.resolveTypeBinding();
-            String generic = "";
+            final ITypeBinding argType= arg.resolveTypeBinding();
+            String generic= "";
 
             if (argType != null) {
-                final ITypeBinding[] typeArgs = argType.getTypeArguments();
+                final ITypeBinding[] typeArgs= argType.getTypeArguments();
 
                 if (typeArgs != null) {
                     if (typeArgs.length != 1) {
                         return VISIT_SUBTREE;
                     }
 
-                    final ITypeBinding typeParam = typeArgs[0];
+                    final ITypeBinding typeParam= typeArgs[0];
 
                     if (!typeParam.isEnum()) {
                         return VISIT_SUBTREE;
                     }
-                    generic = "<" + typeParam.getQualifiedName() + ">";
+                    generic= "<" + typeParam.getQualifiedName() + ">";
                 }
             }
 
             if (isMethod(node, "com.google.common.collect.Maps", "newEnumMap", "java.lang.Class" + generic)
                     || isMethod(node, "com.google.gwt.thirdparty.guava.common.collect.Maps", "newEnumMap",
                             "java.lang.Class" + generic)) {
-                final ASTBuilder b = this.ctx.getASTBuilder();
-                final Refactorings r = this.ctx.getRefactorings();
+                final ASTBuilder b= this.ctx.getASTBuilder();
+                final Refactorings r= this.ctx.getRefactorings();
 
-                final Type type = b.getAST().newParameterizedType(b.type(classesToUseWithImport
-                        .contains("java.util.EnumMap") ? "EnumMap" : "java.util.EnumMap"));
+                final Type type= b.getAST().newParameterizedType(
+                        b.type(classesToUseWithImport.contains("java.util.EnumMap") ? "EnumMap" : "java.util.EnumMap"));
                 r.replace(node, b.new0(type, b.copy(arg)));
                 importsToAdd.add("java.util.EnumMap");
                 return DO_NOT_VISIT_SUBTREE;
@@ -167,16 +159,14 @@ public class AggregateConstructorRatherThanGWTMethodCleanUp extends NewClassImpo
     }
 
     private boolean maybeRefactor(final MethodInvocation node, final Set<String> classesToUseWithImport,
-            final Set<String> importsToAdd, final String aggregateInterface,
-            final String implClass) {
-        if (isMethod(node, "com.google.common.collect." + aggregateInterface, "new" + implClass)
-                || isMethod(node, "com.google.gwt.thirdparty.guava.common.collect." + aggregateInterface,
-                        "new" + implClass)) {
-            final ASTBuilder b = this.ctx.getASTBuilder();
-            final Refactorings r = this.ctx.getRefactorings();
+            final Set<String> importsToAdd, final String aggregateInterface, final String implClass) {
+        if (isMethod(node, "com.google.common.collect." + aggregateInterface, "new" + implClass) || isMethod(node,
+                "com.google.gwt.thirdparty.guava.common.collect." + aggregateInterface, "new" + implClass)) {
+            final ASTBuilder b= this.ctx.getASTBuilder();
+            final Refactorings r= this.ctx.getRefactorings();
 
-            Type type = b.getAST().newParameterizedType(b.type(classesToUseWithImport
-                    .contains("java.util." + implClass) ? implClass : "java.util." + implClass));
+            Type type= b.getAST().newParameterizedType(b.type(
+                    classesToUseWithImport.contains("java.util." + implClass) ? implClass : "java.util." + implClass));
             r.replace(node, b.new0(type));
             importsToAdd.add("java.util." + implClass);
             return DO_NOT_VISIT_SUBTREE;

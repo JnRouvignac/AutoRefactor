@@ -40,32 +40,29 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
 @SuppressWarnings("javadoc")
-@RunWith(value = Parameterized.class)
+@RunWith(value= Parameterized.class)
 public class TypeNameDeciderTest {
     private String qualifiedName;
     private TreeSet<String> imports;
     private String expectedResult;
 
-    public TypeNameDeciderTest(
-            String qualifiedName, TreeSet<String> imports, String expectedResult) {
-        this.qualifiedName = qualifiedName;
-        this.imports = imports;
-        this.expectedResult = expectedResult;
+    public TypeNameDeciderTest(String qualifiedName, TreeSet<String> imports, String expectedResult) {
+        this.qualifiedName= qualifiedName;
+        this.imports= imports;
+        this.expectedResult= expectedResult;
     }
 
-    @Parameters// (name = "{0} + imports{1} => {2}")
+    @Parameters // (name = "{0} + imports{1} => {2}")
     public static Collection<Object[]> data() {
-        return Arrays.asList(new Object[][] {
-            { "java.util.Map", imports(), "java.util.Map" },
-            { "java.util.Map", imports("java.util.Map"), "Map" },
-            { "java.util.Map", imports("java.util.*"), "Map" },
-            { "java.util.Map.Entry", imports(), "java.util.Map.Entry" },
-            { "java.util.Map.Entry", imports("java.util.Map"), "Map.Entry" },
-            { "java.util.Map.Entry", imports("java.util.*"), "Map.Entry" },
-            { "java.util.Map.Entry", imports("java.util.Map.Entry"), "Entry" },
-            { "java.util.Map.Entry", imports("java.util.Map.*"), "Entry" },
-            { "java.util.concurrent.Callable", imports("java.util.*"), "java.util.concurrent.Callable" },
-        });
+        return Arrays.asList(new Object[][] { { "java.util.Map", imports(), "java.util.Map" },
+                { "java.util.Map", imports("java.util.Map"), "Map" },
+                { "java.util.Map", imports("java.util.*"), "Map" },
+                { "java.util.Map.Entry", imports(), "java.util.Map.Entry" },
+                { "java.util.Map.Entry", imports("java.util.Map"), "Map.Entry" },
+                { "java.util.Map.Entry", imports("java.util.*"), "Map.Entry" },
+                { "java.util.Map.Entry", imports("java.util.Map.Entry"), "Entry" },
+                { "java.util.Map.Entry", imports("java.util.Map.*"), "Entry" },
+                { "java.util.concurrent.Callable", imports("java.util.*"), "java.util.concurrent.Callable" }, });
     }
 
     @Test
@@ -80,7 +77,7 @@ public class TypeNameDeciderTest {
              *
              * @param fullyQualifiedName fullyQualifiedName.
              *
-             * @return  the type binding.
+             * @return the type binding.
              */
             public ITypeBinding resolveTypeBinding(String fullyQualifiedName) {
                 return new TypeBindingStub(fullyQualifiedName);
@@ -89,7 +86,7 @@ public class TypeNameDeciderTest {
     }
 
     private static TreeSet<String> imports(String... imports) {
-        final TreeSet<String> results = new TreeSet<String>();
+        final TreeSet<String> results= new TreeSet<String>();
         Collections.addAll(results, imports);
         return results;
     }

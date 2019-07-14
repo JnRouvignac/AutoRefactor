@@ -82,17 +82,14 @@ public class AndroidWakeLockCleanUp extends AbstractCleanUpRule {
     public boolean visit(MethodInvocation node) {
         if (isMethod(node, "android.os.PowerManager.WakeLock", "release")) {
             // check whether it is being called in onDestroy()
-            MethodDeclaration enclosingMethod = getAncestor(node, MethodDeclaration.class);
+            MethodDeclaration enclosingMethod= getAncestor(node, MethodDeclaration.class);
             if (isMethod(enclosingMethod, "android.app.Activity", "onDestroy")) {
-                final Refactorings r = ctx.getRefactorings();
-                TypeDeclaration typeDeclaration = getAncestor(enclosingMethod, TypeDeclaration.class);
-                MethodDeclaration onPauseMethod = findMethod(typeDeclaration, "onPause");
+                final Refactorings r= ctx.getRefactorings();
+                TypeDeclaration typeDeclaration= getAncestor(enclosingMethod, TypeDeclaration.class);
+                MethodDeclaration onPauseMethod= findMethod(typeDeclaration, "onPause");
                 if (onPauseMethod != null && node.getParent().getNodeType() == ASTNode.EXPRESSION_STATEMENT) {
                     r.remove(node.getParent());
-                    r.insertLast(
-                            onPauseMethod.getBody(),
-                            Block.STATEMENTS_PROPERTY,
-                            createWakelockReleaseStmt(node));
+                    r.insertLast(onPauseMethod.getBody(), Block.STATEMENTS_PROPERTY, createWakelockReleaseStmt(node));
                 } else {
                     // Add the missing onPause() method to the class.
                     r.insertAfter(createOnPauseMethodDeclaration(), enclosingMethod);
@@ -100,20 +97,15 @@ public class AndroidWakeLockCleanUp extends AbstractCleanUpRule {
                 return DO_NOT_VISIT_SUBTREE;
             }
         } else if (isMethod(node, "android.os.PowerManager.WakeLock", "acquire")) {
-            final Refactorings r = ctx.getRefactorings();
-            TypeDeclaration typeDeclaration = getAncestor(node, TypeDeclaration.class);
-            ReleasePresenceChecker releasePresenceChecker = new ReleasePresenceChecker();
+            final Refactorings r= ctx.getRefactorings();
+            TypeDeclaration typeDeclaration= getAncestor(node, TypeDeclaration.class);
+            ReleasePresenceChecker releasePresenceChecker= new ReleasePresenceChecker();
             if (!releasePresenceChecker.findOrDefault(typeDeclaration, false)) {
-                MethodDeclaration onPauseMethod = findMethod(typeDeclaration, "onPause");
+                MethodDeclaration onPauseMethod= findMethod(typeDeclaration, "onPause");
                 if (onPauseMethod != null && node.getParent().getNodeType() == ASTNode.EXPRESSION_STATEMENT) {
-                    r.insertLast(
-                            onPauseMethod.getBody(),
-                            Block.STATEMENTS_PROPERTY,
-                            createWakelockReleaseStmt(node));
+                    r.insertLast(onPauseMethod.getBody(), Block.STATEMENTS_PROPERTY, createWakelockReleaseStmt(node));
                 } else {
-                    r.insertLast(
-                            typeDeclaration,
-                            typeDeclaration.getBodyDeclarationsProperty(),
+                    r.insertLast(typeDeclaration, typeDeclaration.getBodyDeclarationsProperty(),
                             createOnPauseMethodDeclaration());
                 }
                 return DO_NOT_VISIT_SUBTREE;
@@ -123,28 +115,22 @@ public class AndroidWakeLockCleanUp extends AbstractCleanUpRule {
     }
 
     private Statement createWakelockReleaseStmt(MethodInvocation methodInvocation) {
-        final ASTBuilder b = ctx.getASTBuilder();
-        return  b.if0(
-                b.not(b.invoke(b.copyExpression(methodInvocation), "isHeld")),
+        final ASTBuilder b= ctx.getASTBuilder();
+        return b.if0(b.not(b.invoke(b.copyExpression(methodInvocation), "isHeld")),
                 b.block(b.toStmt(b.invoke(b.copyExpression(methodInvocation), "release"))));
     }
 
     private MethodDeclaration createOnPauseMethodDeclaration() {
-        final ASTBuilder b = ctx.getASTBuilder();
-        return b.method(
-                b.extendedModifiers(b.annotation("Override"), b.protected0()),
-                "onPause",
-                b.parameters(),
-                b.block(
-                   b.toStmt(b.superInvoke("onPause"))));
+        final ASTBuilder b= ctx.getASTBuilder();
+        return b.method(b.extendedModifiers(b.annotation("Override"), b.protected0()), "onPause", b.parameters(),
+                b.block(b.toStmt(b.superInvoke("onPause"))));
     }
 
     private MethodDeclaration findMethod(TypeDeclaration typeDeclaration, String methodToFind) {
         if (typeDeclaration != null) {
             for (MethodDeclaration method : typeDeclaration.getMethods()) {
-                IMethodBinding methodBinding = method.resolveBinding();
-                if (methodBinding != null
-                        && methodToFind.equals(methodBinding.getName())
+                IMethodBinding methodBinding= method.resolveBinding();
+                if (methodBinding != null && methodToFind.equals(methodBinding.getName())
                         && method.parameters().isEmpty()) {
                     return method;
                 }

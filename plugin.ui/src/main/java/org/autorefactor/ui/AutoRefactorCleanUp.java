@@ -42,7 +42,7 @@ import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 
 /** AutoRefactorCleanUp. */
 public class AutoRefactorCleanUp implements ICleanUp {
-    private static final String KEY = "org.autorefactor.ui.autorefactor_clean_up";
+    private static final String KEY= "org.autorefactor.ui.autorefactor_clean_up";
 
     private CleanUpOptions fOptions;
 
@@ -56,7 +56,7 @@ public class AutoRefactorCleanUp implements ICleanUp {
      * @throws CoreException CoreException
      */
     public ICleanUpFix createFix(CleanUpContext context) throws CoreException {
-        CompilationUnit compilationUnit = context.getAST();
+        CompilationUnit compilationUnit= context.getAST();
         if (compilationUnit != null && fOptions.isEnabled(KEY)) {
             return AutoRefactorFix.createCleanUp(compilationUnit, fOptions.isEnabled(KEY), fOptions);
         }
@@ -80,7 +80,7 @@ public class AutoRefactorCleanUp implements ICleanUp {
      */
     public String[] getStepDescriptions() {
         if (fOptions.isEnabled(KEY)) {
-            return new String[] {"AutoRefactor (only 1 pass)"};
+            return new String[] { "AutoRefactor (only 1 pass)" };
         } else {
             return new String[0];
         }
@@ -94,22 +94,22 @@ public class AutoRefactorCleanUp implements ICleanUp {
     public void setOptions(CleanUpOptions options) {
         Assert.isLegal(options != null);
         Assert.isTrue(fOptions == null);
-        fOptions = options;
+        fOptions= options;
     }
 
     /**
      * Check the pre-conditions.
      *
-     * @param project project
+     * @param project          project
      * @param compilationUnits compilation units
-     * @param monitor monitor
+     * @param monitor          monitor
      * @return Refactoring status
      * @throws CoreException CoreException
      */
     public RefactoringStatus checkPreConditions(IJavaProject project, ICompilationUnit[] compilationUnits,
             IProgressMonitor monitor) throws CoreException {
         if (fOptions.isEnabled(KEY)) {
-            fStatus = new RefactoringStatus();
+            fStatus= new RefactoringStatus();
         }
         return new RefactoringStatus();
     }
@@ -129,7 +129,7 @@ public class AutoRefactorCleanUp implements ICleanUp {
                 return fStatus;
             }
         } finally {
-            fStatus = null;
+            fStatus= null;
         }
     }
 }

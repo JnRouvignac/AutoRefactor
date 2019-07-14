@@ -73,101 +73,93 @@ import org.eclipse.jdt.core.dom.WhileStatement;
 
 /** Matches two pieces of code on semantic (not on syntax). */
 public class ASTSemanticMatcher extends ASTMatcher {
-    private static final Map<PrefixExpression.Operator, Operator> PREFIX_TO_INFIX_OPERATOR =
-            new HashMap<PrefixExpression.Operator, Operator>() {
-            private static final long serialVersionUID = -8949107654517355855L;
+    private static final Map<PrefixExpression.Operator, Operator> PREFIX_TO_INFIX_OPERATOR= new HashMap<PrefixExpression.Operator, Operator>() {
+        private static final long serialVersionUID= -8949107654517355855L;
 
-            {
-                put(PrefixExpression.Operator.INCREMENT, Operator.PLUS);
-                put(PrefixExpression.Operator.DECREMENT, Operator.MINUS);
-            }
-        };
+        {
+            put(PrefixExpression.Operator.INCREMENT, Operator.PLUS);
+            put(PrefixExpression.Operator.DECREMENT, Operator.MINUS);
+        }
+    };
 
-    private static final Map<PrefixExpression.Operator, Assignment.Operator> PREFIX_TO_ASSIGN_OPERATOR =
-            new HashMap<PrefixExpression.Operator, Assignment.Operator>() {
-            private static final long serialVersionUID = -8949107654517355856L;
+    private static final Map<PrefixExpression.Operator, Assignment.Operator> PREFIX_TO_ASSIGN_OPERATOR= new HashMap<PrefixExpression.Operator, Assignment.Operator>() {
+        private static final long serialVersionUID= -8949107654517355856L;
 
-            {
-                put(PrefixExpression.Operator.INCREMENT, Assignment.Operator.PLUS_ASSIGN);
-                put(PrefixExpression.Operator.DECREMENT, Assignment.Operator.MINUS_ASSIGN);
-            }
-        };
+        {
+            put(PrefixExpression.Operator.INCREMENT, Assignment.Operator.PLUS_ASSIGN);
+            put(PrefixExpression.Operator.DECREMENT, Assignment.Operator.MINUS_ASSIGN);
+        }
+    };
 
-    private static final Map<PostfixExpression.Operator, Operator> POSTFIX_TO_INFIX_OPERATOR =
-            new HashMap<PostfixExpression.Operator, Operator>() {
-            private static final long serialVersionUID = -8949107654517355857L;
+    private static final Map<PostfixExpression.Operator, Operator> POSTFIX_TO_INFIX_OPERATOR= new HashMap<PostfixExpression.Operator, Operator>() {
+        private static final long serialVersionUID= -8949107654517355857L;
 
-            {
-                put(PostfixExpression.Operator.INCREMENT, Operator.PLUS);
-                put(PostfixExpression.Operator.DECREMENT, Operator.MINUS);
-            }
-        };
+        {
+            put(PostfixExpression.Operator.INCREMENT, Operator.PLUS);
+            put(PostfixExpression.Operator.DECREMENT, Operator.MINUS);
+        }
+    };
 
-    private static final Map<PostfixExpression.Operator, Assignment.Operator> POSTFIX_TO_ASSIGN_OPERATOR =
-            new HashMap<PostfixExpression.Operator, Assignment.Operator>() {
-            private static final long serialVersionUID = -8949107654517355858L;
+    private static final Map<PostfixExpression.Operator, Assignment.Operator> POSTFIX_TO_ASSIGN_OPERATOR= new HashMap<PostfixExpression.Operator, Assignment.Operator>() {
+        private static final long serialVersionUID= -8949107654517355858L;
 
-            {
-                put(PostfixExpression.Operator.INCREMENT, Assignment.Operator.PLUS_ASSIGN);
-                put(PostfixExpression.Operator.DECREMENT, Assignment.Operator.MINUS_ASSIGN);
-            }
-        };
+        {
+            put(PostfixExpression.Operator.INCREMENT, Assignment.Operator.PLUS_ASSIGN);
+            put(PostfixExpression.Operator.DECREMENT, Assignment.Operator.MINUS_ASSIGN);
+        }
+    };
 
-    private static final Map<PrefixExpression.Operator, PostfixExpression.Operator> PREFIX_TO_POSTFIX_OPERATOR =
-            new HashMap<PrefixExpression.Operator, PostfixExpression.Operator>() {
-            private static final long serialVersionUID = -8949107654517355859L;
+    private static final Map<PrefixExpression.Operator, PostfixExpression.Operator> PREFIX_TO_POSTFIX_OPERATOR= new HashMap<PrefixExpression.Operator, PostfixExpression.Operator>() {
+        private static final long serialVersionUID= -8949107654517355859L;
 
-            {
-                put(PrefixExpression.Operator.INCREMENT, PostfixExpression.Operator.INCREMENT);
-                put(PrefixExpression.Operator.DECREMENT, PostfixExpression.Operator.DECREMENT);
-            }
-        };
+        {
+            put(PrefixExpression.Operator.INCREMENT, PostfixExpression.Operator.INCREMENT);
+            put(PrefixExpression.Operator.DECREMENT, PostfixExpression.Operator.DECREMENT);
+        }
+    };
 
-    private static final Map<Assignment.Operator, Operator> ASSIGN_TO_INFIX_OPERATOR =
-            new HashMap<Assignment.Operator, Operator>() {
-            private static final long serialVersionUID = -8949107654517355859L;
+    private static final Map<Assignment.Operator, Operator> ASSIGN_TO_INFIX_OPERATOR= new HashMap<Assignment.Operator, Operator>() {
+        private static final long serialVersionUID= -8949107654517355859L;
 
-            {
-                put(Assignment.Operator.PLUS_ASSIGN, Operator.PLUS);
-                put(Assignment.Operator.MINUS_ASSIGN, Operator.MINUS);
-                put(Assignment.Operator.TIMES_ASSIGN, Operator.TIMES);
-                put(Assignment.Operator.DIVIDE_ASSIGN, Operator.DIVIDE);
-                put(Assignment.Operator.BIT_AND_ASSIGN, Operator.AND);
-                put(Assignment.Operator.BIT_OR_ASSIGN, Operator.OR);
-                put(Assignment.Operator.BIT_XOR_ASSIGN, Operator.XOR);
-                put(Assignment.Operator.REMAINDER_ASSIGN, Operator.REMAINDER);
-                put(Assignment.Operator.LEFT_SHIFT_ASSIGN, Operator.LEFT_SHIFT);
-                put(Assignment.Operator.RIGHT_SHIFT_SIGNED_ASSIGN, Operator.RIGHT_SHIFT_SIGNED);
-                put(Assignment.Operator.RIGHT_SHIFT_UNSIGNED_ASSIGN,
-                        Operator.RIGHT_SHIFT_UNSIGNED);
-            }
-        };
+        {
+            put(Assignment.Operator.PLUS_ASSIGN, Operator.PLUS);
+            put(Assignment.Operator.MINUS_ASSIGN, Operator.MINUS);
+            put(Assignment.Operator.TIMES_ASSIGN, Operator.TIMES);
+            put(Assignment.Operator.DIVIDE_ASSIGN, Operator.DIVIDE);
+            put(Assignment.Operator.BIT_AND_ASSIGN, Operator.AND);
+            put(Assignment.Operator.BIT_OR_ASSIGN, Operator.OR);
+            put(Assignment.Operator.BIT_XOR_ASSIGN, Operator.XOR);
+            put(Assignment.Operator.REMAINDER_ASSIGN, Operator.REMAINDER);
+            put(Assignment.Operator.LEFT_SHIFT_ASSIGN, Operator.LEFT_SHIFT);
+            put(Assignment.Operator.RIGHT_SHIFT_SIGNED_ASSIGN, Operator.RIGHT_SHIFT_SIGNED);
+            put(Assignment.Operator.RIGHT_SHIFT_UNSIGNED_ASSIGN, Operator.RIGHT_SHIFT_UNSIGNED);
+        }
+    };
 
-    private static final Map<Operator, Operator> INFIX_TO_MIRROR_OPERATOR =
-            new HashMap<Operator, Operator>() {
-            private static final long serialVersionUID = -8949107654517355857L;
+    private static final Map<Operator, Operator> INFIX_TO_MIRROR_OPERATOR= new HashMap<Operator, Operator>() {
+        private static final long serialVersionUID= -8949107654517355857L;
 
-            {
-                put(Operator.EQUALS, Operator.EQUALS);
-                put(Operator.NOT_EQUALS, Operator.NOT_EQUALS);
-                put(Operator.CONDITIONAL_AND, Operator.CONDITIONAL_AND);
-                put(Operator.CONDITIONAL_OR, Operator.CONDITIONAL_OR);
-                put(Operator.AND, Operator.AND);
-                put(Operator.OR, Operator.OR);
-                put(Operator.XOR, Operator.XOR);
-                put(Operator.GREATER, Operator.LESS);
-                put(Operator.LESS, Operator.GREATER);
-                put(Operator.LESS_EQUALS, Operator.GREATER_EQUALS);
-                put(Operator.GREATER_EQUALS, Operator.LESS_EQUALS);
-            }
-        };
+        {
+            put(Operator.EQUALS, Operator.EQUALS);
+            put(Operator.NOT_EQUALS, Operator.NOT_EQUALS);
+            put(Operator.CONDITIONAL_AND, Operator.CONDITIONAL_AND);
+            put(Operator.CONDITIONAL_OR, Operator.CONDITIONAL_OR);
+            put(Operator.AND, Operator.AND);
+            put(Operator.OR, Operator.OR);
+            put(Operator.XOR, Operator.XOR);
+            put(Operator.GREATER, Operator.LESS);
+            put(Operator.LESS, Operator.GREATER);
+            put(Operator.LESS_EQUALS, Operator.GREATER_EQUALS);
+            put(Operator.GREATER_EQUALS, Operator.LESS_EQUALS);
+        }
+    };
 
     @Override
     public boolean match(final InfixExpression node, final Object otherObject) {
-        final Object other = unbracket(otherObject);
+        final Object other= unbracket(otherObject);
 
         if (other instanceof PrefixExpression) {
-            PrefixExpression pe = (PrefixExpression) other;
+            PrefixExpression pe= (PrefixExpression) other;
 
             if (PrefixExpression.Operator.NOT.equals(pe.getOperator())) {
                 return matchOpposite(node, pe.getOperand());
@@ -175,36 +167,29 @@ public class ASTSemanticMatcher extends ASTMatcher {
         }
 
         if (other instanceof InfixExpression) {
-            InfixExpression ie = (InfixExpression) other;
+            InfixExpression ie= (InfixExpression) other;
 
-            if (!node.hasExtendedOperands()
-                    && !ie.hasExtendedOperands()
-                    && isPassive(node.getLeftOperand())
+            if (!node.hasExtendedOperands() && !ie.hasExtendedOperands() && isPassive(node.getLeftOperand())
                     && isPassive(node.getRightOperand())
                     && safeSubtreeMatch(node.getLeftOperand(), ie.getRightOperand())
                     && safeSubtreeMatch(node.getRightOperand(), ie.getLeftOperand())) {
                 if (node.getOperator().equals(INFIX_TO_MIRROR_OPERATOR.get(ie.getOperator()))) {
                     return true;
-                } else if (Arrays.asList(InfixExpression.Operator.PLUS,
-                        InfixExpression.Operator.TIMES).contains(ie.getOperator())
+                } else if (Arrays.asList(InfixExpression.Operator.PLUS, InfixExpression.Operator.TIMES)
+                        .contains(ie.getOperator())
                         && node.getOperator().equals(ie.getOperator())
-                        && hasType(node.getLeftOperand(), "short", "int", "long", "float", "double",
-                                "java.lang.Short", "java.lang.Integer", "java.lang.Long", "java.lang.Float",
-                                "java.lang.Double")
+                        && hasType(node.getLeftOperand(), "short", "int", "long", "float", "double", "java.lang.Short",
+                                "java.lang.Integer", "java.lang.Long", "java.lang.Float", "java.lang.Double")
                         && haveSameType(node.getLeftOperand(), node.getRightOperand())) {
                     return true;
                 }
             }
 
-            if (node.getOperator().equals(ie.getOperator())
-                    && Arrays.asList(
-                            InfixExpression.Operator.PLUS,
-                            InfixExpression.Operator.TIMES,
-                            InfixExpression.Operator.AND,
-                            InfixExpression.Operator.CONDITIONAL_AND,
-                            InfixExpression.Operator.OR,
-                            InfixExpression.Operator.CONDITIONAL_OR,
-                            InfixExpression.Operator.XOR).contains(ie.getOperator())) {
+            if (node.getOperator().equals(ie.getOperator()) && Arrays
+                    .asList(InfixExpression.Operator.PLUS, InfixExpression.Operator.TIMES, InfixExpression.Operator.AND,
+                            InfixExpression.Operator.CONDITIONAL_AND, InfixExpression.Operator.OR,
+                            InfixExpression.Operator.CONDITIONAL_OR, InfixExpression.Operator.XOR)
+                    .contains(ie.getOperator())) {
                 return isOperandsMatching(node, ie, true);
             }
         }
@@ -214,7 +199,7 @@ public class ASTSemanticMatcher extends ASTMatcher {
 
     @Override
     public boolean match(final ParenthesizedExpression node, final Object otherObject) {
-        final Object other = unbracket(otherObject);
+        final Object other= unbracket(otherObject);
 
         return safeSubtreeMatch(node.getExpression(), other);
     }
@@ -229,7 +214,7 @@ public class ASTSemanticMatcher extends ASTMatcher {
 
     @Override
     public boolean match(final PrefixExpression node, final Object otherObject) {
-        final Object other = unbracket(otherObject);
+        final Object other= unbracket(otherObject);
 
         if (!(other instanceof PrefixExpression) && PrefixExpression.Operator.NOT.equals(node.getOperator())) {
             return matchOpposite(node.getOperand(), other);
@@ -248,7 +233,7 @@ public class ASTSemanticMatcher extends ASTMatcher {
 
     @Override
     public boolean match(final PostfixExpression node, final Object otherObject) {
-        final Object other = unbracket(otherObject);
+        final Object other= unbracket(otherObject);
 
         if (node.getParent() instanceof Statement) {
             if (other instanceof Assignment) {
@@ -263,17 +248,15 @@ public class ASTSemanticMatcher extends ASTMatcher {
 
     @Override
     public boolean match(final Assignment node, final Object otherObject) {
-        final Object other = unbracket(otherObject);
+        final Object other= unbracket(otherObject);
 
         if (other instanceof PrefixExpression && ((PrefixExpression) other).getParent() instanceof Statement) {
             return match0((PrefixExpression) other, node);
-        } else if (other instanceof PostfixExpression
-                && ((PostfixExpression) other).getParent() instanceof Statement) {
+        } else if (other instanceof PostfixExpression && ((PostfixExpression) other).getParent() instanceof Statement) {
             return match0((PostfixExpression) other, node);
         } else if (other instanceof Assignment) {
             return matchAssignmentWithAndWithoutEqual(node, (Assignment) other)
-                    || matchAssignmentWithAndWithoutEqual((Assignment) other, node)
-                    || super.match(node, other);
+                    || matchAssignmentWithAndWithoutEqual((Assignment) other, node) || super.match(node, other);
         }
 
         return super.match(node, other);
@@ -282,19 +265,14 @@ public class ASTSemanticMatcher extends ASTMatcher {
     private boolean matchAssignmentWithAndWithoutEqual(final Assignment node, final Assignment assignment) {
         if (Assignment.Operator.ASSIGN.equals(node.getOperator())
                 && node.getRightHandSide() instanceof InfixExpression) {
-            InfixExpression infixExpr = (InfixExpression) node.getRightHandSide();
+            InfixExpression infixExpr= (InfixExpression) node.getRightHandSide();
 
             if (!infixExpr.hasExtendedOperands()
-                    && Arrays.asList(Assignment.Operator.PLUS_ASSIGN,
-                            Assignment.Operator.MINUS_ASSIGN,
-                            Assignment.Operator.TIMES_ASSIGN,
-                            Assignment.Operator.DIVIDE_ASSIGN,
-                            Assignment.Operator.BIT_AND_ASSIGN,
-                            Assignment.Operator.BIT_OR_ASSIGN,
-                            Assignment.Operator.BIT_XOR_ASSIGN,
-                            Assignment.Operator.REMAINDER_ASSIGN,
-                            Assignment.Operator.LEFT_SHIFT_ASSIGN,
-                            Assignment.Operator.RIGHT_SHIFT_SIGNED_ASSIGN,
+                    && Arrays.asList(Assignment.Operator.PLUS_ASSIGN, Assignment.Operator.MINUS_ASSIGN,
+                            Assignment.Operator.TIMES_ASSIGN, Assignment.Operator.DIVIDE_ASSIGN,
+                            Assignment.Operator.BIT_AND_ASSIGN, Assignment.Operator.BIT_OR_ASSIGN,
+                            Assignment.Operator.BIT_XOR_ASSIGN, Assignment.Operator.REMAINDER_ASSIGN,
+                            Assignment.Operator.LEFT_SHIFT_ASSIGN, Assignment.Operator.RIGHT_SHIFT_SIGNED_ASSIGN,
                             Assignment.Operator.RIGHT_SHIFT_UNSIGNED_ASSIGN).contains(assignment.getOperator())
                     && ASSIGN_TO_INFIX_OPERATOR.get(assignment.getOperator()).equals(infixExpr.getOperator())) {
                 return safeSubtreeMatch(node.getLeftHandSide(), assignment.getLeftHandSide())
@@ -322,29 +300,24 @@ public class ASTSemanticMatcher extends ASTMatcher {
     }
 
     private boolean match0(final Assignment assignment, final Expression prefixOrPostfixOperand,
-            final Operator infixAssociatedOperator,
-            final Assignment.Operator assignmentAssociatedOperator) {
+            final Operator infixAssociatedOperator, final Assignment.Operator assignmentAssociatedOperator) {
         if (Assignment.Operator.ASSIGN.equals(assignment.getOperator())
                 && assignment.getRightHandSide() instanceof InfixExpression) {
-            InfixExpression infixExpr = (InfixExpression) assignment.getRightHandSide();
-            if (!infixExpr.hasExtendedOperands()
-                    && infixAssociatedOperator.equals(infixExpr.getOperator())) {
+            InfixExpression infixExpr= (InfixExpression) assignment.getRightHandSide();
+            if (!infixExpr.hasExtendedOperands() && infixAssociatedOperator.equals(infixExpr.getOperator())) {
                 if (isOneLiteral(infixExpr.getRightOperand())) {
                     return safeSubtreeMatch(prefixOrPostfixOperand, assignment.getLeftHandSide())
                             && safeSubtreeMatch(prefixOrPostfixOperand, infixExpr.getLeftOperand());
-                } else if (Operator.PLUS.equals(infixExpr.getOperator())
-                        && isOneLiteral(infixExpr.getLeftOperand())) {
+                } else if (Operator.PLUS.equals(infixExpr.getOperator()) && isOneLiteral(infixExpr.getLeftOperand())) {
                     return safeSubtreeMatch(prefixOrPostfixOperand, assignment.getLeftHandSide())
                             && safeSubtreeMatch(prefixOrPostfixOperand, infixExpr.getRightOperand());
                 }
             }
-        } else if (Arrays.asList(Assignment.Operator.PLUS_ASSIGN,
-                Assignment.Operator.MINUS_ASSIGN).contains(assignment.getOperator())
-                && assignmentAssociatedOperator.equals(assignment.getOperator())) {
-            Object assignmentExpr = assignment.resolveConstantExpressionValue();
+        } else if (Arrays.asList(Assignment.Operator.PLUS_ASSIGN, Assignment.Operator.MINUS_ASSIGN)
+                .contains(assignment.getOperator()) && assignmentAssociatedOperator.equals(assignment.getOperator())) {
+            Object assignmentExpr= assignment.resolveConstantExpressionValue();
 
-            if (assignmentExpr instanceof Number
-                    && ((Number) assignmentExpr).longValue() == 1) {
+            if (assignmentExpr instanceof Number && ((Number) assignmentExpr).longValue() == 1) {
                 return safeSubtreeMatch(prefixOrPostfixOperand, assignment.getLeftHandSide());
             }
         }
@@ -353,36 +326,25 @@ public class ASTSemanticMatcher extends ASTMatcher {
     }
 
     private boolean isOneLiteral(Expression operand) {
-        Object rightExpr = operand.resolveConstantExpressionValue();
+        Object rightExpr= operand.resolveConstantExpressionValue();
 
-        return rightExpr instanceof Number
-                && ((Number) rightExpr).longValue() == 1;
+        return rightExpr instanceof Number && ((Number) rightExpr).longValue() == 1;
     }
 
     @Override
     public boolean match(final Block node, final Object otherObject) {
-        final Object other = unbracket(otherObject);
+        final Object other= unbracket(otherObject);
 
-        if (other instanceof AssertStatement
-            || other instanceof BreakStatement
-            || other instanceof ConstructorInvocation
-            || other instanceof ContinueStatement
-            || other instanceof DoStatement
-            || other instanceof EmptyStatement
-            || other instanceof EnhancedForStatement
-            || other instanceof ExpressionStatement
-            || other instanceof ForStatement
-            || other instanceof IfStatement
-            || other instanceof LabeledStatement
-            || other instanceof ReturnStatement
-            || other instanceof SuperConstructorInvocation
-            || other instanceof SwitchStatement
-            || other instanceof SynchronizedStatement
-            || other instanceof ThrowStatement
-            || other instanceof TryStatement
-            || other instanceof TypeDeclarationStatement
-            || other instanceof VariableDeclarationStatement
-            || other instanceof WhileStatement) {
+        if (other instanceof AssertStatement || other instanceof BreakStatement
+                || other instanceof ConstructorInvocation || other instanceof ContinueStatement
+                || other instanceof DoStatement || other instanceof EmptyStatement
+                || other instanceof EnhancedForStatement || other instanceof ExpressionStatement
+                || other instanceof ForStatement || other instanceof IfStatement || other instanceof LabeledStatement
+                || other instanceof ReturnStatement || other instanceof SuperConstructorInvocation
+                || other instanceof SwitchStatement || other instanceof SynchronizedStatement
+                || other instanceof ThrowStatement || other instanceof TryStatement
+                || other instanceof TypeDeclarationStatement || other instanceof VariableDeclarationStatement
+                || other instanceof WhileStatement) {
             return match0(node, (Statement) other);
         }
 
@@ -391,7 +353,7 @@ public class ASTSemanticMatcher extends ASTMatcher {
 
     @Override
     public boolean match(final AssertStatement node, final Object otherObject) {
-        final Object other = unbracket(otherObject);
+        final Object other= unbracket(otherObject);
 
         if (other instanceof Block) {
             return match0((Block) other, (Statement) node);
@@ -402,7 +364,7 @@ public class ASTSemanticMatcher extends ASTMatcher {
 
     @Override
     public boolean match(final BreakStatement node, final Object otherObject) {
-        final Object other = unbracket(otherObject);
+        final Object other= unbracket(otherObject);
 
         if (other instanceof Block) {
             return match0((Block) other, (Statement) node);
@@ -413,7 +375,7 @@ public class ASTSemanticMatcher extends ASTMatcher {
 
     @Override
     public boolean match(final ConstructorInvocation node, final Object otherObject) {
-        final Object other = unbracket(otherObject);
+        final Object other= unbracket(otherObject);
 
         if (other instanceof Block) {
             return match0((Block) other, (Statement) node);
@@ -424,7 +386,7 @@ public class ASTSemanticMatcher extends ASTMatcher {
 
     @Override
     public boolean match(final ContinueStatement node, final Object otherObject) {
-        final Object other = unbracket(otherObject);
+        final Object other= unbracket(otherObject);
 
         if (other instanceof Block) {
             return match0((Block) other, (Statement) node);
@@ -435,7 +397,7 @@ public class ASTSemanticMatcher extends ASTMatcher {
 
     @Override
     public boolean match(final DoStatement node, final Object otherObject) {
-        final Object other = unbracket(otherObject);
+        final Object other= unbracket(otherObject);
 
         if (other instanceof Block) {
             return match0((Block) other, (Statement) node);
@@ -446,7 +408,7 @@ public class ASTSemanticMatcher extends ASTMatcher {
 
     @Override
     public boolean match(final EmptyStatement node, final Object otherObject) {
-        final Object other = unbracket(otherObject);
+        final Object other= unbracket(otherObject);
 
         if (other instanceof Block) {
             return match0((Block) other, (Statement) node);
@@ -457,7 +419,7 @@ public class ASTSemanticMatcher extends ASTMatcher {
 
     @Override
     public boolean match(final EnhancedForStatement node, final Object otherObject) {
-        final Object other = unbracket(otherObject);
+        final Object other= unbracket(otherObject);
 
         if (other instanceof Block) {
             return match0((Block) other, (Statement) node);
@@ -468,7 +430,7 @@ public class ASTSemanticMatcher extends ASTMatcher {
 
     @Override
     public boolean match(final ExpressionStatement node, final Object otherObject) {
-        final Object other = unbracket(otherObject);
+        final Object other= unbracket(otherObject);
 
         if (other instanceof Block) {
             return match0((Block) other, (Statement) node);
@@ -479,17 +441,16 @@ public class ASTSemanticMatcher extends ASTMatcher {
 
     @Override
     public boolean match(final ConditionalExpression node, final Object otherObject) {
-        final Object other = unbracket(otherObject);
+        final Object other= unbracket(otherObject);
 
         if (super.match(node, other)) {
             return true;
         }
 
         if (other instanceof ConditionalExpression) {
-            ConditionalExpression ce = (ConditionalExpression) other;
+            ConditionalExpression ce= (ConditionalExpression) other;
 
-            if (node.getElseExpression() != null
-                    && ce.getElseExpression() != null) {
+            if (node.getElseExpression() != null && ce.getElseExpression() != null) {
                 return matchOpposite(node.getExpression(), ce.getExpression())
                         && safeSubtreeMatch(node.getThenExpression(), ce.getElseExpression())
                         && safeSubtreeMatch(node.getElseExpression(), ce.getThenExpression());
@@ -501,7 +462,7 @@ public class ASTSemanticMatcher extends ASTMatcher {
 
     @Override
     public boolean match(final ForStatement node, final Object otherObject) {
-        final Object other = unbracket(otherObject);
+        final Object other= unbracket(otherObject);
 
         if (other instanceof Block) {
             return match0((Block) other, (Statement) node);
@@ -512,7 +473,7 @@ public class ASTSemanticMatcher extends ASTMatcher {
 
     @Override
     public boolean match(final IfStatement node, final Object otherObject) {
-        final Object other = unbracket(otherObject);
+        final Object other= unbracket(otherObject);
 
         if (other instanceof Block) {
             return match0((Block) other, (Statement) node);
@@ -523,10 +484,9 @@ public class ASTSemanticMatcher extends ASTMatcher {
         }
 
         if (other instanceof IfStatement) {
-            IfStatement is = (IfStatement) other;
+            IfStatement is= (IfStatement) other;
 
-            if (node.getElseStatement() != null
-                    && is.getElseStatement() != null) {
+            if (node.getElseStatement() != null && is.getElseStatement() != null) {
                 return matchOpposite(node.getExpression(), is.getExpression())
                         && safeSubtreeMatch(node.getThenStatement(), is.getElseStatement())
                         && safeSubtreeMatch(node.getElseStatement(), is.getThenStatement());
@@ -538,7 +498,7 @@ public class ASTSemanticMatcher extends ASTMatcher {
 
     @Override
     public boolean match(final LabeledStatement node, final Object otherObject) {
-        final Object other = unbracket(otherObject);
+        final Object other= unbracket(otherObject);
 
         if (other instanceof Block) {
             return match0((Block) other, (Statement) node);
@@ -549,7 +509,7 @@ public class ASTSemanticMatcher extends ASTMatcher {
 
     @Override
     public boolean match(final ReturnStatement node, final Object otherObject) {
-        final Object other = unbracket(otherObject);
+        final Object other= unbracket(otherObject);
 
         if (other instanceof Block) {
             return match0((Block) other, (Statement) node);
@@ -560,7 +520,7 @@ public class ASTSemanticMatcher extends ASTMatcher {
 
     @Override
     public boolean match(final SuperConstructorInvocation node, final Object otherObject) {
-        final Object other = unbracket(otherObject);
+        final Object other= unbracket(otherObject);
 
         if (other instanceof Block) {
             return match0((Block) other, (Statement) node);
@@ -571,7 +531,7 @@ public class ASTSemanticMatcher extends ASTMatcher {
 
     @Override
     public boolean match(final SwitchStatement node, final Object otherObject) {
-        final Object other = unbracket(otherObject);
+        final Object other= unbracket(otherObject);
 
         if (other instanceof Block) {
             return match0((Block) other, (Statement) node);
@@ -582,7 +542,7 @@ public class ASTSemanticMatcher extends ASTMatcher {
 
     @Override
     public boolean match(final SynchronizedStatement node, final Object otherObject) {
-        final Object other = unbracket(otherObject);
+        final Object other= unbracket(otherObject);
 
         if (other instanceof Block) {
             return match0((Block) other, (Statement) node);
@@ -593,7 +553,7 @@ public class ASTSemanticMatcher extends ASTMatcher {
 
     @Override
     public boolean match(final ThrowStatement node, final Object otherObject) {
-        final Object other = unbracket(otherObject);
+        final Object other= unbracket(otherObject);
 
         if (other instanceof Block) {
             return match0((Block) other, (Statement) node);
@@ -604,7 +564,7 @@ public class ASTSemanticMatcher extends ASTMatcher {
 
     @Override
     public boolean match(final TryStatement node, final Object otherObject) {
-        final Object other = unbracket(otherObject);
+        final Object other= unbracket(otherObject);
 
         if (other instanceof Block) {
             return match0((Block) other, (Statement) node);
@@ -615,7 +575,7 @@ public class ASTSemanticMatcher extends ASTMatcher {
 
     @Override
     public boolean match(final TypeDeclarationStatement node, final Object otherObject) {
-        final Object other = unbracket(otherObject);
+        final Object other= unbracket(otherObject);
 
         if (other instanceof Block) {
             return match0((Block) other, (Statement) node);
@@ -626,7 +586,7 @@ public class ASTSemanticMatcher extends ASTMatcher {
 
     @Override
     public boolean match(final VariableDeclarationStatement node, final Object otherObject) {
-        final Object other = unbracket(otherObject);
+        final Object other= unbracket(otherObject);
 
         if (other instanceof Block) {
             return match0((Block) other, (Statement) node);
@@ -637,7 +597,7 @@ public class ASTSemanticMatcher extends ASTMatcher {
 
     @Override
     public boolean match(final WhileStatement node, final Object otherObject) {
-        final Object other = unbracket(otherObject);
+        final Object other= unbracket(otherObject);
 
         if (other instanceof Block) {
             return match0((Block) other, (Statement) node);
@@ -647,14 +607,10 @@ public class ASTSemanticMatcher extends ASTMatcher {
     }
 
     private boolean match0(final Block node, final Statement other) {
-        if ((node.getParent() instanceof IfStatement
-                || node.getParent() instanceof ForStatement
-                || node.getParent() instanceof EnhancedForStatement
-                || node.getParent() instanceof WhileStatement
-                || node.getParent() instanceof DoStatement)
-                && node.statements().size() == 1) {
-            return safeSubtreeMatch(node.statements().get(0), other)
-                    || super.match(node, other);
+        if ((node.getParent() instanceof IfStatement || node.getParent() instanceof ForStatement
+                || node.getParent() instanceof EnhancedForStatement || node.getParent() instanceof WhileStatement
+                || node.getParent() instanceof DoStatement) && node.statements().size() == 1) {
+            return safeSubtreeMatch(node.statements().get(0), other) || super.match(node, other);
         }
 
         return super.match(node, other);
@@ -663,33 +619,30 @@ public class ASTSemanticMatcher extends ASTMatcher {
     /**
      * Match the boolean opposite.
      *
-     * @param node Node to check
+     * @param node        Node to check
      * @param otherObject Node to compare
      * @return True if it is the boolean opposite.
      */
     public boolean matchOpposite(final ASTNode node, final Object otherObject) {
-        final Object other = unbracket(otherObject);
+        final Object other= unbracket(otherObject);
 
         if (node instanceof ParenthesizedExpression) {
-            return matchOpposite(((ParenthesizedExpression) node).getExpression(),
-                    other);
+            return matchOpposite(((ParenthesizedExpression) node).getExpression(), other);
         }
 
         if (node instanceof PrefixExpression) {
-            final PrefixExpression pe = (PrefixExpression) node;
+            final PrefixExpression pe= (PrefixExpression) node;
 
             if (PrefixExpression.Operator.NOT.equals(pe.getOperator())) {
                 if (other instanceof PrefixExpression
-                        && PrefixExpression.Operator.NOT.equals(
-                                ((PrefixExpression) other).getOperator())) {
+                        && PrefixExpression.Operator.NOT.equals(((PrefixExpression) other).getOperator())) {
                     return matchOpposite(pe.getOperand(), ((PrefixExpression) other).getOperand());
                 } else {
                     return safeSubtreeMatch(pe.getOperand(), other);
                 }
             }
         } else if (other instanceof PrefixExpression
-                && PrefixExpression.Operator.NOT.equals(
-                        ((PrefixExpression) other).getOperator())) {
+                && PrefixExpression.Operator.NOT.equals(((PrefixExpression) other).getOperator())) {
             return safeSubtreeMatch(node, ((PrefixExpression) other).getOperand());
         }
 
@@ -701,49 +654,41 @@ public class ASTSemanticMatcher extends ASTMatcher {
             return false;
         }
 
-        final InfixExpression ie1 = (InfixExpression) node;
-        final InfixExpression ie2 = (InfixExpression) other;
+        final InfixExpression ie1= (InfixExpression) node;
+        final InfixExpression ie2= (InfixExpression) other;
 
         if ((ie1.hasExtendedOperands() ^ ie2.hasExtendedOperands())
                 || (ie1.hasExtendedOperands() && ie1.extendedOperands().size() != ie2.extendedOperands().size())) {
             return false;
         }
 
-        final Expression leftOperand1 = ie1.getLeftOperand();
-        final Expression rightOperand1 = ie1.getRightOperand();
-        final Expression leftOperand2 = ie2.getLeftOperand();
-        final Expression rightOperand2 = ie2.getRightOperand();
+        final Expression leftOperand1= ie1.getLeftOperand();
+        final Expression rightOperand1= ie1.getRightOperand();
+        final Expression leftOperand2= ie2.getLeftOperand();
+        final Expression rightOperand2= ie2.getRightOperand();
 
         if (ie1.getOperator().equals(ie2.getOperator())) {
-            if (!ie1.hasExtendedOperands()
-                    && !ie2.hasExtendedOperands()) {
-                if (Arrays.asList(
-                        InfixExpression.Operator.EQUALS,
-                        InfixExpression.Operator.NOT_EQUALS,
+            if (!ie1.hasExtendedOperands() && !ie2.hasExtendedOperands()) {
+                if (Arrays.asList(InfixExpression.Operator.EQUALS, InfixExpression.Operator.NOT_EQUALS,
                         InfixExpression.Operator.XOR).contains(ie1.getOperator())) {
                     if (matchOneOppositeOther(leftOperand1, leftOperand2, rightOperand2, rightOperand1)
                             || matchOneOppositeOther(rightOperand2, rightOperand1, leftOperand1, leftOperand2)) {
                         return true;
                     }
 
-                    if (isPassive(leftOperand1)
-                            && isPassive(rightOperand1)
-                            && isPassive(leftOperand2)
+                    if (isPassive(leftOperand1) && isPassive(rightOperand1) && isPassive(leftOperand2)
                             && isPassive(rightOperand2)
                             && (matchOneOppositeOther(leftOperand1, leftOperand2, rightOperand2, rightOperand1)
                                     || matchOneOppositeOther(rightOperand2, rightOperand1, leftOperand1,
                                             leftOperand2))) {
                         return true;
                     }
-                } else if (isPassive(leftOperand1)
-                        && isPassive(rightOperand1)
-                        && isPassive(leftOperand2)
+                } else if (isPassive(leftOperand1) && isPassive(rightOperand1) && isPassive(leftOperand2)
                         && isPassive(rightOperand2)
-                        && Arrays.asList(
-                                InfixExpression.Operator.GREATER,
-                                InfixExpression.Operator.GREATER_EQUALS,
-                                InfixExpression.Operator.LESS,
-                                InfixExpression.Operator.LESS_EQUALS).contains(ie1.getOperator())) {
+                        && Arrays
+                                .asList(InfixExpression.Operator.GREATER, InfixExpression.Operator.GREATER_EQUALS,
+                                        InfixExpression.Operator.LESS, InfixExpression.Operator.LESS_EQUALS)
+                                .contains(ie1.getOperator())) {
                     return safeSubtreeMatch(ie1.getLeftOperand(), ie2.getRightOperand())
                             && safeSubtreeMatch(ie1.getRightOperand(), ie2.getLeftOperand());
                 }
@@ -752,41 +697,31 @@ public class ASTSemanticMatcher extends ASTMatcher {
             return false;
         }
 
-        final Operator reverseOp = (Operator) OperatorEnum.getOperator(ie1).getReverseBooleanOperator();
+        final Operator reverseOp= (Operator) OperatorEnum.getOperator(ie1).getReverseBooleanOperator();
 
         if (ie2.getOperator().equals(reverseOp)) {
-            if (Arrays.asList(
-                    InfixExpression.Operator.AND,
-                    InfixExpression.Operator.CONDITIONAL_AND,
-                    InfixExpression.Operator.OR,
-                    InfixExpression.Operator.CONDITIONAL_OR).contains(ie1.getOperator())) {
+            if (Arrays
+                    .asList(InfixExpression.Operator.AND, InfixExpression.Operator.CONDITIONAL_AND,
+                            InfixExpression.Operator.OR, InfixExpression.Operator.CONDITIONAL_OR)
+                    .contains(ie1.getOperator())) {
                 return isOperandsMatching(ie1, ie2, false);
-            } else if (Arrays.asList(
-                    InfixExpression.Operator.EQUALS,
-                    InfixExpression.Operator.NOT_EQUALS).contains(ie1.getOperator())) {
+            } else if (Arrays.asList(InfixExpression.Operator.EQUALS, InfixExpression.Operator.NOT_EQUALS)
+                    .contains(ie1.getOperator())) {
                 return isOperandsMatching(ie1, ie2, true);
-            } else if (isPassive(leftOperand1)
-                    && isPassive(rightOperand1)
-                    && isPassive(leftOperand2)
+            } else if (isPassive(leftOperand1) && isPassive(rightOperand1) && isPassive(leftOperand2)
                     && isPassive(rightOperand2)
-                    && Arrays.asList(
-                            InfixExpression.Operator.GREATER,
-                            InfixExpression.Operator.GREATER_EQUALS,
-                            InfixExpression.Operator.LESS,
-                            InfixExpression.Operator.LESS_EQUALS).contains(ie1.getOperator())) {
-                return safeSubtreeMatch(leftOperand1, leftOperand2)
-                        && safeSubtreeMatch(rightOperand1, rightOperand2);
+                    && Arrays
+                            .asList(InfixExpression.Operator.GREATER, InfixExpression.Operator.GREATER_EQUALS,
+                                    InfixExpression.Operator.LESS, InfixExpression.Operator.LESS_EQUALS)
+                            .contains(ie1.getOperator())) {
+                return safeSubtreeMatch(leftOperand1, leftOperand2) && safeSubtreeMatch(rightOperand1, rightOperand2);
             }
 
             return false;
         }
 
-        if (isPassive(leftOperand1)
-                && isPassive(rightOperand1)
-                && isPassive(leftOperand2)
-                && isPassive(rightOperand2)
-                && !ie1.hasExtendedOperands()
-                && !ie2.hasExtendedOperands()) {
+        if (isPassive(leftOperand1) && isPassive(rightOperand1) && isPassive(leftOperand2) && isPassive(rightOperand2)
+                && !ie1.hasExtendedOperands() && !ie2.hasExtendedOperands()) {
             if ((InfixExpression.Operator.GREATER.equals(ie1.getOperator())
                     && InfixExpression.Operator.GREATER_EQUALS.equals(ie2.getOperator()))
                     || (InfixExpression.Operator.GREATER_EQUALS.equals(ie1.getOperator())
@@ -795,8 +730,7 @@ public class ASTSemanticMatcher extends ASTMatcher {
                             && InfixExpression.Operator.LESS_EQUALS.equals(ie2.getOperator()))
                     || (InfixExpression.Operator.LESS_EQUALS.equals(ie1.getOperator())
                             && InfixExpression.Operator.LESS.equals(ie2.getOperator()))) {
-                return safeSubtreeMatch(leftOperand1, rightOperand2)
-                        && safeSubtreeMatch(rightOperand1, leftOperand2);
+                return safeSubtreeMatch(leftOperand1, rightOperand2) && safeSubtreeMatch(rightOperand1, leftOperand2);
             }
         }
 
@@ -804,19 +738,17 @@ public class ASTSemanticMatcher extends ASTMatcher {
     }
 
     private boolean matchOneOppositeOther(final Expression equalOperand1, final Expression equalOperand2,
-            final Expression oppositeOperand1,
-            final Expression oppositeOperand2) {
-        return safeSubtreeMatch(equalOperand1, equalOperand2)
-                && matchOpposite(oppositeOperand1, oppositeOperand2);
+            final Expression oppositeOperand1, final Expression oppositeOperand2) {
+        return safeSubtreeMatch(equalOperand1, equalOperand2) && matchOpposite(oppositeOperand1, oppositeOperand2);
     }
 
     private boolean isOperandsMatching(final InfixExpression ie1, final InfixExpression ie2, final boolean equal) {
-        final List<Expression> operands1 = new ArrayList<Expression>();
+        final List<Expression> operands1= new ArrayList<Expression>();
         operands1.add(ie1.getLeftOperand());
         operands1.add(ie1.getRightOperand());
         operands1.addAll(ie1.extendedOperands());
 
-        final List<Expression> operands2 = new ArrayList<Expression>();
+        final List<Expression> operands2= new ArrayList<Expression>();
         operands2.add(ie2.getLeftOperand());
         operands2.add(ie2.getRightOperand());
         operands2.addAll(ie2.extendedOperands());
@@ -825,16 +757,16 @@ public class ASTSemanticMatcher extends ASTMatcher {
             return false;
         }
 
-        boolean isMatching = true;
-        final Iterator<Expression> iterator = operands1.iterator();
-        final Iterator<Expression> iterator2 = operands2.iterator();
+        boolean isMatching= true;
+        final Iterator<Expression> iterator= operands1.iterator();
+        final Iterator<Expression> iterator2= operands2.iterator();
 
         while (iterator.hasNext() && iterator2.hasNext()) {
-            final Expression expr = iterator.next();
-            final Expression otherExpr = iterator2.next();
+            final Expression expr= iterator.next();
+            final Expression otherExpr= iterator2.next();
 
             if (equal ? !safeSubtreeMatch(expr, otherExpr) : !matchOpposite(expr, otherExpr)) {
-                isMatching = false;
+                isMatching= false;
                 break;
             }
         }
@@ -855,11 +787,11 @@ public class ASTSemanticMatcher extends ASTMatcher {
             }
         }
 
-        for (Iterator<Expression> iterator3 = operands1.iterator(); iterator3.hasNext();) {
-            final Expression expr = iterator3.next();
+        for (Iterator<Expression> iterator3= operands1.iterator(); iterator3.hasNext();) {
+            final Expression expr= iterator3.next();
 
-            for (Iterator<Expression> iterator4 = operands2.iterator(); iterator4.hasNext();) {
-                final Expression otherExpr = iterator4.next();
+            for (Iterator<Expression> iterator4= operands2.iterator(); iterator4.hasNext();) {
+                final Expression otherExpr= iterator4.next();
 
                 if (equal ? safeSubtreeMatch(expr, otherExpr) : matchOpposite(expr, otherExpr)) {
                     iterator3.remove();

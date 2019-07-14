@@ -74,20 +74,19 @@ public class RemoveFieldsDefaultValuesCleanUp extends AbstractCleanUpRule {
         if (!canRemoveFieldDefaultValue(node)) {
             return VISIT_SUBTREE;
         }
-        final ITypeBinding fieldType = node.getType().resolveBinding();
+        final ITypeBinding fieldType= node.getType().resolveBinding();
         if (fieldType == null || isFinal(node.getModifiers())) {
             return VISIT_SUBTREE;
         }
 
-        boolean visitSubtree = VISIT_SUBTREE;
+        boolean visitSubtree= VISIT_SUBTREE;
         for (VariableDeclarationFragment vdf : fragments(node)) {
-            final Expression initializer = vdf.getInitializer();
-            if (initializer != null && ((!fieldType.isPrimitive()
-                    && isNullLiteral(initializer)) || (fieldType.isPrimitive()
-                            && isPrimitiveLiteral(initializer)
+            final Expression initializer= vdf.getInitializer();
+            if (initializer != null && ((!fieldType.isPrimitive() && isNullLiteral(initializer))
+                    || (fieldType.isPrimitive() && isPrimitiveLiteral(initializer)
                             && isPrimitiveDefaultValue(initializer.resolveConstantExpressionValue())))) {
                 this.ctx.getRefactorings().remove(initializer);
-                visitSubtree = DO_NOT_VISIT_SUBTREE;
+                visitSubtree= DO_NOT_VISIT_SUBTREE;
             }
         }
         return visitSubtree;
@@ -96,21 +95,17 @@ public class RemoveFieldsDefaultValuesCleanUp extends AbstractCleanUpRule {
     private boolean canRemoveFieldDefaultValue(final FieldDeclaration node) {
         // Do not remove default values from interface/annotation fields
         // because they are final by default
-        final ASTNode parent = node.getParent();
+        final ASTNode parent= node.getParent();
         if (parent instanceof TypeDeclaration) {
             return !((TypeDeclaration) parent).isInterface();
         }
-        return parent instanceof AnonymousClassDeclaration
-                || parent instanceof EnumDeclaration;
+        return parent instanceof AnonymousClassDeclaration || parent instanceof EnumDeclaration;
     }
 
     private boolean isPrimitiveDefaultValue(Object val) {
-        if (val instanceof Short
-                || val instanceof Integer
-                || val instanceof Long) {
+        if (val instanceof Short || val instanceof Integer || val instanceof Long) {
             return ((Number) val).longValue() == 0;
-        } else if (val instanceof Double
-                || val instanceof Float) {
+        } else if (val instanceof Double || val instanceof Float) {
             return ((Number) val).doubleValue() == 0;
         } else if (val instanceof Boolean) {
             return Boolean.FALSE.equals(val);

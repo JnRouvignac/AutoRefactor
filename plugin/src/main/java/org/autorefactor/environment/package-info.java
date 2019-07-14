@@ -23,5 +23,8 @@
  * which accompanies this distribution under LICENSE-ECLIPSE, and is
  * available at http://www.eclipse.org/legal/epl-v10.html
  */
-/** Provides classes and interfaces providing the environment to execute refactorings. */
+/**
+ * Provides classes and interfaces providing the environment to execute
+ * refactorings.
+ */
 package org.autorefactor.environment;

@@ -34,8 +34,8 @@ import org.autorefactor.util.IllegalStateException;
 
 /** Collects code paths into the CFG. */
 public class CodePathCollector {
-    private final List<List<CFGBasicBlock>> results = new ArrayList<List<CFGBasicBlock>>();
-    private final LinkedList<CFGBasicBlock> stack = new LinkedList<CFGBasicBlock>();
+    private final List<List<CFGBasicBlock>> results= new ArrayList<List<CFGBasicBlock>>();
+    private final LinkedList<CFGBasicBlock> stack= new LinkedList<CFGBasicBlock>();
 
     /**
      * Returns the collected code paths.
@@ -62,17 +62,16 @@ public class CodePathCollector {
 
         stack.addFirst(block);
         try {
-            boolean foundAtLeastOneEdge = false;
+            boolean foundAtLeastOneEdge= false;
             for (Object obj : block.getOutgoingEdgesAndVariableAccesses()) {
                 if (obj instanceof CFGEdge) {
-                    final CFGEdge edge = (CFGEdge) obj;
+                    final CFGEdge edge= (CFGEdge) obj;
                     collectPathes(edge.getTargetBlock());
-                    foundAtLeastOneEdge = true;
+                    foundAtLeastOneEdge= true;
                 }
             }
             if (!foundAtLeastOneEdge) {
-                throw new IllegalStateException(block.getNode(),
-                        "Path should have ended with an exit block: " + stack);
+                throw new IllegalStateException(block.getNode(), "Path should have ended with an exit block: " + stack);
             }
         } finally {
             stack.removeLast();

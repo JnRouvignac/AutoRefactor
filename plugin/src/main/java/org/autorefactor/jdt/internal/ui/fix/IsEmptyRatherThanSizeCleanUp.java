@@ -79,63 +79,53 @@ public class IsEmptyRatherThanSizeCleanUp extends AbstractCleanUpRule {
 
     @Override
     public boolean visit(InfixExpression node) {
-        final MethodInvocation leftMi = as(node.getLeftOperand(), MethodInvocation.class);
-        final Long rightLiteral = asNumber(node.getRightOperand());
+        final MethodInvocation leftMi= as(node.getLeftOperand(), MethodInvocation.class);
+        final Long rightLiteral= asNumber(node.getRightOperand());
 
-        final MethodInvocation rightMi = as(node.getRightOperand(), MethodInvocation.class);
-        final Long leftLiteral = asNumber(node.getLeftOperand());
+        final MethodInvocation rightMi= as(node.getRightOperand(), MethodInvocation.class);
+        final Long leftLiteral= asNumber(node.getLeftOperand());
 
         if (maybeReplaceCollectionSize(node, leftMi, sign(node.getOperator(), true),
                 rightLiteral) == DO_NOT_VISIT_SUBTREE) {
             return DO_NOT_VISIT_SUBTREE;
         }
 
-        return maybeReplaceCollectionSize(node, rightMi, sign(node.getOperator(), false),
-                leftLiteral);
+        return maybeReplaceCollectionSize(node, rightMi, sign(node.getOperator(), false), leftLiteral);
     }
 
     private boolean maybeReplaceCollectionSize(final InfixExpression node, final MethodInvocation miToReplace,
             final Operator operator, final Long literalSize) {
-        if ((isMethod(miToReplace, "java.util.Collection", "size")
-                || isMethod(miToReplace, "java.util.Map", "size")
+        if ((isMethod(miToReplace, "java.util.Collection", "size") || isMethod(miToReplace, "java.util.Map", "size")
                 || (isMethod(miToReplace, "java.lang.String", "length") && getJavaMinorVersion() >= 6))
                 && literalSize != null) {
-            final Refactorings r = this.ctx.getRefactorings();
-            final ASTBuilder b = this.ctx.getASTBuilder();
+            final Refactorings r= this.ctx.getRefactorings();
+            final ASTBuilder b= this.ctx.getASTBuilder();
 
             if (literalSize == 0) {
                 if (GREATER_EQUALS.equals(operator)) {
-                    r.replace(node,
-                            b.boolean0(true));
+                    r.replace(node, b.boolean0(true));
                     return DO_NOT_VISIT_SUBTREE;
                 } else if (LESS.equals(operator)) {
-                    r.replace(node,
-                            b.boolean0(false));
+                    r.replace(node, b.boolean0(false));
                 } else if (GREATER.equals(operator)) {
-                    r.replace(node,
-                            b.not(b.invoke(b.copyExpression(miToReplace), "isEmpty")));
+                    r.replace(node, b.not(b.invoke(b.copyExpression(miToReplace), "isEmpty")));
                     return DO_NOT_VISIT_SUBTREE;
                 } else if (EQUALS.equals(operator)) {
-                    r.replace(node,
-                            b.invoke(b.copyExpression(miToReplace), "isEmpty"));
+                    r.replace(node, b.invoke(b.copyExpression(miToReplace), "isEmpty"));
                     return DO_NOT_VISIT_SUBTREE;
                 } else if (NOT_EQUALS.equals(operator)) {
-                    r.replace(node,
-                            b.not(b.invoke(b.copyExpression(miToReplace), "isEmpty")));
+                    r.replace(node, b.not(b.invoke(b.copyExpression(miToReplace), "isEmpty")));
                     return DO_NOT_VISIT_SUBTREE;
                 } else if (LESS_EQUALS.equals(operator)) {
-                    r.replace(node,
-                            b.invoke(b.copyExpression(miToReplace), "isEmpty"));
+                    r.replace(node, b.invoke(b.copyExpression(miToReplace), "isEmpty"));
                     return DO_NOT_VISIT_SUBTREE;
                 }
             } else if (literalSize == 1) {
                 if (GREATER_EQUALS.equals(operator)) {
-                    r.replace(node,
-                            b.not(b.invoke(b.copyExpression(miToReplace), "isEmpty")));
+                    r.replace(node, b.not(b.invoke(b.copyExpression(miToReplace), "isEmpty")));
                     return DO_NOT_VISIT_SUBTREE;
                 } else if (LESS.equals(operator)) {
-                    r.replace(node,
-                            b.invoke(b.copyExpression(miToReplace), "isEmpty"));
+                    r.replace(node, b.invoke(b.copyExpression(miToReplace), "isEmpty"));
                     return DO_NOT_VISIT_SUBTREE;
                 }
             }
@@ -145,13 +135,13 @@ public class IsEmptyRatherThanSizeCleanUp extends AbstractCleanUpRule {
     }
 
     private Long asNumber(final Expression expr) {
-        Long longValue = null;
+        Long longValue= null;
         if (expr != null) {
-            final Object val = expr.resolveConstantExpressionValue();
+            final Object val= expr.resolveConstantExpressionValue();
             if (val instanceof Integer) {
-                longValue = (long) ((Integer) val).intValue();
+                longValue= (long) ((Integer) val).intValue();
             } else if (val instanceof Long) {
-                longValue = (Long) val;
+                longValue= (Long) val;
             }
         }
         return longValue;

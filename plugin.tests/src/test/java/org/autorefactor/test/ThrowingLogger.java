@@ -42,7 +42,7 @@ class ThrowingLogger implements Logger {
      * Log a error message with exception.
      *
      * @param message the message
-     * @param e the exception
+     * @param e       the exception
      */
     public void error(String message, Exception e) {
         if (e instanceof RuntimeException) {

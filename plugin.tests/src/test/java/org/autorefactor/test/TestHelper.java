@@ -59,10 +59,8 @@ import org.eclipse.text.edits.TextEdit;
 
 public final class TestHelper {
     /** Environment for unit tests. */
-    public static final Environment TEST_ENVIRONMENT = new Environment(new CurrentThreadEvenLoop(),
-                                                                       null,
-                                                                       new ThrowingLogger(),
-                                                                       null);
+    public static final Environment TEST_ENVIRONMENT= new Environment(new CurrentThreadEvenLoop(), null,
+            new ThrowingLogger(), null);
 
     private TestHelper() {
     }
@@ -80,14 +78,14 @@ public final class TestHelper {
     }
 
     public static String readAll(File file) throws IOException {
-        final StringBuilder sb = new StringBuilder();
-        FileInputStream input = null;
-        Reader reader = null;
+        final StringBuilder sb= new StringBuilder();
+        FileInputStream input= null;
+        Reader reader= null;
         try {
-            input = new FileInputStream(file);
-            reader = new InputStreamReader(input, "UTF-8");
-            int c = 0;
-            while ((c = reader.read()) != -1) {
+            input= new FileInputStream(file);
+            reader= new InputStreamReader(input, "UTF-8");
+            int c= 0;
+            while ((c= reader.read()) != -1) {
                 sb.append((char) c);
             }
         } finally {
@@ -102,22 +100,21 @@ public final class TestHelper {
     }
 
     public static JavaProjectOptions newJavaProjectOptions(Release javaSE, int tabSize) {
-        final JavaProjectOptionsImpl options = new JavaProjectOptionsImpl();
+        final JavaProjectOptionsImpl options= new JavaProjectOptionsImpl();
         options.setTabSize(tabSize);
         options.setJavaSERelease(javaSE);
         return options;
     }
 
     public static String normalizeJavaSourceCode(String source) {
-        final CodeFormatter codeFormatter = createCodeFormatter(getJava7Options());
+        final CodeFormatter codeFormatter= createCodeFormatter(getJava7Options());
 
-        final TextEdit edit = codeFormatter.format(K_COMPILATION_UNIT,
-            source, 0, source.length(), // source to format
-            0, System.getProperty("line.separator") // initial indentation and line separator
+        final TextEdit edit= codeFormatter.format(K_COMPILATION_UNIT, source, 0, source.length(), // source to format
+                0, System.getProperty("line.separator") // initial indentation and line separator
         );
 
         try {
-            final IDocument document = new Document(source);
+            final IDocument document= new Document(source);
             edit.apply(document);
             return document.get();
         } catch (MalformedTreeException e) {
@@ -128,7 +125,7 @@ public final class TestHelper {
     }
 
     private static Map<String, String> getJava7Options() {
-        Map<String, String> options = DefaultCodeFormatterConstants.getEclipseDefaultSettings();
+        Map<String, String> options= DefaultCodeFormatterConstants.getEclipseDefaultSettings();
         options.put(COMPILER_COMPLIANCE, VERSION_1_7);
         options.put(COMPILER_CODEGEN_TARGET_PLATFORM, VERSION_1_7);
         options.put(COMPILER_SOURCE, VERSION_1_7);
@@ -137,20 +134,18 @@ public final class TestHelper {
 
     public static Collection<Object[]> samples(String samplesBaseDir, Collection<Class<?>> whitelistRules,
             Collection<Class<?>> blacklistRules) {
-        final File samplesDir = new File(samplesBaseDir, "samples_in");
-        final File[] sampleFiles = samplesDir.listFiles(new EndsWithFileFilter("Sample.java"));
+        final File samplesDir= new File(samplesBaseDir, "samples_in");
+        final File[] sampleFiles= samplesDir.listFiles(new EndsWithFileFilter("Sample.java"));
         Arrays.sort(sampleFiles);
 
-        final Collection<String> whitelist = toSampleNames(whitelistRules);
-        final Collection<String> blacklist = toSampleNames(blacklistRules);
+        final Collection<String> whitelist= toSampleNames(whitelistRules);
+        final Collection<String> blacklist= toSampleNames(blacklistRules);
 
-        final List<Object[]> output = new ArrayList<Object[]>(sampleFiles.length);
+        final List<Object[]> output= new ArrayList<Object[]>(sampleFiles.length);
         for (File file : sampleFiles) {
-            final String fileName = file.getName();
+            final String fileName= file.getName();
 
-            if (!whitelist.isEmpty()
-                    ? whitelist.contains(fileName)
-                    : !blacklist.contains(fileName)) {
+            if (!whitelist.isEmpty() ? whitelist.contains(fileName) : !blacklist.contains(fileName)) {
                 output.add(new Object[] { fileName });
             }
         }
@@ -158,9 +153,9 @@ public final class TestHelper {
     }
 
     private static Collection<String> toSampleNames(Collection<Class<?>> clazzes) {
-        final Collection<String> results = new ArrayList<String>();
+        final Collection<String> results= new ArrayList<String>();
         for (Class<?> clazz : clazzes) {
-            final String name = clazz.getSimpleName();
+            final String name= clazz.getSimpleName();
             results.add(name.substring(0, name.lastIndexOf("CleanUp")) + "Sample.java");
         }
         return results;

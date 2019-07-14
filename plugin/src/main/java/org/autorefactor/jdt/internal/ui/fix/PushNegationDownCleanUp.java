@@ -83,33 +83,33 @@ public class PushNegationDownCleanUp extends AbstractCleanUpRule {
         if (!hasOperator(node, NOT)) {
             return VISIT_SUBTREE;
         }
-        final ASTBuilder b = ctx.getASTBuilder();
-        final Refactorings r = ctx.getRefactorings();
+        final ASTBuilder b= ctx.getASTBuilder();
+        final Refactorings r= ctx.getRefactorings();
 
-        final Expression operand = removeParentheses(node.getOperand());
+        final Expression operand= removeParentheses(node.getOperand());
         if (operand instanceof PrefixExpression) {
-            final PrefixExpression pe = (PrefixExpression) operand;
+            final PrefixExpression pe= (PrefixExpression) operand;
             if (hasOperator(pe, NOT)) {
                 r.replace(node, b.move(pe.getOperand()));
                 return DO_NOT_VISIT_SUBTREE;
             }
         } else if (operand instanceof InfixExpression) {
-            final InfixExpression ie = (InfixExpression) operand;
-            final Operator reverseOp = (Operator) OperatorEnum.getOperator(ie).getReverseBooleanOperator();
+            final InfixExpression ie= (InfixExpression) operand;
+            final Operator reverseOp= (Operator) OperatorEnum.getOperator(ie).getReverseBooleanOperator();
             if (reverseOp != null) {
-                List<Expression> allOperands = new ArrayList<Expression>(allOperands(ie));
+                List<Expression> allOperands= new ArrayList<Expression>(allOperands(ie));
                 if (Arrays.<Operator>asList(CONDITIONAL_AND, CONDITIONAL_OR, AND, OR).contains(ie.getOperator())) {
-                    for (ListIterator<Expression> it = allOperands.listIterator(); it.hasNext();) {
+                    for (ListIterator<Expression> it= allOperands.listIterator(); it.hasNext();) {
                         it.set(b.negate(it.next()));
                     }
                 } else {
-                    allOperands = b.move(allOperands);
+                    allOperands= b.move(allOperands);
                 }
                 r.replace(node, b.parenthesize(b.infixExpr(reverseOp, allOperands)));
                 return DO_NOT_VISIT_SUBTREE;
             }
         } else {
-            final Boolean constant = getBooleanLiteral(operand);
+            final Boolean constant= getBooleanLiteral(operand);
             if (constant != null) {
                 r.replace(node, b.boolean0(!constant));
                 return DO_NOT_VISIT_SUBTREE;

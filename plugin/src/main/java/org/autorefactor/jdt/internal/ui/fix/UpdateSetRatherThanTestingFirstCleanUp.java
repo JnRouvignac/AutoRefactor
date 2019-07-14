@@ -79,9 +79,9 @@ public class UpdateSetRatherThanTestingFirstCleanUp extends AbstractCleanUpRule 
 
     @Override
     public boolean visit(IfStatement node) {
-        final Statement elseStmt = node.getElseStatement();
-        final Statement thenStmt = node.getThenStatement();
-        final PrefixExpression pe = as(node.getExpression(), PrefixExpression.class);
+        final Statement elseStmt= node.getElseStatement();
+        final Statement thenStmt= node.getThenStatement();
+        final PrefixExpression pe= as(node.getExpression(), PrefixExpression.class);
         if (hasOperator(pe, NOT)) {
             return maybeReplaceSetContains(node, pe.getOperand(), thenStmt, elseStmt, false);
         } else {
@@ -89,33 +89,32 @@ public class UpdateSetRatherThanTestingFirstCleanUp extends AbstractCleanUpRule 
         }
     }
 
-    private boolean maybeReplaceSetContains(final IfStatement ifStmtToReplace,
-            final Expression ifExpr, final Statement stmt, final Statement oppositeStmt, final boolean negate) {
+    private boolean maybeReplaceSetContains(final IfStatement ifStmtToReplace, final Expression ifExpr,
+            final Statement stmt, final Statement oppositeStmt, final boolean negate) {
         return maybeReplaceSetContains(ifStmtToReplace, ifExpr, stmt, oppositeStmt, negate, "add")
                 && maybeReplaceSetContains(ifStmtToReplace, ifExpr, oppositeStmt, stmt, !negate, "remove");
     }
 
-    private boolean maybeReplaceSetContains(final IfStatement ifStmtToReplace,
-            final Expression ifExpr, final Statement stmt, final Statement oppositeStmt,
-            final boolean negate, final String methodName) {
-        final List<Statement> stmts = asList(stmt);
-        final MethodInvocation miContains = as(ifExpr, MethodInvocation.class);
-        if (!stmts.isEmpty()
-                && isMethod(miContains, "java.util.Set", "contains", "java.lang.Object")) {
-            final Statement firstStmt = getFirst(stmts);
-            final MethodInvocation miAddOrRemove = asExpression(firstStmt, MethodInvocation.class);
-            final ASTSemanticMatcher astMatcher = new ASTSemanticMatcher();
+    private boolean maybeReplaceSetContains(final IfStatement ifStmtToReplace, final Expression ifExpr,
+            final Statement stmt, final Statement oppositeStmt, final boolean negate, final String methodName) {
+        final List<Statement> stmts= asList(stmt);
+        final MethodInvocation miContains= as(ifExpr, MethodInvocation.class);
+        if (!stmts.isEmpty() && isMethod(miContains, "java.util.Set", "contains", "java.lang.Object")) {
+            final Statement firstStmt= getFirst(stmts);
+            final MethodInvocation miAddOrRemove= asExpression(firstStmt, MethodInvocation.class);
+            final ASTSemanticMatcher astMatcher= new ASTSemanticMatcher();
             if (isMethod(miAddOrRemove, "java.util.Set", methodName, "java.lang.Object")
                     && match(astMatcher, miContains.getExpression(), miAddOrRemove.getExpression())
                     && match(astMatcher, arg0(miContains), arg0(miAddOrRemove))) {
-                final ASTBuilder b = this.ctx.getASTBuilder();
-                final Refactorings r = this.ctx.getRefactorings();
+                final ASTBuilder b= this.ctx.getASTBuilder();
+                final Refactorings r= this.ctx.getRefactorings();
 
                 if (stmts.size() == 1 && asList(oppositeStmt).isEmpty()) {
                     // Only one statement: replace if statement with col.add() (or col.remove())
                     r.replace(ifStmtToReplace, b.move(firstStmt));
                 } else {
-                    // There are other statements, replace the if condition with col.add() (or col.remove())
+                    // There are other statements, replace the if condition with col.add() (or
+                    // col.remove())
                     r.replace(ifStmtToReplace.getExpression(),
                             negate ? b.negate(miAddOrRemove, ASTBuilder.Copy.MOVE) : b.move(miAddOrRemove));
                     r.remove(firstStmt);

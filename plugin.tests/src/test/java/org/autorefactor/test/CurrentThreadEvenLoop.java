@@ -31,16 +31,17 @@ import org.autorefactor.environment.EventLoop;
 
 class CurrentThreadEvenLoop implements EventLoop {
     /**
-     * Calls the {@link Callable#call()} method of the callable to be invoked by the event loop at the
-     * next reasonable opportunity.
+     * Calls the {@link Callable#call()} method of the callable to be invoked by the
+     * event loop at the next reasonable opportunity.
      *
      * @param call the callable to invoke
-     * @param <E> the declared exception type returned by the callable
-     * @throws E the exception possibly returned by executing the callable that is then thrown
+     * @param <E>  the declared exception type returned by the callable
+     * @throws E the exception possibly returned by executing the callable that is
+     *           then thrown
      */
     public <E extends Exception> void syncExec(Callable<E> callable) throws E {
         try {
-            final E ex = callable.call();
+            final E ex= callable.call();
             if (ex != null) {
                 throw ex;
             }

@@ -68,10 +68,10 @@ import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 public class BreakRatherThanPassiveIterationsCleanUp extends AbstractCleanUpRule {
     private static final class SideEffectVisitor extends InterruptibleVisitor {
         private final Set<String> localVariableNames;
-        private boolean hasSideEffect = false;
+        private boolean hasSideEffect= false;
 
         private SideEffectVisitor(final Set<String> localVariableNames) {
-            this.localVariableNames = localVariableNames;
+            this.localVariableNames= localVariableNames;
         }
 
         private boolean hasSideEffect() {
@@ -86,7 +86,7 @@ public class BreakRatherThanPassiveIterationsCleanUp extends AbstractCleanUpRule
         private boolean visitVar(final Expression modifiedVar) {
             if (!(modifiedVar instanceof SimpleName)
                     || !localVariableNames.contains(((SimpleName) modifiedVar).getIdentifier())) {
-                hasSideEffect = true;
+                hasSideEffect= true;
                 return interruptVisit();
             }
 
@@ -95,8 +95,7 @@ public class BreakRatherThanPassiveIterationsCleanUp extends AbstractCleanUpRule
 
         @Override
         public boolean visit(final PrefixExpression node) {
-            if (INCREMENT.equals(node.getOperator())
-                    || DECREMENT.equals(node.getOperator())) {
+            if (INCREMENT.equals(node.getOperator()) || DECREMENT.equals(node.getOperator())) {
                 return visitVar(node.getOperand());
             }
             return VISIT_SUBTREE;
@@ -110,12 +109,11 @@ public class BreakRatherThanPassiveIterationsCleanUp extends AbstractCleanUpRule
         @SuppressWarnings("unchecked")
         @Override
         public boolean visit(final InfixExpression node) {
-            if (InfixExpression.Operator.PLUS.equals(node.getOperator())
-                    && hasType(node, "java.lang.String")
+            if (InfixExpression.Operator.PLUS.equals(node.getOperator()) && hasType(node, "java.lang.String")
                     && (mayCallImplicitToString(node.getLeftOperand())
                             || mayCallImplicitToString(node.getRightOperand())
                             || mayCallImplicitToString(node.extendedOperands()))) {
-                hasSideEffect = true;
+                hasSideEffect= true;
                 return interruptVisit();
             }
             return VISIT_SUBTREE;
@@ -133,35 +131,33 @@ public class BreakRatherThanPassiveIterationsCleanUp extends AbstractCleanUpRule
         }
 
         private boolean mayCallImplicitToString(final Expression expr) {
-            return !hasType(expr, "java.lang.String", "boolean", "short", "int", "long", "float",
-                    "double", "java.lang.Short", "java.lang.Boolean", "java.lang.Integer", "java.lang.Long",
-                    "java.lang.Float", "java.lang.Double")
-                    && !(expr instanceof PrefixExpression)
-                    && !(expr instanceof InfixExpression)
+            return !hasType(expr, "java.lang.String", "boolean", "short", "int", "long", "float", "double",
+                    "java.lang.Short", "java.lang.Boolean", "java.lang.Integer", "java.lang.Long", "java.lang.Float",
+                    "java.lang.Double") && !(expr instanceof PrefixExpression) && !(expr instanceof InfixExpression)
                     && !(expr instanceof PostfixExpression);
         }
 
         @Override
         public boolean visit(final SuperMethodInvocation node) {
-            hasSideEffect = true;
+            hasSideEffect= true;
             return interruptVisit();
         }
 
         @Override
         public boolean visit(final MethodInvocation node) {
-            hasSideEffect = true;
+            hasSideEffect= true;
             return interruptVisit();
         }
 
         @Override
         public boolean visit(final ClassInstanceCreation node) {
-            hasSideEffect = true;
+            hasSideEffect= true;
             return interruptVisit();
         }
 
         @Override
         public boolean visit(final ThrowStatement node) {
-            hasSideEffect = true;
+            hasSideEffect= true;
             return interruptVisit();
         }
     }
@@ -195,7 +191,7 @@ public class BreakRatherThanPassiveIterationsCleanUp extends AbstractCleanUpRule
 
     @Override
     public boolean visit(final ForStatement node) {
-        final Set<String> vars = new HashSet<String>();
+        final Set<String> vars= new HashSet<String>();
 
         for (final Expression initializer : initializers(node)) {
             vars.addAll(getLocalVariableIdentifiers(initializer, true));
@@ -215,7 +211,7 @@ public class BreakRatherThanPassiveIterationsCleanUp extends AbstractCleanUpRule
     }
 
     private boolean hasSideEffect(final ASTNode node, final Set<String> allowedVars) {
-        final SideEffectVisitor variableUseVisitor = new SideEffectVisitor(allowedVars);
+        final SideEffectVisitor variableUseVisitor= new SideEffectVisitor(allowedVars);
         variableUseVisitor.visitNode(node);
         return variableUseVisitor.hasSideEffect();
     }
@@ -230,14 +226,14 @@ public class BreakRatherThanPassiveIterationsCleanUp extends AbstractCleanUpRule
     }
 
     private boolean visitLoopBody(final Statement body, final Set<String> allowedVars) {
-        final List<Statement> stmts = asList(body);
+        final List<Statement> stmts= asList(body);
 
         if (stmts == null || stmts.isEmpty()) {
             return VISIT_SUBTREE;
         }
 
-        for (int i = 0; i < stmts.size() - 1; i++) {
-            final Statement stmt = stmts.get(i);
+        for (int i= 0; i < stmts.size() - 1; i++) {
+            final Statement stmt= stmts.get(i);
             allowedVars.addAll(getLocalVariableIdentifiers(stmt, true));
 
             if (hasSideEffect(stmt, allowedVars)) {
@@ -245,29 +241,28 @@ public class BreakRatherThanPassiveIterationsCleanUp extends AbstractCleanUpRule
             }
         }
 
-
         if (stmts.get(stmts.size() - 1) instanceof IfStatement) {
-            final IfStatement ifStmt = (IfStatement) stmts.get(stmts.size() - 1);
+            final IfStatement ifStmt= (IfStatement) stmts.get(stmts.size() - 1);
 
             if (ifStmt.getElseStatement() == null && !hasSideEffect(ifStmt.getExpression(), allowedVars)) {
-                final List<Statement> assignments = asList(ifStmt.getThenStatement());
+                final List<Statement> assignments= asList(ifStmt.getThenStatement());
 
                 for (final Statement stmt : assignments) {
                     if (stmt instanceof VariableDeclarationStatement) {
-                        final VariableDeclarationStatement decl = (VariableDeclarationStatement) stmt;
+                        final VariableDeclarationStatement decl= (VariableDeclarationStatement) stmt;
 
                         for (final Object obj : decl.fragments()) {
-                            final VariableDeclarationFragment fragment = (VariableDeclarationFragment) obj;
+                            final VariableDeclarationFragment fragment= (VariableDeclarationFragment) obj;
 
                             if (!isHardCoded(fragment.getInitializer())) {
                                 return VISIT_SUBTREE;
                             }
                         }
                     } else if (stmt instanceof ExpressionStatement) {
-                        final Expression expr = ((ExpressionStatement) stmt).getExpression();
+                        final Expression expr= ((ExpressionStatement) stmt).getExpression();
 
                         if (expr instanceof Assignment) {
-                            final Assignment assignment = (Assignment) expr;
+                            final Assignment assignment= (Assignment) expr;
 
                             if (!isHardCoded(assignment.getRightHandSide())) {
                                 return VISIT_SUBTREE;
@@ -289,8 +284,8 @@ public class BreakRatherThanPassiveIterationsCleanUp extends AbstractCleanUpRule
     }
 
     private void addBreak(final IfStatement ifStmt, final List<Statement> assignments) {
-        final ASTBuilder b = ctx.getASTBuilder();
-        final Refactorings r = ctx.getRefactorings();
+        final ASTBuilder b= ctx.getASTBuilder();
+        final Refactorings r= ctx.getRefactorings();
 
         if (ifStmt.getThenStatement() instanceof Block) {
             r.insertAfter(b.break0(), assignments.get(assignments.size() - 1));

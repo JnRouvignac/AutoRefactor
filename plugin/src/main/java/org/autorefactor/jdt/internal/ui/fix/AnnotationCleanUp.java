@@ -85,34 +85,33 @@ public class AnnotationCleanUp extends AbstractCleanUpRule {
 
     @Override
     public boolean visit(NormalAnnotation node) {
-        final Refactorings r = this.ctx.getRefactorings();
-        final ASTBuilder b = this.ctx.getASTBuilder();
-        final List<MemberValuePair> values = values(node);
+        final Refactorings r= this.ctx.getRefactorings();
+        final ASTBuilder b= this.ctx.getASTBuilder();
+        final List<MemberValuePair> values= values(node);
         if (values.isEmpty()) {
             r.replace(node, b.markerAnnotation(b.move(node.getTypeName())));
             return DO_NOT_VISIT_SUBTREE;
         } else if (values.size() == 1) {
-            MemberValuePair pair = values.get(0);
+            MemberValuePair pair= values.get(0);
             if ("value".equals(pair.getName().getIdentifier())) {
-                r.replace(node,
-                        b.singleValueAnnotation(b.move(node.getTypeName()), b.move(pair.getValue())));
+                r.replace(node, b.singleValueAnnotation(b.move(node.getTypeName()), b.move(pair.getValue())));
                 return DO_NOT_VISIT_SUBTREE;
             }
         }
 
-        boolean result = VISIT_SUBTREE;
-        Map<String, IMethodBinding> elements = toElementsMap(node.resolveAnnotationBinding());
+        boolean result= VISIT_SUBTREE;
+        Map<String, IMethodBinding> elements= toElementsMap(node.resolveAnnotationBinding());
         for (MemberValuePair pair : values) {
-            IMethodBinding elementBinding = elements.get(pair.getName().getIdentifier());
+            IMethodBinding elementBinding= elements.get(pair.getName().getIdentifier());
             if (equal(elementBinding.getReturnType(), pair.getValue(), elementBinding.getDefaultValue())) {
                 r.remove(pair);
-                result = DO_NOT_VISIT_SUBTREE;
+                result= DO_NOT_VISIT_SUBTREE;
             } else if (pair.getValue().getNodeType() == ARRAY_INITIALIZER) {
-                ArrayInitializer arrayInit = (ArrayInitializer) pair.getValue();
-                List<Expression> exprs = expressions(arrayInit);
+                ArrayInitializer arrayInit= (ArrayInitializer) pair.getValue();
+                List<Expression> exprs= expressions(arrayInit);
                 if (exprs.size() == 1) {
                     r.replace(arrayInit, b.move(exprs.get(0)));
-                    result = DO_NOT_VISIT_SUBTREE;
+                    result= DO_NOT_VISIT_SUBTREE;
                 }
             }
         }
@@ -123,9 +122,9 @@ public class AnnotationCleanUp extends AbstractCleanUpRule {
         if (annotBinding == null) {
             return Collections.emptyMap();
         }
-        ITypeBinding annotationType = annotBinding.getAnnotationType();
-        IMethodBinding[] elements = annotationType.getDeclaredMethods();
-        Map<String, IMethodBinding> results = new HashMap<String, IMethodBinding>();
+        ITypeBinding annotationType= annotBinding.getAnnotationType();
+        IMethodBinding[] elements= annotationType.getDeclaredMethods();
+        Map<String, IMethodBinding> results= new HashMap<String, IMethodBinding>();
         for (IMethodBinding element : elements) {
             results.put(element.getName(), element);
         }
@@ -133,7 +132,7 @@ public class AnnotationCleanUp extends AbstractCleanUpRule {
     }
 
     private boolean equal(ITypeBinding typeBinding, Expression expr, Object javaObj2) {
-        Object javaObj1 = expr.resolveConstantExpressionValue();
+        Object javaObj1= expr.resolveConstantExpressionValue();
         switch (expr.getNodeType()) {
         case ARRAY_INITIALIZER:
             return arraysEqual(typeBinding, (ArrayInitializer) expr, javaObj2);
@@ -144,7 +143,7 @@ public class AnnotationCleanUp extends AbstractCleanUpRule {
             return Utils.equalNotNull(javaObj1, javaObj2);
 
         case NUMBER_LITERAL:
-            PrimitiveEnum primEnum = getPrimitiveEnum(typeBinding);
+            PrimitiveEnum primEnum= getPrimitiveEnum(typeBinding);
             switch (primEnum) {
             case BYTE:
                 return Utils.equalNotNull(toByte(javaObj1), toByte(javaObj2));
@@ -169,12 +168,12 @@ public class AnnotationCleanUp extends AbstractCleanUpRule {
 
     private boolean arraysEqual(ITypeBinding typeBinding, ArrayInitializer arrayInit, Object javaObj) {
         if (javaObj instanceof Object[]) {
-            Object[] javaObjArray = (Object[]) javaObj;
-            List<Expression> exprs = expressions(arrayInit);
+            Object[] javaObjArray= (Object[]) javaObj;
+            List<Expression> exprs= expressions(arrayInit);
             if (exprs.size() == javaObjArray.length) {
-                boolean result = true;
-                for (int i = 0; i < javaObjArray.length; i++) {
-                    result &= equal(typeBinding.getElementType(), exprs.get(i), javaObjArray[i]);
+                boolean result= true;
+                for (int i= 0; i < javaObjArray.length; i++) {
+                    result&= equal(typeBinding.getElementType(), exprs.get(i), javaObjArray[i]);
                 }
                 return result;
             }
@@ -185,7 +184,7 @@ public class AnnotationCleanUp extends AbstractCleanUpRule {
     private Byte toByte(Object javaObj) {
         // no byte literal exist
         if (javaObj instanceof Integer) {
-            int i = (Integer) javaObj;
+            int i= (Integer) javaObj;
             if (Byte.MIN_VALUE <= i && i <= Byte.MAX_VALUE) {
                 return (byte) i;
             }
@@ -196,7 +195,7 @@ public class AnnotationCleanUp extends AbstractCleanUpRule {
     private Short toShort(Object javaObj) {
         // no short literal exist
         if (javaObj instanceof Integer) {
-            int i = (Integer) javaObj;
+            int i= (Integer) javaObj;
             if (Short.MIN_VALUE <= i && i <= Short.MAX_VALUE) {
                 return (short) i;
             }
@@ -214,7 +213,7 @@ public class AnnotationCleanUp extends AbstractCleanUpRule {
     private Long toLong(Object javaObj) {
         if (javaObj instanceof Integer) {
             return ((Integer) javaObj).longValue();
-        } else  if (javaObj instanceof Long) {
+        } else if (javaObj instanceof Long) {
             return (Long) javaObj;
         }
         return null;
@@ -223,9 +222,9 @@ public class AnnotationCleanUp extends AbstractCleanUpRule {
     private Float toFloat(Object javaObj) {
         if (javaObj instanceof Integer) {
             return ((Integer) javaObj).floatValue();
-        } else  if (javaObj instanceof Long) {
+        } else if (javaObj instanceof Long) {
             return ((Long) javaObj).floatValue();
-        } else  if (javaObj instanceof Float) {
+        } else if (javaObj instanceof Float) {
             return (Float) javaObj;
         }
         return null;
@@ -234,11 +233,11 @@ public class AnnotationCleanUp extends AbstractCleanUpRule {
     private Double toDouble(Object javaObj) {
         if (javaObj instanceof Integer) {
             return ((Integer) javaObj).doubleValue();
-        } else  if (javaObj instanceof Long) {
+        } else if (javaObj instanceof Long) {
             return ((Long) javaObj).doubleValue();
-        } else  if (javaObj instanceof Float) {
+        } else if (javaObj instanceof Float) {
             return ((Float) javaObj).doubleValue();
-        } else  if (javaObj instanceof Double) {
+        } else if (javaObj instanceof Double) {
             return (Double) javaObj;
         }
         return null;

@@ -30,10 +30,8 @@ import static org.autorefactor.util.Utils.*;
 /**
  * An immutable pair of objects.
  *
- * @param <F>
- *            The type of the first element in the pair
- * @param <S>
- *            The type of the second element in the pair
+ * @param <F> The type of the first element in the pair
+ * @param <S> The type of the second element in the pair
  */
 public final class Pair<F, S> {
     /** First object. */
@@ -44,10 +42,8 @@ public final class Pair<F, S> {
     /**
      * Returns an immutable empty pair.
      *
-     * @param <F>
-     *            the first element type
-     * @param <S>
-     *            the second element type
+     * @param <F> the first element type
+     * @param <S> the second element type
      * @return an immutable empty
      */
     public static <F, S> Pair<F, S> empty() {
@@ -57,14 +53,10 @@ public final class Pair<F, S> {
     /**
      * Returns an immutable pair made of the two objects.
      *
-     * @param <F>
-     *            the first element type
-     * @param <S>
-     *            the second element type
-     * @param first
-     *            the first element, can be null
-     * @param second
-     *            the second element, can be null
+     * @param <F>    the first element type
+     * @param <S>    the second element type
+     * @param first  the first element, can be null
+     * @param second the second element, can be null
      * @return an immutable pair made of the two objects.
      */
     public static <F, S> Pair<F, S> of(F first, S second) {
@@ -74,14 +66,12 @@ public final class Pair<F, S> {
     /**
      * Creates a new pair.
      *
-     * @param first
-     *            the first element, can be null
-     * @param second
-     *            the second element, can be null
+     * @param first  the first element, can be null
+     * @param second the second element, can be null
      */
     private Pair(F first, S second) {
-        this.first = first;
-        this.second = second;
+        this.first= first;
+        this.second= second;
     }
 
     /**
@@ -104,9 +94,9 @@ public final class Pair<F, S> {
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((first == null) ? 0 : first.hashCode());
+        final int prime= 31;
+        int result= 1;
+        result= prime * result + ((first == null) ? 0 : first.hashCode());
         return prime * result + ((second == null) ? 0 : second.hashCode());
     }
 
@@ -118,9 +108,8 @@ public final class Pair<F, S> {
         if (obj == null || getClass() != obj.getClass()) {
             return false;
         }
-        final Pair<?, ?> other = (Pair<?, ?>) obj;
-        return equal(first, other.first)
-                && equal(second, other.second);
+        final Pair<?, ?> other= (Pair<?, ?>) obj;
+        return equal(first, other.first) && equal(second, other.second);
     }
 
     @Override

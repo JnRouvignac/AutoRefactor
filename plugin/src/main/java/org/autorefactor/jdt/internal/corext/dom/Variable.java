@@ -30,7 +30,8 @@ import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
 /**
- * Represents a variable being written in the source code, including its name and possibly its type.
+ * Represents a variable being written in the source code, including its name
+ * and possibly its type.
  * <p>
  * It helps generate various declarations and accesses to this variable.
  */
@@ -42,22 +43,22 @@ public class Variable {
     /**
      * Builds a variable with its name and its type.
      *
-     * @param typeName the variable's type name
+     * @param typeName     the variable's type name
      * @param variableName the variable's name
-     * @param astBuilder the builder to build new AST nodes
+     * @param astBuilder   the builder to build new AST nodes
      */
     public Variable(String typeName, String variableName, ASTBuilder astBuilder) {
-        this.typeName = typeName;
-        this.variableName = variableName;
-        this.b = astBuilder;
+        this.typeName= typeName;
+        this.variableName= variableName;
+        this.b= astBuilder;
     }
 
     /**
-     * Builds a variable with its name and no type information.
-     * Calling any method dealing with the type will throw an exception.
+     * Builds a variable with its name and no type information. Calling any method
+     * dealing with the type will throw an exception.
      *
      * @param variableName the variable's name
-     * @param astBuilder the builder to build new AST nodes
+     * @param astBuilder   the builder to build new AST nodes
      */
     public Variable(String variableName, ASTBuilder astBuilder) {
         this(null, variableName, astBuilder);
@@ -113,13 +114,14 @@ public class Variable {
 
     private void checkTypeDefined() {
         if (typeName == null) {
-            throw new IllegalStateException("This method cannot be called on variable '"
-                + variableName + "', because no type has been defined for it.");
+            throw new IllegalStateException("This method cannot be called on variable '" + variableName
+                    + "', because no type has been defined for it.");
         }
     }
 
     /**
-     * Builds a {@link VariableDeclarationStatement} with the name and type this variable.
+     * Builds a {@link VariableDeclarationStatement} with the name and type this
+     * variable.
      *
      * @return a new {@link VariableDeclarationStatement}
      */

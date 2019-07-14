@@ -71,25 +71,24 @@ public class DoWhileRatherThanDuplicateCodeCleanUp extends AbstractCleanUpRule {
 
     @Override
     public boolean visit(WhileStatement node) {
-        final List<Statement> whileStmts = asList(node.getBody());
+        final List<Statement> whileStmts= asList(node.getBody());
 
         if (whileStmts.isEmpty()) {
             return VISIT_SUBTREE;
         }
 
-        final List<Statement> previousStmts = new ArrayList<Statement>(whileStmts.size());
-        final ASTSemanticMatcher matcher = new ASTSemanticMatcher();
+        final List<Statement> previousStmts= new ArrayList<Statement>(whileStmts.size());
+        final ASTSemanticMatcher matcher= new ASTSemanticMatcher();
 
-        Statement previousStmt = getPreviousSibling(node);
-        int i = whileStmts.size() - 1;
+        Statement previousStmt= getPreviousSibling(node);
+        int i= whileStmts.size() - 1;
         while (i >= 0) {
-            if (previousStmt == null || !match(matcher, previousStmt,
-                    whileStmts.get(i))) {
+            if (previousStmt == null || !match(matcher, previousStmt, whileStmts.get(i))) {
                 return VISIT_SUBTREE;
             }
             i--;
             previousStmts.add(previousStmt);
-            previousStmt = getPreviousSibling(previousStmt);
+            previousStmt= getPreviousSibling(previousStmt);
         }
 
         replaceWithDoWhile(node, previousStmts);
@@ -97,10 +96,10 @@ public class DoWhileRatherThanDuplicateCodeCleanUp extends AbstractCleanUpRule {
     }
 
     private void replaceWithDoWhile(final WhileStatement node, final List<Statement> previousStmts) {
-        final Refactorings r = this.ctx.getRefactorings();
+        final Refactorings r= this.ctx.getRefactorings();
         r.remove(previousStmts);
 
-        final ASTBuilder b = this.ctx.getASTBuilder();
+        final ASTBuilder b= this.ctx.getASTBuilder();
         r.replace(node, b.doWhile(b.copy(node.getExpression()), b.copy(node.getBody())));
     }
 }

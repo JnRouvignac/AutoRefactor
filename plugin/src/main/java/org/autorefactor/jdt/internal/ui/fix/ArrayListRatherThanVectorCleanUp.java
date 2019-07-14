@@ -46,20 +46,15 @@ import org.eclipse.jdt.core.dom.Type;
 
 /** See {@link #getDescription()} method. */
 public class ArrayListRatherThanVectorCleanUp extends AbstractClassSubstituteCleanUp {
-    private static final Map<String, String[]> CAN_BE_CASTED_TO = new HashMap<String, String[]>();
+    private static final Map<String, String[]> CAN_BE_CASTED_TO= new HashMap<String, String[]>();
 
     static {
-        CAN_BE_CASTED_TO.put("java.lang.Object", new String[]{"java.lang.Object"});
-        CAN_BE_CASTED_TO.put("java.lang.Cloneable", new String[]{"java.lang.Cloneable", "java.lang.Object"});
-        CAN_BE_CASTED_TO.put("java.io.Serializable",
-                new String[]{"java.io.Serializable", "java.lang.Object"});
-        CAN_BE_CASTED_TO.put("java.util.Collection", new String[]{"java.util.Collection", "java.lang.Object"});
-        CAN_BE_CASTED_TO.put("java.util.AbstractCollection",
-                new String[]{"java.util.AbstractCollection", "java.util.Collection", "java.lang.Object"});
-        CAN_BE_CASTED_TO.put("java.util.Vector",
-                new String[]{"java.util.Vector",
-                    "java.util.AbstractCollection", "java.util.Collection",
-                    "java.io.Serializable", "java.lang.Cloneable", "java.lang.Object"});
+        CAN_BE_CASTED_TO.put("java.lang.Object", new String[] { "java.lang.Object" });
+        CAN_BE_CASTED_TO.put("java.lang.Cloneable", new String[] { "java.lang.Cloneable", "java.lang.Object" });
+        CAN_BE_CASTED_TO.put("java.io.Serializable", new String[] { "java.io.Serializable", "java.lang.Object" });
+        CAN_BE_CASTED_TO.put("java.util.Collection", new String[] { "java.util.Collection", "java.lang.Object" });
+        CAN_BE_CASTED_TO.put("java.util.AbstractCollection", new String[] { "java.util.AbstractCollection", "java.util.Collection", "java.lang.Object" });
+        CAN_BE_CASTED_TO.put("java.util.Vector", new String[] { "java.util.Vector", "java.util.AbstractCollection", "java.util.Collection", "java.io.Serializable", "java.lang.Cloneable", "java.lang.Object" });
     }
 
     /**
@@ -101,7 +96,7 @@ public class ArrayListRatherThanVectorCleanUp extends AbstractClassSubstituteCle
 
     @Override
     protected String[] getExistingClassCanonicalName() {
-        return new String[] {"java.util.Vector"};
+        return new String[] { "java.util.Vector" };
     }
 
     @Override
@@ -138,24 +133,21 @@ public class ArrayListRatherThanVectorCleanUp extends AbstractClassSubstituteCle
             return true;
         }
 
-        final String argumentType = getArgumentType(mi);
+        final String argumentType= getArgumentType(mi);
         return isMethod(mi, "java.util.Collection", "add", "java.lang.Object")
                 || isMethod(mi, "java.util.List", "addAll", "int", "java.util.Collection")
                 || isMethod(mi, "java.util.Collection", "clear")
                 || isMethod(mi, "java.util.Collection", "contains", "java.lang.Object")
                 || isMethod(mi, "java.util.Collection", "containsAll", "java.util.Collection")
                 || isMethod(mi, "java.lang.Object", "equals", "java.lang.Object")
-                || isMethod(mi, "java.lang.Object", "hashCode")
-                || isMethod(mi, "java.util.Collection", "isEmpty")
+                || isMethod(mi, "java.lang.Object", "hashCode") || isMethod(mi, "java.util.Collection", "isEmpty")
                 || isMethod(mi, "java.util.Collection", "iterator")
                 || isMethod(mi, "java.util.Collection", "remove", "java.lang.Object")
                 || isMethod(mi, "java.util.Collection", "removeAll", "java.util.Collection")
                 || isMethod(mi, "java.util.Collection", "retainAll", "java.util.Collection")
-                || isMethod(mi, "java.util.Collection", "size")
-                || isMethod(mi, "java.util.Collection", "toArray")
+                || isMethod(mi, "java.util.Collection", "size") || isMethod(mi, "java.util.Collection", "toArray")
                 || isMethod(mi, "java.util.Collection", "toArray", argumentType + "[]")
-                || isMethod(mi, "java.lang.Object", "clone")
-                || isMethod(mi, "java.lang.Object", "toString");
+                || isMethod(mi, "java.lang.Object", "clone") || isMethod(mi, "java.lang.Object", "toString");
     }
 
     @Override
@@ -181,17 +173,17 @@ public class ArrayListRatherThanVectorCleanUp extends AbstractClassSubstituteCle
     }
 
     private void reorderArguments(final MethodInvocation refactoredMi) {
-        List<Expression> args = arguments(refactoredMi);
-        Expression item = args.get(0);
-        Expression index = args.get(1);
+        List<Expression> args= arguments(refactoredMi);
+        Expression item= args.get(0);
+        Expression index= args.get(1);
         args.clear();
         args.add(index);
         args.add(item);
 
-        final List<Type> typeArgs = typeArguments(refactoredMi);
+        final List<Type> typeArgs= typeArguments(refactoredMi);
         if (typeArgs != null && !typeArgs.isEmpty()) {
-            Type itemType = typeArgs.get(0);
-            Type indexType = typeArgs.get(1);
+            Type itemType= typeArgs.get(0);
+            Type indexType= typeArgs.get(1);
             typeArgs.clear();
             typeArgs.add(indexType);
             typeArgs.add(itemType);
@@ -199,10 +191,8 @@ public class ArrayListRatherThanVectorCleanUp extends AbstractClassSubstituteCle
     }
 
     @Override
-    protected boolean isTypeCompatible(final ITypeBinding variableType,
-            final ITypeBinding refType) {
-        return super.isTypeCompatible(variableType, refType)
-                || hasType(variableType,
-                           getOrDefault(CAN_BE_CASTED_TO, refType.getErasure().getQualifiedName(), new String[0]));
+    protected boolean isTypeCompatible(final ITypeBinding variableType, final ITypeBinding refType) {
+        return super.isTypeCompatible(variableType, refType) || hasType(variableType,
+                getOrDefault(CAN_BE_CASTED_TO, refType.getErasure().getQualifiedName(), new String[0]));
     }
 }

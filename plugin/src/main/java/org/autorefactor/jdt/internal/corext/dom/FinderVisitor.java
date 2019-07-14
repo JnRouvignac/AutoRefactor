@@ -31,7 +31,8 @@ import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 
 /**
- * A visitor that stops visiting as fast as possible once a result has been found.
+ * A visitor that stops visiting as fast as possible once a result has been
+ * found.
  *
  * @param <R> type of the results returned by this finder visitor
  */
@@ -47,15 +48,15 @@ public class FinderVisitor<R> extends ASTVisitor {
      * @param result the result
      */
     protected void setResult(R result) {
-        this.resultFound = true;
-        this.result = result;
+        this.resultFound= true;
+        this.result= result;
     }
 
     /**
-     * Calls {@link ASTNode#accept(ASTVisitor)} on the provided node
-     * and returns the found result if one exists, or the default value.
+     * Calls {@link ASTNode#accept(ASTVisitor)} on the provided node and returns the
+     * found result if one exists, or the default value.
      *
-     * @param nodeToVisit the node to visit
+     * @param nodeToVisit   the node to visit
      * @param defaultResult the default result if no result could be found
      * @return the result found, or the default result when none exist
      */

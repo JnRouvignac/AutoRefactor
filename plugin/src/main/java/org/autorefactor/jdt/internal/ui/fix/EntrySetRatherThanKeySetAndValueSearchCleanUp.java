@@ -103,10 +103,11 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
     /**
      * This class helps decide which name to give to a new variable.
      * <p>
-     * When creating a new variable, its name may shadow another variable or field used in the local
-     * scope.
+     * When creating a new variable, its name may shadow another variable or field
+     * used in the local scope.
      * <p>
-     * Does JDT provide a public API for naming local variables? I could not find any.
+     * Does JDT provide a public API for naming local variables? I could not find
+     * any.
      */
     private static final class VariableNameDecider {
         private final ASTNode scope;
@@ -114,36 +115,37 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
         private final ASTNode namingScope;
 
         private VariableNameDecider(ASTNode scope, int insertionPoint) {
-            this.scope = scope;
-            this.insertionPoint = insertionPoint;
-            this.namingScope = getNamingScope(scope);
+            this.scope= scope;
+            this.insertionPoint= insertionPoint;
+            this.namingScope= getNamingScope(scope);
         }
 
         private ASTNode getNamingScope(ASTNode scope) {
-            Class<?>[] ancestorClasses = new Class<?>[] { MethodDeclaration.class, Initializer.class };
-            ASTNode ancestor = getFirstAncestorOrNull(scope, ancestorClasses);
+            Class<?>[] ancestorClasses= new Class<?>[] { MethodDeclaration.class, Initializer.class };
+            ASTNode ancestor= getFirstAncestorOrNull(scope, ancestorClasses);
             if (ancestor == null) {
                 throw new IllegalStateException(scope, "Expected to find an ancestor among the types "
-                    + Arrays.toString(ancestorClasses) + " but could not find any");
+                        + Arrays.toString(ancestorClasses) + " but could not find any");
             }
             return ancestor;
         }
 
         /**
-         * Returns a name suggestion suitable for use when inserting a new variable declaration. This
-         * name:
+         * Returns a name suggestion suitable for use when inserting a new variable
+         * declaration. This name:
          * <ul>
          * <li>will not shadow any variable name in use after the insertion point</li>
-         * <li>and will not conflict with local variables declared before the insertion point.</li>
+         * <li>and will not conflict with local variables declared before the insertion
+         * point.</li>
          * </ul>
          *
-         * @param candidateNames
-         *          the suggestion will be one of the candidate names, maybe suffixed by a number
+         * @param candidateNames the suggestion will be one of the candidate names,
+         *                       maybe suffixed by a number
          * @return the suggestion for a variable name
          */
         public String suggest(String... candidateNames) {
-            final Set<String> declaredLocalVarNames = new HashSet<String>(collectDeclaredLocalVariableNames());
-            final Set<String> varNamesUsedAfter = new HashSet<String>(collectVariableNamesUsedAfter());
+            final Set<String> declaredLocalVarNames= new HashSet<String>(collectDeclaredLocalVariableNames());
+            final Set<String> varNamesUsedAfter= new HashSet<String>(collectVariableNamesUsedAfter());
             // Can we use one of the candidate names?
             for (String candidate : candidateNames) {
                 if (isSuitable(candidate, declaredLocalVarNames, varNamesUsedAfter)) {
@@ -152,9 +154,9 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
             }
 
             // Iterate on the first candidate name and suffix it with an integer
-            int i = 1;
+            int i= 1;
             do {
-                final String candidate = candidateNames[0] + i;
+                final String candidate= candidateNames[0] + i;
                 if (isSuitable(candidate, declaredLocalVarNames, varNamesUsedAfter)) {
                     return candidate;
                 }
@@ -162,11 +164,11 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
             } while (true);
         }
 
-        private boolean isSuitable(
-                String candidateName, Set<String> declaredLocalVarNames, Set<String> varNamesUsedAfter) {
-            return  // no variable declaration conflict
-                    !declaredLocalVarNames.contains(candidateName)
-                    // new variable does not shadow use of other variables/fields with the same name
+        private boolean isSuitable(String candidateName, Set<String> declaredLocalVarNames,
+                Set<String> varNamesUsedAfter) {
+            // No variable declaration conflict
+            return !declaredLocalVarNames.contains(candidateName)
+                    // New variable does not shadow use of other variables/fields with the same name
                     && !varNamesUsedAfter.contains(candidateName);
         }
 
@@ -179,32 +181,31 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
 
                 @Override
                 public boolean visit(SimpleName node) {
-                    final IBinding binding = node.resolveBinding();
+                    final IBinding binding= node.resolveBinding();
                     if (binding.getKind() == IBinding.VARIABLE) {
                         addResult(((IVariableBinding) binding).getName());
                     }
                     return VISIT_SUBTREE;
                 }
-            } .collect(namingScope);
+            }.collect(namingScope);
         }
 
         private List<String> collectVariableNamesUsedAfter() {
             return new CollectorVisitor<String>() {
                 @Override
                 public boolean preVisit2(ASTNode node) {
-                    return node.getStartPosition() > insertionPoint
-                            && !isTypeDeclaration(node);
+                    return node.getStartPosition() > insertionPoint && !isTypeDeclaration(node);
                 }
 
                 @Override
                 public boolean visit(SimpleName node) {
-                    final IBinding binding = node.resolveBinding();
+                    final IBinding binding= node.resolveBinding();
                     if (binding.getKind() == IBinding.VARIABLE) {
                         addResult(((IVariableBinding) binding).getName());
                     }
                     return VISIT_SUBTREE;
                 }
-            } .collect(scope);
+            }.collect(scope);
         }
 
         private boolean isTypeDeclaration(ASTNode node) {
@@ -223,18 +224,18 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
 
     @Override
     public boolean visit(EnhancedForStatement enhancedFor) {
-        final Expression foreachExpr = enhancedFor.getExpression();
+        final Expression foreachExpr= enhancedFor.getExpression();
         if (isKeySetMethod(foreachExpr)) {
             // From 'for (K key : map.keySet()) { }'
             // -> mapExpression become 'map', parameter become 'K key'
-            final Expression mapExpression = ((MethodInvocation) foreachExpr).getExpression();
+            final Expression mapExpression= ((MethodInvocation) foreachExpr).getExpression();
             if (mapExpression == null) {
                 // not implemented
                 return VISIT_SUBTREE;
             }
-            final SingleVariableDeclaration parameter = enhancedFor.getParameter();
-            final List<MethodInvocation> getValueMis =
-                    collectMapGetValueCalls(mapExpression, parameter, enhancedFor.getBody());
+            final SingleVariableDeclaration parameter= enhancedFor.getParameter();
+            final List<MethodInvocation> getValueMis= collectMapGetValueCalls(mapExpression, parameter,
+                    enhancedFor.getBody());
             if (!getValueMis.isEmpty() && haveSameTypeBindings(getValueMis)) {
                 replaceEntryIterationByKeyIteration(enhancedFor, mapExpression, parameter, getValueMis);
                 return DO_NOT_VISIT_SUBTREE;
@@ -246,66 +247,60 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
 
     private void replaceEntryIterationByKeyIteration(EnhancedForStatement enhancedFor, final Expression mapExpression,
             final SingleVariableDeclaration parameter, final List<MethodInvocation> getValueMis) {
-        final ASTBuilder b = ctx.getASTBuilder();
-        final Refactorings r = ctx.getRefactorings();
+        final ASTBuilder b= ctx.getASTBuilder();
+        final Refactorings r= ctx.getRefactorings();
 
-        final VariableDefinitionsUsesVisitor keyUseVisitor = new VariableDefinitionsUsesVisitor(parameter);
+        final VariableDefinitionsUsesVisitor keyUseVisitor= new VariableDefinitionsUsesVisitor(parameter);
         enhancedFor.getBody().accept(keyUseVisitor);
-        int keyUses = keyUseVisitor.getUses().size();
+        int keyUses= keyUseVisitor.getUses().size();
 
-        final int insertionPoint = asList(enhancedFor.getBody()).get(0).getStartPosition() - 1;
-        final Variable entryVar = new Variable(
-            new VariableNameDecider(enhancedFor.getBody(), insertionPoint).suggest("entry", "mapEntry"), b);
-        final TypeNameDecider typeNameDecider = new TypeNameDecider(parameter);
+        final int insertionPoint= asList(enhancedFor.getBody()).get(0).getStartPosition() - 1;
+        final Variable entryVar= new Variable(
+                new VariableNameDecider(enhancedFor.getBody(), insertionPoint).suggest("entry", "mapEntry"), b);
+        final TypeNameDecider typeNameDecider= new TypeNameDecider(parameter);
 
-        final MethodInvocation getValueMi0 = getValueMis.get(0);
-        final ITypeBinding typeBinding = getValueMi0.getExpression().resolveTypeBinding();
+        final MethodInvocation getValueMi0= getValueMis.get(0);
+        final ITypeBinding typeBinding= getValueMi0.getExpression().resolveTypeBinding();
         if (typeBinding != null && typeBinding.isRawType()) {
             // for (Object key : map.keySet()) => for (Object key : map.entrySet())
             r.set(enhancedFor, EXPRESSION_PROPERTY, b.invoke(b.move(mapExpression), "entrySet"));
-            final Type objectType = b.type(typeNameDecider.useSimplestPossibleName("java.lang.Object"));
-            final Variable objectVar = new Variable(
-                new VariableNameDecider(enhancedFor.getBody(), insertionPoint).suggest("obj"), b);
+            final Type objectType= b.type(typeNameDecider.useSimplestPossibleName("java.lang.Object"));
+            final Variable objectVar= new Variable(
+                    new VariableNameDecider(enhancedFor.getBody(), insertionPoint).suggest("obj"), b);
             r.set(enhancedFor, PARAMETER_PROPERTY, b.declareSingleVariable(objectVar.varNameRaw(), objectType));
 
             // for (Map.Entry<K, V> mapEntry : map.entrySet()) {
-            //     Map.Entry mapEntry = (Map.Entry) obj; // <--- add this statement
-            //     Object key = mapEntry.getKey(); // <--- add this statement
+            // Map.Entry mapEntry = (Map.Entry) obj; // <--- add this statement
+            // Object key = mapEntry.getKey(); // <--- add this statement
 
-            final Type mapKeyType = b.copy(parameter.getType());
-            final VariableDeclarationStatement newKeyDecl = b.declareStmt(
-                    mapKeyType,
-                    b.move(parameter.getName()),
+            final Type mapKeyType= b.copy(parameter.getType());
+            final VariableDeclarationStatement newKeyDecl= b.declareStmt(mapKeyType, b.move(parameter.getName()),
                     b.invoke(entryVar.varName(), "getKey"));
 
             r.insertFirst(enhancedFor.getBody(), Block.STATEMENTS_PROPERTY, newKeyDecl);
 
             if (keyUses > getValueMis.size()) {
-                String mapEntryTypeName = typeNameDecider.useSimplestPossibleName("java.util.Map.Entry");
+                String mapEntryTypeName= typeNameDecider.useSimplestPossibleName("java.util.Map.Entry");
 
-                final VariableDeclarationStatement newEntryDecl = b.declareStmt(
-                        b.type(mapEntryTypeName),
-                        entryVar.varName(),
-                        b.cast(b.type(mapEntryTypeName), objectVar.varName()));
+                final VariableDeclarationStatement newEntryDecl= b.declareStmt(b.type(mapEntryTypeName),
+                        entryVar.varName(), b.cast(b.type(mapEntryTypeName), objectVar.varName()));
                 r.insertFirst(enhancedFor.getBody(), Block.STATEMENTS_PROPERTY, newEntryDecl);
             }
         } else {
             // for (K key : map.keySet()) => for (K key : map.entrySet())
             r.set(enhancedFor, EXPRESSION_PROPERTY, b.invoke(b.move(mapExpression), "entrySet"));
-            // for (K key : map.entrySet()) => for (Map.Entry<K, V> mapEntry : map.entrySet())
-            final Type mapEntryType = createMapEntryType(parameter, getValueMi0, typeNameDecider);
-            r.set(enhancedFor, PARAMETER_PROPERTY,
-                  b.declareSingleVariable(entryVar.varNameRaw(), mapEntryType));
+            // for (K key : map.entrySet()) => for (Map.Entry<K, V> mapEntry :
+            // map.entrySet())
+            final Type mapEntryType= createMapEntryType(parameter, getValueMi0, typeNameDecider);
+            r.set(enhancedFor, PARAMETER_PROPERTY, b.declareSingleVariable(entryVar.varNameRaw(), mapEntryType));
 
             if (keyUses > getValueMis.size()) {
                 // for (Map.Entry<K, V> mapEntry : map.entrySet()) {
-                //     K key = mapEntry.getKey(); // <--- add this statement
-                final Type mapKeyType = b.copy(parameter.getType());
+                // K key = mapEntry.getKey(); // <--- add this statement
+                final Type mapKeyType= b.copy(parameter.getType());
 
-                final VariableDeclarationStatement newKeyDeclaration = b.declareStmt(
-                        mapKeyType,
-                        b.move(parameter.getName()),
-                        b.invoke(entryVar.varName(), "getKey"));
+                final VariableDeclarationStatement newKeyDeclaration= b.declareStmt(mapKeyType,
+                        b.move(parameter.getName()), b.invoke(entryVar.varName(), "getKey"));
                 r.insertFirst(enhancedFor.getBody(), Block.STATEMENTS_PROPERTY, newKeyDeclaration);
             }
         }
@@ -317,52 +312,52 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
     }
 
     /**
-     * If possible, use the type declaration, so we can return the type as it was declared.
-     * Otherwise, let's use the type binding and output verbose fully qualified types.
+     * If possible, use the type declaration, so we can return the type as it was
+     * declared. Otherwise, let's use the type binding and output verbose fully
+     * qualified types.
      */
-    private Type createMapEntryType(
-            SingleVariableDeclaration parameter, MethodInvocation getValueMi, TypeNameDecider typeNameDecider) {
-        final String mapEntryType = typeNameDecider.useSimplestPossibleName("java.util.Map.Entry");
+    private Type createMapEntryType(SingleVariableDeclaration parameter, MethodInvocation getValueMi,
+            TypeNameDecider typeNameDecider) {
+        final String mapEntryType= typeNameDecider.useSimplestPossibleName("java.util.Map.Entry");
 
-        final ASTBuilder b = ctx.getASTBuilder();
-        final Type paramType = parameter.getType();
+        final ASTBuilder b= ctx.getASTBuilder();
+        final Type paramType= parameter.getType();
         final Type mapKeyType;
         if (paramType.isPrimitiveType()) {
             // Use the type binding (not as precise as what is in the code)
-            final ITypeBinding mapTypeBinding = getValueMi.getExpression().resolveTypeBinding();
-            final ITypeBinding keyTypeBinding = mapTypeBinding.getTypeArguments()[0];
-            mapKeyType = b.toType(keyTypeBinding, typeNameDecider);
+            final ITypeBinding mapTypeBinding= getValueMi.getExpression().resolveTypeBinding();
+            final ITypeBinding keyTypeBinding= mapTypeBinding.getTypeArguments()[0];
+            mapKeyType= b.toType(keyTypeBinding, typeNameDecider);
         } else {
             // Use the type as defined in the code
-            mapKeyType = b.move(paramType);
+            mapKeyType= b.move(paramType);
         }
-        final Type mapValueType = b.copyType(getValueMi, typeNameDecider);
+        final Type mapValueType= b.copyType(getValueMi, typeNameDecider);
         return b.genericType(mapEntryType, mapKeyType, mapValueType);
     }
 
     private boolean isKeySetMethod(Expression expr) {
-        return expr instanceof MethodInvocation
-            && isMethod((MethodInvocation) expr, "java.util.Map", "keySet");
+        return expr instanceof MethodInvocation && isMethod((MethodInvocation) expr, "java.util.Map", "keySet");
     }
 
-    private List<MethodInvocation> collectMapGetValueCalls(
-            Expression mapExpression, SingleVariableDeclaration parameter, Statement body) {
+    private List<MethodInvocation> collectMapGetValueCalls(Expression mapExpression,
+            SingleVariableDeclaration parameter, Statement body) {
         return new CollectMapGetCalls(mapExpression, parameter).collect(body);
     }
 
     /** Sanity check. */
     private boolean haveSameTypeBindings(Collection<? extends Expression> exprs) {
-        Iterator<? extends Expression> it = exprs.iterator();
+        Iterator<? extends Expression> it= exprs.iterator();
         if (!it.hasNext()) {
             // Not really expected
             return false;
         }
-        final ITypeBinding type0 = it.next().resolveTypeBinding();
+        final ITypeBinding type0= it.next().resolveTypeBinding();
         if (type0 == null) {
             return false;
         }
         while (it.hasNext()) {
-            final ITypeBinding typeN = it.next().resolveTypeBinding();
+            final ITypeBinding typeN= it.next().resolveTypeBinding();
             if (!areSameTypeBindings(type0, typeN)) {
                 return false;
             }
@@ -381,14 +376,14 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
     /** Special handling because of captures. */
     private boolean areSameParameterizedTypeBindings(final ITypeBinding type1, final ITypeBinding type2) {
         return type1.getErasure().equals(type2.getErasure())
-            && areSameTypeBindings(type1.getTypeArguments(), type2.getTypeArguments());
+                && areSameTypeBindings(type1.getTypeArguments(), type2.getTypeArguments());
     }
 
     private boolean areSameTypeBindings(ITypeBinding[] types1, ITypeBinding[] types2) {
         if (types1.length != types2.length) {
             return false;
         }
-        for (int i = 0; i < types1.length; i++) {
+        for (int i= 0; i < types1.length; i++) {
             if (!areSameTypeBindings(types1[i], types2[i])) {
                 return false;
             }
@@ -407,16 +402,16 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
     }
 
     /**
-     * Class to find {@code map.get(loopVariable)} constructs in the AST tree,
-     * and collect the type of the value, which is unknown until one is located.
+     * Class to find {@code map.get(loopVariable)} constructs in the AST tree, and
+     * collect the type of the value, which is unknown until one is located.
      */
     class CollectMapGetCalls extends CollectorVisitor<MethodInvocation> {
         private final Expression mapExpression;
         private final SingleVariableDeclaration forEachParameter;
 
         public CollectMapGetCalls(Expression mapExpression, SingleVariableDeclaration forEachParameter) {
-            this.mapExpression = mapExpression;
-            this.forEachParameter = forEachParameter;
+            this.mapExpression= mapExpression;
+            this.forEachParameter= forEachParameter;
         }
 
         @Override
@@ -435,8 +430,8 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
             } else if (expr1.getNodeType() != METHOD_INVOCATION || expr2.getNodeType() != METHOD_INVOCATION) {
                 return isSameVariable(expr1, expr2);
             } else {
-                final MethodInvocation mi1 = (MethodInvocation) expr1;
-                final MethodInvocation mi2 = (MethodInvocation) expr2;
+                final MethodInvocation mi1= (MethodInvocation) expr1;
+                final MethodInvocation mi2= (MethodInvocation) expr2;
                 return areBindingsEqual(mi1.resolveTypeBinding(), mi2.resolveTypeBinding())
                         && isSameReference(mi1.getExpression(), mi2.getExpression());
             }

@@ -41,16 +41,16 @@ public class Environment {
     /**
      * Builds an instance of this class.
      *
-     * @param eventLoop the event loop
-     * @param jobManager the job manager
-     * @param logger the logger
+     * @param eventLoop   the event loop
+     * @param jobManager  the job manager
+     * @param logger      the logger
      * @param preferences the preferences
      */
     public Environment(EventLoop eventLoop, JobManager jobManager, Logger logger, Preferences preferences) {
-        this.eventLoop = eventLoop;
-        this.jobManager = jobManager;
-        this.logger = logger;
-        this.preferences = preferences;
+        this.eventLoop= eventLoop;
+        this.jobManager= jobManager;
+        this.logger= logger;
+        this.preferences= preferences;
     }
 
     /**

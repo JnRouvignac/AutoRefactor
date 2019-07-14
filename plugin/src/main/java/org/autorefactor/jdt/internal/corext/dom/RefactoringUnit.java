@@ -36,11 +36,11 @@ public class RefactoringUnit {
      * RefactoringUnit.
      *
      * @param compilationUnit compilationUnit
-     * @param options options
+     * @param options         options
      */
     public RefactoringUnit(ICompilationUnit compilationUnit, JavaProjectOptions options) {
-        this.compilationUnit = compilationUnit;
-        this.options = options;
+        this.compilationUnit= compilationUnit;
+        this.options= options;
     }
 
     ICompilationUnit getCompilationUnit() {

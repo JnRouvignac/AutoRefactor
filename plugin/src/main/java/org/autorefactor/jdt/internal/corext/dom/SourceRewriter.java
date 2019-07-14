@@ -38,8 +38,8 @@ import org.eclipse.text.edits.TextEdit;
 
 /** Directly rewrites source code. */
 public class SourceRewriter {
-    private final Set<SourceLocation> removals = new LinkedHashSet<SourceLocation>();
-    private final Map<SourceLocation, String> replacements = new LinkedHashMap<SourceLocation, String>();
+    private final Set<SourceLocation> removals= new LinkedHashSet<SourceLocation>();
+    private final Map<SourceLocation, String> replacements= new LinkedHashMap<SourceLocation, String>();
 
     /**
      * Removes the provided source location from the source.
@@ -51,9 +51,10 @@ public class SourceRewriter {
     }
 
     /**
-     * Replaces the provided source location with the replacement string in the source.
+     * Replaces the provided source location with the replacement string in the
+     * source.
      *
-     * @param toReplace the source location to replace
+     * @param toReplace   the source location to replace
      * @param replacement the replacement string
      */
     public void replace(SourceLocation toReplace, String replacement) {
@@ -61,18 +62,19 @@ public class SourceRewriter {
     }
 
     /**
-     * Adds the edits contained in the current instance to the provided edits for the provided document.
+     * Adds the edits contained in the current instance to the provided edits for
+     * the provided document.
      *
      * @param document the document to edit
-     * @param edits where to add edits
+     * @param edits    where to add edits
      */
     public void addEdits(IDocument document, TextEdit edits) {
         for (SourceLocation loc : this.removals) {
             edits.addChild(new DeleteEdit(loc.getStartPosition(), loc.getLength()));
         }
         for (Entry<SourceLocation, String> entry : this.replacements.entrySet()) {
-            SourceLocation loc = entry.getKey();
-            String replacement = entry.getValue();
+            SourceLocation loc= entry.getKey();
+            String replacement= entry.getValue();
             edits.addChild(new ReplaceEdit(loc.getStartPosition(), loc.getLength(), replacement));
         }
     }

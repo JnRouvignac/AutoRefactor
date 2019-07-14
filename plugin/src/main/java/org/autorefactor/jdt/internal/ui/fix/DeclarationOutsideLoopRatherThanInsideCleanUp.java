@@ -83,53 +83,50 @@ public class DeclarationOutsideLoopRatherThanInsideCleanUp extends AbstractClean
 
     @Override
     public boolean visit(final Block node) {
-        final List<Statement> blockStmt = asList(node);
-        boolean result = VISIT_SUBTREE;
+        final List<Statement> blockStmt= asList(node);
+        boolean result= VISIT_SUBTREE;
 
         List<Statement> forStmts;
-        for (int i = 0; i < blockStmt.size(); i++) {
-            final Statement stmt = blockStmt.get(i);
-            final ForStatement forStatement = as(stmt, ForStatement.class);
-            final EnhancedForStatement enhancedForStatement = as(stmt, EnhancedForStatement.class);
-            final WhileStatement whileStatement = as(stmt, WhileStatement.class);
-            final DoStatement doStatement = as(stmt, DoStatement.class);
-            forStmts = null;
+        for (int i= 0; i < blockStmt.size(); i++) {
+            final Statement stmt= blockStmt.get(i);
+            final ForStatement forStatement= as(stmt, ForStatement.class);
+            final EnhancedForStatement enhancedForStatement= as(stmt, EnhancedForStatement.class);
+            final WhileStatement whileStatement= as(stmt, WhileStatement.class);
+            final DoStatement doStatement= as(stmt, DoStatement.class);
+            forStmts= null;
 
             if (forStatement != null) {
-                forStmts = asList(forStatement.getBody());
+                forStmts= asList(forStatement.getBody());
             } else if (enhancedForStatement != null) {
-                forStmts = asList(enhancedForStatement.getBody());
+                forStmts= asList(enhancedForStatement.getBody());
             } else if (whileStatement != null) {
-                forStmts = asList(whileStatement.getBody());
+                forStmts= asList(whileStatement.getBody());
             } else if (doStatement != null) {
-                forStmts = asList(doStatement.getBody());
+                forStmts= asList(doStatement.getBody());
             }
 
             if (forStmts != null) {
-                final Set<String> varNames = new HashSet<String>();
+                final Set<String> varNames= new HashSet<String>();
 
-                for (int j = 0; j < i; j++) {
+                for (int j= 0; j < i; j++) {
                     if (!(blockStmt.get(j) instanceof Block)) {
                         varNames.addAll(getLocalVariableIdentifiers(blockStmt.get(j), false));
                     }
                 }
-                for (int j = i + 1; j < blockStmt.size(); j++) {
+                for (int j= i + 1; j < blockStmt.size(); j++) {
                     varNames.addAll(getLocalVariableIdentifiers(blockStmt.get(j), true));
                 }
 
-                final List<VariableDeclarationStatement> candidates = new ArrayList<VariableDeclarationStatement>();
+                final List<VariableDeclarationStatement> candidates= new ArrayList<VariableDeclarationStatement>();
 
                 for (final Statement forStmt : forStmts) {
-                    final VariableDeclarationStatement decl = as(forStmt, VariableDeclarationStatement.class);
+                    final VariableDeclarationStatement decl= as(forStmt, VariableDeclarationStatement.class);
 
-                    if (decl != null
-                            && !isFinal(decl.getModifiers())
-                            && !hasAnnotation(decl.modifiers())
-                            && decl.fragments() != null
-                            && decl.fragments().size() == 1) {
-                        final VariableDeclarationFragment fragment = (VariableDeclarationFragment) decl
-                                .fragments().get(0);
-                        final String id = fragment.getName().getIdentifier();
+                    if (decl != null && !isFinal(decl.getModifiers()) && !hasAnnotation(decl.modifiers())
+                            && decl.fragments() != null && decl.fragments().size() == 1) {
+                        final VariableDeclarationFragment fragment= (VariableDeclarationFragment) decl.fragments()
+                                .get(0);
+                        final String id= fragment.getName().getIdentifier();
 
                         if (!varNames.contains(id)) {
                             candidates.add(decl);
@@ -138,12 +135,12 @@ public class DeclarationOutsideLoopRatherThanInsideCleanUp extends AbstractClean
                     }
                 }
 
-                final ASTBuilder b = this.ctx.getASTBuilder();
-                final Refactorings r = this.ctx.getRefactorings();
+                final ASTBuilder b= this.ctx.getASTBuilder();
+                final Refactorings r= this.ctx.getRefactorings();
 
                 for (final VariableDeclarationStatement candidate : candidates) {
                     moveDeclaration(b, r, stmt, candidate);
-                    result = DO_NOT_VISIT_SUBTREE;
+                    result= DO_NOT_VISIT_SUBTREE;
                 }
             }
         }
@@ -164,16 +161,14 @@ public class DeclarationOutsideLoopRatherThanInsideCleanUp extends AbstractClean
 
     private void moveDeclaration(final ASTBuilder b, final Refactorings r, final Statement stmt,
             final VariableDeclarationStatement varToMove) {
-        final VariableDeclarationFragment fragment = (VariableDeclarationFragment) varToMove.fragments()
-                .get(0);
+        final VariableDeclarationFragment fragment= (VariableDeclarationFragment) varToMove.fragments().get(0);
 
         if (fragment.getInitializer() != null) {
-            final Type copyOfType = b.copy(varToMove.getType());
-            final SimpleName name = fragment.getName();
-            r.insertBefore(b.declareStmt(copyOfType,
-                    b.declareFragment(b.copy(name))), stmt);
-            r.replace(varToMove, b.toStmt(b.assign(b.copy(name), Assignment.Operator.ASSIGN,
-                    b.copy(fragment.getInitializer()))));
+            final Type copyOfType= b.copy(varToMove.getType());
+            final SimpleName name= fragment.getName();
+            r.insertBefore(b.declareStmt(copyOfType, b.declareFragment(b.copy(name))), stmt);
+            r.replace(varToMove,
+                    b.toStmt(b.assign(b.copy(name), Assignment.Operator.ASSIGN, b.copy(fragment.getInitializer()))));
         } else {
             r.insertBefore(b.copy(varToMove), stmt);
             r.remove(varToMove);

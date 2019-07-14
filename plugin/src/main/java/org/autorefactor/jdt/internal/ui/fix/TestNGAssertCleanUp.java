@@ -93,7 +93,7 @@ public class TestNGAssertCleanUp extends AbstractUnitTestCleanUp {
     @Override
     public boolean visit(CompilationUnit node) {
         // new file: reset the value
-        canUseAssertNotEquals = false;
+        canUseAssertNotEquals= false;
         return super.visit(node);
     }
 
@@ -101,13 +101,13 @@ public class TestNGAssertCleanUp extends AbstractUnitTestCleanUp {
     public boolean visit(ImportDeclaration node) {
         if (!canUseAssertNotEquals) {
             // we have not found testng yet for this file, go on looking for it
-            canUseAssertNotEquals = canUseAssertNotEquals(node);
+            canUseAssertNotEquals= canUseAssertNotEquals(node);
         }
         return super.visit(node);
     }
 
     private boolean canUseAssertNotEquals(final ImportDeclaration node) {
-        final ITypeBinding typeBinding = resolveTypeBinding(node);
+        final ITypeBinding typeBinding= resolveTypeBinding(node);
         if (hasType(typeBinding, "org.testng.Assert")) {
             for (IMethodBinding mb : typeBinding.getDeclaredMethods()) {
                 if (mb.toString().contains("assertNotEquals")) {
@@ -124,7 +124,7 @@ public class TestNGAssertCleanUp extends AbstractUnitTestCleanUp {
     }
 
     private ITypeBinding resolveTypeBinding(final ImportDeclaration node) {
-        IBinding resolveBinding = node.resolveBinding();
+        IBinding resolveBinding= node.resolveBinding();
         if (resolveBinding instanceof ITypeBinding) {
             return (ITypeBinding) resolveBinding;
         } else if (resolveBinding instanceof IMethodBinding) {
@@ -135,7 +135,7 @@ public class TestNGAssertCleanUp extends AbstractUnitTestCleanUp {
 
     @Override
     public boolean visit(MethodInvocation node) {
-        final List<Expression> args = arguments(node);
+        final List<Expression> args= arguments(node);
         if (isMethod(node, "org.testng.Assert", "assertTrue", "boolean")) {
             return maybeRefactorStatement(node, node, true, args.get(0), null, false);
         } else if (isMethod(node, "org.testng.Assert", "assertTrue", "boolean", "java.lang.String")) {
@@ -166,9 +166,9 @@ public class TestNGAssertCleanUp extends AbstractUnitTestCleanUp {
 
     @Override
     public boolean visit(IfStatement node) {
-        final List<Statement> stmts = asList(node.getThenStatement());
+        final List<Statement> stmts= asList(node.getThenStatement());
         if (node.getElseStatement() == null && stmts.size() == 1) {
-            final MethodInvocation mi = asExpression(stmts.get(0), MethodInvocation.class);
+            final MethodInvocation mi= asExpression(stmts.get(0), MethodInvocation.class);
             if (isMethod(mi, "org.testng.Assert", "fail")) {
                 return maybeRefactorStatement(node, mi, false, node.getExpression(), null, true);
             } else if (isMethod(mi, "org.testng.Assert", "fail", "java.lang.String")) {
@@ -180,8 +180,8 @@ public class TestNGAssertCleanUp extends AbstractUnitTestCleanUp {
 
     @Override
     protected MethodInvocation invokeQualifiedMethod(final ASTBuilder b, final Expression copyOfExpr,
-            final String methodName,
-            final Expression copyOfActual, final Expression copyOfExpected, final Expression failureMessage) {
+            final String methodName, final Expression copyOfActual, final Expression copyOfExpected,
+            final Expression failureMessage) {
         if (failureMessage == null) {
             if (copyOfActual == null) {
                 return b.invoke(copyOfExpr, methodName);

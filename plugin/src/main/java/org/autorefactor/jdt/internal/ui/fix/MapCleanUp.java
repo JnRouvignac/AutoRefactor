@@ -89,7 +89,7 @@ public class MapCleanUp extends AbstractCleanUpRule {
 
     @Override
     public boolean visit(Block node) {
-        final NewAndPutAllMethodVisitor newAndPutAllMethodVisitor = new NewAndPutAllMethodVisitor(ctx, node);
+        final NewAndPutAllMethodVisitor newAndPutAllMethodVisitor= new NewAndPutAllMethodVisitor(ctx, node);
         node.accept(newAndPutAllMethodVisitor);
         return newAndPutAllMethodVisitor.getResult();
     }
@@ -101,20 +101,20 @@ public class MapCleanUp extends AbstractCleanUpRule {
 
         @Override
         public boolean visit(ExpressionStatement node) {
-            final MethodInvocation mi = asExpression(node, MethodInvocation.class);
+            final MethodInvocation mi= asExpression(node, MethodInvocation.class);
             if (isMethod(mi, "java.util.Map", "putAll", "java.util.Map")) {
-                final Expression arg0 = arg0(mi);
-                final Statement previousStmt = getPreviousSibling(node);
+                final Expression arg0= arg0(mi);
+                final Statement previousStmt= getPreviousSibling(node);
 
-                final Assignment as = asExpression(previousStmt, Assignment.class);
+                final Assignment as= asExpression(previousStmt, Assignment.class);
                 if (hasOperator(as, Assignment.Operator.ASSIGN)) {
-                    final Expression lhs = as.getLeftHandSide();
+                    final Expression lhs= as.getLeftHandSide();
                     if (lhs instanceof SimpleName && isSameLocalVariable(lhs, mi.getExpression())) {
                         return maybeReplaceInitializer(as.getRightHandSide(), arg0, node);
                     }
                 } else if (previousStmt instanceof VariableDeclarationStatement) {
-                    final VariableDeclarationFragment vdf = getUniqueFragment((VariableDeclarationStatement)
-                            previousStmt);
+                    final VariableDeclarationFragment vdf= getUniqueFragment(
+                            (VariableDeclarationStatement) previousStmt);
                     if (vdf != null && isSameLocalVariable(vdf, mi.getExpression())) {
                         return maybeReplaceInitializer(vdf.getInitializer(), arg0, node);
                     }
@@ -123,14 +123,12 @@ public class MapCleanUp extends AbstractCleanUpRule {
             return VISIT_SUBTREE;
         }
 
-        private boolean maybeReplaceInitializer(Expression nodeToReplace,
-                final Expression arg0, ExpressionStatement nodeToRemove) {
-            final ClassInstanceCreation cic = as(nodeToReplace, ClassInstanceCreation.class);
-            if (canReplaceInitializer(cic, arg0)
-                    && isCastCompatible(nodeToReplace, arg0)) {
-                final ASTBuilder b = ctx.getASTBuilder();
-                ctx.getRefactorings().replace(nodeToReplace,
-                        b.new0(b.copy(cic.getType()), b.copy(arg0)));
+        private boolean maybeReplaceInitializer(Expression nodeToReplace, final Expression arg0,
+                ExpressionStatement nodeToRemove) {
+            final ClassInstanceCreation cic= as(nodeToReplace, ClassInstanceCreation.class);
+            if (canReplaceInitializer(cic, arg0) && isCastCompatible(nodeToReplace, arg0)) {
+                final ASTBuilder b= ctx.getASTBuilder();
+                ctx.getRefactorings().replace(nodeToReplace, b.new0(b.copy(cic.getType()), b.copy(arg0)));
                 ctx.getRefactorings().remove(nodeToRemove);
                 setResult(DO_NOT_VISIT_SUBTREE);
                 return DO_NOT_VISIT_SUBTREE;
@@ -142,35 +140,27 @@ public class MapCleanUp extends AbstractCleanUpRule {
             if (cic == null) {
                 return false;
             }
-            final List<Expression> args = arguments(cic);
-            final boolean noArgsCtor = args.isEmpty();
-            final boolean mapCapacityCtor = isValidCapacityParameter(sourceMap, args);
-            return (noArgsCtor && hasType(cic,
-                    "java.util.concurrent.ConcurrentHashMap",
-                    "java.util.concurrent.ConcurrentSkipListMap",
-                    "java.util.Hashtable",
-                    "java.util.HashMap",
-                    "java.util.IdentityHashMap",
-                    "java.util.LinkedHashMap",
-                    "java.util.TreeMap",
-                    "java.util.WeakHashMap")) || (mapCapacityCtor && hasType(cic,
-                            "java.util.concurrent.ConcurrentHashMap",
-                            "java.util.Hashtable",
-                            "java.util.HashMap",
-                            "java.util.IdentityHashMap",
-                            "java.util.LinkedHashMap",
+            final List<Expression> args= arguments(cic);
+            final boolean noArgsCtor= args.isEmpty();
+            final boolean mapCapacityCtor= isValidCapacityParameter(sourceMap, args);
+            return (noArgsCtor && hasType(cic, "java.util.concurrent.ConcurrentHashMap",
+                    "java.util.concurrent.ConcurrentSkipListMap", "java.util.Hashtable", "java.util.HashMap",
+                    "java.util.IdentityHashMap", "java.util.LinkedHashMap", "java.util.TreeMap",
+                    "java.util.WeakHashMap"))
+                    || (mapCapacityCtor && hasType(cic, "java.util.concurrent.ConcurrentHashMap", "java.util.Hashtable",
+                            "java.util.HashMap", "java.util.IdentityHashMap", "java.util.LinkedHashMap",
                             "java.util.WeakHashMap"));
         }
 
         private boolean isValidCapacityParameter(Expression sourceMap, final List<Expression> args) {
             if (args.size() == 1 && isPrimitive(args.get(0), "int")) {
-                final Object constant = args.get(0).resolveConstantExpressionValue();
-                final MethodInvocation mi = as(args.get(0), MethodInvocation.class);
+                final Object constant= args.get(0).resolveConstantExpressionValue();
+                final MethodInvocation mi= as(args.get(0), MethodInvocation.class);
                 if (constant != null) {
                     return constant.equals(0);
-                } else  {
-                    return isMethod(mi, "java.util.Map", "size") && match(new ASTSemanticMatcher(),
-                            mi.getExpression(), sourceMap);
+                } else {
+                    return isMethod(mi, "java.util.Map", "size")
+                            && match(new ASTSemanticMatcher(), mi.getExpression(), sourceMap);
                 }
             }
             return false;

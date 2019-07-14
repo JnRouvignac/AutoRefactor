@@ -42,23 +42,17 @@ import org.eclipse.jdt.core.dom.MethodInvocation;
 
 /** See {@link #getDescription()} method. */
 public class ArrayListRatherThanLinkedListCleanUp extends AbstractClassSubstituteCleanUp {
-    private static final Map<String, String[]> CAN_BE_CASTED_TO = new HashMap<String, String[]>();
+    private static final Map<String, String[]> CAN_BE_CASTED_TO= new HashMap<String, String[]>();
 
     static {
-        CAN_BE_CASTED_TO.put("java.lang.Object", new String[]{"java.lang.Object"});
-        CAN_BE_CASTED_TO.put("java.lang.Cloneable", new String[]{"java.lang.Cloneable", "java.lang.Object"});
-        CAN_BE_CASTED_TO.put("java.io.Serializable",
-                new String[]{"java.io.Serializable", "java.lang.Object"});
-        CAN_BE_CASTED_TO.put("java.util.Collection", new String[]{"java.util.Collection", "java.lang.Object"});
-        CAN_BE_CASTED_TO.put("java.util.List", new String[]{"java.util.List", "java.lang.Object"});
-        CAN_BE_CASTED_TO.put("java.util.AbstractList",
-                new String[]{"java.util.AbstractList", "java.util.List", "java.lang.Object"});
-        CAN_BE_CASTED_TO.put("java.util.AbstractCollection",
-                new String[]{"java.util.AbstractCollection", "java.util.Collection", "java.lang.Object"});
-        CAN_BE_CASTED_TO.put("java.util.LinkedList",
-                new String[]{"java.util.LinkedList", "java.util.AbstractList", "java.util.List",
-                    "java.util.AbstractCollection", "java.util.Collection",
-                    "java.io.Serializable", "java.lang.Cloneable", "java.lang.Object"});
+        CAN_BE_CASTED_TO.put("java.lang.Object", new String[] { "java.lang.Object" });
+        CAN_BE_CASTED_TO.put("java.lang.Cloneable", new String[] { "java.lang.Cloneable", "java.lang.Object" });
+        CAN_BE_CASTED_TO.put("java.io.Serializable", new String[] { "java.io.Serializable", "java.lang.Object" });
+        CAN_BE_CASTED_TO.put("java.util.Collection", new String[] { "java.util.Collection", "java.lang.Object" });
+        CAN_BE_CASTED_TO.put("java.util.List", new String[] { "java.util.List", "java.lang.Object" });
+        CAN_BE_CASTED_TO.put("java.util.AbstractList", new String[] { "java.util.AbstractList", "java.util.List", "java.lang.Object" });
+        CAN_BE_CASTED_TO.put("java.util.AbstractCollection", new String[] { "java.util.AbstractCollection", "java.util.Collection", "java.lang.Object" });
+        CAN_BE_CASTED_TO.put("java.util.LinkedList", new String[] { "java.util.LinkedList", "java.util.AbstractList", "java.util.List", "java.util.AbstractCollection", "java.util.Collection", "java.io.Serializable", "java.lang.Cloneable", "java.lang.Object" });
     }
 
     /**
@@ -90,7 +84,7 @@ public class ArrayListRatherThanLinkedListCleanUp extends AbstractClassSubstitut
 
     @Override
     protected String[] getExistingClassCanonicalName() {
-        return new String[] {"java.util.LinkedList"};
+        return new String[] { "java.util.LinkedList" };
     }
 
     @Override
@@ -109,36 +103,30 @@ public class ArrayListRatherThanLinkedListCleanUp extends AbstractClassSubstitut
 
     @Override
     protected boolean canMethodBeRefactored(MethodInvocation mi, List<MethodInvocation> methodCallsToRefactor) {
-        final String argumentType = getArgumentType(mi);
+        final String argumentType= getArgumentType(mi);
         return isMethod(mi, "java.util.Collection", "add", "java.lang.Object")
                 || isMethod(mi, "java.util.Collection", "addAll", "java.util.Collection")
                 || isMethod(mi, "java.util.Collection", "clear")
                 || isMethod(mi, "java.util.Collection", "contains", "java.lang.Object")
                 || isMethod(mi, "java.util.Collection", "containsAll", "java.util.Collection")
                 || isMethod(mi, "java.lang.Object", "equals", "java.lang.Object")
-                || isMethod(mi, "java.util.List", "get", "int")
-                || isMethod(mi, "java.lang.Object", "hashCode")
+                || isMethod(mi, "java.util.List", "get", "int") || isMethod(mi, "java.lang.Object", "hashCode")
                 || isMethod(mi, "java.util.List", "indexOf", "java.lang.Object")
                 || isMethod(mi, "java.util.List", "lastIndexOf", "java.lang.Object")
                 || isMethod(mi, "java.util.Collection", "size")
                 || isMethod(mi, "java.util.List", "subList", "int", "int")
                 || isMethod(mi, "java.util.Collection", "toArray")
                 || isMethod(mi, "java.util.Collection", "toArray", argumentType + "[]")
-                || isMethod(mi, "java.util.Collection", "isEmpty")
-                || isMethod(mi, "java.lang.Object", "toString")
-                || isMethod(mi, "java.lang.Object", "finalize")
-                || isMethod(mi, "java.lang.Object", "notify")
-                || isMethod(mi, "java.lang.Object", "notifyAll")
-                || isMethod(mi, "java.lang.Object", "wait")
+                || isMethod(mi, "java.util.Collection", "isEmpty") || isMethod(mi, "java.lang.Object", "toString")
+                || isMethod(mi, "java.lang.Object", "finalize") || isMethod(mi, "java.lang.Object", "notify")
+                || isMethod(mi, "java.lang.Object", "notifyAll") || isMethod(mi, "java.lang.Object", "wait")
                 || isMethod(mi, "java.lang.Object", "wait", "long")
                 || isMethod(mi, "java.lang.Object", "wait", "long", "int");
     }
 
     @Override
-    protected boolean isTypeCompatible(final ITypeBinding variableType,
-            final ITypeBinding refType) {
-        return super.isTypeCompatible(variableType, refType)
-                || hasType(variableType,
-                           getOrDefault(CAN_BE_CASTED_TO, refType.getErasure().getQualifiedName(), new String[0]));
+    protected boolean isTypeCompatible(final ITypeBinding variableType, final ITypeBinding refType) {
+        return super.isTypeCompatible(variableType, refType) || hasType(variableType,
+                getOrDefault(CAN_BE_CASTED_TO, refType.getErasure().getQualifiedName(), new String[0]));
     }
 }

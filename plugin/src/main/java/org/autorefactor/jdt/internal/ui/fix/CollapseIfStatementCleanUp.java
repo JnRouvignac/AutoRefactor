@@ -70,7 +70,7 @@ public class CollapseIfStatementCleanUp extends AbstractCleanUpRule {
     @Override
     public boolean visit(IfStatement node) {
         if (node.getElseStatement() == null) {
-            final IfStatement is = as(node.getThenStatement(), IfStatement.class);
+            final IfStatement is= as(node.getThenStatement(), IfStatement.class);
             if (is != null) {
                 return replaceIfNoElseStatement(node, is);
             }
@@ -83,10 +83,8 @@ public class CollapseIfStatementCleanUp extends AbstractCleanUpRule {
             return VISIT_SUBTREE;
         }
 
-        final ASTBuilder b = this.ctx.getASTBuilder();
-        final InfixExpression ie = b.infixExpr(
-                parenthesizeOrExpr(b, outerIf.getExpression()),
-                CONDITIONAL_AND,
+        final ASTBuilder b= this.ctx.getASTBuilder();
+        final InfixExpression ie= b.infixExpr(parenthesizeOrExpr(b, outerIf.getExpression()), CONDITIONAL_AND,
                 parenthesizeOrExpr(b, innerIf.getExpression()));
         this.ctx.getRefactorings().replace(outerIf.getExpression(), ie);
         this.ctx.getRefactorings().replace(outerIf.getThenStatement(), b.copy(innerIf.getThenStatement()));
@@ -95,7 +93,7 @@ public class CollapseIfStatementCleanUp extends AbstractCleanUpRule {
 
     private Expression parenthesizeOrExpr(ASTBuilder b, Expression expr) {
         if (expr instanceof InfixExpression) {
-            final InfixExpression ie = (InfixExpression) expr;
+            final InfixExpression ie= (InfixExpression) expr;
             if (hasOperator(ie, CONDITIONAL_OR)) {
                 return b.parenthesize(b.copy(ie));
             }

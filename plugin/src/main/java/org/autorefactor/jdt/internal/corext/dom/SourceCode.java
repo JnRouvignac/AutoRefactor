@@ -45,15 +45,15 @@ public class SourceCode {
         /**
          * Builds an instance of this class.
          *
-         * @param lineText the text of this line
-         * @param offset the start position of this line in the source file
-         * @param length the length of this line
+         * @param lineText   the text of this line
+         * @param offset     the start position of this line in the source file
+         * @param length     the length of this line
          * @param sourceCode the enclosing source file
          */
         public Line(String lineText, int offset, int length, SourceCode sourceCode) {
             super(offset, length);
-            this.lineText = lineText;
-            this.sourceCode = sourceCode;
+            this.lineText= lineText;
+            this.sourceCode= sourceCode;
         }
 
         /**
@@ -67,45 +67,43 @@ public class SourceCode {
 
         @Override
         public String toString() {
-            final CompilationUnit astRoot = sourceCode.astRoot;
-            return "[(" + astRoot.getLineNumber(getStartPosition()) + ","
-                    + astRoot.getColumnNumber(getStartPosition()) + ")"
-                    + " => (" + astRoot.getLineNumber(getEndPosition())
-                    + "," + astRoot.getColumnNumber(getEndPosition()) + ")]";
+            final CompilationUnit astRoot= sourceCode.astRoot;
+            return "[(" + astRoot.getLineNumber(getStartPosition()) + "," + astRoot.getColumnNumber(getStartPosition())
+                    + ")" + " => (" + astRoot.getLineNumber(getEndPosition()) + ","
+                    + astRoot.getColumnNumber(getEndPosition()) + ")]";
         }
     }
 
     private final CompilationUnit astRoot;
     private final String text;
     private final ICompilationUnit compilationUnit;
-    private final List<Line> lines = new ArrayList<Line>();
+    private final List<Line> lines= new ArrayList<Line>();
 
     /**
      * Builds an instance of this class.
      *
-     * @param text the text of the source file.
-     * @param astRoot the AST root of the source file
+     * @param text            the text of the source file.
+     * @param astRoot         the AST root of the source file
      * @param compilationUnit the compilation unit of the source file
      */
-    public SourceCode(String text, CompilationUnit astRoot,
-            ICompilationUnit compilationUnit) {
-        this.astRoot = astRoot;
-        this.text = text;
-        this.compilationUnit = compilationUnit;
+    public SourceCode(String text, CompilationUnit astRoot, ICompilationUnit compilationUnit) {
+        this.astRoot= astRoot;
+        this.text= text;
+        this.compilationUnit= compilationUnit;
         computeLines();
     }
 
     private void computeLines() {
         try {
-            final String lineSeparator = this.compilationUnit.findRecommendedLineSeparator();
-            int fromIndex = 0;
-            Matcher matcher = Pattern.compile(".*?" + lineSeparator).matcher(this.text);
+            final String lineSeparator= this.compilationUnit.findRecommendedLineSeparator();
+            int fromIndex= 0;
+            Matcher matcher= Pattern.compile(".*?" + lineSeparator).matcher(this.text);
             while (fromIndex < this.text.length() && matcher.find(fromIndex)) {
-                String lineText = matcher.group();
-                int offset = this.text.indexOf(lineText, fromIndex);
-                int length = lineText.length();
+                String lineText= matcher.group();
+                int offset= this.text.indexOf(lineText, fromIndex);
+                int length= lineText.length();
                 this.lines.add(new Line(lineText, offset, length, this));
-                fromIndex += offset + length;
+                fromIndex+= offset + length;
             }
         } catch (JavaModelException e) {
             throw new UnhandledException(astRoot, e);

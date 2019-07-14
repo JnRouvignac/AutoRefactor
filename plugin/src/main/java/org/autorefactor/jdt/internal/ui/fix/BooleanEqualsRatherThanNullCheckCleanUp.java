@@ -80,34 +80,33 @@ public class BooleanEqualsRatherThanNullCheckCleanUp extends AbstractCleanUpRule
     @Override
     public boolean visit(InfixExpression node) {
         if (hasOperator(node, CONDITIONAL_AND, CONDITIONAL_OR)) {
-            final Expression leftOperand = node.getLeftOperand();
-            final Expression rightOperand = node.getRightOperand();
+            final Expression leftOperand= node.getLeftOperand();
+            final Expression rightOperand= node.getRightOperand();
 
-            final InfixExpression condition = as(leftOperand, InfixExpression.class);
-            final boolean isNullCheck = hasOperator(condition, EQUALS);
-            final boolean isAndExpr = hasOperator(node, CONDITIONAL_AND);
-            if (!node.hasExtendedOperands()
-                    && isNullCheck ^ isAndExpr && condition != null && hasOperator(condition, EQUALS, NOT_EQUALS)) {
-                Expression firstExpr = null;
+            final InfixExpression condition= as(leftOperand, InfixExpression.class);
+            final boolean isNullCheck= hasOperator(condition, EQUALS);
+            final boolean isAndExpr= hasOperator(node, CONDITIONAL_AND);
+            if (!node.hasExtendedOperands() && isNullCheck ^ isAndExpr && condition != null
+                    && hasOperator(condition, EQUALS, NOT_EQUALS)) {
+                Expression firstExpr= null;
                 if (isNullLiteral(condition.getLeftOperand())) {
-                    firstExpr = condition.getRightOperand();
+                    firstExpr= condition.getRightOperand();
                 } else if (isNullLiteral(condition.getRightOperand())) {
-                    firstExpr = condition.getLeftOperand();
+                    firstExpr= condition.getLeftOperand();
                 }
 
-                Expression secondExpr = null;
-                final PrefixExpression negateSecondExpr = as(rightOperand, PrefixExpression.class);
+                Expression secondExpr= null;
+                final PrefixExpression negateSecondExpr= as(rightOperand, PrefixExpression.class);
                 final boolean isPositiveExpr;
                 if (negateSecondExpr != null && hasOperator(negateSecondExpr, NOT)) {
-                    secondExpr = negateSecondExpr.getOperand();
-                    isPositiveExpr = false;
+                    secondExpr= negateSecondExpr.getOperand();
+                    isPositiveExpr= false;
                 } else {
-                    secondExpr = rightOperand;
-                    isPositiveExpr = true;
+                    secondExpr= rightOperand;
+                    isPositiveExpr= true;
                 }
 
-                if (firstExpr != null && hasType(firstExpr, "java.lang.Boolean")
-                        && isPassive(firstExpr)
+                if (firstExpr != null && hasType(firstExpr, "java.lang.Boolean") && isPassive(firstExpr)
                         && match(new ASTSemanticMatcher(), firstExpr, secondExpr)) {
                     replaceNullCheck(node, firstExpr, isNullCheck, isAndExpr, isPositiveExpr);
                     return DO_NOT_VISIT_SUBTREE;
@@ -119,19 +118,17 @@ public class BooleanEqualsRatherThanNullCheckCleanUp extends AbstractCleanUpRule
 
     private void replaceNullCheck(final InfixExpression node, final Expression firstExpr, final boolean isNullCheck,
             final boolean isAndExpr, final boolean isPositiveExpr) {
-        final ASTBuilder b = ctx.getASTBuilder();
+        final ASTBuilder b= ctx.getASTBuilder();
 
-        final Name booleanConstant = b.name("Boolean",
-                isAndExpr == isPositiveExpr ? "TRUE" : "FALSE");
-        final MethodInvocation equalsMethod = b.invoke(booleanConstant, "equals", b.copy(firstExpr));
+        final Name booleanConstant= b.name("Boolean", isAndExpr == isPositiveExpr ? "TRUE" : "FALSE");
+        final MethodInvocation equalsMethod= b.invoke(booleanConstant, "equals", b.copy(firstExpr));
 
-        Expression newExpr = null;
+        Expression newExpr= null;
         if (!isNullCheck || isAndExpr) {
-            newExpr = equalsMethod;
+            newExpr= equalsMethod;
         } else {
-            newExpr = b.not(equalsMethod);
+            newExpr= b.not(equalsMethod);
         }
-        ctx.getRefactorings().replace(node,
-                newExpr);
+        ctx.getRefactorings().replace(node, newExpr);
     }
 }

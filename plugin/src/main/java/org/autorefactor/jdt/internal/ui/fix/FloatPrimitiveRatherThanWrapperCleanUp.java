@@ -96,58 +96,44 @@ public class FloatPrimitiveRatherThanWrapperCleanUp extends AbstractPrimitiveRat
 
     @Override
     public List<InfixExpression.Operator> getInfixInSafeOperators() {
-        return Arrays.<InfixExpression.Operator>asList(InfixExpression.Operator.DIVIDE,
-                InfixExpression.Operator.MINUS,
-                InfixExpression.Operator.PLUS,
-                InfixExpression.Operator.REMAINDER,
-                InfixExpression.Operator.TIMES);
+        return Arrays.<InfixExpression.Operator>asList(InfixExpression.Operator.DIVIDE, InfixExpression.Operator.MINUS,
+                InfixExpression.Operator.PLUS, InfixExpression.Operator.REMAINDER, InfixExpression.Operator.TIMES);
     }
 
     @Override
     public List<PostfixExpression.Operator> getPostfixInSafeOperators() {
-        return Arrays.<PostfixExpression.Operator>asList(
-                PostfixExpression.Operator.INCREMENT,
+        return Arrays.<PostfixExpression.Operator>asList(PostfixExpression.Operator.INCREMENT,
                 PostfixExpression.Operator.DECREMENT);
     }
 
     @Override
     public List<PrefixExpression.Operator> getPrefixOutSafeOperators() {
         return Arrays.<PrefixExpression.Operator>asList(INCREMENT, PrefixExpression.Operator.MINUS, DECREMENT,
-                PrefixExpression.Operator.PLUS,
-                COMPLEMENT);
+                PrefixExpression.Operator.PLUS, COMPLEMENT);
     }
 
     @Override
     public List<InfixExpression.Operator> getInfixOutSafeOperators() {
         return Arrays.<InfixExpression.Operator>asList(InfixExpression.Operator.DIVIDE,
-                InfixExpression.Operator.GREATER,
-                InfixExpression.Operator.GREATER_EQUALS,
-                InfixExpression.Operator.LESS,
-                InfixExpression.Operator.LESS_EQUALS,
-                InfixExpression.Operator.MINUS,
-                InfixExpression.Operator.PLUS,
-                InfixExpression.Operator.REMAINDER,
-                InfixExpression.Operator.TIMES);
+                InfixExpression.Operator.GREATER, InfixExpression.Operator.GREATER_EQUALS,
+                InfixExpression.Operator.LESS, InfixExpression.Operator.LESS_EQUALS, InfixExpression.Operator.MINUS,
+                InfixExpression.Operator.PLUS, InfixExpression.Operator.REMAINDER, InfixExpression.Operator.TIMES);
     }
 
     @Override
     public List<PostfixExpression.Operator> getPostfixOutSafeOperators() {
-        return Arrays.<PostfixExpression.Operator>asList(
-                PostfixExpression.Operator.INCREMENT,
+        return Arrays.<PostfixExpression.Operator>asList(PostfixExpression.Operator.INCREMENT,
                 PostfixExpression.Operator.DECREMENT);
     }
 
     @Override
     public List<Assignment.Operator> getAssignmentOutSafeOperators() {
-        return Arrays.<Assignment.Operator>asList(PLUS_ASSIGN,
-                MINUS_ASSIGN,
-                TIMES_ASSIGN,
-                DIVIDE_ASSIGN,
+        return Arrays.<Assignment.Operator>asList(PLUS_ASSIGN, MINUS_ASSIGN, TIMES_ASSIGN, DIVIDE_ASSIGN,
                 REMAINDER_ASSIGN);
     }
 
     @Override
     public String[] getSafeInConstants() {
-        return new String[]{"MIN_VALUE", "MAX_VALUE"};
+        return new String[] { "MIN_VALUE", "MAX_VALUE" };
     }
 }

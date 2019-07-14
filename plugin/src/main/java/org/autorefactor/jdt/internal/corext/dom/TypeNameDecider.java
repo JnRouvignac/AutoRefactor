@@ -43,6 +43,7 @@ import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.ImportDeclaration;
 import org.eclipse.jdt.core.dom.Name;
 import org.eclipse.jdt.core.dom.VariableDeclaration;
+
 /** Helps decide on which type name to use. */
 public class TypeNameDecider {
     /** Strategy that resolves type bindings. */
@@ -68,8 +69,8 @@ public class TypeNameDecider {
         private final ITypeBinding anyTypeBinding;
 
         public ReflectionResolveTypeBindingStrategy(ASTNode parsedNode, ITypeBinding anyTypeBinding) {
-            this.parsedNode = parsedNode;
-            this.anyTypeBinding = anyTypeBinding;
+            this.parsedNode= parsedNode;
+            this.anyTypeBinding= anyTypeBinding;
         }
 
         /**
@@ -81,15 +82,15 @@ public class TypeNameDecider {
          */
         public ITypeBinding resolveTypeBinding(String fullyQualifiedName) {
             try {
-                final Object bindingResolver = getField(anyTypeBinding, "resolver");
-                final Object compilationUnitScope = getField(bindingResolver, "scope");
+                final Object bindingResolver= getField(anyTypeBinding, "resolver");
+                final Object compilationUnitScope= getField(bindingResolver, "scope");
 
-                final char[][] simpleNamesArray = toSimpleNamesArray(fullyQualifiedName);
-                final Method getType = compilationUnitScope.getClass().getMethod("getType", char[][].class, int.class);
-                final Object internalTypeBinding =
-                        invokeMethod(compilationUnitScope, getType, simpleNamesArray, simpleNamesArray.length);
+                final char[][] simpleNamesArray= toSimpleNamesArray(fullyQualifiedName);
+                final Method getType= compilationUnitScope.getClass().getMethod("getType", char[][].class, int.class);
+                final Object internalTypeBinding= invokeMethod(compilationUnitScope, getType, simpleNamesArray,
+                        simpleNamesArray.length);
 
-                final Method getTypeBinding = bindingResolver.getClass().getDeclaredMethod("getTypeBinding",
+                final Method getTypeBinding= bindingResolver.getClass().getDeclaredMethod("getTypeBinding",
                         internalTypeBinding.getClass().getSuperclass().getSuperclass());
                 return invokeMethod(bindingResolver, getTypeBinding, internalTypeBinding);
             } catch (Exception e) {
@@ -106,9 +107,8 @@ public class TypeNameDecider {
 
         @SuppressWarnings("unchecked")
         private <T> T getField(Object object, String fieldName)
-                throws IllegalAccessException, InvocationTargetException,
-                NoSuchFieldException {
-            final Field f = object.getClass().getDeclaredField(fieldName);
+                throws IllegalAccessException, InvocationTargetException, NoSuchFieldException {
+            final Field f= object.getClass().getDeclaredField(fieldName);
             f.setAccessible(true);
             return (T) f.get(object);
         }
@@ -119,33 +119,33 @@ public class TypeNameDecider {
     private final String packageName;
 
     /**
-     * Builds an instance, and extracts out of the provided node: a type binding and the types
-     * imported in the current compilation unit.
+     * Builds an instance, and extracts out of the provided node: a type binding and
+     * the types imported in the current compilation unit.
      *
      * @param parsedNode the node where to extract information from
      */
     public TypeNameDecider(final ASTNode parsedNode) {
-        this.resolveTypeBindingStrategy =
-                new ReflectionResolveTypeBindingStrategy(parsedNode, getAnyTypeBinding(parsedNode));
-        final ASTNode root = parsedNode.getRoot();
+        this.resolveTypeBindingStrategy= new ReflectionResolveTypeBindingStrategy(parsedNode,
+                getAnyTypeBinding(parsedNode));
+        final ASTNode root= parsedNode.getRoot();
         if (!(root instanceof CompilationUnit)) {
             throw new IllegalArgumentException(parsedNode, "Expected the root to be a CompilationUnit");
         }
-        final CompilationUnit cu = (CompilationUnit) root;
-        this.packageName = cu.getPackage().getName().getFullyQualifiedName();
-        this.importedTypes = getImportedTypes(cu);
+        final CompilationUnit cu= (CompilationUnit) root;
+        this.packageName= cu.getPackage().getName().getFullyQualifiedName();
+        this.importedTypes= getImportedTypes(cu);
     }
 
     /**
      * Builds an instance.
      *
      * @param resolveTypeBindingStrategy the strategy that resolves type bindings
-     * @param importedTypes the imported types
+     * @param importedTypes              the imported types
      */
     public TypeNameDecider(ResolveTypeBindingStrategy resolveTypeBindingStrategy, TreeSet<String> importedTypes) {
-        this.resolveTypeBindingStrategy = resolveTypeBindingStrategy;
-        this.packageName = "";
-        this.importedTypes = importedTypes;
+        this.resolveTypeBindingStrategy= resolveTypeBindingStrategy;
+        this.packageName= "";
+        this.importedTypes= importedTypes;
     }
 
     private ITypeBinding getAnyTypeBinding(final ASTNode parsedNode) {
@@ -159,17 +159,17 @@ public class TypeNameDecider {
     }
 
     private static TreeSet<String> getImportedTypes(CompilationUnit cu) {
-        final TreeSet<String> results = new TreeSet<String>();
+        final TreeSet<String> results= new TreeSet<String>();
         for (ImportDeclaration importDecl : imports(cu)) {
-            Name importName = importDecl.getName();
+            Name importName= importDecl.getName();
             results.add(importName.getFullyQualifiedName());
         }
         return results;
     }
 
     /**
-     * Returns the simplest possible name that should be used when referring to the provided fully
-     * qualifier type name.
+     * Returns the simplest possible name that should be used when referring to the
+     * provided fully qualifier type name.
      *
      * @param fullyQualifiedName the fully qualified name of the type
      * @return the simplest possible name to use when referring to the type
@@ -189,73 +189,69 @@ public class TypeNameDecider {
     }
 
     /**
-     * Returns the simplest possible name that should be used when referring to the provided type binding.
+     * Returns the simplest possible name that should be used when referring to the
+     * provided type binding.
      *
      * @param typeBinding the type binding
      * @return the simplest possible name to use when referring to the type
      */
     public String useSimplestPossibleName(ITypeBinding typeBinding) {
-        final String pkgName = typeBinding.getPackage().getName();
+        final String pkgName= typeBinding.getPackage().getName();
         if ("java.lang".equals(pkgName) || pkgName.equals(this.packageName)) {
             // TODO beware of name shadowing!
             return typeBinding.getName();
         }
 
-        final String fqn = typeBinding.getQualifiedName();
+        final String fqn= typeBinding.getQualifiedName();
         final String elementBefore;
         if (importedTypes.contains(fqn)) {
-            elementBefore = fqn;
+            elementBefore= fqn;
         } else {
-            final SortedSet<String> elementsBefore = importedTypes.headSet(fqn);
+            final SortedSet<String> elementsBefore= importedTypes.headSet(fqn);
             if (elementsBefore.isEmpty()) {
                 return fqn;
             }
-            elementBefore = elementsBefore.last();
+            elementBefore= elementsBefore.last();
         }
 
         if (elementBefore.equals(fqn)) {
-            int lastIdx = fqn.lastIndexOf('.');
+            int lastIdx= fqn.lastIndexOf('.');
             if (lastIdx != -1) {
                 return fqn.substring(lastIdx + 1);
             }
         }
 
-        final String[] names = fqn.split("\\.");
-        final String[] elementBeforeNames = elementBefore.split("\\.");
-        if (names.length < elementBeforeNames.length
-                || names.length - 1 > elementBeforeNames.length) {
+        final String[] names= fqn.split("\\.");
+        final String[] elementBeforeNames= elementBefore.split("\\.");
+        if (names.length < elementBeforeNames.length || names.length - 1 > elementBeforeNames.length) {
             return fqn;
         }
-        int i = 0;
+        int i= 0;
         for (; i < names.length && i < elementBeforeNames.length; i++) {
-            final String name = names[i];
-            final String elementBeforeName = elementBeforeNames[i];
+            final String name= names[i];
+            final String elementBeforeName= elementBeforeNames[i];
             if (!name.equals(elementBeforeName)) {
-                if ("*".equals(elementBeforeName)
-                        && i + 1 == elementBeforeNames.length) {
+                if ("*".equals(elementBeforeName) && i + 1 == elementBeforeNames.length) {
                     if (i + 1 == names.length) {
                         return name;
-                    } else if (i + 2 == names.length
-                            && typeBinding.getDeclaringClass() != null) {
+                    } else if (i + 2 == names.length && typeBinding.getDeclaringClass() != null) {
                         return names[i] + "." + names[i + 1];
                     }
                 }
                 return fqn;
             }
         }
-        if (i == elementBeforeNames.length
-                && names.length == i + 1
-                && typeBinding.getDeclaringClass() != null) {
+        if (i == elementBeforeNames.length && names.length == i + 1 && typeBinding.getDeclaringClass() != null) {
             return names[i - 1] + "." + names[i];
         }
         return fqn;
     }
 
     private static char[][] toSimpleNamesArray(String fullyQualifiedName) {
-        final String[] simpleNames = fullyQualifiedName.split("\\.");
-        final char[][] result = new char[simpleNames.length][];
-        for (int i = 0; i < simpleNames.length; i++) {
-            result[i] = simpleNames[i].toCharArray();
+        final String[] simpleNames= fullyQualifiedName.split("\\.");
+        final char[][] result= new char[simpleNames.length][];
+        for (int i= 0; i < simpleNames.length; i++) {
+            result[i]= simpleNames[i].toCharArray();
         }
         return result;
     }

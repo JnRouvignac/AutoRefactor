@@ -39,14 +39,14 @@ class TypeBindingStub implements ITypeBinding {
     private final TypeBindingStub declaringClass;
 
     TypeBindingStub(String fullyQualifiedName) {
-        this.fullyQualifiedName = fullyQualifiedName;
-        this.packageBinding = toPackage(fullyQualifiedName);
-        this.declaringClass = toDeclaringClass(fullyQualifiedName);
+        this.fullyQualifiedName= fullyQualifiedName;
+        this.packageBinding= toPackage(fullyQualifiedName);
+        this.declaringClass= toDeclaringClass(fullyQualifiedName);
     }
 
     public IPackageBinding toPackage(String fullyQualifiedName) {
-        final String[] names = fullyQualifiedName.split("\\.");
-        for (int i = 0; i < names.length; i++) {
+        final String[] names= fullyQualifiedName.split("\\.");
+        for (int i= 0; i < names.length; i++) {
             if (Character.isUpperCase(names[i].charAt(0))) {
                 return new PackageBindingStub(joinAsString(names, i, "."));
             }
@@ -55,19 +55,18 @@ class TypeBindingStub implements ITypeBinding {
     }
 
     public TypeBindingStub toDeclaringClass(String fullyQualifiedName) {
-        final String[] names = fullyQualifiedName.split("\\.");
-        int length = names.length;
-        if (Character.isUpperCase(names[length - 1].charAt(0))
-                && Character.isUpperCase(names[length - 2].charAt(0))) {
+        final String[] names= fullyQualifiedName.split("\\.");
+        int length= names.length;
+        if (Character.isUpperCase(names[length - 1].charAt(0)) && Character.isUpperCase(names[length - 2].charAt(0))) {
             return new TypeBindingStub(joinAsString(names, length - 1, "."));
         }
         return null;
     }
 
     private String joinAsString(String[] names, int limit, String separator) {
-        final StringBuilder sb = new StringBuilder();
+        final StringBuilder sb= new StringBuilder();
         sb.append(names[0]);
-        for (int i = 1; i < limit; i++) {
+        for (int i= 1; i < limit; i++) {
             sb.append(separator).append(names[i]);
         }
         return sb.toString();

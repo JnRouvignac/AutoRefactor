@@ -90,16 +90,14 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
 
     @Override
     public boolean visit(ClassInstanceCreation node) {
-        final ITypeBinding typeBinding = node.getType().resolveBinding();
-        if (hasType(typeBinding, "java.math.BigDecimal", "java.math.BigInteger")
-                && arguments(node).size() == 1) {
-            final Expression arg0 = arguments(node).get(0);
+        final ITypeBinding typeBinding= node.getType().resolveBinding();
+        if (hasType(typeBinding, "java.math.BigDecimal", "java.math.BigInteger") && arguments(node).size() == 1) {
+            final Expression arg0= arguments(node).get(0);
             if (arg0 instanceof NumberLiteral && hasType(typeBinding, "java.math.BigDecimal")) {
-                final String token = ((NumberLiteral) arg0).getToken().replaceFirst("[lLfFdD]$", "");
+                final String token= ((NumberLiteral) arg0).getToken().replaceFirst("[lLfFdD]$", "");
                 if (token.contains(".")) {
                     // Only instantiation from double, not from integer
-                    ctx.getRefactorings().replace(arg0,
-                            getStringLiteral(token));
+                    ctx.getRefactorings().replace(arg0, getStringLiteral(token));
                     return DO_NOT_VISIT_SUBTREE;
                 } else if (getJavaMinorVersion() < 5) {
                     return VISIT_SUBTREE;
@@ -110,15 +108,14 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
                 } else if (TEN_LONG_LITERAL_RE.matcher(token).matches()) {
                     return replaceWithQualifiedName(node, typeBinding, "TEN");
                 } else {
-                    ctx.getRefactorings().replace(node,
-                            getValueOf(typeBinding.getName(), token));
+                    ctx.getRefactorings().replace(node, getValueOf(typeBinding.getName(), token));
                     return DO_NOT_VISIT_SUBTREE;
                 }
             } else if (arg0 instanceof StringLiteral) {
                 if (getJavaMinorVersion() < 5) {
                     return VISIT_SUBTREE;
                 }
-                final String literalValue = ((StringLiteral) arg0).getLiteralValue().replaceFirst("[lLfFdD]$", "");
+                final String literalValue= ((StringLiteral) arg0).getLiteralValue().replaceFirst("[lLfFdD]$", "");
                 if (literalValue.matches("0+")) {
                     return replaceWithQualifiedName(node, typeBinding, "ZERO");
                 } else if (literalValue.matches("0+1")) {
@@ -126,8 +123,7 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
                 } else if (literalValue.matches("0+10")) {
                     return replaceWithQualifiedName(node, typeBinding, "TEN");
                 } else if (literalValue.matches("\\d+")) {
-                    this.ctx.getRefactorings().replace(node,
-                            getValueOf(typeBinding.getName(), literalValue));
+                    this.ctx.getRefactorings().replace(node, getValueOf(typeBinding.getName(), literalValue));
                     return DO_NOT_VISIT_SUBTREE;
                 }
             }
@@ -136,13 +132,12 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
     }
 
     private boolean replaceWithQualifiedName(ASTNode node, ITypeBinding typeBinding, String field) {
-        this.ctx.getRefactorings().replace(node,
-                this.ctx.getASTBuilder().name(typeBinding.getName(), field));
+        this.ctx.getRefactorings().replace(node, this.ctx.getASTBuilder().name(typeBinding.getName(), field));
         return DO_NOT_VISIT_SUBTREE;
     }
 
     private ASTNode getValueOf(String name, String numberLiteral) {
-        final ASTBuilder b = this.ctx.getASTBuilder();
+        final ASTBuilder b= this.ctx.getASTBuilder();
         return b.invoke(name, "valueOf", b.number(numberLiteral));
     }
 
@@ -152,7 +147,7 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
 
     @Override
     public boolean visit(PrefixExpression node) {
-        final MethodInvocation mi = as(node.getOperand(), MethodInvocation.class);
+        final MethodInvocation mi= as(node.getOperand(), MethodInvocation.class);
         if (NOT.equals(node.getOperator()) && mi != null) {
             return maybeReplaceEquals(false, node, mi);
         }
@@ -164,19 +159,16 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
         if (node.getExpression() == null) {
             return VISIT_SUBTREE;
         }
-        if (getJavaMinorVersion() >= 5
-                && (isMethod(node, "java.math.BigInteger", "valueOf", "long")
-                        || isMethod(node, "java.math.BigDecimal", "valueOf", "long")
-                        || isMethod(node, "java.math.BigDecimal", "valueOf", "double"))) {
-            final ITypeBinding typeBinding = node.getExpression().resolveTypeBinding();
-            final Expression arg0 = arg0(node);
+        if (getJavaMinorVersion() >= 5 && (isMethod(node, "java.math.BigInteger", "valueOf", "long")
+                || isMethod(node, "java.math.BigDecimal", "valueOf", "long")
+                || isMethod(node, "java.math.BigDecimal", "valueOf", "double"))) {
+            final ITypeBinding typeBinding= node.getExpression().resolveTypeBinding();
+            final Expression arg0= arg0(node);
             if (arg0 instanceof NumberLiteral) {
-                final String token = ((NumberLiteral) arg0).getToken().replaceFirst("[lLfFdD]$", "");
+                final String token= ((NumberLiteral) arg0).getToken().replaceFirst("[lLfFdD]$", "");
                 if (token.contains(".") && hasType(typeBinding, "java.math.BigDecimal")) {
                     this.ctx.getRefactorings().replace(node,
-                            getClassInstanceCreatorNode(
-                                    (Name) node.getExpression(),
-                                    token));
+                            getClassInstanceCreatorNode((Name) node.getExpression(), token));
                 } else if (ZERO_LONG_LITERAL_RE.matcher(token).matches()) {
                     replaceWithQualifiedName(node, typeBinding, "ZERO");
                 } else if (ONE_LONG_LITERAL_RE.matcher(token).matches()) {
@@ -198,11 +190,10 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
     private boolean maybeReplaceEquals(final boolean isPositive, final Expression node, final MethodInvocation mi) {
         if (isMethod(mi, "java.math.BigDecimal", "equals", "java.lang.Object")
                 || isMethod(mi, "java.math.BigInteger", "equals", "java.lang.Object")) {
-            final Expression arg0 = arg0(mi);
+            final Expression arg0= arg0(mi);
             if (hasType(arg0, "java.math.BigDecimal", "java.math.BigInteger")) {
                 if (isInStringAppend(mi.getParent())) {
-                    this.ctx.getRefactorings().replace(node,
-                            parenthesize(getCompareToNode(isPositive, mi)));
+                    this.ctx.getRefactorings().replace(node, parenthesize(getCompareToNode(isPositive, mi)));
                 } else {
                     this.ctx.getRefactorings().replace(node, getCompareToNode(isPositive, mi));
                 }
@@ -218,9 +209,8 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
 
     private boolean isInStringAppend(final ASTNode node) {
         if (node instanceof InfixExpression) {
-            final InfixExpression expr = (InfixExpression) node;
-            if (hasOperator(expr, PLUS)
-                    || hasType(expr.getLeftOperand(), "java.lang.String")
+            final InfixExpression expr= (InfixExpression) node;
+            if (hasOperator(expr, PLUS) || hasType(expr.getLeftOperand(), "java.lang.String")
                     || hasType(expr.getRightOperand(), "java.lang.String")) {
                 return true;
             }
@@ -229,14 +219,13 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
     }
 
     private ASTNode getClassInstanceCreatorNode(final Name className, final String numberLiteral) {
-        final ASTBuilder b = this.ctx.getASTBuilder();
+        final ASTBuilder b= this.ctx.getASTBuilder();
         return b.new0(className.getFullyQualifiedName(), b.string(numberLiteral));
     }
 
     private InfixExpression getCompareToNode(final boolean isPositive, final MethodInvocation node) {
-        final ASTBuilder b = this.ctx.getASTBuilder();
-        final MethodInvocation mi = b.invoke(
-                b.copy(node.getExpression()), "compareTo", b.copy(arg0(node)));
+        final ASTBuilder b= this.ctx.getASTBuilder();
+        final MethodInvocation mi= b.invoke(b.copy(node.getExpression()), "compareTo", b.copy(arg0(node)));
 
         return b.infixExpr(mi, isPositive ? EQUALS : NOT_EQUALS, b.int0(0));
     }

@@ -70,10 +70,9 @@ public class BooleanConstantRatherThanValueOfCleanUp extends AbstractCleanUpRule
     public boolean visit(MethodInvocation node) {
         if (isMethod(node, "java.lang.Boolean", "valueOf", "java.lang.String")
                 || isMethod(node, "java.lang.Boolean", "valueOf", "boolean")) {
-            final BooleanLiteral l = as(arguments(node), BooleanLiteral.class);
+            final BooleanLiteral l= as(arguments(node), BooleanLiteral.class);
             if (l != null) {
-                ctx.getRefactorings().replace(node,
-                        toFieldAccess(node, l.booleanValue()));
+                ctx.getRefactorings().replace(node, toFieldAccess(node, l.booleanValue()));
                 return DO_NOT_VISIT_SUBTREE;
             }
         }
@@ -81,8 +80,8 @@ public class BooleanConstantRatherThanValueOfCleanUp extends AbstractCleanUpRule
     }
 
     private FieldAccess toFieldAccess(final MethodInvocation node, final boolean booleanLiteral) {
-        final ASTBuilder b = ctx.getASTBuilder();
-        final FieldAccess fa = b.getAST().newFieldAccess();
+        final ASTBuilder b= ctx.getASTBuilder();
+        final FieldAccess fa= b.getAST().newFieldAccess();
         if (node.getExpression() instanceof Name) {
             fa.setExpression(b.copy(node.getExpression()));
         }

@@ -31,8 +31,7 @@ import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
 import org.eclipse.jdt.core.dom.SuperConstructorInvocation;
 
 /** See {@link #getDescription()} method. */
-public class RemoveEmptySuperConstrInvocationCleanUp extends
-        AbstractCleanUpRule {
+public class RemoveEmptySuperConstrInvocationCleanUp extends AbstractCleanUpRule {
     /**
      * Get the name.
      *
@@ -63,7 +62,7 @@ public class RemoveEmptySuperConstrInvocationCleanUp extends
     @Override
     public boolean visit(SuperConstructorInvocation node) {
         if (node.arguments().isEmpty()) {
-            // A replacement keeps  comments, contrary to remove
+            // A replacement keeps comments, contrary to remove
             ctx.getRefactorings().replace(node, null);
             return DO_NOT_VISIT_SUBTREE;
         }

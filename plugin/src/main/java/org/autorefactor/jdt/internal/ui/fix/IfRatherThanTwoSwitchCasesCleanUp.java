@@ -89,13 +89,13 @@ public class IfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRule {
         }
 
         public VarOccurrenceVisitor(final Set<String> localVarIds) {
-            this.localVarIds = localVarIds;
+            this.localVarIds= localVarIds;
         }
 
         @Override
         public boolean visit(final SimpleName aVariable) {
             if (localVarIds.contains(aVariable.getIdentifier())) {
-                varUsed = true;
+                varUsed= true;
                 return interruptVisit();
             }
             return VISIT_SUBTREE;
@@ -113,25 +113,25 @@ public class IfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRule {
             return VISIT_SUBTREE;
         }
 
-        final List<?> stmts = node.statements();
+        final List<?> stmts= node.statements();
 
         if (stmts.isEmpty()) {
             return VISIT_SUBTREE;
         }
 
-        final Set<String> previousVarIds = new HashSet<String>();
-        final Set<String> caseVarIds = new HashSet<String>();
-        final List<Pair<List<Expression>, List<Statement>>> switchStructure = newArrayList();
-        List<Expression> caseExprs = newArrayList();
-        List<Statement> caseStmts = newArrayList();
+        final Set<String> previousVarIds= new HashSet<String>();
+        final Set<String> caseVarIds= new HashSet<String>();
+        final List<Pair<List<Expression>, List<Statement>>> switchStructure= newArrayList();
+        List<Expression> caseExprs= newArrayList();
+        List<Statement> caseStmts= newArrayList();
 
-        boolean isPreviousStmtACase = true;
-        int caseNb = 0;
-        int caseIndexWithDefault = -1;
-        final ASTBuilder b = this.ctx.getASTBuilder();
+        boolean isPreviousStmtACase= true;
+        int caseNb= 0;
+        int caseIndexWithDefault= -1;
+        final ASTBuilder b= this.ctx.getASTBuilder();
 
         for (Object object : stmts) {
-            Statement stmt = (Statement) object;
+            Statement stmt= (Statement) object;
 
             if (stmt instanceof SwitchCase) {
                 if (!isPreviousStmtACase) {
@@ -145,19 +145,19 @@ public class IfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRule {
                     caseVarIds.clear();
 
                     switchStructure.add(Pair.<List<Expression>, List<Statement>>of(caseExprs, caseStmts));
-                    caseExprs = newArrayList();
-                    caseStmts = newArrayList();
+                    caseExprs= newArrayList();
+                    caseStmts= newArrayList();
                 }
 
                 if (((SwitchCase) stmt).isDefault()) {
-                    caseIndexWithDefault = caseNb;
+                    caseIndexWithDefault= caseNb;
                 } else {
                     caseExprs.add(((SwitchCase) stmt).getExpression());
                 }
 
-                isPreviousStmtACase = true;
+                isPreviousStmtACase= true;
             } else {
-                final VarOccurrenceVisitor varOccurrenceVisitor = new VarOccurrenceVisitor(previousVarIds);
+                final VarOccurrenceVisitor varOccurrenceVisitor= new VarOccurrenceVisitor(previousVarIds);
                 varOccurrenceVisitor.visitNode(stmt);
 
                 if (varOccurrenceVisitor.isVarUsed()) {
@@ -167,7 +167,7 @@ public class IfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRule {
                 caseVarIds.addAll(getLocalVariableIdentifiers(stmt, false));
                 caseStmts.add(stmt);
 
-                isPreviousStmtACase = false;
+                isPreviousStmtACase= false;
             }
         }
 
@@ -179,18 +179,18 @@ public class IfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRule {
         }
 
         if (caseIndexWithDefault != -1) {
-            Pair<List<Expression>, List<Statement>> caseWithDefault = switchStructure.remove(caseIndexWithDefault);
+            Pair<List<Expression>, List<Statement>> caseWithDefault= switchStructure.remove(caseIndexWithDefault);
             switchStructure.add(caseWithDefault);
         }
 
         for (final Pair<List<Expression>, List<Statement>> caseStructure : switchStructure) {
-            final Statement lastStmt = caseStructure.getSecond().get(caseStructure.getSecond().size() - 1);
+            final Statement lastStmt= caseStructure.getSecond().get(caseStructure.getSecond().size() - 1);
 
             if (!fallsThrough(lastStmt)) {
                 return VISIT_SUBTREE;
             }
 
-            final BreakStatement bs = as(lastStmt, BreakStatement.class);
+            final BreakStatement bs= as(lastStmt, BreakStatement.class);
 
             if (bs != null && bs.getLabel() == null) {
                 caseStructure.getSecond().remove(caseStructure.getSecond().size() - 1);
@@ -205,40 +205,40 @@ public class IfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRule {
     private void replaceSwitch(final SwitchStatement node,
             final List<Pair<List<Expression>, List<Statement>>> switchStructure, final int caseIndexWithDefault,
             final ASTBuilder b) {
-        final Refactorings r = this.ctx.getRefactorings();
+        final Refactorings r= this.ctx.getRefactorings();
 
-        final Expression discriminant = node.getExpression();
-        Statement currentBlock = null;
+        final Expression discriminant= node.getExpression();
+        Statement currentBlock= null;
 
-        for (int i = switchStructure.size() - 1; i >= 0; i--) {
-            final Pair<List<Expression>, List<Statement>> caseStructure = switchStructure.get(i);
+        for (int i= switchStructure.size() - 1; i >= 0; i--) {
+            final Pair<List<Expression>, List<Statement>> caseStructure= switchStructure.get(i);
 
             final Expression newCondition;
             if (caseStructure.getFirst().size() == 1) {
-                newCondition = buildEquality(b, discriminant, caseStructure.getFirst().get(0));
+                newCondition= buildEquality(b, discriminant, caseStructure.getFirst().get(0));
             } else {
-                final List<Expression> equalities = newArrayList();
+                final List<Expression> equalities= newArrayList();
 
                 for (Expression value : caseStructure.getFirst()) {
                     equalities.add(b.parenthesizeIfNeeded(buildEquality(b, discriminant, value)));
                 }
-                newCondition = b.infixExpr(InfixExpression.Operator.CONDITIONAL_OR, equalities);
+                newCondition= b.infixExpr(InfixExpression.Operator.CONDITIONAL_OR, equalities);
             }
 
-            final Statement[] copyOfStmts = new Statement[caseStructure.getSecond().size()];
+            final Statement[] copyOfStmts= new Statement[caseStructure.getSecond().size()];
 
-            for (int j = 0; j < caseStructure.getSecond().size(); j++) {
-                copyOfStmts[j] = b.copy(caseStructure.getSecond().get(j));
+            for (int j= 0; j < caseStructure.getSecond().size(); j++) {
+                copyOfStmts[j]= b.copy(caseStructure.getSecond().get(j));
             }
 
-            final Block newBlock = b.block(copyOfStmts);
+            final Block newBlock= b.block(copyOfStmts);
 
             if (currentBlock != null) {
-                currentBlock = b.if0(newCondition, newBlock, currentBlock);
+                currentBlock= b.if0(newCondition, newBlock, currentBlock);
             } else if (caseIndexWithDefault == -1) {
-                currentBlock = b.if0(newCondition, newBlock);
+                currentBlock= b.if0(newCondition, newBlock);
             } else {
-                currentBlock = newBlock;
+                currentBlock= newBlock;
             }
         }
 
@@ -250,12 +250,12 @@ public class IfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRule {
 
         if (hasType(value, "java.lang.String", "java.lang.Boolean", "java.lang.Byte", "java.lang.Character",
                 "java.lang.Double", "java.lang.Float", "java.lang.Integer", "java.lang.Long", "java.lang.Short")) {
-            equality = b.invoke(b.copy(value), "equals", b.copy(discriminant));
+            equality= b.invoke(b.copy(value), "equals", b.copy(discriminant));
         } else if (value.resolveTypeBinding() != null && value.resolveTypeBinding().isEnum()) {
-            equality = b.infixExpr(b.copy(discriminant), InfixExpression.Operator.EQUALS, b.getAST().newQualifiedName(
+            equality= b.infixExpr(b.copy(discriminant), InfixExpression.Operator.EQUALS, b.getAST().newQualifiedName(
                     b.name(value.resolveTypeBinding().getQualifiedName().split("\\.")), b.copy((SimpleName) value)));
         } else {
-            equality = b.infixExpr(b.parenthesizeIfNeeded(b.copy(discriminant)), InfixExpression.Operator.EQUALS,
+            equality= b.infixExpr(b.parenthesizeIfNeeded(b.copy(discriminant)), InfixExpression.Operator.EQUALS,
                     b.copy(value));
         }
 

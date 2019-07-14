@@ -78,7 +78,8 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 
 /**
- * Wizard page which allows the user to choose which refactorings to apply to the selected java elements.
+ * Wizard page which allows the user to choose which refactorings to apply to
+ * the selected java elements.
  */
 public class ChooseRefactoringWizardPage extends WizardPage {
     private final class CheckStateProvider implements ICheckStateProvider {
@@ -111,22 +112,22 @@ public class ChooseRefactoringWizardPage extends WizardPage {
         }
     }
 
-    private final HashMap<Object, Boolean> checkedState = new HashMap<Object, Boolean>();
+    private final HashMap<Object, Boolean> checkedState= new HashMap<Object, Boolean>();
     private Text filterText;
     private CheckboxTableViewer tableViewer;
     private Button selectAllVisibleCheckbox;
 
-    private final Styler defaultStyler = new Styler() {
+    private final Styler defaultStyler= new Styler() {
         @Override
         public void applyStyles(TextStyle textStyle) {
             // no specific style
         }
     };
 
-    private final Styler underlineStyler = new Styler() {
+    private final Styler underlineStyler= new Styler() {
         @Override
         public void applyStyles(TextStyle style) {
-            style.underline = true;
+            style.underline= true;
         }
     };
 
@@ -137,12 +138,14 @@ public class ChooseRefactoringWizardPage extends WizardPage {
     }
 
     /**
-     * Returns the refactorings (selected by the user) to apply to the selected elements.
+     * Returns the refactorings (selected by the user) to apply to the selected
+     * elements.
      *
-     * @return the refactorings (selected by the user) to apply to the selected elements
+     * @return the refactorings (selected by the user) to apply to the selected
+     *         elements
      */
     public List<RefactoringRule> getSelectedRefactorings() {
-        final ArrayList<RefactoringRule> results = new ArrayList<RefactoringRule>();
+        final ArrayList<RefactoringRule> results= new ArrayList<RefactoringRule>();
         for (Object o : tableViewer.getCheckedElements()) {
             results.add((RefactoringRule) o);
         }
@@ -168,7 +171,7 @@ public class ChooseRefactoringWizardPage extends WizardPage {
     }
 
     private void createFilterText(Composite parent) {
-        filterText = new Text(parent, BORDER | SWT.SINGLE);
+        filterText= new Text(parent, BORDER | SWT.SINGLE);
         filterText.setMessage("Type in to filter refactorings");
         filterText.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
 
@@ -182,12 +185,12 @@ public class ChooseRefactoringWizardPage extends WizardPage {
     }
 
     private void createSelectAllCheckbox(Composite parent) {
-        selectAllVisibleCheckbox = new Button(parent, CHECK);
+        selectAllVisibleCheckbox= new Button(parent, CHECK);
         selectAllVisibleCheckbox.setText("Toggle all the visible refactorings");
         selectAllVisibleCheckbox.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
-                final Object[] visibleElements = filter(tableViewer, tableViewer.getInput());
+                final Object[] visibleElements= filter(tableViewer, tableViewer.getInput());
                 for (Object element : visibleElements) {
                     setChecked(element, selectAllVisibleCheckbox.getSelection());
                 }
@@ -195,8 +198,8 @@ public class ChooseRefactoringWizardPage extends WizardPage {
 
             private Object[] filter(StructuredViewer viewer, Object input) {
                 try {
-                    final Class<StructuredViewer> clazz = StructuredViewer.class;
-                    Method m = clazz.getDeclaredMethod("filter", Object[].class);
+                    final Class<StructuredViewer> clazz= StructuredViewer.class;
+                    Method m= clazz.getDeclaredMethod("filter", Object[].class);
                     m.setAccessible(true);
                     return (Object[]) m.invoke(viewer, (Object) ((List<?>) input).toArray());
                 } catch (Exception e) {
@@ -212,46 +215,43 @@ public class ChooseRefactoringWizardPage extends WizardPage {
     }
 
     private void createRefactoringsTable(Composite parent) {
-        tableViewer = newCheckList(parent,
-                BORDER | H_SCROLL | CHECK | NO_FOCUS | HIDE_SELECTION);
+        tableViewer= newCheckList(parent, BORDER | H_SCROLL | CHECK | NO_FOCUS | HIDE_SELECTION);
         createColumns(tableViewer);
         tableViewer.setContentProvider(new ArrayContentProvider());
-        final List<RefactoringRule> refactorings = AllCleanUpRules.getAllCleanUpRules();
+        final List<RefactoringRule> refactorings= AllCleanUpRules.getAllCleanUpRules();
         tableViewer.setInput(refactorings);
         tableViewer.setCheckStateProvider(new CheckStateProvider(refactorings));
         tableViewer.setComparator(new ViewerComparator() {
             @Override
             public int compare(Viewer viewer, Object o1, Object o2) {
-                return ((RefactoringRule) o1).getName().compareTo(
-                        ((RefactoringRule) o2).getName());
+                return ((RefactoringRule) o1).getName().compareTo(((RefactoringRule) o2).getName());
             }
         });
         tableViewer.addFilter(new ViewerFilter() {
             @Override
             public boolean select(Viewer viewer, Object parentElement, Object refactoring) {
-                final String filter = filterText.getText().toLowerCase();
-                final RefactoringRule rule = (RefactoringRule) refactoring;
-                final String description = rule.getDescription().toLowerCase();
-                final String name = rule.getName().toLowerCase();
-                return description.contains(filter)
-                    || name.contains(filter);
+                final String filter= filterText.getText().toLowerCase();
+                final RefactoringRule rule= (RefactoringRule) refactoring;
+                final String description= rule.getDescription().toLowerCase();
+                final String name= rule.getName().toLowerCase();
+                return description.contains(filter) || name.contains(filter);
             }
         });
         ColumnViewerToolTipSupport.enableFor(tableViewer, ToolTip.NO_RECREATE);
         tableViewer.setLabelProvider(new StyledCellLabelProvider() {
             @Override
             public void update(ViewerCell cell) {
-                final String filter = filterText.getText().toLowerCase();
-                final String name = ((RefactoringRule) cell.getElement()).getName();
+                final String filter= filterText.getText().toLowerCase();
+                final String name= ((RefactoringRule) cell.getElement()).getName();
                 cell.setText(name);
                 cell.setStyleRanges(getStyleRanges(name, filter));
             }
 
             private StyleRange[] getStyleRanges(String text, String filter) {
-                final int matchIndex = text.toLowerCase().indexOf(filter);
-                final int matchLength = filter.length();
+                final int matchIndex= text.toLowerCase().indexOf(filter);
+                final int matchLength= filter.length();
                 if (matchIndex != -1 && matchLength != 0) {
-                    final StyledString styledString = new StyledString(text, defaultStyler);
+                    final StyledString styledString= new StyledString(text, defaultStyler);
                     styledString.setStyle(matchIndex, matchLength, underlineStyler);
                     return styledString.getStyleRanges();
                 }
@@ -260,7 +260,7 @@ public class ChooseRefactoringWizardPage extends WizardPage {
 
             @Override
             public String getToolTipText(Object refactoring) {
-                RefactoringRule refactoringRule = (RefactoringRule) refactoring;
+                RefactoringRule refactoringRule= (RefactoringRule) refactoring;
                 return refactoringRule.getDescription() + "\n\nWhy to do so:\n" + refactoringRule.getReason();
             }
 
@@ -270,40 +270,40 @@ public class ChooseRefactoringWizardPage extends WizardPage {
             }
         });
 
-        final Table table = tableViewer.getTable();
+        final Table table= tableViewer.getTable();
         table.setLinesVisible(false);
         table.addListener(SWT.EraseItem, new Listener() {
             public void handleEvent(Event event) {
                 if ((event.detail & SWT.SELECTED) != 0) {
-                    event.detail &= ~SWT.SELECTED;
+                    event.detail&= ~SWT.SELECTED;
                 }
             }
         });
         table.addListener(SWT.MouseDown, new Listener() {
             public void handleEvent(Event event) {
-                Point pt = new Point(event.x, event.y);
-                TableItem item = table.getItem(pt);
+                Point pt= new Point(event.x, event.y);
+                TableItem item= table.getItem(pt);
 
                 if (item == null) {
                     return;
                 }
 
-                int index = table.indexOf(item);
-                Object element = tableViewer.getElementAt(index);
+                int index= table.indexOf(item);
+                Object element= tableViewer.getElementAt(index);
                 tableViewer.setChecked(element, !tableViewer.getChecked(element));
             }
         });
         table.addListener(SWT.MouseDoubleClick, new Listener() {
             public void handleEvent(Event event) {
-                Point pt = new Point(event.x, event.y);
-                TableItem item = table.getItem(pt);
+                Point pt= new Point(event.x, event.y);
+                TableItem item= table.getItem(pt);
 
                 if (item == null) {
                     return;
                 }
 
-                int index = table.indexOf(item);
-                Object element = tableViewer.getElementAt(index);
+                int index= table.indexOf(item);
+                Object element= tableViewer.getElementAt(index);
                 tableViewer.setCheckedElements(new Object[] { element });
 
                 ChooseRefactoringWizardPage.this.getWizard().performFinish();
@@ -316,7 +316,7 @@ public class ChooseRefactoringWizardPage extends WizardPage {
     }
 
     private void createColumns(final TableViewer tableViewer) {
-        TableViewerColumn refactoringColumn = createTableViewerColumn(tableViewer);
+        TableViewerColumn refactoringColumn= createTableViewerColumn(tableViewer);
         refactoringColumn.setLabelProvider(new ColumnLabelProvider() {
             @Override
             public String getText(Object element) {
@@ -326,16 +326,16 @@ public class ChooseRefactoringWizardPage extends WizardPage {
     }
 
     private TableViewerColumn createTableViewerColumn(TableViewer tableViewer) {
-        final TableViewerColumn viewerColumn = new TableViewerColumn(tableViewer, SWT.NONE);
-        final TableColumn column = viewerColumn.getColumn();
+        final TableViewerColumn viewerColumn= new TableViewerColumn(tableViewer, SWT.NONE);
+        final TableColumn column= viewerColumn.getColumn();
         column.setResizable(true);
         column.setMoveable(true);
         return viewerColumn;
     }
 
     private void packColumns(final Table table) {
-        final int length = table.getColumns().length;
-        for (int i = 0; i < length; i++) {
+        final int length= table.getColumns().length;
+        for (int i= 0; i < length; i++) {
             table.getColumn(i).pack();
         }
     }

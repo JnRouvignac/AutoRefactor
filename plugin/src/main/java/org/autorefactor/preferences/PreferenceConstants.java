@@ -28,14 +28,10 @@ package org.autorefactor.preferences;
 /** Interface holding preference constants. */
 public enum PreferenceConstants {
     /** Preference that turns debug mode on or off. */
-    DEBUG_MODE_ON(
-            "debug_mode_on",
-            "Enable debug mode (for developers)",
-            Boolean.FALSE);
+    DEBUG_MODE_ON("debug_mode_on", "Enable debug mode (for developers)", Boolean.FALSE);
 
     /** TODO use this for preferences initialization. */
-    private static final String JDT_ALWAYS_USE_THIS_FOR_NON_STATIC_METHOD_ACCESS =
-            "cleanup.always_use_this_for_non_static_method_access";
+    private static final String JDT_ALWAYS_USE_THIS_FOR_NON_STATIC_METHOD_ACCESS= "cleanup.always_use_this_for_non_static_method_access";
 
     /** The preference name (not shown to the user). */
     private final String name;
@@ -47,15 +43,13 @@ public enum PreferenceConstants {
     /**
      * Builds an instance of this class.
      *
-     * @param name
-     *            the preference name
-     * @param description
-     *            the preference description
+     * @param name        the preference name
+     * @param description the preference description
      */
     PreferenceConstants(String name, String description, Object defaultValue) {
-        this.name = name;
-        this.description = description;
-        this.defaultValue = defaultValue;
+        this.name= name;
+        this.description= description;
+        this.defaultValue= defaultValue;
     }
 
     /**
@@ -69,8 +63,7 @@ public enum PreferenceConstants {
     }
 
     /**
-     * Returns the preference description. This description is displayed on the
-     * UI.
+     * Returns the preference description. This description is displayed on the UI.
      *
      * @return the preference description
      */
@@ -79,8 +72,8 @@ public enum PreferenceConstants {
     }
 
     /**
-     * Returns the preference name. The preference name must uniquely identify
-     * the preference in the AutoRefactor project.
+     * Returns the preference name. The preference name must uniquely identify the
+     * preference in the AutoRefactor project.
      *
      * @return the preference name
      */

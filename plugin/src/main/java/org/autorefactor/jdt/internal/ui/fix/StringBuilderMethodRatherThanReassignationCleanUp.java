@@ -71,15 +71,14 @@ public class StringBuilderMethodRatherThanReassignationCleanUp extends AbstractC
 
     @Override
     public boolean visit(Assignment node) {
-        final Expression targetVar = node.getLeftHandSide();
-        Expression var = node.getRightHandSide();
-        if (ASSIGN.equals(node.getOperator())
-                && hasType(targetVar, "java.lang.StringBuffer", "java.lang.StringBuilder")
+        final Expression targetVar= node.getLeftHandSide();
+        Expression var= node.getRightHandSide();
+        if (ASSIGN.equals(node.getOperator()) && hasType(targetVar, "java.lang.StringBuffer", "java.lang.StringBuilder")
                 && var instanceof MethodInvocation) {
-            var = getVar(var);
+            var= getVar(var);
 
             if (isSameVariable(targetVar, var)) {
-                final ASTBuilder b = this.ctx.getASTBuilder();
+                final ASTBuilder b= this.ctx.getASTBuilder();
                 ctx.getRefactorings().replace(node, b.copy(node.getRightHandSide()));
                 return DO_NOT_VISIT_SUBTREE;
             }
@@ -88,19 +87,12 @@ public class StringBuilderMethodRatherThanReassignationCleanUp extends AbstractC
     }
 
     private Expression getVar(final Expression var) {
-        final MethodInvocation mi = as(var, MethodInvocation.class);
+        final MethodInvocation mi= as(var, MethodInvocation.class);
         if (var instanceof Name) {
             return var;
-        } else if (mi != null
-                && hasType(mi.getExpression(), "java.lang.StringBuffer", "java.lang.StringBuilder")
-                && Arrays.asList(
-                        "append",
-                        "appendCodePoint",
-                        "delete",
-                        "deleteCharAt",
-                        "insert",
-                        "replace",
-                        "reverse").contains(mi.getName().getIdentifier())) {
+        } else if (mi != null && hasType(mi.getExpression(), "java.lang.StringBuffer", "java.lang.StringBuilder")
+                && Arrays.asList("append", "appendCodePoint", "delete", "deleteCharAt", "insert", "replace", "reverse")
+                        .contains(mi.getName().getIdentifier())) {
             return getVar(mi.getExpression());
         }
         return null;

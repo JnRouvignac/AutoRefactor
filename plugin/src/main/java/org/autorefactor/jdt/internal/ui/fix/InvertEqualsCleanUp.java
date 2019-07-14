@@ -39,7 +39,8 @@ import org.eclipse.jdt.core.dom.MethodInvocation;
 /**
  * See {@link #getDescription()} method.
  * <p>
- * TODO JNR use CFG and expression analysis to find extra information about expression nullness.
+ * TODO JNR use CFG and expression analysis to find extra information about
+ * expression nullness.
  * </p>
  */
 public class InvertEqualsCleanUp extends AbstractCleanUpRule {
@@ -75,12 +76,11 @@ public class InvertEqualsCleanUp extends AbstractCleanUpRule {
         if (node.getExpression() == null) {
             return VISIT_SUBTREE;
         }
-        boolean isEquals = isMethod(node, "java.lang.Object", "equals", "java.lang.Object");
-        boolean isStringEqualsIgnoreCase =
-                isMethod(node, "java.lang.String", "equalsIgnoreCase", "java.lang.String");
+        boolean isEquals= isMethod(node, "java.lang.Object", "equals", "java.lang.Object");
+        boolean isStringEqualsIgnoreCase= isMethod(node, "java.lang.String", "equalsIgnoreCase", "java.lang.String");
         if (isEquals || isStringEqualsIgnoreCase) {
-            final Expression expr = node.getExpression();
-            final Expression arg0 = arg0(node);
+            final Expression expr= node.getExpression();
+            final Expression arg0= arg0(node);
             if (!isConstant(expr) && isConstant(arg0) && !isPrimitive(arg0)) {
                 invertEqualsInvocation(node, isEquals, expr, arg0);
                 return DO_NOT_VISIT_SUBTREE;
@@ -91,9 +91,9 @@ public class InvertEqualsCleanUp extends AbstractCleanUpRule {
 
     private void invertEqualsInvocation(final MethodInvocation node, final boolean isEquals, final Expression expr,
             final Expression arg0) {
-        final ASTBuilder b = this.ctx.getASTBuilder();
+        final ASTBuilder b= this.ctx.getASTBuilder();
 
-        final String methodName = isEquals ? "equals" : "equalsIgnoreCase";
+        final String methodName= isEquals ? "equals" : "equalsIgnoreCase";
         this.ctx.getRefactorings().replace(node,
                 b.invoke(b.parenthesizeIfNeeded(b.copy(arg0)), methodName, b.copy(expr)));
     }

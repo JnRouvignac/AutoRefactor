@@ -76,15 +76,13 @@ public class EndOfMethodRatherThanReturnCleanUp extends AbstractCleanUpRule {
     }
 
     private boolean isLastStmt(final Statement node) {
-        final Statement nextStmt = ASTNodes.getNextStatement(node);
+        final Statement nextStmt= ASTNodes.getNextStatement(node);
 
         if (nextStmt == null) {
             if (node.getParent() instanceof MethodDeclaration) {
                 return true;
-            } else if (node.getParent() instanceof WhileStatement
-                    || node.getParent() instanceof DoStatement
-                    || node.getParent() instanceof ForStatement
-                    || node.getParent() instanceof EnhancedForStatement) {
+            } else if (node.getParent() instanceof WhileStatement || node.getParent() instanceof DoStatement
+                    || node.getParent() instanceof ForStatement || node.getParent() instanceof EnhancedForStatement) {
                 return false;
             } else if (node.getParent() instanceof Statement) {
                 return isLastStmt((Statement) node.getParent());

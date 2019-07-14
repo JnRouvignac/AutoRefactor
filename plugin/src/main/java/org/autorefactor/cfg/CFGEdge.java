@@ -40,17 +40,18 @@ public class CFGEdge {
     /**
      * Builds an instance of this class.
      *
-     * @param condition the decision condition that led to the creation of this edge.
+     * @param condition        the decision condition that led to the creation of
+     *                         this edge.
      * @param evaluationResult the condition evaluation result
-     * @param sourceBlock the source block
-     * @param targetBlock the target block
+     * @param sourceBlock      the source block
+     * @param targetBlock      the target block
      */
-    public CFGEdge(Expression condition, boolean evaluationResult,
-            CFGBasicBlock sourceBlock, CFGBasicBlock targetBlock) {
-        this.condition = condition;
-        this.evaluationResult = evaluationResult;
-        this.sourceBlock = sourceBlock;
-        this.targetBlock = targetBlock;
+    public CFGEdge(Expression condition, boolean evaluationResult, CFGBasicBlock sourceBlock,
+            CFGBasicBlock targetBlock) {
+        this.condition= condition;
+        this.evaluationResult= evaluationResult;
+        this.sourceBlock= sourceBlock;
+        this.targetBlock= targetBlock;
     }
 
     /**
@@ -91,7 +92,7 @@ public class CFGEdge {
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("EDGE[");
+        final StringBuilder sb= new StringBuilder("EDGE[");
         this.sourceBlock.appendDotNodeLabel(sb);
         sb.append(" -> ");
         this.targetBlock.appendDotNodeLabel(sb);
@@ -100,15 +101,12 @@ public class CFGEdge {
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result
-                + ((condition == null) ? 0 : condition.hashCode());
-        result = prime * result + (evaluationResult ? 1231 : 1237);
-        result = prime * result
-                + ((sourceBlock == null) ? 0 : sourceBlock.hashCode());
-        return prime * result
-                + ((targetBlock == null) ? 0 : targetBlock.hashCode());
+        final int prime= 31;
+        int result= 1;
+        result= prime * result + ((condition == null) ? 0 : condition.hashCode());
+        result= prime * result + (evaluationResult ? 1231 : 1237);
+        result= prime * result + ((sourceBlock == null) ? 0 : sourceBlock.hashCode());
+        return prime * result + ((targetBlock == null) ? 0 : targetBlock.hashCode());
     }
 
     @Override
@@ -119,10 +117,8 @@ public class CFGEdge {
         if (obj == null || getClass() != obj.getClass()) {
             return false;
         }
-        final CFGEdge other = (CFGEdge) obj;
-        return equal(condition, other.condition)
-                && equal(evaluationResult, other.evaluationResult)
-                && equal(sourceBlock, other.sourceBlock)
-                && equal(targetBlock, other.targetBlock);
+        final CFGEdge other= (CFGEdge) obj;
+        return equal(condition, other.condition) && equal(evaluationResult, other.evaluationResult)
+                && equal(sourceBlock, other.sourceBlock) && equal(targetBlock, other.targetBlock);
     }
 }

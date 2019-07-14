@@ -54,72 +54,65 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
-@RunWith(value = Parameterized.class)
+@RunWith(value= Parameterized.class)
 public class CFGBuilderTest {
     private String testName;
     private int methodDeclarationNb;
 
     public CFGBuilderTest(String testName, int methodDeclarationNb) {
-        this.testName = testName;
-        this.methodDeclarationNb = methodDeclarationNb;
+        this.testName= testName;
+        this.methodDeclarationNb= methodDeclarationNb;
     }
 
     @Override
     public String toString() {
-        return getClass().getSimpleName()
-                + "[" + testName + ", methodNb=" + methodDeclarationNb + "]";
+        return getClass().getSimpleName() + "[" + testName + ", methodNb=" + methodDeclarationNb + "]";
     }
 
-    @Parameters(name = "{index}: {0}")
+    @Parameters(name= "{index}: {0}")
     public static Collection<Object[]> data() {
-        return Arrays.asList(new Object[][] {
-                { "ForWithIfToEndLoopSample", 0 },
-                { "IfElseIfSample", 0 },
-                { "LabelsSample", 0 },
-                { "SwitchSample", 0 },
-                { "WhileLoopsSample", 2 },
-                { "TryCatchThrowSample", 0 },
-        });
+        return Arrays.asList(
+                new Object[][] { { "ForWithIfToEndLoopSample", 0 }, { "IfElseIfSample", 0 }, { "LabelsSample", 0 },
+                        { "SwitchSample", 0 }, { "WhileLoopsSample", 2 }, { "TryCatchThrowSample", 0 }, });
     }
 
     @Test
     public void testCFGBuilder() throws Exception {
-        final String sampleName = testName + ".java";
-        final File javaFile = new File("src/test/java/org/autorefactor/cfg", sampleName);
+        final String sampleName= testName + ".java";
+        final File javaFile= new File("src/test/java/org/autorefactor/cfg", sampleName);
         assertTrue(testName + ": sample in java file " + javaFile + " should exist", javaFile.exists());
-        final File dotFile = new File("src/test/resources/org/autorefactor/cfg", testName + ".dot");
+        final File dotFile= new File("src/test/resources/org/autorefactor/cfg", testName + ".dot");
         assertTrue(testName + ": sample out dot file " + dotFile + " should exist", dotFile.exists());
 
-        final String dotSource = readAll(dotFile).trim();
-        final String javaSource = readAll(javaFile);
+        final String dotSource= readAll(dotFile).trim();
+        final String javaSource= readAll(javaFile);
 
-        final IPackageFragment packageFragment = JavaCoreHelper.getPackageFragment("org.autorefactor.cfg");
-        final ICompilationUnit cu = packageFragment.createCompilationUnit(
-                sampleName, javaSource, true, null);
+        final IPackageFragment packageFragment= JavaCoreHelper.getPackageFragment("org.autorefactor.cfg");
+        final ICompilationUnit cu= packageFragment.createCompilationUnit(sampleName, javaSource, true, null);
         cu.getBuffer().setContents(javaSource);
         cu.save(null, true);
 
-        final JavaProjectOptions options = newJavaProjectOptions(Release.javaSE("1.8"), 4);
-        final ASTParser parser = ASTParser.newParser(AST.JLS8);
+        final JavaProjectOptions options= newJavaProjectOptions(Release.javaSE("1.8"), 4);
+        final ASTParser parser= ASTParser.newParser(AST.JLS8);
         autoRefactorHandlerResetParser(cu, parser, options);
 
-        final CompilationUnit astRoot = (CompilationUnit) parser.createAST(null);
-        final CFGBuilder builder = new CFGBuilder(javaSource, options);
-        final List<CFGBasicBlock> blocks = builder.buildCFG(astRoot);
+        final CompilationUnit astRoot= (CompilationUnit) parser.createAST(null);
+        final CFGBuilder builder= new CFGBuilder(javaSource, options);
+        final List<CFGBasicBlock> blocks= builder.buildCFG(astRoot);
 
-        final CFGBasicBlock block = blocks.get(methodDeclarationNb);
-        final String actual = new CFGDotPrinter().toDot(block).trim();
-        final File dotFileOut = new File("src/test/resources/org/autorefactor/cfg", testName + "_out.dot");
+        final CFGBasicBlock block= blocks.get(methodDeclarationNb);
+        final String actual= new CFGDotPrinter().toDot(block).trim();
+        final File dotFileOut= new File("src/test/resources/org/autorefactor/cfg", testName + "_out.dot");
         writeAll(dotFileOut, actual);
         assertEquals(testName + ": wrong output;", dotSource, actual);
     }
 
     private void writeAll(File file, String fileContent) throws Exception {
-        FileOutputStream os = null;
-        Writer writer = null;
+        FileOutputStream os= null;
+        Writer writer= null;
         try {
-            os = new FileOutputStream(file);
-            writer = new BufferedWriter(new OutputStreamWriter(os));
+            os= new FileOutputStream(file);
+            writer= new BufferedWriter(new OutputStreamWriter(os));
             writer.append(fileContent);
         } finally {
             if (writer != null) {
@@ -132,16 +125,16 @@ public class CFGBuilderTest {
     }
 
     private JavaProjectOptions newJavaProjectOptions(Release javaSERelease, int tabSize) {
-        JavaProjectOptionsImpl options = new JavaProjectOptionsImpl();
+        JavaProjectOptionsImpl options= new JavaProjectOptionsImpl();
         options.setJavaSERelease(javaSERelease);
         options.setTabSize(tabSize);
         return options;
     }
 
-    private void autoRefactorHandlerResetParser(ICompilationUnit cu, ASTParser parser,
-            JavaProjectOptions options) throws Exception {
-        final Method m = ApplyRefactoringsJob.class.getDeclaredMethod(
-                "resetParser", ICompilationUnit.class, ASTParser.class, JavaProjectOptions.class);
+    private void autoRefactorHandlerResetParser(ICompilationUnit cu, ASTParser parser, JavaProjectOptions options)
+            throws Exception {
+        final Method m= ApplyRefactoringsJob.class.getDeclaredMethod("resetParser", ICompilationUnit.class,
+                ASTParser.class, JavaProjectOptions.class);
         m.setAccessible(true);
         m.invoke(null, cu, parser, options);
     }

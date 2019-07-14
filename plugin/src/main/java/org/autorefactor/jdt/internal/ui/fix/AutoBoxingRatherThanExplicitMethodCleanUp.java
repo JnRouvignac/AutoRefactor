@@ -70,25 +70,24 @@ public class AutoBoxingRatherThanExplicitMethodCleanUp extends AbstractCleanUpRu
 
     @Override
     public boolean visit(MethodInvocation node) {
-        if ("valueOf".equals(node.getName().getIdentifier())
-                && node.getExpression() != null
+        if ("valueOf".equals(node.getName().getIdentifier()) && node.getExpression() != null
                 && getJavaMinorVersion() >= 5
                 && (isMethod(node, "java.lang.Boolean", "valueOf", "boolean")
-                || isMethod(node, "java.lang.Byte", "valueOf", "byte")
-                || isMethod(node, "java.lang.Character", "valueOf", "char")
-                || isMethod(node, "java.lang.Short", "valueOf", "short")
-                || isMethod(node, "java.lang.Integer", "valueOf", "int")
-                || isMethod(node, "java.lang.Long", "valueOf", "long")
-                || isMethod(node, "java.lang.Float", "valueOf", "float")
-                || isMethod(node, "java.lang.Double", "valueOf", "double"))) {
-            final ITypeBinding primitiveType = node.resolveMethodBinding().getParameterTypes()[0];
-            final ITypeBinding wrapperClass = node.resolveMethodBinding().getDeclaringClass();
+                        || isMethod(node, "java.lang.Byte", "valueOf", "byte")
+                        || isMethod(node, "java.lang.Character", "valueOf", "char")
+                        || isMethod(node, "java.lang.Short", "valueOf", "short")
+                        || isMethod(node, "java.lang.Integer", "valueOf", "int")
+                        || isMethod(node, "java.lang.Long", "valueOf", "long")
+                        || isMethod(node, "java.lang.Float", "valueOf", "float")
+                        || isMethod(node, "java.lang.Double", "valueOf", "double"))) {
+            final ITypeBinding primitiveType= node.resolveMethodBinding().getParameterTypes()[0];
+            final ITypeBinding wrapperClass= node.resolveMethodBinding().getDeclaringClass();
 
-            final ITypeBinding actualResultType = getDestinationType(node);
-            final ITypeBinding actualParameterType = arg0(node).resolveTypeBinding();
+            final ITypeBinding actualResultType= getDestinationType(node);
+            final ITypeBinding actualParameterType= arg0(node).resolveTypeBinding();
 
-            if ((actualResultType != null && (actualResultType.equals(primitiveType)
-                    || actualResultType.equals(wrapperClass)))
+            if ((actualResultType != null
+                    && (actualResultType.equals(primitiveType) || actualResultType.equals(wrapperClass)))
                     || (actualParameterType != null && actualParameterType.equals(wrapperClass))) {
                 useAutoBoxing(node, primitiveType, wrapperClass, actualParameterType, actualResultType);
                 return DO_NOT_VISIT_SUBTREE;
@@ -100,9 +99,9 @@ public class AutoBoxingRatherThanExplicitMethodCleanUp extends AbstractCleanUpRu
     private void useAutoBoxing(final MethodInvocation node, final ITypeBinding primitiveType,
             final ITypeBinding wrapperClass, final ITypeBinding actualParameterType,
             final ITypeBinding actualResultType) {
-        final ASTBuilder b = this.ctx.getASTBuilder();
-        if (primitiveType != null
-                && !primitiveType.equals(actualParameterType) && !primitiveType.equals(actualResultType)
+        final ASTBuilder b= this.ctx.getASTBuilder();
+        if (primitiveType != null && !primitiveType.equals(actualParameterType)
+                && !primitiveType.equals(actualResultType)
                 && (wrapperClass == null || !wrapperClass.equals(actualParameterType))) {
             this.ctx.getRefactorings().replace(node, b.cast(b.type(primitiveType.getName()), b.copy(arg0(node))));
         } else {

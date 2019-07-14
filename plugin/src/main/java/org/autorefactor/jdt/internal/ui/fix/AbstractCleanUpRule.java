@@ -38,8 +38,8 @@ import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.QualifiedName;
 
 /**
- * Abstract class to extend when writing refactoring rules as {@link ASTVisitor}s.
- * It centralizes useful features for refactoring rules.
+ * Abstract class to extend when writing refactoring rules as
+ * {@link ASTVisitor}s. It centralizes useful features for refactoring rules.
  */
 public abstract class AbstractCleanUpRule extends ASTVisitor implements JavaRefactoringRule {
 
@@ -49,7 +49,7 @@ public abstract class AbstractCleanUpRule extends ASTVisitor implements JavaRefa
         @Override
         public boolean visit(QualifiedName node) {
             if (node.getFullyQualifiedName().contains("lombok")) {
-                useLombok = true;
+                useLombok= true;
                 return interruptVisit();
             }
             return VISIT_SUBTREE;
@@ -103,13 +103,13 @@ public abstract class AbstractCleanUpRule extends ASTVisitor implements JavaRefa
      * @param ctx the refactoring context.
      */
     public void setRefactoringContext(RefactoringContext ctx) {
-        this.ctx = ctx;
+        this.ctx= ctx;
     }
 
     @Override
     public boolean preVisit2(ASTNode node) {
         if (node instanceof CompilationUnit) {
-            LombokVisitor lombokVisitor = new LombokVisitor();
+            LombokVisitor lombokVisitor= new LombokVisitor();
             lombokVisitor.visitNode(node);
 
             if (lombokVisitor.isUseLombok()) {

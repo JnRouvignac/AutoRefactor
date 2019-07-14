@@ -68,13 +68,11 @@ public class AddBracketsToControlStatementCleanUp extends AbstractCleanUpRule {
 
     @Override
     public boolean visit(IfStatement node) {
-        boolean result = VISIT_SUBTREE;
-        if (node.getThenStatement() != null
-                && !(node.getThenStatement() instanceof Block)) {
-            result = setBlock(node.getThenStatement());
+        boolean result= VISIT_SUBTREE;
+        if (node.getThenStatement() != null && !(node.getThenStatement() instanceof Block)) {
+            result= setBlock(node.getThenStatement());
         }
-        if (node.getElseStatement() != null
-                && !(node.getElseStatement() instanceof Block)
+        if (node.getElseStatement() != null && !(node.getElseStatement() instanceof Block)
                 && !(node.getElseStatement() instanceof IfStatement)) {
             return setBlock(node.getElseStatement()) || result;
         }
@@ -117,8 +115,8 @@ public class AddBracketsToControlStatementCleanUp extends AbstractCleanUpRule {
         if (statement == null) {
             return VISIT_SUBTREE;
         }
-        final ASTBuilder b = this.ctx.getASTBuilder();
-        final Block block = b.block(b.copy(statement));
+        final ASTBuilder b= this.ctx.getASTBuilder();
+        final Block block= b.block(b.copy(statement));
         block.accept(this);
         this.ctx.getRefactorings().replace(statement, block);
         return DO_NOT_VISIT_SUBTREE;

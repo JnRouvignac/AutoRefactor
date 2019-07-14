@@ -91,7 +91,7 @@ public class WorkspacePreferencePage extends PreferencePage implements IWorkbenc
 
     @Override
     protected Control createContents(Composite parent) {
-        final List<RefactoringRule> allRefactoringRules = AllCleanUpRules.getAllCleanUpRules();
+        final List<RefactoringRule> allRefactoringRules= AllCleanUpRules.getAllCleanUpRules();
         Collections.sort(allRefactoringRules, new Comparator<RefactoringRule>() {
             /**
              * Compare objects.
@@ -107,7 +107,7 @@ public class WorkspacePreferencePage extends PreferencePage implements IWorkbenc
 
         });
 
-        final Group ruleGroup = createControls(parent, allRefactoringRules);
+        final Group ruleGroup= createControls(parent, allRefactoringRules);
 
         initialize();
         invalidateToggleRules(ruleGroup);
@@ -117,21 +117,21 @@ public class WorkspacePreferencePage extends PreferencePage implements IWorkbenc
     }
 
     private Group createControls(final Composite parent, final List<RefactoringRule> allRefactoringRules) {
-        fieldEditorParent = new Composite(parent, SWT.FILL);
+        fieldEditorParent= new Composite(parent, SWT.FILL);
 
         initFields(allRefactoringRules);
 
-        final Group ruleGroup = new Group(fieldEditorParent, SWT.FILL);
+        final Group ruleGroup= new Group(fieldEditorParent, SWT.FILL);
         ruleGroup.setText("Rules by default");
 
         // All rule checkbox
-        toggleAllRules = new Button(ruleGroup, SWT.CHECK | SWT.LEFT);
+        toggleAllRules= new Button(ruleGroup, SWT.CHECK | SWT.LEFT);
         toggleAllRules.setFont(ruleGroup.getFont());
         toggleAllRules.setText("Toggle all the rules");
         toggleAllRules.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                boolean isSelected = WorkspacePreferencePage.this.toggleAllRules.getSelection();
+                boolean isSelected= WorkspacePreferencePage.this.toggleAllRules.getSelection();
                 for (BooleanFieldEditor rule : WorkspacePreferencePage.this.rules) {
                     ((Button) rule.getDescriptionControl(ruleGroup)).setSelection(isSelected);
                 }
@@ -139,13 +139,12 @@ public class WorkspacePreferencePage extends PreferencePage implements IWorkbenc
         });
 
         // Add a space
-        Composite spacer = new Composite(ruleGroup, SWT.NULL);
+        Composite spacer= new Composite(ruleGroup, SWT.NULL);
         spacer.setLayoutData(new GridData(0, 5));
 
-        rules = new ArrayList<BooleanFieldEditor>(allRefactoringRules.size());
+        rules= new ArrayList<BooleanFieldEditor>(allRefactoringRules.size());
         for (final RefactoringRule refactoringRule : allRefactoringRules) {
-            final BooleanFieldEditor booleanFieldEditor = new BooleanFieldEditor(
-                    getPropertyName(refactoringRule),
+            final BooleanFieldEditor booleanFieldEditor= new BooleanFieldEditor(getPropertyName(refactoringRule),
                     refactoringRule.getName(), SWT.WRAP, ruleGroup);
             booleanFieldEditor.getDescriptionControl(ruleGroup).setToolTipText(refactoringRule.getDescription());
             ((Button) booleanFieldEditor.getDescriptionControl(ruleGroup)).addSelectionListener(new SelectionAdapter() {
@@ -166,16 +165,15 @@ public class WorkspacePreferencePage extends PreferencePage implements IWorkbenc
      * @param allRefactoringRules allRefactoringRules
      */
     protected void initFields(final List<RefactoringRule> allRefactoringRules) {
-        fields = new ArrayList<FieldEditor>(1 + allRefactoringRules.size());
+        fields= new ArrayList<FieldEditor>(1 + allRefactoringRules.size());
 
-        fields.add(new BooleanFieldEditor(DEBUG_MODE_ON.getName(), DEBUG_MODE_ON.getDescription(),
-                fieldEditorParent));
+        fields.add(new BooleanFieldEditor(DEBUG_MODE_ON.getName(), DEBUG_MODE_ON.getDescription(), fieldEditorParent));
     }
 
     private void invalidateToggleRules(final Composite ruleGroup) {
-        boolean isAllRulesChecked = true;
+        boolean isAllRulesChecked= true;
         for (final BooleanFieldEditor rule : WorkspacePreferencePage.this.rules) {
-            isAllRulesChecked = ((Button) rule.getDescriptionControl(ruleGroup)).getSelection();
+            isAllRulesChecked= ((Button) rule.getDescriptionControl(ruleGroup)).getSelection();
             if (!isAllRulesChecked) {
                 break;
             }
@@ -196,14 +194,14 @@ public class WorkspacePreferencePage extends PreferencePage implements IWorkbenc
 
     /** Check the state. */
     protected void checkState() {
-        boolean valid = true;
-        invalidFieldEditor = null;
+        boolean valid= true;
+        invalidFieldEditor= null;
 
         if (fields != null) {
             for (final FieldEditor field : fields) {
-                valid = field.isValid();
+                valid= field.isValid();
                 if (!valid) {
-                    invalidFieldEditor = field;
+                    invalidFieldEditor= field;
                     break;
                 }
             }

@@ -76,7 +76,7 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
 
     @Override
     public boolean visit(Block node) {
-        final IfAndFollowingCodeVisitor ifAndFollowingCodeVisitor = new IfAndFollowingCodeVisitor(node);
+        final IfAndFollowingCodeVisitor ifAndFollowingCodeVisitor= new IfAndFollowingCodeVisitor(node);
         node.accept(ifAndFollowingCodeVisitor);
         return ifAndFollowingCodeVisitor.getResult();
     }
@@ -89,10 +89,10 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
         @Override
         public boolean visit(TryStatement node) {
             if (node.resources().isEmpty()) {
-                final List<Statement> tryStmts = asList(node.getBody());
+                final List<Statement> tryStmts= asList(node.getBody());
 
                 if (tryStmts.isEmpty()) {
-                    final List<Statement> finallyStmts = asList(node.getFinally());
+                    final List<Statement> finallyStmts= asList(node.getFinally());
 
                     if (!finallyStmts.isEmpty()) {
                         return maybeInlineBlock(node, node.getFinally());
@@ -108,13 +108,13 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
 
         @Override
         public boolean visit(IfStatement node) {
-            final Refactorings r = InlineCodeRatherThanPeremptoryConditionCleanUp.this.ctx.getRefactorings();
+            final Refactorings r= InlineCodeRatherThanPeremptoryConditionCleanUp.this.ctx.getRefactorings();
 
-            final Statement thenStmt = node.getThenStatement();
-            final Statement elseStmt = node.getElseStatement();
-            final Expression condition = node.getExpression();
+            final Statement thenStmt= node.getThenStatement();
+            final Statement elseStmt= node.getElseStatement();
+            final Expression condition= node.getExpression();
 
-            final Object constantCondition = peremptoryValue(condition);
+            final Object constantCondition= peremptoryValue(condition);
 
             if (Boolean.TRUE.equals(constantCondition)) {
                 return maybeInlineBlock(node, thenStmt);
@@ -137,9 +137,9 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
                 setResult(DO_NOT_VISIT_SUBTREE);
                 return DO_NOT_VISIT_SUBTREE;
             } else {
-                final Set<String> ifVariableNames = getLocalVariableIdentifiers(unconditionnalStatement, false);
+                final Set<String> ifVariableNames= getLocalVariableIdentifiers(unconditionnalStatement, false);
 
-                final Set<String> followingVariableNames = new HashSet<String>();
+                final Set<String> followingVariableNames= new HashSet<String>();
                 for (final Statement statement : getNextSiblings(node)) {
                     followingVariableNames.addAll(getLocalVariableIdentifiers(statement, true));
                 }
@@ -155,16 +155,15 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
     }
 
     private Object peremptoryValue(final Expression condition) {
-        final Object constantCondition = condition.resolveConstantExpressionValue();
+        final Object constantCondition= condition.resolveConstantExpressionValue();
 
         if (constantCondition != null) {
             return constantCondition;
         } else if (condition instanceof InfixExpression) {
-            InfixExpression ie = (InfixExpression) condition;
-            final ASTSemanticMatcher matcher = new ASTSemanticMatcher();
+            InfixExpression ie= (InfixExpression) condition;
+            final ASTSemanticMatcher matcher= new ASTSemanticMatcher();
 
-            if (hasOperator(ie, EQUALS, NOT_EQUALS)
-                    && isPassive(ie.getLeftOperand())) {
+            if (hasOperator(ie, EQUALS, NOT_EQUALS) && isPassive(ie.getLeftOperand())) {
                 if (match(matcher, ie.getLeftOperand(), ie.getRightOperand())) {
                     return EQUALS.equals(ie.getOperator());
                 }
@@ -179,8 +178,8 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
     }
 
     private void replaceBlockByPlainCode(final Statement sourceNode, final Statement unconditionnalStatement) {
-        final ASTBuilder b = this.ctx.getASTBuilder();
-        final Refactorings r = this.ctx.getRefactorings();
+        final ASTBuilder b= this.ctx.getASTBuilder();
+        final Refactorings r= this.ctx.getRefactorings();
 
         if (unconditionnalStatement instanceof Block && sourceNode.getParent() instanceof Block) {
             r.replace(sourceNode, b.copyRange(statements((Block) unconditionnalStatement)));

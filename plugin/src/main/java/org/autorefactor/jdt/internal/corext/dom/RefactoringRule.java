@@ -32,8 +32,8 @@ import org.eclipse.jdt.core.dom.CompilationUnit;
 /**
  * Interface that all refactoring rules must implement.
  * <p>
- * First, {@link #setRefactoringContext(RefactoringContext)} is called, then {@link #getRefactorings(CompilationUnit)}
- * is called next.
+ * First, {@link #setRefactoringContext(RefactoringContext)} is called, then
+ * {@link #getRefactorings(CompilationUnit)} is called next.
  */
 public interface RefactoringRule {
     /**
@@ -44,21 +44,24 @@ public interface RefactoringRule {
     String getName();
 
     /**
-     * Returns a description of the refactoring rule suitable for displaying to the user.
+     * Returns a description of the refactoring rule suitable for displaying to the
+     * user.
      *
      * @return the description
      */
     String getDescription();
 
     /**
-     * Returns the motivation of the refactoring rule suitable for displaying to the user.
+     * Returns the motivation of the refactoring rule suitable for displaying to the
+     * user.
      *
      * @return the motivation
      */
     String getReason();
 
     /**
-     * Returns all the refactorings determined for the provided compilation unit after analysis.
+     * Returns all the refactorings determined for the provided compilation unit
+     * after analysis.
      *
      * @param astRoot the compilation unit to refactor
      * @return all the determined refactorings
@@ -76,8 +79,8 @@ public interface RefactoringRule {
      * Returns whether the current refactoring is enabled by the preferences.
      *
      * @param preferences the preferences
-     * @return true if the current refactoring is enabled by the preferences,
-     *         false otherwise.
+     * @return true if the current refactoring is enabled by the preferences, false
+     *         otherwise.
      */
     boolean isEnabled(Preferences preferences);
 

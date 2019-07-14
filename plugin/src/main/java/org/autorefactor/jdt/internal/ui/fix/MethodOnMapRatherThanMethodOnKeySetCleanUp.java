@@ -67,9 +67,9 @@ public class MethodOnMapRatherThanMethodOnKeySetCleanUp extends AbstractCleanUpR
 
     @Override
     public boolean visit(MethodInvocation mi) {
-        Expression miExpr = mi.getExpression();
+        Expression miExpr= mi.getExpression();
         if (isKeySetMethod(miExpr)) {
-            final MethodInvocation mapKeySetMi = (MethodInvocation) miExpr;
+            final MethodInvocation mapKeySetMi= (MethodInvocation) miExpr;
             if (isMethod(mi, "java.util.Set", "clear")) {
                 return removeInvocationOfMapKeySet(mapKeySetMi, mi, "clear");
             }
@@ -80,7 +80,8 @@ public class MethodOnMapRatherThanMethodOnKeySetCleanUp extends AbstractCleanUpR
                 return removeInvocationOfMapKeySet(mapKeySetMi, mi, "isEmpty");
             }
             if (isMethod(mi, "java.util.Set", "remove", "java.lang.Object")
-                    // If parent is not an expression statement, the MethodInvocation must return a boolean.
+                    // If parent is not an expression statement, the MethodInvocation must return a
+                    // boolean.
                     // In that case, we cannot replace because `Map.removeKey(key) != null`
                     // is not strictly equivalent to `Map.keySet().remove(key)`
                     && mi.getParent().getNodeType() == EXPRESSION_STATEMENT) {
@@ -93,20 +94,15 @@ public class MethodOnMapRatherThanMethodOnKeySetCleanUp extends AbstractCleanUpR
         return VISIT_SUBTREE;
     }
 
-    private boolean removeInvocationOfMapKeySet(
-            MethodInvocation mapKeySetMi, MethodInvocation actualMi, String methodName) {
-        final ASTBuilder b = ctx.getASTBuilder();
-        ctx.getRefactorings().replace(
-            actualMi,
-            b.invoke(
-                b.copyExpression(mapKeySetMi),
-                methodName,
-                b.copyRange(arguments(actualMi))));
+    private boolean removeInvocationOfMapKeySet(MethodInvocation mapKeySetMi, MethodInvocation actualMi,
+            String methodName) {
+        final ASTBuilder b= ctx.getASTBuilder();
+        ctx.getRefactorings().replace(actualMi,
+                b.invoke(b.copyExpression(mapKeySetMi), methodName, b.copyRange(arguments(actualMi))));
         return DO_NOT_VISIT_SUBTREE;
     }
 
     private boolean isKeySetMethod(Expression expr) {
-        return expr instanceof MethodInvocation
-            && isMethod((MethodInvocation) expr, "java.util.Map", "keySet");
+        return expr instanceof MethodInvocation && isMethod((MethodInvocation) expr, "java.util.Map", "keySet");
     }
 }

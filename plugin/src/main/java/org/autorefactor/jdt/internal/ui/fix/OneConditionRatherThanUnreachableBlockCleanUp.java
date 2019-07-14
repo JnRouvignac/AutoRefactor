@@ -69,12 +69,11 @@ public class OneConditionRatherThanUnreachableBlockCleanUp extends AbstractClean
 
     @Override
     public boolean visit(IfStatement node) {
-        final IfStatement secondIf = as(node.getElseStatement(), IfStatement.class);
-        final ASTSemanticMatcher matcher = new ASTSemanticMatcher();
+        final IfStatement secondIf= as(node.getElseStatement(), IfStatement.class);
+        final ASTSemanticMatcher matcher= new ASTSemanticMatcher();
 
         if (!isExceptionExpected(node) && secondIf != null && isPassive(node.getExpression())
-                && isPassive(secondIf.getExpression())
-                && match(matcher, node.getExpression(), secondIf.getExpression())
+                && isPassive(secondIf.getExpression()) && match(matcher, node.getExpression(), secondIf.getExpression())
                 && ((secondIf.getElseStatement() == null) || !fallsThrough(node.getThenStatement())
                         || fallsThrough(secondIf.getThenStatement()) || !fallsThrough(secondIf.getElseStatement()))) {
             refactorCondition(secondIf);
@@ -86,8 +85,8 @@ public class OneConditionRatherThanUnreachableBlockCleanUp extends AbstractClean
     }
 
     private void refactorCondition(final IfStatement secondIf) {
-        final ASTBuilder b = this.ctx.getASTBuilder();
-        final Refactorings r = this.ctx.getRefactorings();
+        final ASTBuilder b= this.ctx.getASTBuilder();
+        final Refactorings r= this.ctx.getRefactorings();
 
         if (secondIf.getElseStatement() == null) {
             r.remove(secondIf);

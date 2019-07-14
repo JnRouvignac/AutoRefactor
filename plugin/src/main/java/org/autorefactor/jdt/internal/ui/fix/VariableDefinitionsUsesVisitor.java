@@ -50,11 +50,12 @@ import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 public final class VariableDefinitionsUsesVisitor extends ASTVisitor {
     private final IVariableBinding variableBinding;
     private final ASTNode scopeNode;
-    private final List<SimpleName> definitions = new ArrayList<SimpleName>();
-    private final List<SimpleName> uses = new ArrayList<SimpleName>();
+    private final List<SimpleName> definitions= new ArrayList<SimpleName>();
+    private final List<SimpleName> uses= new ArrayList<SimpleName>();
 
     /**
-     * Builds from a {@link VariableDeclaration} and infers the variable binding and the scope from it.
+     * Builds from a {@link VariableDeclaration} and infers the variable binding and
+     * the scope from it.
      *
      * @param variableDeclaration the variable declaration, cannot be {@code null}
      */
@@ -63,20 +64,21 @@ public final class VariableDefinitionsUsesVisitor extends ASTVisitor {
     }
 
     /**
-     * Builds with the variable binding to look for and the scope where to look for references.
+     * Builds with the variable binding to look for and the scope where to look for
+     * references.
      *
      * @param variableBinding the variable binding to find, cannot be {@code null}
-     * @param scopeNode the {@link ASTNode} which is the scope of the search
+     * @param scopeNode       the {@link ASTNode} which is the scope of the search
      */
     public VariableDefinitionsUsesVisitor(IVariableBinding variableBinding, ASTNode scopeNode) {
-        this.variableBinding = variableBinding;
-        this.scopeNode = scopeNode;
+        this.variableBinding= variableBinding;
+        this.scopeNode= scopeNode;
     }
 
     private static ASTNode getDeclaringScope(VariableDeclaration variableDeclaration) {
-        ASTNode node = variableDeclaration.getParent();
+        ASTNode node= variableDeclaration.getParent();
         while (isVariableDeclaration(node)) {
-            node = node.getParent();
+            node= node.getParent();
         }
         return node;
     }

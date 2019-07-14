@@ -69,12 +69,12 @@ public class LiteralRatherThanBooleanConstantCleanUp extends AbstractCleanUpRule
 
     @Override
     public boolean visit(QualifiedName node) {
-        final ASTNode parent = removeParentheses(node.getParent());
+        final ASTNode parent= removeParentheses(node.getParent());
         if (parent instanceof VariableDeclarationFragment) {
-            final ITypeBinding typeBinding = resolveTypeBinding((VariableDeclarationFragment) parent);
+            final ITypeBinding typeBinding= resolveTypeBinding((VariableDeclarationFragment) parent);
             return replaceBooleanObjectByPrimitive(node, typeBinding);
         } else if (parent instanceof Assignment) {
-            final ITypeBinding typeBinding = ((Assignment) parent).resolveTypeBinding();
+            final ITypeBinding typeBinding= ((Assignment) parent).resolveTypeBinding();
             return replaceBooleanObjectByPrimitive(node, typeBinding);
         }
         return VISIT_SUBTREE;
@@ -92,7 +92,7 @@ public class LiteralRatherThanBooleanConstantCleanUp extends AbstractCleanUpRule
     }
 
     private boolean replaceWithBooleanLiteral(final QualifiedName node, final boolean val) {
-        final BooleanLiteral booleanLiteral = this.ctx.getASTBuilder().boolean0(val);
+        final BooleanLiteral booleanLiteral= this.ctx.getASTBuilder().boolean0(val);
         this.ctx.getRefactorings().replace(node, booleanLiteral);
         return DO_NOT_VISIT_SUBTREE;
     }

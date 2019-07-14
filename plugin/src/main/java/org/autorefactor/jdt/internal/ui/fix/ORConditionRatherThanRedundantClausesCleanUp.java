@@ -74,10 +74,9 @@ public class ORConditionRatherThanRedundantClausesCleanUp extends AbstractCleanU
 
     @Override
     public boolean visit(InfixExpression node) {
-        if (isPassive(node) && hasOperator(node, CONDITIONAL_OR, OR)
-                && !node.hasExtendedOperands()) {
-            final Expression leftOperand = node.getLeftOperand();
-            final Expression rightOperand = node.getRightOperand();
+        if (isPassive(node) && hasOperator(node, CONDITIONAL_OR, OR) && !node.hasExtendedOperands()) {
+            final Expression leftOperand= node.getLeftOperand();
+            final Expression rightOperand= node.getRightOperand();
             return maybeRefactorCondition(node, node.getOperator(), leftOperand, rightOperand, true)
                     && maybeRefactorCondition(node, node.getOperator(), rightOperand, leftOperand, false);
         }
@@ -87,25 +86,21 @@ public class ORConditionRatherThanRedundantClausesCleanUp extends AbstractCleanU
 
     private boolean maybeRefactorCondition(final InfixExpression node, final Operator operator,
             final Expression operand1, final Expression operand2, final boolean forward) {
-        final InfixExpression complexCondition = as(operand1, InfixExpression.class);
+        final InfixExpression complexCondition= as(operand1, InfixExpression.class);
 
-        if (complexCondition != null
-                && !complexCondition.hasExtendedOperands()
+        if (complexCondition != null && !complexCondition.hasExtendedOperands()
                 && hasOperator(complexCondition, CONDITIONAL_AND, AND)) {
-            final ASTSemanticMatcher matcher = new ASTSemanticMatcher();
+            final ASTSemanticMatcher matcher= new ASTSemanticMatcher();
 
-            if (isPrimitive(complexCondition.getLeftOperand())
-                    && isPrimitive(complexCondition.getRightOperand())
+            if (isPrimitive(complexCondition.getLeftOperand()) && isPrimitive(complexCondition.getRightOperand())
                     && isPrimitive(operand2)) {
                 if (matcher.matchOpposite(complexCondition.getLeftOperand(), operand2)) {
-                    replaceDuplicateExpr(node, operator, complexCondition.getRightOperand(), operand2,
-                            forward);
+                    replaceDuplicateExpr(node, operator, complexCondition.getRightOperand(), operand2, forward);
                     return DO_NOT_VISIT_SUBTREE;
                 }
 
                 if (matcher.matchOpposite(complexCondition.getRightOperand(), operand2)) {
-                    replaceDuplicateExpr(node, operator, complexCondition.getLeftOperand(), operand2,
-                            forward);
+                    replaceDuplicateExpr(node, operator, complexCondition.getLeftOperand(), operand2, forward);
                     return DO_NOT_VISIT_SUBTREE;
                 }
             }
@@ -113,18 +108,14 @@ public class ORConditionRatherThanRedundantClausesCleanUp extends AbstractCleanU
         return VISIT_SUBTREE;
     }
 
-    private void replaceDuplicateExpr(final InfixExpression node, final Operator operator,
-            final Expression leftExpr,
-            final Expression rightExpr,
-            final boolean forward) {
-        final ASTBuilder b = ctx.getASTBuilder();
+    private void replaceDuplicateExpr(final InfixExpression node, final Operator operator, final Expression leftExpr,
+            final Expression rightExpr, final boolean forward) {
+        final ASTBuilder b= ctx.getASTBuilder();
 
         if (forward) {
-            ctx.getRefactorings().replace(node,
-                    b.infixExpr(b.copy(leftExpr), operator, b.copy(rightExpr)));
+            ctx.getRefactorings().replace(node, b.infixExpr(b.copy(leftExpr), operator, b.copy(rightExpr)));
         } else {
-            ctx.getRefactorings().replace(node,
-                    b.infixExpr(b.copy(rightExpr), operator, b.copy(leftExpr)));
+            ctx.getRefactorings().replace(node, b.infixExpr(b.copy(rightExpr), operator, b.copy(leftExpr)));
         }
     }
 }

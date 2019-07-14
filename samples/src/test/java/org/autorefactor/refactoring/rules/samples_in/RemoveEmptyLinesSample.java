@@ -83,10 +83,10 @@ public class RemoveEmptyLinesSample
     }
 
 
-    public void doNotRefactorTrailingWhitespaceAfterBraces() throws Exception { 
-        try { 
+    public void doNotRefactorTrailingWhitespaceAfterBraces() throws Exception {
+        try {
           System.out.println();
-        } catch (Exception e) { 
+        } catch (Exception e) {
         }
     }
 

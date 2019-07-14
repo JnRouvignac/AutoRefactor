@@ -67,24 +67,22 @@ public class StringValueOfRatherThanConcatCleanUp extends AbstractCleanUpRule {
 
     @Override
     public boolean visit(InfixExpression node) {
-        if (InfixExpression.Operator.PLUS.equals(node.getOperator())
-                && extendedOperands(node).isEmpty()) {
-            final Expression leftOperand = node.getLeftOperand();
-            final Expression rightOperand = node.getRightOperand();
+        if (InfixExpression.Operator.PLUS.equals(node.getOperator()) && extendedOperands(node).isEmpty()) {
+            final Expression leftOperand= node.getLeftOperand();
+            final Expression rightOperand= node.getRightOperand();
 
             return maybeReplaceStringConcatenation(node, leftOperand, rightOperand)
-                // if not replaced then try the other way round
-                && maybeReplaceStringConcatenation(node, rightOperand, leftOperand);
+                    // if not replaced then try the other way round
+                    && maybeReplaceStringConcatenation(node, rightOperand, leftOperand);
         }
         return VISIT_SUBTREE;
     }
 
-    private boolean maybeReplaceStringConcatenation(
-            final InfixExpression node, final Expression expr, final Expression variable) {
-        if (expr instanceof StringLiteral
-                && ((StringLiteral) expr).getLiteralValue().matches("")
+    private boolean maybeReplaceStringConcatenation(final InfixExpression node, final Expression expr,
+            final Expression variable) {
+        if (expr instanceof StringLiteral && ((StringLiteral) expr).getLiteralValue().matches("")
                 && !hasType(variable, "java.lang.String", "char[]")) {
-            final ASTBuilder b = this.ctx.getASTBuilder();
+            final ASTBuilder b= this.ctx.getASTBuilder();
             ctx.getRefactorings().replace(node, b.invoke("String", "valueOf", b.copy(variable)));
             return DO_NOT_VISIT_SUBTREE;
         }

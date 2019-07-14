@@ -95,9 +95,8 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
 
     @Override
     public boolean visit(CastExpression node) {
-        final NumberLiteral literal = as(node.getExpression(), NumberLiteral.class);
-        if (literal != null
-                && (literal.getToken().matches(".*[^lLdDfF]") || literal.getToken().matches("0x.*[^lL]"))) {
+        final NumberLiteral literal= as(node.getExpression(), NumberLiteral.class);
+        if (literal != null && (literal.getToken().matches(".*[^lLdDfF]") || literal.getToken().matches("0x.*[^lL]"))) {
             if (hasType(node.getType().resolveBinding(), "long")) {
                 createPrimitive(node, literal, 'L');
                 return DO_NOT_VISIT_SUBTREE;
@@ -115,7 +114,7 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
         }
 
         if (canRemoveCast(node)) {
-            final ASTBuilder b = ctx.getASTBuilder();
+            final ASTBuilder b= ctx.getASTBuilder();
             ctx.getRefactorings().replace(node, b.move(node.getExpression()));
             return DO_NOT_VISIT_SUBTREE;
         }
@@ -123,47 +122,45 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
     }
 
     private void createPrimitive(final CastExpression node, final NumberLiteral literal, final char postfix) {
-        final ASTBuilder b = this.ctx.getASTBuilder();
+        final ASTBuilder b= this.ctx.getASTBuilder();
 
-        final NumberLiteral numberLiteral = b.numberLiteral();
+        final NumberLiteral numberLiteral= b.numberLiteral();
         numberLiteral.setToken(literal.getToken() + postfix);
 
         ctx.getRefactorings().replace(node, numberLiteral);
     }
 
     private boolean canRemoveCast(CastExpression node) {
-        final ASTNode parent = node.getParent();
+        final ASTNode parent= node.getParent();
         switch (parent.getNodeType()) {
         case RETURN_STATEMENT:
-            final MethodDeclaration md = getAncestor(parent, MethodDeclaration.class);
+            final MethodDeclaration md= getAncestor(parent, MethodDeclaration.class);
             return isAssignmentCompatible(node.getExpression(), md.getReturnType2())
                     || isConstantExpressionAssignmentConversion(node);
 
         case ASSIGNMENT:
-            final Assignment as = (Assignment) parent;
-            return isAssignmentCompatible(node.getExpression(), as)
-                    || isConstantExpressionAssignmentConversion(node);
+            final Assignment as= (Assignment) parent;
+            return isAssignmentCompatible(node.getExpression(), as) || isConstantExpressionAssignmentConversion(node);
 
         case VARIABLE_DECLARATION_FRAGMENT:
-            final VariableDeclarationFragment vdf = (VariableDeclarationFragment) parent;
+            final VariableDeclarationFragment vdf= (VariableDeclarationFragment) parent;
             return isAssignmentCompatible(node.getExpression(), resolveTypeBinding(vdf))
                     || isConstantExpressionAssignmentConversion(node);
 
         case INFIX_EXPRESSION:
             if (!isPrimitiveTypeNarrowing(node)) {
-                final InfixExpression ie = (InfixExpression) parent;
-                final Expression lo = ie.getLeftOperand();
-                final Expression ro = ie.getRightOperand();
+                final InfixExpression ie= (InfixExpression) parent;
+                final Expression lo= ie.getLeftOperand();
+                final Expression ro= ie.getRightOperand();
 
                 if (node.equals(lo)) {
                     return (isStringConcat(ie) || isAssignmentCompatible(node.getExpression(), ro))
                             && !hasOperator(ie, DIVIDE, PLUS, MINUS);
                 } else {
-                    final boolean integralDivision = isIntegralDivision(ie);
+                    final boolean integralDivision= isIntegralDivision(ie);
                     return ((isNotRefactored(lo) && isStringConcat(ie))
-                            || (integralDivision
-                                    ? canRemoveCastInIntegralDivision(node, ie)
-                                            : isAssignmentCompatibleInInfixExpression(node, ie)))
+                            || (integralDivision ? canRemoveCastInIntegralDivision(node, ie)
+                                    : isAssignmentCompatibleInInfixExpression(node, ie)))
                             && !isIntegralDividedByFloatingPoint(node, ie);
                 }
             }
@@ -172,7 +169,7 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
     }
 
     private boolean canRemoveCastInIntegralDivision(CastExpression node, InfixExpression ie) {
-        final ITypeBinding leftOperandType = getLeftOperandType(ie, node);
+        final ITypeBinding leftOperandType= getLeftOperandType(ie, node);
         return isIntegralDivision(ie) // safety check
                 && isAssignmentCompatible(node.getExpression().resolveTypeBinding(), leftOperandType)
                 && compareTo(node.resolveTypeBinding(), leftOperandType) >= 0;
@@ -183,14 +180,14 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
     }
 
     private boolean isAssignmentCompatibleInInfixExpression(final CastExpression node, final InfixExpression ie) {
-        final ITypeBinding leftOpType = getLeftOperandType(ie, node);
+        final ITypeBinding leftOpType= getLeftOperandType(ie, node);
         return isAssignmentCompatible(node.getExpression().resolveTypeBinding(), leftOpType)
                 && isAssignmentCompatible(node.resolveTypeBinding(), leftOpType);
     }
 
     private ITypeBinding getLeftOperandType(InfixExpression ie, CastExpression node) {
-        final List<Expression> operands = allOperands(ie);
-        final List<Expression> previousOperands = operands.subList(0, operands.indexOf(node));
+        final List<Expression> operands= allOperands(ie);
+        final List<Expression> previousOperands= operands.subList(0, operands.indexOf(node));
         if (isAnyRefactored(previousOperands)) {
             return null;
         }
@@ -198,20 +195,20 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
     }
 
     private ITypeBinding getTypeBinding(final List<Expression> previousOperands) {
-        final Iterator<Expression> it = previousOperands.iterator();
-        ITypeBinding maxTypeBinding = it.next().resolveTypeBinding();
+        final Iterator<Expression> it= previousOperands.iterator();
+        ITypeBinding maxTypeBinding= it.next().resolveTypeBinding();
         while (it.hasNext()) {
-            final ITypeBinding typeBinding = it.next().resolveTypeBinding();
+            final ITypeBinding typeBinding= it.next().resolveTypeBinding();
             if (compareTo(maxTypeBinding, typeBinding) < 0) {
-                maxTypeBinding = typeBinding;
+                maxTypeBinding= typeBinding;
             }
         }
         return maxTypeBinding;
     }
 
     private int compareTo(ITypeBinding binding1, ITypeBinding binding2) {
-        final int rank1 = toPseudoEnum(binding1.getQualifiedName());
-        final int rank2 = toPseudoEnum(binding2.getQualifiedName());
+        final int rank1= toPseudoEnum(binding1.getQualifiedName());
+        final int rank2= toPseudoEnum(binding2.getQualifiedName());
         return rank1 - rank2;
     }
 
@@ -243,16 +240,17 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
         return false;
     }
 
-    /** If left operand is refactored, we cannot easily make inferences about right operand. Wait for next iteration. */
+    /**
+     * If left operand is refactored, we cannot easily make inferences about right
+     * operand. Wait for next iteration.
+     */
     private boolean isNotRefactored(Expression leftOperand) {
         return preVisit2(leftOperand);
     }
 
     private boolean isIntegralDividedByFloatingPoint(CastExpression node, InfixExpression ie) {
-        final Expression rightOp = ie.getRightOperand();
-        return isIntegralType(ie.getLeftOperand())
-                && hasOperator(ie, DIVIDE)
-                && isFloatingPointType(rightOp)
+        final Expression rightOp= ie.getRightOperand();
+        return isIntegralType(ie.getLeftOperand()) && hasOperator(ie, DIVIDE) && isFloatingPointType(rightOp)
                 && node.equals(rightOp);
     }
 
@@ -266,12 +264,12 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
 
     /** @see JLS, section 5.2 Assignment Conversion */
     private boolean isConstantExpressionAssignmentConversion(CastExpression node) {
-        final Object value = node.getExpression().resolveConstantExpressionValue();
+        final Object value= node.getExpression().resolveConstantExpressionValue();
         if (value instanceof Integer) {
-            final int val = (Integer) value;
-            return     (hasType(node, "byte")  && Byte.MIN_VALUE  <= val && val <= Byte.MAX_VALUE)
+            final int val= (Integer) value;
+            return (hasType(node, "byte") && Byte.MIN_VALUE <= val && val <= Byte.MAX_VALUE)
                     || (hasType(node, "short") && Short.MIN_VALUE <= val && val <= Short.MAX_VALUE)
-                    || (hasType(node, "char")  && 0               <= val && val <= 65535);
+                    || (hasType(node, "char") && 0 <= val && val <= 65535);
         }
         return false;
     }
@@ -281,10 +279,9 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
     }
 
     private boolean isPrimitiveTypeNarrowing(CastExpression node) {
-        final ITypeBinding castTypeBinding = node.getType().resolveBinding();
-        final ITypeBinding exprTypeBinding = node.getExpression().resolveTypeBinding();
-        return isPrimitive(castTypeBinding)
-                && isPrimitive(exprTypeBinding)
+        final ITypeBinding castTypeBinding= node.getType().resolveBinding();
+        final ITypeBinding exprTypeBinding= node.getExpression().resolveTypeBinding();
+        return isPrimitive(castTypeBinding) && isPrimitive(exprTypeBinding)
                 && isAssignmentCompatible(castTypeBinding, exprTypeBinding);
     }
 

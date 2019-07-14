@@ -50,22 +50,16 @@ import static org.autorefactor.util.Utils.*;
 
 /** See {@link #getDescription()} method. */
 public class SetRatherThanMapCleanUp extends AbstractClassSubstituteCleanUp {
-    private static final Map<String, String[]> CAN_BE_CASTED_TO = new HashMap<String, String[]>();
+    private static final Map<String, String[]> CAN_BE_CASTED_TO= new HashMap<String, String[]>();
 
     static {
-        CAN_BE_CASTED_TO.put("java.lang.Object", new String[]{"java.lang.Object"});
-        CAN_BE_CASTED_TO.put("java.lang.Cloneable", new String[]{"java.lang.Cloneable", "java.lang.Object"});
-        CAN_BE_CASTED_TO.put("java.io.Serializable",
-                new String[]{"java.io.Serializable", "java.lang.Object"});
-        CAN_BE_CASTED_TO.put("java.util.Map", new String[]{"java.util.Map", "java.lang.Object"});
-        CAN_BE_CASTED_TO.put("java.util.AbstractMap",
-                new String[]{"java.util.AbstractMap", "java.lang.Cloneable", "java.lang.Object"});
-        CAN_BE_CASTED_TO.put("java.util.TreeMap",
-                new String[]{"java.util.TreeMap", "java.io.Serializable", "java.util.Map",
-                    "java.util.AbstractMap", "java.lang.Cloneable", "java.lang.Object"});
-        CAN_BE_CASTED_TO.put("java.util.HashMap",
-                new String[]{"java.util.HashMap", "java.io.Serializable", "java.util.Map",
-                    "java.util.AbstractMap", "java.lang.Cloneable", "java.lang.Object"});
+        CAN_BE_CASTED_TO.put("java.lang.Object", new String[] { "java.lang.Object" });
+        CAN_BE_CASTED_TO.put("java.lang.Cloneable", new String[] { "java.lang.Cloneable", "java.lang.Object" });
+        CAN_BE_CASTED_TO.put("java.io.Serializable", new String[] { "java.io.Serializable", "java.lang.Object" });
+        CAN_BE_CASTED_TO.put("java.util.Map", new String[] { "java.util.Map", "java.lang.Object" });
+        CAN_BE_CASTED_TO.put("java.util.AbstractMap", new String[] { "java.util.AbstractMap", "java.lang.Cloneable", "java.lang.Object" });
+        CAN_BE_CASTED_TO.put("java.util.TreeMap", new String[] { "java.util.TreeMap", "java.io.Serializable", "java.util.Map", "java.util.AbstractMap", "java.lang.Cloneable", "java.lang.Object" });
+        CAN_BE_CASTED_TO.put("java.util.HashMap", new String[] { "java.util.HashMap", "java.io.Serializable", "java.util.Map", "java.util.AbstractMap", "java.lang.Cloneable", "java.lang.Object" });
     }
 
     /**
@@ -102,16 +96,13 @@ public class SetRatherThanMapCleanUp extends AbstractClassSubstituteCleanUp {
 
     @Override
     protected String[] getExistingClassCanonicalName() {
-        return new String[] {"java.util.HashMap", "java.util.TreeMap"};
+        return new String[] { "java.util.HashMap", "java.util.TreeMap" };
     }
 
     @Override
     public Set<String> getClassesToImport() {
-        return new HashSet<String>(Arrays.asList(
-                "java.util.HashSet",
-                "java.util.TreeSet",
-                "java.util.AbstractSet",
-                "java.util.Set"));
+        return new HashSet<String>(
+                Arrays.asList("java.util.HashSet", "java.util.TreeSet", "java.util.AbstractSet", "java.util.Set"));
     }
 
     @Override
@@ -131,7 +122,7 @@ public class SetRatherThanMapCleanUp extends AbstractClassSubstituteCleanUp {
 
     @Override
     protected boolean canInstantiationBeRefactored(final ClassInstanceCreation instanceCreation) {
-        ITypeBinding[] parameterTypes = instanceCreation.resolveConstructorBinding().getParameterTypes();
+        ITypeBinding[] parameterTypes= instanceCreation.resolveConstructorBinding().getParameterTypes();
 
         return parameterTypes.length == 0 || hasType(parameterTypes[0], "int");
     }
@@ -139,37 +130,38 @@ public class SetRatherThanMapCleanUp extends AbstractClassSubstituteCleanUp {
     /**
      * Returns the substitute type.
      *
-     * @param b The builder.
-     * @param origType The original type
-     * @param originalExpr The original expression
-     * @param classesToUseWithImport The classes that should be used with simple name.
-     * @param importsToAdd The imports that need to be added during this refactoring.
+     * @param b                      The builder.
+     * @param origType               The original type
+     * @param originalExpr           The original expression
+     * @param classesToUseWithImport The classes that should be used with simple
+     *                               name.
+     * @param importsToAdd           The imports that need to be added during this
+     *                               refactoring.
      * @return the substitute type.
      */
     @Override
     protected Type substituteType(final ASTBuilder b, final Type origType, final ASTNode originalExpr,
             final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
-        String substitutingType = getSubstitutingClassName(origType.resolveBinding().getErasure().getQualifiedName());
+        String substitutingType= getSubstitutingClassName(origType.resolveBinding().getErasure().getQualifiedName());
 
         if (classesToUseWithImport.contains(substitutingType)) {
             importsToAdd.add(substitutingType);
-            substitutingType = getSimpleName(substitutingType);
+            substitutingType= getSimpleName(substitutingType);
         }
 
-        final ITypeBinding origTypeBinding = origType.resolveBinding();
-        final TypeNameDecider typeNameDecider = new TypeNameDecider(originalExpr);
+        final ITypeBinding origTypeBinding= origType.resolveBinding();
+        final TypeNameDecider typeNameDecider= new TypeNameDecider(originalExpr);
 
         if (origTypeBinding.isParameterizedType()) {
-            final ITypeBinding[] origTypeArgs = origTypeBinding.getTypeArguments();
+            final ITypeBinding[] origTypeArgs= origTypeBinding.getTypeArguments();
             final Type[] newTypes;
             if (origTypeArgs.length > 0) {
-                newTypes = new Type[1];
-                newTypes[0] = b.toType(origTypeArgs[0], typeNameDecider);
+                newTypes= new Type[1];
+                newTypes[0]= b.toType(origTypeArgs[0], typeNameDecider);
             } else {
-                newTypes = new Type[0];
+                newTypes= new Type[0];
             }
-            return b.genericType(substitutingType,
-                    newTypes);
+            return b.genericType(substitutingType, newTypes);
         }
 
         return b.type(substitutingType);
@@ -178,14 +170,10 @@ public class SetRatherThanMapCleanUp extends AbstractClassSubstituteCleanUp {
     @Override
     protected boolean canMethodBeRefactored(final MethodInvocation mi,
             final List<MethodInvocation> methodCallsToRefactor) {
-        if (isMethod(mi, "java.util.Map", "clear")
-                || isMethod(mi, "java.util.Map", "isEmpty")
-                || isMethod(mi, "java.util.Map", "size")
-                || isMethod(mi, "java.lang.Object", "finalize")
-                || isMethod(mi, "java.lang.Object", "notify")
-                || isMethod(mi, "java.lang.Object", "notifyAll")
-                || isMethod(mi, "java.lang.Object", "wait")
-                || isMethod(mi, "java.lang.Object", "wait", "long")
+        if (isMethod(mi, "java.util.Map", "clear") || isMethod(mi, "java.util.Map", "isEmpty")
+                || isMethod(mi, "java.util.Map", "size") || isMethod(mi, "java.lang.Object", "finalize")
+                || isMethod(mi, "java.lang.Object", "notify") || isMethod(mi, "java.lang.Object", "notifyAll")
+                || isMethod(mi, "java.lang.Object", "wait") || isMethod(mi, "java.lang.Object", "wait", "long")
                 || isMethod(mi, "java.lang.Object", "wait", "long", "int")) {
             return true;
         } else if (isMethod(mi, "java.util.Map", "containsKey", "java.lang.Object")) {
@@ -218,7 +206,7 @@ public class SetRatherThanMapCleanUp extends AbstractClassSubstituteCleanUp {
     }
 
     private boolean isReturnValueLost(final ASTNode node) {
-        ASTNode parentNode = node.getParent();
+        ASTNode parentNode= node.getParent();
 
         return parentNode instanceof ExpressionStatement
                 || (parentNode instanceof ParenthesizedExpression && isReturnValueLost(parentNode));
@@ -236,10 +224,8 @@ public class SetRatherThanMapCleanUp extends AbstractClassSubstituteCleanUp {
     }
 
     @Override
-    protected boolean isTypeCompatible(final ITypeBinding variableType,
-            final ITypeBinding refType) {
-        return super.isTypeCompatible(variableType, refType)
-                || hasType(variableType,
-                           getOrDefault(CAN_BE_CASTED_TO, refType.getErasure().getQualifiedName(), new String[0]));
+    protected boolean isTypeCompatible(final ITypeBinding variableType, final ITypeBinding refType) {
+        return super.isTypeCompatible(variableType, refType) || hasType(variableType,
+                getOrDefault(CAN_BE_CASTED_TO, refType.getErasure().getQualifiedName(), new String[0]));
     }
 }

@@ -103,39 +103,36 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
 
         @Override
         public String toString() {
-            return "System.arraycopy("
-                    + srcArrayExpr + ", " + srcPos + ", "
-                    + destArrayExpr + ", " + destPos + ", "
+            return "System.arraycopy(" + srcArrayExpr + ", " + srcPos + ", " + destArrayExpr + ", " + destPos + ", "
                     + length + ")";
         }
     }
 
     @Override
     public boolean visit(ForStatement node) {
-        final SystemArrayCopyParams params = new SystemArrayCopyParams();
+        final SystemArrayCopyParams params= new SystemArrayCopyParams();
         collectUniqueIndex(node, params);
-        final IVariableBinding incrementedIdx = getUniqueIncrementedVariable(node);
-        final List<Statement> stmts = asList(node.getBody());
+        final IVariableBinding incrementedIdx= getUniqueIncrementedVariable(node);
+        final List<Statement> stmts= asList(node.getBody());
 
-        if (equalNotNull(params.indexVarBinding, incrementedIdx)
-                && stmts.size() == 1) {
+        if (equalNotNull(params.indexVarBinding, incrementedIdx) && stmts.size() == 1) {
             collectLength(node.getExpression(), incrementedIdx, params);
 
-            final Assignment as = asExpression(stmts.get(0), Assignment.class);
+            final Assignment as= asExpression(stmts.get(0), Assignment.class);
 
             if (hasOperator(as, ASSIGN)) {
-                final Expression lhs = as.getLeftHandSide();
-                final Expression rhs = as.getRightHandSide();
+                final Expression lhs= as.getLeftHandSide();
+                final Expression rhs= as.getRightHandSide();
 
                 if (lhs instanceof ArrayAccess && rhs instanceof ArrayAccess) {
-                    final ArrayAccess aaLHS = (ArrayAccess) lhs;
-                    final ArrayAccess aaRHS = (ArrayAccess) rhs;
-                    params.destArrayExpr = aaLHS.getArray();
-                    params.srcArrayExpr = aaRHS.getArray();
+                    final ArrayAccess aaLHS= (ArrayAccess) lhs;
+                    final ArrayAccess aaRHS= (ArrayAccess) rhs;
+                    params.destArrayExpr= aaLHS.getArray();
+                    params.srcArrayExpr= aaRHS.getArray();
 
                     if (haveSameType(params.srcArrayExpr, params.destArrayExpr)) {
-                        params.destPos = calcIndex(aaLHS.getIndex(), params);
-                        params.srcPos = calcIndex(aaRHS.getIndex(), params);
+                        params.destPos= calcIndex(aaLHS.getIndex(), params);
+                        params.srcPos= calcIndex(aaRHS.getIndex(), params);
                         return replaceWithSystemArrayCopyCloneAll(node, params);
                     }
                 }
@@ -145,24 +142,23 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
     }
 
     private Expression calcIndex(Expression index, SystemArrayCopyParams params) {
-        final ASTBuilder b = this.ctx.getASTBuilder();
+        final ASTBuilder b= this.ctx.getASTBuilder();
 
         if (index instanceof SimpleName) {
-            final IVariableBinding idxVar = getVariableBinding(index);
+            final IVariableBinding idxVar= getVariableBinding(index);
 
             if (equalNotNull(params.indexVarBinding, idxVar)) {
                 return b.copy(params.indexStartPos);
             }
         } else if (index instanceof InfixExpression) {
-            final InfixExpression ie = (InfixExpression) index;
+            final InfixExpression ie= (InfixExpression) index;
 
-            if (!ie.hasExtendedOperands()
-                    && hasOperator(ie, PLUS)) {
-                final Expression leftOp = ie.getLeftOperand();
-                final Expression rightOp = ie.getRightOperand();
+            if (!ie.hasExtendedOperands() && hasOperator(ie, PLUS)) {
+                final Expression leftOp= ie.getLeftOperand();
+                final Expression rightOp= ie.getRightOperand();
 
                 if (leftOp instanceof SimpleName) {
-                    final IVariableBinding idxVar = getVariableBinding(leftOp);
+                    final IVariableBinding idxVar= getVariableBinding(leftOp);
 
                     if (equalNotNull(params.indexVarBinding, idxVar)) {
                         return plus(rightOp, params.indexStartPos);
@@ -170,7 +166,7 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
                 }
 
                 if (rightOp instanceof SimpleName) {
-                    final IVariableBinding idxVar = getVariableBinding(rightOp);
+                    final IVariableBinding idxVar= getVariableBinding(rightOp);
 
                     if (equalNotNull(params.indexVarBinding, idxVar)) {
                         return plus(leftOp, params.indexStartPos);
@@ -182,9 +178,9 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
     }
 
     private Expression plus(Expression expr1, Expression expr2) {
-        final ASTBuilder b = this.ctx.getASTBuilder();
-        final Integer expr1Value = intValue(expr1);
-        final Integer expr2Value = intValue(expr2);
+        final ASTBuilder b= this.ctx.getASTBuilder();
+        final Integer expr1Value= intValue(expr1);
+        final Integer expr2Value= intValue(expr2);
 
         if (expr1Value != null && expr2Value != null) {
             return b.int0(expr1Value + expr2Value);
@@ -193,59 +189,42 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
         } else if (equalNotNull(expr2Value, 0)) {
             return b.copy(expr1);
         }
-        return b.infixExpr(
-                b.copy(expr1),
-                PLUS,
-                b.copy(expr2));
+        return b.infixExpr(b.copy(expr1), PLUS, b.copy(expr2));
     }
 
     private Expression minus(Expression expr1, Expression expr2) {
-        final ASTBuilder b = this.ctx.getASTBuilder();
-        final Integer expr1Value = intValue(expr1);
-        final Integer expr2Value = intValue(expr2);
+        final ASTBuilder b= this.ctx.getASTBuilder();
+        final Integer expr1Value= intValue(expr1);
+        final Integer expr2Value= intValue(expr2);
 
         if (expr1Value != null && expr2Value != null) {
             return b.int0(expr1Value - expr2Value);
         } else if (equalNotNull(expr1Value, 0)) {
-            throw new NotImplementedException(expr2, "Code is not implemented for negating expr2: "
-                    + expr2);
+            throw new NotImplementedException(expr2, "Code is not implemented for negating expr2: " + expr2);
         } else if (equalNotNull(expr2Value, 0)) {
             return b.copy(expr1);
         }
-        return b.infixExpr(
-                b.copy(expr1),
-                MINUS,
-                b.copy(expr2));
+        return b.infixExpr(b.copy(expr1), MINUS, b.copy(expr2));
     }
 
     private Expression minusPlusOne(Expression expr1, Expression expr2) {
-        final ASTBuilder b = this.ctx.getASTBuilder();
-        final Integer expr1Value = intValue(expr1);
-        final Integer expr2Value = intValue(expr2);
+        final ASTBuilder b= this.ctx.getASTBuilder();
+        final Integer expr1Value= intValue(expr1);
+        final Integer expr2Value= intValue(expr2);
 
         if (expr1Value != null && expr2Value != null) {
             return b.int0(expr1Value - expr2Value + 1);
         } else if (equalNotNull(expr1Value, 0)) {
-            throw new NotImplementedException(expr2, "Code is not implemented for negating expr2: "
-                    + expr2);
+            throw new NotImplementedException(expr2, "Code is not implemented for negating expr2: " + expr2);
         } else if (equalNotNull(expr2Value, 0)) {
-            return b.infixExpr(
-                    b.copy(expr1),
-                    PLUS,
-                    ctx.getAST().newNumberLiteral("1"));
+            return b.infixExpr(b.copy(expr1), PLUS, ctx.getAST().newNumberLiteral("1"));
         }
 
-        return b.infixExpr(
-                b.infixExpr(
-                        b.copy(expr1),
-                        MINUS,
-                        b.copy(expr2)),
-                PLUS,
-                ctx.getAST().newNumberLiteral("1"));
+        return b.infixExpr(b.infixExpr(b.copy(expr1), MINUS, b.copy(expr2)), PLUS, ctx.getAST().newNumberLiteral("1"));
     }
 
     private Integer intValue(Expression expr) {
-        Object literal = expr.resolveConstantExpressionValue();
+        Object literal= expr.resolveConstantExpressionValue();
 
         if (literal instanceof Number) {
             return ((Number) literal).intValue();
@@ -254,10 +233,10 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
         return null;
     }
 
-    private void collectLength(final Expression condition,
-            final IVariableBinding incrementedIdx, final SystemArrayCopyParams params) {
+    private void collectLength(final Expression condition, final IVariableBinding incrementedIdx,
+            final SystemArrayCopyParams params) {
         if (condition instanceof InfixExpression) {
-            final InfixExpression ie = (InfixExpression) condition;
+            final InfixExpression ie= (InfixExpression) condition;
             if (hasOperator(ie, LESS, LESS_EQUALS)) {
                 collectLength(incrementedIdx, params, ie, ie.getLeftOperand(), ie.getRightOperand());
             } else if (hasOperator(ie, GREATER, GREATER_EQUALS)) {
@@ -268,49 +247,36 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
 
     private void collectLength(final IVariableBinding incrementedIdx, final SystemArrayCopyParams params,
             final InfixExpression ie, final Expression variable, final Expression boundary) {
-        IVariableBinding conditionIdx = getVariableBinding(variable);
+        IVariableBinding conditionIdx= getVariableBinding(variable);
         if (equalNotNull(incrementedIdx, conditionIdx)) {
-            final ASTBuilder b = ctx.getASTBuilder();
+            final ASTBuilder b= ctx.getASTBuilder();
 
             if (hasOperator(ie, LESS_EQUALS, GREATER_EQUALS)) {
-                params.length = minusPlusOne(boundary, params.indexStartPos);
+                params.length= minusPlusOne(boundary, params.indexStartPos);
             } else {
-                params.length = minus(boundary, params.indexStartPos);
+                params.length= minus(boundary, params.indexStartPos);
             }
         }
     }
 
     private boolean replaceWithSystemArrayCopyCloneAll(ForStatement node, SystemArrayCopyParams params) {
-        if (params.srcArrayExpr == null
-                || params.srcPos == null
-                || params.destArrayExpr == null
-                || params.destPos == null
-                || params.length == null) {
+        if (params.srcArrayExpr == null || params.srcPos == null || params.destArrayExpr == null
+                || params.destPos == null || params.length == null) {
             return VISIT_SUBTREE;
         }
-        final ASTBuilder b = this.ctx.getASTBuilder();
-        return replaceWithSystemArrayCopy(node,
-                b.copy(params.srcArrayExpr),
-                params.srcPos,
-                b.copy(params.destArrayExpr),
-                params.destPos,
-                params.length);
+        final ASTBuilder b= this.ctx.getASTBuilder();
+        return replaceWithSystemArrayCopy(node, b.copy(params.srcArrayExpr), params.srcPos,
+                b.copy(params.destArrayExpr), params.destPos, params.length);
     }
 
-    private boolean replaceWithSystemArrayCopy(ForStatement node,
-            Expression srcArrayExpr, Expression srcPos,
-            Expression destArrayExpr, Expression destPos,
-            Expression length) {
-        final ASTBuilder b = this.ctx.getASTBuilder();
-        final TryStatement tryS = b.try0(
-                b.block(
-                        b.toStmt(
-                                b.invoke("System", "arraycopy",
-                                        srcArrayExpr, srcPos, destArrayExpr, destPos, length))),
+    private boolean replaceWithSystemArrayCopy(ForStatement node, Expression srcArrayExpr, Expression srcPos,
+            Expression destArrayExpr, Expression destPos, Expression length) {
+        final ASTBuilder b= this.ctx.getASTBuilder();
+        final TryStatement tryS= b.try0(
+                b.block(b
+                        .toStmt(b.invoke("System", "arraycopy", srcArrayExpr, srcPos, destArrayExpr, destPos, length))),
                 b.catch0("IndexOutOfBoundsException", "e",
-                        b.throw0(
-                                b.new0("ArrayIndexOutOfBoundsException",
-                                        b.invoke("e", "getMessage")))));
+                        b.throw0(b.new0("ArrayIndexOutOfBoundsException", b.invoke("e", "getMessage")))));
 
         this.ctx.getRefactorings().replace(node, tryS);
         return DO_NOT_VISIT_SUBTREE;
@@ -321,30 +287,28 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
             return;
         }
 
-        final Expression initializer0 = initializers(node).get(0);
+        final Expression initializer0= initializers(node).get(0);
 
         if (initializer0 instanceof VariableDeclarationExpression) {
-            final VariableDeclarationExpression vde =
-                    (VariableDeclarationExpression) initializer0;
+            final VariableDeclarationExpression vde= (VariableDeclarationExpression) initializer0;
             if (isPrimitive(vde, "int") && fragments(vde).size() == 1) {
                 // This must be the array index
-                VariableDeclarationFragment vdf = fragments(vde).get(0);
+                VariableDeclarationFragment vdf= fragments(vde).get(0);
                 if (vdf.getExtraDimensions() == 0) {
-                    params.indexStartPos = vdf.getInitializer();
-                    params.indexVarBinding = vdf.resolveBinding();
+                    params.indexStartPos= vdf.getInitializer();
+                    params.indexVarBinding= vdf.resolveBinding();
                 }
             }
         } else if (initializer0 instanceof Assignment) {
-            final Assignment as = (Assignment) initializer0;
-            if (hasOperator(as, ASSIGN)
-                    && isPrimitive(as.resolveTypeBinding(), "int")) {
+            final Assignment as= (Assignment) initializer0;
+            if (hasOperator(as, ASSIGN) && isPrimitive(as.resolveTypeBinding(), "int")) {
                 // This must be the array index
-                params.indexStartPos = as.getRightHandSide();
-                final Expression lhs = as.getLeftHandSide();
+                params.indexStartPos= as.getRightHandSide();
+                final Expression lhs= as.getLeftHandSide();
                 if (lhs instanceof SimpleName) {
-                    final IBinding binding = ((SimpleName) lhs).resolveBinding();
+                    final IBinding binding= ((SimpleName) lhs).resolveBinding();
                     if (binding instanceof IVariableBinding) {
-                        params.indexVarBinding = (IVariableBinding) binding;
+                        params.indexVarBinding= (IVariableBinding) binding;
                     }
                 }
             }
@@ -355,14 +319,14 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
         if (updaters(node).size() != 1) {
             return null;
         }
-        final Expression updater0 = updaters(node).get(0);
+        final Expression updater0= updaters(node).get(0);
         if (updater0 instanceof PostfixExpression) {
-            final PostfixExpression pe = (PostfixExpression) updater0;
+            final PostfixExpression pe= (PostfixExpression) updater0;
             if (hasOperator(pe, PostfixExpression.Operator.INCREMENT)) {
                 return getVariableBinding(pe.getOperand());
             }
         } else if (updater0 instanceof PrefixExpression) {
-            final PrefixExpression pe = (PrefixExpression) updater0;
+            final PrefixExpression pe= (PrefixExpression) updater0;
             if (hasOperator(pe, PrefixExpression.Operator.INCREMENT)) {
                 return getVariableBinding(pe.getOperand());
             }
@@ -372,8 +336,8 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
 
     private IVariableBinding getVariableBinding(final Expression e) {
         if (e instanceof SimpleName) {
-            final SimpleName sn = (SimpleName) e;
-            final IBinding binding = sn.resolveBinding();
+            final SimpleName sn= (SimpleName) e;
+            final IBinding binding= sn.resolveBinding();
             if (binding instanceof IVariableBinding) { // this is a local variable or a field
                 return (IVariableBinding) binding;
             }

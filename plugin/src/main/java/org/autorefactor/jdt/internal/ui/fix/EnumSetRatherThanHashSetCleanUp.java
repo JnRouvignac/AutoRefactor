@@ -45,8 +45,7 @@ import org.eclipse.jdt.core.dom.TypeLiteral;
 /**
  * Replaces HashSet for enum type creation to EnumSet factory static methods.
  */
-public final class EnumSetRatherThanHashSetCleanUp extends
-        AbstractEnumCollectionReplacementCleanUp {
+public final class EnumSetRatherThanHashSetCleanUp extends AbstractEnumCollectionReplacementCleanUp {
     /**
      * Get the name.
      *
@@ -90,47 +89,44 @@ public final class EnumSetRatherThanHashSetCleanUp extends
     }
 
     /**
-     * Refactoring is not correct if argument for HashSet constructor is a Collection, but other
-     * than EnumSet. <br>
+     * Refactoring is not correct if argument for HashSet constructor is a
+     * Collection, but other than EnumSet. <br>
      * In case of empty collection <code>EnumSet.copyOf</code> will throw an
      * <code>IllegalArgumentException</code>, <br>
      * and HashSet(Collection) will not. <br>
      * <br>
-     * Other constructors can be replaced with <code>EnumSet.noneOf(Class)</code> method. <br>
+     * Other constructors can be replaced with <code>EnumSet.noneOf(Class)</code>
+     * method. <br>
      * <br>
-     * @param cic
-     *            - class instance creation node to be replaced
-     * @param type
-     *            - type argument of the declaration
+     *
+     * @param cic  - class instance creation node to be replaced
+     * @param type - type argument of the declaration
      * @see java.util.EnumSet#noneOf(Class) <br>
      */
     @Override
-    boolean maybeReplace(ClassInstanceCreation cic, Set<String> alreadyImportedClasses,
-            Set<String> importsToAdd, Type... types) {
+    boolean maybeReplace(ClassInstanceCreation cic, Set<String> alreadyImportedClasses, Set<String> importsToAdd,
+            Type... types) {
         if (types == null || types.length < 1) {
             return VISIT_SUBTREE;
         }
 
-        Type type = types[0];
-        ASTBuilder b = ctx.getASTBuilder();
-        List<Expression> arguments = arguments(cic);
+        Type type= types[0];
+        ASTBuilder b= ctx.getASTBuilder();
+        List<Expression> arguments= arguments(cic);
         final MethodInvocation invocation;
 
-        if (!arguments.isEmpty()
-                && instanceOf(arguments.get(0), "java.util.Collection")) {
-            Expression typeArg = arguments.get(0);
+        if (!arguments.isEmpty() && instanceOf(arguments.get(0), "java.util.Collection")) {
+            Expression typeArg= arguments.get(0);
             if (!instanceOf(typeArg, "java.util.EnumSet")) {
                 return VISIT_SUBTREE;
             }
-            invocation = b.invoke(alreadyImportedClasses.contains("java.util.EnumSet") ? b.name("EnumSet")
-                    : b.name("java", "util", "EnumSet"),
-                    "copyOf", b.copy(typeArg));
+            invocation= b.invoke(alreadyImportedClasses.contains("java.util.EnumSet") ? b.name("EnumSet")
+                    : b.name("java", "util", "EnumSet"), "copyOf", b.copy(typeArg));
         } else {
-            TypeLiteral newTypeLiteral = ctx.getAST().newTypeLiteral();
+            TypeLiteral newTypeLiteral= ctx.getAST().newTypeLiteral();
             newTypeLiteral.setType(b.copy(type));
-            invocation = b.invoke(alreadyImportedClasses.contains("java.util.EnumSet") ? b.name("EnumSet")
-                    : b.name("java", "util", "EnumSet"),
-                    "noneOf", newTypeLiteral);
+            invocation= b.invoke(alreadyImportedClasses.contains("java.util.EnumSet") ? b.name("EnumSet")
+                    : b.name("java", "util", "EnumSet"), "noneOf", newTypeLiteral);
         }
 
         ctx.getRefactorings().replace(cic, invocation);

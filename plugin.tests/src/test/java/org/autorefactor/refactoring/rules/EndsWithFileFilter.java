@@ -32,13 +32,11 @@ public class EndsWithFileFilter implements FileFilter {
     private String nameEnd;
 
     public EndsWithFileFilter(String nameEnd) {
-        this.nameEnd = nameEnd;
+        this.nameEnd= nameEnd;
     }
 
     /** {@inheritDoc} */
     public boolean accept(File file) {
-        return file.getName().endsWith(nameEnd)
-                && file.exists()
-                && file.isFile();
+        return file.getName().endsWith(nameEnd) && file.exists() && file.isFile();
     }
 }

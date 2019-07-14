@@ -128,18 +128,18 @@ public class RemoveSemiColonCleanUp extends AbstractCleanUpRule {
     }
 
     private boolean visit(BodyDeclaration node) {
-        final BodyDeclaration nextSibling = getNextSibling(node);
-        final ASTNode parent = node.getParent();
+        final BodyDeclaration nextSibling= getNextSibling(node);
+        final ASTNode parent= node.getParent();
         if (nextSibling != null) {
             return removeSuperfluousSemiColons(node, getEndPosition(node), nextSibling.getStartPosition());
         } else if (parent instanceof AbstractTypeDeclaration) {
-            final AbstractTypeDeclaration typeDecl = (AbstractTypeDeclaration) parent;
+            final AbstractTypeDeclaration typeDecl= (AbstractTypeDeclaration) parent;
             return removeSuperfluousSemiColons(node, getEndPosition(node), getEndPosition(typeDecl) - 1);
         } else if (parent instanceof AnonymousClassDeclaration) {
-            final AnonymousClassDeclaration classDecl = (AnonymousClassDeclaration) parent;
+            final AnonymousClassDeclaration classDecl= (AnonymousClassDeclaration) parent;
             return removeSuperfluousSemiColons(node, getEndPosition(node), getEndPosition(classDecl) - 1);
         } else if (parent instanceof CompilationUnit) {
-            final CompilationUnit cu = (CompilationUnit) parent;
+            final CompilationUnit cu= (CompilationUnit) parent;
             return removeSuperfluousSemiColons(node, getEndPosition(node), getEndPosition(cu) - 1);
         } else if (parent instanceof TypeDeclarationStatement) {
             return VISIT_SUBTREE;
@@ -152,50 +152,49 @@ public class RemoveSemiColonCleanUp extends AbstractCleanUpRule {
         if (end <= start) {
             return VISIT_SUBTREE;
         }
-        boolean result = VISIT_SUBTREE;
-        final Map<String, SourceLocation> nonCommentsStrings = getNonCommentsStrings(node, start, end);
+        boolean result= VISIT_SUBTREE;
+        final Map<String, SourceLocation> nonCommentsStrings= getNonCommentsStrings(node, start, end);
         for (Entry<String, SourceLocation> entry : nonCommentsStrings.entrySet()) {
-            final String s = entry.getKey();
-            final Matcher m = Pattern.compile("\\s*(;+)\\s*").matcher(s);
+            final String s= entry.getKey();
+            final Matcher m= Pattern.compile("\\s*(;+)\\s*").matcher(s);
             while (m.find()) {
-                int startPos = entry.getValue().getStartPosition();
-                SourceLocation toRemove = fromPositions(startPos + m.start(1), startPos + m.end(1));
+                int startPos= entry.getValue().getStartPosition();
+                SourceLocation toRemove= fromPositions(startPos + m.start(1), startPos + m.end(1));
                 this.ctx.getRefactorings().remove(toRemove);
-                result = DO_NOT_VISIT_SUBTREE;
+                result= DO_NOT_VISIT_SUBTREE;
             }
         }
         return result;
     }
 
     private Map<String, SourceLocation> getNonCommentsStrings(ASTNode node, int start, int end) {
-        final List<Comment> comments = filterCommentsInRange(start, end, node.getRoot());
+        final List<Comment> comments= filterCommentsInRange(start, end, node.getRoot());
 
-        final String source = ctx.getSource(node);
-        final LinkedHashMap<String, SourceLocation> results = new LinkedHashMap<String, SourceLocation>();
+        final String source= ctx.getSource(node);
+        final LinkedHashMap<String, SourceLocation> results= new LinkedHashMap<String, SourceLocation>();
         if (comments.isEmpty()) {
             putResult(source, start, end, results);
         } else {
-            int nextStart = start;
+            int nextStart= start;
             for (Comment comment : comments) {
                 if (nextStart < comment.getStartPosition()) {
                     putResult(source, nextStart, comment.getStartPosition(), results);
                 }
-                nextStart = getEndPosition(comment);
+                nextStart= getEndPosition(comment);
             }
         }
         return results;
     }
 
-    private void putResult(String source, int start, int end,
-            final LinkedHashMap<String, SourceLocation> results) {
-        final SourceLocation sourceLoc = fromPositions(start, end);
-        final String s = sourceLoc.substring(source);
+    private void putResult(String source, int start, int end, final LinkedHashMap<String, SourceLocation> results) {
+        final SourceLocation sourceLoc= fromPositions(start, end);
+        final String s= sourceLoc.substring(source);
         results.put(s, sourceLoc);
     }
 
     private List<Comment> filterCommentsInRange(int start, int end, final ASTNode root) {
         if (root instanceof CompilationUnit) {
-            final CompilationUnit cu = (CompilationUnit) root;
+            final CompilationUnit cu= (CompilationUnit) root;
             return filterCommentsInRange(start, end, getCommentList(cu));
         }
         return Collections.emptyList();
@@ -205,14 +204,13 @@ public class RemoveSemiColonCleanUp extends AbstractCleanUpRule {
         if (commentList.isEmpty()) {
             return Collections.emptyList();
         }
-        final List<Comment> comments = new ArrayList<Comment>(commentList);
+        final List<Comment> comments= new ArrayList<Comment>(commentList);
         Collections.sort(comments, new NodeStartPositionComparator());
 
-        final Iterator<Comment> it = comments.iterator();
+        final Iterator<Comment> it= comments.iterator();
         while (it.hasNext()) {
-            final Comment comment = it.next();
-            if (comment.getStartPosition() < start
-                    || getEndPosition(comment) > end) {
+            final Comment comment= it.next();
+            if (comment.getStartPosition() < start || getEndPosition(comment) > end) {
                 it.remove();
             }
         }
@@ -221,12 +219,12 @@ public class RemoveSemiColonCleanUp extends AbstractCleanUpRule {
 
     @Override
     public boolean visit(TryStatement node) {
-        final List<VariableDeclarationExpression> resources = resources(node);
+        final List<VariableDeclarationExpression> resources= resources(node);
         if (resources.isEmpty()) {
             return VISIT_SUBTREE;
         }
-        VariableDeclarationExpression lastResource = getLast(resources);
-        Block body = node.getBody();
+        VariableDeclarationExpression lastResource= getLast(resources);
+        Block body= node.getBody();
         return removeSuperfluousSemiColons(node, getEndPosition(lastResource), body.getStartPosition());
     }
 }

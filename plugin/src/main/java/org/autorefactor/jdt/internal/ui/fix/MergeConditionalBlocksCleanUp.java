@@ -72,20 +72,19 @@ public class MergeConditionalBlocksCleanUp extends AbstractCleanUpRule {
 
     @Override
     public boolean visit(IfStatement node) {
-        final List<Statement> elseCode = asList(node.getElseStatement());
+        final List<Statement> elseCode= asList(node.getElseStatement());
 
         if (elseCode != null && elseCode.size() == 1 && elseCode.get(0) instanceof IfStatement) {
-            final IfStatement subNode = (IfStatement) elseCode.get(0);
+            final IfStatement subNode= (IfStatement) elseCode.get(0);
 
             return maybeMergeBlocks(node, subNode, subNode.getThenStatement(), subNode.getElseStatement(), true)
-                    && maybeMergeBlocks(node, subNode, subNode.getElseStatement(), subNode.getThenStatement(),
-                            false);
+                    && maybeMergeBlocks(node, subNode, subNode.getElseStatement(), subNode.getThenStatement(), false);
         }
         return VISIT_SUBTREE;
     }
 
-    private boolean maybeMergeBlocks(final IfStatement node, final IfStatement subNode,
-            final Statement doubleStmts, final Statement remainingStmts, final boolean isPositive) {
+    private boolean maybeMergeBlocks(final IfStatement node, final IfStatement subNode, final Statement doubleStmts,
+            final Statement remainingStmts, final boolean isPositive) {
         if (doubleStmts != null && match(new ASTSemanticMatcher(), node.getThenStatement(), doubleStmts)) {
             refactorBlocks(node.getExpression(), subNode, remainingStmts, isPositive);
             return DO_NOT_VISIT_SUBTREE;
@@ -95,14 +94,14 @@ public class MergeConditionalBlocksCleanUp extends AbstractCleanUpRule {
 
     private void refactorBlocks(final Expression firstCondition, final IfStatement subNode,
             final Statement remainingStmts, final boolean isPositive) {
-        final ASTBuilder b = this.ctx.getASTBuilder();
-        final Refactorings r = this.ctx.getRefactorings();
+        final ASTBuilder b= this.ctx.getASTBuilder();
+        final Refactorings r= this.ctx.getRefactorings();
 
         final Expression additionalCondition;
         if (isPositive) {
-            additionalCondition = b.copy(subNode.getExpression());
+            additionalCondition= b.copy(subNode.getExpression());
         } else {
-            additionalCondition = b.negate(subNode.getExpression(), Copy.COPY);
+            additionalCondition= b.negate(subNode.getExpression(), Copy.COPY);
         }
 
         r.replace(firstCondition, b.infixExpr(b.parenthesizeIfNeeded(b.copy(firstCondition)),

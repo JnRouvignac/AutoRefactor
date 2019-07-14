@@ -76,7 +76,8 @@ public final class Utils {
      *
      * @param obj1 the first object to compare for equality
      * @param obj2 the second object to compare for equality
-     * @return true if the two provided objects are equal and not null, false otherwise.
+     * @return true if the two provided objects are equal and not null, false
+     *         otherwise.
      */
     public static boolean equalNotNull(Object obj1, Object obj2) {
         return obj1 != null && obj1.equals(obj2);
@@ -173,12 +174,13 @@ public final class Utils {
     /**
      * Returns the first element in the list.
      * <p>
-     * Note: Care must be taken to first test that the list is not empty before calling this method.
+     * Note: Care must be taken to first test that the list is not empty before
+     * calling this method.
      *
      * @param list the list
-     * @param <E> the type of elements in the list
+     * @param <E>  the type of elements in the list
      * @return the first element
-     * @throws NullPointerException if the list is {@code null}
+     * @throws NullPointerException      if the list is {@code null}
      * @throws IndexOutOfBoundsException if the list is empty
      */
     public static <E> E getFirst(final List<E> list) {
@@ -188,12 +190,13 @@ public final class Utils {
     /**
      * Returns the last element in the list.
      * <p>
-     * Note: Care must be taken to first test that the list is not empty before calling this method.
+     * Note: Care must be taken to first test that the list is not empty before
+     * calling this method.
      *
      * @param list the list
-     * @param <E> the type of elements in the list
+     * @param <E>  the type of elements in the list
      * @return the last element
-     * @throws NullPointerException if the list is {@code null}
+     * @throws NullPointerException      if the list is {@code null}
      * @throws IndexOutOfBoundsException if the list is empty
      */
     public static <E> E getLast(final List<E> list) {
@@ -201,15 +204,16 @@ public final class Utils {
     }
 
     /**
-     * Returns the value to which the specified key is mapped, or defaultValue if this map contains no mapping for the
-     * key.
+     * Returns the value to which the specified key is mapped, or defaultValue if
+     * this map contains no mapping for the key.
      *
-     * @param map the map
-     * @param key the key
+     * @param map          the map
+     * @param key          the key
      * @param defaultValue default value to use if there is no such key in this map
-     * @param <K> type for the key
-     * @param <V> type for the value
-     * @return the value associated to this key in this map, the default value otherwise
+     * @param <K>          type for the key
+     * @param <V>          type for the value
+     * @return the value associated to this key in this map, the default value
+     *         otherwise
      */
     public static <K, V> V getOrDefault(Map<K, V> map, K key, V defaultValue) {
         return map.containsKey(key) ? map.get(key) : defaultValue;

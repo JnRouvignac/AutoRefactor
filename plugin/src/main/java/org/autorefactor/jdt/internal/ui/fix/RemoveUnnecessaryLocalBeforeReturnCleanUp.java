@@ -84,7 +84,7 @@ public class RemoveUnnecessaryLocalBeforeReturnCleanUp extends AbstractCleanUpRu
 
     @Override
     public boolean visit(Block node) {
-        final ReturnStatementVisitor returnStatementVisitor = new ReturnStatementVisitor(ctx, node);
+        final ReturnStatementVisitor returnStatementVisitor= new ReturnStatementVisitor(ctx, node);
         node.accept(returnStatementVisitor);
         return returnStatementVisitor.getResult();
     }
@@ -96,11 +96,11 @@ public class RemoveUnnecessaryLocalBeforeReturnCleanUp extends AbstractCleanUpRu
 
         @Override
         public boolean visit(ReturnStatement node) {
-            final Statement previousSibling = getPreviousSibling(node);
+            final Statement previousSibling= getPreviousSibling(node);
             if (!ctx.getRefactorings().hasBeenRefactored(previousSibling)
                     && previousSibling instanceof VariableDeclarationStatement) {
-                final VariableDeclarationStatement vds = (VariableDeclarationStatement) previousSibling;
-                final VariableDeclarationFragment vdf = getUniqueFragment(vds);
+                final VariableDeclarationStatement vds= (VariableDeclarationStatement) previousSibling;
+                final VariableDeclarationFragment vdf= getUniqueFragment(vds);
 
                 if (vdf != null && isSameLocalVariable(node.getExpression(), vdf.getName())) {
                     removeVariable(node, vds, vdf);
@@ -108,9 +108,8 @@ public class RemoveUnnecessaryLocalBeforeReturnCleanUp extends AbstractCleanUpRu
                     return DO_NOT_VISIT_SUBTREE;
                 }
             } else {
-                final Assignment as = asExpression(previousSibling, Assignment.class);
-                if (hasOperator(as, ASSIGN)
-                        && isSameLocalVariable(node.getExpression(), as.getLeftHandSide())
+                final Assignment as= asExpression(previousSibling, Assignment.class);
+                if (hasOperator(as, ASSIGN) && isSameLocalVariable(node.getExpression(), as.getLeftHandSide())
                         && !isUsedAfterReturn((IVariableBinding) ((Name) as.getLeftHandSide()).resolveBinding(),
                                 node)) {
                     replaceReturnStatement(node, previousSibling, as.getRightHandSide());
@@ -122,14 +121,13 @@ public class RemoveUnnecessaryLocalBeforeReturnCleanUp extends AbstractCleanUpRu
         }
 
         private boolean isUsedAfterReturn(final IVariableBinding varToSearch, final ASTNode scopeNode) {
-            final TryStatement tryStmt =
-                    getAncestorOrNull(scopeNode, TryStatement.class);
+            final TryStatement tryStmt= getAncestorOrNull(scopeNode, TryStatement.class);
             if (tryStmt == null) {
                 return false;
             } else {
                 if (tryStmt.getFinally() != null) {
-                    final VariableDefinitionsUsesVisitor variableUseVisitor =
-                            new VariableDefinitionsUsesVisitor(varToSearch, tryStmt.getFinally()).find();
+                    final VariableDefinitionsUsesVisitor variableUseVisitor= new VariableDefinitionsUsesVisitor(
+                            varToSearch, tryStmt.getFinally()).find();
                     if (!variableUseVisitor.getUses().isEmpty()) {
                         return true;
                     }
@@ -140,13 +138,11 @@ public class RemoveUnnecessaryLocalBeforeReturnCleanUp extends AbstractCleanUpRu
 
         private void removeVariable(final ReturnStatement node, final VariableDeclarationStatement vds,
                 final VariableDeclarationFragment vdf) {
-            final Expression returnExpr = vdf.getInitializer();
+            final Expression returnExpr= vdf.getInitializer();
             if (returnExpr instanceof ArrayInitializer) {
-                final ASTBuilder b = ctx.getASTBuilder();
-                final ReturnStatement newReturnStmt =
-                        b.return0(b.newArray(
-                                b.copy((ArrayType) vds.getType()),
-                                b.move((ArrayInitializer) returnExpr)));
+                final ASTBuilder b= ctx.getASTBuilder();
+                final ReturnStatement newReturnStmt= b
+                        .return0(b.newArray(b.copy((ArrayType) vds.getType()), b.move((ArrayInitializer) returnExpr)));
                 replaceReturnStatementForArray(node, vds, newReturnStmt);
             } else {
                 replaceReturnStatement(node, vds, returnExpr);
@@ -155,15 +151,15 @@ public class RemoveUnnecessaryLocalBeforeReturnCleanUp extends AbstractCleanUpRu
 
         private void replaceReturnStatementForArray(final ReturnStatement node, final Statement previousSibling,
                 final ReturnStatement newReturnStmt) {
-            final Refactorings r = ctx.getRefactorings();
+            final Refactorings r= ctx.getRefactorings();
             r.remove(previousSibling);
             r.replace(node, newReturnStmt);
         }
 
         private void replaceReturnStatement(final ReturnStatement node, final Statement previousSibling,
                 final Expression returnExpr) {
-            final ASTBuilder b = ctx.getASTBuilder();
-            final Refactorings r = ctx.getRefactorings();
+            final ASTBuilder b= ctx.getASTBuilder();
+            final Refactorings r= ctx.getRefactorings();
             r.remove(previousSibling);
             r.replace(node, b.return0(b.move(returnExpr)));
         }

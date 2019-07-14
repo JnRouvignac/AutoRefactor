@@ -37,9 +37,9 @@ class LineAndColumn {
     private final int colNo;
 
     public LineAndColumn(int position, int lineNo, int colNo) {
-        this.startPosition = position;
-        this.lineNo = lineNo;
-        this.colNo = colNo;
+        this.startPosition= position;
+        this.lineNo= lineNo;
+        this.colNo= colNo;
     }
 
     public int getStartPosition() {
@@ -62,20 +62,19 @@ class LineAndColumn {
         if (obj == null || getClass() != obj.getClass()) {
             return false;
         }
-        final LineAndColumn other = (LineAndColumn) obj;
+        final LineAndColumn other= (LineAndColumn) obj;
         return equal(startPosition, other.startPosition);
     }
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
+        final int prime= 31;
+        int result= 1;
         return prime * result + startPosition;
     }
 
     @Override
     public String toString() {
-        return "LineAndColumn [startPosition=" + startPosition + ", lineNo="
-                + lineNo + ", colNo=" + colNo + "]";
+        return "LineAndColumn [startPosition=" + startPosition + ", lineNo=" + lineNo + ", colNo=" + colNo + "]";
     }
 }

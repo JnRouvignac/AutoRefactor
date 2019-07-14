@@ -42,7 +42,7 @@ public class EclipsePreferences implements Preferences {
      * @param preferenceStore the preference store
      */
     public EclipsePreferences(IPreferenceStore preferenceStore) {
-        this.preferenceStore = preferenceStore;
+        this.preferenceStore= preferenceStore;
     }
 
     private boolean getBoolean(PreferenceConstants pref) {

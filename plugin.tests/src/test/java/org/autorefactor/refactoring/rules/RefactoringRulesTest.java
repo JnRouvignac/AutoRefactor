@@ -63,30 +63,30 @@ import org.junit.runners.Parameterized.Parameters;
  * Tests each refactoring rule in isolation. Each refactoring rule is run in a
  * loop until it cannot apply any more changes to the sample file.
  */
-@RunWith(value = Parameterized.class)
+@RunWith(value= Parameterized.class)
 public class RefactoringRulesTest {
-    private static final String SAMPLES_BASE_DIR = "../samples/src/test/java/org/autorefactor/refactoring/rules/";
-    private static final String PACKAGE_NAME = "org.autorefactor.refactoring.rules.samples_in";
+    private static final String SAMPLES_BASE_DIR= "../samples/src/test/java/org/autorefactor/refactoring/rules/";
+    private static final String PACKAGE_NAME= "org.autorefactor.refactoring.rules.samples_in";
 
     /** If not empty, then only run the refactorings present in this collection. */
-    private static final Collection<Class<?>> WHITELIST = Arrays.<Class<?>> asList(
-    );
-    /** When {@link #WHITELIST} is empty, the refactorings present in this collection will never be run. */
-    private static final Collection<Class<?>> BLACKLIST = Arrays.<Class<?>> asList(
-            ReduceVariableScopeCleanUp.class
-    );
+    private static final Collection<Class<?>> WHITELIST= Arrays.<Class<?>>asList();
+    /**
+     * When {@link #WHITELIST} is empty, the refactorings present in this collection
+     * will never be run.
+     */
+    private static final Collection<Class<?>> BLACKLIST= Arrays.<Class<?>>asList(ReduceVariableScopeCleanUp.class);
 
     private final String testName;
 
     public RefactoringRulesTest(String testName) {
-        this.testName = testName;
+        this.testName= testName;
     }
 
-    @Parameters(name = "{0}Refactoring")
+    @Parameters(name= "{0}Refactoring")
     public static Collection<Object[]> data() {
-        Collection<Object[]> samples = samples(SAMPLES_BASE_DIR, WHITELIST, BLACKLIST);
+        Collection<Object[]> samples= samples(SAMPLES_BASE_DIR, WHITELIST, BLACKLIST);
         for (Object[] sample : samples) {
-            sample[0] = ((String) sample[0]).replace("Sample.java", "");
+            sample[0]= ((String) sample[0]).replace("Sample.java", "");
         }
         return samples;
     }
@@ -107,61 +107,56 @@ public class RefactoringRulesTest {
     }
 
     private void testRefactoring0() throws Exception {
-        final String sampleName = testName + "Sample.java";
-        final File sampleIn = new File(SAMPLES_BASE_DIR, "samples_in/" + sampleName);
+        final String sampleName= testName + "Sample.java";
+        final File sampleIn= new File(SAMPLES_BASE_DIR, "samples_in/" + sampleName);
         assertTrue(testName + ": sample in file " + sampleIn + " should exist", sampleIn.exists());
-        final File sampleOut = new File(SAMPLES_BASE_DIR, "samples_out/" + sampleName);
+        final File sampleOut= new File(SAMPLES_BASE_DIR, "samples_out/" + sampleName);
         assertTrue(testName + ": sample out file " + sampleOut + " should exist", sampleOut.exists());
 
-        final String refactoringClassname = testName + "CleanUp";
-        final RefactoringRule refactoring = getRefactoringClass(refactoringClassname);
+        final String refactoringClassname= testName + "CleanUp";
+        final RefactoringRule refactoring= getRefactoringClass(refactoringClassname);
         assertNotNull(testName + ": refactoring class " + refactoringClassname + " should exist.\n"
-                + "Make sure you added it to the method getAllCleanUpRules() "
-                + "of the " + AllCleanUpRules.class + ".",
-                refactoring);
+                + "Make sure you added it to the method getAllCleanUpRules() " + "of the " + AllCleanUpRules.class
+                + ".", refactoring);
 
-        final String sampleInSource = readAll(sampleIn);
-        final String sampleOutSource = readAll(sampleOut);
+        final String sampleInSource= readAll(sampleIn);
+        final String sampleOutSource= readAll(sampleOut);
 
         given(sampleInSource, sampleOutSource);
 
-        final IDocument doc = when(sampleName, refactoring, sampleInSource);
+        final IDocument doc= when(sampleName, refactoring, sampleInSource);
 
         then(sampleOutSource, doc);
     }
 
     private void given(final String sampleInSource, final String sampleOutSource) {
-        final String actual = normalizeJavaSourceCode(sampleInSource.replaceAll("samples_in", "samples_out"));
-        final String expected = normalizeJavaSourceCode(sampleOutSource);
+        final String actual= normalizeJavaSourceCode(sampleInSource.replaceAll("samples_in", "samples_out"));
+        final String expected= normalizeJavaSourceCode(sampleOutSource);
         assertNotEquals(testName + ": verify nothing;", expected, actual);
     }
 
     private IDocument when(final String sampleName, final RefactoringRule refactoring, final String sampleInSource)
             throws Exception, JavaModelException {
-        final IPackageFragment packageFragment = JavaCoreHelper.getPackageFragment(PACKAGE_NAME);
-        final ICompilationUnit cu = packageFragment.createCompilationUnit(
-                sampleName, sampleInSource, true, null);
+        final IPackageFragment packageFragment= JavaCoreHelper.getPackageFragment(PACKAGE_NAME);
+        final ICompilationUnit cu= packageFragment.createCompilationUnit(sampleName, sampleInSource, true, null);
         cu.getBuffer().setContents(sampleInSource);
         cu.save(null, true);
 
-        final IDocument doc = new Document(sampleInSource);
-        new ApplyRefactoringsJob(null, null, TEST_ENVIRONMENT).applyRefactoring(
-                doc, cu,
-                new AggregateASTVisitor(Arrays.asList(refactoring)),
-                newJavaProjectOptions(Release.javaSE("1.8.0"), 4),
+        final IDocument doc= new Document(sampleInSource);
+        new ApplyRefactoringsJob(null, null, TEST_ENVIRONMENT).applyRefactoring(doc, cu,
+                new AggregateASTVisitor(Arrays.asList(refactoring)), newJavaProjectOptions(Release.javaSE("1.8.0"), 4),
                 SubMonitor.convert(new NullProgressMonitor()), true);
         return doc;
     }
 
     private void then(final String sampleOutSource, final IDocument doc) {
-        final String actual = normalizeJavaSourceCode(
-                doc.get().replaceAll("samples_in", "samples_out"));
-        final String expected = normalizeJavaSourceCode(sampleOutSource);
+        final String actual= normalizeJavaSourceCode(doc.get().replaceAll("samples_in", "samples_out"));
+        final String expected= normalizeJavaSourceCode(sampleOutSource);
         assertEquals(testName + ": wrong output;", expected, actual);
     }
 
     private RefactoringRule getRefactoringClass(final String refactoringClassName) throws Exception {
-        Collection<RefactoringRule> refactorings = AllCleanUpRules.getAllCleanUpRules();
+        Collection<RefactoringRule> refactorings= AllCleanUpRules.getAllCleanUpRules();
         for (RefactoringRule refactoring : refactorings) {
             if (refactoring.getClass().getSimpleName().equals(refactoringClassName)) {
                 return refactoring;

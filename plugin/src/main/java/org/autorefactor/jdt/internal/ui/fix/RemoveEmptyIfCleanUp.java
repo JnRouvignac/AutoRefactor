@@ -72,21 +72,19 @@ public class RemoveEmptyIfCleanUp extends AbstractCleanUpRule {
 
     @Override
     public boolean visit(IfStatement node) {
-        final Refactorings r = this.ctx.getRefactorings();
+        final Refactorings r= this.ctx.getRefactorings();
 
-        final Statement thenStmt = node.getThenStatement();
-        final Statement elseStmt = node.getElseStatement();
+        final Statement thenStmt= node.getThenStatement();
+        final Statement elseStmt= node.getElseStatement();
         if (elseStmt != null && asList(elseStmt).isEmpty()) {
             r.remove(elseStmt);
             return DO_NOT_VISIT_SUBTREE;
         } else if (thenStmt != null && asList(thenStmt).isEmpty()) {
-            final ASTBuilder b = this.ctx.getASTBuilder();
+            final ASTBuilder b= this.ctx.getASTBuilder();
 
-            final Expression condition = node.getExpression();
+            final Expression condition= node.getExpression();
             if (elseStmt != null) {
-                r.replace(node,
-                          b.if0(b.negate(condition),
-                                b.move(elseStmt)));
+                r.replace(node, b.if0(b.negate(condition), b.move(elseStmt)));
             } else if (isPassive(condition)) {
                 removeBlock(node, r, b);
                 return DO_NOT_VISIT_SUBTREE;
@@ -97,13 +95,10 @@ public class RemoveEmptyIfCleanUp extends AbstractCleanUpRule {
     }
 
     private void removeBlock(final IfStatement node, final Refactorings r, final ASTBuilder b) {
-        if (node.getParent() instanceof IfStatement
-                || node.getParent() instanceof EnhancedForStatement
-                || node.getParent() instanceof ForStatement
-                || node.getParent() instanceof WhileStatement
+        if (node.getParent() instanceof IfStatement || node.getParent() instanceof EnhancedForStatement
+                || node.getParent() instanceof ForStatement || node.getParent() instanceof WhileStatement
                 || node.getParent() instanceof DoStatement) {
-            r.replace(node,
-                    b.block());
+            r.replace(node, b.block());
         } else {
             r.remove(node);
         }

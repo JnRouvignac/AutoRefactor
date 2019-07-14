@@ -38,7 +38,7 @@ public interface Logger {
      * Logs an error message with an exception into Eclipse workspace logs.
      *
      * @param message the message to log
-     * @param e the exception to log
+     * @param e       the exception to log
      */
     void error(String message, Exception e);
 

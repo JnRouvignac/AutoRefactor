@@ -85,7 +85,7 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
             return VISIT_SUBTREE;
         }
 
-        ITypeBinding destinationTypeBinding = getDestinationType(node);
+        ITypeBinding destinationTypeBinding= getDestinationType(node);
 
         if (destinationTypeBinding != null && destinationTypeBinding.isPrimitive()
                 && "valueOf".equals(node.getName().getIdentifier())) {
@@ -122,18 +122,16 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
             }
         }
 
-        final ITypeBinding typeBinding = node.getExpression().resolveTypeBinding();
-        if (typeBinding != null
-                && node.getExpression() instanceof ClassInstanceCreation) {
-            final List<Expression> cicArgs = arguments((ClassInstanceCreation) node.getExpression());
+        final ITypeBinding typeBinding= node.getExpression().resolveTypeBinding();
+        if (typeBinding != null && node.getExpression() instanceof ClassInstanceCreation) {
+            final List<Expression> cicArgs= arguments((ClassInstanceCreation) node.getExpression());
             if (cicArgs.size() == 1) {
-                final Expression arg0 = cicArgs.get(0);
+                final Expression arg0= cicArgs.get(0);
                 if (arguments(node).isEmpty() && hasType(arg0, "java.lang.String")) {
-                    final String methodName = getMethodName(
-                            typeBinding.getQualifiedName(), node.getName().getIdentifier());
+                    final String methodName= getMethodName(typeBinding.getQualifiedName(),
+                            node.getName().getIdentifier());
                     if (methodName != null) {
-                        ctx.getRefactorings().replace(
-                                node,
+                        ctx.getRefactorings().replace(node,
                                 newMethodInvocation(typeBinding.getName(), methodName, arg0));
                         return DO_NOT_VISIT_SUBTREE;
                     }
@@ -150,39 +148,31 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
     }
 
     private boolean replaceMethodName(MethodInvocation node, String methodName) {
-        final SimpleName name = this.ctx.getASTBuilder().simpleName(methodName);
+        final SimpleName name= this.ctx.getASTBuilder().simpleName(methodName);
         this.ctx.getRefactorings().set(node, MethodInvocation.NAME_PROPERTY, name);
         return DO_NOT_VISIT_SUBTREE;
     }
 
     private boolean replaceWithTheSingleArgument(MethodInvocation node) {
-        final ASTBuilder b = this.ctx.getASTBuilder();
+        final ASTBuilder b= this.ctx.getASTBuilder();
         this.ctx.getRefactorings().replace(node, b.copy(arg0(node)));
         return DO_NOT_VISIT_SUBTREE;
     }
 
-    private String getMethodName(final String typeName,
-            final String invokedMethodName) {
-        if ("java.lang.Boolean".equals(typeName)
-                && "booleanValue".equals(invokedMethodName)) {
+    private String getMethodName(final String typeName, final String invokedMethodName) {
+        if ("java.lang.Boolean".equals(typeName) && "booleanValue".equals(invokedMethodName)) {
             return "valueOf";
-        } else if ("java.lang.Byte".equals(typeName)
-                && "byteValue".equals(invokedMethodName)) {
+        } else if ("java.lang.Byte".equals(typeName) && "byteValue".equals(invokedMethodName)) {
             return "parseByte";
-        } else if ("java.lang.Double".equals(typeName)
-                && "doubleValue".equals(invokedMethodName)) {
+        } else if ("java.lang.Double".equals(typeName) && "doubleValue".equals(invokedMethodName)) {
             return "parseDouble";
-        } else if ("java.lang.Float".equals(typeName)
-                && "floatValue".equals(invokedMethodName)) {
+        } else if ("java.lang.Float".equals(typeName) && "floatValue".equals(invokedMethodName)) {
             return "parseFloat";
-        } else if ("java.lang.Long".equals(typeName)
-                && "longValue".equals(invokedMethodName)) {
+        } else if ("java.lang.Long".equals(typeName) && "longValue".equals(invokedMethodName)) {
             return "parseLong";
-        } else if ("java.lang.Short".equals(typeName)
-                && "shortValue".equals(invokedMethodName)) {
+        } else if ("java.lang.Short".equals(typeName) && "shortValue".equals(invokedMethodName)) {
             return "parseShort";
-        } else if ("java.lang.Integer".equals(typeName)
-                && "intValue".equals(invokedMethodName)) {
+        } else if ("java.lang.Integer".equals(typeName) && "intValue".equals(invokedMethodName)) {
             return "parseInt";
         }
         return null;
@@ -190,17 +180,11 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
 
     @Override
     public boolean visit(ClassInstanceCreation node) {
-        final ITypeBinding typeBinding = node.getType().resolveBinding();
-        final List<Expression> args = arguments(node);
+        final ITypeBinding typeBinding= node.getType().resolveBinding();
+        final List<Expression> args= arguments(node);
         if (getJavaMinorVersion() >= 5 && args.size() == 1) {
-            if (hasType(typeBinding,
-                    "java.lang.Boolean",
-                    "java.lang.Byte",
-                    "java.lang.Character",
-                    "java.lang.Double",
-                    "java.lang.Long",
-                    "java.lang.Short",
-                    "java.lang.Integer")) {
+            if (hasType(typeBinding, "java.lang.Boolean", "java.lang.Byte", "java.lang.Character", "java.lang.Double",
+                    "java.lang.Long", "java.lang.Short", "java.lang.Integer")) {
                 replaceWithValueOf(node, typeBinding);
                 return DO_NOT_VISIT_SUBTREE;
             } else if (hasType(typeBinding, "java.lang.Float")) {
@@ -212,33 +196,27 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
 
     private boolean replaceFloatInstanceWithValueOf(ClassInstanceCreation node, final ITypeBinding typeBinding,
             final List<Expression> args) {
-        final Expression arg0 = args.get(0);
+        final Expression arg0= args.get(0);
         if (isPrimitive(arg0, "double")) {
-            final ASTBuilder b = ctx.getASTBuilder();
-            ctx.getRefactorings().replace(
-                    node,
+            final ASTBuilder b= ctx.getASTBuilder();
+            ctx.getRefactorings().replace(node,
                     b.invoke(typeBinding.getName(), "valueOf", b.cast(b.type("float"), b.copy(arg0))));
         } else if (hasType(arg0, "java.lang.Double")) {
-            final ASTBuilder b = ctx.getASTBuilder();
-            ctx.getRefactorings().replace(
-                    node,
-                    b.invoke(b.copy(arg0), "floatValue"));
+            final ASTBuilder b= ctx.getASTBuilder();
+            ctx.getRefactorings().replace(node, b.invoke(b.copy(arg0), "floatValue"));
         } else {
             replaceWithValueOf(node, typeBinding);
         }
         return DO_NOT_VISIT_SUBTREE;
     }
 
-    private void replaceWithValueOf(ClassInstanceCreation node,
-            final ITypeBinding typeBinding) {
-        this.ctx.getRefactorings().replace(
-                node,
+    private void replaceWithValueOf(ClassInstanceCreation node, final ITypeBinding typeBinding) {
+        this.ctx.getRefactorings().replace(node,
                 newMethodInvocation(typeBinding.getName(), "valueOf", arguments(node).get(0)));
     }
 
-    private MethodInvocation newMethodInvocation(String typeName,
-            String methodName, Expression arg) {
-        final ASTBuilder b = this.ctx.getASTBuilder();
+    private MethodInvocation newMethodInvocation(String typeName, String methodName, Expression arg) {
+        final ASTBuilder b= this.ctx.getASTBuilder();
         return b.invoke(typeName, methodName, b.copy(arg));
     }
 }

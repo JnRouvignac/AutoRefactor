@@ -81,7 +81,7 @@ public class NoAssignmentInIfConditionCleanUp extends AbstractCleanUpRule {
 
     @Override
     public boolean visit(Block node) {
-        final NewAndPutAllMethodVisitor newAndPutAllMethodVisitor = new NewAndPutAllMethodVisitor(ctx, node);
+        final NewAndPutAllMethodVisitor newAndPutAllMethodVisitor= new NewAndPutAllMethodVisitor(ctx, node);
         node.accept(newAndPutAllMethodVisitor);
         return newAndPutAllMethodVisitor.getResult();
     }
@@ -97,15 +97,15 @@ public class NoAssignmentInIfConditionCleanUp extends AbstractCleanUpRule {
                 return VISIT_SUBTREE;
             }
 
-            final InfixExpression ie = as(node.getExpression(), InfixExpression.class);
+            final InfixExpression ie= as(node.getExpression(), InfixExpression.class);
             return moveAssignmentBeforeIfStatementIfPossible(node, ie);
         }
 
         private boolean moveAssignmentBeforeIfStatementIfPossible(IfStatement node, InfixExpression ie) {
             if (ie != null) {
-                final InfixExpression leftIe = as(ie.getLeftOperand(), InfixExpression.class);
-                final Assignment leftAs = as(ie.getLeftOperand(), Assignment.class);
-                final Assignment rightAs = as(ie.getRightOperand(), Assignment.class);
+                final InfixExpression leftIe= as(ie.getLeftOperand(), InfixExpression.class);
+                final Assignment leftAs= as(ie.getLeftOperand(), Assignment.class);
+                final Assignment rightAs= as(ie.getRightOperand(), Assignment.class);
                 if (leftAs != null) {
                     return moveAssignmentBeforeIfStatement(node, leftAs);
                 } else if (rightAs != null) {
@@ -118,21 +118,19 @@ public class NoAssignmentInIfConditionCleanUp extends AbstractCleanUpRule {
         }
 
         private boolean moveAssignmentBeforeIfStatement(final IfStatement node, final Assignment a) {
-            final Refactorings r = ctx.getRefactorings();
-            final ASTBuilder b = ctx.getASTBuilder();
-            final VariableDeclarationStatement vds = as(getPreviousSibling(node), VariableDeclarationStatement.class);
-            final Expression lhs = removeParentheses(a.getLeftHandSide());
-            final VariableDeclarationFragment vdf = findVariableDeclarationFragment(vds, lhs);
+            final Refactorings r= ctx.getRefactorings();
+            final ASTBuilder b= ctx.getASTBuilder();
+            final VariableDeclarationStatement vds= as(getPreviousSibling(node), VariableDeclarationStatement.class);
+            final Expression lhs= removeParentheses(a.getLeftHandSide());
+            final VariableDeclarationFragment vdf= findVariableDeclarationFragment(vds, lhs);
             if (vdf != null) {
                 r.set(vdf, INITIALIZER_PROPERTY, a.getRightHandSide());
-                r.replace(getParent(a, ParenthesizedExpression.class),
-                        b.copy(lhs));
+                r.replace(getParent(a, ParenthesizedExpression.class), b.copy(lhs));
                 setResult(DO_NOT_VISIT_SUBTREE);
                 return DO_NOT_VISIT_SUBTREE;
             } else if (!isAnElseIf(node)) {
                 r.insertBefore(b.toStmt(b.move(a)), node);
-                r.replace(getParent(a, ParenthesizedExpression.class),
-                        b.copy(lhs));
+                r.replace(getParent(a, ParenthesizedExpression.class), b.copy(lhs));
                 setResult(DO_NOT_VISIT_SUBTREE);
                 return DO_NOT_VISIT_SUBTREE;
             }
@@ -152,9 +150,8 @@ public class NoAssignmentInIfConditionCleanUp extends AbstractCleanUpRule {
         }
 
         private boolean isAnElseIf(IfStatement node) {
-            final ASTNode parent = node.getParent();
-            return parent instanceof IfStatement
-                    && node.equals(((IfStatement) parent).getElseStatement());
+            final ASTNode parent= node.getParent();
+            return parent instanceof IfStatement && node.equals(((IfStatement) parent).getElseStatement());
         }
     }
 }

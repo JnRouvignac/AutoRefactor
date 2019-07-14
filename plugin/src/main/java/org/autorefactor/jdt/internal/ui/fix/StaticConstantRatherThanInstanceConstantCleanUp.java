@@ -74,8 +74,7 @@ public class StaticConstantRatherThanInstanceConstantCleanUp extends AbstractCle
 
     @Override
     public boolean visit(FieldDeclaration node) {
-        if (node.getType().isPrimitiveType()
-                || hasType(node.getType().resolveBinding(), "java.lang.Byte")
+        if (node.getType().isPrimitiveType() || hasType(node.getType().resolveBinding(), "java.lang.Byte")
                 || hasType(node.getType().resolveBinding(), "java.lang.Character")
                 || hasType(node.getType().resolveBinding(), "java.lang.Short")
                 || hasType(node.getType().resolveBinding(), "java.lang.Integer")
@@ -84,19 +83,18 @@ public class StaticConstantRatherThanInstanceConstantCleanUp extends AbstractCle
                 || hasType(node.getType().resolveBinding(), "java.lang.Float")
                 || hasType(node.getType().resolveBinding(), "java.lang.Double")
                 || hasType(node.getType().resolveBinding(), "java.lang.String")) {
-            Modifier finalModifier = null;
+            Modifier finalModifier= null;
             for (final Modifier modifier : getModifiersOnly(modifiers(node))) {
                 if (modifier.isStatic()) {
                     return VISIT_SUBTREE;
                 }
                 if (modifier.isFinal()) {
-                    finalModifier = modifier;
+                    finalModifier= modifier;
                 }
             }
 
             if (finalModifier != null && node.fragments() != null && node.fragments().size() == 1) {
-                final Expression initializer =
-                        ((VariableDeclarationFragment) node.fragments().get(0)).getInitializer();
+                final Expression initializer= ((VariableDeclarationFragment) node.fragments().get(0)).getInitializer();
 
                 if (isHardCoded(initializer)) {
                     addStaticModifier(finalModifier);
@@ -109,14 +107,14 @@ public class StaticConstantRatherThanInstanceConstantCleanUp extends AbstractCle
     }
 
     private void addStaticModifier(final Modifier finalModifier) {
-        final ASTBuilder b = ctx.getASTBuilder();
-        final Refactorings r = ctx.getRefactorings();
+        final ASTBuilder b= ctx.getASTBuilder();
+        final Refactorings r= ctx.getRefactorings();
 
         r.insertBefore(b.static0(), finalModifier);
     }
 
     private List<Modifier> getModifiersOnly(final Collection<IExtendedModifier> modifiers) {
-        final List<Modifier> results = new LinkedList<Modifier>();
+        final List<Modifier> results= new LinkedList<Modifier>();
         for (final IExtendedModifier em : modifiers) {
             if (em.isModifier()) {
                 results.add((Modifier) em);

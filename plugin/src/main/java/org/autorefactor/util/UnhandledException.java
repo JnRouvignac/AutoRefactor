@@ -28,14 +28,14 @@ package org.autorefactor.util;
 import org.eclipse.jdt.core.dom.ASTNode;
 
 /**
- * Exception thrown when an exception could not be handled.
- * The cause is the unhandled exception.
+ * Exception thrown when an exception could not be handled. The cause is the
+ * unhandled exception.
  */
 public class UnhandledException extends AutoRefactorException {
     /**
      * Constructor.
      *
-     * @param node the node from which to retrieve the source location
+     * @param node      the node from which to retrieve the source location
      * @param unhandled the unhandled exception.
      */
     public UnhandledException(ASTNode node, Throwable unhandled) {
@@ -45,8 +45,8 @@ public class UnhandledException extends AutoRefactorException {
     /**
      * Constructor.
      *
-     * @param node the node from which to retrieve the source location
-     * @param message the message to report
+     * @param node      the node from which to retrieve the source location
+     * @param message   the message to report
      * @param unhandled the unhandled exception.
      */
     public UnhandledException(ASTNode node, String message, Throwable unhandled) {

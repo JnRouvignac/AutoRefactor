@@ -76,7 +76,7 @@ public class AutoRefactorTabPage extends CleanUpTabPage {
      */
     @Override
     public Composite createContents(Composite parent) {
-        final List<RefactoringRule> allRefactoringRules = AllCleanUpRules.getAllCleanUpRules();
+        final List<RefactoringRule> allRefactoringRules= AllCleanUpRules.getAllCleanUpRules();
         Collections.sort(allRefactoringRules, new Comparator<RefactoringRule>() {
             /**
              * Compare objects.
@@ -92,7 +92,7 @@ public class AutoRefactorTabPage extends CleanUpTabPage {
 
         });
 
-        final Group ruleGroup = createControls(parent, allRefactoringRules);
+        final Group ruleGroup= createControls(parent, allRefactoringRules);
 
         initialize();
         invalidateToggleRules(ruleGroup);
@@ -101,31 +101,30 @@ public class AutoRefactorTabPage extends CleanUpTabPage {
     }
 
     private Group createControls(final Composite parent, final List<RefactoringRule> allRefactoringRules) {
-        fieldEditorParent = new Composite(parent, SWT.FILL);
+        fieldEditorParent= new Composite(parent, SWT.FILL);
         fieldEditorParent.setLayout(new FillLayout());
 
-        ScrolledComposite scrolledComposite = new ScrolledComposite(fieldEditorParent,
+        ScrolledComposite scrolledComposite= new ScrolledComposite(fieldEditorParent,
                 SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
 
         initFields(allRefactoringRules);
 
-        Composite composite = new Composite(scrolledComposite, SWT.FILL);
-        final Group ruleGroup = new Group(composite, SWT.FILL);
+        Composite composite= new Composite(scrolledComposite, SWT.FILL);
+        final Group ruleGroup= new Group(composite, SWT.FILL);
         ruleGroup.setText("Rules by default");
 
         // All rule checkbox
-        toggleAllRules = new Button(ruleGroup, SWT.CHECK | SWT.LEFT);
+        toggleAllRules= new Button(ruleGroup, SWT.CHECK | SWT.LEFT);
         toggleAllRules.setFont(ruleGroup.getFont());
         toggleAllRules.setText("Toggle all the rules");
         toggleAllRules.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                boolean isSelected = AutoRefactorTabPage.this.toggleAllRules.getSelection();
+                boolean isSelected= AutoRefactorTabPage.this.toggleAllRules.getSelection();
 
                 for (BooleanFieldEditor rule : AutoRefactorTabPage.this.rules) {
                     ((Button) rule.getDescriptionControl(ruleGroup)).setSelection(isSelected);
-                    rule.getPreferenceStore().setValue(rule.getPreferenceName(),
-                            isSelected);
+                    rule.getPreferenceStore().setValue(rule.getPreferenceName(), isSelected);
                 }
 
                 AutoRefactorPlugin.getDefault().getPreferenceStore().needsSaving();
@@ -133,22 +132,21 @@ public class AutoRefactorTabPage extends CleanUpTabPage {
         });
 
         // Add a space
-        Composite spacer = new Composite(ruleGroup, SWT.NULL);
+        Composite spacer= new Composite(ruleGroup, SWT.NULL);
         spacer.setLayoutData(new GridData(0, 5));
 
-        rules = new ArrayList<BooleanFieldEditor>(allRefactoringRules.size());
+        rules= new ArrayList<BooleanFieldEditor>(allRefactoringRules.size());
 
         for (final RefactoringRule refactoringRule : allRefactoringRules) {
-            final BooleanFieldEditor booleanFieldEditor = new BooleanFieldEditor(
-                    getPropertyName(refactoringRule),
+            final BooleanFieldEditor booleanFieldEditor= new BooleanFieldEditor(getPropertyName(refactoringRule),
                     refactoringRule.getName(), SWT.WRAP, ruleGroup);
 
             booleanFieldEditor.getDescriptionControl(ruleGroup).setToolTipText(refactoringRule.getDescription());
             ((Button) booleanFieldEditor.getDescriptionControl(ruleGroup)).addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(final SelectionEvent e) {
-                    final String isPreferenceEnabled = booleanFieldEditor.getBooleanValue()
-                            ? CleanUpOptions.TRUE : CleanUpOptions.FALSE;
+                    final String isPreferenceEnabled= booleanFieldEditor.getBooleanValue() ? CleanUpOptions.TRUE
+                            : CleanUpOptions.FALSE;
 
                     booleanFieldEditor.getPreferenceStore().setValue(booleanFieldEditor.getPreferenceName(),
                             isPreferenceEnabled);
@@ -172,13 +170,13 @@ public class AutoRefactorTabPage extends CleanUpTabPage {
      * @param allRefactoringRules all the refactoring rules
      */
     protected void initFields(final List<RefactoringRule> allRefactoringRules) {
-        fields = new ArrayList<FieldEditor>(allRefactoringRules.size());
+        fields= new ArrayList<FieldEditor>(allRefactoringRules.size());
     }
 
     private void invalidateToggleRules(final Composite ruleGroup) {
-        boolean isAllRulesChecked = true;
+        boolean isAllRulesChecked= true;
         for (final BooleanFieldEditor rule : this.rules) {
-            isAllRulesChecked = ((Button) rule.getDescriptionControl(ruleGroup)).getSelection();
+            isAllRulesChecked= ((Button) rule.getDescriptionControl(ruleGroup)).getSelection();
             if (!isAllRulesChecked) {
                 break;
             }
@@ -225,7 +223,7 @@ public class AutoRefactorTabPage extends CleanUpTabPage {
      */
     @Override
     public int getSelectedCleanUpCount() {
-        int selectedCleanups = 0;
+        int selectedCleanups= 0;
 
         if (fields != null) {
             for (final FieldEditor field : fields) {
@@ -246,11 +244,10 @@ public class AutoRefactorTabPage extends CleanUpTabPage {
     public void setOptions(CleanUpOptions options) {
         if (fields != null) {
             for (final FieldEditor field : fields) {
-                final String isPreferenceEnabled = ((BooleanFieldEditor) field).getBooleanValue()
-                        ? CleanUpOptions.TRUE : CleanUpOptions.FALSE;
+                final String isPreferenceEnabled= ((BooleanFieldEditor) field).getBooleanValue() ? CleanUpOptions.TRUE
+                        : CleanUpOptions.FALSE;
 
-                options.setOption(field.getPreferenceName(),
-                        isPreferenceEnabled);
+                options.setOption(field.getPreferenceName(), isPreferenceEnabled);
                 field.getPreferenceStore().setValue(field.getPreferenceName(), isPreferenceEnabled);
             }
         }

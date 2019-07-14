@@ -220,7 +220,7 @@ public class StringSample {
         s1.equalsIgnoreCase(s2);
         s1.equalsIgnoreCase(s2);
     }
-    
+
     public void refactorIndexOf(){
         String b = "b";
         "a".indexOf('a', 0);
@@ -228,7 +228,7 @@ public class StringSample {
         b.trim().indexOf('\t', 0);
         "a".indexOf('\n');
     }
-    
+
     public void refactorlastIndexOfCases(){
         String b = "b";
         "a".lastIndexOf('a', 0);
@@ -236,7 +236,7 @@ public class StringSample {
         b.toLowerCase().lastIndexOf('\t', 0);
         "a".lastIndexOf('\n');
     }
-    
+
     public void doNotRefactorInvocationsOtherThanOneChar(){
         "a".indexOf(1);
         "a".indexOf(1, 0);

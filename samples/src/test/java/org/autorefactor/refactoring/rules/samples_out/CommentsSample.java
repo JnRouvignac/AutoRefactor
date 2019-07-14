@@ -136,7 +136,7 @@ public class CommentsSample implements Runnable, Callable<Void>, Closeable {
      */
     public void bewareOfSlashesAfterSlashes2() {
     }
-    
+
     class Sample
     {
     Object SEED=1;

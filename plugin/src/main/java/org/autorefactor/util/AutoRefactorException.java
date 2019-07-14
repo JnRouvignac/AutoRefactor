@@ -48,7 +48,7 @@ public class AutoRefactorException extends RuntimeException {
     /**
      * Constructor.
      *
-     * @param node the node from which to retrieve the source location
+     * @param node    the node from which to retrieve the source location
      * @param message the exception message
      */
     public AutoRefactorException(ASTNode node, String message) {
@@ -58,7 +58,7 @@ public class AutoRefactorException extends RuntimeException {
     /**
      * Constructor.
      *
-     * @param node the node from which to retrieve the source location
+     * @param node  the node from which to retrieve the source location
      * @param cause the cause
      */
     public AutoRefactorException(ASTNode node, Throwable cause) {
@@ -68,16 +68,16 @@ public class AutoRefactorException extends RuntimeException {
     /**
      * Constructor.
      *
-     * @param node the node from which to retrieve the source location
+     * @param node    the node from which to retrieve the source location
      * @param message the exception message
-     * @param cause the cause
+     * @param cause   the cause
      */
     public AutoRefactorException(ASTNode node, String message, Throwable cause) {
         super(buildMessage(node, message), cause);
     }
 
     private static String buildMessage(ASTNode node, String message) {
-        final String sourceLocation = getSourceLocation(node);
+        final String sourceLocation= getSourceLocation(node);
         if (sourceLocation.length() > 0) {
             return sourceLocation + ":" + message;
         }

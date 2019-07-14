@@ -70,12 +70,10 @@ public class OppositeComparisonRatherThanNegativeExpressionCleanUp extends Abstr
     @Override
     public boolean visit(final PrefixExpression node) {
         if (Operator.MINUS.equals(node.getOperator())) {
-            final MethodInvocation mi = as(node.getOperand(), MethodInvocation.class);
+            final MethodInvocation mi= as(node.getOperand(), MethodInvocation.class);
 
             if (mi != null && mi.getExpression() != null && mi.arguments().size() == 1) {
-                final String[] classes = { "java.lang.Double", "java.lang.Float", "java.lang.Short",
-                    "java.lang.Integer", "java.lang.Long", "java.lang.Character", "java.lang.Byte",
-                    "java.lang.Boolean" };
+                final String[] classes= { "java.lang.Double", "java.lang.Float", "java.lang.Short", "java.lang.Integer", "java.lang.Long", "java.lang.Character", "java.lang.Byte", "java.lang.Boolean" };
 
                 for (final String clazz : classes) {
                     if (isMethod(mi, clazz, "compareTo", clazz) && hasType((Expression) mi.arguments().get(0), clazz)) {
@@ -90,8 +88,8 @@ public class OppositeComparisonRatherThanNegativeExpressionCleanUp extends Abstr
     }
 
     private void reverseObjects(final PrefixExpression node, final MethodInvocation mi) {
-        final ASTBuilder b = ctx.getASTBuilder();
-        final Refactorings r = ctx.getRefactorings();
+        final ASTBuilder b= ctx.getASTBuilder();
+        final Refactorings r= ctx.getRefactorings();
 
         r.replace(node, b.invoke(b.parenthesizeIfNeeded(b.copy((Expression) mi.arguments().get(0))), "compareTo",
                 b.copy(mi.getExpression())));
