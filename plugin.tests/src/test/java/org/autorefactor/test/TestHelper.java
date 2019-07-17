@@ -48,7 +48,7 @@ import org.autorefactor.environment.Environment;
 import org.autorefactor.jdt.internal.corext.dom.JavaProjectOptions;
 import org.autorefactor.jdt.internal.corext.dom.JavaProjectOptionsImpl;
 import org.autorefactor.jdt.internal.corext.dom.Release;
-import org.autorefactor.refactoring.rules.EndsWithFileFilter;
+import org.autorefactor.jdt.internal.ui.fix.EndsWithFileFilter;
 import org.eclipse.jdt.core.formatter.CodeFormatter;
 import org.eclipse.jdt.core.formatter.DefaultCodeFormatterConstants;
 import org.eclipse.jface.text.BadLocationException;

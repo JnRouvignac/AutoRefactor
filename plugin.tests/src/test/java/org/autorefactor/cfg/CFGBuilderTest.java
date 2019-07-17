@@ -43,7 +43,7 @@ import org.autorefactor.jdt.internal.corext.dom.ApplyRefactoringsJob;
 import org.autorefactor.jdt.internal.corext.dom.JavaProjectOptions;
 import org.autorefactor.jdt.internal.corext.dom.JavaProjectOptionsImpl;
 import org.autorefactor.jdt.internal.corext.dom.Release;
-import org.autorefactor.refactoring.rules.JavaCoreHelper;
+import org.autorefactor.jdt.internal.ui.fix.JavaCoreHelper;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.dom.AST;
