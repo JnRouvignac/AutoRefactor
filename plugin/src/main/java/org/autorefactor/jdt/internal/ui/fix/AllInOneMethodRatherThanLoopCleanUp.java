@@ -253,7 +253,7 @@ public class AllInOneMethodRatherThanLoopCleanUp extends NewClassImportCleanUp {
         if (isMethod(colMI, "java.util.Collection", "add", "java.lang.Object")) {
             replaceWithCollectionMethod(node, "addAll", colMI.getExpression(), data);
             return DO_NOT_VISIT_SUBTREE;
-        } else if (isMethod(colMI, "java.util.Collection", "remove", "java.lang.Object")) {
+        } else if (isMethod(colMI, "java.util.Set", "remove", "java.lang.Object")) {
             replaceWithCollectionMethod(node, "removeAll", colMI.getExpression(), data);
             return DO_NOT_VISIT_SUBTREE;
         }
