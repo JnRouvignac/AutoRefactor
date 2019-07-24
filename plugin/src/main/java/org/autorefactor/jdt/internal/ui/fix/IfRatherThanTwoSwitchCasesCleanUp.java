@@ -214,7 +214,9 @@ public class IfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRule {
             final Pair<List<Expression>, List<Statement>> caseStructure= switchStructure.get(i);
 
             final Expression newCondition;
-            if (caseStructure.getFirst().size() == 1) {
+            if (caseStructure.getFirst().isEmpty()) {
+                newCondition= null;
+            } else if (caseStructure.getFirst().size() == 1) {
                 newCondition= buildEquality(b, discriminant, caseStructure.getFirst().get(0));
             } else {
                 final List<Expression> equalities= newArrayList();

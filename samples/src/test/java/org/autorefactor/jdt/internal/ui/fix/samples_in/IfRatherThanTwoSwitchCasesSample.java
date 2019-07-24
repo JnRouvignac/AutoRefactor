@@ -31,7 +31,7 @@ public class IfRatherThanTwoSwitchCasesSample {
 
     public int i2 = 0;
 
-    public void replaceSwitchWithIfOnParameter(int i1) {
+    public void replaceSwitchWithParameterDiscriminant(int i1) {
         int i = 0;
         // Keep this comment
         switch (i1) {
@@ -52,7 +52,25 @@ public class IfRatherThanTwoSwitchCasesSample {
         }
     }
 
-    public void replaceSwitchWithIfOnLocalVariable() {
+    public void replaceSwitchWithDefault(int i1) {
+        int i = 0;
+        // Keep this comment
+        switch (i1) {
+        case 0:
+        case 1:
+        case 2:
+            // Keep this comment too
+            i = 0;
+            break;
+
+        default:
+            // Keep this comment also
+            i = 150;
+            break;
+        }
+    }
+
+    public void replaceSwitchWithLocalVariableDiscriminant() {
         int i1 = 0;
         int i = 0;
         // Keep this comment
@@ -74,7 +92,7 @@ public class IfRatherThanTwoSwitchCasesSample {
         }
     }
 
-    public void replaceSwitchWithIfOnField() {
+    public void replaceSwitchWithFieldDiscriminant() {
         int i = 0;
         // Keep this comment
         switch (i2) {
@@ -90,7 +108,7 @@ public class IfRatherThanTwoSwitchCasesSample {
         }
     }
 
-    public void replaceSwitchWithIfOnCharacter(char a1) {
+    public void replaceSwitchWithCharacterDiscriminant(char a1) {
         int i = 0;
         // Keep this comment
         switch (a1) {
@@ -109,7 +127,7 @@ public class IfRatherThanTwoSwitchCasesSample {
         }
     }
 
-    public void replaceSwitchWithIfOnString(String text) {
+    public void replaceSwitchWithStringDiscriminant(String text) {
         int i = 0;
         // Keep this comment
         switch (text) {
@@ -129,7 +147,7 @@ public class IfRatherThanTwoSwitchCasesSample {
         }
     }
 
-    public void replaceSwitchWithIfOnEnum(DayOfWeek day) {
+    public void replaceSwitchWithEnumDiscriminant(DayOfWeek day) {
         int i = 0;
         // Keep this comment
         switch (day) {

@@ -31,7 +31,7 @@ public class IfRatherThanTwoSwitchCasesSample {
 
     public int i2 = 0;
 
-    public void replaceSwitchWithIfOnParameter(int i1) {
+    public void replaceSwitchWithParameterDiscriminant(int i1) {
         int i = 0;
         // Keep this comment
         if ((i1 == 0) || (i1 == 1) || (i1 == 2)) {
@@ -45,7 +45,19 @@ public class IfRatherThanTwoSwitchCasesSample {
         }
     }
 
-    public void replaceSwitchWithIfOnLocalVariable() {
+    public void replaceSwitchWithDefault(int i1) {
+        int i = 0;
+        // Keep this comment
+        if ((i1 == 0) || (i1 == 1) || (i1 == 2)) {
+            // Keep this comment too
+            i = 0;
+        } else {
+            // Keep this comment also
+            i = 150;
+        }
+    }
+
+    public void replaceSwitchWithLocalVariableDiscriminant() {
         int i1 = 0;
         int i = 0;
         // Keep this comment
@@ -60,7 +72,7 @@ public class IfRatherThanTwoSwitchCasesSample {
         }
     }
 
-    public void replaceSwitchWithIfOnField() {
+    public void replaceSwitchWithFieldDiscriminant() {
         int i = 0;
         // Keep this comment
         if (i2 == 0) {
@@ -71,7 +83,7 @@ public class IfRatherThanTwoSwitchCasesSample {
         }
     }
 
-    public void replaceSwitchWithIfOnCharacter(char a1) {
+    public void replaceSwitchWithCharacterDiscriminant(char a1) {
         int i = 0;
         // Keep this comment
         if (a1 == 'a') {
@@ -82,7 +94,7 @@ public class IfRatherThanTwoSwitchCasesSample {
         }
     }
 
-    public void replaceSwitchWithIfOnString(String text) {
+    public void replaceSwitchWithStringDiscriminant(String text) {
         int i = 0;
         // Keep this comment
         if ("foo".equals(text) || "bar".equals(text)) {
@@ -96,7 +108,7 @@ public class IfRatherThanTwoSwitchCasesSample {
         }
     }
 
-    public void replaceSwitchWithIfOnEnum(DayOfWeek day) {
+    public void replaceSwitchWithEnumDiscriminant(DayOfWeek day) {
         int i = 0;
         // Keep this comment
         if ((day == java.time.DayOfWeek.MONDAY) || (day == java.time.DayOfWeek.TUESDAY)
