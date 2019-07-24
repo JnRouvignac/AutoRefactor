@@ -205,6 +205,7 @@ public class IfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRule {
     private void replaceSwitch(final SwitchStatement node,
             final List<Pair<List<Expression>, List<Statement>>> switchStructure, final int caseIndexWithDefault,
             final ASTBuilder b) {
+        int localCaseIndexWithDefault= caseIndexWithDefault;
         final Refactorings r= this.ctx.getRefactorings();
 
         final Expression discriminant= node.getExpression();
@@ -237,7 +238,9 @@ public class IfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRule {
 
             if (currentBlock != null) {
                 currentBlock= b.if0(newCondition, newBlock, currentBlock);
-            } else if (caseIndexWithDefault == -1) {
+            } else if (copyOfStmts.length == 0) {
+                localCaseIndexWithDefault= -1;
+            } else if (localCaseIndexWithDefault == -1) {
                 currentBlock= b.if0(newCondition, newBlock);
             } else {
                 currentBlock= newBlock;

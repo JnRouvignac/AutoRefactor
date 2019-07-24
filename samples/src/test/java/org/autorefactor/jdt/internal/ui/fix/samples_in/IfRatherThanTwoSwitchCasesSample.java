@@ -70,6 +70,22 @@ public class IfRatherThanTwoSwitchCasesSample {
         }
     }
 
+    public void replaceSwitchWithEmptyDefault(int i1) {
+        int i = 0;
+        // Keep this comment
+        switch (i1) {
+        case 0:
+        case 1:
+        case 2:
+            // Keep this comment too
+            i = 0;
+            break;
+
+        default:
+            break;
+        }
+    }
+
     public void replaceSwitchWithLocalVariableDiscriminant() {
         int i1 = 0;
         int i = 0;
