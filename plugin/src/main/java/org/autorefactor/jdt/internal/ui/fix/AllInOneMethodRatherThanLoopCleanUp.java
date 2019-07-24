@@ -136,19 +136,14 @@ public class AllInOneMethodRatherThanLoopCleanUp extends NewClassImportCleanUp {
         final IVariableBinding foreachVariable= node.getParameter().resolveBinding();
         // We should remove all the loop variable occurrences
         // As we replace only one, there should be no more than one occurrence
-        if (getVariableUseCount(foreachVariable, node.getBody()) == 1) {
+        if (getVariableUseCount(foreachVariable, node.getBody()) == 1
+                && mi != null && mi.arguments().size() == 1) {
             if (instanceOf(iterable, "java.util.Collection")) {
-                if (isMethod(mi, "java.util.Collection", "add", "java.lang.Object")) {
-                    return maybeReplaceWithCollectionMethod(node, iterable, "addAll", mi);
-                } else if (isMethod(mi, "java.util.Collection", "remove", "java.lang.Object")) {
-                    return maybeReplaceWithCollectionMethod(node, iterable, "removeAll", mi);
+                if (isSameLocalVariable(node.getParameter(), arg0(mi))) {
+                    return maybeReplaceForCollection(node, mi, iterable);
                 }
-            } else if (isArray(iterable) && isMethod(mi, "java.util.Collection", "add", "java.lang.Object")
-                    && areTypeCompatible(getCalledType(mi), iterable.resolveTypeBinding())
-                    && isSameLocalVariable(foreachVariable, arg0(mi))) {
-                replaceWithCollectionsAddAll(node, iterable, mi, classesToUseWithImport);
-                importsToAdd.add("java.util.Collections");
-                return DO_NOT_VISIT_SUBTREE;
+            } else if (isArray(iterable) && isSameLocalVariable(foreachVariable, arg0(mi))) {
+                return maybeReplaceForArray(node, classesToUseWithImport, importsToAdd, iterable, mi);
             }
         }
 
@@ -166,15 +161,6 @@ public class AllInOneMethodRatherThanLoopCleanUp extends NewClassImportCleanUp {
                         b.copy(iterable))));
     }
 
-    private boolean maybeReplaceWithCollectionMethod(EnhancedForStatement node, Expression collection,
-            String methodName, MethodInvocation colMI) {
-        if (isSameLocalVariable(node.getParameter(), arg0(colMI))) {
-            replaceWithCollectionMethod(node, methodName, colMI.getExpression(), collection);
-            return DO_NOT_VISIT_SUBTREE;
-        }
-        return VISIT_SUBTREE;
-    }
-
     @Override
     public boolean visit(ForStatement node) {
         return maybeRefactorForStatement(node, getAlreadyImportedClasses(node), new HashSet<String>());
@@ -188,38 +174,48 @@ public class AllInOneMethodRatherThanLoopCleanUp extends NewClassImportCleanUp {
         if (loopContent != null && loopContent.getLoopVariable() != null && stmts.size() == 1) {
             final SimpleName loopVariable= (SimpleName) loopContent.getLoopVariable();
             final IVariableBinding loopVariableName= (IVariableBinding) loopVariable.resolveBinding();
+            final MethodInvocation mi= asExpression(stmts.get(0), MethodInvocation.class);
 
             // We should remove all the loop variable occurrences
             // As we replace only one, there should be no more than one occurrence
-            if (getVariableUseCount(loopVariableName, node.getBody()) == 1) {
-                final MethodInvocation mi= asExpression(stmts.get(0), MethodInvocation.class);
+            if (mi != null && mi.arguments().size() == 1 && getVariableUseCount(loopVariableName, node.getBody()) == 1) {
 
                 switch (loopContent.getContainerType()) {
                 case COLLECTION:
-                    if (isMethod(mi, "java.util.Collection", "add", "java.lang.Object")) {
-                        return maybeReplaceWithCollectionMethod(node, loopContent, "addAll", mi);
-                    } else if (isMethod(mi, "java.util.Collection", "remove", "java.lang.Object")) {
-                        return maybeReplaceWithCollectionMethod(node, loopContent, "removeAll", mi);
+                    final Expression addArg01= arg0(mi);
+                    final MethodInvocation getMI= as(addArg01, MethodInvocation.class);
+
+                    if (getMI != null && getMI.arguments().size() == 1 && isSameVariable(loopContent, getMI)) {
+                        return maybeReplaceForCollection(node, mi, getMI.getExpression());
                     }
                     break;
 
                 case ARRAY:
-                    if (isMethod(mi, "java.util.Collection", "add", "java.lang.Object") && areTypeCompatible(
-                            getCalledType(mi), loopContent.getContainerVariable().resolveTypeBinding())) {
-                        final Expression addArg0= arg0(mi);
-                        final ArrayAccess aa= as(addArg0, ArrayAccess.class);
+                    final Expression addArg0= arg0(mi);
+                    final ArrayAccess aa= as(addArg0, ArrayAccess.class);
 
-                        if (isSameVariable(loopContent, aa)) {
-                            replaceWithCollectionsAddAll(node, loopContent.getContainerVariable(), mi,
-                                    classesToUseWithImport);
-                            importsToAdd.add("java.util.Collections");
-                            return DO_NOT_VISIT_SUBTREE;
-                        }
+                    if (isSameVariable(loopContent, aa)) {
+                        final Expression iterable= loopContent.getContainerVariable();
+
+                        return maybeReplaceForArray(node, classesToUseWithImport, importsToAdd, iterable, mi);
                     }
                     break;
                 }
             }
         }
+
+        return VISIT_SUBTREE;
+    }
+
+    private boolean maybeReplaceForArray(final Statement node, final Set<String> classesToUseWithImport,
+            final Set<String> importsToAdd, final Expression iterable, final MethodInvocation mi) {
+        if (isMethod(mi, "java.util.Collection", "add", "java.lang.Object")
+                && areTypeCompatible(getCalledType(mi), iterable.resolveTypeBinding())) {
+            replaceWithCollectionsAddAll(node, iterable, mi, classesToUseWithImport);
+            importsToAdd.add("java.util.Collections");
+            return DO_NOT_VISIT_SUBTREE;
+        }
+
         return VISIT_SUBTREE;
     }
 
@@ -252,30 +248,36 @@ public class AllInOneMethodRatherThanLoopCleanUp extends NewClassImportCleanUp {
         return false;
     }
 
-    private boolean maybeReplaceWithCollectionMethod(ForStatement node, ForLoopContent loopContent, String methodName,
-            MethodInvocation colMI) {
-        final Expression addArg0= arg0(colMI);
-        final MethodInvocation getMI= as(addArg0, MethodInvocation.class);
-        if (isSameVariable(loopContent, getMI)) {
-            replaceWithCollectionMethod(node, methodName, colMI.getExpression(), getMI.getExpression());
+    private boolean maybeReplaceForCollection(final ASTNode node, final MethodInvocation colMI,
+            final Expression data) {
+        if (isMethod(colMI, "java.util.Collection", "add", "java.lang.Object")) {
+            replaceWithCollectionMethod(node, "addAll", colMI.getExpression(), data);
+            return DO_NOT_VISIT_SUBTREE;
+        } else if (isMethod(colMI, "java.util.Collection", "remove", "java.lang.Object")) {
+            replaceWithCollectionMethod(node, "removeAll", colMI.getExpression(), data);
             return DO_NOT_VISIT_SUBTREE;
         }
+
         return VISIT_SUBTREE;
     }
 
-    private boolean isSameVariable(ForLoopContent loopContent, final MethodInvocation getMI) {
+    private boolean isSameVariable(final ForLoopContent loopContent, final MethodInvocation getMI) {
         return isMethod(getMI, "java.util.List", "get", "int") && getMI.getExpression() instanceof Name
                 && isSameLocalVariable(arg0(getMI), loopContent.getLoopVariable());
     }
 
-    private void replaceWithCollectionMethod(ASTNode toReplace, String methodName, Expression colWhereToAddAll,
-            Expression colToAddAll) {
+    private void replaceWithCollectionMethod(final ASTNode toReplace, final String methodName,
+            final Expression affectedCollection,
+            final Expression data) {
         final ASTBuilder b= ctx.getASTBuilder();
-        if (colWhereToAddAll != null) {
-            ctx.getRefactorings().replace(toReplace,
-                    b.toStmt(b.invoke(b.copy(colWhereToAddAll), methodName, b.copy(colToAddAll))));
+        final MethodInvocation newMethod;
+
+        if (affectedCollection != null) {
+            newMethod= b.invoke(b.copy(affectedCollection), methodName, b.copy(data));
         } else {
-            ctx.getRefactorings().replace(toReplace, b.toStmt(b.invoke(methodName, b.copy(colToAddAll))));
+            newMethod= b.invoke(methodName, b.copy(data));
         }
+
+        ctx.getRefactorings().replace(toReplace, b.toStmt(newMethod));
     }
 }
