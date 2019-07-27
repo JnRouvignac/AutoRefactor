@@ -37,17 +37,17 @@ public class CollectionContainsSample {
         return col.contains(toFind);
     }
 
-    public boolean replaceForeachInvertedEquals(List<String> col, String toFind) {
+    public boolean replaceForeachInvertedEquals(List<Date> col, Date toFind) {
         // Keep this comment
         return col.contains(toFind);
     }
 
-    public boolean replaceForeachWithNotCollectionContains(List<String> col, String toFind) {
+    public boolean replaceForeachWithNotCollectionContains(List<byte[]> col, byte[] toFind) {
         // Keep this comment
         return !col.contains(toFind);
     }
 
-    public boolean replaceForeachNextStatementAfterTry(List<String> col, String toFind) {
+    public boolean replaceForeachNextStatementAfterTry(List<Integer> col, Integer toFind) {
         try {
             // Keep this comment
             return col.contains(toFind);

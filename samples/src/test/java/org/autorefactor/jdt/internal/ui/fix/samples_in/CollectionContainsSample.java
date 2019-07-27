@@ -42,19 +42,19 @@ public class CollectionContainsSample {
         return false;
     }
 
-    public boolean replaceForeachInvertedEquals(List<String> col, String toFind) {
+    public boolean replaceForeachInvertedEquals(List<Date> col, Date toFind) {
         // Keep this comment
-        for (String s : col) {
-            if (toFind.equals(s)) {
+        for (Date day : col) {
+            if (toFind.equals(day)) {
                 return true;
             }
         }
         return false;
     }
 
-    public boolean replaceForeachWithNotCollectionContains(List<String> col, String toFind) {
+    public boolean replaceForeachWithNotCollectionContains(List<byte[]> col, byte[] toFind) {
         // Keep this comment
-        for (String s : col) {
+        for (byte[] s : col) {
             if (s.equals(toFind)) {
                 return false;
             }
@@ -62,10 +62,10 @@ public class CollectionContainsSample {
         return true;
     }
 
-    public boolean replaceForeachNextStatementAfterTry(List<String> col, String toFind) {
+    public boolean replaceForeachNextStatementAfterTry(List<Integer> col, Integer toFind) {
         try {
             // Keep this comment
-            for (String s : col) {
+            for (Integer s : col) {
                 if (s.equals(toFind)) {
                     return true;
                 }
