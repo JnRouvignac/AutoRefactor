@@ -41,7 +41,6 @@ import static org.eclipse.jdt.core.dom.InfixExpression.Operator.NOT_EQUALS;
 import static org.eclipse.jdt.core.dom.PrefixExpression.Operator.NOT;
 
 import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
-import org.autorefactor.jdt.internal.corext.dom.ASTSemanticMatcher;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
@@ -107,7 +106,7 @@ public class BooleanEqualsRatherThanNullCheckCleanUp extends AbstractCleanUpRule
                 }
 
                 if (firstExpr != null && hasType(firstExpr, "java.lang.Boolean") && isPassive(firstExpr)
-                        && match(new ASTSemanticMatcher(), firstExpr, secondExpr)) {
+                        && match(firstExpr, secondExpr)) {
                     replaceNullCheck(node, firstExpr, isNullCheck, isAndExpr, isPositiveExpr);
                     return DO_NOT_VISIT_SUBTREE;
                 }

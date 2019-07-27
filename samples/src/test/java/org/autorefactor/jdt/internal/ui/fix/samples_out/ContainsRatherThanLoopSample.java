@@ -31,7 +31,7 @@ import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.List;
 
-public class CollectionContainsSample {
+public class ContainsRatherThanLoopSample {
     public boolean replaceForeach(List<String> col, String toFind) {
         // Keep this comment
         return col.contains(toFind);
@@ -86,11 +86,15 @@ public class CollectionContainsSample {
     }
 
     public boolean replaceForeachHoldResultInVariableThenBreak(List<String> col, String toFind) {
+
+        // Keep this comment
         boolean result = col.contains(toFind);
         return result;
     }
 
     public boolean replaceForeachHoldResultInVariableNoBreak(List<String> col, String toFind) {
+
+        // Keep this comment
         boolean result = col.contains(toFind);
         return result;
     }

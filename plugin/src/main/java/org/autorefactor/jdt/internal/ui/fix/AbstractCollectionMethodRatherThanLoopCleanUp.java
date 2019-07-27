@@ -2,6 +2,7 @@
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
  * Copyright (C) 2015-2018 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2019 Fabrice TIERCELIN - Reuse for Collection.containsAll()
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,7 +28,6 @@ package org.autorefactor.jdt.internal.ui.fix;
 
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.arg0;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.as;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.asExpression;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.asList;
@@ -38,11 +38,9 @@ import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getPreviousState
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getUniqueFragment;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasOperator;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.instanceOf;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isMethod;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isSameLocalVariable;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isSameVariable;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.match;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.removeParentheses;
 import static org.autorefactor.jdt.internal.corext.dom.ForLoopHelper.decomposeInitializer;
 import static org.autorefactor.jdt.internal.corext.dom.ForLoopHelper.iterateOverContainer;
 import static org.autorefactor.jdt.internal.corext.dom.ForLoopHelper.ContainerType.COLLECTION;
@@ -53,7 +51,6 @@ import static org.eclipse.jdt.core.dom.Assignment.Operator.ASSIGN;
 import java.util.List;
 
 import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
-import org.autorefactor.jdt.internal.corext.dom.ASTSemanticMatcher;
 import org.autorefactor.jdt.internal.corext.dom.BlockSubVisitor;
 import org.autorefactor.jdt.internal.corext.dom.FinderVisitor;
 import org.autorefactor.jdt.internal.corext.dom.ForLoopHelper.ForLoopContent;
@@ -78,33 +75,34 @@ import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
 /** See {@link #getDescription()} method. */
-public class CollectionContainsCleanUp extends AbstractCleanUpRule {
+public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends AbstractCleanUpRule {
     /**
-     * Get the name.
+     * Get the expression to find.
      *
-     * @return the name.
+     * @param condition The condition
+     * @param forVar    The variable
+     * @return The expression
      */
-    public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_CollectionContainsCleanUp_name;
-    }
+    protected abstract Expression getExpressionToFind(MethodInvocation condition, Expression forVar);
 
     /**
-     * Get the description.
+     * Returns the method to replace or null otherwise.
      *
-     * @return the description.
+     * @param condition The condition
+     * @return true if it is method to replace.
      */
-    public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_CollectionContainsCleanUp_description;
-    }
+    protected abstract MethodInvocation getMethodToReplace(Expression condition);
 
     /**
-     * Get the reason.
+     * Generate the future method.
      *
-     * @return the reason.
+     * @param iterable   The iterable
+     * @param toFind     The expression to find
+     * @param isPositive true if the expression is positive
+     * @param b          The builder
+     * @return the future method.
      */
-    public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_CollectionContainsCleanUp_reason;
-    }
+    protected abstract Expression newMethod(Expression iterable, Expression toFind, boolean isPositive, ASTBuilder b);
 
     @Override
     public boolean visit(Block node) {
@@ -113,7 +111,7 @@ public class CollectionContainsCleanUp extends AbstractCleanUpRule {
         return assignmentForAndReturnVisitor.getResult();
     }
 
-    private static final class AssignmentForAndReturnVisitor extends BlockSubVisitor {
+    private final class AssignmentForAndReturnVisitor extends BlockSubVisitor {
         public AssignmentForAndReturnVisitor(final RefactoringContext ctx, final Block startNode) {
             super(ctx, startNode);
         }
@@ -128,10 +126,10 @@ public class CollectionContainsCleanUp extends AbstractCleanUpRule {
         private boolean maybeReplaceWithCollectionContains(Statement forNode, Expression iterable,
                 Expression loopElement, IfStatement is) {
             if (is != null && is.getElseStatement() == null && instanceOf(iterable, "java.util.Collection")) {
-                MethodInvocation cond= as(is.getExpression(), MethodInvocation.class);
+                MethodInvocation cond= getMethodToReplace(is.getExpression());
                 List<Statement> thenStmts= asList(is.getThenStatement());
 
-                if (!thenStmts.isEmpty() && isMethod(cond, "java.lang.Object", "equals", "java.lang.Object")) {
+                if (!thenStmts.isEmpty() && cond != null) {
                     Expression toFind= getExpressionToFind(cond, loopElement);
 
                     if (toFind != null) {
@@ -151,24 +149,24 @@ public class CollectionContainsCleanUp extends AbstractCleanUpRule {
                             }
 
                             return maybeReplaceLoopAndVariable(forNode, iterable, thenStmt, toFind);
-                        } else {
-                            BreakStatement bs= as(thenStmts.get(thenStmts.size() - 1), BreakStatement.class);
+                        }
 
-                            if (bs != null && bs.getLabel() == null) {
-                                if (thenStmts.size() == 2 && maybeReplaceLoopAndVariable(forNode, iterable,
-                                        thenStmts.get(0), toFind) == DO_NOT_VISIT_SUBTREE) {
-                                    return DO_NOT_VISIT_SUBTREE;
-                                }
+                        BreakStatement bs= as(thenStmts.get(thenStmts.size() - 1), BreakStatement.class);
 
-                                if (loopElementIsUsed(loopElement, thenStmts)) {
-                                    // Cannot remove the loop and its loop element
-                                    return VISIT_SUBTREE;
-                                }
-
-                                replaceLoopByIf(forNode, iterable, thenStmts, toFind, bs);
-                                setResult(DO_NOT_VISIT_SUBTREE);
+                        if (bs != null && bs.getLabel() == null) {
+                            if (thenStmts.size() == 2 && maybeReplaceLoopAndVariable(forNode, iterable,
+                                    thenStmts.get(0), toFind) == DO_NOT_VISIT_SUBTREE) {
                                 return DO_NOT_VISIT_SUBTREE;
                             }
+
+                            if (loopElementIsUsed(loopElement, thenStmts)) {
+                                // Cannot remove the loop and its loop element
+                                return VISIT_SUBTREE;
+                            }
+
+                            replaceLoopByIf(forNode, iterable, thenStmts, toFind, bs);
+                            setResult(DO_NOT_VISIT_SUBTREE);
+                            return DO_NOT_VISIT_SUBTREE;
                         }
                     }
                 }
@@ -190,7 +188,7 @@ public class CollectionContainsCleanUp extends AbstractCleanUpRule {
             return false;
         }
 
-        private static class VarUseFinderVisitor extends FinderVisitor<Boolean> {
+        private class VarUseFinderVisitor extends FinderVisitor<Boolean> {
             private final SimpleName varName;
 
             public VarUseFinderVisitor(SimpleName varName) {
@@ -213,8 +211,7 @@ public class CollectionContainsCleanUp extends AbstractCleanUpRule {
             thenStmts.remove(thenStmts.size() - 1);
 
             ASTBuilder b= ctx.getASTBuilder();
-            Statement replacement= b.if0(collectionContains(iterable, toFind, true, b),
-                    b.block(b.copyRange(thenStmts)));
+            Statement replacement= b.if0(newMethod(iterable, toFind, true, b), b.block(b.copyRange(thenStmts)));
             ctx.getRefactorings().replace(forNode, replacement);
 
             thenStmts.add(bs);
@@ -223,7 +220,7 @@ public class CollectionContainsCleanUp extends AbstractCleanUpRule {
         private void replaceLoopAndReturn(Statement forNode, Expression iterable, Expression toFind,
                 Statement forNextStmt, boolean negate) {
             ASTBuilder b= ctx.getASTBuilder();
-            ctx.getRefactorings().replace(forNode, b.return0(collectionContains(iterable, toFind, negate, b)));
+            ctx.getRefactorings().replace(forNode, b.return0(newMethod(iterable, toFind, negate, b)));
 
             if (forNextStmt.equals(getNextSibling(forNode))) {
                 ctx.getRefactorings().remove(forNextStmt);
@@ -265,10 +262,9 @@ public class CollectionContainsCleanUp extends AbstractCleanUpRule {
             Statement replacement;
             if (previousStmtIsPreviousSibling && previousStmt instanceof VariableDeclarationStatement) {
                 replacement= b.declareStmt(b.type("boolean"), b.move((SimpleName) initName),
-                        collectionContains(iterable, toFind, isPositive, b));
+                        newMethod(iterable, toFind, isPositive, b));
             } else if (!previousStmtIsPreviousSibling || previousStmt instanceof ExpressionStatement) {
-                replacement= b.toStmt(
-                        b.assign(b.copy(initName), ASSIGN, collectionContains(iterable, toFind, isPositive, b)));
+                replacement= b.toStmt(b.assign(b.copy(initName), ASSIGN, newMethod(iterable, toFind, isPositive, b)));
             } else {
                 throw new NotImplementedException(forNode);
             }
@@ -278,17 +274,6 @@ public class CollectionContainsCleanUp extends AbstractCleanUpRule {
             if (previousStmtIsPreviousSibling) {
                 ctx.getRefactorings().remove(previousStmt);
             }
-        }
-
-        private Expression collectionContains(Expression iterable, Expression toFind, boolean isPositive,
-                ASTBuilder b) {
-            final MethodInvocation invoke= b.invoke(b.move(iterable), "contains", b.move(toFind));
-
-            if (isPositive) {
-                return invoke;
-            }
-
-            return b.not(invoke);
         }
 
         private Boolean signCollectionContains(BooleanLiteral innerBl, BooleanLiteral outerBl) {
@@ -333,33 +318,6 @@ public class CollectionContainsCleanUp extends AbstractCleanUpRule {
             return null;
         }
 
-        private Expression getExpressionToFind(MethodInvocation cond, Expression forVar) {
-            Expression expr= removeParentheses(cond.getExpression());
-            Expression arg0= removeParentheses(arg0(cond));
-
-            if (isSameVariable(forVar, expr)) {
-                return arg0;
-            }
-
-            if (isSameVariable(forVar, arg0)) {
-                return expr;
-            }
-
-            if (matches(forVar, expr)) {
-                return arg0;
-            }
-
-            if (matches(forVar, arg0)) {
-                return expr;
-            }
-
-            return null;
-        }
-
-        private boolean matches(Expression e1, Expression e2) {
-            return match(new ASTSemanticMatcher(), e1, e2);
-        }
-
         @Override
         public boolean visit(ForStatement node) {
             final ForLoopContent loopContent= iterateOverContainer(node);
@@ -374,7 +332,7 @@ public class CollectionContainsCleanUp extends AbstractCleanUpRule {
                         loopElement= loopVarPair.getFirst();
                         MethodInvocation mi= as(loopVarPair.getSecond(), MethodInvocation.class);
 
-                        if (!matches(mi, collectionGet(loopContent))
+                        if (!match(mi, collectionGet(loopContent))
                                 || !isSameVariable(mi.getExpression(), loopContent.getContainerVariable())) {
                             return VISIT_SUBTREE;
                         }
@@ -399,7 +357,7 @@ public class CollectionContainsCleanUp extends AbstractCleanUpRule {
                         loopElement= loopVarPair.getFirst();
                         MethodInvocation mi= as(loopVarPair.getSecond(), MethodInvocation.class);
 
-                        if (!matches(mi, iteratorNext(loopContent))
+                        if (!match(mi, iteratorNext(loopContent))
                                 || !isSameVariable(mi.getExpression(), loopContent.getIteratorVariable())) {
                             return VISIT_SUBTREE;
                         }

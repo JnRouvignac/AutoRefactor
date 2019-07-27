@@ -33,9 +33,8 @@ import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.match;
 import java.util.List;
 
 import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
-import org.autorefactor.jdt.internal.corext.dom.ASTSemanticMatcher;
-import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.autorefactor.jdt.internal.corext.dom.ASTBuilder.Copy;
+import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.InfixExpression;
@@ -85,7 +84,7 @@ public class MergeConditionalBlocksCleanUp extends AbstractCleanUpRule {
 
     private boolean maybeMergeBlocks(final IfStatement node, final IfStatement subNode, final Statement doubleStmts,
             final Statement remainingStmts, final boolean isPositive) {
-        if (doubleStmts != null && match(new ASTSemanticMatcher(), node.getThenStatement(), doubleStmts)) {
+        if (doubleStmts != null && match(node.getThenStatement(), doubleStmts)) {
             refactorBlocks(node.getExpression(), subNode, remainingStmts, isPositive);
             return DO_NOT_VISIT_SUBTREE;
         }

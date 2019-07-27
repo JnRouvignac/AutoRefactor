@@ -2181,6 +2181,17 @@ public final class ASTNodes {
     /**
      * Returns whether the two provided nodes structurally match.
      *
+     * @param node1 the first node to compare
+     * @param node2 the second node to compare
+     * @return true if the two provided nodes structurally match, false otherwise
+     */
+    public static boolean match(ASTNode node1, ASTNode node2) {
+        return match(new ASTSemanticMatcher(), node1, node2);
+    }
+
+    /**
+     * Returns whether the two provided nodes structurally match.
+     *
      * @param matcher the AST matcher
      * @param node1   the first node to compare
      * @param node2   the second node to compare

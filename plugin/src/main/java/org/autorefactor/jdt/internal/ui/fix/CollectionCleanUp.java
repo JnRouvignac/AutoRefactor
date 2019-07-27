@@ -45,7 +45,6 @@ import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.match;
 import java.util.List;
 
 import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
-import org.autorefactor.jdt.internal.corext.dom.ASTSemanticMatcher;
 import org.autorefactor.jdt.internal.corext.dom.BlockSubVisitor;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Block;
@@ -164,8 +163,7 @@ public class CollectionCleanUp extends AbstractCleanUpRule {
                 if (constant != null) {
                     return constant.equals(0);
                 } else {
-                    return isMethod(mi, "java.util.Collection", "size")
-                            && match(new ASTSemanticMatcher(), mi.getExpression(), sourceCollection);
+                    return isMethod(mi, "java.util.Collection", "size") && match(mi.getExpression(), sourceCollection);
                 }
             }
             return false;

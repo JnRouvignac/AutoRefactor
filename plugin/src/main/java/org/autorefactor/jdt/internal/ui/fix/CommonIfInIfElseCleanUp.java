@@ -33,7 +33,6 @@ import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isPassive;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.match;
 
 import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
-import org.autorefactor.jdt.internal.corext.dom.ASTSemanticMatcher;
 import org.eclipse.jdt.core.dom.IfStatement;
 
 /**
@@ -100,7 +99,7 @@ public class CommonIfInIfElseCleanUp extends AbstractCleanUpRule {
         if (isPassive(node.getExpression()) && thenInnerIfStmt != null && elseInnerIfStmt != null
                 && thenInnerIfStmt.getElseStatement() == null && elseInnerIfStmt.getElseStatement() == null
                 && isPassive(thenInnerIfStmt.getExpression())
-                && match(new ASTSemanticMatcher(), thenInnerIfStmt.getExpression(), elseInnerIfStmt.getExpression())) {
+                && match(thenInnerIfStmt.getExpression(), elseInnerIfStmt.getExpression())) {
             final ASTBuilder b= this.ctx.getASTBuilder();
             this.ctx.getRefactorings().replace(node,
                     b.if0(b.move(thenInnerIfStmt.getExpression()), b.block(b.if0(b.move(node.getExpression()),
