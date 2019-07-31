@@ -63,15 +63,192 @@ public class LambdaExpressionRatherThanComparatorSample {
         return listToSort;
     }
 
-    public List<String> doNotUseMethodRef(List<String> listToSort) {
+    public List<Date> useNegatedMethodRef(List<Date> listToSort) {
         // Keep this comment
-        Comparator<String> comparator = new Comparator<String>() {
+        Comparator<Date> comparator = new Comparator<Date>() {
 
             @Override
-            public int compare(String o1, String o2) {
-                return o2.toLowerCase(Locale.ENGLISH).compareTo(o1.toLowerCase(Locale.ENGLISH));
+            public int compare(Date o1, Date o2) {
+                return -o1.toString().compareTo(o2.toString());
             }
 
+        };
+        Collections.sort(listToSort, comparator);
+
+        return listToSort;
+    }
+
+    public List<Date> useMethodRefNullFirst(List<Date> listToSort) {
+        // Keep this comment
+        Comparator<Date> comparator = new Comparator<Date>() {
+
+            @Override
+            public int compare(Date o1, Date o2) {
+            	if (o1 != null) {
+                	if (o2 != null) {
+                        return o1.toString().compareTo(o2.toString());
+                	}
+
+                	return 1;
+            	} else if (o2 != null) {
+            		return -1;
+            	} else {
+            		return 0;
+            	}
+            }
+
+        };
+        Collections.sort(listToSort, comparator);
+
+        return listToSort;
+    }
+
+    public List<Date> useMethodRefNullLast(List<Date> listToSort) {
+        // Keep this comment
+        Comparator<Date> comparator = new Comparator<Date>() {
+
+            @Override
+            public int compare(Date o1, Date o2) {
+            	if (o1 != null) {
+                	if (null != o2) {
+                        return o1.toString().compareTo(o2.toString());
+                	} else {
+                		return -10;
+                	}
+            	} else {
+            		return (o2 == null) ? 0 : 20;
+            	}
+            }
+
+        };
+        Collections.sort(listToSort, comparator);
+
+        return listToSort;
+    }
+
+    public List<Date> useReversedMethodRefNullFirst(List<Date> listToSort) {
+        // Keep this comment
+        Comparator<Date> comparator = new Comparator<Date>() {
+
+            @Override
+            public int compare(Date o1, Date o2) {
+            	if (o1 != null)
+                	if (null == o2)
+                		return 123;
+                	 else
+                        return o2.toString().compareTo(o1.toString());
+
+            	return (o2 == null) ? 0 : -123;
+            }
+
+        };
+        Collections.sort(listToSort, comparator);
+
+        return listToSort;
+    }
+
+    public List<Date> useReversedMethodRefNullLast(List<Date> listToSort) {
+        // Keep this comment
+        Collections.sort(listToSort, new Comparator<Date>() {
+
+            @Override
+            public int compare(Date o1, Date o2) {
+            	if (o1 != null) {
+                	if (null == o2) {
+                		return -10;
+                	} else {
+                        return Long.compare(o2.getTime(), o1.getTime());
+                	}
+            	}
+
+            	return (o2 == null) ? 0 : 20;
+            }
+
+        });
+
+        return listToSort;
+    }
+
+    public List<Date> useMethodRefWithNegation(List<Date> listToSort) {
+        // Keep this comment
+        Comparator<Date> comparator = new Comparator<Date>() {
+            @Override
+            public int compare(Date o1, Date o2) {
+            	if (!(o1 != null)) {
+            		if (o2 != null) {
+            			return -1;
+            		} else {
+            			return 0;
+            		}
+            	} else {
+            		if (o2 != null) {
+            			return -o1.toString().compareTo(o2.toString());
+            		}
+
+            		return 1;
+            	}
+            }
+        };
+        listToSort.sort(comparator);
+
+        return listToSort;
+    }
+
+    public List<Date> useMethodRefUnorderedCondition(List<Date> listToSort) {
+        // Keep this comment
+        Comparator<Date> comparator = new Comparator<Date>() {
+
+            @Override
+            public int compare(Date o1, Date o2) {
+            	if (o2 != null) {
+                	if (o1 != null) {
+                        return o1.toString().compareTo(o2.toString());
+                	}
+
+                	return -1;
+            	} else if (o1 != null) {
+            		return 1;
+            	} else {
+            		return 0;
+            	}
+            }
+
+        };
+        Collections.sort(listToSort, comparator);
+
+        return listToSort;
+    }
+
+    public List<Date> doNotUseMethodRefWithWeirdBehavior(List<Date> listToSort) {
+        Comparator<Date> comparator = new Comparator<Date>() {
+
+            @Override
+            public int compare(Date o1, Date o2) {
+            	if (o1 != null) {
+                	if (o2 != null) {
+                        return o1.toString().compareTo(o2.toString());
+                	} else {
+                    	return 1;
+                	}
+            	} else if (o2 != null) {
+            		return -1;
+            	} else {
+            		return 100;
+            	}
+            }
+
+        };
+        Collections.sort(listToSort, comparator);
+
+        return listToSort;
+    }
+
+    public List<String> doNotUseMethodRef(List<String> listToSort) {
+        Comparator<String> comparator = new Comparator<String>() {
+            @Override
+            public int compare(String o1, String o2) {
+                return o1.toLowerCase(Locale.ENGLISH).compareTo(o2.toLowerCase(Locale.ENGLISH));
+            }
         };
         Collections.sort(listToSort, comparator);
 
