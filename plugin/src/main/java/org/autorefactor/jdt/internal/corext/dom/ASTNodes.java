@@ -91,6 +91,7 @@ import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.ImportDeclaration;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.Javadoc;
+import org.eclipse.jdt.core.dom.LabeledStatement;
 import org.eclipse.jdt.core.dom.MemberValuePair;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
@@ -372,9 +373,12 @@ public final class ASTNodes {
     public static List<Statement> asList(Statement stmt) {
         if (stmt == null) {
             return Collections.emptyList();
-        } else if (stmt instanceof Block) {
+        }
+
+        if (stmt instanceof Block) {
             return statements((Block) stmt);
         }
+
         return Arrays.asList(stmt);
     }
 
@@ -390,12 +394,23 @@ public final class ASTNodes {
      */
     @SuppressWarnings("unchecked")
     public static <T extends Statement> T as(Statement stmt, Class<T> stmtClass) {
-        if (stmt != null) {
-            final List<Statement> stmts= asList(stmt);
-            if (stmts.size() == 1 && stmtClass.isAssignableFrom(stmts.get(0).getClass())) {
-                return (T) stmts.get(0);
+        if (stmt == null) {
+            return null;
+        }
+
+        final List<Statement> stmts= asList(stmt);
+        if (stmts.size() == 1) {
+            final Statement oneStmt= stmts.get(0);
+
+            if (stmtClass.isAssignableFrom(oneStmt.getClass())) {
+                return (T) oneStmt;
+            }
+
+            if (oneStmt instanceof LabeledStatement) {
+                return as(((LabeledStatement) oneStmt).getBody(), stmtClass);
             }
         }
+
         return null;
     }
 
