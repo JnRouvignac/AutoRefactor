@@ -94,7 +94,7 @@ public class ContainsRatherThanLoopCleanUp extends AbstractCollectionMethodRathe
     protected MethodInvocation getMethodToReplace(Expression condition) {
         MethodInvocation method= as(condition, MethodInvocation.class);
 
-        if (isMethod(method, "java.lang.Object", "equals", "java.lang.Object")) {
+        if (isMethod(method, Object.class.getCanonicalName(), "equals", Object.class.getCanonicalName())) {
             return method;
         }
 

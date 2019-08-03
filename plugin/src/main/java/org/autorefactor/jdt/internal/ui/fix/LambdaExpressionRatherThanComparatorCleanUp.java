@@ -31,6 +31,7 @@ import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasType;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isMethod;
 
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -104,7 +105,7 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
 
     @Override
     public Set<String> getClassesToImport() {
-        return new HashSet<String>(Arrays.asList("java.util.Comparator"));
+        return new HashSet<String>(Arrays.asList(Comparator.class.getCanonicalName()));
     }
 
     @Override
@@ -122,7 +123,7 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
         final AnonymousClassDeclaration anonymousClassDecl= node.getAnonymousClassDeclaration();
         final Type type= node.getType();
 
-        if (hasType(type.resolveBinding(), "java.util.Comparator") && node.arguments().isEmpty()
+        if (hasType(type.resolveBinding(), Comparator.class.getCanonicalName()) && node.arguments().isEmpty()
                 && anonymousClassDecl != null && anonymousClassDecl.bodyDeclarations() != null
                 && anonymousClassDecl.bodyDeclarations().size() == 1 && type != null && type.resolveBinding() != null
                 && type.resolveBinding().getTypeArguments() != null
@@ -148,7 +149,7 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
         final MethodDeclaration methodDecl= (MethodDeclaration) body;
         final Block methodBody= methodDecl.getBody();
 
-        if (isMethod(methodDecl, "java.util.Comparator", "compare", typeArgument.getQualifiedName(),
+        if (isMethod(methodDecl, Comparator.class.getCanonicalName(), "compare", typeArgument.getQualifiedName(),
                 typeArgument.getQualifiedName())) {
             @SuppressWarnings("unchecked")
             final List<Statement> stmts= methodBody.statements();
@@ -252,7 +253,7 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
         typeMethodRef.setType(b.toType(type, typeNameDecider));
         typeMethodRef.setName(b.copy(method.getName()));
         final MethodInvocation comparingMethod= b
-                .invoke(classesToUseWithImport.contains("java.util.Comparator") ? b.name("Comparator")
+                .invoke(classesToUseWithImport.contains(Comparator.class.getCanonicalName()) ? b.name("Comparator")
                         : b.name("java", "util", "Comparator"), "comparing", typeMethodRef);
         if (straightOrder) {
             r.replace(node, comparingMethod);
@@ -272,7 +273,7 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
         final LambdaExpression lambdaExpr= b.lambda();
         final ITypeBinding destinationType= getDestinationType(node);
 
-        boolean isTypeKnown= destinationType != null && hasType(destinationType, "java.util.Comparator")
+        boolean isTypeKnown= destinationType != null && hasType(destinationType, Comparator.class.getCanonicalName())
                 && destinationType.getTypeArguments() != null && destinationType.getTypeArguments().length == 1 && Utils.equalNotNull(destinationType.getTypeArguments()[0], type);
 
         if (isTypeKnown && straightOrder) {
@@ -284,7 +285,7 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
         lambdaExpr.setBody(b.fieldAccess(b.simpleName(identifier1), b.copy(field.getName())));
         lambdaExpr.setParentheses(false);
         final MethodInvocation comparingMethod= b
-                .invoke(classesToUseWithImport.contains("java.util.Comparator") ? b.name("Comparator")
+                .invoke(classesToUseWithImport.contains(Comparator.class.getCanonicalName()) ? b.name("Comparator")
                         : b.name("java", "util", "Comparator"), "comparing", lambdaExpr);
         if (straightOrder) {
             r.replace(node, comparingMethod);

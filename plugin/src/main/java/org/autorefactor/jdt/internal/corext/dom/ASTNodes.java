@@ -129,46 +129,6 @@ import org.eclipse.jdt.core.dom.WhileStatement;
  * {@link ASTNode}s.
  */
 public final class ASTNodes {
-    /** Enum representing a primitive type. */
-    public enum PrimitiveEnum {
-        /** The {@code boolean} type. */
-        BOOLEAN("boolean"),
-        /** The {@code byte} type. */
-        BYTE("byte"),
-        /** The {@code char} type. */
-        CHAR("char"),
-        /** The {@code short} type. */
-        SHORT("short"),
-        /** The {@code int} type. */
-        INT("int"),
-        /** The {@code long} type. */
-        LONG("long"),
-        /** The {@code float} type. */
-        FLOAT("float"),
-        /** The {@code double} type. */
-        DOUBLE("double");
-
-        private final String name;
-
-        private PrimitiveEnum(String name) {
-            this.name= name;
-        }
-
-        private static PrimitiveEnum valueOf2(String name) {
-            for (PrimitiveEnum primEnum : values()) {
-                if (primEnum.name.equals(name)) {
-                    return primEnum;
-                }
-            }
-            return null;
-        }
-
-        @Override
-        public String toString() {
-            return name;
-        }
-    }
-
     /** Enum representing the possible side effect of an expression. */
     public enum ExprActivity {
         /** Does nothing. */
@@ -257,7 +217,7 @@ public final class ASTNodes {
         @SuppressWarnings("unchecked")
         @Override
         public boolean visit(InfixExpression node) {
-            if (InfixExpression.Operator.PLUS.equals(node.getOperator()) && hasType(node, "java.lang.String")
+            if (InfixExpression.Operator.PLUS.equals(node.getOperator()) && hasType(node, String.class.getCanonicalName())
                     && (mayCallImplicitToString(node.getLeftOperand())
                             || mayCallImplicitToString(node.getRightOperand())
                             || mayCallImplicitToString(node.extendedOperands()))) {
@@ -278,9 +238,9 @@ public final class ASTNodes {
         }
 
         private boolean mayCallImplicitToString(Expression expr) {
-            return !hasType(expr, "java.lang.String", "boolean", "short", "int", "long", "float", "double",
-                    "java.lang.Short", "java.lang.Boolean", "java.lang.Integer", "java.lang.Long", "java.lang.Float",
-                    "java.lang.Double") && !(expr instanceof PrefixExpression) && !(expr instanceof InfixExpression)
+            return !hasType(expr, String.class.getCanonicalName(), boolean.class.getSimpleName(), short.class.getSimpleName(), int.class.getSimpleName(), long.class.getSimpleName(), float.class.getSimpleName(), double.class.getSimpleName(),
+                    Short.class.getCanonicalName(), Boolean.class.getCanonicalName(), Integer.class.getCanonicalName(), Long.class.getCanonicalName(), Float.class.getCanonicalName(),
+                    Double.class.getCanonicalName()) && !(expr instanceof PrefixExpression) && !(expr instanceof InfixExpression)
                     && !(expr instanceof PostfixExpression);
         }
 
@@ -958,7 +918,7 @@ public final class ASTNodes {
             return bl.booleanValue();
         }
         final QualifiedName qn= as(expr, QualifiedName.class);
-        if (hasType(qn, "java.lang.Boolean")) {
+        if (hasType(qn, Boolean.class.getCanonicalName())) {
             return getBooleanObject(qn);
         }
         return null;
@@ -1105,45 +1065,45 @@ public final class ASTNodes {
             } else if (parent instanceof ArrayAccess) {
                 final ArrayAccess arrayAccess= (ArrayAccess) parent;
                 if (arrayAccess.getIndex().equals(node)) {
-                    return node.getAST().resolveWellKnownType("int");
+                    return node.getAST().resolveWellKnownType(int.class.getSimpleName());
                 }
             } else if (parent instanceof ConditionalExpression) {
                 final ConditionalExpression conditionalExpr= (ConditionalExpression) parent;
                 if (conditionalExpr.getExpression().equals(node)) {
-                    return node.getAST().resolveWellKnownType("boolean");
+                    return node.getAST().resolveWellKnownType(boolean.class.getSimpleName());
                 }
             } else if (parent instanceof PrefixExpression) {
                 final PrefixExpression prefixExpr= (PrefixExpression) parent;
                 if (Operator.NOT.equals(prefixExpr.getOperator())) {
-                    return node.getAST().resolveWellKnownType("boolean");
+                    return node.getAST().resolveWellKnownType(boolean.class.getSimpleName());
                 }
             } else if (parent instanceof InfixExpression) {
                 final InfixExpression prefixExpr= (InfixExpression) parent;
                 if (Arrays.asList(InfixExpression.Operator.CONDITIONAL_AND, InfixExpression.Operator.CONDITIONAL_OR)
                         .contains(prefixExpr.getOperator())) {
-                    return node.getAST().resolveWellKnownType("boolean");
+                    return node.getAST().resolveWellKnownType(boolean.class.getSimpleName());
                 }
             } else if (parent instanceof IfStatement) {
                 final IfStatement ifStmt= (IfStatement) parent;
                 if (ifStmt.getExpression().equals(node)) {
-                    return node.getAST().resolveWellKnownType("boolean");
+                    return node.getAST().resolveWellKnownType(boolean.class.getSimpleName());
                 }
             } else if (parent instanceof WhileStatement) {
                 final WhileStatement whileStmt= (WhileStatement) parent;
                 if (whileStmt.getExpression().equals(node)) {
-                    return node.getAST().resolveWellKnownType("boolean");
+                    return node.getAST().resolveWellKnownType(boolean.class.getSimpleName());
                 }
             } else if (parent instanceof DoStatement) {
                 final DoStatement doStmt= (DoStatement) parent;
                 if (doStmt.getExpression().equals(node)) {
-                    return node.getAST().resolveWellKnownType("boolean");
+                    return node.getAST().resolveWellKnownType(boolean.class.getSimpleName());
                 }
             } else if (parent instanceof SwitchStatement) {
                 final SwitchStatement switchStmt= (SwitchStatement) parent;
                 if (switchStmt.getExpression().equals(node)) {
                     final ITypeBinding discriminentType= switchStmt.getExpression().resolveTypeBinding();
                     if (discriminentType.isPrimitive() || discriminentType.isEnum()
-                            || hasType(discriminentType, "java.lang.String")) {
+                            || hasType(discriminentType, String.class.getCanonicalName())) {
                         return discriminentType;
                     } else {
                         return node.getAST()
@@ -1652,21 +1612,8 @@ public final class ASTNodes {
      */
     public static boolean isPrimitive(ITypeBinding typeBinding) {
         return typeBinding != null && typeBinding.isPrimitive()
-                && Arrays.asList("boolean", "byte", "char", "short", "int", "long", "float", "double")
+                && Arrays.asList(boolean.class.getSimpleName(), byte.class.getSimpleName(), char.class.getSimpleName(), short.class.getSimpleName(), int.class.getSimpleName(), long.class.getSimpleName(), float.class.getSimpleName(), double.class.getSimpleName())
                         .contains(typeBinding.getQualifiedName());
-    }
-
-    /**
-     * Returns an enum representing the primitive type of this type binding.
-     *
-     * @param typeBinding the type binding to analyze
-     * @return an enum representing the primitive type of this type binding,
-     *         {@code null} if the type binding is null, or if it does not a
-     *         primitive type.
-     */
-    public static PrimitiveEnum getPrimitiveEnum(ITypeBinding typeBinding) {
-        return typeBinding != null && typeBinding.isPrimitive() ? PrimitiveEnum.valueOf2(typeBinding.getQualifiedName())
-                : null;
     }
 
     /**
@@ -1755,7 +1702,7 @@ public final class ASTNodes {
      * @return {@code true}, or it throws
      */
     public static boolean checkNoExtendedOperands(InfixExpression node) {
-        if (!hasType(node, "java.lang.String") && node.hasExtendedOperands()) {
+        if (!hasType(node, String.class.getCanonicalName()) && node.hasExtendedOperands()) {
             throw new NotImplementedException(node, "for extended operands");
         }
         return true;
@@ -1815,7 +1762,7 @@ public final class ASTNodes {
 
                 if (catchClause.getException().getType() != null
                         && !instanceOf(catchClause.getException().getType().resolveBinding(),
-                                "java.lang.RuntimeException")) {
+                                RuntimeException.class.getCanonicalName())) {
                     return true;
                 }
             }
@@ -2547,58 +2494,58 @@ public final class ASTNodes {
     }
 
     private static String getBoxedTypeName(String primitiveName) {
-        if ("long".equals(primitiveName)) {
-            return "java.lang.Long";
+        if (long.class.getSimpleName().equals(primitiveName)) {
+            return Long.class.getCanonicalName();
         }
-        if ("int".equals(primitiveName)) {
-            return "java.lang.Integer";
+        if (int.class.getSimpleName().equals(primitiveName)) {
+            return Integer.class.getCanonicalName();
         }
-        if ("short".equals(primitiveName)) {
-            return "java.lang.Short";
+        if (short.class.getSimpleName().equals(primitiveName)) {
+            return Short.class.getCanonicalName();
         }
-        if ("char".equals(primitiveName)) {
-            return "java.lang.Character";
+        if (char.class.getSimpleName().equals(primitiveName)) {
+            return Character.class.getCanonicalName();
         }
-        if ("byte".equals(primitiveName)) {
-            return "java.lang.Byte";
+        if (byte.class.getSimpleName().equals(primitiveName)) {
+            return Byte.class.getCanonicalName();
         }
-        if ("boolean".equals(primitiveName)) {
-            return "java.lang.Boolean";
+        if (boolean.class.getSimpleName().equals(primitiveName)) {
+            return Boolean.class.getCanonicalName();
         }
-        if ("float".equals(primitiveName)) {
-            return "java.lang.Float";
+        if (float.class.getSimpleName().equals(primitiveName)) {
+            return Float.class.getCanonicalName();
         }
-        if ("double".equals(primitiveName)) {
-            return "java.lang.Double";
+        if (double.class.getSimpleName().equals(primitiveName)) {
+            return Double.class.getCanonicalName();
         }
 
         return null;
     }
 
     private static String getUnboxedTypeName(String wrapperName) {
-        if ("java.lang.Long".equals(wrapperName)) {
-            return "long";
+        if (Long.class.getCanonicalName().equals(wrapperName)) {
+            return long.class.getSimpleName();
         }
-        if ("java.lang.Integer".equals(wrapperName)) {
-            return "int";
+        if (Integer.class.getCanonicalName().equals(wrapperName)) {
+            return int.class.getSimpleName();
         }
-        if ("java.lang.Short".equals(wrapperName)) {
-            return "short";
+        if (Short.class.getCanonicalName().equals(wrapperName)) {
+            return short.class.getSimpleName();
         }
-        if ("java.lang.Character".equals(wrapperName)) {
-            return "char";
+        if (Character.class.getCanonicalName().equals(wrapperName)) {
+            return char.class.getSimpleName();
         }
-        if ("java.lang.Byte".equals(wrapperName)) {
-            return "byte";
+        if (Byte.class.getCanonicalName().equals(wrapperName)) {
+            return byte.class.getSimpleName();
         }
-        if ("java.lang.Boolean".equals(wrapperName)) {
-            return "boolean";
+        if (Boolean.class.getCanonicalName().equals(wrapperName)) {
+            return boolean.class.getSimpleName();
         }
-        if ("java.lang.Float".equals(wrapperName)) {
-            return "float";
+        if (Float.class.getCanonicalName().equals(wrapperName)) {
+            return float.class.getSimpleName();
         }
-        if ("java.lang.Double".equals(wrapperName)) {
-            return "double";
+        if (Double.class.getCanonicalName().equals(wrapperName)) {
+            return double.class.getSimpleName();
         }
 
         return null;

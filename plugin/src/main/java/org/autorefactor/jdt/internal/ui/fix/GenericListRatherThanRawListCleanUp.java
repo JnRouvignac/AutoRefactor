@@ -29,10 +29,19 @@ package org.autorefactor.jdt.internal.ui.fix;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.*;
 import static org.autorefactor.util.Utils.getOrDefault;
 
+import java.io.Serializable;
+import java.util.AbstractCollection;
+import java.util.AbstractList;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Stack;
+import java.util.Vector;
 
 import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
 import org.autorefactor.jdt.internal.corext.dom.Release;
@@ -52,15 +61,15 @@ public class GenericListRatherThanRawListCleanUp extends AbstractClassSubstitute
     private static final Map<String, String[]> CAN_BE_CASTED_TO= new HashMap<String, String[]>();
 
     static {
-        CAN_BE_CASTED_TO.put("java.lang.Object", new String[] { "java.lang.Object" });
-        CAN_BE_CASTED_TO.put("java.lang.Cloneable", new String[] { "java.lang.Cloneable", "java.lang.Object" });
-        CAN_BE_CASTED_TO.put("java.io.Serializable", new String[] { "java.io.Serializable", "java.lang.Object" });
-        CAN_BE_CASTED_TO.put("java.util.Collection", new String[] { "java.util.Collection", "java.lang.Object" });
-        CAN_BE_CASTED_TO.put("java.util.List", new String[] { "java.util.List", "java.lang.Object" });
-        CAN_BE_CASTED_TO.put("java.util.AbstractList", new String[] { "java.util.AbstractList", "java.util.List", "java.lang.Object" });
-        CAN_BE_CASTED_TO.put("java.util.AbstractCollection", new String[] { "java.util.AbstractCollection", "java.util.Collection", "java.lang.Object" });
-        CAN_BE_CASTED_TO.put("java.util.LinkedList", new String[] { "java.util.LinkedList", "java.util.AbstractList", "java.util.List", "java.util.AbstractCollection", "java.util.Collection", "java.io.Serializable", "java.lang.Cloneable", "java.lang.Object" });
-        CAN_BE_CASTED_TO.put("java.util.ArrayList", new String[] { "java.util.ArrayList", "java.util.AbstractList", "java.util.List", "java.util.AbstractCollection", "java.util.Collection", "java.io.Serializable", "java.lang.Cloneable", "java.lang.Object" });
+        CAN_BE_CASTED_TO.put(Object.class.getCanonicalName(), new String[] { Object.class.getCanonicalName() });
+        CAN_BE_CASTED_TO.put(Cloneable.class.getCanonicalName(), new String[] { Cloneable.class.getCanonicalName(), Object.class.getCanonicalName() });
+        CAN_BE_CASTED_TO.put(Serializable.class.getCanonicalName(), new String[] { Serializable.class.getCanonicalName(), Object.class.getCanonicalName() });
+        CAN_BE_CASTED_TO.put(Collection.class.getCanonicalName(), new String[] { Collection.class.getCanonicalName(), Object.class.getCanonicalName() });
+        CAN_BE_CASTED_TO.put(List.class.getCanonicalName(), new String[] { List.class.getCanonicalName(), Object.class.getCanonicalName() });
+        CAN_BE_CASTED_TO.put(AbstractList.class.getCanonicalName(), new String[] { AbstractList.class.getCanonicalName(), List.class.getCanonicalName(), Object.class.getCanonicalName() });
+        CAN_BE_CASTED_TO.put(AbstractCollection.class.getCanonicalName(), new String[] { AbstractCollection.class.getCanonicalName(), Collection.class.getCanonicalName(), Object.class.getCanonicalName() });
+        CAN_BE_CASTED_TO.put(LinkedList.class.getCanonicalName(), new String[] { LinkedList.class.getCanonicalName(), AbstractList.class.getCanonicalName(), List.class.getCanonicalName(), AbstractCollection.class.getCanonicalName(), Collection.class.getCanonicalName(), Serializable.class.getCanonicalName(), Cloneable.class.getCanonicalName(), Object.class.getCanonicalName() });
+        CAN_BE_CASTED_TO.put(ArrayList.class.getCanonicalName(), new String[] { ArrayList.class.getCanonicalName(), AbstractList.class.getCanonicalName(), List.class.getCanonicalName(), AbstractCollection.class.getCanonicalName(), Collection.class.getCanonicalName(), Serializable.class.getCanonicalName(), Cloneable.class.getCanonicalName(), Object.class.getCanonicalName() });
     }
 
     private ITypeBinding elementType;
@@ -105,7 +114,7 @@ public class GenericListRatherThanRawListCleanUp extends AbstractClassSubstitute
 
     @Override
     protected String[] getExistingClassCanonicalName() {
-        return new String[] { "java.util.LinkedList", "java.util.ArrayList", "java.util.Vector", "java.util.Stack" };
+        return new String[] { LinkedList.class.getCanonicalName(), ArrayList.class.getCanonicalName(), Vector.class.getCanonicalName(), Stack.class.getCanonicalName() };
     }
 
     @Override
@@ -150,7 +159,7 @@ public class GenericListRatherThanRawListCleanUp extends AbstractClassSubstitute
 
         ITypeBinding[] parameterTypes= instanceCreation.resolveConstructorBinding().getParameterTypes();
 
-        if (parameterTypes.length > 0 && hasType(parameterTypes[0], "java.util.Collection")) {
+        if (parameterTypes.length > 0 && hasType(parameterTypes[0], Collection.class.getCanonicalName())) {
             ITypeBinding actualParameter= arguments(instanceCreation).get(0).resolveTypeBinding();
 
             if (isParameterizedTypeWithOneArgument(actualParameter)) {
@@ -167,89 +176,89 @@ public class GenericListRatherThanRawListCleanUp extends AbstractClassSubstitute
             return false;
         }
 
-        if (isMethod(mi, "java.util.Collection", "clear")
-                || isMethod(mi, "java.lang.Object", "equals", "java.lang.Object")
-                || isMethod(mi, "java.lang.Object", "hashCode") || isMethod(mi, "java.util.Collection", "size")
-                || isMethod(mi, "java.util.Collection", "isEmpty") || isMethod(mi, "java.lang.Object", "toString")
-                || isMethod(mi, "java.lang.Object", "finalize") || isMethod(mi, "java.lang.Object", "notify")
-                || isMethod(mi, "java.lang.Object", "notifyAll") || isMethod(mi, "java.lang.Object", "wait")
-                || isMethod(mi, "java.lang.Object", "wait", "long")
-                || isMethod(mi, "java.lang.Object", "wait", "long", "int")
-                || isMethod(mi, "java.util.ArrayList", "ensureCapacity", "int")
-                || isMethod(mi, "java.util.ArrayList", "removeRange", "int", "int")
-                || isMethod(mi, "java.util.ArrayList", "forEach", "java.util.function.Consumer")
-                || isMethod(mi, "java.util.ArrayList", "removeIf", "java.util.function.Predicate")
-                || isMethod(mi, "java.util.ArrayList", "sort", "java.util.Comparator")
-                || isMethod(mi, "java.util.Vector", "trimToSize")
-                || isMethod(mi, "java.util.Vector", "ensureCapacity", "int")
-                || isMethod(mi, "java.util.Vector", "setSize", "int") || isMethod(mi, "java.util.Vector", "capacity")
-                || isMethod(mi, "java.util.Vector", "removeElementAt", "int")
-                || isMethod(mi, "java.util.Vector", "removeAllElements") || isMethod(mi, "java.util.Stack", "empty")) {
+        if (isMethod(mi, Collection.class.getCanonicalName(), "clear")
+                || isMethod(mi, Object.class.getCanonicalName(), "equals", Object.class.getCanonicalName())
+                || isMethod(mi, Object.class.getCanonicalName(), "hashCode") || isMethod(mi, Collection.class.getCanonicalName(), "size")
+                || isMethod(mi, Collection.class.getCanonicalName(), "isEmpty") || isMethod(mi, Object.class.getCanonicalName(), "toString")
+                || isMethod(mi, Object.class.getCanonicalName(), "finalize") || isMethod(mi, Object.class.getCanonicalName(), "notify")
+                || isMethod(mi, Object.class.getCanonicalName(), "notifyAll") || isMethod(mi, Object.class.getCanonicalName(), "wait")
+                || isMethod(mi, Object.class.getCanonicalName(), "wait", long.class.getSimpleName())
+                || isMethod(mi, Object.class.getCanonicalName(), "wait", long.class.getSimpleName(), int.class.getSimpleName())
+                || isMethod(mi, ArrayList.class.getCanonicalName(), "ensureCapacity", int.class.getSimpleName())
+                || isMethod(mi, ArrayList.class.getCanonicalName(), "removeRange", int.class.getSimpleName(), int.class.getSimpleName())
+                || isMethod(mi, ArrayList.class.getCanonicalName(), "forEach", "java.util.function.Consumer")
+                || isMethod(mi, ArrayList.class.getCanonicalName(), "removeIf", "java.util.function.Predicate")
+                || isMethod(mi, ArrayList.class.getCanonicalName(), "sort", Comparator.class.getCanonicalName())
+                || isMethod(mi, Vector.class.getCanonicalName(), "trimToSize")
+                || isMethod(mi, Vector.class.getCanonicalName(), "ensureCapacity", int.class.getSimpleName())
+                || isMethod(mi, Vector.class.getCanonicalName(), "setSize", int.class.getSimpleName()) || isMethod(mi, Vector.class.getCanonicalName(), "capacity")
+                || isMethod(mi, Vector.class.getCanonicalName(), "removeElementAt", int.class.getSimpleName())
+                || isMethod(mi, Vector.class.getCanonicalName(), "removeAllElements") || isMethod(mi, Stack.class.getCanonicalName(), "empty")) {
             return true;
-        } else if (isMethod(mi, "java.util.Collection", "add", "java.lang.Object")
-                || isMethod(mi, "java.util.Collection", "contains", "java.lang.Object")
-                || isMethod(mi, "java.util.List", "indexOf", "java.lang.Object")
-                || isMethod(mi, "java.util.List", "lastIndexOf", "java.lang.Object")
-                || isMethod(mi, "java.util.LinkedList", "addFirst", "java.lang.Object")
-                || isMethod(mi, "java.util.LinkedList", "addLast", "java.lang.Object")
-                || isMethod(mi, "java.util.LinkedList", "offer", "java.lang.Object")
-                || isMethod(mi, "java.util.LinkedList", "offerFirst", "java.lang.Object")
-                || isMethod(mi, "java.util.LinkedList", "offerLast", "java.lang.Object")
-                || isMethod(mi, "java.util.LinkedList", "push", "java.lang.Object")
-                || isMethod(mi, "java.util.Collection", "remove", "java.lang.Object")
-                || isMethod(mi, "java.util.LinkedList", "removeFirstOccurrence", "java.lang.Object")
-                || isMethod(mi, "java.util.LinkedList", "removeLastOccurrence", "java.lang.Object")
-                || isMethod(mi, "java.util.Vector", "indexOf", "java.lang.Object", "int")
-                || isMethod(mi, "java.util.Vector", "lastIndexOf", "java.lang.Object", "int")
-                || isMethod(mi, "java.util.Vector", "setElementAt", "java.lang.Object", "int")
-                || isMethod(mi, "java.util.Vector", "insertElementAt", "java.lang.Object", "int")
-                || isMethod(mi, "java.util.Vector", "addElement", "java.lang.Object")
-                || isMethod(mi, "java.util.Vector", "removeElement", "java.lang.Object")
-                || isMethod(mi, "java.util.Stack", "push", "java.lang.Object")
-                || isMethod(mi, "java.util.Stack", "search", "java.lang.Object")) {
+        } else if (isMethod(mi, Collection.class.getCanonicalName(), "add", Object.class.getCanonicalName())
+                || isMethod(mi, Collection.class.getCanonicalName(), "contains", Object.class.getCanonicalName())
+                || isMethod(mi, List.class.getCanonicalName(), "indexOf", Object.class.getCanonicalName())
+                || isMethod(mi, List.class.getCanonicalName(), "lastIndexOf", Object.class.getCanonicalName())
+                || isMethod(mi, LinkedList.class.getCanonicalName(), "addFirst", Object.class.getCanonicalName())
+                || isMethod(mi, LinkedList.class.getCanonicalName(), "addLast", Object.class.getCanonicalName())
+                || isMethod(mi, LinkedList.class.getCanonicalName(), "offer", Object.class.getCanonicalName())
+                || isMethod(mi, LinkedList.class.getCanonicalName(), "offerFirst", Object.class.getCanonicalName())
+                || isMethod(mi, LinkedList.class.getCanonicalName(), "offerLast", Object.class.getCanonicalName())
+                || isMethod(mi, LinkedList.class.getCanonicalName(), "push", Object.class.getCanonicalName())
+                || isMethod(mi, Collection.class.getCanonicalName(), "remove", Object.class.getCanonicalName())
+                || isMethod(mi, LinkedList.class.getCanonicalName(), "removeFirstOccurrence", Object.class.getCanonicalName())
+                || isMethod(mi, LinkedList.class.getCanonicalName(), "removeLastOccurrence", Object.class.getCanonicalName())
+                || isMethod(mi, Vector.class.getCanonicalName(), "indexOf", Object.class.getCanonicalName(), int.class.getSimpleName())
+                || isMethod(mi, Vector.class.getCanonicalName(), "lastIndexOf", Object.class.getCanonicalName(), int.class.getSimpleName())
+                || isMethod(mi, Vector.class.getCanonicalName(), "setElementAt", Object.class.getCanonicalName(), int.class.getSimpleName())
+                || isMethod(mi, Vector.class.getCanonicalName(), "insertElementAt", Object.class.getCanonicalName(), int.class.getSimpleName())
+                || isMethod(mi, Vector.class.getCanonicalName(), "addElement", Object.class.getCanonicalName())
+                || isMethod(mi, Vector.class.getCanonicalName(), "removeElement", Object.class.getCanonicalName())
+                || isMethod(mi, Stack.class.getCanonicalName(), "push", Object.class.getCanonicalName())
+                || isMethod(mi, Stack.class.getCanonicalName(), "search", Object.class.getCanonicalName())) {
             ITypeBinding newElementType= arguments(mi).get(0).resolveTypeBinding();
             return resolveTypeCompatible(newElementType);
-        } else if (isMethod(mi, "java.util.List", "add", "int", "java.lang.Object")
-                || isMethod(mi, "java.util.List", "set", "int", "java.lang.Object")) {
+        } else if (isMethod(mi, List.class.getCanonicalName(), "add", int.class.getSimpleName(), Object.class.getCanonicalName())
+                || isMethod(mi, List.class.getCanonicalName(), "set", int.class.getSimpleName(), Object.class.getCanonicalName())) {
             return resolveTypeCompatible(arguments(mi).get(1).resolveTypeBinding());
-        } else if (isMethod(mi, "java.util.Collection", "toArray", "java.lang.Object[]")
-                || isMethod(mi, "java.util.Vector", "copyInto", "java.lang.Object[]")) {
+        } else if (isMethod(mi, Collection.class.getCanonicalName(), "toArray", Object[].class.getCanonicalName())
+                || isMethod(mi, Vector.class.getCanonicalName(), "copyInto", Object[].class.getCanonicalName())) {
             ITypeBinding newElementType= arguments(mi).get(0).resolveTypeBinding().getElementType();
             return resolveTypeCompatible(newElementType);
-        } else if (isMethod(mi, "java.util.Collection", "addAll", "java.util.Collection")
-                || isMethod(mi, "java.util.Collection", "containsAll", "java.util.Collection")) {
+        } else if (isMethod(mi, Collection.class.getCanonicalName(), "addAll", Collection.class.getCanonicalName())
+                || isMethod(mi, Collection.class.getCanonicalName(), "containsAll", Collection.class.getCanonicalName())) {
             return resolveTypeCompatibleIfPossible(arguments(mi).get(0).resolveTypeBinding());
-        } else if (isMethod(mi, "java.util.List", "addAll", "int", "java.util.Collection")) {
+        } else if (isMethod(mi, List.class.getCanonicalName(), "addAll", int.class.getSimpleName(), Collection.class.getCanonicalName())) {
             return resolveTypeCompatibleIfPossible(arguments(mi).get(1).resolveTypeBinding());
-        } else if (isMethod(mi, "java.util.List", "get", "int") || isMethod(mi, "java.util.List", "remove")
-                || isMethod(mi, "java.util.List", "remove", "int") || isMethod(mi, "java.util.LinkedList", "element")
-                || isMethod(mi, "java.util.LinkedList", "getFirst") || isMethod(mi, "java.util.LinkedList", "getLast")
-                || isMethod(mi, "java.util.LinkedList", "peek") || isMethod(mi, "java.util.LinkedList", "peekFirst")
-                || isMethod(mi, "java.util.LinkedList", "peekLast") || isMethod(mi, "java.util.LinkedList", "poll")
-                || isMethod(mi, "java.util.LinkedList", "pollFirst") || isMethod(mi, "java.util.LinkedList", "pollLast")
-                || isMethod(mi, "java.util.LinkedList", "pop") || isMethod(mi, "java.util.LinkedList", "removeFirst")
-                || isMethod(mi, "java.util.LinkedList", "removeLast")
-                || isMethod(mi, "java.util.Vector", "elementAt", "int")
-                || isMethod(mi, "java.util.Vector", "firstElement") || isMethod(mi, "java.util.Vector", "lastElement")
-                || isMethod(mi, "java.util.Stack", "pop") || isMethod(mi, "java.util.Stack", "peek")) {
+        } else if (isMethod(mi, List.class.getCanonicalName(), "get", int.class.getSimpleName()) || isMethod(mi, List.class.getCanonicalName(), "remove")
+                || isMethod(mi, List.class.getCanonicalName(), "remove", int.class.getSimpleName()) || isMethod(mi, LinkedList.class.getCanonicalName(), "element")
+                || isMethod(mi, LinkedList.class.getCanonicalName(), "getFirst") || isMethod(mi, LinkedList.class.getCanonicalName(), "getLast")
+                || isMethod(mi, LinkedList.class.getCanonicalName(), "peek") || isMethod(mi, LinkedList.class.getCanonicalName(), "peekFirst")
+                || isMethod(mi, LinkedList.class.getCanonicalName(), "peekLast") || isMethod(mi, LinkedList.class.getCanonicalName(), "poll")
+                || isMethod(mi, LinkedList.class.getCanonicalName(), "pollFirst") || isMethod(mi, LinkedList.class.getCanonicalName(), "pollLast")
+                || isMethod(mi, LinkedList.class.getCanonicalName(), "pop") || isMethod(mi, LinkedList.class.getCanonicalName(), "removeFirst")
+                || isMethod(mi, LinkedList.class.getCanonicalName(), "removeLast")
+                || isMethod(mi, Vector.class.getCanonicalName(), "elementAt", int.class.getSimpleName())
+                || isMethod(mi, Vector.class.getCanonicalName(), "firstElement") || isMethod(mi, Vector.class.getCanonicalName(), "lastElement")
+                || isMethod(mi, Stack.class.getCanonicalName(), "pop") || isMethod(mi, Stack.class.getCanonicalName(), "peek")) {
             if (isExprReceived(mi)) {
                 ITypeBinding newElementType= getDestinationType(mi);
                 return resolveTypeCompatible(newElementType);
             } else {
                 return true;
             }
-        } else if (isMethod(mi, "java.util.LinkedList", "descendingIterator")
-                || isMethod(mi, "java.util.List", "iterator") || isMethod(mi, "java.util.List", "listIterator")
-                || isMethod(mi, "java.util.List", "listIterator", "int")
-                || isMethod(mi, "java.util.List", "spliterator") || isMethod(mi, "java.util.Vector", "elements")) {
+        } else if (isMethod(mi, LinkedList.class.getCanonicalName(), "descendingIterator")
+                || isMethod(mi, List.class.getCanonicalName(), "iterator") || isMethod(mi, List.class.getCanonicalName(), "listIterator")
+                || isMethod(mi, List.class.getCanonicalName(), "listIterator", int.class.getSimpleName())
+                || isMethod(mi, List.class.getCanonicalName(), "spliterator") || isMethod(mi, Vector.class.getCanonicalName(), "elements")) {
             if (isExprReceived(mi)) {
                 ITypeBinding newElementType= getDestinationType(mi);
                 return resolveTypeCompatibleIfPossible(newElementType);
             } else {
                 return true;
             }
-        } else if (isMethod(mi, "java.util.List", "subList", "int", "int")
-                || isMethod(mi, "java.util.Collection", "toArray")) {
+        } else if (isMethod(mi, List.class.getCanonicalName(), "subList", int.class.getSimpleName(), int.class.getSimpleName())
+                || isMethod(mi, Collection.class.getCanonicalName(), "toArray")) {
             if (isExprReceived(mi)) {
                 ITypeBinding newCollectionType= getDestinationType(mi);
                 if (newCollectionType != null) {
@@ -288,7 +297,7 @@ public class GenericListRatherThanRawListCleanUp extends AbstractClassSubstitute
         if (newElementType.isPrimitive()) {
             newElementType= getBoxedTypeBinding(newElementType, ctx.getAST());
         }
-        if (!hasType(newElementType, "java.lang.Object")
+        if (!hasType(newElementType, Object.class.getCanonicalName())
                 && (elementType == null || newElementType.equals(elementType))) {
             elementType= newElementType;
             return true;

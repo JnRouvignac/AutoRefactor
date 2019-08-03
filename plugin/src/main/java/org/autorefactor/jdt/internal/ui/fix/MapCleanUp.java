@@ -40,7 +40,16 @@ import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isPrimitive;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isSameLocalVariable;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.match;
 
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.IdentityHashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.WeakHashMap;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListMap;
 
 import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
 import org.autorefactor.jdt.internal.corext.dom.BlockSubVisitor;
@@ -99,7 +108,7 @@ public class MapCleanUp extends AbstractCleanUpRule {
         @Override
         public boolean visit(ExpressionStatement node) {
             final MethodInvocation mi= asExpression(node, MethodInvocation.class);
-            if (isMethod(mi, "java.util.Map", "putAll", "java.util.Map")) {
+            if (isMethod(mi, Map.class.getCanonicalName(), "putAll", Map.class.getCanonicalName())) {
                 final Expression arg0= arg0(mi);
                 final Statement previousStmt= getPreviousSibling(node);
 
@@ -140,23 +149,23 @@ public class MapCleanUp extends AbstractCleanUpRule {
             final List<Expression> args= arguments(cic);
             final boolean noArgsCtor= args.isEmpty();
             final boolean mapCapacityCtor= isValidCapacityParameter(sourceMap, args);
-            return (noArgsCtor && hasType(cic, "java.util.concurrent.ConcurrentHashMap",
-                    "java.util.concurrent.ConcurrentSkipListMap", "java.util.Hashtable", "java.util.HashMap",
-                    "java.util.IdentityHashMap", "java.util.LinkedHashMap", "java.util.TreeMap",
-                    "java.util.WeakHashMap"))
-                    || (mapCapacityCtor && hasType(cic, "java.util.concurrent.ConcurrentHashMap", "java.util.Hashtable",
-                            "java.util.HashMap", "java.util.IdentityHashMap", "java.util.LinkedHashMap",
-                            "java.util.WeakHashMap"));
+            return (noArgsCtor && hasType(cic, ConcurrentHashMap.class.getCanonicalName(),
+                    ConcurrentSkipListMap.class.getCanonicalName(), Hashtable.class.getCanonicalName(), HashMap.class.getCanonicalName(),
+                    IdentityHashMap.class.getCanonicalName(), LinkedHashMap.class.getCanonicalName(), TreeMap.class.getCanonicalName(),
+                    WeakHashMap.class.getCanonicalName()))
+                    || (mapCapacityCtor && hasType(cic, ConcurrentHashMap.class.getCanonicalName(), Hashtable.class.getCanonicalName(),
+                            HashMap.class.getCanonicalName(), IdentityHashMap.class.getCanonicalName(), LinkedHashMap.class.getCanonicalName(),
+                            WeakHashMap.class.getCanonicalName()));
         }
 
         private boolean isValidCapacityParameter(Expression sourceMap, final List<Expression> args) {
-            if (args.size() == 1 && isPrimitive(args.get(0), "int")) {
+            if (args.size() == 1 && isPrimitive(args.get(0), int.class.getSimpleName())) {
                 final Object constant= args.get(0).resolveConstantExpressionValue();
                 final MethodInvocation mi= as(args.get(0), MethodInvocation.class);
                 if (constant != null) {
                     return constant.equals(0);
                 } else {
-                    return isMethod(mi, "java.util.Map", "size") && match(mi.getExpression(), sourceMap);
+                    return isMethod(mi, Map.class.getCanonicalName(), "size") && match(mi.getExpression(), sourceMap);
                 }
             }
             return false;

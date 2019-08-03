@@ -108,7 +108,7 @@ public class TernaryOperatorRatherThanDuplicateConditionsCleanUp extends Abstrac
     }
 
     private boolean isBooleanAndPassive(final Expression expr) {
-        return isPrimitive(expr, "boolean") && isPassive(expr);
+        return isPrimitive(expr, boolean.class.getSimpleName()) && isPassive(expr);
     }
 
     private boolean maybeReplaceDuplicateExpr(final ASTSemanticMatcher matcher, final InfixExpression node,

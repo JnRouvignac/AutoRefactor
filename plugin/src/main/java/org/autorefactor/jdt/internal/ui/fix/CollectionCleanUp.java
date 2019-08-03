@@ -40,7 +40,24 @@ import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isPrimitive;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isSameLocalVariable;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.match;
 
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.PriorityQueue;
+import java.util.TreeSet;
+import java.util.Vector;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.DelayQueue;
+import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.PriorityBlockingQueue;
 
 import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
 import org.autorefactor.jdt.internal.corext.dom.BlockSubVisitor;
@@ -99,7 +116,7 @@ public class CollectionCleanUp extends AbstractCleanUpRule {
         @Override
         public boolean visit(ExpressionStatement node) {
             final MethodInvocation mi= asExpression(node, MethodInvocation.class);
-            if (isMethod(mi, "java.util.Collection", "addAll", "java.util.Collection")) {
+            if (isMethod(mi, Collection.class.getCanonicalName(), "addAll", Collection.class.getCanonicalName())) {
                 final Expression arg0= arg0(mi);
                 final Statement previousStmt= getPreviousSibling(node);
 
@@ -141,27 +158,27 @@ public class CollectionCleanUp extends AbstractCleanUpRule {
             final boolean noArgsCtor= args.isEmpty();
             final boolean colCapacityCtor= isValidCapacityParameter(sourceCollection, args);
             return (noArgsCtor && hasType(cic, "java.util.concurrent.ConcurrentLinkedDeque",
-                    "java.util.concurrent.ConcurrentLinkedQueue", "java.util.concurrent.ConcurrentSkipListSet",
-                    "java.util.concurrent.CopyOnWriteArrayList", "java.util.concurrent.CopyOnWriteArraySet",
-                    "java.util.concurrent.DelayQueue", "java.util.concurrent.LinkedBlockingDeque",
-                    "java.util.concurrent.LinkedBlockingQueue", "java.util.concurrent.LinkedTransferQueue",
-                    "java.util.concurrent.PriorityBlockingQueue", "java.util.ArrayDeque", "java.util.ArrayList",
-                    "java.util.HashSet", "java.util.LinkedHashSet", "java.util.LinkedList", "java.util.PriorityQueue",
-                    "java.util.TreeSet", "java.util.Vector"))
-                    || (colCapacityCtor && hasType(cic, "java.util.concurrent.LinkedBlockingDeque",
-                            "java.util.concurrent.LinkedBlockingQueue", "java.util.concurrent.PriorityBlockingQueue",
-                            "java.util.ArrayDeque", "java.util.ArrayList", "java.util.HashSet",
-                            "java.util.LinkedHashSet", "java.util.PriorityQueue", "java.util.Vector"));
+                    ConcurrentLinkedQueue.class.getCanonicalName(), ConcurrentSkipListSet.class.getCanonicalName(),
+                    CopyOnWriteArrayList.class.getCanonicalName(), CopyOnWriteArraySet.class.getCanonicalName(),
+                    DelayQueue.class.getCanonicalName(), LinkedBlockingDeque.class.getCanonicalName(),
+                    LinkedBlockingQueue.class.getCanonicalName(), "java.util.concurrent.LinkedTransferQueue",
+                    PriorityBlockingQueue.class.getCanonicalName(), ArrayDeque.class.getCanonicalName(), ArrayList.class.getCanonicalName(),
+                    HashSet.class.getCanonicalName(), LinkedHashSet.class.getCanonicalName(), LinkedList.class.getCanonicalName(), PriorityQueue.class.getCanonicalName(),
+                    TreeSet.class.getCanonicalName(), Vector.class.getCanonicalName()))
+                    || (colCapacityCtor && hasType(cic, LinkedBlockingDeque.class.getCanonicalName(),
+                            LinkedBlockingQueue.class.getCanonicalName(), PriorityBlockingQueue.class.getCanonicalName(),
+                            ArrayDeque.class.getCanonicalName(), ArrayList.class.getCanonicalName(), HashSet.class.getCanonicalName(),
+                            LinkedHashSet.class.getCanonicalName(), PriorityQueue.class.getCanonicalName(), Vector.class.getCanonicalName()));
         }
 
         private boolean isValidCapacityParameter(Expression sourceCollection, final List<Expression> args) {
-            if (args.size() == 1 && isPrimitive(args.get(0), "int")) {
+            if (args.size() == 1 && isPrimitive(args.get(0), int.class.getSimpleName())) {
                 final Object constant= args.get(0).resolveConstantExpressionValue();
                 final MethodInvocation mi= as(args.get(0), MethodInvocation.class);
                 if (constant != null) {
                     return constant.equals(0);
                 } else {
-                    return isMethod(mi, "java.util.Collection", "size") && match(mi.getExpression(), sourceCollection);
+                    return isMethod(mi, Collection.class.getCanonicalName(), "size") && match(mi.getExpression(), sourceCollection);
                 }
             }
             return false;

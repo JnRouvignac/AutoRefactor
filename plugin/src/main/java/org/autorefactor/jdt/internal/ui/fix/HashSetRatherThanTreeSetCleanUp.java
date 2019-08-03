@@ -26,12 +26,18 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
+import java.io.Serializable;
+import java.util.AbstractCollection;
+import java.util.AbstractSet;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.Expression;
@@ -46,13 +52,13 @@ public class HashSetRatherThanTreeSetCleanUp extends AbstractClassSubstituteClea
     private static final Map<String, String[]> CAN_BE_CASTED_TO= new HashMap<String, String[]>();
 
     static {
-        CAN_BE_CASTED_TO.put("java.lang.Object", new String[] { "java.lang.Object" });
-        CAN_BE_CASTED_TO.put("java.lang.Cloneable", new String[] { "java.lang.Cloneable", "java.lang.Object" });
-        CAN_BE_CASTED_TO.put("java.io.Serializable", new String[] { "java.io.Serializable", "java.lang.Object" });
-        CAN_BE_CASTED_TO.put("java.util.Collection", new String[] { "java.util.Collection", "java.lang.Object" });
-        CAN_BE_CASTED_TO.put("java.util.AbstractCollection", new String[] { "java.util.AbstractCollection", "java.util.Collection", "java.lang.Object" });
-        CAN_BE_CASTED_TO.put("java.util.AbstractSet", new String[] { "java.util.AbstractSet", "java.util.Set", "java.util.AbstractCollection", "java.util.Collection", "java.lang.Object" });
-        CAN_BE_CASTED_TO.put("java.util.TreeSet", new String[] { "java.util.TreeSet", "java.util.AbstractSet", "java.util.Set", "java.util.AbstractCollection", "java.util.Collection", "java.io.Serializable", "java.lang.Cloneable", "java.lang.Object" });
+        CAN_BE_CASTED_TO.put(Object.class.getCanonicalName(), new String[] { Object.class.getCanonicalName() });
+        CAN_BE_CASTED_TO.put(Cloneable.class.getCanonicalName(), new String[] { Cloneable.class.getCanonicalName(), Object.class.getCanonicalName() });
+        CAN_BE_CASTED_TO.put(Serializable.class.getCanonicalName(), new String[] { Serializable.class.getCanonicalName(), Object.class.getCanonicalName() });
+        CAN_BE_CASTED_TO.put(Collection.class.getCanonicalName(), new String[] { Collection.class.getCanonicalName(), Object.class.getCanonicalName() });
+        CAN_BE_CASTED_TO.put(AbstractCollection.class.getCanonicalName(), new String[] { AbstractCollection.class.getCanonicalName(), Collection.class.getCanonicalName(), Object.class.getCanonicalName() });
+        CAN_BE_CASTED_TO.put(AbstractSet.class.getCanonicalName(), new String[] { AbstractSet.class.getCanonicalName(), Set.class.getCanonicalName(), AbstractCollection.class.getCanonicalName(), Collection.class.getCanonicalName(), Object.class.getCanonicalName() });
+        CAN_BE_CASTED_TO.put(TreeSet.class.getCanonicalName(), new String[] { TreeSet.class.getCanonicalName(), AbstractSet.class.getCanonicalName(), Set.class.getCanonicalName(), AbstractCollection.class.getCanonicalName(), Collection.class.getCanonicalName(), Serializable.class.getCanonicalName(), Cloneable.class.getCanonicalName(), Object.class.getCanonicalName() });
     }
 
     /**
@@ -84,18 +90,18 @@ public class HashSetRatherThanTreeSetCleanUp extends AbstractClassSubstituteClea
 
     @Override
     protected String[] getExistingClassCanonicalName() {
-        return new String[] { "java.util.TreeSet" };
+        return new String[] { TreeSet.class.getCanonicalName() };
     }
 
     @Override
     public Set<String> getClassesToImport() {
-        return new HashSet<String>(Arrays.asList("java.util.HashSet"));
+        return new HashSet<String>(Arrays.asList(HashSet.class.getCanonicalName()));
     }
 
     @Override
     protected String getSubstitutingClassName(String origRawType) {
-        if ("java.util.TreeSet".equals(origRawType)) {
-            return "java.util.HashSet";
+        if (TreeSet.class.getCanonicalName().equals(origRawType)) {
+            return HashSet.class.getCanonicalName();
         } else {
             return null;
         }
@@ -109,26 +115,26 @@ public class HashSetRatherThanTreeSetCleanUp extends AbstractClassSubstituteClea
     @Override
     protected boolean canInstantiationBeRefactored(final ClassInstanceCreation instanceCreation) {
         return instanceCreation.arguments().size() != 1
-                || !hasType((Expression) instanceCreation.arguments().get(0), "java.util.Comparator");
+                || !hasType((Expression) instanceCreation.arguments().get(0), Comparator.class.getCanonicalName());
     }
 
     @Override
     protected boolean canMethodBeRefactored(final MethodInvocation mi,
             final List<MethodInvocation> methodCallsToRefactor) {
-        return isMethod(mi, "java.util.Collection", "add", "java.lang.Object")
-                || isMethod(mi, "java.util.Collection", "clear")
-                || isMethod(mi, "java.util.Collection", "contains", "java.lang.Object")
-                || isMethod(mi, "java.util.Collection", "isEmpty")
-                || isMethod(mi, "java.util.Collection", "remove", "java.lang.Object")
-                || isMethod(mi, "java.util.Collection", "size")
-                || isMethod(mi, "java.util.Collection", "removeAll", "java.util.Collection")
-                || isMethod(mi, "java.util.Collection", "addAll", "java.util.Collection")
-                || isMethod(mi, "java.util.Collection", "containsAll", "java.util.Collection")
-                || isMethod(mi, "java.util.Collection", "retainAll", "java.util.Collection")
-                || isMethod(mi, "java.lang.Object", "finalize") || isMethod(mi, "java.lang.Object", "notify")
-                || isMethod(mi, "java.lang.Object", "notifyAll") || isMethod(mi, "java.lang.Object", "wait")
-                || isMethod(mi, "java.lang.Object", "wait", "long")
-                || isMethod(mi, "java.lang.Object", "wait", "long", "int");
+        return isMethod(mi, Collection.class.getCanonicalName(), "add", Object.class.getCanonicalName())
+                || isMethod(mi, Collection.class.getCanonicalName(), "clear")
+                || isMethod(mi, Collection.class.getCanonicalName(), "contains", Object.class.getCanonicalName())
+                || isMethod(mi, Collection.class.getCanonicalName(), "isEmpty")
+                || isMethod(mi, Collection.class.getCanonicalName(), "remove", Object.class.getCanonicalName())
+                || isMethod(mi, Collection.class.getCanonicalName(), "size")
+                || isMethod(mi, Collection.class.getCanonicalName(), "removeAll", Collection.class.getCanonicalName())
+                || isMethod(mi, Collection.class.getCanonicalName(), "addAll", Collection.class.getCanonicalName())
+                || isMethod(mi, Collection.class.getCanonicalName(), "containsAll", Collection.class.getCanonicalName())
+                || isMethod(mi, Collection.class.getCanonicalName(), "retainAll", Collection.class.getCanonicalName())
+                || isMethod(mi, Object.class.getCanonicalName(), "finalize") || isMethod(mi, Object.class.getCanonicalName(), "notify")
+                || isMethod(mi, Object.class.getCanonicalName(), "notifyAll") || isMethod(mi, Object.class.getCanonicalName(), "wait")
+                || isMethod(mi, Object.class.getCanonicalName(), "wait", long.class.getSimpleName())
+                || isMethod(mi, Object.class.getCanonicalName(), "wait", long.class.getSimpleName(), int.class.getSimpleName());
     }
 
     @Override

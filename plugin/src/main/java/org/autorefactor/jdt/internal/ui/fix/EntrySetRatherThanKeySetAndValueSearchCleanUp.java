@@ -45,6 +45,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
@@ -262,7 +264,7 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
         if (typeBinding != null && typeBinding.isRawType()) {
             // for (Object key : map.keySet()) => for (Object key : map.entrySet())
             r.set(enhancedFor, EXPRESSION_PROPERTY, b.invoke(b.move(mapExpression), "entrySet"));
-            final Type objectType= b.type(typeNameDecider.useSimplestPossibleName("java.lang.Object"));
+            final Type objectType= b.type(typeNameDecider.useSimplestPossibleName(Object.class.getCanonicalName()));
             final Variable objectVar= new Variable(
                     new VariableNameDecider(enhancedFor.getBody(), insertionPoint).suggest("obj"), b);
             r.set(enhancedFor, PARAMETER_PROPERTY, b.declareSingleVariable(objectVar.varNameRaw(), objectType));
@@ -278,7 +280,7 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
             r.insertFirst(enhancedFor.getBody(), Block.STATEMENTS_PROPERTY, newKeyDecl);
 
             if (keyUses > getValueMis.size()) {
-                String mapEntryTypeName= typeNameDecider.useSimplestPossibleName("java.util.Map.Entry");
+                String mapEntryTypeName= typeNameDecider.useSimplestPossibleName(Entry.class.getCanonicalName());
 
                 final VariableDeclarationStatement newEntryDecl= b.declareStmt(b.type(mapEntryTypeName),
                         entryVar.varName(), b.cast(b.type(mapEntryTypeName), objectVar.varName()));
@@ -316,7 +318,7 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
      */
     private Type createMapEntryType(SingleVariableDeclaration parameter, MethodInvocation getValueMi,
             TypeNameDecider typeNameDecider) {
-        final String mapEntryType= typeNameDecider.useSimplestPossibleName("java.util.Map.Entry");
+        final String mapEntryType= typeNameDecider.useSimplestPossibleName(Entry.class.getCanonicalName());
 
         final ASTBuilder b= ctx.getASTBuilder();
         final Type paramType= parameter.getType();
@@ -335,7 +337,7 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
     }
 
     private boolean isKeySetMethod(Expression expr) {
-        return expr instanceof MethodInvocation && isMethod((MethodInvocation) expr, "java.util.Map", "keySet");
+        return expr instanceof MethodInvocation && isMethod((MethodInvocation) expr, Map.class.getCanonicalName(), "keySet");
     }
 
     private List<MethodInvocation> collectMapGetValueCalls(Expression mapExpression,
@@ -415,7 +417,7 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
         @Override
         public boolean visit(MethodInvocation node) {
             if (isSameReference(node.getExpression(), mapExpression)
-                    && isMethod(node, "java.util.Map", "get", "java.lang.Object")
+                    && isMethod(node, Map.class.getCanonicalName(), "get", Object.class.getCanonicalName())
                     && isSameVariable(arg0(node), forEachParameter.getName())) {
                 addResult(node);
             }

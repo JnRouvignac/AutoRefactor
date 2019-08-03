@@ -26,12 +26,17 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
+import java.io.Serializable;
+import java.util.AbstractMap;
+import java.util.AbstractSet;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
 import org.autorefactor.jdt.internal.corext.dom.Release;
@@ -53,13 +58,13 @@ public class SetRatherThanMapCleanUp extends AbstractClassSubstituteCleanUp {
     private static final Map<String, String[]> CAN_BE_CASTED_TO= new HashMap<String, String[]>();
 
     static {
-        CAN_BE_CASTED_TO.put("java.lang.Object", new String[] { "java.lang.Object" });
-        CAN_BE_CASTED_TO.put("java.lang.Cloneable", new String[] { "java.lang.Cloneable", "java.lang.Object" });
-        CAN_BE_CASTED_TO.put("java.io.Serializable", new String[] { "java.io.Serializable", "java.lang.Object" });
-        CAN_BE_CASTED_TO.put("java.util.Map", new String[] { "java.util.Map", "java.lang.Object" });
-        CAN_BE_CASTED_TO.put("java.util.AbstractMap", new String[] { "java.util.AbstractMap", "java.lang.Cloneable", "java.lang.Object" });
-        CAN_BE_CASTED_TO.put("java.util.TreeMap", new String[] { "java.util.TreeMap", "java.io.Serializable", "java.util.Map", "java.util.AbstractMap", "java.lang.Cloneable", "java.lang.Object" });
-        CAN_BE_CASTED_TO.put("java.util.HashMap", new String[] { "java.util.HashMap", "java.io.Serializable", "java.util.Map", "java.util.AbstractMap", "java.lang.Cloneable", "java.lang.Object" });
+        CAN_BE_CASTED_TO.put(Object.class.getCanonicalName(), new String[] { Object.class.getCanonicalName() });
+        CAN_BE_CASTED_TO.put(Cloneable.class.getCanonicalName(), new String[] { Cloneable.class.getCanonicalName(), Object.class.getCanonicalName() });
+        CAN_BE_CASTED_TO.put(Serializable.class.getCanonicalName(), new String[] { Serializable.class.getCanonicalName(), Object.class.getCanonicalName() });
+        CAN_BE_CASTED_TO.put(Map.class.getCanonicalName(), new String[] { Map.class.getCanonicalName(), Object.class.getCanonicalName() });
+        CAN_BE_CASTED_TO.put(AbstractMap.class.getCanonicalName(), new String[] { AbstractMap.class.getCanonicalName(), Cloneable.class.getCanonicalName(), Object.class.getCanonicalName() });
+        CAN_BE_CASTED_TO.put(TreeMap.class.getCanonicalName(), new String[] { TreeMap.class.getCanonicalName(), Serializable.class.getCanonicalName(), Map.class.getCanonicalName(), AbstractMap.class.getCanonicalName(), Cloneable.class.getCanonicalName(), Object.class.getCanonicalName() });
+        CAN_BE_CASTED_TO.put(HashMap.class.getCanonicalName(), new String[] { HashMap.class.getCanonicalName(), Serializable.class.getCanonicalName(), Map.class.getCanonicalName(), AbstractMap.class.getCanonicalName(), Cloneable.class.getCanonicalName(), Object.class.getCanonicalName() });
     }
 
     /**
@@ -96,25 +101,25 @@ public class SetRatherThanMapCleanUp extends AbstractClassSubstituteCleanUp {
 
     @Override
     protected String[] getExistingClassCanonicalName() {
-        return new String[] { "java.util.HashMap", "java.util.TreeMap" };
+        return new String[] { HashMap.class.getCanonicalName(), TreeMap.class.getCanonicalName() };
     }
 
     @Override
     public Set<String> getClassesToImport() {
         return new HashSet<String>(
-                Arrays.asList("java.util.HashSet", "java.util.TreeSet", "java.util.AbstractSet", "java.util.Set"));
+                Arrays.asList(HashSet.class.getCanonicalName(), TreeSet.class.getCanonicalName(), AbstractSet.class.getCanonicalName(), Set.class.getCanonicalName()));
     }
 
     @Override
     protected String getSubstitutingClassName(String origRawType) {
-        if ("java.util.HashMap".equals(origRawType)) {
-            return "java.util.HashSet";
-        } else if ("java.util.TreeMap".equals(origRawType)) {
-            return "java.util.TreeSet";
-        } else if ("java.util.AbstractMap".equals(origRawType)) {
-            return "java.util.AbstractSet";
-        } else if ("java.util.Map".equals(origRawType)) {
-            return "java.util.Set";
+        if (HashMap.class.getCanonicalName().equals(origRawType)) {
+            return HashSet.class.getCanonicalName();
+        } else if (TreeMap.class.getCanonicalName().equals(origRawType)) {
+            return TreeSet.class.getCanonicalName();
+        } else if (AbstractMap.class.getCanonicalName().equals(origRawType)) {
+            return AbstractSet.class.getCanonicalName();
+        } else if (Map.class.getCanonicalName().equals(origRawType)) {
+            return Set.class.getCanonicalName();
         } else {
             return null;
         }
@@ -124,7 +129,7 @@ public class SetRatherThanMapCleanUp extends AbstractClassSubstituteCleanUp {
     protected boolean canInstantiationBeRefactored(final ClassInstanceCreation instanceCreation) {
         ITypeBinding[] parameterTypes= instanceCreation.resolveConstructorBinding().getParameterTypes();
 
-        return parameterTypes.length == 0 || hasType(parameterTypes[0], "int");
+        return parameterTypes.length == 0 || hasType(parameterTypes[0], int.class.getSimpleName());
     }
 
     /**
@@ -170,23 +175,23 @@ public class SetRatherThanMapCleanUp extends AbstractClassSubstituteCleanUp {
     @Override
     protected boolean canMethodBeRefactored(final MethodInvocation mi,
             final List<MethodInvocation> methodCallsToRefactor) {
-        if (isMethod(mi, "java.util.Map", "clear") || isMethod(mi, "java.util.Map", "isEmpty")
-                || isMethod(mi, "java.util.Map", "size") || isMethod(mi, "java.lang.Object", "finalize")
-                || isMethod(mi, "java.lang.Object", "notify") || isMethod(mi, "java.lang.Object", "notifyAll")
-                || isMethod(mi, "java.lang.Object", "wait") || isMethod(mi, "java.lang.Object", "wait", "long")
-                || isMethod(mi, "java.lang.Object", "wait", "long", "int")) {
+        if (isMethod(mi, Map.class.getCanonicalName(), "clear") || isMethod(mi, Map.class.getCanonicalName(), "isEmpty")
+                || isMethod(mi, Map.class.getCanonicalName(), "size") || isMethod(mi, Object.class.getCanonicalName(), "finalize")
+                || isMethod(mi, Object.class.getCanonicalName(), "notify") || isMethod(mi, Object.class.getCanonicalName(), "notifyAll")
+                || isMethod(mi, Object.class.getCanonicalName(), "wait") || isMethod(mi, Object.class.getCanonicalName(), "wait", long.class.getSimpleName())
+                || isMethod(mi, Object.class.getCanonicalName(), "wait", long.class.getSimpleName(), int.class.getSimpleName())) {
             return true;
-        } else if (isMethod(mi, "java.util.Map", "containsKey", "java.lang.Object")) {
+        } else if (isMethod(mi, Map.class.getCanonicalName(), "containsKey", Object.class.getCanonicalName())) {
             methodCallsToRefactor.add(mi);
             return true;
-        } else if (isMethod(mi, "java.util.Map", "put", "java.lang.Object", "java.lang.Object")) {
+        } else if (isMethod(mi, Map.class.getCanonicalName(), "put", Object.class.getCanonicalName(), Object.class.getCanonicalName())) {
             if (isPassive((Expression) mi.arguments().get(1))) {
                 methodCallsToRefactor.add(mi);
                 return true;
             } else {
                 return false;
             }
-        } else if (isMethod(mi, "java.util.Map", "remove", "java.lang.Object")) {
+        } else if (isMethod(mi, Map.class.getCanonicalName(), "remove", Object.class.getCanonicalName())) {
             return isReturnValueLost(mi);
         } else {
             // Here are the following cases:
@@ -215,9 +220,9 @@ public class SetRatherThanMapCleanUp extends AbstractClassSubstituteCleanUp {
     @Override
     protected void refactorMethod(final ASTBuilder b, final MethodInvocation originalMi,
             final MethodInvocation refactoredMi) {
-        if (isMethod(originalMi, "java.util.Map", "containsKey", "java.lang.Object")) {
+        if (isMethod(originalMi, Map.class.getCanonicalName(), "containsKey", Object.class.getCanonicalName())) {
             refactoredMi.setName(b.simpleName("contains"));
-        } else if (isMethod(originalMi, "java.util.Map", "put", "java.lang.Object", "java.lang.Object")) {
+        } else if (isMethod(originalMi, Map.class.getCanonicalName(), "put", Object.class.getCanonicalName(), Object.class.getCanonicalName())) {
             refactoredMi.setName(b.simpleName("add"));
             refactoredMi.arguments().remove(1);
         }

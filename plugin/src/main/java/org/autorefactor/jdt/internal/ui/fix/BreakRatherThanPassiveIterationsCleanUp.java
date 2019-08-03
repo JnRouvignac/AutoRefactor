@@ -104,7 +104,7 @@ public class BreakRatherThanPassiveIterationsCleanUp extends AbstractCleanUpRule
         @SuppressWarnings("unchecked")
         @Override
         public boolean visit(final InfixExpression node) {
-            if (InfixExpression.Operator.PLUS.equals(node.getOperator()) && hasType(node, "java.lang.String")
+            if (InfixExpression.Operator.PLUS.equals(node.getOperator()) && hasType(node, String.class.getCanonicalName())
                     && (mayCallImplicitToString(node.getLeftOperand())
                             || mayCallImplicitToString(node.getRightOperand())
                             || mayCallImplicitToString(node.extendedOperands()))) {
@@ -126,9 +126,9 @@ public class BreakRatherThanPassiveIterationsCleanUp extends AbstractCleanUpRule
         }
 
         private boolean mayCallImplicitToString(final Expression expr) {
-            return !hasType(expr, "java.lang.String", "boolean", "short", "int", "long", "float", "double",
-                    "java.lang.Short", "java.lang.Boolean", "java.lang.Integer", "java.lang.Long", "java.lang.Float",
-                    "java.lang.Double") && !(expr instanceof PrefixExpression) && !(expr instanceof InfixExpression)
+            return !hasType(expr, String.class.getCanonicalName(), boolean.class.getSimpleName(), short.class.getSimpleName(), int.class.getSimpleName(), long.class.getSimpleName(), float.class.getSimpleName(), double.class.getSimpleName(),
+                    Short.class.getCanonicalName(), Boolean.class.getCanonicalName(), Integer.class.getCanonicalName(), Long.class.getCanonicalName(), Float.class.getCanonicalName(),
+                    Double.class.getCanonicalName()) && !(expr instanceof PrefixExpression) && !(expr instanceof InfixExpression)
                     && !(expr instanceof PostfixExpression);
         }
 

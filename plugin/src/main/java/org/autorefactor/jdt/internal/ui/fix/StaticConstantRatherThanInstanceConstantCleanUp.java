@@ -72,15 +72,15 @@ public class StaticConstantRatherThanInstanceConstantCleanUp extends AbstractCle
 
     @Override
     public boolean visit(FieldDeclaration node) {
-        if (node.getType().isPrimitiveType() || hasType(node.getType().resolveBinding(), "java.lang.Byte")
-                || hasType(node.getType().resolveBinding(), "java.lang.Character")
-                || hasType(node.getType().resolveBinding(), "java.lang.Short")
-                || hasType(node.getType().resolveBinding(), "java.lang.Integer")
-                || hasType(node.getType().resolveBinding(), "java.lang.Long")
-                || hasType(node.getType().resolveBinding(), "java.lang.Boolean")
-                || hasType(node.getType().resolveBinding(), "java.lang.Float")
-                || hasType(node.getType().resolveBinding(), "java.lang.Double")
-                || hasType(node.getType().resolveBinding(), "java.lang.String")) {
+        if (node.getType().isPrimitiveType() || hasType(node.getType().resolveBinding(), Byte.class.getCanonicalName())
+                || hasType(node.getType().resolveBinding(), Character.class.getCanonicalName())
+                || hasType(node.getType().resolveBinding(), Short.class.getCanonicalName())
+                || hasType(node.getType().resolveBinding(), Integer.class.getCanonicalName())
+                || hasType(node.getType().resolveBinding(), Long.class.getCanonicalName())
+                || hasType(node.getType().resolveBinding(), Boolean.class.getCanonicalName())
+                || hasType(node.getType().resolveBinding(), Float.class.getCanonicalName())
+                || hasType(node.getType().resolveBinding(), Double.class.getCanonicalName())
+                || hasType(node.getType().resolveBinding(), String.class.getCanonicalName())) {
             Modifier finalModifier= null;
             for (final Modifier modifier : getModifiersOnly(modifiers(node))) {
                 if (modifier.isStatic()) {

@@ -95,17 +95,17 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
     public boolean visit(CastExpression node) {
         final NumberLiteral literal= as(node.getExpression(), NumberLiteral.class);
         if (literal != null && (literal.getToken().matches(".*[^lLdDfF]") || literal.getToken().matches("0x.*[^lL]"))) {
-            if (hasType(node.getType().resolveBinding(), "long")) {
+            if (hasType(node.getType().resolveBinding(), long.class.getSimpleName())) {
                 createPrimitive(node, literal, 'L');
                 return false;
             }
 
-            if (hasType(node.getType().resolveBinding(), "float")) {
+            if (hasType(node.getType().resolveBinding(), float.class.getSimpleName())) {
                 createPrimitive(node, literal, 'f');
                 return false;
             }
 
-            if (hasType(node.getType().resolveBinding(), "double")) {
+            if (hasType(node.getType().resolveBinding(), double.class.getSimpleName())) {
                 createPrimitive(node, literal, 'd');
                 return false;
             }
@@ -211,19 +211,19 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
     }
 
     private int toPseudoEnum(String name) {
-        if ("byte".equals(name) || "java.lang.Byte".equals(name)) {
+        if (byte.class.getSimpleName().equals(name) || Byte.class.getCanonicalName().equals(name)) {
             return 1;
-        } else if ("short".equals(name) || "java.lang.Short".equals(name)) {
+        } else if (short.class.getSimpleName().equals(name) || Short.class.getCanonicalName().equals(name)) {
             return 2;
-        } else if ("char".equals(name) || "java.lang.Character".equals(name)) {
+        } else if (char.class.getSimpleName().equals(name) || Character.class.getCanonicalName().equals(name)) {
             return 3;
-        } else if ("int".equals(name) || "java.lang.Integer".equals(name)) {
+        } else if (int.class.getSimpleName().equals(name) || Integer.class.getCanonicalName().equals(name)) {
             return 4;
-        } else if ("long".equals(name) || "java.lang.Long".equals(name)) {
+        } else if (long.class.getSimpleName().equals(name) || Long.class.getCanonicalName().equals(name)) {
             return 5;
-        } else if ("float".equals(name) || "java.lang.Float".equals(name)) {
+        } else if (float.class.getSimpleName().equals(name) || Float.class.getCanonicalName().equals(name)) {
             return 6;
-        } else if ("double".equals(name) || "java.lang.Double".equals(name)) {
+        } else if (double.class.getSimpleName().equals(name) || Double.class.getCanonicalName().equals(name)) {
             return 7;
         }
         throw new NotImplementedException(null, "for type '" + name + "'");
@@ -253,11 +253,11 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
     }
 
     private boolean isIntegralType(final Expression expr) {
-        return hasType(expr, "byte", "char", "short", "int", "long");
+        return hasType(expr, byte.class.getSimpleName(), char.class.getSimpleName(), short.class.getSimpleName(), int.class.getSimpleName(), long.class.getSimpleName());
     }
 
     private boolean isFloatingPointType(final Expression expr) {
-        return hasType(expr, "float", "double");
+        return hasType(expr, float.class.getSimpleName(), double.class.getSimpleName());
     }
 
     /** @see JLS, section 5.2 Assignment Conversion */
@@ -265,15 +265,15 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
         final Object value= node.getExpression().resolveConstantExpressionValue();
         if (value instanceof Integer) {
             final int val= (Integer) value;
-            return (hasType(node, "byte") && Byte.MIN_VALUE <= val && val <= Byte.MAX_VALUE)
-                    || (hasType(node, "short") && Short.MIN_VALUE <= val && val <= Short.MAX_VALUE)
-                    || (hasType(node, "char") && 0 <= val && val <= 65535);
+            return (hasType(node, byte.class.getSimpleName()) && Byte.MIN_VALUE <= val && val <= Byte.MAX_VALUE)
+                    || (hasType(node, short.class.getSimpleName()) && Short.MIN_VALUE <= val && val <= Short.MAX_VALUE)
+                    || (hasType(node, char.class.getSimpleName()) && 0 <= val && val <= 65535);
         }
         return false;
     }
 
     private boolean isStringConcat(InfixExpression ie) {
-        return hasType(ie, "java.lang.String");
+        return hasType(ie, String.class.getCanonicalName());
     }
 
     private boolean isPrimitiveTypeNarrowing(CastExpression node) {

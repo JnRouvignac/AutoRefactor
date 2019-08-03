@@ -284,7 +284,7 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
     private boolean hasOverrideAnnotation(ASTNode node) {
         if (node instanceof BodyDeclaration) {
             for (IExtendedModifier modifier : modifiers((BodyDeclaration) node)) {
-                return hasType(getTypeName(modifier), "java.lang.Override");
+                return hasType(getTypeName(modifier), Override.class.getCanonicalName());
             }
         }
         return false;

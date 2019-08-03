@@ -72,7 +72,7 @@ public class StringBuilderRatherThanStringBufferCleanUp extends AbstractClassSub
 
     @Override
     protected String[] getExistingClassCanonicalName() {
-        return new String[] { "java.lang.StringBuffer" };
+        return new String[] { StringBuffer.class.getCanonicalName() };
     }
 
     @Override
@@ -82,37 +82,37 @@ public class StringBuilderRatherThanStringBufferCleanUp extends AbstractClassSub
 
     @Override
     protected boolean isMethodReturningExistingClass(final MethodInvocation mi) {
-        return isMethod(mi, "java.lang.StringBuffer", "append", "boolean")
-                || isMethod(mi, "java.lang.StringBuffer", "append", "char")
-                || isMethod(mi, "java.lang.StringBuffer", "append", "char[]")
-                || isMethod(mi, "java.lang.StringBuffer", "append", "char[]", "int", "int")
-                || isMethod(mi, "java.lang.StringBuffer", "append", "java.lang.CharSequence")
-                || isMethod(mi, "java.lang.StringBuffer", "append", "java.lang.CharSequence", "int", "int")
-                || isMethod(mi, "java.lang.StringBuffer", "append", "double")
-                || isMethod(mi, "java.lang.StringBuffer", "append", "float")
-                || isMethod(mi, "java.lang.StringBuffer", "append", "int")
-                || isMethod(mi, "java.lang.StringBuffer", "append", "long")
-                || isMethod(mi, "java.lang.StringBuffer", "append", "java.lang.Object")
-                || isMethod(mi, "java.lang.StringBuffer", "append", "java.lang.String")
-                || isMethod(mi, "java.lang.StringBuffer", "append", "java.lang.StringBuffer")
-                || isMethod(mi, "java.lang.StringBuffer", "appendCodePoint", "int")
-                || isMethod(mi, "java.lang.StringBuffer", "delete", "int", "int")
-                || isMethod(mi, "java.lang.StringBuffer", "deleteCharAt", "int")
-                || isMethod(mi, "java.lang.StringBuffer", "insert", "int", "boolean")
-                || isMethod(mi, "java.lang.StringBuffer", "insert", "int", "char")
-                || isMethod(mi, "java.lang.StringBuffer", "insert", "int", "char[]")
-                || isMethod(mi, "java.lang.StringBuffer", "insert", "int", "char[]", "int", "int")
-                || isMethod(mi, "java.lang.StringBuffer", "insert", "int", "java.lang.CharSequence")
-                || isMethod(mi, "java.lang.StringBuffer", "insert", "int", "java.lang.CharSequence", "int", "int")
-                || isMethod(mi, "java.lang.StringBuffer", "insert", "int", "double")
-                || isMethod(mi, "java.lang.StringBuffer", "insert", "int", "float")
-                || isMethod(mi, "java.lang.StringBuffer", "insert", "int", "int")
-                || isMethod(mi, "java.lang.StringBuffer", "insert", "int", "long")
-                || isMethod(mi, "java.lang.StringBuffer", "insert", "int", "java.lang.Object")
-                || isMethod(mi, "java.lang.StringBuffer", "insert", "int", "java.lang.String")
-                || isMethod(mi, "java.lang.StringBuffer", "replace", "int", "int", "java.lang.String")
-                || isMethod(mi, "java.lang.StringBuffer", "reverse")
-                || isMethod(mi, "java.lang.StringBuffer", "ensureCapacity", "int")
-                || isMethod(mi, "java.lang.StringBuffer", "getChars", "int", "int", "char[]", "int");
+        return isMethod(mi, StringBuffer.class.getCanonicalName(), "append", boolean.class.getSimpleName())
+                || isMethod(mi, StringBuffer.class.getCanonicalName(), "append", char.class.getSimpleName())
+                || isMethod(mi, StringBuffer.class.getCanonicalName(), "append", "char[]")
+                || isMethod(mi, StringBuffer.class.getCanonicalName(), "append", "char[]", int.class.getSimpleName(), int.class.getSimpleName())
+                || isMethod(mi, StringBuffer.class.getCanonicalName(), "append", CharSequence.class.getCanonicalName())
+                || isMethod(mi, StringBuffer.class.getCanonicalName(), "append", CharSequence.class.getCanonicalName(), int.class.getSimpleName(), int.class.getSimpleName())
+                || isMethod(mi, StringBuffer.class.getCanonicalName(), "append", double.class.getSimpleName())
+                || isMethod(mi, StringBuffer.class.getCanonicalName(), "append", float.class.getSimpleName())
+                || isMethod(mi, StringBuffer.class.getCanonicalName(), "append", int.class.getSimpleName())
+                || isMethod(mi, StringBuffer.class.getCanonicalName(), "append", long.class.getSimpleName())
+                || isMethod(mi, StringBuffer.class.getCanonicalName(), "append", Object.class.getCanonicalName())
+                || isMethod(mi, StringBuffer.class.getCanonicalName(), "append", String.class.getCanonicalName())
+                || isMethod(mi, StringBuffer.class.getCanonicalName(), "append", StringBuffer.class.getCanonicalName())
+                || isMethod(mi, StringBuffer.class.getCanonicalName(), "appendCodePoint", int.class.getSimpleName())
+                || isMethod(mi, StringBuffer.class.getCanonicalName(), "delete", int.class.getSimpleName(), int.class.getSimpleName())
+                || isMethod(mi, StringBuffer.class.getCanonicalName(), "deleteCharAt", int.class.getSimpleName())
+                || isMethod(mi, StringBuffer.class.getCanonicalName(), "insert", int.class.getSimpleName(), boolean.class.getSimpleName())
+                || isMethod(mi, StringBuffer.class.getCanonicalName(), "insert", int.class.getSimpleName(), char.class.getSimpleName())
+                || isMethod(mi, StringBuffer.class.getCanonicalName(), "insert", int.class.getSimpleName(), "char[]")
+                || isMethod(mi, StringBuffer.class.getCanonicalName(), "insert", int.class.getSimpleName(), "char[]", int.class.getSimpleName(), int.class.getSimpleName())
+                || isMethod(mi, StringBuffer.class.getCanonicalName(), "insert", int.class.getSimpleName(), CharSequence.class.getCanonicalName())
+                || isMethod(mi, StringBuffer.class.getCanonicalName(), "insert", int.class.getSimpleName(), CharSequence.class.getCanonicalName(), int.class.getSimpleName(), int.class.getSimpleName())
+                || isMethod(mi, StringBuffer.class.getCanonicalName(), "insert", int.class.getSimpleName(), double.class.getSimpleName())
+                || isMethod(mi, StringBuffer.class.getCanonicalName(), "insert", int.class.getSimpleName(), float.class.getSimpleName())
+                || isMethod(mi, StringBuffer.class.getCanonicalName(), "insert", int.class.getSimpleName(), int.class.getSimpleName())
+                || isMethod(mi, StringBuffer.class.getCanonicalName(), "insert", int.class.getSimpleName(), long.class.getSimpleName())
+                || isMethod(mi, StringBuffer.class.getCanonicalName(), "insert", int.class.getSimpleName(), Object.class.getCanonicalName())
+                || isMethod(mi, StringBuffer.class.getCanonicalName(), "insert", int.class.getSimpleName(), String.class.getCanonicalName())
+                || isMethod(mi, StringBuffer.class.getCanonicalName(), "replace", int.class.getSimpleName(), int.class.getSimpleName(), String.class.getCanonicalName())
+                || isMethod(mi, StringBuffer.class.getCanonicalName(), "reverse")
+                || isMethod(mi, StringBuffer.class.getCanonicalName(), "ensureCapacity", int.class.getSimpleName())
+                || isMethod(mi, StringBuffer.class.getCanonicalName(), "getChars", int.class.getSimpleName(), int.class.getSimpleName(), "char[]", int.class.getSimpleName());
     }
 }

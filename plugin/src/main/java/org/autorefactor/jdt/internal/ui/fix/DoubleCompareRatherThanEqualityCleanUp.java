@@ -70,8 +70,8 @@ public class DoubleCompareRatherThanEqualityCleanUp extends AbstractCleanUpRule 
     public boolean visit(final InfixExpression node) {
         if (!node.hasExtendedOperands()
                 && hasOperator(node, EQUALS, NOT_EQUALS, LESS_EQUALS, GREATER_EQUALS, LESS, GREATER)
-                && hasType(node.getLeftOperand(), "double", "java.lang.Double")
-                && hasType(node.getRightOperand(), "double", "java.lang.Double")) {
+                && hasType(node.getLeftOperand(), double.class.getSimpleName(), Double.class.getCanonicalName())
+                && hasType(node.getRightOperand(), double.class.getSimpleName(), Double.class.getCanonicalName())) {
             replace(node);
             return false;
         }

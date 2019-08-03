@@ -30,8 +30,11 @@ import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasType;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.instanceOf;
 
 import java.util.Arrays;
+import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
@@ -73,17 +76,17 @@ public final class EnumMapRatherThanHashMapCleanUp extends AbstractEnumCollectio
 
     @Override
     public String getImplType() {
-        return "java.util.HashMap";
+        return HashMap.class.getCanonicalName();
     }
 
     @Override
     public String getInterfaceType() {
-        return "java.util.Map";
+        return Map.class.getCanonicalName();
     }
 
     @Override
     public Set<String> getClassesToImport() {
-        return new HashSet<String>(Arrays.asList("java.util.EnumMap"));
+        return new HashSet<String>(Arrays.asList(EnumMap.class.getCanonicalName()));
     }
 
     /**
@@ -110,12 +113,12 @@ public final class EnumMapRatherThanHashMapCleanUp extends AbstractEnumCollectio
         List<Expression> arguments= arguments(cic);
 
         if (!arguments.isEmpty() && isTargetType(arguments.get(0).resolveTypeBinding())
-                && !hasType(arguments.get(0).resolveTypeBinding(), "java.util.EnumMap")) {
+                && !hasType(arguments.get(0).resolveTypeBinding(), EnumMap.class.getCanonicalName())) {
             return true;
         }
 
         replace(cic, alreadyImportedClasses, importsToAdd, keyType, valueType, arguments);
-        importsToAdd.add("java.util.EnumMap");
+        importsToAdd.add(EnumMap.class.getCanonicalName());
         return false;
     }
 
@@ -124,7 +127,7 @@ public final class EnumMapRatherThanHashMapCleanUp extends AbstractEnumCollectio
         ASTBuilder b= ctx.getASTBuilder();
         Expression newParam= resolveParameter(keyType, arguments);
         Type newType= b.genericType(
-                alreadyImportedClasses.contains("java.util.EnumMap") ? "EnumMap" : "java.util.EnumMap", b.copy(keyType),
+                alreadyImportedClasses.contains(EnumMap.class.getCanonicalName()) ? "EnumMap" : EnumMap.class.getCanonicalName(), b.copy(keyType),
                 b.copy(valueType));
 
         // If there were no type args in original creation (diamond operator),
@@ -144,7 +147,7 @@ public final class EnumMapRatherThanHashMapCleanUp extends AbstractEnumCollectio
      * @return correct parameter for EnumMap constructor
      */
     private Expression resolveParameter(Type keyType, List<Expression> originalArgs) {
-        if (!originalArgs.isEmpty() && instanceOf(originalArgs.get(0), "java.util.EnumMap")) {
+        if (!originalArgs.isEmpty() && instanceOf(originalArgs.get(0), EnumMap.class.getCanonicalName())) {
             return ctx.getASTBuilder().copy(originalArgs.get(0));
         }
         TypeLiteral keyTypeLiteral= keyType.getAST().newTypeLiteral();

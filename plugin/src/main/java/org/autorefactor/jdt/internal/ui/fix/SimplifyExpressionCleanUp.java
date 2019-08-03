@@ -380,7 +380,7 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
 
     private boolean replace(final InfixExpression node, final boolean isTrue, final Expression exprToCopy) {
         checkNoExtendedOperands(node);
-        if (!isPrimitive(node.getLeftOperand(), "boolean") && !isPrimitive(node.getRightOperand(), "boolean")) {
+        if (!isPrimitive(node.getLeftOperand(), boolean.class.getSimpleName()) && !isPrimitive(node.getRightOperand(), boolean.class.getSimpleName())) {
             return true;
         }
         // Either:
@@ -483,8 +483,8 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
                         && arguments(expr).get(0).subtreeMatch(new ASTSemanticMatcher(), nullCheckedExpression)) {
                     // Did we invoke java.lang.Object.equals() or
                     // java.lang.String.equalsIgnoreCase()?
-                    return isMethod(expr, "java.lang.Object", "equals", "java.lang.Object")
-                            || isMethod(expr, "java.lang.String", "equalsIgnoreCase", "java.lang.String");
+                    return isMethod(expr, Object.class.getCanonicalName(), "equals", Object.class.getCanonicalName())
+                            || isMethod(expr, String.class.getCanonicalName(), "equalsIgnoreCase", String.class.getCanonicalName());
                 }
             }
         }

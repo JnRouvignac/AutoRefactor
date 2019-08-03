@@ -46,6 +46,7 @@ import static org.autorefactor.jdt.internal.corext.dom.ForLoopHelper.IterationTy
 import static org.autorefactor.jdt.internal.corext.dom.ForLoopHelper.IterationType.ITERATOR;
 import static org.eclipse.jdt.core.dom.Assignment.Operator.ASSIGN;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
@@ -123,7 +124,7 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends Abst
 
         private boolean maybeReplaceWithCollectionContains(Statement forNode, Expression iterable,
                 Expression loopElement, IfStatement is) {
-            if (is != null && is.getElseStatement() == null && instanceOf(iterable, "java.util.Collection")) {
+            if (is != null && is.getElseStatement() == null && instanceOf(iterable, Collection.class.getCanonicalName())) {
                 MethodInvocation cond= getMethodToReplace(is.getExpression());
                 List<Statement> thenStmts= asList(is.getThenStatement());
 
@@ -259,7 +260,7 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends Abst
 
             Statement replacement;
             if (previousStmtIsPreviousSibling && previousStmt instanceof VariableDeclarationStatement) {
-                replacement= b.declareStmt(b.type("boolean"), b.move((SimpleName) initName),
+                replacement= b.declareStmt(b.type(boolean.class.getSimpleName()), b.move((SimpleName) initName),
                         newMethod(iterable, toFind, isPositive, b));
             } else if (!previousStmtIsPreviousSibling || previousStmt instanceof ExpressionStatement) {
                 replacement= b.toStmt(b.assign(b.copy(initName), ASSIGN, newMethod(iterable, toFind, isPositive, b)));

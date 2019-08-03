@@ -26,7 +26,6 @@
 package org.autorefactor.jdt.internal.ui.fix;
 
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.expressions;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getPrimitiveEnum;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.values;
 import static org.eclipse.jdt.core.dom.ASTNode.ARRAY_INITIALIZER;
 import static org.eclipse.jdt.core.dom.ASTNode.BOOLEAN_LITERAL;
@@ -41,7 +40,6 @@ import java.util.Map;
 
 import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
 import org.autorefactor.jdt.internal.corext.dom.Refactorings;
-import org.autorefactor.jdt.internal.corext.dom.ASTNodes.PrimitiveEnum;
 import org.autorefactor.util.NotImplementedException;
 import org.autorefactor.util.Utils;
 import org.eclipse.jdt.core.dom.ArrayInitializer;
@@ -141,23 +139,37 @@ public class AnnotationCleanUp extends AbstractCleanUpRule {
             return Utils.equalNotNull(javaObj1, javaObj2);
 
         case NUMBER_LITERAL:
-            PrimitiveEnum primEnum= getPrimitiveEnum(typeBinding);
-            switch (primEnum) {
-            case BYTE:
-                return Utils.equalNotNull(toByte(javaObj1), toByte(javaObj2));
-            case SHORT:
-                return Utils.equalNotNull(toShort(javaObj1), toShort(javaObj2));
-            case INT:
-                return Utils.equalNotNull(toInteger(javaObj1), toInteger(javaObj2));
-            case LONG:
-                return Utils.equalNotNull(toLong(javaObj1), toLong(javaObj2));
-            case FLOAT:
-                return Utils.equalNotNull(toFloat(javaObj1), toFloat(javaObj2));
-            case DOUBLE:
-                return Utils.equalNotNull(toDouble(javaObj1), toDouble(javaObj2));
-            default:
-                throw new NotImplementedException(expr, "for primitive type \"" + primEnum + "\".");
+            if (typeBinding.isPrimitive()) {
+                String type= typeBinding.getQualifiedName();
+
+                if (type.equals(byte.class.getSimpleName())) {
+                    return Utils.equalNotNull(toByte(javaObj1), toByte(javaObj2));
+                }
+
+                if (type.equals(short.class.getSimpleName())) {
+                    return Utils.equalNotNull(toShort(javaObj1), toShort(javaObj2));
+                }
+
+                if (type.equals(int.class.getSimpleName())) {
+                    return Utils.equalNotNull(toInteger(javaObj1), toInteger(javaObj2));
+                }
+
+                if (type.equals(long.class.getSimpleName())) {
+                    return Utils.equalNotNull(toLong(javaObj1), toLong(javaObj2));
+                }
+
+                if (type.equals(float.class.getSimpleName())) {
+                    return Utils.equalNotNull(toFloat(javaObj1), toFloat(javaObj2));
+                }
+
+                if (type.equals(double.class.getSimpleName())) {
+                    return Utils.equalNotNull(toDouble(javaObj1), toDouble(javaObj2));
+                }
+
+                throw new NotImplementedException(expr, "for primitive type \"" + type + "\".");
             }
+
+            return false;
 
         default:
             return false;

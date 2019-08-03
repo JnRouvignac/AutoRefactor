@@ -29,6 +29,8 @@ import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.arguments;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.instanceOf;
 
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -73,17 +75,17 @@ public final class EnumSetRatherThanHashSetCleanUp extends AbstractEnumCollectio
 
     @Override
     public String getImplType() {
-        return "java.util.HashSet";
+        return HashSet.class.getCanonicalName();
     }
 
     @Override
     public String getInterfaceType() {
-        return "java.util.Set";
+        return Set.class.getCanonicalName();
     }
 
     @Override
     public Set<String> getClassesToImport() {
-        return new HashSet<String>(Arrays.asList("java.util.EnumSet"));
+        return new HashSet<String>(Arrays.asList(EnumSet.class.getCanonicalName()));
     }
 
     /**
@@ -113,22 +115,22 @@ public final class EnumSetRatherThanHashSetCleanUp extends AbstractEnumCollectio
         List<Expression> arguments= arguments(cic);
         final MethodInvocation invocation;
 
-        if (!arguments.isEmpty() && instanceOf(arguments.get(0), "java.util.Collection")) {
+        if (!arguments.isEmpty() && instanceOf(arguments.get(0), Collection.class.getCanonicalName())) {
             Expression typeArg= arguments.get(0);
-            if (!instanceOf(typeArg, "java.util.EnumSet")) {
+            if (!instanceOf(typeArg, EnumSet.class.getCanonicalName())) {
                 return true;
             }
-            invocation= b.invoke(alreadyImportedClasses.contains("java.util.EnumSet") ? b.name("EnumSet")
+            invocation= b.invoke(alreadyImportedClasses.contains(EnumSet.class.getCanonicalName()) ? b.name("EnumSet")
                     : b.name("java", "util", "EnumSet"), "copyOf", b.copy(typeArg));
         } else {
             TypeLiteral newTypeLiteral= ctx.getAST().newTypeLiteral();
             newTypeLiteral.setType(b.copy(type));
-            invocation= b.invoke(alreadyImportedClasses.contains("java.util.EnumSet") ? b.name("EnumSet")
+            invocation= b.invoke(alreadyImportedClasses.contains(EnumSet.class.getCanonicalName()) ? b.name("EnumSet")
                     : b.name("java", "util", "EnumSet"), "noneOf", newTypeLiteral);
         }
 
         ctx.getRefactorings().replace(cic, invocation);
-        importsToAdd.add("java.util.EnumSet");
+        importsToAdd.add(EnumSet.class.getCanonicalName());
         return false;
     }
 }

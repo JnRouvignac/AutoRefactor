@@ -74,8 +74,8 @@ public class InvertEqualsCleanUp extends AbstractCleanUpRule {
         if (node.getExpression() == null) {
             return true;
         }
-        boolean isEquals= isMethod(node, "java.lang.Object", "equals", "java.lang.Object");
-        boolean isStringEqualsIgnoreCase= isMethod(node, "java.lang.String", "equalsIgnoreCase", "java.lang.String");
+        boolean isEquals= isMethod(node, Object.class.getCanonicalName(), "equals", Object.class.getCanonicalName());
+        boolean isStringEqualsIgnoreCase= isMethod(node, String.class.getCanonicalName(), "equalsIgnoreCase", String.class.getCanonicalName());
         if (isEquals || isStringEqualsIgnoreCase) {
             final Expression expr= node.getExpression();
             final Expression arg0= arg0(node);

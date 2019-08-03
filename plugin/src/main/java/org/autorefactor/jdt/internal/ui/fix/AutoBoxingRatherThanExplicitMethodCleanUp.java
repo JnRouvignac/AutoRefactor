@@ -70,14 +70,14 @@ public class AutoBoxingRatherThanExplicitMethodCleanUp extends AbstractCleanUpRu
     public boolean visit(MethodInvocation node) {
         if ("valueOf".equals(node.getName().getIdentifier()) && node.getExpression() != null
                 && getJavaMinorVersion() >= 5
-                && (isMethod(node, "java.lang.Boolean", "valueOf", "boolean")
-                        || isMethod(node, "java.lang.Byte", "valueOf", "byte")
-                        || isMethod(node, "java.lang.Character", "valueOf", "char")
-                        || isMethod(node, "java.lang.Short", "valueOf", "short")
-                        || isMethod(node, "java.lang.Integer", "valueOf", "int")
-                        || isMethod(node, "java.lang.Long", "valueOf", "long")
-                        || isMethod(node, "java.lang.Float", "valueOf", "float")
-                        || isMethod(node, "java.lang.Double", "valueOf", "double"))) {
+                && (isMethod(node, Boolean.class.getCanonicalName(), "valueOf", boolean.class.getSimpleName())
+                        || isMethod(node, Byte.class.getCanonicalName(), "valueOf", byte.class.getSimpleName())
+                        || isMethod(node, Character.class.getCanonicalName(), "valueOf", char.class.getSimpleName())
+                        || isMethod(node, Short.class.getCanonicalName(), "valueOf", short.class.getSimpleName())
+                        || isMethod(node, Integer.class.getCanonicalName(), "valueOf", int.class.getSimpleName())
+                        || isMethod(node, Long.class.getCanonicalName(), "valueOf", long.class.getSimpleName())
+                        || isMethod(node, Float.class.getCanonicalName(), "valueOf", float.class.getSimpleName())
+                        || isMethod(node, Double.class.getCanonicalName(), "valueOf", double.class.getSimpleName()))) {
             final ITypeBinding primitiveType= node.resolveMethodBinding().getParameterTypes()[0];
             final ITypeBinding wrapperClass= node.resolveMethodBinding().getDeclaringClass();
 

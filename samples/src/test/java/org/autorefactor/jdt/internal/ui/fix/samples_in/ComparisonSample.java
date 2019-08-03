@@ -25,9 +25,10 @@
  */
 package org.autorefactor.jdt.internal.ui.fix.samples_in;
 
-public class ComparisonSample {
+import java.util.Comparator;
 
-    public boolean fixCompareToUsage() {
+public class ComparisonSample {
+    public boolean refactorComparableComparingToZero() {
         boolean b;
         final String s = "";
 
@@ -51,6 +52,31 @@ public class ComparisonSample {
         b = 1 != s.compareTo("smaller");
         b = 1 == s.compareTo("greater");
         b = 1 == s.compareToIgnoreCase("greater");
+
+        return b;
+    }
+
+    public boolean refactorComparatorComparingToZero(Comparator<String> comparator) {
+        boolean b;
+        final String s = "";
+
+        // Valid, do no change these ones
+        b = comparator.compare(s, "smaller") < 0;
+        b = comparator.compare(s, "smaller") <= 0;
+        b = comparator.compare(s, "equal") == 0;
+        b = comparator.compare(s, "different") != 0;
+        b = comparator.compare(s, "greater") >= 0;
+        b = comparator.compare(s, "greater") > 0;
+
+        // Invalid, refactor them
+        b = comparator.compare(s, "smaller") == -1;
+        b = comparator.compare(s, "greater") != -1;
+        b = comparator.compare(s, "smaller") != 1;
+        b = (comparator.compare(s, "greater")) == 1;
+        b = -1 == (comparator.compare(s, "smaller"));
+        b = -1 != comparator.compare(s, "greater");
+        b = 1 != comparator.compare(s, "smaller");
+        b = 1 == comparator.compare(s, "greater");
 
         return b;
     }

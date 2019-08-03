@@ -72,12 +72,12 @@ public class BytePrimitiveRatherThanWrapperCleanUp extends AbstractPrimitiveRath
 
     @Override
     public String getWrapperFullyQualifiedName() {
-        return "java.lang.Byte";
+        return Byte.class.getCanonicalName();
     }
 
     @Override
     public String getPrimitiveTypeName() {
-        return "byte";
+        return byte.class.getSimpleName();
     }
 
     @Override

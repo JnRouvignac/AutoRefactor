@@ -105,15 +105,15 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
                 && isStringBuilderOrBuffer(node.getExpression())) {
             final MethodInvocation embeddedMI= as(arg0(node), MethodInvocation.class);
 
-            if (isMethod(embeddedMI, "java.lang.String", "substring", "int", "int")
-                    || isMethod(embeddedMI, "java.lang.CharSequence", "subSequence", "int", "int")) {
+            if (isMethod(embeddedMI, String.class.getCanonicalName(), "substring", int.class.getSimpleName(), int.class.getSimpleName())
+                    || isMethod(embeddedMI, CharSequence.class.getCanonicalName(), "subSequence", int.class.getSimpleName(), int.class.getSimpleName())) {
                 replaceWithAppendSubstring(node, embeddedMI);
                 return false;
             }
 
             return maybeRefactorAppending(node);
-        } else if (isMethod(node, "java.lang.StringBuilder", "toString")
-                || isMethod(node, "java.lang.StringBuffer", "toString")) {
+        } else if (isMethod(node, StringBuilder.class.getCanonicalName(), "toString")
+                || isMethod(node, StringBuffer.class.getCanonicalName(), "toString")) {
             final LinkedList<Pair<ITypeBinding, Expression>> allAppendedStrings= new LinkedList<Pair<ITypeBinding, Expression>>();
             final Expression lastExpr= readAppendMethod(node.getExpression(), allAppendedStrings,
                     new AtomicBoolean(false), new AtomicBoolean(false));
@@ -128,11 +128,11 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 
     @Override
     public boolean visit(ClassInstanceCreation node) {
-        if ((hasType(node, "java.lang.StringBuilder") || hasType(node, "java.lang.StringBuffer"))
+        if ((hasType(node, StringBuilder.class.getCanonicalName()) || hasType(node, StringBuffer.class.getCanonicalName()))
                 && arguments(node).size() == 1) {
             final Expression arg0= arguments(node).get(0);
 
-            if (hasType(arg0, "java.lang.String")
+            if (hasType(arg0, String.class.getCanonicalName())
                     && (arg0 instanceof InfixExpression || (arg0 instanceof MethodInvocation
                             && (isToString((MethodInvocation) arg0) || isStringValueOf((MethodInvocation) arg0))))) {
                 return maybeRefactorAppending(node);
@@ -182,14 +182,14 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
                 if (arguments(cic).size() == 1) {
                     final Expression arg0= arguments(cic).get(0);
                     if (isStringBuilderOrBuffer(cic)
-                            && (hasType(arg0, "java.lang.String") || instanceOf(arg0, "java.lang.CharSequence"))) {
+                            && (hasType(arg0, String.class.getCanonicalName()) || instanceOf(arg0, CharSequence.class.getCanonicalName()))) {
                         isInstanceCreationToRewrite.set(true);
                         readSubExpressions(arg0, allOperands, isRefactoringNeeded);
                     }
                 } else if (arguments(cic).isEmpty() && !allOperands.isEmpty()
                         && ((allOperands.getFirst().getFirst() != null)
-                                ? hasType(allOperands.getFirst().getFirst(), "java.lang.String")
-                                : hasType(allOperands.getFirst().getSecond(), "java.lang.String"))) {
+                                ? hasType(allOperands.getFirst().getFirst(), String.class.getCanonicalName())
+                                : hasType(allOperands.getFirst().getSecond(), String.class.getCanonicalName()))) {
                     isInstanceCreationToRewrite.set(true);
                     isRefactoringNeeded.set(true);
                 }
@@ -238,7 +238,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
     }
 
     private boolean isStringConcat(final InfixExpression node) {
-        if (!hasOperator(node, PLUS) || !hasType(node, "java.lang.String")) {
+        if (!hasOperator(node, PLUS) || !hasType(node, String.class.getCanonicalName())) {
             return false;
         }
         if (!isValuedStringLiteralOrConstant(node.getLeftOperand())
@@ -256,7 +256,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
     private boolean isValuedStringLiteralOrConstant(Expression expr) {
         if (expr instanceof StringLiteral) {
             return !isEmptyString(expr);
-        } else if (expr instanceof Name && hasType(expr, "java.lang.String")) {
+        } else if (expr instanceof Name && hasType(expr, String.class.getCanonicalName())) {
             Name name= (Name) expr;
             return name.resolveConstantExpressionValue() != null;
         }
@@ -281,7 +281,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
             final Pair<ITypeBinding, Expression> expr= iter.next();
             if (expr.getSecond().getNodeType() == ASTNode.METHOD_INVOCATION) {
                 final MethodInvocation mi= (MethodInvocation) expr.getSecond();
-                if (isMethod(mi, "java.lang.Object", "toString")) {
+                if (isMethod(mi, Object.class.getCanonicalName(), "toString")) {
                     if (mi.getExpression() != null) {
                         iter.set(Pair.<ITypeBinding, Expression>of(null, mi.getExpression()));
                     } else {
@@ -339,8 +339,8 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
                         result= b.copy(lastExpr);
                         finalStrings.add(getTypedExpression(b, appendedString));
                     } else if ((appendedString.getFirst() != null)
-                            ? hasType(appendedString.getFirst(), "java.lang.String")
-                            : hasType(appendedString.getSecond(), "java.lang.String")) {
+                            ? hasType(appendedString.getFirst(), String.class.getCanonicalName())
+                            : hasType(appendedString.getSecond(), String.class.getCanonicalName())) {
                         result= b.new0(b.copy(((ClassInstanceCreation) lastExpr).getType()),
                                 getTypedExpression(b, appendedString));
                     } else {
@@ -418,7 +418,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
     }
 
     private boolean isStringBuilderOrBuffer(final Expression expr) {
-        return hasType(expr, "java.lang.StringBuffer", "java.lang.StringBuilder");
+        return hasType(expr, StringBuffer.class.getCanonicalName(), StringBuilder.class.getCanonicalName());
     }
 
     private boolean isVariable(final Expression expr) {
@@ -434,30 +434,30 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
     }
 
     private boolean isToString(final MethodInvocation mi) {
-        return isMethod(mi, "java.lang.Boolean", "toString", "boolean")
-                || isMethod(mi, "java.lang.Byte", "toString", "byte")
-                || isMethod(mi, "java.lang.Character", "toString", "char")
-                || isMethod(mi, "java.lang.Short", "toString", "short")
-                || isMethod(mi, "java.lang.Integer", "toString", "int")
-                || isMethod(mi, "java.lang.Long", "toString", "long")
-                || isMethod(mi, "java.lang.Float", "toString", "float")
-                || isMethod(mi, "java.lang.Double", "toString", "double");
+        return isMethod(mi, Boolean.class.getCanonicalName(), "toString", boolean.class.getSimpleName())
+                || isMethod(mi, Byte.class.getCanonicalName(), "toString", byte.class.getSimpleName())
+                || isMethod(mi, Character.class.getCanonicalName(), "toString", char.class.getSimpleName())
+                || isMethod(mi, Short.class.getCanonicalName(), "toString", short.class.getSimpleName())
+                || isMethod(mi, Integer.class.getCanonicalName(), "toString", int.class.getSimpleName())
+                || isMethod(mi, Long.class.getCanonicalName(), "toString", long.class.getSimpleName())
+                || isMethod(mi, Float.class.getCanonicalName(), "toString", float.class.getSimpleName())
+                || isMethod(mi, Double.class.getCanonicalName(), "toString", double.class.getSimpleName());
     }
 
     private boolean isStringValueOf(final MethodInvocation mi) {
-        return isMethod(mi, "java.lang.String", "valueOf", "java.lang.Object")
-                || isMethod(mi, "java.lang.String", "valueOf", "boolean")
-                || isMethod(mi, "java.lang.Boolean", "valueOf", "boolean")
-                || isMethod(mi, "java.lang.String", "valueOf", "char")
-                || isMethod(mi, "java.lang.Character", "valueOf", "char")
-                || isMethod(mi, "java.lang.String", "valueOf", "int")
-                || isMethod(mi, "java.lang.Integer", "valueOf", "int")
-                || isMethod(mi, "java.lang.String", "valueOf", "long")
-                || isMethod(mi, "java.lang.Long", "valueOf", "long")
-                || isMethod(mi, "java.lang.String", "valueOf", "float")
-                || isMethod(mi, "java.lang.Float", "valueOf", "float")
-                || isMethod(mi, "java.lang.String", "valueOf", "double")
-                || isMethod(mi, "java.lang.Double", "valueOf", "double");
+        return isMethod(mi, String.class.getCanonicalName(), "valueOf", Object.class.getCanonicalName())
+                || isMethod(mi, String.class.getCanonicalName(), "valueOf", boolean.class.getSimpleName())
+                || isMethod(mi, Boolean.class.getCanonicalName(), "valueOf", boolean.class.getSimpleName())
+                || isMethod(mi, String.class.getCanonicalName(), "valueOf", char.class.getSimpleName())
+                || isMethod(mi, Character.class.getCanonicalName(), "valueOf", char.class.getSimpleName())
+                || isMethod(mi, String.class.getCanonicalName(), "valueOf", int.class.getSimpleName())
+                || isMethod(mi, Integer.class.getCanonicalName(), "valueOf", int.class.getSimpleName())
+                || isMethod(mi, String.class.getCanonicalName(), "valueOf", long.class.getSimpleName())
+                || isMethod(mi, Long.class.getCanonicalName(), "valueOf", long.class.getSimpleName())
+                || isMethod(mi, String.class.getCanonicalName(), "valueOf", float.class.getSimpleName())
+                || isMethod(mi, Float.class.getCanonicalName(), "valueOf", float.class.getSimpleName())
+                || isMethod(mi, String.class.getCanonicalName(), "valueOf", double.class.getSimpleName())
+                || isMethod(mi, Double.class.getCanonicalName(), "valueOf", double.class.getSimpleName());
     }
 
     private Expression getTypedExpression(final ASTBuilder b, final Pair<ITypeBinding, Expression> typeAndValue) {
@@ -489,13 +489,13 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
         boolean canRemoveEmptyStrings= false;
         for (int i= 0; i < allOperands.size(); i++) {
             Pair<ITypeBinding, Expression> expr= allOperands.get(i);
-            boolean canNowRemoveEmptyStrings= canRemoveEmptyStrings || hasType(expr.getSecond(), "java.lang.String");
+            boolean canNowRemoveEmptyStrings= canRemoveEmptyStrings || hasType(expr.getSecond(), String.class.getCanonicalName());
             if (isEmptyString(expr.getSecond())) {
                 boolean removeExpr= false;
                 if (canRemoveEmptyStrings) {
                     removeExpr= true;
                 } else if (canNowRemoveEmptyStrings && i + 1 < allOperands.size()
-                        && hasType(allOperands.get(i + 1).getSecond(), "java.lang.String")) {
+                        && hasType(allOperands.get(i + 1).getSecond(), String.class.getCanonicalName())) {
                     removeExpr= true;
                 }
 
@@ -517,7 +517,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 
         case 1:
             final Pair<ITypeBinding, Expression> expr= appendedStrings.get(0);
-            if (hasType(expr.getSecond(), "java.lang.String")) {
+            if (hasType(expr.getSecond(), String.class.getCanonicalName())) {
                 return b.copy(expr.getSecond());
             }
             return b.invoke("String", "valueOf", getTypedExpression(b, expr));
@@ -542,6 +542,6 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
         final Pair<ITypeBinding, Expression> arg0= appendedStrings.get(0);
         final Pair<ITypeBinding, Expression> arg1= appendedStrings.get(1);
 
-        return !hasType(arg0.getSecond(), "java.lang.String") && !hasType(arg1.getSecond(), "java.lang.String");
+        return !hasType(arg0.getSecond(), String.class.getCanonicalName()) && !hasType(arg1.getSecond(), String.class.getCanonicalName());
     }
 }

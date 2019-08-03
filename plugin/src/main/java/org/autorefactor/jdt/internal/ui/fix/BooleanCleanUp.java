@@ -209,7 +209,7 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
                 } else {
                     orientedCondition= b.negate(ifCondition, Copy.COPY);
                 }
-                final Expression expr= getExpression(orientedCondition, "boolean", null);
+                final Expression expr= getExpression(orientedCondition, boolean.class.getSimpleName(), null);
                 replaceInParent(node, expr);
             }
             return false;
@@ -227,7 +227,7 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
                     } else {
                         orientedCondition= b.negate(ifCondition, Copy.COPY);
                     }
-                    final Expression expr= getExpression(orientedCondition, "java.lang.Boolean", booleanName);
+                    final Expression expr= getExpression(orientedCondition, Boolean.class.getCanonicalName(), booleanName);
                     replaceInParent(node, expr);
                 }
             }
@@ -452,7 +452,8 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
             }
             return getExpression(orientedCondition, expressionTypeName, booleanName);
         } else if ((isPrimitive(thenExpression) || isPrimitive(elseExpression))
-                && ("boolean".equals(expressionTypeName) || "java.lang.Boolean".equals(expressionTypeName))) {
+                && ("boolean".equals(expressionTypeName)
+                        || Boolean.class.getCanonicalName().equals(expressionTypeName))) {
             // If both expressions are primitive, there cannot be any NPE
             // If only one expression is primitive, a NPE is already possible so we do not
             // care
@@ -474,9 +475,9 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
     }
 
     private Expression getExpression(Expression condition, String expressionTypeName, Name booleanName) {
-        if ("boolean".equals(expressionTypeName)) {
+        if (boolean.class.getSimpleName().equals(expressionTypeName)) {
             return condition;
-        } else if (getJavaMinorVersion() >= 4 && "java.lang.Boolean".equals(expressionTypeName)) {
+        } else if (getJavaMinorVersion() >= 4 && Boolean.class.getCanonicalName().equals(expressionTypeName)) {
             return b.invoke(booleanName, "valueOf", condition);
         }
         return null;
@@ -486,7 +487,7 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
         if (!isSimpleNameAlreadyUsed("Boolean", getAncestor(node, CompilationUnit.class))) {
             return b.name("Boolean");
         }
-        return b.name("java.lang.Boolean");
+        return b.name(Boolean.class.getCanonicalName());
     }
 
     private boolean isSimpleNameAlreadyUsed(String simpleName, CompilationUnit cu) {

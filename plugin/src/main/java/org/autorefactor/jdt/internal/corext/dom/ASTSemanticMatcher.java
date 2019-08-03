@@ -178,8 +178,8 @@ public class ASTSemanticMatcher extends ASTMatcher {
                 } else if (Arrays.asList(InfixExpression.Operator.PLUS, InfixExpression.Operator.TIMES)
                         .contains(ie.getOperator())
                         && node.getOperator().equals(ie.getOperator())
-                        && hasType(node.getLeftOperand(), "short", "int", "long", "float", "double", "java.lang.Short",
-                                "java.lang.Integer", "java.lang.Long", "java.lang.Float", "java.lang.Double")
+                        && hasType(node.getLeftOperand(), short.class.getSimpleName(), int.class.getSimpleName(), long.class.getSimpleName(), float.class.getSimpleName(), double.class.getSimpleName(), Short.class.getCanonicalName(),
+                                Integer.class.getCanonicalName(), Long.class.getCanonicalName(), Float.class.getCanonicalName(), Double.class.getCanonicalName())
                         && haveSameType(node.getLeftOperand(), node.getRightOperand())) {
                     return true;
                 }

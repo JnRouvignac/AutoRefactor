@@ -97,22 +97,22 @@ public class JUnitAssertCleanUp extends AbstractUnitTestCleanUp {
 
     private boolean maybeRefactorMethod(final MethodInvocation node, final String unitTestPackagePath,
             final List<Expression> args) {
-        if (isMethod(node, unitTestPackagePath + "Assert", "assertTrue", "boolean")) {
+        if (isMethod(node, unitTestPackagePath + "Assert", "assertTrue", boolean.class.getSimpleName())) {
             return maybeRefactorStatement(node, node, true, args.get(0), null, false);
-        } else if (isMethod(node, unitTestPackagePath + "Assert", "assertTrue", "java.lang.String", "boolean")) {
+        } else if (isMethod(node, unitTestPackagePath + "Assert", "assertTrue", String.class.getCanonicalName(), boolean.class.getSimpleName())) {
             return maybeRefactorStatement(node, node, true, args.get(1), args.get(0), false);
-        } else if (isMethod(node, unitTestPackagePath + "Assert", "assertFalse", "boolean")) {
+        } else if (isMethod(node, unitTestPackagePath + "Assert", "assertFalse", boolean.class.getSimpleName())) {
             return maybeRefactorStatement(node, node, false, args.get(0), null, false);
-        } else if (isMethod(node, unitTestPackagePath + "Assert", "assertFalse", "java.lang.String", "boolean")) {
+        } else if (isMethod(node, unitTestPackagePath + "Assert", "assertFalse", String.class.getCanonicalName(), boolean.class.getSimpleName())) {
             return maybeRefactorStatement(node, node, false, args.get(1), args.get(0), false);
         } else if (isMethod(node, unitTestPackagePath + "Assert", "assertEquals", OBJECT, OBJECT)
-                || isMethod(node, unitTestPackagePath + "Assert", "assertEquals", "long", "long")
-                || isMethod(node, unitTestPackagePath + "Assert", "assertEquals", "double", "double")) {
+                || isMethod(node, unitTestPackagePath + "Assert", "assertEquals", long.class.getSimpleName(), long.class.getSimpleName())
+                || isMethod(node, unitTestPackagePath + "Assert", "assertEquals", double.class.getSimpleName(), double.class.getSimpleName())) {
             return maybeRefactorToAssertEquals(node, node, true, args.get(1), args.get(0), null, false);
-        } else if (isMethod(node, unitTestPackagePath + "Assert", "assertEquals", "java.lang.String", OBJECT, OBJECT)
-                || isMethod(node, unitTestPackagePath + "Assert", "assertEquals", "java.lang.String", "long", "long")
-                || isMethod(node, unitTestPackagePath + "Assert", "assertEquals", "java.lang.String", "double",
-                        "double")) {
+        } else if (isMethod(node, unitTestPackagePath + "Assert", "assertEquals", String.class.getCanonicalName(), OBJECT, OBJECT)
+                || isMethod(node, unitTestPackagePath + "Assert", "assertEquals", String.class.getCanonicalName(), long.class.getSimpleName(), long.class.getSimpleName())
+                || isMethod(node, unitTestPackagePath + "Assert", "assertEquals", String.class.getCanonicalName(), double.class.getSimpleName(),
+                        double.class.getSimpleName())) {
             return maybeRefactorToAssertEquals(node, node, true, args.get(2), args.get(1), args.get(0), false);
         }
         return true;
@@ -138,7 +138,7 @@ public class JUnitAssertCleanUp extends AbstractUnitTestCleanUp {
             final String unitTestPackagePath) {
         if (isMethod(mi, unitTestPackagePath + "Assert", "fail")) {
             return maybeRefactorStatement(node, mi, false, node.getExpression(), null, true);
-        } else if (isMethod(mi, unitTestPackagePath + "Assert", "fail", "java.lang.String")) {
+        } else if (isMethod(mi, unitTestPackagePath + "Assert", "fail", String.class.getCanonicalName())) {
             return maybeRefactorStatement(node, mi, false, node.getExpression(), arguments(mi).get(0), true);
         }
         return true;

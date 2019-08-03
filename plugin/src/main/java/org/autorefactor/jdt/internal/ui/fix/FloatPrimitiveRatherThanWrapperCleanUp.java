@@ -75,12 +75,12 @@ public class FloatPrimitiveRatherThanWrapperCleanUp extends AbstractPrimitiveRat
 
     @Override
     public String getWrapperFullyQualifiedName() {
-        return "java.lang.Float";
+        return Float.class.getCanonicalName();
     }
 
     @Override
     public String getPrimitiveTypeName() {
-        return "float";
+        return float.class.getSimpleName();
     }
 
     @Override

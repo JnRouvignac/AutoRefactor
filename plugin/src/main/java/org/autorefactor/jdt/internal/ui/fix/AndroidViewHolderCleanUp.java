@@ -118,7 +118,7 @@ public class AndroidViewHolderCleanUp extends AbstractCleanUpRule {
     @Override
     public boolean visit(MethodDeclaration node) {
         Block body= node.getBody();
-        if (body != null && isMethod(node, "android.widget.Adapter", "getView", "int", "android.view.View",
+        if (body != null && isMethod(node, "android.widget.Adapter", "getView", int.class.getSimpleName(), "android.view.View",
                 "android.view.ViewGroup")) {
             final GetViewVariableVisitor visitor= new GetViewVariableVisitor();
             body.accept(visitor);
@@ -299,11 +299,11 @@ public class AndroidViewHolderCleanUp extends AbstractCleanUpRule {
         private boolean isInflateMethod(MethodInvocation node) {
             final String inflaterType= "android.view.LayoutInflater";
             final String viewGroupType= "android.view.ViewGroup";
-            return isMethod(node, inflaterType, "inflate", "int", viewGroupType)
-                    || isMethod(node, inflaterType, "inflate", "int", viewGroupType, "boolean")
+            return isMethod(node, inflaterType, "inflate", int.class.getSimpleName(), viewGroupType)
+                    || isMethod(node, inflaterType, "inflate", int.class.getSimpleName(), viewGroupType, boolean.class.getSimpleName())
                     || isMethod(node, inflaterType, "inflate", "org.xmlpull.v1.XmlPullParser", viewGroupType)
                     || isMethod(node, inflaterType, "inflate", "org.xmlpull.v1.XmlPullParser", viewGroupType,
-                            "boolean");
+                            boolean.class.getSimpleName());
         }
     }
 
@@ -357,7 +357,7 @@ public class AndroidViewHolderCleanUp extends AbstractCleanUpRule {
 
         @Override
         public boolean visit(MethodInvocation node) {
-            if (isMethod(node, "android.view.View", "findViewById", "int")
+            if (isMethod(node, "android.view.View", "findViewById", int.class.getSimpleName())
                     && isSameVariable(viewVariableName, node.getExpression())) {
                 FindViewByIdItem item= new FindViewByIdItem();
                 if (item.setAssignment(node)) {

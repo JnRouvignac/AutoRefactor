@@ -71,7 +71,7 @@ public class StringBuilderMethodRatherThanReassignationCleanUp extends AbstractC
     public boolean visit(Assignment node) {
         final Expression targetVar= node.getLeftHandSide();
         Expression var= node.getRightHandSide();
-        if (ASSIGN.equals(node.getOperator()) && hasType(targetVar, "java.lang.StringBuffer", "java.lang.StringBuilder")
+        if (ASSIGN.equals(node.getOperator()) && hasType(targetVar, StringBuffer.class.getCanonicalName(), StringBuilder.class.getCanonicalName())
                 && var instanceof MethodInvocation) {
             var= getVar(var);
 
@@ -88,7 +88,7 @@ public class StringBuilderMethodRatherThanReassignationCleanUp extends AbstractC
         final MethodInvocation mi= as(var, MethodInvocation.class);
         if (var instanceof Name) {
             return var;
-        } else if (mi != null && hasType(mi.getExpression(), "java.lang.StringBuffer", "java.lang.StringBuilder")
+        } else if (mi != null && hasType(mi.getExpression(), StringBuffer.class.getCanonicalName(), StringBuilder.class.getCanonicalName())
                 && Arrays.asList("append", "appendCodePoint", "delete", "deleteCharAt", "insert", "replace", "reverse")
                         .contains(mi.getName().getIdentifier())) {
             return getVar(mi.getExpression());

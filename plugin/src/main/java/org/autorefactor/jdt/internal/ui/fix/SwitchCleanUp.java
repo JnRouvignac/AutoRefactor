@@ -410,7 +410,7 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
     private Variable extractVariableWithConstantValue(Expression firstOp, Expression secondOp) {
         // TODO JNR handle enums
         // TODO JNR handle strings
-        if (firstOp instanceof SimpleName && hasType(firstOp, "char", "byte", "short", "int")
+        if (firstOp instanceof SimpleName && hasType(firstOp, char.class.getSimpleName(), byte.class.getSimpleName(), short.class.getSimpleName(), int.class.getSimpleName())
                 && (secondOp instanceof NumberLiteral || secondOp instanceof CharacterLiteral)) {
             return new Variable((SimpleName) firstOp, Arrays.asList(secondOp));
         }

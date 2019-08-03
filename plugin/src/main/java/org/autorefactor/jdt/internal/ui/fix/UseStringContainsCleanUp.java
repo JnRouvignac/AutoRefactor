@@ -69,8 +69,8 @@ public class UseStringContainsCleanUp extends AbstractCleanUpRule {
     @Override
     public boolean visit(MethodInvocation node) {
         final ASTNode parent= getFirstAncestorWithoutParentheses(node);
-        if (parent instanceof InfixExpression && (isMethod(node, "java.lang.String", "indexOf", "java.lang.String")
-                || isMethod(node, "java.lang.String", "lastIndexOf", "java.lang.String"))) {
+        if (parent instanceof InfixExpression && (isMethod(node, String.class.getCanonicalName(), "indexOf", String.class.getCanonicalName())
+                || isMethod(node, String.class.getCanonicalName(), "lastIndexOf", String.class.getCanonicalName()))) {
             final InfixExpression ie= (InfixExpression) parent;
             if (is(ie, node, Operator.GREATER_EQUALS, 0)) {
                 return replaceWithStringContains(ie, node, false);

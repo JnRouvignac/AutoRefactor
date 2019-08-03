@@ -30,12 +30,18 @@ import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasType;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isMethod;
 import static org.autorefactor.util.Utils.getOrDefault;
 
+import java.io.Serializable;
+import java.util.AbstractCollection;
+import java.util.ArrayDeque;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Stack;
+import java.util.Vector;
 
 import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
 import org.autorefactor.jdt.internal.corext.dom.Release;
@@ -47,13 +53,13 @@ public class ArrayDequeRatherThanStackCleanUp extends AbstractClassSubstituteCle
     private static final Map<String, String[]> CAN_BE_CASTED_TO= new HashMap<String, String[]>();
 
     static {
-        CAN_BE_CASTED_TO.put("java.lang.Object", new String[] { "java.lang.Object" });
-        CAN_BE_CASTED_TO.put("java.lang.Cloneable", new String[] { "java.lang.Cloneable", "java.lang.Object" });
-        CAN_BE_CASTED_TO.put("java.io.Serializable", new String[] { "java.io.Serializable", "java.lang.Object" });
-        CAN_BE_CASTED_TO.put("java.util.Collection", new String[] { "java.util.Collection", "java.lang.Object" });
-        CAN_BE_CASTED_TO.put("java.util.AbstractCollection", new String[] { "java.util.AbstractCollection", "java.util.Collection", "java.lang.Object" });
-        CAN_BE_CASTED_TO.put("java.util.Vector", new String[] { "java.util.Vector", "java.util.AbstractCollection", "java.util.Collection", "java.io.Serializable", "java.lang.Cloneable", "java.lang.Object" });
-        CAN_BE_CASTED_TO.put("java.util.Stack", new String[] { "java.util.Stack", "java.util.Vector", "java.util.AbstractCollection", "java.util.Collection", "java.io.Serializable", "java.lang.Cloneable", "java.lang.Object" });
+        CAN_BE_CASTED_TO.put(Object.class.getCanonicalName(), new String[] { Object.class.getCanonicalName() });
+        CAN_BE_CASTED_TO.put(Cloneable.class.getCanonicalName(), new String[] { Cloneable.class.getCanonicalName(), Object.class.getCanonicalName() });
+        CAN_BE_CASTED_TO.put(Serializable.class.getCanonicalName(), new String[] { Serializable.class.getCanonicalName(), Object.class.getCanonicalName() });
+        CAN_BE_CASTED_TO.put(Collection.class.getCanonicalName(), new String[] { Collection.class.getCanonicalName(), Object.class.getCanonicalName() });
+        CAN_BE_CASTED_TO.put(AbstractCollection.class.getCanonicalName(), new String[] { AbstractCollection.class.getCanonicalName(), Collection.class.getCanonicalName(), Object.class.getCanonicalName() });
+        CAN_BE_CASTED_TO.put(Vector.class.getCanonicalName(), new String[] { Vector.class.getCanonicalName(), AbstractCollection.class.getCanonicalName(), Collection.class.getCanonicalName(), Serializable.class.getCanonicalName(), Cloneable.class.getCanonicalName(), Object.class.getCanonicalName() });
+        CAN_BE_CASTED_TO.put(Stack.class.getCanonicalName(), new String[] { Stack.class.getCanonicalName(), Vector.class.getCanonicalName(), AbstractCollection.class.getCanonicalName(), Collection.class.getCanonicalName(), Serializable.class.getCanonicalName(), Cloneable.class.getCanonicalName(), Object.class.getCanonicalName() });
     }
 
     /**
@@ -95,20 +101,20 @@ public class ArrayDequeRatherThanStackCleanUp extends AbstractClassSubstituteCle
 
     @Override
     protected String[] getExistingClassCanonicalName() {
-        return new String[] { "java.util.Stack" };
+        return new String[] { Stack.class.getCanonicalName() };
     }
 
     @Override
     public Set<String> getClassesToImport() {
-        return new HashSet<String>(Arrays.asList("java.util.ArrayDeque", "java.util.Collection"));
+        return new HashSet<String>(Arrays.asList(ArrayDeque.class.getCanonicalName(), Collection.class.getCanonicalName()));
     }
 
     @Override
     protected String getSubstitutingClassName(String origRawType) {
-        if ("java.util.Stack".equals(origRawType)) {
-            return "java.util.ArrayDeque";
-        } else if ("java.util.Vector".equals(origRawType)) {
-            return "java.util.Collection";
+        if (Stack.class.getCanonicalName().equals(origRawType)) {
+            return ArrayDeque.class.getCanonicalName();
+        } else if (Vector.class.getCanonicalName().equals(origRawType)) {
+            return Collection.class.getCanonicalName();
         } else {
             return null;
         }
@@ -117,52 +123,52 @@ public class ArrayDequeRatherThanStackCleanUp extends AbstractClassSubstituteCle
     @Override
     protected boolean canMethodBeRefactored(final MethodInvocation mi,
             final List<MethodInvocation> methodCallsToRefactor) {
-        if (isMethod(mi, "java.util.Vector", "addElement", "java.lang.Object")
-                || isMethod(mi, "java.util.Vector", "copyInto", "java.lang.Object[]")
-                || isMethod(mi, "java.util.Vector", "firstElement") || isMethod(mi, "java.util.Vector", "lastElement")
-                || isMethod(mi, "java.util.Vector", "removeElement", "java.lang.Object")
-                || isMethod(mi, "java.util.Vector", "removeAllElements") || isMethod(mi, "java.util.Stack", "empty")) {
+        if (isMethod(mi, Vector.class.getCanonicalName(), "addElement", Object.class.getCanonicalName())
+                || isMethod(mi, Vector.class.getCanonicalName(), "copyInto", Object[].class.getCanonicalName())
+                || isMethod(mi, Vector.class.getCanonicalName(), "firstElement") || isMethod(mi, Vector.class.getCanonicalName(), "lastElement")
+                || isMethod(mi, Vector.class.getCanonicalName(), "removeElement", Object.class.getCanonicalName())
+                || isMethod(mi, Vector.class.getCanonicalName(), "removeAllElements") || isMethod(mi, Stack.class.getCanonicalName(), "empty")) {
             methodCallsToRefactor.add(mi);
             return true;
         }
 
         final String argumentType= getArgumentType(mi);
-        return isMethod(mi, "java.util.Collection", "add", "java.lang.Object")
-                || isMethod(mi, "java.util.List", "addAll", "int", "java.util.Collection")
-                || isMethod(mi, "java.util.Collection", "clear")
-                || isMethod(mi, "java.util.Collection", "contains", "java.lang.Object")
-                || isMethod(mi, "java.util.Collection", "containsAll", "java.util.Collection")
-                || isMethod(mi, "java.lang.Object", "equals", "java.lang.Object")
-                || isMethod(mi, "java.lang.Object", "hashCode") || isMethod(mi, "java.util.Collection", "isEmpty")
-                || isMethod(mi, "java.util.Collection", "iterator")
-                || isMethod(mi, "java.util.Collection", "remove", "java.lang.Object")
-                || isMethod(mi, "java.util.Collection", "removeAll", "java.util.Collection")
-                || isMethod(mi, "java.util.Collection", "retainAll", "java.util.Collection")
-                || isMethod(mi, "java.util.Collection", "size") || isMethod(mi, "java.util.Collection", "toArray")
-                || isMethod(mi, "java.util.Collection", "toArray", argumentType + "[]")
-                || isMethod(mi, "java.util.Stack", "clone")
-                || isMethod(mi, "java.util.Stack", "retainAll", "java.util.Collection")
-                || isMethod(mi, "java.lang.Object", "toString") || isMethod(mi, "java.util.Stack", "peek")
-                || isMethod(mi, "java.util.Stack", "pop")
-                || isMethod(mi, "java.util.Stack", "push", "java.lang.Object");
+        return isMethod(mi, Collection.class.getCanonicalName(), "add", Object.class.getCanonicalName())
+                || isMethod(mi, List.class.getCanonicalName(), "addAll", int.class.getSimpleName(), Collection.class.getCanonicalName())
+                || isMethod(mi, Collection.class.getCanonicalName(), "clear")
+                || isMethod(mi, Collection.class.getCanonicalName(), "contains", Object.class.getCanonicalName())
+                || isMethod(mi, Collection.class.getCanonicalName(), "containsAll", Collection.class.getCanonicalName())
+                || isMethod(mi, Object.class.getCanonicalName(), "equals", Object.class.getCanonicalName())
+                || isMethod(mi, Object.class.getCanonicalName(), "hashCode") || isMethod(mi, Collection.class.getCanonicalName(), "isEmpty")
+                || isMethod(mi, Collection.class.getCanonicalName(), "iterator")
+                || isMethod(mi, Collection.class.getCanonicalName(), "remove", Object.class.getCanonicalName())
+                || isMethod(mi, Collection.class.getCanonicalName(), "removeAll", Collection.class.getCanonicalName())
+                || isMethod(mi, Collection.class.getCanonicalName(), "retainAll", Collection.class.getCanonicalName())
+                || isMethod(mi, Collection.class.getCanonicalName(), "size") || isMethod(mi, Collection.class.getCanonicalName(), "toArray")
+                || isMethod(mi, Collection.class.getCanonicalName(), "toArray", argumentType + "[]")
+                || isMethod(mi, Stack.class.getCanonicalName(), "clone")
+                || isMethod(mi, Stack.class.getCanonicalName(), "retainAll", Collection.class.getCanonicalName())
+                || isMethod(mi, Object.class.getCanonicalName(), "toString") || isMethod(mi, Stack.class.getCanonicalName(), "peek")
+                || isMethod(mi, Stack.class.getCanonicalName(), "pop")
+                || isMethod(mi, Stack.class.getCanonicalName(), "push", Object.class.getCanonicalName());
     }
 
     @Override
     protected void refactorMethod(final ASTBuilder b, final MethodInvocation originalMi,
             final MethodInvocation refactoredMi) {
-        if (isMethod(originalMi, "java.util.Vector", "addElement", "java.lang.Object")) {
+        if (isMethod(originalMi, Vector.class.getCanonicalName(), "addElement", Object.class.getCanonicalName())) {
             refactoredMi.setName(b.simpleName("add"));
-        } else if (isMethod(originalMi, "java.util.Vector", "copyInto", "java.lang.Object[]")) {
+        } else if (isMethod(originalMi, Vector.class.getCanonicalName(), "copyInto", Object[].class.getCanonicalName())) {
             refactoredMi.setName(b.simpleName("toArray"));
-        } else if (isMethod(originalMi, "java.util.Vector", "firstElement")) {
+        } else if (isMethod(originalMi, Vector.class.getCanonicalName(), "firstElement")) {
             refactoredMi.setName(b.simpleName("getFirst"));
-        } else if (isMethod(originalMi, "java.util.Vector", "lastElement")) {
+        } else if (isMethod(originalMi, Vector.class.getCanonicalName(), "lastElement")) {
             refactoredMi.setName(b.simpleName("getLast"));
-        } else if (isMethod(originalMi, "java.util.Vector", "removeElement", "java.lang.Object")) {
+        } else if (isMethod(originalMi, Vector.class.getCanonicalName(), "removeElement", Object.class.getCanonicalName())) {
             refactoredMi.setName(b.simpleName("remove"));
-        } else if (isMethod(originalMi, "java.util.Vector", "removeAllElements")) {
+        } else if (isMethod(originalMi, Vector.class.getCanonicalName(), "removeAllElements")) {
             refactoredMi.setName(b.simpleName("clear"));
-        } else if (isMethod(originalMi, "java.util.Stack", "empty")) {
+        } else if (isMethod(originalMi, Stack.class.getCanonicalName(), "empty")) {
             refactoredMi.setName(b.simpleName("isEmpty"));
         }
     }

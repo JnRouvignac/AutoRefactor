@@ -103,7 +103,7 @@ public class BooleanEqualsRatherThanNullCheckCleanUp extends AbstractCleanUpRule
                     isPositiveExpr= true;
                 }
 
-                if (firstExpr != null && hasType(firstExpr, "java.lang.Boolean") && isPassive(firstExpr)
+                if (firstExpr != null && hasType(firstExpr, Boolean.class.getCanonicalName()) && isPassive(firstExpr)
                         && match(firstExpr, secondExpr)) {
                     replaceNullCheck(node, firstExpr, isNullCheck, isAndExpr, isPositiveExpr);
                     return false;

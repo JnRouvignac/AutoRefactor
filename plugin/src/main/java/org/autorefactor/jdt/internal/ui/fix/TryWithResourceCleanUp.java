@@ -37,6 +37,7 @@ import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isSameVariable;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.resources;
 import static org.eclipse.jdt.core.dom.ASTNode.TRY_STATEMENT;
 
+import java.io.Closeable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -143,7 +144,7 @@ public class TryWithResourceCleanUp extends AbstractCleanUpRule {
     }
 
     private boolean methodClosesCloseables(final MethodInvocation mi) {
-        if (isMethod(mi, "java.io.Closeable", "close")) {
+        if (isMethod(mi, Closeable.class.getCanonicalName(), "close")) {
             return true;
         }
 //        // Try to handle Guava's Closeables.closeQuietly(), Apache Commons IO'a IOUtils.closeQuietly()

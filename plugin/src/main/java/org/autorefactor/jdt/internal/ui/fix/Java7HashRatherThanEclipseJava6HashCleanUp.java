@@ -232,7 +232,7 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
             final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
         final Block body= node.getBody();
 
-        if (isMethod(node, "java.lang.Object", "hashCode") && body != null) {
+        if (isMethod(node, Object.class.getCanonicalName(), "hashCode") && body != null) {
             @SuppressWarnings("unchecked")
             final List<Statement> stmts= body.statements();
 
@@ -266,7 +266,7 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
         final Statement stmt= data.getStmtIterator().next();
         final VariableDeclarationStatement varDecl= as(stmt, VariableDeclarationStatement.class);
 
-        if (varDecl != null && hasType(varDecl.getType().resolveBinding(), "int") && varDecl.fragments().size() == 1) {
+        if (varDecl != null && hasType(varDecl.getType().resolveBinding(), int.class.getSimpleName()) && varDecl.fragments().size() == 1) {
             final VariableDeclarationFragment varFragment= (VariableDeclarationFragment) varDecl.fragments().get(0);
             final String varId= varFragment.getName().getIdentifier();
             final NumberLiteral varLiteral= as(varFragment.getInitializer(), NumberLiteral.class);
@@ -295,7 +295,7 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
             @SuppressWarnings("unchecked")
             final List<VariableDeclarationFragment> fragments= varStmt.fragments();
 
-            if (hasType(varStmt.getType().resolveBinding(), "long") && fragments != null && fragments.size() == 1) {
+            if (hasType(varStmt.getType().resolveBinding(), long.class.getSimpleName()) && fragments != null && fragments.size() == 1) {
                 final VariableDeclarationFragment fragment= fragments.get(0);
                 data.setTempVar(fragment.getName());
                 final Expression initializer= fragment.getInitializer();
@@ -360,7 +360,7 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
         SimpleName fieldToFind= null;
         final MethodInvocation doubleToLongBits= as(initializer, MethodInvocation.class);
 
-        if (doubleToLongBits != null && isMethod(doubleToLongBits, "java.lang.Double", "doubleToLongBits", "double")) {
+        if (doubleToLongBits != null && isMethod(doubleToLongBits, Double.class.getCanonicalName(), "doubleToLongBits", double.class.getSimpleName())) {
             final SimpleName fieldName= as((Expression) doubleToLongBits.arguments().get(0), SimpleName.class);
 
             if (fieldName != null && !fieldName.getIdentifier().equals(data.getPrimeId())
@@ -409,7 +409,7 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
         } else if (newHash instanceof MethodInvocation && data.isTempValueUsed()) {
             final MethodInvocation specificMethod= (MethodInvocation) newHash;
 
-            if (isMethod(specificMethod, "java.lang.Float", "floatToIntBits", "float")) {
+            if (isMethod(specificMethod, Float.class.getCanonicalName(), "floatToIntBits", float.class.getSimpleName())) {
                 final SimpleName fieldName= getField((Expression) specificMethod.arguments().get(0));
 
                 if (fieldName != null && !fieldName.getIdentifier().equals(data.getPrimeId())
@@ -417,15 +417,15 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
                     data.getFields().add(fieldName);
                     return true;
                 }
-            } else if (isMethod(specificMethod, "java.util.Arrays", "hashCode", "boolean[]")
-                    || isMethod(specificMethod, "java.util.Arrays", "hashCode", "byte[]")
-                    || isMethod(specificMethod, "java.util.Arrays", "hashCode", "char[]")
-                    || isMethod(specificMethod, "java.util.Arrays", "hashCode", "double[]")
-                    || isMethod(specificMethod, "java.util.Arrays", "hashCode", "float[]")
-                    || isMethod(specificMethod, "java.util.Arrays", "hashCode", "int[]")
-                    || isMethod(specificMethod, "java.util.Arrays", "hashCode", "java.lang.Object[]")
-                    || isMethod(specificMethod, "java.util.Arrays", "hashCode", "long[]")
-                    || isMethod(specificMethod, "java.util.Arrays", "hashCode", "short[]")) {
+            } else if (isMethod(specificMethod, Arrays.class.getCanonicalName(), "hashCode", "boolean[]")
+                    || isMethod(specificMethod, Arrays.class.getCanonicalName(), "hashCode", "byte[]")
+                    || isMethod(specificMethod, Arrays.class.getCanonicalName(), "hashCode", "char[]")
+                    || isMethod(specificMethod, Arrays.class.getCanonicalName(), "hashCode", "double[]")
+                    || isMethod(specificMethod, Arrays.class.getCanonicalName(), "hashCode", "float[]")
+                    || isMethod(specificMethod, Arrays.class.getCanonicalName(), "hashCode", "int[]")
+                    || isMethod(specificMethod, Arrays.class.getCanonicalName(), "hashCode", Object[].class.getCanonicalName())
+                    || isMethod(specificMethod, Arrays.class.getCanonicalName(), "hashCode", "long[]")
+                    || isMethod(specificMethod, Arrays.class.getCanonicalName(), "hashCode", "short[]")) {
                 final SimpleName fieldName= getField((Expression) specificMethod.arguments().get(0));
 
                 if (fieldName != null && !fieldName.getIdentifier().equals(data.getPrimeId())
@@ -472,7 +472,7 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
         final CastExpression castExpression= (CastExpression) newHash;
         final InfixExpression bitwise= as(castExpression.getExpression(), InfixExpression.class);
 
-        if (hasType(castExpression, "int") && bitwise != null && hasType(bitwise, "long", "double")
+        if (hasType(castExpression, int.class.getSimpleName()) && bitwise != null && hasType(bitwise, long.class.getSimpleName(), double.class.getSimpleName())
                 && Operator.XOR.equals(bitwise.getOperator())) {
             final Expression operand1= bitwise.getLeftOperand();
             final Expression operand2= bitwise.getRightOperand();
@@ -532,7 +532,7 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
         if (isFieldNull != null && !isFieldNull.hasExtendedOperands()
                 && Arrays.asList(Operator.EQUALS, Operator.NOT_EQUALS).contains(isFieldNull.getOperator())) {
             return isObjectValid(data, condition, isFieldNull);
-        } else if (booleanField != null && hasType(booleanField, "boolean")
+        } else if (booleanField != null && hasType(booleanField, boolean.class.getSimpleName())
                 && !booleanField.getIdentifier().equals(data.getPrimeId())
                 && !booleanField.getIdentifier().equals(data.getResultId()) && hashForTrue != null
                 && hashForFalse != null) {

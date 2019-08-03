@@ -99,6 +99,6 @@ public final class RemoveUncheckedThrowsClausesCleanUp extends AbstractCleanUpRu
 
     private boolean isUnchecked(Type type) {
         final ITypeBinding binding= type.resolveBinding();
-        return instanceOf(binding, "java.lang.RuntimeException") || instanceOf(binding, "java.lang.Error");
+        return instanceOf(binding, RuntimeException.class.getCanonicalName()) || instanceOf(binding, Error.class.getCanonicalName());
     }
 }

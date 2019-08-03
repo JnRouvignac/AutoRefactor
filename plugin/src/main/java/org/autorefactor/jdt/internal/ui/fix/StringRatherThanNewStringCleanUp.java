@@ -66,9 +66,9 @@ public class StringRatherThanNewStringCleanUp extends AbstractCleanUpRule {
 
     @Override
     public boolean visit(ClassInstanceCreation node) {
-        if (hasType(node, "java.lang.String") && arguments(node).size() == 1) {
+        if (hasType(node, String.class.getCanonicalName()) && arguments(node).size() == 1) {
             final Expression arg0= arguments(node).get(0);
-            if (hasType(arg0, "java.lang.String")
+            if (hasType(arg0, String.class.getCanonicalName())
                     && (arg0 instanceof StringLiteral || arg0 instanceof InfixExpression)) {
                 final ASTBuilder b= ctx.getASTBuilder();
                 ctx.getRefactorings().replace(node, b.parenthesizeIfNeeded(b.copy(arg0)));

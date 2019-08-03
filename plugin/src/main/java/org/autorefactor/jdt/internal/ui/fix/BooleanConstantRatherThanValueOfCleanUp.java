@@ -66,8 +66,8 @@ public class BooleanConstantRatherThanValueOfCleanUp extends AbstractCleanUpRule
 
     @Override
     public boolean visit(MethodInvocation node) {
-        if (isMethod(node, "java.lang.Boolean", "valueOf", "java.lang.String")
-                || isMethod(node, "java.lang.Boolean", "valueOf", "boolean")) {
+        if (isMethod(node, Boolean.class.getCanonicalName(), "valueOf", String.class.getCanonicalName())
+                || isMethod(node, Boolean.class.getCanonicalName(), "valueOf", boolean.class.getSimpleName())) {
             final BooleanLiteral l= as(arguments(node), BooleanLiteral.class);
             if (l != null) {
                 ctx.getRefactorings().replace(node, toFieldAccess(node, l.booleanValue()));

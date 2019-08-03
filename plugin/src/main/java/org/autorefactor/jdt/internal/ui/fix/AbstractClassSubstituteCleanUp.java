@@ -399,7 +399,7 @@ public abstract class AbstractClassSubstituteCleanUp extends NewClassImportClean
                 }
             }
         }
-        return "java.lang.Object";
+        return Object.class.getCanonicalName();
     }
 
     private final class ObjectInstantiationVisitor extends ASTVisitor {

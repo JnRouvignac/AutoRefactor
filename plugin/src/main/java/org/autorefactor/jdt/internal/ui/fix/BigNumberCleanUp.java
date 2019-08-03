@@ -40,6 +40,9 @@ import static org.eclipse.jdt.core.dom.InfixExpression.Operator.NOT_EQUALS;
 import static org.eclipse.jdt.core.dom.InfixExpression.Operator.PLUS;
 import static org.eclipse.jdt.core.dom.PrefixExpression.Operator.NOT;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+
 import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
@@ -89,9 +92,9 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
     @Override
     public boolean visit(ClassInstanceCreation node) {
         final ITypeBinding typeBinding= node.getType().resolveBinding();
-        if (hasType(typeBinding, "java.math.BigDecimal", "java.math.BigInteger") && arguments(node).size() == 1) {
+        if (hasType(typeBinding, BigDecimal.class.getCanonicalName(), BigInteger.class.getCanonicalName()) && arguments(node).size() == 1) {
             final Expression arg0= arguments(node).get(0);
-            if (arg0 instanceof NumberLiteral && hasType(typeBinding, "java.math.BigDecimal")) {
+            if (arg0 instanceof NumberLiteral && hasType(typeBinding, BigDecimal.class.getCanonicalName())) {
                 final String token= ((NumberLiteral) arg0).getToken().replaceFirst("[lLfFdD]$", "");
                 if (token.contains(".")) {
                     // Only instantiation from double, not from integer
@@ -154,14 +157,14 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
         if (node.getExpression() == null) {
             return true;
         }
-        if (getJavaMinorVersion() >= 5 && (isMethod(node, "java.math.BigInteger", "valueOf", "long")
-                || isMethod(node, "java.math.BigDecimal", "valueOf", "long")
-                || isMethod(node, "java.math.BigDecimal", "valueOf", "double"))) {
+        if (getJavaMinorVersion() >= 5 && (isMethod(node, BigInteger.class.getCanonicalName(), "valueOf", long.class.getSimpleName())
+                || isMethod(node, BigDecimal.class.getCanonicalName(), "valueOf", long.class.getSimpleName())
+                || isMethod(node, BigDecimal.class.getCanonicalName(), "valueOf", double.class.getSimpleName()))) {
             final ITypeBinding typeBinding= node.getExpression().resolveTypeBinding();
             final Expression arg0= arg0(node);
             if (arg0 instanceof NumberLiteral) {
                 final String token= ((NumberLiteral) arg0).getToken().replaceFirst("[lLfFdD]$", "");
-                if (token.contains(".") && hasType(typeBinding, "java.math.BigDecimal")) {
+                if (token.contains(".") && hasType(typeBinding, BigDecimal.class.getCanonicalName())) {
                     this.ctx.getRefactorings().replace(node,
                             getClassInstanceCreatorNode((Name) node.getExpression(), token));
                 } else if (ZERO_LONG_LITERAL_RE.matcher(token).matches()) {
@@ -183,10 +186,10 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
     }
 
     private boolean maybeReplaceEquals(final boolean isPositive, final Expression node, final MethodInvocation mi) {
-        if (isMethod(mi, "java.math.BigDecimal", "equals", "java.lang.Object")
-                || isMethod(mi, "java.math.BigInteger", "equals", "java.lang.Object")) {
+        if (isMethod(mi, BigDecimal.class.getCanonicalName(), "equals", Object.class.getCanonicalName())
+                || isMethod(mi, BigInteger.class.getCanonicalName(), "equals", Object.class.getCanonicalName())) {
             final Expression arg0= arg0(mi);
-            if (hasType(arg0, "java.math.BigDecimal", "java.math.BigInteger")) {
+            if (hasType(arg0, BigDecimal.class.getCanonicalName(), BigInteger.class.getCanonicalName())) {
                 if (isInStringAppend(mi.getParent())) {
                     this.ctx.getRefactorings().replace(node, parenthesize(getCompareToNode(isPositive, mi)));
                 } else {
@@ -205,8 +208,8 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
     private boolean isInStringAppend(final ASTNode node) {
         if (node instanceof InfixExpression) {
             final InfixExpression expr= (InfixExpression) node;
-            if (hasOperator(expr, PLUS) || hasType(expr.getLeftOperand(), "java.lang.String")
-                    || hasType(expr.getRightOperand(), "java.lang.String")) {
+            if (hasOperator(expr, PLUS) || hasType(expr.getLeftOperand(), String.class.getCanonicalName())
+                    || hasType(expr.getRightOperand(), String.class.getCanonicalName())) {
                 return true;
             }
         }

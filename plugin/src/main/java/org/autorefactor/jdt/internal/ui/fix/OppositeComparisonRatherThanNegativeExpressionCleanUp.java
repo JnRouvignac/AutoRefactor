@@ -71,7 +71,7 @@ public class OppositeComparisonRatherThanNegativeExpressionCleanUp extends Abstr
             final MethodInvocation mi= as(node.getOperand(), MethodInvocation.class);
 
             if (mi != null && mi.getExpression() != null && mi.arguments().size() == 1) {
-                final String[] classes= { "java.lang.Double", "java.lang.Float", "java.lang.Short", "java.lang.Integer", "java.lang.Long", "java.lang.Character", "java.lang.Byte", "java.lang.Boolean" };
+                final String[] classes= { Double.class.getCanonicalName(), Float.class.getCanonicalName(), Short.class.getCanonicalName(), Integer.class.getCanonicalName(), Long.class.getCanonicalName(), Character.class.getCanonicalName(), Byte.class.getCanonicalName(), Boolean.class.getCanonicalName() };
 
                 for (final String clazz : classes) {
                     if (isMethod(mi, clazz, "compareTo", clazz) && hasType((Expression) mi.arguments().get(0), clazz)) {

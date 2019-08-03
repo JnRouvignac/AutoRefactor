@@ -84,12 +84,12 @@ public class IntPrimitiveRatherThanWrapperCleanUp extends AbstractPrimitiveRathe
 
     @Override
     public String getWrapperFullyQualifiedName() {
-        return "java.lang.Integer";
+        return Integer.class.getCanonicalName();
     }
 
     @Override
     public String getPrimitiveTypeName() {
-        return "int";
+        return int.class.getSimpleName();
     }
 
     @Override

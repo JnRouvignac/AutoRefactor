@@ -25,6 +25,8 @@
  */
 package org.autorefactor.jdt.internal.corext.dom;
 
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 import org.autorefactor.util.Pair;
@@ -193,11 +195,11 @@ public final class ForLoopHelper {
                 final MethodInvocation condMi= as(node.getExpression(), MethodInvocation.class);
                 final MethodInvocation initMi= as(initPair.getSecond(), MethodInvocation.class);
                 if (condMi != null && isSameVariable(init, condMi.getExpression())
-                        && isMethod(initMi, "java.util.Collection", "iterator")
-                        && isMethod(condMi, "java.util.Iterator", "hasNext")) {
+                        && isMethod(initMi, Collection.class.getCanonicalName(), "iterator")
+                        && isMethod(condMi, Iterator.class.getCanonicalName(), "hasNext")) {
                     return getIteratorOnCollection(initMi.getExpression(), condMi.getExpression());
                 }
-            } else if (updaters.size() == 1 && isPrimitive(firstInit, "int")) {
+            } else if (updaters.size() == 1 && isPrimitive(firstInit, int.class.getSimpleName())) {
                 final Pair<Name, Expression> initPair= decomposeInitializer(firstInit);
                 final Name init= initPair.getFirst();
                 final ForLoopContent forContent= getIndexOnIterable(condition, init);
@@ -294,7 +296,7 @@ public final class ForLoopHelper {
         if (containerVar instanceof MethodInvocation) {
             final MethodInvocation mi= (MethodInvocation) containerVar;
             final Name containerVarName= as(mi.getExpression(), Name.class);
-            if (containerVarName != null && isMethod(mi, "java.util.Collection", "size")) {
+            if (containerVarName != null && isMethod(mi, Collection.class.getCanonicalName(), "size")) {
                 return ForLoopContent.indexedCollection(containerVarName, (Name) loopVar);
             }
         } else if (containerVar instanceof QualifiedName) {

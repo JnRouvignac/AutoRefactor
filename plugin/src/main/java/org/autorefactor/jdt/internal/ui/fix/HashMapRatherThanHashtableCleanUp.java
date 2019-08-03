@@ -26,9 +26,11 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -46,11 +48,11 @@ public class HashMapRatherThanHashtableCleanUp extends AbstractClassSubstituteCl
     private static final Map<String, String[]> CAN_BE_CASTED_TO= new HashMap<String, String[]>();
 
     static {
-        CAN_BE_CASTED_TO.put("java.lang.Object", new String[] { "java.lang.Object" });
-        CAN_BE_CASTED_TO.put("java.lang.Cloneable", new String[] { "java.lang.Cloneable", "java.lang.Object" });
-        CAN_BE_CASTED_TO.put("java.io.Serializable", new String[] { "java.io.Serializable", "java.lang.Object" });
-        CAN_BE_CASTED_TO.put("java.util.Map", new String[] { "java.util.Map", "java.lang.Object" });
-        CAN_BE_CASTED_TO.put("java.util.Hashtable", new String[] { "java.util.Hashtable", "java.io.Serializable", "java.util.Map", "java.lang.Cloneable", "java.lang.Object" });
+        CAN_BE_CASTED_TO.put(Object.class.getCanonicalName(), new String[] { Object.class.getCanonicalName() });
+        CAN_BE_CASTED_TO.put(Cloneable.class.getCanonicalName(), new String[] { Cloneable.class.getCanonicalName(), Object.class.getCanonicalName() });
+        CAN_BE_CASTED_TO.put(Serializable.class.getCanonicalName(), new String[] { Serializable.class.getCanonicalName(), Object.class.getCanonicalName() });
+        CAN_BE_CASTED_TO.put(Map.class.getCanonicalName(), new String[] { Map.class.getCanonicalName(), Object.class.getCanonicalName() });
+        CAN_BE_CASTED_TO.put(Hashtable.class.getCanonicalName(), new String[] { Hashtable.class.getCanonicalName(), Serializable.class.getCanonicalName(), Map.class.getCanonicalName(), Cloneable.class.getCanonicalName(), Object.class.getCanonicalName() });
     }
 
     /**
@@ -92,18 +94,18 @@ public class HashMapRatherThanHashtableCleanUp extends AbstractClassSubstituteCl
 
     @Override
     protected String[] getExistingClassCanonicalName() {
-        return new String[] { "java.util.Hashtable" };
+        return new String[] { Hashtable.class.getCanonicalName() };
     }
 
     @Override
     public Set<String> getClassesToImport() {
-        return new HashSet<String>(Arrays.asList("java.util.HashMap"));
+        return new HashSet<String>(Arrays.asList(HashMap.class.getCanonicalName()));
     }
 
     @Override
     protected String getSubstitutingClassName(String origRawType) {
-        if ("java.util.Hashtable".equals(origRawType)) {
-            return "java.util.HashMap";
+        if (Hashtable.class.getCanonicalName().equals(origRawType)) {
+            return HashMap.class.getCanonicalName();
         } else {
             return null;
         }
@@ -112,7 +114,7 @@ public class HashMapRatherThanHashtableCleanUp extends AbstractClassSubstituteCl
     @Override
     protected boolean canMethodBeRefactored(final MethodInvocation mi,
             final List<MethodInvocation> methodCallsToRefactor) {
-        if (isMethod(mi, "java.util.Hashtable", "contains", "java.lang.Object")) {
+        if (isMethod(mi, Hashtable.class.getCanonicalName(), "contains", Object.class.getCanonicalName())) {
             methodCallsToRefactor.add(mi);
         }
         return true;

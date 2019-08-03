@@ -80,9 +80,9 @@ public class LiteralRatherThanBooleanConstantCleanUp extends AbstractCleanUpRule
 
     private boolean replaceBooleanObjectByPrimitive(final QualifiedName node, final ITypeBinding typeBinding) {
         if (typeBinding != null && typeBinding.isPrimitive()) {
-            if (isField(node, "java.lang.Boolean", "TRUE")) {
+            if (isField(node, Boolean.class.getCanonicalName(), "TRUE")) {
                 return replaceWithBooleanLiteral(node, true);
-            } else if (isField(node, "java.lang.Boolean", "FALSE")) {
+            } else if (isField(node, Boolean.class.getCanonicalName(), "FALSE")) {
                 return replaceWithBooleanLiteral(node, false);
             }
         }

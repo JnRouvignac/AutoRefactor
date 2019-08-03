@@ -68,13 +68,13 @@ public class UnboxingRatherThanExplicitMethodCleanUp extends AbstractCleanUpRule
     @Override
     public boolean visit(MethodInvocation node) {
         if (node.getExpression() != null && getJavaMinorVersion() >= 5
-                && (isMethod(node, "java.lang.Boolean", "booleanValue") || isMethod(node, "java.lang.Byte", "byteValue")
-                        || isMethod(node, "java.lang.Character", "charValue")
-                        || isMethod(node, "java.lang.Short", "shortValue")
-                        || isMethod(node, "java.lang.Integer", "intValue")
-                        || isMethod(node, "java.lang.Long", "longValue")
-                        || isMethod(node, "java.lang.Float", "floatValue")
-                        || isMethod(node, "java.lang.Double", "doubleValue"))) {
+                && (isMethod(node, Boolean.class.getCanonicalName(), "booleanValue") || isMethod(node, Byte.class.getCanonicalName(), "byteValue")
+                        || isMethod(node, Character.class.getCanonicalName(), "charValue")
+                        || isMethod(node, Short.class.getCanonicalName(), "shortValue")
+                        || isMethod(node, Integer.class.getCanonicalName(), "intValue")
+                        || isMethod(node, Long.class.getCanonicalName(), "longValue")
+                        || isMethod(node, Float.class.getCanonicalName(), "floatValue")
+                        || isMethod(node, Double.class.getCanonicalName(), "doubleValue"))) {
             final ITypeBinding actualResultType= getDestinationType(node);
 
             if (actualResultType != null && actualResultType.isAssignmentCompatible(node.resolveTypeBinding())) {

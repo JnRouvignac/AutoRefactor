@@ -81,8 +81,8 @@ public class StringCleanUp extends AbstractCleanUpRule {
         final ASTBuilder b= this.ctx.getASTBuilder();
         final Refactorings r= ctx.getRefactorings();
         final boolean isStringValueOf= isStringValueOf(node);
-        if (isMethod(node, "java.lang.Object", "toString")) {
-            if (hasType(expr, "java.lang.String")) {
+        if (isMethod(node, Object.class.getCanonicalName(), "toString")) {
+            if (hasType(expr, String.class.getCanonicalName())) {
                 // if node is already a String, no need to call toString()
                 r.replace(node, b.move(expr));
                 return false;
@@ -91,15 +91,15 @@ public class StringCleanUp extends AbstractCleanUpRule {
                 final InfixExpression ie= (InfixExpression) node.getParent();
                 final Expression leftOp= ie.getLeftOperand();
                 final Expression rightOp= ie.getRightOperand();
-                final boolean leftOpIsString= hasType(leftOp, "java.lang.String");
-                final boolean rightOpIsString= hasType(rightOp, "java.lang.String");
+                final boolean leftOpIsString= hasType(leftOp, String.class.getCanonicalName());
+                final boolean rightOpIsString= hasType(rightOp, String.class.getCanonicalName());
                 final MethodInvocation lmi= as(leftOp, MethodInvocation.class);
                 final MethodInvocation rmi= as(rightOp, MethodInvocation.class);
                 if (!node.equals(lmi) && !node.equals(rmi) && (leftOpIsString || rightOpIsString)) {
                     // node is in the extended operands
                     r.replace(node, replaceToString(node.getExpression()));
                     return false;
-                } else if (leftOpIsString && isMethod(rmi, "java.lang.Object", "toString")) {
+                } else if (leftOpIsString && isMethod(rmi, Object.class.getCanonicalName(), "toString")) {
                     r.replace(rmi, replaceToString(rmi.getExpression()));
                     return false;
                 } else if (rightOpIsString && node.equals(lmi)) {
@@ -107,7 +107,7 @@ public class StringCleanUp extends AbstractCleanUpRule {
                     return false;
                 }
             }
-        } else if (isStringValueOf && hasType(arg0(node), "java.lang.String")) {
+        } else if (isStringValueOf && hasType(arg0(node), String.class.getCanonicalName())) {
             if (arg0(node) instanceof StringLiteral || arg0(node) instanceof InfixExpression) {
                 r.replace(node, b.parenthesizeIfNeeded(b.move(arg0(node))));
                 return false;
@@ -118,12 +118,12 @@ public class StringCleanUp extends AbstractCleanUpRule {
             final Expression lo= ie.getLeftOperand();
             final Expression ro= ie.getRightOperand();
             if (node.equals(lo)) {
-                if (hasType(ro, "java.lang.String")) {
+                if (hasType(ro, String.class.getCanonicalName())) {
                     replaceStringValueOfByArg0(lo, node);
                     return false;
                 }
             } else if (node.equals(ro)) {
-                if (hasType(lo, "java.lang.String")
+                if (hasType(lo, String.class.getCanonicalName())
                         // Do not refactor left and right operand at the same time
                         // to avoid compilation errors post refactoring
                         && !r.hasBeenRefactored(lo)) {
@@ -135,21 +135,21 @@ public class StringCleanUp extends AbstractCleanUpRule {
                 replaceStringValueOfByArg0(node, node);
                 return false;
             }
-        } else if (isMethod(node, "java.lang.String", "equals", "java.lang.Object")) {
+        } else if (isMethod(node, String.class.getCanonicalName(), "equals", Object.class.getCanonicalName())) {
             final MethodInvocation leftInvocation= as(node.getExpression(), MethodInvocation.class);
             final MethodInvocation rightInvocation= as(arg0(node), MethodInvocation.class);
 
             if (leftInvocation != null && rightInvocation != null
-                    && ((isMethod(leftInvocation, "java.lang.String", "toLowerCase")
-                            && isMethod(rightInvocation, "java.lang.String", "toLowerCase"))
-                            || (isMethod(leftInvocation, "java.lang.String", "toUpperCase")
-                                    && isMethod(rightInvocation, "java.lang.String", "toUpperCase")))) {
+                    && ((isMethod(leftInvocation, String.class.getCanonicalName(), "toLowerCase")
+                            && isMethod(rightInvocation, String.class.getCanonicalName(), "toLowerCase"))
+                            || (isMethod(leftInvocation, String.class.getCanonicalName(), "toUpperCase")
+                                    && isMethod(rightInvocation, String.class.getCanonicalName(), "toUpperCase")))) {
                 final Expression leftExpr= leftInvocation.getExpression();
                 final Expression rightExpr= rightInvocation.getExpression();
                 r.replace(node, b.invoke(b.copy(leftExpr), "equalsIgnoreCase", b.copy(rightExpr)));
                 return false;
             }
-        } else if (isMethod(node, "java.lang.String", "equalsIgnoreCase", "java.lang.String")) {
+        } else if (isMethod(node, String.class.getCanonicalName(), "equalsIgnoreCase", String.class.getCanonicalName())) {
             final AtomicBoolean isRefactoringNeeded= new AtomicBoolean(false);
 
             final Expression leftExpr= getReducedStringExpression(node.getExpression(), isRefactoringNeeded);
@@ -159,10 +159,10 @@ public class StringCleanUp extends AbstractCleanUpRule {
                 r.replace(node, b.invoke(b.copy(leftExpr), "equalsIgnoreCase", b.copy(rightExpr)));
                 return false;
             }
-        } else if (isMethod(node, "java.lang.String", "indexOf", "java.lang.String")
-                || isMethod(node, "java.lang.String", "lastIndexOf", "java.lang.String")
-                || isMethod(node, "java.lang.String", "indexOf", "java.lang.String", "java.lang.Integer")
-                || isMethod(node, "java.lang.String", "lastIndexOf", "java.lang.String", "java.lang.Integer")) {
+        } else if (isMethod(node, String.class.getCanonicalName(), "indexOf", String.class.getCanonicalName())
+                || isMethod(node, String.class.getCanonicalName(), "lastIndexOf", String.class.getCanonicalName())
+                || isMethod(node, String.class.getCanonicalName(), "indexOf", String.class.getCanonicalName(), Integer.class.getCanonicalName())
+                || isMethod(node, String.class.getCanonicalName(), "lastIndexOf", String.class.getCanonicalName(), Integer.class.getCanonicalName())) {
             Expression expression= arg0(node);
             if (expression instanceof StringLiteral) {
                 String value= ((StringLiteral) expression).getLiteralValue();
@@ -179,8 +179,8 @@ public class StringCleanUp extends AbstractCleanUpRule {
 
     private Expression getReducedStringExpression(Expression stringExpr, AtomicBoolean isRefactoringNeeded) {
         final MethodInvocation casingInvocation= as(stringExpr, MethodInvocation.class);
-        if (casingInvocation != null && (isMethod(casingInvocation, "java.lang.String", "toLowerCase")
-                || isMethod(casingInvocation, "java.lang.String", "toUpperCase"))) {
+        if (casingInvocation != null && (isMethod(casingInvocation, String.class.getCanonicalName(), "toLowerCase")
+                || isMethod(casingInvocation, String.class.getCanonicalName(), "toUpperCase"))) {
             isRefactoringNeeded.set(true);
             return casingInvocation.getExpression();
         }
@@ -210,26 +210,26 @@ public class StringCleanUp extends AbstractCleanUpRule {
 
     private boolean isToStringForPrimitive(final MethodInvocation node) {
         return "toString".equals(node.getName().getIdentifier()) // fast-path
-                && (isMethod(node, "java.lang.Boolean", "toString", "boolean")
-                        || isMethod(node, "java.lang.Character", "toString", "char")
-                        || isMethod(node, "java.lang.Byte", "toString", "byte")
-                        || isMethod(node, "java.lang.Short", "toString", "short")
-                        || isMethod(node, "java.lang.Integer", "toString", "int")
-                        || isMethod(node, "java.lang.Long", "toString", "long")
-                        || isMethod(node, "java.lang.Float", "toString", "float")
-                        || isMethod(node, "java.lang.Double", "toString", "double"));
+                && (isMethod(node, Boolean.class.getCanonicalName(), "toString", boolean.class.getSimpleName())
+                        || isMethod(node, Character.class.getCanonicalName(), "toString", char.class.getSimpleName())
+                        || isMethod(node, Byte.class.getCanonicalName(), "toString", byte.class.getSimpleName())
+                        || isMethod(node, Short.class.getCanonicalName(), "toString", short.class.getSimpleName())
+                        || isMethod(node, Integer.class.getCanonicalName(), "toString", int.class.getSimpleName())
+                        || isMethod(node, Long.class.getCanonicalName(), "toString", long.class.getSimpleName())
+                        || isMethod(node, Float.class.getCanonicalName(), "toString", float.class.getSimpleName())
+                        || isMethod(node, Double.class.getCanonicalName(), "toString", double.class.getSimpleName()));
     }
 
     private boolean isStringValueOf(final MethodInvocation node) {
-        return hasType(node.getExpression(), "java.lang.String") // fast-path
-                && (isMethod(node, "java.lang.String", "valueOf", "boolean")
-                        || isMethod(node, "java.lang.String", "valueOf", "char")
-                        || isMethod(node, "java.lang.String", "valueOf", "byte")
-                        || isMethod(node, "java.lang.String", "valueOf", "short")
-                        || isMethod(node, "java.lang.String", "valueOf", "int")
-                        || isMethod(node, "java.lang.String", "valueOf", "long")
-                        || isMethod(node, "java.lang.String", "valueOf", "float")
-                        || isMethod(node, "java.lang.String", "valueOf", "double")
-                        || isMethod(node, "java.lang.String", "valueOf", "java.lang.Object"));
+        return hasType(node.getExpression(), String.class.getCanonicalName()) // fast-path
+                && (isMethod(node, String.class.getCanonicalName(), "valueOf", boolean.class.getSimpleName())
+                        || isMethod(node, String.class.getCanonicalName(), "valueOf", char.class.getSimpleName())
+                        || isMethod(node, String.class.getCanonicalName(), "valueOf", byte.class.getSimpleName())
+                        || isMethod(node, String.class.getCanonicalName(), "valueOf", short.class.getSimpleName())
+                        || isMethod(node, String.class.getCanonicalName(), "valueOf", int.class.getSimpleName())
+                        || isMethod(node, String.class.getCanonicalName(), "valueOf", long.class.getSimpleName())
+                        || isMethod(node, String.class.getCanonicalName(), "valueOf", float.class.getSimpleName())
+                        || isMethod(node, String.class.getCanonicalName(), "valueOf", double.class.getSimpleName())
+                        || isMethod(node, String.class.getCanonicalName(), "valueOf", Object.class.getCanonicalName()));
     }
 }

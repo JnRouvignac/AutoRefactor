@@ -31,9 +31,15 @@ import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasType;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isMethod;
 import static org.autorefactor.util.Utils.getOrDefault;
 
+import java.io.Serializable;
+import java.util.AbstractCollection;
+import java.util.AbstractList;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -66,15 +72,15 @@ public class SetRatherThanListCleanUp extends AbstractClassSubstituteCleanUp {
     private static final Map<String, String[]> CAN_BE_CASTED_TO= new HashMap<String, String[]>();
 
     static {
-        CAN_BE_CASTED_TO.put("java.lang.Object", new String[] { "java.lang.Object" });
-        CAN_BE_CASTED_TO.put("java.lang.Cloneable", new String[] { "java.lang.Cloneable", "java.lang.Object" });
-        CAN_BE_CASTED_TO.put("java.io.Serializable", new String[] { "java.io.Serializable", "java.lang.Object" });
-        CAN_BE_CASTED_TO.put("java.util.Collection", new String[] { "java.util.Collection", "java.lang.Object" });
-        CAN_BE_CASTED_TO.put("java.util.List", new String[] { "java.util.List", "java.lang.Object" });
-        CAN_BE_CASTED_TO.put("java.util.AbstractList", new String[] { "java.util.AbstractList", "java.util.List", "java.lang.Object" });
-        CAN_BE_CASTED_TO.put("java.util.AbstractCollection", new String[] { "java.util.AbstractCollection", "java.util.Collection", "java.lang.Object" });
-        CAN_BE_CASTED_TO.put("java.util.LinkedList", new String[] { "java.util.LinkedList", "java.util.AbstractList", "java.util.List", "java.util.AbstractCollection", "java.util.Collection", "java.io.Serializable", "java.lang.Cloneable", "java.lang.Object" });
-        CAN_BE_CASTED_TO.put("java.util.ArrayList", new String[] { "java.util.ArrayList", "java.util.AbstractList", "java.util.List", "java.util.AbstractCollection", "java.util.Collection", "java.io.Serializable", "java.lang.Cloneable", "java.lang.Object" });
+        CAN_BE_CASTED_TO.put(Object.class.getCanonicalName(), new String[] { Object.class.getCanonicalName() });
+        CAN_BE_CASTED_TO.put(Cloneable.class.getCanonicalName(), new String[] { Cloneable.class.getCanonicalName(), Object.class.getCanonicalName() });
+        CAN_BE_CASTED_TO.put(Serializable.class.getCanonicalName(), new String[] { Serializable.class.getCanonicalName(), Object.class.getCanonicalName() });
+        CAN_BE_CASTED_TO.put(Collection.class.getCanonicalName(), new String[] { Collection.class.getCanonicalName(), Object.class.getCanonicalName() });
+        CAN_BE_CASTED_TO.put(List.class.getCanonicalName(), new String[] { List.class.getCanonicalName(), Object.class.getCanonicalName() });
+        CAN_BE_CASTED_TO.put(AbstractList.class.getCanonicalName(), new String[] { AbstractList.class.getCanonicalName(), List.class.getCanonicalName(), Object.class.getCanonicalName() });
+        CAN_BE_CASTED_TO.put(AbstractCollection.class.getCanonicalName(), new String[] { AbstractCollection.class.getCanonicalName(), Collection.class.getCanonicalName(), Object.class.getCanonicalName() });
+        CAN_BE_CASTED_TO.put(LinkedList.class.getCanonicalName(), new String[] { LinkedList.class.getCanonicalName(), AbstractList.class.getCanonicalName(), List.class.getCanonicalName(), AbstractCollection.class.getCanonicalName(), Collection.class.getCanonicalName(), Serializable.class.getCanonicalName(), Cloneable.class.getCanonicalName(), Object.class.getCanonicalName() });
+        CAN_BE_CASTED_TO.put(ArrayList.class.getCanonicalName(), new String[] { ArrayList.class.getCanonicalName(), AbstractList.class.getCanonicalName(), List.class.getCanonicalName(), AbstractCollection.class.getCanonicalName(), Collection.class.getCanonicalName(), Serializable.class.getCanonicalName(), Cloneable.class.getCanonicalName(), Object.class.getCanonicalName() });
     }
 
     private boolean isContainsMethodUsed;
@@ -114,20 +120,20 @@ public class SetRatherThanListCleanUp extends AbstractClassSubstituteCleanUp {
 
     @Override
     protected String[] getExistingClassCanonicalName() {
-        return new String[] { "java.util.ArrayList", "java.util.LinkedList" };
+        return new String[] { ArrayList.class.getCanonicalName(), LinkedList.class.getCanonicalName() };
     }
 
     @Override
     public Set<String> getClassesToImport() {
-        return new HashSet<String>(Arrays.asList("java.util.HashSet", "java.util.Set"));
+        return new HashSet<String>(Arrays.asList(HashSet.class.getCanonicalName(), Set.class.getCanonicalName()));
     }
 
     @Override
     protected String getSubstitutingClassName(String origRawType) {
-        if ("java.util.ArrayList".equals(origRawType) || "java.util.LinkedList".equals(origRawType)) {
-            return "java.util.HashSet";
-        } else if ("java.util.AbstractList".equals(origRawType) || "java.util.List".equals(origRawType)) {
-            return "java.util.Set";
+        if (ArrayList.class.getCanonicalName().equals(origRawType) || LinkedList.class.getCanonicalName().equals(origRawType)) {
+            return HashSet.class.getCanonicalName();
+        } else if (AbstractList.class.getCanonicalName().equals(origRawType) || List.class.getCanonicalName().equals(origRawType)) {
+            return Set.class.getCanonicalName();
         } else {
             return null;
         }
@@ -146,31 +152,31 @@ public class SetRatherThanListCleanUp extends AbstractClassSubstituteCleanUp {
     @Override
     protected boolean canMethodBeRefactored(final MethodInvocation mi,
             final List<MethodInvocation> methodCallsToRefactor) {
-        if (isMethod(mi, "java.util.Collection", "contains", "java.lang.Object")) {
+        if (isMethod(mi, Collection.class.getCanonicalName(), "contains", Object.class.getCanonicalName())) {
             isContainsMethodUsed= true;
         }
 
-        if (isMethod(mi, "java.util.List", "add", "int", "java.lang.Object")
-                || isMethod(mi, "java.util.List", "addAll", "int", "java.util.Collection")) {
+        if (isMethod(mi, List.class.getCanonicalName(), "add", int.class.getSimpleName(), Object.class.getCanonicalName())
+                || isMethod(mi, List.class.getCanonicalName(), "addAll", int.class.getSimpleName(), Collection.class.getCanonicalName())) {
             methodCallsToRefactor.add(mi);
             return true;
         }
 
-        return isMethod(mi, "java.util.Collection", "add", "java.lang.Object")
-                || isMethod(mi, "java.util.Collection", "addAll", "java.util.Collection")
-                || isMethod(mi, "java.util.Collection", "clear")
-                || isMethod(mi, "java.util.Collection", "contains", "java.lang.Object")
-                || isMethod(mi, "java.util.Collection", "isEmpty") || isMethod(mi, "java.lang.Object", "finalize")
-                || isMethod(mi, "java.lang.Object", "notify") || isMethod(mi, "java.lang.Object", "notifyAll")
-                || isMethod(mi, "java.lang.Object", "wait") || isMethod(mi, "java.lang.Object", "wait", "long")
-                || isMethod(mi, "java.lang.Object", "wait", "long", "int");
+        return isMethod(mi, Collection.class.getCanonicalName(), "add", Object.class.getCanonicalName())
+                || isMethod(mi, Collection.class.getCanonicalName(), "addAll", Collection.class.getCanonicalName())
+                || isMethod(mi, Collection.class.getCanonicalName(), "clear")
+                || isMethod(mi, Collection.class.getCanonicalName(), "contains", Object.class.getCanonicalName())
+                || isMethod(mi, Collection.class.getCanonicalName(), "isEmpty") || isMethod(mi, Object.class.getCanonicalName(), "finalize")
+                || isMethod(mi, Object.class.getCanonicalName(), "notify") || isMethod(mi, Object.class.getCanonicalName(), "notifyAll")
+                || isMethod(mi, Object.class.getCanonicalName(), "wait") || isMethod(mi, Object.class.getCanonicalName(), "wait", long.class.getSimpleName())
+                || isMethod(mi, Object.class.getCanonicalName(), "wait", long.class.getSimpleName(), int.class.getSimpleName());
     }
 
     @Override
     protected void refactorMethod(final ASTBuilder b, final MethodInvocation originalMi,
             final MethodInvocation refactoredMi) {
-        if (isMethod(originalMi, "java.util.List", "add", "int", "java.lang.Object")
-                || isMethod(originalMi, "java.util.List", "addAll", "int", "java.util.Collection")) {
+        if (isMethod(originalMi, List.class.getCanonicalName(), "add", int.class.getSimpleName(), Object.class.getCanonicalName())
+                || isMethod(originalMi, List.class.getCanonicalName(), "addAll", int.class.getSimpleName(), Collection.class.getCanonicalName())) {
             List<Expression> args= arguments(refactoredMi);
             Expression item= args.get(1);
             args.clear();

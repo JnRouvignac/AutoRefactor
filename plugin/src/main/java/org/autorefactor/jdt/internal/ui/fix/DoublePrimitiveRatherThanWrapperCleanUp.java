@@ -75,12 +75,12 @@ public class DoublePrimitiveRatherThanWrapperCleanUp extends AbstractPrimitiveRa
 
     @Override
     public String getWrapperFullyQualifiedName() {
-        return "java.lang.Double";
+        return Double.class.getCanonicalName();
     }
 
     @Override
     public String getPrimitiveTypeName() {
-        return "double";
+        return double.class.getSimpleName();
     }
 
     @Override

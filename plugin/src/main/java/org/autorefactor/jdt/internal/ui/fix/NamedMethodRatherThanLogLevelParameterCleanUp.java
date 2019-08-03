@@ -30,6 +30,8 @@ import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isField;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isMethod;
 
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
 import org.autorefactor.jdt.internal.corext.dom.Refactorings;
@@ -68,7 +70,7 @@ public class NamedMethodRatherThanLogLevelParameterCleanUp extends AbstractClean
 
     @Override
     public boolean visit(final MethodInvocation node) {
-        if (isMethod(node, "java.util.logging.Logger", "log", "java.util.logging.Level", "java.lang.String")) {
+        if (isMethod(node, Logger.class.getCanonicalName(), "log", Level.class.getCanonicalName(), String.class.getCanonicalName())) {
             final List<Expression> args= arguments(node);
 
             if (args != null && args.size() == 2) {
@@ -79,17 +81,17 @@ public class NamedMethodRatherThanLogLevelParameterCleanUp extends AbstractClean
                     final QualifiedName levelType= (QualifiedName) level;
                     final String methodName;
 
-                    if (isField(levelType, "java.util.logging.Level", "SEVERE")) {
+                    if (isField(levelType, Level.class.getCanonicalName(), "SEVERE")) {
                         methodName= "severe";
-                    } else if (isField(levelType, "java.util.logging.Level", "WARNING")) {
+                    } else if (isField(levelType, Level.class.getCanonicalName(), "WARNING")) {
                         methodName= "warning";
-                    } else if (isField(levelType, "java.util.logging.Level", "INFO")) {
+                    } else if (isField(levelType, Level.class.getCanonicalName(), "INFO")) {
                         methodName= "info";
-                    } else if (isField(levelType, "java.util.logging.Level", "FINE")) {
+                    } else if (isField(levelType, Level.class.getCanonicalName(), "FINE")) {
                         methodName= "fine";
-                    } else if (isField(levelType, "java.util.logging.Level", "FINER")) {
+                    } else if (isField(levelType, Level.class.getCanonicalName(), "FINER")) {
                         methodName= "finer";
-                    } else if (isField(levelType, "java.util.logging.Level", "FINEST")) {
+                    } else if (isField(levelType, Level.class.getCanonicalName(), "FINEST")) {
                         methodName= "finest";
                     } else {
                         return true;

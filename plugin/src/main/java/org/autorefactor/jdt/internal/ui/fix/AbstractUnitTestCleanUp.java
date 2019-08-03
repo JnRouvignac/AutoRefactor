@@ -58,7 +58,7 @@ public abstract class AbstractUnitTestCleanUp extends AbstractCleanUpRule {
     /**
      * The OBJECT constant.
      */
-    protected static final String OBJECT= "java.lang.Object";
+    protected static final String OBJECT= Object.class.getCanonicalName();
 
     /**
      * The OBJECT constant.

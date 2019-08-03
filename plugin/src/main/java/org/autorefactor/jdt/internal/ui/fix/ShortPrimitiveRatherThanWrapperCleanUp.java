@@ -84,12 +84,12 @@ public class ShortPrimitiveRatherThanWrapperCleanUp extends AbstractPrimitiveRat
 
     @Override
     public String getWrapperFullyQualifiedName() {
-        return "java.lang.Short";
+        return Short.class.getCanonicalName();
     }
 
     @Override
     public String getPrimitiveTypeName() {
-        return "short";
+        return short.class.getSimpleName();
     }
 
     @Override

@@ -77,8 +77,8 @@ public class LogParametersRatherThanLogMessageCleanUp extends AbstractCleanUpRul
     }
 
     private boolean maybeRefactorMethod(final MethodInvocation node, final String methodName) {
-        if (isMethod(node, "org.slf4j.Logger", methodName, "java.lang.String")
-                || isMethod(node, "ch.qos.logback.classic.Logger", methodName, "java.lang.String")) {
+        if (isMethod(node, "org.slf4j.Logger", methodName, String.class.getCanonicalName())
+                || isMethod(node, "ch.qos.logback.classic.Logger", methodName, String.class.getCanonicalName())) {
             final List<Expression> args= arguments(node);
 
             if (args != null && args.size() == 1) {
@@ -126,7 +126,7 @@ public class LogParametersRatherThanLogMessageCleanUp extends AbstractCleanUpRul
                 hasObjects= true;
                 messageBuilder.append("{}");
 
-                if (hasType(string, "java.lang.Throwable")) {
+                if (hasType(string, Throwable.class.getCanonicalName())) {
                     params.add(b.invoke("String", "valueOf", b.copy(string)));
                 } else {
                     params.add(b.copy(string));

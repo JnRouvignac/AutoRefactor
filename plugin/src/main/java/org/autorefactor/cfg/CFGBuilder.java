@@ -268,7 +268,7 @@ public class CFGBuilder {
             ArrayAccess aa= (ArrayAccess) node;
             addVariableAccess(basicBlock, aa.getArray(), flags, throwers);
             addVariableAccess(basicBlock, aa.getIndex(), flags, throwers);
-            throwers.addThrow(aa, newException(node, "java.lang.ArrayIndexOutOfBoundsException"));
+            throwers.addThrow(aa, newException(node, ArrayIndexOutOfBoundsException.class.getCanonicalName()));
             return true;
         case ARRAY_CREATION:
             ArrayCreation ac= (ArrayCreation) node;
@@ -316,7 +316,7 @@ public class CFGBuilder {
             boolean mightThrow= addVariableAccess(basicBlock, fa.getExpression(), flags, throwers);
             basicBlock.addVariableAccess(new VariableAccess(fa, flags));
             if (is(flags, READ)) {
-                throwers.addThrow(fa, newException(node, "java.lang.NullPointerException"));
+                throwers.addThrow(fa, newException(node, NullPointerException.class.getCanonicalName()));
                 mightThrow= true;
             }
             return mightThrow;
@@ -343,14 +343,14 @@ public class CFGBuilder {
             SimpleName sn= (SimpleName) node;
             basicBlock.addVariableAccess(new VariableAccess(sn, flags));
             if (is(flags, READ)) {
-                throwers.addThrow(sn, newException(node, "java.lang.NullPointerException"));
+                throwers.addThrow(sn, newException(node, NullPointerException.class.getCanonicalName()));
                 return true;
             }
             return false;
         case QUALIFIED_NAME:
             QualifiedName qn= (QualifiedName) node;
             basicBlock.addVariableAccess(new VariableAccess(qn, flags));
-            throwers.addThrow(qn, newException(node, "java.lang.NullPointerException"));
+            throwers.addThrow(qn, newException(node, NullPointerException.class.getCanonicalName()));
             return true;
         case PARENTHESIZED_EXPRESSION:
             ParenthesizedExpression pe= (ParenthesizedExpression) node;

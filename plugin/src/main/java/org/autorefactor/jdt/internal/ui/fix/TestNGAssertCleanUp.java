@@ -135,29 +135,29 @@ public class TestNGAssertCleanUp extends AbstractUnitTestCleanUp {
     @Override
     public boolean visit(MethodInvocation node) {
         final List<Expression> args= arguments(node);
-        if (isMethod(node, "org.testng.Assert", "assertTrue", "boolean")) {
+        if (isMethod(node, "org.testng.Assert", "assertTrue", boolean.class.getSimpleName())) {
             return maybeRefactorStatement(node, node, true, args.get(0), null, false);
-        } else if (isMethod(node, "org.testng.Assert", "assertTrue", "boolean", "java.lang.String")) {
+        } else if (isMethod(node, "org.testng.Assert", "assertTrue", boolean.class.getSimpleName(), String.class.getCanonicalName())) {
             return maybeRefactorStatement(node, node, true, args.get(0), args.get(1), false);
-        } else if (isMethod(node, "org.testng.Assert", "assertFalse", "boolean")) {
+        } else if (isMethod(node, "org.testng.Assert", "assertFalse", boolean.class.getSimpleName())) {
             return maybeRefactorStatement(node, node, false, args.get(0), null, false);
-        } else if (isMethod(node, "org.testng.Assert", "assertFalse", "boolean", "java.lang.String")) {
+        } else if (isMethod(node, "org.testng.Assert", "assertFalse", boolean.class.getSimpleName(), String.class.getCanonicalName())) {
             return maybeRefactorStatement(node, node, false, args.get(0), args.get(1), false);
         } else if (isMethod(node, "org.testng.Assert", "assertEquals", OBJECT, OBJECT)
-                || isMethod(node, "org.testng.Assert", "assertEquals", "long", "long")
-                || isMethod(node, "org.testng.Assert", "assertEquals", "double", "double")) {
+                || isMethod(node, "org.testng.Assert", "assertEquals", long.class.getSimpleName(), long.class.getSimpleName())
+                || isMethod(node, "org.testng.Assert", "assertEquals", double.class.getSimpleName(), double.class.getSimpleName())) {
             return maybeRefactorToAssertEquals(node, node, true, args.get(0), args.get(1), null, false);
-        } else if (isMethod(node, "org.testng.Assert", "assertEquals", OBJECT, OBJECT, "java.lang.String")
-                || isMethod(node, "org.testng.Assert", "assertEquals", "long", "long", "java.lang.String")
-                || isMethod(node, "org.testng.Assert", "assertEquals", "double", "double", "java.lang.String")) {
+        } else if (isMethod(node, "org.testng.Assert", "assertEquals", OBJECT, OBJECT, String.class.getCanonicalName())
+                || isMethod(node, "org.testng.Assert", "assertEquals", long.class.getSimpleName(), long.class.getSimpleName(), String.class.getCanonicalName())
+                || isMethod(node, "org.testng.Assert", "assertEquals", double.class.getSimpleName(), double.class.getSimpleName(), String.class.getCanonicalName())) {
             return maybeRefactorToAssertEquals(node, node, true, args.get(0), args.get(1), args.get(2), false);
         } else if (isMethod(node, "org.testng.Assert", "assertNotEquals", OBJECT, OBJECT)
-                || isMethod(node, "org.testng.Assert", "assertNotEquals", "long", "long")
-                || isMethod(node, "org.testng.Assert", "assertNotEquals", "double", "double")) {
+                || isMethod(node, "org.testng.Assert", "assertNotEquals", long.class.getSimpleName(), long.class.getSimpleName())
+                || isMethod(node, "org.testng.Assert", "assertNotEquals", double.class.getSimpleName(), double.class.getSimpleName())) {
             return maybeRefactorToAssertEquals(node, node, false, args.get(0), args.get(1), null, false);
-        } else if (isMethod(node, "org.testng.Assert", "assertNotEquals", OBJECT, OBJECT, "java.lang.String")
-                || isMethod(node, "org.testng.Assert", "assertNotEquals", "long", "long", "java.lang.String")
-                || isMethod(node, "org.testng.Assert", "assertNotEquals", "double", "double", "java.lang.String")) {
+        } else if (isMethod(node, "org.testng.Assert", "assertNotEquals", OBJECT, OBJECT, String.class.getCanonicalName())
+                || isMethod(node, "org.testng.Assert", "assertNotEquals", long.class.getSimpleName(), long.class.getSimpleName(), String.class.getCanonicalName())
+                || isMethod(node, "org.testng.Assert", "assertNotEquals", double.class.getSimpleName(), double.class.getSimpleName(), String.class.getCanonicalName())) {
             return maybeRefactorToAssertEquals(node, node, false, args.get(0), args.get(1), args.get(2), false);
         }
         return true;
@@ -170,7 +170,7 @@ public class TestNGAssertCleanUp extends AbstractUnitTestCleanUp {
             final MethodInvocation mi= asExpression(stmts.get(0), MethodInvocation.class);
             if (isMethod(mi, "org.testng.Assert", "fail")) {
                 return maybeRefactorStatement(node, mi, false, node.getExpression(), null, true);
-            } else if (isMethod(mi, "org.testng.Assert", "fail", "java.lang.String")) {
+            } else if (isMethod(mi, "org.testng.Assert", "fail", String.class.getCanonicalName())) {
                 return maybeRefactorStatement(node, mi, false, node.getExpression(), arguments(mi).get(0), true);
             }
         }

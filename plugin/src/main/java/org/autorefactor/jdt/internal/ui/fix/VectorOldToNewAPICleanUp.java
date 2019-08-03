@@ -32,6 +32,7 @@ import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isMethod;
 import static org.eclipse.jdt.core.dom.MethodInvocation.NAME_PROPERTY;
 
 import java.util.List;
+import java.util.Vector;
 
 import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
 import org.autorefactor.jdt.internal.corext.dom.Refactorings;
@@ -76,21 +77,21 @@ public class VectorOldToNewAPICleanUp extends AbstractCleanUpRule {
 
     @Override
     public boolean visit(MethodInvocation node) {
-        if (isMethod(node, "java.util.Vector", "elementAt", "int")) {
+        if (isMethod(node, Vector.class.getCanonicalName(), "elementAt", int.class.getSimpleName())) {
             replaceWith(node, "get");
-        } else if (isMethod(node, "java.util.Vector", "addElement", "java.lang.Object")) {
+        } else if (isMethod(node, Vector.class.getCanonicalName(), "addElement", Object.class.getCanonicalName())) {
             replaceWith(node, "add");
-        } else if (isMethod(node, "java.util.Vector", "insertElementAt", "java.lang.Object", "int")) {
+        } else if (isMethod(node, Vector.class.getCanonicalName(), "insertElementAt", Object.class.getCanonicalName(), int.class.getSimpleName())) {
             replaceWithAndSwapArguments(node, "add");
-        } else if (isMethod(node, "java.util.Vector", "copyInto", "java.lang.Object[]")) {
+        } else if (isMethod(node, Vector.class.getCanonicalName(), "copyInto", Object[].class.getCanonicalName())) {
             replaceWith(node, "toArray");
-        } else if (isMethod(node, "java.util.Vector", "removeAllElements")) {
+        } else if (isMethod(node, Vector.class.getCanonicalName(), "removeAllElements")) {
             replaceWith(node, "clear");
-        } else if (isMethod(node, "java.util.Vector", "removeElement", "java.lang.Object")) {
+        } else if (isMethod(node, Vector.class.getCanonicalName(), "removeElement", Object.class.getCanonicalName())) {
             replaceWithSpecial(node, "remove");
-        } else if (isMethod(node, "java.util.Vector", "removeElementAt", "int")) {
+        } else if (isMethod(node, Vector.class.getCanonicalName(), "removeElementAt", int.class.getSimpleName())) {
             replaceWith(node, "remove");
-        } else if (isMethod(node, "java.util.Vector", "setElementAt", "java.lang.Object", "int")) {
+        } else if (isMethod(node, Vector.class.getCanonicalName(), "setElementAt", Object.class.getCanonicalName(), int.class.getSimpleName())) {
             replaceWithAndSwapArguments(node, "set");
         } else {
             return true;
@@ -111,7 +112,7 @@ public class VectorOldToNewAPICleanUp extends AbstractCleanUpRule {
         final ASTBuilder b= this.ctx.getASTBuilder();
         final Refactorings r= this.ctx.getRefactorings();
         r.set(node, NAME_PROPERTY, b.simpleName(newMethodName));
-        if (hasType(arg0, "int", "short", "byte")) {
+        if (hasType(arg0, int.class.getSimpleName(), short.class.getSimpleName(), byte.class.getSimpleName())) {
             r.replace(arg0, b.cast(b.type("Object"), b.move(arg0)));
         }
     }

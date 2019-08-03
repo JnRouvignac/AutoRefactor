@@ -32,6 +32,8 @@ import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isSameVariable;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.match;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.removeParentheses;
 
+import java.util.Collection;
+
 import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
@@ -89,7 +91,7 @@ public class ContainsAllRatherThanLoopCleanUp extends AbstractCollectionMethodRa
 
         MethodInvocation method= as(negation.getOperand(), MethodInvocation.class);
 
-        if (!isMethod(method, "java.util.Collection", "contains", "java.lang.Object")) {
+        if (!isMethod(method, Collection.class.getCanonicalName(), "contains", Object.class.getCanonicalName())) {
             return null;
         }
 

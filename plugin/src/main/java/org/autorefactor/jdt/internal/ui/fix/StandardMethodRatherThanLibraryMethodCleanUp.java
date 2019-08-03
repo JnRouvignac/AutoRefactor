@@ -101,11 +101,11 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
 
     private boolean maybeRefactorMethodInvocation(final MethodInvocation node, final Set<String> classesToUseWithImport,
             final Set<String> importsToAdd) {
-        if (isMethod(node, "org.apache.commons.lang3.ObjectUtils", "hashCode", "java.lang.Object")
-                || isMethod(node, "org.apache.commons.lang3.ObjectUtils", "equals", "java.lang.Object",
-                        "java.lang.Object")
-                || isMethod(node, "org.apache.commons.lang3.ObjectUtils", "toString", "java.lang.Object",
-                        "java.lang.String")) {
+        if (isMethod(node, "org.apache.commons.lang3.ObjectUtils", "hashCode", Object.class.getCanonicalName())
+                || isMethod(node, "org.apache.commons.lang3.ObjectUtils", "equals", Object.class.getCanonicalName(),
+                        Object.class.getCanonicalName())
+                || isMethod(node, "org.apache.commons.lang3.ObjectUtils", "toString", Object.class.getCanonicalName(),
+                        String.class.getCanonicalName())) {
             replaceUtilClass(node, classesToUseWithImport, importsToAdd);
             return false;
         }
@@ -114,9 +114,9 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
         final Name javaUtilObjects= classesToUseWithImport.contains("java.util.Objects") ? b.simpleName("Objects")
                 : b.name("java", "util", "Objects");
 
-        if (isMethod(node, "com.google.common.base.Objects", "equal", "java.lang.Object", "java.lang.Object")
-                || isMethod(node, "com.google.gwt.thirdparty.guava.common.base.Objects", "equal", "java.lang.Object",
-                        "java.lang.Object")) {
+        if (isMethod(node, "com.google.common.base.Objects", "equal", Object.class.getCanonicalName(), Object.class.getCanonicalName())
+                || isMethod(node, "com.google.gwt.thirdparty.guava.common.base.Objects", "equal", Object.class.getCanonicalName(),
+                        Object.class.getCanonicalName())) {
             final Refactorings r= this.ctx.getRefactorings();
 
             r.replace(node, b.invoke(javaUtilObjects, "equals", b.copy((Expression) node.arguments().get(0)),
@@ -125,7 +125,7 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
             return false;
         }
 
-        if (isMethod(node, "org.apache.commons.lang3.ObjectUtils", "toString", "java.lang.Object")) {
+        if (isMethod(node, "org.apache.commons.lang3.ObjectUtils", "toString", Object.class.getCanonicalName())) {
             final Refactorings r= this.ctx.getRefactorings();
 
             r.replace(node,
@@ -134,8 +134,8 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
             return false;
         }
 
-        if (isMethod(node, "com.google.common.base.Objects", "hashCode", "java.lang.Object[]") || isMethod(node,
-                "com.google.gwt.thirdparty.guava.common.base.Objects", "hashCode", "java.lang.Object[]")) {
+        if (isMethod(node, "com.google.common.base.Objects", "hashCode", Object[].class.getCanonicalName()) || isMethod(node,
+                "com.google.gwt.thirdparty.guava.common.base.Objects", "hashCode", Object[].class.getCanonicalName())) {
             final Refactorings r= this.ctx.getRefactorings();
 
             final List<Expression> copyOfArgs= new ArrayList<Expression>(node.arguments().size());
@@ -149,7 +149,7 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
             return false;
         }
 
-        if (isMethod(node, "org.apache.commons.lang3.ObjectUtils", "hashCodeMulti", "java.lang.Object[]")) {
+        if (isMethod(node, "org.apache.commons.lang3.ObjectUtils", "hashCodeMulti", Object[].class.getCanonicalName())) {
             final Refactorings r= this.ctx.getRefactorings();
 
             if (node.getExpression() != null) {
@@ -164,13 +164,13 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
         }
 
         if (isMethod(node, "com.google.common.base.Preconditions", "checkNotNull", "T")
-                || isMethod(node, "com.google.common.base.Preconditions", "checkNotNull", "T", "java.lang.Object")
+                || isMethod(node, "com.google.common.base.Preconditions", "checkNotNull", "T", Object.class.getCanonicalName())
                 || isMethod(node, "com.google.gwt.thirdparty.guava.common.base.Preconditions", "checkNotNull", "T")
                 || isMethod(node, "com.google.gwt.thirdparty.guava.common.base.Preconditions", "checkNotNull", "T",
-                        "java.lang.Object")
+                        Object.class.getCanonicalName())
                 || isMethod(node, "org.apache.commons.lang3.Validate", "notNull", "T")
-                || isMethod(node, "org.apache.commons.lang3.Validate", "notNull", "T", "java.lang.String",
-                        "java.lang.Object[]")) {
+                || isMethod(node, "org.apache.commons.lang3.Validate", "notNull", "T", String.class.getCanonicalName(),
+                        Object[].class.getCanonicalName())) {
             final Refactorings r= this.ctx.getRefactorings();
 
             final List<Expression> copyOfArgs= copyArguments(b, node);

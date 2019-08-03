@@ -35,6 +35,8 @@ import static org.eclipse.jdt.core.dom.InfixExpression.Operator.LESS;
 import static org.eclipse.jdt.core.dom.InfixExpression.Operator.LESS_EQUALS;
 import static org.eclipse.jdt.core.dom.InfixExpression.Operator.NOT_EQUALS;
 
+import java.util.Comparator;
+
 import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.InfixExpression;
@@ -89,10 +91,10 @@ public class ComparisonCleanUp extends AbstractCleanUpRule {
                 return true;
             }
 
-            if (isMethod(comparisonMI, "java.lang.Comparable", "compareTo", "java.lang.Object")
-                    || isMethod(comparisonMI, "java.lang.Comparator", "compare", "java.lang.Object", "java.lang.Object")
+            if (isMethod(comparisonMI, Comparable.class.getCanonicalName(), "compareTo", Object.class.getCanonicalName())
+                    || isMethod(comparisonMI, Comparator.class.getCanonicalName(), "compare", Object.class.getCanonicalName(), Object.class.getCanonicalName())
                     || (getJavaMinorVersion() >= 2
-                            && isMethod(comparisonMI, "java.lang.String", "compareToIgnoreCase", "java.lang.String"))) {
+                            && isMethod(comparisonMI, String.class.getCanonicalName(), "compareToIgnoreCase", String.class.getCanonicalName()))) {
                 final Object literalValue= literal.resolveConstantExpressionValue();
 
                 if (literalValue instanceof Number) {
@@ -121,9 +123,9 @@ public class ComparisonCleanUp extends AbstractCleanUpRule {
 
                     return false;
                 }
-                return true;
             }
         }
+
         return true;
     }
 

@@ -29,12 +29,26 @@ package org.autorefactor.jdt.internal.ui.fix;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.*;
 import static org.autorefactor.util.Utils.getOrDefault;
 
+import java.io.Serializable;
+import java.security.AuthProvider;
+import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.IdentityHashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Properties;
 import java.util.Set;
+import java.util.TreeMap;
+import java.util.WeakHashMap;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.jar.Attributes;
 
 import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
 import org.autorefactor.jdt.internal.corext.dom.Release;
@@ -55,15 +69,15 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
     private static final Map<String, String[]> CAN_BE_CASTED_TO= new HashMap<String, String[]>();
 
     static {
-        CAN_BE_CASTED_TO.put("java.lang.Object", new String[] { "java.lang.Object" });
-        CAN_BE_CASTED_TO.put("java.lang.Cloneable", new String[] { "java.lang.Cloneable", "java.lang.Object" });
-        CAN_BE_CASTED_TO.put("java.io.Serializable", new String[] { "java.io.Serializable", "java.lang.Object" });
-        CAN_BE_CASTED_TO.put("java.util.Map", new String[] { "java.util.Map", "java.lang.Object" });
-        CAN_BE_CASTED_TO.put("java.util.AbstractMap", new String[] { "java.util.AbstractMap", "java.util.Map", "java.lang.Object" });
-        CAN_BE_CASTED_TO.put("java.util.TreeMap", new String[] { "java.util.TreeMap", "java.util.AbstractMap", "java.util.Map", "java.io.Serializable", "java.lang.Cloneable", "java.lang.Object" });
-        CAN_BE_CASTED_TO.put("java.util.HashMap", new String[] { "java.util.HashMap", "java.util.AbstractMap", "java.util.Map", "java.io.Serializable", "java.lang.Cloneable", "java.lang.Object" });
-        CAN_BE_CASTED_TO.put("java.util.EnumMap", new String[] { "java.util.EnumMap", "java.util.AbstractMap", "java.util.Map", "java.io.Serializable", "java.lang.Cloneable", "java.lang.Object" });
-        CAN_BE_CASTED_TO.put("java.util.Hashtable", new String[] { "java.util.Hashtable", "java.util.AbstractMap", "java.util.Map", "java.io.Serializable", "java.lang.Cloneable", "java.lang.Object" });
+        CAN_BE_CASTED_TO.put(Object.class.getCanonicalName(), new String[] { Object.class.getCanonicalName() });
+        CAN_BE_CASTED_TO.put(Cloneable.class.getCanonicalName(), new String[] { Cloneable.class.getCanonicalName(), Object.class.getCanonicalName() });
+        CAN_BE_CASTED_TO.put(Serializable.class.getCanonicalName(), new String[] { Serializable.class.getCanonicalName(), Object.class.getCanonicalName() });
+        CAN_BE_CASTED_TO.put(Map.class.getCanonicalName(), new String[] { Map.class.getCanonicalName(), Object.class.getCanonicalName() });
+        CAN_BE_CASTED_TO.put(AbstractMap.class.getCanonicalName(), new String[] { AbstractMap.class.getCanonicalName(), Map.class.getCanonicalName(), Object.class.getCanonicalName() });
+        CAN_BE_CASTED_TO.put(TreeMap.class.getCanonicalName(), new String[] { TreeMap.class.getCanonicalName(), AbstractMap.class.getCanonicalName(), Map.class.getCanonicalName(), Serializable.class.getCanonicalName(), Cloneable.class.getCanonicalName(), Object.class.getCanonicalName() });
+        CAN_BE_CASTED_TO.put(HashMap.class.getCanonicalName(), new String[] { HashMap.class.getCanonicalName(), AbstractMap.class.getCanonicalName(), Map.class.getCanonicalName(), Serializable.class.getCanonicalName(), Cloneable.class.getCanonicalName(), Object.class.getCanonicalName() });
+        CAN_BE_CASTED_TO.put(EnumMap.class.getCanonicalName(), new String[] { EnumMap.class.getCanonicalName(), AbstractMap.class.getCanonicalName(), Map.class.getCanonicalName(), Serializable.class.getCanonicalName(), Cloneable.class.getCanonicalName(), Object.class.getCanonicalName() });
+        CAN_BE_CASTED_TO.put(Hashtable.class.getCanonicalName(), new String[] { Hashtable.class.getCanonicalName(), AbstractMap.class.getCanonicalName(), Map.class.getCanonicalName(), Serializable.class.getCanonicalName(), Cloneable.class.getCanonicalName(), Object.class.getCanonicalName() });
     }
 
     private ITypeBinding keyType;
@@ -111,7 +125,7 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
 
     @Override
     protected String[] getExistingClassCanonicalName() {
-        return new String[] { "java.util.jar.Attributes", "java.security.AuthProvider", "java.util.concurrent.ConcurrentHashMap", "java.util.concurrent.ConcurrentSkipListMap", "java.util.EnumMap", "java.util.HashMap", "java.util.Hashtable", "java.util.IdentityHashMap", "java.util.LinkedHashMap", "javax.print.attribute.standard.PrinterStateReasons", "java.util.Properties", "java.security.Provider", "java.awt.RenderingHints", "javax.script.SimpleBindings", "javax.management.openmbean.TabularDataSupport", "java.util.TreeMap", "javax.swing.UIDefaults", "java.util.WeakHashMap" };
+        return new String[] { Attributes.class.getCanonicalName(), AuthProvider.class.getCanonicalName(), ConcurrentHashMap.class.getCanonicalName(), ConcurrentSkipListMap.class.getCanonicalName(), EnumMap.class.getCanonicalName(), HashMap.class.getCanonicalName(), Hashtable.class.getCanonicalName(), IdentityHashMap.class.getCanonicalName(), LinkedHashMap.class.getCanonicalName(), "javax.print.attribute.standard.PrinterStateReasons", Properties.class.getCanonicalName(), "java.security.Provider", "java.awt.RenderingHints", "javax.script.SimpleBindings", "javax.management.openmbean.TabularDataSupport", TreeMap.class.getCanonicalName(), "javax.swing.UIDefaults", WeakHashMap.class.getCanonicalName() };
     }
 
     @Override
@@ -160,7 +174,7 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
 
         ITypeBinding[] parameterTypes= instanceCreation.resolveConstructorBinding().getParameterTypes();
 
-        if (parameterTypes.length > 0 && hasType(parameterTypes[0], "java.util.Map")) {
+        if (parameterTypes.length > 0 && hasType(parameterTypes[0], Map.class.getCanonicalName())) {
             ITypeBinding actualParameter= arguments(instanceCreation).get(0).resolveTypeBinding();
 
             if (isParameterizedTypeWithNbArguments(actualParameter, 2)) {
@@ -180,21 +194,21 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
         }
 
         final List<Expression> arguments= arguments(mi);
-        if (isMethod(mi, "java.lang.Object", "equals", "java.lang.Object")
-                || isMethod(mi, "java.lang.Object", "toString") || isMethod(mi, "java.lang.Object", "finalize")
-                || isMethod(mi, "java.lang.Object", "notify") || isMethod(mi, "java.lang.Object", "notifyAll")
-                || isMethod(mi, "java.lang.Object", "size") || isMethod(mi, "java.lang.Object", "wait")
-                || isMethod(mi, "java.lang.Object", "wait", "long")
-                || isMethod(mi, "java.lang.Object", "wait", "long", "int") || isMethod(mi, "java.util.Map", "clear")
-                || isMethod(mi, "java.util.Map", "containsKey", "java.lang.Object")
-                || isMethod(mi, "java.util.Map", "containsValue", "java.lang.Object")
-                || isMethod(mi, "java.util.Map", "equals", "java.lang.Object")
-                || isMethod(mi, "java.util.Map", "forEach", "java.util.function.BiConsumer")
-                || isMethod(mi, "java.util.Map", "hashCode") || isMethod(mi, "java.util.Map", "isEmpty")
-                || isMethod(mi, "java.util.Map", "size")
-                || isMethod(mi, "java.util.Map", "remove", "java.lang.Object", "java.lang.Object")) {
+        if (isMethod(mi, Object.class.getCanonicalName(), "equals", Object.class.getCanonicalName())
+                || isMethod(mi, Object.class.getCanonicalName(), "toString") || isMethod(mi, Object.class.getCanonicalName(), "finalize")
+                || isMethod(mi, Object.class.getCanonicalName(), "notify") || isMethod(mi, Object.class.getCanonicalName(), "notifyAll")
+                || isMethod(mi, Object.class.getCanonicalName(), "size") || isMethod(mi, Object.class.getCanonicalName(), "wait")
+                || isMethod(mi, Object.class.getCanonicalName(), "wait", long.class.getSimpleName())
+                || isMethod(mi, Object.class.getCanonicalName(), "wait", long.class.getSimpleName(), int.class.getSimpleName()) || isMethod(mi, Map.class.getCanonicalName(), "clear")
+                || isMethod(mi, Map.class.getCanonicalName(), "containsKey", Object.class.getCanonicalName())
+                || isMethod(mi, Map.class.getCanonicalName(), "containsValue", Object.class.getCanonicalName())
+                || isMethod(mi, Map.class.getCanonicalName(), "equals", Object.class.getCanonicalName())
+                || isMethod(mi, Map.class.getCanonicalName(), "forEach", "java.util.function.BiConsumer")
+                || isMethod(mi, Map.class.getCanonicalName(), "hashCode") || isMethod(mi, Map.class.getCanonicalName(), "isEmpty")
+                || isMethod(mi, Map.class.getCanonicalName(), "size")
+                || isMethod(mi, Map.class.getCanonicalName(), "remove", Object.class.getCanonicalName(), Object.class.getCanonicalName())) {
             return true;
-        } else if (isMethod(mi, "java.util.Map", "ofEntries", "java.util.Map.Entry[]")) {
+        } else if (isMethod(mi, Map.class.getCanonicalName(), "ofEntries", Entry[].class.getCanonicalName())) {
             final ITypeBinding paramType= arguments.get(0).resolveTypeBinding().getElementType();
 
             if (isParameterizedTypeWithNbArguments(paramType, 2)) {
@@ -202,8 +216,8 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
                 final ITypeBinding newValueType= paramType.getTypeArguments()[1];
                 return resolveKeyTypeCompatible(newKeyType) && resolveValueTypeCompatible(newValueType);
             }
-        } else if (isMethod(mi, "java.util.Map", "putAll", "java.util.Map")
-                || isMethod(mi, "java.util.LinkedHashMap", "removeEldestEntry", "java.util.Map.Entry")) {
+        } else if (isMethod(mi, Map.class.getCanonicalName(), "putAll", Map.class.getCanonicalName())
+                || isMethod(mi, LinkedHashMap.class.getCanonicalName(), "removeEldestEntry", Entry.class.getCanonicalName())) {
             final ITypeBinding paramType= arguments.get(0).resolveTypeBinding();
 
             if (isParameterizedTypeWithNbArguments(paramType, 2)) {
@@ -211,39 +225,39 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
                 final ITypeBinding newValueType= paramType.getTypeArguments()[1];
                 return resolveKeyTypeCompatible(newKeyType) && resolveValueTypeCompatible(newValueType);
             }
-        } else if (isMethod(mi, "java.util.TreeMap", "lastKey") || isMethod(mi, "java.util.TreeMap", "firstKey")) {
+        } else if (isMethod(mi, TreeMap.class.getCanonicalName(), "lastKey") || isMethod(mi, TreeMap.class.getCanonicalName(), "firstKey")) {
             return resolveDestinationTypeCompatibleWithKey(mi);
-        } else if (isMethod(mi, "java.util.Map", "get", "java.lang.Object")
-                || isMethod(mi, "java.util.Map", "remove", "java.lang.Object")) {
+        } else if (isMethod(mi, Map.class.getCanonicalName(), "get", Object.class.getCanonicalName())
+                || isMethod(mi, Map.class.getCanonicalName(), "remove", Object.class.getCanonicalName())) {
             return resolveDestinationTypeCompatibleWithValue(mi);
-        } else if (isMethod(mi, "java.util.Map", "keySet") || isMethod(mi, "java.util.TreeMap", "comparator")
-                || isMethod(mi, "java.util.TreeMap", "descendingKeySet")
-                || isMethod(mi, "java.util.TreeMap", "navigableKeySet")) {
+        } else if (isMethod(mi, Map.class.getCanonicalName(), "keySet") || isMethod(mi, TreeMap.class.getCanonicalName(), "comparator")
+                || isMethod(mi, TreeMap.class.getCanonicalName(), "descendingKeySet")
+                || isMethod(mi, TreeMap.class.getCanonicalName(), "navigableKeySet")) {
             return resolveDestinationParamTypeCompatibleWithKey(mi);
-        } else if (isMethod(mi, "java.util.Map", "values")) {
+        } else if (isMethod(mi, Map.class.getCanonicalName(), "values")) {
             return resolveDestinationParamTypeCompatibleWithValue(mi);
-        } else if (isMethod(mi, "java.util.TreeMap", "descendingMap") || isMethod(mi, "java.util.TreeMap", "firstEntry")
-                || isMethod(mi, "java.util.TreeMap", "lastEntry") || isMethod(mi, "java.util.TreeMap", "pollFirstEntry")
-                || isMethod(mi, "java.util.TreeMap", "pollLastEntry") || isMethod(mi, "java.util.Map", "of")) {
+        } else if (isMethod(mi, TreeMap.class.getCanonicalName(), "descendingMap") || isMethod(mi, TreeMap.class.getCanonicalName(), "firstEntry")
+                || isMethod(mi, TreeMap.class.getCanonicalName(), "lastEntry") || isMethod(mi, TreeMap.class.getCanonicalName(), "pollFirstEntry")
+                || isMethod(mi, TreeMap.class.getCanonicalName(), "pollLastEntry") || isMethod(mi, Map.class.getCanonicalName(), "of")) {
             return resolveDestinationParamTypeCompatibleWithKeyValue(mi);
-        } else if (isMethod(mi, "java.util.TreeMap", "ceilingEntry", "java.lang.Object")
-                || isMethod(mi, "java.util.TreeMap", "floorEntry", "java.lang.Object")
-                || isMethod(mi, "java.util.TreeMap", "headMap", "java.lang.Object")
-                || isMethod(mi, "java.util.TreeMap", "headMap", "java.lang.Object", "boolean")
-                || isMethod(mi, "java.util.TreeMap", "higherEntry", "java.lang.Object")
-                || isMethod(mi, "java.util.TreeMap", "lowerEntry", "java.lang.Object")
-                || isMethod(mi, "java.util.TreeMap", "tailMap", "java.lang.Object")
-                || isMethod(mi, "java.util.TreeMap", "tailMap", "java.lang.Object", "boolean")) {
+        } else if (isMethod(mi, TreeMap.class.getCanonicalName(), "ceilingEntry", Object.class.getCanonicalName())
+                || isMethod(mi, TreeMap.class.getCanonicalName(), "floorEntry", Object.class.getCanonicalName())
+                || isMethod(mi, TreeMap.class.getCanonicalName(), "headMap", Object.class.getCanonicalName())
+                || isMethod(mi, TreeMap.class.getCanonicalName(), "headMap", Object.class.getCanonicalName(), boolean.class.getSimpleName())
+                || isMethod(mi, TreeMap.class.getCanonicalName(), "higherEntry", Object.class.getCanonicalName())
+                || isMethod(mi, TreeMap.class.getCanonicalName(), "lowerEntry", Object.class.getCanonicalName())
+                || isMethod(mi, TreeMap.class.getCanonicalName(), "tailMap", Object.class.getCanonicalName())
+                || isMethod(mi, TreeMap.class.getCanonicalName(), "tailMap", Object.class.getCanonicalName(), boolean.class.getSimpleName())) {
             final ITypeBinding newKeyType= arguments.get(0).resolveTypeBinding();
             return resolveKeyTypeCompatible(newKeyType) && resolveDestinationParamTypeCompatibleWithKeyValue(mi);
-        } else if (isMethod(mi, "java.util.Map", "entry", "java.lang.Object", "java.lang.Object")
-                || isMethod(mi, "java.util.Map", "of", "java.lang.Object", "java.lang.Object")
-                || isMethod(mi, "java.util.TreeMap", "subMap", "java.lang.Object", "java.lang.Object")) {
+        } else if (isMethod(mi, Map.class.getCanonicalName(), "entry", Object.class.getCanonicalName(), Object.class.getCanonicalName())
+                || isMethod(mi, Map.class.getCanonicalName(), "of", Object.class.getCanonicalName(), Object.class.getCanonicalName())
+                || isMethod(mi, TreeMap.class.getCanonicalName(), "subMap", Object.class.getCanonicalName(), Object.class.getCanonicalName())) {
             final ITypeBinding newKeyType= arguments.get(0).resolveTypeBinding();
             final ITypeBinding newValueType= arguments.get(1).resolveTypeBinding();
             return resolveKeyTypeCompatible(newKeyType) && resolveValueTypeCompatible(newValueType)
                     && resolveDestinationParamTypeCompatibleWithKeyValue(mi);
-        } else if (isMethod(mi, "java.util.Map", "entrySet")) {
+        } else if (isMethod(mi, Map.class.getCanonicalName(), "entrySet")) {
             if (isExprReceived(mi)) {
                 final ITypeBinding newTargetType= getDestinationType(mi);
 
@@ -258,66 +272,66 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
             } else {
                 return true;
             }
-        } else if (isMethod(mi, "java.util.TreeMap", "ceilingKey", "java.lang.Object")
-                || isMethod(mi, "java.util.TreeMap", "floorKey", "java.lang.Object")
-                || isMethod(mi, "java.util.TreeMap", "higherKey", "java.lang.Object")
-                || isMethod(mi, "java.util.TreeMap", "lowerKey", "java.lang.Object")) {
+        } else if (isMethod(mi, TreeMap.class.getCanonicalName(), "ceilingKey", Object.class.getCanonicalName())
+                || isMethod(mi, TreeMap.class.getCanonicalName(), "floorKey", Object.class.getCanonicalName())
+                || isMethod(mi, TreeMap.class.getCanonicalName(), "higherKey", Object.class.getCanonicalName())
+                || isMethod(mi, TreeMap.class.getCanonicalName(), "lowerKey", Object.class.getCanonicalName())) {
             return resolveKeyTypeCompatible(arguments.get(0).resolveTypeBinding())
                     && resolveDestinationTypeCompatibleWithKey(mi);
-        } else if (isMethod(mi, "java.util.Map", "getOrDefault", "java.lang.Object", "java.lang.Object")) {
+        } else if (isMethod(mi, Map.class.getCanonicalName(), "getOrDefault", Object.class.getCanonicalName(), Object.class.getCanonicalName())) {
             return resolveValueTypeCompatible(arguments.get(1).resolveTypeBinding())
                     && resolveDestinationTypeCompatibleWithValue(mi);
-        } else if (isMethod(mi, "java.util.Map", "put", "java.lang.Object", "java.lang.Object")
-                || isMethod(mi, "java.util.Map", "putIfAbsent", "java.lang.Object", "java.lang.Object")
-                || isMethod(mi, "java.util.Map", "replace", "java.lang.Object", "java.lang.Object")) {
+        } else if (isMethod(mi, Map.class.getCanonicalName(), "put", Object.class.getCanonicalName(), Object.class.getCanonicalName())
+                || isMethod(mi, Map.class.getCanonicalName(), "putIfAbsent", Object.class.getCanonicalName(), Object.class.getCanonicalName())
+                || isMethod(mi, Map.class.getCanonicalName(), "replace", Object.class.getCanonicalName(), Object.class.getCanonicalName())) {
             return resolveKeyTypeCompatible(arguments.get(0).resolveTypeBinding())
                     && resolveValueTypeCompatible(arguments.get(1).resolveTypeBinding())
                     && resolveDestinationTypeCompatibleWithValue(mi);
-        } else if (isMethod(mi, "java.util.Map", "replace", "java.lang.Object", "java.lang.Object",
-                "java.lang.Object")) {
+        } else if (isMethod(mi, Map.class.getCanonicalName(), "replace", Object.class.getCanonicalName(), Object.class.getCanonicalName(),
+                Object.class.getCanonicalName())) {
             return resolveKeyTypeCompatible(arguments.get(0).resolveTypeBinding())
                     && resolveValueTypeCompatible(arguments.get(1).resolveTypeBinding())
                     && resolveValueTypeCompatible(arguments.get(2).resolveTypeBinding());
-        } else if (isMethod(mi, "java.util.TreeMap", "subMap", "java.lang.Object", "boolean", "java.lang.Object",
-                "boolean")) {
+        } else if (isMethod(mi, TreeMap.class.getCanonicalName(), "subMap", Object.class.getCanonicalName(), boolean.class.getSimpleName(), Object.class.getCanonicalName(),
+                boolean.class.getSimpleName())) {
             final ITypeBinding newKeyType= arguments.get(0).resolveTypeBinding();
             final ITypeBinding newValueType= arguments.get(2).resolveTypeBinding();
             return resolveKeyTypeCompatible(newKeyType) && resolveValueTypeCompatible(newValueType)
                     && resolveDestinationParamTypeCompatibleWithKeyValue(mi);
-        } else if (isMethod(mi, "java.util.Map", "of", "java.lang.Object", "java.lang.Object", "java.lang.Object",
-                "java.lang.Object")
-                || isMethod(mi, "java.util.Map", "of", "java.lang.Object", "java.lang.Object", "java.lang.Object",
-                        "java.lang.Object", "java.lang.Object", "java.lang.Object")
-                || isMethod(mi, "java.util.Map", "of", "java.lang.Object", "java.lang.Object", "java.lang.Object",
-                        "java.lang.Object", "java.lang.Object", "java.lang.Object", "java.lang.Object",
-                        "java.lang.Object")
-                || isMethod(mi, "java.util.Map", "of", "java.lang.Object", "java.lang.Object", "java.lang.Object",
-                        "java.lang.Object", "java.lang.Object", "java.lang.Object", "java.lang.Object",
-                        "java.lang.Object", "java.lang.Object", "java.lang.Object")
-                || isMethod(mi, "java.util.Map", "of", "java.lang.Object", "java.lang.Object", "java.lang.Object",
-                        "java.lang.Object", "java.lang.Object", "java.lang.Object", "java.lang.Object",
-                        "java.lang.Object", "java.lang.Object", "java.lang.Object", "java.lang.Object",
-                        "java.lang.Object")
-                || isMethod(mi, "java.util.Map", "of", "java.lang.Object", "java.lang.Object", "java.lang.Object",
-                        "java.lang.Object", "java.lang.Object", "java.lang.Object", "java.lang.Object",
-                        "java.lang.Object", "java.lang.Object", "java.lang.Object", "java.lang.Object",
-                        "java.lang.Object", "java.lang.Object", "java.lang.Object")
-                || isMethod(mi, "java.util.Map", "of", "java.lang.Object", "java.lang.Object", "java.lang.Object",
-                        "java.lang.Object", "java.lang.Object", "java.lang.Object", "java.lang.Object",
-                        "java.lang.Object", "java.lang.Object", "java.lang.Object", "java.lang.Object",
-                        "java.lang.Object", "java.lang.Object", "java.lang.Object", "java.lang.Object",
-                        "java.lang.Object")
-                || isMethod(mi, "java.util.Map", "of", "java.lang.Object", "java.lang.Object", "java.lang.Object",
-                        "java.lang.Object", "java.lang.Object", "java.lang.Object", "java.lang.Object",
-                        "java.lang.Object", "java.lang.Object", "java.lang.Object", "java.lang.Object",
-                        "java.lang.Object", "java.lang.Object", "java.lang.Object", "java.lang.Object",
-                        "java.lang.Object", "java.lang.Object", "java.lang.Object")
-                || isMethod(mi, "java.util.Map", "of", "java.lang.Object", "java.lang.Object", "java.lang.Object",
-                        "java.lang.Object", "java.lang.Object", "java.lang.Object", "java.lang.Object",
-                        "java.lang.Object", "java.lang.Object", "java.lang.Object", "java.lang.Object",
-                        "java.lang.Object", "java.lang.Object", "java.lang.Object", "java.lang.Object",
-                        "java.lang.Object", "java.lang.Object", "java.lang.Object", "java.lang.Object",
-                        "java.lang.Object")) {
+        } else if (isMethod(mi, Map.class.getCanonicalName(), "of", Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(),
+                Object.class.getCanonicalName())
+                || isMethod(mi, Map.class.getCanonicalName(), "of", Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(),
+                        Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName())
+                || isMethod(mi, Map.class.getCanonicalName(), "of", Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(),
+                        Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(),
+                        Object.class.getCanonicalName())
+                || isMethod(mi, Map.class.getCanonicalName(), "of", Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(),
+                        Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(),
+                        Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName())
+                || isMethod(mi, Map.class.getCanonicalName(), "of", Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(),
+                        Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(),
+                        Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(),
+                        Object.class.getCanonicalName())
+                || isMethod(mi, Map.class.getCanonicalName(), "of", Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(),
+                        Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(),
+                        Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(),
+                        Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName())
+                || isMethod(mi, Map.class.getCanonicalName(), "of", Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(),
+                        Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(),
+                        Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(),
+                        Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(),
+                        Object.class.getCanonicalName())
+                || isMethod(mi, Map.class.getCanonicalName(), "of", Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(),
+                        Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(),
+                        Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(),
+                        Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(),
+                        Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName())
+                || isMethod(mi, Map.class.getCanonicalName(), "of", Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(),
+                        Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(),
+                        Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(),
+                        Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(),
+                        Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(),
+                        Object.class.getCanonicalName())) {
             final Iterator<Expression> argumentIterator= arguments.iterator();
 
             final List<ITypeBinding> keyTypes= new ArrayList<ITypeBinding>();
@@ -341,8 +355,8 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
             }
 
             return resolveDestinationParamTypeCompatibleWithKeyValue(mi);
-        } else if (isMethod(mi, "java.util.Map", "compute", "java.lang.Object", "java.util.function.BiFunction")
-                || isMethod(mi, "java.util.Map", "computeIfPresent", "java.lang.Object",
+        } else if (isMethod(mi, Map.class.getCanonicalName(), "compute", Object.class.getCanonicalName(), "java.util.function.BiFunction")
+                || isMethod(mi, Map.class.getCanonicalName(), "computeIfPresent", Object.class.getCanonicalName(),
                         "java.util.function.BiFunction")) {
             final ITypeBinding paramType= arguments.get(1).resolveTypeBinding();
 
@@ -352,7 +366,7 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
                 return resolveKeyTypeCompatible(arguments.get(0).resolveTypeBinding())
                         && resolveValueTypeCompatible(newValueType) && resolveDestinationTypeCompatibleWithValue(mi);
             }
-        } else if (isMethod(mi, "java.util.Map", "computeIfAbsent", "java.lang.Object",
+        } else if (isMethod(mi, Map.class.getCanonicalName(), "computeIfAbsent", Object.class.getCanonicalName(),
                 "java.util.function.Function")) {
             final ITypeBinding paramType= arguments.get(1).resolveTypeBinding();
 
@@ -362,7 +376,7 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
                 return resolveKeyTypeCompatible(arguments.get(0).resolveTypeBinding())
                         && resolveValueTypeCompatible(newValueType) && resolveDestinationTypeCompatibleWithValue(mi);
             }
-        } else if (isMethod(mi, "java.util.Map", "merge", "java.lang.Object", "java.lang.Object",
+        } else if (isMethod(mi, Map.class.getCanonicalName(), "merge", Object.class.getCanonicalName(), Object.class.getCanonicalName(),
                 "java.util.function.BiFunction")) {
             final ITypeBinding paramType= arguments.get(2).resolveTypeBinding();
 
@@ -373,7 +387,7 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
                         && resolveValueTypeCompatible(arguments.get(1).resolveTypeBinding())
                         && resolveValueTypeCompatible(newValueType) && resolveDestinationTypeCompatibleWithValue(mi);
             }
-        } else if (isMethod(mi, "java.util.Map", "replaceAll", "java.util.function.BiFunction")) {
+        } else if (isMethod(mi, Map.class.getCanonicalName(), "replaceAll", "java.util.function.BiFunction")) {
             final ITypeBinding paramType= arguments.get(0).resolveTypeBinding();
 
             if (isParameterizedTypeWithNbArguments(paramType, 3)) {
@@ -443,7 +457,7 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
         if (newElementType.isPrimitive()) {
             newElementType= getBoxedTypeBinding(newElementType, ctx.getAST());
         }
-        if (!hasType(newElementType, "java.lang.Object") && (keyType == null || newElementType.equals(keyType))) {
+        if (!hasType(newElementType, Object.class.getCanonicalName()) && (keyType == null || newElementType.equals(keyType))) {
             keyType= newElementType;
             return true;
         }
@@ -457,7 +471,7 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
         if (newElementType.isPrimitive()) {
             newElementType= getBoxedTypeBinding(newElementType, ctx.getAST());
         }
-        if (!hasType(newElementType, "java.lang.Object") && (valueType == null || newElementType.equals(valueType))) {
+        if (!hasType(newElementType, Object.class.getCanonicalName()) && (valueType == null || newElementType.equals(valueType))) {
             valueType= newElementType;
             return true;
         }

@@ -177,7 +177,7 @@ public class RedundantModifiersCleanUp extends AbstractCleanUpRule {
         if (node instanceof TypeDeclaration) {
             TypeDeclaration clazz= (TypeDeclaration) node;
             return isFinalClass(clazz) && clazz.superInterfaceTypes().isEmpty() && (clazz.getSuperclassType() == null
-                    || hasType(clazz.getSuperclassType().resolveBinding(), "java.lang.Object"));
+                    || hasType(clazz.getSuperclassType().resolveBinding(), Object.class.getCanonicalName()));
         }
 
         return false;

@@ -111,7 +111,7 @@ public class ImplicitDefaultConstructorRatherThanWrittenOneCleanUp extends Abstr
 
             if (uniqueConstructor != null
                     && (!isCheckedExceptionThrown(uniqueConstructor) || node.getSuperclassType() == null
-                            || hasType(node.getSuperclassType().resolveBinding(), "java.lang.Object"))
+                            || hasType(node.getSuperclassType().resolveBinding(), Object.class.getCanonicalName()))
                     && (uniqueConstructor.parameters() == null || uniqueConstructor.parameters().isEmpty())
                     && isDefaultStmts(uniqueConstructor)) {
                 if (uniqueConstructor.modifiers() != null && uniqueConstructor.modifiers().size() == 1) {
@@ -164,6 +164,6 @@ public class ImplicitDefaultConstructorRatherThanWrittenOneCleanUp extends Abstr
 
     private boolean isChecked(Type type) {
         final ITypeBinding binding= type.resolveBinding();
-        return !instanceOf(binding, "java.lang.RuntimeException") && !instanceOf(binding, "java.lang.Error");
+        return !instanceOf(binding, RuntimeException.class.getCanonicalName()) && !instanceOf(binding, Error.class.getCanonicalName());
     }
 }

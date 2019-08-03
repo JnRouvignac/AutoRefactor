@@ -85,12 +85,12 @@ public class BooleanPrimitiveRatherThanWrapperCleanUp extends AbstractPrimitiveR
 
     @Override
     public String getWrapperFullyQualifiedName() {
-        return "java.lang.Boolean";
+        return Boolean.class.getCanonicalName();
     }
 
     @Override
     public String getPrimitiveTypeName() {
-        return "boolean";
+        return boolean.class.getSimpleName();
     }
 
     @Override

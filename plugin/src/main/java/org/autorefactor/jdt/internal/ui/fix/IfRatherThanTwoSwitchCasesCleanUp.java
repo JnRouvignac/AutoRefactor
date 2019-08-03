@@ -251,8 +251,8 @@ public class IfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRule {
     private Expression buildEquality(final ASTBuilder b, final Expression discriminant, final Expression value) {
         final Expression equality;
 
-        if (hasType(value, "java.lang.String", "java.lang.Boolean", "java.lang.Byte", "java.lang.Character",
-                "java.lang.Double", "java.lang.Float", "java.lang.Integer", "java.lang.Long", "java.lang.Short")) {
+        if (hasType(value, String.class.getCanonicalName(), Boolean.class.getCanonicalName(), Byte.class.getCanonicalName(), Character.class.getCanonicalName(),
+                Double.class.getCanonicalName(), Float.class.getCanonicalName(), Integer.class.getCanonicalName(), Long.class.getCanonicalName(), Short.class.getCanonicalName())) {
             equality= b.invoke(b.copy(value), "equals", b.copy(discriminant));
         } else if (value.resolveTypeBinding() != null && value.resolveTypeBinding().isEnum()) {
             equality= b.infixExpr(b.copy(discriminant), InfixExpression.Operator.EQUALS, b.getAST().newQualifiedName(

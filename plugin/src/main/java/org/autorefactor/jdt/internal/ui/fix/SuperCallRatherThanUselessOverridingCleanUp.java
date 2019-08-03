@@ -180,7 +180,7 @@ public class SuperCallRatherThanUselessOverridingCleanUp extends AbstractCleanUp
         for (final IAnnotationBinding annotation : methodBinding.getAnnotations()) {
             final ITypeBinding annotationType= annotation.getAnnotationType();
 
-            if (!hasType(annotationType, "java.lang.Override", "java.lang.SuppressWarnings")) {
+            if (!hasType(annotationType, Override.class.getCanonicalName(), SuppressWarnings.class.getCanonicalName())) {
                 return true;
             }
         }

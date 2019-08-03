@@ -30,7 +30,10 @@ import static org.junit.Assert.assertEquals;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.TreeSet;
+import java.util.concurrent.Callable;
 
 import org.autorefactor.jdt.internal.corext.dom.TypeNameDecider;
 import org.eclipse.jdt.core.dom.ITypeBinding;
@@ -54,15 +57,15 @@ public class TypeNameDeciderTest {
 
     @Parameters // (name = "{0} + imports{1} => {2}")
     public static Collection<Object[]> data() {
-        return Arrays.asList(new Object[][] { { "java.util.Map", imports(), "java.util.Map" },
-                { "java.util.Map", imports("java.util.Map"), "Map" },
-                { "java.util.Map", imports("java.util.*"), "Map" },
-                { "java.util.Map.Entry", imports(), "java.util.Map.Entry" },
-                { "java.util.Map.Entry", imports("java.util.Map"), "Map.Entry" },
-                { "java.util.Map.Entry", imports("java.util.*"), "Map.Entry" },
-                { "java.util.Map.Entry", imports("java.util.Map.Entry"), "Entry" },
-                { "java.util.Map.Entry", imports("java.util.Map.*"), "Entry" },
-                { "java.util.concurrent.Callable", imports("java.util.*"), "java.util.concurrent.Callable" }, });
+        return Arrays.asList(new Object[][] { { Map.class.getCanonicalName(), imports(), Map.class.getCanonicalName() },
+                { Map.class.getCanonicalName(), imports(Map.class.getCanonicalName()), "Map" },
+                { Map.class.getCanonicalName(), imports("java.util.*"), "Map" },
+                { Entry.class.getCanonicalName(), imports(), Entry.class.getCanonicalName() },
+                { Entry.class.getCanonicalName(), imports(Map.class.getCanonicalName()), "Map.Entry" },
+                { Entry.class.getCanonicalName(), imports("java.util.*"), "Map.Entry" },
+                { Entry.class.getCanonicalName(), imports(Entry.class.getCanonicalName()), "Entry" },
+                { Entry.class.getCanonicalName(), imports("java.util.Map.*"), "Entry" },
+                { Callable.class.getCanonicalName(), imports("java.util.*"), Callable.class.getCanonicalName() }, });
     }
 
     @Test

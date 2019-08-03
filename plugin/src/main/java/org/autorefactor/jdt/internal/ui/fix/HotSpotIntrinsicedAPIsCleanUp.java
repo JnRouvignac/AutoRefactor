@@ -289,7 +289,7 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
 
         if (initializer0 instanceof VariableDeclarationExpression) {
             final VariableDeclarationExpression vde= (VariableDeclarationExpression) initializer0;
-            if (isPrimitive(vde, "int") && fragments(vde).size() == 1) {
+            if (isPrimitive(vde, int.class.getSimpleName()) && fragments(vde).size() == 1) {
                 // This must be the array index
                 VariableDeclarationFragment vdf= fragments(vde).get(0);
                 if (vdf.getExtraDimensions() == 0) {
@@ -299,7 +299,7 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
             }
         } else if (initializer0 instanceof Assignment) {
             final Assignment as= (Assignment) initializer0;
-            if (hasOperator(as, ASSIGN) && isPrimitive(as.resolveTypeBinding(), "int")) {
+            if (hasOperator(as, ASSIGN) && isPrimitive(as.resolveTypeBinding(), int.class.getSimpleName())) {
                 // This must be the array index
                 params.indexStartPos= as.getRightHandSide();
                 final Expression lhs= as.getLeftHandSide();

@@ -35,6 +35,9 @@ import static org.eclipse.jdt.core.dom.InfixExpression.Operator.LESS;
 import static org.eclipse.jdt.core.dom.InfixExpression.Operator.LESS_EQUALS;
 import static org.eclipse.jdt.core.dom.InfixExpression.Operator.NOT_EQUALS;
 
+import java.util.Collection;
+import java.util.Map;
+
 import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
 import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.eclipse.jdt.core.dom.Expression;
@@ -93,8 +96,8 @@ public class IsEmptyRatherThanSizeCleanUp extends AbstractCleanUpRule {
 
     private boolean maybeReplaceCollectionSize(final InfixExpression node, final MethodInvocation miToReplace,
             final Operator operator, final Long literalSize) {
-        if ((isMethod(miToReplace, "java.util.Collection", "size") || isMethod(miToReplace, "java.util.Map", "size")
-                || (isMethod(miToReplace, "java.lang.String", "length") && getJavaMinorVersion() >= 6))
+        if ((isMethod(miToReplace, Collection.class.getCanonicalName(), "size") || isMethod(miToReplace, Map.class.getCanonicalName(), "size")
+                || (isMethod(miToReplace, String.class.getCanonicalName(), "length") && getJavaMinorVersion() >= 6))
                 && literalSize != null) {
             final Refactorings r= this.ctx.getRefactorings();
             final ASTBuilder b= this.ctx.getASTBuilder();
