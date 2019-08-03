@@ -26,8 +26,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.areBindingsEqual;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.arg0;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.asList;
@@ -185,7 +183,7 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
                     if (binding.getKind() == IBinding.VARIABLE) {
                         addResult(((IVariableBinding) binding).getName());
                     }
-                    return VISIT_SUBTREE;
+                    return true;
                 }
             }.collect(namingScope);
         }
@@ -203,7 +201,7 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
                     if (binding.getKind() == IBinding.VARIABLE) {
                         addResult(((IVariableBinding) binding).getName());
                     }
-                    return VISIT_SUBTREE;
+                    return true;
                 }
             }.collect(scope);
         }
@@ -231,18 +229,18 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
             final Expression mapExpression= ((MethodInvocation) foreachExpr).getExpression();
             if (mapExpression == null) {
                 // not implemented
-                return VISIT_SUBTREE;
+                return true;
             }
             final SingleVariableDeclaration parameter= enhancedFor.getParameter();
             final List<MethodInvocation> getValueMis= collectMapGetValueCalls(mapExpression, parameter,
                     enhancedFor.getBody());
             if (!getValueMis.isEmpty() && haveSameTypeBindings(getValueMis)) {
                 replaceEntryIterationByKeyIteration(enhancedFor, mapExpression, parameter, getValueMis);
-                return DO_NOT_VISIT_SUBTREE;
+                return false;
             }
         }
 
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private void replaceEntryIterationByKeyIteration(EnhancedForStatement enhancedFor, final Expression mapExpression,
@@ -421,7 +419,7 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
                     && isSameVariable(arg0(node), forEachParameter.getName())) {
                 addResult(node);
             }
-            return VISIT_SUBTREE;
+            return true;
         }
 
         private boolean isSameReference(Expression expr1, Expression expr2) {

@@ -25,7 +25,6 @@
  */
 package org.autorefactor.jdt.internal.corext.dom;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
 import static org.autorefactor.jdt.internal.corext.dom.SourceLocation.getEndPosition;
 
 import java.util.ArrayList;
@@ -176,8 +175,8 @@ public class ASTCommentRewriter {
         edits.accept(new TextEditVisitor() {
             @Override
             public boolean visit(MultiTextEdit edit) {
-                // move on there is nothing to check here
-                return VISIT_SUBTREE;
+                // Move on there is nothing to check here
+                return true;
             }
 
             @Override
@@ -203,7 +202,7 @@ public class ASTCommentRewriter {
             final int start= node.getStartPosition();
             final int length= node.getLength();
 
-            // chomp from the end before the start variable gets modified
+            // Chomp from the end before the start variable gets modified
             final int startToRemove= chompWhitespacesBefore(source, start);
             final int endToRemove= chompWhitespacesAfter(source, start + length);
             final int lengthToRemove= endToRemove - startToRemove;
@@ -269,13 +268,13 @@ public class ASTCommentRewriter {
         // TODO JNR how to obey configured line length?
         final int commentStart= lineComment.getStartPosition();
         if (commentStart < nodeStart) {
-            // assume comment is situated exactly before target node for javadoc
+            // Assume comment is situated exactly before target node for javadoc
             final String spaceAtStart= getSpaceAtStart(source, lineComment);
             commentEdits.add(new ReplaceEdit(commentStart, "//".length(), "/**" + spaceAtStart));
             commentEdits.add(new InsertEdit(getEndPosition(lineComment), getSpaceAtEnd(source, lineComment) + "*/"));
             replaceEndsOfBlockCommentFromCommentText(commentEdits, lineComment, source);
         } else {
-            // assume comment is situated exactly after target node for javadoc
+            // Assume comment is situated exactly after target node for javadoc
             final StringBuilder newJavadoc= new StringBuilder("/**").append(getSpaceAtStart(source, lineComment));
 
             appendCommentTextReplaceEndsOfBlockComment(newJavadoc, lineComment, source);
@@ -411,7 +410,7 @@ public class ASTCommentRewriter {
 
     private SourceLocation getIndent(ASTNode node, TreeSet<Integer> lineStarts) {
         if (lineStarts.isEmpty()) {
-            // no match, return empty range
+            // No match, return empty range
             return SourceLocation.fromPositions(0, 0);
         }
 
@@ -449,7 +448,7 @@ public class ASTCommentRewriter {
             end= i;
             // TODO JNR how to get project specific newline separator?? @see #lineSeparator
             if (c == '\n') {
-                // we chomped the newline character, do not chomp on the next line
+                // We chomped the newline character, do not chomp on the next line
                 break;
             }
         }

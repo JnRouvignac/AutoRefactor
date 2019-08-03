@@ -25,9 +25,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
-
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -91,11 +88,7 @@ public abstract class NewClassImportCleanUp extends AbstractCleanUpRule {
         public boolean visit(TypeDeclaration nestedClass) {
             classnamesNeverUsedLocally.remove(nestedClass.getName().getIdentifier());
 
-            if (classnamesNeverUsedLocally.isEmpty()) {
-                return interruptVisit();
-            }
-
-            return VISIT_SUBTREE;
+            return !classnamesNeverUsedLocally.isEmpty() || interruptVisit();
         }
 
         @Override
@@ -108,7 +101,7 @@ public abstract class NewClassImportCleanUp extends AbstractCleanUpRule {
                 }
             }
 
-            return VISIT_SUBTREE;
+            return true;
         }
 
         /**
@@ -154,14 +147,14 @@ public abstract class NewClassImportCleanUp extends AbstractCleanUpRule {
 
     @Override
     public boolean visit(final CompilationUnit node) {
-        if (super.visit(node) == DO_NOT_VISIT_SUBTREE) {
-            return DO_NOT_VISIT_SUBTREE;
+        if (!super.visit(node)) {
+            return false;
         }
 
         final Set<String> classesToUse= getClassesToImport();
 
         if (classesToUse.isEmpty()) {
-            return VISIT_SUBTREE;
+            return true;
         }
 
         final Map<String, String> importsByClassname= new HashMap<String, String>();
@@ -210,11 +203,11 @@ public abstract class NewClassImportCleanUp extends AbstractCleanUpRule {
                     r.getImportRewrite().addImport(importToAdd);
                 }
 
-                return DO_NOT_VISIT_SUBTREE;
+                return false;
             }
         }
 
-        return VISIT_SUBTREE;
+        return true;
     }
 
     /**

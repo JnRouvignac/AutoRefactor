@@ -25,8 +25,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.asList;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getLocalVariableIdentifiers;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasType;
@@ -90,15 +88,12 @@ public class BreakRatherThanPassiveIterationsCleanUp extends AbstractCleanUpRule
                 return interruptVisit();
             }
 
-            return VISIT_SUBTREE;
+            return true;
         }
 
         @Override
         public boolean visit(final PrefixExpression node) {
-            if (INCREMENT.equals(node.getOperator()) || DECREMENT.equals(node.getOperator())) {
-                return visitVar(node.getOperand());
-            }
-            return VISIT_SUBTREE;
+            return !(INCREMENT.equals(node.getOperator()) || DECREMENT.equals(node.getOperator())) || visitVar(node.getOperand());
         }
 
         @Override
@@ -116,7 +111,7 @@ public class BreakRatherThanPassiveIterationsCleanUp extends AbstractCleanUpRule
                 hasSideEffect= true;
                 return interruptVisit();
             }
-            return VISIT_SUBTREE;
+            return true;
         }
 
         private boolean mayCallImplicitToString(final List<Expression> extendedOperands) {
@@ -198,12 +193,12 @@ public class BreakRatherThanPassiveIterationsCleanUp extends AbstractCleanUpRule
         }
 
         if (hasSideEffect(node.getExpression(), vars)) {
-            return VISIT_SUBTREE;
+            return true;
         }
 
         for (final Expression updater : updaters(node)) {
             if (hasSideEffect(updater, vars)) {
-                return VISIT_SUBTREE;
+                return true;
             }
         }
 
@@ -218,18 +213,14 @@ public class BreakRatherThanPassiveIterationsCleanUp extends AbstractCleanUpRule
 
     @Override
     public boolean visit(final EnhancedForStatement node) {
-        if (isArray(node.getExpression())) {
-            return visitLoopBody(node.getBody(), new HashSet<String>());
-        }
-
-        return VISIT_SUBTREE;
+        return !isArray(node.getExpression()) || visitLoopBody(node.getBody(), new HashSet<String>());
     }
 
     private boolean visitLoopBody(final Statement body, final Set<String> allowedVars) {
         final List<Statement> stmts= asList(body);
 
         if (stmts == null || stmts.isEmpty()) {
-            return VISIT_SUBTREE;
+            return true;
         }
 
         for (int i= 0; i < stmts.size() - 1; i++) {
@@ -237,7 +228,7 @@ public class BreakRatherThanPassiveIterationsCleanUp extends AbstractCleanUpRule
             allowedVars.addAll(getLocalVariableIdentifiers(stmt, true));
 
             if (hasSideEffect(stmt, allowedVars)) {
-                return VISIT_SUBTREE;
+                return true;
             }
         }
 
@@ -255,7 +246,7 @@ public class BreakRatherThanPassiveIterationsCleanUp extends AbstractCleanUpRule
                             final VariableDeclarationFragment fragment= (VariableDeclarationFragment) obj;
 
                             if (!isHardCoded(fragment.getInitializer())) {
-                                return VISIT_SUBTREE;
+                                return true;
                             }
                         }
                     } else if (stmt instanceof ExpressionStatement) {
@@ -265,22 +256,22 @@ public class BreakRatherThanPassiveIterationsCleanUp extends AbstractCleanUpRule
                             final Assignment assignment= (Assignment) expr;
 
                             if (!isHardCoded(assignment.getRightHandSide())) {
-                                return VISIT_SUBTREE;
+                                return true;
                             }
                         } else {
-                            return VISIT_SUBTREE;
+                            return true;
                         }
                     } else {
-                        return VISIT_SUBTREE;
+                        return true;
                     }
                 }
 
                 addBreak(ifStmt, assignments);
-                return DO_NOT_VISIT_SUBTREE;
+                return false;
             }
         }
 
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private void addBreak(final IfStatement ifStmt, final List<Statement> assignments) {

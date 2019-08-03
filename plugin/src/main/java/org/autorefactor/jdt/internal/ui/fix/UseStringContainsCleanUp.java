@@ -25,8 +25,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasOperator;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isMethod;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.removeParentheses;
@@ -84,7 +82,7 @@ public class UseStringContainsCleanUp extends AbstractCleanUpRule {
                 return replaceWithStringContains(ie, node, true);
             }
         }
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private boolean replaceWithStringContains(InfixExpression ie, MethodInvocation node, boolean negate) {
@@ -96,7 +94,7 @@ public class UseStringContainsCleanUp extends AbstractCleanUpRule {
         } else {
             r.replace(ie, b.move(node));
         }
-        return DO_NOT_VISIT_SUBTREE;
+        return false;
     }
 
     private boolean is(final InfixExpression ie, MethodInvocation node, Operator operator, Integer constant) {

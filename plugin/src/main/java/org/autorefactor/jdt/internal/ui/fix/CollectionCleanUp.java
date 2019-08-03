@@ -26,8 +26,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.arg0;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.arguments;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.as;
@@ -119,7 +117,7 @@ public class CollectionCleanUp extends AbstractCleanUpRule {
                     }
                 }
             }
-            return VISIT_SUBTREE;
+            return true;
         }
 
         private boolean replaceInitializer(Expression nodeToReplace, final Expression arg0,
@@ -129,10 +127,10 @@ public class CollectionCleanUp extends AbstractCleanUpRule {
                 final ASTBuilder b= ctx.getASTBuilder();
                 ctx.getRefactorings().replace(nodeToReplace, b.new0(b.copy(cic.getType()), b.copy(arg0)));
                 ctx.getRefactorings().remove(nodeToRemove);
-                setResult(DO_NOT_VISIT_SUBTREE);
-                return DO_NOT_VISIT_SUBTREE;
+                setResult(false);
+                return false;
             }
-            return VISIT_SUBTREE;
+            return true;
         }
 
         private boolean canReplaceInitializer(final ClassInstanceCreation cic, Expression sourceCollection) {

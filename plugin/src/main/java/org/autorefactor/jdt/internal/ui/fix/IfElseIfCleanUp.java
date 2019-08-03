@@ -25,8 +25,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.statements;
 import static org.eclipse.jdt.core.dom.IfStatement.ELSE_STATEMENT_PROPERTY;
 
@@ -112,9 +110,9 @@ public class IfElseIfCleanUp extends AbstractCleanUpRule {
             if (elseStmts.size() == 1 && elseStmts.get(0) instanceof IfStatement) {
                 final ASTBuilder b= this.ctx.getASTBuilder();
                 this.ctx.getRefactorings().set(node, ELSE_STATEMENT_PROPERTY, b.copy(elseStmts.get(0)));
-                return DO_NOT_VISIT_SUBTREE;
+                return false;
             }
         }
-        return VISIT_SUBTREE;
+        return true;
     }
 }

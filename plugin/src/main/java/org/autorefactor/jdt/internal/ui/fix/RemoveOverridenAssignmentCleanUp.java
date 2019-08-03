@@ -25,8 +25,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.asExpression;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getNextSibling;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasOperator;
@@ -99,10 +97,10 @@ public class RemoveOverridenAssignmentCleanUp extends AbstractCleanUpRule {
 
                 if (isOverridden && !isRead) {
                     ctx.getRefactorings().remove(fragment.getInitializer());
-                    return DO_NOT_VISIT_SUBTREE;
+                    return false;
                 }
             }
         }
-        return VISIT_SUBTREE;
+        return true;
     }
 }

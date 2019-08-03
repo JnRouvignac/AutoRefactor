@@ -25,8 +25,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isPassive;
 
 import java.util.List;
@@ -83,13 +81,13 @@ public class RemoveEmptyStatementCleanUp extends AbstractCleanUpRule {
 
             if (isThenEmpty && (isElseEmpty || node.getElseStatement() == null)) {
                 this.ctx.getRefactorings().remove(node);
-                return DO_NOT_VISIT_SUBTREE;
+                return false;
             } else if (isElseEmpty) {
                 this.ctx.getRefactorings().remove(node.getElseStatement());
-                return DO_NOT_VISIT_SUBTREE;
+                return false;
             }
         }
-        return VISIT_SUBTREE;
+        return true;
     }
 
     @Override
@@ -97,7 +95,7 @@ public class RemoveEmptyStatementCleanUp extends AbstractCleanUpRule {
         if (isPassive(node.getExpression()) && node.getExpression().resolveTypeBinding().isArray()) {
             return maybeRemoveStmtWithEmptyBody(node, node.getBody());
         }
-        return VISIT_SUBTREE;
+        return true;
     }
 
     @Override
@@ -106,7 +104,7 @@ public class RemoveEmptyStatementCleanUp extends AbstractCleanUpRule {
                 && arePassive(node.initializers()) && isPassive(node.getExpression())) {
             return maybeRemoveStmtWithEmptyBody(node, node.getBody());
         }
-        return VISIT_SUBTREE;
+        return true;
     }
 
     @Override
@@ -115,7 +113,7 @@ public class RemoveEmptyStatementCleanUp extends AbstractCleanUpRule {
                 && !Boolean.TRUE.equals(node.getExpression().resolveConstantExpressionValue())) {
             return maybeRemoveStmtWithEmptyBody(node, node.getBody());
         }
-        return VISIT_SUBTREE;
+        return true;
     }
 
     @Override
@@ -124,7 +122,7 @@ public class RemoveEmptyStatementCleanUp extends AbstractCleanUpRule {
                 && !Boolean.TRUE.equals(node.getExpression().resolveConstantExpressionValue())) {
             return maybeRemoveStmtWithEmptyBody(node, node.getBody());
         }
-        return VISIT_SUBTREE;
+        return true;
     }
 
     @Override
@@ -142,10 +140,10 @@ public class RemoveEmptyStatementCleanUp extends AbstractCleanUpRule {
 
         if (parent instanceof Block && isEmptyCode(node)) {
             this.ctx.getRefactorings().remove(node);
-            return DO_NOT_VISIT_SUBTREE;
+            return false;
         }
 
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private boolean arePassive(final List<?> initializers) {
@@ -162,9 +160,9 @@ public class RemoveEmptyStatementCleanUp extends AbstractCleanUpRule {
     private boolean maybeRemoveStmtWithEmptyBody(final Statement node, final Statement emptyCode) {
         if (isEmptyCode(emptyCode)) {
             this.ctx.getRefactorings().remove(node);
-            return DO_NOT_VISIT_SUBTREE;
+            return false;
         }
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private boolean isEmptyCode(final Statement emptyCode) {

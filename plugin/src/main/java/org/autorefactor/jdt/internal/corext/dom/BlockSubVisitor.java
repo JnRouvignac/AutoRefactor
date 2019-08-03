@@ -25,9 +25,6 @@
  */
 package org.autorefactor.jdt.internal.corext.dom;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
-
 import org.autorefactor.jdt.internal.ui.fix.RefactoringContext;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.Block;
@@ -44,7 +41,7 @@ public class BlockSubVisitor extends ASTVisitor {
 
     private Block startNode;
 
-    private boolean result= VISIT_SUBTREE;
+    private boolean result= true;
 
     /**
      * Constructor.
@@ -77,6 +74,6 @@ public class BlockSubVisitor extends ASTVisitor {
 
     @Override
     public boolean visit(Block node) {
-        return (startNode == node) ? VISIT_SUBTREE : DO_NOT_VISIT_SUBTREE;
+        return startNode == node;
     }
 }

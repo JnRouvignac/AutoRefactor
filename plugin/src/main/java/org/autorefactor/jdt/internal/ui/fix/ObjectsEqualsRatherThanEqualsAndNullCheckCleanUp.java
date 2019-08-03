@@ -25,8 +25,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.as;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.asList;
 
@@ -148,7 +146,7 @@ public class ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp extends NewClassIm
             }
         }
 
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private boolean maybeReplaceCode(final IfStatement node, final InfixExpression condition,
@@ -183,7 +181,7 @@ public class ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp extends NewClassIm
             }
         }
 
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private boolean maybeReplaceEquals(final IfStatement node, final Name firstField,
@@ -226,11 +224,11 @@ public class ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp extends NewClassIm
                     && !returnFalse2.booleanValue()) {
                 replaceEquals(node, firstField, secondField, returnStmt1, classesToUseWithImport);
                 importsToAdd.add("java.util.Objects");
-                return DO_NOT_VISIT_SUBTREE;
+                return false;
             }
         }
 
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private boolean match(final Name firstField, final Name secondField, final Expression thisObject,

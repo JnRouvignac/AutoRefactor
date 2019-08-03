@@ -25,8 +25,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
 import static org.autorefactor.jdt.internal.corext.dom.SourceLocation.getEndPosition;
 
 import java.util.SortedSet;
@@ -84,7 +82,7 @@ public class RemoveEmptyLinesCleanUp extends AbstractCleanUpRule {
         final String source= this.ctx.getSource(node);
         if (source.length() == 0) {
             // empty file, bail out
-            return VISIT_SUBTREE;
+            return true;
         }
 
         computeLineEnds(node);
@@ -94,7 +92,7 @@ public class RemoveEmptyLinesCleanUp extends AbstractCleanUpRule {
         int index= getIndexOfFirstNonWhitespaceChar(source, 0);
         if (index != -1) {
             r.remove(SourceLocation.fromPositions(0, index));
-            return DO_NOT_VISIT_SUBTREE;
+            return false;
         }
 
         if (node.getPackage() != null) {
@@ -103,12 +101,12 @@ public class RemoveEmptyLinesCleanUp extends AbstractCleanUpRule {
             if (lastNonWsIndex != -1) {
                 int endOfLineIndex= beforeNewlineChars(source, lastNonWsIndex);
                 if (maybeRemoveEmptyLines(source, endOfLineIndex, lastIndex)) {
-                    return DO_NOT_VISIT_SUBTREE;
+                    return false;
                 }
             }
         }
 
-        boolean result= VISIT_SUBTREE;
+        boolean result= true;
         final String newline= "(?:" + NEWLINE_PATTERN + ")";
         Matcher m= Pattern.compile("(" + newline + "\\s*?" + newline + "\\s*?" + ")" + "(?:" + newline + "\\s*?)+")
                 .matcher(source);
@@ -116,25 +114,25 @@ public class RemoveEmptyLinesCleanUp extends AbstractCleanUpRule {
             final String matchedString= m.group(0);
             if (!"\r\n\r\n".equals(matchedString) && !"\n\n".equals(matchedString) && !"\r\r".equals(matchedString)) {
                 r.remove(SourceLocation.fromPositions(m.end(1), m.end(0)));
-                result= DO_NOT_VISIT_SUBTREE;
+                result= false;
             }
         }
-        if (result == DO_NOT_VISIT_SUBTREE) {
-            return DO_NOT_VISIT_SUBTREE;
+        if (!result) {
+            return false;
         }
 
         int afterLastNonWsIndex= getLastIndexOfNonWhitespaceChar(source, source.length() - 1) + 1;
         if (substringMatchesAny(source, afterLastNonWsIndex, "\r\n", "\r", "\n")) {
-            return VISIT_SUBTREE;
+            return true;
         }
 
         Matcher endOfFileMatcher= Pattern.compile(newline + "(" + "\\s*?" + "(" + newline + "\\s*?)+)").matcher(source)
                 .region(afterLastNonWsIndex, source.length());
         if (endOfFileMatcher.find()) {
             r.remove(SourceLocation.fromPositions(endOfFileMatcher.start(2), endOfFileMatcher.end(2)));
-            return DO_NOT_VISIT_SUBTREE;
+            return false;
         }
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private boolean substringMatchesAny(String s, int offset, String... stringToMatch) {
@@ -196,18 +194,15 @@ public class RemoveEmptyLinesCleanUp extends AbstractCleanUpRule {
         final String source= this.ctx.getSource(node);
         int openingCurlyIndex= findOpeningCurlyForTypeBody(node, source);
         if (openingCurlyOnSameLineAsEndOfNode(node, openingCurlyIndex)) {
-            return VISIT_SUBTREE;
+            return true;
         }
         if (maybeRemoveEmptyLinesAfterCurly(node, openingCurlyIndex)) {
-            return DO_NOT_VISIT_SUBTREE;
+            return false;
         }
 
         int lastNonWsIndex2= getIndexOfFirstNonWhitespaceChar(source, openingCurlyIndex + 1);
         int endOfLineIndex2= previousLineEnd(lastNonWsIndex2);
-        if (maybeRemoveEmptyLines(source, openingCurlyIndex + 1, endOfLineIndex2)) {
-            return DO_NOT_VISIT_SUBTREE;
-        }
-        return visitNodeWithClosingCurly(node);
+        return !maybeRemoveEmptyLines(source, openingCurlyIndex + 1, endOfLineIndex2) && visitNodeWithClosingCurly(node);
     }
 
     private int findOpeningCurlyForTypeBody(AbstractTypeDeclaration node, String source) {
@@ -225,14 +220,14 @@ public class RemoveEmptyLinesCleanUp extends AbstractCleanUpRule {
     public boolean visit(MethodDeclaration node) {
         final Block body= node.getBody();
         if (body == null) {
-            return VISIT_SUBTREE;
+            return true;
         }
         int openingCurlyIndex= body.getStartPosition();
         if (openingCurlyOnSameLineAsEndOfNode(node, openingCurlyIndex)) {
-            return VISIT_SUBTREE;
+            return true;
         }
         if (maybeRemoveEmptyLinesAfterCurly(node, openingCurlyIndex)) {
-            return DO_NOT_VISIT_SUBTREE;
+            return false;
         }
         return visit(body);
     }
@@ -242,12 +237,12 @@ public class RemoveEmptyLinesCleanUp extends AbstractCleanUpRule {
         final String source= this.ctx.getSource(node);
         int openingCurlyIndex= node.getStartPosition();
         if (openingCurlyOnSameLineAsEndOfNode(node, openingCurlyIndex)) {
-            return VISIT_SUBTREE;
+            return true;
         }
         int lastNonWsIndex= getIndexOfFirstNonWhitespaceChar(source, openingCurlyIndex + 1);
         int endOfLineIndex= previousLineEnd(lastNonWsIndex);
         if (maybeRemoveEmptyLines(source, openingCurlyIndex + 1, endOfLineIndex)) {
-            return DO_NOT_VISIT_SUBTREE;
+            return false;
         }
         return visitNodeWithClosingCurly(node);
     }
@@ -256,9 +251,9 @@ public class RemoveEmptyLinesCleanUp extends AbstractCleanUpRule {
         final String source= this.ctx.getSource(node);
         int closingCurlyIndex= source.lastIndexOf('}', getEndPosition(node));
         if (maybeRemoveEmptyLinesAfterCurly(node, closingCurlyIndex)) {
-            return DO_NOT_VISIT_SUBTREE;
+            return false;
         }
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private boolean openingCurlyOnSameLineAsEndOfNode(final ASTNode node, int openingCurlyIndex) {

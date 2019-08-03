@@ -27,8 +27,6 @@
 package org.autorefactor.jdt.internal.ui.fix;
 
 import static java.util.Arrays.asList;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.bodyDeclarations;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getAncestorOrNull;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getFirstAncestorOrNull;
@@ -202,10 +200,10 @@ public class AndroidViewHolderCleanUp extends AbstractCleanUpRule {
                             b.cast(viewHolderItemVar.type(), b.invoke("convertView", "getTag"))))));
                 }
                 r.remove(visitor.viewAssignmentStmt);
-                return DO_NOT_VISIT_SUBTREE;
+                return false;
             }
         }
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private TypeDeclaration createViewHolderItemClass(FindViewByIdVisitor findViewByIdVisitor, SimpleName typeName,
@@ -250,7 +248,7 @@ public class AndroidViewHolderCleanUp extends AbstractCleanUpRule {
                     viewAssignmentStmt= getAncestorOrNull(viewVariableDeclFragment, VariableDeclarationStatement.class);
                     if (viewAssignmentStmt == null) {
                         resetData();
-                        return VISIT_SUBTREE;
+                        return true;
                     }
                 } else if (ancestor instanceof Assignment) {
                     viewVariableAssignment= (Assignment) ancestor;
@@ -259,19 +257,19 @@ public class AndroidViewHolderCleanUp extends AbstractCleanUpRule {
                         viewVariableName= (SimpleName) lhs;
                     } else {
                         resetData();
-                        return VISIT_SUBTREE;
+                        return true;
                     }
                     viewAssignmentStmt= getAncestorOrNull(viewVariableAssignment, ExpressionStatement.class);
                 }
-                return DO_NOT_VISIT_SUBTREE;
+                return false;
             }
-            return VISIT_SUBTREE;
+            return true;
         }
 
         @Override
         public boolean visit(ReturnStatement node) {
             this.returnStmt= node;
-            return VISIT_SUBTREE;
+            return true;
         }
 
         private boolean canApplyRefactoring() {
@@ -366,7 +364,7 @@ public class AndroidViewHolderCleanUp extends AbstractCleanUpRule {
                     items.add(item);
                 }
             }
-            return VISIT_SUBTREE;
+            return true;
         }
     }
 }

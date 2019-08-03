@@ -25,8 +25,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasOperator;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isMethod;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.removeParentheses;
@@ -78,15 +76,8 @@ public class ComparisonCleanUp extends AbstractCleanUpRule {
 
     @Override
     public boolean visit(InfixExpression node) {
-        if (!node.hasExtendedOperands()) {
-            if (maybeStandardizeComparison(node, node.getLeftOperand(),
-                    node.getRightOperand()) == DO_NOT_VISIT_SUBTREE) {
-                return DO_NOT_VISIT_SUBTREE;
-            }
-            return maybeStandardizeComparison(node, node.getRightOperand(), node.getLeftOperand());
-        }
-
-        return VISIT_SUBTREE;
+        return node.hasExtendedOperands() || (maybeStandardizeComparison(node, node.getLeftOperand(),
+                node.getRightOperand()) && maybeStandardizeComparison(node, node.getRightOperand(), node.getLeftOperand()));
     }
 
     private boolean maybeStandardizeComparison(InfixExpression node, final Expression comparator,
@@ -95,7 +86,7 @@ public class ComparisonCleanUp extends AbstractCleanUpRule {
             final MethodInvocation comparisonMI= (MethodInvocation) removeParentheses(comparator);
             if (comparisonMI.getExpression() == null) {
                 // TODO JNR handle same class calls and sub classes
-                return VISIT_SUBTREE;
+                return true;
             }
 
             if (isMethod(comparisonMI, "java.lang.Comparable", "compareTo", "java.lang.Object")
@@ -109,7 +100,7 @@ public class ComparisonCleanUp extends AbstractCleanUpRule {
                     final double doubleValue= numberValue.doubleValue();
 
                     if (doubleValue == 0) {
-                        return VISIT_SUBTREE;
+                        return true;
                     }
 
                     if (hasOperator(node, EQUALS)) {
@@ -125,15 +116,15 @@ public class ComparisonCleanUp extends AbstractCleanUpRule {
                             refactorComparingToZero(node, comparisonMI, LESS_EQUALS);
                         }
                     } else {
-                        return VISIT_SUBTREE;
+                        return true;
                     }
 
-                    return DO_NOT_VISIT_SUBTREE;
+                    return false;
                 }
-                return VISIT_SUBTREE;
+                return true;
             }
         }
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private void refactorComparingToZero(final InfixExpression node, final MethodInvocation comparisonMI,

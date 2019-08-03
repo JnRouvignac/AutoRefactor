@@ -25,8 +25,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.areSameVariables;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.as;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.asExpression;
@@ -106,7 +104,7 @@ public class TryWithResourceCleanUp extends AbstractCleanUpRule {
         final VariableDeclarationStatement previousDeclStmt= as(getPreviousStatement(node),
                 VariableDeclarationStatement.class);
         if (previousDeclStmt == null) {
-            return VISIT_SUBTREE;
+            return true;
         }
 
         final VariableDeclarationFragment previousDeclFragment= getUniqueFragment(previousDeclStmt);
@@ -141,7 +139,7 @@ public class TryWithResourceCleanUp extends AbstractCleanUpRule {
                 }
             }
         }
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private boolean methodClosesCloseables(final MethodInvocation mi) {
@@ -167,12 +165,12 @@ public class TryWithResourceCleanUp extends AbstractCleanUpRule {
     private boolean refactorToTryWithResources(TryStatement node, VariableDeclarationExpression newResource,
             List<ASTNode> nodesToRemove) {
         if (newResource == null) {
-            return VISIT_SUBTREE;
+            return true;
         }
         final Refactorings r= ctx.getRefactorings();
         r.insertFirst(node, TryStatement.RESOURCES_PROPERTY, newResource);
         r.remove(nodesToRemove);
-        return DO_NOT_VISIT_SUBTREE;
+        return false;
     }
 
     private VariableDeclarationExpression newResource(List<Statement> tryStmts,
@@ -221,6 +219,6 @@ public class TryWithResourceCleanUp extends AbstractCleanUpRule {
         final ASTBuilder b= ctx.getASTBuilder();
         r.insertLast(outerTryStmt, TryStatement.RESOURCES_PROPERTY, b.copyRange(resources(innerTryStmt)));
         r.replace(innerTryStmt, b.move(innerTryStmt.getBody()));
-        return DO_NOT_VISIT_SUBTREE;
+        return false;
     }
 }

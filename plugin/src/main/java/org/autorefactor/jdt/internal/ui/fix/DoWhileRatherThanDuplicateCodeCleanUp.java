@@ -25,8 +25,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.asList;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getPreviousSibling;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.match;
@@ -74,7 +72,7 @@ public class DoWhileRatherThanDuplicateCodeCleanUp extends AbstractCleanUpRule {
         final List<Statement> whileStmts= asList(node.getBody());
 
         if (whileStmts.isEmpty()) {
-            return VISIT_SUBTREE;
+            return true;
         }
 
         final List<Statement> previousStmts= new ArrayList<Statement>(whileStmts.size());
@@ -84,7 +82,7 @@ public class DoWhileRatherThanDuplicateCodeCleanUp extends AbstractCleanUpRule {
         int i= whileStmts.size() - 1;
         while (i >= 0) {
             if (previousStmt == null || !match(matcher, previousStmt, whileStmts.get(i))) {
-                return VISIT_SUBTREE;
+                return true;
             }
             i--;
             previousStmts.add(previousStmt);
@@ -92,7 +90,7 @@ public class DoWhileRatherThanDuplicateCodeCleanUp extends AbstractCleanUpRule {
         }
 
         replaceWithDoWhile(node, previousStmts);
-        return DO_NOT_VISIT_SUBTREE;
+        return false;
     }
 
     private void replaceWithDoWhile(final WhileStatement node, final List<Statement> previousStmts) {

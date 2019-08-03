@@ -25,8 +25,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasType;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isHardCoded;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.modifiers;
@@ -86,7 +84,7 @@ public class StaticConstantRatherThanInstanceConstantCleanUp extends AbstractCle
             Modifier finalModifier= null;
             for (final Modifier modifier : getModifiersOnly(modifiers(node))) {
                 if (modifier.isStatic()) {
-                    return VISIT_SUBTREE;
+                    return true;
                 }
                 if (modifier.isFinal()) {
                     finalModifier= modifier;
@@ -98,12 +96,12 @@ public class StaticConstantRatherThanInstanceConstantCleanUp extends AbstractCle
 
                 if (isHardCoded(initializer)) {
                     addStaticModifier(finalModifier);
-                    return DO_NOT_VISIT_SUBTREE;
+                    return false;
                 }
             }
         }
 
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private void addStaticModifier(final Modifier finalModifier) {

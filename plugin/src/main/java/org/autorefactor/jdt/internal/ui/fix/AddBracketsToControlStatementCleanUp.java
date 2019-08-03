@@ -25,9 +25,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
-
 import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.DoStatement;
@@ -68,57 +65,43 @@ public class AddBracketsToControlStatementCleanUp extends AbstractCleanUpRule {
 
     @Override
     public boolean visit(IfStatement node) {
-        boolean result= VISIT_SUBTREE;
-        if (node.getThenStatement() != null && !(node.getThenStatement() instanceof Block)) {
-            result= setBlock(node.getThenStatement());
+        boolean result= maybeAddBrackets(node.getThenStatement());
+
+        if (!(node.getElseStatement() instanceof IfStatement)) {
+            result&= maybeAddBrackets(node.getElseStatement());
         }
-        if (node.getElseStatement() != null && !(node.getElseStatement() instanceof Block)
-                && !(node.getElseStatement() instanceof IfStatement)) {
-            return setBlock(node.getElseStatement()) || result;
-        }
+
         return result;
     }
 
     @Override
     public boolean visit(EnhancedForStatement node) {
-        if (node.getBody() != null && !(node.getBody() instanceof Block)) {
-            return setBlock(node.getBody());
-        }
-        return VISIT_SUBTREE;
+        return maybeAddBrackets(node.getBody());
     }
 
     @Override
     public boolean visit(ForStatement node) {
-        if (node.getBody() != null && !(node.getBody() instanceof Block)) {
-            return setBlock(node.getBody());
-        }
-        return VISIT_SUBTREE;
+        return maybeAddBrackets(node.getBody());
     }
 
     @Override
     public boolean visit(WhileStatement node) {
-        if (node.getBody() != null && !(node.getBody() instanceof Block)) {
-            return setBlock(node.getBody());
-        }
-        return VISIT_SUBTREE;
+        return maybeAddBrackets(node.getBody());
     }
 
     @Override
     public boolean visit(DoStatement node) {
-        if (node.getBody() != null && !(node.getBody() instanceof Block)) {
-            return setBlock(node.getBody());
-        }
-        return VISIT_SUBTREE;
+        return maybeAddBrackets(node.getBody());
     }
 
-    private boolean setBlock(Statement statement) {
-        if (statement == null) {
-            return VISIT_SUBTREE;
+    private boolean maybeAddBrackets(final Statement statement) {
+        if (statement == null || statement instanceof Block) {
+            return true;
         }
+
         final ASTBuilder b= this.ctx.getASTBuilder();
         final Block block= b.block(b.copy(statement));
-        block.accept(this);
         this.ctx.getRefactorings().replace(statement, block);
-        return DO_NOT_VISIT_SUBTREE;
+        return false;
     }
 }

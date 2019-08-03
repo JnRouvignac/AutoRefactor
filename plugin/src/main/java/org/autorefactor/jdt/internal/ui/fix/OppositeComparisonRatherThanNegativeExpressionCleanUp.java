@@ -25,8 +25,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.as;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasType;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isMethod;
@@ -78,13 +76,13 @@ public class OppositeComparisonRatherThanNegativeExpressionCleanUp extends Abstr
                 for (final String clazz : classes) {
                     if (isMethod(mi, clazz, "compareTo", clazz) && hasType((Expression) mi.arguments().get(0), clazz)) {
                         reverseObjects(node, mi);
-                        return DO_NOT_VISIT_SUBTREE;
+                        return false;
                     }
                 }
             }
         }
 
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private void reverseObjects(final PrefixExpression node, final MethodInvocation mi) {

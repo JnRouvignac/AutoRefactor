@@ -26,8 +26,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.arg0;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.as;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getBoxedTypeBinding;
@@ -87,7 +85,7 @@ public class StringCleanUp extends AbstractCleanUpRule {
             if (hasType(expr, "java.lang.String")) {
                 // if node is already a String, no need to call toString()
                 r.replace(node, b.move(expr));
-                return DO_NOT_VISIT_SUBTREE;
+                return false;
             } else if (parent.getNodeType() == INFIX_EXPRESSION) {
                 // if node is in a String context, no need to call toString()
                 final InfixExpression ie= (InfixExpression) node.getParent();
@@ -100,19 +98,19 @@ public class StringCleanUp extends AbstractCleanUpRule {
                 if (!node.equals(lmi) && !node.equals(rmi) && (leftOpIsString || rightOpIsString)) {
                     // node is in the extended operands
                     r.replace(node, replaceToString(node.getExpression()));
-                    return DO_NOT_VISIT_SUBTREE;
+                    return false;
                 } else if (leftOpIsString && isMethod(rmi, "java.lang.Object", "toString")) {
                     r.replace(rmi, replaceToString(rmi.getExpression()));
-                    return DO_NOT_VISIT_SUBTREE;
+                    return false;
                 } else if (rightOpIsString && node.equals(lmi)) {
                     r.replace(lmi, replaceToString(lmi.getExpression()));
-                    return DO_NOT_VISIT_SUBTREE;
+                    return false;
                 }
             }
         } else if (isStringValueOf && hasType(arg0(node), "java.lang.String")) {
             if (arg0(node) instanceof StringLiteral || arg0(node) instanceof InfixExpression) {
                 r.replace(node, b.parenthesizeIfNeeded(b.move(arg0(node))));
-                return DO_NOT_VISIT_SUBTREE;
+                return false;
             }
         } else if ((isToStringForPrimitive(node) || isStringValueOf) && parent.getNodeType() == INFIX_EXPRESSION) {
             // if node is in a String context, no need to call toString()
@@ -122,7 +120,7 @@ public class StringCleanUp extends AbstractCleanUpRule {
             if (node.equals(lo)) {
                 if (hasType(ro, "java.lang.String")) {
                     replaceStringValueOfByArg0(lo, node);
-                    return DO_NOT_VISIT_SUBTREE;
+                    return false;
                 }
             } else if (node.equals(ro)) {
                 if (hasType(lo, "java.lang.String")
@@ -130,12 +128,12 @@ public class StringCleanUp extends AbstractCleanUpRule {
                         // to avoid compilation errors post refactoring
                         && !r.hasBeenRefactored(lo)) {
                     replaceStringValueOfByArg0(ro, node);
-                    return DO_NOT_VISIT_SUBTREE;
+                    return false;
                 }
             } else {
                 // left or right operation is necessarily a string, so just replace
                 replaceStringValueOfByArg0(node, node);
-                return DO_NOT_VISIT_SUBTREE;
+                return false;
             }
         } else if (isMethod(node, "java.lang.String", "equals", "java.lang.Object")) {
             final MethodInvocation leftInvocation= as(node.getExpression(), MethodInvocation.class);
@@ -149,7 +147,7 @@ public class StringCleanUp extends AbstractCleanUpRule {
                 final Expression leftExpr= leftInvocation.getExpression();
                 final Expression rightExpr= rightInvocation.getExpression();
                 r.replace(node, b.invoke(b.copy(leftExpr), "equalsIgnoreCase", b.copy(rightExpr)));
-                return DO_NOT_VISIT_SUBTREE;
+                return false;
             }
         } else if (isMethod(node, "java.lang.String", "equalsIgnoreCase", "java.lang.String")) {
             final AtomicBoolean isRefactoringNeeded= new AtomicBoolean(false);
@@ -159,7 +157,7 @@ public class StringCleanUp extends AbstractCleanUpRule {
 
             if (isRefactoringNeeded.get()) {
                 r.replace(node, b.invoke(b.copy(leftExpr), "equalsIgnoreCase", b.copy(rightExpr)));
-                return DO_NOT_VISIT_SUBTREE;
+                return false;
             }
         } else if (isMethod(node, "java.lang.String", "indexOf", "java.lang.String")
                 || isMethod(node, "java.lang.String", "lastIndexOf", "java.lang.String")
@@ -172,11 +170,11 @@ public class StringCleanUp extends AbstractCleanUpRule {
                     CharacterLiteral replacement= b.charLiteral();
                     replacement.setCharValue(value.charAt(0));
                     r.replace(expression, replacement);
-                    return DO_NOT_VISIT_SUBTREE;
+                    return false;
                 }
             }
         }
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private Expression getReducedStringExpression(Expression stringExpr, AtomicBoolean isRefactoringNeeded) {

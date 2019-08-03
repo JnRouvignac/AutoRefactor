@@ -25,9 +25,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
-
 import org.eclipse.jdt.core.dom.SuperConstructorInvocation;
 
 /** See {@link #getDescription()} method. */
@@ -64,8 +61,8 @@ public class RemoveEmptySuperConstrInvocationCleanUp extends AbstractCleanUpRule
         if (node.arguments().isEmpty()) {
             // A replacement keeps comments, contrary to remove
             ctx.getRefactorings().replace(node, null);
-            return DO_NOT_VISIT_SUBTREE;
+            return false;
         }
-        return VISIT_SUBTREE;
+        return true;
     }
 }

@@ -26,8 +26,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getCommentList;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getFileName;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasType;
@@ -157,7 +155,7 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
         final String comment= getComment(node);
         if (EMPTY_BLOCK_COMMENT.matcher(comment).matches()) {
             this.ctx.getRefactorings().remove(node);
-            return DO_NOT_VISIT_SUBTREE;
+            return false;
         }
         final ASTNode nextNode= getNextNode(node);
         if (acceptJavadoc(nextNode) && !betterCommentExist(node, nextNode)) {
@@ -166,7 +164,7 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
             } else {
                 this.ctx.getRefactorings().toJavadoc(node);
             }
-            return DO_NOT_VISIT_SUBTREE;
+            return false;
         }
         final Matcher emptyLineAtStartMatcher= EMPTY_LINE_AT_START_OF_BLOCK_COMMENT.matcher(comment);
         if (emptyLineAtStartMatcher.find()) {
@@ -179,9 +177,9 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
         final String replacement= getReplacement(comment, false);
         if (replacement != null && !replacement.equals(comment)) {
             this.ctx.getRefactorings().replace(node, replacement);
-            return DO_NOT_VISIT_SUBTREE;
+            return false;
         }
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private String getReplacement(String comment, boolean isJavadoc) {
@@ -229,23 +227,23 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
         final Matcher emptyLineAtEndMatcher= EMPTY_LINE_AT_END_OF_BLOCK_COMMENT.matcher(comment);
         if (EMPTY_JAVADOC.matcher(comment).matches()) {
             this.ctx.getRefactorings().remove(node);
-            return DO_NOT_VISIT_SUBTREE;
+            return false;
         } else if (emptyLineAtStartMatcher.find()) {
             return replaceEmptyLineAtStartOfComment(node, emptyLineAtStartMatcher);
         } else if (emptyLineAtEndMatcher.find()) {
             return replaceEmptyLineAtEndOfComment(node, emptyLineAtEndMatcher);
         } else if (allTagsEmpty(tags(node))) {
             this.ctx.getRefactorings().remove(node);
-            return DO_NOT_VISIT_SUBTREE;
+            return false;
         } else if (!acceptJavadoc(getNextNode(node)) && node.getStartPosition() != 0) {
             this.ctx.getRefactorings().replace(node, comment.replace("/**", "/*"));
-            return DO_NOT_VISIT_SUBTREE;
+            return false;
         } else if (JAVADOC_ONLY_INHERITDOC.matcher(comment).matches()) {
             final ASTNode nextNode= getNextNode(node);
             if (hasOverrideAnnotation(nextNode)) {
                 // {@inheritDoc} tag is redundant with @Override annotation
                 this.ctx.getRefactorings().remove(node);
-                return DO_NOT_VISIT_SUBTREE;
+                return false;
             }
 
             if (!isWellFormattedInheritDoc) {
@@ -254,14 +252,14 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
                 int endLine= this.astRoot.getLineNumber(node.getStartPosition() + node.getLength());
                 if (startLine != endLine) {
                     this.ctx.getRefactorings().replace(node, "/** {@inheritDoc} */");
-                    return DO_NOT_VISIT_SUBTREE;
+                    return false;
                 }
             }
         } else if (!isWellFormattedInheritDoc && !JAVADOC_HAS_PUNCTUATION.matcher(comment).find()) {
             final String newComment= addPeriodAtEndOfFirstLine(node, comment);
             if (newComment != null) {
                 this.ctx.getRefactorings().replace(node, newComment);
-                return DO_NOT_VISIT_SUBTREE;
+                return false;
             }
         } else {
             final Matcher m= JAVADOC_FIRST_LETTER_LOWERCASE.matcher(comment);
@@ -269,7 +267,7 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
                 String newComment= m.group(1) + m.group(2).toUpperCase() + m.group(3);
                 if (!newComment.equals(comment)) {
                     this.ctx.getRefactorings().replace(node, newComment);
-                    return DO_NOT_VISIT_SUBTREE;
+                    return false;
                 }
             }
         }
@@ -277,10 +275,10 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
             final String replacement= getReplacement(comment, true);
             if (replacement != null && !replacement.equals(comment)) {
                 this.ctx.getRefactorings().replace(node, replacement);
-                return DO_NOT_VISIT_SUBTREE;
+                return false;
             }
         }
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private boolean hasOverrideAnnotation(ASTNode node) {
@@ -313,13 +311,13 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
     private boolean replaceEmptyLineAtStartOfComment(Comment node, Matcher matcher) {
         final String replacement= matcher.replaceFirst(matcher.group(1) + matcher.group(2));
         this.ctx.getRefactorings().replace(node, replacement);
-        return DO_NOT_VISIT_SUBTREE;
+        return false;
     }
 
     private boolean replaceEmptyLineAtEndOfComment(Comment node, Matcher matcher) {
         final String replacement= matcher.replaceFirst(matcher.group(1));
         this.ctx.getRefactorings().replace(node, replacement);
-        return DO_NOT_VISIT_SUBTREE;
+        return false;
     }
 
     private String addPeriodAtEndOfFirstLine(Javadoc node, String comment) {
@@ -437,20 +435,20 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
         final String comment= getComment(node);
         if (EMPTY_LINE_COMMENT.matcher(comment).matches() || ECLIPSE_GENERATED_TODOS.matcher(comment).matches()) {
             this.ctx.getRefactorings().remove(node);
-            return DO_NOT_VISIT_SUBTREE;
+            return false;
         } else if (!TOOLS_CONTROL_INSTRUCTIONS.matcher(comment).matches()
                 && !ECLIPSE_IGNORE_NON_EXTERNALIZED_STRINGS.matcher(comment).matches()) {
             final ASTNode nextNode= getNextNode(node);
             final ASTNode previousNode= getPreviousSibling(nextNode);
             if (previousNode != null && isSameLineNumber(node, previousNode)) {
                 this.ctx.getRefactorings().toJavadoc(node, previousNode);
-                return DO_NOT_VISIT_SUBTREE;
+                return false;
             } else if (acceptJavadoc(nextNode) && !betterCommentExist(node, nextNode)) {
                 this.ctx.getRefactorings().toJavadoc(node, nextNode);
-                return DO_NOT_VISIT_SUBTREE;
+                return false;
             }
         }
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private boolean isSameLineNumber(LineComment node, ASTNode previousNode) {
@@ -562,7 +560,7 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
                 throw new NotImplementedException(comment);
             }
         }
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private String getComment(Comment node) {

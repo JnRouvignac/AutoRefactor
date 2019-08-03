@@ -25,8 +25,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasType;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.instanceOf;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.modifiers;
@@ -106,7 +104,7 @@ public class ImplicitDefaultConstructorRatherThanWrittenOneCleanUp extends Abstr
                         uniqueConstructor= methodDeclaration;
                     } else {
                         // Too much constructors
-                        return VISIT_SUBTREE;
+                        return true;
                     }
                 }
             }
@@ -123,18 +121,18 @@ public class ImplicitDefaultConstructorRatherThanWrittenOneCleanUp extends Abstr
                         if ((modifier.isPublic() && isPublicClass) || (modifier.isProtected() && isProtectedClass)
                                 || (modifier.isPrivate() && isPrivateClass)) {
                             ctx.getRefactorings().remove(uniqueConstructor);
-                            return DO_NOT_VISIT_SUBTREE;
+                            return false;
                         }
                     }
                 } else if ((uniqueConstructor.modifiers() == null || uniqueConstructor.modifiers().isEmpty())
                         && isPackageClass) {
                     ctx.getRefactorings().remove(uniqueConstructor);
-                    return DO_NOT_VISIT_SUBTREE;
+                    return false;
                 }
             }
         }
 
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private boolean isDefaultStmts(final MethodDeclaration uniqueConstructor) {

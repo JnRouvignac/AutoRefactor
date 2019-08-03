@@ -25,8 +25,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.instanceOf;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.thrownExceptionTypes;
 
@@ -75,9 +73,9 @@ public final class RemoveUncheckedThrowsClausesCleanUp extends AbstractCleanUpRu
             for (ASTNode n : nodesToRemove) {
                 ctx.getRefactorings().replace(n, null);
             }
-            return DO_NOT_VISIT_SUBTREE;
+            return false;
         }
-        return VISIT_SUBTREE;
+        return true;
     }
 
     /**

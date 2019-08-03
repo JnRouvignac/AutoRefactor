@@ -26,7 +26,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.arguments;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.asExpression;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.asList;
@@ -161,7 +160,7 @@ public class TestNGAssertCleanUp extends AbstractUnitTestCleanUp {
                 || isMethod(node, "org.testng.Assert", "assertNotEquals", "double", "double", "java.lang.String")) {
             return maybeRefactorToAssertEquals(node, node, false, args.get(0), args.get(1), args.get(2), false);
         }
-        return VISIT_SUBTREE;
+        return true;
     }
 
     @Override
@@ -175,7 +174,7 @@ public class TestNGAssertCleanUp extends AbstractUnitTestCleanUp {
                 return maybeRefactorStatement(node, mi, false, node.getExpression(), arguments(mi).get(0), true);
             }
         }
-        return VISIT_SUBTREE;
+        return true;
     }
 
     @Override

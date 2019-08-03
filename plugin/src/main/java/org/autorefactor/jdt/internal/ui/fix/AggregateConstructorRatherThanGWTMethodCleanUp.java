@@ -25,8 +25,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasType;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isMethod;
 
@@ -118,7 +116,7 @@ public class AggregateConstructorRatherThanGWTMethodCleanUp extends NewClassImpo
             final Expression arg= (Expression) node.arguments().get(0);
 
             if (!hasType(arg, "java.lang.Class")) {
-                return VISIT_SUBTREE;
+                return true;
             }
 
             final ITypeBinding argType= arg.resolveTypeBinding();
@@ -129,13 +127,13 @@ public class AggregateConstructorRatherThanGWTMethodCleanUp extends NewClassImpo
 
                 if (typeArgs != null) {
                     if (typeArgs.length != 1) {
-                        return VISIT_SUBTREE;
+                        return true;
                     }
 
                     final ITypeBinding typeParam= typeArgs[0];
 
                     if (!typeParam.isEnum()) {
-                        return VISIT_SUBTREE;
+                        return true;
                     }
                     generic= "<" + typeParam.getQualifiedName() + ">";
                 }
@@ -151,11 +149,11 @@ public class AggregateConstructorRatherThanGWTMethodCleanUp extends NewClassImpo
                         b.type(classesToUseWithImport.contains("java.util.EnumMap") ? "EnumMap" : "java.util.EnumMap"));
                 r.replace(node, b.new0(type, b.copy(arg)));
                 importsToAdd.add("java.util.EnumMap");
-                return DO_NOT_VISIT_SUBTREE;
+                return false;
             }
         }
 
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private boolean maybeRefactor(final MethodInvocation node, final Set<String> classesToUseWithImport,
@@ -169,9 +167,9 @@ public class AggregateConstructorRatherThanGWTMethodCleanUp extends NewClassImpo
                     classesToUseWithImport.contains("java.util." + implClass) ? implClass : "java.util." + implClass));
             r.replace(node, b.new0(type));
             importsToAdd.add("java.util." + implClass);
-            return DO_NOT_VISIT_SUBTREE;
+            return false;
         }
 
-        return VISIT_SUBTREE;
+        return true;
     }
 }

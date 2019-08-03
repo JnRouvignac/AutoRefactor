@@ -25,9 +25,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
-
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jdt.core.dom.DoStatement;
 import org.eclipse.jdt.core.dom.EnhancedForStatement;
@@ -70,9 +67,9 @@ public class EndOfMethodRatherThanReturnCleanUp extends AbstractCleanUpRule {
     public boolean visit(ReturnStatement node) {
         if (node.getExpression() == null && isLastStmt(node)) {
             ctx.getRefactorings().remove(node);
-            return DO_NOT_VISIT_SUBTREE;
+            return false;
         }
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private boolean isLastStmt(final Statement node) {

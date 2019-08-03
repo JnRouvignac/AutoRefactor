@@ -25,8 +25,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isMethod;
 
 import java.util.ArrayList;
@@ -109,7 +107,7 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
                 || isMethod(node, "org.apache.commons.lang3.ObjectUtils", "toString", "java.lang.Object",
                         "java.lang.String")) {
             replaceUtilClass(node, classesToUseWithImport, importsToAdd);
-            return DO_NOT_VISIT_SUBTREE;
+            return false;
         }
         final ASTBuilder b= this.ctx.getASTBuilder();
 
@@ -124,7 +122,7 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
             r.replace(node, b.invoke(javaUtilObjects, "equals", b.copy((Expression) node.arguments().get(0)),
                     b.copy((Expression) node.arguments().get(1))));
             importsToAdd.add("java.util.Objects");
-            return DO_NOT_VISIT_SUBTREE;
+            return false;
         }
 
         if (isMethod(node, "org.apache.commons.lang3.ObjectUtils", "toString", "java.lang.Object")) {
@@ -133,7 +131,7 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
             r.replace(node,
                     b.invoke(javaUtilObjects, "toString", b.copy((Expression) node.arguments().get(0)), b.string("")));
             importsToAdd.add("java.util.Objects");
-            return DO_NOT_VISIT_SUBTREE;
+            return false;
         }
 
         if (isMethod(node, "com.google.common.base.Objects", "hashCode", "java.lang.Object[]") || isMethod(node,
@@ -148,7 +146,7 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
 
             r.replace(node, b.invoke(javaUtilObjects, "hash", copyOfArgs.toArray(new Expression[copyOfArgs.size()])));
             importsToAdd.add("java.util.Objects");
-            return DO_NOT_VISIT_SUBTREE;
+            return false;
         }
 
         if (isMethod(node, "org.apache.commons.lang3.ObjectUtils", "hashCodeMulti", "java.lang.Object[]")) {
@@ -162,7 +160,7 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
             }
 
             importsToAdd.add("java.util.Objects");
-            return DO_NOT_VISIT_SUBTREE;
+            return false;
         }
 
         if (isMethod(node, "com.google.common.base.Preconditions", "checkNotNull", "T")
@@ -185,13 +183,13 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
                         .setBody(b.invoke(b.simpleName("String"), "format", copyOfArgs.subList(1, copyOfArgs.size())));
                 r.replace(node, b.invoke(javaUtilObjects, "requireNonNull", copyOfArgs.get(0), messageSupplier));
             } else {
-                return VISIT_SUBTREE;
+                return true;
             }
             importsToAdd.add("java.util.Objects");
-            return DO_NOT_VISIT_SUBTREE;
+            return false;
         }
 
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private List<Expression> copyArguments(final ASTBuilder b, final MethodInvocation node) {

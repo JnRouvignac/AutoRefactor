@@ -25,8 +25,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.expressions;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getPrimitiveEnum;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.values;
@@ -90,28 +88,28 @@ public class AnnotationCleanUp extends AbstractCleanUpRule {
         final List<MemberValuePair> values= values(node);
         if (values.isEmpty()) {
             r.replace(node, b.markerAnnotation(b.move(node.getTypeName())));
-            return DO_NOT_VISIT_SUBTREE;
+            return false;
         } else if (values.size() == 1) {
             MemberValuePair pair= values.get(0);
             if ("value".equals(pair.getName().getIdentifier())) {
                 r.replace(node, b.singleValueAnnotation(b.move(node.getTypeName()), b.move(pair.getValue())));
-                return DO_NOT_VISIT_SUBTREE;
+                return false;
             }
         }
 
-        boolean result= VISIT_SUBTREE;
+        boolean result= true;
         Map<String, IMethodBinding> elements= toElementsMap(node.resolveAnnotationBinding());
         for (MemberValuePair pair : values) {
             IMethodBinding elementBinding= elements.get(pair.getName().getIdentifier());
             if (equal(elementBinding.getReturnType(), pair.getValue(), elementBinding.getDefaultValue())) {
                 r.remove(pair);
-                result= DO_NOT_VISIT_SUBTREE;
+                result= false;
             } else if (pair.getValue().getNodeType() == ARRAY_INITIALIZER) {
                 ArrayInitializer arrayInit= (ArrayInitializer) pair.getValue();
                 List<Expression> exprs= expressions(arrayInit);
                 if (exprs.size() == 1) {
                     r.replace(arrayInit, b.move(exprs.get(0)));
-                    result= DO_NOT_VISIT_SUBTREE;
+                    result= false;
                 }
             }
         }

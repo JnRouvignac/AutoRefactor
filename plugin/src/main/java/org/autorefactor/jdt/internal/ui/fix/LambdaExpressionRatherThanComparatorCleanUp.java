@@ -25,8 +25,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.as;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getDestinationType;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasType;
@@ -142,7 +140,7 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
             }
         }
 
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private boolean maybeRefactorMethod(final ClassInstanceCreation node, final ITypeBinding typeArgument,
@@ -176,7 +174,7 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
             }
         }
 
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private boolean maybeRefactorComparison(final ClassInstanceCreation node, final MethodDeclaration methodDecl,
@@ -209,13 +207,13 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
                 if (Utils.equalNotNull(objectExpr1.getIdentifier(), identifier1)
                         && Utils.equalNotNull(objectExpr2.getIdentifier(), identifier2)) {
                     refactorMethod(node, typeArgument, method1, classesToUseWithImport, true);
-                    return DO_NOT_VISIT_SUBTREE;
+                    return false;
                 }
 
                 if (Utils.equalNotNull(objectExpr1.getIdentifier(), identifier2)
                         && Utils.equalNotNull(objectExpr2.getIdentifier(), identifier1)) {
                     refactorMethod(node, typeArgument, method1, classesToUseWithImport, false);
-                    return DO_NOT_VISIT_SUBTREE;
+                    return false;
                 }
             }
         } else if (field1 != null && field2 != null) {
@@ -229,18 +227,18 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
                 if (Utils.equalNotNull(objectExpr1.getIdentifier(), identifier1)
                         && Utils.equalNotNull(objectExpr2.getIdentifier(), identifier2)) {
                     refactorField(node, typeArgument, field1, identifier1, classesToUseWithImport, true);
-                    return DO_NOT_VISIT_SUBTREE;
+                    return false;
                 }
 
                 if (Utils.equalNotNull(objectExpr1.getIdentifier(), identifier2)
                         && Utils.equalNotNull(objectExpr2.getIdentifier(), identifier1)) {
                     refactorField(node, typeArgument, field1, identifier1, classesToUseWithImport, false);
-                    return DO_NOT_VISIT_SUBTREE;
+                    return false;
                 }
             }
         }
 
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private void refactorMethod(final ClassInstanceCreation node, final ITypeBinding type,
@@ -274,11 +272,8 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
         final LambdaExpression lambdaExpr= b.lambda();
         final ITypeBinding destinationType= getDestinationType(node);
 
-        boolean isTypeKnown= false;
-        if (destinationType != null && hasType(destinationType, "java.util.Comparator")
-                && destinationType.getTypeArguments() != null && destinationType.getTypeArguments().length == 1) {
-            isTypeKnown= Utils.equalNotNull(destinationType.getTypeArguments()[0], type);
-        }
+        boolean isTypeKnown= destinationType != null && hasType(destinationType, "java.util.Comparator")
+                && destinationType.getTypeArguments() != null && destinationType.getTypeArguments().length == 1 && Utils.equalNotNull(destinationType.getTypeArguments()[0], type);
 
         if (isTypeKnown && straightOrder) {
             lambdaExpr.parameters().add(b.declareFragment(b.simpleName(identifier1)));

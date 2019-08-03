@@ -25,8 +25,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.asList;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.fallsThrough;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getNextSibling;
@@ -88,7 +86,7 @@ public class OneIfRatherThanDuplicateBlocksThatFallThroughCleanUp extends Abstra
 
         @Override
         public boolean visit(IfStatement node) {
-            if (getResult() == VISIT_SUBTREE) {
+            if (getResult()) {
                 final List<IfStatement> duplicateIfBlocks= new ArrayList<IfStatement>();
                 duplicateIfBlocks.add(node);
                 while (addOneMoreIf(duplicateIfBlocks)) {
@@ -98,12 +96,12 @@ public class OneIfRatherThanDuplicateBlocksThatFallThroughCleanUp extends Abstra
                 if (duplicateIfBlocks.size() > 1) {
                     mergeCode(duplicateIfBlocks);
 
-                    setResult(DO_NOT_VISIT_SUBTREE);
-                    return DO_NOT_VISIT_SUBTREE;
+                    setResult(false);
+                    return false;
                 }
-                return VISIT_SUBTREE;
+                return true;
             }
-            return DO_NOT_VISIT_SUBTREE;
+            return false;
         }
 
         private boolean addOneMoreIf(final List<IfStatement> duplicateIfBlocks) {

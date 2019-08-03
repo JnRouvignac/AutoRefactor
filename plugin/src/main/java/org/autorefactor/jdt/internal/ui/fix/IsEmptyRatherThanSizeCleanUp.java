@@ -26,8 +26,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.as;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isMethod;
 import static org.eclipse.jdt.core.dom.InfixExpression.Operator.EQUALS;
@@ -85,9 +83,9 @@ public class IsEmptyRatherThanSizeCleanUp extends AbstractCleanUpRule {
         final MethodInvocation rightMi= as(node.getRightOperand(), MethodInvocation.class);
         final Long leftLiteral= asNumber(node.getLeftOperand());
 
-        if (maybeReplaceCollectionSize(node, leftMi, sign(node.getOperator(), true),
-                rightLiteral) == DO_NOT_VISIT_SUBTREE) {
-            return DO_NOT_VISIT_SUBTREE;
+        if (!maybeReplaceCollectionSize(node, leftMi, sign(node.getOperator(), true),
+                rightLiteral)) {
+            return false;
         }
 
         return maybeReplaceCollectionSize(node, rightMi, sign(node.getOperator(), false), leftLiteral);
@@ -104,34 +102,34 @@ public class IsEmptyRatherThanSizeCleanUp extends AbstractCleanUpRule {
             if (literalSize == 0) {
                 if (GREATER_EQUALS.equals(operator)) {
                     r.replace(node, b.boolean0(true));
-                    return DO_NOT_VISIT_SUBTREE;
+                    return false;
                 } else if (LESS.equals(operator)) {
                     r.replace(node, b.boolean0(false));
                 } else if (GREATER.equals(operator)) {
                     r.replace(node, b.not(b.invoke(b.copyExpression(miToReplace), "isEmpty")));
-                    return DO_NOT_VISIT_SUBTREE;
+                    return false;
                 } else if (EQUALS.equals(operator)) {
                     r.replace(node, b.invoke(b.copyExpression(miToReplace), "isEmpty"));
-                    return DO_NOT_VISIT_SUBTREE;
+                    return false;
                 } else if (NOT_EQUALS.equals(operator)) {
                     r.replace(node, b.not(b.invoke(b.copyExpression(miToReplace), "isEmpty")));
-                    return DO_NOT_VISIT_SUBTREE;
+                    return false;
                 } else if (LESS_EQUALS.equals(operator)) {
                     r.replace(node, b.invoke(b.copyExpression(miToReplace), "isEmpty"));
-                    return DO_NOT_VISIT_SUBTREE;
+                    return false;
                 }
             } else if (literalSize == 1) {
                 if (GREATER_EQUALS.equals(operator)) {
                     r.replace(node, b.not(b.invoke(b.copyExpression(miToReplace), "isEmpty")));
-                    return DO_NOT_VISIT_SUBTREE;
+                    return false;
                 } else if (LESS.equals(operator)) {
                     r.replace(node, b.invoke(b.copyExpression(miToReplace), "isEmpty"));
-                    return DO_NOT_VISIT_SUBTREE;
+                    return false;
                 }
             }
         }
 
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private Long asNumber(final Expression expr) {

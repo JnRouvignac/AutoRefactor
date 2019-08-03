@@ -25,8 +25,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.as;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.fallsThrough;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isExceptionExpected;
@@ -77,10 +75,10 @@ public class ElseRatherThanOppositeConditionCleanUp extends AbstractCleanUpRule 
                 && (!fallsThrough(node.getThenStatement()) || !fallsThrough(secondIf.getThenStatement()))) {
             removeCondition(secondIf);
 
-            return DO_NOT_VISIT_SUBTREE;
+            return false;
         }
 
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private void removeCondition(final IfStatement secondIf) {

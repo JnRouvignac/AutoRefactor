@@ -25,8 +25,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.as;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getAncestorOrNull;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasType;
@@ -248,20 +246,20 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
                 if (data.getPrimeId() != null && data.getResultId() != null && data.getStmtIterator().hasNext()) {
                     while (!data.isHasReturnStmt() && data.getStmtIterator().hasNext()) {
                         if (!isStmtValid(data)) {
-                            return VISIT_SUBTREE;
+                            return true;
                         }
                     }
 
                     if (data.isHasReturnStmt() && !data.getStmtIterator().hasNext()) {
                         refactorHash(node, classesToUseWithImport, data);
                         importsToAdd.add("java.util.Objects");
-                        return DO_NOT_VISIT_SUBTREE;
+                        return false;
                     }
                 }
             }
         }
 
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private String isVariableValid(final CollectedData data, final int initValue) {

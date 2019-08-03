@@ -25,7 +25,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.asExpression;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getAncestor;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.initializers;
@@ -211,13 +210,13 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
     @Override
     public boolean visit(SimpleName node) {
         findVariableAccesses(node);
-        return VISIT_SUBTREE;
+        return true;
     }
 
     @Override
     public boolean visit(QualifiedName node) {
         findVariableAccesses(node);
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private void findVariableAccesses(Name node) {

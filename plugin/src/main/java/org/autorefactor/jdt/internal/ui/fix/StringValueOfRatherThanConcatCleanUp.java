@@ -26,8 +26,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.extendedOperands;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasType;
 
@@ -75,7 +73,7 @@ public class StringValueOfRatherThanConcatCleanUp extends AbstractCleanUpRule {
                     // if not replaced then try the other way round
                     && maybeReplaceStringConcatenation(node, rightOperand, leftOperand);
         }
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private boolean maybeReplaceStringConcatenation(final InfixExpression node, final Expression expr,
@@ -84,8 +82,8 @@ public class StringValueOfRatherThanConcatCleanUp extends AbstractCleanUpRule {
                 && !hasType(variable, "java.lang.String", "char[]")) {
             final ASTBuilder b= this.ctx.getASTBuilder();
             ctx.getRefactorings().replace(node, b.invoke("String", "valueOf", b.copy(variable)));
-            return DO_NOT_VISIT_SUBTREE;
+            return false;
         }
-        return VISIT_SUBTREE;
+        return true;
     }
 }

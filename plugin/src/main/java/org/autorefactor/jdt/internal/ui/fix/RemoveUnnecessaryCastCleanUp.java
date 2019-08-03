@@ -27,8 +27,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.allOperands;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.as;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getAncestor;
@@ -99,26 +97,26 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
         if (literal != null && (literal.getToken().matches(".*[^lLdDfF]") || literal.getToken().matches("0x.*[^lL]"))) {
             if (hasType(node.getType().resolveBinding(), "long")) {
                 createPrimitive(node, literal, 'L');
-                return DO_NOT_VISIT_SUBTREE;
+                return false;
             }
 
             if (hasType(node.getType().resolveBinding(), "float")) {
                 createPrimitive(node, literal, 'f');
-                return DO_NOT_VISIT_SUBTREE;
+                return false;
             }
 
             if (hasType(node.getType().resolveBinding(), "double")) {
                 createPrimitive(node, literal, 'd');
-                return DO_NOT_VISIT_SUBTREE;
+                return false;
             }
         }
 
         if (canRemoveCast(node)) {
             final ASTBuilder b= ctx.getASTBuilder();
             ctx.getRefactorings().replace(node, b.move(node.getExpression()));
-            return DO_NOT_VISIT_SUBTREE;
+            return false;
         }
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private void createPrimitive(final CastExpression node, final NumberLiteral literal, final char postfix) {

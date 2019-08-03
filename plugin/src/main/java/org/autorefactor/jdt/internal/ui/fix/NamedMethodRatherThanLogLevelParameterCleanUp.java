@@ -25,8 +25,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.arguments;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isField;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isMethod;
@@ -94,16 +92,16 @@ public class NamedMethodRatherThanLogLevelParameterCleanUp extends AbstractClean
                     } else if (isField(levelType, "java.util.logging.Level", "FINEST")) {
                         methodName= "finest";
                     } else {
-                        return VISIT_SUBTREE;
+                        return true;
                     }
 
                     replaceLevelByMethodName(node, methodName, message);
-                    return DO_NOT_VISIT_SUBTREE;
+                    return false;
                 }
             }
         }
 
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private void replaceLevelByMethodName(final MethodInvocation node, final String methodName,

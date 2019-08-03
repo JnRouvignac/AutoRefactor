@@ -37,8 +37,6 @@ import static org.eclipse.jdt.core.dom.Modifier.isStatic;
 import static org.eclipse.jdt.core.search.IJavaSearchConstants.WAIT_UNTIL_READY_TO_SEARCH;
 import static org.eclipse.jdt.core.search.SearchEngine.createWorkspaceScope;
 import static org.eclipse.jdt.core.search.SearchPattern.R_EXACT_MATCH;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.fragments;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getEnclosingType;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getFirstAncestorOrNull;
@@ -545,7 +543,7 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
 
             node.accept(new NamesCollector());
         }
-        return VISIT_SUBTREE;
+        return true;
     }
 
     @Override
@@ -575,7 +573,7 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
                 // We cannot determine the FQN, so we cannot safely replace it
                 types.cannotReplaceSimpleName(node.getName().getIdentifier());
             }
-            return VISIT_SUBTREE;
+            return true;
         }
 
         @Override
@@ -589,7 +587,7 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
                 // We cannot determine the FQN, so we cannot safely replace it
                 methods.cannotReplaceSimpleName(simpleName);
             }
-            return VISIT_SUBTREE;
+            return true;
         }
 
         @Override
@@ -605,7 +603,7 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
                     fields.cannotReplaceSimpleName(simpleName);
                 }
             }
-            return VISIT_SUBTREE;
+            return true;
         }
     }
 
@@ -637,10 +635,10 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
             final QName qname= QName.valueOf(declaringClass.getErasure().getQualifiedName(), methodBinding.getName());
             if (methods.canReplaceFqnWithSimpleName(node, qname, FqnType.METHOD)) {
                 ctx.getRefactorings().remove(expr);
-                return DO_NOT_VISIT_SUBTREE;
+                return false;
             }
         }
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private boolean hasKind(Name name, int bindingKind) {
@@ -663,14 +661,14 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
     public boolean visit(MethodDeclaration node) {
         // Method parameters
         for (final SingleVariableDeclaration parameter : parameters(node)) {
-            if (maybeReplaceFqnsWithSimpleNames(parameter) == DO_NOT_VISIT_SUBTREE) {
-                return DO_NOT_VISIT_SUBTREE;
+            if (!maybeReplaceFqnsWithSimpleNames(parameter)) {
+                return false;
             }
         }
 
         // Method return value
-        if (maybeReplaceFqnsWithSimpleNames(node.getReturnType2()) == DO_NOT_VISIT_SUBTREE) {
-            return DO_NOT_VISIT_SUBTREE;
+        if (!maybeReplaceFqnsWithSimpleNames(node.getReturnType2())) {
+            return false;
         }
 
         // Method body
@@ -691,20 +689,20 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
         if (node != null) {
             final Iterable<QualifiedName> qualifiedNames= new QualifiedNamesCollector().collect(node);
             for (final QualifiedName qualifiedName : qualifiedNames) {
-                if (maybeReplaceFqnWithSimpleName(qualifiedName, localIdentifiers) == DO_NOT_VISIT_SUBTREE) {
-                    return DO_NOT_VISIT_SUBTREE;
+                if (!maybeReplaceFqnWithSimpleName(qualifiedName, localIdentifiers)) {
+                    return false;
                 }
             }
         }
 
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private static final class QualifiedNamesCollector extends CollectorVisitor<QualifiedName> {
         @Override
         public boolean visit(QualifiedName node) {
             addResult(node);
-            return VISIT_SUBTREE;
+            return true;
         }
     }
 
@@ -712,15 +710,15 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
         final ASTNode ancestor= getFirstAncestorOrNull(node, PackageDeclaration.class, ImportDeclaration.class);
         final QName qname= getFullyQualifiedNameOrNull(node);
         if (ancestor != null || qname == null) {
-            return VISIT_SUBTREE;
+            return true;
         }
         if (types.canReplaceFqnWithSimpleName(node, qname, FqnType.TYPE)
                 || (fields.canReplaceFqnWithSimpleName(node, qname, FqnType.FIELD)
                         && !localIdentifiers.contains(qname.simpleName))) {
             final ASTBuilder b= ctx.getASTBuilder();
             ctx.getRefactorings().replace(node, b.copy(node.getName()));
-            return DO_NOT_VISIT_SUBTREE;
+            return false;
         }
-        return VISIT_SUBTREE;
+        return true;
     }
 }

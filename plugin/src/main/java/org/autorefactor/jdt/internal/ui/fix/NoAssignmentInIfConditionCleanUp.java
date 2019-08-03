@@ -26,8 +26,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.as;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.fragments;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getParent;
@@ -94,7 +92,7 @@ public class NoAssignmentInIfConditionCleanUp extends AbstractCleanUpRule {
         @Override
         public boolean visit(IfStatement node) {
             if (!(node.getParent() instanceof Block)) {
-                return VISIT_SUBTREE;
+                return true;
             }
 
             final InfixExpression ie= as(node.getExpression(), InfixExpression.class);
@@ -114,7 +112,7 @@ public class NoAssignmentInIfConditionCleanUp extends AbstractCleanUpRule {
                     return moveAssignmentBeforeIfStatementIfPossible(node, leftIe);
                 }
             }
-            return VISIT_SUBTREE;
+            return true;
         }
 
         private boolean moveAssignmentBeforeIfStatement(final IfStatement node, final Assignment a) {
@@ -126,15 +124,15 @@ public class NoAssignmentInIfConditionCleanUp extends AbstractCleanUpRule {
             if (vdf != null) {
                 r.set(vdf, INITIALIZER_PROPERTY, a.getRightHandSide());
                 r.replace(getParent(a, ParenthesizedExpression.class), b.copy(lhs));
-                setResult(DO_NOT_VISIT_SUBTREE);
-                return DO_NOT_VISIT_SUBTREE;
+                setResult(false);
+                return false;
             } else if (!isAnElseIf(node)) {
                 r.insertBefore(b.toStmt(b.move(a)), node);
                 r.replace(getParent(a, ParenthesizedExpression.class), b.copy(lhs));
-                setResult(DO_NOT_VISIT_SUBTREE);
-                return DO_NOT_VISIT_SUBTREE;
+                setResult(false);
+                return false;
             }
-            return VISIT_SUBTREE;
+            return true;
         }
 
         private VariableDeclarationFragment findVariableDeclarationFragment(final VariableDeclarationStatement vds,

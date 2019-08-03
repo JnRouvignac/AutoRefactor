@@ -26,8 +26,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.as;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasOperator;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isPassive;
@@ -81,7 +79,7 @@ public class ORConditionRatherThanRedundantClausesCleanUp extends AbstractCleanU
                     && maybeRefactorCondition(node, node.getOperator(), rightOperand, leftOperand, false);
         }
 
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private boolean maybeRefactorCondition(final InfixExpression node, final Operator operator,
@@ -96,16 +94,16 @@ public class ORConditionRatherThanRedundantClausesCleanUp extends AbstractCleanU
                     && isPrimitive(operand2)) {
                 if (matcher.matchOpposite(complexCondition.getLeftOperand(), operand2)) {
                     replaceDuplicateExpr(node, operator, complexCondition.getRightOperand(), operand2, forward);
-                    return DO_NOT_VISIT_SUBTREE;
+                    return false;
                 }
 
                 if (matcher.matchOpposite(complexCondition.getRightOperand(), operand2)) {
                     replaceDuplicateExpr(node, operator, complexCondition.getLeftOperand(), operand2, forward);
-                    return DO_NOT_VISIT_SUBTREE;
+                    return false;
                 }
             }
         }
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private void replaceDuplicateExpr(final InfixExpression node, final Operator operator, final Expression leftExpr,

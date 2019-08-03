@@ -26,8 +26,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.arguments;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasType;
 
@@ -74,9 +72,9 @@ public class StringRatherThanNewStringCleanUp extends AbstractCleanUpRule {
                     && (arg0 instanceof StringLiteral || arg0 instanceof InfixExpression)) {
                 final ASTBuilder b= ctx.getASTBuilder();
                 ctx.getRefactorings().replace(node, b.parenthesizeIfNeeded(b.copy(arg0)));
-                return DO_NOT_VISIT_SUBTREE;
+                return false;
             }
         }
-        return VISIT_SUBTREE;
+        return true;
     }
 }

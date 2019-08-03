@@ -25,8 +25,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.asList;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.fallsThrough;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getNextSibling;
@@ -88,7 +86,7 @@ public class OneCodeThatFallsThroughRatherThanRedundantBlocksCleanUp extends Abs
 
         @Override
         public boolean visit(TryStatement node) {
-            if (getResult() == VISIT_SUBTREE && node.getFinally() == null) {
+            if (getResult() && node.getFinally() == null) {
                 final List<Statement> redundantStmts= new ArrayList<Statement>();
                 for (final CatchClause catchClause : (List<CatchClause>) node.catchClauses()) {
                     redundantStmts.add(catchClause.getBody());
@@ -96,19 +94,19 @@ public class OneCodeThatFallsThroughRatherThanRedundantBlocksCleanUp extends Abs
 
                 return maybeRemoveRedundantCode(node, redundantStmts);
             }
-            return VISIT_SUBTREE;
+            return true;
         }
 
         @Override
         public boolean visit(IfStatement node) {
-            if (getResult() == VISIT_SUBTREE) {
+            if (getResult()) {
                 final List<Statement> redundantStmts= new ArrayList<Statement>();
                 redundantStmts.add(node.getThenStatement());
                 extractStmt(node, redundantStmts);
 
                 return maybeRemoveRedundantCode(node, redundantStmts);
             }
-            return VISIT_SUBTREE;
+            return true;
         }
 
         private void extractStmt(final IfStatement node, final List<Statement> redundantStmts) {
@@ -150,13 +148,13 @@ public class OneCodeThatFallsThroughRatherThanRedundantBlocksCleanUp extends Abs
                             ASTBuilder b= ctx.getASTBuilder();
                             r.replace(redundantStmt, b.block());
                         }
-                        setResult(DO_NOT_VISIT_SUBTREE);
+                        setResult(false);
                     }
                 }
 
                 return getResult();
             }
-            return VISIT_SUBTREE;
+            return true;
         }
     }
 }

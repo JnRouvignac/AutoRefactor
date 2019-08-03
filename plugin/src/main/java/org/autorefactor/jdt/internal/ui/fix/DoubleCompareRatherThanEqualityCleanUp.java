@@ -25,8 +25,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasOperator;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasType;
 import static org.eclipse.jdt.core.dom.InfixExpression.Operator.EQUALS;
@@ -75,10 +73,10 @@ public class DoubleCompareRatherThanEqualityCleanUp extends AbstractCleanUpRule 
                 && hasType(node.getLeftOperand(), "double", "java.lang.Double")
                 && hasType(node.getRightOperand(), "double", "java.lang.Double")) {
             replace(node);
-            return DO_NOT_VISIT_SUBTREE;
+            return false;
         }
 
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private void replace(final InfixExpression node) {

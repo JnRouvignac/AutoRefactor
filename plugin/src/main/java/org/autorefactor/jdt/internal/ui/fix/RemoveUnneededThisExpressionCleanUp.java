@@ -25,8 +25,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.as;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getEnclosingType;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isEqual;
@@ -80,9 +78,9 @@ public class RemoveUnneededThisExpressionCleanUp extends AbstractCleanUpRule {
                 && typeArguments(node).isEmpty()) {
             // remove useless thisExpressions
             this.ctx.getRefactorings().remove(node.getExpression());
-            return DO_NOT_VISIT_SUBTREE;
+            return false;
         }
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private static boolean thisExpressionRefersToEnclosingType(ThisExpression thisExpression) {

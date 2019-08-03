@@ -26,8 +26,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.as;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.asExpression;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.asList;
@@ -144,8 +142,8 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends Abst
 
                             if (isPositive != null) {
                                 replaceLoopAndReturn(forNode, iterable, toFind, forNextStmt, isPositive);
-                                setResult(DO_NOT_VISIT_SUBTREE);
-                                return DO_NOT_VISIT_SUBTREE;
+                                setResult(false);
+                                return false;
                             }
 
                             return maybeReplaceLoopAndVariable(forNode, iterable, thenStmt, toFind);
@@ -154,24 +152,24 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends Abst
                         BreakStatement bs= as(thenStmts.get(thenStmts.size() - 1), BreakStatement.class);
 
                         if (bs != null && bs.getLabel() == null) {
-                            if (thenStmts.size() == 2 && maybeReplaceLoopAndVariable(forNode, iterable,
-                                    thenStmts.get(0), toFind) == DO_NOT_VISIT_SUBTREE) {
-                                return DO_NOT_VISIT_SUBTREE;
+                            if (thenStmts.size() == 2 && !maybeReplaceLoopAndVariable(forNode, iterable,
+                                    thenStmts.get(0), toFind)) {
+                                return false;
                             }
 
                             if (loopElementIsUsed(loopElement, thenStmts)) {
                                 // Cannot remove the loop and its loop element
-                                return VISIT_SUBTREE;
+                                return true;
                             }
 
                             replaceLoopByIf(forNode, iterable, thenStmts, toFind, bs);
-                            setResult(DO_NOT_VISIT_SUBTREE);
-                            return DO_NOT_VISIT_SUBTREE;
+                            setResult(false);
+                            return false;
                         }
                     }
                 }
             }
-            return VISIT_SUBTREE;
+            return true;
         }
 
         private boolean loopElementIsUsed(Expression loopElement, List<Statement> thenStmts) {
@@ -199,10 +197,10 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends Abst
             public boolean visit(SimpleName variable) {
                 if (isSameLocalVariable(varName, variable)) {
                     setResult(true);
-                    return DO_NOT_VISIT_SUBTREE;
+                    return false;
                 }
 
-                return VISIT_SUBTREE;
+                return true;
             }
         }
 
@@ -246,13 +244,13 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends Abst
                     if (isPositive != null) {
                         replaceLoopAndVariable(forNode, iterable, toFind, previousStmt, previousStmtIsPreviousSibling,
                                 initName, isPositive);
-                        setResult(DO_NOT_VISIT_SUBTREE);
-                        return DO_NOT_VISIT_SUBTREE;
+                        setResult(false);
+                        return false;
                     }
                 }
             }
 
-            return VISIT_SUBTREE;
+            return true;
         }
 
         private void replaceLoopAndVariable(Statement forNode, Expression iterable, Expression toFind,
@@ -334,7 +332,7 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends Abst
 
                         if (!match(mi, collectionGet(loopContent))
                                 || !isSameVariable(mi.getExpression(), loopContent.getContainerVariable())) {
-                            return VISIT_SUBTREE;
+                            return true;
                         }
 
                         is= as(stmts.get(1), IfStatement.class);
@@ -342,7 +340,7 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends Abst
                         is= as(stmts.get(0), IfStatement.class);
                         loopElement= collectionGet(loopContent);
                     } else {
-                        return VISIT_SUBTREE;
+                        return true;
                     }
 
                     return maybeReplaceWithCollectionContains(node, loopContent.getContainerVariable(), loopElement,
@@ -359,7 +357,7 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends Abst
 
                         if (!match(mi, iteratorNext(loopContent))
                                 || !isSameVariable(mi.getExpression(), loopContent.getIteratorVariable())) {
-                            return VISIT_SUBTREE;
+                            return true;
                         }
 
                         is= as(stmts.get(1), IfStatement.class);
@@ -367,7 +365,7 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends Abst
                         is= as(stmts.get(0), IfStatement.class);
                         loopElement= iteratorNext(loopContent);
                     } else {
-                        return VISIT_SUBTREE;
+                        return true;
                     }
 
                     return maybeReplaceWithCollectionContains(node, loopContent.getContainerVariable(), loopElement,
@@ -375,7 +373,7 @@ public abstract class AbstractCollectionMethodRatherThanLoopCleanUp extends Abst
                 }
             }
 
-            return VISIT_SUBTREE;
+            return true;
         }
 
         private MethodInvocation iteratorNext(final ForLoopContent loopContent) {

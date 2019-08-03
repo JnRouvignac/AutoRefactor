@@ -25,8 +25,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.catchClauses;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.fragments;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getOverridenMethods;
@@ -327,11 +325,11 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
                         r.remove(catchClause1);
                         r.set(catchClause2.getException(), SingleVariableDeclaration.TYPE_PROPERTY, ut);
                     }
-                    return DO_NOT_VISIT_SUBTREE;
+                    return false;
                 }
             }
         }
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private Binding[] resolveTypeBindings(List<CatchClause> catchClauses) {

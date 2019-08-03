@@ -26,8 +26,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.asExpression;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getAncestorOrNull;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getPreviousSibling;
@@ -104,8 +102,8 @@ public class RemoveUnnecessaryLocalBeforeReturnCleanUp extends AbstractCleanUpRu
 
                 if (vdf != null && isSameLocalVariable(node.getExpression(), vdf.getName())) {
                     removeVariable(node, vds, vdf);
-                    setResult(DO_NOT_VISIT_SUBTREE);
-                    return DO_NOT_VISIT_SUBTREE;
+                    setResult(false);
+                    return false;
                 }
             } else {
                 final Assignment as= asExpression(previousSibling, Assignment.class);
@@ -113,11 +111,11 @@ public class RemoveUnnecessaryLocalBeforeReturnCleanUp extends AbstractCleanUpRu
                         && !isUsedAfterReturn((IVariableBinding) ((Name) as.getLeftHandSide()).resolveBinding(),
                                 node)) {
                     replaceReturnStatement(node, previousSibling, as.getRightHandSide());
-                    setResult(DO_NOT_VISIT_SUBTREE);
-                    return DO_NOT_VISIT_SUBTREE;
+                    setResult(false);
+                    return false;
                 }
             }
-            return VISIT_SUBTREE;
+            return true;
         }
 
         private boolean isUsedAfterReturn(final IVariableBinding varToSearch, final ASTNode scopeNode) {

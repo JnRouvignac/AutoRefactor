@@ -26,8 +26,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.as;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isPassive;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.match;
@@ -104,8 +102,8 @@ public class CommonIfInIfElseCleanUp extends AbstractCleanUpRule {
             this.ctx.getRefactorings().replace(node,
                     b.if0(b.move(thenInnerIfStmt.getExpression()), b.block(b.if0(b.move(node.getExpression()),
                             b.move(thenInnerIfStmt.getThenStatement()), b.move(elseInnerIfStmt.getThenStatement())))));
-            return DO_NOT_VISIT_SUBTREE;
+            return false;
         }
-        return VISIT_SUBTREE;
+        return true;
     }
 }

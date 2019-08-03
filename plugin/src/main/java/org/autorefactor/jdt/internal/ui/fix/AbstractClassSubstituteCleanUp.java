@@ -26,8 +26,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getAncestorOrNull;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getNextSibling;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasType;
@@ -256,11 +254,11 @@ public abstract class AbstractClassSubstituteCleanUp extends NewClassImportClean
             if (canInstantiationBeRefactored(instanceCreation) && canBeRefactored(node, instanceCreation,
                     instanceCreation.resolveTypeBinding(), varDecls, methodCallsToRefactor) && canCodeBeRefactored()) {
                 replaceClass(instanceCreation, varDecls, methodCallsToRefactor, classesToUseWithImport, importsToAdd);
-                return DO_NOT_VISIT_SUBTREE;
+                return false;
             }
         }
 
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private boolean canBeRefactored(Block node, final ASTNode itemToRefactor, final ITypeBinding itemTypeBinding,
@@ -424,12 +422,12 @@ public abstract class AbstractClassSubstituteCleanUp extends NewClassImportClean
 
         @Override
         public boolean visit(Block node) {
-            return (startNode == node) ? VISIT_SUBTREE : DO_NOT_VISIT_SUBTREE;
+            return startNode == node;
         }
 
         @Override
         public boolean visit(AnonymousClassDeclaration node) {
-            return DO_NOT_VISIT_SUBTREE;
+            return false;
         }
 
         @Override
@@ -444,7 +442,7 @@ public abstract class AbstractClassSubstituteCleanUp extends NewClassImportClean
             if (hasType(typeBinding, getExistingClassCanonicalName())) {
                 objectInstantiations.add(instanceCreation);
             }
-            return VISIT_SUBTREE;
+            return true;
         }
     }
 
@@ -471,7 +469,7 @@ public abstract class AbstractClassSubstituteCleanUp extends NewClassImportClean
             if (aVariable.getIdentifier().equals(varDeclName.getIdentifier()) && !aVariable.equals(varDeclName)) {
                 varOccurrences.add(aVariable);
             }
-            return VISIT_SUBTREE;
+            return true;
         }
 
         @Override
@@ -484,7 +482,7 @@ public abstract class AbstractClassSubstituteCleanUp extends NewClassImportClean
                     return interruptVisit();
                 }
             }
-            return VISIT_SUBTREE;
+            return true;
         }
     }
 }

@@ -25,8 +25,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.as;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.asList;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getLocalVariableIdentifiers;
@@ -84,7 +82,7 @@ public class DeclarationOutsideLoopRatherThanInsideCleanUp extends AbstractClean
     @Override
     public boolean visit(final Block node) {
         final List<Statement> blockStmt= asList(node);
-        boolean result= VISIT_SUBTREE;
+        boolean result= true;
 
         List<Statement> forStmts;
         for (int i= 0; i < blockStmt.size(); i++) {
@@ -140,7 +138,7 @@ public class DeclarationOutsideLoopRatherThanInsideCleanUp extends AbstractClean
 
                 for (final VariableDeclarationStatement candidate : candidates) {
                     moveDeclaration(b, r, stmt, candidate);
-                    result= DO_NOT_VISIT_SUBTREE;
+                    result= false;
                 }
             }
         }

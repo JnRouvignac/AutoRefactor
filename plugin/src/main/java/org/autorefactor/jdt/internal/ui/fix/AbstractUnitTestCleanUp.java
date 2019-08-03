@@ -118,7 +118,7 @@ public abstract class AbstractUnitTestCleanUp extends AbstractCleanUpRule {
                 staticImports.add(node.getName().getFullyQualifiedName());
             }
         }
-        return VISIT_SUBTREE;
+        return true;
     }
 
     /**
@@ -182,7 +182,7 @@ public abstract class AbstractUnitTestCleanUp extends AbstractCleanUpRule {
         } else if (isRewriteNeeded) {
             return refactorToAssertTrueOrFalse(nodeToReplace, originalMethod, failureMessage, condition, isAssertTrue);
         }
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private boolean refactorToAssertTrueOrFalse(final ASTNode nodeToReplace, final MethodInvocation originalMethod,
@@ -193,7 +193,7 @@ public abstract class AbstractUnitTestCleanUp extends AbstractCleanUpRule {
 
         r.replace(nodeToReplace, invokeMethodOrStatement(nodeToReplace, b,
                 invokeMethod(b, originalMethod, methodName, b.copy(condition), null, failureMessage)));
-        return DO_NOT_VISIT_SUBTREE;
+        return false;
     }
 
     private boolean maybeReplaceOrRemove(final ASTNode nodeToReplace, final MethodInvocation originalMethod,
@@ -201,12 +201,12 @@ public abstract class AbstractUnitTestCleanUp extends AbstractCleanUpRule {
         final Refactorings r= this.ctx.getRefactorings();
         if (replace) {
             r.replace(nodeToReplace, invokeFail(nodeToReplace, originalMethod, failureMessage));
-            return DO_NOT_VISIT_SUBTREE;
+            return false;
         } else if (nodeToReplace.getParent().getNodeType() == EXPRESSION_STATEMENT) {
             r.remove(nodeToReplace.getParent());
-            return DO_NOT_VISIT_SUBTREE;
+            return false;
         }
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private MethodInvocation invokeFail(final ASTNode node, final MethodInvocation originalMethod,
@@ -233,7 +233,7 @@ public abstract class AbstractUnitTestCleanUp extends AbstractCleanUpRule {
             final MethodInvocation newAssert= invokeMethod(b, originalMethod, getAssertName(isAssertEquals, "Same"),
                     b.copy(actualAndExpected.getFirst()), b.copy(actualAndExpected.getSecond()), failureMessage);
             r.replace(nodeToReplace, invokeMethodOrStatement(nodeToReplace, b, newAssert));
-            return DO_NOT_VISIT_SUBTREE;
+            return false;
         } else {
             return maybeRefactorToAssertEquals(nodeToReplace, originalMethod, isAssertEquals,
                     actualAndExpected.getFirst(), actualAndExpected.getSecond(), failureMessage, true);
@@ -261,24 +261,24 @@ public abstract class AbstractUnitTestCleanUp extends AbstractCleanUpRule {
         if (isNullLiteral(actualValue)) {
             r.replace(nodeToReplace, invokeMethodOrStatement(nodeToReplace, b,
                     invokeAssertNull(originalMethod, isAssertEquals, expectedValue, failureMessage)));
-            return DO_NOT_VISIT_SUBTREE;
+            return false;
         } else if (isNullLiteral(expectedValue)) {
             r.replace(nodeToReplace, invokeMethodOrStatement(nodeToReplace, b,
                     invokeAssertNull(originalMethod, isAssertEquals, actualValue, failureMessage)));
-            return DO_NOT_VISIT_SUBTREE;
+            return false;
         } else if ((isConstant(actualValue) || isVariableNamedExpected(actualValue)) && !isConstant(expectedValue)
                 && !isVariableNamedExpected(expectedValue)) {
             final MethodInvocation newAssert= invokeMethod(b, originalMethod, getAssertName(isAssertEquals, "Equals"),
                     b.copy(expectedValue), b.copy(actualValue), failureMessage);
             r.replace(nodeToReplace, invokeMethodOrStatement(nodeToReplace, b, newAssert));
-            return DO_NOT_VISIT_SUBTREE;
+            return false;
         } else if (isRewriteNeeded) {
             final MethodInvocation newAssert= invokeMethod(b, originalMethod, getAssertName(isAssertEquals, "Equals"),
                     b.copy(actualValue), b.copy(expectedValue), failureMessage);
             r.replace(nodeToReplace, invokeMethodOrStatement(nodeToReplace, b, newAssert));
-            return DO_NOT_VISIT_SUBTREE;
+            return false;
         }
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private boolean isVariableNamedExpected(final Expression expr) {

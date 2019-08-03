@@ -26,8 +26,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getAncestor;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isMethod;
 
@@ -94,7 +92,7 @@ public class AndroidWakeLockCleanUp extends AbstractCleanUpRule {
                     // Add the missing onPause() method to the class.
                     r.insertAfter(createOnPauseMethodDeclaration(), enclosingMethod);
                 }
-                return DO_NOT_VISIT_SUBTREE;
+                return false;
             }
         } else if (isMethod(node, "android.os.PowerManager.WakeLock", "acquire")) {
             final Refactorings r= ctx.getRefactorings();
@@ -108,10 +106,10 @@ public class AndroidWakeLockCleanUp extends AbstractCleanUpRule {
                     r.insertLast(typeDeclaration, typeDeclaration.getBodyDeclarationsProperty(),
                             createOnPauseMethodDeclaration());
                 }
-                return DO_NOT_VISIT_SUBTREE;
+                return false;
             }
         }
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private Statement createWakelockReleaseStmt(MethodInvocation methodInvocation) {
@@ -144,9 +142,9 @@ public class AndroidWakeLockCleanUp extends AbstractCleanUpRule {
         public boolean visit(MethodInvocation node) {
             if (isMethod(node, "android.os.PowerManager.WakeLock", "release")) {
                 setResult(true);
-                return DO_NOT_VISIT_SUBTREE;
+                return false;
             }
-            return VISIT_SUBTREE;
+            return true;
         }
     }
 }

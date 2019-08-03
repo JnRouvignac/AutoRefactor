@@ -26,8 +26,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.arguments;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.asList;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getCalledType;
@@ -104,7 +102,7 @@ public class LambdaCleanUp extends AbstractCleanUpRule {
             node.accept(lambdaExprVisitor);
             return lambdaExprVisitor.getResult();
         }
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private final class LambdaExprVisitor extends BlockSubVisitor {
@@ -119,13 +117,13 @@ public class LambdaCleanUp extends AbstractCleanUpRule {
                 // FIXME: it should also be possible to deal with a SingleVariableDeclaration
                 // when the type matches the expected inferred type
                 removeParamParentheses(node);
-                return DO_NOT_VISIT_SUBTREE;
+                return false;
             } else if (node.getBody() instanceof Block) {
                 final List<Statement> stmts= asList((Block) node.getBody());
 
                 if (stmts.size() == 1 && stmts.get(0) instanceof ReturnStatement) {
                     removeReturnAndBrackets(node, stmts);
-                    return DO_NOT_VISIT_SUBTREE;
+                    return false;
                 }
             } else if (node.getBody() instanceof ClassInstanceCreation) {
                 final ClassInstanceCreation ci= (ClassInstanceCreation) node.getBody();
@@ -133,7 +131,7 @@ public class LambdaCleanUp extends AbstractCleanUpRule {
                 final List<Expression> arguments= arguments(ci);
                 if (node.parameters().size() == arguments.size() && isSameIdentifier(node, arguments)) {
                     replaceByCreationReference(node, ci);
-                    return DO_NOT_VISIT_SUBTREE;
+                    return false;
                 }
             } else if (node.getBody() instanceof SuperMethodInvocation) {
                 final SuperMethodInvocation smi= (SuperMethodInvocation) node.getBody();
@@ -141,7 +139,7 @@ public class LambdaCleanUp extends AbstractCleanUpRule {
                 final List<Expression> arguments= arguments(smi);
                 if (node.parameters().size() == arguments.size() && isSameIdentifier(node, arguments)) {
                     replaceBySuperMethodReference(node, smi);
-                    return DO_NOT_VISIT_SUBTREE;
+                    return false;
                 }
             } else if (node.getBody() instanceof MethodInvocation) {
                 final MethodInvocation mi= (MethodInvocation) node.getBody();
@@ -151,7 +149,7 @@ public class LambdaCleanUp extends AbstractCleanUpRule {
                 final List<Expression> arguments= arguments(mi);
                 if (node.parameters().size() == arguments.size()) {
                     if (!isSameIdentifier(node, arguments)) {
-                        return VISIT_SUBTREE;
+                        return true;
                     }
 
                     if (isStaticMethod(mi)) {
@@ -164,30 +162,30 @@ public class LambdaCleanUp extends AbstractCleanUpRule {
                             for (final IMethodBinding methodBinding : calledType.getDeclaredMethods()) {
                                 if ((methodBinding.getModifiers() & Modifier.STATIC) == 0 && isMethod(methodBinding,
                                         calledType.getQualifiedName(), mi.getName().getIdentifier(), remainingParams)) {
-                                    return VISIT_SUBTREE;
+                                    return true;
                                 }
                             }
                         }
 
                         replaceByTypeReference(node, mi);
-                        return DO_NOT_VISIT_SUBTREE;
+                        return false;
                     }
 
                     if (calledExpr == null || calledExpr instanceof StringLiteral || calledExpr instanceof NumberLiteral
                             || calledExpr instanceof ThisExpression) {
                         replaceByMethodReference(node, mi);
-                        return DO_NOT_VISIT_SUBTREE;
+                        return false;
                     } else if (calledExpr instanceof FieldAccess) {
                         final FieldAccess fieldAccess= (FieldAccess) calledExpr;
                         if (fieldAccess.resolveFieldBinding().isEffectivelyFinal()) {
                             replaceByMethodReference(node, mi);
-                            return DO_NOT_VISIT_SUBTREE;
+                            return false;
                         }
                     } else if (calledExpr instanceof SuperFieldAccess) {
                         final SuperFieldAccess fieldAccess= (SuperFieldAccess) calledExpr;
                         if (fieldAccess.resolveFieldBinding().isEffectivelyFinal()) {
                             replaceByMethodReference(node, mi);
-                            return DO_NOT_VISIT_SUBTREE;
+                            return false;
                         }
                     }
                 } else if (calledExpr instanceof SimpleName && node.parameters().size() == arguments.size() + 1) {
@@ -196,7 +194,7 @@ public class LambdaCleanUp extends AbstractCleanUpRule {
                         for (int i= 0; i < arguments.size(); i++) {
                             final ASTNode expr= removeParentheses(arguments.get(i));
                             if (!(expr instanceof SimpleName) || !isSameIdentifier(node, i + 1, (SimpleName) expr)) {
-                                return VISIT_SUBTREE;
+                                return true;
                             }
                         }
 
@@ -210,16 +208,16 @@ public class LambdaCleanUp extends AbstractCleanUpRule {
                         for (IMethodBinding methodBinding : clazz.getDeclaredMethods()) {
                             if ((methodBinding.getModifiers() & Modifier.STATIC) > 0 && isMethod(methodBinding,
                                     clazz.getQualifiedName(), mi.getName().getIdentifier(), remainingParams)) {
-                                return VISIT_SUBTREE;
+                                return true;
                             }
                         }
 
                         replaceByTypeReference(node, mi);
-                        return DO_NOT_VISIT_SUBTREE;
+                        return false;
                     }
                 }
             }
-            return VISIT_SUBTREE;
+            return true;
         }
 
         private boolean isStaticMethod(final MethodInvocation mi) {

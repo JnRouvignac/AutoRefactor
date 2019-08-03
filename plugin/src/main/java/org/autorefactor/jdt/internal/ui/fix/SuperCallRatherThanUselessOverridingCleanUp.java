@@ -25,8 +25,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.asExpression;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasType;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.statements;
@@ -92,7 +90,7 @@ public class SuperCallRatherThanUselessOverridingCleanUp extends AbstractCleanUp
     @Override
     public boolean visit(final MethodDeclaration node) {
         if (node.getBody() == null) {
-            return VISIT_SUBTREE;
+            return true;
         }
 
         final List<Statement> bodyStmts= statements(node.getBody());
@@ -114,17 +112,17 @@ public class SuperCallRatherThanUselessOverridingCleanUp extends AbstractCleanUp
                         // protected also means package visibility, so check if it is required
                         if (!isMethodUsedInItsPackage(declMethodBinding, node)) {
                             this.ctx.getRefactorings().remove(node);
-                            return DO_NOT_VISIT_SUBTREE;
+                            return false;
                         }
                     } else {
                         this.ctx.getRefactorings().remove(node);
-                        return DO_NOT_VISIT_SUBTREE;
+                        return false;
                     }
                 }
             }
         }
 
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private boolean haveSameParameters(final MethodDeclaration node, final SuperMethodInvocation bodyMi) {

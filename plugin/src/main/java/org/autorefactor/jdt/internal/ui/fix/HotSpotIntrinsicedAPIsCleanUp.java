@@ -25,8 +25,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.asExpression;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.asList;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.fragments;
@@ -138,7 +136,7 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
                 }
             }
         }
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private Expression calcIndex(Expression index, SystemArrayCopyParams params) {
@@ -262,7 +260,7 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
     private boolean replaceWithSystemArrayCopyCloneAll(ForStatement node, SystemArrayCopyParams params) {
         if (params.srcArrayExpr == null || params.srcPos == null || params.destArrayExpr == null
                 || params.destPos == null || params.length == null) {
-            return VISIT_SUBTREE;
+            return true;
         }
         final ASTBuilder b= this.ctx.getASTBuilder();
         return replaceWithSystemArrayCopy(node, b.copy(params.srcArrayExpr), params.srcPos,
@@ -279,7 +277,7 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
                         b.throw0(b.new0("ArrayIndexOutOfBoundsException", b.invoke("e", "getMessage")))));
 
         this.ctx.getRefactorings().replace(node, tryS);
-        return DO_NOT_VISIT_SUBTREE;
+        return false;
     }
 
     private void collectUniqueIndex(ForStatement node, SystemArrayCopyParams params) {

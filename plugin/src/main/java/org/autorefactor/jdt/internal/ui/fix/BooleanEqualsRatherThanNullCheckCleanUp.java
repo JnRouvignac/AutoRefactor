@@ -26,8 +26,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.as;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasOperator;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasType;
@@ -108,11 +106,11 @@ public class BooleanEqualsRatherThanNullCheckCleanUp extends AbstractCleanUpRule
                 if (firstExpr != null && hasType(firstExpr, "java.lang.Boolean") && isPassive(firstExpr)
                         && match(firstExpr, secondExpr)) {
                     replaceNullCheck(node, firstExpr, isNullCheck, isAndExpr, isPositiveExpr);
-                    return DO_NOT_VISIT_SUBTREE;
+                    return false;
                 }
             }
         }
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private void replaceNullCheck(final InfixExpression node, final Expression firstExpr, final boolean isNullCheck,

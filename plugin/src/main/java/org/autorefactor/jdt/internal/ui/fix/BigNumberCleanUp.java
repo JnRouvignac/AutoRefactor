@@ -26,8 +26,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.arg0;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.arguments;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.as;
@@ -98,9 +96,9 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
                 if (token.contains(".")) {
                     // Only instantiation from double, not from integer
                     ctx.getRefactorings().replace(arg0, getStringLiteral(token));
-                    return DO_NOT_VISIT_SUBTREE;
+                    return false;
                 } else if (getJavaMinorVersion() < 5) {
-                    return VISIT_SUBTREE;
+                    return true;
                 } else if (ZERO_LONG_LITERAL_RE.matcher(token).matches()) {
                     return replaceWithQualifiedName(node, typeBinding, "ZERO");
                 } else if (ONE_LONG_LITERAL_RE.matcher(token).matches()) {
@@ -109,11 +107,11 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
                     return replaceWithQualifiedName(node, typeBinding, "TEN");
                 } else {
                     ctx.getRefactorings().replace(node, getValueOf(typeBinding.getName(), token));
-                    return DO_NOT_VISIT_SUBTREE;
+                    return false;
                 }
             } else if (arg0 instanceof StringLiteral) {
                 if (getJavaMinorVersion() < 5) {
-                    return VISIT_SUBTREE;
+                    return true;
                 }
                 final String literalValue= ((StringLiteral) arg0).getLiteralValue().replaceFirst("[lLfFdD]$", "");
                 if (literalValue.matches("0+")) {
@@ -124,16 +122,16 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
                     return replaceWithQualifiedName(node, typeBinding, "TEN");
                 } else if (literalValue.matches("\\d+")) {
                     this.ctx.getRefactorings().replace(node, getValueOf(typeBinding.getName(), literalValue));
-                    return DO_NOT_VISIT_SUBTREE;
+                    return false;
                 }
             }
         }
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private boolean replaceWithQualifiedName(ASTNode node, ITypeBinding typeBinding, String field) {
         this.ctx.getRefactorings().replace(node, this.ctx.getASTBuilder().name(typeBinding.getName(), field));
-        return DO_NOT_VISIT_SUBTREE;
+        return false;
     }
 
     private ASTNode getValueOf(String name, String numberLiteral) {
@@ -148,16 +146,13 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
     @Override
     public boolean visit(PrefixExpression node) {
         final MethodInvocation mi= as(node.getOperand(), MethodInvocation.class);
-        if (NOT.equals(node.getOperator()) && mi != null) {
-            return maybeReplaceEquals(false, node, mi);
-        }
-        return VISIT_SUBTREE;
+        return !(NOT.equals(node.getOperator()) && mi != null) || maybeReplaceEquals(false, node, mi);
     }
 
     @Override
     public boolean visit(MethodInvocation node) {
         if (node.getExpression() == null) {
-            return VISIT_SUBTREE;
+            return true;
         }
         if (getJavaMinorVersion() >= 5 && (isMethod(node, "java.math.BigInteger", "valueOf", "long")
                 || isMethod(node, "java.math.BigDecimal", "valueOf", "long")
@@ -176,15 +171,15 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
                 } else if (TEN_LONG_LITERAL_RE.matcher(token).matches()) {
                     replaceWithQualifiedName(node, typeBinding, "TEN");
                 } else {
-                    return VISIT_SUBTREE;
+                    return true;
                 }
-                return DO_NOT_VISIT_SUBTREE;
+                return false;
             }
         } else if (!(node.getParent() instanceof PrefixExpression)
                 || !hasOperator((PrefixExpression) node.getParent(), NOT)) {
             return maybeReplaceEquals(true, node, node);
         }
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private boolean maybeReplaceEquals(final boolean isPositive, final Expression node, final MethodInvocation mi) {
@@ -197,10 +192,10 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
                 } else {
                     this.ctx.getRefactorings().replace(node, getCompareToNode(isPositive, mi));
                 }
-                return DO_NOT_VISIT_SUBTREE;
+                return false;
             }
         }
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private ParenthesizedExpression parenthesize(final Expression compareToNode) {

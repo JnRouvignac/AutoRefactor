@@ -25,8 +25,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.asList;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getAncestorOrNull;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getNextSiblings;
@@ -91,10 +89,10 @@ public class IfRatherThanWhileAndFallsThroughCleanUp extends AbstractCleanUpRule
                     ctx.getRefactorings().remove(breakStmt);
                 }
                 ctx.getRefactorings().replace(node, b.if0(b.copy(node.getExpression()), b.copy(node.getBody())));
-                return DO_NOT_VISIT_SUBTREE;
+                return false;
             }
         }
-        return VISIT_SUBTREE;
+        return true;
     }
 
     /**
@@ -161,40 +159,37 @@ public class IfRatherThanWhileAndFallsThroughCleanUp extends AbstractCleanUpRule
 
             breaks.add(aBreak);
 
-            return VISIT_SUBTREE;
+            return true;
         }
 
         @Override
         public boolean visit(WhileStatement node) {
-            if (!root.equals(node)) {
-                return DO_NOT_VISIT_SUBTREE;
-            }
-            return VISIT_SUBTREE;
+            return root.equals(node);
         }
 
         @Override
         public boolean visit(DoStatement node) {
-            return DO_NOT_VISIT_SUBTREE;
+            return false;
         }
 
         @Override
         public boolean visit(ForStatement node) {
-            return DO_NOT_VISIT_SUBTREE;
+            return false;
         }
 
         @Override
         public boolean visit(EnhancedForStatement node) {
-            return DO_NOT_VISIT_SUBTREE;
+            return false;
         }
 
         @Override
         public boolean visit(SwitchStatement node) {
-            return DO_NOT_VISIT_SUBTREE;
+            return false;
         }
 
         @Override
         public boolean visit(AnonymousClassDeclaration node) {
-            return DO_NOT_VISIT_SUBTREE;
+            return false;
         }
     }
 }

@@ -25,8 +25,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasType;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isPassive;
 
@@ -73,9 +71,9 @@ public class LazyLogicalRatherThanEagerCleanUp extends AbstractCleanUpRule {
             final ASTBuilder b= ctx.getASTBuilder();
             ctx.getRefactorings().replace(node, b.infixExpr(b.copy(node.getLeftOperand()),
                     getLazyOperator(node.getOperator()), b.copy(node.getRightOperand())));
-            return DO_NOT_VISIT_SUBTREE;
+            return false;
         }
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private Operator getLazyOperator(final Operator operator) {

@@ -26,8 +26,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.arguments;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasType;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isMethod;
@@ -95,9 +93,9 @@ public class VectorOldToNewAPICleanUp extends AbstractCleanUpRule {
         } else if (isMethod(node, "java.util.Vector", "setElementAt", "java.lang.Object", "int")) {
             replaceWithAndSwapArguments(node, "set");
         } else {
-            return VISIT_SUBTREE;
+            return true;
         }
-        return DO_NOT_VISIT_SUBTREE;
+        return false;
     }
 
     private void replaceWith(final MethodInvocation node, final String newMethodName) {

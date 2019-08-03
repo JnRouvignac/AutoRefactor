@@ -25,8 +25,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.arg0;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getDestinationType;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isMethod;
@@ -90,10 +88,10 @@ public class AutoBoxingRatherThanExplicitMethodCleanUp extends AbstractCleanUpRu
                     && (actualResultType.equals(primitiveType) || actualResultType.equals(wrapperClass)))
                     || (actualParameterType != null && actualParameterType.equals(wrapperClass))) {
                 useAutoBoxing(node, primitiveType, wrapperClass, actualParameterType, actualResultType);
-                return DO_NOT_VISIT_SUBTREE;
+                return false;
             }
         }
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private void useAutoBoxing(final MethodInvocation node, final ITypeBinding primitiveType,

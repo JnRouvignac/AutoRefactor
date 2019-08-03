@@ -25,8 +25,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getDestinationType;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isMethod;
 
@@ -81,10 +79,10 @@ public class UnboxingRatherThanExplicitMethodCleanUp extends AbstractCleanUpRule
 
             if (actualResultType != null && actualResultType.isAssignmentCompatible(node.resolveTypeBinding())) {
                 useUnboxing(node);
-                return DO_NOT_VISIT_SUBTREE;
+                return false;
             }
         }
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private void useUnboxing(final MethodInvocation node) {

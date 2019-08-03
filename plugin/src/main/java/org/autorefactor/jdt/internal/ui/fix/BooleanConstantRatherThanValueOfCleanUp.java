@@ -25,8 +25,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.arguments;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.as;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isMethod;
@@ -73,10 +71,10 @@ public class BooleanConstantRatherThanValueOfCleanUp extends AbstractCleanUpRule
             final BooleanLiteral l= as(arguments(node), BooleanLiteral.class);
             if (l != null) {
                 ctx.getRefactorings().replace(node, toFieldAccess(node, l.booleanValue()));
-                return DO_NOT_VISIT_SUBTREE;
+                return false;
             }
         }
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private FieldAccess toFieldAccess(final MethodInvocation node, final boolean booleanLiteral) {

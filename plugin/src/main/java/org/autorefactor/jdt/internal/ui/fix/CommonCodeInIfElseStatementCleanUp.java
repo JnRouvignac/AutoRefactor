@@ -27,8 +27,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.as;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.asList;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isPassive;
@@ -84,7 +82,7 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
     @Override
     public boolean visit(IfStatement node) {
         if (node.getElseStatement() == null) {
-            return VISIT_SUBTREE;
+            return true;
         }
 
         final List<List<Statement>> allCasesStmts= new ArrayList<List<Statement>>();
@@ -115,10 +113,10 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
 
             if (hasCodeToMove) {
                 removeIdenticalTrailingCode(node, allCasesStmts, caseStmtsToRemove);
-                return DO_NOT_VISIT_SUBTREE;
+                return false;
             }
         }
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private void removeIdenticalTrailingCode(IfStatement node, final List<List<Statement>> allCasesStmts,

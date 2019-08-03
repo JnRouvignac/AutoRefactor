@@ -26,8 +26,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.as;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.asExpression;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.asList;
@@ -167,8 +165,8 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
         @Override
         public boolean visit(IfStatement node) {
             final boolean result= visitIfStatement(node);
-            if (result == DO_NOT_VISIT_SUBTREE) {
-                setResult(DO_NOT_VISIT_SUBTREE);
+            if (!result) {
+                setResult(false);
             }
             return result;
         }
@@ -214,7 +212,7 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
                 final Expression expr= getExpression(orientedCondition, "boolean", null);
                 replaceInParent(node, expr);
             }
-            return DO_NOT_VISIT_SUBTREE;
+            return false;
         }
 
         @Override
@@ -233,7 +231,7 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
                     replaceInParent(node, expr);
                 }
             }
-            return DO_NOT_VISIT_SUBTREE;
+            return false;
         }
 
         private void replaceInParent(ASTNode nodeToReplace, ASTNode replacementNode) {
@@ -275,10 +273,10 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
                     node.getThenExpression(), node.getElseExpression());
             if (newE != null) {
                 ctx.getRefactorings().replace(node, newE);
-                return DO_NOT_VISIT_SUBTREE;
+                return false;
             }
         }
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private boolean withThenReturnStmt(IfStatement node, ReturnStatement thenRs, ReturnStatement elseRs) {
@@ -286,7 +284,7 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
         if (newRs != null) {
             ctx.getRefactorings().replace(node, newRs);
             ctx.getRefactorings().remove(elseRs);
-            return DO_NOT_VISIT_SUBTREE;
+            return false;
         }
         final MethodDeclaration md= getAncestor(node, MethodDeclaration.class);
         final Type returnType= md.getReturnType2();
@@ -299,11 +297,11 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
                 if (newRs != null) {
                     ctx.getRefactorings().replace(node, newRs);
                     ctx.getRefactorings().remove(elseRs);
-                    return DO_NOT_VISIT_SUBTREE;
+                    return false;
                 }
             }
         }
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private boolean noThenReturnStmt(final IfStatement node) {
@@ -330,7 +328,7 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
                 }
             }
         }
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private boolean isElseStatementOfParent(IfStatement node) {
@@ -350,10 +348,10 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
             if (newE != null) {
                 ctx.getRefactorings().replace(rightHandSide, newE);
                 ctx.getRefactorings().remove(node);
-                return DO_NOT_VISIT_SUBTREE;
+                return false;
             }
         }
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private Statement toSingleStmt(final Statement stmt) {
@@ -524,7 +522,7 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
                     // make sure to keep curly braces if the node is an else statement
                     ctx.getRefactorings().replace(node,
                             isElseStatementOfParent(node) ? copyStmt : toSingleStmt(copyStmt));
-                    return DO_NOT_VISIT_SUBTREE;
+                    return false;
                 }
             }
         }
@@ -536,10 +534,7 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
                     node.getElseStatement() != null ? node.getElseStatement() : getNextSibling(node),
                     ReturnStatement.class);
 
-            if (elseRs != null) {
-                return withThenReturnStmt(node, thenRs, elseRs);
-            }
-            return VISIT_SUBTREE;
+            return (elseRs == null) || withThenReturnStmt(node, thenRs, elseRs);
         } else {
             return noThenReturnStmt(node);
         }

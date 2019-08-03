@@ -26,8 +26,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.arg0;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.arguments;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.as;
@@ -110,7 +108,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
             if (isMethod(embeddedMI, "java.lang.String", "substring", "int", "int")
                     || isMethod(embeddedMI, "java.lang.CharSequence", "subSequence", "int", "int")) {
                 replaceWithAppendSubstring(node, embeddedMI);
-                return DO_NOT_VISIT_SUBTREE;
+                return false;
             }
 
             return maybeRefactorAppending(node);
@@ -122,10 +120,10 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
             if (lastExpr instanceof ClassInstanceCreation) {
                 // Replace with String concatenation
                 this.ctx.getRefactorings().replace(node, createStringConcats(allAppendedStrings));
-                return DO_NOT_VISIT_SUBTREE;
+                return false;
             }
         }
-        return VISIT_SUBTREE;
+        return true;
     }
 
     @Override
@@ -140,7 +138,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
                 return maybeRefactorAppending(node);
             }
         }
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private boolean maybeRefactorAppending(Expression node) {
@@ -160,10 +158,10 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
                 } else {
                     replaceWithNewStringAppends(node, allAppendedStrings, lastExpr, isInstanceCreationToRewrite.get());
                 }
-                return DO_NOT_VISIT_SUBTREE;
+                return false;
             }
         }
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private Expression readAppendMethod(final Expression expr,
@@ -480,10 +478,10 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
             boolean replaceNeeded= filterOutEmptyStringsFromStringConcat(allOperands);
             if (replaceNeeded) {
                 this.ctx.getRefactorings().replace(node, createStringConcats(allOperands));
-                return DO_NOT_VISIT_SUBTREE;
+                return false;
             }
         }
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private boolean filterOutEmptyStringsFromStringConcat(final List<Pair<ITypeBinding, Expression>> allOperands) {

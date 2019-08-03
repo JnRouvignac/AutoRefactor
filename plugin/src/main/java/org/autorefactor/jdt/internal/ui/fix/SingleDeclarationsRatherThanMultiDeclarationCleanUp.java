@@ -25,9 +25,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
-
 import java.util.List;
 
 import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
@@ -85,10 +82,10 @@ public class SingleDeclarationsRatherThanMultiDeclarationCleanUp extends Abstrac
         if (fragments != null && fragments.size() > 1) {
             refactorMultiDeclaration(node, modifiers, type, fragments, docComment);
 
-            return DO_NOT_VISIT_SUBTREE;
+            return false;
         }
 
-        return VISIT_SUBTREE;
+        return true;
     }
 
     @SuppressWarnings("rawtypes")

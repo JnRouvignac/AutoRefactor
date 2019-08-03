@@ -25,8 +25,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.arguments;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasType;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.instanceOf;
@@ -104,7 +102,7 @@ public final class EnumMapRatherThanHashMapCleanUp extends AbstractEnumCollectio
     boolean maybeReplace(ClassInstanceCreation cic, Set<String> alreadyImportedClasses, Set<String> importsToAdd,
             Type... types) {
         if (types == null || types.length < 2) {
-            return VISIT_SUBTREE;
+            return true;
         }
 
         Type keyType= types[0];
@@ -113,12 +111,12 @@ public final class EnumMapRatherThanHashMapCleanUp extends AbstractEnumCollectio
 
         if (!arguments.isEmpty() && isTargetType(arguments.get(0).resolveTypeBinding())
                 && !hasType(arguments.get(0).resolveTypeBinding(), "java.util.EnumMap")) {
-            return VISIT_SUBTREE;
+            return true;
         }
 
         replace(cic, alreadyImportedClasses, importsToAdd, keyType, valueType, arguments);
         importsToAdd.add("java.util.EnumMap");
-        return DO_NOT_VISIT_SUBTREE;
+        return false;
     }
 
     private void replace(ClassInstanceCreation cic, Set<String> alreadyImportedClasses, Set<String> importsToAdd,

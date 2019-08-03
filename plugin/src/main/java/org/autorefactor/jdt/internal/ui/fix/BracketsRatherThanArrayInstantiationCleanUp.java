@@ -25,8 +25,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getDestinationType;
 import static org.autorefactor.util.Utils.equalNotNull;
 
@@ -75,11 +73,11 @@ public class BracketsRatherThanArrayInstantiationCleanUp extends AbstractCleanUp
 
             if (equalNotNull(arrayType, destinationType) && isDestinationAllowed(node)) {
                 refactorWithInitializer(node);
-                return DO_NOT_VISIT_SUBTREE;
+                return false;
             }
         }
 
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private void refactorWithInitializer(final ArrayCreation node) {

@@ -25,8 +25,6 @@
  */
 package org.autorefactor.jdt.internal.corext.dom;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.*;
-
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 
@@ -70,6 +68,6 @@ public class FinderVisitor<R> extends ASTVisitor {
     @Override
     public boolean preVisit2(ASTNode node) {
         // exit has fast as possible when the result is found
-        return resultFound ? DO_NOT_VISIT_SUBTREE : VISIT_SUBTREE;
+        return !resultFound;
     }
 }

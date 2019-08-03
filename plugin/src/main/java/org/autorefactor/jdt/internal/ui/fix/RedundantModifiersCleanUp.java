@@ -26,8 +26,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasType;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.modifiers;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.resources;
@@ -140,11 +138,11 @@ public class RedundantModifiersCleanUp extends AbstractCleanUpRule {
 
     private boolean removePublicStaticFinalModifiers(FieldDeclaration node) {
         // Remove modifiers implied by the context
-        boolean result= VISIT_SUBTREE;
+        boolean result= true;
         for (Modifier m : getModifiersOnly(modifiers(node))) {
             if (m.isPublic() || m.isStatic() || m.isFinal()) {
                 ctx.getRefactorings().remove(m);
-                result= DO_NOT_VISIT_SUBTREE;
+                result= false;
             }
         }
         return result;
@@ -189,18 +187,18 @@ public class RedundantModifiersCleanUp extends AbstractCleanUpRule {
         for (Modifier modifier : getModifiersOnly(modifiers(node))) {
             if (modifier.isProtected()) {
                 ctx.getRefactorings().remove(modifier);
-                return DO_NOT_VISIT_SUBTREE;
+                return false;
             }
         }
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private boolean removePublicAbstractModifiers(BodyDeclaration node) {
-        boolean result= VISIT_SUBTREE;
+        boolean result= true;
         for (Modifier m : getModifiersOnly(modifiers(node))) {
             if (m.isPublic() || m.isAbstract()) {
                 ctx.getRefactorings().remove(m);
-                result= DO_NOT_VISIT_SUBTREE;
+                result= false;
             }
         }
         return result;
@@ -218,8 +216,8 @@ public class RedundantModifiersCleanUp extends AbstractCleanUpRule {
 
     @Override
     public boolean visit(EnumDeclaration node) {
-        if (removeStaticAbstractModifier(modifiers(node)) == DO_NOT_VISIT_SUBTREE) {
-            return DO_NOT_VISIT_SUBTREE;
+        if (!removeStaticAbstractModifier(modifiers(node))) {
+            return false;
         }
 
         return ensureModifiersOrder(node);
@@ -227,7 +225,7 @@ public class RedundantModifiersCleanUp extends AbstractCleanUpRule {
 
     @Override
     public boolean visit(TryStatement node) {
-        boolean result= VISIT_SUBTREE;
+        boolean result= true;
         for (VariableDeclarationExpression resource : resources(node)) {
             result&= removeFinalModifier(modifiers(resource));
         }
@@ -236,8 +234,8 @@ public class RedundantModifiersCleanUp extends AbstractCleanUpRule {
 
     @Override
     public boolean visit(TypeDeclaration node) {
-        if (isInterface(node) && removeStaticAbstractModifier(modifiers(node)) == DO_NOT_VISIT_SUBTREE) {
-            return DO_NOT_VISIT_SUBTREE;
+        if (isInterface(node) && !removeStaticAbstractModifier(modifiers(node))) {
+            return false;
         }
 
         return ensureModifiersOrder(node);
@@ -250,10 +248,10 @@ public class RedundantModifiersCleanUp extends AbstractCleanUpRule {
 
         if (!extendedModifiers.equals(reorderedModifiers)) {
             reorderModifiers(reorderedModifiers);
-            return DO_NOT_VISIT_SUBTREE;
+            return false;
         }
 
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private void reorderModifiers(final List<IExtendedModifier> reorderedModifiers) {
@@ -270,11 +268,11 @@ public class RedundantModifiersCleanUp extends AbstractCleanUpRule {
     }
 
     private boolean removeStaticAbstractModifier(List<IExtendedModifier> modifiers) {
-        boolean result= VISIT_SUBTREE;
+        boolean result= true;
         for (Modifier m : getModifiersOnly(modifiers)) {
             if (m.isStatic() || m.isAbstract()) {
                 ctx.getRefactorings().remove(m);
-                result= DO_NOT_VISIT_SUBTREE;
+                result= false;
             }
         }
         return result;
@@ -285,15 +283,15 @@ public class RedundantModifiersCleanUp extends AbstractCleanUpRule {
         if (isInterface(node.getParent().getParent())) {
             return removeFinalModifier(modifiers(node));
         }
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private boolean removeFinalModifier(List<IExtendedModifier> modifiers) {
-        boolean result= VISIT_SUBTREE;
+        boolean result= true;
         for (Modifier m : getModifiersOnly(modifiers)) {
             if (m.isFinal()) {
                 ctx.getRefactorings().remove(m);
-                result= DO_NOT_VISIT_SUBTREE;
+                result= false;
             }
         }
         return result;

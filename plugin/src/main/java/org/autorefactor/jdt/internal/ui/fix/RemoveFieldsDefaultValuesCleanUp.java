@@ -25,8 +25,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.fragments;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isNullLiteral;
 import static org.eclipse.jdt.core.dom.Modifier.isFinal;
@@ -72,21 +70,21 @@ public class RemoveFieldsDefaultValuesCleanUp extends AbstractCleanUpRule {
     @Override
     public boolean visit(FieldDeclaration node) {
         if (!canRemoveFieldDefaultValue(node)) {
-            return VISIT_SUBTREE;
+            return true;
         }
         final ITypeBinding fieldType= node.getType().resolveBinding();
         if (fieldType == null || isFinal(node.getModifiers())) {
-            return VISIT_SUBTREE;
+            return true;
         }
 
-        boolean visitSubtree= VISIT_SUBTREE;
+        boolean visitSubtree= true;
         for (VariableDeclarationFragment vdf : fragments(node)) {
             final Expression initializer= vdf.getInitializer();
             if (initializer != null && ((!fieldType.isPrimitive() && isNullLiteral(initializer))
                     || (fieldType.isPrimitive() && isPrimitiveLiteral(initializer)
                             && isPrimitiveDefaultValue(initializer.resolveConstantExpressionValue())))) {
                 this.ctx.getRefactorings().remove(initializer);
-                visitSubtree= DO_NOT_VISIT_SUBTREE;
+                visitSubtree= false;
             }
         }
         return visitSubtree;

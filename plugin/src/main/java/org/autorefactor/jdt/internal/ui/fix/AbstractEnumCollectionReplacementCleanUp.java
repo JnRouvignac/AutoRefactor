@@ -25,7 +25,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.fragments;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getAncestorOrNull;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getFirstAncestorOrNull;
@@ -111,7 +110,7 @@ public abstract class AbstractEnumCollectionReplacementCleanUp extends NewClassI
             }
         }
 
-        return VISIT_SUBTREE;
+        return true;
     }
 
     abstract String getImplType();
@@ -138,7 +137,7 @@ public abstract class AbstractEnumCollectionReplacementCleanUp extends NewClassI
             }
         }
 
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private boolean handleAssignment(final ClassInstanceCreation node, final Assignment a,
@@ -161,7 +160,7 @@ public abstract class AbstractEnumCollectionReplacementCleanUp extends NewClassI
             }
         }
 
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private boolean handleVarDeclarationStatement(final VariableDeclarationStatement node,
@@ -190,7 +189,7 @@ public abstract class AbstractEnumCollectionReplacementCleanUp extends NewClassI
             }
         }
 
-        return VISIT_SUBTREE;
+        return true;
     }
 
     /**

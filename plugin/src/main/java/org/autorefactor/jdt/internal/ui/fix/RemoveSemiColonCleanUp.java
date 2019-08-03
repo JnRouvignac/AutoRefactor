@@ -25,8 +25,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getCommentList;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getNextSibling;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.resources;
@@ -142,7 +140,7 @@ public class RemoveSemiColonCleanUp extends AbstractCleanUpRule {
             final CompilationUnit cu= (CompilationUnit) parent;
             return removeSuperfluousSemiColons(node, getEndPosition(node), getEndPosition(cu) - 1);
         } else if (parent instanceof TypeDeclarationStatement) {
-            return VISIT_SUBTREE;
+            return true;
         }
         throw new NotImplementedException(node,
                 "for a parent of type " + (parent != null ? parent.getClass().getSimpleName() : null));
@@ -150,9 +148,9 @@ public class RemoveSemiColonCleanUp extends AbstractCleanUpRule {
 
     private boolean removeSuperfluousSemiColons(ASTNode node, int start, int end) {
         if (end <= start) {
-            return VISIT_SUBTREE;
+            return true;
         }
-        boolean result= VISIT_SUBTREE;
+        boolean result= true;
         final Map<String, SourceLocation> nonCommentsStrings= getNonCommentsStrings(node, start, end);
         for (Entry<String, SourceLocation> entry : nonCommentsStrings.entrySet()) {
             final String s= entry.getKey();
@@ -161,7 +159,7 @@ public class RemoveSemiColonCleanUp extends AbstractCleanUpRule {
                 int startPos= entry.getValue().getStartPosition();
                 SourceLocation toRemove= fromPositions(startPos + m.start(1), startPos + m.end(1));
                 this.ctx.getRefactorings().remove(toRemove);
-                result= DO_NOT_VISIT_SUBTREE;
+                result= false;
             }
         }
         return result;
@@ -221,7 +219,7 @@ public class RemoveSemiColonCleanUp extends AbstractCleanUpRule {
     public boolean visit(TryStatement node) {
         final List<VariableDeclarationExpression> resources= resources(node);
         if (resources.isEmpty()) {
-            return VISIT_SUBTREE;
+            return true;
         }
         VariableDeclarationExpression lastResource= getLast(resources);
         Block body= node.getBody();

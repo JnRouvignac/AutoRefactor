@@ -26,8 +26,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.asList;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.extendedOperands;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.fallsThrough;
@@ -175,9 +173,9 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
         public boolean visit(BreakStatement node) {
             if (node.getLabel() == null) {
                 setResult(true);
-                return DO_NOT_VISIT_SUBTREE;
+                return false;
             }
-            return VISIT_SUBTREE;
+            return true;
         }
 
         @Override
@@ -207,7 +205,7 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
 
         private boolean ignoreUnlabledBreaksInInnerBreakableStatement() {
             // unlabeled breaks in inner loops/switchs work ok with switch refactoring rule
-            return DO_NOT_VISIT_SUBTREE;
+            return false;
         }
     }
 
@@ -241,12 +239,12 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
     @Override
     public boolean visit(final IfStatement node) {
         if (hasUnlabeledBreak(node)) {
-            return VISIT_SUBTREE;
+            return true;
         }
 
         Variable variable= extractVariableAndValues(node);
         if (variable == null) {
-            return VISIT_SUBTREE;
+            return true;
         }
 
         final SimpleName switchExpr= variable.name;
@@ -258,7 +256,7 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
         while (haveSameIdentifier(switchExpr, variable.name) && haveSameType(switchExpr, variable.name)) {
             if (detectDeclarationConflicts(currentNode.getThenStatement(), variableDeclarationIds)) {
                 // Cannot declare two variables with the same name in two cases
-                return VISIT_SUBTREE;
+                return true;
             }
 
             cases.add(new SwitchCaseSection(variable.constantValues, asList(currentNode.getThenStatement())));
@@ -303,9 +301,9 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
             final List<SwitchCaseSection> cases, final Statement remainingStmt) {
         if (switchExpr != null && cases.size() > 1) {
             replaceWithSwitchStmt(node, switchExpr, cases, remainingStmt);
-            return DO_NOT_VISIT_SUBTREE;
+            return false;
         }
-        return VISIT_SUBTREE;
+        return true;
     }
 
     /** Side-effect: removes the dead branches in a chain of if-elseif. */
@@ -434,15 +432,15 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
                 if (referenceCase.hasSameCode(comparedCase)) {
                     if (!previousSectionFallsthrough(switchStructure, comparedIndex)) {
                         mergeCases(Merge.AFTER_SWITCH_CASES, referenceCase, comparedCase);
-                        return DO_NOT_VISIT_SUBTREE;
+                        return false;
                     } else if (referenceIndex == 0 || !previousSectionFallsthrough(switchStructure, referenceIndex)) {
                         mergeCases(Merge.BEFORE_SWITCH_CASES, comparedCase, referenceCase);
-                        return DO_NOT_VISIT_SUBTREE;
+                        return false;
                     }
                 }
             }
         }
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private boolean previousSectionFallsthrough(final List<SwitchCaseSection> switchStructure, int idx) {

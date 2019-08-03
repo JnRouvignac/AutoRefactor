@@ -25,8 +25,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.as;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isPassive;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.match;
@@ -118,7 +116,7 @@ public class OppositeConditionRatherThanDuplicateConditionCleanUp extends Abstra
                 }
             }
         }
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private boolean maybeRefactorCondition(final IfStatement node, final IfStatement secondIf,
@@ -128,14 +126,14 @@ public class OppositeConditionRatherThanDuplicateConditionCleanUp extends Abstra
         if (match(matcher, duplicateExpr, secondIf.getExpression())) {
             refactorCondition(node, duplicateExpr, notDuplicateExpr, secondIf.getThenStatement(),
                     secondIf.getElseStatement());
-            return DO_NOT_VISIT_SUBTREE;
+            return false;
         } else if (matcher.matchOpposite(duplicateExpr, secondIf.getExpression())) {
             refactorCondition(node, duplicateExpr, notDuplicateExpr, secondIf.getElseStatement(),
                     secondIf.getThenStatement());
-            return DO_NOT_VISIT_SUBTREE;
+            return false;
         }
 
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private void refactorCondition(final IfStatement node, final Expression duplicateExpr,

@@ -27,8 +27,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.arg0;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.arguments;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getDestinationType;
@@ -82,7 +80,7 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
     @Override
     public boolean visit(MethodInvocation node) {
         if (node.getExpression() == null) {
-            return VISIT_SUBTREE;
+            return true;
         }
 
         ITypeBinding destinationTypeBinding= getDestinationType(node);
@@ -133,12 +131,12 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
                     if (methodName != null) {
                         ctx.getRefactorings().replace(node,
                                 newMethodInvocation(typeBinding.getName(), methodName, arg0));
-                        return DO_NOT_VISIT_SUBTREE;
+                        return false;
                     }
                 }
             }
         }
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private boolean is(MethodInvocation node, String declaringTypeQualifiedName) {
@@ -150,13 +148,13 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
     private boolean replaceMethodName(MethodInvocation node, String methodName) {
         final SimpleName name= this.ctx.getASTBuilder().simpleName(methodName);
         this.ctx.getRefactorings().set(node, MethodInvocation.NAME_PROPERTY, name);
-        return DO_NOT_VISIT_SUBTREE;
+        return false;
     }
 
     private boolean replaceWithTheSingleArgument(MethodInvocation node) {
         final ASTBuilder b= this.ctx.getASTBuilder();
         this.ctx.getRefactorings().replace(node, b.copy(arg0(node)));
-        return DO_NOT_VISIT_SUBTREE;
+        return false;
     }
 
     private String getMethodName(final String typeName, final String invokedMethodName) {
@@ -186,12 +184,12 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
             if (hasType(typeBinding, "java.lang.Boolean", "java.lang.Byte", "java.lang.Character", "java.lang.Double",
                     "java.lang.Long", "java.lang.Short", "java.lang.Integer")) {
                 replaceWithValueOf(node, typeBinding);
-                return DO_NOT_VISIT_SUBTREE;
+                return false;
             } else if (hasType(typeBinding, "java.lang.Float")) {
                 return replaceFloatInstanceWithValueOf(node, typeBinding, args);
             }
         }
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private boolean replaceFloatInstanceWithValueOf(ClassInstanceCreation node, final ITypeBinding typeBinding,
@@ -207,7 +205,7 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
         } else {
             replaceWithValueOf(node, typeBinding);
         }
-        return DO_NOT_VISIT_SUBTREE;
+        return false;
     }
 
     private void replaceWithValueOf(ClassInstanceCreation node, final ITypeBinding typeBinding) {

@@ -211,13 +211,13 @@ public final class ASTNodes {
         @Override
         public boolean visit(SingleVariableDeclaration node) {
             variableNames.add(node.getName().getIdentifier());
-            return VISIT_SUBTREE;
+            return true;
         }
 
         @Override
         public boolean visit(VariableDeclarationFragment node) {
             variableNames.add(node.getName().getIdentifier());
-            return VISIT_SUBTREE;
+            return true;
         }
 
         @Override
@@ -245,7 +245,7 @@ public final class ASTNodes {
                 activityLevel= ExprActivity.ACTIVE;
                 return interruptVisit();
             }
-            return VISIT_SUBTREE;
+            return true;
         }
 
         @Override
@@ -263,7 +263,7 @@ public final class ASTNodes {
                             || mayCallImplicitToString(node.extendedOperands()))) {
                 activityLevel= ExprActivity.CAN_BE_ACTIVE;
             }
-            return VISIT_SUBTREE;
+            return true;
         }
 
         private boolean mayCallImplicitToString(List<Expression> extendedOperands) {
@@ -287,41 +287,27 @@ public final class ASTNodes {
         @Override
         public boolean visit(SuperMethodInvocation node) {
             activityLevel= ExprActivity.CAN_BE_ACTIVE;
-            return VISIT_SUBTREE;
+            return true;
         }
 
         @Override
         public boolean visit(MethodInvocation node) {
             activityLevel= ExprActivity.CAN_BE_ACTIVE;
-            return VISIT_SUBTREE;
+            return true;
         }
 
         @Override
         public boolean visit(ClassInstanceCreation node) {
             activityLevel= ExprActivity.CAN_BE_ACTIVE;
-            return VISIT_SUBTREE;
+            return true;
         }
 
         @Override
         public boolean visit(ThrowStatement node) {
             activityLevel= ExprActivity.CAN_BE_ACTIVE;
-            return VISIT_SUBTREE;
+            return true;
         }
     }
-
-    /**
-     * Boolean constant to use when returning from an
-     * {@link org.eclipse.jdt.core.dom.ASTVisitor} {{visit(*)}} method to indicate
-     * that the visitor does not want to visit a node's subtree. This helps
-     * readability.
-     */
-    public static final boolean DO_NOT_VISIT_SUBTREE= false;
-    /**
-     * Boolean constant to use when returning from an
-     * {@link org.eclipse.jdt.core.dom.ASTVisitor} {{visit(*)}} method to indicate
-     * that the visitor wants to visit a node's subtree. This helps readability.
-     */
-    public static final boolean VISIT_SUBTREE= true;
 
     private ASTNodes() {
     }

@@ -26,8 +26,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.asList;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isPassive;
 
@@ -78,7 +76,7 @@ public class RemoveEmptyIfCleanUp extends AbstractCleanUpRule {
         final Statement elseStmt= node.getElseStatement();
         if (elseStmt != null && asList(elseStmt).isEmpty()) {
             r.remove(elseStmt);
-            return DO_NOT_VISIT_SUBTREE;
+            return false;
         } else if (thenStmt != null && asList(thenStmt).isEmpty()) {
             final ASTBuilder b= this.ctx.getASTBuilder();
 
@@ -87,11 +85,11 @@ public class RemoveEmptyIfCleanUp extends AbstractCleanUpRule {
                 r.replace(node, b.if0(b.negate(condition), b.move(elseStmt)));
             } else if (isPassive(condition)) {
                 removeBlock(node, r, b);
-                return DO_NOT_VISIT_SUBTREE;
+                return false;
             }
         }
 
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private void removeBlock(final IfStatement node, final Refactorings r, final ASTBuilder b) {

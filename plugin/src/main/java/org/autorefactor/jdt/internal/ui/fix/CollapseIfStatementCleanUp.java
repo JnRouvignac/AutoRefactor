@@ -26,8 +26,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.as;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasOperator;
 import static org.eclipse.jdt.core.dom.InfixExpression.Operator.CONDITIONAL_AND;
@@ -75,12 +73,12 @@ public class CollapseIfStatementCleanUp extends AbstractCleanUpRule {
                 return replaceIfNoElseStatement(node, is);
             }
         }
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private boolean replaceIfNoElseStatement(IfStatement outerIf, IfStatement innerIf) {
         if (innerIf.getElseStatement() != null) {
-            return VISIT_SUBTREE;
+            return true;
         }
 
         final ASTBuilder b= this.ctx.getASTBuilder();
@@ -88,7 +86,7 @@ public class CollapseIfStatementCleanUp extends AbstractCleanUpRule {
                 parenthesizeOrExpr(b, innerIf.getExpression()));
         this.ctx.getRefactorings().replace(outerIf.getExpression(), ie);
         this.ctx.getRefactorings().replace(outerIf.getThenStatement(), b.copy(innerIf.getThenStatement()));
-        return DO_NOT_VISIT_SUBTREE;
+        return false;
     }
 
     private Expression parenthesizeOrExpr(ASTBuilder b, Expression expr) {

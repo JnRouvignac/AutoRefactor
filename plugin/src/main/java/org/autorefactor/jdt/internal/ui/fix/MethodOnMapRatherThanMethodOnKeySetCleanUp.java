@@ -26,8 +26,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.arguments;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isMethod;
 import static org.eclipse.jdt.core.dom.ASTNode.EXPRESSION_STATEMENT;
@@ -91,7 +89,7 @@ public class MethodOnMapRatherThanMethodOnKeySetCleanUp extends AbstractCleanUpR
                 return removeInvocationOfMapKeySet(mapKeySetMi, mi, "containsKey");
             }
         }
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private boolean removeInvocationOfMapKeySet(MethodInvocation mapKeySetMi, MethodInvocation actualMi,
@@ -99,7 +97,7 @@ public class MethodOnMapRatherThanMethodOnKeySetCleanUp extends AbstractCleanUpR
         final ASTBuilder b= ctx.getASTBuilder();
         ctx.getRefactorings().replace(actualMi,
                 b.invoke(b.copyExpression(mapKeySetMi), methodName, b.copyRange(arguments(actualMi))));
-        return DO_NOT_VISIT_SUBTREE;
+        return false;
     }
 
     private boolean isKeySetMethod(Expression expr) {

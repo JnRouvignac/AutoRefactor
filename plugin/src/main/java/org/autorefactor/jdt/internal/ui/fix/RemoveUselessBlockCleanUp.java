@@ -71,7 +71,7 @@ public class RemoveUselessBlockCleanUp extends AbstractCleanUpRule {
         final List<Statement> stmts= statements(node);
         if (stmts.size() == 1 && stmts.get(0) instanceof Block) {
             replaceBlock((Block) stmts.get(0));
-            return DO_NOT_VISIT_SUBTREE;
+            return false;
         } else if (node.getParent() instanceof Block) {
             final Set<String> ifVariableNames= getLocalVariableIdentifiers(node, false);
 
@@ -82,10 +82,10 @@ public class RemoveUselessBlockCleanUp extends AbstractCleanUpRule {
 
             if (!ifVariableNames.removeAll(followingVariableNames)) {
                 replaceBlock(node);
-                return DO_NOT_VISIT_SUBTREE;
+                return false;
             }
         }
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private void replaceBlock(final Block node) {

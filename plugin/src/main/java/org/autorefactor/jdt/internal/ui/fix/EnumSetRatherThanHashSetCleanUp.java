@@ -25,8 +25,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.arguments;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.instanceOf;
 
@@ -107,7 +105,7 @@ public final class EnumSetRatherThanHashSetCleanUp extends AbstractEnumCollectio
     boolean maybeReplace(ClassInstanceCreation cic, Set<String> alreadyImportedClasses, Set<String> importsToAdd,
             Type... types) {
         if (types == null || types.length < 1) {
-            return VISIT_SUBTREE;
+            return true;
         }
 
         Type type= types[0];
@@ -118,7 +116,7 @@ public final class EnumSetRatherThanHashSetCleanUp extends AbstractEnumCollectio
         if (!arguments.isEmpty() && instanceOf(arguments.get(0), "java.util.Collection")) {
             Expression typeArg= arguments.get(0);
             if (!instanceOf(typeArg, "java.util.EnumSet")) {
-                return VISIT_SUBTREE;
+                return true;
             }
             invocation= b.invoke(alreadyImportedClasses.contains("java.util.EnumSet") ? b.name("EnumSet")
                     : b.name("java", "util", "EnumSet"), "copyOf", b.copy(typeArg));
@@ -131,6 +129,6 @@ public final class EnumSetRatherThanHashSetCleanUp extends AbstractEnumCollectio
 
         ctx.getRefactorings().replace(cic, invocation);
         importsToAdd.add("java.util.EnumSet");
-        return DO_NOT_VISIT_SUBTREE;
+        return false;
     }
 }

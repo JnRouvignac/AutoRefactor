@@ -25,8 +25,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.arguments;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.findImplementedType;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getParent;
@@ -95,7 +93,7 @@ public class UseDiamondOperatorCleanUp extends AbstractCleanUpRule {
                 && parentAllowsDiamondOperator(node) && canUseDiamondOperator(node, type)) {
             return maybeRemoveAllTypeArguments((ParameterizedType) type);
         }
-        return VISIT_SUBTREE;
+        return true;
     }
 
     /**
@@ -181,8 +179,8 @@ public class UseDiamondOperatorCleanUp extends AbstractCleanUpRule {
         final List<Type> typeArguments= typeArguments(pt);
         if (!typeArguments.isEmpty()) {
             this.ctx.getRefactorings().remove(typeArguments);
-            return DO_NOT_VISIT_SUBTREE;
+            return false;
         }
-        return VISIT_SUBTREE;
+        return true;
     }
 }

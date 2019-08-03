@@ -25,8 +25,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.arg0;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.as;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.asExpression;
@@ -129,7 +127,7 @@ public class AllInOneMethodRatherThanLoopCleanUp extends NewClassImportCleanUp {
         final List<Statement> stmts= asList(node.getBody());
 
         if (stmts.size() != 1) {
-            return VISIT_SUBTREE;
+            return true;
         }
 
         final MethodInvocation mi= asExpression(stmts.get(0), MethodInvocation.class);
@@ -147,7 +145,7 @@ public class AllInOneMethodRatherThanLoopCleanUp extends NewClassImportCleanUp {
             }
         }
 
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private void replaceWithCollectionsAddAll(final Statement node, final Expression iterable,
@@ -204,7 +202,7 @@ public class AllInOneMethodRatherThanLoopCleanUp extends NewClassImportCleanUp {
             }
         }
 
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private boolean maybeReplaceForArray(final Statement node, final Set<String> classesToUseWithImport,
@@ -213,10 +211,10 @@ public class AllInOneMethodRatherThanLoopCleanUp extends NewClassImportCleanUp {
                 && areTypeCompatible(getCalledType(mi), iterable.resolveTypeBinding())) {
             replaceWithCollectionsAddAll(node, iterable, mi, classesToUseWithImport);
             importsToAdd.add("java.util.Collections");
-            return DO_NOT_VISIT_SUBTREE;
+            return false;
         }
 
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private int getVariableUseCount(final IVariableBinding variableBinding, Statement toVisit) {
@@ -252,13 +250,13 @@ public class AllInOneMethodRatherThanLoopCleanUp extends NewClassImportCleanUp {
             final Expression data) {
         if (isMethod(colMI, "java.util.Collection", "add", "java.lang.Object")) {
             replaceWithCollectionMethod(node, "addAll", colMI.getExpression(), data);
-            return DO_NOT_VISIT_SUBTREE;
+            return false;
         } else if (isMethod(colMI, "java.util.Set", "remove", "java.lang.Object")) {
             replaceWithCollectionMethod(node, "removeAll", colMI.getExpression(), data);
-            return DO_NOT_VISIT_SUBTREE;
+            return false;
         }
 
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private boolean isSameVariable(final ForLoopContent loopContent, final MethodInvocation getMI) {

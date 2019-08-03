@@ -25,9 +25,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
-
 import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
 import org.eclipse.jdt.core.dom.NumberLiteral;
 
@@ -69,9 +66,9 @@ public class CapitalizeLongLiteralCleanUp extends AbstractCleanUpRule {
         final String token= node.getToken();
         if (token.endsWith("l")) {
             replaceLong(node, token);
-            return DO_NOT_VISIT_SUBTREE;
+            return false;
         }
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private void replaceLong(final NumberLiteral node, final String token) {

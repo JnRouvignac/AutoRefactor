@@ -25,8 +25,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isField;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.removeParentheses;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.resolveTypeBinding;
@@ -77,7 +75,7 @@ public class LiteralRatherThanBooleanConstantCleanUp extends AbstractCleanUpRule
             final ITypeBinding typeBinding= ((Assignment) parent).resolveTypeBinding();
             return replaceBooleanObjectByPrimitive(node, typeBinding);
         }
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private boolean replaceBooleanObjectByPrimitive(final QualifiedName node, final ITypeBinding typeBinding) {
@@ -88,12 +86,12 @@ public class LiteralRatherThanBooleanConstantCleanUp extends AbstractCleanUpRule
                 return replaceWithBooleanLiteral(node, false);
             }
         }
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private boolean replaceWithBooleanLiteral(final QualifiedName node, final boolean val) {
         final BooleanLiteral booleanLiteral= this.ctx.getASTBuilder().boolean0(val);
         this.ctx.getRefactorings().replace(node, booleanLiteral);
-        return DO_NOT_VISIT_SUBTREE;
+        return false;
     }
 }

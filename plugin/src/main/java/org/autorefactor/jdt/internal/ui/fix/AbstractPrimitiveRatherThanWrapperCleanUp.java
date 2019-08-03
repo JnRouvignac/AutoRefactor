@@ -25,8 +25,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getAncestorOrNull;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasType;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isField;
@@ -185,13 +183,13 @@ public abstract class AbstractPrimitiveRatherThanWrapperCleanUp extends Abstract
 
                     if (varOccurrenceVisitor.isPrimitiveAllowed() && varOccurrenceVisitor.getAutoBoxingCount() < 2) {
                         refactorWrapper(node);
-                        return DO_NOT_VISIT_SUBTREE;
+                        return false;
                     }
                 }
             }
         }
 
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private void refactorWrapper(final VariableDeclarationStatement node) {
@@ -265,7 +263,7 @@ public abstract class AbstractPrimitiveRatherThanWrapperCleanUp extends Abstract
                     return interruptVisit();
                 }
             }
-            return VISIT_SUBTREE;
+            return true;
         }
 
         private boolean isPrimitiveAllowed(final ASTNode node) {

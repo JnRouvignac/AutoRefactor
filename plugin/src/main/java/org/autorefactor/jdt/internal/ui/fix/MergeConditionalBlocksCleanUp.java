@@ -25,8 +25,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.asList;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.match;
 
@@ -79,16 +77,16 @@ public class MergeConditionalBlocksCleanUp extends AbstractCleanUpRule {
             return maybeMergeBlocks(node, subNode, subNode.getThenStatement(), subNode.getElseStatement(), true)
                     && maybeMergeBlocks(node, subNode, subNode.getElseStatement(), subNode.getThenStatement(), false);
         }
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private boolean maybeMergeBlocks(final IfStatement node, final IfStatement subNode, final Statement doubleStmts,
             final Statement remainingStmts, final boolean isPositive) {
         if (doubleStmts != null && match(node.getThenStatement(), doubleStmts)) {
             refactorBlocks(node.getExpression(), subNode, remainingStmts, isPositive);
-            return DO_NOT_VISIT_SUBTREE;
+            return false;
         }
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private void refactorBlocks(final Expression firstCondition, final IfStatement subNode,

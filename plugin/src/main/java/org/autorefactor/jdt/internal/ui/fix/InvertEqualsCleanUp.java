@@ -25,8 +25,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.arg0;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isConstant;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isMethod;
@@ -74,7 +72,7 @@ public class InvertEqualsCleanUp extends AbstractCleanUpRule {
     @Override
     public boolean visit(MethodInvocation node) {
         if (node.getExpression() == null) {
-            return VISIT_SUBTREE;
+            return true;
         }
         boolean isEquals= isMethod(node, "java.lang.Object", "equals", "java.lang.Object");
         boolean isStringEqualsIgnoreCase= isMethod(node, "java.lang.String", "equalsIgnoreCase", "java.lang.String");
@@ -83,10 +81,10 @@ public class InvertEqualsCleanUp extends AbstractCleanUpRule {
             final Expression arg0= arg0(node);
             if (!isConstant(expr) && isConstant(arg0) && !isPrimitive(arg0)) {
                 invertEqualsInvocation(node, isEquals, expr, arg0);
-                return DO_NOT_VISIT_SUBTREE;
+                return false;
             }
         }
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private void invertEqualsInvocation(final MethodInvocation node, final boolean isEquals, final Expression expr,

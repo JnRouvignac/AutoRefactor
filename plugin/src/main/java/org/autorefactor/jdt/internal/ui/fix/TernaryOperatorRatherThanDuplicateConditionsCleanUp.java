@@ -26,8 +26,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.as;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasOperator;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isPassive;
@@ -106,7 +104,7 @@ public class TernaryOperatorRatherThanDuplicateConditionsCleanUp extends Abstrac
             }
         }
 
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private boolean isBooleanAndPassive(final Expression expr) {
@@ -118,10 +116,10 @@ public class TernaryOperatorRatherThanDuplicateConditionsCleanUp extends Abstrac
             final Expression oppositeExpr) {
         if (matcher.matchOpposite(oneCondition, oppositeCondition) && !match(matcher, oneExpr, oppositeExpr)) {
             replaceDuplicateExpr(node, oneCondition, oneExpr, oppositeExpr);
-            return DO_NOT_VISIT_SUBTREE;
+            return false;
         }
 
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private Expression getBasisExpression(final Expression originalExpr, final AtomicBoolean isExprPositive) {

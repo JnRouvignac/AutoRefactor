@@ -25,8 +25,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.allOperands;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.arguments;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.as;
@@ -136,7 +134,7 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
         if (innerExpr != node) {
             return replaceBy(node, innerExpr);
         }
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private Expression getExpressionWithoutParentheses(ParenthesizedExpression node) {
@@ -308,15 +306,15 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
                 }
             }
         } else if (hasOperator(node, EQUALS, NOT_EQUALS, XOR) && !node.hasExtendedOperands()
-                && maybeReduceBooleanExpression(node, lhs, rhs) == DO_NOT_VISIT_SUBTREE) {
-            return DO_NOT_VISIT_SUBTREE;
+                && !maybeReduceBooleanExpression(node, lhs, rhs)) {
+            return false;
         }
 
         if (shouldHaveParentheses(node)) {
             addParentheses(node);
-            return DO_NOT_VISIT_SUBTREE;
+            return false;
         }
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private boolean maybeReduceBooleanExpression(final InfixExpression node, final Expression leftExpr,
@@ -348,7 +346,7 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
             if (rightOppositeExpr != null) {
                 final Operator reverseOp= getReverseOperator(node);
                 r.replace(node, b.infixExpr(b.copy(leftExpr), reverseOp, b.copy(rightOppositeExpr)));
-                return DO_NOT_VISIT_SUBTREE;
+                return false;
             }
         } else {
             if (rightOppositeExpr != null) {
@@ -358,10 +356,10 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
                 final Operator reverseOp= getReverseOperator(node);
                 r.replace(node, b.infixExpr(b.copy(leftOppositeExpr), reverseOp, b.copy(rightExpr)));
             }
-            return DO_NOT_VISIT_SUBTREE;
+            return false;
         }
 
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private Operator getAppropriateOperator(final InfixExpression node) {
@@ -383,7 +381,7 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
     private boolean replace(final InfixExpression node, final boolean isTrue, final Expression exprToCopy) {
         checkNoExtendedOperands(node);
         if (!isPrimitive(node.getLeftOperand(), "boolean") && !isPrimitive(node.getRightOperand(), "boolean")) {
-            return VISIT_SUBTREE;
+            return true;
         }
         // Either:
         // - Two boolean primitives: no possible NPE
@@ -398,7 +396,7 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
             operand= b.negate(exprToCopy);
         }
         this.ctx.getRefactorings().replace(node, operand);
-        return DO_NOT_VISIT_SUBTREE;
+        return false;
     }
 
     private boolean replaceWithNewInfixExpr(InfixExpression node, final List<Expression> remainingOperands) {
@@ -408,7 +406,7 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
             final ASTBuilder b= ctx.getASTBuilder();
             ctx.getRefactorings().replace(node, b.infixExpr(node.getOperator(), b.move(remainingOperands)));
         }
-        return DO_NOT_VISIT_SUBTREE;
+        return false;
     }
 
     private List<Expression> removeUselessOperands(InfixExpression node, Boolean shortCircuitValue, Boolean noOpValue) {
@@ -461,7 +459,7 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
     private boolean replaceBy(ASTNode node, Expression expr) {
         final ASTBuilder b= ctx.getASTBuilder();
         ctx.getRefactorings().replace(node, b.move(expr));
-        return DO_NOT_VISIT_SUBTREE;
+        return false;
     }
 
     /**

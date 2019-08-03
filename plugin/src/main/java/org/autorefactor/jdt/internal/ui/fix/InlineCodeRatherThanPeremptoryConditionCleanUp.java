@@ -98,12 +98,12 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
                         return maybeInlineBlock(node, node.getFinally());
                     } else {
                         InlineCodeRatherThanPeremptoryConditionCleanUp.this.ctx.getRefactorings().remove(node);
-                        return DO_NOT_VISIT_SUBTREE;
+                        return false;
                     }
                 }
             }
 
-            return VISIT_SUBTREE;
+            return true;
         }
 
         @Override
@@ -123,19 +123,19 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
                     return maybeInlineBlock(node, elseStmt);
                 } else {
                     r.remove(node);
-                    setResult(DO_NOT_VISIT_SUBTREE);
-                    return DO_NOT_VISIT_SUBTREE;
+                    setResult(false);
+                    return false;
                 }
             }
-            return VISIT_SUBTREE;
+            return true;
         }
 
         private boolean maybeInlineBlock(final Statement node, final Statement unconditionnalStatement) {
             if (fallsThrough(unconditionnalStatement)) {
                 replaceBlockByPlainCode(node, unconditionnalStatement);
                 removeForwardCode(node, unconditionnalStatement);
-                setResult(DO_NOT_VISIT_SUBTREE);
-                return DO_NOT_VISIT_SUBTREE;
+                setResult(false);
+                return false;
             } else {
                 final Set<String> ifVariableNames= getLocalVariableIdentifiers(unconditionnalStatement, false);
 
@@ -146,11 +146,11 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
 
                 if (!ifVariableNames.removeAll(followingVariableNames)) {
                     replaceBlockByPlainCode(node, unconditionnalStatement);
-                    setResult(DO_NOT_VISIT_SUBTREE);
-                    return DO_NOT_VISIT_SUBTREE;
+                    setResult(false);
+                    return false;
                 }
             }
-            return VISIT_SUBTREE;
+            return true;
         }
     }
 

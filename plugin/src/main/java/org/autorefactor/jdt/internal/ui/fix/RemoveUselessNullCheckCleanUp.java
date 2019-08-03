@@ -26,8 +26,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.as;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.asExpression;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.asList;
@@ -123,7 +121,7 @@ public class RemoveUselessNullCheckCleanUp extends AbstractCleanUpRule {
                     }
                 }
             }
-            return VISIT_SUBTREE;
+            return true;
         }
 
         private Statement getThenStatement(IfStatement node) {
@@ -149,15 +147,15 @@ public class RemoveUselessNullCheckCleanUp extends AbstractCleanUpRule {
             if (isNullLiteral(condition.getRightOperand())
                     && match(matcher, condition.getLeftOperand(), as.getRightHandSide())) {
                 replaceWithStraightAssign(node, as.getLeftHandSide(), condition.getLeftOperand());
-                setResult(DO_NOT_VISIT_SUBTREE);
-                return DO_NOT_VISIT_SUBTREE;
+                setResult(false);
+                return false;
             } else if (isNullLiteral(condition.getLeftOperand())
                     && match(matcher, condition.getRightOperand(), as.getRightHandSide())) {
                 replaceWithStraightAssign(node, as.getLeftHandSide(), condition.getRightOperand());
-                setResult(DO_NOT_VISIT_SUBTREE);
-                return DO_NOT_VISIT_SUBTREE;
+                setResult(false);
+                return false;
             }
-            return VISIT_SUBTREE;
+            return true;
         }
 
         private void replaceWithStraightAssign(IfStatement node, Expression leftHandSide, Expression rightHandSide) {
@@ -173,17 +171,17 @@ public class RemoveUselessNullCheckCleanUp extends AbstractCleanUpRule {
                         && match(matcher, condition.getLeftOperand(), rs.getExpression())) {
                     ctx.getRefactorings().remove(toRemove);
                     replaceWithStraightReturn(node, condition.getLeftOperand());
-                    setResult(DO_NOT_VISIT_SUBTREE);
-                    return DO_NOT_VISIT_SUBTREE;
+                    setResult(false);
+                    return false;
                 } else if (isNullLiteral(condition.getLeftOperand())
                         && match(matcher, condition.getRightOperand(), rs.getExpression())) {
                     ctx.getRefactorings().remove(toRemove);
                     replaceWithStraightReturn(node, condition.getRightOperand());
-                    setResult(DO_NOT_VISIT_SUBTREE);
-                    return DO_NOT_VISIT_SUBTREE;
+                    setResult(false);
+                    return false;
                 }
             }
-            return VISIT_SUBTREE;
+            return true;
         }
 
         private void replaceWithStraightReturn(IfStatement node, Expression returnedExpr) {

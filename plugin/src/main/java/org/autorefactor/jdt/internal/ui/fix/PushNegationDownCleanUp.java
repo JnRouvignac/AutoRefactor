@@ -25,8 +25,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.allOperands;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getBooleanLiteral;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasOperator;
@@ -81,7 +79,7 @@ public class PushNegationDownCleanUp extends AbstractCleanUpRule {
     @Override
     public boolean visit(PrefixExpression node) {
         if (!hasOperator(node, NOT)) {
-            return VISIT_SUBTREE;
+            return true;
         }
         final ASTBuilder b= ctx.getASTBuilder();
         final Refactorings r= ctx.getRefactorings();
@@ -91,7 +89,7 @@ public class PushNegationDownCleanUp extends AbstractCleanUpRule {
             final PrefixExpression pe= (PrefixExpression) operand;
             if (hasOperator(pe, NOT)) {
                 r.replace(node, b.move(pe.getOperand()));
-                return DO_NOT_VISIT_SUBTREE;
+                return false;
             }
         } else if (operand instanceof InfixExpression) {
             final InfixExpression ie= (InfixExpression) operand;
@@ -106,15 +104,15 @@ public class PushNegationDownCleanUp extends AbstractCleanUpRule {
                     allOperands= b.move(allOperands);
                 }
                 r.replace(node, b.parenthesize(b.infixExpr(reverseOp, allOperands)));
-                return DO_NOT_VISIT_SUBTREE;
+                return false;
             }
         } else {
             final Boolean constant= getBooleanLiteral(operand);
             if (constant != null) {
                 r.replace(node, b.boolean0(!constant));
-                return DO_NOT_VISIT_SUBTREE;
+                return false;
             }
         }
-        return VISIT_SUBTREE;
+        return true;
     }
 }

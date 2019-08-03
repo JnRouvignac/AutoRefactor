@@ -25,7 +25,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.arguments;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.asExpression;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.asList;
@@ -88,8 +87,8 @@ public class JUnitAssertCleanUp extends AbstractUnitTestCleanUp {
     public boolean visit(MethodInvocation node) {
         final List<Expression> args= arguments(node);
         int i= 0;
-        boolean shouldVisit= VISIT_SUBTREE;
-        while (shouldVisit == VISIT_SUBTREE && i < PACKAGE_PATHES.length) {
+        boolean shouldVisit= true;
+        while (shouldVisit && i < PACKAGE_PATHES.length) {
             shouldVisit= maybeRefactorMethod(node, PACKAGE_PATHES[i], args);
             i++;
         }
@@ -116,7 +115,7 @@ public class JUnitAssertCleanUp extends AbstractUnitTestCleanUp {
                         "double")) {
             return maybeRefactorToAssertEquals(node, node, true, args.get(2), args.get(1), args.get(0), false);
         }
-        return VISIT_SUBTREE;
+        return true;
     }
 
     @Override
@@ -125,14 +124,14 @@ public class JUnitAssertCleanUp extends AbstractUnitTestCleanUp {
         if (node.getElseStatement() == null && stmts.size() == 1) {
             final MethodInvocation mi= asExpression(stmts.get(0), MethodInvocation.class);
             int i= 0;
-            boolean shouldVisit= VISIT_SUBTREE;
-            while (shouldVisit == VISIT_SUBTREE && i < PACKAGE_PATHES.length) {
+            boolean shouldVisit= true;
+            while (shouldVisit && i < PACKAGE_PATHES.length) {
                 shouldVisit= maybeRefactorIf(node, mi, PACKAGE_PATHES[i]);
                 i++;
             }
             return shouldVisit;
         }
-        return VISIT_SUBTREE;
+        return true;
     }
 
     private boolean maybeRefactorIf(final IfStatement node, final MethodInvocation mi,
@@ -142,7 +141,7 @@ public class JUnitAssertCleanUp extends AbstractUnitTestCleanUp {
         } else if (isMethod(mi, unitTestPackagePath + "Assert", "fail", "java.lang.String")) {
             return maybeRefactorStatement(node, mi, false, node.getExpression(), arguments(mi).get(0), true);
         }
-        return VISIT_SUBTREE;
+        return true;
     }
 
     @Override

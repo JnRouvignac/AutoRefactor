@@ -25,8 +25,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.DO_NOT_VISIT_SUBTREE;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.VISIT_SUBTREE;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.as;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.fallsThrough;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getLocalVariableIdentifiers;
@@ -98,25 +96,25 @@ public class IfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRule {
                 varUsed= true;
                 return interruptVisit();
             }
-            return VISIT_SUBTREE;
+            return true;
         }
 
         @Override
         public boolean visit(final Block node) {
-            return DO_NOT_VISIT_SUBTREE;
+            return false;
         }
     }
 
     @Override
     public boolean visit(final SwitchStatement node) {
         if (!isPassive(node.getExpression())) {
-            return VISIT_SUBTREE;
+            return true;
         }
 
         final List<?> stmts= node.statements();
 
         if (stmts.isEmpty()) {
-            return VISIT_SUBTREE;
+            return true;
         }
 
         final Set<String> previousVarIds= new HashSet<String>();
@@ -138,7 +136,7 @@ public class IfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRule {
                     caseNb++;
 
                     if (caseNb > 2) {
-                        return VISIT_SUBTREE;
+                        return true;
                     }
 
                     previousVarIds.addAll(caseVarIds);
@@ -161,7 +159,7 @@ public class IfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRule {
                 varOccurrenceVisitor.visitNode(stmt);
 
                 if (varOccurrenceVisitor.isVarUsed()) {
-                    return VISIT_SUBTREE;
+                    return true;
                 }
 
                 caseVarIds.addAll(getLocalVariableIdentifiers(stmt, false));
@@ -175,7 +173,7 @@ public class IfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRule {
         caseNb++;
 
         if (caseNb > 2) {
-            return VISIT_SUBTREE;
+            return true;
         }
 
         if (caseIndexWithDefault != -1) {
@@ -187,7 +185,7 @@ public class IfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRule {
             final Statement lastStmt= caseStructure.getSecond().get(caseStructure.getSecond().size() - 1);
 
             if (!fallsThrough(lastStmt)) {
-                return VISIT_SUBTREE;
+                return true;
             }
 
             final BreakStatement bs= as(lastStmt, BreakStatement.class);
@@ -199,7 +197,7 @@ public class IfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRule {
 
         replaceSwitch(node, switchStructure, caseIndexWithDefault, b);
 
-        return DO_NOT_VISIT_SUBTREE;
+        return false;
     }
 
     private void replaceSwitch(final SwitchStatement node,
