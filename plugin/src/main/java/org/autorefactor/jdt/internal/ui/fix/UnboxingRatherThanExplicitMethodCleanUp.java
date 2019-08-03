@@ -29,6 +29,7 @@ import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getTargetType;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isMethod;
 
 import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
+import org.autorefactor.jdt.internal.corext.dom.Release;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 
@@ -61,13 +62,14 @@ public class UnboxingRatherThanExplicitMethodCleanUp extends AbstractCleanUpRule
         return MultiFixMessages.CleanUpRefactoringWizard_UnboxingRatherThanExplicitMethodCleanUp_reason;
     }
 
-    private int getJavaMinorVersion() {
-        return ctx.getJavaProjectOptions().getJavaSERelease().getMinorVersion();
+    @Override
+    public boolean isJavaVersionSupported(final Release javaSeRelease) {
+        return javaSeRelease.getMinorVersion() >= 5;
     }
 
     @Override
     public boolean visit(MethodInvocation node) {
-        if (node.getExpression() != null && getJavaMinorVersion() >= 5
+        if (node.getExpression() != null
                 && (isMethod(node, Boolean.class.getCanonicalName(), "booleanValue") || isMethod(node, Byte.class.getCanonicalName(), "byteValue")
                         || isMethod(node, Character.class.getCanonicalName(), "charValue")
                         || isMethod(node, Short.class.getCanonicalName(), "shortValue")

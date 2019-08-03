@@ -36,6 +36,7 @@ import java.util.List;
 
 import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
 import org.autorefactor.jdt.internal.corext.dom.BlockSubVisitor;
+import org.autorefactor.jdt.internal.corext.dom.Release;
 import org.autorefactor.jdt.internal.corext.dom.TypeNameDecider;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Block;
@@ -91,18 +92,16 @@ public class LambdaCleanUp extends AbstractCleanUpRule {
         return MultiFixMessages.CleanUpRefactoringWizard_LambdaCleanUp_reason;
     }
 
-    private int getJavaMinorVersion() {
-        return ctx.getJavaProjectOptions().getJavaSERelease().getMinorVersion();
+    @Override
+    public boolean isJavaVersionSupported(final Release javaSeRelease) {
+        return javaSeRelease.getMinorVersion() >= 8;
     }
 
     @Override
     public boolean visit(Block node) {
-        if (getJavaMinorVersion() >= 8) {
-            final LambdaExprVisitor lambdaExprVisitor= new LambdaExprVisitor(node);
-            node.accept(lambdaExprVisitor);
-            return lambdaExprVisitor.getResult();
-        }
-        return true;
+        final LambdaExprVisitor lambdaExprVisitor= new LambdaExprVisitor(node);
+        node.accept(lambdaExprVisitor);
+        return lambdaExprVisitor.getResult();
     }
 
     private final class LambdaExprVisitor extends BlockSubVisitor {
