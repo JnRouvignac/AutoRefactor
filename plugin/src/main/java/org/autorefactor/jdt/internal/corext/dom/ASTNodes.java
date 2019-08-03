@@ -1043,11 +1043,11 @@ public final class ASTNodes {
      *
      * @return the type of either a method return or an assigned variable
      */
-    public static ITypeBinding getDestinationType(final ASTNode node) {
+    public static ITypeBinding getTargetType(final ASTNode node) {
         if (node != null) {
             final ASTNode parent= node.getParent();
             if (parent instanceof ParenthesizedExpression) {
-                return getDestinationType(parent);
+                return getTargetType(parent);
             } else if (parent instanceof ReturnStatement) {
                 final ReturnStatement returnStmt= (ReturnStatement) parent;
                 if (returnStmt.getExpression().equals(node)) {

@@ -26,7 +26,7 @@
 package org.autorefactor.jdt.internal.ui.fix;
 
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.as;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getDestinationType;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getTargetType;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasType;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isMethod;
 
@@ -271,7 +271,7 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
         final TypeNameDecider typeNameDecider= new TypeNameDecider(field);
 
         final LambdaExpression lambdaExpr= b.lambda();
-        final ITypeBinding destinationType= getDestinationType(node);
+        final ITypeBinding destinationType= getTargetType(node);
 
         boolean isTypeKnown= destinationType != null && hasType(destinationType, Comparator.class.getCanonicalName())
                 && destinationType.getTypeArguments() != null && destinationType.getTypeArguments().length == 1 && Utils.equalNotNull(destinationType.getTypeArguments()[0], type);

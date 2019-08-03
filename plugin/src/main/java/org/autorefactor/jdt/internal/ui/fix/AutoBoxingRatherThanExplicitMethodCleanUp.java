@@ -26,7 +26,7 @@
 package org.autorefactor.jdt.internal.ui.fix;
 
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.arg0;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getDestinationType;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getTargetType;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isMethod;
 
 import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
@@ -81,7 +81,7 @@ public class AutoBoxingRatherThanExplicitMethodCleanUp extends AbstractCleanUpRu
             final ITypeBinding primitiveType= node.resolveMethodBinding().getParameterTypes()[0];
             final ITypeBinding wrapperClass= node.resolveMethodBinding().getDeclaringClass();
 
-            final ITypeBinding actualResultType= getDestinationType(node);
+            final ITypeBinding actualResultType= getTargetType(node);
             final ITypeBinding actualParameterType= arg0(node).resolveTypeBinding();
 
             if ((actualResultType != null

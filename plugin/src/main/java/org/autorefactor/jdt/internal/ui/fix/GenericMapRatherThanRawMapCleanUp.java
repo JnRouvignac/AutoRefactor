@@ -259,7 +259,7 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
                     && resolveDestinationParamTypeCompatibleWithKeyValue(mi);
         } else if (isMethod(mi, Map.class.getCanonicalName(), "entrySet")) {
             if (isExprReceived(mi)) {
-                final ITypeBinding newTargetType= getDestinationType(mi);
+                final ITypeBinding newTargetType= getTargetType(mi);
 
                 if (isParameterizedTypeWithNbArguments(newTargetType, 1)) {
                     final ITypeBinding newElementType= newTargetType.getTypeArguments()[0];
@@ -410,16 +410,16 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
     }
 
     private boolean resolveDestinationTypeCompatibleWithKey(final MethodInvocation mi) {
-        return !isExprReceived(mi) || resolveKeyTypeCompatible(getDestinationType(mi));
+        return !isExprReceived(mi) || resolveKeyTypeCompatible(getTargetType(mi));
     }
 
     private boolean resolveDestinationTypeCompatibleWithValue(final MethodInvocation mi) {
-        return !isExprReceived(mi) || resolveValueTypeCompatible(getDestinationType(mi));
+        return !isExprReceived(mi) || resolveValueTypeCompatible(getTargetType(mi));
     }
 
     private boolean resolveDestinationParamTypeCompatibleWithKey(final MethodInvocation mi) {
         if (isExprReceived(mi)) {
-            final ITypeBinding newElementType= getDestinationType(mi);
+            final ITypeBinding newElementType= getTargetType(mi);
             return isParameterizedTypeWithNbArguments(newElementType, 1)
                     && resolveKeyTypeCompatible(newElementType.getTypeArguments()[0]);
         }
@@ -428,7 +428,7 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
 
     private boolean resolveDestinationParamTypeCompatibleWithValue(final MethodInvocation mi) {
         if (isExprReceived(mi)) {
-            final ITypeBinding newElementType= getDestinationType(mi);
+            final ITypeBinding newElementType= getTargetType(mi);
             return isParameterizedTypeWithNbArguments(newElementType, 1)
                     && resolveValueTypeCompatible(newElementType.getTypeArguments()[0]);
         }
@@ -437,7 +437,7 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
 
     private boolean resolveDestinationParamTypeCompatibleWithKeyValue(final MethodInvocation mi) {
         if (isExprReceived(mi)) {
-            final ITypeBinding newElementType= getDestinationType(mi);
+            final ITypeBinding newElementType= getTargetType(mi);
             return isParameterizedTypeWithNbArguments(newElementType, 2)
                     && resolveKeyTypeCompatible(newElementType.getTypeArguments()[0])
                     && resolveValueTypeCompatible(newElementType.getTypeArguments()[1]);

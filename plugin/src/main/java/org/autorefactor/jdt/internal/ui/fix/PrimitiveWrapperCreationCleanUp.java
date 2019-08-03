@@ -29,7 +29,7 @@ package org.autorefactor.jdt.internal.ui.fix;
 
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.arg0;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.arguments;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getDestinationType;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getTargetType;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasType;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isMethod;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isPrimitive;
@@ -83,7 +83,7 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
             return true;
         }
 
-        ITypeBinding destinationTypeBinding= getDestinationType(node);
+        ITypeBinding destinationTypeBinding= getTargetType(node);
 
         if (destinationTypeBinding != null && destinationTypeBinding.isPrimitive()
                 && "valueOf".equals(node.getName().getIdentifier())) {

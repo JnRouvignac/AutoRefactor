@@ -242,7 +242,7 @@ public class GenericListRatherThanRawListCleanUp extends AbstractClassSubstitute
                 || isMethod(mi, Vector.class.getCanonicalName(), "firstElement") || isMethod(mi, Vector.class.getCanonicalName(), "lastElement")
                 || isMethod(mi, Stack.class.getCanonicalName(), "pop") || isMethod(mi, Stack.class.getCanonicalName(), "peek")) {
             if (isExprReceived(mi)) {
-                ITypeBinding newElementType= getDestinationType(mi);
+                ITypeBinding newElementType= getTargetType(mi);
                 return resolveTypeCompatible(newElementType);
             } else {
                 return true;
@@ -252,7 +252,7 @@ public class GenericListRatherThanRawListCleanUp extends AbstractClassSubstitute
                 || isMethod(mi, List.class.getCanonicalName(), "listIterator", int.class.getSimpleName())
                 || isMethod(mi, List.class.getCanonicalName(), "spliterator") || isMethod(mi, Vector.class.getCanonicalName(), "elements")) {
             if (isExprReceived(mi)) {
-                ITypeBinding newElementType= getDestinationType(mi);
+                ITypeBinding newElementType= getTargetType(mi);
                 return resolveTypeCompatibleIfPossible(newElementType);
             } else {
                 return true;
@@ -260,7 +260,7 @@ public class GenericListRatherThanRawListCleanUp extends AbstractClassSubstitute
         } else if (isMethod(mi, List.class.getCanonicalName(), "subList", int.class.getSimpleName(), int.class.getSimpleName())
                 || isMethod(mi, Collection.class.getCanonicalName(), "toArray")) {
             if (isExprReceived(mi)) {
-                ITypeBinding newCollectionType= getDestinationType(mi);
+                ITypeBinding newCollectionType= getTargetType(mi);
                 if (newCollectionType != null) {
                     ITypeBinding newElementType= newCollectionType.getElementType();
                     return resolveTypeCompatible(newElementType);

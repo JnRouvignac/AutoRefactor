@@ -25,7 +25,7 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getDestinationType;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getTargetType;
 import static org.autorefactor.util.Utils.equalNotNull;
 
 import java.util.List;
@@ -69,7 +69,7 @@ public class BracketsRatherThanArrayInstantiationCleanUp extends AbstractCleanUp
     public boolean visit(ArrayCreation node) {
         if (node.getInitializer() != null || isVoid(node)) {
             final ITypeBinding arrayType= node.resolveTypeBinding();
-            final ITypeBinding destinationType= getDestinationType(node);
+            final ITypeBinding destinationType= getTargetType(node);
 
             if (equalNotNull(arrayType, destinationType) && isDestinationAllowed(node)) {
                 refactorWithInitializer(node);

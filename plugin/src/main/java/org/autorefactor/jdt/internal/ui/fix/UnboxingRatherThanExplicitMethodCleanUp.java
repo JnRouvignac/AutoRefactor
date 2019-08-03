@@ -25,7 +25,7 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getDestinationType;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getTargetType;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isMethod;
 
 import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
@@ -75,7 +75,7 @@ public class UnboxingRatherThanExplicitMethodCleanUp extends AbstractCleanUpRule
                         || isMethod(node, Long.class.getCanonicalName(), "longValue")
                         || isMethod(node, Float.class.getCanonicalName(), "floatValue")
                         || isMethod(node, Double.class.getCanonicalName(), "doubleValue"))) {
-            final ITypeBinding actualResultType= getDestinationType(node);
+            final ITypeBinding actualResultType= getTargetType(node);
 
             if (actualResultType != null && actualResultType.isAssignmentCompatible(node.resolveTypeBinding())) {
                 useUnboxing(node);
