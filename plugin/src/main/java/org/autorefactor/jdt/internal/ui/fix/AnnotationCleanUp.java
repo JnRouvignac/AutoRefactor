@@ -192,7 +192,7 @@ public class AnnotationCleanUp extends AbstractCleanUpRule {
     }
 
     private Byte toByte(Object javaObj) {
-        // no byte literal exist
+        // No byte literal exist
         if (javaObj instanceof Integer) {
             int i= (Integer) javaObj;
             if (Byte.MIN_VALUE <= i && i <= Byte.MAX_VALUE) {
@@ -203,7 +203,7 @@ public class AnnotationCleanUp extends AbstractCleanUpRule {
     }
 
     private Short toShort(Object javaObj) {
-        // no short literal exist
+        // No short literal exist
         if (javaObj instanceof Integer) {
             int i= (Integer) javaObj;
             if (Short.MIN_VALUE <= i && i <= Short.MAX_VALUE) {

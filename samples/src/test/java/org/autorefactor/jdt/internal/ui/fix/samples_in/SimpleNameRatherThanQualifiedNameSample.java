@@ -90,7 +90,7 @@ public class SimpleNameRatherThanQualifiedNameSample {
     }
 
     private void acceptListString(List<String> l) {
-        // nothing to do
+        // Nothing to do
     }
 
     public boolean removeQualifiedNameForStaticTypeImport(Map.Entry<?, ?> e) {
@@ -231,7 +231,7 @@ public class SimpleNameRatherThanQualifiedNameSample {
 
     static class Inner {
         static class InnerInner {
-            // empty
+            // Empty
         }
         private static final Inner INSTANCE = new Inner();
         private static Inner getInstance() {

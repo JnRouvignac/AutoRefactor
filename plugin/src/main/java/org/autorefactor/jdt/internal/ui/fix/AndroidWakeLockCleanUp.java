@@ -79,7 +79,7 @@ public class AndroidWakeLockCleanUp extends AbstractCleanUpRule {
     @Override
     public boolean visit(MethodInvocation node) {
         if (isMethod(node, "android.os.PowerManager.WakeLock", "release")) { //$NON-NLS-1$ $NON-NLS-2$
-            // check whether it is being called in onDestroy()
+            // Check whether it is being called in onDestroy()
             MethodDeclaration enclosingMethod= getAncestor(node, MethodDeclaration.class);
             if (isMethod(enclosingMethod, "android.app.Activity", "onDestroy")) { //$NON-NLS-1$ $NON-NLS-2$
                 final Refactorings r= ctx.getRefactorings();

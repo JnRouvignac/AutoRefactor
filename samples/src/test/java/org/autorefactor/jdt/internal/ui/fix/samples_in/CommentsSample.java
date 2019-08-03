@@ -53,11 +53,11 @@ public class CommentsSample implements Runnable, Callable<Void>, Closeable {
     }
 
     /**
-     * uppercase first word.
+     * Uppercase first word.
      */
     private int i;
     private int j; // This must be attached as a javadoc to field 'j' */
-    //uppercase
+    // Uppercase
     private int k;
     // First part of javadoc
     private int l; // Second part of javadoc */
@@ -90,12 +90,12 @@ public class CommentsSample implements Runnable, Callable<Void>, Closeable {
      * Convert to a javadoc
      */
     public static void main(String[] args) {
-        // remove block comment just below
+        // Remove block comment just below
         /*
          *
          */
         //
-        // remove comment lines just above and below
+        // Remove comment lines just above and below
         //
 
         try {
@@ -181,7 +181,7 @@ public class CommentsSample implements Runnable, Callable<Void>, Closeable {
     //// single line starts with 4 slashes
     public int bewareOfSlashesAfterSlashesAfterJavaElement; //// second line starts with 4 slashes too
 
-    // first line
+    // First line
     //// second line starts with 4 slashes and may trigger compilation errors
     public void bewareOfSlashesAfterSlashes2() {
     }

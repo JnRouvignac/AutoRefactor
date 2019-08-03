@@ -179,7 +179,7 @@ public abstract class AndroidViewHolderSample extends BaseAdapter {
         @Override
         public View getView(final int position, View convertView, final ViewGroup parent) {
             View rootView = convertView;
-            // this should not be refactored
+            // This should not be refactored
             if (rootView != null) {
                 return rootView;
             }

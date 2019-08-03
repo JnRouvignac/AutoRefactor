@@ -70,7 +70,7 @@ public class StringValueOfRatherThanConcatCleanUp extends AbstractCleanUpRule {
             final Expression rightOperand= node.getRightOperand();
 
             return maybeReplaceStringConcatenation(node, leftOperand, rightOperand)
-                    // if not replaced then try the other way round
+                    // If not replaced then try the other way round
                     && maybeReplaceStringConcatenation(node, rightOperand, leftOperand);
         }
         return true;

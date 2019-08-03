@@ -30,26 +30,26 @@ import java.sql.SQLException;
 public class RemoveUncheckedThrowsClausesSample {
 
     public void refactorMethod() throws Exception {
-        // some code
+        // Some code
     }
 
     public void refactorMethod2() {
-        // some code
+        // Some code
     }
 
     public void doNotRefactor() throws Exception, SQLException {
-        // some code
+        // Some code
     }
 
-    // remove unchecked descendants from constructor
+    // Remove unchecked descendants from constructor
     public RemoveUncheckedThrowsClausesSample() throws SQLException {
-        // some code
+        // Some code
     }
 
-    // remove unchecked from constructor
+    // Remove unchecked from constructor
     public RemoveUncheckedThrowsClausesSample(int i)
             throws Exception {
-        // some code
+        // Some code
     }
 
 }

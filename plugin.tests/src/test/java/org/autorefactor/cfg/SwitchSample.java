@@ -35,7 +35,7 @@ public class SwitchSample {
             case 0: // fall through
             case 1:
                 boolean b = false;
-                // fall through
+                // Fall through
             case 2:
                 b = true;
                 break;
@@ -49,10 +49,10 @@ public class SwitchSample {
                 break;
             default:
             }
-            // fall through
+            // Fall through
         case 1:
             int k = 0;
-            // fall through
+            // Fall through
 //        case 2:
 //            k++;
 //            // fall through

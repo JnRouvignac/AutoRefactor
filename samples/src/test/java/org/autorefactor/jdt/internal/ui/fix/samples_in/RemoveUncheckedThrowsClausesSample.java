@@ -30,27 +30,27 @@ import java.sql.SQLException;
 public class RemoveUncheckedThrowsClausesSample {
 
     public void refactorMethod() throws NullPointerException, Exception, Error {
-        // some code
+        // Some code
     }
 
     public void refactorMethod2() throws IllegalArgumentException {
-        // some code
+        // Some code
     }
 
     public void doNotRefactor() throws Exception, SQLException {
-        // some code
+        // Some code
     }
 
-    // remove unchecked descendants from constructor
+    // Remove unchecked descendants from constructor
     public RemoveUncheckedThrowsClausesSample() throws AssertionError,
             NullPointerException, SQLException {
-        // some code
+        // Some code
     }
 
-    // remove unchecked from constructor
+    // Remove unchecked from constructor
     public RemoveUncheckedThrowsClausesSample(int i)
             throws RuntimeException, Error, Exception {
-        // some code
+        // Some code
     }
 
 }

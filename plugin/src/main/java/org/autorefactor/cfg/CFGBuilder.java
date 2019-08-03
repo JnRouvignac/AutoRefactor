@@ -289,7 +289,7 @@ public class CFGBuilder {
         case NUMBER_LITERAL:
         case STRING_LITERAL:
         case TYPE_LITERAL:
-            // nothing to do
+            // Nothing to do
             return false;
         case CAST_EXPRESSION:
             CastExpression cae= (CastExpression) node;
@@ -599,7 +599,7 @@ public class CFGBuilder {
             final LivenessState liveAfterBody= buildCFG(node.getBody(), LivenessState.of(liveEdge), throwers);
             if (!liveAfterBody.liveEdges.isEmpty()) {
                 if (node.getReturnType2() == null || node.getReturnType2().resolveBinding() == null // added for unit
-                                                                                                    // tests
+                                                                                                    // Tests
                         || "void".equals(node.getReturnType2().resolveBinding().getName())) { //$NON-NLS-1$
                     buildEdges(liveAfterBody, exitBlock);
                 } else {
@@ -896,10 +896,10 @@ public class CFGBuilder {
      */
     public LivenessState buildCFG(SwitchCase node, CFGBasicBlock switchConditionBasicBlock, LivenessState state,
             ThrowerBlocks throwers) {
-        // the current live blocks will be empty if there was a break,
+        // The current live blocks will be empty if there was a break,
         // or populated in case of fall-through.
         addVariableAccess(switchConditionBasicBlock, node.getExpression(), READ, throwers);
-        // add an edge going from the condition of the switch
+        // Add an edge going from the condition of the switch
         // (state.liveBasicBlock is the condition of the switch)
         state.add(new CFGEdgeBuilder(node.getExpression(), true, switchConditionBasicBlock));
         return state.nextStmtWillCreateNewBlock();
@@ -1422,7 +1422,7 @@ public class CFGBuilder {
      * @return the blocks liveness state after current node
      */
     public LivenessState buildCFG(LabeledStatement node, LivenessState state, ThrowerBlocks throwers) {
-        // does not count as an executable node, so do not get a basic block for it
+        // Does not count as an executable node, so do not get a basic block for it
         return buildCFG(node.getBody(), state, throwers);
     }
 
@@ -1463,7 +1463,7 @@ public class CFGBuilder {
 
     private LivenessState getInBlockStmtResult(LivenessState state, CFGBasicBlock basicBlock) {
         if (state.liveBasicBlock == null) {
-            // new block was created for current node
+            // New block was created for current node
             return new LivenessState(basicBlock, new CFGEdgeBuilder(basicBlock));
         }
         return state;

@@ -40,13 +40,13 @@ public interface JavaConstants {
      *      Underscores in Numeric Literals</a>
      */
     String INTEGER_LITERAL_COMPATIBLE_PATTERN= "" + "(?:" //$NON-NLS-1$ $NON-NLS-2$
-    // binary literal
+    // Binary literal
             + "(?:0b|0B)(?:[0-1][0-1_]*)?[0-1]" + ")|(?:" //$NON-NLS-1$ $NON-NLS-2$
-            // octal literal
+            // Octal literal
             + "0(?:[0-7_]*)?[0-7]" + ")|(?:" //$NON-NLS-1$ $NON-NLS-2$
-            // decimal literal
+            // Decimal literal
             + "[0-9]([0-9_]*[0-9])?" + ")|(?:" //$NON-NLS-1$ $NON-NLS-2$
-            // hexadecimal literal
+            // Hexadecimal literal
             + "(?:0x|0X)([0-9a-fA-F][0-9a-fA-F_]*)?[0-9a-fA-F]" + ")"; //$NON-NLS-1$ $NON-NLS-2$
 
     /** Pattern identifying number literal for an integer. */
@@ -60,34 +60,34 @@ public interface JavaConstants {
 
     /** Pattern identifying number literal for long "0". */
     Pattern ZERO_LONG_LITERAL_RE= Pattern.compile("(?:" + "(?:" //$NON-NLS-1$ $NON-NLS-2$
-    // binary literal
+    // Binary literal
             + "(?:0b|0B)(?:0[0_]*)?0" + ")|(?:" //$NON-NLS-1$ $NON-NLS-2$
-            // octal literal
+            // Octal literal
             + "0[0_]*0" + ")|(?:" //$NON-NLS-1$ $NON-NLS-2$
-            // decimal literal
+            // Decimal literal
             + "0(?:[0_]*0)?" + ")|(?:" //$NON-NLS-1$ $NON-NLS-2$
-            // hexadecimal literal
+            // Hexadecimal literal
             + "(?:0x|0X)(?:0[0_]*)?0" + ")" + ")(?:l|L)?"); //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
 
     /** Pattern identifying number literal for long "1". */
     Pattern ONE_LONG_LITERAL_RE= Pattern.compile("(?:" + "(?:" //$NON-NLS-1$ $NON-NLS-2$
-    // binary literal
+    // Binary literal
             + "(?:0b|0B)(?:0[0_]*)?1" + ")|(?:" //$NON-NLS-1$ $NON-NLS-2$
-            // octal literal
+            // Octal literal
             + "0[0_]*1" + ")|(?:" //$NON-NLS-1$ $NON-NLS-2$
-            // decimal literal
+            // Decimal literal
             + "1" + ")|(?:" //$NON-NLS-1$ $NON-NLS-2$
-            // hexadecimal literal
+            // Hexadecimal literal
             + "(?:0x|0X)(?:0[0_]*)?1" + ")" + ")(?:l|L)?"); //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
 
     /** Pattern identifying number literal for long "10". */
     Pattern TEN_LONG_LITERAL_RE= Pattern.compile("(?:" + "(?:" //$NON-NLS-1$ $NON-NLS-2$
-    // binary literal
+    // Binary literal
             + "(?:0b|0B)(?:0[0_]*)?1_*0_*1_*0" + ")|(?:" //$NON-NLS-1$ $NON-NLS-2$
-            // octal literal
+            // Octal literal
             + "0[0_]*1_*3" + ")|(?:" //$NON-NLS-1$ $NON-NLS-2$
-            // decimal literal
+            // Decimal literal
             + "1_*0" + ")|(?:" //$NON-NLS-1$ $NON-NLS-2$
-            // hexadecimal literal
+            // Hexadecimal literal
             + "(?:0x|0X)(?:0[0_]*)?(?:a|A)" + ")" + ")(?:l|L)?"); //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
 }

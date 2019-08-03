@@ -67,7 +67,7 @@ public class FinderVisitor<R> extends ASTVisitor {
 
     @Override
     public boolean preVisit2(ASTNode node) {
-        // exit has fast as possible when the result is found
+        // Exit has fast as possible when the result is found
         return !resultFound;
     }
 }

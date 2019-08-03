@@ -258,7 +258,7 @@ public class TestNGAssertSample {
         assertNotEquals(o, expected);
         assertNotEquals(o, expected, "Failure message to keep");
 
-        // tests that this works according to levenshtein distance
+        // Tests that this works according to levenshtein distance
         int expceted = 0;
         assertEquals(o, expceted);
     }

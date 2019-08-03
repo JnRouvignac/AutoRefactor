@@ -91,7 +91,7 @@ public class TestNGAssertCleanUp extends AbstractUnitTestCleanUp {
 
     @Override
     public boolean visit(CompilationUnit node) {
-        // new file: reset the value
+        // New file: reset the value
         canUseAssertNotEquals= false;
         return super.visit(node);
     }
@@ -99,7 +99,7 @@ public class TestNGAssertCleanUp extends AbstractUnitTestCleanUp {
     @Override
     public boolean visit(ImportDeclaration node) {
         if (!canUseAssertNotEquals) {
-            // we have not found testng yet for this file, go on looking for it
+            // We have not found testng yet for this file, go on looking for it
             canUseAssertNotEquals= canUseAssertNotEquals(node);
         }
         return super.visit(node);

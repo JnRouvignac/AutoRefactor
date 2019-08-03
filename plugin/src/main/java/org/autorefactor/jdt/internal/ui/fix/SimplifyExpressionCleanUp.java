@@ -199,7 +199,7 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
                 // TODO JNR add additional code to check if the cast is really required
                 // or if it can be removed.
                 || innerExpr instanceof CastExpression
-                // infix and prefix or postfix without parenthesis is not readable
+                // Infix and prefix or postfix without parenthesis is not readable
                 || ((parent instanceof InfixExpression
                         || parent instanceof PrefixExpression
                         || parent instanceof PostfixExpression)

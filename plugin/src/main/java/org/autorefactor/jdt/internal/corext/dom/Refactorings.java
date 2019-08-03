@@ -251,7 +251,7 @@ public class Refactorings {
             while (currIter.hasNext()) {
                 ASTNode currNode= currIter.next();
                 if (origNode.equals(currNode)) {
-                    // all current nodes must be found in the original list now
+                    // All current nodes must be found in the original list now
                     while (origIter.hasNext() && currIter.hasNext()) {
                         origNode= origIter.next();
                         currNode= currIter.next();

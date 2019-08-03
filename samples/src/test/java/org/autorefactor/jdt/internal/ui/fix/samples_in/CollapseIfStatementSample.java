@@ -28,22 +28,22 @@ package org.autorefactor.jdt.internal.ui.fix.samples_in;
 public class CollapseIfStatementSample {
 
     public void collapseIfStatements(boolean b1, boolean b2) {
-        // keep this comment 1
+        // Keep this comment 1
         if (b1) {
-            // keep this comment 2
+            // Keep this comment 2
             if (b2) {
-                // keep this comment 3
+                // Keep this comment 3
                 int i = 0;
             }
         }
     }
 
     public void collapseIfStatementsAddParenthesesIfDifferentConditionalOperator(boolean b1, boolean b2, boolean b3) {
-        // keep this comment 1
+        // Keep this comment 1
         if (b1) {
-            // keep this comment 2
+            // Keep this comment 2
             if (b2 || b3) {
-                // keep this comment 3
+                // Keep this comment 3
                 int i = 0;
             }
         }

@@ -513,14 +513,14 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
                 // Then and else statement are matching, bar the boolean values
                 // which are opposite
                 final Statement copyStmt= b.copySubtree(node.getThenStatement());
-                // identify the node that need to be replaced after the copy
+                // Identify the node that need to be replaced after the copy
                 final BooleanASTMatcher matcher2= new BooleanASTMatcher(matcher.matches);
 
                 if (match(matcher2, copyStmt, node.getElseStatement())) {
                     final Expression ifCondition= node.getExpression();
                     copyStmt.accept(
                             new BooleanReplaceVisitor(ifCondition, matcher2.matches.values(), getBooleanName(node)));
-                    // make sure to keep curly braces if the node is an else statement
+                    // Make sure to keep curly braces if the node is an else statement
                     ctx.getRefactorings().replace(node,
                             isElseStatementOfParent(node) ? copyStmt : toSingleStmt(copyStmt));
                     return false;

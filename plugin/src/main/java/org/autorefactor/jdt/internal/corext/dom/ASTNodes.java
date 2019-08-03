@@ -1535,7 +1535,7 @@ public final class ASTNodes {
      */
     public static boolean isSameLocalVariable(IBinding binding, Expression expr) {
         return isLocalVariable(binding) && expr != null && expr.getNodeType() == SIMPLE_NAME
-        // no need to use IVariableBinding.isEqualTo(IBinding) since we are looking for
+        // No need to use IVariableBinding.isEqualTo(IBinding) since we are looking for
         // a *local* variable
                 && binding.equals(((SimpleName) expr).resolveBinding());
     }
@@ -2014,7 +2014,7 @@ public final class ASTNodes {
             Set<IMethodBinding> results) {
         for (IMethodBinding methodFromType : superType.getDeclaredMethods()) {
             if (overridingMethod.overrides(methodFromType) && !results.add(methodFromType)) {
-                // type has already been visited
+                // Type has already been visited
                 return true;
             }
         }
@@ -2023,12 +2023,12 @@ public final class ASTNodes {
 
     private static IMethodBinding findOverridenMethod(ITypeBinding typeBinding, String typeQualifiedName,
             String methodName, String[] parameterTypesQualifiedNames) {
-        // superclass
+        // Superclass
         ITypeBinding superclassBinding= typeBinding.getSuperclass();
         if (superclassBinding != null) {
             superclassBinding= superclassBinding.getErasure();
             if (typeQualifiedName.equals(superclassBinding.getErasure().getQualifiedName())) {
-                // found the type
+                // Found the type
                 return findOverridenMethod(methodName, parameterTypesQualifiedNames,
                         superclassBinding.getDeclaredMethods());
             }
@@ -2038,11 +2038,11 @@ public final class ASTNodes {
                 return overridenMethod;
             }
         }
-        // interfaces
+        // Interfaces
         for (ITypeBinding itfBinding : typeBinding.getInterfaces()) {
             itfBinding= itfBinding.getErasure();
             if (typeQualifiedName.equals(itfBinding.getQualifiedName())) {
-                // found the type
+                // Found the type
                 return findOverridenMethod(methodName, parameterTypesQualifiedNames, itfBinding.getDeclaredMethods());
             }
             IMethodBinding overridenMethod= findOverridenMethod(itfBinding, typeQualifiedName, methodName,
@@ -2403,7 +2403,7 @@ public final class ASTNodes {
             if (cu.getTypeRoot() != null) {
                 return cu.getTypeRoot().getElementName() + ":" + line + ":" + column; //$NON-NLS-1$ $NON-NLS-2$
             }
-            // it was not created from a file
+            // It was not created from a file
             return line + ":" + column; //$NON-NLS-1$
         }
         return ""; //$NON-NLS-1$

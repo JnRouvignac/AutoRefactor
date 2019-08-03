@@ -120,7 +120,7 @@ public class ChooseRefactoringWizardPage extends WizardPage {
     private final Styler defaultStyler= new Styler() {
         @Override
         public void applyStyles(TextStyle textStyle) {
-            // no specific style
+            // No specific style
         }
     };
 
@@ -164,7 +164,7 @@ public class ChooseRefactoringWizardPage extends WizardPage {
         createSelectAllCheckbox(parent);
         createRefactoringsTable(parent);
 
-        // required to avoid an error in the system
+        // Required to avoid an error in the system
         setControl(parent);
         // Allows to click the "Finish" button
         setPageComplete(true);
@@ -178,7 +178,7 @@ public class ChooseRefactoringWizardPage extends WizardPage {
         filterText.addKeyListener(new KeyAdapter() {
             @Override
             public void keyReleased(KeyEvent event) {
-                // trigger a call to StyledCellLabelProvider.update()
+                // Trigger a call to StyledCellLabelProvider.update()
                 tableViewer.refresh(true);
             }
         });

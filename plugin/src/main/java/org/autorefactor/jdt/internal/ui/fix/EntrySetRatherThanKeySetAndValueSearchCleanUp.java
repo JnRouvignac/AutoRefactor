@@ -230,7 +230,7 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
             // -> mapExpression become 'map', parameter become 'K key'
             final Expression mapExpression= ((MethodInvocation) foreachExpr).getExpression();
             if (mapExpression == null) {
-                // not implemented
+                // Not implemented
                 return true;
             }
             final SingleVariableDeclaration parameter= enhancedFor.getParameter();

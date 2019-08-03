@@ -114,7 +114,7 @@ public abstract class AbstractCleanUpRule extends ASTVisitor implements JavaRefa
                 return false;
             }
         }
-        // only visit nodes that have not been refactored
+        // Only visit nodes that have not been refactored
         // to avoid trying to refactor twice the same node (or sub nodes)
         return !ctx.getRefactorings().hasBeenRefactored(node);
     }

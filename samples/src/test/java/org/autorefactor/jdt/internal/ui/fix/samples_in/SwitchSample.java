@@ -79,7 +79,7 @@ public class SwitchSample {
             i = 25;
             i = 30;
         } else if (i1 == 5) {
-            // do nothing
+            // Do nothing
         } else if (i1 == 4)
             i = 40;
         else {

@@ -133,7 +133,7 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
                 // throw new IllegalStateException();
                 // }
             }
-            // return false;
+            // Return false;
             throw new NotImplementedException(name, name);
         }
 
@@ -229,7 +229,7 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
                 this.allVariableAccesses.put(varName, list);
             }
             if (list.isEmpty() || !getLast(list).getScope().equals(accessTypeAndScope.getSecond())) {
-                // only keep first write in scope
+                // Only keep first write in scope
                 list.add(new VariableAccess(node, accessTypeAndScope.getFirst(), accessTypeAndScope.getSecond()));
             }
         }
@@ -435,7 +435,7 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
         VariableAccess lastWrite= null;
         for (VariableAccess varAccess : variableAccesses) {
             if (varAccess.getAccessType() == WRITE) {
-                // is only write
+                // Is only write
                 lastWrite= varAccess;
             } else if ((varAccess.getAccessType() & READ) != 0 && lastWrite != null
                     && !isReadDominatedByWriteInScopeMoreReducedThanVariableScope(varAccess.getScope(),

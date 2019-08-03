@@ -50,13 +50,13 @@ public class CodePathCollector {
 
     private void collectPathes(CFGBasicBlock block) {
         if (block.isExitBlock()) {
-            // this is the end of this path,
+            // This is the end of this path,
             // let's take a copy of the stack
             results.add(new ArrayList<CFGBasicBlock>(stack));
             return;
         }
         if (stack.contains(block)) {
-            // cycle detected, let's stop it here
+            // Cycle detected, let's stop it here
             return;
         }
 

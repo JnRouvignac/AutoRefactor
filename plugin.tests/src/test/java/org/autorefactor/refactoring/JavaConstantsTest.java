@@ -35,11 +35,11 @@ public class JavaConstantsTest {
     public Object[][] getValidLongZeroLiteral() {
         return new Object[][] {
                 // @formatter:off
-                // valid
+                // Valid
                 { "0b0l" }, { "0B0l" }, { "0b0000l" }, { "0B0000l" }, { "0b0L" }, { "0B0L" }, { "0b0000L" }, //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$ $NON-NLS-4$ $NON-NLS-5$ $NON-NLS-6$ $NON-NLS-7$
                 { "0B0000L" }, { "00000l" }, { "00l" }, { "00000L" }, { "00L" }, { "0l" }, { "0L" }, { "0x0l" }, //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$ $NON-NLS-4$ $NON-NLS-5$ $NON-NLS-6$ $NON-NLS-7$ $NON-NLS-8$
                 { "0X0l" }, { "0x0000l" }, { "0X0000l" }, { "0x0L" }, { "0X0L" }, { "0x0000L" }, { "0X0000L" }, //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$ $NON-NLS-4$ $NON-NLS-5$ $NON-NLS-6$ $NON-NLS-7$
-                // valid underscores
+                // Valid underscores
                 { "0b0_0_0_0l" }, { "0B0_000l" }, { "0b000_0l" }, { "0B00_00l" }, { "0b0_0_0_0L" }, { "0B0_000L" }, //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$ $NON-NLS-4$ $NON-NLS-5$ $NON-NLS-6$
                 { "0b000_0L" }, { "0B00_00L" }, { "0_0_0_0_0l" }, { "0_0l" }, { "0000_0l" }, { "0_0_0_0_0L" }, //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$ $NON-NLS-4$ $NON-NLS-5$ $NON-NLS-6$
                 { "0_0L" }, { "0000_0L" }, { "0l" }, { "0L" }, { "0x0_000l" }, { "0X00_00l" }, { "0x0_0_0_0l" }, //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$ $NON-NLS-4$ $NON-NLS-5$ $NON-NLS-6$ $NON-NLS-7$
@@ -52,10 +52,10 @@ public class JavaConstantsTest {
     public Object[][] getValidIntegerZeroLiteral() {
         return new Object[][] {
                 // @formatter:off
-                // valid
+                // Valid
                 { "0b0" }, { "0B0" }, { "0b0000" }, { "0B0000" }, { "00000" }, { "00" }, { "0" }, { "0x0" }, { "0X0" }, //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$ $NON-NLS-4$ $NON-NLS-5$ $NON-NLS-6$ $NON-NLS-7$ $NON-NLS-8$ $NON-NLS-9$
                 { "0x0000" }, { "0X0000" }, //$NON-NLS-1$ $NON-NLS-2$
-                // valid underscores
+                // Valid underscores
                 { "0b0_0_0_0" }, { "0B0_000" }, { "0b000_0" }, { "0B00_00" }, { "0_0_0_0_0" }, { "0_0" }, { "0000_0" }, //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$ $NON-NLS-4$ $NON-NLS-5$ $NON-NLS-6$ $NON-NLS-7$
                 { "0" }, { "0x0_000" }, { "0X00_00" }, { "0x0_0_0_0" }, { "0X000_0" }, //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$ $NON-NLS-4$ $NON-NLS-5$
                 // @formatter:on
@@ -66,7 +66,7 @@ public class JavaConstantsTest {
     public Object[][] getInvalidIntegerZeroLiteral() {
         return new Object[][] {
                 // @formatter:off
-                // invalid
+                // Invalid
                 { "0b_0" }, { "0B_0" }, //$NON-NLS-1$ $NON-NLS-2$
                 // This is an identifier, not a numeric literal
                 { "_00000" }, { "_00" }, { "_0" }, //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
@@ -88,11 +88,11 @@ public class JavaConstantsTest {
     public Object[][] getValidLongOneLiteral() {
         return new Object[][] {
                 // @formatter:off
-                // valid
+                // Valid
                 { "0b1l" }, { "0B1l" }, { "0b0001l" }, { "0B0001l" }, { "0b1L" }, { "0B1L" }, { "0b0001L" }, //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$ $NON-NLS-4$ $NON-NLS-5$ $NON-NLS-6$ $NON-NLS-7$
                 { "0B0001L" }, { "00001l" }, { "01l" }, { "00001L" }, { "01L" }, { "1l" }, { "1L" }, { "0x1l" }, //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$ $NON-NLS-4$ $NON-NLS-5$ $NON-NLS-6$ $NON-NLS-7$ $NON-NLS-8$
                 { "0X1l" }, { "0x0001l" }, { "0X0001l" }, { "0x1L" }, { "0X1L" }, { "0x0001L" }, { "0X0001L" }, //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$ $NON-NLS-4$ $NON-NLS-5$ $NON-NLS-6$ $NON-NLS-7$
-                // valid underscores
+                // Valid underscores
                 { "0b0_0_0_1l" }, { "0B0_001l" }, { "0b000_1l" }, { "0B00_01l" }, { "0b0_0_0_1L" }, { "0B0_001L" }, //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$ $NON-NLS-4$ $NON-NLS-5$ $NON-NLS-6$
                 { "0b000_1L" }, { "0B00_01L" }, { "0_0_0_0_1l" }, { "0_1l" }, { "0000_1l" }, { "0_0_0_0_1L" }, //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$ $NON-NLS-4$ $NON-NLS-5$ $NON-NLS-6$
                 { "0_1L" }, { "0000_1L" }, { "1l" }, { "1L" }, { "0x0_001l" }, { "0X00_01l" }, { "0x0_0_0_1l" }, //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$ $NON-NLS-4$ $NON-NLS-5$ $NON-NLS-6$ $NON-NLS-7$
@@ -105,10 +105,10 @@ public class JavaConstantsTest {
     public Object[][] getValidIntegerOneLiteral() {
         return new Object[][] {
                 // @formatter:off
-                // valid
+                // Valid
                 { "0b1" }, { "0B1" }, { "0b0001" }, { "0B0001" }, { "00001" }, { "01" }, { "1" }, { "0x1" }, { "0X1" }, //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$ $NON-NLS-4$ $NON-NLS-5$ $NON-NLS-6$ $NON-NLS-7$ $NON-NLS-8$ $NON-NLS-9$
                 { "0x0001" }, { "0X0001" }, //$NON-NLS-1$ $NON-NLS-2$
-                // valid underscores
+                // Valid underscores
                 { "0b0_0_0_1" }, { "0B0_001" }, { "0b000_1" }, { "0B00_01" }, { "0_0_0_0_1" }, { "0_1" }, { "0000_1" }, //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$ $NON-NLS-4$ $NON-NLS-5$ $NON-NLS-6$ $NON-NLS-7$
                 { "1" }, { "0x0_001" }, { "0X00_01" }, { "0x0_0_0_1" }, { "0X000_1" }, //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$ $NON-NLS-4$ $NON-NLS-5$
                 // @formatter:on
@@ -119,7 +119,7 @@ public class JavaConstantsTest {
     public Object[][] getInvalidIntegerOneLiteral() {
         return new Object[][] {
                 // @formatter:off
-                // invalid
+                // Invalid
                 { "0b_1" }, { "0B_1" }, //$NON-NLS-1$ $NON-NLS-2$
                 // This is an identifier, not a numeric literal
                 { "_00001" }, { "_01" }, { "_1" }, //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
@@ -141,13 +141,13 @@ public class JavaConstantsTest {
     public Object[][] getValidLongTenLiteral() {
         return new Object[][] {
                 // @formatter:off
-                // valid
+                // Valid
                 { "0b1010l" }, { "0B1010l" }, { "0b0001010l" }, { "0B0001010l" }, { "0b1010L" }, { "0B1010L" }, //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$ $NON-NLS-4$ $NON-NLS-5$ $NON-NLS-6$
                 { "0b0001010L" }, { "0B0001010L" }, { "000013l" }, { "013l" }, { "000013L" }, { "013L" }, { "10l" }, //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$ $NON-NLS-4$ $NON-NLS-5$ $NON-NLS-6$ $NON-NLS-7$
                 { "10L" }, { "0xal" }, { "0Xal" }, { "0x000al" }, { "0X000al" }, { "0xAl" }, { "0XAl" }, { "0x000Al" }, //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$ $NON-NLS-4$ $NON-NLS-5$ $NON-NLS-6$ $NON-NLS-7$ $NON-NLS-8$
                 { "0X000Al" }, { "0xaL" }, { "0XaL" }, { "0x000aL" }, { "0X000aL" }, { "0xAL" }, { "0XAL" }, //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$ $NON-NLS-4$ $NON-NLS-5$ $NON-NLS-6$ $NON-NLS-7$
                 { "0x000AL" }, { "0X000AL" }, //$NON-NLS-1$ $NON-NLS-2$
-                // valid underscores
+                // Valid underscores
                 { "0b0_0_0_10_10l" }, { "0B0_00101_0l" }, { "0b000_1_010l" }, { "0B00_0101_0l" }, { "0b0_0_0_10_10L" }, //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$ $NON-NLS-4$ $NON-NLS-5$
                 { "0B0_00101_0L" }, { "0b000_1_010L" }, { "0B00_0101_0L" }, { "0_0_0_0_13l" }, { "0_13l" }, //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$ $NON-NLS-4$ $NON-NLS-5$
                 { "0000_13l" }, { "0_1_3l" }, { "0_0_0_0_13L" }, { "0_13L" }, { "0000_13L" }, { "0_1_3L" }, { "10l" }, //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$ $NON-NLS-4$ $NON-NLS-5$ $NON-NLS-6$ $NON-NLS-7$
@@ -162,10 +162,10 @@ public class JavaConstantsTest {
     public Object[][] getValidIntegerTenLiteral() {
         return new Object[][] {
                 // @formatter:off
-                // valid
+                // Valid
                 { "0b1010" }, { "0B1010" }, { "0b0001010" }, { "0B0001010" }, { "000013" }, { "013" }, { "10" }, //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$ $NON-NLS-4$ $NON-NLS-5$ $NON-NLS-6$ $NON-NLS-7$
                 { "0xa" }, { "0Xa" }, { "0x000a" }, { "0X000a" }, { "0xA" }, { "0XA" }, { "0x000A" }, { "0X000A" }, //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$ $NON-NLS-4$ $NON-NLS-5$ $NON-NLS-6$ $NON-NLS-7$ $NON-NLS-8$
-                // valid underscores
+                // Valid underscores
                 { "0b0_0_0_1010" }, { "0B0_001010" }, { "0b000_1010" }, { "0B00_01010" }, { "0_0_0_0_13" }, { "0_13" }, //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$ $NON-NLS-4$ $NON-NLS-5$ $NON-NLS-6$
                 { "0000_13" }, { "10" }, { "0x0_00a" }, { "0X00_0a" }, { "0x0_0_0_a" }, { "0X000_a" }, { "0x0_00A" }, //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$ $NON-NLS-4$ $NON-NLS-5$ $NON-NLS-6$ $NON-NLS-7$
                 { "0X00_0A" }, { "0x0_0_0_A" }, { "0X000_A" }, //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
@@ -177,7 +177,7 @@ public class JavaConstantsTest {
     public Object[][] getInvalidIntegerTenLiteral() {
         return new Object[][] {
                 // @formatter:off
-                // invalid
+                // Invalid
                 { "0b_1010" }, { "0B_1010" }, //$NON-NLS-1$ $NON-NLS-2$
                 // This is an identifier, not a numeric literal
                 { "_000013" }, { "_013" }, { "_10" }, //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$

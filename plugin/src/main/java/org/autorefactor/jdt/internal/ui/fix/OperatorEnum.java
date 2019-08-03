@@ -274,7 +274,7 @@ public enum OperatorEnum {
         final OperatorEnum op1= getOperator(node1);
         final OperatorEnum op2= getOperator(node2);
         if (op1 == null || op2 == null) {
-            // uncomparable results
+            // Uncomparable results
             return 0;
         }
         return compareTo(op1, op2);

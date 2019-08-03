@@ -142,7 +142,7 @@ public class RefactoringContext {
             if (comment.getStartPosition() <= position && position <= getEndPosition(comment)) {
                 return true;
             } else if (position < comment.getStartPosition()) {
-                // since comment list is "arranged in order of increasing source position"
+                // Since comment list is "arranged in order of increasing source position"
                 // it is impossible for this position to be surrounded by a comment
                 return false;
             }

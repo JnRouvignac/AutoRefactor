@@ -232,7 +232,7 @@ public final class JavaCoreHelper {
             IClasspathEntry[] oldEntries= javaProject.getRawClasspath();
             IClasspathEntry[] newEntries;
             if (oldEntries.length != 0) {
-                // remove duplicate entries
+                // Remove duplicate entries
                 Set<IClasspathEntry> set= new HashSet<IClasspathEntry>(Arrays.asList(oldEntries));
                 set.addAll(classpathEntries);
                 newEntries= set.toArray(new IClasspathEntry[set.size()]);
@@ -244,6 +244,6 @@ public final class JavaCoreHelper {
     }
 
     private JavaCoreHelper() {
-        // private for utility classes
+        // Private for utility classes
     }
 }

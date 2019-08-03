@@ -30,7 +30,7 @@ import java.util.List;
 public class ReduceVariableScopeSample {
 
     public static void main(String[] args) {
-        // push variable into for loops initializers
+        // Push variable into for loops initializers
         int i;
         {
             i = 0;

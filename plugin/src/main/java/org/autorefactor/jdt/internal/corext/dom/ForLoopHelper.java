@@ -82,7 +82,7 @@ public final class ForLoopHelper {
         private Name elementVariable;
 
         private ForLoopContent() {
-            // use method factories
+            // Use method factories
         }
 
         private static ForLoopContent indexedArray(Name containerVariable, Name loopVariable) {

@@ -68,8 +68,8 @@ public class CommentsSample implements Runnable, Callable<Void>, Closeable {
     // Do not convert this line comment to javadoc
     /** Convert to a javadoc. */
     public static void main(String[] args) {
-        // remove block comment just below
-        // remove comment lines just above and below
+        // Remove block comment just below
+        // Remove comment lines just above and below
 
         try {
             args[0] = "blue";

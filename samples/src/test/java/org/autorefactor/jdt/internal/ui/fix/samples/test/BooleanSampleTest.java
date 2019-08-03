@@ -254,14 +254,14 @@ public class BooleanSampleTest {
         try {
             return invoke(obj, methodName, args, getClasses(args));
         } catch (NoSuchMethodException e) {
-            // try with primitive types
+            // Try with primitive types
         }
 
         try {
             final Class<?>[] type = getPrimitiveTypes(args);
             return invoke(obj, methodName, args, type);
         } catch (NoSuchMethodException e) {
-            // try with java.lang.Object
+            // Try with java.lang.Object
         }
         return invoke(obj, methodName, args, objectsArray(args));
     }

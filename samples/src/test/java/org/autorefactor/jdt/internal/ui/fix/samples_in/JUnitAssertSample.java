@@ -220,7 +220,7 @@ public class JUnitAssertSample {
         assertEquals(o, expected);
         assertEquals("Failure message to keep", o, expected);
 
-        // tests that this works according to levenshtein distance
+        // Tests that this works according to levenshtein distance
         int expceted = 0;
         assertEquals(o, expceted);
     }
@@ -244,7 +244,7 @@ public class JUnitAssertSample {
         assertEquals(l, expected);
         assertEquals("Failure message to keep", l, expected);
 
-        // tests that this works according to levenshtein distance
+        // Tests that this works according to levenshtein distance
         int expceted = 0;
         assertEquals(l, expceted);
     }
@@ -257,7 +257,7 @@ public class JUnitAssertSample {
         assertEquals(d, expected);
         assertEquals("Failure message to keep", d, expected);
 
-        // tests that this works according to levenshtein distance
+        // Tests that this works according to levenshtein distance
         int expceted = 0;
         assertEquals(d, expceted);
     }

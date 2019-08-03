@@ -91,7 +91,7 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
         if (collectAllCases(allCasesStmts, node)) {
             final List<List<Statement>> caseStmtsToRemove= new LinkedList<List<Statement>>();
 
-            // initialize removedCaseStmts list
+            // Initialize removedCaseStmts list
             for (int i= 0; i < allCasesStmts.size(); i++) {
                 caseStmtsToRemove.add(new LinkedList<Statement>());
             }
@@ -292,7 +292,7 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
         final List<Statement> thenStmts= asList(node.getThenStatement());
         final List<Statement> elseStmts= asList(node.getElseStatement());
         if (thenStmts.isEmpty() || elseStmts.isEmpty()) {
-            // if the then or else clause is empty, then there is no common code whatsoever.
+            // If the then or else clause is empty, then there is no common code whatsoever.
             // let other refactorings take care of removing empty blocks.
             return false;
         }

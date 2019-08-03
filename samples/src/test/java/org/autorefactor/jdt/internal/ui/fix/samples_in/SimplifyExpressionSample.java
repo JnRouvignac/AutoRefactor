@@ -93,32 +93,32 @@ public class SimplifyExpressionSample {
     }
 
     public void borderLineParenthezisedExpressions(Integer i) throws Exception {
-        // do not replace any because they are in a String concatenation
+        // Do not replace any because they are in a String concatenation
         String s1 = ((Number) i).doubleValue() + " ";
         String s2 = (i instanceof Number) + " ";
         String s3 = (i + 0) + " ";
         String s4 = (i == null ? null : "i") + " ";
-        // do not replace
+        // Do not replace
         long l1   = 2 + (i == null ? 0 : i);
         long l2   = (i != null && i == 0) ? 0 : i;
 
-        // replace
+        // Replace
         boolean b1 = ((Number) i).doubleValue() == 0;
-        // replace
+        // Replace
         boolean b2 = (i instanceof Number);
-        // do not replace
+        // Do not replace
         boolean b3 = (i + 0) == 0;
-        // do not replace
+        // Do not replace
         Collection<?> c = null;
         Object obj = ((List<?>) c).get(0);
-        // do not replace
+        // Do not replace
         boolean b4 = !(i instanceof Number);
         boolean b5 = !(b4 = false);
-        // replace
+        // Replace
         boolean b6 = (i != null);
-        // replace
+        // Replace
         boolean b7 = b5 && (i != null);
-        // do not replace
+        // Do not replace
         boolean b8 = b1 ? (b2 ? b3 : b4) : (b5 ? b6 : true);
         boolean b9 = (i != null ? i : Integer.valueOf(2)).byteValue() == 0;
         boolean b10 = b1 ? (b2 = true) : (b3 = true);
@@ -129,7 +129,7 @@ public class SimplifyExpressionSample {
     }
 
     public boolean doNotReplaceParenthesesAroundAssignmentInCondition(Reader reader, char[] cbuf, int c) throws IOException {
-        // such expressions are used a lot in while conditions
+        // Such expressions are used a lot in while conditions
         return -1 != (c = reader.read(cbuf));
     }
 

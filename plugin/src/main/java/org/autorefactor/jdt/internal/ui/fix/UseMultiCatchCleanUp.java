@@ -281,7 +281,7 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
         private boolean isSameMethodBinding(IMethodBinding binding1, IMethodBinding binding2) {
             return binding1 != null && binding2 != null
                     && (binding1.equals(binding2) || binding1.overrides(binding2) || binding2.overrides(binding1)
-                    // this is a really expensive check. Do it at the very end
+                    // This is a really expensive check. Do it at the very end
                             || areOverridingSameMethod(binding1, binding2));
         }
 

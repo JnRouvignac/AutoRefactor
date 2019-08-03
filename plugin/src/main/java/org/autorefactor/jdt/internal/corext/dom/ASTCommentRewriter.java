@@ -152,7 +152,7 @@ public class ASTCommentRewriter {
         if (!commentEdits.isEmpty() && !anyOverlaps(edits, commentEdits)) {
             edits.addChildren(commentEdits.toArray(new TextEdit[commentEdits.size()]));
         }
-        // else, code edits take priority. Give up applying current text edits.
+        // Else, code edits take priority. Give up applying current text edits.
         // They will be retried in the next refactoring loop.
     }
 

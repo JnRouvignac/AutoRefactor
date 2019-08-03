@@ -134,7 +134,7 @@ public class CFGDotPrinter {
     private void collect(CFGBasicBlock block, Map<ASTNode, CFGSubGraph> subGraphs, Set<CFGEdge> edges) {
         CFGSubGraph blockSubGraph= getSubGraph(subGraphs, block.getNode());
         if (!blockSubGraph.blocks.add(block)) {
-            // node was already added.
+            // Node was already added.
             // Avoid cycles: do not go through this path again
             return;
         }
@@ -157,10 +157,10 @@ public class CFGDotPrinter {
             if (ASTNodes.isLoop(node) || node instanceof IfStatement || node instanceof SwitchStatement
                     || node instanceof MethodDeclaration || node instanceof TryStatement
                     || node instanceof CatchClause) {
-                // such statements need their own subgraph to ease reading the CFG
+                // Such statements need their own subgraph to ease reading the CFG
                 subGraph= new CFGSubGraph(ASTPrintHelper.codeExcerpt(node), node.getStartPosition());
                 subGraphs.put(node, subGraph);
-                // builds all sub graphs all the way to the top node
+                // Builds all sub graphs all the way to the top node
                 CFGSubGraph parentSubGraph= getSubGraph(subGraphs, node.getParent());
                 if (parentSubGraph != null) {
                     parentSubGraph.subGraphs.add(subGraph);

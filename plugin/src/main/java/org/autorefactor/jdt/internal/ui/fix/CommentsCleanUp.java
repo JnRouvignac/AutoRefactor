@@ -502,7 +502,7 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
             final SourceLocation newLoc= pair.getFirst();
             final Comment newComment= pair.getSecond();
             if (newLoc.compareTo(bestLoc) < 0) {
-                // since comments are visited in ascending order,
+                // Since comments are visited in ascending order,
                 // we can forget this comment.
                 iter.remove();
                 continue;
@@ -512,7 +512,7 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
             }
             if (bestLoc.compareTo(newLoc) < 0
                     && (!(newComment instanceof LineComment) || !(bestComment instanceof LineComment))) {
-                // new comment is a BlockComment or a Javadoc
+                // New comment is a BlockComment or a Javadoc
                 bestLoc= newLoc;
                 bestComment= newComment;
                 continue;

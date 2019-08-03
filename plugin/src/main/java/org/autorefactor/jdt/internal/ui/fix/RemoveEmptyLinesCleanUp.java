@@ -81,7 +81,7 @@ public class RemoveEmptyLinesCleanUp extends AbstractCleanUpRule {
 
         final String source= this.ctx.getSource(node);
         if (source.length() == 0) {
-            // empty file, bail out
+            // Empty file, bail out
             return true;
         }
 

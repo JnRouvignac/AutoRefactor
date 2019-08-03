@@ -83,11 +83,11 @@ public class StringCleanUp extends AbstractCleanUpRule {
         final boolean isStringValueOf= isStringValueOf(node);
         if (isMethod(node, Object.class.getCanonicalName(), "toString")) { //$NON-NLS-1$
             if (hasType(expr, String.class.getCanonicalName())) {
-                // if node is already a String, no need to call toString()
+                // If node is already a String, no need to call toString()
                 r.replace(node, b.move(expr));
                 return false;
             } else if (parent.getNodeType() == INFIX_EXPRESSION) {
-                // if node is in a String context, no need to call toString()
+                // If node is in a String context, no need to call toString()
                 final InfixExpression ie= (InfixExpression) node.getParent();
                 final Expression leftOp= ie.getLeftOperand();
                 final Expression rightOp= ie.getRightOperand();
@@ -96,7 +96,7 @@ public class StringCleanUp extends AbstractCleanUpRule {
                 final MethodInvocation lmi= as(leftOp, MethodInvocation.class);
                 final MethodInvocation rmi= as(rightOp, MethodInvocation.class);
                 if (!node.equals(lmi) && !node.equals(rmi) && (leftOpIsString || rightOpIsString)) {
-                    // node is in the extended operands
+                    // Node is in the extended operands
                     r.replace(node, replaceToString(node.getExpression()));
                     return false;
                 } else if (leftOpIsString && isMethod(rmi, Object.class.getCanonicalName(), "toString")) { //$NON-NLS-1$
@@ -113,7 +113,7 @@ public class StringCleanUp extends AbstractCleanUpRule {
                 return false;
             }
         } else if ((isToStringForPrimitive(node) || isStringValueOf) && parent.getNodeType() == INFIX_EXPRESSION) {
-            // if node is in a String context, no need to call toString()
+            // If node is in a String context, no need to call toString()
             final InfixExpression ie= (InfixExpression) node.getParent();
             final Expression lo= ie.getLeftOperand();
             final Expression ro= ie.getRightOperand();
@@ -131,7 +131,7 @@ public class StringCleanUp extends AbstractCleanUpRule {
                     return false;
                 }
             } else {
-                // left or right operation is necessarily a string, so just replace
+                // Left or right operation is necessarily a string, so just replace
                 replaceStringValueOfByArg0(node, node);
                 return false;
             }

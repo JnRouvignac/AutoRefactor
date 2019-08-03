@@ -333,31 +333,31 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
             List<FQN> bestMatches= new ArrayList<FQN>();
             for (FQN fqn : fqns) {
                 if (fqn.equals(FQN.CANNOT_REPLACE_SIMPLE_NAME)) {
-                    // something got wrong while computing the FQNs => bail out
+                    // Something got wrong while computing the FQNs => bail out
                     return Collections.emptyList();
                 } else if (bestMatches.isEmpty()) {
-                    // we now have a best match
+                    // We now have a best match
                     bestMatches.add(fqn);
                 } else if (bestMatches.get(0).fromImport()) {
                     if (fqn.isMember()) {
-                        // local FQNs take precedence over imported FQNs
+                        // Local FQNs take precedence over imported FQNs
                         bestMatches.clear();
                         bestMatches.add(fqn);
-                    } else // fqn is imported
+                    } else // FQN is imported
                         if (bestMatches.get(0).fromStarImport()) {
                             if (fqn.fromSpecificImport()) {
-                                // specific imports take precedence over on-demand imports
+                                // Specific imports take precedence over on-demand imports
                                 bestMatches.clear();
                             }
                             bestMatches.add(fqn);
                         } else if (fqn.fromSpecificImport()) {
-                            // import conflicts:
+                            // Import conflicts:
                             // there is more than one specific import.
                             // this is a compile-error: do not try to replace
                             return Collections.emptyList();
                         }
                 } else if (fqn.isMember()) {
-                    // group local FQNs together
+                    // Group local FQNs together
                     bestMatches.add(fqn);
                 }
             }
@@ -508,7 +508,7 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
                 final boolean isTopLevelType= typeNameMatch.getType().getDeclaringType() == null;
                 if (isTopLevelType) {
                     if (!pkgName.equals(typeNameMatch.getPackageName())) {
-                        // sanity check failed
+                        // Sanity check failed
                         throw new IllegalStateException("Expected package '" + typeNameMatch.getPackageName() //$NON-NLS-1$
                                 + "' to be equal to '" + pkgName + "'"); //$NON-NLS-1$ $NON-NLS-2$
                     }

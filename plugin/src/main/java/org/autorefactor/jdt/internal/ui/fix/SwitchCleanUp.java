@@ -204,7 +204,7 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
         }
 
         private boolean ignoreUnlabledBreaksInInnerBreakableStatement() {
-            // unlabeled breaks in inner loops/switchs work ok with switch refactoring rule
+            // Unlabeled breaks in inner loops/switchs work ok with switch refactoring rule
             return false;
         }
     }
@@ -318,7 +318,7 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
                     throw new NotImplementedException(expr, "Cannot handle non constant expressions"); //$NON-NLS-1$
                 }
                 if (alreadyProccessedValues.add(constantValue)) {
-                    // this is a new value (never seen before)
+                    // This is a new value (never seen before)
                     filteredExprs.add(expr);
                 }
             }
