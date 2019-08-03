@@ -545,7 +545,7 @@ public final class ASTNodes {
     public static Expression arg0(final MethodInvocation node) {
         final List<Expression> args= arguments(node);
         if (args.isEmpty()) {
-            throw new IllegalArgumentException(node, "The arguments must not be empty for method " + node);
+            throw new IllegalArgumentException(node, "The arguments must not be empty for method " + node); //$NON-NLS-1$
         }
         return args.get(0);
     }
@@ -936,9 +936,9 @@ public final class ASTNodes {
      */
     public static Boolean getBooleanObject(final QualifiedName qualifiedName) {
         final String fqn= qualifiedName.getFullyQualifiedName();
-        if ("Boolean.TRUE".equals(fqn)) {
+        if ("Boolean.TRUE".equals(fqn)) { //$NON-NLS-1$
             return true;
-        } else if ("Boolean.FALSE".equals(fqn)) {
+        } else if ("Boolean.FALSE".equals(fqn)) { //$NON-NLS-1$
             return false;
         }
         return null;
@@ -962,7 +962,7 @@ public final class ASTNodes {
         if (ancestor != null) {
             return ancestor;
         }
-        throw new IllegalStateException(node, "Could not find any ancestor for " + ancestorClass + "and node " + node);
+        throw new IllegalStateException(node, "Could not find any ancestor for " + ancestorClass + "and node " + node); //$NON-NLS-1$ $NON-NLS-2$
     }
 
     /**
@@ -1002,8 +1002,8 @@ public final class ASTNodes {
         final ASTNode ancestor= getFirstAncestorOrNull(node, ancestorClasses);
         if (ancestor == null) {
             throw new IllegalStateException(node,
-                    "Could not find any ancestor for " + Arrays.toString(ancestorClasses) + " and node type "
-                            + (node != null ? node.getClass().getSimpleName() : null) + " node.toString() " + node);
+                    "Could not find any ancestor for " + Arrays.toString(ancestorClasses) + " and node type " //$NON-NLS-1$ $NON-NLS-2$
+                            + (node != null ? node.getClass().getSimpleName() : null) + " node.toString() " + node); //$NON-NLS-1$
         }
         return ancestor;
     }
@@ -1021,7 +1021,7 @@ public final class ASTNodes {
      */
     public static ASTNode getFirstAncestorOrNull(ASTNode node, Class<?>... ancestorClasses) {
         if (ancestorClasses.length == 1) {
-            throw new java.lang.IllegalArgumentException("Please use ASTHelper.getAncestor(ASTNode, Class<?>) instead");
+            throw new java.lang.IllegalArgumentException("Please use ASTHelper.getAncestor(ASTNode, Class<?>) instead"); //$NON-NLS-1$
         }
         if (node == null || node.getParent() == null || ancestorClasses.length == 0) {
             return null;
@@ -1703,7 +1703,7 @@ public final class ASTNodes {
      */
     public static boolean checkNoExtendedOperands(InfixExpression node) {
         if (!hasType(node, String.class.getCanonicalName()) && node.hasExtendedOperands()) {
-            throw new NotImplementedException(node, "for extended operands");
+            throw new NotImplementedException(node, "for extended operands"); //$NON-NLS-1$
         }
         return true;
     }
@@ -2382,7 +2382,7 @@ public final class ASTNodes {
             if (cu.getTypeRoot() != null) { // added for unit tests
                 return cu.getTypeRoot().getElementName();
             }
-            return "FakeClass.java";
+            return "FakeClass.java"; //$NON-NLS-1$
         }
         return null;
     }
@@ -2401,12 +2401,12 @@ public final class ASTNodes {
             final int line= cu.getLineNumber(position);
             final int column= cu.getColumnNumber(position) + 1;
             if (cu.getTypeRoot() != null) {
-                return cu.getTypeRoot().getElementName() + ":" + line + ":" + column;
+                return cu.getTypeRoot().getElementName() + ":" + line + ":" + column; //$NON-NLS-1$ $NON-NLS-2$
             }
             // it was not created from a file
-            return line + ":" + column;
+            return line + ":" + column; //$NON-NLS-1$
         }
-        return "";
+        return ""; //$NON-NLS-1$
     }
 
     /**

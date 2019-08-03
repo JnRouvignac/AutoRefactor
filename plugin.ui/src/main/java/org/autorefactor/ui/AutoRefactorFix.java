@@ -71,7 +71,7 @@ public class AutoRefactorFix implements ICleanUpFix {
             final CleanUpOptions fOptions) {
         boolean hasChanges= false;
         final ICompilationUnit iCompilationUnit= (ICompilationUnit) compilationUnit.getJavaElement();
-        final CleanUpChange cleanUpChange= new CleanUpChange("AutoRefactor", iCompilationUnit);
+        final CleanUpChange cleanUpChange= new CleanUpChange("AutoRefactor", iCompilationUnit); //$NON-NLS-1$
         TextEdit allEdits= null;
 
         if (enabled) {

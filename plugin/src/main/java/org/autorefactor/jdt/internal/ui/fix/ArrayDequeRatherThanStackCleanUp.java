@@ -123,53 +123,53 @@ public class ArrayDequeRatherThanStackCleanUp extends AbstractClassSubstituteCle
     @Override
     protected boolean canMethodBeRefactored(final MethodInvocation mi,
             final List<MethodInvocation> methodCallsToRefactor) {
-        if (isMethod(mi, Vector.class.getCanonicalName(), "addElement", Object.class.getCanonicalName())
-                || isMethod(mi, Vector.class.getCanonicalName(), "copyInto", Object[].class.getCanonicalName())
-                || isMethod(mi, Vector.class.getCanonicalName(), "firstElement") || isMethod(mi, Vector.class.getCanonicalName(), "lastElement")
-                || isMethod(mi, Vector.class.getCanonicalName(), "removeElement", Object.class.getCanonicalName())
-                || isMethod(mi, Vector.class.getCanonicalName(), "removeAllElements") || isMethod(mi, Stack.class.getCanonicalName(), "empty")) {
+        if (isMethod(mi, Vector.class.getCanonicalName(), "addElement", Object.class.getCanonicalName()) //$NON-NLS-1$
+                || isMethod(mi, Vector.class.getCanonicalName(), "copyInto", Object[].class.getCanonicalName()) //$NON-NLS-1$
+                || isMethod(mi, Vector.class.getCanonicalName(), "firstElement") || isMethod(mi, Vector.class.getCanonicalName(), "lastElement") //$NON-NLS-1$ $NON-NLS-2$
+                || isMethod(mi, Vector.class.getCanonicalName(), "removeElement", Object.class.getCanonicalName()) //$NON-NLS-1$
+                || isMethod(mi, Vector.class.getCanonicalName(), "removeAllElements") || isMethod(mi, Stack.class.getCanonicalName(), "empty")) { //$NON-NLS-1$ $NON-NLS-2$
             methodCallsToRefactor.add(mi);
             return true;
         }
 
         final String argumentType= getArgumentType(mi);
-        return isMethod(mi, Collection.class.getCanonicalName(), "add", Object.class.getCanonicalName())
-                || isMethod(mi, List.class.getCanonicalName(), "addAll", int.class.getSimpleName(), Collection.class.getCanonicalName())
-                || isMethod(mi, Collection.class.getCanonicalName(), "clear")
-                || isMethod(mi, Collection.class.getCanonicalName(), "contains", Object.class.getCanonicalName())
-                || isMethod(mi, Collection.class.getCanonicalName(), "containsAll", Collection.class.getCanonicalName())
-                || isMethod(mi, Object.class.getCanonicalName(), "equals", Object.class.getCanonicalName())
-                || isMethod(mi, Object.class.getCanonicalName(), "hashCode") || isMethod(mi, Collection.class.getCanonicalName(), "isEmpty")
-                || isMethod(mi, Collection.class.getCanonicalName(), "iterator")
-                || isMethod(mi, Collection.class.getCanonicalName(), "remove", Object.class.getCanonicalName())
-                || isMethod(mi, Collection.class.getCanonicalName(), "removeAll", Collection.class.getCanonicalName())
-                || isMethod(mi, Collection.class.getCanonicalName(), "retainAll", Collection.class.getCanonicalName())
-                || isMethod(mi, Collection.class.getCanonicalName(), "size") || isMethod(mi, Collection.class.getCanonicalName(), "toArray")
-                || isMethod(mi, Collection.class.getCanonicalName(), "toArray", argumentType + "[]")
-                || isMethod(mi, Stack.class.getCanonicalName(), "clone")
-                || isMethod(mi, Stack.class.getCanonicalName(), "retainAll", Collection.class.getCanonicalName())
-                || isMethod(mi, Object.class.getCanonicalName(), "toString") || isMethod(mi, Stack.class.getCanonicalName(), "peek")
-                || isMethod(mi, Stack.class.getCanonicalName(), "pop")
-                || isMethod(mi, Stack.class.getCanonicalName(), "push", Object.class.getCanonicalName());
+        return isMethod(mi, Collection.class.getCanonicalName(), "add", Object.class.getCanonicalName()) //$NON-NLS-1$
+                || isMethod(mi, List.class.getCanonicalName(), "addAll", int.class.getSimpleName(), Collection.class.getCanonicalName()) //$NON-NLS-1$
+                || isMethod(mi, Collection.class.getCanonicalName(), "clear") //$NON-NLS-1$
+                || isMethod(mi, Collection.class.getCanonicalName(), "contains", Object.class.getCanonicalName()) //$NON-NLS-1$
+                || isMethod(mi, Collection.class.getCanonicalName(), "containsAll", Collection.class.getCanonicalName()) //$NON-NLS-1$
+                || isMethod(mi, Object.class.getCanonicalName(), "equals", Object.class.getCanonicalName()) //$NON-NLS-1$
+                || isMethod(mi, Object.class.getCanonicalName(), "hashCode") || isMethod(mi, Collection.class.getCanonicalName(), "isEmpty") //$NON-NLS-1$ $NON-NLS-2$
+                || isMethod(mi, Collection.class.getCanonicalName(), "iterator") //$NON-NLS-1$
+                || isMethod(mi, Collection.class.getCanonicalName(), "remove", Object.class.getCanonicalName()) //$NON-NLS-1$
+                || isMethod(mi, Collection.class.getCanonicalName(), "removeAll", Collection.class.getCanonicalName()) //$NON-NLS-1$
+                || isMethod(mi, Collection.class.getCanonicalName(), "retainAll", Collection.class.getCanonicalName()) //$NON-NLS-1$
+                || isMethod(mi, Collection.class.getCanonicalName(), "size") || isMethod(mi, Collection.class.getCanonicalName(), "toArray") //$NON-NLS-1$ $NON-NLS-2$
+                || isMethod(mi, Collection.class.getCanonicalName(), "toArray", argumentType + "[]") //$NON-NLS-1$ $NON-NLS-2$
+                || isMethod(mi, Stack.class.getCanonicalName(), "clone") //$NON-NLS-1$
+                || isMethod(mi, Stack.class.getCanonicalName(), "retainAll", Collection.class.getCanonicalName()) //$NON-NLS-1$
+                || isMethod(mi, Object.class.getCanonicalName(), "toString") || isMethod(mi, Stack.class.getCanonicalName(), "peek") //$NON-NLS-1$ $NON-NLS-2$
+                || isMethod(mi, Stack.class.getCanonicalName(), "pop") //$NON-NLS-1$
+                || isMethod(mi, Stack.class.getCanonicalName(), "push", Object.class.getCanonicalName()); //$NON-NLS-1$
     }
 
     @Override
     protected void refactorMethod(final ASTBuilder b, final MethodInvocation originalMi,
             final MethodInvocation refactoredMi) {
-        if (isMethod(originalMi, Vector.class.getCanonicalName(), "addElement", Object.class.getCanonicalName())) {
-            refactoredMi.setName(b.simpleName("add"));
-        } else if (isMethod(originalMi, Vector.class.getCanonicalName(), "copyInto", Object[].class.getCanonicalName())) {
-            refactoredMi.setName(b.simpleName("toArray"));
-        } else if (isMethod(originalMi, Vector.class.getCanonicalName(), "firstElement")) {
-            refactoredMi.setName(b.simpleName("getFirst"));
-        } else if (isMethod(originalMi, Vector.class.getCanonicalName(), "lastElement")) {
-            refactoredMi.setName(b.simpleName("getLast"));
-        } else if (isMethod(originalMi, Vector.class.getCanonicalName(), "removeElement", Object.class.getCanonicalName())) {
-            refactoredMi.setName(b.simpleName("remove"));
-        } else if (isMethod(originalMi, Vector.class.getCanonicalName(), "removeAllElements")) {
-            refactoredMi.setName(b.simpleName("clear"));
-        } else if (isMethod(originalMi, Stack.class.getCanonicalName(), "empty")) {
-            refactoredMi.setName(b.simpleName("isEmpty"));
+        if (isMethod(originalMi, Vector.class.getCanonicalName(), "addElement", Object.class.getCanonicalName())) { //$NON-NLS-1$
+            refactoredMi.setName(b.simpleName("add")); //$NON-NLS-1$
+        } else if (isMethod(originalMi, Vector.class.getCanonicalName(), "copyInto", Object[].class.getCanonicalName())) { //$NON-NLS-1$
+            refactoredMi.setName(b.simpleName("toArray")); //$NON-NLS-1$
+        } else if (isMethod(originalMi, Vector.class.getCanonicalName(), "firstElement")) { //$NON-NLS-1$
+            refactoredMi.setName(b.simpleName("getFirst")); //$NON-NLS-1$
+        } else if (isMethod(originalMi, Vector.class.getCanonicalName(), "lastElement")) { //$NON-NLS-1$
+            refactoredMi.setName(b.simpleName("getLast")); //$NON-NLS-1$
+        } else if (isMethod(originalMi, Vector.class.getCanonicalName(), "removeElement", Object.class.getCanonicalName())) { //$NON-NLS-1$
+            refactoredMi.setName(b.simpleName("remove")); //$NON-NLS-1$
+        } else if (isMethod(originalMi, Vector.class.getCanonicalName(), "removeAllElements")) { //$NON-NLS-1$
+            refactoredMi.setName(b.simpleName("clear")); //$NON-NLS-1$
+        } else if (isMethod(originalMi, Stack.class.getCanonicalName(), "empty")) { //$NON-NLS-1$
+            refactoredMi.setName(b.simpleName("isEmpty")); //$NON-NLS-1$
         }
     }
 

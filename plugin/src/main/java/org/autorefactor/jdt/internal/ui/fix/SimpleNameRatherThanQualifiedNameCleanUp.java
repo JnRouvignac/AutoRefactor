@@ -93,7 +93,7 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
 
         private static QName valueOf(String fullyQualifiedName) {
             QName qname= null;
-            for (String name : fullyQualifiedName.split("\\.")) {
+            for (String name : fullyQualifiedName.split("\\.")) { //$NON-NLS-1$
                 qname= new QName(qname, name);
             }
             return qname;
@@ -128,7 +128,7 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
 
         @Override
         public String toString() {
-            return qualifier != null ? qualifier + "." + simpleName : simpleName;
+            return qualifier != null ? qualifier + "." + simpleName : simpleName; //$NON-NLS-1$
         }
     }
 
@@ -181,9 +181,9 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
         @Override
         public String toString() {
             if (equals(CANNOT_REPLACE_SIMPLE_NAME)) {
-                return "CANNOT_REPLACE_SIMPLE_NAME";
+                return "CANNOT_REPLACE_SIMPLE_NAME"; //$NON-NLS-1$
             }
-            return fullyQualifiedName + (fromImport ? " (imported)" : " (member)");
+            return fullyQualifiedName + (fromImport ? " (imported)" : " (member)"); //$NON-NLS-1$ $NON-NLS-2$
         }
     }
 
@@ -386,7 +386,7 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
 
         @Override
         public String toString() {
-            return getClass().getSimpleName() + "(simpleNames=" + simpleNames + ")";
+            return getClass().getSimpleName() + "(simpleNames=" + simpleNames + ")"; //$NON-NLS-1$ $NON-NLS-2$
         }
     }
 
@@ -455,7 +455,7 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
             return;
         }
         if (binding.getKind() != TYPE) {
-            throw new NotImplementedException(node, "for a binding of kind " + binding.getKind());
+            throw new NotImplementedException(node, "for a binding of kind " + binding.getKind()); //$NON-NLS-1$
         }
         final ITypeBinding typeBinding= (ITypeBinding) binding;
         final String typeName= typeBinding.getQualifiedName();
@@ -509,8 +509,8 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
                 if (isTopLevelType) {
                     if (!pkgName.equals(typeNameMatch.getPackageName())) {
                         // sanity check failed
-                        throw new IllegalStateException("Expected package '" + typeNameMatch.getPackageName()
-                                + "' to be equal to '" + pkgName + "'");
+                        throw new IllegalStateException("Expected package '" + typeNameMatch.getPackageName() //$NON-NLS-1$
+                                + "' to be equal to '" + pkgName + "'"); //$NON-NLS-1$ $NON-NLS-2$
                     }
                     QName qname= QName.valueOf(typeNameMatch.getFullyQualifiedName());
                     types.addName(FQN.fromImport(qname, true));
@@ -539,7 +539,7 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
             for (final ImportDeclaration importDecl : imports(compilationUnit)) {
                 readImport(importDecl);
             }
-            importTypesFromPackage("java.lang", compilationUnit);
+            importTypesFromPackage("java.lang", compilationUnit); //$NON-NLS-1$
 
             node.accept(new NamesCollector());
         }

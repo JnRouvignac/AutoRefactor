@@ -113,7 +113,7 @@ public abstract class AbstractUnitTestCleanUp extends AbstractCleanUpRule {
     public boolean visit(final ImportDeclaration node) {
         if (node.isStatic()) {
             if (node.isOnDemand()) {
-                staticImports.add(node.getName().getFullyQualifiedName() + ".*");
+                staticImports.add(node.getName().getFullyQualifiedName() + ".*"); //$NON-NLS-1$
             } else {
                 staticImports.add(node.getName().getFullyQualifiedName());
             }
@@ -169,7 +169,7 @@ public abstract class AbstractUnitTestCleanUp extends AbstractCleanUpRule {
                 return maybeRefactorComparison(nodeToReplace, originalMethod, conditionIe, !isAssertTrue,
                         failureMessage, isRewriteNeeded);
             }
-        } else if (isMethod(conditionMi, OBJECT, "equals", OBJECT)) {
+        } else if (isMethod(conditionMi, OBJECT, "equals", OBJECT)) { //$NON-NLS-1$
             if (canUseAssertNotEquals() || isAssertTrue) {
                 final Pair<Expression, Expression> actualAndExpected= getActualAndExpected(conditionMi.getExpression(),
                         arg0(conditionMi));
@@ -189,7 +189,7 @@ public abstract class AbstractUnitTestCleanUp extends AbstractCleanUpRule {
             final Expression failureMessage, final Expression condition, final boolean isAssertTrue) {
         final ASTBuilder b= this.ctx.getASTBuilder();
         final Refactorings r= this.ctx.getRefactorings();
-        final String methodName= isAssertTrue ? "assertTrue" : "assertFalse";
+        final String methodName= isAssertTrue ? "assertTrue" : "assertFalse"; //$NON-NLS-1$ $NON-NLS-2$
 
         r.replace(nodeToReplace, invokeMethodOrStatement(nodeToReplace, b,
                 invokeMethod(b, originalMethod, methodName, b.copy(condition), null, failureMessage)));
@@ -214,7 +214,7 @@ public abstract class AbstractUnitTestCleanUp extends AbstractCleanUpRule {
         final ASTBuilder b= this.ctx.getASTBuilder();
         final List<Expression> args= arguments(originalMethod);
         if (args.size() == 1 || args.size() == 2) {
-            return invokeMethod(b, originalMethod, "fail", null, null, failureMessage);
+            return invokeMethod(b, originalMethod, "fail", null, null, failureMessage); //$NON-NLS-1$
         } else {
             throw new NotImplementedException(node);
         }
@@ -230,7 +230,7 @@ public abstract class AbstractUnitTestCleanUp extends AbstractCleanUpRule {
             final ASTBuilder b= this.ctx.getASTBuilder();
             final Refactorings r= this.ctx.getRefactorings();
 
-            final MethodInvocation newAssert= invokeMethod(b, originalMethod, getAssertName(isAssertEquals, "Same"),
+            final MethodInvocation newAssert= invokeMethod(b, originalMethod, getAssertName(isAssertEquals, "Same"), //$NON-NLS-1$
                     b.copy(actualAndExpected.getFirst()), b.copy(actualAndExpected.getSecond()), failureMessage);
             r.replace(nodeToReplace, invokeMethodOrStatement(nodeToReplace, b, newAssert));
             return false;
@@ -268,12 +268,12 @@ public abstract class AbstractUnitTestCleanUp extends AbstractCleanUpRule {
             return false;
         } else if ((isConstant(actualValue) || isVariableNamedExpected(actualValue)) && !isConstant(expectedValue)
                 && !isVariableNamedExpected(expectedValue)) {
-            final MethodInvocation newAssert= invokeMethod(b, originalMethod, getAssertName(isAssertEquals, "Equals"),
+            final MethodInvocation newAssert= invokeMethod(b, originalMethod, getAssertName(isAssertEquals, "Equals"), //$NON-NLS-1$
                     b.copy(expectedValue), b.copy(actualValue), failureMessage);
             r.replace(nodeToReplace, invokeMethodOrStatement(nodeToReplace, b, newAssert));
             return false;
         } else if (isRewriteNeeded) {
-            final MethodInvocation newAssert= invokeMethod(b, originalMethod, getAssertName(isAssertEquals, "Equals"),
+            final MethodInvocation newAssert= invokeMethod(b, originalMethod, getAssertName(isAssertEquals, "Equals"), //$NON-NLS-1$
                     b.copy(actualValue), b.copy(expectedValue), failureMessage);
             r.replace(nodeToReplace, invokeMethodOrStatement(nodeToReplace, b, newAssert));
             return false;
@@ -285,7 +285,7 @@ public abstract class AbstractUnitTestCleanUp extends AbstractCleanUpRule {
         switch (expr.getNodeType()) {
         case SIMPLE_NAME:
             final SimpleName sn= (SimpleName) expr;
-            return levenshteinDistance(sn.getIdentifier().toLowerCase(), "expected") <= 3;
+            return levenshteinDistance(sn.getIdentifier().toLowerCase(), "expected") <= 3; //$NON-NLS-1$
 
         case QUALIFIED_NAME:
             final QualifiedName qn= (QualifiedName) expr;
@@ -297,7 +297,7 @@ public abstract class AbstractUnitTestCleanUp extends AbstractCleanUpRule {
     }
 
     private String getAssertName(final boolean isPositive, final String assertType) {
-        return "assert" + (isPositive ? "" : "Not") + assertType;
+        return "assert" + (isPositive ? "" : "Not") + assertType; //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
     }
 
     private boolean isComparingObjects(final InfixExpression ie) {
@@ -317,7 +317,7 @@ public abstract class AbstractUnitTestCleanUp extends AbstractCleanUpRule {
     private MethodInvocation invokeAssertNull(final MethodInvocation originalMethod, final boolean isPositive,
             final Expression actual, final Expression failureMessage) {
         final ASTBuilder b= this.ctx.getASTBuilder();
-        final String methodName= getAssertName(isPositive, "Null");
+        final String methodName= getAssertName(isPositive, "Null"); //$NON-NLS-1$
         final Expression copyOfActual= b.copy(actual);
         return invokeMethod(b, originalMethod, methodName, copyOfActual, null, failureMessage);
     }
@@ -339,9 +339,9 @@ public abstract class AbstractUnitTestCleanUp extends AbstractCleanUpRule {
         final String qualifiedMethodName= originalMethod.resolveMethodBinding().getDeclaringClass().getQualifiedName();
 
         Expression qualifiedMethod;
-        if (originalMethod.getExpression() == null && !staticImports.contains(qualifiedMethodName + "." + methodName)
-                && !staticImports.contains(qualifiedMethodName + ".*")) {
-            qualifiedMethod= b.name(qualifiedMethodName.split("\\."));
+        if (originalMethod.getExpression() == null && !staticImports.contains(qualifiedMethodName + "." + methodName) //$NON-NLS-1$
+                && !staticImports.contains(qualifiedMethodName + ".*")) { //$NON-NLS-1$
+            qualifiedMethod= b.name(qualifiedMethodName.split("\\.")); //$NON-NLS-1$
         } else {
             qualifiedMethod= b.copyExpression(originalMethod);
         }

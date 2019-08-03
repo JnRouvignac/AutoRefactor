@@ -127,7 +127,7 @@ public final class EnumMapRatherThanHashMapCleanUp extends AbstractEnumCollectio
         ASTBuilder b= ctx.getASTBuilder();
         Expression newParam= resolveParameter(keyType, arguments);
         Type newType= b.genericType(
-                alreadyImportedClasses.contains(EnumMap.class.getCanonicalName()) ? "EnumMap" : EnumMap.class.getCanonicalName(), b.copy(keyType),
+                alreadyImportedClasses.contains(EnumMap.class.getCanonicalName()) ? "EnumMap" : EnumMap.class.getCanonicalName(), b.copy(keyType), //$NON-NLS-1$
                 b.copy(valueType));
 
         // If there were no type args in original creation (diamond operator),

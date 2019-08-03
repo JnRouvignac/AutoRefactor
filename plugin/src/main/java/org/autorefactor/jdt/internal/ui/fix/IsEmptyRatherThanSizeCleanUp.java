@@ -96,8 +96,8 @@ public class IsEmptyRatherThanSizeCleanUp extends AbstractCleanUpRule {
 
     private boolean maybeReplaceCollectionSize(final InfixExpression node, final MethodInvocation miToReplace,
             final Operator operator, final Long literalSize) {
-        if ((isMethod(miToReplace, Collection.class.getCanonicalName(), "size") || isMethod(miToReplace, Map.class.getCanonicalName(), "size")
-                || (isMethod(miToReplace, String.class.getCanonicalName(), "length") && getJavaMinorVersion() >= 6))
+        if ((isMethod(miToReplace, Collection.class.getCanonicalName(), "size") || isMethod(miToReplace, Map.class.getCanonicalName(), "size") //$NON-NLS-1$ $NON-NLS-2$
+                || (isMethod(miToReplace, String.class.getCanonicalName(), "length") && getJavaMinorVersion() >= 6)) //$NON-NLS-1$
                 && literalSize != null) {
             final Refactorings r= this.ctx.getRefactorings();
             final ASTBuilder b= this.ctx.getASTBuilder();
@@ -109,24 +109,24 @@ public class IsEmptyRatherThanSizeCleanUp extends AbstractCleanUpRule {
                 } else if (LESS.equals(operator)) {
                     r.replace(node, b.boolean0(false));
                 } else if (GREATER.equals(operator)) {
-                    r.replace(node, b.not(b.invoke(b.copyExpression(miToReplace), "isEmpty")));
+                    r.replace(node, b.not(b.invoke(b.copyExpression(miToReplace), "isEmpty"))); //$NON-NLS-1$
                     return false;
                 } else if (EQUALS.equals(operator)) {
-                    r.replace(node, b.invoke(b.copyExpression(miToReplace), "isEmpty"));
+                    r.replace(node, b.invoke(b.copyExpression(miToReplace), "isEmpty")); //$NON-NLS-1$
                     return false;
                 } else if (NOT_EQUALS.equals(operator)) {
-                    r.replace(node, b.not(b.invoke(b.copyExpression(miToReplace), "isEmpty")));
+                    r.replace(node, b.not(b.invoke(b.copyExpression(miToReplace), "isEmpty"))); //$NON-NLS-1$
                     return false;
                 } else if (LESS_EQUALS.equals(operator)) {
-                    r.replace(node, b.invoke(b.copyExpression(miToReplace), "isEmpty"));
+                    r.replace(node, b.invoke(b.copyExpression(miToReplace), "isEmpty")); //$NON-NLS-1$
                     return false;
                 }
             } else if (literalSize == 1) {
                 if (GREATER_EQUALS.equals(operator)) {
-                    r.replace(node, b.not(b.invoke(b.copyExpression(miToReplace), "isEmpty")));
+                    r.replace(node, b.not(b.invoke(b.copyExpression(miToReplace), "isEmpty"))); //$NON-NLS-1$
                     return false;
                 } else if (LESS.equals(operator)) {
-                    r.replace(node, b.invoke(b.copyExpression(miToReplace), "isEmpty"));
+                    r.replace(node, b.invoke(b.copyExpression(miToReplace), "isEmpty")); //$NON-NLS-1$
                     return false;
                 }
             }

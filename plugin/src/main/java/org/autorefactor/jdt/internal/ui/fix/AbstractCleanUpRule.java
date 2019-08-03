@@ -46,7 +46,7 @@ public abstract class AbstractCleanUpRule extends ASTVisitor implements JavaRefa
 
         @Override
         public boolean visit(QualifiedName node) {
-            if (node.getFullyQualifiedName().contains("lombok")) {
+            if (node.getFullyQualifiedName().contains("lombok")) { //$NON-NLS-1$
                 useLombok= true;
                 return interruptVisit();
             }

@@ -90,15 +90,15 @@ public class UpdateSetRatherThanTestingFirstCleanUp extends AbstractCleanUpRule 
 
     private boolean maybeReplaceSetContains(final IfStatement ifStmtToReplace, final Expression ifExpr,
             final Statement stmt, final Statement oppositeStmt, final boolean negate) {
-        return maybeReplaceSetContains(ifStmtToReplace, ifExpr, stmt, oppositeStmt, negate, "add")
-                && maybeReplaceSetContains(ifStmtToReplace, ifExpr, oppositeStmt, stmt, !negate, "remove");
+        return maybeReplaceSetContains(ifStmtToReplace, ifExpr, stmt, oppositeStmt, negate, "add") //$NON-NLS-1$
+                && maybeReplaceSetContains(ifStmtToReplace, ifExpr, oppositeStmt, stmt, !negate, "remove"); //$NON-NLS-1$
     }
 
     private boolean maybeReplaceSetContains(final IfStatement ifStmtToReplace, final Expression ifExpr,
             final Statement stmt, final Statement oppositeStmt, final boolean negate, final String methodName) {
         final List<Statement> stmts= asList(stmt);
         final MethodInvocation miContains= as(ifExpr, MethodInvocation.class);
-        if (!stmts.isEmpty() && isMethod(miContains, Set.class.getCanonicalName(), "contains", Object.class.getCanonicalName())) {
+        if (!stmts.isEmpty() && isMethod(miContains, Set.class.getCanonicalName(), "contains", Object.class.getCanonicalName())) { //$NON-NLS-1$
             final Statement firstStmt= getFirst(stmts);
             final MethodInvocation miAddOrRemove= asExpression(firstStmt, MethodInvocation.class);
             final ASTSemanticMatcher astMatcher= new ASTSemanticMatcher();

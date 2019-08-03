@@ -72,34 +72,34 @@ public class VariableAccess {
 
     @Override
     public String toString() {
-        final StringBuilder sb= new StringBuilder("VAR_ACCESS[");
+        final StringBuilder sb= new StringBuilder("VAR_ACCESS["); //$NON-NLS-1$
         toString(sb);
-        return sb.append("]").toString();
+        return sb.append("]").toString(); //$NON-NLS-1$
     }
 
     private void toString(final StringBuilder sb) {
         sb.append(this.type);
-        sb.append(" ").append(this.name).append(" <= ");
+        sb.append(" ").append(this.name).append(" <= "); //$NON-NLS-1$ $NON-NLS-2$
         if ((this.accessType & DECL_INIT) != 0) {
-            sb.append("DECL_INIT");
+            sb.append("DECL_INIT"); //$NON-NLS-1$
         }
         if ((this.accessType & DECL_UNINIT) != 0) {
             if (sb.length() > 0) {
-                sb.append("|");
+                sb.append("|"); //$NON-NLS-1$
             }
-            sb.append("DECL_UNINIT");
+            sb.append("DECL_UNINIT"); //$NON-NLS-1$
         }
         if ((this.accessType & READ) != 0) {
             if (sb.length() > 0) {
-                sb.append("|");
+                sb.append("|"); //$NON-NLS-1$
             }
-            sb.append("READ");
+            sb.append("READ"); //$NON-NLS-1$
         }
         if ((this.accessType & WRITE) != 0) {
             if (sb.length() > 0) {
-                sb.append("|");
+                sb.append("|"); //$NON-NLS-1$
             }
-            sb.append("WRITE");
+            sb.append("WRITE"); //$NON-NLS-1$
         }
     }
 }

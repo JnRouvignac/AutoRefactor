@@ -132,9 +132,9 @@ public class ChooseRefactoringWizardPage extends WizardPage {
     };
 
     ChooseRefactoringWizardPage() {
-        super("Choose refactorings...");
-        setTitle("Choose refactorings...");
-        setDescription("Choose the refactorings to perform automatically");
+        super("Choose refactorings..."); //$NON-NLS-1$
+        setTitle("Choose refactorings..."); //$NON-NLS-1$
+        setDescription("Choose the refactorings to perform automatically"); //$NON-NLS-1$
     }
 
     /**
@@ -172,7 +172,7 @@ public class ChooseRefactoringWizardPage extends WizardPage {
 
     private void createFilterText(Composite parent) {
         filterText= new Text(parent, BORDER | SWT.SINGLE);
-        filterText.setMessage("Type in to filter refactorings");
+        filterText.setMessage("Type in to filter refactorings"); //$NON-NLS-1$
         filterText.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
 
         filterText.addKeyListener(new KeyAdapter() {
@@ -186,7 +186,7 @@ public class ChooseRefactoringWizardPage extends WizardPage {
 
     private void createSelectAllCheckbox(Composite parent) {
         selectAllVisibleCheckbox= new Button(parent, CHECK);
-        selectAllVisibleCheckbox.setText("Toggle all the visible refactorings");
+        selectAllVisibleCheckbox.setText("Toggle all the visible refactorings"); //$NON-NLS-1$
         selectAllVisibleCheckbox.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
@@ -199,7 +199,7 @@ public class ChooseRefactoringWizardPage extends WizardPage {
             private Object[] filter(StructuredViewer viewer, Object input) {
                 try {
                     final Class<StructuredViewer> clazz= StructuredViewer.class;
-                    Method m= clazz.getDeclaredMethod("filter", Object[].class);
+                    Method m= clazz.getDeclaredMethod("filter", Object[].class); //$NON-NLS-1$
                     m.setAccessible(true);
                     return (Object[]) m.invoke(viewer, (Object) ((List<?>) input).toArray());
                 } catch (Exception e) {
@@ -261,7 +261,7 @@ public class ChooseRefactoringWizardPage extends WizardPage {
             @Override
             public String getToolTipText(Object refactoring) {
                 RefactoringRule refactoringRule= (RefactoringRule) refactoring;
-                return refactoringRule.getDescription() + "\n\nWhy to do so:\n" + refactoringRule.getReason();
+                return refactoringRule.getDescription() + "\n\nWhy to do so:\n" + refactoringRule.getReason(); //$NON-NLS-1$
             }
 
             @Override

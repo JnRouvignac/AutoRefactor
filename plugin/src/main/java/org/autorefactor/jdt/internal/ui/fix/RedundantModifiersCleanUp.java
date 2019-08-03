@@ -109,10 +109,10 @@ public class RedundantModifiersCleanUp extends AbstractCleanUpRule {
                 final int i1= ORDERED_MODIFIERS.indexOf(((Modifier) o1).getKeyword());
                 final int i2= ORDERED_MODIFIERS.indexOf(((Modifier) o2).getKeyword());
                 if (i1 == -1) {
-                    throw new NotImplementedException(((Modifier) o1), "cannot determine order for modifier " + o1);
+                    throw new NotImplementedException(((Modifier) o1), "cannot determine order for modifier " + o1); //$NON-NLS-1$
                 }
                 if (i2 == -1) {
-                    throw new NotImplementedException(((Modifier) o2), "cannot compare modifier " + o2);
+                    throw new NotImplementedException(((Modifier) o2), "cannot compare modifier " + o2); //$NON-NLS-1$
                 }
                 return i1 - i2;
             }

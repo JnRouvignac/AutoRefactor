@@ -82,15 +82,15 @@ public class TypeNameDecider {
          */
         public ITypeBinding resolveTypeBinding(String fullyQualifiedName) {
             try {
-                final Object bindingResolver= getField(anyTypeBinding, "resolver");
-                final Object compilationUnitScope= getField(bindingResolver, "scope");
+                final Object bindingResolver= getField(anyTypeBinding, "resolver"); //$NON-NLS-1$
+                final Object compilationUnitScope= getField(bindingResolver, "scope"); //$NON-NLS-1$
 
                 final char[][] simpleNamesArray= toSimpleNamesArray(fullyQualifiedName);
-                final Method getType= compilationUnitScope.getClass().getMethod("getType", char[][].class, int.class);
+                final Method getType= compilationUnitScope.getClass().getMethod("getType", char[][].class, int.class); //$NON-NLS-1$
                 final Object internalTypeBinding= invokeMethod(compilationUnitScope, getType, simpleNamesArray,
                         simpleNamesArray.length);
 
-                final Method getTypeBinding= bindingResolver.getClass().getDeclaredMethod("getTypeBinding",
+                final Method getTypeBinding= bindingResolver.getClass().getDeclaredMethod("getTypeBinding", //$NON-NLS-1$
                         internalTypeBinding.getClass().getSuperclass().getSuperclass());
                 return invokeMethod(bindingResolver, getTypeBinding, internalTypeBinding);
             } catch (Exception e) {
@@ -129,7 +129,7 @@ public class TypeNameDecider {
                 getAnyTypeBinding(parsedNode));
         final ASTNode root= parsedNode.getRoot();
         if (!(root instanceof CompilationUnit)) {
-            throw new IllegalArgumentException(parsedNode, "Expected the root to be a CompilationUnit");
+            throw new IllegalArgumentException(parsedNode, "Expected the root to be a CompilationUnit"); //$NON-NLS-1$
         }
         final CompilationUnit cu= (CompilationUnit) root;
         this.packageName= cu.getPackage().getName().getFullyQualifiedName();
@@ -144,7 +144,7 @@ public class TypeNameDecider {
      */
     public TypeNameDecider(ResolveTypeBindingStrategy resolveTypeBindingStrategy, TreeSet<String> importedTypes) {
         this.resolveTypeBindingStrategy= resolveTypeBindingStrategy;
-        this.packageName= "";
+        this.packageName= ""; //$NON-NLS-1$
         this.importedTypes= importedTypes;
     }
 
@@ -197,7 +197,7 @@ public class TypeNameDecider {
      */
     public String useSimplestPossibleName(ITypeBinding typeBinding) {
         final String pkgName= typeBinding.getPackage().getName();
-        if ("java.lang".equals(pkgName) || pkgName.equals(this.packageName)) {
+        if ("java.lang".equals(pkgName) || pkgName.equals(this.packageName)) { //$NON-NLS-1$
             // TODO beware of name shadowing!
             return typeBinding.getName();
         }
@@ -221,8 +221,8 @@ public class TypeNameDecider {
             }
         }
 
-        final String[] names= fqn.split("\\.");
-        final String[] elementBeforeNames= elementBefore.split("\\.");
+        final String[] names= fqn.split("\\."); //$NON-NLS-1$
+        final String[] elementBeforeNames= elementBefore.split("\\."); //$NON-NLS-1$
         if (names.length < elementBeforeNames.length || names.length - 1 > elementBeforeNames.length) {
             return fqn;
         }
@@ -231,24 +231,24 @@ public class TypeNameDecider {
             final String name= names[i];
             final String elementBeforeName= elementBeforeNames[i];
             if (!name.equals(elementBeforeName)) {
-                if ("*".equals(elementBeforeName) && i + 1 == elementBeforeNames.length) {
+                if ("*".equals(elementBeforeName) && i + 1 == elementBeforeNames.length) { //$NON-NLS-1$
                     if (i + 1 == names.length) {
                         return name;
                     } else if (i + 2 == names.length && typeBinding.getDeclaringClass() != null) {
-                        return names[i] + "." + names[i + 1];
+                        return names[i] + "." + names[i + 1]; //$NON-NLS-1$
                     }
                 }
                 return fqn;
             }
         }
         if (i == elementBeforeNames.length && names.length == i + 1 && typeBinding.getDeclaringClass() != null) {
-            return names[i - 1] + "." + names[i];
+            return names[i - 1] + "." + names[i]; //$NON-NLS-1$
         }
         return fqn;
     }
 
     private static char[][] toSimpleNamesArray(String fullyQualifiedName) {
-        final String[] simpleNames= fullyQualifiedName.split("\\.");
+        final String[] simpleNames= fullyQualifiedName.split("\\."); //$NON-NLS-1$
         final char[][] result= new char[simpleNames.length][];
         for (int i= 0; i < simpleNames.length; i++) {
             result[i]= simpleNames[i].toCharArray();

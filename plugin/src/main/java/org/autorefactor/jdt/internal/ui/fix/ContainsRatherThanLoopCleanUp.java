@@ -94,7 +94,7 @@ public class ContainsRatherThanLoopCleanUp extends AbstractCollectionMethodRathe
     protected MethodInvocation getMethodToReplace(Expression condition) {
         MethodInvocation method= as(condition, MethodInvocation.class);
 
-        if (isMethod(method, Object.class.getCanonicalName(), "equals", Object.class.getCanonicalName())) {
+        if (isMethod(method, Object.class.getCanonicalName(), "equals", Object.class.getCanonicalName())) { //$NON-NLS-1$
             return method;
         }
 
@@ -103,7 +103,7 @@ public class ContainsRatherThanLoopCleanUp extends AbstractCollectionMethodRathe
 
     @Override
     protected Expression newMethod(Expression iterable, Expression toFind, boolean isPositive, ASTBuilder b) {
-        final MethodInvocation invoke= b.invoke(b.move(iterable), "contains", b.move(toFind));
+        final MethodInvocation invoke= b.invoke(b.move(iterable), "contains", b.move(toFind)); //$NON-NLS-1$
 
         if (isPositive) {
             return invoke;

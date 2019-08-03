@@ -80,7 +80,7 @@ public class ApplyRefactoringsJob extends Job {
      */
     public ApplyRefactoringsJob(Queue<RefactoringUnit> refactoringUnits, List<RefactoringRule> refactoringRulesToApply,
             Environment environment) {
-        super("AutoRefactor");
+        super("AutoRefactor"); //$NON-NLS-1$
         setPriority(Job.LONG);
         this.refactoringUnits= refactoringUnits;
         this.refactoringRulesToApply= refactoringRulesToApply;
@@ -95,10 +95,10 @@ public class ApplyRefactoringsJob extends Job {
         } catch (OperationCanceledException e) {
             throw e;
         } catch (Exception e) {
-            final String msg= "Error while applying refactorings.\n\n"
-                    + "Please look at the Eclipse workspace logs and "
-                    + "report the stacktrace to the AutoRefactor project.\n"
-                    + "Please provide sample java code that triggers the error.\n\n";
+            final String msg= "Error while applying refactorings.\n\n" //$NON-NLS-1$
+                    + "Please look at the Eclipse workspace logs and " //$NON-NLS-1$
+                    + "report the stacktrace to the AutoRefactor project.\n" //$NON-NLS-1$
+                    + "Please provide sample java code that triggers the error.\n\n"; //$NON-NLS-1$
             return new Status(IStatus.ERROR, PLUGIN_ID, msg, e);
         } finally {
             environment.getJobManager().unregister(this);
@@ -118,7 +118,7 @@ public class ApplyRefactoringsJob extends Job {
                 final ICompilationUnit compilationUnit= toRefactor.getCompilationUnit();
                 final JavaProjectOptions options= toRefactor.getOptions();
                 try {
-                    loopMonitor.subTask("Applying refactorings to " + getClassName(compilationUnit));
+                    loopMonitor.subTask("Applying refactorings to " + getClassName(compilationUnit)); //$NON-NLS-1$
                     final AggregateASTVisitor refactoring= new AggregateASTVisitor(refactoringRulesToApply);
                     applyRefactoring(compilationUnit, refactoring, options, loopMonitor.newChild(1), true);
                 } catch (OperationCanceledException e) {
@@ -138,7 +138,7 @@ public class ApplyRefactoringsJob extends Job {
     private String getClassName(final ICompilationUnit compilationUnit) {
         final String elName= compilationUnit.getElementName();
         final String simpleName= elName.substring(0, elName.lastIndexOf('.'));
-        return compilationUnit.getParent().getElementName() + "." + simpleName;
+        return compilationUnit.getParent().getElementName() + "." + simpleName; //$NON-NLS-1$
     }
 
     /**
@@ -172,8 +172,8 @@ public class ApplyRefactoringsJob extends Job {
                  * - applying automated refactorings to such files
                  */
                 environment.getLogger()
-                        .error("File \"" + compilationUnit.getPath() + "\" is not synchronized with the file system."
-                                + " Automated refactorings will not be applied to it.");
+                        .error("File \"" + compilationUnit.getPath() + "\" is not synchronized with the file system." //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
+                                + " Automated refactorings will not be applied to it."); //$NON-NLS-1$
                 return null;
             }
             final IDocument document= textFileBuffer.getDocument();
@@ -238,9 +238,9 @@ public class ApplyRefactoringsJob extends Job {
 
             if (iterationCount > maxIterations) {
                 // Oops! Something went wrong.
-                final String errorMsg= "An infinite loop has been detected for file " + getFileName(astRoot) + "."
-                        + " A possible cause is that code is being incorrectly"
-                        + " refactored one way then refactored back to what it was." + " Fix the code before pursuing."
+                final String errorMsg= "An infinite loop has been detected for file " + getFileName(astRoot) + "." //$NON-NLS-1$ $NON-NLS-2$
+                        + " A possible cause is that code is being incorrectly" //$NON-NLS-1$
+                        + " refactored one way then refactored back to what it was." + " Fix the code before pursuing." //$NON-NLS-1$ $NON-NLS-2$
                         + getPossibleCulprits(nbLoopsWithSameVisitors, lastLoopVisitors);
                 environment.getLogger().error(errorMsg, new IllegalStateException(astRoot, errorMsg));
                 break;
@@ -297,13 +297,13 @@ public class ApplyRefactoringsJob extends Job {
 
     private String getPossibleCulprits(int nbLoopsWithSameVisitors, Set<ASTVisitor> lastLoopVisitors) {
         if (nbLoopsWithSameVisitors < 100 || lastLoopVisitors.isEmpty()) {
-            return "";
+            return ""; //$NON-NLS-1$
         }
-        final StringBuilder sb= new StringBuilder(" Possible culprit ASTVisitor classes are: ");
+        final StringBuilder sb= new StringBuilder(" Possible culprit ASTVisitor classes are: "); //$NON-NLS-1$
         final Iterator<ASTVisitor> iter= lastLoopVisitors.iterator();
         sb.append(iter.next().getClass().getName());
         while (iter.hasNext()) {
-            sb.append(", ").append(iter.next().getClass().getName());
+            sb.append(", ").append(iter.next().getClass().getName()); //$NON-NLS-1$
         }
         return sb.toString();
     }

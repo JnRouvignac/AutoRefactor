@@ -69,8 +69,8 @@ public final class TestHelper {
         try {
             test.call();
         } catch (RuntimeException e) {
-            if ("org.autorefactor.util.UnhandledException".equals(e.getClass().getName())
-                    || "Unexpected exception".equals(e.getMessage())) {
+            if ("org.autorefactor.util.UnhandledException".equals(e.getClass().getName()) //$NON-NLS-1$
+                    || "Unexpected exception".equals(e.getMessage())) { //$NON-NLS-1$
                 throw (Exception) e.getCause();
             }
             throw e;
@@ -83,7 +83,7 @@ public final class TestHelper {
         Reader reader= null;
         try {
             input= new FileInputStream(file);
-            reader= new InputStreamReader(input, "UTF-8");
+            reader= new InputStreamReader(input, "UTF-8"); //$NON-NLS-1$
             int c= 0;
             while ((c= reader.read()) != -1) {
                 sb.append((char) c);
@@ -110,7 +110,7 @@ public final class TestHelper {
         final CodeFormatter codeFormatter= createCodeFormatter(getJava7Options());
 
         final TextEdit edit= codeFormatter.format(K_COMPILATION_UNIT, source, 0, source.length(), // source to format
-                0, System.getProperty("line.separator") // initial indentation and line separator
+                0, System.getProperty("line.separator") // initial indentation and line separator $NON-NLS-1$
         );
 
         try {
@@ -134,8 +134,8 @@ public final class TestHelper {
 
     public static Collection<Object[]> samples(String samplesBaseDir, Collection<Class<?>> whitelistRules,
             Collection<Class<?>> blacklistRules) {
-        final File samplesDir= new File(samplesBaseDir, "samples_in");
-        final File[] sampleFiles= samplesDir.listFiles(new EndsWithFileFilter("Sample.java"));
+        final File samplesDir= new File(samplesBaseDir, "samples_in"); //$NON-NLS-1$
+        final File[] sampleFiles= samplesDir.listFiles(new EndsWithFileFilter("Sample.java")); //$NON-NLS-1$
         Arrays.sort(sampleFiles);
 
         final Collection<String> whitelist= toSampleNames(whitelistRules);
@@ -156,7 +156,7 @@ public final class TestHelper {
         final Collection<String> results= new ArrayList<String>();
         for (Class<?> clazz : clazzes) {
             final String name= clazz.getSimpleName();
-            results.add(name.substring(0, name.lastIndexOf("CleanUp")) + "Sample.java");
+            results.add(name.substring(0, name.lastIndexOf("CleanUp")) + "Sample.java"); //$NON-NLS-1$ $NON-NLS-2$
         }
         return results;
     }

@@ -72,7 +72,7 @@ public class PrepareApplyRefactoringsJob extends Job {
      */
     public PrepareApplyRefactoringsJob(List<IJavaElement> javaElements, List<RefactoringRule> refactoringRulesToApply,
             Environment environment) {
-        super("Prepare AutoRefactor");
+        super("Prepare AutoRefactor"); //$NON-NLS-1$
         setPriority(Job.SHORT);
         this.javaElements= javaElements;
         this.refactoringRulesToApply= refactoringRulesToApply;
@@ -87,10 +87,10 @@ public class PrepareApplyRefactoringsJob extends Job {
         } catch (OperationCanceledException e) {
             throw e;
         } catch (Exception e) {
-            final String msg= "Error while preparing automatic refactorings.\n\n"
-                    + "Please look at the Eclipse workspace logs and "
-                    + "report the stacktrace to the AutoRefactor project.\n"
-                    + "Please provide sample java code that triggers the error.\n\n";
+            final String msg= "Error while preparing automatic refactorings.\n\n" //$NON-NLS-1$
+                    + "Please look at the Eclipse workspace logs and " //$NON-NLS-1$
+                    + "report the stacktrace to the AutoRefactor project.\n" //$NON-NLS-1$
+                    + "Please provide sample java code that triggers the error.\n\n"; //$NON-NLS-1$
             return new Status(IStatus.ERROR, PLUGIN_ID, msg, e);
         } finally {
             environment.getJobManager().unregister(this);
@@ -102,7 +102,7 @@ public class PrepareApplyRefactoringsJob extends Job {
             final Queue<RefactoringUnit> toRefactor= collectRefactoringUnits(javaElements, monitor);
             final int nbCores= Runtime.getRuntime().availableProcessors();
             final int nbWorkers= computeNbWorkers(toRefactor.size(), nbCores);
-            final JobGroup jobGroup= new JobGroup("Job name", nbWorkers, nbWorkers);
+            final JobGroup jobGroup= new JobGroup("Job name", nbWorkers, nbWorkers); //$NON-NLS-1$
             for (int i= 0; i < nbWorkers; i++) {
                 final Job job= new ApplyRefactoringsJob(toRefactor, clone(refactoringRulesToApply), environment);
                 job.setJobGroup(jobGroup);
@@ -219,7 +219,7 @@ public class PrepareApplyRefactoringsJob extends Job {
         IJavaElement[] packages= ((IPackageFragmentRoot) motherPackage.getParent()).getChildren();
 
         for (IJavaElement onePackage : packages) {
-            if (onePackage instanceof IPackageFragment && onePackage.getElementName().startsWith(packageName + ".")) {
+            if (onePackage instanceof IPackageFragment && onePackage.getElementName().startsWith(packageName + ".")) { //$NON-NLS-1$
                 subPackages.add(onePackage);
             }
         }

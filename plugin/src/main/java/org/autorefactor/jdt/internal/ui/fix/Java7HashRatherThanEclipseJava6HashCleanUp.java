@@ -210,7 +210,7 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 
     @Override
     public Set<String> getClassesToImport() {
-        return new HashSet<String>(Arrays.asList("java.util.Objects"));
+        return new HashSet<String>(Arrays.asList("java.util.Objects")); //$NON-NLS-1$
     }
 
     @Override
@@ -232,7 +232,7 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
             final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
         final Block body= node.getBody();
 
-        if (isMethod(node, Object.class.getCanonicalName(), "hashCode") && body != null) {
+        if (isMethod(node, Object.class.getCanonicalName(), "hashCode") && body != null) { //$NON-NLS-1$
             @SuppressWarnings("unchecked")
             final List<Statement> stmts= body.statements();
 
@@ -252,7 +252,7 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 
                     if (data.isHasReturnStmt() && !data.getStmtIterator().hasNext()) {
                         refactorHash(node, classesToUseWithImport, data);
-                        importsToAdd.add("java.util.Objects");
+                        importsToAdd.add("java.util.Objects"); //$NON-NLS-1$
                         return false;
                     }
                 }
@@ -360,7 +360,7 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
         SimpleName fieldToFind= null;
         final MethodInvocation doubleToLongBits= as(initializer, MethodInvocation.class);
 
-        if (doubleToLongBits != null && isMethod(doubleToLongBits, Double.class.getCanonicalName(), "doubleToLongBits", double.class.getSimpleName())) {
+        if (doubleToLongBits != null && isMethod(doubleToLongBits, Double.class.getCanonicalName(), "doubleToLongBits", double.class.getSimpleName())) { //$NON-NLS-1$
             final SimpleName fieldName= as((Expression) doubleToLongBits.arguments().get(0), SimpleName.class);
 
             if (fieldName != null && !fieldName.getIdentifier().equals(data.getPrimeId())
@@ -409,7 +409,7 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
         } else if (newHash instanceof MethodInvocation && data.isTempValueUsed()) {
             final MethodInvocation specificMethod= (MethodInvocation) newHash;
 
-            if (isMethod(specificMethod, Float.class.getCanonicalName(), "floatToIntBits", float.class.getSimpleName())) {
+            if (isMethod(specificMethod, Float.class.getCanonicalName(), "floatToIntBits", float.class.getSimpleName())) { //$NON-NLS-1$
                 final SimpleName fieldName= getField((Expression) specificMethod.arguments().get(0));
 
                 if (fieldName != null && !fieldName.getIdentifier().equals(data.getPrimeId())
@@ -417,15 +417,15 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
                     data.getFields().add(fieldName);
                     return true;
                 }
-            } else if (isMethod(specificMethod, Arrays.class.getCanonicalName(), "hashCode", "boolean[]")
-                    || isMethod(specificMethod, Arrays.class.getCanonicalName(), "hashCode", "byte[]")
-                    || isMethod(specificMethod, Arrays.class.getCanonicalName(), "hashCode", "char[]")
-                    || isMethod(specificMethod, Arrays.class.getCanonicalName(), "hashCode", "double[]")
-                    || isMethod(specificMethod, Arrays.class.getCanonicalName(), "hashCode", "float[]")
-                    || isMethod(specificMethod, Arrays.class.getCanonicalName(), "hashCode", "int[]")
-                    || isMethod(specificMethod, Arrays.class.getCanonicalName(), "hashCode", Object[].class.getCanonicalName())
-                    || isMethod(specificMethod, Arrays.class.getCanonicalName(), "hashCode", "long[]")
-                    || isMethod(specificMethod, Arrays.class.getCanonicalName(), "hashCode", "short[]")) {
+            } else if (isMethod(specificMethod, Arrays.class.getCanonicalName(), "hashCode", "boolean[]") //$NON-NLS-1$ $NON-NLS-2$
+                    || isMethod(specificMethod, Arrays.class.getCanonicalName(), "hashCode", "byte[]") //$NON-NLS-1$ $NON-NLS-2$
+                    || isMethod(specificMethod, Arrays.class.getCanonicalName(), "hashCode", "char[]") //$NON-NLS-1$ $NON-NLS-2$
+                    || isMethod(specificMethod, Arrays.class.getCanonicalName(), "hashCode", "double[]") //$NON-NLS-1$ $NON-NLS-2$
+                    || isMethod(specificMethod, Arrays.class.getCanonicalName(), "hashCode", "float[]") //$NON-NLS-1$ $NON-NLS-2$
+                    || isMethod(specificMethod, Arrays.class.getCanonicalName(), "hashCode", "int[]") //$NON-NLS-1$ $NON-NLS-2$
+                    || isMethod(specificMethod, Arrays.class.getCanonicalName(), "hashCode", Object[].class.getCanonicalName()) //$NON-NLS-1$
+                    || isMethod(specificMethod, Arrays.class.getCanonicalName(), "hashCode", "long[]") //$NON-NLS-1$ $NON-NLS-2$
+                    || isMethod(specificMethod, Arrays.class.getCanonicalName(), "hashCode", "short[]")) { //$NON-NLS-1$ $NON-NLS-2$
                 final SimpleName fieldName= getField((Expression) specificMethod.arguments().get(0));
 
                 if (fieldName != null && !fieldName.getIdentifier().equals(data.getPrimeId())
@@ -591,7 +591,7 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
             }
 
             if (zero != null && hashOnField != null && hashOnField.getExpression() != null
-                    && "hashCode".equals(hashOnField.getName().getIdentifier())
+                    && "hashCode".equals(hashOnField.getName().getIdentifier()) //$NON-NLS-1$
                     && (hashOnField.arguments() == null || hashOnField.arguments().isEmpty())) {
                 final Object zeroValue= zero.resolveConstantExpressionValue();
                 final SimpleName fieldToHash= getField(hashOnField.getExpression());
@@ -627,8 +627,8 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
         }
 
         r.replace(stmts.get(0),
-                b.return0(b.invoke(classesToUseWithImport.contains("java.util.Objects") ? b.name("Objects")
-                        : b.name("java", "util", "Objects"), "hash", copyOfFields)));
+                b.return0(b.invoke(classesToUseWithImport.contains("java.util.Objects") ? b.name("Objects") //$NON-NLS-1$ $NON-NLS-2$
+                        : b.name("java", "util", "Objects"), "hash", copyOfFields))); //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$ $NON-NLS-4$
 
         for (int i= 1; i < stmts.size(); i++) {
             r.remove(stmts.get(i));

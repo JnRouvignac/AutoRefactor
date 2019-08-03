@@ -213,11 +213,11 @@ public class CFGBuilder {
 
         @Override
         public String toString() {
-            return "LivenessState [liveBasicBlock=" + liveBasicBlock + ", liveEdges=" + liveEdges + "]";
+            return "LivenessState [liveBasicBlock=" + liveBasicBlock + ", liveEdges=" + liveEdges + "]"; //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
         }
     }
 
-    private static final Pattern NEWLINE= Pattern.compile("\r\n|\r|\n");
+    private static final Pattern NEWLINE= Pattern.compile("\r\n|\r|\n"); //$NON-NLS-1$
 
     private final String source;
     private final int tabSize;
@@ -457,7 +457,7 @@ public class CFGBuilder {
             return state.nextStmtWillCreateNewBlock();
         }
         try {
-            final Method m= getClass().getMethod("buildCFG", node.getClass(), LivenessState.class, ThrowerBlocks.class);
+            final Method m= getClass().getMethod("buildCFG", node.getClass(), LivenessState.class, ThrowerBlocks.class); //$NON-NLS-1$
             return (LivenessState) m.invoke(this, node, state, throwers);
         } catch (Exception e) {
             throw new UnhandledException(node, e);
@@ -600,16 +600,16 @@ public class CFGBuilder {
             if (!liveAfterBody.liveEdges.isEmpty()) {
                 if (node.getReturnType2() == null || node.getReturnType2().resolveBinding() == null // added for unit
                                                                                                     // tests
-                        || "void".equals(node.getReturnType2().resolveBinding().getName())) {
+                        || "void".equals(node.getReturnType2().resolveBinding().getName())) { //$NON-NLS-1$
                     buildEdges(liveAfterBody, exitBlock);
                 } else {
-                    throw new IllegalStateException(node, "Did not expect to find any edges to build "
-                            + "for a constructor or a non void method return type.");
+                    throw new IllegalStateException(node, "Did not expect to find any edges to build " //$NON-NLS-1$
+                            + "for a constructor or a non void method return type."); //$NON-NLS-1$
                 }
             }
             if (!this.edgesToBuild.isEmpty()) {
                 throw new IllegalStateException(node,
-                        "At this point, there should not be any edges left to build. Left edges: " + this.edgesToBuild);
+                        "At this point, there should not be any edges left to build. Left edges: " + this.edgesToBuild); //$NON-NLS-1$
             }
             List<CFGBasicBlock> throwingBlocks= throwers.selectBlocksThrowing(null);
             if (!throwingBlocks.isEmpty()) {
@@ -1637,7 +1637,7 @@ public class CFGBuilder {
             buildEdges(state, basicBlock);
             return basicBlock;
         }
-        throw new NotImplementedException(null, "for empty expressions list");
+        throw new NotImplementedException(null, "for empty expressions list"); //$NON-NLS-1$
     }
 
     private CFGBasicBlock newEntryBlock(MethodDeclaration node) {
@@ -1674,7 +1674,7 @@ public class CFGBuilder {
             lastMatchPosition= matchResult.end();
             ++lineNo;
         }
-        throw new IllegalStateException(null, "A line and column number should have been found");
+        throw new IllegalStateException(null, "A line and column number should have been found"); //$NON-NLS-1$
     }
 
     private int countCharacters(String s, int tabSize) {

@@ -74,8 +74,8 @@ public class InvertEqualsCleanUp extends AbstractCleanUpRule {
         if (node.getExpression() == null) {
             return true;
         }
-        boolean isEquals= isMethod(node, Object.class.getCanonicalName(), "equals", Object.class.getCanonicalName());
-        boolean isStringEqualsIgnoreCase= isMethod(node, String.class.getCanonicalName(), "equalsIgnoreCase", String.class.getCanonicalName());
+        boolean isEquals= isMethod(node, Object.class.getCanonicalName(), "equals", Object.class.getCanonicalName()); //$NON-NLS-1$
+        boolean isStringEqualsIgnoreCase= isMethod(node, String.class.getCanonicalName(), "equalsIgnoreCase", String.class.getCanonicalName()); //$NON-NLS-1$
         if (isEquals || isStringEqualsIgnoreCase) {
             final Expression expr= node.getExpression();
             final Expression arg0= arg0(node);
@@ -91,7 +91,7 @@ public class InvertEqualsCleanUp extends AbstractCleanUpRule {
             final Expression arg0) {
         final ASTBuilder b= this.ctx.getASTBuilder();
 
-        final String methodName= isEquals ? "equals" : "equalsIgnoreCase";
+        final String methodName= isEquals ? "equals" : "equalsIgnoreCase"; //$NON-NLS-1$ $NON-NLS-2$
         this.ctx.getRefactorings().replace(node,
                 b.invoke(b.parenthesizeIfNeeded(b.copy(arg0)), methodName, b.copy(expr)));
     }

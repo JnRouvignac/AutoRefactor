@@ -144,7 +144,7 @@ public class TryWithResourceCleanUp extends AbstractCleanUpRule {
     }
 
     private boolean methodClosesCloseables(final MethodInvocation mi) {
-        if (isMethod(mi, Closeable.class.getCanonicalName(), "close")) {
+        if (isMethod(mi, Closeable.class.getCanonicalName(), "close")) { //$NON-NLS-1$
             return true;
         }
 //        // Try to handle Guava's Closeables.closeQuietly(), Apache Commons IO'a IOUtils.closeQuietly()

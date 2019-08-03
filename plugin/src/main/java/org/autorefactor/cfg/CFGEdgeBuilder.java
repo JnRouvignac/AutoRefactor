@@ -122,13 +122,13 @@ public class CFGEdgeBuilder {
      */
     public CFGEdge build() {
         if (sourceBlock == null) {
-            throw new IllegalStateException(this.condition, "sourceBlock is mandatory");
+            throw new IllegalStateException(this.condition, "sourceBlock is mandatory"); //$NON-NLS-1$
         }
         if (targetBlock == null) {
-            throw new IllegalStateException(this.condition, "targetBlock is mandatory");
+            throw new IllegalStateException(this.condition, "targetBlock is mandatory"); //$NON-NLS-1$
         }
         if (built != null) {
-            throw new IllegalStateException(this.condition, "CFGEdgeBuilder " + this + " has already been built");
+            throw new IllegalStateException(this.condition, "CFGEdgeBuilder " + this + " has already been built"); //$NON-NLS-1$ $NON-NLS-2$
         }
         if (condition != null) {
             built= buildEdge(condition, evaluationResult, sourceBlock, targetBlock);
@@ -182,14 +182,14 @@ public class CFGEdgeBuilder {
 
     @Override
     public String toString() {
-        final StringBuilder sb= new StringBuilder("EDGE_BUILDER[");
+        final StringBuilder sb= new StringBuilder("EDGE_BUILDER["); //$NON-NLS-1$
         this.sourceBlock.appendDotNodeLabel(sb);
-        sb.append(" -> ");
+        sb.append(" -> "); //$NON-NLS-1$
         if (this.targetBlock != null) {
             this.targetBlock.appendDotNodeLabel(sb);
         } else {
-            sb.append("?");
+            sb.append("?"); //$NON-NLS-1$
         }
-        return sb.append("]").toString();
+        return sb.append("]").toString(); //$NON-NLS-1$
     }
 }

@@ -158,7 +158,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
      * @param visitors the visitors that will be executed by this
      *                 {@link AggregateASTVisitor}
      */
-    @SuppressWarnings({ "rawtypes", "unchecked" })
+    @SuppressWarnings({ "rawtypes", "unchecked" }) // $NON-NLS-2$
     public AggregateASTVisitor(List<RefactoringRule> visitors) {
         this.visitors= (List) visitors;
         analyzeVisitors();
@@ -213,11 +213,11 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
             return;
         }
         for (Method m : clazz.getDeclaredMethods()) {
-            if (is("preVisit", m)) {
+            if (is("preVisit", m)) { //$NON-NLS-1$
                 preVisitors.add(v);
-            } else if (is("preVisit2", m)) {
+            } else if (is("preVisit2", m)) { //$NON-NLS-1$
                 preVisitors2.add(v);
-            } else if (is("postVisit", m)) {
+            } else if (is("postVisit", m)) { //$NON-NLS-1$
                 postVisitors.add(v);
             } else if (isVisit(m)) {
                 put(visitorsMap, m.getParameterTypes()[0], v);
@@ -234,13 +234,13 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     private static boolean isVisit(Method m) {
-        return "visit".equals(m.getName()) && m.getParameterTypes().length == 1
+        return "visit".equals(m.getName()) && m.getParameterTypes().length == 1 //$NON-NLS-1$
                 && ASTNode.class.isAssignableFrom(m.getParameterTypes()[0])
                 && !Modifier.isAbstract(m.getParameterTypes()[0].getModifiers());
     }
 
     private static boolean isEndVisit(Method m) {
-        return "endVisit".equals(m.getName()) && m.getParameterTypes().length == 1
+        return "endVisit".equals(m.getName()) && m.getParameterTypes().length == 1 //$NON-NLS-1$
                 && ASTNode.class.isAssignableFrom(m.getParameterTypes()[0])
                 && !Modifier.isAbstract(m.getParameterTypes()[0].getModifiers());
     }
@@ -284,7 +284,7 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
      *
      * @param ctx the refactoring context.
      */
-    @SuppressWarnings({ "rawtypes", "unchecked" })
+    @SuppressWarnings({ "rawtypes", "unchecked" }) // $NON-NLS-2$
     public void setRefactoringContext(RefactoringContext ctx) {
         this.ctx= ctx;
         for (RefactoringRule v : (List<RefactoringRule>) (List) visitors) {
@@ -349,8 +349,8 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     private void logBadlyBehavedVisitor(ASTVisitor v, ASTNode node) {
-        String message= "Visitor " + v.getClass().getName() + " is badly behaved:"
-                + " it reported doing a refactoring, but it did not actually contribute any refactoring.";
+        String message= "Visitor " + v.getClass().getName() + " is badly behaved:" //$NON-NLS-1$ $NON-NLS-2$
+                + " it reported doing a refactoring, but it did not actually contribute any refactoring."; //$NON-NLS-1$
         ctx.getLogger().error(message, new AutoRefactorException(node, message));
     }
 
@@ -359,8 +359,8 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
             // let the user cancel the current operation
             throw (OperationCanceledException) e;
         }
-        String message= "Visitor " + v.getClass().getName() + " is faulty,"
-                + " it will be disabled for the rest of this run.";
+        String message= "Visitor " + v.getClass().getName() + " is faulty," //$NON-NLS-1$ $NON-NLS-2$
+                + " it will be disabled for the rest of this run."; //$NON-NLS-1$
         ctx.getLogger().error(message, new UnhandledException(node, message, e));
     }
 
@@ -386,62 +386,62 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
             }
         });
         for (Method m : mm) {
-            System.out.println("@Override");
-            System.out.print("public " + m.getReturnType() + " ");
-            System.out.print(m.getName() + "(");
+            System.out.println("@Override"); //$NON-NLS-1$
+            System.out.print("public " + m.getReturnType() + " "); //$NON-NLS-1$ $NON-NLS-2$
+            System.out.print(m.getName() + "("); //$NON-NLS-1$
             Class<?>[] paramTypes= m.getParameterTypes();
             for (int i= 0; i < paramTypes.length; i++) {
                 Class<?> paramType= paramTypes[i];
                 if (i > 0) {
-                    System.out.print(", ");
+                    System.out.print(", "); //$NON-NLS-1$
                 }
-                System.out.print(paramType.getSimpleName() + " node");
+                System.out.print(paramType.getSimpleName() + " node"); //$NON-NLS-1$
             }
-            System.out.println(") {");
+            System.out.println(") {"); //$NON-NLS-1$
             final boolean isVisit= isVisit(m);
             final boolean isEndVisit= isEndVisit(m);
-            final boolean isPrevisit2= is("preVisit2", m);
+            final boolean isPrevisit2= is("preVisit2", m); //$NON-NLS-1$
             if (isVisit || isEndVisit) {
-                System.out.print("\tfinal List<ASTVisitor> visitorList = getVisitors(");
-                System.out.print((isVisit ? "visitorsMap" : "endVisitorsMap") + ", ");
-                System.out.println(m.getParameterTypes()[0].getSimpleName() + ".class);");
+                System.out.print("\tfinal List<ASTVisitor> visitorList = getVisitors("); //$NON-NLS-1$
+                System.out.print((isVisit ? "visitorsMap" : "endVisitorsMap") + ", "); //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
+                System.out.println(m.getParameterTypes()[0].getSimpleName() + ".class);"); //$NON-NLS-1$
             }
-            System.out.print("\tfor (Iterator<ASTVisitor> iter = ");
-            if (is("preVisit", m)) {
-                System.out.print("preVisitors");
+            System.out.print("\tfor (Iterator<ASTVisitor> iter = "); //$NON-NLS-1$
+            if (is("preVisit", m)) { //$NON-NLS-1$
+                System.out.print("preVisitors"); //$NON-NLS-1$
             } else if (isPrevisit2) {
-                System.out.print("preVisitors2");
-            } else if (is("postVisit", m)) {
-                System.out.print("postVisitors");
+                System.out.print("preVisitors2"); //$NON-NLS-1$
+            } else if (is("postVisit", m)) { //$NON-NLS-1$
+                System.out.print("postVisitors"); //$NON-NLS-1$
             } else if (isVisit || isEndVisit) {
-                System.out.print("visitorList");
+                System.out.print("visitorList"); //$NON-NLS-1$
             } else {
-                throw new NotImplementedException(null, "for method " + m);
+                throw new NotImplementedException(null, "for method " + m); //$NON-NLS-1$
             }
-            System.out.println(".iterator(); iter.hasNext();) {");
-            System.out.println("\t\tfinal ASTVisitor v = iter.next();");
-            System.out.println("\t\ttry {");
+            System.out.println(".iterator(); iter.hasNext();) {"); //$NON-NLS-1$
+            System.out.println("\t\tfinal ASTVisitor v = iter.next();"); //$NON-NLS-1$
+            System.out.println("\t\ttry {"); //$NON-NLS-1$
             if (isPrevisit2) {
-                System.out.println("\t\t\tif (!v." + m.getName() + "(node)) {");
-                System.out.println("\t\t\t\treturn DO_NOT_VISIT_SUBTREE;");
-                System.out.println("\t\t\t}");
+                System.out.println("\t\t\tif (!v." + m.getName() + "(node)) {"); //$NON-NLS-1$ $NON-NLS-2$
+                System.out.println("\t\t\t\treturn DO_NOT_VISIT_SUBTREE;"); //$NON-NLS-1$
+                System.out.println("\t\t\t}"); //$NON-NLS-1$
             } else if (Boolean.TYPE.equals(m.getReturnType())) {
-                System.out.println("\t\t\tif (isJavaVersionSupported(v)");
-                System.out.println("\t\t\t\t\t&& !continueVisiting(v." + m.getName() + "(node), v, node)) {");
-                System.out.println("\t\t\t\treturn DO_NOT_VISIT_SUBTREE;");
-                System.out.println("\t\t\t}");
+                System.out.println("\t\t\tif (isJavaVersionSupported(v)"); //$NON-NLS-1$
+                System.out.println("\t\t\t\t\t&& !continueVisiting(v." + m.getName() + "(node), v, node)) {"); //$NON-NLS-1$ $NON-NLS-2$
+                System.out.println("\t\t\t\treturn DO_NOT_VISIT_SUBTREE;"); //$NON-NLS-1$
+                System.out.println("\t\t\t}"); //$NON-NLS-1$
             } else {
-                System.out.println("\t\t\tv." + m.getName() + "(node);");
+                System.out.println("\t\t\tv." + m.getName() + "(node);"); //$NON-NLS-1$ $NON-NLS-2$
             }
-            System.out.println("\t\t} catch (Exception e) {");
-            System.out.println("\t\t\tlogFaultyVisitor(v, node, e);");
-            System.out.println("\t\t\titer.remove();");
-            System.out.println("\t\t}");
-            System.out.println("\t}");
+            System.out.println("\t\t} catch (Exception e) {"); //$NON-NLS-1$
+            System.out.println("\t\t\tlogFaultyVisitor(v, node, e);"); //$NON-NLS-1$
+            System.out.println("\t\t\titer.remove();"); //$NON-NLS-1$
+            System.out.println("\t\t}"); //$NON-NLS-1$
+            System.out.println("\t}"); //$NON-NLS-1$
             if (Boolean.TYPE.equals(m.getReturnType())) {
-                System.out.println("\treturn VISIT_SUBTREE;");
+                System.out.println("\treturn VISIT_SUBTREE;"); //$NON-NLS-1$
             }
-            System.out.println("}");
+            System.out.println("}"); //$NON-NLS-1$
             System.out.println();
         }
     }

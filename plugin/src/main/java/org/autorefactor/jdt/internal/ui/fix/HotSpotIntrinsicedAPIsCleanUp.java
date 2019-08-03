@@ -101,8 +101,8 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
 
         @Override
         public String toString() {
-            return "System.arraycopy(" + srcArrayExpr + ", " + srcPos + ", " + destArrayExpr + ", " + destPos + ", "
-                    + length + ")";
+            return "System.arraycopy(" + srcArrayExpr + ", " + srcPos + ", " + destArrayExpr + ", " + destPos + ", " //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$ $NON-NLS-4$ $NON-NLS-5$
+                    + length + ")"; //$NON-NLS-1$
         }
     }
 
@@ -198,7 +198,7 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
         if (expr1Value != null && expr2Value != null) {
             return b.int0(expr1Value - expr2Value);
         } else if (equalNotNull(expr1Value, 0)) {
-            throw new NotImplementedException(expr2, "Code is not implemented for negating expr2: " + expr2);
+            throw new NotImplementedException(expr2, "Code is not implemented for negating expr2: " + expr2); //$NON-NLS-1$
         } else if (equalNotNull(expr2Value, 0)) {
             return b.copy(expr1);
         }
@@ -213,12 +213,12 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
         if (expr1Value != null && expr2Value != null) {
             return b.int0(expr1Value - expr2Value + 1);
         } else if (equalNotNull(expr1Value, 0)) {
-            throw new NotImplementedException(expr2, "Code is not implemented for negating expr2: " + expr2);
+            throw new NotImplementedException(expr2, "Code is not implemented for negating expr2: " + expr2); //$NON-NLS-1$
         } else if (equalNotNull(expr2Value, 0)) {
-            return b.infixExpr(b.copy(expr1), PLUS, ctx.getAST().newNumberLiteral("1"));
+            return b.infixExpr(b.copy(expr1), PLUS, ctx.getAST().newNumberLiteral("1")); //$NON-NLS-1$
         }
 
-        return b.infixExpr(b.infixExpr(b.copy(expr1), MINUS, b.copy(expr2)), PLUS, ctx.getAST().newNumberLiteral("1"));
+        return b.infixExpr(b.infixExpr(b.copy(expr1), MINUS, b.copy(expr2)), PLUS, ctx.getAST().newNumberLiteral("1")); //$NON-NLS-1$
     }
 
     private Integer intValue(Expression expr) {
@@ -272,9 +272,9 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
         final ASTBuilder b= this.ctx.getASTBuilder();
         final TryStatement tryS= b.try0(
                 b.block(b
-                        .toStmt(b.invoke("System", "arraycopy", srcArrayExpr, srcPos, destArrayExpr, destPos, length))),
-                b.catch0("IndexOutOfBoundsException", "e",
-                        b.throw0(b.new0("ArrayIndexOutOfBoundsException", b.invoke("e", "getMessage")))));
+                        .toStmt(b.invoke("System", "arraycopy", srcArrayExpr, srcPos, destArrayExpr, destPos, length))), //$NON-NLS-1$ $NON-NLS-2$
+                b.catch0("IndexOutOfBoundsException", "e", //$NON-NLS-1$ $NON-NLS-2$
+                        b.throw0(b.new0("ArrayIndexOutOfBoundsException", b.invoke("e", "getMessage"))))); //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
 
         this.ctx.getRefactorings().replace(node, tryS);
         return false;

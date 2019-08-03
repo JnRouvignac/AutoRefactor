@@ -69,8 +69,8 @@ public class UseStringContainsCleanUp extends AbstractCleanUpRule {
     @Override
     public boolean visit(MethodInvocation node) {
         final ASTNode parent= getFirstAncestorWithoutParentheses(node);
-        if (parent instanceof InfixExpression && (isMethod(node, String.class.getCanonicalName(), "indexOf", String.class.getCanonicalName())
-                || isMethod(node, String.class.getCanonicalName(), "lastIndexOf", String.class.getCanonicalName()))) {
+        if (parent instanceof InfixExpression && (isMethod(node, String.class.getCanonicalName(), "indexOf", String.class.getCanonicalName()) //$NON-NLS-1$
+                || isMethod(node, String.class.getCanonicalName(), "lastIndexOf", String.class.getCanonicalName()))) { //$NON-NLS-1$
             final InfixExpression ie= (InfixExpression) parent;
             if (is(ie, node, Operator.GREATER_EQUALS, 0)) {
                 return replaceWithStringContains(ie, node, false);
@@ -88,7 +88,7 @@ public class UseStringContainsCleanUp extends AbstractCleanUpRule {
     private boolean replaceWithStringContains(InfixExpression ie, MethodInvocation node, boolean negate) {
         final Refactorings r= this.ctx.getRefactorings();
         final ASTBuilder b= this.ctx.getASTBuilder();
-        r.set(node, MethodInvocation.NAME_PROPERTY, b.simpleName("contains"));
+        r.set(node, MethodInvocation.NAME_PROPERTY, b.simpleName("contains")); //$NON-NLS-1$
         if (negate) {
             r.replace(ie, b.not(b.move(node)));
         } else {

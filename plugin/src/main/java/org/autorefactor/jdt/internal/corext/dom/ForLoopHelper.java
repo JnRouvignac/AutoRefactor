@@ -168,10 +168,10 @@ public final class ForLoopHelper {
 
         @Override
         public String toString() {
-            return getClass().getSimpleName() + "(" + "iterationType=" + iterationType + ", containerType="
-                    + containerType + ", containerVariable=" + containerVariable + ", iteratorVariable="
-                    + iteratorVariable + ", loopVariable=" + loopVariable + ", elementVariable=" + elementVariable
-                    + ")";
+            return getClass().getSimpleName() + "(" + "iterationType=" + iterationType + ", containerType=" //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
+                    + containerType + ", containerVariable=" + containerVariable + ", iteratorVariable=" //$NON-NLS-1$ $NON-NLS-2$
+                    + iteratorVariable + ", loopVariable=" + loopVariable + ", elementVariable=" + elementVariable //$NON-NLS-1$ $NON-NLS-2$
+                    + ")"; //$NON-NLS-1$
         }
     }
 
@@ -195,8 +195,8 @@ public final class ForLoopHelper {
                 final MethodInvocation condMi= as(node.getExpression(), MethodInvocation.class);
                 final MethodInvocation initMi= as(initPair.getSecond(), MethodInvocation.class);
                 if (condMi != null && isSameVariable(init, condMi.getExpression())
-                        && isMethod(initMi, Collection.class.getCanonicalName(), "iterator")
-                        && isMethod(condMi, Iterator.class.getCanonicalName(), "hasNext")) {
+                        && isMethod(initMi, Collection.class.getCanonicalName(), "iterator") //$NON-NLS-1$
+                        && isMethod(condMi, Iterator.class.getCanonicalName(), "hasNext")) { //$NON-NLS-1$
                     return getIteratorOnCollection(initMi.getExpression(), condMi.getExpression());
                 }
             } else if (updaters.size() == 1 && isPrimitive(firstInit, int.class.getSimpleName())) {
@@ -296,7 +296,7 @@ public final class ForLoopHelper {
         if (containerVar instanceof MethodInvocation) {
             final MethodInvocation mi= (MethodInvocation) containerVar;
             final Name containerVarName= as(mi.getExpression(), Name.class);
-            if (containerVarName != null && isMethod(mi, Collection.class.getCanonicalName(), "size")) {
+            if (containerVarName != null && isMethod(mi, Collection.class.getCanonicalName(), "size")) { //$NON-NLS-1$
                 return ForLoopContent.indexedCollection(containerVarName, (Name) loopVar);
             }
         } else if (containerVar instanceof QualifiedName) {
@@ -310,6 +310,6 @@ public final class ForLoopHelper {
     }
 
     private static boolean isArrayLength(final QualifiedName containerVarName) {
-        return isArray(containerVarName.getQualifier()) && "length".equals(containerVarName.getName().getIdentifier());
+        return isArray(containerVarName.getQualifier()) && "length".equals(containerVarName.getName().getIdentifier()); //$NON-NLS-1$
     }
 }

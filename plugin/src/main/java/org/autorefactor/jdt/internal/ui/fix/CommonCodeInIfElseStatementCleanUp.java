@@ -195,7 +195,7 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
             final Block block= (Block) parent;
             return findNodeToRemove(block);
         }
-        throw new NotImplementedException(parent, "for parent of type " + parent.getClass());
+        throw new NotImplementedException(parent, "for parent of type " + parent.getClass()); //$NON-NLS-1$
     }
 
     private boolean allRemovable(boolean[] areCasesRemovable) {
@@ -267,14 +267,14 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
 
     private int minSize(List<List<Statement>> allCasesStmts) {
         if (allCasesStmts.isEmpty()) {
-            throw new IllegalStateException(null, "allCasesStmts List must not be empty");
+            throw new IllegalStateException(null, "allCasesStmts List must not be empty"); //$NON-NLS-1$
         }
         int min= Integer.MAX_VALUE;
         for (List<Statement> stmts : allCasesStmts) {
             min= Math.min(min, stmts.size());
         }
         if (min == Integer.MAX_VALUE) {
-            throw new IllegalStateException(null, "The minimum size should never have been equal to Integer.MAX_VALUE");
+            throw new IllegalStateException(null, "The minimum size should never have been equal to Integer.MAX_VALUE"); //$NON-NLS-1$
         }
         return min;
     }

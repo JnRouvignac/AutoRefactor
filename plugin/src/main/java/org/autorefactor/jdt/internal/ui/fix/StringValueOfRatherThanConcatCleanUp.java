@@ -78,10 +78,10 @@ public class StringValueOfRatherThanConcatCleanUp extends AbstractCleanUpRule {
 
     private boolean maybeReplaceStringConcatenation(final InfixExpression node, final Expression expr,
             final Expression variable) {
-        if (expr instanceof StringLiteral && ((StringLiteral) expr).getLiteralValue().matches("")
-                && !hasType(variable, String.class.getCanonicalName(), "char[]")) {
+        if (expr instanceof StringLiteral && ((StringLiteral) expr).getLiteralValue().matches("") //$NON-NLS-1$
+                && !hasType(variable, String.class.getCanonicalName(), "char[]")) { //$NON-NLS-1$
             final ASTBuilder b= this.ctx.getASTBuilder();
-            ctx.getRefactorings().replace(node, b.invoke("String", "valueOf", b.copy(variable)));
+            ctx.getRefactorings().replace(node, b.invoke("String", "valueOf", b.copy(variable))); //$NON-NLS-1$ $NON-NLS-2$
             return false;
         }
         return true;

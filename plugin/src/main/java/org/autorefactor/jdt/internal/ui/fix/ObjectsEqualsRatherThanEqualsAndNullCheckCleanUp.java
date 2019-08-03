@@ -98,7 +98,7 @@ public class ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp extends NewClassIm
 
     @Override
     public Set<String> getClassesToImport() {
-        return new HashSet<String>(Arrays.asList("java.util.Objects"));
+        return new HashSet<String>(Arrays.asList("java.util.Objects")); //$NON-NLS-1$
     }
 
     @Override
@@ -211,7 +211,7 @@ public class ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp extends NewClassIm
         final MethodInvocation equalsMethod= as(equalsCondition.getOperand(), MethodInvocation.class);
 
         if (secondField != null && returnStmt1 != null && returnStmt2 != null && equalsMethod != null
-                && equalsMethod.getExpression() != null && "equals".equals(equalsMethod.getName().getIdentifier())
+                && equalsMethod.getExpression() != null && "equals".equals(equalsMethod.getName().getIdentifier()) //$NON-NLS-1$
                 && (equalsMethod.arguments() == null || equalsMethod.arguments().size() == 1)
                 && (match(firstField, secondField, equalsMethod.getExpression(),
                         (ASTNode) equalsMethod.arguments().get(0))
@@ -223,7 +223,7 @@ public class ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp extends NewClassIm
             if (returnFalse1 != null && !returnFalse1.booleanValue() && returnFalse2 != null
                     && !returnFalse2.booleanValue()) {
                 replaceEquals(node, firstField, secondField, returnStmt1, classesToUseWithImport);
-                importsToAdd.add("java.util.Objects");
+                importsToAdd.add("java.util.Objects"); //$NON-NLS-1$
                 return false;
             }
         }
@@ -244,8 +244,8 @@ public class ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp extends NewClassIm
 
         r.replace(node,
                 b.if0(b.not(b.invoke(
-                        classesToUseWithImport.contains("java.util.Objects") ? b.name("Objects")
-                                : b.name("java", "util", "Objects"),
-                        "equals", b.copy(firstField), b.copy(secondField))), b.block(b.copy(returnStmt1))));
+                        classesToUseWithImport.contains("java.util.Objects") ? b.name("Objects") //$NON-NLS-1$ $NON-NLS-2$
+                                : b.name("java", "util", "Objects"), //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
+                        "equals", b.copy(firstField), b.copy(secondField))), b.block(b.copy(returnStmt1)))); //$NON-NLS-1$
     }
 }

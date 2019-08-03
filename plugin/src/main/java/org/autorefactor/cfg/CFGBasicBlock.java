@@ -173,10 +173,10 @@ public class CFGBasicBlock implements Comparable<CFGBasicBlock> {
     public void addIncomingEdge(CFGEdge edge) {
         if (edge.getTargetBlock() != this) {
             throw new IllegalArgumentException(null,
-                    "Error: the target block of this incoming edge is not the current block: " + edge);
+                    "Error: the target block of this incoming edge is not the current block: " + edge); //$NON-NLS-1$
         }
         if (!this.incomingEdges.add(edge)) {
-            throw new IllegalArgumentException(null, "Error: duplicate incoming edge:" + edge);
+            throw new IllegalArgumentException(null, "Error: duplicate incoming edge:" + edge); //$NON-NLS-1$
         }
     }
 
@@ -188,10 +188,10 @@ public class CFGBasicBlock implements Comparable<CFGBasicBlock> {
     public void addOutgoingEdge(CFGEdge edge) {
         if (edge.getSourceBlock() != this) {
             throw new IllegalArgumentException(null,
-                    "Error: the source block of this outgoing edge is not the current block");
+                    "Error: the source block of this outgoing edge is not the current block"); //$NON-NLS-1$
         }
         if (!this.outgoingEdgesAndVariableAccesses.add(edge)) {
-            throw new IllegalArgumentException(null, "Error: duplicate outgoing edge:" + edge);
+            throw new IllegalArgumentException(null, "Error: duplicate outgoing edge:" + edge); //$NON-NLS-1$
         }
     }
 
@@ -276,12 +276,12 @@ public class CFGBasicBlock implements Comparable<CFGBasicBlock> {
      */
     StringBuilder appendDotNodeId(StringBuilder sb) {
         if (isEntryBlock()) {
-            sb.append("Entry");
+            sb.append("Entry"); //$NON-NLS-1$
         } else if (isExitBlock()) {
-            sb.append("Exit");
+            sb.append("Exit"); //$NON-NLS-1$
         } else {
             LineAndColumn lal= this.lineAndColumn;
-            sb.append("_").append(lal.getLine()).append("_").append(lal.getColumn());
+            sb.append("_").append(lal.getLine()).append("_").append(lal.getColumn()); //$NON-NLS-1$ $NON-NLS-2$
         }
         return sb;
     }
@@ -294,17 +294,17 @@ public class CFGBasicBlock implements Comparable<CFGBasicBlock> {
      * @return the provided string builder
      */
     StringBuilder appendDotNodeLabel(StringBuilder sb) {
-        sb.append(this.codeExcerpt).append("\\n(");
+        sb.append(this.codeExcerpt).append("\\n("); //$NON-NLS-1$
         LineAndColumn lal= this.lineAndColumn;
-        sb.append(lal.getLine()).append(",").append(lal.getColumn()).append(")");
+        sb.append(lal.getLine()).append(",").append(lal.getColumn()).append(")"); //$NON-NLS-1$ $NON-NLS-2$
         return sb;
     }
 
     @Override
     public String toString() {
-        final StringBuilder sb= new StringBuilder("BLOCK[");
+        final StringBuilder sb= new StringBuilder("BLOCK["); //$NON-NLS-1$
         toString(sb);
-        return sb.append("]").toString();
+        return sb.append("]").toString(); //$NON-NLS-1$
     }
 
     private void toString(final StringBuilder sb) {

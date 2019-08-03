@@ -111,21 +111,21 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
         return MultiFixMessages.CleanUpRefactoringWizard_CommentsCleanUp_reason;
     }
 
-    private static final Pattern EMPTY_LINE_COMMENT= Pattern.compile("//\\s*");
-    private static final Pattern EMPTY_BLOCK_COMMENT= Pattern.compile("/\\*\\s*(\\*\\s*)*\\*/");
-    private static final Pattern EMPTY_JAVADOC= Pattern.compile("/\\*\\*\\s*(\\*\\s*)*\\*/");
-    private static final Pattern EMPTY_LINE_AT_START_OF_BLOCK_COMMENT= Pattern.compile("(/\\*)(?:\\s*\\*)+(\\s*\\*)");
-    private static final Pattern EMPTY_LINE_AT_START_OF_JAVADOC= Pattern.compile("(/\\*\\*)(?:\\s*\\*)+(\\s*\\*)");
-    private static final Pattern EMPTY_LINE_AT_END_OF_BLOCK_COMMENT= Pattern.compile("(?:\\*\\s*)*\\*\\s*(\\*/)");
+    private static final Pattern EMPTY_LINE_COMMENT= Pattern.compile("//\\s*"); //$NON-NLS-1$
+    private static final Pattern EMPTY_BLOCK_COMMENT= Pattern.compile("/\\*\\s*(\\*\\s*)*\\*/"); //$NON-NLS-1$
+    private static final Pattern EMPTY_JAVADOC= Pattern.compile("/\\*\\*\\s*(\\*\\s*)*\\*/"); //$NON-NLS-1$
+    private static final Pattern EMPTY_LINE_AT_START_OF_BLOCK_COMMENT= Pattern.compile("(/\\*)(?:\\s*\\*)+(\\s*\\*)"); //$NON-NLS-1$
+    private static final Pattern EMPTY_LINE_AT_START_OF_JAVADOC= Pattern.compile("(/\\*\\*)(?:\\s*\\*)+(\\s*\\*)"); //$NON-NLS-1$
+    private static final Pattern EMPTY_LINE_AT_END_OF_BLOCK_COMMENT= Pattern.compile("(?:\\*\\s*)*\\*\\s*(\\*/)"); //$NON-NLS-1$
     private static final Pattern JAVADOC_ONLY_INHERITDOC= Pattern
-            .compile("/\\*\\*\\s*(\\*\\s*)*\\{@inheritDoc\\}\\s*(\\*\\s*)*\\*/");
+            .compile("/\\*\\*\\s*(\\*\\s*)*\\{@inheritDoc\\}\\s*(\\*\\s*)*\\*/"); //$NON-NLS-1$
     private static final Pattern ECLIPSE_GENERATED_TODOS= Pattern
-            .compile("//\\s*" + "(:?" + "(?:TODO Auto-generated (?:(?:(?:method|constructor) stub)|(?:catch block)))"
-                    + "|" + "(?:TODO: handle exception)" + ")" + "\\s*");
+            .compile("//\\s*" + "(:?" + "(?:TODO Auto-generated (?:(?:(?:method|constructor) stub)|(?:catch block)))" //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
+                    + "|" + "(?:TODO: handle exception)" + ")" + "\\s*"); //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$ $NON-NLS-4$
     private static final Pattern ECLIPSE_GENERATED_NON_JAVADOC= Pattern
-            .compile("/\\*\\s*\\(non-Javadoc\\)\\s*\\*\\s*@see\\s*");
+            .compile("/\\*\\s*\\(non-Javadoc\\)\\s*\\*\\s*@see\\s*"); //$NON-NLS-1$
     private static final Pattern ECLIPSE_IGNORE_NON_EXTERNALIZED_STRINGS= Pattern
-            .compile("//\\s*\\$NON-NLS-\\d\\$\\s*");
+            .compile("//\\s*\\$NON-NLS-\\d\\$\\s*"); //$NON-NLS-1$
     /**
      * Ignore special instructions to locally enable/disable tools working on java
      * code:
@@ -134,18 +134,18 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
      * <li>JDT</li>
      * </ul>
      */
-    private static final Pattern TOOLS_CONTROL_INSTRUCTIONS= Pattern.compile("//\\s*@\\w+:\\w+");
-    private static final Pattern JAVADOC_HAS_PUNCTUATION= Pattern.compile("\\.|\\?|!|:");
+    private static final Pattern TOOLS_CONTROL_INSTRUCTIONS= Pattern.compile("//\\s*@\\w+:\\w+"); //$NON-NLS-1$
+    private static final Pattern JAVADOC_HAS_PUNCTUATION= Pattern.compile("\\.|\\?|!|:"); //$NON-NLS-1$
     private static final Pattern JAVADOC_WITHOUT_PUNCTUATION=
             // @formatter:off
-            Pattern.compile("" + "(.*?)" + "(" + "\\s*" + "(?:" + "\\*" + "/" + ")?" + ")", Pattern.DOTALL);
+            Pattern.compile("" + "(.*?)" + "(" + "\\s*" + "(?:" + "\\*" + "/" + ")?" + ")", Pattern.DOTALL); //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$ $NON-NLS-4$ $NON-NLS-5$ $NON-NLS-6$ $NON-NLS-7$ $NON-NLS-8$ $NON-NLS-9$
     // @formatter:on
     private static final Pattern FIRST_JAVADOC_TAG=
             // @formatter:off
-            Pattern.compile("" + "(" + "/\\*\\*" + ")?" + "\\s*" + "(?:\\*\\s*)?" + "@\\w+", Pattern.MULTILINE);
+            Pattern.compile("" + "(" + "/\\*\\*" + ")?" + "\\s*" + "(?:\\*\\s*)?" + "@\\w+", Pattern.MULTILINE); //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$ $NON-NLS-4$ $NON-NLS-5$ $NON-NLS-6$ $NON-NLS-7$
     // @formatter:on
     private static final Pattern JAVADOC_FIRST_LETTER_LOWERCASE= Pattern
-            .compile("(/\\*\\*\\s*(?:(?:\\r|\\n|\\r\\n|\\s)\\s*\\*)*\\s*)(\\w)(.*)", Pattern.DOTALL);
+            .compile("(/\\*\\*\\s*(?:(?:\\r|\\n|\\r\\n|\\s)\\s*\\*)*\\s*)(\\w)(.*)", Pattern.DOTALL); //$NON-NLS-1$
 
     private CompilationUnit astRoot;
     private final List<Pair<SourceLocation, Comment>> comments= new ArrayList<Pair<SourceLocation, Comment>>();
@@ -185,10 +185,10 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
     private String getReplacement(String comment, boolean isJavadoc) {
         int commentLineLength= this.ctx.getJavaProjectOptions().getCommentLineLength();
         String commentNoStartNorEnd= comment.substring(0, comment.length() - 2).substring(isJavadoc ? 3 : 2);
-        String commentWithSpaces= commentNoStartNorEnd.replaceAll("\\s*(\\r\\n|\\r|\\n)\\s*\\*", " ");
-        String commentContent= commentWithSpaces.replaceAll("\\s+", " ").trim();
+        String commentWithSpaces= commentNoStartNorEnd.replaceAll("\\s*(\\r\\n|\\r|\\n)\\s*\\*", " "); //$NON-NLS-1$ $NON-NLS-2$
+        String commentContent= commentWithSpaces.replaceAll("\\s+", " ").trim(); //$NON-NLS-1$ $NON-NLS-2$
         if (commentContent.length() + (isJavadoc ? 7 : 6) < commentLineLength) {
-            return (isJavadoc ? "/** " : "/* ") + commentContent + " */";
+            return (isJavadoc ? "/** " : "/* ") + commentContent + " */"; //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
         }
         return null;
     }
@@ -222,7 +222,7 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
     @Override
     public boolean visit(Javadoc node) {
         final String comment= getComment(node);
-        final boolean isWellFormattedInheritDoc= "/** {@inheritDoc} */".equals(comment);
+        final boolean isWellFormattedInheritDoc= "/** {@inheritDoc} */".equals(comment); //$NON-NLS-1$
         final Matcher emptyLineAtStartMatcher= EMPTY_LINE_AT_START_OF_JAVADOC.matcher(comment);
         final Matcher emptyLineAtEndMatcher= EMPTY_LINE_AT_END_OF_BLOCK_COMMENT.matcher(comment);
         if (EMPTY_JAVADOC.matcher(comment).matches()) {
@@ -236,7 +236,7 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
             this.ctx.getRefactorings().remove(node);
             return false;
         } else if (!acceptJavadoc(getNextNode(node)) && node.getStartPosition() != 0) {
-            this.ctx.getRefactorings().replace(node, comment.replace("/**", "/*"));
+            this.ctx.getRefactorings().replace(node, comment.replace("/**", "/*")); //$NON-NLS-1$ $NON-NLS-2$
             return false;
         } else if (JAVADOC_ONLY_INHERITDOC.matcher(comment).matches()) {
             final ASTNode nextNode= getNextNode(node);
@@ -251,7 +251,7 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
                 int startLine= this.astRoot.getLineNumber(node.getStartPosition());
                 int endLine= this.astRoot.getLineNumber(node.getStartPosition() + node.getLength());
                 if (startLine != endLine) {
-                    this.ctx.getRefactorings().replace(node, "/** {@inheritDoc} */");
+                    this.ctx.getRefactorings().replace(node, "/** {@inheritDoc} */"); //$NON-NLS-1$
                     return false;
                 }
             }
@@ -322,7 +322,7 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
 
     private String addPeriodAtEndOfFirstLine(Javadoc node, String comment) {
         String beforeFirstTag= comment;
-        String afterFirstTag= "";
+        String afterFirstTag= ""; //$NON-NLS-1$
         final Matcher m= FIRST_JAVADOC_TAG.matcher(comment);
         if (m.find()) {
             if (m.start() == 0) {
@@ -338,10 +338,10 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
                 final TagElement firstLine= tagElements.get(0);
                 final int relativeStart= firstLine.getStartPosition() - node.getStartPosition();
                 final int endOfFirstLine= relativeStart + firstLine.getLength();
-                return comment.substring(0, endOfFirstLine) + "." + comment.substring(endOfFirstLine);
+                return comment.substring(0, endOfFirstLine) + "." + comment.substring(endOfFirstLine); //$NON-NLS-1$
                 // TODO JNR do the replace here, not outside this method
             }
-            return matcher.group(1) + "." + matcher.group(2) + afterFirstTag;
+            return matcher.group(1) + "." + matcher.group(2) + afterFirstTag; //$NON-NLS-1$
         }
         return null;
     }
@@ -391,7 +391,7 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
             // useless
             return !isTagEmptyOrWithSimpleNameOnly(tag);
         } else if (!TAG_INHERITDOC.equals(tagName) && throwIfUnknown) {
-            throw new NotImplementedException(tag, "for tagName " + tagName);
+            throw new NotImplementedException(tag, "for tagName " + tagName); //$NON-NLS-1$
         }
         return true;
     }
@@ -534,7 +534,7 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
         // PackageDeclaration node accept javadoc in package-info.java files,
         // but they are useless everywhere else.
         return node instanceof BodyDeclaration
-                || (node instanceof PackageDeclaration && "package-info.java".equals(getFileName(node)));
+                || (node instanceof PackageDeclaration && "package-info.java".equals(getFileName(node))); //$NON-NLS-1$
     }
 
     @Override

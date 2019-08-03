@@ -236,7 +236,7 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
 
         private void replaceInParent(ASTNode nodeToReplace, ASTNode replacementNode) {
             if (nodeToReplace.getParent() == null) {
-                throw new IllegalArgumentException(nodeToReplace, "The node to replace does not have a parent");
+                throw new IllegalArgumentException(nodeToReplace, "The node to replace does not have a parent"); //$NON-NLS-1$
             }
             final StructuralPropertyDescriptor locationInParent= nodeToReplace.getLocationInParent();
             if (locationInParent instanceof ChildPropertyDescriptor) {
@@ -433,8 +433,8 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
         // TODO JNR rejuggle exception messages like this:
         // compilationUnit.java:line number: error message
         throw new IllegalStateException(md,
-                "Did not expect any other return type than boolean or java.lang.Boolean for method "
-                        + md.getName().getIdentifier() + ", but found " + qualifiedName);
+                "Did not expect any other return type than boolean or java.lang.Boolean for method " //$NON-NLS-1$
+                        + md.getName().getIdentifier() + ", but found " + qualifiedName); //$NON-NLS-1$
     }
 
     private Expression newExpressionOrNull(String expressionTypeName, Expression condition, Expression thenExpression,
@@ -452,7 +452,7 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
             }
             return getExpression(orientedCondition, expressionTypeName, booleanName);
         } else if ((isPrimitive(thenExpression) || isPrimitive(elseExpression))
-                && ("boolean".equals(expressionTypeName)
+                && ("boolean".equals(expressionTypeName) //$NON-NLS-1$
                         || Boolean.class.getCanonicalName().equals(expressionTypeName))) {
             // If both expressions are primitive, there cannot be any NPE
             // If only one expression is primitive, a NPE is already possible so we do not
@@ -478,14 +478,14 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
         if (boolean.class.getSimpleName().equals(expressionTypeName)) {
             return condition;
         } else if (getJavaMinorVersion() >= 4 && Boolean.class.getCanonicalName().equals(expressionTypeName)) {
-            return b.invoke(booleanName, "valueOf", condition);
+            return b.invoke(booleanName, "valueOf", condition); //$NON-NLS-1$
         }
         return null;
     }
 
     private Name getBooleanName(ASTNode node) {
-        if (!isSimpleNameAlreadyUsed("Boolean", getAncestor(node, CompilationUnit.class))) {
-            return b.name("Boolean");
+        if (!isSimpleNameAlreadyUsed("Boolean", getAncestor(node, CompilationUnit.class))) { //$NON-NLS-1$
+            return b.name("Boolean"); //$NON-NLS-1$
         }
         return b.name(Boolean.class.getCanonicalName());
     }

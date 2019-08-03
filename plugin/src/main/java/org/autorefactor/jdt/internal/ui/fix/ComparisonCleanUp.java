@@ -91,10 +91,10 @@ public class ComparisonCleanUp extends AbstractCleanUpRule {
                 return true;
             }
 
-            if (isMethod(comparisonMI, Comparable.class.getCanonicalName(), "compareTo", Object.class.getCanonicalName())
-                    || isMethod(comparisonMI, Comparator.class.getCanonicalName(), "compare", Object.class.getCanonicalName(), Object.class.getCanonicalName())
+            if (isMethod(comparisonMI, Comparable.class.getCanonicalName(), "compareTo", Object.class.getCanonicalName()) //$NON-NLS-1$
+                    || isMethod(comparisonMI, Comparator.class.getCanonicalName(), "compare", Object.class.getCanonicalName(), Object.class.getCanonicalName()) //$NON-NLS-1$
                     || (getJavaMinorVersion() >= 2
-                            && isMethod(comparisonMI, String.class.getCanonicalName(), "compareToIgnoreCase", String.class.getCanonicalName()))) {
+                            && isMethod(comparisonMI, String.class.getCanonicalName(), "compareToIgnoreCase", String.class.getCanonicalName()))) { //$NON-NLS-1$
                 final Object literalValue= literal.resolveConstantExpressionValue();
 
                 if (literalValue instanceof Number) {
@@ -132,6 +132,6 @@ public class ComparisonCleanUp extends AbstractCleanUpRule {
     private void refactorComparingToZero(final InfixExpression node, final MethodInvocation comparisonMI,
             final Operator operator) {
         final ASTBuilder b= this.ctx.getASTBuilder();
-        this.ctx.getRefactorings().replace(node, b.infixExpr(b.copy(comparisonMI), operator, b.number("0")));
+        this.ctx.getRefactorings().replace(node, b.infixExpr(b.copy(comparisonMI), operator, b.number("0"))); //$NON-NLS-1$
     }
 }

@@ -66,8 +66,8 @@ public class BooleanConstantRatherThanValueOfCleanUp extends AbstractCleanUpRule
 
     @Override
     public boolean visit(MethodInvocation node) {
-        if (isMethod(node, Boolean.class.getCanonicalName(), "valueOf", String.class.getCanonicalName())
-                || isMethod(node, Boolean.class.getCanonicalName(), "valueOf", boolean.class.getSimpleName())) {
+        if (isMethod(node, Boolean.class.getCanonicalName(), "valueOf", String.class.getCanonicalName()) //$NON-NLS-1$
+                || isMethod(node, Boolean.class.getCanonicalName(), "valueOf", boolean.class.getSimpleName())) { //$NON-NLS-1$
             final BooleanLiteral l= as(arguments(node), BooleanLiteral.class);
             if (l != null) {
                 ctx.getRefactorings().replace(node, toFieldAccess(node, l.booleanValue()));
@@ -83,7 +83,7 @@ public class BooleanConstantRatherThanValueOfCleanUp extends AbstractCleanUpRule
         if (node.getExpression() instanceof Name) {
             fa.setExpression(b.copy(node.getExpression()));
         }
-        fa.setName(b.simpleName(booleanLiteral ? "TRUE" : "FALSE"));
+        fa.setName(b.simpleName(booleanLiteral ? "TRUE" : "FALSE")); //$NON-NLS-1$ $NON-NLS-2$
         return fa;
     }
 }

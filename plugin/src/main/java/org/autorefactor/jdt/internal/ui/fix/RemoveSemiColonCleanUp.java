@@ -143,7 +143,7 @@ public class RemoveSemiColonCleanUp extends AbstractCleanUpRule {
             return true;
         }
         throw new NotImplementedException(node,
-                "for a parent of type " + (parent != null ? parent.getClass().getSimpleName() : null));
+                "for a parent of type " + (parent != null ? parent.getClass().getSimpleName() : null)); //$NON-NLS-1$
     }
 
     private boolean removeSuperfluousSemiColons(ASTNode node, int start, int end) {
@@ -154,7 +154,7 @@ public class RemoveSemiColonCleanUp extends AbstractCleanUpRule {
         final Map<String, SourceLocation> nonCommentsStrings= getNonCommentsStrings(node, start, end);
         for (Entry<String, SourceLocation> entry : nonCommentsStrings.entrySet()) {
             final String s= entry.getKey();
-            final Matcher m= Pattern.compile("\\s*(;+)\\s*").matcher(s);
+            final Matcher m= Pattern.compile("\\s*(;+)\\s*").matcher(s); //$NON-NLS-1$
             while (m.find()) {
                 int startPos= entry.getValue().getStartPosition();
                 SourceLocation toRemove= fromPositions(startPos + m.start(1), startPos + m.end(1));

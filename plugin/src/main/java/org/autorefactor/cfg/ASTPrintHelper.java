@@ -43,7 +43,7 @@ public final class ASTPrintHelper {
             final Expression expr= iter.next();
             sb.append(expr);
             if (iter.hasNext()) {
-                sb.append(", ");
+                sb.append(", "); //$NON-NLS-1$
             }
         }
         return sb.toString();
@@ -51,13 +51,13 @@ public final class ASTPrintHelper {
 
     static String codeExcerpt(ASTNode node) {
         final String nodeString= node.toString();
-        final String[] nodeLines= nodeString.split("\n");
+        final String[] nodeLines= nodeString.split("\n"); //$NON-NLS-1$
         final String codeExcerpt;
-        if (nodeLines[0].matches("\\s*\\{\\s*")) {
-            codeExcerpt= nodeLines[0] + " " + nodeLines[1] + " ...";
+        if (nodeLines[0].matches("\\s*\\{\\s*")) { //$NON-NLS-1$
+            codeExcerpt= nodeLines[0] + " " + nodeLines[1] + " ..."; //$NON-NLS-1$ $NON-NLS-2$
         } else {
             codeExcerpt= nodeLines[0];
         }
-        return codeExcerpt.replaceAll("\\s+", " ");
+        return codeExcerpt.replaceAll("\\s+", " "); //$NON-NLS-1$ $NON-NLS-2$
     }
 }

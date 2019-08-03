@@ -32,7 +32,7 @@ import org.eclipse.jdt.core.dom.ASTNode;
  * are not handled.
  */
 public class NotImplementedException extends AutoRefactorException {
-    private static final String DEFAULT_MESSAGE= "Code is not implemented";
+    private static final String DEFAULT_MESSAGE= "Code is not implemented"; //$NON-NLS-1$
 
     /**
      * Class constructor to use when some code is not implemented.
@@ -50,7 +50,7 @@ public class NotImplementedException extends AutoRefactorException {
      * @param cause the unexpected object
      */
     public NotImplementedException(ASTNode node, Object cause) {
-        this(node, "for an object of type " + (cause != null ? cause.getClass() : null));
+        this(node, "for an object of type " + (cause != null ? cause.getClass() : null)); //$NON-NLS-1$
     }
 
     /**
@@ -60,6 +60,6 @@ public class NotImplementedException extends AutoRefactorException {
      * @param reason an additional message
      */
     public NotImplementedException(ASTNode node, String reason) {
-        super(node, DEFAULT_MESSAGE + " " + (reason != null ? reason : ""));
+        super(node, DEFAULT_MESSAGE + " " + (reason != null ? reason : "")); //$NON-NLS-1$ $NON-NLS-2$
     }
 }

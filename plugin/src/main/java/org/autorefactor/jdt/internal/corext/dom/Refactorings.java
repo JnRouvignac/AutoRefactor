@@ -60,7 +60,7 @@ import org.eclipse.text.edits.TextEdit;
  * the rule finished traversing the whole AST tree.
  */
 public class Refactorings {
-    private static final String UNTOUCH_COMMENT= "untouchComment";
+    private static final String UNTOUCH_COMMENT= "untouchComment"; //$NON-NLS-1$
 
     private final EventLoop eventLoop;
     private final SubMonitor monitor;
@@ -336,7 +336,7 @@ public class Refactorings {
      */
     public void remove(SourceLocation toRemove) {
         if (toRemove.getLength() == 0) {
-            throw new IllegalArgumentException("Cannot remove an empty source range: " + toRemove);
+            throw new IllegalArgumentException("Cannot remove an empty source range: " + toRemove); //$NON-NLS-1$
         }
         hasRefactorings= true;
         sourceRewriter.remove(toRemove);

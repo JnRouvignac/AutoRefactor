@@ -124,8 +124,8 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
             Class<?>[] ancestorClasses= new Class<?>[] { MethodDeclaration.class, Initializer.class };
             ASTNode ancestor= getFirstAncestorOrNull(scope, ancestorClasses);
             if (ancestor == null) {
-                throw new IllegalStateException(scope, "Expected to find an ancestor among the types "
-                        + Arrays.toString(ancestorClasses) + " but could not find any");
+                throw new IllegalStateException(scope, "Expected to find an ancestor among the types " //$NON-NLS-1$
+                        + Arrays.toString(ancestorClasses) + " but could not find any"); //$NON-NLS-1$
             }
             return ancestor;
         }
@@ -256,17 +256,17 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
 
         final int insertionPoint= asList(enhancedFor.getBody()).get(0).getStartPosition() - 1;
         final Variable entryVar= new Variable(
-                new VariableNameDecider(enhancedFor.getBody(), insertionPoint).suggest("entry", "mapEntry"), b);
+                new VariableNameDecider(enhancedFor.getBody(), insertionPoint).suggest("entry", "mapEntry"), b); //$NON-NLS-1$ $NON-NLS-2$
         final TypeNameDecider typeNameDecider= new TypeNameDecider(parameter);
 
         final MethodInvocation getValueMi0= getValueMis.get(0);
         final ITypeBinding typeBinding= getValueMi0.getExpression().resolveTypeBinding();
         if (typeBinding != null && typeBinding.isRawType()) {
             // for (Object key : map.keySet()) => for (Object key : map.entrySet())
-            r.set(enhancedFor, EXPRESSION_PROPERTY, b.invoke(b.move(mapExpression), "entrySet"));
+            r.set(enhancedFor, EXPRESSION_PROPERTY, b.invoke(b.move(mapExpression), "entrySet")); //$NON-NLS-1$
             final Type objectType= b.type(typeNameDecider.useSimplestPossibleName(Object.class.getCanonicalName()));
             final Variable objectVar= new Variable(
-                    new VariableNameDecider(enhancedFor.getBody(), insertionPoint).suggest("obj"), b);
+                    new VariableNameDecider(enhancedFor.getBody(), insertionPoint).suggest("obj"), b); //$NON-NLS-1$
             r.set(enhancedFor, PARAMETER_PROPERTY, b.declareSingleVariable(objectVar.varNameRaw(), objectType));
 
             // for (Map.Entry<K, V> mapEntry : map.entrySet()) {
@@ -275,7 +275,7 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
 
             final Type mapKeyType= b.copy(parameter.getType());
             final VariableDeclarationStatement newKeyDecl= b.declareStmt(mapKeyType, b.move(parameter.getName()),
-                    b.invoke(entryVar.varName(), "getKey"));
+                    b.invoke(entryVar.varName(), "getKey")); //$NON-NLS-1$
 
             r.insertFirst(enhancedFor.getBody(), Block.STATEMENTS_PROPERTY, newKeyDecl);
 
@@ -288,7 +288,7 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
             }
         } else {
             // for (K key : map.keySet()) => for (K key : map.entrySet())
-            r.set(enhancedFor, EXPRESSION_PROPERTY, b.invoke(b.move(mapExpression), "entrySet"));
+            r.set(enhancedFor, EXPRESSION_PROPERTY, b.invoke(b.move(mapExpression), "entrySet")); //$NON-NLS-1$
             // for (K key : map.entrySet()) => for (Map.Entry<K, V> mapEntry :
             // map.entrySet())
             final Type mapEntryType= createMapEntryType(parameter, getValueMi0, typeNameDecider);
@@ -300,14 +300,14 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
                 final Type mapKeyType= b.copy(parameter.getType());
 
                 final VariableDeclarationStatement newKeyDeclaration= b.declareStmt(mapKeyType,
-                        b.move(parameter.getName()), b.invoke(entryVar.varName(), "getKey"));
+                        b.move(parameter.getName()), b.invoke(entryVar.varName(), "getKey")); //$NON-NLS-1$
                 r.insertFirst(enhancedFor.getBody(), Block.STATEMENTS_PROPERTY, newKeyDeclaration);
             }
         }
 
         // Replace all occurrences of map.get(key) => mapEntry.getValue()
         for (MethodInvocation getValueMi : getValueMis) {
-            r.replace(getValueMi, b.invoke(entryVar.varName(), "getValue"));
+            r.replace(getValueMi, b.invoke(entryVar.varName(), "getValue")); //$NON-NLS-1$
         }
     }
 
@@ -337,7 +337,7 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
     }
 
     private boolean isKeySetMethod(Expression expr) {
-        return expr instanceof MethodInvocation && isMethod((MethodInvocation) expr, Map.class.getCanonicalName(), "keySet");
+        return expr instanceof MethodInvocation && isMethod((MethodInvocation) expr, Map.class.getCanonicalName(), "keySet"); //$NON-NLS-1$
     }
 
     private List<MethodInvocation> collectMapGetValueCalls(Expression mapExpression,
@@ -417,7 +417,7 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
         @Override
         public boolean visit(MethodInvocation node) {
             if (isSameReference(node.getExpression(), mapExpression)
-                    && isMethod(node, Map.class.getCanonicalName(), "get", Object.class.getCanonicalName())
+                    && isMethod(node, Map.class.getCanonicalName(), "get", Object.class.getCanonicalName()) //$NON-NLS-1$
                     && isSameVariable(arg0(node), forEachParameter.getName())) {
                 addResult(node);
             }

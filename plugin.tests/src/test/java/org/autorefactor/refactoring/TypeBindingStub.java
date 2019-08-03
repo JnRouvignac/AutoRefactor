@@ -45,20 +45,20 @@ class TypeBindingStub implements ITypeBinding {
     }
 
     public IPackageBinding toPackage(String fullyQualifiedName) {
-        final String[] names= fullyQualifiedName.split("\\.");
+        final String[] names= fullyQualifiedName.split("\\."); //$NON-NLS-1$
         for (int i= 0; i < names.length; i++) {
             if (Character.isUpperCase(names[i].charAt(0))) {
-                return new PackageBindingStub(joinAsString(names, i, "."));
+                return new PackageBindingStub(joinAsString(names, i, ".")); //$NON-NLS-1$
             }
         }
-        throw new IllegalStateException("Did not expect to get there");
+        throw new IllegalStateException("Did not expect to get there"); //$NON-NLS-1$
     }
 
     public TypeBindingStub toDeclaringClass(String fullyQualifiedName) {
-        final String[] names= fullyQualifiedName.split("\\.");
+        final String[] names= fullyQualifiedName.split("\\."); //$NON-NLS-1$
         int length= names.length;
         if (Character.isUpperCase(names[length - 1].charAt(0)) && Character.isUpperCase(names[length - 2].charAt(0))) {
-            return new TypeBindingStub(joinAsString(names, length - 1, "."));
+            return new TypeBindingStub(joinAsString(names, length - 1, ".")); //$NON-NLS-1$
         }
         return null;
     }

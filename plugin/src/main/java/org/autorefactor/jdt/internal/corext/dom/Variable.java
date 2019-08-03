@@ -114,8 +114,8 @@ public class Variable {
 
     private void checkTypeDefined() {
         if (typeName == null) {
-            throw new IllegalStateException("This method cannot be called on variable '" + variableName
-                    + "', because no type has been defined for it.");
+            throw new IllegalStateException("This method cannot be called on variable '" + variableName //$NON-NLS-1$
+                    + "', because no type has been defined for it."); //$NON-NLS-1$
         }
     }
 
@@ -131,6 +131,6 @@ public class Variable {
 
     @Override
     public String toString() {
-        return Variable.class.getSimpleName() + "[" + (typeName != null ? typeName + " " : "") + variableName + "]";
+        return Variable.class.getSimpleName() + "[" + (typeName != null ? typeName + " " : "") + variableName + "]"; //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$ $NON-NLS-4$
     }
 }

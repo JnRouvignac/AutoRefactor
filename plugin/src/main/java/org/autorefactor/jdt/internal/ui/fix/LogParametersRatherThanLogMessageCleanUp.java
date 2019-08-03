@@ -71,14 +71,14 @@ public class LogParametersRatherThanLogMessageCleanUp extends AbstractCleanUpRul
 
     @Override
     public boolean visit(final MethodInvocation node) {
-        return maybeRefactorMethod(node, "debug") && maybeRefactorMethod(node, "error")
-                && maybeRefactorMethod(node, "info") && maybeRefactorMethod(node, "trace")
-                && maybeRefactorMethod(node, "warn");
+        return maybeRefactorMethod(node, "debug") && maybeRefactorMethod(node, "error") //$NON-NLS-1$ $NON-NLS-2$
+                && maybeRefactorMethod(node, "info") && maybeRefactorMethod(node, "trace") //$NON-NLS-1$ $NON-NLS-2$
+                && maybeRefactorMethod(node, "warn"); //$NON-NLS-1$
     }
 
     private boolean maybeRefactorMethod(final MethodInvocation node, final String methodName) {
-        if (isMethod(node, "org.slf4j.Logger", methodName, String.class.getCanonicalName())
-                || isMethod(node, "ch.qos.logback.classic.Logger", methodName, String.class.getCanonicalName())) {
+        if (isMethod(node, "org.slf4j.Logger", methodName, String.class.getCanonicalName()) //$NON-NLS-1$
+                || isMethod(node, "ch.qos.logback.classic.Logger", methodName, String.class.getCanonicalName())) { //$NON-NLS-1$
             final List<Expression> args= arguments(node);
 
             if (args != null && args.size() == 1) {
@@ -117,17 +117,17 @@ public class LogParametersRatherThanLogMessageCleanUp extends AbstractCleanUpRul
                 hasLiteral= true;
                 final String literal= (String) string.resolveConstantExpressionValue();
 
-                if ((literal != null) && (literal.contains("{") || literal.contains("}"))) {
+                if ((literal != null) && (literal.contains("{") || literal.contains("}"))) { //$NON-NLS-1$ $NON-NLS-2$
                     return true;
                 }
 
                 messageBuilder.append(literal);
             } else {
                 hasObjects= true;
-                messageBuilder.append("{}");
+                messageBuilder.append("{}"); //$NON-NLS-1$
 
                 if (hasType(string, Throwable.class.getCanonicalName())) {
-                    params.add(b.invoke("String", "valueOf", b.copy(string)));
+                    params.add(b.invoke("String", "valueOf", b.copy(string))); //$NON-NLS-1$ $NON-NLS-2$
                 } else {
                     params.add(b.copy(string));
                 }

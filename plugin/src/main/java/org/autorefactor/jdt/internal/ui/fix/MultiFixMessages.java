@@ -33,7 +33,7 @@ import org.eclipse.osgi.util.NLS;
  * @since 1.11
  */
 public final class MultiFixMessages extends NLS {
-    private static final String BUNDLE_NAME= "org.autorefactor.jdt.internal.ui.fix.MultiFixMessages"; //$NON-NLS-1$
+    private static final String BUNDLE_NAME= "org.autorefactor.jdt.internal.ui.fix.MultiFixMessages"; //$NON-NLS-1$ $NON-NLS-1$
 
     private MultiFixMessages() {
     }

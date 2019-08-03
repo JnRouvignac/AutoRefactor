@@ -28,10 +28,10 @@ package org.autorefactor.preferences;
 /** Interface holding preference constants. */
 public enum PreferenceConstants {
     /** Preference that turns debug mode on or off. */
-    DEBUG_MODE_ON("debug_mode_on", "Enable debug mode (for developers)", Boolean.FALSE);
+    DEBUG_MODE_ON("debug_mode_on", "Enable debug mode (for developers)", Boolean.FALSE); //$NON-NLS-1$ $NON-NLS-2$
 
     /** TODO use this for preferences initialization. */
-    private static final String JDT_ALWAYS_USE_THIS_FOR_NON_STATIC_METHOD_ACCESS= "cleanup.always_use_this_for_non_static_method_access";
+    private static final String JDT_ALWAYS_USE_THIS_FOR_NON_STATIC_METHOD_ACCESS= "cleanup.always_use_this_for_non_static_method_access"; //$NON-NLS-1$
 
     /** The preference name (not shown to the user). */
     private final String name;

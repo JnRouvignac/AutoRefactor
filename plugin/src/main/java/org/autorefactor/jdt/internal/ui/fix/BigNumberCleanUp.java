@@ -95,19 +95,19 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
         if (hasType(typeBinding, BigDecimal.class.getCanonicalName(), BigInteger.class.getCanonicalName()) && arguments(node).size() == 1) {
             final Expression arg0= arguments(node).get(0);
             if (arg0 instanceof NumberLiteral && hasType(typeBinding, BigDecimal.class.getCanonicalName())) {
-                final String token= ((NumberLiteral) arg0).getToken().replaceFirst("[lLfFdD]$", "");
-                if (token.contains(".")) {
+                final String token= ((NumberLiteral) arg0).getToken().replaceFirst("[lLfFdD]$", ""); //$NON-NLS-1$ $NON-NLS-2$
+                if (token.contains(".")) { //$NON-NLS-1$
                     // Only instantiation from double, not from integer
                     ctx.getRefactorings().replace(arg0, getStringLiteral(token));
                     return false;
                 } else if (getJavaMinorVersion() < 5) {
                     return true;
                 } else if (ZERO_LONG_LITERAL_RE.matcher(token).matches()) {
-                    return replaceWithQualifiedName(node, typeBinding, "ZERO");
+                    return replaceWithQualifiedName(node, typeBinding, "ZERO"); //$NON-NLS-1$
                 } else if (ONE_LONG_LITERAL_RE.matcher(token).matches()) {
-                    return replaceWithQualifiedName(node, typeBinding, "ONE");
+                    return replaceWithQualifiedName(node, typeBinding, "ONE"); //$NON-NLS-1$
                 } else if (TEN_LONG_LITERAL_RE.matcher(token).matches()) {
-                    return replaceWithQualifiedName(node, typeBinding, "TEN");
+                    return replaceWithQualifiedName(node, typeBinding, "TEN"); //$NON-NLS-1$
                 } else {
                     ctx.getRefactorings().replace(node, getValueOf(typeBinding.getName(), token));
                     return false;
@@ -116,14 +116,14 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
                 if (getJavaMinorVersion() < 5) {
                     return true;
                 }
-                final String literalValue= ((StringLiteral) arg0).getLiteralValue().replaceFirst("[lLfFdD]$", "");
-                if (literalValue.matches("0+")) {
-                    return replaceWithQualifiedName(node, typeBinding, "ZERO");
-                } else if (literalValue.matches("0+1")) {
-                    return replaceWithQualifiedName(node, typeBinding, "ONE");
-                } else if (literalValue.matches("0+10")) {
-                    return replaceWithQualifiedName(node, typeBinding, "TEN");
-                } else if (literalValue.matches("\\d+")) {
+                final String literalValue= ((StringLiteral) arg0).getLiteralValue().replaceFirst("[lLfFdD]$", ""); //$NON-NLS-1$ $NON-NLS-2$
+                if (literalValue.matches("0+")) { //$NON-NLS-1$
+                    return replaceWithQualifiedName(node, typeBinding, "ZERO"); //$NON-NLS-1$
+                } else if (literalValue.matches("0+1")) { //$NON-NLS-1$
+                    return replaceWithQualifiedName(node, typeBinding, "ONE"); //$NON-NLS-1$
+                } else if (literalValue.matches("0+10")) { //$NON-NLS-1$
+                    return replaceWithQualifiedName(node, typeBinding, "TEN"); //$NON-NLS-1$
+                } else if (literalValue.matches("\\d+")) { //$NON-NLS-1$
                     this.ctx.getRefactorings().replace(node, getValueOf(typeBinding.getName(), literalValue));
                     return false;
                 }
@@ -139,7 +139,7 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
 
     private ASTNode getValueOf(String name, String numberLiteral) {
         final ASTBuilder b= this.ctx.getASTBuilder();
-        return b.invoke(name, "valueOf", b.number(numberLiteral));
+        return b.invoke(name, "valueOf", b.number(numberLiteral)); //$NON-NLS-1$
     }
 
     private StringLiteral getStringLiteral(String numberLiteral) {
@@ -157,22 +157,22 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
         if (node.getExpression() == null) {
             return true;
         }
-        if (getJavaMinorVersion() >= 5 && (isMethod(node, BigInteger.class.getCanonicalName(), "valueOf", long.class.getSimpleName())
-                || isMethod(node, BigDecimal.class.getCanonicalName(), "valueOf", long.class.getSimpleName())
-                || isMethod(node, BigDecimal.class.getCanonicalName(), "valueOf", double.class.getSimpleName()))) {
+        if (getJavaMinorVersion() >= 5 && (isMethod(node, BigInteger.class.getCanonicalName(), "valueOf", long.class.getSimpleName()) //$NON-NLS-1$
+                || isMethod(node, BigDecimal.class.getCanonicalName(), "valueOf", long.class.getSimpleName()) //$NON-NLS-1$
+                || isMethod(node, BigDecimal.class.getCanonicalName(), "valueOf", double.class.getSimpleName()))) { //$NON-NLS-1$
             final ITypeBinding typeBinding= node.getExpression().resolveTypeBinding();
             final Expression arg0= arg0(node);
             if (arg0 instanceof NumberLiteral) {
-                final String token= ((NumberLiteral) arg0).getToken().replaceFirst("[lLfFdD]$", "");
-                if (token.contains(".") && hasType(typeBinding, BigDecimal.class.getCanonicalName())) {
+                final String token= ((NumberLiteral) arg0).getToken().replaceFirst("[lLfFdD]$", ""); //$NON-NLS-1$ $NON-NLS-2$
+                if (token.contains(".") && hasType(typeBinding, BigDecimal.class.getCanonicalName())) { //$NON-NLS-1$
                     this.ctx.getRefactorings().replace(node,
                             getClassInstanceCreatorNode((Name) node.getExpression(), token));
                 } else if (ZERO_LONG_LITERAL_RE.matcher(token).matches()) {
-                    replaceWithQualifiedName(node, typeBinding, "ZERO");
+                    replaceWithQualifiedName(node, typeBinding, "ZERO"); //$NON-NLS-1$
                 } else if (ONE_LONG_LITERAL_RE.matcher(token).matches()) {
-                    replaceWithQualifiedName(node, typeBinding, "ONE");
+                    replaceWithQualifiedName(node, typeBinding, "ONE"); //$NON-NLS-1$
                 } else if (TEN_LONG_LITERAL_RE.matcher(token).matches()) {
-                    replaceWithQualifiedName(node, typeBinding, "TEN");
+                    replaceWithQualifiedName(node, typeBinding, "TEN"); //$NON-NLS-1$
                 } else {
                     return true;
                 }
@@ -186,8 +186,8 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
     }
 
     private boolean maybeReplaceEquals(final boolean isPositive, final Expression node, final MethodInvocation mi) {
-        if (isMethod(mi, BigDecimal.class.getCanonicalName(), "equals", Object.class.getCanonicalName())
-                || isMethod(mi, BigInteger.class.getCanonicalName(), "equals", Object.class.getCanonicalName())) {
+        if (isMethod(mi, BigDecimal.class.getCanonicalName(), "equals", Object.class.getCanonicalName()) //$NON-NLS-1$
+                || isMethod(mi, BigInteger.class.getCanonicalName(), "equals", Object.class.getCanonicalName())) { //$NON-NLS-1$
             final Expression arg0= arg0(mi);
             if (hasType(arg0, BigDecimal.class.getCanonicalName(), BigInteger.class.getCanonicalName())) {
                 if (isInStringAppend(mi.getParent())) {
@@ -223,7 +223,7 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
 
     private InfixExpression getCompareToNode(final boolean isPositive, final MethodInvocation node) {
         final ASTBuilder b= this.ctx.getASTBuilder();
-        final MethodInvocation mi= b.invoke(b.copy(node.getExpression()), "compareTo", b.copy(arg0(node)));
+        final MethodInvocation mi= b.invoke(b.copy(node.getExpression()), "compareTo", b.copy(arg0(node))); //$NON-NLS-1$
 
         return b.infixExpr(mi, isPositive ? EQUALS : NOT_EQUALS, b.int0(0));
     }

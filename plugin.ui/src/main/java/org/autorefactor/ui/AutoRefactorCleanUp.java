@@ -42,7 +42,7 @@ import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 
 /** AutoRefactorCleanUp. */
 public class AutoRefactorCleanUp implements ICleanUp {
-    private static final String KEY= "org.autorefactor.ui.autorefactor_clean_up";
+    private static final String KEY= "org.autorefactor.ui.autorefactor_clean_up"; //$NON-NLS-1$
 
     private CleanUpOptions fOptions;
 
@@ -80,7 +80,7 @@ public class AutoRefactorCleanUp implements ICleanUp {
      */
     public String[] getStepDescriptions() {
         if (fOptions.isEnabled(KEY)) {
-            return new String[] { "AutoRefactor (only 1 pass)" };
+            return new String[] { "AutoRefactor (only 1 pass)" }; //$NON-NLS-1$
         } else {
             return new String[0];
         }

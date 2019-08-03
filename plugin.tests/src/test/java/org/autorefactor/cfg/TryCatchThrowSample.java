@@ -40,7 +40,7 @@ public class TryCatchThrowSample {
                 throw new RuntimeException();
             }
             {
-                result = new String(by, "UTF-8");
+                result = new String(by, "UTF-8"); //$NON-NLS-1$
             }
             by[0] = 0;
         } catch (IllegalStateException e) {

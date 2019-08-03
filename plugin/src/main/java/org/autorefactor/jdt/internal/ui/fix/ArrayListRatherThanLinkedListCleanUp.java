@@ -110,24 +110,24 @@ public class ArrayListRatherThanLinkedListCleanUp extends AbstractClassSubstitut
     @Override
     protected boolean canMethodBeRefactored(MethodInvocation mi, List<MethodInvocation> methodCallsToRefactor) {
         final String argumentType= getArgumentType(mi);
-        return isMethod(mi, Collection.class.getCanonicalName(), "add", Object.class.getCanonicalName())
-                || isMethod(mi, Collection.class.getCanonicalName(), "addAll", Collection.class.getCanonicalName())
-                || isMethod(mi, Collection.class.getCanonicalName(), "clear")
-                || isMethod(mi, Collection.class.getCanonicalName(), "contains", Object.class.getCanonicalName())
-                || isMethod(mi, Collection.class.getCanonicalName(), "containsAll", Collection.class.getCanonicalName())
-                || isMethod(mi, Object.class.getCanonicalName(), "equals", Object.class.getCanonicalName())
-                || isMethod(mi, List.class.getCanonicalName(), "get", int.class.getSimpleName()) || isMethod(mi, Object.class.getCanonicalName(), "hashCode")
-                || isMethod(mi, List.class.getCanonicalName(), "indexOf", Object.class.getCanonicalName())
-                || isMethod(mi, List.class.getCanonicalName(), "lastIndexOf", Object.class.getCanonicalName())
-                || isMethod(mi, Collection.class.getCanonicalName(), "size")
-                || isMethod(mi, List.class.getCanonicalName(), "subList", int.class.getSimpleName(), int.class.getSimpleName())
-                || isMethod(mi, Collection.class.getCanonicalName(), "toArray")
-                || isMethod(mi, Collection.class.getCanonicalName(), "toArray", argumentType + "[]")
-                || isMethod(mi, Collection.class.getCanonicalName(), "isEmpty") || isMethod(mi, Object.class.getCanonicalName(), "toString")
-                || isMethod(mi, Object.class.getCanonicalName(), "finalize") || isMethod(mi, Object.class.getCanonicalName(), "notify")
-                || isMethod(mi, Object.class.getCanonicalName(), "notifyAll") || isMethod(mi, Object.class.getCanonicalName(), "wait")
-                || isMethod(mi, Object.class.getCanonicalName(), "wait", long.class.getSimpleName())
-                || isMethod(mi, Object.class.getCanonicalName(), "wait", long.class.getSimpleName(), int.class.getSimpleName());
+        return isMethod(mi, Collection.class.getCanonicalName(), "add", Object.class.getCanonicalName()) //$NON-NLS-1$
+                || isMethod(mi, Collection.class.getCanonicalName(), "addAll", Collection.class.getCanonicalName()) //$NON-NLS-1$
+                || isMethod(mi, Collection.class.getCanonicalName(), "clear") //$NON-NLS-1$
+                || isMethod(mi, Collection.class.getCanonicalName(), "contains", Object.class.getCanonicalName()) //$NON-NLS-1$
+                || isMethod(mi, Collection.class.getCanonicalName(), "containsAll", Collection.class.getCanonicalName()) //$NON-NLS-1$
+                || isMethod(mi, Object.class.getCanonicalName(), "equals", Object.class.getCanonicalName()) //$NON-NLS-1$
+                || isMethod(mi, List.class.getCanonicalName(), "get", int.class.getSimpleName()) || isMethod(mi, Object.class.getCanonicalName(), "hashCode") //$NON-NLS-1$ $NON-NLS-2$
+                || isMethod(mi, List.class.getCanonicalName(), "indexOf", Object.class.getCanonicalName()) //$NON-NLS-1$
+                || isMethod(mi, List.class.getCanonicalName(), "lastIndexOf", Object.class.getCanonicalName()) //$NON-NLS-1$
+                || isMethod(mi, Collection.class.getCanonicalName(), "size") //$NON-NLS-1$
+                || isMethod(mi, List.class.getCanonicalName(), "subList", int.class.getSimpleName(), int.class.getSimpleName()) //$NON-NLS-1$
+                || isMethod(mi, Collection.class.getCanonicalName(), "toArray") //$NON-NLS-1$
+                || isMethod(mi, Collection.class.getCanonicalName(), "toArray", argumentType + "[]") //$NON-NLS-1$ $NON-NLS-2$
+                || isMethod(mi, Collection.class.getCanonicalName(), "isEmpty") || isMethod(mi, Object.class.getCanonicalName(), "toString") //$NON-NLS-1$ $NON-NLS-2$
+                || isMethod(mi, Object.class.getCanonicalName(), "finalize") || isMethod(mi, Object.class.getCanonicalName(), "notify") //$NON-NLS-1$ $NON-NLS-2$
+                || isMethod(mi, Object.class.getCanonicalName(), "notifyAll") || isMethod(mi, Object.class.getCanonicalName(), "wait") //$NON-NLS-1$ $NON-NLS-2$
+                || isMethod(mi, Object.class.getCanonicalName(), "wait", long.class.getSimpleName()) //$NON-NLS-1$
+                || isMethod(mi, Object.class.getCanonicalName(), "wait", long.class.getSimpleName(), int.class.getSimpleName()); //$NON-NLS-1$
     }
 
     @Override

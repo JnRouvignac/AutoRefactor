@@ -108,7 +108,7 @@ public class MapCleanUp extends AbstractCleanUpRule {
         @Override
         public boolean visit(ExpressionStatement node) {
             final MethodInvocation mi= asExpression(node, MethodInvocation.class);
-            if (isMethod(mi, Map.class.getCanonicalName(), "putAll", Map.class.getCanonicalName())) {
+            if (isMethod(mi, Map.class.getCanonicalName(), "putAll", Map.class.getCanonicalName())) { //$NON-NLS-1$
                 final Expression arg0= arg0(mi);
                 final Statement previousStmt= getPreviousSibling(node);
 
@@ -165,7 +165,7 @@ public class MapCleanUp extends AbstractCleanUpRule {
                 if (constant != null) {
                     return constant.equals(0);
                 } else {
-                    return isMethod(mi, Map.class.getCanonicalName(), "size") && match(mi.getExpression(), sourceMap);
+                    return isMethod(mi, Map.class.getCanonicalName(), "size") && match(mi.getExpression(), sourceMap); //$NON-NLS-1$
                 }
             }
             return false;

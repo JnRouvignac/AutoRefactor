@@ -93,8 +93,8 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
 
         @Override
         public String toString() {
-            return constantValues.size() == 1 ? name + " = " + constantValues.get(0)
-                    : name + " = one of " + constantValues;
+            return constantValues.size() == 1 ? name + " = " + constantValues.get(0) //$NON-NLS-1$
+                    : name + " = one of " + constantValues; //$NON-NLS-1$
         }
     }
 
@@ -155,15 +155,15 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
         public String toString() {
             final StringBuilder sb= new StringBuilder();
             for (Expression expr : constantExprs) {
-                sb.append("new case ").append(expr).append(":\n");
+                sb.append("new case ").append(expr).append(":\n"); //$NON-NLS-1$ $NON-NLS-2$
             }
             for (SwitchCase existingCase : existingCases) {
-                sb.append("existing case ").append(existingCase.getExpression()).append(":\n");
+                sb.append("existing case ").append(existingCase.getExpression()).append(":\n"); //$NON-NLS-1$ $NON-NLS-2$
             }
             for (Statement stmt : stmts) {
-                sb.append("    ").append(stmt);
+                sb.append("    ").append(stmt); //$NON-NLS-1$
             }
-            sb.append("    break; // not needed if previous statement breaks control flow");
+            sb.append("    break; // not needed if previous statement breaks control flow"); //$NON-NLS-1$
             return sb.toString();
         }
     }
@@ -315,7 +315,7 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
             for (final Expression expr : sourceCase.constantExprs) {
                 final Object constantValue= expr.resolveConstantExpressionValue();
                 if (constantValue == null) {
-                    throw new NotImplementedException(expr, "Cannot handle non constant expressions");
+                    throw new NotImplementedException(expr, "Cannot handle non constant expressions"); //$NON-NLS-1$
                 }
                 if (alreadyProccessedValues.add(constantValue)) {
                     // this is a new value (never seen before)

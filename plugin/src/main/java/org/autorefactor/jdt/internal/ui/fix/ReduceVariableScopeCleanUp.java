@@ -86,7 +86,7 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
      * @return the name.
      */
     public String getName() {
-        return "Reduce scope of variable";
+        return "Reduce scope of variable"; //$NON-NLS-1$
     }
 
     /**
@@ -95,7 +95,7 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
      * @return the description.
      */
     public String getDescription() {
-        return "Reduces the scope of local variables.";
+        return "Reduces the scope of local variables."; //$NON-NLS-1$
     }
 
     /**
@@ -104,7 +104,7 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
      * @return the reason.
      */
     public String getReason() {
-        return "It reduces the reading and debugging cost.";
+        return "It reduces the reading and debugging cost."; //$NON-NLS-1$
     }
 
     private static final int DECL= 1 << 0;
@@ -161,7 +161,7 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
 
         public VariableAccess(Name variableName, int accessType, ASTNode scope) {
             if (accessType == 0) {
-                throw new IllegalArgumentException(null, "accessType must not be null");
+                throw new IllegalArgumentException(null, "accessType must not be null"); //$NON-NLS-1$
             }
             this.variableName= variableName;
             this.accessType= accessType;
@@ -184,21 +184,21 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
         public String toString() {
             final StringBuilder sb= new StringBuilder();
             if ((this.accessType & DECL) != 0) {
-                sb.append("DECL");
+                sb.append("DECL"); //$NON-NLS-1$
             }
             if ((this.accessType & READ) != 0) {
                 if (sb.length() > 0) {
-                    sb.append(" | ");
+                    sb.append(" | "); //$NON-NLS-1$
                 }
-                sb.append("READ");
+                sb.append("READ"); //$NON-NLS-1$
             }
             if ((this.accessType & WRITE) != 0) {
                 if (sb.length() > 0) {
-                    sb.append(" | ");
+                    sb.append(" | "); //$NON-NLS-1$
                 }
-                sb.append("WRITE");
+                sb.append("WRITE"); //$NON-NLS-1$
             }
-            sb.append("\n");
+            sb.append("\n"); //$NON-NLS-1$
             sb.append(scope);
             return sb.toString();
         }
@@ -341,7 +341,7 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
                 // newFs.setBody(copy(fs.getBody()));
                 // }
             } else {
-                throw new NotImplementedException(scope, "for more than one initializer in for loop.");
+                throw new NotImplementedException(scope, "for more than one initializer in for loop."); //$NON-NLS-1$
             }
         } else if (scope instanceof WhileStatement) {
             final WhileStatement ws= (WhileStatement) scope;
@@ -371,7 +371,7 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
                 this.ctx.getRefactorings().replace(is, newIs);
             } else {
                 throw new IllegalStateException(is,
-                        "Parent statement should be inside the then or else statement of this if statement: " + is);
+                        "Parent statement should be inside the then or else statement of this if statement: " + is); //$NON-NLS-1$
             }
         } else {
             throw new NotImplementedException(scope);

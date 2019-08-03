@@ -55,7 +55,7 @@ public class ChooseRefactoringsWizard extends Wizard {
 
     @Override
     public String getWindowTitle() {
-        return "Choose refactorings...";
+        return "Choose refactorings..."; //$NON-NLS-1$
     }
 
     @Override

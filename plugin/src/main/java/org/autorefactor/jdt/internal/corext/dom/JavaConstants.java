@@ -39,55 +39,55 @@ public interface JavaConstants {
      *      "http://docs.oracle.com/javase/7/docs/technotes/guides/language/underscores-literals.html">
      *      Underscores in Numeric Literals</a>
      */
-    String INTEGER_LITERAL_COMPATIBLE_PATTERN= "" + "(?:"
+    String INTEGER_LITERAL_COMPATIBLE_PATTERN= "" + "(?:" //$NON-NLS-1$ $NON-NLS-2$
     // binary literal
-            + "(?:0b|0B)(?:[0-1][0-1_]*)?[0-1]" + ")|(?:"
+            + "(?:0b|0B)(?:[0-1][0-1_]*)?[0-1]" + ")|(?:" //$NON-NLS-1$ $NON-NLS-2$
             // octal literal
-            + "0(?:[0-7_]*)?[0-7]" + ")|(?:"
+            + "0(?:[0-7_]*)?[0-7]" + ")|(?:" //$NON-NLS-1$ $NON-NLS-2$
             // decimal literal
-            + "[0-9]([0-9_]*[0-9])?" + ")|(?:"
+            + "[0-9]([0-9_]*[0-9])?" + ")|(?:" //$NON-NLS-1$ $NON-NLS-2$
             // hexadecimal literal
-            + "(?:0x|0X)([0-9a-fA-F][0-9a-fA-F_]*)?[0-9a-fA-F]" + ")";
+            + "(?:0x|0X)([0-9a-fA-F][0-9a-fA-F_]*)?[0-9a-fA-F]" + ")"; //$NON-NLS-1$ $NON-NLS-2$
 
     /** Pattern identifying number literal for an integer. */
     Pattern INTEGER_LITERAL_COMPATIBLE_RE= Pattern.compile(INTEGER_LITERAL_COMPATIBLE_PATTERN);
 
     /** String pattern identifying number literal for a long. */
-    String LONG_LITERAL_COMPATIBLE_PATTERN= "" + ("(?:" + INTEGER_LITERAL_COMPATIBLE_PATTERN + ")(?:l|L)?");
+    String LONG_LITERAL_COMPATIBLE_PATTERN= "" + ("(?:" + INTEGER_LITERAL_COMPATIBLE_PATTERN + ")(?:l|L)?"); //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
 
     /** Pattern identifying number literal for a long. */
     Pattern LONG_LITERAL_COMPATIBLE_RE= Pattern.compile(LONG_LITERAL_COMPATIBLE_PATTERN);
 
     /** Pattern identifying number literal for long "0". */
-    Pattern ZERO_LONG_LITERAL_RE= Pattern.compile("(?:" + "(?:"
+    Pattern ZERO_LONG_LITERAL_RE= Pattern.compile("(?:" + "(?:" //$NON-NLS-1$ $NON-NLS-2$
     // binary literal
-            + "(?:0b|0B)(?:0[0_]*)?0" + ")|(?:"
+            + "(?:0b|0B)(?:0[0_]*)?0" + ")|(?:" //$NON-NLS-1$ $NON-NLS-2$
             // octal literal
-            + "0[0_]*0" + ")|(?:"
+            + "0[0_]*0" + ")|(?:" //$NON-NLS-1$ $NON-NLS-2$
             // decimal literal
-            + "0(?:[0_]*0)?" + ")|(?:"
+            + "0(?:[0_]*0)?" + ")|(?:" //$NON-NLS-1$ $NON-NLS-2$
             // hexadecimal literal
-            + "(?:0x|0X)(?:0[0_]*)?0" + ")" + ")(?:l|L)?");
+            + "(?:0x|0X)(?:0[0_]*)?0" + ")" + ")(?:l|L)?"); //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
 
     /** Pattern identifying number literal for long "1". */
-    Pattern ONE_LONG_LITERAL_RE= Pattern.compile("(?:" + "(?:"
+    Pattern ONE_LONG_LITERAL_RE= Pattern.compile("(?:" + "(?:" //$NON-NLS-1$ $NON-NLS-2$
     // binary literal
-            + "(?:0b|0B)(?:0[0_]*)?1" + ")|(?:"
+            + "(?:0b|0B)(?:0[0_]*)?1" + ")|(?:" //$NON-NLS-1$ $NON-NLS-2$
             // octal literal
-            + "0[0_]*1" + ")|(?:"
+            + "0[0_]*1" + ")|(?:" //$NON-NLS-1$ $NON-NLS-2$
             // decimal literal
-            + "1" + ")|(?:"
+            + "1" + ")|(?:" //$NON-NLS-1$ $NON-NLS-2$
             // hexadecimal literal
-            + "(?:0x|0X)(?:0[0_]*)?1" + ")" + ")(?:l|L)?");
+            + "(?:0x|0X)(?:0[0_]*)?1" + ")" + ")(?:l|L)?"); //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
 
     /** Pattern identifying number literal for long "10". */
-    Pattern TEN_LONG_LITERAL_RE= Pattern.compile("(?:" + "(?:"
+    Pattern TEN_LONG_LITERAL_RE= Pattern.compile("(?:" + "(?:" //$NON-NLS-1$ $NON-NLS-2$
     // binary literal
-            + "(?:0b|0B)(?:0[0_]*)?1_*0_*1_*0" + ")|(?:"
+            + "(?:0b|0B)(?:0[0_]*)?1_*0_*1_*0" + ")|(?:" //$NON-NLS-1$ $NON-NLS-2$
             // octal literal
-            + "0[0_]*1_*3" + ")|(?:"
+            + "0[0_]*1_*3" + ")|(?:" //$NON-NLS-1$ $NON-NLS-2$
             // decimal literal
-            + "1_*0" + ")|(?:"
+            + "1_*0" + ")|(?:" //$NON-NLS-1$ $NON-NLS-2$
             // hexadecimal literal
-            + "(?:0x|0X)(?:0[0_]*)?(?:a|A)" + ")" + ")(?:l|L)?");
+            + "(?:0x|0X)(?:0[0_]*)?(?:a|A)" + ")" + ")(?:l|L)?"); //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
 }

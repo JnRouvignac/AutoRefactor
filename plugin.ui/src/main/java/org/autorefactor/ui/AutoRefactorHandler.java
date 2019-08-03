@@ -88,7 +88,7 @@ public class AutoRefactorHandler extends AbstractHandler {
             PrintWriter pw= new PrintWriter(sw);
             e.printStackTrace(pw);
 
-            showMessage(shell, "An error has occurred:\n\n" + sw);
+            showMessage(shell, "An error has occurred:\n\n" + sw); //$NON-NLS-1$
         }
 
         // TODO JNR provide a maven plugin
@@ -111,15 +111,15 @@ public class AutoRefactorHandler extends AbstractHandler {
     static List<IJavaElement> getSelectedJavaElements(ExecutionEvent event) {
         final Shell shell= HandlerUtil.getActiveShell(event);
         final String activePartId= HandlerUtil.getActivePartId(event);
-        if ("org.eclipse.jdt.ui.CompilationUnitEditor".equals(activePartId)
-                || "com.google.gwt.eclipse.core.editors.gwtJavaEditor".equals(activePartId)
-                || "com.google.gwt.eclipse.core.editors.java.GWTJavaEditor".equals(activePartId)) {
+        if ("org.eclipse.jdt.ui.CompilationUnitEditor".equals(activePartId) //$NON-NLS-1$
+                || "com.google.gwt.eclipse.core.editors.gwtJavaEditor".equals(activePartId) //$NON-NLS-1$
+                || "com.google.gwt.eclipse.core.editors.java.GWTJavaEditor".equals(activePartId)) { //$NON-NLS-1$
             return getSelectedJavaElements(shell, HandlerUtil.getActiveEditor(event));
-        } else if ("org.eclipse.jdt.ui.PackageExplorer".equals(activePartId)
-                || "org.eclipse.ui.navigator.ProjectExplorer".equals(activePartId)) {
+        } else if ("org.eclipse.jdt.ui.PackageExplorer".equals(activePartId) //$NON-NLS-1$
+                || "org.eclipse.ui.navigator.ProjectExplorer".equals(activePartId)) { //$NON-NLS-1$
             return getSelectedJavaElements(shell, (IStructuredSelection) HandlerUtil.getCurrentSelection(event));
         } else {
-            getEnvironment().getLogger().warn("Code is not implemented for activePartId '" + activePartId + "'.");
+            getEnvironment().getLogger().warn("Code is not implemented for activePartId '" + activePartId + "'."); //$NON-NLS-1$ $NON-NLS-2$
             return Collections.emptyList();
         }
     }
@@ -143,7 +143,7 @@ public class AutoRefactorHandler extends AbstractHandler {
         }
 
         if (!goodSelection) {
-            showMessage(shell, "Please select a Java source file, Java package or Java project");
+            showMessage(shell, "Please select a Java source file, Java package or Java project"); //$NON-NLS-1$
         }
 
         return results;
@@ -163,7 +163,7 @@ public class AutoRefactorHandler extends AbstractHandler {
         if (javaElement instanceof ICompilationUnit) {
             return Collections.singletonList(javaElement);
         }
-        showMessage(shell, "This action only works on Java source files");
+        showMessage(shell, "This action only works on Java source files"); //$NON-NLS-1$
         return Collections.emptyList();
     }
 
@@ -173,7 +173,7 @@ public class AutoRefactorHandler extends AbstractHandler {
              * Run.
              */
             public void run() {
-                openInformation(shell, "Info", message);
+                openInformation(shell, "Info", message); //$NON-NLS-1$
             }
         });
     }

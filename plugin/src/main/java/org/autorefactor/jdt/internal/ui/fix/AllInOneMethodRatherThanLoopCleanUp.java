@@ -155,9 +155,9 @@ public class AllInOneMethodRatherThanLoopCleanUp extends NewClassImportCleanUp {
         ASTBuilder b= ctx.getASTBuilder();
         ctx.getRefactorings().replace(node,
                 b.toStmt(b.invoke(
-                        classesToUseWithImport.contains(Collections.class.getCanonicalName()) ? b.name("Collections")
-                                : b.name("java", "util", "Collections"),
-                        "addAll", mi.getExpression() != null ? b.copy(mi.getExpression()) : b.this0(),
+                        classesToUseWithImport.contains(Collections.class.getCanonicalName()) ? b.name("Collections") //$NON-NLS-1$
+                                : b.name("java", "util", "Collections"), //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
+                        "addAll", mi.getExpression() != null ? b.copy(mi.getExpression()) : b.this0(), //$NON-NLS-1$
                         b.copy(iterable))));
     }
 
@@ -209,7 +209,7 @@ public class AllInOneMethodRatherThanLoopCleanUp extends NewClassImportCleanUp {
 
     private boolean maybeReplaceForArray(final Statement node, final Set<String> classesToUseWithImport,
             final Set<String> importsToAdd, final Expression iterable, final MethodInvocation mi) {
-        if (isMethod(mi, Collection.class.getCanonicalName(), "add", Object.class.getCanonicalName())
+        if (isMethod(mi, Collection.class.getCanonicalName(), "add", Object.class.getCanonicalName()) //$NON-NLS-1$
                 && areTypeCompatible(getCalledType(mi), iterable.resolveTypeBinding())) {
             replaceWithCollectionsAddAll(node, iterable, mi, classesToUseWithImport);
             importsToAdd.add(Collections.class.getCanonicalName());
@@ -250,11 +250,11 @@ public class AllInOneMethodRatherThanLoopCleanUp extends NewClassImportCleanUp {
 
     private boolean maybeReplaceForCollection(final ASTNode node, final MethodInvocation colMI,
             final Expression data) {
-        if (isMethod(colMI, Collection.class.getCanonicalName(), "add", Object.class.getCanonicalName())) {
-            replaceWithCollectionMethod(node, "addAll", colMI.getExpression(), data);
+        if (isMethod(colMI, Collection.class.getCanonicalName(), "add", Object.class.getCanonicalName())) { //$NON-NLS-1$
+            replaceWithCollectionMethod(node, "addAll", colMI.getExpression(), data); //$NON-NLS-1$
             return false;
-        } else if (isMethod(colMI, Set.class.getCanonicalName(), "remove", Object.class.getCanonicalName())) {
-            replaceWithCollectionMethod(node, "removeAll", colMI.getExpression(), data);
+        } else if (isMethod(colMI, Set.class.getCanonicalName(), "remove", Object.class.getCanonicalName())) { //$NON-NLS-1$
+            replaceWithCollectionMethod(node, "removeAll", colMI.getExpression(), data); //$NON-NLS-1$
             return false;
         }
 
@@ -262,7 +262,7 @@ public class AllInOneMethodRatherThanLoopCleanUp extends NewClassImportCleanUp {
     }
 
     private boolean isSameVariable(final ForLoopContent loopContent, final MethodInvocation getMI) {
-        return isMethod(getMI, List.class.getCanonicalName(), "get", int.class.getSimpleName()) && getMI.getExpression() instanceof Name
+        return isMethod(getMI, List.class.getCanonicalName(), "get", int.class.getSimpleName()) && getMI.getExpression() instanceof Name //$NON-NLS-1$
                 && isSameLocalVariable(arg0(getMI), loopContent.getLoopVariable());
     }
 

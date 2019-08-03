@@ -62,7 +62,7 @@ public class RemoveStupidIdiomaticPatternCleanUp extends AbstractCleanUpRule {
      * @return the name.
      */
     public String getName() {
-        return "Try statement then return";
+        return "Try statement then return"; //$NON-NLS-1$
     }
 
     /**
@@ -71,7 +71,7 @@ public class RemoveStupidIdiomaticPatternCleanUp extends AbstractCleanUpRule {
      * @return the description.
      */
     public String getDescription() {
-        return "Refactors to a proper use of try statements and return statements.";
+        return "Refactors to a proper use of try statements and return statements."; //$NON-NLS-1$
     }
 
     /**
@@ -80,8 +80,8 @@ public class RemoveStupidIdiomaticPatternCleanUp extends AbstractCleanUpRule {
      * @return the reason.
      */
     public String getReason() {
-        return "It reduces code to focus attention on code that matters."
-                + " It also improves the time and space performance.";
+        return "It reduces code to focus attention on code that matters." //$NON-NLS-1$
+                + " It also improves the time and space performance."; //$NON-NLS-1$
     }
 
     // TODO JNR

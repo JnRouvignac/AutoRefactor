@@ -94,7 +94,7 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
     @Override
     public boolean visit(CastExpression node) {
         final NumberLiteral literal= as(node.getExpression(), NumberLiteral.class);
-        if (literal != null && (literal.getToken().matches(".*[^lLdDfF]") || literal.getToken().matches("0x.*[^lL]"))) {
+        if (literal != null && (literal.getToken().matches(".*[^lLdDfF]") || literal.getToken().matches("0x.*[^lL]"))) { //$NON-NLS-1$ $NON-NLS-2$
             if (hasType(node.getType().resolveBinding(), long.class.getSimpleName())) {
                 createPrimitive(node, literal, 'L');
                 return false;
@@ -226,7 +226,7 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
         } else if (double.class.getSimpleName().equals(name) || Double.class.getCanonicalName().equals(name)) {
             return 7;
         }
-        throw new NotImplementedException(null, "for type '" + name + "'");
+        throw new NotImplementedException(null, "for type '" + name + "'"); //$NON-NLS-1$ $NON-NLS-2$
     }
 
     private boolean isAnyRefactored(final List<Expression> operands) {

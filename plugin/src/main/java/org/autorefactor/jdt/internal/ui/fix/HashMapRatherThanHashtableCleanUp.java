@@ -114,7 +114,7 @@ public class HashMapRatherThanHashtableCleanUp extends AbstractClassSubstituteCl
     @Override
     protected boolean canMethodBeRefactored(final MethodInvocation mi,
             final List<MethodInvocation> methodCallsToRefactor) {
-        if (isMethod(mi, Hashtable.class.getCanonicalName(), "contains", Object.class.getCanonicalName())) {
+        if (isMethod(mi, Hashtable.class.getCanonicalName(), "contains", Object.class.getCanonicalName())) { //$NON-NLS-1$
             methodCallsToRefactor.add(mi);
         }
         return true;
@@ -123,7 +123,7 @@ public class HashMapRatherThanHashtableCleanUp extends AbstractClassSubstituteCl
     @Override
     protected void refactorMethod(final ASTBuilder b, final MethodInvocation originalMi,
             final MethodInvocation refactoredMi) {
-        refactoredMi.setName(b.simpleName("containsValue"));
+        refactoredMi.setName(b.simpleName("containsValue")); //$NON-NLS-1$
     }
 
     @Override

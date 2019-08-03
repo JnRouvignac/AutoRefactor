@@ -106,7 +106,7 @@ public class BracketsRatherThanArrayInstantiationCleanUp extends AbstractCleanUp
 
     private boolean isVoid(final ArrayCreation node) {
         @SuppressWarnings("unchecked")
-        final List<Expression> dimensions= (List<Expression>) node.dimensions();
+        final List<Expression> dimensions= node.dimensions();
 
         for (final Expression dimension : dimensions) {
             final Object dimensionLiteral= dimension.resolveConstantExpressionValue();

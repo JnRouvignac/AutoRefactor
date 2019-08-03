@@ -111,12 +111,12 @@ public class AutoRefactorTabPage extends CleanUpTabPage {
 
         Composite composite= new Composite(scrolledComposite, SWT.FILL);
         final Group ruleGroup= new Group(composite, SWT.FILL);
-        ruleGroup.setText("Rules by default");
+        ruleGroup.setText("Rules by default"); //$NON-NLS-1$
 
         // All rule checkbox
         toggleAllRules= new Button(ruleGroup, SWT.CHECK | SWT.LEFT);
         toggleAllRules.setFont(ruleGroup.getFont());
-        toggleAllRules.setText("Toggle all the rules");
+        toggleAllRules.setText("Toggle all the rules"); //$NON-NLS-1$
         toggleAllRules.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -213,7 +213,7 @@ public class AutoRefactorTabPage extends CleanUpTabPage {
      * @return String
      */
     public String getPreview() {
-        return "// no preview";
+        return "// no preview"; //$NON-NLS-1$
     }
 
     /**
@@ -270,7 +270,7 @@ public class AutoRefactorTabPage extends CleanUpTabPage {
      * @return the cleanup property name
      */
     public static String getCleanupPropertyName(final RefactoringRule refactoringRule) {
-        return refactoringRule.getClass().getCanonicalName() + ":cleanup";
+        return refactoringRule.getClass().getCanonicalName() + ":cleanup"; //$NON-NLS-1$
     }
 
     @Override

@@ -118,8 +118,8 @@ public class AndroidViewHolderCleanUp extends AbstractCleanUpRule {
     @Override
     public boolean visit(MethodDeclaration node) {
         Block body= node.getBody();
-        if (body != null && isMethod(node, "android.widget.Adapter", "getView", int.class.getSimpleName(), "android.view.View",
-                "android.view.ViewGroup")) {
+        if (body != null && isMethod(node, "android.widget.Adapter", "getView", int.class.getSimpleName(), "android.view.View", //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
+                "android.view.ViewGroup")) { //$NON-NLS-1$
             final GetViewVariableVisitor visitor= new GetViewVariableVisitor();
             body.accept(visitor);
             if (visitor.canApplyRefactoring()) {
@@ -141,7 +141,7 @@ public class AndroidViewHolderCleanUp extends AbstractCleanUpRule {
                 thenStmts.add(b.toStmt(b.assign(convertViewVar.varName(), ASSIGN, b.copy(visitor.getInflateExpr()))));
 
                 // assign to local view variable when necessary
-                if (!"convertView".equals(visitor.viewVariableName.getIdentifier())) {
+                if (!"convertView".equals(visitor.viewVariableName.getIdentifier())) { //$NON-NLS-1$
                     Statement assignConvertViewToView= null;
                     if (visitor.viewVariableDeclFragment != null) {
                         assignConvertViewToView= b.declareStmt(b.copyType(visitor.viewVariableName, typeNameDecider),
@@ -166,7 +166,7 @@ public class AndroidViewHolderCleanUp extends AbstractCleanUpRule {
                 body.accept(findViewByIdVisitor);
                 if (!findViewByIdVisitor.items.isEmpty()) {
                     // TODO JNR name conflict? Use VariableNameDecider
-                    Variable viewHolderItemVar= new Variable("ViewHolderItem", "viewHolderItem", b);
+                    Variable viewHolderItemVar= new Variable("ViewHolderItem", "viewHolderItem", b); //$NON-NLS-1$ $NON-NLS-2$
 
                     // create ViewHolderItem class
                     r.insertBefore(createViewHolderItemClass(findViewByIdVisitor, viewHolderItemVar.typeName(),
@@ -193,11 +193,11 @@ public class AndroidViewHolderCleanUp extends AbstractCleanUpRule {
                         r.replace(item.findViewByIdExpr, b.copy(fieldAccess));
                     }
                     // store viewHolderItem in convertView
-                    thenStmts.add(b.toStmt(b.invoke("convertView", "setTag", viewHolderItemVar.varName())));
+                    thenStmts.add(b.toStmt(b.invoke("convertView", "setTag", viewHolderItemVar.varName()))); //$NON-NLS-1$ $NON-NLS-2$
 
                     // retrieve viewHolderItem from convertView
                     ifStmt.setElseStatement(b.block(b.toStmt(b.assign(viewHolderItemVar.varName(), ASSIGN,
-                            b.cast(viewHolderItemVar.type(), b.invoke("convertView", "getTag"))))));
+                            b.cast(viewHolderItemVar.type(), b.invoke("convertView", "getTag")))))); //$NON-NLS-1$ $NON-NLS-2$
                 }
                 r.remove(visitor.viewAssignmentStmt);
                 return false;
@@ -297,12 +297,12 @@ public class AndroidViewHolderCleanUp extends AbstractCleanUpRule {
         }
 
         private boolean isInflateMethod(MethodInvocation node) {
-            final String inflaterType= "android.view.LayoutInflater";
-            final String viewGroupType= "android.view.ViewGroup";
-            return isMethod(node, inflaterType, "inflate", int.class.getSimpleName(), viewGroupType)
-                    || isMethod(node, inflaterType, "inflate", int.class.getSimpleName(), viewGroupType, boolean.class.getSimpleName())
-                    || isMethod(node, inflaterType, "inflate", "org.xmlpull.v1.XmlPullParser", viewGroupType)
-                    || isMethod(node, inflaterType, "inflate", "org.xmlpull.v1.XmlPullParser", viewGroupType,
+            final String inflaterType= "android.view.LayoutInflater"; //$NON-NLS-1$
+            final String viewGroupType= "android.view.ViewGroup"; //$NON-NLS-1$
+            return isMethod(node, inflaterType, "inflate", int.class.getSimpleName(), viewGroupType) //$NON-NLS-1$
+                    || isMethod(node, inflaterType, "inflate", int.class.getSimpleName(), viewGroupType, boolean.class.getSimpleName()) //$NON-NLS-1$
+                    || isMethod(node, inflaterType, "inflate", "org.xmlpull.v1.XmlPullParser", viewGroupType) //$NON-NLS-1$ $NON-NLS-2$
+                    || isMethod(node, inflaterType, "inflate", "org.xmlpull.v1.XmlPullParser", viewGroupType, //$NON-NLS-1$ $NON-NLS-2$
                             boolean.class.getSimpleName());
         }
     }
@@ -357,7 +357,7 @@ public class AndroidViewHolderCleanUp extends AbstractCleanUpRule {
 
         @Override
         public boolean visit(MethodInvocation node) {
-            if (isMethod(node, "android.view.View", "findViewById", int.class.getSimpleName())
+            if (isMethod(node, "android.view.View", "findViewById", int.class.getSimpleName()) //$NON-NLS-1$ $NON-NLS-2$
                     && isSameVariable(viewVariableName, node.getExpression())) {
                 FindViewByIdItem item= new FindViewByIdItem();
                 if (item.setAssignment(node)) {

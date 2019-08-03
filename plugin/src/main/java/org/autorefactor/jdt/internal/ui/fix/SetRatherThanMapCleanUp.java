@@ -175,23 +175,23 @@ public class SetRatherThanMapCleanUp extends AbstractClassSubstituteCleanUp {
     @Override
     protected boolean canMethodBeRefactored(final MethodInvocation mi,
             final List<MethodInvocation> methodCallsToRefactor) {
-        if (isMethod(mi, Map.class.getCanonicalName(), "clear") || isMethod(mi, Map.class.getCanonicalName(), "isEmpty")
-                || isMethod(mi, Map.class.getCanonicalName(), "size") || isMethod(mi, Object.class.getCanonicalName(), "finalize")
-                || isMethod(mi, Object.class.getCanonicalName(), "notify") || isMethod(mi, Object.class.getCanonicalName(), "notifyAll")
-                || isMethod(mi, Object.class.getCanonicalName(), "wait") || isMethod(mi, Object.class.getCanonicalName(), "wait", long.class.getSimpleName())
-                || isMethod(mi, Object.class.getCanonicalName(), "wait", long.class.getSimpleName(), int.class.getSimpleName())) {
+        if (isMethod(mi, Map.class.getCanonicalName(), "clear") || isMethod(mi, Map.class.getCanonicalName(), "isEmpty") //$NON-NLS-1$ $NON-NLS-2$
+                || isMethod(mi, Map.class.getCanonicalName(), "size") || isMethod(mi, Object.class.getCanonicalName(), "finalize") //$NON-NLS-1$ $NON-NLS-2$
+                || isMethod(mi, Object.class.getCanonicalName(), "notify") || isMethod(mi, Object.class.getCanonicalName(), "notifyAll") //$NON-NLS-1$ $NON-NLS-2$
+                || isMethod(mi, Object.class.getCanonicalName(), "wait") || isMethod(mi, Object.class.getCanonicalName(), "wait", long.class.getSimpleName()) //$NON-NLS-1$ $NON-NLS-2$
+                || isMethod(mi, Object.class.getCanonicalName(), "wait", long.class.getSimpleName(), int.class.getSimpleName())) { //$NON-NLS-1$
             return true;
-        } else if (isMethod(mi, Map.class.getCanonicalName(), "containsKey", Object.class.getCanonicalName())) {
+        } else if (isMethod(mi, Map.class.getCanonicalName(), "containsKey", Object.class.getCanonicalName())) { //$NON-NLS-1$
             methodCallsToRefactor.add(mi);
             return true;
-        } else if (isMethod(mi, Map.class.getCanonicalName(), "put", Object.class.getCanonicalName(), Object.class.getCanonicalName())) {
+        } else if (isMethod(mi, Map.class.getCanonicalName(), "put", Object.class.getCanonicalName(), Object.class.getCanonicalName())) { //$NON-NLS-1$
             if (isPassive((Expression) mi.arguments().get(1))) {
                 methodCallsToRefactor.add(mi);
                 return true;
             } else {
                 return false;
             }
-        } else if (isMethod(mi, Map.class.getCanonicalName(), "remove", Object.class.getCanonicalName())) {
+        } else if (isMethod(mi, Map.class.getCanonicalName(), "remove", Object.class.getCanonicalName())) { //$NON-NLS-1$
             return isReturnValueLost(mi);
         } else {
             // Here are the following cases:
@@ -220,10 +220,10 @@ public class SetRatherThanMapCleanUp extends AbstractClassSubstituteCleanUp {
     @Override
     protected void refactorMethod(final ASTBuilder b, final MethodInvocation originalMi,
             final MethodInvocation refactoredMi) {
-        if (isMethod(originalMi, Map.class.getCanonicalName(), "containsKey", Object.class.getCanonicalName())) {
-            refactoredMi.setName(b.simpleName("contains"));
-        } else if (isMethod(originalMi, Map.class.getCanonicalName(), "put", Object.class.getCanonicalName(), Object.class.getCanonicalName())) {
-            refactoredMi.setName(b.simpleName("add"));
+        if (isMethod(originalMi, Map.class.getCanonicalName(), "containsKey", Object.class.getCanonicalName())) { //$NON-NLS-1$
+            refactoredMi.setName(b.simpleName("contains")); //$NON-NLS-1$
+        } else if (isMethod(originalMi, Map.class.getCanonicalName(), "put", Object.class.getCanonicalName(), Object.class.getCanonicalName())) { //$NON-NLS-1$
+            refactoredMi.setName(b.simpleName("add")); //$NON-NLS-1$
             refactoredMi.arguments().remove(1);
         }
     }

@@ -113,23 +113,23 @@ public class HashMapRatherThanTreeMapCleanUp extends AbstractClassSubstituteClea
     @Override
     protected boolean canMethodBeRefactored(final MethodInvocation mi,
             final List<MethodInvocation> methodCallsToRefactor) {
-        return isMethod(mi, Map.class.getCanonicalName(), "clear")
-                || isMethod(mi, Map.class.getCanonicalName(), "containsKey", Object.class.getCanonicalName())
-                || isMethod(mi, Map.class.getCanonicalName(), "containsValue", Object.class.getCanonicalName())
-                || isMethod(mi, Map.class.getCanonicalName(), "get", Object.class.getCanonicalName())
-                || isMethod(mi, Map.class.getCanonicalName(), "getOrDefault", Object.class.getCanonicalName(), Object.class.getCanonicalName())
-                || isMethod(mi, Map.class.getCanonicalName(), "isEmpty")
-                || isMethod(mi, Map.class.getCanonicalName(), "put", Object.class.getCanonicalName(), Object.class.getCanonicalName())
-                || isMethod(mi, Map.class.getCanonicalName(), "putAll", Map.class.getCanonicalName())
-                || isMethod(mi, Map.class.getCanonicalName(), "putIfAbsent", Object.class.getCanonicalName(), Object.class.getCanonicalName())
-                || isMethod(mi, Map.class.getCanonicalName(), "remove", Object.class.getCanonicalName())
-                || isMethod(mi, Map.class.getCanonicalName(), "remove", Object.class.getCanonicalName(), Object.class.getCanonicalName())
-                || isMethod(mi, Map.class.getCanonicalName(), "replace", Object.class.getCanonicalName(), Object.class.getCanonicalName())
-                || isMethod(mi, Map.class.getCanonicalName(), "replace", Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName())
-                || isMethod(mi, Map.class.getCanonicalName(), "size") || isMethod(mi, Object.class.getCanonicalName(), "finalize")
-                || isMethod(mi, Object.class.getCanonicalName(), "notify") || isMethod(mi, Object.class.getCanonicalName(), "notifyAll")
-                || isMethod(mi, Object.class.getCanonicalName(), "wait") || isMethod(mi, Object.class.getCanonicalName(), "wait", long.class.getSimpleName())
-                || isMethod(mi, Object.class.getCanonicalName(), "wait", long.class.getSimpleName(), int.class.getSimpleName());
+        return isMethod(mi, Map.class.getCanonicalName(), "clear") //$NON-NLS-1$
+                || isMethod(mi, Map.class.getCanonicalName(), "containsKey", Object.class.getCanonicalName()) //$NON-NLS-1$
+                || isMethod(mi, Map.class.getCanonicalName(), "containsValue", Object.class.getCanonicalName()) //$NON-NLS-1$
+                || isMethod(mi, Map.class.getCanonicalName(), "get", Object.class.getCanonicalName()) //$NON-NLS-1$
+                || isMethod(mi, Map.class.getCanonicalName(), "getOrDefault", Object.class.getCanonicalName(), Object.class.getCanonicalName()) //$NON-NLS-1$
+                || isMethod(mi, Map.class.getCanonicalName(), "isEmpty") //$NON-NLS-1$
+                || isMethod(mi, Map.class.getCanonicalName(), "put", Object.class.getCanonicalName(), Object.class.getCanonicalName()) //$NON-NLS-1$
+                || isMethod(mi, Map.class.getCanonicalName(), "putAll", Map.class.getCanonicalName()) //$NON-NLS-1$
+                || isMethod(mi, Map.class.getCanonicalName(), "putIfAbsent", Object.class.getCanonicalName(), Object.class.getCanonicalName()) //$NON-NLS-1$
+                || isMethod(mi, Map.class.getCanonicalName(), "remove", Object.class.getCanonicalName()) //$NON-NLS-1$
+                || isMethod(mi, Map.class.getCanonicalName(), "remove", Object.class.getCanonicalName(), Object.class.getCanonicalName()) //$NON-NLS-1$
+                || isMethod(mi, Map.class.getCanonicalName(), "replace", Object.class.getCanonicalName(), Object.class.getCanonicalName()) //$NON-NLS-1$
+                || isMethod(mi, Map.class.getCanonicalName(), "replace", Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName()) //$NON-NLS-1$
+                || isMethod(mi, Map.class.getCanonicalName(), "size") || isMethod(mi, Object.class.getCanonicalName(), "finalize") //$NON-NLS-1$ $NON-NLS-2$
+                || isMethod(mi, Object.class.getCanonicalName(), "notify") || isMethod(mi, Object.class.getCanonicalName(), "notifyAll") //$NON-NLS-1$ $NON-NLS-2$
+                || isMethod(mi, Object.class.getCanonicalName(), "wait") || isMethod(mi, Object.class.getCanonicalName(), "wait", long.class.getSimpleName()) //$NON-NLS-1$ $NON-NLS-2$
+                || isMethod(mi, Object.class.getCanonicalName(), "wait", long.class.getSimpleName(), int.class.getSimpleName()); //$NON-NLS-1$
     }
 
     @Override

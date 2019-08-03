@@ -73,7 +73,7 @@ public class JavaProjectOptionsImpl implements JavaProjectOptions {
      */
     public Map<String, String> getCompilerOptions() {
         final Map<String, String> options= getOptions();
-        final String v= javaSERelease.getMajorVersion() + "." + javaSERelease.getMinorVersion();
+        final String v= javaSERelease.getMajorVersion() + "." + javaSERelease.getMinorVersion(); //$NON-NLS-1$
         setComplianceOptions(v, options);
         return options;
     }

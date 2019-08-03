@@ -120,13 +120,13 @@ public final class EnumSetRatherThanHashSetCleanUp extends AbstractEnumCollectio
             if (!instanceOf(typeArg, EnumSet.class.getCanonicalName())) {
                 return true;
             }
-            invocation= b.invoke(alreadyImportedClasses.contains(EnumSet.class.getCanonicalName()) ? b.name("EnumSet")
-                    : b.name("java", "util", "EnumSet"), "copyOf", b.copy(typeArg));
+            invocation= b.invoke(alreadyImportedClasses.contains(EnumSet.class.getCanonicalName()) ? b.name("EnumSet") //$NON-NLS-1$
+                    : b.name("java", "util", "EnumSet"), "copyOf", b.copy(typeArg)); //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$ $NON-NLS-4$
         } else {
             TypeLiteral newTypeLiteral= ctx.getAST().newTypeLiteral();
             newTypeLiteral.setType(b.copy(type));
-            invocation= b.invoke(alreadyImportedClasses.contains(EnumSet.class.getCanonicalName()) ? b.name("EnumSet")
-                    : b.name("java", "util", "EnumSet"), "noneOf", newTypeLiteral);
+            invocation= b.invoke(alreadyImportedClasses.contains(EnumSet.class.getCanonicalName()) ? b.name("EnumSet") //$NON-NLS-1$
+                    : b.name("java", "util", "EnumSet"), "noneOf", newTypeLiteral); //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$ $NON-NLS-4$
         }
 
         ctx.getRefactorings().replace(cic, invocation);

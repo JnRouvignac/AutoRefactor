@@ -78,13 +78,13 @@ public class AndroidWakeLockCleanUp extends AbstractCleanUpRule {
 
     @Override
     public boolean visit(MethodInvocation node) {
-        if (isMethod(node, "android.os.PowerManager.WakeLock", "release")) {
+        if (isMethod(node, "android.os.PowerManager.WakeLock", "release")) { //$NON-NLS-1$ $NON-NLS-2$
             // check whether it is being called in onDestroy()
             MethodDeclaration enclosingMethod= getAncestor(node, MethodDeclaration.class);
-            if (isMethod(enclosingMethod, "android.app.Activity", "onDestroy")) {
+            if (isMethod(enclosingMethod, "android.app.Activity", "onDestroy")) { //$NON-NLS-1$ $NON-NLS-2$
                 final Refactorings r= ctx.getRefactorings();
                 TypeDeclaration typeDeclaration= getAncestor(enclosingMethod, TypeDeclaration.class);
-                MethodDeclaration onPauseMethod= findMethod(typeDeclaration, "onPause");
+                MethodDeclaration onPauseMethod= findMethod(typeDeclaration, "onPause"); //$NON-NLS-1$
                 if (onPauseMethod != null && node.getParent().getNodeType() == ASTNode.EXPRESSION_STATEMENT) {
                     r.remove(node.getParent());
                     r.insertLast(onPauseMethod.getBody(), Block.STATEMENTS_PROPERTY, createWakelockReleaseStmt(node));
@@ -94,12 +94,12 @@ public class AndroidWakeLockCleanUp extends AbstractCleanUpRule {
                 }
                 return false;
             }
-        } else if (isMethod(node, "android.os.PowerManager.WakeLock", "acquire")) {
+        } else if (isMethod(node, "android.os.PowerManager.WakeLock", "acquire")) { //$NON-NLS-1$ $NON-NLS-2$
             final Refactorings r= ctx.getRefactorings();
             TypeDeclaration typeDeclaration= getAncestor(node, TypeDeclaration.class);
             ReleasePresenceChecker releasePresenceChecker= new ReleasePresenceChecker();
             if (!releasePresenceChecker.findOrDefault(typeDeclaration, false)) {
-                MethodDeclaration onPauseMethod= findMethod(typeDeclaration, "onPause");
+                MethodDeclaration onPauseMethod= findMethod(typeDeclaration, "onPause"); //$NON-NLS-1$
                 if (onPauseMethod != null && node.getParent().getNodeType() == ASTNode.EXPRESSION_STATEMENT) {
                     r.insertLast(onPauseMethod.getBody(), Block.STATEMENTS_PROPERTY, createWakelockReleaseStmt(node));
                 } else {
@@ -114,14 +114,14 @@ public class AndroidWakeLockCleanUp extends AbstractCleanUpRule {
 
     private Statement createWakelockReleaseStmt(MethodInvocation methodInvocation) {
         final ASTBuilder b= ctx.getASTBuilder();
-        return b.if0(b.not(b.invoke(b.copyExpression(methodInvocation), "isHeld")),
-                b.block(b.toStmt(b.invoke(b.copyExpression(methodInvocation), "release"))));
+        return b.if0(b.not(b.invoke(b.copyExpression(methodInvocation), "isHeld")), //$NON-NLS-1$
+                b.block(b.toStmt(b.invoke(b.copyExpression(methodInvocation), "release")))); //$NON-NLS-1$
     }
 
     private MethodDeclaration createOnPauseMethodDeclaration() {
         final ASTBuilder b= ctx.getASTBuilder();
-        return b.method(b.extendedModifiers(b.annotation("Override"), b.protected0()), "onPause", b.parameters(),
-                b.block(b.toStmt(b.superInvoke("onPause"))));
+        return b.method(b.extendedModifiers(b.annotation("Override"), b.protected0()), "onPause", b.parameters(), //$NON-NLS-1$ $NON-NLS-2$
+                b.block(b.toStmt(b.superInvoke("onPause")))); //$NON-NLS-1$
     }
 
     private MethodDeclaration findMethod(TypeDeclaration typeDeclaration, String methodToFind) {
@@ -140,7 +140,7 @@ public class AndroidWakeLockCleanUp extends AbstractCleanUpRule {
     private static class ReleasePresenceChecker extends FinderVisitor<Boolean> {
         @Override
         public boolean visit(MethodInvocation node) {
-            if (isMethod(node, "android.os.PowerManager.WakeLock", "release")) {
+            if (isMethod(node, "android.os.PowerManager.WakeLock", "release")) { //$NON-NLS-1$ $NON-NLS-2$
                 setResult(true);
                 return false;
             }

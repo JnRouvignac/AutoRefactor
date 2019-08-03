@@ -71,25 +71,25 @@ public class MethodOnMapRatherThanMethodOnKeySetCleanUp extends AbstractCleanUpR
         Expression miExpr= mi.getExpression();
         if (isKeySetMethod(miExpr)) {
             final MethodInvocation mapKeySetMi= (MethodInvocation) miExpr;
-            if (isMethod(mi, Set.class.getCanonicalName(), "clear")) {
-                return removeInvocationOfMapKeySet(mapKeySetMi, mi, "clear");
+            if (isMethod(mi, Set.class.getCanonicalName(), "clear")) { //$NON-NLS-1$
+                return removeInvocationOfMapKeySet(mapKeySetMi, mi, "clear"); //$NON-NLS-1$
             }
-            if (isMethod(mi, Set.class.getCanonicalName(), "size")) {
-                return removeInvocationOfMapKeySet(mapKeySetMi, mi, "size");
+            if (isMethod(mi, Set.class.getCanonicalName(), "size")) { //$NON-NLS-1$
+                return removeInvocationOfMapKeySet(mapKeySetMi, mi, "size"); //$NON-NLS-1$
             }
-            if (isMethod(mi, Set.class.getCanonicalName(), "isEmpty")) {
-                return removeInvocationOfMapKeySet(mapKeySetMi, mi, "isEmpty");
+            if (isMethod(mi, Set.class.getCanonicalName(), "isEmpty")) { //$NON-NLS-1$
+                return removeInvocationOfMapKeySet(mapKeySetMi, mi, "isEmpty"); //$NON-NLS-1$
             }
-            if (isMethod(mi, Set.class.getCanonicalName(), "remove", Object.class.getCanonicalName())
+            if (isMethod(mi, Set.class.getCanonicalName(), "remove", Object.class.getCanonicalName()) //$NON-NLS-1$
                     // If parent is not an expression statement, the MethodInvocation must return a
                     // boolean.
                     // In that case, we cannot replace because `Map.removeKey(key) != null`
                     // is not strictly equivalent to `Map.keySet().remove(key)`
                     && mi.getParent().getNodeType() == EXPRESSION_STATEMENT) {
-                return removeInvocationOfMapKeySet(mapKeySetMi, mi, "remove");
+                return removeInvocationOfMapKeySet(mapKeySetMi, mi, "remove"); //$NON-NLS-1$
             }
-            if (isMethod(mi, Set.class.getCanonicalName(), "contains", Object.class.getCanonicalName())) {
-                return removeInvocationOfMapKeySet(mapKeySetMi, mi, "containsKey");
+            if (isMethod(mi, Set.class.getCanonicalName(), "contains", Object.class.getCanonicalName())) { //$NON-NLS-1$
+                return removeInvocationOfMapKeySet(mapKeySetMi, mi, "containsKey"); //$NON-NLS-1$
             }
         }
         return true;
@@ -104,6 +104,6 @@ public class MethodOnMapRatherThanMethodOnKeySetCleanUp extends AbstractCleanUpR
     }
 
     private boolean isKeySetMethod(Expression expr) {
-        return expr instanceof MethodInvocation && isMethod((MethodInvocation) expr, Map.class.getCanonicalName(), "keySet");
+        return expr instanceof MethodInvocation && isMethod((MethodInvocation) expr, Map.class.getCanonicalName(), "keySet"); //$NON-NLS-1$
     }
 }

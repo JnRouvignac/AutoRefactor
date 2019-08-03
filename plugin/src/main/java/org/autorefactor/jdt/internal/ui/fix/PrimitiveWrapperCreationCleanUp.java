@@ -86,37 +86,37 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
         ITypeBinding destinationTypeBinding= getTargetType(node);
 
         if (destinationTypeBinding != null && destinationTypeBinding.isPrimitive()
-                && "valueOf".equals(node.getName().getIdentifier())) {
-            if (isMethod(node, Boolean.class.getCanonicalName(), "valueOf", boolean.class.getSimpleName())
-                    || isMethod(node, Byte.class.getCanonicalName(), "valueOf", byte.class.getSimpleName())
-                    || isMethod(node, Character.class.getCanonicalName(), "valueOf", char.class.getSimpleName())
-                    || isMethod(node, Short.class.getCanonicalName(), "valueOf", short.class.getSimpleName())
-                    || isMethod(node, Integer.class.getCanonicalName(), "valueOf", int.class.getSimpleName())
-                    || isMethod(node, Long.class.getCanonicalName(), "valueOf", long.class.getSimpleName())
-                    || isMethod(node, Float.class.getCanonicalName(), "valueOf", float.class.getSimpleName())
-                    || isMethod(node, Double.class.getCanonicalName(), "valueOf", double.class.getSimpleName())) {
+                && "valueOf".equals(node.getName().getIdentifier())) { //$NON-NLS-1$
+            if (isMethod(node, Boolean.class.getCanonicalName(), "valueOf", boolean.class.getSimpleName()) //$NON-NLS-1$
+                    || isMethod(node, Byte.class.getCanonicalName(), "valueOf", byte.class.getSimpleName()) //$NON-NLS-1$
+                    || isMethod(node, Character.class.getCanonicalName(), "valueOf", char.class.getSimpleName()) //$NON-NLS-1$
+                    || isMethod(node, Short.class.getCanonicalName(), "valueOf", short.class.getSimpleName()) //$NON-NLS-1$
+                    || isMethod(node, Integer.class.getCanonicalName(), "valueOf", int.class.getSimpleName()) //$NON-NLS-1$
+                    || isMethod(node, Long.class.getCanonicalName(), "valueOf", long.class.getSimpleName()) //$NON-NLS-1$
+                    || isMethod(node, Float.class.getCanonicalName(), "valueOf", float.class.getSimpleName()) //$NON-NLS-1$
+                    || isMethod(node, Double.class.getCanonicalName(), "valueOf", double.class.getSimpleName())) { //$NON-NLS-1$
                 return replaceWithTheSingleArgument(node);
             }
             if (is(node, Byte.class.getCanonicalName())) {
-                return replaceMethodName(node, "parseByte");
+                return replaceMethodName(node, "parseByte"); //$NON-NLS-1$
             }
             if (is(node, Short.class.getCanonicalName())) {
-                return replaceMethodName(node, "parseShort");
+                return replaceMethodName(node, "parseShort"); //$NON-NLS-1$
             }
             if (is(node, Integer.class.getCanonicalName())) {
-                return replaceMethodName(node, "parseInt");
+                return replaceMethodName(node, "parseInt"); //$NON-NLS-1$
             }
             if (is(node, Long.class.getCanonicalName())) {
-                return replaceMethodName(node, "parseLong");
+                return replaceMethodName(node, "parseLong"); //$NON-NLS-1$
             }
-            if (isMethod(node, Boolean.class.getCanonicalName(), "valueOf", String.class.getCanonicalName())) {
-                return replaceMethodName(node, "parseBoolean");
+            if (isMethod(node, Boolean.class.getCanonicalName(), "valueOf", String.class.getCanonicalName())) { //$NON-NLS-1$
+                return replaceMethodName(node, "parseBoolean"); //$NON-NLS-1$
             }
             if (is(node, Float.class.getCanonicalName())) {
-                return replaceMethodName(node, "parseFloat");
+                return replaceMethodName(node, "parseFloat"); //$NON-NLS-1$
             }
             if (is(node, Double.class.getCanonicalName())) {
-                return replaceMethodName(node, "parseDouble");
+                return replaceMethodName(node, "parseDouble"); //$NON-NLS-1$
             }
         }
 
@@ -140,8 +140,8 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
     }
 
     private boolean is(MethodInvocation node, String declaringTypeQualifiedName) {
-        return isMethod(node, declaringTypeQualifiedName, "valueOf", String.class.getCanonicalName())
-                || (isMethod(node, declaringTypeQualifiedName, "valueOf", String.class.getCanonicalName(), int.class.getSimpleName())
+        return isMethod(node, declaringTypeQualifiedName, "valueOf", String.class.getCanonicalName()) //$NON-NLS-1$
+                || (isMethod(node, declaringTypeQualifiedName, "valueOf", String.class.getCanonicalName(), int.class.getSimpleName()) //$NON-NLS-1$
                         && equal(10, arguments(node).get(1).resolveConstantExpressionValue()));
     }
 
@@ -158,20 +158,20 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
     }
 
     private String getMethodName(final String typeName, final String invokedMethodName) {
-        if (Boolean.class.getCanonicalName().equals(typeName) && "booleanValue".equals(invokedMethodName)) {
-            return "valueOf";
-        } else if (Byte.class.getCanonicalName().equals(typeName) && "byteValue".equals(invokedMethodName)) {
-            return "parseByte";
-        } else if (Double.class.getCanonicalName().equals(typeName) && "doubleValue".equals(invokedMethodName)) {
-            return "parseDouble";
-        } else if (Float.class.getCanonicalName().equals(typeName) && "floatValue".equals(invokedMethodName)) {
-            return "parseFloat";
-        } else if (Long.class.getCanonicalName().equals(typeName) && "longValue".equals(invokedMethodName)) {
-            return "parseLong";
-        } else if (Short.class.getCanonicalName().equals(typeName) && "shortValue".equals(invokedMethodName)) {
-            return "parseShort";
-        } else if (Integer.class.getCanonicalName().equals(typeName) && "intValue".equals(invokedMethodName)) {
-            return "parseInt";
+        if (Boolean.class.getCanonicalName().equals(typeName) && "booleanValue".equals(invokedMethodName)) { //$NON-NLS-1$
+            return "valueOf"; //$NON-NLS-1$
+        } else if (Byte.class.getCanonicalName().equals(typeName) && "byteValue".equals(invokedMethodName)) { //$NON-NLS-1$
+            return "parseByte"; //$NON-NLS-1$
+        } else if (Double.class.getCanonicalName().equals(typeName) && "doubleValue".equals(invokedMethodName)) { //$NON-NLS-1$
+            return "parseDouble"; //$NON-NLS-1$
+        } else if (Float.class.getCanonicalName().equals(typeName) && "floatValue".equals(invokedMethodName)) { //$NON-NLS-1$
+            return "parseFloat"; //$NON-NLS-1$
+        } else if (Long.class.getCanonicalName().equals(typeName) && "longValue".equals(invokedMethodName)) { //$NON-NLS-1$
+            return "parseLong"; //$NON-NLS-1$
+        } else if (Short.class.getCanonicalName().equals(typeName) && "shortValue".equals(invokedMethodName)) { //$NON-NLS-1$
+            return "parseShort"; //$NON-NLS-1$
+        } else if (Integer.class.getCanonicalName().equals(typeName) && "intValue".equals(invokedMethodName)) { //$NON-NLS-1$
+            return "parseInt"; //$NON-NLS-1$
         }
         return null;
     }
@@ -198,10 +198,10 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
         if (isPrimitive(arg0, double.class.getSimpleName())) {
             final ASTBuilder b= ctx.getASTBuilder();
             ctx.getRefactorings().replace(node,
-                    b.invoke(typeBinding.getName(), "valueOf", b.cast(b.type(float.class.getSimpleName()), b.copy(arg0))));
+                    b.invoke(typeBinding.getName(), "valueOf", b.cast(b.type(float.class.getSimpleName()), b.copy(arg0)))); //$NON-NLS-1$
         } else if (hasType(arg0, Double.class.getCanonicalName())) {
             final ASTBuilder b= ctx.getASTBuilder();
-            ctx.getRefactorings().replace(node, b.invoke(b.copy(arg0), "floatValue"));
+            ctx.getRefactorings().replace(node, b.invoke(b.copy(arg0), "floatValue")); //$NON-NLS-1$
         } else {
             replaceWithValueOf(node, typeBinding);
         }
@@ -210,7 +210,7 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
 
     private void replaceWithValueOf(ClassInstanceCreation node, final ITypeBinding typeBinding) {
         this.ctx.getRefactorings().replace(node,
-                newMethodInvocation(typeBinding.getName(), "valueOf", arguments(node).get(0)));
+                newMethodInvocation(typeBinding.getName(), "valueOf", arguments(node).get(0))); //$NON-NLS-1$
     }
 
     private MethodInvocation newMethodInvocation(String typeName, String methodName, Expression arg) {

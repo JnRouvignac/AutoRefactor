@@ -140,7 +140,7 @@ public class CharPrimitiveRatherThanWrapperCleanUp extends AbstractPrimitiveRath
 
     @Override
     public String[] getSafeInConstants() {
-        return new String[] { "MIN_VALUE", "MAX_VALUE" };
+        return new String[] { "MIN_VALUE", "MAX_VALUE" }; //$NON-NLS-1$ $NON-NLS-2$
     }
 
     @Override

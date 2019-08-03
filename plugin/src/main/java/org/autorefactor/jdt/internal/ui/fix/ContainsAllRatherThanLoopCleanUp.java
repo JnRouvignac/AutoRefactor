@@ -91,7 +91,7 @@ public class ContainsAllRatherThanLoopCleanUp extends AbstractCollectionMethodRa
 
         MethodInvocation method= as(negation.getOperand(), MethodInvocation.class);
 
-        if (!isMethod(method, Collection.class.getCanonicalName(), "contains", Object.class.getCanonicalName())) {
+        if (!isMethod(method, Collection.class.getCanonicalName(), "contains", Object.class.getCanonicalName())) { //$NON-NLS-1$
             return null;
         }
 
@@ -100,7 +100,7 @@ public class ContainsAllRatherThanLoopCleanUp extends AbstractCollectionMethodRa
 
     @Override
     protected Expression newMethod(Expression iterable, Expression toFind, boolean isPositive, ASTBuilder b) {
-        final MethodInvocation invoke= b.invoke(b.move(toFind), "containsAll", b.move(iterable));
+        final MethodInvocation invoke= b.invoke(b.move(toFind), "containsAll", b.move(iterable)); //$NON-NLS-1$
 
         if (isPositive) {
             return b.not(invoke);

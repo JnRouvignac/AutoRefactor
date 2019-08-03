@@ -116,7 +116,7 @@ public class CollectionCleanUp extends AbstractCleanUpRule {
         @Override
         public boolean visit(ExpressionStatement node) {
             final MethodInvocation mi= asExpression(node, MethodInvocation.class);
-            if (isMethod(mi, Collection.class.getCanonicalName(), "addAll", Collection.class.getCanonicalName())) {
+            if (isMethod(mi, Collection.class.getCanonicalName(), "addAll", Collection.class.getCanonicalName())) { //$NON-NLS-1$
                 final Expression arg0= arg0(mi);
                 final Statement previousStmt= getPreviousSibling(node);
 
@@ -157,11 +157,11 @@ public class CollectionCleanUp extends AbstractCleanUpRule {
             final List<Expression> args= arguments(cic);
             final boolean noArgsCtor= args.isEmpty();
             final boolean colCapacityCtor= isValidCapacityParameter(sourceCollection, args);
-            return (noArgsCtor && hasType(cic, "java.util.concurrent.ConcurrentLinkedDeque",
+            return (noArgsCtor && hasType(cic, "java.util.concurrent.ConcurrentLinkedDeque", //$NON-NLS-1$
                     ConcurrentLinkedQueue.class.getCanonicalName(), ConcurrentSkipListSet.class.getCanonicalName(),
                     CopyOnWriteArrayList.class.getCanonicalName(), CopyOnWriteArraySet.class.getCanonicalName(),
                     DelayQueue.class.getCanonicalName(), LinkedBlockingDeque.class.getCanonicalName(),
-                    LinkedBlockingQueue.class.getCanonicalName(), "java.util.concurrent.LinkedTransferQueue",
+                    LinkedBlockingQueue.class.getCanonicalName(), "java.util.concurrent.LinkedTransferQueue", //$NON-NLS-1$
                     PriorityBlockingQueue.class.getCanonicalName(), ArrayDeque.class.getCanonicalName(), ArrayList.class.getCanonicalName(),
                     HashSet.class.getCanonicalName(), LinkedHashSet.class.getCanonicalName(), LinkedList.class.getCanonicalName(), PriorityQueue.class.getCanonicalName(),
                     TreeSet.class.getCanonicalName(), Vector.class.getCanonicalName()))
@@ -178,7 +178,7 @@ public class CollectionCleanUp extends AbstractCleanUpRule {
                 if (constant != null) {
                     return constant.equals(0);
                 } else {
-                    return isMethod(mi, Collection.class.getCanonicalName(), "size") && match(mi.getExpression(), sourceCollection);
+                    return isMethod(mi, Collection.class.getCanonicalName(), "size") && match(mi.getExpression(), sourceCollection); //$NON-NLS-1$
                 }
             }
             return false;

@@ -67,7 +67,7 @@ public class WorkspacePreferencePage extends PreferencePage implements IWorkbenc
 
     /** Default constructor. */
     public WorkspacePreferencePage() {
-        super("AutoRefactor workbench preferences");
+        super("AutoRefactor workbench preferences"); //$NON-NLS-1$
         setPreferenceStore(AutoRefactorPlugin.getDefault().getPreferenceStore());
     }
 
@@ -122,12 +122,12 @@ public class WorkspacePreferencePage extends PreferencePage implements IWorkbenc
         initFields(allRefactoringRules);
 
         final Group ruleGroup= new Group(fieldEditorParent, SWT.FILL);
-        ruleGroup.setText("Rules by default");
+        ruleGroup.setText("Rules by default"); //$NON-NLS-1$
 
         // All rule checkbox
         toggleAllRules= new Button(ruleGroup, SWT.CHECK | SWT.LEFT);
         toggleAllRules.setFont(ruleGroup.getFont());
-        toggleAllRules.setText("Toggle all the rules");
+        toggleAllRules.setText("Toggle all the rules"); //$NON-NLS-1$
         toggleAllRules.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {

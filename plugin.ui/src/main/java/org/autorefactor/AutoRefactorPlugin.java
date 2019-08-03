@@ -45,7 +45,7 @@ import org.osgi.framework.BundleContext;
 /** The activator class controls the plug-in life cycle. */
 public class AutoRefactorPlugin extends AbstractUIPlugin {
     /** The plug-in ID. */
-    public static final String PLUGIN_ID= "org.autorefactor.plugin.ui";
+    public static final String PLUGIN_ID= "org.autorefactor.plugin.ui"; //$NON-NLS-1$
 
     /** The shared instance. */
     private static AutoRefactorPlugin plugin;

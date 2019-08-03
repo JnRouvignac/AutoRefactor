@@ -89,7 +89,7 @@ public class AnnotationCleanUp extends AbstractCleanUpRule {
             return false;
         } else if (values.size() == 1) {
             MemberValuePair pair= values.get(0);
-            if ("value".equals(pair.getName().getIdentifier())) {
+            if ("value".equals(pair.getName().getIdentifier())) { //$NON-NLS-1$
                 r.replace(node, b.singleValueAnnotation(b.move(node.getTypeName()), b.move(pair.getValue())));
                 return false;
             }
@@ -166,7 +166,7 @@ public class AnnotationCleanUp extends AbstractCleanUpRule {
                     return Utils.equalNotNull(toDouble(javaObj1), toDouble(javaObj2));
                 }
 
-                throw new NotImplementedException(expr, "for primitive type \"" + type + "\".");
+                throw new NotImplementedException(expr, "for primitive type \"" + type + "\"."); //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
             }
 
             return false;

@@ -117,8 +117,8 @@ public class BooleanEqualsRatherThanNullCheckCleanUp extends AbstractCleanUpRule
             final boolean isAndExpr, final boolean isPositiveExpr) {
         final ASTBuilder b= ctx.getASTBuilder();
 
-        final Name booleanConstant= b.name("Boolean", isAndExpr == isPositiveExpr ? "TRUE" : "FALSE");
-        final MethodInvocation equalsMethod= b.invoke(booleanConstant, "equals", b.copy(firstExpr));
+        final Name booleanConstant= b.name("Boolean", isAndExpr == isPositiveExpr ? "TRUE" : "FALSE"); //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
+        final MethodInvocation equalsMethod= b.invoke(booleanConstant, "equals", b.copy(firstExpr)); //$NON-NLS-1$
 
         Expression newExpr= null;
         if (!isNullCheck || isAndExpr) {

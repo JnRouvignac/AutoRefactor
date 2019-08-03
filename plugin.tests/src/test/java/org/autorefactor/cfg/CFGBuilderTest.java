@@ -66,33 +66,33 @@ public class CFGBuilderTest {
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + "[" + testName + ", methodNb=" + methodDeclarationNb + "]";
+        return getClass().getSimpleName() + "[" + testName + ", methodNb=" + methodDeclarationNb + "]"; //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
     }
 
     @Parameters(name= "{index}: {0}")
     public static Collection<Object[]> data() {
         return Arrays.asList(
-                new Object[][] { { "ForWithIfToEndLoopSample", 0 }, { "IfElseIfSample", 0 }, { "LabelsSample", 0 },
-                        { "SwitchSample", 0 }, { "WhileLoopsSample", 2 }, { "TryCatchThrowSample", 0 }, });
+                new Object[][] { { "ForWithIfToEndLoopSample", 0 }, { "IfElseIfSample", 0 }, { "LabelsSample", 0 }, //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
+                        { "SwitchSample", 0 }, { "WhileLoopsSample", 2 }, { "TryCatchThrowSample", 0 }, }); //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
     }
 
     @Test
     public void testCFGBuilder() throws Exception {
-        final String sampleName= testName + ".java";
-        final File javaFile= new File("src/test/java/org/autorefactor/cfg", sampleName);
-        assertTrue(testName + ": sample in java file " + javaFile + " should exist", javaFile.exists());
-        final File dotFile= new File("src/test/resources/org/autorefactor/cfg", testName + ".dot");
-        assertTrue(testName + ": sample out dot file " + dotFile + " should exist", dotFile.exists());
+        final String sampleName= testName + ".java"; //$NON-NLS-1$
+        final File javaFile= new File("src/test/java/org/autorefactor/cfg", sampleName); //$NON-NLS-1$
+        assertTrue(testName + ": sample in java file " + javaFile + " should exist", javaFile.exists()); //$NON-NLS-1$ $NON-NLS-2$
+        final File dotFile= new File("src/test/resources/org/autorefactor/cfg", testName + ".dot"); //$NON-NLS-1$ $NON-NLS-2$
+        assertTrue(testName + ": sample out dot file " + dotFile + " should exist", dotFile.exists()); //$NON-NLS-1$ $NON-NLS-2$
 
         final String dotSource= readAll(dotFile).trim();
         final String javaSource= readAll(javaFile);
 
-        final IPackageFragment packageFragment= JavaCoreHelper.getPackageFragment("org.autorefactor.cfg");
+        final IPackageFragment packageFragment= JavaCoreHelper.getPackageFragment("org.autorefactor.cfg"); //$NON-NLS-1$
         final ICompilationUnit cu= packageFragment.createCompilationUnit(sampleName, javaSource, true, null);
         cu.getBuffer().setContents(javaSource);
         cu.save(null, true);
 
-        final JavaProjectOptions options= newJavaProjectOptions(Release.javaSE("1.8"), 4);
+        final JavaProjectOptions options= newJavaProjectOptions(Release.javaSE("1.8"), 4); //$NON-NLS-1$
         final ASTParser parser= ASTParser.newParser(AST.JLS8);
         autoRefactorHandlerResetParser(cu, parser, options);
 
@@ -102,9 +102,9 @@ public class CFGBuilderTest {
 
         final CFGBasicBlock block= blocks.get(methodDeclarationNb);
         final String actual= new CFGDotPrinter().toDot(block).trim();
-        final File dotFileOut= new File("src/test/resources/org/autorefactor/cfg", testName + "_out.dot");
+        final File dotFileOut= new File("src/test/resources/org/autorefactor/cfg", testName + "_out.dot"); //$NON-NLS-1$ $NON-NLS-2$
         writeAll(dotFileOut, actual);
-        assertEquals(testName + ": wrong output;", dotSource, actual);
+        assertEquals(testName + ": wrong output;", dotSource, actual); //$NON-NLS-1$
     }
 
     private void writeAll(File file, String fileContent) throws Exception {
@@ -133,7 +133,7 @@ public class CFGBuilderTest {
 
     private void autoRefactorHandlerResetParser(ICompilationUnit cu, ASTParser parser, JavaProjectOptions options)
             throws Exception {
-        final Method m= ApplyRefactoringsJob.class.getDeclaredMethod("resetParser", ICompilationUnit.class,
+        final Method m= ApplyRefactoringsJob.class.getDeclaredMethod("resetParser", ICompilationUnit.class, //$NON-NLS-1$
                 ASTParser.class, JavaProjectOptions.class);
         m.setAccessible(true);
         m.invoke(null, cu, parser, options);

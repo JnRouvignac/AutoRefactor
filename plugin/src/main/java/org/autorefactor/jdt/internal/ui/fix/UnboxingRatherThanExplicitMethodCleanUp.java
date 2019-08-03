@@ -70,13 +70,13 @@ public class UnboxingRatherThanExplicitMethodCleanUp extends AbstractCleanUpRule
     @Override
     public boolean visit(MethodInvocation node) {
         if (node.getExpression() != null
-                && (isMethod(node, Boolean.class.getCanonicalName(), "booleanValue") || isMethod(node, Byte.class.getCanonicalName(), "byteValue")
-                        || isMethod(node, Character.class.getCanonicalName(), "charValue")
-                        || isMethod(node, Short.class.getCanonicalName(), "shortValue")
-                        || isMethod(node, Integer.class.getCanonicalName(), "intValue")
-                        || isMethod(node, Long.class.getCanonicalName(), "longValue")
-                        || isMethod(node, Float.class.getCanonicalName(), "floatValue")
-                        || isMethod(node, Double.class.getCanonicalName(), "doubleValue"))) {
+                && (isMethod(node, Boolean.class.getCanonicalName(), "booleanValue") || isMethod(node, Byte.class.getCanonicalName(), "byteValue") //$NON-NLS-1$ $NON-NLS-2$
+                        || isMethod(node, Character.class.getCanonicalName(), "charValue") //$NON-NLS-1$
+                        || isMethod(node, Short.class.getCanonicalName(), "shortValue") //$NON-NLS-1$
+                        || isMethod(node, Integer.class.getCanonicalName(), "intValue") //$NON-NLS-1$
+                        || isMethod(node, Long.class.getCanonicalName(), "longValue") //$NON-NLS-1$
+                        || isMethod(node, Float.class.getCanonicalName(), "floatValue") //$NON-NLS-1$
+                        || isMethod(node, Double.class.getCanonicalName(), "doubleValue"))) { //$NON-NLS-1$
             final ITypeBinding actualResultType= getTargetType(node);
 
             if (actualResultType != null && actualResultType.isAssignmentCompatible(node.resolveTypeBinding())) {

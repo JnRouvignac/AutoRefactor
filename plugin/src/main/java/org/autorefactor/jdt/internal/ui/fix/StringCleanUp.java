@@ -81,7 +81,7 @@ public class StringCleanUp extends AbstractCleanUpRule {
         final ASTBuilder b= this.ctx.getASTBuilder();
         final Refactorings r= ctx.getRefactorings();
         final boolean isStringValueOf= isStringValueOf(node);
-        if (isMethod(node, Object.class.getCanonicalName(), "toString")) {
+        if (isMethod(node, Object.class.getCanonicalName(), "toString")) { //$NON-NLS-1$
             if (hasType(expr, String.class.getCanonicalName())) {
                 // if node is already a String, no need to call toString()
                 r.replace(node, b.move(expr));
@@ -99,7 +99,7 @@ public class StringCleanUp extends AbstractCleanUpRule {
                     // node is in the extended operands
                     r.replace(node, replaceToString(node.getExpression()));
                     return false;
-                } else if (leftOpIsString && isMethod(rmi, Object.class.getCanonicalName(), "toString")) {
+                } else if (leftOpIsString && isMethod(rmi, Object.class.getCanonicalName(), "toString")) { //$NON-NLS-1$
                     r.replace(rmi, replaceToString(rmi.getExpression()));
                     return false;
                 } else if (rightOpIsString && node.equals(lmi)) {
@@ -135,34 +135,34 @@ public class StringCleanUp extends AbstractCleanUpRule {
                 replaceStringValueOfByArg0(node, node);
                 return false;
             }
-        } else if (isMethod(node, String.class.getCanonicalName(), "equals", Object.class.getCanonicalName())) {
+        } else if (isMethod(node, String.class.getCanonicalName(), "equals", Object.class.getCanonicalName())) { //$NON-NLS-1$
             final MethodInvocation leftInvocation= as(node.getExpression(), MethodInvocation.class);
             final MethodInvocation rightInvocation= as(arg0(node), MethodInvocation.class);
 
             if (leftInvocation != null && rightInvocation != null
-                    && ((isMethod(leftInvocation, String.class.getCanonicalName(), "toLowerCase")
-                            && isMethod(rightInvocation, String.class.getCanonicalName(), "toLowerCase"))
-                            || (isMethod(leftInvocation, String.class.getCanonicalName(), "toUpperCase")
-                                    && isMethod(rightInvocation, String.class.getCanonicalName(), "toUpperCase")))) {
+                    && ((isMethod(leftInvocation, String.class.getCanonicalName(), "toLowerCase") //$NON-NLS-1$
+                            && isMethod(rightInvocation, String.class.getCanonicalName(), "toLowerCase")) //$NON-NLS-1$
+                            || (isMethod(leftInvocation, String.class.getCanonicalName(), "toUpperCase") //$NON-NLS-1$
+                                    && isMethod(rightInvocation, String.class.getCanonicalName(), "toUpperCase")))) { //$NON-NLS-1$
                 final Expression leftExpr= leftInvocation.getExpression();
                 final Expression rightExpr= rightInvocation.getExpression();
-                r.replace(node, b.invoke(b.copy(leftExpr), "equalsIgnoreCase", b.copy(rightExpr)));
+                r.replace(node, b.invoke(b.copy(leftExpr), "equalsIgnoreCase", b.copy(rightExpr))); //$NON-NLS-1$
                 return false;
             }
-        } else if (isMethod(node, String.class.getCanonicalName(), "equalsIgnoreCase", String.class.getCanonicalName())) {
+        } else if (isMethod(node, String.class.getCanonicalName(), "equalsIgnoreCase", String.class.getCanonicalName())) { //$NON-NLS-1$
             final AtomicBoolean isRefactoringNeeded= new AtomicBoolean(false);
 
             final Expression leftExpr= getReducedStringExpression(node.getExpression(), isRefactoringNeeded);
             final Expression rightExpr= getReducedStringExpression(arg0(node), isRefactoringNeeded);
 
             if (isRefactoringNeeded.get()) {
-                r.replace(node, b.invoke(b.copy(leftExpr), "equalsIgnoreCase", b.copy(rightExpr)));
+                r.replace(node, b.invoke(b.copy(leftExpr), "equalsIgnoreCase", b.copy(rightExpr))); //$NON-NLS-1$
                 return false;
             }
-        } else if (isMethod(node, String.class.getCanonicalName(), "indexOf", String.class.getCanonicalName())
-                || isMethod(node, String.class.getCanonicalName(), "lastIndexOf", String.class.getCanonicalName())
-                || isMethod(node, String.class.getCanonicalName(), "indexOf", String.class.getCanonicalName(), Integer.class.getCanonicalName())
-                || isMethod(node, String.class.getCanonicalName(), "lastIndexOf", String.class.getCanonicalName(), Integer.class.getCanonicalName())) {
+        } else if (isMethod(node, String.class.getCanonicalName(), "indexOf", String.class.getCanonicalName()) //$NON-NLS-1$
+                || isMethod(node, String.class.getCanonicalName(), "lastIndexOf", String.class.getCanonicalName()) //$NON-NLS-1$
+                || isMethod(node, String.class.getCanonicalName(), "indexOf", String.class.getCanonicalName(), Integer.class.getCanonicalName()) //$NON-NLS-1$
+                || isMethod(node, String.class.getCanonicalName(), "lastIndexOf", String.class.getCanonicalName(), Integer.class.getCanonicalName())) { //$NON-NLS-1$
             Expression expression= arg0(node);
             if (expression instanceof StringLiteral) {
                 String value= ((StringLiteral) expression).getLiteralValue();
@@ -179,8 +179,8 @@ public class StringCleanUp extends AbstractCleanUpRule {
 
     private Expression getReducedStringExpression(Expression stringExpr, AtomicBoolean isRefactoringNeeded) {
         final MethodInvocation casingInvocation= as(stringExpr, MethodInvocation.class);
-        if (casingInvocation != null && (isMethod(casingInvocation, String.class.getCanonicalName(), "toLowerCase")
-                || isMethod(casingInvocation, String.class.getCanonicalName(), "toUpperCase"))) {
+        if (casingInvocation != null && (isMethod(casingInvocation, String.class.getCanonicalName(), "toLowerCase") //$NON-NLS-1$
+                || isMethod(casingInvocation, String.class.getCanonicalName(), "toUpperCase"))) { //$NON-NLS-1$
             isRefactoringNeeded.set(true);
             return casingInvocation.getExpression();
         }
@@ -209,27 +209,27 @@ public class StringCleanUp extends AbstractCleanUpRule {
     }
 
     private boolean isToStringForPrimitive(final MethodInvocation node) {
-        return "toString".equals(node.getName().getIdentifier()) // fast-path
-                && (isMethod(node, Boolean.class.getCanonicalName(), "toString", boolean.class.getSimpleName())
-                        || isMethod(node, Character.class.getCanonicalName(), "toString", char.class.getSimpleName())
-                        || isMethod(node, Byte.class.getCanonicalName(), "toString", byte.class.getSimpleName())
-                        || isMethod(node, Short.class.getCanonicalName(), "toString", short.class.getSimpleName())
-                        || isMethod(node, Integer.class.getCanonicalName(), "toString", int.class.getSimpleName())
-                        || isMethod(node, Long.class.getCanonicalName(), "toString", long.class.getSimpleName())
-                        || isMethod(node, Float.class.getCanonicalName(), "toString", float.class.getSimpleName())
-                        || isMethod(node, Double.class.getCanonicalName(), "toString", double.class.getSimpleName()));
+        return "toString".equals(node.getName().getIdentifier()) // fast-path $NON-NLS-1$
+                && (isMethod(node, Boolean.class.getCanonicalName(), "toString", boolean.class.getSimpleName()) //$NON-NLS-1$
+                        || isMethod(node, Character.class.getCanonicalName(), "toString", char.class.getSimpleName()) //$NON-NLS-1$
+                        || isMethod(node, Byte.class.getCanonicalName(), "toString", byte.class.getSimpleName()) //$NON-NLS-1$
+                        || isMethod(node, Short.class.getCanonicalName(), "toString", short.class.getSimpleName()) //$NON-NLS-1$
+                        || isMethod(node, Integer.class.getCanonicalName(), "toString", int.class.getSimpleName()) //$NON-NLS-1$
+                        || isMethod(node, Long.class.getCanonicalName(), "toString", long.class.getSimpleName()) //$NON-NLS-1$
+                        || isMethod(node, Float.class.getCanonicalName(), "toString", float.class.getSimpleName()) //$NON-NLS-1$
+                        || isMethod(node, Double.class.getCanonicalName(), "toString", double.class.getSimpleName())); //$NON-NLS-1$
     }
 
     private boolean isStringValueOf(final MethodInvocation node) {
         return hasType(node.getExpression(), String.class.getCanonicalName()) // fast-path
-                && (isMethod(node, String.class.getCanonicalName(), "valueOf", boolean.class.getSimpleName())
-                        || isMethod(node, String.class.getCanonicalName(), "valueOf", char.class.getSimpleName())
-                        || isMethod(node, String.class.getCanonicalName(), "valueOf", byte.class.getSimpleName())
-                        || isMethod(node, String.class.getCanonicalName(), "valueOf", short.class.getSimpleName())
-                        || isMethod(node, String.class.getCanonicalName(), "valueOf", int.class.getSimpleName())
-                        || isMethod(node, String.class.getCanonicalName(), "valueOf", long.class.getSimpleName())
-                        || isMethod(node, String.class.getCanonicalName(), "valueOf", float.class.getSimpleName())
-                        || isMethod(node, String.class.getCanonicalName(), "valueOf", double.class.getSimpleName())
-                        || isMethod(node, String.class.getCanonicalName(), "valueOf", Object.class.getCanonicalName()));
+                && (isMethod(node, String.class.getCanonicalName(), "valueOf", boolean.class.getSimpleName()) //$NON-NLS-1$
+                        || isMethod(node, String.class.getCanonicalName(), "valueOf", char.class.getSimpleName()) //$NON-NLS-1$
+                        || isMethod(node, String.class.getCanonicalName(), "valueOf", byte.class.getSimpleName()) //$NON-NLS-1$
+                        || isMethod(node, String.class.getCanonicalName(), "valueOf", short.class.getSimpleName()) //$NON-NLS-1$
+                        || isMethod(node, String.class.getCanonicalName(), "valueOf", int.class.getSimpleName()) //$NON-NLS-1$
+                        || isMethod(node, String.class.getCanonicalName(), "valueOf", long.class.getSimpleName()) //$NON-NLS-1$
+                        || isMethod(node, String.class.getCanonicalName(), "valueOf", float.class.getSimpleName()) //$NON-NLS-1$
+                        || isMethod(node, String.class.getCanonicalName(), "valueOf", double.class.getSimpleName()) //$NON-NLS-1$
+                        || isMethod(node, String.class.getCanonicalName(), "valueOf", Object.class.getCanonicalName())); //$NON-NLS-1$
     }
 }

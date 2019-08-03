@@ -483,8 +483,8 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
                         && arguments(expr).get(0).subtreeMatch(new ASTSemanticMatcher(), nullCheckedExpression)) {
                     // Did we invoke java.lang.Object.equals() or
                     // java.lang.String.equalsIgnoreCase()?
-                    return isMethod(expr, Object.class.getCanonicalName(), "equals", Object.class.getCanonicalName())
-                            || isMethod(expr, String.class.getCanonicalName(), "equalsIgnoreCase", String.class.getCanonicalName());
+                    return isMethod(expr, Object.class.getCanonicalName(), "equals", Object.class.getCanonicalName()) //$NON-NLS-1$
+                            || isMethod(expr, String.class.getCanonicalName(), "equalsIgnoreCase", String.class.getCanonicalName()); //$NON-NLS-1$
                 }
             }
         }

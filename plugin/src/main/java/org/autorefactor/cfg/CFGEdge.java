@@ -92,11 +92,11 @@ public class CFGEdge {
 
     @Override
     public String toString() {
-        final StringBuilder sb= new StringBuilder("EDGE[");
+        final StringBuilder sb= new StringBuilder("EDGE["); //$NON-NLS-1$
         this.sourceBlock.appendDotNodeLabel(sb);
-        sb.append(" -> ");
+        sb.append(" -> "); //$NON-NLS-1$
         this.targetBlock.appendDotNodeLabel(sb);
-        return sb.append("]").toString();
+        return sb.append("]").toString(); //$NON-NLS-1$
     }
 
     @Override

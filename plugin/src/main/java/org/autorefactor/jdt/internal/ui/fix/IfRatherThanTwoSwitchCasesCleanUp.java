@@ -253,10 +253,10 @@ public class IfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRule {
 
         if (hasType(value, String.class.getCanonicalName(), Boolean.class.getCanonicalName(), Byte.class.getCanonicalName(), Character.class.getCanonicalName(),
                 Double.class.getCanonicalName(), Float.class.getCanonicalName(), Integer.class.getCanonicalName(), Long.class.getCanonicalName(), Short.class.getCanonicalName())) {
-            equality= b.invoke(b.copy(value), "equals", b.copy(discriminant));
+            equality= b.invoke(b.copy(value), "equals", b.copy(discriminant)); //$NON-NLS-1$
         } else if (value.resolveTypeBinding() != null && value.resolveTypeBinding().isEnum()) {
             equality= b.infixExpr(b.copy(discriminant), InfixExpression.Operator.EQUALS, b.getAST().newQualifiedName(
-                    b.name(value.resolveTypeBinding().getQualifiedName().split("\\.")), b.copy((SimpleName) value)));
+                    b.name(value.resolveTypeBinding().getQualifiedName().split("\\.")), b.copy((SimpleName) value))); //$NON-NLS-1$
         } else {
             equality= b.infixExpr(b.parenthesizeIfNeeded(b.copy(discriminant)), InfixExpression.Operator.EQUALS,
                     b.copy(value));

@@ -89,7 +89,7 @@ public class StringBuilderMethodRatherThanReassignationCleanUp extends AbstractC
         if (var instanceof Name) {
             return var;
         } else if (mi != null && hasType(mi.getExpression(), StringBuffer.class.getCanonicalName(), StringBuilder.class.getCanonicalName())
-                && Arrays.asList("append", "appendCodePoint", "delete", "deleteCharAt", "insert", "replace", "reverse")
+                && Arrays.asList("append", "appendCodePoint", "delete", "deleteCharAt", "insert", "replace", "reverse") //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$ $NON-NLS-4$ $NON-NLS-5$ $NON-NLS-6$ $NON-NLS-7$
                         .contains(mi.getName().getIdentifier())) {
             return getVar(mi.getExpression());
         }

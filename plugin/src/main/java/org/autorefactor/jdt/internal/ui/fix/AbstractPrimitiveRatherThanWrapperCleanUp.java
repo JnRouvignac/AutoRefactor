@@ -228,7 +228,7 @@ public abstract class AbstractPrimitiveRatherThanWrapperCleanUp extends Abstract
                             && isNotNull(castExpr.getExpression()));
         } else if (expr instanceof MethodInvocation) {
             final MethodInvocation mi= (MethodInvocation) expr;
-            return isMethod(mi, getWrapperFullyQualifiedName(), "valueOf", getPrimitiveTypeName());
+            return isMethod(mi, getWrapperFullyQualifiedName(), "valueOf", getPrimitiveTypeName()); //$NON-NLS-1$
         }
         return false;
     }

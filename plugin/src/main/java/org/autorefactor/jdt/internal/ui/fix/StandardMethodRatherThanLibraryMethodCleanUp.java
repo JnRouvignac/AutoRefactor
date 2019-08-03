@@ -86,7 +86,7 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
 
     @Override
     public Set<String> getClassesToImport() {
-        return new HashSet<String>(Arrays.asList("java.util.Objects"));
+        return new HashSet<String>(Arrays.asList("java.util.Objects")); //$NON-NLS-1$
     }
 
     @Override
@@ -101,41 +101,41 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
 
     private boolean maybeRefactorMethodInvocation(final MethodInvocation node, final Set<String> classesToUseWithImport,
             final Set<String> importsToAdd) {
-        if (isMethod(node, "org.apache.commons.lang3.ObjectUtils", "hashCode", Object.class.getCanonicalName())
-                || isMethod(node, "org.apache.commons.lang3.ObjectUtils", "equals", Object.class.getCanonicalName(),
+        if (isMethod(node, "org.apache.commons.lang3.ObjectUtils", "hashCode", Object.class.getCanonicalName()) //$NON-NLS-1$ $NON-NLS-2$
+                || isMethod(node, "org.apache.commons.lang3.ObjectUtils", "equals", Object.class.getCanonicalName(), //$NON-NLS-1$ $NON-NLS-2$
                         Object.class.getCanonicalName())
-                || isMethod(node, "org.apache.commons.lang3.ObjectUtils", "toString", Object.class.getCanonicalName(),
+                || isMethod(node, "org.apache.commons.lang3.ObjectUtils", "toString", Object.class.getCanonicalName(), //$NON-NLS-1$ $NON-NLS-2$
                         String.class.getCanonicalName())) {
             replaceUtilClass(node, classesToUseWithImport, importsToAdd);
             return false;
         }
         final ASTBuilder b= this.ctx.getASTBuilder();
 
-        final Name javaUtilObjects= classesToUseWithImport.contains("java.util.Objects") ? b.simpleName("Objects")
-                : b.name("java", "util", "Objects");
+        final Name javaUtilObjects= classesToUseWithImport.contains("java.util.Objects") ? b.simpleName("Objects") //$NON-NLS-1$ $NON-NLS-2$
+                : b.name("java", "util", "Objects"); //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
 
-        if (isMethod(node, "com.google.common.base.Objects", "equal", Object.class.getCanonicalName(), Object.class.getCanonicalName())
-                || isMethod(node, "com.google.gwt.thirdparty.guava.common.base.Objects", "equal", Object.class.getCanonicalName(),
+        if (isMethod(node, "com.google.common.base.Objects", "equal", Object.class.getCanonicalName(), Object.class.getCanonicalName()) //$NON-NLS-1$ $NON-NLS-2$
+                || isMethod(node, "com.google.gwt.thirdparty.guava.common.base.Objects", "equal", Object.class.getCanonicalName(), //$NON-NLS-1$ $NON-NLS-2$
                         Object.class.getCanonicalName())) {
             final Refactorings r= this.ctx.getRefactorings();
 
-            r.replace(node, b.invoke(javaUtilObjects, "equals", b.copy((Expression) node.arguments().get(0)),
+            r.replace(node, b.invoke(javaUtilObjects, "equals", b.copy((Expression) node.arguments().get(0)), //$NON-NLS-1$
                     b.copy((Expression) node.arguments().get(1))));
-            importsToAdd.add("java.util.Objects");
+            importsToAdd.add("java.util.Objects"); //$NON-NLS-1$
             return false;
         }
 
-        if (isMethod(node, "org.apache.commons.lang3.ObjectUtils", "toString", Object.class.getCanonicalName())) {
+        if (isMethod(node, "org.apache.commons.lang3.ObjectUtils", "toString", Object.class.getCanonicalName())) { //$NON-NLS-1$ $NON-NLS-2$
             final Refactorings r= this.ctx.getRefactorings();
 
             r.replace(node,
-                    b.invoke(javaUtilObjects, "toString", b.copy((Expression) node.arguments().get(0)), b.string("")));
-            importsToAdd.add("java.util.Objects");
+                    b.invoke(javaUtilObjects, "toString", b.copy((Expression) node.arguments().get(0)), b.string(""))); //$NON-NLS-1$ $NON-NLS-2$
+            importsToAdd.add("java.util.Objects"); //$NON-NLS-1$
             return false;
         }
 
-        if (isMethod(node, "com.google.common.base.Objects", "hashCode", Object[].class.getCanonicalName()) || isMethod(node,
-                "com.google.gwt.thirdparty.guava.common.base.Objects", "hashCode", Object[].class.getCanonicalName())) {
+        if (isMethod(node, "com.google.common.base.Objects", "hashCode", Object[].class.getCanonicalName()) || isMethod(node, //$NON-NLS-1$ $NON-NLS-2$
+                "com.google.gwt.thirdparty.guava.common.base.Objects", "hashCode", Object[].class.getCanonicalName())) { //$NON-NLS-1$ $NON-NLS-2$
             final Refactorings r= this.ctx.getRefactorings();
 
             final List<Expression> copyOfArgs= new ArrayList<Expression>(node.arguments().size());
@@ -144,48 +144,48 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
                 copyOfArgs.add(b.copy((Expression) expression));
             }
 
-            r.replace(node, b.invoke(javaUtilObjects, "hash", copyOfArgs.toArray(new Expression[copyOfArgs.size()])));
-            importsToAdd.add("java.util.Objects");
+            r.replace(node, b.invoke(javaUtilObjects, "hash", copyOfArgs.toArray(new Expression[copyOfArgs.size()]))); //$NON-NLS-1$
+            importsToAdd.add("java.util.Objects"); //$NON-NLS-1$
             return false;
         }
 
-        if (isMethod(node, "org.apache.commons.lang3.ObjectUtils", "hashCodeMulti", Object[].class.getCanonicalName())) {
+        if (isMethod(node, "org.apache.commons.lang3.ObjectUtils", "hashCodeMulti", Object[].class.getCanonicalName())) { //$NON-NLS-1$ $NON-NLS-2$
             final Refactorings r= this.ctx.getRefactorings();
 
             if (node.getExpression() != null) {
                 r.replace(node.getExpression(), javaUtilObjects);
-                r.replace(node.getName(), b.simpleName("hash"));
+                r.replace(node.getName(), b.simpleName("hash")); //$NON-NLS-1$
             } else {
-                r.replace(node, b.invoke(javaUtilObjects, "hash", copyArguments(b, node)));
+                r.replace(node, b.invoke(javaUtilObjects, "hash", copyArguments(b, node))); //$NON-NLS-1$
             }
 
-            importsToAdd.add("java.util.Objects");
+            importsToAdd.add("java.util.Objects"); //$NON-NLS-1$
             return false;
         }
 
-        if (isMethod(node, "com.google.common.base.Preconditions", "checkNotNull", "T")
-                || isMethod(node, "com.google.common.base.Preconditions", "checkNotNull", "T", Object.class.getCanonicalName())
-                || isMethod(node, "com.google.gwt.thirdparty.guava.common.base.Preconditions", "checkNotNull", "T")
-                || isMethod(node, "com.google.gwt.thirdparty.guava.common.base.Preconditions", "checkNotNull", "T",
+        if (isMethod(node, "com.google.common.base.Preconditions", "checkNotNull", "T") //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
+                || isMethod(node, "com.google.common.base.Preconditions", "checkNotNull", "T", Object.class.getCanonicalName()) //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
+                || isMethod(node, "com.google.gwt.thirdparty.guava.common.base.Preconditions", "checkNotNull", "T") //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
+                || isMethod(node, "com.google.gwt.thirdparty.guava.common.base.Preconditions", "checkNotNull", "T", //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
                         Object.class.getCanonicalName())
-                || isMethod(node, "org.apache.commons.lang3.Validate", "notNull", "T")
-                || isMethod(node, "org.apache.commons.lang3.Validate", "notNull", "T", String.class.getCanonicalName(),
+                || isMethod(node, "org.apache.commons.lang3.Validate", "notNull", "T") //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
+                || isMethod(node, "org.apache.commons.lang3.Validate", "notNull", "T", String.class.getCanonicalName(), //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
                         Object[].class.getCanonicalName())) {
             final Refactorings r= this.ctx.getRefactorings();
 
             final List<Expression> copyOfArgs= copyArguments(b, node);
 
             if (copyOfArgs.size() <= 2) {
-                r.replace(node, b.invoke(javaUtilObjects, "requireNonNull", copyOfArgs));
+                r.replace(node, b.invoke(javaUtilObjects, "requireNonNull", copyOfArgs)); //$NON-NLS-1$
             } else if (ctx.getJavaProjectOptions().getJavaSERelease().getMinorVersion() >= 8) {
                 LambdaExpression messageSupplier= b.lambda();
                 messageSupplier
-                        .setBody(b.invoke(b.simpleName("String"), "format", copyOfArgs.subList(1, copyOfArgs.size())));
-                r.replace(node, b.invoke(javaUtilObjects, "requireNonNull", copyOfArgs.get(0), messageSupplier));
+                        .setBody(b.invoke(b.simpleName("String"), "format", copyOfArgs.subList(1, copyOfArgs.size()))); //$NON-NLS-1$ $NON-NLS-2$
+                r.replace(node, b.invoke(javaUtilObjects, "requireNonNull", copyOfArgs.get(0), messageSupplier)); //$NON-NLS-1$
             } else {
                 return true;
             }
-            importsToAdd.add("java.util.Objects");
+            importsToAdd.add("java.util.Objects"); //$NON-NLS-1$
             return false;
         }
 
@@ -206,8 +206,8 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
         final ASTBuilder b= this.ctx.getASTBuilder();
         final Refactorings r= this.ctx.getRefactorings();
 
-        r.replace(node.getExpression(), classesToUseWithImport.contains("java.util.Objects") ? b.simpleName("Objects")
-                : b.name("java", "util", "Objects"));
-        importsToAdd.add("java.util.Objects");
+        r.replace(node.getExpression(), classesToUseWithImport.contains("java.util.Objects") ? b.simpleName("Objects") //$NON-NLS-1$ $NON-NLS-2$
+                : b.name("java", "util", "Objects")); //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
+        importsToAdd.add("java.util.Objects"); //$NON-NLS-1$
     }
 }

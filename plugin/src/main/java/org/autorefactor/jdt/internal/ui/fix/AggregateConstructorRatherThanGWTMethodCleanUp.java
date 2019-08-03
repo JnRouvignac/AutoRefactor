@@ -111,12 +111,12 @@ public class AggregateConstructorRatherThanGWTMethodCleanUp extends NewClassImpo
     private boolean maybeRefactorMethodInvocation(final MethodInvocation node, final Set<String> classesToUseWithImport,
             final Set<String> importsToAdd) {
         if (node.arguments().isEmpty()) {
-            return maybeRefactor(node, classesToUseWithImport, importsToAdd, "Lists", "ArrayList")
-                    && maybeRefactor(node, classesToUseWithImport, importsToAdd, "Lists", "LinkedList")
-                    && maybeRefactor(node, classesToUseWithImport, importsToAdd, "Maps", "HashMap")
-                    && maybeRefactor(node, classesToUseWithImport, importsToAdd, "Maps", "TreeMap")
-                    && maybeRefactor(node, classesToUseWithImport, importsToAdd, "Maps", "LinkedHashMap")
-                    && maybeRefactor(node, classesToUseWithImport, importsToAdd, "Maps", "IdentityHashMap");
+            return maybeRefactor(node, classesToUseWithImport, importsToAdd, "Lists", "ArrayList") //$NON-NLS-1$ $NON-NLS-2$
+                    && maybeRefactor(node, classesToUseWithImport, importsToAdd, "Lists", "LinkedList") //$NON-NLS-1$ $NON-NLS-2$
+                    && maybeRefactor(node, classesToUseWithImport, importsToAdd, "Maps", "HashMap") //$NON-NLS-1$ $NON-NLS-2$
+                    && maybeRefactor(node, classesToUseWithImport, importsToAdd, "Maps", "TreeMap") //$NON-NLS-1$ $NON-NLS-2$
+                    && maybeRefactor(node, classesToUseWithImport, importsToAdd, "Maps", "LinkedHashMap") //$NON-NLS-1$ $NON-NLS-2$
+                    && maybeRefactor(node, classesToUseWithImport, importsToAdd, "Maps", "IdentityHashMap"); //$NON-NLS-1$ $NON-NLS-2$
         }
 
         if (node.arguments().size() == 1) {
@@ -127,7 +127,7 @@ public class AggregateConstructorRatherThanGWTMethodCleanUp extends NewClassImpo
             }
 
             final ITypeBinding argType= arg.resolveTypeBinding();
-            String generic= "";
+            String generic= ""; //$NON-NLS-1$
 
             if (argType != null) {
                 final ITypeBinding[] typeArgs= argType.getTypeArguments();
@@ -142,18 +142,18 @@ public class AggregateConstructorRatherThanGWTMethodCleanUp extends NewClassImpo
                     if (!typeParam.isEnum()) {
                         return true;
                     }
-                    generic= "<" + typeParam.getQualifiedName() + ">";
+                    generic= "<" + typeParam.getQualifiedName() + ">"; //$NON-NLS-1$ $NON-NLS-2$
                 }
             }
 
-            if (isMethod(node, "com.google.common.collect.Maps", "newEnumMap", Class.class.getCanonicalName() + generic)
-                    || isMethod(node, "com.google.gwt.thirdparty.guava.common.collect.Maps", "newEnumMap",
+            if (isMethod(node, "com.google.common.collect.Maps", "newEnumMap", Class.class.getCanonicalName() + generic) //$NON-NLS-1$ $NON-NLS-2$
+                    || isMethod(node, "com.google.gwt.thirdparty.guava.common.collect.Maps", "newEnumMap", //$NON-NLS-1$ $NON-NLS-2$
                             Class.class.getCanonicalName() + generic)) {
                 final ASTBuilder b= this.ctx.getASTBuilder();
                 final Refactorings r= this.ctx.getRefactorings();
 
                 final Type type= b.getAST().newParameterizedType(
-                        b.type(classesToUseWithImport.contains(EnumMap.class.getCanonicalName()) ? "EnumMap" : EnumMap.class.getCanonicalName()));
+                        b.type(classesToUseWithImport.contains(EnumMap.class.getCanonicalName()) ? "EnumMap" : EnumMap.class.getCanonicalName())); //$NON-NLS-1$
                 r.replace(node, b.new0(type, b.copy(arg)));
                 importsToAdd.add(EnumMap.class.getCanonicalName());
                 return false;
@@ -165,15 +165,15 @@ public class AggregateConstructorRatherThanGWTMethodCleanUp extends NewClassImpo
 
     private boolean maybeRefactor(final MethodInvocation node, final Set<String> classesToUseWithImport,
             final Set<String> importsToAdd, final String aggregateInterface, final String implClass) {
-        if (isMethod(node, "com.google.common.collect." + aggregateInterface, "new" + implClass) || isMethod(node,
-                "com.google.gwt.thirdparty.guava.common.collect." + aggregateInterface, "new" + implClass)) {
+        if (isMethod(node, "com.google.common.collect." + aggregateInterface, "new" + implClass) || isMethod(node, //$NON-NLS-1$ $NON-NLS-2$
+                "com.google.gwt.thirdparty.guava.common.collect." + aggregateInterface, "new" + implClass)) { //$NON-NLS-1$ $NON-NLS-2$
             final ASTBuilder b= this.ctx.getASTBuilder();
             final Refactorings r= this.ctx.getRefactorings();
 
             Type type= b.getAST().newParameterizedType(b.type(
-                    classesToUseWithImport.contains("java.util." + implClass) ? implClass : "java.util." + implClass));
+                    classesToUseWithImport.contains("java.util." + implClass) ? implClass : "java.util." + implClass)); //$NON-NLS-1$ $NON-NLS-2$
             r.replace(node, b.new0(type));
-            importsToAdd.add("java.util." + implClass);
+            importsToAdd.add("java.util." + implClass); //$NON-NLS-1$
             return false;
         }
 

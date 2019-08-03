@@ -59,7 +59,7 @@ import org.eclipse.text.edits.TextEditVisitor;
 
 /** This class rewrites AST comments. */
 public class ASTCommentRewriter {
-    private static final Pattern INDENT= Pattern.compile("\\s+");
+    private static final Pattern INDENT= Pattern.compile("\\s+"); //$NON-NLS-1$
     /**
      * Using a Set to avoid duplicates because Javadocs are visited twice via
      * CompilationUnit.getCommentList() and visit(Javadoc).
@@ -81,7 +81,7 @@ public class ASTCommentRewriter {
 
     private String getLineSeparator(CompilationUnit astRoot) {
         String result= findRecommendedLineSeparator(astRoot);
-        return result != null ? result : System.getProperty("line.separator");
+        return result != null ? result : System.getProperty("line.separator"); //$NON-NLS-1$
     }
 
     private String findRecommendedLineSeparator(CompilationUnit astRoot) {
@@ -225,8 +225,8 @@ public class ASTCommentRewriter {
 
     private void addBlockCommentToJavadocEdits(List<TextEdit> commentEdits) {
         for (BlockComment blockComment : this.blockCommentToJavadoc) {
-            final int offset= blockComment.getStartPosition() + "/*".length();
-            commentEdits.add(new InsertEdit(offset, "*"));
+            final int offset= blockComment.getStartPosition() + "/*".length(); //$NON-NLS-1$
+            commentEdits.add(new InsertEdit(offset, "*")); //$NON-NLS-1$
         }
     }
 
@@ -252,7 +252,7 @@ public class ASTCommentRewriter {
         final TreeSet<Integer> lineStarts= new TreeSet<Integer>();
         lineStarts.add(0);
 
-        final Matcher matcher= Pattern.compile("\\r\\n|\\r|\\n").matcher(source);
+        final Matcher matcher= Pattern.compile("\\r\\n|\\r|\\n").matcher(source); //$NON-NLS-1$
         while (matcher.find()) {
             lineStarts.add(matcher.end());
         }
@@ -270,17 +270,17 @@ public class ASTCommentRewriter {
         if (commentStart < nodeStart) {
             // Assume comment is situated exactly before target node for javadoc
             final String spaceAtStart= getSpaceAtStart(source, lineComment);
-            commentEdits.add(new ReplaceEdit(commentStart, "//".length(), "/**" + spaceAtStart));
-            commentEdits.add(new InsertEdit(getEndPosition(lineComment), getSpaceAtEnd(source, lineComment) + "*/"));
+            commentEdits.add(new ReplaceEdit(commentStart, "//".length(), "/**" + spaceAtStart)); //$NON-NLS-1$ $NON-NLS-2$
+            commentEdits.add(new InsertEdit(getEndPosition(lineComment), getSpaceAtEnd(source, lineComment) + "*/")); //$NON-NLS-1$
             replaceEndsOfBlockCommentFromCommentText(commentEdits, lineComment, source);
         } else {
             // Assume comment is situated exactly after target node for javadoc
-            final StringBuilder newJavadoc= new StringBuilder("/**").append(getSpaceAtStart(source, lineComment));
+            final StringBuilder newJavadoc= new StringBuilder("/**").append(getSpaceAtStart(source, lineComment)); //$NON-NLS-1$
 
             appendCommentTextReplaceEndsOfBlockComment(newJavadoc, lineComment, source);
 
             SourceLocation indent= getIndent(nextNode, lineStarts);
-            newJavadoc.append(getSpaceAtEnd(source, lineComment)).append("*/").append(lineSeparator).append(source,
+            newJavadoc.append(getSpaceAtEnd(source, lineComment)).append("*/").append(lineSeparator).append(source, //$NON-NLS-1$
                     indent.getStartPosition(), indent.getEndPosition());
             commentEdits.add(new InsertEdit(nodeStart, newJavadoc.toString()));
             deleteLineCommentAfterNode(commentEdits, source, lineComment);
@@ -289,11 +289,11 @@ public class ASTCommentRewriter {
 
     private void appendCommentTextReplaceEndsOfBlockComment(StringBuilder sb, LineComment lineComment, String source) {
         final int commentStart= lineComment.getStartPosition();
-        int nextStart= commentStart + "//".length();
+        int nextStart= commentStart + "//".length(); //$NON-NLS-1$
         final Matcher matcher= endsOfBlockCommentMatcher(lineComment, source, nextStart);
         while (matcher.find()) {
             sb.append(source, nextStart, matcher.start());
-            sb.append("* /");
+            sb.append("* /"); //$NON-NLS-1$
             nextStart= matcher.end();
         }
         if (source.charAt(nextStart) == '/') {
@@ -303,13 +303,13 @@ public class ASTCommentRewriter {
     }
 
     private String getSpaceAtStart(String source, final LineComment lineComment) {
-        final char firstChar= source.charAt(lineComment.getStartPosition() + "//".length());
-        return !Character.isWhitespace(firstChar) ? " " : "";
+        final char firstChar= source.charAt(lineComment.getStartPosition() + "//".length()); //$NON-NLS-1$
+        return !Character.isWhitespace(firstChar) ? " " : ""; //$NON-NLS-1$ $NON-NLS-2$
     }
 
     private String getSpaceAtEnd(String source, final LineComment lineComment) {
         final char lastChar= source.charAt(getEndPosition(lineComment) - 1);
-        return !Character.isWhitespace(lastChar) ? " " : "";
+        return !Character.isWhitespace(lastChar) ? " " : ""; //$NON-NLS-1$ $NON-NLS-2$
     }
 
     private void deleteLineCommentAfterNode(List<TextEdit> commentEdits, String source, LineComment lineComment) {
@@ -341,19 +341,19 @@ public class ASTCommentRewriter {
 
     private void replaceLineCommentBeforeJavaElement(List<TextEdit> commentEdits, LineComment lineComment,
             List<LineComment> lineComments, int i, String source, TreeSet<Integer> lineStarts) {
-        final int replaceLength= "//".length();
+        final int replaceLength= "//".length(); //$NON-NLS-1$
         final boolean isFirst= i == 0;
         String replacementText;
         final SourceLocation indentLoc= getIndentForJavadoc(lineComment, source, lineStarts);
         if (isFirst) {
             // TODO JNR how to obey configured indentation?
-            replacementText= "/**" + lineSeparator + indentLoc.substring(source) + " *";
+            replacementText= "/**" + lineSeparator + indentLoc.substring(source) + " *"; //$NON-NLS-1$ $NON-NLS-2$
         } else {
-            replacementText= " *";
+            replacementText= " *"; //$NON-NLS-1$
         }
         final boolean commentStartsWithSlash= source.charAt(lineComment.getStartPosition() + replaceLength) == '/';
         if (commentStartsWithSlash) {
-            replacementText+= " ";
+            replacementText+= " "; //$NON-NLS-1$
         }
         commentEdits.add(new ReplaceEdit(lineComment.getStartPosition(), replaceLength, replacementText));
 
@@ -363,7 +363,7 @@ public class ASTCommentRewriter {
         if (isLast) {
             // TODO JNR how to obey configured indentation?
             final int position= getEndPosition(lineComment);
-            commentEdits.add(new InsertEdit(position, lineSeparator + indentLoc.substring(source) + " */"));
+            commentEdits.add(new InsertEdit(position, lineSeparator + indentLoc.substring(source) + " */")); //$NON-NLS-1$
         }
     }
 
@@ -371,30 +371,30 @@ public class ASTCommentRewriter {
             String source) {
         final Matcher matcher= endsOfBlockCommentMatcher(lineComment, source, lineComment.getStartPosition());
         while (matcher.find()) {
-            commentEdits.add(new ReplaceEdit(matcher.start(), matcher.end() - matcher.start(), "* /"));
+            commentEdits.add(new ReplaceEdit(matcher.start(), matcher.end() - matcher.start(), "* /")); //$NON-NLS-1$
         }
     }
 
     private Matcher endsOfBlockCommentMatcher(LineComment lineComment, String source, int startPos) {
-        return Pattern.compile("\\*/").matcher(source).region(startPos, getEndPosition(lineComment));
+        return Pattern.compile("\\*/").matcher(source).region(startPos, getEndPosition(lineComment)); //$NON-NLS-1$
     }
 
     private void replaceLineCommentAfterJavaElement(List<TextEdit> commentEdits, LineComment lineComment,
             List<LineComment> lineComments, int i, String source, TreeSet<Integer> lineStarts) {
         if (i - 1 < 0) {
             throw new NotImplementedException(lineComment,
-                    "for a line comment situated after the java elements that it documents,"
-                            + " and this line comment is not the last line comment to add to the javadoc.");
+                    "for a line comment situated after the java elements that it documents," //$NON-NLS-1$
+                            + " and this line comment is not the last line comment to add to the javadoc."); //$NON-NLS-1$
         }
 
         final LineComment previousLineComment= lineComments.get(i - 1);
         final int position= getEndPosition(previousLineComment);
         final String indent= getIndentForJavadoc(previousLineComment, source, lineStarts).substring(source);
-        final StringBuilder newJavadoc= new StringBuilder(lineSeparator).append(indent).append(" *");
+        final StringBuilder newJavadoc= new StringBuilder(lineSeparator).append(indent).append(" *"); //$NON-NLS-1$
 
         appendCommentTextReplaceEndsOfBlockComment(newJavadoc, lineComment, source);
 
-        newJavadoc.append(lineSeparator).append(indent).append(" */");
+        newJavadoc.append(lineSeparator).append(indent).append(" */"); //$NON-NLS-1$
         commentEdits.add(new InsertEdit(position, newJavadoc.toString()));
         deleteLineCommentAfterNode(commentEdits, source, lineComment);
     }

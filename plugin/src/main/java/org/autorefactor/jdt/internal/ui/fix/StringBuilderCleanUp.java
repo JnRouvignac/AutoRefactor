@@ -91,29 +91,29 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
     }
 
     private boolean isEmptyString(final Expression expr) {
-        return "".equals(expr.resolveConstantExpressionValue())
+        return "".equals(expr.resolveConstantExpressionValue()) //$NON-NLS-1$
                 // Due to a bug with ASTNode.resolveConstantExpressionValue()
                 // in Eclipse 3.7.2 and 3.8.0, this second check is necessary
-                || (expr instanceof StringLiteral && "".equals(((StringLiteral) expr).getLiteralValue()));
+                || (expr instanceof StringLiteral && "".equals(((StringLiteral) expr).getLiteralValue())); //$NON-NLS-1$
     }
 
     @Override
     public boolean visit(MethodInvocation node) {
-        if (node.getExpression() != null && "append".equals(node.getName().getIdentifier())
+        if (node.getExpression() != null && "append".equals(node.getName().getIdentifier()) //$NON-NLS-1$
                 && arguments(node).size() == 1
                 // Most expensive check comes last
                 && isStringBuilderOrBuffer(node.getExpression())) {
             final MethodInvocation embeddedMI= as(arg0(node), MethodInvocation.class);
 
-            if (isMethod(embeddedMI, String.class.getCanonicalName(), "substring", int.class.getSimpleName(), int.class.getSimpleName())
-                    || isMethod(embeddedMI, CharSequence.class.getCanonicalName(), "subSequence", int.class.getSimpleName(), int.class.getSimpleName())) {
+            if (isMethod(embeddedMI, String.class.getCanonicalName(), "substring", int.class.getSimpleName(), int.class.getSimpleName()) //$NON-NLS-1$
+                    || isMethod(embeddedMI, CharSequence.class.getCanonicalName(), "subSequence", int.class.getSimpleName(), int.class.getSimpleName())) { //$NON-NLS-1$
                 replaceWithAppendSubstring(node, embeddedMI);
                 return false;
             }
 
             return maybeRefactorAppending(node);
-        } else if (isMethod(node, StringBuilder.class.getCanonicalName(), "toString")
-                || isMethod(node, StringBuffer.class.getCanonicalName(), "toString")) {
+        } else if (isMethod(node, StringBuilder.class.getCanonicalName(), "toString") //$NON-NLS-1$
+                || isMethod(node, StringBuffer.class.getCanonicalName(), "toString")) { //$NON-NLS-1$
             final LinkedList<Pair<ITypeBinding, Expression>> allAppendedStrings= new LinkedList<Pair<ITypeBinding, Expression>>();
             final Expression lastExpr= readAppendMethod(node.getExpression(), allAppendedStrings,
                     new AtomicBoolean(false), new AtomicBoolean(false));
@@ -171,7 +171,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
         if (isStringBuilderOrBuffer(exp)) {
             if (exp instanceof MethodInvocation) {
                 final MethodInvocation mi= (MethodInvocation) exp;
-                if ("append".equals(mi.getName().getIdentifier()) && arguments(mi).size() == 1) {
+                if ("append".equals(mi.getName().getIdentifier()) && arguments(mi).size() == 1) { //$NON-NLS-1$
                     final Expression arg0= arguments(mi).get(0);
                     readSubExpressions(arg0, allOperands, isRefactoringNeeded);
                     return readAppendMethod(mi.getExpression(), allOperands, isRefactoringNeeded,
@@ -281,7 +281,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
             final Pair<ITypeBinding, Expression> expr= iter.next();
             if (expr.getSecond().getNodeType() == ASTNode.METHOD_INVOCATION) {
                 final MethodInvocation mi= (MethodInvocation) expr.getSecond();
-                if (isMethod(mi, Object.class.getCanonicalName(), "toString")) {
+                if (isMethod(mi, Object.class.getCanonicalName(), "toString")) { //$NON-NLS-1$
                     if (mi.getExpression() != null) {
                         iter.set(Pair.<ITypeBinding, Expression>of(null, mi.getExpression()));
                     } else {
@@ -360,7 +360,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
             if (result == null) {
                 result= finalString;
             } else {
-                result= b.invoke(result, "append", finalString);
+                result= b.invoke(result, "append", finalString); //$NON-NLS-1$
             }
         }
 
@@ -409,9 +409,9 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
         final Expression lastExpr= b.copy(node.getExpression());
         MethodInvocation newAppendSubstring= null;
         if (arg1 == null) {
-            newAppendSubstring= b.invoke(lastExpr, "append", stringVar, arg0);
+            newAppendSubstring= b.invoke(lastExpr, "append", stringVar, arg0); //$NON-NLS-1$
         } else {
-            newAppendSubstring= b.invoke(lastExpr, "append", stringVar, arg0, arg1);
+            newAppendSubstring= b.invoke(lastExpr, "append", stringVar, arg0, arg1); //$NON-NLS-1$
         }
 
         this.ctx.getRefactorings().replace(node, newAppendSubstring);
@@ -434,30 +434,30 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
     }
 
     private boolean isToString(final MethodInvocation mi) {
-        return isMethod(mi, Boolean.class.getCanonicalName(), "toString", boolean.class.getSimpleName())
-                || isMethod(mi, Byte.class.getCanonicalName(), "toString", byte.class.getSimpleName())
-                || isMethod(mi, Character.class.getCanonicalName(), "toString", char.class.getSimpleName())
-                || isMethod(mi, Short.class.getCanonicalName(), "toString", short.class.getSimpleName())
-                || isMethod(mi, Integer.class.getCanonicalName(), "toString", int.class.getSimpleName())
-                || isMethod(mi, Long.class.getCanonicalName(), "toString", long.class.getSimpleName())
-                || isMethod(mi, Float.class.getCanonicalName(), "toString", float.class.getSimpleName())
-                || isMethod(mi, Double.class.getCanonicalName(), "toString", double.class.getSimpleName());
+        return isMethod(mi, Boolean.class.getCanonicalName(), "toString", boolean.class.getSimpleName()) //$NON-NLS-1$
+                || isMethod(mi, Byte.class.getCanonicalName(), "toString", byte.class.getSimpleName()) //$NON-NLS-1$
+                || isMethod(mi, Character.class.getCanonicalName(), "toString", char.class.getSimpleName()) //$NON-NLS-1$
+                || isMethod(mi, Short.class.getCanonicalName(), "toString", short.class.getSimpleName()) //$NON-NLS-1$
+                || isMethod(mi, Integer.class.getCanonicalName(), "toString", int.class.getSimpleName()) //$NON-NLS-1$
+                || isMethod(mi, Long.class.getCanonicalName(), "toString", long.class.getSimpleName()) //$NON-NLS-1$
+                || isMethod(mi, Float.class.getCanonicalName(), "toString", float.class.getSimpleName()) //$NON-NLS-1$
+                || isMethod(mi, Double.class.getCanonicalName(), "toString", double.class.getSimpleName()); //$NON-NLS-1$
     }
 
     private boolean isStringValueOf(final MethodInvocation mi) {
-        return isMethod(mi, String.class.getCanonicalName(), "valueOf", Object.class.getCanonicalName())
-                || isMethod(mi, String.class.getCanonicalName(), "valueOf", boolean.class.getSimpleName())
-                || isMethod(mi, Boolean.class.getCanonicalName(), "valueOf", boolean.class.getSimpleName())
-                || isMethod(mi, String.class.getCanonicalName(), "valueOf", char.class.getSimpleName())
-                || isMethod(mi, Character.class.getCanonicalName(), "valueOf", char.class.getSimpleName())
-                || isMethod(mi, String.class.getCanonicalName(), "valueOf", int.class.getSimpleName())
-                || isMethod(mi, Integer.class.getCanonicalName(), "valueOf", int.class.getSimpleName())
-                || isMethod(mi, String.class.getCanonicalName(), "valueOf", long.class.getSimpleName())
-                || isMethod(mi, Long.class.getCanonicalName(), "valueOf", long.class.getSimpleName())
-                || isMethod(mi, String.class.getCanonicalName(), "valueOf", float.class.getSimpleName())
-                || isMethod(mi, Float.class.getCanonicalName(), "valueOf", float.class.getSimpleName())
-                || isMethod(mi, String.class.getCanonicalName(), "valueOf", double.class.getSimpleName())
-                || isMethod(mi, Double.class.getCanonicalName(), "valueOf", double.class.getSimpleName());
+        return isMethod(mi, String.class.getCanonicalName(), "valueOf", Object.class.getCanonicalName()) //$NON-NLS-1$
+                || isMethod(mi, String.class.getCanonicalName(), "valueOf", boolean.class.getSimpleName()) //$NON-NLS-1$
+                || isMethod(mi, Boolean.class.getCanonicalName(), "valueOf", boolean.class.getSimpleName()) //$NON-NLS-1$
+                || isMethod(mi, String.class.getCanonicalName(), "valueOf", char.class.getSimpleName()) //$NON-NLS-1$
+                || isMethod(mi, Character.class.getCanonicalName(), "valueOf", char.class.getSimpleName()) //$NON-NLS-1$
+                || isMethod(mi, String.class.getCanonicalName(), "valueOf", int.class.getSimpleName()) //$NON-NLS-1$
+                || isMethod(mi, Integer.class.getCanonicalName(), "valueOf", int.class.getSimpleName()) //$NON-NLS-1$
+                || isMethod(mi, String.class.getCanonicalName(), "valueOf", long.class.getSimpleName()) //$NON-NLS-1$
+                || isMethod(mi, Long.class.getCanonicalName(), "valueOf", long.class.getSimpleName()) //$NON-NLS-1$
+                || isMethod(mi, String.class.getCanonicalName(), "valueOf", float.class.getSimpleName()) //$NON-NLS-1$
+                || isMethod(mi, Float.class.getCanonicalName(), "valueOf", float.class.getSimpleName()) //$NON-NLS-1$
+                || isMethod(mi, String.class.getCanonicalName(), "valueOf", double.class.getSimpleName()) //$NON-NLS-1$
+                || isMethod(mi, Double.class.getCanonicalName(), "valueOf", double.class.getSimpleName()); //$NON-NLS-1$
     }
 
     private Expression getTypedExpression(final ASTBuilder b, final Pair<ITypeBinding, Expression> typeAndValue) {
@@ -513,14 +513,14 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
         final ASTBuilder b= this.ctx.getASTBuilder();
         switch (appendedStrings.size()) {
         case 0:
-            return b.string("");
+            return b.string(""); //$NON-NLS-1$
 
         case 1:
             final Pair<ITypeBinding, Expression> expr= appendedStrings.get(0);
             if (hasType(expr.getSecond(), String.class.getCanonicalName())) {
                 return b.copy(expr.getSecond());
             }
-            return b.invoke("String", "valueOf", getTypedExpression(b, expr));
+            return b.invoke("String", "valueOf", getTypedExpression(b, expr)); //$NON-NLS-1$ $NON-NLS-2$
 
         default: // >= 2
             boolean isFirstAndNotAString= isFirstAndNotAString(appendedStrings);
@@ -528,7 +528,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
             List<Expression> concatenateStrings= new ArrayList<Expression>(appendedStrings.size());
             for (final Pair<ITypeBinding, Expression> typeAndValue : appendedStrings) {
                 if (isFirstAndNotAString) {
-                    concatenateStrings.add(b.invoke("String", "valueOf", getTypedExpression(b, typeAndValue)));
+                    concatenateStrings.add(b.invoke("String", "valueOf", getTypedExpression(b, typeAndValue))); //$NON-NLS-1$ $NON-NLS-2$
                     isFirstAndNotAString= false;
                 } else {
                     concatenateStrings.add(b.parenthesizeIfNeeded(getTypedExpression(b, typeAndValue)));

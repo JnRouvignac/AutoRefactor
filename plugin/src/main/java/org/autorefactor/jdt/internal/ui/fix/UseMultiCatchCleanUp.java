@@ -192,7 +192,7 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
             final StringBuilder sb= new StringBuilder();
             for (ITypeBinding typeBinding : typeBindings) {
                 if (sb.length() > 0) {
-                    sb.append(" | ");
+                    sb.append(" | "); //$NON-NLS-1$
                 }
                 sb.append(typeBinding.getName());
             }

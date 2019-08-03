@@ -57,8 +57,8 @@ public final class JavaCoreHelper {
     private static final Path[] EMPTY_PATHS= new Path[0];
 
     public static IPackageFragment getPackageFragment(String packageName) throws Exception {
-        final IJavaProject javaProject= createJavaProject("projectName", "bin");
-        final IPackageFragmentRoot root= addSourceContainer(javaProject, "/testRoot");
+        final IJavaProject javaProject= createJavaProject("projectName", "bin"); //$NON-NLS-1$ $NON-NLS-2$
+        final IPackageFragmentRoot root= addSourceContainer(javaProject, "/testRoot"); //$NON-NLS-1$
         addToClasspath(javaProject, getClasspathEntries(root));
         return root.createPackageFragment(packageName, true, null);
     }
@@ -72,7 +72,7 @@ public final class JavaCoreHelper {
         final IClasspathEntry rtJarEntry= JavaCore.newLibraryEntry(getPathToRtJar(), null, null);
         entries.add(rtJarEntry);
 
-        extractClasspathEntries(entries, "../samples/pom.xml");
+        extractClasspathEntries(entries, "../samples/pom.xml"); //$NON-NLS-1$
         return entries;
     }
 
@@ -81,45 +81,45 @@ public final class JavaCoreHelper {
         final DocumentBuilder builder= factory.newDocumentBuilder();
         final Document document= builder.parse(new File(classpathFile));
 
-        final Node projectNode= getNodeByNodeName(document.getChildNodes(), "project");
+        final Node projectNode= getNodeByNodeName(document.getChildNodes(), "project"); //$NON-NLS-1$
         final List<Node> dependencies= asList(
-                getNodeByNodeName(projectNode.getChildNodes(), "dependencies").getChildNodes());
+                getNodeByNodeName(projectNode.getChildNodes(), "dependencies").getChildNodes()); //$NON-NLS-1$
         final String m2Repo= getM2Repository();
         for (Node dependency : dependencies) {
             if (dependency.getNodeType() == Node.COMMENT_NODE) {
                 continue;
             }
             final NodeList children= dependency.getChildNodes();
-            String groupId= getNodeByNodeName(children, "groupId").getTextContent();
-            String artifactId= getNodeByNodeName(children, "artifactId").getTextContent();
-            String version= getNodeByNodeName(children, "version").getTextContent();
+            String groupId= getNodeByNodeName(children, "groupId").getTextContent(); //$NON-NLS-1$
+            String artifactId= getNodeByNodeName(children, "artifactId").getTextContent(); //$NON-NLS-1$
+            String version= getNodeByNodeName(children, "version").getTextContent(); //$NON-NLS-1$
             String sep= File.separator;
             final String jarPath= m2Repo + sep + toPath(groupId) + sep + artifactId + sep + version + sep + artifactId
-                    + "-" + version + ".jar";
+                    + "-" + version + ".jar"; //$NON-NLS-1$ $NON-NLS-2$
             entries.add(JavaCore.newLibraryEntry(new Path(jarPath), null, null));
         }
     }
 
     private static String getM2Repository() throws Exception {
-        final String userHome= System.getProperty("user.home");
-        final File m2Settings= new File(userHome + "/.m2/settings.xml");
+        final String userHome= System.getProperty("user.home"); //$NON-NLS-1$
+        final File m2Settings= new File(userHome + "/.m2/settings.xml"); //$NON-NLS-1$
         if (m2Settings.exists() && m2Settings.isFile()) {
             final Document document= DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(m2Settings);
 
-            final Node settingsNode= getNodeByNodeName(document.getChildNodes(), "settings");
+            final Node settingsNode= getNodeByNodeName(document.getChildNodes(), "settings"); //$NON-NLS-1$
             if (settingsNode != null) {
-                final Node localRepoNode= getNodeByNodeName(settingsNode.getChildNodes(), "localRepository");
+                final Node localRepoNode= getNodeByNodeName(settingsNode.getChildNodes(), "localRepository"); //$NON-NLS-1$
                 if (localRepoNode != null) {
                     return localRepoNode.getTextContent();
                 }
             }
         }
-        final File m2Repo= new File(userHome + "/.m2/repository");
+        final File m2Repo= new File(userHome + "/.m2/repository"); //$NON-NLS-1$
         if (m2Repo.exists() && m2Repo.isDirectory()) {
             return m2Repo.getPath();
         }
-        throw new RuntimeException("Cannot determine maven repository." + " Tried \"" + m2Settings + "\" file"
-                + " and \"" + m2Repo + "\" directory.");
+        throw new RuntimeException("Cannot determine maven repository." + " Tried \"" + m2Settings + "\" file" //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$ $NON-NLS-4$
+                + " and \"" + m2Repo + "\" directory."); //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
     }
 
     private static Node getNodeByNodeName(NodeList nodes, String nodeName) {
@@ -215,12 +215,12 @@ public final class JavaCoreHelper {
     }
 
     private static IPath getPathToRtJar() {
-        final String classPath= System.getProperty("sun.boot.class.path");
-        final int idx= classPath.indexOf("rt.jar");
+        final String classPath= System.getProperty("sun.boot.class.path"); //$NON-NLS-1$
+        final int idx= classPath.indexOf("rt.jar"); //$NON-NLS-1$
         if (idx == -1) {
-            throw new RuntimeException("Could not find Java runtime library rt.jar");
+            throw new RuntimeException("Could not find Java runtime library rt.jar"); //$NON-NLS-1$
         }
-        final int end= idx + "rt.jar".length();
+        final int end= idx + "rt.jar".length(); //$NON-NLS-1$
         final int lastIdx= classPath.lastIndexOf(':', idx);
         final int start= lastIdx != -1 ? lastIdx + 1 : 0;
         return new Path(classPath.substring(start, end));

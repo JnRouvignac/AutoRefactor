@@ -70,15 +70,15 @@ public class AutoBoxingRatherThanExplicitMethodCleanUp extends AbstractCleanUpRu
 
     @Override
     public boolean visit(MethodInvocation node) {
-        if ("valueOf".equals(node.getName().getIdentifier()) && node.getExpression() != null
-                && (isMethod(node, Boolean.class.getCanonicalName(), "valueOf", boolean.class.getSimpleName())
-                        || isMethod(node, Byte.class.getCanonicalName(), "valueOf", byte.class.getSimpleName())
-                        || isMethod(node, Character.class.getCanonicalName(), "valueOf", char.class.getSimpleName())
-                        || isMethod(node, Short.class.getCanonicalName(), "valueOf", short.class.getSimpleName())
-                        || isMethod(node, Integer.class.getCanonicalName(), "valueOf", int.class.getSimpleName())
-                        || isMethod(node, Long.class.getCanonicalName(), "valueOf", long.class.getSimpleName())
-                        || isMethod(node, Float.class.getCanonicalName(), "valueOf", float.class.getSimpleName())
-                        || isMethod(node, Double.class.getCanonicalName(), "valueOf", double.class.getSimpleName()))) {
+        if ("valueOf".equals(node.getName().getIdentifier()) && node.getExpression() != null //$NON-NLS-1$
+                && (isMethod(node, Boolean.class.getCanonicalName(), "valueOf", boolean.class.getSimpleName()) //$NON-NLS-1$
+                        || isMethod(node, Byte.class.getCanonicalName(), "valueOf", byte.class.getSimpleName()) //$NON-NLS-1$
+                        || isMethod(node, Character.class.getCanonicalName(), "valueOf", char.class.getSimpleName()) //$NON-NLS-1$
+                        || isMethod(node, Short.class.getCanonicalName(), "valueOf", short.class.getSimpleName()) //$NON-NLS-1$
+                        || isMethod(node, Integer.class.getCanonicalName(), "valueOf", int.class.getSimpleName()) //$NON-NLS-1$
+                        || isMethod(node, Long.class.getCanonicalName(), "valueOf", long.class.getSimpleName()) //$NON-NLS-1$
+                        || isMethod(node, Float.class.getCanonicalName(), "valueOf", float.class.getSimpleName()) //$NON-NLS-1$
+                        || isMethod(node, Double.class.getCanonicalName(), "valueOf", double.class.getSimpleName()))) { //$NON-NLS-1$
             final ITypeBinding primitiveType= node.resolveMethodBinding().getParameterTypes()[0];
             final ITypeBinding wrapperClass= node.resolveMethodBinding().getDeclaringClass();
 

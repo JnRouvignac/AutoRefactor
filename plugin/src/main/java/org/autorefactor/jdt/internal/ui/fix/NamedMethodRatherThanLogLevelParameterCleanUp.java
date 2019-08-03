@@ -70,7 +70,7 @@ public class NamedMethodRatherThanLogLevelParameterCleanUp extends AbstractClean
 
     @Override
     public boolean visit(final MethodInvocation node) {
-        if (isMethod(node, Logger.class.getCanonicalName(), "log", Level.class.getCanonicalName(), String.class.getCanonicalName())) {
+        if (isMethod(node, Logger.class.getCanonicalName(), "log", Level.class.getCanonicalName(), String.class.getCanonicalName())) { //$NON-NLS-1$
             final List<Expression> args= arguments(node);
 
             if (args != null && args.size() == 2) {
@@ -81,18 +81,18 @@ public class NamedMethodRatherThanLogLevelParameterCleanUp extends AbstractClean
                     final QualifiedName levelType= (QualifiedName) level;
                     final String methodName;
 
-                    if (isField(levelType, Level.class.getCanonicalName(), "SEVERE")) {
-                        methodName= "severe";
-                    } else if (isField(levelType, Level.class.getCanonicalName(), "WARNING")) {
-                        methodName= "warning";
-                    } else if (isField(levelType, Level.class.getCanonicalName(), "INFO")) {
-                        methodName= "info";
-                    } else if (isField(levelType, Level.class.getCanonicalName(), "FINE")) {
-                        methodName= "fine";
-                    } else if (isField(levelType, Level.class.getCanonicalName(), "FINER")) {
-                        methodName= "finer";
-                    } else if (isField(levelType, Level.class.getCanonicalName(), "FINEST")) {
-                        methodName= "finest";
+                    if (isField(levelType, Level.class.getCanonicalName(), "SEVERE")) { //$NON-NLS-1$
+                        methodName= "severe"; //$NON-NLS-1$
+                    } else if (isField(levelType, Level.class.getCanonicalName(), "WARNING")) { //$NON-NLS-1$
+                        methodName= "warning"; //$NON-NLS-1$
+                    } else if (isField(levelType, Level.class.getCanonicalName(), "INFO")) { //$NON-NLS-1$
+                        methodName= "info"; //$NON-NLS-1$
+                    } else if (isField(levelType, Level.class.getCanonicalName(), "FINE")) { //$NON-NLS-1$
+                        methodName= "fine"; //$NON-NLS-1$
+                    } else if (isField(levelType, Level.class.getCanonicalName(), "FINER")) { //$NON-NLS-1$
+                        methodName= "finer"; //$NON-NLS-1$
+                    } else if (isField(levelType, Level.class.getCanonicalName(), "FINEST")) { //$NON-NLS-1$
+                        methodName= "finest"; //$NON-NLS-1$
                     } else {
                         return true;
                     }

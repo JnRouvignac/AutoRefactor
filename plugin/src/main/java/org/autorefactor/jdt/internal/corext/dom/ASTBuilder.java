@@ -312,7 +312,7 @@ public class ASTBuilder {
         if (typeName.indexOf('.') == -1) {
             return simpleType(typeName);
         }
-        return qualifiedType(typeName.split("\\."));
+        return qualifiedType(typeName.split("\\.")); //$NON-NLS-1$
     }
 
     private Type simpleType(final String name) {
@@ -326,7 +326,7 @@ public class ASTBuilder {
     private Type qualifiedType(String... names) {
         switch (names.length) {
         case 0:
-            throw new IllegalArgumentException(null, "Expected one or more names, but got 0");
+            throw new IllegalArgumentException(null, "Expected one or more names, but got 0"); //$NON-NLS-1$
         case 1:
             return simpleType(names[0]);
         default:
@@ -420,7 +420,7 @@ public class ASTBuilder {
      */
     public Type toType(ITypeBinding typeBinding, TypeNameDecider typeNameDecider) {
         if (typeBinding == null) {
-            throw new IllegalArgumentException(null, "typeBinding cannot be null");
+            throw new IllegalArgumentException(null, "typeBinding cannot be null"); //$NON-NLS-1$
         }
 
         if (typeBinding.isParameterizedType()) {
@@ -448,13 +448,13 @@ public class ASTBuilder {
         } else if (typeBinding.isCapture()) {
             if (typeBinding.getTypeBounds().length > 1) {
                 throw new NotImplementedException(null,
-                        "because it violates the javadoc of `ITypeBinding.getTypeBounds()`: "
+                        "because it violates the javadoc of `ITypeBinding.getTypeBounds()`: " //$NON-NLS-1$
                                 + "\"Note that per construction, it can only contain one class or array type, "
                                 + "at most, and then it is located in first position.\"");
             }
             return toType(typeBinding.getWildcard(), typeNameDecider);
         }
-        throw new NotImplementedException(null, " for the type binding '" + typeBinding + "'");
+        throw new NotImplementedException(null, " for the type binding '" + typeBinding + "'"); //$NON-NLS-1$ $NON-NLS-2$
     }
 
     private Type copyType(final Type type) {
@@ -488,7 +488,7 @@ public class ASTBuilder {
             return copyOfType;
         }
 
-        throw new NotImplementedException(null, "Unknown type for type " + type);
+        throw new NotImplementedException(null, "Unknown type for type " + type); //$NON-NLS-1$
     }
 
     /**
@@ -515,7 +515,7 @@ public class ASTBuilder {
         }
         if (!isValidForRangeOperation(nodes)) {
             throw new IllegalArgumentException(nodes.get(0),
-                    "The provided nodes are not valid for doing a range copy: " + nodes);
+                    "The provided nodes are not valid for doing a range copy: " + nodes); //$NON-NLS-1$
         }
         return refactorings.createCopyTarget(nodes.get(0), nodes.get(nodes.size() - 1));
     }
@@ -533,7 +533,7 @@ public class ASTBuilder {
         }
         if (!isValidForRangeOperation(nodes)) {
             throw new IllegalArgumentException(nodes.get(0),
-                    "The provided nodes are not valid for doing a range move: " + nodes);
+                    "The provided nodes are not valid for doing a range move: " + nodes); //$NON-NLS-1$
         }
         return refactorings.createMoveTarget(nodes.get(0), nodes.get(nodes.size() - 1));
     }
@@ -775,8 +775,8 @@ public class ASTBuilder {
      */
     public InfixExpression infixExpr(InfixExpression.Operator operator, Collection<? extends Expression> allOperands) {
         if (allOperands.size() < 2) {
-            throw new IllegalArgumentException(null, "Not enough operands for an infix expression: "
-                    + "needed at least 2, but got " + allOperands.size());
+            throw new IllegalArgumentException(null, "Not enough operands for an infix expression: " //$NON-NLS-1$
+                    + "needed at least 2, but got " + allOperands.size()); //$NON-NLS-1$
         }
         final Iterator<? extends Expression> it= allOperands.iterator();
         final InfixExpression ie= ast.newInfixExpression();
@@ -1006,7 +1006,7 @@ public class ASTBuilder {
      */
     public Name name(String... names) {
         if (names.length == 0) {
-            throw new IllegalArgumentException(null, "Expected at least one name, but was given 0 names");
+            throw new IllegalArgumentException(null, "Expected at least one name, but was given 0 names"); //$NON-NLS-1$
         }
         if (names.length == 1) {
             return simpleName(names[0]);
@@ -1281,7 +1281,7 @@ public class ASTBuilder {
      * @return a newline statement
      */
     public Statement newlinePlaceholder() {
-        return (Statement) refactorings.getRewrite().createStringPlaceholder("\n", EMPTY_STATEMENT);
+        return (Statement) refactorings.getRewrite().createStringPlaceholder("\n", EMPTY_STATEMENT); //$NON-NLS-1$
     }
 
     /**

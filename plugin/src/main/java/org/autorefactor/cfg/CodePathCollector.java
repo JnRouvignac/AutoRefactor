@@ -71,7 +71,7 @@ public class CodePathCollector {
                 }
             }
             if (!foundAtLeastOneEdge) {
-                throw new IllegalStateException(block.getNode(), "Path should have ended with an exit block: " + stack);
+                throw new IllegalStateException(block.getNode(), "Path should have ended with an exit block: " + stack); //$NON-NLS-1$
             }
         } finally {
             stack.removeLast();

@@ -77,22 +77,22 @@ public class VectorOldToNewAPICleanUp extends AbstractCleanUpRule {
 
     @Override
     public boolean visit(MethodInvocation node) {
-        if (isMethod(node, Vector.class.getCanonicalName(), "elementAt", int.class.getSimpleName())) {
-            replaceWith(node, "get");
-        } else if (isMethod(node, Vector.class.getCanonicalName(), "addElement", Object.class.getCanonicalName())) {
-            replaceWith(node, "add");
-        } else if (isMethod(node, Vector.class.getCanonicalName(), "insertElementAt", Object.class.getCanonicalName(), int.class.getSimpleName())) {
-            replaceWithAndSwapArguments(node, "add");
-        } else if (isMethod(node, Vector.class.getCanonicalName(), "copyInto", Object[].class.getCanonicalName())) {
-            replaceWith(node, "toArray");
-        } else if (isMethod(node, Vector.class.getCanonicalName(), "removeAllElements")) {
-            replaceWith(node, "clear");
-        } else if (isMethod(node, Vector.class.getCanonicalName(), "removeElement", Object.class.getCanonicalName())) {
-            replaceWithSpecial(node, "remove");
-        } else if (isMethod(node, Vector.class.getCanonicalName(), "removeElementAt", int.class.getSimpleName())) {
-            replaceWith(node, "remove");
-        } else if (isMethod(node, Vector.class.getCanonicalName(), "setElementAt", Object.class.getCanonicalName(), int.class.getSimpleName())) {
-            replaceWithAndSwapArguments(node, "set");
+        if (isMethod(node, Vector.class.getCanonicalName(), "elementAt", int.class.getSimpleName())) { //$NON-NLS-1$
+            replaceWith(node, "get"); //$NON-NLS-1$
+        } else if (isMethod(node, Vector.class.getCanonicalName(), "addElement", Object.class.getCanonicalName())) { //$NON-NLS-1$
+            replaceWith(node, "add"); //$NON-NLS-1$
+        } else if (isMethod(node, Vector.class.getCanonicalName(), "insertElementAt", Object.class.getCanonicalName(), int.class.getSimpleName())) { //$NON-NLS-1$
+            replaceWithAndSwapArguments(node, "add"); //$NON-NLS-1$
+        } else if (isMethod(node, Vector.class.getCanonicalName(), "copyInto", Object[].class.getCanonicalName())) { //$NON-NLS-1$
+            replaceWith(node, "toArray"); //$NON-NLS-1$
+        } else if (isMethod(node, Vector.class.getCanonicalName(), "removeAllElements")) { //$NON-NLS-1$
+            replaceWith(node, "clear"); //$NON-NLS-1$
+        } else if (isMethod(node, Vector.class.getCanonicalName(), "removeElement", Object.class.getCanonicalName())) { //$NON-NLS-1$
+            replaceWithSpecial(node, "remove"); //$NON-NLS-1$
+        } else if (isMethod(node, Vector.class.getCanonicalName(), "removeElementAt", int.class.getSimpleName())) { //$NON-NLS-1$
+            replaceWith(node, "remove"); //$NON-NLS-1$
+        } else if (isMethod(node, Vector.class.getCanonicalName(), "setElementAt", Object.class.getCanonicalName(), int.class.getSimpleName())) { //$NON-NLS-1$
+            replaceWithAndSwapArguments(node, "set"); //$NON-NLS-1$
         } else {
             return true;
         }
@@ -113,7 +113,7 @@ public class VectorOldToNewAPICleanUp extends AbstractCleanUpRule {
         final Refactorings r= this.ctx.getRefactorings();
         r.set(node, NAME_PROPERTY, b.simpleName(newMethodName));
         if (hasType(arg0, int.class.getSimpleName(), short.class.getSimpleName(), byte.class.getSimpleName())) {
-            r.replace(arg0, b.cast(b.type("Object"), b.move(arg0)));
+            r.replace(arg0, b.cast(b.type("Object"), b.move(arg0))); //$NON-NLS-1$
         }
     }
 
@@ -130,12 +130,12 @@ public class VectorOldToNewAPICleanUp extends AbstractCleanUpRule {
 
     private void assertSize(final List<Expression> args, final int expectedSize) {
         if (args == null) {
-            throw new IllegalArgumentException(null, "Expected " + args + "to not be null");
+            throw new IllegalArgumentException(null, "Expected " + args + "to not be null"); //$NON-NLS-1$ $NON-NLS-2$
         }
         if (args.size() != expectedSize) {
             final Expression node= !args.isEmpty() ? args.get(0) : null;
             throw new IllegalArgumentException(node,
-                    "Expected " + args + " to have size <" + expectedSize + ">, but found <" + args.size() + ">");
+                    "Expected " + args + " to have size <" + expectedSize + ">, but found <" + args.size() + ">"); //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$ $NON-NLS-4$
         }
     }
 }

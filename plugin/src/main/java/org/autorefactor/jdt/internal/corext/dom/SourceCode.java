@@ -68,9 +68,9 @@ public class SourceCode {
         @Override
         public String toString() {
             final CompilationUnit astRoot= sourceCode.astRoot;
-            return "[(" + astRoot.getLineNumber(getStartPosition()) + "," + astRoot.getColumnNumber(getStartPosition())
-                    + ")" + " => (" + astRoot.getLineNumber(getEndPosition()) + ","
-                    + astRoot.getColumnNumber(getEndPosition()) + ")]";
+            return "[(" + astRoot.getLineNumber(getStartPosition()) + "," + astRoot.getColumnNumber(getStartPosition()) //$NON-NLS-1$ $NON-NLS-2$
+                    + ")" + " => (" + astRoot.getLineNumber(getEndPosition()) + "," //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
+                    + astRoot.getColumnNumber(getEndPosition()) + ")]"; //$NON-NLS-1$
         }
     }
 
@@ -97,7 +97,7 @@ public class SourceCode {
         try {
             final String lineSeparator= this.compilationUnit.findRecommendedLineSeparator();
             int fromIndex= 0;
-            Matcher matcher= Pattern.compile(".*?" + lineSeparator).matcher(this.text);
+            Matcher matcher= Pattern.compile(".*?" + lineSeparator).matcher(this.text); //$NON-NLS-1$
             while (fromIndex < this.text.length() && matcher.find(fromIndex)) {
                 String lineText= matcher.group();
                 int offset= this.text.indexOf(lineText, fromIndex);
