@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2017 Fabrice Tiercelin - Initial API and implementation
+ * Copyright (C) 2017-2019 Fabrice Tiercelin - Initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.as;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.asList;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.fallsThrough;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getNextSibling;
@@ -86,42 +87,64 @@ public class OneCodeThatFallsThroughRatherThanRedundantBlocksCleanUp extends Abs
 
         @Override
         public boolean visit(TryStatement node) {
-            if (getResult() && node.getFinally() == null) {
-                final List<Statement> redundantStmts= new ArrayList<Statement>();
-                for (final CatchClause catchClause : (List<CatchClause>) node.catchClauses()) {
-                    redundantStmts.add(catchClause.getBody());
-                }
-
-                return maybeRemoveRedundantCode(node, redundantStmts);
-            }
-            return true;
+            return visitStmt(node);
         }
 
         @Override
         public boolean visit(IfStatement node) {
-            if (getResult()) {
-                final List<Statement> redundantStmts= new ArrayList<Statement>();
-                redundantStmts.add(node.getThenStatement());
-                extractStmt(node, redundantStmts);
-
-                return maybeRemoveRedundantCode(node, redundantStmts);
-            }
-            return true;
+            return visitStmt(node);
         }
 
-        private void extractStmt(final IfStatement node, final List<Statement> redundantStmts) {
-            Statement subIfStmt= node.getElseStatement();
-            if (subIfStmt != null) {
-                if (subIfStmt instanceof IfStatement) {
-                    redundantStmts.add(((IfStatement) subIfStmt).getThenStatement());
-                    extractStmt((IfStatement) subIfStmt, redundantStmts);
-                } else {
-                    redundantStmts.add(subIfStmt);
-                }
+        private boolean visitStmt(Statement node) {
+            if (!getResult()) {
+                return true;
             }
+
+            final List<Statement> redundantStmts= new ArrayList<Statement>();
+            collectStmts(node, redundantStmts);
+            return maybeRemoveRedundantCode(node, redundantStmts);
+        }
+
+        @SuppressWarnings("unchecked")
+        private void collectStmts(Statement node, final List<Statement> redundantStmts) {
+            if (node == null) {
+                return;
+            }
+
+            TryStatement ts= as(node, TryStatement.class);
+            IfStatement is= as(node, IfStatement.class);
+
+            if (ts != null && ts.getFinally() == null) {
+                for (final CatchClause catchClause : (List<CatchClause>) ts.catchClauses()) {
+                    doCollectStmts(catchClause.getBody(), redundantStmts);
+                }
+            } else if (is != null) {
+                doCollectStmts(is.getThenStatement(), redundantStmts);
+                doCollectStmts(is.getElseStatement(), redundantStmts);
+            }
+        }
+
+        private void doCollectStmts(Statement node, final List<Statement> redundantStmts) {
+            if (node == null) {
+                return;
+            }
+
+            redundantStmts.add(node);
+            List<Statement> stmts= asList(node);
+
+            if (stmts == null || stmts.isEmpty()) {
+                return;
+            }
+
+            node= stmts.get(stmts.size() - 1);
+            collectStmts(node, redundantStmts);
         }
 
         private boolean maybeRemoveRedundantCode(final Statement node, final List<Statement> redundantStmts) {
+            if (redundantStmts.isEmpty()) {
+                return true;
+            }
+
             final List<Statement> referenceStmts= new ArrayList<Statement>();
 
             Statement nextSibling= getNextSibling(node);
@@ -132,9 +155,11 @@ public class OneCodeThatFallsThroughRatherThanRedundantBlocksCleanUp extends Abs
 
             if (nextSibling != null) {
                 referenceStmts.add(nextSibling);
+                ASTBuilder b= ctx.getASTBuilder();
 
                 for (final Statement redundantStmt : redundantStmts) {
                     List<Statement> stmtsToCompare= asList(redundantStmt);
+
                     if (stmtsToCompare.size() > referenceStmts.size()) {
                         stmtsToCompare= stmtsToCompare.subList(stmtsToCompare.size() - referenceStmts.size(),
                                 stmtsToCompare.size());
@@ -142,18 +167,19 @@ public class OneCodeThatFallsThroughRatherThanRedundantBlocksCleanUp extends Abs
 
                     if (match(referenceStmts, stmtsToCompare)) {
                         Refactorings r= ctx.getRefactorings();
+
                         if (redundantStmt instanceof Block) {
                             r.remove(stmtsToCompare);
                         } else {
-                            ASTBuilder b= ctx.getASTBuilder();
                             r.replace(redundantStmt, b.block());
                         }
+
                         setResult(false);
+                        return false;
                     }
                 }
-
-                return getResult();
             }
+
             return true;
         }
     }

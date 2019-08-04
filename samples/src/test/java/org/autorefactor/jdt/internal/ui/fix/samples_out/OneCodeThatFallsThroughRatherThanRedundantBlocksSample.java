@@ -1,7 +1,7 @@
 /*
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
- * Copyright (C) 2017 Fabrice Tiercelin - Initial API and implementation
+ * Copyright (C) 2017-2019 Fabrice Tiercelin - Initial API and implementation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,7 +28,6 @@ package org.autorefactor.jdt.internal.ui.fix.samples_out;
 import java.util.List;
 
 public class OneCodeThatFallsThroughRatherThanRedundantBlocksSample {
-
     public void mergeCatchIntoFollowingCode(String number) {
         // Keep this comment
         try {
@@ -234,6 +233,85 @@ public class OneCodeThatFallsThroughRatherThanRedundantBlocksSample {
         i = i + 42;
         System.out.println("Doing something");
         throw new Exception();
+    }
+
+    public void mergeDeepStmts(String number, int i) {
+        // Keep this comment
+        try {
+            Integer.valueOf(number);
+        } catch (NumberFormatException nfe) {
+            if (i <= 0) {
+                i += 42;
+            } else if (i == 10) {
+                i += 42;
+                System.out.println("Doing another thing");
+                return;
+            } else if (i == 20) {
+                i += 42;
+            }
+        } catch (IllegalArgumentException iae) {
+            System.out.println("Doing another thing");
+            return;
+        } catch (NullPointerException npe) {
+        }
+        System.out.println("Doing something");
+        return;
+    }
+
+    public void mergeDeeperStmts(String number, int i) {
+        // Keep this comment
+        if (i > 0) {
+            try {
+                Integer.valueOf(number);
+            } catch (NumberFormatException nfe) {
+                if (i == 5) {
+                    i += 42;
+                } else if (i == 10) {
+                    i += 42;
+                    System.out.println("Doing another thing");
+                    return;
+                } else if (i == 20) {
+                    i += 42;
+                }
+            } catch (IllegalArgumentException iae) {
+                System.out.println("Doing another thing");
+                return;
+            } catch (NullPointerException npe) {
+            }
+        }
+        System.out.println("Doing something");
+        return;
+    }
+
+    public void doNotRefactorNotLastStmts(String number, int i) {
+        if (i > 0) {
+            try {
+                Integer.valueOf(number);
+            } catch (NumberFormatException nfe) {
+                if (i == 5) {
+                    i += 42;
+                    System.out.println("Doing something");
+                    return;
+                } else if (i == 10) {
+                    i += 42;
+                    System.out.println("Doing another thing");
+                    return;
+                } else if (i == 20) {
+                    i += 42;
+                    System.out.println("Doing something");
+                    return;
+                }
+            } catch (IllegalArgumentException iae) {
+                System.out.println("Doing another thing");
+                return;
+            } catch (NullPointerException npe) {
+                System.out.println("Doing something");
+                return;
+            }
+            System.out.println("Insidious code...");
+        }
+        System.out.println("Doing something");
+        return;
     }
 
     public void mergeIfWithContinue(int[] numbers) {
