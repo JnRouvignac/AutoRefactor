@@ -25,20 +25,13 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.arg0;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.as;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.usesGivenSignature;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isSameVariable;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.match;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.removeParentheses;
-
 import java.util.Collection;
 
-import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.PrefixExpression;
-import org.eclipse.jdt.core.dom.PrefixExpression.Operator;
 
 /** See {@link #getDescription()} method. */
 public class ContainsAllRatherThanLoopCleanUp extends AbstractCollectionMethodRatherThanLoopCleanUp {
@@ -71,10 +64,10 @@ public class ContainsAllRatherThanLoopCleanUp extends AbstractCollectionMethodRa
 
     @Override
     protected Expression getExpressionToFind(MethodInvocation cond, Expression forVar) {
-        Expression expr= removeParentheses(cond.getExpression());
-        Expression arg0= removeParentheses(arg0(cond));
+        Expression expr= ASTNodes.getUnparenthesedExpression(cond.getExpression());
+        Expression arg0= ASTNodes.getUnparenthesedExpression(ASTNodes.arg0(cond));
 
-        if (isSameVariable(forVar, arg0) || match(forVar, arg0)) {
+        if (ASTNodes.isSameVariable(forVar, arg0) || ASTNodes.match(forVar, arg0)) {
             return expr;
         }
 
@@ -83,15 +76,15 @@ public class ContainsAllRatherThanLoopCleanUp extends AbstractCollectionMethodRa
 
     @Override
     protected MethodInvocation getMethodToReplace(Expression condition) {
-        PrefixExpression negation= as(condition, PrefixExpression.class);
+        PrefixExpression negation= ASTNodes.as(condition, PrefixExpression.class);
 
-        if (negation == null || !Operator.NOT.equals(negation.getOperator())) {
+        if (negation == null || !PrefixExpression.Operator.NOT.equals(negation.getOperator())) {
             return null;
         }
 
-        MethodInvocation method= as(negation.getOperand(), MethodInvocation.class);
+        MethodInvocation method= ASTNodes.as(negation.getOperand(), MethodInvocation.class);
 
-        if (!usesGivenSignature(method, Collection.class.getCanonicalName(), "contains", Object.class.getCanonicalName())) { //$NON-NLS-1$
+        if (!ASTNodes.usesGivenSignature(method, Collection.class.getCanonicalName(), "contains", Object.class.getCanonicalName())) { //$NON-NLS-1$
             return null;
         }
 
@@ -99,7 +92,7 @@ public class ContainsAllRatherThanLoopCleanUp extends AbstractCollectionMethodRa
     }
 
     @Override
-    protected Expression newMethod(Expression iterable, Expression toFind, boolean isPositive, ASTBuilder b) {
+    protected Expression newMethod(Expression iterable, Expression toFind, boolean isPositive, ASTNodeFactory b) {
         final MethodInvocation invoke= b.invoke(b.move(toFind), "containsAll", b.move(iterable)); //$NON-NLS-1$
 
         if (isPositive) {

@@ -25,19 +25,14 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.as;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isPassive;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.match;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.removeParentheses;
-
 import java.util.Arrays;
 
-import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.ASTSemanticMatcher;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.InfixExpression;
-import org.eclipse.jdt.core.dom.InfixExpression.Operator;
 import org.eclipse.jdt.core.dom.PrefixExpression;
 import org.eclipse.jdt.core.dom.Statement;
 
@@ -103,9 +98,9 @@ public class OppositeConditionRatherThanDuplicateConditionCleanUp extends Abstra
             final InfixExpression firstCondition= (InfixExpression) node.getExpression();
 
             if (!firstCondition.hasExtendedOperands()
-                    && Arrays.<Operator>asList(Operator.AND, Operator.CONDITIONAL_AND)
+                    && Arrays.<InfixExpression.Operator>asList(InfixExpression.Operator.AND, InfixExpression.Operator.CONDITIONAL_AND)
                             .contains(firstCondition.getOperator())
-                    && isPassive(firstCondition.getLeftOperand()) && isPassive(firstCondition.getRightOperand())) {
+                    && ASTNodes.isPassive(firstCondition.getLeftOperand()) && ASTNodes.isPassive(firstCondition.getRightOperand())) {
                 final IfStatement secondIf= (IfStatement) node.getElseStatement();
 
                 if (secondIf.getElseStatement() != null) {
@@ -123,7 +118,7 @@ public class OppositeConditionRatherThanDuplicateConditionCleanUp extends Abstra
             final Expression duplicateExpr, final Expression notDuplicateExpr) {
         final ASTSemanticMatcher matcher= new ASTSemanticMatcher();
 
-        if (match(matcher, duplicateExpr, secondIf.getExpression())) {
+        if (ASTNodes.match(matcher, duplicateExpr, secondIf.getExpression())) {
             refactorCondition(node, duplicateExpr, notDuplicateExpr, secondIf.getThenStatement(),
                     secondIf.getElseStatement());
             return false;
@@ -138,7 +133,7 @@ public class OppositeConditionRatherThanDuplicateConditionCleanUp extends Abstra
 
     private void refactorCondition(final IfStatement node, final Expression duplicateExpr,
             final Expression notDuplicateExpr, final Statement positiveStmt, final Statement negativeStmt) {
-        final ASTBuilder b= this.ctx.getASTBuilder();
+        final ASTNodeFactory b= this.ctx.getASTBuilder();
 
         Statement negativeStmtCopy;
         if (negativeStmt instanceof IfStatement) {
@@ -150,7 +145,7 @@ public class OppositeConditionRatherThanDuplicateConditionCleanUp extends Abstra
         final Expression secondCond;
         final Statement secondStmtCopy;
         final Statement thirdStmtCopy;
-        final PrefixExpression negativeCond= as(notDuplicateExpr, PrefixExpression.class);
+        final PrefixExpression negativeCond= ASTNodes.as(notDuplicateExpr, PrefixExpression.class);
 
         if (negativeCond != null && PrefixExpression.Operator.NOT.equals(negativeCond.getOperator())) {
             secondCond= negativeCond.getOperand();
@@ -163,7 +158,7 @@ public class OppositeConditionRatherThanDuplicateConditionCleanUp extends Abstra
         }
 
         this.ctx.getRefactorings().replace(node,
-                b.if0(b.parenthesizeIfNeeded(b.negate(removeParentheses(duplicateExpr))), negativeStmtCopy,
-                        b.if0(b.copy(removeParentheses(secondCond)), secondStmtCopy, thirdStmtCopy)));
+                b.if0(b.parenthesizeIfNeeded(b.negate(ASTNodes.getUnparenthesedExpression(duplicateExpr))), negativeStmtCopy,
+                        b.if0(b.copy(ASTNodes.getUnparenthesedExpression(secondCond)), secondStmtCopy, thirdStmtCopy)));
     }
 }

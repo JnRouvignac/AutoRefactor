@@ -26,34 +26,16 @@
  */
 package org.autorefactor.jdt.internal.corext.dom;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.arguments;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.catchClauses;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.extendedOperands;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasOperator;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.modifiers;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.removeParentheses;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.statements;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.typeArguments;
-import static org.autorefactor.util.Utils.equal;
 import static org.eclipse.jdt.core.dom.ASTNode.ARRAY_TYPE;
 import static org.eclipse.jdt.core.dom.ASTNode.ASSIGNMENT;
 import static org.eclipse.jdt.core.dom.ASTNode.CONDITIONAL_EXPRESSION;
-import static org.eclipse.jdt.core.dom.ASTNode.EMPTY_STATEMENT;
 import static org.eclipse.jdt.core.dom.ASTNode.INFIX_EXPRESSION;
 import static org.eclipse.jdt.core.dom.ASTNode.CAST_EXPRESSION;
 import static org.eclipse.jdt.core.dom.ASTNode.INSTANCEOF_EXPRESSION;
-import static org.eclipse.jdt.core.dom.ASTNode.PREFIX_EXPRESSION;
 import static org.eclipse.jdt.core.dom.ASTNode.PRIMITIVE_TYPE;
 import static org.eclipse.jdt.core.dom.ASTNode.QUALIFIED_TYPE;
 import static org.eclipse.jdt.core.dom.ASTNode.SIMPLE_TYPE;
 import static org.eclipse.jdt.core.dom.ASTNode.PARAMETERIZED_TYPE;
-import static org.eclipse.jdt.core.dom.Modifier.ModifierKeyword.FINAL_KEYWORD;
-import static org.eclipse.jdt.core.dom.Modifier.ModifierKeyword.PRIVATE_KEYWORD;
-import static org.eclipse.jdt.core.dom.Modifier.ModifierKeyword.PROTECTED_KEYWORD;
-import static org.eclipse.jdt.core.dom.Modifier.ModifierKeyword.PUBLIC_KEYWORD;
-import static org.eclipse.jdt.core.dom.Modifier.ModifierKeyword.STATIC_KEYWORD;
-import static org.eclipse.jdt.core.dom.PrefixExpression.Operator.NOT;
-
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -63,6 +45,7 @@ import java.util.ListIterator;
 
 import org.autorefactor.util.IllegalArgumentException;
 import org.autorefactor.util.NotImplementedException;
+import org.autorefactor.util.Utils;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Annotation;
@@ -95,6 +78,7 @@ import org.eclipse.jdt.core.dom.MarkerAnnotation;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Modifier;
+import org.eclipse.jdt.core.dom.Modifier.ModifierKeyword;
 import org.eclipse.jdt.core.dom.Name;
 import org.eclipse.jdt.core.dom.NullLiteral;
 import org.eclipse.jdt.core.dom.NumberLiteral;
@@ -130,41 +114,41 @@ import org.eclipse.jdt.core.dom.WildcardType;
  * Helper class for building AST note in a somewhat fluent API. Method names
  * which are also java keywords are postfixed with a "0".
  */
-public class ASTBuilder {
-    /** Copy operations to be performed deeply into {@link ASTBuilder} methods. */
+public class ASTNodeFactory {
+    /** Copy operations to be performed deeply into {@link ASTNodeFactory} methods. */
     public enum Copy {
         /** Do not perform any copy. Returns the node as is. */
         NONE {
             @Override
-            protected <T extends ASTNode> T perform(ASTBuilder b, T node) {
+            protected <T extends ASTNode> T perform(ASTNodeFactory b, T node) {
                 return node;
             }
         },
         /** Delegates to {@link ASTBuilder#copy(ASTNode)}. */
         COPY {
             @Override
-            protected <T extends ASTNode> T perform(ASTBuilder b, T node) {
+            protected <T extends ASTNode> T perform(ASTNodeFactory b, T node) {
                 return b.copy(node);
             }
         },
         /** Delegates to {@link ASTBuilder#move(ASTNode)}. */
         MOVE {
             @Override
-            protected <T extends ASTNode> T perform(ASTBuilder b, T node) {
+            protected <T extends ASTNode> T perform(ASTNodeFactory b, T node) {
                 return b.move(node);
             }
         };
 
         /**
          * Performs the copy operation on the provided node with the provided
-         * {@link ASTBuilder}.
+         * {@link ASTNodeFactory}.
          *
-         * @param b    the {@link ASTBuilder} allowing to copy the provided node
+         * @param b    the {@link ASTNodeFactory} allowing to copy the provided node
          * @param node the node on which to perform the copy operation
          * @param <T>  the node type
          * @return the copied node
          */
-        protected abstract <T extends ASTNode> T perform(ASTBuilder b, T node);
+        protected abstract <T extends ASTNode> T perform(ASTNodeFactory b, T node);
     }
 
     private final AST ast;
@@ -175,7 +159,7 @@ public class ASTBuilder {
      *
      * @param refactorings the refactorings
      */
-    public ASTBuilder(final Refactorings refactorings) {
+    public ASTNodeFactory(final Refactorings refactorings) {
         this.refactorings= refactorings;
         this.ast= refactorings.getAST();
     }
@@ -234,7 +218,7 @@ public class ASTBuilder {
      */
     public Block block(final Statement... stmts) {
         final Block block= ast.newBlock();
-        addAll(statements(block), stmts);
+        addAll(ASTNodes.statements(block), stmts);
         return block;
     }
 
@@ -352,7 +336,7 @@ public class ASTBuilder {
         }
 
         final ParameterizedType parameterizedType= ast.newParameterizedType(type);
-        Collections.addAll(typeArguments(parameterizedType), typeArguments);
+        Collections.addAll(ASTNodes.typeArguments(parameterizedType), typeArguments);
         return parameterizedType;
     }
 
@@ -372,7 +356,7 @@ public class ASTBuilder {
         cc.setException(svd);
 
         final Block block= ast.newBlock();
-        addAll(statements(block), stmts);
+        addAll(ASTNodes.statements(block), stmts);
         cc.setBody(block);
         return cc;
     }
@@ -386,7 +370,7 @@ public class ASTBuilder {
      */
     @SuppressWarnings("unchecked")
     public <T extends ASTNode> T copy(T nodeToCopy) {
-        if (nodeToCopy.getNodeType() == ARRAY_TYPE) {
+        if (nodeToCopy.getNodeType() == ASTNode.ARRAY_TYPE) {
             return (T) copyType((Type) nodeToCopy);
         } else if (isValidInCurrentAST(nodeToCopy)) {
             return refactorings.createCopyTarget(nodeToCopy);
@@ -425,7 +409,7 @@ public class ASTBuilder {
 
         if (typeBinding.isParameterizedType()) {
             final ParameterizedType type= ast.newParameterizedType(toType(typeBinding.getErasure(), typeNameDecider));
-            final List<Type> typeArgs= typeArguments(type);
+            final List<Type> typeArgs= ASTNodes.typeArguments(type);
             for (ITypeBinding typeArg : typeBinding.getTypeArguments()) {
                 typeArgs.add(toType(typeArg, typeNameDecider));
             }
@@ -477,7 +461,7 @@ public class ASTBuilder {
         case PARAMETERIZED_TYPE:
             final ParameterizedType pType= (ParameterizedType) type;
             final ParameterizedType copyOfType= ast.newParameterizedType(copy(pType.getType()));
-            final List<Type> newTypeArgs= typeArguments(copyOfType);
+            final List<Type> newTypeArgs= ASTNodes.typeArguments(copyOfType);
             for (Object typeArg : pType.typeArguments()) {
                 if (((Type) typeArg).isWildcardType()) {
                     newTypeArgs.add(ast.newWildcardType());
@@ -550,7 +534,7 @@ public class ASTBuilder {
         final ASTNode parent= firstNode.getParent();
         final StructuralPropertyDescriptor locInParent= firstNode.getLocationInParent();
         for (ASTNode node : nodes) {
-            if (!equal(node.getParent(), parent) || !equal(node.getLocationInParent(), locInParent)) {
+            if (!Utils.equal(node.getParent(), parent) || !Utils.equal(node.getLocationInParent(), locInParent)) {
                 return false;
             }
         }
@@ -607,7 +591,7 @@ public class ASTBuilder {
     public VariableDeclarationExpression declareExpr(Type type, SimpleName varName, Expression initializer) {
         final VariableDeclarationFragment fragment= declareFragment(varName, initializer);
         final VariableDeclarationExpression vde= ast.newVariableDeclarationExpression(fragment);
-        modifiers(vde).add(final0());
+        ASTNodes.modifiers(vde).add(final0());
         vde.setType(type);
         return vde;
     }
@@ -694,7 +678,7 @@ public class ASTBuilder {
      * @return a {@code final} modifier
      */
     public Modifier final0() {
-        return ast.newModifier(FINAL_KEYWORD);
+        return ast.newModifier(ModifierKeyword.FINAL_KEYWORD);
     }
 
     /**
@@ -784,7 +768,7 @@ public class ASTBuilder {
         ie.setOperator(operator);
         ie.setRightOperand(it.next());
         while (it.hasNext()) {
-            extendedOperands(ie).add(it.next());
+            ASTNodes.extendedOperands(ie).add(it.next());
         }
         return ie;
     }
@@ -822,7 +806,7 @@ public class ASTBuilder {
         ie.setLeftOperand(leftOperand);
         ie.setOperator(operator);
         ie.setRightOperand(rightOperand);
-        Collections.addAll(extendedOperands(ie), extendedOperands);
+        Collections.addAll(ASTNodes.extendedOperands(ie), extendedOperands);
         return ie;
     }
 
@@ -848,7 +832,7 @@ public class ASTBuilder {
         final MethodInvocation mi= ast.newMethodInvocation();
         mi.setExpression(ast.newSimpleName(expression));
         mi.setName(ast.newSimpleName(methodName));
-        addAll(arguments(mi), arguments);
+        addAll(ASTNodes.arguments(mi), arguments);
         return mi;
     }
 
@@ -862,7 +846,7 @@ public class ASTBuilder {
     public MethodInvocation invoke(String methodName, Expression... arguments) {
         final MethodInvocation mi= ast.newMethodInvocation();
         mi.setName(ast.newSimpleName(methodName));
-        addAll(arguments(mi), arguments);
+        addAll(ASTNodes.arguments(mi), arguments);
         return mi;
     }
 
@@ -878,7 +862,7 @@ public class ASTBuilder {
         final MethodInvocation mi= ast.newMethodInvocation();
         mi.setExpression(expression);
         mi.setName(ast.newSimpleName(methodName));
-        addAll(arguments(mi), arguments);
+        addAll(ASTNodes.arguments(mi), arguments);
         return mi;
     }
 
@@ -1034,7 +1018,7 @@ public class ASTBuilder {
     public ClassInstanceCreation new0(String typeName, Expression... arguments) {
         final ClassInstanceCreation cic= ast.newClassInstanceCreation();
         cic.setType(simpleType(typeName));
-        addAll(arguments(cic), arguments);
+        addAll(ASTNodes.arguments(cic), arguments);
         return cic;
     }
 
@@ -1048,7 +1032,7 @@ public class ASTBuilder {
     public ClassInstanceCreation new0(Type type, Expression... arguments) {
         final ClassInstanceCreation cic= ast.newClassInstanceCreation();
         cic.setType(type);
-        addAll(arguments(cic), arguments);
+        addAll(ASTNodes.arguments(cic), arguments);
         return cic;
     }
 
@@ -1060,7 +1044,7 @@ public class ASTBuilder {
 
     private <E extends Expression> void addAll(MethodInvocation mi, List<E> arguments) {
         if (!isEmptyRangeCopy(arguments)) {
-            arguments(mi).addAll(arguments);
+            ASTNodes.arguments(mi).addAll(arguments);
         }
     }
 
@@ -1085,7 +1069,7 @@ public class ASTBuilder {
      * @return a new prefix expression
      */
     public Expression not(Expression expr) {
-        return prefixExpr(NOT, expr);
+        return prefixExpr(PrefixExpression.Operator.NOT, expr);
     }
 
     /**
@@ -1107,11 +1091,11 @@ public class ASTBuilder {
      * @return the negated expression, copied according to the copy operation
      */
     public Expression negate(Expression expr, Copy copy) {
-        final Expression exprNoParen= removeParentheses(expr);
-        if (exprNoParen.getNodeType() == PREFIX_EXPRESSION) {
+        final Expression exprNoParen= ASTNodes.getUnparenthesedExpression(expr);
+        if (exprNoParen.getNodeType() == ASTNode.PREFIX_EXPRESSION) {
             final PrefixExpression pe= (PrefixExpression) exprNoParen;
-            if (hasOperator(pe, NOT)) {
-                return copy.perform(this, removeParentheses(pe.getOperand()));
+            if (ASTNodes.hasOperator(pe, PrefixExpression.Operator.NOT)) {
+                return copy.perform(this, ASTNodes.getUnparenthesedExpression(pe.getOperand()));
             }
         }
 
@@ -1250,7 +1234,7 @@ public class ASTBuilder {
     public TryStatement try0(final Block body, CatchClause... catchClauses) {
         final TryStatement tryS= ast.newTryStatement();
         tryS.setBody(body);
-        addAll(catchClauses(tryS), catchClauses);
+        addAll(ASTNodes.catchClauses(tryS), catchClauses);
         return tryS;
     }
 
@@ -1281,7 +1265,7 @@ public class ASTBuilder {
      * @return a newline statement
      */
     public Statement newlinePlaceholder() {
-        return (Statement) refactorings.getRewrite().createStringPlaceholder("\n", EMPTY_STATEMENT); //$NON-NLS-1$
+        return (Statement) refactorings.getRewrite().createStringPlaceholder("\n", ASTNode.EMPTY_STATEMENT); //$NON-NLS-1$
     }
 
     /**
@@ -1290,7 +1274,7 @@ public class ASTBuilder {
      * @return a {@code public} modifier
      */
     public Modifier public0() {
-        return ast.newModifier(PUBLIC_KEYWORD);
+        return ast.newModifier(ModifierKeyword.PUBLIC_KEYWORD);
     }
 
     /**
@@ -1299,7 +1283,7 @@ public class ASTBuilder {
      * @return a {@code private} modifier
      */
     public Modifier private0() {
-        return ast.newModifier(PRIVATE_KEYWORD);
+        return ast.newModifier(ModifierKeyword.PRIVATE_KEYWORD);
     }
 
     /**
@@ -1308,7 +1292,7 @@ public class ASTBuilder {
      * @return a {@code protected} modifier
      */
     public Modifier protected0() {
-        return ast.newModifier(PROTECTED_KEYWORD);
+        return ast.newModifier(ModifierKeyword.PROTECTED_KEYWORD);
     }
 
     /**
@@ -1317,7 +1301,7 @@ public class ASTBuilder {
      * @return a {@code static} modifier
      */
     public Modifier static0() {
-        return ast.newModifier(STATIC_KEYWORD);
+        return ast.newModifier(ModifierKeyword.STATIC_KEYWORD);
     }
 
     /**
@@ -1344,7 +1328,7 @@ public class ASTBuilder {
     public MethodDeclaration method(List<IExtendedModifier> modifiers, String methodName,
             List<SingleVariableDeclaration> parameters, Block block) {
         final MethodDeclaration md= ast.newMethodDeclaration();
-        modifiers(md).addAll(modifiers);
+        ASTNodes.modifiers(md).addAll(modifiers);
         md.setName(simpleName(methodName));
         md.parameters().addAll(parameters);
         md.setBody(block);

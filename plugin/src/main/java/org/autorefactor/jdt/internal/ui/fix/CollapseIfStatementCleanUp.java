@@ -26,12 +26,8 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.as;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasOperator;
-import static org.eclipse.jdt.core.dom.InfixExpression.Operator.CONDITIONAL_AND;
-import static org.eclipse.jdt.core.dom.InfixExpression.Operator.CONDITIONAL_OR;
-
-import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.InfixExpression;
@@ -68,7 +64,7 @@ public class CollapseIfStatementCleanUp extends AbstractCleanUpRule {
     @Override
     public boolean visit(IfStatement node) {
         if (node.getElseStatement() == null) {
-            final IfStatement is= as(node.getThenStatement(), IfStatement.class);
+            final IfStatement is= ASTNodes.as(node.getThenStatement(), IfStatement.class);
             if (is != null) {
                 return replaceIfNoElseStatement(node, is);
             }
@@ -81,18 +77,18 @@ public class CollapseIfStatementCleanUp extends AbstractCleanUpRule {
             return true;
         }
 
-        final ASTBuilder b= this.ctx.getASTBuilder();
-        final InfixExpression ie= b.infixExpr(parenthesizeOrExpr(b, outerIf.getExpression()), CONDITIONAL_AND,
+        final ASTNodeFactory b= this.ctx.getASTBuilder();
+        final InfixExpression ie= b.infixExpr(parenthesizeOrExpr(b, outerIf.getExpression()), InfixExpression.Operator.CONDITIONAL_AND,
                 parenthesizeOrExpr(b, innerIf.getExpression()));
         this.ctx.getRefactorings().replace(outerIf.getExpression(), ie);
         this.ctx.getRefactorings().replace(outerIf.getThenStatement(), b.copy(innerIf.getThenStatement()));
         return false;
     }
 
-    private Expression parenthesizeOrExpr(ASTBuilder b, Expression expr) {
+    private Expression parenthesizeOrExpr(ASTNodeFactory b, Expression expr) {
         if (expr instanceof InfixExpression) {
             final InfixExpression ie= (InfixExpression) expr;
-            if (hasOperator(ie, CONDITIONAL_OR)) {
+            if (ASTNodes.hasOperator(ie, InfixExpression.Operator.CONDITIONAL_OR)) {
                 return b.parenthesize(b.copy(ie));
             }
         }

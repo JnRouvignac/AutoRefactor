@@ -25,10 +25,8 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getTargetType;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.usesGivenSignature;
-
-import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.Release;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.MethodInvocation;
@@ -70,14 +68,14 @@ public class UnboxingRatherThanExplicitMethodCleanUp extends AbstractCleanUpRule
     @Override
     public boolean visit(MethodInvocation node) {
         if (node.getExpression() != null
-                && (usesGivenSignature(node, Boolean.class.getCanonicalName(), "booleanValue") || usesGivenSignature(node, Byte.class.getCanonicalName(), "byteValue") //$NON-NLS-1$ $NON-NLS-2$
-                        || usesGivenSignature(node, Character.class.getCanonicalName(), "charValue") //$NON-NLS-1$
-                        || usesGivenSignature(node, Short.class.getCanonicalName(), "shortValue") //$NON-NLS-1$
-                        || usesGivenSignature(node, Integer.class.getCanonicalName(), "intValue") //$NON-NLS-1$
-                        || usesGivenSignature(node, Long.class.getCanonicalName(), "longValue") //$NON-NLS-1$
-                        || usesGivenSignature(node, Float.class.getCanonicalName(), "floatValue") //$NON-NLS-1$
-                        || usesGivenSignature(node, Double.class.getCanonicalName(), "doubleValue"))) { //$NON-NLS-1$
-            final ITypeBinding actualResultType= getTargetType(node);
+                && (ASTNodes.usesGivenSignature(node, Boolean.class.getCanonicalName(), "booleanValue") || ASTNodes.usesGivenSignature(node, Byte.class.getCanonicalName(), "byteValue") //$NON-NLS-1$ $NON-NLS-2$
+                        || ASTNodes.usesGivenSignature(node, Character.class.getCanonicalName(), "charValue") //$NON-NLS-1$
+                        || ASTNodes.usesGivenSignature(node, Short.class.getCanonicalName(), "shortValue") //$NON-NLS-1$
+                        || ASTNodes.usesGivenSignature(node, Integer.class.getCanonicalName(), "intValue") //$NON-NLS-1$
+                        || ASTNodes.usesGivenSignature(node, Long.class.getCanonicalName(), "longValue") //$NON-NLS-1$
+                        || ASTNodes.usesGivenSignature(node, Float.class.getCanonicalName(), "floatValue") //$NON-NLS-1$
+                        || ASTNodes.usesGivenSignature(node, Double.class.getCanonicalName(), "doubleValue"))) { //$NON-NLS-1$
+            final ITypeBinding actualResultType= ASTNodes.getTargetType(node);
 
             if (actualResultType != null && actualResultType.isAssignmentCompatible(node.resolveTypeBinding())) {
                 useUnboxing(node);
@@ -88,7 +86,7 @@ public class UnboxingRatherThanExplicitMethodCleanUp extends AbstractCleanUpRule
     }
 
     private void useUnboxing(final MethodInvocation node) {
-        final ASTBuilder b= this.ctx.getASTBuilder();
+        final ASTNodeFactory b= this.ctx.getASTBuilder();
         this.ctx.getRefactorings().replace(node, b.copy(node.getExpression()));
     }
 }

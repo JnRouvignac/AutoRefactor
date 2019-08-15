@@ -25,8 +25,6 @@
  */
 package org.autorefactor.jdt.internal.corext.dom;
 
-import static org.autorefactor.jdt.internal.corext.dom.PluginConstant.PLUGIN_ID;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -91,7 +89,7 @@ public class PrepareApplyRefactoringsJob extends Job {
                     + "Please look at the Eclipse workspace logs and " //$NON-NLS-1$
                     + "report the stacktrace to the AutoRefactor project.\n" //$NON-NLS-1$
                     + "Please provide sample java code that triggers the error.\n\n"; //$NON-NLS-1$
-            return new Status(IStatus.ERROR, PLUGIN_ID, msg, e);
+            return new Status(IStatus.ERROR, PluginConstant.PLUGIN_ID, msg, e);
         } finally {
             environment.getJobManager().unregister(this);
         }
@@ -188,7 +186,7 @@ public class PrepareApplyRefactoringsJob extends Job {
     }
 
     private JavaProjectOptions getJavaProjectOptions(IJavaElement javaElement) {
-        final IJavaProject javaProject= getIJavaProject(javaElement);
+        final IJavaProject javaProject= PrepareApplyRefactoringsJob.getIJavaProject(javaElement);
         JavaProjectOptions options= javaProjects.get(javaProject);
         if (options == null) {
             options= new JavaProjectOptionsImpl(javaProject.getOptions(true));
@@ -206,7 +204,7 @@ public class PrepareApplyRefactoringsJob extends Job {
     public static IJavaProject getIJavaProject(IJavaElement javaElement) {
         if (javaElement instanceof ICompilationUnit || javaElement instanceof IPackageFragment
                 || javaElement instanceof IPackageFragmentRoot) {
-            return getIJavaProject(javaElement.getParent());
+            return PrepareApplyRefactoringsJob.getIJavaProject(javaElement.getParent());
         } else if (javaElement instanceof IJavaProject) {
             return (IJavaProject) javaElement;
         }

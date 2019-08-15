@@ -25,14 +25,11 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.asList;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getPreviousSibling;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.match;
-
 import java.util.ArrayList;
 import java.util.List;
 
-import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.ASTSemanticMatcher;
 import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.eclipse.jdt.core.dom.Statement;
@@ -69,7 +66,7 @@ public class DoWhileRatherThanDuplicateCodeCleanUp extends AbstractCleanUpRule {
 
     @Override
     public boolean visit(WhileStatement node) {
-        final List<Statement> whileStmts= asList(node.getBody());
+        final List<Statement> whileStmts= ASTNodes.asList(node.getBody());
 
         if (whileStmts.isEmpty()) {
             return true;
@@ -78,15 +75,15 @@ public class DoWhileRatherThanDuplicateCodeCleanUp extends AbstractCleanUpRule {
         final List<Statement> previousStmts= new ArrayList<Statement>(whileStmts.size());
         final ASTSemanticMatcher matcher= new ASTSemanticMatcher();
 
-        Statement previousStmt= getPreviousSibling(node);
+        Statement previousStmt= ASTNodes.getPreviousSibling(node);
         int i= whileStmts.size() - 1;
         while (i >= 0) {
-            if (previousStmt == null || !match(matcher, previousStmt, whileStmts.get(i))) {
+            if (previousStmt == null || !ASTNodes.match(matcher, previousStmt, whileStmts.get(i))) {
                 return true;
             }
             i--;
             previousStmts.add(previousStmt);
-            previousStmt= getPreviousSibling(previousStmt);
+            previousStmt= ASTNodes.getPreviousSibling(previousStmt);
         }
 
         replaceWithDoWhile(node, previousStmts);
@@ -97,7 +94,7 @@ public class DoWhileRatherThanDuplicateCodeCleanUp extends AbstractCleanUpRule {
         final Refactorings r= this.ctx.getRefactorings();
         r.remove(previousStmts);
 
-        final ASTBuilder b= this.ctx.getASTBuilder();
+        final ASTNodeFactory b= this.ctx.getASTBuilder();
         r.replace(node, b.doWhile(b.copy(node.getExpression()), b.copy(node.getBody())));
     }
 }

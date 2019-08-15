@@ -26,20 +26,10 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.as;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasOperator;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isPassive;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isPrimitive;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.match;
-import static org.eclipse.jdt.core.dom.InfixExpression.Operator.AND;
-import static org.eclipse.jdt.core.dom.InfixExpression.Operator.CONDITIONAL_AND;
-import static org.eclipse.jdt.core.dom.InfixExpression.Operator.CONDITIONAL_OR;
-import static org.eclipse.jdt.core.dom.InfixExpression.Operator.OR;
-import static org.eclipse.jdt.core.dom.PrefixExpression.Operator.NOT;
-
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.ASTSemanticMatcher;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.InfixExpression;
@@ -76,13 +66,13 @@ public class TernaryOperatorRatherThanDuplicateConditionsCleanUp extends Abstrac
 
     @Override
     public boolean visit(final InfixExpression node) {
-        if (hasOperator(node, CONDITIONAL_OR, OR) && !node.hasExtendedOperands()) {
-            final InfixExpression firstCondition= as(node.getLeftOperand(), InfixExpression.class);
-            final InfixExpression secondCondition= as(node.getRightOperand(), InfixExpression.class);
+        if (ASTNodes.hasOperator(node, InfixExpression.Operator.CONDITIONAL_OR, InfixExpression.Operator.OR) && !node.hasExtendedOperands()) {
+            final InfixExpression firstCondition= ASTNodes.as(node.getLeftOperand(), InfixExpression.class);
+            final InfixExpression secondCondition= ASTNodes.as(node.getRightOperand(), InfixExpression.class);
 
             if (firstCondition != null && !firstCondition.hasExtendedOperands()
-                    && hasOperator(firstCondition, CONDITIONAL_AND, AND) && secondCondition != null
-                    && !secondCondition.hasExtendedOperands() && hasOperator(secondCondition, CONDITIONAL_AND, AND)
+                    && ASTNodes.hasOperator(firstCondition, InfixExpression.Operator.CONDITIONAL_AND, InfixExpression.Operator.AND) && secondCondition != null
+                    && !secondCondition.hasExtendedOperands() && ASTNodes.hasOperator(secondCondition, InfixExpression.Operator.CONDITIONAL_AND, InfixExpression.Operator.AND)
                     && isBooleanAndPassive(firstCondition.getLeftOperand())
                     && isBooleanAndPassive(firstCondition.getRightOperand())
                     && isBooleanAndPassive(secondCondition.getLeftOperand())
@@ -108,13 +98,13 @@ public class TernaryOperatorRatherThanDuplicateConditionsCleanUp extends Abstrac
     }
 
     private boolean isBooleanAndPassive(final Expression expr) {
-        return isPrimitive(expr, boolean.class.getSimpleName()) && isPassive(expr);
+        return ASTNodes.isPrimitive(expr, boolean.class.getSimpleName()) && ASTNodes.isPassive(expr);
     }
 
     private boolean maybeReplaceDuplicateExpr(final ASTSemanticMatcher matcher, final InfixExpression node,
             final Expression oneCondition, final Expression oppositeCondition, final Expression oneExpr,
             final Expression oppositeExpr) {
-        if (matcher.matchOpposite(oneCondition, oppositeCondition) && !match(matcher, oneExpr, oppositeExpr)) {
+        if (matcher.matchOpposite(oneCondition, oppositeCondition) && !ASTNodes.match(matcher, oneExpr, oppositeExpr)) {
             replaceDuplicateExpr(node, oneCondition, oneExpr, oppositeExpr);
             return false;
         }
@@ -124,9 +114,9 @@ public class TernaryOperatorRatherThanDuplicateConditionsCleanUp extends Abstrac
 
     private Expression getBasisExpression(final Expression originalExpr, final AtomicBoolean isExprPositive) {
         Expression basisExpr= null;
-        final PrefixExpression negateExpr= as(originalExpr, PrefixExpression.class);
+        final PrefixExpression negateExpr= ASTNodes.as(originalExpr, PrefixExpression.class);
 
-        if (hasOperator(negateExpr, NOT)) {
+        if (ASTNodes.hasOperator(negateExpr, PrefixExpression.Operator.NOT)) {
             basisExpr= negateExpr.getOperand();
             isExprPositive.set(false);
         } else {
@@ -143,7 +133,7 @@ public class TernaryOperatorRatherThanDuplicateConditionsCleanUp extends Abstrac
 
         final Expression basicExpr= getBasisExpression(oneCondition, isFirstExprPositive);
 
-        final ASTBuilder b= ctx.getASTBuilder();
+        final ASTNodeFactory b= ctx.getASTBuilder();
         final Expression thenExpr;
         final Expression elseExpr;
 

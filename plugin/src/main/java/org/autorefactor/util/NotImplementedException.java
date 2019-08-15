@@ -60,6 +60,6 @@ public class NotImplementedException extends AutoRefactorException {
      * @param reason an additional message
      */
     public NotImplementedException(ASTNode node, String reason) {
-        super(node, DEFAULT_MESSAGE + " " + (reason != null ? reason : "")); //$NON-NLS-1$ $NON-NLS-2$
+        super(node, NotImplementedException.DEFAULT_MESSAGE + " " + (reason != null ? reason : "")); //$NON-NLS-1$ $NON-NLS-2$
     }
 }

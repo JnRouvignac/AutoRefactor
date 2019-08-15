@@ -25,12 +25,9 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasType;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isPassive;
-
-import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jdt.core.dom.InfixExpression;
-import org.eclipse.jdt.core.dom.InfixExpression.Operator;
 
 /** See {@link #getDescription()} method. */
 public class LazyLogicalRatherThanEagerCleanUp extends AbstractCleanUpRule {
@@ -64,11 +61,11 @@ public class LazyLogicalRatherThanEagerCleanUp extends AbstractCleanUpRule {
     @Override
     public boolean visit(InfixExpression node) {
         if (!node.hasExtendedOperands()
-                && (hasType(node.getLeftOperand(), boolean.class.getSimpleName()) || hasType(node.getLeftOperand(), Boolean.class.getCanonicalName()))
-                && (hasType(node.getRightOperand(), boolean.class.getSimpleName()) || hasType(node.getRightOperand(), Boolean.class.getCanonicalName()))
-                && isPassive(node.getRightOperand())
-                && (Operator.AND.equals(node.getOperator()) || Operator.OR.equals(node.getOperator()))) {
-            final ASTBuilder b= ctx.getASTBuilder();
+                && (ASTNodes.hasType(node.getLeftOperand(), boolean.class.getSimpleName()) || ASTNodes.hasType(node.getLeftOperand(), Boolean.class.getCanonicalName()))
+                && (ASTNodes.hasType(node.getRightOperand(), boolean.class.getSimpleName()) || ASTNodes.hasType(node.getRightOperand(), Boolean.class.getCanonicalName()))
+                && ASTNodes.isPassive(node.getRightOperand())
+                && (InfixExpression.Operator.AND.equals(node.getOperator()) || InfixExpression.Operator.OR.equals(node.getOperator()))) {
+            final ASTNodeFactory b= ctx.getASTBuilder();
             ctx.getRefactorings().replace(node, b.infixExpr(b.copy(node.getLeftOperand()),
                     getLazyOperator(node.getOperator()), b.copy(node.getRightOperand())));
             return false;
@@ -76,11 +73,11 @@ public class LazyLogicalRatherThanEagerCleanUp extends AbstractCleanUpRule {
         return true;
     }
 
-    private Operator getLazyOperator(final Operator operator) {
-        if (Operator.AND.equals(operator)) {
-            return Operator.CONDITIONAL_AND;
+    private InfixExpression.Operator getLazyOperator(final InfixExpression.Operator operator) {
+        if (InfixExpression.Operator.AND.equals(operator)) {
+            return InfixExpression.Operator.CONDITIONAL_AND;
         } else {
-            return Operator.CONDITIONAL_OR;
+            return InfixExpression.Operator.CONDITIONAL_OR;
         }
     }
 }

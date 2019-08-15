@@ -25,12 +25,8 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.as;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.fallsThrough;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isExceptionExpected;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isPassive;
-
-import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.ASTSemanticMatcher;
 import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.eclipse.jdt.core.dom.IfStatement;
@@ -66,13 +62,13 @@ public class ElseRatherThanOppositeConditionCleanUp extends AbstractCleanUpRule 
 
     @Override
     public boolean visit(final IfStatement node) {
-        final IfStatement secondIf= as(node.getElseStatement(), IfStatement.class);
+        final IfStatement secondIf= ASTNodes.as(node.getElseStatement(), IfStatement.class);
         final ASTSemanticMatcher matcher= new ASTSemanticMatcher();
 
-        if (secondIf != null && isPassive(node.getExpression()) && isPassive(secondIf.getExpression())
+        if (secondIf != null && ASTNodes.isPassive(node.getExpression()) && ASTNodes.isPassive(secondIf.getExpression())
                 && matcher.matchOpposite(node.getExpression(), secondIf.getExpression())
-                && (secondIf.getElseStatement() == null || !isExceptionExpected(node))
-                && (!fallsThrough(node.getThenStatement()) || !fallsThrough(secondIf.getThenStatement()))) {
+                && (secondIf.getElseStatement() == null || !ASTNodes.isExceptionExpected(node))
+                && (!ASTNodes.fallsThrough(node.getThenStatement()) || !ASTNodes.fallsThrough(secondIf.getThenStatement()))) {
             removeCondition(secondIf);
 
             return false;
@@ -82,7 +78,7 @@ public class ElseRatherThanOppositeConditionCleanUp extends AbstractCleanUpRule 
     }
 
     private void removeCondition(final IfStatement secondIf) {
-        final ASTBuilder b= this.ctx.getASTBuilder();
+        final ASTNodeFactory b= this.ctx.getASTBuilder();
         final Refactorings r= this.ctx.getRefactorings();
 
         r.replace(secondIf, b.copy(secondIf.getThenStatement()));

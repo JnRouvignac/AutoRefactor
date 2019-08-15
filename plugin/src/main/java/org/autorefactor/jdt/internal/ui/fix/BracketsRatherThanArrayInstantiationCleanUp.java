@@ -25,12 +25,11 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getTargetType;
-import static org.autorefactor.util.Utils.equalNotNull;
-
 import java.util.List;
 
-import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
+import org.autorefactor.util.Utils;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ArrayCreation;
 import org.eclipse.jdt.core.dom.Expression;
@@ -69,9 +68,9 @@ public class BracketsRatherThanArrayInstantiationCleanUp extends AbstractCleanUp
     public boolean visit(ArrayCreation node) {
         if (node.getInitializer() != null || isVoid(node)) {
             final ITypeBinding arrayType= node.resolveTypeBinding();
-            final ITypeBinding destinationType= getTargetType(node);
+            final ITypeBinding destinationType= ASTNodes.getTargetType(node);
 
-            if (equalNotNull(arrayType, destinationType) && isDestinationAllowed(node)) {
+            if (Utils.equalNotNull(arrayType, destinationType) && isDestinationAllowed(node)) {
                 refactorWithInitializer(node);
                 return false;
             }
@@ -84,7 +83,7 @@ public class BracketsRatherThanArrayInstantiationCleanUp extends AbstractCleanUp
         if (node.getInitializer() != null) {
             ctx.getRefactorings().replace(node, node.getInitializer());
         } else {
-            final ASTBuilder b= ctx.getASTBuilder();
+            final ASTNodeFactory b= ctx.getASTBuilder();
             ctx.getRefactorings().replace(node, b.copy(b.arrayInitializer()));
         }
     }

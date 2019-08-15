@@ -25,9 +25,6 @@
  */
 package org.autorefactor.jdt.internal.corext.dom;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.*;
-import static org.autorefactor.jdt.internal.corext.dom.PluginConstant.*;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -99,7 +96,7 @@ public class ApplyRefactoringsJob extends Job {
                     + "Please look at the Eclipse workspace logs and " //$NON-NLS-1$
                     + "report the stacktrace to the AutoRefactor project.\n" //$NON-NLS-1$
                     + "Please provide sample java code that triggers the error.\n\n"; //$NON-NLS-1$
-            return new Status(IStatus.ERROR, PLUGIN_ID, msg, e);
+            return new Status(IStatus.ERROR, PluginConstant.PLUGIN_ID, msg, e);
         } finally {
             environment.getJobManager().unregister(this);
         }
@@ -233,12 +230,12 @@ public class ApplyRefactoringsJob extends Job {
             // type bindings were lost. Is there a way to recover them?
             // FIXME we should find a way to apply all the changes at
             // the AST level and refresh the bindings
-            resetParser(compilationUnit, parser, options);
+            ApplyRefactoringsJob.resetParser(compilationUnit, parser, options);
             astRoot= (CompilationUnit) parser.createAST(null);
 
             if (iterationCount > maxIterations) {
                 // Oops! Something went wrong.
-                final String errorMsg= "An infinite loop has been detected for file " + getFileName(astRoot) + "." //$NON-NLS-1$ $NON-NLS-2$
+                final String errorMsg= "An infinite loop has been detected for file " + ASTNodes.getFileName(astRoot) + "." //$NON-NLS-1$ $NON-NLS-2$
                         + " A possible cause is that code is being incorrectly" //$NON-NLS-1$
                         + " refactored one way then refactored back to what it was." + " Fix the code before pursuing." //$NON-NLS-1$ $NON-NLS-2$
                         + getPossibleCulprits(nbLoopsWithSameVisitors, lastLoopVisitors);

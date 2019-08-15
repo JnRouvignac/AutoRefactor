@@ -26,20 +26,10 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.as;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasOperator;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isPassive;
-import static org.eclipse.jdt.core.dom.InfixExpression.Operator.AND;
-import static org.eclipse.jdt.core.dom.InfixExpression.Operator.CONDITIONAL_AND;
-import static org.eclipse.jdt.core.dom.InfixExpression.Operator.CONDITIONAL_OR;
-import static org.eclipse.jdt.core.dom.InfixExpression.Operator.EQUALS;
-import static org.eclipse.jdt.core.dom.InfixExpression.Operator.OR;
-import static org.eclipse.jdt.core.dom.InfixExpression.Operator.XOR;
-import static org.eclipse.jdt.core.dom.PrefixExpression.Operator.NOT;
-
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.ASTSemanticMatcher;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.InfixExpression;
@@ -76,15 +66,15 @@ public class XORRatherThanDuplicateConditionsCleanUp extends AbstractCleanUpRule
 
     @Override
     public boolean visit(final InfixExpression node) {
-        if (hasOperator(node, CONDITIONAL_OR, OR) && !node.hasExtendedOperands()) {
-            final InfixExpression firstCondition= as(node.getLeftOperand(), InfixExpression.class);
-            final InfixExpression secondCondition= as(node.getRightOperand(), InfixExpression.class);
+        if (ASTNodes.hasOperator(node, InfixExpression.Operator.CONDITIONAL_OR, InfixExpression.Operator.OR) && !node.hasExtendedOperands()) {
+            final InfixExpression firstCondition= ASTNodes.as(node.getLeftOperand(), InfixExpression.class);
+            final InfixExpression secondCondition= ASTNodes.as(node.getRightOperand(), InfixExpression.class);
 
             if (firstCondition != null && !firstCondition.hasExtendedOperands()
-                    && hasOperator(firstCondition, CONDITIONAL_AND, AND) && secondCondition != null
-                    && !secondCondition.hasExtendedOperands() && hasOperator(secondCondition, CONDITIONAL_AND, AND)
-                    && isPassive(firstCondition.getLeftOperand()) && isPassive(firstCondition.getRightOperand())
-                    && isPassive(secondCondition.getLeftOperand()) && isPassive(secondCondition.getRightOperand())) {
+                    && ASTNodes.hasOperator(firstCondition, InfixExpression.Operator.CONDITIONAL_AND, InfixExpression.Operator.AND) && secondCondition != null
+                    && !secondCondition.hasExtendedOperands() && ASTNodes.hasOperator(secondCondition, InfixExpression.Operator.CONDITIONAL_AND, InfixExpression.Operator.AND)
+                    && ASTNodes.isPassive(firstCondition.getLeftOperand()) && ASTNodes.isPassive(firstCondition.getRightOperand())
+                    && ASTNodes.isPassive(secondCondition.getLeftOperand()) && ASTNodes.isPassive(secondCondition.getRightOperand())) {
                 final ASTSemanticMatcher matcher= new ASTSemanticMatcher();
 
                 return maybeReplaceDuplicateExpr(matcher, node, firstCondition.getLeftOperand(),
@@ -119,9 +109,9 @@ public class XORRatherThanDuplicateConditionsCleanUp extends AbstractCleanUpRule
 
     private Expression getBasisExpression(final Expression originalExpr, final AtomicBoolean isExprPositive) {
         Expression basisExpr= null;
-        final PrefixExpression negateExpr= as(originalExpr, PrefixExpression.class);
+        final PrefixExpression negateExpr= ASTNodes.as(originalExpr, PrefixExpression.class);
 
-        if (hasOperator(negateExpr, NOT)) {
+        if (ASTNodes.hasOperator(negateExpr, PrefixExpression.Operator.NOT)) {
             basisExpr= negateExpr.getOperand();
             isExprPositive.set(false);
         } else {
@@ -135,12 +125,12 @@ public class XORRatherThanDuplicateConditionsCleanUp extends AbstractCleanUpRule
     private void replaceDuplicateExpr(final InfixExpression node, final Expression firstExpr,
             final Expression secondExpr, final AtomicBoolean isFirstExprPositive,
             final AtomicBoolean isSecondExprPositive) {
-        final ASTBuilder b= ctx.getASTBuilder();
+        final ASTNodeFactory b= ctx.getASTBuilder();
 
         if (isFirstExprPositive.get() == isSecondExprPositive.get()) {
-            ctx.getRefactorings().replace(node, b.infixExpr(b.copy(firstExpr), EQUALS, b.copy(secondExpr)));
+            ctx.getRefactorings().replace(node, b.infixExpr(b.copy(firstExpr), InfixExpression.Operator.EQUALS, b.copy(secondExpr)));
         } else {
-            ctx.getRefactorings().replace(node, b.infixExpr(b.copy(firstExpr), XOR, b.copy(secondExpr)));
+            ctx.getRefactorings().replace(node, b.infixExpr(b.copy(firstExpr), InfixExpression.Operator.XOR, b.copy(secondExpr)));
         }
     }
 }

@@ -25,10 +25,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.arguments;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.findImplementedType;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getParent;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.typeArguments;
 import static org.eclipse.jdt.core.dom.ASTNode.ASSIGNMENT;
 import static org.eclipse.jdt.core.dom.ASTNode.METHOD_INVOCATION;
 import static org.eclipse.jdt.core.dom.ASTNode.RETURN_STATEMENT;
@@ -38,6 +34,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.Release;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Assignment;
@@ -101,7 +98,7 @@ public class UseDiamondOperatorCleanUp extends AbstractCleanUpRule {
      * {@link ClassInstanceCreation#isResolvedTypeInferredFromExpectedType()}.
      */
     private boolean canUseDiamondOperator(ClassInstanceCreation node, final Type type) {
-        List<Expression> args= arguments(node);
+        List<Expression> args= ASTNodes.arguments(node);
         if (args.isEmpty()) {
             return true;
         }
@@ -127,7 +124,7 @@ public class UseDiamondOperatorCleanUp extends AbstractCleanUpRule {
             ITypeBinding actualParamType= actualCtorParamTypes[i];
             String actualParamTypeQName= actualParamType.getErasure().getQualifiedName();
             Expression actualArg= args.get(i);
-            ITypeBinding actualArgType= findImplementedType(actualArg.resolveTypeBinding(), actualParamTypeQName);
+            ITypeBinding actualArgType= ASTNodes.findImplementedType(actualArg.resolveTypeBinding(), actualParamTypeQName);
 
             if (actualArgType != null && declParamType.isParameterizedType()) {
                 ITypeBinding[] declParamTypeArgs= declParamType.getTypeArguments();
@@ -159,7 +156,7 @@ public class UseDiamondOperatorCleanUp extends AbstractCleanUpRule {
     }
 
     private boolean parentAllowsDiamondOperator(ClassInstanceCreation node) {
-        final ASTNode parentInfo= getParent(node, ParenthesizedExpression.class);
+        final ASTNode parentInfo= ASTNodes.getParent(node, ParenthesizedExpression.class);
         final StructuralPropertyDescriptor locationInParent= parentInfo.getLocationInParent();
 
         switch (parentInfo.getParent().getNodeType()) {
@@ -176,7 +173,7 @@ public class UseDiamondOperatorCleanUp extends AbstractCleanUpRule {
     }
 
     private boolean maybeRemoveAllTypeArguments(ParameterizedType pt) {
-        final List<Type> typeArguments= typeArguments(pt);
+        final List<Type> typeArguments= ASTNodes.typeArguments(pt);
         if (!typeArguments.isEmpty()) {
             this.ctx.getRefactorings().remove(typeArguments);
             return false;

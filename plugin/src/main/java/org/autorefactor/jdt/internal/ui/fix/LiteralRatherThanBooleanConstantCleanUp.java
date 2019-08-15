@@ -25,10 +25,7 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isField;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.removeParentheses;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.resolveTypeBinding;
-
+import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.BooleanLiteral;
@@ -67,9 +64,9 @@ public class LiteralRatherThanBooleanConstantCleanUp extends AbstractCleanUpRule
 
     @Override
     public boolean visit(QualifiedName node) {
-        final ASTNode parent= removeParentheses(node.getParent());
+        final ASTNode parent= ASTNodes.getUnparenthesedExpression(node.getParent());
         if (parent instanceof VariableDeclarationFragment) {
-            final ITypeBinding typeBinding= resolveTypeBinding((VariableDeclarationFragment) parent);
+            final ITypeBinding typeBinding= ASTNodes.resolveTypeBinding((VariableDeclarationFragment) parent);
             return replaceBooleanObjectByPrimitive(node, typeBinding);
         } else if (parent instanceof Assignment) {
             final ITypeBinding typeBinding= ((Assignment) parent).resolveTypeBinding();
@@ -80,9 +77,9 @@ public class LiteralRatherThanBooleanConstantCleanUp extends AbstractCleanUpRule
 
     private boolean replaceBooleanObjectByPrimitive(final QualifiedName node, final ITypeBinding typeBinding) {
         if (typeBinding != null && typeBinding.isPrimitive()) {
-            if (isField(node, Boolean.class.getCanonicalName(), "TRUE")) { //$NON-NLS-1$
+            if (ASTNodes.isField(node, Boolean.class.getCanonicalName(), "TRUE")) { //$NON-NLS-1$
                 return replaceWithBooleanLiteral(node, true);
-            } else if (isField(node, Boolean.class.getCanonicalName(), "FALSE")) { //$NON-NLS-1$
+            } else if (ASTNodes.isField(node, Boolean.class.getCanonicalName(), "FALSE")) { //$NON-NLS-1$
                 return replaceWithBooleanLiteral(node, false);
             }
         }

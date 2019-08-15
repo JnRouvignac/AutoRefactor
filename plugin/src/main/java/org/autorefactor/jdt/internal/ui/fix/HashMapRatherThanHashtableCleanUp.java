@@ -35,24 +35,23 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.Release;
+import org.autorefactor.util.Utils;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.MethodInvocation;
-
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.*;
-import static org.autorefactor.util.Utils.*;
 
 /** See {@link #getDescription()} method. */
 public class HashMapRatherThanHashtableCleanUp extends AbstractClassSubstituteCleanUp {
     private static final Map<String, String[]> CAN_BE_CASTED_TO= new HashMap<String, String[]>();
 
     static {
-        CAN_BE_CASTED_TO.put(Object.class.getCanonicalName(), new String[] { Object.class.getCanonicalName() });
-        CAN_BE_CASTED_TO.put(Cloneable.class.getCanonicalName(), new String[] { Cloneable.class.getCanonicalName(), Object.class.getCanonicalName() });
-        CAN_BE_CASTED_TO.put(Serializable.class.getCanonicalName(), new String[] { Serializable.class.getCanonicalName(), Object.class.getCanonicalName() });
-        CAN_BE_CASTED_TO.put(Map.class.getCanonicalName(), new String[] { Map.class.getCanonicalName(), Object.class.getCanonicalName() });
-        CAN_BE_CASTED_TO.put(Hashtable.class.getCanonicalName(), new String[] { Hashtable.class.getCanonicalName(), Serializable.class.getCanonicalName(), Map.class.getCanonicalName(), Cloneable.class.getCanonicalName(), Object.class.getCanonicalName() });
+        HashMapRatherThanHashtableCleanUp.CAN_BE_CASTED_TO.put(Object.class.getCanonicalName(), new String[] { Object.class.getCanonicalName() });
+        HashMapRatherThanHashtableCleanUp.CAN_BE_CASTED_TO.put(Cloneable.class.getCanonicalName(), new String[] { Cloneable.class.getCanonicalName(), Object.class.getCanonicalName() });
+        HashMapRatherThanHashtableCleanUp.CAN_BE_CASTED_TO.put(Serializable.class.getCanonicalName(), new String[] { Serializable.class.getCanonicalName(), Object.class.getCanonicalName() });
+        HashMapRatherThanHashtableCleanUp.CAN_BE_CASTED_TO.put(Map.class.getCanonicalName(), new String[] { Map.class.getCanonicalName(), Object.class.getCanonicalName() });
+        HashMapRatherThanHashtableCleanUp.CAN_BE_CASTED_TO.put(Hashtable.class.getCanonicalName(), new String[] { Hashtable.class.getCanonicalName(), Serializable.class.getCanonicalName(), Map.class.getCanonicalName(), Cloneable.class.getCanonicalName(), Object.class.getCanonicalName() });
     }
 
     /**
@@ -114,21 +113,21 @@ public class HashMapRatherThanHashtableCleanUp extends AbstractClassSubstituteCl
     @Override
     protected boolean canMethodBeRefactored(final MethodInvocation mi,
             final List<MethodInvocation> methodCallsToRefactor) {
-        if (usesGivenSignature(mi, Hashtable.class.getCanonicalName(), "contains", Object.class.getCanonicalName())) { //$NON-NLS-1$
+        if (ASTNodes.usesGivenSignature(mi, Hashtable.class.getCanonicalName(), "contains", Object.class.getCanonicalName())) { //$NON-NLS-1$
             methodCallsToRefactor.add(mi);
         }
         return true;
     }
 
     @Override
-    protected void refactorMethod(final ASTBuilder b, final MethodInvocation originalMi,
+    protected void refactorMethod(final ASTNodeFactory b, final MethodInvocation originalMi,
             final MethodInvocation refactoredMi) {
         refactoredMi.setName(b.simpleName("containsValue")); //$NON-NLS-1$
     }
 
     @Override
     protected boolean isTypeCompatible(final ITypeBinding variableType, final ITypeBinding refType) {
-        return super.isTypeCompatible(variableType, refType) || hasType(variableType,
-                getOrDefault(CAN_BE_CASTED_TO, refType.getErasure().getQualifiedName(), new String[0]));
+        return super.isTypeCompatible(variableType, refType) || ASTNodes.hasType(variableType,
+                Utils.getOrDefault(HashMapRatherThanHashtableCleanUp.CAN_BE_CASTED_TO, refType.getErasure().getQualifiedName(), new String[0]));
     }
 }

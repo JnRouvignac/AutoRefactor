@@ -25,7 +25,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isSameLocalVariable;
 import static org.eclipse.jdt.core.dom.ASTNode.ASSIGNMENT;
 import static org.eclipse.jdt.core.dom.ASTNode.SINGLE_VARIABLE_DECLARATION;
 import static org.eclipse.jdt.core.dom.ASTNode.VARIABLE_DECLARATION_EXPRESSION;
@@ -35,6 +34,7 @@ import static org.eclipse.jdt.core.dom.ASTNode.VARIABLE_DECLARATION_STATEMENT;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.Assignment;
@@ -59,7 +59,7 @@ public final class VariableDefinitionsUsesVisitor extends ASTVisitor {
      * @param variableDeclaration the variable declaration, cannot be {@code null}
      */
     public VariableDefinitionsUsesVisitor(VariableDeclaration variableDeclaration) {
-        this(variableDeclaration.resolveBinding(), getDeclaringScope(variableDeclaration));
+        this(variableDeclaration.resolveBinding(), VariableDefinitionsUsesVisitor.getDeclaringScope(variableDeclaration));
     }
 
     /**
@@ -76,7 +76,7 @@ public final class VariableDefinitionsUsesVisitor extends ASTVisitor {
 
     private static ASTNode getDeclaringScope(VariableDeclaration variableDeclaration) {
         ASTNode node= variableDeclaration.getParent();
-        while (isVariableDeclaration(node)) {
+        while (VariableDefinitionsUsesVisitor.isVariableDeclaration(node)) {
             node= node.getParent();
         }
         return node;
@@ -109,7 +109,7 @@ public final class VariableDefinitionsUsesVisitor extends ASTVisitor {
 
     @Override
     public boolean visit(SimpleName node) {
-        if (isSameLocalVariable(variableBinding, node)) {
+        if (ASTNodes.isSameLocalVariable(variableBinding, node)) {
             switch (node.getParent().getNodeType()) {
             case ASSIGNMENT:
                 addDefinitionOrUse(node, Assignment.LEFT_HAND_SIDE_PROPERTY);

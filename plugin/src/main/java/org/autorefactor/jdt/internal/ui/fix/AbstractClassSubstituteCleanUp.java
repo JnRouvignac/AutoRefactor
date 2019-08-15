@@ -26,9 +26,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getAncestorOrNull;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getNextSibling;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasType;
 import static org.eclipse.jdt.core.dom.ASTNode.ASSIGNMENT;
 import static org.eclipse.jdt.core.dom.ASTNode.CAST_EXPRESSION;
 import static org.eclipse.jdt.core.dom.ASTNode.CLASS_INSTANCE_CREATION;
@@ -49,7 +46,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.InterruptibleVisitor;
 import org.autorefactor.jdt.internal.corext.dom.TypeNameDecider;
 import org.eclipse.jdt.core.dom.ASTNode;
@@ -163,7 +161,7 @@ public abstract class AbstractClassSubstituteCleanUp extends NewClassImportClean
      * @param originalMi   The original method invocation
      * @param refactoredMi The new method invocation
      */
-    protected void refactorMethod(final ASTBuilder b, final MethodInvocation originalMi,
+    protected void refactorMethod(final ASTNodeFactory b, final MethodInvocation originalMi,
             final MethodInvocation refactoredMi) {
     }
 
@@ -188,7 +186,7 @@ public abstract class AbstractClassSubstituteCleanUp extends NewClassImportClean
      *                               refactoring.
      * @return the substitute type or null if the class should be the same.
      */
-    protected Type substituteType(final ASTBuilder b, final Type origType, final ASTNode originalExpr,
+    protected Type substituteType(final ASTNodeFactory b, final Type origType, final ASTNode originalExpr,
             final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
         final ITypeBinding origTypeBinding= origType.resolveBinding();
         final String origRawType= origTypeBinding.getErasure().getQualifiedName();
@@ -281,11 +279,11 @@ public abstract class AbstractClassSubstituteCleanUp extends NewClassImportClean
         for (final VariableDeclaration varDecl : varDecls) {
             final VarOccurrenceVisitor varOccurrenceVisitor= new VarOccurrenceVisitor(varDecl);
 
-            final Statement parent= getAncestorOrNull(varDecl, Statement.class);
-            Statement nextSibling= getNextSibling(parent);
+            final Statement parent= ASTNodes.getAncestorOrNull(varDecl, Statement.class);
+            Statement nextSibling= ASTNodes.getNextSibling(parent);
             while (nextSibling != null) {
                 varOccurrenceVisitor.visitNode(nextSibling);
-                nextSibling= getNextSibling(nextSibling);
+                nextSibling= ASTNodes.getNextSibling(nextSibling);
             }
 
             if (varOccurrenceVisitor.isUsedInAnnonymousClass()) {
@@ -307,7 +305,7 @@ public abstract class AbstractClassSubstituteCleanUp extends NewClassImportClean
     private void replaceClass(final ClassInstanceCreation originalInstanceCreation,
             final List<VariableDeclaration> variableDecls, final List<MethodInvocation> methodCallsToRefactor,
             final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
-        final ASTBuilder b= ctx.getASTBuilder();
+        final ASTNodeFactory b= ctx.getASTBuilder();
         final Type substituteType= substituteType(b, originalInstanceCreation.getType(), originalInstanceCreation,
                 classesToUseWithImport, importsToAdd);
 
@@ -439,7 +437,7 @@ public abstract class AbstractClassSubstituteCleanUp extends NewClassImportClean
                 typeBinding= instanceCreation.resolveTypeBinding();
             }
 
-            if (hasType(typeBinding, getExistingClassCanonicalName())) {
+            if (ASTNodes.hasType(typeBinding, getExistingClassCanonicalName())) {
                 objectInstantiations.add(instanceCreation);
             }
             return true;

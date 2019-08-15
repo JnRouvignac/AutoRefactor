@@ -26,15 +26,8 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.asExpression;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getAncestorOrNull;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getPreviousSibling;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getUniqueFragment;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasOperator;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isSameLocalVariable;
-import static org.eclipse.jdt.core.dom.Assignment.Operator.ASSIGN;
-
-import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.BlockSubVisitor;
 import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.eclipse.jdt.core.dom.ASTNode;
@@ -94,20 +87,20 @@ public class RemoveUnnecessaryLocalBeforeReturnCleanUp extends AbstractCleanUpRu
 
         @Override
         public boolean visit(ReturnStatement node) {
-            final Statement previousSibling= getPreviousSibling(node);
+            final Statement previousSibling= ASTNodes.getPreviousSibling(node);
             if (!ctx.getRefactorings().hasBeenRefactored(previousSibling)
                     && previousSibling instanceof VariableDeclarationStatement) {
                 final VariableDeclarationStatement vds= (VariableDeclarationStatement) previousSibling;
-                final VariableDeclarationFragment vdf= getUniqueFragment(vds);
+                final VariableDeclarationFragment vdf= ASTNodes.getUniqueFragment(vds);
 
-                if (vdf != null && isSameLocalVariable(node.getExpression(), vdf.getName())) {
+                if (vdf != null && ASTNodes.isSameLocalVariable(node.getExpression(), vdf.getName())) {
                     removeVariable(node, vds, vdf);
                     setResult(false);
                     return false;
                 }
             } else {
-                final Assignment as= asExpression(previousSibling, Assignment.class);
-                if (hasOperator(as, ASSIGN) && isSameLocalVariable(node.getExpression(), as.getLeftHandSide())
+                final Assignment as= ASTNodes.asExpression(previousSibling, Assignment.class);
+                if (ASTNodes.hasOperator(as, Assignment.Operator.ASSIGN) && ASTNodes.isSameLocalVariable(node.getExpression(), as.getLeftHandSide())
                         && !isUsedAfterReturn((IVariableBinding) ((Name) as.getLeftHandSide()).resolveBinding(),
                                 node)) {
                     replaceReturnStatement(node, previousSibling, as.getRightHandSide());
@@ -119,7 +112,7 @@ public class RemoveUnnecessaryLocalBeforeReturnCleanUp extends AbstractCleanUpRu
         }
 
         private boolean isUsedAfterReturn(final IVariableBinding varToSearch, final ASTNode scopeNode) {
-            final TryStatement tryStmt= getAncestorOrNull(scopeNode, TryStatement.class);
+            final TryStatement tryStmt= ASTNodes.getAncestorOrNull(scopeNode, TryStatement.class);
             if (tryStmt == null) {
                 return false;
             } else {
@@ -138,7 +131,7 @@ public class RemoveUnnecessaryLocalBeforeReturnCleanUp extends AbstractCleanUpRu
                 final VariableDeclarationFragment vdf) {
             final Expression returnExpr= vdf.getInitializer();
             if (returnExpr instanceof ArrayInitializer) {
-                final ASTBuilder b= ctx.getASTBuilder();
+                final ASTNodeFactory b= ctx.getASTBuilder();
                 final ReturnStatement newReturnStmt= b
                         .return0(b.newArray(b.copy((ArrayType) vds.getType()), b.move((ArrayInitializer) returnExpr)));
                 replaceReturnStatementForArray(node, vds, newReturnStmt);
@@ -156,7 +149,7 @@ public class RemoveUnnecessaryLocalBeforeReturnCleanUp extends AbstractCleanUpRu
 
         private void replaceReturnStatement(final ReturnStatement node, final Statement previousSibling,
                 final Expression returnExpr) {
-            final ASTBuilder b= ctx.getASTBuilder();
+            final ASTNodeFactory b= ctx.getASTBuilder();
             final Refactorings r= ctx.getRefactorings();
             r.remove(previousSibling);
             r.replace(node, b.return0(b.move(returnExpr)));

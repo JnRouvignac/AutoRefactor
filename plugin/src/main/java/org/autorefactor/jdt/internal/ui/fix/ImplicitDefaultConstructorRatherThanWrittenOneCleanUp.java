@@ -25,13 +25,9 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasType;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.instanceOf;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.modifiers;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.statements;
-
 import java.util.List;
 
+import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jdt.core.dom.IExtendedModifier;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
@@ -79,7 +75,7 @@ public class ImplicitDefaultConstructorRatherThanWrittenOneCleanUp extends Abstr
             boolean isPackageClass= true;
             boolean isPrivateClass= false;
 
-            for (final IExtendedModifier extendedModifier : modifiers(node)) {
+            for (final IExtendedModifier extendedModifier : ASTNodes.modifiers(node)) {
                 if (extendedModifier.isModifier()) {
                     final Modifier modifier= (Modifier) extendedModifier;
                     if (modifier.isPublic()) {
@@ -111,7 +107,7 @@ public class ImplicitDefaultConstructorRatherThanWrittenOneCleanUp extends Abstr
 
             if (uniqueConstructor != null
                     && (!isCheckedExceptionThrown(uniqueConstructor) || node.getSuperclassType() == null
-                            || hasType(node.getSuperclassType().resolveBinding(), Object.class.getCanonicalName()))
+                            || ASTNodes.hasType(node.getSuperclassType().resolveBinding(), Object.class.getCanonicalName()))
                     && (uniqueConstructor.parameters() == null || uniqueConstructor.parameters().isEmpty())
                     && isDefaultStmts(uniqueConstructor)) {
                 if (uniqueConstructor.modifiers() != null && uniqueConstructor.modifiers().size() == 1) {
@@ -136,7 +132,7 @@ public class ImplicitDefaultConstructorRatherThanWrittenOneCleanUp extends Abstr
     }
 
     private boolean isDefaultStmts(final MethodDeclaration uniqueConstructor) {
-        final List<Statement> stmts= statements(uniqueConstructor.getBody());
+        final List<Statement> stmts= ASTNodes.statements(uniqueConstructor.getBody());
         if (stmts == null || stmts.isEmpty()) {
             return true;
         } else if (stmts.size() == 1) {
@@ -164,6 +160,6 @@ public class ImplicitDefaultConstructorRatherThanWrittenOneCleanUp extends Abstr
 
     private boolean isChecked(Type type) {
         final ITypeBinding binding= type.resolveBinding();
-        return !instanceOf(binding, RuntimeException.class.getCanonicalName()) && !instanceOf(binding, Error.class.getCanonicalName());
+        return !ASTNodes.instanceOf(binding, RuntimeException.class.getCanonicalName()) && !ASTNodes.instanceOf(binding, Error.class.getCanonicalName());
     }
 }

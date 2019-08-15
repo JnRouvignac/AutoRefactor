@@ -25,14 +25,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.catchClauses;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.fragments;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getOverridenMethods;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isSameVariable;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.match;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.resolveTypeBinding;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.types;
-import static org.autorefactor.util.Utils.equalNotNull;
 import static org.eclipse.jdt.core.dom.ASTNode.SIMPLE_TYPE;
 import static org.eclipse.jdt.core.dom.ASTNode.UNION_TYPE;
 
@@ -47,12 +39,13 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.ASTSemanticMatcher;
 import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.autorefactor.jdt.internal.corext.dom.Release;
 import org.autorefactor.util.NotImplementedException;
+import org.autorefactor.util.Utils;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.CatchClause;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
@@ -218,8 +211,8 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
             }
 
             VariableDeclarationStatement node2= (VariableDeclarationStatement) other;
-            List<VariableDeclarationFragment> fragments1= fragments(node);
-            List<VariableDeclarationFragment> fragments2= fragments(node2);
+            List<VariableDeclarationFragment> fragments1= ASTNodes.fragments(node);
+            List<VariableDeclarationFragment> fragments2= ASTNodes.fragments(node2);
             if (fragments1.size() == fragments2.size()) {
                 Iterator<VariableDeclarationFragment> it1= fragments1.iterator();
                 Iterator<VariableDeclarationFragment> it2= fragments2.iterator();
@@ -228,7 +221,7 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
                 while (it1.hasNext() && it2.hasNext()) {
                     VariableDeclarationFragment f1= it1.next();
                     VariableDeclarationFragment f2= it2.next();
-                    if (equalNotNull(resolveTypeBinding(f1), resolveTypeBinding(f2))
+                    if (Utils.equalNotNull(ASTNodes.resolveTypeBinding(f1), ASTNodes.resolveTypeBinding(f2))
                             // This structural match is a bit dumb
                             // It cannot reconcile 1 with 1L, true with Boolean.TRUE, etc.
                             // Let's rely on other refactoring rules which will simplify such expressions
@@ -286,14 +279,14 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
         }
 
         private boolean areOverridingSameMethod(IMethodBinding binding1, IMethodBinding binding2) {
-            Set<IMethodBinding> commonOverridenMethods= getOverridenMethods(binding1);
-            commonOverridenMethods.retainAll(getOverridenMethods(binding2));
+            Set<IMethodBinding> commonOverridenMethods= ASTNodes.getOverridenMethods(binding1);
+            commonOverridenMethods.retainAll(ASTNodes.getOverridenMethods(binding2));
             return !commonOverridenMethods.isEmpty();
         }
 
         private boolean areBothReferringToSameVariables(ASTNode node, Object other) {
             for (Entry<ASTNode, ASTNode> pairedVariables : matchingVariables.entrySet()) {
-                if (isSameVariable(node, pairedVariables.getKey())) {
+                if (ASTNodes.isSameVariable(node, pairedVariables.getKey())) {
                     return isSameVariable0(other, pairedVariables.getValue());
                 }
             }
@@ -301,13 +294,13 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
         }
 
         private boolean isSameVariable0(Object other, ASTNode node2) {
-            return other instanceof ASTNode && isSameVariable((ASTNode) other, node2);
+            return other instanceof ASTNode && ASTNodes.isSameVariable((ASTNode) other, node2);
         }
     }
 
     @Override
     public boolean visit(TryStatement node) {
-        List<CatchClause> catchClauses= catchClauses(node);
+        List<CatchClause> catchClauses= ASTNodes.catchClauses(node);
         Binding[] typeBindings= resolveTypeBindings(catchClauses);
         for (int i= 0; i < catchClauses.size(); i++) {
             CatchClause catchClause1= catchClauses.get(i);
@@ -348,7 +341,7 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
             return new SingleBinding(type.resolveBinding());
 
         case UNION_TYPE:
-            List<Type> types= types((UnionType) type);
+            List<Type> types= ASTNodes.types((UnionType) type);
             ITypeBinding[] typeBindings= new ITypeBinding[types.size()];
             for (int j= 0; j < types.size(); j++) {
                 typeBindings[j]= types.get(j).resolveBinding();
@@ -363,7 +356,7 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
 
     private boolean matchMultiCatch(CatchClause catchClause1, CatchClause catchClause2) {
         final MultiCatchASTMatcher matcher= new MultiCatchASTMatcher(catchClause1, catchClause2);
-        return match(matcher, catchClause1.getBody(), catchClause2.getBody());
+        return ASTNodes.match(matcher, catchClause1.getBody(), catchClause2.getBody());
     }
 
     private MergeDirection mergeDirection(Binding[] typeBindings, int start, int end) {
@@ -403,9 +396,9 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
         collectAllUnionedTypes(allTypes, Arrays.asList(types));
         removeSupersededAlternatives(allTypes);
 
-        final ASTBuilder b= this.ctx.getASTBuilder();
+        final ASTNodeFactory b= this.ctx.getASTBuilder();
         final UnionType result= this.ctx.getAST().newUnionType();
-        final List<Type> unionedTypes= types(result);
+        final List<Type> unionedTypes= ASTNodes.types(result);
         for (Type unionedType : allTypes) {
             unionedTypes.add(b.copy(unionedType));
         }
@@ -416,7 +409,7 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
         for (final Type type : types) {
             if (type instanceof UnionType) {
                 final UnionType ut= (UnionType) type;
-                collectAllUnionedTypes(results, types(ut));
+                collectAllUnionedTypes(results, ASTNodes.types(ut));
             } else {
                 results.add(type);
             }

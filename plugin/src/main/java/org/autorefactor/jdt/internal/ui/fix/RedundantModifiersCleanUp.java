@@ -26,13 +26,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasType;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.modifiers;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.resources;
-import static org.eclipse.jdt.core.dom.Modifier.isFinal;
-import static org.eclipse.jdt.core.dom.Modifier.isPrivate;
-import static org.eclipse.jdt.core.dom.Modifier.isProtected;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -40,7 +33,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.util.NotImplementedException;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Annotation;
@@ -106,8 +100,8 @@ public class RedundantModifiersCleanUp extends AbstractCleanUpRule {
             } else if (o2.isAnnotation()) {
                 return 1;
             } else {
-                final int i1= ORDERED_MODIFIERS.indexOf(((Modifier) o1).getKeyword());
-                final int i2= ORDERED_MODIFIERS.indexOf(((Modifier) o2).getKeyword());
+                final int i1= RedundantModifiersCleanUp.ORDERED_MODIFIERS.indexOf(((Modifier) o1).getKeyword());
+                final int i2= RedundantModifiersCleanUp.ORDERED_MODIFIERS.indexOf(((Modifier) o2).getKeyword());
                 if (i1 == -1) {
                     throw new NotImplementedException(((Modifier) o1), "cannot determine order for modifier " + o1); //$NON-NLS-1$
                 }
@@ -130,7 +124,7 @@ public class RedundantModifiersCleanUp extends AbstractCleanUpRule {
         if (isInterface(node.getParent())) {
             return removePublicStaticFinalModifiers(node);
         }
-        if (isProtected(node.getModifiers()) && isFinalClass(node.getParent())) {
+        if (Modifier.isProtected(node.getModifiers()) && isFinalClass(node.getParent())) {
             return removeProtectedModifier(node);
         }
         return ensureModifiersOrder(node);
@@ -139,7 +133,7 @@ public class RedundantModifiersCleanUp extends AbstractCleanUpRule {
     private boolean removePublicStaticFinalModifiers(FieldDeclaration node) {
         // Remove modifiers implied by the context
         boolean result= true;
-        for (Modifier m : getModifiersOnly(modifiers(node))) {
+        for (Modifier m : getModifiersOnly(ASTNodes.modifiers(node))) {
             if (m.isPublic() || m.isStatic() || m.isFinal()) {
                 ctx.getRefactorings().remove(m);
                 result= false;
@@ -153,7 +147,7 @@ public class RedundantModifiersCleanUp extends AbstractCleanUpRule {
     }
 
     private boolean isFinalClass(ASTNode node) {
-        return node instanceof TypeDeclaration && isFinal(((TypeDeclaration) node).getModifiers());
+        return node instanceof TypeDeclaration && Modifier.isFinal(((TypeDeclaration) node).getModifiers());
     }
 
     @Override
@@ -163,10 +157,10 @@ public class RedundantModifiersCleanUp extends AbstractCleanUpRule {
             return removePublicAbstractModifiers(node);
         }
         int modifiers= node.getModifiers();
-        if (isFinal(modifiers) && (isFinalClass(node.getParent()) || isPrivate(modifiers))) {
-            return removeFinalModifier(modifiers(node));
+        if (Modifier.isFinal(modifiers) && (isFinalClass(node.getParent()) || Modifier.isPrivate(modifiers))) {
+            return removeFinalModifier(ASTNodes.modifiers(node));
         }
-        if (isProtected(node.getModifiers()) && (node.isConstructor() ? isFinalClass(node.getParent())
+        if (Modifier.isProtected(node.getModifiers()) && (node.isConstructor() ? isFinalClass(node.getParent())
                 : isFinalClassWithoutInheritance(node.getParent()))) {
             return removeProtectedModifier(node);
         }
@@ -177,14 +171,14 @@ public class RedundantModifiersCleanUp extends AbstractCleanUpRule {
         if (node instanceof TypeDeclaration) {
             TypeDeclaration clazz= (TypeDeclaration) node;
             return isFinalClass(clazz) && clazz.superInterfaceTypes().isEmpty() && (clazz.getSuperclassType() == null
-                    || hasType(clazz.getSuperclassType().resolveBinding(), Object.class.getCanonicalName()));
+                    || ASTNodes.hasType(clazz.getSuperclassType().resolveBinding(), Object.class.getCanonicalName()));
         }
 
         return false;
     }
 
     private boolean removeProtectedModifier(BodyDeclaration node) {
-        for (Modifier modifier : getModifiersOnly(modifiers(node))) {
+        for (Modifier modifier : getModifiersOnly(ASTNodes.modifiers(node))) {
             if (modifier.isProtected()) {
                 ctx.getRefactorings().remove(modifier);
                 return false;
@@ -195,7 +189,7 @@ public class RedundantModifiersCleanUp extends AbstractCleanUpRule {
 
     private boolean removePublicAbstractModifiers(BodyDeclaration node) {
         boolean result= true;
-        for (Modifier m : getModifiersOnly(modifiers(node))) {
+        for (Modifier m : getModifiersOnly(ASTNodes.modifiers(node))) {
             if (m.isPublic() || m.isAbstract()) {
                 ctx.getRefactorings().remove(m);
                 result= false;
@@ -216,7 +210,7 @@ public class RedundantModifiersCleanUp extends AbstractCleanUpRule {
 
     @Override
     public boolean visit(EnumDeclaration node) {
-        if (!removeStaticAbstractModifier(modifiers(node))) {
+        if (!removeStaticAbstractModifier(ASTNodes.modifiers(node))) {
             return false;
         }
 
@@ -226,15 +220,15 @@ public class RedundantModifiersCleanUp extends AbstractCleanUpRule {
     @Override
     public boolean visit(TryStatement node) {
         boolean result= true;
-        for (VariableDeclarationExpression resource : resources(node)) {
-            result&= removeFinalModifier(modifiers(resource));
+        for (VariableDeclarationExpression resource : ASTNodes.resources(node)) {
+            result&= removeFinalModifier(ASTNodes.modifiers(resource));
         }
         return result;
     }
 
     @Override
     public boolean visit(TypeDeclaration node) {
-        if (isInterface(node) && !removeStaticAbstractModifier(modifiers(node))) {
+        if (isInterface(node) && !removeStaticAbstractModifier(ASTNodes.modifiers(node))) {
             return false;
         }
 
@@ -242,7 +236,7 @@ public class RedundantModifiersCleanUp extends AbstractCleanUpRule {
     }
 
     private boolean ensureModifiersOrder(BodyDeclaration node) {
-        final List<IExtendedModifier> extendedModifiers= modifiers(node);
+        final List<IExtendedModifier> extendedModifiers= ASTNodes.modifiers(node);
         final List<IExtendedModifier> reorderedModifiers= new ArrayList<IExtendedModifier>(extendedModifiers);
         Collections.sort(reorderedModifiers, new ModifierOrderComparator());
 
@@ -255,7 +249,7 @@ public class RedundantModifiersCleanUp extends AbstractCleanUpRule {
     }
 
     private void reorderModifiers(final List<IExtendedModifier> reorderedModifiers) {
-        final ASTBuilder b= ctx.getASTBuilder();
+        final ASTNodeFactory b= ctx.getASTBuilder();
 
         for (int i= 0; i < reorderedModifiers.size(); i++) {
             IExtendedModifier m= reorderedModifiers.get(i);
@@ -281,7 +275,7 @@ public class RedundantModifiersCleanUp extends AbstractCleanUpRule {
     @Override
     public boolean visit(SingleVariableDeclaration node) {
         if (isInterface(node.getParent().getParent())) {
-            return removeFinalModifier(modifiers(node));
+            return removeFinalModifier(ASTNodes.modifiers(node));
         }
         return true;
     }

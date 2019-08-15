@@ -26,15 +26,10 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.arguments;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.asExpression;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.asList;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasType;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.usesGivenSignature;
-
 import java.util.List;
 
-import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.util.Pair;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.Expression;
@@ -107,7 +102,7 @@ public class TestNGAssertCleanUp extends AbstractUnitTestCleanUp {
 
     private boolean canUseAssertNotEquals(final ImportDeclaration node) {
         final ITypeBinding typeBinding= resolveTypeBinding(node);
-        if (hasType(typeBinding, "org.testng.Assert")) { //$NON-NLS-1$
+        if (ASTNodes.hasType(typeBinding, "org.testng.Assert")) { //$NON-NLS-1$
             for (IMethodBinding mb : typeBinding.getDeclaredMethods()) {
                 if (mb.toString().contains("assertNotEquals")) { //$NON-NLS-1$
                     return true;
@@ -134,30 +129,30 @@ public class TestNGAssertCleanUp extends AbstractUnitTestCleanUp {
 
     @Override
     public boolean visit(MethodInvocation node) {
-        final List<Expression> args= arguments(node);
-        if (usesGivenSignature(node, "org.testng.Assert", "assertTrue", boolean.class.getSimpleName())) { //$NON-NLS-1$ $NON-NLS-2$
+        final List<Expression> args= ASTNodes.arguments(node);
+        if (ASTNodes.usesGivenSignature(node, "org.testng.Assert", "assertTrue", boolean.class.getSimpleName())) { //$NON-NLS-1$ $NON-NLS-2$
             return maybeRefactorStatement(node, node, true, args.get(0), null, false);
-        } else if (usesGivenSignature(node, "org.testng.Assert", "assertTrue", boolean.class.getSimpleName(), String.class.getCanonicalName())) { //$NON-NLS-1$ $NON-NLS-2$
+        } else if (ASTNodes.usesGivenSignature(node, "org.testng.Assert", "assertTrue", boolean.class.getSimpleName(), String.class.getCanonicalName())) { //$NON-NLS-1$ $NON-NLS-2$
             return maybeRefactorStatement(node, node, true, args.get(0), args.get(1), false);
-        } else if (usesGivenSignature(node, "org.testng.Assert", "assertFalse", boolean.class.getSimpleName())) { //$NON-NLS-1$ $NON-NLS-2$
+        } else if (ASTNodes.usesGivenSignature(node, "org.testng.Assert", "assertFalse", boolean.class.getSimpleName())) { //$NON-NLS-1$ $NON-NLS-2$
             return maybeRefactorStatement(node, node, false, args.get(0), null, false);
-        } else if (usesGivenSignature(node, "org.testng.Assert", "assertFalse", boolean.class.getSimpleName(), String.class.getCanonicalName())) { //$NON-NLS-1$ $NON-NLS-2$
+        } else if (ASTNodes.usesGivenSignature(node, "org.testng.Assert", "assertFalse", boolean.class.getSimpleName(), String.class.getCanonicalName())) { //$NON-NLS-1$ $NON-NLS-2$
             return maybeRefactorStatement(node, node, false, args.get(0), args.get(1), false);
-        } else if (usesGivenSignature(node, "org.testng.Assert", "assertEquals", OBJECT, OBJECT) //$NON-NLS-1$ $NON-NLS-2$
-                || usesGivenSignature(node, "org.testng.Assert", "assertEquals", long.class.getSimpleName(), long.class.getSimpleName()) //$NON-NLS-1$ $NON-NLS-2$
-                || usesGivenSignature(node, "org.testng.Assert", "assertEquals", double.class.getSimpleName(), double.class.getSimpleName())) { //$NON-NLS-1$ $NON-NLS-2$
+        } else if (ASTNodes.usesGivenSignature(node, "org.testng.Assert", "assertEquals", AbstractUnitTestCleanUp.OBJECT, AbstractUnitTestCleanUp.OBJECT) //$NON-NLS-1$ $NON-NLS-2$
+                || ASTNodes.usesGivenSignature(node, "org.testng.Assert", "assertEquals", long.class.getSimpleName(), long.class.getSimpleName()) //$NON-NLS-1$ $NON-NLS-2$
+                || ASTNodes.usesGivenSignature(node, "org.testng.Assert", "assertEquals", double.class.getSimpleName(), double.class.getSimpleName())) { //$NON-NLS-1$ $NON-NLS-2$
             return maybeRefactorToAssertEquals(node, node, true, args.get(0), args.get(1), null, false);
-        } else if (usesGivenSignature(node, "org.testng.Assert", "assertEquals", OBJECT, OBJECT, String.class.getCanonicalName()) //$NON-NLS-1$ $NON-NLS-2$
-                || usesGivenSignature(node, "org.testng.Assert", "assertEquals", long.class.getSimpleName(), long.class.getSimpleName(), String.class.getCanonicalName()) //$NON-NLS-1$ $NON-NLS-2$
-                || usesGivenSignature(node, "org.testng.Assert", "assertEquals", double.class.getSimpleName(), double.class.getSimpleName(), String.class.getCanonicalName())) { //$NON-NLS-1$ $NON-NLS-2$
+        } else if (ASTNodes.usesGivenSignature(node, "org.testng.Assert", "assertEquals", AbstractUnitTestCleanUp.OBJECT, AbstractUnitTestCleanUp.OBJECT, String.class.getCanonicalName()) //$NON-NLS-1$ $NON-NLS-2$
+                || ASTNodes.usesGivenSignature(node, "org.testng.Assert", "assertEquals", long.class.getSimpleName(), long.class.getSimpleName(), String.class.getCanonicalName()) //$NON-NLS-1$ $NON-NLS-2$
+                || ASTNodes.usesGivenSignature(node, "org.testng.Assert", "assertEquals", double.class.getSimpleName(), double.class.getSimpleName(), String.class.getCanonicalName())) { //$NON-NLS-1$ $NON-NLS-2$
             return maybeRefactorToAssertEquals(node, node, true, args.get(0), args.get(1), args.get(2), false);
-        } else if (usesGivenSignature(node, "org.testng.Assert", "assertNotEquals", OBJECT, OBJECT) //$NON-NLS-1$ $NON-NLS-2$
-                || usesGivenSignature(node, "org.testng.Assert", "assertNotEquals", long.class.getSimpleName(), long.class.getSimpleName()) //$NON-NLS-1$ $NON-NLS-2$
-                || usesGivenSignature(node, "org.testng.Assert", "assertNotEquals", double.class.getSimpleName(), double.class.getSimpleName())) { //$NON-NLS-1$ $NON-NLS-2$
+        } else if (ASTNodes.usesGivenSignature(node, "org.testng.Assert", "assertNotEquals", AbstractUnitTestCleanUp.OBJECT, AbstractUnitTestCleanUp.OBJECT) //$NON-NLS-1$ $NON-NLS-2$
+                || ASTNodes.usesGivenSignature(node, "org.testng.Assert", "assertNotEquals", long.class.getSimpleName(), long.class.getSimpleName()) //$NON-NLS-1$ $NON-NLS-2$
+                || ASTNodes.usesGivenSignature(node, "org.testng.Assert", "assertNotEquals", double.class.getSimpleName(), double.class.getSimpleName())) { //$NON-NLS-1$ $NON-NLS-2$
             return maybeRefactorToAssertEquals(node, node, false, args.get(0), args.get(1), null, false);
-        } else if (usesGivenSignature(node, "org.testng.Assert", "assertNotEquals", OBJECT, OBJECT, String.class.getCanonicalName()) //$NON-NLS-1$ $NON-NLS-2$
-                || usesGivenSignature(node, "org.testng.Assert", "assertNotEquals", long.class.getSimpleName(), long.class.getSimpleName(), String.class.getCanonicalName()) //$NON-NLS-1$ $NON-NLS-2$
-                || usesGivenSignature(node, "org.testng.Assert", "assertNotEquals", double.class.getSimpleName(), double.class.getSimpleName(), String.class.getCanonicalName())) { //$NON-NLS-1$ $NON-NLS-2$
+        } else if (ASTNodes.usesGivenSignature(node, "org.testng.Assert", "assertNotEquals", AbstractUnitTestCleanUp.OBJECT, AbstractUnitTestCleanUp.OBJECT, String.class.getCanonicalName()) //$NON-NLS-1$ $NON-NLS-2$
+                || ASTNodes.usesGivenSignature(node, "org.testng.Assert", "assertNotEquals", long.class.getSimpleName(), long.class.getSimpleName(), String.class.getCanonicalName()) //$NON-NLS-1$ $NON-NLS-2$
+                || ASTNodes.usesGivenSignature(node, "org.testng.Assert", "assertNotEquals", double.class.getSimpleName(), double.class.getSimpleName(), String.class.getCanonicalName())) { //$NON-NLS-1$ $NON-NLS-2$
             return maybeRefactorToAssertEquals(node, node, false, args.get(0), args.get(1), args.get(2), false);
         }
         return true;
@@ -165,20 +160,20 @@ public class TestNGAssertCleanUp extends AbstractUnitTestCleanUp {
 
     @Override
     public boolean visit(IfStatement node) {
-        final List<Statement> stmts= asList(node.getThenStatement());
+        final List<Statement> stmts= ASTNodes.asList(node.getThenStatement());
         if (node.getElseStatement() == null && stmts.size() == 1) {
-            final MethodInvocation mi= asExpression(stmts.get(0), MethodInvocation.class);
-            if (usesGivenSignature(mi, "org.testng.Assert", "fail")) { //$NON-NLS-1$ $NON-NLS-2$
+            final MethodInvocation mi= ASTNodes.asExpression(stmts.get(0), MethodInvocation.class);
+            if (ASTNodes.usesGivenSignature(mi, "org.testng.Assert", "fail")) { //$NON-NLS-1$ $NON-NLS-2$
                 return maybeRefactorStatement(node, mi, false, node.getExpression(), null, true);
-            } else if (usesGivenSignature(mi, "org.testng.Assert", "fail", String.class.getCanonicalName())) { //$NON-NLS-1$ $NON-NLS-2$
-                return maybeRefactorStatement(node, mi, false, node.getExpression(), arguments(mi).get(0), true);
+            } else if (ASTNodes.usesGivenSignature(mi, "org.testng.Assert", "fail", String.class.getCanonicalName())) { //$NON-NLS-1$ $NON-NLS-2$
+                return maybeRefactorStatement(node, mi, false, node.getExpression(), ASTNodes.arguments(mi).get(0), true);
             }
         }
         return true;
     }
 
     @Override
-    protected MethodInvocation invokeQualifiedMethod(final ASTBuilder b, final Expression copyOfExpr,
+    protected MethodInvocation invokeQualifiedMethod(final ASTNodeFactory b, final Expression copyOfExpr,
             final String methodName, final Expression copyOfActual, final Expression copyOfExpected,
             final Expression failureMessage) {
         if (failureMessage == null) {

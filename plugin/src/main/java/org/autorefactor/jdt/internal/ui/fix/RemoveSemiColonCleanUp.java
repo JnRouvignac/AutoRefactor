@@ -25,13 +25,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getCommentList;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getNextSibling;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.resources;
-import static org.autorefactor.jdt.internal.corext.dom.SourceLocation.fromPositions;
-import static org.autorefactor.jdt.internal.corext.dom.SourceLocation.getEndPosition;
-import static org.autorefactor.util.Utils.getLast;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -43,8 +36,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.autorefactor.jdt.internal.corext.dom.SourceLocation;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes.NodeStartPositionComparator;
 import org.autorefactor.util.NotImplementedException;
+import org.autorefactor.util.Utils;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.AbstractTypeDeclaration;
 import org.eclipse.jdt.core.dom.AnnotationTypeDeclaration;
@@ -126,19 +121,19 @@ public class RemoveSemiColonCleanUp extends AbstractCleanUpRule {
     }
 
     private boolean visit(BodyDeclaration node) {
-        final BodyDeclaration nextSibling= getNextSibling(node);
+        final BodyDeclaration nextSibling= ASTNodes.getNextSibling(node);
         final ASTNode parent= node.getParent();
         if (nextSibling != null) {
-            return removeSuperfluousSemiColons(node, getEndPosition(node), nextSibling.getStartPosition());
+            return removeSuperfluousSemiColons(node, SourceLocation.getEndPosition(node), nextSibling.getStartPosition());
         } else if (parent instanceof AbstractTypeDeclaration) {
             final AbstractTypeDeclaration typeDecl= (AbstractTypeDeclaration) parent;
-            return removeSuperfluousSemiColons(node, getEndPosition(node), getEndPosition(typeDecl) - 1);
+            return removeSuperfluousSemiColons(node, SourceLocation.getEndPosition(node), SourceLocation.getEndPosition(typeDecl) - 1);
         } else if (parent instanceof AnonymousClassDeclaration) {
             final AnonymousClassDeclaration classDecl= (AnonymousClassDeclaration) parent;
-            return removeSuperfluousSemiColons(node, getEndPosition(node), getEndPosition(classDecl) - 1);
+            return removeSuperfluousSemiColons(node, SourceLocation.getEndPosition(node), SourceLocation.getEndPosition(classDecl) - 1);
         } else if (parent instanceof CompilationUnit) {
             final CompilationUnit cu= (CompilationUnit) parent;
-            return removeSuperfluousSemiColons(node, getEndPosition(node), getEndPosition(cu) - 1);
+            return removeSuperfluousSemiColons(node, SourceLocation.getEndPosition(node), SourceLocation.getEndPosition(cu) - 1);
         } else if (parent instanceof TypeDeclarationStatement) {
             return true;
         }
@@ -157,7 +152,7 @@ public class RemoveSemiColonCleanUp extends AbstractCleanUpRule {
             final Matcher m= Pattern.compile("\\s*(;+)\\s*").matcher(s); //$NON-NLS-1$
             while (m.find()) {
                 int startPos= entry.getValue().getStartPosition();
-                SourceLocation toRemove= fromPositions(startPos + m.start(1), startPos + m.end(1));
+                SourceLocation toRemove= SourceLocation.fromPositions(startPos + m.start(1), startPos + m.end(1));
                 this.ctx.getRefactorings().remove(toRemove);
                 result= false;
             }
@@ -178,14 +173,14 @@ public class RemoveSemiColonCleanUp extends AbstractCleanUpRule {
                 if (nextStart < comment.getStartPosition()) {
                     putResult(source, nextStart, comment.getStartPosition(), results);
                 }
-                nextStart= getEndPosition(comment);
+                nextStart= SourceLocation.getEndPosition(comment);
             }
         }
         return results;
     }
 
     private void putResult(String source, int start, int end, final LinkedHashMap<String, SourceLocation> results) {
-        final SourceLocation sourceLoc= fromPositions(start, end);
+        final SourceLocation sourceLoc= SourceLocation.fromPositions(start, end);
         final String s= sourceLoc.substring(source);
         results.put(s, sourceLoc);
     }
@@ -193,7 +188,7 @@ public class RemoveSemiColonCleanUp extends AbstractCleanUpRule {
     private List<Comment> filterCommentsInRange(int start, int end, final ASTNode root) {
         if (root instanceof CompilationUnit) {
             final CompilationUnit cu= (CompilationUnit) root;
-            return filterCommentsInRange(start, end, getCommentList(cu));
+            return filterCommentsInRange(start, end, ASTNodes.getCommentList(cu));
         }
         return Collections.emptyList();
     }
@@ -208,7 +203,7 @@ public class RemoveSemiColonCleanUp extends AbstractCleanUpRule {
         final Iterator<Comment> it= comments.iterator();
         while (it.hasNext()) {
             final Comment comment= it.next();
-            if (comment.getStartPosition() < start || getEndPosition(comment) > end) {
+            if (comment.getStartPosition() < start || SourceLocation.getEndPosition(comment) > end) {
                 it.remove();
             }
         }
@@ -217,12 +212,12 @@ public class RemoveSemiColonCleanUp extends AbstractCleanUpRule {
 
     @Override
     public boolean visit(TryStatement node) {
-        final List<VariableDeclarationExpression> resources= resources(node);
+        final List<VariableDeclarationExpression> resources= ASTNodes.resources(node);
         if (resources.isEmpty()) {
             return true;
         }
-        VariableDeclarationExpression lastResource= getLast(resources);
+        VariableDeclarationExpression lastResource= Utils.getLast(resources);
         Block body= node.getBody();
-        return removeSuperfluousSemiColons(node, getEndPosition(lastResource), body.getStartPosition());
+        return removeSuperfluousSemiColons(node, SourceLocation.getEndPosition(lastResource), body.getStartPosition());
     }
 }

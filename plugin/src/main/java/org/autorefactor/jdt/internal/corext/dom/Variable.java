@@ -38,7 +38,7 @@ import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 public class Variable {
     private final String typeName;
     private final String variableName;
-    private final ASTBuilder b;
+    private final ASTNodeFactory b;
 
     /**
      * Builds a variable with its name and its type.
@@ -47,7 +47,7 @@ public class Variable {
      * @param variableName the variable's name
      * @param astBuilder   the builder to build new AST nodes
      */
-    public Variable(String typeName, String variableName, ASTBuilder astBuilder) {
+    public Variable(String typeName, String variableName, ASTNodeFactory astBuilder) {
         this.typeName= typeName;
         this.variableName= variableName;
         this.b= astBuilder;
@@ -60,7 +60,7 @@ public class Variable {
      * @param variableName the variable's name
      * @param astBuilder   the builder to build new AST nodes
      */
-    public Variable(String variableName, ASTBuilder astBuilder) {
+    public Variable(String variableName, ASTNodeFactory astBuilder) {
         this(null, variableName, astBuilder);
     }
 

@@ -26,21 +26,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.asList;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.extendedOperands;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.fallsThrough;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getLocalVariableIdentifiers;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasType;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.haveSameType;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.match;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.removeParentheses;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.statements;
-import static org.autorefactor.util.Utils.getLast;
-import static org.eclipse.jdt.core.dom.InfixExpression.Operator.CONDITIONAL_OR;
-import static org.eclipse.jdt.core.dom.InfixExpression.Operator.EQUALS;
-import static org.eclipse.jdt.core.dom.InfixExpression.Operator.OR;
-import static org.eclipse.jdt.core.dom.InfixExpression.Operator.XOR;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -48,12 +33,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTMatcherSameVariablesAndMethods;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.FinderVisitor;
 import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.autorefactor.util.NotImplementedException;
+import org.autorefactor.util.Utils;
 import org.eclipse.jdt.core.dom.BreakStatement;
 import org.eclipse.jdt.core.dom.CharacterLiteral;
 import org.eclipse.jdt.core.dom.DoStatement;
@@ -62,7 +48,6 @@ import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ForStatement;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.InfixExpression;
-import org.eclipse.jdt.core.dom.InfixExpression.Operator;
 import org.eclipse.jdt.core.dom.NumberLiteral;
 import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.Statement;
@@ -135,7 +120,7 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
         }
 
         private boolean fallsThrough() {
-            return stmts.isEmpty() || !ASTNodes.fallsThrough(getLast(stmts));
+            return stmts.isEmpty() || !ASTNodes.fallsThrough(Utils.getLast(stmts));
         }
 
         private boolean hasSameCode(SwitchCaseSection other) {
@@ -144,7 +129,7 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
             }
 
             for (int i= 0; i < stmts.size(); i++) {
-                if (!match(variablesAndMethodsMatcher, stmts.get(i), other.stmts.get(i))) {
+                if (!ASTNodes.match(variablesAndMethodsMatcher, stmts.get(i), other.stmts.get(i))) {
                     return false;
                 }
             }
@@ -253,13 +238,13 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
 
         final Set<String> variableDeclarationIds= new HashSet<String>();
         IfStatement currentNode= node;
-        while (haveSameIdentifier(switchExpr, variable.name) && haveSameType(switchExpr, variable.name)) {
+        while (haveSameIdentifier(switchExpr, variable.name) && ASTNodes.haveSameType(switchExpr, variable.name)) {
             if (detectDeclarationConflicts(currentNode.getThenStatement(), variableDeclarationIds)) {
                 // Cannot declare two variables with the same name in two cases
                 return true;
             }
 
-            cases.add(new SwitchCaseSection(variable.constantValues, asList(currentNode.getThenStatement())));
+            cases.add(new SwitchCaseSection(variable.constantValues, ASTNodes.asList(currentNode.getThenStatement())));
             remainingStmt= currentNode.getElseStatement();
 
             variable= extractVariableAndValues(remainingStmt);
@@ -282,7 +267,7 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
     }
 
     private boolean detectDeclarationConflicts(final Statement stmt, final Set<String> variableDeclarationIds) {
-        final Set<String> varNames= getLocalVariableIdentifiers(stmt, false);
+        final Set<String> varNames= ASTNodes.getLocalVariableIdentifiers(stmt, false);
         final boolean hasConflict= containsAny(variableDeclarationIds, varNames);
         variableDeclarationIds.addAll(varNames);
         return hasConflict;
@@ -332,13 +317,13 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
 
     private void replaceWithSwitchStmt(final IfStatement node, final Expression switchExpr,
             final List<SwitchCaseSection> cases, final Statement remainingStmt) {
-        final ASTBuilder b= ctx.getASTBuilder();
+        final ASTNodeFactory b= ctx.getASTBuilder();
         final SwitchStatement switchStmt= b.switch0(b.move(switchExpr));
         for (final SwitchCaseSection aCase : cases) {
             addCaseWithStmts(switchStmt, aCase.constantExprs, aCase.stmts);
         }
         if (remainingStmt != null) {
-            addDefaultWithStmts(switchStmt, asList(remainingStmt));
+            addDefaultWithStmts(switchStmt, ASTNodes.asList(remainingStmt));
         }
         ctx.getRefactorings().replace(node, switchStmt);
     }
@@ -349,8 +334,8 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
 
     private void addCaseWithStmts(final SwitchStatement switchStmt, final List<Expression> caseValues,
             final List<Statement> innerStmts) {
-        final ASTBuilder b= ctx.getASTBuilder();
-        final List<Statement> switchStmts= statements(switchStmt);
+        final ASTNodeFactory b= ctx.getASTBuilder();
+        final List<Statement> switchStmts= ASTNodes.statements(switchStmt);
 
         // Add the case statement(s)
         if (caseValues != null) {
@@ -367,7 +352,7 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
             for (final Statement stmt : innerStmts) {
                 switchStmts.add(b.move(stmt));
             }
-            isBreakNeeded= !fallsThrough(getLast(innerStmts));
+            isBreakNeeded= !ASTNodes.fallsThrough(Utils.getLast(innerStmts));
         }
         // When required: end with a break;
         if (isBreakNeeded) {
@@ -383,34 +368,35 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
     }
 
     private Variable extractVariableAndValues(Expression expr) {
-        final Expression exprNoParen= removeParentheses(expr);
+        final Expression exprNoParen= ASTNodes.getUnparenthesedExpression(expr);
         return exprNoParen instanceof InfixExpression
                 ? extractVariableAndValuesFromInfixExpression((InfixExpression) exprNoParen)
                 : null;
     }
 
     private Variable extractVariableAndValuesFromInfixExpression(InfixExpression infixExpr) {
-        final Operator op= infixExpr.getOperator();
         final Expression leftOp= infixExpr.getLeftOperand();
         final Expression rightOp= infixExpr.getRightOperand();
-        if (extendedOperands(infixExpr).isEmpty() && (CONDITIONAL_OR.equals(op) || OR.equals(op) || XOR.equals(op))) {
+
+        if (ASTNodes.extendedOperands(infixExpr).isEmpty() && ASTNodes.hasOperator(infixExpr, InfixExpression.Operator.CONDITIONAL_OR, InfixExpression.Operator.OR, InfixExpression.Operator.XOR)) {
             final Variable leftVar= extractVariableAndValues(leftOp);
             final Variable rightVar= extractVariableAndValues(rightOp);
 
             if (leftVar != null && leftVar.isSameVariable(rightVar)) {
                 return leftVar.mergeValues(rightVar);
             }
-        } else if (EQUALS.equals(op)) {
+        } else if (InfixExpression.Operator.EQUALS.equals(infixExpr.getOperator())) {
             Variable variable= extractVariableWithConstantValue(leftOp, rightOp);
             return variable != null ? variable : extractVariableWithConstantValue(rightOp, leftOp);
         }
+
         return null;
     }
 
     private Variable extractVariableWithConstantValue(Expression firstOp, Expression secondOp) {
         // TODO JNR handle enums
         // TODO JNR handle strings
-        if (firstOp instanceof SimpleName && hasType(firstOp, char.class.getSimpleName(), byte.class.getSimpleName(), short.class.getSimpleName(), int.class.getSimpleName())
+        if (firstOp instanceof SimpleName && ASTNodes.hasType(firstOp, char.class.getSimpleName(), byte.class.getSimpleName(), short.class.getSimpleName(), int.class.getSimpleName())
                 && (secondOp instanceof NumberLiteral || secondOp instanceof CharacterLiteral)) {
             return new Variable((SimpleName) firstOp, Arrays.asList(secondOp));
         }
@@ -451,7 +437,7 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
         final List<SwitchCaseSection> switchStructure= new ArrayList<SwitchCaseSection>();
 
         SwitchCaseSection currentCase= new SwitchCaseSection();
-        for (final Statement stmt : statements(node)) {
+        for (final Statement stmt : ASTNodes.statements(node)) {
             if (stmt instanceof SwitchCase) {
                 if (!currentCase.stmts.isEmpty()) {
                     switchStructure.add(currentCase);
@@ -480,7 +466,7 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
     }
 
     private void mergeCases(Merge merge, SwitchCaseSection sectionToKeep, SwitchCaseSection sectionToRemove) {
-        final ASTBuilder b= this.ctx.getASTBuilder();
+        final ASTNodeFactory b= this.ctx.getASTBuilder();
         final Refactorings r= this.ctx.getRefactorings();
 
         final Statement caseKept;

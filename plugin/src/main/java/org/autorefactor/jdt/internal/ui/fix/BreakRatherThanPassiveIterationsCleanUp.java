@@ -25,21 +25,12 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.asList;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getLocalVariableIdentifiers;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasType;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.initializers;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isArray;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isHardCoded;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.updaters;
-import static org.eclipse.jdt.core.dom.PrefixExpression.Operator.DECREMENT;
-import static org.eclipse.jdt.core.dom.PrefixExpression.Operator.INCREMENT;
-
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.InterruptibleVisitor;
 import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.eclipse.jdt.core.dom.ASTNode;
@@ -93,7 +84,7 @@ public class BreakRatherThanPassiveIterationsCleanUp extends AbstractCleanUpRule
 
         @Override
         public boolean visit(final PrefixExpression node) {
-            return !(INCREMENT.equals(node.getOperator()) || DECREMENT.equals(node.getOperator())) || visitVar(node.getOperand());
+            return !(PrefixExpression.Operator.INCREMENT.equals(node.getOperator()) || PrefixExpression.Operator.DECREMENT.equals(node.getOperator())) || visitVar(node.getOperand());
         }
 
         @Override
@@ -104,7 +95,7 @@ public class BreakRatherThanPassiveIterationsCleanUp extends AbstractCleanUpRule
         @SuppressWarnings("unchecked")
         @Override
         public boolean visit(final InfixExpression node) {
-            if (InfixExpression.Operator.PLUS.equals(node.getOperator()) && hasType(node, String.class.getCanonicalName())
+            if (InfixExpression.Operator.PLUS.equals(node.getOperator()) && ASTNodes.hasType(node, String.class.getCanonicalName())
                     && (mayCallImplicitToString(node.getLeftOperand())
                             || mayCallImplicitToString(node.getRightOperand())
                             || mayCallImplicitToString(node.extendedOperands()))) {
@@ -126,7 +117,7 @@ public class BreakRatherThanPassiveIterationsCleanUp extends AbstractCleanUpRule
         }
 
         private boolean mayCallImplicitToString(final Expression expr) {
-            return !hasType(expr, String.class.getCanonicalName(), boolean.class.getSimpleName(), short.class.getSimpleName(), int.class.getSimpleName(), long.class.getSimpleName(), float.class.getSimpleName(), double.class.getSimpleName(),
+            return !ASTNodes.hasType(expr, String.class.getCanonicalName(), boolean.class.getSimpleName(), short.class.getSimpleName(), int.class.getSimpleName(), long.class.getSimpleName(), float.class.getSimpleName(), double.class.getSimpleName(),
                     Short.class.getCanonicalName(), Boolean.class.getCanonicalName(), Integer.class.getCanonicalName(), Long.class.getCanonicalName(), Float.class.getCanonicalName(),
                     Double.class.getCanonicalName()) && !(expr instanceof PrefixExpression) && !(expr instanceof InfixExpression)
                     && !(expr instanceof PostfixExpression);
@@ -188,15 +179,15 @@ public class BreakRatherThanPassiveIterationsCleanUp extends AbstractCleanUpRule
     public boolean visit(final ForStatement node) {
         final Set<String> vars= new HashSet<String>();
 
-        for (final Expression initializer : initializers(node)) {
-            vars.addAll(getLocalVariableIdentifiers(initializer, true));
+        for (final Expression initializer : ASTNodes.initializers(node)) {
+            vars.addAll(ASTNodes.getLocalVariableIdentifiers(initializer, true));
         }
 
         if (hasSideEffect(node.getExpression(), vars)) {
             return true;
         }
 
-        for (final Expression updater : updaters(node)) {
+        for (final Expression updater : ASTNodes.updaters(node)) {
             if (hasSideEffect(updater, vars)) {
                 return true;
             }
@@ -213,11 +204,11 @@ public class BreakRatherThanPassiveIterationsCleanUp extends AbstractCleanUpRule
 
     @Override
     public boolean visit(final EnhancedForStatement node) {
-        return !isArray(node.getExpression()) || visitLoopBody(node.getBody(), new HashSet<String>());
+        return !ASTNodes.isArray(node.getExpression()) || visitLoopBody(node.getBody(), new HashSet<String>());
     }
 
     private boolean visitLoopBody(final Statement body, final Set<String> allowedVars) {
-        final List<Statement> stmts= asList(body);
+        final List<Statement> stmts= ASTNodes.asList(body);
 
         if (stmts == null || stmts.isEmpty()) {
             return true;
@@ -225,7 +216,7 @@ public class BreakRatherThanPassiveIterationsCleanUp extends AbstractCleanUpRule
 
         for (int i= 0; i < stmts.size() - 1; i++) {
             final Statement stmt= stmts.get(i);
-            allowedVars.addAll(getLocalVariableIdentifiers(stmt, true));
+            allowedVars.addAll(ASTNodes.getLocalVariableIdentifiers(stmt, true));
 
             if (hasSideEffect(stmt, allowedVars)) {
                 return true;
@@ -236,7 +227,7 @@ public class BreakRatherThanPassiveIterationsCleanUp extends AbstractCleanUpRule
             final IfStatement ifStmt= (IfStatement) stmts.get(stmts.size() - 1);
 
             if (ifStmt.getElseStatement() == null && !hasSideEffect(ifStmt.getExpression(), allowedVars)) {
-                final List<Statement> assignments= asList(ifStmt.getThenStatement());
+                final List<Statement> assignments= ASTNodes.asList(ifStmt.getThenStatement());
 
                 for (final Statement stmt : assignments) {
                     if (stmt instanceof VariableDeclarationStatement) {
@@ -245,7 +236,7 @@ public class BreakRatherThanPassiveIterationsCleanUp extends AbstractCleanUpRule
                         for (final Object obj : decl.fragments()) {
                             final VariableDeclarationFragment fragment= (VariableDeclarationFragment) obj;
 
-                            if (!isHardCoded(fragment.getInitializer())) {
+                            if (!ASTNodes.isHardCoded(fragment.getInitializer())) {
                                 return true;
                             }
                         }
@@ -255,7 +246,7 @@ public class BreakRatherThanPassiveIterationsCleanUp extends AbstractCleanUpRule
                         if (expr instanceof Assignment) {
                             final Assignment assignment= (Assignment) expr;
 
-                            if (!isHardCoded(assignment.getRightHandSide())) {
+                            if (!ASTNodes.isHardCoded(assignment.getRightHandSide())) {
                                 return true;
                             }
                         } else {
@@ -275,7 +266,7 @@ public class BreakRatherThanPassiveIterationsCleanUp extends AbstractCleanUpRule
     }
 
     private void addBreak(final IfStatement ifStmt, final List<Statement> assignments) {
-        final ASTBuilder b= ctx.getASTBuilder();
+        final ASTNodeFactory b= ctx.getASTBuilder();
         final Refactorings r= ctx.getRefactorings();
 
         if (ifStmt.getThenStatement() instanceof Block) {

@@ -25,15 +25,12 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.as;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.asList;
-
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.ASTSemanticMatcher;
 import org.autorefactor.jdt.internal.corext.dom.Refactorings;
@@ -43,7 +40,6 @@ import org.eclipse.jdt.core.dom.BooleanLiteral;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.InfixExpression;
-import org.eclipse.jdt.core.dom.InfixExpression.Operator;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Name;
 import org.eclipse.jdt.core.dom.NullLiteral;
@@ -114,20 +110,20 @@ public class ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp extends NewClassIm
     private boolean maybeRefactorIfStatement(final IfStatement node, final Set<String> classesToUseWithImport,
             final Set<String> importsToAdd) {
         if (node.getElseStatement() != null) {
-            final InfixExpression condition= as(node.getExpression(), InfixExpression.class);
-            final List<Statement> thenStmts= asList(node.getThenStatement());
-            final List<Statement> elseStmts= asList(node.getElseStatement());
+            final InfixExpression condition= ASTNodes.as(node.getExpression(), InfixExpression.class);
+            final List<Statement> thenStmts= ASTNodes.asList(node.getThenStatement());
+            final List<Statement> elseStmts= ASTNodes.asList(node.getElseStatement());
 
             if (condition != null && !condition.hasExtendedOperands()
-                    && Arrays.asList(Operator.EQUALS, Operator.NOT_EQUALS).contains(condition.getOperator())
+                    && Arrays.asList(InfixExpression.Operator.EQUALS, InfixExpression.Operator.NOT_EQUALS).contains(condition.getOperator())
                     && thenStmts != null && thenStmts.size() == 1 && elseStmts != null && elseStmts.size() == 1) {
                 final Expression operand1= condition.getLeftOperand();
                 final Expression operand2= condition.getRightOperand();
 
-                final Name field1= as(operand1, Name.class);
-                final NullLiteral nullLiteral1= as(operand2, NullLiteral.class);
-                final NullLiteral nullLiteral2= as(operand1, NullLiteral.class);
-                final Name field2= as(operand2, Name.class);
+                final Name field1= ASTNodes.as(operand1, Name.class);
+                final NullLiteral nullLiteral1= ASTNodes.as(operand2, NullLiteral.class);
+                final NullLiteral nullLiteral2= ASTNodes.as(operand1, NullLiteral.class);
+                final Name field2= ASTNodes.as(operand2, Name.class);
 
                 final Name firstField;
 
@@ -155,24 +151,24 @@ public class ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp extends NewClassIm
         final IfStatement checkNullityStmt;
         final IfStatement checkEqualsStmt;
 
-        if (Operator.EQUALS.equals(condition.getOperator())) {
-            checkNullityStmt= as(thenStmts.get(0), IfStatement.class);
-            checkEqualsStmt= as(elseStmts.get(0), IfStatement.class);
+        if (InfixExpression.Operator.EQUALS.equals(condition.getOperator())) {
+            checkNullityStmt= ASTNodes.as(thenStmts.get(0), IfStatement.class);
+            checkEqualsStmt= ASTNodes.as(elseStmts.get(0), IfStatement.class);
         } else {
-            checkEqualsStmt= as(thenStmts.get(0), IfStatement.class);
-            checkNullityStmt= as(elseStmts.get(0), IfStatement.class);
+            checkEqualsStmt= ASTNodes.as(thenStmts.get(0), IfStatement.class);
+            checkNullityStmt= ASTNodes.as(elseStmts.get(0), IfStatement.class);
         }
 
         if (checkNullityStmt != null && checkNullityStmt.getElseStatement() == null && checkEqualsStmt != null
                 && checkEqualsStmt.getElseStatement() == null) {
-            final InfixExpression nullityCondition= as(checkNullityStmt.getExpression(), InfixExpression.class);
-            final List<Statement> nullityStmts= asList(checkNullityStmt.getThenStatement());
+            final InfixExpression nullityCondition= ASTNodes.as(checkNullityStmt.getExpression(), InfixExpression.class);
+            final List<Statement> nullityStmts= ASTNodes.asList(checkNullityStmt.getThenStatement());
 
-            final PrefixExpression equalsCondition= as(checkEqualsStmt.getExpression(), PrefixExpression.class);
-            final List<Statement> equalsStmts= asList(checkEqualsStmt.getThenStatement());
+            final PrefixExpression equalsCondition= ASTNodes.as(checkEqualsStmt.getExpression(), PrefixExpression.class);
+            final List<Statement> equalsStmts= ASTNodes.asList(checkEqualsStmt.getThenStatement());
 
             if (nullityCondition != null && !nullityCondition.hasExtendedOperands()
-                    && Operator.NOT_EQUALS.equals(nullityCondition.getOperator()) && nullityStmts != null
+                    && InfixExpression.Operator.NOT_EQUALS.equals(nullityCondition.getOperator()) && nullityStmts != null
                     && nullityStmts.size() == 1 && equalsCondition != null
                     && PrefixExpression.Operator.NOT.equals(equalsCondition.getOperator()) && equalsStmts != null
                     && equalsStmts.size() == 1) {
@@ -191,10 +187,10 @@ public class ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp extends NewClassIm
         final Expression nullityOperand1= nullityCondition.getLeftOperand();
         final Expression nullityOperand2= nullityCondition.getRightOperand();
 
-        final Name nullityField1= as(nullityOperand1, Name.class);
-        final NullLiteral nullityLiteral1= as(nullityOperand2, NullLiteral.class);
-        final NullLiteral nullityLiteral2= as(nullityOperand1, NullLiteral.class);
-        final Name nullityField2= as(nullityOperand2, Name.class);
+        final Name nullityField1= ASTNodes.as(nullityOperand1, Name.class);
+        final NullLiteral nullityLiteral1= ASTNodes.as(nullityOperand2, NullLiteral.class);
+        final NullLiteral nullityLiteral2= ASTNodes.as(nullityOperand1, NullLiteral.class);
+        final Name nullityField2= ASTNodes.as(nullityOperand2, Name.class);
 
         final Name secondField;
 
@@ -206,9 +202,9 @@ public class ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp extends NewClassIm
             secondField= null;
         }
 
-        final ReturnStatement returnStmt1= as(nullityStmts.get(0), ReturnStatement.class);
-        final ReturnStatement returnStmt2= as(equalsStmts.get(0), ReturnStatement.class);
-        final MethodInvocation equalsMethod= as(equalsCondition.getOperand(), MethodInvocation.class);
+        final ReturnStatement returnStmt1= ASTNodes.as(nullityStmts.get(0), ReturnStatement.class);
+        final ReturnStatement returnStmt2= ASTNodes.as(equalsStmts.get(0), ReturnStatement.class);
+        final MethodInvocation equalsMethod= ASTNodes.as(equalsCondition.getOperand(), MethodInvocation.class);
 
         if (secondField != null && returnStmt1 != null && returnStmt2 != null && equalsMethod != null
                 && equalsMethod.getExpression() != null && "equals".equals(equalsMethod.getName().getIdentifier()) //$NON-NLS-1$
@@ -217,8 +213,8 @@ public class ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp extends NewClassIm
                         (ASTNode) equalsMethod.arguments().get(0))
                         || match(secondField, firstField, equalsMethod.getExpression(),
                                 (ASTNode) equalsMethod.arguments().get(0)))) {
-            final BooleanLiteral returnFalse1= as(returnStmt1.getExpression(), BooleanLiteral.class);
-            final BooleanLiteral returnFalse2= as(returnStmt2.getExpression(), BooleanLiteral.class);
+            final BooleanLiteral returnFalse1= ASTNodes.as(returnStmt1.getExpression(), BooleanLiteral.class);
+            final BooleanLiteral returnFalse2= ASTNodes.as(returnStmt2.getExpression(), BooleanLiteral.class);
 
             if (returnFalse1 != null && !returnFalse1.booleanValue() && returnFalse2 != null
                     && !returnFalse2.booleanValue()) {
@@ -239,7 +235,7 @@ public class ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp extends NewClassIm
 
     private void replaceEquals(final IfStatement node, final Name firstField, final Name secondField,
             final ReturnStatement returnStmt1, final Set<String> classesToUseWithImport) {
-        final ASTBuilder b= this.ctx.getASTBuilder();
+        final ASTNodeFactory b= this.ctx.getASTBuilder();
         final Refactorings r= this.ctx.getRefactorings();
 
         r.replace(node,

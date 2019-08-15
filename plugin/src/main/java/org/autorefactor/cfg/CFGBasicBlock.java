@@ -25,12 +25,11 @@
  */
 package org.autorefactor.cfg;
 
-import static org.autorefactor.util.Utils.equal;
-
 import java.util.Collection;
 import java.util.LinkedList;
 
 import org.autorefactor.util.IllegalArgumentException;
+import org.autorefactor.util.Utils;
 import org.eclipse.jdt.core.dom.ASTNode;
 
 /**
@@ -222,8 +221,8 @@ public class CFGBasicBlock implements Comparable<CFGBasicBlock> {
             return false;
         }
         final CFGBasicBlock other= (CFGBasicBlock) obj;
-        return equal(fileName, other.fileName) && equal(lineAndColumn, other.lineAndColumn)
-                && equal(isEntryBlock, other.isEntryBlock);
+        return Utils.equal(fileName, other.fileName) && Utils.equal(lineAndColumn, other.lineAndColumn)
+                && Utils.equal(isEntryBlock, other.isEntryBlock);
     }
 
     /**

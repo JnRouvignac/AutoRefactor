@@ -25,16 +25,12 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasOperator;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.usesGivenSignature;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.removeParentheses;
-
-import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.InfixExpression;
-import org.eclipse.jdt.core.dom.InfixExpression.Operator;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 
 /** See {@link #getDescription()} method. */
@@ -69,16 +65,16 @@ public class UseStringContainsCleanUp extends AbstractCleanUpRule {
     @Override
     public boolean visit(MethodInvocation node) {
         final ASTNode parent= getFirstAncestorWithoutParentheses(node);
-        if (parent instanceof InfixExpression && (usesGivenSignature(node, String.class.getCanonicalName(), "indexOf", String.class.getCanonicalName()) //$NON-NLS-1$
-                || usesGivenSignature(node, String.class.getCanonicalName(), "lastIndexOf", String.class.getCanonicalName()))) { //$NON-NLS-1$
+        if (parent instanceof InfixExpression && (ASTNodes.usesGivenSignature(node, String.class.getCanonicalName(), "indexOf", String.class.getCanonicalName()) //$NON-NLS-1$
+                || ASTNodes.usesGivenSignature(node, String.class.getCanonicalName(), "lastIndexOf", String.class.getCanonicalName()))) { //$NON-NLS-1$
             final InfixExpression ie= (InfixExpression) parent;
-            if (is(ie, node, Operator.GREATER_EQUALS, 0)) {
+            if (is(ie, node, InfixExpression.Operator.GREATER_EQUALS, 0)) {
                 return replaceWithStringContains(ie, node, false);
-            } else if (is(ie, node, Operator.LESS, 0)) {
+            } else if (is(ie, node, InfixExpression.Operator.LESS, 0)) {
                 return replaceWithStringContains(ie, node, true);
-            } else if (is(ie, node, Operator.NOT_EQUALS, -1)) {
+            } else if (is(ie, node, InfixExpression.Operator.NOT_EQUALS, -1)) {
                 return replaceWithStringContains(ie, node, false);
-            } else if (is(ie, node, Operator.EQUALS, -1)) {
+            } else if (is(ie, node, InfixExpression.Operator.EQUALS, -1)) {
                 return replaceWithStringContains(ie, node, true);
             }
         }
@@ -87,7 +83,7 @@ public class UseStringContainsCleanUp extends AbstractCleanUpRule {
 
     private boolean replaceWithStringContains(InfixExpression ie, MethodInvocation node, boolean negate) {
         final Refactorings r= this.ctx.getRefactorings();
-        final ASTBuilder b= this.ctx.getASTBuilder();
+        final ASTNodeFactory b= this.ctx.getASTBuilder();
         r.set(node, MethodInvocation.NAME_PROPERTY, b.simpleName("contains")); //$NON-NLS-1$
         if (negate) {
             r.replace(ie, b.not(b.move(node)));
@@ -97,10 +93,10 @@ public class UseStringContainsCleanUp extends AbstractCleanUpRule {
         return false;
     }
 
-    private boolean is(final InfixExpression ie, MethodInvocation node, Operator operator, Integer constant) {
-        final Expression leftOp= removeParentheses(ie.getLeftOperand());
-        final Expression rightOp= removeParentheses(ie.getRightOperand());
-        return hasOperator(ie, operator)
+    private boolean is(final InfixExpression ie, MethodInvocation node, InfixExpression.Operator operator, Integer constant) {
+        final Expression leftOp= ASTNodes.getUnparenthesedExpression(ie.getLeftOperand());
+        final Expression rightOp= ASTNodes.getUnparenthesedExpression(ie.getRightOperand());
+        return ASTNodes.hasOperator(ie, operator)
                 && ((leftOp.equals(node) && constant.equals(rightOp.resolveConstantExpressionValue()))
                         || (rightOp.equals(node) && constant.equals(leftOp.resolveConstantExpressionValue())));
     }

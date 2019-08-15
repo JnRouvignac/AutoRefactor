@@ -25,18 +25,14 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.as;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getTargetType;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasType;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.usesGivenSignature;
-
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.autorefactor.jdt.internal.corext.dom.Release;
 import org.autorefactor.jdt.internal.corext.dom.TypeNameDecider;
@@ -123,7 +119,7 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
         final AnonymousClassDeclaration anonymousClassDecl= node.getAnonymousClassDeclaration();
         final Type type= node.getType();
 
-        if (hasType(type.resolveBinding(), Comparator.class.getCanonicalName()) && node.arguments().isEmpty()
+        if (ASTNodes.hasType(type.resolveBinding(), Comparator.class.getCanonicalName()) && node.arguments().isEmpty()
                 && anonymousClassDecl != null && anonymousClassDecl.bodyDeclarations() != null
                 && anonymousClassDecl.bodyDeclarations().size() == 1 && type != null && type.resolveBinding() != null
                 && type.resolveBinding().getTypeArguments() != null
@@ -149,16 +145,16 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
         final MethodDeclaration methodDecl= (MethodDeclaration) body;
         final Block methodBody= methodDecl.getBody();
 
-        if (usesGivenSignature(methodDecl, Comparator.class.getCanonicalName(), "compare", typeArgument.getQualifiedName(), //$NON-NLS-1$
+        if (ASTNodes.usesGivenSignature(methodDecl, Comparator.class.getCanonicalName(), "compare", typeArgument.getQualifiedName(), //$NON-NLS-1$
                 typeArgument.getQualifiedName())) {
             @SuppressWarnings("unchecked")
             final List<Statement> stmts= methodBody.statements();
 
             if (stmts != null && stmts.size() == 1) {
-                final ReturnStatement returnStmt= as(stmts.get(0), ReturnStatement.class);
+                final ReturnStatement returnStmt= ASTNodes.as(stmts.get(0), ReturnStatement.class);
 
                 if (returnStmt != null) {
-                    final MethodInvocation compareToMethod= as(returnStmt.getExpression(), MethodInvocation.class);
+                    final MethodInvocation compareToMethod= ASTNodes.as(returnStmt.getExpression(), MethodInvocation.class);
 
                     if (compareToMethod != null && compareToMethod.getExpression() != null) {
                         final String comparisonClass= compareToMethod.getExpression().resolveTypeBinding()
@@ -166,7 +162,7 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
 
                         if (compareToMethod != null && compareToMethod.getExpression() != null
                                 && compareToMethod.getExpression().resolveTypeBinding() != null
-                                && usesGivenSignature(compareToMethod, comparisonClass, "compareTo", comparisonClass)) { //$NON-NLS-1$
+                                && ASTNodes.usesGivenSignature(compareToMethod, comparisonClass, "compareTo", comparisonClass)) { //$NON-NLS-1$
                             return maybeRefactorComparison(node, methodDecl, compareToMethod, typeArgument,
                                     classesToUseWithImport);
                         }
@@ -190,19 +186,19 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
         final Expression expr1= compareToMethod.getExpression();
         final Expression expr2= (Expression) compareToMethod.arguments().get(0);
 
-        final MethodInvocation method1= as(expr1, MethodInvocation.class);
-        final MethodInvocation method2= as(expr2, MethodInvocation.class);
+        final MethodInvocation method1= ASTNodes.as(expr1, MethodInvocation.class);
+        final MethodInvocation method2= ASTNodes.as(expr2, MethodInvocation.class);
 
-        final QualifiedName field1= as(expr1, QualifiedName.class);
-        final QualifiedName field2= as(expr2, QualifiedName.class);
+        final QualifiedName field1= ASTNodes.as(expr1, QualifiedName.class);
+        final QualifiedName field2= ASTNodes.as(expr2, QualifiedName.class);
 
         if (method1 != null && (method1.arguments() != null || method1.arguments().isEmpty()) && method2 != null
                 && (method2.arguments() != null || method2.arguments().isEmpty())) {
             final String methodName1= method1.getName().getIdentifier();
             final String methodName2= method2.getName().getIdentifier();
 
-            final SimpleName objectExpr1= as(method1.getExpression(), SimpleName.class);
-            final SimpleName objectExpr2= as(method2.getExpression(), SimpleName.class);
+            final SimpleName objectExpr1= ASTNodes.as(method1.getExpression(), SimpleName.class);
+            final SimpleName objectExpr2= ASTNodes.as(method2.getExpression(), SimpleName.class);
 
             if (Utils.equalNotNull(methodName1, methodName2) && objectExpr1 != null && objectExpr2 != null) {
                 if (Utils.equalNotNull(objectExpr1.getIdentifier(), identifier1)
@@ -221,8 +217,8 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
             final String fieldName1= field1.getName().getIdentifier();
             final String fieldName2= field2.getName().getIdentifier();
 
-            final SimpleName objectExpr1= as(field1.getQualifier(), SimpleName.class);
-            final SimpleName objectExpr2= as(field2.getQualifier(), SimpleName.class);
+            final SimpleName objectExpr1= ASTNodes.as(field1.getQualifier(), SimpleName.class);
+            final SimpleName objectExpr2= ASTNodes.as(field2.getQualifier(), SimpleName.class);
 
             if (Utils.equalNotNull(fieldName1, fieldName2) && objectExpr1 != null && objectExpr2 != null) {
                 if (Utils.equalNotNull(objectExpr1.getIdentifier(), identifier1)
@@ -244,7 +240,7 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
 
     private void refactorMethod(final ClassInstanceCreation node, final ITypeBinding type,
             final MethodInvocation method, final Set<String> classesToUseWithImport, final boolean straightOrder) {
-        final ASTBuilder b= ctx.getASTBuilder();
+        final ASTNodeFactory b= ctx.getASTBuilder();
         final Refactorings r= ctx.getRefactorings();
 
         final TypeNameDecider typeNameDecider= new TypeNameDecider(method);
@@ -265,15 +261,15 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
     @SuppressWarnings("unchecked")
     private void refactorField(final ClassInstanceCreation node, final ITypeBinding type, final QualifiedName field,
             final String identifier1, final Set<String> classesToUseWithImport, final boolean straightOrder) {
-        final ASTBuilder b= ctx.getASTBuilder();
+        final ASTNodeFactory b= ctx.getASTBuilder();
         final Refactorings r= ctx.getRefactorings();
 
         final TypeNameDecider typeNameDecider= new TypeNameDecider(field);
 
         final LambdaExpression lambdaExpr= b.lambda();
-        final ITypeBinding destinationType= getTargetType(node);
+        final ITypeBinding destinationType= ASTNodes.getTargetType(node);
 
-        boolean isTypeKnown= destinationType != null && hasType(destinationType, Comparator.class.getCanonicalName())
+        boolean isTypeKnown= destinationType != null && ASTNodes.hasType(destinationType, Comparator.class.getCanonicalName())
                 && destinationType.getTypeArguments() != null && destinationType.getTypeArguments().length == 1 && Utils.equalNotNull(destinationType.getTypeArguments()[0], type);
 
         if (isTypeKnown && straightOrder) {

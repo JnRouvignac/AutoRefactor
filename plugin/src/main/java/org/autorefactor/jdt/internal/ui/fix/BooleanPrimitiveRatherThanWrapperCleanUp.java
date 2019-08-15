@@ -28,21 +28,6 @@ package org.autorefactor.jdt.internal.ui.fix;
 import static org.eclipse.jdt.core.dom.ASTNode.DO_STATEMENT;
 import static org.eclipse.jdt.core.dom.ASTNode.IF_STATEMENT;
 import static org.eclipse.jdt.core.dom.ASTNode.WHILE_STATEMENT;
-import static org.eclipse.jdt.core.dom.Assignment.Operator.BIT_AND_ASSIGN;
-import static org.eclipse.jdt.core.dom.Assignment.Operator.BIT_OR_ASSIGN;
-import static org.eclipse.jdt.core.dom.Assignment.Operator.BIT_XOR_ASSIGN;
-import static org.eclipse.jdt.core.dom.InfixExpression.Operator.AND;
-import static org.eclipse.jdt.core.dom.InfixExpression.Operator.CONDITIONAL_AND;
-import static org.eclipse.jdt.core.dom.InfixExpression.Operator.CONDITIONAL_OR;
-import static org.eclipse.jdt.core.dom.InfixExpression.Operator.EQUALS;
-import static org.eclipse.jdt.core.dom.InfixExpression.Operator.GREATER;
-import static org.eclipse.jdt.core.dom.InfixExpression.Operator.GREATER_EQUALS;
-import static org.eclipse.jdt.core.dom.InfixExpression.Operator.LESS;
-import static org.eclipse.jdt.core.dom.InfixExpression.Operator.LESS_EQUALS;
-import static org.eclipse.jdt.core.dom.InfixExpression.Operator.NOT_EQUALS;
-import static org.eclipse.jdt.core.dom.InfixExpression.Operator.OR;
-import static org.eclipse.jdt.core.dom.InfixExpression.Operator.XOR;
-import static org.eclipse.jdt.core.dom.PrefixExpression.Operator.NOT;
 
 import java.util.Arrays;
 import java.util.List;
@@ -100,28 +85,28 @@ public class BooleanPrimitiveRatherThanWrapperCleanUp extends AbstractPrimitiveR
 
     @Override
     public List<PrefixExpression.Operator> getPrefixInSafeOperators() {
-        return Arrays.<PrefixExpression.Operator>asList(NOT);
+        return Arrays.<PrefixExpression.Operator>asList(PrefixExpression.Operator.NOT);
     }
 
     @Override
     public List<InfixExpression.Operator> getInfixInSafeOperators() {
-        return Arrays.<InfixExpression.Operator>asList(AND, CONDITIONAL_AND, CONDITIONAL_OR, EQUALS, GREATER,
-                GREATER_EQUALS, LESS, LESS_EQUALS, NOT_EQUALS, OR, XOR);
+        return Arrays.<InfixExpression.Operator>asList(InfixExpression.Operator.AND, InfixExpression.Operator.CONDITIONAL_AND, InfixExpression.Operator.CONDITIONAL_OR, InfixExpression.Operator.EQUALS, InfixExpression.Operator.GREATER,
+                InfixExpression.Operator.GREATER_EQUALS, InfixExpression.Operator.LESS, InfixExpression.Operator.LESS_EQUALS, InfixExpression.Operator.NOT_EQUALS, InfixExpression.Operator.OR, InfixExpression.Operator.XOR);
     }
 
     @Override
     public List<PrefixExpression.Operator> getPrefixOutSafeOperators() {
-        return Arrays.<PrefixExpression.Operator>asList(NOT);
+        return Arrays.<PrefixExpression.Operator>asList(PrefixExpression.Operator.NOT);
     }
 
     @Override
     public List<InfixExpression.Operator> getInfixOutSafeOperators() {
-        return Arrays.<InfixExpression.Operator>asList(AND, OR, CONDITIONAL_AND, CONDITIONAL_OR, XOR);
+        return Arrays.<InfixExpression.Operator>asList(InfixExpression.Operator.AND, InfixExpression.Operator.OR, InfixExpression.Operator.CONDITIONAL_AND, InfixExpression.Operator.CONDITIONAL_OR, InfixExpression.Operator.XOR);
     }
 
     @Override
     public List<Assignment.Operator> getAssignmentOutSafeOperators() {
-        return Arrays.<Assignment.Operator>asList(BIT_AND_ASSIGN, BIT_OR_ASSIGN, BIT_XOR_ASSIGN);
+        return Arrays.<Assignment.Operator>asList(Assignment.Operator.BIT_AND_ASSIGN, Assignment.Operator.BIT_OR_ASSIGN, Assignment.Operator.BIT_XOR_ASSIGN);
     }
 
     @Override

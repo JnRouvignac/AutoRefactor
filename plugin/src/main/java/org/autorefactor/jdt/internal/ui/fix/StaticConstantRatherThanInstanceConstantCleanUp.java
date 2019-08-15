@@ -25,15 +25,12 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasType;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isHardCoded;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.modifiers;
-
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
@@ -72,17 +69,17 @@ public class StaticConstantRatherThanInstanceConstantCleanUp extends AbstractCle
 
     @Override
     public boolean visit(FieldDeclaration node) {
-        if (node.getType().isPrimitiveType() || hasType(node.getType().resolveBinding(), Byte.class.getCanonicalName())
-                || hasType(node.getType().resolveBinding(), Character.class.getCanonicalName())
-                || hasType(node.getType().resolveBinding(), Short.class.getCanonicalName())
-                || hasType(node.getType().resolveBinding(), Integer.class.getCanonicalName())
-                || hasType(node.getType().resolveBinding(), Long.class.getCanonicalName())
-                || hasType(node.getType().resolveBinding(), Boolean.class.getCanonicalName())
-                || hasType(node.getType().resolveBinding(), Float.class.getCanonicalName())
-                || hasType(node.getType().resolveBinding(), Double.class.getCanonicalName())
-                || hasType(node.getType().resolveBinding(), String.class.getCanonicalName())) {
+        if (node.getType().isPrimitiveType() || ASTNodes.hasType(node.getType().resolveBinding(), Byte.class.getCanonicalName())
+                || ASTNodes.hasType(node.getType().resolveBinding(), Character.class.getCanonicalName())
+                || ASTNodes.hasType(node.getType().resolveBinding(), Short.class.getCanonicalName())
+                || ASTNodes.hasType(node.getType().resolveBinding(), Integer.class.getCanonicalName())
+                || ASTNodes.hasType(node.getType().resolveBinding(), Long.class.getCanonicalName())
+                || ASTNodes.hasType(node.getType().resolveBinding(), Boolean.class.getCanonicalName())
+                || ASTNodes.hasType(node.getType().resolveBinding(), Float.class.getCanonicalName())
+                || ASTNodes.hasType(node.getType().resolveBinding(), Double.class.getCanonicalName())
+                || ASTNodes.hasType(node.getType().resolveBinding(), String.class.getCanonicalName())) {
             Modifier finalModifier= null;
-            for (final Modifier modifier : getModifiersOnly(modifiers(node))) {
+            for (final Modifier modifier : getModifiersOnly(ASTNodes.modifiers(node))) {
                 if (modifier.isStatic()) {
                     return true;
                 }
@@ -94,7 +91,7 @@ public class StaticConstantRatherThanInstanceConstantCleanUp extends AbstractCle
             if (finalModifier != null && node.fragments() != null && node.fragments().size() == 1) {
                 final Expression initializer= ((VariableDeclarationFragment) node.fragments().get(0)).getInitializer();
 
-                if (isHardCoded(initializer)) {
+                if (ASTNodes.isHardCoded(initializer)) {
                     addStaticModifier(finalModifier);
                     return false;
                 }
@@ -105,7 +102,7 @@ public class StaticConstantRatherThanInstanceConstantCleanUp extends AbstractCle
     }
 
     private void addStaticModifier(final Modifier finalModifier) {
-        final ASTBuilder b= ctx.getASTBuilder();
+        final ASTNodeFactory b= ctx.getASTBuilder();
         final Refactorings r= ctx.getRefactorings();
 
         r.insertBefore(b.static0(), finalModifier);

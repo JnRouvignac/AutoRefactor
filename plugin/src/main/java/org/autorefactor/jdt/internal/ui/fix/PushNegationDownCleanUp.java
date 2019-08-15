@@ -25,26 +25,16 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.allOperands;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getBooleanLiteral;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasOperator;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.removeParentheses;
-import static org.eclipse.jdt.core.dom.InfixExpression.Operator.AND;
-import static org.eclipse.jdt.core.dom.InfixExpression.Operator.CONDITIONAL_AND;
-import static org.eclipse.jdt.core.dom.InfixExpression.Operator.CONDITIONAL_OR;
-import static org.eclipse.jdt.core.dom.InfixExpression.Operator.OR;
-import static org.eclipse.jdt.core.dom.PrefixExpression.Operator.NOT;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.ListIterator;
 
-import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.InfixExpression;
-import org.eclipse.jdt.core.dom.InfixExpression.Operator;
 import org.eclipse.jdt.core.dom.PrefixExpression;
 
 /** See {@link #getDescription()} method. */
@@ -78,25 +68,25 @@ public class PushNegationDownCleanUp extends AbstractCleanUpRule {
 
     @Override
     public boolean visit(PrefixExpression node) {
-        if (!hasOperator(node, NOT)) {
+        if (!ASTNodes.hasOperator(node, PrefixExpression.Operator.NOT)) {
             return true;
         }
-        final ASTBuilder b= ctx.getASTBuilder();
+        final ASTNodeFactory b= ctx.getASTBuilder();
         final Refactorings r= ctx.getRefactorings();
 
-        final Expression operand= removeParentheses(node.getOperand());
+        final Expression operand= ASTNodes.getUnparenthesedExpression(node.getOperand());
         if (operand instanceof PrefixExpression) {
             final PrefixExpression pe= (PrefixExpression) operand;
-            if (hasOperator(pe, NOT)) {
+            if (ASTNodes.hasOperator(pe, PrefixExpression.Operator.NOT)) {
                 r.replace(node, b.move(pe.getOperand()));
                 return false;
             }
         } else if (operand instanceof InfixExpression) {
             final InfixExpression ie= (InfixExpression) operand;
-            final Operator reverseOp= (Operator) OperatorEnum.getOperator(ie).getReverseBooleanOperator();
+            final InfixExpression.Operator reverseOp= (InfixExpression.Operator) OperatorEnum.getOperator(ie).getReverseBooleanOperator();
             if (reverseOp != null) {
-                List<Expression> allOperands= new ArrayList<Expression>(allOperands(ie));
-                if (Arrays.<Operator>asList(CONDITIONAL_AND, CONDITIONAL_OR, AND, OR).contains(ie.getOperator())) {
+                List<Expression> allOperands= new ArrayList<Expression>(ASTNodes.allOperands(ie));
+                if (Arrays.<InfixExpression.Operator>asList(InfixExpression.Operator.CONDITIONAL_AND, InfixExpression.Operator.CONDITIONAL_OR, InfixExpression.Operator.AND, InfixExpression.Operator.OR).contains(ie.getOperator())) {
                     for (ListIterator<Expression> it= allOperands.listIterator(); it.hasNext();) {
                         it.set(b.negate(it.next()));
                     }
@@ -107,7 +97,7 @@ public class PushNegationDownCleanUp extends AbstractCleanUpRule {
                 return false;
             }
         } else {
-            final Boolean constant= getBooleanLiteral(operand);
+            final Boolean constant= ASTNodes.getBooleanLiteral(operand);
             if (constant != null) {
                 r.replace(node, b.boolean0(!constant));
                 return false;

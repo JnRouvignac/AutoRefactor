@@ -25,16 +25,14 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.fragments;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isNullLiteral;
-import static org.eclipse.jdt.core.dom.Modifier.isFinal;
-
+import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
 import org.eclipse.jdt.core.dom.EnumDeclaration;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.ITypeBinding;
+import org.eclipse.jdt.core.dom.Modifier;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
@@ -73,14 +71,14 @@ public class RemoveFieldsDefaultValuesCleanUp extends AbstractCleanUpRule {
             return true;
         }
         final ITypeBinding fieldType= node.getType().resolveBinding();
-        if (fieldType == null || isFinal(node.getModifiers())) {
+        if (fieldType == null || Modifier.isFinal(node.getModifiers())) {
             return true;
         }
 
         boolean visitSubtree= true;
-        for (VariableDeclarationFragment vdf : fragments(node)) {
+        for (VariableDeclarationFragment vdf : ASTNodes.fragments(node)) {
             final Expression initializer= vdf.getInitializer();
-            if (initializer != null && ((!fieldType.isPrimitive() && isNullLiteral(initializer))
+            if (initializer != null && ((!fieldType.isPrimitive() && ASTNodes.isNullLiteral(initializer))
                     || (fieldType.isPrimitive() && isPrimitiveLiteral(initializer)
                             && isPrimitiveDefaultValue(initializer.resolveConstantExpressionValue())))) {
                 this.ctx.getRefactorings().remove(initializer);

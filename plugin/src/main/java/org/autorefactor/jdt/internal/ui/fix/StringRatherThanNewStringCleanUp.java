@@ -26,10 +26,8 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.arguments;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasType;
-
-import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.InfixExpression;
@@ -66,11 +64,11 @@ public class StringRatherThanNewStringCleanUp extends AbstractCleanUpRule {
 
     @Override
     public boolean visit(ClassInstanceCreation node) {
-        if (hasType(node, String.class.getCanonicalName()) && arguments(node).size() == 1) {
-            final Expression arg0= arguments(node).get(0);
-            if (hasType(arg0, String.class.getCanonicalName())
+        if (ASTNodes.hasType(node, String.class.getCanonicalName()) && ASTNodes.arguments(node).size() == 1) {
+            final Expression arg0= ASTNodes.arguments(node).get(0);
+            if (ASTNodes.hasType(arg0, String.class.getCanonicalName())
                     && (arg0 instanceof StringLiteral || arg0 instanceof InfixExpression)) {
-                final ASTBuilder b= ctx.getASTBuilder();
+                final ASTNodeFactory b= ctx.getASTBuilder();
                 ctx.getRefactorings().replace(node, b.parenthesizeIfNeeded(b.copy(arg0)));
                 return false;
             }

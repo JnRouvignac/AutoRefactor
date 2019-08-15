@@ -25,8 +25,7 @@
  */
 package org.autorefactor.util;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.*;
-
+import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jdt.core.dom.ASTNode;
 
 /**
@@ -42,7 +41,7 @@ public class AutoRefactorException extends RuntimeException {
      * @param node the node from which to retrieve the source location
      */
     public AutoRefactorException(ASTNode node) {
-        super(getSourceLocation(node));
+        super(ASTNodes.getSourceLocation(node));
     }
 
     /**
@@ -52,7 +51,7 @@ public class AutoRefactorException extends RuntimeException {
      * @param message the exception message
      */
     public AutoRefactorException(ASTNode node, String message) {
-        super(buildMessage(node, message));
+        super(AutoRefactorException.buildMessage(node, message));
     }
 
     /**
@@ -62,7 +61,7 @@ public class AutoRefactorException extends RuntimeException {
      * @param cause the cause
      */
     public AutoRefactorException(ASTNode node, Throwable cause) {
-        super(getSourceLocation(node), cause);
+        super(ASTNodes.getSourceLocation(node), cause);
     }
 
     /**
@@ -73,11 +72,11 @@ public class AutoRefactorException extends RuntimeException {
      * @param cause   the cause
      */
     public AutoRefactorException(ASTNode node, String message, Throwable cause) {
-        super(buildMessage(node, message), cause);
+        super(AutoRefactorException.buildMessage(node, message), cause);
     }
 
     private static String buildMessage(ASTNode node, String message) {
-        final String sourceLocation= getSourceLocation(node);
+        final String sourceLocation= ASTNodes.getSourceLocation(node);
         if (sourceLocation.length() > 0) {
             return sourceLocation + ":" + message; //$NON-NLS-1$
         }

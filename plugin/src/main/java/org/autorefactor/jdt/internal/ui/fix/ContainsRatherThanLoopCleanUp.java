@@ -26,14 +26,8 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.arg0;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.as;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.usesGivenSignature;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isSameVariable;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.match;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.removeParentheses;
-
-import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 
@@ -68,22 +62,22 @@ public class ContainsRatherThanLoopCleanUp extends AbstractCollectionMethodRathe
 
     @Override
     protected Expression getExpressionToFind(MethodInvocation cond, Expression forVar) {
-        Expression expr= removeParentheses(cond.getExpression());
-        Expression arg0= removeParentheses(arg0(cond));
+        Expression expr= ASTNodes.getUnparenthesedExpression(cond.getExpression());
+        Expression arg0= ASTNodes.getUnparenthesedExpression(ASTNodes.arg0(cond));
 
-        if (isSameVariable(forVar, expr)) {
+        if (ASTNodes.isSameVariable(forVar, expr)) {
             return arg0;
         }
 
-        if (isSameVariable(forVar, arg0)) {
+        if (ASTNodes.isSameVariable(forVar, arg0)) {
             return expr;
         }
 
-        if (match(forVar, expr)) {
+        if (ASTNodes.match(forVar, expr)) {
             return arg0;
         }
 
-        if (match(forVar, arg0)) {
+        if (ASTNodes.match(forVar, arg0)) {
             return expr;
         }
 
@@ -92,9 +86,9 @@ public class ContainsRatherThanLoopCleanUp extends AbstractCollectionMethodRathe
 
     @Override
     protected MethodInvocation getMethodToReplace(Expression condition) {
-        MethodInvocation method= as(condition, MethodInvocation.class);
+        MethodInvocation method= ASTNodes.as(condition, MethodInvocation.class);
 
-        if (usesGivenSignature(method, Object.class.getCanonicalName(), "equals", Object.class.getCanonicalName())) { //$NON-NLS-1$
+        if (ASTNodes.usesGivenSignature(method, Object.class.getCanonicalName(), "equals", Object.class.getCanonicalName())) { //$NON-NLS-1$
             return method;
         }
 
@@ -102,7 +96,7 @@ public class ContainsRatherThanLoopCleanUp extends AbstractCollectionMethodRathe
     }
 
     @Override
-    protected Expression newMethod(Expression iterable, Expression toFind, boolean isPositive, ASTBuilder b) {
+    protected Expression newMethod(Expression iterable, Expression toFind, boolean isPositive, ASTNodeFactory b) {
         final MethodInvocation invoke= b.invoke(b.move(iterable), "contains", b.move(toFind)); //$NON-NLS-1$
 
         if (isPositive) {

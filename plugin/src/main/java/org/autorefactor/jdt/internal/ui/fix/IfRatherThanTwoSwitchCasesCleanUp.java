@@ -25,21 +25,16 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.as;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.fallsThrough;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getLocalVariableIdentifiers;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasType;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isPassive;
-import static org.autorefactor.util.Utils.newArrayList;
-
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.InterruptibleVisitor;
 import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.autorefactor.util.Pair;
+import org.autorefactor.util.Utils;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.BreakStatement;
 import org.eclipse.jdt.core.dom.Expression;
@@ -107,7 +102,7 @@ public class IfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRule {
 
     @Override
     public boolean visit(final SwitchStatement node) {
-        if (!isPassive(node.getExpression())) {
+        if (!ASTNodes.isPassive(node.getExpression())) {
             return true;
         }
 
@@ -119,14 +114,14 @@ public class IfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRule {
 
         final Set<String> previousVarIds= new HashSet<String>();
         final Set<String> caseVarIds= new HashSet<String>();
-        final List<Pair<List<Expression>, List<Statement>>> switchStructure= newArrayList();
-        List<Expression> caseExprs= newArrayList();
-        List<Statement> caseStmts= newArrayList();
+        final List<Pair<List<Expression>, List<Statement>>> switchStructure= Utils.newArrayList();
+        List<Expression> caseExprs= Utils.newArrayList();
+        List<Statement> caseStmts= Utils.newArrayList();
 
         boolean isPreviousStmtACase= true;
         int caseNb= 0;
         int caseIndexWithDefault= -1;
-        final ASTBuilder b= this.ctx.getASTBuilder();
+        final ASTNodeFactory b= this.ctx.getASTBuilder();
 
         for (Object object : stmts) {
             Statement stmt= (Statement) object;
@@ -143,8 +138,8 @@ public class IfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRule {
                     caseVarIds.clear();
 
                     switchStructure.add(Pair.<List<Expression>, List<Statement>>of(caseExprs, caseStmts));
-                    caseExprs= newArrayList();
-                    caseStmts= newArrayList();
+                    caseExprs= Utils.newArrayList();
+                    caseStmts= Utils.newArrayList();
                 }
 
                 if (((SwitchCase) stmt).isDefault()) {
@@ -162,7 +157,7 @@ public class IfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRule {
                     return true;
                 }
 
-                caseVarIds.addAll(getLocalVariableIdentifiers(stmt, false));
+                caseVarIds.addAll(ASTNodes.getLocalVariableIdentifiers(stmt, false));
                 caseStmts.add(stmt);
 
                 isPreviousStmtACase= false;
@@ -184,11 +179,11 @@ public class IfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRule {
         for (final Pair<List<Expression>, List<Statement>> caseStructure : switchStructure) {
             final Statement lastStmt= caseStructure.getSecond().get(caseStructure.getSecond().size() - 1);
 
-            if (!fallsThrough(lastStmt)) {
+            if (!ASTNodes.fallsThrough(lastStmt)) {
                 return true;
             }
 
-            final BreakStatement bs= as(lastStmt, BreakStatement.class);
+            final BreakStatement bs= ASTNodes.as(lastStmt, BreakStatement.class);
 
             if (bs != null && bs.getLabel() == null) {
                 caseStructure.getSecond().remove(caseStructure.getSecond().size() - 1);
@@ -202,7 +197,7 @@ public class IfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRule {
 
     private void replaceSwitch(final SwitchStatement node,
             final List<Pair<List<Expression>, List<Statement>>> switchStructure, final int caseIndexWithDefault,
-            final ASTBuilder b) {
+            final ASTNodeFactory b) {
         int localCaseIndexWithDefault= caseIndexWithDefault;
         final Refactorings r= this.ctx.getRefactorings();
 
@@ -218,7 +213,7 @@ public class IfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRule {
             } else if (caseStructure.getFirst().size() == 1) {
                 newCondition= buildEquality(b, discriminant, caseStructure.getFirst().get(0));
             } else {
-                final List<Expression> equalities= newArrayList();
+                final List<Expression> equalities= Utils.newArrayList();
 
                 for (Expression value : caseStructure.getFirst()) {
                     equalities.add(b.parenthesizeIfNeeded(buildEquality(b, discriminant, value)));
@@ -248,10 +243,10 @@ public class IfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRule {
         r.replace(node, currentBlock);
     }
 
-    private Expression buildEquality(final ASTBuilder b, final Expression discriminant, final Expression value) {
+    private Expression buildEquality(final ASTNodeFactory b, final Expression discriminant, final Expression value) {
         final Expression equality;
 
-        if (hasType(value, String.class.getCanonicalName(), Boolean.class.getCanonicalName(), Byte.class.getCanonicalName(), Character.class.getCanonicalName(),
+        if (ASTNodes.hasType(value, String.class.getCanonicalName(), Boolean.class.getCanonicalName(), Byte.class.getCanonicalName(), Character.class.getCanonicalName(),
                 Double.class.getCanonicalName(), Float.class.getCanonicalName(), Integer.class.getCanonicalName(), Long.class.getCanonicalName(), Short.class.getCanonicalName())) {
             equality= b.invoke(b.copy(value), "equals", b.copy(discriminant)); //$NON-NLS-1$
         } else if (value.resolveTypeBinding() != null && value.resolveTypeBinding().isEnum()) {

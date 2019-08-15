@@ -26,20 +26,9 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.arg0;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.arguments;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.as;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.extendedOperands;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasOperator;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasType;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.instanceOf;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.removeParentheses;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.usesGivenSignature;
 import static org.eclipse.jdt.core.dom.ASTNode.FIELD_ACCESS;
 import static org.eclipse.jdt.core.dom.ASTNode.QUALIFIED_NAME;
 import static org.eclipse.jdt.core.dom.ASTNode.SIMPLE_NAME;
-import static org.eclipse.jdt.core.dom.InfixExpression.Operator.PLUS;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -48,7 +37,8 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.Bindings;
 import org.autorefactor.util.Pair;
 import org.eclipse.jdt.core.dom.ASTNode;
@@ -100,20 +90,20 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
     @Override
     public boolean visit(MethodInvocation node) {
         if (node.getExpression() != null && "append".equals(node.getName().getIdentifier()) //$NON-NLS-1$
-                && arguments(node).size() == 1
+                && ASTNodes.arguments(node).size() == 1
                 // Most expensive check comes last
                 && isStringBuilderOrBuffer(node.getExpression())) {
-            final MethodInvocation embeddedMI= as(arg0(node), MethodInvocation.class);
+            final MethodInvocation embeddedMI= ASTNodes.as(ASTNodes.arg0(node), MethodInvocation.class);
 
-            if (usesGivenSignature(embeddedMI, String.class.getCanonicalName(), "substring", int.class.getSimpleName(), int.class.getSimpleName()) //$NON-NLS-1$
-                    || usesGivenSignature(embeddedMI, CharSequence.class.getCanonicalName(), "subSequence", int.class.getSimpleName(), int.class.getSimpleName())) { //$NON-NLS-1$
+            if (ASTNodes.usesGivenSignature(embeddedMI, String.class.getCanonicalName(), "substring", int.class.getSimpleName(), int.class.getSimpleName()) //$NON-NLS-1$
+                    || ASTNodes.usesGivenSignature(embeddedMI, CharSequence.class.getCanonicalName(), "subSequence", int.class.getSimpleName(), int.class.getSimpleName())) { //$NON-NLS-1$
                 replaceWithAppendSubstring(node, embeddedMI);
                 return false;
             }
 
             return maybeRefactorAppending(node);
-        } else if (usesGivenSignature(node, StringBuilder.class.getCanonicalName(), "toString") //$NON-NLS-1$
-                || usesGivenSignature(node, StringBuffer.class.getCanonicalName(), "toString")) { //$NON-NLS-1$
+        } else if (ASTNodes.usesGivenSignature(node, StringBuilder.class.getCanonicalName(), "toString") //$NON-NLS-1$
+                || ASTNodes.usesGivenSignature(node, StringBuffer.class.getCanonicalName(), "toString")) { //$NON-NLS-1$
             final LinkedList<Pair<ITypeBinding, Expression>> allAppendedStrings= new LinkedList<Pair<ITypeBinding, Expression>>();
             final Expression lastExpr= readAppendMethod(node.getExpression(), allAppendedStrings,
                     new AtomicBoolean(false), new AtomicBoolean(false));
@@ -128,11 +118,11 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 
     @Override
     public boolean visit(ClassInstanceCreation node) {
-        if ((hasType(node, StringBuilder.class.getCanonicalName()) || hasType(node, StringBuffer.class.getCanonicalName()))
-                && arguments(node).size() == 1) {
-            final Expression arg0= arguments(node).get(0);
+        if ((ASTNodes.hasType(node, StringBuilder.class.getCanonicalName()) || ASTNodes.hasType(node, StringBuffer.class.getCanonicalName()))
+                && ASTNodes.arguments(node).size() == 1) {
+            final Expression arg0= ASTNodes.arguments(node).get(0);
 
-            if (hasType(arg0, String.class.getCanonicalName())
+            if (ASTNodes.hasType(arg0, String.class.getCanonicalName())
                     && (arg0 instanceof InfixExpression || (arg0 instanceof MethodInvocation
                             && (isToString((MethodInvocation) arg0) || isStringValueOf((MethodInvocation) arg0))))) {
                 return maybeRefactorAppending(node);
@@ -167,29 +157,29 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
     private Expression readAppendMethod(final Expression expr,
             final LinkedList<Pair<ITypeBinding, Expression>> allOperands, final AtomicBoolean isRefactoringNeeded,
             final AtomicBoolean isInstanceCreationToRewrite) {
-        final Expression exp= removeParentheses(expr);
+        final Expression exp= ASTNodes.getUnparenthesedExpression(expr);
         if (isStringBuilderOrBuffer(exp)) {
             if (exp instanceof MethodInvocation) {
                 final MethodInvocation mi= (MethodInvocation) exp;
-                if ("append".equals(mi.getName().getIdentifier()) && arguments(mi).size() == 1) { //$NON-NLS-1$
-                    final Expression arg0= arguments(mi).get(0);
+                if ("append".equals(mi.getName().getIdentifier()) && ASTNodes.arguments(mi).size() == 1) { //$NON-NLS-1$
+                    final Expression arg0= ASTNodes.arguments(mi).get(0);
                     readSubExpressions(arg0, allOperands, isRefactoringNeeded);
                     return readAppendMethod(mi.getExpression(), allOperands, isRefactoringNeeded,
                             isInstanceCreationToRewrite);
                 }
             } else if (exp instanceof ClassInstanceCreation) {
                 final ClassInstanceCreation cic= (ClassInstanceCreation) exp;
-                if (arguments(cic).size() == 1) {
-                    final Expression arg0= arguments(cic).get(0);
+                if (ASTNodes.arguments(cic).size() == 1) {
+                    final Expression arg0= ASTNodes.arguments(cic).get(0);
                     if (isStringBuilderOrBuffer(cic)
-                            && (hasType(arg0, String.class.getCanonicalName()) || instanceOf(arg0, CharSequence.class.getCanonicalName()))) {
+                            && (ASTNodes.hasType(arg0, String.class.getCanonicalName()) || ASTNodes.instanceOf(arg0, CharSequence.class.getCanonicalName()))) {
                         isInstanceCreationToRewrite.set(true);
                         readSubExpressions(arg0, allOperands, isRefactoringNeeded);
                     }
-                } else if (arguments(cic).isEmpty() && !allOperands.isEmpty()
+                } else if (ASTNodes.arguments(cic).isEmpty() && !allOperands.isEmpty()
                         && ((allOperands.getFirst().getFirst() != null)
-                                ? hasType(allOperands.getFirst().getFirst(), String.class.getCanonicalName())
-                                : hasType(allOperands.getFirst().getSecond(), String.class.getCanonicalName()))) {
+                                ? ASTNodes.hasType(allOperands.getFirst().getFirst(), String.class.getCanonicalName())
+                                : ASTNodes.hasType(allOperands.getFirst().getSecond(), String.class.getCanonicalName()))) {
                     isInstanceCreationToRewrite.set(true);
                     isRefactoringNeeded.set(true);
                 }
@@ -207,7 +197,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
             final InfixExpression ie= (InfixExpression) arg;
             if (isStringConcat(ie)) {
                 if (ie.hasExtendedOperands()) {
-                    final List<Expression> reversed= new ArrayList<Expression>(extendedOperands(ie));
+                    final List<Expression> reversed= new ArrayList<Expression>(ASTNodes.extendedOperands(ie));
                     Collections.reverse(reversed);
 
                     if (isValuedStringLiteralOrConstant(reversed.get(0)) && !results.isEmpty()
@@ -238,14 +228,14 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
     }
 
     private boolean isStringConcat(final InfixExpression node) {
-        if (!hasOperator(node, PLUS) || !hasType(node, String.class.getCanonicalName())) {
+        if (!ASTNodes.hasOperator(node, InfixExpression.Operator.PLUS) || !ASTNodes.hasType(node, String.class.getCanonicalName())) {
             return false;
         }
         if (!isValuedStringLiteralOrConstant(node.getLeftOperand())
                 || !isValuedStringLiteralOrConstant(node.getRightOperand())) {
             return true;
         }
-        for (Expression expr : extendedOperands(node)) {
+        for (Expression expr : ASTNodes.extendedOperands(node)) {
             if (!isValuedStringLiteralOrConstant(expr)) {
                 return true;
             }
@@ -256,7 +246,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
     private boolean isValuedStringLiteralOrConstant(Expression expr) {
         if (expr instanceof StringLiteral) {
             return !isEmptyString(expr);
-        } else if (expr instanceof Name && hasType(expr, String.class.getCanonicalName())) {
+        } else if (expr instanceof Name && ASTNodes.hasType(expr, String.class.getCanonicalName())) {
             Name name= (Name) expr;
             return name.resolveConstantExpressionValue() != null;
         }
@@ -281,7 +271,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
             final Pair<ITypeBinding, Expression> expr= iter.next();
             if (expr.getSecond().getNodeType() == ASTNode.METHOD_INVOCATION) {
                 final MethodInvocation mi= (MethodInvocation) expr.getSecond();
-                if (usesGivenSignature(mi, Object.class.getCanonicalName(), "toString")) { //$NON-NLS-1$
+                if (ASTNodes.usesGivenSignature(mi, Object.class.getCanonicalName(), "toString")) { //$NON-NLS-1$
                     if (mi.getExpression() != null) {
                         iter.set(Pair.<ITypeBinding, Expression>of(null, mi.getExpression()));
                     } else {
@@ -298,11 +288,11 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 
     private Pair<ITypeBinding, Expression> getTypeAndValue(final MethodInvocation mi) {
         final ITypeBinding expectedType= mi.resolveMethodBinding().getParameterTypes()[0];
-        if (hasType(arg0(mi), expectedType.getQualifiedName(),
+        if (ASTNodes.hasType(ASTNodes.arg0(mi), expectedType.getQualifiedName(),
                 Bindings.getBoxedTypeBinding(expectedType, mi.getAST()).getQualifiedName())) {
-            return Pair.<ITypeBinding, Expression>of(null, arg0(mi));
+            return Pair.<ITypeBinding, Expression>of(null, ASTNodes.arg0(mi));
         } else {
-            return Pair.<ITypeBinding, Expression>of(expectedType, arg0(mi));
+            return Pair.<ITypeBinding, Expression>of(expectedType, ASTNodes.arg0(mi));
         }
     }
 
@@ -318,7 +308,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
     private void replaceWithNewStringAppends(final Expression node,
             final LinkedList<Pair<ITypeBinding, Expression>> allAppendedStrings, final Expression lastExpr,
             final boolean isInstanceCreationToRewrite) {
-        final ASTBuilder b= this.ctx.getASTBuilder();
+        final ASTNodeFactory b= this.ctx.getASTBuilder();
 
         Expression result= null;
         final List<Expression> tempStringLiterals= new ArrayList<Expression>();
@@ -339,8 +329,8 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
                         result= b.copy(lastExpr);
                         finalStrings.add(getTypedExpression(b, appendedString));
                     } else if ((appendedString.getFirst() != null)
-                            ? hasType(appendedString.getFirst(), String.class.getCanonicalName())
-                            : hasType(appendedString.getSecond(), String.class.getCanonicalName())) {
+                            ? ASTNodes.hasType(appendedString.getFirst(), String.class.getCanonicalName())
+                            : ASTNodes.hasType(appendedString.getSecond(), String.class.getCanonicalName())) {
                         result= b.new0(b.copy(((ClassInstanceCreation) lastExpr).getType()),
                                 getTypedExpression(b, appendedString));
                     } else {
@@ -367,7 +357,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
         ctx.getRefactorings().replace(node, result);
     }
 
-    private Expression handleTempStringLiterals(final ASTBuilder b, final Expression lastExpr,
+    private Expression handleTempStringLiterals(final ASTNodeFactory b, final Expression lastExpr,
             final boolean isInstanceCreationToRewrite, Expression result, final List<Expression> tempStringLiterals,
             final List<Expression> finalStrings, final AtomicBoolean isFirst) {
         if (!tempStringLiterals.isEmpty()) {
@@ -390,20 +380,20 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
         return result;
     }
 
-    private Expression getString(final ASTBuilder b, final List<Expression> tempStringLiterals) {
+    private Expression getString(final ASTNodeFactory b, final List<Expression> tempStringLiterals) {
         final Expression newExpr;
         if (tempStringLiterals.size() == 1) {
             newExpr= tempStringLiterals.get(0);
         } else {
-            newExpr= b.infixExpr(PLUS, tempStringLiterals);
+            newExpr= b.infixExpr(InfixExpression.Operator.PLUS, tempStringLiterals);
         }
         return newExpr;
     }
 
     private void replaceWithAppendSubstring(final MethodInvocation node, final MethodInvocation embeddedMI) {
-        final ASTBuilder b= this.ctx.getASTBuilder();
+        final ASTNodeFactory b= this.ctx.getASTBuilder();
         final Expression stringVar= b.copy(embeddedMI.getExpression());
-        final List<Expression> args= arguments(embeddedMI);
+        final List<Expression> args= ASTNodes.arguments(embeddedMI);
         final Expression arg0= b.copy(args.get(0));
         final Expression arg1= b.copy(args.get(1));
         final Expression lastExpr= b.copy(node.getExpression());
@@ -418,11 +408,11 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
     }
 
     private boolean isStringBuilderOrBuffer(final Expression expr) {
-        return hasType(expr, StringBuffer.class.getCanonicalName(), StringBuilder.class.getCanonicalName());
+        return ASTNodes.hasType(expr, StringBuffer.class.getCanonicalName(), StringBuilder.class.getCanonicalName());
     }
 
     private boolean isVariable(final Expression expr) {
-        switch (removeParentheses(expr).getNodeType()) {
+        switch (ASTNodes.getUnparenthesedExpression(expr).getNodeType()) {
         case SIMPLE_NAME:
         case QUALIFIED_NAME:
         case FIELD_ACCESS:
@@ -434,33 +424,33 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
     }
 
     private boolean isToString(final MethodInvocation mi) {
-        return usesGivenSignature(mi, Boolean.class.getCanonicalName(), "toString", boolean.class.getSimpleName()) //$NON-NLS-1$
-                || usesGivenSignature(mi, Byte.class.getCanonicalName(), "toString", byte.class.getSimpleName()) //$NON-NLS-1$
-                || usesGivenSignature(mi, Character.class.getCanonicalName(), "toString", char.class.getSimpleName()) //$NON-NLS-1$
-                || usesGivenSignature(mi, Short.class.getCanonicalName(), "toString", short.class.getSimpleName()) //$NON-NLS-1$
-                || usesGivenSignature(mi, Integer.class.getCanonicalName(), "toString", int.class.getSimpleName()) //$NON-NLS-1$
-                || usesGivenSignature(mi, Long.class.getCanonicalName(), "toString", long.class.getSimpleName()) //$NON-NLS-1$
-                || usesGivenSignature(mi, Float.class.getCanonicalName(), "toString", float.class.getSimpleName()) //$NON-NLS-1$
-                || usesGivenSignature(mi, Double.class.getCanonicalName(), "toString", double.class.getSimpleName()); //$NON-NLS-1$
+        return ASTNodes.usesGivenSignature(mi, Boolean.class.getCanonicalName(), "toString", boolean.class.getSimpleName()) //$NON-NLS-1$
+                || ASTNodes.usesGivenSignature(mi, Byte.class.getCanonicalName(), "toString", byte.class.getSimpleName()) //$NON-NLS-1$
+                || ASTNodes.usesGivenSignature(mi, Character.class.getCanonicalName(), "toString", char.class.getSimpleName()) //$NON-NLS-1$
+                || ASTNodes.usesGivenSignature(mi, Short.class.getCanonicalName(), "toString", short.class.getSimpleName()) //$NON-NLS-1$
+                || ASTNodes.usesGivenSignature(mi, Integer.class.getCanonicalName(), "toString", int.class.getSimpleName()) //$NON-NLS-1$
+                || ASTNodes.usesGivenSignature(mi, Long.class.getCanonicalName(), "toString", long.class.getSimpleName()) //$NON-NLS-1$
+                || ASTNodes.usesGivenSignature(mi, Float.class.getCanonicalName(), "toString", float.class.getSimpleName()) //$NON-NLS-1$
+                || ASTNodes.usesGivenSignature(mi, Double.class.getCanonicalName(), "toString", double.class.getSimpleName()); //$NON-NLS-1$
     }
 
     private boolean isStringValueOf(final MethodInvocation mi) {
-        return usesGivenSignature(mi, String.class.getCanonicalName(), "valueOf", Object.class.getCanonicalName()) //$NON-NLS-1$
-                || usesGivenSignature(mi, String.class.getCanonicalName(), "valueOf", boolean.class.getSimpleName()) //$NON-NLS-1$
-                || usesGivenSignature(mi, Boolean.class.getCanonicalName(), "valueOf", boolean.class.getSimpleName()) //$NON-NLS-1$
-                || usesGivenSignature(mi, String.class.getCanonicalName(), "valueOf", char.class.getSimpleName()) //$NON-NLS-1$
-                || usesGivenSignature(mi, Character.class.getCanonicalName(), "valueOf", char.class.getSimpleName()) //$NON-NLS-1$
-                || usesGivenSignature(mi, String.class.getCanonicalName(), "valueOf", int.class.getSimpleName()) //$NON-NLS-1$
-                || usesGivenSignature(mi, Integer.class.getCanonicalName(), "valueOf", int.class.getSimpleName()) //$NON-NLS-1$
-                || usesGivenSignature(mi, String.class.getCanonicalName(), "valueOf", long.class.getSimpleName()) //$NON-NLS-1$
-                || usesGivenSignature(mi, Long.class.getCanonicalName(), "valueOf", long.class.getSimpleName()) //$NON-NLS-1$
-                || usesGivenSignature(mi, String.class.getCanonicalName(), "valueOf", float.class.getSimpleName()) //$NON-NLS-1$
-                || usesGivenSignature(mi, Float.class.getCanonicalName(), "valueOf", float.class.getSimpleName()) //$NON-NLS-1$
-                || usesGivenSignature(mi, String.class.getCanonicalName(), "valueOf", double.class.getSimpleName()) //$NON-NLS-1$
-                || usesGivenSignature(mi, Double.class.getCanonicalName(), "valueOf", double.class.getSimpleName()); //$NON-NLS-1$
+        return ASTNodes.usesGivenSignature(mi, String.class.getCanonicalName(), "valueOf", Object.class.getCanonicalName()) //$NON-NLS-1$
+                || ASTNodes.usesGivenSignature(mi, String.class.getCanonicalName(), "valueOf", boolean.class.getSimpleName()) //$NON-NLS-1$
+                || ASTNodes.usesGivenSignature(mi, Boolean.class.getCanonicalName(), "valueOf", boolean.class.getSimpleName()) //$NON-NLS-1$
+                || ASTNodes.usesGivenSignature(mi, String.class.getCanonicalName(), "valueOf", char.class.getSimpleName()) //$NON-NLS-1$
+                || ASTNodes.usesGivenSignature(mi, Character.class.getCanonicalName(), "valueOf", char.class.getSimpleName()) //$NON-NLS-1$
+                || ASTNodes.usesGivenSignature(mi, String.class.getCanonicalName(), "valueOf", int.class.getSimpleName()) //$NON-NLS-1$
+                || ASTNodes.usesGivenSignature(mi, Integer.class.getCanonicalName(), "valueOf", int.class.getSimpleName()) //$NON-NLS-1$
+                || ASTNodes.usesGivenSignature(mi, String.class.getCanonicalName(), "valueOf", long.class.getSimpleName()) //$NON-NLS-1$
+                || ASTNodes.usesGivenSignature(mi, Long.class.getCanonicalName(), "valueOf", long.class.getSimpleName()) //$NON-NLS-1$
+                || ASTNodes.usesGivenSignature(mi, String.class.getCanonicalName(), "valueOf", float.class.getSimpleName()) //$NON-NLS-1$
+                || ASTNodes.usesGivenSignature(mi, Float.class.getCanonicalName(), "valueOf", float.class.getSimpleName()) //$NON-NLS-1$
+                || ASTNodes.usesGivenSignature(mi, String.class.getCanonicalName(), "valueOf", double.class.getSimpleName()) //$NON-NLS-1$
+                || ASTNodes.usesGivenSignature(mi, Double.class.getCanonicalName(), "valueOf", double.class.getSimpleName()); //$NON-NLS-1$
     }
 
-    private Expression getTypedExpression(final ASTBuilder b, final Pair<ITypeBinding, Expression> typeAndValue) {
+    private Expression getTypedExpression(final ASTNodeFactory b, final Pair<ITypeBinding, Expression> typeAndValue) {
         Expression expression= null;
         if (typeAndValue.getFirst() != null) {
             expression= b.cast(b.type(typeAndValue.getFirst().getQualifiedName()), b.copy(typeAndValue.getSecond()));
@@ -489,13 +479,13 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
         boolean canRemoveEmptyStrings= false;
         for (int i= 0; i < allOperands.size(); i++) {
             Pair<ITypeBinding, Expression> expr= allOperands.get(i);
-            boolean canNowRemoveEmptyStrings= canRemoveEmptyStrings || hasType(expr.getSecond(), String.class.getCanonicalName());
+            boolean canNowRemoveEmptyStrings= canRemoveEmptyStrings || ASTNodes.hasType(expr.getSecond(), String.class.getCanonicalName());
             if (isEmptyString(expr.getSecond())) {
                 boolean removeExpr= false;
                 if (canRemoveEmptyStrings) {
                     removeExpr= true;
                 } else if (canNowRemoveEmptyStrings && i + 1 < allOperands.size()
-                        && hasType(allOperands.get(i + 1).getSecond(), String.class.getCanonicalName())) {
+                        && ASTNodes.hasType(allOperands.get(i + 1).getSecond(), String.class.getCanonicalName())) {
                     removeExpr= true;
                 }
 
@@ -510,14 +500,14 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
     }
 
     private Expression createStringConcats(final List<Pair<ITypeBinding, Expression>> appendedStrings) {
-        final ASTBuilder b= this.ctx.getASTBuilder();
+        final ASTNodeFactory b= this.ctx.getASTBuilder();
         switch (appendedStrings.size()) {
         case 0:
             return b.string(""); //$NON-NLS-1$
 
         case 1:
             final Pair<ITypeBinding, Expression> expr= appendedStrings.get(0);
-            if (hasType(expr.getSecond(), String.class.getCanonicalName())) {
+            if (ASTNodes.hasType(expr.getSecond(), String.class.getCanonicalName())) {
                 return b.copy(expr.getSecond());
             }
             return b.invoke("String", "valueOf", getTypedExpression(b, expr)); //$NON-NLS-1$ $NON-NLS-2$
@@ -534,7 +524,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
                     concatenateStrings.add(b.parenthesizeIfNeeded(getTypedExpression(b, typeAndValue)));
                 }
             }
-            return b.infixExpr(PLUS, concatenateStrings);
+            return b.infixExpr(InfixExpression.Operator.PLUS, concatenateStrings);
         }
     }
 
@@ -542,6 +532,6 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
         final Pair<ITypeBinding, Expression> arg0= appendedStrings.get(0);
         final Pair<ITypeBinding, Expression> arg1= appendedStrings.get(1);
 
-        return !hasType(arg0.getSecond(), String.class.getCanonicalName()) && !hasType(arg1.getSecond(), String.class.getCanonicalName());
+        return !ASTNodes.hasType(arg0.getSecond(), String.class.getCanonicalName()) && !ASTNodes.hasType(arg1.getSecond(), String.class.getCanonicalName());
     }
 }

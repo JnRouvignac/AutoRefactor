@@ -120,7 +120,7 @@ public final class Bindings {
         if (!type.isPrimitive()) {
             return type;
         }
-        String boxedTypeName= getBoxedTypeName(type.getName());
+        String boxedTypeName= Bindings.getBoxedTypeName(type.getName());
         if (boxedTypeName == null) {
             return type;
         }

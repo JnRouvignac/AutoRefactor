@@ -25,27 +25,12 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.asExpression;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.asList;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.fragments;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasOperator;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.haveSameType;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.initializers;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isPrimitive;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.updaters;
-import static org.autorefactor.util.Utils.equalNotNull;
-import static org.eclipse.jdt.core.dom.Assignment.Operator.ASSIGN;
-import static org.eclipse.jdt.core.dom.InfixExpression.Operator.GREATER;
-import static org.eclipse.jdt.core.dom.InfixExpression.Operator.GREATER_EQUALS;
-import static org.eclipse.jdt.core.dom.InfixExpression.Operator.LESS;
-import static org.eclipse.jdt.core.dom.InfixExpression.Operator.LESS_EQUALS;
-import static org.eclipse.jdt.core.dom.InfixExpression.Operator.MINUS;
-import static org.eclipse.jdt.core.dom.InfixExpression.Operator.PLUS;
-
 import java.util.List;
 
-import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.util.NotImplementedException;
+import org.autorefactor.util.Utils;
 import org.eclipse.jdt.core.dom.ArrayAccess;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Expression;
@@ -111,14 +96,14 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
         final SystemArrayCopyParams params= new SystemArrayCopyParams();
         collectUniqueIndex(node, params);
         final IVariableBinding incrementedIdx= getUniqueIncrementedVariable(node);
-        final List<Statement> stmts= asList(node.getBody());
+        final List<Statement> stmts= ASTNodes.asList(node.getBody());
 
-        if (equalNotNull(params.indexVarBinding, incrementedIdx) && stmts.size() == 1) {
+        if (Utils.equalNotNull(params.indexVarBinding, incrementedIdx) && stmts.size() == 1) {
             collectLength(node.getExpression(), incrementedIdx, params);
 
-            final Assignment as= asExpression(stmts.get(0), Assignment.class);
+            final Assignment as= ASTNodes.asExpression(stmts.get(0), Assignment.class);
 
-            if (hasOperator(as, ASSIGN)) {
+            if (ASTNodes.hasOperator(as, Assignment.Operator.ASSIGN)) {
                 final Expression lhs= as.getLeftHandSide();
                 final Expression rhs= as.getRightHandSide();
 
@@ -128,7 +113,7 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
                     params.destArrayExpr= aaLHS.getArray();
                     params.srcArrayExpr= aaRHS.getArray();
 
-                    if (haveSameType(params.srcArrayExpr, params.destArrayExpr)) {
+                    if (ASTNodes.haveSameType(params.srcArrayExpr, params.destArrayExpr)) {
                         params.destPos= calcIndex(aaLHS.getIndex(), params);
                         params.srcPos= calcIndex(aaRHS.getIndex(), params);
                         return replaceWithSystemArrayCopyCloneAll(node, params);
@@ -140,25 +125,25 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
     }
 
     private Expression calcIndex(Expression index, SystemArrayCopyParams params) {
-        final ASTBuilder b= this.ctx.getASTBuilder();
+        final ASTNodeFactory b= this.ctx.getASTBuilder();
 
         if (index instanceof SimpleName) {
             final IVariableBinding idxVar= getVariableBinding(index);
 
-            if (equalNotNull(params.indexVarBinding, idxVar)) {
+            if (Utils.equalNotNull(params.indexVarBinding, idxVar)) {
                 return b.copy(params.indexStartPos);
             }
         } else if (index instanceof InfixExpression) {
             final InfixExpression ie= (InfixExpression) index;
 
-            if (!ie.hasExtendedOperands() && hasOperator(ie, PLUS)) {
+            if (!ie.hasExtendedOperands() && ASTNodes.hasOperator(ie, InfixExpression.Operator.PLUS)) {
                 final Expression leftOp= ie.getLeftOperand();
                 final Expression rightOp= ie.getRightOperand();
 
                 if (leftOp instanceof SimpleName) {
                     final IVariableBinding idxVar= getVariableBinding(leftOp);
 
-                    if (equalNotNull(params.indexVarBinding, idxVar)) {
+                    if (Utils.equalNotNull(params.indexVarBinding, idxVar)) {
                         return plus(rightOp, params.indexStartPos);
                     }
                 }
@@ -166,7 +151,7 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
                 if (rightOp instanceof SimpleName) {
                     final IVariableBinding idxVar= getVariableBinding(rightOp);
 
-                    if (equalNotNull(params.indexVarBinding, idxVar)) {
+                    if (Utils.equalNotNull(params.indexVarBinding, idxVar)) {
                         return plus(leftOp, params.indexStartPos);
                     }
                 }
@@ -176,49 +161,49 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
     }
 
     private Expression plus(Expression expr1, Expression expr2) {
-        final ASTBuilder b= this.ctx.getASTBuilder();
+        final ASTNodeFactory b= this.ctx.getASTBuilder();
         final Integer expr1Value= intValue(expr1);
         final Integer expr2Value= intValue(expr2);
 
         if (expr1Value != null && expr2Value != null) {
             return b.int0(expr1Value + expr2Value);
-        } else if (equalNotNull(expr1Value, 0)) {
+        } else if (Utils.equalNotNull(expr1Value, 0)) {
             return b.copy(expr2);
-        } else if (equalNotNull(expr2Value, 0)) {
+        } else if (Utils.equalNotNull(expr2Value, 0)) {
             return b.copy(expr1);
         }
-        return b.infixExpr(b.copy(expr1), PLUS, b.copy(expr2));
+        return b.infixExpr(b.copy(expr1), InfixExpression.Operator.PLUS, b.copy(expr2));
     }
 
     private Expression minus(Expression expr1, Expression expr2) {
-        final ASTBuilder b= this.ctx.getASTBuilder();
+        final ASTNodeFactory b= this.ctx.getASTBuilder();
         final Integer expr1Value= intValue(expr1);
         final Integer expr2Value= intValue(expr2);
 
         if (expr1Value != null && expr2Value != null) {
             return b.int0(expr1Value - expr2Value);
-        } else if (equalNotNull(expr1Value, 0)) {
+        } else if (Utils.equalNotNull(expr1Value, 0)) {
             throw new NotImplementedException(expr2, "Code is not implemented for negating expr2: " + expr2); //$NON-NLS-1$
-        } else if (equalNotNull(expr2Value, 0)) {
+        } else if (Utils.equalNotNull(expr2Value, 0)) {
             return b.copy(expr1);
         }
-        return b.infixExpr(b.copy(expr1), MINUS, b.copy(expr2));
+        return b.infixExpr(b.copy(expr1), InfixExpression.Operator.MINUS, b.copy(expr2));
     }
 
     private Expression minusPlusOne(Expression expr1, Expression expr2) {
-        final ASTBuilder b= this.ctx.getASTBuilder();
+        final ASTNodeFactory b= this.ctx.getASTBuilder();
         final Integer expr1Value= intValue(expr1);
         final Integer expr2Value= intValue(expr2);
 
         if (expr1Value != null && expr2Value != null) {
             return b.int0(expr1Value - expr2Value + 1);
-        } else if (equalNotNull(expr1Value, 0)) {
+        } else if (Utils.equalNotNull(expr1Value, 0)) {
             throw new NotImplementedException(expr2, "Code is not implemented for negating expr2: " + expr2); //$NON-NLS-1$
-        } else if (equalNotNull(expr2Value, 0)) {
-            return b.infixExpr(b.copy(expr1), PLUS, ctx.getAST().newNumberLiteral("1")); //$NON-NLS-1$
+        } else if (Utils.equalNotNull(expr2Value, 0)) {
+            return b.infixExpr(b.copy(expr1), InfixExpression.Operator.PLUS, ctx.getAST().newNumberLiteral("1")); //$NON-NLS-1$
         }
 
-        return b.infixExpr(b.infixExpr(b.copy(expr1), MINUS, b.copy(expr2)), PLUS, ctx.getAST().newNumberLiteral("1")); //$NON-NLS-1$
+        return b.infixExpr(b.infixExpr(b.copy(expr1), InfixExpression.Operator.MINUS, b.copy(expr2)), InfixExpression.Operator.PLUS, ctx.getAST().newNumberLiteral("1")); //$NON-NLS-1$
     }
 
     private Integer intValue(Expression expr) {
@@ -235,9 +220,9 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
             final SystemArrayCopyParams params) {
         if (condition instanceof InfixExpression) {
             final InfixExpression ie= (InfixExpression) condition;
-            if (hasOperator(ie, LESS, LESS_EQUALS)) {
+            if (ASTNodes.hasOperator(ie, InfixExpression.Operator.LESS, InfixExpression.Operator.LESS_EQUALS)) {
                 collectLength(incrementedIdx, params, ie, ie.getLeftOperand(), ie.getRightOperand());
-            } else if (hasOperator(ie, GREATER, GREATER_EQUALS)) {
+            } else if (ASTNodes.hasOperator(ie, InfixExpression.Operator.GREATER, InfixExpression.Operator.GREATER_EQUALS)) {
                 collectLength(incrementedIdx, params, ie, ie.getRightOperand(), ie.getLeftOperand());
             }
         }
@@ -246,10 +231,8 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
     private void collectLength(final IVariableBinding incrementedIdx, final SystemArrayCopyParams params,
             final InfixExpression ie, final Expression variable, final Expression boundary) {
         IVariableBinding conditionIdx= getVariableBinding(variable);
-        if (equalNotNull(incrementedIdx, conditionIdx)) {
-            final ASTBuilder b= ctx.getASTBuilder();
-
-            if (hasOperator(ie, LESS_EQUALS, GREATER_EQUALS)) {
+        if (Utils.equalNotNull(incrementedIdx, conditionIdx)) {
+            if (ASTNodes.hasOperator(ie, InfixExpression.Operator.LESS_EQUALS, InfixExpression.Operator.GREATER_EQUALS)) {
                 params.length= minusPlusOne(boundary, params.indexStartPos);
             } else {
                 params.length= minus(boundary, params.indexStartPos);
@@ -262,14 +245,14 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
                 || params.destPos == null || params.length == null) {
             return true;
         }
-        final ASTBuilder b= this.ctx.getASTBuilder();
+        final ASTNodeFactory b= this.ctx.getASTBuilder();
         return replaceWithSystemArrayCopy(node, b.copy(params.srcArrayExpr), params.srcPos,
                 b.copy(params.destArrayExpr), params.destPos, params.length);
     }
 
     private boolean replaceWithSystemArrayCopy(ForStatement node, Expression srcArrayExpr, Expression srcPos,
             Expression destArrayExpr, Expression destPos, Expression length) {
-        final ASTBuilder b= this.ctx.getASTBuilder();
+        final ASTNodeFactory b= this.ctx.getASTBuilder();
         final TryStatement tryS= b.try0(
                 b.block(b
                         .toStmt(b.invoke("System", "arraycopy", srcArrayExpr, srcPos, destArrayExpr, destPos, length))), //$NON-NLS-1$ $NON-NLS-2$
@@ -281,17 +264,17 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
     }
 
     private void collectUniqueIndex(ForStatement node, SystemArrayCopyParams params) {
-        if (initializers(node).size() != 1) {
+        if (ASTNodes.initializers(node).size() != 1) {
             return;
         }
 
-        final Expression initializer0= initializers(node).get(0);
+        final Expression initializer0= ASTNodes.initializers(node).get(0);
 
         if (initializer0 instanceof VariableDeclarationExpression) {
             final VariableDeclarationExpression vde= (VariableDeclarationExpression) initializer0;
-            if (isPrimitive(vde, int.class.getSimpleName()) && fragments(vde).size() == 1) {
+            if (ASTNodes.isPrimitive(vde, int.class.getSimpleName()) && ASTNodes.fragments(vde).size() == 1) {
                 // This must be the array index
-                VariableDeclarationFragment vdf= fragments(vde).get(0);
+                VariableDeclarationFragment vdf= ASTNodes.fragments(vde).get(0);
                 if (vdf.getExtraDimensions() == 0) {
                     params.indexStartPos= vdf.getInitializer();
                     params.indexVarBinding= vdf.resolveBinding();
@@ -299,7 +282,7 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
             }
         } else if (initializer0 instanceof Assignment) {
             final Assignment as= (Assignment) initializer0;
-            if (hasOperator(as, ASSIGN) && isPrimitive(as.resolveTypeBinding(), int.class.getSimpleName())) {
+            if (ASTNodes.hasOperator(as, Assignment.Operator.ASSIGN) && ASTNodes.isPrimitive(as.resolveTypeBinding(), int.class.getSimpleName())) {
                 // This must be the array index
                 params.indexStartPos= as.getRightHandSide();
                 final Expression lhs= as.getLeftHandSide();
@@ -314,18 +297,18 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
     }
 
     private IVariableBinding getUniqueIncrementedVariable(ForStatement node) {
-        if (updaters(node).size() != 1) {
+        if (ASTNodes.updaters(node).size() != 1) {
             return null;
         }
-        final Expression updater0= updaters(node).get(0);
+        final Expression updater0= ASTNodes.updaters(node).get(0);
         if (updater0 instanceof PostfixExpression) {
             final PostfixExpression pe= (PostfixExpression) updater0;
-            if (hasOperator(pe, PostfixExpression.Operator.INCREMENT)) {
+            if (ASTNodes.hasOperator(pe, PostfixExpression.Operator.INCREMENT)) {
                 return getVariableBinding(pe.getOperand());
             }
         } else if (updater0 instanceof PrefixExpression) {
             final PrefixExpression pe= (PrefixExpression) updater0;
-            if (hasOperator(pe, PrefixExpression.Operator.INCREMENT)) {
+            if (ASTNodes.hasOperator(pe, PrefixExpression.Operator.INCREMENT)) {
                 return getVariableBinding(pe.getOperand());
             }
         }

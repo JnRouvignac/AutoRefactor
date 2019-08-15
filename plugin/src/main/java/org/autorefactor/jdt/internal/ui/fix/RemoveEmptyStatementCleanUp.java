@@ -25,10 +25,9 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isPassive;
-
 import java.util.List;
 
+import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.DoStatement;
@@ -75,7 +74,7 @@ public class RemoveEmptyStatementCleanUp extends AbstractCleanUpRule {
 
     @Override
     public boolean visit(final IfStatement node) {
-        if (isPassive(node.getExpression())) {
+        if (ASTNodes.isPassive(node.getExpression())) {
             final boolean isThenEmpty= isEmptyCode(node.getThenStatement());
             final boolean isElseEmpty= isEmptyCode(node.getElseStatement());
 
@@ -92,7 +91,7 @@ public class RemoveEmptyStatementCleanUp extends AbstractCleanUpRule {
 
     @Override
     public boolean visit(final EnhancedForStatement node) {
-        if (isPassive(node.getExpression()) && node.getExpression().resolveTypeBinding().isArray()) {
+        if (ASTNodes.isPassive(node.getExpression()) && node.getExpression().resolveTypeBinding().isArray()) {
             return maybeRemoveStmtWithEmptyBody(node, node.getBody());
         }
         return true;
@@ -101,7 +100,7 @@ public class RemoveEmptyStatementCleanUp extends AbstractCleanUpRule {
     @Override
     public boolean visit(final ForStatement node) {
         if (node.getExpression() != null && !Boolean.TRUE.equals(node.getExpression().resolveConstantExpressionValue())
-                && arePassive(node.initializers()) && isPassive(node.getExpression())) {
+                && arePassive(node.initializers()) && ASTNodes.isPassive(node.getExpression())) {
             return maybeRemoveStmtWithEmptyBody(node, node.getBody());
         }
         return true;
@@ -109,7 +108,7 @@ public class RemoveEmptyStatementCleanUp extends AbstractCleanUpRule {
 
     @Override
     public boolean visit(final WhileStatement node) {
-        if (isPassive(node.getExpression())
+        if (ASTNodes.isPassive(node.getExpression())
                 && !Boolean.TRUE.equals(node.getExpression().resolveConstantExpressionValue())) {
             return maybeRemoveStmtWithEmptyBody(node, node.getBody());
         }
@@ -118,7 +117,7 @@ public class RemoveEmptyStatementCleanUp extends AbstractCleanUpRule {
 
     @Override
     public boolean visit(final DoStatement node) {
-        if (isPassive(node.getExpression())
+        if (ASTNodes.isPassive(node.getExpression())
                 && !Boolean.TRUE.equals(node.getExpression().resolveConstantExpressionValue())) {
             return maybeRemoveStmtWithEmptyBody(node, node.getBody());
         }
@@ -149,7 +148,7 @@ public class RemoveEmptyStatementCleanUp extends AbstractCleanUpRule {
     private boolean arePassive(final List<?> initializers) {
         if (initializers != null) {
             for (final Object initializer : initializers) {
-                if (!isPassive((Expression) initializer)) {
+                if (!ASTNodes.isPassive((Expression) initializer)) {
                     return false;
                 }
             }

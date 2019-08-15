@@ -25,15 +25,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.eclipse.jdt.core.dom.Assignment.Operator.DIVIDE_ASSIGN;
-import static org.eclipse.jdt.core.dom.Assignment.Operator.MINUS_ASSIGN;
-import static org.eclipse.jdt.core.dom.Assignment.Operator.PLUS_ASSIGN;
-import static org.eclipse.jdt.core.dom.Assignment.Operator.REMAINDER_ASSIGN;
-import static org.eclipse.jdt.core.dom.Assignment.Operator.TIMES_ASSIGN;
-import static org.eclipse.jdt.core.dom.PrefixExpression.Operator.COMPLEMENT;
-import static org.eclipse.jdt.core.dom.PrefixExpression.Operator.DECREMENT;
-import static org.eclipse.jdt.core.dom.PrefixExpression.Operator.INCREMENT;
-
 import java.util.Arrays;
 import java.util.List;
 
@@ -90,8 +81,8 @@ public class DoublePrimitiveRatherThanWrapperCleanUp extends AbstractPrimitiveRa
 
     @Override
     public List<PrefixExpression.Operator> getPrefixInSafeOperators() {
-        return Arrays.<PrefixExpression.Operator>asList(INCREMENT, PrefixExpression.Operator.MINUS, DECREMENT,
-                PrefixExpression.Operator.PLUS, COMPLEMENT);
+        return Arrays.<PrefixExpression.Operator>asList(PrefixExpression.Operator.INCREMENT, PrefixExpression.Operator.MINUS, PrefixExpression.Operator.DECREMENT,
+                PrefixExpression.Operator.PLUS, PrefixExpression.Operator.COMPLEMENT);
     }
 
     @Override
@@ -110,8 +101,8 @@ public class DoublePrimitiveRatherThanWrapperCleanUp extends AbstractPrimitiveRa
 
     @Override
     public List<PrefixExpression.Operator> getPrefixOutSafeOperators() {
-        return Arrays.<PrefixExpression.Operator>asList(INCREMENT, PrefixExpression.Operator.MINUS, DECREMENT,
-                PrefixExpression.Operator.PLUS, COMPLEMENT);
+        return Arrays.<PrefixExpression.Operator>asList(PrefixExpression.Operator.INCREMENT, PrefixExpression.Operator.MINUS, PrefixExpression.Operator.DECREMENT,
+                PrefixExpression.Operator.PLUS, PrefixExpression.Operator.COMPLEMENT);
     }
 
     @Override
@@ -130,8 +121,8 @@ public class DoublePrimitiveRatherThanWrapperCleanUp extends AbstractPrimitiveRa
 
     @Override
     public List<Assignment.Operator> getAssignmentOutSafeOperators() {
-        return Arrays.<Assignment.Operator>asList(PLUS_ASSIGN, MINUS_ASSIGN, TIMES_ASSIGN, DIVIDE_ASSIGN,
-                REMAINDER_ASSIGN);
+        return Arrays.<Assignment.Operator>asList(Assignment.Operator.PLUS_ASSIGN, Assignment.Operator.MINUS_ASSIGN, Assignment.Operator.TIMES_ASSIGN, Assignment.Operator.DIVIDE_ASSIGN,
+                Assignment.Operator.REMAINDER_ASSIGN);
     }
 
     @Override

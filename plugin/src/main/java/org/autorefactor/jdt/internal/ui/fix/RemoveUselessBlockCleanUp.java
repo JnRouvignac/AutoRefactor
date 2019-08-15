@@ -26,13 +26,12 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.*;
-
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.Statement;
@@ -68,16 +67,16 @@ public class RemoveUselessBlockCleanUp extends AbstractCleanUpRule {
 
     @Override
     public boolean visit(Block node) {
-        final List<Statement> stmts= statements(node);
+        final List<Statement> stmts= ASTNodes.statements(node);
         if (stmts.size() == 1 && stmts.get(0) instanceof Block) {
             replaceBlock((Block) stmts.get(0));
             return false;
         } else if (node.getParent() instanceof Block) {
-            final Set<String> ifVariableNames= getLocalVariableIdentifiers(node, false);
+            final Set<String> ifVariableNames= ASTNodes.getLocalVariableIdentifiers(node, false);
 
             final Set<String> followingVariableNames= new HashSet<String>();
-            for (final Statement statement : getNextSiblings(node)) {
-                followingVariableNames.addAll(getLocalVariableIdentifiers(statement, true));
+            for (final Statement statement : ASTNodes.getNextSiblings(node)) {
+                followingVariableNames.addAll(ASTNodes.getLocalVariableIdentifiers(statement, true));
             }
 
             if (!ifVariableNames.removeAll(followingVariableNames)) {
@@ -89,8 +88,8 @@ public class RemoveUselessBlockCleanUp extends AbstractCleanUpRule {
     }
 
     private void replaceBlock(final Block node) {
-        final ASTBuilder b= this.ctx.getASTBuilder();
+        final ASTNodeFactory b= this.ctx.getASTBuilder();
         final Refactorings r= this.ctx.getRefactorings();
-        r.replace(node, b.copyRange(statements(node)));
+        r.replace(node, b.copyRange(ASTNodes.statements(node)));
     }
 }

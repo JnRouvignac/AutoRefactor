@@ -26,24 +26,12 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.arg0;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.arguments;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.as;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasOperator;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasType;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.usesGivenSignature;
-import static org.autorefactor.jdt.internal.corext.dom.JavaConstants.ONE_LONG_LITERAL_RE;
-import static org.autorefactor.jdt.internal.corext.dom.JavaConstants.TEN_LONG_LITERAL_RE;
-import static org.autorefactor.jdt.internal.corext.dom.JavaConstants.ZERO_LONG_LITERAL_RE;
-import static org.eclipse.jdt.core.dom.InfixExpression.Operator.EQUALS;
-import static org.eclipse.jdt.core.dom.InfixExpression.Operator.NOT_EQUALS;
-import static org.eclipse.jdt.core.dom.InfixExpression.Operator.PLUS;
-import static org.eclipse.jdt.core.dom.PrefixExpression.Operator.NOT;
-
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
-import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
+import org.autorefactor.jdt.internal.corext.dom.JavaConstants;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.Expression;
@@ -92,9 +80,9 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
     @Override
     public boolean visit(ClassInstanceCreation node) {
         final ITypeBinding typeBinding= node.getType().resolveBinding();
-        if (hasType(typeBinding, BigDecimal.class.getCanonicalName(), BigInteger.class.getCanonicalName()) && arguments(node).size() == 1) {
-            final Expression arg0= arguments(node).get(0);
-            if (arg0 instanceof NumberLiteral && hasType(typeBinding, BigDecimal.class.getCanonicalName())) {
+        if (ASTNodes.hasType(typeBinding, BigDecimal.class.getCanonicalName(), BigInteger.class.getCanonicalName()) && ASTNodes.arguments(node).size() == 1) {
+            final Expression arg0= ASTNodes.arguments(node).get(0);
+            if (arg0 instanceof NumberLiteral && ASTNodes.hasType(typeBinding, BigDecimal.class.getCanonicalName())) {
                 final String token= ((NumberLiteral) arg0).getToken().replaceFirst("[lLfFdD]$", ""); //$NON-NLS-1$ $NON-NLS-2$
                 if (token.contains(".")) { //$NON-NLS-1$
                     // Only instantiation from double, not from integer
@@ -102,11 +90,11 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
                     return false;
                 } else if (getJavaMinorVersion() < 5) {
                     return true;
-                } else if (ZERO_LONG_LITERAL_RE.matcher(token).matches()) {
+                } else if (JavaConstants.ZERO_LONG_LITERAL_RE.matcher(token).matches()) {
                     return replaceWithQualifiedName(node, typeBinding, "ZERO"); //$NON-NLS-1$
-                } else if (ONE_LONG_LITERAL_RE.matcher(token).matches()) {
+                } else if (JavaConstants.ONE_LONG_LITERAL_RE.matcher(token).matches()) {
                     return replaceWithQualifiedName(node, typeBinding, "ONE"); //$NON-NLS-1$
-                } else if (TEN_LONG_LITERAL_RE.matcher(token).matches()) {
+                } else if (JavaConstants.TEN_LONG_LITERAL_RE.matcher(token).matches()) {
                     return replaceWithQualifiedName(node, typeBinding, "TEN"); //$NON-NLS-1$
                 } else {
                     ctx.getRefactorings().replace(node, getValueOf(typeBinding.getName(), token));
@@ -138,7 +126,7 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
     }
 
     private ASTNode getValueOf(String name, String numberLiteral) {
-        final ASTBuilder b= this.ctx.getASTBuilder();
+        final ASTNodeFactory b= this.ctx.getASTBuilder();
         return b.invoke(name, "valueOf", b.number(numberLiteral)); //$NON-NLS-1$
     }
 
@@ -148,8 +136,8 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
 
     @Override
     public boolean visit(PrefixExpression node) {
-        final MethodInvocation mi= as(node.getOperand(), MethodInvocation.class);
-        return !(NOT.equals(node.getOperator()) && mi != null) || maybeReplaceEquals(false, node, mi);
+        final MethodInvocation mi= ASTNodes.as(node.getOperand(), MethodInvocation.class);
+        return !(PrefixExpression.Operator.NOT.equals(node.getOperator()) && mi != null) || maybeReplaceEquals(false, node, mi);
     }
 
     @Override
@@ -157,21 +145,21 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
         if (node.getExpression() == null) {
             return true;
         }
-        if (getJavaMinorVersion() >= 5 && (usesGivenSignature(node, BigInteger.class.getCanonicalName(), "valueOf", long.class.getSimpleName()) //$NON-NLS-1$
-                || usesGivenSignature(node, BigDecimal.class.getCanonicalName(), "valueOf", long.class.getSimpleName()) //$NON-NLS-1$
-                || usesGivenSignature(node, BigDecimal.class.getCanonicalName(), "valueOf", double.class.getSimpleName()))) { //$NON-NLS-1$
+        if (getJavaMinorVersion() >= 5 && (ASTNodes.usesGivenSignature(node, BigInteger.class.getCanonicalName(), "valueOf", long.class.getSimpleName()) //$NON-NLS-1$
+                || ASTNodes.usesGivenSignature(node, BigDecimal.class.getCanonicalName(), "valueOf", long.class.getSimpleName()) //$NON-NLS-1$
+                || ASTNodes.usesGivenSignature(node, BigDecimal.class.getCanonicalName(), "valueOf", double.class.getSimpleName()))) { //$NON-NLS-1$
             final ITypeBinding typeBinding= node.getExpression().resolveTypeBinding();
-            final Expression arg0= arg0(node);
+            final Expression arg0= ASTNodes.arg0(node);
             if (arg0 instanceof NumberLiteral) {
                 final String token= ((NumberLiteral) arg0).getToken().replaceFirst("[lLfFdD]$", ""); //$NON-NLS-1$ $NON-NLS-2$
-                if (token.contains(".") && hasType(typeBinding, BigDecimal.class.getCanonicalName())) { //$NON-NLS-1$
+                if (token.contains(".") && ASTNodes.hasType(typeBinding, BigDecimal.class.getCanonicalName())) { //$NON-NLS-1$
                     this.ctx.getRefactorings().replace(node,
                             getClassInstanceCreatorNode((Name) node.getExpression(), token));
-                } else if (ZERO_LONG_LITERAL_RE.matcher(token).matches()) {
+                } else if (JavaConstants.ZERO_LONG_LITERAL_RE.matcher(token).matches()) {
                     replaceWithQualifiedName(node, typeBinding, "ZERO"); //$NON-NLS-1$
-                } else if (ONE_LONG_LITERAL_RE.matcher(token).matches()) {
+                } else if (JavaConstants.ONE_LONG_LITERAL_RE.matcher(token).matches()) {
                     replaceWithQualifiedName(node, typeBinding, "ONE"); //$NON-NLS-1$
-                } else if (TEN_LONG_LITERAL_RE.matcher(token).matches()) {
+                } else if (JavaConstants.TEN_LONG_LITERAL_RE.matcher(token).matches()) {
                     replaceWithQualifiedName(node, typeBinding, "TEN"); //$NON-NLS-1$
                 } else {
                     return true;
@@ -179,17 +167,17 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
                 return false;
             }
         } else if (!(node.getParent() instanceof PrefixExpression)
-                || !hasOperator((PrefixExpression) node.getParent(), NOT)) {
+                || !ASTNodes.hasOperator((PrefixExpression) node.getParent(), PrefixExpression.Operator.NOT)) {
             return maybeReplaceEquals(true, node, node);
         }
         return true;
     }
 
     private boolean maybeReplaceEquals(final boolean isPositive, final Expression node, final MethodInvocation mi) {
-        if (usesGivenSignature(mi, BigDecimal.class.getCanonicalName(), "equals", Object.class.getCanonicalName()) //$NON-NLS-1$
-                || usesGivenSignature(mi, BigInteger.class.getCanonicalName(), "equals", Object.class.getCanonicalName())) { //$NON-NLS-1$
-            final Expression arg0= arg0(mi);
-            if (hasType(arg0, BigDecimal.class.getCanonicalName(), BigInteger.class.getCanonicalName())) {
+        if (ASTNodes.usesGivenSignature(mi, BigDecimal.class.getCanonicalName(), "equals", Object.class.getCanonicalName()) //$NON-NLS-1$
+                || ASTNodes.usesGivenSignature(mi, BigInteger.class.getCanonicalName(), "equals", Object.class.getCanonicalName())) { //$NON-NLS-1$
+            final Expression arg0= ASTNodes.arg0(mi);
+            if (ASTNodes.hasType(arg0, BigDecimal.class.getCanonicalName(), BigInteger.class.getCanonicalName())) {
                 if (isInStringAppend(mi.getParent())) {
                     this.ctx.getRefactorings().replace(node, parenthesize(getCompareToNode(isPositive, mi)));
                 } else {
@@ -208,8 +196,8 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
     private boolean isInStringAppend(final ASTNode node) {
         if (node instanceof InfixExpression) {
             final InfixExpression expr= (InfixExpression) node;
-            if (hasOperator(expr, PLUS) || hasType(expr.getLeftOperand(), String.class.getCanonicalName())
-                    || hasType(expr.getRightOperand(), String.class.getCanonicalName())) {
+            if (ASTNodes.hasOperator(expr, InfixExpression.Operator.PLUS) || ASTNodes.hasType(expr.getLeftOperand(), String.class.getCanonicalName())
+                    || ASTNodes.hasType(expr.getRightOperand(), String.class.getCanonicalName())) {
                 return true;
             }
         }
@@ -217,14 +205,14 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
     }
 
     private ASTNode getClassInstanceCreatorNode(final Name className, final String numberLiteral) {
-        final ASTBuilder b= this.ctx.getASTBuilder();
+        final ASTNodeFactory b= this.ctx.getASTBuilder();
         return b.new0(className.getFullyQualifiedName(), b.string(numberLiteral));
     }
 
     private InfixExpression getCompareToNode(final boolean isPositive, final MethodInvocation node) {
-        final ASTBuilder b= this.ctx.getASTBuilder();
-        final MethodInvocation mi= b.invoke(b.copy(node.getExpression()), "compareTo", b.copy(arg0(node))); //$NON-NLS-1$
+        final ASTNodeFactory b= this.ctx.getASTBuilder();
+        final MethodInvocation mi= b.invoke(b.copy(node.getExpression()), "compareTo", b.copy(ASTNodes.arg0(node))); //$NON-NLS-1$
 
-        return b.infixExpr(mi, isPositive ? EQUALS : NOT_EQUALS, b.int0(0));
+        return b.infixExpr(mi, isPositive ? InfixExpression.Operator.EQUALS : InfixExpression.Operator.NOT_EQUALS, b.int0(0));
     }
 }

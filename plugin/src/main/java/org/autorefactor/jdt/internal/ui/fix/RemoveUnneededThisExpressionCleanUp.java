@@ -25,11 +25,7 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.as;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getEnclosingType;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isEqual;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.typeArguments;
-
+import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.util.NotImplementedException;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.AbstractTypeDeclaration;
@@ -73,9 +69,9 @@ public class RemoveUnneededThisExpressionCleanUp extends AbstractCleanUpRule {
 
     @Override
     public boolean visit(MethodInvocation node) {
-        final ThisExpression te= as(node.getExpression(), ThisExpression.class);
-        if (thisExpressionRefersToEnclosingType(te) && isCallingMethodDeclaredInEnclosingType(node)
-                && typeArguments(node).isEmpty()) {
+        final ThisExpression te= ASTNodes.as(node.getExpression(), ThisExpression.class);
+        if (RemoveUnneededThisExpressionCleanUp.thisExpressionRefersToEnclosingType(te) && isCallingMethodDeclaredInEnclosingType(node)
+                && ASTNodes.typeArguments(node).isEmpty()) {
             // Remove useless thisExpressions
             this.ctx.getRefactorings().remove(node.getExpression());
             return false;
@@ -85,30 +81,30 @@ public class RemoveUnneededThisExpressionCleanUp extends AbstractCleanUpRule {
 
     private static boolean thisExpressionRefersToEnclosingType(ThisExpression thisExpression) {
         return thisExpression != null
-                && thisExpressionRefersToEnclosingType(thisExpression.getQualifier(), thisExpression);
+                && RemoveUnneededThisExpressionCleanUp.thisExpressionRefersToEnclosingType(thisExpression.getQualifier(), thisExpression);
     }
 
     private static boolean thisExpressionRefersToEnclosingType(Name thisQualifierName, ASTNode node) {
         if (thisQualifierName == null) {
             return true;
         }
-        final ASTNode enclosingType= getEnclosingType(node);
+        final ASTNode enclosingType= ASTNodes.getEnclosingType(node);
         if (enclosingType instanceof AnonymousClassDeclaration) {
             return false;
         }
         final AbstractTypeDeclaration ancestor= (AbstractTypeDeclaration) enclosingType;
         if (thisQualifierName instanceof SimpleName) {
-            return isEqual((SimpleName) thisQualifierName, ancestor.getName());
+            return ASTNodes.isEqual((SimpleName) thisQualifierName, ancestor.getName());
         } else if (thisQualifierName instanceof QualifiedName) {
             final QualifiedName qn= (QualifiedName) thisQualifierName;
-            return isEqual(qn.getName(), ancestor.getName())
-                    && thisExpressionRefersToEnclosingType(qn.getQualifier(), ancestor);
+            return ASTNodes.isEqual(qn.getName(), ancestor.getName())
+                    && RemoveUnneededThisExpressionCleanUp.thisExpressionRefersToEnclosingType(qn.getQualifier(), ancestor);
         }
         throw new NotImplementedException(thisQualifierName);
     }
 
     private boolean isCallingMethodDeclaredInEnclosingType(MethodInvocation node) {
-        final ASTNode currentType= getEnclosingType(node);
+        final ASTNode currentType= ASTNodes.getEnclosingType(node);
         final IMethodBinding mb= node.resolveMethodBinding();
         if (currentType instanceof AnonymousClassDeclaration) {
             final AnonymousClassDeclaration c= (AnonymousClassDeclaration) currentType;

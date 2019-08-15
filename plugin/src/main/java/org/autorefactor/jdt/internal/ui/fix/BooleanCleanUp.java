@@ -26,35 +26,17 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.as;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.asExpression;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.asList;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.fragments;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getAncestor;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getBooleanLiteral;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getBooleanObject;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getNextSibling;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getPreviousSibling;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasOperator;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.imports;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isPassive;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isPrimitive;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isSameVariable;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.match;
-import static org.eclipse.jdt.core.dom.Assignment.Operator.ASSIGN;
-import static org.eclipse.jdt.core.dom.InfixExpression.Operator.CONDITIONAL_AND;
-import static org.eclipse.jdt.core.dom.InfixExpression.Operator.CONDITIONAL_OR;
-
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory.Copy;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.ASTSemanticMatcher;
 import org.autorefactor.jdt.internal.corext.dom.BlockSubVisitor;
-import org.autorefactor.jdt.internal.corext.dom.ASTBuilder.Copy;
 import org.autorefactor.util.IllegalArgumentException;
 import org.autorefactor.util.IllegalStateException;
 import org.autorefactor.util.NotImplementedException;
@@ -74,7 +56,7 @@ import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.ImportDeclaration;
-import org.eclipse.jdt.core.dom.InfixExpression.Operator;
+import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.Name;
 import org.eclipse.jdt.core.dom.PrimitiveType;
@@ -136,7 +118,7 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
         public boolean match(BooleanLiteral node, Object other) {
             if (other instanceof Expression) {
                 final Expression expr= (Expression) other;
-                if (areOppositeBooleanValues(node, expr)) {
+                if (BooleanCleanUp.areOppositeBooleanValues(node, expr)) {
                     matches.put(expr, node);
                     return true;
                 }
@@ -148,7 +130,7 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
         public boolean match(QualifiedName node, Object other) {
             if (other instanceof Expression) {
                 final Expression expr= (Expression) other;
-                if (this.previousMatches.containsKey(other) || areOppositeBooleanValues(node, expr)) {
+                if (this.previousMatches.containsKey(other) || BooleanCleanUp.areOppositeBooleanValues(node, expr)) {
                     matches.put(expr, node);
                     return true;
                 }
@@ -183,8 +165,8 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
      * Compares mixed boolean literal and Boolean object values against each other.
      */
     private static boolean areOppositeBooleanValues(Expression expr1, Expression expr2) {
-        final Boolean b1= getBooleanLiteral(expr1);
-        final Boolean b2= getBooleanLiteral(expr2);
+        final Boolean b1= ASTNodes.getBooleanLiteral(expr1);
+        final Boolean b2= ASTNodes.getBooleanLiteral(expr2);
         return b1 != null && b2 != null && !b1.equals(b2);
     }
 
@@ -202,7 +184,7 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
         @Override
         public boolean visit(BooleanLiteral node) {
             if (this.nodesToReplace.contains(node)) {
-                Boolean booleanValue= getBooleanLiteral(node);
+                Boolean booleanValue= ASTNodes.getBooleanLiteral(node);
                 Expression orientedCondition;
                 if (booleanValue) {
                     orientedCondition= b.copy(ifCondition);
@@ -218,8 +200,8 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
         @Override
         public boolean visit(QualifiedName node) {
             if (this.nodesToReplace.contains(node)) {
-                final QualifiedName qn= as(node, QualifiedName.class);
-                Boolean booleanValue= getBooleanObject(qn);
+                final QualifiedName qn= ASTNodes.as(node, QualifiedName.class);
+                Boolean booleanValue= ASTNodes.getBooleanObject(qn);
                 if (booleanValue != null) {
                     Expression orientedCondition;
                     if (booleanValue) {
@@ -253,7 +235,7 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
         }
     }
 
-    private ASTBuilder b;
+    private ASTNodeFactory b;
 
     @Override
     public void setRefactoringContext(RefactoringContext ctx) {
@@ -286,13 +268,13 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
             ctx.getRefactorings().remove(elseRs);
             return false;
         }
-        final MethodDeclaration md= getAncestor(node, MethodDeclaration.class);
+        final MethodDeclaration md= ASTNodes.getAncestor(node, MethodDeclaration.class);
         final Type returnType= md.getReturnType2();
         if (returnType != null && returnType.isPrimitiveType()) {
             final PrimitiveType pt= (PrimitiveType) returnType;
             if (PrimitiveType.BOOLEAN.equals(pt.getPrimitiveTypeCode())) {
-                final Boolean thenBool= getBooleanLiteral(thenRs.getExpression());
-                final Boolean elseBool= getBooleanLiteral(elseRs.getExpression());
+                final Boolean thenBool= ASTNodes.getBooleanLiteral(thenRs.getExpression());
+                final Boolean elseBool= ASTNodes.getBooleanLiteral(elseRs.getExpression());
                 newRs= getReturnStatement(node, thenBool, elseBool, thenRs.getExpression(), elseRs.getExpression());
                 if (newRs != null) {
                     ctx.getRefactorings().replace(node, newRs);
@@ -305,10 +287,10 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
     }
 
     private boolean noThenReturnStmt(final IfStatement node) {
-        final Assignment thenA= asExpression(node.getThenStatement(), Assignment.class);
-        if (hasOperator(thenA, ASSIGN) && asList(node.getElseStatement()).isEmpty()
+        final Assignment thenA= ASTNodes.asExpression(node.getThenStatement(), Assignment.class);
+        if (ASTNodes.hasOperator(thenA, Assignment.Operator.ASSIGN) && ASTNodes.asList(node.getElseStatement()).isEmpty()
                 && (thenA.getLeftHandSide() instanceof Name || thenA.getLeftHandSide() instanceof FieldAccess)) {
-            final Statement previousSibling= getPreviousSibling(node);
+            final Statement previousSibling= ASTNodes.getPreviousSibling(node);
             if (previousSibling instanceof VariableDeclarationStatement) {
                 final VariableDeclarationStatement vds= (VariableDeclarationStatement) previousSibling;
                 VariableDeclarationFragment vdf= getVariableDeclarationFragment(vds, thenA.getLeftHandSide());
@@ -321,8 +303,8 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
                     }
                 }
             } else if (previousSibling instanceof ExpressionStatement) {
-                final Assignment elseA= asExpression(previousSibling, Assignment.class);
-                if (hasOperator(elseA, ASSIGN) && isSameVariable(thenA.getLeftHandSide(), elseA.getLeftHandSide())) {
+                final Assignment elseA= ASTNodes.asExpression(previousSibling, Assignment.class);
+                if (ASTNodes.hasOperator(elseA, Assignment.Operator.ASSIGN) && ASTNodes.isSameVariable(thenA.getLeftHandSide(), elseA.getLeftHandSide())) {
                     final ITypeBinding typeBinding= elseA.resolveTypeBinding();
                     return maybeReplace(node, thenA, typeBinding, elseA.getRightHandSide());
                 }
@@ -356,7 +338,7 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
 
     private Statement toSingleStmt(final Statement stmt) {
         if (stmt instanceof Block) {
-            final List<Statement> stmts= asList(stmt);
+            final List<Statement> stmts= ASTNodes.asList(stmt);
             if (stmts.size() == 1) {
                 return stmts.get(0);
             }
@@ -379,8 +361,8 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
         return null;
     }
 
-    private Operator getConditionalOperator(boolean isOrOperator) {
-        return isOrOperator ? CONDITIONAL_OR : CONDITIONAL_AND;
+    private InfixExpression.Operator getConditionalOperator(boolean isOrOperator) {
+        return isOrOperator ? InfixExpression.Operator.CONDITIONAL_OR : InfixExpression.Operator.CONDITIONAL_AND;
     }
 
     private Expression signExpr(Expression ie, boolean isPositive) {
@@ -395,8 +377,8 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
         if (vds == null) {
             return null;
         }
-        for (VariableDeclarationFragment vdf : fragments(vds)) {
-            if (isSameVariable(expr, vdf)) {
+        for (VariableDeclarationFragment vdf : ASTNodes.fragments(vds)) {
+            if (ASTNodes.isSameVariable(expr, vdf)) {
                 return vdf;
             }
         }
@@ -405,13 +387,13 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
 
     private ReturnStatement getReturnStatement(final IfStatement node, final Expression thenExpression,
             final Expression elseExpression) {
-        if (areOppositeBooleanValues(thenExpression, elseExpression)) {
+        if (BooleanCleanUp.areOppositeBooleanValues(thenExpression, elseExpression)) {
             Expression exprToReturn= b.copy(node.getExpression());
-            if (getBooleanLiteral(elseExpression)) {
+            if (ASTNodes.getBooleanLiteral(elseExpression)) {
                 exprToReturn= b.negate(exprToReturn, Copy.NONE);
             }
 
-            final MethodDeclaration md= getAncestor(node, MethodDeclaration.class);
+            final MethodDeclaration md= ASTNodes.getAncestor(node, MethodDeclaration.class);
             final Expression returnExpr= getReturnExpression(md, exprToReturn);
             if (returnExpr != null) {
                 return b.return0(returnExpr);
@@ -439,10 +421,10 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
 
     private Expression newExpressionOrNull(String expressionTypeName, Expression condition, Expression thenExpression,
             Expression elseExpression) {
-        Boolean thenLiteral= getBooleanLiteral(thenExpression);
-        Boolean elseLiteral= getBooleanLiteral(elseExpression);
+        Boolean thenLiteral= ASTNodes.getBooleanLiteral(thenExpression);
+        Boolean elseLiteral= ASTNodes.getBooleanLiteral(elseExpression);
 
-        if (areOppositeBooleanValues(thenExpression, elseExpression)) {
+        if (BooleanCleanUp.areOppositeBooleanValues(thenExpression, elseExpression)) {
             final Name booleanName= getBooleanName(condition);
             Expression orientedCondition;
             if (thenLiteral) {
@@ -451,7 +433,7 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
                 orientedCondition= b.negate(condition, Copy.COPY);
             }
             return getExpression(orientedCondition, expressionTypeName, booleanName);
-        } else if ((isPrimitive(thenExpression) || isPrimitive(elseExpression))
+        } else if ((ASTNodes.isPrimitive(thenExpression) || ASTNodes.isPrimitive(elseExpression))
                 && ("boolean".equals(expressionTypeName) //$NON-NLS-1$
                         || Boolean.class.getCanonicalName().equals(expressionTypeName))) {
             // If both expressions are primitive, there cannot be any NPE
@@ -459,15 +441,15 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
             // care
             if (thenLiteral != null && elseLiteral == null) {
                 if (thenLiteral) {
-                    return b.infixExpr(b.copy(condition), CONDITIONAL_OR, b.copy(elseExpression));
+                    return b.infixExpr(b.copy(condition), InfixExpression.Operator.CONDITIONAL_OR, b.copy(elseExpression));
                 } else {
-                    return b.infixExpr(b.negate(condition, Copy.COPY), CONDITIONAL_AND, b.copy(elseExpression));
+                    return b.infixExpr(b.negate(condition, Copy.COPY), InfixExpression.Operator.CONDITIONAL_AND, b.copy(elseExpression));
                 }
             } else if (thenLiteral == null && elseLiteral != null) {
                 if (elseLiteral) {
-                    return b.infixExpr(b.negate(condition, Copy.COPY), CONDITIONAL_OR, b.copy(thenExpression));
+                    return b.infixExpr(b.negate(condition, Copy.COPY), InfixExpression.Operator.CONDITIONAL_OR, b.copy(thenExpression));
                 } else {
-                    return b.infixExpr(b.copy(condition), CONDITIONAL_AND, b.copy(thenExpression));
+                    return b.infixExpr(b.copy(condition), InfixExpression.Operator.CONDITIONAL_AND, b.copy(thenExpression));
                 }
             }
         }
@@ -484,14 +466,14 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
     }
 
     private Name getBooleanName(ASTNode node) {
-        if (!isSimpleNameAlreadyUsed("Boolean", getAncestor(node, CompilationUnit.class))) { //$NON-NLS-1$
+        if (!isSimpleNameAlreadyUsed("Boolean", ASTNodes.getAncestor(node, CompilationUnit.class))) { //$NON-NLS-1$
             return b.name("Boolean"); //$NON-NLS-1$
         }
         return b.name(Boolean.class.getCanonicalName());
     }
 
     private boolean isSimpleNameAlreadyUsed(String simpleName, CompilationUnit cu) {
-        for (ImportDeclaration id : imports(cu)) {
+        for (ImportDeclaration id : ASTNodes.imports(cu)) {
             if (id.getName() instanceof QualifiedName) {
                 QualifiedName f= (QualifiedName) id.getName();
                 if (simpleName.equals(f.getName().getIdentifier())) {
@@ -505,10 +487,10 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
     }
 
     private boolean visitIfStatement(final IfStatement node) {
-        if (isPassive(node.getExpression())) {
+        if (ASTNodes.isPassive(node.getExpression())) {
             final BooleanASTMatcher matcher= new BooleanASTMatcher();
 
-            if (match(matcher, node.getThenStatement(), node.getElseStatement())
+            if (ASTNodes.match(matcher, node.getThenStatement(), node.getElseStatement())
                     && (matcher.matches.size() <= 1 || node.getExpression() instanceof Name)) {
                 // Then and else statement are matching, bar the boolean values
                 // which are opposite
@@ -516,7 +498,7 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
                 // Identify the node that need to be replaced after the copy
                 final BooleanASTMatcher matcher2= new BooleanASTMatcher(matcher.matches);
 
-                if (match(matcher2, copyStmt, node.getElseStatement())) {
+                if (ASTNodes.match(matcher2, copyStmt, node.getElseStatement())) {
                     final Expression ifCondition= node.getExpression();
                     copyStmt.accept(
                             new BooleanReplaceVisitor(ifCondition, matcher2.matches.values(), getBooleanName(node)));
@@ -528,11 +510,11 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
             }
         }
 
-        final ReturnStatement thenRs= as(node.getThenStatement(), ReturnStatement.class);
+        final ReturnStatement thenRs= ASTNodes.as(node.getThenStatement(), ReturnStatement.class);
 
         if (thenRs != null) {
-            final ReturnStatement elseRs= as(
-                    node.getElseStatement() != null ? node.getElseStatement() : getNextSibling(node),
+            final ReturnStatement elseRs= ASTNodes.as(
+                    node.getElseStatement() != null ? node.getElseStatement() : ASTNodes.getNextSibling(node),
                     ReturnStatement.class);
 
             return (elseRs == null) || withThenReturnStmt(node, thenRs, elseRs);

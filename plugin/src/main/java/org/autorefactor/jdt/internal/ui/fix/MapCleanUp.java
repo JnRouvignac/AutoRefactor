@@ -26,20 +26,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.arg0;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.arguments;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.as;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.asExpression;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getPreviousSibling;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getUniqueFragment;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasOperator;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasType;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isCastCompatible;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.usesGivenSignature;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isPrimitive;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isSameLocalVariable;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.match;
-
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.IdentityHashMap;
@@ -51,7 +37,8 @@ import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 
-import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.BlockSubVisitor;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Block;
@@ -107,21 +94,21 @@ public class MapCleanUp extends AbstractCleanUpRule {
 
         @Override
         public boolean visit(ExpressionStatement node) {
-            final MethodInvocation mi= asExpression(node, MethodInvocation.class);
-            if (usesGivenSignature(mi, Map.class.getCanonicalName(), "putAll", Map.class.getCanonicalName())) { //$NON-NLS-1$
-                final Expression arg0= arg0(mi);
-                final Statement previousStmt= getPreviousSibling(node);
+            final MethodInvocation mi= ASTNodes.asExpression(node, MethodInvocation.class);
+            if (ASTNodes.usesGivenSignature(mi, Map.class.getCanonicalName(), "putAll", Map.class.getCanonicalName())) { //$NON-NLS-1$
+                final Expression arg0= ASTNodes.arg0(mi);
+                final Statement previousStmt= ASTNodes.getPreviousSibling(node);
 
-                final Assignment as= asExpression(previousStmt, Assignment.class);
-                if (hasOperator(as, Assignment.Operator.ASSIGN)) {
+                final Assignment as= ASTNodes.asExpression(previousStmt, Assignment.class);
+                if (ASTNodes.hasOperator(as, Assignment.Operator.ASSIGN)) {
                     final Expression lhs= as.getLeftHandSide();
-                    if (lhs instanceof SimpleName && isSameLocalVariable(lhs, mi.getExpression())) {
+                    if (lhs instanceof SimpleName && ASTNodes.isSameLocalVariable(lhs, mi.getExpression())) {
                         return maybeReplaceInitializer(as.getRightHandSide(), arg0, node);
                     }
                 } else if (previousStmt instanceof VariableDeclarationStatement) {
-                    final VariableDeclarationFragment vdf= getUniqueFragment(
+                    final VariableDeclarationFragment vdf= ASTNodes.getUniqueFragment(
                             (VariableDeclarationStatement) previousStmt);
-                    if (vdf != null && isSameLocalVariable(vdf, mi.getExpression())) {
+                    if (vdf != null && ASTNodes.isSameLocalVariable(vdf, mi.getExpression())) {
                         return maybeReplaceInitializer(vdf.getInitializer(), arg0, node);
                     }
                 }
@@ -131,9 +118,9 @@ public class MapCleanUp extends AbstractCleanUpRule {
 
         private boolean maybeReplaceInitializer(Expression nodeToReplace, final Expression arg0,
                 ExpressionStatement nodeToRemove) {
-            final ClassInstanceCreation cic= as(nodeToReplace, ClassInstanceCreation.class);
-            if (canReplaceInitializer(cic, arg0) && isCastCompatible(nodeToReplace, arg0)) {
-                final ASTBuilder b= ctx.getASTBuilder();
+            final ClassInstanceCreation cic= ASTNodes.as(nodeToReplace, ClassInstanceCreation.class);
+            if (canReplaceInitializer(cic, arg0) && ASTNodes.isCastCompatible(nodeToReplace, arg0)) {
+                final ASTNodeFactory b= ctx.getASTBuilder();
                 ctx.getRefactorings().replace(nodeToReplace, b.new0(b.copy(cic.getType()), b.copy(arg0)));
                 ctx.getRefactorings().remove(nodeToRemove);
                 setResult(false);
@@ -146,26 +133,26 @@ public class MapCleanUp extends AbstractCleanUpRule {
             if (cic == null) {
                 return false;
             }
-            final List<Expression> args= arguments(cic);
+            final List<Expression> args= ASTNodes.arguments(cic);
             final boolean noArgsCtor= args.isEmpty();
             final boolean mapCapacityCtor= isValidCapacityParameter(sourceMap, args);
-            return (noArgsCtor && hasType(cic, ConcurrentHashMap.class.getCanonicalName(),
+            return (noArgsCtor && ASTNodes.hasType(cic, ConcurrentHashMap.class.getCanonicalName(),
                     ConcurrentSkipListMap.class.getCanonicalName(), Hashtable.class.getCanonicalName(), HashMap.class.getCanonicalName(),
                     IdentityHashMap.class.getCanonicalName(), LinkedHashMap.class.getCanonicalName(), TreeMap.class.getCanonicalName(),
                     WeakHashMap.class.getCanonicalName()))
-                    || (mapCapacityCtor && hasType(cic, ConcurrentHashMap.class.getCanonicalName(), Hashtable.class.getCanonicalName(),
+                    || (mapCapacityCtor && ASTNodes.hasType(cic, ConcurrentHashMap.class.getCanonicalName(), Hashtable.class.getCanonicalName(),
                             HashMap.class.getCanonicalName(), IdentityHashMap.class.getCanonicalName(), LinkedHashMap.class.getCanonicalName(),
                             WeakHashMap.class.getCanonicalName()));
         }
 
         private boolean isValidCapacityParameter(Expression sourceMap, final List<Expression> args) {
-            if (args.size() == 1 && isPrimitive(args.get(0), int.class.getSimpleName())) {
+            if (args.size() == 1 && ASTNodes.isPrimitive(args.get(0), int.class.getSimpleName())) {
                 final Object constant= args.get(0).resolveConstantExpressionValue();
-                final MethodInvocation mi= as(args.get(0), MethodInvocation.class);
+                final MethodInvocation mi= ASTNodes.as(args.get(0), MethodInvocation.class);
                 if (constant != null) {
                     return constant.equals(0);
                 } else {
-                    return usesGivenSignature(mi, Map.class.getCanonicalName(), "size") && match(mi.getExpression(), sourceMap); //$NON-NLS-1$
+                    return ASTNodes.usesGivenSignature(mi, Map.class.getCanonicalName(), "size") && ASTNodes.match(mi.getExpression(), sourceMap); //$NON-NLS-1$
                 }
             }
             return false;

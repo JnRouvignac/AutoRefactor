@@ -25,14 +25,10 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.as;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasType;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isSameVariable;
-import static org.eclipse.jdt.core.dom.Assignment.Operator.ASSIGN;
-
 import java.util.Arrays;
 
-import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
@@ -71,12 +67,12 @@ public class StringBuilderMethodRatherThanReassignationCleanUp extends AbstractC
     public boolean visit(Assignment node) {
         final Expression targetVar= node.getLeftHandSide();
         Expression var= node.getRightHandSide();
-        if (ASSIGN.equals(node.getOperator()) && hasType(targetVar, StringBuffer.class.getCanonicalName(), StringBuilder.class.getCanonicalName())
+        if (Assignment.Operator.ASSIGN.equals(node.getOperator()) && ASTNodes.hasType(targetVar, StringBuffer.class.getCanonicalName(), StringBuilder.class.getCanonicalName())
                 && var instanceof MethodInvocation) {
             var= getVar(var);
 
-            if (isSameVariable(targetVar, var)) {
-                final ASTBuilder b= this.ctx.getASTBuilder();
+            if (ASTNodes.isSameVariable(targetVar, var)) {
+                final ASTNodeFactory b= this.ctx.getASTBuilder();
                 ctx.getRefactorings().replace(node, b.copy(node.getRightHandSide()));
                 return false;
             }
@@ -85,10 +81,10 @@ public class StringBuilderMethodRatherThanReassignationCleanUp extends AbstractC
     }
 
     private Expression getVar(final Expression var) {
-        final MethodInvocation mi= as(var, MethodInvocation.class);
+        final MethodInvocation mi= ASTNodes.as(var, MethodInvocation.class);
         if (var instanceof Name) {
             return var;
-        } else if (mi != null && hasType(mi.getExpression(), StringBuffer.class.getCanonicalName(), StringBuilder.class.getCanonicalName())
+        } else if (mi != null && ASTNodes.hasType(mi.getExpression(), StringBuffer.class.getCanonicalName(), StringBuilder.class.getCanonicalName())
                 && Arrays.asList("append", "appendCodePoint", "delete", "deleteCharAt", "insert", "replace", "reverse") //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$ $NON-NLS-4$ $NON-NLS-5$ $NON-NLS-6$ $NON-NLS-7$
                         .contains(mi.getName().getIdentifier())) {
             return getVar(mi.getExpression());

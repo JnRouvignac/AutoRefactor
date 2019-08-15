@@ -26,25 +26,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getCommentList;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getFileName;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasType;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.modifiers;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.tags;
-import static org.eclipse.jdt.core.dom.TagElement.TAG_AUTHOR;
-import static org.eclipse.jdt.core.dom.TagElement.TAG_DEPRECATED;
-import static org.eclipse.jdt.core.dom.TagElement.TAG_EXCEPTION;
-import static org.eclipse.jdt.core.dom.TagElement.TAG_INHERITDOC;
-import static org.eclipse.jdt.core.dom.TagElement.TAG_PARAM;
-import static org.eclipse.jdt.core.dom.TagElement.TAG_RETURN;
-import static org.eclipse.jdt.core.dom.TagElement.TAG_SEE;
-import static org.eclipse.jdt.core.dom.TagElement.TAG_SERIAL;
-import static org.eclipse.jdt.core.dom.TagElement.TAG_SERIALDATA;
-import static org.eclipse.jdt.core.dom.TagElement.TAG_SERIALFIELD;
-import static org.eclipse.jdt.core.dom.TagElement.TAG_SINCE;
-import static org.eclipse.jdt.core.dom.TagElement.TAG_THROWS;
-import static org.eclipse.jdt.core.dom.TagElement.TAG_VERSION;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -53,6 +34,7 @@ import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.SourceLocation;
 import org.autorefactor.util.NotImplementedException;
 import org.autorefactor.util.Pair;
@@ -153,24 +135,24 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
     @Override
     public boolean visit(BlockComment node) {
         final String comment= getComment(node);
-        if (EMPTY_BLOCK_COMMENT.matcher(comment).matches()) {
+        if (CommentsCleanUp.EMPTY_BLOCK_COMMENT.matcher(comment).matches()) {
             this.ctx.getRefactorings().remove(node);
             return false;
         }
         final ASTNode nextNode= getNextNode(node);
         if (acceptJavadoc(nextNode) && !betterCommentExist(node, nextNode)) {
-            if (ECLIPSE_GENERATED_NON_JAVADOC.matcher(comment).find()) {
+            if (CommentsCleanUp.ECLIPSE_GENERATED_NON_JAVADOC.matcher(comment).find()) {
                 this.ctx.getRefactorings().remove(node);
             } else {
                 this.ctx.getRefactorings().toJavadoc(node);
             }
             return false;
         }
-        final Matcher emptyLineAtStartMatcher= EMPTY_LINE_AT_START_OF_BLOCK_COMMENT.matcher(comment);
+        final Matcher emptyLineAtStartMatcher= CommentsCleanUp.EMPTY_LINE_AT_START_OF_BLOCK_COMMENT.matcher(comment);
         if (emptyLineAtStartMatcher.find()) {
             return replaceEmptyLineAtStartOfComment(node, emptyLineAtStartMatcher);
         }
-        final Matcher emptyLineAtEndMatcher= EMPTY_LINE_AT_END_OF_BLOCK_COMMENT.matcher(comment);
+        final Matcher emptyLineAtEndMatcher= CommentsCleanUp.EMPTY_LINE_AT_END_OF_BLOCK_COMMENT.matcher(comment);
         if (emptyLineAtEndMatcher.find()) {
             return replaceEmptyLineAtEndOfComment(node, emptyLineAtEndMatcher);
         }
@@ -223,22 +205,22 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
     public boolean visit(Javadoc node) {
         final String comment= getComment(node);
         final boolean isWellFormattedInheritDoc= "/** {@inheritDoc} */".equals(comment); //$NON-NLS-1$
-        final Matcher emptyLineAtStartMatcher= EMPTY_LINE_AT_START_OF_JAVADOC.matcher(comment);
-        final Matcher emptyLineAtEndMatcher= EMPTY_LINE_AT_END_OF_BLOCK_COMMENT.matcher(comment);
-        if (EMPTY_JAVADOC.matcher(comment).matches()) {
+        final Matcher emptyLineAtStartMatcher= CommentsCleanUp.EMPTY_LINE_AT_START_OF_JAVADOC.matcher(comment);
+        final Matcher emptyLineAtEndMatcher= CommentsCleanUp.EMPTY_LINE_AT_END_OF_BLOCK_COMMENT.matcher(comment);
+        if (CommentsCleanUp.EMPTY_JAVADOC.matcher(comment).matches()) {
             this.ctx.getRefactorings().remove(node);
             return false;
         } else if (emptyLineAtStartMatcher.find()) {
             return replaceEmptyLineAtStartOfComment(node, emptyLineAtStartMatcher);
         } else if (emptyLineAtEndMatcher.find()) {
             return replaceEmptyLineAtEndOfComment(node, emptyLineAtEndMatcher);
-        } else if (allTagsEmpty(tags(node))) {
+        } else if (allTagsEmpty(ASTNodes.tags(node))) {
             this.ctx.getRefactorings().remove(node);
             return false;
         } else if (!acceptJavadoc(getNextNode(node)) && node.getStartPosition() != 0) {
             this.ctx.getRefactorings().replace(node, comment.replace("/**", "/*")); //$NON-NLS-1$ $NON-NLS-2$
             return false;
-        } else if (JAVADOC_ONLY_INHERITDOC.matcher(comment).matches()) {
+        } else if (CommentsCleanUp.JAVADOC_ONLY_INHERITDOC.matcher(comment).matches()) {
             final ASTNode nextNode= getNextNode(node);
             if (hasOverrideAnnotation(nextNode)) {
                 // {@inheritDoc} tag is redundant with @Override annotation
@@ -255,14 +237,14 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
                     return false;
                 }
             }
-        } else if (!isWellFormattedInheritDoc && !JAVADOC_HAS_PUNCTUATION.matcher(comment).find()) {
+        } else if (!isWellFormattedInheritDoc && !CommentsCleanUp.JAVADOC_HAS_PUNCTUATION.matcher(comment).find()) {
             final String newComment= addPeriodAtEndOfFirstLine(node, comment);
             if (newComment != null) {
                 this.ctx.getRefactorings().replace(node, newComment);
                 return false;
             }
         } else {
-            final Matcher m= JAVADOC_FIRST_LETTER_LOWERCASE.matcher(comment);
+            final Matcher m= CommentsCleanUp.JAVADOC_FIRST_LETTER_LOWERCASE.matcher(comment);
             if (m.matches() && Character.isLowerCase(m.group(2).charAt(0))) {
                 String newComment= m.group(1) + m.group(2).toUpperCase() + m.group(3);
                 if (!newComment.equals(comment)) {
@@ -283,8 +265,8 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
 
     private boolean hasOverrideAnnotation(ASTNode node) {
         if (node instanceof BodyDeclaration) {
-            for (IExtendedModifier modifier : modifiers((BodyDeclaration) node)) {
-                return hasType(getTypeName(modifier), Override.class.getCanonicalName());
+            for (IExtendedModifier modifier : ASTNodes.modifiers((BodyDeclaration) node)) {
+                return ASTNodes.hasType(getTypeName(modifier), Override.class.getCanonicalName());
             }
         }
         return false;
@@ -300,7 +282,7 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
     }
 
     private boolean hasNoTags(Javadoc node) {
-        for (TagElement tag : tags(node)) {
+        for (TagElement tag : ASTNodes.tags(node)) {
             if (tag.getTagName() != null) {
                 return false;
             }
@@ -323,7 +305,7 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
     private String addPeriodAtEndOfFirstLine(Javadoc node, String comment) {
         String beforeFirstTag= comment;
         String afterFirstTag= ""; //$NON-NLS-1$
-        final Matcher m= FIRST_JAVADOC_TAG.matcher(comment);
+        final Matcher m= CommentsCleanUp.FIRST_JAVADOC_TAG.matcher(comment);
         if (m.find()) {
             if (m.start() == 0) {
                 return null;
@@ -331,9 +313,9 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
             beforeFirstTag= comment.substring(0, m.start());
             afterFirstTag= comment.substring(m.start());
         }
-        final Matcher matcher= JAVADOC_WITHOUT_PUNCTUATION.matcher(beforeFirstTag);
+        final Matcher matcher= CommentsCleanUp.JAVADOC_WITHOUT_PUNCTUATION.matcher(beforeFirstTag);
         if (matcher.matches()) {
-            final List<TagElement> tagElements= tags(node);
+            final List<TagElement> tagElements= ASTNodes.tags(node);
             if (tagElements.size() >= 2) {
                 final TagElement firstLine= tagElements.get(0);
                 final int relativeStart= firstLine.getStartPosition() - node.getStartPosition();
@@ -373,24 +355,24 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
 
     private boolean isNotEmpty(TagElement tag, boolean throwIfUnknown) {
         final String tagName= tag.getTagName();
-        if (tagName == null || TAG_AUTHOR.equals(tagName)
+        if (tagName == null || TagElement.TAG_AUTHOR.equals(tagName)
         // || TAG_CODE.equals(tagName)
-                || TAG_DEPRECATED.equals(tagName)
+                || TagElement.TAG_DEPRECATED.equals(tagName)
                 // || TAG_DOCROOT.equals(tagName)
                 // || TAG_LINK.equals(tagName)
                 // || TAG_LINKPLAIN.equals(tagName)
                 // || TAG_LITERAL.equals(tagName)
-                || TAG_RETURN.equals(tagName) || TAG_SEE.equals(tagName) || TAG_SERIAL.equals(tagName)
-                || TAG_SERIALDATA.equals(tagName) || TAG_SERIALFIELD.equals(tagName) || TAG_SINCE.equals(tagName)
+                || TagElement.TAG_RETURN.equals(tagName) || TagElement.TAG_SEE.equals(tagName) || TagElement.TAG_SERIAL.equals(tagName)
+                || TagElement.TAG_SERIALDATA.equals(tagName) || TagElement.TAG_SERIALFIELD.equals(tagName) || TagElement.TAG_SINCE.equals(tagName)
                 // || TAG_VALUE.equals(tagName)
-                || TAG_VERSION.equals(tagName)) {
+                || TagElement.TAG_VERSION.equals(tagName)) {
             // TODO JNR a return tag repeating the return type of the method is useless
             return anyTextElementNotEmpty(tag.fragments(), throwIfUnknown);
-        } else if (TAG_EXCEPTION.equals(tagName) || TAG_PARAM.equals(tagName) || TAG_THROWS.equals(tagName)) {
+        } else if (TagElement.TAG_EXCEPTION.equals(tagName) || TagElement.TAG_PARAM.equals(tagName) || TagElement.TAG_THROWS.equals(tagName)) {
             // TODO JNR a @throws tag repeating the checked exceptions of the method is
             // useless
             return !isTagEmptyOrWithSimpleNameOnly(tag);
-        } else if (!TAG_INHERITDOC.equals(tagName) && throwIfUnknown) {
+        } else if (!TagElement.TAG_INHERITDOC.equals(tagName) && throwIfUnknown) {
             throw new NotImplementedException(tag, "for tagName " + tagName); //$NON-NLS-1$
         }
         return true;
@@ -433,11 +415,11 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
     @Override
     public boolean visit(LineComment node) {
         final String comment= getComment(node);
-        if (EMPTY_LINE_COMMENT.matcher(comment).matches() || ECLIPSE_GENERATED_TODOS.matcher(comment).matches()) {
+        if (CommentsCleanUp.EMPTY_LINE_COMMENT.matcher(comment).matches() || CommentsCleanUp.ECLIPSE_GENERATED_TODOS.matcher(comment).matches()) {
             this.ctx.getRefactorings().remove(node);
             return false;
-        } else if (!TOOLS_CONTROL_INSTRUCTIONS.matcher(comment).matches()
-                && !ECLIPSE_IGNORE_NON_EXTERNALIZED_STRINGS.matcher(comment).matches()) {
+        } else if (!CommentsCleanUp.TOOLS_CONTROL_INSTRUCTIONS.matcher(comment).matches()
+                && !CommentsCleanUp.ECLIPSE_IGNORE_NON_EXTERNALIZED_STRINGS.matcher(comment).matches()) {
             final ASTNode nextNode= getNextNode(node);
             final ASTNode previousNode= getPreviousSibling(nextNode);
             if (previousNode != null && isSameLineNumber(node, previousNode)) {
@@ -534,7 +516,7 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
         // PackageDeclaration node accept javadoc in package-info.java files,
         // but they are useless everywhere else.
         return node instanceof BodyDeclaration
-                || (node instanceof PackageDeclaration && "package-info.java".equals(getFileName(node))); //$NON-NLS-1$
+                || (node instanceof PackageDeclaration && "package-info.java".equals(ASTNodes.getFileName(node))); //$NON-NLS-1$
     }
 
     @Override
@@ -542,11 +524,11 @@ public class CommentsCleanUp extends AbstractCleanUpRule {
         comments.clear();
 
         this.astRoot= node;
-        for (Comment comment : getCommentList(astRoot)) {
+        for (Comment comment : ASTNodes.getCommentList(astRoot)) {
             comments.add(Pair.of(new SourceLocation(comment), comment));
         }
 
-        for (Comment comment : getCommentList(astRoot)) {
+        for (Comment comment : ASTNodes.getCommentList(astRoot)) {
             if (comment.isBlockComment()) {
                 final BlockComment bc= (BlockComment) comment;
                 bc.accept(this);

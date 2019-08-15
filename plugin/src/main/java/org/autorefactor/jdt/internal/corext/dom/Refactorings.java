@@ -88,7 +88,7 @@ public class Refactorings {
         this.rewrite.setTargetSourceRangeComputer(new TargetSourceRangeComputer() {
             @Override
             public SourceRange computeSourceRange(ASTNode node) {
-                if (Boolean.TRUE.equals(node.getProperty(UNTOUCH_COMMENT))) {
+                if (Boolean.TRUE.equals(node.getProperty(Refactorings.UNTOUCH_COMMENT))) {
                     return new SourceRange(node.getStartPosition(), node.getLength());
                 }
                 return super.computeSourceRange(node);
@@ -275,7 +275,7 @@ public class Refactorings {
      *      org.eclipse.text.edits.TextEditGroup)
      */
     public void replace(ASTNode node, ASTNode replacement) {
-        node.setProperty(UNTOUCH_COMMENT, Boolean.TRUE);
+        node.setProperty(Refactorings.UNTOUCH_COMMENT, Boolean.TRUE);
         rewrite.replace(node, replacement, null);
         addRefactoredNodes(node);
     }
@@ -325,7 +325,7 @@ public class Refactorings {
      * @see ASTRewrite#remove(ASTNode, org.eclipse.text.edits.TextEditGroup)
      */
     public void removeButKeepComment(ASTNode node) {
-        node.setProperty(UNTOUCH_COMMENT, Boolean.TRUE);
+        node.setProperty(Refactorings.UNTOUCH_COMMENT, Boolean.TRUE);
         remove(node);
     }
 
@@ -446,7 +446,7 @@ public class Refactorings {
      * @param oldNode   the old node containing the old location
      * @param newIndex  the new index for the node in the parent's list
      * @param movedNode the old node which has been moved using
-     *                  {@link org.autorefactor.jdt.internal.corext.dom.ASTBuilder#move(ASTNode)}
+     *                  {@link org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory#move(ASTNode)}
      */
     public void moveToIndex(ASTNode oldNode, int newIndex, ASTNode movedNode) {
         insertAt(oldNode.getParent(), oldNode.getLocationInParent(), movedNode, newIndex);

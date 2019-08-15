@@ -25,8 +25,7 @@
  */
 package org.autorefactor.jdt.internal.corext.dom;
 
-import static org.autorefactor.util.Utils.equal;
-
+import org.autorefactor.util.Utils;
 import org.eclipse.jdt.core.ISourceRange;
 import org.eclipse.jdt.core.dom.ASTNode;
 
@@ -185,7 +184,7 @@ public class SourceLocation implements ISourceRange, Comparable<ISourceRange> {
     }
 
     private boolean overlapsRight(ISourceRange range) {
-        return range.getOffset() <= getStartPosition() && getStartPosition() <= getEndPosition(range);
+        return range.getOffset() <= getStartPosition() && getStartPosition() <= SourceLocation.getEndPosition(range);
     }
 
     /**
@@ -220,7 +219,7 @@ public class SourceLocation implements ISourceRange, Comparable<ISourceRange> {
             return false;
         }
         final SourceLocation other= (SourceLocation) obj;
-        return equal(length, other.length) && equal(offset, other.offset);
+        return Utils.equal(length, other.length) && Utils.equal(offset, other.offset);
     }
 
     @Override

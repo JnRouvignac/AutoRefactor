@@ -25,8 +25,6 @@
  */
 package org.autorefactor.util;
 
-import static org.autorefactor.util.Utils.*;
-
 /**
  * An immutable pair of objects.
  *
@@ -109,7 +107,7 @@ public final class Pair<F, S> {
             return false;
         }
         final Pair<?, ?> other= (Pair<?, ?>) obj;
-        return equal(first, other.first) && equal(second, other.second);
+        return Utils.equal(first, other.first) && Utils.equal(second, other.second);
     }
 
     @Override

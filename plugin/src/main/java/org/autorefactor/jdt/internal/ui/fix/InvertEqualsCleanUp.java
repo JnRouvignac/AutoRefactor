@@ -25,12 +25,8 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.arg0;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isConstant;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.usesGivenSignature;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isPrimitive;
-
-import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 
@@ -74,12 +70,12 @@ public class InvertEqualsCleanUp extends AbstractCleanUpRule {
         if (node.getExpression() == null) {
             return true;
         }
-        boolean isEquals= usesGivenSignature(node, Object.class.getCanonicalName(), "equals", Object.class.getCanonicalName()); //$NON-NLS-1$
-        boolean isStringEqualsIgnoreCase= usesGivenSignature(node, String.class.getCanonicalName(), "equalsIgnoreCase", String.class.getCanonicalName()); //$NON-NLS-1$
+        boolean isEquals= ASTNodes.usesGivenSignature(node, Object.class.getCanonicalName(), "equals", Object.class.getCanonicalName()); //$NON-NLS-1$
+        boolean isStringEqualsIgnoreCase= ASTNodes.usesGivenSignature(node, String.class.getCanonicalName(), "equalsIgnoreCase", String.class.getCanonicalName()); //$NON-NLS-1$
         if (isEquals || isStringEqualsIgnoreCase) {
             final Expression expr= node.getExpression();
-            final Expression arg0= arg0(node);
-            if (!isConstant(expr) && isConstant(arg0) && !isPrimitive(arg0)) {
+            final Expression arg0= ASTNodes.arg0(node);
+            if (!ASTNodes.isConstant(expr) && ASTNodes.isConstant(arg0) && !ASTNodes.isPrimitive(arg0)) {
                 invertEqualsInvocation(node, isEquals, expr, arg0);
                 return false;
             }
@@ -89,7 +85,7 @@ public class InvertEqualsCleanUp extends AbstractCleanUpRule {
 
     private void invertEqualsInvocation(final MethodInvocation node, final boolean isEquals, final Expression expr,
             final Expression arg0) {
-        final ASTBuilder b= this.ctx.getASTBuilder();
+        final ASTNodeFactory b= this.ctx.getASTBuilder();
 
         final String methodName= isEquals ? "equals" : "equalsIgnoreCase"; //$NON-NLS-1$ $NON-NLS-2$
         this.ctx.getRefactorings().replace(node,

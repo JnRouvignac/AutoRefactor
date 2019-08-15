@@ -25,16 +25,8 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasOperator;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasType;
-import static org.eclipse.jdt.core.dom.InfixExpression.Operator.EQUALS;
-import static org.eclipse.jdt.core.dom.InfixExpression.Operator.GREATER;
-import static org.eclipse.jdt.core.dom.InfixExpression.Operator.GREATER_EQUALS;
-import static org.eclipse.jdt.core.dom.InfixExpression.Operator.LESS;
-import static org.eclipse.jdt.core.dom.InfixExpression.Operator.LESS_EQUALS;
-import static org.eclipse.jdt.core.dom.InfixExpression.Operator.NOT_EQUALS;
-
-import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jdt.core.dom.InfixExpression;
 
 /** See {@link #getDescription()} method. */
@@ -69,9 +61,9 @@ public class DoubleCompareRatherThanEqualityCleanUp extends AbstractCleanUpRule 
     @Override
     public boolean visit(final InfixExpression node) {
         if (!node.hasExtendedOperands()
-                && hasOperator(node, EQUALS, NOT_EQUALS, LESS_EQUALS, GREATER_EQUALS, LESS, GREATER)
-                && hasType(node.getLeftOperand(), double.class.getSimpleName(), Double.class.getCanonicalName())
-                && hasType(node.getRightOperand(), double.class.getSimpleName(), Double.class.getCanonicalName())) {
+                && ASTNodes.hasOperator(node, InfixExpression.Operator.EQUALS, InfixExpression.Operator.NOT_EQUALS, InfixExpression.Operator.LESS_EQUALS, InfixExpression.Operator.GREATER_EQUALS, InfixExpression.Operator.LESS, InfixExpression.Operator.GREATER)
+                && ASTNodes.hasType(node.getLeftOperand(), double.class.getSimpleName(), Double.class.getCanonicalName())
+                && ASTNodes.hasType(node.getRightOperand(), double.class.getSimpleName(), Double.class.getCanonicalName())) {
             replace(node);
             return false;
         }
@@ -80,7 +72,7 @@ public class DoubleCompareRatherThanEqualityCleanUp extends AbstractCleanUpRule 
     }
 
     private void replace(final InfixExpression node) {
-        final ASTBuilder b= this.ctx.getASTBuilder();
+        final ASTNodeFactory b= this.ctx.getASTBuilder();
         this.ctx.getRefactorings().replace(node,
                 b.infixExpr(
                         b.invoke("Double", "compare", b.copy(node.getLeftOperand()), b.copy(node.getRightOperand())), //$NON-NLS-1$ $NON-NLS-2$

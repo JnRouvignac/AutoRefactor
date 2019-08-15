@@ -25,9 +25,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.asList;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getAncestorOrNull;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getNextSiblings;
 import static org.eclipse.jdt.core.dom.ASTNode.BREAK_STATEMENT;
 import static org.eclipse.jdt.core.dom.ASTNode.IF_STATEMENT;
 import static org.eclipse.jdt.core.dom.ASTNode.RETURN_STATEMENT;
@@ -36,7 +33,8 @@ import static org.eclipse.jdt.core.dom.ASTNode.THROW_STATEMENT;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.InterruptibleVisitor;
 import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
 import org.eclipse.jdt.core.dom.BreakStatement;
@@ -84,7 +82,7 @@ public class IfRatherThanWhileAndFallsThroughCleanUp extends AbstractCleanUpRule
             breakVisitor.visitNode(node);
 
             if (breakVisitor.canBeRefactored()) {
-                final ASTBuilder b= ctx.getASTBuilder();
+                final ASTNodeFactory b= ctx.getASTBuilder();
                 for (final BreakStatement breakStmt : breakVisitor.getBreaks()) {
                     ctx.getRefactorings().remove(breakStmt);
                 }
@@ -102,7 +100,7 @@ public class IfRatherThanWhileAndFallsThroughCleanUp extends AbstractCleanUpRule
      * @return true if the statement falls through.
      */
     private boolean isEndingWithExit(final Statement stmt) {
-        final List<Statement> stmts= asList(stmt);
+        final List<Statement> stmts= ASTNodes.asList(stmt);
         if (stmts.isEmpty()) {
             return false;
         }
@@ -147,9 +145,9 @@ public class IfRatherThanWhileAndFallsThroughCleanUp extends AbstractCleanUpRule
 
         @Override
         public boolean visit(BreakStatement aBreak) {
-            Statement parent= getAncestorOrNull(aBreak, Statement.class);
-            while (parent != root && (getNextSiblings(parent) == null || getNextSiblings(parent).isEmpty())) {
-                parent= getAncestorOrNull(parent, Statement.class);
+            Statement parent= ASTNodes.getAncestorOrNull(aBreak, Statement.class);
+            while (parent != root && (ASTNodes.getNextSiblings(parent) == null || ASTNodes.getNextSiblings(parent).isEmpty())) {
+                parent= ASTNodes.getAncestorOrNull(parent, Statement.class);
             }
 
             if (parent != root) {

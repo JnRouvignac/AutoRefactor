@@ -25,13 +25,11 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.asList;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.match;
-
 import java.util.List;
 
-import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
-import org.autorefactor.jdt.internal.corext.dom.ASTBuilder.Copy;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory.Copy;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.IfStatement;
@@ -69,7 +67,7 @@ public class MergeConditionalBlocksCleanUp extends AbstractCleanUpRule {
 
     @Override
     public boolean visit(IfStatement node) {
-        final List<Statement> elseCode= asList(node.getElseStatement());
+        final List<Statement> elseCode= ASTNodes.asList(node.getElseStatement());
 
         if (elseCode != null && elseCode.size() == 1 && elseCode.get(0) instanceof IfStatement) {
             final IfStatement subNode= (IfStatement) elseCode.get(0);
@@ -82,7 +80,7 @@ public class MergeConditionalBlocksCleanUp extends AbstractCleanUpRule {
 
     private boolean maybeMergeBlocks(final IfStatement node, final IfStatement subNode, final Statement doubleStmts,
             final Statement remainingStmts, final boolean isPositive) {
-        if (doubleStmts != null && match(node.getThenStatement(), doubleStmts)) {
+        if (doubleStmts != null && ASTNodes.match(node.getThenStatement(), doubleStmts)) {
             refactorBlocks(node.getExpression(), subNode, remainingStmts, isPositive);
             return false;
         }
@@ -91,7 +89,7 @@ public class MergeConditionalBlocksCleanUp extends AbstractCleanUpRule {
 
     private void refactorBlocks(final Expression firstCondition, final IfStatement subNode,
             final Statement remainingStmts, final boolean isPositive) {
-        final ASTBuilder b= this.ctx.getASTBuilder();
+        final ASTNodeFactory b= this.ctx.getASTBuilder();
         final Refactorings r= this.ctx.getRefactorings();
 
         final Expression additionalCondition;

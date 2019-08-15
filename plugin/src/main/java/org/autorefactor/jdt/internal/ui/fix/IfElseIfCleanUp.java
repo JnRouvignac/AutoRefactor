@@ -25,12 +25,10 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.statements;
-import static org.eclipse.jdt.core.dom.IfStatement.ELSE_STATEMENT_PROPERTY;
-
 import java.util.List;
 
-import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.Statement;
@@ -106,10 +104,10 @@ public class IfElseIfCleanUp extends AbstractCleanUpRule {
     public boolean visit(IfStatement node) {
         final Statement elseStmt= node.getElseStatement();
         if (elseStmt instanceof Block) {
-            List<Statement> elseStmts= statements((Block) elseStmt);
+            List<Statement> elseStmts= ASTNodes.statements((Block) elseStmt);
             if (elseStmts.size() == 1 && elseStmts.get(0) instanceof IfStatement) {
-                final ASTBuilder b= this.ctx.getASTBuilder();
-                this.ctx.getRefactorings().set(node, ELSE_STATEMENT_PROPERTY, b.copy(elseStmts.get(0)));
+                final ASTNodeFactory b= this.ctx.getASTBuilder();
+                this.ctx.getRefactorings().set(node, IfStatement.ELSE_STATEMENT_PROPERTY, b.copy(elseStmts.get(0)));
                 return false;
             }
         }

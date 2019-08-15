@@ -27,10 +27,6 @@ package org.autorefactor.jdt.internal.ui.fix;
 
 import static org.eclipse.jdt.core.dom.ASTNode.ARRAY_ACCESS;
 import static org.eclipse.jdt.core.dom.ASTNode.SWITCH_STATEMENT;
-import static org.eclipse.jdt.core.dom.PrefixExpression.Operator.COMPLEMENT;
-import static org.eclipse.jdt.core.dom.PrefixExpression.Operator.DECREMENT;
-import static org.eclipse.jdt.core.dom.PrefixExpression.Operator.INCREMENT;
-
 import java.util.Arrays;
 import java.util.List;
 
@@ -87,8 +83,8 @@ public class BytePrimitiveRatherThanWrapperCleanUp extends AbstractPrimitiveRath
 
     @Override
     public List<PrefixExpression.Operator> getPrefixInSafeOperators() {
-        return Arrays.<PrefixExpression.Operator>asList(INCREMENT, PrefixExpression.Operator.MINUS, DECREMENT,
-                PrefixExpression.Operator.PLUS, COMPLEMENT);
+        return Arrays.<PrefixExpression.Operator>asList(PrefixExpression.Operator.INCREMENT, PrefixExpression.Operator.MINUS, PrefixExpression.Operator.DECREMENT,
+                PrefixExpression.Operator.PLUS, PrefixExpression.Operator.COMPLEMENT);
     }
 
     @Override
@@ -99,8 +95,8 @@ public class BytePrimitiveRatherThanWrapperCleanUp extends AbstractPrimitiveRath
 
     @Override
     public List<PrefixExpression.Operator> getPrefixOutSafeOperators() {
-        return Arrays.<PrefixExpression.Operator>asList(INCREMENT, PrefixExpression.Operator.MINUS, DECREMENT,
-                PrefixExpression.Operator.PLUS, COMPLEMENT);
+        return Arrays.<PrefixExpression.Operator>asList(PrefixExpression.Operator.INCREMENT, PrefixExpression.Operator.MINUS, PrefixExpression.Operator.DECREMENT,
+                PrefixExpression.Operator.PLUS, PrefixExpression.Operator.COMPLEMENT);
     }
 
     @Override

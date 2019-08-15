@@ -25,16 +25,11 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.as;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.asList;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.fallsThrough;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getNextSibling;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.match;
-
 import java.util.ArrayList;
 import java.util.List;
 
-import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.BlockSubVisitor;
 import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.eclipse.jdt.core.dom.Block;
@@ -111,8 +106,8 @@ public class OneCodeThatFallsThroughRatherThanRedundantBlocksCleanUp extends Abs
                 return;
             }
 
-            TryStatement ts= as(node, TryStatement.class);
-            IfStatement is= as(node, IfStatement.class);
+            TryStatement ts= ASTNodes.as(node, TryStatement.class);
+            IfStatement is= ASTNodes.as(node, IfStatement.class);
 
             if (ts != null && ts.getFinally() == null) {
                 for (final CatchClause catchClause : (List<CatchClause>) ts.catchClauses()) {
@@ -130,7 +125,7 @@ public class OneCodeThatFallsThroughRatherThanRedundantBlocksCleanUp extends Abs
             }
 
             redundantStmts.add(node);
-            List<Statement> stmts= asList(node);
+            List<Statement> stmts= ASTNodes.asList(node);
 
             if (stmts == null || stmts.isEmpty()) {
                 return;
@@ -147,25 +142,25 @@ public class OneCodeThatFallsThroughRatherThanRedundantBlocksCleanUp extends Abs
 
             final List<Statement> referenceStmts= new ArrayList<Statement>();
 
-            Statement nextSibling= getNextSibling(node);
-            while (nextSibling != null && !fallsThrough(nextSibling)) {
+            Statement nextSibling= ASTNodes.getNextSibling(node);
+            while (nextSibling != null && !ASTNodes.fallsThrough(nextSibling)) {
                 referenceStmts.add(nextSibling);
-                nextSibling= getNextSibling(nextSibling);
+                nextSibling= ASTNodes.getNextSibling(nextSibling);
             }
 
             if (nextSibling != null) {
                 referenceStmts.add(nextSibling);
-                ASTBuilder b= ctx.getASTBuilder();
+                ASTNodeFactory b= ctx.getASTBuilder();
 
                 for (final Statement redundantStmt : redundantStmts) {
-                    List<Statement> stmtsToCompare= asList(redundantStmt);
+                    List<Statement> stmtsToCompare= ASTNodes.asList(redundantStmt);
 
                     if (stmtsToCompare.size() > referenceStmts.size()) {
                         stmtsToCompare= stmtsToCompare.subList(stmtsToCompare.size() - referenceStmts.size(),
                                 stmtsToCompare.size());
                     }
 
-                    if (match(referenceStmts, stmtsToCompare)) {
+                    if (ASTNodes.match(referenceStmts, stmtsToCompare)) {
                         Refactorings r= ctx.getRefactorings();
 
                         if (redundantStmt instanceof Block) {

@@ -26,10 +26,8 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.asList;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isPassive;
-
-import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.eclipse.jdt.core.dom.DoStatement;
 import org.eclipse.jdt.core.dom.EnhancedForStatement;
@@ -74,16 +72,16 @@ public class RemoveEmptyIfCleanUp extends AbstractCleanUpRule {
 
         final Statement thenStmt= node.getThenStatement();
         final Statement elseStmt= node.getElseStatement();
-        if (elseStmt != null && asList(elseStmt).isEmpty()) {
+        if (elseStmt != null && ASTNodes.asList(elseStmt).isEmpty()) {
             r.remove(elseStmt);
             return false;
-        } else if (thenStmt != null && asList(thenStmt).isEmpty()) {
-            final ASTBuilder b= this.ctx.getASTBuilder();
+        } else if (thenStmt != null && ASTNodes.asList(thenStmt).isEmpty()) {
+            final ASTNodeFactory b= this.ctx.getASTBuilder();
 
             final Expression condition= node.getExpression();
             if (elseStmt != null) {
                 r.replace(node, b.if0(b.negate(condition), b.move(elseStmt)));
-            } else if (isPassive(condition)) {
+            } else if (ASTNodes.isPassive(condition)) {
                 removeBlock(node, r, b);
                 return false;
             }
@@ -92,7 +90,7 @@ public class RemoveEmptyIfCleanUp extends AbstractCleanUpRule {
         return true;
     }
 
-    private void removeBlock(final IfStatement node, final Refactorings r, final ASTBuilder b) {
+    private void removeBlock(final IfStatement node, final Refactorings r, final ASTNodeFactory b) {
         if (node.getParent() instanceof IfStatement || node.getParent() instanceof EnhancedForStatement
                 || node.getParent() instanceof ForStatement || node.getParent() instanceof WhileStatement
                 || node.getParent() instanceof DoStatement) {

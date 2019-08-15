@@ -26,20 +26,11 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.as;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasOperator;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isPassive;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isPrimitive;
-import static org.eclipse.jdt.core.dom.InfixExpression.Operator.AND;
-import static org.eclipse.jdt.core.dom.InfixExpression.Operator.CONDITIONAL_AND;
-import static org.eclipse.jdt.core.dom.InfixExpression.Operator.CONDITIONAL_OR;
-import static org.eclipse.jdt.core.dom.InfixExpression.Operator.OR;
-
-import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.ASTSemanticMatcher;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.InfixExpression;
-import org.eclipse.jdt.core.dom.InfixExpression.Operator;
 
 /** See {@link #getDescription()} method. */
 public class ORConditionRatherThanRedundantClausesCleanUp extends AbstractCleanUpRule {
@@ -72,7 +63,7 @@ public class ORConditionRatherThanRedundantClausesCleanUp extends AbstractCleanU
 
     @Override
     public boolean visit(InfixExpression node) {
-        if (isPassive(node) && hasOperator(node, CONDITIONAL_OR, OR) && !node.hasExtendedOperands()) {
+        if (ASTNodes.isPassive(node) && ASTNodes.hasOperator(node, InfixExpression.Operator.CONDITIONAL_OR, InfixExpression.Operator.OR) && !node.hasExtendedOperands()) {
             final Expression leftOperand= node.getLeftOperand();
             final Expression rightOperand= node.getRightOperand();
             return maybeRefactorCondition(node, node.getOperator(), leftOperand, rightOperand, true)
@@ -82,16 +73,16 @@ public class ORConditionRatherThanRedundantClausesCleanUp extends AbstractCleanU
         return true;
     }
 
-    private boolean maybeRefactorCondition(final InfixExpression node, final Operator operator,
+    private boolean maybeRefactorCondition(final InfixExpression node, final InfixExpression.Operator operator,
             final Expression operand1, final Expression operand2, final boolean forward) {
-        final InfixExpression complexCondition= as(operand1, InfixExpression.class);
+        final InfixExpression complexCondition= ASTNodes.as(operand1, InfixExpression.class);
 
         if (complexCondition != null && !complexCondition.hasExtendedOperands()
-                && hasOperator(complexCondition, CONDITIONAL_AND, AND)) {
+                && ASTNodes.hasOperator(complexCondition, InfixExpression.Operator.CONDITIONAL_AND, InfixExpression.Operator.AND)) {
             final ASTSemanticMatcher matcher= new ASTSemanticMatcher();
 
-            if (isPrimitive(complexCondition.getLeftOperand()) && isPrimitive(complexCondition.getRightOperand())
-                    && isPrimitive(operand2)) {
+            if (ASTNodes.isPrimitive(complexCondition.getLeftOperand()) && ASTNodes.isPrimitive(complexCondition.getRightOperand())
+                    && ASTNodes.isPrimitive(operand2)) {
                 if (matcher.matchOpposite(complexCondition.getLeftOperand(), operand2)) {
                     replaceDuplicateExpr(node, operator, complexCondition.getRightOperand(), operand2, forward);
                     return false;
@@ -106,9 +97,9 @@ public class ORConditionRatherThanRedundantClausesCleanUp extends AbstractCleanU
         return true;
     }
 
-    private void replaceDuplicateExpr(final InfixExpression node, final Operator operator, final Expression leftExpr,
+    private void replaceDuplicateExpr(final InfixExpression node, final InfixExpression.Operator operator, final Expression leftExpr,
             final Expression rightExpr, final boolean forward) {
-        final ASTBuilder b= ctx.getASTBuilder();
+        final ASTNodeFactory b= ctx.getASTBuilder();
 
         if (forward) {
             ctx.getRefactorings().replace(node, b.infixExpr(b.copy(leftExpr), operator, b.copy(rightExpr)));

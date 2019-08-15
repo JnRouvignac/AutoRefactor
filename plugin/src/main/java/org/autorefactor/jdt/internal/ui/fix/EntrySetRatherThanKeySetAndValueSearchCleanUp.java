@@ -26,20 +26,10 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.areBindingsEqual;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.arg0;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.asList;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getFirstAncestorOrNull;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.usesGivenSignature;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isSameVariable;
 import static org.eclipse.jdt.core.dom.ASTNode.ANNOTATION_TYPE_DECLARATION;
 import static org.eclipse.jdt.core.dom.ASTNode.ANONYMOUS_CLASS_DECLARATION;
 import static org.eclipse.jdt.core.dom.ASTNode.ENUM_DECLARATION;
-import static org.eclipse.jdt.core.dom.ASTNode.METHOD_INVOCATION;
 import static org.eclipse.jdt.core.dom.ASTNode.TYPE_DECLARATION;
-import static org.eclipse.jdt.core.dom.EnhancedForStatement.EXPRESSION_PROPERTY;
-import static org.eclipse.jdt.core.dom.EnhancedForStatement.PARAMETER_PROPERTY;
-
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
@@ -49,7 +39,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.CollectorVisitor;
 import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.autorefactor.jdt.internal.corext.dom.TypeNameDecider;
@@ -122,7 +113,7 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
 
         private ASTNode getNamingScope(ASTNode scope) {
             Class<?>[] ancestorClasses= new Class<?>[] { MethodDeclaration.class, Initializer.class };
-            ASTNode ancestor= getFirstAncestorOrNull(scope, ancestorClasses);
+            ASTNode ancestor= ASTNodes.getFirstAncestorOrNull(scope, ancestorClasses);
             if (ancestor == null) {
                 throw new IllegalStateException(scope, "Expected to find an ancestor among the types " //$NON-NLS-1$
                         + Arrays.toString(ancestorClasses) + " but could not find any"); //$NON-NLS-1$
@@ -247,14 +238,14 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
 
     private void replaceEntryIterationByKeyIteration(EnhancedForStatement enhancedFor, final Expression mapExpression,
             final SingleVariableDeclaration parameter, final List<MethodInvocation> getValueMis) {
-        final ASTBuilder b= ctx.getASTBuilder();
+        final ASTNodeFactory b= ctx.getASTBuilder();
         final Refactorings r= ctx.getRefactorings();
 
         final VariableDefinitionsUsesVisitor keyUseVisitor= new VariableDefinitionsUsesVisitor(parameter);
         enhancedFor.getBody().accept(keyUseVisitor);
         int keyUses= keyUseVisitor.getUses().size();
 
-        final int insertionPoint= asList(enhancedFor.getBody()).get(0).getStartPosition() - 1;
+        final int insertionPoint= ASTNodes.asList(enhancedFor.getBody()).get(0).getStartPosition() - 1;
         final Variable entryVar= new Variable(
                 new VariableNameDecider(enhancedFor.getBody(), insertionPoint).suggest("entry", "mapEntry"), b); //$NON-NLS-1$ $NON-NLS-2$
         final TypeNameDecider typeNameDecider= new TypeNameDecider(parameter);
@@ -263,11 +254,11 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
         final ITypeBinding typeBinding= getValueMi0.getExpression().resolveTypeBinding();
         if (typeBinding != null && typeBinding.isRawType()) {
             // for (Object key : map.keySet()) => for (Object key : map.entrySet())
-            r.set(enhancedFor, EXPRESSION_PROPERTY, b.invoke(b.move(mapExpression), "entrySet")); //$NON-NLS-1$
+            r.set(enhancedFor, EnhancedForStatement.EXPRESSION_PROPERTY, b.invoke(b.move(mapExpression), "entrySet")); //$NON-NLS-1$
             final Type objectType= b.type(typeNameDecider.useSimplestPossibleName(Object.class.getCanonicalName()));
             final Variable objectVar= new Variable(
                     new VariableNameDecider(enhancedFor.getBody(), insertionPoint).suggest("obj"), b); //$NON-NLS-1$
-            r.set(enhancedFor, PARAMETER_PROPERTY, b.declareSingleVariable(objectVar.varNameRaw(), objectType));
+            r.set(enhancedFor, EnhancedForStatement.PARAMETER_PROPERTY, b.declareSingleVariable(objectVar.varNameRaw(), objectType));
 
             // for (Map.Entry<K, V> mapEntry : map.entrySet()) {
             // Map.Entry mapEntry = (Map.Entry) obj; // <--- add this statement
@@ -288,11 +279,11 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
             }
         } else {
             // for (K key : map.keySet()) => for (K key : map.entrySet())
-            r.set(enhancedFor, EXPRESSION_PROPERTY, b.invoke(b.move(mapExpression), "entrySet")); //$NON-NLS-1$
+            r.set(enhancedFor, EnhancedForStatement.EXPRESSION_PROPERTY, b.invoke(b.move(mapExpression), "entrySet")); //$NON-NLS-1$
             // for (K key : map.entrySet()) => for (Map.Entry<K, V> mapEntry :
             // map.entrySet())
             final Type mapEntryType= createMapEntryType(parameter, getValueMi0, typeNameDecider);
-            r.set(enhancedFor, PARAMETER_PROPERTY, b.declareSingleVariable(entryVar.varNameRaw(), mapEntryType));
+            r.set(enhancedFor, EnhancedForStatement.PARAMETER_PROPERTY, b.declareSingleVariable(entryVar.varNameRaw(), mapEntryType));
 
             if (keyUses > getValueMis.size()) {
                 // for (Map.Entry<K, V> mapEntry : map.entrySet()) {
@@ -320,7 +311,7 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
             TypeNameDecider typeNameDecider) {
         final String mapEntryType= typeNameDecider.useSimplestPossibleName(Entry.class.getCanonicalName());
 
-        final ASTBuilder b= ctx.getASTBuilder();
+        final ASTNodeFactory b= ctx.getASTBuilder();
         final Type paramType= parameter.getType();
         final Type mapKeyType;
         if (paramType.isPrimitiveType()) {
@@ -337,7 +328,7 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
     }
 
     private boolean isKeySetMethod(Expression expr) {
-        return expr instanceof MethodInvocation && usesGivenSignature((MethodInvocation) expr, Map.class.getCanonicalName(), "keySet"); //$NON-NLS-1$
+        return expr instanceof MethodInvocation && ASTNodes.usesGivenSignature((MethodInvocation) expr, Map.class.getCanonicalName(), "keySet"); //$NON-NLS-1$
     }
 
     private List<MethodInvocation> collectMapGetValueCalls(Expression mapExpression,
@@ -417,8 +408,8 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
         @Override
         public boolean visit(MethodInvocation node) {
             if (isSameReference(node.getExpression(), mapExpression)
-                    && usesGivenSignature(node, Map.class.getCanonicalName(), "get", Object.class.getCanonicalName()) //$NON-NLS-1$
-                    && isSameVariable(arg0(node), forEachParameter.getName())) {
+                    && ASTNodes.usesGivenSignature(node, Map.class.getCanonicalName(), "get", Object.class.getCanonicalName()) //$NON-NLS-1$
+                    && ASTNodes.isSameVariable(ASTNodes.arg0(node), forEachParameter.getName())) {
                 addResult(node);
             }
             return true;
@@ -427,12 +418,12 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
         private boolean isSameReference(Expression expr1, Expression expr2) {
             if (expr1 == null || expr2 == null) {
                 return false;
-            } else if (expr1.getNodeType() != METHOD_INVOCATION || expr2.getNodeType() != METHOD_INVOCATION) {
-                return isSameVariable(expr1, expr2);
+            } else if (expr1.getNodeType() != ASTNode.METHOD_INVOCATION || expr2.getNodeType() != ASTNode.METHOD_INVOCATION) {
+                return ASTNodes.isSameVariable(expr1, expr2);
             } else {
                 final MethodInvocation mi1= (MethodInvocation) expr1;
                 final MethodInvocation mi2= (MethodInvocation) expr2;
-                return areBindingsEqual(mi1.resolveTypeBinding(), mi2.resolveTypeBinding())
+                return ASTNodes.areBindingsEqual(mi1.resolveTypeBinding(), mi2.resolveTypeBinding())
                         && isSameReference(mi1.getExpression(), mi2.getExpression());
             }
         }

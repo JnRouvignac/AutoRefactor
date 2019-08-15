@@ -25,10 +25,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.arguments;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasType;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.instanceOf;
-
 import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -37,7 +33,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.Type;
@@ -110,10 +107,10 @@ public final class EnumMapRatherThanHashMapCleanUp extends AbstractEnumCollectio
 
         Type keyType= types[0];
         Type valueType= types[1];
-        List<Expression> arguments= arguments(cic);
+        List<Expression> arguments= ASTNodes.arguments(cic);
 
         if (!arguments.isEmpty() && isTargetType(arguments.get(0).resolveTypeBinding())
-                && !hasType(arguments.get(0).resolveTypeBinding(), EnumMap.class.getCanonicalName())) {
+                && !ASTNodes.hasType(arguments.get(0).resolveTypeBinding(), EnumMap.class.getCanonicalName())) {
             return true;
         }
 
@@ -124,7 +121,7 @@ public final class EnumMapRatherThanHashMapCleanUp extends AbstractEnumCollectio
 
     private void replace(ClassInstanceCreation cic, Set<String> alreadyImportedClasses, Set<String> importsToAdd,
             Type keyType, Type valueType, List<Expression> arguments) {
-        ASTBuilder b= ctx.getASTBuilder();
+        ASTNodeFactory b= ctx.getASTBuilder();
         Expression newParam= resolveParameter(keyType, arguments);
         Type newType= b.genericType(
                 alreadyImportedClasses.contains(EnumMap.class.getCanonicalName()) ? "EnumMap" : EnumMap.class.getCanonicalName(), b.copy(keyType), //$NON-NLS-1$
@@ -147,7 +144,7 @@ public final class EnumMapRatherThanHashMapCleanUp extends AbstractEnumCollectio
      * @return correct parameter for EnumMap constructor
      */
     private Expression resolveParameter(Type keyType, List<Expression> originalArgs) {
-        if (!originalArgs.isEmpty() && instanceOf(originalArgs.get(0), EnumMap.class.getCanonicalName())) {
+        if (!originalArgs.isEmpty() && ASTNodes.instanceOf(originalArgs.get(0), EnumMap.class.getCanonicalName())) {
             return ctx.getASTBuilder().copy(originalArgs.get(0));
         }
         TypeLiteral keyTypeLiteral= keyType.getAST().newTypeLiteral();

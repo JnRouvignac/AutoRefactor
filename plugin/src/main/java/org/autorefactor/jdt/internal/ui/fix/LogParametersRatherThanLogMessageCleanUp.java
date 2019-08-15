@@ -25,15 +25,12 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.arguments;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasType;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.usesGivenSignature;
-
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.InfixExpression;
@@ -77,9 +74,9 @@ public class LogParametersRatherThanLogMessageCleanUp extends AbstractCleanUpRul
     }
 
     private boolean maybeRefactorMethod(final MethodInvocation node, final String methodName) {
-        if (usesGivenSignature(node, "org.slf4j.Logger", methodName, String.class.getCanonicalName()) //$NON-NLS-1$
-                || usesGivenSignature(node, "ch.qos.logback.classic.Logger", methodName, String.class.getCanonicalName())) { //$NON-NLS-1$
-            final List<Expression> args= arguments(node);
+        if (ASTNodes.usesGivenSignature(node, "org.slf4j.Logger", methodName, String.class.getCanonicalName()) //$NON-NLS-1$
+                || ASTNodes.usesGivenSignature(node, "ch.qos.logback.classic.Logger", methodName, String.class.getCanonicalName())) { //$NON-NLS-1$
+            final List<Expression> args= ASTNodes.arguments(node);
 
             if (args != null && args.size() == 1) {
                 final Expression message= args.get(0);
@@ -96,7 +93,7 @@ public class LogParametersRatherThanLogMessageCleanUp extends AbstractCleanUpRul
     @SuppressWarnings("unchecked")
     private boolean maybeReplaceConcatenation(final MethodInvocation node, final String methodName,
             final Expression message) {
-        final ASTBuilder b= this.ctx.getASTBuilder();
+        final ASTNodeFactory b= this.ctx.getASTBuilder();
 
         final InfixExpression concatenation= (InfixExpression) message;
         final List<Expression> strings= new ArrayList<Expression>();
@@ -126,7 +123,7 @@ public class LogParametersRatherThanLogMessageCleanUp extends AbstractCleanUpRul
                 hasObjects= true;
                 messageBuilder.append("{}"); //$NON-NLS-1$
 
-                if (hasType(string, Throwable.class.getCanonicalName())) {
+                if (ASTNodes.hasType(string, Throwable.class.getCanonicalName())) {
                     params.add(b.invoke("String", "valueOf", b.copy(string))); //$NON-NLS-1$ $NON-NLS-2$
                 } else {
                     params.add(b.copy(string));
@@ -142,7 +139,7 @@ public class LogParametersRatherThanLogMessageCleanUp extends AbstractCleanUpRul
         return true;
     }
 
-    private void replaceConcatenation(final MethodInvocation node, final String methodName, final ASTBuilder b,
+    private void replaceConcatenation(final MethodInvocation node, final String methodName, final ASTNodeFactory b,
             final StringBuilder messageBuilder, final List<Expression> params) {
         params.add(0, b.string(messageBuilder.toString()));
 

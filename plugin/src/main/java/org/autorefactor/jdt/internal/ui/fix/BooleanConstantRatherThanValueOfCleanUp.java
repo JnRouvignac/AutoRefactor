@@ -25,11 +25,8 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.arguments;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.as;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.usesGivenSignature;
-
-import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jdt.core.dom.BooleanLiteral;
 import org.eclipse.jdt.core.dom.FieldAccess;
 import org.eclipse.jdt.core.dom.MethodInvocation;
@@ -66,9 +63,9 @@ public class BooleanConstantRatherThanValueOfCleanUp extends AbstractCleanUpRule
 
     @Override
     public boolean visit(MethodInvocation node) {
-        if (usesGivenSignature(node, Boolean.class.getCanonicalName(), "valueOf", String.class.getCanonicalName()) //$NON-NLS-1$
-                || usesGivenSignature(node, Boolean.class.getCanonicalName(), "valueOf", boolean.class.getSimpleName())) { //$NON-NLS-1$
-            final BooleanLiteral l= as(arguments(node), BooleanLiteral.class);
+        if (ASTNodes.usesGivenSignature(node, Boolean.class.getCanonicalName(), "valueOf", String.class.getCanonicalName()) //$NON-NLS-1$
+                || ASTNodes.usesGivenSignature(node, Boolean.class.getCanonicalName(), "valueOf", boolean.class.getSimpleName())) { //$NON-NLS-1$
+            final BooleanLiteral l= ASTNodes.as(ASTNodes.arguments(node), BooleanLiteral.class);
             if (l != null) {
                 ctx.getRefactorings().replace(node, toFieldAccess(node, l.booleanValue()));
                 return false;
@@ -78,7 +75,7 @@ public class BooleanConstantRatherThanValueOfCleanUp extends AbstractCleanUpRule
     }
 
     private FieldAccess toFieldAccess(final MethodInvocation node, final boolean booleanLiteral) {
-        final ASTBuilder b= ctx.getASTBuilder();
+        final ASTNodeFactory b= ctx.getASTBuilder();
         final FieldAccess fa= b.getAST().newFieldAccess();
         if (node.getExpression() instanceof Name) {
             fa.setExpression(b.copy(node.getExpression()));

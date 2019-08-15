@@ -25,7 +25,7 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.eclipse.jdt.core.dom.WhileStatement;
 
 /**
@@ -65,7 +65,7 @@ public class DoWhileRatherThanWhileCleanUp extends AbstractCleanUpRule {
     public boolean visit(WhileStatement node) {
         final Object constantCondition= node.getExpression().resolveConstantExpressionValue();
         if (Boolean.TRUE.equals(constantCondition)) {
-            ASTBuilder b= this.ctx.getASTBuilder();
+            ASTNodeFactory b= this.ctx.getASTBuilder();
             this.ctx.getRefactorings().replace(node, b.doWhile(b.copy(node.getExpression()), b.copy(node.getBody())));
             return false;
         }

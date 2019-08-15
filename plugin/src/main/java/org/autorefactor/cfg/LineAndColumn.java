@@ -25,7 +25,7 @@
  */
 package org.autorefactor.cfg;
 
-import static org.autorefactor.util.Utils.*;
+import org.autorefactor.util.Utils;
 
 /**
  * Contains a position in the source code with the start position from the start
@@ -63,7 +63,7 @@ class LineAndColumn {
             return false;
         }
         final LineAndColumn other= (LineAndColumn) obj;
-        return equal(startPosition, other.startPosition);
+        return Utils.equal(startPosition, other.startPosition);
     }
 
     @Override

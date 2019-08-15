@@ -27,7 +27,7 @@ package org.autorefactor.jdt.internal.ui.fix;
 
 import java.util.List;
 
-import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
@@ -91,7 +91,7 @@ public class SingleDeclarationsRatherThanMultiDeclarationCleanUp extends Abstrac
     @SuppressWarnings("rawtypes")
     private void refactorMultiDeclaration(final ASTNode node, final List modifiers, final Type type,
             final List fragments, final Javadoc docComment) {
-        final ASTBuilder b= this.ctx.getASTBuilder();
+        final ASTNodeFactory b= this.ctx.getASTBuilder();
 
         for (int i= fragments.size() - 1; 0 <= i; i--) {
             final VariableDeclarationFragment fragment= (VariableDeclarationFragment) fragments.get(i);
@@ -129,7 +129,7 @@ public class SingleDeclarationsRatherThanMultiDeclarationCleanUp extends Abstrac
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" }) // $NON-NLS-2$
-    private void updateModifiers(final ASTBuilder b, final List modifiers, final List newModifiers) {
+    private void updateModifiers(final ASTNodeFactory b, final List modifiers, final List newModifiers) {
         newModifiers.clear();
         for (final Object modifier : modifiers) {
             newModifiers.add(b.copy((ASTNode) modifier));

@@ -27,20 +27,6 @@ package org.autorefactor.jdt.internal.ui.fix;
 
 import static org.eclipse.jdt.core.dom.ASTNode.ARRAY_ACCESS;
 import static org.eclipse.jdt.core.dom.ASTNode.SWITCH_STATEMENT;
-import static org.eclipse.jdt.core.dom.Assignment.Operator.BIT_AND_ASSIGN;
-import static org.eclipse.jdt.core.dom.Assignment.Operator.BIT_OR_ASSIGN;
-import static org.eclipse.jdt.core.dom.Assignment.Operator.BIT_XOR_ASSIGN;
-import static org.eclipse.jdt.core.dom.Assignment.Operator.DIVIDE_ASSIGN;
-import static org.eclipse.jdt.core.dom.Assignment.Operator.LEFT_SHIFT_ASSIGN;
-import static org.eclipse.jdt.core.dom.Assignment.Operator.MINUS_ASSIGN;
-import static org.eclipse.jdt.core.dom.Assignment.Operator.PLUS_ASSIGN;
-import static org.eclipse.jdt.core.dom.Assignment.Operator.REMAINDER_ASSIGN;
-import static org.eclipse.jdt.core.dom.Assignment.Operator.RIGHT_SHIFT_SIGNED_ASSIGN;
-import static org.eclipse.jdt.core.dom.Assignment.Operator.RIGHT_SHIFT_UNSIGNED_ASSIGN;
-import static org.eclipse.jdt.core.dom.Assignment.Operator.TIMES_ASSIGN;
-import static org.eclipse.jdt.core.dom.PrefixExpression.Operator.COMPLEMENT;
-import static org.eclipse.jdt.core.dom.PrefixExpression.Operator.DECREMENT;
-import static org.eclipse.jdt.core.dom.PrefixExpression.Operator.INCREMENT;
 
 import java.util.Arrays;
 import java.util.List;
@@ -99,8 +85,8 @@ public class IntPrimitiveRatherThanWrapperCleanUp extends AbstractPrimitiveRathe
 
     @Override
     public List<PrefixExpression.Operator> getPrefixInSafeOperators() {
-        return Arrays.<PrefixExpression.Operator>asList(INCREMENT, PrefixExpression.Operator.MINUS, DECREMENT,
-                PrefixExpression.Operator.PLUS, COMPLEMENT);
+        return Arrays.<PrefixExpression.Operator>asList(PrefixExpression.Operator.INCREMENT, PrefixExpression.Operator.MINUS, PrefixExpression.Operator.DECREMENT,
+                PrefixExpression.Operator.PLUS, PrefixExpression.Operator.COMPLEMENT);
     }
 
     @Override
@@ -120,8 +106,8 @@ public class IntPrimitiveRatherThanWrapperCleanUp extends AbstractPrimitiveRathe
 
     @Override
     public List<PrefixExpression.Operator> getPrefixOutSafeOperators() {
-        return Arrays.<PrefixExpression.Operator>asList(INCREMENT, PrefixExpression.Operator.MINUS, DECREMENT,
-                PrefixExpression.Operator.PLUS, COMPLEMENT);
+        return Arrays.<PrefixExpression.Operator>asList(PrefixExpression.Operator.INCREMENT, PrefixExpression.Operator.MINUS, PrefixExpression.Operator.DECREMENT,
+                PrefixExpression.Operator.PLUS, PrefixExpression.Operator.COMPLEMENT);
     }
 
     @Override
@@ -143,9 +129,9 @@ public class IntPrimitiveRatherThanWrapperCleanUp extends AbstractPrimitiveRathe
 
     @Override
     public List<Assignment.Operator> getAssignmentOutSafeOperators() {
-        return Arrays.<Assignment.Operator>asList(PLUS_ASSIGN, MINUS_ASSIGN, TIMES_ASSIGN, DIVIDE_ASSIGN,
-                BIT_AND_ASSIGN, BIT_OR_ASSIGN, BIT_XOR_ASSIGN, REMAINDER_ASSIGN, LEFT_SHIFT_ASSIGN,
-                RIGHT_SHIFT_SIGNED_ASSIGN, RIGHT_SHIFT_UNSIGNED_ASSIGN);
+        return Arrays.<Assignment.Operator>asList(Assignment.Operator.PLUS_ASSIGN, Assignment.Operator.MINUS_ASSIGN, Assignment.Operator.TIMES_ASSIGN, Assignment.Operator.DIVIDE_ASSIGN,
+                Assignment.Operator.BIT_AND_ASSIGN, Assignment.Operator.BIT_OR_ASSIGN, Assignment.Operator.BIT_XOR_ASSIGN, Assignment.Operator.REMAINDER_ASSIGN, Assignment.Operator.LEFT_SHIFT_ASSIGN,
+                Assignment.Operator.RIGHT_SHIFT_SIGNED_ASSIGN, Assignment.Operator.RIGHT_SHIFT_UNSIGNED_ASSIGN);
     }
 
     @Override

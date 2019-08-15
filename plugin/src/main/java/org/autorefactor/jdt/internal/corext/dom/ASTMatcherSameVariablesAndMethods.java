@@ -25,8 +25,7 @@
  */
 package org.autorefactor.jdt.internal.corext.dom;
 
-import static org.autorefactor.util.Utils.equalNotNull;
-
+import org.autorefactor.util.Utils;
 import org.eclipse.jdt.core.dom.IBinding;
 import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;
@@ -42,7 +41,7 @@ public final class ASTMatcherSameVariablesAndMethods extends ASTSemanticMatcher 
     }
 
     private boolean sameReference(SimpleName node1, SimpleName node2) {
-        return equalNotNull(getDeclaration(node1), getDeclaration(node2));
+        return Utils.equalNotNull(getDeclaration(node1), getDeclaration(node2));
     }
 
     private IBinding getDeclaration(SimpleName node) {

@@ -25,9 +25,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.arguments;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.instanceOf;
-
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.EnumSet;
@@ -35,7 +32,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
@@ -111,13 +109,13 @@ public final class EnumSetRatherThanHashSetCleanUp extends AbstractEnumCollectio
         }
 
         Type type= types[0];
-        ASTBuilder b= ctx.getASTBuilder();
-        List<Expression> arguments= arguments(cic);
+        ASTNodeFactory b= ctx.getASTBuilder();
+        List<Expression> arguments= ASTNodes.arguments(cic);
         final MethodInvocation invocation;
 
-        if (!arguments.isEmpty() && instanceOf(arguments.get(0), Collection.class.getCanonicalName())) {
+        if (!arguments.isEmpty() && ASTNodes.instanceOf(arguments.get(0), Collection.class.getCanonicalName())) {
             Expression typeArg= arguments.get(0);
-            if (!instanceOf(typeArg, EnumSet.class.getCanonicalName())) {
+            if (!ASTNodes.instanceOf(typeArg, EnumSet.class.getCanonicalName())) {
                 return true;
             }
             invocation= b.invoke(alreadyImportedClasses.contains(EnumSet.class.getCanonicalName()) ? b.name("EnumSet") //$NON-NLS-1$

@@ -26,15 +26,12 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.*;
-import static org.eclipse.jdt.core.dom.InfixExpression.Operator.EQUALS;
-import static org.eclipse.jdt.core.dom.InfixExpression.Operator.NOT_EQUALS;
-
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.ASTSemanticMatcher;
 import org.autorefactor.jdt.internal.corext.dom.BlockSubVisitor;
 import org.autorefactor.jdt.internal.corext.dom.Refactorings;
@@ -89,10 +86,10 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
         @Override
         public boolean visit(TryStatement node) {
             if (node.resources().isEmpty()) {
-                final List<Statement> tryStmts= asList(node.getBody());
+                final List<Statement> tryStmts= ASTNodes.asList(node.getBody());
 
                 if (tryStmts.isEmpty()) {
-                    final List<Statement> finallyStmts= asList(node.getFinally());
+                    final List<Statement> finallyStmts= ASTNodes.asList(node.getFinally());
 
                     if (!finallyStmts.isEmpty()) {
                         return maybeInlineBlock(node, node.getFinally());
@@ -131,17 +128,17 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
         }
 
         private boolean maybeInlineBlock(final Statement node, final Statement unconditionnalStatement) {
-            if (fallsThrough(unconditionnalStatement)) {
+            if (ASTNodes.fallsThrough(unconditionnalStatement)) {
                 replaceBlockByPlainCode(node, unconditionnalStatement);
                 removeForwardCode(node, unconditionnalStatement);
                 setResult(false);
                 return false;
             } else {
-                final Set<String> ifVariableNames= getLocalVariableIdentifiers(unconditionnalStatement, false);
+                final Set<String> ifVariableNames= ASTNodes.getLocalVariableIdentifiers(unconditionnalStatement, false);
 
                 final Set<String> followingVariableNames= new HashSet<String>();
-                for (final Statement statement : getNextSiblings(node)) {
-                    followingVariableNames.addAll(getLocalVariableIdentifiers(statement, true));
+                for (final Statement statement : ASTNodes.getNextSiblings(node)) {
+                    followingVariableNames.addAll(ASTNodes.getLocalVariableIdentifiers(statement, true));
                 }
 
                 if (!ifVariableNames.removeAll(followingVariableNames)) {
@@ -163,13 +160,13 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
             InfixExpression ie= (InfixExpression) condition;
             final ASTSemanticMatcher matcher= new ASTSemanticMatcher();
 
-            if (hasOperator(ie, EQUALS, NOT_EQUALS) && isPassive(ie.getLeftOperand())) {
-                if (match(matcher, ie.getLeftOperand(), ie.getRightOperand())) {
-                    return EQUALS.equals(ie.getOperator());
+            if (ASTNodes.hasOperator(ie, InfixExpression.Operator.EQUALS, InfixExpression.Operator.NOT_EQUALS) && ASTNodes.isPassive(ie.getLeftOperand())) {
+                if (ASTNodes.match(matcher, ie.getLeftOperand(), ie.getRightOperand())) {
+                    return InfixExpression.Operator.EQUALS.equals(ie.getOperator());
                 }
 
                 if (matcher.matchOpposite(ie.getLeftOperand(), ie.getRightOperand())) {
-                    return NOT_EQUALS.equals(ie.getOperator());
+                    return InfixExpression.Operator.NOT_EQUALS.equals(ie.getOperator());
                 }
             }
         }
@@ -178,11 +175,11 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
     }
 
     private void replaceBlockByPlainCode(final Statement sourceNode, final Statement unconditionnalStatement) {
-        final ASTBuilder b= this.ctx.getASTBuilder();
+        final ASTNodeFactory b= this.ctx.getASTBuilder();
         final Refactorings r= this.ctx.getRefactorings();
 
         if (unconditionnalStatement instanceof Block && sourceNode.getParent() instanceof Block) {
-            r.replace(sourceNode, b.copyRange(statements((Block) unconditionnalStatement)));
+            r.replace(sourceNode, b.copyRange(ASTNodes.statements((Block) unconditionnalStatement)));
         } else {
             r.replace(sourceNode, b.copy(unconditionnalStatement));
         }
@@ -190,7 +187,7 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
 
     private void removeForwardCode(final Statement astNode, final Statement unconditionnalStatement) {
         if (astNode.getParent() instanceof Block) {
-            this.ctx.getRefactorings().remove(getNextSiblings(astNode));
+            this.ctx.getRefactorings().remove(ASTNodes.getNextSiblings(astNode));
             removeForwardCode((Block) astNode.getParent(), unconditionnalStatement);
         } else if (astNode.getParent() instanceof TryStatement) {
             removeForwardCode((TryStatement) astNode.getParent(), unconditionnalStatement);

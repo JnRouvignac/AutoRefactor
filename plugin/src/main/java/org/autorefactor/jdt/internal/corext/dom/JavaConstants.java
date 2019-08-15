@@ -50,13 +50,13 @@ public interface JavaConstants {
             + "(?:0x|0X)([0-9a-fA-F][0-9a-fA-F_]*)?[0-9a-fA-F]" + ")"; //$NON-NLS-1$ $NON-NLS-2$
 
     /** Pattern identifying number literal for an integer. */
-    Pattern INTEGER_LITERAL_COMPATIBLE_RE= Pattern.compile(INTEGER_LITERAL_COMPATIBLE_PATTERN);
+    Pattern INTEGER_LITERAL_COMPATIBLE_RE= Pattern.compile(JavaConstants.INTEGER_LITERAL_COMPATIBLE_PATTERN);
 
     /** String pattern identifying number literal for a long. */
-    String LONG_LITERAL_COMPATIBLE_PATTERN= "" + ("(?:" + INTEGER_LITERAL_COMPATIBLE_PATTERN + ")(?:l|L)?"); //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
+    String LONG_LITERAL_COMPATIBLE_PATTERN= "" + ("(?:" + JavaConstants.INTEGER_LITERAL_COMPATIBLE_PATTERN + ")(?:l|L)?"); //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
 
     /** Pattern identifying number literal for a long. */
-    Pattern LONG_LITERAL_COMPATIBLE_RE= Pattern.compile(LONG_LITERAL_COMPATIBLE_PATTERN);
+    Pattern LONG_LITERAL_COMPATIBLE_RE= Pattern.compile(JavaConstants.LONG_LITERAL_COMPATIBLE_PATTERN);
 
     /** Pattern identifying number literal for long "0". */
     Pattern ZERO_LONG_LITERAL_RE= Pattern.compile("(?:" + "(?:" //$NON-NLS-1$ $NON-NLS-2$

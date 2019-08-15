@@ -25,7 +25,7 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.eclipse.jdt.core.dom.NumberLiteral;
 
 /**
@@ -72,7 +72,7 @@ public class CapitalizeLongLiteralCleanUp extends AbstractCleanUpRule {
     }
 
     private void replaceLong(final NumberLiteral node, final String token) {
-        final ASTBuilder b= this.ctx.getASTBuilder();
+        final ASTNodeFactory b= this.ctx.getASTBuilder();
 
         final NumberLiteral replacement= b.numberLiteral();
         final String newToken= token.substring(0, token.length() - 1) + "L"; //$NON-NLS-1$

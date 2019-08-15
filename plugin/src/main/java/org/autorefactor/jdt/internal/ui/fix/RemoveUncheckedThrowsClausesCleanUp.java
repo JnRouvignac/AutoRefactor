@@ -25,13 +25,11 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.instanceOf;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.thrownExceptionTypes;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
@@ -89,7 +87,7 @@ public final class RemoveUncheckedThrowsClausesCleanUp extends AbstractCleanUpRu
      */
     private Collection<ASTNode> getUncheckedExceptions(MethodDeclaration node) {
         List<ASTNode> result= new ArrayList<ASTNode>();
-        for (Type n : thrownExceptionTypes(node)) {
+        for (Type n : ASTNodes.thrownExceptionTypes(node)) {
             if (isUnchecked(n)) {
                 result.add(n);
             }
@@ -99,6 +97,6 @@ public final class RemoveUncheckedThrowsClausesCleanUp extends AbstractCleanUpRu
 
     private boolean isUnchecked(Type type) {
         final ITypeBinding binding= type.resolveBinding();
-        return instanceOf(binding, RuntimeException.class.getCanonicalName()) || instanceOf(binding, Error.class.getCanonicalName());
+        return ASTNodes.instanceOf(binding, RuntimeException.class.getCanonicalName()) || ASTNodes.instanceOf(binding, Error.class.getCanonicalName());
     }
 }

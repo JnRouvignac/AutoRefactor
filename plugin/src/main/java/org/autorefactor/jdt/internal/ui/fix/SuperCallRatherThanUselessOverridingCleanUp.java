@@ -25,16 +25,10 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.asExpression;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasType;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.statements;
-import static org.eclipse.jdt.core.search.IJavaSearchConstants.REFERENCES;
-import static org.eclipse.jdt.core.search.SearchPattern.R_EXACT_MATCH;
-import static org.eclipse.jdt.core.search.SearchPattern.createPattern;
-
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.util.UnhandledException;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IJavaElement;
@@ -49,9 +43,11 @@ import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.SuperMethodInvocation;
+import org.eclipse.jdt.core.search.IJavaSearchConstants;
 import org.eclipse.jdt.core.search.SearchEngine;
 import org.eclipse.jdt.core.search.SearchMatch;
 import org.eclipse.jdt.core.search.SearchParticipant;
+import org.eclipse.jdt.core.search.SearchPattern;
 import org.eclipse.jdt.core.search.SearchRequestor;
 
 /**
@@ -93,10 +89,10 @@ public class SuperCallRatherThanUselessOverridingCleanUp extends AbstractCleanUp
             return true;
         }
 
-        final List<Statement> bodyStmts= statements(node.getBody());
+        final List<Statement> bodyStmts= ASTNodes.statements(node.getBody());
 
         if (bodyStmts.size() == 1) {
-            final SuperMethodInvocation bodyMi= asExpression(bodyStmts.get(0), SuperMethodInvocation.class);
+            final SuperMethodInvocation bodyMi= ASTNodes.asExpression(bodyStmts.get(0), SuperMethodInvocation.class);
 
             if (bodyMi != null) {
                 final IMethodBinding bodyMethodBinding= bodyMi.resolveMethodBinding();
@@ -155,7 +151,7 @@ public class SuperCallRatherThanUselessOverridingCleanUp extends AbstractCleanUp
 
         try {
             final SearchEngine searchEngine= new SearchEngine();
-            searchEngine.search(createPattern(methodBinding.getJavaElement(), REFERENCES, R_EXACT_MATCH),
+            searchEngine.search(SearchPattern.createPattern(methodBinding.getJavaElement(), IJavaSearchConstants.REFERENCES, SearchPattern.R_EXACT_MATCH),
                     new SearchParticipant[] { SearchEngine.getDefaultSearchParticipant() },
                     SearchEngine.createJavaSearchScope(new IJavaElement[] { methodPackage.getJavaElement() }),
                     requestor, ctx.getProgressMonitor());
@@ -180,7 +176,7 @@ public class SuperCallRatherThanUselessOverridingCleanUp extends AbstractCleanUp
         for (final IAnnotationBinding annotation : methodBinding.getAnnotations()) {
             final ITypeBinding annotationType= annotation.getAnnotationType();
 
-            if (!hasType(annotationType, Override.class.getCanonicalName(), SuppressWarnings.class.getCanonicalName())) {
+            if (!ASTNodes.hasType(annotationType, Override.class.getCanonicalName(), SuppressWarnings.class.getCanonicalName())) {
                 return true;
             }
         }

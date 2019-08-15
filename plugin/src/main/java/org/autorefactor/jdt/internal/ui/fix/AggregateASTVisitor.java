@@ -213,15 +213,15 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
             return;
         }
         for (Method m : clazz.getDeclaredMethods()) {
-            if (is("preVisit", m)) { //$NON-NLS-1$
+            if (AggregateASTVisitor.is("preVisit", m)) { //$NON-NLS-1$
                 preVisitors.add(v);
-            } else if (is("preVisit2", m)) { //$NON-NLS-1$
+            } else if (AggregateASTVisitor.is("preVisit2", m)) { //$NON-NLS-1$
                 preVisitors2.add(v);
-            } else if (is("postVisit", m)) { //$NON-NLS-1$
+            } else if (AggregateASTVisitor.is("postVisit", m)) { //$NON-NLS-1$
                 postVisitors.add(v);
-            } else if (isVisit(m)) {
+            } else if (AggregateASTVisitor.isVisit(m)) {
                 put(visitorsMap, m.getParameterTypes()[0], v);
-            } else if (isEndVisit(m)) {
+            } else if (AggregateASTVisitor.isEndVisit(m)) {
                 put(endVisitorsMap, m.getParameterTypes()[0], v);
             }
         }
@@ -398,20 +398,20 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
                 System.out.print(paramType.getSimpleName() + " node"); //$NON-NLS-1$
             }
             System.out.println(") {"); //$NON-NLS-1$
-            final boolean isVisit= isVisit(m);
-            final boolean isEndVisit= isEndVisit(m);
-            final boolean isPrevisit2= is("preVisit2", m); //$NON-NLS-1$
+            final boolean isVisit= AggregateASTVisitor.isVisit(m);
+            final boolean isEndVisit= AggregateASTVisitor.isEndVisit(m);
+            final boolean isPrevisit2= AggregateASTVisitor.is("preVisit2", m); //$NON-NLS-1$
             if (isVisit || isEndVisit) {
                 System.out.print("\tfinal List<ASTVisitor> visitorList = getVisitors("); //$NON-NLS-1$
                 System.out.print((isVisit ? "visitorsMap" : "endVisitorsMap") + ", "); //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
                 System.out.println(m.getParameterTypes()[0].getSimpleName() + ".class);"); //$NON-NLS-1$
             }
             System.out.print("\tfor (Iterator<ASTVisitor> iter = "); //$NON-NLS-1$
-            if (is("preVisit", m)) { //$NON-NLS-1$
+            if (AggregateASTVisitor.is("preVisit", m)) { //$NON-NLS-1$
                 System.out.print("preVisitors"); //$NON-NLS-1$
             } else if (isPrevisit2) {
                 System.out.print("preVisitors2"); //$NON-NLS-1$
-            } else if (is("postVisit", m)) { //$NON-NLS-1$
+            } else if (AggregateASTVisitor.is("postVisit", m)) { //$NON-NLS-1$
                 System.out.print("postVisitors"); //$NON-NLS-1$
             } else if (isVisit || isEndVisit) {
                 System.out.print("visitorList"); //$NON-NLS-1$

@@ -25,16 +25,12 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.asList;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.fallsThrough;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getNextSibling;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.match;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.BlockSubVisitor;
 import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.eclipse.jdt.core.dom.Block;
@@ -106,18 +102,18 @@ public class OneIfRatherThanDuplicateBlocksThatFallThroughCleanUp extends Abstra
 
         private boolean addOneMoreIf(final List<IfStatement> duplicateIfBlocks) {
             if (duplicateIfBlocks.get(duplicateIfBlocks.size() - 1).getElseStatement() == null) {
-                final Statement nextSibling= getNextSibling(duplicateIfBlocks.get(duplicateIfBlocks.size() - 1));
+                final Statement nextSibling= ASTNodes.getNextSibling(duplicateIfBlocks.get(duplicateIfBlocks.size() - 1));
 
                 if (nextSibling instanceof IfStatement && ((IfStatement) nextSibling).getElseStatement() == null
                         && !ctx.getRefactorings().hasBeenRefactored(nextSibling)) {
                     final IfStatement nextIf= (IfStatement) nextSibling;
 
-                    final List<Statement> lastIfStmts= asList(
+                    final List<Statement> lastIfStmts= ASTNodes.asList(
                             duplicateIfBlocks.get(duplicateIfBlocks.size() - 1).getThenStatement());
-                    final List<Statement> nextIfStmts= asList(nextIf.getThenStatement());
+                    final List<Statement> nextIfStmts= ASTNodes.asList(nextIf.getThenStatement());
                     if (lastIfStmts != null && !lastIfStmts.isEmpty()
-                            && fallsThrough(lastIfStmts.get(lastIfStmts.size() - 1))
-                            && match(lastIfStmts, nextIfStmts)) {
+                            && ASTNodes.fallsThrough(lastIfStmts.get(lastIfStmts.size() - 1))
+                            && ASTNodes.match(lastIfStmts, nextIfStmts)) {
                         duplicateIfBlocks.add(nextIf);
                         return true;
                     }
@@ -128,7 +124,7 @@ public class OneIfRatherThanDuplicateBlocksThatFallThroughCleanUp extends Abstra
         }
 
         private void mergeCode(final List<IfStatement> duplicateIfBlocks) {
-            final ASTBuilder b= ctx.getASTBuilder();
+            final ASTNodeFactory b= ctx.getASTBuilder();
             final Refactorings r= ctx.getRefactorings();
 
             Iterator<IfStatement> iterator= duplicateIfBlocks.iterator();

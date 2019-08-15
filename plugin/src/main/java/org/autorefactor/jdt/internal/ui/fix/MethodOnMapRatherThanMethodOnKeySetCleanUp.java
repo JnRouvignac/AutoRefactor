@@ -26,14 +26,12 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.arguments;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.usesGivenSignature;
-import static org.eclipse.jdt.core.dom.ASTNode.EXPRESSION_STATEMENT;
-
 import java.util.Map;
 import java.util.Set;
 
-import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
+import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 
@@ -71,24 +69,24 @@ public class MethodOnMapRatherThanMethodOnKeySetCleanUp extends AbstractCleanUpR
         Expression miExpr= mi.getExpression();
         if (isKeySetMethod(miExpr)) {
             final MethodInvocation mapKeySetMi= (MethodInvocation) miExpr;
-            if (usesGivenSignature(mi, Set.class.getCanonicalName(), "clear")) { //$NON-NLS-1$
+            if (ASTNodes.usesGivenSignature(mi, Set.class.getCanonicalName(), "clear")) { //$NON-NLS-1$
                 return removeInvocationOfMapKeySet(mapKeySetMi, mi, "clear"); //$NON-NLS-1$
             }
-            if (usesGivenSignature(mi, Set.class.getCanonicalName(), "size")) { //$NON-NLS-1$
+            if (ASTNodes.usesGivenSignature(mi, Set.class.getCanonicalName(), "size")) { //$NON-NLS-1$
                 return removeInvocationOfMapKeySet(mapKeySetMi, mi, "size"); //$NON-NLS-1$
             }
-            if (usesGivenSignature(mi, Set.class.getCanonicalName(), "isEmpty")) { //$NON-NLS-1$
+            if (ASTNodes.usesGivenSignature(mi, Set.class.getCanonicalName(), "isEmpty")) { //$NON-NLS-1$
                 return removeInvocationOfMapKeySet(mapKeySetMi, mi, "isEmpty"); //$NON-NLS-1$
             }
-            if (usesGivenSignature(mi, Set.class.getCanonicalName(), "remove", Object.class.getCanonicalName()) //$NON-NLS-1$
+            if (ASTNodes.usesGivenSignature(mi, Set.class.getCanonicalName(), "remove", Object.class.getCanonicalName()) //$NON-NLS-1$
                     // If parent is not an expression statement, the MethodInvocation must return a
                     // boolean.
                     // In that case, we cannot replace because `Map.removeKey(key) != null`
                     // is not strictly equivalent to `Map.keySet().remove(key)`
-                    && mi.getParent().getNodeType() == EXPRESSION_STATEMENT) {
+                    && mi.getParent().getNodeType() == ASTNode.EXPRESSION_STATEMENT) {
                 return removeInvocationOfMapKeySet(mapKeySetMi, mi, "remove"); //$NON-NLS-1$
             }
-            if (usesGivenSignature(mi, Set.class.getCanonicalName(), "contains", Object.class.getCanonicalName())) { //$NON-NLS-1$
+            if (ASTNodes.usesGivenSignature(mi, Set.class.getCanonicalName(), "contains", Object.class.getCanonicalName())) { //$NON-NLS-1$
                 return removeInvocationOfMapKeySet(mapKeySetMi, mi, "containsKey"); //$NON-NLS-1$
             }
         }
@@ -97,13 +95,13 @@ public class MethodOnMapRatherThanMethodOnKeySetCleanUp extends AbstractCleanUpR
 
     private boolean removeInvocationOfMapKeySet(MethodInvocation mapKeySetMi, MethodInvocation actualMi,
             String methodName) {
-        final ASTBuilder b= ctx.getASTBuilder();
+        final ASTNodeFactory b= ctx.getASTBuilder();
         ctx.getRefactorings().replace(actualMi,
-                b.invoke(b.copyExpression(mapKeySetMi), methodName, b.copyRange(arguments(actualMi))));
+                b.invoke(b.copyExpression(mapKeySetMi), methodName, b.copyRange(ASTNodes.arguments(actualMi))));
         return false;
     }
 
     private boolean isKeySetMethod(Expression expr) {
-        return expr instanceof MethodInvocation && usesGivenSignature((MethodInvocation) expr, Map.class.getCanonicalName(), "keySet"); //$NON-NLS-1$
+        return expr instanceof MethodInvocation && ASTNodes.usesGivenSignature((MethodInvocation) expr, Map.class.getCanonicalName(), "keySet"); //$NON-NLS-1$
     }
 }

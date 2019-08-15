@@ -26,9 +26,8 @@
 package org.autorefactor.cfg;
 
 import org.autorefactor.util.IllegalStateException;
+import org.autorefactor.util.Utils;
 import org.eclipse.jdt.core.dom.Expression;
-
-import static org.autorefactor.util.Utils.*;
 
 /** Builder for a {@link CFGEdge}. */
 public class CFGEdgeBuilder {
@@ -99,8 +98,8 @@ public class CFGEdgeBuilder {
             return false;
         }
         final CFGEdgeBuilder other= (CFGEdgeBuilder) obj;
-        return equal(condition, other.condition) && equal(evaluationResult, other.evaluationResult)
-                && equal(sourceBlock, other.sourceBlock) && equal(targetBlock, other.targetBlock);
+        return Utils.equal(condition, other.condition) && Utils.equal(evaluationResult, other.evaluationResult)
+                && Utils.equal(sourceBlock, other.sourceBlock) && Utils.equal(targetBlock, other.targetBlock);
     }
 
     /**
@@ -131,9 +130,9 @@ public class CFGEdgeBuilder {
             throw new IllegalStateException(this.condition, "CFGEdgeBuilder " + this + " has already been built"); //$NON-NLS-1$ $NON-NLS-2$
         }
         if (condition != null) {
-            built= buildEdge(condition, evaluationResult, sourceBlock, targetBlock);
+            built= CFGEdgeBuilder.buildEdge(condition, evaluationResult, sourceBlock, targetBlock);
         } else {
-            built= buildEdge(sourceBlock, targetBlock);
+            built= CFGEdgeBuilder.buildEdge(sourceBlock, targetBlock);
         }
         return built;
     }
@@ -146,7 +145,7 @@ public class CFGEdgeBuilder {
      * @return a new {@link CFGEdge}
      */
     public static CFGEdge buildEdge(CFGBasicBlock sourceBlock, CFGBasicBlock targetBlock) {
-        return buildEdge(null, true, sourceBlock, targetBlock);
+        return CFGEdgeBuilder.buildEdge(null, true, sourceBlock, targetBlock);
     }
 
     /**
@@ -159,7 +158,7 @@ public class CFGEdgeBuilder {
      * @return a new {@link CFGEdge}
      */
     public static CFGEdge buildEdge(Expression condition, CFGBasicBlock sourceBlock, CFGBasicBlock targetBlock) {
-        return buildEdge(condition, true, sourceBlock, targetBlock);
+        return CFGEdgeBuilder.buildEdge(condition, true, sourceBlock, targetBlock);
     }
 
     /**

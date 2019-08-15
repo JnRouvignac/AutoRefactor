@@ -26,10 +26,8 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.extendedOperands;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasType;
-
-import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.StringLiteral;
@@ -65,7 +63,7 @@ public class StringValueOfRatherThanConcatCleanUp extends AbstractCleanUpRule {
 
     @Override
     public boolean visit(InfixExpression node) {
-        if (InfixExpression.Operator.PLUS.equals(node.getOperator()) && extendedOperands(node).isEmpty()) {
+        if (InfixExpression.Operator.PLUS.equals(node.getOperator()) && ASTNodes.extendedOperands(node).isEmpty()) {
             final Expression leftOperand= node.getLeftOperand();
             final Expression rightOperand= node.getRightOperand();
 
@@ -79,8 +77,8 @@ public class StringValueOfRatherThanConcatCleanUp extends AbstractCleanUpRule {
     private boolean maybeReplaceStringConcatenation(final InfixExpression node, final Expression expr,
             final Expression variable) {
         if (expr instanceof StringLiteral && ((StringLiteral) expr).getLiteralValue().matches("") //$NON-NLS-1$
-                && !hasType(variable, String.class.getCanonicalName(), "char[]")) { //$NON-NLS-1$
-            final ASTBuilder b= this.ctx.getASTBuilder();
+                && !ASTNodes.hasType(variable, String.class.getCanonicalName(), "char[]")) { //$NON-NLS-1$
+            final ASTNodeFactory b= this.ctx.getASTBuilder();
             ctx.getRefactorings().replace(node, b.invoke("String", "valueOf", b.copy(variable))); //$NON-NLS-1$ $NON-NLS-2$
             return false;
         }

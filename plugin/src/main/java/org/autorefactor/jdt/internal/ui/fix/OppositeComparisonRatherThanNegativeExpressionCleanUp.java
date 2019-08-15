@@ -25,16 +25,12 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.as;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasType;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.usesGivenSignature;
-
-import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.PrefixExpression;
-import org.eclipse.jdt.core.dom.PrefixExpression.Operator;
 
 /** See {@link #getDescription()} method. */
 public class OppositeComparisonRatherThanNegativeExpressionCleanUp extends AbstractCleanUpRule {
@@ -67,14 +63,14 @@ public class OppositeComparisonRatherThanNegativeExpressionCleanUp extends Abstr
 
     @Override
     public boolean visit(final PrefixExpression node) {
-        if (Operator.MINUS.equals(node.getOperator())) {
-            final MethodInvocation mi= as(node.getOperand(), MethodInvocation.class);
+        if (PrefixExpression.Operator.MINUS.equals(node.getOperator())) {
+            final MethodInvocation mi= ASTNodes.as(node.getOperand(), MethodInvocation.class);
 
             if (mi != null && mi.getExpression() != null && mi.arguments().size() == 1) {
                 final String[] classes= { Double.class.getCanonicalName(), Float.class.getCanonicalName(), Short.class.getCanonicalName(), Integer.class.getCanonicalName(), Long.class.getCanonicalName(), Character.class.getCanonicalName(), Byte.class.getCanonicalName(), Boolean.class.getCanonicalName() };
 
                 for (final String clazz : classes) {
-                    if (usesGivenSignature(mi, clazz, "compareTo", clazz) && hasType((Expression) mi.arguments().get(0), clazz)) { //$NON-NLS-1$
+                    if (ASTNodes.usesGivenSignature(mi, clazz, "compareTo", clazz) && ASTNodes.hasType((Expression) mi.arguments().get(0), clazz)) { //$NON-NLS-1$
                         reverseObjects(node, mi);
                         return false;
                     }
@@ -86,7 +82,7 @@ public class OppositeComparisonRatherThanNegativeExpressionCleanUp extends Abstr
     }
 
     private void reverseObjects(final PrefixExpression node, final MethodInvocation mi) {
-        final ASTBuilder b= ctx.getASTBuilder();
+        final ASTNodeFactory b= ctx.getASTBuilder();
         final Refactorings r= ctx.getRefactorings();
 
         r.replace(node, b.invoke(b.parenthesizeIfNeeded(b.copy((Expression) mi.arguments().get(0))), "compareTo", //$NON-NLS-1$

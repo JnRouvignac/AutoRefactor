@@ -69,7 +69,7 @@ public final class Release {
      * @throws RuntimeException if the provided version is not valid
      */
     public static Release javaSE(String version) {
-        return javaSE(toIntegerArray(version));
+        return Release.javaSE(Release.toIntegerArray(version));
     }
 
     /**

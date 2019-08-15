@@ -27,15 +27,11 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.as;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.asList;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isPassive;
-
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTMatcherSameVariablesAndMethods;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.ASTSemanticMatcher;
@@ -121,7 +117,7 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
 
     private void removeIdenticalTrailingCode(IfStatement node, final List<List<Statement>> allCasesStmts,
             final List<List<Statement>> caseStmtsToRemove) {
-        final ASTBuilder b= this.ctx.getASTBuilder();
+        final ASTNodeFactory b= this.ctx.getASTBuilder();
         final Refactorings r= this.ctx.getRefactorings();
 
         // Remove the nodes common to all cases
@@ -175,7 +171,7 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
         }
     }
 
-    private void insertIdenticalCode(final IfStatement node, final ASTBuilder b, final Refactorings r,
+    private void insertIdenticalCode(final IfStatement node, final ASTNodeFactory b, final Refactorings r,
             final List<Statement> stmtsToRemove) {
         for (final Statement stmtToRemove : stmtsToRemove) {
             r.insertAfter(b.copy(stmtToRemove), node);
@@ -214,7 +210,7 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
             final ASTNode parent= findNodeToRemove(allCasesStmts.get(i).get(0));
 
             if (removedStmts.containsAll(allCasesStmts.get(i))
-                    && (!(parent instanceof IfStatement) || isPassive(((IfStatement) parent).getExpression()))) {
+                    && (!(parent instanceof IfStatement) || ASTNodes.isPassive(((IfStatement) parent).getExpression()))) {
                 areCasesRemovable[i]= true;
             } else {
                 this.ctx.getRefactorings().remove(removedStmts);
@@ -289,8 +285,8 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
      *         otherwise
      */
     private boolean collectAllCases(List<List<Statement>> allCases, IfStatement node) {
-        final List<Statement> thenStmts= asList(node.getThenStatement());
-        final List<Statement> elseStmts= asList(node.getElseStatement());
+        final List<Statement> thenStmts= ASTNodes.asList(node.getThenStatement());
+        final List<Statement> elseStmts= ASTNodes.asList(node.getElseStatement());
         if (thenStmts.isEmpty() || elseStmts.isEmpty()) {
             // If the then or else clause is empty, then there is no common code whatsoever.
             // let other refactorings take care of removing empty blocks.
@@ -299,7 +295,7 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
 
         allCases.add(thenStmts);
         if (elseStmts.size() == 1) {
-            final IfStatement is= as(elseStmts.get(0), IfStatement.class);
+            final IfStatement is= ASTNodes.as(elseStmts.get(0), IfStatement.class);
             if (is != null) {
                 return collectAllCases(allCases, is);
             }

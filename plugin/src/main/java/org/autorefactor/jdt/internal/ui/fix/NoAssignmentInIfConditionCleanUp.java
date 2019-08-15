@@ -26,15 +26,8 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.as;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.fragments;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getParent;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getPreviousSibling;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isSameVariable;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.removeParentheses;
-import static org.eclipse.jdt.core.dom.VariableDeclarationFragment.INITIALIZER_PROPERTY;
-
-import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.BlockSubVisitor;
 import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.eclipse.jdt.core.dom.ASTNode;
@@ -95,15 +88,15 @@ public class NoAssignmentInIfConditionCleanUp extends AbstractCleanUpRule {
                 return true;
             }
 
-            final InfixExpression ie= as(node.getExpression(), InfixExpression.class);
+            final InfixExpression ie= ASTNodes.as(node.getExpression(), InfixExpression.class);
             return moveAssignmentBeforeIfStatementIfPossible(node, ie);
         }
 
         private boolean moveAssignmentBeforeIfStatementIfPossible(IfStatement node, InfixExpression ie) {
             if (ie != null) {
-                final InfixExpression leftIe= as(ie.getLeftOperand(), InfixExpression.class);
-                final Assignment leftAs= as(ie.getLeftOperand(), Assignment.class);
-                final Assignment rightAs= as(ie.getRightOperand(), Assignment.class);
+                final InfixExpression leftIe= ASTNodes.as(ie.getLeftOperand(), InfixExpression.class);
+                final Assignment leftAs= ASTNodes.as(ie.getLeftOperand(), Assignment.class);
+                final Assignment rightAs= ASTNodes.as(ie.getRightOperand(), Assignment.class);
                 if (leftAs != null) {
                     return moveAssignmentBeforeIfStatement(node, leftAs);
                 } else if (rightAs != null) {
@@ -117,18 +110,18 @@ public class NoAssignmentInIfConditionCleanUp extends AbstractCleanUpRule {
 
         private boolean moveAssignmentBeforeIfStatement(final IfStatement node, final Assignment a) {
             final Refactorings r= ctx.getRefactorings();
-            final ASTBuilder b= ctx.getASTBuilder();
-            final VariableDeclarationStatement vds= as(getPreviousSibling(node), VariableDeclarationStatement.class);
-            final Expression lhs= removeParentheses(a.getLeftHandSide());
+            final ASTNodeFactory b= ctx.getASTBuilder();
+            final VariableDeclarationStatement vds= ASTNodes.as(ASTNodes.getPreviousSibling(node), VariableDeclarationStatement.class);
+            final Expression lhs= ASTNodes.getUnparenthesedExpression(a.getLeftHandSide());
             final VariableDeclarationFragment vdf= findVariableDeclarationFragment(vds, lhs);
             if (vdf != null) {
-                r.set(vdf, INITIALIZER_PROPERTY, a.getRightHandSide());
-                r.replace(getParent(a, ParenthesizedExpression.class), b.copy(lhs));
+                r.set(vdf, VariableDeclarationFragment.INITIALIZER_PROPERTY, a.getRightHandSide());
+                r.replace(ASTNodes.getParent(a, ParenthesizedExpression.class), b.copy(lhs));
                 setResult(false);
                 return false;
             } else if (!isAnElseIf(node)) {
                 r.insertBefore(b.toStmt(b.move(a)), node);
-                r.replace(getParent(a, ParenthesizedExpression.class), b.copy(lhs));
+                r.replace(ASTNodes.getParent(a, ParenthesizedExpression.class), b.copy(lhs));
                 setResult(false);
                 return false;
             }
@@ -138,8 +131,8 @@ public class NoAssignmentInIfConditionCleanUp extends AbstractCleanUpRule {
         private VariableDeclarationFragment findVariableDeclarationFragment(final VariableDeclarationStatement vds,
                 final Expression expr) {
             if (vds != null && expr instanceof SimpleName) {
-                for (VariableDeclarationFragment vdf : fragments(vds)) {
-                    if (isSameVariable(expr, vdf)) {
+                for (VariableDeclarationFragment vdf : ASTNodes.fragments(vds)) {
+                    if (ASTNodes.isSameVariable(expr, vdf)) {
                         return vdf;
                     }
                 }

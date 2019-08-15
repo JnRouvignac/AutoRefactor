@@ -25,22 +25,14 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.arg0;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.as;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.asExpression;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.asList;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasOperator;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.usesGivenSignature;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.match;
-import static org.autorefactor.util.Utils.getFirst;
-import static org.eclipse.jdt.core.dom.PrefixExpression.Operator.NOT;
-
 import java.util.List;
 import java.util.Set;
 
-import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.ASTSemanticMatcher;
 import org.autorefactor.jdt.internal.corext.dom.Refactorings;
+import org.autorefactor.util.Utils;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.MethodInvocation;
@@ -80,8 +72,8 @@ public class UpdateSetRatherThanTestingFirstCleanUp extends AbstractCleanUpRule 
     public boolean visit(IfStatement node) {
         final Statement elseStmt= node.getElseStatement();
         final Statement thenStmt= node.getThenStatement();
-        final PrefixExpression pe= as(node.getExpression(), PrefixExpression.class);
-        if (hasOperator(pe, NOT)) {
+        final PrefixExpression pe= ASTNodes.as(node.getExpression(), PrefixExpression.class);
+        if (ASTNodes.hasOperator(pe, PrefixExpression.Operator.NOT)) {
             return maybeReplaceSetContains(node, pe.getOperand(), thenStmt, elseStmt, false);
         } else {
             return maybeReplaceSetContains(node, node.getExpression(), elseStmt, thenStmt, true);
@@ -96,26 +88,26 @@ public class UpdateSetRatherThanTestingFirstCleanUp extends AbstractCleanUpRule 
 
     private boolean maybeReplaceSetContains(final IfStatement ifStmtToReplace, final Expression ifExpr,
             final Statement stmt, final Statement oppositeStmt, final boolean negate, final String methodName) {
-        final List<Statement> stmts= asList(stmt);
-        final MethodInvocation miContains= as(ifExpr, MethodInvocation.class);
-        if (!stmts.isEmpty() && usesGivenSignature(miContains, Set.class.getCanonicalName(), "contains", Object.class.getCanonicalName())) { //$NON-NLS-1$
-            final Statement firstStmt= getFirst(stmts);
-            final MethodInvocation miAddOrRemove= asExpression(firstStmt, MethodInvocation.class);
+        final List<Statement> stmts= ASTNodes.asList(stmt);
+        final MethodInvocation miContains= ASTNodes.as(ifExpr, MethodInvocation.class);
+        if (!stmts.isEmpty() && ASTNodes.usesGivenSignature(miContains, Set.class.getCanonicalName(), "contains", Object.class.getCanonicalName())) { //$NON-NLS-1$
+            final Statement firstStmt= Utils.getFirst(stmts);
+            final MethodInvocation miAddOrRemove= ASTNodes.asExpression(firstStmt, MethodInvocation.class);
             final ASTSemanticMatcher astMatcher= new ASTSemanticMatcher();
-            if (usesGivenSignature(miAddOrRemove, Set.class.getCanonicalName(), methodName, Object.class.getCanonicalName())
-                    && match(astMatcher, miContains.getExpression(), miAddOrRemove.getExpression())
-                    && match(astMatcher, arg0(miContains), arg0(miAddOrRemove))) {
-                final ASTBuilder b= this.ctx.getASTBuilder();
+            if (ASTNodes.usesGivenSignature(miAddOrRemove, Set.class.getCanonicalName(), methodName, Object.class.getCanonicalName())
+                    && ASTNodes.match(astMatcher, miContains.getExpression(), miAddOrRemove.getExpression())
+                    && ASTNodes.match(astMatcher, ASTNodes.arg0(miContains), ASTNodes.arg0(miAddOrRemove))) {
+                final ASTNodeFactory b= this.ctx.getASTBuilder();
                 final Refactorings r= this.ctx.getRefactorings();
 
-                if (stmts.size() == 1 && asList(oppositeStmt).isEmpty()) {
+                if (stmts.size() == 1 && ASTNodes.asList(oppositeStmt).isEmpty()) {
                     // Only one statement: replace if statement with col.add() (or col.remove())
                     r.replace(ifStmtToReplace, b.move(firstStmt));
                 } else {
                     // There are other statements, replace the if condition with col.add() (or
                     // col.remove())
                     r.replace(ifStmtToReplace.getExpression(),
-                            negate ? b.negate(miAddOrRemove, ASTBuilder.Copy.MOVE) : b.move(miAddOrRemove));
+                            negate ? b.negate(miAddOrRemove, ASTNodeFactory.Copy.MOVE) : b.move(miAddOrRemove));
                     r.remove(firstStmt);
                 }
                 return false;

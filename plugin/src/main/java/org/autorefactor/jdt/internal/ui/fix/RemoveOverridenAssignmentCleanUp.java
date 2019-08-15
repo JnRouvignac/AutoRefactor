@@ -25,13 +25,7 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.asExpression;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getNextSibling;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasOperator;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isPassive;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isSameVariable;
-import static org.eclipse.jdt.core.dom.Assignment.Operator.ASSIGN;
-
+import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.SimpleName;
@@ -73,17 +67,17 @@ public class RemoveOverridenAssignmentCleanUp extends AbstractCleanUpRule {
         if (node.fragments() != null && node.fragments().size() == 1) {
             final VariableDeclarationFragment fragment= (VariableDeclarationFragment) node.fragments().get(0);
 
-            if (fragment.getInitializer() != null && isPassive(fragment.getInitializer())) {
+            if (fragment.getInitializer() != null && ASTNodes.isPassive(fragment.getInitializer())) {
                 final SimpleName varName= fragment.getName();
                 final IVariableBinding variable= fragment.resolveBinding();
-                Statement stmtToInspect= getNextSibling(node);
+                Statement stmtToInspect= ASTNodes.getNextSibling(node);
                 boolean isOverridden= false;
                 boolean isRead= false;
 
                 while (stmtToInspect != null && !isOverridden && !isRead) {
-                    final Assignment assignment= asExpression(stmtToInspect, Assignment.class);
-                    if (assignment != null && isSameVariable(varName, assignment.getLeftHandSide())) {
-                        if (hasOperator(assignment, ASSIGN)) {
+                    final Assignment assignment= ASTNodes.asExpression(stmtToInspect, Assignment.class);
+                    if (assignment != null && ASTNodes.isSameVariable(varName, assignment.getLeftHandSide())) {
+                        if (ASTNodes.hasOperator(assignment, Assignment.Operator.ASSIGN)) {
                             isOverridden= true;
                         } else {
                             isRead= true;
@@ -92,7 +86,7 @@ public class RemoveOverridenAssignmentCleanUp extends AbstractCleanUpRule {
 
                     isRead|= !new VariableDefinitionsUsesVisitor(variable, stmtToInspect).find().getUses().isEmpty();
 
-                    stmtToInspect= getNextSibling(stmtToInspect);
+                    stmtToInspect= ASTNodes.getNextSibling(stmtToInspect);
                 }
 
                 if (isOverridden && !isRead) {

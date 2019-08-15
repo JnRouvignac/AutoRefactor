@@ -25,12 +25,10 @@
  */
 package org.autorefactor.jdt.internal.corext.dom;
 
-import static org.autorefactor.util.Utils.equalNotNull;
 import static org.eclipse.jdt.core.dom.ASTNode.BREAK_STATEMENT;
 import static org.eclipse.jdt.core.dom.ASTNode.CONTINUE_STATEMENT;
 import static org.eclipse.jdt.core.dom.ASTNode.FIELD_ACCESS;
 import static org.eclipse.jdt.core.dom.ASTNode.IF_STATEMENT;
-import static org.eclipse.jdt.core.dom.ASTNode.PARENTHESIZED_EXPRESSION;
 import static org.eclipse.jdt.core.dom.ASTNode.QUALIFIED_NAME;
 import static org.eclipse.jdt.core.dom.ASTNode.RETURN_STATEMENT;
 import static org.eclipse.jdt.core.dom.ASTNode.SIMPLE_NAME;
@@ -38,10 +36,6 @@ import static org.eclipse.jdt.core.dom.ASTNode.SINGLE_VARIABLE_DECLARATION;
 import static org.eclipse.jdt.core.dom.ASTNode.THIS_EXPRESSION;
 import static org.eclipse.jdt.core.dom.ASTNode.THROW_STATEMENT;
 import static org.eclipse.jdt.core.dom.ASTNode.VARIABLE_DECLARATION_FRAGMENT;
-import static org.eclipse.jdt.core.dom.IBinding.VARIABLE;
-import static org.eclipse.jdt.core.dom.InfixExpression.Operator.NOT_EQUALS;
-import static org.eclipse.jdt.core.dom.PrefixExpression.Operator.DECREMENT;
-import static org.eclipse.jdt.core.dom.PrefixExpression.Operator.INCREMENT;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -58,6 +52,7 @@ import java.util.TreeSet;
 import org.autorefactor.util.IllegalArgumentException;
 import org.autorefactor.util.IllegalStateException;
 import org.autorefactor.util.NotImplementedException;
+import org.autorefactor.util.Utils;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.AbstractTypeDeclaration;
@@ -102,7 +97,6 @@ import org.eclipse.jdt.core.dom.ParameterizedType;
 import org.eclipse.jdt.core.dom.ParenthesizedExpression;
 import org.eclipse.jdt.core.dom.PostfixExpression;
 import org.eclipse.jdt.core.dom.PrefixExpression;
-import org.eclipse.jdt.core.dom.PrefixExpression.Operator;
 import org.eclipse.jdt.core.dom.QualifiedName;
 import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.SimpleName;
@@ -201,7 +195,7 @@ public final class ASTNodes {
 
         @Override
         public boolean visit(PrefixExpression node) {
-            if (INCREMENT.equals(node.getOperator()) || DECREMENT.equals(node.getOperator())) {
+            if (PrefixExpression.Operator.INCREMENT.equals(node.getOperator()) || PrefixExpression.Operator.DECREMENT.equals(node.getOperator())) {
                 activityLevel= ExprActivity.ACTIVE;
                 return interruptVisit();
             }
@@ -217,7 +211,7 @@ public final class ASTNodes {
         @SuppressWarnings("unchecked")
         @Override
         public boolean visit(InfixExpression node) {
-            if (InfixExpression.Operator.PLUS.equals(node.getOperator()) && hasType(node, String.class.getCanonicalName())
+            if (InfixExpression.Operator.PLUS.equals(node.getOperator()) && ASTNodes.hasType(node, String.class.getCanonicalName())
                     && (mayCallImplicitToString(node.getLeftOperand())
                             || mayCallImplicitToString(node.getRightOperand())
                             || mayCallImplicitToString(node.extendedOperands()))) {
@@ -238,7 +232,7 @@ public final class ASTNodes {
         }
 
         private boolean mayCallImplicitToString(Expression expr) {
-            return !hasType(expr, String.class.getCanonicalName(), boolean.class.getSimpleName(), short.class.getSimpleName(), int.class.getSimpleName(), long.class.getSimpleName(), float.class.getSimpleName(), double.class.getSimpleName(),
+            return !ASTNodes.hasType(expr, String.class.getCanonicalName(), boolean.class.getSimpleName(), short.class.getSimpleName(), int.class.getSimpleName(), long.class.getSimpleName(), float.class.getSimpleName(), double.class.getSimpleName(),
                     Short.class.getCanonicalName(), Boolean.class.getCanonicalName(), Integer.class.getCanonicalName(), Long.class.getCanonicalName(), Float.class.getCanonicalName(),
                     Double.class.getCanonicalName()) && !(expr instanceof PrefixExpression) && !(expr instanceof InfixExpression)
                     && !(expr instanceof PostfixExpression);
@@ -281,9 +275,9 @@ public final class ASTNodes {
      * @return the same node after removing any parentheses around it. If there are
      *         no parentheses around it then the exact same node is returned
      */
-    public static ASTNode removeParentheses(ASTNode node) {
+    public static ASTNode getUnparenthesedExpression(ASTNode node) {
         if (node instanceof Expression) {
-            return removeParentheses((Expression) node);
+            return ASTNodes.getUnparenthesedExpression((Expression) node);
         }
         return node;
     }
@@ -296,9 +290,9 @@ public final class ASTNodes {
      *         are no parentheses around it then the exact same expression is
      *         returned
      */
-    public static Expression removeParentheses(Expression expr) {
-        if (expr.getNodeType() == PARENTHESIZED_EXPRESSION) {
-            return removeParentheses(((ParenthesizedExpression) expr).getExpression());
+    public static Expression getUnparenthesedExpression(Expression expr) {
+        if (expr.getNodeType() == ASTNode.PARENTHESIZED_EXPRESSION) {
+            return ASTNodes.getUnparenthesedExpression(((ParenthesizedExpression) expr).getExpression());
         }
         return expr;
     }
@@ -322,7 +316,7 @@ public final class ASTNodes {
         }
 
         if (stmt instanceof Block) {
-            return statements((Block) stmt);
+            return ASTNodes.statements((Block) stmt);
         }
 
         return Arrays.asList(stmt);
@@ -344,7 +338,7 @@ public final class ASTNodes {
             return null;
         }
 
-        final List<Statement> stmts= asList(stmt);
+        final List<Statement> stmts= ASTNodes.asList(stmt);
         if (stmts.size() == 1) {
             final Statement oneStmt= stmts.get(0);
 
@@ -353,7 +347,7 @@ public final class ASTNodes {
             }
 
             if (oneStmt instanceof LabeledStatement) {
-                return as(((LabeledStatement) oneStmt).getBody(), stmtClass);
+                return ASTNodes.as(((LabeledStatement) oneStmt).getBody(), stmtClass);
             }
         }
 
@@ -369,7 +363,7 @@ public final class ASTNodes {
      *         {@code false} otherwise
      */
     public static boolean is(Statement stmt, Class<? extends Statement> stmtClass) {
-        return as(stmt, stmtClass) != null;
+        return ASTNodes.as(stmt, stmtClass) != null;
     }
 
     /**
@@ -388,7 +382,7 @@ public final class ASTNodes {
             if (exprClass.isAssignableFrom(expr.getClass())) {
                 return (T) expr;
             } else if (expr instanceof ParenthesizedExpression) {
-                return as(((ParenthesizedExpression) expr).getExpression(), exprClass);
+                return ASTNodes.as(((ParenthesizedExpression) expr).getExpression(), exprClass);
             }
         }
         return null;
@@ -403,7 +397,7 @@ public final class ASTNodes {
      *         {@code false} otherwise
      */
     public static boolean is(Expression expr, Class<? extends Expression> exprClass) {
-        return as(expr, exprClass) != null;
+        return ASTNodes.as(expr, exprClass) != null;
     }
 
     /**
@@ -415,7 +409,7 @@ public final class ASTNodes {
      *         ignoring parentheses, false otherwise
      */
     public static boolean isNullLiteral(Expression expr) {
-        return is(expr, NullLiteral.class);
+        return ASTNodes.is(expr, NullLiteral.class);
     }
 
     /**
@@ -430,7 +424,7 @@ public final class ASTNodes {
      */
     public static <T extends Expression> T as(Collection<? extends Expression> exprs, Class<T> exprClass) {
         if (exprs != null && exprs.size() == 1) {
-            return as(exprs.iterator().next(), exprClass);
+            return ASTNodes.as(exprs.iterator().next(), exprClass);
         }
         return null;
     }
@@ -447,9 +441,9 @@ public final class ASTNodes {
      *         {@link ExpressionStatement}
      */
     public static <T extends Expression> T asExpression(Statement stmt, Class<T> exprClass) {
-        final ExpressionStatement es= as(stmt, ExpressionStatement.class);
+        final ExpressionStatement es= ASTNodes.as(stmt, ExpressionStatement.class);
         if (es != null) {
-            return as(es.getExpression(), exprClass);
+            return ASTNodes.as(es.getExpression(), exprClass);
         }
         return null;
     }
@@ -543,7 +537,7 @@ public final class ASTNodes {
      * @throws IllegalArgumentException if this method invocation has no arguments
      */
     public static Expression arg0(final MethodInvocation node) {
-        final List<Expression> args= arguments(node);
+        final List<Expression> args= ASTNodes.arguments(node);
         if (args.isEmpty()) {
             throw new IllegalArgumentException(node, "The arguments must not be empty for method " + node); //$NON-NLS-1$
         }
@@ -617,7 +611,7 @@ public final class ASTNodes {
      * @return a List of expressions
      */
     public static List<Expression> allOperands(InfixExpression node) {
-        final List<Expression> extOps= extendedOperands(node);
+        final List<Expression> extOps= ASTNodes.extendedOperands(node);
         final List<Expression> results= new ArrayList<Expression>(2 + extOps.size());
         results.add(node.getLeftOperand());
         results.add(node.getRightOperand());
@@ -913,13 +907,13 @@ public final class ASTNodes {
      *         represents one, null otherwise
      */
     public static Boolean getBooleanLiteral(Expression expr) {
-        final BooleanLiteral bl= as(expr, BooleanLiteral.class);
+        final BooleanLiteral bl= ASTNodes.as(expr, BooleanLiteral.class);
         if (bl != null) {
             return bl.booleanValue();
         }
-        final QualifiedName qn= as(expr, QualifiedName.class);
-        if (hasType(qn, Boolean.class.getCanonicalName())) {
-            return getBooleanObject(qn);
+        final QualifiedName qn= ASTNodes.as(expr, QualifiedName.class);
+        if (ASTNodes.hasType(qn, Boolean.class.getCanonicalName())) {
+            return ASTNodes.getBooleanObject(qn);
         }
         return null;
     }
@@ -958,7 +952,7 @@ public final class ASTNodes {
      * @throws IllegalStateException if ancestor not found.
      */
     public static <T extends ASTNode> T getAncestor(ASTNode node, Class<T> ancestorClass) {
-        final T ancestor= getAncestorOrNull(node, ancestorClass);
+        final T ancestor= ASTNodes.getAncestorOrNull(node, ancestorClass);
         if (ancestor != null) {
             return ancestor;
         }
@@ -985,7 +979,7 @@ public final class ASTNodes {
         if (ancestorClass.isAssignableFrom(parent.getClass())) {
             return (T) parent;
         }
-        return getAncestorOrNull(parent, ancestorClass);
+        return ASTNodes.getAncestorOrNull(parent, ancestorClass);
     }
 
     /**
@@ -999,7 +993,7 @@ public final class ASTNodes {
      */
     public static ASTNode getEnclosingType(ASTNode node) {
         final Class<?>[] ancestorClasses= { AbstractTypeDeclaration.class, AnonymousClassDeclaration.class };
-        final ASTNode ancestor= getFirstAncestorOrNull(node, ancestorClasses);
+        final ASTNode ancestor= ASTNodes.getFirstAncestorOrNull(node, ancestorClasses);
         if (ancestor == null) {
             throw new IllegalStateException(node,
                     "Could not find any ancestor for " + Arrays.toString(ancestorClasses) + " and node type " //$NON-NLS-1$ $NON-NLS-2$
@@ -1032,7 +1026,7 @@ public final class ASTNodes {
                 return parent;
             }
         }
-        return getFirstAncestorOrNull(parent, ancestorClasses);
+        return ASTNodes.getFirstAncestorOrNull(parent, ancestorClasses);
     }
 
     /**
@@ -1047,11 +1041,11 @@ public final class ASTNodes {
         if (node != null) {
             final ASTNode parent= node.getParent();
             if (parent instanceof ParenthesizedExpression) {
-                return getTargetType(parent);
+                return ASTNodes.getTargetType(parent);
             } else if (parent instanceof ReturnStatement) {
                 final ReturnStatement returnStmt= (ReturnStatement) parent;
                 if (returnStmt.getExpression().equals(node)) {
-                    final MethodDeclaration method= getAncestorOrNull(returnStmt, MethodDeclaration.class);
+                    final MethodDeclaration method= ASTNodes.getAncestorOrNull(returnStmt, MethodDeclaration.class);
                     if (method != null && method.getReturnType2() != null) {
                         return method.getReturnType2().resolveBinding();
                     }
@@ -1059,7 +1053,7 @@ public final class ASTNodes {
             } else if (parent instanceof CastExpression) {
                 return ((CastExpression) parent).resolveTypeBinding();
             } else if (parent instanceof VariableDeclarationFragment) {
-                return resolveTypeBinding((VariableDeclarationFragment) parent);
+                return ASTNodes.resolveTypeBinding((VariableDeclarationFragment) parent);
             } else if (parent instanceof Assignment) {
                 return ((Assignment) parent).getLeftHandSide().resolveTypeBinding();
             } else if (parent instanceof ArrayAccess) {
@@ -1074,7 +1068,7 @@ public final class ASTNodes {
                 }
             } else if (parent instanceof PrefixExpression) {
                 final PrefixExpression prefixExpr= (PrefixExpression) parent;
-                if (Operator.NOT.equals(prefixExpr.getOperator())) {
+                if (PrefixExpression.Operator.NOT.equals(prefixExpr.getOperator())) {
                     return node.getAST().resolveWellKnownType(boolean.class.getSimpleName());
                 }
             } else if (parent instanceof InfixExpression) {
@@ -1103,7 +1097,7 @@ public final class ASTNodes {
                 if (switchStmt.getExpression().equals(node)) {
                     final ITypeBinding discriminentType= switchStmt.getExpression().resolveTypeBinding();
                     if (discriminentType.isPrimitive() || discriminentType.isEnum()
-                            || hasType(discriminentType, String.class.getCanonicalName())) {
+                            || ASTNodes.hasType(discriminentType, String.class.getCanonicalName())) {
                         return discriminentType;
                     } else {
                         return node.getAST()
@@ -1124,7 +1118,7 @@ public final class ASTNodes {
      *         otherwise
      */
     public static BodyDeclaration getPreviousSibling(BodyDeclaration startNode) {
-        return getSibling(startNode, true);
+        return ASTNodes.getSibling(startNode, true);
     }
 
     /**
@@ -1134,7 +1128,7 @@ public final class ASTNodes {
      * @return the previous statement in the same block if it exists, null otherwise
      */
     public static Statement getPreviousSibling(Statement startNode) {
-        return getSibling(startNode, true);
+        return ASTNodes.getSibling(startNode, true);
     }
 
     /**
@@ -1145,13 +1139,13 @@ public final class ASTNodes {
      *         otherwise
      */
     public static Statement getPreviousStatement(Statement startNode) {
-        final Statement previousSibling= getPreviousSibling(startNode);
+        final Statement previousSibling= ASTNodes.getPreviousSibling(startNode);
         if (previousSibling != null) {
             return previousSibling;
         }
         final ASTNode parent= startNode.getParent();
         if (parent instanceof Statement) {
-            return getPreviousStatement((Statement) parent);
+            return ASTNodes.getPreviousStatement((Statement) parent);
         }
         return null;
     }
@@ -1164,7 +1158,7 @@ public final class ASTNodes {
      *         otherwise
      */
     public static BodyDeclaration getNextSibling(BodyDeclaration startNode) {
-        return getSibling(startNode, false);
+        return ASTNodes.getSibling(startNode, false);
     }
 
     /**
@@ -1174,7 +1168,7 @@ public final class ASTNodes {
      * @return the next statement in the same block if it exists, null otherwise
      */
     public static Statement getNextSibling(Statement startNode) {
-        return getSibling(startNode, false);
+        return ASTNodes.getSibling(startNode, false);
     }
 
     /**
@@ -1186,7 +1180,7 @@ public final class ASTNodes {
      */
     public static List<Statement> getNextSiblings(Statement startNode) {
         if (startNode.getParent() instanceof Block) {
-            final List<Statement> stmts= asList((Statement) startNode.getParent());
+            final List<Statement> stmts= ASTNodes.asList((Statement) startNode.getParent());
             final int indexOfNode= stmts.indexOf(startNode);
             final int siblingIndex= indexOfNode + 1;
             if (0 <= siblingIndex && siblingIndex < stmts.size()) {
@@ -1203,13 +1197,13 @@ public final class ASTNodes {
      * @return the next statement in the source file if it exists, null otherwise
      */
     public static Statement getNextStatement(Statement startNode) {
-        final Statement nextSibling= getNextSibling(startNode);
+        final Statement nextSibling= ASTNodes.getNextSibling(startNode);
         if (nextSibling != null) {
             return nextSibling;
         }
         final ASTNode parent= startNode.getParent();
         if (parent instanceof Statement) {
-            return getNextStatement((Statement) parent);
+            return ASTNodes.getNextStatement((Statement) parent);
         }
         return null;
     }
@@ -1218,13 +1212,13 @@ public final class ASTNodes {
         final ASTNode parent= node.getParent();
         if (parent instanceof AbstractTypeDeclaration) {
             final AbstractTypeDeclaration typeDecl= (AbstractTypeDeclaration) parent;
-            return getSibling(node, typeDecl, lookForPrevious);
+            return ASTNodes.getSibling(node, typeDecl, lookForPrevious);
         } else if (parent instanceof AnonymousClassDeclaration) {
             final AnonymousClassDeclaration classDecl= (AnonymousClassDeclaration) parent;
-            return getSibling(node, classDecl, lookForPrevious);
+            return ASTNodes.getSibling(node, classDecl, lookForPrevious);
         } else if (parent instanceof CompilationUnit) {
             final CompilationUnit cu= (CompilationUnit) parent;
-            final List<AbstractTypeDeclaration> types= types(cu);
+            final List<AbstractTypeDeclaration> types= ASTNodes.types(cu);
             final int index= types.indexOf(node);
             if (index != -1 && index + 1 < types.size()) {
                 return types.get(index + 1);
@@ -1235,12 +1229,12 @@ public final class ASTNodes {
 
     private static BodyDeclaration getSibling(BodyDeclaration node, AbstractTypeDeclaration parent,
             boolean lookForPrevious) {
-        return getSibling(node, bodyDeclarations(parent), lookForPrevious);
+        return ASTNodes.getSibling(node, ASTNodes.bodyDeclarations(parent), lookForPrevious);
     }
 
     private static BodyDeclaration getSibling(BodyDeclaration node, AnonymousClassDeclaration parent,
             boolean lookForPrevious) {
-        return getSibling(node, bodyDeclarations(parent), lookForPrevious);
+        return ASTNodes.getSibling(node, ASTNodes.bodyDeclarations(parent), lookForPrevious);
     }
 
     private static BodyDeclaration getSibling(BodyDeclaration node, List<BodyDeclaration> bodyDeclarations,
@@ -1266,7 +1260,7 @@ public final class ASTNodes {
 
     private static Statement getSibling(Statement node, boolean isPrevious) {
         if (node.getParent() instanceof Block) {
-            final List<Statement> stmts= asList((Statement) node.getParent());
+            final List<Statement> stmts= ASTNodes.asList((Statement) node.getParent());
             final int indexOfNode= stmts.indexOf(node);
             final int siblingIndex= isPrevious ? indexOfNode - 1 : indexOfNode + 1;
             if (0 <= siblingIndex && siblingIndex < stmts.size()) {
@@ -1338,7 +1332,7 @@ public final class ASTNodes {
      * @param operator the operator to test
      * @return true if the provided node has the provided operator, false otherwise.
      */
-    public static boolean hasOperator(PrefixExpression node, Operator... operator) {
+    public static boolean hasOperator(PrefixExpression node, PrefixExpression.Operator... operator) {
         return node != null && Arrays.asList(operator).contains(node.getOperator());
     }
 
@@ -1353,7 +1347,7 @@ public final class ASTNodes {
      *         provided type, false otherwise
      */
     public static boolean hasType(Expression expr, String... oneOfQualifiedTypeNames) {
-        return expr != null && hasType(expr.resolveTypeBinding(), oneOfQualifiedTypeNames);
+        return expr != null && ASTNodes.hasType(expr.resolveTypeBinding(), oneOfQualifiedTypeNames);
     }
 
     /**
@@ -1387,7 +1381,7 @@ public final class ASTNodes {
      *         the provided type, {@code false} otherwise
      */
     public static boolean haveSameType(Expression expr1, Expression expr2) {
-        return expr1 != null && expr2 != null && equalNotNull(expr1.resolveTypeBinding(), expr2.resolveTypeBinding());
+        return expr1 != null && expr2 != null && Utils.equalNotNull(expr1.resolveTypeBinding(), expr2.resolveTypeBinding());
     }
 
     /**
@@ -1400,7 +1394,7 @@ public final class ASTNodes {
      *         qualified type name, {@code false} otherwise
      */
     public static boolean instanceOf(Expression expr, String qualifiedTypeName) {
-        return expr != null && instanceOf(expr.resolveTypeBinding(), qualifiedTypeName);
+        return expr != null && ASTNodes.instanceOf(expr.resolveTypeBinding(), qualifiedTypeName);
     }
 
     /**
@@ -1413,7 +1407,7 @@ public final class ASTNodes {
      *         type name, false otherwise
      */
     public static boolean instanceOf(ITypeBinding typeBinding, String qualifiedTypeName) {
-        return findImplementedType(typeBinding, qualifiedTypeName) != null;
+        return ASTNodes.findImplementedType(typeBinding, qualifiedTypeName) != null;
     }
 
     /**
@@ -1438,7 +1432,7 @@ public final class ASTNodes {
      *         otherwise
      */
     public static boolean isConstant(final Expression expr) {
-        return (expr != null && expr.resolveConstantExpressionValue() != null) || isEnumConstant(expr);
+        return (expr != null && expr.resolveConstantExpressionValue() != null) || ASTNodes.isEnumConstant(expr);
     }
 
     private static boolean isEnumConstant(final Expression expr) {
@@ -1473,13 +1467,13 @@ public final class ASTNodes {
             case ASTNode.INFIX_EXPRESSION:
                 InfixExpression infixExpression= (InfixExpression) expr;
 
-                if (!isHardCoded(infixExpression.getLeftOperand())) {
+                if (!ASTNodes.isHardCoded(infixExpression.getLeftOperand())) {
                     return false;
-                } else if (!isHardCoded(infixExpression.getRightOperand())) {
+                } else if (!ASTNodes.isHardCoded(infixExpression.getRightOperand())) {
                     return false;
                 } else if (infixExpression.hasExtendedOperands()) {
                     for (Object operand : infixExpression.extendedOperands()) {
-                        if (!isHardCoded((Expression) operand)) {
+                        if (!ASTNodes.isHardCoded((Expression) operand)) {
                             return false;
                         }
                     }
@@ -1489,20 +1483,20 @@ public final class ASTNodes {
 
             case ASTNode.PREFIX_EXPRESSION:
                 PrefixExpression prefixExpression= (PrefixExpression) expr;
-                return isHardCoded(prefixExpression.getOperand());
+                return ASTNodes.isHardCoded(prefixExpression.getOperand());
 
             case ASTNode.POSTFIX_EXPRESSION:
                 PostfixExpression postfixExpression= (PostfixExpression) expr;
-                return isHardCoded(postfixExpression.getOperand());
+                return ASTNodes.isHardCoded(postfixExpression.getOperand());
 
             case ASTNode.CAST_EXPRESSION:
-                return isHardCoded(((CastExpression) expr).getExpression());
+                return ASTNodes.isHardCoded(((CastExpression) expr).getExpression());
 
             case ASTNode.PARENTHESIZED_EXPRESSION:
-                return isHardCoded(((ParenthesizedExpression) expr).getExpression());
+                return ASTNodes.isHardCoded(((ParenthesizedExpression) expr).getExpression());
 
             default:
-                return expr.resolveConstantExpressionValue() != null || isEnumConstant(expr);
+                return expr.resolveConstantExpressionValue() != null || ASTNodes.isEnumConstant(expr);
             }
         } else {
             return false;
@@ -1517,7 +1511,7 @@ public final class ASTNodes {
      *         {@code false} otherwise
      */
     public static boolean isLocalVariable(IBinding binding) {
-        if (binding != null && binding.getKind() == VARIABLE) {
+        if (binding != null && binding.getKind() == IBinding.VARIABLE) {
             final IVariableBinding bnd= (IVariableBinding) binding;
             return !bnd.isField() && !bnd.isEnumConstant();
         }
@@ -1534,7 +1528,7 @@ public final class ASTNodes {
      *         same local variable, {@code false} otherwise
      */
     public static boolean isSameLocalVariable(IBinding binding, Expression expr) {
-        return isLocalVariable(binding) && expr != null && expr.getNodeType() == SIMPLE_NAME
+        return ASTNodes.isLocalVariable(binding) && expr != null && expr.getNodeType() == ASTNode.SIMPLE_NAME
         // No need to use IVariableBinding.isEqualTo(IBinding) since we are looking for
         // a *local* variable
                 && binding.equals(((SimpleName) expr).resolveBinding());
@@ -1549,8 +1543,8 @@ public final class ASTNodes {
      *         variable, {@code false} otherwise
      */
     public static boolean isSameLocalVariable(Expression expr1, Expression expr2) {
-        return expr1 != null && expr1.getNodeType() == SIMPLE_NAME
-                && isSameLocalVariable(((SimpleName) expr1).resolveBinding(), expr2);
+        return expr1 != null && expr1.getNodeType() == ASTNode.SIMPLE_NAME
+                && ASTNodes.isSameLocalVariable(((SimpleName) expr1).resolveBinding(), expr2);
     }
 
     /**
@@ -1563,7 +1557,7 @@ public final class ASTNodes {
      *         {@code false} otherwise
      */
     public static boolean isSameLocalVariable(VariableDeclaration varDecl, Expression expr) {
-        return varDecl != null && isSameLocalVariable(varDecl.resolveBinding(), expr);
+        return varDecl != null && ASTNodes.isSameLocalVariable(varDecl.resolveBinding(), expr);
     }
 
     /**
@@ -1575,7 +1569,7 @@ public final class ASTNodes {
      *         otherwise
      */
     public static boolean isPrimitive(Expression expr, String primitiveTypeName) {
-        return expr != null && isPrimitive(expr.resolveTypeBinding(), primitiveTypeName);
+        return expr != null && ASTNodes.isPrimitive(expr.resolveTypeBinding(), primitiveTypeName);
     }
 
     /**
@@ -1586,7 +1580,7 @@ public final class ASTNodes {
      *         otherwise
      */
     public static boolean isPrimitive(Expression expr) {
-        return expr != null && isPrimitive(expr.resolveTypeBinding());
+        return expr != null && ASTNodes.isPrimitive(expr.resolveTypeBinding());
     }
 
     /**
@@ -1637,7 +1631,7 @@ public final class ASTNodes {
         }
         final Set<String> visitedClasses= new HashSet<String>();
         visitedClasses.add(typeErasure.getQualifiedName());
-        return findImplementedType(typeBinding, qualifiedTypeName, visitedClasses);
+        return ASTNodes.findImplementedType(typeBinding, qualifiedTypeName, visitedClasses);
     }
 
     private static ITypeBinding findImplementedType(ITypeBinding typeBinding, String qualifiedTypeName,
@@ -1649,7 +1643,7 @@ public final class ASTNodes {
                 return superclass;
             }
             visitedInterfaces.add(superClassQualifiedName);
-            final ITypeBinding implementedType= findImplementedType(superclass, qualifiedTypeName, visitedInterfaces);
+            final ITypeBinding implementedType= ASTNodes.findImplementedType(superclass, qualifiedTypeName, visitedInterfaces);
             if (implementedType != null) {
                 return implementedType;
             }
@@ -1660,7 +1654,7 @@ public final class ASTNodes {
                 return itfBinding;
             }
             visitedInterfaces.add(itfQualifiedName);
-            final ITypeBinding implementedType= findImplementedType(itfBinding, qualifiedTypeName, visitedInterfaces);
+            final ITypeBinding implementedType= ASTNodes.findImplementedType(itfBinding, qualifiedTypeName, visitedInterfaces);
             if (implementedType != null) {
                 return implementedType;
             }
@@ -1676,13 +1670,13 @@ public final class ASTNodes {
      *         {@code null} otherwise.
      */
     public static Expression getNullCheckedExpression(Expression expr) {
-        final Expression e= removeParentheses(expr);
+        final Expression e= ASTNodes.getUnparenthesedExpression(expr);
         if (e instanceof InfixExpression) {
             final InfixExpression ie= (InfixExpression) e;
-            if (hasOperator(ie, NOT_EQUALS) && checkNoExtendedOperands(ie)) {
-                if (isNullLiteral(ie.getLeftOperand())) {
+            if (ASTNodes.hasOperator(ie, InfixExpression.Operator.NOT_EQUALS) && ASTNodes.checkNoExtendedOperands(ie)) {
+                if (ASTNodes.isNullLiteral(ie.getLeftOperand())) {
                     return ie.getRightOperand();
-                } else if (isNullLiteral(ie.getRightOperand())) {
+                } else if (ASTNodes.isNullLiteral(ie.getRightOperand())) {
                     return ie.getLeftOperand();
                 }
             }
@@ -1702,7 +1696,7 @@ public final class ASTNodes {
      * @return {@code true}, or it throws
      */
     public static boolean checkNoExtendedOperands(InfixExpression node) {
-        if (!hasType(node, String.class.getCanonicalName()) && node.hasExtendedOperands()) {
+        if (!ASTNodes.hasType(node, String.class.getCanonicalName()) && node.hasExtendedOperands()) {
             throw new NotImplementedException(node, "for extended operands"); //$NON-NLS-1$
         }
         return true;
@@ -1720,7 +1714,7 @@ public final class ASTNodes {
         if (node == null) {
             return null;
         }
-        final List<VariableDeclarationFragment> fragments= fragments(node);
+        final List<VariableDeclarationFragment> fragments= ASTNodes.fragments(node);
         return fragments.size() == 1 ? fragments.get(0) : null;
     }
 
@@ -1742,7 +1736,7 @@ public final class ASTNodes {
      * @return true if the provided node is breakable, false otherwise
      */
     public static boolean isBreakable(ASTNode node) {
-        return isLoop(node) || node instanceof SwitchStatement;
+        return ASTNodes.isLoop(node) || node instanceof SwitchStatement;
     }
 
     /**
@@ -1752,7 +1746,7 @@ public final class ASTNodes {
      * @return true if a checked exception is supposed to be caught.
      */
     public static boolean isExceptionExpected(final ASTNode node) {
-        ASTNode parentNode= getFirstAncestorOrNull(node, TryStatement.class, BodyDeclaration.class);
+        ASTNode parentNode= ASTNodes.getFirstAncestorOrNull(node, TryStatement.class, BodyDeclaration.class);
 
         while (parentNode instanceof TryStatement) {
             TryStatement tryStmt= (TryStatement) parentNode;
@@ -1761,13 +1755,13 @@ public final class ASTNodes {
                 CatchClause catchClause= (CatchClause) object;
 
                 if (catchClause.getException().getType() != null
-                        && !instanceOf(catchClause.getException().getType().resolveBinding(),
+                        && !ASTNodes.instanceOf(catchClause.getException().getType().resolveBinding(),
                                 RuntimeException.class.getCanonicalName())) {
                     return true;
                 }
             }
 
-            parentNode= getFirstAncestorOrNull(parentNode, TryStatement.class, BodyDeclaration.class);
+            parentNode= ASTNodes.getFirstAncestorOrNull(parentNode, TryStatement.class, BodyDeclaration.class);
         }
 
         return false;
@@ -1784,7 +1778,7 @@ public final class ASTNodes {
      *         signature, false otherwise
      */
     public static boolean isField(QualifiedName node, String qualifiedTypeName, String... fieldNames) {
-        return instanceOf(node, qualifiedTypeName)
+        return ASTNodes.instanceOf(node, qualifiedTypeName)
                 && Arrays.asList(fieldNames).contains(node.getName().getIdentifier());
     }
 
@@ -1805,7 +1799,7 @@ public final class ASTNodes {
     public static boolean usesGivenSignature(MethodInvocation node, String typeQualifiedName, String methodName,
             String... parameterTypesQualifiedNames) {
         return node != null
-                && usesGivenSignature(node.resolveMethodBinding(), typeQualifiedName, methodName, parameterTypesQualifiedNames);
+                && ASTNodes.usesGivenSignature(node.resolveMethodBinding(), typeQualifiedName, methodName, parameterTypesQualifiedNames);
     }
 
     /**
@@ -1825,7 +1819,7 @@ public final class ASTNodes {
     public static boolean usesGivenSignature(MethodDeclaration node, String typeQualifiedName, String methodName,
             String... parameterTypesQualifiedNames) {
         return node != null
-                && usesGivenSignature(node.resolveBinding(), typeQualifiedName, methodName, parameterTypesQualifiedNames);
+                && ASTNodes.usesGivenSignature(node.resolveBinding(), typeQualifiedName, methodName, parameterTypesQualifiedNames);
     }
 
     /**
@@ -1851,22 +1845,22 @@ public final class ASTNodes {
         }
         // OK more heavy checks now
         final ITypeBinding declaringClass= methodBinding.getDeclaringClass();
-        final ITypeBinding implementedType= findImplementedType(declaringClass, typeQualifiedName);
-        final boolean isInstanceOf= instanceOf(declaringClass, typeQualifiedName);
-        if (parameterTypesMatch(implementedType, isInstanceOf, methodBinding, parameterTypesQualifiedNames)) {
+        final ITypeBinding implementedType= ASTNodes.findImplementedType(declaringClass, typeQualifiedName);
+        final boolean isInstanceOf= ASTNodes.instanceOf(declaringClass, typeQualifiedName);
+        if (ASTNodes.parameterTypesMatch(implementedType, isInstanceOf, methodBinding, parameterTypesQualifiedNames)) {
             return true;
         }
         // A lot more heavy checks
         // FIXME find a more efficient way to do this. It would be awesome
         // if an API to directly find the overriddenMethod IMethodBinding existed
-        IMethodBinding overriddenMethod= findOverridenMethod(declaringClass, typeQualifiedName, methodName,
+        IMethodBinding overriddenMethod= ASTNodes.findOverridenMethod(declaringClass, typeQualifiedName, methodName,
                 parameterTypesQualifiedNames);
         if (overriddenMethod != null && methodBinding.overrides(overriddenMethod)) {
             return true;
         }
         IMethodBinding methodDeclaration= methodBinding.getMethodDeclaration();
         return methodDeclaration != null && methodDeclaration != methodBinding
-                && usesGivenSignature(methodDeclaration, typeQualifiedName, methodName, parameterTypesQualifiedNames);
+                && ASTNodes.usesGivenSignature(methodDeclaration, typeQualifiedName, methodName, parameterTypesQualifiedNames);
     }
 
     private static boolean parameterTypesMatch(ITypeBinding implementedType, boolean isInstanceOf,
@@ -1874,10 +1868,10 @@ public final class ASTNodes {
         if (implementedType != null && !implementedType.isRawType()) {
             final ITypeBinding erasure= implementedType.getErasure();
             if (erasure.isGenericType() || erasure.isParameterizedType()) {
-                return parameterizedTypesMatch(implementedType, erasure, methodBinding);
+                return ASTNodes.parameterizedTypesMatch(implementedType, erasure, methodBinding);
             }
         }
-        return isInstanceOf && concreteTypesMatch(methodBinding.getParameterTypes(), parameterTypesQualifiedNames);
+        return isInstanceOf && ASTNodes.concreteTypesMatch(methodBinding.getParameterTypes(), parameterTypesQualifiedNames);
     }
 
     private static boolean concreteTypesMatch(ITypeBinding[] typeBindings, String... typesQualifiedNames) {
@@ -1897,16 +1891,16 @@ public final class ASTNodes {
     private static boolean parameterizedTypesMatch(final ITypeBinding clazz, final ITypeBinding clazzErasure,
             IMethodBinding methodBinding) {
         if (clazz.isParameterizedType() && !clazz.equals(clazzErasure)) {
-            final Map<ITypeBinding, ITypeBinding> genericToConcreteTypeParamsFromClass= getGenericToConcreteTypeParamsMap(
+            final Map<ITypeBinding, ITypeBinding> genericToConcreteTypeParamsFromClass= ASTNodes.getGenericToConcreteTypeParamsMap(
                     clazz, clazzErasure);
 
             for (IMethodBinding declaredMethod : clazzErasure.getDeclaredMethods()) {
                 if (declaredMethod.getName().equals(methodBinding.getName())) {
-                    final Map<ITypeBinding, ITypeBinding> genericToConcreteTypeParams= getGenericToConcreteTypeParamsMap(
+                    final Map<ITypeBinding, ITypeBinding> genericToConcreteTypeParams= ASTNodes.getGenericToConcreteTypeParamsMap(
                             methodBinding, declaredMethod);
                     genericToConcreteTypeParams.putAll(genericToConcreteTypeParamsFromClass);
 
-                    if (parameterizedTypesMatch2(genericToConcreteTypeParams, methodBinding, declaredMethod)) {
+                    if (ASTNodes.parameterizedTypesMatch2(genericToConcreteTypeParams, methodBinding, declaredMethod)) {
                         return true;
                     }
                 }
@@ -1917,12 +1911,12 @@ public final class ASTNodes {
 
     private static Map<ITypeBinding, ITypeBinding> getGenericToConcreteTypeParamsMap(final IMethodBinding method,
             final IMethodBinding methodErasure) {
-        return getGenericToConcreteTypeParamsMap(method.getTypeArguments(), methodErasure.getTypeParameters());
+        return ASTNodes.getGenericToConcreteTypeParamsMap(method.getTypeArguments(), methodErasure.getTypeParameters());
     }
 
     private static Map<ITypeBinding, ITypeBinding> getGenericToConcreteTypeParamsMap(final ITypeBinding clazz,
             final ITypeBinding clazzErasure) {
-        return getGenericToConcreteTypeParamsMap(clazz.getTypeArguments(), clazzErasure.getTypeParameters());
+        return ASTNodes.getGenericToConcreteTypeParamsMap(clazz.getTypeArguments(), clazzErasure.getTypeParameters());
     }
 
     private static Map<ITypeBinding, ITypeBinding> getGenericToConcreteTypeParamsMap(final ITypeBinding[] typeParams,
@@ -1992,20 +1986,20 @@ public final class ASTNodes {
      */
     public static Set<IMethodBinding> getOverridenMethods(IMethodBinding overridingMethod) {
         final Set<IMethodBinding> results= new HashSet<IMethodBinding>();
-        findOverridenMethods(overridingMethod, results, overridingMethod.getDeclaringClass());
+        ASTNodes.findOverridenMethods(overridingMethod, results, overridingMethod.getDeclaringClass());
         return results;
     }
 
     private static void findOverridenMethods(IMethodBinding overridingMethod, Set<IMethodBinding> results,
             ITypeBinding declaringClass) {
         final ITypeBinding superclass= declaringClass.getSuperclass();
-        if (superclass != null && !addOverridenMethods(overridingMethod, superclass, results)) {
-            findOverridenMethods(overridingMethod, results, superclass);
+        if (superclass != null && !ASTNodes.addOverridenMethods(overridingMethod, superclass, results)) {
+            ASTNodes.findOverridenMethods(overridingMethod, results, superclass);
         }
 
         for (ITypeBinding itf : declaringClass.getInterfaces()) {
-            if (!addOverridenMethods(overridingMethod, itf, results)) {
-                findOverridenMethods(overridingMethod, results, itf);
+            if (!ASTNodes.addOverridenMethods(overridingMethod, itf, results)) {
+                ASTNodes.findOverridenMethods(overridingMethod, results, itf);
             }
         }
     }
@@ -2029,10 +2023,10 @@ public final class ASTNodes {
             superclassBinding= superclassBinding.getErasure();
             if (typeQualifiedName.equals(superclassBinding.getErasure().getQualifiedName())) {
                 // Found the type
-                return findOverridenMethod(methodName, parameterTypesQualifiedNames,
+                return ASTNodes.findOverridenMethod(methodName, parameterTypesQualifiedNames,
                         superclassBinding.getDeclaredMethods());
             }
-            IMethodBinding overridenMethod= findOverridenMethod(superclassBinding, typeQualifiedName, methodName,
+            IMethodBinding overridenMethod= ASTNodes.findOverridenMethod(superclassBinding, typeQualifiedName, methodName,
                     parameterTypesQualifiedNames);
             if (overridenMethod != null) {
                 return overridenMethod;
@@ -2043,9 +2037,9 @@ public final class ASTNodes {
             itfBinding= itfBinding.getErasure();
             if (typeQualifiedName.equals(itfBinding.getQualifiedName())) {
                 // Found the type
-                return findOverridenMethod(methodName, parameterTypesQualifiedNames, itfBinding.getDeclaredMethods());
+                return ASTNodes.findOverridenMethod(methodName, parameterTypesQualifiedNames, itfBinding.getDeclaredMethods());
             }
-            IMethodBinding overridenMethod= findOverridenMethod(itfBinding, typeQualifiedName, methodName,
+            IMethodBinding overridenMethod= ASTNodes.findOverridenMethod(itfBinding, typeQualifiedName, methodName,
                     parameterTypesQualifiedNames);
             if (overridenMethod != null) {
                 return overridenMethod;
@@ -2059,7 +2053,7 @@ public final class ASTNodes {
         for (IMethodBinding methodBinding : declaredMethods) {
             final IMethodBinding methodDecl= methodBinding.getMethodDeclaration();
             if (methodBinding.getName().equals(methodName) && methodDecl != null
-                    && concreteTypesMatch(methodDecl.getParameterTypes(), parameterTypesQualifiedNames)) {
+                    && ASTNodes.concreteTypesMatch(methodDecl.getParameterTypes(), parameterTypesQualifiedNames)) {
                 return methodBinding;
             }
         }
@@ -2075,9 +2069,9 @@ public final class ASTNodes {
      */
     public static boolean isEqual(Name name1, Name name2) {
         if (name1 instanceof SimpleName && name2 instanceof SimpleName) {
-            return isEqual((SimpleName) name1, (SimpleName) name2);
+            return ASTNodes.isEqual((SimpleName) name1, (SimpleName) name2);
         } else if (name1 instanceof QualifiedName && name2 instanceof QualifiedName) {
-            return isEqual((QualifiedName) name1, (QualifiedName) name2);
+            return ASTNodes.isEqual((QualifiedName) name1, (QualifiedName) name2);
         }
         return false;
     }
@@ -2101,7 +2095,7 @@ public final class ASTNodes {
      * @return true if the two qualified names are equal, false otherwise.
      */
     public static boolean isEqual(QualifiedName name1, QualifiedName name2) {
-        return isEqual(name1.getName(), name2.getName()) && isEqual(name1.getQualifier(), name2.getQualifier());
+        return ASTNodes.isEqual(name1.getName(), name2.getName()) && ASTNodes.isEqual(name1.getQualifier(), name2.getQualifier());
     }
 
     /**
@@ -2119,7 +2113,7 @@ public final class ASTNodes {
         final ASTSemanticMatcher matcher= new ASTSemanticMatcher();
 
         for (int codeLine= 0; codeLine < referenceStmts.size(); codeLine++) {
-            if (!match(matcher, referenceStmts.get(codeLine), comparedStmts.get(codeLine))) {
+            if (!ASTNodes.match(matcher, referenceStmts.get(codeLine), comparedStmts.get(codeLine))) {
                 return false;
             }
         }
@@ -2134,7 +2128,7 @@ public final class ASTNodes {
      * @return true if the two provided nodes structurally match, false otherwise
      */
     public static boolean match(ASTNode node1, ASTNode node2) {
-        return match(new ASTSemanticMatcher(), node1, node2);
+        return ASTNodes.match(new ASTSemanticMatcher(), node1, node2);
     }
 
     /**
@@ -2150,7 +2144,7 @@ public final class ASTNodes {
     }
 
     private static boolean areVariableBindingsEqual(ASTNode node1, ASTNode node2) {
-        return areBindingsEqual(varBinding(node1), varBinding(node2));
+        return ASTNodes.areBindingsEqual(ASTNodes.varBinding(node1), ASTNodes.varBinding(node2));
     }
 
     /**
@@ -2199,7 +2193,7 @@ public final class ASTNodes {
      *         otherwise
      */
     public static boolean isSameVariable(SimpleName name1, SimpleName name2) {
-        return areVariableBindingsEqual(name1, name2);
+        return ASTNodes.areVariableBindingsEqual(name1, name2);
     }
 
     /**
@@ -2211,7 +2205,7 @@ public final class ASTNodes {
      *         false otherwise
      */
     public static boolean isSameVariable(SimpleName name1, FieldAccess field2) {
-        return as(field2.getExpression(), ThisExpression.class) != null && areVariableBindingsEqual(field2, name1);
+        return ASTNodes.as(field2.getExpression(), ThisExpression.class) != null && ASTNodes.areVariableBindingsEqual(field2, name1);
     }
 
     /**
@@ -2223,7 +2217,7 @@ public final class ASTNodes {
      *         false otherwise
      */
     public static boolean isSameVariable(QualifiedName name1, QualifiedName name2) {
-        return areVariableBindingsEqual(name1, name2) && isSameVariable(name1.getQualifier(), name2.getQualifier());
+        return ASTNodes.areVariableBindingsEqual(name1, name2) && ASTNodes.isSameVariable(name1.getQualifier(), name2.getQualifier());
     }
 
     /**
@@ -2235,7 +2229,7 @@ public final class ASTNodes {
      *         false otherwise
      */
     public static boolean isSameVariable(QualifiedName name1, FieldAccess field2) {
-        return areVariableBindingsEqual(name1, field2) && isSameVariable(field2.getExpression(), name1.getQualifier());
+        return ASTNodes.areVariableBindingsEqual(name1, field2) && ASTNodes.isSameVariable(field2.getExpression(), name1.getQualifier());
     }
 
     /**
@@ -2247,8 +2241,8 @@ public final class ASTNodes {
      *         false otherwise
      */
     public static boolean isSameVariable(FieldAccess field1, FieldAccess field2) {
-        return areVariableBindingsEqual(field1, field2)
-                && isSameVariable(field1.getExpression(), field2.getExpression());
+        return ASTNodes.areVariableBindingsEqual(field1, field2)
+                && ASTNodes.isSameVariable(field1.getExpression(), field2.getExpression());
     }
 
     /**
@@ -2261,7 +2255,7 @@ public final class ASTNodes {
      */
     public static boolean areSameVariables(final ASTNode node0, final ASTNode... otherNodes) {
         for (ASTNode nodeN : otherNodes) {
-            if (!isSameVariable(node0, nodeN)) {
+            if (!ASTNodes.isSameVariable(node0, nodeN)) {
                 return false;
             }
         }
@@ -2277,46 +2271,46 @@ public final class ASTNodes {
      *         otherwise
      */
     public static boolean isSameVariable(ASTNode node1, ASTNode node2) {
-        node1= removeParentheses(node1);
-        node2= removeParentheses(node2);
+        node1= ASTNodes.getUnparenthesedExpression(node1);
+        node2= ASTNodes.getUnparenthesedExpression(node2);
         if (node1 == null || node2 == null) {
             return false;
         }
         switch (node1.getNodeType()) {
         case THIS_EXPRESSION:
-            return node2.getNodeType() == THIS_EXPRESSION;
+            return node2.getNodeType() == ASTNode.THIS_EXPRESSION;
         case SIMPLE_NAME:
             final SimpleName sn= (SimpleName) node1;
             switch (node2.getNodeType()) {
             case QUALIFIED_NAME:
-                return isSameVariable(sn, (QualifiedName) node2);
+                return ASTNodes.isSameVariable(sn, (QualifiedName) node2);
             case FIELD_ACCESS:
-                return isSameVariable(sn, (FieldAccess) node2);
+                return ASTNodes.isSameVariable(sn, (FieldAccess) node2);
             }
             break;
         case QUALIFIED_NAME:
             final QualifiedName qn= (QualifiedName) node1;
             switch (node2.getNodeType()) {
             case SIMPLE_NAME:
-                return isSameVariable((SimpleName) node2, qn);
+                return ASTNodes.isSameVariable((SimpleName) node2, qn);
             case QUALIFIED_NAME:
-                return isSameVariable(qn, (QualifiedName) node2);
+                return ASTNodes.isSameVariable(qn, (QualifiedName) node2);
             case FIELD_ACCESS:
-                return isSameVariable(qn, (FieldAccess) node2);
+                return ASTNodes.isSameVariable(qn, (FieldAccess) node2);
             }
             break;
         case FIELD_ACCESS:
             final FieldAccess fa= (FieldAccess) node1;
             switch (node2.getNodeType()) {
             case SIMPLE_NAME:
-                return isSameVariable((SimpleName) node2, fa);
+                return ASTNodes.isSameVariable((SimpleName) node2, fa);
             case QUALIFIED_NAME:
-                return isSameVariable((QualifiedName) node2, fa);
+                return ASTNodes.isSameVariable((QualifiedName) node2, fa);
             case FIELD_ACCESS:
-                return isSameVariable(fa, (FieldAccess) node2);
+                return ASTNodes.isSameVariable(fa, (FieldAccess) node2);
             }
         }
-        return areVariableBindingsEqual(node1, node2);
+        return ASTNodes.areVariableBindingsEqual(node1, node2);
     }
 
     /**
@@ -2331,8 +2325,8 @@ public final class ASTNodes {
      */
     public static ASTNode getParent(ASTNode node, Class<?>... includedClasses) {
         final ASTNode parent= node.getParent();
-        if (instanceOf(parent, includedClasses)) {
-            return getParent(parent, includedClasses);
+        if (ASTNodes.instanceOf(parent, includedClasses)) {
+            return ASTNodes.getParent(parent, includedClasses);
         }
         return node;
     }
@@ -2362,8 +2356,8 @@ public final class ASTNodes {
         if (parent == null) {
             return node;
         }
-        if (instanceOf(parent, ignoredClasses)) {
-            return getParentIgnoring(parent, ignoredClasses);
+        if (ASTNodes.instanceOf(parent, ignoredClasses)) {
+            return ASTNodes.getParentIgnoring(parent, ignoredClasses);
         }
         return parent;
     }
@@ -2447,7 +2441,7 @@ public final class ASTNodes {
      * @return true if the statement falls through.
      */
     public static boolean fallsThrough(Statement stmt) {
-        final List<Statement> stmts= asList(stmt);
+        final List<Statement> stmts= ASTNodes.asList(stmt);
         if (stmts.isEmpty()) {
             return false;
         }
@@ -2464,7 +2458,7 @@ public final class ASTNodes {
             final IfStatement ifStmt= (IfStatement) lastStmt;
             final Statement thenStmt= ifStmt.getThenStatement();
             final Statement elseStmt= ifStmt.getElseStatement();
-            return fallsThrough(thenStmt) && fallsThrough(elseStmt);
+            return ASTNodes.fallsThrough(thenStmt) && ASTNodes.fallsThrough(elseStmt);
 
         default:
             return false;

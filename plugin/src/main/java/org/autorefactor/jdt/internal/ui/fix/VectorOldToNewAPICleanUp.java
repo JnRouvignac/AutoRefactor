@@ -26,15 +26,11 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.arguments;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasType;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.usesGivenSignature;
-import static org.eclipse.jdt.core.dom.MethodInvocation.NAME_PROPERTY;
-
 import java.util.List;
 import java.util.Vector;
 
-import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.autorefactor.jdt.internal.corext.dom.Release;
 import org.autorefactor.util.IllegalArgumentException;
@@ -77,21 +73,21 @@ public class VectorOldToNewAPICleanUp extends AbstractCleanUpRule {
 
     @Override
     public boolean visit(MethodInvocation node) {
-        if (usesGivenSignature(node, Vector.class.getCanonicalName(), "elementAt", int.class.getSimpleName())) { //$NON-NLS-1$
+        if (ASTNodes.usesGivenSignature(node, Vector.class.getCanonicalName(), "elementAt", int.class.getSimpleName())) { //$NON-NLS-1$
             replaceWith(node, "get"); //$NON-NLS-1$
-        } else if (usesGivenSignature(node, Vector.class.getCanonicalName(), "addElement", Object.class.getCanonicalName())) { //$NON-NLS-1$
+        } else if (ASTNodes.usesGivenSignature(node, Vector.class.getCanonicalName(), "addElement", Object.class.getCanonicalName())) { //$NON-NLS-1$
             replaceWith(node, "add"); //$NON-NLS-1$
-        } else if (usesGivenSignature(node, Vector.class.getCanonicalName(), "insertElementAt", Object.class.getCanonicalName(), int.class.getSimpleName())) { //$NON-NLS-1$
+        } else if (ASTNodes.usesGivenSignature(node, Vector.class.getCanonicalName(), "insertElementAt", Object.class.getCanonicalName(), int.class.getSimpleName())) { //$NON-NLS-1$
             replaceWithAndSwapArguments(node, "add"); //$NON-NLS-1$
-        } else if (usesGivenSignature(node, Vector.class.getCanonicalName(), "copyInto", Object[].class.getCanonicalName())) { //$NON-NLS-1$
+        } else if (ASTNodes.usesGivenSignature(node, Vector.class.getCanonicalName(), "copyInto", Object[].class.getCanonicalName())) { //$NON-NLS-1$
             replaceWith(node, "toArray"); //$NON-NLS-1$
-        } else if (usesGivenSignature(node, Vector.class.getCanonicalName(), "removeAllElements")) { //$NON-NLS-1$
+        } else if (ASTNodes.usesGivenSignature(node, Vector.class.getCanonicalName(), "removeAllElements")) { //$NON-NLS-1$
             replaceWith(node, "clear"); //$NON-NLS-1$
-        } else if (usesGivenSignature(node, Vector.class.getCanonicalName(), "removeElement", Object.class.getCanonicalName())) { //$NON-NLS-1$
+        } else if (ASTNodes.usesGivenSignature(node, Vector.class.getCanonicalName(), "removeElement", Object.class.getCanonicalName())) { //$NON-NLS-1$
             replaceWithSpecial(node, "remove"); //$NON-NLS-1$
-        } else if (usesGivenSignature(node, Vector.class.getCanonicalName(), "removeElementAt", int.class.getSimpleName())) { //$NON-NLS-1$
+        } else if (ASTNodes.usesGivenSignature(node, Vector.class.getCanonicalName(), "removeElementAt", int.class.getSimpleName())) { //$NON-NLS-1$
             replaceWith(node, "remove"); //$NON-NLS-1$
-        } else if (usesGivenSignature(node, Vector.class.getCanonicalName(), "setElementAt", Object.class.getCanonicalName(), int.class.getSimpleName())) { //$NON-NLS-1$
+        } else if (ASTNodes.usesGivenSignature(node, Vector.class.getCanonicalName(), "setElementAt", Object.class.getCanonicalName(), int.class.getSimpleName())) { //$NON-NLS-1$
             replaceWithAndSwapArguments(node, "set"); //$NON-NLS-1$
         } else {
             return true;
@@ -100,31 +96,31 @@ public class VectorOldToNewAPICleanUp extends AbstractCleanUpRule {
     }
 
     private void replaceWith(final MethodInvocation node, final String newMethodName) {
-        final ASTBuilder b= this.ctx.getASTBuilder();
-        ctx.getRefactorings().set(node, NAME_PROPERTY, b.simpleName(newMethodName));
+        final ASTNodeFactory b= this.ctx.getASTBuilder();
+        ctx.getRefactorings().set(node, MethodInvocation.NAME_PROPERTY, b.simpleName(newMethodName));
     }
 
     private void replaceWithSpecial(final MethodInvocation node, final String newMethodName) {
-        final List<Expression> args= arguments(node);
+        final List<Expression> args= ASTNodes.arguments(node);
         assertSize(args, 1);
         final Expression arg0= args.get(0);
 
-        final ASTBuilder b= this.ctx.getASTBuilder();
+        final ASTNodeFactory b= this.ctx.getASTBuilder();
         final Refactorings r= this.ctx.getRefactorings();
-        r.set(node, NAME_PROPERTY, b.simpleName(newMethodName));
-        if (hasType(arg0, int.class.getSimpleName(), short.class.getSimpleName(), byte.class.getSimpleName())) {
+        r.set(node, MethodInvocation.NAME_PROPERTY, b.simpleName(newMethodName));
+        if (ASTNodes.hasType(arg0, int.class.getSimpleName(), short.class.getSimpleName(), byte.class.getSimpleName())) {
             r.replace(arg0, b.cast(b.type("Object"), b.move(arg0))); //$NON-NLS-1$
         }
     }
 
     private void replaceWithAndSwapArguments(final MethodInvocation node, final String newMethodName) {
-        final List<Expression> args= arguments(node);
+        final List<Expression> args= ASTNodes.arguments(node);
         assertSize(args, 2);
         final Expression arg1= args.get(1);
 
-        final ASTBuilder b= ctx.getASTBuilder();
+        final ASTNodeFactory b= ctx.getASTBuilder();
         final Refactorings r= ctx.getRefactorings();
-        r.set(node, NAME_PROPERTY, b.simpleName(newMethodName));
+        r.set(node, MethodInvocation.NAME_PROPERTY, b.simpleName(newMethodName));
         r.moveToIndex(arg1, 0, b.move(arg1));
     }
 

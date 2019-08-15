@@ -25,9 +25,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasType;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.usesGivenSignature;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumMap;
@@ -39,7 +36,8 @@ import java.util.LinkedList;
 import java.util.Set;
 import java.util.TreeMap;
 
-import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.autorefactor.jdt.internal.corext.dom.Release;
 import org.eclipse.jdt.core.dom.Expression;
@@ -122,7 +120,7 @@ public class AggregateConstructorRatherThanGWTMethodCleanUp extends NewClassImpo
         if (node.arguments().size() == 1) {
             final Expression arg= (Expression) node.arguments().get(0);
 
-            if (!hasType(arg, Class.class.getCanonicalName())) {
+            if (!ASTNodes.hasType(arg, Class.class.getCanonicalName())) {
                 return true;
             }
 
@@ -146,10 +144,10 @@ public class AggregateConstructorRatherThanGWTMethodCleanUp extends NewClassImpo
                 }
             }
 
-            if (usesGivenSignature(node, "com.google.common.collect.Maps", "newEnumMap", Class.class.getCanonicalName() + generic) //$NON-NLS-1$ $NON-NLS-2$
-                    || usesGivenSignature(node, "com.google.gwt.thirdparty.guava.common.collect.Maps", "newEnumMap", //$NON-NLS-1$ $NON-NLS-2$
+            if (ASTNodes.usesGivenSignature(node, "com.google.common.collect.Maps", "newEnumMap", Class.class.getCanonicalName() + generic) //$NON-NLS-1$ $NON-NLS-2$
+                    || ASTNodes.usesGivenSignature(node, "com.google.gwt.thirdparty.guava.common.collect.Maps", "newEnumMap", //$NON-NLS-1$ $NON-NLS-2$
                             Class.class.getCanonicalName() + generic)) {
-                final ASTBuilder b= this.ctx.getASTBuilder();
+                final ASTNodeFactory b= this.ctx.getASTBuilder();
                 final Refactorings r= this.ctx.getRefactorings();
 
                 final Type type= b.getAST().newParameterizedType(
@@ -165,9 +163,9 @@ public class AggregateConstructorRatherThanGWTMethodCleanUp extends NewClassImpo
 
     private boolean maybeRefactor(final MethodInvocation node, final Set<String> classesToUseWithImport,
             final Set<String> importsToAdd, final String aggregateInterface, final String implClass) {
-        if (usesGivenSignature(node, "com.google.common.collect." + aggregateInterface, "new" + implClass) || usesGivenSignature(node, //$NON-NLS-1$ $NON-NLS-2$
+        if (ASTNodes.usesGivenSignature(node, "com.google.common.collect." + aggregateInterface, "new" + implClass) || ASTNodes.usesGivenSignature(node, //$NON-NLS-1$ $NON-NLS-2$
                 "com.google.gwt.thirdparty.guava.common.collect." + aggregateInterface, "new" + implClass)) { //$NON-NLS-1$ $NON-NLS-2$
-            final ASTBuilder b= this.ctx.getASTBuilder();
+            final ASTNodeFactory b= this.ctx.getASTBuilder();
             final Refactorings r= this.ctx.getRefactorings();
 
             Type type= b.getAST().newParameterizedType(b.type(

@@ -34,21 +34,20 @@ import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Comment;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.*;
-import static org.autorefactor.jdt.internal.corext.dom.SourceLocation.*;
-
 import org.autorefactor.environment.Environment;
 import org.autorefactor.environment.Logger;
-import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.JavaProjectOptions;
 import org.autorefactor.jdt.internal.corext.dom.Refactorings;
+import org.autorefactor.jdt.internal.corext.dom.SourceLocation;
 
 /** Class holding necessary data for a refactoring. */
 public class RefactoringContext {
     private final ICompilationUnit compilationUnit;
     private final CompilationUnit astRoot;
     private final Refactorings refactorings;
-    private final ASTBuilder astBuilder;
+    private final ASTNodeFactory astBuilder;
     private final JavaProjectOptions options;
     private final SubMonitor monitor;
     private final Environment environment;
@@ -69,7 +68,7 @@ public class RefactoringContext {
         this.monitor= monitor;
         this.environment= environment;
         this.refactorings= new Refactorings(astRoot, environment.getEventLoop(), monitor);
-        this.astBuilder= new ASTBuilder(refactorings);
+        this.astBuilder= new ASTNodeFactory(refactorings);
         this.options= options;
     }
 
@@ -83,11 +82,11 @@ public class RefactoringContext {
     }
 
     /**
-     * Returns a new {@link ASTBuilder} object to use in the refactoring.
+     * Returns a new {@link ASTNodeFactory} object to use in the refactoring.
      *
-     * @return a new {@link ASTBuilder} object to use in the refactoring
+     * @return a new {@link ASTNodeFactory} object to use in the refactoring
      */
-    public ASTBuilder getASTBuilder() {
+    public ASTNodeFactory getASTBuilder() {
         return astBuilder;
     }
 
@@ -138,8 +137,8 @@ public class RefactoringContext {
     }
 
     boolean isInComment(int position) {
-        for (Comment comment : getCommentList(astRoot)) {
-            if (comment.getStartPosition() <= position && position <= getEndPosition(comment)) {
+        for (Comment comment : ASTNodes.getCommentList(astRoot)) {
+            if (comment.getStartPosition() <= position && position <= SourceLocation.getEndPosition(comment)) {
                 return true;
             } else if (position < comment.getStartPosition()) {
                 // Since comment list is "arranged in order of increasing source position"

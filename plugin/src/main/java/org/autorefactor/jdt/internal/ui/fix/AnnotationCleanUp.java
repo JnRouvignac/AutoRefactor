@@ -25,8 +25,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.expressions;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.values;
 import static org.eclipse.jdt.core.dom.ASTNode.ARRAY_INITIALIZER;
 import static org.eclipse.jdt.core.dom.ASTNode.BOOLEAN_LITERAL;
 import static org.eclipse.jdt.core.dom.ASTNode.CHARACTER_LITERAL;
@@ -38,10 +36,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.autorefactor.util.NotImplementedException;
 import org.autorefactor.util.Utils;
+import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ArrayInitializer;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.IAnnotationBinding;
@@ -82,8 +82,8 @@ public class AnnotationCleanUp extends AbstractCleanUpRule {
     @Override
     public boolean visit(NormalAnnotation node) {
         final Refactorings r= this.ctx.getRefactorings();
-        final ASTBuilder b= this.ctx.getASTBuilder();
-        final List<MemberValuePair> values= values(node);
+        final ASTNodeFactory b= this.ctx.getASTBuilder();
+        final List<MemberValuePair> values= ASTNodes.values(node);
         if (values.isEmpty()) {
             r.replace(node, b.markerAnnotation(b.move(node.getTypeName())));
             return false;
@@ -102,9 +102,9 @@ public class AnnotationCleanUp extends AbstractCleanUpRule {
             if (equal(elementBinding.getReturnType(), pair.getValue(), elementBinding.getDefaultValue())) {
                 r.remove(pair);
                 result= false;
-            } else if (pair.getValue().getNodeType() == ARRAY_INITIALIZER) {
+            } else if (pair.getValue().getNodeType() == ASTNode.ARRAY_INITIALIZER) {
                 ArrayInitializer arrayInit= (ArrayInitializer) pair.getValue();
-                List<Expression> exprs= expressions(arrayInit);
+                List<Expression> exprs= ASTNodes.expressions(arrayInit);
                 if (exprs.size() == 1) {
                     r.replace(arrayInit, b.move(exprs.get(0)));
                     result= false;
@@ -179,7 +179,7 @@ public class AnnotationCleanUp extends AbstractCleanUpRule {
     private boolean arraysEqual(ITypeBinding typeBinding, ArrayInitializer arrayInit, Object javaObj) {
         if (javaObj instanceof Object[]) {
             Object[] javaObjArray= (Object[]) javaObj;
-            List<Expression> exprs= expressions(arrayInit);
+            List<Expression> exprs= ASTNodes.expressions(arrayInit);
             if (exprs.size() == javaObjArray.length) {
                 boolean result= true;
                 for (int i= 0; i < javaObjArray.length; i++) {

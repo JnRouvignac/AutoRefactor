@@ -26,19 +26,10 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.as;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.asList;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getNextSibling;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasOperator;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.is;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isNullLiteral;
-import static org.eclipse.jdt.core.dom.InfixExpression.OPERATOR_PROPERTY;
-import static org.eclipse.jdt.core.dom.InfixExpression.Operator.EQUALS;
-import static org.eclipse.jdt.core.dom.InfixExpression.Operator.NOT_EQUALS;
-
 import java.util.List;
 
-import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.BlockSubVisitor;
 import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.eclipse.jdt.core.dom.ASTNode;
@@ -104,7 +95,7 @@ public class WorkWithNullCheckedExpressionFirstCleanUp extends AbstractCleanUpRu
         }
 
         private Statement getThenStatement(IfStatement node) {
-            final List<Statement> thenStmts= asList(node.getThenStatement());
+            final List<Statement> thenStmts= ASTNodes.asList(node.getThenStatement());
             if (thenStmts.size() == 1) {
                 return thenStmts.get(0);
             }
@@ -112,20 +103,20 @@ public class WorkWithNullCheckedExpressionFirstCleanUp extends AbstractCleanUpRu
         }
 
         private Statement getElseStatement(IfStatement node, Statement thenStmt) {
-            final List<Statement> elseStmts= asList(node.getElseStatement());
+            final List<Statement> elseStmts= ASTNodes.asList(node.getElseStatement());
             if (elseStmts.size() == 1) {
                 return elseStmts.get(0);
             }
-            if (elseStmts.isEmpty() && is(thenStmt, ReturnStatement.class)) {
-                return getNextSibling(node);
+            if (elseStmts.isEmpty() && ASTNodes.is(thenStmt, ReturnStatement.class)) {
+                return ASTNodes.getNextSibling(node);
             }
             return null;
         }
 
         private boolean isNullCheck(Expression ifExpression) {
-            final InfixExpression condition= as(ifExpression, InfixExpression.class);
-            return hasOperator(condition, EQUALS) && !condition.hasExtendedOperands()
-                    && (isNullLiteral(condition.getLeftOperand()) || isNullLiteral(condition.getRightOperand()));
+            final InfixExpression condition= ASTNodes.as(ifExpression, InfixExpression.class);
+            return ASTNodes.hasOperator(condition, InfixExpression.Operator.EQUALS) && !condition.hasExtendedOperands()
+                    && (ASTNodes.isNullLiteral(condition.getLeftOperand()) || ASTNodes.isNullLiteral(condition.getRightOperand()));
         }
 
         private boolean simpleStmt(Statement stmt) {
@@ -145,9 +136,9 @@ public class WorkWithNullCheckedExpressionFirstCleanUp extends AbstractCleanUpRu
 
         /** Revert condition + swap then and else statements. */
         private void revertIfStatement(IfStatement node, Statement thenStmt, Statement elseStmt) {
-            final ASTBuilder b= ctx.getASTBuilder();
+            final ASTNodeFactory b= ctx.getASTBuilder();
             final Refactorings r= ctx.getRefactorings();
-            r.set(node.getExpression(), OPERATOR_PROPERTY, NOT_EQUALS);
+            r.set(node.getExpression(), InfixExpression.OPERATOR_PROPERTY, InfixExpression.Operator.NOT_EQUALS);
             r.replace(thenStmt, b.move(elseStmt));
             r.replace(elseStmt, b.move(thenStmt));
         }

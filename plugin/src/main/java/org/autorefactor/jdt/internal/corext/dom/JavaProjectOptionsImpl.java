@@ -29,10 +29,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.autorefactor.util.UnhandledException;
+import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.formatter.DefaultCodeFormatterConstants;
-
-import static org.eclipse.jdt.core.JavaCore.*;
-import static org.eclipse.jdt.core.formatter.DefaultCodeFormatterConstants.*;
 
 /** Implementation of {@link JavaProjectOptions} for Eclipse JDT. */
 public class JavaProjectOptionsImpl implements JavaProjectOptions {
@@ -51,7 +49,7 @@ public class JavaProjectOptionsImpl implements JavaProjectOptions {
      */
     public JavaProjectOptionsImpl(Map<String, String> options) {
         this.options= options;
-        this.javaSERelease= Release.javaSE(options.get(COMPILER_SOURCE));
+        this.javaSERelease= Release.javaSE(options.get(JavaCore.COMPILER_SOURCE));
     }
 
     private Integer asInteger(String preference) {
@@ -72,9 +70,9 @@ public class JavaProjectOptionsImpl implements JavaProjectOptions {
      * @return the compiler options.
      */
     public Map<String, String> getCompilerOptions() {
-        final Map<String, String> options= getOptions();
+        final Map<String, String> options= JavaCore.getOptions();
         final String v= javaSERelease.getMajorVersion() + "." + javaSERelease.getMinorVersion(); //$NON-NLS-1$
-        setComplianceOptions(v, options);
+        JavaCore.setComplianceOptions(v, options);
         return options;
     }
 
@@ -93,7 +91,7 @@ public class JavaProjectOptionsImpl implements JavaProjectOptions {
      * @return the tab size.
      */
     public Integer getTabSize() {
-        return asInteger(FORMATTER_INDENTATION_SIZE);
+        return asInteger(DefaultCodeFormatterConstants.FORMATTER_INDENTATION_SIZE);
     }
 
     /**
@@ -102,7 +100,7 @@ public class JavaProjectOptionsImpl implements JavaProjectOptions {
      * @return the comment line length.
      */
     public int getCommentLineLength() {
-        Integer result= asInteger(FORMATTER_COMMENT_LINE_LENGTH);
+        Integer result= asInteger(DefaultCodeFormatterConstants.FORMATTER_COMMENT_LINE_LENGTH);
         if (result == null) {
             result= asInteger(DefaultCodeFormatterConstants.FORMATTER_LINE_SPLIT);
         }
@@ -124,6 +122,6 @@ public class JavaProjectOptionsImpl implements JavaProjectOptions {
      * @param tabSize the tabulation Size to set
      */
     public void setTabSize(int tabSize) {
-        options.put(FORMATTER_INDENTATION_SIZE, String.valueOf(tabSize));
+        options.put(DefaultCodeFormatterConstants.FORMATTER_INDENTATION_SIZE, String.valueOf(tabSize));
     }
 }

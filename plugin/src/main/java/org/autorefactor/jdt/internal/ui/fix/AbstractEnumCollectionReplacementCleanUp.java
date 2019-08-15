@@ -25,12 +25,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.fragments;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getAncestorOrNull;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getFirstAncestorOrNull;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasType;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.removeParentheses;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.typeArguments;
 import static org.eclipse.jdt.core.dom.ASTNode.ASSIGNMENT;
 import static org.eclipse.jdt.core.dom.ASTNode.RETURN_STATEMENT;
 import static org.eclipse.jdt.core.dom.ASTNode.VARIABLE_DECLARATION_STATEMENT;
@@ -39,7 +33,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.TypeNameDecider;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Assignment;
@@ -86,7 +81,7 @@ public abstract class AbstractEnumCollectionReplacementCleanUp extends NewClassI
         Type type= node.getType();
 
         if (isEnabled() && type.isParameterizedType() && creates(node, getImplType())) {
-            ASTNode parent= getFirstAncestorOrNull(node, ReturnStatement.class, Assignment.class,
+            ASTNode parent= ASTNodes.getFirstAncestorOrNull(node, ReturnStatement.class, Assignment.class,
                     VariableDeclarationStatement.class);
             if (parent != null) {
                 switch (parent.getNodeType()) {
@@ -122,7 +117,7 @@ public abstract class AbstractEnumCollectionReplacementCleanUp extends NewClassI
 
     private boolean handleReturnStatement(final ClassInstanceCreation node, final ReturnStatement rs,
             final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
-        MethodDeclaration md= getAncestorOrNull(node, MethodDeclaration.class);
+        MethodDeclaration md= ASTNodes.getAncestorOrNull(node, MethodDeclaration.class);
 
         if (md != null) {
             Type returnType= md.getReturnType2();
@@ -149,7 +144,7 @@ public abstract class AbstractEnumCollectionReplacementCleanUp extends NewClassI
 
             if (typeArguments.length > 0 && typeArguments[0].isEnum()) {
                 final TypeNameDecider typeNameDecider= new TypeNameDecider(lhs);
-                ASTBuilder b= ctx.getASTBuilder();
+                ASTNodeFactory b= ctx.getASTBuilder();
                 Type[] types= new Type[typeArguments.length];
 
                 for (int i= 0; i < types.length; i++) {
@@ -169,16 +164,16 @@ public abstract class AbstractEnumCollectionReplacementCleanUp extends NewClassI
 
         if (type.isParameterizedType() && isTargetType(type)) {
             ParameterizedType ptype= (ParameterizedType) type;
-            List<Type> typeArguments= typeArguments(ptype);
+            List<Type> typeArguments= ASTNodes.typeArguments(ptype);
 
             if (!typeArguments.isEmpty() && typeArguments.get(0).resolveBinding().isEnum()) {
-                List<VariableDeclarationFragment> fragments= fragments(node);
+                List<VariableDeclarationFragment> fragments= ASTNodes.fragments(node);
 
                 for (VariableDeclarationFragment vdf : fragments) {
                     Expression initExpr= vdf.getInitializer();
 
                     if (initExpr != null) {
-                        initExpr= removeParentheses(initExpr);
+                        initExpr= ASTNodes.getUnparenthesedExpression(initExpr);
 
                         if (creates(initExpr, getImplType())) {
                             return maybeReplace((ClassInstanceCreation) initExpr, classesToUseWithImport, importsToAdd,
@@ -197,11 +192,11 @@ public abstract class AbstractEnumCollectionReplacementCleanUp extends NewClassI
      * to avoid boilerplate casting and shorten method name.
      */
     List<Type> typeArgs(final Type parameterizedType) {
-        return typeArguments((ParameterizedType) parameterizedType);
+        return ASTNodes.typeArguments((ParameterizedType) parameterizedType);
     }
 
     boolean isTargetType(final ITypeBinding it) {
-        return hasType(it, getInterfaceType());
+        return ASTNodes.hasType(it, getInterfaceType());
     }
 
     private boolean isEnum(final Type type) {
@@ -209,7 +204,7 @@ public abstract class AbstractEnumCollectionReplacementCleanUp extends NewClassI
     }
 
     private boolean creates(final Expression exp, final String type) {
-        return exp.getNodeType() == ASTNode.CLASS_INSTANCE_CREATION && hasType(exp.resolveTypeBinding(), type);
+        return exp.getNodeType() == ASTNode.CLASS_INSTANCE_CREATION && ASTNodes.hasType(exp.resolveTypeBinding(), type);
     }
 
     private boolean isTargetType(final Type type) {

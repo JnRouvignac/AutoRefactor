@@ -27,17 +27,11 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.arg0;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.arguments;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getTargetType;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasType;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.usesGivenSignature;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isPrimitive;
-import static org.autorefactor.util.Utils.equal;
-
 import java.util.List;
 
-import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
+import org.autorefactor.util.Utils;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ITypeBinding;
@@ -83,18 +77,18 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
             return true;
         }
 
-        ITypeBinding destinationTypeBinding= getTargetType(node);
+        ITypeBinding destinationTypeBinding= ASTNodes.getTargetType(node);
 
         if (destinationTypeBinding != null && destinationTypeBinding.isPrimitive()
                 && "valueOf".equals(node.getName().getIdentifier())) { //$NON-NLS-1$
-            if (usesGivenSignature(node, Boolean.class.getCanonicalName(), "valueOf", boolean.class.getSimpleName()) //$NON-NLS-1$
-                    || usesGivenSignature(node, Byte.class.getCanonicalName(), "valueOf", byte.class.getSimpleName()) //$NON-NLS-1$
-                    || usesGivenSignature(node, Character.class.getCanonicalName(), "valueOf", char.class.getSimpleName()) //$NON-NLS-1$
-                    || usesGivenSignature(node, Short.class.getCanonicalName(), "valueOf", short.class.getSimpleName()) //$NON-NLS-1$
-                    || usesGivenSignature(node, Integer.class.getCanonicalName(), "valueOf", int.class.getSimpleName()) //$NON-NLS-1$
-                    || usesGivenSignature(node, Long.class.getCanonicalName(), "valueOf", long.class.getSimpleName()) //$NON-NLS-1$
-                    || usesGivenSignature(node, Float.class.getCanonicalName(), "valueOf", float.class.getSimpleName()) //$NON-NLS-1$
-                    || usesGivenSignature(node, Double.class.getCanonicalName(), "valueOf", double.class.getSimpleName())) { //$NON-NLS-1$
+            if (ASTNodes.usesGivenSignature(node, Boolean.class.getCanonicalName(), "valueOf", boolean.class.getSimpleName()) //$NON-NLS-1$
+                    || ASTNodes.usesGivenSignature(node, Byte.class.getCanonicalName(), "valueOf", byte.class.getSimpleName()) //$NON-NLS-1$
+                    || ASTNodes.usesGivenSignature(node, Character.class.getCanonicalName(), "valueOf", char.class.getSimpleName()) //$NON-NLS-1$
+                    || ASTNodes.usesGivenSignature(node, Short.class.getCanonicalName(), "valueOf", short.class.getSimpleName()) //$NON-NLS-1$
+                    || ASTNodes.usesGivenSignature(node, Integer.class.getCanonicalName(), "valueOf", int.class.getSimpleName()) //$NON-NLS-1$
+                    || ASTNodes.usesGivenSignature(node, Long.class.getCanonicalName(), "valueOf", long.class.getSimpleName()) //$NON-NLS-1$
+                    || ASTNodes.usesGivenSignature(node, Float.class.getCanonicalName(), "valueOf", float.class.getSimpleName()) //$NON-NLS-1$
+                    || ASTNodes.usesGivenSignature(node, Double.class.getCanonicalName(), "valueOf", double.class.getSimpleName())) { //$NON-NLS-1$
                 return replaceWithTheSingleArgument(node);
             }
             if (is(node, Byte.class.getCanonicalName())) {
@@ -109,7 +103,7 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
             if (is(node, Long.class.getCanonicalName())) {
                 return replaceMethodName(node, "parseLong"); //$NON-NLS-1$
             }
-            if (usesGivenSignature(node, Boolean.class.getCanonicalName(), "valueOf", String.class.getCanonicalName())) { //$NON-NLS-1$
+            if (ASTNodes.usesGivenSignature(node, Boolean.class.getCanonicalName(), "valueOf", String.class.getCanonicalName())) { //$NON-NLS-1$
                 return replaceMethodName(node, "parseBoolean"); //$NON-NLS-1$
             }
             if (is(node, Float.class.getCanonicalName())) {
@@ -122,10 +116,10 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
 
         final ITypeBinding typeBinding= node.getExpression().resolveTypeBinding();
         if (typeBinding != null && node.getExpression() instanceof ClassInstanceCreation) {
-            final List<Expression> cicArgs= arguments((ClassInstanceCreation) node.getExpression());
+            final List<Expression> cicArgs= ASTNodes.arguments((ClassInstanceCreation) node.getExpression());
             if (cicArgs.size() == 1) {
                 final Expression arg0= cicArgs.get(0);
-                if (arguments(node).isEmpty() && hasType(arg0, String.class.getCanonicalName())) {
+                if (ASTNodes.arguments(node).isEmpty() && ASTNodes.hasType(arg0, String.class.getCanonicalName())) {
                     final String methodName= getMethodName(typeBinding.getQualifiedName(),
                             node.getName().getIdentifier());
                     if (methodName != null) {
@@ -140,9 +134,9 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
     }
 
     private boolean is(MethodInvocation node, String declaringTypeQualifiedName) {
-        return usesGivenSignature(node, declaringTypeQualifiedName, "valueOf", String.class.getCanonicalName()) //$NON-NLS-1$
-                || (usesGivenSignature(node, declaringTypeQualifiedName, "valueOf", String.class.getCanonicalName(), int.class.getSimpleName()) //$NON-NLS-1$
-                        && equal(10, arguments(node).get(1).resolveConstantExpressionValue()));
+        return ASTNodes.usesGivenSignature(node, declaringTypeQualifiedName, "valueOf", String.class.getCanonicalName()) //$NON-NLS-1$
+                || (ASTNodes.usesGivenSignature(node, declaringTypeQualifiedName, "valueOf", String.class.getCanonicalName(), int.class.getSimpleName()) //$NON-NLS-1$
+                        && Utils.equal(10, ASTNodes.arguments(node).get(1).resolveConstantExpressionValue()));
     }
 
     private boolean replaceMethodName(MethodInvocation node, String methodName) {
@@ -152,8 +146,8 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
     }
 
     private boolean replaceWithTheSingleArgument(MethodInvocation node) {
-        final ASTBuilder b= this.ctx.getASTBuilder();
-        this.ctx.getRefactorings().replace(node, b.copy(arg0(node)));
+        final ASTNodeFactory b= this.ctx.getASTBuilder();
+        this.ctx.getRefactorings().replace(node, b.copy(ASTNodes.arg0(node)));
         return false;
     }
 
@@ -179,13 +173,13 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
     @Override
     public boolean visit(ClassInstanceCreation node) {
         final ITypeBinding typeBinding= node.getType().resolveBinding();
-        final List<Expression> args= arguments(node);
+        final List<Expression> args= ASTNodes.arguments(node);
         if (getJavaMinorVersion() >= 5 && args.size() == 1) {
-            if (hasType(typeBinding, Boolean.class.getCanonicalName(), Byte.class.getCanonicalName(), Character.class.getCanonicalName(), Double.class.getCanonicalName(),
+            if (ASTNodes.hasType(typeBinding, Boolean.class.getCanonicalName(), Byte.class.getCanonicalName(), Character.class.getCanonicalName(), Double.class.getCanonicalName(),
                     Long.class.getCanonicalName(), Short.class.getCanonicalName(), Integer.class.getCanonicalName())) {
                 replaceWithValueOf(node, typeBinding);
                 return false;
-            } else if (hasType(typeBinding, Float.class.getCanonicalName())) {
+            } else if (ASTNodes.hasType(typeBinding, Float.class.getCanonicalName())) {
                 return replaceFloatInstanceWithValueOf(node, typeBinding, args);
             }
         }
@@ -195,12 +189,12 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
     private boolean replaceFloatInstanceWithValueOf(ClassInstanceCreation node, final ITypeBinding typeBinding,
             final List<Expression> args) {
         final Expression arg0= args.get(0);
-        if (isPrimitive(arg0, double.class.getSimpleName())) {
-            final ASTBuilder b= ctx.getASTBuilder();
+        if (ASTNodes.isPrimitive(arg0, double.class.getSimpleName())) {
+            final ASTNodeFactory b= ctx.getASTBuilder();
             ctx.getRefactorings().replace(node,
                     b.invoke(typeBinding.getName(), "valueOf", b.cast(b.type(float.class.getSimpleName()), b.copy(arg0)))); //$NON-NLS-1$
-        } else if (hasType(arg0, Double.class.getCanonicalName())) {
-            final ASTBuilder b= ctx.getASTBuilder();
+        } else if (ASTNodes.hasType(arg0, Double.class.getCanonicalName())) {
+            final ASTNodeFactory b= ctx.getASTBuilder();
             ctx.getRefactorings().replace(node, b.invoke(b.copy(arg0), "floatValue")); //$NON-NLS-1$
         } else {
             replaceWithValueOf(node, typeBinding);
@@ -210,11 +204,11 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
 
     private void replaceWithValueOf(ClassInstanceCreation node, final ITypeBinding typeBinding) {
         this.ctx.getRefactorings().replace(node,
-                newMethodInvocation(typeBinding.getName(), "valueOf", arguments(node).get(0))); //$NON-NLS-1$
+                newMethodInvocation(typeBinding.getName(), "valueOf", ASTNodes.arguments(node).get(0))); //$NON-NLS-1$
     }
 
     private MethodInvocation newMethodInvocation(String typeName, String methodName, Expression arg) {
-        final ASTBuilder b= this.ctx.getASTBuilder();
+        final ASTNodeFactory b= this.ctx.getASTBuilder();
         return b.invoke(typeName, methodName, b.copy(arg));
     }
 }

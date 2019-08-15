@@ -27,7 +27,7 @@ package org.autorefactor.cfg;
 
 import org.eclipse.jdt.core.dom.Expression;
 
-import static org.autorefactor.util.Utils.*;
+import org.autorefactor.util.Utils;
 
 /** This class represents an edge of the control flow graph. */
 public class CFGEdge {
@@ -118,7 +118,7 @@ public class CFGEdge {
             return false;
         }
         final CFGEdge other= (CFGEdge) obj;
-        return equal(condition, other.condition) && equal(evaluationResult, other.evaluationResult)
-                && equal(sourceBlock, other.sourceBlock) && equal(targetBlock, other.targetBlock);
+        return Utils.equal(condition, other.condition) && Utils.equal(evaluationResult, other.evaluationResult)
+                && Utils.equal(sourceBlock, other.sourceBlock) && Utils.equal(targetBlock, other.targetBlock);
     }
 }

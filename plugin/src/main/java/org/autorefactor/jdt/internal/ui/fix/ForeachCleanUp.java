@@ -25,9 +25,7 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.initializers;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.updaters;
-
+import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.FieldAccess;
@@ -83,12 +81,12 @@ public class ForeachCleanUp extends AbstractCleanUpRule {
         final VariableUseVisitor variableUseVisitor= new VariableUseVisitor();
         node.accept(variableUseVisitor);
 
-        if (initializers(node).size() == 1) {
-            initializers(node);
+        if (ASTNodes.initializers(node).size() == 1) {
+            ASTNodes.initializers(node);
         }
 
         node.getExpression();
-        updaters(node);
+        ASTNodes.updaters(node);
         node.getBody();
         // TODO JNR iterate over array with index
         // TODO JNR iterate over array with temporary variable with generics

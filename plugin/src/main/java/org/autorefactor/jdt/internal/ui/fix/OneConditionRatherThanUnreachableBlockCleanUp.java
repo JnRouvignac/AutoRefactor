@@ -25,13 +25,8 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.as;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.fallsThrough;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isExceptionExpected;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isPassive;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.match;
-
-import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.ASTSemanticMatcher;
 import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.eclipse.jdt.core.dom.IfStatement;
@@ -67,13 +62,13 @@ public class OneConditionRatherThanUnreachableBlockCleanUp extends AbstractClean
 
     @Override
     public boolean visit(IfStatement node) {
-        final IfStatement secondIf= as(node.getElseStatement(), IfStatement.class);
+        final IfStatement secondIf= ASTNodes.as(node.getElseStatement(), IfStatement.class);
         final ASTSemanticMatcher matcher= new ASTSemanticMatcher();
 
-        if (!isExceptionExpected(node) && secondIf != null && isPassive(node.getExpression())
-                && isPassive(secondIf.getExpression()) && match(matcher, node.getExpression(), secondIf.getExpression())
-                && ((secondIf.getElseStatement() == null) || !fallsThrough(node.getThenStatement())
-                        || fallsThrough(secondIf.getThenStatement()) || !fallsThrough(secondIf.getElseStatement()))) {
+        if (!ASTNodes.isExceptionExpected(node) && secondIf != null && ASTNodes.isPassive(node.getExpression())
+                && ASTNodes.isPassive(secondIf.getExpression()) && ASTNodes.match(matcher, node.getExpression(), secondIf.getExpression())
+                && ((secondIf.getElseStatement() == null) || !ASTNodes.fallsThrough(node.getThenStatement())
+                        || ASTNodes.fallsThrough(secondIf.getThenStatement()) || !ASTNodes.fallsThrough(secondIf.getElseStatement()))) {
             refactorCondition(secondIf);
 
             return false;
@@ -83,7 +78,7 @@ public class OneConditionRatherThanUnreachableBlockCleanUp extends AbstractClean
     }
 
     private void refactorCondition(final IfStatement secondIf) {
-        final ASTBuilder b= this.ctx.getASTBuilder();
+        final ASTNodeFactory b= this.ctx.getASTBuilder();
         final Refactorings r= this.ctx.getRefactorings();
 
         if (secondIf.getElseStatement() == null) {

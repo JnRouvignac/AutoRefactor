@@ -238,7 +238,7 @@ public enum OperatorEnum {
      * @return true if the supplied operator is associative, false otherwise
      */
     public static boolean isAssociative(InfixExpression.Operator operator) {
-        return OPERATORS.get(operator).isAssociative;
+        return OperatorEnum.OPERATORS.get(operator).isAssociative;
     }
 
     /**
@@ -249,7 +249,7 @@ public enum OperatorEnum {
      *         otherwise
      */
     public static boolean isBoolean(InfixExpression.Operator operator) {
-        return OPERATORS.get(operator).isBoolean;
+        return OperatorEnum.OPERATORS.get(operator).isBoolean;
     }
 
     /**
@@ -271,13 +271,13 @@ public enum OperatorEnum {
      *         greater than 0 if the first node is greater than the second node
      */
     public static int compareTo(ASTNode node1, ASTNode node2) {
-        final OperatorEnum op1= getOperator(node1);
-        final OperatorEnum op2= getOperator(node2);
+        final OperatorEnum op1= OperatorEnum.getOperator(node1);
+        final OperatorEnum op2= OperatorEnum.getOperator(node2);
         if (op1 == null || op2 == null) {
             // Uncomparable results
             return 0;
         }
-        return compareTo(op1, op2);
+        return OperatorEnum.compareTo(op1, op2);
     }
 
     /**
@@ -313,16 +313,16 @@ public enum OperatorEnum {
         }
         switch (expr.getNodeType()) {
         case ASTNode.PREFIX_EXPRESSION:
-            return OPERATORS.get(((PrefixExpression) expr).getOperator());
+            return OperatorEnum.OPERATORS.get(((PrefixExpression) expr).getOperator());
         case ASTNode.POSTFIX_EXPRESSION:
-            return OPERATORS.get(((PostfixExpression) expr).getOperator());
+            return OperatorEnum.OPERATORS.get(((PostfixExpression) expr).getOperator());
         case ASTNode.INFIX_EXPRESSION:
-            return OPERATORS.get(((InfixExpression) expr).getOperator());
+            return OperatorEnum.OPERATORS.get(((InfixExpression) expr).getOperator());
         case ASTNode.METHOD_INVOCATION:
         case ASTNode.SUPER_METHOD_INVOCATION:
             return PARENTHESES;
         case ASTNode.ASSIGNMENT:
-            return OPERATORS.get(((Assignment) expr).getOperator());
+            return OperatorEnum.OPERATORS.get(((Assignment) expr).getOperator());
         case ASTNode.VARIABLE_DECLARATION_FRAGMENT:
             return ASSIGN;
         case ASTNode.FIELD_ACCESS:
