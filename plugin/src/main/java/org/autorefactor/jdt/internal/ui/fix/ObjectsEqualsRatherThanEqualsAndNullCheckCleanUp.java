@@ -115,7 +115,7 @@ public class ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp extends NewClassIm
             final List<Statement> elseStmts= ASTNodes.asList(node.getElseStatement());
 
             if (condition != null && !condition.hasExtendedOperands()
-                    && Arrays.asList(InfixExpression.Operator.EQUALS, InfixExpression.Operator.NOT_EQUALS).contains(condition.getOperator())
+                    && ASTNodes.hasOperator(condition, InfixExpression.Operator.EQUALS, InfixExpression.Operator.NOT_EQUALS)
                     && thenStmts != null && thenStmts.size() == 1 && elseStmts != null && elseStmts.size() == 1) {
                 final Expression operand1= condition.getLeftOperand();
                 final Expression operand2= condition.getRightOperand();

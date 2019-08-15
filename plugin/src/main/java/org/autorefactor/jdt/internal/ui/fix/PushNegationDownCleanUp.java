@@ -26,7 +26,6 @@
 package org.autorefactor.jdt.internal.ui.fix;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -86,7 +85,7 @@ public class PushNegationDownCleanUp extends AbstractCleanUpRule {
             final InfixExpression.Operator reverseOp= (InfixExpression.Operator) OperatorEnum.getOperator(ie).getReverseBooleanOperator();
             if (reverseOp != null) {
                 List<Expression> allOperands= new ArrayList<Expression>(ASTNodes.allOperands(ie));
-                if (Arrays.<InfixExpression.Operator>asList(InfixExpression.Operator.CONDITIONAL_AND, InfixExpression.Operator.CONDITIONAL_OR, InfixExpression.Operator.AND, InfixExpression.Operator.OR).contains(ie.getOperator())) {
+                if (ASTNodes.hasOperator(ie, InfixExpression.Operator.CONDITIONAL_AND, InfixExpression.Operator.CONDITIONAL_OR, InfixExpression.Operator.AND, InfixExpression.Operator.OR)) {
                     for (ListIterator<Expression> it= allOperands.listIterator(); it.hasNext();) {
                         it.set(b.negate(it.next()));
                     }

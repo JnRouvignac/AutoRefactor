@@ -525,7 +525,7 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
         final NumberLiteral hashForFalse= ASTNodes.as(condition.getElseExpression(), NumberLiteral.class);
 
         if (isFieldNull != null && !isFieldNull.hasExtendedOperands()
-                && Arrays.asList(InfixExpression.Operator.EQUALS, InfixExpression.Operator.NOT_EQUALS).contains(isFieldNull.getOperator())) {
+                && ASTNodes.hasOperator(isFieldNull, InfixExpression.Operator.EQUALS, InfixExpression.Operator.NOT_EQUALS)) {
             return isObjectValid(data, condition, isFieldNull);
         } else if (booleanField != null && ASTNodes.hasType(booleanField, boolean.class.getSimpleName())
                 && !booleanField.getIdentifier().equals(data.getPrimeId())

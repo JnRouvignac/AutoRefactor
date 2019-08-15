@@ -1073,8 +1073,7 @@ public final class ASTNodes {
                 }
             } else if (parent instanceof InfixExpression) {
                 final InfixExpression prefixExpr= (InfixExpression) parent;
-                if (Arrays.asList(InfixExpression.Operator.CONDITIONAL_AND, InfixExpression.Operator.CONDITIONAL_OR)
-                        .contains(prefixExpr.getOperator())) {
+                if (ASTNodes.hasOperator(prefixExpr, InfixExpression.Operator.CONDITIONAL_AND, InfixExpression.Operator.CONDITIONAL_OR)) {
                     return node.getAST().resolveWellKnownType(boolean.class.getSimpleName());
                 }
             } else if (parent instanceof IfStatement) {

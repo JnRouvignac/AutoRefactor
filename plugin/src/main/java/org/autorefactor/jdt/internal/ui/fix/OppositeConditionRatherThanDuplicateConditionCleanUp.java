@@ -25,8 +25,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import java.util.Arrays;
-
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.ASTSemanticMatcher;
@@ -98,8 +96,7 @@ public class OppositeConditionRatherThanDuplicateConditionCleanUp extends Abstra
             final InfixExpression firstCondition= (InfixExpression) node.getExpression();
 
             if (!firstCondition.hasExtendedOperands()
-                    && Arrays.<InfixExpression.Operator>asList(InfixExpression.Operator.AND, InfixExpression.Operator.CONDITIONAL_AND)
-                            .contains(firstCondition.getOperator())
+                    && ASTNodes.hasOperator(firstCondition, InfixExpression.Operator.AND, InfixExpression.Operator.CONDITIONAL_AND)
                     && ASTNodes.isPassive(firstCondition.getLeftOperand()) && ASTNodes.isPassive(firstCondition.getRightOperand())) {
                 final IfStatement secondIf= (IfStatement) node.getElseStatement();
 

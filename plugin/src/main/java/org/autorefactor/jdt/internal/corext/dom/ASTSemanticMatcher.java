@@ -26,7 +26,6 @@
 package org.autorefactor.jdt.internal.corext.dom;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -170,8 +169,7 @@ public class ASTSemanticMatcher extends ASTMatcher {
                     && safeSubtreeMatch(node.getRightOperand(), ie.getLeftOperand())) {
                 if (node.getOperator().equals(ASTSemanticMatcher.INFIX_TO_MIRROR_OPERATOR.get(ie.getOperator()))) {
                     return true;
-                } else if (Arrays.asList(InfixExpression.Operator.PLUS, InfixExpression.Operator.TIMES)
-                        .contains(ie.getOperator())
+                } else if (ASTNodes.hasOperator(ie, InfixExpression.Operator.PLUS, InfixExpression.Operator.TIMES)
                         && node.getOperator().equals(ie.getOperator())
                         && ASTNodes.hasType(node.getLeftOperand(), short.class.getSimpleName(), int.class.getSimpleName(), long.class.getSimpleName(), float.class.getSimpleName(), double.class.getSimpleName(), Short.class.getCanonicalName(),
                                 Integer.class.getCanonicalName(), Long.class.getCanonicalName(), Float.class.getCanonicalName(), Double.class.getCanonicalName())
@@ -180,11 +178,9 @@ public class ASTSemanticMatcher extends ASTMatcher {
                 }
             }
 
-            if (node.getOperator().equals(ie.getOperator()) && Arrays
-                    .asList(InfixExpression.Operator.PLUS, InfixExpression.Operator.TIMES, InfixExpression.Operator.AND,
+            if (node.getOperator().equals(ie.getOperator()) && ASTNodes.hasOperator(ie, InfixExpression.Operator.PLUS, InfixExpression.Operator.TIMES, InfixExpression.Operator.AND,
                             InfixExpression.Operator.CONDITIONAL_AND, InfixExpression.Operator.OR,
-                            InfixExpression.Operator.CONDITIONAL_OR, InfixExpression.Operator.XOR)
-                    .contains(ie.getOperator())) {
+                            InfixExpression.Operator.CONDITIONAL_OR, InfixExpression.Operator.XOR)) {
                 return isOperandsMatching(node, ie, true);
             }
         }
@@ -263,12 +259,12 @@ public class ASTSemanticMatcher extends ASTMatcher {
             InfixExpression infixExpr= (InfixExpression) node.getRightHandSide();
 
             if (!infixExpr.hasExtendedOperands()
-                    && Arrays.asList(Assignment.Operator.PLUS_ASSIGN, Assignment.Operator.MINUS_ASSIGN,
+                    && ASTNodes.hasOperator(assignment, Assignment.Operator.PLUS_ASSIGN, Assignment.Operator.MINUS_ASSIGN,
                             Assignment.Operator.TIMES_ASSIGN, Assignment.Operator.DIVIDE_ASSIGN,
                             Assignment.Operator.BIT_AND_ASSIGN, Assignment.Operator.BIT_OR_ASSIGN,
                             Assignment.Operator.BIT_XOR_ASSIGN, Assignment.Operator.REMAINDER_ASSIGN,
                             Assignment.Operator.LEFT_SHIFT_ASSIGN, Assignment.Operator.RIGHT_SHIFT_SIGNED_ASSIGN,
-                            Assignment.Operator.RIGHT_SHIFT_UNSIGNED_ASSIGN).contains(assignment.getOperator())
+                            Assignment.Operator.RIGHT_SHIFT_UNSIGNED_ASSIGN)
                     && ASTSemanticMatcher.ASSIGN_TO_INFIX_OPERATOR.get(assignment.getOperator()).equals(infixExpr.getOperator())) {
                 return safeSubtreeMatch(node.getLeftHandSide(), assignment.getLeftHandSide())
                         && safeSubtreeMatch(infixExpr.getLeftOperand(), assignment.getLeftHandSide())
@@ -308,8 +304,7 @@ public class ASTSemanticMatcher extends ASTMatcher {
                             && safeSubtreeMatch(prefixOrPostfixOperand, infixExpr.getRightOperand());
                 }
             }
-        } else if (Arrays.asList(Assignment.Operator.PLUS_ASSIGN, Assignment.Operator.MINUS_ASSIGN)
-                .contains(assignment.getOperator()) && assignmentAssociatedOperator.equals(assignment.getOperator())) {
+        } else if (ASTNodes.hasOperator(assignment, Assignment.Operator.PLUS_ASSIGN, Assignment.Operator.MINUS_ASSIGN) && assignmentAssociatedOperator.equals(assignment.getOperator())) {
             Object assignmentExpr= assignment.resolveConstantExpressionValue();
 
             if (assignmentExpr instanceof Number && ((Number) assignmentExpr).longValue() == 1) {
@@ -664,8 +659,8 @@ public class ASTSemanticMatcher extends ASTMatcher {
 
         if (ie1.getOperator().equals(ie2.getOperator())) {
             if (!ie1.hasExtendedOperands() && !ie2.hasExtendedOperands()) {
-                if (Arrays.asList(InfixExpression.Operator.EQUALS, InfixExpression.Operator.NOT_EQUALS,
-                        InfixExpression.Operator.XOR).contains(ie1.getOperator())) {
+                if (ASTNodes.hasOperator(ie1, InfixExpression.Operator.EQUALS, InfixExpression.Operator.NOT_EQUALS,
+                        InfixExpression.Operator.XOR)) {
                     if (matchOneOppositeOther(leftOperand1, leftOperand2, rightOperand2, rightOperand1)
                             || matchOneOppositeOther(rightOperand2, rightOperand1, leftOperand1, leftOperand2)) {
                         return true;
@@ -680,10 +675,8 @@ public class ASTSemanticMatcher extends ASTMatcher {
                     }
                 } else if (ASTNodes.isPassive(leftOperand1) && ASTNodes.isPassive(rightOperand1) && ASTNodes.isPassive(leftOperand2)
                         && ASTNodes.isPassive(rightOperand2)
-                        && Arrays
-                                .asList(InfixExpression.Operator.GREATER, InfixExpression.Operator.GREATER_EQUALS,
-                                        InfixExpression.Operator.LESS, InfixExpression.Operator.LESS_EQUALS)
-                                .contains(ie1.getOperator())) {
+                        && ASTNodes.hasOperator(ie1, InfixExpression.Operator.GREATER, InfixExpression.Operator.GREATER_EQUALS,
+                                        InfixExpression.Operator.LESS, InfixExpression.Operator.LESS_EQUALS)) {
                     return safeSubtreeMatch(ie1.getLeftOperand(), ie2.getRightOperand())
                             && safeSubtreeMatch(ie1.getRightOperand(), ie2.getLeftOperand());
                 }
@@ -695,20 +688,15 @@ public class ASTSemanticMatcher extends ASTMatcher {
         final InfixExpression.Operator reverseOp= (InfixExpression.Operator) OperatorEnum.getOperator(ie1).getReverseBooleanOperator();
 
         if (ie2.getOperator().equals(reverseOp)) {
-            if (Arrays
-                    .asList(InfixExpression.Operator.AND, InfixExpression.Operator.CONDITIONAL_AND,
-                            InfixExpression.Operator.OR, InfixExpression.Operator.CONDITIONAL_OR)
-                    .contains(ie1.getOperator())) {
+            if (ASTNodes.hasOperator(ie1, InfixExpression.Operator.AND, InfixExpression.Operator.CONDITIONAL_AND,
+                            InfixExpression.Operator.OR, InfixExpression.Operator.CONDITIONAL_OR)) {
                 return isOperandsMatching(ie1, ie2, false);
-            } else if (Arrays.asList(InfixExpression.Operator.EQUALS, InfixExpression.Operator.NOT_EQUALS)
-                    .contains(ie1.getOperator())) {
+            } else if (ASTNodes.hasOperator(ie1, InfixExpression.Operator.EQUALS, InfixExpression.Operator.NOT_EQUALS)) {
                 return isOperandsMatching(ie1, ie2, true);
             } else if (ASTNodes.isPassive(leftOperand1) && ASTNodes.isPassive(rightOperand1) && ASTNodes.isPassive(leftOperand2)
                     && ASTNodes.isPassive(rightOperand2)
-                    && Arrays
-                            .asList(InfixExpression.Operator.GREATER, InfixExpression.Operator.GREATER_EQUALS,
-                                    InfixExpression.Operator.LESS, InfixExpression.Operator.LESS_EQUALS)
-                            .contains(ie1.getOperator())) {
+                    && ASTNodes.hasOperator(ie1, InfixExpression.Operator.GREATER, InfixExpression.Operator.GREATER_EQUALS,
+                                    InfixExpression.Operator.LESS, InfixExpression.Operator.LESS_EQUALS)) {
                 return safeSubtreeMatch(leftOperand1, leftOperand2) && safeSubtreeMatch(rightOperand1, rightOperand2);
             }
 
