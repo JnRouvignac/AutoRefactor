@@ -195,8 +195,8 @@ public final class ForLoopHelper {
                 final MethodInvocation condMi= as(node.getExpression(), MethodInvocation.class);
                 final MethodInvocation initMi= as(initPair.getSecond(), MethodInvocation.class);
                 if (condMi != null && isSameVariable(init, condMi.getExpression())
-                        && isMethod(initMi, Collection.class.getCanonicalName(), "iterator") //$NON-NLS-1$
-                        && isMethod(condMi, Iterator.class.getCanonicalName(), "hasNext")) { //$NON-NLS-1$
+                        && usesGivenSignature(initMi, Collection.class.getCanonicalName(), "iterator") //$NON-NLS-1$
+                        && usesGivenSignature(condMi, Iterator.class.getCanonicalName(), "hasNext")) { //$NON-NLS-1$
                     return getIteratorOnCollection(initMi.getExpression(), condMi.getExpression());
                 }
             } else if (updaters.size() == 1 && isPrimitive(firstInit, int.class.getSimpleName())) {
@@ -296,7 +296,7 @@ public final class ForLoopHelper {
         if (containerVar instanceof MethodInvocation) {
             final MethodInvocation mi= (MethodInvocation) containerVar;
             final Name containerVarName= as(mi.getExpression(), Name.class);
-            if (containerVarName != null && isMethod(mi, Collection.class.getCanonicalName(), "size")) { //$NON-NLS-1$
+            if (containerVarName != null && usesGivenSignature(mi, Collection.class.getCanonicalName(), "size")) { //$NON-NLS-1$
                 return ForLoopContent.indexedCollection(containerVarName, (Name) loopVar);
             }
         } else if (containerVar instanceof QualifiedName) {

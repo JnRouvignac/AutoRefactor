@@ -30,7 +30,7 @@ import static java.util.Arrays.asList;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.bodyDeclarations;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getAncestorOrNull;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getFirstAncestorOrNull;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isMethod;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.usesGivenSignature;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isSameVariable;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.modifiers;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.parameters;
@@ -118,7 +118,7 @@ public class AndroidViewHolderCleanUp extends AbstractCleanUpRule {
     @Override
     public boolean visit(MethodDeclaration node) {
         Block body= node.getBody();
-        if (body != null && isMethod(node, "android.widget.Adapter", "getView", int.class.getSimpleName(), "android.view.View", //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
+        if (body != null && usesGivenSignature(node, "android.widget.Adapter", "getView", int.class.getSimpleName(), "android.view.View", //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
                 "android.view.ViewGroup")) { //$NON-NLS-1$
             final GetViewVariableVisitor visitor= new GetViewVariableVisitor();
             body.accept(visitor);
@@ -299,10 +299,10 @@ public class AndroidViewHolderCleanUp extends AbstractCleanUpRule {
         private boolean isInflateMethod(MethodInvocation node) {
             final String inflaterType= "android.view.LayoutInflater"; //$NON-NLS-1$
             final String viewGroupType= "android.view.ViewGroup"; //$NON-NLS-1$
-            return isMethod(node, inflaterType, "inflate", int.class.getSimpleName(), viewGroupType) //$NON-NLS-1$
-                    || isMethod(node, inflaterType, "inflate", int.class.getSimpleName(), viewGroupType, boolean.class.getSimpleName()) //$NON-NLS-1$
-                    || isMethod(node, inflaterType, "inflate", "org.xmlpull.v1.XmlPullParser", viewGroupType) //$NON-NLS-1$ $NON-NLS-2$
-                    || isMethod(node, inflaterType, "inflate", "org.xmlpull.v1.XmlPullParser", viewGroupType, //$NON-NLS-1$ $NON-NLS-2$
+            return usesGivenSignature(node, inflaterType, "inflate", int.class.getSimpleName(), viewGroupType) //$NON-NLS-1$
+                    || usesGivenSignature(node, inflaterType, "inflate", int.class.getSimpleName(), viewGroupType, boolean.class.getSimpleName()) //$NON-NLS-1$
+                    || usesGivenSignature(node, inflaterType, "inflate", "org.xmlpull.v1.XmlPullParser", viewGroupType) //$NON-NLS-1$ $NON-NLS-2$
+                    || usesGivenSignature(node, inflaterType, "inflate", "org.xmlpull.v1.XmlPullParser", viewGroupType, //$NON-NLS-1$ $NON-NLS-2$
                             boolean.class.getSimpleName());
         }
     }
@@ -357,7 +357,7 @@ public class AndroidViewHolderCleanUp extends AbstractCleanUpRule {
 
         @Override
         public boolean visit(MethodInvocation node) {
-            if (isMethod(node, "android.view.View", "findViewById", int.class.getSimpleName()) //$NON-NLS-1$ $NON-NLS-2$
+            if (usesGivenSignature(node, "android.view.View", "findViewById", int.class.getSimpleName()) //$NON-NLS-1$ $NON-NLS-2$
                     && isSameVariable(viewVariableName, node.getExpression())) {
                 FindViewByIdItem item= new FindViewByIdItem();
                 if (item.setAssignment(node)) {

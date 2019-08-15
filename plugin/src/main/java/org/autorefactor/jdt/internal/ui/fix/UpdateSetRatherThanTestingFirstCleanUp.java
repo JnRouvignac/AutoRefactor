@@ -30,7 +30,7 @@ import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.as;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.asExpression;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.asList;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasOperator;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isMethod;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.usesGivenSignature;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.match;
 import static org.autorefactor.util.Utils.getFirst;
 import static org.eclipse.jdt.core.dom.PrefixExpression.Operator.NOT;
@@ -98,11 +98,11 @@ public class UpdateSetRatherThanTestingFirstCleanUp extends AbstractCleanUpRule 
             final Statement stmt, final Statement oppositeStmt, final boolean negate, final String methodName) {
         final List<Statement> stmts= asList(stmt);
         final MethodInvocation miContains= as(ifExpr, MethodInvocation.class);
-        if (!stmts.isEmpty() && isMethod(miContains, Set.class.getCanonicalName(), "contains", Object.class.getCanonicalName())) { //$NON-NLS-1$
+        if (!stmts.isEmpty() && usesGivenSignature(miContains, Set.class.getCanonicalName(), "contains", Object.class.getCanonicalName())) { //$NON-NLS-1$
             final Statement firstStmt= getFirst(stmts);
             final MethodInvocation miAddOrRemove= asExpression(firstStmt, MethodInvocation.class);
             final ASTSemanticMatcher astMatcher= new ASTSemanticMatcher();
-            if (isMethod(miAddOrRemove, Set.class.getCanonicalName(), methodName, Object.class.getCanonicalName())
+            if (usesGivenSignature(miAddOrRemove, Set.class.getCanonicalName(), methodName, Object.class.getCanonicalName())
                     && match(astMatcher, miContains.getExpression(), miAddOrRemove.getExpression())
                     && match(astMatcher, arg0(miContains), arg0(miAddOrRemove))) {
                 final ASTBuilder b= this.ctx.getASTBuilder();

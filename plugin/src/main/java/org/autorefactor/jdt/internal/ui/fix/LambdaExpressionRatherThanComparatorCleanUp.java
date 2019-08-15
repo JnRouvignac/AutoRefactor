@@ -28,7 +28,7 @@ package org.autorefactor.jdt.internal.ui.fix;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.as;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getTargetType;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasType;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isMethod;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.usesGivenSignature;
 
 import java.util.Arrays;
 import java.util.Comparator;
@@ -149,7 +149,7 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
         final MethodDeclaration methodDecl= (MethodDeclaration) body;
         final Block methodBody= methodDecl.getBody();
 
-        if (isMethod(methodDecl, Comparator.class.getCanonicalName(), "compare", typeArgument.getQualifiedName(), //$NON-NLS-1$
+        if (usesGivenSignature(methodDecl, Comparator.class.getCanonicalName(), "compare", typeArgument.getQualifiedName(), //$NON-NLS-1$
                 typeArgument.getQualifiedName())) {
             @SuppressWarnings("unchecked")
             final List<Statement> stmts= methodBody.statements();
@@ -166,7 +166,7 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
 
                         if (compareToMethod != null && compareToMethod.getExpression() != null
                                 && compareToMethod.getExpression().resolveTypeBinding() != null
-                                && isMethod(compareToMethod, comparisonClass, "compareTo", comparisonClass)) { //$NON-NLS-1$
+                                && usesGivenSignature(compareToMethod, comparisonClass, "compareTo", comparisonClass)) { //$NON-NLS-1$
                             return maybeRefactorComparison(node, methodDecl, compareToMethod, typeArgument,
                                     classesToUseWithImport);
                         }

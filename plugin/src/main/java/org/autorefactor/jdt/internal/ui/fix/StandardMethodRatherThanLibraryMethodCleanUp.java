@@ -25,7 +25,7 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isMethod;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.usesGivenSignature;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -101,10 +101,10 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
 
     private boolean maybeRefactorMethodInvocation(final MethodInvocation node, final Set<String> classesToUseWithImport,
             final Set<String> importsToAdd) {
-        if (isMethod(node, "org.apache.commons.lang3.ObjectUtils", "hashCode", Object.class.getCanonicalName()) //$NON-NLS-1$ $NON-NLS-2$
-                || isMethod(node, "org.apache.commons.lang3.ObjectUtils", "equals", Object.class.getCanonicalName(), //$NON-NLS-1$ $NON-NLS-2$
+        if (usesGivenSignature(node, "org.apache.commons.lang3.ObjectUtils", "hashCode", Object.class.getCanonicalName()) //$NON-NLS-1$ $NON-NLS-2$
+                || usesGivenSignature(node, "org.apache.commons.lang3.ObjectUtils", "equals", Object.class.getCanonicalName(), //$NON-NLS-1$ $NON-NLS-2$
                         Object.class.getCanonicalName())
-                || isMethod(node, "org.apache.commons.lang3.ObjectUtils", "toString", Object.class.getCanonicalName(), //$NON-NLS-1$ $NON-NLS-2$
+                || usesGivenSignature(node, "org.apache.commons.lang3.ObjectUtils", "toString", Object.class.getCanonicalName(), //$NON-NLS-1$ $NON-NLS-2$
                         String.class.getCanonicalName())) {
             replaceUtilClass(node, classesToUseWithImport, importsToAdd);
             return false;
@@ -114,8 +114,8 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
         final Name javaUtilObjects= classesToUseWithImport.contains("java.util.Objects") ? b.simpleName("Objects") //$NON-NLS-1$ $NON-NLS-2$
                 : b.name("java", "util", "Objects"); //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
 
-        if (isMethod(node, "com.google.common.base.Objects", "equal", Object.class.getCanonicalName(), Object.class.getCanonicalName()) //$NON-NLS-1$ $NON-NLS-2$
-                || isMethod(node, "com.google.gwt.thirdparty.guava.common.base.Objects", "equal", Object.class.getCanonicalName(), //$NON-NLS-1$ $NON-NLS-2$
+        if (usesGivenSignature(node, "com.google.common.base.Objects", "equal", Object.class.getCanonicalName(), Object.class.getCanonicalName()) //$NON-NLS-1$ $NON-NLS-2$
+                || usesGivenSignature(node, "com.google.gwt.thirdparty.guava.common.base.Objects", "equal", Object.class.getCanonicalName(), //$NON-NLS-1$ $NON-NLS-2$
                         Object.class.getCanonicalName())) {
             final Refactorings r= this.ctx.getRefactorings();
 
@@ -125,7 +125,7 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
             return false;
         }
 
-        if (isMethod(node, "org.apache.commons.lang3.ObjectUtils", "toString", Object.class.getCanonicalName())) { //$NON-NLS-1$ $NON-NLS-2$
+        if (usesGivenSignature(node, "org.apache.commons.lang3.ObjectUtils", "toString", Object.class.getCanonicalName())) { //$NON-NLS-1$ $NON-NLS-2$
             final Refactorings r= this.ctx.getRefactorings();
 
             r.replace(node,
@@ -134,7 +134,7 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
             return false;
         }
 
-        if (isMethod(node, "com.google.common.base.Objects", "hashCode", Object[].class.getCanonicalName()) || isMethod(node, //$NON-NLS-1$ $NON-NLS-2$
+        if (usesGivenSignature(node, "com.google.common.base.Objects", "hashCode", Object[].class.getCanonicalName()) || usesGivenSignature(node, //$NON-NLS-1$ $NON-NLS-2$
                 "com.google.gwt.thirdparty.guava.common.base.Objects", "hashCode", Object[].class.getCanonicalName())) { //$NON-NLS-1$ $NON-NLS-2$
             final Refactorings r= this.ctx.getRefactorings();
 
@@ -149,7 +149,7 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
             return false;
         }
 
-        if (isMethod(node, "org.apache.commons.lang3.ObjectUtils", "hashCodeMulti", Object[].class.getCanonicalName())) { //$NON-NLS-1$ $NON-NLS-2$
+        if (usesGivenSignature(node, "org.apache.commons.lang3.ObjectUtils", "hashCodeMulti", Object[].class.getCanonicalName())) { //$NON-NLS-1$ $NON-NLS-2$
             final Refactorings r= this.ctx.getRefactorings();
 
             if (node.getExpression() != null) {
@@ -163,13 +163,13 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
             return false;
         }
 
-        if (isMethod(node, "com.google.common.base.Preconditions", "checkNotNull", "T") //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
-                || isMethod(node, "com.google.common.base.Preconditions", "checkNotNull", "T", Object.class.getCanonicalName()) //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
-                || isMethod(node, "com.google.gwt.thirdparty.guava.common.base.Preconditions", "checkNotNull", "T") //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
-                || isMethod(node, "com.google.gwt.thirdparty.guava.common.base.Preconditions", "checkNotNull", "T", //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
+        if (usesGivenSignature(node, "com.google.common.base.Preconditions", "checkNotNull", "T") //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
+                || usesGivenSignature(node, "com.google.common.base.Preconditions", "checkNotNull", "T", Object.class.getCanonicalName()) //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
+                || usesGivenSignature(node, "com.google.gwt.thirdparty.guava.common.base.Preconditions", "checkNotNull", "T") //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
+                || usesGivenSignature(node, "com.google.gwt.thirdparty.guava.common.base.Preconditions", "checkNotNull", "T", //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
                         Object.class.getCanonicalName())
-                || isMethod(node, "org.apache.commons.lang3.Validate", "notNull", "T") //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
-                || isMethod(node, "org.apache.commons.lang3.Validate", "notNull", "T", String.class.getCanonicalName(), //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
+                || usesGivenSignature(node, "org.apache.commons.lang3.Validate", "notNull", "T") //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
+                || usesGivenSignature(node, "org.apache.commons.lang3.Validate", "notNull", "T", String.class.getCanonicalName(), //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
                         Object[].class.getCanonicalName())) {
             final Refactorings r= this.ctx.getRefactorings();
 

@@ -26,7 +26,7 @@
 package org.autorefactor.jdt.internal.ui.fix;
 
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getTargetType;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isMethod;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.usesGivenSignature;
 
 import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
 import org.autorefactor.jdt.internal.corext.dom.Release;
@@ -70,13 +70,13 @@ public class UnboxingRatherThanExplicitMethodCleanUp extends AbstractCleanUpRule
     @Override
     public boolean visit(MethodInvocation node) {
         if (node.getExpression() != null
-                && (isMethod(node, Boolean.class.getCanonicalName(), "booleanValue") || isMethod(node, Byte.class.getCanonicalName(), "byteValue") //$NON-NLS-1$ $NON-NLS-2$
-                        || isMethod(node, Character.class.getCanonicalName(), "charValue") //$NON-NLS-1$
-                        || isMethod(node, Short.class.getCanonicalName(), "shortValue") //$NON-NLS-1$
-                        || isMethod(node, Integer.class.getCanonicalName(), "intValue") //$NON-NLS-1$
-                        || isMethod(node, Long.class.getCanonicalName(), "longValue") //$NON-NLS-1$
-                        || isMethod(node, Float.class.getCanonicalName(), "floatValue") //$NON-NLS-1$
-                        || isMethod(node, Double.class.getCanonicalName(), "doubleValue"))) { //$NON-NLS-1$
+                && (usesGivenSignature(node, Boolean.class.getCanonicalName(), "booleanValue") || usesGivenSignature(node, Byte.class.getCanonicalName(), "byteValue") //$NON-NLS-1$ $NON-NLS-2$
+                        || usesGivenSignature(node, Character.class.getCanonicalName(), "charValue") //$NON-NLS-1$
+                        || usesGivenSignature(node, Short.class.getCanonicalName(), "shortValue") //$NON-NLS-1$
+                        || usesGivenSignature(node, Integer.class.getCanonicalName(), "intValue") //$NON-NLS-1$
+                        || usesGivenSignature(node, Long.class.getCanonicalName(), "longValue") //$NON-NLS-1$
+                        || usesGivenSignature(node, Float.class.getCanonicalName(), "floatValue") //$NON-NLS-1$
+                        || usesGivenSignature(node, Double.class.getCanonicalName(), "doubleValue"))) { //$NON-NLS-1$
             final ITypeBinding actualResultType= getTargetType(node);
 
             if (actualResultType != null && actualResultType.isAssignmentCompatible(node.resolveTypeBinding())) {

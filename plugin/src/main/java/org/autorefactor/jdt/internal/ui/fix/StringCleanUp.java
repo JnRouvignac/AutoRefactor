@@ -28,14 +28,14 @@ package org.autorefactor.jdt.internal.ui.fix;
 
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.arg0;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.as;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getBoxedTypeBinding;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasType;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isMethod;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.usesGivenSignature;
 import static org.eclipse.jdt.core.dom.ASTNode.INFIX_EXPRESSION;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
+import org.autorefactor.jdt.internal.corext.dom.Bindings;
 import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.CharacterLiteral;
@@ -81,7 +81,7 @@ public class StringCleanUp extends AbstractCleanUpRule {
         final ASTBuilder b= this.ctx.getASTBuilder();
         final Refactorings r= ctx.getRefactorings();
         final boolean isStringValueOf= isStringValueOf(node);
-        if (isMethod(node, Object.class.getCanonicalName(), "toString")) { //$NON-NLS-1$
+        if (usesGivenSignature(node, Object.class.getCanonicalName(), "toString")) { //$NON-NLS-1$
             if (hasType(expr, String.class.getCanonicalName())) {
                 // If node is already a String, no need to call toString()
                 r.replace(node, b.move(expr));
@@ -99,7 +99,7 @@ public class StringCleanUp extends AbstractCleanUpRule {
                     // Node is in the extended operands
                     r.replace(node, replaceToString(node.getExpression()));
                     return false;
-                } else if (leftOpIsString && isMethod(rmi, Object.class.getCanonicalName(), "toString")) { //$NON-NLS-1$
+                } else if (leftOpIsString && usesGivenSignature(rmi, Object.class.getCanonicalName(), "toString")) { //$NON-NLS-1$
                     r.replace(rmi, replaceToString(rmi.getExpression()));
                     return false;
                 } else if (rightOpIsString && node.equals(lmi)) {
@@ -135,21 +135,21 @@ public class StringCleanUp extends AbstractCleanUpRule {
                 replaceStringValueOfByArg0(node, node);
                 return false;
             }
-        } else if (isMethod(node, String.class.getCanonicalName(), "equals", Object.class.getCanonicalName())) { //$NON-NLS-1$
+        } else if (usesGivenSignature(node, String.class.getCanonicalName(), "equals", Object.class.getCanonicalName())) { //$NON-NLS-1$
             final MethodInvocation leftInvocation= as(node.getExpression(), MethodInvocation.class);
             final MethodInvocation rightInvocation= as(arg0(node), MethodInvocation.class);
 
             if (leftInvocation != null && rightInvocation != null
-                    && ((isMethod(leftInvocation, String.class.getCanonicalName(), "toLowerCase") //$NON-NLS-1$
-                            && isMethod(rightInvocation, String.class.getCanonicalName(), "toLowerCase")) //$NON-NLS-1$
-                            || (isMethod(leftInvocation, String.class.getCanonicalName(), "toUpperCase") //$NON-NLS-1$
-                                    && isMethod(rightInvocation, String.class.getCanonicalName(), "toUpperCase")))) { //$NON-NLS-1$
+                    && ((usesGivenSignature(leftInvocation, String.class.getCanonicalName(), "toLowerCase") //$NON-NLS-1$
+                            && usesGivenSignature(rightInvocation, String.class.getCanonicalName(), "toLowerCase")) //$NON-NLS-1$
+                            || (usesGivenSignature(leftInvocation, String.class.getCanonicalName(), "toUpperCase") //$NON-NLS-1$
+                                    && usesGivenSignature(rightInvocation, String.class.getCanonicalName(), "toUpperCase")))) { //$NON-NLS-1$
                 final Expression leftExpr= leftInvocation.getExpression();
                 final Expression rightExpr= rightInvocation.getExpression();
                 r.replace(node, b.invoke(b.copy(leftExpr), "equalsIgnoreCase", b.copy(rightExpr))); //$NON-NLS-1$
                 return false;
             }
-        } else if (isMethod(node, String.class.getCanonicalName(), "equalsIgnoreCase", String.class.getCanonicalName())) { //$NON-NLS-1$
+        } else if (usesGivenSignature(node, String.class.getCanonicalName(), "equalsIgnoreCase", String.class.getCanonicalName())) { //$NON-NLS-1$
             final AtomicBoolean isRefactoringNeeded= new AtomicBoolean(false);
 
             final Expression leftExpr= getReducedStringExpression(node.getExpression(), isRefactoringNeeded);
@@ -159,10 +159,10 @@ public class StringCleanUp extends AbstractCleanUpRule {
                 r.replace(node, b.invoke(b.copy(leftExpr), "equalsIgnoreCase", b.copy(rightExpr))); //$NON-NLS-1$
                 return false;
             }
-        } else if (isMethod(node, String.class.getCanonicalName(), "indexOf", String.class.getCanonicalName()) //$NON-NLS-1$
-                || isMethod(node, String.class.getCanonicalName(), "lastIndexOf", String.class.getCanonicalName()) //$NON-NLS-1$
-                || isMethod(node, String.class.getCanonicalName(), "indexOf", String.class.getCanonicalName(), Integer.class.getCanonicalName()) //$NON-NLS-1$
-                || isMethod(node, String.class.getCanonicalName(), "lastIndexOf", String.class.getCanonicalName(), Integer.class.getCanonicalName())) { //$NON-NLS-1$
+        } else if (usesGivenSignature(node, String.class.getCanonicalName(), "indexOf", String.class.getCanonicalName()) //$NON-NLS-1$
+                || usesGivenSignature(node, String.class.getCanonicalName(), "lastIndexOf", String.class.getCanonicalName()) //$NON-NLS-1$
+                || usesGivenSignature(node, String.class.getCanonicalName(), "indexOf", String.class.getCanonicalName(), Integer.class.getCanonicalName()) //$NON-NLS-1$
+                || usesGivenSignature(node, String.class.getCanonicalName(), "lastIndexOf", String.class.getCanonicalName(), Integer.class.getCanonicalName())) { //$NON-NLS-1$
             Expression expression= arg0(node);
             if (expression instanceof StringLiteral) {
                 String value= ((StringLiteral) expression).getLiteralValue();
@@ -179,8 +179,8 @@ public class StringCleanUp extends AbstractCleanUpRule {
 
     private Expression getReducedStringExpression(Expression stringExpr, AtomicBoolean isRefactoringNeeded) {
         final MethodInvocation casingInvocation= as(stringExpr, MethodInvocation.class);
-        if (casingInvocation != null && (isMethod(casingInvocation, String.class.getCanonicalName(), "toLowerCase") //$NON-NLS-1$
-                || isMethod(casingInvocation, String.class.getCanonicalName(), "toUpperCase"))) { //$NON-NLS-1$
+        if (casingInvocation != null && (usesGivenSignature(casingInvocation, String.class.getCanonicalName(), "toLowerCase") //$NON-NLS-1$
+                || usesGivenSignature(casingInvocation, String.class.getCanonicalName(), "toUpperCase"))) { //$NON-NLS-1$
             isRefactoringNeeded.set(true);
             return casingInvocation.getExpression();
         }
@@ -192,7 +192,7 @@ public class StringCleanUp extends AbstractCleanUpRule {
 
         final ITypeBinding expectedType= mi.resolveMethodBinding().getParameterTypes()[0];
         final ITypeBinding actualType= arg0(mi).resolveTypeBinding();
-        if (!expectedType.equals(actualType) && !getBoxedTypeBinding(expectedType, mi.getAST()).equals(actualType)) {
+        if (!expectedType.equals(actualType) && !Bindings.getBoxedTypeBinding(expectedType, mi.getAST()).equals(actualType)) {
             ctx.getRefactorings().replace(toReplace, b.cast(b.type(expectedType.getQualifiedName()), b.move(arg0(mi))));
         } else {
             ctx.getRefactorings().replace(toReplace, b.parenthesizeIfNeeded(b.move(arg0(mi))));
@@ -210,26 +210,26 @@ public class StringCleanUp extends AbstractCleanUpRule {
 
     private boolean isToStringForPrimitive(final MethodInvocation node) {
         return "toString".equals(node.getName().getIdentifier()) // fast-path $NON-NLS-1$
-                && (isMethod(node, Boolean.class.getCanonicalName(), "toString", boolean.class.getSimpleName()) //$NON-NLS-1$
-                        || isMethod(node, Character.class.getCanonicalName(), "toString", char.class.getSimpleName()) //$NON-NLS-1$
-                        || isMethod(node, Byte.class.getCanonicalName(), "toString", byte.class.getSimpleName()) //$NON-NLS-1$
-                        || isMethod(node, Short.class.getCanonicalName(), "toString", short.class.getSimpleName()) //$NON-NLS-1$
-                        || isMethod(node, Integer.class.getCanonicalName(), "toString", int.class.getSimpleName()) //$NON-NLS-1$
-                        || isMethod(node, Long.class.getCanonicalName(), "toString", long.class.getSimpleName()) //$NON-NLS-1$
-                        || isMethod(node, Float.class.getCanonicalName(), "toString", float.class.getSimpleName()) //$NON-NLS-1$
-                        || isMethod(node, Double.class.getCanonicalName(), "toString", double.class.getSimpleName())); //$NON-NLS-1$
+                && (usesGivenSignature(node, Boolean.class.getCanonicalName(), "toString", boolean.class.getSimpleName()) //$NON-NLS-1$
+                        || usesGivenSignature(node, Character.class.getCanonicalName(), "toString", char.class.getSimpleName()) //$NON-NLS-1$
+                        || usesGivenSignature(node, Byte.class.getCanonicalName(), "toString", byte.class.getSimpleName()) //$NON-NLS-1$
+                        || usesGivenSignature(node, Short.class.getCanonicalName(), "toString", short.class.getSimpleName()) //$NON-NLS-1$
+                        || usesGivenSignature(node, Integer.class.getCanonicalName(), "toString", int.class.getSimpleName()) //$NON-NLS-1$
+                        || usesGivenSignature(node, Long.class.getCanonicalName(), "toString", long.class.getSimpleName()) //$NON-NLS-1$
+                        || usesGivenSignature(node, Float.class.getCanonicalName(), "toString", float.class.getSimpleName()) //$NON-NLS-1$
+                        || usesGivenSignature(node, Double.class.getCanonicalName(), "toString", double.class.getSimpleName())); //$NON-NLS-1$
     }
 
     private boolean isStringValueOf(final MethodInvocation node) {
         return hasType(node.getExpression(), String.class.getCanonicalName()) // fast-path
-                && (isMethod(node, String.class.getCanonicalName(), "valueOf", boolean.class.getSimpleName()) //$NON-NLS-1$
-                        || isMethod(node, String.class.getCanonicalName(), "valueOf", char.class.getSimpleName()) //$NON-NLS-1$
-                        || isMethod(node, String.class.getCanonicalName(), "valueOf", byte.class.getSimpleName()) //$NON-NLS-1$
-                        || isMethod(node, String.class.getCanonicalName(), "valueOf", short.class.getSimpleName()) //$NON-NLS-1$
-                        || isMethod(node, String.class.getCanonicalName(), "valueOf", int.class.getSimpleName()) //$NON-NLS-1$
-                        || isMethod(node, String.class.getCanonicalName(), "valueOf", long.class.getSimpleName()) //$NON-NLS-1$
-                        || isMethod(node, String.class.getCanonicalName(), "valueOf", float.class.getSimpleName()) //$NON-NLS-1$
-                        || isMethod(node, String.class.getCanonicalName(), "valueOf", double.class.getSimpleName()) //$NON-NLS-1$
-                        || isMethod(node, String.class.getCanonicalName(), "valueOf", Object.class.getCanonicalName())); //$NON-NLS-1$
+                && (usesGivenSignature(node, String.class.getCanonicalName(), "valueOf", boolean.class.getSimpleName()) //$NON-NLS-1$
+                        || usesGivenSignature(node, String.class.getCanonicalName(), "valueOf", char.class.getSimpleName()) //$NON-NLS-1$
+                        || usesGivenSignature(node, String.class.getCanonicalName(), "valueOf", byte.class.getSimpleName()) //$NON-NLS-1$
+                        || usesGivenSignature(node, String.class.getCanonicalName(), "valueOf", short.class.getSimpleName()) //$NON-NLS-1$
+                        || usesGivenSignature(node, String.class.getCanonicalName(), "valueOf", int.class.getSimpleName()) //$NON-NLS-1$
+                        || usesGivenSignature(node, String.class.getCanonicalName(), "valueOf", long.class.getSimpleName()) //$NON-NLS-1$
+                        || usesGivenSignature(node, String.class.getCanonicalName(), "valueOf", float.class.getSimpleName()) //$NON-NLS-1$
+                        || usesGivenSignature(node, String.class.getCanonicalName(), "valueOf", double.class.getSimpleName()) //$NON-NLS-1$
+                        || usesGivenSignature(node, String.class.getCanonicalName(), "valueOf", Object.class.getCanonicalName())); //$NON-NLS-1$
     }
 }

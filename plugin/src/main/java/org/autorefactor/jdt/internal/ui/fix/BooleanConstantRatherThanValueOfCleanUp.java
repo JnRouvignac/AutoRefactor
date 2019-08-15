@@ -27,7 +27,7 @@ package org.autorefactor.jdt.internal.ui.fix;
 
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.arguments;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.as;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isMethod;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.usesGivenSignature;
 
 import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
 import org.eclipse.jdt.core.dom.BooleanLiteral;
@@ -66,8 +66,8 @@ public class BooleanConstantRatherThanValueOfCleanUp extends AbstractCleanUpRule
 
     @Override
     public boolean visit(MethodInvocation node) {
-        if (isMethod(node, Boolean.class.getCanonicalName(), "valueOf", String.class.getCanonicalName()) //$NON-NLS-1$
-                || isMethod(node, Boolean.class.getCanonicalName(), "valueOf", boolean.class.getSimpleName())) { //$NON-NLS-1$
+        if (usesGivenSignature(node, Boolean.class.getCanonicalName(), "valueOf", String.class.getCanonicalName()) //$NON-NLS-1$
+                || usesGivenSignature(node, Boolean.class.getCanonicalName(), "valueOf", boolean.class.getSimpleName())) { //$NON-NLS-1$
             final BooleanLiteral l= as(arguments(node), BooleanLiteral.class);
             if (l != null) {
                 ctx.getRefactorings().replace(node, toFieldAccess(node, l.booleanValue()));

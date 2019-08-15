@@ -33,7 +33,7 @@ import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.findImplementedT
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getCalledType;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.instanceOf;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isArray;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isMethod;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.usesGivenSignature;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isSameLocalVariable;
 import static org.autorefactor.jdt.internal.corext.dom.ForLoopHelper.iterateOverContainer;
 
@@ -209,7 +209,7 @@ public class AllInOneMethodRatherThanLoopCleanUp extends NewClassImportCleanUp {
 
     private boolean maybeReplaceForArray(final Statement node, final Set<String> classesToUseWithImport,
             final Set<String> importsToAdd, final Expression iterable, final MethodInvocation mi) {
-        if (isMethod(mi, Collection.class.getCanonicalName(), "add", Object.class.getCanonicalName()) //$NON-NLS-1$
+        if (usesGivenSignature(mi, Collection.class.getCanonicalName(), "add", Object.class.getCanonicalName()) //$NON-NLS-1$
                 && areTypeCompatible(getCalledType(mi), iterable.resolveTypeBinding())) {
             replaceWithCollectionsAddAll(node, iterable, mi, classesToUseWithImport);
             importsToAdd.add(Collections.class.getCanonicalName());
@@ -250,10 +250,10 @@ public class AllInOneMethodRatherThanLoopCleanUp extends NewClassImportCleanUp {
 
     private boolean maybeReplaceForCollection(final ASTNode node, final MethodInvocation colMI,
             final Expression data) {
-        if (isMethod(colMI, Collection.class.getCanonicalName(), "add", Object.class.getCanonicalName())) { //$NON-NLS-1$
+        if (usesGivenSignature(colMI, Collection.class.getCanonicalName(), "add", Object.class.getCanonicalName())) { //$NON-NLS-1$
             replaceWithCollectionMethod(node, "addAll", colMI.getExpression(), data); //$NON-NLS-1$
             return false;
-        } else if (isMethod(colMI, Set.class.getCanonicalName(), "remove", Object.class.getCanonicalName())) { //$NON-NLS-1$
+        } else if (usesGivenSignature(colMI, Set.class.getCanonicalName(), "remove", Object.class.getCanonicalName())) { //$NON-NLS-1$
             replaceWithCollectionMethod(node, "removeAll", colMI.getExpression(), data); //$NON-NLS-1$
             return false;
         }
@@ -262,7 +262,7 @@ public class AllInOneMethodRatherThanLoopCleanUp extends NewClassImportCleanUp {
     }
 
     private boolean isSameVariable(final ForLoopContent loopContent, final MethodInvocation getMI) {
-        return isMethod(getMI, List.class.getCanonicalName(), "get", int.class.getSimpleName()) && getMI.getExpression() instanceof Name //$NON-NLS-1$
+        return usesGivenSignature(getMI, List.class.getCanonicalName(), "get", int.class.getSimpleName()) && getMI.getExpression() instanceof Name //$NON-NLS-1$
                 && isSameLocalVariable(arg0(getMI), loopContent.getLoopVariable());
     }
 

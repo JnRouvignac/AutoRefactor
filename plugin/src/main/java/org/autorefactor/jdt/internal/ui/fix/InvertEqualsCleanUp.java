@@ -27,7 +27,7 @@ package org.autorefactor.jdt.internal.ui.fix;
 
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.arg0;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isConstant;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isMethod;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.usesGivenSignature;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isPrimitive;
 
 import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
@@ -74,8 +74,8 @@ public class InvertEqualsCleanUp extends AbstractCleanUpRule {
         if (node.getExpression() == null) {
             return true;
         }
-        boolean isEquals= isMethod(node, Object.class.getCanonicalName(), "equals", Object.class.getCanonicalName()); //$NON-NLS-1$
-        boolean isStringEqualsIgnoreCase= isMethod(node, String.class.getCanonicalName(), "equalsIgnoreCase", String.class.getCanonicalName()); //$NON-NLS-1$
+        boolean isEquals= usesGivenSignature(node, Object.class.getCanonicalName(), "equals", Object.class.getCanonicalName()); //$NON-NLS-1$
+        boolean isStringEqualsIgnoreCase= usesGivenSignature(node, String.class.getCanonicalName(), "equalsIgnoreCase", String.class.getCanonicalName()); //$NON-NLS-1$
         if (isEquals || isStringEqualsIgnoreCase) {
             final Expression expr= node.getExpression();
             final Expression arg0= arg0(node);

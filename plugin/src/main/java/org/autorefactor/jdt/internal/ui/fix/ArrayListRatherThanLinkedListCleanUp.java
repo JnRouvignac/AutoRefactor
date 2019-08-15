@@ -27,7 +27,7 @@
 package org.autorefactor.jdt.internal.ui.fix;
 
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasType;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isMethod;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.usesGivenSignature;
 import static org.autorefactor.util.Utils.getOrDefault;
 
 import java.io.Serializable;
@@ -110,24 +110,24 @@ public class ArrayListRatherThanLinkedListCleanUp extends AbstractClassSubstitut
     @Override
     protected boolean canMethodBeRefactored(MethodInvocation mi, List<MethodInvocation> methodCallsToRefactor) {
         final String argumentType= getArgumentType(mi);
-        return isMethod(mi, Collection.class.getCanonicalName(), "add", Object.class.getCanonicalName()) //$NON-NLS-1$
-                || isMethod(mi, Collection.class.getCanonicalName(), "addAll", Collection.class.getCanonicalName()) //$NON-NLS-1$
-                || isMethod(mi, Collection.class.getCanonicalName(), "clear") //$NON-NLS-1$
-                || isMethod(mi, Collection.class.getCanonicalName(), "contains", Object.class.getCanonicalName()) //$NON-NLS-1$
-                || isMethod(mi, Collection.class.getCanonicalName(), "containsAll", Collection.class.getCanonicalName()) //$NON-NLS-1$
-                || isMethod(mi, Object.class.getCanonicalName(), "equals", Object.class.getCanonicalName()) //$NON-NLS-1$
-                || isMethod(mi, List.class.getCanonicalName(), "get", int.class.getSimpleName()) || isMethod(mi, Object.class.getCanonicalName(), "hashCode") //$NON-NLS-1$ $NON-NLS-2$
-                || isMethod(mi, List.class.getCanonicalName(), "indexOf", Object.class.getCanonicalName()) //$NON-NLS-1$
-                || isMethod(mi, List.class.getCanonicalName(), "lastIndexOf", Object.class.getCanonicalName()) //$NON-NLS-1$
-                || isMethod(mi, Collection.class.getCanonicalName(), "size") //$NON-NLS-1$
-                || isMethod(mi, List.class.getCanonicalName(), "subList", int.class.getSimpleName(), int.class.getSimpleName()) //$NON-NLS-1$
-                || isMethod(mi, Collection.class.getCanonicalName(), "toArray") //$NON-NLS-1$
-                || isMethod(mi, Collection.class.getCanonicalName(), "toArray", argumentType + "[]") //$NON-NLS-1$ $NON-NLS-2$
-                || isMethod(mi, Collection.class.getCanonicalName(), "isEmpty") || isMethod(mi, Object.class.getCanonicalName(), "toString") //$NON-NLS-1$ $NON-NLS-2$
-                || isMethod(mi, Object.class.getCanonicalName(), "finalize") || isMethod(mi, Object.class.getCanonicalName(), "notify") //$NON-NLS-1$ $NON-NLS-2$
-                || isMethod(mi, Object.class.getCanonicalName(), "notifyAll") || isMethod(mi, Object.class.getCanonicalName(), "wait") //$NON-NLS-1$ $NON-NLS-2$
-                || isMethod(mi, Object.class.getCanonicalName(), "wait", long.class.getSimpleName()) //$NON-NLS-1$
-                || isMethod(mi, Object.class.getCanonicalName(), "wait", long.class.getSimpleName(), int.class.getSimpleName()); //$NON-NLS-1$
+        return usesGivenSignature(mi, Collection.class.getCanonicalName(), "add", Object.class.getCanonicalName()) //$NON-NLS-1$
+                || usesGivenSignature(mi, Collection.class.getCanonicalName(), "addAll", Collection.class.getCanonicalName()) //$NON-NLS-1$
+                || usesGivenSignature(mi, Collection.class.getCanonicalName(), "clear") //$NON-NLS-1$
+                || usesGivenSignature(mi, Collection.class.getCanonicalName(), "contains", Object.class.getCanonicalName()) //$NON-NLS-1$
+                || usesGivenSignature(mi, Collection.class.getCanonicalName(), "containsAll", Collection.class.getCanonicalName()) //$NON-NLS-1$
+                || usesGivenSignature(mi, Object.class.getCanonicalName(), "equals", Object.class.getCanonicalName()) //$NON-NLS-1$
+                || usesGivenSignature(mi, List.class.getCanonicalName(), "get", int.class.getSimpleName()) || usesGivenSignature(mi, Object.class.getCanonicalName(), "hashCode") //$NON-NLS-1$ $NON-NLS-2$
+                || usesGivenSignature(mi, List.class.getCanonicalName(), "indexOf", Object.class.getCanonicalName()) //$NON-NLS-1$
+                || usesGivenSignature(mi, List.class.getCanonicalName(), "lastIndexOf", Object.class.getCanonicalName()) //$NON-NLS-1$
+                || usesGivenSignature(mi, Collection.class.getCanonicalName(), "size") //$NON-NLS-1$
+                || usesGivenSignature(mi, List.class.getCanonicalName(), "subList", int.class.getSimpleName(), int.class.getSimpleName()) //$NON-NLS-1$
+                || usesGivenSignature(mi, Collection.class.getCanonicalName(), "toArray") //$NON-NLS-1$
+                || usesGivenSignature(mi, Collection.class.getCanonicalName(), "toArray", argumentType + "[]") //$NON-NLS-1$ $NON-NLS-2$
+                || usesGivenSignature(mi, Collection.class.getCanonicalName(), "isEmpty") || usesGivenSignature(mi, Object.class.getCanonicalName(), "toString") //$NON-NLS-1$ $NON-NLS-2$
+                || usesGivenSignature(mi, Object.class.getCanonicalName(), "finalize") || usesGivenSignature(mi, Object.class.getCanonicalName(), "notify") //$NON-NLS-1$ $NON-NLS-2$
+                || usesGivenSignature(mi, Object.class.getCanonicalName(), "notifyAll") || usesGivenSignature(mi, Object.class.getCanonicalName(), "wait") //$NON-NLS-1$ $NON-NLS-2$
+                || usesGivenSignature(mi, Object.class.getCanonicalName(), "wait", long.class.getSimpleName()) //$NON-NLS-1$
+                || usesGivenSignature(mi, Object.class.getCanonicalName(), "wait", long.class.getSimpleName(), int.class.getSimpleName()); //$NON-NLS-1$
     }
 
     @Override

@@ -169,7 +169,7 @@ public abstract class AbstractUnitTestCleanUp extends AbstractCleanUpRule {
                 return maybeRefactorComparison(nodeToReplace, originalMethod, conditionIe, !isAssertTrue,
                         failureMessage, isRewriteNeeded);
             }
-        } else if (isMethod(conditionMi, OBJECT, "equals", OBJECT)) { //$NON-NLS-1$
+        } else if (usesGivenSignature(conditionMi, OBJECT, "equals", OBJECT)) { //$NON-NLS-1$
             if (canUseAssertNotEquals() || isAssertTrue) {
                 final Pair<Expression, Expression> actualAndExpected= getActualAndExpected(conditionMi.getExpression(),
                         arg0(conditionMi));

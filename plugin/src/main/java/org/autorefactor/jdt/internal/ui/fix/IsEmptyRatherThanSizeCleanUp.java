@@ -27,7 +27,7 @@
 package org.autorefactor.jdt.internal.ui.fix;
 
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.as;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isMethod;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.usesGivenSignature;
 import static org.eclipse.jdt.core.dom.InfixExpression.Operator.EQUALS;
 import static org.eclipse.jdt.core.dom.InfixExpression.Operator.GREATER;
 import static org.eclipse.jdt.core.dom.InfixExpression.Operator.GREATER_EQUALS;
@@ -96,8 +96,8 @@ public class IsEmptyRatherThanSizeCleanUp extends AbstractCleanUpRule {
 
     private boolean maybeReplaceCollectionSize(final InfixExpression node, final MethodInvocation miToReplace,
             final Operator operator, final Long literalSize) {
-        if ((isMethod(miToReplace, Collection.class.getCanonicalName(), "size") || isMethod(miToReplace, Map.class.getCanonicalName(), "size") //$NON-NLS-1$ $NON-NLS-2$
-                || (isMethod(miToReplace, String.class.getCanonicalName(), "length") && getJavaMinorVersion() >= 6)) //$NON-NLS-1$
+        if ((usesGivenSignature(miToReplace, Collection.class.getCanonicalName(), "size") || usesGivenSignature(miToReplace, Map.class.getCanonicalName(), "size") //$NON-NLS-1$ $NON-NLS-2$
+                || (usesGivenSignature(miToReplace, String.class.getCanonicalName(), "length") && getJavaMinorVersion() >= 6)) //$NON-NLS-1$
                 && literalSize != null) {
             final Refactorings r= this.ctx.getRefactorings();
             final ASTBuilder b= this.ctx.getASTBuilder();

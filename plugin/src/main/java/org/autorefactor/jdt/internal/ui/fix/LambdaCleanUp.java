@@ -29,7 +29,7 @@ package org.autorefactor.jdt.internal.ui.fix;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.arguments;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.asList;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getCalledType;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isMethod;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.usesGivenSignature;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.removeParentheses;
 
 import java.util.List;
@@ -159,7 +159,7 @@ public class LambdaCleanUp extends AbstractCleanUpRule {
                             }
 
                             for (final IMethodBinding methodBinding : calledType.getDeclaredMethods()) {
-                                if ((methodBinding.getModifiers() & Modifier.STATIC) == 0 && isMethod(methodBinding,
+                                if ((methodBinding.getModifiers() & Modifier.STATIC) == 0 && usesGivenSignature(methodBinding,
                                         calledType.getQualifiedName(), mi.getName().getIdentifier(), remainingParams)) {
                                     return true;
                                 }
@@ -205,7 +205,7 @@ public class LambdaCleanUp extends AbstractCleanUpRule {
                         }
 
                         for (IMethodBinding methodBinding : clazz.getDeclaredMethods()) {
-                            if ((methodBinding.getModifiers() & Modifier.STATIC) > 0 && isMethod(methodBinding,
+                            if ((methodBinding.getModifiers() & Modifier.STATIC) > 0 && usesGivenSignature(methodBinding,
                                     clazz.getQualifiedName(), mi.getName().getIdentifier(), remainingParams)) {
                                 return true;
                             }

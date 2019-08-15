@@ -26,7 +26,7 @@
 package org.autorefactor.jdt.internal.ui.fix;
 
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasOperator;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isMethod;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.usesGivenSignature;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.removeParentheses;
 
 import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
@@ -69,8 +69,8 @@ public class UseStringContainsCleanUp extends AbstractCleanUpRule {
     @Override
     public boolean visit(MethodInvocation node) {
         final ASTNode parent= getFirstAncestorWithoutParentheses(node);
-        if (parent instanceof InfixExpression && (isMethod(node, String.class.getCanonicalName(), "indexOf", String.class.getCanonicalName()) //$NON-NLS-1$
-                || isMethod(node, String.class.getCanonicalName(), "lastIndexOf", String.class.getCanonicalName()))) { //$NON-NLS-1$
+        if (parent instanceof InfixExpression && (usesGivenSignature(node, String.class.getCanonicalName(), "indexOf", String.class.getCanonicalName()) //$NON-NLS-1$
+                || usesGivenSignature(node, String.class.getCanonicalName(), "lastIndexOf", String.class.getCanonicalName()))) { //$NON-NLS-1$
             final InfixExpression ie= (InfixExpression) parent;
             if (is(ie, node, Operator.GREATER_EQUALS, 0)) {
                 return replaceWithStringContains(ie, node, false);

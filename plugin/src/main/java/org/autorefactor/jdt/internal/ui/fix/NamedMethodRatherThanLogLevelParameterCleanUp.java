@@ -27,7 +27,7 @@ package org.autorefactor.jdt.internal.ui.fix;
 
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.arguments;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isField;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isMethod;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.usesGivenSignature;
 
 import java.util.List;
 import java.util.logging.Level;
@@ -70,7 +70,7 @@ public class NamedMethodRatherThanLogLevelParameterCleanUp extends AbstractClean
 
     @Override
     public boolean visit(final MethodInvocation node) {
-        if (isMethod(node, Logger.class.getCanonicalName(), "log", Level.class.getCanonicalName(), String.class.getCanonicalName())) { //$NON-NLS-1$
+        if (usesGivenSignature(node, Logger.class.getCanonicalName(), "log", Level.class.getCanonicalName(), String.class.getCanonicalName())) { //$NON-NLS-1$
             final List<Expression> args= arguments(node);
 
             if (args != null && args.size() == 2) {

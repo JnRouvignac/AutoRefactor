@@ -26,7 +26,7 @@
 package org.autorefactor.jdt.internal.ui.fix;
 
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasType;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isMethod;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.usesGivenSignature;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -146,8 +146,8 @@ public class AggregateConstructorRatherThanGWTMethodCleanUp extends NewClassImpo
                 }
             }
 
-            if (isMethod(node, "com.google.common.collect.Maps", "newEnumMap", Class.class.getCanonicalName() + generic) //$NON-NLS-1$ $NON-NLS-2$
-                    || isMethod(node, "com.google.gwt.thirdparty.guava.common.collect.Maps", "newEnumMap", //$NON-NLS-1$ $NON-NLS-2$
+            if (usesGivenSignature(node, "com.google.common.collect.Maps", "newEnumMap", Class.class.getCanonicalName() + generic) //$NON-NLS-1$ $NON-NLS-2$
+                    || usesGivenSignature(node, "com.google.gwt.thirdparty.guava.common.collect.Maps", "newEnumMap", //$NON-NLS-1$ $NON-NLS-2$
                             Class.class.getCanonicalName() + generic)) {
                 final ASTBuilder b= this.ctx.getASTBuilder();
                 final Refactorings r= this.ctx.getRefactorings();
@@ -165,7 +165,7 @@ public class AggregateConstructorRatherThanGWTMethodCleanUp extends NewClassImpo
 
     private boolean maybeRefactor(final MethodInvocation node, final Set<String> classesToUseWithImport,
             final Set<String> importsToAdd, final String aggregateInterface, final String implClass) {
-        if (isMethod(node, "com.google.common.collect." + aggregateInterface, "new" + implClass) || isMethod(node, //$NON-NLS-1$ $NON-NLS-2$
+        if (usesGivenSignature(node, "com.google.common.collect." + aggregateInterface, "new" + implClass) || usesGivenSignature(node, //$NON-NLS-1$ $NON-NLS-2$
                 "com.google.gwt.thirdparty.guava.common.collect." + aggregateInterface, "new" + implClass)) { //$NON-NLS-1$ $NON-NLS-2$
             final ASTBuilder b= this.ctx.getASTBuilder();
             final Refactorings r= this.ctx.getRefactorings();

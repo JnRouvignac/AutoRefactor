@@ -51,6 +51,7 @@ import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.jar.Attributes;
 
 import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
+import org.autorefactor.jdt.internal.corext.dom.Bindings;
 import org.autorefactor.jdt.internal.corext.dom.Release;
 import org.autorefactor.jdt.internal.corext.dom.TypeNameDecider;
 import org.eclipse.jdt.core.dom.ASTNode;
@@ -194,21 +195,21 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
         }
 
         final List<Expression> arguments= arguments(mi);
-        if (isMethod(mi, Object.class.getCanonicalName(), "equals", Object.class.getCanonicalName()) //$NON-NLS-1$
-                || isMethod(mi, Object.class.getCanonicalName(), "toString") || isMethod(mi, Object.class.getCanonicalName(), "finalize") //$NON-NLS-1$ $NON-NLS-2$
-                || isMethod(mi, Object.class.getCanonicalName(), "notify") || isMethod(mi, Object.class.getCanonicalName(), "notifyAll") //$NON-NLS-1$ $NON-NLS-2$
-                || isMethod(mi, Object.class.getCanonicalName(), "size") || isMethod(mi, Object.class.getCanonicalName(), "wait") //$NON-NLS-1$ $NON-NLS-2$
-                || isMethod(mi, Object.class.getCanonicalName(), "wait", long.class.getSimpleName()) //$NON-NLS-1$
-                || isMethod(mi, Object.class.getCanonicalName(), "wait", long.class.getSimpleName(), int.class.getSimpleName()) || isMethod(mi, Map.class.getCanonicalName(), "clear") //$NON-NLS-1$ $NON-NLS-2$
-                || isMethod(mi, Map.class.getCanonicalName(), "containsKey", Object.class.getCanonicalName()) //$NON-NLS-1$
-                || isMethod(mi, Map.class.getCanonicalName(), "containsValue", Object.class.getCanonicalName()) //$NON-NLS-1$
-                || isMethod(mi, Map.class.getCanonicalName(), "equals", Object.class.getCanonicalName()) //$NON-NLS-1$
-                || isMethod(mi, Map.class.getCanonicalName(), "forEach", "java.util.function.BiConsumer") //$NON-NLS-1$ $NON-NLS-2$
-                || isMethod(mi, Map.class.getCanonicalName(), "hashCode") || isMethod(mi, Map.class.getCanonicalName(), "isEmpty") //$NON-NLS-1$ $NON-NLS-2$
-                || isMethod(mi, Map.class.getCanonicalName(), "size") //$NON-NLS-1$
-                || isMethod(mi, Map.class.getCanonicalName(), "remove", Object.class.getCanonicalName(), Object.class.getCanonicalName())) { //$NON-NLS-1$
+        if (usesGivenSignature(mi, Object.class.getCanonicalName(), "equals", Object.class.getCanonicalName()) //$NON-NLS-1$
+                || usesGivenSignature(mi, Object.class.getCanonicalName(), "toString") || usesGivenSignature(mi, Object.class.getCanonicalName(), "finalize") //$NON-NLS-1$ $NON-NLS-2$
+                || usesGivenSignature(mi, Object.class.getCanonicalName(), "notify") || usesGivenSignature(mi, Object.class.getCanonicalName(), "notifyAll") //$NON-NLS-1$ $NON-NLS-2$
+                || usesGivenSignature(mi, Object.class.getCanonicalName(), "size") || usesGivenSignature(mi, Object.class.getCanonicalName(), "wait") //$NON-NLS-1$ $NON-NLS-2$
+                || usesGivenSignature(mi, Object.class.getCanonicalName(), "wait", long.class.getSimpleName()) //$NON-NLS-1$
+                || usesGivenSignature(mi, Object.class.getCanonicalName(), "wait", long.class.getSimpleName(), int.class.getSimpleName()) || usesGivenSignature(mi, Map.class.getCanonicalName(), "clear") //$NON-NLS-1$ $NON-NLS-2$
+                || usesGivenSignature(mi, Map.class.getCanonicalName(), "containsKey", Object.class.getCanonicalName()) //$NON-NLS-1$
+                || usesGivenSignature(mi, Map.class.getCanonicalName(), "containsValue", Object.class.getCanonicalName()) //$NON-NLS-1$
+                || usesGivenSignature(mi, Map.class.getCanonicalName(), "equals", Object.class.getCanonicalName()) //$NON-NLS-1$
+                || usesGivenSignature(mi, Map.class.getCanonicalName(), "forEach", "java.util.function.BiConsumer") //$NON-NLS-1$ $NON-NLS-2$
+                || usesGivenSignature(mi, Map.class.getCanonicalName(), "hashCode") || usesGivenSignature(mi, Map.class.getCanonicalName(), "isEmpty") //$NON-NLS-1$ $NON-NLS-2$
+                || usesGivenSignature(mi, Map.class.getCanonicalName(), "size") //$NON-NLS-1$
+                || usesGivenSignature(mi, Map.class.getCanonicalName(), "remove", Object.class.getCanonicalName(), Object.class.getCanonicalName())) { //$NON-NLS-1$
             return true;
-        } else if (isMethod(mi, Map.class.getCanonicalName(), "ofEntries", Entry[].class.getCanonicalName())) { //$NON-NLS-1$
+        } else if (usesGivenSignature(mi, Map.class.getCanonicalName(), "ofEntries", Entry[].class.getCanonicalName())) { //$NON-NLS-1$
             final ITypeBinding paramType= arguments.get(0).resolveTypeBinding().getElementType();
 
             if (isParameterizedTypeWithNbArguments(paramType, 2)) {
@@ -216,8 +217,8 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
                 final ITypeBinding newValueType= paramType.getTypeArguments()[1];
                 return resolveKeyTypeCompatible(newKeyType) && resolveValueTypeCompatible(newValueType);
             }
-        } else if (isMethod(mi, Map.class.getCanonicalName(), "putAll", Map.class.getCanonicalName()) //$NON-NLS-1$
-                || isMethod(mi, LinkedHashMap.class.getCanonicalName(), "removeEldestEntry", Entry.class.getCanonicalName())) { //$NON-NLS-1$
+        } else if (usesGivenSignature(mi, Map.class.getCanonicalName(), "putAll", Map.class.getCanonicalName()) //$NON-NLS-1$
+                || usesGivenSignature(mi, LinkedHashMap.class.getCanonicalName(), "removeEldestEntry", Entry.class.getCanonicalName())) { //$NON-NLS-1$
             final ITypeBinding paramType= arguments.get(0).resolveTypeBinding();
 
             if (isParameterizedTypeWithNbArguments(paramType, 2)) {
@@ -225,39 +226,39 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
                 final ITypeBinding newValueType= paramType.getTypeArguments()[1];
                 return resolveKeyTypeCompatible(newKeyType) && resolveValueTypeCompatible(newValueType);
             }
-        } else if (isMethod(mi, TreeMap.class.getCanonicalName(), "lastKey") || isMethod(mi, TreeMap.class.getCanonicalName(), "firstKey")) { //$NON-NLS-1$ $NON-NLS-2$
+        } else if (usesGivenSignature(mi, TreeMap.class.getCanonicalName(), "lastKey") || usesGivenSignature(mi, TreeMap.class.getCanonicalName(), "firstKey")) { //$NON-NLS-1$ $NON-NLS-2$
             return resolveDestinationTypeCompatibleWithKey(mi);
-        } else if (isMethod(mi, Map.class.getCanonicalName(), "get", Object.class.getCanonicalName()) //$NON-NLS-1$
-                || isMethod(mi, Map.class.getCanonicalName(), "remove", Object.class.getCanonicalName())) { //$NON-NLS-1$
+        } else if (usesGivenSignature(mi, Map.class.getCanonicalName(), "get", Object.class.getCanonicalName()) //$NON-NLS-1$
+                || usesGivenSignature(mi, Map.class.getCanonicalName(), "remove", Object.class.getCanonicalName())) { //$NON-NLS-1$
             return resolveDestinationTypeCompatibleWithValue(mi);
-        } else if (isMethod(mi, Map.class.getCanonicalName(), "keySet") || isMethod(mi, TreeMap.class.getCanonicalName(), "comparator") //$NON-NLS-1$ $NON-NLS-2$
-                || isMethod(mi, TreeMap.class.getCanonicalName(), "descendingKeySet") //$NON-NLS-1$
-                || isMethod(mi, TreeMap.class.getCanonicalName(), "navigableKeySet")) { //$NON-NLS-1$
+        } else if (usesGivenSignature(mi, Map.class.getCanonicalName(), "keySet") || usesGivenSignature(mi, TreeMap.class.getCanonicalName(), "comparator") //$NON-NLS-1$ $NON-NLS-2$
+                || usesGivenSignature(mi, TreeMap.class.getCanonicalName(), "descendingKeySet") //$NON-NLS-1$
+                || usesGivenSignature(mi, TreeMap.class.getCanonicalName(), "navigableKeySet")) { //$NON-NLS-1$
             return resolveDestinationParamTypeCompatibleWithKey(mi);
-        } else if (isMethod(mi, Map.class.getCanonicalName(), "values")) { //$NON-NLS-1$
+        } else if (usesGivenSignature(mi, Map.class.getCanonicalName(), "values")) { //$NON-NLS-1$
             return resolveDestinationParamTypeCompatibleWithValue(mi);
-        } else if (isMethod(mi, TreeMap.class.getCanonicalName(), "descendingMap") || isMethod(mi, TreeMap.class.getCanonicalName(), "firstEntry") //$NON-NLS-1$ $NON-NLS-2$
-                || isMethod(mi, TreeMap.class.getCanonicalName(), "lastEntry") || isMethod(mi, TreeMap.class.getCanonicalName(), "pollFirstEntry") //$NON-NLS-1$ $NON-NLS-2$
-                || isMethod(mi, TreeMap.class.getCanonicalName(), "pollLastEntry") || isMethod(mi, Map.class.getCanonicalName(), "of")) { //$NON-NLS-1$ $NON-NLS-2$
+        } else if (usesGivenSignature(mi, TreeMap.class.getCanonicalName(), "descendingMap") || usesGivenSignature(mi, TreeMap.class.getCanonicalName(), "firstEntry") //$NON-NLS-1$ $NON-NLS-2$
+                || usesGivenSignature(mi, TreeMap.class.getCanonicalName(), "lastEntry") || usesGivenSignature(mi, TreeMap.class.getCanonicalName(), "pollFirstEntry") //$NON-NLS-1$ $NON-NLS-2$
+                || usesGivenSignature(mi, TreeMap.class.getCanonicalName(), "pollLastEntry") || usesGivenSignature(mi, Map.class.getCanonicalName(), "of")) { //$NON-NLS-1$ $NON-NLS-2$
             return resolveDestinationParamTypeCompatibleWithKeyValue(mi);
-        } else if (isMethod(mi, TreeMap.class.getCanonicalName(), "ceilingEntry", Object.class.getCanonicalName()) //$NON-NLS-1$
-                || isMethod(mi, TreeMap.class.getCanonicalName(), "floorEntry", Object.class.getCanonicalName()) //$NON-NLS-1$
-                || isMethod(mi, TreeMap.class.getCanonicalName(), "headMap", Object.class.getCanonicalName()) //$NON-NLS-1$
-                || isMethod(mi, TreeMap.class.getCanonicalName(), "headMap", Object.class.getCanonicalName(), boolean.class.getSimpleName()) //$NON-NLS-1$
-                || isMethod(mi, TreeMap.class.getCanonicalName(), "higherEntry", Object.class.getCanonicalName()) //$NON-NLS-1$
-                || isMethod(mi, TreeMap.class.getCanonicalName(), "lowerEntry", Object.class.getCanonicalName()) //$NON-NLS-1$
-                || isMethod(mi, TreeMap.class.getCanonicalName(), "tailMap", Object.class.getCanonicalName()) //$NON-NLS-1$
-                || isMethod(mi, TreeMap.class.getCanonicalName(), "tailMap", Object.class.getCanonicalName(), boolean.class.getSimpleName())) { //$NON-NLS-1$
+        } else if (usesGivenSignature(mi, TreeMap.class.getCanonicalName(), "ceilingEntry", Object.class.getCanonicalName()) //$NON-NLS-1$
+                || usesGivenSignature(mi, TreeMap.class.getCanonicalName(), "floorEntry", Object.class.getCanonicalName()) //$NON-NLS-1$
+                || usesGivenSignature(mi, TreeMap.class.getCanonicalName(), "headMap", Object.class.getCanonicalName()) //$NON-NLS-1$
+                || usesGivenSignature(mi, TreeMap.class.getCanonicalName(), "headMap", Object.class.getCanonicalName(), boolean.class.getSimpleName()) //$NON-NLS-1$
+                || usesGivenSignature(mi, TreeMap.class.getCanonicalName(), "higherEntry", Object.class.getCanonicalName()) //$NON-NLS-1$
+                || usesGivenSignature(mi, TreeMap.class.getCanonicalName(), "lowerEntry", Object.class.getCanonicalName()) //$NON-NLS-1$
+                || usesGivenSignature(mi, TreeMap.class.getCanonicalName(), "tailMap", Object.class.getCanonicalName()) //$NON-NLS-1$
+                || usesGivenSignature(mi, TreeMap.class.getCanonicalName(), "tailMap", Object.class.getCanonicalName(), boolean.class.getSimpleName())) { //$NON-NLS-1$
             final ITypeBinding newKeyType= arguments.get(0).resolveTypeBinding();
             return resolveKeyTypeCompatible(newKeyType) && resolveDestinationParamTypeCompatibleWithKeyValue(mi);
-        } else if (isMethod(mi, Map.class.getCanonicalName(), "entry", Object.class.getCanonicalName(), Object.class.getCanonicalName()) //$NON-NLS-1$
-                || isMethod(mi, Map.class.getCanonicalName(), "of", Object.class.getCanonicalName(), Object.class.getCanonicalName()) //$NON-NLS-1$
-                || isMethod(mi, TreeMap.class.getCanonicalName(), "subMap", Object.class.getCanonicalName(), Object.class.getCanonicalName())) { //$NON-NLS-1$
+        } else if (usesGivenSignature(mi, Map.class.getCanonicalName(), "entry", Object.class.getCanonicalName(), Object.class.getCanonicalName()) //$NON-NLS-1$
+                || usesGivenSignature(mi, Map.class.getCanonicalName(), "of", Object.class.getCanonicalName(), Object.class.getCanonicalName()) //$NON-NLS-1$
+                || usesGivenSignature(mi, TreeMap.class.getCanonicalName(), "subMap", Object.class.getCanonicalName(), Object.class.getCanonicalName())) { //$NON-NLS-1$
             final ITypeBinding newKeyType= arguments.get(0).resolveTypeBinding();
             final ITypeBinding newValueType= arguments.get(1).resolveTypeBinding();
             return resolveKeyTypeCompatible(newKeyType) && resolveValueTypeCompatible(newValueType)
                     && resolveDestinationParamTypeCompatibleWithKeyValue(mi);
-        } else if (isMethod(mi, Map.class.getCanonicalName(), "entrySet")) { //$NON-NLS-1$
+        } else if (usesGivenSignature(mi, Map.class.getCanonicalName(), "entrySet")) { //$NON-NLS-1$
             if (isExprReceived(mi)) {
                 final ITypeBinding newTargetType= getTargetType(mi);
 
@@ -272,61 +273,61 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
             } else {
                 return true;
             }
-        } else if (isMethod(mi, TreeMap.class.getCanonicalName(), "ceilingKey", Object.class.getCanonicalName()) //$NON-NLS-1$
-                || isMethod(mi, TreeMap.class.getCanonicalName(), "floorKey", Object.class.getCanonicalName()) //$NON-NLS-1$
-                || isMethod(mi, TreeMap.class.getCanonicalName(), "higherKey", Object.class.getCanonicalName()) //$NON-NLS-1$
-                || isMethod(mi, TreeMap.class.getCanonicalName(), "lowerKey", Object.class.getCanonicalName())) { //$NON-NLS-1$
+        } else if (usesGivenSignature(mi, TreeMap.class.getCanonicalName(), "ceilingKey", Object.class.getCanonicalName()) //$NON-NLS-1$
+                || usesGivenSignature(mi, TreeMap.class.getCanonicalName(), "floorKey", Object.class.getCanonicalName()) //$NON-NLS-1$
+                || usesGivenSignature(mi, TreeMap.class.getCanonicalName(), "higherKey", Object.class.getCanonicalName()) //$NON-NLS-1$
+                || usesGivenSignature(mi, TreeMap.class.getCanonicalName(), "lowerKey", Object.class.getCanonicalName())) { //$NON-NLS-1$
             return resolveKeyTypeCompatible(arguments.get(0).resolveTypeBinding())
                     && resolveDestinationTypeCompatibleWithKey(mi);
-        } else if (isMethod(mi, Map.class.getCanonicalName(), "getOrDefault", Object.class.getCanonicalName(), Object.class.getCanonicalName())) { //$NON-NLS-1$
+        } else if (usesGivenSignature(mi, Map.class.getCanonicalName(), "getOrDefault", Object.class.getCanonicalName(), Object.class.getCanonicalName())) { //$NON-NLS-1$
             return resolveValueTypeCompatible(arguments.get(1).resolveTypeBinding())
                     && resolveDestinationTypeCompatibleWithValue(mi);
-        } else if (isMethod(mi, Map.class.getCanonicalName(), "put", Object.class.getCanonicalName(), Object.class.getCanonicalName()) //$NON-NLS-1$
-                || isMethod(mi, Map.class.getCanonicalName(), "putIfAbsent", Object.class.getCanonicalName(), Object.class.getCanonicalName()) //$NON-NLS-1$
-                || isMethod(mi, Map.class.getCanonicalName(), "replace", Object.class.getCanonicalName(), Object.class.getCanonicalName())) { //$NON-NLS-1$
+        } else if (usesGivenSignature(mi, Map.class.getCanonicalName(), "put", Object.class.getCanonicalName(), Object.class.getCanonicalName()) //$NON-NLS-1$
+                || usesGivenSignature(mi, Map.class.getCanonicalName(), "putIfAbsent", Object.class.getCanonicalName(), Object.class.getCanonicalName()) //$NON-NLS-1$
+                || usesGivenSignature(mi, Map.class.getCanonicalName(), "replace", Object.class.getCanonicalName(), Object.class.getCanonicalName())) { //$NON-NLS-1$
             return resolveKeyTypeCompatible(arguments.get(0).resolveTypeBinding())
                     && resolveValueTypeCompatible(arguments.get(1).resolveTypeBinding())
                     && resolveDestinationTypeCompatibleWithValue(mi);
-        } else if (isMethod(mi, Map.class.getCanonicalName(), "replace", Object.class.getCanonicalName(), Object.class.getCanonicalName(), //$NON-NLS-1$
+        } else if (usesGivenSignature(mi, Map.class.getCanonicalName(), "replace", Object.class.getCanonicalName(), Object.class.getCanonicalName(), //$NON-NLS-1$
                 Object.class.getCanonicalName())) {
             return resolveKeyTypeCompatible(arguments.get(0).resolveTypeBinding())
                     && resolveValueTypeCompatible(arguments.get(1).resolveTypeBinding())
                     && resolveValueTypeCompatible(arguments.get(2).resolveTypeBinding());
-        } else if (isMethod(mi, TreeMap.class.getCanonicalName(), "subMap", Object.class.getCanonicalName(), boolean.class.getSimpleName(), Object.class.getCanonicalName(), //$NON-NLS-1$
+        } else if (usesGivenSignature(mi, TreeMap.class.getCanonicalName(), "subMap", Object.class.getCanonicalName(), boolean.class.getSimpleName(), Object.class.getCanonicalName(), //$NON-NLS-1$
                 boolean.class.getSimpleName())) {
             final ITypeBinding newKeyType= arguments.get(0).resolveTypeBinding();
             final ITypeBinding newValueType= arguments.get(2).resolveTypeBinding();
             return resolveKeyTypeCompatible(newKeyType) && resolveValueTypeCompatible(newValueType)
                     && resolveDestinationParamTypeCompatibleWithKeyValue(mi);
-        } else if (isMethod(mi, Map.class.getCanonicalName(), "of", Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(), //$NON-NLS-1$
+        } else if (usesGivenSignature(mi, Map.class.getCanonicalName(), "of", Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(), //$NON-NLS-1$
                 Object.class.getCanonicalName())
-                || isMethod(mi, Map.class.getCanonicalName(), "of", Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(), //$NON-NLS-1$
+                || usesGivenSignature(mi, Map.class.getCanonicalName(), "of", Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(), //$NON-NLS-1$
                         Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName())
-                || isMethod(mi, Map.class.getCanonicalName(), "of", Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(), //$NON-NLS-1$
+                || usesGivenSignature(mi, Map.class.getCanonicalName(), "of", Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(), //$NON-NLS-1$
                         Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(),
                         Object.class.getCanonicalName())
-                || isMethod(mi, Map.class.getCanonicalName(), "of", Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(), //$NON-NLS-1$
+                || usesGivenSignature(mi, Map.class.getCanonicalName(), "of", Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(), //$NON-NLS-1$
                         Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(),
                         Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName())
-                || isMethod(mi, Map.class.getCanonicalName(), "of", Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(), //$NON-NLS-1$
-                        Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(),
-                        Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(),
-                        Object.class.getCanonicalName())
-                || isMethod(mi, Map.class.getCanonicalName(), "of", Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(), //$NON-NLS-1$
-                        Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(),
-                        Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(),
-                        Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName())
-                || isMethod(mi, Map.class.getCanonicalName(), "of", Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(), //$NON-NLS-1$
-                        Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(),
+                || usesGivenSignature(mi, Map.class.getCanonicalName(), "of", Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(), //$NON-NLS-1$
                         Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(),
                         Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(),
                         Object.class.getCanonicalName())
-                || isMethod(mi, Map.class.getCanonicalName(), "of", Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(), //$NON-NLS-1$
+                || usesGivenSignature(mi, Map.class.getCanonicalName(), "of", Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(), //$NON-NLS-1$
+                        Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(),
+                        Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(),
+                        Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName())
+                || usesGivenSignature(mi, Map.class.getCanonicalName(), "of", Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(), //$NON-NLS-1$
+                        Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(),
+                        Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(),
+                        Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(),
+                        Object.class.getCanonicalName())
+                || usesGivenSignature(mi, Map.class.getCanonicalName(), "of", Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(), //$NON-NLS-1$
                         Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(),
                         Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(),
                         Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(),
                         Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName())
-                || isMethod(mi, Map.class.getCanonicalName(), "of", Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(), //$NON-NLS-1$
+                || usesGivenSignature(mi, Map.class.getCanonicalName(), "of", Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(), //$NON-NLS-1$
                         Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(),
                         Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(),
                         Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(), Object.class.getCanonicalName(),
@@ -355,8 +356,8 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
             }
 
             return resolveDestinationParamTypeCompatibleWithKeyValue(mi);
-        } else if (isMethod(mi, Map.class.getCanonicalName(), "compute", Object.class.getCanonicalName(), "java.util.function.BiFunction") //$NON-NLS-1$ $NON-NLS-2$
-                || isMethod(mi, Map.class.getCanonicalName(), "computeIfPresent", Object.class.getCanonicalName(), //$NON-NLS-1$
+        } else if (usesGivenSignature(mi, Map.class.getCanonicalName(), "compute", Object.class.getCanonicalName(), "java.util.function.BiFunction") //$NON-NLS-1$ $NON-NLS-2$
+                || usesGivenSignature(mi, Map.class.getCanonicalName(), "computeIfPresent", Object.class.getCanonicalName(), //$NON-NLS-1$
                         "java.util.function.BiFunction")) { //$NON-NLS-1$
             final ITypeBinding paramType= arguments.get(1).resolveTypeBinding();
 
@@ -366,7 +367,7 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
                 return resolveKeyTypeCompatible(arguments.get(0).resolveTypeBinding())
                         && resolveValueTypeCompatible(newValueType) && resolveDestinationTypeCompatibleWithValue(mi);
             }
-        } else if (isMethod(mi, Map.class.getCanonicalName(), "computeIfAbsent", Object.class.getCanonicalName(), //$NON-NLS-1$
+        } else if (usesGivenSignature(mi, Map.class.getCanonicalName(), "computeIfAbsent", Object.class.getCanonicalName(), //$NON-NLS-1$
                 "java.util.function.Function")) { //$NON-NLS-1$
             final ITypeBinding paramType= arguments.get(1).resolveTypeBinding();
 
@@ -376,7 +377,7 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
                 return resolveKeyTypeCompatible(arguments.get(0).resolveTypeBinding())
                         && resolveValueTypeCompatible(newValueType) && resolveDestinationTypeCompatibleWithValue(mi);
             }
-        } else if (isMethod(mi, Map.class.getCanonicalName(), "merge", Object.class.getCanonicalName(), Object.class.getCanonicalName(), //$NON-NLS-1$
+        } else if (usesGivenSignature(mi, Map.class.getCanonicalName(), "merge", Object.class.getCanonicalName(), Object.class.getCanonicalName(), //$NON-NLS-1$
                 "java.util.function.BiFunction")) { //$NON-NLS-1$
             final ITypeBinding paramType= arguments.get(2).resolveTypeBinding();
 
@@ -387,7 +388,7 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
                         && resolveValueTypeCompatible(arguments.get(1).resolveTypeBinding())
                         && resolveValueTypeCompatible(newValueType) && resolveDestinationTypeCompatibleWithValue(mi);
             }
-        } else if (isMethod(mi, Map.class.getCanonicalName(), "replaceAll", "java.util.function.BiFunction")) { //$NON-NLS-1$ $NON-NLS-2$
+        } else if (usesGivenSignature(mi, Map.class.getCanonicalName(), "replaceAll", "java.util.function.BiFunction")) { //$NON-NLS-1$ $NON-NLS-2$
             final ITypeBinding paramType= arguments.get(0).resolveTypeBinding();
 
             if (isParameterizedTypeWithNbArguments(paramType, 3)) {
@@ -455,7 +456,7 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
             return false;
         }
         if (newElementType.isPrimitive()) {
-            newElementType= getBoxedTypeBinding(newElementType, ctx.getAST());
+            newElementType= Bindings.getBoxedTypeBinding(newElementType, ctx.getAST());
         }
         if (!hasType(newElementType, Object.class.getCanonicalName()) && (keyType == null || newElementType.equals(keyType))) {
             keyType= newElementType;
@@ -469,7 +470,7 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
             return false;
         }
         if (newElementType.isPrimitive()) {
-            newElementType= getBoxedTypeBinding(newElementType, ctx.getAST());
+            newElementType= Bindings.getBoxedTypeBinding(newElementType, ctx.getAST());
         }
         if (!hasType(newElementType, Object.class.getCanonicalName()) && (valueType == null || newElementType.equals(valueType))) {
             valueType= newElementType;

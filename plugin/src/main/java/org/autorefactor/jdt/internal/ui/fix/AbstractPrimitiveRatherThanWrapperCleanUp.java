@@ -28,7 +28,7 @@ package org.autorefactor.jdt.internal.ui.fix;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getAncestorOrNull;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasType;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isField;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isMethod;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.usesGivenSignature;
 import static org.eclipse.jdt.core.dom.ASTNode.ASSIGNMENT;
 import static org.eclipse.jdt.core.dom.ASTNode.CAST_EXPRESSION;
 import static org.eclipse.jdt.core.dom.ASTNode.CONDITIONAL_EXPRESSION;
@@ -228,7 +228,7 @@ public abstract class AbstractPrimitiveRatherThanWrapperCleanUp extends Abstract
                             && isNotNull(castExpr.getExpression()));
         } else if (expr instanceof MethodInvocation) {
             final MethodInvocation mi= (MethodInvocation) expr;
-            return isMethod(mi, getWrapperFullyQualifiedName(), "valueOf", getPrimitiveTypeName()); //$NON-NLS-1$
+            return usesGivenSignature(mi, getWrapperFullyQualifiedName(), "valueOf", getPrimitiveTypeName()); //$NON-NLS-1$
         }
         return false;
     }

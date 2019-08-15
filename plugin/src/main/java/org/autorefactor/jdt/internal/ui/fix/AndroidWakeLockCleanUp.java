@@ -27,7 +27,7 @@
 package org.autorefactor.jdt.internal.ui.fix;
 
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getAncestor;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isMethod;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.usesGivenSignature;
 
 import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
 import org.autorefactor.jdt.internal.corext.dom.FinderVisitor;
@@ -78,10 +78,10 @@ public class AndroidWakeLockCleanUp extends AbstractCleanUpRule {
 
     @Override
     public boolean visit(MethodInvocation node) {
-        if (isMethod(node, "android.os.PowerManager.WakeLock", "release")) { //$NON-NLS-1$ $NON-NLS-2$
+        if (usesGivenSignature(node, "android.os.PowerManager.WakeLock", "release")) { //$NON-NLS-1$ $NON-NLS-2$
             // Check whether it is being called in onDestroy()
             MethodDeclaration enclosingMethod= getAncestor(node, MethodDeclaration.class);
-            if (isMethod(enclosingMethod, "android.app.Activity", "onDestroy")) { //$NON-NLS-1$ $NON-NLS-2$
+            if (usesGivenSignature(enclosingMethod, "android.app.Activity", "onDestroy")) { //$NON-NLS-1$ $NON-NLS-2$
                 final Refactorings r= ctx.getRefactorings();
                 TypeDeclaration typeDeclaration= getAncestor(enclosingMethod, TypeDeclaration.class);
                 MethodDeclaration onPauseMethod= findMethod(typeDeclaration, "onPause"); //$NON-NLS-1$
@@ -94,7 +94,7 @@ public class AndroidWakeLockCleanUp extends AbstractCleanUpRule {
                 }
                 return false;
             }
-        } else if (isMethod(node, "android.os.PowerManager.WakeLock", "acquire")) { //$NON-NLS-1$ $NON-NLS-2$
+        } else if (usesGivenSignature(node, "android.os.PowerManager.WakeLock", "acquire")) { //$NON-NLS-1$ $NON-NLS-2$
             final Refactorings r= ctx.getRefactorings();
             TypeDeclaration typeDeclaration= getAncestor(node, TypeDeclaration.class);
             ReleasePresenceChecker releasePresenceChecker= new ReleasePresenceChecker();
@@ -140,7 +140,7 @@ public class AndroidWakeLockCleanUp extends AbstractCleanUpRule {
     private static class ReleasePresenceChecker extends FinderVisitor<Boolean> {
         @Override
         public boolean visit(MethodInvocation node) {
-            if (isMethod(node, "android.os.PowerManager.WakeLock", "release")) { //$NON-NLS-1$ $NON-NLS-2$
+            if (usesGivenSignature(node, "android.os.PowerManager.WakeLock", "release")) { //$NON-NLS-1$ $NON-NLS-2$
                 setResult(true);
                 return false;
             }

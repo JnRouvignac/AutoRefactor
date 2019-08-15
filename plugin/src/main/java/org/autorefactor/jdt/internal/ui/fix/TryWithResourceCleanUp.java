@@ -32,7 +32,7 @@ import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.asList;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getNullCheckedExpression;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getPreviousStatement;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getUniqueFragment;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isMethod;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.usesGivenSignature;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isSameVariable;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.resources;
 import static org.eclipse.jdt.core.dom.ASTNode.TRY_STATEMENT;
@@ -144,7 +144,7 @@ public class TryWithResourceCleanUp extends AbstractCleanUpRule {
     }
 
     private boolean methodClosesCloseables(final MethodInvocation mi) {
-        if (isMethod(mi, Closeable.class.getCanonicalName(), "close")) { //$NON-NLS-1$
+        if (usesGivenSignature(mi, Closeable.class.getCanonicalName(), "close")) { //$NON-NLS-1$
             return true;
         }
 //        // Try to handle Guava's Closeables.closeQuietly(), Apache Commons IO'a IOUtils.closeQuietly()

@@ -28,7 +28,7 @@ package org.autorefactor.jdt.internal.ui.fix;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.as;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getAncestorOrNull;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasType;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isMethod;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.usesGivenSignature;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -232,7 +232,7 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
             final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
         final Block body= node.getBody();
 
-        if (isMethod(node, Object.class.getCanonicalName(), "hashCode") && body != null) { //$NON-NLS-1$
+        if (usesGivenSignature(node, Object.class.getCanonicalName(), "hashCode") && body != null) { //$NON-NLS-1$
             @SuppressWarnings("unchecked")
             final List<Statement> stmts= body.statements();
 
@@ -360,7 +360,7 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
         SimpleName fieldToFind= null;
         final MethodInvocation doubleToLongBits= as(initializer, MethodInvocation.class);
 
-        if (doubleToLongBits != null && isMethod(doubleToLongBits, Double.class.getCanonicalName(), "doubleToLongBits", double.class.getSimpleName())) { //$NON-NLS-1$
+        if (doubleToLongBits != null && usesGivenSignature(doubleToLongBits, Double.class.getCanonicalName(), "doubleToLongBits", double.class.getSimpleName())) { //$NON-NLS-1$
             final SimpleName fieldName= as((Expression) doubleToLongBits.arguments().get(0), SimpleName.class);
 
             if (fieldName != null && !fieldName.getIdentifier().equals(data.getPrimeId())
@@ -409,7 +409,7 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
         } else if (newHash instanceof MethodInvocation && data.isTempValueUsed()) {
             final MethodInvocation specificMethod= (MethodInvocation) newHash;
 
-            if (isMethod(specificMethod, Float.class.getCanonicalName(), "floatToIntBits", float.class.getSimpleName())) { //$NON-NLS-1$
+            if (usesGivenSignature(specificMethod, Float.class.getCanonicalName(), "floatToIntBits", float.class.getSimpleName())) { //$NON-NLS-1$
                 final SimpleName fieldName= getField((Expression) specificMethod.arguments().get(0));
 
                 if (fieldName != null && !fieldName.getIdentifier().equals(data.getPrimeId())
@@ -417,15 +417,15 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
                     data.getFields().add(fieldName);
                     return true;
                 }
-            } else if (isMethod(specificMethod, Arrays.class.getCanonicalName(), "hashCode", "boolean[]") //$NON-NLS-1$ $NON-NLS-2$
-                    || isMethod(specificMethod, Arrays.class.getCanonicalName(), "hashCode", "byte[]") //$NON-NLS-1$ $NON-NLS-2$
-                    || isMethod(specificMethod, Arrays.class.getCanonicalName(), "hashCode", "char[]") //$NON-NLS-1$ $NON-NLS-2$
-                    || isMethod(specificMethod, Arrays.class.getCanonicalName(), "hashCode", "double[]") //$NON-NLS-1$ $NON-NLS-2$
-                    || isMethod(specificMethod, Arrays.class.getCanonicalName(), "hashCode", "float[]") //$NON-NLS-1$ $NON-NLS-2$
-                    || isMethod(specificMethod, Arrays.class.getCanonicalName(), "hashCode", "int[]") //$NON-NLS-1$ $NON-NLS-2$
-                    || isMethod(specificMethod, Arrays.class.getCanonicalName(), "hashCode", Object[].class.getCanonicalName()) //$NON-NLS-1$
-                    || isMethod(specificMethod, Arrays.class.getCanonicalName(), "hashCode", "long[]") //$NON-NLS-1$ $NON-NLS-2$
-                    || isMethod(specificMethod, Arrays.class.getCanonicalName(), "hashCode", "short[]")) { //$NON-NLS-1$ $NON-NLS-2$
+            } else if (usesGivenSignature(specificMethod, Arrays.class.getCanonicalName(), "hashCode", "boolean[]") //$NON-NLS-1$ $NON-NLS-2$
+                    || usesGivenSignature(specificMethod, Arrays.class.getCanonicalName(), "hashCode", "byte[]") //$NON-NLS-1$ $NON-NLS-2$
+                    || usesGivenSignature(specificMethod, Arrays.class.getCanonicalName(), "hashCode", "char[]") //$NON-NLS-1$ $NON-NLS-2$
+                    || usesGivenSignature(specificMethod, Arrays.class.getCanonicalName(), "hashCode", "double[]") //$NON-NLS-1$ $NON-NLS-2$
+                    || usesGivenSignature(specificMethod, Arrays.class.getCanonicalName(), "hashCode", "float[]") //$NON-NLS-1$ $NON-NLS-2$
+                    || usesGivenSignature(specificMethod, Arrays.class.getCanonicalName(), "hashCode", "int[]") //$NON-NLS-1$ $NON-NLS-2$
+                    || usesGivenSignature(specificMethod, Arrays.class.getCanonicalName(), "hashCode", Object[].class.getCanonicalName()) //$NON-NLS-1$
+                    || usesGivenSignature(specificMethod, Arrays.class.getCanonicalName(), "hashCode", "long[]") //$NON-NLS-1$ $NON-NLS-2$
+                    || usesGivenSignature(specificMethod, Arrays.class.getCanonicalName(), "hashCode", "short[]")) { //$NON-NLS-1$ $NON-NLS-2$
                 final SimpleName fieldName= getField((Expression) specificMethod.arguments().get(0));
 
                 if (fieldName != null && !fieldName.getIdentifier().equals(data.getPrimeId())

@@ -27,7 +27,7 @@ package org.autorefactor.jdt.internal.ui.fix;
 
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.arg0;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.as;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isMethod;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.usesGivenSignature;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isSameVariable;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.match;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.removeParentheses;
@@ -91,7 +91,7 @@ public class ContainsAllRatherThanLoopCleanUp extends AbstractCollectionMethodRa
 
         MethodInvocation method= as(negation.getOperand(), MethodInvocation.class);
 
-        if (!isMethod(method, Collection.class.getCanonicalName(), "contains", Object.class.getCanonicalName())) { //$NON-NLS-1$
+        if (!usesGivenSignature(method, Collection.class.getCanonicalName(), "contains", Object.class.getCanonicalName())) { //$NON-NLS-1$
             return null;
         }
 

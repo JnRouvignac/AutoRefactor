@@ -28,7 +28,7 @@ package org.autorefactor.jdt.internal.ui.fix;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.arguments;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.asExpression;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.asList;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isMethod;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.usesGivenSignature;
 
 import java.util.List;
 
@@ -97,21 +97,21 @@ public class JUnitAssertCleanUp extends AbstractUnitTestCleanUp {
 
     private boolean maybeRefactorMethod(final MethodInvocation node, final String unitTestPackagePath,
             final List<Expression> args) {
-        if (isMethod(node, unitTestPackagePath + "Assert", "assertTrue", boolean.class.getSimpleName())) { //$NON-NLS-1$ $NON-NLS-2$
+        if (usesGivenSignature(node, unitTestPackagePath + "Assert", "assertTrue", boolean.class.getSimpleName())) { //$NON-NLS-1$ $NON-NLS-2$
             return maybeRefactorStatement(node, node, true, args.get(0), null, false);
-        } else if (isMethod(node, unitTestPackagePath + "Assert", "assertTrue", String.class.getCanonicalName(), boolean.class.getSimpleName())) { //$NON-NLS-1$ $NON-NLS-2$
+        } else if (usesGivenSignature(node, unitTestPackagePath + "Assert", "assertTrue", String.class.getCanonicalName(), boolean.class.getSimpleName())) { //$NON-NLS-1$ $NON-NLS-2$
             return maybeRefactorStatement(node, node, true, args.get(1), args.get(0), false);
-        } else if (isMethod(node, unitTestPackagePath + "Assert", "assertFalse", boolean.class.getSimpleName())) { //$NON-NLS-1$ $NON-NLS-2$
+        } else if (usesGivenSignature(node, unitTestPackagePath + "Assert", "assertFalse", boolean.class.getSimpleName())) { //$NON-NLS-1$ $NON-NLS-2$
             return maybeRefactorStatement(node, node, false, args.get(0), null, false);
-        } else if (isMethod(node, unitTestPackagePath + "Assert", "assertFalse", String.class.getCanonicalName(), boolean.class.getSimpleName())) { //$NON-NLS-1$ $NON-NLS-2$
+        } else if (usesGivenSignature(node, unitTestPackagePath + "Assert", "assertFalse", String.class.getCanonicalName(), boolean.class.getSimpleName())) { //$NON-NLS-1$ $NON-NLS-2$
             return maybeRefactorStatement(node, node, false, args.get(1), args.get(0), false);
-        } else if (isMethod(node, unitTestPackagePath + "Assert", "assertEquals", OBJECT, OBJECT) //$NON-NLS-1$ $NON-NLS-2$
-                || isMethod(node, unitTestPackagePath + "Assert", "assertEquals", long.class.getSimpleName(), long.class.getSimpleName()) //$NON-NLS-1$ $NON-NLS-2$
-                || isMethod(node, unitTestPackagePath + "Assert", "assertEquals", double.class.getSimpleName(), double.class.getSimpleName())) { //$NON-NLS-1$ $NON-NLS-2$
+        } else if (usesGivenSignature(node, unitTestPackagePath + "Assert", "assertEquals", OBJECT, OBJECT) //$NON-NLS-1$ $NON-NLS-2$
+                || usesGivenSignature(node, unitTestPackagePath + "Assert", "assertEquals", long.class.getSimpleName(), long.class.getSimpleName()) //$NON-NLS-1$ $NON-NLS-2$
+                || usesGivenSignature(node, unitTestPackagePath + "Assert", "assertEquals", double.class.getSimpleName(), double.class.getSimpleName())) { //$NON-NLS-1$ $NON-NLS-2$
             return maybeRefactorToAssertEquals(node, node, true, args.get(1), args.get(0), null, false);
-        } else if (isMethod(node, unitTestPackagePath + "Assert", "assertEquals", String.class.getCanonicalName(), OBJECT, OBJECT) //$NON-NLS-1$ $NON-NLS-2$
-                || isMethod(node, unitTestPackagePath + "Assert", "assertEquals", String.class.getCanonicalName(), long.class.getSimpleName(), long.class.getSimpleName()) //$NON-NLS-1$ $NON-NLS-2$
-                || isMethod(node, unitTestPackagePath + "Assert", "assertEquals", String.class.getCanonicalName(), double.class.getSimpleName(), //$NON-NLS-1$ $NON-NLS-2$
+        } else if (usesGivenSignature(node, unitTestPackagePath + "Assert", "assertEquals", String.class.getCanonicalName(), OBJECT, OBJECT) //$NON-NLS-1$ $NON-NLS-2$
+                || usesGivenSignature(node, unitTestPackagePath + "Assert", "assertEquals", String.class.getCanonicalName(), long.class.getSimpleName(), long.class.getSimpleName()) //$NON-NLS-1$ $NON-NLS-2$
+                || usesGivenSignature(node, unitTestPackagePath + "Assert", "assertEquals", String.class.getCanonicalName(), double.class.getSimpleName(), //$NON-NLS-1$ $NON-NLS-2$
                         double.class.getSimpleName())) {
             return maybeRefactorToAssertEquals(node, node, true, args.get(2), args.get(1), args.get(0), false);
         }
@@ -136,9 +136,9 @@ public class JUnitAssertCleanUp extends AbstractUnitTestCleanUp {
 
     private boolean maybeRefactorIf(final IfStatement node, final MethodInvocation mi,
             final String unitTestPackagePath) {
-        if (isMethod(mi, unitTestPackagePath + "Assert", "fail")) { //$NON-NLS-1$ $NON-NLS-2$
+        if (usesGivenSignature(mi, unitTestPackagePath + "Assert", "fail")) { //$NON-NLS-1$ $NON-NLS-2$
             return maybeRefactorStatement(node, mi, false, node.getExpression(), null, true);
-        } else if (isMethod(mi, unitTestPackagePath + "Assert", "fail", String.class.getCanonicalName())) { //$NON-NLS-1$ $NON-NLS-2$
+        } else if (usesGivenSignature(mi, unitTestPackagePath + "Assert", "fail", String.class.getCanonicalName())) { //$NON-NLS-1$ $NON-NLS-2$
             return maybeRefactorStatement(node, mi, false, node.getExpression(), arguments(mi).get(0), true);
         }
         return true;

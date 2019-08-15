@@ -27,7 +27,7 @@ package org.autorefactor.jdt.internal.ui.fix;
 
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.arguments;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasType;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isMethod;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.usesGivenSignature;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -77,8 +77,8 @@ public class LogParametersRatherThanLogMessageCleanUp extends AbstractCleanUpRul
     }
 
     private boolean maybeRefactorMethod(final MethodInvocation node, final String methodName) {
-        if (isMethod(node, "org.slf4j.Logger", methodName, String.class.getCanonicalName()) //$NON-NLS-1$
-                || isMethod(node, "ch.qos.logback.classic.Logger", methodName, String.class.getCanonicalName())) { //$NON-NLS-1$
+        if (usesGivenSignature(node, "org.slf4j.Logger", methodName, String.class.getCanonicalName()) //$NON-NLS-1$
+                || usesGivenSignature(node, "ch.qos.logback.classic.Logger", methodName, String.class.getCanonicalName())) { //$NON-NLS-1$
             final List<Expression> args= arguments(node);
 
             if (args != null && args.size() == 1) {

@@ -33,7 +33,7 @@ import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getBooleanLitera
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getNullCheckedExpression;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasOperator;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.is;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isMethod;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.usesGivenSignature;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isPrimitive;
 import static org.autorefactor.util.Utils.equalNotNull;
 import static org.eclipse.jdt.core.dom.InfixExpression.Operator.AND;
@@ -483,8 +483,8 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
                         && arguments(expr).get(0).subtreeMatch(new ASTSemanticMatcher(), nullCheckedExpression)) {
                     // Did we invoke java.lang.Object.equals() or
                     // java.lang.String.equalsIgnoreCase()?
-                    return isMethod(expr, Object.class.getCanonicalName(), "equals", Object.class.getCanonicalName()) //$NON-NLS-1$
-                            || isMethod(expr, String.class.getCanonicalName(), "equalsIgnoreCase", String.class.getCanonicalName()); //$NON-NLS-1$
+                    return usesGivenSignature(expr, Object.class.getCanonicalName(), "equals", Object.class.getCanonicalName()) //$NON-NLS-1$
+                            || usesGivenSignature(expr, String.class.getCanonicalName(), "equalsIgnoreCase", String.class.getCanonicalName()); //$NON-NLS-1$
                 }
             }
         }

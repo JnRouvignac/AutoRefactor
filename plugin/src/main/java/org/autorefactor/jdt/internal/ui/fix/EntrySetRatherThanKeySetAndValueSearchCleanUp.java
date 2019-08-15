@@ -30,7 +30,7 @@ import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.areBindingsEqual
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.arg0;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.asList;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getFirstAncestorOrNull;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isMethod;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.usesGivenSignature;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isSameVariable;
 import static org.eclipse.jdt.core.dom.ASTNode.ANNOTATION_TYPE_DECLARATION;
 import static org.eclipse.jdt.core.dom.ASTNode.ANONYMOUS_CLASS_DECLARATION;
@@ -337,7 +337,7 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
     }
 
     private boolean isKeySetMethod(Expression expr) {
-        return expr instanceof MethodInvocation && isMethod((MethodInvocation) expr, Map.class.getCanonicalName(), "keySet"); //$NON-NLS-1$
+        return expr instanceof MethodInvocation && usesGivenSignature((MethodInvocation) expr, Map.class.getCanonicalName(), "keySet"); //$NON-NLS-1$
     }
 
     private List<MethodInvocation> collectMapGetValueCalls(Expression mapExpression,
@@ -417,7 +417,7 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
         @Override
         public boolean visit(MethodInvocation node) {
             if (isSameReference(node.getExpression(), mapExpression)
-                    && isMethod(node, Map.class.getCanonicalName(), "get", Object.class.getCanonicalName()) //$NON-NLS-1$
+                    && usesGivenSignature(node, Map.class.getCanonicalName(), "get", Object.class.getCanonicalName()) //$NON-NLS-1$
                     && isSameVariable(arg0(node), forEachParameter.getName())) {
                 addResult(node);
             }

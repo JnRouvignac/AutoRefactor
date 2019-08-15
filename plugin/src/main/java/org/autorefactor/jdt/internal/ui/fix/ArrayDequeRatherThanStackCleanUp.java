@@ -27,7 +27,7 @@
 package org.autorefactor.jdt.internal.ui.fix;
 
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasType;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isMethod;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.usesGivenSignature;
 import static org.autorefactor.util.Utils.getOrDefault;
 
 import java.io.Serializable;
@@ -123,52 +123,52 @@ public class ArrayDequeRatherThanStackCleanUp extends AbstractClassSubstituteCle
     @Override
     protected boolean canMethodBeRefactored(final MethodInvocation mi,
             final List<MethodInvocation> methodCallsToRefactor) {
-        if (isMethod(mi, Vector.class.getCanonicalName(), "addElement", Object.class.getCanonicalName()) //$NON-NLS-1$
-                || isMethod(mi, Vector.class.getCanonicalName(), "copyInto", Object[].class.getCanonicalName()) //$NON-NLS-1$
-                || isMethod(mi, Vector.class.getCanonicalName(), "firstElement") || isMethod(mi, Vector.class.getCanonicalName(), "lastElement") //$NON-NLS-1$ $NON-NLS-2$
-                || isMethod(mi, Vector.class.getCanonicalName(), "removeElement", Object.class.getCanonicalName()) //$NON-NLS-1$
-                || isMethod(mi, Vector.class.getCanonicalName(), "removeAllElements") || isMethod(mi, Stack.class.getCanonicalName(), "empty")) { //$NON-NLS-1$ $NON-NLS-2$
+        if (usesGivenSignature(mi, Vector.class.getCanonicalName(), "addElement", Object.class.getCanonicalName()) //$NON-NLS-1$
+                || usesGivenSignature(mi, Vector.class.getCanonicalName(), "copyInto", Object[].class.getCanonicalName()) //$NON-NLS-1$
+                || usesGivenSignature(mi, Vector.class.getCanonicalName(), "firstElement") || usesGivenSignature(mi, Vector.class.getCanonicalName(), "lastElement") //$NON-NLS-1$ $NON-NLS-2$
+                || usesGivenSignature(mi, Vector.class.getCanonicalName(), "removeElement", Object.class.getCanonicalName()) //$NON-NLS-1$
+                || usesGivenSignature(mi, Vector.class.getCanonicalName(), "removeAllElements") || usesGivenSignature(mi, Stack.class.getCanonicalName(), "empty")) { //$NON-NLS-1$ $NON-NLS-2$
             methodCallsToRefactor.add(mi);
             return true;
         }
 
         final String argumentType= getArgumentType(mi);
-        return isMethod(mi, Collection.class.getCanonicalName(), "add", Object.class.getCanonicalName()) //$NON-NLS-1$
-                || isMethod(mi, List.class.getCanonicalName(), "addAll", int.class.getSimpleName(), Collection.class.getCanonicalName()) //$NON-NLS-1$
-                || isMethod(mi, Collection.class.getCanonicalName(), "clear") //$NON-NLS-1$
-                || isMethod(mi, Collection.class.getCanonicalName(), "contains", Object.class.getCanonicalName()) //$NON-NLS-1$
-                || isMethod(mi, Collection.class.getCanonicalName(), "containsAll", Collection.class.getCanonicalName()) //$NON-NLS-1$
-                || isMethod(mi, Object.class.getCanonicalName(), "equals", Object.class.getCanonicalName()) //$NON-NLS-1$
-                || isMethod(mi, Object.class.getCanonicalName(), "hashCode") || isMethod(mi, Collection.class.getCanonicalName(), "isEmpty") //$NON-NLS-1$ $NON-NLS-2$
-                || isMethod(mi, Collection.class.getCanonicalName(), "iterator") //$NON-NLS-1$
-                || isMethod(mi, Collection.class.getCanonicalName(), "remove", Object.class.getCanonicalName()) //$NON-NLS-1$
-                || isMethod(mi, Collection.class.getCanonicalName(), "removeAll", Collection.class.getCanonicalName()) //$NON-NLS-1$
-                || isMethod(mi, Collection.class.getCanonicalName(), "retainAll", Collection.class.getCanonicalName()) //$NON-NLS-1$
-                || isMethod(mi, Collection.class.getCanonicalName(), "size") || isMethod(mi, Collection.class.getCanonicalName(), "toArray") //$NON-NLS-1$ $NON-NLS-2$
-                || isMethod(mi, Collection.class.getCanonicalName(), "toArray", argumentType + "[]") //$NON-NLS-1$ $NON-NLS-2$
-                || isMethod(mi, Stack.class.getCanonicalName(), "clone") //$NON-NLS-1$
-                || isMethod(mi, Stack.class.getCanonicalName(), "retainAll", Collection.class.getCanonicalName()) //$NON-NLS-1$
-                || isMethod(mi, Object.class.getCanonicalName(), "toString") || isMethod(mi, Stack.class.getCanonicalName(), "peek") //$NON-NLS-1$ $NON-NLS-2$
-                || isMethod(mi, Stack.class.getCanonicalName(), "pop") //$NON-NLS-1$
-                || isMethod(mi, Stack.class.getCanonicalName(), "push", Object.class.getCanonicalName()); //$NON-NLS-1$
+        return usesGivenSignature(mi, Collection.class.getCanonicalName(), "add", Object.class.getCanonicalName()) //$NON-NLS-1$
+                || usesGivenSignature(mi, List.class.getCanonicalName(), "addAll", int.class.getSimpleName(), Collection.class.getCanonicalName()) //$NON-NLS-1$
+                || usesGivenSignature(mi, Collection.class.getCanonicalName(), "clear") //$NON-NLS-1$
+                || usesGivenSignature(mi, Collection.class.getCanonicalName(), "contains", Object.class.getCanonicalName()) //$NON-NLS-1$
+                || usesGivenSignature(mi, Collection.class.getCanonicalName(), "containsAll", Collection.class.getCanonicalName()) //$NON-NLS-1$
+                || usesGivenSignature(mi, Object.class.getCanonicalName(), "equals", Object.class.getCanonicalName()) //$NON-NLS-1$
+                || usesGivenSignature(mi, Object.class.getCanonicalName(), "hashCode") || usesGivenSignature(mi, Collection.class.getCanonicalName(), "isEmpty") //$NON-NLS-1$ $NON-NLS-2$
+                || usesGivenSignature(mi, Collection.class.getCanonicalName(), "iterator") //$NON-NLS-1$
+                || usesGivenSignature(mi, Collection.class.getCanonicalName(), "remove", Object.class.getCanonicalName()) //$NON-NLS-1$
+                || usesGivenSignature(mi, Collection.class.getCanonicalName(), "removeAll", Collection.class.getCanonicalName()) //$NON-NLS-1$
+                || usesGivenSignature(mi, Collection.class.getCanonicalName(), "retainAll", Collection.class.getCanonicalName()) //$NON-NLS-1$
+                || usesGivenSignature(mi, Collection.class.getCanonicalName(), "size") || usesGivenSignature(mi, Collection.class.getCanonicalName(), "toArray") //$NON-NLS-1$ $NON-NLS-2$
+                || usesGivenSignature(mi, Collection.class.getCanonicalName(), "toArray", argumentType + "[]") //$NON-NLS-1$ $NON-NLS-2$
+                || usesGivenSignature(mi, Stack.class.getCanonicalName(), "clone") //$NON-NLS-1$
+                || usesGivenSignature(mi, Stack.class.getCanonicalName(), "retainAll", Collection.class.getCanonicalName()) //$NON-NLS-1$
+                || usesGivenSignature(mi, Object.class.getCanonicalName(), "toString") || usesGivenSignature(mi, Stack.class.getCanonicalName(), "peek") //$NON-NLS-1$ $NON-NLS-2$
+                || usesGivenSignature(mi, Stack.class.getCanonicalName(), "pop") //$NON-NLS-1$
+                || usesGivenSignature(mi, Stack.class.getCanonicalName(), "push", Object.class.getCanonicalName()); //$NON-NLS-1$
     }
 
     @Override
     protected void refactorMethod(final ASTBuilder b, final MethodInvocation originalMi,
             final MethodInvocation refactoredMi) {
-        if (isMethod(originalMi, Vector.class.getCanonicalName(), "addElement", Object.class.getCanonicalName())) { //$NON-NLS-1$
+        if (usesGivenSignature(originalMi, Vector.class.getCanonicalName(), "addElement", Object.class.getCanonicalName())) { //$NON-NLS-1$
             refactoredMi.setName(b.simpleName("add")); //$NON-NLS-1$
-        } else if (isMethod(originalMi, Vector.class.getCanonicalName(), "copyInto", Object[].class.getCanonicalName())) { //$NON-NLS-1$
+        } else if (usesGivenSignature(originalMi, Vector.class.getCanonicalName(), "copyInto", Object[].class.getCanonicalName())) { //$NON-NLS-1$
             refactoredMi.setName(b.simpleName("toArray")); //$NON-NLS-1$
-        } else if (isMethod(originalMi, Vector.class.getCanonicalName(), "firstElement")) { //$NON-NLS-1$
+        } else if (usesGivenSignature(originalMi, Vector.class.getCanonicalName(), "firstElement")) { //$NON-NLS-1$
             refactoredMi.setName(b.simpleName("getFirst")); //$NON-NLS-1$
-        } else if (isMethod(originalMi, Vector.class.getCanonicalName(), "lastElement")) { //$NON-NLS-1$
+        } else if (usesGivenSignature(originalMi, Vector.class.getCanonicalName(), "lastElement")) { //$NON-NLS-1$
             refactoredMi.setName(b.simpleName("getLast")); //$NON-NLS-1$
-        } else if (isMethod(originalMi, Vector.class.getCanonicalName(), "removeElement", Object.class.getCanonicalName())) { //$NON-NLS-1$
+        } else if (usesGivenSignature(originalMi, Vector.class.getCanonicalName(), "removeElement", Object.class.getCanonicalName())) { //$NON-NLS-1$
             refactoredMi.setName(b.simpleName("remove")); //$NON-NLS-1$
-        } else if (isMethod(originalMi, Vector.class.getCanonicalName(), "removeAllElements")) { //$NON-NLS-1$
+        } else if (usesGivenSignature(originalMi, Vector.class.getCanonicalName(), "removeAllElements")) { //$NON-NLS-1$
             refactoredMi.setName(b.simpleName("clear")); //$NON-NLS-1$
-        } else if (isMethod(originalMi, Stack.class.getCanonicalName(), "empty")) { //$NON-NLS-1$
+        } else if (usesGivenSignature(originalMi, Stack.class.getCanonicalName(), "empty")) { //$NON-NLS-1$
             refactoredMi.setName(b.simpleName("isEmpty")); //$NON-NLS-1$
         }
     }

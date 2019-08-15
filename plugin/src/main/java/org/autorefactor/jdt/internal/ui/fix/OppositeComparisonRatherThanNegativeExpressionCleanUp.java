@@ -27,7 +27,7 @@ package org.autorefactor.jdt.internal.ui.fix;
 
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.as;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasType;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isMethod;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.usesGivenSignature;
 
 import org.autorefactor.jdt.internal.corext.dom.ASTBuilder;
 import org.autorefactor.jdt.internal.corext.dom.Refactorings;
@@ -74,7 +74,7 @@ public class OppositeComparisonRatherThanNegativeExpressionCleanUp extends Abstr
                 final String[] classes= { Double.class.getCanonicalName(), Float.class.getCanonicalName(), Short.class.getCanonicalName(), Integer.class.getCanonicalName(), Long.class.getCanonicalName(), Character.class.getCanonicalName(), Byte.class.getCanonicalName(), Boolean.class.getCanonicalName() };
 
                 for (final String clazz : classes) {
-                    if (isMethod(mi, clazz, "compareTo", clazz) && hasType((Expression) mi.arguments().get(0), clazz)) { //$NON-NLS-1$
+                    if (usesGivenSignature(mi, clazz, "compareTo", clazz) && hasType((Expression) mi.arguments().get(0), clazz)) { //$NON-NLS-1$
                         reverseObjects(node, mi);
                         return false;
                     }

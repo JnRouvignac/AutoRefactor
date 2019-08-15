@@ -1107,7 +1107,7 @@ public final class ASTNodes {
                         return discriminentType;
                     } else {
                         return node.getAST()
-                                .resolveWellKnownType(getUnboxedTypeName(discriminentType.getQualifiedName()));
+                                .resolveWellKnownType(Bindings.getUnboxedTypeName(discriminentType.getQualifiedName()));
                     }
                 }
             }
@@ -1802,10 +1802,10 @@ public final class ASTNodes {
      * @return true if the provided method invocation matches the provided method
      *         signature, false otherwise
      */
-    public static boolean isMethod(MethodInvocation node, String typeQualifiedName, String methodName,
+    public static boolean usesGivenSignature(MethodInvocation node, String typeQualifiedName, String methodName,
             String... parameterTypesQualifiedNames) {
         return node != null
-                && isMethod(node.resolveMethodBinding(), typeQualifiedName, methodName, parameterTypesQualifiedNames);
+                && usesGivenSignature(node.resolveMethodBinding(), typeQualifiedName, methodName, parameterTypesQualifiedNames);
     }
 
     /**
@@ -1822,10 +1822,10 @@ public final class ASTNodes {
      * @return true if the provided method declaration matches the provided method
      *         signature, false otherwise
      */
-    public static boolean isMethod(MethodDeclaration node, String typeQualifiedName, String methodName,
+    public static boolean usesGivenSignature(MethodDeclaration node, String typeQualifiedName, String methodName,
             String... parameterTypesQualifiedNames) {
         return node != null
-                && isMethod(node.resolveBinding(), typeQualifiedName, methodName, parameterTypesQualifiedNames);
+                && usesGivenSignature(node.resolveBinding(), typeQualifiedName, methodName, parameterTypesQualifiedNames);
     }
 
     /**
@@ -1842,7 +1842,7 @@ public final class ASTNodes {
      * @return true if the provided method invocation matches the provided method
      *         signature, false otherwise
      */
-    public static boolean isMethod(IMethodBinding methodBinding, String typeQualifiedName, String methodName,
+    public static boolean usesGivenSignature(IMethodBinding methodBinding, String typeQualifiedName, String methodName,
             String... parameterTypesQualifiedNames) {
         // Let's do the fast checks first
         if (methodBinding == null || !methodName.equals(methodBinding.getName())
@@ -1866,7 +1866,7 @@ public final class ASTNodes {
         }
         IMethodBinding methodDeclaration= methodBinding.getMethodDeclaration();
         return methodDeclaration != null && methodDeclaration != methodBinding
-                && isMethod(methodDeclaration, typeQualifiedName, methodName, parameterTypesQualifiedNames);
+                && usesGivenSignature(methodDeclaration, typeQualifiedName, methodName, parameterTypesQualifiedNames);
     }
 
     private static boolean parameterTypesMatch(ITypeBinding implementedType, boolean isInstanceOf,
@@ -1886,8 +1886,8 @@ public final class ASTNodes {
         }
         for (int i= 0; i < typesQualifiedNames.length; i++) {
             if (!typesQualifiedNames[i].equals(typeBindings[i].getQualifiedName())
-                    && !typesQualifiedNames[i].equals(getBoxedTypeName(typeBindings[i].getQualifiedName()))
-                    && !typesQualifiedNames[i].equals(getUnboxedTypeName(typeBindings[i].getQualifiedName()))) {
+                    && !typesQualifiedNames[i].equals(Bindings.getBoxedTypeName(typeBindings[i].getQualifiedName()))
+                    && !typesQualifiedNames[i].equals(Bindings.getUnboxedTypeName(typeBindings[i].getQualifiedName()))) {
                 return false;
             }
         }
@@ -1962,7 +1962,7 @@ public final class ASTNodes {
             final ITypeBinding erasure1= paramTypes[i].getErasure();
             final String erasureName1;
             if (erasure1.isPrimitive()) {
-                erasureName1= getBoxedTypeName(erasure1.getQualifiedName());
+                erasureName1= Bindings.getBoxedTypeName(erasure1.getQualifiedName());
             } else {
                 erasureName1= erasure1.getQualifiedName();
             }
@@ -1970,7 +1970,7 @@ public final class ASTNodes {
             final ITypeBinding erasure2= concreteParamType.getErasure();
             final String erasureName2;
             if (erasure2.isPrimitive()) {
-                erasureName2= getBoxedTypeName(erasure2.getQualifiedName());
+                erasureName2= Bindings.getBoxedTypeName(erasure2.getQualifiedName());
             } else {
                 erasureName2= erasure2.getQualifiedName();
             }
@@ -2469,85 +2469,5 @@ public final class ASTNodes {
         default:
             return false;
         }
-    }
-
-    /**
-     * Get the type of the associated primitive wrapper.
-     *
-     * @param type A primitive or wrapper type.
-     * @param ast  The AST.
-     * @return The type of the associated primitive wrapper.
-     */
-    public static ITypeBinding getBoxedTypeBinding(ITypeBinding type, org.eclipse.jdt.core.dom.AST ast) {
-        if (!type.isPrimitive()) {
-            return type;
-        }
-        String boxedTypeName= getBoxedTypeName(type.getName());
-        if (boxedTypeName == null) {
-            return type;
-        }
-        ITypeBinding boxed= ast.resolveWellKnownType(boxedTypeName);
-        if (boxed == null) {
-            return type;
-        }
-        return boxed;
-    }
-
-    private static String getBoxedTypeName(String primitiveName) {
-        if (long.class.getSimpleName().equals(primitiveName)) {
-            return Long.class.getCanonicalName();
-        }
-        if (int.class.getSimpleName().equals(primitiveName)) {
-            return Integer.class.getCanonicalName();
-        }
-        if (short.class.getSimpleName().equals(primitiveName)) {
-            return Short.class.getCanonicalName();
-        }
-        if (char.class.getSimpleName().equals(primitiveName)) {
-            return Character.class.getCanonicalName();
-        }
-        if (byte.class.getSimpleName().equals(primitiveName)) {
-            return Byte.class.getCanonicalName();
-        }
-        if (boolean.class.getSimpleName().equals(primitiveName)) {
-            return Boolean.class.getCanonicalName();
-        }
-        if (float.class.getSimpleName().equals(primitiveName)) {
-            return Float.class.getCanonicalName();
-        }
-        if (double.class.getSimpleName().equals(primitiveName)) {
-            return Double.class.getCanonicalName();
-        }
-
-        return null;
-    }
-
-    private static String getUnboxedTypeName(String wrapperName) {
-        if (Long.class.getCanonicalName().equals(wrapperName)) {
-            return long.class.getSimpleName();
-        }
-        if (Integer.class.getCanonicalName().equals(wrapperName)) {
-            return int.class.getSimpleName();
-        }
-        if (Short.class.getCanonicalName().equals(wrapperName)) {
-            return short.class.getSimpleName();
-        }
-        if (Character.class.getCanonicalName().equals(wrapperName)) {
-            return char.class.getSimpleName();
-        }
-        if (Byte.class.getCanonicalName().equals(wrapperName)) {
-            return byte.class.getSimpleName();
-        }
-        if (Boolean.class.getCanonicalName().equals(wrapperName)) {
-            return boolean.class.getSimpleName();
-        }
-        if (Float.class.getCanonicalName().equals(wrapperName)) {
-            return float.class.getSimpleName();
-        }
-        if (Double.class.getCanonicalName().equals(wrapperName)) {
-            return double.class.getSimpleName();
-        }
-
-        return null;
     }
 }

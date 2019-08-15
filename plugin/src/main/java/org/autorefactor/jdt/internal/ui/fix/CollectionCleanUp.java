@@ -35,7 +35,7 @@ import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.getUniqueFragmen
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasOperator;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.hasType;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isCastCompatible;
-import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isMethod;
+import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.usesGivenSignature;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isPrimitive;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.isSameLocalVariable;
 import static org.autorefactor.jdt.internal.corext.dom.ASTNodes.match;
@@ -116,7 +116,7 @@ public class CollectionCleanUp extends AbstractCleanUpRule {
         @Override
         public boolean visit(ExpressionStatement node) {
             final MethodInvocation mi= asExpression(node, MethodInvocation.class);
-            if (isMethod(mi, Collection.class.getCanonicalName(), "addAll", Collection.class.getCanonicalName())) { //$NON-NLS-1$
+            if (usesGivenSignature(mi, Collection.class.getCanonicalName(), "addAll", Collection.class.getCanonicalName())) { //$NON-NLS-1$
                 final Expression arg0= arg0(mi);
                 final Statement previousStmt= getPreviousSibling(node);
 
@@ -178,7 +178,7 @@ public class CollectionCleanUp extends AbstractCleanUpRule {
                 if (constant != null) {
                     return constant.equals(0);
                 } else {
-                    return isMethod(mi, Collection.class.getCanonicalName(), "size") && match(mi.getExpression(), sourceCollection); //$NON-NLS-1$
+                    return usesGivenSignature(mi, Collection.class.getCanonicalName(), "size") && match(mi.getExpression(), sourceCollection); //$NON-NLS-1$
                 }
             }
             return false;
