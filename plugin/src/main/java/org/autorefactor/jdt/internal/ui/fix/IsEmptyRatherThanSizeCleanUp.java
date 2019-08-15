@@ -74,13 +74,13 @@ public class IsEmptyRatherThanSizeCleanUp extends AbstractCleanUpRule {
         final MethodInvocation leftMi= ASTNodes.as(node.getLeftOperand(), MethodInvocation.class);
         final Long rightLiteral= asNumber(node.getRightOperand());
 
-        final MethodInvocation rightMi= ASTNodes.as(node.getRightOperand(), MethodInvocation.class);
-        final Long leftLiteral= asNumber(node.getLeftOperand());
-
         if (!maybeReplaceCollectionSize(node, leftMi, node.getOperator(),
                 rightLiteral)) {
             return false;
         }
+
+        final MethodInvocation rightMi= ASTNodes.as(node.getRightOperand(), MethodInvocation.class);
+        final Long leftLiteral= asNumber(node.getLeftOperand());
 
         return maybeReplaceCollectionSize(node, rightMi, sign(node.getOperator()), leftLiteral);
     }

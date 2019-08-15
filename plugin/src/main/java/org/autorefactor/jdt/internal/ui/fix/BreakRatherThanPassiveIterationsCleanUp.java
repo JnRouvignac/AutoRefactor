@@ -84,7 +84,7 @@ public class BreakRatherThanPassiveIterationsCleanUp extends AbstractCleanUpRule
 
         @Override
         public boolean visit(final PrefixExpression node) {
-            return !(PrefixExpression.Operator.INCREMENT.equals(node.getOperator()) || PrefixExpression.Operator.DECREMENT.equals(node.getOperator())) || visitVar(node.getOperand());
+            return !ASTNodes.hasOperator(node, PrefixExpression.Operator.INCREMENT, PrefixExpression.Operator.DECREMENT) || visitVar(node.getOperand());
         }
 
         @Override
@@ -95,7 +95,7 @@ public class BreakRatherThanPassiveIterationsCleanUp extends AbstractCleanUpRule
         @SuppressWarnings("unchecked")
         @Override
         public boolean visit(final InfixExpression node) {
-            if (InfixExpression.Operator.PLUS.equals(node.getOperator()) && ASTNodes.hasType(node, String.class.getCanonicalName())
+            if (ASTNodes.hasOperator(node, InfixExpression.Operator.PLUS) && ASTNodes.hasType(node, String.class.getCanonicalName())
                     && (mayCallImplicitToString(node.getLeftOperand())
                             || mayCallImplicitToString(node.getRightOperand())
                             || mayCallImplicitToString(node.extendedOperands()))) {

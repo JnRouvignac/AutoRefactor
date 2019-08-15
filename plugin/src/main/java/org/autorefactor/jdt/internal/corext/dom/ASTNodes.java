@@ -195,7 +195,7 @@ public final class ASTNodes {
 
         @Override
         public boolean visit(PrefixExpression node) {
-            if (PrefixExpression.Operator.INCREMENT.equals(node.getOperator()) || PrefixExpression.Operator.DECREMENT.equals(node.getOperator())) {
+            if (ASTNodes.hasOperator(node, PrefixExpression.Operator.INCREMENT, PrefixExpression.Operator.DECREMENT)) {
                 activityLevel= ExprActivity.ACTIVE;
                 return interruptVisit();
             }
@@ -211,7 +211,7 @@ public final class ASTNodes {
         @SuppressWarnings("unchecked")
         @Override
         public boolean visit(InfixExpression node) {
-            if (InfixExpression.Operator.PLUS.equals(node.getOperator()) && ASTNodes.hasType(node, String.class.getCanonicalName())
+            if (ASTNodes.hasOperator(node, InfixExpression.Operator.PLUS) && ASTNodes.hasType(node, String.class.getCanonicalName())
                     && (mayCallImplicitToString(node.getLeftOperand())
                             || mayCallImplicitToString(node.getRightOperand())
                             || mayCallImplicitToString(node.extendedOperands()))) {
@@ -1068,7 +1068,7 @@ public final class ASTNodes {
                 }
             } else if (parent instanceof PrefixExpression) {
                 final PrefixExpression prefixExpr= (PrefixExpression) parent;
-                if (PrefixExpression.Operator.NOT.equals(prefixExpr.getOperator())) {
+                if (ASTNodes.hasOperator(prefixExpr, PrefixExpression.Operator.NOT)) {
                     return node.getAST().resolveWellKnownType(boolean.class.getSimpleName());
                 }
             } else if (parent instanceof InfixExpression) {

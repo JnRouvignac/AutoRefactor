@@ -144,7 +144,7 @@ public class OppositeConditionRatherThanDuplicateConditionCleanUp extends Abstra
         final Statement thirdStmtCopy;
         final PrefixExpression negativeCond= ASTNodes.as(notDuplicateExpr, PrefixExpression.class);
 
-        if (negativeCond != null && PrefixExpression.Operator.NOT.equals(negativeCond.getOperator())) {
+        if (negativeCond != null && ASTNodes.hasOperator(negativeCond, PrefixExpression.Operator.NOT)) {
             secondCond= negativeCond.getOperand();
             secondStmtCopy= b.move(positiveStmt);
             thirdStmtCopy= b.move(node.getThenStatement());

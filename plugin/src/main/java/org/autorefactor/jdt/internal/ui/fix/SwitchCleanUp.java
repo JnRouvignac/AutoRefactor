@@ -385,7 +385,7 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
             if (leftVar != null && leftVar.isSameVariable(rightVar)) {
                 return leftVar.mergeValues(rightVar);
             }
-        } else if (InfixExpression.Operator.EQUALS.equals(infixExpr.getOperator())) {
+        } else if (ASTNodes.hasOperator(infixExpr, InfixExpression.Operator.EQUALS)) {
             Variable variable= extractVariableWithConstantValue(leftOp, rightOp);
             return variable != null ? variable : extractVariableWithConstantValue(rightOp, leftOp);
         }

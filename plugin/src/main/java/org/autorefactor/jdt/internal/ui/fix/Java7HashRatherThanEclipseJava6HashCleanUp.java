@@ -372,9 +372,9 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
             final InfixExpression primeTimesResult= ASTNodes.as(hashAddition.getLeftOperand(), InfixExpression.class);
             final Expression newHash= hashAddition.getRightOperand();
 
-            if (!hashAddition.hasExtendedOperands() && InfixExpression.Operator.PLUS.equals(hashAddition.getOperator())
+            if (!hashAddition.hasExtendedOperands() && ASTNodes.hasOperator(hashAddition, InfixExpression.Operator.PLUS)
                     && primeTimesResult != null && !primeTimesResult.hasExtendedOperands()
-                    && InfixExpression.Operator.TIMES.equals(primeTimesResult.getOperator())
+                    && ASTNodes.hasOperator(primeTimesResult, InfixExpression.Operator.TIMES)
                     && ((isGivenVariable(primeTimesResult.getLeftOperand(), data.getPrimeId())
                             && isGivenVariable(primeTimesResult.getRightOperand(), data.getResultId()))
                             || (isGivenVariable(primeTimesResult.getLeftOperand(), data.getResultId())
@@ -468,7 +468,7 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
         final InfixExpression bitwise= ASTNodes.as(castExpression.getExpression(), InfixExpression.class);
 
         if (ASTNodes.hasType(castExpression, int.class.getSimpleName()) && bitwise != null && ASTNodes.hasType(bitwise, long.class.getSimpleName(), double.class.getSimpleName())
-                && InfixExpression.Operator.XOR.equals(bitwise.getOperator())) {
+                && ASTNodes.hasOperator(bitwise, InfixExpression.Operator.XOR)) {
             final Expression operand1= bitwise.getLeftOperand();
             final Expression operand2= bitwise.getRightOperand();
 
@@ -493,7 +493,7 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
                 moveExpr= null;
             }
 
-            if (fieldName != null && moveExpr != null && InfixExpression.Operator.RIGHT_SHIFT_UNSIGNED.equals(moveExpr.getOperator())) {
+            if (fieldName != null && moveExpr != null && ASTNodes.hasOperator(moveExpr, InfixExpression.Operator.RIGHT_SHIFT_UNSIGNED)) {
                 final SimpleName againFieldName= getField(moveExpr.getLeftOperand());
                 final NumberLiteral hash= ASTNodes.as(moveExpr.getRightOperand(), NumberLiteral.class);
 
@@ -577,7 +577,7 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
             final NumberLiteral zero;
             final MethodInvocation hashOnField;
 
-            if (InfixExpression.Operator.EQUALS.equals(isFieldNull.getOperator())) {
+            if (ASTNodes.hasOperator(isFieldNull, InfixExpression.Operator.EQUALS)) {
                 zero= ASTNodes.as(condition.getThenExpression(), NumberLiteral.class);
                 hashOnField= ASTNodes.as(condition.getElseExpression(), MethodInvocation.class);
             } else {

@@ -78,7 +78,7 @@ public class ContainsAllRatherThanLoopCleanUp extends AbstractCollectionMethodRa
     protected MethodInvocation getMethodToReplace(Expression condition) {
         PrefixExpression negation= ASTNodes.as(condition, PrefixExpression.class);
 
-        if (negation == null || !PrefixExpression.Operator.NOT.equals(negation.getOperator())) {
+        if (negation == null || !ASTNodes.hasOperator(negation, PrefixExpression.Operator.NOT)) {
             return null;
         }
 

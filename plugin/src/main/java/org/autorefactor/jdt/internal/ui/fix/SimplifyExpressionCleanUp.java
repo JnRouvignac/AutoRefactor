@@ -132,22 +132,15 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
         }
         // Infix, prefix or postfix without parenthesis is not readable
         if ((parent instanceof InfixExpression
-                && (InfixExpression.Operator.PLUS.equals(((InfixExpression) parent).getOperator())
-                        || InfixExpression.Operator.MINUS.equals(((InfixExpression) parent).getOperator())))
+                && ASTNodes.hasOperator((InfixExpression) parent, InfixExpression.Operator.PLUS, InfixExpression.Operator.MINUS))
                 || (parent instanceof PrefixExpression
-                        && (PrefixExpression.Operator.PLUS.equals(((PrefixExpression) parent).getOperator())
-                                || PrefixExpression.Operator.MINUS.equals(((PrefixExpression) parent).getOperator())))) {
+                        && ASTNodes.hasOperator((PrefixExpression) parent, PrefixExpression.Operator.PLUS, PrefixExpression.Operator.MINUS))) {
             if (innerExpr instanceof PrefixExpression
-                    && (PrefixExpression.Operator.DECREMENT.equals(((PrefixExpression) innerExpr).getOperator())
-                            || PrefixExpression.Operator.INCREMENT.equals(((PrefixExpression) innerExpr).getOperator())
-                            || PrefixExpression.Operator.PLUS.equals(((PrefixExpression) innerExpr).getOperator())
-                            || PrefixExpression.Operator.MINUS.equals(((PrefixExpression) innerExpr).getOperator()))) {
+                    && ASTNodes.hasOperator((PrefixExpression) innerExpr, PrefixExpression.Operator.DECREMENT, PrefixExpression.Operator.INCREMENT, PrefixExpression.Operator.PLUS, PrefixExpression.Operator.MINUS)) {
                 return node;
             }
             if (innerExpr instanceof PostfixExpression
-                    && (PostfixExpression.Operator.DECREMENT.equals(((PostfixExpression) innerExpr).getOperator())
-                            || PostfixExpression.Operator.INCREMENT.equals(((PostfixExpression) innerExpr)
-                                    .getOperator()))) {
+                    && ASTNodes.hasOperator((PostfixExpression) innerExpr, PostfixExpression.Operator.DECREMENT, PostfixExpression.Operator.INCREMENT)) {
                 return node;
             }
         }
@@ -197,7 +190,7 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
                 final InfixExpression innerIe= (InfixExpression) innerExpr;
                 final InfixExpression.Operator innerOp= innerIe.getOperator();
                 final InfixExpression.Operator parentOp= ((InfixExpression) parent).getOperator();
-                return InfixExpression.Operator.EQUALS.equals(parentOp) || shouldHaveParentheses(innerOp, parentOp)
+                return ASTNodes.hasOperator((InfixExpression) parent, InfixExpression.Operator.EQUALS) || shouldHaveParentheses(innerOp, parentOp)
                         || ASTNodes.is(innerIe.getLeftOperand(), Assignment.class)
                         || ASTNodes.is(innerIe.getRightOperand(), Assignment.class);
             }
@@ -337,7 +330,7 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
     }
 
     private InfixExpression.Operator getAppropriateOperator(final InfixExpression node) {
-        if (InfixExpression.Operator.NOT_EQUALS.equals(node.getOperator())) {
+        if (ASTNodes.hasOperator(node, InfixExpression.Operator.NOT_EQUALS)) {
             return InfixExpression.Operator.XOR;
         } else {
             return node.getOperator();
@@ -345,7 +338,7 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
     }
 
     private InfixExpression.Operator getReverseOperator(final InfixExpression node) {
-        if (InfixExpression.Operator.EQUALS.equals(node.getOperator())) {
+        if (ASTNodes.hasOperator(node, InfixExpression.Operator.EQUALS)) {
             return InfixExpression.Operator.XOR;
         } else {
             return InfixExpression.Operator.EQUALS;

@@ -63,7 +63,7 @@ public class OppositeComparisonRatherThanNegativeExpressionCleanUp extends Abstr
 
     @Override
     public boolean visit(final PrefixExpression node) {
-        if (PrefixExpression.Operator.MINUS.equals(node.getOperator())) {
+        if (ASTNodes.hasOperator(node, PrefixExpression.Operator.MINUS)) {
             final MethodInvocation mi= ASTNodes.as(node.getOperand(), MethodInvocation.class);
 
             if (mi != null && mi.getExpression() != null && mi.arguments().size() == 1) {

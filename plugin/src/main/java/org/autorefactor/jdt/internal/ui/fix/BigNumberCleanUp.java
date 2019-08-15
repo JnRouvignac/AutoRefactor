@@ -137,7 +137,7 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
     @Override
     public boolean visit(PrefixExpression node) {
         final MethodInvocation mi= ASTNodes.as(node.getOperand(), MethodInvocation.class);
-        return !(PrefixExpression.Operator.NOT.equals(node.getOperator()) && mi != null) || maybeReplaceEquals(false, node, mi);
+        return !(ASTNodes.hasOperator(node, PrefixExpression.Operator.NOT) && mi != null) || maybeReplaceEquals(false, node, mi);
     }
 
     @Override

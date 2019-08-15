@@ -64,17 +64,17 @@ public class LazyLogicalRatherThanEagerCleanUp extends AbstractCleanUpRule {
                 && (ASTNodes.hasType(node.getLeftOperand(), boolean.class.getSimpleName()) || ASTNodes.hasType(node.getLeftOperand(), Boolean.class.getCanonicalName()))
                 && (ASTNodes.hasType(node.getRightOperand(), boolean.class.getSimpleName()) || ASTNodes.hasType(node.getRightOperand(), Boolean.class.getCanonicalName()))
                 && ASTNodes.isPassive(node.getRightOperand())
-                && (InfixExpression.Operator.AND.equals(node.getOperator()) || InfixExpression.Operator.OR.equals(node.getOperator()))) {
+                && ASTNodes.hasOperator(node, InfixExpression.Operator.AND, InfixExpression.Operator.OR)) {
             final ASTNodeFactory b= ctx.getASTBuilder();
             ctx.getRefactorings().replace(node, b.infixExpr(b.copy(node.getLeftOperand()),
-                    getLazyOperator(node.getOperator()), b.copy(node.getRightOperand())));
+                    getLazyOperator(node), b.copy(node.getRightOperand())));
             return false;
         }
         return true;
     }
 
-    private InfixExpression.Operator getLazyOperator(final InfixExpression.Operator operator) {
-        if (InfixExpression.Operator.AND.equals(operator)) {
+    private InfixExpression.Operator getLazyOperator(final InfixExpression node) {
+        if (ASTNodes.hasOperator(node, InfixExpression.Operator.AND)) {
             return InfixExpression.Operator.CONDITIONAL_AND;
         } else {
             return InfixExpression.Operator.CONDITIONAL_OR;

@@ -155,7 +155,7 @@ public class ASTSemanticMatcher extends ASTMatcher {
         if (other instanceof PrefixExpression) {
             PrefixExpression pe= (PrefixExpression) other;
 
-            if (PrefixExpression.Operator.NOT.equals(pe.getOperator())) {
+            if (ASTNodes.hasOperator(pe, PrefixExpression.Operator.NOT)) {
                 return matchOpposite(node, pe.getOperand());
             }
         }
@@ -207,7 +207,7 @@ public class ASTSemanticMatcher extends ASTMatcher {
     public boolean match(final PrefixExpression node, final Object otherObject) {
         final Object other= unbracket(otherObject);
 
-        if (!(other instanceof PrefixExpression) && PrefixExpression.Operator.NOT.equals(node.getOperator())) {
+        if (!(other instanceof PrefixExpression) && ASTNodes.hasOperator(node, PrefixExpression.Operator.NOT)) {
             return matchOpposite(node.getOperand(), other);
         }
 
@@ -254,7 +254,7 @@ public class ASTSemanticMatcher extends ASTMatcher {
     }
 
     private boolean matchAssignmentWithAndWithoutEqual(final Assignment node, final Assignment assignment) {
-        if (Assignment.Operator.ASSIGN.equals(node.getOperator())
+        if (ASTNodes.hasOperator(node, Assignment.Operator.ASSIGN)
                 && node.getRightHandSide() instanceof InfixExpression) {
             InfixExpression infixExpr= (InfixExpression) node.getRightHandSide();
 
@@ -292,14 +292,14 @@ public class ASTSemanticMatcher extends ASTMatcher {
 
     private boolean match0(final Assignment assignment, final Expression prefixOrPostfixOperand,
             final InfixExpression.Operator infixAssociatedOperator, final Assignment.Operator assignmentAssociatedOperator) {
-        if (Assignment.Operator.ASSIGN.equals(assignment.getOperator())
+        if (ASTNodes.hasOperator(assignment, Assignment.Operator.ASSIGN)
                 && assignment.getRightHandSide() instanceof InfixExpression) {
             InfixExpression infixExpr= (InfixExpression) assignment.getRightHandSide();
             if (!infixExpr.hasExtendedOperands() && infixAssociatedOperator.equals(infixExpr.getOperator())) {
                 if (isOneLiteral(infixExpr.getRightOperand())) {
                     return safeSubtreeMatch(prefixOrPostfixOperand, assignment.getLeftHandSide())
                             && safeSubtreeMatch(prefixOrPostfixOperand, infixExpr.getLeftOperand());
-                } else if (InfixExpression.Operator.PLUS.equals(infixExpr.getOperator()) && isOneLiteral(infixExpr.getLeftOperand())) {
+                } else if (ASTNodes.hasOperator(infixExpr, InfixExpression.Operator.PLUS) && isOneLiteral(infixExpr.getLeftOperand())) {
                     return safeSubtreeMatch(prefixOrPostfixOperand, assignment.getLeftHandSide())
                             && safeSubtreeMatch(prefixOrPostfixOperand, infixExpr.getRightOperand());
                 }
@@ -623,16 +623,16 @@ public class ASTSemanticMatcher extends ASTMatcher {
         if (node instanceof PrefixExpression) {
             final PrefixExpression pe= (PrefixExpression) node;
 
-            if (PrefixExpression.Operator.NOT.equals(pe.getOperator())) {
+            if (ASTNodes.hasOperator(pe, PrefixExpression.Operator.NOT)) {
                 if (other instanceof PrefixExpression
-                        && PrefixExpression.Operator.NOT.equals(((PrefixExpression) other).getOperator())) {
+                        && ASTNodes.hasOperator(((PrefixExpression) other), PrefixExpression.Operator.NOT)) {
                     return matchOpposite(pe.getOperand(), ((PrefixExpression) other).getOperand());
                 } else {
                     return safeSubtreeMatch(pe.getOperand(), other);
                 }
             }
         } else if (other instanceof PrefixExpression
-                && PrefixExpression.Operator.NOT.equals(((PrefixExpression) other).getOperator())) {
+                && ASTNodes.hasOperator(((PrefixExpression) other), PrefixExpression.Operator.NOT)) {
             return safeSubtreeMatch(node, ((PrefixExpression) other).getOperand());
         }
 
@@ -705,14 +705,14 @@ public class ASTSemanticMatcher extends ASTMatcher {
 
         if (ASTNodes.isPassive(leftOperand1) && ASTNodes.isPassive(rightOperand1) && ASTNodes.isPassive(leftOperand2) && ASTNodes.isPassive(rightOperand2)
                 && !ie1.hasExtendedOperands() && !ie2.hasExtendedOperands()) {
-            if ((InfixExpression.Operator.GREATER.equals(ie1.getOperator())
-                    && InfixExpression.Operator.GREATER_EQUALS.equals(ie2.getOperator()))
-                    || (InfixExpression.Operator.GREATER_EQUALS.equals(ie1.getOperator())
-                            && InfixExpression.Operator.GREATER.equals(ie2.getOperator()))
-                    || (InfixExpression.Operator.LESS.equals(ie1.getOperator())
-                            && InfixExpression.Operator.LESS_EQUALS.equals(ie2.getOperator()))
-                    || (InfixExpression.Operator.LESS_EQUALS.equals(ie1.getOperator())
-                            && InfixExpression.Operator.LESS.equals(ie2.getOperator()))) {
+            if ((ASTNodes.hasOperator(ie1, InfixExpression.Operator.GREATER)
+                    && ASTNodes.hasOperator(ie2, InfixExpression.Operator.GREATER_EQUALS))
+                    || (ASTNodes.hasOperator(ie1, InfixExpression.Operator.GREATER_EQUALS)
+                            && ASTNodes.hasOperator(ie2, InfixExpression.Operator.GREATER))
+                    || (ASTNodes.hasOperator(ie1, InfixExpression.Operator.LESS)
+                            && ASTNodes.hasOperator(ie2, InfixExpression.Operator.LESS_EQUALS))
+                    || (ASTNodes.hasOperator(ie1, InfixExpression.Operator.LESS_EQUALS)
+                            && ASTNodes.hasOperator(ie2, InfixExpression.Operator.LESS))) {
                 return safeSubtreeMatch(leftOperand1, rightOperand2) && safeSubtreeMatch(rightOperand1, leftOperand2);
             }
         }

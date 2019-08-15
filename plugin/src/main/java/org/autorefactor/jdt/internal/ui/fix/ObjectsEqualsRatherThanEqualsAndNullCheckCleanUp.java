@@ -151,7 +151,7 @@ public class ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp extends NewClassIm
         final IfStatement checkNullityStmt;
         final IfStatement checkEqualsStmt;
 
-        if (InfixExpression.Operator.EQUALS.equals(condition.getOperator())) {
+        if (ASTNodes.hasOperator(condition, InfixExpression.Operator.EQUALS)) {
             checkNullityStmt= ASTNodes.as(thenStmts.get(0), IfStatement.class);
             checkEqualsStmt= ASTNodes.as(elseStmts.get(0), IfStatement.class);
         } else {
@@ -168,9 +168,9 @@ public class ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp extends NewClassIm
             final List<Statement> equalsStmts= ASTNodes.asList(checkEqualsStmt.getThenStatement());
 
             if (nullityCondition != null && !nullityCondition.hasExtendedOperands()
-                    && InfixExpression.Operator.NOT_EQUALS.equals(nullityCondition.getOperator()) && nullityStmts != null
+                    && ASTNodes.hasOperator(nullityCondition, InfixExpression.Operator.NOT_EQUALS) && nullityStmts != null
                     && nullityStmts.size() == 1 && equalsCondition != null
-                    && PrefixExpression.Operator.NOT.equals(equalsCondition.getOperator()) && equalsStmts != null
+                    && ASTNodes.hasOperator(equalsCondition, PrefixExpression.Operator.NOT) && equalsStmts != null
                     && equalsStmts.size() == 1) {
                 return maybeReplaceEquals(node, firstField, nullityCondition, nullityStmts, equalsCondition,
                         equalsStmts, classesToUseWithImport, importsToAdd);
