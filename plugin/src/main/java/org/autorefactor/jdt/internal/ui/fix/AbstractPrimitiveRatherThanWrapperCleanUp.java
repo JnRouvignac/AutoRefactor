@@ -256,6 +256,7 @@ public abstract class AbstractPrimitiveRatherThanWrapperCleanUp extends Abstract
             if (isPrimitiveAllowed && aVar.getIdentifier().equals(varDecl.getName().getIdentifier())
                     && !aVar.getParent().equals(varDecl)) {
                 isPrimitiveAllowed= isPrimitiveAllowed(aVar);
+
                 if (!isPrimitiveAllowed) {
                     return interruptVisit();
                 }
@@ -276,14 +277,17 @@ public abstract class AbstractPrimitiveRatherThanWrapperCleanUp extends Abstract
 
             case ASSIGNMENT:
                 final Assignment assignment= (Assignment) parentNode;
+
                 if (getAssignmentOutSafeOperators().contains(assignment.getOperator())) {
                     return true;
-                } else if (assignment.getLeftHandSide().equals(node)) {
-                    return isNotNull(assignment.getRightHandSide());
-                } else {
-                    return assignment.getRightHandSide().equals(node) && assignment.getLeftHandSide() instanceof Name
-                            && isOfType((Name) assignment.getLeftHandSide());
                 }
+
+                if (assignment.getLeftHandSide().equals(node)) {
+                    return isNotNull(assignment.getRightHandSide());
+                }
+
+                return assignment.getRightHandSide().equals(node) && assignment.getLeftHandSide() instanceof Name
+                        && isOfType((Name) assignment.getLeftHandSide());
 
             case VARIABLE_DECLARATION_FRAGMENT:
                 final VariableDeclarationFragment fragment= (VariableDeclarationFragment) parentNode;
@@ -293,6 +297,7 @@ public abstract class AbstractPrimitiveRatherThanWrapperCleanUp extends Abstract
                 final ReturnStatement returnStmt= (ReturnStatement) parentNode;
                 if (returnStmt.getExpression().equals(node)) {
                     final MethodDeclaration method= ASTNodes.getAncestorOrNull(returnStmt, MethodDeclaration.class);
+
                     if (method != null && method.getReturnType2() != null) {
                         if (ASTNodes.hasType(method.getReturnType2().resolveBinding(), getPrimitiveTypeName())) {
                             return true;
@@ -301,16 +306,13 @@ public abstract class AbstractPrimitiveRatherThanWrapperCleanUp extends Abstract
                                 isVarReturned= true;
                                 autoBoxingCount++;
                             }
+
                             return true;
-                        } else {
-                            return false;
                         }
-                    } else {
-                        return false;
                     }
-                } else {
-                    return false;
                 }
+
+                return false;
 
             case CONDITIONAL_EXPRESSION:
                 final ConditionalExpression conditionalExpr= (ConditionalExpression) parentNode;
@@ -336,9 +338,9 @@ public abstract class AbstractPrimitiveRatherThanWrapperCleanUp extends Abstract
             } else if (ASTNodes.hasType(name.resolveTypeBinding(), getWrapperFullyQualifiedName())) {
                 autoBoxingCount++;
                 return true;
-            } else {
-                return false;
             }
+
+            return false;
         }
     }
 }
