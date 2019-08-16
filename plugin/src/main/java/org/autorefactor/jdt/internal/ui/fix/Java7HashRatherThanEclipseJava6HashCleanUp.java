@@ -617,7 +617,7 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 
         final List<Expression> copyOfFields= new ArrayList<Expression>(data.getFields().size());
 
-        for (final Expression simpleName : data.getFields()) {
+        for (Expression simpleName : data.getFields()) {
             copyOfFields.add(b.copy(simpleName));
         }
 

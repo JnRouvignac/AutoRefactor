@@ -141,7 +141,7 @@ public class LambdaCleanUp extends AbstractCleanUpRule {
                             remainingParams[i]= arguments.get(i + 1).resolveTypeBinding().getQualifiedName();
                         }
 
-                        for (final IMethodBinding methodBinding : calledType.getDeclaredMethods()) {
+                        for (IMethodBinding methodBinding : calledType.getDeclaredMethods()) {
                             if ((methodBinding.getModifiers() & Modifier.STATIC) == 0 && ASTNodes.usesGivenSignature(methodBinding,
                                     calledType.getQualifiedName(), mi.getName().getIdentifier(), remainingParams)) {
                                 return true;

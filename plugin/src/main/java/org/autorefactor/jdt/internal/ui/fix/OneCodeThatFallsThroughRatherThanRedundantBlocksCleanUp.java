@@ -110,7 +110,7 @@ public class OneCodeThatFallsThroughRatherThanRedundantBlocksCleanUp extends Abs
             IfStatement is= ASTNodes.as(node, IfStatement.class);
 
             if (ts != null && ts.getFinally() == null) {
-                for (final CatchClause catchClause : (List<CatchClause>) ts.catchClauses()) {
+                for (CatchClause catchClause : (List<CatchClause>) ts.catchClauses()) {
                     doCollectStatements(catchClause.getBody(), redundantStatements);
                 }
             } else if (is != null) {
@@ -152,7 +152,7 @@ public class OneCodeThatFallsThroughRatherThanRedundantBlocksCleanUp extends Abs
                 referenceStatements.add(nextSibling);
                 ASTNodeFactory b= ctx.getASTBuilder();
 
-                for (final Statement redundantStatement : redundantStatements) {
+                for (Statement redundantStatement : redundantStatements) {
                     List<Statement> stmtsToCompare= ASTNodes.asList(redundantStatement);
 
                     if (stmtsToCompare.size() > referenceStatements.size()) {

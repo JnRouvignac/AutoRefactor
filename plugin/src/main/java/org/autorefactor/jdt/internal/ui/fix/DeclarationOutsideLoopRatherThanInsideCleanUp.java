@@ -114,7 +114,7 @@ public class DeclarationOutsideLoopRatherThanInsideCleanUp extends AbstractClean
 
                 final List<VariableDeclarationStatement> candidates= new ArrayList<VariableDeclarationStatement>();
 
-                for (final Statement declarationStatement : forStatements) {
+                for (Statement declarationStatement : forStatements) {
                     final VariableDeclarationStatement decl= ASTNodes.as(declarationStatement, VariableDeclarationStatement.class);
 
                     if (decl != null && !Modifier.isFinal(decl.getModifiers()) && !hasAnnotation(decl.modifiers())
@@ -133,7 +133,7 @@ public class DeclarationOutsideLoopRatherThanInsideCleanUp extends AbstractClean
                 final ASTNodeFactory b= this.ctx.getASTBuilder();
                 final Refactorings r= this.ctx.getRefactorings();
 
-                for (final VariableDeclarationStatement candidate : candidates) {
+                for (VariableDeclarationStatement candidate : candidates) {
                     moveDeclaration(b, r, statement, candidate);
                     result= false;
                 }
@@ -145,7 +145,7 @@ public class DeclarationOutsideLoopRatherThanInsideCleanUp extends AbstractClean
 
     @SuppressWarnings("unchecked")
     private boolean hasAnnotation(final List<?> modifiers) {
-        for (final IExtendedModifier em : (List<IExtendedModifier>) modifiers) {
+        for (IExtendedModifier em : (List<IExtendedModifier>) modifiers) {
             if (!em.isModifier()) {
                 return true;
             }

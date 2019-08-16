@@ -147,7 +147,7 @@ public class RemoveEmptyStatementCleanUp extends AbstractCleanUpRule {
 
     private boolean arePassive(final List<?> initializers) {
         if (initializers != null) {
-            for (final Object initializer : initializers) {
+            for (Object initializer : initializers) {
                 if (!ASTNodes.isPassive((Expression) initializer)) {
                     return false;
                 }

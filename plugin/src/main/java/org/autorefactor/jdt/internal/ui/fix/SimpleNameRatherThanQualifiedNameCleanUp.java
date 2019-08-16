@@ -270,7 +270,7 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
                 final FqnType fqnType, final ASTNode node) {
             ITypeBinding superTypeBinding= typeBinding;
             do {
-                for (final IBinding binding : getDeclaredBinding(superTypeBinding, fqnType, node)) {
+                for (IBinding binding : getDeclaredBinding(superTypeBinding, fqnType, node)) {
                     if (binding.getName().equals(simpleName) && (Modifier.isPublic(binding.getModifiers())
                             || Modifier.isProtected(binding.getModifiers()) || (!Modifier.isPrivate(binding.getModifiers())
                                     && superTypeBinding.getPackage().equals(typeBinding.getPackage())))) {
@@ -290,7 +290,7 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
             while (enclosingType != null) {
                 final ITypeBinding enclosingTypeBinding= resolveEnclosingTypeBinding(enclosingType);
 
-                for (final IBinding binding : getDeclaredBinding(enclosingTypeBinding, fqnType, node)) {
+                for (IBinding binding : getDeclaredBinding(enclosingTypeBinding, fqnType, node)) {
                     if (binding.getName().equals(simpleName)) {
                         return enclosingTypeBinding;
                     }
@@ -527,7 +527,7 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
         final ITypeBinding typeBinding= node.resolveBinding();
         if (typeBinding != null && !typeBinding.isNested() && node.getParent() instanceof CompilationUnit) {
             final CompilationUnit compilationUnit= (CompilationUnit) node.getParent();
-            for (final ImportDeclaration importDecl : ASTNodes.imports(compilationUnit)) {
+            for (ImportDeclaration importDecl : ASTNodes.imports(compilationUnit)) {
                 readImport(importDecl);
             }
             importTypesFromPackage("java.lang", compilationUnit); //$NON-NLS-1$
@@ -651,7 +651,7 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
     @Override
     public boolean visit(MethodDeclaration node) {
         // Method parameters
-        for (final SingleVariableDeclaration parameter : ASTNodes.parameters(node)) {
+        for (SingleVariableDeclaration parameter : ASTNodes.parameters(node)) {
             if (!maybeReplaceFqnsWithSimpleNames(parameter)) {
                 return false;
             }
@@ -664,7 +664,7 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
 
         // Method body
         final Set<String> localIdentifiers= new HashSet<String>();
-        for (final SingleVariableDeclaration localParameter : ASTNodes.parameters(node)) {
+        for (SingleVariableDeclaration localParameter : ASTNodes.parameters(node)) {
             localIdentifiers.add(localParameter.getName().getIdentifier());
         }
         localIdentifiers.addAll(ASTNodes.getLocalVariableIdentifiers(node.getBody(), true));
@@ -679,7 +679,7 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
     private boolean maybeReplaceFqnsWithSimpleNames(final ASTNode node, final Set<String> localIdentifiers) {
         if (node != null) {
             final Iterable<QualifiedName> qualifiedNames= new QualifiedNamesCollector().collect(node);
-            for (final QualifiedName qualifiedName : qualifiedNames) {
+            for (QualifiedName qualifiedName : qualifiedNames) {
                 if (!maybeReplaceFqnWithSimpleName(qualifiedName, localIdentifiers)) {
                     return false;
                 }

@@ -179,7 +179,7 @@ public class BreakRatherThanPassiveIterationsCleanUp extends AbstractCleanUpRule
     public boolean visit(final ForStatement node) {
         final Set<String> vars= new HashSet<String>();
 
-        for (final Expression initializer : ASTNodes.initializers(node)) {
+        for (Expression initializer : ASTNodes.initializers(node)) {
             vars.addAll(ASTNodes.getLocalVariableIdentifiers(initializer, true));
         }
 
@@ -187,7 +187,7 @@ public class BreakRatherThanPassiveIterationsCleanUp extends AbstractCleanUpRule
             return true;
         }
 
-        for (final Expression updater : ASTNodes.updaters(node)) {
+        for (Expression updater : ASTNodes.updaters(node)) {
             if (hasSideEffect(updater, vars)) {
                 return true;
             }
@@ -229,11 +229,11 @@ public class BreakRatherThanPassiveIterationsCleanUp extends AbstractCleanUpRule
             if (ifStatement.getElseStatement() == null && !hasSideEffect(ifStatement.getExpression(), allowedVars)) {
                 final List<Statement> assignments= ASTNodes.asList(ifStatement.getThenStatement());
 
-                for (final Statement statement : assignments) {
+                for (Statement statement : assignments) {
                     if (statement instanceof VariableDeclarationStatement) {
                         final VariableDeclarationStatement decl= (VariableDeclarationStatement) statement;
 
-                        for (final Object obj : decl.fragments()) {
+                        for (Object obj : decl.fragments()) {
                             final VariableDeclarationFragment fragment= (VariableDeclarationFragment) obj;
 
                             if (!ASTNodes.isHardCoded(fragment.getInitializer())) {

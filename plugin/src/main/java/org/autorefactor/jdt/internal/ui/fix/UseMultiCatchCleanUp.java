@@ -406,7 +406,7 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
     }
 
     private void collectAllUnionedTypes(List<Type> results, Collection<Type> types) {
-        for (final Type type : types) {
+        for (Type type : types) {
             if (type instanceof UnionType) {
                 final UnionType ut= (UnionType) type;
                 collectAllUnionedTypes(results, ASTNodes.types(ut));

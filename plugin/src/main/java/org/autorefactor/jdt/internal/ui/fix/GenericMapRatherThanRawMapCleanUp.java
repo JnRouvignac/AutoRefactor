@@ -342,13 +342,13 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
                 valueTypes.add(argumentIterator.next().resolveTypeBinding());
             }
 
-            for (final ITypeBinding keyType : keyTypes) {
+            for (ITypeBinding keyType : keyTypes) {
                 if (!resolveKeyTypeCompatible(keyType)) {
                     return false;
                 }
             }
 
-            for (final ITypeBinding valueType : valueTypes) {
+            for (ITypeBinding valueType : valueTypes) {
                 if (!resolveValueTypeCompatible(valueType)) {
                     return false;
                 }

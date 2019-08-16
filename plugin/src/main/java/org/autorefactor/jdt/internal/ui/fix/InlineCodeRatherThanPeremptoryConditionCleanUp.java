@@ -137,7 +137,7 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
                 final Set<String> ifVariableNames= ASTNodes.getLocalVariableIdentifiers(unconditionnalStatement, false);
 
                 final Set<String> followingVariableNames= new HashSet<String>();
-                for (final Statement statement : ASTNodes.getNextSiblings(node)) {
+                for (Statement statement : ASTNodes.getNextSiblings(node)) {
                     followingVariableNames.addAll(ASTNodes.getLocalVariableIdentifiers(statement, true));
                 }
 

@@ -69,7 +69,7 @@ public class OppositeComparisonRatherThanNegativeExpressionCleanUp extends Abstr
             if (mi != null && mi.getExpression() != null && mi.arguments().size() == 1) {
                 final String[] classes= { Double.class.getCanonicalName(), Float.class.getCanonicalName(), Short.class.getCanonicalName(), Integer.class.getCanonicalName(), Long.class.getCanonicalName(), Character.class.getCanonicalName(), Byte.class.getCanonicalName(), Boolean.class.getCanonicalName() };
 
-                for (final String clazz : classes) {
+                for (String clazz : classes) {
                     if (ASTNodes.usesGivenSignature(mi, clazz, "compareTo", clazz) && ASTNodes.hasType((Expression) mi.arguments().get(0), clazz)) { //$NON-NLS-1$
                         reverseObjects(node, mi);
                         return false;

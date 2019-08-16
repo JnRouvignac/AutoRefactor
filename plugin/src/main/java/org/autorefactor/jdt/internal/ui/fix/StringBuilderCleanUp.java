@@ -204,7 +204,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
                             && isValuedStringLiteralOrConstant(results.get(0).getSecond())) {
                         isRefactoringNeeded.set(true);
                     }
-                    for (final Expression op : reversed) {
+                    for (Expression op : reversed) {
                         if (!isValuedStringLiteralOrConstant(reversed.get(0))) {
                             isRefactoringNeeded.set(true);
                         }
@@ -315,7 +315,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
         final List<Expression> finalStrings= new ArrayList<Expression>();
         final AtomicBoolean isFirst= new AtomicBoolean(true);
 
-        for (final Pair<ITypeBinding, Expression> appendedString : allAppendedStrings) {
+        for (Pair<ITypeBinding, Expression> appendedString : allAppendedStrings) {
             if (isValuedStringLiteralOrConstant(appendedString.getSecond())) {
                 tempStringLiterals.add(b.copy(appendedString.getSecond()));
             } else {
@@ -346,7 +346,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
         result= handleTempStringLiterals(b, lastExpression, isInstanceCreationToRewrite, result, tempStringLiterals,
                 finalStrings, isFirst);
 
-        for (final Expression finalString : finalStrings) {
+        for (Expression finalString : finalStrings) {
             if (result == null) {
                 result= finalString;
             } else {
@@ -516,7 +516,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
             boolean isFirstAndNotAString= isFirstAndNotAString(appendedStrings);
 
             List<Expression> concatenateStrings= new ArrayList<Expression>(appendedStrings.size());
-            for (final Pair<ITypeBinding, Expression> typeAndValue : appendedStrings) {
+            for (Pair<ITypeBinding, Expression> typeAndValue : appendedStrings) {
                 if (isFirstAndNotAString) {
                     concatenateStrings.add(b.invoke("String", "valueOf", getTypedExpression(b, typeAndValue))); //$NON-NLS-1$ $NON-NLS-2$
                     isFirstAndNotAString= false;

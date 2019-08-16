@@ -75,7 +75,7 @@ public class RemoveUselessBlockCleanUp extends AbstractCleanUpRule {
             final Set<String> ifVariableNames= ASTNodes.getLocalVariableIdentifiers(node, false);
 
             final Set<String> followingVariableNames= new HashSet<String>();
-            for (final Statement statement : ASTNodes.getNextSiblings(node)) {
+            for (Statement statement : ASTNodes.getNextSiblings(node)) {
                 followingVariableNames.addAll(ASTNodes.getLocalVariableIdentifiers(statement, true));
             }
 

@@ -134,7 +134,7 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
                 r.removeButKeepComment(node);
             } else {
                 List<Statement> orderedStatements= new ArrayList<Statement>(caseStmtsToRemove.get(0).size());
-                for (final Statement stmtToRemove : caseStmtsToRemove.get(0)) {
+                for (Statement stmtToRemove : caseStmtsToRemove.get(0)) {
                     orderedStatements.add(0, b.copy(stmtToRemove));
                 }
                 r.replace(node, b.block(orderedStatements.toArray(new Statement[caseStmtsToRemove.get(0).size()])));
@@ -162,7 +162,7 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
                 insertIdenticalCode(node, b, r, caseStmtsToRemove.get(0));
             } else {
                 List<Statement> orderedStatements= new ArrayList<Statement>(caseStmtsToRemove.get(0).size() + 1);
-                for (final Statement stmtToRemove : caseStmtsToRemove.get(0)) {
+                for (Statement stmtToRemove : caseStmtsToRemove.get(0)) {
                     orderedStatements.add(0, b.copy(stmtToRemove));
                 }
                 orderedStatements.add(0, b.move(node));
@@ -173,7 +173,7 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
 
     private void insertIdenticalCode(final IfStatement node, final ASTNodeFactory b, final Refactorings r,
             final List<Statement> stmtsToRemove) {
-        for (final Statement stmtToRemove : stmtsToRemove) {
+        for (Statement stmtToRemove : stmtsToRemove) {
             r.insertAfter(b.copy(stmtToRemove), node);
         }
     }

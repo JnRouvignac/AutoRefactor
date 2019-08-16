@@ -75,7 +75,7 @@ public class ImplicitDefaultConstructorRatherThanWrittenOneCleanUp extends Abstr
             boolean isPackageClass= true;
             boolean isPrivateClass= false;
 
-            for (final IExtendedModifier extendedModifier : ASTNodes.modifiers(node)) {
+            for (IExtendedModifier extendedModifier : ASTNodes.modifiers(node)) {
                 if (extendedModifier.isModifier()) {
                     final Modifier modifier= (Modifier) extendedModifier;
                     if (modifier.isPublic()) {
@@ -94,7 +94,7 @@ public class ImplicitDefaultConstructorRatherThanWrittenOneCleanUp extends Abstr
                 }
             }
 
-            for (final MethodDeclaration methodDeclaration : node.getMethods()) {
+            for (MethodDeclaration methodDeclaration : node.getMethods()) {
                 if (methodDeclaration.isConstructor()) {
                     if (uniqueConstructor == null) {
                         uniqueConstructor= methodDeclaration;
@@ -149,7 +149,7 @@ public class ImplicitDefaultConstructorRatherThanWrittenOneCleanUp extends Abstr
 
     private boolean isCheckedExceptionThrown(final MethodDeclaration uniqueConstructor) {
         if (uniqueConstructor.thrownExceptionTypes() != null) {
-            for (final Object type : uniqueConstructor.thrownExceptionTypes()) {
+            for (Object type : uniqueConstructor.thrownExceptionTypes()) {
                 if (isChecked((Type) type)) {
                     return true;
                 }

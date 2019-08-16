@@ -176,7 +176,7 @@ public class IfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRule {
             switchStructure.add(caseWithDefault);
         }
 
-        for (final Pair<List<Expression>, List<Statement>> caseStructure : switchStructure) {
+        for (Pair<List<Expression>, List<Statement>> caseStructure : switchStructure) {
             final Statement lastStatement= caseStructure.getSecond().get(caseStructure.getSecond().size() - 1);
 
             if (!ASTNodes.fallsThrough(lastStatement)) {

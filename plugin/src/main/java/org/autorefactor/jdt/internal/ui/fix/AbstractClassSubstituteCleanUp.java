@@ -245,7 +245,7 @@ public abstract class AbstractClassSubstituteCleanUp extends NewClassImportClean
         final ObjectInstantiationVisitor classCreationVisitor= new ObjectInstantiationVisitor(node);
         node.accept(classCreationVisitor);
 
-        for (final ClassInstanceCreation instanceCreation : classCreationVisitor.getObjectInstantiations()) {
+        for (ClassInstanceCreation instanceCreation : classCreationVisitor.getObjectInstantiations()) {
             final List<VariableDeclaration> varDecls= new ArrayList<VariableDeclaration>();
             final List<MethodInvocation> methodCallsToRefactor= new ArrayList<MethodInvocation>();
 
@@ -276,7 +276,7 @@ public abstract class AbstractClassSubstituteCleanUp extends NewClassImportClean
 
     private boolean canVarOccurrenceBeRefactored0(final Block node, final List<VariableDeclaration> varDecls,
             final List<MethodInvocation> methodCallsToRefactor, final List<VariableDeclaration> otherVarDecls) {
-        for (final VariableDeclaration varDecl : varDecls) {
+        for (VariableDeclaration varDecl : varDecls) {
             final VarOccurrenceVisitor varOccurrenceVisitor= new VarOccurrenceVisitor(varDecl);
 
             final Statement parent= ASTNodes.getAncestorOrNull(varDecl, Statement.class);
@@ -290,7 +290,7 @@ public abstract class AbstractClassSubstituteCleanUp extends NewClassImportClean
                 return false;
             }
 
-            for (final SimpleName varOccurrence : varOccurrenceVisitor.getVarOccurrences()) {
+            for (SimpleName varOccurrence : varOccurrenceVisitor.getVarOccurrences()) {
                 final List<VariableDeclaration> subVarDecls= new ArrayList<VariableDeclaration>();
                 if (!canBeRefactored(node, varOccurrence, varOccurrence.resolveTypeBinding(), subVarDecls,
                         methodCallsToRefactor)) {
@@ -314,13 +314,13 @@ public abstract class AbstractClassSubstituteCleanUp extends NewClassImportClean
             originalInstanceCreation.setType(substituteType);
         }
 
-        for (final MethodInvocation methodCall : methodCallsToRefactor) {
+        for (MethodInvocation methodCall : methodCallsToRefactor) {
             final MethodInvocation copyOfMethodCall= b.copySubtree(methodCall);
             refactorMethod(b, methodCall, copyOfMethodCall);
             ctx.getRefactorings().replace(methodCall, copyOfMethodCall);
         }
 
-        for (final VariableDeclaration variableDecl : variableDecls) {
+        for (VariableDeclaration variableDecl : variableDecls) {
             final VariableDeclarationStatement oldDeclareStatement= (VariableDeclarationStatement) variableDecl.getParent();
             final Type substituteVarType= substituteType(b, oldDeclareStatement.getType(),
                     (ASTNode) oldDeclareStatement.fragments().get(0), classesToUseWithImport, importsToAdd);

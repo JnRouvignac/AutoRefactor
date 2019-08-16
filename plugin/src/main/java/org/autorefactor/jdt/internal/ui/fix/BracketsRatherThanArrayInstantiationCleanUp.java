@@ -107,7 +107,7 @@ public class BracketsRatherThanArrayInstantiationCleanUp extends AbstractCleanUp
         @SuppressWarnings("unchecked")
         final List<Expression> dimensions= node.dimensions();
 
-        for (final Expression dimension : dimensions) {
+        for (Expression dimension : dimensions) {
             final Object dimensionLiteral= dimension.resolveConstantExpressionValue();
 
             if (!(dimensionLiteral instanceof Number) || ((Number) dimensionLiteral).longValue() != 0) {

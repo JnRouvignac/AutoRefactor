@@ -83,7 +83,7 @@ public class IfRatherThanWhileAndFallsThroughCleanUp extends AbstractCleanUpRule
 
             if (breakVisitor.canBeRefactored()) {
                 final ASTNodeFactory b= ctx.getASTBuilder();
-                for (final BreakStatement breakStatement : breakVisitor.getBreaks()) {
+                for (BreakStatement breakStatement : breakVisitor.getBreaks()) {
                     ctx.getRefactorings().remove(breakStatement);
                 }
                 ctx.getRefactorings().replace(node, b.if0(b.copy(node.getExpression()), b.copy(node.getBody())));

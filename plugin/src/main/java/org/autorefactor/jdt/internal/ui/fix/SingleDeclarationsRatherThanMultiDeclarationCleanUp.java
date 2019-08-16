@@ -131,7 +131,7 @@ public class SingleDeclarationsRatherThanMultiDeclarationCleanUp extends Abstrac
     @SuppressWarnings({ "rawtypes", "unchecked" }) // $NON-NLS-2$
     private void updateModifiers(final ASTNodeFactory b, final List modifiers, final List newModifiers) {
         newModifiers.clear();
-        for (final Object modifier : modifiers) {
+        for (Object modifier : modifiers) {
             newModifiers.add(b.copy((ASTNode) modifier));
         }
     }

@@ -173,7 +173,7 @@ public class SuperCallRatherThanUselessOverridingCleanUp extends AbstractCleanUp
     }
 
     private boolean hasSignificantAnnotations(final IMethodBinding methodBinding) {
-        for (final IAnnotationBinding annotation : methodBinding.getAnnotations()) {
+        for (IAnnotationBinding annotation : methodBinding.getAnnotations()) {
             final ITypeBinding annotationType= annotation.getAnnotationType();
 
             if (!ASTNodes.hasType(annotationType, Override.class.getCanonicalName(), SuppressWarnings.class.getCanonicalName())) {

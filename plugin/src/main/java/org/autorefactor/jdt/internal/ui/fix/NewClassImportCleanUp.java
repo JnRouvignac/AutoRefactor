@@ -128,7 +128,7 @@ public abstract class NewClassImportCleanUp extends AbstractCleanUpRule {
             importsByPackage.put(getPackageName(clazz), clazz);
         }
 
-        for (final Object anObject : cu.imports()) {
+        for (Object anObject : cu.imports()) {
             final ImportDeclaration anImport= (ImportDeclaration) anObject;
 
             if (anImport.isOnDemand()) {

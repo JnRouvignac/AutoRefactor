@@ -109,7 +109,7 @@ public class LogParametersRatherThanLogMessageCleanUp extends AbstractCleanUpRul
         boolean hasLiteral= false;
         boolean hasObjects= false;
 
-        for (final Expression string : strings) {
+        for (Expression string : strings) {
             if (string instanceof StringLiteral) {
                 hasLiteral= true;
                 final String literal= (String) string.resolveConstantExpressionValue();

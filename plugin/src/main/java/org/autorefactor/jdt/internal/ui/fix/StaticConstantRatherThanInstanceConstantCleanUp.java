@@ -79,7 +79,7 @@ public class StaticConstantRatherThanInstanceConstantCleanUp extends AbstractCle
                 || ASTNodes.hasType(node.getType().resolveBinding(), Double.class.getCanonicalName())
                 || ASTNodes.hasType(node.getType().resolveBinding(), String.class.getCanonicalName())) {
             Modifier finalModifier= null;
-            for (final Modifier modifier : getModifiersOnly(ASTNodes.modifiers(node))) {
+            for (Modifier modifier : getModifiersOnly(ASTNodes.modifiers(node))) {
                 if (modifier.isStatic()) {
                     return true;
                 }
@@ -110,7 +110,7 @@ public class StaticConstantRatherThanInstanceConstantCleanUp extends AbstractCle
 
     private List<Modifier> getModifiersOnly(final Collection<IExtendedModifier> modifiers) {
         final List<Modifier> results= new LinkedList<Modifier>();
-        for (final IExtendedModifier em : modifiers) {
+        for (IExtendedModifier em : modifiers) {
             if (em.isModifier()) {
                 results.add((Modifier) em);
             }

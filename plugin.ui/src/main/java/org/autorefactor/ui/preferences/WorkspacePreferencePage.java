@@ -143,7 +143,7 @@ public class WorkspacePreferencePage extends PreferencePage implements IWorkbenc
         spacer.setLayoutData(new GridData(0, 5));
 
         rules= new ArrayList<BooleanFieldEditor>(allRefactoringRules.size());
-        for (final RefactoringRule refactoringRule : allRefactoringRules) {
+        for (RefactoringRule refactoringRule : allRefactoringRules) {
             final BooleanFieldEditor booleanFieldEditor= new BooleanFieldEditor(getPropertyName(refactoringRule),
                     refactoringRule.getName(), SWT.WRAP, ruleGroup);
             booleanFieldEditor.getDescriptionControl(ruleGroup).setToolTipText(refactoringRule.getDescription());
@@ -172,7 +172,7 @@ public class WorkspacePreferencePage extends PreferencePage implements IWorkbenc
 
     private void invalidateToggleRules(final Composite ruleGroup) {
         boolean isAllRulesChecked= true;
-        for (final BooleanFieldEditor rule : WorkspacePreferencePage.this.rules) {
+        for (BooleanFieldEditor rule : WorkspacePreferencePage.this.rules) {
             isAllRulesChecked= ((Button) rule.getDescriptionControl(ruleGroup)).getSelection();
             if (!isAllRulesChecked) {
                 break;
@@ -184,7 +184,7 @@ public class WorkspacePreferencePage extends PreferencePage implements IWorkbenc
     /** Initialize. */
     protected void initialize() {
         if (fields != null) {
-            for (final FieldEditor field : fields) {
+            for (FieldEditor field : fields) {
                 field.setPage(this);
                 field.setPreferenceStore(getPreferenceStore());
                 field.load();
@@ -198,7 +198,7 @@ public class WorkspacePreferencePage extends PreferencePage implements IWorkbenc
         invalidFieldEditor= null;
 
         if (fields != null) {
-            for (final FieldEditor field : fields) {
+            for (FieldEditor field : fields) {
                 valid= field.isValid();
                 if (!valid) {
                     invalidFieldEditor= field;
@@ -220,7 +220,7 @@ public class WorkspacePreferencePage extends PreferencePage implements IWorkbenc
     @Override
     protected void performDefaults() {
         if (fields != null) {
-            for (final FieldEditor field : fields) {
+            for (FieldEditor field : fields) {
                 field.loadDefault();
             }
         }
@@ -232,7 +232,7 @@ public class WorkspacePreferencePage extends PreferencePage implements IWorkbenc
     @Override
     public boolean performOk() {
         if (fields != null) {
-            for (final FieldEditor field : fields) {
+            for (FieldEditor field : fields) {
                 field.store();
             }
         }

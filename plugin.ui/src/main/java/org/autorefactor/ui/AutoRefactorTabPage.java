@@ -137,7 +137,7 @@ public class AutoRefactorTabPage extends CleanUpTabPage {
 
         rules= new ArrayList<BooleanFieldEditor>(allRefactoringRules.size());
 
-        for (final RefactoringRule refactoringRule : allRefactoringRules) {
+        for (RefactoringRule refactoringRule : allRefactoringRules) {
             final BooleanFieldEditor booleanFieldEditor= new BooleanFieldEditor(getPropertyName(refactoringRule),
                     refactoringRule.getName(), SWT.WRAP, ruleGroup);
 
@@ -175,7 +175,7 @@ public class AutoRefactorTabPage extends CleanUpTabPage {
 
     private void invalidateToggleRules(final Composite ruleGroup) {
         boolean isAllRulesChecked= true;
-        for (final BooleanFieldEditor rule : this.rules) {
+        for (BooleanFieldEditor rule : this.rules) {
             isAllRulesChecked= ((Button) rule.getDescriptionControl(ruleGroup)).getSelection();
             if (!isAllRulesChecked) {
                 break;
@@ -187,7 +187,7 @@ public class AutoRefactorTabPage extends CleanUpTabPage {
     /** Initialize. */
     protected void initialize() {
         if (fields != null) {
-            for (final FieldEditor field : fields) {
+            for (FieldEditor field : fields) {
                 field.setPreferenceStore(AutoRefactorPlugin.getDefault().getPreferenceStore());
                 field.load();
             }
@@ -226,7 +226,7 @@ public class AutoRefactorTabPage extends CleanUpTabPage {
         int selectedCleanups= 0;
 
         if (fields != null) {
-            for (final FieldEditor field : fields) {
+            for (FieldEditor field : fields) {
                 if (((BooleanFieldEditor) field).getBooleanValue()) {
                     selectedCleanups++;
                 }
@@ -243,7 +243,7 @@ public class AutoRefactorTabPage extends CleanUpTabPage {
      */
     public void setOptions(CleanUpOptions options) {
         if (fields != null) {
-            for (final FieldEditor field : fields) {
+            for (FieldEditor field : fields) {
                 final String isPreferenceEnabled= ((BooleanFieldEditor) field).getBooleanValue() ? CleanUpOptions.TRUE
                         : CleanUpOptions.FALSE;
 
