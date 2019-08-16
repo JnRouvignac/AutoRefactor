@@ -120,7 +120,7 @@ public class NoAssignmentInIfConditionCleanUp extends AbstractCleanUpRule {
                 setResult(false);
                 return false;
             } else if (!isAnElseIf(node)) {
-                r.insertBefore(b.toStmt(b.move(a)), node);
+                r.insertBefore(b.toStatement(b.move(a)), node);
                 r.replace(ASTNodes.getParent(a, ParenthesizedExpression.class), b.copy(lhs));
                 setResult(false);
                 return false;
@@ -129,10 +129,10 @@ public class NoAssignmentInIfConditionCleanUp extends AbstractCleanUpRule {
         }
 
         private VariableDeclarationFragment findVariableDeclarationFragment(final VariableDeclarationStatement vds,
-                final Expression expr) {
-            if (vds != null && expr instanceof SimpleName) {
+                final Expression expression) {
+            if (vds != null && expression instanceof SimpleName) {
                 for (VariableDeclarationFragment vdf : ASTNodes.fragments(vds)) {
-                    if (ASTNodes.isSameVariable(expr, vdf)) {
+                    if (ASTNodes.isSameVariable(expression, vdf)) {
                         return vdf;
                     }
                 }

@@ -53,7 +53,7 @@ public class DoWhileRatherThanDuplicateCodeSample {
         }
     }
 
-    public void doNotReplaceWithMissingStmt(int i) {
+    public void doNotReplaceWithMissingStatement(int i) {
         System.out.println("A statement");
         while (i-- > 0) {
             System.out.println("A statement");

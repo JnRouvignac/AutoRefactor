@@ -280,14 +280,14 @@ public abstract class AbstractUnitTestCleanUp extends AbstractCleanUpRule {
         return true;
     }
 
-    private boolean isVariableNamedExpected(final Expression expr) {
-        switch (expr.getNodeType()) {
+    private boolean isVariableNamedExpected(final Expression expression) {
+        switch (expression.getNodeType()) {
         case SIMPLE_NAME:
-            final SimpleName sn= (SimpleName) expr;
+            final SimpleName sn= (SimpleName) expression;
             return AbstractUnitTestCleanUp.levenshteinDistance(sn.getIdentifier().toLowerCase(), "expected") <= 3; //$NON-NLS-1$
 
         case QUALIFIED_NAME:
-            final QualifiedName qn= (QualifiedName) expr;
+            final QualifiedName qn= (QualifiedName) expression;
             return isVariableNamedExpected(qn.getName());
 
         default:
@@ -307,7 +307,7 @@ public abstract class AbstractUnitTestCleanUp extends AbstractCleanUpRule {
             final MethodInvocation newMethod) {
         if (nodeToReplace instanceof Statement) {
             // The new node should be also a statement
-            return b.toStmt(newMethod);
+            return b.toStatement(newMethod);
         } else {
             return newMethod;
         }

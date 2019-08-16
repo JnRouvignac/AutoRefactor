@@ -78,44 +78,44 @@ public class DeclarationOutsideLoopRatherThanInsideCleanUp extends AbstractClean
 
     @Override
     public boolean visit(final Block node) {
-        final List<Statement> blockStmt= ASTNodes.asList(node);
+        final List<Statement> blockStatement= ASTNodes.asList(node);
         boolean result= true;
 
-        List<Statement> forStmts;
-        for (int i= 0; i < blockStmt.size(); i++) {
-            final Statement stmt= blockStmt.get(i);
-            final ForStatement forStatement= ASTNodes.as(stmt, ForStatement.class);
-            final EnhancedForStatement enhancedForStatement= ASTNodes.as(stmt, EnhancedForStatement.class);
-            final WhileStatement whileStatement= ASTNodes.as(stmt, WhileStatement.class);
-            final DoStatement doStatement= ASTNodes.as(stmt, DoStatement.class);
-            forStmts= null;
+        List<Statement> forStatements;
+        for (int i= 0; i < blockStatement.size(); i++) {
+            final Statement statement= blockStatement.get(i);
+            final ForStatement forStatement= ASTNodes.as(statement, ForStatement.class);
+            final EnhancedForStatement enhancedForStatement= ASTNodes.as(statement, EnhancedForStatement.class);
+            final WhileStatement whileStatement= ASTNodes.as(statement, WhileStatement.class);
+            final DoStatement doStatement= ASTNodes.as(statement, DoStatement.class);
+            forStatements= null;
 
             if (forStatement != null) {
-                forStmts= ASTNodes.asList(forStatement.getBody());
+                forStatements= ASTNodes.asList(forStatement.getBody());
             } else if (enhancedForStatement != null) {
-                forStmts= ASTNodes.asList(enhancedForStatement.getBody());
+                forStatements= ASTNodes.asList(enhancedForStatement.getBody());
             } else if (whileStatement != null) {
-                forStmts= ASTNodes.asList(whileStatement.getBody());
+                forStatements= ASTNodes.asList(whileStatement.getBody());
             } else if (doStatement != null) {
-                forStmts= ASTNodes.asList(doStatement.getBody());
+                forStatements= ASTNodes.asList(doStatement.getBody());
             }
 
-            if (forStmts != null) {
+            if (forStatements != null) {
                 final Set<String> varNames= new HashSet<String>();
 
                 for (int j= 0; j < i; j++) {
-                    if (!(blockStmt.get(j) instanceof Block)) {
-                        varNames.addAll(ASTNodes.getLocalVariableIdentifiers(blockStmt.get(j), false));
+                    if (!(blockStatement.get(j) instanceof Block)) {
+                        varNames.addAll(ASTNodes.getLocalVariableIdentifiers(blockStatement.get(j), false));
                     }
                 }
-                for (int j= i + 1; j < blockStmt.size(); j++) {
-                    varNames.addAll(ASTNodes.getLocalVariableIdentifiers(blockStmt.get(j), true));
+                for (int j= i + 1; j < blockStatement.size(); j++) {
+                    varNames.addAll(ASTNodes.getLocalVariableIdentifiers(blockStatement.get(j), true));
                 }
 
                 final List<VariableDeclarationStatement> candidates= new ArrayList<VariableDeclarationStatement>();
 
-                for (final Statement forStmt : forStmts) {
-                    final VariableDeclarationStatement decl= ASTNodes.as(forStmt, VariableDeclarationStatement.class);
+                for (final Statement declarationStatement : forStatements) {
+                    final VariableDeclarationStatement decl= ASTNodes.as(declarationStatement, VariableDeclarationStatement.class);
 
                     if (decl != null && !Modifier.isFinal(decl.getModifiers()) && !hasAnnotation(decl.modifiers())
                             && decl.fragments() != null && decl.fragments().size() == 1) {
@@ -134,7 +134,7 @@ public class DeclarationOutsideLoopRatherThanInsideCleanUp extends AbstractClean
                 final Refactorings r= this.ctx.getRefactorings();
 
                 for (final VariableDeclarationStatement candidate : candidates) {
-                    moveDeclaration(b, r, stmt, candidate);
+                    moveDeclaration(b, r, statement, candidate);
                     result= false;
                 }
             }
@@ -154,18 +154,18 @@ public class DeclarationOutsideLoopRatherThanInsideCleanUp extends AbstractClean
         return false;
     }
 
-    private void moveDeclaration(final ASTNodeFactory b, final Refactorings r, final Statement stmt,
+    private void moveDeclaration(final ASTNodeFactory b, final Refactorings r, final Statement statement,
             final VariableDeclarationStatement varToMove) {
         final VariableDeclarationFragment fragment= (VariableDeclarationFragment) varToMove.fragments().get(0);
 
         if (fragment.getInitializer() != null) {
             final Type copyOfType= b.copy(varToMove.getType());
             final SimpleName name= fragment.getName();
-            r.insertBefore(b.declareStmt(copyOfType, b.declareFragment(b.copy(name))), stmt);
+            r.insertBefore(b.declareStatement(copyOfType, b.declareFragment(b.copy(name))), statement);
             r.replace(varToMove,
-                    b.toStmt(b.assign(b.copy(name), Assignment.Operator.ASSIGN, b.copy(fragment.getInitializer()))));
+                    b.toStatement(b.assign(b.copy(name), Assignment.Operator.ASSIGN, b.copy(fragment.getInitializer()))));
         } else {
-            r.insertBefore(b.copy(varToMove), stmt);
+            r.insertBefore(b.copy(varToMove), statement);
             r.remove(varToMove);
         }
     }

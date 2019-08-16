@@ -117,9 +117,9 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
         @Override
         public boolean match(BooleanLiteral node, Object other) {
             if (other instanceof Expression) {
-                final Expression expr= (Expression) other;
-                if (BooleanCleanUp.areOppositeBooleanValues(node, expr)) {
-                    matches.put(expr, node);
+                final Expression expression= (Expression) other;
+                if (BooleanCleanUp.areOppositeBooleanValues(node, expression)) {
+                    matches.put(expression, node);
                     return true;
                 }
             }
@@ -129,9 +129,9 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
         @Override
         public boolean match(QualifiedName node, Object other) {
             if (other instanceof Expression) {
-                final Expression expr= (Expression) other;
-                if (this.previousMatches.containsKey(other) || BooleanCleanUp.areOppositeBooleanValues(node, expr)) {
-                    matches.put(expr, node);
+                final Expression expression= (Expression) other;
+                if (this.previousMatches.containsKey(other) || BooleanCleanUp.areOppositeBooleanValues(node, expression)) {
+                    matches.put(expression, node);
                     return true;
                 }
             }
@@ -191,8 +191,8 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
                 } else {
                     orientedCondition= b.negate(ifCondition, Copy.COPY);
                 }
-                final Expression expr= getExpression(orientedCondition, boolean.class.getSimpleName(), null);
-                replaceInParent(node, expr);
+                final Expression expression= getExpression(orientedCondition, boolean.class.getSimpleName(), null);
+                replaceInParent(node, expression);
             }
             return false;
         }
@@ -209,8 +209,8 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
                     } else {
                         orientedCondition= b.negate(ifCondition, Copy.COPY);
                     }
-                    final Expression expr= getExpression(orientedCondition, Boolean.class.getCanonicalName(), booleanName);
-                    replaceInParent(node, expr);
+                    final Expression expression= getExpression(orientedCondition, Boolean.class.getCanonicalName(), booleanName);
+                    replaceInParent(node, expression);
                 }
             }
             return false;
@@ -261,7 +261,7 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
         return true;
     }
 
-    private boolean withThenReturnStmt(IfStatement node, ReturnStatement thenRs, ReturnStatement elseRs) {
+    private boolean withThenReturnStatement(IfStatement node, ReturnStatement thenRs, ReturnStatement elseRs) {
         ReturnStatement newRs= getReturnStatement(node, thenRs.getExpression(), elseRs.getExpression());
         if (newRs != null) {
             ctx.getRefactorings().replace(node, newRs);
@@ -286,7 +286,7 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
         return true;
     }
 
-    private boolean noThenReturnStmt(final IfStatement node) {
+    private boolean noThenReturnStatement(final IfStatement node) {
         final Assignment thenA= ASTNodes.asExpression(node.getThenStatement(), Assignment.class);
         if (ASTNodes.hasOperator(thenA, Assignment.Operator.ASSIGN) && ASTNodes.asList(node.getElseStatement()).isEmpty()
                 && (thenA.getLeftHandSide() instanceof Name || thenA.getLeftHandSide() instanceof FieldAccess)) {
@@ -336,27 +336,27 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
         return true;
     }
 
-    private Statement toSingleStmt(final Statement stmt) {
-        if (stmt instanceof Block) {
-            final List<Statement> stmts= ASTNodes.asList(stmt);
-            if (stmts.size() == 1) {
-                return stmts.get(0);
+    private Statement toSingleStatement(final Statement statement) {
+        if (statement instanceof Block) {
+            final List<Statement> statements= ASTNodes.asList(statement);
+            if (statements.size() == 1) {
+                return statements.get(0);
             }
         }
-        return stmt;
+        return statement;
     }
 
     private ReturnStatement getReturnStatement(IfStatement node, Boolean thenBool, Boolean elseBool,
-            Expression thenExpr, Expression elseExpr) {
+            Expression thenExpression, Expression elseExpression) {
         if (thenBool == null && elseBool != null) {
-            final Expression leftOp= signExpr(b.parenthesizeIfNeeded(b.copy(node.getExpression())), !elseBool);
-            return b.return0(b.infixExpr(leftOp, getConditionalOperator(elseBool.booleanValue()),
-                    b.parenthesizeIfNeeded(b.copy(thenExpr))));
+            final Expression leftOp= signExpression(b.parenthesizeIfNeeded(b.copy(node.getExpression())), !elseBool);
+            return b.return0(b.infixExpression(leftOp, getConditionalOperator(elseBool.booleanValue()),
+                    b.parenthesizeIfNeeded(b.copy(thenExpression))));
         } else if (thenBool != null && elseBool == null) {
-            final Expression leftOp= signExpr(b.parenthesizeIfNeeded(b.copy(node.getExpression())),
+            final Expression leftOp= signExpression(b.parenthesizeIfNeeded(b.copy(node.getExpression())),
                     thenBool.booleanValue());
-            return b.return0(b.infixExpr(leftOp, getConditionalOperator(thenBool.booleanValue()),
-                    b.parenthesizeIfNeeded(b.copy(elseExpr))));
+            return b.return0(b.infixExpression(leftOp, getConditionalOperator(thenBool.booleanValue()),
+                    b.parenthesizeIfNeeded(b.copy(elseExpression))));
         }
         return null;
     }
@@ -365,7 +365,7 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
         return isOrOperator ? InfixExpression.Operator.CONDITIONAL_OR : InfixExpression.Operator.CONDITIONAL_AND;
     }
 
-    private Expression signExpr(Expression ie, boolean isPositive) {
+    private Expression signExpression(Expression ie, boolean isPositive) {
         if (isPositive) {
             return ie;
         }
@@ -373,12 +373,12 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
     }
 
     private VariableDeclarationFragment getVariableDeclarationFragment(final VariableDeclarationStatement vds,
-            final Expression expr) {
+            final Expression expression) {
         if (vds == null) {
             return null;
         }
         for (VariableDeclarationFragment vdf : ASTNodes.fragments(vds)) {
-            if (ASTNodes.isSameVariable(expr, vdf)) {
+            if (ASTNodes.isSameVariable(expression, vdf)) {
                 return vdf;
             }
         }
@@ -394,9 +394,9 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
             }
 
             final MethodDeclaration md= ASTNodes.getAncestor(node, MethodDeclaration.class);
-            final Expression returnExpr= getReturnExpression(md, exprToReturn);
-            if (returnExpr != null) {
-                return b.return0(returnExpr);
+            final Expression returnExpression= getReturnExpression(md, exprToReturn);
+            if (returnExpression != null) {
+                return b.return0(returnExpression);
             }
         }
         return null;
@@ -441,15 +441,15 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
             // care
             if (thenLiteral != null && elseLiteral == null) {
                 if (thenLiteral) {
-                    return b.infixExpr(b.copy(condition), InfixExpression.Operator.CONDITIONAL_OR, b.copy(elseExpression));
+                    return b.infixExpression(b.copy(condition), InfixExpression.Operator.CONDITIONAL_OR, b.copy(elseExpression));
                 } else {
-                    return b.infixExpr(b.negate(condition, Copy.COPY), InfixExpression.Operator.CONDITIONAL_AND, b.copy(elseExpression));
+                    return b.infixExpression(b.negate(condition, Copy.COPY), InfixExpression.Operator.CONDITIONAL_AND, b.copy(elseExpression));
                 }
             } else if (thenLiteral == null && elseLiteral != null) {
                 if (elseLiteral) {
-                    return b.infixExpr(b.negate(condition, Copy.COPY), InfixExpression.Operator.CONDITIONAL_OR, b.copy(thenExpression));
+                    return b.infixExpression(b.negate(condition, Copy.COPY), InfixExpression.Operator.CONDITIONAL_OR, b.copy(thenExpression));
                 } else {
-                    return b.infixExpr(b.copy(condition), InfixExpression.Operator.CONDITIONAL_AND, b.copy(thenExpression));
+                    return b.infixExpression(b.copy(condition), InfixExpression.Operator.CONDITIONAL_AND, b.copy(thenExpression));
                 }
             }
         }
@@ -494,17 +494,17 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
                     && (matcher.matches.size() <= 1 || node.getExpression() instanceof Name)) {
                 // Then and else statement are matching, bar the boolean values
                 // which are opposite
-                final Statement copyStmt= b.copySubtree(node.getThenStatement());
+                final Statement copyStatement= b.copySubtree(node.getThenStatement());
                 // Identify the node that need to be replaced after the copy
                 final BooleanASTMatcher matcher2= new BooleanASTMatcher(matcher.matches);
 
-                if (ASTNodes.match(matcher2, copyStmt, node.getElseStatement())) {
+                if (ASTNodes.match(matcher2, copyStatement, node.getElseStatement())) {
                     final Expression ifCondition= node.getExpression();
-                    copyStmt.accept(
+                    copyStatement.accept(
                             new BooleanReplaceVisitor(ifCondition, matcher2.matches.values(), getBooleanName(node)));
                     // Make sure to keep curly braces if the node is an else statement
                     ctx.getRefactorings().replace(node,
-                            isElseStatementOfParent(node) ? copyStmt : toSingleStmt(copyStmt));
+                            isElseStatementOfParent(node) ? copyStatement : toSingleStatement(copyStatement));
                     return false;
                 }
             }
@@ -517,9 +517,9 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
                     node.getElseStatement() != null ? node.getElseStatement() : ASTNodes.getNextSibling(node),
                     ReturnStatement.class);
 
-            return (elseRs == null) || withThenReturnStmt(node, thenRs, elseRs);
+            return (elseRs == null) || withThenReturnStatement(node, thenRs, elseRs);
         } else {
-            return noThenReturnStmt(node);
+            return noThenReturnStatement(node);
         }
     }
 }

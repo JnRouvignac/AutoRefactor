@@ -108,12 +108,12 @@ public class OneIfRatherThanDuplicateBlocksThatFallThroughCleanUp extends Abstra
                         && !ctx.getRefactorings().hasBeenRefactored(nextSibling)) {
                     final IfStatement nextIf= (IfStatement) nextSibling;
 
-                    final List<Statement> lastIfStmts= ASTNodes.asList(
+                    final List<Statement> lastIfStatements= ASTNodes.asList(
                             duplicateIfBlocks.get(duplicateIfBlocks.size() - 1).getThenStatement());
-                    final List<Statement> nextIfStmts= ASTNodes.asList(nextIf.getThenStatement());
-                    if (lastIfStmts != null && !lastIfStmts.isEmpty()
-                            && ASTNodes.fallsThrough(lastIfStmts.get(lastIfStmts.size() - 1))
-                            && ASTNodes.match(lastIfStmts, nextIfStmts)) {
+                    final List<Statement> nextIfStatements= ASTNodes.asList(nextIf.getThenStatement());
+                    if (lastIfStatements != null && !lastIfStatements.isEmpty()
+                            && ASTNodes.fallsThrough(lastIfStatements.get(lastIfStatements.size() - 1))
+                            && ASTNodes.match(lastIfStatements, nextIfStatements)) {
                         duplicateIfBlocks.add(nextIf);
                         return true;
                     }
@@ -131,7 +131,7 @@ public class OneIfRatherThanDuplicateBlocksThatFallThroughCleanUp extends Abstra
             Expression newCondition= b.parenthesizeIfNeeded(b.copy(iterator.next().getExpression()));
 
             while (iterator.hasNext()) {
-                newCondition= b.infixExpr(newCondition, InfixExpression.Operator.CONDITIONAL_OR,
+                newCondition= b.infixExpression(newCondition, InfixExpression.Operator.CONDITIONAL_OR,
                         b.parenthesizeIfNeeded(b.copy(iterator.next().getExpression())));
             }
 

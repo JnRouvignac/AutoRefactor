@@ -71,15 +71,15 @@ public class StringCleanUp extends AbstractCleanUpRule {
 
     @Override
     public boolean visit(MethodInvocation node) {
-        final Expression expr= node.getExpression();
+        final Expression stringExpression= node.getExpression();
         final ASTNode parent= node.getParent();
         final ASTNodeFactory b= this.ctx.getASTBuilder();
         final Refactorings r= ctx.getRefactorings();
         final boolean isStringValueOf= isStringValueOf(node);
         if (ASTNodes.usesGivenSignature(node, Object.class.getCanonicalName(), "toString")) { //$NON-NLS-1$
-            if (ASTNodes.hasType(expr, String.class.getCanonicalName())) {
+            if (ASTNodes.hasType(stringExpression, String.class.getCanonicalName())) {
                 // If node is already a String, no need to call toString()
-                r.replace(node, b.move(expr));
+                r.replace(node, b.move(stringExpression));
                 return false;
             } else if (parent.getNodeType() == ASTNode.INFIX_EXPRESSION) {
                 // If node is in a String context, no need to call toString()
@@ -139,19 +139,19 @@ public class StringCleanUp extends AbstractCleanUpRule {
                             && ASTNodes.usesGivenSignature(rightInvocation, String.class.getCanonicalName(), "toLowerCase")) //$NON-NLS-1$
                             || (ASTNodes.usesGivenSignature(leftInvocation, String.class.getCanonicalName(), "toUpperCase") //$NON-NLS-1$
                                     && ASTNodes.usesGivenSignature(rightInvocation, String.class.getCanonicalName(), "toUpperCase")))) { //$NON-NLS-1$
-                final Expression leftExpr= leftInvocation.getExpression();
-                final Expression rightExpr= rightInvocation.getExpression();
-                r.replace(node, b.invoke(b.copy(leftExpr), "equalsIgnoreCase", b.copy(rightExpr))); //$NON-NLS-1$
+                final Expression leftExpression= leftInvocation.getExpression();
+                final Expression rightExpression= rightInvocation.getExpression();
+                r.replace(node, b.invoke(b.copy(leftExpression), "equalsIgnoreCase", b.copy(rightExpression))); //$NON-NLS-1$
                 return false;
             }
         } else if (ASTNodes.usesGivenSignature(node, String.class.getCanonicalName(), "equalsIgnoreCase", String.class.getCanonicalName())) { //$NON-NLS-1$
             final AtomicBoolean isRefactoringNeeded= new AtomicBoolean(false);
 
-            final Expression leftExpr= getReducedStringExpression(node.getExpression(), isRefactoringNeeded);
-            final Expression rightExpr= getReducedStringExpression(ASTNodes.arg0(node), isRefactoringNeeded);
+            final Expression leftExpression= getReducedStringExpression(node.getExpression(), isRefactoringNeeded);
+            final Expression rightExpression= getReducedStringExpression(ASTNodes.arg0(node), isRefactoringNeeded);
 
             if (isRefactoringNeeded.get()) {
-                r.replace(node, b.invoke(b.copy(leftExpr), "equalsIgnoreCase", b.copy(rightExpr))); //$NON-NLS-1$
+                r.replace(node, b.invoke(b.copy(leftExpression), "equalsIgnoreCase", b.copy(rightExpression))); //$NON-NLS-1$
                 return false;
             }
         } else if (ASTNodes.usesGivenSignature(node, String.class.getCanonicalName(), "indexOf", String.class.getCanonicalName()) //$NON-NLS-1$
@@ -172,14 +172,14 @@ public class StringCleanUp extends AbstractCleanUpRule {
         return true;
     }
 
-    private Expression getReducedStringExpression(Expression stringExpr, AtomicBoolean isRefactoringNeeded) {
-        final MethodInvocation casingInvocation= ASTNodes.as(stringExpr, MethodInvocation.class);
+    private Expression getReducedStringExpression(Expression stringExpression, AtomicBoolean isRefactoringNeeded) {
+        final MethodInvocation casingInvocation= ASTNodes.as(stringExpression, MethodInvocation.class);
         if (casingInvocation != null && (ASTNodes.usesGivenSignature(casingInvocation, String.class.getCanonicalName(), "toLowerCase") //$NON-NLS-1$
                 || ASTNodes.usesGivenSignature(casingInvocation, String.class.getCanonicalName(), "toUpperCase"))) { //$NON-NLS-1$
             isRefactoringNeeded.set(true);
             return casingInvocation.getExpression();
         }
-        return stringExpr;
+        return stringExpression;
     }
 
     private void replaceStringValueOfByArg0(final Expression toReplace, final MethodInvocation mi) {
@@ -194,10 +194,10 @@ public class StringCleanUp extends AbstractCleanUpRule {
         }
     }
 
-    private Expression replaceToString(final Expression expr) {
+    private Expression replaceToString(final Expression expression) {
         final ASTNodeFactory b= ctx.getASTBuilder();
-        if (expr != null) {
-            return b.move(expr);
+        if (expression != null) {
+            return b.move(expression);
         } else {
             return b.this0();
         }

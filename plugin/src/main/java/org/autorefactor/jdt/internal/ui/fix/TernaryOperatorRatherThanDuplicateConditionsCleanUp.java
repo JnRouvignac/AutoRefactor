@@ -79,16 +79,16 @@ public class TernaryOperatorRatherThanDuplicateConditionsCleanUp extends Abstrac
                     && isBooleanAndPassive(secondCondition.getRightOperand())) {
                 ASTSemanticMatcher matcher= new ASTSemanticMatcher();
 
-                return maybeReplaceDuplicateExpr(matcher, node, firstCondition.getLeftOperand(),
+                return maybeReplaceDuplicateExpression(matcher, node, firstCondition.getLeftOperand(),
                         secondCondition.getLeftOperand(), firstCondition.getRightOperand(),
                         secondCondition.getRightOperand())
-                        && maybeReplaceDuplicateExpr(matcher, node, firstCondition.getLeftOperand(),
+                        && maybeReplaceDuplicateExpression(matcher, node, firstCondition.getLeftOperand(),
                                 secondCondition.getRightOperand(), firstCondition.getRightOperand(),
                                 secondCondition.getLeftOperand())
-                        && maybeReplaceDuplicateExpr(matcher, node, firstCondition.getRightOperand(),
+                        && maybeReplaceDuplicateExpression(matcher, node, firstCondition.getRightOperand(),
                                 secondCondition.getLeftOperand(), firstCondition.getLeftOperand(),
                                 secondCondition.getRightOperand())
-                        && maybeReplaceDuplicateExpr(matcher, node, firstCondition.getRightOperand(),
+                        && maybeReplaceDuplicateExpression(matcher, node, firstCondition.getRightOperand(),
                                 secondCondition.getRightOperand(), firstCondition.getLeftOperand(),
                                 secondCondition.getLeftOperand());
             }
@@ -97,54 +97,54 @@ public class TernaryOperatorRatherThanDuplicateConditionsCleanUp extends Abstrac
         return true;
     }
 
-    private boolean isBooleanAndPassive(final Expression expr) {
-        return ASTNodes.isPrimitive(expr, boolean.class.getSimpleName()) && ASTNodes.isPassive(expr);
+    private boolean isBooleanAndPassive(final Expression expression) {
+        return ASTNodes.isPrimitive(expression, boolean.class.getSimpleName()) && ASTNodes.isPassive(expression);
     }
 
-    private boolean maybeReplaceDuplicateExpr(final ASTSemanticMatcher matcher, final InfixExpression node,
-            final Expression oneCondition, final Expression oppositeCondition, final Expression oneExpr,
-            final Expression oppositeExpr) {
-        if (matcher.matchOpposite(oneCondition, oppositeCondition) && !ASTNodes.match(matcher, oneExpr, oppositeExpr)) {
-            replaceDuplicateExpr(node, oneCondition, oneExpr, oppositeExpr);
+    private boolean maybeReplaceDuplicateExpression(final ASTSemanticMatcher matcher, final InfixExpression node,
+            final Expression oneCondition, final Expression oppositeCondition, final Expression oneExpression,
+            final Expression oppositeExpression) {
+        if (matcher.matchOpposite(oneCondition, oppositeCondition) && !ASTNodes.match(matcher, oneExpression, oppositeExpression)) {
+            replaceDuplicateExpression(node, oneCondition, oneExpression, oppositeExpression);
             return false;
         }
 
         return true;
     }
 
-    private Expression getBasisExpression(final Expression originalExpr, final AtomicBoolean isExprPositive) {
-        Expression basisExpr= null;
-        final PrefixExpression negateExpr= ASTNodes.as(originalExpr, PrefixExpression.class);
+    private Expression getBasisExpression(final Expression originalExpression, final AtomicBoolean isExprPositive) {
+        Expression basisExpression= null;
+        final PrefixExpression negateExpression= ASTNodes.as(originalExpression, PrefixExpression.class);
 
-        if (ASTNodes.hasOperator(negateExpr, PrefixExpression.Operator.NOT)) {
-            basisExpr= negateExpr.getOperand();
+        if (ASTNodes.hasOperator(negateExpression, PrefixExpression.Operator.NOT)) {
+            basisExpression= negateExpression.getOperand();
             isExprPositive.set(false);
         } else {
-            basisExpr= originalExpr;
+            basisExpression= originalExpression;
             isExprPositive.set(true);
         }
 
-        return basisExpr;
+        return basisExpression;
     }
 
-    private void replaceDuplicateExpr(final InfixExpression node, final Expression oneCondition,
-            final Expression oneExpr, final Expression oppositeExpr) {
+    private void replaceDuplicateExpression(final InfixExpression node, final Expression oneCondition,
+            final Expression oneExpression, final Expression oppositeExpression) {
         final AtomicBoolean isFirstExprPositive= new AtomicBoolean();
 
-        final Expression basicExpr= getBasisExpression(oneCondition, isFirstExprPositive);
+        final Expression basicExpression= getBasisExpression(oneCondition, isFirstExprPositive);
 
         final ASTNodeFactory b= ctx.getASTBuilder();
-        final Expression thenExpr;
-        final Expression elseExpr;
+        final Expression thenExpression;
+        final Expression elseExpression;
 
         if (isFirstExprPositive.get()) {
-            thenExpr= oneExpr;
-            elseExpr= oppositeExpr;
+            thenExpression= oneExpression;
+            elseExpression= oppositeExpression;
         } else {
-            thenExpr= oppositeExpr;
-            elseExpr= oneExpr;
+            thenExpression= oppositeExpression;
+            elseExpression= oneExpression;
         }
 
-        ctx.getRefactorings().replace(node, b.conditionalExpr(b.copy(basicExpr), b.copy(thenExpr), b.copy(elseExpr)));
+        ctx.getRefactorings().replace(node, b.conditionalExpression(b.copy(basicExpression), b.copy(thenExpression), b.copy(elseExpression)));
     }
 }

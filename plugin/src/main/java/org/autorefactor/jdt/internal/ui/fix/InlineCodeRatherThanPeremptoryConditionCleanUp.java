@@ -86,12 +86,12 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
         @Override
         public boolean visit(TryStatement node) {
             if (node.resources().isEmpty()) {
-                final List<Statement> tryStmts= ASTNodes.asList(node.getBody());
+                final List<Statement> tryStatements= ASTNodes.asList(node.getBody());
 
-                if (tryStmts.isEmpty()) {
-                    final List<Statement> finallyStmts= ASTNodes.asList(node.getFinally());
+                if (tryStatements.isEmpty()) {
+                    final List<Statement> finallyStatements= ASTNodes.asList(node.getFinally());
 
-                    if (!finallyStmts.isEmpty()) {
+                    if (!finallyStatements.isEmpty()) {
                         return maybeInlineBlock(node, node.getFinally());
                     } else {
                         InlineCodeRatherThanPeremptoryConditionCleanUp.this.ctx.getRefactorings().remove(node);
@@ -107,17 +107,17 @@ public class InlineCodeRatherThanPeremptoryConditionCleanUp extends AbstractClea
         public boolean visit(IfStatement node) {
             final Refactorings r= InlineCodeRatherThanPeremptoryConditionCleanUp.this.ctx.getRefactorings();
 
-            final Statement thenStmt= node.getThenStatement();
-            final Statement elseStmt= node.getElseStatement();
+            final Statement thenStatement= node.getThenStatement();
+            final Statement elseStatement= node.getElseStatement();
             final Expression condition= node.getExpression();
 
             final Object constantCondition= peremptoryValue(condition);
 
             if (Boolean.TRUE.equals(constantCondition)) {
-                return maybeInlineBlock(node, thenStmt);
+                return maybeInlineBlock(node, thenStatement);
             } else if (Boolean.FALSE.equals(constantCondition)) {
-                if (elseStmt != null) {
-                    return maybeInlineBlock(node, elseStmt);
+                if (elseStatement != null) {
+                    return maybeInlineBlock(node, elseStatement);
                 } else {
                     r.remove(node);
                     setResult(false);

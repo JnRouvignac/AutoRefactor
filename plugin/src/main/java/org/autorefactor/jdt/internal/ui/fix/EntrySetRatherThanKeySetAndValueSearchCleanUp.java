@@ -215,11 +215,11 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
 
     @Override
     public boolean visit(EnhancedForStatement enhancedFor) {
-        final Expression foreachExpr= enhancedFor.getExpression();
-        if (isKeySetMethod(foreachExpr)) {
+        final Expression foreachExpression= enhancedFor.getExpression();
+        if (isKeySetMethod(foreachExpression)) {
             // From 'for (K key : map.keySet()) { }'
             // -> mapExpression become 'map', parameter become 'K key'
-            final Expression mapExpression= ((MethodInvocation) foreachExpr).getExpression();
+            final Expression mapExpression= ((MethodInvocation) foreachExpression).getExpression();
             if (mapExpression == null) {
                 // Not implemented
                 return true;
@@ -265,7 +265,7 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
             // Object key = mapEntry.getKey(); // <--- add this statement
 
             final Type mapKeyType= b.copy(parameter.getType());
-            final VariableDeclarationStatement newKeyDecl= b.declareStmt(mapKeyType, b.move(parameter.getName()),
+            final VariableDeclarationStatement newKeyDecl= b.declareStatement(mapKeyType, b.move(parameter.getName()),
                     b.invoke(entryVar.varName(), "getKey")); //$NON-NLS-1$
 
             r.insertFirst(enhancedFor.getBody(), Block.STATEMENTS_PROPERTY, newKeyDecl);
@@ -273,7 +273,7 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
             if (keyUses > getValueMis.size()) {
                 String mapEntryTypeName= typeNameDecider.useSimplestPossibleName(Entry.class.getCanonicalName());
 
-                final VariableDeclarationStatement newEntryDecl= b.declareStmt(b.type(mapEntryTypeName),
+                final VariableDeclarationStatement newEntryDecl= b.declareStatement(b.type(mapEntryTypeName),
                         entryVar.varName(), b.cast(b.type(mapEntryTypeName), objectVar.varName()));
                 r.insertFirst(enhancedFor.getBody(), Block.STATEMENTS_PROPERTY, newEntryDecl);
             }
@@ -290,7 +290,7 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
                 // K key = mapEntry.getKey(); // <--- add this statement
                 final Type mapKeyType= b.copy(parameter.getType());
 
-                final VariableDeclarationStatement newKeyDeclaration= b.declareStmt(mapKeyType,
+                final VariableDeclarationStatement newKeyDeclaration= b.declareStatement(mapKeyType,
                         b.move(parameter.getName()), b.invoke(entryVar.varName(), "getKey")); //$NON-NLS-1$
                 r.insertFirst(enhancedFor.getBody(), Block.STATEMENTS_PROPERTY, newKeyDeclaration);
             }
@@ -327,8 +327,8 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
         return b.genericType(mapEntryType, mapKeyType, mapValueType);
     }
 
-    private boolean isKeySetMethod(Expression expr) {
-        return expr instanceof MethodInvocation && ASTNodes.usesGivenSignature((MethodInvocation) expr, Map.class.getCanonicalName(), "keySet"); //$NON-NLS-1$
+    private boolean isKeySetMethod(Expression expression) {
+        return expression instanceof MethodInvocation && ASTNodes.usesGivenSignature((MethodInvocation) expression, Map.class.getCanonicalName(), "keySet"); //$NON-NLS-1$
     }
 
     private List<MethodInvocation> collectMapGetValueCalls(Expression mapExpression,

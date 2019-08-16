@@ -78,20 +78,20 @@ public class CollapseIfStatementCleanUp extends AbstractCleanUpRule {
         }
 
         final ASTNodeFactory b= this.ctx.getASTBuilder();
-        final InfixExpression ie= b.infixExpr(parenthesizeOrExpr(b, outerIf.getExpression()), InfixExpression.Operator.CONDITIONAL_AND,
-                parenthesizeOrExpr(b, innerIf.getExpression()));
+        final InfixExpression ie= b.infixExpression(parenthesizeOrExpression(b, outerIf.getExpression()), InfixExpression.Operator.CONDITIONAL_AND,
+                parenthesizeOrExpression(b, innerIf.getExpression()));
         this.ctx.getRefactorings().replace(outerIf.getExpression(), ie);
         this.ctx.getRefactorings().replace(outerIf.getThenStatement(), b.copy(innerIf.getThenStatement()));
         return false;
     }
 
-    private Expression parenthesizeOrExpr(ASTNodeFactory b, Expression expr) {
-        if (expr instanceof InfixExpression) {
-            final InfixExpression ie= (InfixExpression) expr;
+    private Expression parenthesizeOrExpression(ASTNodeFactory b, Expression expression) {
+        if (expression instanceof InfixExpression) {
+            final InfixExpression ie= (InfixExpression) expression;
             if (ASTNodes.hasOperator(ie, InfixExpression.Operator.CONDITIONAL_OR)) {
                 return b.parenthesize(b.copy(ie));
             }
         }
-        return b.copy(expr);
+        return b.copy(expression);
     }
 }

@@ -102,12 +102,12 @@ public class IfElseIfCleanUp extends AbstractCleanUpRule {
 
     @Override
     public boolean visit(IfStatement node) {
-        final Statement elseStmt= node.getElseStatement();
-        if (elseStmt instanceof Block) {
-            List<Statement> elseStmts= ASTNodes.statements((Block) elseStmt);
-            if (elseStmts.size() == 1 && elseStmts.get(0) instanceof IfStatement) {
+        final Statement elseStatement= node.getElseStatement();
+        if (elseStatement instanceof Block) {
+            List<Statement> elseStatements= ASTNodes.statements((Block) elseStatement);
+            if (elseStatements.size() == 1 && elseStatements.get(0) instanceof IfStatement) {
                 final ASTNodeFactory b= this.ctx.getASTBuilder();
-                this.ctx.getRefactorings().set(node, IfStatement.ELSE_STATEMENT_PROPERTY, b.copy(elseStmts.get(0)));
+                this.ctx.getRefactorings().set(node, IfStatement.ELSE_STATEMENT_PROPERTY, b.copy(elseStatements.get(0)));
                 return false;
             }
         }

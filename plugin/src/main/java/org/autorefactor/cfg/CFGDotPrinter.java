@@ -56,7 +56,7 @@ public class CFGDotPrinter {
     // TODO JNR
     // - Add variable access nodes
     // - link them with "--" and/or inside a box
-    // - Display expr in the box?
+    // - Display expression in the box?
     // - node label of the form: var name + line, column + R, W, Decl
     // - use separate colors?
 

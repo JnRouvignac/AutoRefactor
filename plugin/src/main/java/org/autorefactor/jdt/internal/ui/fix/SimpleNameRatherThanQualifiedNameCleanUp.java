@@ -618,14 +618,14 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
 
     @Override
     public boolean visit(MethodInvocation node) {
-        final Expression expr= node.getExpression();
+        final Expression expression= node.getExpression();
         final IMethodBinding methodBinding= node.resolveMethodBinding();
-        if (methodBinding != null && expr instanceof Name && hasKind((Name) expr, IBinding.TYPE)
+        if (methodBinding != null && expression instanceof Name && hasKind((Name) expression, IBinding.TYPE)
                 && node.typeArguments().isEmpty()) {
             final ITypeBinding declaringClass= methodBinding.getDeclaringClass();
             final QName qname= QName.valueOf(declaringClass.getErasure().getQualifiedName(), methodBinding.getName());
             if (methods.canReplaceFqnWithSimpleName(node, qname, FqnType.METHOD)) {
-                ctx.getRefactorings().remove(expr);
+                ctx.getRefactorings().remove(expression);
                 return false;
             }
         }

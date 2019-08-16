@@ -70,29 +70,29 @@ public class UpdateSetRatherThanTestingFirstCleanUp extends AbstractCleanUpRule 
 
     @Override
     public boolean visit(IfStatement node) {
-        final Statement elseStmt= node.getElseStatement();
-        final Statement thenStmt= node.getThenStatement();
+        final Statement elseStatement= node.getElseStatement();
+        final Statement thenStatement= node.getThenStatement();
         final PrefixExpression pe= ASTNodes.as(node.getExpression(), PrefixExpression.class);
         if (ASTNodes.hasOperator(pe, PrefixExpression.Operator.NOT)) {
-            return maybeReplaceSetContains(node, pe.getOperand(), thenStmt, elseStmt, false);
+            return maybeReplaceSetContains(node, pe.getOperand(), thenStatement, elseStatement, false);
         } else {
-            return maybeReplaceSetContains(node, node.getExpression(), elseStmt, thenStmt, true);
+            return maybeReplaceSetContains(node, node.getExpression(), elseStatement, thenStatement, true);
         }
     }
 
-    private boolean maybeReplaceSetContains(final IfStatement ifStmtToReplace, final Expression ifExpr,
-            final Statement stmt, final Statement oppositeStmt, final boolean negate) {
-        return maybeReplaceSetContains(ifStmtToReplace, ifExpr, stmt, oppositeStmt, negate, "add") //$NON-NLS-1$
-                && maybeReplaceSetContains(ifStmtToReplace, ifExpr, oppositeStmt, stmt, !negate, "remove"); //$NON-NLS-1$
+    private boolean maybeReplaceSetContains(final IfStatement ifStmtToReplace, final Expression ifExpression,
+            final Statement statement, final Statement oppositeStatement, final boolean negate) {
+        return maybeReplaceSetContains(ifStmtToReplace, ifExpression, statement, oppositeStatement, negate, "add") //$NON-NLS-1$
+                && maybeReplaceSetContains(ifStmtToReplace, ifExpression, oppositeStatement, statement, !negate, "remove"); //$NON-NLS-1$
     }
 
-    private boolean maybeReplaceSetContains(final IfStatement ifStmtToReplace, final Expression ifExpr,
-            final Statement stmt, final Statement oppositeStmt, final boolean negate, final String methodName) {
-        final List<Statement> stmts= ASTNodes.asList(stmt);
-        final MethodInvocation miContains= ASTNodes.as(ifExpr, MethodInvocation.class);
-        if (!stmts.isEmpty() && ASTNodes.usesGivenSignature(miContains, Set.class.getCanonicalName(), "contains", Object.class.getCanonicalName())) { //$NON-NLS-1$
-            final Statement firstStmt= Utils.getFirst(stmts);
-            final MethodInvocation miAddOrRemove= ASTNodes.asExpression(firstStmt, MethodInvocation.class);
+    private boolean maybeReplaceSetContains(final IfStatement ifStmtToReplace, final Expression ifExpression,
+            final Statement statement, final Statement oppositeStatement, final boolean negate, final String methodName) {
+        final List<Statement> statements= ASTNodes.asList(statement);
+        final MethodInvocation miContains= ASTNodes.as(ifExpression, MethodInvocation.class);
+        if (!statements.isEmpty() && ASTNodes.usesGivenSignature(miContains, Set.class.getCanonicalName(), "contains", Object.class.getCanonicalName())) { //$NON-NLS-1$
+            final Statement firstStatement= Utils.getFirst(statements);
+            final MethodInvocation miAddOrRemove= ASTNodes.asExpression(firstStatement, MethodInvocation.class);
             final ASTSemanticMatcher astMatcher= new ASTSemanticMatcher();
             if (ASTNodes.usesGivenSignature(miAddOrRemove, Set.class.getCanonicalName(), methodName, Object.class.getCanonicalName())
                     && ASTNodes.match(astMatcher, miContains.getExpression(), miAddOrRemove.getExpression())
@@ -100,15 +100,15 @@ public class UpdateSetRatherThanTestingFirstCleanUp extends AbstractCleanUpRule 
                 final ASTNodeFactory b= this.ctx.getASTBuilder();
                 final Refactorings r= this.ctx.getRefactorings();
 
-                if (stmts.size() == 1 && ASTNodes.asList(oppositeStmt).isEmpty()) {
+                if (statements.size() == 1 && ASTNodes.asList(oppositeStatement).isEmpty()) {
                     // Only one statement: replace if statement with col.add() (or col.remove())
-                    r.replace(ifStmtToReplace, b.move(firstStmt));
+                    r.replace(ifStmtToReplace, b.move(firstStatement));
                 } else {
                     // There are other statements, replace the if condition with col.add() (or
                     // col.remove())
                     r.replace(ifStmtToReplace.getExpression(),
                             negate ? b.negate(miAddOrRemove, ASTNodeFactory.Copy.MOVE) : b.move(miAddOrRemove));
-                    r.remove(firstStmt);
+                    r.remove(firstStatement);
                 }
                 return false;
             }

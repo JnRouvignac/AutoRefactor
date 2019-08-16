@@ -112,47 +112,47 @@ public class RemoveUnnecessaryLocalBeforeReturnCleanUp extends AbstractCleanUpRu
         }
 
         private boolean isUsedAfterReturn(final IVariableBinding varToSearch, final ASTNode scopeNode) {
-            final TryStatement tryStmt= ASTNodes.getAncestorOrNull(scopeNode, TryStatement.class);
-            if (tryStmt == null) {
+            final TryStatement tryStatement= ASTNodes.getAncestorOrNull(scopeNode, TryStatement.class);
+            if (tryStatement == null) {
                 return false;
             } else {
-                if (tryStmt.getFinally() != null) {
+                if (tryStatement.getFinally() != null) {
                     final VariableDefinitionsUsesVisitor variableUseVisitor= new VariableDefinitionsUsesVisitor(
-                            varToSearch, tryStmt.getFinally()).find();
+                            varToSearch, tryStatement.getFinally()).find();
                     if (!variableUseVisitor.getUses().isEmpty()) {
                         return true;
                     }
                 }
-                return isUsedAfterReturn(varToSearch, tryStmt);
+                return isUsedAfterReturn(varToSearch, tryStatement);
             }
         }
 
         private void removeVariable(final ReturnStatement node, final VariableDeclarationStatement vds,
                 final VariableDeclarationFragment vdf) {
-            final Expression returnExpr= vdf.getInitializer();
-            if (returnExpr instanceof ArrayInitializer) {
+            final Expression returnExpression= vdf.getInitializer();
+            if (returnExpression instanceof ArrayInitializer) {
                 final ASTNodeFactory b= ctx.getASTBuilder();
-                final ReturnStatement newReturnStmt= b
-                        .return0(b.newArray(b.copy((ArrayType) vds.getType()), b.move((ArrayInitializer) returnExpr)));
-                replaceReturnStatementForArray(node, vds, newReturnStmt);
+                final ReturnStatement newReturnStatement= b
+                        .return0(b.newArray(b.copy((ArrayType) vds.getType()), b.move((ArrayInitializer) returnExpression)));
+                replaceReturnStatementForArray(node, vds, newReturnStatement);
             } else {
-                replaceReturnStatement(node, vds, returnExpr);
+                replaceReturnStatement(node, vds, returnExpression);
             }
         }
 
         private void replaceReturnStatementForArray(final ReturnStatement node, final Statement previousSibling,
-                final ReturnStatement newReturnStmt) {
+                final ReturnStatement newReturnStatement) {
             final Refactorings r= ctx.getRefactorings();
             r.remove(previousSibling);
-            r.replace(node, newReturnStmt);
+            r.replace(node, newReturnStatement);
         }
 
         private void replaceReturnStatement(final ReturnStatement node, final Statement previousSibling,
-                final Expression returnExpr) {
+                final Expression returnExpression) {
             final ASTNodeFactory b= ctx.getASTBuilder();
             final Refactorings r= ctx.getRefactorings();
             r.remove(previousSibling);
-            r.replace(node, b.return0(b.move(returnExpr)));
+            r.replace(node, b.return0(b.move(returnExpression)));
         }
     }
 }

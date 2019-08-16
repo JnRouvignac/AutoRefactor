@@ -235,7 +235,7 @@ public class OneCodeThatFallsThroughRatherThanRedundantBlocksSample {
         throw new Exception();
     }
 
-    public void mergeDeepStmts(String number, int i) {
+    public void mergeDeepStatements(String number, int i) {
         // Keep this comment
         try {
             Integer.valueOf(number);
@@ -258,7 +258,7 @@ public class OneCodeThatFallsThroughRatherThanRedundantBlocksSample {
         return;
     }
 
-    public void mergeDeeperStmts(String number, int i) {
+    public void mergeDeeperStatements(String number, int i) {
         // Keep this comment
         if (i > 0) {
             try {
@@ -283,7 +283,7 @@ public class OneCodeThatFallsThroughRatherThanRedundantBlocksSample {
         return;
     }
 
-    public void doNotRefactorNotLastStmts(String number, int i) {
+    public void doNotRefactorNotLastStatements(String number, int i) {
         if (i > 0) {
             try {
                 Integer.valueOf(number);

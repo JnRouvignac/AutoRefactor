@@ -115,7 +115,7 @@ public class OppositeComparisonRatherThanNegativeExpressionSample {
         return ((Float) floats.get(0)).compareTo(number);
     }
 
-    public int doNotRefactorNonNegativeExpr(Double number) {
+    public int doNotRefactorNonNegativeExpression(Double number) {
         Double anotherNumber = Double.MAX_VALUE;
         return number.compareTo(anotherNumber);
     }

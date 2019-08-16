@@ -195,9 +195,9 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
 
     private boolean isInStringAppend(final ASTNode node) {
         if (node instanceof InfixExpression) {
-            final InfixExpression expr= (InfixExpression) node;
-            if (ASTNodes.hasOperator(expr, InfixExpression.Operator.PLUS) || ASTNodes.hasType(expr.getLeftOperand(), String.class.getCanonicalName())
-                    || ASTNodes.hasType(expr.getRightOperand(), String.class.getCanonicalName())) {
+            final InfixExpression expression= (InfixExpression) node;
+            if (ASTNodes.hasOperator(expression, InfixExpression.Operator.PLUS) || ASTNodes.hasType(expression.getLeftOperand(), String.class.getCanonicalName())
+                    || ASTNodes.hasType(expression.getRightOperand(), String.class.getCanonicalName())) {
                 return true;
             }
         }
@@ -213,6 +213,6 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
         final ASTNodeFactory b= this.ctx.getASTBuilder();
         final MethodInvocation mi= b.invoke(b.copy(node.getExpression()), "compareTo", b.copy(ASTNodes.arg0(node))); //$NON-NLS-1$
 
-        return b.infixExpr(mi, isPositive ? InfixExpression.Operator.EQUALS : InfixExpression.Operator.NOT_EQUALS, b.int0(0));
+        return b.infixExpression(mi, isPositive ? InfixExpression.Operator.EQUALS : InfixExpression.Operator.NOT_EQUALS, b.int0(0));
     }
 }

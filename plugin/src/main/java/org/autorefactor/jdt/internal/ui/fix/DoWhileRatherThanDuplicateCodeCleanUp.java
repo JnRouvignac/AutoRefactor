@@ -66,33 +66,33 @@ public class DoWhileRatherThanDuplicateCodeCleanUp extends AbstractCleanUpRule {
 
     @Override
     public boolean visit(WhileStatement node) {
-        final List<Statement> whileStmts= ASTNodes.asList(node.getBody());
+        final List<Statement> whileStatements= ASTNodes.asList(node.getBody());
 
-        if (whileStmts.isEmpty()) {
+        if (whileStatements.isEmpty()) {
             return true;
         }
 
-        final List<Statement> previousStmts= new ArrayList<Statement>(whileStmts.size());
+        final List<Statement> previousStatements= new ArrayList<Statement>(whileStatements.size());
         final ASTSemanticMatcher matcher= new ASTSemanticMatcher();
 
-        Statement previousStmt= ASTNodes.getPreviousSibling(node);
-        int i= whileStmts.size() - 1;
+        Statement previousStatement= ASTNodes.getPreviousSibling(node);
+        int i= whileStatements.size() - 1;
         while (i >= 0) {
-            if (previousStmt == null || !ASTNodes.match(matcher, previousStmt, whileStmts.get(i))) {
+            if (previousStatement == null || !ASTNodes.match(matcher, previousStatement, whileStatements.get(i))) {
                 return true;
             }
             i--;
-            previousStmts.add(previousStmt);
-            previousStmt= ASTNodes.getPreviousSibling(previousStmt);
+            previousStatements.add(previousStatement);
+            previousStatement= ASTNodes.getPreviousSibling(previousStatement);
         }
 
-        replaceWithDoWhile(node, previousStmts);
+        replaceWithDoWhile(node, previousStatements);
         return false;
     }
 
-    private void replaceWithDoWhile(final WhileStatement node, final List<Statement> previousStmts) {
+    private void replaceWithDoWhile(final WhileStatement node, final List<Statement> previousStatements) {
         final Refactorings r= this.ctx.getRefactorings();
-        r.remove(previousStmts);
+        r.remove(previousStatements);
 
         final ASTNodeFactory b= this.ctx.getASTBuilder();
         r.replace(node, b.doWhile(b.copy(node.getExpression()), b.copy(node.getBody())));

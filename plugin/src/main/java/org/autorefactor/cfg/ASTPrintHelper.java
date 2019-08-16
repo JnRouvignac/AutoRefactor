@@ -40,8 +40,8 @@ public final class ASTPrintHelper {
     static String codeExcerpt(List<Expression> expressions) {
         final StringBuilder sb= new StringBuilder();
         for (final Iterator<Expression> iter= expressions.iterator(); iter.hasNext();) {
-            final Expression expr= iter.next();
-            sb.append(expr);
+            final Expression expression= iter.next();
+            sb.append(expression);
             if (iter.hasNext()) {
                 sb.append(", "); //$NON-NLS-1$
             }

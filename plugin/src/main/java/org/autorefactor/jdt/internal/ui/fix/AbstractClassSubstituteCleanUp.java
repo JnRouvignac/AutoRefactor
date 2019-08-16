@@ -179,14 +179,14 @@ public abstract class AbstractClassSubstituteCleanUp extends NewClassImportClean
      *
      * @param b                      The builder.
      * @param origType               The original type
-     * @param originalExpr           The original expression
+     * @param originalExpression     The original expression
      * @param classesToUseWithImport The classes that should be used with simple
      *                               name.
      * @param importsToAdd           The imports that need to be added during this
      *                               refactoring.
      * @return the substitute type or null if the class should be the same.
      */
-    protected Type substituteType(final ASTNodeFactory b, final Type origType, final ASTNode originalExpr,
+    protected Type substituteType(final ASTNodeFactory b, final Type origType, final ASTNode originalExpression,
             final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
         final ITypeBinding origTypeBinding= origType.resolveBinding();
         final String origRawType= origTypeBinding.getErasure().getQualifiedName();
@@ -198,7 +198,7 @@ public abstract class AbstractClassSubstituteCleanUp extends NewClassImportClean
                 substitutingClassName= getSimpleName(substitutingClassName);
             }
 
-            final TypeNameDecider typeNameDecider= new TypeNameDecider(originalExpr);
+            final TypeNameDecider typeNameDecider= new TypeNameDecider(originalExpression);
 
             if (origTypeBinding.isParameterizedType()) {
                 final ITypeBinding[] origTypeArgs= origTypeBinding.getTypeArguments();
@@ -321,12 +321,12 @@ public abstract class AbstractClassSubstituteCleanUp extends NewClassImportClean
         }
 
         for (final VariableDeclaration variableDecl : variableDecls) {
-            final VariableDeclarationStatement oldDeclareStmt= (VariableDeclarationStatement) variableDecl.getParent();
-            final Type substituteVarType= substituteType(b, oldDeclareStmt.getType(),
-                    (ASTNode) oldDeclareStmt.fragments().get(0), classesToUseWithImport, importsToAdd);
+            final VariableDeclarationStatement oldDeclareStatement= (VariableDeclarationStatement) variableDecl.getParent();
+            final Type substituteVarType= substituteType(b, oldDeclareStatement.getType(),
+                    (ASTNode) oldDeclareStatement.fragments().get(0), classesToUseWithImport, importsToAdd);
 
             if (substituteVarType != null) {
-                ctx.getRefactorings().replace(oldDeclareStmt.getType(), substituteVarType);
+                ctx.getRefactorings().replace(oldDeclareStatement.getType(), substituteVarType);
             }
         }
     }
@@ -387,9 +387,9 @@ public abstract class AbstractClassSubstituteCleanUp extends NewClassImportClean
     }
 
     static String getArgumentType(final MethodInvocation mi) {
-        final Expression expr= mi.getExpression();
-        if (expr != null) {
-            final ITypeBinding typeBinding= expr.resolveTypeBinding();
+        final Expression expression= mi.getExpression();
+        if (expression != null) {
+            final ITypeBinding typeBinding= expression.resolveTypeBinding();
             if (typeBinding != null) {
                 final ITypeBinding[] typeArguments= typeBinding.getTypeArguments();
                 if (typeArguments.length == 1) {

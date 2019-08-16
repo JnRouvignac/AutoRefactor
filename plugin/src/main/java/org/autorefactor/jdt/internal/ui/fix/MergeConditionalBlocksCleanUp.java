@@ -78,17 +78,17 @@ public class MergeConditionalBlocksCleanUp extends AbstractCleanUpRule {
         return true;
     }
 
-    private boolean maybeMergeBlocks(final IfStatement node, final IfStatement subNode, final Statement doubleStmts,
-            final Statement remainingStmts, final boolean isPositive) {
-        if (doubleStmts != null && ASTNodes.match(node.getThenStatement(), doubleStmts)) {
-            refactorBlocks(node.getExpression(), subNode, remainingStmts, isPositive);
+    private boolean maybeMergeBlocks(final IfStatement node, final IfStatement subNode, final Statement doubleStatements,
+            final Statement remainingStatements, final boolean isPositive) {
+        if (doubleStatements != null && ASTNodes.match(node.getThenStatement(), doubleStatements)) {
+            refactorBlocks(node.getExpression(), subNode, remainingStatements, isPositive);
             return false;
         }
         return true;
     }
 
     private void refactorBlocks(final Expression firstCondition, final IfStatement subNode,
-            final Statement remainingStmts, final boolean isPositive) {
+            final Statement remainingStatements, final boolean isPositive) {
         final ASTNodeFactory b= this.ctx.getASTBuilder();
         final Refactorings r= this.ctx.getRefactorings();
 
@@ -99,10 +99,10 @@ public class MergeConditionalBlocksCleanUp extends AbstractCleanUpRule {
             additionalCondition= b.negate(subNode.getExpression(), Copy.COPY);
         }
 
-        r.replace(firstCondition, b.infixExpr(b.parenthesizeIfNeeded(b.copy(firstCondition)),
+        r.replace(firstCondition, b.infixExpression(b.parenthesizeIfNeeded(b.copy(firstCondition)),
                 InfixExpression.Operator.CONDITIONAL_OR, b.parenthesizeIfNeeded(additionalCondition)));
-        if (remainingStmts != null) {
-            r.replace(subNode, b.copy(remainingStmts));
+        if (remainingStatements != null) {
+            r.replace(subNode, b.copy(remainingStatements));
         } else {
             r.remove(subNode);
         }

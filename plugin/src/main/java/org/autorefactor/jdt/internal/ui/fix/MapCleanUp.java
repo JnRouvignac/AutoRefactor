@@ -97,17 +97,17 @@ public class MapCleanUp extends AbstractCleanUpRule {
             final MethodInvocation mi= ASTNodes.asExpression(node, MethodInvocation.class);
             if (ASTNodes.usesGivenSignature(mi, Map.class.getCanonicalName(), "putAll", Map.class.getCanonicalName())) { //$NON-NLS-1$
                 final Expression arg0= ASTNodes.arg0(mi);
-                final Statement previousStmt= ASTNodes.getPreviousSibling(node);
+                final Statement previousStatement= ASTNodes.getPreviousSibling(node);
 
-                final Assignment as= ASTNodes.asExpression(previousStmt, Assignment.class);
+                final Assignment as= ASTNodes.asExpression(previousStatement, Assignment.class);
                 if (ASTNodes.hasOperator(as, Assignment.Operator.ASSIGN)) {
                     final Expression lhs= as.getLeftHandSide();
                     if (lhs instanceof SimpleName && ASTNodes.isSameLocalVariable(lhs, mi.getExpression())) {
                         return maybeReplaceInitializer(as.getRightHandSide(), arg0, node);
                     }
-                } else if (previousStmt instanceof VariableDeclarationStatement) {
+                } else if (previousStatement instanceof VariableDeclarationStatement) {
                     final VariableDeclarationFragment vdf= ASTNodes.getUniqueFragment(
-                            (VariableDeclarationStatement) previousStmt);
+                            (VariableDeclarationStatement) previousStatement);
                     if (vdf != null && ASTNodes.isSameLocalVariable(vdf, mi.getExpression())) {
                         return maybeReplaceInitializer(vdf.getInitializer(), arg0, node);
                     }

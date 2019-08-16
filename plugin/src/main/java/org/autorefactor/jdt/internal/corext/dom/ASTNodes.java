@@ -222,8 +222,8 @@ public final class ASTNodes {
 
         private boolean mayCallImplicitToString(List<Expression> extendedOperands) {
             if (extendedOperands != null) {
-                for (Expression expr : extendedOperands) {
-                    if (mayCallImplicitToString(expr)) {
+                for (Expression expression : extendedOperands) {
+                    if (mayCallImplicitToString(expression)) {
                         return true;
                     }
                 }
@@ -231,11 +231,11 @@ public final class ASTNodes {
             return false;
         }
 
-        private boolean mayCallImplicitToString(Expression expr) {
-            return !ASTNodes.hasType(expr, String.class.getCanonicalName(), boolean.class.getSimpleName(), short.class.getSimpleName(), int.class.getSimpleName(), long.class.getSimpleName(), float.class.getSimpleName(), double.class.getSimpleName(),
+        private boolean mayCallImplicitToString(Expression expression) {
+            return !ASTNodes.hasType(expression, String.class.getCanonicalName(), boolean.class.getSimpleName(), short.class.getSimpleName(), int.class.getSimpleName(), long.class.getSimpleName(), float.class.getSimpleName(), double.class.getSimpleName(),
                     Short.class.getCanonicalName(), Boolean.class.getCanonicalName(), Integer.class.getCanonicalName(), Long.class.getCanonicalName(), Float.class.getCanonicalName(),
-                    Double.class.getCanonicalName()) && !(expr instanceof PrefixExpression) && !(expr instanceof InfixExpression)
-                    && !(expr instanceof PostfixExpression);
+                    Double.class.getCanonicalName()) && !(expression instanceof PrefixExpression) && !(expression instanceof InfixExpression)
+                    && !(expression instanceof PostfixExpression);
         }
 
         @Override
@@ -285,16 +285,16 @@ public final class ASTNodes {
     /**
      * Returns the same expression after removing any parentheses around it.
      *
-     * @param expr the expression around which parentheses must be removed
+     * @param expression the expression around which parentheses must be removed
      * @return the same expression after removing any parentheses around it If there
      *         are no parentheses around it then the exact same expression is
      *         returned
      */
-    public static Expression getUnparenthesedExpression(Expression expr) {
-        if (expr.getNodeType() == ASTNode.PARENTHESIZED_EXPRESSION) {
-            return ASTNodes.getUnparenthesedExpression(((ParenthesizedExpression) expr).getExpression());
+    public static Expression getUnparenthesedExpression(Expression expression) {
+        if (expression.getNodeType() == ASTNode.PARENTHESIZED_EXPRESSION) {
+            return ASTNodes.getUnparenthesedExpression(((ParenthesizedExpression) expression).getExpression());
         }
-        return expr;
+        return expression;
     }
 
     // AST nodes conversions
@@ -307,19 +307,19 @@ public final class ASTNodes {
      * <li>otherwise, the current node is returned wrapped in a list</li>
      * </ul>
      *
-     * @param stmt the statement to analyze
+     * @param statement the statement to analyze
      * @return the provided statement as a non null list of statements
      */
-    public static List<Statement> asList(Statement stmt) {
-        if (stmt == null) {
+    public static List<Statement> asList(Statement statement) {
+        if (statement == null) {
             return Collections.emptyList();
         }
 
-        if (stmt instanceof Block) {
-            return ASTNodes.statements((Block) stmt);
+        if (statement instanceof Block) {
+            return ASTNodes.statements((Block) statement);
         }
 
-        return Arrays.asList(stmt);
+        return Arrays.asList(statement);
     }
 
     /**
@@ -327,27 +327,27 @@ public final class ASTNodes {
      * matches.
      *
      * @param <T>       the required statement type
-     * @param stmt      the statement to cast
+     * @param statement the statement to cast
      * @param stmtClass the class representing the required statement type
      * @return the provided statement as an object of the provided type if type
      *         matches, null otherwise
      */
     @SuppressWarnings("unchecked")
-    public static <T extends Statement> T as(Statement stmt, Class<T> stmtClass) {
-        if (stmt == null) {
+    public static <T extends Statement> T as(Statement statement, Class<T> stmtClass) {
+        if (statement == null) {
             return null;
         }
 
-        final List<Statement> stmts= ASTNodes.asList(stmt);
-        if (stmts.size() == 1) {
-            final Statement oneStmt= stmts.get(0);
+        final List<Statement> statements= ASTNodes.asList(statement);
+        if (statements.size() == 1) {
+            final Statement oneStatement= statements.get(0);
 
-            if (stmtClass.isAssignableFrom(oneStmt.getClass())) {
-                return (T) oneStmt;
+            if (stmtClass.isAssignableFrom(oneStatement.getClass())) {
+                return (T) oneStatement;
             }
 
-            if (oneStmt instanceof LabeledStatement) {
-                return ASTNodes.as(((LabeledStatement) oneStmt).getBody(), stmtClass);
+            if (oneStatement instanceof LabeledStatement) {
+                return ASTNodes.as(((LabeledStatement) oneStatement).getBody(), stmtClass);
             }
         }
 
@@ -357,32 +357,32 @@ public final class ASTNodes {
     /**
      * Returns whether the provided statement has the provided type.
      *
-     * @param stmt      the statement to test
+     * @param statement the statement to test
      * @param stmtClass the type to test the statement against
      * @return {@code true} if the provided statement has the provided type,
      *         {@code false} otherwise
      */
-    public static boolean is(Statement stmt, Class<? extends Statement> stmtClass) {
-        return ASTNodes.as(stmt, stmtClass) != null;
+    public static boolean is(Statement statement, Class<? extends Statement> stmtClass) {
+        return ASTNodes.as(statement, stmtClass) != null;
     }
 
     /**
      * Casts the provided expression to an object of the provided type if type
      * matches.
      *
-     * @param <T>       the required expression type
-     * @param expr      the expression to cast
-     * @param exprClass the class representing the required expression type
+     * @param <T>        the required expression type
+     * @param expression the expression to cast
+     * @param exprClass  the class representing the required expression type
      * @return the provided expression as an object of the provided type if type
      *         matches, null otherwise
      */
     @SuppressWarnings("unchecked")
-    public static <T extends Expression> T as(Expression expr, Class<T> exprClass) {
-        if (expr != null) {
-            if (exprClass.isAssignableFrom(expr.getClass())) {
-                return (T) expr;
-            } else if (expr instanceof ParenthesizedExpression) {
-                return ASTNodes.as(((ParenthesizedExpression) expr).getExpression(), exprClass);
+    public static <T extends Expression> T as(Expression expression, Class<T> exprClass) {
+        if (expression != null) {
+            if (exprClass.isAssignableFrom(expression.getClass())) {
+                return (T) expression;
+            } else if (expression instanceof ParenthesizedExpression) {
+                return ASTNodes.as(((ParenthesizedExpression) expression).getExpression(), exprClass);
             }
         }
         return null;
@@ -391,25 +391,25 @@ public final class ASTNodes {
     /**
      * Returns whether the provided expression has the provided type.
      *
-     * @param expr      the expression to test
-     * @param exprClass the type to test the expression against
+     * @param expression the expression to test
+     * @param exprClass  the type to test the expression against
      * @return {@code true} if the provided expression has the provided type,
      *         {@code false} otherwise
      */
-    public static boolean is(Expression expr, Class<? extends Expression> exprClass) {
-        return ASTNodes.as(expr, exprClass) != null;
+    public static boolean is(Expression expression, Class<? extends Expression> exprClass) {
+        return ASTNodes.as(expression, exprClass) != null;
     }
 
     /**
      * Returns whether the provided expression represents a {@link NullLiteral}
      * ignoring parentheses.
      *
-     * @param expr the expression to check
+     * @param expression the expression to check
      * @return true if the provided expression represents a {@link NullLiteral}
      *         ignoring parentheses, false otherwise
      */
-    public static boolean isNullLiteral(Expression expr) {
-        return ASTNodes.is(expr, NullLiteral.class);
+    public static boolean isNullLiteral(Expression expression) {
+        return ASTNodes.is(expression, NullLiteral.class);
     }
 
     /**
@@ -435,13 +435,13 @@ public final class ASTNodes {
      * {@link ExpressionStatement} if possible.
      *
      * @param <T>       the required expression type
-     * @param stmt      the statement
+     * @param statement the statement
      * @param exprClass the class representing the required expression type
      * @return the {@link Expression} of a specified type out of an
      *         {@link ExpressionStatement}
      */
-    public static <T extends Expression> T asExpression(Statement stmt, Class<T> exprClass) {
-        final ExpressionStatement es= ASTNodes.as(stmt, ExpressionStatement.class);
+    public static <T extends Expression> T asExpression(Statement statement, Class<T> exprClass) {
+        final ExpressionStatement es= ASTNodes.as(statement, ExpressionStatement.class);
         if (es != null) {
             return ASTNodes.as(es.getExpression(), exprClass);
         }
@@ -902,16 +902,16 @@ public final class ASTNodes {
      * Returns the {@link Boolean} object value represented by the provided
      * expression.
      *
-     * @param expr the expression to analyze
+     * @param expression the expression to analyze
      * @return the {@link Boolean} object value if the provided expression
      *         represents one, null otherwise
      */
-    public static Boolean getBooleanLiteral(Expression expr) {
-        final BooleanLiteral bl= ASTNodes.as(expr, BooleanLiteral.class);
+    public static Boolean getBooleanLiteral(Expression expression) {
+        final BooleanLiteral bl= ASTNodes.as(expression, BooleanLiteral.class);
         if (bl != null) {
             return bl.booleanValue();
         }
-        final QualifiedName qn= ASTNodes.as(expr, QualifiedName.class);
+        final QualifiedName qn= ASTNodes.as(expression, QualifiedName.class);
         if (ASTNodes.hasType(qn, Boolean.class.getCanonicalName())) {
             return ASTNodes.getBooleanObject(qn);
         }
@@ -1043,9 +1043,9 @@ public final class ASTNodes {
             if (parent instanceof ParenthesizedExpression) {
                 return ASTNodes.getTargetType(parent);
             } else if (parent instanceof ReturnStatement) {
-                final ReturnStatement returnStmt= (ReturnStatement) parent;
-                if (returnStmt.getExpression().equals(node)) {
-                    final MethodDeclaration method= ASTNodes.getAncestorOrNull(returnStmt, MethodDeclaration.class);
+                final ReturnStatement returnStatement= (ReturnStatement) parent;
+                if (returnStatement.getExpression().equals(node)) {
+                    final MethodDeclaration method= ASTNodes.getAncestorOrNull(returnStatement, MethodDeclaration.class);
                     if (method != null && method.getReturnType2() != null) {
                         return method.getReturnType2().resolveBinding();
                     }
@@ -1062,39 +1062,39 @@ public final class ASTNodes {
                     return node.getAST().resolveWellKnownType(int.class.getSimpleName());
                 }
             } else if (parent instanceof ConditionalExpression) {
-                final ConditionalExpression conditionalExpr= (ConditionalExpression) parent;
-                if (conditionalExpr.getExpression().equals(node)) {
+                final ConditionalExpression conditionalExpression= (ConditionalExpression) parent;
+                if (conditionalExpression.getExpression().equals(node)) {
                     return node.getAST().resolveWellKnownType(boolean.class.getSimpleName());
                 }
             } else if (parent instanceof PrefixExpression) {
-                final PrefixExpression prefixExpr= (PrefixExpression) parent;
-                if (ASTNodes.hasOperator(prefixExpr, PrefixExpression.Operator.NOT)) {
+                final PrefixExpression prefixExpression= (PrefixExpression) parent;
+                if (ASTNodes.hasOperator(prefixExpression, PrefixExpression.Operator.NOT)) {
                     return node.getAST().resolveWellKnownType(boolean.class.getSimpleName());
                 }
             } else if (parent instanceof InfixExpression) {
-                final InfixExpression prefixExpr= (InfixExpression) parent;
-                if (ASTNodes.hasOperator(prefixExpr, InfixExpression.Operator.CONDITIONAL_AND, InfixExpression.Operator.CONDITIONAL_OR)) {
+                final InfixExpression prefixExpression= (InfixExpression) parent;
+                if (ASTNodes.hasOperator(prefixExpression, InfixExpression.Operator.CONDITIONAL_AND, InfixExpression.Operator.CONDITIONAL_OR)) {
                     return node.getAST().resolveWellKnownType(boolean.class.getSimpleName());
                 }
             } else if (parent instanceof IfStatement) {
-                final IfStatement ifStmt= (IfStatement) parent;
-                if (ifStmt.getExpression().equals(node)) {
+                final IfStatement ifStatement= (IfStatement) parent;
+                if (ifStatement.getExpression().equals(node)) {
                     return node.getAST().resolveWellKnownType(boolean.class.getSimpleName());
                 }
             } else if (parent instanceof WhileStatement) {
-                final WhileStatement whileStmt= (WhileStatement) parent;
-                if (whileStmt.getExpression().equals(node)) {
+                final WhileStatement whileStatement= (WhileStatement) parent;
+                if (whileStatement.getExpression().equals(node)) {
                     return node.getAST().resolveWellKnownType(boolean.class.getSimpleName());
                 }
             } else if (parent instanceof DoStatement) {
-                final DoStatement doStmt= (DoStatement) parent;
-                if (doStmt.getExpression().equals(node)) {
+                final DoStatement doStatement= (DoStatement) parent;
+                if (doStatement.getExpression().equals(node)) {
                     return node.getAST().resolveWellKnownType(boolean.class.getSimpleName());
                 }
             } else if (parent instanceof SwitchStatement) {
-                final SwitchStatement switchStmt= (SwitchStatement) parent;
-                if (switchStmt.getExpression().equals(node)) {
-                    final ITypeBinding discriminentType= switchStmt.getExpression().resolveTypeBinding();
+                final SwitchStatement switchStatement= (SwitchStatement) parent;
+                if (switchStatement.getExpression().equals(node)) {
+                    final ITypeBinding discriminentType= switchStatement.getExpression().resolveTypeBinding();
                     if (discriminentType.isPrimitive() || discriminentType.isEnum()
                             || ASTNodes.hasType(discriminentType, String.class.getCanonicalName())) {
                         return discriminentType;
@@ -1179,11 +1179,11 @@ public final class ASTNodes {
      */
     public static List<Statement> getNextSiblings(Statement startNode) {
         if (startNode.getParent() instanceof Block) {
-            final List<Statement> stmts= ASTNodes.asList((Statement) startNode.getParent());
-            final int indexOfNode= stmts.indexOf(startNode);
+            final List<Statement> statements= ASTNodes.asList((Statement) startNode.getParent());
+            final int indexOfNode= statements.indexOf(startNode);
             final int siblingIndex= indexOfNode + 1;
-            if (0 <= siblingIndex && siblingIndex < stmts.size()) {
-                return stmts.subList(siblingIndex, stmts.size());
+            if (0 <= siblingIndex && siblingIndex < statements.size()) {
+                return statements.subList(siblingIndex, statements.size());
             }
         }
         return Collections.emptyList();
@@ -1259,11 +1259,11 @@ public final class ASTNodes {
 
     private static Statement getSibling(Statement node, boolean isPrevious) {
         if (node.getParent() instanceof Block) {
-            final List<Statement> stmts= ASTNodes.asList((Statement) node.getParent());
-            final int indexOfNode= stmts.indexOf(node);
+            final List<Statement> statements= ASTNodes.asList((Statement) node.getParent());
+            final int indexOfNode= statements.indexOf(node);
             final int siblingIndex= isPrevious ? indexOfNode - 1 : indexOfNode + 1;
-            if (0 <= siblingIndex && siblingIndex < stmts.size()) {
-                return stmts.get(siblingIndex);
+            if (0 <= siblingIndex && siblingIndex < statements.size()) {
+                return statements.get(siblingIndex);
             }
         }
         return null;
@@ -1339,14 +1339,14 @@ public final class ASTNodes {
      * Returns whether the provided expression evaluates to exactly one of the
      * provided type.
      *
-     * @param expr                    the expression to analyze
+     * @param expression              the expression to analyze
      * @param oneOfQualifiedTypeNames the type binding qualified name must be equal
      *                                to one of these qualified type names
      * @return true if the provided expression evaluates to exactly one of the
      *         provided type, false otherwise
      */
-    public static boolean hasType(Expression expr, String... oneOfQualifiedTypeNames) {
-        return expr != null && ASTNodes.hasType(expr.resolveTypeBinding(), oneOfQualifiedTypeNames);
+    public static boolean hasType(Expression expression, String... oneOfQualifiedTypeNames) {
+        return expression != null && ASTNodes.hasType(expression.resolveTypeBinding(), oneOfQualifiedTypeNames);
     }
 
     /**
@@ -1387,13 +1387,13 @@ public final class ASTNodes {
      * Returns whether the provided expression is an instance of the qualified type
      * name.
      *
-     * @param expr              the expression to analyze
+     * @param expression        the expression to analyze
      * @param qualifiedTypeName the qualified type name
      * @return {@code true} if the provided expression is an instance of the
      *         qualified type name, {@code false} otherwise
      */
-    public static boolean instanceOf(Expression expr, String qualifiedTypeName) {
-        return expr != null && ASTNodes.instanceOf(expr.resolveTypeBinding(), qualifiedTypeName);
+    public static boolean instanceOf(Expression expression, String qualifiedTypeName) {
+        return expression != null && ASTNodes.instanceOf(expression.resolveTypeBinding(), qualifiedTypeName);
     }
 
     /**
@@ -1412,12 +1412,12 @@ public final class ASTNodes {
     /**
      * Returns whether the provided expression represents an array.
      *
-     * @param expr the expression to analyze
+     * @param expression the expression to analyze
      * @return true the provided expression represents an array, false otherwise
      */
-    public static boolean isArray(Expression expr) {
-        if (expr != null) {
-            final ITypeBinding typeBinding= expr.resolveTypeBinding();
+    public static boolean isArray(Expression expression) {
+        if (expression != null) {
+            final ITypeBinding typeBinding= expression.resolveTypeBinding();
             return typeBinding != null && typeBinding.isArray();
         }
         return false;
@@ -1426,18 +1426,18 @@ public final class ASTNodes {
     /**
      * Returns whether the provided expression represents a constant value.
      *
-     * @param expr the expression to analyze
+     * @param expression the expression to analyze
      * @return true the provided expression represents a constant value, false
      *         otherwise
      */
-    public static boolean isConstant(final Expression expr) {
-        return (expr != null && expr.resolveConstantExpressionValue() != null) || ASTNodes.isEnumConstant(expr);
+    public static boolean isConstant(final Expression expression) {
+        return (expression != null && expression.resolveConstantExpressionValue() != null) || ASTNodes.isEnumConstant(expression);
     }
 
-    private static boolean isEnumConstant(final Expression expr) {
+    private static boolean isEnumConstant(final Expression expression) {
         // TODO JNR make it work for enums fields which are static final, but not null
-        if (expr instanceof Name) {
-            final IBinding binding= ((Name) expr).resolveBinding();
+        if (expression instanceof Name) {
+            final IBinding binding= ((Name) expression).resolveBinding();
             if (binding instanceof IVariableBinding) {
                 return ((IVariableBinding) binding).isEnumConstant();
             }
@@ -1449,13 +1449,13 @@ public final class ASTNodes {
      * Returns whether the provided expression is hard-coded as a literal in the
      * byte code ignoring parentheses.
      *
-     * @param expr the expression to check
+     * @param expression the expression to check
      * @return true if the provided expression is hard-coded as a literal in the
      *         byte code ignoring parentheses, false otherwise
      */
-    public static boolean isHardCoded(final Expression expr) {
-        if (expr != null) {
-            switch (expr.getNodeType()) {
+    public static boolean isHardCoded(final Expression expression) {
+        if (expression != null) {
+            switch (expression.getNodeType()) {
             case ASTNode.BOOLEAN_LITERAL:
             case ASTNode.CHARACTER_LITERAL:
             case ASTNode.NUMBER_LITERAL:
@@ -1464,7 +1464,7 @@ public final class ASTNodes {
                 return true;
 
             case ASTNode.INFIX_EXPRESSION:
-                InfixExpression infixExpression= (InfixExpression) expr;
+                InfixExpression infixExpression= (InfixExpression) expression;
 
                 if (!ASTNodes.isHardCoded(infixExpression.getLeftOperand())) {
                     return false;
@@ -1481,21 +1481,21 @@ public final class ASTNodes {
                 return true;
 
             case ASTNode.PREFIX_EXPRESSION:
-                PrefixExpression prefixExpression= (PrefixExpression) expr;
+                PrefixExpression prefixExpression= (PrefixExpression) expression;
                 return ASTNodes.isHardCoded(prefixExpression.getOperand());
 
             case ASTNode.POSTFIX_EXPRESSION:
-                PostfixExpression postfixExpression= (PostfixExpression) expr;
+                PostfixExpression postfixExpression= (PostfixExpression) expression;
                 return ASTNodes.isHardCoded(postfixExpression.getOperand());
 
             case ASTNode.CAST_EXPRESSION:
-                return ASTNodes.isHardCoded(((CastExpression) expr).getExpression());
+                return ASTNodes.isHardCoded(((CastExpression) expression).getExpression());
 
             case ASTNode.PARENTHESIZED_EXPRESSION:
-                return ASTNodes.isHardCoded(((ParenthesizedExpression) expr).getExpression());
+                return ASTNodes.isHardCoded(((ParenthesizedExpression) expression).getExpression());
 
             default:
-                return expr.resolveConstantExpressionValue() != null || ASTNodes.isEnumConstant(expr);
+                return expression.resolveConstantExpressionValue() != null || ASTNodes.isEnumConstant(expression);
             }
         } else {
             return false;
@@ -1521,16 +1521,16 @@ public final class ASTNodes {
      * Returns whether the provided binding and expression represent the same local
      * variable.
      *
-     * @param binding the binding to analyze
-     * @param expr    the expression to analyze
+     * @param binding    the binding to analyze
+     * @param expression the expression to analyze
      * @return {@code true} if the provided binding and expression represent the
      *         same local variable, {@code false} otherwise
      */
-    public static boolean isSameLocalVariable(IBinding binding, Expression expr) {
-        return ASTNodes.isLocalVariable(binding) && expr != null && expr.getNodeType() == ASTNode.SIMPLE_NAME
+    public static boolean isSameLocalVariable(IBinding binding, Expression expression) {
+        return ASTNodes.isLocalVariable(binding) && expression != null && expression.getNodeType() == ASTNode.SIMPLE_NAME
         // No need to use IVariableBinding.isEqualTo(IBinding) since we are looking for
         // a *local* variable
-                && binding.equals(((SimpleName) expr).resolveBinding());
+                && binding.equals(((SimpleName) expression).resolveBinding());
     }
 
     /**
@@ -1550,36 +1550,36 @@ public final class ASTNodes {
      * Returns whether the provided variable declaration and expression represent
      * the same local variable.
      *
-     * @param varDecl the variable declaration to analyze
-     * @param expr    the expression to analyze
+     * @param varDecl    the variable declaration to analyze
+     * @param expression the expression to analyze
      * @return {@code true} if the provided nodes represent the same local variable,
      *         {@code false} otherwise
      */
-    public static boolean isSameLocalVariable(VariableDeclaration varDecl, Expression expr) {
-        return varDecl != null && ASTNodes.isSameLocalVariable(varDecl.resolveBinding(), expr);
+    public static boolean isSameLocalVariable(VariableDeclaration varDecl, Expression expression) {
+        return varDecl != null && ASTNodes.isSameLocalVariable(varDecl.resolveBinding(), expression);
     }
 
     /**
      * Returns whether the provided expression evaluates to a primitive type.
      *
-     * @param expr              the expression to analyze
+     * @param expression        the expression to analyze
      * @param primitiveTypeName the primitive type name
      * @return true if the provided expression evaluates to a primitive type, false
      *         otherwise
      */
-    public static boolean isPrimitive(Expression expr, String primitiveTypeName) {
-        return expr != null && ASTNodes.isPrimitive(expr.resolveTypeBinding(), primitiveTypeName);
+    public static boolean isPrimitive(Expression expression, String primitiveTypeName) {
+        return expression != null && ASTNodes.isPrimitive(expression.resolveTypeBinding(), primitiveTypeName);
     }
 
     /**
      * Returns whether the provided expression evaluates to a primitive type.
      *
-     * @param expr the expression to analyze
+     * @param expression the expression to analyze
      * @return true if the provided expression evaluates to a primitive type, false
      *         otherwise
      */
-    public static boolean isPrimitive(Expression expr) {
-        return expr != null && ASTNodes.isPrimitive(expr.resolveTypeBinding());
+    public static boolean isPrimitive(Expression expression) {
+        return expression != null && ASTNodes.isPrimitive(expression.resolveTypeBinding());
     }
 
     /**
@@ -1664,12 +1664,12 @@ public final class ASTNodes {
     /**
      * Returns the null-checked expression if the provided node is a null check.
      *
-     * @param expr the suspected null-checked expression
+     * @param expression the suspected null-checked expression
      * @return the null-checked expression if the provided node is a null-check, or
      *         {@code null} otherwise.
      */
-    public static Expression getNullCheckedExpression(Expression expr) {
-        final Expression e= ASTNodes.getUnparenthesedExpression(expr);
+    public static Expression getNullCheckedExpression(Expression expression) {
+        final Expression e= ASTNodes.getUnparenthesedExpression(expression);
         if (e instanceof InfixExpression) {
             final InfixExpression ie= (InfixExpression) e;
             if (ASTNodes.hasOperator(ie, InfixExpression.Operator.NOT_EQUALS) && ASTNodes.checkNoExtendedOperands(ie)) {
@@ -1748,9 +1748,9 @@ public final class ASTNodes {
         ASTNode parentNode= ASTNodes.getFirstAncestorOrNull(node, TryStatement.class, BodyDeclaration.class);
 
         while (parentNode instanceof TryStatement) {
-            TryStatement tryStmt= (TryStatement) parentNode;
+            TryStatement tryStatement= (TryStatement) parentNode;
 
-            for (Object object : tryStmt.catchClauses()) {
+            for (Object object : tryStatement.catchClauses()) {
                 CatchClause catchClause= (CatchClause) object;
 
                 if (catchClause.getException().getType() != null
@@ -2100,19 +2100,19 @@ public final class ASTNodes {
     /**
      * Returns whether the two provided codes structurally match.
      *
-     * @param referenceStmts the first code to compare
-     * @param comparedStmts  the second code to compare
+     * @param referenceStatements the first code to compare
+     * @param comparedStatements  the second code to compare
      * @return true if the two provided codes structurally match, false otherwise
      */
-    public static boolean match(final List<Statement> referenceStmts, final List<Statement> comparedStmts) {
-        if (referenceStmts.size() != comparedStmts.size()) {
+    public static boolean match(final List<Statement> referenceStatements, final List<Statement> comparedStatements) {
+        if (referenceStatements.size() != comparedStatements.size()) {
             return false;
         }
 
         final ASTSemanticMatcher matcher= new ASTSemanticMatcher();
 
-        for (int codeLine= 0; codeLine < referenceStmts.size(); codeLine++) {
-            if (!ASTNodes.match(matcher, referenceStmts.get(codeLine), comparedStmts.get(codeLine))) {
+        for (int codeLine= 0; codeLine < referenceStatements.size(); codeLine++) {
+            if (!ASTNodes.match(matcher, referenceStatements.get(codeLine), comparedStatements.get(codeLine))) {
                 return false;
             }
         }
@@ -2436,17 +2436,17 @@ public final class ASTNodes {
     /**
      * Return true if the statement falls through.
      *
-     * @param stmt the statement
+     * @param statement the statement
      * @return true if the statement falls through.
      */
-    public static boolean fallsThrough(Statement stmt) {
-        final List<Statement> stmts= ASTNodes.asList(stmt);
-        if (stmts.isEmpty()) {
+    public static boolean fallsThrough(Statement statement) {
+        final List<Statement> statements= ASTNodes.asList(statement);
+        if (statements.isEmpty()) {
             return false;
         }
 
-        final Statement lastStmt= stmts.get(stmts.size() - 1);
-        switch (lastStmt.getNodeType()) {
+        final Statement lastStatement= statements.get(statements.size() - 1);
+        switch (lastStatement.getNodeType()) {
         case RETURN_STATEMENT:
         case THROW_STATEMENT:
         case BREAK_STATEMENT:
@@ -2454,10 +2454,10 @@ public final class ASTNodes {
             return true;
 
         case IF_STATEMENT:
-            final IfStatement ifStmt= (IfStatement) lastStmt;
-            final Statement thenStmt= ifStmt.getThenStatement();
-            final Statement elseStmt= ifStmt.getElseStatement();
-            return ASTNodes.fallsThrough(thenStmt) && ASTNodes.fallsThrough(elseStmt);
+            final IfStatement ifStatement= (IfStatement) lastStatement;
+            final Statement thenStatement= ifStatement.getThenStatement();
+            final Statement elseStatement= ifStatement.getElseStatement();
+            return ASTNodes.fallsThrough(thenStatement) && ASTNodes.fallsThrough(elseStatement);
 
         default:
             return false;

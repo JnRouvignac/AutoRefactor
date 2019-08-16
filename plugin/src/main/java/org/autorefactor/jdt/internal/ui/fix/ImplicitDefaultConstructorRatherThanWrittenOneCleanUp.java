@@ -109,7 +109,7 @@ public class ImplicitDefaultConstructorRatherThanWrittenOneCleanUp extends Abstr
                     && (!isCheckedExceptionThrown(uniqueConstructor) || node.getSuperclassType() == null
                             || ASTNodes.hasType(node.getSuperclassType().resolveBinding(), Object.class.getCanonicalName()))
                     && (uniqueConstructor.parameters() == null || uniqueConstructor.parameters().isEmpty())
-                    && isDefaultStmts(uniqueConstructor)) {
+                    && isDefaultStatements(uniqueConstructor)) {
                 if (uniqueConstructor.modifiers() != null && uniqueConstructor.modifiers().size() == 1) {
                     final IExtendedModifier extendedModifier= (IExtendedModifier) uniqueConstructor.modifiers().get(0);
                     if (extendedModifier.isModifier()) {
@@ -131,15 +131,15 @@ public class ImplicitDefaultConstructorRatherThanWrittenOneCleanUp extends Abstr
         return true;
     }
 
-    private boolean isDefaultStmts(final MethodDeclaration uniqueConstructor) {
-        final List<Statement> stmts= ASTNodes.statements(uniqueConstructor.getBody());
-        if (stmts == null || stmts.isEmpty()) {
+    private boolean isDefaultStatements(final MethodDeclaration uniqueConstructor) {
+        final List<Statement> statements= ASTNodes.statements(uniqueConstructor.getBody());
+        if (statements == null || statements.isEmpty()) {
             return true;
-        } else if (stmts.size() == 1) {
-            final Statement stmt= stmts.get(0);
-            if (stmt instanceof SuperConstructorInvocation) {
-                final SuperConstructorInvocation superStmt= (SuperConstructorInvocation) stmt;
-                if (superStmt.arguments() == null || superStmt.arguments().isEmpty()) {
+        } else if (statements.size() == 1) {
+            final Statement statement= statements.get(0);
+            if (statement instanceof SuperConstructorInvocation) {
+                final SuperConstructorInvocation superStatement= (SuperConstructorInvocation) statement;
+                if (superStatement.arguments() == null || superStatement.arguments().isEmpty()) {
                     return true;
                 }
             }

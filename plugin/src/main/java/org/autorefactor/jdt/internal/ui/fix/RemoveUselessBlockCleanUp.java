@@ -67,9 +67,9 @@ public class RemoveUselessBlockCleanUp extends AbstractCleanUpRule {
 
     @Override
     public boolean visit(Block node) {
-        final List<Statement> stmts= ASTNodes.statements(node);
-        if (stmts.size() == 1 && stmts.get(0) instanceof Block) {
-            replaceBlock((Block) stmts.get(0));
+        final List<Statement> statements= ASTNodes.statements(node);
+        if (statements.size() == 1 && statements.get(0) instanceof Block) {
+            replaceBlock((Block) statements.get(0));
             return false;
         } else if (node.getParent() instanceof Block) {
             final Set<String> ifVariableNames= ASTNodes.getLocalVariableIdentifiers(node, false);

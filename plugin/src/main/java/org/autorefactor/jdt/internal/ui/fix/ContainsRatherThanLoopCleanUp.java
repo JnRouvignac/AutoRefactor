@@ -61,24 +61,24 @@ public class ContainsRatherThanLoopCleanUp extends AbstractCollectionMethodRathe
     }
 
     @Override
-    protected Expression getExpressionToFind(MethodInvocation cond, Expression forVar) {
-        Expression expr= ASTNodes.getUnparenthesedExpression(cond.getExpression());
-        Expression arg0= ASTNodes.getUnparenthesedExpression(ASTNodes.arg0(cond));
+    protected Expression getExpressionToFind(MethodInvocation condition, Expression forVar) {
+        Expression expression= ASTNodes.getUnparenthesedExpression(condition.getExpression());
+        Expression arg0= ASTNodes.getUnparenthesedExpression(ASTNodes.arg0(condition));
 
-        if (ASTNodes.isSameVariable(forVar, expr)) {
+        if (ASTNodes.isSameVariable(forVar, expression)) {
             return arg0;
         }
 
         if (ASTNodes.isSameVariable(forVar, arg0)) {
-            return expr;
+            return expression;
         }
 
-        if (ASTNodes.match(forVar, expr)) {
+        if (ASTNodes.match(forVar, expression)) {
             return arg0;
         }
 
         if (ASTNodes.match(forVar, arg0)) {
-            return expr;
+            return expression;
         }
 
         return null;

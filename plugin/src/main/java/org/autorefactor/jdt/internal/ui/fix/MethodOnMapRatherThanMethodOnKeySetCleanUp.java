@@ -66,9 +66,9 @@ public class MethodOnMapRatherThanMethodOnKeySetCleanUp extends AbstractCleanUpR
 
     @Override
     public boolean visit(MethodInvocation mi) {
-        Expression miExpr= mi.getExpression();
-        if (isKeySetMethod(miExpr)) {
-            final MethodInvocation mapKeySetMi= (MethodInvocation) miExpr;
+        Expression miExpression= mi.getExpression();
+        if (isKeySetMethod(miExpression)) {
+            final MethodInvocation mapKeySetMi= (MethodInvocation) miExpression;
             if (ASTNodes.usesGivenSignature(mi, Set.class.getCanonicalName(), "clear")) { //$NON-NLS-1$
                 return removeInvocationOfMapKeySet(mapKeySetMi, mi, "clear"); //$NON-NLS-1$
             }
@@ -101,7 +101,7 @@ public class MethodOnMapRatherThanMethodOnKeySetCleanUp extends AbstractCleanUpR
         return false;
     }
 
-    private boolean isKeySetMethod(Expression expr) {
-        return expr instanceof MethodInvocation && ASTNodes.usesGivenSignature((MethodInvocation) expr, Map.class.getCanonicalName(), "keySet"); //$NON-NLS-1$
+    private boolean isKeySetMethod(Expression expression) {
+        return expression instanceof MethodInvocation && ASTNodes.usesGivenSignature((MethodInvocation) expression, Map.class.getCanonicalName(), "keySet"); //$NON-NLS-1$
     }
 }

@@ -40,7 +40,7 @@ public class OppositeConditionRatherThanDuplicateConditionSample {
         }
     }
 
-    public int doNotMoveExtendedExpr(boolean duplicateCondition, boolean anotherCondition, boolean oneMoreCondition) {
+    public int doNotMoveExtendedExpression(boolean duplicateCondition, boolean anotherCondition, boolean oneMoreCondition) {
         if (duplicateCondition && anotherCondition && oneMoreCondition) {
             return 0;
         } else if (duplicateCondition) {

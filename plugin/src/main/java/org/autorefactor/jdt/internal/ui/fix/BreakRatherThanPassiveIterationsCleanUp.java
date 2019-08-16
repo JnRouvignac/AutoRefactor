@@ -107,8 +107,8 @@ public class BreakRatherThanPassiveIterationsCleanUp extends AbstractCleanUpRule
 
         private boolean mayCallImplicitToString(final List<Expression> extendedOperands) {
             if (extendedOperands != null) {
-                for (Expression expr : extendedOperands) {
-                    if (mayCallImplicitToString(expr)) {
+                for (Expression expression : extendedOperands) {
+                    if (mayCallImplicitToString(expression)) {
                         return true;
                     }
                 }
@@ -116,11 +116,11 @@ public class BreakRatherThanPassiveIterationsCleanUp extends AbstractCleanUpRule
             return false;
         }
 
-        private boolean mayCallImplicitToString(final Expression expr) {
-            return !ASTNodes.hasType(expr, String.class.getCanonicalName(), boolean.class.getSimpleName(), short.class.getSimpleName(), int.class.getSimpleName(), long.class.getSimpleName(), float.class.getSimpleName(), double.class.getSimpleName(),
+        private boolean mayCallImplicitToString(final Expression expression) {
+            return !ASTNodes.hasType(expression, String.class.getCanonicalName(), boolean.class.getSimpleName(), short.class.getSimpleName(), int.class.getSimpleName(), long.class.getSimpleName(), float.class.getSimpleName(), double.class.getSimpleName(),
                     Short.class.getCanonicalName(), Boolean.class.getCanonicalName(), Integer.class.getCanonicalName(), Long.class.getCanonicalName(), Float.class.getCanonicalName(),
-                    Double.class.getCanonicalName()) && !(expr instanceof PrefixExpression) && !(expr instanceof InfixExpression)
-                    && !(expr instanceof PostfixExpression);
+                    Double.class.getCanonicalName()) && !(expression instanceof PrefixExpression) && !(expression instanceof InfixExpression)
+                    && !(expression instanceof PostfixExpression);
         }
 
         @Override
@@ -208,30 +208,30 @@ public class BreakRatherThanPassiveIterationsCleanUp extends AbstractCleanUpRule
     }
 
     private boolean visitLoopBody(final Statement body, final Set<String> allowedVars) {
-        final List<Statement> stmts= ASTNodes.asList(body);
+        final List<Statement> statements= ASTNodes.asList(body);
 
-        if (stmts == null || stmts.isEmpty()) {
+        if (statements == null || statements.isEmpty()) {
             return true;
         }
 
-        for (int i= 0; i < stmts.size() - 1; i++) {
-            final Statement stmt= stmts.get(i);
-            allowedVars.addAll(ASTNodes.getLocalVariableIdentifiers(stmt, true));
+        for (int i= 0; i < statements.size() - 1; i++) {
+            final Statement statement= statements.get(i);
+            allowedVars.addAll(ASTNodes.getLocalVariableIdentifiers(statement, true));
 
-            if (hasSideEffect(stmt, allowedVars)) {
+            if (hasSideEffect(statement, allowedVars)) {
                 return true;
             }
         }
 
-        if (stmts.get(stmts.size() - 1) instanceof IfStatement) {
-            final IfStatement ifStmt= (IfStatement) stmts.get(stmts.size() - 1);
+        if (statements.get(statements.size() - 1) instanceof IfStatement) {
+            final IfStatement ifStatement= (IfStatement) statements.get(statements.size() - 1);
 
-            if (ifStmt.getElseStatement() == null && !hasSideEffect(ifStmt.getExpression(), allowedVars)) {
-                final List<Statement> assignments= ASTNodes.asList(ifStmt.getThenStatement());
+            if (ifStatement.getElseStatement() == null && !hasSideEffect(ifStatement.getExpression(), allowedVars)) {
+                final List<Statement> assignments= ASTNodes.asList(ifStatement.getThenStatement());
 
-                for (final Statement stmt : assignments) {
-                    if (stmt instanceof VariableDeclarationStatement) {
-                        final VariableDeclarationStatement decl= (VariableDeclarationStatement) stmt;
+                for (final Statement statement : assignments) {
+                    if (statement instanceof VariableDeclarationStatement) {
+                        final VariableDeclarationStatement decl= (VariableDeclarationStatement) statement;
 
                         for (final Object obj : decl.fragments()) {
                             final VariableDeclarationFragment fragment= (VariableDeclarationFragment) obj;
@@ -240,11 +240,11 @@ public class BreakRatherThanPassiveIterationsCleanUp extends AbstractCleanUpRule
                                 return true;
                             }
                         }
-                    } else if (stmt instanceof ExpressionStatement) {
-                        final Expression expr= ((ExpressionStatement) stmt).getExpression();
+                    } else if (statement instanceof ExpressionStatement) {
+                        final Expression expression= ((ExpressionStatement) statement).getExpression();
 
-                        if (expr instanceof Assignment) {
-                            final Assignment assignment= (Assignment) expr;
+                        if (expression instanceof Assignment) {
+                            final Assignment assignment= (Assignment) expression;
 
                             if (!ASTNodes.isHardCoded(assignment.getRightHandSide())) {
                                 return true;
@@ -257,7 +257,7 @@ public class BreakRatherThanPassiveIterationsCleanUp extends AbstractCleanUpRule
                     }
                 }
 
-                addBreak(ifStmt, assignments);
+                addBreak(ifStatement, assignments);
                 return false;
             }
         }
@@ -265,14 +265,14 @@ public class BreakRatherThanPassiveIterationsCleanUp extends AbstractCleanUpRule
         return true;
     }
 
-    private void addBreak(final IfStatement ifStmt, final List<Statement> assignments) {
+    private void addBreak(final IfStatement ifStatement, final List<Statement> assignments) {
         final ASTNodeFactory b= ctx.getASTBuilder();
         final Refactorings r= ctx.getRefactorings();
 
-        if (ifStmt.getThenStatement() instanceof Block) {
+        if (ifStatement.getThenStatement() instanceof Block) {
             r.insertAfter(b.break0(), assignments.get(assignments.size() - 1));
         } else {
-            r.replace(ifStmt.getThenStatement(), b.block(b.copy(ifStmt.getThenStatement()), b.break0()));
+            r.replace(ifStatement.getThenStatement(), b.block(b.copy(ifStatement.getThenStatement()), b.break0()));
         }
     }
 }

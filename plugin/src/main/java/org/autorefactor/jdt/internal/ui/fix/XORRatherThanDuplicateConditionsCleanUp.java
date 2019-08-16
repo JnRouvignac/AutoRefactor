@@ -77,10 +77,10 @@ public class XORRatherThanDuplicateConditionsCleanUp extends AbstractCleanUpRule
                     && ASTNodes.isPassive(secondCondition.getLeftOperand()) && ASTNodes.isPassive(secondCondition.getRightOperand())) {
                 final ASTSemanticMatcher matcher= new ASTSemanticMatcher();
 
-                return maybeReplaceDuplicateExpr(matcher, node, firstCondition.getLeftOperand(),
+                return maybeReplaceDuplicateExpression(matcher, node, firstCondition.getLeftOperand(),
                         secondCondition.getLeftOperand(), firstCondition.getRightOperand(),
                         secondCondition.getRightOperand())
-                        && maybeReplaceDuplicateExpr(matcher, node, firstCondition.getLeftOperand(),
+                        && maybeReplaceDuplicateExpression(matcher, node, firstCondition.getLeftOperand(),
                                 secondCondition.getRightOperand(), firstCondition.getRightOperand(),
                                 secondCondition.getLeftOperand());
             }
@@ -89,48 +89,48 @@ public class XORRatherThanDuplicateConditionsCleanUp extends AbstractCleanUpRule
         return true;
     }
 
-    private boolean maybeReplaceDuplicateExpr(final ASTSemanticMatcher matcher, final InfixExpression node,
-            final Expression firstExpr, final Expression firstOppositeExpr, final Expression secondExpr,
-            final Expression secondOppositeExpr) {
-        if (matcher.matchOpposite(firstExpr, firstOppositeExpr)
-                && matcher.matchOpposite(secondExpr, secondOppositeExpr)) {
+    private boolean maybeReplaceDuplicateExpression(final ASTSemanticMatcher matcher, final InfixExpression node,
+            final Expression firstExpression, final Expression firstOppositeExpression, final Expression secondExpression,
+            final Expression secondOppositeExpression) {
+        if (matcher.matchOpposite(firstExpression, firstOppositeExpression)
+                && matcher.matchOpposite(secondExpression, secondOppositeExpression)) {
             final AtomicBoolean isFirstExprPositive= new AtomicBoolean();
             final AtomicBoolean isSecondExprPositive= new AtomicBoolean();
 
-            final Expression firstBasicExpr= getBasisExpression(firstExpr, isFirstExprPositive);
-            final Expression secondBasicExpr= getBasisExpression(secondExpr, isSecondExprPositive);
+            final Expression firstBasicExpression= getBasisExpression(firstExpression, isFirstExprPositive);
+            final Expression secondBasicExpression= getBasisExpression(secondExpression, isSecondExprPositive);
 
-            replaceDuplicateExpr(node, firstBasicExpr, secondBasicExpr, isFirstExprPositive, isSecondExprPositive);
+            replaceDuplicateExpression(node, firstBasicExpression, secondBasicExpression, isFirstExprPositive, isSecondExprPositive);
             return false;
         }
 
         return true;
     }
 
-    private Expression getBasisExpression(final Expression originalExpr, final AtomicBoolean isExprPositive) {
-        Expression basisExpr= null;
-        final PrefixExpression negateExpr= ASTNodes.as(originalExpr, PrefixExpression.class);
+    private Expression getBasisExpression(final Expression originalExpression, final AtomicBoolean isExprPositive) {
+        Expression basisExpression= null;
+        final PrefixExpression negateExpression= ASTNodes.as(originalExpression, PrefixExpression.class);
 
-        if (ASTNodes.hasOperator(negateExpr, PrefixExpression.Operator.NOT)) {
-            basisExpr= negateExpr.getOperand();
+        if (ASTNodes.hasOperator(negateExpression, PrefixExpression.Operator.NOT)) {
+            basisExpression= negateExpression.getOperand();
             isExprPositive.set(false);
         } else {
-            basisExpr= originalExpr;
+            basisExpression= originalExpression;
             isExprPositive.set(true);
         }
 
-        return basisExpr;
+        return basisExpression;
     }
 
-    private void replaceDuplicateExpr(final InfixExpression node, final Expression firstExpr,
-            final Expression secondExpr, final AtomicBoolean isFirstExprPositive,
+    private void replaceDuplicateExpression(final InfixExpression node, final Expression firstExpression,
+            final Expression secondExpression, final AtomicBoolean isFirstExprPositive,
             final AtomicBoolean isSecondExprPositive) {
         final ASTNodeFactory b= ctx.getASTBuilder();
 
         if (isFirstExprPositive.get() == isSecondExprPositive.get()) {
-            ctx.getRefactorings().replace(node, b.infixExpr(b.copy(firstExpr), InfixExpression.Operator.EQUALS, b.copy(secondExpr)));
+            ctx.getRefactorings().replace(node, b.infixExpression(b.copy(firstExpression), InfixExpression.Operator.EQUALS, b.copy(secondExpression)));
         } else {
-            ctx.getRefactorings().replace(node, b.infixExpr(b.copy(firstExpr), InfixExpression.Operator.XOR, b.copy(secondExpr)));
+            ctx.getRefactorings().replace(node, b.infixExpression(b.copy(firstExpression), InfixExpression.Operator.XOR, b.copy(secondExpression)));
         }
     }
 }

@@ -116,9 +116,9 @@ public class JUnitAssertCleanUp extends AbstractUnitTestCleanUp {
 
     @Override
     public boolean visit(IfStatement node) {
-        final List<Statement> stmts= ASTNodes.asList(node.getThenStatement());
-        if (node.getElseStatement() == null && stmts.size() == 1) {
-            final MethodInvocation mi= ASTNodes.asExpression(stmts.get(0), MethodInvocation.class);
+        final List<Statement> statements= ASTNodes.asList(node.getThenStatement());
+        if (node.getElseStatement() == null && statements.size() == 1) {
+            final MethodInvocation mi= ASTNodes.asExpression(statements.get(0), MethodInvocation.class);
             int i= 0;
             boolean shouldVisit= true;
             while (shouldVisit && i < JUnitAssertCleanUp.PACKAGE_PATHES.length) {
@@ -141,23 +141,23 @@ public class JUnitAssertCleanUp extends AbstractUnitTestCleanUp {
     }
 
     @Override
-    protected MethodInvocation invokeQualifiedMethod(final ASTNodeFactory b, final Expression copyOfExpr,
+    protected MethodInvocation invokeQualifiedMethod(final ASTNodeFactory b, final Expression copyOfExpression,
             final String methodName, final Expression copyOfActual, final Expression copyOfExpected,
             final Expression failureMessage) {
         if (failureMessage == null) {
             if (copyOfActual == null) {
-                return b.invoke(copyOfExpr, methodName);
+                return b.invoke(copyOfExpression, methodName);
             } else if (copyOfExpected == null) {
-                return b.invoke(copyOfExpr, methodName, copyOfActual);
+                return b.invoke(copyOfExpression, methodName, copyOfActual);
             } else {
-                return b.invoke(copyOfExpr, methodName, copyOfExpected, copyOfActual);
+                return b.invoke(copyOfExpression, methodName, copyOfExpected, copyOfActual);
             }
         } else if (copyOfActual == null) {
-            return b.invoke(copyOfExpr, methodName, b.copy(failureMessage));
+            return b.invoke(copyOfExpression, methodName, b.copy(failureMessage));
         } else if (copyOfExpected == null) {
-            return b.invoke(copyOfExpr, methodName, b.copy(failureMessage), copyOfActual);
+            return b.invoke(copyOfExpression, methodName, b.copy(failureMessage), copyOfActual);
         } else {
-            return b.invoke(copyOfExpr, methodName, b.copy(failureMessage), copyOfExpected, copyOfActual);
+            return b.invoke(copyOfExpression, methodName, b.copy(failureMessage), copyOfExpected, copyOfActual);
         }
     }
 }

@@ -148,13 +148,13 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
         if (ASTNodes.usesGivenSignature(methodDecl, Comparator.class.getCanonicalName(), "compare", typeArgument.getQualifiedName(), //$NON-NLS-1$
                 typeArgument.getQualifiedName())) {
             @SuppressWarnings("unchecked")
-            final List<Statement> stmts= methodBody.statements();
+            final List<Statement> statements= methodBody.statements();
 
-            if (stmts != null && stmts.size() == 1) {
-                final ReturnStatement returnStmt= ASTNodes.as(stmts.get(0), ReturnStatement.class);
+            if (statements != null && statements.size() == 1) {
+                final ReturnStatement returnStatement= ASTNodes.as(statements.get(0), ReturnStatement.class);
 
-                if (returnStmt != null) {
-                    final MethodInvocation compareToMethod= ASTNodes.as(returnStmt.getExpression(), MethodInvocation.class);
+                if (returnStatement != null) {
+                    final MethodInvocation compareToMethod= ASTNodes.as(returnStatement.getExpression(), MethodInvocation.class);
 
                     if (compareToMethod != null && compareToMethod.getExpression() != null) {
                         final String comparisonClass= compareToMethod.getExpression().resolveTypeBinding()
@@ -266,23 +266,23 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
 
         final TypeNameDecider typeNameDecider= new TypeNameDecider(field);
 
-        final LambdaExpression lambdaExpr= b.lambda();
+        final LambdaExpression lambdaExpression= b.lambda();
         final ITypeBinding destinationType= ASTNodes.getTargetType(node);
 
         boolean isTypeKnown= destinationType != null && ASTNodes.hasType(destinationType, Comparator.class.getCanonicalName())
                 && destinationType.getTypeArguments() != null && destinationType.getTypeArguments().length == 1 && Utils.equalNotNull(destinationType.getTypeArguments()[0], type);
 
         if (isTypeKnown && straightOrder) {
-            lambdaExpr.parameters().add(b.declareFragment(b.simpleName(identifier1)));
+            lambdaExpression.parameters().add(b.declareFragment(b.simpleName(identifier1)));
         } else {
-            lambdaExpr.parameters().add(b.declareSingleVariable(identifier1, b.toType(type, typeNameDecider)));
+            lambdaExpression.parameters().add(b.declareSingleVariable(identifier1, b.toType(type, typeNameDecider)));
         }
 
-        lambdaExpr.setBody(b.fieldAccess(b.simpleName(identifier1), b.copy(field.getName())));
-        lambdaExpr.setParentheses(false);
+        lambdaExpression.setBody(b.fieldAccess(b.simpleName(identifier1), b.copy(field.getName())));
+        lambdaExpression.setParentheses(false);
         final MethodInvocation comparingMethod= b
                 .invoke(classesToUseWithImport.contains(Comparator.class.getCanonicalName()) ? b.name("Comparator") //$NON-NLS-1$
-                        : b.name("java", "util", "Comparator"), "comparing", lambdaExpr); //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$ $NON-NLS-4$
+                        : b.name("java", "util", "Comparator"), "comparing", lambdaExpression); //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$ $NON-NLS-4$
         if (straightOrder) {
             r.replace(node, comparingMethod);
         } else {

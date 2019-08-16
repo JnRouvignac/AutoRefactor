@@ -81,51 +81,51 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
             return true;
         }
 
-        final List<List<Statement>> allCasesStmts= new ArrayList<List<Statement>>();
+        final List<List<Statement>> allCasesStatements= new ArrayList<List<Statement>>();
 
         // Collect all the if / else if / else if / ... / else cases
-        if (collectAllCases(allCasesStmts, node)) {
+        if (collectAllCases(allCasesStatements, node)) {
             final List<List<Statement>> caseStmtsToRemove= new LinkedList<List<Statement>>();
 
-            // Initialize removedCaseStmts list
-            for (int i= 0; i < allCasesStmts.size(); i++) {
+            // Initialize removedCaseStatements list
+            for (int i= 0; i < allCasesStatements.size(); i++) {
                 caseStmtsToRemove.add(new LinkedList<Statement>());
             }
 
             // If all cases exist
             final ASTSemanticMatcher matcher= new ASTMatcherSameVariablesAndMethods();
-            final int minSize= minSize(allCasesStmts);
+            final int minSize= minSize(allCasesStatements);
 
             // Identify matching statements starting from the end of each case
             boolean hasCodeToMove= false;
             for (int stmtIndex= 1; stmtIndex <= minSize; stmtIndex++) {
-                if (!match(matcher, allCasesStmts, stmtIndex, 0, allCasesStmts.size())
-                        || anyContains(caseStmtsToRemove, allCasesStmts, stmtIndex)) {
+                if (!match(matcher, allCasesStatements, stmtIndex, 0, allCasesStatements.size())
+                        || anyContains(caseStmtsToRemove, allCasesStatements, stmtIndex)) {
                     break;
                 }
-                flagStmtsToRemove(allCasesStmts, stmtIndex, caseStmtsToRemove);
+                flagStmtsToRemove(allCasesStatements, stmtIndex, caseStmtsToRemove);
                 hasCodeToMove= true;
             }
 
             if (hasCodeToMove) {
-                removeIdenticalTrailingCode(node, allCasesStmts, caseStmtsToRemove);
+                removeIdenticalTrailingCode(node, allCasesStatements, caseStmtsToRemove);
                 return false;
             }
         }
         return true;
     }
 
-    private void removeIdenticalTrailingCode(IfStatement node, final List<List<Statement>> allCasesStmts,
+    private void removeIdenticalTrailingCode(IfStatement node, final List<List<Statement>> allCasesStatements,
             final List<List<Statement>> caseStmtsToRemove) {
         final ASTNodeFactory b= this.ctx.getASTBuilder();
         final Refactorings r= this.ctx.getRefactorings();
 
         // Remove the nodes common to all cases
-        final boolean[] areCasesRemovable= new boolean[allCasesStmts.size()];
-        for (int i= 0; i < allCasesStmts.size(); i++) {
+        final boolean[] areCasesRemovable= new boolean[allCasesStatements.size()];
+        for (int i= 0; i < allCasesStatements.size(); i++) {
             areCasesRemovable[i]= false;
         }
-        removeStmtsFromCases(allCasesStmts, caseStmtsToRemove, areCasesRemovable);
+        removeStmtsFromCases(allCasesStatements, caseStmtsToRemove, areCasesRemovable);
 
         if (allRemovable(areCasesRemovable)) {
             if (node.getParent() instanceof Block) {
@@ -133,11 +133,11 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
 
                 r.removeButKeepComment(node);
             } else {
-                List<Statement> orderedStmts= new ArrayList<Statement>(caseStmtsToRemove.get(0).size());
+                List<Statement> orderedStatements= new ArrayList<Statement>(caseStmtsToRemove.get(0).size());
                 for (final Statement stmtToRemove : caseStmtsToRemove.get(0)) {
-                    orderedStmts.add(0, b.copy(stmtToRemove));
+                    orderedStatements.add(0, b.copy(stmtToRemove));
                 }
-                r.replace(node, b.block(orderedStmts.toArray(new Statement[caseStmtsToRemove.get(0).size()])));
+                r.replace(node, b.block(orderedStatements.toArray(new Statement[caseStmtsToRemove.get(0).size()])));
             }
         } else {
             // Remove empty cases
@@ -153,20 +153,20 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
 
             for (int i= 1; i < areCasesRemovable.length; i++) {
                 if (areCasesRemovable[i]) {
-                    final Statement firstStmt= allCasesStmts.get(i).get(0);
-                    r.remove(findNodeToRemove(firstStmt));
+                    final Statement firstStatement= allCasesStatements.get(i).get(0);
+                    r.remove(findNodeToRemove(firstStatement));
                 }
             }
 
             if (node.getParent() instanceof Block) {
                 insertIdenticalCode(node, b, r, caseStmtsToRemove.get(0));
             } else {
-                List<Statement> orderedStmts= new ArrayList<Statement>(caseStmtsToRemove.get(0).size() + 1);
+                List<Statement> orderedStatements= new ArrayList<Statement>(caseStmtsToRemove.get(0).size() + 1);
                 for (final Statement stmtToRemove : caseStmtsToRemove.get(0)) {
-                    orderedStmts.add(0, b.copy(stmtToRemove));
+                    orderedStatements.add(0, b.copy(stmtToRemove));
                 }
-                orderedStmts.add(0, b.move(node));
-                r.replace(node, b.block(orderedStmts.toArray(new Statement[caseStmtsToRemove.get(0).size() + 1])));
+                orderedStatements.add(0, b.move(node));
+                r.replace(node, b.block(orderedStatements.toArray(new Statement[caseStmtsToRemove.get(0).size() + 1])));
             }
         }
     }
@@ -203,42 +203,42 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
         return true;
     }
 
-    private void removeStmtsFromCases(List<List<Statement>> allCasesStmts, List<List<Statement>> removedCaseStmts,
+    private void removeStmtsFromCases(List<List<Statement>> allCasesStatements, List<List<Statement>> removedCaseStatements,
             boolean[] areCasesRemovable) {
-        for (int i= 0; i < allCasesStmts.size(); i++) {
-            final List<Statement> removedStmts= removedCaseStmts.get(i);
-            final ASTNode parent= findNodeToRemove(allCasesStmts.get(i).get(0));
+        for (int i= 0; i < allCasesStatements.size(); i++) {
+            final List<Statement> removedStatements= removedCaseStatements.get(i);
+            final ASTNode parent= findNodeToRemove(allCasesStatements.get(i).get(0));
 
-            if (removedStmts.containsAll(allCasesStmts.get(i))
+            if (removedStatements.containsAll(allCasesStatements.get(i))
                     && (!(parent instanceof IfStatement) || ASTNodes.isPassive(((IfStatement) parent).getExpression()))) {
                 areCasesRemovable[i]= true;
             } else {
-                this.ctx.getRefactorings().remove(removedStmts);
+                this.ctx.getRefactorings().remove(removedStatements);
             }
         }
     }
 
-    private boolean anyContains(List<List<Statement>> removedCaseStmts, List<List<Statement>> allCasesStmts,
+    private boolean anyContains(List<List<Statement>> removedCaseStatements, List<List<Statement>> allCasesStatements,
             int stmtIndex) {
-        for (int i= 0; i < allCasesStmts.size(); i++) {
-            final List<Statement> caseStmts= allCasesStmts.get(i);
-            if (removedCaseStmts.get(i).contains(caseStmts.get(caseStmts.size() - stmtIndex))) {
+        for (int i= 0; i < allCasesStatements.size(); i++) {
+            final List<Statement> caseStatements= allCasesStatements.get(i);
+            if (removedCaseStatements.get(i).contains(caseStatements.get(caseStatements.size() - stmtIndex))) {
                 return true;
             }
         }
         return false;
     }
 
-    private void flagStmtsToRemove(List<List<Statement>> allCasesStmts, int stmtIndex,
-            List<List<Statement>> removedCaseStmts) {
-        for (int i= 0; i < allCasesStmts.size(); i++) {
-            final List<Statement> caseStmts= allCasesStmts.get(i);
-            final Statement stmtToRemove= caseStmts.get(caseStmts.size() - stmtIndex);
-            removedCaseStmts.get(i).add(stmtToRemove);
+    private void flagStmtsToRemove(List<List<Statement>> allCasesStatements, int stmtIndex,
+            List<List<Statement>> removedCaseStatements) {
+        for (int i= 0; i < allCasesStatements.size(); i++) {
+            final List<Statement> caseStatements= allCasesStatements.get(i);
+            final Statement stmtToRemove= caseStatements.get(caseStatements.size() - stmtIndex);
+            removedCaseStatements.get(i).add(stmtToRemove);
         }
     }
 
-    private boolean match(ASTSemanticMatcher matcher, List<List<Statement>> allCasesStmts, int stmtIndex,
+    private boolean match(ASTSemanticMatcher matcher, List<List<Statement>> allCasesStatements, int stmtIndex,
             int startIndex, int endIndex) {
         if (startIndex == endIndex || startIndex == endIndex - 1) {
             return true;
@@ -246,8 +246,8 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
         final int comparisonIndex;
         if (endIndex - startIndex > 1) {
             final int pivotIndex= (endIndex + startIndex + 1) / 2;
-            if (!match(matcher, allCasesStmts, stmtIndex, startIndex, pivotIndex)
-                    || !match(matcher, allCasesStmts, stmtIndex, pivotIndex, endIndex)) {
+            if (!match(matcher, allCasesStatements, stmtIndex, startIndex, pivotIndex)
+                    || !match(matcher, allCasesStatements, stmtIndex, pivotIndex, endIndex)) {
                 return false;
             }
             comparisonIndex= pivotIndex;
@@ -255,19 +255,19 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
             comparisonIndex= endIndex - 1;
         }
 
-        final List<Statement> caseStmts1= allCasesStmts.get(startIndex);
-        final List<Statement> caseStmts2= allCasesStmts.get(comparisonIndex);
+        final List<Statement> caseStmts1= allCasesStatements.get(startIndex);
+        final List<Statement> caseStmts2= allCasesStatements.get(comparisonIndex);
         return ASTNodes.match(matcher, caseStmts1.get(caseStmts1.size() - stmtIndex),
                 caseStmts2.get(caseStmts2.size() - stmtIndex));
     }
 
-    private int minSize(List<List<Statement>> allCasesStmts) {
-        if (allCasesStmts.isEmpty()) {
-            throw new IllegalStateException(null, "allCasesStmts List must not be empty"); //$NON-NLS-1$
+    private int minSize(List<List<Statement>> allCasesStatements) {
+        if (allCasesStatements.isEmpty()) {
+            throw new IllegalStateException(null, "allCasesStatements List must not be empty"); //$NON-NLS-1$
         }
         int min= Integer.MAX_VALUE;
-        for (List<Statement> stmts : allCasesStmts) {
-            min= Math.min(min, stmts.size());
+        for (List<Statement> statements : allCasesStatements) {
+            min= Math.min(min, statements.size());
         }
         if (min == Integer.MAX_VALUE) {
             throw new IllegalStateException(null, "The minimum size should never have been equal to Integer.MAX_VALUE"); //$NON-NLS-1$
@@ -285,22 +285,22 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
      *         otherwise
      */
     private boolean collectAllCases(List<List<Statement>> allCases, IfStatement node) {
-        final List<Statement> thenStmts= ASTNodes.asList(node.getThenStatement());
-        final List<Statement> elseStmts= ASTNodes.asList(node.getElseStatement());
-        if (thenStmts.isEmpty() || elseStmts.isEmpty()) {
+        final List<Statement> thenStatements= ASTNodes.asList(node.getThenStatement());
+        final List<Statement> elseStatements= ASTNodes.asList(node.getElseStatement());
+        if (thenStatements.isEmpty() || elseStatements.isEmpty()) {
             // If the then or else clause is empty, then there is no common code whatsoever.
             // let other refactorings take care of removing empty blocks.
             return false;
         }
 
-        allCases.add(thenStmts);
-        if (elseStmts.size() == 1) {
-            final IfStatement is= ASTNodes.as(elseStmts.get(0), IfStatement.class);
+        allCases.add(thenStatements);
+        if (elseStatements.size() == 1) {
+            final IfStatement is= ASTNodes.as(elseStatements.get(0), IfStatement.class);
             if (is != null) {
                 return collectAllCases(allCases, is);
             }
         }
-        allCases.add(elseStmts);
+        allCases.add(elseStatements);
         return true;
     }
 }

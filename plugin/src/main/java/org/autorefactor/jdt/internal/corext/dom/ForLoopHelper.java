@@ -261,9 +261,9 @@ public final class ForLoopHelper {
         return Pair.empty();
     }
 
-    private static boolean isZero(final Expression expr) {
-        if (expr != null) {
-            final Object val= expr.resolveConstantExpressionValue();
+    private static boolean isZero(final Expression expression) {
+        if (expression != null) {
+            final Object val= expression.resolveConstantExpressionValue();
             if (val instanceof Integer) {
                 return ((Integer) val).intValue() == 0;
             }

@@ -195,36 +195,36 @@ public abstract class AbstractPrimitiveRatherThanWrapperCleanUp extends Abstract
         ctx.getRefactorings().replace(node.getType(), primitiveType);
     }
 
-    private boolean isNotNull(final Expression expr) {
-        if (expr instanceof ParenthesizedExpression) {
-            final ParenthesizedExpression parenthesizedExpr= (ParenthesizedExpression) expr;
-            return isNotNull(parenthesizedExpr.getExpression());
-        } else if (expr instanceof ConditionalExpression) {
-            final ConditionalExpression prefixExpr= (ConditionalExpression) expr;
-            return isNotNull(prefixExpr.getThenExpression()) && isNotNull(prefixExpr.getElseExpression());
-        } else if (getLiteralClass().equals(expr.getClass())) {
+    private boolean isNotNull(final Expression expression) {
+        if (expression instanceof ParenthesizedExpression) {
+            final ParenthesizedExpression parenthesizedExpression= (ParenthesizedExpression) expression;
+            return isNotNull(parenthesizedExpression.getExpression());
+        } else if (expression instanceof ConditionalExpression) {
+            final ConditionalExpression prefixExpression= (ConditionalExpression) expression;
+            return isNotNull(prefixExpression.getThenExpression()) && isNotNull(prefixExpression.getElseExpression());
+        } else if (getLiteralClass().equals(expression.getClass())) {
             return true;
-        } else if (expr instanceof QualifiedName) {
-            final QualifiedName qualifiedName= (QualifiedName) expr;
+        } else if (expression instanceof QualifiedName) {
+            final QualifiedName qualifiedName= (QualifiedName) expression;
             return ASTNodes.hasType(qualifiedName.getQualifier(), getWrapperFullyQualifiedName())
                     && (ASTNodes.isField(qualifiedName, getWrapperFullyQualifiedName(), getSafeInConstants())
                             || ASTNodes.isField(qualifiedName, getPrimitiveTypeName(), getSafeInConstants()));
-        } else if (expr instanceof InfixExpression) {
-            final InfixExpression infixExpr= (InfixExpression) expr;
-            return getInfixInSafeOperators().contains(infixExpr.getOperator());
-        } else if (expr instanceof PrefixExpression) {
-            final PrefixExpression prefixExpr= (PrefixExpression) expr;
-            return getPrefixInSafeOperators().contains(prefixExpr.getOperator());
-        } else if (expr instanceof PostfixExpression) {
-            final PostfixExpression postfixExpr= (PostfixExpression) expr;
-            return getPostfixInSafeOperators().contains(postfixExpr.getOperator());
-        } else if (expr instanceof CastExpression) {
-            final CastExpression castExpr= (CastExpression) expr;
-            return ASTNodes.hasType(castExpr.getType().resolveBinding(), getPrimitiveTypeName())
-                    || (ASTNodes.hasType(castExpr.getType().resolveBinding(), getWrapperFullyQualifiedName())
-                            && isNotNull(castExpr.getExpression()));
-        } else if (expr instanceof MethodInvocation) {
-            final MethodInvocation mi= (MethodInvocation) expr;
+        } else if (expression instanceof InfixExpression) {
+            final InfixExpression infixExpression= (InfixExpression) expression;
+            return getInfixInSafeOperators().contains(infixExpression.getOperator());
+        } else if (expression instanceof PrefixExpression) {
+            final PrefixExpression prefixExpression= (PrefixExpression) expression;
+            return getPrefixInSafeOperators().contains(prefixExpression.getOperator());
+        } else if (expression instanceof PostfixExpression) {
+            final PostfixExpression postfixExpression= (PostfixExpression) expression;
+            return getPostfixInSafeOperators().contains(postfixExpression.getOperator());
+        } else if (expression instanceof CastExpression) {
+            final CastExpression castExpression= (CastExpression) expression;
+            return ASTNodes.hasType(castExpression.getType().resolveBinding(), getPrimitiveTypeName())
+                    || (ASTNodes.hasType(castExpression.getType().resolveBinding(), getWrapperFullyQualifiedName())
+                            && isNotNull(castExpression.getExpression()));
+        } else if (expression instanceof MethodInvocation) {
+            final MethodInvocation mi= (MethodInvocation) expression;
             return ASTNodes.usesGivenSignature(mi, getWrapperFullyQualifiedName(), "valueOf", getPrimitiveTypeName()); //$NON-NLS-1$
         }
         return false;
@@ -272,8 +272,8 @@ public abstract class AbstractPrimitiveRatherThanWrapperCleanUp extends Abstract
                 return isPrimitiveAllowed(parentNode);
 
             case CAST_EXPRESSION:
-                final CastExpression castExpr= (CastExpression) parentNode;
-                return ASTNodes.hasType(castExpr.getType().resolveBinding(), getPrimitiveTypeName());
+                final CastExpression castExpression= (CastExpression) parentNode;
+                return ASTNodes.hasType(castExpression.getType().resolveBinding(), getPrimitiveTypeName());
 
             case ASSIGNMENT:
                 final Assignment assignment= (Assignment) parentNode;
@@ -294,9 +294,9 @@ public abstract class AbstractPrimitiveRatherThanWrapperCleanUp extends Abstract
                 return fragment.getInitializer().equals(node) && isOfType(fragment.getName());
 
             case RETURN_STATEMENT:
-                final ReturnStatement returnStmt= (ReturnStatement) parentNode;
-                if (returnStmt.getExpression().equals(node)) {
-                    final MethodDeclaration method= ASTNodes.getAncestorOrNull(returnStmt, MethodDeclaration.class);
+                final ReturnStatement returnStatement= (ReturnStatement) parentNode;
+                if (returnStatement.getExpression().equals(node)) {
+                    final MethodDeclaration method= ASTNodes.getAncestorOrNull(returnStatement, MethodDeclaration.class);
 
                     if (method != null && method.getReturnType2() != null) {
                         if (ASTNodes.hasType(method.getReturnType2().resolveBinding(), getPrimitiveTypeName())) {
@@ -315,8 +315,8 @@ public abstract class AbstractPrimitiveRatherThanWrapperCleanUp extends Abstract
                 return false;
 
             case CONDITIONAL_EXPRESSION:
-                final ConditionalExpression conditionalExpr= (ConditionalExpression) parentNode;
-                return conditionalExpr.getExpression().equals(node);
+                final ConditionalExpression conditionalExpression= (ConditionalExpression) parentNode;
+                return conditionalExpression.getExpression().equals(node);
 
             case PREFIX_EXPRESSION:
                 return getPrefixOutSafeOperators().contains(((PrefixExpression) parentNode).getOperator());

@@ -85,7 +85,7 @@ public class AndroidWakeLockCleanUp extends AbstractCleanUpRule {
                 MethodDeclaration onPauseMethod= findMethod(typeDeclaration, "onPause"); //$NON-NLS-1$
                 if (onPauseMethod != null && node.getParent().getNodeType() == ASTNode.EXPRESSION_STATEMENT) {
                     r.remove(node.getParent());
-                    r.insertLast(onPauseMethod.getBody(), Block.STATEMENTS_PROPERTY, createWakelockReleaseStmt(node));
+                    r.insertLast(onPauseMethod.getBody(), Block.STATEMENTS_PROPERTY, createWakelockReleaseStatement(node));
                 } else {
                     // Add the missing onPause() method to the class.
                     r.insertAfter(createOnPauseMethodDeclaration(), enclosingMethod);
@@ -99,7 +99,7 @@ public class AndroidWakeLockCleanUp extends AbstractCleanUpRule {
             if (!releasePresenceChecker.findOrDefault(typeDeclaration, false)) {
                 MethodDeclaration onPauseMethod= findMethod(typeDeclaration, "onPause"); //$NON-NLS-1$
                 if (onPauseMethod != null && node.getParent().getNodeType() == ASTNode.EXPRESSION_STATEMENT) {
-                    r.insertLast(onPauseMethod.getBody(), Block.STATEMENTS_PROPERTY, createWakelockReleaseStmt(node));
+                    r.insertLast(onPauseMethod.getBody(), Block.STATEMENTS_PROPERTY, createWakelockReleaseStatement(node));
                 } else {
                     r.insertLast(typeDeclaration, typeDeclaration.getBodyDeclarationsProperty(),
                             createOnPauseMethodDeclaration());
@@ -110,16 +110,16 @@ public class AndroidWakeLockCleanUp extends AbstractCleanUpRule {
         return true;
     }
 
-    private Statement createWakelockReleaseStmt(MethodInvocation methodInvocation) {
+    private Statement createWakelockReleaseStatement(MethodInvocation methodInvocation) {
         final ASTNodeFactory b= ctx.getASTBuilder();
         return b.if0(b.not(b.invoke(b.copyExpression(methodInvocation), "isHeld")), //$NON-NLS-1$
-                b.block(b.toStmt(b.invoke(b.copyExpression(methodInvocation), "release")))); //$NON-NLS-1$
+                b.block(b.toStatement(b.invoke(b.copyExpression(methodInvocation), "release")))); //$NON-NLS-1$
     }
 
     private MethodDeclaration createOnPauseMethodDeclaration() {
         final ASTNodeFactory b= ctx.getASTBuilder();
         return b.method(b.extendedModifiers(b.annotation("Override"), b.protected0()), "onPause", b.parameters(), //$NON-NLS-1$ $NON-NLS-2$
-                b.block(b.toStmt(b.superInvoke("onPause")))); //$NON-NLS-1$
+                b.block(b.toStatement(b.superInvoke("onPause")))); //$NON-NLS-1$
     }
 
     private MethodDeclaration findMethod(TypeDeclaration typeDeclaration, String methodToFind) {

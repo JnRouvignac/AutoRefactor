@@ -302,27 +302,27 @@ public enum OperatorEnum {
      * supplied node. Although this method accepts an {@link ASTNode}, the provided
      * node must be an expression.
      *
-     * @param expr the expression node
+     * @param expression the expression node
      * @return the equivalent {@link OperatorEnum} for the operator used inside the
      *         supplied node, null if the supplied node is not an expression or if
      *         it does not use an operator
      */
-    public static OperatorEnum getOperator(ASTNode expr) {
-        if (expr == null) {
+    public static OperatorEnum getOperator(ASTNode expression) {
+        if (expression == null) {
             return null;
         }
-        switch (expr.getNodeType()) {
+        switch (expression.getNodeType()) {
         case ASTNode.PREFIX_EXPRESSION:
-            return OperatorEnum.OPERATORS.get(((PrefixExpression) expr).getOperator());
+            return OperatorEnum.OPERATORS.get(((PrefixExpression) expression).getOperator());
         case ASTNode.POSTFIX_EXPRESSION:
-            return OperatorEnum.OPERATORS.get(((PostfixExpression) expr).getOperator());
+            return OperatorEnum.OPERATORS.get(((PostfixExpression) expression).getOperator());
         case ASTNode.INFIX_EXPRESSION:
-            return OperatorEnum.OPERATORS.get(((InfixExpression) expr).getOperator());
+            return OperatorEnum.OPERATORS.get(((InfixExpression) expression).getOperator());
         case ASTNode.METHOD_INVOCATION:
         case ASTNode.SUPER_METHOD_INVOCATION:
             return PARENTHESES;
         case ASTNode.ASSIGNMENT:
-            return OperatorEnum.OPERATORS.get(((Assignment) expr).getOperator());
+            return OperatorEnum.OPERATORS.get(((Assignment) expression).getOperator());
         case ASTNode.VARIABLE_DECLARATION_FRAGMENT:
             return ASSIGN;
         case ASTNode.FIELD_ACCESS:

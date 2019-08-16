@@ -127,11 +127,11 @@ public class AnnotationCleanUp extends AbstractCleanUpRule {
         return results;
     }
 
-    private boolean equal(ITypeBinding typeBinding, Expression expr, Object javaObj2) {
-        Object javaObj1= expr.resolveConstantExpressionValue();
-        switch (expr.getNodeType()) {
+    private boolean equal(ITypeBinding typeBinding, Expression expression, Object javaObj2) {
+        Object javaObj1= expression.resolveConstantExpressionValue();
+        switch (expression.getNodeType()) {
         case ARRAY_INITIALIZER:
-            return arraysEqual(typeBinding, (ArrayInitializer) expr, javaObj2);
+            return arraysEqual(typeBinding, (ArrayInitializer) expression, javaObj2);
 
         case BOOLEAN_LITERAL:
         case CHARACTER_LITERAL:
@@ -166,7 +166,7 @@ public class AnnotationCleanUp extends AbstractCleanUpRule {
                     return Utils.equalNotNull(toDouble(javaObj1), toDouble(javaObj2));
                 }
 
-                throw new NotImplementedException(expr, "for primitive type \"" + type + "\"."); //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
+                throw new NotImplementedException(expression, "for primitive type \"" + type + "\"."); //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
             }
 
             return false;

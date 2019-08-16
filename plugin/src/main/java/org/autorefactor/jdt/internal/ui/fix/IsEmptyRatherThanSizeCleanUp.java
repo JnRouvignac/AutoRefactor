@@ -127,10 +127,10 @@ public class IsEmptyRatherThanSizeCleanUp extends AbstractCleanUpRule {
         return true;
     }
 
-    private Long asNumber(final Expression expr) {
+    private Long asNumber(final Expression expression) {
         Long longValue= null;
-        if (expr != null) {
-            final Object val= expr.resolveConstantExpressionValue();
+        if (expression != null) {
+            final Object val= expression.resolveConstantExpressionValue();
             if (val instanceof Integer) {
                 longValue= (long) ((Integer) val).intValue();
             } else if (val instanceof Long) {

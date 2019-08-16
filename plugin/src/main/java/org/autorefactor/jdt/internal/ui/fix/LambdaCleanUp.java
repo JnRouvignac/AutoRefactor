@@ -101,10 +101,10 @@ public class LambdaCleanUp extends AbstractCleanUpRule {
             removeParamParentheses(node);
             return false;
         } else if (node.getBody() instanceof Block) {
-            final List<Statement> stmts= ASTNodes.asList((Block) node.getBody());
+            final List<Statement> statements= ASTNodes.asList((Block) node.getBody());
 
-            if (stmts.size() == 1 && stmts.get(0) instanceof ReturnStatement) {
-                removeReturnAndBrackets(node, stmts);
+            if (statements.size() == 1 && statements.get(0) instanceof ReturnStatement) {
+                removeReturnAndBrackets(node, statements);
                 return false;
             }
         } else if (node.getBody() instanceof ClassInstanceCreation) {
@@ -125,7 +125,7 @@ public class LambdaCleanUp extends AbstractCleanUpRule {
             }
         } else if (node.getBody() instanceof MethodInvocation) {
             final MethodInvocation mi= (MethodInvocation) node.getBody();
-            final Expression calledExpr= mi.getExpression();
+            final Expression calledExpression= mi.getExpression();
             final ITypeBinding calledType= ASTNodes.getCalledType(mi);
 
             final List<Expression> arguments= ASTNodes.arguments(mi);
@@ -153,34 +153,34 @@ public class LambdaCleanUp extends AbstractCleanUpRule {
                     return false;
                 }
 
-                if (calledExpr == null || calledExpr instanceof StringLiteral || calledExpr instanceof NumberLiteral
-                        || calledExpr instanceof ThisExpression) {
+                if (calledExpression == null || calledExpression instanceof StringLiteral || calledExpression instanceof NumberLiteral
+                        || calledExpression instanceof ThisExpression) {
                     replaceByMethodReference(node, mi);
                     return false;
-                } else if (calledExpr instanceof FieldAccess) {
-                    final FieldAccess fieldAccess= (FieldAccess) calledExpr;
+                } else if (calledExpression instanceof FieldAccess) {
+                    final FieldAccess fieldAccess= (FieldAccess) calledExpression;
                     if (fieldAccess.resolveFieldBinding().isEffectivelyFinal()) {
                         replaceByMethodReference(node, mi);
                         return false;
                     }
-                } else if (calledExpr instanceof SuperFieldAccess) {
-                    final SuperFieldAccess fieldAccess= (SuperFieldAccess) calledExpr;
+                } else if (calledExpression instanceof SuperFieldAccess) {
+                    final SuperFieldAccess fieldAccess= (SuperFieldAccess) calledExpression;
                     if (fieldAccess.resolveFieldBinding().isEffectivelyFinal()) {
                         replaceByMethodReference(node, mi);
                         return false;
                     }
                 }
-            } else if (calledExpr instanceof SimpleName && node.parameters().size() == arguments.size() + 1) {
-                final SimpleName calledObject= (SimpleName) calledExpr;
+            } else if (calledExpression instanceof SimpleName && node.parameters().size() == arguments.size() + 1) {
+                final SimpleName calledObject= (SimpleName) calledExpression;
                 if (isSameIdentifier(node, 0, calledObject)) {
                     for (int i= 0; i < arguments.size(); i++) {
-                        final ASTNode expr= ASTNodes.getUnparenthesedExpression(arguments.get(i));
-                        if (!(expr instanceof SimpleName) || !isSameIdentifier(node, i + 1, (SimpleName) expr)) {
+                        final ASTNode expression= ASTNodes.getUnparenthesedExpression(arguments.get(i));
+                        if (!(expression instanceof SimpleName) || !isSameIdentifier(node, i + 1, (SimpleName) expression)) {
                             return true;
                         }
                     }
 
-                    final ITypeBinding clazz= calledExpr.resolveTypeBinding();
+                    final ITypeBinding clazz= calledExpression.resolveTypeBinding();
                     final String[] remainingParams= new String[arguments.size() + 1];
                     remainingParams[0]= clazz.getQualifiedName();
                     for (int i= 0; i < arguments.size(); i++) {
@@ -204,12 +204,12 @@ public class LambdaCleanUp extends AbstractCleanUpRule {
     }
 
     private boolean isStaticMethod(final MethodInvocation mi) {
-        final Expression calledExpr= mi.getExpression();
+        final Expression calledExpression= mi.getExpression();
 
-        if (calledExpr == null) {
+        if (calledExpression == null) {
             return (mi.resolveMethodBinding().getModifiers() & Modifier.STATIC) != 0;
-        } else if (calledExpr instanceof SimpleName) {
-            return ((SimpleName) calledExpr).resolveBinding().getKind() == IBinding.TYPE;
+        } else if (calledExpression instanceof SimpleName) {
+            return ((SimpleName) calledExpression).resolveBinding().getKind() == IBinding.TYPE;
         }
 
         return false;
@@ -217,9 +217,9 @@ public class LambdaCleanUp extends AbstractCleanUpRule {
 
     private boolean areSameIdentifiers(LambdaExpression node, List<Expression> arguments) {
         for (int i= 0; i < node.parameters().size(); i++) {
-            final Expression expr= ASTNodes.getUnparenthesedExpression(arguments.get(i));
+            final Expression expression= ASTNodes.getUnparenthesedExpression(arguments.get(i));
 
-            if (!(expr instanceof SimpleName) || !isSameIdentifier(node, i, (SimpleName) expr)) {
+            if (!(expression instanceof SimpleName) || !isSameIdentifier(node, i, (SimpleName) expression)) {
                 return false;
             }
         }
@@ -245,19 +245,19 @@ public class LambdaCleanUp extends AbstractCleanUpRule {
     private void removeParamParentheses(final LambdaExpression node) {
         final ASTNodeFactory b= ctx.getASTBuilder();
 
-        final LambdaExpression copyOfLambdaExpr= b.lambda();
+        final LambdaExpression copyOfLambdaExpression= b.lambda();
         final ASTNode copyOfParameter= b.copy((ASTNode) node.parameters().get(0));
-        copyOfLambdaExpr.parameters().add(copyOfParameter);
-        copyOfLambdaExpr.setBody(b.copy(node.getBody()));
-        copyOfLambdaExpr.setParentheses(false);
-        ctx.getRefactorings().replace(node, copyOfLambdaExpr);
+        copyOfLambdaExpression.parameters().add(copyOfParameter);
+        copyOfLambdaExpression.setBody(b.copy(node.getBody()));
+        copyOfLambdaExpression.setParentheses(false);
+        ctx.getRefactorings().replace(node, copyOfLambdaExpression);
     }
 
-    private void removeReturnAndBrackets(final LambdaExpression node, final List<Statement> stmts) {
+    private void removeReturnAndBrackets(final LambdaExpression node, final List<Statement> statements) {
         final ASTNodeFactory b= ctx.getASTBuilder();
 
-        final ReturnStatement returnStmt= (ReturnStatement) stmts.get(0);
-        ctx.getRefactorings().replace(node.getBody(), b.parenthesizeIfNeeded(b.copy(returnStmt.getExpression())));
+        final ReturnStatement returnStatement= (ReturnStatement) statements.get(0);
+        ctx.getRefactorings().replace(node.getBody(), b.parenthesizeIfNeeded(b.copy(returnStatement.getExpression())));
     }
 
     private void replaceByCreationReference(final LambdaExpression node, final ClassInstanceCreation ci) {

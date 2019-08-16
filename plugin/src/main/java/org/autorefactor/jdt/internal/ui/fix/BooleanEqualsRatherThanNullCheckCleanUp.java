@@ -71,30 +71,30 @@ public class BooleanEqualsRatherThanNullCheckCleanUp extends AbstractCleanUpRule
 
             final InfixExpression condition= ASTNodes.as(leftOperand, InfixExpression.class);
             final boolean isNullCheck= ASTNodes.hasOperator(condition, InfixExpression.Operator.EQUALS);
-            final boolean isAndExpr= ASTNodes.hasOperator(node, InfixExpression.Operator.CONDITIONAL_AND);
-            if (!node.hasExtendedOperands() && isNullCheck ^ isAndExpr && condition != null
+            final boolean isAndExpression= ASTNodes.hasOperator(node, InfixExpression.Operator.CONDITIONAL_AND);
+            if (!node.hasExtendedOperands() && isNullCheck ^ isAndExpression && condition != null
                     && ASTNodes.hasOperator(condition, InfixExpression.Operator.EQUALS, InfixExpression.Operator.NOT_EQUALS)) {
-                Expression firstExpr= null;
+                Expression firstExpression= null;
                 if (ASTNodes.isNullLiteral(condition.getLeftOperand())) {
-                    firstExpr= condition.getRightOperand();
+                    firstExpression= condition.getRightOperand();
                 } else if (ASTNodes.isNullLiteral(condition.getRightOperand())) {
-                    firstExpr= condition.getLeftOperand();
+                    firstExpression= condition.getLeftOperand();
                 }
 
-                Expression secondExpr= null;
-                final PrefixExpression negateSecondExpr= ASTNodes.as(rightOperand, PrefixExpression.class);
-                final boolean isPositiveExpr;
-                if (negateSecondExpr != null && ASTNodes.hasOperator(negateSecondExpr, PrefixExpression.Operator.NOT)) {
-                    secondExpr= negateSecondExpr.getOperand();
-                    isPositiveExpr= false;
+                Expression secondExpression= null;
+                final PrefixExpression negateSecondExpression= ASTNodes.as(rightOperand, PrefixExpression.class);
+                final boolean isPositiveExpression;
+                if (negateSecondExpression != null && ASTNodes.hasOperator(negateSecondExpression, PrefixExpression.Operator.NOT)) {
+                    secondExpression= negateSecondExpression.getOperand();
+                    isPositiveExpression= false;
                 } else {
-                    secondExpr= rightOperand;
-                    isPositiveExpr= true;
+                    secondExpression= rightOperand;
+                    isPositiveExpression= true;
                 }
 
-                if (firstExpr != null && ASTNodes.hasType(firstExpr, Boolean.class.getCanonicalName()) && ASTNodes.isPassive(firstExpr)
-                        && ASTNodes.match(firstExpr, secondExpr)) {
-                    replaceNullCheck(node, firstExpr, isNullCheck, isAndExpr, isPositiveExpr);
+                if (firstExpression != null && ASTNodes.hasType(firstExpression, Boolean.class.getCanonicalName()) && ASTNodes.isPassive(firstExpression)
+                        && ASTNodes.match(firstExpression, secondExpression)) {
+                    replaceNullCheck(node, firstExpression, isNullCheck, isAndExpression, isPositiveExpression);
                     return false;
                 }
             }
@@ -102,19 +102,19 @@ public class BooleanEqualsRatherThanNullCheckCleanUp extends AbstractCleanUpRule
         return true;
     }
 
-    private void replaceNullCheck(final InfixExpression node, final Expression firstExpr, final boolean isNullCheck,
-            final boolean isAndExpr, final boolean isPositiveExpr) {
+    private void replaceNullCheck(final InfixExpression node, final Expression firstExpression, final boolean isNullCheck,
+            final boolean isAndExpression, final boolean isPositiveExpression) {
         final ASTNodeFactory b= ctx.getASTBuilder();
 
-        final Name booleanConstant= b.name("Boolean", isAndExpr == isPositiveExpr ? "TRUE" : "FALSE"); //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
-        final MethodInvocation equalsMethod= b.invoke(booleanConstant, "equals", b.copy(firstExpr)); //$NON-NLS-1$
+        final Name booleanConstant= b.name("Boolean", isAndExpression == isPositiveExpression ? "TRUE" : "FALSE"); //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
+        final MethodInvocation equalsMethod= b.invoke(booleanConstant, "equals", b.copy(firstExpression)); //$NON-NLS-1$
 
-        Expression newExpr= null;
-        if (!isNullCheck || isAndExpr) {
-            newExpr= equalsMethod;
+        Expression newExpression= null;
+        if (!isNullCheck || isAndExpression) {
+            newExpression= equalsMethod;
         } else {
-            newExpr= b.not(equalsMethod);
+            newExpression= b.not(equalsMethod);
         }
-        ctx.getRefactorings().replace(node, newExpr);
+        ctx.getRefactorings().replace(node, newExpression);
     }
 }

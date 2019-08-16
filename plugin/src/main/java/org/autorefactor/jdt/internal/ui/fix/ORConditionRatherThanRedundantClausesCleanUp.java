@@ -84,12 +84,12 @@ public class ORConditionRatherThanRedundantClausesCleanUp extends AbstractCleanU
             if (ASTNodes.isPrimitive(complexCondition.getLeftOperand()) && ASTNodes.isPrimitive(complexCondition.getRightOperand())
                     && ASTNodes.isPrimitive(operand2)) {
                 if (matcher.matchOpposite(complexCondition.getLeftOperand(), operand2)) {
-                    replaceDuplicateExpr(node, operator, complexCondition.getRightOperand(), operand2, forward);
+                    replaceDuplicateExpression(node, operator, complexCondition.getRightOperand(), operand2, forward);
                     return false;
                 }
 
                 if (matcher.matchOpposite(complexCondition.getRightOperand(), operand2)) {
-                    replaceDuplicateExpr(node, operator, complexCondition.getLeftOperand(), operand2, forward);
+                    replaceDuplicateExpression(node, operator, complexCondition.getLeftOperand(), operand2, forward);
                     return false;
                 }
             }
@@ -97,14 +97,14 @@ public class ORConditionRatherThanRedundantClausesCleanUp extends AbstractCleanU
         return true;
     }
 
-    private void replaceDuplicateExpr(final InfixExpression node, final InfixExpression.Operator operator, final Expression leftExpr,
-            final Expression rightExpr, final boolean forward) {
+    private void replaceDuplicateExpression(final InfixExpression node, final InfixExpression.Operator operator, final Expression leftExpression,
+            final Expression rightExpression, final boolean forward) {
         final ASTNodeFactory b= ctx.getASTBuilder();
 
         if (forward) {
-            ctx.getRefactorings().replace(node, b.infixExpr(b.copy(leftExpr), operator, b.copy(rightExpr)));
+            ctx.getRefactorings().replace(node, b.infixExpression(b.copy(leftExpression), operator, b.copy(rightExpression)));
         } else {
-            ctx.getRefactorings().replace(node, b.infixExpr(b.copy(rightExpr), operator, b.copy(leftExpr)));
+            ctx.getRefactorings().replace(node, b.infixExpression(b.copy(rightExpression), operator, b.copy(leftExpression)));
         }
     }
 }

@@ -89,10 +89,10 @@ public class SuperCallRatherThanUselessOverridingCleanUp extends AbstractCleanUp
             return true;
         }
 
-        final List<Statement> bodyStmts= ASTNodes.statements(node.getBody());
+        final List<Statement> bodyStatements= ASTNodes.statements(node.getBody());
 
-        if (bodyStmts.size() == 1) {
-            final SuperMethodInvocation bodyMi= ASTNodes.asExpression(bodyStmts.get(0), SuperMethodInvocation.class);
+        if (bodyStatements.size() == 1) {
+            final SuperMethodInvocation bodyMi= ASTNodes.asExpression(bodyStatements.get(0), SuperMethodInvocation.class);
 
             if (bodyMi != null) {
                 final IMethodBinding bodyMethodBinding= bodyMi.resolveMethodBinding();
@@ -126,10 +126,10 @@ public class SuperCallRatherThanUselessOverridingCleanUp extends AbstractCleanUp
 
         for (int i= 0; i < node.parameters().size(); i++) {
             final SingleVariableDeclaration paramName= (SingleVariableDeclaration) parameters.get(i);
-            final Expression paramExpr= (Expression) bodyMi.arguments().get(i);
+            final Expression paramExpression= (Expression) bodyMi.arguments().get(i);
 
-            if (!(paramExpr instanceof SimpleName)
-                    || !paramName.getName().getIdentifier().equals(((SimpleName) paramExpr).getIdentifier())) {
+            if (!(paramExpression instanceof SimpleName)
+                    || !paramName.getName().getIdentifier().equals(((SimpleName) paramExpression).getIdentifier())) {
                 return false;
             }
         }

@@ -92,7 +92,7 @@ public class PushNegationDownCleanUp extends AbstractCleanUpRule {
                 } else {
                     allOperands= b.move(allOperands);
                 }
-                r.replace(node, b.parenthesize(b.infixExpr(reverseOp, allOperands)));
+                r.replace(node, b.parenthesize(b.infixExpression(reverseOp, allOperands)));
                 return false;
             }
         } else {

@@ -296,16 +296,16 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
         final Name varName= varAccess.getVariableName();
         final Type varType= getType(varDecl.getVariableName().getParent());
         if (scope instanceof Block) {
-            final List<Statement> stmts= ASTNodes.statements((Block) scope);
-            for (int i= 0; i < stmts.size(); i++) {
-                final Statement stmt= stmts.get(i);
-                final Expression parentExpr= ASTNodes.getAncestor(varName, Expression.class); // FIXME i=0
-                final Statement parentStmt= ASTNodes.getAncestor(parentExpr, Statement.class); // FIXME i=0
-                if (stmt.equals(parentStmt)) {
-                    final VariableDeclarationFragment vdf= getVariableDeclarationFragment(parentExpr, varName);
+            final List<Statement> statements= ASTNodes.statements((Block) scope);
+            for (int i= 0; i < statements.size(); i++) {
+                final Statement statement= statements.get(i);
+                final Expression parentExpression= ASTNodes.getAncestor(varName, Expression.class); // FIXME i=0
+                final Statement parentStatement= ASTNodes.getAncestor(parentExpression, Statement.class); // FIXME i=0
+                if (statement.equals(parentStatement)) {
+                    final VariableDeclarationFragment vdf= getVariableDeclarationFragment(parentExpression, varName);
                     final VariableDeclarationStatement vds= ast.newVariableDeclarationStatement(vdf);
                     vds.setType(varType);
-                    this.ctx.getRefactorings().replace(stmt, vds);
+                    this.ctx.getRefactorings().replace(statement, vds);
                     break;
                 }
             }
@@ -314,8 +314,8 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
             final EnhancedForStatement newEfs= b.copy(efs);
             newEfs.setParameter(b.copy(efs.getParameter()));
             newEfs.setExpression(b.copy(efs.getExpression()));
-            final Statement parentStmt= ASTNodes.getAncestor(varName, Statement.class);
-            if (Utils.equalNotNull(efs.getBody(), parentStmt)) {
+            final Statement parentStatement= ASTNodes.getAncestor(varName, Statement.class);
+            if (Utils.equalNotNull(efs.getBody(), parentStatement)) {
                 newEfs.setBody(copy(efs.getBody(), varName));
             }
             this.ctx.getRefactorings().replace(efs, newEfs);
@@ -331,7 +331,7 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
                 initializers.add(vde);
                 this.ctx.getRefactorings().replace(fs, newFs);
                 // TODO JNR
-                // if (equalNotNull(fs.getBody(), parentStmt)) {
+                // if (equalNotNull(fs.getBody(), parentStatement)) {
                 // newFs.setBody(copy(fs.getBody()));
                 // }
             } else {
@@ -341,8 +341,8 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
             final WhileStatement ws= (WhileStatement) scope;
             final WhileStatement newWs= ast.newWhileStatement();
             newWs.setExpression(b.copy(ws.getExpression()));
-            final Statement parentStmt= ASTNodes.getAncestor(varName, Statement.class);
-            if (Utils.equalNotNull(ws.getBody(), parentStmt)) {
+            final Statement parentStatement= ASTNodes.getAncestor(varName, Statement.class);
+            if (Utils.equalNotNull(ws.getBody(), parentStatement)) {
                 newWs.setBody(copy(ws.getBody(), varName));
             }
             this.ctx.getRefactorings().replace(ws, newWs);
@@ -350,14 +350,14 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
             final IfStatement is= (IfStatement) scope;
             final IfStatement newIs= ast.newIfStatement();
             newIs.setExpression(b.copy(is.getExpression()));
-            final Statement parentStmt= ASTNodes.getAncestor(varName, Statement.class);
-            if (Utils.equalNotNull(is.getThenStatement(), parentStmt)) {
+            final Statement parentStatement= ASTNodes.getAncestor(varName, Statement.class);
+            if (Utils.equalNotNull(is.getThenStatement(), parentStatement)) {
                 newIs.setThenStatement(copy(is.getThenStatement(), varName));
                 if (is.getElseStatement() != null) {
                     newIs.setElseStatement(b.copy(is.getElseStatement()));
                 }
                 this.ctx.getRefactorings().replace(is, newIs);
-            } else if (Utils.equalNotNull(is.getElseStatement(), parentStmt)) {
+            } else if (Utils.equalNotNull(is.getElseStatement(), parentStatement)) {
                 if (is.getThenStatement() != null) {
                     newIs.setThenStatement(b.copy(is.getThenStatement()));
                 }

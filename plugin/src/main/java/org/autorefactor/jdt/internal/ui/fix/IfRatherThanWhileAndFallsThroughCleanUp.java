@@ -83,8 +83,8 @@ public class IfRatherThanWhileAndFallsThroughCleanUp extends AbstractCleanUpRule
 
             if (breakVisitor.canBeRefactored()) {
                 final ASTNodeFactory b= ctx.getASTBuilder();
-                for (final BreakStatement breakStmt : breakVisitor.getBreaks()) {
-                    ctx.getRefactorings().remove(breakStmt);
+                for (final BreakStatement breakStatement : breakVisitor.getBreaks()) {
+                    ctx.getRefactorings().remove(breakStatement);
                 }
                 ctx.getRefactorings().replace(node, b.if0(b.copy(node.getExpression()), b.copy(node.getBody())));
                 return false;
@@ -96,30 +96,30 @@ public class IfRatherThanWhileAndFallsThroughCleanUp extends AbstractCleanUpRule
     /**
      * Return true if the statement falls through.
      *
-     * @param stmt the statement
+     * @param statement the statement
      * @return true if the statement falls through.
      */
-    private boolean isEndingWithExit(final Statement stmt) {
-        final List<Statement> stmts= ASTNodes.asList(stmt);
-        if (stmts.isEmpty()) {
+    private boolean isEndingWithExit(final Statement statement) {
+        final List<Statement> statements= ASTNodes.asList(statement);
+        if (statements.isEmpty()) {
             return false;
         }
 
-        final Statement lastStmt= stmts.get(stmts.size() - 1);
-        switch (lastStmt.getNodeType()) {
+        final Statement lastStatement= statements.get(statements.size() - 1);
+        switch (lastStatement.getNodeType()) {
         case RETURN_STATEMENT:
         case THROW_STATEMENT:
             return true;
 
         case BREAK_STATEMENT:
-            final BreakStatement breakStmt= (BreakStatement) lastStmt;
-            return breakStmt.getLabel() == null;
+            final BreakStatement breakStatement= (BreakStatement) lastStatement;
+            return breakStatement.getLabel() == null;
 
         case IF_STATEMENT:
-            final IfStatement ifStmt= (IfStatement) lastStmt;
-            final Statement thenStmt= ifStmt.getThenStatement();
-            final Statement elseStmt= ifStmt.getElseStatement();
-            return isEndingWithExit(thenStmt) && isEndingWithExit(elseStmt);
+            final IfStatement ifStatement= (IfStatement) lastStatement;
+            final Statement thenStatement= ifStatement.getThenStatement();
+            final Statement elseStatement= ifStatement.getElseStatement();
+            return isEndingWithExit(thenStatement) && isEndingWithExit(elseStatement);
 
         default:
             return false;

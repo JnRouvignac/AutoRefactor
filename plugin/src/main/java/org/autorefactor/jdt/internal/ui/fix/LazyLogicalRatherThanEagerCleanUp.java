@@ -66,7 +66,7 @@ public class LazyLogicalRatherThanEagerCleanUp extends AbstractCleanUpRule {
                 && ASTNodes.isPassive(node.getRightOperand())
                 && ASTNodes.hasOperator(node, InfixExpression.Operator.AND, InfixExpression.Operator.OR)) {
             final ASTNodeFactory b= ctx.getASTBuilder();
-            ctx.getRefactorings().replace(node, b.infixExpr(b.copy(node.getLeftOperand()),
+            ctx.getRefactorings().replace(node, b.infixExpression(b.copy(node.getLeftOperand()),
                     getLazyOperator(node), b.copy(node.getRightOperand())));
             return false;
         }

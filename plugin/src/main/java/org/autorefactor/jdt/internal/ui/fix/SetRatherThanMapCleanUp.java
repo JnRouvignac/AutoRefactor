@@ -136,7 +136,7 @@ public class SetRatherThanMapCleanUp extends AbstractClassSubstituteCleanUp {
      *
      * @param b                      The builder.
      * @param origType               The original type
-     * @param originalExpr           The original expression
+     * @param originalExpression           The original expression
      * @param classesToUseWithImport The classes that should be used with simple
      *                               name.
      * @param importsToAdd           The imports that need to be added during this
@@ -144,7 +144,7 @@ public class SetRatherThanMapCleanUp extends AbstractClassSubstituteCleanUp {
      * @return the substitute type.
      */
     @Override
-    protected Type substituteType(final ASTNodeFactory b, final Type origType, final ASTNode originalExpr,
+    protected Type substituteType(final ASTNodeFactory b, final Type origType, final ASTNode originalExpression,
             final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
         String substitutingType= getSubstitutingClassName(origType.resolveBinding().getErasure().getQualifiedName());
 
@@ -154,7 +154,7 @@ public class SetRatherThanMapCleanUp extends AbstractClassSubstituteCleanUp {
         }
 
         final ITypeBinding origTypeBinding= origType.resolveBinding();
-        final TypeNameDecider typeNameDecider= new TypeNameDecider(originalExpr);
+        final TypeNameDecider typeNameDecider= new TypeNameDecider(originalExpression);
 
         if (origTypeBinding.isParameterizedType()) {
             final ITypeBinding[] origTypeArgs= origTypeBinding.getTypeArguments();

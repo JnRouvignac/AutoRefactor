@@ -213,12 +213,12 @@ public class ASTNodeFactory {
     /**
      * Builds a new {@link Block} instance.
      *
-     * @param stmts the statements to add to the block
+     * @param statements the statements to add to the block
      * @return a new Block
      */
-    public Block block(final Statement... stmts) {
+    public Block block(final Statement... statements) {
         final Block block= ast.newBlock();
-        addAll(ASTNodes.statements(block), stmts);
+        addAll(ASTNodes.statements(block), statements);
         return block;
     }
 
@@ -244,12 +244,12 @@ public class ASTNodeFactory {
     /**
      * Builds a new {@link SwitchCase} instance.
      *
-     * @param expr the case expression
+     * @param expression the case expression
      * @return a new switch case statement
      */
-    public SwitchCase case0(Expression expr) {
+    public SwitchCase case0(Expression expression) {
         final SwitchCase sc= ast.newSwitchCase();
-        sc.setExpression(expr);
+        sc.setExpression(expression);
         return sc;
     }
 
@@ -257,13 +257,13 @@ public class ASTNodeFactory {
      * Builds a new {@link CastExpression} instance.
      *
      * @param type the type being cast to
-     * @param expr the expression being cast
+     * @param expression the expression being cast
      * @return a new CastExpression
      */
-    public CastExpression cast(Type type, Expression expr) {
+    public CastExpression cast(Type type, Expression expression) {
         final CastExpression ce= ast.newCastExpression();
         ce.setType(type);
-        ce.setExpression(parenthesizeIfNeeded(expr));
+        ce.setExpression(parenthesizeIfNeeded(expression));
         return ce;
     }
 
@@ -345,10 +345,10 @@ public class ASTNodeFactory {
      *
      * @param exceptionTypeName   the exception type name
      * @param caughtExceptionName the local name for the caught exception
-     * @param stmts               the statements to add to the catch clause
+     * @param statements          the statements to add to the catch clause
      * @return a new catch clause
      */
-    public CatchClause catch0(String exceptionTypeName, String caughtExceptionName, Statement... stmts) {
+    public CatchClause catch0(String exceptionTypeName, String caughtExceptionName, Statement... statements) {
         final CatchClause cc= ast.newCatchClause();
         final SingleVariableDeclaration svd= ast.newSingleVariableDeclaration();
         svd.setType(simpleType(exceptionTypeName));
@@ -356,7 +356,7 @@ public class ASTNodeFactory {
         cc.setException(svd);
 
         final Block block= ast.newBlock();
-        addAll(ASTNodes.statements(block), stmts);
+        addAll(ASTNodes.statements(block), statements);
         cc.setBody(block);
         return cc;
     }
@@ -385,13 +385,13 @@ public class ASTNodeFactory {
     /**
      * Creates a type by copying the type binding of the provided expression.
      *
-     * @param expr            the expression whose type must be copied
+     * @param expression      the expression whose type must be copied
      * @param typeNameDecider decides on how the type should be referenced (simple
      *                        name or qualified name)
      * @return a new type
      */
-    public Type copyType(Expression expr, TypeNameDecider typeNameDecider) {
-        return toType(expr.resolveTypeBinding(), typeNameDecider);
+    public Type copyType(Expression expression, TypeNameDecider typeNameDecider) {
+        return toType(expression.resolveTypeBinding(), typeNameDecider);
     }
 
     /**
@@ -562,9 +562,9 @@ public class ASTNodeFactory {
      * @param initializer the variable initializer, can be null
      * @return a new variable declaration statement
      */
-    public VariableDeclarationStatement declareStmt(Type type, SimpleName varName, Expression initializer) {
+    public VariableDeclarationStatement declareStatement(Type type, SimpleName varName, Expression initializer) {
         final VariableDeclarationFragment fragment= declareFragment(varName, initializer);
-        return declareStmt(type, fragment);
+        return declareStatement(type, fragment);
     }
 
     /**
@@ -574,7 +574,7 @@ public class ASTNodeFactory {
      * @param fragment the fragment being declared
      * @return a new variable declaration statement
      */
-    public VariableDeclarationStatement declareStmt(Type type, VariableDeclarationFragment fragment) {
+    public VariableDeclarationStatement declareStatement(Type type, VariableDeclarationFragment fragment) {
         final VariableDeclarationStatement vds= ast.newVariableDeclarationStatement(fragment);
         vds.setType(type);
         return vds;
@@ -588,7 +588,7 @@ public class ASTNodeFactory {
      * @param initializer the variable initializer, can be null
      * @return a new variable declaration expression
      */
-    public VariableDeclarationExpression declareExpr(Type type, SimpleName varName, Expression initializer) {
+    public VariableDeclarationExpression declareExpression(Type type, SimpleName varName, Expression initializer) {
         final VariableDeclarationFragment fragment= declareFragment(varName, initializer);
         final VariableDeclarationExpression vde= ast.newVariableDeclarationExpression(fragment);
         ASTNodes.modifiers(vde).add(final0());
@@ -603,7 +603,7 @@ public class ASTNodeFactory {
      * @param fragment the variable declaration fragment
      * @return a new variable declaration expression
      */
-    public VariableDeclarationExpression declareExpr(Type type, VariableDeclarationFragment fragment) {
+    public VariableDeclarationExpression declareExpression(Type type, VariableDeclarationFragment fragment) {
         final VariableDeclarationExpression vde= ast.newVariableDeclarationExpression(fragment);
         vde.setType(type);
         return vde;
@@ -661,13 +661,13 @@ public class ASTNodeFactory {
     /**
      * Builds a new {@link FieldAccess} instance.
      *
-     * @param expr      the expression on which the field is accessed
-     * @param fieldName the field name being accessed
+     * @param expression the expression on which the field is accessed
+     * @param fieldName  the field name being accessed
      * @return a new single field access
      */
-    public FieldAccess fieldAccess(Expression expr, SimpleName fieldName) {
+    public FieldAccess fieldAccess(Expression expression, SimpleName fieldName) {
         final FieldAccess fa= getAST().newFieldAccess();
-        fa.setExpression(expr);
+        fa.setExpression(expression);
         fa.setName(fieldName);
         return fa;
     }
@@ -757,7 +757,7 @@ public class ASTNodeFactory {
      * @param allOperands the operands
      * @return a new infix expression
      */
-    public InfixExpression infixExpr(InfixExpression.Operator operator, Collection<? extends Expression> allOperands) {
+    public InfixExpression infixExpression(InfixExpression.Operator operator, Collection<? extends Expression> allOperands) {
         if (allOperands.size() < 2) {
             throw new IllegalArgumentException(null, "Not enough operands for an infix expression: " //$NON-NLS-1$
                     + "needed at least 2, but got " + allOperands.size()); //$NON-NLS-1$
@@ -782,7 +782,7 @@ public class ASTNodeFactory {
      *                       false
      * @return a new conditional expression
      */
-    public ConditionalExpression conditionalExpr(Expression mainExpression, Expression thenExpression,
+    public ConditionalExpression conditionalExpression(Expression mainExpression, Expression thenExpression,
             Expression elseExpression) {
         final ConditionalExpression ce= ast.newConditionalExpression();
         ce.setExpression(mainExpression);
@@ -800,7 +800,7 @@ public class ASTNodeFactory {
      * @param extendedOperands the extended operands
      * @return a new infix expression
      */
-    public InfixExpression infixExpr(Expression leftOperand, InfixExpression.Operator operator, Expression rightOperand,
+    public InfixExpression infixExpression(Expression leftOperand, InfixExpression.Operator operator, Expression rightOperand,
             Expression... extendedOperands) {
         final InfixExpression ie= ast.newInfixExpression();
         ie.setLeftOperand(leftOperand);
@@ -1065,33 +1065,33 @@ public class ASTNodeFactory {
     /**
      * Builds a new {@link PrefixExpression} instance using the not operator ('!').
      *
-     * @param expr the expression to negate
+     * @param expression the expression to negate
      * @return a new prefix expression
      */
-    public Expression not(Expression expr) {
-        return prefixExpr(PrefixExpression.Operator.NOT, expr);
+    public Expression not(Expression expression) {
+        return prefixExpression(PrefixExpression.Operator.NOT, expression);
     }
 
     /**
      * Negates the provided expression by moving it in the AST.
      *
-     * @param expr the expression to negate
+     * @param expression the expression to negate
      * @return the negated expression, moved in the AST
      */
-    public Expression negate(Expression expr) {
-        return negate(expr, Copy.MOVE);
+    public Expression negate(Expression expression) {
+        return negate(expression, Copy.MOVE);
     }
 
     /**
      * Negates the provided expression and applies the provided copy operation on
      * the returned expression.
      *
-     * @param expr the expression to negate
+     * @param expression the expression to negate
      * @param copy the copy operation to perform
      * @return the negated expression, copied according to the copy operation
      */
-    public Expression negate(Expression expr, Copy copy) {
-        final Expression exprNoParen= ASTNodes.getUnparenthesedExpression(expr);
+    public Expression negate(Expression expression, Copy copy) {
+        final Expression exprNoParen= ASTNodes.getUnparenthesedExpression(expression);
         if (exprNoParen.getNodeType() == ASTNode.PREFIX_EXPRESSION) {
             final PrefixExpression pe= (PrefixExpression) exprNoParen;
             if (ASTNodes.hasOperator(pe, PrefixExpression.Operator.NOT)) {
@@ -1099,7 +1099,7 @@ public class ASTNodeFactory {
             }
         }
 
-        return not(parenthesizeIfNeeded(copy.perform(this, expr)));
+        return not(parenthesizeIfNeeded(copy.perform(this, expression)));
     }
 
     /**
@@ -1124,7 +1124,7 @@ public class ASTNodeFactory {
         return pe;
     }
 
-    private Expression prefixExpr(PrefixExpression.Operator operator, Expression operand) {
+    private Expression prefixExpression(PrefixExpression.Operator operator, Expression operand) {
         final PrefixExpression pe= ast.newPrefixExpression();
         pe.setOperator(operator);
         pe.setOperand(operand);
@@ -1184,12 +1184,12 @@ public class ASTNodeFactory {
     /**
      * Builds a new {@link SwitchStatement} instance.
      *
-     * @param expr the switch expression
+     * @param expression the switch expression
      * @return a new switch statement
      */
-    public SwitchStatement switch0(Expression expr) {
+    public SwitchStatement switch0(Expression expression) {
         final SwitchStatement ss= ast.newSwitchStatement();
-        ss.setExpression(expr);
+        ss.setExpression(expression);
         return ss;
     }
 
@@ -1220,7 +1220,7 @@ public class ASTNodeFactory {
      * @param expression the expression to transform into a statement
      * @return a new expression statement
      */
-    public ExpressionStatement toStmt(final Expression expression) {
+    public ExpressionStatement toStatement(final Expression expression) {
         return ast.newExpressionStatement(expression);
     }
 
@@ -1241,21 +1241,21 @@ public class ASTNodeFactory {
     /**
      * Parenthesizes the provided expression if its type requires it.
      *
-     * @param expr the expression to conditionally return parenthesized
+     * @param expression the expression to conditionally return parenthesized
      * @return the parenthesized expression of the provided expression to return or
      *         this expression itself
      */
-    public Expression parenthesizeIfNeeded(Expression expr) {
-        switch (expr.getNodeType()) {
+    public Expression parenthesizeIfNeeded(Expression expression) {
+        switch (expression.getNodeType()) {
         case ASSIGNMENT:
         case CAST_EXPRESSION:
         case CONDITIONAL_EXPRESSION:
         case INFIX_EXPRESSION:
         case INSTANCEOF_EXPRESSION:
-            return parenthesize(expr);
+            return parenthesize(expression);
 
         default:
-            return expr;
+            return expression;
         }
     }
 

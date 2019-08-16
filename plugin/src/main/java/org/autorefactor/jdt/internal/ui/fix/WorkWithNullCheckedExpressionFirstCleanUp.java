@@ -83,11 +83,11 @@ public class WorkWithNullCheckedExpressionFirstCleanUp extends AbstractCleanUpRu
 
         @Override
         public boolean visit(IfStatement node) {
-            final Statement thenStmt= getThenStatement(node);
-            final Statement elseStmt= getElseStatement(node, thenStmt);
-            if (isNullCheck(node.getExpression()) && thenStmt != null && elseStmt != null
-                    && thenStmt.getNodeType() == elseStmt.getNodeType() && simpleStmt(thenStmt)) {
-                revertIfStatement(node, thenStmt, elseStmt);
+            final Statement thenStatement= getThenStatement(node);
+            final Statement elseStatement= getElseStatement(node, thenStatement);
+            if (isNullCheck(node.getExpression()) && thenStatement != null && elseStatement != null
+                    && thenStatement.getNodeType() == elseStatement.getNodeType() && simpleStatement(thenStatement)) {
+                revertIfStatement(node, thenStatement, elseStatement);
                 setResult(false);
                 return false;
             }
@@ -95,19 +95,19 @@ public class WorkWithNullCheckedExpressionFirstCleanUp extends AbstractCleanUpRu
         }
 
         private Statement getThenStatement(IfStatement node) {
-            final List<Statement> thenStmts= ASTNodes.asList(node.getThenStatement());
-            if (thenStmts.size() == 1) {
-                return thenStmts.get(0);
+            final List<Statement> thenStatements= ASTNodes.asList(node.getThenStatement());
+            if (thenStatements.size() == 1) {
+                return thenStatements.get(0);
             }
             return null;
         }
 
-        private Statement getElseStatement(IfStatement node, Statement thenStmt) {
-            final List<Statement> elseStmts= ASTNodes.asList(node.getElseStatement());
-            if (elseStmts.size() == 1) {
-                return elseStmts.get(0);
+        private Statement getElseStatement(IfStatement node, Statement thenStatement) {
+            final List<Statement> elseStatements= ASTNodes.asList(node.getElseStatement());
+            if (elseStatements.size() == 1) {
+                return elseStatements.get(0);
             }
-            if (elseStmts.isEmpty() && ASTNodes.is(thenStmt, ReturnStatement.class)) {
+            if (elseStatements.isEmpty() && ASTNodes.is(thenStatement, ReturnStatement.class)) {
                 return ASTNodes.getNextSibling(node);
             }
             return null;
@@ -119,8 +119,8 @@ public class WorkWithNullCheckedExpressionFirstCleanUp extends AbstractCleanUpRu
                     && (ASTNodes.isNullLiteral(condition.getLeftOperand()) || ASTNodes.isNullLiteral(condition.getRightOperand()));
         }
 
-        private boolean simpleStmt(Statement stmt) {
-            switch (stmt.getNodeType()) {
+        private boolean simpleStatement(Statement statement) {
+            switch (statement.getNodeType()) {
             case ASTNode.IF_STATEMENT:
             case ASTNode.DO_STATEMENT:
             case ASTNode.WHILE_STATEMENT:
@@ -135,12 +135,12 @@ public class WorkWithNullCheckedExpressionFirstCleanUp extends AbstractCleanUpRu
         }
 
         /** Revert condition + swap then and else statements. */
-        private void revertIfStatement(IfStatement node, Statement thenStmt, Statement elseStmt) {
+        private void revertIfStatement(IfStatement node, Statement thenStatement, Statement elseStatement) {
             final ASTNodeFactory b= ctx.getASTBuilder();
             final Refactorings r= ctx.getRefactorings();
             r.set(node.getExpression(), InfixExpression.OPERATOR_PROPERTY, InfixExpression.Operator.NOT_EQUALS);
-            r.replace(thenStmt, b.move(elseStmt));
-            r.replace(elseStmt, b.move(thenStmt));
+            r.replace(thenStatement, b.move(elseStatement));
+            r.replace(elseStatement, b.move(thenStatement));
         }
     }
 }

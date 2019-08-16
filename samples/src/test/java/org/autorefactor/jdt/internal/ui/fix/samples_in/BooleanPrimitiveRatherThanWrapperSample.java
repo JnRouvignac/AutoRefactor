@@ -142,7 +142,7 @@ public class BooleanPrimitiveRatherThanWrapperSample {
         }
     }
 
-    public void replaceWrapperInPrefixExpr() {
+    public void replaceWrapperInPrefixExpression() {
         // Keep this comment
         Boolean alwaysInitializedVar = Boolean.TRUE;
         if (!alwaysInitializedVar) {
@@ -174,7 +174,7 @@ public class BooleanPrimitiveRatherThanWrapperSample {
         } while (alwaysInitializedVar);
     }
 
-    public String replaceWrapperInConditionalExpr() {
+    public String replaceWrapperInConditionalExpression() {
         // Keep this comment
         Boolean alwaysInitializedVar = Boolean.TRUE;
         return alwaysInitializedVar ? "foo" : "bar";

@@ -170,13 +170,13 @@ public abstract class AbstractEnumCollectionReplacementCleanUp extends NewClassI
                 List<VariableDeclarationFragment> fragments= ASTNodes.fragments(node);
 
                 for (VariableDeclarationFragment vdf : fragments) {
-                    Expression initExpr= vdf.getInitializer();
+                    Expression initExpression= vdf.getInitializer();
 
-                    if (initExpr != null) {
-                        initExpr= ASTNodes.getUnparenthesedExpression(initExpr);
+                    if (initExpression != null) {
+                        initExpression= ASTNodes.getUnparenthesedExpression(initExpression);
 
-                        if (creates(initExpr, getImplType())) {
-                            return maybeReplace((ClassInstanceCreation) initExpr, classesToUseWithImport, importsToAdd,
+                        if (creates(initExpression, getImplType())) {
+                            return maybeReplace((ClassInstanceCreation) initExpression, classesToUseWithImport, importsToAdd,
                                     typeArguments.toArray(new Type[typeArguments.size()]));
                         }
                     }

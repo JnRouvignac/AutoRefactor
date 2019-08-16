@@ -125,8 +125,8 @@ public class Variable {
      *
      * @return a new {@link VariableDeclarationStatement}
      */
-    public VariableDeclarationStatement declareStmt() {
-        return b.declareStmt(type(), varName(), null);
+    public VariableDeclarationStatement declareStatement() {
+        return b.declareStatement(type(), varName(), null);
     }
 
     @Override

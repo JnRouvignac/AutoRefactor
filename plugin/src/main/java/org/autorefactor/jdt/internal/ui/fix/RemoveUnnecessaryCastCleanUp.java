@@ -242,12 +242,12 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
                 && node.equals(rightOp);
     }
 
-    private boolean isIntegralType(final Expression expr) {
-        return ASTNodes.hasType(expr, byte.class.getSimpleName(), char.class.getSimpleName(), short.class.getSimpleName(), int.class.getSimpleName(), long.class.getSimpleName());
+    private boolean isIntegralType(final Expression expression) {
+        return ASTNodes.hasType(expression, byte.class.getSimpleName(), char.class.getSimpleName(), short.class.getSimpleName(), int.class.getSimpleName(), long.class.getSimpleName());
     }
 
-    private boolean isFloatingPointType(final Expression expr) {
-        return ASTNodes.hasType(expr, float.class.getSimpleName(), double.class.getSimpleName());
+    private boolean isFloatingPointType(final Expression expression) {
+        return ASTNodes.hasType(expression, float.class.getSimpleName(), double.class.getSimpleName());
     }
 
     /** @see JLS, section 5.2 Assignment Conversion */
@@ -273,12 +273,12 @@ public class RemoveUnnecessaryCastCleanUp extends AbstractCleanUpRule {
                 && isAssignmentCompatible(castTypeBinding, exprTypeBinding);
     }
 
-    private boolean isAssignmentCompatible(Expression expr, Type type) {
-        return expr != null && type != null && isAssignmentCompatible(expr.resolveTypeBinding(), type.resolveBinding());
+    private boolean isAssignmentCompatible(Expression expression, Type type) {
+        return expression != null && type != null && isAssignmentCompatible(expression.resolveTypeBinding(), type.resolveBinding());
     }
 
-    private boolean isAssignmentCompatible(Expression expr, ITypeBinding typeBinding) {
-        return expr != null && typeBinding != null && isAssignmentCompatible(expr.resolveTypeBinding(), typeBinding);
+    private boolean isAssignmentCompatible(Expression expression, ITypeBinding typeBinding) {
+        return expression != null && typeBinding != null && isAssignmentCompatible(expression.resolveTypeBinding(), typeBinding);
     }
 
     private boolean isAssignmentCompatible(Expression expr1, Expression expr2) {

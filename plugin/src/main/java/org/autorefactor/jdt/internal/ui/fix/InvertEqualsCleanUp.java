@@ -73,22 +73,22 @@ public class InvertEqualsCleanUp extends AbstractCleanUpRule {
         boolean isEquals= ASTNodes.usesGivenSignature(node, Object.class.getCanonicalName(), "equals", Object.class.getCanonicalName()); //$NON-NLS-1$
         boolean isStringEqualsIgnoreCase= ASTNodes.usesGivenSignature(node, String.class.getCanonicalName(), "equalsIgnoreCase", String.class.getCanonicalName()); //$NON-NLS-1$
         if (isEquals || isStringEqualsIgnoreCase) {
-            final Expression expr= node.getExpression();
+            final Expression expression= node.getExpression();
             final Expression arg0= ASTNodes.arg0(node);
-            if (!ASTNodes.isConstant(expr) && ASTNodes.isConstant(arg0) && !ASTNodes.isPrimitive(arg0)) {
-                invertEqualsInvocation(node, isEquals, expr, arg0);
+            if (!ASTNodes.isConstant(expression) && ASTNodes.isConstant(arg0) && !ASTNodes.isPrimitive(arg0)) {
+                invertEqualsInvocation(node, isEquals, expression, arg0);
                 return false;
             }
         }
         return true;
     }
 
-    private void invertEqualsInvocation(final MethodInvocation node, final boolean isEquals, final Expression expr,
+    private void invertEqualsInvocation(final MethodInvocation node, final boolean isEquals, final Expression expression,
             final Expression arg0) {
         final ASTNodeFactory b= this.ctx.getASTBuilder();
 
         final String methodName= isEquals ? "equals" : "equalsIgnoreCase"; //$NON-NLS-1$ $NON-NLS-2$
         this.ctx.getRefactorings().replace(node,
-                b.invoke(b.parenthesizeIfNeeded(b.copy(arg0)), methodName, b.copy(expr)));
+                b.invoke(b.parenthesizeIfNeeded(b.copy(arg0)), methodName, b.copy(expression)));
     }
 }

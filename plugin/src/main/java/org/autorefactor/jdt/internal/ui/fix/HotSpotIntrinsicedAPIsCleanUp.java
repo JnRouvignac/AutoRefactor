@@ -78,15 +78,15 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
     private static class SystemArrayCopyParams {
         private IVariableBinding indexVarBinding;
         private Expression indexStartPos;
-        private Expression srcArrayExpr;
+        private Expression srcArrayExpression;
         private Expression srcPos;
-        private Expression destArrayExpr;
+        private Expression destArrayExpression;
         private Expression destPos;
         private Expression length;
 
         @Override
         public String toString() {
-            return "System.arraycopy(" + srcArrayExpr + ", " + srcPos + ", " + destArrayExpr + ", " + destPos + ", " //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$ $NON-NLS-4$ $NON-NLS-5$
+            return "System.arraycopy(" + srcArrayExpression + ", " + srcPos + ", " + destArrayExpression + ", " + destPos + ", " //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$ $NON-NLS-4$ $NON-NLS-5$
                     + length + ")"; //$NON-NLS-1$
         }
     }
@@ -96,12 +96,12 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
         final SystemArrayCopyParams params= new SystemArrayCopyParams();
         collectUniqueIndex(node, params);
         final IVariableBinding incrementedIdx= getUniqueIncrementedVariable(node);
-        final List<Statement> stmts= ASTNodes.asList(node.getBody());
+        final List<Statement> statements= ASTNodes.asList(node.getBody());
 
-        if (Utils.equalNotNull(params.indexVarBinding, incrementedIdx) && stmts.size() == 1) {
+        if (Utils.equalNotNull(params.indexVarBinding, incrementedIdx) && statements.size() == 1) {
             collectLength(node.getExpression(), incrementedIdx, params);
 
-            final Assignment as= ASTNodes.asExpression(stmts.get(0), Assignment.class);
+            final Assignment as= ASTNodes.asExpression(statements.get(0), Assignment.class);
 
             if (ASTNodes.hasOperator(as, Assignment.Operator.ASSIGN)) {
                 final Expression lhs= as.getLeftHandSide();
@@ -110,10 +110,10 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
                 if (lhs instanceof ArrayAccess && rhs instanceof ArrayAccess) {
                     final ArrayAccess aaLHS= (ArrayAccess) lhs;
                     final ArrayAccess aaRHS= (ArrayAccess) rhs;
-                    params.destArrayExpr= aaLHS.getArray();
-                    params.srcArrayExpr= aaRHS.getArray();
+                    params.destArrayExpression= aaLHS.getArray();
+                    params.srcArrayExpression= aaRHS.getArray();
 
-                    if (ASTNodes.haveSameType(params.srcArrayExpr, params.destArrayExpr)) {
+                    if (ASTNodes.haveSameType(params.srcArrayExpression, params.destArrayExpression)) {
                         params.destPos= calcIndex(aaLHS.getIndex(), params);
                         params.srcPos= calcIndex(aaRHS.getIndex(), params);
                         return replaceWithSystemArrayCopyCloneAll(node, params);
@@ -172,7 +172,7 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
         } else if (Utils.equalNotNull(expr2Value, 0)) {
             return b.copy(expr1);
         }
-        return b.infixExpr(b.copy(expr1), InfixExpression.Operator.PLUS, b.copy(expr2));
+        return b.infixExpression(b.copy(expr1), InfixExpression.Operator.PLUS, b.copy(expr2));
     }
 
     private Expression minus(Expression expr1, Expression expr2) {
@@ -187,7 +187,7 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
         } else if (Utils.equalNotNull(expr2Value, 0)) {
             return b.copy(expr1);
         }
-        return b.infixExpr(b.copy(expr1), InfixExpression.Operator.MINUS, b.copy(expr2));
+        return b.infixExpression(b.copy(expr1), InfixExpression.Operator.MINUS, b.copy(expr2));
     }
 
     private Expression minusPlusOne(Expression expr1, Expression expr2) {
@@ -200,14 +200,14 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
         } else if (Utils.equalNotNull(expr1Value, 0)) {
             throw new NotImplementedException(expr2, "Code is not implemented for negating expr2: " + expr2); //$NON-NLS-1$
         } else if (Utils.equalNotNull(expr2Value, 0)) {
-            return b.infixExpr(b.copy(expr1), InfixExpression.Operator.PLUS, ctx.getAST().newNumberLiteral("1")); //$NON-NLS-1$
+            return b.infixExpression(b.copy(expr1), InfixExpression.Operator.PLUS, ctx.getAST().newNumberLiteral("1")); //$NON-NLS-1$
         }
 
-        return b.infixExpr(b.infixExpr(b.copy(expr1), InfixExpression.Operator.MINUS, b.copy(expr2)), InfixExpression.Operator.PLUS, ctx.getAST().newNumberLiteral("1")); //$NON-NLS-1$
+        return b.infixExpression(b.infixExpression(b.copy(expr1), InfixExpression.Operator.MINUS, b.copy(expr2)), InfixExpression.Operator.PLUS, ctx.getAST().newNumberLiteral("1")); //$NON-NLS-1$
     }
 
-    private Integer intValue(Expression expr) {
-        Object literal= expr.resolveConstantExpressionValue();
+    private Integer intValue(Expression expression) {
+        Object literal= expression.resolveConstantExpressionValue();
 
         if (literal instanceof Number) {
             return ((Number) literal).intValue();
@@ -241,21 +241,21 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
     }
 
     private boolean replaceWithSystemArrayCopyCloneAll(ForStatement node, SystemArrayCopyParams params) {
-        if (params.srcArrayExpr == null || params.srcPos == null || params.destArrayExpr == null
+        if (params.srcArrayExpression == null || params.srcPos == null || params.destArrayExpression == null
                 || params.destPos == null || params.length == null) {
             return true;
         }
         final ASTNodeFactory b= this.ctx.getASTBuilder();
-        return replaceWithSystemArrayCopy(node, b.copy(params.srcArrayExpr), params.srcPos,
-                b.copy(params.destArrayExpr), params.destPos, params.length);
+        return replaceWithSystemArrayCopy(node, b.copy(params.srcArrayExpression), params.srcPos,
+                b.copy(params.destArrayExpression), params.destPos, params.length);
     }
 
-    private boolean replaceWithSystemArrayCopy(ForStatement node, Expression srcArrayExpr, Expression srcPos,
-            Expression destArrayExpr, Expression destPos, Expression length) {
+    private boolean replaceWithSystemArrayCopy(ForStatement node, Expression srcArrayExpression, Expression srcPos,
+            Expression destArrayExpression, Expression destPos, Expression length) {
         final ASTNodeFactory b= this.ctx.getASTBuilder();
         final TryStatement tryS= b.try0(
                 b.block(b
-                        .toStmt(b.invoke("System", "arraycopy", srcArrayExpr, srcPos, destArrayExpr, destPos, length))), //$NON-NLS-1$ $NON-NLS-2$
+                        .toStatement(b.invoke("System", "arraycopy", srcArrayExpression, srcPos, destArrayExpression, destPos, length))), //$NON-NLS-1$ $NON-NLS-2$
                 b.catch0("IndexOutOfBoundsException", "e", //$NON-NLS-1$ $NON-NLS-2$
                         b.throw0(b.new0("ArrayIndexOutOfBoundsException", b.invoke("e", "getMessage"))))); //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
 

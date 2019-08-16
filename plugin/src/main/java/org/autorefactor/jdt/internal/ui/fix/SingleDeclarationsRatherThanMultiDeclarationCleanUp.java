@@ -108,9 +108,9 @@ public class SingleDeclarationsRatherThanMultiDeclarationCleanUp extends Abstrac
             final VariableDeclarationFragment newFragment= b.declareFragment(copyOfFragment, copyOfInitializer);
             final ASTNode newNode;
             if (node instanceof VariableDeclarationStatement) {
-                final VariableDeclarationStatement newStmt= b.declareStmt(copyOfType, newFragment);
-                updateModifiers(b, modifiers, newStmt.modifiers());
-                newNode= newStmt;
+                final VariableDeclarationStatement newStatement= b.declareStatement(copyOfType, newFragment);
+                updateModifiers(b, modifiers, newStatement.modifiers());
+                newNode= newStatement;
             } else {
                 final FieldDeclaration newField= b.declareField(copyOfType, newFragment);
                 if (docComment != null) {

@@ -164,7 +164,7 @@ public class CommonCodeInIfElseStatementSample {
         }
     }
 
-    public static Predicate<String> doNotMergeDifferentLambdaExpr(final boolean caseSensitive, final String... allowedSet) {
+    public static Predicate<String> doNotMergeDifferentLambdaExpression(final boolean caseSensitive, final String... allowedSet) {
         if (caseSensitive) {
             return x -> Arrays.stream(allowedSet).anyMatch(y -> (x == null && y == null) || (x != null && x.equals(y)));
         } else {

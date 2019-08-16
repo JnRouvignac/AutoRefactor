@@ -66,7 +66,7 @@ public class LambdaSample extends Date {
         return someString -> (someString.trim().toLowerCase() + "bar");
     }
 
-    public Function<String, String> doNotRemoveReturnWithSeveralStmts() {
+    public Function<String, String> doNotRemoveReturnWithSeveralStatements() {
         return someString -> {String trimmed = someString.trim();
         return trimmed.toLowerCase();};
     }

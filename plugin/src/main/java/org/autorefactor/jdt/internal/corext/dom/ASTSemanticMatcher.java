@@ -256,58 +256,58 @@ public class ASTSemanticMatcher extends ASTMatcher {
     private boolean matchAssignmentWithAndWithoutEqual(final Assignment node, final Assignment assignment) {
         if (ASTNodes.hasOperator(node, Assignment.Operator.ASSIGN)
                 && node.getRightHandSide() instanceof InfixExpression) {
-            InfixExpression infixExpr= (InfixExpression) node.getRightHandSide();
+            InfixExpression infixExpression= (InfixExpression) node.getRightHandSide();
 
-            if (!infixExpr.hasExtendedOperands()
+            if (!infixExpression.hasExtendedOperands()
                     && ASTNodes.hasOperator(assignment, Assignment.Operator.PLUS_ASSIGN, Assignment.Operator.MINUS_ASSIGN,
                             Assignment.Operator.TIMES_ASSIGN, Assignment.Operator.DIVIDE_ASSIGN,
                             Assignment.Operator.BIT_AND_ASSIGN, Assignment.Operator.BIT_OR_ASSIGN,
                             Assignment.Operator.BIT_XOR_ASSIGN, Assignment.Operator.REMAINDER_ASSIGN,
                             Assignment.Operator.LEFT_SHIFT_ASSIGN, Assignment.Operator.RIGHT_SHIFT_SIGNED_ASSIGN,
                             Assignment.Operator.RIGHT_SHIFT_UNSIGNED_ASSIGN)
-                    && ASTSemanticMatcher.ASSIGN_TO_INFIX_OPERATOR.get(assignment.getOperator()).equals(infixExpr.getOperator())) {
+                    && ASTSemanticMatcher.ASSIGN_TO_INFIX_OPERATOR.get(assignment.getOperator()).equals(infixExpression.getOperator())) {
                 return safeSubtreeMatch(node.getLeftHandSide(), assignment.getLeftHandSide())
-                        && safeSubtreeMatch(infixExpr.getLeftOperand(), assignment.getLeftHandSide())
-                        && safeSubtreeMatch(infixExpr.getRightOperand(), assignment.getRightHandSide());
+                        && safeSubtreeMatch(infixExpression.getLeftOperand(), assignment.getLeftHandSide())
+                        && safeSubtreeMatch(infixExpression.getRightOperand(), assignment.getRightHandSide());
             }
         }
 
         return false;
     }
 
-    private boolean match0(final PrefixExpression prefixExpr, final PostfixExpression postfixExpr) {
-        return postfixExpr.getOperator().equals(ASTSemanticMatcher.PREFIX_TO_POSTFIX_OPERATOR.get(prefixExpr.getOperator()))
-                && safeSubtreeMatch(prefixExpr.getOperand(), postfixExpr.getOperand());
+    private boolean match0(final PrefixExpression prefixExpression, final PostfixExpression postfixExpression) {
+        return postfixExpression.getOperator().equals(ASTSemanticMatcher.PREFIX_TO_POSTFIX_OPERATOR.get(prefixExpression.getOperator()))
+                && safeSubtreeMatch(prefixExpression.getOperand(), postfixExpression.getOperand());
     }
 
-    private boolean match0(final PrefixExpression prefixExpr, final Assignment assignment) {
-        return match0(assignment, prefixExpr.getOperand(), ASTSemanticMatcher.PREFIX_TO_INFIX_OPERATOR.get(prefixExpr.getOperator()),
-                ASTSemanticMatcher.PREFIX_TO_ASSIGN_OPERATOR.get(prefixExpr.getOperator()));
+    private boolean match0(final PrefixExpression prefixExpression, final Assignment assignment) {
+        return match0(assignment, prefixExpression.getOperand(), ASTSemanticMatcher.PREFIX_TO_INFIX_OPERATOR.get(prefixExpression.getOperator()),
+                ASTSemanticMatcher.PREFIX_TO_ASSIGN_OPERATOR.get(prefixExpression.getOperator()));
     }
 
-    private boolean match0(final PostfixExpression postfixExpr, final Assignment assignment) {
-        return match0(assignment, postfixExpr.getOperand(), ASTSemanticMatcher.POSTFIX_TO_INFIX_OPERATOR.get(postfixExpr.getOperator()),
-                ASTSemanticMatcher.POSTFIX_TO_ASSIGN_OPERATOR.get(postfixExpr.getOperator()));
+    private boolean match0(final PostfixExpression postfixExpression, final Assignment assignment) {
+        return match0(assignment, postfixExpression.getOperand(), ASTSemanticMatcher.POSTFIX_TO_INFIX_OPERATOR.get(postfixExpression.getOperator()),
+                ASTSemanticMatcher.POSTFIX_TO_ASSIGN_OPERATOR.get(postfixExpression.getOperator()));
     }
 
     private boolean match0(final Assignment assignment, final Expression prefixOrPostfixOperand,
             final InfixExpression.Operator infixAssociatedOperator, final Assignment.Operator assignmentAssociatedOperator) {
         if (ASTNodes.hasOperator(assignment, Assignment.Operator.ASSIGN)
                 && assignment.getRightHandSide() instanceof InfixExpression) {
-            InfixExpression infixExpr= (InfixExpression) assignment.getRightHandSide();
-            if (!infixExpr.hasExtendedOperands() && infixAssociatedOperator.equals(infixExpr.getOperator())) {
-                if (isOneLiteral(infixExpr.getRightOperand())) {
+            InfixExpression infixExpression= (InfixExpression) assignment.getRightHandSide();
+            if (!infixExpression.hasExtendedOperands() && infixAssociatedOperator.equals(infixExpression.getOperator())) {
+                if (isOneLiteral(infixExpression.getRightOperand())) {
                     return safeSubtreeMatch(prefixOrPostfixOperand, assignment.getLeftHandSide())
-                            && safeSubtreeMatch(prefixOrPostfixOperand, infixExpr.getLeftOperand());
-                } else if (ASTNodes.hasOperator(infixExpr, InfixExpression.Operator.PLUS) && isOneLiteral(infixExpr.getLeftOperand())) {
+                            && safeSubtreeMatch(prefixOrPostfixOperand, infixExpression.getLeftOperand());
+                } else if (ASTNodes.hasOperator(infixExpression, InfixExpression.Operator.PLUS) && isOneLiteral(infixExpression.getLeftOperand())) {
                     return safeSubtreeMatch(prefixOrPostfixOperand, assignment.getLeftHandSide())
-                            && safeSubtreeMatch(prefixOrPostfixOperand, infixExpr.getRightOperand());
+                            && safeSubtreeMatch(prefixOrPostfixOperand, infixExpression.getRightOperand());
                 }
             }
         } else if (ASTNodes.hasOperator(assignment, Assignment.Operator.PLUS_ASSIGN, Assignment.Operator.MINUS_ASSIGN) && assignmentAssociatedOperator.equals(assignment.getOperator())) {
-            Object assignmentExpr= assignment.resolveConstantExpressionValue();
+            Object assignmentExpression= assignment.resolveConstantExpressionValue();
 
-            if (assignmentExpr instanceof Number && ((Number) assignmentExpr).longValue() == 1) {
+            if (assignmentExpression instanceof Number && ((Number) assignmentExpression).longValue() == 1) {
                 return safeSubtreeMatch(prefixOrPostfixOperand, assignment.getLeftHandSide());
             }
         }
@@ -316,9 +316,9 @@ public class ASTSemanticMatcher extends ASTMatcher {
     }
 
     private boolean isOneLiteral(Expression operand) {
-        Object rightExpr= operand.resolveConstantExpressionValue();
+        Object rightExpression= operand.resolveConstantExpressionValue();
 
-        return rightExpr instanceof Number && ((Number) rightExpr).longValue() == 1;
+        return rightExpression instanceof Number && ((Number) rightExpression).longValue() == 1;
     }
 
     @Override
@@ -745,10 +745,10 @@ public class ASTSemanticMatcher extends ASTMatcher {
         final Iterator<Expression> iterator2= operands2.iterator();
 
         while (iterator.hasNext() && iterator2.hasNext()) {
-            final Expression expr= iterator.next();
-            final Expression otherExpr= iterator2.next();
+            final Expression expression= iterator.next();
+            final Expression otherExpression= iterator2.next();
 
-            if (equal ? !safeSubtreeMatch(expr, otherExpr) : !matchOpposite(expr, otherExpr)) {
+            if (equal ? !safeSubtreeMatch(expression, otherExpression) : !matchOpposite(expression, otherExpression)) {
                 isMatching= false;
                 break;
             }
@@ -771,12 +771,12 @@ public class ASTSemanticMatcher extends ASTMatcher {
         }
 
         for (Iterator<Expression> iterator3= operands1.iterator(); iterator3.hasNext();) {
-            final Expression expr= iterator3.next();
+            final Expression expression= iterator3.next();
 
             for (Iterator<Expression> iterator4= operands2.iterator(); iterator4.hasNext();) {
-                final Expression otherExpr= iterator4.next();
+                final Expression otherExpression= iterator4.next();
 
-                if (equal ? safeSubtreeMatch(expr, otherExpr) : matchOpposite(expr, otherExpr)) {
+                if (equal ? safeSubtreeMatch(expression, otherExpression) : matchOpposite(expression, otherExpression)) {
                     iterator3.remove();
                     iterator4.remove();
                     break;

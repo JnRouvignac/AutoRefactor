@@ -82,26 +82,26 @@ public class OneCodeThatFallsThroughRatherThanRedundantBlocksCleanUp extends Abs
 
         @Override
         public boolean visit(TryStatement node) {
-            return visitStmt(node);
+            return visitStatement(node);
         }
 
         @Override
         public boolean visit(IfStatement node) {
-            return visitStmt(node);
+            return visitStatement(node);
         }
 
-        private boolean visitStmt(Statement node) {
+        private boolean visitStatement(Statement node) {
             if (!getResult()) {
                 return true;
             }
 
-            final List<Statement> redundantStmts= new ArrayList<Statement>();
-            collectStmts(node, redundantStmts);
-            return maybeRemoveRedundantCode(node, redundantStmts);
+            final List<Statement> redundantStatements= new ArrayList<Statement>();
+            collectStatements(node, redundantStatements);
+            return maybeRemoveRedundantCode(node, redundantStatements);
         }
 
         @SuppressWarnings("unchecked")
-        private void collectStmts(Statement node, final List<Statement> redundantStmts) {
+        private void collectStatements(Statement node, final List<Statement> redundantStatements) {
             if (node == null) {
                 return;
             }
@@ -111,62 +111,62 @@ public class OneCodeThatFallsThroughRatherThanRedundantBlocksCleanUp extends Abs
 
             if (ts != null && ts.getFinally() == null) {
                 for (final CatchClause catchClause : (List<CatchClause>) ts.catchClauses()) {
-                    doCollectStmts(catchClause.getBody(), redundantStmts);
+                    doCollectStatements(catchClause.getBody(), redundantStatements);
                 }
             } else if (is != null) {
-                doCollectStmts(is.getThenStatement(), redundantStmts);
-                doCollectStmts(is.getElseStatement(), redundantStmts);
+                doCollectStatements(is.getThenStatement(), redundantStatements);
+                doCollectStatements(is.getElseStatement(), redundantStatements);
             }
         }
 
-        private void doCollectStmts(Statement node, final List<Statement> redundantStmts) {
+        private void doCollectStatements(Statement node, final List<Statement> redundantStatements) {
             if (node == null) {
                 return;
             }
 
-            redundantStmts.add(node);
-            List<Statement> stmts= ASTNodes.asList(node);
+            redundantStatements.add(node);
+            List<Statement> statements= ASTNodes.asList(node);
 
-            if (stmts == null || stmts.isEmpty()) {
+            if (statements == null || statements.isEmpty()) {
                 return;
             }
 
-            node= stmts.get(stmts.size() - 1);
-            collectStmts(node, redundantStmts);
+            node= statements.get(statements.size() - 1);
+            collectStatements(node, redundantStatements);
         }
 
-        private boolean maybeRemoveRedundantCode(final Statement node, final List<Statement> redundantStmts) {
-            if (redundantStmts.isEmpty()) {
+        private boolean maybeRemoveRedundantCode(final Statement node, final List<Statement> redundantStatements) {
+            if (redundantStatements.isEmpty()) {
                 return true;
             }
 
-            final List<Statement> referenceStmts= new ArrayList<Statement>();
+            final List<Statement> referenceStatements= new ArrayList<Statement>();
 
             Statement nextSibling= ASTNodes.getNextSibling(node);
             while (nextSibling != null && !ASTNodes.fallsThrough(nextSibling)) {
-                referenceStmts.add(nextSibling);
+                referenceStatements.add(nextSibling);
                 nextSibling= ASTNodes.getNextSibling(nextSibling);
             }
 
             if (nextSibling != null) {
-                referenceStmts.add(nextSibling);
+                referenceStatements.add(nextSibling);
                 ASTNodeFactory b= ctx.getASTBuilder();
 
-                for (final Statement redundantStmt : redundantStmts) {
-                    List<Statement> stmtsToCompare= ASTNodes.asList(redundantStmt);
+                for (final Statement redundantStatement : redundantStatements) {
+                    List<Statement> stmtsToCompare= ASTNodes.asList(redundantStatement);
 
-                    if (stmtsToCompare.size() > referenceStmts.size()) {
-                        stmtsToCompare= stmtsToCompare.subList(stmtsToCompare.size() - referenceStmts.size(),
+                    if (stmtsToCompare.size() > referenceStatements.size()) {
+                        stmtsToCompare= stmtsToCompare.subList(stmtsToCompare.size() - referenceStatements.size(),
                                 stmtsToCompare.size());
                     }
 
-                    if (ASTNodes.match(referenceStmts, stmtsToCompare)) {
+                    if (ASTNodes.match(referenceStatements, stmtsToCompare)) {
                         Refactorings r= ctx.getRefactorings();
 
-                        if (redundantStmt instanceof Block) {
+                        if (redundantStatement instanceof Block) {
                             r.remove(stmtsToCompare);
                         } else {
-                            r.replace(redundantStmt, b.block());
+                            r.replace(redundantStatement, b.block());
                         }
 
                         setResult(false);

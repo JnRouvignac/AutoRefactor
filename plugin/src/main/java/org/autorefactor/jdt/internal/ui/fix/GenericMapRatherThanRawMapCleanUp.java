@@ -138,7 +138,7 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
      *
      * @param b                      The builder.
      * @param origType               The original type
-     * @param originalExpr           The original expression
+     * @param originalExpression     The original expression
      * @param classesToUseWithImport The classes that should be used with simple
      *                               name.
      * @param importsToAdd           The imports that need to be added during this
@@ -146,13 +146,13 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
      * @return the substitute type.
      */
     @Override
-    protected Type substituteType(final ASTNodeFactory b, final Type origType, final ASTNode originalExpr,
+    protected Type substituteType(final ASTNodeFactory b, final Type origType, final ASTNode originalExpression,
             final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
         if (origType.isParameterizedType()) {
             return null;
         }
 
-        final TypeNameDecider typeNameDecider= new TypeNameDecider(originalExpr);
+        final TypeNameDecider typeNameDecider= new TypeNameDecider(originalExpression);
 
         final ParameterizedType parameterizedType= b.getAST().newParameterizedType(b.copy(origType));
         final List<Type> typeArgs= ASTNodes.typeArguments(parameterizedType);

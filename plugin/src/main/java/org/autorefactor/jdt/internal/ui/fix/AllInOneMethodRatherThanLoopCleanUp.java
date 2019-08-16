@@ -116,13 +116,13 @@ public class AllInOneMethodRatherThanLoopCleanUp extends NewClassImportCleanUp {
     private boolean maybeRefactorEnhancedForStatement(final EnhancedForStatement node,
             final Set<String> classesToUseWithImport, final Set<String> importsToAdd) {
         final Expression iterable= node.getExpression();
-        final List<Statement> stmts= ASTNodes.asList(node.getBody());
+        final List<Statement> statements= ASTNodes.asList(node.getBody());
 
-        if (stmts.size() != 1) {
+        if (statements.size() != 1) {
             return true;
         }
 
-        final MethodInvocation mi= ASTNodes.asExpression(stmts.get(0), MethodInvocation.class);
+        final MethodInvocation mi= ASTNodes.asExpression(statements.get(0), MethodInvocation.class);
         final IVariableBinding foreachVariable= node.getParameter().resolveBinding();
         // We should remove all the loop variable occurrences
         // As we replace only one, there should be no more than one occurrence
@@ -144,7 +144,7 @@ public class AllInOneMethodRatherThanLoopCleanUp extends NewClassImportCleanUp {
             final MethodInvocation mi, final Set<String> classesToUseWithImport) {
         ASTNodeFactory b= ctx.getASTBuilder();
         ctx.getRefactorings().replace(node,
-                b.toStmt(b.invoke(
+                b.toStatement(b.invoke(
                         classesToUseWithImport.contains(Collections.class.getCanonicalName()) ? b.name("Collections") //$NON-NLS-1$
                                 : b.name("java", "util", "Collections"), //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
                         "addAll", mi.getExpression() != null ? b.copy(mi.getExpression()) : b.this0(), //$NON-NLS-1$
@@ -159,12 +159,12 @@ public class AllInOneMethodRatherThanLoopCleanUp extends NewClassImportCleanUp {
     private boolean maybeRefactorForStatement(final ForStatement node, final Set<String> classesToUseWithImport,
             final Set<String> importsToAdd) {
         final ForLoopContent loopContent= ForLoopHelper.iterateOverContainer(node);
-        final List<Statement> stmts= ASTNodes.asList(node.getBody());
+        final List<Statement> statements= ASTNodes.asList(node.getBody());
 
-        if (loopContent != null && loopContent.getLoopVariable() != null && stmts.size() == 1) {
+        if (loopContent != null && loopContent.getLoopVariable() != null && statements.size() == 1) {
             final SimpleName loopVariable= (SimpleName) loopContent.getLoopVariable();
             final IVariableBinding loopVariableName= (IVariableBinding) loopVariable.resolveBinding();
-            final MethodInvocation mi= ASTNodes.asExpression(stmts.get(0), MethodInvocation.class);
+            final MethodInvocation mi= ASTNodes.asExpression(statements.get(0), MethodInvocation.class);
 
             // We should remove all the loop variable occurrences
             // As we replace only one, there should be no more than one occurrence
@@ -268,6 +268,6 @@ public class AllInOneMethodRatherThanLoopCleanUp extends NewClassImportCleanUp {
             newMethod= b.invoke(methodName, b.copy(data));
         }
 
-        ctx.getRefactorings().replace(toReplace, b.toStmt(newMethod));
+        ctx.getRefactorings().replace(toReplace, b.toStatement(newMethod));
     }
 }

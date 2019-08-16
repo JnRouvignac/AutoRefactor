@@ -112,15 +112,15 @@ public class OppositeConditionRatherThanDuplicateConditionCleanUp extends Abstra
     }
 
     private boolean maybeRefactorCondition(final IfStatement node, final IfStatement secondIf,
-            final Expression duplicateExpr, final Expression notDuplicateExpr) {
+            final Expression duplicateExpression, final Expression notDuplicateExpression) {
         final ASTSemanticMatcher matcher= new ASTSemanticMatcher();
 
-        if (ASTNodes.match(matcher, duplicateExpr, secondIf.getExpression())) {
-            refactorCondition(node, duplicateExpr, notDuplicateExpr, secondIf.getThenStatement(),
+        if (ASTNodes.match(matcher, duplicateExpression, secondIf.getExpression())) {
+            refactorCondition(node, duplicateExpression, notDuplicateExpression, secondIf.getThenStatement(),
                     secondIf.getElseStatement());
             return false;
-        } else if (matcher.matchOpposite(duplicateExpr, secondIf.getExpression())) {
-            refactorCondition(node, duplicateExpr, notDuplicateExpr, secondIf.getElseStatement(),
+        } else if (matcher.matchOpposite(duplicateExpression, secondIf.getExpression())) {
+            refactorCondition(node, duplicateExpression, notDuplicateExpression, secondIf.getElseStatement(),
                     secondIf.getThenStatement());
             return false;
         }
@@ -128,34 +128,34 @@ public class OppositeConditionRatherThanDuplicateConditionCleanUp extends Abstra
         return true;
     }
 
-    private void refactorCondition(final IfStatement node, final Expression duplicateExpr,
-            final Expression notDuplicateExpr, final Statement positiveStmt, final Statement negativeStmt) {
+    private void refactorCondition(final IfStatement node, final Expression duplicateExpression,
+            final Expression notDuplicateExpression, final Statement positiveStatement, final Statement negativeStatement) {
         final ASTNodeFactory b= this.ctx.getASTBuilder();
 
         Statement negativeStmtCopy;
-        if (negativeStmt instanceof IfStatement) {
-            negativeStmtCopy= b.block(b.move(negativeStmt));
+        if (negativeStatement instanceof IfStatement) {
+            negativeStmtCopy= b.block(b.move(negativeStatement));
         } else {
-            negativeStmtCopy= b.move(negativeStmt);
+            negativeStmtCopy= b.move(negativeStatement);
         }
 
         final Expression secondCond;
         final Statement secondStmtCopy;
         final Statement thirdStmtCopy;
-        final PrefixExpression negativeCond= ASTNodes.as(notDuplicateExpr, PrefixExpression.class);
+        final PrefixExpression negativeCond= ASTNodes.as(notDuplicateExpression, PrefixExpression.class);
 
         if (negativeCond != null && ASTNodes.hasOperator(negativeCond, PrefixExpression.Operator.NOT)) {
             secondCond= negativeCond.getOperand();
-            secondStmtCopy= b.move(positiveStmt);
+            secondStmtCopy= b.move(positiveStatement);
             thirdStmtCopy= b.move(node.getThenStatement());
         } else {
-            secondCond= notDuplicateExpr;
+            secondCond= notDuplicateExpression;
             secondStmtCopy= b.move(node.getThenStatement());
-            thirdStmtCopy= b.move(positiveStmt);
+            thirdStmtCopy= b.move(positiveStatement);
         }
 
         this.ctx.getRefactorings().replace(node,
-                b.if0(b.parenthesizeIfNeeded(b.negate(ASTNodes.getUnparenthesedExpression(duplicateExpr))), negativeStmtCopy,
+                b.if0(b.parenthesizeIfNeeded(b.negate(ASTNodes.getUnparenthesedExpression(duplicateExpression))), negativeStmtCopy,
                         b.if0(b.copy(ASTNodes.getUnparenthesedExpression(secondCond)), secondStmtCopy, thirdStmtCopy)));
     }
 }
