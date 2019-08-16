@@ -108,31 +108,36 @@ public class LambdaCleanUp extends AbstractCleanUpRule {
         public boolean visit(LambdaExpression node) {
             if (node.hasParentheses() && node.parameters().size() == 1
                     && node.parameters().get(0) instanceof VariableDeclarationFragment) {
-                // FIXME: it should also be possible to deal with a SingleVariableDeclaration
+                // TODO it should also be possible to deal with a SingleVariableDeclaration
                 // when the type matches the expected inferred type
+                // To do this, we should visit the whole block and check the target type
                 removeParamParentheses(node);
+                setResult(false);
                 return false;
             } else if (node.getBody() instanceof Block) {
                 final List<Statement> stmts= ASTNodes.asList((Block) node.getBody());
 
                 if (stmts.size() == 1 && stmts.get(0) instanceof ReturnStatement) {
                     removeReturnAndBrackets(node, stmts);
+                    setResult(false);
                     return false;
                 }
             } else if (node.getBody() instanceof ClassInstanceCreation) {
                 final ClassInstanceCreation ci= (ClassInstanceCreation) node.getBody();
 
                 final List<Expression> arguments= ASTNodes.arguments(ci);
-                if (node.parameters().size() == arguments.size() && isSameIdentifier(node, arguments)) {
+                if (node.parameters().size() == arguments.size() && areSameIdentifiers(node, arguments)) {
                     replaceByCreationReference(node, ci);
+                    setResult(false);
                     return false;
                 }
             } else if (node.getBody() instanceof SuperMethodInvocation) {
                 final SuperMethodInvocation smi= (SuperMethodInvocation) node.getBody();
 
                 final List<Expression> arguments= ASTNodes.arguments(smi);
-                if (node.parameters().size() == arguments.size() && isSameIdentifier(node, arguments)) {
+                if (node.parameters().size() == arguments.size() && areSameIdentifiers(node, arguments)) {
                     replaceBySuperMethodReference(node, smi);
+                    setResult(false);
                     return false;
                 }
             } else if (node.getBody() instanceof MethodInvocation) {
@@ -142,7 +147,7 @@ public class LambdaCleanUp extends AbstractCleanUpRule {
 
                 final List<Expression> arguments= ASTNodes.arguments(mi);
                 if (node.parameters().size() == arguments.size()) {
-                    if (!isSameIdentifier(node, arguments)) {
+                    if (!areSameIdentifiers(node, arguments)) {
                         return true;
                     }
 
@@ -162,23 +167,27 @@ public class LambdaCleanUp extends AbstractCleanUpRule {
                         }
 
                         replaceByTypeReference(node, mi);
+                        setResult(false);
                         return false;
                     }
 
                     if (calledExpr == null || calledExpr instanceof StringLiteral || calledExpr instanceof NumberLiteral
                             || calledExpr instanceof ThisExpression) {
                         replaceByMethodReference(node, mi);
+                        setResult(false);
                         return false;
                     } else if (calledExpr instanceof FieldAccess) {
                         final FieldAccess fieldAccess= (FieldAccess) calledExpr;
                         if (fieldAccess.resolveFieldBinding().isEffectivelyFinal()) {
                             replaceByMethodReference(node, mi);
+                            setResult(false);
                             return false;
                         }
                     } else if (calledExpr instanceof SuperFieldAccess) {
                         final SuperFieldAccess fieldAccess= (SuperFieldAccess) calledExpr;
                         if (fieldAccess.resolveFieldBinding().isEffectivelyFinal()) {
                             replaceByMethodReference(node, mi);
+                            setResult(false);
                             return false;
                         }
                     }
@@ -207,10 +216,12 @@ public class LambdaCleanUp extends AbstractCleanUpRule {
                         }
 
                         replaceByTypeReference(node, mi);
+                        setResult(false);
                         return false;
                     }
                 }
             }
+
             return true;
         }
 
@@ -226,18 +237,16 @@ public class LambdaCleanUp extends AbstractCleanUpRule {
             return false;
         }
 
-        private boolean isSameIdentifier(LambdaExpression node, List<Expression> arguments) {
+        private boolean areSameIdentifiers(LambdaExpression node, List<Expression> arguments) {
             for (int i= 0; i < node.parameters().size(); i++) {
-                if (!isSameIdentifier(node, arguments, i)) {
+                final Expression expr= ASTNodes.getUnparenthesedExpression(arguments.get(i));
+
+                if (!(expr instanceof SimpleName) || !isSameIdentifier(node, i, (SimpleName) expr)) {
                     return false;
                 }
             }
-            return true;
-        }
 
-        private boolean isSameIdentifier(final LambdaExpression node, final List<Expression> arguments, final int i) {
-            final Expression expr= ASTNodes.getUnparenthesedExpression(arguments.get(i));
-            return expr instanceof SimpleName && isSameIdentifier(node, i, (SimpleName) expr);
+            return true;
         }
 
         private boolean isSameIdentifier(final LambdaExpression node, final int i, final SimpleName argument) {
@@ -246,9 +255,11 @@ public class LambdaCleanUp extends AbstractCleanUpRule {
                 final VariableDeclarationFragment vdf= (VariableDeclarationFragment) param0;
                 return vdf.getName().getIdentifier().equals(argument.getIdentifier());
                 // } else if (param0 instanceof SingleVariableDeclaration) {
-                // FIXME: it should also be possible to deal with a SingleVariableDeclaration
+                // TODO it should also be possible to deal with a SingleVariableDeclaration
                 // when the type matches the expected inferred type
+                // To do this, we should visit the whole block and check the target type
             }
+
             return false;
         }
 
