@@ -1292,11 +1292,12 @@ public final class ASTNodes {
      * node.
      *
      * @param node     the node for which to test the operator
-     * @param operator the operator to test
+     * @param anOperator the first operator to test
+     * @param operators the other operators to test
      * @return true if the provided node has the provided operator, false otherwise.
      */
-    public static boolean hasOperator(Assignment node, Assignment.Operator... operator) {
-        return node != null && Arrays.asList(operator).contains(node.getOperator());
+    public static boolean hasOperator(Assignment node, Assignment.Operator anOperator, Assignment.Operator... operators) {
+        return node != null && isOperatorInList(node.getOperator(), anOperator, operators);
     }
 
     /**
@@ -1304,11 +1305,12 @@ public final class ASTNodes {
      * node.
      *
      * @param node     the node for which to test the operator
-     * @param operator the operator to test
+     * @param anOperator the first operator to test
+     * @param operators the other operators to test
      * @return true if the provided node has the provided operator, false otherwise.
      */
-    public static boolean hasOperator(InfixExpression node, InfixExpression.Operator... operator) {
-        return node != null && Arrays.asList(operator).contains(node.getOperator());
+    public static boolean hasOperator(InfixExpression node, InfixExpression.Operator anOperator, InfixExpression.Operator... operators) {
+        return node != null && isOperatorInList(node.getOperator(), anOperator, operators);
     }
 
     /**
@@ -1316,11 +1318,12 @@ public final class ASTNodes {
      * node.
      *
      * @param node     the node for which to test the operator
-     * @param operator the operator to test
+     * @param anOperator the first operator to test
+     * @param operators the other operators to test
      * @return true if the provided node has the provided operator, false otherwise.
      */
-    public static boolean hasOperator(PostfixExpression node, PostfixExpression.Operator... operator) {
-        return node != null && Arrays.asList(operator).contains(node.getOperator());
+    public static boolean hasOperator(PostfixExpression node, PostfixExpression.Operator anOperator, PostfixExpression.Operator... operators) {
+        return node != null && isOperatorInList(node.getOperator(), anOperator, operators);
     }
 
     /**
@@ -1328,11 +1331,16 @@ public final class ASTNodes {
      * node.
      *
      * @param node     the node for which to test the operator
-     * @param operator the operator to test
+     * @param anOperator the first operator to test
+     * @param operators the other operators to test
      * @return true if the provided node has the provided operator, false otherwise.
      */
-    public static boolean hasOperator(PrefixExpression node, PrefixExpression.Operator... operator) {
-        return node != null && Arrays.asList(operator).contains(node.getOperator());
+    public static boolean hasOperator(PrefixExpression node, PrefixExpression.Operator anOperator, PrefixExpression.Operator... operators) {
+        return node != null && isOperatorInList(node.getOperator(), anOperator, operators);
+    }
+
+    private static boolean isOperatorInList(Object realOperator, Object anOperator, Object[] operators) {
+        return realOperator != null && (realOperator.equals(anOperator) || Arrays.asList(operators).contains(realOperator));
     }
 
     /**
