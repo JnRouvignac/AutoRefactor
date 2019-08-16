@@ -70,11 +70,13 @@ import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.ConditionalExpression;
 import org.eclipse.jdt.core.dom.ConstructorInvocation;
 import org.eclipse.jdt.core.dom.ContinueStatement;
+import org.eclipse.jdt.core.dom.CreationReference;
 import org.eclipse.jdt.core.dom.DoStatement;
 import org.eclipse.jdt.core.dom.EmptyStatement;
 import org.eclipse.jdt.core.dom.EnhancedForStatement;
 import org.eclipse.jdt.core.dom.EnumConstantDeclaration;
 import org.eclipse.jdt.core.dom.EnumDeclaration;
+import org.eclipse.jdt.core.dom.ExpressionMethodReference;
 import org.eclipse.jdt.core.dom.ExpressionStatement;
 import org.eclipse.jdt.core.dom.FieldAccess;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
@@ -86,6 +88,7 @@ import org.eclipse.jdt.core.dom.Initializer;
 import org.eclipse.jdt.core.dom.InstanceofExpression;
 import org.eclipse.jdt.core.dom.Javadoc;
 import org.eclipse.jdt.core.dom.LabeledStatement;
+import org.eclipse.jdt.core.dom.LambdaExpression;
 import org.eclipse.jdt.core.dom.LineComment;
 import org.eclipse.jdt.core.dom.MarkerAnnotation;
 import org.eclipse.jdt.core.dom.MemberRef;
@@ -115,6 +118,7 @@ import org.eclipse.jdt.core.dom.StringLiteral;
 import org.eclipse.jdt.core.dom.SuperConstructorInvocation;
 import org.eclipse.jdt.core.dom.SuperFieldAccess;
 import org.eclipse.jdt.core.dom.SuperMethodInvocation;
+import org.eclipse.jdt.core.dom.SuperMethodReference;
 import org.eclipse.jdt.core.dom.SwitchCase;
 import org.eclipse.jdt.core.dom.SwitchStatement;
 import org.eclipse.jdt.core.dom.SynchronizedStatement;
@@ -126,6 +130,7 @@ import org.eclipse.jdt.core.dom.TryStatement;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.TypeDeclarationStatement;
 import org.eclipse.jdt.core.dom.TypeLiteral;
+import org.eclipse.jdt.core.dom.TypeMethodReference;
 import org.eclipse.jdt.core.dom.TypeParameter;
 import org.eclipse.jdt.core.dom.UnionType;
 import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
@@ -2022,6 +2027,23 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
+    public boolean visit(CreationReference node) {
+        final List<ASTVisitor> visitorList= getVisitors(visitorsMap, CreationReference.class);
+        for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
+            final ASTVisitor v= iter.next();
+            try {
+                if (isJavaVersionSupported(v) && !continueVisiting(v.visit(node), v, node)) {
+                    return false;
+                }
+            } catch (Exception e) {
+                logFaultyVisitor(v, node, e);
+                iter.remove();
+            }
+        }
+        return true;
+    }
+
+    @Override
     public boolean visit(DoStatement node) {
         final List<ASTVisitor> visitorList= getVisitors(visitorsMap, DoStatement.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
@@ -2092,6 +2114,23 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     @Override
     public boolean visit(EnumDeclaration node) {
         final List<ASTVisitor> visitorList= getVisitors(visitorsMap, EnumDeclaration.class);
+        for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
+            final ASTVisitor v= iter.next();
+            try {
+                if (isJavaVersionSupported(v) && !continueVisiting(v.visit(node), v, node)) {
+                    return false;
+                }
+            } catch (Exception e) {
+                logFaultyVisitor(v, node, e);
+                iter.remove();
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public boolean visit(ExpressionMethodReference node) {
+        final List<ASTVisitor> visitorList= getVisitors(visitorsMap, ExpressionMethodReference.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
             try {
@@ -2279,6 +2318,23 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     @Override
     public boolean visit(LabeledStatement node) {
         final List<ASTVisitor> visitorList= getVisitors(visitorsMap, LabeledStatement.class);
+        for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
+            final ASTVisitor v= iter.next();
+            try {
+                if (isJavaVersionSupported(v) && !continueVisiting(v.visit(node), v, node)) {
+                    return false;
+                }
+            } catch (Exception e) {
+                logFaultyVisitor(v, node, e);
+                iter.remove();
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public boolean visit(LambdaExpression node) {
+        final List<ASTVisitor> visitorList= getVisitors(visitorsMap, LambdaExpression.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
             try {
@@ -2787,6 +2843,23 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     @Override
+    public boolean visit(SuperMethodReference node) {
+        final List<ASTVisitor> visitorList= getVisitors(visitorsMap, SuperMethodReference.class);
+        for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
+            final ASTVisitor v= iter.next();
+            try {
+                if (isJavaVersionSupported(v) && !continueVisiting(v.visit(node), v, node)) {
+                    return false;
+                }
+            } catch (Exception e) {
+                logFaultyVisitor(v, node, e);
+                iter.remove();
+            }
+        }
+        return true;
+    }
+
+    @Override
     public boolean visit(SwitchCase node) {
         final List<ASTVisitor> visitorList= getVisitors(visitorsMap, SwitchCase.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
@@ -2959,6 +3032,23 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     @Override
     public boolean visit(TypeLiteral node) {
         final List<ASTVisitor> visitorList= getVisitors(visitorsMap, TypeLiteral.class);
+        for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
+            final ASTVisitor v= iter.next();
+            try {
+                if (isJavaVersionSupported(v) && !continueVisiting(v.visit(node), v, node)) {
+                    return false;
+                }
+            } catch (Exception e) {
+                logFaultyVisitor(v, node, e);
+                iter.remove();
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public boolean visit(TypeMethodReference node) {
+        final List<ASTVisitor> visitorList= getVisitors(visitorsMap, TypeMethodReference.class);
         for (Iterator<ASTVisitor> iter= visitorList.iterator(); iter.hasNext();) {
             final ASTVisitor v= iter.next();
             try {
