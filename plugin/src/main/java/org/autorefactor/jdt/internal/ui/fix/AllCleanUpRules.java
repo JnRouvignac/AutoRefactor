@@ -125,7 +125,7 @@ public final class AllCleanUpRules {
                 new EnumSetRatherThanHashSetCleanUp(), new RemoveUncheckedThrowsClausesCleanUp(),
                 new CapitalizeLongLiteralCleanUp(), new SwitchCleanUp(), new IfRatherThanTwoSwitchCasesCleanUp(),
 
-                // Those refactorings should end the list because they clean the previous
+                // Those cleanups should end the list because they clean the previous
                 // changes
                 new RemoveSemiColonCleanUp(), new AddBracketsToControlStatementCleanUp(),
                 new RemoveUnnecessaryLocalBeforeReturnCleanUp(), new RedundantModifiersCleanUp(),

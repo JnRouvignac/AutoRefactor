@@ -120,7 +120,7 @@ public class StringCleanUp extends AbstractCleanUpRule {
             } else if (node.equals(ro)) {
                 if (ASTNodes.hasType(lo, String.class.getCanonicalName())
                         // Do not refactor left and right operand at the same time
-                        // to avoid compilation errors post refactoring
+                        // to avoid compilation errors post cleanup
                         && !r.hasBeenRefactored(lo)) {
                     replaceStringValueOfByArg0(ro, node);
                     return false;

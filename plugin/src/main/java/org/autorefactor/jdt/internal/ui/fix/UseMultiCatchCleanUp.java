@@ -224,7 +224,7 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
                     if (Utils.equalNotNull(ASTNodes.resolveTypeBinding(f1), ASTNodes.resolveTypeBinding(f2))
                             // This structural match is a bit dumb
                             // It cannot reconcile 1 with 1L, true with Boolean.TRUE, etc.
-                            // Let's rely on other refactoring rules which will simplify such expressions
+                            // Let's rely on other cleanup rules which will simplify such expressions
                             // and convert 1L => 1 (in long context), Boolean.TRUE to true (in boolean
                             // context), etc.
                             && ASTNodes.match(this, f1.getInitializer(), f2.getInitializer())) {

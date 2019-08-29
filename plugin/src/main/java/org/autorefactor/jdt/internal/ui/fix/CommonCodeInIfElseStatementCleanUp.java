@@ -289,7 +289,7 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
         final List<Statement> elseStatements= ASTNodes.asList(node.getElseStatement());
         if (thenStatements.isEmpty() || elseStatements.isEmpty()) {
             // If the then or else clause is empty, then there is no common code whatsoever.
-            // let other refactorings take care of removing empty blocks.
+            // let other cleanups take care of removing empty blocks.
             return false;
         }
 

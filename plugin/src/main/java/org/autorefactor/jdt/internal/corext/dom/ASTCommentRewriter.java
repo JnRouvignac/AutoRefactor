@@ -151,7 +151,7 @@ public class ASTCommentRewriter {
             edits.addChildren(commentEdits.toArray(new TextEdit[commentEdits.size()]));
         }
         // Else, code edits take priority. Give up applying current text edits.
-        // They will be retried in the next refactoring loop.
+        // They will be retried in the next cleanup loop.
     }
 
     private int nbEdits() {

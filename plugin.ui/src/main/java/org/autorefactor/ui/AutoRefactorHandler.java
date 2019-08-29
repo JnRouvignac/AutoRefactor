@@ -97,7 +97,7 @@ public class AutoRefactorHandler extends AbstractHandler {
         // @see http://stackoverflow.com/questions/2113865/jdt-without-eclipse
 
         // TODO JNR provide from the UI the ability to execute groovy (other
-        // scripts? rhino?) scripts for refactoring.
+        // scripts? rhino?) scripts for cleanup.
 
         // <p> Extract method: Live variable analysis - READ WRITE variable analysis
         // (including method params).

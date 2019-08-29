@@ -249,12 +249,12 @@ public class ApplyRefactoringsJob extends Job {
 
             final Refactorings refactorings= refactoring.getRefactorings(astRoot);
             if (!refactorings.hasRefactorings()) {
-                // No new refactorings have been applied,
-                // We are done with applying the refactorings.
+                // No new cleanups have been applied,
+                // We are done with applying the cleanups.
                 break;
             }
 
-            // Apply the refactorings and save the compilation unit
+            // Apply the cleanups and save the compilation unit
             refactorings.applyTo(document, hasToSave);
             textEdits.add(refactorings.getEdits());
             if (!hasToSave) {

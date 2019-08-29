@@ -189,7 +189,7 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
         }
 
         private boolean ignoreUnlabledBreaksInInnerBreakableStatement() {
-            // Unlabeled breaks in inner loops/switchs work ok with switch refactoring rule
+            // Unlabeled breaks in inner loops/switchs work ok with switch cleanup rule
             return false;
         }
     }
