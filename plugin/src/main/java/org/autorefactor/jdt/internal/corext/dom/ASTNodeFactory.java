@@ -331,10 +331,6 @@ public class ASTNodeFactory {
      */
     public Type genericType(String typeName, Type... typeArguments) {
         final Type type= type(typeName);
-        if (typeArguments.length == 0) {
-            return type;
-        }
-
         final ParameterizedType parameterizedType= ast.newParameterizedType(type);
         Collections.addAll(ASTNodes.typeArguments(parameterizedType), typeArguments);
         return parameterizedType;

@@ -49,7 +49,6 @@ import java.util.Set;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.InterruptibleVisitor;
-import org.autorefactor.jdt.internal.corext.dom.TypeNameDecider;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
@@ -58,6 +57,7 @@ import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.MethodInvocation;
+import org.eclipse.jdt.core.dom.ParameterizedType;
 import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.Type;
@@ -183,7 +183,7 @@ public abstract class AbstractClassSubstituteCleanUp extends NewClassImportClean
      * @param classesToUseWithImport The classes that should be used with simple
      *                               name.
      * @param importsToAdd           The imports that need to be added during this
-     *                               refactoring.
+     *                               cleanup.
      * @return the substitute type or null if the class should be the same.
      */
     protected Type substituteType(final ASTNodeFactory b, final Type origType, final ASTNode originalExpression,
@@ -198,13 +198,12 @@ public abstract class AbstractClassSubstituteCleanUp extends NewClassImportClean
                 substitutingClassName= getSimpleName(substitutingClassName);
             }
 
-            final TypeNameDecider typeNameDecider= new TypeNameDecider(originalExpression);
-
             if (origTypeBinding.isParameterizedType()) {
-                final ITypeBinding[] origTypeArgs= origTypeBinding.getTypeArguments();
-                final Type[] newTypes= new Type[origTypeArgs.length];
-                for (int i= 0; i < origTypeArgs.length; i++) {
-                    newTypes[i]= b.toType(origTypeArgs[i], typeNameDecider);
+                @SuppressWarnings("unchecked")
+                final List<Type> origTypeArgs= (List<Type>) ((ParameterizedType) origType).typeArguments();
+                final Type[] newTypes= new Type[origTypeArgs.size()];
+                for (int i= 0; i < origTypeArgs.size(); i++) {
+                    newTypes[i]= b.copy(origTypeArgs.get(i));
                 }
                 return b.genericType(substitutingClassName, newTypes);
             }

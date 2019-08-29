@@ -70,6 +70,11 @@ public class ArrayDequeRatherThanStackSample {
         Collection<String> queue = new ArrayDeque<String>();
     }
 
+    public void replaceStackVariableDeclarationWithDiamondOperator() {
+        // Keep this comment
+        ArrayDeque<String> queue = new ArrayDeque<>();
+    }
+
     public void doNotReplaceInterface() {
         // Keep this comment
         List<String> queue = new Stack<String>();
