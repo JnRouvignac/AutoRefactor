@@ -90,6 +90,13 @@ public class SetRatherThanMapSample {
         Map<String, Observable> aggregate3 = new TreeMap<String, Observable>();
     }
 
+    public void replaceMapVariableDeclarationWithDiamondOperator() {
+        // Keep this comment
+        HashMap<String, Observable> aggregate = new HashMap<>();
+        TreeMap<String, Observable> aggregate2 = new TreeMap<>();
+        Map<String, Observable> aggregate3 = new TreeMap<>();
+    }
+
     public void replaceHashMapVariableUse() {
         // Keep this comment
         HashMap<String, String> aggregate = new HashMap<String, String>();

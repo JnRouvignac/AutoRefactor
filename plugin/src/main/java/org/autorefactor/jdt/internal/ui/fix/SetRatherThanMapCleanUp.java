@@ -49,6 +49,7 @@ import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ExpressionStatement;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.MethodInvocation;
+import org.eclipse.jdt.core.dom.ParameterizedType;
 import org.eclipse.jdt.core.dom.ParenthesizedExpression;
 import org.eclipse.jdt.core.dom.Type;
 
@@ -159,7 +160,7 @@ public class SetRatherThanMapCleanUp extends AbstractClassSubstituteCleanUp {
         if (origTypeBinding.isParameterizedType()) {
             final ITypeBinding[] origTypeArgs= origTypeBinding.getTypeArguments();
             final Type[] newTypes;
-            if (origTypeArgs.length > 0) {
+            if (origTypeArgs.length > 0 && !((ParameterizedType) origType).typeArguments().isEmpty()) {
                 newTypes= new Type[1];
                 newTypes[0]= b.toType(origTypeArgs[0], typeNameDecider);
             } else {

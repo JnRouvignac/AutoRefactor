@@ -92,6 +92,13 @@ public class SetRatherThanMapSample {
         Set<String> aggregate3 = new TreeSet<String>();
     }
 
+    public void replaceMapVariableDeclarationWithDiamondOperator() {
+        // Keep this comment
+        HashSet<String> aggregate = new HashSet<>();
+        TreeSet<String> aggregate2 = new TreeSet<>();
+        Set<String> aggregate3 = new TreeSet<>();
+    }
+
     public void replaceHashMapVariableUse() {
         // Keep this comment
         HashSet<String> aggregate = new HashSet<String>();

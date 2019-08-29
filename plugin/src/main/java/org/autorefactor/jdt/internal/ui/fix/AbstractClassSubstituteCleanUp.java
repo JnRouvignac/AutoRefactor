@@ -49,6 +49,7 @@ import java.util.Set;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.InterruptibleVisitor;
+import org.autorefactor.jdt.internal.corext.dom.TypeNameDecider;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
@@ -198,13 +199,21 @@ public abstract class AbstractClassSubstituteCleanUp extends NewClassImportClean
                 substitutingClassName= getSimpleName(substitutingClassName);
             }
 
+            final TypeNameDecider typeNameDecider= new TypeNameDecider(originalExpression);
+
             if (origTypeBinding.isParameterizedType()) {
-                @SuppressWarnings("unchecked")
-                final List<Type> origTypeArgs= (List<Type>) ((ParameterizedType) origType).typeArguments();
-                final Type[] newTypes= new Type[origTypeArgs.size()];
-                for (int i= 0; i < origTypeArgs.size(); i++) {
-                    newTypes[i]= b.copy(origTypeArgs.get(i));
+                final ITypeBinding[] origTypeArgs= origTypeBinding.getTypeArguments();
+
+                final Type[] newTypes;
+                if (((ParameterizedType) origType).typeArguments().isEmpty()) {
+                    newTypes= new Type[0];
+                } else {
+                    newTypes= new Type[origTypeArgs.length];
+                    for (int i= 0; i < origTypeArgs.length; i++) {
+                        newTypes[i]= b.toType(origTypeArgs[i], typeNameDecider);
+                    }
                 }
+
                 return b.genericType(substitutingClassName, newTypes);
             }
 

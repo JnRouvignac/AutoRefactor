@@ -67,6 +67,11 @@ public class HashMapRatherThanHashtableSample {
         HashMap<String, String> map = new HashMap<String, String>();
     }
 
+    public void replaceHashtableVariableDeclarationWithDiamondOpertor() {
+        // Keep this comment
+        HashMap<String, String> map = new HashMap<>();
+    }
+
     public void replaceMapVariableDeclaration() {
         // Keep this comment
         Map<String, String> map = new HashMap<String, String>();
