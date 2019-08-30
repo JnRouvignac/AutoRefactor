@@ -35,7 +35,7 @@ import org.eclipse.jface.wizard.Wizard;
 import static org.autorefactor.AutoRefactorPlugin.*;
 
 /**
- * Wizard which allows the user to choose which refactorings to apply to the
+ * Wizard which allows the user to choose which cleanups to apply to the
  * selected java elements.
  */
 public class ChooseRefactoringsWizard extends Wizard {

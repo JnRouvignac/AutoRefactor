@@ -28,7 +28,7 @@ package org.autorefactor.environment;
 import org.autorefactor.preferences.Preferences;
 
 /**
- * Holds all the services required for doing refactorings.
+ * Holds all the services required for doing cleanups.
  * <p>
  * This is poor man's dependency injection.
  */

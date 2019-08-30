@@ -56,7 +56,7 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.text.edits.TextEdit;
 
 /**
- * Class aggregating all the refactorings performed by a refactoring rule until
+ * Class aggregating all the refactorings performed by a cleanup rule until
  * the rule finished traversing the whole AST tree.
  */
 public class Refactorings {
@@ -110,7 +110,7 @@ public class Refactorings {
     }
 
     /**
-     * Returns whether the provided node has been the target of a refactoring.
+     * Returns whether the provided node has been the target of a cleanup.
      *
      * @param node the node for which to make the determination
      * @return true if the provided node has been refactored, false otherwise
@@ -365,9 +365,9 @@ public class Refactorings {
     }
 
     /**
-     * Returns whether this instance has any refactorings.
+     * Returns whether this instance has any cleanups.
      *
-     * @return true if this instance has any refactorings, false otherwise.
+     * @return true if this instance has any cleanups, false otherwise.
      */
     public boolean hasRefactorings() {
         return hasRefactorings;
@@ -488,7 +488,7 @@ public class Refactorings {
     }
 
     /**
-     * Applies the accumulated refactorings to the provided document.
+     * Applies the accumulated cleanups to the provided document.
      *
      * @param document  the document to refactor
      * @param hasToSave true if the saving should be handled here

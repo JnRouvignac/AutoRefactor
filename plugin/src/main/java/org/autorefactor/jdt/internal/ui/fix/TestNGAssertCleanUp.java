@@ -45,7 +45,7 @@ import org.eclipse.jdt.core.dom.Statement;
  * See {@link #getDescription()} method.
  * <p>
  * FIXME: Assert.assertNotEquals() exists only since TestNG 6.1. This
- * refactoring should be made conditional on TestNG version.
+ * cleanup should be made conditional on TestNG version.
  * </p>
  */
 public class TestNGAssertCleanUp extends AbstractUnitTestCleanUp {

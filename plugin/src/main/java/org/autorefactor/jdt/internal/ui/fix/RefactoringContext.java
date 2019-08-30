@@ -73,18 +73,18 @@ public class RefactoringContext {
     }
 
     /**
-     * Returns the {@link AST} object to use in the refactoring.
+     * Returns the {@link AST} object to use in the cleanup.
      *
-     * @return the {@link AST} object to use in the refactoring
+     * @return the {@link AST} object to use in the cleanup
      */
     public AST getAST() {
         return refactorings.getAST();
     }
 
     /**
-     * Returns a new {@link ASTNodeFactory} object to use in the refactoring.
+     * Returns a new {@link ASTNodeFactory} object to use in the cleanup.
      *
-     * @return a new {@link ASTNodeFactory} object to use in the refactoring
+     * @return a new {@link ASTNodeFactory} object to use in the cleanup
      */
     public ASTNodeFactory getASTBuilder() {
         return astBuilder;

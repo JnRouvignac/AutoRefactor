@@ -57,8 +57,8 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
 /**
- * Tests all refactoring rules at the same time. This test verifies that all the
- * refactoring rules work together and do not introduce problems.
+ * Tests all cleanup rules at the same time. This test verifies that all the
+ * cleanup rules work together and do not introduce problems.
  */
 @RunWith(value= Parameterized.class)
 public class AllCleanUpRulesTest {

@@ -25,6 +25,6 @@
  */
 /**
  * Provides classes and interfaces providing the environment to execute
- * refactorings.
+ * cleanups.
  */
 package org.autorefactor.environment;

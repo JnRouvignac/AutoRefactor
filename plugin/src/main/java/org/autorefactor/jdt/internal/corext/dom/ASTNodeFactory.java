@@ -157,7 +157,7 @@ public class ASTNodeFactory {
     /**
      * Class constructor.
      *
-     * @param refactorings the refactorings
+     * @param refactorings the cleanups
      */
     public ASTNodeFactory(final Refactorings refactorings) {
         this.refactorings= refactorings;

@@ -64,8 +64,8 @@ public class PrepareApplyRefactoringsJob extends Job {
      * Builds an instance of this class.
      *
      * @param javaElements            the java elements selected for automatic
-     *                                refactoring
-     * @param refactoringRulesToApply the refactorings to apply
+     *                                cleanup
+     * @param refactoringRulesToApply the cleanups to apply
      * @param environment             the environment
      */
     public PrepareApplyRefactoringsJob(List<IJavaElement> javaElements, List<RefactoringRule> refactoringRulesToApply,
@@ -112,8 +112,8 @@ public class PrepareApplyRefactoringsJob extends Job {
     }
 
     /**
-     * Clones all the refactorings to apply. In fairness, this method is only useful
-     * for stateful refactorings.
+     * Clones all the cleanups to apply. In fairness, this method is only useful
+     * for stateful cleanups.
      */
     private List<RefactoringRule> clone(List<RefactoringRule> refactorings) throws Exception {
         final List<RefactoringRule> res= new ArrayList<RefactoringRule>(refactorings.size());

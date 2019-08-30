@@ -41,7 +41,7 @@ import org.eclipse.ui.handlers.HandlerUtil;
 
 /**
  * This is the Eclipse handler for launching a wizard allowing to select
- * automated refactorings to apply. This is invoked from the Eclipse UI.
+ * automated cleanups to apply. This is invoked from the Eclipse UI.
  *
  * @see <a href="http://www.vogella.com/tutorials/EclipseWizards/article.html"
  *      >Creating Eclipse Wizards - Tutorial </a>

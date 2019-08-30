@@ -117,11 +117,11 @@ public class AutoRefactorFix implements ICleanUpFix {
     }
 
     /**
-     * Returns the refactoring rules which have been enabled from the Eclipse
+     * Returns the cleanup rules which have been enabled from the Eclipse
      * preferences.
      *
      * @param options the options
-     * @return the refactoring rules which have been enabled from the Eclipse
+     * @return the cleanup rules which have been enabled from the Eclipse
      *         preferences
      */
     public static List<RefactoringRule> getConfiguredRefactoringRules(final CleanUpOptions options) {

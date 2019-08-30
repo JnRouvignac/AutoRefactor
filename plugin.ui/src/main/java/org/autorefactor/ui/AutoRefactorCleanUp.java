@@ -103,7 +103,7 @@ public class AutoRefactorCleanUp implements ICleanUp {
      * @param project          project
      * @param compilationUnits compilation units
      * @param monitor          monitor
-     * @return Refactoring status
+     * @return Cleanup status
      * @throws CoreException CoreException
      */
     public RefactoringStatus checkPreConditions(IJavaProject project, ICompilationUnit[] compilationUnits,
@@ -118,7 +118,7 @@ public class AutoRefactorCleanUp implements ICleanUp {
      * Check the post-conditions.
      *
      * @param monitor monitor
-     * @return Refactoring Status
+     * @return Cleanup Status
      * @throws CoreException CoreException
      */
     public RefactoringStatus checkPostConditions(IProgressMonitor monitor) throws CoreException {

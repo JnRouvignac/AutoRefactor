@@ -37,10 +37,10 @@ public interface Preferences {
     boolean debugModeOn();
 
     /**
-     * Returns whether this refactoring rule is on.
+     * Returns whether this cleanup rule is on.
      *
      * @param clazz The class.
-     * @return true if this refactoring rule is on, false otherwise.
+     * @return true if this cleanup rule is on, false otherwise.
      */
     boolean isEnabled(Class<? extends AbstractCleanUpRule> clazz);
 }

@@ -87,7 +87,7 @@ public final class EnumSetRatherThanHashSetCleanUp extends AbstractEnumCollectio
     }
 
     /**
-     * Refactoring is not correct if argument for HashSet constructor is a
+     * Cleanup is not correct if argument for HashSet constructor is a
      * Collection, but other than EnumSet. <br>
      * In case of empty collection <code>EnumSet.copyOf</code> will throw an
      * <code>IllegalArgumentException</code>, <br>

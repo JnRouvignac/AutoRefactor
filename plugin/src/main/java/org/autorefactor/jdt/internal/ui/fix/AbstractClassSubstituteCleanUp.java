@@ -167,9 +167,9 @@ public abstract class AbstractClassSubstituteCleanUp extends NewClassImportClean
     }
 
     /**
-     * If the refactoring can be done.
+     * If the cleanup can be done.
      *
-     * @return True if refactoring can be done.
+     * @return True if cleanup can be done.
      */
     protected boolean canCodeBeRefactored() {
         return true;

@@ -78,7 +78,7 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 
 /**
- * Wizard page which allows the user to choose which refactorings to apply to
+ * Wizard page which allows the user to choose which cleanups to apply to
  * the selected java elements.
  */
 public class ChooseRefactoringWizardPage extends WizardPage {
@@ -138,10 +138,10 @@ public class ChooseRefactoringWizardPage extends WizardPage {
     }
 
     /**
-     * Returns the refactorings (selected by the user) to apply to the selected
+     * Returns the cleanups (selected by the user) to apply to the selected
      * elements.
      *
-     * @return the refactorings (selected by the user) to apply to the selected
+     * @return the cleanups (selected by the user) to apply to the selected
      *         elements
      */
     public List<RefactoringRule> getSelectedRefactorings() {

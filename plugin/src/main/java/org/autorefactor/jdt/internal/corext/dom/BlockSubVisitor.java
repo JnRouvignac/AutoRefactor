@@ -35,7 +35,7 @@ import org.eclipse.jdt.core.dom.Block;
  */
 public class BlockSubVisitor extends ASTVisitor {
     /**
-     * The refactoring context.
+     * The cleanup context.
      */
     protected RefactoringContext ctx;
 
@@ -46,7 +46,7 @@ public class BlockSubVisitor extends ASTVisitor {
     /**
      * Constructor.
      *
-     * @param ctx       The refactoring context
+     * @param ctx       The cleanup context
      * @param startNode The start node block
      */
     public BlockSubVisitor(final RefactoringContext ctx, final Block startNode) {

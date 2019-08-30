@@ -58,7 +58,7 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.text.edits.TextEdit;
 
 /**
- * Eclipse job that applies the provided refactoring rules in background.
+ * Eclipse job that applies the provided cleanup rules in background.
  * Several such jobs might be started and run in parallel to form a worker pool,
  * with all workers accepting work items ({@link RefactoringUnit}) from a queue
  * provided by the partitioner ({@link PrepareApplyRefactoringsJob}).
@@ -72,7 +72,7 @@ public class ApplyRefactoringsJob extends Job {
      * Builds an instance of this class.
      *
      * @param refactoringUnits        the units to automatically refactor
-     * @param refactoringRulesToApply the refactorings to apply
+     * @param refactoringRulesToApply the cleanups to apply
      * @param environment             the environment
      */
     public ApplyRefactoringsJob(Queue<RefactoringUnit> refactoringUnits, List<RefactoringRule> refactoringRulesToApply,
@@ -139,7 +139,7 @@ public class ApplyRefactoringsJob extends Job {
     }
 
     /**
-     * Applies the refactorings provided inside the {@link AggregateASTVisitor} to
+     * Applies the cleanups provided inside the {@link AggregateASTVisitor} to
      * the provided {@link ICompilationUnit}.
      *
      * @param compilationUnit    the compilation unit to refactor
@@ -166,7 +166,7 @@ public class ApplyRefactoringsJob extends Job {
                 /*
                  * Cannot read the source when a file is not synchronized, Let's ignore this
                  * file to avoid problems when: - doing string manipulation with the source text
-                 * - applying automated refactorings to such files
+                 * - applying automated cleanups to such files
                  */
                 environment.getLogger()
                         .error("File \"" + compilationUnit.getPath() + "\" is not synchronized with the file system." //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
@@ -182,7 +182,7 @@ public class ApplyRefactoringsJob extends Job {
     }
 
     /**
-     * Applies the refactorings provided inside the {@link AggregateASTVisitor} to
+     * Applies the cleanups provided inside the {@link AggregateASTVisitor} to
      * the provided {@link ICompilationUnit}.
      *
      * @param document        the document where the compilation unit comes from

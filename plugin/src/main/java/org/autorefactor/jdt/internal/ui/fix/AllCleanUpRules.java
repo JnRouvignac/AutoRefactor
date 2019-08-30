@@ -39,11 +39,11 @@ public final class AllCleanUpRules {
     }
 
     /**
-     * Returns the refactoring rules which have been enabled from the Eclipse
+     * Returns the cleanup rules which have been enabled from the Eclipse
      * preferences.
      *
      * @param preferences the preferences
-     * @return the refactoring rules which have been enabled from the Eclipse
+     * @return the cleanup rules which have been enabled from the Eclipse
      *         preferences
      */
     public static List<RefactoringRule> getConfiguredRefactoringRules(final Preferences preferences) {
@@ -58,9 +58,9 @@ public final class AllCleanUpRules {
     }
 
     /**
-     * Returns all the available refactoring rules.
+     * Returns all the available cleanup rules.
      *
-     * @return all the available refactoring rules
+     * @return all the available cleanup rules
      */
     public static List<RefactoringRule> getAllCleanUpRules() {
         return AllCleanUpRules.newArrayList(new IntPrimitiveRatherThanWrapperCleanUp(), new ShortPrimitiveRatherThanWrapperCleanUp(),

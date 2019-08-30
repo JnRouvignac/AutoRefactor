@@ -36,8 +36,8 @@ import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.QualifiedName;
 
 /**
- * Abstract class to extend when writing refactoring rules as
- * {@link ASTVisitor}s. It centralizes useful features for refactoring rules.
+ * Abstract class to extend when writing cleanup rules as
+ * {@link ASTVisitor}s. It centralizes useful features for cleanup rules.
  */
 public abstract class AbstractCleanUpRule extends ASTVisitor implements JavaRefactoringRule {
 
@@ -96,9 +96,9 @@ public abstract class AbstractCleanUpRule extends ASTVisitor implements JavaRefa
     }
 
     /**
-     * Set the refactoring context.
+     * Set the cleanup context.
      *
-     * @param ctx the refactoring context.
+     * @param ctx the cleanup context.
      */
     public void setRefactoringContext(RefactoringContext ctx) {
         this.ctx= ctx;
@@ -120,11 +120,11 @@ public abstract class AbstractCleanUpRule extends ASTVisitor implements JavaRefa
     }
 
     /**
-     * Get the refactorings.
+     * Get the cleanups.
      *
      * @param astRoot The AST toot
      *
-     * @return the refactorings.
+     * @return the cleanups.
      */
     public Refactorings getRefactorings(CompilationUnit astRoot) {
         astRoot.accept(this);

@@ -33,7 +33,7 @@ public class RefactoringUnit {
     private final JavaProjectOptions options;
 
     /**
-     * RefactoringUnit.
+     * CleanupUnit.
      *
      * @param compilationUnit compilationUnit
      * @param options         options

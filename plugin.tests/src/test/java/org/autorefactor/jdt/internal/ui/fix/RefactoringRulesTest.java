@@ -60,7 +60,7 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
 /**
- * Tests each refactoring rule in isolation. Each refactoring rule is run in a
+ * Tests each refactoring rule in isolation. Each cleanup rule is run in a
  * loop until it cannot apply any more changes to the sample file.
  */
 @RunWith(value= Parameterized.class)
@@ -71,7 +71,7 @@ public class RefactoringRulesTest {
     /** If not empty, then only run the refactorings present in this collection. */
     private static final Collection<Class<?>> WHITELIST= Arrays.<Class<?>>asList();
     /**
-     * When {@link #WHITELIST} is empty, the refactorings present in this collection
+     * When {@link #WHITELIST} is empty, the cleanups present in this collection
      * will never be run.
      */
     private static final Collection<Class<?>> BLACKLIST= Arrays.<Class<?>>asList(ReduceVariableScopeCleanUp.class);

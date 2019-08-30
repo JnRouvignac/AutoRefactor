@@ -167,7 +167,7 @@ public class AutoRefactorTabPage extends CleanUpTabPage {
     /**
      * Initialize the fields.
      *
-     * @param allRefactoringRules all the refactoring rules
+     * @param allRefactoringRules all the cleanup rules
      */
     protected void initFields(final List<RefactoringRule> allRefactoringRules) {
         fields= new ArrayList<FieldEditor>(allRefactoringRules.size());
@@ -256,8 +256,8 @@ public class AutoRefactorTabPage extends CleanUpTabPage {
     /**
      * Get the property name.
      *
-     * @param refactoringRule refactoring rule
-     * @return refactoringRule
+     * @param refactoringRule cleanup rule
+     * @return cleanupRule
      */
     public String getPropertyName(final RefactoringRule refactoringRule) {
         return getCleanupPropertyName(refactoringRule);
@@ -266,7 +266,7 @@ public class AutoRefactorTabPage extends CleanUpTabPage {
     /**
      * Get the cleanup property name.
      *
-     * @param refactoringRule a refactoring rule
+     * @param refactoringRule a cleanup rule
      * @return the cleanup property name
      */
     public static String getCleanupPropertyName(final RefactoringRule refactoringRule) {

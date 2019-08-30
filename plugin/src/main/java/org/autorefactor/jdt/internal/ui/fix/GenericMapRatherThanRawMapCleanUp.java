@@ -142,7 +142,7 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
      * @param classesToUseWithImport The classes that should be used with simple
      *                               name.
      * @param importsToAdd           The imports that need to be added during this
-     *                               refactoring.
+     *                               cleanup.
      * @return the substitute type.
      */
     @Override

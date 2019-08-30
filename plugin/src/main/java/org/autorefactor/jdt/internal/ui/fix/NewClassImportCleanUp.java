@@ -47,7 +47,7 @@ import org.eclipse.jdt.core.dom.TypeDeclaration;
 public abstract class NewClassImportCleanUp extends AbstractCleanUpRule {
 
     /**
-     * The class that does the refactoring when an import needs to be added.
+     * The class that does the cleanup when an import needs to be added.
      */
     public abstract class CleanUpWithNewClassImport extends ASTVisitor {
         private Set<String> classesToUseWithImport= new HashSet<String>();
@@ -247,9 +247,9 @@ public abstract class NewClassImportCleanUp extends AbstractCleanUpRule {
     }
 
     /**
-     * The class that does the refactoring when an import needs to be added.
+     * The class that does the cleanup when an import needs to be added.
      *
-     * @return The class that does the refactoring when an import needs to be added.
+     * @return The class that does the cleanup when an import needs to be added.
      */
     public abstract CleanUpWithNewClassImport getRefactoringClassInstance();
 

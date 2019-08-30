@@ -285,9 +285,9 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     /**
-     * Set the refactoring context.
+     * Set the cleanup context.
      *
-     * @param ctx the refactoring context.
+     * @param ctx the cleanup context.
      */
     @SuppressWarnings({ "rawtypes", "unchecked" }) // $NON-NLS-2$
     public void setRefactoringContext(RefactoringContext ctx) {
@@ -299,11 +299,11 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     /**
-     * Get the refactorings.
+     * Get the cleanups.
      *
      * @param astRoot The AST toot
      *
-     * @return the refactorings.
+     * @return the cleanups.
      */
     public Refactorings getRefactorings(CompilationUnit astRoot) {
         astRoot.accept(this);
@@ -311,18 +311,18 @@ public class AggregateASTVisitor extends ASTVisitor implements JavaRefactoringRu
     }
 
     /**
-     * Get the refactorings.
+     * Get the cleanups.
      *
-     * @return the refactorings.
+     * @return the cleanups.
      */
     public Refactorings getRefactorings() {
         return this.ctx.getRefactorings();
     }
 
     /**
-     * Returns the visitors that contributed refactorings in the last run.
+     * Returns the visitors that contributed cleanups in the last run.
      *
-     * @return the visitors that contributed refactorings in the last run
+     * @return the visitors that contributed cleanups in the last run
      */
     public Set<ASTVisitor> getVisitorsContributingRefactoring() {
         return visitorsContributingRefactoring;

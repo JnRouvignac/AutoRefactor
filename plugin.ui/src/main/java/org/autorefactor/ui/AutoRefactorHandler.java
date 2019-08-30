@@ -58,7 +58,7 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 /**
- * This is the Eclipse handler for launching the automated refactorings. This is
+ * This is the Eclipse handler for launching the automated cleanups. This is
  * invoked from the Eclipse UI.
  *
  * @see <a href=

@@ -74,7 +74,7 @@ public class WorkspacePreferencePage extends PreferencePage implements IWorkbenc
     /**
      * Get the property name.
      *
-     * @param refactoringRule a refactoring rule
+     * @param refactoringRule a cleanup rule
      * @return the property name
      */
     public String getPropertyName(final RefactoringRule refactoringRule) {
@@ -162,7 +162,7 @@ public class WorkspacePreferencePage extends PreferencePage implements IWorkbenc
     /**
      * Initialize the fields.
      *
-     * @param allRefactoringRules allRefactoringRules
+     * @param allRefactoringRules allCleanupRules
      */
     protected void initFields(final List<RefactoringRule> allRefactoringRules) {
         fields= new ArrayList<FieldEditor>(1 + allRefactoringRules.size());
