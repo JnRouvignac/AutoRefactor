@@ -73,11 +73,11 @@ public class PushNegationDownSample {
         return !((!b1) && (!b2));
     }
 
-    public boolean doNotNegateNonBooleanExprs(Object o) {
+    public boolean replaceNegateNonBooleanExprs(Object o) {
         return !(o != null /* another refactoring removes the parentheses */);
     }
 
-    public boolean doNotNegateNonBooleanPrimitiveExprs(Boolean b) {
+    public boolean replaceNegateNonBooleanPrimitiveExprs(Boolean b) {
         return !(b != null /* another refactoring removes the parentheses */);
     }
 
