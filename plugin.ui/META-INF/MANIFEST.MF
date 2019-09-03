@@ -19,6 +19,6 @@ Require-Bundle: org.autorefactor.plugin,
 Bundle-ActivationPolicy: lazy
 Comment2: Need to follow Eclipse's supported JRE unless dictated by
 Comment3: functionalities required from Eclipse or JRE.
-Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Export-Package: org.autorefactor;x-friends:="org.autorefactor.plugin.tests"
 Automatic-Module-Name: org.autorefactor.plugin.ui
