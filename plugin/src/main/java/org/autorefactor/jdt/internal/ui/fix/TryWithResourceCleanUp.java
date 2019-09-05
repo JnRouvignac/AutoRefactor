@@ -100,7 +100,7 @@ public class TryWithResourceCleanUp extends AbstractCleanUpRule {
         final VariableDeclarationFragment previousDeclFragment= ASTNodes.getUniqueFragment(previousDeclStatement);
         final List<Statement> finallyStatements= ASTNodes.asList(node.getFinally());
         if (previousDeclFragment != null && !finallyStatements.isEmpty()) {
-            final List<ASTNode> nodesToRemove= new ArrayList<ASTNode>();
+            final List<ASTNode> nodesToRemove= new ArrayList<>();
             nodesToRemove.add(previousDeclStatement);
 
             final Statement finallyStatement= finallyStatements.get(0);

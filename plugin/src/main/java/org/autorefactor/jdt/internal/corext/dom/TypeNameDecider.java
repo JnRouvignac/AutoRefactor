@@ -83,7 +83,7 @@ public class TypeNameDecider {
                 final Object bindingResolver= getField(anyTypeBinding, "resolver"); //$NON-NLS-1$
                 final Object compilationUnitScope= getField(bindingResolver, "scope"); //$NON-NLS-1$
 
-                final char[][] simpleNamesArray= TypeNameDecider.toSimpleNamesArray(fullyQualifiedName);
+                final char[][] simpleNamesArray= toSimpleNamesArray(fullyQualifiedName);
                 final Method getType= compilationUnitScope.getClass().getMethod("getType", char[][].class, int.class); //$NON-NLS-1$
                 final Object internalTypeBinding= invokeMethod(compilationUnitScope, getType, simpleNamesArray,
                         simpleNamesArray.length);
@@ -131,7 +131,7 @@ public class TypeNameDecider {
         }
         final CompilationUnit cu= (CompilationUnit) root;
         this.packageName= cu.getPackage().getName().getFullyQualifiedName();
-        this.importedTypes= TypeNameDecider.getImportedTypes(cu);
+        this.importedTypes= getImportedTypes(cu);
     }
 
     /**
@@ -157,7 +157,7 @@ public class TypeNameDecider {
     }
 
     private static TreeSet<String> getImportedTypes(CompilationUnit cu) {
-        final TreeSet<String> results= new TreeSet<String>();
+        final TreeSet<String> results= new TreeSet<>();
         for (ImportDeclaration importDecl : ASTNodes.imports(cu)) {
             Name importName= importDecl.getName();
             results.add(importName.getFullyQualifiedName());

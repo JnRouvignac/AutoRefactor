@@ -91,16 +91,8 @@ public class BracketsRatherThanArrayInstantiationCleanUp extends AbstractCleanUp
     private boolean isDestinationAllowed(final ASTNode node) {
         final int parentType= node.getParent().getNodeType();
 
-        switch (parentType) {
-        case ASTNode.FIELD_DECLARATION:
-        case ASTNode.VARIABLE_DECLARATION_EXPRESSION:
-        case ASTNode.VARIABLE_DECLARATION_FRAGMENT:
-        case ASTNode.VARIABLE_DECLARATION_STATEMENT:
-            return true;
-
-        default:
-            return false;
-        }
+        return parentType == ASTNode.FIELD_DECLARATION || parentType == ASTNode.VARIABLE_DECLARATION_EXPRESSION || parentType == ASTNode.VARIABLE_DECLARATION_FRAGMENT
+                || parentType == ASTNode.VARIABLE_DECLARATION_STATEMENT;
     }
 
     private boolean isVoid(final ArrayCreation node) {

@@ -49,8 +49,8 @@ import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 public final class VariableDefinitionsUsesVisitor extends ASTVisitor {
     private final IVariableBinding variableBinding;
     private final ASTNode scopeNode;
-    private final List<SimpleName> definitions= new ArrayList<SimpleName>();
-    private final List<SimpleName> uses= new ArrayList<SimpleName>();
+    private final List<SimpleName> definitions= new ArrayList<>();
+    private final List<SimpleName> uses= new ArrayList<>();
 
     /**
      * Builds from a {@link VariableDeclaration} and infers the variable binding and
@@ -59,7 +59,7 @@ public final class VariableDefinitionsUsesVisitor extends ASTVisitor {
      * @param variableDeclaration the variable declaration, cannot be {@code null}
      */
     public VariableDefinitionsUsesVisitor(VariableDeclaration variableDeclaration) {
-        this(variableDeclaration.resolveBinding(), VariableDefinitionsUsesVisitor.getDeclaringScope(variableDeclaration));
+        this(variableDeclaration.resolveBinding(), getDeclaringScope(variableDeclaration));
     }
 
     /**
@@ -76,7 +76,7 @@ public final class VariableDefinitionsUsesVisitor extends ASTVisitor {
 
     private static ASTNode getDeclaringScope(VariableDeclaration variableDeclaration) {
         ASTNode node= variableDeclaration.getParent();
-        while (VariableDefinitionsUsesVisitor.isVariableDeclaration(node)) {
+        while (isVariableDeclaration(node)) {
             node= node.getParent();
         }
         return node;

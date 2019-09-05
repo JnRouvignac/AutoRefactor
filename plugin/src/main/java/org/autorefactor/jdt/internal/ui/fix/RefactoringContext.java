@@ -25,6 +25,13 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
+import org.autorefactor.environment.Environment;
+import org.autorefactor.environment.Logger;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
+import org.autorefactor.jdt.internal.corext.dom.JavaProjectOptions;
+import org.autorefactor.jdt.internal.corext.dom.Refactorings;
+import org.autorefactor.jdt.internal.corext.dom.SourceLocation;
 import org.autorefactor.util.UnhandledException;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jdt.core.ICompilationUnit;
@@ -33,14 +40,6 @@ import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Comment;
 import org.eclipse.jdt.core.dom.CompilationUnit;
-
-import org.autorefactor.environment.Environment;
-import org.autorefactor.environment.Logger;
-import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
-import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
-import org.autorefactor.jdt.internal.corext.dom.JavaProjectOptions;
-import org.autorefactor.jdt.internal.corext.dom.Refactorings;
-import org.autorefactor.jdt.internal.corext.dom.SourceLocation;
 
 /** Class holding necessary data for a refactoring. */
 public class RefactoringContext {

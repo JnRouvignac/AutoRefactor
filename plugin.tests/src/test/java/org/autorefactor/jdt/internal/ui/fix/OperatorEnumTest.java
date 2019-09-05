@@ -25,22 +25,22 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.autorefactor.jdt.internal.ui.fix.OperatorEnum;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
-
 public class OperatorEnumTest {
     // @DataProvider
     public Iterator<Object[]> getPairsOfOperatorsWithSamePrecedence() {
-        final List<Object[]> results= new ArrayList<Object[]>();
+        final List<Object[]> results= new ArrayList<>();
         for (int i= 0; i < OperatorEnum.values().length; i++) {
             OperatorEnum op1= OperatorEnum.values()[i];
             for (int j= i; j < OperatorEnum.values().length; j++) {
@@ -55,7 +55,7 @@ public class OperatorEnumTest {
 
     // @DataProvider
     public Iterator<Object[]> getPairsOfOperatorsWithDifferentPrecedence() {
-        final List<Object[]> results= new ArrayList<Object[]>();
+        final List<Object[]> results= new ArrayList<>();
         for (int i= 0; i < OperatorEnum.values().length; i++) {
             OperatorEnum op1= OperatorEnum.values()[i];
             for (int j= i + 1; j < OperatorEnum.values().length; j++) {

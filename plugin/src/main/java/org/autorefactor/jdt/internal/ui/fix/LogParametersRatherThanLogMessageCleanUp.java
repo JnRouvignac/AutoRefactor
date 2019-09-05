@@ -96,7 +96,7 @@ public class LogParametersRatherThanLogMessageCleanUp extends AbstractCleanUpRul
         final ASTNodeFactory b= this.ctx.getASTBuilder();
 
         final InfixExpression concatenation= (InfixExpression) message;
-        final List<Expression> strings= new ArrayList<Expression>();
+        final List<Expression> strings= new ArrayList<>();
         strings.add(concatenation.getLeftOperand());
         strings.add(concatenation.getRightOperand());
 
@@ -105,7 +105,7 @@ public class LogParametersRatherThanLogMessageCleanUp extends AbstractCleanUpRul
         }
 
         final StringBuilder messageBuilder= new StringBuilder();
-        final List<Expression> params= new LinkedList<Expression>();
+        final List<Expression> params= new LinkedList<>();
         boolean hasLiteral= false;
         boolean hasObjects= false;
 
@@ -114,7 +114,7 @@ public class LogParametersRatherThanLogMessageCleanUp extends AbstractCleanUpRul
                 hasLiteral= true;
                 final String literal= (String) string.resolveConstantExpressionValue();
 
-                if ((literal != null) && (literal.contains("{") || literal.contains("}"))) { //$NON-NLS-1$ $NON-NLS-2$
+                if (literal != null && (literal.contains("{") || literal.contains("}"))) { //$NON-NLS-1$ $NON-NLS-2$
                     return true;
                 }
 

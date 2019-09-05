@@ -54,7 +54,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 public final class JavaCoreHelper {
-    private static final Path[] EMPTY_PATHS= new Path[0];
+    private static final Path[] EMPTY_PATHS= {};
 
     public static IPackageFragment getPackageFragment(String packageName) throws Exception {
         final IJavaProject javaProject= createJavaProject("projectName", "bin"); //$NON-NLS-1$ $NON-NLS-2$
@@ -64,7 +64,7 @@ public final class JavaCoreHelper {
     }
 
     private static List<IClasspathEntry> getClasspathEntries(final IPackageFragmentRoot root) throws Exception {
-        final List<IClasspathEntry> entries= new ArrayList<IClasspathEntry>();
+        final List<IClasspathEntry> entries= new ArrayList<>();
         final IClasspathEntry srcEntry= JavaCore.newSourceEntry(root.getPath(), EMPTY_PATHS, EMPTY_PATHS, null);
         entries.add(srcEntry);
 
@@ -143,7 +143,7 @@ public final class JavaCoreHelper {
     }
 
     private static List<Node> asList(NodeList nodeList) {
-        final List<Node> results= new ArrayList<Node>();
+        final List<Node> results= new ArrayList<>();
         int length= nodeList.getLength();
         for (int i= 0; i < length; i++) {
             final Node item= nodeList.item(i);
@@ -233,7 +233,7 @@ public final class JavaCoreHelper {
             IClasspathEntry[] newEntries;
             if (oldEntries.length != 0) {
                 // Remove duplicate entries
-                Set<IClasspathEntry> set= new HashSet<IClasspathEntry>(Arrays.asList(oldEntries));
+                Set<IClasspathEntry> set= new HashSet<>(Arrays.asList(oldEntries));
                 set.addAll(classpathEntries);
                 newEntries= set.toArray(new IClasspathEntry[set.size()]);
             } else {

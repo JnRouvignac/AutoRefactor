@@ -126,7 +126,7 @@ public class AutoRefactorHandler extends AbstractHandler {
 
     private static List<IJavaElement> getSelectedJavaElements(Shell shell, IStructuredSelection selection) {
         boolean goodSelection= true;
-        final List<IJavaElement> results= new ArrayList<IJavaElement>();
+        final List<IJavaElement> results= new ArrayList<>();
 
         for (Object el : selection.toArray()) {
             if (el instanceof ICompilationUnit || el instanceof IPackageFragment || el instanceof IPackageFragmentRoot

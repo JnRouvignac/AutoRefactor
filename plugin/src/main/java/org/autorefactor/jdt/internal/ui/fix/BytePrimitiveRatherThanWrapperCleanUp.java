@@ -27,6 +27,7 @@ package org.autorefactor.jdt.internal.ui.fix;
 
 import static org.eclipse.jdt.core.dom.ASTNode.ARRAY_ACCESS;
 import static org.eclipse.jdt.core.dom.ASTNode.SWITCH_STATEMENT;
+
 import java.util.Arrays;
 import java.util.List;
 

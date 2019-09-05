@@ -46,15 +46,15 @@ import org.eclipse.jdt.core.dom.MethodInvocation;
 
 /** See {@link #getDescription()} method. */
 public class HashMapRatherThanTreeMapCleanUp extends AbstractClassSubstituteCleanUp {
-    private static final Map<String, String[]> CAN_BE_CASTED_TO= new HashMap<String, String[]>();
+    private static final Map<String, String[]> CAN_BE_CASTED_TO= new HashMap<>();
 
     static {
-        HashMapRatherThanTreeMapCleanUp.CAN_BE_CASTED_TO.put(Object.class.getCanonicalName(), new String[] { Object.class.getCanonicalName() });
-        HashMapRatherThanTreeMapCleanUp.CAN_BE_CASTED_TO.put(Cloneable.class.getCanonicalName(), new String[] { Cloneable.class.getCanonicalName(), Object.class.getCanonicalName() });
-        HashMapRatherThanTreeMapCleanUp.CAN_BE_CASTED_TO.put(Serializable.class.getCanonicalName(), new String[] { Serializable.class.getCanonicalName(), Object.class.getCanonicalName() });
-        HashMapRatherThanTreeMapCleanUp.CAN_BE_CASTED_TO.put(Map.class.getCanonicalName(), new String[] { Map.class.getCanonicalName(), Object.class.getCanonicalName() });
-        HashMapRatherThanTreeMapCleanUp.CAN_BE_CASTED_TO.put(AbstractMap.class.getCanonicalName(), new String[] { AbstractMap.class.getCanonicalName(), Cloneable.class.getCanonicalName(), Object.class.getCanonicalName() });
-        HashMapRatherThanTreeMapCleanUp.CAN_BE_CASTED_TO.put(TreeMap.class.getCanonicalName(), new String[] { TreeMap.class.getCanonicalName(), Serializable.class.getCanonicalName(), Map.class.getCanonicalName(), AbstractMap.class.getCanonicalName(), Cloneable.class.getCanonicalName(), Object.class.getCanonicalName() });
+        CAN_BE_CASTED_TO.put(Object.class.getCanonicalName(), new String[] { Object.class.getCanonicalName() });
+        CAN_BE_CASTED_TO.put(Cloneable.class.getCanonicalName(), new String[] { Cloneable.class.getCanonicalName(), Object.class.getCanonicalName() });
+        CAN_BE_CASTED_TO.put(Serializable.class.getCanonicalName(), new String[] { Serializable.class.getCanonicalName(), Object.class.getCanonicalName() });
+        CAN_BE_CASTED_TO.put(Map.class.getCanonicalName(), new String[] { Map.class.getCanonicalName(), Object.class.getCanonicalName() });
+        CAN_BE_CASTED_TO.put(AbstractMap.class.getCanonicalName(), new String[] { AbstractMap.class.getCanonicalName(), Cloneable.class.getCanonicalName(), Object.class.getCanonicalName() });
+        CAN_BE_CASTED_TO.put(TreeMap.class.getCanonicalName(), new String[] { TreeMap.class.getCanonicalName(), Serializable.class.getCanonicalName(), Map.class.getCanonicalName(), AbstractMap.class.getCanonicalName(), Cloneable.class.getCanonicalName(), Object.class.getCanonicalName() });
     }
 
     /**
@@ -91,7 +91,7 @@ public class HashMapRatherThanTreeMapCleanUp extends AbstractClassSubstituteClea
 
     @Override
     public Set<String> getClassesToImport() {
-        return new HashSet<String>(Arrays.asList(HashMap.class.getCanonicalName()));
+        return new HashSet<>(Arrays.asList(HashMap.class.getCanonicalName()));
     }
 
     @Override
@@ -134,6 +134,6 @@ public class HashMapRatherThanTreeMapCleanUp extends AbstractClassSubstituteClea
     @Override
     protected boolean isTypeCompatible(final ITypeBinding variableType, final ITypeBinding refType) {
         return super.isTypeCompatible(variableType, refType) || ASTNodes.hasType(variableType,
-                Utils.getOrDefault(HashMapRatherThanTreeMapCleanUp.CAN_BE_CASTED_TO, refType.getErasure().getQualifiedName(), new String[0]));
+                Utils.getOrDefault(CAN_BE_CASTED_TO, refType.getErasure().getQualifiedName(), new String[0]));
     }
 }

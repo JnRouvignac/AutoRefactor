@@ -45,13 +45,12 @@ import org.eclipse.jdt.core.dom.TypeDeclaration;
  * Handle the need to add an import for a class.
  */
 public abstract class NewClassImportCleanUp extends AbstractCleanUpRule {
-
     /**
      * The class that does the cleanup when an import needs to be added.
      */
     public abstract class CleanUpWithNewClassImport extends ASTVisitor {
-        private Set<String> classesToUseWithImport= new HashSet<String>();
-        private Set<String> importsToAdd= new HashSet<String>();
+        private Set<String> classesToUseWithImport= new HashSet<>();
+        private Set<String> importsToAdd= new HashSet<>();
 
         /**
          * The imports that need to be added.
@@ -73,7 +72,7 @@ public abstract class NewClassImportCleanUp extends AbstractCleanUpRule {
     }
 
     private class LocalClassVisitor extends InterruptibleVisitor {
-        private Set<String> classnamesNeverUsedLocally= new HashSet<String>();
+        private Set<String> classnamesNeverUsedLocally= new HashSet<>();
 
         /**
          * LocalClassVisitor.
@@ -119,10 +118,10 @@ public abstract class NewClassImportCleanUp extends AbstractCleanUpRule {
      * @return True if an import already exists for a class.
      */
     public Set<String> getAlreadyImportedClasses(final ASTNode node) {
-        final Set<String> alreadyImportedClasses= new HashSet<String>();
+        final Set<String> alreadyImportedClasses= new HashSet<>();
         final CompilationUnit cu= (CompilationUnit) node.getRoot();
         final Set<String> classesToUse= getClassesToImport();
-        final Map<String, String> importsByPackage= new HashMap<String, String>();
+        final Map<String, String> importsByPackage= new HashMap<>();
 
         for (String clazz : classesToUse) {
             importsByPackage.put(getPackageName(clazz), clazz);
@@ -157,16 +156,16 @@ public abstract class NewClassImportCleanUp extends AbstractCleanUpRule {
             return true;
         }
 
-        final Map<String, String> importsByClassname= new HashMap<String, String>();
-        final Map<String, String> importsByPackage= new HashMap<String, String>();
+        final Map<String, String> importsByClassname= new HashMap<>();
+        final Map<String, String> importsByPackage= new HashMap<>();
 
         for (String clazz : classesToUse) {
             importsByClassname.put(getSimpleName(clazz), clazz);
             importsByPackage.put(getPackageName(clazz), clazz);
         }
 
-        Set<String> alreadyImportedClasses= new HashSet<String>();
-        Set<String> classesToImport= new HashSet<String>(classesToUse);
+        Set<String> alreadyImportedClasses= new HashSet<>();
+        Set<String> classesToImport= new HashSet<>(classesToUse);
 
         for (Object anObject : node.imports()) {
             ImportDeclaration anImport= (ImportDeclaration) anObject;

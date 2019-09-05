@@ -25,8 +25,13 @@
  */
 package org.autorefactor.refactoring;
 
-import static org.autorefactor.jdt.internal.corext.dom.JavaConstants.*;
-import static org.junit.Assert.*;
+import static org.autorefactor.jdt.internal.corext.dom.JavaConstants.INTEGER_LITERAL_COMPATIBLE_RE;
+import static org.autorefactor.jdt.internal.corext.dom.JavaConstants.LONG_LITERAL_COMPATIBLE_RE;
+import static org.autorefactor.jdt.internal.corext.dom.JavaConstants.ONE_LONG_LITERAL_RE;
+import static org.autorefactor.jdt.internal.corext.dom.JavaConstants.TEN_LONG_LITERAL_RE;
+import static org.autorefactor.jdt.internal.corext.dom.JavaConstants.ZERO_LONG_LITERAL_RE;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 

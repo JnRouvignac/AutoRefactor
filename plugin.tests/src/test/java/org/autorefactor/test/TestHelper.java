@@ -117,9 +117,7 @@ public final class TestHelper {
             final IDocument document= new Document(source);
             edit.apply(document);
             return document.get();
-        } catch (MalformedTreeException e) {
-            throw new RuntimeException(e);
-        } catch (BadLocationException e) {
+        } catch (MalformedTreeException | BadLocationException e) {
             throw new RuntimeException(e);
         }
     }
@@ -153,7 +151,7 @@ public final class TestHelper {
     }
 
     private static Collection<String> toSampleNames(Collection<Class<?>> clazzes) {
-        final Collection<String> results= new ArrayList<String>();
+        final Collection<String> results= new ArrayList<>();
         for (Class<?> clazz : clazzes) {
             final String name= clazz.getSimpleName();
             results.add(name.substring(0, name.lastIndexOf("CleanUp")) + "Sample.java"); //$NON-NLS-1$ $NON-NLS-2$

@@ -51,7 +51,7 @@ public class AutoRefactorException extends RuntimeException {
      * @param message the exception message
      */
     public AutoRefactorException(ASTNode node, String message) {
-        super(AutoRefactorException.buildMessage(node, message));
+        super(buildMessage(node, message));
     }
 
     /**
@@ -72,12 +72,12 @@ public class AutoRefactorException extends RuntimeException {
      * @param cause   the cause
      */
     public AutoRefactorException(ASTNode node, String message, Throwable cause) {
-        super(AutoRefactorException.buildMessage(node, message), cause);
+        super(buildMessage(node, message), cause);
     }
 
     private static String buildMessage(ASTNode node, String message) {
         final String sourceLocation= ASTNodes.getSourceLocation(node);
-        if (sourceLocation.length() > 0) {
+        if (!sourceLocation.isEmpty()) {
             return sourceLocation + ":" + message; //$NON-NLS-1$
         }
         return message;

@@ -40,7 +40,6 @@ import org.eclipse.jdt.core.dom.QualifiedName;
  * {@link ASTVisitor}s. It centralizes useful features for cleanup rules.
  */
 public abstract class AbstractCleanUpRule extends ASTVisitor implements JavaRefactoringRule {
-
     private static final class LombokVisitor extends InterruptibleVisitor {
         private boolean useLombok;
 

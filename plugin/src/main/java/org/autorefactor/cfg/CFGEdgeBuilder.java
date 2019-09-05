@@ -25,8 +25,9 @@
  */
 package org.autorefactor.cfg;
 
+import java.util.Objects;
+
 import org.autorefactor.util.IllegalStateException;
-import org.autorefactor.util.Utils;
 import org.eclipse.jdt.core.dom.Expression;
 
 /** Builder for a {@link CFGEdge}. */
@@ -81,12 +82,7 @@ public class CFGEdgeBuilder {
 
     @Override
     public int hashCode() {
-        final int prime= 31;
-        int result= 1;
-        result= prime * result + ((condition == null) ? 0 : condition.hashCode());
-        result= prime * result + (evaluationResult ? 1231 : 1237);
-        result= prime * result + ((sourceBlock == null) ? 0 : sourceBlock.hashCode());
-        return prime * result + ((targetBlock == null) ? 0 : targetBlock.hashCode());
+        return Objects.hash(condition, evaluationResult, sourceBlock, targetBlock);
     }
 
     @Override
@@ -98,8 +94,8 @@ public class CFGEdgeBuilder {
             return false;
         }
         final CFGEdgeBuilder other= (CFGEdgeBuilder) obj;
-        return Utils.equal(condition, other.condition) && Utils.equal(evaluationResult, other.evaluationResult)
-                && Utils.equal(sourceBlock, other.sourceBlock) && Utils.equal(targetBlock, other.targetBlock);
+        return Objects.equals(condition, other.condition) && Objects.equals(evaluationResult, other.evaluationResult)
+                && Objects.equals(sourceBlock, other.sourceBlock) && Objects.equals(targetBlock, other.targetBlock);
     }
 
     /**
@@ -130,9 +126,9 @@ public class CFGEdgeBuilder {
             throw new IllegalStateException(this.condition, "CFGEdgeBuilder " + this + " has already been built"); //$NON-NLS-1$ $NON-NLS-2$
         }
         if (condition != null) {
-            built= CFGEdgeBuilder.buildEdge(condition, evaluationResult, sourceBlock, targetBlock);
+            built= buildEdge(condition, evaluationResult, sourceBlock, targetBlock);
         } else {
-            built= CFGEdgeBuilder.buildEdge(sourceBlock, targetBlock);
+            built= buildEdge(sourceBlock, targetBlock);
         }
         return built;
     }
@@ -145,7 +141,7 @@ public class CFGEdgeBuilder {
      * @return a new {@link CFGEdge}
      */
     public static CFGEdge buildEdge(CFGBasicBlock sourceBlock, CFGBasicBlock targetBlock) {
-        return CFGEdgeBuilder.buildEdge(null, true, sourceBlock, targetBlock);
+        return buildEdge(null, true, sourceBlock, targetBlock);
     }
 
     /**
@@ -158,7 +154,7 @@ public class CFGEdgeBuilder {
      * @return a new {@link CFGEdge}
      */
     public static CFGEdge buildEdge(Expression condition, CFGBasicBlock sourceBlock, CFGBasicBlock targetBlock) {
-        return CFGEdgeBuilder.buildEdge(condition, true, sourceBlock, targetBlock);
+        return buildEdge(condition, true, sourceBlock, targetBlock);
     }
 
     /**

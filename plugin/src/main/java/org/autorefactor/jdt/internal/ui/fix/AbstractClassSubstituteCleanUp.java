@@ -68,13 +68,10 @@ import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 /** See {@link #getDescription()} method. */
 public abstract class AbstractClassSubstituteCleanUp extends NewClassImportCleanUp {
     private final class RefactoringWithObjectsClass extends CleanUpWithNewClassImport {
-
         @Override
         public boolean visit(Block node) {
-            final boolean isSubTreeToVisit= AbstractClassSubstituteCleanUp.this.maybeRefactorBlock(node,
+            return AbstractClassSubstituteCleanUp.this.maybeRefactorBlock(node,
                     getClassesToUseWithImport(), getImportsToAdd());
-
-            return isSubTreeToVisit;
         }
     }
 
@@ -254,8 +251,8 @@ public abstract class AbstractClassSubstituteCleanUp extends NewClassImportClean
         node.accept(classCreationVisitor);
 
         for (ClassInstanceCreation instanceCreation : classCreationVisitor.getObjectInstantiations()) {
-            final List<VariableDeclaration> varDecls= new ArrayList<VariableDeclaration>();
-            final List<MethodInvocation> methodCallsToRefactor= new ArrayList<MethodInvocation>();
+            final List<VariableDeclaration> varDecls= new ArrayList<>();
+            final List<MethodInvocation> methodCallsToRefactor= new ArrayList<>();
 
             if (canInstantiationBeRefactored(instanceCreation) && canBeRefactored(node, instanceCreation,
                     instanceCreation.resolveTypeBinding(), varDecls, methodCallsToRefactor) && canCodeBeRefactored()) {
@@ -275,7 +272,7 @@ public abstract class AbstractClassSubstituteCleanUp extends NewClassImportClean
 
     private boolean canVarOccurrenceBeRefactored(final Block node, final List<VariableDeclaration> varDecls,
             final List<MethodInvocation> methodCallsToRefactor) {
-        final List<VariableDeclaration> otherVarDecls= new ArrayList<VariableDeclaration>();
+        final List<VariableDeclaration> otherVarDecls= new ArrayList<>();
         final boolean canBeRefactored= canVarOccurrenceBeRefactored0(node, varDecls, methodCallsToRefactor,
                 otherVarDecls);
         varDecls.addAll(otherVarDecls);
@@ -299,7 +296,7 @@ public abstract class AbstractClassSubstituteCleanUp extends NewClassImportClean
             }
 
             for (SimpleName varOccurrence : varOccurrenceVisitor.getVarOccurrences()) {
-                final List<VariableDeclaration> subVarDecls= new ArrayList<VariableDeclaration>();
+                final List<VariableDeclaration> subVarDecls= new ArrayList<>();
                 if (!canBeRefactored(node, varOccurrence, varOccurrence.resolveTypeBinding(), subVarDecls,
                         methodCallsToRefactor)) {
                     return false;
@@ -409,7 +406,7 @@ public abstract class AbstractClassSubstituteCleanUp extends NewClassImportClean
     }
 
     private final class ObjectInstantiationVisitor extends ASTVisitor {
-        private final List<ClassInstanceCreation> objectInstantiations= new ArrayList<ClassInstanceCreation>();
+        private final List<ClassInstanceCreation> objectInstantiations= new ArrayList<>();
 
         private final Block startNode;
 
@@ -454,7 +451,7 @@ public abstract class AbstractClassSubstituteCleanUp extends NewClassImportClean
 
     private class VarOccurrenceVisitor extends InterruptibleVisitor {
         private final VariableDeclaration varDecl;
-        private final List<SimpleName> varOccurrences= new ArrayList<SimpleName>();
+        private final List<SimpleName> varOccurrences= new ArrayList<>();
         private boolean isUsedInAnnonymousClass;
 
         public VarOccurrenceVisitor(VariableDeclaration variable) {

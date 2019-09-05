@@ -57,7 +57,7 @@ import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 public class BreakRatherThanPassiveIterationsCleanUp extends AbstractCleanUpRule {
     private static final class SideEffectVisitor extends InterruptibleVisitor {
         private final Set<String> localVariableNames;
-        private boolean hasSideEffect= false;
+        private boolean hasSideEffect;
 
         private SideEffectVisitor(final Set<String> localVariableNames) {
             this.localVariableNames= localVariableNames;
@@ -177,7 +177,7 @@ public class BreakRatherThanPassiveIterationsCleanUp extends AbstractCleanUpRule
 
     @Override
     public boolean visit(final ForStatement node) {
-        final Set<String> vars= new HashSet<String>();
+        final Set<String> vars= new HashSet<>();
 
         for (Expression initializer : ASTNodes.initializers(node)) {
             vars.addAll(ASTNodes.getLocalVariableIdentifiers(initializer, true));

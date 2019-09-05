@@ -33,8 +33,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTMatcherSameVariablesAndMethods;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.FinderVisitor;
 import org.autorefactor.jdt.internal.corext.dom.Refactorings;
@@ -71,7 +71,7 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
         }
 
         private Variable mergeValues(final Variable other) {
-            final List<Expression> values= new ArrayList<Expression>(constantValues);
+            final List<Expression> values= new ArrayList<>(constantValues);
             values.addAll(other.constantValues);
             return new Variable(name, values);
         }
@@ -233,10 +233,10 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
         }
 
         final SimpleName switchExpression= variable.name;
-        final List<SwitchCaseSection> cases= new ArrayList<SwitchCaseSection>();
+        final List<SwitchCaseSection> cases= new ArrayList<>();
         Statement remainingStatement= null;
 
-        final Set<String> variableDeclarationIds= new HashSet<String>();
+        final Set<String> variableDeclarationIds= new HashSet<>();
         IfStatement currentNode= node;
         while (haveSameIdentifier(switchExpression, variable.name) && ASTNodes.haveSameType(switchExpression, variable.name)) {
             if (detectDeclarationConflicts(currentNode.getThenStatement(), variableDeclarationIds)) {
@@ -293,10 +293,10 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
 
     /** Side-effect: removes the dead branches in a chain of if-elseif. */
     private List<SwitchCaseSection> filterDuplicateCaseValues(final List<SwitchCaseSection> sourceCases) {
-        final List<SwitchCaseSection> results= new ArrayList<SwitchCaseSection>();
-        final Set<Object> alreadyProccessedValues= new HashSet<Object>();
+        final List<SwitchCaseSection> results= new ArrayList<>();
+        final Set<Object> alreadyProccessedValues= new HashSet<>();
         for (SwitchCaseSection sourceCase : sourceCases) {
-            final List<Expression> filteredExprs= new ArrayList<Expression>();
+            final List<Expression> filteredExprs= new ArrayList<>();
             for (Expression expression : sourceCase.constantExprs) {
                 final Object constantValue= expression.resolveConstantExpressionValue();
                 if (constantValue == null) {
@@ -434,7 +434,7 @@ public class SwitchCleanUp extends AbstractCleanUpRule {
     }
 
     private List<SwitchCaseSection> getSwitchStructure(final SwitchStatement node) {
-        final List<SwitchCaseSection> switchStructure= new ArrayList<SwitchCaseSection>();
+        final List<SwitchCaseSection> switchStructure= new ArrayList<>();
 
         SwitchCaseSection currentCase= new SwitchCaseSection();
         for (Statement statement : ASTNodes.statements(node)) {

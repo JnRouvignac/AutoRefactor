@@ -67,7 +67,7 @@ public class OneConditionRatherThanUnreachableBlockCleanUp extends AbstractClean
 
         if (!ASTNodes.isExceptionExpected(node) && secondIf != null && ASTNodes.isPassive(node.getExpression())
                 && ASTNodes.isPassive(secondIf.getExpression()) && ASTNodes.match(matcher, node.getExpression(), secondIf.getExpression())
-                && ((secondIf.getElseStatement() == null) || !ASTNodes.fallsThrough(node.getThenStatement())
+                && (secondIf.getElseStatement() == null || !ASTNodes.fallsThrough(node.getThenStatement())
                         || ASTNodes.fallsThrough(secondIf.getThenStatement()) || !ASTNodes.fallsThrough(secondIf.getElseStatement()))) {
             refactorCondition(secondIf);
 

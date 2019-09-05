@@ -68,11 +68,11 @@ public class Refactorings {
     private final ASTRewrite rewrite;
     private final ImportRewrite importRewrite;
     private TextEdit edits;
-    private final Map<Pair<ASTNode, ChildListPropertyDescriptor>, ListRewrite> listRewriteCache= new HashMap<Pair<ASTNode, ChildListPropertyDescriptor>, ListRewrite>();
+    private final Map<Pair<ASTNode, ChildListPropertyDescriptor>, ListRewrite> listRewriteCache= new HashMap<>();
     private final ASTCommentRewriter commentRewriter;
     private final SourceRewriter sourceRewriter= new SourceRewriter();
     /** Nodes that cannot be visited. */
-    private final Set<ASTNode> refactoredNodes= new HashSet<ASTNode>();
+    private final Set<ASTNode> refactoredNodes= new HashSet<>();
 
     /**
      * Builds an instance of this class.
@@ -88,7 +88,7 @@ public class Refactorings {
         this.rewrite.setTargetSourceRangeComputer(new TargetSourceRangeComputer() {
             @Override
             public SourceRange computeSourceRange(ASTNode node) {
-                if (Boolean.TRUE.equals(node.getProperty(Refactorings.UNTOUCH_COMMENT))) {
+                if (Boolean.TRUE.equals(node.getProperty(UNTOUCH_COMMENT))) {
                     return new SourceRange(node.getStartPosition(), node.getLength());
                 }
                 return super.computeSourceRange(node);
@@ -275,7 +275,7 @@ public class Refactorings {
      *      org.eclipse.text.edits.TextEditGroup)
      */
     public void replace(ASTNode node, ASTNode replacement) {
-        node.setProperty(Refactorings.UNTOUCH_COMMENT, Boolean.TRUE);
+        node.setProperty(UNTOUCH_COMMENT, Boolean.TRUE);
         rewrite.replace(node, replacement, null);
         addRefactoredNodes(node);
     }
@@ -325,7 +325,7 @@ public class Refactorings {
      * @see ASTRewrite#remove(ASTNode, org.eclipse.text.edits.TextEditGroup)
      */
     public void removeButKeepComment(ASTNode node) {
-        node.setProperty(Refactorings.UNTOUCH_COMMENT, Boolean.TRUE);
+        node.setProperty(UNTOUCH_COMMENT, Boolean.TRUE);
         remove(node);
     }
 

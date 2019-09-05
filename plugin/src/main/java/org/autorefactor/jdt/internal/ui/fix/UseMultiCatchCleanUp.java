@@ -99,7 +99,7 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
         NONE, UP, DOWN;
     }
 
-    private static abstract class Binding {
+    private abstract static class Binding {
         protected abstract Boolean isSubTypeCompatible(Binding type);
     }
 
@@ -194,7 +194,7 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
     }
 
     private static final class MultiCatchASTMatcher extends ASTSemanticMatcher {
-        private final Map<ASTNode, ASTNode> matchingVariables= new HashMap<ASTNode, ASTNode>();
+        private final Map<ASTNode, ASTNode> matchingVariables= new HashMap<>();
 
         public MultiCatchASTMatcher(CatchClause catchClause1, CatchClause catchClause2) {
             matchingVariables.put(catchClause1.getException(), catchClause2.getException());
@@ -392,7 +392,7 @@ public class UseMultiCatchCleanUp extends AbstractCleanUpRule {
     }
 
     private UnionType unionTypes(Type... types) {
-        final List<Type> allTypes= new ArrayList<Type>();
+        final List<Type> allTypes= new ArrayList<>();
         collectAllUnionedTypes(allTypes, Arrays.asList(types));
         removeSupersededAlternatives(allTypes);
 

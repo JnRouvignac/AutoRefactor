@@ -35,9 +35,9 @@ import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.autorefactor.jdt.internal.corext.dom.SourceLocation;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes.NodeStartPositionComparator;
+import org.autorefactor.jdt.internal.corext.dom.SourceLocation;
 import org.autorefactor.util.NotImplementedException;
 import org.autorefactor.util.Utils;
 import org.eclipse.jdt.core.dom.ASTNode;
@@ -164,7 +164,7 @@ public class RemoveSemiColonCleanUp extends AbstractCleanUpRule {
         final List<Comment> comments= filterCommentsInRange(start, end, node.getRoot());
 
         final String source= ctx.getSource(node);
-        final LinkedHashMap<String, SourceLocation> results= new LinkedHashMap<String, SourceLocation>();
+        final LinkedHashMap<String, SourceLocation> results= new LinkedHashMap<>();
         if (comments.isEmpty()) {
             putResult(source, start, end, results);
         } else {
@@ -197,7 +197,7 @@ public class RemoveSemiColonCleanUp extends AbstractCleanUpRule {
         if (commentList.isEmpty()) {
             return Collections.emptyList();
         }
-        final List<Comment> comments= new ArrayList<Comment>(commentList);
+        final List<Comment> comments= new ArrayList<>(commentList);
         Collections.sort(comments, new NodeStartPositionComparator());
 
         final Iterator<Comment> it= comments.iterator();

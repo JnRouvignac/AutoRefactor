@@ -25,7 +25,8 @@
  */
 package org.autorefactor.jdt.internal.corext.dom;
 
-import org.autorefactor.util.Utils;
+import java.util.Objects;
+
 import org.eclipse.jdt.core.ISourceRange;
 import org.eclipse.jdt.core.dom.ASTNode;
 
@@ -184,7 +185,7 @@ public class SourceLocation implements ISourceRange, Comparable<ISourceRange> {
     }
 
     private boolean overlapsRight(ISourceRange range) {
-        return range.getOffset() <= getStartPosition() && getStartPosition() <= SourceLocation.getEndPosition(range);
+        return range.getOffset() <= getStartPosition() && getStartPosition() <= getEndPosition(range);
     }
 
     /**
@@ -204,10 +205,7 @@ public class SourceLocation implements ISourceRange, Comparable<ISourceRange> {
 
     @Override
     public int hashCode() {
-        final int prime= 31;
-        int result= 1;
-        result= prime * result + length;
-        return prime * result + offset;
+        return Objects.hash(length, offset);
     }
 
     @Override
@@ -219,7 +217,7 @@ public class SourceLocation implements ISourceRange, Comparable<ISourceRange> {
             return false;
         }
         final SourceLocation other= (SourceLocation) obj;
-        return Utils.equal(length, other.length) && Utils.equal(offset, other.offset);
+        return Objects.equals(length, other.length) && Objects.equals(offset, other.offset);
     }
 
     @Override

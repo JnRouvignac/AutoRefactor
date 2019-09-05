@@ -50,15 +50,15 @@ import org.eclipse.jdt.core.dom.Type;
 
 /** See {@link #getDescription()} method. */
 public class ArrayListRatherThanVectorCleanUp extends AbstractClassSubstituteCleanUp {
-    private static final Map<String, String[]> CAN_BE_CASTED_TO= new HashMap<String, String[]>();
+    private static final Map<String, String[]> CAN_BE_CASTED_TO= new HashMap<>();
 
     static {
-        ArrayListRatherThanVectorCleanUp.CAN_BE_CASTED_TO.put(Object.class.getCanonicalName(), new String[] { Object.class.getCanonicalName() });
-        ArrayListRatherThanVectorCleanUp.CAN_BE_CASTED_TO.put(Cloneable.class.getCanonicalName(), new String[] { Cloneable.class.getCanonicalName(), Object.class.getCanonicalName() });
-        ArrayListRatherThanVectorCleanUp.CAN_BE_CASTED_TO.put(Serializable.class.getCanonicalName(), new String[] { Serializable.class.getCanonicalName(), Object.class.getCanonicalName() });
-        ArrayListRatherThanVectorCleanUp.CAN_BE_CASTED_TO.put(Collection.class.getCanonicalName(), new String[] { Collection.class.getCanonicalName(), Object.class.getCanonicalName() });
-        ArrayListRatherThanVectorCleanUp.CAN_BE_CASTED_TO.put(AbstractCollection.class.getCanonicalName(), new String[] { AbstractCollection.class.getCanonicalName(), Collection.class.getCanonicalName(), Object.class.getCanonicalName() });
-        ArrayListRatherThanVectorCleanUp.CAN_BE_CASTED_TO.put(Vector.class.getCanonicalName(), new String[] { Vector.class.getCanonicalName(), AbstractCollection.class.getCanonicalName(), Collection.class.getCanonicalName(), Serializable.class.getCanonicalName(), Cloneable.class.getCanonicalName(), Object.class.getCanonicalName() });
+        CAN_BE_CASTED_TO.put(Object.class.getCanonicalName(), new String[] { Object.class.getCanonicalName() });
+        CAN_BE_CASTED_TO.put(Cloneable.class.getCanonicalName(), new String[] { Cloneable.class.getCanonicalName(), Object.class.getCanonicalName() });
+        CAN_BE_CASTED_TO.put(Serializable.class.getCanonicalName(), new String[] { Serializable.class.getCanonicalName(), Object.class.getCanonicalName() });
+        CAN_BE_CASTED_TO.put(Collection.class.getCanonicalName(), new String[] { Collection.class.getCanonicalName(), Object.class.getCanonicalName() });
+        CAN_BE_CASTED_TO.put(AbstractCollection.class.getCanonicalName(), new String[] { AbstractCollection.class.getCanonicalName(), Collection.class.getCanonicalName(), Object.class.getCanonicalName() });
+        CAN_BE_CASTED_TO.put(Vector.class.getCanonicalName(), new String[] { Vector.class.getCanonicalName(), AbstractCollection.class.getCanonicalName(), Collection.class.getCanonicalName(), Serializable.class.getCanonicalName(), Cloneable.class.getCanonicalName(), Object.class.getCanonicalName() });
     }
 
     /**
@@ -105,7 +105,7 @@ public class ArrayListRatherThanVectorCleanUp extends AbstractClassSubstituteCle
 
     @Override
     public Set<String> getClassesToImport() {
-        return new HashSet<String>(Arrays.asList(ArrayList.class.getCanonicalName()));
+        return new HashSet<>(Arrays.asList(ArrayList.class.getCanonicalName()));
     }
 
     @Override
@@ -197,6 +197,6 @@ public class ArrayListRatherThanVectorCleanUp extends AbstractClassSubstituteCle
     @Override
     protected boolean isTypeCompatible(final ITypeBinding variableType, final ITypeBinding refType) {
         return super.isTypeCompatible(variableType, refType) || ASTNodes.hasType(variableType,
-                Utils.getOrDefault(ArrayListRatherThanVectorCleanUp.CAN_BE_CASTED_TO, refType.getErasure().getQualifiedName(), new String[0]));
+                Utils.getOrDefault(CAN_BE_CASTED_TO, refType.getErasure().getQualifiedName(), new String[0]));
     }
 }

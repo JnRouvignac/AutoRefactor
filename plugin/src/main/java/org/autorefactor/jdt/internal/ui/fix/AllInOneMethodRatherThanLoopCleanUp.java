@@ -51,21 +51,16 @@ import org.eclipse.jdt.core.dom.Statement;
 /** See {@link #getDescription()} method. */
 public class AllInOneMethodRatherThanLoopCleanUp extends NewClassImportCleanUp {
     private final class RefactoringWithObjectsClass extends CleanUpWithNewClassImport {
-
         @Override
         public boolean visit(EnhancedForStatement node) {
-            final boolean isSubTreeToVisit= AllInOneMethodRatherThanLoopCleanUp.this
+            return AllInOneMethodRatherThanLoopCleanUp.this
                     .maybeRefactorEnhancedForStatement(node, getClassesToUseWithImport(), getImportsToAdd());
-
-            return isSubTreeToVisit;
         }
 
         @Override
         public boolean visit(ForStatement node) {
-            final boolean isSubTreeToVisit= AllInOneMethodRatherThanLoopCleanUp.this.maybeRefactorForStatement(node,
+            return AllInOneMethodRatherThanLoopCleanUp.this.maybeRefactorForStatement(node,
                     getClassesToUseWithImport(), getImportsToAdd());
-
-            return isSubTreeToVisit;
         }
     }
 
@@ -98,14 +93,12 @@ public class AllInOneMethodRatherThanLoopCleanUp extends NewClassImportCleanUp {
 
     @Override
     public RefactoringWithObjectsClass getRefactoringClassInstance() {
-        final RefactoringWithObjectsClass refactoringWithNewClassImport= new RefactoringWithObjectsClass();
-
-        return refactoringWithNewClassImport;
+        return new RefactoringWithObjectsClass();
     }
 
     @Override
     public Set<String> getClassesToImport() {
-        return new HashSet<String>(Arrays.asList(Collections.class.getCanonicalName()));
+        return new HashSet<>(Arrays.asList(Collections.class.getCanonicalName()));
     }
 
     @Override
@@ -169,7 +162,6 @@ public class AllInOneMethodRatherThanLoopCleanUp extends NewClassImportCleanUp {
             // We should remove all the loop variable occurrences
             // As we replace only one, there should be no more than one occurrence
             if (mi != null && mi.arguments().size() == 1 && getVariableUseCount(loopVariableName, node.getBody()) == 1) {
-
                 switch (loopContent.getContainerType()) {
                 case COLLECTION:
                     final Expression addArg01= ASTNodes.arg0(mi);

@@ -54,21 +54,16 @@ import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
  */
 public abstract class AbstractEnumCollectionReplacementCleanUp extends NewClassImportCleanUp {
     private final class RefactoringWithObjectsClass extends CleanUpWithNewClassImport {
-
         @Override
         public boolean visit(ClassInstanceCreation node) {
-            final boolean isSubTreeToVisit= AbstractEnumCollectionReplacementCleanUp.this
+            return AbstractEnumCollectionReplacementCleanUp.this
                     .maybeRefactorClassInstanceCreation(node, getClassesToUseWithImport(), getImportsToAdd());
-
-            return isSubTreeToVisit;
         }
     }
 
     @Override
     public RefactoringWithObjectsClass getRefactoringClassInstance() {
-        final RefactoringWithObjectsClass refactoringWithNewClassImport= new RefactoringWithObjectsClass();
-
-        return refactoringWithNewClassImport;
+        return new RefactoringWithObjectsClass();
     }
 
     @Override

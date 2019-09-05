@@ -43,7 +43,7 @@ public final class Utils {
      * @return a new, empty {@code ArrayList}
      */
     public static <E> ArrayList<E> newArrayList() {
-        return new ArrayList<E>();
+        return new ArrayList<>();
     }
 
     /**
@@ -54,7 +54,7 @@ public final class Utils {
      * @return a new, empty {@code HashMap}
      */
     public static <K, V> HashMap<K, V> newHashMap() {
-        return new HashMap<K, V>();
+        return new HashMap<>();
     }
 
     /**

@@ -218,7 +218,7 @@ public class ApplyRefactoringsJob extends Job {
         Set<ASTVisitor> lastLoopVisitors= Collections.emptySet();
         int nbLoopsWithSameVisitors= 0;
 
-        List<TextEdit> textEdits= new ArrayList<TextEdit>();
+        List<TextEdit> textEdits= new ArrayList<>();
 
         monitor.setWorkRemaining(maxIterations);
 
@@ -230,7 +230,7 @@ public class ApplyRefactoringsJob extends Job {
             // type bindings were lost. Is there a way to recover them?
             // FIXME we should find a way to apply all the changes at
             // the AST level and refresh the bindings
-            ApplyRefactoringsJob.resetParser(compilationUnit, parser, options);
+            resetParser(compilationUnit, parser, options);
             astRoot= (CompilationUnit) parser.createAST(null);
 
             if (iterationCount > maxIterations) {
@@ -278,7 +278,7 @@ public class ApplyRefactoringsJob extends Job {
             if (thisLoopVisitors.equals(lastLoopVisitors)) {
                 nbLoopsWithSameVisitors++;
             } else {
-                lastLoopVisitors= new HashSet<ASTVisitor>(thisLoopVisitors);
+                lastLoopVisitors= new HashSet<>(thisLoopVisitors);
                 nbLoopsWithSameVisitors= 0;
             }
         } while (true);

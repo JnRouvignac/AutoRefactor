@@ -71,14 +71,14 @@ public class RemoveEmptyLinesCleanUp extends AbstractCleanUpRule {
     }
 
     private static final Pattern NEWLINE_PATTERN= Pattern.compile("\\r\\n|\\n|\\r"); //$NON-NLS-1$
-    private final TreeSet<Integer> lineEnds= new TreeSet<Integer>();
+    private final TreeSet<Integer> lineEnds= new TreeSet<>();
 
     @Override
     public boolean visit(CompilationUnit node) {
         lineEnds.clear();
 
         final String source= this.ctx.getSource(node);
-        if (source.length() == 0) {
+        if (source.isEmpty()) {
             // Empty file, bail out
             return true;
         }
@@ -105,7 +105,7 @@ public class RemoveEmptyLinesCleanUp extends AbstractCleanUpRule {
         }
 
         boolean result= true;
-        final String newline= "(?:" + RemoveEmptyLinesCleanUp.NEWLINE_PATTERN + ")"; //$NON-NLS-1$ $NON-NLS-2$
+        final String newline= "(?:" + NEWLINE_PATTERN + ")"; //$NON-NLS-1$ $NON-NLS-2$
         Matcher m= Pattern.compile("(" + newline + "\\s*?" + newline + "\\s*?" + ")" + "(?:" + newline + "\\s*?)+") //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$ $NON-NLS-4$ $NON-NLS-5$ $NON-NLS-6$
                 .matcher(source);
         while (m.find()) {
@@ -147,7 +147,7 @@ public class RemoveEmptyLinesCleanUp extends AbstractCleanUpRule {
     }
 
     private void computeLineEnds(CompilationUnit node) {
-        final Matcher matcher= RemoveEmptyLinesCleanUp.NEWLINE_PATTERN.matcher(ctx.getSource(node));
+        final Matcher matcher= NEWLINE_PATTERN.matcher(ctx.getSource(node));
         while (matcher.find()) {
             lineEnds.add(matcher.end());
         }
@@ -221,13 +221,7 @@ public class RemoveEmptyLinesCleanUp extends AbstractCleanUpRule {
             return true;
         }
         int openingCurlyIndex= body.getStartPosition();
-        if (openingCurlyOnSameLineAsEndOfNode(node, openingCurlyIndex)) {
-            return true;
-        }
-        if (maybeRemoveEmptyLinesAfterCurly(node, openingCurlyIndex)) {
-            return false;
-        }
-        return visit(body);
+        return openingCurlyOnSameLineAsEndOfNode(node, openingCurlyIndex) || (!maybeRemoveEmptyLinesAfterCurly(node, openingCurlyIndex) && visit(body));
     }
 
     @Override
@@ -239,19 +233,13 @@ public class RemoveEmptyLinesCleanUp extends AbstractCleanUpRule {
         }
         int lastNonWsIndex= getIndexOfFirstNonWhitespaceChar(source, openingCurlyIndex + 1);
         int endOfLineIndex= previousLineEnd(lastNonWsIndex);
-        if (maybeRemoveEmptyLines(source, openingCurlyIndex + 1, endOfLineIndex)) {
-            return false;
-        }
-        return visitNodeWithClosingCurly(node);
+        return !maybeRemoveEmptyLines(source, openingCurlyIndex + 1, endOfLineIndex) && visitNodeWithClosingCurly(node);
     }
 
     private boolean visitNodeWithClosingCurly(ASTNode node) {
         final String source= this.ctx.getSource(node);
         int closingCurlyIndex= source.lastIndexOf('}', SourceLocation.getEndPosition(node));
-        if (maybeRemoveEmptyLinesAfterCurly(node, closingCurlyIndex)) {
-            return false;
-        }
-        return true;
+        return !maybeRemoveEmptyLinesAfterCurly(node, closingCurlyIndex);
     }
 
     private boolean openingCurlyOnSameLineAsEndOfNode(final ASTNode node, int openingCurlyIndex) {
@@ -270,7 +258,7 @@ public class RemoveEmptyLinesCleanUp extends AbstractCleanUpRule {
 
     private boolean maybeRemoveEmptyLines(String source, int endOfLineIndex, int newLineIndex) {
         if (endOfLineIndex < newLineIndex) {
-            Matcher matcher= RemoveEmptyLinesCleanUp.NEWLINE_PATTERN.matcher(source).region(endOfLineIndex, newLineIndex);
+            Matcher matcher= NEWLINE_PATTERN.matcher(source).region(endOfLineIndex, newLineIndex);
             boolean isEqualToNewline= matcher.matches();
             if (!isEqualToNewline && matcher.find() && matcher.end() < newLineIndex) {
                 final SourceLocation toRemove= SourceLocation.fromPositions(matcher.end(), newLineIndex);
@@ -292,7 +280,7 @@ public class RemoveEmptyLinesCleanUp extends AbstractCleanUpRule {
     }
 
     private int beforeNewlineChars(final String source, int fromIndex) {
-        Matcher matcher= RemoveEmptyLinesCleanUp.NEWLINE_PATTERN.matcher(source);
+        Matcher matcher= NEWLINE_PATTERN.matcher(source);
         if (matcher.find(fromIndex)) {
             return matcher.start();
         }

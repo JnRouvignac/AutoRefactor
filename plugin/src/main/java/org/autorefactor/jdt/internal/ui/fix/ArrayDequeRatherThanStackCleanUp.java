@@ -48,16 +48,16 @@ import org.eclipse.jdt.core.dom.MethodInvocation;
 
 /** See {@link #getDescription()} method. */
 public class ArrayDequeRatherThanStackCleanUp extends AbstractClassSubstituteCleanUp {
-    private static final Map<String, String[]> CAN_BE_CASTED_TO= new HashMap<String, String[]>();
+    private static final Map<String, String[]> CAN_BE_CASTED_TO= new HashMap<>();
 
     static {
-        ArrayDequeRatherThanStackCleanUp.CAN_BE_CASTED_TO.put(Object.class.getCanonicalName(), new String[] { Object.class.getCanonicalName() });
-        ArrayDequeRatherThanStackCleanUp.CAN_BE_CASTED_TO.put(Cloneable.class.getCanonicalName(), new String[] { Cloneable.class.getCanonicalName(), Object.class.getCanonicalName() });
-        ArrayDequeRatherThanStackCleanUp.CAN_BE_CASTED_TO.put(Serializable.class.getCanonicalName(), new String[] { Serializable.class.getCanonicalName(), Object.class.getCanonicalName() });
-        ArrayDequeRatherThanStackCleanUp.CAN_BE_CASTED_TO.put(Collection.class.getCanonicalName(), new String[] { Collection.class.getCanonicalName(), Object.class.getCanonicalName() });
-        ArrayDequeRatherThanStackCleanUp.CAN_BE_CASTED_TO.put(AbstractCollection.class.getCanonicalName(), new String[] { AbstractCollection.class.getCanonicalName(), Collection.class.getCanonicalName(), Object.class.getCanonicalName() });
-        ArrayDequeRatherThanStackCleanUp.CAN_BE_CASTED_TO.put(Vector.class.getCanonicalName(), new String[] { Vector.class.getCanonicalName(), AbstractCollection.class.getCanonicalName(), Collection.class.getCanonicalName(), Serializable.class.getCanonicalName(), Cloneable.class.getCanonicalName(), Object.class.getCanonicalName() });
-        ArrayDequeRatherThanStackCleanUp.CAN_BE_CASTED_TO.put(Stack.class.getCanonicalName(), new String[] { Stack.class.getCanonicalName(), Vector.class.getCanonicalName(), AbstractCollection.class.getCanonicalName(), Collection.class.getCanonicalName(), Serializable.class.getCanonicalName(), Cloneable.class.getCanonicalName(), Object.class.getCanonicalName() });
+        CAN_BE_CASTED_TO.put(Object.class.getCanonicalName(), new String[] { Object.class.getCanonicalName() });
+        CAN_BE_CASTED_TO.put(Cloneable.class.getCanonicalName(), new String[] { Cloneable.class.getCanonicalName(), Object.class.getCanonicalName() });
+        CAN_BE_CASTED_TO.put(Serializable.class.getCanonicalName(), new String[] { Serializable.class.getCanonicalName(), Object.class.getCanonicalName() });
+        CAN_BE_CASTED_TO.put(Collection.class.getCanonicalName(), new String[] { Collection.class.getCanonicalName(), Object.class.getCanonicalName() });
+        CAN_BE_CASTED_TO.put(AbstractCollection.class.getCanonicalName(), new String[] { AbstractCollection.class.getCanonicalName(), Collection.class.getCanonicalName(), Object.class.getCanonicalName() });
+        CAN_BE_CASTED_TO.put(Vector.class.getCanonicalName(), new String[] { Vector.class.getCanonicalName(), AbstractCollection.class.getCanonicalName(), Collection.class.getCanonicalName(), Serializable.class.getCanonicalName(), Cloneable.class.getCanonicalName(), Object.class.getCanonicalName() });
+        CAN_BE_CASTED_TO.put(Stack.class.getCanonicalName(), new String[] { Stack.class.getCanonicalName(), Vector.class.getCanonicalName(), AbstractCollection.class.getCanonicalName(), Collection.class.getCanonicalName(), Serializable.class.getCanonicalName(), Cloneable.class.getCanonicalName(), Object.class.getCanonicalName() });
     }
 
     /**
@@ -104,7 +104,7 @@ public class ArrayDequeRatherThanStackCleanUp extends AbstractClassSubstituteCle
 
     @Override
     public Set<String> getClassesToImport() {
-        return new HashSet<String>(Arrays.asList(ArrayDeque.class.getCanonicalName(), Collection.class.getCanonicalName()));
+        return new HashSet<>(Arrays.asList(ArrayDeque.class.getCanonicalName(), Collection.class.getCanonicalName()));
     }
 
     @Override
@@ -174,6 +174,6 @@ public class ArrayDequeRatherThanStackCleanUp extends AbstractClassSubstituteCle
     @Override
     protected boolean isTypeCompatible(final ITypeBinding variableType, final ITypeBinding refType) {
         return super.isTypeCompatible(variableType, refType) || ASTNodes.hasType(variableType,
-                Utils.getOrDefault(ArrayDequeRatherThanStackCleanUp.CAN_BE_CASTED_TO, refType.getErasure().getQualifiedName(), new String[0]));
+                Utils.getOrDefault(CAN_BE_CASTED_TO, refType.getErasure().getQualifiedName(), new String[0]));
     }
 }

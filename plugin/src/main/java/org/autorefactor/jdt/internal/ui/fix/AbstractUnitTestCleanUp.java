@@ -62,7 +62,7 @@ public abstract class AbstractUnitTestCleanUp extends AbstractCleanUpRule {
     /**
      * The OBJECT constant.
      */
-    private final Set<String> staticImports= new HashSet<String>();
+    private final Set<String> staticImports= new HashSet<>();
 
     /**
      * Return true if assertNotEquals can be used.
@@ -168,7 +168,7 @@ public abstract class AbstractUnitTestCleanUp extends AbstractCleanUpRule {
                 return maybeRefactorComparison(nodeToReplace, originalMethod, conditionIe, !isAssertTrue,
                         failureMessage, isRewriteNeeded);
             }
-        } else if (ASTNodes.usesGivenSignature(conditionMi, AbstractUnitTestCleanUp.OBJECT, "equals", AbstractUnitTestCleanUp.OBJECT)) { //$NON-NLS-1$
+        } else if (ASTNodes.usesGivenSignature(conditionMi, OBJECT, "equals", OBJECT)) { //$NON-NLS-1$
             if (canUseAssertNotEquals() || isAssertTrue) {
                 final Pair<Expression, Expression> actualAndExpected= getActualAndExpected(conditionMi.getExpression(),
                         ASTNodes.arg0(conditionMi));
@@ -284,7 +284,7 @@ public abstract class AbstractUnitTestCleanUp extends AbstractCleanUpRule {
         switch (expression.getNodeType()) {
         case SIMPLE_NAME:
             final SimpleName sn= (SimpleName) expression;
-            return AbstractUnitTestCleanUp.levenshteinDistance(sn.getIdentifier().toLowerCase(), "expected") <= 3; //$NON-NLS-1$
+            return levenshteinDistance(sn.getIdentifier().toLowerCase(), "expected") <= 3; //$NON-NLS-1$
 
         case QUALIFIED_NAME:
             final QualifiedName qn= (QualifiedName) expression;

@@ -25,14 +25,14 @@
  */
 package org.autorefactor.ui;
 
+import static org.autorefactor.AutoRefactorPlugin.getEnvironment;
+
 import java.util.List;
 
 import org.autorefactor.jdt.internal.corext.dom.PrepareApplyRefactoringsJob;
 import org.autorefactor.jdt.internal.corext.dom.RefactoringRule;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jface.wizard.Wizard;
-
-import static org.autorefactor.AutoRefactorPlugin.*;
 
 /**
  * Wizard which allows the user to choose which cleanups to apply to the

@@ -28,14 +28,15 @@ package org.autorefactor.jdt.internal.corext.dom;
 
 import static org.eclipse.jdt.core.dom.ASTNode.ARRAY_TYPE;
 import static org.eclipse.jdt.core.dom.ASTNode.ASSIGNMENT;
+import static org.eclipse.jdt.core.dom.ASTNode.CAST_EXPRESSION;
 import static org.eclipse.jdt.core.dom.ASTNode.CONDITIONAL_EXPRESSION;
 import static org.eclipse.jdt.core.dom.ASTNode.INFIX_EXPRESSION;
-import static org.eclipse.jdt.core.dom.ASTNode.CAST_EXPRESSION;
 import static org.eclipse.jdt.core.dom.ASTNode.INSTANCEOF_EXPRESSION;
+import static org.eclipse.jdt.core.dom.ASTNode.PARAMETERIZED_TYPE;
 import static org.eclipse.jdt.core.dom.ASTNode.PRIMITIVE_TYPE;
 import static org.eclipse.jdt.core.dom.ASTNode.QUALIFIED_TYPE;
 import static org.eclipse.jdt.core.dom.ASTNode.SIMPLE_TYPE;
-import static org.eclipse.jdt.core.dom.ASTNode.PARAMETERIZED_TYPE;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -366,7 +367,7 @@ public class ASTNodeFactory {
      */
     @SuppressWarnings("unchecked")
     public <T extends ASTNode> T copy(T nodeToCopy) {
-        if (nodeToCopy.getNodeType() == ASTNode.ARRAY_TYPE) {
+        if (nodeToCopy.getNodeType() == ARRAY_TYPE) {
             return (T) copyType((Type) nodeToCopy);
         } else if (isValidInCurrentAST(nodeToCopy)) {
             return refactorings.createCopyTarget(nodeToCopy);

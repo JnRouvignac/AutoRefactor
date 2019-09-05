@@ -80,31 +80,36 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
     @Override
     public boolean visit(ClassInstanceCreation node) {
         final ITypeBinding typeBinding= node.getType().resolveBinding();
+
         if (ASTNodes.hasType(typeBinding, BigDecimal.class.getCanonicalName(), BigInteger.class.getCanonicalName()) && ASTNodes.arguments(node).size() == 1) {
             final Expression arg0= ASTNodes.arguments(node).get(0);
+
             if (arg0 instanceof NumberLiteral && ASTNodes.hasType(typeBinding, BigDecimal.class.getCanonicalName())) {
                 final String token= ((NumberLiteral) arg0).getToken().replaceFirst("[lLfFdD]$", ""); //$NON-NLS-1$ $NON-NLS-2$
+
                 if (token.contains(".")) { //$NON-NLS-1$
                     // Only instantiation from double, not from integer
                     ctx.getRefactorings().replace(arg0, getStringLiteral(token));
                     return false;
-                } else if (getJavaMinorVersion() < 5) {
-                    return true;
-                } else if (JavaConstants.ZERO_LONG_LITERAL_RE.matcher(token).matches()) {
-                    return replaceWithQualifiedName(node, typeBinding, "ZERO"); //$NON-NLS-1$
-                } else if (JavaConstants.ONE_LONG_LITERAL_RE.matcher(token).matches()) {
-                    return replaceWithQualifiedName(node, typeBinding, "ONE"); //$NON-NLS-1$
-                } else if (JavaConstants.TEN_LONG_LITERAL_RE.matcher(token).matches()) {
-                    return replaceWithQualifiedName(node, typeBinding, "TEN"); //$NON-NLS-1$
-                } else {
-                    ctx.getRefactorings().replace(node, getValueOf(typeBinding.getName(), token));
-                    return false;
+                } else if (getJavaMinorVersion() >= 5) {
+                    if (JavaConstants.ZERO_LONG_LITERAL_RE.matcher(token).matches()) {
+                        return replaceWithQualifiedName(node, typeBinding, "ZERO"); //$NON-NLS-1$
+                    } else if (JavaConstants.ONE_LONG_LITERAL_RE.matcher(token).matches()) {
+                        return replaceWithQualifiedName(node, typeBinding, "ONE"); //$NON-NLS-1$
+                    } else if (JavaConstants.TEN_LONG_LITERAL_RE.matcher(token).matches()) {
+                        return replaceWithQualifiedName(node, typeBinding, "TEN"); //$NON-NLS-1$
+                    } else {
+                        ctx.getRefactorings().replace(node, getValueOf(typeBinding.getName(), token));
+                        return false;
+                    }
                 }
             } else if (arg0 instanceof StringLiteral) {
                 if (getJavaMinorVersion() < 5) {
                     return true;
                 }
+
                 final String literalValue= ((StringLiteral) arg0).getLiteralValue().replaceFirst("[lLfFdD]$", ""); //$NON-NLS-1$ $NON-NLS-2$
+
                 if (literalValue.matches("0+")) { //$NON-NLS-1$
                     return replaceWithQualifiedName(node, typeBinding, "ZERO"); //$NON-NLS-1$
                 } else if (literalValue.matches("0+1")) { //$NON-NLS-1$
@@ -117,6 +122,7 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
                 }
             }
         }
+
         return true;
     }
 
@@ -137,7 +143,7 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
     @Override
     public boolean visit(PrefixExpression node) {
         final MethodInvocation mi= ASTNodes.as(node.getOperand(), MethodInvocation.class);
-        return !(ASTNodes.hasOperator(node, PrefixExpression.Operator.NOT) && mi != null) || maybeReplaceEquals(false, node, mi);
+        return !ASTNodes.hasOperator(node, PrefixExpression.Operator.NOT) || mi == null || maybeReplaceEquals(false, node, mi);
     }
 
     @Override

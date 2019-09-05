@@ -99,7 +99,7 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
 
     private class BooleanASTMatcher extends ASTSemanticMatcher {
         /** else node to then node. */
-        final Map<ASTNode, ASTNode> matches= new HashMap<ASTNode, ASTNode>();
+        final Map<ASTNode, ASTNode> matches= new HashMap<>();
         final Map<ASTNode, ASTNode> previousMatches;
 
         public BooleanASTMatcher() {
@@ -118,7 +118,7 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
         public boolean match(BooleanLiteral node, Object other) {
             if (other instanceof Expression) {
                 final Expression expression= (Expression) other;
-                if (BooleanCleanUp.areOppositeBooleanValues(node, expression)) {
+                if (areOppositeBooleanValues(node, expression)) {
                     matches.put(expression, node);
                     return true;
                 }
@@ -130,7 +130,7 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
         public boolean match(QualifiedName node, Object other) {
             if (other instanceof Expression) {
                 final Expression expression= (Expression) other;
-                if (this.previousMatches.containsKey(other) || BooleanCleanUp.areOppositeBooleanValues(node, expression)) {
+                if (this.previousMatches.containsKey(other) || areOppositeBooleanValues(node, expression)) {
                     matches.put(expression, node);
                     return true;
                 }
@@ -387,7 +387,7 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
 
     private ReturnStatement getReturnStatement(final IfStatement node, final Expression thenExpression,
             final Expression elseExpression) {
-        if (BooleanCleanUp.areOppositeBooleanValues(thenExpression, elseExpression)) {
+        if (areOppositeBooleanValues(thenExpression, elseExpression)) {
             Expression exprToReturn= b.copy(node.getExpression());
             if (ASTNodes.getBooleanLiteral(elseExpression)) {
                 exprToReturn= b.negate(exprToReturn, Copy.NONE);
@@ -424,7 +424,7 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
         Boolean thenLiteral= ASTNodes.getBooleanLiteral(thenExpression);
         Boolean elseLiteral= ASTNodes.getBooleanLiteral(elseExpression);
 
-        if (BooleanCleanUp.areOppositeBooleanValues(thenExpression, elseExpression)) {
+        if (areOppositeBooleanValues(thenExpression, elseExpression)) {
             final Name booleanName= getBooleanName(condition);
             Expression orientedCondition;
             if (thenLiteral) {
@@ -517,7 +517,7 @@ public class BooleanCleanUp extends AbstractCleanUpRule {
                     node.getElseStatement() != null ? node.getElseStatement() : ASTNodes.getNextSibling(node),
                     ReturnStatement.class);
 
-            return (elseRs == null) || withThenReturnStatement(node, thenRs, elseRs);
+            return elseRs == null || withThenReturnStatement(node, thenRs, elseRs);
         } else {
             return noThenReturnStatement(node);
         }

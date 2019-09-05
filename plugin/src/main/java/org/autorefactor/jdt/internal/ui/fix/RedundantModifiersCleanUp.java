@@ -100,8 +100,8 @@ public class RedundantModifiersCleanUp extends AbstractCleanUpRule {
             } else if (o2.isAnnotation()) {
                 return 1;
             } else {
-                final int i1= RedundantModifiersCleanUp.ORDERED_MODIFIERS.indexOf(((Modifier) o1).getKeyword());
-                final int i2= RedundantModifiersCleanUp.ORDERED_MODIFIERS.indexOf(((Modifier) o2).getKeyword());
+                final int i1= ORDERED_MODIFIERS.indexOf(((Modifier) o1).getKeyword());
+                final int i2= ORDERED_MODIFIERS.indexOf(((Modifier) o2).getKeyword());
                 if (i1 == -1) {
                     throw new NotImplementedException(((Modifier) o1), "cannot determine order for modifier " + o1); //$NON-NLS-1$
                 }
@@ -210,11 +210,7 @@ public class RedundantModifiersCleanUp extends AbstractCleanUpRule {
 
     @Override
     public boolean visit(EnumDeclaration node) {
-        if (!removeStaticAbstractModifier(ASTNodes.modifiers(node))) {
-            return false;
-        }
-
-        return ensureModifiersOrder(node);
+        return removeStaticAbstractModifier(ASTNodes.modifiers(node)) && ensureModifiersOrder(node);
     }
 
     @Override
@@ -228,16 +224,12 @@ public class RedundantModifiersCleanUp extends AbstractCleanUpRule {
 
     @Override
     public boolean visit(TypeDeclaration node) {
-        if (isInterface(node) && !removeStaticAbstractModifier(ASTNodes.modifiers(node))) {
-            return false;
-        }
-
-        return ensureModifiersOrder(node);
+        return (!isInterface(node) || removeStaticAbstractModifier(ASTNodes.modifiers(node))) && ensureModifiersOrder(node);
     }
 
     private boolean ensureModifiersOrder(BodyDeclaration node) {
         final List<IExtendedModifier> extendedModifiers= ASTNodes.modifiers(node);
-        final List<IExtendedModifier> reorderedModifiers= new ArrayList<IExtendedModifier>(extendedModifiers);
+        final List<IExtendedModifier> reorderedModifiers= new ArrayList<>(extendedModifiers);
         Collections.sort(reorderedModifiers, new ModifierOrderComparator());
 
         if (!extendedModifiers.equals(reorderedModifiers)) {
@@ -274,10 +266,7 @@ public class RedundantModifiersCleanUp extends AbstractCleanUpRule {
 
     @Override
     public boolean visit(SingleVariableDeclaration node) {
-        if (isInterface(node.getParent().getParent())) {
-            return removeFinalModifier(ASTNodes.modifiers(node));
-        }
-        return true;
+        return !isInterface(node.getParent().getParent()) || removeFinalModifier(ASTNodes.modifiers(node));
     }
 
     private boolean removeFinalModifier(List<IExtendedModifier> modifiers) {
@@ -292,7 +281,7 @@ public class RedundantModifiersCleanUp extends AbstractCleanUpRule {
     }
 
     private List<Modifier> getModifiersOnly(Collection<IExtendedModifier> modifiers) {
-        final List<Modifier> results= new ArrayList<Modifier>();
+        final List<Modifier> results= new ArrayList<>();
         for (IExtendedModifier em : modifiers) {
             if (em.isModifier()) {
                 results.add((Modifier) em);

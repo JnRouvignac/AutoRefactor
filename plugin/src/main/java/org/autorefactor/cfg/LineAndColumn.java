@@ -25,7 +25,7 @@
  */
 package org.autorefactor.cfg;
 
-import org.autorefactor.util.Utils;
+import java.util.Objects;
 
 /**
  * Contains a position in the source code with the start position from the start
@@ -63,14 +63,12 @@ class LineAndColumn {
             return false;
         }
         final LineAndColumn other= (LineAndColumn) obj;
-        return Utils.equal(startPosition, other.startPosition);
+        return Objects.equals(startPosition, other.startPosition);
     }
 
     @Override
     public int hashCode() {
-        final int prime= 31;
-        int result= 1;
-        return prime * result + startPosition;
+        return Objects.hash(startPosition);
     }
 
     @Override

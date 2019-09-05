@@ -177,16 +177,16 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
         @Override
         public String toString() {
             final StringBuilder sb= new StringBuilder();
-            if ((this.accessType & ReduceVariableScopeCleanUp.DECL) != 0) {
+            if ((this.accessType & DECL) != 0) {
                 sb.append("DECL"); //$NON-NLS-1$
             }
-            if ((this.accessType & ReduceVariableScopeCleanUp.READ) != 0) {
+            if ((this.accessType & READ) != 0) {
                 if (sb.length() > 0) {
                     sb.append(" | "); //$NON-NLS-1$
                 }
                 sb.append("READ"); //$NON-NLS-1$
             }
-            if ((this.accessType & ReduceVariableScopeCleanUp.WRITE) != 0) {
+            if ((this.accessType & WRITE) != 0) {
                 if (sb.length() > 0) {
                     sb.append(" | "); //$NON-NLS-1$
                 }
@@ -198,7 +198,7 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
         }
     }
 
-    private final Map<VariableName, List<VariableAccess>> allVariableAccesses= new HashMap<VariableName, List<VariableAccess>>();
+    private final Map<VariableName, List<VariableAccess>> allVariableAccesses= new HashMap<>();
     private static final Pair<Integer, ASTNode> NULL_PAIR= Pair.of(0, null);
 
     @Override
@@ -219,7 +219,7 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
             final VariableName varName= new VariableName(node);
             List<VariableAccess> list= this.allVariableAccesses.get(varName);
             if (list == null) {
-                list= new ArrayList<VariableAccess>();
+                list= new ArrayList<>();
                 this.allVariableAccesses.put(varName, list);
             }
             if (list.isEmpty() || !Utils.getLast(list).getScope().equals(accessTypeAndScope.getSecond())) {
@@ -238,19 +238,19 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
         } else if (parent instanceof ImportDeclaration || parent instanceof MethodDeclaration
                 || parent instanceof MethodInvocation || parent instanceof PackageDeclaration || parent instanceof Type
                 || parent instanceof TypeDeclaration) {
-            return ReduceVariableScopeCleanUp.NULL_PAIR;
+            return NULL_PAIR;
         } else if (parent instanceof SingleVariableDeclaration) {
             final SingleVariableDeclaration var= (SingleVariableDeclaration) parent;
             return getAccessTypeAndScope(var.getParent());
         } else if (parent instanceof VariableDeclarationFragment) {
             final VariableDeclarationFragment var= (VariableDeclarationFragment) parent;
-            return Pair.of(var.getInitializer() != null ? ReduceVariableScopeCleanUp.WRITE | ReduceVariableScopeCleanUp.DECL : ReduceVariableScopeCleanUp.DECL, getScope(var));
+            return Pair.of(var.getInitializer() != null ? WRITE | DECL : DECL, getScope(var));
         } else if (parent instanceof Assignment) {
-            return Pair.of(ReduceVariableScopeCleanUp.WRITE, getScope(parent.getParent()));
+            return Pair.of(WRITE, getScope(parent.getParent()));
         } else if (parent instanceof InfixExpression) {
-            return Pair.of(ReduceVariableScopeCleanUp.READ, getScope(parent.getParent()));
+            return Pair.of(READ, getScope(parent.getParent()));
         } else if (parent instanceof PostfixExpression) {
-            return Pair.of(ReduceVariableScopeCleanUp.READ | ReduceVariableScopeCleanUp.WRITE, getScope(parent.getParent()));
+            return Pair.of(READ | WRITE, getScope(parent.getParent()));
         }
         throw new NotImplementedException(parent);
     }
@@ -276,7 +276,7 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
                 remove(varDecl.getVariableName());
 
                 for (VariableAccess varAccess : variableAccesses) {
-                    if (varAccess.getAccessType() == ReduceVariableScopeCleanUp.WRITE) {
+                    if (varAccess.getAccessType() == WRITE) {
                         replace(varDecl, varAccess);
                     } // TODO JNR if (varAccess.getAccessType() & WRITE) {
                 }
@@ -428,10 +428,10 @@ public class ReduceVariableScopeCleanUp extends AbstractCleanUpRule {
 
         VariableAccess lastWrite= null;
         for (VariableAccess varAccess : variableAccesses) {
-            if (varAccess.getAccessType() == ReduceVariableScopeCleanUp.WRITE) {
+            if (varAccess.getAccessType() == WRITE) {
                 // Is only write
                 lastWrite= varAccess;
-            } else if ((varAccess.getAccessType() & ReduceVariableScopeCleanUp.READ) != 0 && lastWrite != null
+            } else if ((varAccess.getAccessType() & READ) != 0 && lastWrite != null
                     && !isReadDominatedByWriteInScopeMoreReducedThanVariableScope(varAccess.getScope(),
                             lastWrite.getScope(), varDecl.getScope())) {
                 // TODO JNR return sublist of reduceable scope

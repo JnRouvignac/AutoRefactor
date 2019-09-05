@@ -61,7 +61,7 @@ import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 /** See {@link #getDescription()} method. */
 public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCleanUp {
     private final class CollectedData {
-        private List<Expression> fields= new ArrayList<Expression>();
+        private List<Expression> fields= new ArrayList<>();
         private String primeId;
         private String resultId;
         private Iterator<Statement> stmtIterator;
@@ -74,7 +74,7 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
          *
          * @return the current value
          */
-        public final SimpleName getTempVar() {
+        public SimpleName getTempVar() {
             return tempVar;
         }
 
@@ -83,7 +83,7 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
          *
          * @param tempVar the new value
          */
-        public final void setTempVar(final SimpleName tempVar) {
+        public void setTempVar(final SimpleName tempVar) {
             this.tempVar= tempVar;
         }
 
@@ -166,13 +166,10 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
     }
 
     private final class RefactoringWithObjectsClass extends CleanUpWithNewClassImport {
-
         @Override
         public boolean visit(final MethodDeclaration node) {
-            final boolean isSubTreeToVisit= Java7HashRatherThanEclipseJava6HashCleanUp.this
+            return Java7HashRatherThanEclipseJava6HashCleanUp.this
                     .maybeRefactorMethodDeclaration(node, getClassesToUseWithImport(), getImportsToAdd());
-
-            return isSubTreeToVisit;
         }
     }
 
@@ -205,7 +202,7 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 
     @Override
     public Set<String> getClassesToImport() {
-        return new HashSet<String>(Arrays.asList("java.util.Objects")); //$NON-NLS-1$
+        return new HashSet<>(Arrays.asList("java.util.Objects")); //$NON-NLS-1$
     }
 
     @Override
@@ -269,7 +266,7 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
             if (varFragment.getExtraDimensions() == 0 && varLiteral != null) {
                 final Object varValue= varLiteral.resolveConstantExpressionValue();
 
-                if ((varValue instanceof Number) && ((Number) varValue).intValue() == initValue) {
+                if (varValue instanceof Number && ((Number) varValue).intValue() == initValue) {
                     return varId;
                 }
             }
@@ -500,7 +497,7 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
                 if (againFieldName != null && againFieldName.getIdentifier().equals(fieldName) && hash != null) {
                     final Object numberForHash= hash.resolveConstantExpressionValue();
 
-                    if ((numberForHash instanceof Number) && ((Number) numberForHash).intValue() == 32) {
+                    if (numberForHash instanceof Number && ((Number) numberForHash).intValue() == 32) {
                         if (data.isTempValueUsed()) {
                             data.getFields().add(againFieldName);
                             return true;
@@ -542,8 +539,8 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
         final Object numberForTrue= hashForTrue.resolveConstantExpressionValue();
         final Object numberForFalse= hashForFalse.resolveConstantExpressionValue();
 
-        if ((numberForTrue instanceof Number) && ((Number) numberForTrue).intValue() == 1231
-                && (numberForFalse instanceof Number) && ((Number) numberForFalse).intValue() == 1237) {
+        if (numberForTrue instanceof Number && ((Number) numberForTrue).intValue() == 1231
+                && numberForFalse instanceof Number && ((Number) numberForFalse).intValue() == 1237) {
             data.getFields().add(booleanField);
             return true;
         }
@@ -591,7 +588,7 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
                 final Object zeroValue= zero.resolveConstantExpressionValue();
                 final SimpleName fieldToHash= getField(hashOnField.getExpression());
 
-                if ((zeroValue instanceof Number) && ((Number) zeroValue).intValue() == 0 && fieldToHash != null
+                if (zeroValue instanceof Number && ((Number) zeroValue).intValue() == 0 && fieldToHash != null
                         && fieldName.equals(fieldToHash.getIdentifier())) {
                     data.getFields().add(fieldToHash);
                     return true;

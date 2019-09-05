@@ -27,9 +27,9 @@ package org.autorefactor.cfg;
 
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.Objects;
 
 import org.autorefactor.util.IllegalArgumentException;
-import org.autorefactor.util.Utils;
 import org.eclipse.jdt.core.dom.ASTNode;
 
 /**
@@ -55,8 +55,8 @@ public class CFGBasicBlock implements Comparable<CFGBasicBlock> {
      */
     private final Boolean isEntryBlock;
     private final LineAndColumn lineAndColumn;
-    private final Collection<CFGEdge> incomingEdges= new LinkedList<CFGEdge>();
-    private final Collection<Object> outgoingEdgesAndVariableAccesses= new LinkedList<Object>();
+    private final Collection<CFGEdge> incomingEdges= new LinkedList<>();
+    private final Collection<Object> outgoingEdgesAndVariableAccesses= new LinkedList<>();
 
     private CFGBasicBlock(ASTNode node, String fileName, String codeExcerpt, boolean isDecision, Boolean isEntryBlock,
             LineAndColumn lineAndColumn) {
@@ -205,11 +205,7 @@ public class CFGBasicBlock implements Comparable<CFGBasicBlock> {
 
     @Override
     public int hashCode() {
-        final int prime= 31;
-        int result= 1;
-        result= prime * result + ((fileName == null) ? 0 : fileName.hashCode());
-        result= prime * result + ((lineAndColumn == null) ? 0 : lineAndColumn.hashCode());
-        return prime * result + ((isEntryBlock == null) ? 0 : isEntryBlock.hashCode());
+        return Objects.hash(fileName, lineAndColumn, isEntryBlock);
     }
 
     @Override
@@ -221,8 +217,8 @@ public class CFGBasicBlock implements Comparable<CFGBasicBlock> {
             return false;
         }
         final CFGBasicBlock other= (CFGBasicBlock) obj;
-        return Utils.equal(fileName, other.fileName) && Utils.equal(lineAndColumn, other.lineAndColumn)
-                && Utils.equal(isEntryBlock, other.isEntryBlock);
+        return Objects.equals(fileName, other.fileName) && Objects.equals(lineAndColumn, other.lineAndColumn)
+                && Objects.equals(isEntryBlock, other.isEntryBlock);
     }
 
     /**

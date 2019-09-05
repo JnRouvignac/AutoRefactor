@@ -29,6 +29,7 @@ package org.autorefactor.jdt.internal.ui.fix;
 import static org.autorefactor.jdt.internal.corext.dom.ForLoopHelper.ContainerType.COLLECTION;
 import static org.autorefactor.jdt.internal.corext.dom.ForLoopHelper.IterationType.INDEX;
 import static org.autorefactor.jdt.internal.corext.dom.ForLoopHelper.IterationType.ITERATOR;
+
 import java.util.Collection;
 import java.util.List;
 

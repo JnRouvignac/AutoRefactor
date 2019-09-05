@@ -80,22 +80,22 @@ public class VariableAccess {
     private void toString(final StringBuilder sb) {
         sb.append(this.type);
         sb.append(" ").append(this.name).append(" <= "); //$NON-NLS-1$ $NON-NLS-2$
-        if ((this.accessType & VariableAccess.DECL_INIT) != 0) {
+        if ((this.accessType & DECL_INIT) != 0) {
             sb.append("DECL_INIT"); //$NON-NLS-1$
         }
-        if ((this.accessType & VariableAccess.DECL_UNINIT) != 0) {
+        if ((this.accessType & DECL_UNINIT) != 0) {
             if (sb.length() > 0) {
                 sb.append("|"); //$NON-NLS-1$
             }
             sb.append("DECL_UNINIT"); //$NON-NLS-1$
         }
-        if ((this.accessType & VariableAccess.READ) != 0) {
+        if ((this.accessType & READ) != 0) {
             if (sb.length() > 0) {
                 sb.append("|"); //$NON-NLS-1$
             }
             sb.append("READ"); //$NON-NLS-1$
         }
-        if ((this.accessType & VariableAccess.WRITE) != 0) {
+        if ((this.accessType & WRITE) != 0) {
             if (sb.length() > 0) {
                 sb.append("|"); //$NON-NLS-1$
             }

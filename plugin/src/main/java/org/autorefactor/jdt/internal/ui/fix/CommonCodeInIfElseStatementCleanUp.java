@@ -31,8 +31,8 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTMatcherSameVariablesAndMethods;
+import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.ASTSemanticMatcher;
 import org.autorefactor.jdt.internal.corext.dom.Refactorings;
@@ -81,11 +81,11 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
             return true;
         }
 
-        final List<List<Statement>> allCasesStatements= new ArrayList<List<Statement>>();
+        final List<List<Statement>> allCasesStatements= new ArrayList<>();
 
         // Collect all the if / else if / else if / ... / else cases
         if (collectAllCases(allCasesStatements, node)) {
-            final List<List<Statement>> caseStmtsToRemove= new LinkedList<List<Statement>>();
+            final List<List<Statement>> caseStmtsToRemove= new LinkedList<>();
 
             // Initialize removedCaseStatements list
             for (int i= 0; i < allCasesStatements.size(); i++) {

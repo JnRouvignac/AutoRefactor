@@ -105,10 +105,7 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
     @Override
     public boolean visit(ParenthesizedExpression node) {
         final Expression innerExpression= getExpressionWithoutParentheses(node);
-        if (innerExpression != node) {
-            return replaceBy(node, innerExpression);
-        }
-        return true;
+        return innerExpression == node || replaceBy(node, innerExpression);
     }
 
     private Expression getExpressionWithoutParentheses(ParenthesizedExpression node) {
@@ -131,22 +128,12 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
             }
         }
         // Infix, prefix or postfix without parenthesis is not readable
-        if ((parent instanceof InfixExpression
+        if ((((parent instanceof InfixExpression
                 && ASTNodes.hasOperator((InfixExpression) parent, InfixExpression.Operator.PLUS, InfixExpression.Operator.MINUS))
                 || (parent instanceof PrefixExpression
-                        && ASTNodes.hasOperator((PrefixExpression) parent, PrefixExpression.Operator.PLUS, PrefixExpression.Operator.MINUS))) {
-            if (innerExpression instanceof PrefixExpression
-                    && ASTNodes.hasOperator((PrefixExpression) innerExpression, PrefixExpression.Operator.DECREMENT, PrefixExpression.Operator.INCREMENT, PrefixExpression.Operator.PLUS, PrefixExpression.Operator.MINUS)) {
-                return node;
-            }
-            if (innerExpression instanceof PostfixExpression
-                    && ASTNodes.hasOperator((PostfixExpression) innerExpression, PostfixExpression.Operator.DECREMENT, PostfixExpression.Operator.INCREMENT)) {
-                return node;
-            }
-        }
-        if (isInnerExprHardToRead(innerExpression, parent)) {
-            // FIXME This is not really that hard to read is it?
-            // return (bla != null) ? bla.getSomething() : null;
+                        && ASTNodes.hasOperator((PrefixExpression) parent, PrefixExpression.Operator.PLUS, PrefixExpression.Operator.MINUS))) && ((innerExpression instanceof PrefixExpression
+                && ASTNodes.hasOperator((PrefixExpression) innerExpression, PrefixExpression.Operator.DECREMENT, PrefixExpression.Operator.INCREMENT, PrefixExpression.Operator.PLUS, PrefixExpression.Operator.MINUS)) || (innerExpression instanceof PostfixExpression
+                && ASTNodes.hasOperator((PostfixExpression) innerExpression, PostfixExpression.Operator.DECREMENT, PostfixExpression.Operator.INCREMENT)))) || isInnerExprHardToRead(innerExpression, parent)) {
             return node;
         }
         if (isUselessParenthesesInStatement(parent, node)) {
@@ -408,7 +395,7 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
     }
 
     private boolean shouldHaveParentheses(InfixExpression.Operator actualChildOp, InfixExpression.Operator actualParentOp) {
-        for (Pair<InfixExpression.Operator, InfixExpression.Operator> pair : SimplifyExpressionCleanUp.SHOULD_HAVE_PARENTHESES) {
+        for (Pair<InfixExpression.Operator, InfixExpression.Operator> pair : SHOULD_HAVE_PARENTHESES) {
             final InfixExpression.Operator childOp= pair.getFirst();
             final InfixExpression.Operator parentOp= pair.getSecond();
             if (childOp.equals(actualChildOp) && parentOp.equals(actualParentOp)) {

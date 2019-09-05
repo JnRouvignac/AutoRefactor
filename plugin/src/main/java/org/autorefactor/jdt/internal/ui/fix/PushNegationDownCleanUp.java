@@ -97,7 +97,7 @@ public class PushNegationDownCleanUp extends AbstractCleanUpRule {
             final InfixExpression.Operator reverseOp= (InfixExpression.Operator) OperatorEnum.getOperator(ie).getReverseBooleanOperator();
 
             if (reverseOp != null) {
-                List<Expression> allOperands= new ArrayList<Expression>(ASTNodes.allOperands(ie));
+                List<Expression> allOperands= new ArrayList<>(ASTNodes.allOperands(ie));
 
                 if (ASTNodes.hasOperator(ie, InfixExpression.Operator.CONDITIONAL_AND, InfixExpression.Operator.CONDITIONAL_OR, InfixExpression.Operator.AND, InfixExpression.Operator.OR)) {
                     for (ListIterator<Expression> it= allOperands.listIterator(); it.hasNext();) {

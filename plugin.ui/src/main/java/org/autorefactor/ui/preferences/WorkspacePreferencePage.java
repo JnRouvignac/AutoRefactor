@@ -104,7 +104,6 @@ public class WorkspacePreferencePage extends PreferencePage implements IWorkbenc
             public int compare(final RefactoringRule o1, final RefactoringRule o2) {
                 return o1.getName().compareTo(o2.getName());
             }
-
         });
 
         final Group ruleGroup= createControls(parent, allRefactoringRules);

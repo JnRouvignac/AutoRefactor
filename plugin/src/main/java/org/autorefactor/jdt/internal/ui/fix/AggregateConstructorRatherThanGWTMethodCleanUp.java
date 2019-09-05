@@ -48,13 +48,10 @@ import org.eclipse.jdt.core.dom.Type;
 /** See {@link #getDescription()} method. */
 public class AggregateConstructorRatherThanGWTMethodCleanUp extends NewClassImportCleanUp {
     private final class RefactoringWithArrayListOrHashMapClass extends CleanUpWithNewClassImport {
-
         @Override
         public boolean visit(final MethodInvocation node) {
-            final boolean isSubTreeToVisit= AggregateConstructorRatherThanGWTMethodCleanUp.this
+            return AggregateConstructorRatherThanGWTMethodCleanUp.this
                     .maybeRefactorMethodInvocation(node, getClassesToUseWithImport(), getImportsToAdd());
-
-            return isSubTreeToVisit;
         }
     }
 
@@ -92,7 +89,7 @@ public class AggregateConstructorRatherThanGWTMethodCleanUp extends NewClassImpo
 
     @Override
     public Set<String> getClassesToImport() {
-        return new HashSet<String>(Arrays.asList(ArrayList.class.getCanonicalName(), LinkedList.class.getCanonicalName(), HashMap.class.getCanonicalName(),
+        return new HashSet<>(Arrays.asList(ArrayList.class.getCanonicalName(), LinkedList.class.getCanonicalName(), HashMap.class.getCanonicalName(),
                 TreeMap.class.getCanonicalName(), LinkedHashMap.class.getCanonicalName(), IdentityHashMap.class.getCanonicalName(), EnumMap.class.getCanonicalName()));
     }
 

@@ -50,13 +50,10 @@ import org.eclipse.jdt.core.dom.Statement;
 /** See {@link #getDescription()} method. */
 public class ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp extends NewClassImportCleanUp {
     private final class RefactoringWithObjectsClass extends CleanUpWithNewClassImport {
-
         @Override
         public boolean visit(final IfStatement node) {
-            final boolean isSubTreeToVisit= ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp.this
+            return ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp.this
                     .maybeRefactorIfStatement(node, getClassesToUseWithImport(), getImportsToAdd());
-
-            return isSubTreeToVisit;
         }
     }
 
@@ -94,7 +91,7 @@ public class ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp extends NewClassIm
 
     @Override
     public Set<String> getClassesToImport() {
-        return new HashSet<String>(Arrays.asList("java.util.Objects")); //$NON-NLS-1$
+        return new HashSet<>(Arrays.asList("java.util.Objects")); //$NON-NLS-1$
     }
 
     @Override

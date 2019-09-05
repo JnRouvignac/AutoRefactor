@@ -192,7 +192,7 @@ public enum OperatorEnum {
 
     private static final Map<Object, OperatorEnum> OPERATORS;
     static {
-        final Map<Object, OperatorEnum> m= new HashMap<Object, OperatorEnum>();
+        final Map<Object, OperatorEnum> m= new HashMap<>();
         for (OperatorEnum op : OperatorEnum.values()) {
             m.put(op.operator, op);
         }
@@ -294,7 +294,7 @@ public enum OperatorEnum {
         final Integer prec1= operator1.precedence;
         final Integer prec2= operator2.precedence;
         // Reverse the precedence because of the values we are assigning
-        return -prec1.compareTo(prec2);
+        return prec2.compareTo(prec1);
     }
 
     /**

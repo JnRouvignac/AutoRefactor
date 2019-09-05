@@ -32,6 +32,7 @@ import static org.eclipse.jdt.core.dom.ASTNode.TYPE_DECLARATION;
 import static org.eclipse.jdt.core.dom.IBinding.METHOD;
 import static org.eclipse.jdt.core.dom.IBinding.TYPE;
 import static org.eclipse.jdt.core.dom.IBinding.VARIABLE;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -91,7 +92,7 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
         }
 
         private static QName valueOf(String qualifiedName, String simpleName) {
-            return new QName(QName.valueOf(qualifiedName), simpleName);
+            return new QName(valueOf(qualifiedName), simpleName);
         }
 
         private QName(QName qualifier, String simpleName) {
@@ -171,7 +172,7 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
 
         @Override
         public String toString() {
-            if (equals(FQN.CANNOT_REPLACE_SIMPLE_NAME)) {
+            if (equals(CANNOT_REPLACE_SIMPLE_NAME)) {
                 return "CANNOT_REPLACE_SIMPLE_NAME"; //$NON-NLS-1$
             }
             return fullyQualifiedName + (fromImport ? " (imported)" : " (member)"); //$NON-NLS-1$ $NON-NLS-2$
@@ -184,7 +185,7 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
          * Simple names for java elements in use in this compilation unit. It merges
          * imports and local declarations.
          */
-        private final Map<String, List<FQN>> simpleNames= new TreeMap<String, List<FQN>>();
+        private final Map<String, List<FQN>> simpleNames= new TreeMap<>();
 
         private void addName(FQN fqn) {
             addName(fqn.fullyQualifiedName.simpleName, fqn);
@@ -197,7 +198,7 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
         private void addName(final String simpleName, FQN fqn) {
             List<FQN> existingFqns= simpleNames.get(simpleName);
             if (existingFqns == null) {
-                existingFqns= new ArrayList<FQN>();
+                existingFqns= new ArrayList<>();
                 simpleNames.put(simpleName, existingFqns);
             }
             existingFqns.add(fqn);
@@ -321,7 +322,7 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
             if (fqns == null) {
                 return Collections.emptyList();
             }
-            List<FQN> bestMatches= new ArrayList<FQN>();
+            List<FQN> bestMatches= new ArrayList<>();
             for (FQN fqn : fqns) {
                 if (fqn.equals(FQN.CANNOT_REPLACE_SIMPLE_NAME)) {
                     // Something got wrong while computing the FQNs => bail out
@@ -445,7 +446,7 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
         if (binding == null) {
             return;
         }
-        if (binding.getKind() != IBinding.TYPE) {
+        if (binding.getKind() != TYPE) {
             throw new NotImplementedException(node, "for a binding of kind " + binding.getKind()); //$NON-NLS-1$
         }
         final ITypeBinding typeBinding= (ITypeBinding) binding;
@@ -513,7 +514,7 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
             final SearchEngine searchEngine= new SearchEngine();
             searchEngine.searchAllTypeNames(pkgName.toCharArray(), SearchPattern.R_EXACT_MATCH, // search in this package
                     null, SearchPattern.R_EXACT_MATCH, // do not filter by type name
-                    IBinding.TYPE, // look for all java types (class, interfaces, enums, etc.)
+                    TYPE, // look for all java types (class, interfaces, enums, etc.)
                     SearchEngine.createWorkspaceScope(), // search everywhere
                     importTypeCollector, IJavaSearchConstants.WAIT_UNTIL_READY_TO_SEARCH, // wait in case the indexer is indexing
                     ctx.getProgressMonitor());
@@ -608,7 +609,7 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
 
             case VARIABLE:
                 final IVariableBinding fieldBinding= (IVariableBinding) binding;
-                if (hasKind(node.getQualifier(), IBinding.TYPE)) {
+                if (hasKind(node.getQualifier(), TYPE)) {
                     return QName.valueOf(fieldBinding.getDeclaringClass().getQualifiedName(), fieldBinding.getName());
                 } // else this is a field access like other.fieldName
             }
@@ -620,7 +621,7 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
     public boolean visit(MethodInvocation node) {
         final Expression expression= node.getExpression();
         final IMethodBinding methodBinding= node.resolveMethodBinding();
-        if (methodBinding != null && expression instanceof Name && hasKind((Name) expression, IBinding.TYPE)
+        if (methodBinding != null && expression instanceof Name && hasKind((Name) expression, TYPE)
                 && node.typeArguments().isEmpty()) {
             final ITypeBinding declaringClass= methodBinding.getDeclaringClass();
             final QName qname= QName.valueOf(declaringClass.getErasure().getQualifiedName(), methodBinding.getName());
@@ -663,7 +664,7 @@ public class SimpleNameRatherThanQualifiedNameCleanUp extends AbstractCleanUpRul
         }
 
         // Method body
-        final Set<String> localIdentifiers= new HashSet<String>();
+        final Set<String> localIdentifiers= new HashSet<>();
         for (SingleVariableDeclaration localParameter : ASTNodes.parameters(node)) {
             localIdentifiers.add(localParameter.getName().getIdentifier());
         }

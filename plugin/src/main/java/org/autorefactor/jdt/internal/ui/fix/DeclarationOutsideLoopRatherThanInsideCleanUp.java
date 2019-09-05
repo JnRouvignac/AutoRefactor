@@ -101,7 +101,7 @@ public class DeclarationOutsideLoopRatherThanInsideCleanUp extends AbstractClean
             }
 
             if (forStatements != null) {
-                final Set<String> varNames= new HashSet<String>();
+                final Set<String> varNames= new HashSet<>();
 
                 for (int j= 0; j < i; j++) {
                     if (!(blockStatement.get(j) instanceof Block)) {
@@ -112,7 +112,7 @@ public class DeclarationOutsideLoopRatherThanInsideCleanUp extends AbstractClean
                     varNames.addAll(ASTNodes.getLocalVariableIdentifiers(blockStatement.get(j), true));
                 }
 
-                final List<VariableDeclarationStatement> candidates= new ArrayList<VariableDeclarationStatement>();
+                final List<VariableDeclarationStatement> candidates= new ArrayList<>();
 
                 for (Statement declarationStatement : forStatements) {
                     final VariableDeclarationStatement decl= ASTNodes.as(declarationStatement, VariableDeclarationStatement.class);

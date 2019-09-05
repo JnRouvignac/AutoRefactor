@@ -128,7 +128,7 @@ public class IfRatherThanWhileAndFallsThroughCleanUp extends AbstractCleanUpRule
 
     private class BreakVisitor extends InterruptibleVisitor {
         private final WhileStatement root;
-        private final List<BreakStatement> breaks= new ArrayList<BreakStatement>();
+        private final List<BreakStatement> breaks= new ArrayList<>();
         private boolean canBeRefactored= true;
 
         public BreakVisitor(final WhileStatement root) {

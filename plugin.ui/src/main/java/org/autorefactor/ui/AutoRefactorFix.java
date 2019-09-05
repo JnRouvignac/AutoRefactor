@@ -81,7 +81,7 @@ public class AutoRefactorFix implements ICleanUpFix {
             final Environment environment= getEnvironment();
             final List<RefactoringRule> refactoringRules= getConfiguredRefactoringRules(fOptions);
             final SubMonitor loopMonitor= SubMonitor.convert(null, 1);
-            final Queue<RefactoringUnit> refactoringUnits= new ConcurrentLinkedQueue<RefactoringUnit>();
+            final Queue<RefactoringUnit> refactoringUnits= new ConcurrentLinkedQueue<>();
             refactoringUnits.add(new RefactoringUnit(iCompilationUnit, options));
 
             final ApplyRefactoringsJob applyRefactoringsJob= new ApplyRefactoringsJob(refactoringUnits,

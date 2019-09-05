@@ -25,9 +25,9 @@
  */
 package org.autorefactor.cfg;
 
-import org.eclipse.jdt.core.dom.Expression;
+import java.util.Objects;
 
-import org.autorefactor.util.Utils;
+import org.eclipse.jdt.core.dom.Expression;
 
 /** This class represents an edge of the control flow graph. */
 public class CFGEdge {
@@ -101,12 +101,7 @@ public class CFGEdge {
 
     @Override
     public int hashCode() {
-        final int prime= 31;
-        int result= 1;
-        result= prime * result + ((condition == null) ? 0 : condition.hashCode());
-        result= prime * result + (evaluationResult ? 1231 : 1237);
-        result= prime * result + ((sourceBlock == null) ? 0 : sourceBlock.hashCode());
-        return prime * result + ((targetBlock == null) ? 0 : targetBlock.hashCode());
+        return Objects.hash(condition, evaluationResult, sourceBlock, targetBlock);
     }
 
     @Override
@@ -118,7 +113,7 @@ public class CFGEdge {
             return false;
         }
         final CFGEdge other= (CFGEdge) obj;
-        return Utils.equal(condition, other.condition) && Utils.equal(evaluationResult, other.evaluationResult)
-                && Utils.equal(sourceBlock, other.sourceBlock) && Utils.equal(targetBlock, other.targetBlock);
+        return Objects.equals(condition, other.condition) && Objects.equals(evaluationResult, other.evaluationResult)
+                && Objects.equals(sourceBlock, other.sourceBlock) && Objects.equals(targetBlock, other.targetBlock);
     }
 }

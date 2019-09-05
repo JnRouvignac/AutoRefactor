@@ -1433,7 +1433,6 @@ public final class MultiFixMessages extends NLS {
 
     static {
         // Initialize resource bundle
-        NLS.initializeMessages(MultiFixMessages.BUNDLE_NAME, MultiFixMessages.class);
+        NLS.initializeMessages(BUNDLE_NAME, MultiFixMessages.class);
     }
-
 }

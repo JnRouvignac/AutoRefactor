@@ -30,6 +30,7 @@ import static org.eclipse.jdt.core.dom.ASTNode.ANNOTATION_TYPE_DECLARATION;
 import static org.eclipse.jdt.core.dom.ASTNode.ANONYMOUS_CLASS_DECLARATION;
 import static org.eclipse.jdt.core.dom.ASTNode.ENUM_DECLARATION;
 import static org.eclipse.jdt.core.dom.ASTNode.TYPE_DECLARATION;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
@@ -112,7 +113,7 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
         }
 
         private ASTNode getNamingScope(ASTNode scope) {
-            Class<?>[] ancestorClasses= new Class<?>[] { MethodDeclaration.class, Initializer.class };
+            Class<?>[] ancestorClasses= { MethodDeclaration.class, Initializer.class };
             ASTNode ancestor= ASTNodes.getFirstAncestorOrNull(scope, ancestorClasses);
             if (ancestor == null) {
                 throw new IllegalStateException(scope, "Expected to find an ancestor among the types " //$NON-NLS-1$
@@ -135,8 +136,8 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
          * @return the suggestion for a variable name
          */
         public String suggest(String... candidateNames) {
-            final Set<String> declaredLocalVarNames= new HashSet<String>(collectDeclaredLocalVariableNames());
-            final Set<String> varNamesUsedAfter= new HashSet<String>(collectVariableNamesUsedAfter());
+            final Set<String> declaredLocalVarNames= new HashSet<>(collectDeclaredLocalVariableNames());
+            final Set<String> varNamesUsedAfter= new HashSet<>(collectVariableNamesUsedAfter());
             // Can we use one of the candidate names?
             for (String candidate : candidateNames) {
                 if (isSuitable(candidate, declaredLocalVarNames, varNamesUsedAfter)) {
@@ -357,11 +358,8 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
     }
 
     private boolean areSameTypeBindings(final ITypeBinding type1, final ITypeBinding type2) {
-        if (type1 == null || type2 == null) {
-            return true;
-        }
-        return type1.isParameterizedType() == type2.isParameterizedType()
-                && areSameParameterizedTypeBindings(type1, type2);
+        return type1 == null || type2 == null || (type1.isParameterizedType() == type2.isParameterizedType()
+                && areSameParameterizedTypeBindings(type1, type2));
     }
 
     /** Special handling because of captures. */

@@ -91,37 +91,22 @@ public class RemoveEmptyStatementCleanUp extends AbstractCleanUpRule {
 
     @Override
     public boolean visit(final EnhancedForStatement node) {
-        if (ASTNodes.isPassive(node.getExpression()) && node.getExpression().resolveTypeBinding().isArray()) {
-            return maybeRemoveStmtWithEmptyBody(node, node.getBody());
-        }
-        return true;
+        return !ASTNodes.isPassive(node.getExpression()) || !node.getExpression().resolveTypeBinding().isArray() || maybeRemoveStmtWithEmptyBody(node, node.getBody());
     }
 
     @Override
     public boolean visit(final ForStatement node) {
-        if (node.getExpression() != null && !Boolean.TRUE.equals(node.getExpression().resolveConstantExpressionValue())
-                && arePassive(node.initializers()) && ASTNodes.isPassive(node.getExpression())) {
-            return maybeRemoveStmtWithEmptyBody(node, node.getBody());
-        }
-        return true;
+        return node.getExpression() == null || Boolean.TRUE.equals(node.getExpression().resolveConstantExpressionValue()) || !arePassive(node.initializers()) || !ASTNodes.isPassive(node.getExpression()) || maybeRemoveStmtWithEmptyBody(node, node.getBody());
     }
 
     @Override
     public boolean visit(final WhileStatement node) {
-        if (ASTNodes.isPassive(node.getExpression())
-                && !Boolean.TRUE.equals(node.getExpression().resolveConstantExpressionValue())) {
-            return maybeRemoveStmtWithEmptyBody(node, node.getBody());
-        }
-        return true;
+        return !ASTNodes.isPassive(node.getExpression()) || Boolean.TRUE.equals(node.getExpression().resolveConstantExpressionValue()) || maybeRemoveStmtWithEmptyBody(node, node.getBody());
     }
 
     @Override
     public boolean visit(final DoStatement node) {
-        if (ASTNodes.isPassive(node.getExpression())
-                && !Boolean.TRUE.equals(node.getExpression().resolveConstantExpressionValue())) {
-            return maybeRemoveStmtWithEmptyBody(node, node.getBody());
-        }
-        return true;
+        return !ASTNodes.isPassive(node.getExpression()) || Boolean.TRUE.equals(node.getExpression().resolveConstantExpressionValue()) || maybeRemoveStmtWithEmptyBody(node, node.getBody());
     }
 
     @Override

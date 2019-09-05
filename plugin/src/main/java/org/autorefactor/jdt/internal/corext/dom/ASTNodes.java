@@ -149,7 +149,7 @@ public final class ASTNodes {
     }
 
     private static final class VariableDeclarationIdentifierVisitor extends ASTVisitor {
-        private final Set<String> variableNames= new HashSet<String>();
+        private final Set<String> variableNames= new HashSet<>();
         private final ASTNode startNode;
         private final boolean includeInnerScopes;
 
@@ -1474,9 +1474,7 @@ public final class ASTNodes {
             case ASTNode.INFIX_EXPRESSION:
                 InfixExpression infixExpression= (InfixExpression) expression;
 
-                if (!isHardCoded(infixExpression.getLeftOperand())) {
-                    return false;
-                } else if (!isHardCoded(infixExpression.getRightOperand())) {
+                if (!isHardCoded(infixExpression.getLeftOperand()) || !isHardCoded(infixExpression.getRightOperand())) {
                     return false;
                 } else if (infixExpression.hasExtendedOperands()) {
                     for (Object operand : infixExpression.extendedOperands()) {
@@ -1535,7 +1533,7 @@ public final class ASTNodes {
      *         same local variable, {@code false} otherwise
      */
     public static boolean isSameLocalVariable(IBinding binding, Expression expression) {
-        return isLocalVariable(binding) && expression != null && expression.getNodeType() == ASTNode.SIMPLE_NAME
+        return isLocalVariable(binding) && expression != null && expression.getNodeType() == SIMPLE_NAME
         // No need to use IVariableBinding.isEqualTo(IBinding) since we are looking for
         // a *local* variable
                 && binding.equals(((SimpleName) expression).resolveBinding());
@@ -1550,7 +1548,7 @@ public final class ASTNodes {
      *         variable, {@code false} otherwise
      */
     public static boolean isSameLocalVariable(Expression expr1, Expression expr2) {
-        return expr1 != null && expr1.getNodeType() == ASTNode.SIMPLE_NAME
+        return expr1 != null && expr1.getNodeType() == SIMPLE_NAME
                 && isSameLocalVariable(((SimpleName) expr1).resolveBinding(), expr2);
     }
 
@@ -1636,7 +1634,7 @@ public final class ASTNodes {
                 || qualifiedTypeName.equals(typeErasure.getQualifiedName())) {
             return typeBinding;
         }
-        final Set<String> visitedClasses= new HashSet<String>();
+        final Set<String> visitedClasses= new HashSet<>();
         visitedClasses.add(typeErasure.getQualifiedName());
         return findImplementedType(typeBinding, qualifiedTypeName, visitedClasses);
     }
@@ -1928,7 +1926,7 @@ public final class ASTNodes {
 
     private static Map<ITypeBinding, ITypeBinding> getGenericToConcreteTypeParamsMap(final ITypeBinding[] typeParams,
             final ITypeBinding[] genericTypeParams) {
-        final Map<ITypeBinding, ITypeBinding> results= new HashMap<ITypeBinding, ITypeBinding>();
+        final Map<ITypeBinding, ITypeBinding> results= new HashMap<>();
         for (int i= 0; i < genericTypeParams.length && i < typeParams.length; i++) {
             results.put(genericTypeParams[i], typeParams[i]);
         }
@@ -1992,7 +1990,7 @@ public final class ASTNodes {
      *         provided method binding
      */
     public static Set<IMethodBinding> getOverridenMethods(IMethodBinding overridingMethod) {
-        final Set<IMethodBinding> results= new HashSet<IMethodBinding>();
+        final Set<IMethodBinding> results= new HashSet<>();
         findOverridenMethods(overridingMethod, results, overridingMethod.getDeclaringClass());
         return results;
     }
@@ -2285,7 +2283,7 @@ public final class ASTNodes {
         }
         switch (node1.getNodeType()) {
         case THIS_EXPRESSION:
-            return node2.getNodeType() == ASTNode.THIS_EXPRESSION;
+            return node2.getNodeType() == THIS_EXPRESSION;
         case SIMPLE_NAME:
             final SimpleName sn= (SimpleName) node1;
             switch (node2.getNodeType()) {

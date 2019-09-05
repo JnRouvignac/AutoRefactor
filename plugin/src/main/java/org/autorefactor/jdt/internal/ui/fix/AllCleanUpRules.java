@@ -47,7 +47,7 @@ public final class AllCleanUpRules {
      *         preferences
      */
     public static List<RefactoringRule> getConfiguredRefactoringRules(final Preferences preferences) {
-        final List<RefactoringRule> refactorings= AllCleanUpRules.getAllCleanUpRules();
+        final List<RefactoringRule> refactorings= getAllCleanUpRules();
         for (final Iterator<RefactoringRule> iter= refactorings.iterator(); iter.hasNext();) {
             final RefactoringRule refactoring= iter.next();
             if (!refactoring.isEnabled(preferences)) {
@@ -63,7 +63,7 @@ public final class AllCleanUpRules {
      * @return all the available cleanup rules
      */
     public static List<RefactoringRule> getAllCleanUpRules() {
-        return AllCleanUpRules.newArrayList(new IntPrimitiveRatherThanWrapperCleanUp(), new ShortPrimitiveRatherThanWrapperCleanUp(),
+        return newArrayList(new IntPrimitiveRatherThanWrapperCleanUp(), new ShortPrimitiveRatherThanWrapperCleanUp(),
                 new LongPrimitiveRatherThanWrapperCleanUp(), new DoublePrimitiveRatherThanWrapperCleanUp(),
                 new FloatPrimitiveRatherThanWrapperCleanUp(), new CharPrimitiveRatherThanWrapperCleanUp(),
                 new BytePrimitiveRatherThanWrapperCleanUp(), new RemoveUselessNullCheckCleanUp(),

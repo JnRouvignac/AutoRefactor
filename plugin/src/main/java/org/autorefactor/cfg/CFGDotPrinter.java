@@ -63,8 +63,8 @@ public class CFGDotPrinter {
     private static final class CFGSubGraph {
         private final String codeExcerpt;
         private final int startPosition;
-        final Set<CFGBasicBlock> blocks= new TreeSet<CFGBasicBlock>();
-        final List<CFGSubGraph> subGraphs= new ArrayList<CFGSubGraph>();
+        final Set<CFGBasicBlock> blocks= new TreeSet<>();
+        final List<CFGSubGraph> subGraphs= new ArrayList<>();
 
         public CFGSubGraph(String codeExcerpt, int startPosition) {
             this.codeExcerpt= codeExcerpt;
@@ -89,8 +89,8 @@ public class CFGDotPrinter {
      * @return a String representing the CFG in the dot format.
      */
     public String toDot(final CFGBasicBlock startBlock) {
-        final Map<ASTNode, CFGSubGraph> subGraphs= new HashMap<ASTNode, CFGSubGraph>();
-        final Set<CFGEdge> edges= new TreeSet<CFGEdge>(new CFGEdgeComparator());
+        final Map<ASTNode, CFGSubGraph> subGraphs= new HashMap<>();
+        final Set<CFGEdge> edges= new TreeSet<>(new CFGEdgeComparator());
         collect(startBlock, subGraphs, edges);
         final CFGSubGraph subGraph= subGraphs.get(startBlock.getNode());
 

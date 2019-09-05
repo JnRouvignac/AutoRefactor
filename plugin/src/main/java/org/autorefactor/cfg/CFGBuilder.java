@@ -25,6 +25,55 @@
  */
 package org.autorefactor.cfg;
 
+import static org.eclipse.jdt.core.dom.ASTNode.ARRAY_ACCESS;
+import static org.eclipse.jdt.core.dom.ASTNode.ARRAY_CREATION;
+import static org.eclipse.jdt.core.dom.ASTNode.ARRAY_INITIALIZER;
+import static org.eclipse.jdt.core.dom.ASTNode.ASSERT_STATEMENT;
+import static org.eclipse.jdt.core.dom.ASTNode.ASSIGNMENT;
+import static org.eclipse.jdt.core.dom.ASTNode.BLOCK;
+import static org.eclipse.jdt.core.dom.ASTNode.BOOLEAN_LITERAL;
+import static org.eclipse.jdt.core.dom.ASTNode.BREAK_STATEMENT;
+import static org.eclipse.jdt.core.dom.ASTNode.CAST_EXPRESSION;
+import static org.eclipse.jdt.core.dom.ASTNode.CHARACTER_LITERAL;
+import static org.eclipse.jdt.core.dom.ASTNode.CLASS_INSTANCE_CREATION;
+import static org.eclipse.jdt.core.dom.ASTNode.CONDITIONAL_EXPRESSION;
+import static org.eclipse.jdt.core.dom.ASTNode.CONSTRUCTOR_INVOCATION;
+import static org.eclipse.jdt.core.dom.ASTNode.CONTINUE_STATEMENT;
+import static org.eclipse.jdt.core.dom.ASTNode.DO_STATEMENT;
+import static org.eclipse.jdt.core.dom.ASTNode.EMPTY_STATEMENT;
+import static org.eclipse.jdt.core.dom.ASTNode.ENHANCED_FOR_STATEMENT;
+import static org.eclipse.jdt.core.dom.ASTNode.EXPRESSION_STATEMENT;
+import static org.eclipse.jdt.core.dom.ASTNode.FIELD_ACCESS;
+import static org.eclipse.jdt.core.dom.ASTNode.FOR_STATEMENT;
+import static org.eclipse.jdt.core.dom.ASTNode.IF_STATEMENT;
+import static org.eclipse.jdt.core.dom.ASTNode.INFIX_EXPRESSION;
+import static org.eclipse.jdt.core.dom.ASTNode.INSTANCEOF_EXPRESSION;
+import static org.eclipse.jdt.core.dom.ASTNode.LABELED_STATEMENT;
+import static org.eclipse.jdt.core.dom.ASTNode.METHOD_INVOCATION;
+import static org.eclipse.jdt.core.dom.ASTNode.NULL_LITERAL;
+import static org.eclipse.jdt.core.dom.ASTNode.NUMBER_LITERAL;
+import static org.eclipse.jdt.core.dom.ASTNode.PARENTHESIZED_EXPRESSION;
+import static org.eclipse.jdt.core.dom.ASTNode.POSTFIX_EXPRESSION;
+import static org.eclipse.jdt.core.dom.ASTNode.PREFIX_EXPRESSION;
+import static org.eclipse.jdt.core.dom.ASTNode.QUALIFIED_NAME;
+import static org.eclipse.jdt.core.dom.ASTNode.RETURN_STATEMENT;
+import static org.eclipse.jdt.core.dom.ASTNode.SIMPLE_NAME;
+import static org.eclipse.jdt.core.dom.ASTNode.STRING_LITERAL;
+import static org.eclipse.jdt.core.dom.ASTNode.SUPER_CONSTRUCTOR_INVOCATION;
+import static org.eclipse.jdt.core.dom.ASTNode.SUPER_FIELD_ACCESS;
+import static org.eclipse.jdt.core.dom.ASTNode.SUPER_METHOD_INVOCATION;
+import static org.eclipse.jdt.core.dom.ASTNode.SWITCH_CASE;
+import static org.eclipse.jdt.core.dom.ASTNode.SWITCH_STATEMENT;
+import static org.eclipse.jdt.core.dom.ASTNode.SYNCHRONIZED_STATEMENT;
+import static org.eclipse.jdt.core.dom.ASTNode.THIS_EXPRESSION;
+import static org.eclipse.jdt.core.dom.ASTNode.THROW_STATEMENT;
+import static org.eclipse.jdt.core.dom.ASTNode.TRY_STATEMENT;
+import static org.eclipse.jdt.core.dom.ASTNode.TYPE_DECLARATION;
+import static org.eclipse.jdt.core.dom.ASTNode.TYPE_LITERAL;
+import static org.eclipse.jdt.core.dom.ASTNode.VARIABLE_DECLARATION_EXPRESSION;
+import static org.eclipse.jdt.core.dom.ASTNode.VARIABLE_DECLARATION_STATEMENT;
+import static org.eclipse.jdt.core.dom.ASTNode.WHILE_STATEMENT;
+
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -127,8 +176,6 @@ import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 import org.eclipse.jdt.core.dom.WhileStatement;
 import org.eclipse.jdt.core.dom.WildcardType;
 
-import static org.eclipse.jdt.core.dom.ASTNode.*;
-
 /**
  * Builds a CFG.
  * <p>
@@ -149,7 +196,7 @@ public class CFGBuilder {
         /**
          * The edges that are live on entering or after finishing analyzing a statement.
          */
-        private final List<CFGEdgeBuilder> liveEdges= new LinkedList<CFGEdgeBuilder>();
+        private final List<CFGEdgeBuilder> liveEdges= new LinkedList<>();
 
         private LivenessState() {
             this.liveBasicBlock= null;
@@ -181,7 +228,7 @@ public class CFGBuilder {
         }
 
         private LivenessState copyLiveEdges() {
-            return LivenessState.of(liveEdges);
+            return of(liveEdges);
         }
 
         private LivenessState nextStmtWillCreateNewBlock() {
@@ -229,7 +276,7 @@ public class CFGBuilder {
      * which can send control flow back to any parent statement.
      * </p>
      */
-    private final Map<Statement, Map<CFGEdgeBuilder, Boolean>> edgesToBuild= new HashMap<Statement, Map<CFGEdgeBuilder, Boolean>>();
+    private final Map<Statement, Map<CFGEdgeBuilder, Boolean>> edgesToBuild= new HashMap<>();
     /** The exit block for the CFG being built. */
     private CFGBasicBlock exitBlock;
 
@@ -239,7 +286,7 @@ public class CFGBuilder {
      * Cannot be made static because for {@link ITypeBinding#equals(Object)} to
      * work, all type bindings must have been loaded from the same CompilationUnit.
      */
-    private final Map<String, ITypeBinding> typeBindingsCache= new HashMap<String, ITypeBinding>();
+    private final Map<String, ITypeBinding> typeBindingsCache= new HashMap<>();
 
     /**
      * Builds an instance of this class.
@@ -725,7 +772,7 @@ public class CFGBuilder {
      */
     public List<CFGBasicBlock> buildCFG(TypeDeclaration node) {
         if (!node.isInterface()) {
-            List<CFGBasicBlock> results= new LinkedList<CFGBasicBlock>();
+            List<CFGBasicBlock> results= new LinkedList<>();
             for (FieldDeclaration fieldDecl : node.getFields()) {
                 buildCFG(fieldDecl);
             }
@@ -758,7 +805,7 @@ public class CFGBuilder {
         final LivenessState liveAfterTry= buildCFG(node.getBody(), state, localThrowers);
         final LivenessState liveAfterCatchClauses= new LivenessState();
 
-        final Set<ITypeBinding> caughtExceptions= new HashSet<ITypeBinding>();
+        final Set<ITypeBinding> caughtExceptions= new HashSet<>();
         for (CatchClause catchClause : ASTNodes.catchClauses(node)) {
             final LivenessState catchState= new LivenessState();
             CFGBasicBlock catchBasicBlock= getCFGBasicBlock(catchClause, catchState);
@@ -1042,7 +1089,7 @@ public class CFGBuilder {
 
     private Statement findLabeledParentStatement(ASTNode node) {
         ASTNode n= node;
-        while (n != null && n.getNodeType() != ASTNode.LABELED_STATEMENT) {
+        while (n != null && n.getNodeType() != LABELED_STATEMENT) {
             n= n.getParent();
         }
         if (n != null) {
@@ -1102,9 +1149,9 @@ public class CFGBuilder {
      *         compilation unit
      */
     public List<CFGBasicBlock> buildCFG(CompilationUnit node) {
-        List<CFGBasicBlock> results= new LinkedList<CFGBasicBlock>();
+        List<CFGBasicBlock> results= new LinkedList<>();
         for (AbstractTypeDeclaration decl : (List<AbstractTypeDeclaration>) node.types()) {
-            if (decl.getNodeType() == ASTNode.TYPE_DECLARATION) {
+            if (decl.getNodeType() == TYPE_DECLARATION) {
                 results.addAll(buildCFG((TypeDeclaration) decl));
             } else {
                 throw new NotImplementedException(node);
@@ -1359,7 +1406,7 @@ public class CFGBuilder {
         if (builder != null) {
             Map<CFGEdgeBuilder, Boolean> builders= this.edgesToBuild.get(node);
             if (builders == null) {
-                builders= new HashMap<CFGEdgeBuilder, Boolean>();
+                builders= new HashMap<>();
                 this.edgesToBuild.put(node, builders);
             }
             builders.put(builder, isBreakStatement);
@@ -1659,7 +1706,7 @@ public class CFGBuilder {
         // file starts with line 1
         int lineNo= 1;
         int lastMatchPosition= 0;
-        final Matcher matcher= CFGBuilder.NEWLINE.matcher(source);
+        final Matcher matcher= NEWLINE.matcher(source);
         while (matcher.find()) {
             final MatchResult matchResult= matcher.toMatchResult();
             if (matchResult.end() >= position) {

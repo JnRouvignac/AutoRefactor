@@ -62,10 +62,10 @@ public class ASTCommentRewriter {
      * Using a Set to avoid duplicates because Javadocs are visited twice via
      * CompilationUnit.getCommentList() and visit(Javadoc).
      */
-    private final Set<Comment> removals= new LinkedHashSet<Comment>();
-    private final Set<Pair<Comment, String>> replacements= new LinkedHashSet<Pair<Comment, String>>();
-    private final List<BlockComment> blockCommentToJavadoc= new ArrayList<BlockComment>();
-    private final Map<ASTNode, List<LineComment>> lineCommentsToJavadoc= new HashMap<ASTNode, List<LineComment>>();
+    private final Set<Comment> removals= new LinkedHashSet<>();
+    private final Set<Pair<Comment, String>> replacements= new LinkedHashSet<>();
+    private final List<BlockComment> blockCommentToJavadoc= new ArrayList<>();
+    private final Map<ASTNode, List<LineComment>> lineCommentsToJavadoc= new HashMap<>();
     private final String lineSeparator;
 
     /**
@@ -127,7 +127,7 @@ public class ASTCommentRewriter {
     public void toJavadoc(LineComment lineComment, ASTNode nextNode) {
         List<LineComment> comments= lineCommentsToJavadoc.get(nextNode);
         if (comments == null) {
-            comments= new LinkedList<LineComment>();
+            comments= new LinkedList<>();
             lineCommentsToJavadoc.put(nextNode, comments);
         }
         comments.add(lineComment);
@@ -247,7 +247,7 @@ public class ASTCommentRewriter {
     }
 
     private TreeSet<Integer> getLineStarts(String source) {
-        final TreeSet<Integer> lineStarts= new TreeSet<Integer>();
+        final TreeSet<Integer> lineStarts= new TreeSet<>();
         lineStarts.add(0);
 
         final Matcher matcher= Pattern.compile("\\r\\n|\\r|\\n").matcher(source); //$NON-NLS-1$
@@ -399,7 +399,7 @@ public class ASTCommentRewriter {
 
     private SourceLocation getIndentForJavadoc(LineComment lineComment, String source, TreeSet<Integer> lineStarts) {
         final SourceLocation indentLoc= getIndent(lineComment, lineStarts);
-        final Matcher matcher= ASTCommentRewriter.INDENT.matcher(source).region(indentLoc.getStartPosition(), indentLoc.getEndPosition());
+        final Matcher matcher= INDENT.matcher(source).region(indentLoc.getStartPosition(), indentLoc.getEndPosition());
         if (matcher.matches()) {
             return indentLoc;
         }

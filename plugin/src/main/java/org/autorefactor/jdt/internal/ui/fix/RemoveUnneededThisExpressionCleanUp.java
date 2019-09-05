@@ -70,7 +70,7 @@ public class RemoveUnneededThisExpressionCleanUp extends AbstractCleanUpRule {
     @Override
     public boolean visit(MethodInvocation node) {
         final ThisExpression te= ASTNodes.as(node.getExpression(), ThisExpression.class);
-        if (RemoveUnneededThisExpressionCleanUp.thisExpressionRefersToEnclosingType(te) && isCallingMethodDeclaredInEnclosingType(node)
+        if (thisExpressionRefersToEnclosingType(te) && isCallingMethodDeclaredInEnclosingType(node)
                 && ASTNodes.typeArguments(node).isEmpty()) {
             // Remove useless thisExpressions
             this.ctx.getRefactorings().remove(node.getExpression());
@@ -81,7 +81,7 @@ public class RemoveUnneededThisExpressionCleanUp extends AbstractCleanUpRule {
 
     private static boolean thisExpressionRefersToEnclosingType(ThisExpression thisExpression) {
         return thisExpression != null
-                && RemoveUnneededThisExpressionCleanUp.thisExpressionRefersToEnclosingType(thisExpression.getQualifier(), thisExpression);
+                && thisExpressionRefersToEnclosingType(thisExpression.getQualifier(), thisExpression);
     }
 
     private static boolean thisExpressionRefersToEnclosingType(Name thisQualifierName, ASTNode node) {
@@ -98,7 +98,7 @@ public class RemoveUnneededThisExpressionCleanUp extends AbstractCleanUpRule {
         } else if (thisQualifierName instanceof QualifiedName) {
             final QualifiedName qn= (QualifiedName) thisQualifierName;
             return ASTNodes.isEqual(qn.getName(), ancestor.getName())
-                    && RemoveUnneededThisExpressionCleanUp.thisExpressionRefersToEnclosingType(qn.getQualifier(), ancestor);
+                    && thisExpressionRefersToEnclosingType(qn.getQualifier(), ancestor);
         }
         throw new NotImplementedException(thisQualifierName);
     }

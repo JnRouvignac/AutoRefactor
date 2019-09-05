@@ -1,10 +1,9 @@
 package org.autorefactor.refactoring;
 
-import org.junit.Test;
-
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import org.autorefactor.jdt.internal.corext.dom.Release;
+import org.junit.Test;
 
 public class ReleaseTest {
     @Test

@@ -39,7 +39,7 @@ import org.eclipse.jdt.core.dom.Statement;
  * See {@link #getDescription()} method.
  */
 public class JUnitAssertCleanUp extends AbstractUnitTestCleanUp {
-    private static final String[] PACKAGE_PATHES= new String[] { "junit.framework.", "org.junit." }; //$NON-NLS-1$ $NON-NLS-2$
+    private static final String[] PACKAGE_PATHES= { "junit.framework.", "org.junit." }; //$NON-NLS-1$ $NON-NLS-2$
 
     /**
      * Get the name.
@@ -84,8 +84,8 @@ public class JUnitAssertCleanUp extends AbstractUnitTestCleanUp {
         final List<Expression> args= ASTNodes.arguments(node);
         int i= 0;
         boolean shouldVisit= true;
-        while (shouldVisit && i < JUnitAssertCleanUp.PACKAGE_PATHES.length) {
-            shouldVisit= maybeRefactorMethod(node, JUnitAssertCleanUp.PACKAGE_PATHES[i], args);
+        while (shouldVisit && i < PACKAGE_PATHES.length) {
+            shouldVisit= maybeRefactorMethod(node, PACKAGE_PATHES[i], args);
             i++;
         }
         return shouldVisit;
@@ -121,8 +121,8 @@ public class JUnitAssertCleanUp extends AbstractUnitTestCleanUp {
             final MethodInvocation mi= ASTNodes.asExpression(statements.get(0), MethodInvocation.class);
             int i= 0;
             boolean shouldVisit= true;
-            while (shouldVisit && i < JUnitAssertCleanUp.PACKAGE_PATHES.length) {
-                shouldVisit= maybeRefactorIf(node, mi, JUnitAssertCleanUp.PACKAGE_PATHES[i]);
+            while (shouldVisit && i < PACKAGE_PATHES.length) {
+                shouldVisit= maybeRefactorIf(node, mi, PACKAGE_PATHES[i]);
                 i++;
             }
             return shouldVisit;

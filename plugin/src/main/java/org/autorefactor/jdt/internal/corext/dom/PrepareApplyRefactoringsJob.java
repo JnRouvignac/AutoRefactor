@@ -57,7 +57,7 @@ import org.eclipse.jdt.core.JavaModelException;
 public class PrepareApplyRefactoringsJob extends Job {
     private final List<IJavaElement> javaElements;
     private final List<RefactoringRule> refactoringRulesToApply;
-    private final Map<IJavaElement, JavaProjectOptions> javaProjects= new HashMap<IJavaElement, JavaProjectOptions>();
+    private final Map<IJavaElement, JavaProjectOptions> javaProjects= new HashMap<>();
     private final Environment environment;
 
     /**
@@ -136,7 +136,7 @@ public class PrepareApplyRefactoringsJob extends Job {
 
     private Queue<RefactoringUnit> collectRefactoringUnits(List<IJavaElement> javaElements, IProgressMonitor monitor) {
         try {
-            final Queue<RefactoringUnit> results= new ConcurrentLinkedQueue<RefactoringUnit>();
+            final Queue<RefactoringUnit> results= new ConcurrentLinkedQueue<>();
             addAll(results, javaElements, monitor);
             return results;
         } catch (Exception e) {
@@ -186,7 +186,7 @@ public class PrepareApplyRefactoringsJob extends Job {
     }
 
     private JavaProjectOptions getJavaProjectOptions(IJavaElement javaElement) {
-        final IJavaProject javaProject= PrepareApplyRefactoringsJob.getIJavaProject(javaElement);
+        final IJavaProject javaProject= getIJavaProject(javaElement);
         JavaProjectOptions options= javaProjects.get(javaProject);
         if (options == null) {
             options= new JavaProjectOptionsImpl(javaProject.getOptions(true));
@@ -204,7 +204,7 @@ public class PrepareApplyRefactoringsJob extends Job {
     public static IJavaProject getIJavaProject(IJavaElement javaElement) {
         if (javaElement instanceof ICompilationUnit || javaElement instanceof IPackageFragment
                 || javaElement instanceof IPackageFragmentRoot) {
-            return PrepareApplyRefactoringsJob.getIJavaProject(javaElement.getParent());
+            return getIJavaProject(javaElement.getParent());
         } else if (javaElement instanceof IJavaProject) {
             return (IJavaProject) javaElement;
         }
@@ -212,7 +212,7 @@ public class PrepareApplyRefactoringsJob extends Job {
     }
 
     private List<IJavaElement> getSubPackages(IPackageFragment motherPackage) throws JavaModelException {
-        List<IJavaElement> subPackages= new ArrayList<IJavaElement>();
+        List<IJavaElement> subPackages= new ArrayList<>();
         String packageName= motherPackage.getElementName();
         IJavaElement[] packages= ((IPackageFragmentRoot) motherPackage.getParent()).getChildren();
 

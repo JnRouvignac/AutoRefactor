@@ -57,13 +57,10 @@ import org.eclipse.jdt.core.dom.TypeMethodReference;
 /** See {@link #getDescription()} method. */
 public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportCleanUp {
     private final class RefactoringWithObjectsClass extends CleanUpWithNewClassImport {
-
         @Override
         public boolean visit(final ClassInstanceCreation node) {
-            final boolean isSubTreeToVisit= LambdaExpressionRatherThanComparatorCleanUp.this
+            return LambdaExpressionRatherThanComparatorCleanUp.this
                     .maybeRefactorClassInstanceCreation(node, getClassesToUseWithImport(), getImportsToAdd());
-
-            return isSubTreeToVisit;
         }
     }
 
@@ -101,7 +98,7 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
 
     @Override
     public Set<String> getClassesToImport() {
-        return new HashSet<String>(Arrays.asList(Comparator.class.getCanonicalName()));
+        return new HashSet<>(Arrays.asList(Comparator.class.getCanonicalName()));
     }
 
     @Override
@@ -131,7 +128,7 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
             if (bodies != null && bodies.size() == 1 && typeArgument != null) {
                 final BodyDeclaration body= bodies.get(0);
 
-                if (body != null && body instanceof MethodDeclaration) {
+                if (body instanceof MethodDeclaration) {
                     return maybeRefactorMethod(node, typeArgument, body, classesToUseWithImport);
                 }
             }

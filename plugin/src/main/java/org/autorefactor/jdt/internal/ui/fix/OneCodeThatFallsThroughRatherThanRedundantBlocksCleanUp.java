@@ -95,7 +95,7 @@ public class OneCodeThatFallsThroughRatherThanRedundantBlocksCleanUp extends Abs
                 return true;
             }
 
-            final List<Statement> redundantStatements= new ArrayList<Statement>();
+            final List<Statement> redundantStatements= new ArrayList<>();
             collectStatements(node, redundantStatements);
             return maybeRemoveRedundantCode(node, redundantStatements);
         }
@@ -140,7 +140,7 @@ public class OneCodeThatFallsThroughRatherThanRedundantBlocksCleanUp extends Abs
                 return true;
             }
 
-            final List<Statement> referenceStatements= new ArrayList<Statement>();
+            final List<Statement> referenceStatements= new ArrayList<>();
 
             Statement nextSibling= ASTNodes.getNextSibling(node);
             while (nextSibling != null && !ASTNodes.fallsThrough(nextSibling)) {

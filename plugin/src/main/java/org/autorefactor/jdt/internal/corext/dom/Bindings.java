@@ -36,7 +36,6 @@ public final class Bindings {
      * Forbidden.
      */
     private Bindings() {
-        super();
     }
 
     /**
@@ -120,7 +119,7 @@ public final class Bindings {
         if (!type.isPrimitive()) {
             return type;
         }
-        String boxedTypeName= Bindings.getBoxedTypeName(type.getName());
+        String boxedTypeName= getBoxedTypeName(type.getName());
         if (boxedTypeName == null) {
             return type;
         }

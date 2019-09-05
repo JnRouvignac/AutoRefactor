@@ -29,6 +29,7 @@ package org.autorefactor.jdt.internal.ui.fix;
 import static org.eclipse.jdt.core.dom.ASTNode.FIELD_ACCESS;
 import static org.eclipse.jdt.core.dom.ASTNode.QUALIFIED_NAME;
 import static org.eclipse.jdt.core.dom.ASTNode.SIMPLE_NAME;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -104,7 +105,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
             return maybeRefactorAppending(node);
         } else if (ASTNodes.usesGivenSignature(node, StringBuilder.class.getCanonicalName(), "toString") //$NON-NLS-1$
                 || ASTNodes.usesGivenSignature(node, StringBuffer.class.getCanonicalName(), "toString")) { //$NON-NLS-1$
-            final LinkedList<Pair<ITypeBinding, Expression>> allAppendedStrings= new LinkedList<Pair<ITypeBinding, Expression>>();
+            final LinkedList<Pair<ITypeBinding, Expression>> allAppendedStrings= new LinkedList<>();
             final Expression lastExpression= readAppendMethod(node.getExpression(), allAppendedStrings,
                     new AtomicBoolean(false), new AtomicBoolean(false));
             if (lastExpression instanceof ClassInstanceCreation) {
@@ -132,7 +133,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
     }
 
     private boolean maybeRefactorAppending(Expression node) {
-        final LinkedList<Pair<ITypeBinding, Expression>> allAppendedStrings= new LinkedList<Pair<ITypeBinding, Expression>>();
+        final LinkedList<Pair<ITypeBinding, Expression>> allAppendedStrings= new LinkedList<>();
         final AtomicBoolean isRefactoringNeeded= new AtomicBoolean(false);
         final AtomicBoolean isInstanceCreationToRewrite= new AtomicBoolean(false);
         final Expression lastExpression= readAppendMethod(node, allAppendedStrings, isRefactoringNeeded,
@@ -197,7 +198,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
             final InfixExpression ie= (InfixExpression) arg;
             if (isStringConcat(ie)) {
                 if (ie.hasExtendedOperands()) {
-                    final List<Expression> reversed= new ArrayList<Expression>(ASTNodes.extendedOperands(ie));
+                    final List<Expression> reversed= new ArrayList<>(ASTNodes.extendedOperands(ie));
                     Collections.reverse(reversed);
 
                     if (isValuedStringLiteralOrConstant(reversed.get(0)) && !results.isEmpty()
@@ -311,8 +312,8 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
         final ASTNodeFactory b= this.ctx.getASTBuilder();
 
         Expression result= null;
-        final List<Expression> tempStringLiterals= new ArrayList<Expression>();
-        final List<Expression> finalStrings= new ArrayList<Expression>();
+        final List<Expression> tempStringLiterals= new ArrayList<>();
+        final List<Expression> finalStrings= new ArrayList<>();
         final AtomicBoolean isFirst= new AtomicBoolean(true);
 
         for (Pair<ITypeBinding, Expression> appendedString : allAppendedStrings) {
@@ -463,7 +464,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
     @Override
     public boolean visit(InfixExpression node) {
         if (isStringConcat(node)) {
-            final LinkedList<Pair<ITypeBinding, Expression>> allOperands= new LinkedList<Pair<ITypeBinding, Expression>>();
+            final LinkedList<Pair<ITypeBinding, Expression>> allOperands= new LinkedList<>();
             readSubExpressions(node, allOperands, new AtomicBoolean(false));
             boolean replaceNeeded= filterOutEmptyStringsFromStringConcat(allOperands);
             if (replaceNeeded) {
@@ -481,14 +482,8 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
             Pair<ITypeBinding, Expression> expression= allOperands.get(i);
             boolean canNowRemoveEmptyStrings= canRemoveEmptyStrings || ASTNodes.hasType(expression.getSecond(), String.class.getCanonicalName());
             if (isEmptyString(expression.getSecond())) {
-                boolean removeExpression= false;
-                if (canRemoveEmptyStrings) {
-                    removeExpression= true;
-                } else if (canNowRemoveEmptyStrings && i + 1 < allOperands.size()
-                        && ASTNodes.hasType(allOperands.get(i + 1).getSecond(), String.class.getCanonicalName())) {
-                    removeExpression= true;
-                }
-
+                boolean removeExpression= canRemoveEmptyStrings || (canNowRemoveEmptyStrings && i + 1 < allOperands.size()
+                        && ASTNodes.hasType(allOperands.get(i + 1).getSecond(), String.class.getCanonicalName()));
                 if (removeExpression) {
                     allOperands.remove(i);
                     replaceNeeded= true;

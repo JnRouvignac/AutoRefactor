@@ -83,7 +83,7 @@ public final class EnumSetRatherThanHashSetCleanUp extends AbstractEnumCollectio
 
     @Override
     public Set<String> getClassesToImport() {
-        return new HashSet<String>(Arrays.asList(EnumSet.class.getCanonicalName()));
+        return new HashSet<>(Arrays.asList(EnumSet.class.getCanonicalName()));
     }
 
     /**

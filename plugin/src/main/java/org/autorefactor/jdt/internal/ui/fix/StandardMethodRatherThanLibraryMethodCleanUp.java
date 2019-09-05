@@ -43,7 +43,6 @@ import org.eclipse.jdt.core.dom.Name;
 /** See {@link #getDescription()} method. */
 public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImportCleanUp {
     private final class RefactoringWithObjectsClass extends CleanUpWithNewClassImport {
-
         @Override
         public boolean visit(final MethodInvocation node) {
             return StandardMethodRatherThanLibraryMethodCleanUp.this.maybeRefactorMethodInvocation(node,
@@ -85,7 +84,7 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
 
     @Override
     public Set<String> getClassesToImport() {
-        return new HashSet<String>(Arrays.asList("java.util.Objects")); //$NON-NLS-1$
+        return new HashSet<>(Arrays.asList("java.util.Objects")); //$NON-NLS-1$
     }
 
     @Override
