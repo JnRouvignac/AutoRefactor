@@ -25,6 +25,7 @@
  */
 package org.autorefactor;
 
+import java.util.ArrayList;
 import java.util.Vector;
 
 import org.autorefactor.environment.Environment;
@@ -162,7 +163,7 @@ public class AutoRefactorPlugin extends AbstractUIPlugin {
     }
 
     private static class JobManagerImpl implements JobManager {
-        private final Vector<Job> jobs= new Vector<>();
+        private final ArrayList<Job> jobs= new  ArrayList<>();
 
         /**
          * Register a job.
