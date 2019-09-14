@@ -93,6 +93,7 @@ import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Name;
 import org.eclipse.jdt.core.dom.NormalAnnotation;
 import org.eclipse.jdt.core.dom.NullLiteral;
+import org.eclipse.jdt.core.dom.NumberLiteral;
 import org.eclipse.jdt.core.dom.ParameterizedType;
 import org.eclipse.jdt.core.dom.ParenthesizedExpression;
 import org.eclipse.jdt.core.dom.PostfixExpression;
@@ -1506,6 +1507,53 @@ public final class ASTNodes {
         } else {
             return false;
         }
+    }
+
+    /**
+     * Integer literal.
+     *
+     * @param input The input
+     * @return Integer literal.
+     */
+    public static Long integerLiteral(Expression input) {
+        NumberLiteral contant= as(input, NumberLiteral.class);
+        PrefixExpression negativeContant= as(input, PrefixExpression.class);
+
+        if (negativeContant != null && hasOperator(negativeContant, PrefixExpression.Operator.MINUS)) {
+            Long value= integerLiteral(negativeContant.getOperand());
+
+            if (value != null) {
+                return -value;
+            }
+        } else if (contant != null) {
+            return positiveLiteral(contant);
+        }
+
+        return null;
+    }
+
+    /**
+     * Positive literal.
+     *
+     * @param input The input
+     * @return Positive literal.
+     */
+    public static Long positiveLiteral(NumberLiteral input) {
+        Object number= input.resolveConstantExpressionValue();
+
+        if (number instanceof Short) {
+            return (long) ((Short) number).intValue();
+        }
+
+        if (number instanceof Integer) {
+            return (long) ((Integer) number).intValue();
+        }
+
+        if (number instanceof Long) {
+            return ((Long) number).longValue();
+        }
+
+        return null;
     }
 
     /**

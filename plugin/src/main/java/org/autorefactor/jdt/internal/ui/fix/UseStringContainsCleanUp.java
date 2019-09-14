@@ -2,6 +2,7 @@
  * AutoRefactor - Eclipse plugin to automatically refactor Java code bases.
  *
  * Copyright (C) 2014-2015 Jean-Noël Rouvignac - initial API and implementation
+ * Copyright (C) 2019 Fabrice Tiercelin - Correctly flag the visited nodes and do not reverse the condition
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,7 +29,6 @@ package org.autorefactor.jdt.internal.ui.fix;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.Refactorings;
-import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
@@ -63,49 +63,56 @@ public class UseStringContainsCleanUp extends AbstractCleanUpRule {
     }
 
     @Override
-    public boolean visit(MethodInvocation node) {
-        final ASTNode parent= getFirstAncestorWithoutParentheses(node);
-        if (parent instanceof InfixExpression && (ASTNodes.usesGivenSignature(node, String.class.getCanonicalName(), "indexOf", String.class.getCanonicalName()) //$NON-NLS-1$
-                || ASTNodes.usesGivenSignature(node, String.class.getCanonicalName(), "lastIndexOf", String.class.getCanonicalName()))) { //$NON-NLS-1$
-            final InfixExpression ie= (InfixExpression) parent;
-            if (is(ie, node, InfixExpression.Operator.GREATER_EQUALS, 0)) {
-                return replaceWithStringContains(ie, node, false);
-            } else if (is(ie, node, InfixExpression.Operator.LESS, 0)) {
-                return replaceWithStringContains(ie, node, true);
-            } else if (is(ie, node, InfixExpression.Operator.NOT_EQUALS, -1)) {
-                return replaceWithStringContains(ie, node, false);
-            } else if (is(ie, node, InfixExpression.Operator.EQUALS, -1)) {
-                return replaceWithStringContains(ie, node, true);
-            }
+    public boolean visit(InfixExpression node) {
+        if (!node.hasExtendedOperands()) {
+            Expression leftOperand= ASTNodes.getUnparenthesedExpression(node.getLeftOperand());
+            Expression rightOperand= ASTNodes.getUnparenthesedExpression(node.getRightOperand());
+
+            return maybeRefactor(node, leftOperand, rightOperand, true)
+                    && maybeRefactor(node, rightOperand, leftOperand, false);
         }
+
         return true;
     }
 
-    private boolean replaceWithStringContains(InfixExpression ie, MethodInvocation node, boolean negate) {
+    private boolean maybeRefactor(InfixExpression node, Expression operand1, Expression operand2,
+            boolean isMethodOnTheLeft) {
+        MethodInvocation indexOf= ASTNodes.as(operand1, MethodInvocation.class);
+        Long value= ASTNodes.integerLiteral(operand2);
+
+        if (indexOf != null
+                && value != null
+                && (ASTNodes.usesGivenSignature(indexOf, String.class.getCanonicalName(), "indexOf", String.class.getCanonicalName()) //$NON-NLS-1$
+                        || ASTNodes.usesGivenSignature(indexOf, String.class.getCanonicalName(), "lastIndexOf", String.class.getCanonicalName()))) { //$NON-NLS-1$
+
+            if (is(node, isMethodOnTheLeft ? InfixExpression.Operator.GREATER_EQUALS : InfixExpression.Operator.LESS_EQUALS, value, 0)
+                    || is(node, InfixExpression.Operator.NOT_EQUALS, value, -1)) {
+                replaceWithStringContains(node, indexOf, false);
+                return false;
+            } else if (is(node, isMethodOnTheLeft ? InfixExpression.Operator.LESS : InfixExpression.Operator.GREATER, value, 0)
+                    || is(node, InfixExpression.Operator.EQUALS, value, -1)) {
+                replaceWithStringContains(node, indexOf, true);
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private boolean is(final InfixExpression ie, InfixExpression.Operator operator, Long number, int constant) {
+        return ASTNodes.hasOperator(ie, operator)
+                && ((long) number) == constant;
+    }
+
+    private void replaceWithStringContains(InfixExpression ie, MethodInvocation node, boolean negate) {
         final Refactorings r= this.ctx.getRefactorings();
         final ASTNodeFactory b= this.ctx.getASTBuilder();
         r.set(node, MethodInvocation.NAME_PROPERTY, b.simpleName("contains")); //$NON-NLS-1$
+
         if (negate) {
             r.replace(ie, b.not(b.move(node)));
         } else {
             r.replace(ie, b.move(node));
         }
-        return false;
-    }
-
-    private boolean is(final InfixExpression ie, MethodInvocation node, InfixExpression.Operator operator, Integer constant) {
-        final Expression leftOp= ASTNodes.getUnparenthesedExpression(ie.getLeftOperand());
-        final Expression rightOp= ASTNodes.getUnparenthesedExpression(ie.getRightOperand());
-        return ASTNodes.hasOperator(ie, operator)
-                && ((leftOp.equals(node) && constant.equals(rightOp.resolveConstantExpressionValue()))
-                        || (rightOp.equals(node) && constant.equals(leftOp.resolveConstantExpressionValue())));
-    }
-
-    private ASTNode getFirstAncestorWithoutParentheses(ASTNode node) {
-        final ASTNode parent= node.getParent();
-        if (node.getNodeType() == ASTNode.PARENTHESIZED_EXPRESSION) {
-            return getFirstAncestorWithoutParentheses(parent);
-        }
-        return parent;
     }
 }

@@ -26,52 +26,45 @@
 package org.autorefactor.jdt.internal.ui.fix.samples_in;
 
 public class UseStringContainsSample {
-
-    private boolean replaceStringIndexOfGreaterThanOrEqual(String s) {
+    public boolean replaceStringIndexOf(String s) {
         // Keep this comment
-        return s.indexOf("test") >= 0;
+        boolean b1 = s.indexOf("test") >= 0;
+        // Keep this comment
+        boolean b2 = s.indexOf("test") < 0;
+        // Keep this comment
+        boolean b3 = s.indexOf("test") != -1;
+        // Keep this comment
+        boolean b4 = s.indexOf("test") == -1;
+        // Keep this comment
+        boolean b5 = 0 <= s.indexOf("test");
+        // Keep this comment
+        boolean b6 = 0 > s.indexOf("test");
+
+        return b1 && b2 && b3 && b4 && b5 && b6;
     }
 
-    private boolean replaceStringIndexOfLesserThan(String s) {
+    public boolean replaceStringLastIndexOf(String s) {
         // Keep this comment
-        return s.indexOf("test") < 0;
+        boolean b1 = s.lastIndexOf("test") >= 0;
+        // Keep this comment
+        boolean b2 = s.lastIndexOf("test") < 0;
+        // Keep this comment
+        boolean b3 = s.lastIndexOf("test") != -1;
+        // Keep this comment
+        boolean b4 = s.lastIndexOf("test") == -1;
+        // Keep this comment
+        boolean b5 = 0 <= s.lastIndexOf("test");
+        // Keep this comment
+        boolean b6 = 0 > s.lastIndexOf("test");
+
+        return b1 && b2 && b3 && b4 && b5 && b6;
     }
 
-    private boolean replaceStringIndexOfNotEqualsMinusOne(String s) {
-        // Keep this comment
-        return s.indexOf("test") != -1;
-    }
-
-    private boolean replaceStringIndexOfEqualsMinusOne(String s) {
-        // Keep this comment
-        return s.indexOf("test") == -1;
-    }
-
-    private boolean replaceStringLastIndexOfGreaterThanOrEqual(String s) {
-        // Keep this comment
-        return s.lastIndexOf("test") >= 0;
-    }
-
-    private boolean replaceStringLastIndexOfLesserThan(String s) {
-        // Keep this comment
-        return s.lastIndexOf("test") < 0;
-    }
-
-    private boolean replaceStringLastIndexOfNotEqualsMinusOne(String s) {
-        // Keep this comment
-        return s.lastIndexOf("test") != -1;
-    }
-
-    private boolean replaceStringLastIndexOfEqualsMinusOne(String s) {
-        // Keep this comment
-        return s.lastIndexOf("test") == -1;
-    }
-
-    private boolean doNotReplaceStringIndexOfCharacter(String s) {
+    public boolean doNotReplaceStringIndexOfCharacter(String s) {
         return s.indexOf(':') >= 0;
     }
 
-    private boolean doNotReplaceStringLastIndexOfCharacter(String s) {
+    public boolean doNotReplaceStringLastIndexOfCharacter(String s) {
         return s.lastIndexOf(':') >= 0;
     }
 }

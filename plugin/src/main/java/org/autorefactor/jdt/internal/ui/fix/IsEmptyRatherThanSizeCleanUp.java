@@ -32,7 +32,6 @@ import java.util.Map;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.Refactorings;
-import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 
@@ -72,7 +71,7 @@ public class IsEmptyRatherThanSizeCleanUp extends AbstractCleanUpRule {
     @Override
     public boolean visit(InfixExpression node) {
         final MethodInvocation leftMi= ASTNodes.as(node.getLeftOperand(), MethodInvocation.class);
-        final Long rightLiteral= asNumber(node.getRightOperand());
+        final Long rightLiteral= ASTNodes.integerLiteral(node.getRightOperand());
 
         if (!maybeReplaceCollectionSize(node, leftMi, node.getOperator(),
                 rightLiteral)) {
@@ -80,7 +79,7 @@ public class IsEmptyRatherThanSizeCleanUp extends AbstractCleanUpRule {
         }
 
         final MethodInvocation rightMi= ASTNodes.as(node.getRightOperand(), MethodInvocation.class);
-        final Long leftLiteral= asNumber(node.getLeftOperand());
+        final Long leftLiteral= ASTNodes.integerLiteral(node.getLeftOperand());
 
         return maybeReplaceCollectionSize(node, rightMi, sign(node.getOperator()), leftLiteral);
     }
@@ -125,19 +124,6 @@ public class IsEmptyRatherThanSizeCleanUp extends AbstractCleanUpRule {
         }
 
         return true;
-    }
-
-    private Long asNumber(final Expression expression) {
-        Long longValue= null;
-        if (expression != null) {
-            final Object val= expression.resolveConstantExpressionValue();
-            if (val instanceof Integer) {
-                longValue= (long) ((Integer) val).intValue();
-            } else if (val instanceof Long) {
-                longValue= (Long) val;
-            }
-        }
-        return longValue;
     }
 
     private InfixExpression.Operator sign(final InfixExpression.Operator operator) {
