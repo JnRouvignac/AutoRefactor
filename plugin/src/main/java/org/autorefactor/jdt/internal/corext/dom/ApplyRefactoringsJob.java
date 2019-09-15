@@ -111,7 +111,7 @@ public class ApplyRefactoringsJob extends Job {
         final SubMonitor loopMonitor= SubMonitor.convert(monitor, refactoringUnits.size());
         try {
             RefactoringUnit toRefactor;
-            while ((toRefactor= refactoringUnits.poll()) != null) {
+            while ((toRefactor= refactoringUnits.poll()) != null && !loopMonitor.isCanceled()) {
                 final ICompilationUnit compilationUnit= toRefactor.getCompilationUnit();
                 final JavaProjectOptions options= toRefactor.getOptions();
                 try {
