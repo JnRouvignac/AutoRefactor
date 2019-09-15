@@ -27,57 +27,89 @@ package org.autorefactor.jdt.internal.ui.fix.samples_in;
 
 import java.util.Comparator;
 
-public class ComparisonSample {
+import com.google.common.primitives.Doubles;
+
+public class ComparisonSample implements Comparator<Double> {
     public boolean refactorComparableComparingToZero() {
-        boolean b;
+        boolean b = true;
         final String s = "";
 
         // Valid, do no change these ones
-        b = s.compareTo("smaller") < 0;
-        b = s.compareTo("smaller") <= 0;
-        b = s.compareTo("equal") == 0;
-        b = s.compareTo("different") != 0;
-        b = s.compareTo("greater") >= 0;
-        b = s.compareTo("greater") > 0;
-        b = s.compareToIgnoreCase("equal") == 0;
+        b &= s.compareTo("smaller") < 0;
+        b &= s.compareTo("smaller") <= 0;
+        b &= s.compareTo("equal") == 0;
+        b &= s.compareTo("different") != 0;
+        b &= s.compareTo("greater") >= 0;
+        b &= s.compareTo("greater") > 0;
+        b &= s.compareToIgnoreCase("equal") == 0;
 
         // Invalid, refactor them
-        b = s.compareTo("smaller") == -1;
-        b = s.compareTo("greater") != -1;
-        b = s.compareTo("smaller") != 1;
-        b = (s.compareTo("greater")) == 1;
-        b = (s.compareToIgnoreCase("greater")) == 1;
-        b = -1 == (s.compareTo("smaller"));
-        b = -1 != s.compareTo("greater");
-        b = 1 != s.compareTo("smaller");
-        b = 1 == s.compareTo("greater");
-        b = 1 == s.compareToIgnoreCase("greater");
+        b &= s.compareTo("smaller") == -1;
+        b &= s.compareTo("greater") != -1;
+        b &= s.compareTo("smaller") != 1;
+        b &= (s.compareTo("greater")) == 1;
+        b &= (s.compareToIgnoreCase("greater")) == 1;
+        b &= -1 == (s.compareTo("smaller"));
+        b &= -1 != s.compareTo("greater");
+        b &= 1 != s.compareTo("smaller");
+        b &= 1 == s.compareTo("greater");
+        b &= 1 == s.compareToIgnoreCase("greater");
 
         return b;
     }
 
     public boolean refactorComparatorComparingToZero(Comparator<String> comparator) {
-        boolean b;
+        boolean b = true;
         final String s = "";
 
         // Valid, do no change these ones
-        b = comparator.compare(s, "smaller") < 0;
-        b = comparator.compare(s, "smaller") <= 0;
-        b = comparator.compare(s, "equal") == 0;
-        b = comparator.compare(s, "different") != 0;
-        b = comparator.compare(s, "greater") >= 0;
-        b = comparator.compare(s, "greater") > 0;
+        b &= comparator.compare(s, "smaller") < 0;
+        b &= comparator.compare(s, "smaller") <= 0;
+        b &= comparator.compare(s, "equal") == 0;
+        b &= comparator.compare(s, "different") != 0;
+        b &= comparator.compare(s, "greater") >= 0;
+        b &= comparator.compare(s, "greater") > 0;
 
         // Invalid, refactor them
-        b = comparator.compare(s, "smaller") == -1;
-        b = comparator.compare(s, "greater") != -1;
-        b = comparator.compare(s, "smaller") != 1;
-        b = (comparator.compare(s, "greater")) == 1;
-        b = -1 == (comparator.compare(s, "smaller"));
-        b = -1 != comparator.compare(s, "greater");
-        b = 1 != comparator.compare(s, "smaller");
-        b = 1 == comparator.compare(s, "greater");
+        b &= comparator.compare(s, "smaller") == -1;
+        b &= comparator.compare(s, "greater") != -1;
+        b &= comparator.compare(s, "smaller") != 1;
+        b &= (comparator.compare(s, "greater")) == 1;
+        b &= -1 == (comparator.compare(s, "smaller"));
+        b &= -1 != comparator.compare(s, "greater");
+        b &= 1 != comparator.compare(s, "smaller");
+        b &= 1 == comparator.compare(s, "greater");
 
         return b;
+    }
+
+    public boolean refactorLocalComparingToZero() {
+        boolean b = true;
+        final Double s = 123d;
+
+        // Valid, do no change these ones
+        b &= compare(s, 100d) < 0;
+        b &= compare(s, 100d) <= 0;
+        b &= compare(s, 123d) == 0;
+        b &= compare(s, 321d) != 0;
+        b &= compare(s, 200d) >= 0;
+        b &= compare(s, 200d) > 0;
+
+        // Invalid, refactor them
+        b &= compare(s, 100d) == -1;
+        b &= compare(s, 200d) != -1;
+        b &= compare(s, 100d) != 1;
+        b &= (compare(s, 200d)) == 1;
+        b &= -1 == (compare(s, 100d));
+        b &= -1 != compare(s, 200d);
+        b &= 1 != compare(s, 100d);
+        b &= 1 == compare(s, 200d);
+
+        return b;
+    }
+
+    @Override
+    public int compare(Double o1, Double o2) {
+        return Doubles.compare(o1, o2);
     }
 }
