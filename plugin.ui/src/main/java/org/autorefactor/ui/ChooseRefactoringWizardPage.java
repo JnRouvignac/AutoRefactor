@@ -171,7 +171,7 @@ public class ChooseRefactoringWizardPage extends WizardPage {
     }
 
     private void createFilterText(Composite parent) {
-        filterText= new Text(parent, BORDER | SWT.SINGLE);
+        filterText= new Text(parent, BORDER | SWT.SINGLE | SWT.SEARCH | SWT.ICON_SEARCH | SWT.ICON_CANCEL);
         filterText.setMessage("Type in to filter refactorings"); //$NON-NLS-1$
         filterText.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
 
