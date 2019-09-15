@@ -26,8 +26,10 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
+import java.awt.RenderingHints;
 import java.io.Serializable;
 import java.security.AuthProvider;
+import java.security.Provider;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.EnumMap;
@@ -45,7 +47,15 @@ import java.util.TreeMap;
 import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.jar.Attributes;
+
+import javax.management.openmbean.TabularDataSupport;
+import javax.print.attribute.standard.PrinterStateReasons;
+import javax.script.SimpleBindings;
+import javax.swing.UIDefaults;
 
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
@@ -125,7 +135,7 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
 
     @Override
     protected String[] getExistingClassCanonicalName() {
-        return new String[] { Attributes.class.getCanonicalName(), AuthProvider.class.getCanonicalName(), ConcurrentHashMap.class.getCanonicalName(), ConcurrentSkipListMap.class.getCanonicalName(), EnumMap.class.getCanonicalName(), HashMap.class.getCanonicalName(), Hashtable.class.getCanonicalName(), IdentityHashMap.class.getCanonicalName(), LinkedHashMap.class.getCanonicalName(), "javax.print.attribute.standard.PrinterStateReasons", Properties.class.getCanonicalName(), "java.security.Provider", "java.awt.RenderingHints", "javax.script.SimpleBindings", "javax.management.openmbean.TabularDataSupport", TreeMap.class.getCanonicalName(), "javax.swing.UIDefaults", WeakHashMap.class.getCanonicalName() }; //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$ $NON-NLS-4$ $NON-NLS-5$ $NON-NLS-6$
+        return new String[] { Attributes.class.getCanonicalName(), AuthProvider.class.getCanonicalName(), ConcurrentHashMap.class.getCanonicalName(), ConcurrentSkipListMap.class.getCanonicalName(), EnumMap.class.getCanonicalName(), HashMap.class.getCanonicalName(), Hashtable.class.getCanonicalName(), IdentityHashMap.class.getCanonicalName(), LinkedHashMap.class.getCanonicalName(), PrinterStateReasons.class.getCanonicalName(), Properties.class.getCanonicalName(), Provider.class.getCanonicalName(), RenderingHints.class.getCanonicalName(), SimpleBindings.class.getCanonicalName(), TabularDataSupport.class.getCanonicalName(), TreeMap.class.getCanonicalName(), UIDefaults.class.getCanonicalName(), WeakHashMap.class.getCanonicalName() };
     }
 
     @Override
@@ -203,7 +213,7 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
                 || ASTNodes.usesGivenSignature(mi, Map.class.getCanonicalName(), "containsKey", Object.class.getCanonicalName()) //$NON-NLS-1$
                 || ASTNodes.usesGivenSignature(mi, Map.class.getCanonicalName(), "containsValue", Object.class.getCanonicalName()) //$NON-NLS-1$
                 || ASTNodes.usesGivenSignature(mi, Map.class.getCanonicalName(), "equals", Object.class.getCanonicalName()) //$NON-NLS-1$
-                || ASTNodes.usesGivenSignature(mi, Map.class.getCanonicalName(), "forEach", "java.util.function.BiConsumer") //$NON-NLS-1$ $NON-NLS-2$
+                || ASTNodes.usesGivenSignature(mi, Map.class.getCanonicalName(), "forEach", BiConsumer.class.getCanonicalName()) //$NON-NLS-1$
                 || ASTNodes.usesGivenSignature(mi, Map.class.getCanonicalName(), "hashCode") || ASTNodes.usesGivenSignature(mi, Map.class.getCanonicalName(), "isEmpty") //$NON-NLS-1$ $NON-NLS-2$
                 || ASTNodes.usesGivenSignature(mi, Map.class.getCanonicalName(), "size") //$NON-NLS-1$
                 || ASTNodes.usesGivenSignature(mi, Map.class.getCanonicalName(), "remove", Object.class.getCanonicalName(), Object.class.getCanonicalName())) { //$NON-NLS-1$
@@ -355,9 +365,9 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
             }
 
             return resolveDestinationParamTypeCompatibleWithKeyValue(mi);
-        } else if (ASTNodes.usesGivenSignature(mi, Map.class.getCanonicalName(), "compute", Object.class.getCanonicalName(), "java.util.function.BiFunction") //$NON-NLS-1$ $NON-NLS-2$
+        } else if (ASTNodes.usesGivenSignature(mi, Map.class.getCanonicalName(), "compute", Object.class.getCanonicalName(), BiFunction.class.getCanonicalName()) //$NON-NLS-1$
                 || ASTNodes.usesGivenSignature(mi, Map.class.getCanonicalName(), "computeIfPresent", Object.class.getCanonicalName(), //$NON-NLS-1$
-                        "java.util.function.BiFunction")) { //$NON-NLS-1$
+                        BiFunction.class.getCanonicalName())) {
             final ITypeBinding paramType= arguments.get(1).resolveTypeBinding();
 
             if (isParameterizedTypeWithNbArguments(paramType, 3)) {
@@ -367,7 +377,7 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
                         && resolveValueTypeCompatible(newValueType) && resolveDestinationTypeCompatibleWithValue(mi);
             }
         } else if (ASTNodes.usesGivenSignature(mi, Map.class.getCanonicalName(), "computeIfAbsent", Object.class.getCanonicalName(), //$NON-NLS-1$
-                "java.util.function.Function")) { //$NON-NLS-1$
+                Function.class.getCanonicalName())) {
             final ITypeBinding paramType= arguments.get(1).resolveTypeBinding();
 
             if (isParameterizedTypeWithNbArguments(paramType, 2)) {
@@ -377,7 +387,7 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
                         && resolveValueTypeCompatible(newValueType) && resolveDestinationTypeCompatibleWithValue(mi);
             }
         } else if (ASTNodes.usesGivenSignature(mi, Map.class.getCanonicalName(), "merge", Object.class.getCanonicalName(), Object.class.getCanonicalName(), //$NON-NLS-1$
-                "java.util.function.BiFunction")) { //$NON-NLS-1$
+                BiFunction.class.getCanonicalName())) {
             final ITypeBinding paramType= arguments.get(2).resolveTypeBinding();
 
             if (isParameterizedTypeWithNbArguments(paramType, 3)) {
@@ -387,7 +397,7 @@ public class GenericMapRatherThanRawMapCleanUp extends AbstractClassSubstituteCl
                         && resolveValueTypeCompatible(arguments.get(1).resolveTypeBinding())
                         && resolveValueTypeCompatible(newValueType) && resolveDestinationTypeCompatibleWithValue(mi);
             }
-        } else if (ASTNodes.usesGivenSignature(mi, Map.class.getCanonicalName(), "replaceAll", "java.util.function.BiFunction")) { //$NON-NLS-1$ $NON-NLS-2$
+        } else if (ASTNodes.usesGivenSignature(mi, Map.class.getCanonicalName(), "replaceAll", BiFunction.class.getCanonicalName())) { //$NON-NLS-1$
             final ITypeBinding paramType= arguments.get(0).resolveTypeBinding();
 
             if (isParameterizedTypeWithNbArguments(paramType, 3)) {

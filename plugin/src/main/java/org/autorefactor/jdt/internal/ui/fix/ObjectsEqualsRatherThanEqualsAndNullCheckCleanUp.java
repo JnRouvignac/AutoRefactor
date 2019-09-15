@@ -28,6 +28,7 @@ package org.autorefactor.jdt.internal.ui.fix;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
@@ -91,7 +92,7 @@ public class ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp extends NewClassIm
 
     @Override
     public Set<String> getClassesToImport() {
-        return new HashSet<>(Arrays.asList("java.util.Objects")); //$NON-NLS-1$
+        return new HashSet<>(Arrays.asList(Objects.class.getCanonicalName()));
     }
 
     @Override
@@ -216,7 +217,7 @@ public class ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp extends NewClassIm
             if (returnFalse1 != null && !returnFalse1.booleanValue() && returnFalse2 != null
                     && !returnFalse2.booleanValue()) {
                 replaceEquals(node, firstField, secondField, returnStmt1, classesToUseWithImport);
-                importsToAdd.add("java.util.Objects"); //$NON-NLS-1$
+                importsToAdd.add(Objects.class.getCanonicalName());
                 return false;
             }
         }
@@ -237,7 +238,7 @@ public class ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp extends NewClassIm
 
         r.replace(node,
                 b.if0(b.not(b.invoke(
-                        classesToUseWithImport.contains("java.util.Objects") ? b.name("Objects") //$NON-NLS-1$ $NON-NLS-2$
+                        classesToUseWithImport.contains(Objects.class.getCanonicalName()) ? b.name("Objects") //$NON-NLS-1$ $NON-NLS-2$
                                 : b.name("java", "util", "Objects"), //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
                         "equals", b.copy(firstField), b.copy(secondField))), b.block(b.copy(returnStmt1)))); //$NON-NLS-1$
     }

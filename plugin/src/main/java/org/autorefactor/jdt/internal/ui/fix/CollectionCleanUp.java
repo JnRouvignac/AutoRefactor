@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.PriorityQueue;
 import java.util.TreeSet;
 import java.util.Vector;
+import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -43,6 +44,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.DelayQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.LinkedTransferQueue;
 import java.util.concurrent.PriorityBlockingQueue;
 
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
@@ -144,11 +146,11 @@ public class CollectionCleanUp extends AbstractCleanUpRule {
             final List<Expression> args= ASTNodes.arguments(cic);
             final boolean noArgsCtor= args.isEmpty();
             final boolean colCapacityCtor= isValidCapacityParameter(sourceCollection, args);
-            return (noArgsCtor && ASTNodes.hasType(cic, "java.util.concurrent.ConcurrentLinkedDeque", //$NON-NLS-1$
+            return (noArgsCtor && ASTNodes.hasType(cic, ConcurrentLinkedDeque.class.getCanonicalName(),
                     ConcurrentLinkedQueue.class.getCanonicalName(), ConcurrentSkipListSet.class.getCanonicalName(),
                     CopyOnWriteArrayList.class.getCanonicalName(), CopyOnWriteArraySet.class.getCanonicalName(),
                     DelayQueue.class.getCanonicalName(), LinkedBlockingDeque.class.getCanonicalName(),
-                    LinkedBlockingQueue.class.getCanonicalName(), "java.util.concurrent.LinkedTransferQueue", //$NON-NLS-1$
+                    LinkedBlockingQueue.class.getCanonicalName(), LinkedTransferQueue.class.getCanonicalName(),
                     PriorityBlockingQueue.class.getCanonicalName(), ArrayDeque.class.getCanonicalName(), ArrayList.class.getCanonicalName(),
                     HashSet.class.getCanonicalName(), LinkedHashSet.class.getCanonicalName(), LinkedList.class.getCanonicalName(), PriorityQueue.class.getCanonicalName(),
                     TreeSet.class.getCanonicalName(), Vector.class.getCanonicalName()))

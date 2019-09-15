@@ -30,6 +30,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
@@ -202,7 +203,7 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 
     @Override
     public Set<String> getClassesToImport() {
-        return new HashSet<>(Arrays.asList("java.util.Objects")); //$NON-NLS-1$
+        return new HashSet<>(Arrays.asList(Objects.class.getCanonicalName()));
     }
 
     @Override
@@ -244,7 +245,7 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
 
                     if (data.isHasReturnStatement() && !data.getStmtIterator().hasNext()) {
                         refactorHash(node, classesToUseWithImport, data);
-                        importsToAdd.add("java.util.Objects"); //$NON-NLS-1$
+                        importsToAdd.add(Objects.class.getCanonicalName());
                         return false;
                     }
                 }
@@ -619,7 +620,7 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
         }
 
         r.replace(statements.get(0),
-                b.return0(b.invoke(classesToUseWithImport.contains("java.util.Objects") ? b.name("Objects") //$NON-NLS-1$ $NON-NLS-2$
+                b.return0(b.invoke(classesToUseWithImport.contains(Objects.class.getCanonicalName()) ? b.name("Objects") //$NON-NLS-1$ $NON-NLS-2$
                         : b.name("java", "util", "Objects"), "hash", copyOfFields))); //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$ $NON-NLS-4$
 
         for (int i= 1; i < statements.size(); i++) {

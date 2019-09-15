@@ -39,6 +39,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 import java.util.Vector;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
@@ -186,8 +188,8 @@ public class GenericListRatherThanRawListCleanUp extends AbstractClassSubstitute
                 || ASTNodes.usesGivenSignature(mi, Object.class.getCanonicalName(), "wait", long.class.getSimpleName(), int.class.getSimpleName()) //$NON-NLS-1$
                 || ASTNodes.usesGivenSignature(mi, ArrayList.class.getCanonicalName(), "ensureCapacity", int.class.getSimpleName()) //$NON-NLS-1$
                 || ASTNodes.usesGivenSignature(mi, ArrayList.class.getCanonicalName(), "removeRange", int.class.getSimpleName(), int.class.getSimpleName()) //$NON-NLS-1$
-                || ASTNodes.usesGivenSignature(mi, ArrayList.class.getCanonicalName(), "forEach", "java.util.function.Consumer") //$NON-NLS-1$ $NON-NLS-2$
-                || ASTNodes.usesGivenSignature(mi, ArrayList.class.getCanonicalName(), "removeIf", "java.util.function.Predicate") //$NON-NLS-1$ $NON-NLS-2$
+                || ASTNodes.usesGivenSignature(mi, ArrayList.class.getCanonicalName(), "forEach", Consumer.class.getCanonicalName()) //$NON-NLS-1$ $NON-NLS-2$
+                || ASTNodes.usesGivenSignature(mi, ArrayList.class.getCanonicalName(), "removeIf", Predicate.class.getCanonicalName()) //$NON-NLS-1$ $NON-NLS-2$
                 || ASTNodes.usesGivenSignature(mi, ArrayList.class.getCanonicalName(), "sort", Comparator.class.getCanonicalName()) //$NON-NLS-1$
                 || ASTNodes.usesGivenSignature(mi, Vector.class.getCanonicalName(), "trimToSize") //$NON-NLS-1$
                 || ASTNodes.usesGivenSignature(mi, Vector.class.getCanonicalName(), "ensureCapacity", int.class.getSimpleName()) //$NON-NLS-1$

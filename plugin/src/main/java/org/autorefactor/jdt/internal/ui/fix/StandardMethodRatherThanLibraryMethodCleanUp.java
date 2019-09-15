@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
@@ -84,7 +85,7 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
 
     @Override
     public Set<String> getClassesToImport() {
-        return new HashSet<>(Arrays.asList("java.util.Objects")); //$NON-NLS-1$
+        return new HashSet<>(Arrays.asList(Objects.class.getCanonicalName()));
     }
 
     @Override
@@ -109,7 +110,7 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
         }
         final ASTNodeFactory b= this.ctx.getASTBuilder();
 
-        final Name javaUtilObjects= classesToUseWithImport.contains("java.util.Objects") ? b.simpleName("Objects") //$NON-NLS-1$ $NON-NLS-2$
+        final Name javaUtilObjects= classesToUseWithImport.contains(Objects.class.getCanonicalName()) ? b.simpleName("Objects") //$NON-NLS-1$ $NON-NLS-2$
                 : b.name("java", "util", "Objects"); //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
 
         if (ASTNodes.usesGivenSignature(node, "com.google.common.base.Objects", "equal", Object.class.getCanonicalName(), Object.class.getCanonicalName()) //$NON-NLS-1$ $NON-NLS-2$
@@ -119,7 +120,7 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
 
             r.replace(node, b.invoke(javaUtilObjects, "equals", b.copy((Expression) node.arguments().get(0)), //$NON-NLS-1$
                     b.copy((Expression) node.arguments().get(1))));
-            importsToAdd.add("java.util.Objects"); //$NON-NLS-1$
+            importsToAdd.add(Objects.class.getCanonicalName());
             return false;
         }
 
@@ -128,7 +129,7 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
 
             r.replace(node,
                     b.invoke(javaUtilObjects, "toString", b.copy((Expression) node.arguments().get(0)), b.string(""))); //$NON-NLS-1$ $NON-NLS-2$
-            importsToAdd.add("java.util.Objects"); //$NON-NLS-1$
+            importsToAdd.add(Objects.class.getCanonicalName());
             return false;
         }
 
@@ -143,7 +144,7 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
             }
 
             r.replace(node, b.invoke(javaUtilObjects, "hash", copyOfArgs.toArray(new Expression[copyOfArgs.size()]))); //$NON-NLS-1$
-            importsToAdd.add("java.util.Objects"); //$NON-NLS-1$
+            importsToAdd.add(Objects.class.getCanonicalName());
             return false;
         }
 
@@ -157,7 +158,7 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
                 r.replace(node, b.invoke(javaUtilObjects, "hash", copyArguments(b, node))); //$NON-NLS-1$
             }
 
-            importsToAdd.add("java.util.Objects"); //$NON-NLS-1$
+            importsToAdd.add(Objects.class.getCanonicalName());
             return false;
         }
 
@@ -183,7 +184,7 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
             } else {
                 return true;
             }
-            importsToAdd.add("java.util.Objects"); //$NON-NLS-1$
+            importsToAdd.add(Objects.class.getCanonicalName());
             return false;
         }
 
@@ -204,8 +205,8 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
         final ASTNodeFactory b= this.ctx.getASTBuilder();
         final Refactorings r= this.ctx.getRefactorings();
 
-        r.replace(node.getExpression(), classesToUseWithImport.contains("java.util.Objects") ? b.simpleName("Objects") //$NON-NLS-1$ $NON-NLS-2$
+        r.replace(node.getExpression(), classesToUseWithImport.contains(Objects.class.getCanonicalName()) ? b.simpleName("Objects") //$NON-NLS-1$
                 : b.name("java", "util", "Objects")); //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
-        importsToAdd.add("java.util.Objects"); //$NON-NLS-1$
+        importsToAdd.add(Objects.class.getCanonicalName());
     }
 }
