@@ -102,16 +102,18 @@
 
     <extension point="org.eclipse.ui.commands">
         <command
-                id="org.autorefactor.automatic.refactoring"
-                defaultHandler="org.autorefactor.ui.AutoRefactorHandler"
-                name="AutoRefactor Clean Up">
+              categoryId="org.eclipse.jdt.ui.category.refactoring"
+              defaultHandler="org.autorefactor.ui.AutoRefactorHandler"
+              description="Execute all enabled AutoRefactor refactorings on selection"
+              id="org.autorefactor.automatic.refactoring"
+              name="AutoRefactor Clean Up">
         </command>
-    </extension>
-    <extension point="org.eclipse.ui.commands">
         <command
-                id="org.autorefactor.choose.refactorings"
-                defaultHandler="org.autorefactor.ui.ChooseRefactoringsWizardHandler"
-                name="Choose refactorings...">
+              categoryId="org.eclipse.jdt.ui.category.refactoring"
+              defaultHandler="org.autorefactor.ui.ChooseRefactoringsWizardHandler"
+              description="Choose AutoRefactor refactorings to execute on selection"
+              id="org.autorefactor.choose.refactorings"
+              name="Choose refactorings...">
         </command>
     </extension>
     
