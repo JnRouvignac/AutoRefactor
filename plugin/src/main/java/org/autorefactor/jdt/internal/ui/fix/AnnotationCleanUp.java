@@ -25,12 +25,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import static org.eclipse.jdt.core.dom.ASTNode.ARRAY_INITIALIZER;
-import static org.eclipse.jdt.core.dom.ASTNode.BOOLEAN_LITERAL;
-import static org.eclipse.jdt.core.dom.ASTNode.CHARACTER_LITERAL;
-import static org.eclipse.jdt.core.dom.ASTNode.NUMBER_LITERAL;
-import static org.eclipse.jdt.core.dom.ASTNode.STRING_LITERAL;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -130,15 +124,15 @@ public class AnnotationCleanUp extends AbstractCleanUpRule {
     private boolean equal(ITypeBinding typeBinding, Expression expression, Object javaObj2) {
         Object javaObj1= expression.resolveConstantExpressionValue();
         switch (expression.getNodeType()) {
-        case ARRAY_INITIALIZER:
+        case ASTNode.ARRAY_INITIALIZER:
             return arraysEqual(typeBinding, (ArrayInitializer) expression, javaObj2);
 
-        case BOOLEAN_LITERAL:
-        case CHARACTER_LITERAL:
-        case STRING_LITERAL:
+        case ASTNode.BOOLEAN_LITERAL:
+        case ASTNode.CHARACTER_LITERAL:
+        case ASTNode.STRING_LITERAL:
             return Utils.equalNotNull(javaObj1, javaObj2);
 
-        case NUMBER_LITERAL:
+        case ASTNode.NUMBER_LITERAL:
             if (typeBinding.isPrimitive()) {
                 String type= typeBinding.getQualifiedName();
 

@@ -1550,7 +1550,7 @@ public final class ASTNodes {
         }
 
         if (number instanceof Long) {
-            return ((Long) number).longValue();
+            return (Long) number;
         }
 
         return null;
