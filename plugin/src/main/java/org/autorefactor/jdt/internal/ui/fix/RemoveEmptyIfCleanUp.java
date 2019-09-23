@@ -29,13 +29,9 @@ package org.autorefactor.jdt.internal.ui.fix;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.Refactorings;
-import org.eclipse.jdt.core.dom.DoStatement;
-import org.eclipse.jdt.core.dom.EnhancedForStatement;
 import org.eclipse.jdt.core.dom.Expression;
-import org.eclipse.jdt.core.dom.ForStatement;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.Statement;
-import org.eclipse.jdt.core.dom.WhileStatement;
 
 /** See {@link #getDescription()} method. */
 public class RemoveEmptyIfCleanUp extends AbstractCleanUpRule {
@@ -91,12 +87,10 @@ public class RemoveEmptyIfCleanUp extends AbstractCleanUpRule {
     }
 
     private void removeBlock(final IfStatement node, final Refactorings r, final ASTNodeFactory b) {
-        if (node.getParent() instanceof IfStatement || node.getParent() instanceof EnhancedForStatement
-                || node.getParent() instanceof ForStatement || node.getParent() instanceof WhileStatement
-                || node.getParent() instanceof DoStatement) {
-            r.replace(node, b.block());
-        } else {
+        if (ASTNodes.canHaveSiblings(node)) {
             r.remove(node);
+        } else {
+            r.replace(node, b.block());
         }
     }
 }

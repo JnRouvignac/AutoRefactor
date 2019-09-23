@@ -27,22 +27,30 @@ package org.autorefactor.jdt.internal.ui.fix.all.samples_out;
 
 public class MergeDuplicateConditionThenSimplifyExprSample {
     public int mergeDuplicateCondition(boolean duplicateCondition, boolean anotherCondition) {
+        int i;
+
         if (duplicateCondition) {
-            return 20;
+            i = 20;
         } else if (anotherCondition) {
-            return 0;
+            i = 0;
         } else {
-            return 10;
+            i = 10;
         }
+
+        return i;
     }
 
     public int mergeDuplicateCondition(int i, boolean anotherCondition) {
+        int j;
+
         if (i <= 0) {
-            return 20;
+            j = 20;
         } else if (anotherCondition) {
-            return 0;
+            j = 0;
         } else {
-            return 10;
+            j = 10;
         }
+
+        return j;
     }
 }

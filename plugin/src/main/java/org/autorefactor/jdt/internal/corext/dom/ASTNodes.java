@@ -1111,6 +1111,22 @@ public final class ASTNodes {
     }
 
     /**
+     * Returns true if a sibling may exist.
+     *
+     * @param node the start node
+     * @return true if a sibling may exist
+     */
+    public static boolean canHaveSiblings(Statement node) {
+        final ASTNode parent= node.getParent();
+
+        if (parent instanceof LabeledStatement) {
+            return canHaveSiblings((LabeledStatement) parent);
+        }
+
+        return parent instanceof Block;
+    }
+
+    /**
      * Returns the previous body declaration in the same block if it exists.
      *
      * @param startNode the start node

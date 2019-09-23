@@ -130,7 +130,8 @@ public final class AllCleanUpRules {
                 new RemoveSemiColonCleanUp(), new AddBracketsToControlStatementCleanUp(),
                 new RemoveUnnecessaryLocalBeforeReturnCleanUp(), new RedundantModifiersCleanUp(),
                 new RemoveUnnecessaryCastCleanUp(), new PushNegationDownCleanUp(),
-                new SimpleNameRatherThanQualifiedNameCleanUp(), new SimplifyExpressionCleanUp());
+                new SimpleNameRatherThanQualifiedNameCleanUp(), new SimplifyExpressionCleanUp(),
+                new ReduceIndentationCleanUp());
     }
 
     private static List<RefactoringRule> newArrayList(final RefactoringRule... refactorings) {
