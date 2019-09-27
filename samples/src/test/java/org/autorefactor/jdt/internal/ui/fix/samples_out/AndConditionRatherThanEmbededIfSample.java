@@ -25,10 +25,11 @@
  */
 package org.autorefactor.jdt.internal.ui.fix.samples_out;
 
-public class CollapseIfStatementSample {
+public class AndConditionRatherThanEmbededIfSample {
 
     public void collapseIfStatements(boolean b1, boolean b2) {
         // Keep this comment 1
+        // Keep this comment 2
         if (b1 && b2) {
             // Keep this comment 3
             int i = 0;
@@ -37,7 +38,17 @@ public class CollapseIfStatementSample {
 
     public void collapseIfStatementsAddParenthesesIfDifferentConditionalOperator(boolean b1, boolean b2, boolean b3) {
         // Keep this comment 1
+        // Keep this comment 2
         if (b1 && (b2 || b3)) {
+            // Keep this comment 3
+            int i = 0;
+        }
+    }
+
+    public void collapseIfWithOROperator(boolean b1, boolean b2, boolean b3) {
+        // Keep this comment 1
+        // Keep this comment 2
+        if (b1 && (b2 | b3)) {
             // Keep this comment 3
             int i = 0;
         }

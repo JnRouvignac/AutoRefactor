@@ -3,6 +3,7 @@
  *
  * Copyright (C) 2013-2015 Jean-Noël Rouvignac - initial API and implementation
  * Copyright (C) 2016 Fabrice Tiercelin - Make sure we do not visit again modified nodes
+ * Copyright (C) 2019 Fabrice Tiercelin - Add parenthesis when it's needed
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,19 +29,19 @@ package org.autorefactor.jdt.internal.ui.fix;
 
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
-import org.eclipse.jdt.core.dom.Expression;
+import org.autorefactor.jdt.internal.corext.dom.Refactorings;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.InfixExpression;
 
 /** See {@link #getDescription()} method. */
-public class CollapseIfStatementCleanUp extends AbstractCleanUpRule {
+public class AndConditionRatherThanEmbededIfCleanUp extends AbstractCleanUpRule {
     /**
      * Get the name.
      *
      * @return the name.
      */
     public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_CollapseIfStatementCleanUp_name;
+        return MultiFixMessages.CleanUpRefactoringWizard_AndConditionRatherThanEmbededIfCleanUp_name;
     }
 
     /**
@@ -49,7 +50,7 @@ public class CollapseIfStatementCleanUp extends AbstractCleanUpRule {
      * @return the description.
      */
     public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_CollapseIfStatementCleanUp_description;
+        return MultiFixMessages.CleanUpRefactoringWizard_AndConditionRatherThanEmbededIfCleanUp_description;
     }
 
     /**
@@ -58,40 +59,30 @@ public class CollapseIfStatementCleanUp extends AbstractCleanUpRule {
      * @return the reason.
      */
     public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_CollapseIfStatementCleanUp_reason;
+        return MultiFixMessages.CleanUpRefactoringWizard_AndConditionRatherThanEmbededIfCleanUp_reason;
     }
 
     @Override
     public boolean visit(IfStatement node) {
         if (node.getElseStatement() == null) {
             final IfStatement is= ASTNodes.as(node.getThenStatement(), IfStatement.class);
-            if (is != null) {
-                return replaceIfNoElseStatement(node, is);
+
+            if ((is != null) && (is.getElseStatement() == null)) {
+                replaceIfNoElseStatement(node, is);
+                return false;
             }
         }
+
         return true;
     }
 
-    private boolean replaceIfNoElseStatement(IfStatement outerIf, IfStatement innerIf) {
-        if (innerIf.getElseStatement() != null) {
-            return true;
-        }
-
+    private void replaceIfNoElseStatement(IfStatement outerIf, IfStatement innerIf) {
         final ASTNodeFactory b= this.ctx.getASTBuilder();
-        final InfixExpression ie= b.infixExpression(parenthesizeOrExpression(b, outerIf.getExpression()), InfixExpression.Operator.CONDITIONAL_AND,
-                parenthesizeOrExpression(b, innerIf.getExpression()));
-        this.ctx.getRefactorings().replace(outerIf.getExpression(), ie);
-        this.ctx.getRefactorings().replace(outerIf.getThenStatement(), b.copy(innerIf.getThenStatement()));
-        return false;
-    }
+        final Refactorings r= this.ctx.getRefactorings();
 
-    private Expression parenthesizeOrExpression(ASTNodeFactory b, Expression expression) {
-        if (expression instanceof InfixExpression) {
-            final InfixExpression ie= (InfixExpression) expression;
-            if (ASTNodes.hasOperator(ie, InfixExpression.Operator.CONDITIONAL_OR)) {
-                return b.parenthesize(b.copy(ie));
-            }
-        }
-        return b.copy(expression);
+        final InfixExpression ie= b.infixExpression(b.parenthesizeIfNeeded(b.copy(outerIf.getExpression())), InfixExpression.Operator.CONDITIONAL_AND,
+                b.parenthesizeIfNeeded(b.copy(innerIf.getExpression())));
+        r.replace(innerIf.getExpression(), ie);
+        r.replace(outerIf, b.copy(innerIf));
     }
 }

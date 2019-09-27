@@ -89,7 +89,7 @@ public final class AllCleanUpRules {
                 new SingleDeclarationsRatherThanMultiDeclarationCleanUp(), new EndOfMethodRatherThanReturnCleanUp(),
                 new DoWhileRatherThanWhileCleanUp(), new DoWhileRatherThanDuplicateCodeCleanUp(),
                 new IfRatherThanWhileAndFallsThroughCleanUp(), new SuperCallRatherThanUselessOverridingCleanUp(),
-                new CollapseIfStatementCleanUp(), new CommonCodeInIfElseStatementCleanUp(),
+                new AndConditionRatherThanEmbededIfCleanUp(), new CommonCodeInIfElseStatementCleanUp(),
                 new OppositeConditionRatherThanDuplicateConditionCleanUp(),
                 new OneConditionRatherThanUnreachableBlockCleanUp(), new MergeConditionalBlocksCleanUp(),
                 new OneIfRatherThanDuplicateBlocksThatFallThroughCleanUp(),
