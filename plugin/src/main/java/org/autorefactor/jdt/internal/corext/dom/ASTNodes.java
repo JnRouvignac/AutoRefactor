@@ -189,6 +189,18 @@ public final class ASTNodes {
         }
 
         @Override
+        public boolean visit(CastExpression node) {
+            activityLevel= ExprActivity.CAN_BE_ACTIVE;
+            return true;
+        }
+
+        @Override
+        public boolean visit(ArrayAccess node) {
+            activityLevel= ExprActivity.CAN_BE_ACTIVE;
+            return true;
+        }
+
+        @Override
         public boolean visit(Assignment node) {
             activityLevel= ExprActivity.ACTIVE;
             return interruptVisit();
@@ -212,10 +224,11 @@ public final class ASTNodes {
         @SuppressWarnings("unchecked")
         @Override
         public boolean visit(InfixExpression node) {
-            if (hasOperator(node, InfixExpression.Operator.PLUS) && hasType(node, String.class.getCanonicalName())
-                    && (mayCallImplicitToString(node.getLeftOperand())
-                            || mayCallImplicitToString(node.getRightOperand())
-                            || mayCallImplicitToString(node.extendedOperands()))) {
+            if (hasOperator(node, InfixExpression.Operator.DIVIDE)
+                    || (hasOperator(node, InfixExpression.Operator.PLUS) && hasType(node, String.class.getCanonicalName())
+                            && (mayCallImplicitToString(node.getLeftOperand())
+                                    || mayCallImplicitToString(node.getRightOperand())
+                                    || mayCallImplicitToString(node.extendedOperands())))) {
                 activityLevel= ExprActivity.CAN_BE_ACTIVE;
             }
             return true;

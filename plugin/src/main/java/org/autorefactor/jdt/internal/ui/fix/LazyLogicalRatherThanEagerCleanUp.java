@@ -25,9 +25,14 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
+import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.InfixExpression;
+import org.eclipse.jdt.core.dom.InfixExpression.Operator;
 
 /** See {@link #getDescription()} method. */
 public class LazyLogicalRatherThanEagerCleanUp extends AbstractCleanUpRule {
@@ -60,24 +65,40 @@ public class LazyLogicalRatherThanEagerCleanUp extends AbstractCleanUpRule {
 
     @Override
     public boolean visit(InfixExpression node) {
-        if (!node.hasExtendedOperands()
-                && ASTNodes.hasOperator(node, InfixExpression.Operator.AND, InfixExpression.Operator.OR)
-                && (ASTNodes.hasType(node.getLeftOperand(), boolean.class.getSimpleName()) || ASTNodes.hasType(node.getLeftOperand(), Boolean.class.getCanonicalName()))
-                && (ASTNodes.hasType(node.getRightOperand(), boolean.class.getSimpleName()) || ASTNodes.hasType(node.getRightOperand(), Boolean.class.getCanonicalName()))
-                && ASTNodes.isPassive(node.getRightOperand())) {
+        if (ASTNodes.hasOperator(node, InfixExpression.Operator.AND, InfixExpression.Operator.OR)) {
+            List<Expression> allOperands= ASTNodes.allOperands(node);
+            boolean isFirst= true;
+            List<Expression> copyOfOperands= new ArrayList<>(allOperands.size());
             final ASTNodeFactory b= ctx.getASTBuilder();
-            ctx.getRefactorings().replace(node, b.infixExpression(b.copy(node.getLeftOperand()),
-                    getLazyOperator(node), b.copy(node.getRightOperand())));
+
+            for (Expression expression : allOperands) {
+                if (!ASTNodes.hasType(expression, boolean.class.getSimpleName(), Boolean.class.getCanonicalName())) {
+                    return true;
+                }
+
+                if (isFirst) {
+                    isFirst= false;
+                } else if (!ASTNodes.isPassive(expression)) {
+                    return true;
+                }
+
+                copyOfOperands.add(b.copy(expression));
+            }
+
+            replaceWithLazyOperator(node, copyOfOperands, b);
             return false;
         }
         return true;
     }
 
-    private InfixExpression.Operator getLazyOperator(final InfixExpression node) {
+    private void replaceWithLazyOperator(InfixExpression node, List<Expression> copyOfOperands,
+            final ASTNodeFactory b) {
+        final Operator lazyOperator;
         if (ASTNodes.hasOperator(node, InfixExpression.Operator.AND)) {
-            return InfixExpression.Operator.CONDITIONAL_AND;
+            lazyOperator= InfixExpression.Operator.CONDITIONAL_AND;
         } else {
-            return InfixExpression.Operator.CONDITIONAL_OR;
+            lazyOperator= InfixExpression.Operator.CONDITIONAL_OR;
         }
+        ctx.getRefactorings().replace(node, b.infixExpression(lazyOperator, copyOfOperands));
     }
 }

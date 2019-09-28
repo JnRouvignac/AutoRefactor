@@ -28,13 +28,18 @@ package org.autorefactor.jdt.internal.ui.fix.samples_out;
 import java.util.List;
 
 public class LazyLogicalRatherThanEagerSample {
-
     private static int staticField = 0;
 
     public void replaceOperatorWithPrimitiveTypes(boolean b1, boolean b2) {
         // Keep this comment
         boolean newBoolean1 = b1 && b2;
         boolean newBoolean2 = b1 || b2;
+    }
+
+    public void replaceOperatorWithExtendedOperands(boolean b1, boolean b2, boolean b3) {
+        // Keep this comment
+        boolean newBoolean1 = b1 && b2 && b3;
+        boolean newBoolean2 = b1 || b2 || b3;
     }
 
     public void replaceOperatorWithWrappers(Boolean b1, Boolean b2) {
@@ -57,6 +62,23 @@ public class LazyLogicalRatherThanEagerSample {
     public void doNotReplaceOperatorWithMethods(List<String> myList) {
         boolean newBoolean1 = myList.remove("lorem") & myList.remove("ipsum");
         boolean newBoolean2 = myList.remove("lorem") | myList.remove("ipsum");
+    }
+
+    public void doNotReplaceOperatorWithArrayAccess() {
+        boolean[] booleans = new boolean[] {true, true};
+        boolean newBoolean1 = booleans[0] & booleans[1] & booleans[2];
+        boolean newBoolean2 = booleans[0] | booleans[1] | booleans[2];
+    }
+
+    public void doNotReplaceOperatorWithDivision(int i1, int i2) {
+        boolean newBoolean1 = (i1 == 123) & ((10 / i1) == i2);
+        boolean newBoolean2 = (i1 == 123) | ((10 / i1) == i2);
+    }
+
+    public void replaceOperatorWithMethodOnLeftOperand(List<String> myList, boolean b1, boolean b2) {
+        // Keep this comment
+        boolean newBoolean1 = myList.remove("lorem") && b1 && b2;
+        boolean newBoolean2 = myList.remove("lorem") || b1 || b2;
     }
 
     public void doNotReplaceOperatorWithIncrements(int i1, int i2, int i3, int i4) {
