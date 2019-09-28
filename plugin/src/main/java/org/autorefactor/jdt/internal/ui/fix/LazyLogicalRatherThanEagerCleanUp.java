@@ -61,10 +61,10 @@ public class LazyLogicalRatherThanEagerCleanUp extends AbstractCleanUpRule {
     @Override
     public boolean visit(InfixExpression node) {
         if (!node.hasExtendedOperands()
+                && ASTNodes.hasOperator(node, InfixExpression.Operator.AND, InfixExpression.Operator.OR)
                 && (ASTNodes.hasType(node.getLeftOperand(), boolean.class.getSimpleName()) || ASTNodes.hasType(node.getLeftOperand(), Boolean.class.getCanonicalName()))
                 && (ASTNodes.hasType(node.getRightOperand(), boolean.class.getSimpleName()) || ASTNodes.hasType(node.getRightOperand(), Boolean.class.getCanonicalName()))
-                && ASTNodes.isPassive(node.getRightOperand())
-                && ASTNodes.hasOperator(node, InfixExpression.Operator.AND, InfixExpression.Operator.OR)) {
+                && ASTNodes.isPassive(node.getRightOperand())) {
             final ASTNodeFactory b= ctx.getASTBuilder();
             ctx.getRefactorings().replace(node, b.infixExpression(b.copy(node.getLeftOperand()),
                     getLazyOperator(node), b.copy(node.getRightOperand())));
