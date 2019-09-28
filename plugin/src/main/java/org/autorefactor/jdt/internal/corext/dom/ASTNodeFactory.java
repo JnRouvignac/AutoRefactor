@@ -26,16 +26,41 @@
  */
 package org.autorefactor.jdt.internal.corext.dom;
 
+import static org.eclipse.jdt.core.dom.ASTNode.ANNOTATION_TYPE_DECLARATION;
+import static org.eclipse.jdt.core.dom.ASTNode.ANNOTATION_TYPE_MEMBER_DECLARATION;
+import static org.eclipse.jdt.core.dom.ASTNode.ANONYMOUS_CLASS_DECLARATION;
+import static org.eclipse.jdt.core.dom.ASTNode.ARRAY_ACCESS;
+import static org.eclipse.jdt.core.dom.ASTNode.ARRAY_CREATION;
+import static org.eclipse.jdt.core.dom.ASTNode.ARRAY_INITIALIZER;
 import static org.eclipse.jdt.core.dom.ASTNode.ARRAY_TYPE;
-import static org.eclipse.jdt.core.dom.ASTNode.ASSIGNMENT;
-import static org.eclipse.jdt.core.dom.ASTNode.CAST_EXPRESSION;
-import static org.eclipse.jdt.core.dom.ASTNode.CONDITIONAL_EXPRESSION;
-import static org.eclipse.jdt.core.dom.ASTNode.INFIX_EXPRESSION;
-import static org.eclipse.jdt.core.dom.ASTNode.INSTANCEOF_EXPRESSION;
+import static org.eclipse.jdt.core.dom.ASTNode.BOOLEAN_LITERAL;
+import static org.eclipse.jdt.core.dom.ASTNode.CHARACTER_LITERAL;
+import static org.eclipse.jdt.core.dom.ASTNode.CLASS_INSTANCE_CREATION;
+import static org.eclipse.jdt.core.dom.ASTNode.CREATION_REFERENCE;
+import static org.eclipse.jdt.core.dom.ASTNode.EXPRESSION_METHOD_REFERENCE;
+import static org.eclipse.jdt.core.dom.ASTNode.FIELD_ACCESS;
+import static org.eclipse.jdt.core.dom.ASTNode.MEMBER_REF;
+import static org.eclipse.jdt.core.dom.ASTNode.METHOD_INVOCATION;
+import static org.eclipse.jdt.core.dom.ASTNode.METHOD_REF;
+import static org.eclipse.jdt.core.dom.ASTNode.NULL_LITERAL;
+import static org.eclipse.jdt.core.dom.ASTNode.NUMBER_LITERAL;
 import static org.eclipse.jdt.core.dom.ASTNode.PARAMETERIZED_TYPE;
+import static org.eclipse.jdt.core.dom.ASTNode.PARENTHESIZED_EXPRESSION;
+import static org.eclipse.jdt.core.dom.ASTNode.POSTFIX_EXPRESSION;
+import static org.eclipse.jdt.core.dom.ASTNode.PREFIX_EXPRESSION;
 import static org.eclipse.jdt.core.dom.ASTNode.PRIMITIVE_TYPE;
+import static org.eclipse.jdt.core.dom.ASTNode.QUALIFIED_NAME;
 import static org.eclipse.jdt.core.dom.ASTNode.QUALIFIED_TYPE;
+import static org.eclipse.jdt.core.dom.ASTNode.SIMPLE_NAME;
 import static org.eclipse.jdt.core.dom.ASTNode.SIMPLE_TYPE;
+import static org.eclipse.jdt.core.dom.ASTNode.STRING_LITERAL;
+import static org.eclipse.jdt.core.dom.ASTNode.SUPER_FIELD_ACCESS;
+import static org.eclipse.jdt.core.dom.ASTNode.SUPER_METHOD_INVOCATION;
+import static org.eclipse.jdt.core.dom.ASTNode.SUPER_METHOD_REFERENCE;
+import static org.eclipse.jdt.core.dom.ASTNode.THIS_EXPRESSION;
+import static org.eclipse.jdt.core.dom.ASTNode.TYPE_LITERAL;
+import static org.eclipse.jdt.core.dom.ASTNode.TYPE_METHOD_REFERENCE;
+import static org.eclipse.jdt.core.dom.ASTNode.VARIABLE_DECLARATION_EXPRESSION;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -1244,15 +1269,40 @@ public class ASTNodeFactory {
      */
     public Expression parenthesizeIfNeeded(Expression expression) {
         switch (expression.getNodeType()) {
-        case ASSIGNMENT:
-        case CAST_EXPRESSION:
-        case CONDITIONAL_EXPRESSION:
-        case INFIX_EXPRESSION:
-        case INSTANCEOF_EXPRESSION:
-            return parenthesize(expression);
+        case ANNOTATION_TYPE_DECLARATION:
+        case ANNOTATION_TYPE_MEMBER_DECLARATION:
+        case ANONYMOUS_CLASS_DECLARATION:
+        case ARRAY_ACCESS:
+        case ARRAY_CREATION:
+        case ARRAY_INITIALIZER:
+        case BOOLEAN_LITERAL:
+        case CHARACTER_LITERAL:
+        case CLASS_INSTANCE_CREATION:
+        case CREATION_REFERENCE:
+        case EXPRESSION_METHOD_REFERENCE:
+        case FIELD_ACCESS:
+        case MEMBER_REF:
+        case METHOD_INVOCATION:
+        case METHOD_REF:
+        case NULL_LITERAL:
+        case NUMBER_LITERAL:
+        case PARENTHESIZED_EXPRESSION:
+        case POSTFIX_EXPRESSION:
+        case PREFIX_EXPRESSION:
+        case QUALIFIED_NAME:
+        case SIMPLE_NAME:
+        case STRING_LITERAL:
+        case SUPER_FIELD_ACCESS:
+        case SUPER_METHOD_INVOCATION:
+        case SUPER_METHOD_REFERENCE:
+        case THIS_EXPRESSION:
+        case TYPE_LITERAL:
+        case TYPE_METHOD_REFERENCE:
+        case VARIABLE_DECLARATION_EXPRESSION:
+            return expression;
 
         default:
-            return expression;
+            return parenthesize(expression);
         }
     }
 
