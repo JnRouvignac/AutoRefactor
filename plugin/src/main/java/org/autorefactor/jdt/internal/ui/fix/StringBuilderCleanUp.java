@@ -119,7 +119,7 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
 
     @Override
     public boolean visit(ClassInstanceCreation node) {
-        if ((ASTNodes.hasType(node, StringBuilder.class.getCanonicalName()) || ASTNodes.hasType(node, StringBuffer.class.getCanonicalName()))
+        if (ASTNodes.hasType(node, StringBuilder.class.getCanonicalName(), StringBuffer.class.getCanonicalName())
                 && ASTNodes.arguments(node).size() == 1) {
             final Expression arg0= ASTNodes.arguments(node).get(0);
 

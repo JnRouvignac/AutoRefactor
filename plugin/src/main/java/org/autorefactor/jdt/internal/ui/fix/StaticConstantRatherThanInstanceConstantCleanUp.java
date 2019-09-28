@@ -69,15 +69,8 @@ public class StaticConstantRatherThanInstanceConstantCleanUp extends AbstractCle
 
     @Override
     public boolean visit(FieldDeclaration node) {
-        if (node.getType().isPrimitiveType() || ASTNodes.hasType(node.getType().resolveBinding(), Byte.class.getCanonicalName())
-                || ASTNodes.hasType(node.getType().resolveBinding(), Character.class.getCanonicalName())
-                || ASTNodes.hasType(node.getType().resolveBinding(), Short.class.getCanonicalName())
-                || ASTNodes.hasType(node.getType().resolveBinding(), Integer.class.getCanonicalName())
-                || ASTNodes.hasType(node.getType().resolveBinding(), Long.class.getCanonicalName())
-                || ASTNodes.hasType(node.getType().resolveBinding(), Boolean.class.getCanonicalName())
-                || ASTNodes.hasType(node.getType().resolveBinding(), Float.class.getCanonicalName())
-                || ASTNodes.hasType(node.getType().resolveBinding(), Double.class.getCanonicalName())
-                || ASTNodes.hasType(node.getType().resolveBinding(), String.class.getCanonicalName())) {
+        if (node.getType().isPrimitiveType() || ASTNodes.hasType(node.getType().resolveBinding(), Byte.class.getCanonicalName(), Character.class.getCanonicalName(), Short.class.getCanonicalName(),
+                Integer.class.getCanonicalName(), Long.class.getCanonicalName(), Boolean.class.getCanonicalName(), Float.class.getCanonicalName(), Double.class.getCanonicalName(), String.class.getCanonicalName())) {
             Modifier finalModifier= null;
             for (Modifier modifier : getModifiersOnly(ASTNodes.modifiers(node))) {
                 if (modifier.isStatic()) {
