@@ -28,6 +28,7 @@
 package org.autorefactor.jdt.internal.ui.fix;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -99,8 +100,7 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
             // Identify matching statements starting from the end of each case
             boolean hasCodeToMove= false;
             for (int stmtIndex= 1; stmtIndex <= minSize; stmtIndex++) {
-                if (!match(matcher, allCasesStatements, stmtIndex, 0, allCasesStatements.size())
-                        || anyContains(caseStmtsToRemove, allCasesStatements, stmtIndex)) {
+                if (!match(matcher, allCasesStatements, stmtIndex)) {
                     break;
                 }
                 flagStmtsToRemove(allCasesStatements, stmtIndex, caseStmtsToRemove);
@@ -112,6 +112,7 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
                 return false;
             }
         }
+
         return true;
     }
 
@@ -122,9 +123,7 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
 
         // Remove the nodes common to all cases
         final boolean[] areCasesRemovable= new boolean[allCasesStatements.size()];
-        for (int i= 0; i < allCasesStatements.size(); i++) {
-            areCasesRemovable[i]= false;
-        }
+        Arrays.fill(areCasesRemovable, false);
         removeStmtsFromCases(allCasesStatements, caseStmtsToRemove, areCasesRemovable);
 
         if (allRemovable(areCasesRemovable)) {
@@ -218,17 +217,6 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
         }
     }
 
-    private boolean anyContains(List<List<Statement>> removedCaseStatements, List<List<Statement>> allCasesStatements,
-            int stmtIndex) {
-        for (int i= 0; i < allCasesStatements.size(); i++) {
-            final List<Statement> caseStatements= allCasesStatements.get(i);
-            if (removedCaseStatements.get(i).contains(caseStatements.get(caseStatements.size() - stmtIndex))) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     private void flagStmtsToRemove(List<List<Statement>> allCasesStatements, int stmtIndex,
             List<List<Statement>> removedCaseStatements) {
         for (int i= 0; i < allCasesStatements.size(); i++) {
@@ -238,40 +226,28 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
         }
     }
 
-    private boolean match(ASTSemanticMatcher matcher, List<List<Statement>> allCasesStatements, int stmtIndex,
-            int startIndex, int endIndex) {
-        if (startIndex == endIndex || startIndex == endIndex - 1) {
-            return true;
-        }
-        final int comparisonIndex;
-        if (endIndex - startIndex > 1) {
-            final int pivotIndex= (endIndex + startIndex + 1) / 2;
-            if (!match(matcher, allCasesStatements, stmtIndex, startIndex, pivotIndex)
-                    || !match(matcher, allCasesStatements, stmtIndex, pivotIndex, endIndex)) {
+    private boolean match(ASTSemanticMatcher matcher, List<List<Statement>> allCasesStatements, int stmtIndex) {
+        for (int i= 1; i < allCasesStatements.size(); i++) {
+            if (!ASTNodes.match(matcher, allCasesStatements.get(0).get(allCasesStatements.get(0).size() - stmtIndex),
+                    allCasesStatements.get(i).get(allCasesStatements.get(i).size() - stmtIndex))) {
                 return false;
             }
-            comparisonIndex= pivotIndex;
-        } else {
-            comparisonIndex= endIndex - 1;
         }
 
-        final List<Statement> caseStmts1= allCasesStatements.get(startIndex);
-        final List<Statement> caseStmts2= allCasesStatements.get(comparisonIndex);
-        return ASTNodes.match(matcher, caseStmts1.get(caseStmts1.size() - stmtIndex),
-                caseStmts2.get(caseStmts2.size() - stmtIndex));
+        return true;
     }
 
     private int minSize(List<List<Statement>> allCasesStatements) {
         if (allCasesStatements.isEmpty()) {
             throw new IllegalStateException(null, "allCasesStatements List must not be empty"); //$NON-NLS-1$
         }
-        int min= Integer.MAX_VALUE;
+
+        int min= allCasesStatements.get(0).size();
+
         for (List<Statement> statements : allCasesStatements) {
             min= Math.min(min, statements.size());
         }
-        if (min == Integer.MAX_VALUE) {
-            throw new IllegalStateException(null, "The minimum size should never have been equal to Integer.MAX_VALUE"); //$NON-NLS-1$
-        }
+
         return min;
     }
 
