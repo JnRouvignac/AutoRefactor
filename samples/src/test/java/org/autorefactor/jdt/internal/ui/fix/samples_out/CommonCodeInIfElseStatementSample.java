@@ -26,11 +26,13 @@
 package org.autorefactor.jdt.internal.ui.fix.samples_out;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
 public class CommonCodeInIfElseStatementSample {
+    private Date j = new Date();
 
     /** common code: i++, Remove if statement */
     public void ifElseRemoveIfNoBrackets(boolean b, int i) {
@@ -153,6 +155,47 @@ public class CommonCodeInIfElseStatementSample {
         if (b1)      return 1;
         else {
             return 2;
+        }
+    }
+
+    public int doNotRefactorWithNameConflict(boolean b) {
+        int i;
+
+        if (b) {
+            int j = 1;
+            i = j + 10;
+        } else {
+            int j = 1;
+            i = j + 10;
+        }
+
+        int j = 123;
+        System.out.println("Other number: " + j);
+        return i;
+    }
+
+    public int doNotRefactorWithNameConfusion(boolean b) {
+        int i;
+
+        if (b) {
+            int j = 1;
+            i = j + 10;
+        } else {
+            int j = 1;
+            i = j + 10;
+        }
+
+        System.out.println("Today: " + j);
+        return i;
+    }
+
+    public int doNotMoveVarOutsideItsScope(boolean b) {
+        if (b) {
+            int dontMoveMeIMLocal = 1;
+            return dontMoveMeIMLocal + 10;
+        } else {
+            int dontMoveMeIMLocal = 2;
+            return dontMoveMeIMLocal + 10;
         }
     }
 

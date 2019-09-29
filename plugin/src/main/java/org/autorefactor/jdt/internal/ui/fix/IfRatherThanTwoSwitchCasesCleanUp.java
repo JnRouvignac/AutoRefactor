@@ -31,8 +31,8 @@ import java.util.Set;
 
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
-import org.autorefactor.jdt.internal.corext.dom.InterruptibleVisitor;
 import org.autorefactor.jdt.internal.corext.dom.Refactorings;
+import org.autorefactor.jdt.internal.corext.dom.VarOccurrenceVisitor;
 import org.autorefactor.util.Pair;
 import org.autorefactor.util.Utils;
 import org.eclipse.jdt.core.dom.Block;
@@ -71,33 +71,6 @@ public class IfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRule {
      */
     public String getReason() {
         return MultiFixMessages.CleanUpRefactoringWizard_IfRatherThanTwoSwitchCasesCleanUp_reason;
-    }
-
-    private class VarOccurrenceVisitor extends InterruptibleVisitor {
-        private final Set<String> localVarIds;
-        private boolean varUsed;
-
-        public boolean isVarUsed() {
-            return varUsed;
-        }
-
-        public VarOccurrenceVisitor(final Set<String> localVarIds) {
-            this.localVarIds= localVarIds;
-        }
-
-        @Override
-        public boolean visit(final SimpleName aVariable) {
-            if (localVarIds.contains(aVariable.getIdentifier())) {
-                varUsed= true;
-                return interruptVisit();
-            }
-            return true;
-        }
-
-        @Override
-        public boolean visit(final Block node) {
-            return false;
-        }
     }
 
     @Override

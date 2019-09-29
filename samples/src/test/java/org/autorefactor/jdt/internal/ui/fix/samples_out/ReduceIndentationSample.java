@@ -146,6 +146,19 @@ public class ReduceIndentationSample {
         return i;
     }
 
+    public int doNotRefactorWithoutNameConfusion(int i) {
+        if (i > 0) {
+            return 0;
+        } else {
+            int j = 123;
+            i = i + j;
+        }
+
+        System.out.println("Today: " + j);
+
+        return i;
+    }
+
     public int refactorWithThrow(int i) {
         // Keep this comment
         if (i > 0) {

@@ -29,14 +29,17 @@ package org.autorefactor.jdt.internal.ui.fix;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import org.autorefactor.jdt.internal.corext.dom.ASTMatcherSameVariablesAndMethods;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.ASTSemanticMatcher;
 import org.autorefactor.jdt.internal.corext.dom.Refactorings;
+import org.autorefactor.jdt.internal.corext.dom.VarOccurrenceVisitor;
 import org.autorefactor.util.IllegalStateException;
 import org.autorefactor.util.NotImplementedException;
 import org.eclipse.jdt.core.dom.ASTNode;
@@ -107,7 +110,7 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
                 hasCodeToMove= true;
             }
 
-            if (hasCodeToMove) {
+            if (hasCodeToMove && !hasVariableConflict(node, caseStmtsToRemove)) {
                 removeIdenticalTrailingCode(node, allCasesStatements, caseStmtsToRemove);
                 return false;
             }
@@ -278,5 +281,26 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
         }
         allCases.add(elseStatements);
         return true;
+    }
+
+    private boolean hasVariableConflict(IfStatement node, final List<List<Statement>> casesStmtsToRemove) {
+        final Set<String> ifVariableNames= new HashSet<>();
+
+        for (List<Statement> caseStmtsToRemove : casesStmtsToRemove) {
+            for (Statement caseStmtToRemove : caseStmtsToRemove) {
+                ifVariableNames.addAll(ASTNodes.getLocalVariableIdentifiers(caseStmtToRemove, false));
+            }
+        }
+
+        for (Statement statement : ASTNodes.getNextSiblings(node)) {
+            final VarOccurrenceVisitor varOccurrenceVisitor= new VarOccurrenceVisitor(ifVariableNames);
+            varOccurrenceVisitor.visitNode(statement);
+
+            if (varOccurrenceVisitor.isVarUsed()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

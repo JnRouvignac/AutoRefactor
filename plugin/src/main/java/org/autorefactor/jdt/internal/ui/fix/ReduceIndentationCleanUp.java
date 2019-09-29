@@ -25,13 +25,13 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.autorefactor.jdt.internal.corext.dom.Refactorings;
+import org.autorefactor.jdt.internal.corext.dom.VarOccurrenceVisitor;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.CatchClause;
@@ -215,12 +215,15 @@ public class ReduceIndentationCleanUp extends AbstractCleanUpRule {
     private boolean hasVariableConflict(IfStatement node, final Statement statementInBlock) {
         final Set<String> ifVariableNames= ASTNodes.getLocalVariableIdentifiers(statementInBlock, false);
 
-        final Set<String> followingVariableNames= new HashSet<>();
         for (Statement statement : ASTNodes.getNextSiblings(node)) {
-            followingVariableNames.addAll(ASTNodes.getLocalVariableIdentifiers(statement, true));
+            final VarOccurrenceVisitor varOccurrenceVisitor= new VarOccurrenceVisitor(ifVariableNames);
+            varOccurrenceVisitor.visitNode(statement);
+
+            if (varOccurrenceVisitor.isVarUsed()) {
+                return true;
+            }
         }
 
-        final boolean hasVariableConflict= ifVariableNames.removeAll(followingVariableNames);
-        return hasVariableConflict;
+        return false;
     }
 }
