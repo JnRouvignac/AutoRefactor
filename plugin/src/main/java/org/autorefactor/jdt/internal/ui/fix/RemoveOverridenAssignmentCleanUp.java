@@ -84,7 +84,7 @@ public class RemoveOverridenAssignmentCleanUp extends AbstractCleanUpRule {
                         }
                     }
 
-                    isRead|= !new VariableDefinitionsUsesVisitor(variable, stmtToInspect).find().getUses().isEmpty();
+                    isRead|= !new VariableDefinitionsUsesVisitor(variable, stmtToInspect, true).find().getUses().isEmpty();
 
                     stmtToInspect= ASTNodes.getNextSibling(stmtToInspect);
                 }

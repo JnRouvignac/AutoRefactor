@@ -204,7 +204,7 @@ public class AllInOneMethodRatherThanLoopCleanUp extends NewClassImportCleanUp {
     private int getVariableUseCount(final IVariableBinding variableBinding, Statement toVisit) {
         if (variableBinding != null) {
             final VariableDefinitionsUsesVisitor variableUseVisitor= new VariableDefinitionsUsesVisitor(variableBinding,
-                    toVisit).find();
+                    toVisit, true).find();
             return variableUseVisitor.getUses().size();
         }
         return 0;

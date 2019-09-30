@@ -38,6 +38,7 @@ import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.Assignment;
+import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.ChildPropertyDescriptor;
 import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.SimpleName;
@@ -49,6 +50,7 @@ import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 public final class VariableDefinitionsUsesVisitor extends ASTVisitor {
     private final IVariableBinding variableBinding;
     private final ASTNode scopeNode;
+    private final boolean includeInnerScopes;
     private final List<SimpleName> definitions= new ArrayList<>();
     private final List<SimpleName> uses= new ArrayList<>();
 
@@ -59,7 +61,7 @@ public final class VariableDefinitionsUsesVisitor extends ASTVisitor {
      * @param variableDeclaration the variable declaration, cannot be {@code null}
      */
     public VariableDefinitionsUsesVisitor(VariableDeclaration variableDeclaration) {
-        this(variableDeclaration.resolveBinding(), getDeclaringScope(variableDeclaration));
+        this(variableDeclaration.resolveBinding(), getDeclaringScope(variableDeclaration), true);
     }
 
     /**
@@ -68,10 +70,12 @@ public final class VariableDefinitionsUsesVisitor extends ASTVisitor {
      *
      * @param variableBinding the variable binding to find, cannot be {@code null}
      * @param scopeNode       the {@link ASTNode} which is the scope of the search
+     * @param includeInnerScopes True if the sub blocks should be analyzed
      */
-    public VariableDefinitionsUsesVisitor(IVariableBinding variableBinding, ASTNode scopeNode) {
+    public VariableDefinitionsUsesVisitor(IVariableBinding variableBinding, ASTNode scopeNode, boolean includeInnerScopes) {
         this.variableBinding= variableBinding;
         this.scopeNode= scopeNode;
+        this.includeInnerScopes= includeInnerScopes;
     }
 
     private static ASTNode getDeclaringScope(VariableDeclaration variableDeclaration) {
@@ -129,6 +133,11 @@ public final class VariableDefinitionsUsesVisitor extends ASTVisitor {
             }
         }
         return true;
+    }
+
+    @Override
+    public boolean visit(Block node) {
+        return scopeNode == node || includeInnerScopes;
     }
 
     private void addDefinitionOrUse(SimpleName node, ChildPropertyDescriptor definitionPropertyDescriptor) {
