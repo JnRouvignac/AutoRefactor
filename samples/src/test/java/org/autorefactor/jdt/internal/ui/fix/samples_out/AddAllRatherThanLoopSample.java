@@ -23,27 +23,24 @@
  * which accompanies this distribution under LICENSE-ECLIPSE, and is
  * available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.autorefactor.jdt.internal.ui.fix.samples_in;
+package org.autorefactor.jdt.internal.ui.fix.samples_out;
 
 import java.util.AbstractSet;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class AllInOneMethodRatherThanLoopSample extends ArrayList<java.util.Date> {
+public class AddAllRatherThanLoopSample extends ArrayList<java.util.Date> {
     public Collection<? super java.util.Date> replaceAddWithForLoopByCollectionsAddAll(
             List<? super java.util.Date> output, java.util.Date[] elems1, java.sql.Date[] elems2) {
         // Keep this comment
-        for (int i = 0; i < elems1.length; i++) {
-            output.add(elems1[i]);
-        }
-        for (int i = 0; i < elems2.length; i++) {
-            output.add(elems2[i]);
-        }
+        Collections.addAll(output, elems1);
+        Collections.addAll(output, elems2);
         
         return output;
     }
@@ -51,20 +48,14 @@ public class AllInOneMethodRatherThanLoopSample extends ArrayList<java.util.Date
     public void replaceAddWithForLoopByCollectionsAddAll(
             java.util.Date[] dates) {
         // Keep this comment
-        for (int i = 0; i < dates.length; i++) {
-            add(dates[i]);
-        }
+        Collections.addAll(this, dates);
     }
 
     public Collection replaceAddWithForEachByCollectionsAddAll(
             List<? super java.util.Date> output, java.util.Date[] elems1, java.sql.Date[] elems2) {
         // Keep this comment
-        for (java.util.Date d : elems1) {
-            output.add(d);
-        }
-        for (java.sql.Date d : elems2) {
-            output.add(d);
-        }
+        Collections.addAll(output, elems1);
+        Collections.addAll(output, elems2);
         
         return output;
     }
@@ -72,17 +63,13 @@ public class AllInOneMethodRatherThanLoopSample extends ArrayList<java.util.Date
     public void replaceAddWithForEachByCollectionsAddAll(
             java.util.Date[] dates) {
         // Keep this comment
-        for (java.util.Date date : dates) {
-            add(date);
-        }
+        Collections.addAll(this, dates);
     }
 
     public Map<String, List<String>> replaceLoopOnCollectionAsExpressionWithArray(
             Map<String, List<String>> mapToFill, String[] inputList) {
         // Keep this comment
-        for (String input : inputList) {
-            mapToFill.get("foo").add(input);
-        }
+        Collections.addAll(mapToFill.get("foo"), inputList);
         
         return mapToFill;
     }
@@ -90,9 +77,7 @@ public class AllInOneMethodRatherThanLoopSample extends ArrayList<java.util.Date
     public Collection replaceLoopOnRawCollectionWithArray(
             List colToFill, String[] inputList) {
         // Keep this comment
-        for (String input : inputList) {
-            colToFill.add(input);
-        }
+        Collections.addAll(colToFill, inputList);
         
         return colToFill;
     }
@@ -100,9 +85,7 @@ public class AllInOneMethodRatherThanLoopSample extends ArrayList<java.util.Date
     public Map<String, List<String>> replaceLoopOnCollectionAsExpressionWithList(
             Map<String, List<String>> mapToFill, List<String> inputList) {
         // Keep this comment
-        for (String input : inputList) {
-            mapToFill.get("foo").add(input);
-        }
+        mapToFill.get("foo").addAll(inputList);
         
         return mapToFill;
     }
@@ -110,9 +93,7 @@ public class AllInOneMethodRatherThanLoopSample extends ArrayList<java.util.Date
     public Collection replaceLoopOnRawCollectionWithList(
             List colToFill, List<String> inputList) {
         // Keep this comment
-        for (String input : inputList) {
-            colToFill.add(input);
-        }
+        colToFill.addAll(inputList);
         
         return colToFill;
     }
@@ -187,18 +168,14 @@ public class AllInOneMethodRatherThanLoopSample extends ArrayList<java.util.Date
 
     public Collection<String> replaceAddWithForLoopByAddAll(List<String> col, List<String> output) {
         // Keep this comment
-        for (int i = 0; i < col.size(); i++) {
-            output.add(col.get(i));
-        }
+        output.addAll(col);
         
         return output;
     }
 
     public Collection<String> replaceAddWithForEachByAddAll(Collection<String> col, List<String> output) {
         // Keep this comment
-        for (String s : col) {
-            output.add(s);
-        }
+        output.addAll(col);
         
         return output;
     }
@@ -219,18 +196,14 @@ public class AllInOneMethodRatherThanLoopSample extends ArrayList<java.util.Date
 
     public Collection<String> replaceRemoveWithForLoopByRemoveAll(List<String> col, Set<String> output) {
         // Keep this comment
-        for (int i = 0; i < col.size(); i++) {
-            output.remove(col.get(i));
-        }
+        output.removeAll(col);
         
         return output;
     }
 
     public Collection<String> replaceRemoveWithForEachByRemoveAll(Collection<String> col, Set<String> output) {
         // Keep this comment
-        for (String s : col) {
-            output.remove(s);
-        }
+        output.removeAll(col);
         
         return output;
     }
@@ -258,9 +231,7 @@ public class AllInOneMethodRatherThanLoopSample extends ArrayList<java.util.Date
     public class MySet extends AbstractSet<String> {
         public MySet(List<String> strings) {
             // Keep this comment
-            for (String s : strings) {
-                add(s);
-            }
+            addAll(strings);
         }
 
         @Override
@@ -281,9 +252,7 @@ public class AllInOneMethodRatherThanLoopSample extends ArrayList<java.util.Date
 
         final MyHashSet set = new MyHashSet();
         // Keep this comment
-        for (String s : strings) {
-            set.add(s);
-        }
+        set.addAll(strings);
         return set;
     }
 }

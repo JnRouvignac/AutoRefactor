@@ -49,17 +49,17 @@ import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.Statement;
 
 /** See {@link #getDescription()} method. */
-public class AllInOneMethodRatherThanLoopCleanUp extends NewClassImportCleanUp {
+public class AddAllRatherThanLoopCleanUp extends NewClassImportCleanUp {
     private final class RefactoringWithObjectsClass extends CleanUpWithNewClassImport {
         @Override
         public boolean visit(EnhancedForStatement node) {
-            return AllInOneMethodRatherThanLoopCleanUp.this
+            return AddAllRatherThanLoopCleanUp.this
                     .maybeRefactorEnhancedForStatement(node, getClassesToUseWithImport(), getImportsToAdd());
         }
 
         @Override
         public boolean visit(ForStatement node) {
-            return AllInOneMethodRatherThanLoopCleanUp.this.maybeRefactorForStatement(node,
+            return AddAllRatherThanLoopCleanUp.this.maybeRefactorForStatement(node,
                     getClassesToUseWithImport(), getImportsToAdd());
         }
     }
@@ -70,7 +70,7 @@ public class AllInOneMethodRatherThanLoopCleanUp extends NewClassImportCleanUp {
      * @return the name.
      */
     public String getName() {
-        return MultiFixMessages.CleanUpRefactoringWizard_AllInOneMethodRatherThanLoopCleanUp_name;
+        return MultiFixMessages.CleanUpRefactoringWizard_AddAllRatherThanLoopCleanUp_name;
     }
 
     /**
@@ -79,7 +79,7 @@ public class AllInOneMethodRatherThanLoopCleanUp extends NewClassImportCleanUp {
      * @return the description.
      */
     public String getDescription() {
-        return MultiFixMessages.CleanUpRefactoringWizard_AllInOneMethodRatherThanLoopCleanUp_description;
+        return MultiFixMessages.CleanUpRefactoringWizard_AddAllRatherThanLoopCleanUp_description;
     }
 
     /**
@@ -88,7 +88,7 @@ public class AllInOneMethodRatherThanLoopCleanUp extends NewClassImportCleanUp {
      * @return the reason.
      */
     public String getReason() {
-        return MultiFixMessages.CleanUpRefactoringWizard_AllInOneMethodRatherThanLoopCleanUp_reason;
+        return MultiFixMessages.CleanUpRefactoringWizard_AddAllRatherThanLoopCleanUp_reason;
     }
 
     @Override
@@ -131,17 +131,6 @@ public class AllInOneMethodRatherThanLoopCleanUp extends NewClassImportCleanUp {
         }
 
         return true;
-    }
-
-    private void replaceWithCollectionsAddAll(final Statement node, final Expression iterable,
-            final MethodInvocation mi, final Set<String> classesToUseWithImport) {
-        ASTNodeFactory b= ctx.getASTBuilder();
-        ctx.getRefactorings().replace(node,
-                b.toStatement(b.invoke(
-                        classesToUseWithImport.contains(Collections.class.getCanonicalName()) ? b.name("Collections") //$NON-NLS-1$
-                                : b.name("java", "util", "Collections"), //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
-                        "addAll", mi.getExpression() != null ? b.copy(mi.getExpression()) : b.this0(), //$NON-NLS-1$
-                        b.copy(iterable))));
     }
 
     @Override
@@ -199,6 +188,17 @@ public class AllInOneMethodRatherThanLoopCleanUp extends NewClassImportCleanUp {
         }
 
         return true;
+    }
+
+    private void replaceWithCollectionsAddAll(final Statement node, final Expression iterable,
+            final MethodInvocation mi, final Set<String> classesToUseWithImport) {
+        ASTNodeFactory b= ctx.getASTBuilder();
+        ctx.getRefactorings().replace(node,
+                b.toStatement(b.invoke(
+                        classesToUseWithImport.contains(Collections.class.getCanonicalName()) ? b.name("Collections") //$NON-NLS-1$
+                                : b.name("java", "util", "Collections"), //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
+                        "addAll", mi.getExpression() != null ? b.copy(mi.getExpression()) : b.this0(), //$NON-NLS-1$
+                        b.copy(iterable))));
     }
 
     private int getVariableUseCount(final IVariableBinding variableBinding, Statement toVisit) {
