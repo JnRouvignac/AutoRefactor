@@ -97,6 +97,7 @@ public final class AllCleanUpRules {
                 new ElseRatherThanOppositeConditionCleanUp(), new GenericMapRatherThanRawMapCleanUp(),
                 new GenericListRatherThanRawListCleanUp(), new UseDiamondOperatorCleanUp(), new UseMultiCatchCleanUp(),
                 new ContainsRatherThanLoopCleanUp(), new ContainsAllRatherThanLoopCleanUp(), new CollectionCleanUp(), new AddAllRatherThanLoopCleanUp(),
+                new FillRatherThanLoopCleanUp(),
                 new ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp(), new BreakRatherThanPassiveIterationsCleanUp(),
                 new UpdateSetRatherThanTestingFirstCleanUp(), new IsEmptyRatherThanSizeCleanUp(), new MapCleanUp(),
                 new EntrySetRatherThanKeySetAndValueSearchCleanUp(), new MethodOnMapRatherThanMethodOnKeySetCleanUp(),
