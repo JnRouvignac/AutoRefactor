@@ -32,6 +32,7 @@ import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Name;
+import org.eclipse.jdt.core.dom.NullLiteral;
 import org.eclipse.jdt.core.dom.PrefixExpression;
 
 /** See {@link #getDescription()} method. */
@@ -75,9 +76,9 @@ public class BooleanEqualsRatherThanNullCheckCleanUp extends AbstractCleanUpRule
             if (!node.hasExtendedOperands() && isNullCheck ^ isAndExpression && condition != null
                     && ASTNodes.hasOperator(condition, InfixExpression.Operator.EQUALS, InfixExpression.Operator.NOT_EQUALS)) {
                 Expression firstExpression= null;
-                if (ASTNodes.isNullLiteral(condition.getLeftOperand())) {
+                if (ASTNodes.is(condition.getLeftOperand(), NullLiteral.class)) {
                     firstExpression= condition.getRightOperand();
-                } else if (ASTNodes.isNullLiteral(condition.getRightOperand())) {
+                } else if (ASTNodes.is(condition.getRightOperand(), NullLiteral.class)) {
                     firstExpression= condition.getLeftOperand();
                 }
 

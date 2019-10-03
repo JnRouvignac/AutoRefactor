@@ -33,6 +33,7 @@ import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.Modifier;
+import org.eclipse.jdt.core.dom.NullLiteral;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
@@ -78,7 +79,7 @@ public class RemoveFieldsDefaultValuesCleanUp extends AbstractCleanUpRule {
         boolean visitSubtree= true;
         for (VariableDeclarationFragment vdf : ASTNodes.fragments(node)) {
             final Expression initializer= vdf.getInitializer();
-            if (initializer != null && ((!fieldType.isPrimitive() && ASTNodes.isNullLiteral(initializer))
+            if (initializer != null && ((!fieldType.isPrimitive() && ASTNodes.is(initializer, NullLiteral.class))
                     || (fieldType.isPrimitive() && isPrimitiveLiteral(initializer)
                             && isPrimitiveDefaultValue(initializer.resolveConstantExpressionValue())))) {
                 this.ctx.getRefactorings().remove(initializer);

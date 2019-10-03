@@ -415,18 +415,6 @@ public final class ASTNodes {
     }
 
     /**
-     * Returns whether the provided expression represents a {@link NullLiteral}
-     * ignoring parentheses.
-     *
-     * @param expression the expression to check
-     * @return true if the provided expression represents a {@link NullLiteral}
-     *         ignoring parentheses, false otherwise
-     */
-    public static boolean isNullLiteral(Expression expression) {
-        return is(expression, NullLiteral.class);
-    }
-
-    /**
      * If the provided expression collection only has one element, then that unique
      * expression is cast to an object of the provided type if type matches.
      *
@@ -1756,9 +1744,9 @@ public final class ASTNodes {
         if (e instanceof InfixExpression) {
             final InfixExpression ie= (InfixExpression) e;
             if (hasOperator(ie, InfixExpression.Operator.NOT_EQUALS) && checkNoExtendedOperands(ie)) {
-                if (isNullLiteral(ie.getLeftOperand())) {
+                if (is(ie.getLeftOperand(), NullLiteral.class)) {
                     return ie.getRightOperand();
-                } else if (isNullLiteral(ie.getRightOperand())) {
+                } else if (is(ie.getRightOperand(), NullLiteral.class)) {
                     return ie.getLeftOperand();
                 }
             }

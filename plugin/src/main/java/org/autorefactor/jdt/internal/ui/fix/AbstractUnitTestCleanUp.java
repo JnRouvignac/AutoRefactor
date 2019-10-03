@@ -45,6 +45,7 @@ import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.ImportDeclaration;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
+import org.eclipse.jdt.core.dom.NullLiteral;
 import org.eclipse.jdt.core.dom.PrefixExpression;
 import org.eclipse.jdt.core.dom.QualifiedName;
 import org.eclipse.jdt.core.dom.SimpleName;
@@ -225,7 +226,7 @@ public abstract class AbstractUnitTestCleanUp extends AbstractCleanUpRule {
         final Pair<Expression, Expression> actualAndExpected= getActualAndExpected(ie.getLeftOperand(),
                 ie.getRightOperand());
 
-        if (isComparingObjects(ie) && !ASTNodes.isNullLiteral(ie.getLeftOperand()) && !ASTNodes.isNullLiteral(ie.getRightOperand())) {
+        if (isComparingObjects(ie) && !ASTNodes.is(ie.getLeftOperand(), NullLiteral.class) && !ASTNodes.is(ie.getRightOperand(), NullLiteral.class)) {
             final ASTNodeFactory b= this.ctx.getASTBuilder();
             final Refactorings r= this.ctx.getRefactorings();
 
@@ -257,11 +258,11 @@ public abstract class AbstractUnitTestCleanUp extends AbstractCleanUpRule {
         final Refactorings r= this.ctx.getRefactorings();
         final ASTNodeFactory b= this.ctx.getASTBuilder();
 
-        if (ASTNodes.isNullLiteral(actualValue)) {
+        if (ASTNodes.is(actualValue, NullLiteral.class)) {
             r.replace(nodeToReplace, invokeMethodOrStatement(nodeToReplace, b,
                     invokeAssertNull(originalMethod, isAssertEquals, expectedValue, failureMessage)));
             return false;
-        } else if (ASTNodes.isNullLiteral(expectedValue)) {
+        } else if (ASTNodes.is(expectedValue, NullLiteral.class)) {
             r.replace(nodeToReplace, invokeMethodOrStatement(nodeToReplace, b,
                     invokeAssertNull(originalMethod, isAssertEquals, actualValue, failureMessage)));
             return false;

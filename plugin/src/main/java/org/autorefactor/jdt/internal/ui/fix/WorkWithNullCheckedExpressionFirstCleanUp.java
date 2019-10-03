@@ -37,6 +37,7 @@ import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.InfixExpression;
+import org.eclipse.jdt.core.dom.NullLiteral;
 import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.Statement;
 
@@ -116,7 +117,7 @@ public class WorkWithNullCheckedExpressionFirstCleanUp extends AbstractCleanUpRu
         private boolean isNullCheck(Expression ifExpression) {
             final InfixExpression condition= ASTNodes.as(ifExpression, InfixExpression.class);
             return ASTNodes.hasOperator(condition, InfixExpression.Operator.EQUALS) && !condition.hasExtendedOperands()
-                    && (ASTNodes.isNullLiteral(condition.getLeftOperand()) || ASTNodes.isNullLiteral(condition.getRightOperand()));
+                    && (ASTNodes.is(condition.getLeftOperand(), NullLiteral.class) || ASTNodes.is(condition.getRightOperand(), NullLiteral.class));
         }
 
         private boolean simpleStatement(Statement statement) {
