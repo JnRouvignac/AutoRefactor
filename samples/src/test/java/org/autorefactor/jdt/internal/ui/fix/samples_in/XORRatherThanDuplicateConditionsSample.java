@@ -68,6 +68,12 @@ public class XORRatherThanDuplicateConditionsSample {
         boolean newBoolean4 = (i1 == i2) && (i3 < i4) || (i1 != i2) && (i4 <= i3);
     }
 
+    public void replaceDuplicateConditionsWithFields() {
+        // Keep this comment
+        boolean newBoolean1 = (staticField > 0) && (staticField < 100) || (staticField <= 0) && (staticField >= 100);
+        boolean newBoolean2 = (staticField > 0) && (staticField < 100) || (staticField >= 100) && !(staticField > 0);
+    }
+
     public void doNotReplaceDuplicateConditionsWithMethods(List<String> myList) {
         boolean newBoolean1 = myList.remove("lorem") && !myList.remove("ipsum") || !myList.remove("lorem")
                 && myList.remove("ipsum");

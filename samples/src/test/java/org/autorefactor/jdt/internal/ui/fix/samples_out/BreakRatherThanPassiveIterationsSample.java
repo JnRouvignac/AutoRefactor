@@ -26,6 +26,7 @@
 package org.autorefactor.jdt.internal.ui.fix.samples_out;
 
 public class BreakRatherThanPassiveIterationsSample {
+    private int[] innerArray = new int[10];
 
     private int crazyInteger = 0;
 
@@ -47,6 +48,20 @@ public class BreakRatherThanPassiveIterationsSample {
         boolean isFound = false;
 
         for (int i : array) {
+            if (i == 42) {
+                // Keep this comment
+                isFound = true;
+                break;
+            }
+        }
+
+        return isFound ? "The result has been found" : "The result has not been found";
+    }
+
+    public String addBreakWithField() {
+        boolean isFound = false;
+
+        for (int i = 0; i < this.innerArray.length; i++) {
             if (i == 42) {
                 // Keep this comment
                 isFound = true;
