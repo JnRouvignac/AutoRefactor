@@ -380,16 +380,6 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
         return true;
     }
 
-    private boolean areSameTypeBindingsByAliasingTypeCaptures(final ITypeBinding type1, final ITypeBinding type2) {
-        if (type1.isCapture() ^ type2.isCapture()) {
-            return false;
-        } else if (type1.isCapture()) {
-            return areSameTypeBindings(type1.getWildcard(), type2.getWildcard());
-        } else {
-            return type1.equals(type2);
-        }
-    }
-
     /**
      * Class to find {@code map.get(loopVariable)} constructs in the AST tree, and
      * collect the type of the value, which is unknown until one is located.
