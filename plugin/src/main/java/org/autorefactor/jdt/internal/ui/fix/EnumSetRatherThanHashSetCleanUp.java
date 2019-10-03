@@ -37,6 +37,7 @@ import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
+import org.eclipse.jdt.core.dom.Name;
 import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.TypeLiteral;
 
@@ -112,19 +113,18 @@ public final class EnumSetRatherThanHashSetCleanUp extends AbstractEnumCollectio
         ASTNodeFactory b= ctx.getASTBuilder();
         List<Expression> arguments= ASTNodes.arguments(cic);
         final MethodInvocation invocation;
+        final Name newClassName= b.name(alreadyImportedClasses.contains(EnumSet.class.getCanonicalName()) ? EnumSet.class.getSimpleName() : EnumSet.class.getCanonicalName());
 
         if (!arguments.isEmpty() && ASTNodes.instanceOf(arguments.get(0), Collection.class.getCanonicalName())) {
             Expression typeArg= arguments.get(0);
             if (!ASTNodes.instanceOf(typeArg, EnumSet.class.getCanonicalName())) {
                 return true;
             }
-            invocation= b.invoke(alreadyImportedClasses.contains(EnumSet.class.getCanonicalName()) ? b.name("EnumSet") //$NON-NLS-1$
-                    : b.name("java", "util", "EnumSet"), "copyOf", b.copy(typeArg)); //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$ $NON-NLS-4$
+            invocation= b.invoke(newClassName, "copyOf", b.copy(typeArg)); //$NON-NLS-1$
         } else {
             TypeLiteral newTypeLiteral= ctx.getAST().newTypeLiteral();
             newTypeLiteral.setType(b.copy(type));
-            invocation= b.invoke(alreadyImportedClasses.contains(EnumSet.class.getCanonicalName()) ? b.name("EnumSet") //$NON-NLS-1$
-                    : b.name("java", "util", "EnumSet"), "noneOf", newTypeLiteral); //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$ $NON-NLS-4$
+            invocation= b.invoke(newClassName, "noneOf", newTypeLiteral); //$NON-NLS-1$
         }
 
         ctx.getRefactorings().replace(cic, invocation);

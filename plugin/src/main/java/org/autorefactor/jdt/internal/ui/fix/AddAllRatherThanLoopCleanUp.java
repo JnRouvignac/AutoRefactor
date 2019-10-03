@@ -194,9 +194,7 @@ public class AddAllRatherThanLoopCleanUp extends NewClassImportCleanUp {
             final MethodInvocation mi, final Set<String> classesToUseWithImport) {
         ASTNodeFactory b= ctx.getASTBuilder();
         ctx.getRefactorings().replace(node,
-                b.toStatement(b.invoke(
-                        classesToUseWithImport.contains(Collections.class.getCanonicalName()) ? b.name("Collections") //$NON-NLS-1$
-                                : b.name("java", "util", "Collections"), //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
+                b.toStatement(b.invoke(b.name(classesToUseWithImport.contains(Collections.class.getCanonicalName()) ? Collections.class.getSimpleName() : Collections.class.getCanonicalName()),
                         "addAll", mi.getExpression() != null ? b.copy(mi.getExpression()) : b.this0(), //$NON-NLS-1$
                         b.copy(iterable))));
     }

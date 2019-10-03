@@ -237,9 +237,7 @@ public class ObjectsEqualsRatherThanEqualsAndNullCheckCleanUp extends NewClassIm
         final Refactorings r= this.ctx.getRefactorings();
 
         r.replace(node,
-                b.if0(b.not(b.invoke(
-                        classesToUseWithImport.contains(Objects.class.getCanonicalName()) ? b.name("Objects") //$NON-NLS-1$ $NON-NLS-2$
-                                : b.name("java", "util", "Objects"), //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
+                b.if0(b.not(b.invoke(b.name(classesToUseWithImport.contains(Objects.class.getCanonicalName()) ? Objects.class.getSimpleName() : Objects.class.getCanonicalName()),
                         "equals", b.copy(firstField), b.copy(secondField))), b.block(b.copy(returnStmt1)))); //$NON-NLS-1$
     }
 }

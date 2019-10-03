@@ -1014,9 +1014,16 @@ public class ASTNodeFactory {
         if (names.length == 0) {
             throw new IllegalArgumentException(null, "Expected at least one name, but was given 0 names"); //$NON-NLS-1$
         }
+
         if (names.length == 1) {
-            return simpleName(names[0]);
+            String[] simpleNames= names[0].split("\\.");
+            if (simpleNames.length == 1) {
+                return simpleName(simpleNames[0]);
+            }
+
+            return ast.newName(simpleNames);
         }
+
         return ast.newName(names);
     }
 

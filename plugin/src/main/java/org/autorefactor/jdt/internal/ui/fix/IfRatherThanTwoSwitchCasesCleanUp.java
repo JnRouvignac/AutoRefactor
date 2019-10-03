@@ -224,7 +224,7 @@ public class IfRatherThanTwoSwitchCasesCleanUp extends AbstractCleanUpRule {
             equality= b.invoke(b.copy(value), "equals", b.copy(discriminant)); //$NON-NLS-1$
         } else if (value.resolveTypeBinding() != null && value.resolveTypeBinding().isEnum()) {
             equality= b.infixExpression(b.copy(discriminant), InfixExpression.Operator.EQUALS, b.getAST().newQualifiedName(
-                    b.name(value.resolveTypeBinding().getQualifiedName().split("\\.")), b.copy((SimpleName) value))); //$NON-NLS-1$
+                    b.name(value.resolveTypeBinding().getQualifiedName()), b.copy((SimpleName) value))); //$NON-NLS-1$
         } else {
             equality= b.infixExpression(b.parenthesizeIfNeeded(b.copy(discriminant)), InfixExpression.Operator.EQUALS,
                     b.copy(value));

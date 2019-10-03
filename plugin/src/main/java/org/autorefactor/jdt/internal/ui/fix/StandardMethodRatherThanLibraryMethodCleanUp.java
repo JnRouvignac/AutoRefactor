@@ -205,8 +205,7 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
         final ASTNodeFactory b= this.ctx.getASTBuilder();
         final Refactorings r= this.ctx.getRefactorings();
 
-        r.replace(node.getExpression(), classesToUseWithImport.contains(Objects.class.getCanonicalName()) ? b.simpleName("Objects") //$NON-NLS-1$
-                : b.name("java", "util", "Objects")); //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
+        r.replace(node.getExpression(), b.name(classesToUseWithImport.contains(Objects.class.getCanonicalName()) ? Objects.class.getSimpleName() : Objects.class.getCanonicalName()));
         importsToAdd.add(Objects.class.getCanonicalName());
     }
 }

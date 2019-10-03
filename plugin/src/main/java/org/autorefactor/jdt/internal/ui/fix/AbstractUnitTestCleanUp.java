@@ -341,7 +341,7 @@ public abstract class AbstractUnitTestCleanUp extends AbstractCleanUpRule {
         Expression qualifiedMethod;
         if (originalMethod.getExpression() == null && !staticImports.contains(qualifiedMethodName + "." + methodName) //$NON-NLS-1$
                 && !staticImports.contains(qualifiedMethodName + ".*")) { //$NON-NLS-1$
-            qualifiedMethod= b.name(qualifiedMethodName.split("\\.")); //$NON-NLS-1$
+            qualifiedMethod= b.name(qualifiedMethodName);
         } else {
             qualifiedMethod= b.copyExpression(originalMethod);
         }

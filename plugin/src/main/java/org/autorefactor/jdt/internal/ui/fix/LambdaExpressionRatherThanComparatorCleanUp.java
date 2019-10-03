@@ -246,8 +246,7 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
         typeMethodRef.setType(b.toType(type, typeNameDecider));
         typeMethodRef.setName(b.copy(method.getName()));
         final MethodInvocation comparingMethod= b
-                .invoke(classesToUseWithImport.contains(Comparator.class.getCanonicalName()) ? b.name("Comparator") //$NON-NLS-1$
-                        : b.name("java", "util", "Comparator"), "comparing", typeMethodRef); //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$ $NON-NLS-4$
+                .invoke(b.name(classesToUseWithImport.contains(Comparator.class.getCanonicalName()) ? Comparator.class.getSimpleName() : Comparator.class.getCanonicalName()), "comparing", typeMethodRef); //$NON-NLS-1$
         if (straightOrder) {
             r.replace(node, comparingMethod);
         } else {
@@ -278,8 +277,7 @@ public class LambdaExpressionRatherThanComparatorCleanUp extends NewClassImportC
         lambdaExpression.setBody(b.fieldAccess(b.simpleName(identifier1), b.copy(field.getName())));
         lambdaExpression.setParentheses(false);
         final MethodInvocation comparingMethod= b
-                .invoke(classesToUseWithImport.contains(Comparator.class.getCanonicalName()) ? b.name("Comparator") //$NON-NLS-1$
-                        : b.name("java", "util", "Comparator"), "comparing", lambdaExpression); //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$ $NON-NLS-4$
+                .invoke(b.name(classesToUseWithImport.contains(Comparator.class.getCanonicalName()) ? Comparator.class.getSimpleName() : Comparator.class.getCanonicalName()), "comparing", lambdaExpression); //$NON-NLS-1$
         if (straightOrder) {
             r.replace(node, comparingMethod);
         } else {
