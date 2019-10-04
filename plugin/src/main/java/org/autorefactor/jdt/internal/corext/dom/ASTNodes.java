@@ -2230,16 +2230,23 @@ public final class ASTNodes {
 
     private static IBinding varBinding(ASTNode node) {
         switch (node.getNodeType()) {
+        case THIS_EXPRESSION:
+            return ((ThisExpression) node).resolveTypeBinding();
+
         case FIELD_ACCESS:
             return ((FieldAccess) node).resolveFieldBinding();
+
         case QUALIFIED_NAME:
         case SIMPLE_NAME:
             return ((Name) node).resolveBinding();
+
         case SINGLE_VARIABLE_DECLARATION:
         case VARIABLE_DECLARATION_FRAGMENT:
             return ((VariableDeclaration) node).resolveBinding();
+
+        default:
+            return null;
         }
-        return null;
     }
 
     /**
@@ -2343,12 +2350,15 @@ public final class ASTNodes {
     public static boolean isSameVariable(ASTNode node1, ASTNode node2) {
         node1= getUnparenthesedExpression(node1);
         node2= getUnparenthesedExpression(node2);
+
         if (node1 == null || node2 == null) {
             return false;
         }
+
         switch (node1.getNodeType()) {
         case THIS_EXPRESSION:
             return node2.getNodeType() == THIS_EXPRESSION;
+
         case SIMPLE_NAME:
             final SimpleName sn= (SimpleName) node1;
             switch (node2.getNodeType()) {
@@ -2358,6 +2368,7 @@ public final class ASTNodes {
                 return isSameVariable(sn, (FieldAccess) node2);
             }
             break;
+
         case QUALIFIED_NAME:
             final QualifiedName qn= (QualifiedName) node1;
             switch (node2.getNodeType()) {
@@ -2369,6 +2380,7 @@ public final class ASTNodes {
                 return isSameVariable(qn, (FieldAccess) node2);
             }
             break;
+
         case FIELD_ACCESS:
             final FieldAccess fa= (FieldAccess) node1;
             switch (node2.getNodeType()) {
@@ -2380,6 +2392,7 @@ public final class ASTNodes {
                 return isSameVariable(fa, (FieldAccess) node2);
             }
         }
+
         return areVariableBindingsEqual(node1, node2);
     }
 
