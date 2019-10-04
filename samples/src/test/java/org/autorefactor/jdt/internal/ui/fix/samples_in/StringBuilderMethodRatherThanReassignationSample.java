@@ -51,6 +51,14 @@ public abstract class StringBuilderMethodRatherThanReassignationSample {
         builder = builder.reverse();
     }
 
+    public void removeFieldReassignation() {
+        // Keep this comment
+        this.classBuffer = this.classBuffer.append("foo");
+
+        // Keep this comment too
+        this.classBuilder = this.classBuilder.append("foo");
+    }
+
     public void removeReassignationOnSeveralCall(StringBuffer buffer, StringBuilder builder) {
         // Keep this comment
         buffer = buffer.append("f").appendCodePoint(1).delete(1, 2).deleteCharAt(3).insert(4, "f").replace(5, 6, "f").reverse();

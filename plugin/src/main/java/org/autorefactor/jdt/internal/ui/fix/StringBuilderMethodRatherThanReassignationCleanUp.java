@@ -31,6 +31,7 @@ import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Expression;
+import org.eclipse.jdt.core.dom.FieldAccess;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Name;
 
@@ -71,7 +72,7 @@ public class StringBuilderMethodRatherThanReassignationCleanUp extends AbstractC
                 && var instanceof MethodInvocation) {
             var= getVar(var);
 
-            if (ASTNodes.isSameVariable(targetVar, var)) {
+            if (ASTNodes.isSameVariable(targetVar, var) && ASTNodes.isPassive(targetVar)) {
                 final ASTNodeFactory b= this.ctx.getASTBuilder();
                 ctx.getRefactorings().replace(node, b.copy(node.getRightHandSide()));
                 return false;
@@ -81,14 +82,18 @@ public class StringBuilderMethodRatherThanReassignationCleanUp extends AbstractC
     }
 
     private Expression getVar(final Expression var) {
-        final MethodInvocation mi= ASTNodes.as(var, MethodInvocation.class);
-        if (var instanceof Name) {
+        if (var instanceof Name || var instanceof FieldAccess) {
             return var;
-        } else if (mi != null && ASTNodes.hasType(mi.getExpression(), StringBuffer.class.getCanonicalName(), StringBuilder.class.getCanonicalName())
+        }
+
+        final MethodInvocation mi= ASTNodes.as(var, MethodInvocation.class);
+
+        if (mi != null && ASTNodes.hasType(mi.getExpression(), StringBuffer.class.getCanonicalName(), StringBuilder.class.getCanonicalName())
                 && Arrays.asList("append", "appendCodePoint", "delete", "deleteCharAt", "insert", "replace", "reverse") //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$ $NON-NLS-4$ $NON-NLS-5$ $NON-NLS-6$ $NON-NLS-7$
                         .contains(mi.getName().getIdentifier())) {
             return getVar(mi.getExpression());
         }
+
         return null;
     }
 }
