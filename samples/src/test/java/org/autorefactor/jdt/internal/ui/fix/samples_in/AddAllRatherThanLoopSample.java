@@ -149,6 +149,12 @@ public class AddAllRatherThanLoopSample extends ArrayList<java.util.Date> {
         return colToFill;
     }
 
+    public void doNotReplaceLoopWithFieldList(List<java.util.Date> input) {
+        for (int i = 0; i < input.size(); i++) {
+            add(innerList.get(i));
+        }
+    }
+
     public Map<String, List<String>> doNotRefactorForEachWithListUsingLoopVariable(
             Map<String, List<String>> mapToFill, List<String> inputList) {
         for (String input : inputList) {

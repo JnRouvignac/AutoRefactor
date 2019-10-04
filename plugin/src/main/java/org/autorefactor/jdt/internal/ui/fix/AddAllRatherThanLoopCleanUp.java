@@ -240,7 +240,8 @@ public class AddAllRatherThanLoopCleanUp extends NewClassImportCleanUp {
 
     private boolean isSameVariable(final ForLoopContent loopContent, final MethodInvocation getMI) {
         return ASTNodes.usesGivenSignature(getMI, List.class.getCanonicalName(), "get", int.class.getSimpleName()) && getMI.getExpression() instanceof Name //$NON-NLS-1$
-                && ASTNodes.isSameLocalVariable(ASTNodes.arg0(getMI), loopContent.getLoopVariable());
+                && ASTNodes.isSameLocalVariable(ASTNodes.arg0(getMI), loopContent.getLoopVariable())
+                && ASTNodes.isSameVariable(loopContent.getContainerVariable(), getMI.getExpression());
     }
 
     private void replaceWithCollectionMethod(final ASTNode toReplace, final String methodName,
