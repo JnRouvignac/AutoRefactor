@@ -78,7 +78,7 @@ public class FillRatherThanLoopSample {
         // Keep this comment
         Arrays.fill(booleanArray, true);
         // Keep this comment too
-        Arrays.fill(booleanArray, false);
+        Arrays.fill(this.booleanArray, false);
     }
 
     public boolean[] doNotReplaceNonForEachLoop() {

@@ -69,7 +69,7 @@ public class AddAllRatherThanLoopSample extends ArrayList<java.util.Date> {
 
     public void replaceForeachWithFieldArray() {
         // Keep this comment
-        for (java.util.Date d : innerArray) {
+        for (java.util.Date d : this.innerArray) {
             add(d);
         }
     }

@@ -32,6 +32,7 @@ import java.util.List;
 import org.autorefactor.util.Pair;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Expression;
+import org.eclipse.jdt.core.dom.FieldAccess;
 import org.eclipse.jdt.core.dom.ForStatement;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
@@ -72,7 +73,7 @@ public final class ForLoopHelper {
     public static final class ForLoopContent {
         private IterationType iterationType;
         private ContainerType containerType;
-        private Name containerVariable;
+        private Expression containerVariable;
         private Expression iteratorVariable;
         private Name loopVariable;
         private Name elementVariable;
@@ -81,7 +82,7 @@ public final class ForLoopHelper {
             // Use method factories
         }
 
-        private static ForLoopContent indexedArray(Name containerVariable, Name loopVariable) {
+        private static ForLoopContent indexedArray(Expression containerVariable, Name loopVariable) {
             final ForLoopContent content= new ForLoopContent();
             content.iterationType= IterationType.INDEX;
             content.containerType= ContainerType.ARRAY;
@@ -90,7 +91,7 @@ public final class ForLoopHelper {
             return content;
         }
 
-        private static ForLoopContent indexedCollection(Name containerVariable, Name loopVariable) {
+        private static ForLoopContent indexedCollection(Expression containerVariable, Name loopVariable) {
             final ForLoopContent content= new ForLoopContent();
             content.iterationType= IterationType.INDEX;
             content.containerType= ContainerType.COLLECTION;
@@ -99,7 +100,7 @@ public final class ForLoopHelper {
             return content;
         }
 
-        private static ForLoopContent iteratedCollection(Expression iteratorVariable, Name containerVariable) {
+        private static ForLoopContent iteratedCollection(Expression containerVariable, Expression iteratorVariable) {
             final ForLoopContent content= new ForLoopContent();
             content.iterationType= IterationType.ITERATOR;
             content.containerType= ContainerType.COLLECTION;
@@ -131,7 +132,7 @@ public final class ForLoopHelper {
          *
          * @return the name of the container variable
          */
-        public Name getContainerVariable() {
+        public Expression getContainerVariable() {
             return containerVariable;
         }
 
@@ -212,8 +213,8 @@ public final class ForLoopHelper {
     }
 
     private static ForLoopContent getIteratorOnCollection(Expression containerVar, Expression iteratorVariable) {
-        if (containerVar instanceof Name) {
-            return ForLoopContent.iteratedCollection(iteratorVariable, (Name) containerVar);
+        if (containerVar instanceof Name || containerVar instanceof FieldAccess) {
+            return ForLoopContent.iteratedCollection(containerVar, iteratorVariable);
         }
         return null;
     }
@@ -286,7 +287,7 @@ public final class ForLoopHelper {
         }
         if (containerVar instanceof MethodInvocation) {
             final MethodInvocation mi= (MethodInvocation) containerVar;
-            final Name containerVarName= ASTNodes.as(mi.getExpression(), Name.class);
+            final Expression containerVarName= ASTNodes.getUnparenthesedExpression(mi.getExpression());
             if (containerVarName != null && ASTNodes.usesGivenSignature(mi, Collection.class.getCanonicalName(), "size")) { //$NON-NLS-1$
                 return ForLoopContent.indexedCollection(containerVarName, (Name) loopVar);
             }
@@ -296,11 +297,21 @@ public final class ForLoopHelper {
                 Name containerVariable= ((QualifiedName) containerVar).getQualifier();
                 return ForLoopContent.indexedArray(containerVariable, (Name) loopVar);
             }
+        } else if (containerVar instanceof FieldAccess) {
+            final FieldAccess containerVarName= (FieldAccess) containerVar;
+            if (isArrayLength(containerVarName)) {
+                Expression containerVariable= ((FieldAccess) containerVar).getExpression();
+                return ForLoopContent.indexedArray(containerVariable, (Name) loopVar);
+            }
         }
         return null;
     }
 
     private static boolean isArrayLength(final QualifiedName containerVarName) {
         return ASTNodes.isArray(containerVarName.getQualifier()) && "length".equals(containerVarName.getName().getIdentifier()); //$NON-NLS-1$
+    }
+
+    private static boolean isArrayLength(final FieldAccess containerVarName) {
+        return ASTNodes.isArray(containerVarName.getExpression()) && "length".equals(containerVarName.getName().getIdentifier()); //$NON-NLS-1$
     }
 }

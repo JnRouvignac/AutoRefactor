@@ -94,8 +94,8 @@ public class FillRatherThanLoopSample {
             booleanArray[i] = true;
         }
         // Keep this comment too
-        for (int i = 0; i < booleanArray.length; i++) {
-            booleanArray[i] = false;
+        for (int i = 0; i < this.booleanArray.length; i++) {
+            this.booleanArray[i] = false;
         }
     }
 
