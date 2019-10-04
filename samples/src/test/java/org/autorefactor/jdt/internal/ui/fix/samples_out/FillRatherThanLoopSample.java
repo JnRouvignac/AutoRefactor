@@ -94,6 +94,16 @@ public class FillRatherThanLoopSample {
         return array;
     }
 
+    public boolean[] doNotReplaceWierdLoop(int j) {
+        boolean[] array = new boolean[10];
+
+        for (int i = 0; j++ < array.length; i++) {
+            array[i] = true;
+        }
+
+        return array;
+    }
+
     public int[] doNotRefactorInitWithoutConstant(int j) {
         int[] array = new int[10];
 

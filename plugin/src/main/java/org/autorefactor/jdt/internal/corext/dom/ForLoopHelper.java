@@ -200,7 +200,9 @@ public final class ForLoopHelper {
                 final Name init= initPair.getFirst();
                 final ForLoopContent forContent= getIndexOnIterable(condition, init);
                 final Name updater= getUpdaterOperand(updaters.get(0));
-                if (forContent != null && isZero(initPair.getSecond()) && ASTNodes.isSameVariable(init, forContent.loopVariable)
+                Long zero= ASTNodes.integerLiteral(initPair.getSecond());
+
+                if (forContent != null && zero != null && zero == 0 && ASTNodes.isSameVariable(init, forContent.loopVariable)
                         && ASTNodes.isSameVariable(init, updater)) {
                     return forContent;
                 }
@@ -261,27 +263,20 @@ public final class ForLoopHelper {
         return Pair.empty();
     }
 
-    private static boolean isZero(final Expression expression) {
-        if (expression != null) {
-            final Object val= expression.resolveConstantExpressionValue();
-            if (val instanceof Integer) {
-                return ((Integer) val).intValue() == 0;
-            }
-        }
-        return false;
-    }
-
     private static ForLoopContent getIndexOnIterable(final Expression condition, Name loopVariable) {
         final InfixExpression ie= ASTNodes.as(condition, InfixExpression.class);
+
         if (ie != null && !ie.hasExtendedOperands()) {
             final Expression leftOp= ie.getLeftOperand();
             final Expression rightOp= ie.getRightOperand();
-            if (ASTNodes.hasOperator(ie, InfixExpression.Operator.LESS)) {
+
+            if (ASTNodes.hasOperator(ie, InfixExpression.Operator.LESS) && ASTNodes.isSameLocalVariable(loopVariable, leftOp)) {
                 return buildForLoopContent(loopVariable, rightOp);
-            } else if (ASTNodes.hasOperator(ie, InfixExpression.Operator.GREATER)) {
+            } else if (ASTNodes.hasOperator(ie, InfixExpression.Operator.GREATER) && ASTNodes.isSameLocalVariable(loopVariable, rightOp)) {
                 return buildForLoopContent(loopVariable, leftOp);
             }
         }
+
         return null;
     }
 
