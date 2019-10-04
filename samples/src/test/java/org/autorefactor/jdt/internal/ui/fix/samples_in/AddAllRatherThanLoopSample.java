@@ -36,7 +36,9 @@ import java.util.Set;
 
 public class AddAllRatherThanLoopSample extends ArrayList<java.util.Date> {
     private java.util.Date[] innerArray = new java.util.Date[10];
-    
+
+    private List<java.util.Date> innerList = new ArrayList<>();
+
     public Collection<? super java.util.Date> replaceAddWithForLoopByCollectionsAddAll(
             List<? super java.util.Date> output, java.util.Date[] elems1, java.sql.Date[] elems2) {
         // Keep this comment
@@ -46,7 +48,7 @@ public class AddAllRatherThanLoopSample extends ArrayList<java.util.Date> {
         for (int i = 0; i < elems2.length; i++) {
             output.add(elems2[i]);
         }
-        
+
         return output;
     }
 
@@ -58,9 +60,30 @@ public class AddAllRatherThanLoopSample extends ArrayList<java.util.Date> {
         }
     }
 
-    public void replaceAddWithField() {
+    public void replaceLoopWithFieldArray() {
+        // Keep this comment
+        for (int i = 0; i < innerArray.length; i++) {
+            add(innerArray[i]);
+        }
+    }
+
+    public void replaceForeachWithFieldArray() {
         // Keep this comment
         for (java.util.Date d : innerArray) {
+            add(d);
+        }
+    }
+
+    public void replaceLoopWithFieldList() {
+        // Keep this comment
+        for (int i = 0; i < innerList.size(); i++) {
+            add(innerList.get(i));
+        }
+    }
+
+    public void replaceForeachWithFieldList() {
+        // Keep this comment
+        for (java.util.Date d : innerList) {
             add(d);
         }
     }
@@ -74,7 +97,7 @@ public class AddAllRatherThanLoopSample extends ArrayList<java.util.Date> {
         for (java.sql.Date d : elems2) {
             output.add(d);
         }
-        
+
         return output;
     }
 
@@ -92,7 +115,7 @@ public class AddAllRatherThanLoopSample extends ArrayList<java.util.Date> {
         for (String input : inputList) {
             mapToFill.get("foo").add(input);
         }
-        
+
         return mapToFill;
     }
 
@@ -102,7 +125,7 @@ public class AddAllRatherThanLoopSample extends ArrayList<java.util.Date> {
         for (String input : inputList) {
             colToFill.add(input);
         }
-        
+
         return colToFill;
     }
 
@@ -112,7 +135,7 @@ public class AddAllRatherThanLoopSample extends ArrayList<java.util.Date> {
         for (String input : inputList) {
             mapToFill.get("foo").add(input);
         }
-        
+
         return mapToFill;
     }
 
@@ -122,7 +145,7 @@ public class AddAllRatherThanLoopSample extends ArrayList<java.util.Date> {
         for (String input : inputList) {
             colToFill.add(input);
         }
-        
+
         return colToFill;
     }
 
@@ -131,7 +154,7 @@ public class AddAllRatherThanLoopSample extends ArrayList<java.util.Date> {
         for (String input : inputList) {
             mapToFill.get(input).add(input);
         }
-        
+
         return mapToFill;
     }
 
@@ -140,7 +163,7 @@ public class AddAllRatherThanLoopSample extends ArrayList<java.util.Date> {
         for (int i = 0; i < inputList.size(); i++) {
             mapToFill.get(inputList.get(i)).add(inputList.get(i));
         }
-        
+
         return mapToFill;
     }
 
@@ -150,7 +173,7 @@ public class AddAllRatherThanLoopSample extends ArrayList<java.util.Date> {
         for (Iterator<String> it = inputList.iterator(); it.hasNext(); input = it.next()) {
             mapToFill.get(input).add(input);
         }
-        
+
         return mapToFill;
     }
 
@@ -165,7 +188,7 @@ public class AddAllRatherThanLoopSample extends ArrayList<java.util.Date> {
         for (String input : inputArray) {
             mapToFill.get(input).add(input);
         }
-        
+
         return mapToFill;
     }
 
@@ -174,7 +197,7 @@ public class AddAllRatherThanLoopSample extends ArrayList<java.util.Date> {
         for (int i = 0; i < inputArray.length; i++) {
             mapToFill.get(inputArray[i]).add(inputArray[i]);
         }
-        
+
         return mapToFill;
     }
 
@@ -182,7 +205,7 @@ public class AddAllRatherThanLoopSample extends ArrayList<java.util.Date> {
         for (int i = 0; i < elems.length; i++) {
             output.add(doSomething(elems[i]));
         }
-        
+
         return output;
     }
 
@@ -190,7 +213,7 @@ public class AddAllRatherThanLoopSample extends ArrayList<java.util.Date> {
         for (String s : elems) {
             output.add(doSomething(s));
         }
-        
+
         return output;
     }
 
@@ -199,7 +222,7 @@ public class AddAllRatherThanLoopSample extends ArrayList<java.util.Date> {
         for (int i = 0; i < col.size(); i++) {
             output.add(col.get(i));
         }
-        
+
         return output;
     }
 
@@ -208,7 +231,7 @@ public class AddAllRatherThanLoopSample extends ArrayList<java.util.Date> {
         for (String s : col) {
             output.add(s);
         }
-        
+
         return output;
     }
 
@@ -218,11 +241,11 @@ public class AddAllRatherThanLoopSample extends ArrayList<java.util.Date> {
         List<String> output = new ArrayList<>();
         output.add("redundant");
         output.add("redundant");
-        
+
         for (int i = 0; i < col.size(); i++) {
             output.remove(col.get(i));
         }
-        
+
         return output;
     }
 
@@ -231,7 +254,7 @@ public class AddAllRatherThanLoopSample extends ArrayList<java.util.Date> {
         for (int i = 0; i < col.size(); i++) {
             output.remove(col.get(i));
         }
-        
+
         return output;
     }
 
@@ -240,7 +263,7 @@ public class AddAllRatherThanLoopSample extends ArrayList<java.util.Date> {
         for (String s : col) {
             output.remove(s);
         }
-        
+
         return output;
     }
 
@@ -248,7 +271,7 @@ public class AddAllRatherThanLoopSample extends ArrayList<java.util.Date> {
         for (int i = 0; i < col.size(); i++) {
             output.add(doSomething(col.get(i)));
         }
-        
+
         return output;
     }
 
@@ -256,7 +279,7 @@ public class AddAllRatherThanLoopSample extends ArrayList<java.util.Date> {
         for (String s : col) {
             output.add(doSomething(s));
         }
-        
+
         return output;
     }
 

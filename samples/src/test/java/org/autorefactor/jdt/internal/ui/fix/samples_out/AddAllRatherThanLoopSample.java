@@ -38,6 +38,8 @@ import java.util.Set;
 public class AddAllRatherThanLoopSample extends ArrayList<java.util.Date> {
     private java.util.Date[] innerArray = new java.util.Date[10];
 
+    private List<java.util.Date> innerList = new ArrayList<>();
+
     public Collection<? super java.util.Date> replaceAddWithForLoopByCollectionsAddAll(
             List<? super java.util.Date> output, java.util.Date[] elems1, java.sql.Date[] elems2) {
         // Keep this comment
@@ -53,9 +55,24 @@ public class AddAllRatherThanLoopSample extends ArrayList<java.util.Date> {
         Collections.addAll(this, dates);
     }
 
-    public void replaceAddWithField() {
+    public void replaceLoopWithFieldArray() {
         // Keep this comment
         Collections.addAll(this, innerArray);
+    }
+
+    public void replaceForeachWithFieldArray() {
+        // Keep this comment
+        Collections.addAll(this, innerArray);
+    }
+
+    public void replaceLoopWithFieldList() {
+        // Keep this comment
+        addAll(innerList);
+    }
+
+    public void replaceForeachWithFieldList() {
+        // Keep this comment
+        addAll(innerList);
     }
 
     public Collection replaceAddWithForEachByCollectionsAddAll(

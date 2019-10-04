@@ -45,7 +45,6 @@ import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Name;
-import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.Statement;
 
 /** See {@link #getDescription()} method. */
@@ -144,17 +143,18 @@ public class AddAllRatherThanLoopCleanUp extends NewClassImportCleanUp {
         final List<Statement> statements= ASTNodes.asList(node.getBody());
 
         if (loopContent != null && loopContent.getLoopVariable() != null && statements.size() == 1) {
-            final SimpleName loopVariable= (SimpleName) loopContent.getLoopVariable();
+            final Name loopVariable= loopContent.getLoopVariable();
             final IVariableBinding loopVariableName= (IVariableBinding) loopVariable.resolveBinding();
             final MethodInvocation mi= ASTNodes.asExpression(statements.get(0), MethodInvocation.class);
 
             // We should remove all the loop variable occurrences
             // As we replace only one, there should be no more than one occurrence
             if (mi != null && mi.arguments().size() == 1 && getVariableUseCount(loopVariableName, node.getBody()) == 1) {
+                final Expression addArg0= ASTNodes.arg0(mi);
+
                 switch (loopContent.getContainerType()) {
                 case COLLECTION:
-                    final Expression addArg01= ASTNodes.arg0(mi);
-                    final MethodInvocation getMI= ASTNodes.as(addArg01, MethodInvocation.class);
+                    final MethodInvocation getMI= ASTNodes.as(addArg0, MethodInvocation.class);
 
                     if (getMI != null && getMI.arguments().size() == 1 && isSameVariable(loopContent, getMI)) {
                         return maybeReplaceForCollection(node, mi, getMI.getExpression());
@@ -162,13 +162,10 @@ public class AddAllRatherThanLoopCleanUp extends NewClassImportCleanUp {
                     break;
 
                 case ARRAY:
-                    final Expression addArg0= ASTNodes.arg0(mi);
                     final ArrayAccess aa= ASTNodes.as(addArg0, ArrayAccess.class);
 
                     if (isSameVariable(loopContent, aa)) {
-                        final Expression iterable= loopContent.getContainerVariable();
-
-                        return maybeReplaceForArray(node, classesToUseWithImport, importsToAdd, iterable, mi);
+                        return maybeReplaceForArray(node, classesToUseWithImport, importsToAdd, loopContent.getContainerVariable(), mi);
                     }
                     break;
                 }
@@ -209,7 +206,7 @@ public class AddAllRatherThanLoopCleanUp extends NewClassImportCleanUp {
     }
 
     private boolean isSameVariable(ForLoopContent loopContent, ArrayAccess aa) {
-        return aa != null && ASTNodes.isSameLocalVariable(aa.getArray(), loopContent.getContainerVariable())
+        return aa != null && ASTNodes.isSameVariable(aa.getArray(), loopContent.getContainerVariable())
                 && ASTNodes.isSameLocalVariable(aa.getIndex(), loopContent.getLoopVariable());
     }
 
