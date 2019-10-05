@@ -104,12 +104,10 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
             final Assignment as= ASTNodes.asExpression(statements.get(0), Assignment.class);
 
             if (ASTNodes.hasOperator(as, Assignment.Operator.ASSIGN)) {
-                final Expression lhs= as.getLeftHandSide();
-                final Expression rhs= as.getRightHandSide();
+                final ArrayAccess aaLHS= ASTNodes.as(as.getLeftHandSide(), ArrayAccess.class);
+                final ArrayAccess aaRHS= ASTNodes.as(as.getRightHandSide(), ArrayAccess.class);
 
-                if (lhs instanceof ArrayAccess && rhs instanceof ArrayAccess) {
-                    final ArrayAccess aaLHS= (ArrayAccess) lhs;
-                    final ArrayAccess aaRHS= (ArrayAccess) rhs;
+                if (aaLHS != null && aaRHS != null) {
                     params.destArrayExpression= aaLHS.getArray();
                     params.srcArrayExpression= aaRHS.getArray();
 
