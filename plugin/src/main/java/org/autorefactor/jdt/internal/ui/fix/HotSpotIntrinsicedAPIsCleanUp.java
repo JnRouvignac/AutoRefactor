@@ -218,8 +218,9 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
 
     private void collectLength(final Expression condition, final IVariableBinding incrementedIdx,
             final SystemArrayCopyParams params) {
-        if (condition instanceof InfixExpression) {
-            final InfixExpression ie= (InfixExpression) condition;
+        final InfixExpression ie= ASTNodes.as(condition, InfixExpression.class);
+
+        if (ie != null) {
             if (ASTNodes.hasOperator(ie, InfixExpression.Operator.LESS, InfixExpression.Operator.LESS_EQUALS)) {
                 collectLength(incrementedIdx, params, ie, ie.getLeftOperand(), ie.getRightOperand());
             } else if (ASTNodes.hasOperator(ie, InfixExpression.Operator.GREATER, InfixExpression.Operator.GREATER_EQUALS)) {
@@ -285,9 +286,10 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
             if (ASTNodes.hasOperator(as, Assignment.Operator.ASSIGN) && ASTNodes.isPrimitive(as.resolveTypeBinding(), int.class.getSimpleName())) {
                 // This must be the array index
                 params.indexStartPos= as.getRightHandSide();
-                final Expression lhs= as.getLeftHandSide();
-                if (lhs instanceof SimpleName) {
-                    final IBinding binding= ((SimpleName) lhs).resolveBinding();
+                final SimpleName lhs= ASTNodes.as(as.getLeftHandSide(), SimpleName.class);
+
+                if (lhs != null) {
+                    final IBinding binding= lhs.resolveBinding();
                     if (binding instanceof IVariableBinding) {
                         params.indexVarBinding= (IVariableBinding) binding;
                     }
@@ -316,13 +318,15 @@ public class HotSpotIntrinsicedAPIsCleanUp extends AbstractCleanUpRule {
     }
 
     private IVariableBinding getVariableBinding(final Expression e) {
-        if (e instanceof SimpleName) {
-            final SimpleName sn= (SimpleName) e;
+        final SimpleName sn= ASTNodes.as(e, SimpleName.class);
+
+        if (sn != null) {
             final IBinding binding= sn.resolveBinding();
-            if (binding instanceof IVariableBinding) { // this is a local variable or a field
+            if (binding instanceof IVariableBinding) { // This is a local variable or a field
                 return (IVariableBinding) binding;
             }
         }
+
         return null;
     }
 }
