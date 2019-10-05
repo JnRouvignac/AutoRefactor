@@ -25,6 +25,7 @@
  */
 package org.autorefactor.jdt.internal.ui.fix.samples_out;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -32,9 +33,22 @@ import java.util.Iterator;
 import java.util.List;
 
 public class ContainsAllRatherThanLoopSample {
+    private List<Long> collectionToAnalyzeField = new ArrayList<>();
+    private List<Long> dataToSearchField = new ArrayList<>();
+
     public boolean replaceForeach(List<Long> collectionToAnalyze, List<Long> dataToSearch) {
         // Keep this comment
         return collectionToAnalyze.containsAll(dataToSearch);
+    }
+
+    public boolean replaceForeachWithField() {
+        // Keep this comment
+        return collectionToAnalyzeField.containsAll(dataToSearchField);
+    }
+
+    public boolean replaceForeachWithThis() {
+        // Keep this comment
+        return this.collectionToAnalyzeField.containsAll(this.dataToSearchField);
     }
 
     public boolean replaceForeachInvertedContains(List<Date> collectionToAnalyze, List<Date> dataToSearch) {
