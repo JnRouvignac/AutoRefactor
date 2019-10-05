@@ -223,43 +223,35 @@ public class BreakRatherThanPassiveIterationsCleanUp extends AbstractCleanUpRule
             }
         }
 
-        if (statements.get(statements.size() - 1) instanceof IfStatement) {
-            final IfStatement ifStatement= (IfStatement) statements.get(statements.size() - 1);
+        final IfStatement ifStatement= ASTNodes.as(statements.get(statements.size() - 1), IfStatement.class);
 
-            if (ifStatement.getElseStatement() == null && !hasSideEffect(ifStatement.getExpression(), allowedVars)) {
-                final List<Statement> assignments= ASTNodes.asList(ifStatement.getThenStatement());
+        if (ifStatement != null && ifStatement.getElseStatement() == null && !hasSideEffect(ifStatement.getExpression(), allowedVars)) {
+            final List<Statement> assignments= ASTNodes.asList(ifStatement.getThenStatement());
 
-                for (Statement statement : assignments) {
-                    if (statement instanceof VariableDeclarationStatement) {
-                        final VariableDeclarationStatement decl= (VariableDeclarationStatement) statement;
+            for (Statement statement : assignments) {
+                if (statement instanceof VariableDeclarationStatement) {
+                    final VariableDeclarationStatement decl= (VariableDeclarationStatement) statement;
 
-                        for (Object obj : decl.fragments()) {
-                            final VariableDeclarationFragment fragment= (VariableDeclarationFragment) obj;
+                    for (Object obj : decl.fragments()) {
+                        final VariableDeclarationFragment fragment= (VariableDeclarationFragment) obj;
 
-                            if (!ASTNodes.isHardCoded(fragment.getInitializer())) {
-                                return true;
-                            }
-                        }
-                    } else if (statement instanceof ExpressionStatement) {
-                        final Expression expression= ((ExpressionStatement) statement).getExpression();
-
-                        if (expression instanceof Assignment) {
-                            final Assignment assignment= (Assignment) expression;
-
-                            if (!ASTNodes.isHardCoded(assignment.getRightHandSide())) {
-                                return true;
-                            }
-                        } else {
+                        if (!ASTNodes.isHardCoded(fragment.getInitializer())) {
                             return true;
                         }
-                    } else {
+                    }
+                } else if (statement instanceof ExpressionStatement) {
+                    final Assignment assignment= ASTNodes.as(((ExpressionStatement) statement).getExpression(), Assignment.class);
+
+                    if (assignment == null || !ASTNodes.isHardCoded(assignment.getRightHandSide())) {
                         return true;
                     }
+                } else {
+                    return true;
                 }
-
-                addBreak(ifStatement, assignments);
-                return false;
             }
+
+            addBreak(ifStatement, assignments);
+            return false;
         }
 
         return true;
