@@ -126,10 +126,10 @@ public class SuperCallRatherThanUselessOverridingCleanUp extends AbstractCleanUp
 
         for (int i= 0; i < node.parameters().size(); i++) {
             final SingleVariableDeclaration paramName= (SingleVariableDeclaration) parameters.get(i);
-            final Expression paramExpression= (Expression) bodyMi.arguments().get(i);
+            final SimpleName paramExpression= ASTNodes.as((Expression) bodyMi.arguments().get(i), SimpleName.class);
 
-            if (!(paramExpression instanceof SimpleName)
-                    || !paramName.getName().getIdentifier().equals(((SimpleName) paramExpression).getIdentifier())) {
+            if (paramExpression == null
+                    || !paramName.getName().getIdentifier().equals(paramExpression.getIdentifier())) {
                 return false;
             }
         }
