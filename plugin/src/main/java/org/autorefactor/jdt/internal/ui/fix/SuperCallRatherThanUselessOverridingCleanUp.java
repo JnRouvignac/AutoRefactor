@@ -103,14 +103,14 @@ public class SuperCallRatherThanUselessOverridingCleanUp extends AbstractCleanUp
                         && !hasSignificantAnnotations(declMethodBinding)
                         && haveSameModifiers(bodyMethodBinding, declMethodBinding)
                         && haveSameParameters(node, bodyMi)) {
-                    if (Modifier.isProtected(declMethodBinding.getModifiers())
-                            && !declaredInSamePackage(bodyMethodBinding, declMethodBinding)) {
-                        // protected also means package visibility, so check if it is required
-                        if (!isMethodUsedInItsPackage(declMethodBinding, node)) {
-                            this.ctx.getRefactorings().remove(node);
-                            return false;
-                        }
-                    } else {
+                    if (!Modifier.isProtected(declMethodBinding.getModifiers())
+                            || declaredInSamePackage(bodyMethodBinding, declMethodBinding)) {
+                        this.ctx.getRefactorings().remove(node);
+                        return false;
+                    }
+
+                    // protected also means package visibility, so check if it is required
+                    if (!isMethodUsedInItsPackage(declMethodBinding, node)) {
                         this.ctx.getRefactorings().remove(node);
                         return false;
                     }

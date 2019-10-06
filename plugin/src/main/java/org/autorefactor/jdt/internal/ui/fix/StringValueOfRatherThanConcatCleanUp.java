@@ -26,10 +26,14 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.autorefactor.jdt.internal.corext.dom.ASTNodeFactory;
 import org.autorefactor.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.InfixExpression;
+import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.StringLiteral;
 
 /** See {@link #getDescription()} method. */
@@ -63,7 +67,7 @@ public class StringValueOfRatherThanConcatCleanUp extends AbstractCleanUpRule {
 
     @Override
     public boolean visit(InfixExpression node) {
-        if (ASTNodes.hasOperator(node, InfixExpression.Operator.PLUS) && ASTNodes.extendedOperands(node).isEmpty()) {
+        if (ASTNodes.hasOperator(node, InfixExpression.Operator.PLUS)) {
             final Expression leftOperand= node.getLeftOperand();
             final Expression rightOperand= node.getRightOperand();
 
@@ -71,17 +75,35 @@ public class StringValueOfRatherThanConcatCleanUp extends AbstractCleanUpRule {
                     // If not replaced then try the other way round
                     && maybeReplaceStringConcatenation(node, rightOperand, leftOperand);
         }
+
         return true;
     }
 
     private boolean maybeReplaceStringConcatenation(final InfixExpression node, final Expression expression,
             final Expression variable) {
-        if (expression instanceof StringLiteral && ((StringLiteral) expression).getLiteralValue().matches("") //$NON-NLS-1$
+        StringLiteral stringLiteral= ASTNodes.as(expression, StringLiteral.class);
+
+        if (stringLiteral != null && stringLiteral.getLiteralValue().matches("") //$NON-NLS-1$
                 && !ASTNodes.hasType(variable, String.class.getCanonicalName(), "char[]")) { //$NON-NLS-1$
             final ASTNodeFactory b= this.ctx.getASTBuilder();
-            ctx.getRefactorings().replace(node, b.invoke("String", "valueOf", b.copy(variable))); //$NON-NLS-1$ $NON-NLS-2$
+            final MethodInvocation newInvoke= b.invoke("String", "valueOf", b.copy(variable)); //$NON-NLS-1$ $NON-NLS-2$
+
+            if (node.hasExtendedOperands()) {
+                List<Expression> extendedOperands= ASTNodes.extendedOperands(node);
+                List<Expression> newOperands= new ArrayList<>(1 + extendedOperands.size());
+                newOperands.add(newInvoke);
+
+                for (Expression extendedOperand : extendedOperands) {
+                    newOperands.add(b.copy(extendedOperand));
+                }
+                ctx.getRefactorings().replace(node, b.infixExpression(InfixExpression.Operator.PLUS, newOperands));
+            } else {
+                ctx.getRefactorings().replace(node, newInvoke);
+            }
+
             return false;
         }
+
         return true;
     }
 }

@@ -27,13 +27,12 @@
 package org.autorefactor.jdt.internal.ui.fix.samples_in;
 
 public class StringValueOfRatherThanConcatSample {
-
     public void replaceForcedConcatenationByStringValueOf(
             Object o, boolean b, char c, byte by, short s, int i, long l, float f, double d) {
-        // Keep this comment 1
+        // Keep this comment
         String text = o + "";
 
-        // Keep this comment 2
+        // Keep this comment too
         text = b + "";
         text = c + "";
         text = by + "";
@@ -43,7 +42,7 @@ public class StringValueOfRatherThanConcatSample {
         text = f + "";
         text = d + "";
 
-        // Keep this comment 3
+        // Keep this comment also
         text = "" + o;
         text = "" + b;
         text = "" + c;
@@ -53,6 +52,12 @@ public class StringValueOfRatherThanConcatSample {
         text = "" + l;
         text = "" + f;
         text = "" + d;
+    }
+
+    public String replaceForcedLongConcatenationByStringValueOf(
+            Object o, boolean b, char c, byte by, short s, int i, long l, float f, double d) {
+        // Keep this comment
+        return o + "" + b + c + by + s + i + l + f + d;
     }
 
     public void doNotReplaceConcatenateWithCharArray(char[] chars) {
