@@ -158,17 +158,20 @@ public class StringCleanUp extends AbstractCleanUpRule {
                 || ASTNodes.usesGivenSignature(node, String.class.getCanonicalName(), "lastIndexOf", String.class.getCanonicalName()) //$NON-NLS-1$
                 || ASTNodes.usesGivenSignature(node, String.class.getCanonicalName(), "indexOf", String.class.getCanonicalName(), Integer.class.getCanonicalName()) //$NON-NLS-1$
                 || ASTNodes.usesGivenSignature(node, String.class.getCanonicalName(), "lastIndexOf", String.class.getCanonicalName(), Integer.class.getCanonicalName())) { //$NON-NLS-1$
-            Expression expression= ASTNodes.arg0(node);
-            if (expression instanceof StringLiteral) {
-                String value= ((StringLiteral) expression).getLiteralValue();
+            StringLiteral stringLiteral= ASTNodes.as(ASTNodes.arg0(node), StringLiteral.class);
+
+            if (stringLiteral != null) {
+                String value= stringLiteral.getLiteralValue();
+
                 if (value.length() == 1) {
                     CharacterLiteral replacement= b.charLiteral();
                     replacement.setCharValue(value.charAt(0));
-                    r.replace(expression, replacement);
+                    r.replace(stringLiteral, replacement);
                     return false;
                 }
             }
         }
+
         return true;
     }
 

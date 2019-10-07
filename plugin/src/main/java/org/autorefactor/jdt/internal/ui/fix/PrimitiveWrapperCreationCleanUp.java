@@ -115,13 +115,17 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
         }
 
         final ITypeBinding typeBinding= node.getExpression().resolveTypeBinding();
-        if (typeBinding != null && node.getExpression() instanceof ClassInstanceCreation) {
-            final List<Expression> cicArgs= ASTNodes.arguments((ClassInstanceCreation) node.getExpression());
+        ClassInstanceCreation classInstanceCreation= ASTNodes.as(node.getExpression(), ClassInstanceCreation.class);
+
+        if (typeBinding != null && classInstanceCreation != null) {
+            final List<Expression> cicArgs= ASTNodes.arguments(classInstanceCreation);
+
             if (cicArgs.size() == 1) {
                 final Expression arg0= cicArgs.get(0);
                 if (ASTNodes.arguments(node).isEmpty() && ASTNodes.hasType(arg0, String.class.getCanonicalName())) {
                     final String methodName= getMethodName(typeBinding.getQualifiedName(),
                             node.getName().getIdentifier());
+
                     if (methodName != null) {
                         ctx.getRefactorings().replace(node,
                                 newMethodInvocation(typeBinding.getName(), methodName, arg0));
@@ -130,6 +134,7 @@ public class PrimitiveWrapperCreationCleanUp extends AbstractCleanUpRule {
                 }
             }
         }
+
         return true;
     }
 

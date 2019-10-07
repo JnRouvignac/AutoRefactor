@@ -65,22 +65,26 @@ public class BooleanConstantRatherThanValueOfCleanUp extends AbstractCleanUpRule
     public boolean visit(MethodInvocation node) {
         if (ASTNodes.usesGivenSignature(node, Boolean.class.getCanonicalName(), "valueOf", String.class.getCanonicalName()) //$NON-NLS-1$
                 || ASTNodes.usesGivenSignature(node, Boolean.class.getCanonicalName(), "valueOf", boolean.class.getSimpleName())) { //$NON-NLS-1$
-            final BooleanLiteral l= ASTNodes.as(ASTNodes.arguments(node), BooleanLiteral.class);
-            if (l != null) {
-                ctx.getRefactorings().replace(node, toFieldAccess(node, l.booleanValue()));
+            final BooleanLiteral literal= ASTNodes.as(ASTNodes.arguments(node), BooleanLiteral.class);
+
+            if (literal != null) {
+                useConstant(node, literal);
                 return false;
             }
         }
         return true;
     }
 
-    private FieldAccess toFieldAccess(final MethodInvocation node, final boolean booleanLiteral) {
+    private void useConstant(MethodInvocation node, final BooleanLiteral literal) {
         final ASTNodeFactory b= ctx.getASTBuilder();
         final FieldAccess fa= b.getAST().newFieldAccess();
-        if (node.getExpression() instanceof Name) {
-            fa.setExpression(b.copy(node.getExpression()));
+        final Name expression= ASTNodes.as(node.getExpression(), Name.class);
+
+        if (expression != null) {
+            fa.setExpression(b.copy(expression));
         }
-        fa.setName(b.simpleName(booleanLiteral ? "TRUE" : "FALSE")); //$NON-NLS-1$ $NON-NLS-2$
-        return fa;
+
+        fa.setName(b.simpleName(literal.booleanValue() ? "TRUE" : "FALSE")); //$NON-NLS-1$ $NON-NLS-2$
+        ctx.getRefactorings().replace(node, fa);
     }
 }

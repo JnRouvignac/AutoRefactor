@@ -25,7 +25,6 @@
  */
 package org.autorefactor.jdt.internal.ui.fix;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -79,9 +78,9 @@ public class LogParametersRatherThanLogMessageCleanUp extends AbstractCleanUpRul
             final List<Expression> args= ASTNodes.arguments(node);
 
             if (args != null && args.size() == 1) {
-                final Expression message= args.get(0);
+                final InfixExpression message= ASTNodes.as(args.get(0), InfixExpression.class);
 
-                if (message instanceof InfixExpression) {
+                if (message != null) {
                     return maybeReplaceConcatenation(node, methodName, message);
                 }
             }
@@ -90,26 +89,16 @@ public class LogParametersRatherThanLogMessageCleanUp extends AbstractCleanUpRul
         return true;
     }
 
-    @SuppressWarnings("unchecked")
     private boolean maybeReplaceConcatenation(final MethodInvocation node, final String methodName,
-            final Expression message) {
+            final InfixExpression message) {
         final ASTNodeFactory b= this.ctx.getASTBuilder();
-
-        final InfixExpression concatenation= (InfixExpression) message;
-        final List<Expression> strings= new ArrayList<>();
-        strings.add(concatenation.getLeftOperand());
-        strings.add(concatenation.getRightOperand());
-
-        if (concatenation.hasExtendedOperands()) {
-            strings.addAll(concatenation.extendedOperands());
-        }
 
         final StringBuilder messageBuilder= new StringBuilder();
         final List<Expression> params= new LinkedList<>();
         boolean hasLiteral= false;
         boolean hasObjects= false;
 
-        for (Expression string : strings) {
+        for (Expression string : ASTNodes.allOperands(message)) {
             if (string instanceof StringLiteral) {
                 hasLiteral= true;
                 final String literal= (String) string.resolveConstantExpressionValue();

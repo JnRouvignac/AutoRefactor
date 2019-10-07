@@ -133,17 +133,15 @@ public class ImplicitDefaultConstructorRatherThanWrittenOneCleanUp extends Abstr
 
     private boolean isDefaultStatements(final MethodDeclaration uniqueConstructor) {
         final List<Statement> statements= ASTNodes.statements(uniqueConstructor.getBody());
+
         if (statements == null || statements.isEmpty()) {
             return true;
         } else if (statements.size() == 1) {
-            final Statement statement= statements.get(0);
-            if (statement instanceof SuperConstructorInvocation) {
-                final SuperConstructorInvocation superStatement= (SuperConstructorInvocation) statement;
-                if (superStatement.arguments() == null || superStatement.arguments().isEmpty()) {
-                    return true;
-                }
-            }
+            final SuperConstructorInvocation superStatement= ASTNodes.as(statements.get(0), SuperConstructorInvocation.class);
+
+            return superStatement != null && (superStatement.arguments() == null || superStatement.arguments().isEmpty());
         }
+
         return false;
     }
 

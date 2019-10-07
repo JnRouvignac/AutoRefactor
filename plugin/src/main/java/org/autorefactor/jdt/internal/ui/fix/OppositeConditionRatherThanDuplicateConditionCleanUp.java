@@ -91,23 +91,21 @@ public class OppositeConditionRatherThanDuplicateConditionCleanUp extends Abstra
 
     @Override
     public boolean visit(IfStatement node) {
-        if (node.getExpression() instanceof InfixExpression && node.getElseStatement() != null
-                && node.getElseStatement() instanceof IfStatement) {
-            final InfixExpression firstCondition= (InfixExpression) node.getExpression();
+        InfixExpression firstCondition= ASTNodes.as(node.getExpression(), InfixExpression.class);
+        IfStatement secondIf= ASTNodes.as(node.getElseStatement(), IfStatement.class);
 
-            if (!firstCondition.hasExtendedOperands()
-                    && ASTNodes.hasOperator(firstCondition, InfixExpression.Operator.AND, InfixExpression.Operator.CONDITIONAL_AND)
-                    && ASTNodes.isPassive(firstCondition.getLeftOperand()) && ASTNodes.isPassive(firstCondition.getRightOperand())) {
-                final IfStatement secondIf= (IfStatement) node.getElseStatement();
-
-                if (secondIf.getElseStatement() != null) {
-                    return maybeRefactorCondition(node, secondIf, firstCondition.getLeftOperand(),
-                            firstCondition.getRightOperand())
-                            && maybeRefactorCondition(node, secondIf, firstCondition.getRightOperand(),
-                                    firstCondition.getLeftOperand());
-                }
-            }
+        if (firstCondition != null
+                && !firstCondition.hasExtendedOperands()
+                && ASTNodes.hasOperator(firstCondition, InfixExpression.Operator.AND, InfixExpression.Operator.CONDITIONAL_AND)
+                && ASTNodes.isPassive(firstCondition.getLeftOperand()) && ASTNodes.isPassive(firstCondition.getRightOperand())
+                && secondIf != null
+                && secondIf.getElseStatement() != null) {
+            return maybeRefactorCondition(node, secondIf, firstCondition.getLeftOperand(),
+                    firstCondition.getRightOperand())
+                    && maybeRefactorCondition(node, secondIf, firstCondition.getRightOperand(),
+                            firstCondition.getLeftOperand());
         }
+
         return true;
     }
 

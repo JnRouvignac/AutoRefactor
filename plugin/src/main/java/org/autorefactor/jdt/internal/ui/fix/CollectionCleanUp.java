@@ -111,8 +111,9 @@ public class CollectionCleanUp extends AbstractCleanUpRule {
 
                 final Assignment as= ASTNodes.asExpression(previousStatement, Assignment.class);
                 if (ASTNodes.hasOperator(as, Assignment.Operator.ASSIGN)) {
-                    final Expression lhs= as.getLeftHandSide();
-                    if (lhs instanceof SimpleName && ASTNodes.isSameLocalVariable(lhs, mi.getExpression())) {
+                    final SimpleName lhs= ASTNodes.as(as.getLeftHandSide(), SimpleName.class);
+
+                    if (lhs != null && ASTNodes.isSameLocalVariable(lhs, mi.getExpression())) {
                         return replaceInitializer(as.getRightHandSide(), arg0, node);
                     }
                 } else if (previousStatement instanceof VariableDeclarationStatement) {

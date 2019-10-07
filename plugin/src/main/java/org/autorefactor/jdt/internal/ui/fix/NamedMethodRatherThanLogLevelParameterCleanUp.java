@@ -71,11 +71,10 @@ public class NamedMethodRatherThanLogLevelParameterCleanUp extends AbstractClean
             final List<Expression> args= ASTNodes.arguments(node);
 
             if (args != null && args.size() == 2) {
-                final Expression level= args.get(0);
+                QualifiedName levelType= ASTNodes.as(args.get(0), QualifiedName.class);
                 final Expression message= args.get(1);
 
-                if (level instanceof QualifiedName) {
-                    final QualifiedName levelType= (QualifiedName) level;
+                if (levelType != null) {
                     final String methodName;
 
                     if (ASTNodes.isField(levelType, Level.class.getCanonicalName(), "SEVERE")) { //$NON-NLS-1$

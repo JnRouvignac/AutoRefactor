@@ -216,11 +216,12 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
 
     @Override
     public boolean visit(EnhancedForStatement enhancedFor) {
-        final Expression foreachExpression= enhancedFor.getExpression();
+        final MethodInvocation foreachExpression= ASTNodes.as(enhancedFor.getExpression(), MethodInvocation.class);
+
         if (isKeySetMethod(foreachExpression)) {
             // From 'for (K key : map.keySet()) { }'
             // -> mapExpression become 'map', parameter become 'K key'
-            final Expression mapExpression= ((MethodInvocation) foreachExpression).getExpression();
+            final Expression mapExpression= foreachExpression.getExpression();
             if (mapExpression == null) {
                 // Not implemented
                 return true;
@@ -328,8 +329,8 @@ public class EntrySetRatherThanKeySetAndValueSearchCleanUp extends AbstractClean
         return b.genericType(mapEntryType, mapKeyType, mapValueType);
     }
 
-    private boolean isKeySetMethod(Expression expression) {
-        return expression instanceof MethodInvocation && ASTNodes.usesGivenSignature((MethodInvocation) expression, Map.class.getCanonicalName(), "keySet"); //$NON-NLS-1$
+    private boolean isKeySetMethod(MethodInvocation foreachExpression) {
+        return foreachExpression != null && ASTNodes.usesGivenSignature(foreachExpression, Map.class.getCanonicalName(), "keySet"); //$NON-NLS-1$
     }
 
     private List<MethodInvocation> collectMapGetValueCalls(Expression mapExpression,

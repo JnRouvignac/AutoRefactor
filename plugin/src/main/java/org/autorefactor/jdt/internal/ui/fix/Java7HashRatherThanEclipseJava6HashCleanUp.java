@@ -322,12 +322,11 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
     }
 
     private boolean isAssignmentValid(final CollectedData data, final ExpressionStatement statement) {
-        final Expression resultExpression= statement.getExpression();
+        final Assignment assignment= ASTNodes.as(statement.getExpression(), Assignment.class);
 
-        if (resultExpression instanceof Assignment) {
-            final Assignment asgmnt= (Assignment) resultExpression;
-            final Expression field= asgmnt.getLeftHandSide();
-            final Expression resultComputation= asgmnt.getRightHandSide();
+        if (assignment != null) {
+            final Expression field= assignment.getLeftHandSide();
+            final Expression resultComputation= assignment.getRightHandSide();
 
             if (isGivenVariable(field, data.getResultId())) {
                 return isHashValid(data, resultComputation);
@@ -365,8 +364,9 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
     }
 
     private boolean isHashValid(final CollectedData data, final Expression hashComputation) {
-        if (hashComputation instanceof InfixExpression) {
-            final InfixExpression hashAddition= (InfixExpression) hashComputation;
+        final InfixExpression hashAddition= ASTNodes.as(hashComputation, InfixExpression.class);
+
+        if (hashAddition != null) {
             final InfixExpression primeTimesResult= ASTNodes.as(hashAddition.getLeftOperand(), InfixExpression.class);
             final Expression newHash= hashAddition.getRightOperand();
 

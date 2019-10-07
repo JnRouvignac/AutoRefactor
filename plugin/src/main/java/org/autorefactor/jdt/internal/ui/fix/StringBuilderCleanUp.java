@@ -82,10 +82,12 @@ public class StringBuilderCleanUp extends AbstractCleanUpRule {
     }
 
     private boolean isEmptyString(final Expression expression) {
+        StringLiteral stringLiteral= ASTNodes.as(expression, StringLiteral.class);
+
         return "".equals(expression.resolveConstantExpressionValue()) //$NON-NLS-1$
                 // Due to a bug with ASTNode.resolveConstantExpressionValue()
                 // in Eclipse 3.7.2 and 3.8.0, this second check is necessary
-                || (expression instanceof StringLiteral && "".equals(((StringLiteral) expression).getLiteralValue())); //$NON-NLS-1$
+                || (stringLiteral != null && "".equals(stringLiteral.getLiteralValue())); //$NON-NLS-1$
     }
 
     @Override
