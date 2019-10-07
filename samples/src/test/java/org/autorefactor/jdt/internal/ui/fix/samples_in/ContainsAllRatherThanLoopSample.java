@@ -236,6 +236,17 @@ public class ContainsAllRatherThanLoopSample {
         return true;
     }
 
+    public boolean replaceBackwardLoopOnCollection(List<Long> collectionToAnalyze, List<Long> dataToSearch) {
+        // Keep this comment
+        for (int i = dataToSearch.size() - 1; i >= 0; i--) {
+            Long number = dataToSearch.get(i);
+            if (!collectionToAnalyze.contains(number)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public boolean replaceForCounterPrefixedUpdater(List<Long> collectionToAnalyze, List<Long> dataToSearch) {
         // Keep this comment
         for (int i = 0; i < dataToSearch.size(); ++i) {

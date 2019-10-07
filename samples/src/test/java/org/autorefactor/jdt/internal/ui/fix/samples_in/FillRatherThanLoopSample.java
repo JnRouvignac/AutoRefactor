@@ -88,6 +88,21 @@ public class FillRatherThanLoopSample {
         return array;
     }
 
+    public String[] refactorBackwardLoopOnArrary() {
+        String[] array = new String[10];
+
+        // Keep this comment
+        for (int i = array.length - 1; i >= 0; i--) {
+            array[i] = "foo";
+        }
+        // Keep this comment too
+        for (int i = array.length - 1; 0 <= i; --i) {
+            array[i] = "foo";
+        }
+
+        return array;
+    }
+
     public void refactorExternalArray() {
         // Keep this comment
         for (int i = 0; i < booleanArray.length; i++) {

@@ -100,14 +100,14 @@ public class ContainsAllRatherThanLoopSample {
     }
 
     public boolean replaceForeachHoldResultInVariableThenBreak(List<Long> collectionToAnalyze, List<Long> dataToSearch) {
-        
+
         // Keep this comment
         boolean result = collectionToAnalyze.containsAll(dataToSearch);
         return result;
     }
 
     public boolean replaceForeachHoldResultInVariableNoBreak(List<Long> collectionToAnalyze, List<Long> dataToSearch) {
-        
+
         // Keep this comment
         boolean result = collectionToAnalyze.containsAll(dataToSearch);
         return result;
@@ -117,7 +117,7 @@ public class ContainsAllRatherThanLoopSample {
         // Keep this comment
         boolean result = true;
         ;
-        
+
         // Keep this comment too
         result = collectionToAnalyze.containsAll(dataToSearch);
         return result;
@@ -159,6 +159,11 @@ public class ContainsAllRatherThanLoopSample {
     }
 
     public boolean replaceForCounterInvertedCondition(List<Long> collectionToAnalyze, List<Long> dataToSearch) {
+        // Keep this comment
+        return collectionToAnalyze.containsAll(dataToSearch);
+    }
+
+    public boolean replaceBackwardLoopOnCollection(List<Long> collectionToAnalyze, List<Long> dataToSearch) {
         // Keep this comment
         return collectionToAnalyze.containsAll(dataToSearch);
     }

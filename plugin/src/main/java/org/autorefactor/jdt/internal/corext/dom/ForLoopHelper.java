@@ -77,26 +77,29 @@ public final class ForLoopHelper {
         private Expression iteratorVariable;
         private Name loopVariable;
         private Name elementVariable;
+        private boolean isLoopingForward;
 
         private ForLoopContent() {
             // Use method factories
         }
 
-        private static ForLoopContent indexedArray(Expression containerVariable, Name loopVariable) {
+        private static ForLoopContent indexedArray(Expression containerVariable, Name loopVariable, boolean isLoopingForward) {
             final ForLoopContent content= new ForLoopContent();
             content.iterationType= IterationType.INDEX;
             content.containerType= ContainerType.ARRAY;
             content.containerVariable= containerVariable;
             content.loopVariable= loopVariable;
+            content.isLoopingForward= isLoopingForward;
             return content;
         }
 
-        private static ForLoopContent indexedCollection(Expression containerVariable, Name loopVariable) {
+        private static ForLoopContent indexedCollection(Expression containerVariable, Name loopVariable, boolean isLoopingForward) {
             final ForLoopContent content= new ForLoopContent();
             content.iterationType= IterationType.INDEX;
             content.containerType= ContainerType.COLLECTION;
             content.containerVariable= containerVariable;
             content.loopVariable= loopVariable;
+            content.isLoopingForward= isLoopingForward;
             return content;
         }
 
@@ -106,6 +109,7 @@ public final class ForLoopHelper {
             content.containerType= ContainerType.COLLECTION;
             content.containerVariable= containerVariable;
             content.iteratorVariable= iteratorVariable;
+            content.isLoopingForward= true;
             return content;
         }
 
@@ -163,11 +167,21 @@ public final class ForLoopHelper {
             return iterationType;
         }
 
+        /**
+         * Returns true if the loop iterate from the start to the end of the container.
+         *
+         * @return true if the loop iterate from the start to the end of the container
+         */
+        public boolean isLoopingForward() {
+            return isLoopingForward;
+        }
+
         @Override
         public String toString() {
             return getClass().getSimpleName() + "(" + "iterationType=" + iterationType + ", containerType=" //$NON-NLS-1$ $NON-NLS-2$ $NON-NLS-3$
                     + containerType + ", containerVariable=" + containerVariable + ", iteratorVariable=" //$NON-NLS-1$ $NON-NLS-2$
                     + iteratorVariable + ", loopVariable=" + loopVariable + ", elementVariable=" + elementVariable //$NON-NLS-1$ $NON-NLS-2$
+                    + ", isLoopingForward=" + isLoopingForward //$NON-NLS-1$
                     + ")"; //$NON-NLS-1$
         }
     }
@@ -202,11 +216,25 @@ public final class ForLoopHelper {
             } else if (updaters.size() == 1 && ASTNodes.isPrimitive(firstInit, int.class.getSimpleName())) {
                 final Pair<Name, Expression> initPair= decomposeInitializer(firstInit);
                 final Name init= initPair.getFirst();
-                final ForLoopContent forContent= getIndexOnIterable(condition, init);
-                final Name updater= getUpdaterOperand(updaters.get(0));
-                Long zero= ASTNodes.integerLiteral(initPair.getSecond());
+                final Expression startValue= initPair.getSecond();
+                Long zero= ASTNodes.integerLiteral(startValue);
+                final InfixExpression startValueMinusOne= ASTNodes.as(startValue, InfixExpression.class);
+                Expression collectionOnSize= null;
+                Expression arrayOnLength= null;
 
-                if (forContent != null && zero != null && zero == 0 && ASTNodes.isSameVariable(init, forContent.loopVariable)
+                if (startValueMinusOne != null && !startValueMinusOne.hasExtendedOperands() && ASTNodes.hasOperator(startValueMinusOne, InfixExpression.Operator.MINUS)) {
+                    final Long one= ASTNodes.integerLiteral(startValueMinusOne.getRightOperand());
+
+                    if (one != null && one == 1) {
+                        collectionOnSize= getCollectionOnSize(startValueMinusOne.getLeftOperand());
+                        arrayOnLength= getArrayOnLength(startValueMinusOne.getLeftOperand());
+                    }
+                }
+
+                final ForLoopContent forContent= getIndexOnIterable(condition, init, zero, collectionOnSize, arrayOnLength);
+                final Name updater= getUpdaterOperand(updaters.get(0), zero != null && zero == 0);
+
+                if (forContent != null && ASTNodes.isSameVariable(init, forContent.loopVariable)
                         && ASTNodes.isSameVariable(init, updater)) {
                     return forContent;
                 }
@@ -224,19 +252,19 @@ public final class ForLoopHelper {
         return null;
     }
 
-    private static Name getUpdaterOperand(Expression updater) {
+    private static Name getUpdaterOperand(Expression updater, boolean isLoopingForward) {
         Expression updaterOperand= null;
 
         if (updater instanceof PostfixExpression) {
             final PostfixExpression pe= (PostfixExpression) updater;
 
-            if (ASTNodes.hasOperator(pe, PostfixExpression.Operator.INCREMENT)) {
+            if (isLoopingForward ? ASTNodes.hasOperator(pe, PostfixExpression.Operator.INCREMENT) : ASTNodes.hasOperator(pe, PostfixExpression.Operator.DECREMENT)) {
                 updaterOperand= pe.getOperand();
             }
         } else if (updater instanceof PrefixExpression) {
             final PrefixExpression pe= (PrefixExpression) updater;
 
-            if (ASTNodes.hasOperator(pe, PrefixExpression.Operator.INCREMENT)) {
+            if (isLoopingForward ? ASTNodes.hasOperator(pe, PrefixExpression.Operator.INCREMENT) : ASTNodes.hasOperator(pe, PrefixExpression.Operator.DECREMENT)) {
                 updaterOperand= pe.getOperand();
             }
         }
@@ -261,6 +289,7 @@ public final class ForLoopHelper {
         if (init instanceof VariableDeclarationExpression) {
             final VariableDeclarationExpression vde= (VariableDeclarationExpression) init;
             final List<VariableDeclarationFragment> fragments= ASTNodes.fragments(vde);
+
             if (fragments.size() == 1) {
                 final VariableDeclarationFragment fragment= fragments.get(0);
                 return Pair.of((Name) fragment.getName(), fragment.getInitializer());
@@ -276,7 +305,7 @@ public final class ForLoopHelper {
         return Pair.empty();
     }
 
-    private static ForLoopContent getIndexOnIterable(final Expression condition, Name loopVariable) {
+    private static ForLoopContent getIndexOnIterable(final Expression condition, Name loopVariable, Long zero, Expression collectionOnSize, Expression arrayOnLength) {
         final InfixExpression ie= ASTNodes.as(condition, InfixExpression.class);
 
         if (ie != null && !ie.hasExtendedOperands()) {
@@ -287,27 +316,45 @@ public final class ForLoopHelper {
                 return null;
             }
 
-            if (ASTNodes.hasOperator(ie, InfixExpression.Operator.LESS) && ASTNodes.isSameLocalVariable(loopVariable, leftOp)) {
-                return buildForLoopContent((Name) loopVariable, rightOp);
-            } else if (ASTNodes.hasOperator(ie, InfixExpression.Operator.GREATER) && ASTNodes.isSameLocalVariable(loopVariable, rightOp)) {
-                return buildForLoopContent((Name) loopVariable, leftOp);
+            if (zero != null && zero == 0) {
+                if (ASTNodes.hasOperator(ie, InfixExpression.Operator.LESS) && ASTNodes.isSameLocalVariable(loopVariable, leftOp)) {
+                    return buildForLoopContent((Name) loopVariable, rightOp, zero, collectionOnSize, arrayOnLength);
+                } else if (ASTNodes.hasOperator(ie, InfixExpression.Operator.GREATER) && ASTNodes.isSameLocalVariable(loopVariable, rightOp)) {
+                    return buildForLoopContent((Name) loopVariable, leftOp, zero, collectionOnSize, arrayOnLength);
+                }
+            } else if (collectionOnSize != null || arrayOnLength != null) {
+                if (ASTNodes.hasOperator(ie, InfixExpression.Operator.GREATER_EQUALS) && ASTNodes.isSameLocalVariable(loopVariable, leftOp)) {
+                    return buildForLoopContent((Name) loopVariable, rightOp, zero, collectionOnSize, arrayOnLength);
+                } else if (ASTNodes.hasOperator(ie, InfixExpression.Operator.LESS_EQUALS) && ASTNodes.isSameLocalVariable(loopVariable, rightOp)) {
+                    return buildForLoopContent((Name) loopVariable, leftOp, zero, collectionOnSize, arrayOnLength);
+                }
             }
         }
 
         return null;
     }
 
-    private static ForLoopContent buildForLoopContent(final Name loopVar, final Expression containerVar) {
-        Expression collectionOnSize= getCollectionOnSize(containerVar);
+    private static ForLoopContent buildForLoopContent(final Name loopVar, final Expression containerVar, Long zero, Expression collectionOnSize, Expression arrayOnLength) {
+        Long zero2= ASTNodes.integerLiteral(containerVar);
+        Expression collectionOnSize2= getCollectionOnSize(containerVar);
+        Expression arrayOnLength2= getArrayOnLength(containerVar);
 
-        if (collectionOnSize != null) {
-            return ForLoopContent.indexedCollection(collectionOnSize, loopVar);
-        }
+        if (zero != null && zero == 0) {
+            if (collectionOnSize2 != null) {
+                return ForLoopContent.indexedCollection(collectionOnSize2, loopVar, true);
+            }
 
-        Expression arrayOnLength= getArrayOnLength(containerVar);
+            if (arrayOnLength2 != null) {
+                return ForLoopContent.indexedArray(arrayOnLength2, loopVar, true);
+            }
+        } else if (zero2 != null && zero2 == 0) {
+            if (collectionOnSize != null) {
+                return ForLoopContent.indexedCollection(collectionOnSize, loopVar, false);
+            }
 
-        if (arrayOnLength != null) {
-            return ForLoopContent.indexedArray(arrayOnLength, loopVar);
+            if (arrayOnLength != null) {
+                return ForLoopContent.indexedArray(arrayOnLength, loopVar, false);
+            }
         }
 
         return null;

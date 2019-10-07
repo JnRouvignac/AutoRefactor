@@ -52,6 +52,19 @@ public class AddAllRatherThanLoopSample extends ArrayList<java.util.Date> {
         return output;
     }
 
+    public Collection<? super java.util.Date> replaceBackwardLoopOnCollections(
+            List<? super java.util.Date> output, java.util.Date[] elems1, java.sql.Date[] elems2) {
+        // Keep this comment
+        for (int i = elems1.length - 1; i >= 0; i--) {
+            output.add(elems1[i]);
+        }
+        for (int i = elems2.length - 1; 0 <= i; i--) {
+            output.add(elems2[i]);
+        }
+
+        return output;
+    }
+
     public void replaceAddWithForLoopByCollectionsAddAll(
             java.util.Date[] dates) {
         // Keep this comment

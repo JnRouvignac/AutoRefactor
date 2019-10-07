@@ -254,6 +254,16 @@ public class ContainsRatherThanLoopSample {
         return false;
     }
 
+    public boolean replaceBackwardLoopOnCollection(List<String> col, String toFind) {
+        // Keep this comment
+        for (int i = col.size() - 1; i >= 0 ; --i) {
+            if (toFind.equals(col.get(i))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public boolean replaceForIterator(List<String> col, String toFind) {
         // Keep this comment
         for (Iterator<String> it = col.iterator(); it.hasNext();) {

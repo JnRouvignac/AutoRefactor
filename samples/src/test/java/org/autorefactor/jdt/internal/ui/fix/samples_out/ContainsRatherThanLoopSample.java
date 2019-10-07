@@ -168,6 +168,11 @@ public class ContainsRatherThanLoopSample {
         return col.contains(toFind);
     }
 
+    public boolean replaceBackwardLoopOnCollection(List<String> col, String toFind) {
+        // Keep this comment
+        return col.contains(toFind);
+    }
+
     public boolean replaceForIterator(List<String> col, String toFind) {
         // Keep this comment
         return col.contains(toFind);
