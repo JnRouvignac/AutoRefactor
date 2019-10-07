@@ -40,7 +40,6 @@ import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Name;
 import org.eclipse.jdt.core.dom.NumberLiteral;
-import org.eclipse.jdt.core.dom.ParenthesizedExpression;
 import org.eclipse.jdt.core.dom.PrefixExpression;
 import org.eclipse.jdt.core.dom.StringLiteral;
 
@@ -185,7 +184,8 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
             final Expression arg0= ASTNodes.arg0(mi);
             if (ASTNodes.hasType(arg0, BigDecimal.class.getCanonicalName(), BigInteger.class.getCanonicalName())) {
                 if (isInStringAppend(mi.getParent())) {
-                    this.ctx.getRefactorings().replace(node, parenthesize(getCompareToNode(isPositive, mi)));
+                    final ASTNodeFactory b= this.ctx.getASTBuilder();
+                    this.ctx.getRefactorings().replace(node, b.parenthesize(getCompareToNode(isPositive, mi)));
                 } else {
                     this.ctx.getRefactorings().replace(node, getCompareToNode(isPositive, mi));
                 }
@@ -195,18 +195,16 @@ public class BigNumberCleanUp extends AbstractCleanUpRule {
         return true;
     }
 
-    private ParenthesizedExpression parenthesize(final Expression compareToNode) {
-        return this.ctx.getASTBuilder().parenthesize(compareToNode);
-    }
-
     private boolean isInStringAppend(final ASTNode node) {
         if (node instanceof InfixExpression) {
             final InfixExpression expression= (InfixExpression) node;
+
             if (ASTNodes.hasOperator(expression, InfixExpression.Operator.PLUS) || ASTNodes.hasType(expression.getLeftOperand(), String.class.getCanonicalName())
                     || ASTNodes.hasType(expression.getRightOperand(), String.class.getCanonicalName())) {
                 return true;
             }
         }
+
         return false;
     }
 
