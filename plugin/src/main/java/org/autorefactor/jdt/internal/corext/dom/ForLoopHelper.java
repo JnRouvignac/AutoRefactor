@@ -184,13 +184,16 @@ public final class ForLoopHelper {
         final List<Expression> initializers= ASTNodes.initializers(node);
         final Expression condition= node.getExpression();
         final List<Expression> updaters= ASTNodes.updaters(node);
+
         if (initializers.size() == 1) {
             Expression firstInit= initializers.get(0);
+
             if (updaters.isEmpty()) {
                 final Pair<Name, Expression> initPair= decomposeInitializer(firstInit);
                 final Name init= initPair.getFirst();
                 final MethodInvocation condMi= ASTNodes.as(node.getExpression(), MethodInvocation.class);
                 final MethodInvocation initMi= ASTNodes.as(initPair.getSecond(), MethodInvocation.class);
+
                 if (condMi != null && ASTNodes.isSameVariable(init, condMi.getExpression())
                         && ASTNodes.usesGivenSignature(initMi, Collection.class.getCanonicalName(), "iterator") //$NON-NLS-1$
                         && ASTNodes.usesGivenSignature(condMi, Iterator.class.getCanonicalName(), "hasNext")) { //$NON-NLS-1$
@@ -209,6 +212,7 @@ public final class ForLoopHelper {
                 }
             }
         }
+
         return null;
     }
 
@@ -216,25 +220,31 @@ public final class ForLoopHelper {
         if (containerVar instanceof Name || containerVar instanceof FieldAccess) {
             return ForLoopContent.iteratedCollection(containerVar, iteratorVariable);
         }
+
         return null;
     }
 
     private static Name getUpdaterOperand(Expression updater) {
         Expression updaterOperand= null;
+
         if (updater instanceof PostfixExpression) {
             final PostfixExpression pe= (PostfixExpression) updater;
+
             if (ASTNodes.hasOperator(pe, PostfixExpression.Operator.INCREMENT)) {
                 updaterOperand= pe.getOperand();
             }
         } else if (updater instanceof PrefixExpression) {
             final PrefixExpression pe= (PrefixExpression) updater;
+
             if (ASTNodes.hasOperator(pe, PrefixExpression.Operator.INCREMENT)) {
                 updaterOperand= pe.getOperand();
             }
         }
+
         if (updaterOperand instanceof Name) {
             return (Name) updaterOperand;
         }
+
         return null;
     }
 
@@ -257,8 +267,10 @@ public final class ForLoopHelper {
             }
         } else if (init instanceof Assignment) {
             final Assignment as= (Assignment) init;
-            if (ASTNodes.hasOperator(as, Assignment.Operator.ASSIGN) && as.getLeftHandSide() instanceof Name) {
-                return Pair.of((Name) as.getLeftHandSide(), as.getRightHandSide());
+            final Name name= ASTNodes.as(as.getLeftHandSide(), Name.class);
+
+            if (ASTNodes.hasOperator(as, Assignment.Operator.ASSIGN) && name != null) {
+                return Pair.of(name, as.getRightHandSide());
             }
         }
         return Pair.empty();
@@ -271,47 +283,65 @@ public final class ForLoopHelper {
             final Expression leftOp= ie.getLeftOperand();
             final Expression rightOp= ie.getRightOperand();
 
+            if (!(loopVariable instanceof Name)) {
+                return null;
+            }
+
             if (ASTNodes.hasOperator(ie, InfixExpression.Operator.LESS) && ASTNodes.isSameLocalVariable(loopVariable, leftOp)) {
-                return buildForLoopContent(loopVariable, rightOp);
+                return buildForLoopContent((Name) loopVariable, rightOp);
             } else if (ASTNodes.hasOperator(ie, InfixExpression.Operator.GREATER) && ASTNodes.isSameLocalVariable(loopVariable, rightOp)) {
-                return buildForLoopContent(loopVariable, leftOp);
+                return buildForLoopContent((Name) loopVariable, leftOp);
             }
         }
 
         return null;
     }
 
-    private static ForLoopContent buildForLoopContent(final Expression loopVar, final Expression containerVar) {
-        if (!(loopVar instanceof Name)) {
-            return null;
+    private static ForLoopContent buildForLoopContent(final Name loopVar, final Expression containerVar) {
+        Expression collectionOnSize= getCollectionOnSize(containerVar);
+
+        if (collectionOnSize != null) {
+            return ForLoopContent.indexedCollection(collectionOnSize, loopVar);
         }
-        if (containerVar instanceof MethodInvocation) {
-            final MethodInvocation mi= (MethodInvocation) containerVar;
+
+        Expression arrayOnLength= getArrayOnLength(containerVar);
+
+        if (arrayOnLength != null) {
+            return ForLoopContent.indexedArray(arrayOnLength, loopVar);
+        }
+
+        return null;
+    }
+
+    private static Expression getCollectionOnSize(final Expression containerVar) {
+        final MethodInvocation mi= ASTNodes.as(containerVar, MethodInvocation.class);
+
+        if (mi != null) {
             final Expression containerVarName= ASTNodes.getUnparenthesedExpression(mi.getExpression());
+
             if (containerVarName != null && ASTNodes.usesGivenSignature(mi, Collection.class.getCanonicalName(), "size")) { //$NON-NLS-1$
-                return ForLoopContent.indexedCollection(containerVarName, (Name) loopVar);
+                return containerVarName;
             }
-        } else if (containerVar instanceof QualifiedName) {
+        }
+
+        return null;
+    }
+
+    private static Expression getArrayOnLength(final Expression containerVar) {
+        if (containerVar instanceof QualifiedName) {
             final QualifiedName containerVarName= (QualifiedName) containerVar;
-            if (isArrayLength(containerVarName)) {
-                Name containerVariable= ((QualifiedName) containerVar).getQualifier();
-                return ForLoopContent.indexedArray(containerVariable, (Name) loopVar);
+
+            if (ASTNodes.isArray(containerVarName.getQualifier()) && "length".equals(containerVarName.getName().getIdentifier())) { //$NON-NLS-1$
+                return containerVarName.getQualifier();
             }
         } else if (containerVar instanceof FieldAccess) {
             final FieldAccess containerVarName= (FieldAccess) containerVar;
-            if (isArrayLength(containerVarName)) {
-                Expression containerVariable= ((FieldAccess) containerVar).getExpression();
-                return ForLoopContent.indexedArray(containerVariable, (Name) loopVar);
+
+            if (ASTNodes.isArray(containerVarName.getExpression()) && "length".equals(containerVarName.getName().getIdentifier())) { //$NON-NLS-1$
+                return containerVarName.getExpression();
             }
         }
+
         return null;
-    }
-
-    private static boolean isArrayLength(final QualifiedName containerVarName) {
-        return ASTNodes.isArray(containerVarName.getQualifier()) && "length".equals(containerVarName.getName().getIdentifier()); //$NON-NLS-1$
-    }
-
-    private static boolean isArrayLength(final FieldAccess containerVarName) {
-        return ASTNodes.isArray(containerVarName.getExpression()) && "length".equals(containerVarName.getName().getIdentifier()); //$NON-NLS-1$
     }
 }
