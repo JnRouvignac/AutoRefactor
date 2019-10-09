@@ -143,20 +143,20 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
             }
         } else {
             // Remove empty cases
-            if (areCasesRemovable[0]) {
-                if (areCasesRemovable.length == 2 && !areCasesRemovable[1]) {
-                    // Then clause is empty and there is only one else clause
-                    // => revert if statement
-                    r.replace(node, b.if0(b.negate(node.getExpression()), b.move(node.getElseStatement())));
-                } else {
-                    r.replace(node.getThenStatement(), b.block());
-                }
-            }
+            for (int i= 0; i < areCasesRemovable.length; i++) {
+                final ASTNode parent= findNodeToRemove(allCasesStatements.get(i).get(0));
 
-            for (int i= 1; i < areCasesRemovable.length; i++) {
                 if (areCasesRemovable[i]) {
-                    final Statement firstStatement= allCasesStatements.get(i).get(0);
-                    r.remove(findNodeToRemove(firstStatement));
+                    if (i == (areCasesRemovable.length - 2) && !areCasesRemovable[i + 1]) {
+                        // Then clause is empty and there is only one else clause
+                        // => revert if statement
+                        r.replace(parent, b.if0(b.negate(((IfStatement) parent).getExpression()), b.move(((IfStatement) parent).getElseStatement())));
+                        break;
+                    } else if (i == (areCasesRemovable.length - 1)) {
+                        r.remove(parent);
+                    } else {
+                        r.replace(((IfStatement) parent).getThenStatement(), b.block());
+                    }
                 }
             }
 

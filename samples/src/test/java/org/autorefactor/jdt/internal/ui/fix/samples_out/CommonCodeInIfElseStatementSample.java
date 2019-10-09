@@ -42,23 +42,23 @@ public class CommonCodeInIfElseStatementSample {
     }
 
     /** common code: i++, Remove if statement */
-    public void ifElseRemoveIf(boolean b, int i) {
+    public void ifElseRemoveIf(boolean b, int number) {
         // Keep this comment
-        i = i + 1;
+        number = number + 1;
     }
 
     /** no common code, Do not remove anything */
-    public void doNotRemoveNotCommonCode(boolean b, int i, int j) {
-        if (b) {
-            i++;
+    public void doNotRemoveNotCommonCode(boolean condition, int number1, int number2) {
+        if (condition) {
+            number1++;
         } else {
-            j++;
+            number2++;
         }
     }
 
     /** common code: i++, Remove then case */
-    public void ifElseRemoveThen(boolean b, int i, int j) {
-        if (!b) {
+    public void ifElseRemoveThen(boolean condition, int i, int j) {
+        if (!condition) {
             j++;
         }
         // Keep this comment
@@ -68,6 +68,31 @@ public class CommonCodeInIfElseStatementSample {
     /** common code: i++, Remove else case */
     public void ifElseRemoveElse(boolean b, int i, int j) {
         if (b) {
+            j++;
+        }
+        // Keep this comment
+        i++;
+    }
+
+    /** Common code: i++, Remove second case */
+    public void reverseMiddle(boolean isActive, boolean isEnabled, int i, int j) {
+        if (isActive) {
+            j++;
+        } else if (!isEnabled) {
+            j++;
+        }
+        // Keep this comment
+        i++;
+    }
+
+    /** Common code: i++, Remove second case */
+    public void reverseEmptySecond(boolean isActive, boolean isEnabled, int i, int j) {
+        if (isActive) {
+            j++;
+        } else if (isEnabled) {
+        } else if (i > 0) {
+            j--;
+        } else {
             j++;
         }
         // Keep this comment
@@ -86,13 +111,13 @@ public class CommonCodeInIfElseStatementSample {
     }
 
     /** not all cases covered, Do not remove anything */
-    public void ifElseIfNoElseDoNotTouch(boolean b, int i, int j) {
+    public void ifElseIfNoElseDoNotTouch(boolean b, int k, int l) {
         if (b) {
-            i++;
-            j++;
+            k++;
+            l++;
         } else if (!b) {
-            i++;
-            j++;
+            k++;
+            l++;
         }
     }
 
@@ -115,8 +140,8 @@ public class CommonCodeInIfElseStatementSample {
         j++;
     }
 
-    public int doNotRefactorDifferentVariablesInReturn(boolean b) {
-        if (b) {
+    public int doNotRefactorDifferentVariablesInReturn(boolean condition) {
+        if (condition) {
             int i = 1;
             return i;
         } else {
@@ -158,10 +183,10 @@ public class CommonCodeInIfElseStatementSample {
         }
     }
 
-    public int doNotRefactorWithNameConflict(boolean b) {
+    public int doNotRefactorWithNameConflict(boolean isActive) {
         int i;
 
-        if (b) {
+        if (isActive) {
             int j = 1;
             i = j + 10;
         } else {
@@ -200,10 +225,10 @@ public class CommonCodeInIfElseStatementSample {
     }
 
     /** common code: i++, Remove if statement */
-    public void ifElseRemoveIfInsideWhile(boolean b, int i) {
-        while (i < 100) {
+    public void ifElseRemoveIfInsideWhile(boolean b, int integer) {
+        while (integer < 100) {
             // Keep this comment
-            i = 1 + i;
+            integer = 1 + integer;
         }
     }
 
