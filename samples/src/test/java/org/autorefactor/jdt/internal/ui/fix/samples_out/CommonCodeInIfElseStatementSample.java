@@ -34,20 +34,20 @@ import java.util.function.Predicate;
 public class CommonCodeInIfElseStatementSample {
     private Date j = new Date();
 
-    /** common code: i++, Remove if statement */
+    /** Common code: i++, Remove if statement */
     public void ifElseRemoveIfNoBrackets(boolean b, int i) {
         // Keep this!
         // Keep this comment
         i++;
     }
 
-    /** common code: i++, Remove if statement */
+    /** Common code: i++, Remove if statement */
     public void ifElseRemoveIf(boolean b, int number) {
         // Keep this comment
         number = number + 1;
     }
 
-    /** no common code, Do not remove anything */
+    /** No common code, Do not remove anything */
     public void doNotRemoveNotCommonCode(boolean condition, int number1, int number2) {
         if (condition) {
             number1++;
@@ -56,7 +56,7 @@ public class CommonCodeInIfElseStatementSample {
         }
     }
 
-    /** common code: i++, Remove then case */
+    /** Common code: i++, Remove then case */
     public void ifElseRemoveThen(boolean condition, int i, int j) {
         if (!condition) {
             j++;
@@ -65,7 +65,7 @@ public class CommonCodeInIfElseStatementSample {
         ++i;
     }
 
-    /** common code: i++, Remove else case */
+    /** Common code: i++, Remove else case */
     public void ifElseRemoveElse(boolean b, int i, int j) {
         if (b) {
             j++;
@@ -99,7 +99,7 @@ public class CommonCodeInIfElseStatementSample {
         i++;
     }
 
-    /** only common code, Remove if statement */
+    /** Only common code, Remove if statement */
     public void ifElseRemoveIfSeveralStatements(boolean b1, boolean b2, int i, int j) {
         // Keep this comment
         i++;
@@ -110,7 +110,7 @@ public class CommonCodeInIfElseStatementSample {
         }
     }
 
-    /** not all cases covered, Do not remove anything */
+    /** Not all cases covered, Do not remove anything */
     public void ifElseIfNoElseDoNotTouch(boolean b, int k, int l) {
         if (b) {
             k++;
@@ -121,14 +121,14 @@ public class CommonCodeInIfElseStatementSample {
         }
     }
 
-    /** only common code: remove if statement */
+    /** Only common code: remove if statement */
     public void ifElseIfElseRemoveIf(boolean b, int i, int j) {
         // Keep this comment
         i++;
         j++;
     }
 
-    /** specific code: keep some if statement */
+    /** Specific code: keep some if statement */
     public void ifElseIfElseRemoveSomeIf(boolean b1, boolean b2, List<String> modifiableList, int i, int j) {
         if (b1) {
         } else if (b2) {
@@ -168,19 +168,21 @@ public class CommonCodeInIfElseStatementSample {
         return 1;
     }
 
-    public int refactorIfElseInElseClause(boolean b1, boolean b2) {
+    public int refactorIfElseInElseClause(boolean b1, boolean b2, int increment) {
         if (b1) {
-            return 1;
+            increment++;
         } else {
-            return 2;
+            increment--;
         }
+        return increment;
     }
 
-    public int refactorIfElseInElseClauseNoBrackets(boolean b1, boolean b2) {
-        if (b1)      return 1;
+    public int refactorIfElseInElseClauseNoBrackets(boolean b1, boolean b2, int increment) {
+        if (b1)      increment++;
         else {
-            return 2;
+            increment--;
         }
+        return increment;
     }
 
     public int doNotRefactorWithNameConflict(boolean isActive) {
@@ -224,7 +226,7 @@ public class CommonCodeInIfElseStatementSample {
         }
     }
 
-    /** common code: i++, Remove if statement */
+    /** Common code: i++, Remove if statement */
     public void ifElseRemoveIfInsideWhile(boolean b, int integer) {
         while (integer < 100) {
             // Keep this comment
@@ -239,5 +241,184 @@ public class CommonCodeInIfElseStatementSample {
             Function<String,String> toLower = x -> x == null ? null : x.toLowerCase();
             return x -> Arrays.stream(allowedSet).map(toLower).anyMatch(y -> (x == null && y == null) || (x != null && toLower.apply(x).equals(y)));
         }
+    }
+
+    public String refactorExceptFallingThroughCase(boolean isValid, boolean isEnabled, int i, int j) {
+        if (isValid) {
+        } else if (i > 0) {
+            return "Do completely other things";
+        }
+        // Keep this comment
+        i++;
+        if (isEnabled && true) {
+            i++;
+        } else {
+            j++;
+        }
+
+        return "Common code";
+    }
+
+    public String refactorExceptFirstCase(boolean isValid, boolean isEnabled, int i, int j) {
+        if (isValid) {
+            return "Do absolutely other things";
+        } else if (i > 0) {
+        }
+        // Keep this comment
+        i++;
+        if (isEnabled && true) {
+            i++;
+        } else {
+            j++;
+        }
+
+        return "Common code";
+    }
+
+    public String refactorExceptLastCase(boolean isValid, boolean isEnabled, int i, int j) {
+        if (isValid) {
+        } else if (!(i > 0)) {
+            return "Do completely other stuff";
+        }
+        // Keep this comment
+        i++;
+        if (isEnabled && true) {
+            i++;
+        } else {
+            j++;
+        }
+
+        return "Common code";
+    }
+
+    public String refactorExceptThrow(boolean isValid, boolean isEnabled, int i, int j) {
+        if (isValid) {
+        } else if (i > 0) {
+            throw new NullPointerException("Do completely other things");
+        }
+        // Keep this comment
+        i++;
+        if (isEnabled && true) {
+            i++;
+        } else {
+            j++;
+        }
+
+        return "Common code";
+    }
+
+    public String refactorExceptBreak(boolean isValid, boolean isEnabled, int i, int j, List<String> texts) {
+        for (String text : texts) {
+            if (isValid) {
+            } else if (i > 0) {
+                break;
+            }
+            // Keep this comment
+            i++;
+            if (isEnabled && true) {
+                i++;
+            } else {
+                j++;
+            }
+        }
+
+        return "Common code";
+    }
+
+    public String refactorExceptContinue(boolean isValid, boolean isEnabled, int i, int j, List<String> texts) {
+        for (String text : texts) {
+            if (isValid) {
+            } else if (i > 0) {
+                continue;
+            }
+            // Keep this comment
+            i++;
+            if (isEnabled && true) {
+                i++;
+            } else {
+                j++;
+            }
+        }
+
+        return "Common code";
+    }
+
+    public String doNotRefactorWithNotFallingThroughCase(boolean isValid, boolean isEnabled, int i, int j) {
+        if (isValid) {
+            i++;
+            if (isEnabled && true) {
+                i++;
+            } else {
+                j++;
+            }
+        } else if (i > 0) {
+            "Do completely other things".chars();
+        } else {
+            i++;
+            if (false || !isEnabled) {
+                j++;
+            } else {
+                i++;
+            }
+        }
+
+        return "Common code";
+    }
+
+    public String refactorSomeFallingThroughCases(boolean isValid, boolean isEnabled, int i, int j) {
+        if (isValid) {
+        } else if (i > 0) {
+            return "Do completely other things";
+        }
+        // Keep this comment
+        i++;
+        if (isEnabled && true) {
+            i++;
+        } else {
+            j++;
+        }
+        return "Common code";
+    }
+
+    public String refactorExceptFallingThroughCases(boolean isValid, boolean isEnabled, int i, int j) {
+        if (isValid) {
+        } else if (i > 0) {
+            return "Do completely other things";
+        } else if (i > 10) {
+            return "Do completely another thing";
+        }
+        // Keep this comment
+        i++;
+        if (isEnabled && true) {
+            i++;
+        } else {
+            j++;
+        }
+
+        return "Common code";
+    }
+
+    public String refactorOtherCases(boolean isValid, boolean isEnabled, int i, int j) {
+        if (isValid) {
+            i++;
+            if (isEnabled && true) {
+                i++;
+            } else {
+                j++;
+            }
+            return "Common code";
+        } else if (i > 0) {
+        } else if (i > 10) {
+        } else if (!(i > 20)) {
+            i++;
+            if (false || !isEnabled) {
+                j++;
+            } else {
+                i++;
+            }
+            return "Common code";
+        }
+        // Keep this comment
+        return "Do completely other things";
     }
 }
