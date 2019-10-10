@@ -119,6 +119,15 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
         return true;
     }
 
+    private void flagStmtsToRemove(List<List<Statement>> allCasesStatements, int stmtIndex,
+            List<List<Statement>> removedCaseStatements) {
+        for (int i= 0; i < allCasesStatements.size(); i++) {
+            final List<Statement> caseStatements= allCasesStatements.get(i);
+            final Statement stmtToRemove= caseStatements.get(caseStatements.size() - stmtIndex);
+            removedCaseStatements.get(i).add(stmtToRemove);
+        }
+    }
+
     private void removeIdenticalTrailingCode(IfStatement node, List<ASTNode> allCases,
             final List<List<Statement>> allCasesStatements, final List<List<Statement>> caseStmtsToRemove) {
         final ASTNodeFactory b= this.ctx.getASTBuilder();
@@ -201,15 +210,6 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
             } else {
                 this.ctx.getRefactorings().remove(removedStatements);
             }
-        }
-    }
-
-    private void flagStmtsToRemove(List<List<Statement>> allCasesStatements, int stmtIndex,
-            List<List<Statement>> removedCaseStatements) {
-        for (int i= 0; i < allCasesStatements.size(); i++) {
-            final List<Statement> caseStatements= allCasesStatements.get(i);
-            final Statement stmtToRemove= caseStatements.get(caseStatements.size() - stmtIndex);
-            removedCaseStatements.get(i).add(stmtToRemove);
         }
     }
 
