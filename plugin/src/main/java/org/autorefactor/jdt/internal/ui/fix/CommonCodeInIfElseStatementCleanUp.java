@@ -222,6 +222,7 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
                         break;
                     } else if (allRemovable(areCasesRemovable, i)) {
                         r.remove(parent);
+                        break;
                     } else {
                         r.replace(((IfStatement) parent).getThenStatement(), b.block());
                     }
