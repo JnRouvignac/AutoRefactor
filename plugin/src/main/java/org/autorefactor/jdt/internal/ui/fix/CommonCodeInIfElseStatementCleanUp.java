@@ -197,7 +197,7 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
         removeStmtsFromCases(allCases, allCasesStatements, caseStmtsToRemove, areCasesRemovable, casesToRefactor);
         final List<Statement> oneCaseToRemove= caseStmtsToRemove.get(casesToRefactor.get(0));
 
-        if (allRemovable(areCasesRemovable)) {
+        if (allRemovable(areCasesRemovable, 0)) {
             if (node.getParent() instanceof Block) {
                 insertIdenticalCode(node, oneCaseToRemove, b, r);
 
@@ -220,7 +220,7 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
                         // => revert if statement
                         r.replace(parent, b.if0(b.negate(((IfStatement) parent).getExpression()), b.move(((IfStatement) parent).getElseStatement())));
                         break;
-                    } else if (i == (areCasesRemovable.length - 1)) {
+                    } else if (allRemovable(areCasesRemovable, i)) {
                         r.remove(parent);
                     } else {
                         r.replace(((IfStatement) parent).getThenStatement(), b.block());
@@ -248,9 +248,9 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
         }
     }
 
-    private boolean allRemovable(boolean[] areCasesRemovable) {
-        for (boolean isCaseRemovable : areCasesRemovable) {
-            if (!isCaseRemovable) {
+    private boolean allRemovable(boolean[] areCasesRemovable, int start) {
+        for (int i= start; i < areCasesRemovable.length; i++) {
+            if (!areCasesRemovable[i]) {
                 return false;
             }
         }

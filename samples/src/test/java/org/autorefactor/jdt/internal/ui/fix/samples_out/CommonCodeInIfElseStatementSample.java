@@ -262,7 +262,6 @@ public class CommonCodeInIfElseStatementSample {
     public String refactorExceptFirstCase(boolean isValid, boolean isEnabled, int i, int j) {
         if (isValid) {
             return "Do absolutely other things";
-        } else if (i > 0) {
         }
         // Keep this comment
         i++;

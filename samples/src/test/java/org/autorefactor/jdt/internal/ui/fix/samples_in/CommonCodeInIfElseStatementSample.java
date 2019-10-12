@@ -372,7 +372,7 @@ public class CommonCodeInIfElseStatementSample {
             // Keep this comment
             i++;
             if (false || !isEnabled) {
-                j++;
+                ++j;
             } else {
                 i++;
             }
