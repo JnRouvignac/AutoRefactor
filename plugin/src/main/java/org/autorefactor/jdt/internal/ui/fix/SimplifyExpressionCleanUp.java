@@ -193,24 +193,31 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
         case ASTNode.ASSIGNMENT:
             final Assignment a= (Assignment) parent;
             return node.equals(a.getRightHandSide());
+
         case ASTNode.METHOD_INVOCATION:
             final MethodInvocation mi= (MethodInvocation) parent;
             return ASTNodes.arguments(mi).contains(node) || canRemoveParenthesesAroundExpression(mi, node);
+
         case ASTNode.IF_STATEMENT:
             final IfStatement is= (IfStatement) parent;
             return node.equals(is.getExpression());
+
         case ASTNode.WHILE_STATEMENT:
             final WhileStatement ws= (WhileStatement) parent;
             return node.equals(ws.getExpression());
+
         case ASTNode.DO_STATEMENT:
             final DoStatement ds= (DoStatement) parent;
             return node.equals(ds.getExpression());
+
         case ASTNode.RETURN_STATEMENT:
             final ReturnStatement rs= (ReturnStatement) parent;
             return node.equals(rs.getExpression());
+
         case ASTNode.VARIABLE_DECLARATION_FRAGMENT:
             final VariableDeclarationFragment vdf= (VariableDeclarationFragment) parent;
             return node.equals(vdf.getInitializer());
+
         default:
             return false;
         }
@@ -235,29 +242,33 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
     public boolean visit(InfixExpression node) {
         final Expression lhs= node.getLeftOperand();
         final Expression rhs= node.getRightOperand();
+
         if (ASTNodes.hasOperator(node, InfixExpression.Operator.CONDITIONAL_OR)) {
             final List<Expression> remainingOperands= removeUselessOperands(node, true, false);
+
             if (!remainingOperands.equals(ASTNodes.allOperands(node))) {
                 return replaceWithNewInfixExpression(node, remainingOperands);
             }
         } else if (ASTNodes.hasOperator(node, InfixExpression.Operator.CONDITIONAL_AND)) {
             final List<Expression> remainingOperands= removeUselessOperands(node, false, true);
+
             if (!remainingOperands.equals(ASTNodes.allOperands(node))) {
                 return replaceWithNewInfixExpression(node, remainingOperands);
-            } else {
-                // FIXME this should actually check anywhere in the infix expression,
-                // not only for left and right operands,
-                // said otherwise: handle extended operands
-                final Expression nullCheckedExpressionLHS= ASTNodes.getNullCheckedExpression(lhs);
-                final Expression nullCheckedExpressionRHS= ASTNodes.getNullCheckedExpression(rhs);
-                if (nullCheckedExpressionLHS != null) {
-                    if (isNullCheckRedundant(rhs, nullCheckedExpressionLHS)) {
-                        ASTNodes.checkNoExtendedOperands(node);
-                        return replaceBy(node, rhs);
-                    }
-                } else if (isNullCheckRedundant(lhs, nullCheckedExpressionRHS)) {
-                    return replaceBy(node, lhs);
+            }
+
+            // FIXME this should actually check anywhere in the infix expression,
+            // not only for left and right operands,
+            // said otherwise: handle extended operands
+            final Expression nullCheckedExpressionLHS= ASTNodes.getNullCheckedExpression(lhs);
+            final Expression nullCheckedExpressionRHS= ASTNodes.getNullCheckedExpression(rhs);
+
+            if (nullCheckedExpressionLHS != null) {
+                if (isNullCheckRedundant(rhs, nullCheckedExpressionLHS)) {
+                    ASTNodes.checkNoExtendedOperands(node);
+                    return replaceBy(node, rhs);
                 }
+            } else if (isNullCheckRedundant(lhs, nullCheckedExpressionRHS)) {
+                return replaceBy(node, lhs);
             }
         } else if (ASTNodes.hasOperator(node, InfixExpression.Operator.EQUALS, InfixExpression.Operator.NOT_EQUALS, InfixExpression.Operator.XOR) && !node.hasExtendedOperands()
                 && !maybeReduceBooleanExpression(node, lhs, rhs)) {
@@ -268,6 +279,7 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
             addParentheses(node);
             return false;
         }
+
         return true;
     }
 
@@ -365,16 +377,21 @@ public class SimplifyExpressionCleanUp extends AbstractCleanUpRule {
 
     private List<Expression> removeUselessOperands(InfixExpression node, Boolean shortCircuitValue, Boolean noOpValue) {
         final List<Expression> allOperands= ASTNodes.allOperands(node);
+
         for (ListIterator<Expression> it= allOperands.listIterator(); it.hasNext();) {
             final Expression operand= it.next();
             final Object value= operand.resolveConstantExpressionValue();
+
             if (shortCircuitValue.equals(value)) {
                 removeRemaining(it);
                 break;
-            } else if (noOpValue.equals(value)) {
+            }
+
+            if (noOpValue.equals(value)) {
                 it.remove();
             }
         }
+
         return allOperands;
     }
 
