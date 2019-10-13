@@ -35,6 +35,21 @@ public class BooleanEqualsRatherThanNullCheckSample {
         boolean newBoolean2 = b1 == null || b1;
         boolean newBoolean3 = b1 != null && !b1;
         boolean newBoolean4 = b1 == null || !b1;
+
+        boolean newBoolean5 = b1 != null & b1;
+        boolean newBoolean6 = b1 == null | b1;
+        boolean newBoolean7 = b1 != null & !b1;
+        boolean newBoolean8 = b1 == null | !b1;
+
+        boolean newBoolean9 = null != b1 && b1;
+        boolean newBoolean10 = null == b1 || b1;
+        boolean newBoolean11 = null != b1 && !b1;
+        boolean newBoolean12 = null == b1 || !b1;
+
+        boolean newBoolean13 = null != b1 & b1;
+        boolean newBoolean14 = null == b1 | b1;
+        boolean newBoolean15 = null != b1 & !b1;
+        boolean newBoolean16 = null == b1 | !b1;
     }
 
     private static class SideEffect {

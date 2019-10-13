@@ -35,6 +35,21 @@ public class BooleanEqualsRatherThanNullCheckSample {
         boolean newBoolean2 = !Boolean.FALSE.equals(b1);
         boolean newBoolean3 = Boolean.FALSE.equals(b1);
         boolean newBoolean4 = !Boolean.TRUE.equals(b1);
+
+        boolean newBoolean5 = Boolean.TRUE.equals(b1);
+        boolean newBoolean6 = !Boolean.FALSE.equals(b1);
+        boolean newBoolean7 = Boolean.FALSE.equals(b1);
+        boolean newBoolean8 = !Boolean.TRUE.equals(b1);
+
+        boolean newBoolean9 = Boolean.TRUE.equals(b1);
+        boolean newBoolean10 = !Boolean.FALSE.equals(b1);
+        boolean newBoolean11 = Boolean.FALSE.equals(b1);
+        boolean newBoolean12 = !Boolean.TRUE.equals(b1);
+
+        boolean newBoolean13 = Boolean.TRUE.equals(b1);
+        boolean newBoolean14 = !Boolean.FALSE.equals(b1);
+        boolean newBoolean15 = Boolean.FALSE.equals(b1);
+        boolean newBoolean16 = !Boolean.TRUE.equals(b1);
     }
 
     private static class SideEffect {
