@@ -55,8 +55,10 @@ public class ReduceIndentationSample {
     public int refactorElse(int i) {
         // Keep this comment
         if (i > 0) {
+            // Keep this comment too
             return 0;
         }
+        // Keep this comment also
         i = i + 1;
 
         return i;
@@ -65,8 +67,10 @@ public class ReduceIndentationSample {
     public int refactorThen(int i) {
         // Keep this comment
         if (!(i > 0)) {
+            // Keep this comment also
             return 0;
         }
+        // Keep this comment too
         i = i + 1;
 
         return i;
@@ -75,25 +79,31 @@ public class ReduceIndentationSample {
     public int refactorIndentation(int i) {
         // Keep this comment
         if (i > 0) {
+            // Keep this comment too
             return 0;
         }
+        // Keep this comment also
         return 1;
     }
 
     public int refactorElseIf(int i) {
         // Keep this comment
         if (i < 0) {
+            // Keep this comment too
             return -1;
         }
         if (i > 0) {
+            // Keep this comment also
             return 1;
         }
+        // Keep this comment again
         return 0;
     }
 
     public int refactorElseIf(int i, List<Integer> integers, boolean isVisible) {
         // Keep this comment
         if (i < 0) {
+            // Keep this comment too
             for (Integer integer : integers) {
                 if (integer < 0) {
                     System.out.println("is negative");
@@ -104,19 +114,23 @@ public class ReduceIndentationSample {
             return 51;
         }
         if (i > 0) {
+            // Keep this comment also
             return 1;
         }
+        // Keep this comment again
         return 0;
     }
 
     public int refactorGreatestIndentation(boolean isActive, boolean isVisible) {
         // Keep this comment
         if (isActive) {
+            // Keep this comment too
             if (isVisible) {
                 return 0;
             }
             return 1;
         }
+        // Keep this comment also
         return 2;
     }
 
@@ -138,8 +152,10 @@ public class ReduceIndentationSample {
 
         // Keep this comment
         if (i > 0) {
+            // Keep this comment too
             return 0;
         }
+        // Keep this comment also
         int j = 123;
         i = i + j;
 
@@ -162,8 +178,10 @@ public class ReduceIndentationSample {
     public int refactorWithThrow(int i) {
         // Keep this comment
         if (i > 0) {
+            // Keep this comment too
             throw new IllegalArgumentException("Positive argument");
         }
+        // Keep this comment also
         i = i + 1;
 
         return i;
@@ -173,8 +191,10 @@ public class ReduceIndentationSample {
         for (Integer integer : integers) {
             // Keep this comment
             if (integer > 0) {
+                // Keep this comment too
                 continue;
             }
+            // Keep this comment also
             System.out.println(integer);
         }
     }
@@ -183,8 +203,10 @@ public class ReduceIndentationSample {
         for (Integer integer : integers) {
             // Keep this comment
             if (integer > 0) {
+                // Keep this comment too
                 break;
             }
+            // Keep this comment also
             System.out.println(integer);
         }
     }
