@@ -143,7 +143,7 @@ public class StandardMethodRatherThanLibraryMethodCleanUp extends NewClassImport
                 copyOfArgs.add(b.copy((Expression) expression));
             }
 
-            r.replace(node, b.invoke(javaUtilObjects, "hash", copyOfArgs.toArray(new Expression[copyOfArgs.size()]))); //$NON-NLS-1$
+            r.replace(node, b.invoke(javaUtilObjects, "hash", copyOfArgs)); //$NON-NLS-1$
             importsToAdd.add(Objects.class.getCanonicalName());
             return false;
         }

@@ -207,7 +207,7 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
                 for (Statement stmtToRemove : oneCaseToRemove) {
                     orderedStatements.add(0, b.copy(stmtToRemove));
                 }
-                r.replace(node, b.block(orderedStatements.toArray(new Statement[oneCaseToRemove.size()])));
+                r.replace(node, b.block(orderedStatements));
             }
         } else {
             // Remove empty cases
@@ -237,7 +237,7 @@ public class CommonCodeInIfElseStatementCleanUp extends AbstractCleanUpRule {
                     orderedStatements.add(0, b.copy(stmtToRemove));
                 }
                 orderedStatements.add(0, b.move(node));
-                r.replace(node, b.block(orderedStatements.toArray(new Statement[oneCaseToRemove.size() + 1])));
+                r.replace(node, b.block(orderedStatements));
             }
         }
     }

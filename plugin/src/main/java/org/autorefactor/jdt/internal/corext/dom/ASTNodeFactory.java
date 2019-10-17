@@ -249,6 +249,18 @@ public class ASTNodeFactory {
     }
 
     /**
+     * Builds a new {@link Block} instance.
+     *
+     * @param statements the statements to add to the block
+     * @return a new Block
+     */
+    public Block block(final Collection<Statement> statements) {
+        final Block block= ast.newBlock();
+        ASTNodes.statements(block).addAll(statements);
+        return block;
+    }
+
+    /**
      * Builds a new {@link BooleanLiteral} instance.
      *
      * @param boolValue the boolean literal value
