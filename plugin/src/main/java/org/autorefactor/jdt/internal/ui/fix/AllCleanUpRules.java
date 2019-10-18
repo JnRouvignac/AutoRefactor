@@ -84,7 +84,9 @@ public final class AllCleanUpRules {
                 new OppositeComparisonRatherThanNegativeExpressionCleanUp(),
                 // TODO JNR implement
                 // new ForeachCleanUp(),
-                new RemoveEmptyIfCleanUp(), new InlineCodeRatherThanPeremptoryConditionCleanUp(),
+                new RemoveEmptyIfCleanUp(),
+                new NoLoopIterationRatherThanEmptyCheckCleanUp(),
+                new InlineCodeRatherThanPeremptoryConditionCleanUp(),
                 new RemoveUselessBlockCleanUp(), new RemoveEmptyStatementCleanUp(),
                 new SingleDeclarationsRatherThanMultiDeclarationCleanUp(), new EndOfMethodRatherThanReturnCleanUp(),
                 new DoWhileRatherThanWhileCleanUp(), new DoWhileRatherThanDuplicateCodeCleanUp(),

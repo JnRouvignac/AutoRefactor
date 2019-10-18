@@ -62,6 +62,7 @@ import static org.eclipse.jdt.core.dom.ASTNode.TYPE_LITERAL;
 import static org.eclipse.jdt.core.dom.ASTNode.TYPE_METHOD_REFERENCE;
 import static org.eclipse.jdt.core.dom.ASTNode.VARIABLE_DECLARATION_EXPRESSION;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -410,6 +411,23 @@ public class ASTNodeFactory {
             return refactorings.createCopyTarget(nodeToCopy);
         }
         return copySubtree(nodeToCopy);
+    }
+
+    /**
+     * Returns a copy of the list of the provided {@link ASTNode}.
+     *
+     * @param <T>         the actual node type
+     * @param nodesToCopy the nodes to copy
+     * @return a copy of the nodes
+     */
+    public <T extends ASTNode> List<T> copy(Collection<T> nodesToCopy) {
+        List<T> copy= new ArrayList<>(nodesToCopy.size());
+
+        for (T astNode : nodesToCopy) {
+            copy.add(copy(astNode));
+        }
+
+        return copy;
     }
 
     private boolean isValidInCurrentAST(ASTNode node) {
