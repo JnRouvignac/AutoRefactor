@@ -359,10 +359,6 @@ public final class ASTNodes {
             if (stmtClass.isAssignableFrom(oneStatement.getClass())) {
                 return (T) oneStatement;
             }
-
-            if (oneStatement instanceof LabeledStatement) {
-                return as(((LabeledStatement) oneStatement).getBody(), stmtClass);
-            }
         }
 
         return null;
