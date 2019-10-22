@@ -76,7 +76,7 @@ public final class AllCleanUpRules {
                 new XORRatherThanDuplicateConditionsCleanUp(), new ORConditionRatherThanRedundantClausesCleanUp(),
                 new TernaryOperatorRatherThanDuplicateConditionsCleanUp(),
                 // Must come after BooleanRefactoring, which may remove some targets
-                new WorkWithNullCheckedExpressionFirstCleanUp(), new InvertEqualsCleanUp(), new ComparisonCleanUp(),
+                new InvertEqualsCleanUp(), new ComparisonCleanUp(),
                 new DoubleCompareRatherThanEqualityCleanUp(), new RemoveUnneededThisExpressionCleanUp(),
                 new AggregateConstructorRatherThanGWTMethodCleanUp(),
                 new StandardMethodRatherThanLibraryMethodCleanUp(), new StringRatherThanNewStringCleanUp(),
