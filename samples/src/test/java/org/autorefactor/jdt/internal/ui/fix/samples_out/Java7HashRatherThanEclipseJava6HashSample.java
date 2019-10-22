@@ -29,8 +29,6 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Observable;
-// No matter org.testng.collections.Objects exists
-import org.testng.collections.*;
 
 public class Java7HashRatherThanEclipseJava6HashSample {
     public class RefactoredClass {
@@ -66,6 +64,18 @@ public class Java7HashRatherThanEclipseJava6HashSample {
             final int prime = 63;
             int result = 1;
             result = prime * result + (innerBoolean ? 1231 : 1237);
+            return result;
+        }
+    }
+
+    public class DoNotRefactorSpecialAssignment {
+        private boolean innerBoolean;
+
+        @Override
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result += prime * result + (innerBoolean ? 1231 : 1237);
             return result;
         }
     }

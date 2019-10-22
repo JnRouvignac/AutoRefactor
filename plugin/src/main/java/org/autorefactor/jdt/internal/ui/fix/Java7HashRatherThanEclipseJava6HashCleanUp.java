@@ -324,7 +324,7 @@ public class Java7HashRatherThanEclipseJava6HashCleanUp extends NewClassImportCl
     private boolean isAssignmentValid(final CollectedData data, final ExpressionStatement statement) {
         final Assignment assignment= ASTNodes.as(statement.getExpression(), Assignment.class);
 
-        if (assignment != null) {
+        if (assignment != null && ASTNodes.hasOperator(assignment, Assignment.Operator.ASSIGN)) {
             final Expression field= assignment.getLeftHandSide();
             final Expression resultComputation= assignment.getRightHandSide();
 
