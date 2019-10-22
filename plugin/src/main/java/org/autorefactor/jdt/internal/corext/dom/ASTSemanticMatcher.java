@@ -25,7 +25,6 @@
  */
 package org.autorefactor.jdt.internal.corext.dom;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -712,26 +711,19 @@ public class ASTSemanticMatcher extends ASTMatcher {
     }
 
     private boolean isOperandsMatching(final InfixExpression ie1, final InfixExpression ie2, final boolean equal) {
-        final List<Expression> operands1= new ArrayList<>();
-        operands1.add(ie1.getLeftOperand());
-        operands1.add(ie1.getRightOperand());
-        operands1.addAll(ie1.extendedOperands());
-
-        final List<Expression> operands2= new ArrayList<>();
-        operands2.add(ie2.getLeftOperand());
-        operands2.add(ie2.getRightOperand());
-        operands2.addAll(ie2.extendedOperands());
+        final List<Expression> operands1= ASTNodes.allOperands(ie1);
+        final List<Expression> operands2= ASTNodes.allOperands(ie2);
 
         if (operands1.size() != operands2.size()) {
             return false;
         }
 
         boolean isMatching= true;
-        final Iterator<Expression> iterator= operands1.iterator();
+        final Iterator<Expression> iterator1= operands1.iterator();
         final Iterator<Expression> iterator2= operands2.iterator();
 
-        while (iterator.hasNext() && iterator2.hasNext()) {
-            final Expression expression= iterator.next();
+        while (iterator1.hasNext() && iterator2.hasNext()) {
+            final Expression expression= iterator1.next();
             final Expression otherExpression= iterator2.next();
 
             if (equal ? !safeSubtreeMatch(expression, otherExpression) : !matchOpposite(expression, otherExpression)) {
