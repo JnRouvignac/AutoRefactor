@@ -135,6 +135,7 @@ public final class AllCleanUpRules {
                 new RemoveSemiColonCleanUp(), new AddBracketsToControlStatementCleanUp(),
                 new RemoveUnnecessaryLocalBeforeReturnCleanUp(), new RedundantModifiersCleanUp(),
                 new RemoveUnnecessaryCastCleanUp(), new PushNegationDownCleanUp(),
+                new LocalVariableRatherThanFieldCleanUp(),
                 new SimpleNameRatherThanQualifiedNameCleanUp(), new SimplifyExpressionCleanUp(),
                 new ReduceIndentationCleanUp());
     }
